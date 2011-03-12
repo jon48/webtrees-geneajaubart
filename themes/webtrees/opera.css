@@ -1,0 +1,7 @@
+/*
+ * @version $Id: opera.css 9087 2010-07-15 23:17:56Z rob $
+ */
+
+#sidebar_pin img, #sidebar_open img {margin-top: 11px!important;}
+.ui-accordion .ui-accordion-header { margin-top: 11px!important; }
+
