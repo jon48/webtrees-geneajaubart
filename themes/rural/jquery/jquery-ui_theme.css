@@ -1,0 +1,198 @@
+/* jquery css THEME adjustments
+ * @package webtrees
+ * @subpackage Themes
+ * @author Jonathan Jaubart ($Author$)
+ * @version p_$Revision$ $Date$
+ * $HeadURL$
+ */
+
+/* Tabs --------------------------------*/
+
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+	font-family: arial,helvetica,sans-serif;
+}
+
+.ui-tabs {font-family: Verdana, Arial, Helvetica, sans-serif; font-size:10px}
+
+.ui-widget-header { background: #e9e2db; border-color: #ddd;}
+.ui-widget-content { background: #f4f0ed;}
+
+.ui-widget-content a { color: #62584D; }
+.ui-widget-content .descriptionbox a { font-weight: bold; }
+
+.ui-tabs-nav .ui-state-default { background: #d3c6b8; color: #62584D; }
+.ui-widget-content .ui-state-active, .ui-widget-content .ui-state-hover { border-color: #ddd;}
+
+.ui-widget-content a:hover 				 { color: #9F8C77; }
+
+.ui-tabs-nav li.ui-tabs-selected 			 { background: #f4f0ed;}
+.ui-tabs-nav li.ui-tabs-selected a	 		 { font-weight:600; color: #62584D; }
+.ui-tabs-nav li.ui-tabs-selected a:hover	 { font-weight:600; color: #62584D; }
+
+
+/* Navigator and Flyout menu Styles */
+
+.nav_content {
+	width: 235px;
+	margin-left: -15px;
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+}
+.flyout {
+	color:#000000; 
+	text-align: left;
+	margin-top: -20px;
+	right: 210px;
+	padding: 3px;
+}
+.flyout2 {
+	color:#000000;
+	text-align: left;
+	margin-top: -2px;
+	left: 40px;
+	padding: 3px;
+}
+.flyout2 a:hover{
+	color:#9f8c77;
+}
+.flyout4 {
+	color:#000000;
+	text-align: left;
+	margin-top: 0px;
+	margin-left: 0px;
+	padding: 3px;
+}
+#flyout3, #flyout3 a, #phusb, #pwife, #shusb, #swife, #spouse {
+	background:none;
+	border:none;
+	text-decoration:none;
+	text-align: left;
+	margin-top: 0px;
+	left: 0px;
+	padding: 0px;
+}
+/* End of Flyout Menu styles*/
+
+
+/* Sidebar --------------------------------*/
+.ui-accordion .ui-accordion-header .ui-icon { position: absolute; left: .5em; top: 50%; margin-top: -8px; }
+.ui-accordion .ui-accordion-content { padding: 1em 2.2em; border-top: 0; margin-top: -2px; position: relative; top: 1px; margin-bottom: 2px; overflow: visible; display: none; }
+.ui-accordion .ui-accordion-content-active { display: block;}
+
+
+#sidebarAccordion .ui-state-default{
+	background-color: #e9e2db;
+	border-color: #d3c6b8;
+}
+
+#sidebarAccordion .ui-state-default a{
+	color: #62584d;
+	font-weight: bold;
+}
+
+
+#sidebarAccordion .ui-state-active{
+	background-color: #D3C6B8;
+	border-color: #9f8c77;
+}
+
+#sidebarAccordion .ui-state-active a {
+	color: #62584d;
+	font-weight: bold;
+}
+
+#sidebar {
+	position: absolute;
+	right: 0px;
+	width: 0px;
+	margin-left:0px;
+	margin-top: 10px;
+	margin-right: 12px;
+	background-color: transparent;
+
+}
+#sidebar_controls {
+	position: absolute;
+	top: 0px;
+	left: -22px;
+	margin: 0;
+	height: 24px; 
+	width: 24px;
+	z-index: 10;
+	border: none;
+	background-color: transparent;
+}
+#sidebar_open {
+	padding: 0;
+}
+#sidebar_open img {
+	position: absolute;
+	padding-top: 1px;
+	padding-bottom: 0px;
+	margin-left: 0px;
+	height: 22px;
+	width: 20px;
+	background: transparent;
+}
+#sidebar_pin {
+	position: absolute;
+	margin-top: 4px;
+	margin-left: 225px;
+	padding-top: 1px;
+	padding-bottom: 0px;
+	background: transparent;
+}
+#sidebar_pin img {
+	padding-right: 4px;
+	padding-left: 4px;
+}
+
+
+.sb_indi_surname_li, .sb_fam_surname_li {
+	list-style-image: url('images/plus.gif');
+	white-space: nowrap;
+}
+.sb_desc_indi_li {
+	list-style-type: none;
+	white-space: nowrap;
+}
+.desc_tree_div {
+	display: none;
+}
+.desc_tree_div ul {
+	padding: 0px;
+	margin-left: 10px;
+	margin-top: 0px;
+	margin-right: 0px;
+}
+
+#sb_desc_content ul {
+	padding: 0px;
+	margin: 0px;
+}
+.name_tree_div {
+	display: none;
+}
+.name_tree_div li,  .name_tree_div_visible li {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+	white-space: nowrap;
+}
+
+.name_tree_div ul, .name_tree_div_visible ul {
+	padding: 0px;
+	margin: 0px;
+}
+
+#sb_clippings_content li {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+	white-space: nowrap;
+}
+#sb_clippings_content ul {
+	padding: 0px;
+	margin: 0px;
+}
