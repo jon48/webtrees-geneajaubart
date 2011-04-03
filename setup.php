@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package webtrees
- * @version $Id: setup.php 10979 2011-02-26 10:11:16Z greg $
+ * @version $Id: setup.php 11143 2011-03-17 18:33:44Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'setup.php');
@@ -847,7 +847,8 @@ try {
 		" n_soundex_surn_dm  VARCHAR(255)     NULL,".
 		" PRIMARY KEY (n_id, n_file, n_num),".
 		"         KEY ix1 (n_full, n_id, n_file),".
-		"         KEY ix2 (n_file, n_surn)".
+		"         KEY ix2 (n_surn, n_file, n_type, n_id),".
+		"         KEY ix3 (n_givn, n_file, n_type, n_id)".
 		") COLLATE utf8_unicode_ci ENGINE=InnoDB"
 	);
 	$dbh->exec(
@@ -962,7 +963,7 @@ try {
 	);
 	$dbh->exec(
 		"INSERT IGNORE INTO `{$TBLPREFIX}site_setting` (setting_name, setting_value) VALUES ".
-		"('WT_SCHEMA_VERSION',               '9'),".
+		"('WT_SCHEMA_VERSION',               '10'),".
 		"('INDEX_DIRECTORY',                 'data/'),".
 		"('STORE_MESSAGES',                  '1'),".
 		"('USE_REGISTRATION_MODULE',         '1'),".
@@ -1000,6 +1001,7 @@ try {
 		'</form>',
 		'<p>', WT_I18N::translate('After you have copied this file to the webserver and set the access permissions, click here to continue'), '</p>',
 		'<form name="contform" action="', WT_SCRIPT_NAME, '" method="get" onsubmit="alert(\'', /* I18N: %s is a filename */ WT_I18N::translate('Reminder: you must copy %s to your webserver', WT_CONFIG_FILE), '\');return true;">',
+		'<input type="hidden" name="lang" value="', WT_LOCALE, '">',
 		'<input type="submit" name="contbtn" value="'.WT_I18N::translate('Continue').'" disabled>',
 		'</form></body></html>';
 	exit;

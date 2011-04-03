@@ -24,7 +24,7 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
-* @version $Id: functions_privacy.php 10239 2011-01-01 22:32:55Z greg $
+* @version $Id: functions_privacy.php 11175 2011-03-23 18:31:18Z greg $
 * @package webtrees
 * @subpackage Privacy
 */
@@ -452,7 +452,9 @@ function privatize_gedcom($gedrec) {
 					// Show all the NAME tags, including subtags
 					if (preg_match_all('/\n1 (NAME|_HNM).*(\n[2-9].*)*/', $gedrec, $matches, PREG_SET_ORDER)) {
 						foreach ($matches as $match) {
-							$newrec.=$match[0];
+							if (canDisplayFact($gid, $gedcom_id, $match[0])) {
+								$newrec.=$match[0];
+							}
 						}
 					}
 				} else {

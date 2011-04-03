@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: db_schema_8_9.php 10873 2011-02-18 22:37:23Z greg $
+// @version $Id: db_schema_8_9.php 11079 2011-03-07 21:48:01Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -37,7 +37,7 @@ define('WT_DB_SCHEMA_8_9', '');
 
 try {
 	self::exec(
-		"ALTER TABLE `###dates` CHANGE d_type d_type ENUM('@#DGREGORIAN@', '@#DJULIAN@', '@#DHEBREW@', '@#DFRENCH R@', '@#DHIJRI@', '@#DROMAN@', '@#DJALALI@')"
+		"ALTER TABLE `##dates` CHANGE d_type d_type ENUM('@#DGREGORIAN@', '@#DJULIAN@', '@#DHEBREW@', '@#DFRENCH R@', '@#DHIJRI@', '@#DROMAN@', '@#DJALALI@')"
 	);
 } catch (PDOException $ex) {
 	// Already been run?

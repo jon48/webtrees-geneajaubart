@@ -26,7 +26,7 @@
  *
  * @package webtrees
  * @subpackage GEDFact_assistant
- * @version $Id: census_2_source_input.php 10696 2011-02-04 21:27:30Z lukasz $
+ * @version $Id: census_2_source_input.php 11107 2011-03-12 20:34:20Z greg $
  * @author Brian Holland
  */
 if (!defined('WT_WEBTREES')) {
@@ -1029,7 +1029,7 @@ global $TEXT_DIRECTION;
 			</script>
 		</div>
 		<div class="cens_sour_1">
-			<div class="cens_sour_2"><?php echo translate_fact('PAGE'); ?></div>
+			<div class="cens_sour_2"><?php echo WT_Gedcom_Tag::getLabel('PAGE'); ?></div>
 			<input id="citation" name="citation" type="text" value="<?php echo ""; ?>" />
 		</div>
 		<div class="cens_sour_1">

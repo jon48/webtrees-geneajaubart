@@ -21,14 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 10927 2011-02-21 18:32:00Z greg $
+// @version $Id: module.php 11202 2011-03-26 13:06:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 class upcoming_events_WT_Module extends WT_Module implements WT_Module_Block {
 	// Extend class WT_Module
@@ -44,6 +42,8 @@ class upcoming_events_WT_Module extends WT_Module implements WT_Module_Block {
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
 		global $ctype, $WT_IMAGES;
+
+		require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 		$days     =get_block_setting($block_id, 'days',      7);
 		$filter   =get_block_setting($block_id, 'filter',    true);

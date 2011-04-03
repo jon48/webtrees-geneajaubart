@@ -1,7 +1,7 @@
 /* clsource_music.js - Author Brian Holland .... email webman@windmillway.f2s.com	-  (modified from Clsource.js - Author Pyro ... email pyrex@chello.hu)
  * @package webtrees
  * @subpackage Module
- * @version $Id: clsource_music.js 10618 2011-01-27 18:42:22Z lukasz $
+ * @version $Id: clsource_music.js 11247 2011-03-31 14:42:49Z brian $
  * @author Brian Holland
 */
 
@@ -103,7 +103,7 @@ var CB_Close_Win		= CB_Close_Win;
 		if (CB_ClearBox == "be") {
 
 			// Previous or Move Left  - "Keys P, or left arrow, or 4"
-			if (c == "%" || c == "p" || b == 80 || b == 37 || b == 52) {
+			if (c == "%" || c == "p" || c == "l" || b == 80 || b == 37 || b == 52) {
 				if (CB_Zoom == "true" ) {
 					moveLeft();
 					return false;
@@ -118,7 +118,7 @@ var CB_Close_Win		= CB_Close_Win;
 			}
 
 			// Next or Move Right  - "Keys N, or right arrow, or 6"
-			if (c == "'" || c == "n" || b == 78 || b == 39 || b == 54) {
+			if (c == "'" || c == "n" || c == "r" || b == 78 || b == 39 || b == 54) {
 				if (CB_Zoom == "true") {
 					moveRight();
 					return false;

@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_placecheck.php 10947 2011-02-24 07:40:03Z larry $
+// $Id: admin_placecheck.php 11107 2011-03-12 20:34:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -231,7 +231,7 @@ case 'go':
 	echo "</tr><tr>";
 	$cols=0;
 	while ($cols<$max) {
-		echo "<th>", translate_fact('PLAC'), "</th><th>", WT_I18N::translate('Latitude'), "</th><th>", WT_I18N::translate('Longitude'), "</th></td>";
+		echo "<th>", WT_Gedcom_Tag::getLabel('PLAC'), "</th><th>", WT_I18N::translate('Latitude'), "</th><th>", WT_I18N::translate('Longitude'), "</th></td>";
 		$cols++;
 	}
 	echo "</tr>";

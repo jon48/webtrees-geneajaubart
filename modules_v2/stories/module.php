@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 10990 2011-02-27 20:45:32Z lukasz $
+// $Id: module.php 11260 2011-04-02 16:40:34Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -56,7 +56,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			$this->show_list();
 			break;
 		default:
-			die("Internal error - unknown action: $mod_action");
+			header('HTTP/1.0 404 Not Found');
 		}
 	}
 
@@ -299,7 +299,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 	private function config() {
 		global $WT_IMAGES, $TEXT_DIRECTION;
 
-		if (WT_USER_CAN_EDIT) {
+		if (WT_USER_GEDCOM_ADMIN) {
 			print_header($this->getTitle());
 
 			$stories=WT_DB::prepare(
@@ -316,10 +316,12 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			echo help_link('add_story', $this->getName());
 			echo '</td></tr>';
 			if (count($stories)>0) {
-				echo '<tr><td class="list_label center width50">', WT_I18N::translate('Story title'), help_link('story_title', $this->getName());
-				echo '</td><td class="list_label center width30">', WT_I18N::translate('Person');
-				echo '</td><td class="list_label center width10">', WT_I18N::translate('Edit story'), help_link('edit_story', $this->getName());
-				echo '</td><td class="list_label center width10">', WT_I18N::translate('Delete'), help_link('delete_story', $this->getName()), '</tr>';
+				echo '<tr>
+					<th class="list_label center width50">', WT_I18N::translate('Story title'), help_link('story_title', $this->getName()), '</th>
+					<th class="list_label center width30">', WT_I18N::translate('Person'), '</th>
+					<th class="list_label center width10">', WT_I18N::translate('Edit story'), help_link('edit_story', $this->getName()), '</th>
+					<th class="list_label center width10">', WT_I18N::translate('Delete'), help_link('delete_story', $this->getName()), '</th>
+					</tr>';
 			}
 			foreach ($stories as $story) {
 				$indi=WT_Person::getInstance($story->xref);
@@ -328,12 +330,12 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				} else {
 					$name=$story->xref;
 				}
-				echo '<tr><td class="optionbox center">';
-				echo get_block_setting($story->block_id, 'title');
-				echo '<td class="list_value_wrap">', $name, '</td>';
-				echo '<td class="optionbox center"><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_edit&amp;block_id=', $story->block_id, '">', WT_I18N::translate('Edit'), '</a></td>';
-				echo '<td class="optionbox center"><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_delete&amp;block_id=', $story->block_id, '" onclick="return confirm(\'', WT_I18N::translate('Are you sure you want to delete this story?'), '\');">', WT_I18N::translate('Delete'), '</a>';
-				echo '</td></tr>';
+				echo '<tr>
+					<td class="optionbox">',get_block_setting($story->block_id, 'title'), '</td>
+					<td class="list_value_wrap">', $name, '</td>
+					<td class="optionbox"><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_edit&amp;block_id=', $story->block_id, '">', WT_I18N::translate('Edit'), '</a></td>
+					<td class="optionbox"><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_delete&amp;block_id=', $story->block_id, '" onclick="return confirm(\'', WT_I18N::translate('Are you sure you want to delete this story?'), '\');">', WT_I18N::translate('Delete'), '</a></td>
+					</tr>';
 			}
 			echo '</table>';
 			print_footer();
@@ -359,8 +361,10 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 
 			echo '<table class="list_table width90">';
 			if (count($stories)>0) {
-				echo '<tr><td class="list_label">', WT_I18N::translate('Story title');
-				echo '</td><td class="list_label">', WT_I18N::translate('Person');
+				echo '<tr>
+					<th class="list_label">', WT_I18N::translate('Story title'), '</th>
+					<th class="list_label">', WT_I18N::translate('Person'), '</th>
+					</tr>';
 			}
 			foreach ($stories as $story) {
 				$indi=WT_Person::getInstance($story->xref);
@@ -370,10 +374,10 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 					$name=$story->xref;
 				}
 				if ($indi->canDisplayDetails()) {
-					echo '<tr><td class="list_value">';
-					echo get_block_setting($story->block_id, 'title');
-					echo '<td class="list_value_wrap">', $name, '</td>';
-					echo '</td></tr>';
+					echo '<tr>
+						<td class="list_value">', get_block_setting($story->block_id, 'title'), '</td>
+						<td class="list_value_wrap">', $name, '</td>
+						</tr>';
 				}
 			}
 			echo '</table>';

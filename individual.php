@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: individual.php 10990 2011-02-27 20:45:32Z lukasz $
+// $Id: individual.php 11209 2011-03-26 18:57:40Z veit $
 
 define('WT_SCRIPT_NAME', 'individual.php');
 require './includes/session.php';
@@ -103,8 +103,7 @@ jQuery(document).ready(function() {
 		if (strlen($controller->indi->getAddName()) > 0) echo "<span class=\"name_head\">", PrintReady($controller->indi->getAddName()), "</span><br />";
 	?>
 	<div id="indi_header">
-		<h1>
-			<?php
+		<h1><?php
 				if ($TEXT_DIRECTION=="rtl") echo "&nbsp;"; {
 					echo PrintReady($controller->indi->getFullName());
 				}
@@ -116,10 +115,9 @@ jQuery(document).ready(function() {
 						echo printReady("<a href=\"admin_users.php?action=edituser&amp;username={$user_name}\">({$user_name})</a>");
 					}
 				}
-			?>
-		</h1>
+			?></h1>
 			<div id="indi_mainimage">
-				<?php if ($controller->canShowHighlightedObject()) {
+				<?php if ($MULTI_MEDIA && $controller->canShowHighlightedObject()) {
 					echo $controller->getHighlightedObject();
 				} ?>
 			</div>

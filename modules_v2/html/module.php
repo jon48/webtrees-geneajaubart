@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 10972 2011-02-25 19:25:19Z greg $
+// @version $Id: module.php 11107 2011-03-12 20:34:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -272,7 +272,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		$html=get_block_setting($block_id, 'html');
 		// title
 		echo '<tr><td class="descriptionbox wrap width33">',
-			translate_fact('TITL'),
+			WT_Gedcom_Tag::getLabel('TITL'),
 			'</td><td class="optionbox"><input type="text" name="title" size="30" value="', htmlspecialchars($title), '" /></td></tr>';
 
 		// templates

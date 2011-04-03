@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: admin_editconfig.php 11012 2011-03-02 13:15:54Z brian $
+// @version $Id: admin_editconfig.php 11163 2011-03-21 13:13:49Z brian $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -287,7 +287,7 @@ echo '<div id="tabs">',
 			<?php } ?>
 			</select>
 			<?php echo WT_I18N::translate('maximum'); ?>: <select name="NEW_GM_MAX_ZOOM">
-			<?php for ($j=1; $j < 15; $j++) { ?>
+			<?php for ($j=1; $j < 17; $j++) { ?>
 			<option value="<?php echo $j, "\""; if ($GOOGLEMAP_MAX_ZOOM==$j) echo " selected=\"selected\""; echo ">", $j; ?></option>
 			<?php } ?>
 			</select>

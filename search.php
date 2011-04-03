@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search.php 10912 2011-02-20 21:44:59Z greg $
+// $Id: search.php 11250 2011-04-01 13:48:42Z greg $
 
 define('WT_SCRIPT_NAME', 'search.php');
 require './includes/session.php';
@@ -109,7 +109,7 @@ if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 <!-- /**************************************************** General Search Form *************************************************************/ -->
 			<?php if ($controller->action == "general") { ?>
 				<td colspan="3" class="facts_label03" style="text-align:center;">
-					<?php echo WT_I18N::translate('General Search'), help_link('search_enter_terms'); ?>
+					<?php echo WT_I18N::translate('General Search'); ?>
 				</td>
 	</tr>
 	<!-- // search terms -->
@@ -204,7 +204,7 @@ if ($controller->action == "replace")
 	if (WT_USER_CAN_EDIT) {
 ?>
 				<td colspan="3" class="facts_label03" style="text-align: center;">
-					<?php echo WT_I18N::translate('Search and replace'), help_link('search_replace'); ?>
+					<?php echo WT_I18N::translate('Search and replace'); ?>
 				</td>
 	</tr>
 	<!-- // search terms -->
@@ -350,9 +350,16 @@ if ($controller->action == "general" || $controller->action == "soundex") {
 		<td class="list_label" style="padding: 5px;">
 			<?php echo WT_I18N::translate('Family trees'); ?>
 		</td>
-		<td class="list_value" style="padding: 5px;" colspan="2">
+		<td class="list_value"colspan="2">
 			<?php
-
+		if (count($all_gedcoms)>3) {
+			echo '<div style="border-bottom:1px solid;"><input type="button" value="', WT_I18N::translate('select all'), '" onclick="jQuery(\'#trees :checkbox\').each(function(){jQuery(this).attr(\'checked\', true);});return false;"/>';
+			echo ' <input type="button" value="', WT_I18N::translate('select none'), '" onclick="jQuery(\'#trees :checkbox\').each(function(){jQuery(this).attr(\'checked\', false);});return false;"/>';
+			if (count($all_gedcoms)>10) {
+			 	echo ' <input type="button" value="', WT_I18N::translate('invert selection'), '" onclick="jQuery(\'#trees :checkbox\').each(function(){jQuery(this).attr(\'checked\', !jQuery(this).attr(\'checked\'));});return false;"/>';
+			}
+		}
+		echo '</div><div id="trees" style="max-height:300px; overflow-x:auto;">';
 		//-- sorting menu by gedcom filename
 		asort($all_gedcoms);
 		foreach ($all_gedcoms as $ged_id=>$gedcom) {
@@ -364,14 +371,7 @@ if ($controller->action == "general" || $controller->action == "soundex") {
 			}
 			echo 'value="yes" id="checkbox_', $ged_id , '" name="', $str, '" />', get_gedcom_setting($ged_id, 'title'), '<br />';
 		}
-		if (count($all_gedcoms)>3) {
-			echo '<br/><input type="button" value="', WT_I18N::translate('select all'), '" onclick="jQuery(this).parent().children(\':checkbox\').each(function(){jQuery(this).attr(\'checked\', true);});return false;"/>';
-			echo ' <input type="button" value="', WT_I18N::translate('select none'), '" onclick="jQuery(this).parent().children(\':checkbox\').each(function(){jQuery(this).attr(\'checked\', false);});return false;"/>';
-			if (count($all_gedcoms)>10) {
-			 	echo ' <input type="button" value="', WT_I18N::translate('invert selection'), '" onclick="jQuery(this).parent().children(\':checkbox\').each(function(){jQuery(this).attr(\'checked\', !jQuery(this).attr(\'checked\'));});return false;"/>';
-			}
-		}
-		echo '</td>';
+		echo '</div></td>';
 ?>
 	</tr>
 	<?php

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 10990 2011-02-27 20:45:32Z lukasz $
+// @version $Id: module.php 11247 2011-03-31 14:42:49Z brian $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,6 +29,7 @@ if (!defined('WT_WEBTREES')) {
 }
 
 require_once WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
+require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 class lightbox_WT_Module extends WT_Module implements WT_Module_Config, WT_Module_Tab {
 	// Extend WT_Module
@@ -49,6 +50,8 @@ class lightbox_WT_Module extends WT_Module implements WT_Module_Config, WT_Modul
 			// TODO: these files should be methods in this class
 			require WT_ROOT.WT_MODULES_DIR.$this->getName().'/'.$mod_action.'.php';
 			break;
+		default:
+			header('HTTP/1.0 404 Not Found');
 		}
 	}
 

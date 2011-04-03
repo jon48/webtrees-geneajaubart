@@ -21,7 +21,7 @@
  *
  * @package webtrees
  * @subpackage Admin
- * @version $Id: admin.php 11050 2011-03-05 13:23:10Z greg $
+ * @version $Id: admin.php 11135 2011-03-16 19:24:39Z nigel $
  */
 
 define('WT_SCRIPT_NAME', 'admin.php');
@@ -230,7 +230,7 @@ foreach ($all_gedcoms as $ged_id=>$gedcom) {
 		'<tr><th><a href="famlist.php?ged=',   rawurlencode($gedcom), '">',
 		WT_I18N::translate('Families'), '</a></th><td>', $stats->totalFamilies(),
 		'</td></tr>',
-		'<tr><th><a href="sourlist.php?ged=',  rawurlencode($gedcom), '">',
+		'<tr><th><a href="sourcelist.php?ged=',  rawurlencode($gedcom), '">',
 		WT_I18N::translate('Sources'), '</a></th><td>', $stats->totalSources(),
 		'</td></tr>',
 		'<tr><th><a href="repolist.php?ged=',  rawurlencode($gedcom), '">',

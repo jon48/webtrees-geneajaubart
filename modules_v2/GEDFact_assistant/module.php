@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 10869 2011-02-18 16:00:33Z greg $
+// @version $Id: module.php 11111 2011-03-13 12:20:38Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -50,6 +50,8 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 			// TODO: this file should be a method in this class
 			require WT_ROOT.WT_MODULES_DIR.$this->getName().'/'.$mod_action.'.php';
 			break;
+		default:
+			header('HTTP/1.0 404 Not Found');
 		}
 	}
 }

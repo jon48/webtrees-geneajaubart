@@ -23,10 +23,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: mediaviewer.php 10869 2011-02-18 16:00:33Z greg $
+// $Id: mediaviewer.php 11206 2011-03-26 16:09:43Z greg $
 
 define('WT_SCRIPT_NAME', 'mediaviewer.php');
 require './includes/session.php';
+require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 $nonfacts=array();
 

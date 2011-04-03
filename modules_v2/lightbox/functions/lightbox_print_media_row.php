@@ -26,7 +26,7 @@
  *
  * @package webtrees
  * @subpackage Module
- * @version $Id: lightbox_print_media_row.php 10869 2011-02-18 16:00:33Z greg $
+ * @version $Id: lightbox_print_media_row.php 11216 2011-03-27 08:43:44Z greg $
  * @author Brian Holland
  */
 
@@ -256,10 +256,31 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 				$menu->addSubMenu($submenu);
 				if (WT_USER_IS_ADMIN) {
 					// Manage Links
-					$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Manage links') . "&nbsp;&nbsp;", "#", "right");
-					$submenu->addOnclick("return window.open('inverselink.php?mediaid={$rowm['m_media']}&amp;linkto=manage', '_blank', 'top=50,left=50,width=570,height=650,resizable=1,scrollbars=1');");
-					$submenu->addClass($submenu_class, $submenu_hoverclass);
-					$menu->addSubMenu($submenu);
+					if (array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
+						$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Manage links') . "&nbsp;&nbsp;", "#", "right");
+						$submenu->addOnclick("return window.open('inverselink.php?mediaid={$rowm['m_media']}&amp;linkto=manage', '_blank', 'top=50,left=50,width=570,height=650,resizable=1,scrollbars=1');");
+						$submenu->addClass($submenu_class, $submenu_hoverclass);
+						$menu->addSubMenu($submenu);
+					} else {
+						$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Set link') . "&nbsp;&nbsp;", "#", "right", "right");
+
+						$ssubmenu = new WT_Menu(WT_I18N::translate('To Person'));
+						$ssubmenu->addOnclick("return window.open('inverselink.php?mediaid={$rowm['m_media']}&amp;linkto=person', '_blank', 'top=50,left=50,width=570,height=650,resizable=1,scrollbars=1');");
+						$ssubmenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+						$submenu->addSubMenu($ssubmenu);
+
+						$ssubmenu = new WT_Menu(WT_I18N::translate('To Family'));
+						$ssubmenu->addOnclick("return window.open('inverselink.php?mediaid={$rowm['m_media']}&amp;linkto=family', '_blank', 'top=50,left=50,width=570,height=650,resizable=1,scrollbars=1');");
+						$ssubmenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+						$submenu->addSubMenu($ssubmenu);
+
+						$ssubmenu = new WT_Menu(WT_I18N::translate('To Source'));
+						$ssubmenu->addOnclick("return window.open('inverselink.php?mediaid={$rowm['m_media']}&amp;linkto=source', '_blank', 'top=50,left=50,width=570,height=650,resizable=1,scrollbars=1');");
+						$ssubmenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+						$submenu->addSubMenu($ssubmenu);
+
+						$menu->addSubMenu($submenu);
+					}
 					// Unlink Media
 					$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Unlink Media') . "&nbsp;&nbsp;", "#", "right");
 					$submenu->addOnclick("return delete_record('$pid', 'OBJE', '".$rowm['m_media']."');");

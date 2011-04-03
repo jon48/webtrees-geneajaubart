@@ -21,7 +21,7 @@
  *
  * @package webtrees
  * @subpackage Admin
- * @version $Id: admin_site_config.php 10897 2011-02-19 22:24:44Z greg $
+ * @version $Id: admin_site_config.php 11186 2011-03-25 13:04:30Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'admin_site_config.php');
@@ -36,9 +36,6 @@ if (!WT_USER_IS_ADMIN) {
 }
 
 print_header(WT_I18N::translate('Site configuration'));
-
-// "Help for this page" link
-echo '<div id="page_help">', help_link('help_editconfig.php'), '</div>';
 
 echo WT_JS_START;
 ?>

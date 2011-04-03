@@ -43,7 +43,6 @@ echo
 	'<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />',
 	'<link rel="stylesheet" href="', $stylesheet, '" type="text/css" media="all" />';
 
-
 if (isset($_GET["mod_action"]) && $_GET["mod_action"]=="places_edit") {
 	echo '<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />';
 }

@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11032 2011-03-04 07:55:43Z greg $
+// @version $Id: module.php 11208 2011-03-26 18:02:15Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -44,6 +44,8 @@ class recent_changes_WT_Module extends WT_Module implements WT_Module_Block {
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
 		global $ctype, $WT_IMAGES;
+
+		require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 		$days = get_block_setting($block_id, 'days', 7);
 		$infoStyle = get_block_setting($block_id, 'infoStyle', 'table');
@@ -146,7 +148,7 @@ class recent_changes_WT_Module extends WT_Module implements WT_Module_Block {
 
 		$infoStyle = get_block_setting($block_id, 'infoStyle', 'table');
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo WT_I18N::translate('Presentation style'); //, help_link('style');
+		echo WT_I18N::translate('Presentation style');
 		echo '</td><td class="optionbox">';
 		echo select_edit_control('infoStyle', array('list' => WT_I18N::translate('list'), 'table' => WT_I18N::translate('table')), null, $infoStyle, '');
 		echo '</td></tr>';

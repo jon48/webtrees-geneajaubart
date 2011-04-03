@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id:$
+// $Id: Tag.php 11090 2011-03-08 20:51:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -649,7 +649,7 @@ class WT_Gedcom_Tag {
 		case '_CREM_GPA2':
 			switch ($sex) {
 			case 'M': return WT_I18N::translate('Cremation of a maternal grandfather');
-			case 'F': return WT_I18N::translate('Cremation of a paternal grandmother');
+			case 'F': return WT_I18N::translate('Cremation of a maternal grandmother');
 			default:  return WT_I18N::translate('Cremation of a grand-parent');
 			}
 		case '_CREM_HSIB':

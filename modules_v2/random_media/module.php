@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11029 2011-03-03 23:32:42Z greg $
+// $Id: module.php 11107 2011-03-12 20:34:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -410,7 +410,7 @@ function openPic(filename, width, height) {
 ?>
 	</td>
 		<td class="optionbox">
-			<center><b><?php echo translate_fact('FORM'); ?></b></center>
+			<center><b><?php echo WT_Gedcom_Tag::getLabel('FORM'); ?></b></center>
 			<table class="width100">
 				<tr>
 			<td class="width33"><input type="checkbox" value="yes"
@@ -457,7 +457,7 @@ function openPic(filename, width, height) {
 				</tr>
 			</table>
 			<br />
-			<center><b><?php echo translate_fact('TYPE'); ?></b></center>
+			<center><b><?php echo WT_Gedcom_Tag::getLabel('TYPE'); ?></b></center>
 			<table class="width100">
 				<tr>
 				<?php

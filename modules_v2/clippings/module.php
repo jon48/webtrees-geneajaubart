@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 10990 2011-02-27 20:45:32Z lukasz $
+// @version $Id: module.php 11211 2011-03-26 20:39:32Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -50,9 +50,12 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 	public function modAction($mod_action) {
 		switch($mod_action) {
 		case 'index':
+			require_once WT_ROOT.'includes/functions/functions_export.php';
 			// TODO: these files should be methods in this class
 			require WT_ROOT.WT_MODULES_DIR.$this->getName().'/'.$mod_action.'.php';
 			break;
+		default:
+			header('HTTP/1.0 404 Not Found');
 		}
 	}
 
@@ -66,7 +69,7 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 		global $SEARCH_SPIDER, $controller;
 
 		if ($SEARCH_SPIDER) {
-			return new WT_Menu('', '', '');
+			return null;
 		}
 		//-- main clippings menu item
 		$menu = new WT_Menu($this->getTitle(), 'module.php?mod=clippings&amp;mod_action=index&amp;ged='.WT_GEDURL, 'down');

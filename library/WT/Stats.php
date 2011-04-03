@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Stats.php 11029 2011-03-03 23:32:42Z greg $
+// @version $Id: Stats.php 11221 2011-03-27 19:53:00Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -283,7 +283,7 @@ class WT_Stats {
 
 	function gedcomUpdated() {
 		$row=
-			WT_DB::prepare("SELECT d_year, d_month, d_day FROM `##dates` WHERE d_file=? AND d_fact=? ORDER BY d_julianday1 DESC, d_type LIMIT 1")
+			WT_DB::prepare("SELECT d_year, d_month, d_day FROM `##dates` WHERE d_julianday1 = ( SELECT max( d_julianday1 ) FROM `##dates` WHERE d_file =? AND d_fact=? ) LIMIT 1")
 			->execute(array($this->_ged_id, 'CHAN'))
 			->fetchOneRow();
 		if ($row) {
@@ -1072,9 +1072,9 @@ class WT_Stats {
 
 		// Get the country names for each language
 		$country_to_iso3166=array();
-		$countries=self::get_all_countries();
 		foreach (WT_I18N::installed_languages() as $code=>$lang) {
 			WT_I18N::init($code);
+			$countries=self::get_all_countries();
 			foreach (self::iso3166() as $three=>$two) {
 				$country_to_iso3166[$three]=$two;
 				$country_to_iso3166[$countries[$three]]=$two;
@@ -1199,9 +1199,9 @@ class WT_Stats {
 		$i = 1;
 		// Get the country names for each language
 		$country_names=array();
-		$all_countries = self::get_all_countries();
 		foreach (WT_I18N::installed_languages() as $code=>$lang) {
 			WT_I18N::init($code);
+			$all_countries = self::get_all_countries();
 			foreach ($all_countries as $country_code=>$country_name) {
 				$country_names[$country_name]=$country_code;
 			}
@@ -1915,7 +1915,7 @@ class WT_Stats {
 				if (isset($eventTypes[$row['fact']])) {
 					$result=$eventTypes[$row['fact']];
 				} else {
-					$result=translate_fact($row['fact']);
+					$result=WT_Gedcom_Tag::getLabel($row['fact']);
 				}
 				break;
 			case 'name':
@@ -2958,6 +2958,121 @@ class WT_Stats {
 		}
 		return $top10;
 	}
+	
+	function _monthFirstChildQuery($simple=true, $sex=false, $year1=-1, $year2=-1, $params=null) {
+		global $WT_STATS_S_CHART_X, $WT_STATS_S_CHART_Y, $WT_STATS_CHART_COLOR1, $WT_STATS_CHART_COLOR2;
+		if ($params === null) {$params = array();}
+		if (isset($params[0])) {$total = $params[0];} else {$total = 10;}
+		if (isset($params[1])) {$one = $params[1];} else {$one = false;} // each family only once if true
+		$total=(int)$total;
+		if ($year1>=0 && $year2>=0) {
+			$sql_years = " AND (d_year BETWEEN '{$year1}' AND '{$year2}')";
+		} else {
+			$sql_years = '';
+		}
+		if ($sex) {
+			$sql_sex1 = ', i_sex';
+			$sql_sex2 = " JOIN `##individuals` AS child ON child1.d_file = i_file AND child1.d_gid = child.i_id ";
+		} else {
+			$sql_sex1 = '';
+			$sql_sex2 = '';
+		}
+		$sql = "SELECT d_month{$sql_sex1}, COUNT(*) AS total"
+			.' FROM ('
+				." SELECT family{$sql_sex1}, MIN(date) AS d_date, d_month"
+					.' FROM ('
+						.' SELECT'
+							.' link1.l_from AS family,'
+							.' link1.l_to AS child,'
+							.' child1.d_julianday2 as date,'
+							.' child1.d_month as d_month'
+							.$sql_sex1
+						.' FROM'
+							." `##link` AS link1"
+						.' LEFT JOIN'
+							." `##dates` AS child1 ON child1.d_file = {$this->_ged_id}"
+						.$sql_sex2
+						.' WHERE'
+							." link1.l_file = {$this->_ged_id} AND"
+							." link1.l_type = 'CHIL' AND"
+							.' child1.d_gid = link1.l_to AND'
+							." child1.d_fact = 'BIRT' AND"
+							." d_type='@#DGREGORIAN@' AND"
+							.' child1.d_month <> ""'
+							.$sql_years
+						.' ORDER BY'
+							.' date'
+					.') AS children'
+				.' GROUP BY'
+					.' family'
+			.') AS first_child'
+			.' GROUP BY'
+				.' d_month'
+		;
+		if ($sex) $sql .= ', i_sex';
+		$rows=self::_runSQL($sql);
+		if ($simple) {
+			if (isset($params[0]) && $params[0] != '') {$size = strtolower($params[0]);} else {$size = $WT_STATS_S_CHART_X.'x'.$WT_STATS_S_CHART_Y;}
+			if (isset($params[1]) && $params[1] != '') {$color_from = strtolower($params[1]);} else {$color_from = $WT_STATS_CHART_COLOR1;}
+			if (isset($params[2]) && $params[2] != '') {$color_to = strtolower($params[2]);} else {$color_to = $WT_STATS_CHART_COLOR2;}
+			$sizes = explode('x', $size);
+			$tot = 0;
+			foreach ($rows as $values) {
+				$tot += $values['total'];
+			}
+			// Beware divide by zero
+			if ($tot==0) return '';
+			$text = '';
+			foreach ($rows as $values) {
+				$counts[] = round(100 * $values['total'] / $tot, 0);
+				switch ($values['d_month']) {
+				default:
+				case 'JAN':
+					$values['d_month'] = 1;
+					break;
+				case 'FEB':
+					$values['d_month'] = 2;
+					break;
+				case 'MAR':
+					$values['d_month'] = 3;
+					break;
+				case 'APR':
+					$values['d_month'] = 4;
+					break;
+				case 'MAY':
+					$values['d_month'] = 5;
+					break;
+				case 'JUN':
+					$values['d_month'] = 6;
+					break;
+				case 'JUL':
+					$values['d_month'] = 7;
+					break;
+				case 'AUG':
+					$values['d_month'] = 8;
+					break;
+				case 'SEP':
+					$values['d_month'] = 9;
+					break;
+				case 'OCT':
+					$values['d_month'] = 10;
+					break;
+				case 'NOV':
+					$values['d_month'] = 11;
+					break;
+				case 'DEC':
+					$values['d_month'] = 12;
+					break;
+				}
+				$text .= WT_I18N::translate(ucfirst(strtolower(($values['d_month'])))).' - '.$values['total'].'|';
+			}
+			$chd = self::_array_to_extended_encoding($counts);
+			$chl = substr($text,0,-1);
+			return '<img src="http://chart.apis.google.com/chart?cht=p3&amp;chd=e:'.$chd.'&amp;chs='.$size.'&amp;chco='.$color_from.','.$color_to.'&amp;chf=bg,s,ffffff00&amp;chl='.$chl.'" width="'.$sizes[0].'" height="'.$sizes[1].'" alt="'.WT_I18N::translate('Month of birth of first child in a relation').'" title="'.WT_I18N::translate('Month of birth of first child in a relation').'" />';
+		}
+		if (!isset($rows)) return 0;
+		return $rows;
+	}
 
 	function largestFamily() {return $this->_familyQuery('full');}
 	function largestFamilySize() {return $this->_familyQuery('size');}
@@ -2969,7 +3084,7 @@ class WT_Stats {
 	function chartLargestFamilies($params=null) {
 		global $WT_STATS_CHART_COLOR1, $WT_STATS_CHART_COLOR2, $WT_STATS_L_CHART_X, $WT_STATS_S_CHART_Y;
 		if ($params === null) {$params = array();}
-		if (isset($params[0]) && $params[0] != '') {$size = strtolower($params[0]);} else {$size = $WT_STATS_L_CHART_X."x".$WT_STATS_S_CHART_Y;}
+		if (isset($params[0]) && $params[0] != '') {$size = strtolower($params[0]);} else {$size = $WT_STATS_L_CHART_X.'x'.$WT_STATS_S_CHART_Y;}
 		if (isset($params[1]) && $params[1] != '') {$color_from = strtolower($params[1]);} else {$color_from = $WT_STATS_CHART_COLOR1;}
 		if (isset($params[2]) && $params[2] != '') {$color_to = strtolower($params[2]);} else {$color_to = $WT_STATS_CHART_COLOR2;}
 		if (isset($params[3]) && $params[3] != '') {$total = strtolower($params[3]);} else {$total = 10;}
@@ -3322,7 +3437,7 @@ class WT_Stats {
 		// Note that we count/display SPFX SURN, but sort/group under just SURN
 		$surnames=array();
 		foreach (array_keys($surname_list) as $surname) {
-			$surnames=array_merge($surnames, get_indilist_surns($surname, '', false, false, WT_GED_ID));
+			$surnames=array_merge($surnames, WT_Query_Name::surnames($surname, '', false, false, WT_GED_ID));
 		}
 		return format_surname_list($surnames, ($type=='list' ? 1 : 2), $show_tot, 'indilist');
 	}
@@ -3356,7 +3471,7 @@ class WT_Stats {
 			if ($n>=$maxtoshow) {
 				break;
 			}
-			$all_surnames = array_merge($all_surnames, get_indilist_surns(utf8_strtoupper($surname), '', false, false, WT_GED_ID));
+			$all_surnames = array_merge($all_surnames, WT_Query_Name::surnames(utf8_strtoupper($surname), '', false, false, WT_GED_ID));
 		}
 		$tot = 0;
 		$per = 0;

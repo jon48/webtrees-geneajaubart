@@ -26,30 +26,30 @@
  *
  * @package webtrees
  * @subpackage GEDFact_assistant
- * @version $Id: media_5_input.php 10869 2011-02-18 16:00:33Z greg $
+ * @version $Id: media_5_input.php 11193 2011-03-26 05:57:38Z brian $
  */
 
 ?>
 
-	<script>
-	var txtcolor="#000000";
-	</script>
-
 	<style type="text/css">
 	<!--
-	#addlinkQueue td, th { padding: 0.2em; }
 	.classy0 { font-family: Verdana, Arial, Helvetica, sans-serif; background-color: transparent; color: #000000; font-size: 10px; }
 	.classy1 { font-family: Verdana, Arial, Helvetica, sans-serif; background-color: transparent; color: #000000; font-size: 10px; }
 	-->
 	</style>
-<?php 
+	
+<?php
+
+global $WT_IMAGES;
 
 // Various JavaScript variables required --------------------------------- ?>
 <script language="javascript" type="text/javascript">
 	var ifamily = "<?php echo WT_I18N::translate('Open Family Navigator'); ?>";
 	var remove = "<?php echo WT_I18N::translate('Remove'); ?>";
 	var linkExists = "<?php echo WT_I18N::translate('This link already exists'); ?>";
-	var imageDir = "<?php echo WT_THEME_DIR.'images/'; ?>";
+	/* ===icons === */
+	var removeLinkIcon = "<?php echo $WT_IMAGES['remove']; ?>";
+	var familyNavIcon = "<?php echo $WT_IMAGES['button_family']; ?>";
 </script>
 
 <?php

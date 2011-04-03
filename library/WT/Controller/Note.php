@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Note.php 11007 2011-03-01 19:06:05Z lukasz $
+// @version $Id: Note.php 11181 2011-03-24 17:21:53Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -171,10 +171,10 @@ class WT_Controller_Note extends WT_Controller_Base {
 			if (WT_USER_CAN_ACCEPT) {
 				$submenu = new WT_Menu(WT_I18N::translate('Undo all changes'), "note.php?nid={$this->nid}&amp;action=undo");
 				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
-				$submenu->addIcon('notes');
+				$submenu->addIcon('note');
 				$menu->addSubmenu($submenu);
 				$submenu = new WT_Menu(WT_I18N::translate('Approve all changes'), "note.php?nid={$this->nid}&amp;action=accept");
-				$submenu->addIcon('notes');
+				$submenu->addIcon('note');
 				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
 				$menu->addSubmenu($submenu);
 			}

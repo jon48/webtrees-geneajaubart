@@ -27,7 +27,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: config_data.php 11034 2011-03-04 11:09:50Z greg $
+ * @version $Id: config_data.php 11107 2011-03-12 20:34:20Z greg $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -455,9 +455,3 @@ $level2_tags=array(
 // The order of name parts, when generating names
 $STANDARD_NAME_FACTS=array('NAME', 'NPFX', 'GIVN', 'SPFX', 'SURN', 'NSFX');
 $REVERSED_NAME_FACTS=array('NAME', 'NPFX', 'SPFX', 'SURN', 'GIVN', 'NSFX');
-
-// Create a label for a fact type.
-// TODO: update rest of code to call WT_Gedcom_Tag::getLabel() directly
-function translate_fact($fact, $person=null) {
-	return WT_Gedcom_Tag::getLabel($fact, $person);
-}

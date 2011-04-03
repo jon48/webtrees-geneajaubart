@@ -1,7 +1,7 @@
 /* clearbox.js - Author Brian Holland .... email webman@windmillway.f2s.com    -  (modified from Clearbox.js - Author Pyro ... email pyrex@chello.hu)
  * @package webtrees
  * @subpackage Module
- * @version $Id: clearbox.js 10869 2011-02-18 16:00:33Z greg $
+ * @version $Id: clearbox.js 11165 2011-03-21 20:58:01Z greg $
  * @author Brian Holland
 */
 
@@ -331,8 +331,8 @@
 		var CB_PicturePause='pause.png';
 		var CB_PictureClose='close_red.png';
 		var CB_PictureLoading='loading.gif';
-		var CB_PictureNotes='notes.gif';
-		var CB_PictureDetails='detail.gif';
+		var CB_PictureNotes='notes.png';
+		var CB_PictureDetails='detail.png';
 		var CB_MusicStart='music_off.png';		
 		var CB_MusicStop='music_on.png';
 		var CB_MusicNull='music_null.png';

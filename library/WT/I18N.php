@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // @author Greg Roach
-// @version $Id: I18N.php 11041 2011-03-04 17:11:30Z greg $
+// @version $Id: I18N.php 11228 2011-03-28 15:24:07Z greg $
 //
 // We use gettext to provide translation.  You should configure xgettext to
 // search for:
@@ -101,10 +101,28 @@ class WT_I18N {
 		Zend_Translate::setCache($cache);
 		// Load the translation file
 		$translate=new Zend_Translate('gettext', WT_ROOT.'language/'.$locale.'.mo', $locale);
-		// TODO: This is where we would use $translate->addTranslation() to add module translations
 		// Make the locale and translation adapter available to the rest of the Zend Framework
 		Zend_Registry::set('Zend_Locale',    $locale);
 		Zend_Registry::set('Zend_Translate', $translate);
+
+		// Load any local user translations
+		if (is_dir(WT_DATA_DIR.'language')) {
+			if (file_exists(WT_DATA_DIR.'language/'.$locale.'.mo')) {
+				$translate->addTranslation(
+					new Zend_Translate('gettext', WT_DATA_DIR.'language/'.$locale.'.mo', $locale)
+				);
+			}
+			if (file_exists(WT_DATA_DIR.'language/'.$locale.'.php')) {
+				$translate->addTranslation(
+					new Zend_Translate('array', WT_DATA_DIR.'language/'.$locale.'.php', $locale)
+				);
+			}
+			if (file_exists(WT_DATA_DIR.'language/'.$locale.'.csv')) {
+				$translate->addTranslation(
+					new Zend_Translate('csv', WT_DATA_DIR.'language/'.$locale.'.csv', $locale)
+				);
+			}
+		}
 
 		// Extract language settings from the translation file
 		global $DATE_FORMAT; // I18N: This is the format string for full dates.  See http://php.net/date for codes
@@ -225,11 +243,11 @@ class WT_I18N {
 					// markup is not permitted.
 					if (self::$dir=='ltr') {
 						if (utf8_direction($arg)=='rtl') {
-							$arg='&#x202B;'.$arg.'&#x202C;';
+							$arg=WT_UTF8_RLE.$arg.WT_UTF8_PDF;
 						}
 					} else {
 						if (utf8_direction($arg)=='ltr') {
-							$arg='&#x202A;'.$arg.'&#x202C;';
+							$arg=WT_UTF8_LRE.$arg.WT_UTF8_PDF;
 						}
 					}
 				}

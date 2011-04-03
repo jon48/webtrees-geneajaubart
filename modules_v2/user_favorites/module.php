@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11046 2011-03-04 20:49:57Z greg $
+// $Id: module.php 11205 2011-03-26 14:52:59Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -126,9 +126,7 @@ class user_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 		if ($ENABLE_AUTOCOMPLETE) {
 			$content = '<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
 			<script type="text/javascript" src="js/jquery/jquery.autocomplete.js"></script>
-			<script type="text/javascript" src="js/jquery/jquery.ajaxQueue.js"></script>
 			<script type="text/javascript">
-			jQuery.noConflict(); // @see http://docs.jquery.com/Using_jQuery_with_Other_Libraries/
 			jQuery(document).ready(function($) {
 				$("input[name^=gid]").autocomplete("autocomplete.php", {
 					extraParams: {field:"IFSRO"},

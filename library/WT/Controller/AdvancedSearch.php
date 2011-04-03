@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: AdvancedSearch.php 10531 2011-01-20 12:07:49Z greg $
+// @version $Id: AdvancedSearch.php 11106 2011-03-12 19:06:49Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -122,7 +122,7 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 	}
 
 	function getLabel($tag) {
-		return translate_fact(str_replace(':SDX', '', $tag));
+		return WT_Gedcom_Tag::getLabel(str_replace(':SDX', '', $tag));
 	}
 
 	function reorderFields() {

@@ -24,7 +24,7 @@
  *
  * @package webtrees
  * @subpackage Lists
- * @version $Id: medialist.php 10869 2011-02-18 16:00:33Z greg $
+ * @version $Id: medialist.php 11086 2011-03-08 06:29:22Z larry $
  */
 
 define('WT_SCRIPT_NAME', 'medialist.php');
@@ -86,7 +86,7 @@ if (empty($folder)) {
 }
 
 // If SESSION_medialist then it's a return
-if (isset($_SESSION['Medialist'])) {
+if (isset($_SESSION['Medialist']) && isset($_SESSION['Filtered_medialist']) ) {
 	$show = "yes";
 	$search = "yes";
 

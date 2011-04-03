@@ -5,7 +5,7 @@
  * used by the SAX parser to generate reports from the XML report file.
  *
  * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
+ * Copyright (C) 2011 webtrees development team.
  *
  * Derived from PhpGedView
  * Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -28,7 +28,7 @@
  *
  * @package webtrees
  * @subpackage Reports
- * @version $Id: Base.php 11021 2011-03-03 12:29:43Z greg $
+ * @version $Id: Base.php 11118 2011-03-13 19:06:59Z lukasz $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -2253,8 +2253,8 @@ function varSHandler($attrs) {
 			// n TYPE This text if string
 			$tfact = $type;
 		}
-		$var = str_replace(array("@fact", "@desc"), array(translate_fact($tfact), $desc), $var);
-		if (substr($var, 0, 18) == 'WT_I18N::translate' || substr($var, 0, 14)=='translate_fact') {
+		$var = str_replace(array("@fact", "@desc"), array(WT_Gedcom_Tag::getLabel($tfact), $desc), $var);
+		if (substr($var, 0, 18) == 'WT_I18N::translate' || substr($var, 0, 23)=='WT_Gedcom_Tag::getLabel') {
 			eval("\$var=$var;");
 		}
 	}
@@ -2497,7 +2497,7 @@ function SetVarSHandler($attrs) {
 		$value = preg_replace("/\\$".$match[$i][1]."/", $t, $value, 1);
 		$i++;
 	}
-	if (substr($value, 0, 18) == 'WT_I18N::translate' || substr($value, 0, 14)=='translate_fact') {
+	if (substr($value, 0, 18) == 'WT_I18N::translate' || substr($value, 0, 23)=='WT_Gedcom_Tag::getLabel') {
 		eval("\$value = $value;");
 	}
 	// Arithmetic functions

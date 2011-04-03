@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 10990 2011-02-27 20:45:32Z lukasz $
+// $Id: module.php 11111 2011-03-13 12:20:38Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -54,6 +54,8 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			require_once WT_ROOT.WT_MODULES_DIR.'googlemap/defaultconfig.php';
 			require WT_ROOT.WT_MODULES_DIR.$this->getName().'/'.$mod_action.'.php';
 			break;
+		default:
+			header('HTTP/1.0 404 Not Found');
 		}
 	}
 

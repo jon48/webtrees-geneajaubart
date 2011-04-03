@@ -24,7 +24,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-# $Id: robots-example.txt 10869 2011-02-18 16:00:33Z greg $
+# $Id: robots-example.txt 11187 2011-03-25 17:18:38Z greg $
 
 ################################################################################
 # Instructions for unfriendly robots ...
@@ -235,7 +235,6 @@ Disallow: /statistics.php
 Disallow: /statisticsplot.php
 Disallow: /themes/
 Disallow: /timeline.php
-Disallow: /treenav.php
 
 # This is a trap for bad robots.
 # Visits to this URL will have their IP address and UA string blacklisted.

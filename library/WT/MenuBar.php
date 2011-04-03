@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// @version $Id: MenuBar.php 11002 2011-03-01 13:08:10Z greg $
+// @version $Id: MenuBar.php 11229 2011-03-28 15:36:45Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -150,7 +150,7 @@ class WT_MenuBar {
 		}
 		// TODO: Use WT_Module_Chart ??
 		if (array_key_exists('tree', WT_Module::getActiveModules())) {
-			$menuList['treenav']=WT_I18N::translate('Interactive tree');
+			$menuList['tree']=WT_I18N::translate('Interactive tree');
 		}
 		if (array_key_exists('googlemap', WT_Module::getActiveModules())) {
 			$menuList['pedigree_map']=WT_I18N::translate('Pedigree Map');
@@ -355,10 +355,9 @@ class WT_MenuBar {
 				$menu->addSubmenu($submenu);
 				break;
 
-			case 'treenav':
+			case 'tree':
 				//-- interactive tree
-				$link = 'treenav.php?ged='.WT_GEDURL;
-				if ($rootid) $link .= '&amp;rootid='.$rootid;
+				$link = 'module.php?mod=tree&amp;mod_action=treeview&amp;ged='.WT_GEDURL.'&amp;rootid='.$rootid;
 				$submenu = new WT_Menu(WT_I18N::translate('Interactive tree'), $link);
 				$submenu->addIcon('tree');
 				$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_gedcom');
@@ -545,7 +544,7 @@ class WT_MenuBar {
 	public static function getSearchMenu() {
 		global $WT_IMAGES, $SEARCH_SPIDER;
 
-		if ((!file_exists(WT_ROOT.'search.php')) || (!empty($SEARCH_SPIDER))) {
+		if ($SEARCH_SPIDER) {
 			return null;
 		}
 		//-- main search menu item
@@ -553,7 +552,7 @@ class WT_MenuBar {
 		$menu->addIcon('search');
 		$menu->addClass('menuitem', 'menuitem_hover', 'submenu', 'icon_large_search');
 		//-- search_general sub menu
-		$submenu = new WT_Menu(WT_I18N::translate('General Search'), 'search.php?ged='.WT_GEDURL.'&amp;action=general');
+		$submenu = new WT_Menu(WT_I18N::translate('General Search'), 'search.php?ged='.WT_GEDURL);
 		$submenu->addIcon('search');
 		$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_search');
 		$menu->addSubmenu($submenu);
@@ -665,16 +664,6 @@ class WT_MenuBar {
 		} else {
 			return null;
 		}
-	}
-
-	public static function getColorMenu($COLOR_THEME_LIST) {
-		$menu=new WT_Menu(WT_I18N::translate('Color Palette'));
-		$menu->addClass('thememenuitem', 'thememenuitem_hover', 'themesubmenu', 'icon_small_theme');
-		foreach ($COLOR_THEME_LIST as $colorChoice=>$colorName) {
-			$submenu=new WT_Menu($colorName, get_query_url(array('themecolor'=>$colorChoice)));
-			$menu->addSubMenu($submenu);
-		}
-		return $menu;
 	}
 
 	public static function getLanguageMenu() {

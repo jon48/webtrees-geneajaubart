@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 10990 2011-02-27 20:45:32Z lukasz $
+// @version $Id: module.php 11125 2011-03-15 21:29:24Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -169,7 +169,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 		$marryear = $family->getMarriageYear();
 		if (!empty($marryear)) {
-			$out .= ' ('.translate_fact('MARR').' '.$marryear.')';
+			$out .= ' ('.WT_Gedcom_Tag::getLabel('MARR').' '.$marryear.')';
 		}
 		$out .= '</a> <a href="'.$person->getHtmlUrl().'"><img src="'.$WT_IMAGES['button_indi'].'" border="0" alt="indi" /></a>';
 		$out .= '<a href="'.$family->getHtmlUrl().'"><img src="'.$WT_IMAGES['button_family'].'" border="0" alt="family" /></a>';
@@ -189,7 +189,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			" FROM `##individuals`, `##name`".
 			" WHERE (i_id LIKE ? OR n_sort LIKE ?)".
 			" AND i_id=n_id AND i_file=n_file AND i_file=?".
-			" ORDER BY n_sort LIMIT".WT_AUTOCOMPLETE_LIMIT
+			" ORDER BY n_sort LIMIT ".WT_AUTOCOMPLETE_LIMIT
 		)
 		->execute(array('INDI', "%{$query}%", "%{$query}%", WT_GED_ID))
 		->fetchAll(PDO::FETCH_ASSOC);

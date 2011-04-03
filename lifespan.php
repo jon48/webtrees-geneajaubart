@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: lifespan.php 10603 2011-01-25 09:28:33Z greg $
+// @version $Id: lifespan.php 11250 2011-04-01 13:48:42Z greg $
 
 define('WT_SCRIPT_NAME', 'lifespan.php');
 require './includes/session.php';
@@ -61,13 +61,13 @@ if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 		?>
 	<table>
 		<tr><td class="person<?php echo $col; ?>" style="padding: 5px" valign="top">
-			<?php echo WT_I18N::translate('Add another person to chart'), help_link('add_person'), '<br />', WT_I18N::translate('Person ID'); ?>
+			<?php echo WT_I18N::translate('Add another person to the chart'), '<br />', WT_I18N::translate('Person ID'); ?>
 			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid" />
 			<?php print_findindi_link("newpid",""); ?>
 			<br />
-			<div style="text-align: center"><input type="checkbox" checked="checked" value="yes" name="addFamily"/><?php echo WT_I18N::translate('Include Immediate Family'); ?></div>
+			<div style="text-align: center"><?php echo WT_I18N::translate('Include the person\'s immediate family?'); ?><input type="checkbox" checked="checked" value="yes" name="addFamily"/></div>
 			<br />
-			<div style="text-align: center"><input type="submit" value="<?php echo WT_I18N::translate('Show'); ?>" /></div>
+			<div style="text-align: center"><input type="submit" value="<?php echo WT_I18N::translate('Add'); ?>" /></div>
 		</td></tr>
 	</table>
 	<?php if (count($controller->pids)<11) { ?><br /><a href="timeline.php"><b><?php echo WT_I18N::translate('Show Timeline chart'); ?></b></a><br /><br /><?php } ?>
@@ -295,11 +295,10 @@ var oldMx = 0;
 
 	<table>
 		<tr>
-			<td rowspan="2"><?php echo help_link('timeline_control'); ?></td>
 			<td align="center"><?php echo WT_I18N::translate('Speed'); ?></td>
 				<td align="center"><?php echo WT_I18N::translate('Begin Year'); ?></td>
 				<td align="center"><?php echo WT_I18N::translate('End Year'); ?></td>
-				<td align="center"><?php echo translate_fact('PLAC'); ?></td>
+				<td align="center"><?php echo WT_Gedcom_Tag::getLabel('PLAC'); ?></td>
 		</tr>
 		<tr>
 			<td><select name="speedMenu" size="1">

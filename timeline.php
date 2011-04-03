@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: timeline.php 10603 2011-01-25 09:28:33Z greg $
+// $Id: timeline.php 11148 2011-03-19 12:00:10Z greg $
 
 define('WT_SCRIPT_NAME', 'timeline.php');
 require './includes/session.php';
@@ -280,10 +280,10 @@ $controller->checkPrivacy();
 			</a>
 			<input type="hidden" name="pids[<?php echo $p; ?>]" value="<?php echo htmlspecialchars($pid); ?>" />
 				<a href="timeline.php?<?php echo $controller->pidlinks; ?>&amp;scale=<?php echo $controller->scale; ?>&amp;remove=<?php echo $pid; ?>&amp;ged=<?php echo WT_GEDURL; ?>" >
-				<span class="details1"><?php echo WT_I18N::translate('Remove person'), help_link('remove_person'); ?></span></a>
+				<span class="details1"><?php echo WT_I18N::translate('Remove person'); ?></span></a>
 			<?php if (!empty($controller->birthyears[$pid])) { ?>
 				<span class="details1"><br />
-				<?php echo WT_I18N::translate('Show age marker'), help_link('show_age_marker'); ?>
+				<?php echo /* I18N: an age indicator, which can be dragged around the screen */ WT_I18N::translate('Show an age cursor?'); ?>
 				<input type="checkbox" name="agebar<?php echo $p; ?>" value="ON" onclick="showhide('agebox<?php echo $p; ?>', this);" />
 				</span>
 			<?php }
@@ -296,7 +296,7 @@ $controller->checkPrivacy();
 			<input type="hidden" name="pids[<?php echo $p; ?>]" value="<?php echo htmlspecialchars($pid); ?>" />
 				<br />
 				<a href="timeline.php?<?php echo $controller->pidlinks; ?>&amp;scale=<?php echo $controller->scale; ?>&amp;remove=<?php echo $pid; ?>&amp;ged=<?php echo WT_GEDURL; ?>" >
-				<span class="details1"><?php echo WT_I18N::translate('Remove person'), help_link('remove_person'); ?></span></a>
+				<span class="details1"><?php echo WT_I18N::translate('Remove person'); ?></span></a>
 			<br />
 		<?php } ?>
 		</td>
@@ -304,12 +304,12 @@ $controller->checkPrivacy();
 		if (!isset($col)) $col = 0;
 		?>
 		<td class="person<?php echo $col; ?>" style="padding: 5px" valign="top">
-			<?php echo WT_I18N::translate('Add another person to chart:<br />Person ID:'), help_link('add_person'); ?>&nbsp;
+			<?php echo WT_I18N::translate('Add another person to the chart'), '<br/>', WT_I18N::translate('Person ID'); ?>&nbsp;
 			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid" />&nbsp;
 			<?php print_findindi_link("newpid",""); ?>
 			<br />
 			<br />
-			<div style="text-align: center"><input type="submit" value="<?php echo WT_I18N::translate('Show'); ?>" /></div>
+			<div style="text-align: center"><input type="submit" value="<?php echo WT_I18N::translate('Add'); ?>" /></div>
 		</td>
 	<?php
 	if (count($controller->people)>0) {
@@ -364,7 +364,7 @@ if (count($controller->people)>0) {
 		$ageyoffset = $baseyoffset + ($controller->bheight*$p);
 		$col = $p % 6;
 		?>
-		<div id="agebox<?php echo $p; ?>" style="position:absolute; <?php echo ($TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20)); ?>px; top:<?php echo $ageyoffset; ?>px; height:<?php echo $controller->bheight; ?>px; visibility: hidden;" onmousedown="ageMD(this, <?php echo $p; ?>);">
+		<div id="agebox<?php echo $p; ?>" style="cursor:move; position:absolute; <?php echo ($TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20)); ?>px; top:<?php echo $ageyoffset; ?>px; height:<?php echo $controller->bheight; ?>px; visibility: hidden;" onmousedown="ageMD(this, <?php echo $p; ?>);">
 			<table cellspacing="0" cellpadding="0">
 				<tr>
 					<td>

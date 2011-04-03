@@ -21,7 +21,7 @@
  *
  * @package webtrees
  * @subpackage Modules
- * @version $Id: Module.php 11054 2011-03-05 14:06:02Z greg $
+ * @version $Id: Module.php 11055 2011-03-05 14:06:39Z greg $
  */
 
 if (!defined('WT_WEBTREES')) {

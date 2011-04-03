@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11045 2011-03-04 20:46:57Z greg $
+// @version $Id: module.php 11242 2011-03-29 20:57:32Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -121,6 +121,7 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 			break;
 		case 'table':
 		default:
+			require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 			require_once WT_ROOT.'js/sorttable.js.htm';
 			$table_id = "ID".floor(microtime()*1000000); // sorttable requires a unique ID
 			$content .= "<table id=\"{$table_id}\" class=\"sortable list_table center\">";

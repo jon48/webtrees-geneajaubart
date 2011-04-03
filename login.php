@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: login.php 10603 2011-01-25 09:28:33Z greg $
+// @version $Id: login.php 11200 2011-03-26 12:48:28Z greg $
 
 define('WT_SCRIPT_NAME', 'login.php');
 require './includes/session.php';
@@ -60,6 +60,7 @@ if ($action=='login') {
 		}
 		$_SESSION['timediff']=time()-$_SESSION['usertime'];
 		$_SESSION['locale']=get_user_setting($user_id, 'language');
+		$_SESSION['theme_dir']=get_user_setting($user_id, 'theme');
 
 		// If we have no access rights to the current gedcom, switch to one where we do
 		if (!userIsAdmin($user_id)) {

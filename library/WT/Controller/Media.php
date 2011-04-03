@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Media.php 11029 2011-03-03 23:32:42Z greg $
+// @version $Id: Media.php 11206 2011-03-26 16:09:43Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -37,12 +37,12 @@ class WT_Controller_Media extends WT_Controller_Base {
 	var $show_changes=true;
 
 	function init() {
-		global $MEDIA_DIRECTORY, $USE_MEDIA_FIREWALL;
+		global $MEDIA_DIRECTORY;
 
 		$filename = safe_GET('filename');
 		$this->mid = safe_GET_xref('mid');
 
-		if ($USE_MEDIA_FIREWALL && empty($filename) && empty($this->mid)) {
+		if (empty($filename) && empty($this->mid)) {
 			// this section used by mediafirewall.php to determine what media file was requested
 
 			if (isset($_SERVER['REQUEST_URI'])) {
@@ -191,35 +191,36 @@ class WT_Controller_Media extends WT_Controller_Base {
 			$menu->addSubmenu($submenu);
 
 			// main link displayed on page
-			if (WT_USER_GEDCOM_ADMIN && file_exists(WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_MEDIA/media_1_ctrl.php')) {
-				$submenu = new WT_Menu(WT_I18N::translate('Manage links'));
+			if (WT_USER_GEDCOM_ADMIN && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
+				$submenu = new WT_Menu(WT_I18N::translate('Manage links'), '', 'right', 'right');
 			} else {
-				$submenu = new WT_Menu(WT_I18N::translate('Set link'));
+				$submenu = new WT_Menu(WT_I18N::translate('Set link'), '', 'right', 'right');
 			}
+			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+			$submenu->addIcon('edit_media');
 
 			// GEDFact assistant Add Media Links =======================
-			if (WT_USER_GEDCOM_ADMIN && file_exists(WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_MEDIA/media_1_ctrl.php')) {
+			if (WT_USER_GEDCOM_ADMIN && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 				$submenu->addOnclick("return ilinkitem('".$this->pid."','manage');");
-				$submenu->addIcon('edit_media');
-				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
-				// Do not print ssubmunu
 			} else {
 				$submenu->addOnclick("return ilinkitem('".$this->pid."','person');");
-				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
 
 				$ssubmenu = new WT_Menu(WT_I18N::translate('To Person'));
 				$ssubmenu->addOnclick("return ilinkitem('".$this->pid."','person');");
 				$ssubmenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+				$ssubmenu->addIcon('edit_media');
 				$submenu->addSubMenu($ssubmenu);
 
 				$ssubmenu = new WT_Menu(WT_I18N::translate('To Family'));
 				$ssubmenu->addOnclick("return ilinkitem('".$this->pid."','family');");
 				$ssubmenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+				$ssubmenu->addIcon('edit_media');
 				$submenu->addSubMenu($ssubmenu);
 
 				$ssubmenu = new WT_Menu(WT_I18N::translate('To Source'));
 				$ssubmenu->addOnclick("return ilinkitem('".$this->pid."','source');");
 				$ssubmenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+				$ssubmenu->addIcon('edit_media');
 				$submenu->addSubMenu($ssubmenu);
 			}
 			$menu->addSubmenu($submenu);
@@ -243,10 +244,10 @@ class WT_Controller_Media extends WT_Controller_Base {
 			if (WT_USER_CAN_ACCEPT) {
 				$submenu = new WT_Menu(WT_I18N::translate('Undo all changes'), "mediaviewer.php?mid={$this->pid}&amp;action=undo");
 				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
-				$submenu->addIcon('notes');
+				$submenu->addIcon('media');
 				$menu->addSubmenu($submenu);
 				$submenu = new WT_Menu(WT_I18N::translate('Approve all changes'), "mediaviewer.php?mid={$this->pid}&amp;action=accept");
-				$submenu->addIcon('notes');
+				$submenu->addIcon('media');
 				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
 				$menu->addSubmenu($submenu);
 			}

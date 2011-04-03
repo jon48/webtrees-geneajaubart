@@ -26,7 +26,7 @@
  *
  * @package webtrees
  * @subpackage Reports
- * @version $Id: reportengine.php 10977 2011-02-26 07:59:18Z greg $
+ * @version $Id: reportengine.php 11107 2011-03-12 20:34:20Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'reportengine.php');
@@ -147,9 +147,7 @@ if ($action=="choose") {
 	echo "<tr><td class=\"descriptionbox wrap width33 vmiddle\">", WT_I18N::translate('Select report'), "</td>";
 	echo "<td class=\"optionbox\"><select onchange=\"this.form.submit();\" name=\"report\">\n";
 	foreach ($reports as $file=>$report) {
-		if ($report["access"] >= WT_USER_ACCESS_LEVEL) {
 			echo "<option value=\"", $file, "\">", $report, "</option>\n";
-		}
 	}
 	echo "</select></td></tr>\n";
 	echo "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" value=\"", WT_I18N::translate('Click here to continue'), "\" /></td></tr>";
@@ -285,7 +283,7 @@ elseif ($action=="setup") {
 						foreach ($options as $indexval => $option) {
 							$opt = explode('=>', $option);
 							list($value, $display)=$opt;
-							if (substr($display, 0, 18)=='WT_I18N::translate' || substr($display, 0, 14)=='translate_fact') {
+							if (substr($display, 0, 18)=='WT_I18N::translate' || substr($display, 0, 23)=='WT_Gedcom_Tag::getLabel') {
 								eval("\$display=$display;");
 							}
 							echo "\t<option value=\"", htmlspecialchars($value), "\"";

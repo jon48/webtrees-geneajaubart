@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report>
-	<!-- $Id: report.xml 10421 2011-01-11 13:25:05Z greg $ -->
+	<!-- $Id: report.xml 11107 2011-03-12 20:34:20Z greg $ -->
 	<Title><var var="WT_I18N::translate('Expanded Relatives Report')" /></Title>
 	<Description><var var="WT_I18N::translate('A report of a person and details of their relatives.')" /></Description>
 	<Input name="pid" lookup="INDI" type="text"><var var="WT_I18N::translate('Enter Individual ID')" /></Input>
@@ -107,12 +107,12 @@
 					<Gedcom id="@FAMS">
 						<TextBox height="$height2" left="$width1" width="$widthB2">
 							<if condition="$sex=='M'">
-								<Text style="minibold"><var var="translate_fact('WIFE')" />: </Text>
+								<Text style="minibold"><var var="WT_Gedcom_Tag::getLabel('WIFE')" />: </Text>
 								<Text style="mini"><GetPersonName id="@WIFE" /> <GedcomValue tag="MARR:DATE" />
 								</Text>
 							</if>
 							<if condition="$sex=='F'">
-								<Text style="minibold"><var var="translate_fact('HUSB')" />: </Text>
+								<Text style="minibold"><var var="WT_Gedcom_Tag::getLabel('HUSB')" />: </Text>
 								<Text style="mini"><GetPersonName id="@HUSB" /> <GedcomValue tag="MARR:DATE" />
 								</Text>
 							</if>

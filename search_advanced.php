@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: search_advanced.php 10603 2011-01-25 09:28:33Z greg $
+// $Id: search_advanced.php 11250 2011-04-01 13:48:42Z greg $
 
 define('WT_SCRIPT_NAME', 'search_advanced.php');
 require './includes/session.php';
@@ -64,7 +64,7 @@ echo WT_JS_START;
 		<?php foreach ($controller->getOtherFields() as $field) { ?>
 		opt = document.createElement('option');
 		opt.value='<?php echo $field; ?>';
-		opt.text='<?php echo $controller->getLabel($field); ?>';
+		opt.text='<?php echo addslashes($controller->getLabel($field)); ?>';
 		sel.options.add(opt);
 		<?php } ?>
 		label.appendChild(sel);
@@ -138,7 +138,7 @@ echo WT_JS_END;
 <table id="field_table" class="list_table <?php echo $TEXT_DIRECTION; ?>" width="35%" border="0">
 	<tr>
 		<td colspan="4" class="facts_label03" style="text-align:center; ">
-			<?php echo WT_I18N::translate('Advanced search'), help_link('advanced_search'); ?>
+			<?php echo WT_I18N::translate('Advanced search'); ?>
 		</td>
 	</tr>
 	<!-- // search terms -->
@@ -218,7 +218,7 @@ echo WT_JS_END;
 					</tr>
 					<tr>
 						<td class="list_label">
-							<?php echo translate_fact('GIVN'); ?>
+							<?php echo WT_Gedcom_Tag::getLabel('GIVN'); ?>
 						</td>
 						<td class="list_value">
 							<input type="text" name="values[<?php echo $j; ?>]" value="<?php echo $controller->getValue($controller->getIndex('FAMC:HUSB:NAME:GIVN:'.$fatherGivnOption)); ?>" />
@@ -233,7 +233,7 @@ echo WT_JS_END;
 					<tr>
 						<?php $j++; ?>
 						<td class="list_label">
-							<?php echo translate_fact('SURN'); ?>
+							<?php echo WT_Gedcom_Tag::getLabel('SURN'); ?>
 						</td>
 						<td class="list_value">
 							<input type="text" name="values[<?php echo $j; ?>]" value="<?php echo $controller->getValue($controller->getIndex('FAMC:HUSB:NAME:SURN:'.$fatherSurnOption)); ?>" />
@@ -255,7 +255,7 @@ echo WT_JS_END;
 					</tr>
 					<tr>
 						<td class="list_label">
-							<?php echo translate_fact('GIVN'); ?>
+							<?php echo WT_Gedcom_Tag::getLabel('GIVN'); ?>
 						</td>
 						<td class="list_value">
 							<input type="text" name="values[<?php echo $j; ?>]" value="<?php echo $controller->getValue($controller->getIndex('FAMC:WIFE:NAME:GIVN:'.$motherGivnOption)); ?>" />
@@ -270,7 +270,7 @@ echo WT_JS_END;
 					</tr>
 					<tr>
 						<td class="list_label">
-							<?php echo translate_fact('SURN'); ?>
+							<?php echo WT_Gedcom_Tag::getLabel('SURN'); ?>
 						</td>
 						<td class="list_value">
 							<input type="text" name="values[<?php echo $j; ?>]" value="<?php echo $controller->getValue($controller->getIndex('FAMC:WIFE:NAME:SURN:'.$motherSurnOption)); ?>" />

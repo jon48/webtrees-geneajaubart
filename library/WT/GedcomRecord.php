@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: GedcomRecord.php 10621 2011-01-27 19:21:58Z lukasz $
+// @version $Id: GedcomRecord.php 11137 2011-03-16 21:08:45Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -547,14 +547,13 @@ class WT_GedcomRecord {
 		if (is_null($name)) {
 			$name=($tag=='li') ? $this->getListName() : $this->getFullName();
 		}
-		$dir=begRTLText($name) ? 'rtl' : 'ltr';
 		$html='<a href="'.$this->getHtmlUrl().'"';
 		if ($find) {
 			$html.=' onclick="pasteid(\''.$this->getXref().'\');"';
 		}
 		$html.=' class="list_item"><b>'.$name.'</b>';
 		$html.=$this->format_list_details();
-		$html='<'.$tag.' class="'.$dir.'" dir="'.$dir.'">'.$html.'</a></'.$tag.'>';
+		$html='<'.$tag.'>'.$html.'</a></'.$tag.'>';
 		return $html;
 	}
 
@@ -820,9 +819,9 @@ class WT_GedcomRecord {
 
 	//////////////////////////////////////////////////////////////////////////////
 	// Get the last-change timestamp for this record - optionally wrapped in a
-	// link to ourself.
+	// link to ourself, sorting - used in recent changes table for time sorting
 	//////////////////////////////////////////////////////////////////////////////
-	public function LastChangeTimestamp($add_url) {
+	public function LastChangeTimestamp($add_url, $sorting=false) {
 		global $DATE_FORMAT, $TIME_FORMAT;
 
 		$chan = $this->getChangeEvent();
@@ -833,11 +832,13 @@ class WT_GedcomRecord {
 
 		$d = $chan->getDate();
 		if (preg_match('/^(\d\d):(\d\d):(\d\d)/', get_gedcom_value('DATE:TIME', 2, $chan->getGedcomRecord(), '', false).':00', $match)) {
-			$t=mktime($match[1], $match[2], $match[3]);
 			$sort=$d->MinJD().$match[1].$match[2].$match[3];
+			if ($sorting) return $sort;
+			$t=mktime($match[1], $match[2], $match[3]);
 			$text=strip_tags($d->Display(false, "{$DATE_FORMAT} - ", array()).date(str_replace('%', '', $TIME_FORMAT), $t));
 		} else {
 			$sort=$d->MinJD().'000000';
+			if ($sorting) return $sort;
 			$text=strip_tags($d->Display(false, "{$DATE_FORMAT}", array()));
 		}
 		if ($add_url) {

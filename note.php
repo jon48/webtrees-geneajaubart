@@ -24,7 +24,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
 * @package webtrees
-* @version $Id: note.php 10869 2011-02-18 16:00:33Z greg $
+* @version $Id: note.php 11181 2011-03-24 17:21:53Z greg $
 */
 
 define('WT_SCRIPT_NAME', 'note.php');
@@ -80,7 +80,6 @@ if ($controller->accept_success) {
 echo '<span class="name_head">', PrintReady(htmlspecialchars($controller->note->getFullName()));
 echo '</span><br />';
 echo '<table class="facts_table">';
-echo '<tr class="', $TEXT_DIRECTION, '"><td><table class="width100">';
 
 // Shared Note details ---------------------
 $noterec=$controller->note->getGedcomRecord();
@@ -90,13 +89,13 @@ $note = print_note_record("<br />".$n1match[1], 1, $noterec, false, true, true);
 echo '<tr><td align="left" class="descriptionbox ', $TEXT_DIRECTION, '">';
 	if (WT_USER_CAN_EDIT) {
 		echo '<a href="javascript: edit_note()" title="', WT_I18N::translate('Edit'), '">';
-		if (!empty($WT_IMAGES["notes"]) && $SHOW_FACT_ICONS) echo '<img src="', $WT_IMAGES["notes"], '" alt="" align="top" />';
+		if (!empty($WT_IMAGES['note']) && $SHOW_FACT_ICONS) echo '<img src="', $WT_IMAGES['note'], '" alt="" align="top" />';
 		echo WT_I18N::translate('Shared note'), '</a>';
 		echo '<div class="editfacts">';
 			echo '<a href="javascript: edit_note()" title="', WT_I18N::translate('Edit'), '"><div class="editlink"><span class="link_text">', WT_I18N::translate('Edit'), '</span></div></a>';
 		echo '</div>';
 	} else { 
-		if (!empty($WT_IMAGES["notes"]) && $SHOW_FACT_ICONS) echo '<img src="', $WT_IMAGES["notes"], '" alt="" align="top" />';
+		if (!empty($WT_IMAGES['note']) && $SHOW_FACT_ICONS) echo '<img src="', $WT_IMAGES['note'], '" alt="" align="top" />';
 		echo WT_I18N::translate('Shared note');
 	}
 	echo '</td><td class="optionbox wrap width80 ', $TEXT_DIRECTION, '">';

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_merge.php 10799 2011-02-12 09:04:56Z lukasz $
+// $Id: admin_site_merge.php 11264 2011-04-02 21:19:00Z nigel $
 
 define('WT_SCRIPT_NAME', 'admin_site_merge.php');
 require './includes/session.php';
@@ -271,8 +271,8 @@ if ($action=="choose") {
 		'<div id="merge"><h3>', WT_I18N::translate('Merge Step 1 of 3'), '</h3>
 		<form method="post" name="merge" action="admin_site_merge.php">
 		<input type="hidden" name="action" value="select" />
-		<p>', WT_I18N::translate('Select two GEDCOM records to merge.  The records must be of the same type.'),
-		'<table class="', $TEXT_DIRECTION, '"><tr>
+		<p>', WT_I18N::translate('Select two GEDCOM records to merge.  The records must be of the same type.'), '</p>
+		<table class="', $TEXT_DIRECTION, '"><tr>
 		<td>',
 		WT_I18N::translate('Merge To ID:'),
 		'</td><td>
@@ -306,7 +306,7 @@ if ($action=="choose") {
 		</td></tr><tr><td>',
 		WT_I18N::translate('Merge From ID:'),
 		'</td><td>
-		<input type="text" name="gid2" id="gid2" value="', $gid2, '" size="10" tabindex="2"/>';
+		<input type="text" name="gid2" id="gid2" value="', $gid2, '" size="10" tabindex="2" />&nbsp;';
 	if (get_gedcom_count()>1) {
 		echo '<select name="ged2" tabindex="5">';
 		foreach ($all_gedcoms as $ged_id=>$ged_name) {
@@ -324,7 +324,6 @@ if ($action=="choose") {
 		<a href="javascript:iopen_find(document.merge.gid2, document.merge.ged2);" tabindex="7">', $inditext, '</a>
 		<a href="javascript:fopen_find(document.merge.gid2, document.merge.ged2);" tabindex="9">', $famtext, '</a>
 		<a href="javascript:sopen_find(document.merge.gid2, document.merge.ged2);" tabindex="11">',  $sourtext, '</a>
-		</td></tr><tr><td colspan="2">
 		</td></tr></table>
 		<input type="submit" value="', WT_I18N::translate('Merge records'), '" tabindex="3" />
 		</form></div>';

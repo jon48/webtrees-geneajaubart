@@ -22,7 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: session.php 11051 2011-03-05 13:36:02Z greg $
+ * @version $Id: session.php 11258 2011-04-02 14:26:20Z greg $
  */
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
@@ -33,8 +33,8 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.1.1');
-define('WT_VERSION_RELEASE', ''); // 'svn', 'beta', 'rc1', '', etc.
+define('WT_VERSION',         '1.1.2');
+define('WT_VERSION_RELEASE', 'svn'); // 'svn', 'beta', 'rc1', '', etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
 define('WT_WEBTREES_URL',    'http://webtrees.net');
 define('WT_WEBTREES_WIKI',   'http://wiki.webtrees.net');
@@ -52,7 +52,7 @@ define('WT_DEBUG_SQL',  false);
 define('WT_ERROR_LEVEL', 2); // 0=none, 1=minimal, 2=full
 
 // Required version of database tables/columns/indexes/etc.
-define('WT_SCHEMA_VERSION', 9);
+define('WT_SCHEMA_VERSION', 10);
 
 // Regular expressions for validating user input, etc.
 define('WT_REGEX_XREF',     '[A-Za-z0-9:_-]+');
@@ -118,9 +118,7 @@ define ('WT_ROOT', realpath(dirname(dirname(__FILE__))).DIRECTORY_SEPARATOR);
 $start_time=microtime(true);
 $PRIVACY_CHECKS=0;
 
-ini_set('arg_separator.output', '&amp;');
-ini_set('error_reporting', E_ALL | E_STRICT);
-ini_set('display_errors', '1');
+// We want to know about all PHP errors
 error_reporting(E_ALL | E_STRICT);
 
 // Invoke the Zend Framework Autoloader, so we can use Zend_XXXXX and WT_XXXXX classes
@@ -228,6 +226,10 @@ try {
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'site-unavailable.php');
 	exit;
 }
+
+// The config.ini.php file must always be in a fixed location.
+// Other user files can be stored elsewhere...
+define('WT_DATA_DIR', realpath(get_site_setting('INDEX_DIRECTORY', 'data')).DIRECTORY_SEPARATOR);
 
 // If we have a preferred URL (e.g. https instead of http, or www.example.com instead of
 // www.isp.com/~example), then redirect to it.

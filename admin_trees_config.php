@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_config.php 10992 2011-02-28 01:05:36Z larry $
+// $Id: admin_trees_config.php 11255 2011-04-02 09:33:37Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_config.php');
 
@@ -33,8 +33,6 @@ if (!WT_USER_GEDCOM_ADMIN) {
 	exit;
 }
 
-$INDEX_DIRECTORY=get_site_setting('INDEX_DIRECTORY');
-
 /**
  * find the name of the first GEDCOM file in a zipfile
  * @param string $zipfile the path and filename
@@ -42,8 +40,6 @@ $INDEX_DIRECTORY=get_site_setting('INDEX_DIRECTORY');
  * @return string the path and filename of the gedcom file
  */
 function GetGEDFromZIP($zipfile, $extract=true) {
-	GLOBAL $INDEX_DIRECTORY;
-
 	require_once WT_ROOT.'library/pclzip.lib.php';
 	$zip = new PclZip($zipfile);
 	// if it's not a valid zip, just return the filename
@@ -55,7 +51,7 @@ function GetGEDFromZIP($zipfile, $extract=true) {
 	$slpos = strrpos($zipfile, "/");
 	if (!$slpos) $slpos = strrpos($zipfile, "\\");
 	if ($slpos) $path = substr($zipfile, 0, $slpos+1);
-	else $path = $INDEX_DIRECTORY;
+	else $path = WT_DATA_DIR;
 	// Scan the files and return the first .ged found
 	foreach ($list as $key=>$listitem) {
 		if (($listitem["status"]="ok") && (strstr(strtolower($listitem["filename"]), ".")==".ged")) {
@@ -76,6 +72,53 @@ function GetGEDFromZIP($zipfile, $extract=true) {
 	}
 	return $zipfile;
 }
+
+/**
+ * The media firewall should always be enabled. This function adds media firewall code to the media/.htaccess file if it is not already there
+ */
+function fix_media_htaccess() {
+	global $errors, $error_msg, $MEDIA_DIRECTORY, $MULTI_MEDIA;
+	if (!$MULTI_MEDIA) return; // don't create an htaccess flie if media is disabled
+	$whichFile = $MEDIA_DIRECTORY.".htaccess";
+	$httext = "";
+	if (file_exists($whichFile)) {
+		$httext = implode('', file($whichFile));
+		if ($httext && strpos('RewriteRule .* '.WT_SCRIPT_PATH.'mediafirewall.php [L]', $httext) !== false) {
+			return; // don't mess with the file if it already refers to the mediafirewall
+		} else {
+			// remove all WT media firewall sections from the .htaccess
+			$httext = preg_replace('/\n?^[#]*\s*BEGIN WT MEDIA FIREWALL SECTION(.*\n){10}[#]*\s*END WT MEDIA FIREWALL SECTION\s*[#]*\n?/m', "", $httext);
+			// comment out any existing lines that set ErrorDocument 404
+			$httext = preg_replace('/^(ErrorDocument\s*404(.*))\n?/', "#$1\n", $httext);
+			$httext = preg_replace('/[^#](ErrorDocument\s*404(.*))\n?/', "\n#$1\n", $httext);
+		}
+	}
+	// add new WT media firewall section to the end of the file
+	$httext .= "\n######## BEGIN WT MEDIA FIREWALL SECTION ##########";
+	$httext .= "\n################## DO NOT MODIFY ###################";
+	$httext .= "\n## THERE MUST BE EXACTLY 11 LINES IN THIS SECTION ##";
+	$httext .= "\n<IfModule mod_rewrite.c>";
+	$httext .= "\n\tRewriteEngine On";
+	$httext .= "\n\tRewriteCond %{REQUEST_FILENAME} !-f";
+	$httext .= "\n\tRewriteCond %{REQUEST_FILENAME} !-d";
+	$httext .= "\n\tRewriteRule .* ".WT_SCRIPT_PATH."mediafirewall.php"." [L]";
+	$httext .= "\n</IfModule>";
+	$httext .= "\nErrorDocument\t404\t".WT_SCRIPT_PATH."mediafirewall.php";
+	$httext .= "\n########## END WT MEDIA FIREWALL SECTION ##########";
+
+	$fp = @fopen($whichFile, "wb");
+	if (!$fp) {
+		$errors = true;
+		$error_msg .= "<span class=\"error\">".WT_I18N::translate('E R R O R !!!<br />Could not write to file <i>%s</i>.  Please check it for proper Write permissions.', $whichFile)."</span><br />";
+		return;
+	} else {
+		fwrite($fp, $httext);
+		fclose($fp);
+		@chmod($whichFile, WT_PERM_FILE); // Make sure apache can read this file
+	}
+	return true;
+}
+
 
 $errors=false;
 $error_msg='';
@@ -115,15 +158,6 @@ case 'add':
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'#privacy');
 	exit;
 case 'update':
-	$_POST["NEW_MEDIA_DIRECTORY"] = trim(str_replace('\\','/',$_POST["NEW_MEDIA_DIRECTORY"]));
-	if (substr ($_POST["NEW_MEDIA_DIRECTORY"], -1) != "/") $_POST["NEW_MEDIA_DIRECTORY"] = $_POST["NEW_MEDIA_DIRECTORY"] . "/";
-	if (substr($_POST["NEW_MEDIA_DIRECTORY"], 0, 2)=="./") $_POST["NEW_MEDIA_DIRECTORY"] = substr($_POST["NEW_MEDIA_DIRECTORY"], 2);
-	if (preg_match("/.*[a-zA-Z]{1}:.*/", $_POST["NEW_MEDIA_DIRECTORY"])>0) $errors = true;
-	if ($_POST["NEW_USE_MEDIA_FIREWALL"]==true) {
-		if (substr($_POST["NEW_MEDIA_DIRECTORY"], 0, 3)=="../") $_POST["NEW_MEDIA_DIRECTORY"] = substr($_POST["NEW_MEDIA_DIRECTORY"], 3);
-		if (substr($_POST["NEW_MEDIA_DIRECTORY"], 0, 1)=="/") $_POST["NEW_MEDIA_DIRECTORY"] = substr($_POST["NEW_MEDIA_DIRECTORY"], 1);
-	}
-
 	set_gedcom_setting(WT_GED_ID, 'ABBREVIATE_CHART_LABELS',      safe_POST_bool('NEW_ABBREVIATE_CHART_LABELS'));
 	set_gedcom_setting(WT_GED_ID, 'ADVANCED_NAME_FACTS',          safe_POST('NEW_ADVANCED_NAME_FACTS'));
 	set_gedcom_setting(WT_GED_ID, 'ADVANCED_PLAC_FACTS',          safe_POST('NEW_ADVANCED_PLAC_FACTS'));
@@ -168,7 +202,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'MAX_ALIVE_AGE',                safe_POST('MAX_ALIVE_AGE', WT_REGEX_INTEGER, 100));
 	set_gedcom_setting(WT_GED_ID, 'MAX_DESCENDANCY_GENERATIONS',  safe_POST('NEW_MAX_DESCENDANCY_GENERATIONS'));
 	set_gedcom_setting(WT_GED_ID, 'MAX_PEDIGREE_GENERATIONS',     safe_POST('NEW_MAX_PEDIGREE_GENERATIONS'));
-	set_gedcom_setting(WT_GED_ID, 'MEDIA_DIRECTORY',              safe_POST('NEW_MEDIA_DIRECTORY'));
 	set_gedcom_setting(WT_GED_ID, 'MEDIA_DIRECTORY_LEVELS',       safe_POST('NEW_MEDIA_DIRECTORY_LEVELS'));
 	set_gedcom_setting(WT_GED_ID, 'MEDIA_EXTERNAL',               safe_POST_bool('NEW_MEDIA_EXTERNAL'));
 	set_gedcom_setting(WT_GED_ID, 'MEDIA_FIREWALL_THUMBS',        safe_POST_bool('NEW_MEDIA_FIREWALL_THUMBS'));
@@ -246,11 +279,31 @@ case 'update':
 		set_gedcom_setting(WT_GED_ID, 'title',                        safe_POST('gedcom_title', WT_REGEX_UNSAFE));
 	}
 
-	if (!$_POST["NEW_MEDIA_FIREWALL_ROOTDIR"]) {
-		$NEW_MEDIA_FIREWALL_ROOTDIR = $INDEX_DIRECTORY;
+	// process NEW_MEDIA_DIRECTORY
+	$errors_mediadir = false;
+	$_POST["NEW_MEDIA_DIRECTORY"] = trim(str_replace('\\','/',$_POST["NEW_MEDIA_DIRECTORY"])); // silently convert backslashes to forward slashes
+	$_POST["NEW_MEDIA_DIRECTORY"] = str_replace('"','',$_POST["NEW_MEDIA_DIRECTORY"]); // silently remove quote marks
+	$_POST["NEW_MEDIA_DIRECTORY"] = str_replace("'",'',$_POST["NEW_MEDIA_DIRECTORY"]); // silently remove quote marks
+	$_POST["NEW_MEDIA_DIRECTORY"] = str_replace("//",'/',$_POST["NEW_MEDIA_DIRECTORY"]); // silently remove duplicate slashes
+	if (substr ($_POST["NEW_MEDIA_DIRECTORY"], -1) != "/") $_POST["NEW_MEDIA_DIRECTORY"] = $_POST["NEW_MEDIA_DIRECTORY"] . "/"; // silently add trailing slash
+	if (substr($_POST["NEW_MEDIA_DIRECTORY"], 0, 1)=="/")                  { $errors_mediadir = true; } // don't allow absolute path
+	if (preg_match("/.*[a-zA-Z]{1}:.*/", $_POST["NEW_MEDIA_DIRECTORY"])>0) { $errors_mediadir = true; } // don't allow drive letters
+	if (preg_match('/([\.]?[\.][\/])+/', $_POST["NEW_MEDIA_DIRECTORY"])>0) { $errors_mediadir = true; } // don't allow ./ or ../ 
+	if ($errors_mediadir) {
+		$errors = true;
+		$error_msg .= "<span class=\"error\">".WT_I18N::translate('Invalid media directory, it should be in the format of "media/", not "%s". ', $_POST["NEW_MEDIA_DIRECTORY"])."</span><br />";
 	} else {
-		$_POST["NEW_MEDIA_FIREWALL_ROOTDIR"] = trim(str_replace('\\','/',$_POST["NEW_MEDIA_FIREWALL_ROOTDIR"]));
-		if (substr ($_POST["NEW_MEDIA_FIREWALL_ROOTDIR"], -1) != "/") $_POST["NEW_MEDIA_FIREWALL_ROOTDIR"] = $_POST["NEW_MEDIA_FIREWALL_ROOTDIR"] . "/";
+		// only save the setting if there were no errors
+		set_gedcom_setting(WT_GED_ID, 'MEDIA_DIRECTORY',              safe_POST('NEW_MEDIA_DIRECTORY'));
+		$MEDIA_DIRECTORY = safe_POST('NEW_MEDIA_DIRECTORY');
+	}
+
+	// process NEW_MEDIA_FIREWALL_ROOTDIR
+	if (!$_POST["NEW_MEDIA_FIREWALL_ROOTDIR"]) {
+		$NEW_MEDIA_FIREWALL_ROOTDIR = WT_DATA_DIR;
+	} else {
+		$_POST["NEW_MEDIA_FIREWALL_ROOTDIR"] = trim(str_replace('\\','/',$_POST["NEW_MEDIA_FIREWALL_ROOTDIR"])); // silently convert backslashes to forward slashes
+		if (substr ($_POST["NEW_MEDIA_FIREWALL_ROOTDIR"], -1) != "/") $_POST["NEW_MEDIA_FIREWALL_ROOTDIR"] = $_POST["NEW_MEDIA_FIREWALL_ROOTDIR"] . "/"; // silently add trailing slash
 		$NEW_MEDIA_FIREWALL_ROOTDIR = safe_POST("NEW_MEDIA_FIREWALL_ROOTDIR");
 	}
 	if (!is_dir($NEW_MEDIA_FIREWALL_ROOTDIR)) {
@@ -258,10 +311,7 @@ case 'update':
 		$error_msg .= "<span class=\"error\">".WT_I18N::translate('The Media Firewall root directory you requested does not exist.  You must create it first.')."</span><br />";
 	}
 	if (!$errors) {
-		// create the media directory
-		// if NEW_MEDIA_FIREWALL_ROOTDIR is the INDEX_DIRECTORY, WT will have perms to create it
-		// if WT is unable to create the directory, tell the user to create it
-		if ($_POST["NEW_USE_MEDIA_FIREWALL"]==true && $USE_MEDIA_FIREWALL==false) {
+		// Since the media firewall is always enabled, need to verify that the protected media dir exists
 			if (!is_dir($NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY)) {
 				@mkdir($NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY, WT_PERM_EXE);
 				if (!is_dir($NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY)) {
@@ -269,11 +319,9 @@ case 'update':
 					$error_msg .= "<span class=\"error\">".WT_I18N::translate('The protected media directory could not be created in the Media Firewall root directory.  Please create this directory and make it world-writable.')." ".$NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY."</span><br />";
 				}
 			}
-		}
 	}
 	if (!$errors) {
-		// create the thumbs dir to make sure we have write perms
-		if ($_POST["NEW_USE_MEDIA_FIREWALL"]==true && $USE_MEDIA_FIREWALL==false) {
+		// Since the media firewall is always enabled, need to verify that the protected thumbs dir exists
 			if (!is_dir($NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY."thumbs")) {
 				@mkdir($NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY."thumbs", WT_PERM_EXE);
 				if (!is_dir($NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY."thumbs")) {
@@ -281,85 +329,24 @@ case 'update':
 					$error_msg .= "<span class=\"error\">".WT_I18N::translate('The protected media directory in the Media Firewall root directory is not world writable. ')." ".$NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY."</span><br />";
 				}
 			}
-		}
 	}
 	if (!$errors) {
 		// copy the .htaccess file from INDEX_DIRECTORY to NEW_MEDIA_FIREWALL_ROOTDIR in case it is still in a web-accessible area
-		if ($_POST["NEW_USE_MEDIA_FIREWALL"]==true && $USE_MEDIA_FIREWALL==false) {
-			if ((file_exists($INDEX_DIRECTORY.".htaccess")) && (is_dir($NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY)) && (!file_exists($NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY.".htaccess")) ) {
-				@copy($INDEX_DIRECTORY.".htaccess", $NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY.".htaccess");
+			if ((file_exists(WT_DATA_DIR.".htaccess")) && (is_dir($NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY)) && (!file_exists($NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY.".htaccess")) ) {
+				@copy(WT_DATA_DIR.".htaccess", $NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY.".htaccess");
 				if (!file_exists($NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY.".htaccess")) {
 					$errors = true;
 					$error_msg .= "<span class=\"error\">".WT_I18N::translate('The protected media directory in the Media Firewall root directory is not world writable. ')." ".$NEW_MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY."</span><br />";
 				}
 			}
-		}
 	}
 	if (!$errors) {
+		// only save the setting if there were no errors
 		set_gedcom_setting(WT_GED_ID, 'MEDIA_FIREWALL_ROOTDIR', safe_POST('NEW_MEDIA_FIREWALL_ROOTDIR'));
 	}
 
-	if ($_POST["NEW_USE_MEDIA_FIREWALL"]==true && $USE_MEDIA_FIREWALL==false) {
-		AddToLog("Media Firewall enabled", 'config');
-
-		if (!$errors) {
-			// create/modify an htaccess file in the main media directory
-			$httext = "";
-			if (file_exists($MEDIA_DIRECTORY.".htaccess")) {
-				$httext = implode('', file($MEDIA_DIRECTORY.".htaccess"));
-				// remove all WT media firewall sections from the .htaccess
-				$httext = preg_replace('/\n?^[#]*\s*BEGIN WT MEDIA FIREWALL SECTION(.*\n){10}[#]*\s*END WT MEDIA FIREWALL SECTION\s*[#]*\n?/m', "", $httext);
-				// comment out any existing lines that set ErrorDocument 404
-				$httext = preg_replace('/^(ErrorDocument\s*404(.*))\n?/', "#$1\n", $httext);
-				$httext = preg_replace('/[^#](ErrorDocument\s*404(.*))\n?/', "\n#$1\n", $httext);
-			}
-			// add new WT media firewall section to the end of the file
-			$httext .= "\n######## BEGIN WT MEDIA FIREWALL SECTION ##########";
-			$httext .= "\n################## DO NOT MODIFY ###################";
-			$httext .= "\n## THERE MUST BE EXACTLY 11 LINES IN THIS SECTION ##";
-			$httext .= "\n<IfModule mod_rewrite.c>";
-			$httext .= "\n\tRewriteEngine On";
-			$httext .= "\n\tRewriteCond %{REQUEST_FILENAME} !-f";
-			$httext .= "\n\tRewriteCond %{REQUEST_FILENAME} !-d";
-			$httext .= "\n\tRewriteRule .* ".WT_SCRIPT_PATH."mediafirewall.php"." [L]";
-			$httext .= "\n</IfModule>";
-			$httext .= "\nErrorDocument\t404\t".WT_SCRIPT_PATH."mediafirewall.php";
-			$httext .= "\n########## END WT MEDIA FIREWALL SECTION ##########";
-
-			$whichFile = $MEDIA_DIRECTORY.".htaccess";
-			$fp = @fopen($whichFile, "wb");
-			if (!$fp) {
-				$errors = true;
-				$error_msg .= "<span class=\"error\">".WT_I18N::translate('E R R O R !!!<br />Could not write to file <i>%s</i>.  Please check it for proper Write permissions.', $whichFile)."</span><br />";
-			} else {
-				fwrite($fp, $httext);
-				fclose($fp);
-				chmod($whichFile, 0644); // Make sure apache can read this file
-			}
-		}
-	} elseif ($_POST["NEW_USE_MEDIA_FIREWALL"]==false && $USE_MEDIA_FIREWALL==true) {
-		AddToLog("Media Firewall disabled", 'config');
-
-		if (file_exists($MEDIA_DIRECTORY.".htaccess")) {
-			$httext = implode('', file($MEDIA_DIRECTORY.".htaccess"));
-			// remove all WT media firewall sections from the .htaccess
-			$httext = preg_replace('/\n?^[#]*\s*BEGIN WT MEDIA FIREWALL SECTION(.*\n){10}[#]*\s*END WT MEDIA FIREWALL SECTION\s*[#]*\n?/m', "", $httext);
-			// comment out any lines that set ErrorDocument 404
-			$httext = preg_replace('/^(ErrorDocument\s*404(.*))\n?/', "#$1\n", $httext);
-			$httext = preg_replace('/[^#](ErrorDocument\s*404(.*))\n?/', "\n#$1\n", $httext);
-			$whichFile = $MEDIA_DIRECTORY.".htaccess";
-			$fp = @fopen($whichFile, "wb");
-			if (!$fp) {
-				$errors = true;
-				$error_msg .= "<span class=\"error\">".WT_I18N::translate('E R R O R !!!<br />Could not write to file <i>%s</i>.  Please check it for proper Write permissions.', $whichFile)."</span><br />";
-			} else {
-				fwrite($fp, $httext);
-				fclose($fp);
-				chmod($whichFile, 0644); // Make sure apache can read this file
-			}
-		}
-
-	}
+	// ensure the media directory has an htaccess file that enables the media firewall 
+	fix_media_htaccess();
 
 	if (!$errors) {
 		$gednews = getUserNews(WT_GEDCOM);
@@ -374,8 +361,13 @@ case 'update':
 		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME);
 		exit;
 	}
-}
+	break;
+default:
+	// ensure the media directory has an htaccess file that enables the media firewall 
+	fix_media_htaccess();
+	break;
 
+}
 print_header(WT_I18N::translate('Family tree configuration'));
 if (get_gedcom_count()==1) { //Removed because it doesn't work here for multiple GEDCOMs. Can be reinstated when fixed (https://bugs.launchpad.net/webtrees/+bug/613235)
 	if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm'; 
@@ -447,7 +439,7 @@ echo WT_JS_START;?>
 					</tr>
 					<tr>
 						<td>
-							<?php echo WT_I18N::translate('Calendar format'), help_link('CALENDAR_FORMAT'); ?>
+							<?php echo WT_I18N::translate('Calendar conversion'), help_link('CALENDAR_FORMAT'); ?>
 						</td>
 						<td>
 							<select id="NEW_CALENDAR_FORMAT0" name="NEW_CALENDAR_FORMAT0">
@@ -722,7 +714,7 @@ echo WT_JS_START;?>
 
 			foreach ($tags as $tag) {
 				if ($tag) {
-					$all_tags[$tag]=translate_fact($tag);
+					$all_tags[$tag]=WT_Gedcom_Tag::getLabel($tag);
 				}
 			}
 
@@ -767,7 +759,7 @@ echo WT_JS_START;?>
 				echo '</td><td width="*">';
 				if ($row->tag_type) {
 					// I18N: e.g. Marriage (MARR)
-					echo WT_I18N::translate('%1$s [%2$s]', translate_fact($row->tag_type), $row->tag_type);
+					echo WT_I18N::translate('%1$s [%2$s]', WT_Gedcom_Tag::getLabel($row->tag_type), $row->tag_type);
 				} else {
 					echo '&nbsp;';
 				}
@@ -804,16 +796,20 @@ echo WT_JS_START;?>
 					</tr>
 					<tr>
 						<td>
-							<?php echo WT_I18N::translate('Multimedia directory'), help_link('MEDIA_DIRECTORY'); ?>
+							<?php echo WT_I18N::translate('Media directory'), help_link('MEDIA_DIRECTORY'); ?>
 						</td>
 						<td>
 							<input type="text" size="50" name="NEW_MEDIA_DIRECTORY" value="<?php echo $MEDIA_DIRECTORY; ?>" dir="ltr" />
-							<?php if (preg_match("/.*[a-zA-Z]{1}:.*/", $MEDIA_DIRECTORY)>0) echo "<span class=\"error\">".WT_I18N::translate('Media path should not contain a drive letter; media may not be displayed.')."</span>"; ?>
+							<?php
+							// these error messages are not duplicates of the checks above, they warn admins that have problems with their existing settings
+							if (preg_match("/.*[a-zA-Z]{1}:.*/", $MEDIA_DIRECTORY)>0) echo "<br /><span class=\"error\">".WT_I18N::translate('Media path should not contain a drive letter.')."</span>";
+							if (preg_match('/([\.]?[\.][\/])+/', $MEDIA_DIRECTORY)>0) echo "<br /><span class=\"error\">".WT_I18N::translate('Media path should not contain "../" or "./"')."</span>";
+							?>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<?php echo WT_I18N::translate('Multi-Media directory levels to keep'), help_link('MEDIA_DIRECTORY_LEVELS'); ?>
+							<?php echo WT_I18N::translate('Multimedia directory levels to keep'), help_link('MEDIA_DIRECTORY_LEVELS'); ?>
 						</td>
 						<td>
 							<input type="text" name="NEW_MEDIA_DIRECTORY_LEVELS" value="<?php echo $MEDIA_DIRECTORY_LEVELS; ?>" size="5" />
@@ -885,24 +881,24 @@ echo WT_JS_START;?>
 					</tr>
 					<tr>
 						<th colspan="2">
-							<?php echo WT_I18N::translate('Media Firewall'); ?>
+							<?php echo WT_I18N::translate('Media Firewall'); ?> (<a href="http://wiki.webtrees.net/Media_Firewall" target="_blank"><?php echo WT_I18N::translate('see the wiki'); ?></a>)
 						</th>
-					</tr>
-					<tr>
-						<td>
-							<?php echo WT_I18N::translate('Use media firewall'), help_link('USE_MEDIA_FIREWALL'); ?>
-						</td>
-						<td>
-							<?php echo edit_field_yes_no('NEW_USE_MEDIA_FIREWALL', get_gedcom_setting(WT_GED_ID, 'USE_MEDIA_FIREWALL')); ?>
-						</td>
 					</tr>
 					<tr>
 						<td>
 							<?php echo WT_I18N::translate('Media firewall root directory'), help_link('MEDIA_FIREWALL_ROOTDIR'); ?>
 						</td>
 						<td>
-							<input type="text" name="NEW_MEDIA_FIREWALL_ROOTDIR" size="50" dir="ltr" value="<?php echo ($MEDIA_FIREWALL_ROOTDIR == $INDEX_DIRECTORY) ? "" : $MEDIA_FIREWALL_ROOTDIR; ?>" /><br />
-						<?php echo WT_I18N::translate('When this field is empty, the <b>%s</b> directory will be used.', $INDEX_DIRECTORY); ?>
+							<input type="text" name="NEW_MEDIA_FIREWALL_ROOTDIR" size="50" dir="ltr" value="<?php echo ($MEDIA_FIREWALL_ROOTDIR == WT_DATA_DIR) ? "" : $MEDIA_FIREWALL_ROOTDIR; ?>" /><br />
+						<?php echo WT_I18N::translate('When this field is empty, the <b>%s</b> directory will be used.', WT_DATA_DIR); ?>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<?php echo WT_I18N::translate('Automatically protect new images'), help_link('USE_MEDIA_FIREWALL'); ?>
+						</td>
+						<td>
+							<?php echo edit_field_yes_no('NEW_USE_MEDIA_FIREWALL', get_gedcom_setting(WT_GED_ID, 'USE_MEDIA_FIREWALL')); ?>
 						</td>
 					</tr>
 					<tr>
@@ -1242,7 +1238,7 @@ echo WT_JS_START;?>
 												echo " checked=\"checked\"";
 											}
 											echo " onchange=\"var old=document.configform.NEW_SHOW_RELATIVES_EVENTS.value; if (this.checked) old+=','+this.value; else old=old.replace(/".$col."/g,''); old=old.replace(/[,]+/gi,','); old=old.replace(/^[,]/gi,''); old=old.replace(/[,]$/gi,''); document.configform.NEW_SHOW_RELATIVES_EVENTS.value=old\" /> ";
-											echo translate_fact($col);
+											echo WT_Gedcom_Tag::getLabel($col);
 										}
 										echo '</td>';
 									}

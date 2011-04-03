@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 10239 2011-01-01 22:32:55Z greg $
+// @version $Id: module.php 11203 2011-03-26 13:08:27Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -42,6 +42,8 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
 		global $ctype, $WT_IMAGES;
+
+		require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 		$show_unassigned=get_block_setting($block_id, 'show_unassigned', true);
 		$show_other     =get_block_setting($block_id, 'show_other',      true);
@@ -74,12 +76,12 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 		$table_id = 'ID'.floor(microtime()*1000000); // sorttable requires a unique ID
 		$content .= '<table id="'.$table_id.'" class="sortable list_table center">';
 		$content .= '<tr>';
-		$content .= '<th class="list_label">'.translate_fact('DATE').'</th>';
+		$content .= '<th class="list_label">'.WT_Gedcom_Tag::getLabel('DATE').'</th>';
 		$content .= '<th class="list_label">'.WT_I18N::translate('Record').'</th>';
 		if ($show_unassigned || $show_other) {
 			$content .= '<th class="list_label">'.WT_I18N::translate('User name').'</th>';
 		}
-		$content .= '<th class="list_label">'.translate_fact('TEXT').'</th>';
+		$content .= '<th class="list_label">'.WT_Gedcom_Tag::getLabel('TEXT').'</th>';
 		$content .= '</tr>';
 
 		$found=false;

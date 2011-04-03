@@ -26,7 +26,7 @@
  *
  * @package webtrees
  * @subpackage Themes
- * @version $Id: theme.php 11049 2011-03-05 12:51:27Z greg $
+ * @version $Id: theme.php 11189 2011-03-25 18:49:45Z greg $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -169,10 +169,10 @@ $WT_IMAGES=array(
 	'children'=>WT_THEME_DIR.'images/children.png',
 
 	// - lifespan chart arrows
-	'lsltarrow'=>WT_THEME_DIR.'images/lsltarrow.png',
-	'lsrtarrow'=>WT_THEME_DIR.'images/lsrtarrow.png',
-	'lsdnarrow'=>WT_THEME_DIR.'images/lsdnarrow.png',
-	'lsuparrow'=>WT_THEME_DIR.'images/lsuparrow.png',
+	'lsltarrow'=>WT_THEME_DIR.'images/lifespan-left.png',
+	'lsrtarrow'=>WT_THEME_DIR.'images/lifespan-right.png',
+	'lsdnarrow'=>WT_THEME_DIR.'images/lifespan-down.png',
+	'lsuparrow'=>WT_THEME_DIR.'images/lifespan-up.png',
 );
 
 //-- variables for the fan chart

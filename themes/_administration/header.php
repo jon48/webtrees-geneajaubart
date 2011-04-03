@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: header.php 11003 2011-03-01 13:32:43Z greg $
+// @version $Id: header.php 11084 2011-03-08 04:10:38Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -38,11 +38,6 @@ echo
 	$javascript,
 	'</head>';
 ?>
-	<!-- This is a script that claims solve all pre-IE9 compatability issues -->
-	<!--[if lt IE 9]>
-	<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js" type="text/javascript">IE7_PNG_SUFFIX=".png";</script>
-	<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/ie7-squish.js" type="text/javascript"></script>
-	<![endif]-->	
 <?php
 echo	
 	'<body id="body">',

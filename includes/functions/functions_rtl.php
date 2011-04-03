@@ -27,7 +27,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package webtrees
- * @version $Id: functions_rtl.php 10578 2011-01-23 17:59:52Z veit $
+ * @version $Id: functions_rtl.php 11137 2011-03-16 21:08:45Z greg $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -1198,30 +1198,6 @@ function oneRTLText($text) {
 	global $RTLOrd;
 	//--- What if gedcom in ANSI?
 	return (strlen($text)==2 && in_array(ord($text),$RTLOrd));
-}
-
-/**
- * Verify if text starts by a RtL character
- *
- * This will verify if text starts by a RtL character
- * @param string $text to verify
- */
-function begRTLText($text) {
-	global $RTLOrd;
-	//--- What if gedcom in ANSI?
-	return (in_array(ord(substr(trim($text),0,2)),$RTLOrd) || in_array(ord(substr(trim($text),1,2)),$RTLOrd));
-}
-
-/**
- * Verify if text ends by a RtL character
- *
- * This will verify if text ends by a RtL character
- * @param string $text to verify
- */
-function endRTLText($text) {
-	global $RTLOrd;
-	//--- What if gedcom in ANSI? -- I believe that not used
-	return (in_array(ord(substr(trim($text),strlen(trim($text))-2,2)),$RTLOrd) || in_array(ord(substr(trim($text),strlen(trim($text))-3,2)),$RTLOrd));
 }
 
 /**
