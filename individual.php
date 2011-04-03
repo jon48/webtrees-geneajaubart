@@ -38,6 +38,10 @@ $nonfamfacts = array(/*"NCHI",*/ "UID", "");
 $controller=new WT_Controller_Individual();
 $controller->init();
 
+//PERSO Create Perso Controller
+$pcontroller = new WT_Perso_Controller_Individual($controller);
+//END PERSO
+
 // tell tabs that use jquery that it is already loaded
 define('WT_JQUERY_LOADED', 1);
 
@@ -157,7 +161,10 @@ jQuery(document).ready(function() {
 									}
 									if ($summary) {
 										echo $summary;
-									}
+									}									
+									//PERSO Add titles
+									$pcontroller->print_titles();
+									//END PERSO
 								echo '</div>';
 							} else {
 								// 2nd and more names
