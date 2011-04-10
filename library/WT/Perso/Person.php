@@ -16,9 +16,6 @@ if (!defined('WT_WEBTREES')) {
 
 class WT_Perso_Person extends WT_Perso_GedcomRecord {
 
-	//Constants
-	private static $TITLE_PREFIX = "de |d'|du |of |von |vom |am |zur |van |del |della |t'|da |ten |ter |das |dos |af ";
-	
 	// Cached results from various functions.
 	private $_titles=null;
 
@@ -34,7 +31,7 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 			if($ct>0){
 				$titles=$match[1];
 				foreach($titles as $title){
-					$ct2 = preg_match_all('/(.*) (('.WT_Perso_Person::$TITLE_PREFIX.')(.*))/', $title, $match2);
+					$ct2 = preg_match_all('/(.*) (('.get_module_setting('perso_general', 'TITLE_PREFIX', '').')(.*))/', $title, $match2);
 					if($ct2>0){
 						$this->_titles[$match2[1][0]][]= trim($match2[2][0]);
 					}
