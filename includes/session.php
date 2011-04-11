@@ -22,7 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: session.php 11258 2011-04-02 14:26:20Z greg $
+ * @version $Id: session.php 11303 2011-04-11 14:27:08Z greg $
  */
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
@@ -34,7 +34,7 @@ if (!defined('WT_SCRIPT_NAME')) {
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
 define('WT_VERSION',         '1.1.2');
-define('WT_VERSION_RELEASE', 'svn'); // 'svn', 'beta', 'rc1', '', etc.
+define('WT_VERSION_RELEASE', ''); // 'svn', 'beta', 'rc1', '', etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
 define('WT_WEBTREES_URL',    'http://webtrees.net');
 define('WT_WEBTREES_WIKI',   'http://wiki.webtrees.net');
@@ -312,7 +312,7 @@ $cfg=array(
 // Search engines don't send cookies, and so create a new session with every visit.
 // Make sure they always use the same one
 if ($SEARCH_SPIDER) {
-	Zend_Session::setId('search_engine_'.$_SERVER['REMOTE_ADDR']);
+	Zend_Session::setId('search-engine-'.str_replace('.', '-', $_SERVER['REMOTE_ADDR']));
 }
 
 Zend_Session::start($cfg);

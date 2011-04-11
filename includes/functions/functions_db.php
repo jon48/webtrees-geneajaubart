@@ -27,7 +27,7 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
-* @version $Id: functions_db.php 11079 2011-03-07 21:48:01Z greg $
+* @version $Id: functions_db.php 11281 2011-04-06 17:58:06Z greg $
 * @package webtrees
 * @subpackage DB
 */
@@ -2165,32 +2165,4 @@ function update_favorites($xref_from, $xref_to, $ged_id=WT_GED_ID) {
 		WT_DB::prepare("UPDATE `##favorites` SET fv_gid=? WHERE fv_gid=? AND fv_file=?")
 		->execute(array($xref_to, $xref_from, $ged_name))
 		->rowCount();
-}
-
-/**
-* count changes by today, this week, or this month for administration dashboard
-*
-* @param string $xref
-* @param string $tree
-*/
-function count_changes_today($xref, $tree) {
-	$sql="SELECT count(change_id) FROM `##change` WHERE status='accepted' AND date(change_time)= date(now()) AND xref LIKE ? '%' AND gedcom_id = ? ";
-	return
-		WT_DB::prepare($sql)
-		->execute(array($xref, $tree))
-		->fetchOne();
-}
-function count_changes_week($xref, $tree) {
-	$sql="SELECT count(change_id) FROM `##change` WHERE status='accepted' AND week(change_time,2)= week(now(),2) AND xref LIKE ? '%' AND gedcom_id = ? ";
-	return
-		WT_DB::prepare($sql)
-		->execute(array($xref, $tree))
-		->fetchOne();
-}
-function count_changes_month($xref, $tree) {
-	$sql="SELECT count(change_id) FROM `##change` WHERE status='accepted' AND month(change_time)= month(now()) AND xref LIKE ? '%' AND gedcom_id = ? ";
-	return
-		WT_DB::prepare($sql)
-		->execute(array($xref, $tree))
-		->fetchOne();
 }

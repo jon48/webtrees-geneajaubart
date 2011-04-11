@@ -24,6 +24,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // $Id: individual.php 11209 2011-03-26 18:57:40Z veit $
+// @version: p_$Revision$ $Date$
+// $HeadURL$
+
 
 define('WT_SCRIPT_NAME', 'individual.php');
 require './includes/session.php';

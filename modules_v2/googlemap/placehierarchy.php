@@ -26,7 +26,7 @@
  * @subpackage Googlemap
  * @author Brian Holland (for v3 googlemaps version at webtrees)
  *
- * $Id: placehierarchy.php 11172 2011-03-22 19:30:58Z brian $
+ * $Id: placehierarchy.php 11295 2011-04-10 09:17:11Z lukasz $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -42,7 +42,7 @@ if (file_exists(WT_ROOT.WT_MODULES_DIR.'googlemap/defaultconfig.php')) {
 $stats = new WT_Stats($GEDCOM);
 
 function check_exist_table() {
-	return WT_DB::table_exists("##placelocation");
+	return WT_DB::table_exists('`##placelocation`');
 }
 
 function place_id_to_hierarchy($id) {
@@ -618,7 +618,7 @@ function map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $pla
 			if (isset($levelo[($level-1)])) {  // ** BH not sure yet what this if statement is for ... TODO **
 				// show the current place on the map
 
-				$place = WT_DB::prepare("SELECT pl_id as place_id, pl_place as place, pl_lati as lati, pl_long as `long`, pl_zoom as zoom, pl_icon as icon FROM ##placelocation WHERE pl_id=?")
+				$place = WT_DB::prepare("SELECT pl_id as place_id, pl_place as place, pl_lati as lati, pl_long as `long`, pl_zoom as zoom, pl_icon as icon FROM `##placelocation` WHERE pl_id=?")
 				->execute(array($levelm))
 				->fetch(PDO::FETCH_ASSOC);
 

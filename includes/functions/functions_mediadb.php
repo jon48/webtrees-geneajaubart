@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_mediadb.php 11107 2011-03-12 20:34:20Z greg $
+// $Id: functions_mediadb.php 11296 2011-04-10 09:32:13Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -668,13 +668,14 @@ function check_media_depth($filename, $truncate = "FRONT", $noise = "VERBOSE") {
 	if ($truncate == "NOTRUNC")
 		$truncate = "FRONT"; // **** temporary over-ride *****
 
-	if (WT_SCRIPT_NAME=='mediafirewall.php') {
+	if (WT_SCRIPT_NAME=='mediafirewall.php' || !WT_USER_CAN_EDIT) {
 		// no extraneous output while displaying images
 		$noise = "QUIET";
 	}
 
-	if (empty($noise) || ($noise != "VERBOSE" && $noise != "QUIET"))
+	if (empty($noise) || ($noise != "VERBOSE" && $noise != "QUIET")) {
 		$noise = "VERBOSE";
+	}
 
 	// NOTE: Check media depth
 	$parts = pathinfo_utf($filename);

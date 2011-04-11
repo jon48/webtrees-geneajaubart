@@ -21,7 +21,7 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
-* @version $Id: set_gedcom_defaults.php 10965 2011-02-25 13:17:44Z greg $
+* @version $Id: set_gedcom_defaults.php 11272 2011-04-04 16:45:14Z lukasz $
 */
 
 if (!defined('WT_WEBTREES') || empty($ged_id) || empty($ged_name)) {
@@ -130,8 +130,8 @@ set_gedcom_setting($ged_id, 'SHOW_REGISTER_CAUTION',        true);
 set_gedcom_setting($ged_id, 'SHOW_RELATIVES_EVENTS',        '_BIRT_CHIL,_BIRT_SIBL,_MARR_CHIL,_MARR_PARE,_DEAT_CHIL,_DEAT_PARE,_DEAT_GPAR,_DEAT_SIBL,_DEAT_SPOU');
 set_gedcom_setting($ged_id, 'SHOW_STATS',                   false);
 set_gedcom_setting($ged_id, 'SOURCE_ID_PREFIX',             'S');
-set_gedcom_setting($ged_id, 'SOUR_FACTS_ADD',               'NOTE,OBJE,REPO,SHARED_NOTE');
-set_gedcom_setting($ged_id, 'SOUR_FACTS_QUICK',             'WWW,EMAIL,NOTE');
+set_gedcom_setting($ged_id, 'SOUR_FACTS_ADD',               'NOTE,REPO,SHARED_NOTE');
+set_gedcom_setting($ged_id, 'SOUR_FACTS_QUICK',             'TEXT,NOTE,REPO');
 set_gedcom_setting($ged_id, 'SOUR_FACTS_UNIQUE',            'AUTH,ABBR,TITL,PUBL,TEXT');
 set_gedcom_setting($ged_id, 'SUBLIST_TRIGGER_F',            '200');
 set_gedcom_setting($ged_id, 'SUBLIST_TRIGGER_I',            '200');
@@ -139,6 +139,7 @@ set_gedcom_setting($ged_id, 'SURNAME_LIST_STYLE',           'style2');
 switch (WT_LOCALE) {
 case 'es': set_gedcom_setting($ged_id, 'SURNAME_TRADITION', 'spanish');    break;
 case 'is': set_gedcom_setting($ged_id, 'SURNAME_TRADITION', 'icelandic');  break;
+case 'lt': set_gedcom_setting($ged_id, 'SURNAME_TRADITION', 'lithuanian'); break;
 case 'pl': set_gedcom_setting($ged_id, 'SURNAME_TRADITION', 'polish');     break;
 case 'pt': set_gedcom_setting($ged_id, 'SURNAME_TRADITION', 'portuguese'); break;
 default:   set_gedcom_setting($ged_id, 'SURNAME_TRADITION', 'paternal');   break;

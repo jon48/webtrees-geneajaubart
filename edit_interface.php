@@ -26,7 +26,7 @@
 *
 * @package webtrees
 * @subpackage Edit
-* @version $Id: edit_interface.php 11161 2011-03-21 10:46:19Z greg $
+* @version $Id: edit_interface.php 11285 2011-04-07 14:35:26Z greg $
 */
 
 define('WT_SCRIPT_NAME', 'edit_interface.php');
@@ -211,7 +211,7 @@ if (!WT_USER_CAN_EDIT || !$disp || !$ALLOW_EDIT_GEDCOM) {
 //-- data that is hidden because of privacy is stored in the $pgv_private_records array
 //-- any private data will be restored when the record is replaced
 if (isset($gedrec)) {
-	$gedrec = privatize_gedcom($gedrec);
+	$gedrec = privatize_gedcom(WT_GED_ID, $gedrec);
 }
 
 if (!isset($type)) {

@@ -1,5 +1,5 @@
 <?php
-// Online UI for editing config.php site configuration variables
+// Interface to edit place locations
 //
 // webtrees: Web based Family History software
 // Copyright (C) 2011 webtrees development team.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_places.php 11262 2011-04-02 20:48:54Z lukasz $
+// $Id: admin_places.php 11298 2011-04-10 10:37:43Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -207,7 +207,7 @@ if ($action=='ImportGedcom') {
 						}
 					}
 				}
-				else $placelist[$j]['lati'] = '0';
+				else $placelist[$j]['lati'] = NULL;
 				if (preg_match("/4 LONG (.*)/", $placerec, $match)) {
 					$placelist[$j]['long'] = trim($match[1]);
 					if (($placelist[$j]['long'][0] != 'E') && ($placelist[$j]['long'][0] != 'W')) {
@@ -218,7 +218,7 @@ if ($action=='ImportGedcom') {
 						}
 					}
 				}
-				else $placelist[$j]['long'] = '0';
+				else $placelist[$j]['long'] = NULL;
 				$j = $j + 1;
 			}
 			$i = $i + 1;
@@ -518,7 +518,7 @@ function showchanges() {
 }
 
 function updateList(inactive) {
-	window.location.href='<?php if (strstr($_SERVER['REQUEST_URI'], '&inactive', true)) { $uri=strstr($_SERVER['REQUEST_URI'], '&inactive', true);} else { $uri=$_SERVER['REQUEST_URI']; } echo $uri, '&inactive='; ?>'+inactive;
+	window.location.href='<?php if (strstrb($_SERVER['REQUEST_URI'], '&inactive')) { $uri=strstrb($_SERVER['REQUEST_URI'], '&inactive');} else { $uri=$_SERVER['REQUEST_URI']; } echo $uri, '&inactive='; ?>'+inactive;
 }
 
 function edit_place_location(placeid) {
@@ -620,19 +620,17 @@ foreach ($placelist as $place) {
 ?>
 </table>
 </div>
-<?php
-?>
-	<table id="gm_manage">
-		<tr>
-			<td colspan="3"><a href="javascript:;" onclick="add_place_location(<?php echo $parent; ?>);return false;"><?php echo WT_I18N::translate('Add place'); ?></a><?php echo help_link('PL_ADD_LOCATION','googlemap'); ?></td>
-		</tr>
-		<tr>
-			<td><a href="module.php?mod=googlemap&mod_action=admin_places&action=ImportGedcom&mode=curr"><?php echo WT_I18N::translate('Import from current GEDCOM'); ?></a><?php echo help_link('PL_IMPORT_GEDCOM','googlemap'); ?></td>
-			<td><a href="module.php?mod=googlemap&mod_action=admin_places&action=ImportGedcom&mode=all"><?php echo WT_I18N::translate('Import from all GEDCOMs'); ?></a><?php echo help_link('PL_IMPORT_ALL_GEDCOM','googlemap'); ?></td>
-			<td><a href="module.php?mod=googlemap&mod_action=admin_places&action=ImportFile&mode=add"><?php echo WT_I18N::translate('Import from file'); ?></a><?php echo help_link('PL_IMPORT_FILE','googlemap'); ?></td>
-		</tr>
-		<tr>
-			<td>
+<table id="gm_manage">
+	<tr>
+		<td colspan="3"><a href="javascript:;" onclick="add_place_location(<?php echo $parent; ?>);return false;"><?php echo WT_I18N::translate('Add place'); ?></a><?php echo help_link('PL_ADD_LOCATION','googlemap'); ?></td>
+	</tr>
+	<tr>
+		<td><a href="module.php?mod=googlemap&mod_action=admin_places&action=ImportGedcom&mode=curr"><?php echo WT_I18N::translate('Import from current GEDCOM'); ?></a><?php echo help_link('PL_IMPORT_GEDCOM','googlemap'); ?></td>
+		<td><a href="module.php?mod=googlemap&mod_action=admin_places&action=ImportGedcom&mode=all"><?php echo WT_I18N::translate('Import from all GEDCOMs'); ?></a><?php echo help_link('PL_IMPORT_ALL_GEDCOM','googlemap'); ?></td>
+		<td><a href="module.php?mod=googlemap&mod_action=admin_places&action=ImportFile&mode=add"><?php echo WT_I18N::translate('Import from file'); ?></a><?php echo help_link('PL_IMPORT_FILE','googlemap'); ?></td>
+	</tr>
+	<tr>
+		<td>
 <?php
 	if (count($where_am_i)<=4) {
 		echo '<a href="module.php?mod=googlemap&mod_action=admin_places&action=ExportFile&parent=', $parent, '">';
@@ -646,9 +644,9 @@ foreach ($placelist as $place) {
 	echo WT_I18N::translate('Export all locations to file'), '</a>';
 	echo help_link('PL_EXPORT_ALL_FILE','googlemap');
 	echo '</td></tr></table>';
-if (empty($SEARCH_SPIDER))
+if (empty($SEARCH_SPIDER)) {
 	print_footer();
-else {
+} else {
 	echo WT_I18N::translate('Search Engine Spider Detected'), ': ', $SEARCH_SPIDER;
 	echo '</div></body></html>';
 }

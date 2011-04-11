@@ -24,7 +24,7 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
-* @version $Id: functions_privacy.php 11175 2011-03-23 18:31:18Z greg $
+* @version $Id: functions_privacy.php 11285 2011-04-07 14:35:26Z greg $
 * @package webtrees
 * @subpackage Privacy
 */
@@ -205,7 +205,7 @@ function showLivingNameById($pid) {
 // Can we display a level 0 record?
 function canDisplayRecord($ged_id, $gedrec) {
 	// TODO - use the privacy settings for $ged_id, not the default gedcom.
-	global $person_privacy, $person_facts, $global_facts, $HIDE_LIVE_PEOPLE, $GEDCOM, $SHOW_DEAD_PEOPLE, $MAX_ALIVE_AGE;
+	global $person_privacy, $person_facts, $global_facts, $HIDE_LIVE_PEOPLE, $SHOW_DEAD_PEOPLE, $MAX_ALIVE_AGE;
 	global $PRIVACY_CHECKS, $SHOW_LIVING_NAMES, $KEEP_ALIVE_YEARS_BIRTH, $KEEP_ALIVE_YEARS_DEATH;
 
 	// Only need to check each record once.
@@ -402,13 +402,11 @@ function canDisplayFact($xref, $ged_id, $gedrec) {
 * @param string $gedrec the raw gedcom record to privatize
 * @return string the privatized gedcom record
 */
-function privatize_gedcom($gedrec) {
-	global $SHOW_PRIVATE_RELATIONSHIPS, $pgv_private_records;
-	global $global_facts, $person_facts, $GEDCOM;
-	$gedcom_id=get_id_from_gedcom($GEDCOM);
+function privatize_gedcom($gedcom_id, $gedrec) {
+	global $SHOW_PRIVATE_RELATIONSHIPS, $pgv_private_records, $global_facts, $person_facts;
 
 	if (preg_match('/^0 @('.WT_REGEX_XREF.')@ ('.WT_REGEX_TAG.')(.*)/', $gedrec, $match)) {
-		$gid = $match[1];
+		$gid  = $match[1];
 		$type = $match[2];
 		$data = $match[3];
 		if (canDisplayRecord($gedcom_id, $gedrec)) {

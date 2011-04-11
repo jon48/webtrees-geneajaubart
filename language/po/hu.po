@@ -3,15 +3,15 @@ msgstr ""
 "Project-Id-Version: Fab\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2011-04-02 16:59+0100\n"
-"PO-Revision-Date: 2011-02-23 15:28+0000\n"
+"PO-Revision-Date: 2011-04-09 18:29+0000\n"
 "Last-Translator: Nagy Ákos <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-04-03 05:03+0000\n"
-"X-Generator: Launchpad (build 12559)\n"
+"X-Launchpad-Export-Date: 2011-04-10 05:03+0000\n"
+"X-Generator: Launchpad (build 12735)\n"
 "X-Poedit-Language: Hungarian\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-SearchPath-0: .\n"
@@ -13573,7 +13573,7 @@ msgstr "december"
 #: webtrees/includes/functions/functions_print.php:1839
 #: webtrees/library/WT/Date/Calendar.php:262
 msgid "Sun"
-msgstr "Nap"
+msgstr "Vas"
 
 #: webtrees/includes/functions/functions_print.php:1840
 #: webtrees/library/WT/Date/Calendar.php:256
@@ -25184,7 +25184,7 @@ msgstr "Ebben az évben az Ön múltjában..."
 
 #: webtrees/calendar.php:148 webtrees/admin.php:270
 msgid "Day"
-msgstr "nap"
+msgstr "Nap"
 
 #: webtrees/calendar.php:163 webtrees/admin.php:270
 msgid "Month"

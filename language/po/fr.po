@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: Fab\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2011-04-02 16:59+0100\n"
-"PO-Revision-Date: 2011-04-01 22:20+0000\n"
+"PO-Revision-Date: 2011-04-04 13:56+0000\n"
 "Last-Translator: Jacqueline Gazaille <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2011-04-03 05:00+0000\n"
+"X-Launchpad-Export-Date: 2011-04-05 05:02+0000\n"
 "X-Generator: Launchpad (build 12559)\n"
 "X-Poedit-Language: French\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -6797,7 +6797,7 @@ msgstr ""
 #: webtrees/modules_v2/tree/class_treeview.php:83
 #: webtrees/modules_v2/tree/class_treeview.php:90
 msgid "Style"
-msgstr ""
+msgstr "Modèle"
 
 #: webtrees/modules_v2/tree/class_treeview.php:107
 msgid "Move the toolbar"
@@ -6822,7 +6822,7 @@ msgstr "Afficher les années de naissance et de décès"
 
 #: webtrees/modules_v2/tree/class_treeview.php:115
 msgid "Use compact layout"
-msgstr ""
+msgstr "Utiliser le modèle compact"
 
 #. I18N: verb/action
 #: webtrees/modules_v2/tree/class_treeview.php:121
@@ -6831,7 +6831,7 @@ msgstr "Imprimer"
 
 #: webtrees/modules_v2/tree/class_treeview.php:122
 msgid "Show all spouses and ancestors"
-msgstr ""
+msgstr "Afficher tous les conjoints et tous les ancêtres"
 
 #. I18N: Button label - view this chart in full-screen mode
 #: webtrees/modules_v2/tree/class_treeview.php:124
@@ -9416,6 +9416,10 @@ msgid ""
 "directory of %1$s will create URLs of the form %2$s and store these items as "
 "%3$s."
 msgstr ""
+"Le répertoire media est utilisé pour créer les adresses URL de vos items "
+"médias. Il est aussi le sous-répertoire dans lequel sont stockés vos items "
+"médias. Par exemple, un répertoire media %1$s créera les URLs comme %2$s et "
+"stockera ces items comme %3$s."
 
 #. I18N: %1$s and %2$s are both directory names
 #: webtrees/help_text.php:1580
@@ -9426,6 +9430,10 @@ msgid ""
 "private directory such as %2$s.  This allows webtrees to apply privacy "
 "filtering to media items."
 msgstr ""
+"Si votre serveur le permet, vous pouvez activer le pare-feu multimédia.  "
+"Cette action transforme le répertoire media %1$s publique en un répertoire "
+"privé comme %2$s.  Cela permet à webtrees d'appliquer des filtres d'accès "
+"privé aux objets multimédia."
 
 #. I18N: %s is a directory name
 #: webtrees/help_text.php:1582
@@ -9434,6 +9442,8 @@ msgid ""
 "The media directory %s must exist, and the webserver must have read and "
 "write access to it."
 msgstr ""
+"Le répertoire %s media doit exister et le serveur web doit avoir les "
+"permissions de lecture et d'écriture pour y accéder."
 
 #: webtrees/help_text.php:1584
 msgid ""
@@ -9441,6 +9451,10 @@ msgid ""
 "to share media items.  If they use different media directories, then they "
 "will be able to use the same filename to access different media items."
 msgstr ""
+"Si deux arbres généalogiques partagent le même répertoire média, alors ils "
+"partageront aussi les items médias.  S'ils utilisent des répertoires médias "
+"différents, alors ils pourront utiliser le même nom de fichier média pour "
+"accéder à des items médias différents."
 
 #: webtrees/help_text.php:1590
 msgid ""
@@ -19243,6 +19257,8 @@ msgid ""
 "You should click the \"Move ALL to Protected\" button to move your media to "
 "the protected directory"
 msgstr ""
+"Vous pouvez cliquer sur le bouton \"Déplacer TOUS à protéger\" pour déplacer "
+"vos médias dans le répertoire protégé."
 
 #: webtrees/admin_media.php:929
 msgid "Move ALL to standard"

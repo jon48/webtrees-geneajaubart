@@ -25,7 +25,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package webtrees
- * @version $Id: functions.php 11075 2011-03-07 00:49:10Z larry $
+ * @version $Id: functions.php 11287 2011-04-08 18:48:45Z lukasz $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -3461,4 +3461,8 @@ function expand_urls($text) {
 	);
 }
 
-
+// Returns the part of the haystack before the first occurrence of the needle.
+// Use it to emulate the before_needle php 5.3.0 strstr function
+function strstrb($haystack, $needle){
+	return substr($haystack, 0, strpos($haystack, $needle));
+}

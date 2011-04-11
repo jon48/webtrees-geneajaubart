@@ -26,7 +26,7 @@
  *
  * @package webtrees
  * @subpackage Module
- * $Id: googlemap.php 11107 2011-03-12 20:34:20Z greg $
+ * $Id: googlemap.php 11302 2011-04-11 14:13:51Z greg $
  *
  * @author Brian Holland
  */
@@ -289,7 +289,7 @@ function setup_map() {
 	}
 	?>
 	<!--  V3 ============ -->
-	<script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false" type="text/javascript"></script>
+	<script src="http://maps.google.com/maps/api/js?v=3.2&amp;sensor=false&amp;language=<?php echo WT_LOCALE; ?>" type="text/javascript"></script>
 	<!--  V3 ============ -->
 	<script type="text/javascript">
 		var minZoomLevel = <?php echo $GOOGLEMAP_MIN_ZOOM;?>;
@@ -308,7 +308,7 @@ function build_indiv_map($indifacts, $famids) {
 	// Create the markers list array ===============================================================
 	$markers=array();
 	// Add the events to the markers list array=====================================================
-	$placelocation=WT_DB::table_exists("##placelocation");
+	$placelocation=WT_DB::table_exists("`##placelocation`");
 	//-- sort the facts into date order
 	sort_facts($indifacts);
 	$i = 0;

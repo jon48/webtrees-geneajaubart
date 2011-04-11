@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: GedcomRecord.php 11137 2011-03-16 21:08:45Z greg $
+// @version $Id: GedcomRecord.php 11285 2011-04-07 14:35:26Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -65,7 +65,7 @@ class WT_GedcomRecord {
 
 		//-- set the gedcom record a privatized version
 		$this->disp  =canDisplayRecord($this->ged_id, $this->gedrec);
-		$this->gedrec=privatize_gedcom($this->gedrec);
+		$this->gedrec=privatize_gedcom($this->ged_id, $this->gedrec);
 	}
 
 	// Get an instance of a GedcomRecord.  We either specify

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Person.php 11234 2011-03-29 13:13:51Z greg $
+// @version $Id: Person.php 11284 2011-04-07 14:05:23Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -1637,7 +1637,7 @@ class WT_Person extends WT_GedcomRecord {
 
 		// Generate a "list" name, by moving the surname to the front of the "full" name
 		// Take care of names with no space before/after the surname
-		$list=preg_replace('/^([^\/]+?)( *)(\/.+\/)/', '$3$2$1', $full);
+		$list=preg_replace('/^([^\/]+?)( *)(\/.+\/)/', '$3,$2$1', $full);
 
 		// Need the 'not known' place holders for the database
 		$fullNN=$full;

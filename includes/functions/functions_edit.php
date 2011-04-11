@@ -27,7 +27,7 @@
 * @package webtrees
 * @subpackage Edit
 * @see functions_places.php
-* @version $Id: functions_edit.php 11238 2011-03-29 18:16:59Z greg $
+* @version $Id: functions_edit.php 11299 2011-04-10 13:22:55Z veit $
 */
 
 if (!defined('WT_WEBTREES')) {
@@ -75,7 +75,7 @@ function select_edit_control($name, $values, $empty, $selected, $extra='') {
 			$html.='<option value="'.htmlspecialchars($key).'">'.htmlspecialchars($value).'</option>';
 		}
 	}
-	return '<select name="'.$name.'" '.$extra.'>'.$html.'</select>';
+	return '<select id="'.$name.'" name="'.$name.'" '.$extra.'>'.$html.'</select>';
 }
 
 // An inline-editing version of select_edit_control()
@@ -703,12 +703,15 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 			break;
 		case 'paternal':
 		case 'polish':
+		case 'lithuanian':
 			// Father gives his surname to his wife and children
 			switch ($nextaction) {
 			case 'addspouseaction':
 				if ($famtag=='WIFE' && preg_match('/\/(.*)\//', $indi_name, $match)) {
 					if ($SURNAME_TRADITION=='polish') {
 						$match[1]=preg_replace(array('/ski$/', '/cki$/', '/dzki$/', '/żki$/'), array('ska', 'cka', 'dzka', 'żka'), $match[1]);
+					} else if ($SURNAME_TRADITION=='lithuanian') {
+						$match[1]=preg_replace(array('/as$/', '/is$/', '/ys$/', '/us$/'), array('ienė', 'ienė', 'ienė', 'ienė'), $match[1]);
 					}
 					$new_marnm=$match[1];
 				}
@@ -718,6 +721,8 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 					$name_fields['SURN']=$match[2];
 					if ($SURNAME_TRADITION=='polish' && $sextag=='F') {
 						$match[2]=preg_replace(array('/ski$/', '/cki$/', '/dzki$/', '/żki$/'), array('ska', 'cka', 'dzka', 'żka'), $match[2]);
+					} else if ($SURNAME_TRADITION=='lithuanian' && $sextag=='F') {
+						$match[2]=preg_replace(array('/as$/', '/a$/', '/is$/', '/ys$/', '/ius$/', '/us$/'), array('aitė', 'aitė', 'ytė', 'ytė', 'iūtė', 'utė'), $match[2]);
 					}
 					$name_fields['SPFX']=trim($match[1]);
 					$name_fields['NAME']="/{$match[1]}{$match[2]}/";
@@ -727,6 +732,9 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 				if ($famtag=='HUSB' && preg_match('/\/((?:[a-z]{2,3}\s+)*)(.*)\//i', $indi_name, $match)) {
 					if ($SURNAME_TRADITION=='polish' && $sextag=='M') {
 						$match[2]=preg_replace(array('/ska$/', '/cka$/', '/dzka$/', '/żka$/'), array('ski', 'cki', 'dzki', 'żki'), $match[2]);
+					} else if ($SURNAME_TRADITION=='lithuanian' && $sextag=='F') {
+						// not a complete list as the rules are somewhat complicated but will do 95% correctly
+						$match[2]=preg_replace(array('/aitė$/', '/ytė$/', '/iūtė$/', '/utė$/'), array('as', 'is', 'ius', 'us'), $match[2]);
 					}
 					$name_fields['SPFX']=trim($match[1]);
 					$name_fields['SURN']=$match[2];
@@ -774,9 +782,9 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 		foreach ($match[1] as $tag)
 			$adv_name_fields[$tag]='';
 	// This is a custom tag, but PGV uses it extensively.
-	if ($SURNAME_TRADITION=='paternal' || $SURNAME_TRADITION=='polish' || (strpos($namerec, '2 _MARNM')!==false))
+	if ($SURNAME_TRADITION=='paternal' || $SURNAME_TRADITION=='polish' || $SURNAME_TRADITION=='lithuanian' || (strpos($namerec, '2 _MARNM')!==false)) {
 		$adv_name_fields['_MARNM']='';
-
+	}
 	$person = WT_Person::getInstance($pid);
 	foreach ($adv_name_fields as $tag=>$dummy) {
 		// Edit existing tags
@@ -1572,15 +1580,19 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		echo ">", WT_I18N::translate_c('unknown gender', 'Unknown'), "</option></select>";
 	} else if ($fact == "TYPE" && $level == '3') {
 		//-- Build the selector for the Media "TYPE" Fact
-		echo "<select name=\"text[]\">";
-		if ($value=='') echo "<option selected=\"selected\" value=\"\" > ", WT_I18N::translate('Choose: '), " </option>";
+		echo '<select name="text[]"><option selected="selected" value="" ></option>';
 		$selectedValue = strtolower($value);
-		foreach (WT_Gedcom_Tag::getFileFormTypes() as $typeName => $typeValue) {
-			echo "<option value=\"", $typeName, "\" ";
-			if ($selectedValue == $typeName) echo "selected=\"selected\" ";
-			echo "> ", $typeValue, " </option>";
+		if (!array_key_exists($selectedValue, WT_Gedcom_Tag::getFileFormTypes())) {
+			echo '<option selected="selected" value="', htmlspecialchars($value), '" >', htmlspecialchars($value), '</option>';
 		}
-		echo "</select>";
+		foreach (WT_Gedcom_Tag::getFileFormTypes() as $typeName => $typeValue) {
+			echo '<option value="', $typeName, '"';
+			if ($selectedValue == $typeName) {
+				echo ' selected="selected"';
+			}
+			echo '>', $typeValue, '</option>';
+		}
+		echo '</select>';
 	} else if (($fact=="NAME" && $upperlevel!='REPO') || $fact=="_MARNM") {
 		// Populated in javascript from sub-tags
 		echo "<input type=\"hidden\" id=\"", $element_id, "\" name=\"", $element_name, "\" onchange=\"updateTextName('", $element_id, "');\" value=\"", PrintReady(htmlspecialchars($value)), "\" />";
@@ -1624,7 +1636,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		else if (($cols>20 || $fact=="NPFX") && $readOnly=='') print_specialchar_link($element_id, false);
 	}
 	// MARRiage TYPE : hide text field and show a selection list
-	if ($fact=="TYPE" and $tags[0]=="MARR") {
+	if ($fact=='TYPE' && $level==2 && $tags[0]=='MARR') {
 		echo "<script type='text/javascript'>";
 		echo "document.getElementById('", $element_id, "').style.display='none'";
 		echo "</script>";
@@ -1946,9 +1958,9 @@ function addNewName() {
 		$tags=array_merge($tags, $match[1]);
 	}
 
-	// Paternal and Polish surname traditions can also create a _MARNM
+	// Paternal and Polish and Lithuanian surname traditions can also create a _MARNM
 	$SURNAME_TRADITION=get_gedcom_setting(WT_GED_ID, 'SURNAME_TRADITION');
-	if ($SURNAME_TRADITION=='paternal' || $SURNAME_TRADITION=='polish') {
+	if ($SURNAME_TRADITION=='paternal' || $SURNAME_TRADITION=='polish' || $SURNAME_TRADITION=='lithuanian') {
 		$tags[]='_MARNM';
 	}
 

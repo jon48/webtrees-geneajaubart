@@ -3,15 +3,15 @@ msgstr ""
 "Project-Id-Version: webtrees 1.0\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2011-04-02 16:59+0100\n"
-"PO-Revision-Date: 2011-03-29 06:09+0000\n"
-"Last-Translator: volschin <Unknown>\n"
+"PO-Revision-Date: 2011-04-10 06:37+0000\n"
+"Last-Translator: Otmar Mayr <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-04-03 05:01+0000\n"
-"X-Generator: Launchpad (build 12559)\n"
+"X-Launchpad-Export-Date: 2011-04-11 05:08+0000\n"
+"X-Generator: Launchpad (build 12735)\n"
 
 #. I18N: A title/heading. %s is a person's name
 #: webtrees/familybook.php:195
@@ -1339,7 +1339,7 @@ msgstr "Lebensspannen-Diagramm"
 
 #: webtrees/lifespan.php:68
 msgid "Include the person's immediate family?"
-msgstr ""
+msgstr "Die enge Verwandschaft der Person einschließen?"
 
 #: webtrees/lifespan.php:73
 msgid "Show Timeline chart"
@@ -1987,6 +1987,7 @@ msgstr "CKEditor"
 msgid ""
 "Adds CKEditor for text editing in FAQ, News, HTML, and Stories modules."
 msgstr ""
+"Verwende CKEditor für Textbearbeitung in FAQ, News und Geschichtenmodul."
 
 #. I18N: Name of a report
 #: webtrees/modules_v2/cemetery_report/module.php:35
@@ -1999,7 +2000,7 @@ msgstr "Friedhofsbericht"
 #: webtrees/modules_v2/cemetery_report/module.php:41
 #: webtrees_tmp/modules_v2_cemetery_report_report.xml.php:5
 msgid "A report of people buried in a given place."
-msgstr ""
+msgstr "Bericht über Personen die an einem bestimmten Ort bestattet wurden."
 
 #: webtrees/modules_v2/faq/module.php:34 webtrees/library/WT/MenuBar.php:614
 msgid "FAQ"
@@ -2103,6 +2104,12 @@ msgid ""
 "typically concerned with privacy, copyright, user-accounts, unsuitable "
 "content, requirement for source-citations, etc."
 msgstr ""
+"FAQ sind Listen von Antworten auf oft gestellte Fragen, welche dazu dienen, "
+"den Benutzern der Webseite Regeln, Methoden und Vorgehensweisen zu "
+"erklären.\r\n"
+"Die Fragen bewegen sich im allgemeinen um die Bereiche Datenschutz, "
+"Copyright, Benutzerkonten, nicht geeignete Inhalte, Anforderungen an "
+"Quellenzitate, usw."
 
 #: webtrees/modules_v2/faq/help_text.php:39
 msgid ""
@@ -2214,7 +2221,7 @@ msgstr "Verwandtschaftsbericht"
 #: webtrees/modules_v2/relative_report/module.php:41
 #: webtrees_tmp/modules_v2_relative_report_report.xml.php:5
 msgid "A report of a person and a list of their relatives."
-msgstr ""
+msgstr "Bericht über eine Person und eine Liste ihrer Angehörigen."
 
 #: webtrees/modules_v2/sitemap/module.php:34
 msgid "Sitemap"
@@ -2742,14 +2749,14 @@ msgstr "Adressenliste"
 #: webtrees/modules_v2/address_report/module.php:41
 #: webtrees_tmp/modules_v2_address_report_report.xml.php:5
 msgid "A report of addresses, telephone numbers, and email addresses."
-msgstr ""
+msgstr "Bericht über Adressen, Telefonnummern, eMail-Adressen"
 
 #. I18N: Name of a report
 #: webtrees/modules_v2/occupation_report/module.php:35
 #: webtrees_tmp/modules_v2_occupation_report_report.xml.php:4
 #: webtrees_tmp/modules_v2_occupation_report_report.xml.php:35
 msgid "Occupation report"
-msgstr ""
+msgstr "Bericht über Berufe"
 
 #. I18N: Description of a report
 #: webtrees/modules_v2/occupation_report/module.php:41
@@ -2952,13 +2959,13 @@ msgstr "Beschränkung:"
 #: webtrees_tmp/modules_v2_bdm_report_report.xml.php:4
 #: webtrees_tmp/modules_v2_bdm_report_report.xml.php:31
 msgid "Births, Deaths, Marriages"
-msgstr "Geburten, Sterbefälle, Hochzeiten"
+msgstr "Geburten, Sterbefälle, Heiraten"
 
 #. I18N: Description of a report.  "vital records" are life events - birth/marriage/death
 #: webtrees/modules_v2/bdm_report/module.php:41
 #: webtrees_tmp/modules_v2_bdm_report_report.xml.php:5
 msgid "A report of vital records for a given date or place."
-msgstr ""
+msgstr "Bericht von Lebensdaten für ein bestimmtes Datum oder einen Ort."
 
 #: webtrees/modules_v2/user_welcome/module.php:34
 msgid "User Welcome"
@@ -3001,7 +3008,7 @@ msgstr "Geschichten"
 
 #: webtrees/modules_v2/stories/module.php:39
 msgid "Add a narrative story to a person."
-msgstr ""
+msgstr "Hinzufügen einer Geschichte zu einer Person."
 
 #: webtrees/modules_v2/stories/module.php:120
 #: webtrees/modules_v2/stories/module.php:189
@@ -3261,6 +3268,8 @@ msgid ""
 "Your user account does not have \"automatically approve changes\" enabled.  "
 "You will only be able to change one record at a time."
 msgstr ""
+"Ihr Benutzerkonto verfügt nicht über die Berechtigung zur \"automatischen "
+"Änderung\" von Datensätzen. Sie können nur jeweils einen Datensatz ändern."
 
 #: webtrees/modules_v2/batch_update/admin_batch_update.php:119
 msgid "Nothing found."
@@ -3432,6 +3441,10 @@ msgid ""
 "individuals whose death can be inferred from other dates, but who do not "
 "have a record of death, burial, cremation, etc."
 msgstr ""
+"Wenn für eine Person noch kein Datensatz für das Todes-, Begräbnis- oder "
+"Einäscherungsdatum gesetzt ist, können die Datenschutzabfragen beschleunigt "
+"werden, in dem ein \"verstorben\"-Merkmal gesetzt wird, das aus anderen "
+"Ereignissen abgeleitet werden kann."
 
 #. I18N: Name of a report
 #: webtrees/modules_v2/change_report/module.php:35
@@ -3526,6 +3539,8 @@ msgid ""
 "Number of days to show: This is the number of days that <b>webtrees</b> "
 "should use when searching for events"
 msgstr ""
+"Anzahl der Tage zru Anzeige: Dies ist die Anzahl der Tage, die <b> webtrees "
+"</ b> bei der Suche nach Ereignissen verwenden soll."
 
 #: webtrees/modules_v2/yahrzeit/help_text.php:41
 msgid ""
@@ -3541,6 +3556,8 @@ msgid ""
 "Adds a sidebar which allows for easy navigation of individuals in a "
 "descendants tree-view format."
 msgstr ""
+"Fügt eine Sidebar hinzu, die eine einfache Navigation zwischen Personen und "
+"Nachkommen in einer Baumansicht ermöglicht."
 
 #: webtrees/modules_v2/descendancy/module.php:240
 #: webtrees/includes/functions/functions_charts.php:268
@@ -4517,6 +4534,10 @@ msgid ""
 "are for countries and states. This serves as a visual cue that the markers "
 "around the flag are from the general area, and not the specific spot."
 msgstr ""
+"Verberge die Flaggen, die im Googlemap Modul für Länder und Staaten "
+"konfiguriert wurden. Diese dient als visueller Hinweis, dass die Marker rund "
+"um die Fahne aus dem allgemeinen Bereich sind, und nicht zu einem "
+"spezifischen Ort gehören."
 
 #: webtrees/modules_v2/googlemap/wt_v3_places_edit.js.php:396
 #: webtrees/modules_v2/googlemap/flags.php:91
@@ -5369,6 +5390,9 @@ msgid ""
 "The census assistant provides a simple way to enter census transcripts and "
 "link them to each person listed in the census."
 msgstr ""
+"Der Volkszählungs-Assistent bietet einen einfachen Weg der Eingabe von "
+"Volkszählungs-Transkripten und verknüpft sie mit jeder Person die in der "
+"Volkszählung angeführt ist."
 
 #: webtrees/modules_v2/GEDFact_assistant/_CENS/census_3_search_add.php:44
 msgid "Add people"
@@ -5708,7 +5732,7 @@ msgstr "Ahnentafelbericht"
 #: webtrees/modules_v2/ahnentafel_report/module.php:41
 #: webtrees_tmp/modules_v2_ahnentafel_report_report.xml.php:6
 msgid "A report of a person's ancestors in a narrative style."
-msgstr ""
+msgstr "Ein Bericht über Vorfahren einer Person in einem Erzähl-Stil."
 
 #: webtrees/modules_v2/review_changes/module.php:34
 #: webtrees/modules_v2/review_changes/module.php:107
@@ -5725,6 +5749,10 @@ msgid ""
 "need to be approved by a moderator.  It also generates daily emails to "
 "moderators whenever pending changes exist."
 msgstr ""
+"Dieser Block zeigt dem Bearbeiter eine Liste von Datensätze mit ausstehenden "
+"Änderungen, die von einem Moderator genehmigt werden müssen. Es erzeugt auch "
+"täglich die eMails an die Moderatoren, wenn ausstehende Änderungen vorhanden "
+"sind."
 
 #: webtrees/modules_v2/review_changes/module.php:86
 msgid "webtrees - Review changes"
@@ -6277,6 +6305,11 @@ msgid ""
 "can configure the block to show an ancestors, descendants, hourglass view, "
 "or an interactive tree.  You can also choose the root person for the chart."
 msgstr ""
+"Der Diagramm-Block ermöglicht es eine Grafik auf der Startseite oder in "
+"\"Meine Seite\" einzufügen. Sie können diesen Block auch konfigurieren, um "
+"einen Vorfahren, Nachkommen in der Sanduhr-Ansicht darzustellen, oder einen "
+"interaktiven Baum zeigen. Sie können auch den Proband für das Diagramm "
+"auswählen."
 
 #: webtrees/modules_v2/charts/module.php:92
 #, php-format
@@ -6305,6 +6338,8 @@ msgid ""
 "You must select an individual and chart type in the block configuration "
 "settings."
 msgstr ""
+"Sie müssen eine Person und einen Diagramm-Typ in den Block-Einstellungen "
+"festlegen."
 
 #: webtrees/modules_v2/charts/module.php:200 webtrees/help_text.php:2213
 msgid "Chart type"
@@ -6396,6 +6431,8 @@ msgstr "Heiratsdaten und -ortebericht"
 #: webtrees_tmp/modules_v2_marriage_report_report.xml.php:5
 msgid "A report of people who were married in a given time or place."
 msgstr ""
+"Bericht von Personen, die in einer bestimmten Zeit oder an einem bestimmten "
+"Ort geheiratet haben."
 
 #: webtrees/modules_v2/login_block/module.php:34
 #: webtrees/modules_v2/login_block/module.php:58
@@ -6454,6 +6491,11 @@ msgid ""
 "GEDCOM administration function, you can also configure names to remove from "
 "this list."
 msgstr ""
+"Dieser Block zeigt die am häufigsten vorkommenden Familiennamen in der "
+"Datenbank. Die Anzahl der Familiennamen, die in diesem Block dargestellt "
+"werden, ist konfigurierbar. Die Einstellungen sind in der GEDCOM-"
+"Konfiguration vorzunehmen. Dort können sie auch Namen aus der Liste "
+"entfernen."
 
 #. I18N: There are separate lists of male/female names, containing %d names each
 #: webtrees/modules_v2/top10_surnames/module.php:92
@@ -6759,7 +6801,7 @@ msgstr "Bericht über die Detailangaben zu einer Person."
 #: webtrees/modules_v2/tree/module.php:63
 msgid ""
 "An interactive tree, showing all the ancestors and descendants of a person."
-msgstr ""
+msgstr "Interaktiver Baum, mit allen Vorfahren und Nachkommen einer Person."
 
 #: webtrees/modules_v2/tree/class_treeview.php:83
 #: webtrees/modules_v2/tree/class_treeview.php:90
@@ -23684,7 +23726,7 @@ msgstr "Ort der Scheidung des Ehepartners"
 #: webtrees/library/WT/Gedcom/Tag.php:246
 #: webtrees/library/WT/Gedcom/Tag.php:285
 msgid "Date of marriage"
-msgstr "Hochzeitsdatum"
+msgstr "Heiratsdatum"
 
 #: webtrees/library/WT/Gedcom/Tag.php:247
 #: webtrees/library/WT/Gedcom/Tag.php:286
@@ -27064,7 +27106,7 @@ msgstr "Sterbeorte"
 
 #: webtrees/statistics.php:396
 msgid "Marriage places"
-msgstr "Hochzeitsorte"
+msgstr "Heiratsort"
 
 #: webtrees/statistics.php:397
 msgid "Events in countries"
@@ -28542,11 +28584,11 @@ msgstr ""
 
 #: webtrees_tmp/modules_v2_marriage_report_report.xml.php:8
 msgid "Marriage Date range start"
-msgstr "von Hochzeitsdatum"
+msgstr "von Heiratsdatum"
 
 #: webtrees_tmp/modules_v2_marriage_report_report.xml.php:9
 msgid "Marriage Date range end"
-msgstr "bis Hochzeitsdatum"
+msgstr "bis Heiratsdatum"
 
 #: webtrees_tmp/modules_v2_cemetery_report_report.xml.php:6
 msgid "Burial Place contains"

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print.php 11238 2011-03-29 18:16:59Z greg $
+// $Id: functions_print.php 11294 2011-04-10 08:32:41Z veit $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -950,7 +950,7 @@ function print_note_record($text, $nlevel, $nrec, $textOnly=false, $return=false
 
 		$brpos = strpos($text, "<br />");
 		if (!$npage) {
-			$data .= "<span class=\"label\">";
+			$data .= "<div class=\"fact_NOTE\"><span class=\"label\">";
 			if ($brpos !== false) {
 				if ($EXPAND_NOTES) $plusminus="minus"; else $plusminus="plus";
 				$data .= "<a href=\"javascript:;\" onclick=\"expand_layer('$elementID'); return false;\"><img id=\"{$elementID}_img\" src=\"".$WT_IMAGES[$plusminus]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"";
@@ -969,7 +969,7 @@ function print_note_record($text, $nlevel, $nrec, $textOnly=false, $return=false
 		if ($brpos !== false) {
 			$data .= substr($text, 0, $brpos);
 			if ($npage) {
-				$data .= "<br />".substr($text, $brpos + 6);
+				$data .= "<br />".substr($text, $brpos + 6) . "</div>";
 			} else {
 				$data .= "<div id=\"$elementID\"";
 				if ($EXPAND_NOTES) $data .= " style=\"display:block\"";
@@ -1359,10 +1359,11 @@ function print_asso_rela_record($event) {
 		}
 		$html=array_unique($html);
 		echo
-			'<br />',
+			'<div class="fact_ASSO">',
 			'<a href="', $person->getHtmlUrl().'">', $person->getFullName(), '</a>',
 			' - ',
 			implode(', ', $html);
+			echo '</div>';
 	}
 }
 
