@@ -34,6 +34,26 @@ return array(
 	'Allows central configuration for Perso modules configuration.'
 									=>	'Permet une gestion centralisée de la configuration des modules Perso.',
 									
+	// Extra footer
+	'Display French <em>CNIL</em> message'
+									=>	'Afficher le message d\'information CNIL',
+	'<em>CNIL</em> reference'		=>	'Numéro d\'autorisation CNIL',
+	'This site has been notified to the French National Commission for Data protection (CNIL) and registered under number %s. '
+									=>	'Ce site a fait l\'objet d\'une déclaration auprès de la Commission Nationale de l\'Informatique et des Libertés, sous le numéro %s. ',
+	'In accordance with the French Data protection Act (<em>Loi Informatique et Libertés</em>) of January 6th, 1978, you have the right to access, modify, rectify and delete personal information that pertains to you. To exercice this right, please contact %s, and provide your name, address and a proof of your identity.'
+									=>	'Conformément à la loi "Informatique et Libertés" du 6 janvier 1978, vous disposez du droit d\'accès, de modification, de rectification et de suppression des données personnelles vous concernant. Afin d\'exercer ce droit, veuillez contacter %s en précisant vos nom et adresse et en fournissant une preuve de votre identité.',
+	'<p>Enable this option to display an information disclaimer in the footer required by the French <em>CNIL</em> for detaining personal information on users.</p>'
+									=>	'<p>Activer cette option permet l\'affichage d\'un message d\'information requis par la Commission Nationale de l\'Informatique et des Libertés (CNIL) pour la détention d\'informations personnelles des utilisateurs.</p>',
+	'<p>If the website has been notified to the French <em>CNIL</em>, an authorisation number may have been delivered. Providing this reference will display a message in the footer visible to all users.</p>'
+									=>	'<p>Si votre site a été déclaré à la Commission Nationale de l\'Informatique et des Libertés (CNIL), un numéro d\'autorisation a dû vous être délivré. Fournir cette référence affichera un message dans le pied de page, visible par tous les utilisateurs.</p>',
+	'Include additional HTML in footer'	
+									=>	'Étendre l\'HTML du pied de page',
+	'<p>Enable this option to include raw additional HTML in the footer of the page. This HTML will only be displayed to non-admin users.</p>'
+									=>	'<p>Activer cette option pour inclure du code HTML additional dans le pied de page. Ce code sera visible seulement par les utilisateurs non-administrateurs.</p>',
+	'Additional HTML in footer'		=>	'Code HTML additionnel pour le pied de page',
+	'<p>If the option has been enabled, the saved HTML will be inserted in the footer, before the logo.</p><p>In edit mode, the HTML characters might have been transformed to their HTML equivalents (for instance &amp;gt; for &gt;), it is however possible to insert HTML characters, they will be automatically converted to their equivalent values.</p>'
+									=>	'<p>Si l\'option est activée, le code HTML sauvegardée sera inséré dans le pied de page, au-dessus du logo.</p><p>En mode édition, les caractères HTML peuvent avoir été modifiés par leurs équivalents HTML (par exemple &amp;gt; pour &gt;), il est cependant possible d\'insérer directement des caractères HTML dans la zone de texte, ils seront convertis en leur equivalents.</p>',					
+														
 	//Titles
 	'Titles'						=>	'Titres',
 	'Title prefixes'				=>	'Particules nobiliaires',

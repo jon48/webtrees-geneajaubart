@@ -42,6 +42,12 @@ echo '<div class="footer_right">';
 echo '<div class="footer_center">';
 
 echo contact_links();
+
+//PERSO Add Extra footer
+$f_hook = new WT_Perso_Hook('h_print_footer');
+$f_hook->execute();
+//
+
 echo
 		'<p class="logo">',
 			'<a href="', WT_WEBTREES_URL, '" target="_blank">',
