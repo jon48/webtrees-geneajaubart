@@ -1,9 +1,10 @@
 <?php
 /**
- * {Description}
+ * Interface for WT_Module to indicate configurable modules.
+ * Support hooks <strong>h_config_tab_name</strong> and <strong>h_config_tab_content</strong>
  *
  * @package webtrees
- * @subpackage SubPackage
+ * @subpackage PersoLibrary
  * @author: Jonathan Jaubart ($Author$)
  * @version: p_$Revision$ $Date$
  * $HeadURL$

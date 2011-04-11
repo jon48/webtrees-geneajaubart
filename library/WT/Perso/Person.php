@@ -31,7 +31,7 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 			if($ct>0){
 				$titles=$match[1];
 				foreach($titles as $title){
-					$ct2 = preg_match_all('/(.*) (('.get_module_setting('perso_general', 'TITLE_PREFIX', '').')(.*))/', $title, $match2);
+					$ct2 = preg_match_all('/(.*) (('.get_module_setting('perso_general', 'PG_TITLE_PREFIX', '').')(.*))/', $title, $match2);
 					if($ct2>0){
 						$this->_titles[$match2[1][0]][]= trim($match2[2][0]);
 					}

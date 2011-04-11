@@ -49,7 +49,7 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 	 * Display the configuration items for each Perso modules, implementing the hooks h_config_tab_name and h_config_tab_content
 	 * 
 	 */
-	public function config(){
+	private function config(){
 
 		if(WT_USER_GEDCOM_ADMIN) {
 				
@@ -93,13 +93,13 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 	 *  	- module_name: if present, name of the calling module. Is required for gedcom setting if validation necessary
 	 *  	- validate: if present, will validate the entry value, according to rule defined within the module.
 	 */
-	public function editsetting(){
+	private function editsetting(){
 		
 		$id=safe_POST('id', '[a-zA-Z0-9_-]+');
 		list($table, $id1, $id2, $id3)=explode('-', $id.'---');
 			
 		// The replacement value.
-		$value=safe_POST('value', WT_REGEX_UNSAFE);	
+		$value=safe_POST('value', WT_REGEX_UNSAFE);
 
 		// Validate the replacement value
 		if($id3 == 'validate' && !is_null($id2)){
@@ -143,16 +143,16 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 	 * 
 	 * @param string $value New setting value
 	 */
-	protected function ok($value) {
+	private function ok($value) {
 		header('Content-type: text/html; charset=UTF-8');
-		echo $value;
+		echo htmlspecialchars($value);
 		exit;
 	}
 	
 	/**
 	 * Is called when saving fails, and return an HTML error.
 	 */
-	protected function fail() {
+	private function fail() {
 		// Any 4xx code should work.  jeditable recommends 406
 		header('HTTP/1.0 406 Not Acceptable');
 		exit;
