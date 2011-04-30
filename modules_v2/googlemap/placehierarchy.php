@@ -25,6 +25,8 @@
  * @package webtrees
  * @subpackage Googlemap
  * @author Brian Holland (for v3 googlemaps version at webtrees)
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  *
  * $Id: placehierarchy.php 11295 2011-04-10 09:17:11Z lukasz $
  */
@@ -329,11 +331,9 @@ function print_gm_markers($place2, $level, $parent, $levelm, $linklevels, $place
 	global $GOOGLEMAP_COORD, $GOOGLEMAP_PH_MARKER, $GM_DISP_SHORT_PLACE, $GM_DISP_COUNT;
 	
 	if (($place2['lati'] == NULL) || ($place2['long'] == NULL) || (($place2['lati'] == "0") && ($place2['long'] == "0"))) {
-		echo "var icon_type = new google.maps.MarkerImage();\n";
-		echo ' icon_type.image = "', WT_MODULES_DIR, 'googlemap/images/marker_yellow.png";';
-		echo ' icon_type.shadow = "', WT_MODULES_DIR, 'googlemap/images/shadow50.png";';
-		echo " icon_type.iconSize = google.maps.Size(20, 34);\n";
-		echo " icon_type.shadowSize = google.maps.Size(37, 34);\n";
+		//PERSO
+		$icon_image = WT_MODULES_DIR. 'googlemap/images/marker_yellow.png';
+		//END PERSO
 		echo "var point = new google.maps.LatLng(0, 0);\n";
 		if ($lastlevel)
 			echo "var marker = createMarker(point, \"<div class='iwstyle' style='width: 250px;'><a href='?level=", $level, $linklevels, "'><br />";
@@ -388,7 +388,7 @@ function print_gm_markers($place2, $level, $parent, $levelm, $linklevels, $place
 		echo "<br />", WT_I18N::translate('This place has no coordinates');
 		if (WT_USER_IS_ADMIN)
 			echo "<br /><a href='module.php?mod=googlemap&mod_action=admin_places&parent=", $levelm, "&display=inactive'>", WT_I18N::translate('Edit geographic location'), "</a>";
-		echo "</div>\", icon_type, \"", str_replace(array('&lrm;', '&rlm;'), array(WT_UTF8_LRM, WT_UTF8_RLM), addslashes($place2['place'])), "\");\n";
+		echo "</div>\", \"$icon_image\", \"", str_replace(array('&lrm;', '&rlm;'), array(WT_UTF8_LRM, WT_UTF8_RLM), addslashes($place2['place'])), "\");\n";
 	} else {
 		$lati = str_replace(array('N', 'S', ','), array('', '-', '.'), $place2['lati']);
 		$long = str_replace(array('E', 'W', ','), array('', '-', '.'), $place2['long']);
@@ -404,16 +404,15 @@ function print_gm_markers($place2, $level, $parent, $levelm, $linklevels, $place
 			$long = "-".abs($long);
 		}
 		
-		// flags by kiwi3685 ---		
-		if (($place2["icon"] == NULL) || ($place2['icon'] == "") || ($GOOGLEMAP_PH_MARKER != "G_FLAG")) {
-			echo "var icon_type = new google.maps.MarkerImage();\n";
-		} else {
-			echo "var icon_type = new google.maps.MarkerImage();\n";
-			echo ' icon_type.image = "', WT_MODULES_DIR, 'googlemap/', $place2['icon'], '";';
-			echo ' icon_type.shadow = "', WT_MODULES_DIR, 'googlemap/images/flag_shadow.png";';
-			echo " icon_type.iconSize = new google.maps.Size(25, 15);\n";
-			echo " icon_type.shadowSize = new google.maps.Size(35, 45);\n";
-		}
+		// flags by kiwi3685 ---	
+		//PERSO Resize flags
+		$icon_image="";
+		$flag_width = 0; $flag_height = 0;
+		if (!(($place2["icon"] == NULL) || ($place2['icon'] == "") || ($GOOGLEMAP_PH_MARKER != "G_FLAG"))) {
+			$icon_image = WT_MODULES_DIR . 'googlemap/' . $place2['icon'];	
+			list($flag_width, $flag_height) = WT_Perso_Functions::getResizedImageSize($icon_image, 25);
+		}		
+		//END PERSO
 		echo "var point = new google.maps.LatLng({$lati}, {$long});\n";
 		if ($lastlevel) {
 			echo "var marker = createMarker(point, \"<div class='iwstyle' style='width: 250px;'><a href='?level=", $level, $linklevels, "'><br />";
@@ -426,7 +425,9 @@ function print_gm_markers($place2, $level, $parent, $levelm, $linklevels, $place
 			}
 		}
 		if (($place2['icon'] != NULL) && ($place2['icon'] != "")) {
-			echo '<img src=\"', WT_MODULES_DIR, 'googlemap/', $place2['icon'], '\">&nbsp;&nbsp;';
+			//PERSO Resize flags
+			echo '<img class=\"flag_gm_50\" src=\"', WT_MODULES_DIR, 'googlemap/', $place2['icon'], '\">&nbsp;&nbsp;';
+			//END PERSO
 		}
 		if ($lastlevel) {
 			$placename = substr($placelevels, 2);
@@ -471,9 +472,13 @@ function print_gm_markers($place2, $level, $parent, $levelm, $linklevels, $place
 		$temp=addslashes($place2['place']);
 		$temp=str_replace(array('&lrm;', '&rlm;'), array(WT_UTF8_LRM, WT_UTF8_RLM), $temp);
 		if (!$GOOGLEMAP_COORD) {
-			echo "<br /><br /></div>\", icon_type, \"", $temp, "\");\n";
+			//PERSO Resize flags
+			echo "<br /><br /></div>\", \"$icon_image\", \"", $temp, "\", \"$flag_width\", \"$flag_height\");\n";
+			//END PERSO
 		} else {
-			echo "<br /><br />", $place2['lati'], ", ", $place2['long'], "</div>\", icon_type, \"", $temp, "\");\n";	
+			//PERSO
+			echo "<br /><br />", $place2['lati'], ", ", $place2['long'], "</div>\", \"$icon_image\", \"", $temp, "\", \"$flag_width\", \"$flag_height\");\n";
+			//END PERSO
 		}
 	}
 }
@@ -522,21 +527,23 @@ function map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $pla
 	});
 	
 	// Creates a marker whose info window displays the given name
-	function createMarker(point, html, icon, name) {	
+	function createMarker(point, html, icon, name, width, height) {	
 		// Choose icon and shadow ============
-		<?php
-		echo "if (icon.image && $level<=3) {";
-			echo "if (icon.image!='", WT_MODULES_DIR, "googlemap/images/marker_yellow.png') {";
-				echo 'var iconImage = new google.maps.MarkerImage(icon.image,'; 
-				echo 'new google.maps.Size(25, 15),';
+		<?php		
+		echo "if (icon) {";		
+			echo "if (icon!='", WT_MODULES_DIR, "googlemap/images/marker_yellow.png' && width != undefined && width > 0 && height !=undefined && height >0) {";			
+				echo 'var iconImage = new google.maps.MarkerImage(icon,'; 
+				echo 'null,';
+				//echo 'new google.maps.Size(25, 15),';
 				echo 'new google.maps.Point(0,0),';
-				echo 'new google.maps.Point(1, 45));';
+				echo 'new google.maps.Point(1, 45),';
+				echo 'new google.maps.Size(width, height));';
 				echo 'var iconShadow = new google.maps.MarkerImage("', WT_MODULES_DIR, 'googlemap/images/flag_shadow.png",';
 				echo 'new google.maps.Size(35, 45),';
 				echo 'new google.maps.Point(0,0),';
 				echo 'new google.maps.Point(1, 45));';
 			echo " } else { ";
-				echo 'var iconImage = new google.maps.MarkerImage(icon.image,';
+				echo 'var iconImage = new google.maps.MarkerImage(icon,';
 				echo 'new google.maps.Size(20, 34),';
 				echo 'new google.maps.Point(0,0),';
 				echo 'new google.maps.Point(9, 34));';
@@ -670,17 +677,14 @@ function map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $pla
 		}
 	} else {
 		// The following is called when no coordinates exist for a place location at all
-		echo "var icon_type = new google.maps.MarkerImage();\n";
-		echo 'icon_type.image = "', WT_MODULES_DIR, 'googlemap/images/marker_yellow.png";';
-		echo 'icon_type.shadow = "', WT_MODULES_DIR, 'googlemap/images/shadow50.png";';
-		echo 'icon_type.iconSize = google.maps.Size(20, 34);';
-		echo 'icon_type.shadowSize = google.maps.Size(37, 34);';
+		//PERSO
+		$icon_image = WT_MODULES_DIR. 'googlemap/images/marker_yellow.png';
 		echo 'var point = new google.maps.LatLng(0, 0);';
 		echo "var marker = createMarker(point, \"<div class='iwstyle' style='width: 250px;'>";
 		echo "<br />", WT_I18N::translate('This place has no coordinates');
 		if (WT_USER_IS_ADMIN)
 			echo "<br /><a href='module.php?mod=googlemap&mod_action=admin_places&parent=0&display=inactive'>", WT_I18N::translate('Edit geographic location'), "</a>";
-		echo "<br /></div>\", icon_type, \"", WT_I18N::translate('Edit geographic location'), "\");\n";
+		echo "<br /></div>\", \"$icon_image\", \"", WT_I18N::translate('Edit geographic location'), "\");\n";
 	}
 	
 	//end markers

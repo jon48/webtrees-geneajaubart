@@ -41,4 +41,17 @@
 	margin-left: 5em; /* whatever the width of dt */
 }
 
+.flag_gm_30 {
+	max-width: 30px;
+	max-height: 30px;	
+}
+
+.flag_gm_50 {
+	max-width: 50px;
+	max-height: 50px;	
+}
+
+.flag_gm_w25 {
+	width: 25px;	
+}
 

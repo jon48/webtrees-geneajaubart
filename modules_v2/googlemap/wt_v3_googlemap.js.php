@@ -24,6 +24,8 @@
  * @package webtrees
  * @subpackage Googlemaps v3
  * $Id: wt_v3_googlemap.js.php 11277 2011-04-05 03:02:03Z brian $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  *
  * @author Brian Holland
  */
@@ -120,15 +122,19 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 	var placer = null;
 
 	// A function to create the marker and set up the event window
-	function createMarker(i, latlng, event, html, category, placed, index, tab, address, media, sv_lati, sv_long, sv_bearing, sv_elevation, sv_zoom, sv_point, marker_icon) {
+	function createMarker(i, latlng, event, html, category, placed, index, tab, address, media, sv_lati, sv_long, sv_bearing, sv_elevation, sv_zoom, sv_point, marker_icon, width, height) {
 		var contentString = '<div id="iwcontent">'+html+'<\/div>';
 		
 		// === Use flag icon (if defined) instead of regular marker icon ===
-		if (marker_icon) {
+		//PERSO Resize flag
+		if (marker_icon && width!= undefined && width > 0 && height != undefined && height >0) {
 			var icon_image = new google.maps.MarkerImage('modules_v2/googlemap/'+marker_icon,
-				new google.maps.Size(25, 15),
+				null,
 				new google.maps.Point(0,0),
-				new google.maps.Point(0, 44));
+				new google.maps.Point(0, 44),
+				new google.maps.Size(width, height)
+		//END PERSO
+				);
 			var icon_shadow = new google.maps.MarkerImage('modules_v2/googlemap/images/flag_shadow.png',
 				new google.maps.Size(35, 45),	// Shadow size
 				new google.maps.Point(0,0),		// Shadow origin
@@ -564,7 +570,14 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 					"<?php if (!empty($gmark['sv_bearing'])) { echo $gmark['sv_bearing']; } ?>",
 					"<?php if (!empty($gmark['sv_elevation'])) { echo $gmark['sv_elevation']; } ?>",
 					"<?php if (!empty($gmark['sv_zoom'])) { echo $gmark['sv_zoom']; } ?>",
-					"<?php if (!empty($gmark['icon'])) { echo $gmark['icon']; } ?>"
+					"<?php if (!empty($gmark['icon'])) { echo $gmark['icon']; } ?>",
+					//PERSO Resize flag
+					"<?php if (!empty($gmark['icon'])) { 
+						$icon_image = WT_MODULES_DIR . 'googlemap/' . $gmark['icon'];	
+						list($flag_width, $flag_height) = WT_Perso_Functions::getResizedImageSize($icon_image, 25); 
+						echo $flag_width, '", "', $flag_height;
+					} ?>"
+					//PERSO Resize flag
 				],
 
 			<?php } ?>
@@ -617,6 +630,10 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 			var sv_elevation = locations[i][18];					// Street View elevation
 			var sv_zoom = locations[i][19];							// Street View zoom
 			var marker_icon = locations[i][20];						// Marker icon image (flag)
+			//PERSO Resize flags
+			var flag_width = locations[i][21];						// Marker icon image width (flag)
+			var flag_height = locations[i][22];						// Marker icon image height (flag)
+			//END PERSO Resize flags
 			var sv_point = new google.maps.LatLng(sv_lati,sv_long); // StreetView Latitude and Longitide
 
 			// === Employ of image tab function using an information image =====
@@ -715,8 +732,12 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 			// create the marker ===============================================
 			var html = multitabs;
 			var zoomLevel = <?php echo $GOOGLEMAP_MAX_ZOOM; ?>;
-			var marker = createMarker(i, point, event, html, category, placed, index, tab, addr2, media, sv_lati, sv_long, sv_bearing, sv_elevation, sv_zoom, sv_point, marker_icon);
-
+			//PERSO Resize flag
+			if (flag_width == null || flag_width == '') { flag_width = 0; }
+			if (flag_height == null || flag_height == '') { flag_height = 0; }
+			var marker = createMarker(i, point, event, html, category, placed, index, tab, addr2, media, sv_lati, sv_long, sv_bearing, sv_elevation, sv_zoom, sv_point, marker_icon, flag_width, flag_height);
+			//END PERSO
+			
 			// if streetview coordinates are available, use them for marker, ===
 			// else use the place coordinates  =========
 			if (sv_point && sv_point != "(0, 0)") {

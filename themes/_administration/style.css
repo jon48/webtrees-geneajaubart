@@ -24,6 +24,8 @@
  * @package webtrees
  * @subpackage Administration
  * @version $Id: style.css 11146 2011-03-18 19:51:29Z greg $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  */
 
 /* general styles */
@@ -466,3 +468,10 @@ html[dir='rtl'] #story_module2 th, html[dir='rtl'] #story_module2 td {text-align
 /* These two needed for now to suppress standard help icons */
 .help {display:inline; margin-left:5px; padding-right:15px; padding-bottom:5px;}
 .icon {display:none;}
+
+/*	PERSO Googlemap addition */
+
+.flag_gm_25 {
+	max-width: 25px;
+	max-height: 25px;	
+}

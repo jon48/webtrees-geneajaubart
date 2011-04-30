@@ -22,6 +22,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // $Id: admin_places.php 11298 2011-04-10 10:37:43Z lukasz $
+// @version: p_$Revision$ $Date$
+// $HeadURL$
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -601,7 +603,9 @@ foreach ($placelist as $place) {
 			echo '<img src="http://labs.google.com/ridefinder/images/mm_20_red.png">';
 		}
 	} else {
-		echo '<img src="', WT_MODULES_DIR, 'googlemap/', $place['icon'], '" width="25" height="15">';
+		//PERSO Resize flags
+		echo '<img class="flag_gm_25" src="', WT_MODULES_DIR, 'googlemap/', $place['icon'], '">';
+		//END PERSO
 	}
 	echo '</td>';
 	echo '<td class="narrow"><a href="javascript:;" onclick="edit_place_location(', $place['place_id'], ');return false;"><img src="', $WT_IMAGES['edit'], '" border="0" alt="', WT_I18N::translate("Edit"), '" /></a></td>';

@@ -25,6 +25,8 @@
  * @package webtrees
  * @subpackage Edit
  * @version $Id: places_edit.php 11282 2011-04-07 06:47:41Z greg $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -356,7 +358,9 @@ $api="v3";
 				<a href="javascript:;" onclick="change_icon();return false;"><?php echo WT_I18N::translate('Change flag'); ?></a>
 <?php   }
 		else { ?>
-				<img alt="<?php echo /* I18N: The emblem of a country or region */ WT_I18N::translate('Flag'); ?>" src="<?php echo WT_MODULES_DIR, 'googlemap/', $place_icon; ?>"/>&nbsp;&nbsp;
+				<!-- PERSO Resize flags -->
+				<img class="flag_gm_30" alt="<?php echo /* I18N: The emblem of a country or region */ WT_I18N::translate('Flag'); ?>" src="<?php echo WT_MODULES_DIR, 'googlemap/', $place_icon; ?>"/>&nbsp;&nbsp;
+				<!-- END PERSO -->
 				<a href="javascript:;" onclick="change_icon();return false;"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;
 				<a href="javascript:;" onclick="remove_icon();return false;"><?php echo WT_I18N::translate('Remove flag'); ?></a>
 <?php   } ?>

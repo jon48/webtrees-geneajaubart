@@ -25,6 +25,8 @@
  * @package webtrees
  * @subpackage Edit
  * @version $Id: wt_v3_places_edit.js.php 11273 2011-04-04 17:41:23Z lukasz $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  *
  * @author Brian Holland (windmillway)
  */
@@ -246,11 +248,15 @@ if (!defined('WT_WEBTREES')) {
 
 		// Create the Main Location Marker
 		<?php 
-		if ($level < 3 && $place_icon != '') {	
+		//PERSO Resize flags
+		if ($place_icon != '') {	
+			list($flag_width, $flag_height) = WT_Perso_Functions::getResizedImageSize(WT_MODULES_DIR.'googlemap/'.$place_icon, 25);			
 			echo 'var image = new google.maps.MarkerImage("', WT_MODULES_DIR, 'googlemap/',$place_icon,'",';
-				echo 'new google.maps.Size(25, 15),';	// Image size
+				echo 'null,';	// Image size
 				echo 'new google.maps.Point(0, 0),';	// Image origin
-				echo 'new google.maps.Point(0, 44)';	// Image anchor
+				echo 'new google.maps.Point(0, 44),';	// Image anchor
+				echo 'new google.maps.Size(',$flag_width,',',$flag_height,')';
+		//END PERSO
 			echo ');';
 			echo 'var iconShadow = new google.maps.MarkerImage("', WT_MODULES_DIR, 'googlemap/images/flag_shadow.png",';
 				echo 'new google.maps.Size(35, 45),';	// Shadow size

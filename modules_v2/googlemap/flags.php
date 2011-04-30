@@ -25,6 +25,8 @@
  * @package webtrees
  * @subpackage Edit
  * @version $Id: flags.php 11020 2011-03-03 09:47:46Z greg $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -197,13 +199,17 @@ else {
 		$j = 1;
 		for ($i = 0; $i < count($flags); $i++) {
 			if ($countrySelected == "Countries") {
-				$tempstr = "<td><input type=\"radio\" dir=\"ltr\" name=\"FLAGS\" value=\"".$i."\" onchange=\"enableButtons();\"><img src=\"".WT_MODULES_DIR."googlemap/places/flags/".$flags[$i].".png\" alt=\"".$flags[$i]."\"  title=\"";
+				//PERSO Resize flags
+				$tempstr = "<td><input type=\"radio\" dir=\"ltr\" name=\"FLAGS\" value=\"".$i."\" onchange=\"enableButtons();\"><img class=\"flag_gm_w25\" src=\"".WT_MODULES_DIR."googlemap/places/flags/".$flags[$i].".png\" alt=\"".$flags[$i]."\"  title=\"";
+				//END PERSO
 				if ($flags[$i]!='blank') $tempstr.=$countries[$flags[$i]];
 				else $tempstr.=$countries['???'];
 				echo $tempstr, "\">&nbsp;&nbsp;", $flags[$i], "</input></td>\n";
 			}
 			else {
-				echo "<td><input type=\"radio\" dir=\"ltr\" name=\"FLAGS\" value=\"", $i, "\" onchange=\"enableButtons();\"><img src=\"".WT_MODULES_DIR."googlemap/places/", $countrySelected, "/flags/", $flags[$i], ".png\">&nbsp;&nbsp;", $flags[$i], "</input></td>\n";
+				//PERSO Resize flags
+				echo "<td><input type=\"radio\" dir=\"ltr\" name=\"FLAGS\" value=\"", $i, "\" onchange=\"enableButtons();\"><img class=\"flag_gm_w25\" src=\"".WT_MODULES_DIR."googlemap/places/", $countrySelected, "/flags/", $flags[$i], ".png\">&nbsp;&nbsp;", $flags[$i], "</input></td>\n";
+				//END PERSO
 			}
 			if ($j == 4) {
 				echo "</tr><tr>\n";
