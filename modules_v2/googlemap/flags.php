@@ -240,7 +240,9 @@ else {
 		$j = 1;
 		for ($i = 0; $i < count($flags_s); $i++) {
 			if ($stateSelected != "States") {
-				echo "<td><input type=\"radio\" dir=\"ltr\" name=\"FLAGS\" value=\"", $i, "\" onchange=\"enableButtons();\"><img src=\"".WT_MODULES_DIR."googlemap/places/", $countrySelected, "/flags/", $stateSelected, "/", $flags_s[$i], ".png\">&nbsp;&nbsp;", $flags_s[$i], "</input></td>\n";
+				//PERSO Resize flags
+				echo "<td><input type=\"radio\" dir=\"ltr\" name=\"FLAGS\" value=\"", $i, "\" onchange=\"enableButtons();\"><img class=\"flag_gm_w25\" src=\"".WT_MODULES_DIR."googlemap/places/", $countrySelected, "/flags/", $stateSelected, "/", $flags_s[$i], ".png\">&nbsp;&nbsp;", $flags_s[$i], "</input></td>\n";
+				//END PERSO
 			}
 			if ($j == 4) {
 				echo "</tr><tr>\n";

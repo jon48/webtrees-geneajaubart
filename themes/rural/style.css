@@ -1156,6 +1156,9 @@ html[dir='rtl'] .header_search {
 
 .rela {
 	opacity: 0.67;
+}
+
+#row_top .rela {
 	text-align: left;
 }
 
