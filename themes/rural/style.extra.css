@@ -32,7 +32,7 @@
  * $HeadURL$
  */
  
- #indi_titles{
+#indi_titles{
 	margin-top: 1em;
 }
 
@@ -53,5 +53,13 @@
 
 .flag_gm_w25 {
 	width: 25px;	
+}
+
+.flag_gm_h50, .fact_flag .flag_gm_h50 {
+	max-height: 50px;	
+}
+
+.fact_flag{
+	float: right;
 }
 

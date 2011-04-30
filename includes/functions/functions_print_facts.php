@@ -29,6 +29,8 @@
  * @package webtrees
  * @subpackage Display
  * @version $Id: functions_print_facts.php 11294 2011-04-10 08:32:41Z veit $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -177,6 +179,9 @@ function print_fact(&$eventObj) {
 	echo "<td class=\"optionbox $styleadd wrap\" $align>";
 	//echo "<td class=\"facts_value facts_value$styleadd\">";
 	if ((canDisplayFact($pid, WT_GED_ID, $factrec))) {
+		//PERSO
+		echo WT_Perso_Functions_Print::getFactPlaceIcon($factrec);
+		//END PERSO
 		// -- first print TYPE for some facts
 		if ($fact!="EVEN" && $fact!="FACT") {
 			if (preg_match("/2 TYPE (.*)/", $factrec, $match)) {
