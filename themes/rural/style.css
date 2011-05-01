@@ -199,15 +199,15 @@ img.block,#calendar_img,#biglink img, #mycart img {
  
 .person_box {
         font-family: tahoma, arial, helvetica, sans-serif;
-        background-color: #d6e0ea;
-        border: solid #9ca3d4 1px;
+        background-color: #D2E2EC;
+        border: solid #85B0CB 1px;
 
 }
 
 .person_boxF {
         font-family: tahoma, arial, helvetica, sans-serif;
-        background-color: #e9daf1;
-        border: 1px solid #ff2080;
+        background-color: #EDE1E8;
+        border: 1px solid #E2789F;
 
 }
 
@@ -343,7 +343,7 @@ table.center {
 }
 
 .facts_value02 {
-	background-color: #d6e0ea;
+	background-color: #D2E2EC;
 	color: black;
 	border: solid #9ca3d4 1px;
 	font: 12px tahoma, arial, helvetica, sans-serif;
@@ -360,7 +360,7 @@ table.center {
 }
 
 .facts_valuered, .facts_valueblue {
-	background-color: #d6e0ea;
+	background-color: #D2E2EC;
 	color: black;
 	font: 12px tahoma, arial, helvetica, sans-serif;
 	padding: 4px 4px 4px 4px;
@@ -1104,10 +1104,6 @@ html[dir='rtl'] .header_search {
 
 .optionbox a {
 	color:#62584D;
-}
-
-.optionbox img {
-	max-height: 32px
 }
 	
 
