@@ -27,6 +27,8 @@
  * @package webtrees
  * @subpackage Module
  * @version $Id: lb_call_js.php 10869 2011-02-18 16:00:33Z greg $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  * @author Brian Holland
  */
 if (!defined('WT_WEBTREES')) {
@@ -42,6 +44,9 @@ global $tabno, $LB_MUSIC_FILE, $LB_SS_SPEED, $LB_TRANSITION, $TEXT_DIRECTION;
 
 	var CB_ImgDetails = "<?php echo WT_I18N::translate('Details'); ?>"; // = "Details"
 	var CB_Detail_Info = "<?php echo WT_I18N::translate('View this Media Item Details ...  Plus other Media Options - MediaViewer page'); ?>"; // = "View this Media Item......etc"
+	//PERSO Detail Infos for Certificates
+	var CB_Detail_Info_Cert = "<?php echo WT_I18N::translate('View details about this certificate'); ?>"; 
+	//END PERSO
 	var CB_ImgNotes = "<?php echo WT_I18N::translate('Notes'); ?>"; // = "Notes"
 	var CB_Note_Info = "<?php echo ''; ?>"; // = ""
 	var CB_Pause_SS = "<?php echo WT_I18N::translate('Pause Slideshow'); ?>"; // = "Pause Slideshow"

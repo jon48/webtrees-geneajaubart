@@ -176,6 +176,15 @@ $WT_IMAGES=array(
 	'lsrtarrow'=>WT_THEME_DIR.'images/lsrtarrow.png',
 	'lsdnarrow'=>WT_THEME_DIR.'images/lsdnarrow.png',
 	'lsuparrow'=>WT_THEME_DIR.'images/lsuparrow.png',
+
+	// PERSO Perso images
+	
+	// Certificates Module
+	'certificate'=>WT_THEME_DIR.'images/certificate.png',
+	'menu_certificate'=>WT_THEME_DIR.'images/certificate.png',
+
+	// END PERSO
+
 );
 
 //-- variables for the fan chart

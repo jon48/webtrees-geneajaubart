@@ -53,13 +53,68 @@ return array(
 	'Additional HTML in footer'		=>	'Code HTML additionnel pour le pied de page',
 	'<p>If the option has been enabled, the saved HTML will be inserted in the footer, before the logo.</p><p>In edit mode, the HTML characters might have been transformed to their HTML equivalents (for instance &amp;gt; for &gt;), it is however possible to insert HTML characters, they will be automatically converted to their equivalent values.</p>'
 									=>	'<p>Si l\'option est activée, le code HTML sauvegardée sera inséré dans le pied de page, au-dessus du logo.</p><p>En mode édition, les caractères HTML peuvent avoir été modifiés par leurs équivalents HTML (par exemple &amp;gt; pour &gt;), il est cependant possible d\'insérer directement des caractères HTML dans la zone de texte, ils seront convertis en leur equivalents.</p>',					
-														
+
+	//Perso certificates module
+	'Perso Certificates'			=>	'Perso Actes',
+	'Display and edition of certificates linked to sources.'
+									=>	'Affichage et édition des actes liés aux sources d\'événements',
+	'Certificates'					=>	'Actes',
+	'View details about this certificate'
+									=>	'Voir les détails de cet acte',
+	'Certificates directory'		=>	'Répertoire des actes',
+	'The certificates directory is used to create URLs for your certificates. You will access the certificates by using URL of the form %2$s, if the certificate directory is %1$s.'
+									=>	'Le Répertoire des actes est utilisée pour créer les adresses URL de vos actes. Vous accédez ainsi aux actes avec une URL du type %2$s, si le Répertoire des actes est %1$s',
+	'The certificates firewall changes the location of the certificates directory from the public directory %1$s to a private directory such as %2$s.  This allows webtrees to apply privacy filtering to certificates.'
+									=>	'Le pare-feu des actes transforme le Répertoire des actes public %1$s en un répertoire privé tel que %2$s. Cela permet d\appliquer des filtres d\'accès privés aux actes.',
+	'The certificates directory %s must exist, and the webserver must have read and write access to it.'
+									=>	'Le Répertoire des actes %s doit exister, et le serveur web doit y avoir les droits de lecture et d\'écriture.',
+	'The certificates directory is shared by all family trees.'
+									=>	'Le Répertoire des actes est partagé par tous les arbres.',
+	'Show certificates'				=>	'Montrer les actes',
+	'Define access level required to display certificates in facts sources. By default, nobody can see the certificates.'
+									=>	'Définit le niveau d\'accès requis pour afficher les actes dans les sources des événements. Par défaut, personne ne peut voir les actes.',
+	'Certificates firewall root directory'
+									=>	'Répertoire racine du pare-feu des actes',
+	'Directory in which the protected certificates directory can be created.  When this field is empty, the <b>%s</b> directory will be used.'
+									=>	'Répertoire dans lequel le répertoire des actes peut être créé de manière protégée. Par défaut, le répertoire <b>%s</b> est utilisé.',
+	'Show non-watermarked certificates'
+									=>	'Montrer les actes non-filigranés',
+	'Define access level required to see certificate images without any watermark. By default, everybody will see the watermark.'
+									=>	'Définit le niveau d\'accès requis pour ne pas afficher de filigrane sur ls images d\'actes. Par défaut, tout le monde peut voir le filigrane.',
+	'When displayed, the watermark is generated from the name of the repository and of the sources, if they exist. Otherwise, a default text is displayed.'
+									=>	'Quand affiché, le filigrane se compose des noms du dépôt d\'archive et de la source, s\'ils existent. Sinon, un texte par défaut est affiché.',
+	'Default watermark'				=>	'Texte du filigrane par défaut',
+	'Text to be displayed by default if no source has been associated with the certificate.'
+									=>	'Texte à afficher par défaut dans le filigrane si aucune source n\'a pu être rattachée à l\'acte.',
+	'Watermark font color'			=>	'Couleur de police du filigrane',
+	'Font color for the watermark. By default, <span style="color:#4d6df3;">the color (77,109,243)</span> is used.' 
+									=>	'Couleur de la police du filigrane. Par défault, <span style="color:#4d6df3;">la couleur (77,109,243)</span> est utilisée.',
+	'This parameter must be entered with the format <strong>RR,GG,BB</strong> with <strong>RR</strong>, <strong>GG</strong> and <strong>BB</strong> the respective <span style="color:#ff0000;">red</span>, <span style="color:#00ff00;">green</span> and <span style="color:#0000ff;">blue</span> components as decimal integers (between 0 and 255).'
+									=>	'Ce paramètre est de la forme <strong>RR,VV,BB</strong> avec <strong>RR</strong>, <strong>VV</strong> et <strong>BB</strong> les composantes respectivement <span style="color:#ff0000;">rouge</span>, <span style="color:#00ff00;">verte</span> et <span style="color:#0000ff;">bleu</span> sous leur forme décimale (comprises entre 0 et 255).',
+	'Watermark minimum font size'	=>	'Taille de police minimale du filigrane',
+	'Watermark maximum font size'	=>	'Taille de police maximale du filigrane',
+	'This image is protected under copyright law.'
+									=>	'Cette image est protégée par les lois sur le copyright.',
+	'The certificate reference was not found.'
+									=>	'La référence de l\'acte n\'a pas été trouvée.',
+	'The certificate file does not exist.'
+									=>	'Le fichier de l\'acte n\'existe pas.',	
+	'You are not allowed to access this certificate.'
+									=>	'Vous n\'êtes pas autorisé à afficher cet acte.',
+	'This certificate file is broken and cannot be watermarked.'
+									=>	'Cet acte semble être corrompu et le filigrane n\'a pas pu être ajouté',							
+	'Individuals linked to this certificate'
+									=>	'Individus liés à cet acte',
+	'Families linked to this certificate'
+									=>	'Familles liés à cet acte',								
+	
 	//Titles
 	'Titles'						=>	'Titres',
 	'Title prefixes'				=>	'Particules nobiliaires',
 	'<p>Set possible aristocratic particules to separate titles from the land they refer to (e.g. Earl <strong>of</strong> Essex). Variants must be separated by the character |.</p><p>An example for this setting is : <strong>de |d\'|du |of |von |vom |am |zur |van |del |della |t\'|da |ten |ter |das |dos |af </strong> (covering some of French, English, German, Dutch, Italian, Spanish, Portuguese, Swedish common particules).</p>'
 									=>	'Définit les particule nobiliaires à utiliser pour séparer le titre de la terre associée (par exemple Comte <strong>de</strong> Toulouse). Les variantes doivent être séparées par le caractère |.</p><p>Une valeur possible pour ce paramètre est : <strong>de |d\'|du |of |von |vom |am |zur |van |del |della |t\'|da |ten |ter |das |dos |af </strong> (couvrant les principales particules françaises, anglaises, allemandes, hollandaises, italiennes, espagnoles, portugaises et suédoises).</p>'
-	
+									
+									
 );
 
 ?>

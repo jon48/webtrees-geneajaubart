@@ -81,9 +81,26 @@ class WT_Perso_Functions_Edit {
 	 * @param string $extra
 	 */
 	static public function edit_field_yes_no_inline($name, $selected=false, $extra='') {
-		return WT_Perso_Functions_Edit::select_edit_control_inline(
+		return self::select_edit_control_inline(
 			$name, array(true=>WT_I18N::translate('yes'), false=>WT_I18N::translate('no')), null, (int)$selected, $extra
 		);
+	}
+	
+	/**
+	 * Return HTML code to pring an inline editable combobox with the different possible user access levels.
+	 * 
+	 * @param string $name Setting id (not setting name)
+	 * @param string $selected Selected value
+	 * @param string $extra
+	 */
+	static public function edit_field_access_level_inline($name, $selected='', $extra='') {
+		$ACCESS_LEVEL=array(
+			WT_PRIV_PUBLIC=>WT_I18N::translate('Show to visitors'),
+			WT_PRIV_USER  =>WT_I18N::translate('Show to members'),
+			WT_PRIV_NONE  =>WT_I18N::translate('Show to managers'),
+			WT_PRIV_HIDE  =>WT_I18N::translate('Hide from everyone')
+		);
+		return self::select_edit_control_inline($name, $ACCESS_LEVEL, null, $selected, $extra);
 	}
 	
 

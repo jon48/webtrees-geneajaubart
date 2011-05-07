@@ -27,8 +27,7 @@ class WT_Perso_GedcomRecord {
 	 */
 	public function __construct(WT_GedcomRecord $gedcomrecord_in){
 		$this->gedcomrecord = $gedcomrecord_in;
-		$this->gedrec = find_gedcom_record($this->gedcomrecord->getXref(), $this->gedcomrecord->getGedId(), false);
-		$this->gedrec = privatize_gedcom($this->gedcomrecord->getGedId(), $this->gedrec);
+		$this->gedrec = $gedcomrecord_in->getGedcomRecord();
 	}
 
 }

@@ -112,24 +112,27 @@ class WT_Perso_Hook {
 	 */
 
 	/**
-	 * Execute the hook function for all subscribed and enabled modules, in the order defined by their priority.
+	 * Return the results of the execution of the hook function for all subscribed and enabled modules, in the order defined by their priority.
 	 * Parameters can be passed if the hook requires them.
 	 *
+	 * @return array Results of the hook executions
 	 */
 	public function execute(){
 		$params = func_get_args();
+		$result = array();
 		$module_names=WT_DB::prepare(
 			"SELECT ph_module_name AS module, ph_module_priority AS priority FROM `##phooks`".
 			" WHERE ph_hook_function = ? AND ph_status='enabled'".
 			" ORDER BY ph_module_priority ASC, module ASC"
 			)->execute(array($this->hook_function))->fetchAssoc();
-			asort($module_names);
-			foreach ($module_names as $module_name => $module_priority) {
-				require_once WT_ROOT.WT_MODULES_DIR.$module_name.'/module.php';
-				$class=$module_name.'_WT_Module';
-				$hook_class=new $class();
-				call_user_func_array(array($hook_class, $this->hook_function), $params);
-			}
+		asort($module_names);
+		foreach ($module_names as $module_name => $module_priority) {
+			require_once WT_ROOT.WT_MODULES_DIR.$module_name.'/module.php';
+			$class=$module_name.'_WT_Module';
+			$hook_class=new $class();
+			$result[] = call_user_func_array(array($hook_class, $this->hook_function), $params);
+		}
+		return $result;
 	}
 
 	/**

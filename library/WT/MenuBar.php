@@ -24,6 +24,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 // @version $Id: MenuBar.php 11229 2011-03-28 15:36:45Z greg $
+// @version: p_$Revision$ $Date$
+// $HeadURL$
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -415,7 +417,10 @@ class WT_MenuBar {
 			'placelist.php' =>WT_I18N::translate('Place hierarchy'),
 			'repolist.php'  =>WT_I18N::translate('Repositories'),
 			'notelist.php'  =>WT_I18N::translate('Shared notes'),
-			'sourcelist.php'=>WT_I18N::translate('Sources')
+			'sourcelist.php'=>WT_I18N::translate('Sources'),
+			//PERSO Add additional lists : Certificates
+			'perso_certificates'	=>WT_I18N::translate('Certificates')
+			//END PERSO
 		);
 		asort($menuList);
 
@@ -482,6 +487,16 @@ class WT_MenuBar {
 					$menu->addSubmenu($submenu);
 				}
 				break;
+				
+			//PERSO Add additional submenus : certificates
+			case 'perso_certificates':
+				$link = 'module.php?mod=perso_certificates&mod_action=certificatelist';
+				$submenu = new WT_Menu($name, $link);
+				$submenu->addIcon('menu_certificate');
+				$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_place');
+				$menu->addSubmenu($submenu);
+				break;
+				
 			}
 		}
 

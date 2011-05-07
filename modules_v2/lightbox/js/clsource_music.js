@@ -2,6 +2,8 @@
  * @package webtrees
  * @subpackage Module
  * @version $Id: clsource_music.js 11247 2011-03-31 14:42:49Z brian $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  * @author Brian Holland
 */
 
@@ -225,7 +227,9 @@ var CB_Close_Win		= CB_Close_Win;
 // Mousewheel for zooming ---------------------------------------------
 // if (zoomSet == 2) {
 	function handle(delta) {
-		if (delta <0) {
+		//PERSO Change mousewheel direction to zoom
+		if (delta > 0) {
+		//END PERSO
 			if (CB_SS == "start"  ) {
 				zoomIn();
 				return false;
@@ -1732,7 +1736,15 @@ var CB_Close_Win		= CB_Close_Win;
 		var MID = CB_Gallery[CB_ActImgId][3];
 		var GEDCOM = CB_Gallery[CB_ActImgId][4];
 //		CB_Txt2.onclick = function () { window.open('mediaviewer.php?filename='+MID+'&ged='+GEDCOM+'', "win01", " resizable=1, scrollbars=1, top=50, HEIGHT=800, WIDTH=1100 "); };
-		if (MID != "") {
+		//PERSO Go to certificate list instead of Media Viewer
+		if(MID == 'PC') {
+			CB_Txt2.onclick  = function () { window.location.href = "module.php?mod=perso_certificates&mod_action=certificatelist&city="+GEDCOM+"&certif="+CB_Gallery[CB_ActImgId][1]; return false; };
+			CB_Txt2a.onclick = function () { window.location.href = "module.php?mod=perso_certificates&mod_action=certificatelist&city="+GEDCOM+"&certif="+CB_Gallery[CB_ActImgId][1]; return false; };			
+			CB_Txt2.title = CB_Detail_Info_Cert;
+			CB_Txt2a.title = CB_Detail_Info_Cert;
+		}
+		//END PERSO
+		else if (MID != "") {
 			CB_Txt2.onclick  = function () { window.location.href = 'mediaviewer.php?mid='+MID+'&ged='+GEDCOM; return false; };
 			CB_Txt2a.onclick = function () { window.location.href = 'mediaviewer.php?mid='+MID+'&ged='+GEDCOM; return false; };
 			//CB_Txt3.onclick = function () { alert(CB_Gallery[CB_ActImgId][5]); };

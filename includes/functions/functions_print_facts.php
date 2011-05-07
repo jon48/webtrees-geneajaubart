@@ -519,6 +519,10 @@ function print_fact_sources($factrec, $level, $return=false) {
 				if ($plusminus=="plus") $data .= WT_I18N::translate('Show Details')."\" title=\"".WT_I18N::translate('Show Details')."\" /></a> ";
 				else $data .= WT_I18N::translate('Hide Details')."\" title=\"".WT_I18N::translate('Hide Details')."\" /></a> ";
 			}
+			//PERSO Prepend fact source text
+			$hook_fs_prepend = new WT_Perso_Hook('h_fs_prepend');
+			$data .= implode('', $hook_fs_prepend->execute($srec)) ;
+			//END PERSO
 			$data .= WT_I18N::translate('Source').":</span> <span class=\"field\">";
 			$source=WT_Source::getInstance($sid);
 			if ($source) {
