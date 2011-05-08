@@ -18,6 +18,7 @@ class WT_Perso_Hook {
 
 	//Private variables
 	protected $hook_function; //Hook function
+	protected $hook_context;
 
 	//Constants
 	private static $DEFAULT_PRIORITY = 99;
@@ -26,9 +27,11 @@ class WT_Perso_Hook {
 	 * Constructor for Hook class
 	 *
 	 * @param string $hook_function_in Hook function to be subscribed or executed
+	 * @param string $hook_context_in Hook context to be subscribed or executed
 	 */
-	public function __construct($hook_function_in){
+	public function __construct($hook_function_in, $hook_context_in = 'all'){
 		$this->hook_function = $hook_function_in;
+		$this->hook_context = $hook_context_in;
 	}
 
 	/**
@@ -44,9 +47,9 @@ class WT_Perso_Hook {
 	 */
 	public function subscribe($hsubscriber){
 		$statement = WT_DB::prepare(
-			"INSERT IGNORE INTO `##phooks` (ph_hook_function, ph_module_name)".
-			" VALUES (?, ?)"
-			)->execute(array($this->hook_function, $hsubscriber));
+			"INSERT IGNORE INTO `##phooks` (ph_hook_function, ph_hook_context, ph_module_name)".
+			" VALUES (?, ?, ?)"
+			)->execute(array($this->hook_function, $this->hook_context, $hsubscriber));
 	}
 
 	/**
@@ -60,8 +63,9 @@ class WT_Perso_Hook {
 			"UPDATE `##phooks`".
 			" SET ph_module_priority=?".
 			" WHERE ph_hook_function=?".
+			" AND ph_hook_context=?".
 			" AND ph_module_name=?"
-			)->execute(array($priority, $this->hook_function, $hsubscriber));
+			)->execute(array($priority, $this->hook_function, $this->hook_context, $hsubscriber));
 	}
 
 	/**
@@ -74,8 +78,9 @@ class WT_Perso_Hook {
 			"UPDATE `##phooks`".
 			" SET ph_status='enabled'".
 			" WHERE ph_hook_function=?".
+			" AND ph_hook_context=?".
 			" AND ph_module_name=?"
-			)->execute(array($this->hook_function, $hsubscriber));
+			)->execute(array($this->hook_function, $this->hook_context, $hsubscriber));
 	}
 
 	/**
@@ -88,8 +93,9 @@ class WT_Perso_Hook {
 			"UPDATE `##phooks`".
 			" SET ph_status='disabled'".
 			" WHERE ph_hook_function=?".
+			" AND ph_hook_context=?".
 			" AND ph_module_name=?"
-			)->execute(array($this->hook_function, $hsubscriber));
+			)->execute(array($this->hook_function, $this->hook_context, $hsubscriber));
 	}
 
 	/**
@@ -101,8 +107,9 @@ class WT_Perso_Hook {
 		WT_DB::prepare(
 			"DELETE FROM `##phooks`".
 			" WHERE ph_hook_function=?".
+			" AND ph_hook_context=?".
 			" AND ph_module_name=?"
-			)->execute(array($this->hook_function, $hsubscriber));
+			)->execute(array($this->hook_function, $this->hook_context, $hsubscriber));
 	}
 
 
@@ -122,9 +129,9 @@ class WT_Perso_Hook {
 		$result = array();
 		$module_names=WT_DB::prepare(
 			"SELECT ph_module_name AS module, ph_module_priority AS priority FROM `##phooks`".
-			" WHERE ph_hook_function = ? AND ph_status='enabled'".
+			" WHERE ph_hook_function = ? AND ph_hook_context=? AND ph_status='enabled'".
 			" ORDER BY ph_module_priority ASC, module ASC"
-			)->execute(array($this->hook_function))->fetchAssoc();
+			)->execute(array($this->hook_function, $this->hook_context))->fetchAssoc();
 		asort($module_names);
 		foreach ($module_names as $module_name => $module_priority) {
 			require_once WT_ROOT.WT_MODULES_DIR.$module_name.'/module.php';
@@ -168,11 +175,19 @@ class WT_Perso_Hook {
 									$priority = WT_Perso_Hook::$DEFAULT_PRIORITY;
 								}
 								else{
-									$hook_item = $key;
+									$hook_item = explode('#', $key, 2);
 									$priority = $value;
 								}
-								if(method_exists($hook_class, $hook_item)){
-									$hooks[$hook_class->getName().'#'.$hook_item]=$priority;
+								if($hook_item && count($hook_item) == 2){
+									$hook_func = $hook_item[0];
+									$hook_cont = $hook_item[1];
+								}
+								else{
+									$hook_func = $hook_item[0];
+									$hook_cont = 'all';
+								}
+								if(method_exists($hook_class, $hook_func)){
+									$hooks[$hook_class->getName().'#'.$hook_func.'#'.$hook_cont]=$priority;
 								}
 							}
 						}
@@ -190,7 +205,7 @@ class WT_Perso_Hook {
 	 */
 	static public function getRawInstalledHooks(){
 		return WT_DB::prepare(
-			"SELECT ph_id AS id, ph_module_name AS module, ph_hook_function AS hook, ph_module_priority AS priority,  ph_status AS status".
+			"SELECT ph_id AS id, ph_module_name AS module, ph_hook_function AS hook, ph_hook_context as context, ph_module_priority AS priority,  ph_status AS status".
 			" FROM `##phooks`".
 			" ORDER BY hook ASC, status ASC, priority ASC, module ASC"
 		)->execute()->fetchAll();
@@ -206,7 +221,7 @@ class WT_Perso_Hook {
 		if($installedhooks===null){
 			$dbhooks=WT_Perso_Hook::getRawInstalledHooks();
 			foreach($dbhooks as $dbhook){
-				$installedhooks[($dbhook->module).'#'.($dbhook->hook)] = array('id' => $dbhook->id, 'status' => $dbhook->status, 'priority' => $dbhook->priority);
+				$installedhooks[($dbhook->module).'#'.($dbhook->hook).'#'.($dbhook->context)] = array('id' => $dbhook->id, 'status' => $dbhook->status, 'priority' => $dbhook->priority);
 			}
 		}
 		return $installedhooks;

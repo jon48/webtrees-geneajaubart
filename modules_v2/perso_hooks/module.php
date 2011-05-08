@@ -16,7 +16,7 @@ if (!defined('WT_WEBTREES')) {
 
 // Create tables, if not already present
 try {
-	WT_DB::updateSchema(WT_ROOT.WT_MODULES_DIR.'perso_hooks/db_schema/', 'PHOOKS_SCHEMA_VERSION', 1);
+	WT_DB::updateSchema(WT_ROOT.WT_MODULES_DIR.'perso_hooks/db_schema/', 'PHOOKS_SCHEMA_VERSION', 2);
 } catch (PDOException $ex) {
 	// The schema update scripts should never fail.  If they do, there is no clean recovery.
 	die($ex);
@@ -66,7 +66,7 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 				foreach($phooks as $phook => $priority){
 					$array_hook = explode('#', $phook);
 					if($ihooks==null || !array_key_exists($phook, $ihooks)){
-						$chook = new WT_Perso_Hook($array_hook[1]);
+						$chook = new WT_Perso_Hook($array_hook[1], $array_hook[2]);
 						$chook->subscribe($array_hook[0]);
 						$chook->setPriority($array_hook[0], $priority);
 					}
@@ -78,7 +78,7 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 				foreach($ihooks as $ihook => $status){
 					$array_hook = explode('#', $ihook);
 					if($phooks==null || !array_key_exists($ihook, $phooks)){
-						$chook = new WT_Perso_Hook($array_hook[1]);
+						$chook = new WT_Perso_Hook($array_hook[1], $array_hook[2]);
 						$chook->remove($array_hook[0]);
 					}
 				}
@@ -109,7 +109,7 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 					if ($new_status!==null) {
 						$new_status= $new_status ? 'enabled' : 'disabled';
 						if($new_status != $previous_status){
-							$chook = new WT_Perso_Hook($array_hook[1]);
+							$chook = new WT_Perso_Hook($array_hook[1], $array_hook[2]);
 							switch($new_status){
 								case 'enabled':
 									$chook->enable($array_hook[0]);
@@ -127,7 +127,7 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 					$previous_priority=$params['priority'];	
 					if ($new_priority!==null) {
 						if($new_priority != $previous_priority){
-							$chook = new WT_Perso_Hook($array_hook[1]);
+							$chook = new WT_Perso_Hook($array_hook[1], $array_hook[2]);
 							$chook->setPriority($array_hook[0], $new_priority);
 						}
 					}
@@ -181,11 +181,11 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 						"sDom": '<"H"prf>t<"F"li>',
 						"bJQueryUI": true,
 						"bAutoWidth":false,
-						"aaSorting": [[ 1, "asc" ]],
+						"aaSorting": [[ 1, "asc" ], [ 2, "asc" ]],
 						"iDisplayLength": 10,
 						"sPaginationType": "full_numbers",
 						"aoColumnDefs": [
-							{ "bSortable": false, "aTargets": [ 0, 3 ] }
+							{ "bSortable": false, "aTargets": [ 0, 4 ] }
 						]
 				  });
 	
@@ -204,6 +204,7 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 								'<tr>',
 								'<th>',WT_I18N::translate('Enabled'),'</th>',
 								'<th>',WT_I18N::translate('Hook Function'),'</th>',
+								'<th>',WT_I18N::translate('Hook Context'),'</th>',
 								'<th>',WT_I18N::translate('Module Name'),'</th>',
 								'<th>',WT_I18N::translate('Priority (1 is high)'),'</th>',
 								'</tr>',
@@ -212,6 +213,7 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 								foreach ($hooks as $id => $hook) {
 									echo '<tr><td>', two_state_checkbox('status-'.($hook->id), ($hook->status)=='enabled'), '</td>',
 										'<td>',$hook->hook,'</td>',
+										'<td>',$hook->context,'</td>',
 										'<td>',$hook->module,'</td>',
 										'<td><input type="text" class="center" size="2" value="',$hook->priority,'" name="moduleorder-',$hook->id,'" /></td>',
 										'</tr>';
