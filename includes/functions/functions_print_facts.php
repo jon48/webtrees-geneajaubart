@@ -890,6 +890,10 @@ function print_main_sources($factrec, $level, $pid, $linenum, $noedit=false) {
 			//echo "<td class=\"facts_value$styleadd\">";
 			$source=WT_Source::getInstance($sid);
 			if ($source) {
+				//PERSO Prepend fact source text
+				$hook_fs_prepend = new WT_Perso_Hook('h_fs_prepend');
+				echo implode('', $hook_fs_prepend->execute($factrec)) ;
+				//END PERSO
 				echo "<a href=\"", $source->getHtmlUrl(), "\">", PrintReady($source->getFullName()), "</a>";
 				// PUBL
 				$text = get_gedcom_value("PUBL", "1", $source->getGedcomRecord());

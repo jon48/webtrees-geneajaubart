@@ -1152,10 +1152,11 @@ html[dir='rtl'] .header_search {
 
 .rela {
 	opacity: 0.67;
+	text-align: left;	
 }
 
-#row_top .rela {
-	text-align: left;
+.row_rela .descriptionbox, .row_sour2 .descriptionbox, .row_note2 .descriptionbox{
+	text-align: center;
 }
 
 /* Text direction */

@@ -1,7 +1,7 @@
 <?php
 /**
  * Interface for WT_Module for modules providing additional footer information.
- * Support hook <strong>h_config_tab_name</strong> and <strong>h_config_tab_content</strong>
+ * Support hook <strong>h_print_footer</strong>
  *
  * @package webtrees
  * @subpackage PersoLibrary
