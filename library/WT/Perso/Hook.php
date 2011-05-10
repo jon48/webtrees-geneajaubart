@@ -127,11 +127,17 @@ class WT_Perso_Hook {
 	public function execute(){
 		$params = func_get_args();
 		$result = array();
+		$sqlquery = '';
+		$sqlparams = array($this->hook_function);
+		if($this->hook_context != 'all') {
+			$sqlparams = array($this->hook_function, $this->hook_context);
+			$sqlquery = " OR ph_hook_context=?";
+		}
 		$module_names=WT_DB::prepare(
 			"SELECT ph_module_name AS module, ph_module_priority AS priority FROM `##phooks`".
-			" WHERE ph_hook_function = ? AND ph_hook_context=? AND ph_status='enabled'".
+			" WHERE ph_hook_function = ? AND (ph_hook_context='all'".$sqlquery.") AND ph_status='enabled'".
 			" ORDER BY ph_module_priority ASC, module ASC"
-			)->execute(array($this->hook_function, $this->hook_context))->fetchAssoc();
+			)->execute($sqlparams)->fetchAssoc();
 		asort($module_names);
 		foreach ($module_names as $module_name => $module_priority) {
 			require_once WT_ROOT.WT_MODULES_DIR.$module_name.'/module.php';
@@ -140,6 +146,34 @@ class WT_Perso_Hook {
 			$result[] = call_user_func_array(array($hook_class, $this->hook_function), $params);
 		}
 		return $result;
+	}
+	
+	/*
+	 * Returns the number of active modules linked to a hook
+	 * 
+	 * @return int Nomber of active modules
+	 */
+	public function getNumberActiveModules(){
+		$sqlquery = '';
+		$sqlparams = array($this->hook_function);
+		if($this->hook_context != 'all') {
+			$sqlparams = array($this->hook_function, $this->hook_context);
+			$sqlquery = " OR ph_hook_context=?";
+		}
+		$module_names=WT_DB::prepare(
+			"SELECT ph_module_name AS modules FROM `##phooks`".
+			" WHERE ph_hook_function = ? AND (ph_hook_context='all'".$sqlquery.") AND ph_status='enabled'"
+			)->execute($sqlparams)->fetchOneColumn();
+		return count($module_names);
+	}
+	
+	/*
+	 * Return whether any active module is linked to a hook
+	 * 
+	 * @return bool True is active modules exist, false otherwise
+	 */
+	public function hasAnyActiveModule(){
+		return ($this->getNumberActiveModules()>0);
 	}
 
 	/**

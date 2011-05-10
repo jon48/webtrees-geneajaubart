@@ -16,6 +16,8 @@ if (!defined('WT_WEBTREES')) {
 
 class WT_Perso_Functions_Certificates {
 	
+	private static $_citiesList = null;	
+	
 	/**
 	 * Returns the certificates directory path as it is really (within the firewall directory).
 	 * 
@@ -48,21 +50,20 @@ class WT_Perso_Functions_Certificates {
 	 * @return array Array of cities name
 	 */
 	public static function getCitiesList(){
-
-		$certdir = self::getRealCertificatesDirectory();
-		$tabCities= array();
-	
-		$dir=opendir($certdir);
+		if(!isset($_citiesList) || is_null($_citiesList)){
+			$certdir = self::getRealCertificatesDirectory();
+			$_citiesList= array();
 		
-		while($entry = readdir($dir)){
-			if($entry!='.' && $entry!='..' && is_dir($certdir.$entry.'/')){
-				$tabCities[]=utf8_encode($entry);
+			$dir=opendir($certdir);
+			
+			while($entry = readdir($dir)){
+				if($entry!='.' && $entry!='..' && is_dir($certdir.$entry.'/')){
+					$_citiesList[]=utf8_encode($entry);
+				}
 			}
+			sort($_citiesList);
 		}
-	
-		sort($tabCities);
-		return $tabCities;
-	
+		return $_citiesList;
 	}
 	
 	/**
@@ -120,6 +121,48 @@ class WT_Perso_Functions_Certificates {
 	
 		sort($tabCertif);
 		return $tabCertif;
+	}
+	
+	/**
+	 * Return the list of certificates from a city $city and containing the characters $contains
+	 *
+	 * @param string $city City to search in
+	 * @param string $contains Characters to match
+	 * @param string $limit Maximum number of results
+	 * @return array Array of matching certificates
+	 */
+	public static function getCertificateListBeginWith($city, $contains, $limit= 9999){
+		$tabFiles= array();	
+		$dirPath=$certdir = self::getRealCertificatesDirectory().utf8_decode($city).'/';
+		$contains = utf8_decode($contains);
+		$nbCert = 0;
+		
+		if(is_dir($dirPath)){
+			$dir=opendir($dirPath);
+			while($entry = readdir($dir)){
+				if($nbCert < $limit && $entry!='.' && $entry!='..' && $entry!='Thumbs.db' &&!is_dir($dirPath.$entry.'/') && stripos($entry, $contains)!== false){
+					$tabFiles[]=utf8_encode($entry);
+					$nbCert++;
+				}
+			}
+		}
+		sort($tabFiles);
+		return $tabFiles;
+	}
+	
+	/**
+	 * Print the list of certificates, to be used by the jQuery module
+	 *
+	 * @param string $city City to search in
+	 * @param string $contains Characters to match
+	 * @param string $limit Maximum number of results
+	 */
+	public static function printCertificateListBeginWith($city, $contains, $limit = 10) {	
+		$listCertif=WT_Perso_Functions_Certificates::getCertificateListBeginWith($city, $contains, $limit);
+		
+		foreach ($listCertif as $element) {
+			echo $element."\n";			
+		}
 	}
 	
 	/**

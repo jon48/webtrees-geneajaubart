@@ -15,7 +15,7 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_HookSubscriber, WT_Perso_Module_Configurable, WT_Perso_Module_FactSourceTextExtender {
+class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_HookSubscriber, WT_Perso_Module_Configurable, WT_Perso_Module_FactSourceTextExtender, WT_Perso_Module_CustomSimpleTagManager {
 	
 	// Extend class WT_Module
 	public function getTitle() {
@@ -32,6 +32,7 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 		switch($mod_action) {
 			case 'certificatelist':
 			case 'certificatefirewall':
+			case 'autocomplete':
 				require WT_ROOT.WT_MODULES_DIR.$this->getName().'/'.$mod_action.'.php';
 				break;
 			default:
@@ -45,7 +46,12 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 			'h_config_tab_name' => 20,
 			'h_config_tab_content' => 20,
 			'h_fs_prepend' => 50,
-			'h_fs_append' => 50
+			'h_fs_append' => 50,
+			'h_get_simpletag_display#_ACT' => 50,
+			'h_get_simpletag_editor#_ACT'	=> 50,
+			'h_add_simple_tag#SOUR'	=> 50,
+			'h_get_expected_tags' => 50,
+			'h_get_help_text_tag#_ACT'	=> 50
 		);
 	}
 	
@@ -141,9 +147,7 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 	}
 	
 	//Implement WT_Perso_Module_FactSourceTextExtender
-	public function h_fs_prepend($srec){
-		global $WT_IMAGES;
-		
+	public function h_fs_prepend($srec){		
 		$html='';		
 		$sid=null;
 		
@@ -164,17 +168,8 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 				if($tag == '_ACT') $certifFile=$text;
 			}
 			
-			if($certifFile != ''){
-				$certdetails = explode('/',$certifFile,2);
-				$pathCertif= WT_MODULES_DIR.$this->getName().'/'.get_module_setting($this->getName(), 'PC_CERT_ROOTDIR', 'certificates/').$certifFile;
-				if($sid) $pathCertif .= '?sid='.$sid;
-				$requestedCity = $certdetails[0];
-				$requestedCertif = $certdetails[1];
-				$html= '<a href="'.$pathCertif.'" title="'.$requestedCertif.'"'.
-						' rel="clearbox[certificate]"'.
-						' rev="PC::'.$requestedCity.'::'.$requestedCertif.'::">'.
-						'<img src="'.$WT_IMAGES["certificate"]."\" class=\"certif_icon\" /></a>";
-			}
+			if($certifFile != '') $html = $this->getDisplay_ACT($certifFile, $sid);
+			
 		}
 		
 		return $html;
@@ -183,6 +178,107 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 	//Implement WT_Perso_Module_FactSourceTextExtender
 	public function h_fs_append($srec){
 	}
+	
+	//Implement WT_Perso_Module_CustomSimpleTagManager
+	public function getCustomTags(){
+		return array('_ACT');
+	}
+
+	//Implement WT_Perso_Module_CustomSimpleTagManager
+	public function h_get_simpletag_display($tag, $value, $context = null, $contextid = null){
+		$html = '';
+		switch($tag){
+			case '_ACT':
+				if($context == 'SOUR') $html = $this->getDisplay_ACT($value, $contextid);
+				break;
+		}
+		return $html;
+	}
+	
+	//Implement WT_Perso_Module_CustomSimpleTagManager
+	public function h_get_simpletag_editor($tag, $value = null, $element_id = '', $element_name = '', $context = null, $contextid = null){
+		global $ENABLE_AUTOCOMPLETE;
+		
+		$html = '';
+		
+		switch($tag){
+			case '_ACT':
+				$element_id = $tag.floor(microtime()*1000000); //replace $element_id so that it is unique
+				if ($ENABLE_AUTOCOMPLETE) require_once WT_ROOT.WT_MODULES_DIR.$this->getName().'/js/autocomplete.js.htm';
+				require WT_ROOT.WT_MODULES_DIR.$this->getName().'/js/updatecertificatevalues.js.htm';
+				$city='';
+				$certif='';
+				if($value){
+					$tabExplode = explode('/', $value, 2);
+					if(count($tabExplode)==2){
+						$city=$tabExplode[0];
+						$certif=$tabExplode[1];
+					}
+				}
+				$tabCities = WT_Perso_Functions_Certificates::getCitiesList();
+				$html .= '<select id="certifCity'.$element_id.'" class="_CITY" onchange="updateTextCertifCity'.$element_id.'(\''.$element_id.'\')" >';
+				foreach ($tabCities as $cities){
+					$selectedCity='';
+					if($cities==$city) $selectedCity='selected="true"';
+					$html .= '<option value="'.$cities.'" '.$selectedCity.' />'.$cities.'</option>';
+				}
+				$html .= '</select>';
+				$html .= '<input id="certifFile'.$element_id.'" autocomplete="off" class="_ACT ac_input" value="'.$certif.'" size="35" onchange="updateTextCertif'.$element_id.'(\''.$element_id.'\')"  onblur="updateTextCertif'.$element_id.'(\''.$element_id.'\')" onmouseout="updateTextCertif'.$element_id.'(\''.$element_id.'\')"/>';		
+				$html .= '<input type="hidden" id="'.$element_id.'" name = "'.$element_name.'" value="'.$value.'" size="35"/>';
+		}
+		
+		return $html;
+	}
+	
+	//Implement WT_Perso_Module_CustomSimpleTagManager
+	public function h_add_simple_tag($context, $level){
+		switch($context){
+			case 'SOUR':
+				add_simple_tag($level.' _ACT');
+				break;
+		}
+	}
+	
+	//Implement WT_Perso_Module_CustomSimpleTagManager
+	public function h_get_expected_tags(){
+		return array('SOUR' => '_ACT');
+	}
+	
+	// Implement WT_Perso_Module_HookSubscriber
+	public function h_get_help_text_tag($tag) {
+		switch($tag){
+			case '_ACT':
+				return array(
+					WT_I18N::translate('Certificate'),
+					'<p>'.WT_I18N::translate('Path to a certificate linked to a source reference.').'</p>');
+			default:
+				return null;
+		}
+	}
+	
+	/**
+	 * Return the HTML code for custom simple tag _ACT
+	 * 
+	 * @param string $certificatePath Path of the Certificate (as per the GEDCOM)
+	 * @param string $sid ID of the linked source, if it exists
+	 */
+	private function getDisplay_ACT($certificatePath, $sid = null){
+		global $WT_IMAGES;
+		
+		$certdetails = explode('/',$certificatePath,2);
+		$html = '';
+		if(count($certdetails)==2){
+			$pathCertif= WT_MODULES_DIR.$this->getName().'/'.get_module_setting($this->getName(), 'PC_CERT_ROOTDIR', 'certificates/').$certificatePath;
+			if($sid) $pathCertif .= '?sid='.$sid;
+			$requestedCity = $certdetails[0];
+			$requestedCertif = $certdetails[1];
+			$html= '<a href="'.$pathCertif.'" title="'.$requestedCertif.'"'.
+					' rel="clearbox[certificate]"'.
+					' rev="PC::'.$requestedCity.'::'.$requestedCertif.'::">'.
+					'<img src="'.$WT_IMAGES["certificate"]."\" class=\"certif_icon\" /></a>";
+		}
+		return $html;
+	}	
 	
 	/**
 	 * Creates a .htaccess file within the Certificates directory in order to redirect public URL requests to the certificates firewall

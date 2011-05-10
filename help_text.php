@@ -27,6 +27,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @version $Id: help_text.php 11265 2011-04-03 09:47:06Z lukasz $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  */
 
 define('WT_SCRIPT_NAME', 'help_text.php');
@@ -3068,14 +3070,27 @@ case 'zip':
 	break;
 
 default:
-	$title=WT_I18N::translate('Help');
-	$text=WT_I18N::translate('The help text has not been written for this item.');
-	// If we've been called from a module, allow the module to provide the help text
-	$mod=safe_GET('mod', '[A-Za-z0-9_]+');
-	if (file_exists(WT_ROOT.WT_MODULES_DIR.$mod.'/help_text.php')) {
-		require WT_ROOT.WT_MODULES_DIR.$mod.'/help_text.php';
+	//PERSO Implement custom tags management
+	$hook_get_help_text_tag = new WT_Perso_Hook('h_get_help_text_tag', $help);
+	if($hook_get_help_text_tag->hasAnyActiveModule()){
+		$result = $hook_get_help_text_tag->execute($help);
+		$title = ''; $text = '';
+		if(count($result)>0 && count($result[0])==2){
+			$title = $result[0][0];
+			$text = $result[0][1];
+		}
 	}
-	break;
+	else{
+	//END PERSO
+		$title=WT_I18N::translate('Help');
+		$text=WT_I18N::translate('The help text has not been written for this item.');
+		// If we've been called from a module, allow the module to provide the help text
+		$mod=safe_GET('mod', '[A-Za-z0-9_]+');
+		if (file_exists(WT_ROOT.WT_MODULES_DIR.$mod.'/help_text.php')) {
+			require WT_ROOT.WT_MODULES_DIR.$mod.'/help_text.php';
+		}
+		break;
+	}
 }
 
 print_simple_header(WT_I18N::translate('Help for «%s»', htmlspecialchars(strip_tags($title))));

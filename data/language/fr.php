@@ -108,7 +108,9 @@ return array(
 	'Individuals linked to this certificate'
 									=>	'Individus liés à cet acte',
 	'Families linked to this certificate'
-									=>	'Familles liés à cet acte',								
+									=>	'Familles liés à cet acte',
+	'Path to a certificate linked to a source reference.'		
+									=>	'Chemin vers un acte lié à la source.',						
 	
 	//Titles
 	'Titles'						=>	'Titres',

@@ -28,6 +28,8 @@
 * @subpackage Edit
 * @see functions_places.php
 * @version $Id: functions_edit.php 11299 2011-04-10 13:22:55Z veit $
+* @version: p_$Revision$ $Date$
+* $HeadURL$
 */
 
 if (!defined('WT_WEBTREES')) {
@@ -1602,38 +1604,46 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		else echo "<span class=\"age\">[", WT_I18N::translate('Edit name'), "]</span>";
 		echo "</a>";
 	} else {
-		// textarea
-		if ($rows>1) echo "<textarea id=\"", $element_id, "\" name=\"", $element_name, "\" rows=\"", $rows, "\" cols=\"", $cols, "\">", PrintReady(htmlspecialchars($value)), "</textarea><br />";
-		else {
-			// text
-			// If using GEDFact-assistant window
-			if ($action=="addnewnote_assisted") {
-				echo "<input type=\"text\" id=\"", $element_id, "\" name=\"", $element_name, "\" value=\"", PrintReady(htmlspecialchars($value)), "\" style=\"width:4.1em;\" dir=\"ltr\"";
-			} else {
-				echo "<input type=\"text\" id=\"", $element_id, "\" name=\"", $element_name, "\" value=\"", PrintReady(htmlspecialchars($value)), "\" size=\"", $cols, "\" dir=\"ltr\"";
-			}
-			echo " class=\"{$fact}\"";
-			echo " autocomplete=\"off\"";
-			if (in_array($fact, $subnamefacts)) echo " onblur=\"updatewholename();\" onkeyup=\"updatewholename();\"";
-			if ($fact=="DATE") echo " onblur=\"valid_date(this);\" onmouseout=\"valid_date(this);\"";
-			if ($fact=="LATI") echo " onblur=\"valid_lati_long(this, 'N', 'S');\" onmouseout=\"valid_lati_long(this, 'N', 'S');\"";
-			if ($fact=="LONG") echo " onblur=\"valid_lati_long(this, 'E', 'W');\" onmouseout=\"valid_lati_long(this, 'E', 'W');\"";
-			//if ($fact=="FILE") echo " onchange=\"if (updateFormat) updateFormat(this.value);\"";
-			echo ' ', $readOnly, " />";
+		//PERSO Implement custom tags management
+		$hook_get_simpletag_editor = new WT_Perso_Hook('h_get_simpletag_editor', $fact);
+		if($hook_get_simpletag_editor->hasAnyActiveModule()){
+			echo implode('', $hook_get_simpletag_editor->execute($fact, $value, $element_id, $element_name));
 		}
-		// split PLAC
-		if ($fact=="PLAC" && $readOnly=='') {
-			echo "<div id=\"", $element_id, "_pop\" style=\"display: inline;\">";
-			print_specialchar_link($element_id, false);
-			print_findplace_link($element_id);
-			echo "</div>";
-			echo "<a href=\"javascript:;\" onclick=\"toggle_lati_long();\"><img src=\"", $WT_IMAGES["target"], "\" border=\"0\" align=\"middle\" alt=\"", WT_Gedcom_Tag::getLabel('LATI'), " / ", WT_Gedcom_Tag::getLabel('LONG'), "\" title=\"", WT_Gedcom_Tag::getLabel('LATI'), " / ", WT_Gedcom_Tag::getLabel('LONG'), "\" /></a>";
-			if (array_key_exists('places_assistant', WT_Module::getActiveModules())) {
-				places_assistant_WT_Module::setup_place_subfields($element_id);
-				places_assistant_WT_Module::print_place_subfields($element_id);
+		else{
+		//END PERSO
+			// textarea
+			if ($rows>1) echo "<textarea id=\"", $element_id, "\" name=\"", $element_name, "\" rows=\"", $rows, "\" cols=\"", $cols, "\">", PrintReady(htmlspecialchars($value)), "</textarea><br />";
+			else {
+				// text
+				// If using GEDFact-assistant window
+				if ($action=="addnewnote_assisted") {
+					echo "<input type=\"text\" id=\"", $element_id, "\" name=\"", $element_name, "\" value=\"", PrintReady(htmlspecialchars($value)), "\" style=\"width:4.1em;\" dir=\"ltr\"";
+				} else {
+					echo "<input type=\"text\" id=\"", $element_id, "\" name=\"", $element_name, "\" value=\"", PrintReady(htmlspecialchars($value)), "\" size=\"", $cols, "\" dir=\"ltr\"";
+				}
+				echo " class=\"{$fact}\"";
+				echo " autocomplete=\"off\"";
+				if (in_array($fact, $subnamefacts)) echo " onblur=\"updatewholename();\" onkeyup=\"updatewholename();\"";
+				if ($fact=="DATE") echo " onblur=\"valid_date(this);\" onmouseout=\"valid_date(this);\"";
+				if ($fact=="LATI") echo " onblur=\"valid_lati_long(this, 'N', 'S');\" onmouseout=\"valid_lati_long(this, 'N', 'S');\"";
+				if ($fact=="LONG") echo " onblur=\"valid_lati_long(this, 'E', 'W');\" onmouseout=\"valid_lati_long(this, 'E', 'W');\"";
+				//if ($fact=="FILE") echo " onchange=\"if (updateFormat) updateFormat(this.value);\"";
+				echo ' ', $readOnly, " />";
 			}
+			// split PLAC
+			if ($fact=="PLAC" && $readOnly=='') {
+				echo "<div id=\"", $element_id, "_pop\" style=\"display: inline;\">";
+				print_specialchar_link($element_id, false);
+				print_findplace_link($element_id);
+				echo "</div>";
+				echo "<a href=\"javascript:;\" onclick=\"toggle_lati_long();\"><img src=\"", $WT_IMAGES["target"], "\" border=\"0\" align=\"middle\" alt=\"", WT_Gedcom_Tag::getLabel('LATI'), " / ", WT_Gedcom_Tag::getLabel('LONG'), "\" title=\"", WT_Gedcom_Tag::getLabel('LATI'), " / ", WT_Gedcom_Tag::getLabel('LONG'), "\" /></a>";
+				if (array_key_exists('places_assistant', WT_Module::getActiveModules())) {
+					places_assistant_WT_Module::setup_place_subfields($element_id);
+					places_assistant_WT_Module::print_place_subfields($element_id);
+				}
+			}
+			else if (($cols>20 || $fact=="NPFX") && $readOnly=='') print_specialchar_link($element_id, false);
 		}
-		else if (($cols>20 || $fact=="NPFX") && $readOnly=='') print_specialchar_link($element_id, false);
 	}
 	// MARRiage TYPE : hide text field and show a selection list
 	if ($fact=='TYPE' && $level==2 && $tags[0]=='MARR') {
@@ -1839,6 +1849,10 @@ function print_add_layer($tag, $level=2, $printSaveButton=true) {
 			// 3 QUAY
 			add_simple_tag(($level+1)." QUAY");
 		}
+		//PERSO Implement custom tags management
+		$hook_add_simple_tag = new WT_Perso_Hook('h_add_simple_tag', $tag);
+		$hook_add_simple_tag->execute($tag, ($level+1));
+		//END PERSO
 		// 3 OBJE
 		add_simple_tag(($level+1)." OBJE");
 		// 3 SHARED_NOTE
@@ -2364,6 +2378,10 @@ function create_add_form($fact) {
 				add_simple_tag("2 QUAY");
 			}
 		}
+		//PERSO Implement custom tags management
+		$hook_add_simple_tag = new WT_Perso_Hook('h_add_simple_tag', $fact);
+		$hook_add_simple_tag->execute($fact, 2);
+		//END PERSO
 	}
 }
 
@@ -2433,6 +2451,15 @@ function create_edit_form($gedrec, $linenum, $level0type) {
 	if (preg_match_all('/('.WT_REGEX_TAG.')/', $ADVANCED_PLAC_FACTS, $match)) {
 		$expected_subtags['PLAC']=array_merge($match[1], $expected_subtags['PLAC']);
 	}
+	//PERSO Add expected custom tags
+	$hook_get_expected_tags = new WT_Perso_Hook('h_get_expected_tags');
+	$hook_expected_tags_all = $hook_get_expected_tags->execute();
+	foreach($hook_expected_tags_all as $hook_expected_tags){
+		foreach($hook_expected_tags as $hook_context => $hook_expected_tag){
+			$expected_subtags[$hook_context][]=$hook_expected_tag;
+		}
+	}
+	//END PERSO
 
 	$stack=array(0=>$level0type);
 	// Loop on existing tags :

@@ -19,6 +19,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // $Id: Tag.php 11090 2011-03-08 20:51:50Z greg $
+// @version: p_$Revision$ $Date$
+// $HeadURL$
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -84,6 +86,9 @@ class WT_Gedcom_Tag {
 		'_NLIV', '_NMAR', '_NMR', '_WT_USER', '_PRMN', '_SCBK', '_SEPR', '_SSHOW', '_STAT',
 		'_SUBQ', '_THUM', '_TODO', '_TYPE', '_UID', '_URL', '_WEIG', '_YART', '__BRTM_CHIL',
 		'__BRTM_GCHI', '__BRTM_GCH1', '__BRTM_GCH2', '__BRTM_HSIB', '__BRTM_SIBL',
+		//PERSO Add Perso tags
+		'_ACT'
+		//END PERSO
 	);
 
 	// Is $tag one of our known tags?
@@ -910,6 +915,9 @@ class WT_Gedcom_Tag {
 		case '__BRTM_GCH2': return WT_I18N::translate_c('son\'s son', 'Brit milah of a grandson');
 		case '__BRTM_HSIB': return WT_I18N::translate ( 'Brit milah of a half-brother');
 		case '__BRTM_SIBL': return WT_I18N::translate ( 'Brit milah of a brother');
+		//PERSO Add Perso Tag
+		case '_ACT' : return WT_I18N::translate('Certificate');
+		//END PERSO
 		default:
 			// If no specialisation exists (e.g. DEAT:CAUS), then look for the general (CAUS)
 			if (strpos($tag, ':')) {
