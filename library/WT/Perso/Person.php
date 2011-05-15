@@ -18,6 +18,7 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 
 	// Cached results from various functions.
 	private $_titles=null;
+	private $_unprotectedPrimarySurname = null;
 
 	/**
 	 * Get an array of the different titles (tag TITL) of an individual
@@ -44,6 +45,30 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 		return $this->_titles;
 	}
 
+	/**
+	 * Returns primary Surname of the individual.
+	 * Warning : no check of privacy if done in this function.
+	 *
+	 * @return string Primary surname
+	 */
+	public function getUnprotectedPrimarySurname() {
+		if(!$this->_unprotectedPrimarySurname){
+			$tmp=$this->gedcomrecord->getAllNames();
+			$this->_unprotectedPrimarySurname = $tmp[$this->gedcomrecord->getPrimaryName()]['surname'];
+		}
+		return $this->_unprotectedPrimarySurname;
+	}
+	
+	/**
+	 * Returns an estimated birth place based on statistics on the base
+	 *
+	 * @param boolean $perc Should the coefficient of reliability be returned
+	 * @return string Estimated birth place if found, null otherwise
+	 */
+	function getEstimatedBirthPlace($perc=false){
+		return $this->gedcomrecord->getBirthPlace();
+	}
+	
 }
 
 ?>

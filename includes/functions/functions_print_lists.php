@@ -28,6 +28,8 @@
  * @package webtrees
  * @subpackage Display
  * @version $Id: functions_print_lists.php 11181 2011-03-24 17:21:53Z greg $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -1122,7 +1124,9 @@ function print_media_table($datalist, $legend="") {
 // Print a table of surnames.
 // @param $surnames array (of SURN, of array of SPFX_SURN, of array of PID)
 // @param $type string, indilist or famlist
-function format_surname_table($surnames, $type) {
+//PERSO Add $extra parameter for more complex urls
+// @param $extra string Extra URL which should be added to the returned link
+function format_surname_table($surnames, $type, $extra = '') {
 	global $GEDCOM;
 
 	require_once WT_ROOT.'js/sorttable.js.htm';
@@ -1144,11 +1148,14 @@ function format_surname_table($surnames, $type) {
 	$row_num=0;
 	foreach ($surnames as $surn=>$surns) {
 		// Each surname links back to the indi/fam surname list
+		//PERSO Add $extra parameter for more complex urls
 		if ($surn) {
-			$url=$type.'.php?surname='.urlencode($surn).'&amp;ged='.rawurlencode($GEDCOM);
+			$url=$type.'.php?surname='.urlencode($surn).'&amp;ged='.rawurlencode($GEDCOM).$extra;
 		} else {
-			$url=$type.'.php?alpha=,&amp;ged='.rawurlencode($GEDCOM);
+			$url=$type.'.php?alpha=,&amp;ged='.rawurlencode($GEDCOM).$extra;
+			
 		}
+		//END PERSO
 		// Row counter
 		++$row_num;
 		$html.='<tr><td class="list_value_wrap rela list_item">'.$row_num.'</td>';
@@ -1208,7 +1215,9 @@ function format_surname_table($surnames, $type) {
 // @param $surnames array (of SURN, of array of SPFX_SURN, of array of PID)
 // @param $type string, indilist or famlist
 // @param $totals, boolean, show totals after each name
-function format_surname_tagcloud($surnames, $type, $totals) {
+//PERSO Add $extra parameter for more complex urls
+// @param $extra string Extra URL which should be added to the returned link
+function format_surname_tagcloud($surnames, $type, $totals, $extra = '') {
 	$cloud=new Zend_Tag_Cloud(
 		array(
 			'tagDecorator'=>array(
@@ -1239,8 +1248,10 @@ function format_surname_tagcloud($surnames, $type, $totals) {
 				'weight'=>count($indis),
 				'params'=>array(
 					'url'=>$surn ?
-						$type.'.php?surname='.urlencode($surn).'&amp;ged='.WT_GEDURL :
-						$type.'.php?alpha=,&amp;ged='.WT_GEDURL
+						//PERSO Add $extra parameter for more complex urls
+						$type.'.php?surname='.urlencode($surn).'&amp;ged='.WT_GEDURL.$extra :
+						$type.'.php?alpha=,&amp;ged='.WT_GEDURL.extra
+						//END PERSO
 				)
 			));
 		}
@@ -1253,17 +1264,21 @@ function format_surname_tagcloud($surnames, $type, $totals) {
 // @param $style, 1=bullet list, 2=semicolon-separated list, 3=tabulated list with up to 4 columns
 // @param $totals, boolean, show totals after each name
 // @param $type string, indilist or famlist
-function format_surname_list($surnames, $style, $totals, $type) {
+//PERSO Add $extra parameter for more complex urls
+// @param $extra string Extra URL which should be added to the returned link
+function format_surname_list($surnames, $style, $totals, $type, $extra = '') {
 	global $TEXT_DIRECTION, $GEDCOM;
 
 	$html=array();
 	foreach ($surnames as $surn=>$surns) {
 		// Each surname links back to the indilist
+		//PERSO Add $extra parameter for more complex urls
 		if ($surn) {
-			$url=$type.'.php?surname='.urlencode($surn).'&amp;ged='.rawurlencode($GEDCOM);
+			$url=$type.'.php?surname='.urlencode($surn).'&amp;ged='.rawurlencode($GEDCOM).$extra;
 		} else {
-			$url=$type.'.php?alpha=,&amp;ged='.rawurlencode($GEDCOM);
+			$url=$type.'.php?alpha=,&amp;ged='.rawurlencode($GEDCOM).$extra;
 		}
+		//END PERSO
 		// If all the surnames are just case variants, then merge them into one
 		// Comment out this block if you want SMITH listed separately from Smith
 		$first_spfxsurn=null;

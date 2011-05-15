@@ -43,6 +43,8 @@
  * @package webtrees
  * @subpackage Lists
  * @version $Id: indilist.php 11246 2011-03-31 13:56:47Z greg $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$ 
  */
 
 define('WT_SCRIPT_NAME', 'indilist.php');
@@ -282,6 +284,10 @@ if ($showList) {
 			}
 		}
 		if ($showList) {
+			// PERSO Add link to Patronymic Lineage
+			echo '<p class="center"><strong><a href="module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&ged='.WT_GEDCOM.'&surname='.urlencode($surname).'">'.WT_I18N::translate('Go to %s lineages', check_NN($legend)).'</a></strong></p>';
+			//END PERSO
+			
 			if ($legend && $show_all=='no') {
 				$legend=WT_I18N::translate('Individuals with surname %s', check_NN($legend));
 			}

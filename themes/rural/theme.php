@@ -182,6 +182,8 @@ $WT_IMAGES=array(
 	// Certificates Module
 	'certificate'=>WT_THEME_DIR.'images/certificate.png',
 	'menu_certificate'=>WT_THEME_DIR.'images/certificate.png',
+	// Patronymic Lineage Module
+	'menu_patronymiclineage'=>WT_THEME_DIR.'images/perso_patronymiclineage.png',
 
 	// END PERSO
 

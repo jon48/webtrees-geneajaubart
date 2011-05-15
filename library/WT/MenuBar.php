@@ -418,8 +418,9 @@ class WT_MenuBar {
 			'repolist.php'  =>WT_I18N::translate('Repositories'),
 			'notelist.php'  =>WT_I18N::translate('Shared notes'),
 			'sourcelist.php'=>WT_I18N::translate('Sources'),
-			//PERSO Add additional lists : Certificates
-			'perso_certificates'	=>WT_I18N::translate('Certificates')
+			//PERSO Add additional lists : Certificates, Patronymic Lineages
+			'perso_certificates'		=>WT_I18N::translate('Certificates'),
+			'perso_patronymiclineage'	=>WT_I18N::translate('Patronymic Lineages')
 			//END PERSO
 		);
 		asort($menuList);
@@ -488,14 +489,25 @@ class WT_MenuBar {
 				}
 				break;
 				
-			//PERSO Add additional submenus : certificates
+			//PERSO Add additional submenus : certificates, Patronymic Lineages
 			case 'perso_certificates':
 				$link = 'module.php?mod=perso_certificates&mod_action=certificatelist';
 				$submenu = new WT_Menu($name, $link);
 				$submenu->addIcon('menu_certificate');
-				$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_place');
+				$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_menu_certificate');
 				$menu->addSubmenu($submenu);
 				break;
+				
+			case 'perso_patronymiclineage':
+				$link = 'module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage';
+				if ($surname) $link .= '&amp;surname='.$surname;
+				$submenu = new WT_Menu($name, $link);
+				$submenu->addIcon('menu_patronymiclineage');
+				$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_menu_patronymiclineage');
+				$menu->addSubmenu($submenu);
+				break;
+				
+			//END PERSO
 				
 			}
 		}
