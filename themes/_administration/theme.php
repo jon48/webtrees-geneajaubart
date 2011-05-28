@@ -25,6 +25,8 @@
  * @package webtrees
  * @subpackage Themes
  * @version $Id: theme.php 9831 2010-11-13 04:43:15Z nigel $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -90,5 +92,12 @@ $WT_IMAGES=array(
 	'media_tex'=>WT_THEME_DIR.'images/media/tex.png',
 	'media_wmv'=>WT_THEME_DIR.'images/media/wmv.png',
 	'media_wmvrem'=>WT_THEME_DIR.'images/media/wmv_rem.png',	
+
+	// PERSO Perso images
+
+	// Loading icon
+	'loading'=>WT_THEME_DIR.'images/loading.gif',
+
+	// END PERSO
 );
 

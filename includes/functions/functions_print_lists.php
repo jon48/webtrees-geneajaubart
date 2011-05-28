@@ -198,7 +198,10 @@ function print_indi_table($datalist, $legend="", $option="") {
 				$class='list_item';
 				$sex_image='';
 			}
-			echo '<a ', $title, ' href="', $person->getHtmlUrl(), '" class="', $class, '">', PrintReady($name['list']), '</a>', $sex_image, "<br/>";
+			//PERSO Add Sosa Image
+			$dperson = new WT_Perso_Person($person);
+			echo '<a ', $title, ' href="', $person->getHtmlUrl(), '" class="', $class, '">', PrintReady($name['list']), '</a>', $sex_image, WT_Perso_Functions_Print::formatSosaNumbers($dperson->getSosaNumbers(), 1, 'smaller') ,"<br/>";
+			//END PERSO
 		}
 		// Indi parents
 		echo $person->getPrimaryParentsNames("parents_$table_id details1", 'none');
@@ -546,6 +549,12 @@ function print_fam_table($datalist, $legend="", $option="") {
 		echo "<td class=\"", $tdclass, "\" align=\"", get_align($names[$n1]['list']), "\">";
 		echo "<a href=\"", $family->getHtmlUrl(), "\" class=\"list_item name2\" dir=\"", $TEXT_DIRECTION, "\">", PrintReady($names[$n1]['list']), "</a>";
 		if ($tiny) echo $husb->getSexImage();
+		//PERSO Add Sosa Icon
+		if($tiny){
+			$dhusb = new WT_Perso_Person($husb);
+			echo WT_Perso_Functions_Print::formatSosaNumbers($dhusb->getSosaNumbers(), 1, 'smaller');
+		}
+		//END PERSO
 		if ($n1!=$n2) {
 			echo "<br /><a href=\"", $family->getHtmlUrl(), "\" class=\"list_item\">", PrintReady($names[$n2]['list']), "</a>";
 		}
@@ -592,6 +601,12 @@ function print_fam_table($datalist, $legend="", $option="") {
 		echo "<td class=\"", $tdclass, "\" align=\"", get_align($names[$n1]['list']), "\">";
 		echo "<a href=\"", $family->getHtmlUrl(), "\" class=\"list_item name2\" dir=\"", $TEXT_DIRECTION, "\">", PrintReady($names[$n1]['list']), "</a>";
 		if ($tiny) echo $wife->getSexImage();
+		//PERSO Add Sosa Icon
+		if($tiny){
+			$dwife = new WT_Perso_Person($wife);
+			echo WT_Perso_Functions_Print::formatSosaNumbers($dwife->getSosaNumbers(), 1, 'smaller');
+		}
+		//END PERSO
 		if ($n1!=$n2) {
 			echo "<br /><a href=\"", $family->getHtmlUrl(), "\" class=\"list_item\">", PrintReady($names[$n2]['list']), "</a>";
 		}
@@ -1646,14 +1661,28 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 			$exp = explode("<br />", $name);
 			$husb = $value['record']->getHusband();
 			if ($husb) $exp[0] .= $husb->getPrimaryParentsNames("parents_$table_id details1", "none");
+			//PERSO Add Sosa Icon
+			if($husb){
+				$dhusb = new WT_Perso_Person($husb);
+				$exp[0] .= WT_Perso_Functions_Print::formatSosaNumbers($dhusb->getSosaNumbers(), 1, 'smaller');
+			}
+			//END PERSO
 			$wife = $value['record']->getWife();
 			if ($wife) $exp[1] .= $wife->getPrimaryParentsNames("parents_$table_id details1", "none");
+			//PERSO Add Sosa Icon
+			if($wife){
+				$dwife = new WT_Perso_Person($wife);
+				$exp[1] .= WT_Perso_Functions_Print::formatSosaNumbers($dwife->getSosaNumbers(), 1, 'smaller');
+			}
+			//END PERSO
 			$name = implode("<div></div>", $exp); // <div></div> is better here than <br />
 		}
 		$return .= "<td class=\"list_value_wrap\" align=\"".get_align($name)."\">";
 		$return .= "<a href=\"".$value['url']."\" class=\"list_item name2\" dir=\"".$TEXT_DIRECTION."\">".PrintReady($name)."</a>";
 		if ($value['record']->getType()=="INDI") {
 			$return .= $value['sex'];
+			$dindi = new WT_Perso_Person($value['record']);
+			$return .= WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1, 'smaller');
 			$return .= $value['record']->getPrimaryParentsNames("parents_$table_id details1", "none");
 		}
 		$return .= "</td>";
@@ -1782,11 +1811,16 @@ function print_events_list($startjd, $endjd, $events='BIRT MARR DEAT', $only_liv
 
 		$value['name'] = $record->getListName();
 		$value['url'] = $record->getHtmlUrl();
+		//PERSO Add Sosa Icon
 		if ($record->getType()=="INDI") {
+			$dindi = new WT_Perso_Person($record);
 			$value['sex'] = $record->getSexImage();
+			$value['sosa'] = WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1, 'smaller');
 		} else {
 			$value['sex'] = '';
+			$value['sosa'] = '';
 		}
+		//END PERSO 
 		$filtered_events[] = $value;
 	}
 
@@ -1801,7 +1835,9 @@ function print_events_list($startjd, $endjd, $events='BIRT MARR DEAT', $only_liv
 	}
 
 	foreach ($filtered_events as $value) {
-		$return .= "<a href=\"".$value['url']."\" class=\"list_item name2\" dir=\"".$TEXT_DIRECTION."\">".PrintReady($value['name'])."</a>".$value['sex'];
+		//PERSO Add Sosa Icon
+		$return .= "<a href=\"".$value['url']."\" class=\"list_item name2\" dir=\"".$TEXT_DIRECTION."\">".PrintReady($value['name'])."</a>".$value['sex'].$value['sosa'];
+		//END PERSO
 		$return .= "<br /><div class=\"indent\">";
 		$return .= WT_Gedcom_Tag::getLabel($value['fact']).' - '.$value['date']->Display(true);
 		if ($value['anniv']!=0) $return .= " (" . WT_I18N::translate('%s year anniversary', $value['anniv']).")";

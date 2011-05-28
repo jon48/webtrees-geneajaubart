@@ -27,6 +27,19 @@ class WT_Perso_Functions {
 		echo WT_JS_END;
 	}
 	
+	/**
+	 * Returns the percentage of two numbers
+	 *
+	 * @param int $num Numerator
+	 * @param int $denom Denominator
+	 * @return float Percentage
+	 */
+	public static function getPercentage($num, $denom){
+		if($denom!=0){
+			return 100 * $num / $denom;
+		}
+		return 0;
+	}
 	
 	/**
 	 * Get width and heigth of an image resized in order fit a target size.

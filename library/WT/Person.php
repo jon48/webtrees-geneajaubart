@@ -22,6 +22,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // @version $Id: Person.php 11284 2011-04-07 14:05:23Z greg $
+// @version: p_$Revision$ $Date$
+// $HeadURL$
+ 
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -1704,7 +1707,11 @@ class WT_Person extends WT_GedcomRecord {
 	// Extra info to display when displaying this record in a list of
 	// selection items or favorites.
 	function format_list_details() {
+		//PERSO Add Sosa icon
+		$dindi = new WT_Perso_Person($this);
 		return
+		'&nbsp;'.WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1).
+		//END PERSO
 		$this->format_first_major_fact(WT_EVENTS_BIRT, 1).
 		$this->format_first_major_fact(WT_EVENTS_DEAT, 1);
 	}

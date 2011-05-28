@@ -469,9 +469,22 @@ html[dir='rtl'] #story_module2 th, html[dir='rtl'] #story_module2 td {text-align
 .help {display:inline; margin-left:5px; padding-right:15px; padding-bottom:5px;}
 .icon {display:none;}
 
-/*	PERSO Googlemap addition */
+/*	PERSO Personal styles */
 
 .flag_gm_25 {
 	max-width: 25px;
 	max-height: 25px;	
+}
+
+.progressbutton{
+	width: 130px;
+	height: 30px;
+}
+
+.progressbutton img {
+	max-height: 20px;
+}
+
+.progressbutton .progressicon {
+	max-height: 16px;
 }

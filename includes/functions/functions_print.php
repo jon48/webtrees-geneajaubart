@@ -24,6 +24,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // $Id: functions_print.php 11294 2011-04-10 08:32:41Z veit $
+// @version: p_$Revision$ $Date$
+// $HeadURL$
+ 
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -64,6 +67,9 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 		echo "</div>";
 		return false;
 	}
+	//PERSO Create the Decorator associated
+	$dperson = new WT_Perso_Person($person);
+	//END PERSO
 	$pid=$person->getXref();
 	if ($count==0) $count = rand();
 	$lbwidth = $bwidth*.75;

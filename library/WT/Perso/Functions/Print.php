@@ -34,7 +34,6 @@ class WT_Perso_Functions_Print {
 		return $html;
 	}
 	
-	
 	/**
 	 * Returns HTML code to include a place cloud
 	 * 
@@ -102,7 +101,8 @@ class WT_Perso_Functions_Print {
 				WT_I18N::translate('Informations for individual %s', $individual->getXref()).
 				'">';
 			$html .= '<'.$tag.'>'.$individual->getFullName().'</'.$tag.'>&nbsp;('.$individual->getXref().')&nbsp;';
-			$html .= '<span><small><em>'.$dindi->format_first_major_fact(WT_EVENTS_BIRT, 10).'</em></small></span>';
+			$html .= WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1, 'small');
+			$html .= '&nbsp;<span><small><em>'.$dindi->format_first_major_fact(WT_EVENTS_BIRT, 10).'</em></small></span>';
 			$html .= '&nbsp;<span><small><em>'.$dindi->format_first_major_fact(WT_EVENTS_DEAT, 10).'</em></small></span>';
 			$html .= '</a>';
 		}
@@ -211,6 +211,42 @@ class WT_Perso_Functions_Print {
 		return $html;
 	}
 	
+	/**
+	 * Format Sosa number to display next to individual details
+	 * Possible format are:
+	 * 	- 1 (default) : display an image if the individual is a Sosa, independtly of the number of times he is
+	 * 	- 2 : display a list of Sosa numbers, with an image, separated by an hyphen.
+	 *
+	 * @param array $sosatab List of Sosa numbers
+	 * @param int $format Format to apply to the Sosa numbers
+	 * @param string $size CSS size for the icon. A CSS style css_$size is required
+	 * @return string HTML code for the formatted Sosa numbers
+	 */
+	public static function formatSosaNumbers($sosatab, $format = 1, $size = 'small'){
+		global $WT_IMAGES;
+		
+		$html = '';
+		switch($format){
+			case 1:
+				if($sosatab && count($sosatab)>0){
+					$html = '<img src="'.$WT_IMAGES['sosa'].'" title="'.WT_I18N::translate('Sosa').'" alt="'.WT_I18N::translate('Sosa').'" class="sosa_'.$size.'" />';
+				}
+				break;
+			case 2:
+				if($sosatab && count($sosatab)>0){
+					ksort($sosatab);
+					$tmp_html = array();
+					foreach ($sosatab as $sosa => $gen) {
+						$tmp_html[] = '<img src="'.$WT_IMAGES['sosa'].'" title="'.WT_I18N::translate('Sosa').'" alt="'.WT_I18N::translate('Sosa').'" class="sosa_'.$size.'" />&nbsp;<strong>'.$sosa.'&nbsp;'.WT_I18N::translate('(G%s)', $gen).'</strong>';
+					}
+					$html = implode(' - ', $tmp_html);
+				}
+				break;
+			default:
+				break;
+		}
+		return $html;
+	}
 	
 } 
 

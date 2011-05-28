@@ -9,6 +9,8 @@
  * @package webtrees
  * @subpackage Display
  * @version $Id: sorttable.js 7337 2010-03-11 04:25:05Z nigel $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  */
 
 addEvent(window, "load", sortables_init);
@@ -50,7 +52,12 @@ function ts_makeSortable(table) {
 
 function ts_getInnerText(el) {
 	if (typeof el == "string") return el;
-	if (typeof el == "undefined") { return el };
+	if (typeof el == "undefined") { return el; };
+	//PERSO Allow use of custom keys
+	if (el.getAttribute("sorttable_customkey") != null) {
+      		return el.getAttribute("sorttable_customkey");
+   	}
+	//END PERSO
 	if (el.innerText) return el.innerText;	//Not needed but it is faster
 	var str = "";
 
@@ -136,20 +143,37 @@ function getParent(el, pTagName) {
 }
 
 function ts_pgv_sort(a,b) {
-	akey = a.cells[SORT_COLUMN_INDEX].getElementsByTagName('a');
-	bkey = b.cells[SORT_COLUMN_INDEX].getElementsByTagName('a');
-	if (akey.length && akey[0].name && bkey.length && bkey[0].name) {
-		// use "name" value as numeric sortkey, if exists
-		aa = parseInt(akey[0].name);
-		bb = parseInt(bkey[0].name);
+	//PERSO : allow to use span cells (for total rows for instance)
+	acell=a.cells[SORT_COLUMN_INDEX];
+	bcell=b.cells[SORT_COLUMN_INDEX];
+	if(acell && bcell){
+		akey = acell.getElementsByTagName('a');
+		bkey = bcell.getElementsByTagName('a');
+		if (akey.length && akey[0].name && bkey.length && bkey[0].name) {
+			// use "name" value as numeric sortkey, if exists
+			aa = parseInt(akey[0].name);
+			bb = parseInt(bkey[0].name);
+			if (aa==bb) return a.rowIndex-b.rowIndex; // equal values sort by their original sequence
+			if (aa<bb) return -1;
+			if (aa>bb) return 1;
+		}
+		aa = ts_getInnerText(acell);
+		bb = ts_getInnerText(bcell);
+		//PERSO : allow to sort integers
+		aaInt = parseInt(aa);
+		bbInt = parseInt(bb);
+		if(!isNaN(aaInt) && !isNaN(bbInt)){
+			if (aaInt==bbInt) return a.rowIndex-b.rowIndex; // equal values sort by their original sequence
+			if (aaInt<bbInt) return -1;
+			if (aaInt>bbInt) return 1;
+		}
+		//END PERSO
 		if (aa==bb) return a.rowIndex-b.rowIndex; // equal values sort by their original sequence
-		if (aa<bb) return -1;
-		if (aa>bb) return 1;
+		return _lc_sort(aa,bb); // locale.js
 	}
-	aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]);
-	bb = ts_getInnerText(b.cells[SORT_COLUMN_INDEX]);
-	if (aa==bb) return a.rowIndex-b.rowIndex; // equal values sort by their original sequence
-	return _lc_sort(aa,bb); // locale.js
+	else{
+		return -1;
+	}
 }
 
 function addEvent(elm, evType, fn, useCapture)

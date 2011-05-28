@@ -29,6 +29,8 @@
  * @package webtrees
  * @subpackage Themes
  * @version $Id: personbox_template.php 10239 2011-01-01 22:32:55Z greg $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$ 
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -51,7 +53,7 @@ if (!defined('WT_WEBTREES')) {
 		<span id="namedef-<?php echo $boxID; ?>" class="name<?php echo $style; ?> <?php echo $classfacts; ?>">
 			<?php echo $name.$addname; ?>
 		</span>
-		<span class="name<?php echo $style; ?>"> <?php echo $genderImage; ?></span>
+		<span class="name<?php echo $style; ?>"> <?php echo $genderImage; ?><?php /*PERSO Add Sosa Icon*/ echo WT_Perso_Functions_Print::formatSosaNumbers($dperson->getSosaNumbers(), 1, 'smaller') ?></span>
 		<?php echo $showid; ?> </a>
 		<div id="fontdef-<?php echo $boxID; ?>" class="details<?php echo $style; ?>">
 			<div id="inout2-<?php echo $boxID; ?>" style="display: block;"><?php echo $BirthDeath; ?></div>

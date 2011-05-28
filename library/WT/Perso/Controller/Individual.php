@@ -17,6 +17,7 @@ if (!defined('WT_WEBTREES')) {
 class WT_Perso_Controller_Individual {
 
 	protected $ctrlIndividual;
+	protected $dindi;
 
 	/**
 	 * Constructor for the decorator
@@ -25,15 +26,15 @@ class WT_Perso_Controller_Individual {
 	 */
 	public function __construct(WT_Controller_Individual  $ctrlIndividual_in){
 		$this->ctrlIndividual = $ctrlIndividual_in;
+		$this->dindi = new WT_Perso_Person($this->ctrlIndividual->indi);
 	}
 
 	/**
 	 * Print the different titles of an individual in a smart way
 	 *
 	 */
-	function print_titles(){
-		$pindi = new WT_Perso_Person($this->ctrlIndividual->indi);
-		$tab=$pindi->getTitles();
+	public function print_titles(){
+		$tab=$this->dindi->getTitles();
 		$countTitles = count($tab);
 		if($countTitles>0){
 			echo '<div id="indi_titles"><dl><dt class="label">'.WT_I18N::translate('Titles').'</dt>';
@@ -44,6 +45,35 @@ class WT_Perso_Controller_Individual {
 			}
 			echo  '</dl></div>';
 		}
+	}
+	
+	/**
+	 * Print individual header extensions.
+	 * Use hooks h_extend_top_center and h_extend_top_right
+	 *
+	 */
+	public function print_extensions_header(){
+		$hook_extend_top_center = new WT_Perso_Hook('h_extend_top_center');
+		$hook_extend_top_right = new WT_Perso_Hook('h_extend_top_right');
+		$hook_extend_top_center = $hook_extend_top_center->execute($this->ctrlIndividual);
+		$hook_extend_top_right = $hook_extend_top_right->execute($this->ctrlIndividual);
+		
+		echo '<td id="indi_top_center">';
+		if(count($hook_extend_top_center)>0){
+			echo implode('', $hook_extend_top_center);
+		}
+		else{
+			echo '&nbsp;';
+		}
+		echo '</td>';
+		echo '<td id="indi_top_right">';
+		if(count($hook_extend_top_right)>0){
+			echo implode('', $hook_extend_top_right);
+		}
+		else{
+			echo '&nbsp;';
+		}
+		echo '</td>';
 	}
 
 }

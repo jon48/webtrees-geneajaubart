@@ -127,8 +127,11 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 			// Verify if the user has enough rights to modify the setting
 			if(!WT_USER_GEDCOM_ADMIN) $this->fail();
 			
+			// Verify if a gedcom ID has been specified;
+			if(is_null($id2)) $this->fail();
+			
 			// Authorised and valid - make update
-			set_gedcom_setting(WT_GED_ID, $id1, $value);
+			set_gedcom_setting($id2, $id1, $value);
 			$this->ok($value);
 			break;
 		default:

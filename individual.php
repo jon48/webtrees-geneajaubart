@@ -110,6 +110,8 @@ jQuery(document).ready(function() {
 		if (strlen($controller->indi->getAddName()) > 0) echo "<span class=\"name_head\">", PrintReady($controller->indi->getAddName()), "</span><br />";
 	?>
 	<div id="indi_header">
+	<?php //PERSO Allow extension of the individual header; ?>
+	<table id="indi_top"><tr><td id="indi_top_left">
 		<h1><?php
 				if ($TEXT_DIRECTION=="rtl") echo "&nbsp;"; {
 					echo PrintReady($controller->indi->getFullName());
@@ -123,6 +125,9 @@ jQuery(document).ready(function() {
 					}
 				}
 			?></h1>
+			</td>
+			<?php $pcontroller->print_extensions_header(); //END PERSO ?>
+			</tr></table>
 			<div id="indi_mainimage">
 				<?php if ($MULTI_MEDIA && $controller->canShowHighlightedObject()) {
 					echo $controller->getHighlightedObject();

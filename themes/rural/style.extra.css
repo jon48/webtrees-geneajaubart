@@ -92,3 +92,61 @@
 	background-color: #f4f0ed;
 }
 
+.sosa_normal {
+	height: 12px;
+	vertical-align: middle;
+}
+
+.sosa_smaller {
+	height: 9px;
+	vertical-align: middle;
+}
+
+.sosa_small {
+	height: 10px;
+	vertical-align: middle;
+}
+
+#indi_top{
+	width:100%;
+	margin: auto;
+}
+
+#indi_top_left {
+	text-align: left;
+	width:33%;
+}
+
+#indi_top_center {
+	text-align: center;
+	width:33%;
+}
+
+.left{
+	text-align: left;
+}
+
+.right{
+	text-align: right;
+}
+
+.percent_container{
+	padding: 1px;	
+}
+
+.percent_frame{
+	width:100%;	
+}
+
+.percent_cell{
+	background-color: #d3c6b8;
+}
+
+.transparent{
+	opacity: 0.67;
+}
+
+.sosastats .icon{
+	padding-right: 0px;
+}
+
