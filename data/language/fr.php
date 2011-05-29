@@ -20,7 +20,7 @@ return array(
 	'LANGUAGE_LIST_SEPARATOR'		=>	', ',
 	'LANGUAGE_LIST_SEPARATOR_LAST'	=>	' et ',
 	'My Page'						=>	'Ma page',	
-	
+
 	//Hooks management
 	'Hooks'							=>	'<em>Hooks</em>',
 	'Implements hooks management.'	=>	'Implémente la gestion des Hooks',
@@ -34,9 +34,14 @@ return array(
 	'Central Perso configuration'	=>	'Configuration des modules Perso',
 	'Allows central configuration for Perso modules configuration.'
 									=>	'Permet une gestion centralisée de la configuration des modules Perso.',
+
+	//General Module
+	'Perso General'					=>	'Perso Général',
+	'General items about Perso modules.'
+									=>	'Configurations diverses pour les Modules Perso',
 									
 	// Extra footer
-	'Display French <em>CNIL</em> message'
+	'Display French <em>CNIL</em> disclaimer'
 									=>	'Afficher le message d\'information CNIL',
 	'<em>CNIL</em> reference'		=>	'Numéro d\'autorisation CNIL',
 	'This site has been notified to the French National Commission for Data protection (CNIL) and registered under number %s. '
@@ -156,10 +161,12 @@ return array(
 	'Define the Sosa root individual for the specified GEDCOM.'
 									=>	'Définit l\'individu de-cujus pour le GEDCOM spécifié.',
 	'Compute'						=>	'Calculer',
+	'Computed'						=>	'Calculé',
 	'Recompute'						=>	'Recalculer',
 	'Compute all Sosas for <em>%s</em>'
 									=>	'Calculer les Sosas pour <em>%s</em>',
-	'Compute all Sosas'				=>	'Calculer les Sosas',
+	'Compute Sosas'					=>	'Calculer les ancêtres Sosas',
+	'Compute all Sosas'				=>	'Calculer tous les ancêtres Sosas',
 	'Compute all Sosa ancestors for the specified GEDCOM, from the set Sosa root individual.'
 									=>	'Calculer les ancêtres Sosa pour le GEDCOM spécifié à partir de l\'individu de-cujus défini.',									
 	'Error'							=>	'Erreur',
@@ -171,6 +178,7 @@ return array(
 	'(G%s)'							=>	'(G%s)',
 	'Complete Sosas'				=>	'Compléter les Sosas',
 	'Sosa Statistics'				=>	'Statistiques Sosa',
+	'Sosa statistics'				=>	'Statistiques Sosa',
 	'No Sosa root individual has been defined.'
 									=>	'Aucun individu n\'a été défini comme de-cujus.', 
 	'%s\'s ancestors'				=>	'Ancêtres de %s',
@@ -188,6 +196,7 @@ return array(
 	'Different'						=>	'Différents',
 	'Total Different'				=>	'Cumul Différents',
 	'Pedigree collapse'				=>	'Implexe',
+	'<strong>G%d</strong>'			=>	'<strong>G%d</strong>',
 	'Theoretical number of ancestors in generation G.'
 									=>	'Nombre théorique d\'ancêtres à la génération G.',							
 	'Number of ancestors found in generation G. A same individual can be counted several times.'
@@ -245,8 +254,8 @@ return array(
 	//Titles
 	'Titles'						=>	'Titres',
 	'Title prefixes'				=>	'Particules nobiliaires',
-	'<p>Set possible aristocratic particules to separate titles from the land they refer to (e.g. Earl <strong>of</strong> Essex). Variants must be separated by the character |.</p><p>An example for this setting is : <strong>de |d\'|du |of |von |vom |am |zur |van |del |della |t\'|da |ten |ter |das |dos |af </strong> (covering some of French, English, German, Dutch, Italian, Spanish, Portuguese, Swedish common particules).</p>'
-									=>	'Définit les particule nobiliaires à utiliser pour séparer le titre de la terre associée (par exemple Comte <strong>de</strong> Toulouse). Les variantes doivent être séparées par le caractère |.</p><p>Une valeur possible pour ce paramètre est : <strong>de |d\'|du |of |von |vom |am |zur |van |del |della |t\'|da |ten |ter |das |dos |af </strong> (couvrant les principales particules françaises, anglaises, allemandes, hollandaises, italiennes, espagnoles, portugaises et suédoises).</p>'
+	'<p>Set possible aristocratic particles to separate titles from the land they refer to (e.g. Earl <strong>of</strong> Essex). Variants must be separated by the character |.</p><p>An example for this setting is : <strong>de |d\'|du |of |von |vom |am |zur |van |del |della |t\'|da |ten |ter |das |dos |af </strong> (covering some of French, English, German, Dutch, Italian, Spanish, Portuguese, Swedish common particles).</p>'
+									=>	'Définit les particule nobiliaires à utiliser pour séparer le titre de la terre associée (par exemple Comte <strong>de</strong> Toulouse). Les variantes doivent être séparées par le caractère |.</p><p>Une valeur possible pour ce paramètre est : <strong>de |d\'|du |of |von |vom |am |zur |van |del |della |t\'|da |ten |ter |das |dos |af </strong> (couvrant les principales particules françaises, anglaises, allemandes, hollandaises, italiennes, espagnoles, portugaises et suédoises).</p>',
 									
 									
 );

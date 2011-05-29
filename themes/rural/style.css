@@ -701,11 +701,11 @@ html[dir='rtl'] .icon,html[dir='rtl'] .adminicon {
 }
 
 .helpfooter {
-	margin: 10px;
+	margin: 0px 10px 0px 10px;
 }
 
 .helpheader {
-	margin: 10px;
+	margin: 0px 10px 0px 10px;
 }
 
 .helpstart {

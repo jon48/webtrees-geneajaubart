@@ -17,7 +17,7 @@ if (!defined('WT_WEBTREES')) {
 switch ($help) {
 	case 'config_title_prefix':
 		$title=WT_I18N::translate('Title prefixes');
-		$text=WT_I18N::translate('<p>Set possible aristocratic particules to separate titles from the land they refer to (e.g. Earl <strong>of</strong> Essex). Variants must be separated by the character |.</p><p>An example for this setting is : <strong>de |d\'|du |of |von |vom |am |zur |van |del |della |t\'|da |ten |ter |das |dos |af </strong> (covering some of French, English, German, Dutch, Italian, Spanish, Portuguese, Swedish common particules).</p>');
+		$text=WT_I18N::translate('<p>Set possible aristocratic particles to separate titles from the land they refer to (e.g. Earl <strong>of</strong> Essex). Variants must be separated by the character |.</p><p>An example for this setting is : <strong>de |d\'|du |of |von |vom |am |zur |van |del |della |t\'|da |ten |ter |das |dos |af </strong> (covering some of French, English, German, Dutch, Italian, Spanish, Portuguese, Swedish common particles).</p>');
 		break;
 	case 'config_display_CNIL':
 		$title=WT_I18N::translate('Display French <em>CNIL</em> disclaimer');

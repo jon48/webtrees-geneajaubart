@@ -245,9 +245,9 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 	 */
 	private function computeSosaEditInterface(){
 		
-		print_simple_header(WT_I18N::translate('Compute Sosa'));
+		print_simple_header(WT_I18N::translate('Compute Sosas'));
 		
-		echo '<h2>', WT_I18N::translate('Compute Sosa'), '</h2>';
+		echo '<h2>', WT_I18N::translate('Compute Sosas'), '</h2>';
 		
 		$pid = safe_GET_xref('pid');
 		if($pid){
