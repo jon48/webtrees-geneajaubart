@@ -576,9 +576,9 @@ if ($usewatermark) {
 	$im = @$imCreateFunc($certfilename);
 
 	if ($im) {
-		if ($debug_verboseLogging) AddToLog("Certificate Firewall log: >about to watermark< file >".$certfilename."< (".getImageInfoForLog($certfilename).") memory used: ".memory_get_usage(), 'certificate');
+		if ($debug_verboseLogging) AddToLog("Certificate Firewall log: >about to watermark< file >".$certfilename."< (".getImageInfoForLog($certfilename).") memory used: ".memory_get_usage(), 'media');
 		$im = applyWatermark($im);
-		if ($debug_verboseLogging) AddToLog("Certificate Firewall log: >watermark complete< file >".$certfilename."< (".getImageInfoForLog($certfilename).") memory used: ".memory_get_usage(), 'certificate');
+		if ($debug_verboseLogging) AddToLog("Certificate Firewall log: >watermark complete< file >".$certfilename."< (".getImageInfoForLog($certfilename).") memory used: ".memory_get_usage(), 'media');
 
 		$imSendFunc = 'image'.$type;
 
@@ -586,12 +586,12 @@ if ($usewatermark) {
 		$imSendFunc($im);
 		imagedestroy($im);
 
-		if ($debug_verboseLogging) AddToLog("Certificate Firewall log: >done with < file >".$certfilename."< (".getImageInfoForLog($certfilename).") memory used: ".memory_get_usage(), 'certificate');
+		if ($debug_verboseLogging) AddToLog("Certificate Firewall log: >done with < file >".$certfilename."< (".getImageInfoForLog($certfilename).") memory used: ".memory_get_usage(), 'media');
 		exit;
 
 	} else {
 		// this image is defective.  log it
-		AddToLog("Certificate Firewall error: >".WT_I18N::translate('This certificate file is broken and cannot be watermarked.')."< in file >".$certfilename."< (".getImageInfoForLog($certfilename).") memory used: ".memory_get_usage(), 'certificate');
+		AddToLog("Certificate Firewall error: >".WT_I18N::translate('This certificate file is broken and cannot be watermarked.')."< in file >".$certfilename."< (".getImageInfoForLog($certfilename).") memory used: ".memory_get_usage(), 'error');
 
 		// set usewatermark to false so image will simply be passed through below
 		$usewatermark = false;

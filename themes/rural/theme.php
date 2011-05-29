@@ -243,3 +243,4 @@ $WT_STATS_CHART_COLOR3="e5e6ef";
 
 // Arrow symbol or icon for up-page links on Help pages
 $UpArrow = "<img src=\"".WT_THEME_DIR."images/uarrow3.png\" class=\"icon\" border=\"0\" alt=\"^\" />";
+?>

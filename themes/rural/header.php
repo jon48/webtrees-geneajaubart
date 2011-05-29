@@ -218,3 +218,4 @@ else {
 // begin content section -->
 '<div id="content">';
 }
+?>

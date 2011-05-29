@@ -22,7 +22,8 @@ class WT_Perso_Hook {
 
 	//Constants
 	private static $DEFAULT_PRIORITY = 99;
-
+	private static $_isModuleOperational = -1;
+	
 	/**
 	 * Constructor for Hook class
 	 *
@@ -125,25 +126,27 @@ class WT_Perso_Hook {
 	 * @return array Results of the hook executions
 	 */
 	public function execute(){
-		$params = func_get_args();
 		$result = array();
-		$sqlquery = '';
-		$sqlparams = array($this->hook_function);
-		if($this->hook_context != 'all') {
-			$sqlparams = array($this->hook_function, $this->hook_context);
-			$sqlquery = " OR ph_hook_context=?";
-		}
-		$module_names=WT_DB::prepare(
-			"SELECT ph_module_name AS module, ph_module_priority AS priority FROM `##phooks`".
-			" WHERE ph_hook_function = ? AND (ph_hook_context='all'".$sqlquery.") AND ph_status='enabled'".
-			" ORDER BY ph_module_priority ASC, module ASC"
-			)->execute($sqlparams)->fetchAssoc();
-		asort($module_names);
-		foreach ($module_names as $module_name => $module_priority) {
-			require_once WT_ROOT.WT_MODULES_DIR.$module_name.'/module.php';
-			$class=$module_name.'_WT_Module';
-			$hook_class=new $class();
-			$result[] = call_user_func_array(array($hook_class, $this->hook_function), $params);
+		if(self::isModuleOperational()){
+			$params = func_get_args();
+			$sqlquery = '';
+			$sqlparams = array($this->hook_function);
+			if($this->hook_context != 'all') {
+				$sqlparams = array($this->hook_function, $this->hook_context);
+				$sqlquery = " OR ph_hook_context=?";
+			}
+			$module_names=WT_DB::prepare(
+				"SELECT ph_module_name AS module, ph_module_priority AS priority FROM `##phooks`".
+				" WHERE ph_hook_function = ? AND (ph_hook_context='all'".$sqlquery.") AND ph_status='enabled'".
+				" ORDER BY ph_module_priority ASC, module ASC"
+				)->execute($sqlparams)->fetchAssoc();
+			asort($module_names);
+			foreach ($module_names as $module_name => $module_priority) {
+				require_once WT_ROOT.WT_MODULES_DIR.$module_name.'/module.php';
+				$class=$module_name.'_WT_Module';
+				$hook_class=new $class();
+				$result[] = call_user_func_array(array($hook_class, $this->hook_function), $params);
+			}
 		}
 		return $result;
 	}
@@ -179,6 +182,21 @@ class WT_Perso_Hook {
 	/**
 	 * Static functions for Hooks.
 	 */
+	
+	/**
+	 * Return whether the Hook module is active and the table has been created. 
+	 *
+	 * @return bool True if module active and table created, false otherwise
+	 */
+	public static function isModuleOperational(){
+		if(self::$_isModuleOperational == -1){
+			self::$_isModuleOperational = array_key_exists('perso_hooks', WT_Module::getActiveModules());
+			if(self::$_isModuleOperational){
+				self::$_isModuleOperational = WT_DB::table_exists('##phooks');
+			}
+		}
+		return self::$_isModuleOperational;
+	}
 
 
 	/**

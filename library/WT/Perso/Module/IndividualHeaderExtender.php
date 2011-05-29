@@ -36,4 +36,3 @@ interface WT_Perso_Module_IndividualHeaderExtender {
 }
 
 ?>
-	

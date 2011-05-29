@@ -251,4 +251,3 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 }
 
 ?>
-	

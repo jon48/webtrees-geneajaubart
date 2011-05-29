@@ -262,4 +262,3 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 }
 
 ?>
-	

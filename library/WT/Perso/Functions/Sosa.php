@@ -261,4 +261,3 @@ class WT_Perso_Functions_Sosa {
 }
 
 ?>
-	
