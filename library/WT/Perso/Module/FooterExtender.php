@@ -15,7 +15,7 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-interface WT_Perso_Module_FooterPrinter {
+interface WT_Perso_Module_FooterExtender {
 
 	/**
 	 * Print additional footer.

@@ -130,6 +130,10 @@ else {
 		echo '</div>';
 		global $ALLOW_THEME_DROPDOWN;
 		echo  '<div id="hbottomright">';
+		//PERSO Extend header
+		$hook_print_header = new WT_Perso_Hook('h_print_header');
+		$hook_print_header->execute();
+		//END PERSO
 		echo '<ul class="makeMenu">';
 		$favmenu = WT_MenuBar::getFavoritesMenu();
 		if (count($favmenu->submenus)>1) {

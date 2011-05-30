@@ -39,7 +39,19 @@ return array(
 	'Perso General'					=>	'Perso Général',
 	'General items about Perso modules.'
 									=>	'Configurations diverses pour les Modules Perso',
-									
+
+	// Extra header
+	'Include additional HTML in header'	
+									=>	'Étendre l\'HTML dans l\'en-tête',
+	'<p>Enable this option to include raw additional HTML in the header of the page. This HTML will only be displayed to non-admin users.</p>'
+									=>	'<p>Activer cette option pour inclure du code HTML additional dans l\'en-tête. Ce code sera visible seulement par les utilisateurs non-administrateurs.</p>',
+	'Hide additional header'		=>	'Masquer l\'en-tête additionnel',
+	'<p>Select the access level until which the additional header should be displayed. The <em>Hide from everyone</em> should be used to show the header to everybody.</p>'
+									=>	'<p>Sélectionner le niveau d\'accès jusqu\'auquel l\'en-tête additionnel doit être affiché. L\'option <em>Masquer à tout le monde</em> devrait être utilisée pour cacher l\'en-tête à tout le monde.</p>',
+	'Additional HTML in header'		=>	'Code HTML additionnel pour l\'en-tête',
+	'<p>If the option has been enabled, the saved HTML will be inserted in the header.</p><p>In edit mode, the HTML characters might have been transformed to their HTML equivalents (for instance &amp;gt; for &gt;), it is however possible to insert HTML characters, they will be automatically converted to their equivalent values.</p>'
+									=>	'<p>Si l\'option est activée, le code HTML sauvegardée sera inséré dans l\'en-tête.</p><p>En mode édition, les caractères HTML peuvent avoir été modifiés par leurs équivalents HTML (par exemple &amp;gt; pour &gt;), il est cependant possible d\'insérer directement des caractères HTML dans la zone de texte, ils seront convertis en leur equivalents.</p>',					
+																
 	// Extra footer
 	'Display French <em>CNIL</em> disclaimer'
 									=>	'Afficher le message d\'information CNIL',
@@ -54,8 +66,11 @@ return array(
 									=>	'<p>Si votre site a été déclaré à la Commission Nationale de l\'Informatique et des Libertés (CNIL), un numéro d\'autorisation a dû vous être délivré. Fournir cette référence affichera un message dans le pied de page, visible par tous les utilisateurs.</p>',
 	'Include additional HTML in footer'	
 									=>	'Étendre l\'HTML du pied de page',
-	'<p>Enable this option to include raw additional HTML in the footer of the page. This HTML will only be displayed to non-admin users.</p>'
-									=>	'<p>Activer cette option pour inclure du code HTML additional dans le pied de page. Ce code sera visible seulement par les utilisateurs non-administrateurs.</p>',
+	'<p>Enable this option to include raw additional HTML in the footer of the page.</p>'
+									=>	'<p>Activer cette option pour inclure du code HTML additional dans le pied de page.</p>',
+	'Hide additional footer'		=>	'Masquer le pied de page additionnel',
+	'<p>Select the access level until which the additional footer should be displayed. The <em>Hide from everyone</em> should be used to show the footer to everybody.</p>'
+									=>	'<p>Sélectionner le niveau d\'accès jusqu\'auquel pied de page additionnel doit être affiché. L\'option <em>Masquer à tout le monde</em> devrait être utilisée pour cacher pied de page à tout le monde.</p>',
 	'Additional HTML in footer'		=>	'Code HTML additionnel pour le pied de page',
 	'<p>If the option has been enabled, the saved HTML will be inserted in the footer, before the logo.</p><p>In edit mode, the HTML characters might have been transformed to their HTML equivalents (for instance &amp;gt; for &gt;), it is however possible to insert HTML characters, they will be automatically converted to their equivalent values.</p>'
 									=>	'<p>Si l\'option est activée, le code HTML sauvegardée sera inséré dans le pied de page, au-dessus du logo.</p><p>En mode édition, les caractères HTML peuvent avoir été modifiés par leurs équivalents HTML (par exemple &amp;gt; pour &gt;), il est cependant possible d\'insérer directement des caractères HTML dans la zone de texte, ils seront convertis en leur equivalents.</p>',					

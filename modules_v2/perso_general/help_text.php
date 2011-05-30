@@ -27,10 +27,25 @@ switch ($help) {
 		$title=WT_I18N::translate('<em>CNIL</em> reference');
 		$text=WT_I18N::translate('<p>If the website has been notified to the French <em>CNIL</em>, an authorisation number may have been delivered. Providing this reference will display a message in the footer visible to all users.</p>');
 		break;
+	case 'config_add_html_header':
+		$title=WT_I18N::translate('Include additional HTML in header');
+		$text=WT_I18N::translate('<p>Enable this option to include raw additional HTML in the footer of the page.</p>');
+		break;
+	case 'config_show_html_header':
+		$title=WT_I18N::translate('Hide additional header');
+		$text=WT_I18N::translate('<p>Select the access level until which the additional header should be displayed. The <em>Hide from everyone</em> should be used to show the header to everybody.</p>');
+		break;
+	case 'config_html_header':
+		$title=WT_I18N::translate('Additional HTML in header');
+		$text=WT_I18N::translate('<p>If the option has been enabled, the saved HTML will be inserted in the header.</p><p>In edit mode, the HTML characters might have been transformed to their HTML equivalents (for instance &amp;gt; for &gt;), it is however possible to insert HTML characters, they will be automatically converted to their equivalent values.</p>');
+		break;
 	case 'config_add_html_footer':
 		$title=WT_I18N::translate('Include additional HTML in footer');
-		$text=WT_I18N::translate('<p>Enable this option to include raw additional HTML in the footer of the page. This HTML will only be displayed to non-admin users.</p>');
+		$text=WT_I18N::translate('<p>Enable this option to include raw additional HTML in the footer of the page.</p>');
 		break;
+	case 'config_show_html_footer':
+		$title=WT_I18N::translate('Hide additional footer');
+		$text=WT_I18N::translate('<p>Select the access level until which the additional footer should be displayed. The <em>Hide from everyone</em> should be used to show the header to everybody.</p>');
 	case 'config_html_footer':
 		$title=WT_I18N::translate('Additional HTML in footer');
 		$text=WT_I18N::translate('<p>If the option has been enabled, the saved HTML will be inserted in the footer, before the logo.</p><p>In edit mode, the HTML characters might have been transformed to their HTML equivalents (for instance &amp;gt; for &gt;), it is however possible to insert HTML characters, they will be automatically converted to their equivalent values.</p>');

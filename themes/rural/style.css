@@ -141,18 +141,21 @@ img.block,#calendar_img,#biglink img, #mycart img {
 }
 
 #htopright{
+	text-align: right;
 	position: absolute;
 	top: 5px;
 	right:0px;
 }
 
 #hbottomright{
+	text-align: right;
 	position: absolute;
 	bottom: 5px;
 	right:0px;
 }
 
 #hcenterright{
+	text-align: right;
 	position: absolute;
 	top:75px;
 	right:0px;
