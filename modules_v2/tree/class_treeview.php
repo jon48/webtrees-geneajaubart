@@ -7,9 +7,6 @@
 // webtrees: Web based Family History software
 // Copyright (C) 2011 webtrees development team.
 //
-// Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
-//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
@@ -24,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: class_treeview.php 11237 2011-03-29 17:11:26Z greg $
+// $Id: class_treeview.php 11669 2011-05-31 23:31:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -74,7 +71,7 @@ class TreeView {
     if (WT_SCRIPT_NAME == 'individual.php')
       $path = 'individual.php?pid='.$rootPerson->getXref().'&ged='.$GEDCOM.'&allPartners='.($this->allPartners ? "false" : "true").'#tree';
     else
-      $path = 'module.php?mod=tree&mod_action=treeview&rootId='.$rootPerson->getXref().'&allPartners='.($this->allPartners ? "false" : "true");
+      $path = 'module.php?mod=tree&mod_action=treeview&rootid='.$rootPerson->getXref().'&allPartners='.($this->allPartners ? "false" : "true");
     $r = '<a name="tv_content"></a><div id="'.$this->name.'_out" dir="ltr" class="tv_out">';
     
     // Read styles (20 maxi) in a hidden list
@@ -109,7 +106,7 @@ class TreeView {
 			'<li id="tvbZoomOut" class="tv_button"><img src="'.$WT_IMAGES['zoomout'].'" alt="'.WT_I18N::translate('Zoom out').'" title="'.WT_I18N::translate('Zoom out').'" /></li>'.
 			'<li id="tvbNoZoom" class="tv_button"><img src="'.WT_MODULES_DIR.'tree/images/zoom0.png" alt="'.WT_I18N::translate('Reset').'" title="'.WT_I18N::translate('Reset').'" /></li>'.
 			'<li id="tvbLeft" class="tv_button"><img src="'.$WT_IMAGES['ldarrow'].'" alt="'.WT_I18N::translate('Align left').'" title="'.WT_I18N::translate('Align left').'" /></li>'.
-			'<li id="tvbCenter" class="tv_button"><img src="'.$WT_IMAGES['patriarch'].'" alt="'./* I18N: verb/action */ WT_I18N::translate('Center').'" title="'.WT_I18N::translate('Center').'" /></li>'.
+			'<li id="tvbCenter" class="tv_button"><img src="'.$WT_IMAGES['center'].'" alt="'./* I18N: verb/action */ WT_I18N::translate('Center').'" title="'.WT_I18N::translate('Center').'" /></li>'.
 			'<li id="tvbRight" class="tv_button"><img src="'.$WT_IMAGES['rdarrow'].'" alt="'.WT_I18N::translate('Align right').'" title="'.WT_I18N::translate('Align right').'" /></li>'.
 			'<li id="tvbDates" class="tv_button tvPressed"><img src="'.WT_MODULES_DIR.'tree/images/dates.png" alt="'.WT_I18N::translate('Show year of birth and death').'" title="'.WT_I18N::translate('Show year of birth and death').'" /></li>'.
 			'<li id="tvbCompact" class="tv_button"><img src="'.WT_MODULES_DIR.'tree/images/compact.png" alt="'.WT_I18N::translate('Use compact layout').'" title="'.WT_I18N::translate('Use compact layout').'" /></li>'.
@@ -121,7 +118,7 @@ class TreeView {
 			'<li id="tvbPrint" class="tv_button"><img src="'.WT_MODULES_DIR.'tree/images/print.png" alt="p" title="'./* I18N: verb/action */ WT_I18N::translate('Print').'" /></li>'.
 			'<li class="tv_button'.($this->allPartners ? ' tvPressed' : '').'"><a href="'.$path.'"><img src="'.$WT_IMAGES["sfamily"].'" alt="'.WT_I18N::translate('Show all spouses and ancestors').'" title="'.WT_I18N::translate('Show all spouses and ancestors').'" /></a></li>';
     if (safe_GET('mod_action') != 'treeview') {
-			$r.='<li class="tv_button"><a href="module.php?mod=tree&mod_action=treeview&rootId='.$rootPerson->getXref().'#tv_content" title="'. /* I18N: Button label - view this chart in full-screen mode */ WT_I18N::translate('Full screen').'"><img src="'.$WT_IMAGES["tree"].'" alt="t" /></a></li>';
+			$r.='<li class="tv_button"><a href="module.php?mod=tree&mod_action=treeview&rootid='.$rootPerson->getXref().'#tv_content" title="'. /* I18N: Button label - view this chart in full-screen mode */ WT_I18N::translate('Full screen').'"><img src="'.$WT_IMAGES["fscreen"].'" alt="full screen" /></a></li>';
 		}
     // Help, and hidden loading image
 		$r.='<li class="tv_button">'.help_link("TV_MODULE", 'tree').'</li>
@@ -211,7 +208,7 @@ class TreeView {
 
     $r = '<div class="tv'.$person->getSex().' tv_person_expanded">';
     $r .= $this->getThumbnail($personGroup, $person);
-    $r .= '<a class="tv_link" href="'.$person->getHtmlUrl().'">'.$person->getFullName().'</a> <a href="module.php?mod=tree&mod_action=treeview&allPartners='.($this->allPartners ? 'true' : 'false').'&rootId='.$person->getXref().'" title="'.WT_I18N::translate('Interactive tree of %s', htmlspecialchars(strip_tags($person->getFullName()))).'"><img src="'.$WT_IMAGES['tree'].'" class="tv_link tv_treelink" /></a>';
+    $r .= '<a class="tv_link" href="'.$person->getHtmlUrl().'">'.$person->getFullName().'</a> <a href="module.php?mod=tree&mod_action=treeview&allPartners='.($this->allPartners ? 'true' : 'false').'&rootid='.$person->getXref().'" title="'.WT_I18N::translate('Interactive tree of %s', htmlspecialchars(strip_tags($person->getFullName()))).'"><img src="'.$WT_IMAGES['tree'].'" class="tv_link tv_treelink" /></a>';
     $r .= '<br /><b>'.WT_Gedcom_Tag::getAbbreviation('BIRT').'</b> '.$person->getBirthDate()->Display().' '.$person->getBirthPlace();
     if ($family) {
       $r .= '<br /><b>'.WT_Gedcom_Tag::getAbbreviation('MARR').'</b> '.$family->getMarriageDate()->Display().' <a href="'.$family->getHtmlUrl().'"><img src="'.$WT_IMAGES['button_family'].'" class="tv_link tv_treelink" title="'.htmlspecialchars(strip_tags($family->getFullName())).'" /></a>'.$family->getMarriagePlace();
@@ -397,93 +394,34 @@ class TreeView {
   			$sexSymbol = WT_UTF8_NO_SEX;
   			break;
   	}
-  	// TODO : other calendars (read option somewhere ?)
-  	$n = $this->getDate($p->getBirthDate());
-    $d = $this->getDate($p->getDeathDate());
-  	$dates = ($n || $d) ? ' <i class="dates">'.($n ? $n : '').($d ? '-'.$d : '').'</i>' : '';
-  	$r = '<div class="tv'.$sex.'"'.$title.'>'.$dates.'<a href="'.$p->getHtmlUrl().'"><span class="tvSexSymbol tv'.$sex.' tv_link">'.$sexSymbol.'</span></a>&nbsp;'.$p->getFullName().'</div>';
+  	$r = '<div class="tv'.$sex.'"'.$title.'>'.$p->getLifeSpan().'<a href="'.$p->getHtmlUrl().'"><span class="tvSexSymbol tv'.$sex.' tv_link">'.$sexSymbol.'</span></a>&nbsp;'.$p->getFullName().'</div>';
   	return $r;
   }
 
-  private function getDate($date) {
-    $q = $date->qual1;
-    switch($q) {
-      case 'abt' :
-        $r = '~';
-        break;
-      case 'bef' :
-        $r = '<';
-        break;
-      case 'aft' :
-        $r = '>';
-        break;
-      default:
-        $r = '';
-    }
-    return $r.$date->gregorianYear();
-  }
-  
   /**
   * Get the thumbnail image for the given person
   *
   * @param Person $person
   * @return string
   */
-  private function getThumbnail($personGroup, $person) {
-    global $MULTI_MEDIA, $SHOW_HIGHLIGHT_IMAGES, $TEXT_DIRECTION, $USE_MEDIA_VIEWER, $USE_SILHOUETTE, $GEDCOM, $WT_IMAGES;
+	private function getThumbnail($personGroup, $person) {
+		global $MULTI_MEDIA, $SHOW_HIGHLIGHT_IMAGES;
 
-    $thumbnail = "";
-    if ($MULTI_MEDIA && $SHOW_HIGHLIGHT_IMAGES) {
-      $object = $person->findHighlightedMedia();
-      if (!empty($object)) {
-        $whichFile = thumb_or_main($object); // Do we send the main image or a thumbnail?
-        $size = findImageSize($whichFile);
-        $class = "tv_link pedigree_image_portrait";
-        if ($size[0]>$size[1]) $class = "tv_link pedigree_image_landscape";
-        if ($TEXT_DIRECTION == "rtl") $class .= "_rtl";
-        // NOTE: IMG ID
-        $imgsize = findImageSize($object["file"]);
-        $imgwidth = $imgsize[0]+50;
-        $imgheight = $imgsize[1]+150;
+		$thumbnail="";
+		if ($MULTI_MEDIA && $SHOW_HIGHLIGHT_IMAGES) {
+			$object=$person->findHighlightedMedia();
+			$img_title=PrintReady(htmlspecialchars($person->getFullName()));
+			if (!empty($object)) {
+				$which=thumb_or_main($object); // Do we send the main image or a thumbnail?
+				$mediaobject=WT_Media::getInstance($object['mid']);
+				$thumbnail=$mediaobject->displayMedia(array('which'=>$which,'display_type'=>'treeview','img_title'=>$img_title,'clearbox'=>'tvlb'.$personGroup->getXref()));
+			} else {
+				$thumbnail=display_silhouette(array('sex'=>$person->getSex(),'display_type'=>'treeview','img_title'=>$img_title)); // may return ''
+			}
+		}
 
-        if (!empty($object['mid']) && $USE_MEDIA_VIEWER) {
-        	$mid = $object['mid'];
-          if (WT_USE_LIGHTBOX) {
-            $media = WT_Media::getInstance($mid);
-            // we need to convert the title to html entities to avoid problems with special chars like quotes,
-            // and we need to decode from utf8 before to retrieve accentuated characters after the html entities conversion 
-            $thumbnail .= '<a class="tv_link" href="'.$object["file"].'" rel="clearbox[tvlb'.$personGroup->getXref().']" rev="'.$mid.'::'.$object["file"].'::'.htmlspecialchars($media->title).'">';
-          }
-          else
-            $thumbnail .= '<a href="mediaviewer.php?mid='.$mid.'">';
-        }
-        else {
-        	$mid = '';
-          $thumbnail .= "<a href=\"javascript:;\" onclick=\"return openImage('".rawurlencode($object["file"])."',$imgwidth, $imgheight);\">";
-        }
-        $thumbnail .= "<img src=\"".$whichFile."\" vspace=\"0\" hspace=\"0\" class=\"$class\" alt=\"$mid\" title=\"\"";
-        if ($imgsize) $thumbnail .= " /></a>";
-        else $thumbnail .= " />";
-      }
-    }
-    if (empty($thumbnail) && ($USE_SILHOUETTE)) {
-      $class = "default_thumbnail pedigree_image_portrait";
-      if ($TEXT_DIRECTION == "rtl") $class .= "_rtl";
-      $sex = $person->getSex();
-      $thumbnail = "<img src=\"";
-      if ($sex == 'F') {
-        $thumbnail .= $WT_IMAGES['default_image_F'];
-      }
-      else if ($sex == 'M') {
-        $thumbnail .= $WT_IMAGES['default_image_M'];
-      }
-      else {
-        $thumbnail .= $WT_IMAGES['default_image_U'];
-      }
-      $thumbnail .="\" class=\"".$class."\" alt=\"\" />";
-    }
-    return $thumbnail;
-  }
+		return $thumbnail;
+	}
 
   /**
   * Draw a vertical line

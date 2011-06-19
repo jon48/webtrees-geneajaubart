@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: family.php 10869 2011-02-18 16:00:33Z greg $
+// $Id: family.php 11462 2011-05-05 06:01:58Z larry $
 
 define('WT_SCRIPT_NAME', 'family.php');
 require './includes/session.php';
@@ -32,30 +32,32 @@ $controller = new WT_Controller_Family();
 $controller->init();
 
 print_header($controller->getPageTitle());
-// completely prevent display if privacy dictates so
+
 if (!$controller->family) {
-	echo "<b>", WT_I18N::translate('Unable to find record with ID'), "</b><br /><br />";
+	echo '<b>', WT_I18N::translate('Unable to find record with ID'), '</b><br /><br />';
 	print_footer();
 	exit;
 }
-else if (!$controller->family->canDisplayDetails()) {
+
+if (!$controller->family->canDisplayDetails()) {
 	print_privacy_error();
 	print_footer();
 	exit;
 }
 
-// LB added for Lightbox viewer ==============================================================
+if ($controller->family->isMarkedDeleted()) {
+	echo '<span class="error">', WT_I18N::translate('This record has been marked for deletion upon admin approval.'), '</span>';
+}
+
 if (WT_USE_LIGHTBOX) {
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 	require_once WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 }
-// LB ======================================================================================
 
 $PEDIGREE_FULL_DETAILS = "1"; // Override GEDCOM configuration
 $show_full = "1";
 
 ?>
-<?php if ($controller->family->isMarkedDeleted()) echo "<span class=\"error\">".WT_I18N::translate('This record has been marked for deletion upon admin approval.')."</span>"; ?>
 <script type="text/javascript">
 <!--
 	function show_gedcom_record(shownew) {

@@ -22,7 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: help_text.php 10239 2011-01-01 22:32:55Z greg $
+ * @version $Id: help_text.php 11330 2011-04-17 10:11:45Z veit $
  */
 
 if (!defined('WT_WEBTREES') || !defined('WT_SCRIPT_NAME') || WT_SCRIPT_NAME!='help_text.php') {
@@ -36,7 +36,7 @@ case 'yahrzeit':
 	$text=WT_I18N::translate('This block shows you Yahrzeiten that are coming up in the near future.<br /><br />Yahrzeiten (singular: Yahrzeit) are anniversaries of a person\'s death.  These anniversaries are observed in the Jewish tradition; they are no longer in common use in other traditions.  «Yahrzeit» can also be spelled «Jahrzeit» or «Yartzeit».<br /><br />The Administrator determines how far ahead the block will look.  You can further refine the block\'s display of upcoming Yahrzeiten through configuration options.');
 	$text.='<ul><li>';
 	$text.=WT_I18N::translate('Number of days to show: This is the number of days that <b>webtrees</b> should use when searching for events');
-	$text.=' (<i>'.WT_I18N::plural('maximum %d day', 'maximum %d days', 30, 30).'</i>).';
+	$text.=' (<em>'.WT_I18N::plural('maximum %d day', 'maximum %d days', 30, 30).'</em>).';
 	$text.='</li><li>';
 	$text.=WT_I18N::translate('Presentation style: Either a simple text "List" or a "Table" format.');
 	$text.='</li></ul>';

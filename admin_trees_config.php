@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_config.php 11265 2011-04-03 09:47:06Z lukasz $
+// $Id: admin_trees_config.php 11699 2011-06-03 12:44:43Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_config.php');
 
@@ -176,8 +176,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'COMMON_NAMES_THRESHOLD',       safe_POST('NEW_COMMON_NAMES_THRESHOLD', WT_REGEX_INTEGER, 40));
 	set_gedcom_setting(WT_GED_ID, 'CONTACT_USER_ID',              safe_POST('NEW_CONTACT_USER_ID'));
 	set_gedcom_setting(WT_GED_ID, 'DEFAULT_PEDIGREE_GENERATIONS', safe_POST('NEW_DEFAULT_PEDIGREE_GENERATIONS'));
-	set_gedcom_setting(WT_GED_ID, 'DISPLAY_JEWISH_GERESHAYIM',    safe_POST_bool('NEW_DISPLAY_JEWISH_GERESHAYIM'));
-	set_gedcom_setting(WT_GED_ID, 'DISPLAY_JEWISH_THOUSANDS',     safe_POST_bool('NEW_DISPLAY_JEWISH_THOUSANDS'));
 	set_gedcom_setting(WT_GED_ID, 'ENABLE_AUTOCOMPLETE',          safe_POST_bool('NEW_ENABLE_AUTOCOMPLETE'));
 	set_gedcom_setting(WT_GED_ID, 'EXPAND_NOTES',                 safe_POST_bool('NEW_EXPAND_NOTES'));
 	set_gedcom_setting(WT_GED_ID, 'EXPAND_RELATIVES_EVENTS',      safe_POST_bool('NEW_EXPAND_RELATIVES_EVENTS'));
@@ -485,22 +483,6 @@ echo WT_JS_START;?>
 							}
 							?>
 						</select></td>
-					</tr>
-					<tr>
-						<td>
-							<?php echo WT_I18N::translate('Display Hebrew thousands'), help_link('DISPLAY_JEWISH_THOUSANDS'); ?>
-						</td>
-						<td>
-							<?php echo edit_field_yes_no('NEW_DISPLAY_JEWISH_THOUSANDS', get_gedcom_setting(WT_GED_ID, 'DISPLAY_JEWISH_THOUSANDS')); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<?php echo WT_I18N::translate('Display Hebrew gershayim'), help_link('DISPLAY_JEWISH_GERESHAYIM'); ?>
-						</td>
-						<td>
-							<?php echo edit_field_yes_no('NEW_DISPLAY_JEWISH_GERESHAYIM', get_gedcom_setting(WT_GED_ID, 'DISPLAY_JEWISH_GERESHAYIM')); ?>
-						</td>
 					</tr>
 					<tr>
 						<td>
@@ -1664,9 +1646,9 @@ echo WT_JS_START;?>
 				<tr>
 					<td style="padding: 5px" class="topbottombar">
 						<div class="btn">
-						<button type="submit" tabindex="<?php echo ++$i; ?>" value="<?php echo WT_I18N::translate('Save configuration'); ?>" /><span><?php echo WT_I18N::translate('Save configuration'); ?></span></button>				
+						<input type="submit" tabindex="<?php echo ++$i; ?>" value="<?php echo WT_I18N::translate('Save'); ?>" />
 						&nbsp;&nbsp;
-						<button type="reset" tabindex="<?php echo ++$i; ?>" value="<?php echo WT_I18N::translate('Reset'); ?>" /><span><?php echo WT_I18N::translate('Reset'); ?></span></button>
+						<input type="reset" tabindex="<?php echo ++$i; ?>" value="<?php echo WT_I18N::translate('Reset'); ?>" />
 						</div>
 					</td>
 				</tr>

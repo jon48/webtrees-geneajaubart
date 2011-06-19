@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11208 2011-03-26 18:02:15Z greg $
+// @version $Id: module.php 11330 2011-04-17 10:11:45Z veit $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -143,7 +143,7 @@ class recent_changes_WT_Module extends WT_Module implements WT_Module_Block {
 		echo WT_I18N::translate('Number of days to show');
 		echo '</td><td class="optionbox">';
 		echo '<input type="text" name="days" size="2" value="', $days, '" />';
-		echo ' <i>', WT_I18N::plural('maximum %d day', 'maximum %d days', 30, 30), '</i>';
+		echo ' <em>', WT_I18N::plural('maximum %d day', 'maximum %d days', 30, 30), '</em>';
 		echo '</td></tr>';
 
 		$infoStyle = get_block_setting($block_id, 'infoStyle', 'table');

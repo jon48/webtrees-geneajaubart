@@ -24,7 +24,7 @@
  *
  * @package webtrees
  * @subpackage Charts
- * @version $Id: descendancy.php 10869 2011-02-18 16:00:33Z greg $
+ * @version $Id: descendancy.php 11417 2011-04-30 11:17:30Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'descendancy.php');
@@ -47,7 +47,7 @@ $nonfamfacts[] = "";
 $controller=new WT_Controller_Descendancy();
 $controller->init();
 
-print_header($controller->name." ".WT_I18N::translate('Descendancy chart'));
+print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Descendants of %s', $controller->name));
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
@@ -58,7 +58,7 @@ if (WT_USE_LIGHTBOX) {
 }
 // ==========================================================================================
 
-echo '<table><tr><td valign="top"><h2>', WT_I18N::translate('Descendancy chart'), ':<br />', PrintReady($controller->name), '</h2>';
+echo '<table><tr><td valign="top"><h2>', WT_I18N::translate('Descendants of %s', $controller->name), '</h2>';
 echo WT_JS_START;
 echo 'var pastefield; function paste_id(value) {pastefield.value=value;}';
 echo WT_JS_END;
@@ -146,13 +146,13 @@ case 1: //-- booklet
 case 2: //-- Individual list
 	$descendants=indi_desc($controller->descPerson, $controller->generations, array());
 	echo '<div class="center">';
-	print_indi_table($descendants, WT_I18N::translate('Descendancy chart').' : '.PrintReady($controller->name));
+	print_indi_table($descendants, WT_I18N::translate('Descendants of %s', $controller->name));
 	echo '</div>';
 	break;
 case 3: //-- Family list
 	$descendants=fam_desc($controller->descPerson, $controller->generations, array());
 	echo '<div class="center">';
-	print_fam_table($descendants, WT_I18N::translate('Descendancy chart').' : '.PrintReady($controller->name));
+	print_fam_table($descendants, WT_I18N::translate('Descendants of %s', $controller->name));
 	echo '</div>';
 	break;
 }

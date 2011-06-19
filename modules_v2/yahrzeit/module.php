@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11242 2011-03-29 20:57:32Z greg $
+// @version $Id: module.php 11509 2011-05-12 11:20:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -74,10 +74,7 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 			foreach (get_anniversary_events($jd, 'DEAT _YART') as $fact) {
 				// Extract hebrew dates only
 				if ($fact['date']->date1->CALENDAR_ESCAPE()=='@#DHEBREW@' && $fact['date']->MinJD()==$fact['date']->MaxJD()) {
-					// Apply privacy
-					if (canDisplayRecord(WT_GED_ID, find_person_record($fact['id'], WT_GED_ID)) && canDisplayFact($fact['id'], WT_GED_ID, $fact['factrec'])) {
-						$yahrzeits[]=$fact;
-					}
+					$yahrzeits[]=$fact;
 				}
 			}
 		}
@@ -187,7 +184,7 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 			$content .= "<tr class=\"sortbottom\">";
 			$content .= "<td class=\"list_label\">";
 			$content .= '<a href="javascript:;" onclick="sortByOtherCol(this,1)"><img src="images/topdown.gif" alt="" border="0" /> '.WT_Gedcom_Tag::getLabel('GIVN').'</a><br />';
-			$content .= WT_I18N::translate('Total Names').": ".$count;
+			$content .= WT_I18N::translate('Total individuals: %s', WT_I18N::number($count));
 			$content .= '</td>';
 			$content .= '<td style="display:none">GIVN</td>';
 			$content .= '<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
@@ -238,7 +235,7 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 		echo WT_I18N::translate('Number of days to show');
 		echo '</td><td class="optionbox">';
 		echo '<input type="text" name="days" size="2" value="'.$days.'" />';
-		echo ' <i>', WT_I18N::plural('maximum %d day', 'maximum %d days', 30, 30) ,'</i>';
+		echo ' <em>', WT_I18N::plural('maximum %d day', 'maximum %d days', 30, 30) ,'</em>';
 		echo '</td></tr>';
 
 		$infoStyle=get_block_setting($block_id, 'infoStyle', 'table');

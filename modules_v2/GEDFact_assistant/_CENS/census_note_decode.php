@@ -26,7 +26,7 @@
  *
  * @package webtrees
  * @subpackage GEDFact_assistant
- * @version $Id: census_note_decode.php 10696 2011-02-04 21:27:30Z lukasz $
+ * @version $Id: census_note_decode.php 11524 2011-05-14 08:52:38Z greg $
  */
 
 	$text = "xCxAx<table cellpadding=\"0\"><tr><td>" . $text;
@@ -40,7 +40,7 @@
 		$text = str_replace(".b.".'Race',   "<span class=\"note1\" alt=\"".'Race or Color - Black, White, Mulatto, Asian, Indian, Chinese etc'."\"   title=\"".'Race or Color - Black, White, Mulatto, Asian, Indian, Chinese etc'."\">  <b>".'Race'."</span>",   $text);
 		$text = str_replace(".b.".'Age',    "<span class=\"note1\" alt=\"".'Age at last birthday'."\"    title=\"".'Age at last birthday'."\">   <b>".'Age'."</span>",    $text);
 		$text = str_replace(".b.".'MC',  "<span class=\"note1\" alt=\"".'Marital Condition - Married, Single, Unmarried, Widowed or Divorced'."\"  title=\"".'Marital Condition - Married, Single, Unmarried, Widowed or Divorced'."\"> <b>".'MC'."</span>",  $text);
-		$text = str_replace(".b.".'DOB',    "<span class=\"note1\" alt=\"".'Date of Birth'."\"    title=\"".'Date of Birth'."\">   <b>".'DOB'."</span>",    $text);
+		$text = str_replace(".b.".'DOB',    "<span class=\"note1\" alt=\"".'Date of birth'."\"    title=\"".'Date of birth'."\">   <b>".'DOB'."</span>",    $text);
 		$text = str_replace(".b.".'Bmth',   "<span class=\"note1\" alt=\"".'Month of birth - If born within Census year'."\"   title=\"".'Month of birth - If born within Census year'."\">  <b>".'Bmth'."</span>",   $text);
 		$text = str_replace(".b.".'YrsM',   "<span class=\"note1\" alt=\"".'Years Married, or Y if married in Census Year'."\"   title=\"".'Years Married, or Y if married in Census Year'."\">  <b>".'YrsM'."</span>",   $text);
 		$text = str_replace(".b.".'ChB',  "<span class=\"note1\" alt=\"".'Children born alive'."\"  title=\"".'Children born alive'."\"> <b>".'ChB'."</span>",  $text);

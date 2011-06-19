@@ -24,7 +24,7 @@
 *
 * @package webtrees
 * @subpackage Charts
-* @version $Id: clippings_ctrl.php 11285 2011-04-07 14:35:26Z greg $
+* @version $Id: clippings_ctrl.php 11550 2011-05-17 16:43:35Z greg $
 */
 
 if (!defined('WT_WEBTREES')) {
@@ -86,8 +86,8 @@ class WT_Controller_Clippings extends WT_Controller_Base {
 
 		$this->action = safe_GET("action");
 		$this->id = safe_GET('id');
-		$remove = safe_GET('remove',"","no");
-		$convert = safe_GET('convert',"","no");
+		$remove = safe_GET('remove',"yes","no");
+		$convert = safe_GET('convert',"yes","no");
 		$this->Zip = safe_GET('Zip');
 		$this->IncludeMedia = safe_GET('IncludeMedia');
 		$this->conv_path = safe_GET('conv_path', WT_REGEX_NOSCRIPT, $_SESSION['exportConvPath']);
@@ -198,80 +198,60 @@ class WT_Controller_Clippings extends WT_Controller_Base {
 				$filetext = utf8_decode($filetext);
 			}
 
-			$tempUserID = '#ExPoRt#';
-			if ($this->privatize_export!='none') {
-				// Create a temporary userid
-				$export_user_id = createTempUser($tempUserID, $this->privatize_export, $GEDCOM); // Create a temporary userid
-
-				// Temporarily become this user
-				$_SESSION["org_user"]=$_SESSION["wt_user"];
-				$_SESSION["wt_user"]=$export_user_id;
+			switch($this->privatize_export) {
+			case 'gedadmin':
+				$access_level=WT_PRIV_NONE;
+				break;
+			case 'user':
+				$access_level=WT_PRIV_USER;
+				break;
+			case 'visitor':
+				$access_level=WT_PRIV_PUBLIC;
+				break;
+			case 'none':
+				$access_level=WT_USER_ACCESS_LEVEL;
+				break;
 			}
 
 			for ($i = 0; $i < $ct; $i++) {
 				$clipping = $cart[$i];
-				if ($clipping['gedcom'] == $GEDCOM) {
-					$record = find_gedcom_record($clipping['id'], WT_GED_ID);
+				if ($clipping['gedcom'] == WT_GEDCOM) {
+					$object=WT_GedcomRecord::getInstance($clipping['id']);
+					if ($this->privatize_export=='none') {
+						$record=find_gedcom_record($clipping['id'], WT_GED_ID);
+					} else {
+						list($record)=$object->privatizeGedcom($access_level);
+					}
+					// Remove links to objects that aren't in the cart
+					preg_match_all('/\n1 '.WT_REGEX_TAG.' @('.WT_REGEX_XREF.')@/', $record, $matches, PREG_SET_ORDER);
+					foreach ($matches as $match) {
+						if (!self::id_in_cart($match[1])) {
+							$record=str_replace($match[0], '', $record);
+						}
+					}
+					$record = convert_media_path($record, $this->conv_path, $this->conv_slashes);
+					if ($remove=='yes') {
+						$record=remove_custom_tags($record);
+					}
 					$savedRecord = $record; // Save this for the "does this file exist" check
-					if ($clipping['type']=='obje') $record = convert_media_path($record, $this->conv_path, $this->conv_slashes);
-					$record = privatize_gedcom(WT_GED_ID, $record);
-					$record = remove_custom_tags($record, $remove);
-					if ($convert == "yes")
-					$record = utf8_decode($record);
+					if ($convert=='yes') {
+						$record=utf8_decode($record);
+					}
 					switch ($clipping['type']) {
 					case 'indi':
-						$ft = preg_match_all("/1 FAMC @(.*)@/", $record, $match, PREG_SET_ORDER);
-						for ($k = 0; $k < $ft; $k++) {
-							if (!self::id_in_cart($match[$k][1])) {
-								$record = preg_replace("/1 FAMC @" . $match[$k][1] . "@.*/", "", $record);
-							}
-						}
-						$ft = preg_match_all("/1 FAMS @(.*)@/", $record, $match, PREG_SET_ORDER);
-						for ($k = 0; $k < $ft; $k++) {
-							if (!self::id_in_cart($match[$k][1])) {
-								$record = preg_replace("/1 FAMS @" . $match[$k][1] . "@.*/", "", $record);
-							}
-						}
-						$filetext .= trim($record) . "\n";
+						$filetext .= $record."\n";
 						$filetext .= "1 SOUR @WEBTREES@\n";
-						$filetext .= "2 PAGE ".WT_SERVER_NAME.WT_SCRIPT_PATH."individual.php?pid={$clipping['id']}&ged=" . rawurlencode($clipping['gedcom']) . "\n";
+						$filetext .= "2 PAGE ".WT_SERVER_NAME.WT_SCRIPT_PATH.$object->getRawUrl()."\n";
 						break;
-
 					case 'fam':
-						$ft = preg_match_all("/1 CHIL @(.*)@/", $record, $match, PREG_SET_ORDER);
-						for ($k = 0; $k < $ft; $k++) {
-							if (!self::id_in_cart($match[$k][1])) {
-								/* if the child is not in the list delete the record of it */
-								$record = preg_replace("/1 CHIL @" . $match[$k][1] . "@.*/", "", $record);
-							}
-						}
-
-						$ft = preg_match_all("/1 HUSB @(.*)@/", $record, $match, PREG_SET_ORDER);
-						for ($k = 0; $k < $ft; $k++) {
-							if (!self::id_in_cart($match[$k][1])) {
-								/* if the husband is not in the list delete the record of him */
-								$record = preg_replace("/1 HUSB @" . $match[$k][1] . "@.*/", "", $record);
-							}
-						}
-
-						$ft = preg_match_all("/1 WIFE @(.*)@/", $record, $match, PREG_SET_ORDER);
-						for ($k = 0; $k < $ft; $k++) {
-							if (!self::id_in_cart($match[$k][1])) {
-								/* if the wife is not in the list delete the record of her */
-								$record = preg_replace("/1 WIFE @" . $match[$k][1] . "@.*/", "", $record);
-							}
-						}
-
-						$filetext .= trim($record) . "\n";
+						$filetext .= $record."\n";
 						$filetext .= "1 SOUR @WEBTREES@\n";
-						$filetext .= "2 PAGE " . WT_SERVER_NAME.WT_SCRIPT_PATH . "family.php?famid={$clipping['id']}&ged=" . rawurlencode($clipping['gedcom']) . "\n";
+						$filetext .= "2 PAGE ".WT_SERVER_NAME.WT_SCRIPT_PATH.$object->getRawUrl()."\n";
 						break;
-
 					case 'source':
-						$filetext .= trim($record) . "\n";
-						$filetext .= "1 NOTE " . WT_SERVER_NAME.WT_SCRIPT_PATH . "source.php?sid={$clipping['id']}&ged=" . rawurlencode($clipping['gedcom']) . "\n";
+						$filetext .= $record."\n";
+						$filetext .= "1 NOTE ".WT_SERVER_NAME.WT_SCRIPT_PATH.$object->getRawUrl()."\n";
 						break;
-
 					default:
 						$ft = preg_match_all("/\n\d FILE (.+)/", $savedRecord, $match, PREG_SET_ORDER);
 						for ($k = 0; $k < $ft; $k++) {
@@ -295,12 +275,6 @@ class WT_Controller_Clippings extends WT_Controller_Base {
 						break;
 					}
 				}
-			}
-
-			if ($this->privatize_export!='none') {
-				$_SESSION["wt_user"]=$_SESSION["org_user"];
-				delete_user($export_user_id);
-				AddToLog("deleted dummy user -> {$tempUserID} <-", 'auth');
 			}
 
 			if ($this->IncludeMedia == "yes")
@@ -404,8 +378,8 @@ class WT_Controller_Clippings extends WT_Controller_Base {
 		if (!self::id_in_cart($clipping['id'])) {
 			$clipping['gedcom'] = $GEDCOM;
 			$ged_id=get_id_from_gedcom($GEDCOM);
-			$gedrec=find_gedcom_record($clipping['id'], $ged_id);
-			if (canDisplayRecord($ged_id, $gedrec) || showLivingNameById($clipping['id'])) {
+			$gedrec=WT_GedcomRecord::getInstance($clipping['id']);
+			if ($gedrec->canDisplayName()) {
 				$cart[] = $clipping;
 				$this->addCount++;
 			} else {
@@ -414,8 +388,7 @@ class WT_Controller_Clippings extends WT_Controller_Base {
 			}
 			//-- look in the gedcom record for any linked SOUR, NOTE, or OBJE and also add them to the
 			//- clippings cart
-			$gedrec = find_gedcom_record($clipping['id'], WT_GED_ID);
-			$st = preg_match_all("/\d SOUR @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
+			$st = preg_match_all("/\d SOUR @(.*)@/", $gedrec->getGedcomRecord(), $match, PREG_SET_ORDER);
 			for ($i = 0; $i < $st; $i++) {
 				// add SOUR
 				$this->add_clipping(WT_Source::getInstance($match[$i][1]));
@@ -426,12 +399,12 @@ class WT_Controller_Clippings extends WT_Controller_Base {
 					$this->add_clipping(WT_Repository::getInstance($rmatch[$j][1]));
 				}
 			}
-			$nt = preg_match_all("/\d NOTE @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
+			$nt = preg_match_all("/\d NOTE @(.*)@/", $gedrec->getGedcomRecord(), $match, PREG_SET_ORDER);
 			for ($i = 0; $i < $nt; $i++) {
 				$this->add_clipping(WT_Note::getInstance($match[$i][1]));
 			}
 			if ($MULTI_MEDIA) {
-				$nt = preg_match_all("/\d OBJE @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
+				$nt = preg_match_all("/\d OBJE @(.*)@/", $gedrec->getGedcomRecord(), $match, PREG_SET_ORDER);
 				for ($i = 0; $i < $nt; $i++) {
 					$this->add_clipping(WT_Media::getInstance($match[$i][1]));
 				}

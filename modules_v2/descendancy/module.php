@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11125 2011-03-15 21:29:24Z greg $
+// @version $Id: module.php 11669 2011-05-31 23:31:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,17 +31,17 @@ if (!defined('WT_WEBTREES')) {
 class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	// Extend WT_Module
 	public function getTitle() {
-		return WT_I18N::translate('Descendancy');
+		return WT_I18N::translate('Descendants');
 	}
 
 	// Extend WT_Module
 	public function getDescription() {
-		return WT_I18N::translate('Adds a sidebar which allows for easy navigation of individuals in a descendants tree-view format.');
+		return WT_I18N::translate('A sidebar that shows the descendants of an individual.');
 	}
 
 	// Implement WT_Module_Sidebar
 	public function defaultSidebarOrder() {
-		return 20;
+		return 30;
 	}
 
 	// Implement WT_Module_Sidebar
@@ -134,7 +134,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		return $out;
 	}
 
-	public function getPersonLi(&$person, $generations=0) {
+	public function getPersonLi($person, $generations=0) {
 		global $WT_IMAGES;
 
 		$out = '';
@@ -143,8 +143,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		else $out .= '<img src="'.$WT_IMAGES['plus'].'" border="0" class="plusminus" />';
 		$out .= $person->getSexImage().' '.$person->getListName().' ';
 		if ($person->canDisplayDetails()) {
-			$bd = $person->getBirthDeathYears(false,'');
-			if (!empty($bd)) $out .= PrintReady(' ('.$bd.')');
+			$out .= PrintReady(' ('.$person->getLifeSpan().')');
 		}
 		$out .= '</a> <a href="'.$person->getHtmlUrl().'"><img src="'.$WT_IMAGES['button_indi'].'" border="0" alt="indi" /></a>';
 		if ($generations>0) {
@@ -159,7 +158,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		return $out;
 	}
 
-	public function getFamilyLi(&$family, &$person, $generations=0) {
+	public function getFamilyLi($family, $person, $generations=0) {
 		global $WT_IMAGES;
 
 		$out = '';
@@ -195,15 +194,12 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		->fetchAll(PDO::FETCH_ASSOC);
 
 		$out = '<ul>';
-		$private_count = 0;
 		foreach ($rows as $row) {
-			$person=PWT_erson::getInstance($row);
+			$person=WT_Person::getInstance($row);
 			if ($person->canDisplayName()) {
 				$out .= $this->getPersonLi($person);
 			}
-			else $private_count++;
 		}
-		if ($private_count>0) $out .= '<li>'.WT_I18N::translate('Private').' ('.$private_count.')</li>';
 		$out .= '</ul>';
 		return $out;
 	}
@@ -229,14 +225,10 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		if ($family->canDisplayDetails()) {
 			$children = $family->getChildren();
 			if (count($children)>0) {
-				$private = 0;
 				foreach($children as $child) {
-					if ($child->canDisplayName()) $out .= $this->getPersonLi($child, $generations-1);
-					else $private++;
+					$out .= $this->getPersonLi($child, $generations-1);
 				}
-				if ($private>0) $out .= '<li class="sb_desc_indi_li">'.WT_I18N::translate('Private').' ('.$private.')</li>';
-			}
-			else {
+			} else {
 				$out .= WT_I18N::translate('No children');
 			}
 		}

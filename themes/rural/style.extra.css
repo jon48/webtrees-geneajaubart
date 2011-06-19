@@ -32,14 +32,52 @@
  * $HeadURL$
  */
  
-#indi_titles{
-	margin-top: 1em;
+ /* Large menu icons */
+ #menu-sosa       				{background-position:center  -600px;}
+ 
+ /* Small menu icon */
+#menu-list-perso-certificate   	{background-position:left    -570px;} html[dir=rtl] #menu-list-perso-certificate	{background-position:right    -570px;} 
+#menu-list-perso-lineage   		{background-position:left     -30px;} html[dir=rtl] #menu-list-perso-lineage 		{background-position:right     -30px;}
+#menu-sosa-list			   		{background-position:left     -90px;} html[dir=rtl] #menu-sosa-list			 		{background-position:right     -90px;}
+#menu-sosa-missing		   		{background-position:left    -450px;} html[dir=rtl] #menu-sosa-list			 		{background-position:right    -450px;}
+#menu-sosa-stats		   		{background-position:left    -630px;} html[dir=rtl] #menu-sosa-list			 		{background-position:right    -630px;}
+#menu-sosa-recompute	   		{background-position:left   -1210px;} html[dir=rtl] #menu-sosa-list			 		{background-position:right   -1210px;}
+
+#indi_perso_header{
+	float: right;
+	width: 84%;
+	color: #62584D;
+	font-size: 1.1em;
+	margin-top: 5px;
 }
 
-#indi_titles dd {    
+#indi_perso_header_left{
+	float: left;
+	padding-left: 5px;
+	text-align: left;
+}
+
+#indi_perso_header_right{
+	float: right;
+	padding-right: 5px;
+	text-align: right;
+}
+
+.indi_perso_header_left_div, .indi_perso_header_right_div {
+	display: block;
+}
+
+#indi_perso_icons{
+	float: right;
+}
+
+#indi-header-titles {}
+#indi-header-titles dt:after {content:":";}
+#indi-header-titles dd {    
 	display: block; /* to force new line */    
 	margin-left: 5em; /* whatever the width of dt */
 }
+
 
 .flag_gm_30 {
 	max-width: 30px;
@@ -90,6 +128,11 @@
 	text-align: center;
 	border: solid #d3c6b8 1px;
 	background-color: #f4f0ed;
+}
+
+.sosa_large {
+	height: 18px;
+	vertical-align: middle;
 }
 
 .sosa_normal {

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Event.php 11021 2011-03-03 12:29:43Z greg $
+// @version $Id: Event.php 11528 2011-05-14 10:57:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -182,7 +182,7 @@ class WT_Event {
 	 *
 	 * @param WT_Date $date
 	 */
-	function setDate(&$date) {
+	function setDate($date) {
 		$this->date = $date;
 		$this->dest = true;
 	}
@@ -224,7 +224,7 @@ class WT_Event {
 	/**
 	 *
 	 */
-	function setParentObject(&$parent) {
+	function setParentObject($parent) {
 		$this->parentObject = $parent;
 	}
 
@@ -342,7 +342,7 @@ class WT_Event {
 	 * @param WT_Event $b
 	 * @return int
 	 */
-	static function CompareDate(&$a, &$b) {
+	static function CompareDate($a, $b) {
 		$adate = $a->getDate();
 		$bdate = $b->getDate();
 		//-- non-dated events should sort according to the preferred sort order
@@ -370,7 +370,7 @@ class WT_Event {
 	 * @param WT_Event $b
 	 * @return int
 	 */
-	static function CompareType(&$a, &$b) {
+	static function CompareType($a, $b) {
 		global $factsort;
 
 		if (empty($factsort))

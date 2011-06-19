@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: pedigree.php 10869 2011-02-18 16:00:33Z greg $
+// $Id: pedigree.php 11417 2011-04-30 11:17:30Z greg $
 
 define('WT_SCRIPT_NAME', 'pedigree.php');
 require './includes/session.php';
@@ -33,8 +33,7 @@ require WT_ROOT.'includes/functions/functions_edit.php';
 $controller = new WT_Controller_Pedigree();
 $controller->init();
 
-// -- echo html header information
-print_header($controller->getPageTitle());
+print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Pedigree tree of %s', $controller->name));
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
@@ -45,12 +44,7 @@ if (WT_USE_LIGHTBOX) {
 }
 
 echo '<table><tr><td valign="middle">';
-echo "<h2>", WT_I18N::translate('Pedigree Tree'), help_link('pedigree_tree');
-echo '<br />', PrintReady($controller->name);
-if ($controller->addname!="") {
-	echo '<br />', PrintReady($controller->addname);
-}
-echo '</h2>';
+echo '<h2>', WT_I18N::translate('Pedigree tree of %s', $controller->name), help_link('pedigree_tree'), '</h2>';
 // -- echo the form to change the number of displayed generations
 ?>
 	<script type="text/javascript">

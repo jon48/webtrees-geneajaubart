@@ -26,7 +26,7 @@
  *
  * @package webtrees
  * @subpackage GEDFact_assistant
- * @version $Id: media_5_input.php 11193 2011-03-26 05:57:38Z brian $
+ * @version $Id: media_5_input.php 11616 2011-05-26 18:26:40Z greg $
  */
 
 ?>
@@ -67,5 +67,4 @@ echo '<script src="', WT_MODULES_DIR, 'GEDFact_assistant/_MEDIA/media_5_input.js
 		</tr>
 		</thead>
 		<tbody></tbody>
-		<tr><td></td></tr>
 	</table>

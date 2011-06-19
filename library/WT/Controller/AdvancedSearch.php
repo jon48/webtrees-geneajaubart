@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: AdvancedSearch.php 11106 2011-03-12 19:06:49Z greg $
+// @version $Id: AdvancedSearch.php 11614 2011-05-26 14:58:13Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -42,20 +42,38 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 	 */
 	function init() {
 		parent :: init();
-		if (empty($_REQUEST['action'])) $this->action="advanced";
+		if (empty($_REQUEST['action'])) {
+			$this->action="advanced";
+		}
 		if ($this->action=="advanced") {
-			if (isset($_REQUEST['fields'])) $this->fields = $_REQUEST['fields'];
-			if (isset($_REQUEST['values'])) $this->values = $_REQUEST['values'];
-			if (isset($_REQUEST['plusminus'])) $this->plusminus = $_REQUEST['plusminus'];
+			if (isset($_REQUEST['fields'])) {
+				$this->fields = $_REQUEST['fields'];
+				ksort($this->fields);
+			}
+			if (isset($_REQUEST['values'])) {
+				$this->values = $_REQUEST['values'];
+			}
+			if (isset($_REQUEST['plusminus'])) {
+				$this->plusminus = $_REQUEST['plusminus'];
+			}
 			$this->reorderFields();
 			$this->advancedSearch();
 		}
-		if (count($this->fields)==0) {
-			$this->fields = explode(",",get_gedcom_setting(WT_GED_ID, 'SEARCH_FACTS_DEFAULT'));
-			$this->fields[] = "FAMC:HUSB:NAME:GIVN:SDX";
-			$this->fields[] = "FAMC:HUSB:NAME:SURN:SDX";
-			$this->fields[] = "FAMC:WIFE:NAME:GIVN:SDX";
-			$this->fields[] = "FAMC:WIFE:NAME:SURN:SDX";
+		if (!$this->fields) {
+			$this->fields=array(
+				'NAME:GIVN:SDX',
+				'NAME:SURN:SDX',
+				'BIRT:DATE',
+				'BIRT:PLAC',
+				'FAMS:MARR:DATE',
+				'FAMS:MARR:PLAC',
+				'DEAT:DATE',
+				'DEAT:PLAC',
+				'FAMC:HUSB:NAME:GIVN:SDX',
+				'FAMC:HUSB:NAME:SURN:SDX',
+				'FAMC:WIFE:NAME:GIVN:SDX',
+				'FAMC:WIFE:NAME:SURN:SDX',
+			);
 		}
 	}
 
@@ -163,7 +181,7 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 		$famcTable = false;
 
 		$sql = '';
-		if ($justSql) $sqlfields = "SELECT DISTINCT {$prefix}_id, {$prefix}_file";
+		if ($justSql) $sqlfields = "SELECT {$prefix}_id, {$prefix}_file";
 		else $sqlfields = "SELECT i_id, i_gedcom, i_isdead, i_file, i_sex";
 		$sqltables = " FROM `##".$table."`";
 		$sqlwhere = " WHERE ".$prefix."_file=".WT_GED_ID;
@@ -431,7 +449,7 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 		else {
 			$ret = false;
 			if ($this->isPostBack) {
-				echo '<br /><div class="warning" style=" text-align: center;"><i>', WT_I18N::translate('No results found.'), '</i><br /></div>';
+				echo '<br /><div class="warning" style=" text-align: center;"><em>', WT_I18N::translate('No results found.'), '</em><br /></div>';
 			}
 		}
 		return $ret;

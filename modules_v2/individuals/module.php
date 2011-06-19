@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11079 2011-03-07 21:48:01Z greg $
+// @version $Id: module.php 11669 2011-05-31 23:31:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,12 +36,12 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return WT_I18N::translate('Adds a sidebar which allows for easy navigation of individuals in a list format.');
+		return WT_I18N::translate('A sidebar that shows an alphabetic list of all the individuals in the family tree.');
 	}
 
 	// Implement WT_Module_Sidebar
 	public function defaultSidebarOrder() {
-		return 30;
+		return 40;
 	}
 
 	// Implement WT_Module_Sidebar
@@ -58,14 +58,20 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		$last = array('alpha'=>$alpha, 'surname'=>$surname, 'search'=>$search);
 		$_SESSION['sb_individuals_last'] = $last;
 
-		if (!empty($search)) return $this->search($search);
-		else if (empty($surname)) return $this->getAlphaSurnames($alpha, $surname);
-		else return $this->getSurnameIndis($alpha, $surname);
+		if ($search) {
+			return $this->search($search);
+		} elseif ($alpha=='@' || $alpha==',' || $surname) {
+			return $this->getSurnameIndis($alpha, $surname);
+		} elseif ($alpha) {
+			return $this->getAlphaSurnames($alpha, $surname);
+		} else {
+			return '';
+		}
 	}
 
 	// Implement WT_Module_Sidebar
 	public function getSidebarContent() {
-		global $SHOW_MARRIED_NAMES, $WT_IMAGES;
+		global $SHOW_MARRIED_NAMES, $WT_IMAGES, $UNKNOWN_NN;
 
 		// Fetch a list of the initial letters of all surnames in the database
 		$initials=WT_Query_Name::surnameAlpha($SHOW_MARRIED_NAMES, false, WT_GED_ID);
@@ -74,7 +80,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		<!--
 		var loadedNames = new Array();
 
-		function searchQ() {
+		function isearchQ() {
 			var query = jQuery("#sb_indi_name").attr("value");
 			if (query.length>1) {
 				jQuery("#sb_indi_content").load("sidebar.php?sb_action=individuals&search="+query);
@@ -87,7 +93,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			var timerid = null;
 			jQuery("#sb_indi_name").keyup(function(e) {
 				if (timerid) window.clearTimeout(timerid);
-				timerid = window.setTimeout("searchQ()", 500);
+				timerid = window.setTimeout("isearchQ()", 500);
 			});
 			jQuery(".sb_indi_letter").live("click", function() {
 				jQuery("#sb_indi_content").load(this.href);
@@ -130,10 +136,13 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		foreach ($initials as $letter=>$count) {
 			switch ($letter) {
 				case '@':
-					$html=WT_I18N::translate('(unknown)');
+					$html=$UNKNOWN_NN;
 					break;
 				case ',':
 					$html=WT_I18N::translate('None');
+					break;
+				case ' ':
+					$html='&nbsp;';
 					break;
 				default:
 					$html=$letter;
@@ -147,12 +156,17 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		$out .= '<div id="sb_indi_content">';
 
 		if (isset($_SESSION['sb_individuals_last'])) {
-			$last = $_SESSION['sb_individuals_last'];
-			$alpha = $last['alpha'];
-			$search = $last['search'];
-			$surname = $last['surname'];
-			if (!empty($search)) $out.= $this->search($search);
-			else if (!empty($alpha)) $out.= $this->getAlphaSurnames($alpha, $surname);
+			$alpha   = $_SESSION['sb_individuals_last']['alpha'];
+			$search  = $_SESSION['sb_individuals_last']['search'];
+			$surname = $_SESSION['sb_individuals_last']['surname'];
+			
+			if ($search) {
+				$out.=$this->search($search);
+			} elseif ($alpha=='@' || $alpha==',' || $surname) {
+				$out.=$this->getSurnameIndis($alpha, $surname);
+			} elseif ($alpha) {
+				$out.=$this->getAlphaSurnames($alpha, $surname);
+			}
 		}
 
 		$out .= '</div></form>';
@@ -169,9 +183,9 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				$out .= '<div class="name_tree_div_visible">';
 				$out .= $this->getSurnameIndis($alpha, $surname1);
 				$out .= '</div>';
-			}
-			else
+			} else {
 				$out .= '<div class="name_tree_div"></div>';
+			}
 			$out .= '</li>';
 		}
 		$out .= '</ul>';
@@ -180,21 +194,20 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 	public function getSurnameIndis($alpha, $surname) {
 		global $SHOW_MARRIED_NAMES;
-		$indis=get_indilist_indis($surname, $alpha, '', $SHOW_MARRIED_NAMES, false, WT_GED_ID);
+		$indis=WT_Query_Name::individuals($surname, $alpha, '', $SHOW_MARRIED_NAMES, false, WT_GED_ID);
 		$out = '<ul>';
-		$private_count = 0;
 		foreach ($indis as $person) {
 			if ($person->canDisplayName()) {
 				$out .= '<li><a href="'.$person->getHtmlUrl().'">'.$person->getSexImage().' '.$person->getListName().' ';
 				if ($person->canDisplayDetails()) {
-					$bd = $person->getBirthDeathYears(false,'');
-					if (!empty($bd)) $out .= PrintReady(' ('.$bd.')');
+					$bd = $person->getLifeSpan();
+					if (!empty($bd)) {
+						$out .= PrintReady(' ('.$bd.')');
+					}
 				}
 				$out .= '</a></li>';
 			}
-			else $private_count++;
 		}
-		if ($private_count>0) $out .= '<li>'.WT_I18N::translate('Private').' ('.$private_count.')</li>';
 		$out .= '</ul>';
 		return $out;
 	}
@@ -216,22 +229,18 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			->fetchAll(PDO::FETCH_ASSOC);
 
 		$out = '<ul>';
-		$private_count = 0;
 		foreach ($rows as $row) {
 			$person=WT_Person::getInstance($row);
 			if ($person->canDisplayName()) {
 				$out .= '<li><a href="'.$person->getHtmlUrl().'">'.$person->getSexImage().' '.$person->getListName().' ';
 				if ($person->canDisplayDetails()) {
-					$bd = $person->getBirthDeathYears(false,'');
+					$bd = $person->getLifeSpan();
 					if (!empty($bd)) $out .= PrintReady(' ('.$bd.')');
 				}
 				$out .= '</a></li>';
 			}
-			else $private_count++;
 		}
-		if ($private_count>0) $out .= '<li>'.PrintReady(WT_I18N::translate('Private').' ('.$private_count.')').'</li>';
 		$out .= '</ul>';
 		return $out;
 	}
-
 }

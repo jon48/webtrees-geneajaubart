@@ -24,7 +24,7 @@
  *
  * @package webtrees
  * @subpackage Display
- * @version $Id: find.php 11021 2011-03-03 12:29:43Z greg $
+ * @version $Id: find.php 11708 2011-06-04 09:59:27Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'find.php');
@@ -323,7 +323,6 @@ if ($type == "media" && $MULTI_MEDIA) {
 	echo "<input type=\"checkbox\" name=\"showthumb\" value=\"true\"";
 	if ($showthumb) echo "checked=\"checked\"";
 	echo "onclick=\"javascript: this.form.submit();\" />", WT_I18N::translate('Show thumbnails');
-	echo help_link('show_thumb');
 	echo "</td></tr>";
 	echo "<tr><td class=\"list_label width10\" style=\"padding: 5px;\">";
 	echo "<input type=\"submit\" name=\"search\" value=\"", WT_I18N::translate('Filter'), "\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
@@ -638,7 +637,7 @@ if ($action=="filter") {
 			foreach ($myindilist as $indi) {
 				echo $indi->format_list('li', true);
 			}
-			echo '</ul></td></tr><tr><td class="list_label">', WT_I18N::translate('Total individuals'), ' ', count($myindilist), '</tr></td>';
+			echo '</ul></td></tr><tr><td class="list_label">', WT_I18N::translate('Total individuals: %s', count($myindilist)), '</tr></td>';
 		} else {
 			echo "<td class=\"list_value_wrap\">";
 			echo WT_I18N::translate('No results found.');
@@ -663,7 +662,7 @@ if ($action=="filter") {
 			foreach ($myfamlist as $family) {
 				echo $family->format_list('li', true);
 			}
-			echo '</ul></td></tr><tr><td class="list_label">', WT_I18N::translate('Total families'), ' ', count($myfamlist), '</tr></td>';
+			echo '</ul></td></tr><tr><td class="list_label">', WT_I18N::translate('Total families: %s', count($myfamlist)), '</tr></td>';
 		} else {
 			echo "<td class=\"list_value_wrap\">";
 			echo WT_I18N::translate('No results found.');
@@ -919,7 +918,7 @@ if ($action=="filter") {
 			foreach ($mysourcelist as $source) {
 				echo '<li><a href="', $source->getHtmlUrl(), '" onclick="pasteid(\'', $source->getXref(), '\');"><span class="list_item">', $source->getListName(),'</span></a></li>';
 			}
-			echo '</ul></td></tr><tr><td class="list_label">', WT_I18N::translate('Total Sources'), ' ', count($mysourcelist), '</td></tr>';
+			echo '</ul></td></tr><tr><td class="list_label">', WT_I18N::translate('Total sources: %s', count($mysourcelist)), '</td></tr>';
 		}
 		else {
 			echo '<tr><td class="list_value_wrap">', WT_I18N::translate('No results found.'), '</td></tr>';

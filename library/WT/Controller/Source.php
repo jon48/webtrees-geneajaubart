@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Source.php 11007 2011-03-01 19:06:05Z lukasz $
+// @version $Id: Source.php 11671 2011-06-01 05:51:11Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -50,13 +50,6 @@ class WT_Controller_Source extends WT_Controller_Base {
 		}
 
 		$this->rid=$this->source->getXref(); // Correct upper/lower case mismatch
-
-		if (!$this->source->canDisplayDetails()) {
-			print_header(WT_I18N::translate('Source'));
-			print_privacy_error();
-			print_footer();
-			exit;
-		}
 
 		//-- perform the desired action
 		switch($this->action) {
@@ -144,13 +137,15 @@ class WT_Controller_Source extends WT_Controller_Base {
 		// edit menu
 		$menu = new WT_Menu(WT_I18N::translate('Edit'));
 		$menu->addIcon('edit_sour');
-		$menu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_large_gedcom');
+		$menu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_large_edit_source');
+		$menu->addId('menu-sour');
 
 		if (WT_USER_CAN_EDIT) {
-			$submenu = new WT_Menu(WT_I18N::translate('Edit Source'));
+			$submenu = new WT_Menu(WT_I18N::translate('Edit source'));
 			$submenu->addOnclick('return edit_source(\''.$this->sid.'\');');
 			$submenu->addIcon('edit_sour');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_source');
+			$submenu->addId('menu-sour-edit');
 			$menu->addSubmenu($submenu);
 
 			$menu->addSeparator();
@@ -161,9 +156,11 @@ class WT_Controller_Source extends WT_Controller_Base {
 			if (!$this->show_changes) {
 				$submenu = new WT_Menu(WT_I18N::translate('This record has been updated.  Click here to show changes.'), "source.php?sid={$this->sid}&amp;show_changes=yes");
 				$submenu->addIcon('edit_sour');
+				$submenu->addId('menu-sour-showchan');
 			} else {
 				$submenu = new WT_Menu(WT_I18N::translate('Click here to hide changes.'), "source.php?sid={$this->sid}&amp;show_changes=no");
 				$submenu->addIcon('edit_sour');
+				$submenu->addId('menu-sour-hidechan');
 			}
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
 			$menu->addSubmenu($submenu);
@@ -172,10 +169,12 @@ class WT_Controller_Source extends WT_Controller_Base {
 				$submenu = new WT_Menu(WT_I18N::translate('Undo all changes'), "source.php?sid={$this->sid}&amp;action=undo");
 				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
 				$submenu->addIcon('edit_sour');
+				$submenu->addId('menu-sour-undochan');
 				$menu->addSubmenu($submenu);
 				$submenu = new WT_Menu(WT_I18N::translate('Approve all changes'), "source.php?sid={$this->sid}&amp;action=accept");
 				$submenu->addIcon('edit_sour');
 				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+				$submenu->addId('menu-sour-savechan');
 				$menu->addSubmenu($submenu);
 			}
 
@@ -187,7 +186,8 @@ class WT_Controller_Source extends WT_Controller_Base {
 			$submenu = new WT_Menu(WT_I18N::translate('Edit raw GEDCOM record'));
 			$submenu->addOnclick("return edit_raw('".$this->sid."');");
 			$submenu->addIcon('gedcom');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_raw');
+			$submenu->addId('menu-sour-editraw');
 			$menu->addSubmenu($submenu);
 		} elseif ($SHOW_GEDCOM_RECORD) {
 			$submenu = new WT_Menu(WT_I18N::translate('View GEDCOM Record'));
@@ -197,7 +197,8 @@ class WT_Controller_Source extends WT_Controller_Base {
 			} else {
 				$submenu->addOnclick("return show_gedcom_record();");
 			}
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_raw');
+			$submenu->addId('menu-sour-viewraw');
 			$menu->addSubmenu($submenu);
 		}
 
@@ -206,14 +207,16 @@ class WT_Controller_Source extends WT_Controller_Base {
 			$submenu = new WT_Menu(WT_I18N::translate('Delete this Source'));
 			$submenu->addOnclick("if (confirm('".WT_I18N::translate('Are you sure you want to delete this Source?')."')) return deletesource('".$this->sid."'); else return false;");
 			$submenu->addIcon('remove');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_delete');
+			$submenu->addId('menu-sour-del');
 			$menu->addSubmenu($submenu);
 		}
 
 		// add to favorites
 		$submenu = new WT_Menu(WT_I18N::translate('Add to My Favorites'), "source.php?action=addfav&amp;sid={$this->sid}&amp;gid={$this->sid}");
 		$submenu->addIcon('favorites');
-		$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+		$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_fav');
+		$submenu->addId('menu-sour-addfav');
 		$menu->addSubmenu($submenu);
 
 		//-- get the link for the first submenu and set it as the link for the main menu

@@ -27,7 +27,7 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
-* @version $Id: functions_db.php 11281 2011-04-06 17:58:06Z greg $
+* @version $Id: functions_db.php 11721 2011-06-06 20:54:32Z greg $
 * @package webtrees
 * @subpackage DB
 */
@@ -38,149 +38,6 @@ if (!defined('WT_WEBTREES')) {
 }
 
 define('WT_FUNCTIONS_DB_PHP', '');
-
-//-- gets the first record in the gedcom
-function get_first_xref($type, $ged_id=WT_GED_ID) {
-	switch ($type) {
-	case "INDI":
-		return
-			WT_DB::prepare("SELECT MIN(i_id) FROM `##individuals` WHERE i_file=?")
-			->execute(array($ged_id))
-			->fetchOne();
-		break;
-	case "FAM":
-		return
-			WT_DB::prepare("SELECT MIN(f_id) FROM `##families` WHERE f_file=?")
-			->execute(array($ged_id))
-			->fetchOne();
-	case "SOUR":
-		return
-			WT_DB::prepare("SELECT MIN(s_id) FROM `##sources` WHERE s_file=?")
-			->execute(array($ged_id))
-			->fetchOne();
-	case "OBJE":
-		return
-			WT_DB::prepare("SELECT MIN(m_media) FROM `##media` WHERE m_gedfile=?")
-			->execute(array($ged_id))
-			->fetchOne();
-	default:
-		return
-			WT_DB::prepare("SELECT MIN(o_id) FROM `##other` WHERE o_file=? AND o_type=?")
-			->execute(array($ged_id, $type))
-			->fetchOne();
-	}
-}
-
-//-- gets the last record in the gedcom
-function get_last_xref($type, $ged_id=WT_GED_ID) {
-	switch ($type) {
-	case "INDI":
-		return
-			WT_DB::prepare("SELECT MAX(i_id) FROM `##individuals` WHERE i_file=?")
-			->execute(array($ged_id))
-			->fetchOne();
-		break;
-	case "FAM":
-		return
-			WT_DB::prepare("SELECT MAX(f_id) FROM `##families` WHERE f_file=?")
-			->execute(array($ged_id))
-			->fetchOne();
-	case "SOUR":
-		return
-			WT_DB::prepare("SELECT MAX(s_id) FROM `##sources` WHERE s_file=?")
-			->execute(array($ged_id))
-			->fetchOne();
-	case "OBJE":
-		return
-			WT_DB::prepare("SELECT MAX(m_media) FROM `##media` WHERE m_gedfile=?")
-			->execute(array($ged_id))
-			->fetchOne();
-	default:
-		return
-			WT_DB::prepare("SELECT MAX(o_id) FROM `##other` WHERE o_file=? AND o_type=?")
-			->execute(array($ged_id, $type))
-			->fetchOne();
-	}
-}
-
-//-- gets the next person in the gedcom
-function get_next_xref($pid, $ged_id=WT_GED_ID) {
-	$type=gedcom_record_type($pid, $ged_id);
-	switch ($type) {
-	case "INDI":
-		return
-			WT_DB::prepare("SELECT MIN(i_id) FROM `##individuals` WHERE i_file=? AND i_id>?")
-			->execute(array($ged_id, $pid))
-			->fetchOne();
-		break;
-	case "FAM":
-		return
-			WT_DB::prepare("SELECT MIN(f_id) FROM `##families` WHERE f_file=? AND f_id>?")
-			->execute(array($ged_id, $pid))
-			->fetchOne();
-	case "SOUR":
-		return
-			WT_DB::prepare("SELECT MIN(s_id) FROM `##sources` WHERE s_file=? AND s_id>?")
-			->execute(array($ged_id, $pid))
-			->fetchOne();
-	case "OBJE":
-		return
-			WT_DB::prepare("SELECT MIN(m_media) FROM `##media` WHERE m_gedfile=? AND m_media>?")
-			->execute(array($ged_id, $pid))
-			->fetchOne();
-	default:
-		return
-			WT_DB::prepare("SELECT MIN(o_id) FROM `##other` WHERE o_file=? AND o_type=? AND o_id>?")
-			->execute(array($ged_id, $type, $pid))
-			->fetchOne();
-	}
-}
-
-//-- gets the previous person in the gedcom
-function get_prev_xref($pid, $ged_id=WT_GED_ID) {
-	$type=gedcom_record_type($pid, $ged_id);
-	switch ($type) {
-	case "INDI":
-		return
-			WT_DB::prepare("SELECT MAX(i_id) FROM `##individuals` WHERE i_file=? AND i_id<?")
-			->execute(array($ged_id, $pid))
-			->fetchOne();
-		break;
-	case "FAM":
-		return
-			WT_DB::prepare("SELECT MAX(f_id) FROM `##families` WHERE f_file=? AND f_id<?")
-			->execute(array($ged_id, $pid))
-			->fetchOne();
-	case "SOUR":
-		return
-			WT_DB::prepare("SELECT MAX(s_id) FROM `##sources` WHERE s_file=? AND s_id<?")
-			->execute(array($ged_id, $pid))
-			->fetchOne();
-	case "OBJE":
-		return
-			WT_DB::prepare("SELECT MAX(m_media) FROM `##media` WHERE m_gedfile=? AND m_media<?")
-			->execute(array($ged_id, $pid))
-			->fetchOne();
-	default:
-		return
-			WT_DB::prepare("SELECT MAX(o_id) FROM `##other` WHERE o_file=? AND o_type=? AND o_id<?")
-			->execute(array($ged_id, $type, $pid))
-			->fetchOne();
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Fetch a list of children for an individual, from all their partners.
-////////////////////////////////////////////////////////////////////////////////
-function fetch_child_ids($parent_id, $ged_id) {
-	static $statement=null;
-
-	if (is_null($statement)) {
-		$statement=WT_DB::prepare("SELECT DISTINCT child.l_from AS xref FROM `##link` child, `##link` spouse WHERE child.l_type=? AND spouse.l_type=? AND child.l_file=spouse.l_file AND child.l_to=spouse.l_to AND spouse.l_from=? AND child.l_file=?");
-	}
-
-	return $statement->execute(array('FAMC', 'FAMS', $parent_id, $ged_id))->fetchOneColumn();
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Count the number of records linked to a given record
@@ -1372,50 +1229,6 @@ function get_top_surnames($ged_id, $min, $max) {
 	}
 }
 
-function delete_fact($linenum, $pid, $gedrec) {
-	global $linefix;
-
-	if (!empty($linenum)) {
-		if ($linenum==0) {
-			delete_gedrec($pid, WT_GED_ID);
-			echo WT_I18N::translate('GEDCOM record successfully deleted.');
-		} else {
-			$gedlines = explode("\n", $gedrec);
-			// NOTE: The array_pop is used to kick off the last empty element on the array
-			// NOTE: To prevent empty lines in the GEDCOM
-			// DEBUG: Records without line breaks are imported as 1 big string
-			if ($linefix > 0) {
-				array_pop($gedlines);
-			}
-			$newged = "";
-			// NOTE: Add all lines that are before the fact to be deleted
-			for ($i=0; $i<$linenum; $i++) {
-				$newged .= trim($gedlines[$i])."\n";
-			}
-			if (isset($gedlines[$linenum])) {
-				$fields = explode(' ', $gedlines[$linenum]);
-				$glevel = $fields[0];
-				$ctlines = count($gedlines);
-				$i++;
-				if ($i<$ctlines) {
-					// Remove the fact
-					while ((isset($gedlines[$i]))&&($gedlines[$i]{0}>$glevel)) {
-						$i++;
-					}
-					// Add the remaining lines
-					while ($i<$ctlines) {
-						$newged .= $gedlines[$i]."\n";
-						$i++;
-					}
-				}
-			}
-			if ($newged != "") {
-				return $newged;
-			}
-		}
-	}
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Get a list of events whose anniversary occured on a given julian day.
 // Used on the on-this-day/upcoming blocks and the day/month calendar views.
@@ -1562,38 +1375,40 @@ function get_anniversary_events($jd, $facts='', $ged_id=WT_GED_ID) {
 				} else {
 					$record=WT_Family::getInstance($row);
 				}
-				// Generate a regex to match the retrieved date - so we can find it in the original gedcom record.
-				// TODO having to go back to the original gedcom is lame.  This is why it is so slow.
-				// We should store the level1 fact here (or in a "facts" table)
-				if ($row['d_type']=='@#DJULIAN@') {
-					if ($row['d_year']<0) {
-						$year_regex=$row['d_year'].' ?[Bb]\.? ?[Cc]\.\ ?';
-					} else {
-						$year_regex="({$row['d_year']}|".($row['d_year']-1)."\/".($row['d_year']%100).")";
-					}
-				} else
-					$year_regex="0*".$row['d_year'];
-				$ged_date_regex="/2 DATE.*(".($row['d_day']>0 ? "0?{$row['d_day']}\s*" : "").$row['d_month']."\s*".($row['d_year']!=0 ? $year_regex : "").")/i";
-				foreach (get_all_subrecords($row['gedrec'], $skipfacts, false, false) as $factrec) {
-					if (preg_match("/(^1 {$row['d_fact']}|^1 (FACT|EVEN).*\n2 TYPE {$row['d_fact']})/s", $factrec) && preg_match($ged_date_regex, $factrec) && preg_match('/2 DATE (.+)/', $factrec, $match)) {
-						$date=new WT_Date($match[1]);
-						if (preg_match('/2 PLAC (.+)/', $factrec, $match)) {
-							$plac=$match[1];
+				if ($record->canDisplayDetails()) {
+					// Generate a regex to match the retrieved date - so we can find it in the original gedcom record.
+					// TODO having to go back to the original gedcom is lame.  This is why it is so slow.
+					// We should store the level1 fact here (or in a "facts" table)
+					if ($row['d_type']=='@#DJULIAN@') {
+						if ($row['d_year']<0) {
+							$year_regex=$row['d_year'].' ?[Bb]\.? ?[Cc]\.\ ?';
 						} else {
-							$plac='';
+							$year_regex="({$row['d_year']}|".($row['d_year']-1)."\/".($row['d_year']%100).")";
 						}
-						if (canDisplayFact($row['xref'], $ged_id, $factrec)) {
-							$found_facts[]=array(
-								'record'=>$record,
-								'id'=>$row['xref'],
-								'objtype'=>$row['type'],
-								'fact'=>$row['d_fact'],
-								'factrec'=>$factrec,
-								'jd'=>$jd,
-								'anniv'=>($row['d_year']==0?0:$anniv->y-$row['d_year']),
-								'date'=>$date,
-								'plac'=>$plac
-							);
+					} else
+						$year_regex="0*".$row['d_year'];
+					$ged_date_regex="/2 DATE.*(".($row['d_day']>0 ? "0?{$row['d_day']}\s*" : "").$row['d_month']."\s*".($row['d_year']!=0 ? $year_regex : "").")/i";
+					foreach (get_all_subrecords($row['gedrec'], $skipfacts, false, false) as $factrec) {
+						if (preg_match("/(^1 {$row['d_fact']}|^1 (FACT|EVEN).*\n2 TYPE {$row['d_fact']})/s", $factrec) && preg_match($ged_date_regex, $factrec) && preg_match('/2 DATE (.+)/', $factrec, $match)) {
+							$date=new WT_Date($match[1]);
+							if (preg_match('/2 PLAC (.+)/', $factrec, $match)) {
+								$plac=$match[1];
+							} else {
+								$plac='';
+							}
+							if (canDisplayFact($row['xref'], $ged_id, $factrec)) {
+								$found_facts[]=array(
+									'record'=>$record,
+									'id'=>$row['xref'],
+									'objtype'=>$row['type'],
+									'fact'=>$row['d_fact'],
+									'factrec'=>$factrec,
+									'jd'=>$jd,
+									'anniv'=>($row['d_year']==0?0:$anniv->y-$row['d_year']),
+									'date'=>$date,
+									'plac'=>$plac
+								);
+							}
 						}
 					}
 				}
@@ -1959,15 +1774,21 @@ function get_newest_registered_user() {
 }
 
 function set_user_password($user_id, $password) {
+	// The crypt() function requires a salt.  You could force a particular
+	// algorithm by creating a salt with a specify format.  See php.net/crypt
+	$password_hash=crypt($password);
 	WT_DB::prepare("UPDATE `##user` SET password=? WHERE user_id=?")
-		->execute(array($password, $user_id));
+		->execute(array($password_hash, $user_id));
 	AddToLog('User ID: '.$user_id. ' ('.get_user_name($user_id).') changed password', 'auth');
 }
 
-function get_user_password($user_id) {
-	return WT_DB::prepare("SELECT password FROM `##user` WHERE user_id=?")
+function check_user_password($user_id, $password) {
+	// crypt() needs the password-hash to use as a salt
+	$password_hash=
+		WT_DB::prepare("SELECT password FROM `##user` WHERE user_id=?")
 		->execute(array($user_id))
 		->fetchOne();
+	return crypt($password, $password_hash)==$password_hash;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

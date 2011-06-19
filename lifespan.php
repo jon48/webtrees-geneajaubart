@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: lifespan.php 11250 2011-04-01 13:48:42Z greg $
+// @version $Id: lifespan.php 11705 2011-06-04 09:13:59Z greg $
 
 define('WT_SCRIPT_NAME', 'lifespan.php');
 require './includes/session.php';
@@ -38,7 +38,7 @@ $controller->init();
 $zoomfactor = 10;
 //if peeps !null then pass new array for zooming
 
-print_header(WT_I18N::translate('Lifespan chart'));
+print_header(WT_I18N::translate('Lifespans'));
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 ?>
@@ -51,7 +51,7 @@ if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 	//-->
 	</script>
 
-<h2><?php echo WT_I18N::translate('Lifespan chart'), help_link('lifespan_chart'); ?></h2>
+<h2><?php echo WT_I18N::translate('Lifespans'), help_link('lifespan_chart'); ?></h2>
 <table><tr><td>
 <form name="people" action="lifespan.php">
 
@@ -61,7 +61,7 @@ if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 		?>
 	<table>
 		<tr><td class="person<?php echo $col; ?>" style="padding: 5px" valign="top">
-			<?php echo WT_I18N::translate('Add another person to the chart'), '<br />', WT_I18N::translate('Person ID'); ?>
+			<?php echo WT_I18N::translate('Add another person to the chart'), '<br/>'; ?>
 			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid" />
 			<?php print_findindi_link("newpid",""); ?>
 			<br />
@@ -70,7 +70,7 @@ if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 			<div style="text-align: center"><input type="submit" value="<?php echo WT_I18N::translate('Add'); ?>" /></div>
 		</td></tr>
 	</table>
-	<?php if (count($controller->pids)<11) { ?><br /><a href="timeline.php"><b><?php echo WT_I18N::translate('Show Timeline chart'); ?></b></a><br /><br /><?php } ?>
+	<?php if (count($controller->pids)<11) { ?><br /><a href="timeline.php"><b><?php echo WT_I18N::translate('Show timeline'); ?></b></a><br /><br /><?php } ?>
 
 </form>
 <script type="text/javascript">

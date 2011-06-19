@@ -24,7 +24,7 @@
 *
 * @package webtrees
 * @subpackage Lists
-* @version $Id: branches.php 11115 2011-03-13 14:03:32Z lukasz $
+* @version $Id: branches.php 11669 2011-05-31 23:31:55Z greg $
 */
 
 define('WT_SCRIPT_NAME', 'branches.php');
@@ -140,7 +140,7 @@ function print_fams($person, $famid=null) {
 	}
 	$current = $person->getSexImage().
 		'<a target="_blank" class="'.$class.'" title="'.WT_I18N::translate('View Person').'" href="'.$person->getHtmlUrl().'">'.PrintReady($person_name).'</a> '.
-		$person->getBirthDeathYears().' '.$sosa;
+		$person->getLifeSpan().' '.$sosa;
 	if ($famid && $person->getChildFamilyPedigree($famid)) {
 		$sex = $person->getSex();
 		$famcrec = get_sub_record(1, '1 FAMC @'.$famid.'@', $person->getGedcomRecord());
@@ -181,14 +181,14 @@ function print_fams($person, $famid=null) {
 				}
 				//How can we use check_NN($names) or something else to replace the unknown unknown name from the page language to the language of the spouse's name?
 				else if ($name['fullNN']=='@P.N. @N.N.') {
-					$spouse_name = $UNKNOWN_NN[$person_script].', '.$UNKNOWN_NN[$person_script];
+					$spouse_name = $UNKNOWN_NN.', '.$UNKNOWN_NN;
 					break;
 				}
 			}
 			list($surn2, $givn2) = explode(', ', $spouse_name.', x');
 			$txt .= $spouse->getSexImage().
 				'<a class="'.$class.'" title="'.WT_I18N::translate('View Person').'" href="'.$spouse->getHtmlUrl().'">'.PrintReady($givn2).' </a>'.
-				'<a class="'.$class.'" title="'.WT_I18N::translate('Branches').'" href="'.WT_SCRIPT_NAME.'?surn='.urlencode($spouse_surname).'&amp;ged='.WT_GEDURL.'">'.PrintReady($surn2).'</a> '.$spouse->getBirthDeathYears().' '.$sosa2;
+				'<a class="'.$class.'" title="'.WT_I18N::translate('Branches').'" href="'.WT_SCRIPT_NAME.'?surn='.urlencode($spouse_surname).'&amp;ged='.WT_GEDURL.'">'.PrintReady($surn2).'</a> '.$spouse->getLifeSpan().' '.$sosa2;
 		}
 		echo $txt;
 		echo '<ol>';

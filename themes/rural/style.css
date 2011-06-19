@@ -108,7 +108,6 @@ img.block,#calendar_img,#biglink img, #mycart img {
 }
 
 .optionbox a img {
-	vertical-align: top;
 }
 
 .button {
@@ -304,7 +303,7 @@ table.center {
 
  
 .facts_table, .facts_table_rtl {
-	width: 98%;
+	width: 100%;
 	font-size:10px;
 }
 
@@ -517,12 +516,11 @@ table.center {
 }
 
 .indent {
-	padding-left: 7px;
-	/*	position: absolute;*/
+	padding-left:20px;
 }
 
 .indent_rtl {
-	padding-right: 7px;
+	padding-right:20px;
 }
 
 .image {
@@ -1471,24 +1469,6 @@ a.showit:hover span {
 }
 /* End of Autocomplete styles*/
 
-/* Flyout menu Styles */
-.flyout {
-	color: #000000;
-	text-align: left;
-	margin-top: -20px;
-	right: 210px;
-	padding: 3px;
-}
-
-.flyoutrtl {
-	color: #000000;
-	text-align: right;
-	margin-top: -20px;
-	left: 210px;
-	padding: 3px;
-}
-
-/* End of Flyout Menu styles*/
 @media print {
 	#backprint {
 		display: none;
@@ -1581,137 +1561,6 @@ dd {
 
 .clearfloat {
 	clear: both;
-}
-
-/* Classes for the INDI page header */
-#indi_header h1 {
-	font: bold 16px tahoma, arial, helvetica, sans-serif;
-	letter-spacing: .3px;
-	padding: 0 .5em;
-	margin: 0.25em 0 0 0;
-}
-
-#indi_header a {
-	color: #62584D;;
-	font-size: .75em;
-	font-weight: normal;
-}
-
-#indi_header a:hover {
-	color: #9F8C77;
-}
-
-#indi_mainimage {
-	margin-right: 15px;
-	vertical-align: top;
-	float: left;
-}
-
-#indi_name_details {
-	vertical-align: top;
-	float: left;
-	margin: 10px 0 0 0;
-	width: 85%;
-}
-
-#indi_name_details a {
-	color: #333377;
-}
-
-#indi_name_details dt:after {
-	content: ":";
-}
-
-#indi_note {
-	margin: 0 0 5px 0;
-}
-
-#nameparts1 {
-	float: left;
-	margin-right: 20px;
-	max-width: 50%;
-}
-
-#nameparts2,#nameparts3,#nameparts4,#nameparts5,#nameparts6 {
-	clear: left;
-}
-
-#name1 {
-	line-height: 1.6;
-	padding-bottom: 2px;
-}
-
-#indi_facts {
-	float: left;
-	padding: 0 15px 0 0;
-	width: 45%;
-}
-
-#sex {
-	margin-top: 3px;
-}
-
-#hitcounter {
-	display: block;
-	margin-bottom: 10px;
-	padding-left: 10px;
-}
-
-/* =================================== */
-	/* tables for Module Admin tab */
-table.tablesorter {
-	background-color: #E0E0E0;
-	margin: 5px 0pt 15px;
-	width: 100%;
-	text-align: left;
-}
-
-table.tablesorter thead tr th,table.tablesorter tfoot tr th {
-	background-color: #E7EEF3;
-	border: 1px solid #FFF;
-	padding: 4px;
-}
-
-table.tablesorter thead tr .header {
-	background-image: url(images/jquery/bg.gif);
-	background-repeat: no-repeat;
-	background-position: center right;
-	padding-right: 20px;
-	white-space: nowrap;
-	cursor: pointer;
-}
-
-table.tablesorter tbody td {
-	color: #3D3D3D;
-	padding: 4px;
-	vertical-align: top;
-}
-
-table.tablesorter tbody tr.odd td {
-	background-color: #E7EEF3;
-}
-
-table.tablesorter thead tr .headerSortUp {
-	background-image: url(images/jquery/asc.gif);
-}
-
-table.tablesorter thead tr .headerSortDown {
-	background-image: url(images/jquery/desc.gif);
-}
-
-table.tablesorter thead tr .headerSortDown,table.tablesorter thead tr .headerSortUp
-	{
-	background-color: #8dbdd8;
-}
-
-div.pager {
-	margin-top: -20px;
-	text-align: left;
-}
-
-div.pager input {
-	width: 50px;
-	text-align: center;
 }
 
 /* styles for FindFacts pop-up */
@@ -1812,12 +1661,8 @@ div.faq_body {
 	font-size: 90%;
 	padding: 0 10px;
 }
-
-/**
-	Top Menu
 	
-	*/
-	
+/* ======= Main menu items ========== */
 	
 #topMenu {
         width: 100%;
@@ -1831,7 +1676,7 @@ div.faq_body {
         background: url(images/menu_bg_center.png) repeat-x;
         margin-left: 37px;
         margin-right: 37px;
-        height: 100%;
+        height: 74px;
 }
 
 .topMenu_left
@@ -1852,129 +1697,232 @@ div.faq_body {
         float: right;
 }
 
+#main-menu  { 	width: 100%; font-size: 10px; font-weight: bold; text-decoration: none; text-align: center; color: #62584D;}
+#main-menu td{ text-align: center;height: 74px;width:1%;background: url(images/divider.png) no-repeat right; margin: auto;}
+#main-menu .topmenu_last{ background: none;}
 
-.menu {
-	width: 100%;
-	font-size: 10px;
-	font-weight: bold;
-	text-decoration: none;
-	text-align: center;
-}
+.main-menu-item,
+.main-menu-item   ul  {padding:0; margin:0; list-style-type:none;}
+.main-menu-item   ul ul {z-index:600;}
+.main-menu-item  li  {position:relative;}
+.main-menu-item li li { clear:both;}
+.main-menu-item   li ul { background-color: #e9e2db; }
+.main-menu-item   li:hover > ul {display:block; position:absolute; top:0; left:100%; right:auto;}
+.main-menu-item > li:hover > ul {left:10px; right:auto; top:55px;}
+.main-menu-item   a {display:block; white-space:nowrap; overflow:hidden; color: #62584D;}
+.main-menu-item  ul {position:absolute; display:none; background:#ffffff; border:solid #d3c6b8 thin; padding:0; z-index:999;}
+.main-menu-item li a {margin:auto; padding-top:40px; width:100%; color: #62584D;}
+.main-menu-item > li > a { height: 20px; }
+.main-menu-item  li li a {display:block; position:relative; float:left; line-height:1.5; padding:3px 10px 1px 5px;vertical-align: middle;}
+.main-menu-item  li li:hover {background-color: #f4f0ed;}
 
-.menu .icon {
-	height: 35px;
-	width: 35px;
-}
+/* Menu icons */
+.main-menu-item > li {margin-top: 5px; background-image:url(images/large_menu_sprite.png); background-repeat:no-repeat; height:40px; text-align:center;}
+.main-menu-item li li {background-image:url(images/small_menu_sprite.png); background-repeat:no-repeat; height:24px; left:auto; line-height:24px; text-align:left; text-indent:26px; width:100%;}
 
-.menu td{
-	text-align: center;
-	height: 74px;
-	width: 1%;
-	background: url(images/divider.png) no-repeat right;
-}
+/* Separators */
+.main-menu-item li.separator {background: url(images/hline.png) repeat-x; display:block; height:3px; width:100%;}
 
-.menu .topmenu_last{
-	background: none;
-}
+/* Reverse left and right on RTL pages */
+html[dir='rtl'] .main-menu-item {float:right;}
+html[dir='rtl'] .main-menu-item li {float:right;}
+html[dir='rtl'] .main-menu-item   li:hover > ul {right:100%; left:auto;}
+html[dir='rtl'] .main-menu-item > li:hover > ul {left:auto; right:0;}
+html[dir='rtl'] .main-menu-item   li  li {text-align:right;}
+html[dir='rtl'] .main-menu-item  li li a {float:right;padding:1px 5px 1px 10px;}
+
+/* Main menu icons */
+#menu-calendar  {background-position:center -200px;}
+#menu-chart     {background-position:center  -80px;}
+#menu-clippings {background-position:center -320px;}
+#menu-fam       {background-position:center -440px;}
+#menu-help      {background-position:center -280px;}
+#menu-indi      {background-position:center -360px;}
+#menu-list      {background-position:center -120px;}
+#menu-mymenu    {background-position:center  -40px;}
+#menu-note      {background-position:center -520px;}
+#menu-obje      {background-position:center -480px;}
+#menu-repo      {background-position:center -560px;}
+#menu-report    {background-position:center -160px;}
+#menu-search    {background-position:center -240px;}
+#menu-sour      {background-position:center -400px;}
+#menu-tree      {background-position:center    0px;}
+
+/* Sub-menu icons */
+#menu-admin                 {background-position:left     0px;} html[dir=rtl] #menu-admin                 {background-position:right     0px;}
+#menu-branches              {background-position:left  -450px;} html[dir=rtl] #menu-branches              {background-position:right  -450px;}
+#menu-calendar-day          {background-position:left   -60px;} html[dir=rtl] #menu-calendar-day          {background-position:right   -60px;}
+#menu-calendar-month        {background-position:left   -60px;} html[dir=rtl] #menu-calendar-month        {background-position:right   -60px;}
+#menu-calendar-year         {background-position:left   -60px;} html[dir=rtl] #menu-calendar-year         {background-position:right   -60px;}
+#menu-chart-ancestry        {background-position:left   -30px;} html[dir=rtl] #menu-chart-ancestry        {background-position:right   -30px;}
+#menu-chart-compact         {background-position:left   -30px;} html[dir=rtl] #menu-chart-compact         {background-position:right   -30px;}
+#menu-chart-descendancy     {background-position:left  -150px;} html[dir=rtl] #menu-chart-descendancy     {background-position:right  -150px;}
+#menu-chart-familybook      {background-position:left  -180px;} html[dir=rtl] #menu-chart-familybook      {background-position:right  -180px;}
+#menu-chart-fanchart        {background-position:left  -210px;} html[dir=rtl] #menu-chart-fanchart        {background-position:right  -210px;}
+#menu-chart-hourglass       {background-position:left  -270px;} html[dir=rtl] #menu-chart-hourglass       {background-position:right  -270px;}
+#menu-chart-lifespan        {background-position:left  -660px;} html[dir=rtl] #menu-chart-lifespan        {background-position:right  -660px;}
+#menu-chart-pedigree        {background-position:left  -480px;} html[dir=rtl] #menu-chart-pedigree        {background-position:right  -480px;}
+#menu-chart-pedigree_map    {background-position:left  -720px;} html[dir=rtl] #menu-chart-pedigree_map    {background-position:right  -720px;}
+#menu-chart-relationship    {background-position:left  -540px;} html[dir=rtl] #menu-chart-relationship    {background-position:right  -540px;}
+#menu-chart-relationship li {background-position:left  -540px;} html[dir=rtl] #menu-chart-relationship li {background-position:right  -540px;}
+#menu-chart-statistics      {background-position:left  -630px;} html[dir=rtl] #menu-chart-statistics      {background-position:right  -630px;}
+#menu-chart-timeline        {background-position:left  -660px;} html[dir=rtl] #menu-chart-timeline        {background-position:right  -660px;}
+#menu-chart-timeline li     {background-position:left  -660px;} html[dir=rtl] #menu-chart-timeline li     {background-position:right  -660px;}
+#menu-chart-tree            {background-position:left  -240px;} html[dir=rtl] #menu-chart-tree            {background-position:right  -240px;}
+#menu-clippingsadd          {background-position:left  -930px;} html[dir=rtl] #menu-clippingsadd          {background-position:right  -930px;}
+#menu-clippingscart         {background-position:left  -900px;} html[dir=rtl] #menu-clippingscart         {background-position:right  -900px;}
+#menu-fam-addchil           {background-position:left -1050px;} html[dir=rtl] #menu-fam-addchil           {background-position:right -1050px;}
+#menu-fam-addfav            {background-position:left  -870px;} html[dir=rtl] #menu-fam-addfav            {background-position:right  -870px;}
+#menu-fam-change            {background-position:left   -90px;} html[dir=rtl] #menu-fam-change            {background-position:right   -90px;}
+#menu-fam-del               {background-position:left  -840px;} html[dir=rtl] #menu-fam-del               {background-position:right  -840px;}
+#menu-fam-editraw           {background-position:left  -240px;} html[dir=rtl] #menu-fam-editraw           {background-position:right  -240px;}
+#menu-fam-hidechan          {background-position:left  -750px;} html[dir=rtl] #menu-fam-hidechan          {background-position:right  -750px;}
+#menu-fam-orderchil         {background-position:left -1080px;} html[dir=rtl] #menu-fam-orderchil         {background-position:right -1080px;}
+#menu-fam-showchan          {background-position:left  -750px;} html[dir=rtl] #menu-fam-showchan          {background-position:right  -750px;}
+#menu-fam-undochan          {background-position:left  -750px;} html[dir=rtl] #menu-fam-undochan          {background-position:right  -750px;}
+#menu-help-contents         {background-position:left  -300px;} html[dir=rtl] #menu-help-contents         {background-position:right  -300px;}
+#menu-help-genealogy        {background-position:left  -120px;} html[dir=rtl] #menu-help-genealogy        {background-position:right  -120px;}
+#menu-help-hide             {background-position:left  -300px;} html[dir=rtl] #menu-help-hide             {background-position:right  -330px;}
+#menu-help-show             {background-position:left  -300px;} html[dir=rtl] #menu-help-show             {background-position:right  -330px;}
+#menu-help-technical        {background-position:left  -120px;} html[dir=rtl] #menu-help-technical        {background-position:right  -120px;}
+#menu-help-wiki             {background-position:left  -690px;} html[dir=rtl] #menu-help-wiki             {background-position:right  -690px;}
+#menu-indi-addfav           {background-position:left  -870px;} html[dir=rtl] #menu-indi-addfav           {background-position:right  -870px;}
+#menu-indi-addname          {background-position:left  -780px;} html[dir=rtl] #menu-indi-addname          {background-position:right  -780px;}
+#menu-indi-del              {background-position:left  -840px;} html[dir=rtl] #menu-indi-del              {background-position:right  -840px;}
+#menu-indi-editname         {background-position:left  -750px;} html[dir=rtl] #menu-indi-editname         {background-position:right  -750px;}
+#menu-indi-editraw          {background-position:left  -240px;} html[dir=rtl] #menu-indi-editraw          {background-position:right  -240px;}
+#menu-indi-editsex          {background-position:left  -810px;} html[dir=rtl] #menu-indi-editsex          {background-position:right  -810px;}
+#menu-indi-hidechan         {background-position:left  -750px;} html[dir=rtl] #menu-indi-hidechan         {background-position:right  -750px;}
+#menu-indi-showchan         {background-position:left  -750px;} html[dir=rtl] #menu-indi-showchan         {background-position:right  -750px;}
+#menu-indi-undochan         {background-position:left  -750px;} html[dir=rtl] #menu-indi-undochan         {background-position:right  -750px;}
+#menu-list-fam              {background-position:left   -90px;} html[dir=rtl] #menu-list-fam              {background-position:right   -90px;}
+#menu-list-indi             {background-position:left  -120px;} html[dir=rtl] #menu-list-indi             {background-position:right  -120px;}
+#menu-list-note             {background-position:left  -420px;} html[dir=rtl] #menu-list-note             {background-position:right  -420px;}
+#menu-list-obje             {background-position:left  -330px;} html[dir=rtl] #menu-list-obje             {background-position:right  -330px;}
+#menu-list-plac             {background-position:left  -510px;} html[dir=rtl] #menu-list-plac             {background-position:right  -510px;}
+#menu-list-repo             {background-position:left  -360px;} html[dir=rtl] #menu-list-repo             {background-position:right  -360px;}
+#menu-list-sour             {background-position:left  -180px;} html[dir=rtl] #menu-list-sour             {background-position:right  -180px;}
+#menu-myaccount             {background-position:left  -390px;} html[dir=rtl] #menu-myaccount             {background-position:right  -390px;}
+#menu-mypage                {background-position:left  -390px;} html[dir=rtl] #menu-mypage                {background-position:right  -390px;}
+#menu-mypedigree            {background-position:left  -480px;} html[dir=rtl] #menu-mypedigree            {background-position:right  -480px;}
+#menu-myrecord              {background-position:left  -120px;} html[dir=rtl] #menu-myrecord              {background-position:right  -120px;}
+#menu-note-addfav           {background-position:left  -870px;} html[dir=rtl] #menu-note-addfav           {background-position:right  -870px;}
+#menu-note-del              {background-position:left  -840px;} html[dir=rtl] #menu-note-del              {background-position:right  -840px;}
+#menu-note-edit             {background-position:left -1020px;} html[dir=rtl] #menu-note-edit             {background-position:right -1020px;}
+#menu-note-editraw          {background-position:left  -240px;} html[dir=rtl] #menu-note-editraw          {background-position:right  -240px;}
+#menu-note-hidechan         {background-position:left -1020px;} html[dir=rtl] #menu-note-hidechan         {background-position:right -1020px;}
+#menu-note-savechan         {background-position:left -1020px;} html[dir=rtl] #menu-note-savechan         {background-position:right -1020px;}
+#menu-note-undochan         {background-position:left -1020px;} html[dir=rtl] #menu-note-undochan         {background-position:right -1020px;}
+#menu-obje-addfav           {background-position:left  -870px;} html[dir=rtl] #menu-obje-addfav           {background-position:right  -870px;}
+#menu-obje-del              {background-position:left  -840px;} html[dir=rtl] #menu-obje-del              {background-position:right  -840px;}
+#menu-obje-edit             {background-position:left -1110px;} html[dir=rtl] #menu-obje-edit             {background-position:right -1110px;}
+#menu-obje-editraw          {background-position:left  -240px;} html[dir=rtl] #menu-obje-editraw          {background-position:right  -240px;}
+#menu-obje-hidechan         {background-position:left -1110px;} html[dir=rtl] #menu-obje-hidechan         {background-position:right -1110px;}
+#menu-obje-link             {background-position:left -1140px;} html[dir=rtl] #menu-obje-link             {background-position:right -1140px;}
+#menu-obje-link-fam         {background-position:left   -90px;} html[dir=rtl] #menu-obje-link-fam         {background-position:right   -90px;}
+#menu-obje-link-indi        {background-position:left  -300px;} html[dir=rtl] #menu-obje-link-indi        {background-position:right  -300px;}
+#menu-obje-link-sour        {background-position:left  -180px;} html[dir=rtl] #menu-obje-link-sour        {background-position:right  -180px;}
+#menu-obje-savechan         {background-position:left -1110px;} html[dir=rtl] #menu-obje-savechan         {background-position:right -1110px;}
+#menu-obje-undochan         {background-position:left -1110px;} html[dir=rtl] #menu-obje-undochan         {background-position:right -1110px;}
+#menu-repo-addfav           {background-position:left  -870px;} html[dir=rtl] #menu-repo-addfav           {background-position:right  -870px;}
+#menu-repo-del              {background-position:left  -840px;} html[dir=rtl] #menu-repo-del              {background-position:right  -840px;}
+#menu-repo-edit             {background-position:left  -990px;} html[dir=rtl] #menu-repo-edit             {background-position:right  -990px;}
+#menu-repo-editraw          {background-position:left  -240px;} html[dir=rtl] #menu-repo-editraw          {background-position:right  -240px;}
+#menu-repo-hidechan         {background-position:left  -990px;} html[dir=rtl] #menu-repo-hidechan         {background-position:right  -990px;}
+#menu-repo-savechan         {background-position:left  -990px;} html[dir=rtl] #menu-repo-savechan         {background-position:right  -990px;}
+#menu-repo-undochan         {background-position:left  -990px;} html[dir=rtl] #menu-repo-undochan         {background-position:right  -990px;}
+#menu-report li             {background-position:left  -570px;} html[dir=rtl] #menu-report li             {background-position:right  -570px;}
+#menu-search-advanced       {background-position:left  -600px;} html[dir=rtl] #menu-search-advanced       {background-position:right  -600px;}
+#menu-search-general        {background-position:left  -600px;} html[dir=rtl] #menu-search-general        {background-position:right  -600px;}
+#menu-search-replace        {background-position:left  -600px;} html[dir=rtl] #menu-search-replace        {background-position:right  -600px;}
+#menu-search-soundex        {background-position:left  -600px;} html[dir=rtl] #menu-search-soundex        {background-position:right  -600px;}
+#menu-sour-addfav           {background-position:left  -870px;} html[dir=rtl] #menu-sour-addfav           {background-position:right  -870px;}
+#menu-sour-del              {background-position:left  -840px;} html[dir=rtl] #menu-sour-del              {background-position:right  -840px;}
+#menu-sour-edit             {background-position:left  -960px;} html[dir=rtl] #menu-sour-edit             {background-position:right  -960px;}
+#menu-sour-editraw          {background-position:left  -240px;} html[dir=rtl] #menu-sour-editraw          {background-position:right  -240px;}
+#menu-sour-hidechan         {background-position:left  -960px;} html[dir=rtl] #menu-sour-hidechan         {background-position:right  -960px;}
+#menu-sour-savechan         {background-position:left  -960px;} html[dir=rtl] #menu-sour-savechan         {background-position:right  -960px;}
+#menu-sour-undochan         {background-position:left  -960px;} html[dir=rtl] #menu-sour-undochan         {background-position:right  -960px;}
+#menu-tree li               {background-position:left  -240px;} html[dir=rtl] #menu-tree li               {background-position:right  -240px;}
+
+/* ========= Login|Favorites|Theme|Language menu items ========== */
+.makeMenu {font-weight: bold;}
+.makeMenu li {display: inline;position: relative;white-space: nowrap;}
+.makeMenu li ul {display: none;	font-weight: normal;position: absolute;left: auto;right: 0px;top: 1.1em;background-color: #e9e2db;border: thin solid #d3c6b8;z-index: 999;}
+html[dir='rtl'] .makeMenu li ul {left: 0px;right: auto;}
+.makeMenu li ul li {padding: 2px;display: block;text-align: left;}
+#header .makeMenu li ul li a{color: #62584D;}
+#header .makeMenu li ul li:hover{background-color: #f4f0ed;white-space: nowrap;}
+
+/* ========= Positioning edit, copy, delete links ============= */
+/* General use */
+.editfacts {clear:left;	padding-top:5px;margin: 0 auto; width:72px;} /* a container for the following three links */
+#sidebar .editfacts {padding-top: 15px;}
+.editlink, .copylink, .deletelink {float:left;}
+html[dir='rtl'] .editlink, html[dir='rtl'] .copylink, html[dir='rtl'] .deletelink {float:right;}
+span.link_text  {display:none;}
+/* Indi header */
+.field  .editlink, .field  .deletelink, .field .copylink {float:right;}
+html[dir='rtl'].field  .editlink, html[dir='rtl'].field  .deletelink  {float:left;}
+/* =========== end edit, copy, delete links ==================== */
+
+/* =========== Indi header ================== */ 
+#indi_header {float:left; width:98%; margin:5px 0; padding:10px;}
+html[dir='rtl'] #indi_header {float:right;}
+#indi_header h3 {color: #62584D; font-size: 90%; font-weight:bold; margin: 0; padding: 0 10px 0 30px; text-align:left;}
+#indi_header h3 .ui-state-active {border-bottom: none;}
+html[dir='rtl'] #indi_header h3 {padding: 0 30px 0 10px; text-align:right;}
+#indi_header h3.name_one {overflow:hidden; position:relative; font-size:1.5em;font-family: tahoma, arial, helvetica, sans-serif;}
+#indi_header h3.name_two {border:1px solid #A28765;background: #D3C6B8; }
+#indi_header h3 .details1 {font-size:1.0em;}
+#indi_header h3.person_box, #indi_header h3.person_boxF , #indi_header h3.person_boxNN  {border:1px solid #A28765;background: #D3C6B8;}
+#indi_header h3 .fact_AGE {padding:5px 0 5px 5px; float:right; font-weight:normal; font-size:65%;}
+html[dir='rtl']  #indi_header h3 .fact_AGE {padding:5px 5px 5px 0; float:left;}
+#indi_header h3 .ui-icon { background-image: url("../../js/jquery/css/images/ui-icons_ffffff_256x240.png") }
+#indi_header h3 a {display:inline;}
+#indi_header a {color:#62584D; font-size:0.75em; font-weight:normal;}
+#indi_header a:hover {color:#9F8C77;}
+#main_name {color:#62584D; float:left; font-size:2em; margin:10px; font-weight:bold;}
+html[dir='rtl'] #main_name {float:right;}
+#indi_mainimage {float:left; width:15%}
+html[dir='rtl'] #indi_mainimage {float:right;}
+#indi_mainimage a img {float:left; padding:0;}
+html[dir='rtl'] #indi_mainimage a img {float:right;}
+#indi_name_details { padding: 5px;}
+#indi_name_details a {color:#62584D;}
+#indi_name_details dt:after {content:":";}
+#name1 {}
+#indi_note {margin:	0 0 5px 0;}
+html[dir='rtl'] #indi_note .fact_NOTE {float:right; margin:00 0 10px;}
+#header_accordion1 {clear:both; float:right; width:84%;}
+html[dir='rtl'] #header_accordion1 {float:left;}
+.indi_table {clear:left;}
+html[dir='rtl'] .indi_table {clear:right;}
+#sex {float:right;}
+html[dir='rtl']  #sex {float:left;}	
+#dates {color: #62584D; float:right;}
+html[dir='rtl']  #dates {	float:left;}
+dd .editlink, dd .deletelink  {float:right;}
+html[dir='rtl']  dd .editlink, html[dir='rtl']  dd .deletelink  {float:left;}
+.fact_NOTE {float:left; margin:0 5px 0 0;}
+#indi_note .note_details {font-size:100%;}
+.fact_SOUR {margin: 3px 0}
+#indi_note .fact_SOUR a {font-size:100%; margin: 3px 0}
 
 
-.menuitem, .menuitem_hover, .menuitem a,.menuitem_rtl a,.menuitem_hover a,.menuitem_hover_rtl a {
-	color: #62584D;
-	padding: 1px;
-}
+/* General sprite */
+.male_gender, .female_gender, .unknown_gender, .editicon, .copyicon, .deleteicon {display: block;background: url('images/general_sprite.png') no-repeat left 0;}
 
-.menuitem div, .menuitem_hover div{
-	margin-left: 5px;
-}
+.female_gender {background-position: -45px 3px; width: 24px;}
+.male_gender {background-position: -72px 3px; width: 24px;}
+.unknown_gender {background-position: -100px 3px; width: 24px;}
+.editicon {background-position: -40px -32px; width: 24px; height:16px;}
+.copyicon {background-position: -70px -32px; width: 24px; height:16px;}
+.deleteicon {background-position: -100px -32px; width: 24px; height:16px;}
 
-.submenu,.submenu_rtl {
-	color: black;
-	background-color: #e9e2db;
-	border: solid #d3c6b8 1px;
-	white-space: nowrap;
-	visibility: hidden;
-	position: absolute;
-	vertical-align: middle;
-}
+.icon_arrow {display: block; background: url('images/small_menu_sprite.png') no-repeat left 0;}
+.icon_arrow {background-position: 90% -1168px;} html[dir='rtl'] .icon_arrow {background-position: 10% -1186px;}
 
-.submenu .icon {
-	vertical-align: middle;
-	height: 22px;
-	width: 22px;
-}
-
-.submenuitem,.submenuitem_rtl {
-	vertical-align: middle;
-	white-space: nowrap;
-	padding: 1px;
-}
-
-.submenuitem,.submenuitem_hover {
-	vertical-align: middle;
-	text-align: left;
-}
-
-.submenuitem_rtl,.submenuitem_hover_rtl {
-	text-align: right;
-}
-
-.submenuitem a, .submenuitem_rtl a, .submenuitem_hover a, .submenuitem_hover_rtl a {
-	display: inline-block;
-	vertical-align: middle;
-}
-
-.submenuitem a,.submenuitem_rtl a {
-	color: #62584D;
-}
-
-.submenuitem_hover,.submenuitem_hover_rtl {
-	background-color: #f4f0ed;
-	white-space: nowrap;
-	padding: 1px;
-}
-
-/* Use CSS menus based on nested <ul> */
-.makeMenu {
-	font-weight: bold;
-}
-
-.makeMenu li {
-	display: inline;
-	position: relative;
-	white-space: nowrap;
-}
-
-.makeMenu li ul {
-	display: none;
-	font-weight: normal;
-	position: absolute;
-	left: auto;
-	right: 0px;
-	top: 1.1em;
-	background-color: #e9e2db;
-	border: thin solid #d3c6b8;
-	z-index: 999;
-}
-
-html[dir='rtl'] .makeMenu li ul {
-	left: 0px;
-	right: auto;
-}
-
-.makeMenu li ul li {
-	padding: 2px;
-	display: block;
-	text-align: left;
-}
-
-#header .makeMenu li ul li a{
-	color: #62584D;;
-}
-
-#header .makeMenu li ul li:hover{
-	background-color: #f4f0ed;
-	white-space: nowrap;
-}
 
 html[dir='rtl'] li up li {
 	text-align: left;
@@ -2012,51 +1960,6 @@ html[dir='rtl'] #extra-menu.makeMenu li ul {
 	right: auto;
 }
 
-/*--- edit links ---*/
-.edit_link:after { /* used only on the user list */
-	content: " " url(images/edit.png);
-}
-
-
-.editfacts { /* a container for the following three links */
-	clear: left;
-	padding-top: 15px;
-}
-
-.link_text {
-	visibility: hidden;
-}
-
-.editlink {
-	background: url(images/edit.png) no-repeat left center;
-	width: 10px;
-	display: inline;
-}
-html[dir='rtl'] .editlink {
-	background: url(images/edit.png) no-repeat right center;
-	float: right;
-}
-
-.copylink {
-	background: url(images/copy.png) no-repeat left center;
-	width: 10px;
-	display: inline;
-}
-html[dir='rtl'] .copylink {
-	background: url(images/copy.png) no-repeat right center;
-	float: right;
-}
-
-.deletelink {
-	background: url(images/delete.png) no-repeat left center;
-	width: 10px;
-	display: inline;
-}
-html[dir='rtl'] .deletelink {
-	background: url(images/delete.png) no-repeat right center;
-	float: right;
-}
-
 .place {
 	padding-top: 5px;
 }
@@ -2064,5 +1967,99 @@ html[dir='rtl'] .deletelink {
 .logo {
 	text-align: center;
 }
+
+/* ========= jquery-ui.custom.css changes ============ */
+.ui-tabs {padding:0;}
+.ui-tabs .ui-tabs-panel {padding:1em 0;}
+html[dir='rtl'] .ui-tabs {direction:rtl;}
+html[dir='rtl'] ui-tabs .ui-tabs-nav li.ui-tabs-selected, html[dir='rtl'] .ui-tabs .ui-tabs-nav li.ui-state-default {float:right;}
+.ui-accordion .ui-accordion-content {overflow:visible;}
+.ui-accordion .ui-accordion-header {text-align:center; margin-top:0;}
+.ui-accordion .ui-accordion-header a {padding: 2px;}
+.ui-helper-reset {line-height: 1.5;}
+html[dir='rtl'] .ui-accordion .ui-accordion-header .ui-icon {right: 0.5em;}
+
+.ui-widget {font-family: Verdana, Arial, Helvetica, sans-serif;}
+.ui-widget-header { background: #e9e2db; border-color: #ddd;}
+.ui-widget-content { background: #f4f0ed; color: #62584D}
+.ui-widget-content a { color: #62584D; }
+.ui-widget-content .descriptionbox a { font-weight: bold; }
+.ui-tabs-nav .ui-state-default { background: #d3c6b8; color: #62584D; }
+.ui-widget-content .ui-state-active, .ui-widget-content .ui-state-hover { border-color: #ddd;}
+.ui-widget-content a:hover 				 { color: #9F8C77; }
+.ui-tabs-nav li.ui-tabs-selected 			 { background: #f4f0ed;}
+.ui-tabs-nav li.ui-tabs-selected a	 		 { font-weight:600; color: #62584D; }
+.ui-tabs-nav li.ui-tabs-selected a:hover	 { font-weight:600; color: #62584D; }
+
+/* ========= Tabs ============== */
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+	font-family: arial,helvetica,sans-serif;
+}
+#main {min-width:600px; width:100%}
+#indi_left {float:left; width:98%;}
+html[dir='rtl'] #indi_left {float:right;}
+#tabs {background-color:#f4f0ed; border-color:#DDD; float:left; width:100%; overflow:auto;font-family: Verdana, Arial, Helvetica, sans-serif; font-size:10px}
+html[dir='rtl'] #tabs {float:right;}
+
+/* ========= Sidebar ============== */
+#sidebar {border-color:#DDD; display:none; margin:5px 2px 0 0; height:auto;}
+#sidebar .ui-icon { background-image: url("../../js/jquery/css/images/ui-icons_ffffff_256x240.png") }
+#sidebar .ui-accordion-header .ui-state-active {border-bottom: none;}
+#sidebar .ui-state-active a, #sidebar .ui-state-default a { font-family: Lucida Grande,Lucida Sans,Arial,sans-serif; color: #62584D;  font-weight: bold; }
+html[dir='rtl'] #sidebar  {margin:5px 0 0 2px;}
+.use-sidebar #indi_left {width:77%;}
+.use-sidebar #sidebar {display:block;}
+.sidebar-at-right #sidebar {	width:20%;}
+.use-sidebar.sidebar-at-right #sidebar, .sidebar-at-right #separator {float:right;}
+html[dir='rtl'] .use-sidebar.sidebar-at-right #sidebar, html[dir='rtl'] .sidebar-at-right #separator  {float:left;}
+#separator {float:right; display:block; background:#D3C6B8 url('images/general_sprite.png') no-repeat -26px 2px; width:14px; border:1px solid #A28765; -moz-border-radius-topleft:3px; -moz-border-radius-topright:3px; margin-top:5px;}
+html[dir='rtl'] #separator {float:left; background:#D3C6B8 url('images/general_sprite.png') no-repeat -1px 2px;}
+.use-sidebar #separator {background:#D3C6B8 url('images/general_sprite.png') no-repeat -1px 2px;}
+html[dir='rtl'] .use-sidebar #separator {background:#99c2ff url('images/general_sprite.png') no-repeat -26px 2px;}
+#sidebar .ui-accordion-header { border:1px solid #A28765;background: #D3C6B8; } 
+
+/* ============== Sidebar content items ============== */
+/* Family navigator */
+#sb_content_family_nav {padding:0;}
+#sb_family_nav_content {}
+.nav_content {width:100%; padding:0;}
+.flyout {color:#000000; 	text-align:left; margin-top:-20px; right:210px; padding:3px;}
+html[dir='rtl'] .flyout {text-align:right; left:210px;}
+.flyout2 {color:#000000;	text-align:left;margin-top:-2px; left:40px; padding:3px;}
+html[dir='rtl'] .flyout2 {text-align:right; right:40px;}
+.flyout4 {color:#000000;	text-align:left; margin-top:0px;margin-left:0px; padding:3px;}
+#flyout3, #flyout3 a, #phusb, #pwife, #shusb, #swife, #spouse {background:none; border:none; text-decoration:none; text-align:left; margin-top:0px; left:0px; padding:0px;}
+html[dir='rtl'] #flyout3 {text-align:right;}
+.flyout, .flyout2, .flyout3{  background-color: #E9E2DB; border: 1px solid #D3C6B8; }
+
+/* Descendancy */
+#sb_content_descendancy {}
+#sb_desc_content {margin-left:3px; font-size:0.8em;}
+html[dir='rtl'] #sb_desc_content {margin-right:3px;}
+#sb_desc_content ul {padding:0px; margin:0px;}
+.sb_desc_indi_li {list-style-type:none;	white-space:nowrap;}
+.desc_tree_div {	display:none;}
+.desc_tree_div ul {padding:0px;	margin-left:10px;margin-top:0px;margin-right:0px;}
+html[dir='rtl'] .desc_tree_div ul {margin-right:10px;margin-left:0px;}
+
+/* Individuals, Families */
+#sb_content_individuals, #sb_content_families {}
+.sb_indi_surname_li, .sb_fam_surname_li {list-style-image:url('images/plus.png'); white-space:nowrap;}
+.name_tree_div {	display:none;}
+.name_tree_div ul, .name_tree_div_visible ul {padding:0px;margin:0px;}
+.name_tree_div li, .name_tree_div_visible li {list-style:none; margin:0px; padding:0px; white-space:normal;}
+
+/* Clippings */
+#sb_content_clippings {}
+#sb_clippings_content ul {padding:0px; margin:0px;}
+#sb_clippings_content li {list-style:none; margin:0px; padding:0px; white-space:nowrap;}
+
+/* References */
+#sb_content_extra_info {font-size:80%; font-weight:bold; padding:5px;}
+#sb_content_extra_info .editfacts {float:right; margin-top:-30px;}
+html[dir='rtl'] #sb_content_extra_info .editfacts {float:left;}
+#sb_content_extra_info a {display:block;}
+#sb_content_extra_info span {font-weight:normal;}
+#sb_content_extra_info #hitcounter {border-top: 1px solid #B2C7D7; font-weight: bold; padding-top: 5px;}
 
 

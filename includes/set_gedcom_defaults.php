@@ -21,7 +21,7 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
-* @version $Id: set_gedcom_defaults.php 11272 2011-04-04 16:45:14Z lukasz $
+* @version $Id: set_gedcom_defaults.php 11572 2011-05-22 20:32:28Z greg $
 */
 
 if (!defined('WT_WEBTREES') || empty($ged_id) || empty($ged_name)) {
@@ -50,8 +50,6 @@ set_gedcom_setting($ged_id, 'COMMON_NAMES_REMOVE',          '');
 set_gedcom_setting($ged_id, 'COMMON_NAMES_THRESHOLD',       '40');
 set_gedcom_setting($ged_id, 'CONTACT_USER_ID',              WT_USER_ID);
 set_gedcom_setting($ged_id, 'DEFAULT_PEDIGREE_GENERATIONS', '4');
-set_gedcom_setting($ged_id, 'DISPLAY_JEWISH_GERESHAYIM',    true);
-set_gedcom_setting($ged_id, 'DISPLAY_JEWISH_THOUSANDS',     false);
 set_gedcom_setting($ged_id, 'ENABLE_AUTOCOMPLETE',          true);
 set_gedcom_setting($ged_id, 'EXPAND_NOTES',                 false);
 set_gedcom_setting($ged_id, 'EXPAND_RELATIVES_EVENTS',      false);
@@ -105,7 +103,6 @@ set_gedcom_setting($ged_id, 'REPO_ID_PREFIX',               'R');
 set_gedcom_setting($ged_id, 'REQUIRE_AUTHENTICATION',       false);
 set_gedcom_setting($ged_id, 'SAVE_WATERMARK_IMAGE',         false);
 set_gedcom_setting($ged_id, 'SAVE_WATERMARK_THUMB',         false);
-set_gedcom_setting($ged_id, 'SEARCH_FACTS_DEFAULT',         'NAME:GIVN:SDX,NAME:SURN:SDX,BIRT:DATE,BIRT:PLAC,FAMS:MARR:DATE,FAMS:MARR:PLAC,DEAT:DATE,DEAT:PLAC');
 set_gedcom_setting($ged_id, 'SHOW_AGE_DIFF',                false);
 set_gedcom_setting($ged_id, 'SHOW_CONTEXT_HELP',            true);
 set_gedcom_setting($ged_id, 'SHOW_COUNTER',                 true);
@@ -125,7 +122,7 @@ set_gedcom_setting($ged_id, 'SHOW_MEDIA_FILENAME',          false);
 set_gedcom_setting($ged_id, 'SHOW_NO_WATERMARK',            WT_PRIV_USER);
 set_gedcom_setting($ged_id, 'SHOW_PARENTS_AGE',             true);
 set_gedcom_setting($ged_id, 'SHOW_PEDIGREE_PLACES',         '9');
-set_gedcom_setting($ged_id, 'SHOW_PRIVATE_RELATIONSHIPS',   false);
+set_gedcom_setting($ged_id, 'SHOW_PRIVATE_RELATIONSHIPS',   true);
 set_gedcom_setting($ged_id, 'SHOW_REGISTER_CAUTION',        true);
 set_gedcom_setting($ged_id, 'SHOW_RELATIVES_EVENTS',        '_BIRT_CHIL,_BIRT_SIBL,_MARR_CHIL,_MARR_PARE,_DEAT_CHIL,_DEAT_PARE,_DEAT_GPAR,_DEAT_SIBL,_DEAT_SPOU');
 set_gedcom_setting($ged_id, 'SHOW_STATS',                   false);

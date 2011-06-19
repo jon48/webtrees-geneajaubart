@@ -5,7 +5,7 @@
 * ($rootid=1, father=2, mother=3 ...)
 *
 * webtrees: Web based Family History software
-* Copyright (C) 2010 webtrees development team.
+* Copyright (C) 2011 webtrees development team.
 *
 * Derived from PhpGedView
 * Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -26,7 +26,7 @@
 *
 * @package webtrees
 * @subpackage Charts
-* @version $Id: ancestry.php 10869 2011-02-18 16:00:33Z greg $
+* @version $Id: ancestry.php 11474 2011-05-06 17:21:11Z lukasz $
 */
 
 define('WT_SCRIPT_NAME', 'ancestry.php');
@@ -49,7 +49,7 @@ $nonfamfacts[] = "";
 $controller=new WT_Controller_Ancestry();
 $controller->init();
 
-print_header($controller->name . " " . WT_I18N::translate('Ancestry chart'));
+print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Ancestors of %s', $controller->name));
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
@@ -60,12 +60,7 @@ if (WT_USE_LIGHTBOX) {
 }
 
 echo '<table><tr><td valign="middle">';
-echo '<h2>', WT_I18N::translate('Ancestry chart'), help_link('ancestry_chart');
-echo '<br />', PrintReady($controller->name);
-if ($controller->addname!="") {
-	echo '<br />', PrintReady($controller->addname);
-}
-echo '</h2>';
+echo '<h2>', WT_I18N::translate('Ancestors of %s', $controller->name), help_link('ancestry_chart'), '</h2>';
 // -- print the form to change the number of displayed generations
 echo WT_JS_START, 'var pastefield; function paste_id(value) {pastefield.value=value;}', WT_JS_END;
 ?>
@@ -119,7 +114,7 @@ if ($controller->show_cousins) {
 	echo '0" onclick="document.people.show_cousins.value=\'1\';"';
 }
 echo ' />';
-echo WT_I18N::translate('Show cousins'), help_link('show_cousins');
+echo WT_I18N::translate('Show cousins');
 
 echo '<br /><input type="radio" name="chart_style" value="2"';
 if ($controller->chart_style=="2") {
@@ -224,7 +219,7 @@ case 2:
 	// Individual list
 	$treeid=ancestry_array($controller->rootid, $PEDIGREE_GENERATIONS);
 	echo '<div class="center">';
-	print_indi_table($treeid, WT_I18N::translate('Ancestry chart').' : '.PrintReady($controller->name), 'sosa');
+	print_indi_table($treeid, WT_I18N::translate('Ancestors of %s', $controller->name), 'sosa');
 	echo '</div>';
 	break;
 case 3:
@@ -241,7 +236,7 @@ case 3:
 		}
 	}
 	echo '<div class="center">';
-	print_fam_table($famlist, WT_I18N::translate('Ancestry chart').' : '.PrintReady($controller->name));
+	print_fam_table($famlist, WT_I18N::translate('Ancestors of %s', $controller->name));
 	echo '</div>';
 	break;
 }

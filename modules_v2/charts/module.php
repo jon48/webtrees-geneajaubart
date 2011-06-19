@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11114 2011-03-13 13:36:10Z greg $
+// @version $Id: module.php 11421 2011-05-01 05:52:17Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -89,10 +89,10 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 		if ($person) {
 			switch($type) {
 				case 'pedigree':
-					$title .= WT_I18N::translate('Pedigree tree of %s', $person->getFullName());
+					$title .= WT_I18N::translate('Pedigree of %s', $person->getFullName());
 					break;
 				case 'descendants':
-					$title .= WT_I18N::translate('Descendancy chart of %s', $person->getFullName());
+					$title .= WT_I18N::translate('Descendants of %s', $person->getFullName());
 					break;
 				case 'hourglass':
 					$title .= WT_I18N::translate('Hourglass chart of %s', $person->getFullName());
@@ -200,8 +200,8 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 		<tr><td class="descriptionbox wrap width33"><?php echo WT_I18N::translate('Chart type'); ?></td>
 		<td class="optionbox">
 			<select name="type">
-				<option value="pedigree"<?php if ($type=="pedigree") echo " selected=\"selected\""; ?>><?php echo WT_I18N::translate('Pedigree Tree'); ?></option>
-				<option value="descendants"<?php if ($type=="descendants") echo " selected=\"selected\""; ?>><?php echo WT_I18N::translate('Descendancy chart'); ?></option>
+				<option value="pedigree"<?php if ($type=="pedigree") echo " selected=\"selected\""; ?>><?php echo WT_I18N::translate('Pedigree'); ?></option>
+				<option value="descendants"<?php if ($type=="descendants") echo " selected=\"selected\""; ?>><?php echo WT_I18N::translate('Descendants'); ?></option>
 				<option value="hourglass"<?php if ($type=="hourglass") echo " selected=\"selected\""; ?>><?php echo WT_I18N::translate('Hourglass chart'); ?></option>
 				<option value="treenav"<?php if ($type=="treenav") echo " selected=\"selected\""; ?>><?php echo WT_I18N::translate('Interactive tree'); ?></option>
 			</select>

@@ -32,7 +32,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // @author Greg Roach
-// @version $Id: Date.php 10873 2011-02-18 22:37:23Z greg $
+// @version $Id: Date.php 11689 2011-06-02 10:20:27Z veit $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');

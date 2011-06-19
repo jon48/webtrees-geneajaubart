@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: statistics.php 11221 2011-03-27 19:53:00Z lukasz $
+// $Id: statistics.php 11708 2011-06-04 09:59:27Z greg $
 
 define('WT_SCRIPT_NAME', 'statistics.php');
 require './includes/session.php';
@@ -48,7 +48,7 @@ if (isset($content) && $content==1) {
 	if ($tab==0) { ?>
 		<div id="pagetab0">
 		<fieldset>
-			<legend><?php echo WT_I18N::translate('Total individuals'), ': ', $stats->totalIndividuals(); ?></legend>
+			<legend><?php echo WT_I18N::translate('Total individuals: %s', $stats->totalIndividuals()); ?></legend>
 				<table class="facts_table">
 					<tr>
 						<td class="facts_label"><?php echo WT_I18N::translate('Total males'); ?></td>
@@ -177,7 +177,7 @@ if (isset($content) && $content==1) {
 	if ($tab==1) { ?>
 		<div id="pagetab1">
 		<fieldset>
-			<legend><?php echo WT_I18N::translate('Total families'), ': ', $stats->totalFamilies(); ?></legend>
+			<legend><?php echo WT_I18N::translate('Total families: %s', $stats->totalFamilies()); ?></legend>
 				<b><?php echo WT_I18N::translate('Events'); ?></b>
 				<table class="facts_table">
 					<tr>
@@ -357,7 +357,7 @@ if (isset($content) && $content==1) {
 				<legend><?php echo WT_I18N::translate('Media objects'), ': ', $stats->totalMedia(); ?></legend>
 				<table class="facts_table">
 				<tr>
-					<td class="facts_label"><?php echo WT_I18N::translate('Media'); ?></td>
+					<td class="facts_label"><?php echo WT_I18N::translate('Media objects'); ?></td>
 				</tr>
 				<tr>
 					<td class="facts_value statistics_chart"><?php echo $stats->chartMedia(); ?></td>
@@ -510,10 +510,7 @@ if (isset($content) && $content==1) {
 
 		?>
 			<tr>
-				<td class="descriptionbox" colspan="4"><?php echo WT_I18N::translate('Fill in the following parameters for the plot'), help_link('stat'); ?></td>
-			</tr>
-			<tr>
-			<td class="descriptionbox width25 wrap"><?php echo WT_I18N::translate('Select chart type:'), help_link('stat_x'); ?></td>
+			<td class="descriptionbox width25 wrap"><?php echo WT_I18N::translate('Select chart type:'); ?></td>
 			<td class="optionbox">
 			<input type="radio" id="stat_11" name="x-as" value="11"
 			<?php
@@ -655,7 +652,7 @@ if (isset($content) && $content==1) {
 			</select>
 			</div>
 			</td>
-			<td class="descriptionbox width20 wrap" id="axes"><?php echo WT_I18N::translate('Categories:'), help_link('stat_z'); ?></td>
+			<td class="descriptionbox width20 wrap" id="axes"><?php echo WT_I18N::translate('Categories:'); ?></td>
 			<td class="optionbox width30" id="zyaxes">
 			<input type="radio" id="z_none" name="z-as" value="300"
 			<?php
@@ -690,7 +687,7 @@ if (isset($content) && $content==1) {
 			</select>
 			<br /><br />
 			<?php
-			echo WT_I18N::translate('results:'), help_link('stat_y'), '<br />';
+			echo WT_I18N::translate('results:'), '<br />';
 			?>
 			<input type="radio" id="y_num" name="y-as" value="201"
 			<?php

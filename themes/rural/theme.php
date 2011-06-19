@@ -101,6 +101,11 @@ $WT_IMAGES=array(
 	'tree'=>WT_THEME_DIR.'images/tree.png',
 	'warning'=>WT_THEME_DIR.'images/warning.png',
 	'wiki'=>WT_THEME_DIR.'images/w_22.png',
+	'itree'=>WT_THEME_DIR.'images/tree.png',
+	// - Interactive Chart Icons
+	'fscreen'=>WT_THEME_DIR.'images/fscreen.gif',
+	'center'=>WT_THEME_DIR.'images/center.gif',
+	'itree'=>WT_THEME_DIR.'images/tree.png',
 
 	//- buttons for data entry pages
 	'button_addmedia'=>WT_THEME_DIR.'images/buttons/addmedia.png',
@@ -161,13 +166,9 @@ $WT_IMAGES=array(
 	'zoomin'=>WT_THEME_DIR.'images/zoomin.png',
 	'zoomout'=>WT_THEME_DIR.'images/zoomout.png',
 	'stop'=>WT_THEME_DIR.'images/stop.png',
-	'pin-out'=>WT_THEME_DIR.'images/pin-out.png',
-	'pin-in'=>WT_THEME_DIR.'images/pin-in.png',
 	'default_image_M'=>WT_THEME_DIR.'images/silhouette_male.png',
 	'default_image_F'=>WT_THEME_DIR.'images/silhouette_female.png',
 	'default_image_U'=>WT_THEME_DIR.'images/silhouette_unknown.png',
-	'slide_open'=>WT_THEME_DIR.'images/open.png',
-	'slide_close'=>WT_THEME_DIR.'images/close.png',
 	'reminder'=>WT_THEME_DIR.'images/reminder.png',
 	'children'=>WT_THEME_DIR.'images/children.png',
 

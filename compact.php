@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: compact.php 10869 2011-02-18 16:00:33Z greg $
+// $Id: compact.php 11669 2011-05-31 23:31:55Z greg $
 
 define('WT_SCRIPT_NAME', 'compact.php');
 require './includes/session.php';
@@ -38,8 +38,7 @@ $person =WT_Person::getInstance($rootid);
 $name   =$person->getFullName();
 $addname=$person->getAddName();
 
-// -- print html header information
-print_header(PrintReady($name) . " " . WT_I18N::translate('Compact chart'));
+print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Compact tree of %s', $person->getFullName()));
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
@@ -53,10 +52,7 @@ if (WT_USE_LIGHTBOX) {
 if (strlen($name)<30) $cellwidth="420";
 else $cellwidth=(strlen($name)*14);
 echo "<table class=\"list_table $TEXT_DIRECTION\"><tr><td width=\"{$cellwidth}px\" valign=\"top\">";
-echo "<h2>" . WT_I18N::translate('Compact chart') . ":";
-echo "<br />".PrintReady($name) ;
-if ($addname != "") echo "<br />" . PrintReady($addname);
-echo "</h2>";
+echo '<h2>', WT_I18N::translate('Compact tree of %s', $person->getFullName()), '</h2>';
 
 // -- print the form
 ?>
@@ -284,17 +280,11 @@ print_footer();
 
 function print_td_person($n) {
 	global $treeid, $WT_IMAGES;
-	global $TEXT_DIRECTION, $MULTI_MEDIA, $SHOW_HIGHLIGHT_IMAGES, $USE_SILHOUETTE, $WT_IMAGES;
+	global $MULTI_MEDIA, $SHOW_HIGHLIGHT_IMAGES;
 	global $showthumbs;
 
 	$text = "";
 	$pid = $treeid[$n];
-
-	if ($TEXT_DIRECTION=="ltr") {
-		$title = WT_I18N::translate('Individual information').": ".$pid;
-	} else {
-		$title = $pid." :".WT_I18N::translate('Individual information');
-	}
 
 	if ($pid) {
 		$indi=WT_Person::getInstance($pid);
@@ -302,51 +292,29 @@ function print_td_person($n) {
 		$addname=$indi->getAddName();
 
 		if ($showthumbs && $MULTI_MEDIA && $SHOW_HIGHLIGHT_IMAGES) {
-			$object = find_highlighted_object($pid, WT_GED_ID, $indi->getGedcomRecord());
+			$object=find_highlighted_object($pid, WT_GED_ID, $indi->getGedcomRecord());
+			$birth_date=$indi->getBirthDate();
+			$death_date=$indi->getDeathDate();
+			$img_title=PrintReady(htmlspecialchars(strip_tags($name)))." - ".strip_tags(html_entity_decode($birth_date->Display(false)." - ".$death_date->Display(false)));
+			$img_title=str_replace(chr(160), "", $img_title); // date->Display might return '&nbsp', which html_entity_decode converts to '0xa0' 
+			$img_id='box-'.$pid;
 			if (!empty($object)) {
-				$whichFile = thumb_or_main($object); // Do we send the main image or a thumbnail?
-				$size = findImageSize($whichFile);
-				$class = "pedigree_image_portrait";
-				if ($size[0]>$size[1]) $class = "pedigree_image_landscape";
-				if ($TEXT_DIRECTION == "rtl") $class .= "_rtl";
-				// NOTE: IMG ID
-				$imgsize = findImageSize($object["file"]);
-				$imgwidth = $imgsize[0]+50;
-				$imgheight = $imgsize[1]+150;
-				if (WT_USE_LIGHTBOX) {
-					$text .= "<a href=\"" . $object["file"] . "\" rel=\"clearbox[general]\" rev=\"" . $object['mid'] . "::" . WT_GEDCOM . "::" . PrintReady(htmlspecialchars($name)) . "\">";
-				} else {
-					$text .= "<a href=\"javascript:;\" onclick=\"return openImage('".rawurlencode($object["file"])."',$imgwidth, $imgheight);\">";
-				}
-				$birth_date=$indi->getBirthDate();
-				$death_date=$indi->getDeathDate();
-				$text .= "<img id=\"box-$pid\" src=\"".$whichFile."\"vspace=\"0\" hspace=\"0\" class=\"$class\" alt =\"\" title=\"".PrintReady(htmlspecialchars(strip_tags($name)))." - ".strip_tags(html_entity_decode($birth_date->Display(false)." - ".$death_date->Display(false)))."\"";
-				if ($imgsize) $text .= " /></a>";
-				else $text .= " />";
-			} else if ($USE_SILHOUETTE && isset($WT_IMAGES["default_image_U"])) {
-				$class = "pedigree_image_portrait";
-				if ($TEXT_DIRECTION == "rtl") $class .= "_rtl";
-				$sex = $indi->getSex();
-				$text = "<img src=\"";
-				if ($sex == 'F') {
-					$text .= $WT_IMAGES["default_image_F"];
-				} else if ($sex == 'M') {
-					$text .= $WT_IMAGES["default_image_M"];
-				} else {
-					$text .= $WT_IMAGES["default_image_U"];
-				}
-				$text .="\" class=\"".$class."\" border=\"none\" alt=\"\" />";
+				$which=thumb_or_main($object); // Do we send the main image or a thumbnail?
+				$mediaobject=WT_Media::getInstance($object['mid']);
+				$text=$mediaobject->displayMedia(array('which'=>$which,'display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$img_title));
+			} else {
+				$text=display_silhouette(array('sex'=>$indi->getSex(),'display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$img_title)); // may return ''
 			}
 		}
 
-		$text .= "<a class=\"name1\" href=\"".$indi->getHtmlUrl()."\" title=\"$title\"> ";
+		$text .= "<a class=\"name1\" href=\"".$indi->getHtmlUrl()."\">";
 		$text .= PrintReady(htmlspecialchars(strip_tags($name)));
 		if ($addname) $text .= "<br />" . PrintReady($addname);
 		$text .= "</a>";
 		$text .= "<br />";
 		if ($indi->canDisplayDetails()) {
 			$text.="<span class='details1'>";
-			$text.=$indi->getBirthYear().'-'.$indi->getDeathYear();
+			$text.=$indi->getLifeSpan();
 			$age=WT_Date::GetAgeYears($indi->getBirthDate(), $indi->getDeathDate());
 			if ($age) {
 				$text.=" <span class=\"age\">".PrintReady("({$age})")."</span>";
@@ -354,9 +322,6 @@ function print_td_person($n) {
 			$text.="</span>";
 		}
 	}
-
-	//Removed by BH causing problems with nicknames not printing
-	//$text = unhtmlentities($text);
 
 	// -- empty box
 	if (empty($text)) {
@@ -402,12 +367,8 @@ function print_arrow_person($n, $arrow_dir) {
 	$text = "";
 	if ($pid) {
 		$indi=WT_Person::getInstance($pid);
-		$name=$indi->getFullName();
-		if ($TEXT_DIRECTION=="ltr") {
-			$title = WT_I18N::translate('Compact chart').": ".$name;
-		} else {
-			$title = $name." :".WT_I18N::translate('Compact chart');
-		}
+		$title=WT_I18N::translate('Compact tree of %s', $indi->getFullName());
+		$title=htmlspecialchars(strip_tags($title));
 		$arrow_img = "<img id='arrow$n' src='".$WT_IMAGES[$arrow_dir."arrow"]."' border='0' align='middle' alt='$title' title='$title' />";
 		$text .= "<a href=\"?rootid=".$pid;
 		if ($showthumbs) $text .= "&amp;showthumbs=".$showthumbs;
@@ -415,6 +376,6 @@ function print_arrow_person($n, $arrow_dir) {
 		$text .= $arrow_img."</a>";
 	}
 	// -- arrow to empty box does not have a url attached.
-	else $text = "<img id='arrow$n' src='".$WT_IMAGES[$arrow_dir."arrow"]."' border='0' align='middle' alt='".WT_I18N::translate('Compact chart')."' title='".WT_I18N::translate('Compact chart')."' style='visibility:hidden;' />";
+	else $text = "<img id='arrow$n' src='".$WT_IMAGES[$arrow_dir."arrow"]."' border='0' align='middle' alt='".WT_I18N::translate('Compact tree')."' title='".WT_I18N::translate('Compact tree')."' style='visibility:hidden;' />";
 	echo $text;
 }

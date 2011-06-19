@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Source.php 10225 2011-01-01 15:04:58Z greg $
+// @version $Id: Source.php 11441 2011-05-02 22:31:24Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,8 +29,28 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Source extends WT_GedcomRecord {
+	// Implement source-specific privacy logic
+	protected function _canDisplayDetailsByType($access_level) {
+		// Hide sources if they are attached to private repositories ...
+		preg_match_all('/\n1 REPO @(.+)@/', $this->_gedrec, $matches);
+		foreach ($matches[1] as $match) {
+			$repo=WT_Repository::getInstance($match);
+			if ($repo && !$repo->canDisplayDetails($access_level)) {
+				return false;
+			}
+		}
+
+		// ... otherwise apply default behaviour
+		return parent::_canDisplayDetailsByType($access_level);
+	}
+
+	// Generate a private version of this record
+	protected function createPrivateGedcomRecord($access_level) {
+		return "0 @".$this->xref."@ ".$this->type."\n1 TITL ".WT_I18N::translate('Private');
+	}
+
 	public function getAuth() {
-		return get_gedcom_value('AUTH', 1, $this->gedrec, '', false);
+		return get_gedcom_value('AUTH', 1, $this->getGedcomRecord(), '', false);
 	}
 
 	// Generate a URL to this record, suitable for use in HTML

@@ -17,6 +17,25 @@ if (!defined('WT_WEBTREES')) {
 class WT_Perso_Functions_Print {
 	
 	/**
+	 * Get an array converted to a list. For example
+	 * array("red", "green", "yellow", "blue") => "red, green, yellow and blue"
+	 * 
+	 * @param array $array Array to convert
+	 * @return string List of elements
+	 */
+	static public function getListFromArray($array) {
+		$n=count($array);
+		switch ($n) {
+		case 0:
+			return '';
+		case 1:
+			return $array[0];
+		default:
+			return implode(WT_I18N::noop(', '), array_slice($array, 0, $n-1)).WT_I18N::noop(' and ').$array[$n-1];
+		}
+	}
+	
+	/**
 	 * Return HTML code to include a flag icon in facts description
 	 *
 	 * @param string $factrec GEDCOM fact record

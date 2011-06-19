@@ -22,10 +22,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_placecheck.php 11297 2011-04-10 10:14:12Z lukasz $
+// $Id: admin_placecheck.php 11700 2011-06-03 16:51:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
+	exit;
+}
+
+if (!WT_USER_IS_ADMIN) {
+	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'admin.php');
 	exit;
 }
 
@@ -78,8 +83,8 @@ print_header(WT_I18N::translate('Place Check').' - '.WT_GEDCOM);
 $target=$openinnew ? 'target="_blank"' : '';
 
 echo '<table id="gm_config"><tr>',
-	'<th><a ', (safe_GET('mod_action')=="admin_editconfig" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_editconfig">', WT_I18N::translate('Google Maps configuration'), '</a>', help_link('GOOGLEMAP_CONFIG','googlemap'), '</th>',
-	'<th><a ', (safe_GET('mod_action')=="admin_places" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_places">', WT_I18N::translate('Edit geographic place locations'), '</a>', help_link('PLE_EDIT','googlemap'), '</th>',
+	'<th><a ', (safe_GET('mod_action')=="admin_editconfig" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_editconfig">', WT_I18N::translate('Google Maps configuration'), '</a>', '</th>',
+	'<th><a ', (safe_GET('mod_action')=="admin_places" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_places">', WT_I18N::translate('Edit geographic place locations'), '</a>', '</th>',
 	'<th><a ', (safe_GET('mod_action')=="admin_placecheck" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_placecheck">', WT_I18N::translate('Place Check'), '</a>', help_link('GOOGLEMAP_PLACECHECK','googlemap'), '</th>',
 '</tr></table>';
 
@@ -361,7 +366,7 @@ case 'go':
 	}
 
 	// echo final row of table
-	echo "<tr><td colspan=\"2\" class=\"accepted\">", WT_I18N::translate('Total unique places'), ": ", $countrows, "</td></tr></table></div>";
+	echo "<tr><td colspan=\"2\" class=\"accepted\">", /* I18N: A count of places */ WT_I18N::translate('Total places: %s', WT_I18N::number($countrows)), "</td></tr></table></div>";
 	break;
 default:
 	// Do not run until user selects a gedcom/place/etc.

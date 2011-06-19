@@ -1,5 +1,5 @@
 /*
- * @version $Id: msie.css 9420 2010-09-11 13:14:57Z rob $
+ * @version $Id: msie.css 11650 2011-05-30 11:46:45Z rob $
  */
  
  form { 
@@ -33,4 +33,6 @@
 a.showit:hover span {
 	filter: alpha(opacity=85);
 }
-
+.makeMenu li ul {
+	top: 2px;
+}

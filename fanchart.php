@@ -24,7 +24,7 @@
  *
  * @package webtrees
  * @subpackage Charts
- * @version $Id: fanchart.php 11195 2011-03-26 08:42:24Z greg $
+ * @version $Id: fanchart.php 11421 2011-05-01 05:52:17Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'fanchart.php');
@@ -184,8 +184,6 @@ function print_fan_chart($treeid, $fanw=640, $fandeg=270) {
 		while ($sosa >= $p2) {
 			$pid=$treeid[$sosa];
 			if ($pid) {
-				$indirec=find_gedcom_record($pid, WT_GED_ID, WT_USER_CAN_EDIT);
-
 				$person =WT_Person::getInstance($pid);
 				$name   =$person->getFullName();
 				$addname=$person->getAddName();
@@ -214,11 +212,11 @@ function print_fan_chart($treeid, $fanw=640, $fandeg=270) {
 				$text = reverseText($name) . "\n";
 				if (!empty($addname)) $text .= reverseText($addname). "\n";
 
-				if (canDisplayRecord(WT_GED_ID, $indirec)) {
-					$birthrec = get_sub_record(1, "1 BIRT", $indirec);
+				if ($person->canDisplayDetails()) {
+					$birthrec = get_sub_record(1, "1 BIRT", $person->getGedcomRecord());
 					$ct = preg_match("/2 DATE.*(\d\d\d\d)/", $birthrec, $match);
 					if ($ct>0) $text.= trim($match[1]);
-					$deathrec = get_sub_record(1, "1 DEAT", $indirec);
+					$deathrec = get_sub_record(1, "1 DEAT", $person->getGedcomRecord());
 					$ct = preg_match("/2 DATE.*(\d\d\d\d)/", $deathrec, $match);
 					if ($ct>0) $text.= "-".trim($match[1]);
 				}
@@ -295,17 +293,17 @@ function print_fan_chart($treeid, $fanw=640, $fandeg=270) {
 				echo "<a href=\"".$person->getHtmlUrl()."\" class=\"name1\">" . $name;
 				if (!empty($addname)) echo "<br />" . $addname;
 				echo "</a>";
-				echo "<br /><a href=\"pedigree.php?rootid=$pid&amp;ged=".WT_GEDURL."\" >".WT_I18N::translate('Pedigree Tree')."</a>";
+				echo "<br /><a href=\"pedigree.php?rootid=$pid&amp;ged=".WT_GEDURL."\" >".WT_I18N::translate('Pedigree')."</a>";
 				if (array_key_exists('googlemap', WT_Module::getActiveModules())) {
-					echo "<br /><a href=\"module.php?mod=googlemap&mod_action=pedigree_map&rootid=".$pid."&amp;ged=".WT_GEDURL."\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".WT_I18N::translate('Pedigree Map')."</a>";
+					echo "<br /><a href=\"module.php?mod=googlemap&mod_action=pedigree_map&rootid=".$pid."&amp;ged=".WT_GEDURL."\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".WT_I18N::translate('Pedigree map')."</a>";
 				}
 				if (WT_USER_GEDCOM_ID && WT_USER_GEDCOM_ID!=$pid) {
 					echo "<br /><a href=\"relationship.php?pid1=".WT_USER_GEDCOM_ID."&amp;pid2={$pid}&amp;ged=".WT_GEDURL."\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".WT_I18N::translate('Relationship to me')."</a>";
 				}
-				echo "<br /><a href=\"descendancy.php?pid=$pid&amp;ged=".WT_GEDURL."\" >".WT_I18N::translate('Descendancy chart')."</a>";
-				echo "<br /><a href=\"ancestry.php?rootid=$pid&amp;ged=".WT_GEDURL."\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".WT_I18N::translate('Ancestry chart')."</a>";
-				echo "<br /><a href=\"compact.php?rootid=$pid&amp;ged=".WT_GEDURL."\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".WT_I18N::translate('Compact chart')."</a>";
-				echo "<br /><a href=\"".$tempURL."\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".WT_I18N::translate('Circle diagram')."</a>";
+				echo "<br /><a href=\"descendancy.php?pid=$pid&amp;ged=".WT_GEDURL."\" >".WT_I18N::translate('Descendants')."</a>";
+				echo "<br /><a href=\"ancestry.php?rootid=$pid&amp;ged=".WT_GEDURL."\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".WT_I18N::translate('Ancestors')."</a>";
+				echo "<br /><a href=\"compact.php?rootid=$pid&amp;ged=".WT_GEDURL."\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".WT_I18N::translate('Compact tree')."</a>";
+				echo "<br /><a href=\"".$tempURL."\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".WT_I18N::translate('Fan chart')."</a>";
 				echo "<br /><a href=\"hourglass.php?pid=$pid&amp;ged=".WT_GEDURL."\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".WT_I18N::translate('Hourglass chart')."</a>";
 				if (array_key_exists('tree', WT_Module::getActiveModules())) {
 					echo '<br /><a href="module.php?mod=tree&amp;mod_action=treeview&amp;ged='.WT_GEDURL.'&amp;rootid='.$pid."\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".WT_I18N::translate('Interactive tree')."</a>";
@@ -369,7 +367,7 @@ function print_fan_chart($treeid, $fanw=640, $fandeg=270) {
 	// note: arg "image_name=" is to avoid image miscaching
 	$image_name= "V".time();
 	unset($_SESSION[$image_name]); // statisticsplot.php uses this to hold a file name to send to browser
-	$image_title=preg_replace("~<.*>~", "", $name) . " " . WT_I18N::translate('Circle diagram');
+	$image_title=preg_replace("~<.*>~", "", $name) . " " . WT_I18N::translate('Fan chart');
 	echo "<p align=\"center\" >";
 	echo "<img src=\"imageflush.php?image_type=png&amp;image_name=$image_name&amp;height=$fanh&amp;width=$fanw\" width=\"$fanw\" height=\"$fanh\" border=\"0\" alt=\"$image_title\" title=\"$image_title\" usemap=\"#fanmap\" />";
 	echo "</p>";
@@ -390,17 +388,14 @@ $name   =$person->getFullName();
 $addname=$person->getAddName();
 
 // -- print html header information
-print_header($name . " " . WT_I18N::translate('Circle diagram'));
+print_header(/* I18N: http://en.wikipedia.org/wiki/Family_tree#Fan_chart - %s is a person's name */ WT_I18N::translate('Fan chart of %s', $person->getFullName()));
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
 if (strlen($name)<30) $cellwidth="420";
 else $cellwidth=(strlen($name)*14);
 echo "<table class=\"list_table $TEXT_DIRECTION\"><tr><td width=\"".$cellwidth."px\" valign=\"top\">";
-echo "<h2>" . WT_I18N::translate('Circle diagram');
-echo "<br />".$name;
-if ($addname != "") echo "<br />" . $addname;
-echo "</h2>";
+echo '<h2>', WT_I18N::translate('Fan chart of %s', $person->getFullName()), '</h2>';
 
 // -- print the form to change the number of displayed generations
 echo WT_JS_START;

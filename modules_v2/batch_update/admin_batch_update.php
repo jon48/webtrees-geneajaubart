@@ -25,7 +25,7 @@
  * @package webtrees
  * @subpackage Module
  * @author Greg Roach
- * $Id: admin_batch_update.php 10661 2011-02-01 11:27:08Z greg $
+ * $Id: admin_batch_update.php 11409 2011-04-29 15:43:08Z greg $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -84,7 +84,7 @@ class batch_update {
 		}
 		$html.='</select>';
 		if ($this->PLUGIN) {
-			$html.='<br/><i>'.$this->PLUGIN->getDescription().'</i>';
+			$html.='<br/><em>'.$this->PLUGIN->getDescription().'</em>';
 		}
 		$html.='</td></tr>';
 
@@ -322,7 +322,7 @@ class batch_update {
 
 	// Get the current view of a record, allowing for pending changes
 	static function getLatestRecord($xref, $type) {
-		return find_gedcom_record($xref, WT_GED_ID);
+		return find_gedcom_record($xref, WT_GED_ID, true);
 	}
 }
 

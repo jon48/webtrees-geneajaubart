@@ -28,52 +28,50 @@ class WT_Perso_Controller_Individual {
 		$this->ctrlIndividual = $ctrlIndividual_in;
 		$this->dindi = new WT_Perso_Person($this->ctrlIndividual->indi);
 	}
-
-	/**
-	 * Print the different titles of an individual in a smart way
-	 *
-	 */
-	public function print_titles(){
-		$tab=$this->dindi->getTitles();
-		$countTitles = count($tab);
-		if($countTitles>0){
-			echo '<div id="indi_titles"><dl><dt class="label">'.WT_I18N::translate('Titles').'</dt>';
-			foreach($tab as $title=>$props){
-				echo '<dd class="field">'.$title. ' ';
-				echo WT_I18N::make_list($props);
-				echo '</dd>';
-			}
-			echo  '</dl></div>';
-		}
-	}
 	
 	/**
 	 * Print individual header extensions.
-	 * Use hooks h_extend_top_center and h_extend_top_right
+	 * Use hooks h_extend_indi_header_left and h_extend_indi_header_right
 	 *
 	 */
 	public function print_extensions_header(){
-		$hook_extend_top_center = new WT_Perso_Hook('h_extend_top_center');
-		$hook_extend_top_right = new WT_Perso_Hook('h_extend_top_right');
-		$hook_extend_top_center = $hook_extend_top_center->execute($this->ctrlIndividual);
-		$hook_extend_top_right = $hook_extend_top_right->execute($this->ctrlIndividual);
+		$hook_extend_indi_header_left = new WT_Perso_Hook('h_extend_indi_header_left');
+		$hook_extend_indi_header_right = new WT_Perso_Hook('h_extend_indi_header_right');
+		$hook_extend_indi_header_left = $hook_extend_indi_header_left->execute($this->ctrlIndividual);
+		$hook_extend_indi_header_right = $hook_extend_indi_header_right->execute($this->ctrlIndividual);
 		
-		echo '<td id="indi_top_center">';
-		if(count($hook_extend_top_center)>0){
-			echo implode('', $hook_extend_top_center);
+		echo '<div id="indi_perso_header">',
+			'<div id="indi_perso_header_left">';
+		foreach ($hook_extend_indi_header_left as $div) {
+			if(count($div)==2){
+				echo '<div id="', $div[0], '" class="indi_perso_header_left_div">',
+					$div[1], '</div>';
+			}
 		}
-		else{
-			echo '&nbsp;';
+		echo '</div>',
+			'<div id="indi_perso_header_right">';
+		foreach ($hook_extend_indi_header_right as $div) {
+			if(count($div)==2){
+				echo '<div id="', $div[0], '" class="indi_perso_header_right_div">',
+					$div[1], '</div>';
+			}
 		}
-		echo '</td>';
-		echo '<td id="indi_top_right">';
-		if(count($hook_extend_top_right)>0){
-			echo implode('', $hook_extend_top_right);
-		}
-		else{
-			echo '&nbsp;';
-		}
-		echo '</td>';
+		echo '</div>',
+		'</div>';
+	}
+	
+	/**
+	 * Print individual header extra icons.
+	 * Use hook h_extend_indi_header_icons
+	 *
+	 */
+	public function print_extra_icons_header(){
+		$hook_extend_indi_header_icons = new WT_Perso_Hook('h_extend_indi_header_icons');
+		$hook_extend_indi_header_icons = $hook_extend_indi_header_icons->execute($this->ctrlIndividual);
+		
+		echo '<span id="indi_perso_icons">&nbsp;',
+			implode('', $hook_extend_indi_header_icons),
+			'</span>';
 	}
 
 }

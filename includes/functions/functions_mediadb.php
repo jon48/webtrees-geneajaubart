@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_mediadb.php 11296 2011-04-10 09:32:13Z lukasz $
+// $Id: functions_mediadb.php 11600 2011-05-25 06:57:37Z larry $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -142,6 +142,21 @@ function check_media_structure() {
 	}
 	return true;
 }
+
+/**
+ * Determine whether the main image or a thumbnail should be sent to the browser
+ */
+function thumb_or_main($object) {
+	global $USE_THUMBS_MAIN;
+
+	if ($object['_THUM']=='Y' || !$USE_THUMBS_MAIN) {
+		$file = 'main';
+	} else {
+		$file = 'thumb';
+	}
+	return $file;
+}
+
 
 /**
 * Get the list of media from the database
@@ -413,6 +428,252 @@ if (!$excludeLinks) {
 	return $medialist;
 }
 /**
+* Simpler version of get_medialist, returns much less information
+* All code should be modified to use this function, then the original get_medialist will go away
+*
+* NOTE: Currently this function should only be called with $linkonly=true
+*
+*
+* 
+* Get the list of media from the database
+*
+* Searches the media table of the database for media items that
+* are associated with the currently active GEDCOM.
+*
+* The medialist that is returned contains the following elements:
+* - REMOVED $media["ID"]          the unique id of this media item in the table (Mxxxx)
+* - $media["XREF"]        Another copy of the Media ID (not sure why there are two)
+* - REMOVED $media["GEDFILE"]     the gedcom file the media item should be added to
+* - REMOVED $media["FILE"]        the filename of the media item
+* - REMOVED $media["EXISTS"]      whether the file exists.  0=no, 1=external, 2=std dir, 3=protected dir
+* - REMOVED $media["THUMB"]       the filename of the thumbnail
+* - REMOVED $media["THUMBEXISTS"] whether the thumbnail exists.  0=no, 1=external, 2=std dir, 3=protected dir
+* - REMOVED $media["FORM"]        the format of the item (ie bmp, gif, jpeg, pcx etc)
+* - REMOVED $media["TYPE"]        the type of media item (ie certificate, document, photo, tombstone etc)
+* - REMOVED $media["TITL"]        a title for the item, used for list display
+* - REMOVED $media["GEDCOM"]      gedcom record snippet
+* - REMOVED $media["LEVEL"]       level number (normally zero)
+* - $media["LINKED"]      Flag for front end to indicate this is linked
+* - $media["LINKS"]       Array of gedcom ids that this is linked to
+* - $media["CHANGE"]      Indicates the type of change waiting admin approval
+*
+* @param boolean $random If $random is true then the function will return 5 random pictures.
+* @return mixed A media list array.
+*/
+
+function get_medialist2($currentdir = false, $directory = "", $linkonly = false, $random = false, $includeExternal = true, $excludeLinks = false) {
+	global $MEDIA_DIRECTORY_LEVELS, $BADMEDIA, $thumbdir, $MEDIATYPE;
+	global $level, $dirs, $MEDIA_DIRECTORY;
+	global $MEDIA_EXTERNAL;
+
+	// get_medialist2 currently only works with $linkonly=true
+	if (!$linkonly) {
+		return;
+	}
+
+	// Create the medialist array of media in the DB and on disk
+	// NOTE: Get the media in the DB
+	$medialist = array ();
+	if (empty($directory))
+		$directory = $MEDIA_DIRECTORY;
+	$myDir = str_replace($MEDIA_DIRECTORY, "", $directory);
+	if ($random) {
+		$rows=
+			WT_DB::prepare("SELECT m_id, m_file, m_media, m_gedrec, m_titl, m_gedfile FROM `##media` WHERE m_gedfile=? ORDER BY RAND() LIMIT 5")
+			->execute(array(WT_GED_ID))
+			->fetchAll();
+	} else if ($MEDIA_EXTERNAL && $includeExternal) {
+		$rows=
+			WT_DB::prepare("SELECT m_id, m_file, m_media, m_gedrec, m_titl, m_gedfile FROM `##media` WHERE m_gedfile=? AND (m_file LIKE ? OR m_file LIKE ?) ORDER BY m_id desc")
+			->execute(array(WT_GED_ID, "%{$myDir}%", "%://%"))
+			->fetchAll();
+	} else {
+		$rows=
+			WT_DB::prepare("SELECT m_id, m_file, m_media, m_gedrec, m_titl, m_gedfile FROM `##media` WHERE m_gedfile=? AND m_file LIKE ? ORDER BY m_id desc")
+			->execute(array(WT_GED_ID, "%{$myDir}%"))
+			->fetchAll();
+	}
+	$mediaObjects = array ();
+
+	// Build the raw medialist array,
+	// but weed out any folders we're not interested in
+	foreach ($rows as $row) {
+		$fileName = check_media_depth($row->m_file, "NOTRUNC", "QUIET");
+		$isExternal = isFileExternal($fileName);
+		if ($isExternal || !$currentdir || $directory == dirname($fileName) . "/") {
+			$media = array ();
+			$media["XREF"] = $row->m_media;
+			$media["LINKED"] = false;
+			$media["LINKS"] = array ();
+			$media["CHANGE"] = "";
+			// Build sort paramters to be used by filesort and mediasort
+			$media["FILESORT"] = basename($fileName);
+			$media["MEDIASORT"] = (!empty($row->m_titl)) ? $row->m_titl : $media["FILESORT"];
+			// Build a sortable key for the medialist
+			$firstChar = substr($media["XREF"], 0, 1);
+			$restChar = substr($media["XREF"], 1);
+			if (is_numeric($firstChar)) {
+				$firstChar = "";
+				$restChar = $media["XREF"];
+			}
+			$keyMediaList = $firstChar . substr("000000" . $restChar, -6) . "_" . $row->m_gedfile;
+			$medialist[$keyMediaList] = $media;
+			$mediaObjects[] = $media["XREF"];
+		}
+	}
+
+	// Look for new Media objects in the list of changes pending approval
+	// At the same time, accumulate a list of GEDCOM IDs that have changes pending approval
+
+	$changedRecords = array ();
+
+	// Search the list of GEDCOM changes pending approval.  There may be some new
+	// links to new or old media items that haven't been approved yet.
+	// Logic:
+	//   Make sure the array $changedRecords contains unique entries.  Ditto for array
+	//   $mediaObjects.
+	//   Read each of the entries in array $changedRecords.  Get the matching record from
+	//   the GEDCOM file.  Search the GEDCOM record for each of the entries in array
+	//   $mediaObjects.  A hit means that the GEDCOM record contains a link to the
+	//   media object.  If we don't already know about the link, add it to that media
+	//   object's link table.
+	$mediaObjects = array_unique($mediaObjects);
+	$changedRecords = array_unique($changedRecords);
+	foreach ($changedRecords as $pid) {
+		$gedrec = find_updated_record($pid, WT_GED_ID);
+		if ($gedrec) {
+			foreach ($mediaObjects as $mediaId) {
+				if (strpos($gedrec, "@" . $mediaId . "@")) {
+					// Build the key for the medialist
+					$firstChar = substr($mediaId, 0, 1);
+					$restChar = substr($mediaId, 1);
+					if (is_numeric($firstChar)) {
+						$firstChar = "";
+						$restChar = $mediaId;
+					}
+					$keyMediaList = $firstChar . substr("000000" . $restChar, -6) . "_" . WT_GED_ID;
+
+					// Add this GEDCOM ID to the link list of the media object
+					if (isset ($medialist[$keyMediaList])) {
+						$medialist[$keyMediaList]["LINKS"][$pid] = gedcom_record_type($pid, WT_GED_ID);
+						$medialist[$keyMediaList]["LINKED"] = true;
+					}
+				}
+			}
+		}
+	}
+
+	uasort($medialist, "mediasort");
+
+	//-- for the media list do not look in the directory
+	if ($linkonly)
+		return $medialist;
+	// NOTE: the code below this has not been optimized for get_medialist2 yet
+
+	// The database part of the medialist is now complete.
+	// We still have to get a list of all media items that exist as files but
+	// have not yet been entered into the database.  We'll do this only for the
+	// current folder.
+	//
+	// At the same time, we'll build a list of all the sub-folders in this folder.
+	$temp = str_replace($MEDIA_DIRECTORY, "", $directory);
+	if ($temp == "")
+		$folderDepth = 0;
+	else
+		$folderDepth = count(explode("/", $temp)) - 1;
+	$dirs = array ();
+	$images = array ();
+
+	$dirs_to_check = array ();
+	if (is_dir(filename_decode($directory))) {
+		array_push($dirs_to_check, $directory);
+	}
+	if (is_dir(filename_decode(get_media_firewall_path($directory)))) {
+		array_push($dirs_to_check, get_media_firewall_path($directory));
+	}
+
+	foreach ($dirs_to_check as $thedir) {
+		$d = dir(filename_decode(substr($thedir, 0, -1)));
+		while (false !== ($fileName = $d->read())) {
+			$fileName = filename_encode($fileName);
+			while (true) {
+				// Make sure we only look at valid media files
+				if (in_array($fileName, $BADMEDIA))
+					break;
+				if (is_dir(filename_decode($thedir . $fileName))) {
+					if ($folderDepth < $MEDIA_DIRECTORY_LEVELS)
+						$dirs[] = $fileName; // note: we will remove duplicates when the loop is complete
+					break;
+				}
+				$exts = explode(".", $fileName);
+				if (count($exts) == 1)
+					break;
+				$ext = strtolower($exts[count($exts) - 1]);
+				if (!in_array($ext, $MEDIATYPE))
+					break;
+
+				// This is a valid media file:
+				// now see whether we already know about it
+				$mediafile = $directory . $fileName;
+				$exist = false;
+				$oldObject = false;
+				foreach ($medialist as $key => $item) {
+					if ($item["FILE"] == $directory . $fileName) {
+						if ($item["CHANGE"] == "delete") {
+							$exist = false;
+							$oldObject = true;
+						} else {
+							$exist = true;
+							$oldObject = false;
+						}
+					}
+				}
+				if ($exist)
+					break;
+
+				// This media item is not yet in the database
+				$media = array ();
+				$media["ID"] = "";
+				$media["XREF"] = "";
+				$media["GEDFILE"] = "";
+				$media["FILE"] = $directory . $fileName;
+				$media["THUMB"] = thumbnail_file($directory . $fileName, false);
+				$media["THUMBEXISTS"] = media_exists($media["THUMB"]);
+				$media["EXISTS"] = media_exists($media["FILE"]);
+				$media["FORM"] = $ext;
+				if ($ext == "jpg" || $ext == "jp2")
+					$media["FORM"] = "jpeg";
+				if ($ext == "tif")
+					$media["FORM"] = "tiff";
+				$media["TYPE"] = "";
+				$media["TITL"] = "";
+				$media["GEDCOM"] = "";
+				$media["LEVEL"] = "0";
+				$media["LINKED"] = false;
+				$media["LINKS"] = array ();
+				$media["CHANGE"] = "";
+				if ($oldObject)
+					$media["CHANGE"] = "append";
+				$images[$fileName] = $media;
+				break;
+			}
+		}
+		$d->close();
+	}
+	//print_r($images); echo "<br />";
+	$dirs = array_unique($dirs); // remove duplicates that were added because we checked both the regular dir and the media firewall dir
+	sort($dirs);
+	//print_r($dirs); echo "<br />";
+	if (count($images) > 0) {
+		ksort($images);
+		$medialist = array_merge($images, $medialist);
+	}
+	//print_r($medialist); echo "<br />";
+	return $medialist;
+}
+
+
+/**
 * Determine whether the current Media item matches the filter criteria
 *
 * @param array $media An item from the Media list produced by get_medialist()
@@ -428,13 +689,8 @@ function filterMedia($media, $filter, $acceptExt) {
 		$acceptExt = "";
 
 	//-- Check Privacy first.  No point in proceeding if Privacy says "don't show"
-	$links = $media["LINKS"];
-	if (count($links) != 0) {
-		foreach ($links as $id => $type) {
-			if (!canDisplayRecord(WT_GED_ID, find_gedcom_record($id, WT_GED_ID))) {
-				return false;
-			}
-		}
+	if ($media["XREF"] && !WT_Media::getInstance($media["XREF"])->canDisplayDetails()) {
+		return false;
 	}
 
 	//-- Accept when filter string contained in Media item's id
@@ -471,7 +727,7 @@ function filterMedia($media, $filter, $acceptExt) {
 
 	//-- Accept when filter string contained in name of any item
 	//-- this Media item is linked to.  (Privacy already checked)
-	foreach ($links as $id=>$type) {
+	foreach ($media['LINKS'] as $id=>$type) {
 		$record=WT_GedcomRecord::getInstance($id);
 		foreach ($record->getAllNames() as $name) {
 			if (strpos(utf8_strtoupper($name['full']), $filter)!==false) {
@@ -482,6 +738,77 @@ function filterMedia($media, $filter, $acceptExt) {
 
 	return false;
 }
+/**
+* Simpler version of filterMedia, works with get_medialist2
+* All code should be modified to use this function, then the original filterMedia will go away
+*
+* Determine whether the current Media item matches the filter criteria
+*
+* @param array $media An item from the Media list produced by get_medialist()
+* @param string $filter The filter to be looked for within various elements of the $media array
+* @param string $acceptExt "http" if links to external media should be considered too
+* @return bool false if the Media item doesn't match the filter criteria
+*/
+function filterMedia2($media, $filter, $acceptExt) {
+
+	if (empty($filter) || strlen($filter) < 2)
+		$filter = "";
+	if (empty($acceptExt) || $acceptExt != "http")
+		$acceptExt = "";
+
+	$mediaobject=WT_Media::getInstance($media['XREF']);
+	if (!$mediaobject) {
+		return false;
+	}
+
+	//-- Check Privacy first.  No point in proceeding if Privacy says "don't show"
+	if (!$mediaobject->canDisplayDetails()) {
+		return false;
+	}
+
+	//-- Accept when filter string contained in Media item's id
+	if ($mediaobject->getXref() == $filter) {
+		return true;
+	}
+
+	//-- Accept external Media only if specifically told to do so
+	if ($mediaobject->isExternal() && $acceptExt != "http")
+		return false;
+
+	//-- Accept everything if filter string is empty
+	if ($filter == "")
+		return true;
+
+	$filter=utf8_strtoupper($filter);
+
+	//-- Accept when filter string contained in file name (but only for editing users)
+	if (WT_USER_CAN_EDIT && strstr(utf8_strtoupper(basename($mediaobject->getFilename())), $filter))
+		return true;
+
+	//-- Accept when filter string contained in Media item's title
+	foreach ($mediaobject->getAllNames() as $name) {
+		if (strpos(utf8_strtoupper($name['full']), $filter)!==false) {
+			return true;
+		}
+	}
+
+	if (strpos(utf8_strtoupper($mediaobject->title), $filter)!==false)
+		return true;
+
+	//-- Accept when filter string contained in name of any item
+	//-- this Media item is linked to.  (Privacy already checked)
+	foreach ($media['LINKS'] as $id=>$type) {
+		$record=WT_GedcomRecord::getInstance($id);
+		foreach ($record->getAllNames() as $name) {
+			if (strpos(utf8_strtoupper($name['full']), $filter)!==false) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 /**
 * Generates the thumbnail filename and path
 *
@@ -499,7 +826,6 @@ function thumbnail_file($filename, $generateThumb = true, $overwrite = false) {
 	if (strlen($filename) == 0)
 		return false;
 
-	// NOTE: Lets get the file details
 	if (isFileExternal($filename))
 		return $filename;
 
@@ -514,6 +840,7 @@ function thumbnail_file($filename, $generateThumb = true, $overwrite = false) {
 	else
 		$thumbExt = "";
 
+	// how does $pid ever get set?
 	if (!empty($pid)) {
 		$media_id_number = get_media_id_from_file($filename);
 		// run the clip method foreach person associated with the picture
@@ -528,6 +855,10 @@ function thumbnail_file($filename, $generateThumb = true, $overwrite = false) {
 	if (!$overwrite && media_exists($thumbDir . $thumbName))
 		return $thumbDir . $thumbName;
 
+	// look for png thumbnail file, so thumbnail for myfile.wmv could be thumbs/myfile.png
+	$altthumb = $parts["filename"] . '.png';
+	if (!$overwrite && media_exists($thumbDir . $altthumb)) return $thumbDir . $altthumb;
+
 	if ($generateThumb && get_gedcom_setting(WT_GED_ID, 'AUTO_GENERATE_THUMBS')) {
 		if (generate_thumbnail($mainDir . $thumbName, $thumbDir . $thumbName)) {
 			return $thumbDir . $thumbName;
@@ -536,21 +867,8 @@ function thumbnail_file($filename, $generateThumb = true, $overwrite = false) {
 
 	// Thumbnail doesn't exist and could not be generated:
 	// Return an icon image instead
-	switch ($thumbExt) {
-		case "pdf" :
-			$which = "_pdf";
-			break;
-		case "doc" :
-		case "txt" :
-			$which = "_doc";
-			break;
-		case "ged" :
-			$which = "_ged";
-			break;
-		default :
-			$which = "";
-	}
-	return $WT_IMAGES["media{$which}"];
+	return media_icon_file($filename);
+
 }
 
 /**
@@ -561,72 +879,146 @@ function thumbnail_file($filename, $generateThumb = true, $overwrite = false) {
 * @param string $filename The full filename of the media item
 * @return string the location of the icon file
 */
-function media_icon_file($filename, $generateThumb = true, $overwrite = false) {
-	global $MEDIA_DIRECTORY, $WT_IMAGES, $MEDIA_DIRECTORY_LEVELS, $MEDIA_EXTERNAL;
+function media_icon_file($filename) {
+	global $WT_IMAGES;
 
 	if (strlen($filename) == 0)
 		return false;
 
 	$filename = check_media_depth($filename, "NOTRUNC");
-	// -- Classify the incoming media file
-	if (preg_match('~^https?://~i', $filename)) $type = 'url_';
-	else $type = 'local_';
-	if ((preg_match('/\.flv$/i', $filename) || preg_match('~^https?://.*\.youtube\..*/watch\?~i', $filename)) && is_dir(WT_ROOT.'js/jw_player')) {
-		$type .= 'flv';
-	} else if (preg_match('~^https?://picasaweb*\.google\..*/.*/~i', $filename)) {
-		$type .= 'picasa';
-	} else if (preg_match('/\.(jpg|jpeg|gif|png)$/i', $filename)) {
-		$type .= 'image';
-	} else if (preg_match('/\.pdf$/i', $filename)) {
-		$type .= 'pdf';
-	} else if (preg_match('/\.(doc|txt)$/i', $filename)) {
-		$type .= 'document';
-	} else if (preg_match('/\.mp3$/i', $filename)) {
-		$type .= 'audio';
-	} else if (preg_match('/\.(avi|wmv)$/i', $filename)) {
-		$type .= 'wmv';
-	} else if (strpos($filename, 'http://maps.google.')===0) {
-		$type .= 'streetview';
-	} else {
-		$type .= 'other';
-	}
-	// $type is now: (url | local) _ (flv | picasa | image | pdf | document| audio | wmv | streetview |other)
-	switch ($type) {
+
+	switch (get_url_type($filename)) {
 		case 'url_flv':
-			$thumb = $WT_IMAGES['media_flashrem'];
+			$iconthumb = $WT_IMAGES['media_flashrem'];
 			break;
 		case 'local_flv':
-			$thumb = $WT_IMAGES['media_flash'];
+			$iconthumb = $WT_IMAGES['media_flash'];
 			break;
 		case 'url_wmv':
-			$thumb = $WT_IMAGES['media_wmvrem'];
+			$iconthumb = $WT_IMAGES['media_wmvrem'];
 			break;
 		case 'local_wmv':
-			$thumb = $WT_IMAGES['media_wmv'];
+			$iconthumb = $WT_IMAGES['media_wmv'];
 			break;
 		case 'url_picasa':
-			$thumb = $WT_IMAGES['media_picasa'];
+			$iconthumb = $WT_IMAGES['media_picasa'];
 			break;
 		case 'url_other':
-			$thumb = $WT_IMAGES['media_globe'];
+			$iconthumb = $WT_IMAGES['media_globe'];
 			break;
 		case 'url_pdf':
 		case 'local_pdf':
-			$thumb = $WT_IMAGES['media_pdf'];
+			$iconthumb = $WT_IMAGES['media_pdf'];
 			break;
 		case 'url_document':
 		case 'local_document':
-			$thumb = $WT_IMAGES['media_doc'];
+			$iconthumb = $WT_IMAGES['media_doc'];
 			break;
 		case 'url_audio':
 		case 'local_audio':
-			$thumb = $WT_IMAGES['media_audio'];
+			$iconthumb = $WT_IMAGES['media_audio'];
 			break;
 		default:
-			$thumb = $WT_IMAGES['media'];
+			$iconthumb = $WT_IMAGES['media'];
 	}
 	// Return an icon image
-	return $thumb;
+	return $iconthumb;
+}
+
+/**
+* parses a filename and determines what sort of content it is 
+*/
+function get_url_type($filename) {
+	// -- Classify the incoming media file
+	if (isFileExternal($filename)) $urltype = 'url_';
+	else $urltype = 'local_';
+	if ((preg_match('/\.flv$/i', $filename) || preg_match('~^https?://.*\.youtube\..*/watch\?~i', $filename)) && is_dir(WT_ROOT.'js/jw_player')) {
+		$urltype .= 'flv';
+	} else if (preg_match('~^https?://picasaweb*\.google\..*/.*/~i', $filename)) {
+		$urltype .= 'picasa';
+	} else if (preg_match('/\.(jpg|jpeg|gif|png)$/i', $filename)) {
+		$urltype .= 'image';
+	} else if (preg_match('/\.(doc|txt)$/i', $filename)) {
+		$urltype .= 'document';
+	} else if (preg_match('/\.(avi|txt)$/i', $filename)) {
+		$urltype .= 'page';
+	} else if (preg_match('/\.mp3$/i', $filename)) {
+		$urltype .= 'audio';
+	} else if (preg_match('/\.pdf$/i', $filename)) {
+		$urltype .= 'pdf';
+	} else if (preg_match('/\.(avi|wmv)$/i', $filename)) {
+		$urltype .= 'wmv';
+	} else if (strpos($filename, 'http://maps.google.')===0) {
+		$urltype .= 'streetview';
+	} else {
+		$urltype .= 'other';
+	}
+	// $urltype is now: (url | local) _ (flv | picasa | image | page | audio | wmv | streetview |other)
+	return $urltype;
+}
+
+/**
+* Return the img code for the appropriate silhouette
+*
+* The config array is designed to match Media->displayMedia
+*/
+function display_silhouette(array $config = array()) {
+	global $USE_SILHOUETTE, $WT_IMAGES, $TEXT_DIRECTION;
+
+	$default_config=array(
+		'sex'=>'U',
+		'align'=>'auto',
+		'display_type'=>'normal',
+		'img_id'=>'',
+		'class'=>'',
+		'img_title'=>'',
+		'addslashes'=>false,
+		'show_full'=>true
+	 );
+	$config=array_merge($default_config, $config);
+
+	if (!$USE_SILHOUETTE) return '';
+	if (($config['sex']!='F') && ($config['sex']!='M')) {
+		$config['sex']='U';
+	}
+	if (!isset($WT_IMAGES['default_image_'.$config['sex']])) {
+		return '';
+	}
+
+	$spacestr='';
+	if ($config['display_type']=='pedigree_person') {
+		$config['align']='none';
+		$config['class']='pedigree_image_portrait';
+		$spacestr=' vspace="0" hspace="0" ';
+	}
+	if ($config['display_type']=='treeview') {
+		$config['align']='none';
+		$config['class']='default_thumbnail pedigree_image_portrait';
+		$spacestr=' vspace="0" hspace="0" ';
+	}
+	if ($config['display_type']=='googlemap') {
+		$config['align']='none';
+		$config['usejavascript']=false;
+		$config['addslashes']=true;
+		$config['class']='pedigree_image_portrait';
+		$spacestr=' vspace="0" hspace="0" ';
+	}
+
+	$classstr='';
+	if ($config['class']) {
+		if ($TEXT_DIRECTION == "rtl") $config['class'] .= "_rtl";
+		$classstr=' class="'.$config['class'].'" ';
+	}
+	$idstr=($config['img_id']) ? ' id="'.$config['img_id'].'" ' : '';
+	$stylestr=($config['show_full']) ? '' : ' style="display: none;" ';
+	$alignstr=($config['align']=='auto') ? 'align="'.($TEXT_DIRECTION=="rtl" ? "right":"left").'"' : ''; 
+	$output='<img '.$idstr.' src="'.$WT_IMAGES['default_image_'.$config['sex']].'" '.$classstr.$spacestr.$alignstr.' border="none" alt="'.$config['img_title'].'" title="'.$config['img_title'].'" '.$stylestr.' />';
+
+	if ($config['addslashes']) {
+		// the image string will be used in javascript code, such as googlemaps
+		$output=addslashes($output);
+	}
+	return $output;
 }
 
 /**
@@ -818,11 +1210,11 @@ function get_media_folders() {
 	global $MEDIA_DIRECTORY, $MEDIA_DIRECTORY_LEVELS, $BADMEDIA;
 
 	$folderList = array ();
-	$folderList[0] = $MEDIA_DIRECTORY; // look in both the standard and protected directories
-	$folderList[1] = get_media_firewall_path($MEDIA_DIRECTORY);
+	$folderList[0] = $MEDIA_DIRECTORY;
 	if ($MEDIA_DIRECTORY_LEVELS == 0)
 		return $folderList;
 
+	$folderList[1] = get_media_firewall_path($MEDIA_DIRECTORY);  // look in both the standard and protected directories
 	$currentFolderNum = 0;
 	$nextFolderNum = 1;
 	while ($currentFolderNum < count($folderList)) {
@@ -849,7 +1241,6 @@ function get_media_folders() {
 			$dir->close();
 		}
 	}
-
 	// remove the media firewall path from the directory listings
 	$currentFolderNum = 0;
 	while ($currentFolderNum < count($folderList)) {
@@ -1879,7 +2270,7 @@ function generate_thumbnail($filename, $thumbnail) {
 			}
 		}
 		if (!file_exists(filename_decode($filename))) return false;  // Can't thumbnail a non-existent image
-		$imgsize = getimagesize(filename_decode($filename));
+		$imgsize = @getimagesize(filename_decode($filename));
 		if (!$imgsize) return false;  // Can't thumbnail an image of unknown size
 
 		//-- check if file is small enough to be its own thumbnail
@@ -1899,8 +2290,8 @@ function generate_thumbnail($filename, $thumbnail) {
 			$fp = fopen(filename_decode($thumbnail), "wb");
 			if (!fwrite($fp, $conts)) return false;
 			fclose($fp);
-			if (!isFileExternal($filename)) $imgsize = getimagesize(filename_decode($filename));
-			else $imgsize = getimagesize(filename_decode($thumbnail));
+			if (!isFileExternal($filename)) $imgsize = @getimagesize(filename_decode($filename));
+			else $imgsize = @getimagesize(filename_decode($thumbnail));
 			if ($imgsize===false) return false;
 			if (($imgsize[0]<150)&&($imgsize[1]<150)) return true;
 		}

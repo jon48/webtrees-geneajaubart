@@ -79,17 +79,20 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			$menu = new WT_Menu(WT_I18N::translate('Sosa Statistics'), 'module.php?mod=perso_sosa&mod_action=statistics', 'down');
 			$menu->addIcon('menu_sosa');
 			$menu->addClass('menuitem', 'menuitem_hover', 'submenu', 'icon_large_menu_sosa');
+			$menu->addId('menu-sosa');
 	
 			//-- Sosa ancestors list
 			$submenu = new WT_Menu(WT_I18N::translate('Sosa Ancestors'), 'module.php?mod=perso_sosa&mod_action=sosalist');
 			$submenu->addIcon('menu_sosa_list');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_menu_sosa_list');
+			$submenu->addId('menu-sosa-list');
 			$menu->addSubMenu($submenu);
 			
 			//-- Missing ancestors list
 			$submenu = new WT_Menu(WT_I18N::translate('Missing Ancestors'), 'module.php?mod=perso_sosa&mod_action=missingancestors');
 			$submenu->addIcon('menu_missing_ancestors');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_menu_missing_ancestors');
+			$submenu->addId('menu-sosa-missing');
 			$menu->addSubMenu($submenu);
 			
 			$menu->addSeparator();
@@ -98,15 +101,17 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			$submenu = new WT_Menu(WT_I18N::translate('Sosa Statistics'), 'module.php?mod=perso_sosa&mod_action=statistics');
 			$submenu->addIcon('menu_sosa');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_sosa_statistics');
+			$submenu->addId('menu-sosa-stats');
 			$menu->addSubMenu($submenu);
 			
 			//-- recompute Sosa submenu
 			if (WT_USER_CAN_EDIT && !empty($controller) && $controller instanceof WT_Controller_Individual ) {
 				$menu->addSeparator();
-				$submenu = new WT_Menu(WT_I18N::translate('Complete Sosas'), 'index.php?ctype=user&amp;ged='.WT_GEDURL);
+				$submenu = new WT_Menu(WT_I18N::translate('Complete Sosas'), '#');
 				$submenu->addOnclick('return compute_sosa(\''.$controller->pid.'\');');
 				$submenu->addIcon('recompute_sosa');
 				$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_recompute_sosa');
+				$submenu->addId('menu-sosa-recompute');
 				$menu->addSubMenu($submenu);
 			}
 		}
@@ -118,7 +123,8 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 		return array(
 			'h_config_tab_name' => 30,
 			'h_config_tab_content' => 30,
-			'h_extend_top_center' => 20
+			'h_extend_indi_header_icons' => 20,
+			'h_extend_indi_header_right' => 20
 		);
 	}
 	
@@ -153,16 +159,25 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 	}
 	
 	//Implement WT_Perso_IndividualHeaderExtender
-	public function h_extend_top_center(WT_Controller_Individual $ctrlIndi) {
+	public function h_extend_indi_header_icons(WT_Controller_Individual $ctrlIndi) {
 		if($ctrlIndi){
 			$dindi = new WT_Perso_Person($ctrlIndi->indi);
-			return WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 2, 'normal');
+			return WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1, 'large');
 		}
 		return '';
 	}
 	
 	//Implement WT_Perso_IndividualHeaderExtender
-	public function h_extend_top_right(WT_Controller_Individual $ctrlIndi) {
+	public function h_extend_indi_header_left(WT_Controller_Individual $ctrlIndi) {
+	}
+	
+	//Implement WT_Perso_IndividualHeaderExtender
+	public function h_extend_indi_header_right(WT_Controller_Individual $ctrlIndi) {
+		if($ctrlIndi){
+			$dindi = new WT_Perso_Person($ctrlIndi->indi);
+			return array('indi-header-sosa',  WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 2, 'normal'));
+		}
+		return '';
 	}
 	
 	/**

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Descendancy.php 11248 2011-03-31 17:09:53Z greg $
+// @version $Id: Descendancy.php 11529 2011-05-14 10:58:32Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -109,7 +109,7 @@ class WT_Controller_Descendancy extends WT_Controller_Base {
 	 * @param string $pid individual Gedcom Id
 	 * @param int $depth the descendancy depth to show
 	 */
-	function print_child_family(&$person, $depth, $label="1.", $gpid="") {
+	function print_child_family($person, $depth, $label="1.", $gpid="") {
 		global $personcount;
 
 		if (is_null($person)) return;
@@ -130,7 +130,7 @@ class WT_Controller_Descendancy extends WT_Controller_Base {
 	 * @param string $pid individual Gedcom Id
 	 * @param int $depth the descendancy depth to show
 	 */
-	function print_child_descendancy(&$person, $depth) {
+	function print_child_descendancy($person, $depth) {
 		global $WT_IMAGES, $Dindent, $personcount;
 	
 		if (is_null($person)) return;
@@ -191,7 +191,7 @@ class WT_Controller_Descendancy extends WT_Controller_Base {
 	 * @param Family $famid family record
 	 * @param int $depth the descendancy depth to show
 	 */
-	function print_family_descendancy(&$person, &$family, $depth) {
+	function print_family_descendancy($person, $family, $depth) {
 		global $GEDCOM, $WT_IMAGES, $Dindent, $personcount;
 	
 		if (is_null($family)) return;

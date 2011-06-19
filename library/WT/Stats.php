@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Stats.php 11221 2011-03-27 19:53:00Z lukasz $
+// @version $Id: Stats.php 11707 2011-06-04 09:54:17Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -72,9 +72,6 @@ class WT_Stats {
 				continue;
 			}
 			$examples[$methods[$i]] = $this->$methods[$i]();
-			if (stristr($methods[$i], 'percentage')) {
-				$examples[$methods[$i]] .='%';
-			}
 			if (stristr($methods[$i], 'highlight')) {
 				$examples[$methods[$i]]=str_replace(array(' align="left"', ' align="right"'), '', $examples[$methods[$i]]);
 			}
@@ -96,9 +93,6 @@ class WT_Stats {
 				continue;
 			} // Include this method name to prevent bad stuff happening
 			$examples[$methods[$i]] = $this->$methods[$i]();
-			if (stristr($methods[$i], 'percentage')) {
-				$examples[$methods[$i]] .='%';
-			}
 			if (stristr($methods[$i], 'highlight')) {
 				$examples[$methods[$i]]=str_replace(array(' align="left"', ' align="right"'), '', $examples[$methods[$i]]);
 			}
@@ -180,7 +174,13 @@ class WT_Stats {
 			// Generate the replacement value for the tag
 			if (method_exists($this, $tags[$i])) {
 				$new_tags[] = "#{$full_tag}#";
-				$new_values[] = call_user_func_array(array($this, $tags[$i]), array($params));
+				$new_value=call_user_func_array(array($this, $tags[$i]), array($params));
+				// Numeric values need "translating" to local formats
+				if (is_numeric($new_value)) {
+					$new_values[]=WT_I18N::number($new_value);
+				} else {
+					$new_values[]=$new_value;
+				}
 			} elseif ($tags[$i] == 'help') {
 				// re-merge, just in case
 				$new_tags[] = "#{$full_tag}#";
@@ -344,7 +344,6 @@ class WT_Stats {
 ///////////////////////////////////////////////////////////////////////////////
 
 	function _getPercentage($total, $type) {
-		$per=null;
 		switch($type) {
 			default:
 			case 'all':
@@ -365,13 +364,14 @@ class WT_Stats {
 			case 'other':
 				$type = $this->totalOtherRecords();
 				break;
+			default:
+				return WT_I18N::percentage(0, 2);
 		}
-		if ($type>0) {
-			$per = round(100 * $total / $type, 2);
+		if ($type==0) {
+			return WT_I18N::percentage(0.0, 2);
 		} else {
-			$per = 0;
+			return WT_I18N::percentage($total / $type, 2);
 		}
-		return $per;
 	}
 
 	function totalRecords() {
@@ -414,7 +414,7 @@ class WT_Stats {
 	}
 
 	function totalIndividualsPercentage() {
-		return $this->_getPercentage($this->totalIndividuals(), 'all', 2);
+		return $this->_getPercentage($this->totalIndividuals(), 'all');
 	}
 
 	function totalFamilies() {
@@ -453,7 +453,7 @@ class WT_Stats {
 	}
 
 	function totalFamiliesPercentage() {
-		return $this->_getPercentage($this->totalFamilies(), 'all', 2);
+		return $this->_getPercentage($this->totalFamilies(), 'all');
 	}
 
 	function totalSources() {
@@ -464,7 +464,7 @@ class WT_Stats {
 	}
 
 	function totalSourcesPercentage() {
-		return $this->_getPercentage($this->totalSources(), 'all', 2);
+		return $this->_getPercentage($this->totalSources(), 'all');
 	}
 
 	function totalNotes() {
@@ -475,7 +475,7 @@ class WT_Stats {
 	}
 
 	function totalNotesPercentage() {
-		return $this->_getPercentage($this->totalNotes(), 'all', 2);
+		return $this->_getPercentage($this->totalNotes(), 'all');
 	}
 
 	function totalRepositories() {
@@ -486,7 +486,7 @@ class WT_Stats {
 	}
 
 	function totalRepositoriesPercentage() {
-		return $this->_getPercentage($this->totalRepositories(), 'all', 2);
+		return $this->_getPercentage($this->totalRepositories(), 'all');
 	}
 
 	function totalOtherRecords() {
@@ -497,7 +497,7 @@ class WT_Stats {
 	}
 
 	function totalOtherPercentage() {
-		return $this->_getPercentage($this->totalOtherRecords(), 'all', 2);
+		return $this->_getPercentage($this->totalOtherRecords(), 'all');
 	}
 
 	function totalSurnames($params = null) {
@@ -513,7 +513,10 @@ class WT_Stats {
 		}
 		$vars[]=$this->_ged_id;
 		return (int)
-			WT_DB::prepare("SELECT COUNT({$distinct} n_surn) FROM `##name` WHERE n_surn {$opt} AND n_file=?")
+			WT_DB::prepare(
+				"SELECT COUNT({$distinct} n_surn COLLATE '".WT_I18N::$collation."')".
+				" FROM `##name`".
+				" WHERE n_surn COLLATE '".WT_I18N::$collation."' {$opt} AND n_file=?")
 			->execute($vars)
 			->fetchOne();
 	}
@@ -1087,7 +1090,7 @@ class WT_Stats {
 			$chart_title=WT_I18N::translate('Surname distribution chart').': '.$surname;
 			// Count how many people are events in each country
 			$surn_countries=array();
-			$indis = get_indilist_indis(utf8_strtoupper($surname), '', '', false, false, WT_GED_ID);
+			$indis = WT_Query_Name::individuals(utf8_strtoupper($surname), '', '', false, false, WT_GED_ID);
 			foreach ($indis as $person) {
 				if (preg_match_all('/^2 PLAC (?:.*, *)*(.*)/m', $person->getGedcomRecord(), $matches)) {
 					// webtrees uses 3 letter country codes and localised country names, but google uses 2 letter codes.
@@ -1218,6 +1221,8 @@ class WT_Stats {
 				}
 			}
 		}
+		// get all the user's countries names
+		$all_countries = self::get_all_countries();
 		foreach ($all_db_countries as $country_code=>$country) {
 			$top10[]="\t<li>";
 			foreach ($country as $country_name=>$tot) {
@@ -2438,7 +2443,7 @@ class WT_Stats {
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						.'d_year<>0 AND '
-						."d_fact IN ('DIV', 'ANUL', '_SEPR') AND "
+						."d_fact = 'DIV' AND "
 						."d_type='@#DGREGORIAN@'";
 						if ($year1>=0 && $year2>=0) {
 							$sql .= " AND d_year BETWEEN '{$year1}' AND '{$year2}'";
@@ -2465,7 +2470,7 @@ class WT_Stats {
 			.' WHERE'
 				.' divorced.d_gid = fam.f_id AND'
 				." fam.f_file = {$this->_ged_id} AND"
-				." divorced.d_fact IN ('DIV', 'ANUL', '_SEPR') AND"
+				." divorced.d_fact = 'DIV' AND"
 				.' divorced.d_julianday2 <> 0 AND'
 				.$years
 				.' (indi.i_id = fam.f_husb OR indi.i_id = fam.f_wife)'
@@ -2474,7 +2479,7 @@ class WT_Stats {
 			$sql = "SELECT d_month, COUNT(*) AS total FROM `##dates` "
 				."WHERE "
 				."d_file={$this->_ged_id} AND "
-				."d_fact IN ('DIV', 'ANUL', '_SEPR')";
+				."d_fact = 'DIV'";
 				if ($year1>=0 && $year2>=0) {
 					$sql .= " AND d_year BETWEEN '{$year1}' AND '{$year2}'";
 				}
@@ -3464,6 +3469,7 @@ class WT_Stats {
 		$tot_indi = $this->totalIndividuals();
 		$surnames = get_common_surnames($threshold);
 		if (count($surnames) <= 0) {return '';}
+		$SURNAME_TRADITION=get_gedcom_setting(WT_GED_ID, 'SURNAME_TRADITION');
 		uasort($surnames, array('WT_Stats', '_name_total_rsort'));
 		$surnames = array_slice($surnames, 0, $maxtoshow);
 		$all_surnames = array();
@@ -3476,7 +3482,7 @@ class WT_Stats {
 		$tot = 0;
 		$per = 0;
 		foreach ($surnames as $indexval=>$surname) {$tot += $surname['match'];}
-		$chart_title = "";
+		$chart_title = '';
 		$chd = '';
 		$chl = array();
 		foreach ($all_surnames as $surn=>$surns) {
@@ -3491,6 +3497,11 @@ class WT_Stats {
 					$top_name = $spfxsurn;
 				}
 			}
+			switch ($SURNAME_TRADITION) {
+			case 'polish':
+				// most common surname should be in male format (Kowalski, not Kowalska)
+				$top_name=preg_replace(array('/ska$/', '/cka$/', '/dzka$/', '/żka$/'), array('ski', 'cki', 'dzki', 'żki'), $top_name);
+			}
 			$per = round(100 * $count_per / $tot_indi, 0);
 			$chd .= self::_array_to_extended_encoding($per);
 			//ToDo: RTL names are often printed LTR when also LTR names are present
@@ -3504,7 +3515,7 @@ class WT_Stats {
 		$chart_title .= WT_I18N::translate('Other').' - '.($tot_indi-$tot);
 
 		$chl = join('|', $chl);
-		return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl=".rawurlencode($chl)."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
+		return '<img src="http://chart.apis.google.com/chart?cht=p3&amp;chd=e:'.$chd.'&amp;chs='.$size.'&amp;chco='.$color_from.','.$color_to.'&amp;chf=bg,s,ffffff00&amp;chl='.rawurlencode($chl).'" width="'.$sizes[0].'" height="'.$sizes[1].'" alt="'.$chart_title.'" title="'.$chart_title.'" />';
 	}
 
 
@@ -3595,7 +3606,7 @@ class WT_Stats {
 			switch ($type) {
 			case 'table':
 				$lookup=array('M'=>WT_I18N::translate('Male'), 'F'=>WT_I18N::translate('Female'), 'U'=>WT_I18N::translate_c('unknown gender', 'Unknown'), 'B'=>WT_I18N::translate('All'));
-				return '<table><tr><td colspan="2" class="descriptionbox center">'.$lookup[$sex].'</td></tr><tr><td class="descriptionbox center">'.WT_I18N::translate('Names').'</td><td class="descriptionbox center">'.WT_I18N::translate('Count').'</td></tr>'.join('', $common).'</table>';
+				return '<table><tr><td colspan="2" class="descriptionbox center">'.$lookup[$sex].'</td></tr><tr><td class="descriptionbox center">'.WT_Gedcom_Tag::getLabel('GIVN').'</td><td class="descriptionbox center">'.WT_I18N::translate('Count').'</td></tr>'.join('', $common).'</table>';
 			case 'list':
 				return "<ul>\n".join("\n", $common)."</ul>\n";
 			case 'nolist':

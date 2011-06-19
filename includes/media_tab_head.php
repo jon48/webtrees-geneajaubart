@@ -24,7 +24,7 @@
  *
  * @package webtrees
  * @subpackage Module
- * @version $Id: media_tab_head.php 10239 2011-01-01 22:32:55Z greg $
+ * @version $Id: media_tab_head.php 11667 2011-05-31 22:11:25Z greg $
  * @author Brian Holland
  */
 
@@ -35,7 +35,7 @@ if (!defined('WT_WEBTREES')) {
 
 define('WT_MEDIA_TAB_HEAD_PHP', '');
 
-global $LB_AL_HEAD_LINKS, $gedrec, $pid;
+global $gedrec, $pid;
 
 require_once WT_ROOT.'js/prototype.js.htm';
 require_once WT_ROOT.'js/scriptaculous.js.htm';

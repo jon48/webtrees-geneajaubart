@@ -27,7 +27,7 @@
 * @package webtrees
 * @subpackage Edit
 * @see functions_places.php
-* @version $Id: functions_edit.php 11299 2011-04-10 13:22:55Z veit $
+* @version $Id: functions_edit.php 11655 2011-05-30 18:02:32Z lukasz $
 * @version: p_$Revision$ $Date$
 * $HeadURL$
 */
@@ -47,6 +47,15 @@ function edit_field_inline($name, $value) {
 		'<span class="editable" id="' . $name . '">' . htmlspecialchars($value) . '</span>' .
 		WT_JS_START .
 		'jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'save.php", {submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'"})' .
+		WT_JS_END;
+}
+
+// Create a text area for inline editing using jeditable
+function edit_text_inline($name, $value) {
+	return
+		'<span class="editable" style="white-space:pre-wrap;" id="' . $name . '">' . htmlspecialchars($value) . '</span>' .
+		WT_JS_START .
+		'jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'save.php", {submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'", type: "textarea", rows:4, cols:60 })' .
 		WT_JS_END;
 }
 
@@ -84,16 +93,16 @@ function select_edit_control($name, $values, $empty, $selected, $extra='') {
 function select_edit_control_inline($name, $values, $empty, $selected, $extra='') {
 	if (!is_null($empty)) {
 		// Push ''=>$empty onto the front of the array, maintaining keys
-		$tmp=array(''=>$empty);
+		$tmp=array(''=>htmlspecialchars($empty));
 		foreach ($values as $key=>$value) {
-			$tmp[$key]=$value;
+			$tmp[$key]=htmlspecialchars($value);
 		}
 		$values=$tmp;
 	}
-	$values['selected']=$selected;
+	$values['selected']=htmlspecialchars($selected);
 	return
 		'<span class="editable" id="' . $name . '">' .
-		(array_key_exists($selected, $values) ? htmlspecialchars($values[$selected]) : '').
+		(array_key_exists($selected, $values) ? $values[$selected] : '').
 		'</span>' .
 		WT_JS_START .
 		'jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'save.php", {type:"select", data:' . json_encode($values) . ', submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'", callback:function(value, settings) {jQuery(this).html(settings.data[value]);} })' .
@@ -341,50 +350,19 @@ function checkChangeTime($pid, $gedrec, $last_time) {
 	}
 }
 
-/**
-* This function will replace a gedcom record with
-* the id $gid with the $gedrec
-* @param string $gid The XREF id of the record to replace
-* @param string $gedrec The new gedcom record to replace with
-* @param boolean $chan Whether or not to update/add the CHAN record
-*/
-function replace_gedrec($gid, $ged_id, $gedrec, $chan=true) {
-	global $pgv_private_records;
-
-	//-- restore any data that was hidden during privatizing
-	if (isset($pgv_private_records[$gid])) {
-		$privatedata = trim(get_last_private_data($gid));
-		$subs = get_all_subrecords("\n".$privatedata, '', false, false);
-		foreach ($subs as $s=>$sub) {
-			if (strstr($gedrec, $sub)===false) $gedrec = trim($gedrec)."\n".$sub;
-		}
-		unset($pgv_private_records[$gid]);
-	}
-
+// Replace an updated record with a newer version
+// $xref/$ged_id - the record to update
+// $gedrec       - the new gedcom record
+// $chan         - whether or not to update the CHAN record
+function replace_gedrec($xref, $ged_id, $gedrec, $chan=true) {
 	if (($gedrec = check_gedcom($gedrec, $chan))!==false) {
-		//-- the following block of code checks if the XREF was changed in this record.
-		//-- if it was changed we add a warning to the change log
-		$ct = preg_match("/0 @(.*)@/", $gedrec, $match);
-		if ($ct>0) {
-			$oldgid = $gid;
-			$gid = trim($match[1]);
-			if ($oldgid!=$gid) {
-				if ($gid=="REF" || $gid=="new" || $gid=="NEW") {
-					$gedrec = preg_replace("/0 @(.*)@/", "0 @".$oldgid."@", $gedrec);
-					$gid = $oldgid;
-				} else {
-					AddToLog("Warning: $oldgid was changed to $gid", 'edit');
-				}
-			}
-		}
-
-		$old_gedrec=find_gedcom_record($gid, $ged_id, true);
+		$old_gedrec=find_gedcom_record($xref, $ged_id, true);
 		if ($old_gedrec!=$gedrec) {
 			WT_DB::prepare(
 				"INSERT INTO `##change` (gedcom_id, xref, old_gedcom, new_gedcom, user_id) VALUES (?, ?, ?, ?, ?)"
 			)->execute(array(
 				$ged_id,
-				$gid,
+				$xref,
 				$old_gedrec,
 				$gedrec,
 				WT_USER_ID
@@ -392,7 +370,7 @@ function replace_gedrec($gid, $ged_id, $gedrec, $chan=true) {
 		}
 
 		if (WT_USER_AUTO_ACCEPT) {
-			accept_all_changes($gid, WT_GED_ID);
+			accept_all_changes($xref, $ged_id);
 		}
 		return true;
 	}
@@ -734,13 +712,20 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 				if ($famtag=='HUSB' && preg_match('/\/((?:[a-z]{2,3}\s+)*)(.*)\//i', $indi_name, $match)) {
 					if ($SURNAME_TRADITION=='polish' && $sextag=='M') {
 						$match[2]=preg_replace(array('/ska$/', '/cka$/', '/dzka$/', '/żka$/'), array('ski', 'cki', 'dzki', 'żki'), $match[2]);
-					} else if ($SURNAME_TRADITION=='lithuanian' && $sextag=='F') {
+					} else if ($SURNAME_TRADITION=='lithuanian') {
 						// not a complete list as the rules are somewhat complicated but will do 95% correctly
 						$match[2]=preg_replace(array('/aitė$/', '/ytė$/', '/iūtė$/', '/utė$/'), array('as', 'is', 'ius', 'us'), $match[2]);
 					}
 					$name_fields['SPFX']=trim($match[1]);
 					$name_fields['SURN']=$match[2];
 					$name_fields['NAME']="/{$match[1]}{$match[2]}/";
+				}
+				if ($famtag=='WIFE' && preg_match('/\/((?:[a-z]{2,3}\s+)*)(.*)\//i', $indi_name, $match)) {
+					if ($SURNAME_TRADITION=='lithuanian') {
+						$match[2]=preg_replace(array('/as$/', '/is$/', '/ys$/', '/us$/'), array('ienė', 'ienė', 'ienė', 'ienė'), $match[2]);
+						$match[2]=preg_replace(array('/aitė$/', '/ytė$/', '/iūtė$/', '/utė$/'), array('ienė', 'ienė', 'ienė', 'ienė'), $match[2]);
+						$new_marnm=$match[2];
+					}
 				}
 				break;
 			}
@@ -2498,7 +2483,10 @@ function create_edit_form($gedrec, $linenum, $level0type) {
 				$add_date = false;
 			} elseif ($type=='STAT') {
 				add_simple_tag($subrecord, $level1type, WT_Gedcom_Tag::getLabel($label, $person));
-		 	} else {
+		 	} elseif ($level0type=='REPO') {
+				$repo = WT_Repository::getInstance($pid);
+				add_simple_tag($subrecord, $level0type, WT_Gedcom_Tag::getLabel($label, $repo));
+			} else {
 				add_simple_tag($subrecord, $level0type, WT_Gedcom_Tag::getLabel($label, $person));
 			}
 		}
@@ -2580,7 +2568,9 @@ function insert_missing_subtags($level1tag, $add_date=false) {
 				add_simple_tag("2 ".$key.' '.WT_USER_NAME, $level1tag);
 			} else if ($level1tag=='TITL' && strstr($ADVANCED_NAME_FACTS, $key)!==false) {
 				add_simple_tag("2 ".$key, $level1tag);
-			} else if ($level1tag!='TITL') {
+			} else if ($level1tag=='NAME' && strstr($ADVANCED_NAME_FACTS, $key)!==false) {
+				add_simple_tag("2 ".$key, $level1tag);
+			} else if ($level1tag!='TITL' && $level1tag!='NAME') {
 				add_simple_tag("2 ".$key, $level1tag);
 			}
 			switch ($key) { // Add level 3/4 tags as appropriate

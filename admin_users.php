@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_users.php 10980 2011-02-26 15:53:24Z greg $
+// $Id: admin_users.php 11655 2011-05-30 18:02:32Z lukasz $
 
 define('WT_SCRIPT_NAME', 'admin_users.php');
 require './includes/session.php';
@@ -109,6 +109,7 @@ case 'loadrows':
 	}
 	$iDisplayStart =(int)safe_GET('iDisplayStart');
 	$iDisplayLength=(int)safe_GET('iDisplayLength');
+	set_user_setting(WT_USER_ID, 'admin_users_page_size', $iDisplayLength);
 	if ($iDisplayLength>0) {
 		$LIMIT=" LIMIT " . $iDisplayStart . ',' . $iDisplayLength;
 	} else {
@@ -221,7 +222,7 @@ case 'load1row':
 	echo '<dd>', edit_field_yes_no_inline('user_setting-'.$user_id.'-auto_accept', get_user_setting($user_id, 'auto_accept')), '</dd>';
 
 	echo '<dt>', WT_I18N::translate('Theme'), '</dt>';
-	echo '<dd>', select_edit_control_inline('user_setting-'.$user_id.'-theme', array_flip(get_theme_names()), WT_I18N::translate('&lt;default theme&gt;'), get_user_setting($user_id, 'theme')), '</dd>';
+	echo '<dd>', select_edit_control_inline('user_setting-'.$user_id.'-theme', array_flip(get_theme_names()), html_entity_decode(WT_I18N::translate('&lt;default theme&gt;')), get_user_setting($user_id, 'theme')), '</dd>';
 
 	echo '<dt>', WT_I18N::translate('Default Tab to show on Individual Information page'), '</dt>';
 	echo '<dd>', edit_field_default_tab_inline('user_setting-'.$user_id.'-defaulttab', get_user_setting($user_id, 'defaulttab', 'personal_facts')), '</dd>';
@@ -283,7 +284,7 @@ if ($action=='createuser' || $action=='edituser2') {
 		} else {
 			// New user
 			if ($action=='createuser') {
-				if ($user_id=create_user($username, $realname, $emailaddress, crypt($pass1))) {
+				if ($user_id=create_user($username, $realname, $emailaddress, $pass1)) {
 					set_user_setting($user_id, 'reg_timestamp', date('U'));
 					set_user_setting($user_id, 'sessiontime', '0');
 					AddToLog("User ->{$username}<- created", 'auth');
@@ -296,7 +297,7 @@ if ($action=='createuser' || $action=='edituser2') {
 			}
 			// Change password
 			if ($action=='edituser2' && !empty($pass1)) {
-				set_user_password($user_id, crypt($pass1));
+				set_user_password($user_id, $pass1);
 			}
 			// Change username
 			if ($action=='edituser2' && $username!=$oldusername) {
@@ -729,7 +730,7 @@ default:
 				"sAjaxSource"     : "<?php echo WT_SCRIPT_NAME.'?action=loadrows'; ?>",
 				"bJQueryUI": true,
 				"bAutoWidth":false,
-				"iDisplayLength": 10,
+				"iDisplayLength": <?php echo get_user_setting(WT_USER_ID, 'admin_users_page_size', 10); ?>,
 				"sPaginationType": "full_numbers",
 				"aaSorting": [[2,'asc']],
 				"aoColumns": [

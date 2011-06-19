@@ -3,7 +3,7 @@
  * Entry point for Lightbox module when changing theme on configuration page
  *
  * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
+ * Copyright (C) 2011 webtrees development team.
  *
  * Derived from PhpGedView
  * Copyright (C) 2002 to 2010  PGV Development Team. All rights reserved.
@@ -22,12 +22,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @package webtrees
- * @subpackage Lightbox
  * @author Brian Holland
- * $Id: index.php 7337 2010-03-11 04:25:05Z nigel $
+ * $Id: index.php 11559 2011-05-20 19:01:33Z lukasz $
  */
 
 header("Location: ../../index.php");
 exit;
-?>

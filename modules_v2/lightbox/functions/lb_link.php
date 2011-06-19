@@ -23,72 +23,56 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lb_link.php 10869 2011-02-18 16:00:33Z greg $
+// $Id: lb_link.php 11665 2011-05-31 21:50:19Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-	// Set Link
-	/**
-	 * Generate link flyout menu
-	 *
-	 * @param string $mediaid
-	 */
-// function print_link_menu2($mediaid) {
-    $mediaid=$media["XREF"];
-		global $TEXT_DIRECTION, $WT_IMAGES;
-		if (!isset($WT_IMAGES['image_link'])) {
-			$WT_IMAGES['image_link']=WT_MODULES_DIR.'lightbox/images/image_link.gif';
-		}
+// Set Link
+/**
+ * Generate link flyout menu
+ *
+ * @param string $mediaid
+ */
+ 
+global $TEXT_DIRECTION, $WT_IMAGES;
+$mediaid=$media['XREF'];
+if (!isset($WT_IMAGES['image_link'])) {
+	$WT_IMAGES['image_link']=WT_MODULES_DIR.'lightbox/images/image_link.gif';
+}
+$classSuffix = '';
+if ($TEXT_DIRECTION=='rtl') $classSuffix = '_rtl';
+// main link displayed on page
+$menu = new WT_Menu();
+$menu->addIcon('image_link');
+$menu->addLabel(WT_I18N::translate('Set link'), 'down');
+$menu->addOnclick("return ilinkitem('$mediaid','person')");
+$menu->addClass('', '', 'submenu');
+$menu->addFlyout('left');
 
-		$classSuffix = "";
-		if ($TEXT_DIRECTION=="rtl") $classSuffix = "_rtl";
+$submenu = new WT_Menu(WT_I18N::translate('To Person'), '#');
+$submenu->addOnclick("return ilinkitem('$mediaid','person')");
+$submenu->addClass('submenuitem'.$classSuffix, 'submenuitem'.$classSuffix);
+$menu->addSubMenu($submenu);
 
-		// main link displayed on page
-		$menu = new WT_Menu();
-		if ($LB_ML_THUMB_LINKS == "icon" || $LB_ML_THUMB_LINKS == "both") {
-			$menu->addIcon('image_link');
-		}
-		if ($LB_ML_THUMB_LINKS == "both") {
-			$menu->addLabel(WT_I18N::translate('Set link'), "down");
-		}
-		if ($LB_ML_THUMB_LINKS == "text") {
-			$menu->addLabel(WT_I18N::translate('Set link'));
-		}
-		$menu->addOnclick("return ilinkitem('$mediaid','person')");
-		$menu->addClass("", "", "submenu");
-		$menu->addFlyout("left");
+$submenu = new WT_Menu(WT_I18N::translate('To Family'), '#');
+$submenu->addOnclick("return ilinkitem('$mediaid','family')");
+$submenu->addClass('submenuitem'.$classSuffix, 'submenuitem'.$classSuffix);
+$menu->addSubMenu($submenu);
 
-		$submenu = new WT_Menu(WT_I18N::translate('To Person'), "#");
-		$submenu->addOnclick("return ilinkitem('$mediaid','person')");
-		$submenu->addClass("submenuitem".$classSuffix, "submenuitem".$classSuffix);
-		$menu->addSubMenu($submenu);
+$submenu = new WT_Menu(WT_I18N::translate('To Source'), '#');
+$submenu->addOnclick("return ilinkitem('$mediaid','source')");
+$submenu->addClass('submenuitem'.$classSuffix, 'submenuitem'.$classSuffix);
+$menu->addSubMenu($submenu);
 
-		$submenu = new WT_Menu(WT_I18N::translate('To Family'), "#");
-		$submenu->addOnclick("return ilinkitem('$mediaid','family')");
-		$submenu->addClass("submenuitem".$classSuffix, "submenuitem".$classSuffix);
-		$menu->addSubMenu($submenu);
-
-		$submenu = new WT_Menu(WT_I18N::translate('To Source'), "#");
-		$submenu->addOnclick("return ilinkitem('$mediaid','source')");
-		$submenu->addClass("submenuitem".$classSuffix, "submenuitem".$classSuffix);
-		$menu->addSubMenu($submenu);
-
-		echo $menu->getMenu();
+echo $menu->getMenu();
 ?>
 <script type="text/javascript">
   function ilinkitem(mediaid, type) {
-		window.open('inverselink.php?mediaid='+mediaid+'&linkto='+type+'&'+sessionname+'='+sessionid, '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1');
-		return false;
-	}
+	window.open('inverselink.php?mediaid='+mediaid+'&linkto='+type+'&'+sessionname+'='+sessionid, '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1');
+	return false;
+  }
 </script>
 <?php
-
-// }
-
-	// Only set link on media that is in the DB
-// if ($media["XREF"] != "") {
-// print_link_menu($media2["XREF"]);
-// }

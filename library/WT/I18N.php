@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // @author Greg Roach
-// @version $Id: I18N.php 11228 2011-03-28 15:24:07Z greg $
+// @version $Id: I18N.php 11548 2011-05-17 13:14:15Z greg $
 //
 // We use gettext to provide translation.  You should configure xgettext to
 // search for:
@@ -36,9 +36,6 @@ if (!defined('WT_WEBTREES')) {
 class WT_I18N {
 	static private $locale='';
 	static private $dir='';
-	static private $list_separator;
-	static private $list_separator_last;
-	static public  $alphabet;
 	static public  $collation;
 
 	// Initialise the translation adapter with a locale setting.
@@ -138,9 +135,6 @@ class WT_I18N {
 		global $WEEK_START; // I18N: This is the first day of the week on calendars. 0=Sunday, 1=Monday...
 		$WEEK_START=self::noop('WEEK_START=0');
 		list(, $WEEK_START)=explode('=', $WEEK_START);
-		global $DICTIONARY_SORT; // I18N: 1=>ignore diacrics when sorting, 0=>letters with diacritics are distinct
-		$DICTIONARY_SORT=self::noop('DICTIONARY_SORT=1');
-		list(, $DICTIONARY_SORT)=explode('=', $DICTIONARY_SORT);
 
 		global $TEXT_DIRECTION;
 		$localeData=Zend_Locale_Data::getList($locale, 'layout');
@@ -149,16 +143,8 @@ class WT_I18N {
 		self::$locale=$locale;
 		self::$dir=$TEXT_DIRECTION;
 
-		// I18N: This is a space separated list of initial letters for lists of names, etc.  Multi-letter characters are OK, e.g. "A B C CS D DZ DZS E F G GY H ..."  You may use upper/lowers case, such as "D Dz Dzs".
-		self::$alphabet=WT_I18N::translate('A B C D E F G H I J K L M N O P Q R S T U V W X Y Z');
-
 		// I18N: This is the name of the MySQL collation that applies to your language.  A list is available at http://dev.mysql.com/doc/refman/5.0/en/charset-unicode-sets.html
 		self::$collation=WT_I18N::translate('utf8_unicode_ci');
-
-		// I18N: This is the puncutation symbol used to separate the first items in a list.  e.g. the <comma><space> in "red, green, yellow and blue"
-		self::$list_separator=WT_I18N::noop('LANGUAGE_LIST_SEPARATOR');
-		// I18N: This is the puncutation symbol used to separate the final items in a list.  e.g. the <space>and<space> in "red, green, yellow and blue"
-		self::$list_separator_last=WT_I18N::noop('LANGUAGE_LIST_SEPARATOR_LAST');
 
 		return $locale;
 	}
@@ -214,25 +200,24 @@ class WT_I18N {
 		return 'lang="'.$lang.'" xml:lang="'.$lang.'" dir="'.$dir.'"';
 	}
 
-	// echo WT_I18N::translate('Hello World!');
-	// echo WT_I18N::translate('The %s sat on the mat', 'cat');
-	static public function translate(/* var_args */) {
+	// Add I18N features to sprintf()
+	// - Convert arrays into lists
+	// - Add directional markup for mixed LTR/RTL strings
+	static public function sprintf(/* var_args */) {
 		$args=func_get_args();
-		$args[0]=Zend_Registry::get('Zend_Translate')->_($args[0]);
-		foreach ($args as &$arg) {
-			if (is_array($arg)) {
-				$arg=WT_I18N::make_list($arg);
-			}
-		}
 		foreach ($args as $n=>&$arg) {
 			if ($n) {
-				if (is_numeric($arg)) {
-					switch (WT_LOCALE) {
-					case 'ar':
-					case 'fa':
-						// TODO: Persian numerals are styled slightly differently to Arab numberals
-						$arg=Zend_Locale_Format::convertNumerals($arg, 'Latn', 'Arab');
-						break;
+				if (is_array($arg)) {
+					// Is this actually used?
+					$n=count($arg);
+					switch ($n) {
+					case 0:
+						$arg='';
+					case 1:
+						$arg=$arg[0];
+					default:
+						// TODO: add LTR/RTL markup to each element?
+						$arg=implode(', ', $arg);
 					}
 				} else {
 					// For each embedded string, if the text-direction is the opposite of the
@@ -256,6 +241,40 @@ class WT_I18N {
 		return call_user_func_array('sprintf', $args);
 	}
 
+	// Translate a number into the local representation.  e.g. 12345.67 becomes
+	// en: 12,345.67
+	// fr: 12 345,67
+	// de: 12.345,67
+	static public function number($n, $precision=0) {
+		// Add "punctuation"
+		$n=Zend_Locale_Format::toNumber($n, array('locale'=>WT_LOCALE, 'precision'=>$precision));
+		// Convert digits
+		if (WT_LOCALE=='ar' || WT_LOCALE=='fa') {
+			$n=Zend_Locale_Format::convertNumerals($n, 'Latn', 'Arab');
+		}
+		return $n;
+	}
+
+	// Translate a fraction into a percentage.  e.g. 0.123 becomes
+	// en: 12.3%
+	// fr: 12,3 %
+	// de: 12,3%
+	static public function percentage($n, $precision=0) {
+		return
+ 			/* I18N: This is a percentage, such as "32.5%". "%s" is the number, "%%" is the percent symbol.  Some languages require a (non-breaking) space between the two, or a different symbol. */
+			WT_I18N::translate('%s%%', WT_I18N::number($n*100.0, $precision));
+	}
+
+
+
+	// echo WT_I18N::translate('Hello World!');
+	// echo WT_I18N::translate('The %s sat on the mat', 'cat');
+	static public function translate(/* var_args */) {
+		$args=func_get_args();
+		$args[0]=Zend_Registry::get('Zend_Translate')->_($args[0]);
+		return call_user_func_array(array('WT_I18N', 'sprintf'), $args);
+	}
+
 	// Context sensitive version of translate.
 	// echo WT_I18N::translate_c('NOMINATIVE', 'January');
 	// echo WT_I18N::translate_c('GENITIVE',   'January');
@@ -268,16 +287,7 @@ class WT_I18N {
 		}
 		$args[0]=$msgtxt;
 		unset ($args[1]);
-		foreach ($args as &$arg) {
-			if (is_array($arg)) {
-				$arg=WT_I18N::make_list($arg);
-			}
-		}
-		// TODO: for each embedded string, if the text-direction is the opposite of the
-		// page language, then wrap it in &ltr; on LTR pages and &rtl; on RTL pages.
-		// This will ensure that non/weakly direction characters in the main string
-		// are displayed correctly by the browser's BIDI algorithm.
-		return call_user_func_array('sprintf', $args);
+		return call_user_func_array(array('WT_I18N', 'sprintf'), $args);
 	}
 
 	// Similar to translate, but do perform "no operation" on it.
@@ -295,24 +305,6 @@ class WT_I18N {
 		$string=Zend_Registry::get('Zend_Translate')->plural($args[0], $args[1], $args[2]);
 		array_splice($args, 0, 3, array($string));
 		return call_user_func_array('sprintf', $args);
-	}
-
-	// Convert an array to a list.  For example
-	// array("red", "green", "yellow", "blue") => "red, green, yellow and blue"
-	static public function make_list($array) {
-		// TODO: for each array element, if the text-direction is the opposite of the
-		// page language, then wrap it in &ltr; on LTR pages and &rtl; on RTL pages.
-		// This will ensure that non/weakly direction characters in the main string
-		// are displayed correctly by the browser's BIDI algorithm.
-		$n=count($array);
-		switch ($n) {
-		case 0:
-			return '';
-		case 1:
-			return $array[0];
-		default:
-			return implode(self::$list_separator, array_slice($array, 0, $n-1)).self::$list_separator_last.$array[$n-1];
-		}
 	}
 
 	// Convert a GEDCOM age string into translated_text

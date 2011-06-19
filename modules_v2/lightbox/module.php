@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11247 2011-03-31 14:42:49Z brian $
+// @version $Id: module.php 11559 2011-05-20 19:01:33Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -73,24 +73,16 @@ class lightbox_WT_Module extends WT_Module implements WT_Module_Config, WT_Modul
 
 	// Implement WT_Module_Tab
 	public function getTabContent() {
-		global $MULTI_MEDIA, $MEDIA_EXTERNAL;
-		global $GEDCOM, $MEDIATYPE;
-		global $WORD_WRAPPED_NOTES, $MEDIA_DIRECTORY, $WT_IMAGES, $TEXT_DIRECTION, $is_media;
-		global $cntm1, $cntm2, $cntm3, $cntm4, $t, $mgedrec ;
-		global $edit ;
-		global $tabno;
-		global $Fam_Navigator, $NAV_ALBUM;
-
 		ob_start();
 		require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_head.php';
 
 		$media_found = false;
 		if (!$this->controller->indi->canDisplayDetails()) {
-			echo "<table class=\"facts_table\" cellpadding=\"0\">";
-			echo "<tr><td class=\"facts_value\">";
+			echo '<table class="facts_table" cellpadding="0">';
+			echo '<tr><td class="facts_value">';
 			print_privacy_error();
-			echo "</td></tr>";
-			echo "</table>";
+			echo '</td></tr>';
+			echo '</table>';
 		} else {
 			require WT_ROOT.WT_MODULES_DIR.'lightbox/album.php';
 		}

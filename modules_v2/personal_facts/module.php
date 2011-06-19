@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 10990 2011-02-27 20:45:32Z lukasz $
+// @version $Id: module.php 11574 2011-05-22 22:56:28Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -99,7 +99,10 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 						print_fact($value);
 					}
 				} else {
-					print_fact($value);
+					//$reftags = array ('CHAN', 'IDNO', 'RFN', 'AFN', 'REFN', 'RIN', '_UID');// list of tags used in "Extra information" sidebar module
+					if (!in_array($value->getTag(), WT_Gedcom_Tag::getReferenceFacts()) || !array_key_exists('extra_info', WT_Module::getActiveModules())) {
+						print_fact($value);
+					}
 				}
 				$FACT_COUNT++;
 			}

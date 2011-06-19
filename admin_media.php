@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_media.php 11213 2011-03-27 07:20:34Z greg $
+// $Id: admin_media.php 11696 2011-06-03 10:39:33Z greg $
 
  /* TODO:
  * Add check for missing index.php files when creating a directory
@@ -469,14 +469,13 @@ if (check_media_structure()) {
 			$medialist = get_medialist(true, $directory);
 			foreach ($medialist as $key => $media) {
 				if (!($MEDIA_EXTERNAL && isFileExternal($filename))) {
-					// why doesn't this use thumbnail_file??
 					$thumbnail = str_replace("$MEDIA_DIRECTORY", $MEDIA_DIRECTORY."thumbs/", check_media_depth($media["FILE"], "NOTRUNC"));
-					if (!$media["THUMBEXISTS"]) {
+					if (!media_exists($thumbnail)) {  
+						// can't use thumbnail_file or $media["THUMB"] or $media["THUMBEXISTS"] because it they reference the icon from WT_IMAGES 
 						if (generate_thumbnail($media["FILE"], $thumbnail)) {
 							echo WT_I18N::translate('Thumbnail %s generated automatically.', $thumbnail);
 							AddToLog("Thumbnail {$thumbnail} generated automatically.", 'edit');
-						}
-						else {
+						}	else {
 							echo "<span class=\"error\">";
 							echo WT_I18N::translate('Thumbnail %s could not be generated automatically.', $thumbnail);
 							echo "</span>";
@@ -749,12 +748,12 @@ if (check_media_structure()) {
 		if (array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 			$menu->addLabel(WT_I18N::translate('Manage links'));
 			$menu->addOnclick("return ilinkitem('$mediaid', 'manage')");
-			$menu->addClass("", "", "submenu");
 			$menu->addFlyout("left");
 			// Do not echo submunu
 
 		} else {
 			$menu->addLabel(WT_I18N::translate('Set link'));
+			$menu->addClass("", "", "submenu");
 			$submenu = new WT_Menu(WT_I18N::translate('To Person'));
 			$submenu->addClass("submenuitem".$classSuffix, "submenuitem_hover".$classSuffix);
 			$submenu->addOnclick("return ilinkitem('$mediaid', 'person')");
@@ -792,7 +791,7 @@ if (check_media_structure()) {
 				</select>
 			</td>
 			<td class="wrap">
-				<?php echo WT_I18N::translate('Show thumbnails'), help_link('show_thumb'); ?>
+				<?php echo WT_I18N::translate('Show thumbnails'); ?>
 				<input type="checkbox" name="showthumb" value="true" <?php if ($showthumb) echo "checked=\"checked\""; ?> onclick="submit();" />
 			</td>
 			<!--<td class="wrap">
@@ -1067,7 +1066,7 @@ echo WT_JS_START; ?>
 	});
 <?php echo WT_JS_END;?>
 
-<form class="tablesorter" method="post" action="<?php echo WT_SCRIPT_NAME; ?>">
+<form method="post" action="<?php echo WT_SCRIPT_NAME; ?>">
 		<table id="media_table">
 			<thead>
 				<tr>
@@ -1091,8 +1090,8 @@ echo WT_JS_START; ?>
 				$printDone = false;
 				foreach ($sortedMediaList as $indexval => $media) {
 					while (true) {
+						$isExternal = isFileExternal($media["FILE"]); // isExternal must be defined before any "break", so the if statement at the end of the loop doesn't fail
 						if (!filterMedia($media, $filter, $httpFilter)) break;
-						$isExternal = isFileExternal($media["FILE"]);
 						if ($passCount==1 && !$isExternal) break;
 						if ($passCount==2 && $isExternal) break;
 						$imgsize = findImageSize($media["FILE"]);
@@ -1184,7 +1183,7 @@ echo WT_JS_START; ?>
 							}
 
 							// Generate thumbnail
-							if (!$isExternal && (empty($media["THUMB"]) || !$media["THUMBEXISTS"])) {
+							if (!$isExternal && (empty($media["THUMB"]) || !$media["THUMBEXISTS"] || strpos($media["THUMB"], "themes/")!==false)) {
 								$ct = preg_match("/\.([^\.]+)$/", $media["FILE"], $match);
 								if ($ct>0) $ext = strtolower(trim($match[1]));
 								if ($ext=="jpg" || $ext=="jpeg" || $ext=="gif" || $ext=="png") {
@@ -1272,7 +1271,7 @@ echo WT_JS_START; ?>
 								echo '<br />';
 							}
 							if ($media["THUMBEXISTS"]) {
-								switch ($media["EXISTS"]) {
+								switch ($media["THUMBEXISTS"]) {
 								case 1:
 									echo WT_I18N::translate('This thumbnail is located on an external server');
 									break;

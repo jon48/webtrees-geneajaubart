@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: admin_editconfig.php 11163 2011-03-21 13:13:49Z brian $
+// @version $Id: admin_editconfig.php 11700 2011-06-03 16:51:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -96,8 +96,8 @@ if (!WT_USER_IS_ADMIN) {
 	exit;
 } else { 
 	echo '<table id="gm_config"><tr>',
-		'<th><a ', (safe_GET('mod_action')=="admin_editconfig" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_editconfig">', WT_I18N::translate('Google Maps configuration'), '</a>', help_link('GOOGLEMAP_CONFIG','googlemap'), '</th>',
-		'<th><a ', (safe_GET('mod_action')=="admin_places" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_places">', WT_I18N::translate('Edit geographic place locations'), '</a>', help_link('PLE_EDIT','googlemap'), '</th>',
+		'<th><a ', (safe_GET('mod_action')=="admin_editconfig" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_editconfig">', WT_I18N::translate('Google Maps configuration'), '</a>', '</th>',
+		'<th><a ', (safe_GET('mod_action')=="admin_places" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_places">', WT_I18N::translate('Edit geographic place locations'), '</a>', '</th>',
 		'<th><a ', (safe_GET('mod_action')=="admin_placecheck" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_placecheck">', WT_I18N::translate('Place Check'), '</a>', help_link('GOOGLEMAP_PLACECHECK','googlemap'), '</th>',
 	'</tr></table>';
 }
@@ -238,7 +238,7 @@ echo '<div id="tabs">',
 	</tr>
 	<tr>
 		<th><?php echo WT_I18N::translate('Use Googlemap for Place Hierarchy'), help_link('GOOGLEMAP_PH','googlemap'); ?></th>
-		<td><?php echo edit_field_yes_no('NEW_GM_PLACE_HIERARCHY', $GOOGLEMAP_PLACE_HIERARCHY); ?></td>
+		<td><?php echo edit_field_yes_no('NEW_GM_PLACE_HIERARCHY', get_module_setting('googlemap', 'GM_PLACE_HIERARCHY')); ?></td>
 	</tr>
 	<tr>
 		<th><?php echo WT_I18N::translate('Size of Place Hierarchy map (in pixels)'), help_link('GOOGLEMAP_PH_MAP_SIZE','googlemap'); ?></th>
@@ -298,7 +298,7 @@ echo '<div id="tabs">',
 <div id="gm_advanced">
 <table class="gm_edit_config">
 	<tr>
-		<th><?php echo WT_I18N::translate('Precision'), help_link('GOOGLEMAP_PRECISION','googlemap'); ?></th>
+		<th><?php echo WT_I18N::translate('Precision of the latitude and longitude'), help_link('GOOGLEMAP_PRECISION','googlemap'); ?></th>
 		<td>
 			<table>
 				<tr>
@@ -356,7 +356,7 @@ echo '<div id="tabs">',
 		</td>
 	</tr>
 	<tr>
-		<th><?php echo WT_I18N::translate('Default top level value'), help_link('GM_DEFAULT_LEVEL_0','googlemap'); ?></th>
+		<th><?php echo WT_I18N::translate('Default value for top-level'), help_link('GM_DEFAULT_LEVEL_0','googlemap'); ?></th>
 		<td><input type="text" name="NEW_GM_DEFAULT_TOP_LEVEL" value="<?php echo $GM_DEFAULT_TOP_VALUE; ?>" size="20" /></td>
 	</tr>
 	<tr>
@@ -392,7 +392,7 @@ echo '<div id="tabs">',
 </div>
 </div>
 <p>
-	<input type="submit" value="<?php echo WT_I18N::translate('Save configuration'); ?>" onclick="closeHelp();" />
+	<input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>" onclick="closeHelp();" />
 	&nbsp;&nbsp;
 	<input type="reset" value="<?php echo WT_I18N::translate('Reset'); ?>" />
 </p>

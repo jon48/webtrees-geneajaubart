@@ -26,7 +26,7 @@
 *
 * @package webtrees
 * @subpackage Admin
-* @version $Id: functions_export.php 11285 2011-04-07 14:35:26Z greg $
+* @version $Id: functions_export.php 11410 2011-04-29 18:22:37Z greg $
 */
 
 if (!defined('WT_WEBTREES')) {
@@ -148,66 +148,11 @@ function gedcom_header($gedfile) {
 	return $HEAD.$SOUR.$DEST.$DATE.$GEDC.$CHAR.$FILE.$COPR.$LANG.$PLAC.$SUBN.$SUBM."\n";
 }
 
-/**
- * Create a temporary user, and assign rights as specified
- */
-function createTempUser($userID, $rights, $gedcom) {
-	if ($tempUserID=get_user_id($userID)) {
-		delete_user($tempUserID);
-		AddToLog("deleted dummy user -> {$userID} <-, which was not deleted in a previous session", 'auth');
-	}
-	$ged_id=get_id_from_gedcom($gedcom);
-
-	$tempUserID=create_user($userID, "Dummy User", "dummy@email", md5(rand()));
-	if (!$tempUserID) return false;
-
-	set_user_setting($tempUserID, 'visibleonline', '0');
-	set_user_setting($tempUserID, 'contactmethod', 'none');
-	switch ($rights) {
-	case 'admin':
-		set_user_setting($tempUserID, 'canadmin', '1');
-		set_user_gedcom_setting($tempUserID, $ged_id, 'canedit', 'admin');
-	case 'gedadmin':
-		set_user_setting($tempUserID, 'canadmin', '0');
-		set_user_gedcom_setting($tempUserID, $ged_id, 'canedit', 'admin');
-		break;
-	case 'user':
-		set_user_setting($tempUserID, 'canadmin', '0');
-		set_user_gedcom_setting($tempUserID, $ged_id, 'canedit', 'access');
-		break;
-	case 'visitor':
-	default:
-		set_user_setting($tempUserID, 'canadmin', '0');
-		set_user_gedcom_setting($tempUserID, $ged_id, 'canedit', 'none');
-		break;
-	}
-	AddToLog("created dummy user -> {$userID} <- with level {$rights} to GEDCOM {$gedcom}", 'auth');
-
-	// Save things in cache
-	$_SESSION["pgv_GED_ID"]           =$ged_id;
-	$_SESSION["pgv_USER_ACCESS_LEVEL"]=getUserAccessLevel($tempUserID, $ged_id);
-
-	return $tempUserID;
-}
-
-/**
- * remove any custom webtrees tags from the given gedcom record
- * custom tags include _WT_USER and _THUM
- * @param string $gedrec the raw gedcom record
- * @return string the updated gedcom record
- */
-function remove_custom_tags($gedrec, $remove="no") {
-	if ($remove=="yes") {
-		//-- remove _WT...
-		$gedrec = preg_replace("/\d _WT.*/", "", $gedrec);
-		//-- remove _THUM
-		$gedrec = preg_replace("/\d _THUM .*/", "", $gedrec);
-	}
-	//-- cleanup so there are not any empty lines
-	$gedrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $gedrec);
-	//-- make downloaded file DOS formatted
-	$gedrec = preg_replace("/([^\r])\n/", "$1\n", $gedrec);
-	return $gedrec;
+// Remove cuustom webtrees tags from the record.
+// _WT*
+// _THUM
+function remove_custom_tags($gedrec) {
+	return preg_replace('/\n\d _(WT|THUM ).*/', '', $gedrec);
 }
 
 /**
@@ -250,14 +195,19 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 	$GEDCOM = $gedcom;
 	$ged_id=get_id_from_gedcom($gedcom);
 
-	$tempUserID = '#ExPoRt#';
-	if ($exportOptions['privatize']!='none') {
-		// Create a temporary userid
-		$export_user_id = createTempUser($tempUserID, $exportOptions['privatize'], $gedcom); // Create a temporary userid
-
-		// Temporarily become this user
-		$_SESSION["org_user"]=$_SESSION["wt_user"];
-		$_SESSION["wt_user"]=$export_user_id;
+	switch($exportOptions['privatize']) {
+	case 'gedadmin':
+		$access_level=WT_PRIV_NONE;
+		break;
+	case 'user':
+		$access_level=WT_PRIV_USER;
+		break;
+	case 'visitor':
+		$access_level=WT_PRIV_PUBLIC;
+		break;
+	case 'none':
+		$access_level=WT_USER_ACCESS_LEVEL;
+		break;
 	}
 
 	$head=gedcom_header($gedcom);
@@ -265,19 +215,26 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 		$head=str_replace("UTF-8", "ANSI", $head);
 		$head=utf8_decode($head);
 	}
-	$head=remove_custom_tags($head, $exportOptions['noCustomTags']);
 
 	// Buffer the output.  Lots of small fwrite() calls can be very slow when writing large gedcoms.
 	$buffer=reformat_record_export($head);
 
-	$recs=
-		WT_DB::prepare("SELECT i_gedcom FROM `##individuals` WHERE i_file=? ORDER BY i_id")
-		->execute(array($ged_id))
-		->fetchOneColumn();
-	foreach ($recs as $rec) {
-		$rec=remove_custom_tags($rec, $exportOptions['noCustomTags']);
-		if ($exportOptions['privatize']!='none') $rec=privatize_gedcom($ged_id, $rec);
-		if ($exportOptions['toANSI']=="yes") $rec=utf8_decode($rec);
+	$rows=WT_DB::prepare(
+		"SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, i_isdead, i_sex".
+		" FROM `##individuals` WHERE i_file=? ORDER BY i_id"
+	)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
+	foreach ($rows as $row) {
+		if ($exportOptions['privatize']=='none') {
+			$rec=$row['gedrec'];
+		} else {
+			list($rec)=WT_Person::getInstance($row)->privatizeGedcom($access_level);
+		}
+		if ($exportOptions['noCustomTags']=='yes') {
+			$rec=remove_custom_tags($rec);
+		}
+		if ($exportOptions['toANSI']=="yes") {
+			$rec=utf8_decode($rec);
+		}
 		$buffer.=reformat_record_export($rec);
 		if (strlen($buffer)>65536) {
 			fwrite($gedout, $buffer);
@@ -285,14 +242,22 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 		}
 	}
 
-	$recs=
-		WT_DB::prepare("SELECT f_gedcom FROM `##families` WHERE f_file=? ORDER BY f_id")
-		->execute(array($ged_id))
-		->fetchOneColumn();
-	foreach ($recs as $rec) {
-		$rec=remove_custom_tags($rec, $exportOptions['noCustomTags']);
-		if ($exportOptions['privatize']!='none') $rec=privatize_gedcom($ged_id, $rec);
-		if ($exportOptions['toANSI']=="yes") $rec=utf8_decode($rec);
+	$rows=WT_DB::prepare(
+		"SELECT 'FAM' AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec, f_husb, f_wife, f_numchil".
+		" FROM `##families` WHERE f_file=? ORDER BY f_id"
+	)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
+	foreach ($rows as $row) {
+		if ($exportOptions['privatize']=='none') {
+			$rec=$row['gedrec'];
+		} else {
+			list($rec)=WT_Family::getInstance($row)->privatizeGedcom($access_level);
+		}
+		if ($exportOptions['noCustomTags']=='yes') {
+			$rec=remove_custom_tags($rec);
+		}
+		if ($exportOptions['toANSI']=="yes") {
+			$rec=utf8_decode($rec);
+		}
 		$buffer.=reformat_record_export($rec);
 		if (strlen($buffer)>65536) {
 			fwrite($gedout, $buffer);
@@ -300,14 +265,22 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 		}
 	}
 
-	$recs=
-		WT_DB::prepare("SELECT s_gedcom FROM `##sources` WHERE s_file=? ORDER BY s_id")
-		->execute(array($ged_id))
-		->fetchOneColumn();
-	foreach ($recs as $rec) {
-		$rec=remove_custom_tags($rec, $exportOptions['noCustomTags']);
-		if ($exportOptions['privatize']!='none') $rec=privatize_gedcom($ged_id, $rec);
-		if ($exportOptions['toANSI']=="yes") $rec=utf8_decode($rec);
+	$rows=WT_DB::prepare(
+		"SELECT 'SOUR' AS type, s_id AS xref, s_file AS ged_id, s_gedcom AS gedrec".
+		" FROM `##sources` WHERE s_file=? ORDER BY s_id"
+	)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
+	foreach ($rows as $row) {
+		if ($exportOptions['privatize']=='none') {
+			$rec=$row['gedrec'];
+		} else {
+			list($rec)=WT_Source::getInstance($row)->privatizeGedcom($access_level);
+		}
+		if ($exportOptions['noCustomTags']=='yes') {
+			$rec=remove_custom_tags($rec);
+		}
+		if ($exportOptions['toANSI']=="yes") {
+			$rec=utf8_decode($rec);
+		}
 		$buffer.=reformat_record_export($rec);
 		if (strlen($buffer)>65536) {
 			fwrite($gedout, $buffer);
@@ -315,14 +288,22 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 		}
 	}
 
-	$recs=
-		WT_DB::prepare("SELECT o_gedcom FROM `##other` WHERE o_file=? AND o_type!=? AND o_type!=? ORDER BY o_id")
-		->execute(array($ged_id, 'HEAD', 'TRLR'))
-		->fetchOneColumn();
-	foreach ($recs as $rec) {
-		$rec=remove_custom_tags($rec, $exportOptions['noCustomTags']);
-		if ($exportOptions['privatize']!='none') $rec=privatize_gedcom($ged_id, $rec);
-		if ($exportOptions['toANSI']=="yes") $rec=utf8_decode($rec);
+	$rows=WT_DB::prepare(
+		"SELECT o_type AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec".
+		" FROM `##other` WHERE o_file=? AND o_type!=? AND o_type!=? ORDER BY o_id"
+	)->execute(array($ged_id, 'HEAD', 'TRLR'))->fetchAll(PDO::FETCH_ASSOC);
+	foreach ($rows as $row) {
+		if ($exportOptions['privatize']=='none') {
+			$rec=$row['gedrec'];
+		} else {
+			list($rec)=WT_GedcomRecord::getInstance($row)->privatizeGedcom($access_level);
+		}
+		if ($exportOptions['noCustomTags']=='yes') {
+			$rec=remove_custom_tags($rec);
+		}
+		if ($exportOptions['toANSI']=="yes") {
+			$rec=utf8_decode($rec);
+		}
 		$buffer.=reformat_record_export($rec);
 		if (strlen($buffer)>65536) {
 			fwrite($gedout, $buffer);
@@ -330,15 +311,23 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 		}
 	}
 
-	$recs=
-		WT_DB::prepare("SELECT m_gedrec FROM `##media` WHERE m_gedfile=? ORDER BY m_media")
-		->execute(array($ged_id))
-		->fetchOneColumn();
-	foreach ($recs as $rec) {
+	$rows=WT_DB::prepare(
+		"SELECT 'OBJE' AS type, m_media AS xref, m_gedfile AS ged_id, m_gedrec AS gedrec, m_titl, m_file".
+		" FROM `##media` WHERE m_gedfile=? ORDER BY m_media"
+	)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
+	foreach ($rows as $row) {
+		if ($exportOptions['privatize']=='none') {
+			$rec=$row['gedrec'];
+		} else {
+			list($rec)=WT_Media::getInstance($row)->privatizeGedcom($access_level);
+		}
 		$rec = convert_media_path($rec, $exportOptions['path'], $exportOptions['slashes']);
-		$rec=remove_custom_tags($rec, $exportOptions['noCustomTags']);
-		if ($exportOptions['privatize']!='none') $rec=privatize_gedcom($ged_id, $rec);
-		if ($exportOptions['toANSI']=="yes") $rec=utf8_decode($rec);
+		if ($exportOptions['noCustomTags']=='yes') {
+			$rec=remove_custom_tags($rec);
+		}
+		if ($exportOptions['toANSI']=="yes") {
+			$rec=utf8_decode($rec);
+		}
 		$buffer.=reformat_record_export($rec);
 		if (strlen($buffer)>65536) {
 			fwrite($gedout, $buffer);
@@ -347,12 +336,6 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 	}
 
 	fwrite($gedout, $buffer."0 TRLR".WT_EOL);
-
-	if ($exportOptions['privatize']!='none') {
-		$_SESSION["wt_user"]=$_SESSION["org_user"];
-		delete_user($export_user_id);
-		AddToLog("deleted dummy user -> {$tempUserID} <-", 'auth');
-	}
 
 	$GEDCOM = $oldGEDCOM;
 }

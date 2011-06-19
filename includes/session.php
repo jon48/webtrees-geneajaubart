@@ -22,7 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: session.php 11303 2011-04-11 14:27:08Z greg $
+ * @version $Id: session.php 11723 2011-06-06 21:07:05Z greg $
  */
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
@@ -33,7 +33,7 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.1.2');
+define('WT_VERSION',         '1.2.0');
 define('WT_VERSION_RELEASE', ''); // 'svn', 'beta', 'rc1', '', etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
 define('WT_WEBTREES_URL',    'http://webtrees.net');
@@ -52,7 +52,7 @@ define('WT_DEBUG_SQL',  false);
 define('WT_ERROR_LEVEL', 2); // 0=none, 1=minimal, 2=full
 
 // Required version of database tables/columns/indexes/etc.
-define('WT_SCHEMA_VERSION', 10);
+define('WT_SCHEMA_VERSION', 11);
 
 // Regular expressions for validating user input, etc.
 define('WT_REGEX_XREF',     '[A-Za-z0-9:_-]+');
@@ -437,19 +437,13 @@ if (WT_SCRIPT_NAME!='help_text.php') {
 	}
 
 	if ($REQUIRE_AUTHENTICATION && !WT_USER_ID && !in_array(WT_SCRIPT_NAME, array('login.php', 'login_register.php', 'help_text.php', 'message.php'))) {
-		if (!empty($_REQUEST['auth']) && $_REQUEST['auth']=='basic') {
-			// if user is attempting basic authentication
-			// TODO: Update if digest auth is ever implemented
-			basicHTTPAuthenticateUser();
+		if (WT_SCRIPT_NAME=='index.php') {
+			$url='index.php?ged='.WT_GEDCOM;
 		} else {
-			if (WT_SCRIPT_NAME=='index.php') {
-				$url='index.php?ged='.WT_GEDCOM;
-			} else {
-				$url=WT_SCRIPT_NAME.'?'.$QUERY_STRING;
-			}
-			header('Location: '.get_site_setting('LOGIN_URL').'?url='.rawurlencode($url));
-			exit;
+			$url=WT_SCRIPT_NAME.'?'.$QUERY_STRING;
 		}
+		header('Location: '.get_site_setting('LOGIN_URL').'?url='.rawurlencode($url));
+		exit;
 	}
 
 	// -- setup session information for tree clippings cart features

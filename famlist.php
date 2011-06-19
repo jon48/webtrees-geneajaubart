@@ -42,7 +42,7 @@
  *
  * @package webtrees
  * @subpackage Lists
- * @version $Id: famlist.php 11246 2011-03-31 13:56:47Z greg $
+ * @version $Id: famlist.php 11603 2011-05-25 08:15:52Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'famlist.php');
@@ -98,16 +98,10 @@ if ($show_all=='yes') {
 	$legend=WT_I18N::translate('All');
 	$url='famlist.php?show_all=yes';
 } elseif ($surname) {
-	$surname=utf8_strtoupper($surname);
-	$alpha=utf8_substr($surname, 0, 1);
-	foreach (explode(' ', WT_I18N::$alphabet) as $letter) {
-		if (strpos($surname, utf8_strtoupper($letter))===0) {
-			$alpha=utf8_strtoupper($letter);
-		}
-	}
+	$alpha=WT_Query_Name::initialLetter($surname);
 	$show_all='no';
 	if ($surname=='@N.N.') {
-		$legend=WT_I18N::translate_c('surname', '(unknown)');
+		$legend=$UNKNOWN_NN;
 	} else {
 		$legend=$surname;
 	}
@@ -115,19 +109,19 @@ if ($show_all=='yes') {
 	case '':
 		break;
 	case '@':
-		$legend.=', '.WT_I18N::translate_c('given name', '(unknown)');
+		$legend.=', '.$UNKNOWN_PN;
 		break;
 	default:
 		$legend.=', '.$falpha;
 		break;
 	}
 	$surname_sublist='no';
-	$url='famlist.php?surname='.urlencode($surname);
+	$url='famlist.php?surname='.rawurlencode($surname);
 } else {
 	$show_all='no';
 	$surname='';
 	if ($alpha=='@') {
-		$legend=WT_I18N::translate('(unknown)');
+		$legend=$UNKNOWN_NN;
 		$surname_sublist='no';
 		$surname='@N.N.';
 	} elseif ($alpha==',') {
@@ -136,7 +130,7 @@ if ($show_all=='yes') {
 	} else {
 		$legend=$alpha;
 	}
-	$url='famlist.php?alpha='.urlencode($alpha);
+	$url='famlist.php?alpha='.rawurlencode($alpha);
 }
 
 
@@ -147,10 +141,13 @@ echo '<h2 class="center">', WT_I18N::translate('Families'), '</h2>';
 foreach ($initials as $letter=>$count) {
 	switch ($letter) {
 	case '@':
-		$html=WT_I18N::translate('(unknown)');
+		$html=$UNKNOWN_NN;
 		break;
 	case ',':
 		$html=WT_I18N::translate('None');
+		break;
+	case ' ':
+		$html='&nbsp;';
 		break;
 	default:
 		$html=$letter;
@@ -159,12 +156,12 @@ foreach ($initials as $letter=>$count) {
 	if ($count) {
 		if ($showList && $letter==$alpha && $show_all=='no') {
 			if ($surname) {
-				$html='<a href="famlist.php?alpha='.urlencode($letter).'&amp;ged='.WT_GEDURL.'" class="warning" title="'.$count.'">'.$html.'</a>';
+				$html='<a href="famlist.php?alpha='.rawurlencode($letter).'&amp;ged='.WT_GEDURL.'" class="warning" title="'.$count.'">'.$html.'</a>';
 			} else {
 				$html='<span class="warning" title="'.$count.'">'.$html.'</span>';
 			}
 		} else {
-			$html='<a href="famlist.php?alpha='.urlencode($letter).'&amp;ged='.WT_GEDURL.'" title="'.$count.'">'.$html.'</a>';
+			$html='<a href="famlist.php?alpha='.rawurlencode($letter).'&amp;ged='.WT_GEDURL.'" title="'.$count.'">'.$html.'</a>';
 		}
 	}
 	$list[]=$html;
@@ -247,7 +244,7 @@ if ($showList) {
 				foreach ($givn_initials as $givn_initial=>$count) {
 					switch ($givn_initial) {
 					case '@':
-						$html=WT_I18N::translate('(unknown)');
+						$html=$UNKNOWN_PN;
 						break;
 					default:
 						$html=$givn_initial;

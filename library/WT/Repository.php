@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Repository.php 10225 2011-01-01 15:04:58Z greg $
+// @version $Id: Repository.php 11410 2011-04-29 18:22:37Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,9 +33,15 @@ class WT_Repository extends WT_GedcomRecord {
 	public function getHtmlUrl() {
 		return parent::_getLinkUrl('repo.php?rid=', '&amp;');
 	}
+
 	// Generate a URL to this record, suitable for use in javascript, HTTP headers, etc.
 	public function getRawUrl() {
 		return parent::_getLinkUrl('repo.php?rid=', '&');
+	}
+
+	// Generate a private version of this record
+	protected function createPrivateGedcomRecord($access_level) {
+		return "0 @".$this->xref."@ REPO\n1 NAME ".WT_I18N::translate('Private');
 	}
 
 	// Get an array of structures containing all the names in the record

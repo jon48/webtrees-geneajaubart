@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 10869 2011-02-18 16:00:33Z greg $
+// @version $Id: module.php 11612 2011-05-26 13:10:40Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -51,7 +51,7 @@ class family_group_report_WT_Module extends WT_Module implements WT_Module_Repor
 		global $controller;
 
 		if ($controller && isset($controller->famid)) {
-			$pid='&amp;pid='.$controller->famid;
+			$pid='&amp;famid='.$controller->famid;
 		} else {
 			$pid='';
 		}
@@ -60,6 +60,7 @@ class family_group_report_WT_Module extends WT_Module implements WT_Module_Repor
 		$menu=new WT_Menu($this->getTitle(), 'reportengine.php?ged='.WT_GEDURL.'&amp;action=setup&amp;report='.WT_MODULES_DIR.$this->getName().'/report.xml'.$pid);
 		$menu->addIcon('sfamily');
 		$menu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_reports');
+		$menu->addId('menu-report-'.$this->getName());
 		$menus[]=$menu;
 
 		return $menus;

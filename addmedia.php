@@ -28,7 +28,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * @package webtrees
  * @subpackage MediaDB
- * @version $Id: addmedia.php 10239 2011-01-01 22:32:55Z greg $
+ * @version $Id: addmedia.php 11365 2011-04-25 16:03:10Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'addmedia.php');
@@ -61,14 +61,14 @@ print_simple_header(WT_I18N::translate('Add a new media item'));
 $disp = true;
 if (empty($pid) && !empty($mid)) $pid = $mid;
 if (!empty($pid)) {
-	$gedrec = find_gedcom_record($pid, WT_GED_ID, true);
-	$disp = canDisplayRecord(WT_GED_ID, $gedrec);
+	$disp = WT_GedcomRecord::getInstance($pid)->canDisplayDetails();
 }
 if ($action=='update' || $action=='newentry') {
 	if (!isset($linktoid) || $linktoid=='new') $linktoid='';
 	if (empty($linktoid) && !empty($gid)) $linktoid = $gid;
 	if (!empty($linktoid)) {
-		$disp = canDisplayRecord(WT_GED_ID, find_gedcom_record($linktoid, WT_GED_ID));
+		$disp = WT_GedcomRecord::getInstance($linktoid)->canDisplayDetails();
+
 	}
 }
 

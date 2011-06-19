@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print.php 11294 2011-04-10 08:32:41Z veit $
+// $Id: functions_print.php 11612 2011-05-26 13:10:40Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
  
@@ -48,8 +48,8 @@ require_once WT_ROOT.'includes/functions/functions_charts.php';
 function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $ZOOM_BOXES, $LINK_ICONS, $GEDCOM;
 	global $MULTI_MEDIA, $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $PEDIGREE_FULL_DETAILS, $SHOW_PEDIGREE_PLACES;
-	global $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
-	global $USE_SILHOUETTE, $WT_IMAGES, $ABBREVIATE_CHART_LABELS, $USE_MEDIA_VIEWER;
+	global $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT;
+	global $WT_IMAGES, $ABBREVIATE_CHART_LABELS;
 	global $chart_style, $box_width, $generations, $show_spouse, $show_full;
 	global $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE, $PEDIGREE_SHOW_GENDER;
 	global $SEARCH_SPIDER;
@@ -103,10 +103,10 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 				// NOTE: Start div I.$pid.$personcount.$count.links
 				$personlinks .= "<table class=\"person_box$isF\"><tr><td class=\"details1\">";
 				// NOTE: Zoom
-				$personlinks .= "<a href=\"pedigree.php?rootid={$pid}&amp;show_full={$PEDIGREE_FULL_DETAILS}&amp;PEDIGREE_GENERATIONS={$OLD_PGENS}&amp;talloffset={$talloffset}&amp;ged=".rawurlencode($GEDCOM)."\" $mouseAction1><b>".WT_I18N::translate('Pedigree Tree')."</b></a>";
+				$personlinks .= "<a href=\"pedigree.php?rootid={$pid}&amp;show_full={$PEDIGREE_FULL_DETAILS}&amp;PEDIGREE_GENERATIONS={$OLD_PGENS}&amp;talloffset={$talloffset}&amp;ged=".rawurlencode($GEDCOM)."\" $mouseAction1><b>".WT_I18N::translate('Pedigree')."</b></a>";
 
 				if (array_key_exists('googlemap', WT_Module::getActiveModules())) {
-					$personlinks .= "<br /><a href=\"module.php?mod=googlemap&amp;mod_action=pedigree_map&amp;rootid={$pid}&amp;ged=".rawurlencode($GEDCOM)."\" ".$mouseAction1."><b>".WT_I18N::translate('Pedigree Map')."</b></a>";
+					$personlinks .= "<br /><a href=\"module.php?mod=googlemap&amp;mod_action=pedigree_map&amp;rootid={$pid}&amp;ged=".rawurlencode($GEDCOM)."\" ".$mouseAction1."><b>".WT_I18N::translate('Pedigree map')."</b></a>";
 				}
 				$username = WT_USER_NAME;
 				if (!empty($username)) {
@@ -116,11 +116,11 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 					}
 				}
 
-				$personlinks .= "<br /><a href=\"descendancy.php?pid={$pid}&amp;show_full={$PEDIGREE_FULL_DETAILS}&amp;generations={$generations}&amp;box_width={$box_width}&amp;ged=".rawurlencode($GEDCOM)."\" $mouseAction1><b>".WT_I18N::translate('Descendancy chart')."</b></a><br />";
-				$personlinks .= "<a href=\"ancestry.php?rootid={$pid}&amp;show_full={$PEDIGREE_FULL_DETAILS}&amp;chart_style={$chart_style}&amp;PEDIGREE_GENERATIONS={$OLD_PGENS}&amp;box_width={$box_width}&amp;ged=".rawurlencode($GEDCOM)."\" ".$mouseAction1."><b>".WT_I18N::translate('Ancestry chart')."</b></a><br />";
-				$personlinks .= "<a href=\"compact.php?rootid={$pid}&amp;ged=".rawurlencode($GEDCOM)."\" ".$mouseAction1."><b>".WT_I18N::translate('Compact chart')."</b></a><br />";
+				$personlinks .= "<br /><a href=\"descendancy.php?pid={$pid}&amp;show_full={$PEDIGREE_FULL_DETAILS}&amp;generations={$generations}&amp;box_width={$box_width}&amp;ged=".rawurlencode($GEDCOM)."\" $mouseAction1><b>".WT_I18N::translate('Descendants')."</b></a><br />";
+				$personlinks .= "<a href=\"ancestry.php?rootid={$pid}&amp;show_full={$PEDIGREE_FULL_DETAILS}&amp;chart_style={$chart_style}&amp;PEDIGREE_GENERATIONS={$OLD_PGENS}&amp;box_width={$box_width}&amp;ged=".rawurlencode($GEDCOM)."\" ".$mouseAction1."><b>".WT_I18N::translate('Ancestors')."</b></a><br />";
+				$personlinks .= "<a href=\"compact.php?rootid={$pid}&amp;ged=".rawurlencode($GEDCOM)."\" ".$mouseAction1."><b>".WT_I18N::translate('Compact tree')."</b></a><br />";
 				if (function_exists("imagettftext")) {
-					$personlinks .= "<a href=\"fanchart.php?rootid={$pid}&amp;PEDIGREE_GENERATIONS={$OLD_PGENS}&amp;ged=".rawurlencode($GEDCOM)."\" ".$mouseAction1."><b>".WT_I18N::translate('Circle diagram')."</b></a><br />";
+					$personlinks .= "<a href=\"fanchart.php?rootid={$pid}&amp;PEDIGREE_GENERATIONS={$OLD_PGENS}&amp;ged=".rawurlencode($GEDCOM)."\" ".$mouseAction1."><b>".WT_I18N::translate('Fan chart')."</b></a><br />";
 				}
 				$personlinks .= "<a href=\"hourglass.php?pid={$pid}&amp;show_full={$PEDIGREE_FULL_DETAILS}&amp;chart_style={$chart_style}&amp;PEDIGREE_GENERATIONS={$OLD_PGENS}&amp;box_width={$box_width}&amp;ged=".rawurlencode($GEDCOM)."&amp;show_spouse={$show_spouse}\" ".$mouseAction1."><b>".WT_I18N::translate('Hourglass chart')."</b></a><br />";
 				if (array_key_exists('tree', WT_Module::getActiveModules())) {
@@ -235,45 +235,15 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 	//-- find the name
 	$name = $person->getFullName();
 	if ($MULTI_MEDIA && $SHOW_HIGHLIGHT_IMAGES) {
-		$object = $person->findHighlightedMedia();
+		$object=$person->findHighlightedMedia();
+		$img_title=PrintReady(htmlspecialchars($name));
+		$img_id='box-'.$boxID.'.-thumb';
 		if (!empty($object)) {
-			$whichFile = thumb_or_main($object); // Do we send the main image or a thumbnail?
-			$size = findImageSize($whichFile);
-			$class = "pedigree_image_portrait";
-			if ($size[0]>$size[1]) $class = "pedigree_image_landscape";
-			if ($TEXT_DIRECTION == "rtl") $class .= "_rtl";
-			// NOTE: IMG ID
-			$imgsize = findImageSize($object["file"]);
-			$imgwidth = $imgsize[0]+50;
-			$imgheight = $imgsize[1]+150;
-
-			if (WT_USE_LIGHTBOX) {
-				$thumbnail .= "<a href=\"" . $object["file"] . "\" rel=\"clearbox[general_2]\" rev=\"" . $object['mid'] . "::" . $GEDCOM . "::" . PrintReady(htmlspecialchars($name)) . "\">";
-			} else if (!empty($object['mid']) && $USE_MEDIA_VIEWER) {
-				$thumbnail .= "<a href=\"mediaviewer.php?mid=".$object['mid']."\" >";
-			} else {
-				$thumbnail .= "<a href=\"javascript:;\" onclick=\"return openImage('".rawurlencode($object["file"])."', $imgwidth, $imgheight);\">";
-			}
-			$thumbnail .= "<img id=\"box-$boxID-thumb\" src=\"".$whichFile."\" vspace=\"0\" hspace=\"0\" class=\"$class\" alt=\"\" title=\"".PrintReady(htmlspecialchars(strip_tags($name)))."\"";
-			if (!$show_full) $thumbnail .= " style=\"display: none;\"";
-			if ($imgsize) $thumbnail .= " /></a>";
-			else $thumbnail .= " />";
-		} else if ($USE_SILHOUETTE && isset($WT_IMAGES["default_image_U"])) {
-			$class = "pedigree_image_portrait";
-			if ($TEXT_DIRECTION == "rtl") $class .= "_rtl";
-			$sex = $person->getSex();
-			$thumbnail = "<img id=\"box-$boxID-thumb\" src=\"";
-			if ($sex == 'F') {
-				$thumbnail .= $WT_IMAGES["default_image_F"]."\"";
-			}
-			else if ($sex == 'M') {
-				$thumbnail .= $WT_IMAGES["default_image_M"]."\"";
-			}
-			else {
-				$thumbnail .= $WT_IMAGES["default_image_U"]."\"";
-			}
-			if (!$show_full) $thumbnail .= " style=\"display: none;\"";
-			$thumbnail .=" class=\"".$class."\" border=\"none\" alt=\"\" />";
+			$which=thumb_or_main($object); // Do we send the main image or a thumbnail?
+			$mediaobject=WT_Media::getInstance($object['mid']);
+			$thumbnail=$mediaobject->displayMedia(array('which'=>$which,'display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$img_title,'show_full'=>$show_full));
+		} else {
+			$thumbnail=display_silhouette(array('sex'=>$person->getSex(),'display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$img_title,'show_full'=>$show_full)); // may return ''
 		}
 	}
 	//-- find additional name
@@ -351,7 +321,7 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 * print out standard HTML header
 *
 * This function will print out the HTML, HEAD, and BODY tags and will load in the CSS javascript and
-* other auxiliary files needed to run PGV.  It will also include the theme specific header file.
+* other auxiliary files needed to run webtrees.  It will also include the theme specific header file.
 * This function should be called by every page, except popups, before anything is output.
 *
 * Popup pages, because of their different format, should invoke function print_simple_header() instead.
@@ -454,10 +424,9 @@ function print_header($title, $view='full') {
 	$javascript=
 		'<script type="text/javascript" src="js/jquery/jquery.min.js"></script>'.
 		'<script type="text/javascript" src="js/jquery/jquery-ui.min.js"></script>'.
-		'<script type="text/javascript" src="js/jquery/jquery.tablesorter.js"></script>'. // Deprecated - use datatables
-		'<script type="text/javascript" src="js/jquery/jquery.tablesorter.pager.js"></script>'. // Deprecated - use datatables
 		'<script type="text/javascript" src="js/jquery/jquery.jeditable.min.js"></script>'.
 		'<script type="text/javascript" src="js/jquery/jquery.dataTables.min.js"></script>'.
+		'<script type="text/javascript" src="js/jquery/jquery.cookie.js"></script>'.
 		WT_JS_START.'
 		// Give JavaScript access to some PHP constants
 		var WT_THEME_DIR   = "'.WT_THEME_DIR.'";
@@ -575,6 +544,25 @@ function print_footer($view='full') {
 	echo '</body></html>';
 }
 
+// print HTML header meta links 
+// previously identical code in each theme's header.php file
+// now added as a function here.
+
+function header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL) {
+	$header_links = '';
+	if (!empty($LINK_CANONICAL)) {
+		$header_links.= '<link rel="canonical" href="'. $LINK_CANONICAL. '" />';
+	}
+	if (!empty($META_DESCRIPTION)) {
+		$header_links.= '<meta name="description" content="'. htmlspecialchars($META_DESCRIPTION). '" />';
+	}
+	$header_links.= '<meta name="robots" content="'. $META_ROBOTS. '" />';
+	if (!empty($META_GENERATOR)) {
+		$header_links.= '<meta name="generator" content="'. $META_GENERATOR. '" />';
+	}
+	return $header_links;
+}
+
 // Page footer for popup/edit windows
 function print_simple_footer() {
 	print_footer('simple');
@@ -588,12 +576,16 @@ function print_simple_footer() {
 function execution_stats() {
 	global $start_time, $PRIVACY_CHECKS;
 
-	return sprintf("<div class=\"execution_stats\">".WT_I18N::translate('Execution time:')." %.3f ".WT_I18N::translate('sec.')." ".WT_I18N::translate('Total Database Queries: ')." %d. ".WT_I18N::translate('Total privacy checks: ')." %d. ".WT_I18N::translate('Total Memory Usage:')." %.0f KB.</div>",
-		microtime(true)-$start_time,
-		WT_DB::getQueryCount(),
-		$PRIVACY_CHECKS,
-		version_compare(PHP_VERSION, '5.2.1', '>=') ? (memory_get_peak_usage(true)/1024) : (memory_get_usage()/1024)
-	);
+	return
+		'<div class="execution_stats">'.
+		WT_I18N::translate(
+			'Execution time: %1$s seconds. Database queries: %2$s. Privacy checks: %3$s. Memory usage: %4$s KB.',
+			WT_I18N::number(microtime(true)-$start_time, 3),
+			WT_I18N::number(WT_DB::getQueryCount()),
+			WT_I18N::number($PRIVACY_CHECKS),
+			WT_I18N::number(version_compare(PHP_VERSION, '5.2.1', '>=') ? (memory_get_peak_usage(true)/1024) : (memory_get_usage()/1024))
+		).
+		'</div>';
 }
 
 // Generate a login link
@@ -703,12 +695,12 @@ function contact_menus($ged_id=WT_GED_ID) {
 	$menuitems=array();
 	if ($support_menu==$contact_menu) {
 		$support_menu['label']=WT_I18N::translate('Technical help contact');
-		$menuitems[]=$support_menu;
+		$menuitems['menu-help-technical']=$support_menu;
 	} else {
 		$support_menu['label']=WT_I18N::translate('Technical help contact');
-		$menuitems[]=$support_menu;
+		$menuitems['menu-help-technical']=$support_menu;
 		$contact_menu['label']=WT_I18N::translate('Genealogy contact');
-		$menuitems[]=$contact_menu;
+		$menuitems['menu-help-genealogy']=$contact_menu;
 	}
 	return $menuitems;
 }
@@ -970,6 +962,7 @@ function print_note_record($text, $nlevel, $nrec, $textOnly=false, $return=false
 			} else {
 				$data .= WT_I18N::translate('Note').": </span>";
 			}
+			$data .= "</div>";
 		}
 
 		if ($brpos !== false) {
@@ -1025,8 +1018,9 @@ function print_fact_notes($factrec, $level, $textOnly=false, $return=false) {
 			$closeSpan = print_note_record($match[$j][1], $nlevel, $nrec, $textOnly, true);
 			$data .= $closeSpan."<br />";
 		} else {
-			$noterec = find_gedcom_record($nmatch[1], $ged_id);
-			if (canDisplayRecord($ged_id, $noterec)) {
+			$note=WT_Note::getInstance($nmatch[1]);
+			if ($note->canDisplayDetails()) {
+				$noterec = $note->getGedcomRecord();
 				//-- print linked note records
 				$nt = preg_match("/0 @$nmatch[1]@ NOTE (.*)/", $noterec, $n1match);
 				$closeSpan = print_note_record(($nt>0)?$n1match[1]:"", 1, $noterec, $textOnly, true);
@@ -1354,7 +1348,7 @@ function print_asso_rela_record($event) {
 					$label=get_relationship_name(get_relationship($associate->getXref(), $person->getXref(), true, 4));
 				}
 				if (!$label) {
-					$label=WT_I18N::translate('Relationship chart');
+					$label=WT_I18N::translate('Relationships');
 				}
 				// For family records (e.g. MARR), identify the spouse with a sex icon
 				if ($event->getParentObject() instanceof WT_Family) {
@@ -1546,12 +1540,13 @@ function format_fact_date(&$eventObj, $anchor=false, $time=false) {
 		}
 	} else {
 		// 1 DEAT Y with no DATE => print YES
+		// 1 BIRT 2 SOUR @S1@ => print YES
 		// 1 DEAT N is not allowed
 		// It is not proper GEDCOM form to use a N(o) value with an event tag to infer that it did not happen.
 		$factrec = str_replace("\nWT_OLD\n", '', $factrec);
 		$factrec = str_replace("\nWT_NEW\n", '', $factrec);
 		$factdetail = explode(' ', trim($factrec));
-		if (isset($factdetail)) if (count($factdetail) == 3) if (strtoupper($factdetail[2]) == 'Y') {
+		if (isset($factdetail) && (count($factdetail) == 3 && strtoupper($factdetail[2]) == 'Y') || (count($factdetail) == 4 && $factdetail[2] == 'SOUR')) {
 			$html.=WT_I18N::translate('Yes');
 		}
 	}
@@ -1686,9 +1681,9 @@ function format_first_major_fact($key, $majorfacts = array("BIRT", "CHR", "BAPM"
 	foreach ($majorfacts as $indexval => $fact) {
 		$event = $person->getFactByType($fact);
 		if (!is_null($event) && $event->hasDatePlace() && $event->canShow()) {
-			$html.='<span dir="'.$TEXT_DIRECTION.'"><br /><i>';
+			$html.='<span dir="'.$TEXT_DIRECTION.'"><br /><em>';
 			$html .= $event->getLabel();
-			$html.=' '.format_fact_date($event).format_fact_place($event).'</i></span>';
+			$html.=' '.format_fact_date($event).format_fact_place($event).'</em></span>';
 			break;
 		}
 	}

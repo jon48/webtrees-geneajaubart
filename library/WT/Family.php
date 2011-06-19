@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Family.php 10392 2011-01-07 21:26:51Z greg $
+// @version $Id: Family.php 11539 2011-05-15 20:20:23Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -77,19 +77,55 @@ class WT_Family extends WT_GedcomRecord {
 		parent::__construct($data);
 	}
 
+	// Generate a private version of this record
+	protected function createPrivateGedcomRecord($access_level) {
+		global $SHOW_PRIVATE_RELATIONSHIPS;
+
+		$rec='0 @'.$this->xref.'@ FAM';
+		// Just show the 1 CHIL/HUSB/WIFE tag, not any subtags, which may contain private data
+		preg_match_all('/\n1 (?:CHIL|HUSB|WIFE) @('.WT_REGEX_XREF.')@/', $this->_gedrec, $matches, PREG_SET_ORDER);
+		foreach ($matches as $match) {
+			$rela=WT_Person::getInstance($match[1]);
+			if ($SHOW_PRIVATE_RELATIONSHIPS || $rela && $rela->canDisplayName($access_level)) {
+				$rec.=$match[0];
+			}
+		}
+		return $rec;
+	}
+
 	/**
 	 * get the husband's person object
 	 * @return Person
 	 */
-	function &getHusband() {
+	function getHusband() {
 		return $this->husb;
 	}
 	/**
 	 * get the wife's person object
 	 * @return Person
 	 */
-	function &getWife() {
+	function getWife() {
 		return $this->wife;
+	}
+
+	// Implement family-specific privacy logic
+	protected function _canDisplayDetailsByType($access_level) {
+		// Hide a family if any member is private
+		preg_match_all('/\n1 (?:CHIL|HUSB|WIFE) @('.WT_REGEX_XREF.')@/', $this->_gedrec, $matches);
+		foreach ($matches[1] as $match) {
+			$person=WT_Person::getInstance($match);
+			if ($person && !$person->canDisplayDetails($access_level)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// Can the name of this record be shown?
+	public function canDisplayName($access_level=WT_USER_ACCESS_LEVEL) {
+		// We can always see the name (Husband-name + Wife-name), however,
+		// the name will often be "private + private"
+		return true;
 	}
 
 	/**
@@ -97,7 +133,7 @@ class WT_Family extends WT_GedcomRecord {
 	 * @param Person $person
 	 * @return Person
 	 */
-	function &getSpouse(&$person) {
+	function getSpouse($person) {
 		if (is_null($this->wife) || is_null($this->husb)) return null;
 		if ($this->wife->equals($person)) return $this->husb;
 		if ($this->husb->equals($person)) return $this->wife;
@@ -131,18 +167,16 @@ class WT_Family extends WT_GedcomRecord {
 	 * get the children
 	 * @return array array of children Persons
 	 */
-	function getChildren() {
+	function getChildren($access_level=WT_USER_ACCESS_LEVEL) {
+		global $SHOW_PRIVATE_RELATIONSHIPS;
+
 		if ($this->_children===null) {
 			$this->_children=array();
-			preg_match_all('/\n1 CHIL @('.WT_REGEX_XREF.')@/', $this->gedrec, $match);
+			preg_match_all('/\n1 CHIL @('.WT_REGEX_XREF.')@/', $this->getGedcomRecord(), $match);
 			foreach ($match[1] as $pid) {
 				$child=WT_Person::getInstance($pid);
-				if ($child) {
-					if ($child->canDisplayName()) {
-						$this->_children[]=$child;
-					}
-				} else {
-					echo '<span class="warning">', WT_I18N::translate('Unable to find record with ID'), ' ', $pid, '</span>';
+				if ($SHOW_PRIVATE_RELATIONSHIPS || $child && $child->canDisplayName($access_level)) {
+					$this->_children[]=$child;
 				}
 			}
 		}
@@ -160,8 +194,8 @@ class WT_Family extends WT_GedcomRecord {
 	 */
 	function getNumberOfChildren() {
 
-		$nchi1=(int)get_gedcom_value('NCHI', 1, $this->gedrec);
-		$nchi2=(int)get_gedcom_value('NCHI', 2, $this->gedrec);
+		$nchi1=(int)get_gedcom_value('NCHI', 1, $this->getGedcomRecord());
+		$nchi2=(int)get_gedcom_value('NCHI', 2, $this->getGedcomRecord());
 		$nchi3=count($this->getChildren());
 		return $this->numChildren=max($nchi1, $nchi2, $nchi3);
 	}
@@ -190,7 +224,7 @@ class WT_Family extends WT_GedcomRecord {
 	 * as a parent in the family
 	 * @param Person $person
 	 */
-	function hasParent(&$person) {
+	function hasParent($person) {
 		if (is_null($person)) return false;
 		if ($person->equals($this->husb)) return true;
 		if ($person->equals($this->wife)) return true;
@@ -201,7 +235,7 @@ class WT_Family extends WT_GedcomRecord {
 	 * as a child in the family
 	 * @param Person $person
 	 */
-	function hasChild(&$person) {
+	function hasChild($person) {
 		if ($person) {
 			foreach ($this->getChildren() as $child) {
 				if ($person->equals($child)) {
@@ -216,7 +250,7 @@ class WT_Family extends WT_GedcomRecord {
 	 * parse marriage record
 	 */
 	function _parseMarriageRecord() {
-		$this->marriage = new WT_Event(trim(get_sub_record(1, '1 MARR', $this->gedrec)), -1);
+		$this->marriage = new WT_Event(trim(get_sub_record(1, '1 MARR', $this->getGedcomRecord())), -1);
 		$this->marriage->setParentObject($this);
 	}
 
@@ -345,11 +379,11 @@ class WT_Family extends WT_GedcomRecord {
 			// Check the script used by each name, so we can match cyrillic with cyrillic, greek with greek, etc.
 			$husb_names=$husb->getAllNames();
 			foreach ($husb_names as $n=>$husb_name) {
-				$husb_names[$n]['script']=utf8_script($husb_name['surn']);
+				$husb_names[$n]['script']=utf8_script($husb_name['full']);
 			}
 			$wife_names=$wife->getAllNames();
 			foreach ($wife_names as $n=>$wife_name) {
-				$wife_names[$n]['script']=utf8_script($wife_name['surn']);
+				$wife_names[$n]['script']=utf8_script($wife_name['full']);
 			}
 			// Add the matched names first
 			foreach ($husb_names as $husb_name) {

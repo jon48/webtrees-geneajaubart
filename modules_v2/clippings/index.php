@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index.php 10603 2011-01-25 09:28:33Z greg $
+// $Id: index.php 11550 2011-05-17 16:43:35Z greg $
 
 global $ENABLE_AUTOCOMPLETE, $cart, $MAX_PEDIGREE_GENERATIONS, $TEXT_DIRECTION, $GEDCOM, $WT_IMAGES;
 
@@ -166,38 +166,34 @@ if ($ct==0) {
 		<?php
 		// Determine the Privatize options available to this user
 		if (WT_USER_IS_ADMIN) {
-			$radioPrivatizeNone = 'checked="checked" ';
 			$radioPrivatizeVisitor = '';
 			$radioPrivatizeUser = '';
 			$radioPrivatizeGedadmin = '';
-			$radioPrivatizeAdmin = '';
+			$radioPrivatizeNone = 'checked="checked" ';
 		} else if (WT_USER_GEDCOM_ADMIN) {
-			$radioPrivatizeNone = 'DISABLED ';
-			$radioPrivatizeVisitor = 'checked="checked" ';
+			$radioPrivatizeVisitor = '';
 			$radioPrivatizeUser = '';
-			$radioPrivatizeGedadmin = '';
-			$radioPrivatizeAdmin = 'DISABLED ';
+			$radioPrivatizeGedadmin = 'checked="checked" ';
+			$radioPrivatizeNone = 'DISABLED ';
 		} else if (WT_USER_ID) {
-			$radioPrivatizeNone = 'DISABLED ';
-			$radioPrivatizeVisitor = 'checked="checked" ';
-			$radioPrivatizeUser = '';
+			$radioPrivatizeVisitor = '';
+			$radioPrivatizeUser = 'checked="checked" ';
 			$radioPrivatizeGedadmin = 'DISABLED ';
-			$radioPrivatizeAdmin = 'DISABLED ';
-		} else {
 			$radioPrivatizeNone = 'DISABLED ';
-			$radioPrivatizeVisitor = 'checked="checked" DISABLED ';
+		} else {
+			$radioPrivatizeVisitor = 'checked="checked" ';
 			$radioPrivatizeUser = 'DISABLED ';
 			$radioPrivatizeGedadmin = 'DISABLED ';
-			$radioPrivatizeAdmin = 'DISABLED ';
+			$radioPrivatizeNone = 'DISABLED ';
 		}
 		?>
 
 		<tr><td class="descriptionbox width50 wrap"><?php echo WT_I18N::translate('Apply privacy settings?'), help_link('apply_privacy'); ?></td>
 		<td class="list_value">
-		<input type="radio" name="privatize_export" value="none" <?php echo $radioPrivatizeNone; ?>/>&nbsp;<?php echo WT_I18N::translate('None'); ?><br />
-		<input type="radio" name="privatize_export" value="visitor" <?php echo $radioPrivatizeVisitor; ?>/>&nbsp;<?php echo WT_I18N::translate('Visitor'); ?><br />
-		<input type="radio" name="privatize_export" value="user" <?php echo $radioPrivatizeUser; ?>/>&nbsp;<?php echo WT_I18N::translate('Member'); ?><br />
-		<input type="radio" name="privatize_export" value="gedadmin" <?php echo $radioPrivatizeGedadmin; ?>/>&nbsp;<?php echo WT_I18N::translate('Manager'); ?>
+		<input type="radio" name="privatize_export1" value="visitor" <?php echo $radioPrivatizeVisitor; ?>/>&nbsp;<?php echo WT_I18N::translate('Visitor'); ?><br />
+		<input type="radio" name="privatize_export2" value="user" <?php echo $radioPrivatizeUser; ?>/>&nbsp;<?php echo WT_I18N::translate('Member'); ?><br />
+		<input type="radio" name="privatize_export3" value="gedadmin" <?php echo $radioPrivatizeGedadmin; ?>/>&nbsp;<?php echo WT_I18N::translate('Manager'); ?>
+		<input type="radio" name="privatize_export4" value="none" <?php echo $radioPrivatizeNone; ?>/>&nbsp;<?php echo WT_I18N::translate('None'); ?><br />
 		</td></tr>
 
 		<tr><td class="descriptionbox width50 wrap"><?php echo WT_I18N::translate('Convert from UTF-8 to ANSI (ISO-8859-1)'), help_link('utf8_ansi'); ?></td>

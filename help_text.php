@@ -26,7 +26,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: help_text.php 11265 2011-04-03 09:47:06Z lukasz $
+ * @version $Id: help_text.php 11704 2011-06-04 09:09:12Z greg $
  * @version: p_$Revision$ $Date$
  * $HeadURL$
  */
@@ -1402,16 +1402,6 @@ case 'DEFAULT_PEDIGREE_GENERATIONS':
 	$text=WT_I18N::translate('Set the default number of generations to display on Descendancy and Pedigree charts.');
 	break;
 
-case 'DISPLAY_JEWISH_GERESHAYIM':
-	$title=WT_I18N::translate('Display Hebrew gershayim');
-	$text=WT_I18N::translate('Show single and double quotes when displaying Hebrew dates.<br /><br />Setting this to <b>Yes</b> will display February 8 1969 as <span lang=\'he-IL\' dir=\'rtl\'>&#1499;\'&#160;&#1513;&#1489;&#1496;&#160;&#1514;&#1513;&#1499;&quot;&#1496;</span>&lrm; while setting it to <b>No</b> will display it as <span lang=\'he-IL\' dir=\'rtl\'>&#1499;&#160;&#1513;&#1489;&#1496;&#160;&#1514;&#1513;&#1499;&#1496;</span>&lrm;.  This has no impact on the Jewish year setting since quotes are not used in Jewish dates displayed with Latin characters.<br /><br />Note: This setting is similar to the PHP 5.0 Calendar constants CAL_JEWISH_ADD_ALAFIM_GERESH and CAL_JEWISH_ADD_GERESHAYIM.  This single setting affects both.');
-	break;
-
-case 'DISPLAY_JEWISH_THOUSANDS':
-	$title=WT_I18N::translate('Display Hebrew thousands');
-	$text=WT_I18N::translate('Show Alafim in Hebrew calendars.<br /><br />Setting this to <b>Yes</b> will display the year 1969 as <span lang="he-IL" dir=\'rtl\'>&#1492;\'&#160;&#1514;&#1513;&#1499;&quot;&#1496;</span>&lrm; while setting it to <b>No</b> will display the year as <span lang="he-IL" dir=\'rtl\'>&#1514;&#1513;&#1499;&quot;&#1496;</span>&lrm;.  This has no impact on the Jewish year setting.  The year will display as 5729 regardless of this setting.<br /><br />Note: This setting is similar to the PHP 5.0 Calendar constant CAL_JEWISH_ADD_ALAFIM.');
-	break;
-
 case 'ENABLE_AUTOCOMPLETE':
 	$title=WT_I18N::translate('Autocomplete');
 	$text=WT_I18N::translate('This option determines whether Autocomplete should be active while information is being entered into certain fields on input forms.  When this option is set to <b>Yes</b>, text input fields for which Autocomplete is possible are indicated by a differently colored background.<br /><br />When Autocomplete is active, <b>webtrees</b> will search its database for possible matches according to what you have already entered.  As you enter more information, the list of possible matches is refined.  When you see the desired input in the list of matches, you can move the mouse cursor to that line of the list and then click the left mouse button to complete the input.<br /><br />The disadvantages of Autocomplete are that it slows the program, entails significant database activity, and also results in more data being sent to the browser.');
@@ -1469,7 +1459,7 @@ case 'GEDCOM_ID_PREFIX':
 
 case 'GENERATE_GUID':
 	$title=WT_I18N::translate('Automatically create globally unique IDs');
-	$text=WT_I18N::translate('<b>GUID</b> in this context is an acronym for Â«Globally Unique IDÂ».<br /><br />GUIDs are intended to help identify each individual in a manner that is repeatable, so that central organizations such as the Family History Center of the LDS Church in Salt Lake City, or even compatible programs running on your own server, can determine whether they are dealing with the same person no matter where the GEDCOM originates.  The goal of the Family History Center is to have a central repository of genealogical data and expose it through web services. This will enable any program to access the data and update their data within it.<br /><br />If you do not intend to share this GEDCOM with anyone else, you do not need to let <b>webtrees</b> create these GUIDs; however, doing so will do no harm other than increasing the size of your GEDCOM.');
+	$text=WT_I18N::translate('<b>GUID</b> in this context is an acronym for «Globally Unique ID».<br /><br />GUIDs are intended to help identify each individual in a manner that is repeatable, so that central organizations such as the Family History Center of the LDS Church in Salt Lake City, or even compatible programs running on your own server, can determine whether they are dealing with the same person no matter where the GEDCOM originates.  The goal of the Family History Center is to have a central repository of genealogical data and expose it through web services. This will enable any program to access the data and update their data within it.<br /><br />If you do not intend to share this GEDCOM with anyone else, you do not need to let <b>webtrees</b> create these GUIDs; however, doing so will do no harm other than increasing the size of your GEDCOM.');
 	break;
 
 case 'HIDE_GEDCOM_ERRORS':
@@ -1695,7 +1685,7 @@ case 'SMTP_AUTH_USER':
 	break;
 
 case 'SMTP_AUTH':
-	$title=WT_I18N::translate('Username and password');
+	$title=WT_I18N::translate('Use password');
 	$text=WT_I18N::translate('Use name and password authentication to connect to the SMTP server.<br /><br />Some SMTP servers require all connections to be authenticated before they will accept outbound e-mails.');
 	break;
 
@@ -1910,8 +1900,8 @@ case 'SHOW_PRIVATE_RELATIONSHIPS':
 	break;
 
 case 'SHOW_REGISTER_CAUTION':
-	$title=WT_I18N::translate('Show acceptable use agreement on Â«Request new user accountÂ» page');
-	$text=WT_I18N::translate('When set to <b>Yes</b>, the following message will appear above the input fields on the Â«Request new user accountÂ» page:<div class="list_value_wrap"><div class="largeError">Notice:</div><div class="error">By completing and submitting this form, you agree:<ul><li>to protect the privacy of living people listed on our site;</li><li>and in the text box below, to explain to whom you are related, or to provide us with information on someone who should be listed on our site.</li></ul></div></div>');
+	$title=WT_I18N::translate('Show acceptable use agreement on «Request new user account» page');
+	$text=WT_I18N::translate('When set to <b>Yes</b>, the following message will appear above the input fields on the «Request new user account» page:<div class="list_value_wrap"><div class="largeError">Notice:</div><div class="error">By completing and submitting this form, you agree:<ul><li>to protect the privacy of living people listed on our site;</li><li>and in the text box below, to explain to whom you are related, or to provide us with information on someone who should be listed on our site.</li></ul></div></div>');
 	break;
 
 case 'SHOW_RELATIVES_EVENTS':
@@ -1962,18 +1952,32 @@ case 'SURNAME_LIST_STYLE':
 case 'SURNAME_TRADITION':
 	$title=WT_I18N::translate('Surname tradition');
 	$text=
-		WT_I18N::translate('When you add new members to a family, <b>webtrees</b> can supply default values for surnames according to regional custom.').
-		'<br /><br /><ul><li>'.
-		WT_I18N::translate('In the <b>Paternal</b> tradition, all family members share the father\'s surname.').
-		'</li><li>'.
-		WT_I18N::translate('In the <b>Spanish</b> and <b>Portuguese</b> tradition, children receive a surname from each parent.').
-		'</li><li>'.
-		WT_I18N::translate('In the <b>Icelandic</b> tradition, children receive their male parent\'s given name as a surname, with a suffix that denotes gender.').
-		'</li><li>'.
-		WT_I18N::translate('In the <b>Polish</b> tradition, all family members share the father\'s surname. For some surnames, the suffix indicates gender.  The suffixes <i>ski</i>, <i>cki</i>, <i>dzki</i>, and <i>Å¼ki</i> indicate male, while the corresponding suffixes <i>ska</i>, <i>cka</i>, <i>dzka</i>, and <i>Å¼ka</i> indicate female.').
-		'</li><li>'.
-		WT_I18N::translate('In the <b>Lithuanian</b> tradition, all family members share the fathers surname. For married females the suffix changes to <i>ienÄ—</i>. While unmarried females suffixes depend on their faters suffix: <i>as</i>, <i>a</i>, <i>is</i>, <i>ys</i>, <i>ius</i> and <i>us</i> change to <i>aitÄ—</i>, <i>aitÄ—</i>, <i>ytÄ—</i>, <i>ytÄ—</i>, <i>iÅ«tÄ—</i> and <i>utÄ—</i>.').
-		'</li></ul>';
+		WT_I18N::translate('When you add a new family member, a default surname can be provided.  This surname will depend on the local tradition.').
+		'<br /><br /><dl><dt>'.
+		WT_I18N::translate_c('Surname tradition', 'paternal').
+		'</dt><dd>'.
+		/* I18N: In the paternal surname tradition, ... */ WT_I18N::translate('All family members take the father\'s surname.').
+		'</dd></dl><dl><dt>'.
+		WT_I18N::translate_c('Surname tradition', 'Spanish').
+		'</dt><dd>'.
+		/* I18N: In the Spanish surname tradition, ... */ WT_I18N::translate('Children take one surname from the father and one surname from the mother.').
+		'</dd></dl><dl><dt>'.
+		WT_I18N::translate_c('Surname tradition', 'Portuguese').
+		'</dt><dd>'.
+		/* I18N: In the Portuguese surname tradition, ... */ WT_I18N::translate('Children take one surname from the mother and one surname from the father.').
+		'</dd></dl><dl><dt>'.
+		WT_I18N::translate_c('Surname tradition', 'Icelandic').
+		'</dt><dd>'.
+		/* I18N: In the Icelandic surname tradition, ... */ WT_I18N::translate('Children take a surname based on their father\'s given name.').
+		'</dd></dl><dl><dt>'.
+		WT_I18N::translate_c('Surname tradition', 'Polish').
+		'</dt><dd>'.
+		/* I18N: In the Polish surname tradition, ... */ WT_I18N::translate('All family members take the father\'s surname, but the suffix may change to indicate the person\'s gender.').
+		'</dd></dl><dl><dt>'.
+		WT_I18N::translate_c('Surname tradition', 'Lithuanian').
+		'</dt><dd>'.
+		/* I18N: In the Lithuanian surname tradition, ... */ WT_I18N::translate('All family members take the father\'s surname, but the suffix may change to indicate the person\'s gender and marital status.').
+		'</dd></dl>';
 	break;
 
 case 'THEME':
@@ -2082,7 +2086,8 @@ case 'add_child':
 case 'add_facts':
 	$title=WT_I18N::translate('Add a fact');
 	$text=WT_I18N::translate('Here you can add a fact to the record being edited.<br /><br />First choose a fact from the drop-down list, then click the <b>Add</b> button.  All possible facts that you can add to the database are in that drop-down list.');
-	$text.=WT_I18N::translate('Add from clipboard');
+	$text.='<br/><br/>';
+	$text.='<b>'.WT_I18N::translate('Add from clipboard').'</b>';
 	$text.='<br/><br/>';
 	$text.=WT_I18N::translate('<b>webtrees</b> allows you to copy up to 10 facts, with all their details, to a clipboard.  This clipboard is different from the Clippings Cart that you can use to export portions of your database.<br /><br />You can select any of the facts from the clipboard and copy the selected fact to the Individual, Family, Media, Source, or Repository record currently being edited.  However, you cannot copy facts of dissimilar record types.  For example, you cannot copy a Marriage fact to a Source or an Individual record since the Marriage fact is associated only with Family records.<br /><br />This is very helpful when entering similar facts, such as census facts, for many individuals or families.');
 	break;
@@ -2150,16 +2155,23 @@ case 'add_wife':
 
 case 'age_differences':
 	$title=WT_I18N::translate('Show date differences');
-	$text=WT_I18N::translate('When this option box is checked, the Â«Close RelativesÂ» tab will show date differences as follows:<br /><ul><li>birth dates of partners.<br />A negative value indicates that the second partner is older than the first.<br /><br /></li><li>marriage date and birth date of the first child.<br />A negative value here indicates that the child was born before the marriage date or that either the birth date or the marriage date is wrong.<br /><br /></li><li>birth dates of siblings.<br />A negative value here indicates that either the order of the children is wrong or that one of the birth dates is wrong.</li></ul>');
+	$text=WT_I18N::translate('When this option box is checked, the «Close Relatives» tab will show date differences as follows:<br /><ul><li>birth dates of partners.<br />A negative value indicates that the second partner is older than the first.<br /><br /></li><li>marriage date and birth date of the first child.<br />A negative value here indicates that the child was born before the marriage date or that either the birth date or the marriage date is wrong.<br /><br /></li><li>birth dates of siblings.<br />A negative value here indicates that either the order of the children is wrong or that one of the birth dates is wrong.</li></ul>');
 	break;
 
 case 'alpha':
-	$title=WT_I18N::translate('Alphabetical index');
-	$text=WT_I18N::translate('Clicking a letter in the Alphabetical index will display a list of the names that start with the letter you clicked.<br /><br />The second to last item in the Alphabetical index can be <b>(unknown)</b>.  This entry will be present when there are people in the database whose surname has not been recorded or does not contain any recognizable letters.  Unknown surnames are often recorded as <b>?</b>, and these will be recognized as <b>(unknown)</b>.  This will also happen if the person is unknown.<br /><br /><b>Note:</b><br />Surnames entered as, for example, <b>Nn</b>, <b>NN</b>, <b>Unknown</b>, or even <b>N.N.</b> will <u>not</u> be found in the <b>(unknown)</b> list. Instead, you will find these persons by clicking <b>N</b> or <b>U</b> because these are the initial letters of those names.  <b>webtrees</b> cannot possibly account for all possible ways of entering unknown surnames;  there is no recognized convention for this.<br /><br />At the end of the Alphabetical index you see <b>ALL</b>. When you click on this item, you will see a list of all surnames in the database.<br /><br /><b>Missing letters?</b><br />If your Alphabetical index appears to be incomplete, with missing letters, your database doesn\'t contain any surnames that start with that missing letter.');
+	$title=
+		/* I18N: Replace A-Z with the first/last letters from your own alphabet. */
+		WT_I18N::translate('A-Z list of names');
+	$text=
+		/* I18N: Replace A-Z with the first/last letters from your own alphabet. Note "…" and "None" should be the same as your translation of these individual terms. */
+		WT_I18N::translate('The A-Z list allows you to select all names beginning with a certain letter.  Unknown names are listed under “…” and people who do not have a surname are listed under “None”.').
+		'</p><p>'.
+		WT_I18N::translate('If a person’s name is not known, it should be left blank.  If you enter “Unknown” as a name, it will be listed under “U”.').
+		'</p>';
 	break;
 
 case 'ancestry_chart':
-	$title=WT_I18N::translate('Ancestry chart');
+	$title=WT_I18N::translate('Ancestors');
 	$text=WT_I18N::translate('The Ancestry page is very similar to the <a href="?help=pedigree.php">Pedigree Tree</a>, but with more details and alternate <a href="?help=chart_style">Chart style</a> displays.<br /><br />Each ancestry is shown with a unique number, calculated according to the <i>Sosa-Stradonitz</i> system:<div style="padding-left:30px;"><b>Even</b> numbers for men (child*2)<br /><b>Odd</b> numbers for women (husband+1) except for <b>1</b></div><br />Example:<br /><div style="padding-left:30px;">The root person is <b>1</b>, regardless of gender.<br /><b>1</b>\'s father is <b>2</b> (<b>1</b> * 2), mother is <b>3</b> (<b>2</b> + 1).<br /><b>2</b>\'s father is <b>4</b> (<b>2</b> * 2), mother is <b>5</b> (<b>4</b> + 1).<br /><b>3</b>\'s father is <b>6</b> (<b>3</b> * 2), mother is <b>7</b> (<b>6</b> + 1).<br /><b>7</b>\'s father is <b>14</b> (<b>7</b> * 2), mother is <b>15</b> (<b>14</b> +1).</div><br />etc.');
 	break;
 
@@ -2425,12 +2437,12 @@ case 'fambook_descent':
 	break;
 
 case 'family_book_chart':
-	$title=WT_I18N::translate('Family book chart');
+	$title=WT_I18N::translate('Family book');
 	$text=WT_I18N::translate('This chart is very similar to the Hourglass chart.  It will show the ancestors and descendants of the selected root person on the same chart.  It will also show the descendants of the root person in the same Hourglass format.<br /><br />The root person is centered in the middle of the page with his descendants listed to the left and his ancestors listed to the right.  In this view, each generation is lined up across the page starting with the earliest generation and ending with the latest.<br /><br />Each descendant of the root person will become the root person of an additional hourglass chart, printed on the same page.  This process repeats until the specified number of descendant generations have been printed.');
 	break;
 
 case 'fan_style':
-	$title=WT_I18N::translate('Circle diagram');
+	$title=WT_I18N::translate('Fan chart');
 	$text=WT_I18N::translate('This option controls the appearance of the diagram.<ul><li><b>1/2</b><br />Half circle 180&deg; diagram</li><li><b>3/4</b><br />Three-quarter 270&deg; diagram, sometimes called <i>Angel wing</i></li><li><b>4/4</b><br />Full circle 360&deg; diagram</li></ul>');
 	break;
 
@@ -2493,11 +2505,11 @@ case 'help_contents_help':
 	$title=WT_I18N::translate('Help contents');
 	$text=
 			'<table><tr><td><span class="helpstart">'.WT_I18N::translate('Help items').'</span>
-			<ul><li><a href="?help=ancestry.php">'.WT_I18N::translate('Ancestry chart').'</a></li><li><a href="?help=fanchart.php">'.WT_I18N::translate('Circle diagram').'</a></li><li><a href="?help=familybook.php">'
-			.WT_I18N::translate('Family book chart').'</a></li><li><a href="?help=gedcom_info">'.WT_I18N::translate('GEDCOM information').'</a></li><li><a href="?help=index_portal">'.WT_I18N::translate('Home page').'</a></li><li><a href="?help=hourglass.php">'.WT_I18N::translate('Hourglass chart').'</a></li><li><a href="?help=individual.php">'
+			<ul><li><a href="?help=ancestry.php">'.WT_I18N::translate('Ancestors').'</a></li><li><a href="?help=fanchart.php">'.WT_I18N::translate('Fan chart').'</a></li><li><a href="?help=familybook.php">'
+			.WT_I18N::translate('Family book').'</a></li><li><a href="?help=gedcom_info">'.WT_I18N::translate('GEDCOM information').'</a></li><li><a href="?help=index_portal">'.WT_I18N::translate('Home page').'</a></li><li><a href="?help=hourglass.php">'.WT_I18N::translate('Hourglass chart').'</a></li><li><a href="?help=individual.php">'
 			.WT_I18N::translate('Individual information').'</a></li><li><a href="?help=indilist.php">'.WT_I18N::translate('Individuals').'</a></li><li><a href="?help=treenav">'.WT_I18N::translate('Interactive tree').'</a></li><li><a href="?help=login.php">'
 			.WT_I18N::translate('Login').'</a></li><li><a href="?help=pls_note11">'.WT_I18N::translate('Lost password request').'</a></li><li><a href="?help=medialist.php">'.WT_I18N::translate('Multimedia').'</a></li><li><a href="?help=edituser.php">'
-			.WT_I18N::translate('My account').'</a></li><li><a href="?help=mypage_portal">'.WT_I18N::translate('My Page').'</a></li><li><a href="?help=edituser_password">'.WT_I18N::translate('Password').'</a></li><li><a href="?help=pedigree.php">'.WT_I18N::translate('Pedigree Tree').'</a></li><li><a href="?help=timeline.php">'.WT_I18N::translate('Timeline chart').'</a></li><li><a href="?help=edituser_username">'.WT_I18N::translate('Username').'</a></li></ul></td>';
+			.WT_I18N::translate('My account').'</a></li><li><a href="?help=mypage_portal">'.WT_I18N::translate('My Page').'</a></li><li><a href="?help=edituser_password">'.WT_I18N::translate('Password').'</a></li><li><a href="?help=pedigree.php">'.WT_I18N::translate('Pedigree').'</a></li><li><a href="?help=timeline.php">'.WT_I18N::translate('Timeline').'</a></li><li><a href="?help=edituser_username">'.WT_I18N::translate('Username').'</a></li></ul></td>';
 		if (WT_USER_IS_ADMIN) {
 			$text.='<td valign="top"><span class="helpstart">'.WT_I18N::translate('Administrator help items').'</span><ul><li><a href="?help=admin.php">'.WT_I18N::translate('Administration').'</a></li><li><a href="?help=help_editconfig.php">'.WT_I18N::translate('Configure').'</a></li><li><a href="?help=help_faq.php">'
 			.WT_I18N::translate('FAQ List: Edit').'</a></li><li><a href="?help=edit_gedcoms">'.WT_I18N::translate('GEDCOM: Administration page').'</a></li><li><a href="?help=edit_config_gedcom">'.WT_I18N::translate('GEDCOM: Configure').'</a></li><li><a href="?help=default_gedcom">'.WT_I18N::translate('GEDCOM: Default').'</a></li><li><a href="readme.html">'.WT_I18N::translate('View readme.html file').'</a></li><li><a href="?help=help_admin_users.php">'.WT_I18N::translate('User administration').'</a></li></ul></td>';
@@ -2579,7 +2591,7 @@ case 'index_welcome':
 	break;
 
 case 'lifespan_chart':
-	$title=WT_I18N::translate('Lifespan chart');
+	$title=WT_I18N::translate('Lifespans');
 	$text=WT_I18N::translate('On this chart you can display one or more persons along a horizontal timeline.  This chart allows you to see how the lives of different people overlapped.<br /><br />You can add people to the chart individually or by family groups by their IDs.  The previous list will be remembered as you add more people to the chart.  You can clear the chart at any time with the <b>Clear Chart</b> button.<br /><br />You can also add people to the chart by searching for them by date range or locality.');
 	break;
 
@@ -2601,11 +2613,6 @@ case 'link_new_husb':
 case 'link_new_wife':
 	$title=WT_I18N::translate('Add a wife using an existing person');
 	$text=WT_I18N::translate('This will allow you to link another individual, who already exists, as a new wife to this person.  This will create a new family with the wife you select.  You will also have the option of specifying a marriage for this new family.');
-	break;
-
-case 'link_person_id':
-	$title=WT_I18N::translate('Person ID');
-	$text=WT_I18N::translate('In this field you enter the ID of the person you are linking to (e.g. I100).');
 	break;
 
 case 'link_wife':
@@ -2700,7 +2707,7 @@ case 'password':
 	break;
 
 case 'pedigree_tree':
-	$title=WT_I18N::translate('Pedigree Tree');
+	$title=WT_I18N::translate('Pedigree');
 	$text=WT_I18N::translate('A pedigree is an enumeration of all ancestors of the starting person.  Users who are not logged in see the pedigree of the starting (root) person chosen by the site administrator.  Logged in users can select their own starting (root) person.<br /><br />In this context, "All ancestors" means the father and mother, their parents, and so on.  The pedigree is displayed graphically; you don\'t have to struggle through pages of text to determine your ancestors.<br /><br />All individuals are displayed in Name boxes on the screen.<br /><ul><li><b>Name boxes on the pedigree</b><br />If the Pedigree page is set to show details, you will see the person\'s name and birth and death dates.  You can click on a person\'s name to take you directly to the Individual Information page of that person.<br /><br />When <b>Show details</b> is on there are two icons inside the name box.</li><li><b>Pedigree icon inside the Name box</b><br />When the option <b>Show Details</b> is on, you see a Pedigree icon in the Name box. Depending on the site settings, you have to hover over the icon or click on it.  When you click on or hover over this icon, a small sub-menu appears.<br /><br />The items <b>Pedigree Tree</b> and <b>Descendancy Chart</b> are similar to those items in the main menu, but the difference is that the starting person is now the individual of mentioned in the Name box.  You also see <b>Family with Spouse</b>. Underneath that you see the name of the spouse followed by the names of the children.  All names are clickable.</li><li><b>Magnifying glass inside the Name box</b><br />Depending on the site settings, you have to hover over the icon or click on it.  This magnifies the Name box so that more details will be displayed.  You will see more dates and events. Names are clickable.</li><li><b>Arrows</b><br />On the left or right of the leftmost or rightmost Name boxes you may see arrows.  When you click on these arrows the screen display will shift in the direction of the arrow.</li></ul>');
 	break;
 
@@ -2865,11 +2872,6 @@ case 'show_spouse':
 	$text=WT_I18N::translate('By default this chart does not show spouses for the descendants because it makes the chart harder to read and understand.  Turning this option on will show spouses on the chart.');
 	break;
 
-case 'show_thumb':
-	$title=WT_I18N::translate('Show thumbnails');
-	$text=WT_I18N::translate('Thumbnails will be shown if you check this box.');
-	break;
-
 case 'simple_filter':
 	$title=WT_I18N::translate('Simple search filter');
 	$text=WT_I18N::translate('Simple search filter based on the characters entered, no wildcards are accepted.');
@@ -2888,11 +2890,6 @@ case 'sortby':
 case 'soundex_search':
 	$title=WT_I18N::translate('Search the way you think the name is written (Soundex)');
 	$text=WT_I18N::translate('Soundex is a method of coding words according to their pronunciation.  This allows you to search the database for names and places when you don\'t know precisely how they are written.  <b>webtrees</b> supports two different Soundex algorithms that produce vastly different results.<ul><li><b>Basic</b><br />This method, patented in 1918 by Russell, is very simple and can be done by hand.<br /><br />Because the Basic method retains the first letter of the name as part of the resultant code, it is not very helpful when you are unsure of that first letter.  The Basic algorithm is not well suited to names that were originally in languages other than English, and even with English names the results are very surprising.  For example, a Basic Soundex search for <b>Smith</b> will return not only <b>Smith, Smid, Smit, Schmidt, Smyth, Smithe, Smithee, Schmitt</b>, all of which are clearly variations of <b>Smith</b>, but also <b>Smead, Sneed, Smoote, Sammett, Shand,</b> and <b>Snoddy</b>.  <br /><br /></li><li><b>Daitch-Mokotoff</b><br />This method, developed in 1985, is much more complex than the Basic method and is not easily done by hand.<br /><br />A Soundex search using this method produces much more accurate results.</li></ul>For details on both Soundex algorithms, visit this <a href="http://www.jewishgen.org/infofiles/soundex.html" target=_blank><b>Jewish Genealogical Society</b></a> web page.');
-	break;
-
-case 'stat':
-	$title=WT_I18N::translate('Options for statistics plots');
-	$text=WT_I18N::translate('A number of different plots of statistics from your database can be produced.<br /><br />Select the chart, then adjust the options from the drop-down boxes.<br /><br />The numbers included in each plot depend on the data available. For example, individuals without a month of birth (e.g. just \'1856\') cannot be included in a plot of births by month.');
 	break;
 
 case 'stat_gax':
@@ -2922,28 +2919,13 @@ case 'stat_gwz':
 	$text=WT_I18N::translate('Select the desired starting year and interval<br /><br />For example, <b>from 1700 interval 50 years</b> describes the following set of date ranges:<div style="padding-left:30px;">before 1700<br />1700 to 1749<br />1750 to 1799<br />1800 to 1849<br />1850 to 1899<br />1900 to 1949<br />1950 to 1999<br />2000 or later</div>');
 	break;
 
-case 'stat_x':
-	$title=WT_I18N::translate('X axis');
-	$text=WT_I18N::translate('The following options are available for the X axis (horizontal). Each will then be presented according to options set for the Y and Z axes.<p style="padding-left: 25px"><b>Month of birth</b>&nbsp;&nbsp;individuals born in each month.<br /><b>Month of death</b>&nbsp;&nbsp;individuals who died in each month.<br /><b>Month of marriage</b>&nbsp;&nbsp;marriages that occurred in each month.<br /><b>Month of birth of first child in a relation</b>&nbsp;&nbsp;the number of first-borns for each family by month.<br /><b>Month of first marriage</b>&nbsp;&nbsp;the number of first marriages per month.<br /><b>Months between marriage and first child</b>&nbsp;&nbsp;the number of months between marriage and birth of first child to that couple.<br /><b>Age related to birth year</b>&nbsp;&nbsp;age at death, related to the time period that includes each person\'s birth year.<br /><b>Age related to death year</b>&nbsp;&nbsp;age at death, related to the time period that includes each person\'s year of death.<br /><b>Age in year of marriage</b>&nbsp;&nbsp;the average age of individuals at the time of their marriages.<br /><b>Age in year of first marriage</b>&nbsp;&nbsp;the average age of individuals at the time of their first marriage.<br /><b>Number of children</b>&nbsp;&nbsp;average family sizes.<br /><b>Individual distribution</b>&nbsp;&nbsp;placement of all persons or persons with the specified name, by country.<br /><b>Birth by country</b>&nbsp;&nbsp;country of birth.<br /><b>Marriage by country</b>&nbsp;&nbsp;country of marriage.<br /><b>Death by country</b>&nbsp;&nbsp;country of death.<br /><b>Individuals with sources</b>&nbsp;&nbsp;pie chart of individuals with sources.<br /><b>Families with sources</b>&nbsp;&nbsp;pie chart of families with sources.</p>');
-	break;
-
-case 'stat_y':
-	$title=WT_I18N::translate('Y axis');
-	$text=WT_I18N::translate('The following options are available for the Y axis (vertical). These options alter the way the items presented on the X axis are displayed.<p style="padding-left: 25px"><b>numbers</b>&nbsp;&nbsp;displays the number of individuals in each category defined by the X axis.<br /><b>percentage</b>&nbsp;&nbsp;calculates and diplays the proportion of each item in the X axis categories.</p>');
-	break;
-
-case 'stat_z':
-	$title=WT_I18N::translate('Z axis');
-	$text=WT_I18N::translate('The following options are available for the Z axis. These options provide a sub-division of the categories selected for the X axis.<p style="padding-left: 25px"><b>none</b>&nbsp;&nbsp;displays the items as a single column for each X axis category.<br /><b>gender</b>&nbsp;&nbsp;displays the items in 2 columns (male and female) for each X axis category.<br /><b>date periods</b>&nbsp;&nbsp;displays the items in a number of columns related to the time periods set in the next section, for each X axis category.</p>');
-	break;
-
 case 'talloffset':
 	$title=WT_I18N::translate('Page layout');
 	$text=WT_I18N::translate('With this option you determine the page layout orientation.<br /><br />Changing this setting might be useful if you want to make a screen print or if you have a different type of screen.<ul><li><b>Portrait</b> mode will make the tree taller, such that a 4 generation chart should fit on a single page printed vertically.</li><li><b>Landscape</b> mode will make a wider tree that should print on a single page printed horizontally.</li><li><b>Oldest at top</b> mode rotates the chart, but not its boxes, by 90 degrees counter-clockwise, so that the oldest generation is at the top of the chart.</li><li><b>Oldest at bottom</b> mode rotates the chart, but not its boxes, by 90 degrees clockwise, so that the oldest generation is at the bottom of the chart.</li></ul>');
 	break;
 
 case 'timeline_chart':
-	$title=WT_I18N::translate('Timeline chart');
+	$title=WT_I18N::translate('Timeline');
 	$text=WT_I18N::translate('On this chart you can display one or more persons along a timeline.  You can, for example, visualize the status of two or more persons at a certain moment.<br /><br />If you click the <b>Time Line</b> link on an other page you will already see one person on the Time Line.  If you clicked the <b>Time Line</b> menu item in a page header, you have to supply the starting person\'s ID.');
 	break;
 
@@ -3093,12 +3075,13 @@ default:
 	}
 }
 
-print_simple_header(WT_I18N::translate('Help for Â«%sÂ»', htmlspecialchars(strip_tags($title))));
-echo '<div class="helpheader">', nl2br($title), '</div>';
-echo '<div class="helpcontent">', nl2br($text),'</div>';
-echo '<div class="helpfooter"><br />';
-echo '<a href="javascript:;" onclick="window.history.go(-1)">','<img src="', $WT_IMAGES["larrow"], '" alt="<"><br />';
-echo '<a href="help_text.php?help=help_contents_help"><b>', WT_I18N::translate('Help contents'), '</b></a><br />';
-echo '<a href="javascript:;" onclick="window.close();"><b>', WT_I18N::translate('Close Window'), '</b></a>';
+print_simple_header($title);
+echo '<div class="helpheader">', $title, '</div>';
+echo '<div class="helpcontent">', $text,'</div>';
+echo '<div class="helpfooter">';
+if ($help!='help_contents_help') {
+	echo '<a href="help_text.php?help=help_contents_help">', WT_I18N::translate('Help contents'), '</a><br />';
+}
+echo '<a href="javascript:;" onclick="window.close();">', WT_I18N::translate('Close Window'), '</a>';
 echo '</div>';
 print_simple_footer();

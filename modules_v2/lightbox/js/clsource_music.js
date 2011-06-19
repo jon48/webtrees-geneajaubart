@@ -1740,8 +1740,6 @@ var CB_Close_Win		= CB_Close_Win;
 		if(MID == 'PC') {
 			CB_Txt2.onclick  = function () { window.location.href = "module.php?mod=perso_certificates&mod_action=certificatelist&city="+GEDCOM+"&certif="+CB_Gallery[CB_ActImgId][1]; return false; };
 			CB_Txt2a.onclick = function () { window.location.href = "module.php?mod=perso_certificates&mod_action=certificatelist&city="+GEDCOM+"&certif="+CB_Gallery[CB_ActImgId][1]; return false; };			
-			CB_Txt2.title = CB_Detail_Info_Cert;
-			CB_Txt2a.title = CB_Detail_Info_Cert;
 		}
 		//END PERSO
 		else if (MID != "") {

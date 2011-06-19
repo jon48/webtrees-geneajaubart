@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Note.php 10239 2011-01-01 22:32:55Z greg $
+// @version $Id: Note.php 11410 2011-04-29 18:22:37Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,6 +29,28 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Note extends WT_GedcomRecord {
+	// Implement note-specific privacy logic
+	protected function _canDisplayDetailsByType($access_level) {
+		// Hide notes if they are attached to private records
+		$linked_ids=WT_DB::prepare(
+			"SELECT l_from FROM `##link` WHERE l_to=? AND l_file=?"
+		)->execute(array($this->xref, $this->ged_id))->fetchOneColumn();
+		foreach ($linked_ids as $linked_id) {
+			$linked_record=WT_GedcomRecord::getInstance($linked_id);
+			if ($linked_record && !$linked_record->canDisplayDetails($access_level)) {
+				return false;
+			}
+		}
+			
+		// Apply default behaviour
+		return parent::_canDisplayDetailsByType($access_level);
+	}
+
+	// Generate a private version of this record
+	protected function createPrivateGedcomRecord($access_level) {
+		return '0 @'.$this->xref.'@  NOTE '.WT_I18N::translate('Private');
+	}
+
 	// Generate a URL to this record, suitable for use in HTML
 	public function getHtmlUrl() {
 		return parent::_getLinkUrl('note.php?nid=', '&amp;');

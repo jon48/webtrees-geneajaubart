@@ -20,7 +20,7 @@
  *
  * @package webtrees
  * @subpackage Modules
- * @version $Id: module.php 11151 2011-03-20 12:31:34Z greg $
+ * @version $Id: module.php 11417 2011-04-30 11:17:30Z greg $
  */
 
 // Tip : you could change the number of generations loaded before ajax calls both in individual page and in treeview page to optimize speed and server load 
@@ -104,10 +104,12 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
     switch($mod_action) {
       case 'treeview':
         $tvName = 'tv';
-        $rid = safe_GET('rootId');
+        $rootid = safe_GET('rootid');
+				$rootid = check_rootid($rootid);
         $tv = new TreeView('tv');
-        ob_start();
-        print_header(WT_I18N::translate('Interactive tree'));
+				ob_start();
+				$person=WT_Person::getInstance($rootid);
+	       print_header(WT_I18N::translate('Interactive tree of %s', $person->getFullName()));
         if (WT_USE_LIGHTBOX) {
         	require WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 				}
@@ -121,11 +123,12 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
         // If TreeView was personalized, include the custom CSS at the end of the header, to "cascade" previously loaded CSS
        	$header = str_replace('</head>', $this->js.$this->css.'</head>', $header);
         echo $header;
-        echo $tv->drawViewport($rid, 4, $this->style);
+        echo $tv->drawViewport($rootid, 4, $this->style);
         print_footer();
         break;
 
       case 'getDetails':
+				header('Content-Type: text/html; charset=UTF-8');
         $pid = safe_GET('pid');
         $i = safe_GET('instance');
         $tv = new TreeView($i);

@@ -25,7 +25,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // @author Greg Roach
-// @version $Id: Jewish.php 11017 2011-03-02 20:15:06Z greg $
+// @version $Id: Jewish.php 11572 2011-05-22 20:32:28Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -217,7 +217,7 @@ class WT_Date_Jewish extends WT_Date_Calendar {
 	// Convert a decimal number to hebrew - like roman numerals, but with extra punctuation
 	// and special rules.
 	static function NumToHebrew($num) {
-		global $DISPLAY_JEWISH_THOUSANDS;
+		$DISPLAY_JEWISH_THOUSANDS=false;
 
 		static $jHundreds = array("", "ק", "ר", "ש", "ת", "תק", "תר","תש", "תת", "תתק");
 		static $jTens     = array("", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ");

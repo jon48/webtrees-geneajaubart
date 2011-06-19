@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: relationship.php 10869 2011-02-18 16:00:33Z greg $
+// $Id: relationship.php 11417 2011-04-30 11:17:30Z greg $
 
 define('WT_SCRIPT_NAME', 'relationship.php');
 require './includes/session.php';
@@ -67,7 +67,33 @@ if (empty($pid1)) {
 $check_node = true;
 $disp = true;
 
-$title_string .= WT_I18N::translate('Relationship chart');
+// ------------------------------------------------------------------------------------------------------------------------------
+
+$person1=WT_Person::getInstance($pid1);
+$person2=WT_Person::getInstance($pid2);
+if ($person1 && $person2) {
+	$title_string=WT_I18N::translate(/* I18N: %s are people's names */ 'Relationships between %1$s and %2$s', $person1->getFullName(), $person2->getFullName());
+} else {
+	$title_string=WT_I18N::translate('Relationships');
+}
+if ($person1) {
+	$pid1=$person1->getXref(); // i1 => I1
+} else {
+	$pid1='';
+}
+if (!empty($_SESSION["pid1"]) && $_SESSION["pid1"]!=$pid1) {
+	unset($_SESSION["relationships"]);
+	$path_to_find=0;
+}
+if ($person2) {
+	$pid2=$person2->getXref(); // i2 => I2
+} else {
+	$pid2='';
+}
+if (!empty($_SESSION["pid2"]) && $_SESSION["pid2"]!=$pid2) {
+	unset($_SESSION["relationships"]);
+	$path_to_find=0;
+}
 // -- print html header information
 print_header($title_string);
 
@@ -77,36 +103,6 @@ if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 if (WT_USE_LIGHTBOX) {
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 	require_once WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
-}
-// ------------------------------------------------------------------------------------------------------------------------------
-
-if ($pid1) {
-	//-- check if the id is valid
-	$person=WT_Person::getInstance($pid1);
-	if ($person) {
-		$title_string.=':<br />'.$person->getFullName();
-		$pid1=$person->getXref(); // i1 => I1
-	} else {
-		$pid1='';
-	}
-	if (!empty($_SESSION["pid1"]) && $_SESSION["pid1"]!=$pid1) {
-		unset($_SESSION["relationships"]);
-		$path_to_find=0;
-	}
-}
-if ($pid2) {
-	//-- check if the id is valid
-	$person=WT_Person::getInstance($pid2);
-	if ($person) {
-		$title_string.=' '.WT_I18N::translate('and').' '.$person->getFullName();
-		$pid2=$person->getXref(); // i2 => I2
-	} else {
-		$pid2='';
-	}
-	if (!empty($_SESSION["pid2"]) && $_SESSION["pid2"]!=$pid2) {
-		unset($_SESSION["relationships"]);
-		$path_to_find=0;
-	}
 }
 ?>
 <script type="text/javascript">
@@ -127,7 +123,7 @@ function paste_id(value) {
 
 	<!-- // Relationship header -->
 	<tr><td colspan="2" class="topbottombar center">
-	<?php echo WT_I18N::translate('Relationship chart'); ?>
+	<?php echo WT_I18N::translate('Relationships'); ?>
 	</td>
 
 	<!-- // Empty space -->
@@ -212,12 +208,8 @@ function paste_id(value) {
 		if (($new_path)&&($path_to_find<$i+1)&&($check_node)) echo " | <span class=\"error\">".($i+1)."</span>";
 		echo "</td>";
 	} else {
-		if ((!empty($pid1))&&(!empty($pid2))) {
-			if ((!canDisplayRecord(WT_GED_ID, find_gedcom_record($pid1, WT_GED_ID)))&&(!showLivingNameById($pid1))) {
-				$disp = false;
-			} elseif (!canDisplayRecord(WT_GED_ID, find_gedcom_record($pid2, WT_GED_ID))&&(!showLivingNameById($pid2))) {
-				$disp = false;
-			}
+		if ($person1 && $person2) {
+			$disp=$person1->canDisplayName() && $person2->canDisplayName();
 			if ($disp) {
 				echo WT_I18N::translate('Show path'), ": </td>";
 				echo "<td class=\"optionbox\">";
@@ -248,7 +240,7 @@ function paste_id(value) {
 	echo " onclick=\"document.people.path_to_find.value='-1';\""; ?> />
 	</td>
 	<?php
-	if ((!empty($pid1))&&(!empty($pid2))&&($disp)) {
+	if ($person1 && $person2 && $disp) {
 		echo "</tr><tr>";
 		if (($disp)&&(!$check_node)) {
 			echo "<td class=\"topbottombar wrap vmiddle center\" colspan=\"2\">";

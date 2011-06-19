@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// @version $Id: Menu.php 11207 2011-03-26 16:45:30Z greg $
+// @version $Id: Menu.php 11720 2011-06-06 05:36:01Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -38,6 +38,7 @@ class WT_Menu {
 	var $hovericon = null;
 	var $flyout = 'down';
 	var $class = '';
+	var $id=null;
 	var $hoverclass = '';
 	var $submenuclass = '';
 	var $iconclass = '';
@@ -52,12 +53,13 @@ class WT_Menu {
 	* @param string $pos The position of the label relative to the icon (right, left, top, bottom)
 	* @param string $flyout The direction where any submenus should appear relative to the menu item (right, down)
 	*/
-	function __construct($label=' ', $link='#', $pos='right', $flyout='down')
+	function __construct($label=' ', $link='#', $pos='right', $flyout='down', $id=null)
 	{
 		$this->submenus = array();
 		$this->addLink($link);
 		$this->addLabel($label, $pos);
 		$this->addFlyout($flyout);
+		$this->addId($id);
 	}
 
 	function isSeparator()
@@ -109,6 +111,10 @@ class WT_Menu {
 		$this->iconclass = $iconclass;
 	}
 
+	function addId($id) {
+		$this->id=$id;
+	}
+
 	function addTarget($target)
 	{
 		$this->target = $target;
@@ -129,7 +135,7 @@ class WT_Menu {
 	function getMenuAsList() {
 		$link = '';
 		if ($this->separator) {
-			return "\t".'<li class="separator"><span></span></li>'."\n";
+			return '<li class="separator"><span></span></li>';
 		}
 		if ($this->link) {
 			if ($this->target !== null) {
@@ -148,15 +154,20 @@ class WT_Menu {
 			$html=$this->label;
 		}
 		if ($this->submenus) {
-			$html.="\n\t".'<ul>'."\n";
+			$html.='<ul>';
 			foreach ($this->submenus as $submenu) {
-				$html.="\t".$submenu->getMenuAsList();
+				if ($submenu->submenus) {
+					$submenu->iconclass.=' icon_arrow';
+				}
+				$html.=$submenu->getMenuAsList();
 			}
-			$html.="\t".'</ul>';
-			return '<li class="node">'.$html.'</li>'."\n";
+			$html.='</ul>';
 		}
-
-		return '<li>'.$html.'</li>'."\n";
+		if ($this->id) {
+			return '<li id="'.$this->id.'">'.$html.'</li>';
+		} else {
+			return '<li>'.$html.'</li>';
+		}
 	}
 
 	// Get the menu as a dropdown form element

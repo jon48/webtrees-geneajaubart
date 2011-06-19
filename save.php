@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: save.php 11019 2011-03-03 07:41:13Z greg $
+// @version $Id: save.php 11611 2011-05-26 11:38:54Z greg $
 
 define('WT_SCRIPT_NAME', 'save.php');
 require './includes/session.php';
@@ -133,7 +133,7 @@ case 'user':
 		// The password will be displayed as "click to edit" on screen.
 		// Accept the update, but pretend to fail.  This will leave the "click to edit" on screen
 		if ($value) {
-			set_user_password($id2, crypt($value));
+			set_user_password($id2, $value);
 		}
 		fail();
 	case 'user_name':
@@ -224,6 +224,29 @@ case 'user_setting':
 	// Authorised and valid - make update
 	set_user_setting($id1, $id2, $value);
 	ok();
+
+case 'module':
+	//////////////////////////////////////////////////////////////////////////////
+	// Table name: WT_MODULE
+	// ID format:  module-{column}-{module_name}
+	//////////////////////////////////////////////////////////////////////////////
+
+	// Authorisation
+	if (!WT_USER_IS_ADMIN) {
+		fail();
+	}
+
+	switch($id1) {
+	case 'status':
+	case 'tab_order':
+	case 'menu_order':
+	case 'sidebar_order':
+		WT_DB::prepare("UPDATE `##module` SET {$id1}=? WHERE module_name=?")
+			->execute(array($value, $id2));
+		ok();
+	default:
+		fail();
+	}
 
 default:
 	// An unrecognised table

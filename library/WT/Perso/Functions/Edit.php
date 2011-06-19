@@ -57,16 +57,16 @@ class WT_Perso_Functions_Edit {
 	static public function select_edit_control_inline($name, $values, $empty, $selected, $extra='') {
 		if (!is_null($empty)) {
 			// Push ''=>$empty onto the front of the array, maintaining keys
-			$tmp=array(''=>$empty);
+			$tmp=array(''=>htmlspecialchars($empty));
 			foreach ($values as $key=>$value) {
-				$tmp[$key]=$value;
+				$tmp[$key]=htmlspecialchars($value);
 			}
 			$values=$tmp;
 		}
-		$values['selected']=$selected;
+		$values['selected']=htmlspecialchars($selected);
 		return
 			'<span class="editable" id="' . $name . '">' .
-			(array_key_exists($selected, $values) ? htmlspecialchars($values[$selected]) : '').
+			(array_key_exists($selected, $values) ? $values[$selected] : '').
 			'</span>' .
 			WT_JS_START .
 			'jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'module.php?mod=perso_config&mod_action=admin_update_setting", {type:"select", data:' . json_encode($values) . ', submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'", callback:function(value, settings) {jQuery(this).html(settings.data[value]);} })' .

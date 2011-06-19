@@ -28,7 +28,7 @@
  *
  * @package webtrees
  * @subpackage Charts
- * @version $Id: hourglass.php 10869 2011-02-18 16:00:33Z greg $
+ * @version $Id: hourglass.php 11417 2011-04-30 11:17:30Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'hourglass.php');
@@ -37,13 +37,12 @@ require './includes/session.php';
 $controller = new WT_Controller_Hourglass();
 $controller->init();
 
-// -- print html header information
-print_header(PrintReady($controller->name)." ".WT_I18N::translate('Hourglass chart'));
+print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Hourglass chart of %s', $controller->name));
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
 echo '<table><tr><td valign="top">';
-echo '<h2>', WT_I18N::translate('Hourglass chart'), help_link('hourglass_chart'), '<br />', PrintReady($controller->name), '</h2>';
+echo '<h2>', WT_I18N::translate('Hourglass chart of %s', $controller->name), help_link('hourglass_chart'), '</h2>';
 
 $controller->setupJavascript();
 

@@ -17,8 +17,9 @@ if (!defined('WT_WEBTREES')) {
 return array(
 	
 	//Overwriting main language files
-	'LANGUAGE_LIST_SEPARATOR'		=>	', ',
-	'LANGUAGE_LIST_SEPARATOR_LAST'	=>	' et ',
+	//'LANGUAGE_LIST_SEPARATOR'		=>	', ',
+	//'LANGUAGE_LIST_SEPARATOR_LAST'	=>	' et ',
+	' and '							=>	' et ',
 	'My Page'						=>	'Ma page',	
 
 	//Hooks management

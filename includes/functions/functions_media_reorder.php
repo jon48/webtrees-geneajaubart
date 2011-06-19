@@ -24,7 +24,7 @@
  *
  * @package webtrees
  * @subpackage Module
- * @version $Id: functions_media_reorder.php 11029 2011-03-03 23:32:42Z greg $
+ * @version $Id: functions_media_reorder.php 11667 2011-05-31 22:11:25Z greg $
  * @author Brian Holland
  */
 
@@ -44,7 +44,7 @@ function media_reorder_row($rtype, $rowm, $pid) {
 	global $WT_IMAGES, $MEDIA_DIRECTORY, $TEXT_DIRECTION;
 	global $GEDCOM, $THUMBNAIL_WIDTH, $USE_MEDIA_VIEWER;
 	global $SEARCH_SPIDER;
-	global $t, $n, $item, $items, $p, $edit, $reorder, $LB_AL_THUMB_LINKS, $note, $rowm;
+	global $t, $n, $item, $items, $p, $edit, $reorder, $note, $rowm;
 	global $LB_URL_WIDTH, $LB_URL_HEIGHT, $order1, $mediaType;
 
 	if (!isset($rowm)) {
@@ -53,7 +53,7 @@ function media_reorder_row($rtype, $rowm, $pid) {
 	echo "<li class=\"facts_value\" style=\"list-style:none;cursor:move;margin-bottom:2px;\" id=\"li_" . $rowm['m_media'] . "\" >";
 
     //echo $rtype." ".$rowm["m_media"]." ".$pid;
-    if (!canDisplayRecord($rowm['m_gedfile'], $rowm['m_gedrec']) || !canDisplayFact($rowm['m_media'], $rowm['m_gedfile'], $rowm['mm_gedrec'])) {
+    if (!WT_Media::getInstance($rowm['m_media'])->canDisplayDetails() || !canDisplayFact($rowm['m_media'], $rowm['m_gedfile'], $rowm['mm_gedrec'])) {
         //echo $rowm['m_media']." no privacy ";
         return false;
     }

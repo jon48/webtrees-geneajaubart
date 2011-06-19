@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11107 2011-03-12 20:34:20Z greg $
+// @version $Id: module.php 11508 2011-05-12 10:54:59Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -172,47 +172,47 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 							<table cellspacing="1" cellpadding="0">
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Individuals').'</td>
-									<td class="facts_value">&nbsp;<a href="indilist.php?surname_sublist=no">#totalIndividuals#</a></td>
-								</tr>
-								<tr>
-									<td class="facts_label">'.WT_I18N::translate('Total surnames').'</td>
-									<td class="facts_value">&nbsp;<a href="indilist.php?surname_sublist=yes">#totalSurnames#</a></td>
-								</tr>
-								<tr>
-									<td class="facts_label">'. WT_I18N::translate('Families').'</td>
-									<td class="facts_value">&nbsp;<a href="famlist.php">#totalFamilies#</a></td>
-								</tr>
-								<tr>
-									<td class="facts_label">'.WT_I18N::translate('Sources').'</td>
-									<td class="facts_value">&nbsp;<a href="sourcelist.php">#totalSources#</a></td>
-								</tr>
-								<tr>
-									<td class="facts_label">'.WT_I18N::translate('Media objects').'</td>
-									<td class="facts_value">&nbsp;#totalMedia#</td>
-								</tr>
-								<tr>
-									<td class="facts_label">'.WT_I18N::translate('Repositories').'</td>
-									<td class="facts_value">&nbsp;#totalRepositories#</td>
-								</tr>
-								<tr>
-									<td class="facts_label">'.WT_I18N::translate('Other records').'</td>
-									<td class="facts_value">&nbsp;#totalOtherRecords#</td>
-								</tr>
-								<tr>
-									<td class="facts_label">'.WT_I18N::translate('Total events').'</td>
-									<td class="facts_value">&nbsp;#totalEvents#</td>
+									<td class="facts_value" align="right"><a href="indilist.php?surname_sublist=no">#totalIndividuals#</a></td>
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Males').'</td>
-									<td class="facts_value">&nbsp;#totalSexMales# [#totalSexMalesPercentage#%]</td>
+									<td class="facts_value" align="right">#totalSexMales#<br />#totalSexMalesPercentage#</td>
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Females').'</td>
-									<td class="facts_value">&nbsp;#totalSexFemales#  [#totalSexFemalesPercentage#%]</td>
+									<td class="facts_value" align="right">#totalSexFemales#<br />#totalSexFemalesPercentage#</td>
+								</tr>
+								<tr>
+									<td class="facts_label">'.WT_I18N::translate('Total surnames').'</td>
+									<td class="facts_value" align="right"><a href="indilist.php?show_all=yes&amp;surname_sublist=yes&amp;ged='.WT_GEDURL.'">#totalSurnames#</a></td>
+								</tr>
+								<tr>
+									<td class="facts_label">'. WT_I18N::translate('Families').'</td>
+									<td class="facts_value" align="right"><a href="famlist.php?ged='.WT_GEDURL.'">#totalFamilies#</a></td>
+								</tr>
+								<tr>
+									<td class="facts_label">'.WT_I18N::translate('Sources').'</td>
+									<td class="facts_value" align="right"><a href="sourcelist.php?ged='.WT_GEDURL.'">#totalSources#</a></td>
+								</tr>
+								<tr>
+									<td class="facts_label">'.WT_I18N::translate('Media objects').'</td>
+									<td class="facts_value" align="right"><a href="medialist.php?ged='.WT_GEDURL.'">#totalMedia#</a></td>
+								</tr>
+								<tr>
+									<td class="facts_label">'.WT_I18N::translate('Repositories').'</td>
+									<td class="facts_value" align="right"><a href="repolist.php?ged='.WT_GEDURL.'">#totalRepositories#</a></td>
+								</tr>
+								<tr>
+									<td class="facts_label">'.WT_I18N::translate('Other records').'</td>
+									<td class="facts_value" align="right">#totalOtherRecords#</td>
+								</tr>
+								<tr>
+									<td class="facts_label">'.WT_I18N::translate('Total events').'</td>
+									<td class="facts_value" align="right">#totalEvents#</td>
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Total users').'</td>
-									<td class="facts_value">&nbsp;#totalUsers#</td>
+									<td class="facts_value" align="right">#totalUsers#</td>
 								</tr>
 							</table>
 						</td>
@@ -221,42 +221,42 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 							<table cellspacing="1" cellpadding="0" border="0">
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Earliest birth year').'</td>
-									<td class="facts_value">&nbsp;#firstBirthYear#&nbsp;</td>
+									<td class="facts_value" align="right">#firstBirthYear#</td>
 									<td class="facts_value">#firstBirth#</td>
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Latest birth year').'</td>
-									<td class="facts_value">&nbsp;#lastBirthYear#&nbsp;</td>
+									<td class="facts_value" align="right">#lastBirthYear#</td>
 									<td class="facts_value">#lastBirth#</td>
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Earliest death year').'</td>
-									<td class="facts_value">&nbsp;#firstDeathYear#&nbsp;</td>
+									<td class="facts_value" align="right">#firstDeathYear#</td>
 									<td class="facts_value">#firstDeath#</td>
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Latest death year').'</td>
-									<td class="facts_value">&nbsp;#lastDeathYear#&nbsp;</td>
+									<td class="facts_value" align="right">#lastDeathYear#</td>
 									<td class="facts_value">#lastDeath#</td>
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Person who lived the longest').'</td>
-									<td class="facts_value">&nbsp;#longestLifeAge#&nbsp;</td>
+									<td class="facts_value" align="right">#longestLifeAge#</td>
 									<td class="facts_value">#longestLife#</td>
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Average age at death').'</td>
-									<td class="facts_value">&nbsp;#averageLifespan#&nbsp;</td>
+									<td class="facts_value" align="right">#averageLifespan#</td>
 									<td class="facts_value"></td>
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Family with the most children').'</td>
-									<td class="facts_value">&nbsp;#largestFamilySize#&nbsp;</td>
+									<td class="facts_value" align="right">#largestFamilySize#</td>
 									<td class="facts_value">#largestFamily#</td>
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Average number of children per family').'</td>
-									<td class="facts_value">&nbsp;#averageChildren#</td>
+									<td class="facts_value" align="right">#averageChildren#</td>
 									<td class="facts_value"></td>
 								</tr>
 							</table>

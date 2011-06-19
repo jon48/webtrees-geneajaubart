@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Name.php 11246 2011-03-31 13:56:47Z greg $
+// @version $Id: Name.php 11602 2011-05-25 08:06:53Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -78,7 +78,7 @@ class WT_Query_Name {
 			);
 		case 'pl':
 			return array(
-				'A','Ą','B','C','Ć','D','E','Ę','F','G','H','I','J','K','L','Ł','M','N','Ń','O','Ó','P','Q','R','S','Ś','T','U','V','W','X','Y','Z','Ź','Ż'
+				'A','B','C','Ć','D','E','F','G','H','I','J','K','L','Ł','M','N','O','Ó','P','Q','R','S','Ś','T','U','V','W','X','Y','Z','Ź','Ż'
 			);
 		case 'ro':
 			return array(
@@ -111,6 +111,54 @@ class WT_Query_Name {
 		}
 	}
 
+	// Get the initial letter of a name, taking care of multi-letter sequences and equivalences.
+	static public function initialLetter($name) {
+		$name=utf8_strtoupper($name);
+		// For some languages, it is not simply the first character.
+		switch (WT_LOCALE) {
+		case 'cs':
+			if (substr($name, 0, 2)=='CH') {
+				return 'CH';
+			}
+			break;
+		case 'da':
+		case 'nb':
+		case 'nn':
+			if (substr($name, 0, 2)=='AA') {
+				return 'Å';
+			}
+			break;
+		case 'hu':
+			if (substr($name, 0, 2)=='CS') {
+				return 'CS';
+			} elseif (substr($name, 0, 2)=='DZS') {
+				return 'DZS';
+			} elseif (substr($name, 0, 2)=='DZ') {
+				return 'DZ';
+			} elseif (substr($name, 0, 2)=='GY') {
+				return 'GY';
+			} elseif (substr($name, 0, 2)=='LY') {
+				return 'LY';
+			} elseif (substr($name, 0, 2)=='NY') {
+				return 'NY';
+			} elseif (substr($name, 0, 2)=='SZ') {
+				return 'SZ';
+			} elseif (substr($name, 0, 2)=='TY') {
+				return 'TY';
+			} elseif (substr($name, 0, 2)=='ZS') {
+				return 'ZS';
+			}
+			break;
+		case 'nl':
+			if (substr($name, 0, 2)=='IJ') {
+				return 'IJ';
+			}
+			break;
+		}
+		// No special rules - just take the first character
+		return utf8_substr($name, 0, 1);
+	}
+
 	// Generate SQL to match a given letter, taking care of cases that
 	// are not covered by the collation setting.  We must consider:
 	// potential substrings, such as Czech "CH" and "C"
@@ -138,6 +186,7 @@ class WT_Query_Name {
 			break;
 		case 'hu':
 			switch ($letter) {
+			case 'C':  return $field." LIKE 'C%' COLLATE ". WT_I18N::$collation." AND ".$field." NOT LIKE 'CS%' COLLATE ". WT_I18N::$collation;
 			case 'D':  return $field." LIKE 'D%' COLLATE ". WT_I18N::$collation." AND ".$field." NOT LIKE 'DZ%' COLLATE ". WT_I18N::$collation;
 			case 'DZ': return $field." LIKE 'DZ%' COLLATE ".WT_I18N::$collation." AND ".$field." NOT LIKE 'DZS%' COLLATE ".WT_I18N::$collation;
 			case 'G':  return $field." LIKE 'G%' COLLATE ". WT_I18N::$collation." AND ".$field." NOT LIKE 'GY%' COLLATE ". WT_I18N::$collation;
@@ -175,8 +224,8 @@ class WT_Query_Name {
 		// are any names beginning with that letter.  It looks better to
 		// show the full alphabet, rather than omitting rare letters such as X
 		foreach (self::_getAlphabet() as $letter) {
-			$alphas[$letter]=WT_DB::prepare($sql." AND ".self::_getInitialSql('n_surn', $letter))
-				->fetchOne();
+			$count=WT_DB::prepare($sql." AND ".self::_getInitialSql('n_surn', $letter))->fetchOne();
+			$alphas[$letter]=WT_I18N::number($count);
 		}
 
 		// Now fetch initial letters that are not in our alphabet,
@@ -185,7 +234,7 @@ class WT_Query_Name {
 			"SELECT LEFT(n_surn, 1), COUNT(n_id)".
 			" FROM `##name` ".
 			($fams ? " JOIN `##link` ON (n_id=l_from AND n_file=l_file AND l_type='FAMS') " : "").
-			" WHERE n_file={$ged_id} ".
+			" WHERE n_file={$ged_id} AND n_surn<>''".
 			($marnm ? "" : " AND n_type!='_MARNM'");
 
 		foreach (self::_getAlphabet() as $n=>$letter) {
@@ -193,11 +242,20 @@ class WT_Query_Name {
 		}
 		$sql.=" GROUP BY LEFT(n_surn, 1) ORDER BY LEFT(n_surn, 1)='', LEFT(n_surn, 1)='@', LEFT(n_surn, 1)";
 		foreach (WT_DB::prepare($sql)->fetchAssoc() as $alpha=>$count) {
-			if ($alpha=='') {
-				// Special code to indicate "no surname"
-				$alpha=',';
-			}
-			$alphas[$alpha]=$count;
+			$alphas[$alpha]=WT_I18N::number($count);
+		}
+
+		// Names with no surname
+		$sql=
+			"SELECT COUNT(n_id)".
+			" FROM `##name` ".
+			($fams ? " JOIN `##link` ON (n_id=l_from AND n_file=l_file AND l_type='FAMS') " : "").
+			" WHERE n_file={$ged_id} AND n_surn=''".
+			($marnm ? "" : " AND n_type!='_MARNM'");
+		$num_none=WT_DB::prepare($sql)->fetchOne();
+		if ($num_none) {
+			// Special code to indicate "no surname"
+			$alphas[',']=$num_none;
 		}
 
 		return $alphas;
@@ -236,9 +294,8 @@ class WT_Query_Name {
 		// are any names beginning with that letter.  It looks better to
 		// show the full alphabet, rather than omitting rare letters such as X
 		foreach (self::_getAlphabet() as $letter) {
-			$alphas[$letter]=
-				WT_DB::prepare($sql." AND ".self::_getInitialSql('n_givn', $letter))
-				->fetchOne();
+			$count=WT_DB::prepare($sql." AND ".self::_getInitialSql('n_givn', $letter))->fetchOne();
+			$alphas[$letter]=WT_I18N::number($count);
 		}
 
 		// Now fetch initial letters that are not in our alphabet,
@@ -268,7 +325,7 @@ class WT_Query_Name {
 		}
 		$sql.=" GROUP BY LEFT(n_givn, 1) ORDER BY LEFT(n_givn, 1)='@', LEFT(n_givn, 1)='', LEFT(n_givn, 1)";
 		foreach (WT_DB::prepare($sql)->fetchAssoc() as $alpha=>$count) {
-			$alphas[$alpha]=$count;
+			$alphas[$alpha]=WT_I18N::number($count);
 		}
 
 		return $alphas;
@@ -327,7 +384,7 @@ class WT_Query_Name {
 	// To search for names with no surnames, use $salpha=","
 	public static function individuals($surn, $salpha, $galpha, $marnm, $fams, $ged_id) {
 		$sql=
-			"SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, i_isdead, i_sex, n_surn, n_surname, n_num ".
+			"SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, i_isdead, i_sex, n_full ".
 			"FROM `##individuals` ".
 			"JOIN `##name` ON (n_id=i_id AND n_file=i_file) ".
 			($fams ? "JOIN `##link` ON (n_id=l_from AND n_file=l_file AND l_type='FAMS') " : "").
@@ -356,13 +413,17 @@ class WT_Query_Name {
 		$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($rows as $row) {
 			$person=WT_Person::getInstance($row);
-			$person->setPrimaryName($row['n_num']);
-			// We need to clone $person, as we may have multiple references to the
-			// same person in this list, and the "primary name" would otherwise
-			// be shared amongst all of them.  This has some performance/memory
-			// implications, and there is probably a better way.  This, however,
-			// is clean, easy and works.
-			$list[]=clone $person;
+			// The name from the database may be private - check the filtered list...
+			foreach ($person->getAllNames() as $n=>$name) {
+				if ($name['fullNN']==$row['n_full']) {
+					$person->setPrimaryName($n);
+					// We need to clone $person, as we may have multiple references to the
+					// same person in this list, and the "primary name" would otherwise
+					// be shared amongst all of them.
+					$list[]=clone $person;
+					break;
+				}
+			}
 		}
 		return $list;
 	}
@@ -385,17 +446,6 @@ class WT_Query_Name {
 		foreach (self::individuals($surn, $salpha, $galpha, $marnm, true, $ged_id) as $indi) {
 			foreach ($indi->getSpouseFamilies() as $family) {
 				$list[$family->getXref()]=$family;
-			}
-		}
-		// If we're searching for "Unknown surname", we also need to include families
-		// with missing spouses
-		if ($surn=='@N.N.' || $salpha=='@') {
-			$rows=
-				WT_DB::prepare("SELECT 'FAM' AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec, f_husb, f_wife, f_numchil FROM `##families` f WHERE f_file={$ged_id} AND (f_husb='' OR f_wife='')")
-				->fetchAll(PDO::FETCH_ASSOC);
-	
-			foreach ($rows as $row) {
-				$list[]=WT_Family::getInstance($row);
 			}
 		}
 		usort($list, array('WT_GedcomRecord', 'Compare'));

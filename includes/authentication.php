@@ -31,7 +31,7 @@
  *
  * @package webtrees
  * @subpackage DB
- * @version $Id: authentication.php 10971 2011-02-25 17:43:32Z greg $
+ * @version $Id: authentication.php 11620 2011-05-27 05:29:39Z larry $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -49,54 +49,27 @@ define('WT_AUTHENTICATION_PHP', '');
  * The username is stored in the <var>$_SESSION["wt_user"]</var> session variable.
  * @param string $user_name the username for the user attempting to login
  * @param string $password the plain text password to test
- * @param boolean $basic true if the userName and password were retrived via Basic HTTP authentication. Defaults to false. At this point, this is only used for logging
  * @return the user_id if successful, false otherwise
  */
-function authenticateUser($user_name, $password, $basic=false) {
+function authenticateUser($user_name, $password) {
 	// If we were already logged in, log out first
 	if (getUserId()) {
 		userLogout(getUserId());
 	}
 
 	if ($user_id=get_user_id($user_name)) {
-		$dbpassword=get_user_password($user_id);
-		if (crypt($password, $dbpassword)==$dbpassword) {
+		if (check_user_password($user_id, $password)) {
 			if (get_user_setting($user_id, 'verified') && get_user_setting($user_id, 'verified_by_admin') || get_user_setting($user_id, 'canadmin')) {
 				// Whenever we change our authorisation level change the session ID
 				Zend_Session::regenerateId();
 				$_SESSION['wt_user'] = $user_id;
-				AddToLog(($basic ? 'Basic HTTP Authentication' :'Login'). ' Successful', 'auth');
+				AddToLog('Login successful', 'auth');
 				return $user_id;
 			}
 		}
 	}
-	AddToLog(($basic ? 'Basic HTTP Authentication' : 'Login').' Failed ->'.$user_name.'<-', 'auth');
+	AddToLog('Login failed ->'.$user_name.'<-', 'auth');
 	return false;
-}
-
-/**
- * authenticate a username and password using Basic HTTP Authentication
- *
- * This function uses authenticateUser(), for authentication, but retrives the userName and password provided via basic auth.
- * @return bool return true if the user is already logged in or the basic HTTP auth username and password credentials match a user in the database return false if they don't
- * @TODO Security audit for this functionality
- * @TODO Do we really need a return value here?
- * @TODO should we reauthenticate the user even if already logged in?
- * @TODO do we need to set the user language and other jobs done in login.php? Should that loading be moved to a function called from the authenticateUser function?
- */
-function basicHTTPAuthenticateUser() {
-	$user_id = getUserId();
-	if (empty($user_id)) { //not logged in.
-		if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])
-				|| (! authenticateUser($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'], true))) {
-			header('WWW-Authenticate: Basic realm="' . WT_I18N::translate('webtrees Authentication System') . '"');
-			header('HTTP/1.0 401 Unauthorized');
-			echo WT_I18N::translate('You must enter a valid login ID and password to access this resource') ;
-			exit;
-		}
-	} else { //already logged in or successful basic authentication
-		return true; //probably not needed
-	}
 }
 
 /**
@@ -346,8 +319,12 @@ function addMessage($message) {
 	$email2 = $message["body"];
 	if (isset($message["from_name"]))
 		$email2 = WT_I18N::translate('Your Name:')." ".$message["from_name"]."\r\n".WT_I18N::translate('Email Address:')." ".$message["from_email"]."\r\n\r\n".$email2;
-	if (!empty($message["url"]))
-		$email2 .= "\r\n\r\n--------------------------------------\r\n\r\n".WT_I18N::translate('This message was sent while viewing the following URL: ')."\r\n".WT_SERVER_NAME.WT_SCRIPT_PATH.$message["url"]."\r\n";
+	if (!empty($message["url"])) {
+		if (strpos($message["url"],WT_SERVER_NAME.WT_SCRIPT_PATH)!==0) {
+			$message["url"]=WT_SERVER_NAME.WT_SCRIPT_PATH.$message["url"];
+		}
+		$email2 .= "\r\n\r\n--------------------------------------\r\n\r\n".WT_I18N::translate('This message was sent while viewing the following URL: ')."\r\n".$message["url"]."\r\n";
+	}
 	$email2 .= "\r\n=--------------------------------------=\r\nIP ADDRESS: ".$_SERVER['REMOTE_ADDR']."\r\n";
 	$email2 .= "DNS LOOKUP: ".gethostbyaddr($_SERVER['REMOTE_ADDR'])."\r\n";
 	$email2 .= "LANGUAGE: ".WT_LOCALE."\r\n";
@@ -402,7 +379,7 @@ function addMessage($message) {
 	//-- [ webtrees-Feature Requests-1588353 ] Supress admin IP address in Outgoing PGV Email
 	if (!userIsAdmin($user_id_from)) {
 		if (!empty($message["url"]))
-			$message["body"] .= "\r\n\r\n--------------------------------------\r\n\r\n".WT_I18N::translate('This message was sent while viewing the following URL: ')."\r\n".WT_SERVER_NAME.WT_SCRIPT_PATH.$message["url"]."\r\n";
+			$message["body"] .= "\r\n\r\n--------------------------------------\r\n\r\n".WT_I18N::translate('This message was sent while viewing the following URL: ')."\r\n".$message["url"]."\r\n";
 		$message["body"] .= "\r\n=--------------------------------------=\r\nIP ADDRESS: ".$_SERVER['REMOTE_ADDR']."\r\n";
 		$message["body"] .= "DNS LOOKUP: ".gethostbyaddr($_SERVER['REMOTE_ADDR'])."\r\n";
 		$message["body"] .= "LANGUAGE: ".WT_LOCALE."\r\n";

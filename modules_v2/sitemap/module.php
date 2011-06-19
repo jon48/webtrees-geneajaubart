@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11211 2011-03-26 20:39:32Z lukasz $
+// @version $Id: module.php 11507 2011-05-12 08:24:38Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,7 +31,7 @@ if (!defined('WT_WEBTREES')) {
 class sitemap_WT_Module extends WT_Module implements WT_Module_Config{
 	// Extend WT_Module
 	public function getTitle() {
-		return WT_I18N::translate('Sitemap');
+		return WT_I18N::translate('Sitemaps');
 	}
 
 	// Extend WT_Module

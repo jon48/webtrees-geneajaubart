@@ -28,7 +28,7 @@
  *
  * @package webtrees
  * @subpackage Reports
- * @version $Id: Base.php 11118 2011-03-13 19:06:59Z lukasz $
+ * @version $Id: Base.php 11468 2011-05-05 18:13:45Z greg $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -2613,7 +2613,8 @@ function FootnoteSHandler($attrs) {
 		$tag = $match[1];
 		$id = $match[2];
 	}
-	if (canDisplayRecord(WT_GED_ID, $gedrec)) {
+	$record=WT_GedcomRecord::GetInstance($id);
+	if ($record && $record->canDisplayDetails()) {
 		array_push($printDataStack, $printData);
 		$printData = true;
 		$style = "";

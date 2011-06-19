@@ -25,7 +25,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package webtrees
- * @version $Id: functions.php 11287 2011-04-08 18:48:45Z lukasz $
+ * @version $Id: functions.php 11603 2011-05-25 08:15:52Z greg $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -107,7 +107,7 @@ function safe_REQUEST($arr, $var, $regex=WT_REGEX_NOSCRIPT, $default=null) {
 		$regex='(?:'.join('|', $regex).')';
 	}
 	if (array_key_exists($var, $arr) && preg_match_recursive('~^'.addcslashes($regex, '~').'$~', $arr[$var])) {
-		return trim_recursive($arr[$var]);
+		return $arr[$var];
 	} else {
 		return $default;
 	}
@@ -143,22 +143,6 @@ function preg_match_recursive($regex, $var) {
 		} else {
 			// Neither scalar nor array.  Object?
 			return false;
-		}
-	}
-}
-
-function trim_recursive($var) {
-	if (is_scalar($var)) {
-		return trim($var);
-	} else {
-		if (is_array($var)) {
-			foreach ($var as $k=>$v) {
-				$var[$k]=trim_recursive($v);
-			}
-			return $var;
-		} else {
-			// Neither scalar nor array.  Object?
-			return $var;
 		}
 	}
 }
@@ -238,8 +222,6 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $CHART_BOX_TAGS;               $CHART_BOX_TAGS               =get_gedcom_setting($ged_id, 'CHART_BOX_TAGS');
 	global $CONTACT_USER_ID;              $CONTACT_USER_ID              =get_gedcom_setting($ged_id, 'CONTACT_USER_ID');
 	global $DEFAULT_PEDIGREE_GENERATIONS; $DEFAULT_PEDIGREE_GENERATIONS =get_gedcom_setting($ged_id, 'DEFAULT_PEDIGREE_GENERATIONS');
-	global $DISPLAY_JEWISH_GERESHAYIM;    $DISPLAY_JEWISH_GERESHAYIM    =get_gedcom_setting($ged_id, 'DISPLAY_JEWISH_GERESHAYIM');
-	global $DISPLAY_JEWISH_THOUSANDS;     $DISPLAY_JEWISH_THOUSANDS     =get_gedcom_setting($ged_id, 'DISPLAY_JEWISH_THOUSANDS');
 	global $ENABLE_AUTOCOMPLETE;          $ENABLE_AUTOCOMPLETE          =get_gedcom_setting($ged_id, 'ENABLE_AUTOCOMPLETE');
 	global $EXPAND_NOTES;                 $EXPAND_NOTES                 =get_gedcom_setting($ged_id, 'EXPAND_NOTES');
 	global $EXPAND_RELATIVES_EVENTS;      $EXPAND_RELATIVES_EVENTS      =get_gedcom_setting($ged_id, 'EXPAND_RELATIVES_EVENTS');
@@ -260,7 +242,7 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $MEDIA_DIRECTORY;              $MEDIA_DIRECTORY              =get_gedcom_setting($ged_id, 'MEDIA_DIRECTORY');
 	global $MEDIA_DIRECTORY_LEVELS;       $MEDIA_DIRECTORY_LEVELS       =get_gedcom_setting($ged_id, 'MEDIA_DIRECTORY_LEVELS');
 	global $MEDIA_EXTERNAL;               $MEDIA_EXTERNAL               =get_gedcom_setting($ged_id, 'MEDIA_EXTERNAL');
-	global $MEDIA_FIREWALL_ROOTDIR;       $MEDIA_FIREWALL_ROOTDIR       =get_gedcom_setting($ged_id, 'MEDIA_FIREWALL_ROOTDIR', get_site_setting('INDEX_DIRECTORY'));
+	global $MEDIA_FIREWALL_ROOTDIR;       $MEDIA_FIREWALL_ROOTDIR       =get_gedcom_setting($ged_id, 'MEDIA_FIREWALL_ROOTDIR', WT_DATA_DIR);
 	global $MEDIA_FIREWALL_THUMBS;        $MEDIA_FIREWALL_THUMBS        =get_gedcom_setting($ged_id, 'MEDIA_FIREWALL_THUMBS');
 	global $MEDIA_ID_PREFIX;              $MEDIA_ID_PREFIX              =get_gedcom_setting($ged_id, 'MEDIA_ID_PREFIX');
 	global $MULTI_MEDIA;                  $MULTI_MEDIA                  =get_gedcom_setting($ged_id, 'MULTI_MEDIA');
@@ -874,7 +856,8 @@ function find_highlighted_object($pid, $ged_id, $indirec) {
 		->fetchAll(PDO::FETCH_NUM);
 
 	foreach ($media as $i=>$row) {
-		if (canDisplayRecord($ged_id, $row[2]) && canDisplayFact($row[0], $ged_id, $row[3])) {
+		$obj=WT_Media::getInstance($row[0]);
+		if ($obj->canDisplayDetails() && canDisplayFact($row[0], $ged_id, $row[3])) {
 			$level=0;
 			$ct = preg_match("/(\d+) OBJE/", $row[3], $match);
 			if ($ct>0) {
@@ -937,19 +920,6 @@ function find_highlighted_object($pid, $ged_id, $indirec) {
 	//if (!empty($objectD)) return $objectD;
 
 	return array();
-}
-
-/**
- * Determine whether the main image or a thumbnail should be sent to the browser
- */
-function thumb_or_main($object) {
-	global $USE_THUMBS_MAIN;
-
-	if ($object['_THUM']=='Y' || !$USE_THUMBS_MAIN) $file = 'file';
-	else $file = 'thumb';
-
-	// Here we should check whether the selected file actually exists
-	return($object[$file]);
 }
 
 /**
@@ -1057,23 +1027,27 @@ function event_sort_name($a, $b) {
 
 function mediasort($a, $b) {
 	$aKey = "";
-	if (!empty($a["TITL"])) {
-		$aKey = $a["TITL"];
+	if (!empty($a["MEDIASORT"])) {
+		$aKey = $a["MEDIASORT"]; // set in get_medialist2 and Media->printLinkedRecords()
 	} else {
-		if (!empty($a["titl"])) {
-			$aKey = $a["titl"];
+		if (!empty($a["TITL"])) {
+			$aKey = $a["TITL"]; // set in get_medialist
 		} else {
-			if (!empty($a["NAME"])) {
-				$aKey = $a["NAME"];
+			if (!empty($a["titl"])) {
+				$aKey = $a["titl"];
 			} else {
-				if (!empty($a["name"])) {
-					$aKey = $a["name"];
+				if (!empty($a["NAME"])) {
+					$aKey = $a["NAME"];
 				} else {
-					if (!empty($a["FILE"])) {
-						$aKey = basename($a["FILE"]);
+					if (!empty($a["name"])) { // set in PrintMediaLinks
+						$aKey = $a["name"];
 					} else {
-						if (!empty($a["file"])) {
-							$aKey = basename($a["file"]);
+						if (!empty($a["FILE"])) {
+							$aKey = basename($a["FILE"]); // set in get_medialist
+						} else {
+							if (!empty($a["file"])) {
+								$aKey = basename($a["file"]);
+							}
 						}
 					}
 				}
@@ -1082,23 +1056,27 @@ function mediasort($a, $b) {
 	}
 
 	$bKey = "";
-	if (!empty($b["TITL"])) {
-		$bKey = $b["TITL"];
+	if (!empty($b["MEDIASORT"])) {
+		$bKey = $b["MEDIASORT"];
 	} else {
-		if (!empty($b["titl"])) {
-			$bKey = $b["titl"];
+		if (!empty($b["TITL"])) {
+			$bKey = $b["TITL"];
 		} else {
-			if (!empty($b["NAME"])) {
-				$bKey = $b["NAME"];
+			if (!empty($b["titl"])) {
+				$bKey = $b["titl"];
 			} else {
-				if (!empty($b["name"])) {
-					$bKey = $b["name"];
+				if (!empty($b["NAME"])) {
+					$bKey = $b["NAME"];
 				} else {
-					if (!empty($b["FILE"])) {
-						$bKey = basename($b["FILE"]);
+					if (!empty($b["name"])) {
+						$bKey = $b["name"];
 					} else {
-						if (!empty($b["file"])) {
-							$bKey = basename($b["file"]);
+						if (!empty($b["FILE"])) {
+							$bKey = basename($b["FILE"]);
+						} else {
+							if (!empty($b["file"])) {
+								$bKey = basename($b["file"]);
+							}
 						}
 					}
 				}
@@ -1114,17 +1092,25 @@ function mediasort($a, $b) {
 
 function filesort($a, $b) {
 	$aKey = "";
-	if (!empty($a["FILE"])) {
-		$aKey = basename($a["FILE"]);
-	} else if (!empty($a["file"])) {
-		$aKey = basename($a["file"]);
+	if (!empty($a["FILESORT"])) {
+		$aKey = $a["FILESORT"]; // set in get_medialist2, has already been basename'd
+	} else {
+		if (!empty($a["FILE"])) {
+			$aKey = basename($a["FILE"]); // set in get_medialist
+		} else if (!empty($a["file"])) {
+			$aKey = basename($a["file"]);
+		}
 	}
 
 	$bKey = "";
-	if (!empty($b["FILE"])) {
-		$bKey = basename($b["FILE"]);
-	} else if (!empty($b["file"])) {
-		$bKey = basename($b["file"]);
+	if (!empty($b["FILESORT"])) {
+		$bKey = $b["FILESORT"];
+	} else {
+		if (!empty($b["FILE"])) {
+			$bKey = basename($b["FILE"]);
+		} else if (!empty($b["file"])) {
+			$bKey = basename($b["file"]);
+		}
 	}
 	return utf8_strcasecmp($aKey, $bKey, true); // Case-insensitive compare
 }
@@ -2639,11 +2625,17 @@ function get_relationship_name_from_path($path, $pid1, $pid2) {
 				case 'F': return WT_I18N::translate('great x%d grandmother', $up);
 				case 'U': return WT_I18N::translate('great x%d grandparent', $up);
 				}
+			case 'fr': // Source: Jacqueline Tetreault
+				switch ($sex2) {
+				case 'M': return WT_I18N::translate('great x%d grandfather', $up-1);
+				case 'F': return WT_I18N::translate('great x%d grandmother', $up-1);
+				case 'U': return WT_I18N::translate('great x%d grandparent', $up-1);
+				}
 			case 'en':
 			default:
 				switch ($sex2) {
 				case 'M': // I18N: if you need a different number for %d, contact the developers, as a code-change is required
-				            return WT_I18N::translate('great x%d grandfather', $up-2);
+				          return WT_I18N::translate('great x%d grandfather', $up-2);
 				case 'F': return WT_I18N::translate('great x%d grandmother', $up-2);
 				case 'U': return WT_I18N::translate('great x%d grandparent', $up-2);
 				}
@@ -2796,69 +2788,24 @@ function get_relationship_name_from_path($path, $pid1, $pid2) {
 		}
 	}
 
-	// Try to split the relationship into sub-relationships, e.g., third-cousin's wife's fourth-cousin.
-	// This next block of code is experimental.  If it doesn't work, we can remove it.....
-	if (preg_match('/^(.*)(hus|wif|spo)(.*)/', $path, $match)) {
-		if ($match[1]=='') {
-			return WT_I18N::translate(
-				// I18N: A complex relationship, such as "husband's great-uncle"
-				'%1$s\'s %2$s',
-				get_relationship_name_from_path($match[2], null, null), // TODO: need the actual people
-				get_relationship_name_from_path($match[3], null, null)
-			);
-		} elseif ($match[3]=='') {
-			return WT_I18N::translate(
-				// I18N: A complex relationship, such as "second cousin's wife"
-				'%1$s\'s %2$s',
-				get_relationship_name_from_path($match[1], null, null),
-				get_relationship_name_from_path($match[2], null, null)
-			);
-		} else {
-			return WT_I18N::translate(
-				// I18N: A complex relationship, such as "second cousin's husband's third cousin"
-				'%1$s\'s %2$s\'s %3$s',
-				get_relationship_name_from_path($match[1], null, null),
-				get_relationship_name_from_path($match[2], null, null),
-				get_relationship_name_from_path($match[3], null, null)
-			);
-		}
-	}
+	// Split the relationship into sub-relationships, e.g., third-cousin's great-uncle.
+	// Try splitting at every point, and choose the path with the shorted translated name.
 
-	// We don't have a specific name for this relationship, and we can't match it with a pattern.
-	// Just spell it out.
-
-	// TODO: long relationships are a bit ridiculous - although technically correct.
-	// Perhaps translate long paths as "a distant blood relative", or "a distant relative by marriage"
-	switch (substr($path, -3, 3)) {
-	case 'mot': $relationship=WT_I18N::translate('mother'  ); break;
-	case 'fat': $relationship=WT_I18N::translate('father'  ); break;
-	case 'par': $relationship=WT_I18N::translate('parent'  ); break;
-	case 'hus': $relationship=WT_I18N::translate('husband' ); break;
-	case 'wif': $relationship=WT_I18N::translate('wife'    ); break;
-	case 'spo': $relationship=WT_I18N::translate('spouse'  ); break;
-	case 'bro': $relationship=WT_I18N::translate('brother' ); break;
-	case 'sis': $relationship=WT_I18N::translate('sister'  ); break;
-	case 'sib': $relationship=WT_I18N::translate('sibling' ); break;
-	case 'son': $relationship=WT_I18N::translate('son'     ); break;
-	case 'dau': $relationship=WT_I18N::translate('daughter'); break;
-	case 'chi': $relationship=WT_I18N::translate('child'   ); break;
-	}
-	while (($path=substr($path, 0, strlen($path)-3))!='') {
-		switch (substr($path, -3, 3)) {
-			// I18N: These strings are used to build paths of relationships, such as "father's wife's husband's brother"
-		case 'mot': $relationship=WT_I18N::translate('mother\'s %s',   $relationship); break;
-		case 'fat': $relationship=WT_I18N::translate('father\'s %s',   $relationship); break;
-		case 'par': $relationship=WT_I18N::translate('parent\'s %s',   $relationship); break;
-		case 'hus': $relationship=WT_I18N::translate('husband\'s %s',  $relationship); break;
-		case 'wif': $relationship=WT_I18N::translate('wife\'s %s',     $relationship); break;
-		case 'spo': $relationship=WT_I18N::translate('spouse\'s %s',   $relationship); break;
-		case 'bro': $relationship=WT_I18N::translate('brother\'s %s',  $relationship); break;
-		case 'sis': $relationship=WT_I18N::translate('sister\'s %s',   $relationship); break;
-		case 'sib': $relationship=WT_I18N::translate('sibling\'s %s',  $relationship); break;
-		case 'son': $relationship=WT_I18N::translate('son\'s %s',      $relationship); break;
-		case 'dau': $relationship=WT_I18N::translate('daughter\'s %s', $relationship); break;
-		case 'chi': $relationship=WT_I18N::translate('child\'s %s',    $relationship); break;
+	$relationship=null;
+	$path1=substr($path, 0, 3);
+	$path2=substr($path, 3);
+	while ($path2) {
+		$tmp=WT_I18N::translate(
+			// I18N: A complex relationship, such as "third-cousin's great-uncle"
+			'%1$s\'s %2$s',
+			get_relationship_name_from_path($path1, null, null), // TODO: need the actual people
+			get_relationship_name_from_path($path2, null, null)
+		);
+		if (!$relationship || strlen($tmp)<strlen($relationship)) {
+			$relationship=$tmp;
 		}
+		$path1.=substr($path2, 0, 3);
+		$path2=substr($path2, 3);
 	}
 	return $relationship;
 }
@@ -2914,22 +2861,6 @@ function filename_encode($filename) {
 		return utf8_encode($filename);
 	else
 		return $filename;
-}
-
-function getfilesize($bytes) {
-	if ($bytes>=1099511627776) {
-		return round($bytes/1099511627776, 2)." TB";
-	}
-	if ($bytes>=1073741824) {
-		return round($bytes/1073741824, 2)." GB";
-	}
-	if ($bytes>=1048576) {
-		return round($bytes/1048576, 2)." MB";
-	}
-	if ($bytes>=1024) {
-		return round($bytes/1024, 2)." KB";
-	}
-	return $bytes." B";
 }
 
 /**

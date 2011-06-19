@@ -22,7 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: help_text.php 11262 2011-04-02 20:48:54Z lukasz $
+ * @version $Id: help_text.php 11700 2011-06-03 16:51:05Z greg $
  */
 
 if (!defined('WT_WEBTREES') || !defined('WT_SCRIPT_NAME') || WT_SCRIPT_NAME!='help_text.php') {
@@ -32,28 +32,18 @@ if (!defined('WT_WEBTREES') || !defined('WT_SCRIPT_NAME') || WT_SCRIPT_NAME!='he
 
 switch ($help) {
 
-case 'GOOGLEMAP_CONFIG':
-	$title=WT_I18N::translate('Configure Google-map');
-	$text=WT_I18N::translate('Configure all aspects of the Google Map module here.');
-	break;
-
-case 'GOOGLEMAP_ENABLE':
-	$title=WT_I18N::translate('Enable Google-map');
-	$text=WT_I18N::translate('Using this option the functionality of the Googlemap can be enabled or disabled.<br />When disabled the Map-tab on the individual page is still shown, but will be left empty. The configuration link for administrators is still available. When disabled the Place Hierarchy has standard show.');
-	break;
-
 case 'GOOGLEMAP_MAP_TYPE':
-	$title=WT_I18N::translate('Google-map type');
+	$title=WT_I18N::translate('Default map type');
 	$text=WT_I18N::translate('The type of map that will be shown by default. This can be Map, Satellite, Hybrid or Terrain.');
 	break;
 
 case 'GOOGLEMAP_MAP_SIZE':
-	$title=WT_I18N::translate('Google-map size');
+	$title=WT_I18N::translate('Size of map (in pixels)');
 	$text=WT_I18N::translate('The size of the map (in pixels) as shown on the Individual pages.');
 	break;
 
 case 'GOOGLEMAP_MAP_ZOOM':
-	$title=WT_I18N::translate('Google-map zoom factor');
+	$title=WT_I18N::translate('Zoom factor of map');
 	$text=WT_I18N::translate('Minimum and maximum zoom factor for the Google map. 1 is the full map, 15 is single house. Note that 15 is only available in certain areas.');
 	break;
 
@@ -68,7 +58,7 @@ case 'GM_DEFAULT_LEVEL_0':
 	break;
 
 case 'GM_NOF_LEVELS':
-	$title=WT_I18N::translate('This indicates the number of levels used within Googlemap');
+	$title=WT_I18N::translate('Number of levels');
 	$text=WT_I18N::translate('This field indicates the number of levels in the places-hierarchy that is being used by the Googlemap modules.<br />The default value is 4 (Country, State, County, Place), which is usually good enough. If you want to add an extra level (for example to add specific location like cemeteries or schools) change this value. If you want to remove a level (for example county) you can also change this value, but keep in mind that the files containing the place-locations contain a 4-level structure.');
 	break;
 
@@ -83,7 +73,7 @@ case 'GM_NAME_POSTFIX':
 	break;
 
 case 'GM_NAME_PRE_POST':
-	$title=WT_I18N::translate('Order of the pre/postfix to use');
+	$title=WT_I18N::translate('Prefix / Postfix order');
 	$text=WT_I18N::translate('This field indicates the order in which names are tried using the prefix and postfix. The possible values are:<br /><ul><li>No pre/postfix</li><li>Normal name, Prefix, Postfix, both</li><li>Normal name, Postfix, Prefix, both</li><li>Prefix, Postfix, both, Normal name</li><li>Postfix, Prefix, both, Normal name</li><li>Prefix, Postfix, Normal name, both</li><li>Postfix, Prefix, Normal name, both</li></ul>');
 	break;
 
@@ -128,11 +118,6 @@ case 'GOOGLEMAP_COORD':
 	break;
 
 // Help texts for places_edit.php
-
-case 'PLE_EDIT':
-	$title=WT_I18N::translate('Edit Google Map Places');
-	$text=WT_I18N::translate('Here you can add, edit or delete Google Map place details.');
-	break;
 
 case 'PLE_PLACES':
 	$title=WT_I18N::translate('Enter place name');
@@ -190,24 +175,19 @@ case 'PLIF_OVERWRITE':
 	break;
 
 case 'PLE_ACTIVE':
-	$title=WT_I18N::translate('List inactive places');
+	$title=WT_I18N::translate('Show inactive places');
 	$text=
-		'<strong>'.
-		WT_I18N::translate('List places in the Google Maps table that are not used by any current Family tree(s).').
-		'</strong><br /><br />'.
-		WT_I18N::translate('The display is set, by default, to only display for editing here those places that exist on BOTH your Family trees and your Google Maps tables.').
-		'<br /><br />'.
-		WT_I18N::translate('When this option is checked, the list of places will display ALL places at this level.').
-		'<br /><br />'.
-		WT_I18N::translate('This is designed to speed up the display of the list when large place lists have been imported, but not all used.').
-		'<br /><br />'.
-		WT_I18N::translate('NOTE - if the option is checked the full list may take a few minutes to display.');
+		'<p>'.
+		WT_I18N::translate('By default, the list shows only those places which can be found in your family trees.  You may have details for other places, such as those imported in bulk from an external file.  Selecting this option will show all places, including ones that are not currently used.').
+		'</p><p class="warning">'.
+		WT_I18N::translate('If you have a large number of inactive places, it can be slow to generate the list.').
+		'</p>';
 	break;
 
 // Help text for placecheck.php
 
 case 'GOOGLEMAP_PLACECHECK':
-	$title=WT_I18N::translate('Place Checking Tool');
+	$title=WT_I18N::translate('Place Check');
 	$text=WT_I18N::translate('<strong>This tool</strong> provides a way to compare places in your gedcom file with the matching entries in the googlemaps \'placelocations\' table.<br /><br /><strong>The display</strong> can be structured for a specific gedcom file; for a specific country within that file; and for a particular area (e.g. state or county) within that country.<br /><br /><strong>Places</strong>are listed alphabetically so that minor spelling differences can be easily spotted, and corrected.<br /><br /><strong>From</strong> the results of the comparison you can click on place names for one of these three options:<br /><br /><strong>1 - </strong>For gedcom file places you will be taken to the Place Heirarchy view. Here you will see all records that are linked to that place.<br /><br /><strong>2 - </strong>For places that exist in the gedcom file, but not in the googlemap table (highlighted in red), you will get the googlemap \"Add place\" screen.<br /><br /><strong>3 - </strong>For places that exist in both the gedcom file and the googlemap table (perhaps without coordinates) you will get the googlemap \"edit place\" screen. Here you can edit any aspect of the place record for the googlemap display.<br /><br /><strong>Hovering</strong> over any place in the googlemap table columns will display the zoom level curently set for that place.');
 	break;
 

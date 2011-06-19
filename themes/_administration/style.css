@@ -23,7 +23,7 @@
  *
  * @package webtrees
  * @subpackage Administration
- * @version $Id: style.css 11146 2011-03-18 19:51:29Z greg $
+ * @version $Id: style.css 11659 2011-05-31 10:25:20Z greg $
  * @version: p_$Revision$ $Date$
  * $HeadURL$
  */
@@ -48,6 +48,8 @@ td {vertical-align:top;}
 .indent {padding-left:15px;}
 html[dir='rtl'] .indent {padding-right:15px;}
 .parentdeath {border:thin solid red; padding:1px;}
+.submenu { background-color:#EEE; border:thin solid #AAA; padding: 3px;}
+
 
 /* jQuery styling over-rides */
 .ui-widget-content a {text-decoration:none;}
@@ -321,6 +323,7 @@ html[dir='rtl'] .upload_media th {text-align:right;}
 html[dir='rtl'] .upload_media td+td {padding-right:20px;}
 
 /* MANAGE MODULES */
+#installed_table {width:100%;}
 #installed_table th {min-width:60px;}
 
 /* MANAGE MENUS, TABS, BLOCKS, SIDEBAR, REPORTS */

@@ -23,41 +23,44 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: mediaviewer.php 11206 2011-03-26 16:09:43Z greg $
+// $Id: mediaviewer.php 11563 2011-05-21 05:28:11Z larry $
 
 define('WT_SCRIPT_NAME', 'mediaviewer.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
-$nonfacts=array();
+// We have finished writing session data, so release the lock
+Zend_Session::writeClose();
 
 $controller = new WT_Controller_Media();
 $controller->init();
 
+print_header($controller->getPageTitle());
+
+if (!$controller->mediaobject) {
+	echo '<b>', WT_I18N::translate('Unable to find record with ID'), '</b><br /><br />';
+	print_footer();
+	exit;
+}
+
+if (!$controller->mediaobject->canDisplayDetails()) {
+	print_privacy_error();
+	print_footer();
+	exit;
+}
+
+if (WT_USE_LIGHTBOX) {
+	require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
+	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
+}
 
 /* Note:
  *  if $controller->getLocalFilename() is not set, then an invalid MID was passed in
  *  if $controller->pid is not set, then a filename was passed in that is not in the gedcom
  */
-
 $filename = $controller->getLocalFilename();
 
-print_header($controller->getPageTitle());
-
-if (!$controller->mediaobject) {
-	echo "<b>", WT_I18N::translate('Unable to find record with ID'), "</b><br /><br />";
-	print_footer();
-	exit;
-}
 global $tmb;
-
-// LBox =============================================================================
-// Get Javascript variables from lb_config.php ---------------------------
-if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
-}
-// LBox  ============================================================================
 
 //The next set of code draws the table that displays information about the person
 ?>
@@ -72,48 +75,11 @@ if (WT_USE_LIGHTBOX) {
 	<tr>
 		<td align="center" width="150">
 			<?php
-
-			// If we can display details
+			// display image
 			if ($controller->canDisplayDetails()) {
-				//Check to see if the File exists in the system. (ie if the file is external, or it exists locally)
-				if (isFileExternal($filename) || $controller->mediaobject->fileExists()) {
-					// the file is external, or it exists locally
-					// attempt to get the image size
-					$imgwidth = $controller->mediaobject->getWidth()+40;
-					$imgheight = $controller->mediaobject->getHeight()+150;
-					if (WT_USE_LIGHTBOX) $dwidth = 200;
-					else $dwidth = 300;
-					if ($imgwidth<$dwidth) $dwidth = $imgwidth;
-
-					$name = trim($controller->mediaobject->getFullName());
-
-					// Get info on how to handle this media file
-					$mediaInfo = mediaFileInfo($filename, $controller->mediaobject->getThumbnail(), $controller->pid, $name, '', false);
-
-					//-- Thumbnail field
-					echo '<a href="', $mediaInfo['url'], '">';
-					echo '<img src="', $mediaInfo['thumb'], '" border="0" align="', $TEXT_DIRECTION=="rtl" ? "left":"right", '" class="thumbnail"', $mediaInfo['width'];
-
-					// Finish off anchor and tooltips
-					echo " alt=\"" . PrintReady(htmlspecialchars($name)) . "\" title=\"" . PrintReady(htmlspecialchars($name)) . "\" /></a>";
-
-					// If download
-					if ($SHOW_MEDIA_DOWNLOAD) {
-						echo "<br /><br /><a href=\"".$filename."\">".WT_I18N::translate('Download File')."</a><br/>";
-					}
-
-					// else the file is not external and does not exist
-				} else {
-					?>
-					<img src="<?php echo $controller->mediaobject->getThumbnail(); ?>" border="0" width="100" alt="<?php echo $controller->mediaobject->getFullName(); ?>" title="<?php echo PrintReady(htmlspecialchars($controller->mediaobject->getFullName())); ?>" />
-					<span class="error">
-						<?php echo WT_I18N::translate('File not found.'); ?>
-					</span>
-					<?php
-				}
+				echo $controller->mediaobject->displayMedia(array('download'=>true, 'align'=>'none', 'alertnotfound'=>true));
 			}
 			?>
-
 		</td>
 		<td valign="top">
 			<table width="100%">
@@ -195,7 +161,7 @@ function show_gedcom_record(shownew) {
 }
 
 function showchanges() {
-	window.location = 'mediaviewer.php?mid=<?php echo $controller->pid; ?>&show_changes=yes';
+	window.location = '<?php echo $controller->mediaobject->getRawUrl(); ?>&show_changes=yes';
 }
 
 function ilinkitem(mediaid, type) {

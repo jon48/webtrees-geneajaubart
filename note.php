@@ -24,7 +24,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
 * @package webtrees
-* @version $Id: note.php 11181 2011-03-24 17:21:53Z greg $
+* @version $Id: note.php 11648 2011-05-30 06:43:31Z nigel $
 */
 
 define('WT_SCRIPT_NAME', 'note.php');
@@ -34,31 +34,33 @@ require WT_ROOT.'includes/functions/functions_print_lists.php';
 // We have finished writing session data, so release the lock
 Zend_Session::writeClose();
 
-$nonfacts = array();
-
 $controller=new WT_Controller_Note();
 $controller->init();
 
-// Tell addmedia.php what to link to
-$linkToID=$controller->nid;
-
 print_header($controller->getPageTitle());
 
-// LightBox
+if (!$controller->note) {
+	echo '<b>', WT_I18N::translate('Unable to find record with ID'), '</b><br /><br />';
+	print_footer();
+	exit;
+}
+
+if (!$controller->note->canDisplayDetails()) {
+	print_privacy_error();
+	print_footer();
+	exit;
+}
+
+if ($controller->note->isMarkedDeleted()) {
+	echo '<span class="error">', WT_I18N::translate('This record has been marked for deletion upon admin approval.'), '</span>';
+}
+
 if (WT_USE_LIGHTBOX) {
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 }
 
-// If note does not currently exist
-if (!$controller->note) {
-	echo "<b>", WT_I18N::translate('Unable to find record with ID'), "</b><br /><br />";
-	print_footer();
-	exit;
-}
-else if ($controller->note->isMarkedDeleted()) {
-	echo '<span class="error">', WT_I18N::translate('This record has been marked for deletion upon admin approval.'), '</span>';
-}
+$linkToID=$controller->nid; // Tell addmedia.php what to link to
 
 echo WT_JS_START;
 echo 'function show_gedcom_record() {';
@@ -92,7 +94,7 @@ echo '<tr><td align="left" class="descriptionbox ', $TEXT_DIRECTION, '">';
 		if (!empty($WT_IMAGES['note']) && $SHOW_FACT_ICONS) echo '<img src="', $WT_IMAGES['note'], '" alt="" align="top" />';
 		echo WT_I18N::translate('Shared note'), '</a>';
 		echo '<div class="editfacts">';
-			echo '<a href="javascript: edit_note()" title="', WT_I18N::translate('Edit'), '"><div class="editlink"><span class="link_text">', WT_I18N::translate('Edit'), '</span></div></a>';
+			echo '<div class="editlink"><a class="editicon" href="javascript: edit_note()" title="', WT_I18N::translate('Edit'), '"><span class="link_text">', WT_I18N::translate('Edit'), '</span></div></a>';
 		echo '</div>';
 	} else { 
 		if (!empty($WT_IMAGES['note']) && $SHOW_FACT_ICONS) echo '<img src="', $WT_IMAGES['note'], '" alt="" align="top" />';

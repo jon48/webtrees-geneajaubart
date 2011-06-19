@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package webtrees
- * @version $Id: functions_utf-8.php 11245 2011-03-31 11:59:44Z greg $
+ * @version $Id: functions_utf-8.php 11548 2011-05-17 13:14:15Z greg $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -34,8 +34,9 @@ define('WT_FUNCTIONS_UTF_8_PHP', '');
 // If there are mixed scripts, then the enclosed scripts should already have been wrapped
 // in lrm/rlm markup.
 function utf8_script($string) {
-	$string=strip_tags($string); // otherwise html tags show up as latin
-	$string=str_replace(array('@N.N.', '@P.N.'), '', $string); // Otherwise unknown names show up as latin
+	$string=strip_tags($string);                               // otherwise HTML tags show up as latin
+	$string=html_entity_decode($string, ENT_QUOTES, 'UTF-8');  // otherwise HTML entities show up as latin
+	$string=str_replace(array('@N.N.', '@P.N.'), '', $string); // otherwise unknown names show up as latin
 	$pos=0;
 	$strlen=strlen($string);
 	while ($pos<$strlen) {

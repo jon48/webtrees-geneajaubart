@@ -40,17 +40,18 @@ echo
 	'<head>',
 	'<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />',
 	'<title>', htmlspecialchars($title), '</title>',
-	'<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />',
+	header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
+	'<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />';
+	
+echo
+	$javascript,
+	'<link type="text/css" href="js/jquery/css/jquery-ui.custom.css" rel="Stylesheet" />',
 	'<link rel="stylesheet" href="', $stylesheet, '" type="text/css" media="all" />';
 
 //PERSO Add extra style sheet for personal additions
 $extrastylesheet= str_replace(".css", ".extra.css", $stylesheet);
 echo '<link rel="stylesheet" href="', $extrastylesheet,'" type="text/css" media="all" />';
 //END PERSO
-
-if (isset($_GET["mod_action"]) && $_GET["mod_action"]=="places_edit") {
-	echo '<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />';
-}
 
 if (file_exists(WT_THEME_DIR.$BROWSERTYPE.'.css')) {
 	echo '<link rel="stylesheet" href="', WT_THEME_DIR.$BROWSERTYPE, '.css" type="text/css" media="all" />';
@@ -66,24 +67,6 @@ if (WT_USE_LIGHTBOX) {
 	}
 }
 
-if (!empty($LINK_CANONICAL)) {
-	echo '<link rel="canonical" href="', $LINK_CANONICAL, '" />';
-}
-if (!empty($META_DESCRIPTION)) {
-	echo '<meta name="description" content="', htmlspecialchars($META_DESCRIPTION), '" />';
-}
-echo '<meta name="robots" content="', $META_ROBOTS, '" />';
-if (!empty($META_GENERATOR)) {
-	echo '<meta name="generator" content="', $META_GENERATOR, '" />';
-}
-
-echo
-	$javascript,
-	'<link type="text/css" href="js/jquery/css/jquery-ui.custom.css" rel="Stylesheet" />',
-	'<link type="text/css" href="', WT_THEME_DIR, 'jquery/jquery-ui_theme.css" rel="Stylesheet" />';
-if ($TEXT_DIRECTION=='rtl') {
-	echo '<link type="text/css" href="', WT_THEME_DIR, 'jquery/jquery-ui_theme_rtl.css" rel="Stylesheet" />';
-}
 echo
 	'<link type="text/css" href="', WT_THEME_DIR, 'modules.css" rel="Stylesheet" />',
 	'</head>',
@@ -103,9 +86,16 @@ if ($view=='simple') {
 }
 else {
 	echo '<div id="main_content">';
-	echo '<div id="header" class="', $TEXT_DIRECTION, '">';
-
-	if (!$SEARCH_SPIDER) {
+	echo '<div id="header">';
+	if ($SEARCH_SPIDER) {
+		// Search engines get a reduced menu
+		$menu_items=array(
+			WT_MenuBar::getGedcomMenu(),
+			WT_MenuBar::getListsMenu(),
+			WT_MenuBar::getCalendarMenu()
+		);
+	} else {
+		// Options for real users
 		echo  '<div id="htopright">';
 		//echo '<div class="header_search">',
 		echo 	'<form action="search.php" method="post">',
@@ -154,6 +144,20 @@ else {
 		}
 		echo '</ul>';
 		echo '</div>';
+		//Prepare menu bar
+		$menu_items=array(
+			WT_MenuBar::getGedcomMenu(),
+			WT_MenuBar::getMyPageMenu(),
+			WT_MenuBar::getChartsMenu(),
+			WT_MenuBar::getListsMenu(),
+			WT_MenuBar::getCalendarMenu(),
+			WT_MenuBar::getReportsMenu(),
+			WT_MenuBar::getSearchMenu(),
+		);
+		foreach (WT_MenuBar::getModuleMenus() as $menu) {
+			$menu_items[]=$menu;
+		}
+		$menu_items[]=WT_MenuBar::getHelpMenu();
 	}
 	echo '</div>'; // close header
 	//end header section
@@ -167,54 +171,20 @@ else {
 		'<div class="topMenu_left"></div>',
 		'<div class="topMenu_right"></div>',
 		'<div class="topMenu_center">',
-		'<table align="center" class="menu">',
+		'<table align="center" id="main-menu">',
 			'<tr>';
-				$menu=WT_MenuBar::getGedcomMenu();
+			$nbMenus = count($menu_items);
+			for ($i = 0; $i < $nbMenus -1 ; $i++) {
+				$menu = $menu_items[$i];
 				if ($menu) {
-					echo '<td valign="top">', $menu->getMenu(), '</td>';
-
+					echo '<td valign="top"><ul class="main-menu-item">', $menu->getMenuAsList(), '</ul></td>';
 				}
-				$menu=WT_MenuBar::getMyPageMenu();
-				if ($menu) {
-					echo '<td valign="top">', $menu->getMenu(), '</td>';
-
-				}
-				$menu=WT_MenuBar::getChartsMenu();
-				if ($menu) {
-					echo '<td valign="top">', $menu->getMenu(), '</td>';
-
-				}
-				$menu=WT_MenuBar::getListsMenu();
-				if ($menu) {
-					echo '<td valign="top">', $menu->getMenu(), '</td>';
-
-				}
-				$menu=WT_MenuBar::getCalendarMenu();
-				if ($menu) {
-					echo '<td valign="top">', $menu->getMenu(), '</td>';
-
-				}
-				$menu=WT_MenuBar::getReportsMenu();
-				if ($menu) {
-					echo '<td valign="top">', $menu->getMenu(), '</td>';
-
-				}
-				$menu=WT_MenuBar::getSearchMenu();
-				if ($menu) {
-					echo '<td valign="top">', $menu->getMenu(), '</td>';
-
-				}
-				$menus=WT_MenuBar::getModuleMenus();
-				foreach ($menus as $m=>$menu) {
-					if ($menu) {
-						echo '<td valign="top">', $menu->getMenu(), '</td>';
-	
-					}
-				}
-				$menu=WT_MenuBar::getHelpMenu();
-				if ($menu) {
-					echo '<td class="topmenu_last" valign="top">', $menu->getMenu(), '</td>';
-				}
+			}
+			$menu = $menu_items[$nbMenus - 1];
+			if ($menu) {
+				echo '<td class="topmenu_last" valign="top"><ul class="main-menu-item">', $menu->getMenuAsList(), '</ul></td>';
+			}
+			unset($menu_items, $menu);
 			echo '</tr>',
 		'</table>',
 		'</div>',

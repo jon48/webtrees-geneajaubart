@@ -22,7 +22,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //
-// @version $Id: Search.php 10250 2011-01-02 09:52:59Z greg $
+// @version $Id: Search.php 11531 2011-05-14 17:01:57Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -286,29 +286,13 @@ class WT_Controller_Search extends WT_Controller_Base {
 	 */
 	function setRequestValues($varNames) {
 		foreach ($varNames as $key => $varName) {
-			if (isset ($_REQUEST[$varName]))
-			{
-				if ($varName == "action")
-				if ($_REQUEST[$varName] == "replace")
-				if (!WT_USER_CAN_ACCEPT)
-				{
-					$this->action = "general";
+			if (isset ($_REQUEST[$varName])) {
+				if ($varName=='action' && $_REQUEST[$varName]=='replace' && !WT_USER_CAN_EDIT) {
+					$this->action='general';
 					continue;
 				}
-				$this-> $varName = $_REQUEST[$varName];
+				$this->$varName = $_REQUEST[$varName];
 			}
-		}
-	}
-
-	/**
-	 * setRequestValues - Prints out all of the variable names and their
-	 * values based on the variable name ($this->$varName).
-	 *
-	 * @param array $varNames - Array of variable names(strings).
-	 */
-	function printVars($varNames) {
-		foreach ($varNames as $key => $varName) {
-			echo $varName.": ".$this-> $varName."<br/>";
 		}
 	}
 
@@ -693,9 +677,9 @@ class WT_Controller_Search extends WT_Controller_Base {
 				load_gedcom_settings(WT_GED_ID);
 			} else
 			if (isset ($this->query)) {
-				echo "<br /><div class=\"warning\" style=\" text-align: center;\"><i>".WT_I18N::translate('No results found.')."</i><br />";
+				echo "<br /><div class=\"warning\" style=\" text-align: center;\"><em>".WT_I18N::translate('No results found.')."</em><br />";
 				if (!isset ($this->srindi) && !isset ($this->srfams) && !isset ($this->srsour) && !isset ($this->srnote)) {
-					echo "<i>".WT_I18N::translate('Be sure to select an option to search for.')."</i><br />";
+					echo "<em>".WT_I18N::translate('Be sure to select an option to search for.')."</em><br />";
 				}
 				echo '</div>';
 			}

@@ -27,7 +27,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: config_data.php 11107 2011-03-12 20:34:20Z greg $
+ * @version $Id: config_data.php 11458 2011-05-04 23:01:12Z nigel $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -37,29 +37,11 @@ if (!defined('WT_WEBTREES')) {
 
 define('WT_CONFIG_DATA_PHP', '');
 
-// Unknown surname in various scripts
-// TODO: This is extremely poor I18N - there is not a 1:1 correlation between script and language
-$UNKNOWN_NN=array(
-	'hebrew'    =>'(לא-ידוע)',
-	'arabic'    =>'(غير معروف)',
-	'greek'     =>'(άγνωστος/η)',
-	'cyrillic'  =>'(неопределено)', // Russian
-	'han'       =>'(未知)',
-	'latin'     =>WT_I18N::translate_c('surname', '(unknown)'),
-	'common'    =>WT_I18N::translate_c('surname', '(unknown)'),
-);
+// Unknown surname
+$UNKNOWN_NN=WT_I18N::translate_c('Unknown surname', '…');
 
-// Unknown givne name in various scripts
-// TODO: This is extremely poor I18N - there is not a 1:1 correlation between script and language
-$UNKNOWN_PN=array(
-	'hebrew'    =>'(לא-ידוע)',
-	'arabic'    =>'(غير معروف)',
-	'greek'     =>'(άγνωστος/η)', // Russian
-	'cyrillic'   =>'(неопределено)',
-	'han'       =>'(未知)',
-	'latin'     =>WT_I18N::translate_c('given name', '(unknown)'),
-	'common'    =>WT_I18N::translate_c('given name', '(unknown)'),
-);
+// Unknown given name
+$UNKNOWN_PN=WT_I18N::translate_c('Unknown given name', '…');
 
 // NPFX tags - name prefixes
 $NPFX_accept=array(
@@ -392,11 +374,13 @@ $level2_tags=array(
 		'SLGS',
 	),
 	'ADDR'=>array(
+		'BAPM',
 		'BIRT',
 		'BURI',
 		'CENS',
 		'CHR',
 		'CHRA',
+		'CONF',
 		'CREM',
 		'DEAT',
 		'EDUC',

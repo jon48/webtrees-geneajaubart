@@ -24,7 +24,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
 * @package webtrees
-* @version $Id: source.php 10869 2011-02-18 16:00:33Z greg $
+* @version $Id: source.php 11543 2011-05-16 16:39:51Z greg $
 */
 
 define('WT_SCRIPT_NAME', 'source.php');
@@ -34,30 +34,33 @@ require WT_ROOT.'includes/functions/functions_print_lists.php';
 // We have finished writing session data, so release the lock
 Zend_Session::writeClose();
 
-$nonfacts = array();
-
 $controller=new WT_Controller_Source();
 $controller->init();
 
-// Tell addmedia.php what to link to
-$linkToID=$controller->sid;
-
 print_header($controller->getPageTitle());
 
-// LightBox
+if (!$controller->source) {
+	echo '<b>', WT_I18N::translate('Unable to find record with ID'), '</b><br /><br />';
+	print_footer();
+	exit;
+}
+
+if (!$controller->source->canDisplayDetails()) {
+	print_privacy_error();
+	print_footer();
+	exit;
+}
+
+if ($controller->source->isMarkedDeleted()) {
+	echo '<span class="error">', WT_I18N::translate('This record has been marked for deletion upon admin approval.'), '</span>';
+}
+
 if (WT_USE_LIGHTBOX) {
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 }
 
-if (!$controller->source) {
-	echo "<b>", WT_I18N::translate('Unable to find record with ID'), "</b><br /><br />";
-	print_footer();
-	exit;
-}
-else if ($controller->source->isMarkedDeleted()) {
-	echo '<span class="error">', WT_I18N::translate('This record has been marked for deletion upon admin approval.'), '</span>';
-}
+$linkToID=$controller->sid; // Tell addmedia.php what to link to
 
 echo WT_JS_START;
 echo 'function show_gedcom_record() {';
@@ -88,9 +91,9 @@ print_main_media($controller->sid);
 if ($controller->source->canEdit()) {
 	print_add_new_fact($controller->sid, $sourcefacts, 'SOUR');
 	// new media
-	echo '<tr><td class="descriptionbox ', $TEXT_DIRECTION, '">';
+	echo '<tr><td class="descriptionbox">';
 	echo WT_I18N::translate('Add media'), help_link('add_media');
-	echo '</td><td class="optionbox ', $TEXT_DIRECTION, '">';
+	echo '</td><td class="optionbox">';
 	echo '<a href="javascript: ', WT_I18N::translate('Add media'), '" onclick="window.open(\'addmedia.php?action=showmediaform&linktoid=', $controller->sid, '\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">', WT_I18N::translate('Add a new media item'), '</a>';
 	echo '<br />';
 	echo '<a href="javascript:;" onclick="window.open(\'inverselink.php?linktoid=', $controller->sid, '&linkto=source\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">', WT_I18N::translate('Link to an existing Media item'), '</a>';

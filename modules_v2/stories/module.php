@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11260 2011-04-02 16:40:34Z greg $
+// $Id: module.php 11704 2011-06-04 09:09:12Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -243,7 +243,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				echo '</td></tr>';
 				echo '</table><table id="story_module2">';
 				echo '<tr>';
-				echo '<th>', WT_I18N::translate('Person'), '</th>';
+				echo '<th>', WT_I18N::translate('Individual'), '</th>';
 				echo '<th>', WT_I18N::translate('Show this block for which languages?'), '</th>';
 				echo '</tr>';
 				echo '<tr>';
@@ -318,7 +318,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			if (count($stories)>0) {
 				echo '<tr>
 					<th class="list_label center width50">', WT_I18N::translate('Story title'), help_link('story_title', $this->getName()), '</th>
-					<th class="list_label center width30">', WT_I18N::translate('Person'), '</th>
+					<th class="list_label center width30">', WT_I18N::translate('Individual'), '</th>
 					<th class="list_label center width10">', WT_I18N::translate('Edit story'), help_link('edit_story', $this->getName()), '</th>
 					<th class="list_label center width10">', WT_I18N::translate('Delete'), help_link('delete_story', $this->getName()), '</th>
 					</tr>';
@@ -363,7 +363,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			if (count($stories)>0) {
 				echo '<tr>
 					<th class="list_label">', WT_I18N::translate('Story title'), '</th>
-					<th class="list_label">', WT_I18N::translate('Person'), '</th>
+					<th class="list_label">', WT_I18N::translate('Individual'), '</th>
 					</tr>';
 			}
 			foreach ($stories as $story) {

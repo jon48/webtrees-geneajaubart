@@ -21,11 +21,14 @@
  *
  * @package webtrees
  * @subpackage Googlemaps v3
- * @version $Id: wt_v3_street_view.php 11293 2011-04-09 23:51:34Z brian $
+ * @version $Id: wt_v3_street_view.php 11694 2011-06-02 19:48:51Z greg $
  *
  * @author Brian Holland (windmillway)
  */
- ?>
+
+header('Content-type: text/html; charset=UTF-8');
+
+?>
  
 <html>
 <head>
@@ -416,7 +419,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 
   	<div id="infoPanel">
     	<!-- <b>Marker status:</b> -->
-    	<div id="markerStatus"><i>Click and drag the marker.</i></div>
+    	<div id="markerStatus"><em>Click and drag the marker.</em></div>
 <!--    	<b>Current position:</b> -->
     	<div id="info" ></div> 
 <!--    	<b>Closest matching address:</b> -->

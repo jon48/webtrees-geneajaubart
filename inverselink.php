@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: inverselink.php 10869 2011-02-18 16:00:33Z greg $
+// $Id: inverselink.php 11704 2011-06-04 09:09:12Z greg $
 
 define('WT_SCRIPT_NAME', 'inverselink.php');
 require './includes/session.php';
@@ -69,7 +69,7 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && file_exists(WT_ROOT.WT_MODULES_DIR.
 
 	//-- check for admin
 	$paramok =  WT_USER_CAN_EDIT;
-	if (!empty($linktoid)) $paramok = canDisplayRecord(WT_GED_ID, find_gedcom_record($linktoid, WT_GED_ID));
+	if (!empty($linktoid)) $paramok = WT_GedcomRecord::getInstance($linktoid)->canDisplayDetails();
 
 	if ($action == "choose" && $paramok) {
 		?>
@@ -135,7 +135,7 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && file_exists(WT_ROOT.WT_MODULES_DIR.
 		echo '<tr><td class="descriptionbox">';
 
 		if ($linkto == "person") {
-			echo WT_I18N::translate('Person'), "</td>";
+			echo WT_I18N::translate('Individual'), "</td>";
 			echo '<td class="optionbox wrap">';
 			if ($linktoid=="") {
 				echo '<input class="pedigree_form" type="text" name="linktoid" id="linktopid" size="3" value="', $linktoid, '" />';

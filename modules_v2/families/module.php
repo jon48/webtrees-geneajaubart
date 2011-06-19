@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11079 2011-03-07 21:48:01Z greg $
+// @version $Id: module.php 11661 2011-05-31 13:15:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,12 +36,12 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return WT_I18N::translate('Adds a sidebar which allows for easy navigation of famlies in a list format.');
+		return WT_I18N::translate('A sidebar that shows an alphabetic list of all the families in the family tree.');
 	}
 
 	// Implement WT_Module_Sidebar
 	public function defaultSidebarOrder() {
-		return 40;
+		return 50;
 	}
 
 	// Implement WT_Module_Sidebar
@@ -57,14 +57,21 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 		$last = array('alpha'=>$alpha, 'surname'=>$surname, 'search'=>$search);
 		$_SESSION['sb_families_last'] = $last;
-		if (!empty($search)) return $this->search($search);
-		else if (empty($surname)) return $this->getAlphaSurnames($alpha, $surname);
-		else return $this->getSurnameFams($alpha, $surname);
+		
+		if ($search) {
+			return $this->search($search);
+		} elseif ($alpha=='@' || $alpha==',' || $surname) {
+			return $this->getSurnameFams($alpha, $surname);
+		} elseif ($alpha) {
+			return $this->getAlphaSurnames($alpha, $surname);
+		} else {
+			return '';
+		}
 	}
 
 	// Implement WT_Module_Sidebar
 	public function getSidebarContent() {
-		global $SHOW_MARRIED_NAMES, $WT_IMAGES;
+		global $SHOW_MARRIED_NAMES, $WT_IMAGES, $UNKNOWN_NN;
 
 		// Fetch a list of the initial letters of all surnames in the database
 		$initials=WT_Query_Name::surnameAlpha($SHOW_MARRIED_NAMES, false, WT_GED_ID);
@@ -73,7 +80,7 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		<!--
 		var famloadedNames = new Array();
 
-		function searchQ() {
+		function fsearchQ() {
 			var query = jQuery("#sb_fam_name").attr("value");
 			if (query.length>1) {
 				jQuery("#sb_fam_content").load("sidebar.php?sb_action=families&search="+query);
@@ -86,7 +93,7 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			var famtimerid = null;
 			jQuery("#sb_fam_name").keyup(function(e) {
 				if (famtimerid) window.clearTimeout(famtimerid);
-				famtimerid = window.setTimeout("searchQ()", 500);
+				famtimerid = window.setTimeout("fsearchQ()", 500);
 			});
 			jQuery(".sb_fam_letter").live("click", function() {
 				jQuery("#sb_fam_content").load(this.href);
@@ -129,10 +136,13 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		foreach ($initials as $letter=>$count) {
 			switch ($letter) {
 				case '@':
-					$html=WT_I18N::translate('(unknown)');
+					$html=$UNKNOWN_NN;
 					break;
 				case ',':
 					$html=WT_I18N::translate('None');
+					break;
+				case ' ':
+					$html='&nbsp;';
 					break;
 				default:
 					$html=$letter;
@@ -145,13 +155,18 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		$out .= '</p>';
 		$out .= '<div id="sb_fam_content">';
 
-		if (isset($_SESSION['sb_families_last'])) {
-			$last = $_SESSION['sb_families_last'];
-			$alpha = $last['alpha'];
-			$search = $last['search'];
-			$surname = $last['surname'];
-			if (!empty($search)) $out.= $this->search($search);
-			else if (!empty($alpha)) $out.= $this->getAlphaSurnames($alpha, $surname);
+		if (isset($_SESSION['sb_individuals_last'])) {
+			$alpha   = $_SESSION['sb_individuals_last']['alpha'];
+			$search  = $_SESSION['sb_individuals_last']['search'];
+			$surname = $_SESSION['sb_individuals_last']['surname'];
+			
+			if ($search) {
+				$out.=$this->search($search);
+			} elseif ($alpha=='@' || $alpha==',' || $surname) {
+				$out.=$this->getSurnameFams($alpha, $surname);
+			} elseif ($alpha) {
+				$out.=$this->getAlphaSurnames($alpha, $surname);
+			}
 		}
 
 		$out .= '</div></form>';
@@ -168,9 +183,9 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				$out .= '<div class="name_tree_div_visible">';
 				$out .= $this->getSurnameFams($alpha, $surname1);
 				$out .= '</div>';
-			}
-			else
+			} else {
 				$out .= '<div class="name_tree_div"></div>';
+			}
 			$out .= '</li>';
 		}
 		$out .= '</ul>';
@@ -179,27 +194,28 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 	public function getSurnameFams($alpha, $surname) {
 		global $SHOW_MARRIED_NAMES;
-		$families=get_famlist_fams($surname, $alpha, '', $SHOW_MARRIED_NAMES, WT_GED_ID);
+		$families=WT_Query_Name::families($surname, $alpha, '', $SHOW_MARRIED_NAMES, WT_GED_ID);
 		$out = '<ul>';
-		$private_count = 0;
 		foreach ($families as $family) {
 			if ($family->canDisplayName()) {
 				$out .= '<li><a href="'.$family->getHtmlUrl().'">'.$family->getFullName().' ';
 				if ($family->canDisplayDetails()) {
 					$bd = $family->getMarriageYear();
-					if (!empty($bd)) $out .= PrintReady(' ('.$bd.')');
+					if (!empty($bd)) {
+						$out .= PrintReady(' ('.$bd.')');
+					}
 				}
 				$out .= '</a></li>';
 			}
-			else $private_count++;
 		}
-		if ($private_count>0) $out .= '<li>'.PrintReady(WT_I18N::translate('Private').' ('.$private_count.')').'</li>';
 		$out .= '</ul>';
 		return $out;
 	}
 
 	public function search($query) {
-		if (strlen($query)<2) return '';
+		if (strlen($query)<2) {
+			return '';
+		}
 
 		//-- search for INDI names
 		$rows=WT_DB::prepare(
@@ -220,7 +236,7 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		if (empty($ids)) {
 			//-- no match : search for FAM id
 			$where = "f_id LIKE ?";
-			$vars[]="%{$FILTER}%";
+			$vars[]="%{$query}%";
 		} else {
 			//-- search for spouses
 			$qs=implode(',', array_fill(0, count($ids), '?'));
@@ -234,7 +250,6 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		->fetchAll(PDO::FETCH_ASSOC);
 
 		$out = '<ul>';
-		$private_count = 0;
 		foreach ($rows as $row) {
 			$family=WT_Family::getInstance($row);
 			if ($family->canDisplayName()) {
@@ -245,9 +260,7 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				}
 				$out .= '</a></li>';
 			}
-			else $private_count++;
 		}
-		if ($private_count>0) $out .= '<li>'.PrintReady(WT_I18N::translate('Private').' ('.$private_count.')').'</li>';
 		$out .= '</ul>';
 		return $out;
 	}

@@ -25,7 +25,7 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
-* @version $Id: functions_import.php 11199 2011-03-26 11:46:29Z greg $
+* @version $Id: functions_import.php 11541 2011-05-16 02:54:10Z larry $
 * @package webtrees
 * @subpackage DB
 */
@@ -676,10 +676,6 @@ function import_record($gedrec, $ged_id, $update) {
 		break;
 	}
 
-	// Just in case the admin has blocked themself from seeing names!
-	$record->disp=true;
-	$record->dispname=true;
-
 	// Update the cross-reference/index tables.
 	update_places($xref, $ged_id, $gedrec);
 	update_dates ($xref, $ged_id, $gedrec);
@@ -973,7 +969,8 @@ function insert_media($objrec, $objlevel, $update, $gid, $ged_id, $count) {
 		$new_media = WT_Media::in_obje_list($media, $ged_id);
 		if (!$new_media) {
 			//-- add it to the media database table
-			$sql_insert_media->execute(array($m_media, $media->ext, $media->title, $media->file, $ged_id, $objrec));
+			$imgsize = $media->getImageAttributes();
+			$sql_insert_media->execute(array($m_media, $imgsize['ext'], $media->title, $media->file, $ged_id, $objrec));
 			$media_count++;
 		} else {
 			//-- already added so update the local id
@@ -1044,7 +1041,8 @@ function update_media($gid, $ged_id, $gedrec, $update = false) {
 		//--check if we already have a similar object
 		$new_media = WT_Media::in_obje_list($media, $ged_id);
 		if (!$new_media) {
-			$sql_insert_media->execute(array($new_m_media, $media->ext, $media->title, $media->file, $ged_id, $gedrec));
+			$imgsize = $media->getImageAttributes();
+			$sql_insert_media->execute(array($new_m_media, $imgsize['ext'], $media->title, $media->file, $ged_id, $gedrec));
 			$media_count++;
 		} else {
 			$new_m_media = $new_media;
@@ -1276,32 +1274,52 @@ function update_record($gedrec, $ged_id, $delete) {
 
 // Create a pseudo-random UUID
 function uuid() {
-	if (defined('WT_USE_RFC4122')) {
-		// Standards purists want this format (RFC4122)
-		$fmt='%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X';
-	} else {
-		// Most users want this format (for compatibility with PAF)
-		$fmt='%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X';
-	}
-	return sprintf(
+	// Official Format with dashes ('%04x%04x-%04x-%04x-%04x-%04x%04x%04x')
+	// Most users want this format (for compatibility with PAF)
+	$fmt='%04X%04X%04X%04X%04X%04X%04X%04X';
+	
+	$uid = sprintf(
 		$fmt,
-		rand(0, 255),
-		rand(0, 255),
-		rand(0, 255),
-		rand(0, 255),
-		rand(0, 255),
-		rand(0, 255),
-		rand(0, 255)&0x3f|0x80, // Set the version to random (10xxxxxx)
-		rand(0, 255),
-		rand(0, 255)&0x0f|0x40, // Set the variant to RFC4122 (0100xxxx)
-		rand(0, 255),
-		rand(0, 255),
-		rand(0, 255),
-		rand(0, 255),
-		rand(0, 255),
-		rand(0, 255),
-		rand(0, 255)
-	);
+    // 32 bits for "time_low"
+    mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+
+    // 16 bits for "time_mid"
+    mt_rand(0, 0xffff),
+
+    // 16 bits for "time_hi_and_version",
+    // four most significant bits holds version number 4
+    mt_rand(0, 0x0fff) | 0x4000,
+
+    // 16 bits, 8 bits for "clk_seq_hi_res",
+    // 8 bits for "clk_seq_low",
+    // two most significant bits holds zero and one for variant RFC4122
+    mt_rand(0, 0x3fff) | 0x8000,
+
+    // 48 bits for "node"
+    mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+    );
+	return sprintf('%s%s', $uid, getCheckSums($uid));
+}
+
+/**
+* Produces checksums compliant with a Family Search guideline from 2007
+* these checksums are compatible with PAF, Legacy, RootsMagic and other applications
+* following these guidelines. This prevents dropping and recreation of UID's 
+*
+* @author Veit Olschinski
+* @param string $uid the 32 hexadecimal character long uid  
+* @return string containing the checksum string for the uid
+*/
+function getCheckSums($uid) {
+	$checkA=0; // a sum of the bytes
+	$checkB=0; // a sum of the incremental values of checkA
+	
+	// Compute both checksums
+	for ($i = 0; $i < 32; $i+=2) {
+		$checkA += hexdec(substr($uid, $i, 2));
+		$checkB += $checkA & 0xFF;
+	}
+	return strtoupper(sprintf('%s%s', substr(dechex($checkA), -2), substr(dechex($checkB), -2)));
 }
 
 /**

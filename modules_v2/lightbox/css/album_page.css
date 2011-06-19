@@ -25,7 +25,7 @@
  *
  * @package webtrees
  * @subpackage Modules
- * @version $Id: album_page.css 10618 2011-01-27 18:42:22Z lukasz $
+ * @version $Id: album_page.css 11682 2011-06-02 01:34:22Z nigel $
  */
  
 /* lightbox_plus.css version 3.00  29/06/2007  */
@@ -71,6 +71,9 @@
         filter: Alpha(opacity=50);
 }
 */
+
+#lightbox {margin-bottom:100px;}
+
 .lb_notes:target, .lb_notes:target a{
 	color:#000000;
     background-color: #ffffcc;

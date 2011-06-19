@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 10397 2011-01-09 13:17:29Z greg $
+// @version $Id: module.php 11671 2011-06-01 05:51:11Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -56,8 +56,8 @@ class page_menu_WT_Module extends WT_Module implements WT_Module_Menu {
 		if (WT_USER_CAN_EDIT && method_exists($controller, 'getEditMenu')) {
 			$menu = $controller->getEditMenu();
 			if ($menu) {
-				$menu->addClass('menuitem', 'menuitem_hover', 'submenu', 'icon_large_gedcom');
-				$menu->addLabel($menu->label, 'down');
+			//	$menu->addClass('menuitem', 'menuitem_hover', 'submenu', 'icon_large_gedcom');
+			//	$menu->addLabel($menu->label, 'down');
 			}
 		}
 		return $menu;

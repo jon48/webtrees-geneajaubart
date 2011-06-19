@@ -14,7 +14,7 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-global $SEARCH_SPIDER, $SURNAME_LIST_STYLE, $WT_IMAGES;
+global $SEARCH_SPIDER, $SURNAME_LIST_STYLE, $WT_IMAGES, $UNKNOWN_NN;
 
 define('WT_ICON_RINGS', '<img src="'.$WT_IMAGES['rings'].'" alt="'.WT_Gedcom_Tag::getLabel('MARR').'" title="'.WT_Gedcom_Tag::getLabel('MARR').'" />');
 
@@ -42,33 +42,27 @@ if ($show_all=='yes') {
 	$legend=WT_I18N::translate('All');
 	$url='module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&show_all=yes';
 } elseif ($surname) {
-	$surname=utf8_strtoupper($surname);
-	$alpha=utf8_substr($surname, 0, 1);
-	foreach (explode(' ', WT_I18N::$alphabet) as $letter) {
-		if (strpos($surname, utf8_strtoupper($letter))===0) {
-			$alpha=utf8_strtoupper($letter);
-		}
-	}
+	$alpha=WT_Query_Name::initialLetter($surname);
 	$show_all='no';
 	if ($surname=='@N.N.') {
-		$legend=WT_I18N::translate_c('surname', '(unknown)');
+		$legend=$UNKNOWN_NN;
 	} else {
 		$legend=$surname;
 	}
 	$surname_sublist='no';
-	$url='module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&surname='.urlencode($surname);
+	$url='module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&surname='.rawurlencode($surname);
 } else {
 	$show_all='no';
 	$surname='';
 	$surname_sublist = 'yes';
 	if ($alpha=='@') {
-		$legend=WT_I18N::translate('(unknown)');
+		$legend=$UNKNOWN_NN;
 		$surname_sublist='no';
 		$surname='@N.N.';
 	} else {
 		$legend=$alpha;
 	}
-	$url='module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&alpha='.urlencode($alpha);
+	$url='module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&alpha='.rawurlencode($alpha);
 }
 
 print_header(WT_I18N::translate('Patronymic Lineages').' : '.$legend);
@@ -78,9 +72,12 @@ echo '<h2 class="center">', WT_I18N::translate('Patronymic Lineages'), '</h2>';
 foreach ($initials as $letter=>$count) {
 	switch ($letter) {
 	case '@':
-		$html=WT_I18N::translate('(unknown)');
+		$html=$UNKNOWN_NN;
 		break;
 	case ',':
+		break;
+	case ' ':
+		$html='&nbsp;';
 		break;
 	default:
 		$html=$letter;
@@ -90,12 +87,12 @@ foreach ($initials as $letter=>$count) {
 		if ($count) {
 			if ($showList && $letter==$alpha && $show_all=='no') {
 				if ($surname) {
-					$html='<a href="module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&alpha='.urlencode($letter).'&amp;ged='.WT_GEDURL.'" class="warning" title="'.$count.'">'.$html.'</a>';
+					$html='<a href="module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&alpha='.rawurlencode($letter).'&amp;ged='.WT_GEDURL.'" class="warning" title="'.$count.'">'.$html.'</a>';
 				} else {
 					$html='<span class="warning" title="'.$count.'">'.$html.'</span>';
 				}
 			} else {
-				$html='<a href="module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&alpha='.urlencode($letter).'&amp;ged='.WT_GEDURL.'" title="'.$count.'">'.$html.'</a>';
+				$html='<a href="module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&alpha='.rawurlencode($letter).'&amp;ged='.WT_GEDURL.'" title="'.$count.'">'.$html.'</a>';
 			}
 		}
 		$list[]=$html;

@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package webtrees
- * @version $Id: admin_pgv_to_wt.php 11282 2011-04-07 06:47:41Z greg $
+ * @version $Id: admin_pgv_to_wt.php 11613 2011-05-26 13:44:31Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'admin_pgv_to_wt.php');
@@ -494,6 +494,10 @@ if ($PGV_SCHEMA_VERSION>=12) {
 		// a) we've already done it (upgrade)
 		// b) it doesn't exist (new install)
 	}
+	// Some PGV installations store the u_reg_timestamp in the format "2010-03-07 21:41:07"
+	WT_DB::prepare(
+		"UPDATE `##user_setting` SET setting_value=UNIX_TIMESTAMP(setting_value) WHERE setting_name='reg_timestamp' AND setting_value like '____-__-__ __:__:__'"
+	)->execute();
 	echo '<p>pgv_users => wt_user_gedcom_setting ...</p>'; ob_flush(); flush(); usleep(50000);
 	try {
 		$user_gedcom_settings=
@@ -589,8 +593,6 @@ foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
 	@set_gedcom_setting($ged_id, 'COMMON_NAMES_THRESHOLD',       $COMMON_NAMES_THRESHOLD);
 	@set_gedcom_setting($ged_id, 'CONTACT_USER_ID',              get_user_id($CONTACT_EMAIL));
 	@set_gedcom_setting($ged_id, 'DEFAULT_PEDIGREE_GENERATIONS', $DEFAULT_PEDIGREE_GENERATIONS);
-	@set_gedcom_setting($ged_id, 'DISPLAY_JEWISH_GERESHAYIM',    $DISPLAY_JEWISH_GERESHAYIM);
-	@set_gedcom_setting($ged_id, 'DISPLAY_JEWISH_THOUSANDS',     $DISPLAY_JEWISH_THOUSANDS);
 	@set_gedcom_setting($ged_id, 'ENABLE_AUTOCOMPLETE',          $ENABLE_AUTOCOMPLETE);
 	@set_gedcom_setting($ged_id, 'EXPAND_NOTES',                 $EXPAND_NOTES);
 	@set_gedcom_setting($ged_id, 'EXPAND_RELATIVES_EVENTS',      $EXPAND_RELATIVES_EVENTS);
@@ -665,7 +667,6 @@ foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
 	@set_gedcom_setting($ged_id, 'REQUIRE_AUTHENTICATION',       $REQUIRE_AUTHENTICATION);
 	@set_gedcom_setting($ged_id, 'SAVE_WATERMARK_IMAGE',         $SAVE_WATERMARK_IMAGE);
 	@set_gedcom_setting($ged_id, 'SAVE_WATERMARK_THUMB',         $SAVE_WATERMARK_THUMB);
-	@set_gedcom_setting($ged_id, 'SEARCH_FACTS_DEFAULT',         $SEARCH_FACTS_DEFAULT);
 	@set_gedcom_setting($ged_id, 'SHOW_AGE_DIFF',                $SHOW_AGE_DIFF);
 	@set_gedcom_setting($ged_id, 'SHOW_CONTEXT_HELP',            $SHOW_CONTEXT_HELP);
 	@set_gedcom_setting($ged_id, 'SHOW_COUNTER',                 $SHOW_COUNTER);

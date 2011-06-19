@@ -24,20 +24,17 @@
  *
  * @package webtrees
  * @subpackage Lists
- * @version $Id: placelist.php 11129 2011-03-16 08:40:41Z greg $
+ * @version $Id: placelist.php 11688 2011-06-02 09:37:21Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'placelist.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
-$use_googlemap = false;
+$use_googlemap = array_key_exists('googlemap', WT_Module::getActiveModules()) && get_module_setting('googlemap', 'GM_PLACE_HIERARCHY');
 
-if (file_exists(WT_ROOT.WT_MODULES_DIR.'googlemap/placehierarchy.php')) {
+if ($use_googlemap) {
 	require WT_ROOT.WT_MODULES_DIR.'googlemap/placehierarchy.php';
-	if (isset($GOOGLEMAP_ENABLED) && $GOOGLEMAP_ENABLED && isset($GOOGLEMAP_PLACE_HIERARCHY) && $GOOGLEMAP_PLACE_HIERARCHY) {
-		$use_googlemap = true;
-	}
 }
 
 function case_in_array($value, $array) {
@@ -206,8 +203,7 @@ if ($display=='hierarchy') {
 
 	if ($use_googlemap) {
 		create_map($placelevels);
-	}
-	else {
+	} else {
 		echo '<br /><br />';
 		if (array_key_exists('places_assistant', WT_Module::getActiveModules())) {
 			// show clickable map if found

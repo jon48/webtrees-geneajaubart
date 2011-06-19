@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11201 2011-03-26 13:04:03Z greg $
+// @version $Id: module.php 11673 2011-06-01 13:49:35Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -150,7 +150,7 @@ class todays_events_WT_Module extends WT_Module implements WT_Module_Block {
 
 		$sortStyle=get_block_setting($block_id, 'sortStyle',  'alpha');
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo WT_I18N::translate('Sort Style');
+		echo WT_I18N::translate('Sort style');
 		echo '</td><td class="optionbox">';
 		echo select_edit_control('sortStyle', array('alpha'=>WT_I18N::translate('alphabetically'), 'anniv'=>WT_I18N::translate('By Anniversary')), null, $sortStyle, '');
 		echo '</td></tr>';

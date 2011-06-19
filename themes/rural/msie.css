@@ -30,6 +30,10 @@
 	filter: alpha(opacity=67);
 }
 
+.makeMenu li ul {
+	top: 2px;
+}
+
 a.showit:hover span {
 	filter: alpha(opacity=85);
 }

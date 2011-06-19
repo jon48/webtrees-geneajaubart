@@ -5,7 +5,7 @@
  * Display media Items using Lightbox
  *
  * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
+ * Copyright (C) 2011 webtrees development team.
  *
  * Derived from PhpGedView
  * Copyright (C) 2002 to 2009  PHPGedView Development Team
@@ -24,9 +24,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @package webtrees
- * @subpackage Module
- * @version $Id: lb_defaultconfig.php 10869 2011-02-18 16:00:33Z greg $
+ * @version $Id: lb_defaultconfig.php 11665 2011-05-31 21:50:19Z greg $
  * @author Brian Holland
  */
 
@@ -35,21 +33,8 @@ if (!defined('WT_WEBTREES')) {
  exit;
 }
 
-global $LB_AL_HEAD_LINKS,$LB_AL_THUMB_LINKS,$LB_ML_THUMB_LINKS,$LB_SS_SPEED;
-global $LB_MUSIC_FILE,$LB_TRANSITION,$LB_URL_WIDTH,$LB_URL_HEIGHT,$LB_TT_BALLOON,$GEDCOM;
-
-$LB_AL_HEAD_LINKS=get_module_setting('lightbox', 'LB_AL_HEAD_LINKS', 'both');   // Album Tab Page Header Links.
-          // Set to 'icon' to view icon links.
-          // Set to 'text' to view text links
-          // Set to 'both' to view both.
-
-$LB_TT_BALLOON=get_module_setting('lightbox', 'LB_TT_BALLOON', 'true');    // Album Tab Page - Above Thumbnail Links.
-          // Set to 'true' to view Tooltip Balloon.
-          // Set to 'false' to view Tooltip Normal.
-
-$LB_AL_THUMB_LINKS=get_module_setting('lightbox', 'LB_AL_THUMB_LINKS', 'text');   // Album Tab Page - Below Thumbnail Links.
-          // Set to 'icon' to view icon links.
-          // Set to 'text' to view text links. [Default]
+global $LB_SS_SPEED;
+global $LB_MUSIC_FILE,$LB_TRANSITION,$LB_URL_WIDTH,$LB_URL_HEIGHT;
 
 $LB_SS_SPEED=get_module_setting('lightbox', 'LB_SS_SPEED', '6');     // SlideShow speed in seconds.  [Min 2  max 25]
 
@@ -63,9 +48,3 @@ $LB_TRANSITION=get_module_setting('lightbox', 'LB_TRANSITION', 'warp');   // Nex
 
 $LB_URL_WIDTH =get_module_setting('lightbox', 'LB_URL_WIDTH',  '1000'); //  URL Window width in pixels
 $LB_URL_HEIGHT=get_module_setting('lightbox', 'LB_URL_HEIGHT', '600'); //  URL Window height in pixels
-
-$LB_ML_THUMB_LINKS = get_module_setting('lightbox', 'LB_ML_THUMB_LINKS', 'text');   // MultiMedia List Page Thumbnail Links
-          // Set to 'icon' to view icon links.
-          // Set to 'text' to view text links. [Default]
-          // Set to 'both' to view both.
-          // Set to 'none' to view neither.

@@ -24,7 +24,7 @@
  *
  * @package webtrees
  * @subpackage Edit
- * @version $Id: wt_v3_places_edit.js.php 11273 2011-04-04 17:41:23Z lukasz $
+ * @version $Id: wt_v3_places_edit.js.php 11319 2011-04-13 20:26:01Z greg $
  * @version: p_$Revision$ $Date$
  * $HeadURL$
  *
@@ -46,7 +46,7 @@ if (!defined('WT_WEBTREES')) {
 	var map;
 	var marker;
 	var zoom;
-	var pl_name = '<?php echo htmlspecialchars($place_name); ?>';
+	var pl_name = "<?php echo htmlspecialchars($place_name); ?>";
 	if (pl_name) {
 		var pl_lati = '<?php echo $place_lati; ?>';
 		var pl_long = '<?php echo $place_long; ?>';	

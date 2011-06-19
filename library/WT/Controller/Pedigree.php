@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Pedigree.php 10239 2011-01-01 22:32:55Z greg $
+// @version $Id: Pedigree.php 11417 2011-04-30 11:17:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -244,14 +244,6 @@ class WT_Controller_Pedigree extends WT_Controller_Base {
 
 		$ydiff = $baseyoffset+35-$minyoffset;
 		$this->adjust_subtree(0, $ydiff);
-	}
-
-	/**
-	 * return the title of this page
-	 * @return string the title of the page to go in the <title> tags
-	 */
-	function getPageTitle() {
-		return $this->getPersonName()." ".WT_I18N::translate('Pedigree Tree');
 	}
 
 	function getPersonName() {

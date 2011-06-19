@@ -15,7 +15,7 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-class perso_general_WT_Module extends WT_Module implements WT_Perso_Module_HookSubscriber, WT_Perso_Module_Configurable, WT_Perso_Module_HeaderExtender, WT_Perso_Module_FooterExtender {
+class perso_general_WT_Module extends WT_Module implements WT_Perso_Module_HookSubscriber, WT_Perso_Module_Configurable, WT_Perso_Module_HeaderExtender, WT_Perso_Module_FooterExtender, WT_Perso_Module_IndividualHeaderExtender{
 
 	// Extend class WT_Module
 	public function getTitle() {
@@ -33,7 +33,8 @@ class perso_general_WT_Module extends WT_Module implements WT_Perso_Module_HookS
 			'h_config_tab_name' => 1,
 			'h_config_tab_content' => 1,
 			'h_print_header' => 20,
-			'h_print_footer' => 20
+			'h_print_footer' => 20,
+			'h_extend_indi_header_left' => 20
 		);
 	}
 
@@ -113,7 +114,35 @@ class perso_general_WT_Module extends WT_Module implements WT_Perso_Module_HookS
 		}
 	}
 
-
+		//Implement WT_Perso_IndividualHeaderExtender
+	public function h_extend_indi_header_icons(WT_Controller_Individual $ctrlIndi) {
+	}
+	
+	//Implement WT_Perso_IndividualHeaderExtender
+	public function h_extend_indi_header_left(WT_Controller_Individual $ctrlIndi) {
+		$res = '';
+		if($ctrlIndi){
+			$dindi = new WT_Perso_Person($ctrlIndi->indi);
+			$tab=$dindi->getTitles();
+			$countTitles = count($tab);
+			if($countTitles>0){
+				$res = '<dl><dt class="label">'.WT_I18N::translate('Titles').'</dt>';
+				foreach($tab as $title=>$props){
+					$res .= '<dd class="field">'.$title. ' ';
+					$res .= WT_Perso_Functions_Print::getListFromArray($props);
+					$res .= '</dd>';
+				}
+			$res .=  '</dl>';
+			}
+		}
+		return array( 'indi-header-titles' , $res);
+	}
+	
+	//Implement WT_Perso_IndividualHeaderExtender
+	public function h_extend_indi_header_right(WT_Controller_Individual $ctrlIndi) {
+	}
+	
+	
 }
 
 ?>

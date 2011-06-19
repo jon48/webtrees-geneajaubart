@@ -26,7 +26,7 @@
  *
  * @package webtrees
  * @subpackage Module
- * $Id: googlemap.php 11302 2011-04-11 14:13:51Z greg $
+ * $Id: googlemap.php 11676 2011-06-01 16:45:40Z greg $
  *
  * @author Brian Holland
  */
@@ -283,10 +283,8 @@ function get_lati_long_placelocation ($place) {
 }
 
 function setup_map() {
-	global $GOOGLEMAP_ENABLED, $GOOGLEMAP_MAP_TYPE, $GOOGLEMAP_MIN_ZOOM, $GOOGLEMAP_MAX_ZOOM;
-	if (!$GOOGLEMAP_ENABLED) {
-		return;
-	}
+	global $GOOGLEMAP_MAP_TYPE, $GOOGLEMAP_MIN_ZOOM, $GOOGLEMAP_MAX_ZOOM;
+
 	?>
 	<!--  V3 ============ -->
 	<script src="http://maps.google.com/maps/api/js?v=3.2&amp;sensor=false&amp;language=<?php echo WT_LOCALE; ?>" type="text/javascript"></script>
@@ -333,7 +331,7 @@ function build_indiv_map($indifacts, $famids) {
 			$spouserec = get_sub_record(2, '2 _WTS', $factrec);
 			$ctlp = preg_match("/\d _WTS @(.*)@/", $spouserec, $spouseid);
 			if ($ctlp>0) {
-				$useThisItem = canDisplayRecord(WT_GED_ID, find_family_record($spouseid[1], WT_GED_ID));
+				$useThisItem = WT_Family::getInstance($spouseid[1])->canDisplayDetails();
 			} else {
 				$useThisItem = true;
 			}

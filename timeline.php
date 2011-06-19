@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: timeline.php 11148 2011-03-19 12:00:10Z greg $
+// $Id: timeline.php 11705 2011-06-04 09:13:59Z greg $
 
 define('WT_SCRIPT_NAME', 'timeline.php');
 require './includes/session.php';
@@ -241,7 +241,7 @@ document.onmousemove = MM;
 document.onmouseup = MU;
 //-->
 </script>
-<h2><?php echo WT_I18N::translate('Timeline chart'), help_link('timeline_chart'); ?></h2>
+<h2><?php echo WT_I18N::translate('Timeline'), help_link('timeline_chart'); ?></h2>
 <form name="people" action="timeline.php">
 <?php
 $controller->checkPrivacy();
@@ -304,8 +304,8 @@ $controller->checkPrivacy();
 		if (!isset($col)) $col = 0;
 		?>
 		<td class="person<?php echo $col; ?>" style="padding: 5px" valign="top">
-			<?php echo WT_I18N::translate('Add another person to the chart'), '<br/>', WT_I18N::translate('Person ID'); ?>&nbsp;
-			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid" />&nbsp;
+			<?php echo WT_I18N::translate('Add another person to the chart'), '<br/>'; ?>
+			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid" />
 			<?php print_findindi_link("newpid",""); ?>
 			<br />
 			<br />
@@ -323,7 +323,7 @@ $controller->checkPrivacy();
 	<?php } ?>
 	</tr>
 </table>
-<br /><a href="lifespan.php?ged=<?php echo WT_GEDURL; ?>"><b><?php echo WT_I18N::translate('Show Lifespan chart'); ?></b></a>
+<br /><a href="lifespan.php?ged=<?php echo WT_GEDURL; ?>"><b><?php echo WT_I18N::translate('Show lifespans'); ?></b></a>
 </form>
 <?php
 if (count($controller->people)>0) {

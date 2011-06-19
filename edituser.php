@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edituser.php 10855 2011-02-17 17:51:02Z greg $
+// $Id: edituser.php 11611 2011-05-26 11:38:54Z greg $
 
 define('WT_SCRIPT_NAME', 'edituser.php');
 require './includes/session.php';
@@ -65,7 +65,7 @@ if ($form_action=='update') {
 	} else {
 		// Change password
 		if (!empty($form_pass1)) {
-			set_user_password(WT_USER_ID, crypt($form_pass1));
+			set_user_password(WT_USER_ID, $form_pass1);
 		}
 		$old_realname =getUserFullName(WT_USER_ID);
 		$old_email    =getUserEmail(WT_USER_ID);
