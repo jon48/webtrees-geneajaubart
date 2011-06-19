@@ -1,43 +1,37 @@
 <?php
-/**
-* Functions to query the database.
-*
-* This file implements the datastore functions necessary for webtrees
-* to use an SQL database as its datastore.
-*
-* webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
- *
- * Derived from PhpGedView
-* Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
-*
-* Modifications Copyright (c) 2010 Greg Roach
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* @version $Id: functions_db.php 11721 2011-06-06 20:54:32Z greg $
-* @package webtrees
-* @subpackage DB
-*/
+// Functions to query the database.
+//
+// This file implements the datastore functions necessary for webtrees
+// to use an SQL database as its datastore.
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+//
+// Modifications Copyright (c) 2010 Greg Roach
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: functions_db.php 11789 2011-06-12 09:24:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-define('WT_FUNCTIONS_DB_PHP', '');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Count the number of records linked to a given record
@@ -1657,7 +1651,7 @@ function set_gedcom_setting($ged_id, $setting_name, $setting_value) {
 function create_user($username, $realname, $email, $password) {
 	try {
 		WT_DB::prepare("INSERT INTO `##user` (user_name, real_name, email, password) VALUES (?, ?, ?, ?)")
-			->execute(array($username, $realname, $email, $password));
+			->execute(array($username, $realname, $email, crypt($password)));
 	} catch (PDOException $ex) {
 		// User already exists?
 	}
@@ -1774,9 +1768,19 @@ function get_newest_registered_user() {
 }
 
 function set_user_password($user_id, $password) {
-	// The crypt() function requires a salt.  You could force a particular
-	// algorithm by creating a salt with a specify format.  See php.net/crypt
-	$password_hash=crypt($password);
+	if (CRYPT_BLOWFISH==1) {
+		// PHP5.3 will always support BLOWFISH - see php.net/crypt
+		// This salt will select the BLOWFISH algorithm with 2^12 rounds
+		$salt='$2a$12$';
+		$salt_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./';
+		for ($i=0;$i<22;++$i) {
+			$salt.=substr($salt_chars, mt_rand(0,63), 1);
+		}
+		$password_hash=crypt($password, $salt);
+	} else {
+		// Our prefered hash algorithm is not available.  Use the default.
+		$password_hash=crypt($password);
+	}
 	WT_DB::prepare("UPDATE `##user` SET password=? WHERE user_id=?")
 		->execute(array($password_hash, $user_id));
 	AddToLog('User ID: '.$user_id. ' ('.get_user_name($user_id).') changed password', 'auth');
@@ -1788,9 +1792,16 @@ function check_user_password($user_id, $password) {
 		WT_DB::prepare("SELECT password FROM `##user` WHERE user_id=?")
 		->execute(array($user_id))
 		->fetchOne();
-	return crypt($password, $password_hash)==$password_hash;
+	if (crypt($password, $password_hash)==$password_hash) {
+		// Update older passwords to use BLOWFISH with 2^12 rounds
+		if (CRYPT_BLOWFISH==1 && substr($password_hash, 0, 7)!='$2a$12$') {
+			set_user_password($user_id, $password);
+		}
+		return true;
+	} else {
+		return false;
+	}
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 // Functions to access the WT_USER_SETTING table
 ////////////////////////////////////////////////////////////////////////////////

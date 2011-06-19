@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package webtrees
- * @version $Id: setup.php 11634 2011-05-28 17:26:04Z greg $
+ * @version $Id: setup.php 11754 2011-06-09 17:55:03Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'setup.php');
@@ -173,7 +173,7 @@ if (empty($_POST['lang'])) {
 	$errors=false;
 
 	// Mandatory extensions
-	foreach (array('pcre', 'pdo', 'pdo_mysql', 'session') as $extension) {
+	foreach (array('pcre', 'pdo', 'pdo_mysql', 'session', 'iconv') as $extension) {
 		if (!extension_loaded($extension)) {
 			echo '<p class="bad">', WT_I18N::translate('PHP extension "%s" is disabled.  You cannot install webtrees until this is enabled.  Please ask your server\'s administrator to enable it.', $extension), '</p>';
 			$errors=true;
@@ -845,7 +845,6 @@ try {
 		" n_type             VARCHAR(15)  NOT NULL,".
 		" n_sort             VARCHAR(255) NOT NULL,". // e.g. "GOGH,VINCENT WILLEM"
 		" n_full             VARCHAR(255) NOT NULL,". // e.g. "Vincent Willem van GOGH"
-		" n_list             VARCHAR(255) NOT NULL,". // e.g. "van GOGH, Vincent Willem"
 		// These fields are only used for INDI records
 		" n_surname          VARCHAR(255)     NULL,". // e.g. "van GOGH"
 		" n_surn             VARCHAR(255)     NULL,". // e.g. "GOGH"
@@ -978,7 +977,7 @@ try {
 
 	$dbh->prepare(
 		"INSERT IGNORE INTO `{$TBLPREFIX}site_setting` (setting_name, setting_value) VALUES ".
-		"('WT_SCHEMA_VERSION',               '10'),".
+		"('WT_SCHEMA_VERSION',               '12'),".
 		"('INDEX_DIRECTORY',                 'data/'),".
 		"('STORE_MESSAGES',                  '1'),".
 		"('USE_REGISTRATION_MODULE',         '1'),".

@@ -39,9 +39,9 @@
 #menu-list-perso-certificate   	{background-position:left    -570px;} html[dir=rtl] #menu-list-perso-certificate	{background-position:right    -570px;} 
 #menu-list-perso-lineage   		{background-position:left     -30px;} html[dir=rtl] #menu-list-perso-lineage 		{background-position:right     -30px;}
 #menu-sosa-list			   		{background-position:left     -90px;} html[dir=rtl] #menu-sosa-list			 		{background-position:right     -90px;}
-#menu-sosa-missing		   		{background-position:left    -450px;} html[dir=rtl] #menu-sosa-list			 		{background-position:right    -450px;}
-#menu-sosa-stats		   		{background-position:left    -630px;} html[dir=rtl] #menu-sosa-list			 		{background-position:right    -630px;}
-#menu-sosa-recompute	   		{background-position:left   -1210px;} html[dir=rtl] #menu-sosa-list			 		{background-position:right   -1210px;}
+#menu-sosa-missing		   		{background-position:left    -450px;} html[dir=rtl] #menu-sosa-missing		 		{background-position:right    -450px;}
+#menu-sosa-stats		   		{background-position:left    -630px;} html[dir=rtl] #menu-sosa-stats		 		{background-position:right    -630px;}
+#menu-sosa-recompute	   		{background-position:left   -1210px;} html[dir=rtl] #menu-sosa-recompute	 		{background-position:right   -1210px;}
 
 #indi_perso_header{
 	float: right;
@@ -51,17 +51,23 @@
 	margin-top: 5px;
 }
 
+html[dir='rtl'] #indi_perso_header { float: left;}
+
 #indi_perso_header_left{
 	float: left;
 	padding-left: 5px;
 	text-align: left;
 }
 
+html[dir='rtl'] #indi_perso_header_left { float: right;}
+
 #indi_perso_header_right{
 	float: right;
 	padding-right: 5px;
 	text-align: right;
 }
+
+html[dir='rtl'] #indi_perso_header_right { float: left;}
 
 .indi_perso_header_left_div, .indi_perso_header_right_div {
 	display: block;
@@ -70,6 +76,8 @@
 #indi_perso_icons{
 	float: right;
 }
+
+html[dir='rtl'] #indi_perso_icons { float: left;}
 
 #indi-header-titles {}
 #indi-header-titles dt:after {content:":";}
@@ -101,6 +109,8 @@
 	float: right;
 }
 
+html[dir='rtl'] .fact_flag { float: left;}
+
 .certif_icon {
 	height: 15px;
 	margin: 0px 2px 0px 2px;
@@ -130,6 +140,10 @@
 	background-color: #f4f0ed;
 }
 
+#loadingarea{
+	margin-top: 10px; margin-bottom: 10px;
+}
+
 .sosa_large {
 	height: 18px;
 	vertical-align: middle;
@@ -150,28 +164,17 @@
 	vertical-align: middle;
 }
 
-#indi_top{
-	width:100%;
-	margin: auto;
-}
-
-#indi_top_left {
-	text-align: left;
-	width:33%;
-}
-
-#indi_top_center {
-	text-align: center;
-	width:33%;
-}
-
 .left{
 	text-align: left;
 }
 
+html[dir='rtl'] .left { float: right;}
+
 .right{
 	text-align: right;
 }
+
+html[dir='rtl'] .right { float: left;}
 
 .percent_container{
 	padding: 1px;	

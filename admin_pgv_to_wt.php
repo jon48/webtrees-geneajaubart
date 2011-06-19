@@ -1,27 +1,24 @@
 <?php
-/**
- * PGV to webtrees transfer wizard
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @package webtrees
- * @version $Id: admin_pgv_to_wt.php 11613 2011-05-26 13:44:31Z greg $
- */
+// PGV to webtrees transfer wizard
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: admin_pgv_to_wt.php 11786 2011-06-12 00:45:31Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_pgv_to_wt.php');
 require './includes/session.php';
@@ -682,7 +679,6 @@ foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
 	@set_gedcom_setting($ged_id, 'SHOW_LIVING_NAMES',            $SHOW_LIVING_NAMES);
 	@set_gedcom_setting($ged_id, 'SHOW_MARRIED_NAMES',           $SHOW_MARRIED_NAMES);
 	@set_gedcom_setting($ged_id, 'SHOW_MEDIA_DOWNLOAD',          $SHOW_MEDIA_DOWNLOAD);
-	@set_gedcom_setting($ged_id, 'SHOW_MEDIA_FILENAME',          $SHOW_MEDIA_FILENAME);
 	@set_gedcom_setting($ged_id, 'SHOW_PARENTS_AGE',             $SHOW_PARENTS_AGE);
 	@set_gedcom_setting($ged_id, 'SHOW_PEDIGREE_PLACES',         $SHOW_PEDIGREE_PLACES);
 	@set_gedcom_setting($ged_id, 'SHOW_PRIVATE_RELATIONSHIPS',   $SHOW_PRIVATE_RELATIONSHIPS);
@@ -988,8 +984,8 @@ WT_DB::prepare(
 
 echo '<p>pgv_name => wt_name ...</p>'; ob_flush(); flush(); usleep(50000);
 WT_DB::prepare(
-	"REPLACE INTO `##name` (n_file, n_id, n_num, n_type, n_sort, n_full, n_list, n_surname, n_surn, n_givn, n_soundex_givn_std, n_soundex_surn_std, n_soundex_givn_dm, n_soundex_surn_dm)".
-	" SELECT n_file, n_id, n_num, n_type, n_sort, n_full, n_list, n_surname, n_surn, n_givn, n_soundex_givn_std, n_soundex_surn_std, n_soundex_givn_dm, n_soundex_surn_dm FROM `{$DBNAME}`.`{$TBLPREFIX}name`"
+	"REPLACE INTO `##name` (n_file, n_id, n_num, n_type, n_sort, n_full, n_surname, n_surn, n_givn, n_soundex_givn_std, n_soundex_surn_std, n_soundex_givn_dm, n_soundex_surn_dm)".
+	" SELECT n_file, n_id, n_num, n_type, n_sort, n_full, n_surname, n_surn, n_givn, n_soundex_givn_std, n_soundex_surn_std, n_soundex_givn_dm, n_soundex_surn_dm FROM `{$DBNAME}`.`{$TBLPREFIX}name`"
 )->execute();
 
 ////////////////////////////////////////////////////////////////////////////////

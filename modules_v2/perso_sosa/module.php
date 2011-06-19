@@ -95,22 +95,19 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			$submenu->addId('menu-sosa-missing');
 			$menu->addSubMenu($submenu);
 			
-			$menu->addSeparator();
-			
 			//-- Sosa statistics
 			$submenu = new WT_Menu(WT_I18N::translate('Sosa Statistics'), 'module.php?mod=perso_sosa&mod_action=statistics');
 			$submenu->addIcon('menu_sosa');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_sosa_statistics');
+			$submenu->addClass('submenuitem separator_top', 'submenuitem_hover', '', 'icon_small_sosa_statistics');
 			$submenu->addId('menu-sosa-stats');
 			$menu->addSubMenu($submenu);
 			
 			//-- recompute Sosa submenu
 			if (WT_USER_CAN_EDIT && !empty($controller) && $controller instanceof WT_Controller_Individual ) {
-				$menu->addSeparator();
 				$submenu = new WT_Menu(WT_I18N::translate('Complete Sosas'), '#');
 				$submenu->addOnclick('return compute_sosa(\''.$controller->pid.'\');');
 				$submenu->addIcon('recompute_sosa');
-				$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_recompute_sosa');
+				$submenu->addClass('submenuitem separator_top', 'submenuitem_hover', '', 'icon_small_recompute_sosa');
 				$submenu->addId('menu-sosa-recompute');
 				$menu->addSubMenu($submenu);
 			}
@@ -262,7 +259,7 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 		
 		print_simple_header(WT_I18N::translate('Compute Sosas'));
 		
-		echo '<h2>', WT_I18N::translate('Compute Sosas'), '</h2>';
+		echo '<div class="helpheader">', WT_I18N::translate('Compute Sosas'), '</div>';
 		
 		$pid = safe_GET_xref('pid');
 		if($pid){

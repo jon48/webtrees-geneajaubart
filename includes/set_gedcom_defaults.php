@@ -1,28 +1,25 @@
 <?php
-/**
-*
-* Set/create default settings for a new gedcom.
-*
-* The calling module must set $ged_id and $ged_name
-*
-* Copyright (C) 2011 webtrees development team.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* @version $Id: set_gedcom_defaults.php 11572 2011-05-22 20:32:28Z greg $
-*/
+// Set/create default settings for a new gedcom.
+//
+// The calling module must set $ged_id and $ged_name
+//
+// Copyright (C) 2011 webtrees development team.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: set_gedcom_defaults.php 11786 2011-06-12 00:45:31Z greg $
 
 if (!defined('WT_WEBTREES') || empty($ged_id) || empty($ged_name)) {
 	header('HTTP/1.0 403 Forbidden');
@@ -118,7 +115,6 @@ set_gedcom_setting($ged_id, 'SHOW_LIST_PLACES',             '1');
 set_gedcom_setting($ged_id, 'SHOW_LIVING_NAMES',            WT_PRIV_USER);
 set_gedcom_setting($ged_id, 'SHOW_MARRIED_NAMES',           true);
 set_gedcom_setting($ged_id, 'SHOW_MEDIA_DOWNLOAD',          false);
-set_gedcom_setting($ged_id, 'SHOW_MEDIA_FILENAME',          false);
 set_gedcom_setting($ged_id, 'SHOW_NO_WATERMARK',            WT_PRIV_USER);
 set_gedcom_setting($ged_id, 'SHOW_PARENTS_AGE',             true);
 set_gedcom_setting($ged_id, 'SHOW_PEDIGREE_PLACES',         '9');

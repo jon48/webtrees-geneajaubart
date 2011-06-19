@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Media.php 11615 2011-05-26 17:37:36Z greg $
+// $Id: Media.php 11785 2011-06-11 22:08:12Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -34,11 +34,14 @@ class WT_Media extends WT_GedcomRecord {
 	var $title         =null;
 	var $file          =null;
 	var $note          =null;
-	var $serverfilename='';
+	var $localfilename =null;
+	var $serverfilename=null;
 	var $fileexists    =false;
-	var $thumbfilename = null;
-	var $thumbserverfilename = '';
-	var $thumbfileexists = false;
+	var $thumbfilename =null;
+	var $thumbserverfilename=null;
+	var $thumbfileexists=false;
+	var $mainimagesize  =null;
+	var $thumbimagesize =null;
 
 	// Create a Media object from either raw GEDCOM data or a database row
 	public function __construct($data) {
@@ -96,7 +99,7 @@ class WT_Media extends WT_GedcomRecord {
 	}
 
 	/**
-	 * get the main media file name
+	 * get the main media filename
 	 * @return string
 	 */
 	public function getFilename() {
@@ -110,7 +113,8 @@ class WT_Media extends WT_GedcomRecord {
 	 */
 	public function getLocalFilename($which='main') {
 		if ($which=='main') {
-			return check_media_depth($this->file);
+			if (!$this->localfilename) $this->localfilename=check_media_depth($this->file);
+			return $this->localfilename;
 		} else {
 			// this is a convenience method
 			return $this->getThumbnail(false);
@@ -118,14 +122,14 @@ class WT_Media extends WT_GedcomRecord {
 	}
 
 	/**
-	 * get the file name on the server, either in the standard or protected directory
+	 * get the filename on the server, either in the standard or protected directory
 	 * @param which string - specify either 'main' or 'thumb'
 	 * @return string
 	 */
 	public function getServerFilename($which='main') {
 		if ($which=='main') {
 			if ($this->serverfilename) return $this->serverfilename;
-			$localfilename = $this->getLocalFilename();
+			$localfilename = $this->getLocalFilename($which);
 			if (!empty($localfilename) && !$this->isExternal()) {
 				if (file_exists($localfilename)) {
 					// found image in unprotected directory
@@ -172,7 +176,7 @@ class WT_Media extends WT_GedcomRecord {
 	 * @return boolean
 	 */
 	public function isExternal() {
-		return isFileExternal($this->getLocalFilename());
+		return isFileExternal($this->getLocalFilename('main'));
 	}
 
 	/**
@@ -268,12 +272,43 @@ class WT_Media extends WT_GedcomRecord {
 
 
 	/**
+	 * get the media FORM from the gedcom.  if not defined, calculate from file extension 
+	 * @return string
+	 */
+	public function getMediaFormat() {
+		$mediaFormat = get_gedcom_value('FORM', 2, $this->getGedcomRecord());
+		if (!$mediaFormat) {
+			$imgsize=$this->getImageAttributes('main');
+			$mediaFormat=$imgsize['ext'];
+		}
+		return $mediaFormat;
+	}
+
+	/**
 	 * get the media type from the gedcom
 	 * @return string
 	 */
-	public function getMediatype() {
+	public function getMediaType() {
 		$mediaType = strtolower(get_gedcom_value('FORM:TYPE', 2, $this->getGedcomRecord()));
 		return $mediaType;
+	}
+
+	/**
+	 * get the media _PRIM from the gedcom
+	 * @return string
+	 */
+	public function isPrimary() {
+		$prim = get_gedcom_value("_PRIM", 1, $this->getGedcomRecord());
+		return $prim;
+	}
+
+	/**
+	 * get the media _THUM from the gedcom
+	 * @return string
+	 */
+	public function useMainImage() {
+		$thum = get_gedcom_value("_THUM", 1, $this->getGedcomRecord());
+		return $thum;
 	}
 
 	/**
@@ -285,6 +320,8 @@ class WT_Media extends WT_GedcomRecord {
 	 */
 	public function getImageAttributes($which='main',$addWidth=0,$addHeight=0) {
 		global $THUMBNAIL_WIDTH, $TEXT_DIRECTION;
+		$var=$which.'imagesize';
+		if (!empty($this->$var)) return $this->$var;
 		$imgsize = array();
 		if ($this->fileExists($which)) {
 			$imgsize=@getimagesize($this->getServerFilename($which)); // [0]=width [1]=height [2]=filetype ['mime']=mimetype
@@ -298,7 +335,7 @@ class WT_Media extends WT_GedcomRecord {
 				$imgsize['ext']=$imageTypes[0+$imgsize[2]];
 				$imgsize['aspect']=($imgsize[0]>$imgsize[1]) ? 'landscape' : 'portrait';
 				// this is for display purposes, always show non-adjusted info
-				$imgsize['WxH']=/* I18N: image dimensions, width x height */ WT_I18N::translate('%1$s &times; %2$s pixels', WT_I18N::number($imgsize['0']), WT_I18N::number($imgsize['1']));
+				$imgsize['WxH']=/* I18N: image dimensions, width x height */ WT_I18N::translate('%1$s × %2$s pixels', WT_I18N::number($imgsize['0']), WT_I18N::number($imgsize['1']));
 				$imgsize['imgWH']=' width="'.$imgsize['adjW'].'" height="'.$imgsize['adjH'].'" ';
 				if ( ($which=='thumb') && ($imgsize['0'] > $THUMBNAIL_WIDTH) ) {
 					// don't let large images break the dislay
@@ -346,7 +383,8 @@ class WT_Media extends WT_GedcomRecord {
 				$imgsize['mime']=$mime[$imgsize['ext']];
 			}
 		}
-		return $imgsize;
+		$this->$var=$imgsize;
+		return $this->$var;
 	}
 
 	// Generate a URL to this record, suitable for use in HTML
@@ -436,7 +474,7 @@ class WT_Media extends WT_GedcomRecord {
 	 * @return string, suitable for use inside an a tag: '<a href="'.$this->getHtmlUrlSnippet().'">';
 	 */
 	public function getHtmlUrlSnippet(array $config = array()) {
-		global $USE_MEDIA_VIEWER,$LB_URL_WIDTH,$LB_URL_HEIGHT;
+		global $USE_MEDIA_VIEWER;
 
 		$default_config=array(
 			'obeyViewerOption'=>true,
@@ -458,7 +496,6 @@ class WT_Media extends WT_GedcomRecord {
 		while (true) {
 			if (WT_USE_LIGHTBOX && $config['uselightbox'] && $config['usejavascript'] && (WT_THEME_DIR!=WT_THEMES_DIR.'_administration/')) {
 				// Lightbox is installed
-				require_once WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 				switch ($urltype) {
 				case 'url_flv':
 					$url = 'js/jw_player/flvVideo.php?flvVideo='.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . $config['img_title'] . "::" . $notes;
@@ -487,7 +524,7 @@ class WT_Media extends WT_GedcomRecord {
 				case 'local_page':
 				case 'local_pdf':
 				case 'local_document':
-					$url = $this->getHtmlUrlDirect('main') . "\" rel='clearbox({$LB_URL_WIDTH}, {$LB_URL_HEIGHT}, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . $config['img_title'] . "::" . $notes;
+					$url = $this->getHtmlUrlDirect('main') . "\" rel='clearbox(" . get_module_setting('lightbox', 'LB_URL_WIDTH',  '1000') . ',' . get_module_setting('lightbox', 'LB_URL_HEIGHT', '600') . ", click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . $config['img_title'] . "::" . $notes;
 					break 2;
 				case 'url_streetview':
 					// need to call getHtmlForStreetview() instead of getHtmlUrlSnippet()
@@ -657,7 +694,8 @@ class WT_Media extends WT_GedcomRecord {
 					$output .= '<div><a href="'.$this->getHtmlUrlDirect('main', true).'">'.WT_I18N::translate('Download File').'</a></div>';
 				}
 			} else if ($config['alertnotfound'] && !$mainexists) {
-				$output .= '<div class="error">'.WT_I18N::translate('File not found.').'</div>';
+				$output .= '<p class="ui-state-error">' . WT_I18N::translate('The file “%s” does not exist.', $this->getLocalFilename()) . '</p>';
+				
 			}
 		}
 		if ($config['addslashes']) {

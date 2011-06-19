@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: GedcomRecord.php 11669 2011-05-31 23:31:55Z greg $
+// @version $Id: GedcomRecord.php 11753 2011-06-09 16:39:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -576,11 +576,6 @@ class WT_GedcomRecord {
 				return 0; // both $x and $y private
 			}
 		}
-	}
-
-	// Static helper function to sort an array of objects by ID
-	static function CompareId($x, $y) {
-		return strnatcasecmp($x->getXref(), $y->getXref());
 	}
 
 	// Static helper function to sort an array of objects by Change Date

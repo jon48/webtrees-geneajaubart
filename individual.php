@@ -25,14 +25,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: individual.php 11691 2011-06-02 13:27:22Z greg $
+// $Id: individual.php 11772 2011-06-10 15:56:22Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
 define('WT_SCRIPT_NAME', 'individual.php');
 require './includes/session.php';
 
-$showFull = ($PEDIGREE_FULL_DETAILS) ? 1 : 0;
 
 // -- array of GEDCOM elements that will be found but should not be displayed
 $nonfacts = array('FAMS', 'FAMC', 'MAY', 'BLOB', 'CHIL', 'HUSB', 'WIFE', 'RFN', '_WT_OBJE_SORT', '');
@@ -42,25 +41,38 @@ $nonfamfacts = array(/*'NCHI',*/ 'UID', '');
 $controller=new WT_Controller_Individual();
 $controller->init();
 
-// tell tabs that use jquery that it is already loaded
-define('WT_JQUERY_LOADED', 1);
+if ($controller->indi && $controller->indi->canDisplayName()) {
 
-// We have finished writing session data, so release the lock
-Zend_Session::writeClose();
 
 print_header($controller->getPageTitle());
 
-if (!$controller->indi) {
-	echo '<b>', WT_I18N::translate('Unable to find record with ID'), '</b><br /><br />';
-	print_footer();
-	exit;
-} else if (!$controller->indi->canDisplayName()) {
-	echo '<div class="facts_value" >';
-	print_privacy_error();
-	echo '</div>';
+	if ($controller->indi->isMarkedDeleted()) {
+		if (WT_USER_CAN_ACCEPT) {
+			echo '<p class="ui-state-highlight">', WT_I18N::translate('This individual has been deleted.  You should review the deletion and then <a href="%1$s">accept</a> or <a href="%2$s">reject</a> it.', $controller->indi->getHtmlUrl().'&amp;action=accept', $controller->indi->getHtmlUrl().'&amp;action=undo'), '</p>';
+		} elseif (WT_USER_CAN_EDIT) {
+			echo '<p class="ui-state-highlight">', WT_I18N::translate('This individual has been deleted.  The deletion will need to be reviewed by a moderator.'), '</p>';
+		}
+	} elseif (find_updated_record($controller->indi->getXref(), WT_GED_ID)!==null) {
+		if (WT_USER_CAN_ACCEPT) {
+			echo '<p class="ui-state-highlight">', WT_I18N::translate('This individual has been edited.  You should review the changes and then <a href="%1$s">accept</a> or <a href="%2$s">reject</a> them.', $controller->indi->getHtmlUrl().'&amp;action=accept', $controller->indi->getHtmlUrl().'&amp;action=undo'), '</p>';
+		} elseif (WT_USER_CAN_EDIT) {
+			echo '<p class="ui-state-highlight">', WT_I18N::translate('This individual has been edited.  The changes need to be reviewed by a moderator.'), '</p>';
+		}
+	} elseif ($controller->accept_success) {
+		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been accepted.'), '</p>';
+	} elseif ($controller->reject_success) {
+		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been rejected.'), '</p>';
+	}
+} else {
+	print_header(WT_I18N::translate('Individual'));
+	echo '<p class="ui-state-error">', WT_I18N::translate('This individual does not exist or you do not have permission to view it.'), '</p>';
 	print_footer();
 	exit;
 }
+// We have finished writing session data, so release the lock
+Zend_Session::writeClose();
+// tell tabs that use jquery that it is already loaded
+define('WT_JQUERY_LOADED', 1);
 
 $linkToID=$controller->pid; // -- Tell addmedia.php what to link to
 echo WT_JS_START; ?>
@@ -72,7 +84,7 @@ function show_gedcom_record(shownew) {
 }
 <?php if (WT_USER_CAN_EDIT) { ?>
 function showchanges() {
-	window.location = '<?php echo $controller->indi->getRawUrl(); ?>&show_changes=yes';
+	window.location = '<?php echo $controller->indi->getRawUrl(); ?>';
 }
 <?php } ?>
 
@@ -137,12 +149,7 @@ jQuery(document).ready(function() {
 <?php
 echo WT_JS_END;
 // ===================================== header area
-if ((empty($SEARCH_SPIDER))&&($controller->accept_success)) {
-	echo '<strong>', WT_I18N::translate('Changes successfully accepted into database'), '</strong><br />';
-}
-if ($controller->indi->isMarkedDeleted()) {
-	echo '<span class="error">', WT_I18N::translate('This record has been marked for deletion upon admin approval.'), '</span>';
-}
+
 echo
 	'<div id="main" class="use-sidebar sidebar-at-right">', //overall page container
 	'<div id="indi_left">',
@@ -235,20 +242,21 @@ if (!$controller->indi->canDisplayDetails()) {
 foreach ($controller->tabs as $tab) {
 	echo $tab->getPreLoadContent();
 }
-$showFull = ($PEDIGREE_FULL_DETAILS) ? 1 : 0;
 echo '<div id="tabs" >';
 echo '<ul>';
 foreach ($controller->tabs as $tab) {
+	$greyed_out='';
+	if ($tab->isGrayedOut()) $greyed_out = 'rela';
 	if ($tab->hasTabContent()) {
 		if ($tab->getName()==$controller->default_tab) {
 			// Default tab loads immediately
-			echo '<li><a title="', $tab->getName(), '" href="#', $tab->getName(), '">';
+			echo '<li class="'.$greyed_out.'"><a title="', $tab->getName(), '" href="#', $tab->getName(), '">';
 		} else if ($tab->canLoadAjax()) {
 			// AJAX tabs load later
-			echo '<li><a title="', $tab->getName(), '" href="',$controller->indi->getHtmlUrl(),'&amp;action=ajax&amp;module=', $tab->getName(), '">';
+			echo '<li class="'.$greyed_out.'"><a title="', $tab->getName(), '" href="',$controller->indi->getHtmlUrl(),'&amp;action=ajax&amp;module=', $tab->getName(), '">';
 		} else {
 			// Non-AJAX tabs load immediately (search engines don't load ajax)
-			echo '<li><a title="', $tab->getName(), '" href="#', $tab->getName(), '">';
+			echo '<li class="'.$greyed_out.'"><a title="', $tab->getName(), '" href="#', $tab->getName(), '">';
 		}
 		echo '<span title="', $tab->getTitle(), '">', $tab->getTitle(), '</span></a></li>';
 	}

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 10990 2011-02-27 20:45:32Z lukasz $
+// $Id: module.php 11735 2011-06-08 14:38:28Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -125,6 +125,10 @@ class sources_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 	// Implement WT_Module_Tab
 	public function hasTabContent() {
 		return WT_USER_CAN_EDIT || $this->get_source_count()>0;
+	}
+	// Implement WT_Module_Tab
+	public function isGrayedOut() {
+		return $this->get_source_count()==0;
 	}
 	// Implement WT_Module_Tab
 	public function canLoadAjax() {

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print.php 11612 2011-05-26 13:10:40Z greg $
+// $Id: functions_print.php 11806 2011-06-13 00:21:19Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
  
@@ -33,7 +33,6 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-define('WT_FUNCTIONS_PRINT_PHP', '');
 
 require_once WT_ROOT.'includes/functions/functions_charts.php';
 
@@ -789,9 +788,6 @@ function print_favorite_selector($option=0) {
 					}
 				}
 			}
-			if (count($gedcomfavs)>0) {
-				$menu->addSeparator();
-			}
 		}
 		if (count($gedcomfavs)>0) {
 			$submenu = new WT_Menu("<strong>".WT_I18N::translate('This GEDCOM\'s Favorites')."</strong>", "#", "right");
@@ -1462,7 +1458,7 @@ function format_fact_date(&$eventObj, $anchor=false, $time=false) {
 				$timerec=get_sub_record(2, '2 DATE', $factrec);
 			}
 			if (preg_match('/[2-3] TIME (.*)/', $timerec, $tmatch)) {
-				$html.=' - <span class="date">'.$tmatch[1].'</span>';
+				$html.='<span class="date"> - '.$tmatch[1].'</span>';
 			}
 		}
 		$fact = $eventObj->getTag();

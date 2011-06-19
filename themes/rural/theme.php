@@ -160,7 +160,6 @@ $WT_IMAGES=array(
 	'spacer'=>WT_THEME_DIR.'images/spacer.png',
 	'uarrow'=>WT_THEME_DIR.'images/uarrow.png',
 	'uarrow2'=>WT_THEME_DIR.'images/uarrow2.png',
-	'uarrow3'=>WT_THEME_DIR.'images/uarrow3.png',
 	'udarrow'=>WT_THEME_DIR.'images/udarrow.png',
 	'vline'=>WT_THEME_DIR.'images/vline.png',
 	'zoomin'=>WT_THEME_DIR.'images/zoomin.png',
@@ -242,6 +241,4 @@ $WT_STATS_CHART_COLOR1="ffffff";
 $WT_STATS_CHART_COLOR2="9ca3d4";
 $WT_STATS_CHART_COLOR3="e5e6ef";
 
-// Arrow symbol or icon for up-page links on Help pages
-$UpArrow = "<img src=\"".WT_THEME_DIR."images/uarrow3.png\" class=\"icon\" border=\"0\" alt=\"^\" />";
 ?>

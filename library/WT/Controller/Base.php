@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Base.php 10225 2011-01-01 15:04:58Z greg $
+// @version $Id: Base.php 11743 2011-06-09 00:00:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -30,10 +30,8 @@ if (!defined('WT_WEBTREES')) {
 
 class WT_Controller_Base {
 	var $action      =null;
-	var $show_changes=null;
 
 	function __construct() {
 		$this->action      =safe_GET('action');
-		$this->show_changes=safe_GET('show_changes', 'no', 'yes')=='yes'; // if not specified, then default to "yes"
 	}
 }

@@ -86,6 +86,8 @@ class WT_Gedcom_Tag {
 		'_NLIV', '_NMAR', '_NMR', '_WT_USER', '_PRMN', '_SCBK', '_SEPR', '_SSHOW', '_STAT',
 		'_SUBQ', '_THUM', '_TODO', '_TYPE', '_UID', '_URL', '_WEIG', '_YART', '__BRTM_CHIL',
 		'__BRTM_GCHI', '__BRTM_GCH1', '__BRTM_GCH2', '__BRTM_HSIB', '__BRTM_SIBL',
+		// These pseudo-tags are generated dynamically to display media object attributes
+		'__FILE_SIZE__', '__IMAGE_SIZE__',	
 		//PERSO Add Perso tags
 		'_ACT'
 		//END PERSO
@@ -314,7 +316,7 @@ class WT_Gedcom_Tag {
 		case 'NOTE': return /* I18N: gedcom tag NOTE */ WT_I18N::translate('Note');
 		case 'NPFX': return /* I18N: gedcom tag NPFX */ WT_I18N::translate('Name prefix');
 		case 'NSFX': return /* I18N: gedcom tag NSFX */ WT_I18N::translate('Name suffix');
-		case 'OBJE': return /* I18N: gedcom tag OBJE */ WT_I18N::translate('Multimedia object');
+		case 'OBJE': return /* I18N: gedcom tag OBJE */ WT_I18N::translate('Media object');
 		case 'OCCU': return /* I18N: gedcom tag OCCU */ WT_I18N::translate('Occupation');
 		case 'OCCU:AGNC': return WT_I18N::translate('Employer');
 		case 'ORDI': return /* I18N: gedcom tag ORDI */ WT_I18N::translate('Ordinance');
@@ -908,13 +910,16 @@ class WT_Gedcom_Tag {
 		case '_URL': return /* I18N: gedcom tag _URL */ WT_I18N::translate('Web URL');
 		case '_WEIG': return /* I18N: gedcom tag _WEIG */ WT_I18N::translate('Weight');
 		case '_YART': return /* I18N: gedcom tag _YART */ WT_I18N::translate('Yahrzeit');
-		// Brit milah applies only to males, no no need for male/female translations
+		// Brit milah applies only to males, no need for male/female translations
 		case '__BRTM_CHIL': return WT_I18N::translate ( 'Brit milah of a son');
 		case '__BRTM_GCHI': return WT_I18N::translate ( 'Brit milah of a grandson');
 		case '__BRTM_GCH1': return WT_I18N::translate_c('daughter\'s son', 'Brit milah of a grandson');
 		case '__BRTM_GCH2': return WT_I18N::translate_c('son\'s son', 'Brit milah of a grandson');
 		case '__BRTM_HSIB': return WT_I18N::translate ( 'Brit milah of a half-brother');
 		case '__BRTM_SIBL': return WT_I18N::translate ( 'Brit milah of a brother');
+		// These "pseudo" tags are generated internally to present information about a media object
+		case '__FILE_SIZE__':  return WT_I18N::translate('File size');
+		case '__IMAGE_SIZE__': return WT_I18N::translate('Image dimensions');		
 		//PERSO Add Perso Tag
 		case '_ACT' : return WT_I18N::translate('Certificate');
 		//END PERSO

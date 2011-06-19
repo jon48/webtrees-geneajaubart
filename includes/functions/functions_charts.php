@@ -1,38 +1,32 @@
 <?php
-/**
- * Functions used for charts
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
- *
- * Derived from PhpGedView
- * Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @package webtrees
- * @subpackage Charts
- * @version $Id: functions_charts.php 11584 2011-05-23 10:05:56Z greg $
- */
+// Functions used for charts
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: functions_charts.php 11789 2011-06-12 09:24:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-define('WT_FUNCTIONS_CHARTS_PHP', '');
 
 /**
  * print a table cell with sosa number
@@ -82,7 +76,7 @@ function print_sosa_number($sosa, $pid = "", $arrowDirection = "up") {
  * @param string $gparid optional gd-parent ID (descendancy booklet)
  */
 function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="", $personcount="1") {
-	global $show_full, $TEXT_DIRECTION, $SHOW_EMPTY_BOXES, $pbwidth, $pbheight, $WT_IMAGES, $show_changes, $GEDCOM;
+	global $show_full, $TEXT_DIRECTION, $SHOW_EMPTY_BOXES, $pbwidth, $pbheight, $WT_IMAGES, $GEDCOM;
 
 	$ged_id=get_id_from_gedcom($GEDCOM);
 
@@ -253,7 +247,7 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
  * @param string $label optional indi label (descendancy booklet)
  */
 function print_family_children($famid, $childid = "", $sosa = 0, $label="", $personcount="1") {
-	global $pbwidth, $pbheight, $show_cousins, $WT_IMAGES, $show_changes, $GEDCOM, $TEXT_DIRECTION;
+	global $pbwidth, $pbheight, $show_cousins, $WT_IMAGES, $GEDCOM, $TEXT_DIRECTION;
 
 	$family=WT_Family::getInstance($famid);
 	$children=array();
@@ -287,25 +281,23 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 
 	$newchildren = array();
 	$oldchildren = array();
-	if (WT_USER_CAN_EDIT) {
-		if (!isset($_REQUEST['show_changes']) || $_REQUEST['show_changes']=='yes') {
-			$newrec = find_gedcom_record($famid, WT_GED_ID, true);
-			$ct = preg_match_all("/1 CHIL @(.*)@/", $newrec, $match, PREG_SET_ORDER);
-			if ($ct > 0) {
-				$oldchil = array();
+	if (WT_USER_CAN_EDIT || WT_USER_CAN_ACCEPT) {
+		$newrec = find_gedcom_record($famid, WT_GED_ID, true);
+		$ct = preg_match_all("/1 CHIL @(.*)@/", $newrec, $match, PREG_SET_ORDER);
+		if ($ct > 0) {
+			$oldchil = array();
+			for ($i = 0; $i < $ct; $i++) {
+				if (!in_array($match[$i][1], $children)) $newchildren[] = $match[$i][1];
+				else $oldchil[] = $match[$i][1];
+			}
+			foreach ($children as $indexval => $chil) {
+				if (!in_array($chil, $oldchil)) $oldchildren[] = $chil;
+			}
+			//-- if there are no old or new children then the children were reordered
+			if ((count($newchildren)==0)&&(count($oldchildren)==0)) {
+				$children = array();
 				for ($i = 0; $i < $ct; $i++) {
-					if (!in_array($match[$i][1], $children)) $newchildren[] = $match[$i][1];
-					else $oldchil[] = $match[$i][1];
-				}
-				foreach ($children as $indexval => $chil) {
-					if (!in_array($chil, $oldchil)) $oldchildren[] = $chil;
-				}
-				//-- if there are no old or new children then the children were reordered
-				if ((count($newchildren)==0)&&(count($oldchildren)==0)) {
-					$children = array();
-					for ($i = 0; $i < $ct; $i++) {
-						$children[] = $match[$i][1];
-					}
+					$children[] = $match[$i][1];
 				}
 			}
 		}
@@ -441,7 +433,6 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 function print_family_facts(&$family) {
 	global $pbwidth, $pbheight;
 	global $TEXT_DIRECTION, $GEDCOM;
-	global $show_changes;
 	global $linkToID;
 
 	$famid=$family->getXref();
@@ -485,9 +476,9 @@ function print_family_facts(&$family) {
 			echo '<tr><td class="descriptionbox">';
 			echo WT_I18N::translate('Add media'), help_link('add_media');
 			echo '</td><td class="optionbox">';
-			echo "<a href=\"javascript: ", WT_I18N::translate('Add media'), "\" onclick=\"window.open('addmedia.php?action=showmediaform&linktoid={$famid}', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Add a new media item'), '</a>';
+			echo "<a href=\"javascript:;\" onclick=\"window.open('addmedia.php?action=showmediaform&linktoid={$famid}', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Add a new media object'), '</a>';
 			echo '<br />';
-			echo "<a href=\"javascript:;\" onclick=\"window.open('inverselink.php?linktoid={$famid}&linkto=family', '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Link to an existing Media item'), '</a>';
+			echo "<a href=\"javascript:;\" onclick=\"window.open('inverselink.php?linktoid={$famid}&linkto=family', '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Link to an existing media object'), '</a>';
 			echo '</td></tr>';
 
 			// -- new source citation

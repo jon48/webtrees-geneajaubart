@@ -21,18 +21,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: imageview.php 11563 2011-05-21 05:28:11Z larry $
+// $Id: imageview.php 11772 2011-06-10 15:56:22Z greg $
 
 define('WT_SCRIPT_NAME', 'imageview.php');
 require './includes/session.php';
-
-// We have finished writing session data, so release the lock
-Zend_Session::writeClose();
 
 $controller = new WT_Controller_Media();
 $controller->init();
 
 print_simple_header(WT_I18N::translate('Image viewer'));
+
+// We have finished writing session data, so release the lock
+Zend_Session::writeClose();
 
 if (!$controller->mediaobject) {
 	echo '<b>', WT_I18N::translate('Unable to find record with ID'), '</b><br /><br />';
@@ -185,8 +185,7 @@ if (!$controller->mediaobject->canDisplayDetails()) {
 
 echo "<form name=\"zoomform\" onsubmit=\"setzoom(document.getElementById('zoomval').value); return false;\" action=\"imageview.php\">";
 if (!$controller->mediaobject->isExternal() && !$controller->mediaobject->fileExists() ) {
-	echo "<span class=\"error\">".WT_I18N::translate('File not found.')."&nbsp;".$controller->getLocalFilename()."</span>";
-	echo "<br /><br /><div class=\"center\"><a href=\"javascript:;\" onclick=\"self.close();\">".WT_I18N::translate('Close Window')."</a></div>";
+	echo '<p class="ui-state-error">', WT_I18N::translate('The file “%s” does not exist.', $controller->mediaobject->getLocalFilename()), '</p>';
 } else {
 	echo "<center><font size=\"6\"><a href=\"javascript:;\" onclick=\"zoomin(); return false;\">+</a> <a href=\"javascript:;\" onclick=\"zoomout();\">&ndash;</a> </font>";
 	echo "<input type=\"text\" size=\"2\" name=\"zoomval\" id=\"zoomval\" value=\"100\" />%";

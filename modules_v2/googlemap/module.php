@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11698 2011-06-03 11:49:18Z greg $
+// $Id: module.php 11734 2011-06-08 14:33:59Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -150,6 +150,10 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		return !$SEARCH_SPIDER && (array_key_exists('googlemap', WT_Module::getActiveModules()) || WT_USER_IS_ADMIN);
 	}
 
+	// Implement WT_Module_Tab
+	public function isGrayedOut() {
+		return false;
+	}
 	// Implement WT_Module_Tab
 	public function getJSCallback() {
 		global $GOOGLEMAP_PH_CONTROLS;

@@ -24,7 +24,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: lightbox_print_media_row.php 11665 2011-05-31 21:50:19Z greg $
+ * @version $Id: lightbox_print_media_row.php 11772 2011-06-10 15:56:22Z greg $
  * @author Brian Holland
  */
 
@@ -56,7 +56,7 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 			echo '</td>';
 			echo '<td class="description_box" valign="top" colspan="3" nowrap="nowrap">';
 			echo '<center><br /><img src="', WT_THEME_DIR, 'images/media.gif" height="30" border="0" />';
-			echo '<font size="1"><br />', WT_I18N::translate('File not found.'), '</font></center>';
+			echo '<p class="ui-state-error">', WT_I18N::translate('The file “%s” does not exist.', $rowm['m_file']), '</p>';
 			echo '</td>';
 			echo '</tr>';
 		} else if (!file_exists($rowm['m_file'])) {
@@ -68,7 +68,7 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 			echo '</td>';
 			echo '<td class="description_box" valign="top" colspan="3" nowrap="nowrap" >';
 			echo '<center><br /><img src="', WT_THEME_DIR, 'images/media.gif" height="30" border="0" />';
-			echo '<font size="1"><br />', WT_I18N::translate('File not found.'), '</font></center>';
+			echo '<p class="ui-state-error">', WT_I18N::translate('The file “%s” does not exist.', $rowm['m_file']), '</p>';
 			echo '</td>';
 			echo '</tr>';
 		} else {

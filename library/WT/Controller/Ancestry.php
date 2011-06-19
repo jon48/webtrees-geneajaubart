@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Ancestry.php 11429 2011-05-01 16:54:49Z greg $
+// @version $Id: Ancestry.php 11738 2011-06-08 19:58:49Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,7 +33,6 @@ require_once WT_ROOT.'includes/functions/functions_charts.php';
 class WT_Controller_Ancestry extends WT_Controller_Base {
 	var $pid = "";
 	var $user = false;
-	var $accept_success = false;
 	var $show_cousins;
 	var $rootid;
 	var $name;

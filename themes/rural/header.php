@@ -53,24 +53,29 @@ $extrastylesheet= str_replace(".css", ".extra.css", $stylesheet);
 echo '<link rel="stylesheet" href="', $extrastylesheet,'" type="text/css" media="all" />';
 //END PERSO
 
-if (file_exists(WT_THEME_DIR.$BROWSERTYPE.'.css')) {
-	echo '<link rel="stylesheet" href="', WT_THEME_DIR.$BROWSERTYPE, '.css" type="text/css" media="all" />';
+switch ($BROWSERTYPE) {
+case 'chrome':
+case 'msie':
+	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_DIR, $BROWSERTYPE, '.css" />';
+	break;
 }
+
 // Additional css files required (Only if Lightbox installed)
 if (WT_USE_LIGHTBOX) {
 	if ($TEXT_DIRECTION=='rtl') {
-		echo '<link rel="stylesheet" href="', WT_MODULES_DIR, 'lightbox/css/clearbox_music_RTL.css" type="text/css" />';
-		echo '<link rel="stylesheet" href="', WT_MODULES_DIR, 'lightbox/css/album_page_RTL_ff.css" type="text/css" media="screen" />';
+		echo '<link rel="stylesheet" type="text/css" href="', WT_MODULES_DIR, 'lightbox/css/clearbox_music_RTL.css" />';
+		echo '<link rel="stylesheet" type="text/css" href="', WT_MODULES_DIR, 'lightbox/css/album_page_RTL_ff.css" media="screen" />';
 	} else {
-		echo '<link rel="stylesheet" href="', WT_MODULES_DIR, 'lightbox/css/clearbox_music.css" type="text/css" />';
-		echo '<link rel="stylesheet" href="', WT_MODULES_DIR, 'lightbox/css/album_page.css" type="text/css" media="screen" />';
+		echo '<link rel="stylesheet" type="text/css" href="', WT_MODULES_DIR, 'lightbox/css/clearbox_music.css" />';
+		echo '<link rel="stylesheet" type="text/css" href="', WT_MODULES_DIR, 'lightbox/css/album_page.css" media="screen" />';
 	}
 }
 
 echo
-	'<link type="text/css" href="', WT_THEME_DIR, 'modules.css" rel="Stylesheet" />',
+	'<link rel="stylesheet" type="text/css" href="', WT_THEME_DIR, 'modules.css" />',
+	$javascript,
 	'</head>',
-	'<body id="body">';
+	'<body>';
 
 // begin header section
 if ($view=='simple') {
@@ -112,13 +117,12 @@ else {
 		echo '<li>';
 		if (WT_USER_ID) {
 			echo '<a href="edituser.php">', WT_I18N::translate('Logged in as '), ' (', WT_USER_NAME, ')</a> | ', logout_link();
-		} elseif (empty($SEARCH_SPIDER)) {
+		} else {
 			echo login_link();
 		}
 		echo '</li>';
 		echo '</ul>';
 		echo '</div>';
-		global $ALLOW_THEME_DROPDOWN;
 		echo  '<div id="hbottomright">';
 		//PERSO Extend header
 		$hook_print_header = new WT_Perso_Hook('h_print_header');
@@ -131,7 +135,7 @@ else {
 			echo $favmenu->getMenuAsList();
 			echo '</li> | ';			
 		}
-		if ($ALLOW_THEME_DROPDOWN && get_site_setting('ALLOW_USER_THEMES')) {
+		if (get_gedcom_setting(WT_GED_ID, 'ALLOW_THEME_DROPDOWN') && get_site_setting('ALLOW_USER_THEMES')) {
 			echo '<li>';
 			echo WT_MenuBar::getThemeMenu()->getMenuAsList();
 			echo '</li> | ';

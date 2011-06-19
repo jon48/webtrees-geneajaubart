@@ -27,14 +27,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: db_schema_3_4.php 10815 2011-02-13 17:16:04Z greg $
+// $Id: db_schema_3_4.php 11789 2011-06-12 09:24:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
-header('HTTP/1.0 403 Forbidden');
-exit;
+	header('HTTP/1.0 403 Forbidden');
+	exit;
 }
-
-define('WT_GM_DB_SCHEMA_3_4', '');
 
 self::exec(
 	"UPDATE `##module` m, `##module_setting` ms SET m.status=CASE WHEN (m.status=1 AND ms.setting_value=1) THEN 'enabled' ELSE 'disabled' END WHERE m.module_name=ms.module_name AND m.module_name='googlemap' AND ms.setting_name='GM_ENABLED'"

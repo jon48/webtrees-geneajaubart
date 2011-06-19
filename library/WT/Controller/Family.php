@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Family.php 11672 2011-06-01 06:11:38Z nigel $
+// @version $Id: Family.php 11743 2011-06-09 00:00:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -37,9 +37,9 @@ class WT_Controller_Family extends WT_Controller_Base {
 	var $family = null;
 	var $difffam = null;
 	var $accept_success = false;
+	var $reject_success = false;
 	var $user = null;
 	var $display = false;
-	var $show_changes = true;
 	var $famrec = '';
 	var $title = '';
 
@@ -86,7 +86,6 @@ class WT_Controller_Family extends WT_Controller_Base {
 		case 'accept':
 			if (WT_USER_CAN_ACCEPT) {
 				accept_all_changes($this->famid, WT_GED_ID);
-				$this->show_changes=false;
 				$this->accept_success=true;
 				//-- check if we just deleted the record and redirect to index
 				$gedrec = find_family_record($this->famid, WT_GED_ID);
@@ -101,8 +100,7 @@ class WT_Controller_Family extends WT_Controller_Base {
 		case 'undo':
 			if (WT_USER_CAN_ACCEPT) {
 				reject_all_changes($this->famid, WT_GED_ID);
-				$this->show_changes=false;
-				$this->accept_success=true;
+				$this->reject_success=true;
 				$gedrec = find_family_record($this->famid, WT_GED_ID);
 				//-- check if we just deleted the record and redirect to index
 				if (empty($gedrec)) {
@@ -124,9 +122,7 @@ class WT_Controller_Family extends WT_Controller_Base {
 			}
 		}
 
-		if ($this->show_changes) {
-			$this->family->diffMerge($this->difffam);
-		}
+		$this->family->diffMerge($this->difffam);
 	}
 
 	function getFamilyID() {
@@ -194,41 +190,6 @@ class WT_Controller_Family extends WT_Controller_Base {
 			$submenu->addId('menu-fam-orderchil');
 				$menu->addSubmenu($submenu);
 			}
-
-			$menu->addSeparator();
-		}
-
-		// show/hide changes
-		if (find_updated_record($this->getFamilyID(), WT_GED_ID)!==null) {
-			if (!$this->show_changes) {
-				$label = WT_I18N::translate('This record has been updated.  Click here to show changes.');
-				$link = $this->family->getHtmlUrl().'&amp;show_changes=yes';
-				$submenu = new WT_Menu($label, $link);
-				$submenu->addId('menu-fam-showchan');
-			} else {
-				$label = WT_I18N::translate('Click here to hide changes.');
-				$link = $this->family->getHtmlUrl().'&amp;show_changes=no';
-				$submenu = new WT_Menu($label, $link);
-				$submenu->addId('menu-fam-hidechan');
-			}
-			$submenu->addIcon('edit_fam');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
-			$menu->addSubmenu($submenu);
-
-			if (WT_USER_CAN_ACCEPT) {
-				$submenu = new WT_Menu(WT_I18N::translate('Undo all changes'), "family.php?famid={$this->famid}&amp;action=undo");
-				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
-				$submenu->addIcon('edit_fam');
-				$submenu->addId('menu-fam-undochan');
-				$menu->addSubmenu($submenu);
-				$submenu = new WT_Menu(WT_I18N::translate('Approve all changes'), "family.php?famid={$this->famid}&amp;action=accept");
-				$submenu->addIcon('edit_fam');
-				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
-				$submenu->addId('menu-fam-savechan');
-				$menu->addSubmenu($submenu);
-			}
-
-			$menu->addSeparator();
 		}
 
 		// edit/view raw gedcom
@@ -242,7 +203,7 @@ class WT_Controller_Family extends WT_Controller_Base {
 		} elseif ($SHOW_GEDCOM_RECORD) {
 			$submenu = new WT_Menu(WT_I18N::translate('View GEDCOM Record'));
 			$submenu->addIcon('gedcom');
-			if ($this->show_changes && WT_USER_CAN_EDIT) {
+			if (WT_USER_CAN_EDIT) {
 				$submenu->addOnclick("return show_gedcom_record('new');");
 			} else {
 				$submenu->addOnclick("return show_gedcom_record();");

@@ -1,10 +1,7 @@
-/**
+/*
  * Style for Standard theme
  *
- * Use this stylesheet to customize the display of your site.
- * To learn more about CSS visit http://www.w3.org/TR/REC-CSS2/
- *
- * webtrees:Web based Family History software
+ * webtrees: Web based Family History software
  * Copyright (C) 2011 webtrees development team.
  *
  * Derived from PhpGedView
@@ -17,26 +14,22 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * @package webtrees
- * @subpackage Themes
- * $Id: style.css 11720 2011-06-06 05:36:01Z nigel $
+ * $Id: style.css 11806 2011-06-13 00:21:19Z nigel $
  */
 
-
-.something {
-	/*empty style to make sure that the BODY style is not ignored */
-}
+/* Add a permanent scrollbar, to prevent "flickering" when hover effects lengthen page */
+html { overflow-y:scroll; }
 
 body {
-	color:black;
-	background-color:white;
+	color:#000000;
+	background-color:#FFFFFF;
 	font:12px tahoma, arial, helvetica, sans-serif;
 	margin:1px;
 	padding-left:5px;
@@ -53,7 +46,6 @@ legend {
 a {
 	color:#555555;
 	text-decoration:none;
-	font-family:tahoma, arial, helvetica, sans-serif;
 }
 
 a:hover	{
@@ -62,7 +54,7 @@ a:hover	{
 }
 
 :focus {
-  -moz-outline-style:none;
+  outline-style:none;
 }
 
 th {
@@ -143,7 +135,7 @@ table.center {
 .list_label, .list_label_wrap {
 	color:#ffffff;
 	background-color:#81a9cb;
-	font:bold 12px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:12px;
 	text-align:center;
 }
 
@@ -151,7 +143,7 @@ table.center {
 	background-color:#edf7f9;
 	color:black;
 	border:solid #81a9cb 1px;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	vertical-align:top;
 }
 
@@ -174,7 +166,7 @@ table.center {
 .facts_label {
 	color:#ffffff;
 	background-color:#81a9cb;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	padding:4px 4px 4px 4px;
 	width:20%;
 	text-align:center;
@@ -182,7 +174,7 @@ table.center {
 
 .facts_label02, .facts_label03 {
 	color:#ffffff;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	padding:4px 4px 4px 4px;
 	text-align:center;
 	font-weight:bold;
@@ -200,7 +192,7 @@ table.center {
 	background-color:#edf7fd;
 	color:black;
 	border:solid #81a9cb 1px;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	padding:4px 4px 4px 4px;
 }
 
@@ -208,14 +200,14 @@ table.center {
 	background-color:#edf7fd;
 	color:black;
 	border:solid #81a9cb 1px;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	padding:5px;
 }
 
 .facts_labelred, .facts_labelblue {
 	color:#ffffff;
 	background-color:#81a9cb;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	padding:4px 4px 4px 4px;
 	width:20%;
 	text-align:center;
@@ -224,7 +216,7 @@ table.center {
 .facts_valuered, .facts_valueblue {
 	background-color:#edf7fd;
 	color:black;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	padding:4px 4px 4px 4px;
 }
 
@@ -299,28 +291,28 @@ table.center {
 
 .name1 {
 	color:#333333;
-	font:bold 11px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:11px;
 }
 
 a:hover .name1 {
 	color:red;
-	font:bold 11px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:11px;
 }
 
 a:hover .name2 {
 	color:red;
-	font:bold 12px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:12px;
 }
 
 a:hover .nameZoom {
 	color:red;
-	font:bold 14px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:14px;
 }
 
 
 .name2 {
 	color:#333;
-	font:bold 12px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:12px;
 }
 
 .details1 {
@@ -328,16 +320,16 @@ a:hover .nameZoom {
 }
 
 .details2 {
-	font:normal 12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 }
 
 .nameZoom {
 	color:#333;
-	font:bold 14px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:14px;
 }
 
 .detailsZoom {
-	font:14px tahoma, arial, helvetica, sans-serif;
+	font-size:14px;
 	text-decoration:none;
 }
 
@@ -347,7 +339,7 @@ a:hover .nameZoom {
 
 .name_head {
 	color:#333;
-	font:bold 16px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:16px;
 	letter-spacing:.2px;
 	line-height:	2;
 	padding:0 5px;
@@ -366,19 +358,17 @@ a:hover .nameZoom {
 
 .error {
 	color:#dd0000;
-	font-family:tahoma, arial, helvetica, sans-serif;
 	font-weight:bold;
 }
 
 .largeError {
 	color:#dd0000;
-	font:large tahoma, arial, helvetica, sans-serif;
+	font-size:large;
 	font-weight:bold;
 }
 
 .warning {
 	color:red;
-	font-family:tahoma, arial, helvetica, sans-serif;
 	font-weight:bold;
 }
 
@@ -475,7 +465,7 @@ html[dir='rtl'] .icon, html[dir='rtl'] .adminicon {
 }
 
 .subheaders {
-	font:bold 15px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:15px;
 	margin-top:15px;
 	vertical-align:bottom;
 }
@@ -516,20 +506,6 @@ html[dir='rtl'] .icon, html[dir='rtl'] .adminicon {
 	font-weight:bold;
 }
 
-/* This is the original.
- * It's not used, but it's left in in case you want to go back to it. */
-.flag {
-	width:15px;
-	border:solid black 1px;
-}
-
-/* This one is for a place flag */
-.brightflag {
-	height:15px;
-	border:none;
-	opacity:1;		/* IE's support is different */
-}
-
 .border1 {
 	border:solid black 1px;
 }
@@ -550,21 +526,21 @@ html[dir='rtl'] .icon, html[dir='rtl'] .adminicon {
 .menuitem {
 	color:#555555;
 	text-decoration:none;
-	font:11px tahoma, arial, helvetica, sans-serif;
+	font-size:11px;
 	padding:1px;
 }
 
 .menuitem_hover {
 	color:black;
 	text-decoration:none;
-	font:11px tahoma, arial, helvetica, sans-serif;
+	font-size:11px;
 	padding:1px;
 }
 
 .submenu {
 	color:black;
 	text-decoration:none;
-	font:11px tahoma, arial, helvetica, sans-serif;
+	font-size:11px;
 	background-color:#edf7fd;
 	border:solid #81a9cb 1px;
 	white-space:nowrap;
@@ -578,7 +554,7 @@ html[dir='rtl'] .icon, html[dir='rtl'] .adminicon {
 	height:20px;
 	color:#555555;
 	text-decoration:none;
-	font:11px tahoma, arial, helvetica, sans-serif;
+	font-size:11px;
 	background-color:#edf7fd;
 	white-space:nowrap;
 	padding:1px;
@@ -588,7 +564,7 @@ html[dir='rtl'] .icon, html[dir='rtl'] .adminicon {
 	vertical-align:middle;
 	height:20px;
 	color:black;
-	font:11px tahoma, arial, helvetica, sans-serif;
+	font-size:11px;
 	background-color:#e6f0fa;
 	white-space:nowrap;
 	padding:1px;
@@ -605,7 +581,7 @@ html[dir='rtl'] .icon, html[dir='rtl'] .adminicon {
 }
 
 .news_title {
-	font:bold 14px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:14px;
 	color:black;
 }
 
@@ -649,13 +625,13 @@ html[dir='rtl'] .icon, html[dir='rtl'] .adminicon {
 
 .helpstart {
 	margin:10px;
-	font:bold 14px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:14px;
 	color:blue;
 	text-decoration:none;
 }
 
 .helptext {
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	color:black;
 }
 
@@ -666,7 +642,7 @@ html[dir='rtl'] .icon, html[dir='rtl'] .adminicon {
 #footer {
 	clear:both;
 	color:black;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	text-align:center;
 }
 
@@ -674,7 +650,7 @@ html[dir='rtl'] .icon, html[dir='rtl'] .adminicon {
 .small_inner_block {
 	max-height:200px;
 	overflow:auto;
-	font:normal 10px tahoma, arial, helvetica, sans-serif;
+	font-size:10px;
 }
 
 .normal_inner_block {
@@ -685,7 +661,7 @@ html[dir='rtl'] .icon, html[dir='rtl'] .adminicon {
 	background-color:#edf7fd;
 	color:black;
 	border:solid #81a9cb 1px;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	vertical-align:top;
 	margin-bottom:5px;
 	padding:1px;
@@ -855,7 +831,6 @@ left:auto;
 .listlog {
 	line-height:20pt;
 	color:#555555;
-	font-family:tahoma, arial, helvetica, sans-serif;
 }
 
 input, button, textarea {
@@ -866,7 +841,7 @@ input, button, textarea {
 	border-top-width:1px;
 	border-left-width:1px;
 	border-bottom-width:1px;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	border-right-width:1px;
 }
 
@@ -891,26 +866,26 @@ select {
 	border-top-width:1px;
 	border-left-width:1px;
 	border-bottom-width:1px;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	border-right-width:1px;
 }
 
 form {
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 }
 
 h2 {
 	color:#000066;
-	font:bold 18px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:18px;
 }
 
 h4 {
 	color:#000066;
-	font:bold 12px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:12px;
 }
 
 .formField {
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 }
 
 .starredname {
@@ -924,7 +899,6 @@ h4 {
 .title {
 	clear:both;
 	font-size:20px;
-	font-family:tahoma, arial, helvetica, sans-serif;
 	float:left;
 	padding-left:10px;
 }
@@ -953,7 +927,7 @@ html[dir='rtl'] .header_search {
 .topbottombar {
 	color:#ffffff;
 	background-color:#81a9cb;
-	font:bold 12px tahoma, arial, helvetica, sans-serif;
+	font-weight:bold; font-size:12px;
 	padding:4px;
 	text-align:center;
 }
@@ -964,7 +938,7 @@ html[dir='rtl'] .header_search {
 	background-color:#d1d9ef;
 	color:black;
 	border:solid #81a9cb 1px;
-	font:11px tahoma, arial, helvetica, sans-serif;
+	font-size:11px;
 	vertical-align:top;
 	white-space:nowrap;
 	padding:3px;
@@ -974,7 +948,7 @@ html[dir='rtl'] .header_search {
 .descriptionbox {
 	color:#ffffff;
 	background-color:#81a9cb;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	vertical-align:top;
 	padding:3px;
 }
@@ -989,7 +963,7 @@ html[dir='rtl'] .header_search {
 	background-color:#d1d9ef;
 	color:black;
 	border:solid #81a9cb 1px;
-	font:12px tahoma, arial, helvetica, sans-serif;
+	font-size:12px;
 	vertical-align:top;
 	white-space:nowrap;
 	padding:3px;
@@ -1141,14 +1115,14 @@ a.showit:hover span {
 	padding:3px;
 	background:#4f4f4f;
 	color:white;
-	font:15px tahoma, arial, helvetica, sans-serif;
+	font-size:15px;
 	text-align:left;
 	opacity:.85;
 	z-index:5;
 }
 
 .lifespan_people span:first-letter {
-	font:bold 16px tahoma, arial, helvetica, sans-serif;
+	font-size:16px;
 	font-variant:small-caps;
 	padding:1px;
 }
@@ -1212,7 +1186,6 @@ a.showit:hover span {
 	{
 		margin:0;
 		padding:0;
-		font-family:Arial;
 		font-size:10px;
 		list-style:none;
 	}
@@ -1245,7 +1218,6 @@ a.showit:hover span {
 	}
 
 .tag_cloud {
-	font-family:tahoma, arial, helvetica, sans-serif;
 	text-align:center;
 }
 .tag_cloud a {
@@ -1345,11 +1317,6 @@ ul.clist {
 	text-decoration:none;
 	color:#000000; 
 	margin:0px;
-}
-
-.menu_separator img {
-	height:3px;
-	width:8em;
 }
 
 .statistics_chart {
@@ -1482,7 +1449,6 @@ div.faq_body {
 	padding:0 10px;
 }
 
-.edit_link:after {content:" " url(images/edit.png);}/* used only on the user list */
 td.descriptionbox  a {color:#ffffff;}/* this keeps the tag color the same when it is a link as when not */
 .place {	padding-top:5px;}
 .logo {text-align:center;}
@@ -1505,9 +1471,6 @@ td.descriptionbox  a {color:#ffffff;}/* this keeps the tag color the same when i
 /* Menu icons */
 #main-menu  > li {background-image:url(images/large_menu_sprite.png); background-repeat:no-repeat; width:110px; height:64px; text-align:center;}
 #main-menu li li {background-image:url(images/small_menu_sprite.png); background-repeat:no-repeat; height:24px; left:auto; line-height:24px; text-align:left; text-indent:26px; width:100%}
-
-/* Separators */
-#main-menu li.separator {background: url(images/hline.png) repeat-x; display:block; height:3px; width:100%;}
 
 /* Reverse left and right on RTL pages */
 html[dir='rtl'] #topMenu {float:right;}
@@ -1562,25 +1525,19 @@ html[dir='rtl'] #main-menu  li li a {float:right;padding:1px 5px 1px 10px;}
 #menu-fam-change            {background-position:left   -90px;} html[dir=rtl] #menu-fam-change            {background-position:right   -90px;}
 #menu-fam-del               {background-position:left  -840px;} html[dir=rtl] #menu-fam-del               {background-position:right  -840px;}
 #menu-fam-editraw           {background-position:left  -240px;} html[dir=rtl] #menu-fam-editraw           {background-position:right  -240px;}
-#menu-fam-hidechan          {background-position:left  -750px;} html[dir=rtl] #menu-fam-hidechan          {background-position:right  -750px;}
 #menu-fam-orderchil         {background-position:left -1080px;} html[dir=rtl] #menu-fam-orderchil         {background-position:right -1080px;}
-#menu-fam-showchan          {background-position:left  -750px;} html[dir=rtl] #menu-fam-showchan          {background-position:right  -750px;}
-#menu-fam-undochan          {background-position:left  -750px;} html[dir=rtl] #menu-fam-undochan          {background-position:right  -750px;}
 #menu-help-contents         {background-position:left  -300px;} html[dir=rtl] #menu-help-contents         {background-position:right  -300px;}
+#menu-help-faq              {background-position:left  -300px;} html[dir=rtl] #menu-help-faq              {background-position:right  -300px;}
 #menu-help-genealogy        {background-position:left  -120px;} html[dir=rtl] #menu-help-genealogy        {background-position:right  -120px;}
-#menu-help-hide             {background-position:left  -300px;} html[dir=rtl] #menu-help-hide             {background-position:right  -330px;}
-#menu-help-show             {background-position:left  -300px;} html[dir=rtl] #menu-help-show             {background-position:right  -330px;}
+#menu-help-hide             {background-position:left  -300px;} html[dir=rtl] #menu-help-hide             {background-position:right  -300px;}
+#menu-help-show             {background-position:left  -300px;} html[dir=rtl] #menu-help-show             {background-position:right  -300px;}
 #menu-help-technical        {background-position:left  -120px;} html[dir=rtl] #menu-help-technical        {background-position:right  -120px;}
 #menu-help-wiki             {background-position:left  -690px;} html[dir=rtl] #menu-help-wiki             {background-position:right  -690px;}
 #menu-indi-addfav           {background-position:left  -870px;} html[dir=rtl] #menu-indi-addfav           {background-position:right  -870px;}
 #menu-indi-addname          {background-position:left  -780px;} html[dir=rtl] #menu-indi-addname          {background-position:right  -780px;}
 #menu-indi-del              {background-position:left  -840px;} html[dir=rtl] #menu-indi-del              {background-position:right  -840px;}
-#menu-indi-editname         {background-position:left  -750px;} html[dir=rtl] #menu-indi-editname         {background-position:right  -750px;}
 #menu-indi-editraw          {background-position:left  -240px;} html[dir=rtl] #menu-indi-editraw          {background-position:right  -240px;}
 #menu-indi-editsex          {background-position:left  -810px;} html[dir=rtl] #menu-indi-editsex          {background-position:right  -810px;}
-#menu-indi-hidechan         {background-position:left  -750px;} html[dir=rtl] #menu-indi-hidechan         {background-position:right  -750px;}
-#menu-indi-showchan         {background-position:left  -750px;} html[dir=rtl] #menu-indi-showchan         {background-position:right  -750px;}
-#menu-indi-undochan         {background-position:left  -750px;} html[dir=rtl] #menu-indi-undochan         {background-position:right  -750px;}
 #menu-list-fam              {background-position:left   -90px;} html[dir=rtl] #menu-list-fam              {background-position:right   -90px;}
 #menu-list-indi             {background-position:left  -120px;} html[dir=rtl] #menu-list-indi             {background-position:right  -120px;}
 #menu-list-note             {background-position:left  -420px;} html[dir=rtl] #menu-list-note             {background-position:right  -420px;}
@@ -1596,27 +1553,18 @@ html[dir='rtl'] #main-menu  li li a {float:right;padding:1px 5px 1px 10px;}
 #menu-note-del              {background-position:left  -840px;} html[dir=rtl] #menu-note-del              {background-position:right  -840px;}
 #menu-note-edit             {background-position:left -1020px;} html[dir=rtl] #menu-note-edit             {background-position:right -1020px;}
 #menu-note-editraw          {background-position:left  -240px;} html[dir=rtl] #menu-note-editraw          {background-position:right  -240px;}
-#menu-note-hidechan         {background-position:left -1020px;} html[dir=rtl] #menu-note-hidechan         {background-position:right -1020px;}
-#menu-note-savechan         {background-position:left -1020px;} html[dir=rtl] #menu-note-savechan         {background-position:right -1020px;}
-#menu-note-undochan         {background-position:left -1020px;} html[dir=rtl] #menu-note-undochan         {background-position:right -1020px;}
 #menu-obje-addfav           {background-position:left  -870px;} html[dir=rtl] #menu-obje-addfav           {background-position:right  -870px;}
 #menu-obje-del              {background-position:left  -840px;} html[dir=rtl] #menu-obje-del              {background-position:right  -840px;}
 #menu-obje-edit             {background-position:left -1110px;} html[dir=rtl] #menu-obje-edit             {background-position:right -1110px;}
 #menu-obje-editraw          {background-position:left  -240px;} html[dir=rtl] #menu-obje-editraw          {background-position:right  -240px;}
-#menu-obje-hidechan         {background-position:left -1110px;} html[dir=rtl] #menu-obje-hidechan         {background-position:right -1110px;}
 #menu-obje-link             {background-position:left -1140px;} html[dir=rtl] #menu-obje-link             {background-position:right -1140px;}
 #menu-obje-link-fam         {background-position:left   -90px;} html[dir=rtl] #menu-obje-link-fam         {background-position:right   -90px;}
 #menu-obje-link-indi        {background-position:left  -300px;} html[dir=rtl] #menu-obje-link-indi        {background-position:right  -300px;}
 #menu-obje-link-sour        {background-position:left  -180px;} html[dir=rtl] #menu-obje-link-sour        {background-position:right  -180px;}
-#menu-obje-savechan         {background-position:left -1110px;} html[dir=rtl] #menu-obje-savechan         {background-position:right -1110px;}
-#menu-obje-undochan         {background-position:left -1110px;} html[dir=rtl] #menu-obje-undochan         {background-position:right -1110px;}
 #menu-repo-addfav           {background-position:left  -870px;} html[dir=rtl] #menu-repo-addfav           {background-position:right  -870px;}
 #menu-repo-del              {background-position:left  -840px;} html[dir=rtl] #menu-repo-del              {background-position:right  -840px;}
 #menu-repo-edit             {background-position:left  -990px;} html[dir=rtl] #menu-repo-edit             {background-position:right  -990px;}
 #menu-repo-editraw          {background-position:left  -240px;} html[dir=rtl] #menu-repo-editraw          {background-position:right  -240px;}
-#menu-repo-hidechan         {background-position:left  -990px;} html[dir=rtl] #menu-repo-hidechan         {background-position:right  -990px;}
-#menu-repo-savechan         {background-position:left  -990px;} html[dir=rtl] #menu-repo-savechan         {background-position:right  -990px;}
-#menu-repo-undochan         {background-position:left  -990px;} html[dir=rtl] #menu-repo-undochan         {background-position:right  -990px;}
 #menu-report li             {background-position:left  -570px;} html[dir=rtl] #menu-report li             {background-position:right  -570px;}
 #menu-search-advanced       {background-position:left  -600px;} html[dir=rtl] #menu-search-advanced       {background-position:right  -600px;}
 #menu-search-general        {background-position:left  -600px;} html[dir=rtl] #menu-search-general        {background-position:right  -600px;}
@@ -1626,10 +1574,10 @@ html[dir='rtl'] #main-menu  li li a {float:right;padding:1px 5px 1px 10px;}
 #menu-sour-del              {background-position:left  -840px;} html[dir=rtl] #menu-sour-del              {background-position:right  -840px;}
 #menu-sour-edit             {background-position:left  -960px;} html[dir=rtl] #menu-sour-edit             {background-position:right  -960px;}
 #menu-sour-editraw          {background-position:left  -240px;} html[dir=rtl] #menu-sour-editraw          {background-position:right  -240px;}
-#menu-sour-hidechan         {background-position:left  -960px;} html[dir=rtl] #menu-sour-hidechan         {background-position:right  -960px;}
-#menu-sour-savechan         {background-position:left  -960px;} html[dir=rtl] #menu-sour-savechan         {background-position:right  -960px;}
-#menu-sour-undochan         {background-position:left  -960px;} html[dir=rtl] #menu-sour-undochan         {background-position:right  -960px;}
 #menu-tree li               {background-position:left  -240px;} html[dir=rtl] #menu-tree li               {background-position:right  -240px;}
+
+#menu-language li {text-align:left;} /* The language menu is always LTR, even on RTL pages */
+#menu-theme    li {text-align:left;} /* The theme menu is always LTR, even on RTL pages */
 
 /* ========= Login|Favorites|Theme|Language menu items ========== */
 #extra-menu {float:right;white-space:nowrap;	margin:20px 10px 0 0;}
@@ -1734,7 +1682,7 @@ html[dir='rtl'] #sidebar  {margin:5px 0 0 2px;}
 .sidebar-at-right #sidebar {	width:20%;}
 .use-sidebar.sidebar-at-right #sidebar, .sidebar-at-right #separator {float:right;}
 html[dir='rtl'] .use-sidebar.sidebar-at-right #sidebar, html[dir='rtl'] .sidebar-at-right #separator  {float:left;}
-#separator {float:right; display:block; background:#99c2ff url('images/general_sprite.png') no-repeat -26px 100px; width:0.75%; min-width: 6px; max-width:10px; border:1px solid #81a9cb; -moz-border-radius-topleft:3px; -moz-border-radius-topright:3px; margin-top:5px;}
+#separator {float:right; display:block; background:#99c2ff url('images/general_sprite.png') no-repeat -26px 100px; width:0.75%; min-width: 6px; max-width:10px; border:1px solid #81a9cb; border-top-left-radius:3px; border-top-right-radius:3px; margin-top:5px;}
 html[dir='rtl'] #separator {float:left; background:#99c2ff url('images/general_sprite.png') no-repeat -1px 100px;}
 .use-sidebar #separator {background:#99c2ff url('images/general_sprite.png') no-repeat -1px 100px;}
 html[dir='rtl'] .use-sidebar #separator {background:#99c2ff url('images/general_sprite.png') no-repeat -26px 100px;}
@@ -1751,8 +1699,9 @@ html[dir='rtl'] .flyout {text-align:right; left:210px;}
 html[dir='rtl'] .flyout2 {text-align:right; right:40px;}
 .flyout2 a:hover{color:#ff0000;}
 .flyout4 {color:#000000;	text-align:left; margin-top:0px;margin-left:0px; padding:3px;}
-#flyout3, #flyout3 a, #phusb, #pwife, #shusb, #swife, #spouse {background:none; border:none; text-decoration:none; text-align:left; margin-top:0px; left:0px; padding:0px;}
-html[dir='rtl'] #flyout3 {text-align:right;}
+.flyout3, .flyout3 a, #phusb, #pwife, #shusb, #swife, #spouse {background:none; border:none; text-decoration:none; text-align:left; margin-top:0px; left:0px; padding:0px;}
+html[dir='rtl'] .flyout3 {text-align:right;}
+.famnav_link div {font-size:10px;}
 
 /* Descendancy */
 #sb_content_descendancy {margin-top:5px;}
@@ -1777,9 +1726,10 @@ html[dir='rtl'] .desc_tree_div ul {margin-right:10px;margin-left:0px;}
 #sb_clippings_content li {list-style:none; margin:0px; padding:0px; white-space:nowrap;}
 
 /* References */
-#sb_content_extra_info {font-size:80%; font-weight:bold; margin-top:1px; padding:5px;}
+#sb_content_extra_info {font-size:80%; font-weight:bold; margin-top:1px; overflow:hidden; padding:5px;}
 #sb_content_extra_info .editfacts {float:right; margin-top:-30px;}
 html[dir='rtl'] #sb_content_extra_info .editfacts {float:left;}
 #sb_content_extra_info a {display:block;}
-#sb_content_extra_info span {font-weight:normal;}
+#sb_content_extra_info span {font-weight:normal; white-space:nowrap;}
+#sb_content_extra_info span a {display:inline;}
 #sb_content_extra_info #hitcounter {border-top: 1px solid #B2C7D7; font-weight: bold; padding-top: 5px;}

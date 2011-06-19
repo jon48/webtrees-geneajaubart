@@ -21,18 +21,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_mediadb.php 11600 2011-05-25 06:57:37Z larry $
+// $Id: functions_mediadb.php 11789 2011-06-12 09:24:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-define('WT_FUNCTIONS_MEDIADB_PHP', '');
-
 //-- Setup array of media types
 $MEDIATYPE = array("a11", "acb", "adc", "adf", "afm", "ai", "aiff", "aif", "amg", "anm", "ans", "apd", "asf", "au", "avi", "awm", "bga", "bmp", "bob", "bpt", "bw", "cal", "cel", "cdr", "cgm", "cmp", "cmv", "cmx", "cpi", "cur", "cut", "cvs", "cwk", "dcs", "dib", "dmf", "dng", "doc", "dsm", "dxf", "dwg", "emf", "enc", "eps", "fac", "fax", "fit", "fla", "flc", "fli", "fpx", "ftk", "ged", "gif", "gmf", "hdf", "iax", "ica", "icb", "ico", "idw", "iff", "img", "jbg", "jbig", "jfif", "jpe", "jpeg", "jp2", "jpg", "jtf", "jtp", "lwf", "mac", "mid", "midi", "miff", "mki", "mmm", ".mod", "mov", "mp2", "mp3", "mpg", "mpt", "msk", "msp", "mus", "mvi", "nap", "ogg", "pal", "pbm", "pcc", "pcd", "pcf", "pct", "pcx", "pdd", "pdf", "pfr", "pgm", "pic", "pict", "pk", "pm3", "pm4", "pm5", "png", "ppm", "ppt", "ps", "psd", "psp", "pxr", "qt", "qxd", "ras", "rgb", "rgba", "rif", "rip", "rla", "rle", "rpf", "rtf", "scr", "sdc", "sdd", "sdw", "sgi", "sid", "sng", "swf", "tga", "tiff", "tif", "txt", "text", "tub", "ul", "vda", "vis", "vob", "vpg", "vst", "wav", "wdb", "win", "wk1", "wks", "wmf", "wmv", "wpd", "wxf", "wp4", "wp5", "wp6", "wpg", "wpp", "xbm", "xls", "xpm", "xwd", "yuv", "zgm");
-$BADMEDIA = array(".", "..", "CVS", "thumbs", "index.php", "MediaInfo.txt", ".cvsignore", ".svn", "watermark");
+$BADMEDIA = array(".", "..", "thumbs", "index.php", "MediaInfo.txt", ".svn", "watermark");
 
 /*
 ****************************
@@ -443,6 +441,8 @@ if (!$excludeLinks) {
 * The medialist that is returned contains the following elements:
 * - REMOVED $media["ID"]          the unique id of this media item in the table (Mxxxx)
 * - $media["XREF"]        Another copy of the Media ID (not sure why there are two)
+* -	$media["FILESORT"]            key to sort by filename
+* -	$media["MEDIASORT"]           key to sort by media name
 * - REMOVED $media["GEDFILE"]     the gedcom file the media item should be added to
 * - REMOVED $media["FILE"]        the filename of the media item
 * - REMOVED $media["EXISTS"]      whether the file exists.  0=no, 1=external, 2=std dir, 3=protected dir
@@ -453,15 +453,15 @@ if (!$excludeLinks) {
 * - REMOVED $media["TITL"]        a title for the item, used for list display
 * - REMOVED $media["GEDCOM"]      gedcom record snippet
 * - REMOVED $media["LEVEL"]       level number (normally zero)
-* - $media["LINKED"]      Flag for front end to indicate this is linked
-* - $media["LINKS"]       Array of gedcom ids that this is linked to
-* - $media["CHANGE"]      Indicates the type of change waiting admin approval
+* - REMOVED $media["LINKED"]      Flag for front end to indicate this is linked
+* - REMOVED $media["LINKS"]       Array of gedcom ids that this is linked to
+* - REMOVED $media["CHANGE"]      Indicates the type of change waiting admin approval
 *
 * @param boolean $random If $random is true then the function will return 5 random pictures.
 * @return mixed A media list array.
 */
 
-function get_medialist2($currentdir = false, $directory = "", $linkonly = false, $random = false, $includeExternal = true, $excludeLinks = false) {
+function get_medialist2($currentdir = false, $directory = "", $linkonly = false, $random = false, $includeExternal = true) {
 	global $MEDIA_DIRECTORY_LEVELS, $BADMEDIA, $thumbdir, $MEDIATYPE;
 	global $level, $dirs, $MEDIA_DIRECTORY;
 	global $MEDIA_EXTERNAL;
@@ -479,21 +479,20 @@ function get_medialist2($currentdir = false, $directory = "", $linkonly = false,
 	$myDir = str_replace($MEDIA_DIRECTORY, "", $directory);
 	if ($random) {
 		$rows=
-			WT_DB::prepare("SELECT m_id, m_file, m_media, m_gedrec, m_titl, m_gedfile FROM `##media` WHERE m_gedfile=? ORDER BY RAND() LIMIT 5")
+			WT_DB::prepare("SELECT m_file, m_media, m_titl, m_gedfile FROM `##media` WHERE m_gedfile=? ORDER BY RAND() LIMIT 5")
 			->execute(array(WT_GED_ID))
 			->fetchAll();
 	} else if ($MEDIA_EXTERNAL && $includeExternal) {
 		$rows=
-			WT_DB::prepare("SELECT m_id, m_file, m_media, m_gedrec, m_titl, m_gedfile FROM `##media` WHERE m_gedfile=? AND (m_file LIKE ? OR m_file LIKE ?) ORDER BY m_id desc")
+			WT_DB::prepare("SELECT m_file, m_media, m_titl, m_gedfile FROM `##media` WHERE m_gedfile=? AND (m_file LIKE ? OR m_file LIKE ?) ORDER BY m_titl desc")
 			->execute(array(WT_GED_ID, "%{$myDir}%", "%://%"))
 			->fetchAll();
 	} else {
 		$rows=
-			WT_DB::prepare("SELECT m_id, m_file, m_media, m_gedrec, m_titl, m_gedfile FROM `##media` WHERE m_gedfile=? AND m_file LIKE ? ORDER BY m_id desc")
+			WT_DB::prepare("SELECT m_file, m_media, m_titl, m_gedfile FROM `##media` WHERE m_gedfile=? AND m_file LIKE ? ORDER BY m_titl desc")
 			->execute(array(WT_GED_ID, "%{$myDir}%"))
 			->fetchAll();
 	}
-	$mediaObjects = array ();
 
 	// Build the raw medialist array,
 	// but weed out any folders we're not interested in
@@ -503,9 +502,6 @@ function get_medialist2($currentdir = false, $directory = "", $linkonly = false,
 		if ($isExternal || !$currentdir || $directory == dirname($fileName) . "/") {
 			$media = array ();
 			$media["XREF"] = $row->m_media;
-			$media["LINKED"] = false;
-			$media["LINKS"] = array ();
-			$media["CHANGE"] = "";
 			// Build sort paramters to be used by filesort and mediasort
 			$media["FILESORT"] = basename($fileName);
 			$media["MEDIASORT"] = (!empty($row->m_titl)) ? $row->m_titl : $media["FILESORT"];
@@ -518,52 +514,10 @@ function get_medialist2($currentdir = false, $directory = "", $linkonly = false,
 			}
 			$keyMediaList = $firstChar . substr("000000" . $restChar, -6) . "_" . $row->m_gedfile;
 			$medialist[$keyMediaList] = $media;
-			$mediaObjects[] = $media["XREF"];
 		}
 	}
 
-	// Look for new Media objects in the list of changes pending approval
-	// At the same time, accumulate a list of GEDCOM IDs that have changes pending approval
-
-	$changedRecords = array ();
-
-	// Search the list of GEDCOM changes pending approval.  There may be some new
-	// links to new or old media items that haven't been approved yet.
-	// Logic:
-	//   Make sure the array $changedRecords contains unique entries.  Ditto for array
-	//   $mediaObjects.
-	//   Read each of the entries in array $changedRecords.  Get the matching record from
-	//   the GEDCOM file.  Search the GEDCOM record for each of the entries in array
-	//   $mediaObjects.  A hit means that the GEDCOM record contains a link to the
-	//   media object.  If we don't already know about the link, add it to that media
-	//   object's link table.
-	$mediaObjects = array_unique($mediaObjects);
-	$changedRecords = array_unique($changedRecords);
-	foreach ($changedRecords as $pid) {
-		$gedrec = find_updated_record($pid, WT_GED_ID);
-		if ($gedrec) {
-			foreach ($mediaObjects as $mediaId) {
-				if (strpos($gedrec, "@" . $mediaId . "@")) {
-					// Build the key for the medialist
-					$firstChar = substr($mediaId, 0, 1);
-					$restChar = substr($mediaId, 1);
-					if (is_numeric($firstChar)) {
-						$firstChar = "";
-						$restChar = $mediaId;
-					}
-					$keyMediaList = $firstChar . substr("000000" . $restChar, -6) . "_" . WT_GED_ID;
-
-					// Add this GEDCOM ID to the link list of the media object
-					if (isset ($medialist[$keyMediaList])) {
-						$medialist[$keyMediaList]["LINKS"][$pid] = gedcom_record_type($pid, WT_GED_ID);
-						$medialist[$keyMediaList]["LINKED"] = true;
-					}
-				}
-			}
-		}
-	}
-
-	uasort($medialist, "mediasort");
+	// uasort($medialist, "mediasort");
 
 	//-- for the media list do not look in the directory
 	if ($linkonly)
@@ -708,7 +662,7 @@ function filterMedia($media, $filter, $acceptExt) {
 
 	$filter=utf8_strtoupper($filter);
 
-	//-- Accept when filter string contained in file name (but only for editing users)
+	//-- Accept when filter string contained in filename (but only for editing users)
 	if (WT_USER_CAN_EDIT && strstr(utf8_strtoupper(basename($media["FILE"])), $filter))
 		return true;
 
@@ -781,7 +735,7 @@ function filterMedia2($media, $filter, $acceptExt) {
 
 	$filter=utf8_strtoupper($filter);
 
-	//-- Accept when filter string contained in file name (but only for editing users)
+	//-- Accept when filter string contained in filename (but only for editing users)
 	if (WT_USER_CAN_EDIT && strstr(utf8_strtoupper(basename($mediaobject->getFilename())), $filter))
 		return true;
 
@@ -795,16 +749,17 @@ function filterMedia2($media, $filter, $acceptExt) {
 	if (strpos(utf8_strtoupper($mediaobject->title), $filter)!==false)
 		return true;
 
+	// TODO: convert this to the API
 	//-- Accept when filter string contained in name of any item
 	//-- this Media item is linked to.  (Privacy already checked)
-	foreach ($media['LINKS'] as $id=>$type) {
-		$record=WT_GedcomRecord::getInstance($id);
-		foreach ($record->getAllNames() as $name) {
-			if (strpos(utf8_strtoupper($name['full']), $filter)!==false) {
-				return true;
-			}
-		}
-	}
+//	foreach ($media['LINKS'] as $id=>$type) {
+//		$record=WT_GedcomRecord::getInstance($id);
+//		foreach ($record->getAllNames() as $name) {
+//			if (strpos(utf8_strtoupper($name['full']), $filter)!==false) {
+//				return true;
+//			}
+//		}
+//	}
 
 	return false;
 }
@@ -816,7 +771,7 @@ function filterMedia2($media, $filter, $acceptExt) {
 *
 * @author roland-d
 * @param string $filename The full filename of the media item
-* @param bool $generateThumb 'true' when thumbnail should be generated, 'false' when only the file name should be returned
+* @param bool $generateThumb 'true' when thumbnail should be generated, 'false' when only the filename should be returned
 * @param bool $overwrite 'true' to replace existing thumbnail
 * @return string the location of the thumbnail
 */
@@ -1029,7 +984,7 @@ function display_silhouette(array $config = array()) {
 * takes a filename, split it in parts and then recreates it according to the
 * chosen media depth
 *
-* When the input file name is a URL, this routine does nothing.  Only http:// URLs
+* When the input filename is a URL, this routine does nothing.  Only http:// URLs
 * are supported.
 *
 * @author roland-d
@@ -1289,7 +1244,7 @@ function process_uploadMedia_form() {
 
 			$error = "";
 
-			// Determine file name on server
+			// Determine filename on server
 			$fileName = trim(trim(safe_POST('filename'.$i, WT_REGEX_NOSCRIPT)), '/');
 			$parts = pathinfo_utf($fileName);
 			if (!empty($parts["basename"])) {
@@ -1299,13 +1254,13 @@ function process_uploadMedia_form() {
 					// Strip invalid extension from supplied name
 					$lastDot = strrpos($mediaFile, '.');
 					if ($lastDot !== false) $mediaFile = substr($mediaFile, 0, $lastDot);
-					// Use extension of original uploaded file name
+					// Use extension of original uploaded filename
 					if (!empty($_FILES["mediafile".$i]["name"])) $parts = pathinfo_utf($_FILES["mediafile".$i]["name"]);
 					else $parts = pathinfo_utf($_FILES["thumbnail".$i]["name"]);
 					if (!empty($parts["extension"])) $mediaFile .= ".".$parts["extension"];
 				}
 			} else {
-				// User did not specify a name to be used on the server:  use the original uploaded file name
+				// User did not specify a name to be used on the server:  use the original uploaded filename
 				if (!empty($_FILES["mediafile".$i]["name"])) $parts = pathinfo_utf($_FILES["mediafile".$i]["name"]);
 				else $parts = pathinfo_utf($_FILES["thumbnail".$i]["name"]);
 				$mediaFile = $parts["basename"];
@@ -1515,9 +1470,9 @@ function show_media_form($pid, $action = "newentry", $filename = "", $linktoid =
 	echo "<table class=\"facts_table center ", $TEXT_DIRECTION, "\">";
 	echo "<tr><td class=\"topbottombar\" colspan=\"2\">";
 	if ($action == "newentry") {
-		echo WT_I18N::translate('Add a new media item');
+		echo WT_I18N::translate('Add a new media object');
 	} else {
-		echo WT_I18N::translate('Edit Media Item (%s)', $pid);
+		echo WT_I18N::translate('Edit media object');
 	}
 	echo "</td></tr>";
 	echo "<tr><td colspan=\"2\" class=\"descriptionbox\"><input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\" /></td></tr>";
@@ -1582,7 +1537,7 @@ function show_media_form($pid, $action = "newentry", $filename = "", $linktoid =
 		}
 		else echo "<input type=\"hidden\" name=\"genthumb\" value=\"yes\" />";
 	}
-	// File name on server
+	// Filename on server
 	$isExternal = isFileExternal($gedfile);
 	if ($gedfile == "FILE") {
 		if (WT_USER_GEDCOM_ADMIN) {
@@ -1837,13 +1792,13 @@ function show_media_form($pid, $action = "newentry", $filename = "", $linktoid =
 	}
 	if (WT_USER_IS_ADMIN) {
 		echo "<tr><td class=\"descriptionbox ", $TEXT_DIRECTION, " wrap width25\">";
-		echo WT_I18N::translate('Admin Option'), help_link('no_update_CHAN'), "</td><td class=\"optionbox wrap\">";
+		echo WT_Gedcom_Tag::getLabel('CHAN'), "</td><td class=\"optionbox wrap\">";
 		if ($NO_UPDATE_CHAN) {
 			echo "<input type=\"checkbox\" checked=\"checked\" name=\"preserve_last_changed\" />";
 		} else {
 			echo "<input type=\"checkbox\" name=\"preserve_last_changed\" />";
 		}
-		echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), "<br />";
+		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN'), "<br />";
 		$event = new WT_Event(get_sub_record(1, "1 CHAN", $gedrec));
 		echo format_fact_date($event, false, true);
 		echo "</td></tr>";
@@ -2193,7 +2148,7 @@ function getImageInfoForLog($filename) {
 	$filesize = sprintf("%.2f", filesize($filename)/1024);
 	$imgsize = @getimagesize($filename);
 	$strinfo = $filesize."kb ";
-	if (is_array($imgsize)) { $strinfo .= @$imgsize[0]."x".@$imgsize[1]." ".@$imgsize['bits']." bits ".@$imgsize['channels']. " channels"; }
+	if (is_array($imgsize)) { $strinfo .= @$imgsize[0].' × '.@$imgsize[1]." ".@$imgsize['bits']." bits ".@$imgsize['channels']. " channels"; }
 	return ($strinfo);
 }
 

@@ -30,14 +30,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: db_schema_3_4.php 10498 2011-01-17 18:27:10Z greg $
+// $Id: db_schema_3_4.php 11789 2011-06-12 09:24:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-define('WT_DB_SCHEMA_3_4', '');
 
 self::exec(
 	"INSERT IGNORE INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value)".

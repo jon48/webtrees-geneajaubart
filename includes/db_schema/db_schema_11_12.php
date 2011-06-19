@@ -1,9 +1,11 @@
 <?php
-// Update the database schema from version 4 to version 5
-// - add support for sorting gedcoms non-alphabetically
+// Update the database schema from version 11 to 12
+// - delete the wt_name.n_list column; it has never been used
+// - a bug in webtrees 1.1.2 caused the wt_name.n_full column
+// to include slashes around the surname.  These are unnecessary,
+// and cause problems when we try to match the name from the
+// gedcom with the name from the table.
 //
-// Also clean out some old/unused values and files.
-// 
 // The script should assume that it can be interrupted at
 // any point, and be able to continue by re-running the script.
 // Fatal errors, however, should be allowed to throw exceptions,
@@ -28,30 +30,23 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: db_schema_4_5.php 11789 2011-06-12 09:24:50Z greg $
+// $Id: db_schema_10_11.php 11634 2011-05-28 17:26:04Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
+// Remove slashes from INDI names
+self::exec("UPDATE `##name` SET n_full=REPLACE(n_full, '/', '') WHERE n_surn IS NOT NULL");
+
+// Remove the n_list column
 try {
-	self::exec("ALTER TABLE `##gedcom` ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0");
-} catch (PDOException $ex) {
-	// If this fails, it has probably already been done.
+	self::exec("ALTER TABLE `##name` DROP n_list");
+} catch (PDOException $x) {
+	// Already done?
 }
-
-try {
-	self::exec("ALTER TABLE `##gedcom` ADD INDEX ix1 (sort_order)");
-} catch (PDOException $ex) {
-	// If this fails, it has probably already been done.
-}
-
-// No longer used
-self::exec("DELETE FROM `##gedcom_setting` WHERE setting_name IN ('PAGE_AFTER_LOGIN')");
-
-// Change of defaults - do not add ASSO, etc. to NOTE objects
-self::exec("UPDATE `##gedcom_setting` SET setting_value='SOUR' WHERE setting_value='ASSO,SOUR,NOTE,REPO' AND setting_name='NOTE_FACTS_ADD'");
 
 // Update the version to indicate success
 set_site_setting($schema_name, $next_version);
+

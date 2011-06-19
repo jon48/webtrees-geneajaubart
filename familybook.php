@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: familybook.php 11417 2011-04-30 11:17:30Z greg $
+// $Id: familybook.php 11785 2011-06-11 22:08:12Z greg $
 
 define('WT_SCRIPT_NAME', 'familybook.php');
 require './includes/session.php';
@@ -214,7 +214,6 @@ if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
 // LBox =====================================================================================
 if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 }
 // ==========================================================================================

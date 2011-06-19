@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Media.php 11683 2011-06-02 04:47:00Z nigel $
+// $Id: Media.php 11768 2011-06-10 10:53:41Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -34,7 +34,8 @@ require_once WT_ROOT.'includes/functions/functions_import.php';
 class WT_Controller_Media extends WT_Controller_Base {
 	var $mid;
 	var $mediaobject;
-	var $show_changes=true;
+	var $accept_success = false;
+	var $reject_success = false;
 
 	function init() {
 		global $MEDIA_DIRECTORY;
@@ -72,9 +73,9 @@ class WT_Controller_Media extends WT_Controller_Base {
 			}
 		}
 
-		//Checks to see if the File Name ($filename) exists
+		//Checks to see if the filename ($filename) exists
 		if (!empty($filename)) {
-			//If the File Name ($filename) is set, then it will call the method to get the Media ID ($this->mid) from the File Name ($filename)
+			//If the filename ($filename) is set, then it will call the method to get the Media ID ($this->mid) from the filename ($filename)
 			$this->mid = get_media_id_from_file($filename);
 			if (!$this->mid) {
 				//This will set the Media ID to be false if the File given doesn't match to anything in the database
@@ -118,7 +119,6 @@ class WT_Controller_Media extends WT_Controller_Base {
 		case 'accept':
 			if (WT_USER_CAN_ACCEPT) {
 				accept_all_changes($this->pid, WT_GED_ID);
-				$this->show_changes=false;
 				$this->accept_success=true;
 				//-- check if we just deleted the record and redirect to index
 				$mediarec = find_media_record($this->pid, WT_GED_ID);
@@ -133,8 +133,7 @@ class WT_Controller_Media extends WT_Controller_Base {
 		case 'undo':
 			if (WT_USER_CAN_ACCEPT) {
 				reject_all_changes($this->pid, WT_GED_ID);
-				$this->show_changes=false;
-				$this->accept_success=true;
+				$this->reject_success=true;
 				$mediarec = find_media_record($this->pid, WT_GED_ID);
 				//-- check if we just deleted the record and redirect to index
 				if (empty($mediarec)) {
@@ -185,7 +184,7 @@ class WT_Controller_Media extends WT_Controller_Base {
 		$menu->addId('menu-obje');
 
 		if (WT_USER_CAN_EDIT) {
-			$submenu = new WT_Menu(WT_I18N::translate('Edit media'));
+			$submenu = new WT_Menu(WT_I18N::translate('Edit media object'));
 			$submenu->addOnclick("window.open('addmedia.php?action=editmedia&pid={$this->pid}', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1')");
 			$submenu->addIcon('edit_media');
 			$submenu->addId('menu-obje-edit');
@@ -228,40 +227,6 @@ class WT_Controller_Media extends WT_Controller_Base {
 				$submenu->addSubMenu($ssubmenu);
 			}
 			$menu->addSubmenu($submenu);
-
-			$menu->addSeparator();
-		}
-
-		// show/hide changes
-		if (find_updated_record($this->pid, WT_GED_ID)!==null) {
-			if (!$this->show_changes) {
-				$label = WT_I18N::translate('This record has been updated.  Click here to show changes.');
-				$link = "mediaviewer.php?mid={$this->pid}&amp;show_changes=yes";
-				$submenu = new WT_Menu($label, $link);
-				$submenu->addId('menu-obje-showchan');
-			} else {
-				$label = WT_I18N::translate('Click here to hide changes.');
-				$link = "mediaviewer.php?mid={$this->pid}&samp;how_changes=no";
-				$submenu = new WT_Menu($label, $link);
-				$submenu->addId('menu-obje-hidechan');
-			}
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
-			$menu->addSubmenu($submenu);
-
-			if (WT_USER_CAN_ACCEPT) {
-				$submenu = new WT_Menu(WT_I18N::translate('Undo all changes'), "mediaviewer.php?mid={$this->pid}&amp;action=undo");
-				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
-				$submenu->addIcon('media');
-				$submenu->addId('menu-obje-undochan');
-				$menu->addSubmenu($submenu);
-				$submenu = new WT_Menu(WT_I18N::translate('Approve all changes'), "mediaviewer.php?mid={$this->pid}&amp;action=accept");
-				$submenu->addIcon('media');
-				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
-				$submenu->addId('menu-obje-savechan');
-				$menu->addSubmenu($submenu);
-			}
-
-			$menu->addSeparator();
 		}
 
 		// edit/view raw gedcom
@@ -275,7 +240,7 @@ class WT_Controller_Media extends WT_Controller_Base {
 		} elseif ($SHOW_GEDCOM_RECORD) {
 			$submenu = new WT_Menu(WT_I18N::translate('View GEDCOM Record'));
 			$submenu->addIcon('gedcom');
-			if ($this->show_changes && WT_USER_CAN_EDIT) {
+			if (WT_USER_CAN_EDIT || WT_USER_CAN_ACCEPT) {
 				$submenu->addOnclick("return show_gedcom_record('new');");
 			} else {
 				$submenu->addOnclick("return show_gedcom_record();");
@@ -325,22 +290,15 @@ class WT_Controller_Media extends WT_Controller_Base {
 	* @return array
 	*/
 	function getFacts($includeFileName=true) {
-		$ignore = array("TITL","FILE");
-		if ($this->show_changes) {
-			$ignore = array();
-		} elseif (WT_USER_GEDCOM_ADMIN) {
-			$ignore = array("TITL");
-		}
-
-		$facts = $this->mediaobject->getFacts($ignore);
+		$facts = $this->mediaobject->getFacts(array());
 		sort_facts($facts);
 		//if ($includeFileName) $facts[] = new WT_Event("1 FILE ".$this->mediaobject->getFilename());
 		$mediaType = $this->mediaobject->getMediatype();
 		$facts[] = new WT_Event("1 TYPE ".WT_Gedcom_Tag::getFileFormTypeValue($mediaType));
 
-		if ($this->show_changes && ($newrec=find_updated_record($this->pid, WT_GED_ID))!==null) {
+		if (($newrec=find_updated_record($this->pid, WT_GED_ID))!==null) {
 			$newmedia = new WT_Media($newrec);
-			$newfacts = $newmedia->getFacts($ignore);
+			$newfacts = $newmedia->getFacts(array());
 			$newimgsize = $newmedia->getImageAttributes();
 			if ($includeFileName) $newfacts[] = new WT_Event("1 TYPE ".WT_Gedcom_Tag::getFileFormTypeValue($mediaType));
 			$newfacts[] = new WT_Event("1 FORM ".$newimgsize['ext']);
@@ -379,10 +337,10 @@ class WT_Controller_Media extends WT_Controller_Base {
 			// get height and width of image, when available
 			$imgsize = $this->mediaobject->getImageAttributes();
 			if (!empty($imgsize['WxH'])) {
-				$facts[] = new WT_Event("1 EVEN " . '<span dir="ltr">' . $imgsize['WxH'] . '</span>' . "\n2 TYPE image_size");
+				$facts[] = new WT_Event('1 __IMAGE_SIZE__ '.$imgsize['WxH']);
 			}
 			//Prints the file size
-			$facts[] = new WT_Event("1 EVEN " . '<span dir="ltr">' . $this->mediaobject->getFilesize(). '</span>' . "\n2 TYPE file_size");
+			$facts[] = new WT_Event('1 __FILE_SIZE__ '.$this->mediaobject->getFilesize());
 		}
 
 		sort_facts($facts);
@@ -402,7 +360,7 @@ class WT_Controller_Media extends WT_Controller_Base {
 	}
 
 	/**
-	* get the file name on the server
+	* get the filename on the server
 	* @return string
 	*/
 	function getServerFilename() {

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_media.php 11696 2011-06-03 10:39:33Z greg $
+// $Id: admin_media.php 11785 2011-06-11 22:08:12Z greg $
 
  /* TODO:
  * Add check for missing index.php files when creating a directory
@@ -307,7 +307,7 @@ function checkpath(folder) {
 }
 
 function showchanges() {
-	window.location = '<?php echo WT_SCRIPT_NAME."?show_changes=yes&directory=".$directory."&level=".$level."&filter=".$filter."&subclick=".$subclick; ?>';
+	window.location = '<?php echo WT_SCRIPT_NAME."?directory=".$directory."&level=".$level."&filter=".$filter."&subclick=".$subclick; ?>';
 }
 
 //-->
@@ -784,10 +784,10 @@ if (check_media_structure()) {
 	<input type="hidden" name="subclick" value="<?php echo $subclick; ?>"/>
 	<table class="media_items <?php echo $TEXT_DIRECTION; ?>">
 		<tr align="center">
-			<td class="wrap"><?php echo WT_I18N::translate('Sequence'), help_link('sortby'); ?>
+			<td class="wrap"><?php echo /* I18N: Label for list of sort options */ WT_I18N::translate('Sort order'); ?>
 				<select name="sortby">
-					<option value="title" <?php if ($sortby=='title') echo "selected=\"selected\""; ?>><?php echo WT_Gedcom_Tag::getLabel('TITL'); ?></option>
-					<option value="file" <?php if ($sortby=='file') echo "selected=\"selected\""; ?>><?php echo WT_Gedcom_Tag::getLabel('FILE'); ?></option>
+					<option value="title" <?php if ($sortby=='title') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('sort by title'); ?></option>
+					<option value="file" <?php if ($sortby=='file') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('sort by filename'); ?></option>
 				</select>
 			</td>
 			<td class="wrap">
@@ -798,7 +798,7 @@ if (check_media_structure()) {
 				<?php echo "<a href=\"#\" onclick=\"expand_layer('uploadmedia');\">".WT_I18N::translate('Upload media files')."</a>". help_link('upload_media'); ?>
 			</td>-->
 			<td class="wrap">
-				<a href="javascript: <?php echo WT_I18N::translate('Add media'); ?>" onclick="window.open('addmedia.php?action=showmediaform&amp;linktoid=new', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1'); return false;"> <?php echo WT_I18N::translate('Add a new media item')."</a>". help_link('add_media'); ?>
+				<a href="javascript:;" onclick="window.open('addmedia.php?action=showmediaform&amp;linktoid=new', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1'); return false;"> <?php echo WT_I18N::translate('Add a new media object')."</a>". help_link('add_media'); ?>
 			</td>
 				<?php
 					$tempURL = WT_SCRIPT_NAME.'?';
@@ -1026,7 +1026,6 @@ if (check_media_structure()) {
 			if (WT_USE_LIGHTBOX) {
 				// Get Lightbox config variables
 				// Following two lines are temporarily removed as they cause problems. BH 07/01/2011
-				//require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 				//require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 			}
 
@@ -1244,7 +1243,7 @@ echo WT_JS_START; ?>
 							}
 						}
 						if (substr($mediaInfo['type'], 0, 4) != 'url_' && !empty($imgsize[0])) {
-							echo "<sub>&nbsp;&nbsp;".WT_I18N::translate('Image Dimensions')." -- ".$imgsize[0]."x".$imgsize[1]."</sub><br />";
+							echo WT_Gedcom_Tag::getLabelValue('__IMAGE_SIZE__', $imgsize[0].' × '.$imgsize[1]);
 						}
 						print_fact_notes($media["GEDCOM"], 1);
 						print_fact_sources($media["GEDCOM"], 1);

@@ -26,14 +26,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: db_schema_9_10.php 11079 2011-03-07 21:48:01Z greg $
+// $Id: db_schema_9_10.php 11789 2011-06-12 09:24:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-define('WT_DB_SCHEMA_9_10', '');
 
 // A bug in the original version of db_schema_8_9 failed to update this :-(
 // Do it again....

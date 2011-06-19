@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Hourglass.php 10639 2011-01-30 09:35:14Z lukasz $
+// @version $Id: Hourglass.php 11738 2011-06-08 19:58:49Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -46,7 +46,6 @@ $nonfamfacts[] = "";
 class WT_Controller_Hourglass extends WT_Controller_Base {
 	var $pid = "";
 
-	var $accept_success = false;
 	var $canedit = false;
 	var $name_count = 0;
 	var $total_names = 0;

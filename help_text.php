@@ -1,35 +1,34 @@
 <?php
-/**
- * Show help text in a popup window.
- *
- * This file also serves as a database of fact and label descriptions,
- * allowing them to be discovered by xgettext, so we may use them dynamically
- * in the rest of the code.
- * Help links are generated using help_link('help_topic')
- *
- * Help text for modules belongs in WT_MODULES_DIR/XXX/help_text.php
- * Module help links are generated using help_link('help_topic', 'module')
- *
- * Copyright (C) 2011 Greg Roach
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @version $Id: help_text.php 11704 2011-06-04 09:09:12Z greg $
- * @version: p_$Revision$ $Date$
- * $HeadURL$
- */
+// Show help text in a popup window.
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// This file also serves as a database of fact and label descriptions,
+// allowing them to be discovered by xgettext, so we may use them dynamically
+// in the rest of the code.
+// Help links are generated using help_link('help_topic')
+//
+// Help text for modules belongs in WT_MODULES_DIR/XXX/help_text.php
+// Module help links are generated using help_link('help_topic', 'module')
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: help_text.php 11753 2011-06-09 16:39:50Z greg $
+// @version: p_$Revision$ $Date$
+// $HeadURL$
 
 define('WT_SCRIPT_NAME', 'help_text.php');
 
@@ -1874,10 +1873,6 @@ case 'SHOW_MEDIA_DOWNLOAD':
 	$text=WT_I18N::translate('The Media Viewer can show a link which, when clicked, will download the Media file to the local PC.<br /><br />You may want to hide the download link for security reasons.');
 	break;
 
-case 'SHOW_MEDIA_FILENAME':
-	$title=WT_I18N::translate('Show file name in media viewer');
-	$text=WT_I18N::translate('The Media Viewer can show the name of the Media file being viewed.  This option determines whether that file name is shown to users or not.<br /><br />You may want to hide the file name for security reasons.');
-	break;
 
 case 'SHOW_NO_WATERMARK':
 	$title=WT_I18N::translate('Who can view non-watermarked images?');
@@ -2098,7 +2093,7 @@ case 'add_husband':
 	break;
 
 case 'add_media':
-	$title=WT_I18N::translate('Add a new media item');
+	$title=WT_I18N::translate('Add a new media object');
 	$text=WT_I18N::translate('Adding multimedia files (MM) to the GEDCOM is a very nice feature.  Although this program already has a great look without media, if you add pictures or other MM to your relatives, it will only get better.<br /><br /><b>What you should understand about MM.</b><br />There are many formats of MM. Although <b>webtrees</b> can handle most of them, there some things to consider.<br /><ul><li><b>Formats</b><br />Pictures can be edited and saved in many formats.  For example, .jpg, .png, .bmp, .gif, etc.  If the same original picture was used to create each of the formats, the viewed image will appear to be the same size no matter which format is used.  However, the image files stored in the database will vary considerably in size.  Generally, .jpg images are considered to the most efficient in terms of storage space.</li><li><b>Image size</b><br />The larger the original image, the larger will be the resultant file\'s size. The picture should fit on the screen without scrolling; the maximum width or height should not be more than the width or height of the screen. <b>webtrees</b> is designed for screens of 1024x768 pixels but not all of this space is available for viewing pictures; the picture\'s size should be set accordingly.  To reduce file sizes, smaller pictures are more desirable.</li><li><b>Resolution</b><br />The resolution of a picture is usually measured in "dpi" (dots/inch), but this is valid only for printed pictures.  When considering pictures shown on screen, the only correct way is to use total dots or pixels. When printed, the picture could have a resolution of 150 - 300 dpi or more depending on the printer. Screen resolutions are rarely better than 50 pixels per inch.  If your picture will never be printed, you can safely lower its resolution (and consequently its file size) without affecting picture quality.  If a low-resolution picture is printed with too great a magnification, its quality will suffer; it will have a grainy appearance.</li><li><b>Color depth</b><br />Another way to keep a file small is to decrease the number of colors that you use.  The number of colors can differ from pure black and white (two colors) to true colors (millions of colors) and anything in between.  You can see that the more colors are used, the bigger the size of the files.</li></ul><b>Why is it important to keep the file size small?</b><br /><ul><li>First of all: Our webspace is limited.  The more large files there are, the more web space we need on the server. The more space we need, the higher our costs.</li><li>Bandwidth.  The more data our server has to send to the remote location (your location), the more we have to pay.  This is because the carrying capacity of the server\'s connection to the Internet is limited, and the link has to be shared (and paid for) by all of the applications running on the server.  <b>webtrees</b> is one of many applications that share the server.  The cost is normally apportioned according to the amount of data each application sends and receives.</li><li>Download time. If you have large files, the user (also you) will have to wait long for the page to download from the server.  Not everybody is blessed with a cable connection, broadband or DSL.</li></ul><b>How to upload your MM</b><br />There are two ways to upload media to the site.  If you have a lot of media items to upload you should contact the site administrator to discuss the best ways.  If it has been enabled by your site administrator, you can use the Upload Media form under your My Page menu.  You can also use the Upload option on the Multimedia form to upload media items.');
 	break;
 
@@ -2692,7 +2687,7 @@ case 'next_path':
 	break;
 
 case 'no_update_CHAN':
-	$title=WT_I18N::translate('Do not update the CHAN (Last Change) record');
+	$title=WT_I18N::translate('Do not update the “last change” record');
 	$text=WT_I18N::translate('Administrators sometimes need to clean up and correct the data submitted by users.  For example, they might need to correct the PLAC location to include the country.  When Administrators make such corrections, information about the original change is normally replaced.  This may not be desirable.<br /><br />When this option is selected, <b>webtrees</b> will retain the original Change information instead of replacing it with that of the current session.  With this option selected, Administrators also have the ability to modify or delete the information associated with the original CHAN tag.');
 	break;
 
@@ -2882,10 +2877,6 @@ case 'skip_sublist':
 	$text=WT_I18N::translate('The standard setting is that, after you have clicked a letter of the Alphabetical index, you will get a sub-list with surnames.  If you click this link, all individuals with surnames that have the currently selected initial letter will be displayed immediately. Thereafter, the list of individuals will be displayed directly whenever you click on a new initial letter in the Alphabetical list.<br /><br />To reverse this action, click on the Show Surname lists link.');
 	break;
 
-case 'sortby':
-	$title=WT_I18N::translate('Sequence');
-	$text=WT_I18N::translate('Select the order in which you wish to see the list.');
-	break;
 
 case 'soundex_search':
 	$title=WT_I18N::translate('Search the way you think the name is written (Soundex)');
@@ -3072,7 +3063,7 @@ default:
 			require WT_ROOT.WT_MODULES_DIR.$mod.'/help_text.php';
 		}
 		break;
-	}
+	} //END PERSO
 }
 
 print_simple_header($title);

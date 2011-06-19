@@ -1,39 +1,32 @@
 <?php
-/**
- * Core Functions
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
- *
- * Derived from PhpGedView
- * Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
- *
- * Modifications Copyright (c) 2010 Greg Roach
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @package webtrees
- * @version $Id: functions.php 11603 2011-05-25 08:15:52Z greg $
- */
+// Core Functions
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: functions.php 11789 2011-06-12 09:24:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-define('WT_FUNCTIONS_PHP', '');
 
 require_once WT_ROOT.'includes/functions/functions_utf-8.php';
 
@@ -217,7 +210,6 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $ADVANCED_NAME_FACTS;          $ADVANCED_NAME_FACTS          =get_gedcom_setting($ged_id, 'ADVANCED_NAME_FACTS');
 	global $ADVANCED_PLAC_FACTS;          $ADVANCED_PLAC_FACTS          =get_gedcom_setting($ged_id, 'ADVANCED_PLAC_FACTS');
 	global $ALLOW_EDIT_GEDCOM;            $ALLOW_EDIT_GEDCOM            =get_gedcom_setting($ged_id, 'ALLOW_EDIT_GEDCOM');
-	global $ALLOW_THEME_DROPDOWN;         $ALLOW_THEME_DROPDOWN         =get_gedcom_setting($ged_id, 'ALLOW_THEME_DROPDOWN');
 	global $CALENDAR_FORMAT;              $CALENDAR_FORMAT              =get_gedcom_setting($ged_id, 'CALENDAR_FORMAT');
 	global $CHART_BOX_TAGS;               $CHART_BOX_TAGS               =get_gedcom_setting($ged_id, 'CHART_BOX_TAGS');
 	global $CONTACT_USER_ID;              $CONTACT_USER_ID              =get_gedcom_setting($ged_id, 'CONTACT_USER_ID');
@@ -274,7 +266,6 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $SHOW_LIVING_NAMES;            $SHOW_LIVING_NAMES            =get_gedcom_setting($ged_id, 'SHOW_LIVING_NAMES');
 	global $SHOW_MARRIED_NAMES;           $SHOW_MARRIED_NAMES           =get_gedcom_setting($ged_id, 'SHOW_MARRIED_NAMES');
 	global $SHOW_MEDIA_DOWNLOAD;          $SHOW_MEDIA_DOWNLOAD          =get_gedcom_setting($ged_id, 'SHOW_MEDIA_DOWNLOAD');
-	global $SHOW_MEDIA_FILENAME;          $SHOW_MEDIA_FILENAME          =get_gedcom_setting($ged_id, 'SHOW_MEDIA_FILENAME');
 	global $SHOW_NO_WATERMARK;            $SHOW_NO_WATERMARK            =get_gedcom_setting($ged_id, 'SHOW_NO_WATERMARK');
 	global $SHOW_PARENTS_AGE;             $SHOW_PARENTS_AGE             =get_gedcom_setting($ged_id, 'SHOW_PARENTS_AGE');
 	global $SHOW_PEDIGREE_PLACES;         $SHOW_PEDIGREE_PLACES         =get_gedcom_setting($ged_id, 'SHOW_PEDIGREE_PLACES');
@@ -925,7 +916,7 @@ function find_highlighted_object($pid, $ged_id, $indirec) {
 /**
  * get the full file path
  *
- * get the file path from a multimedia gedcom record
+ * get the file path from a media gedcom record
  * @param string $mediarec a OBJE subrecord
  * @return the fullpath from the FILE record
  */
@@ -1086,7 +1077,7 @@ function mediasort($a, $b) {
 	return utf8_strcasecmp($aKey, $bKey, true); // Case-insensitive compare
 }
 /**
- * sort an array according to the file name
+ * sort an array according to the filename
  *
  */
 
@@ -3143,7 +3134,6 @@ function isFileExternal($file) {
  */
 function mediaFileInfo($fileName, $thumbName, $mid, $name='', $notes='', $admin='', $obeyViewerOption=true) {
 	global $THUMBNAIL_WIDTH, $WT_IMAGES;
-	global $LB_URL_WIDTH, $LB_URL_HEIGHT;
 	global $GEDCOM, $USE_MEDIA_VIEWER;
 
 	$result = array();
@@ -3177,7 +3167,6 @@ function mediaFileInfo($fileName, $thumbName, $mid, $name='', $notes='', $admin=
 	while (true) {
 		if (WT_USE_LIGHTBOX && $admin!="ADMIN") {
 			// Lightbox is installed
-			require_once WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 			switch ($type) {
 			case 'url_flv':
 				$url = 'js/jw_player/flvVideo.php?flvVideo='.rawurlencode($fileName) . "\" rel='clearbox(500, 392, click)' rev=\"" . $mid . "::" . $GEDCOM . "::" . PrintReady(htmlspecialchars($name)) . "::" . htmlspecialchars($notes);
@@ -3203,7 +3192,7 @@ function mediaFileInfo($fileName, $thumbName, $mid, $name='', $notes='', $admin=
 			case 'local_page':
 			case 'local_pdf':
 			// case 'local_other':
-				$url = $fileName . "\" rel='clearbox({$LB_URL_WIDTH}, {$LB_URL_HEIGHT}, click)' rev=\"" . $mid . "::" . $GEDCOM . "::" . PrintReady(htmlspecialchars($name)) . "::" . htmlspecialchars($notes);
+				$url = $fileName . "\" rel='clearbox(" . get_module_setting('lightbox', 'LB_URL_WIDTH',  '1000') . ',' . get_module_setting('lightbox', 'LB_URL_HEIGHT', '600') . ", click)' rev=\"" . $mid . '::' . $GEDCOM . '::' . PrintReady(htmlspecialchars($name)) . "::" . htmlspecialchars($notes);
 				break 2;
 			case 'url_streetview':
 				if (WT_SCRIPT_NAME != "admin_media.php") {
@@ -3357,7 +3346,7 @@ function pathinfo_utf($path) {
 		$basename=end($tmp);
 		$dirname=substr($path, 0, strlen($path) - strlen($basename) - 1);
 	} else {
-		$basename=$path; // We have just a file name
+		$basename=$path; // We have just a filename
 		$dirname='.';    // For compatibility with pathinfo()
 	}
 

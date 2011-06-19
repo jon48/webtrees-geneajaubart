@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11532 2011-05-14 17:11:07Z greg $
+// @version $Id: module.php 11743 2011-06-09 00:00:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -172,7 +172,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 			$date = $family->getMarriageDate();
 			$place = $family->getMarriagePlace();
 			$famid = $family->getXref();
-			if (!$date && $this->controller->show_changes && ($famrec = find_updated_record($famid))!==null) {
+			if (!$date && ($famrec = find_updated_record($famid))!==null) {
 				$marrrec = get_sub_record(1, "1 MARR", $famrec);
 				if ($marrrec!=$family->getMarriageRecord()) {
 					$date = new WT_Date(get_gedcom_value("MARR:DATE", 1, $marrrec, '', false));
@@ -513,6 +513,10 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 	// Implement WT_Module_Tab
 	public function hasTabContent() {
 		return true;
+	}
+	// Implement WT_Module_Tab
+	public function isGrayedOut() {
+		return false;
 	}
 	// Implement WT_Module_Tab
 	public function canLoadAjax() {

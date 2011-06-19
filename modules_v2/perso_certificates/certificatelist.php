@@ -14,6 +14,7 @@ if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
+require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 $requestedCity = str_replace(@"\'", "'", safe_POST('city'));
 if(!$requestedCity) $requestedCity = str_replace(@"\'", "'", rawurldecode(safe_GET('city')));
@@ -32,7 +33,6 @@ echo '<div class="center"><h2>', WT_I18N::translate('Certificates'), '</h2>';
 
 // Get Javascript variables from lb_config.php ---------------------------
 if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 }
 

@@ -20,7 +20,7 @@
  *
  * @package webtrees
  * @subpackage Modules
- * @version $Id: module.php 11417 2011-04-30 11:17:30Z greg $
+ * @version $Id: module.php 11734 2011-06-08 14:33:59Z greg $
  */
 
 // Tip : you could change the number of generations loaded before ajax calls both in individual page and in treeview page to optimize speed and server load 
@@ -84,6 +84,10 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 	// Implement WT_Module_Tab
 	public function hasTabContent() {
 		return true;
+	}
+	// Implement WT_Module_Tab
+	public function isGrayedOut() {
+		return false;
 	}
 	// Implement WT_Module_Tab
 	public function canLoadAjax() {

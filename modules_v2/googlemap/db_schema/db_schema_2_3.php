@@ -27,14 +27,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: db_schema_2_3.php 10800 2011-02-12 13:49:08Z greg $
+// $Id: db_schema_2_3.php 11789 2011-06-12 09:24:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
-header('HTTP/1.0 403 Forbidden');
-exit;
+	header('HTTP/1.0 403 Forbidden');
+	exit;
 }
-
-define('WT_GM_DB_SCHEMA_2_3', '');
 
 WT_DB::exec("UPDATE `##placelocation` SET pl_icon=REPLACE(pl_icon, '.gif', '.png')");
 

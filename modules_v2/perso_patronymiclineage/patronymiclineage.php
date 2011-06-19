@@ -13,6 +13,7 @@ if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
+require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 global $SEARCH_SPIDER, $SURNAME_LIST_STYLE, $WT_IMAGES, $UNKNOWN_NN;
 

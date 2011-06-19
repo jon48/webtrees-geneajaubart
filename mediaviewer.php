@@ -23,34 +23,45 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: mediaviewer.php 11563 2011-05-21 05:28:11Z larry $
+// $Id: mediaviewer.php 11785 2011-06-11 22:08:12Z greg $
 
 define('WT_SCRIPT_NAME', 'mediaviewer.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
-// We have finished writing session data, so release the lock
-Zend_Session::writeClose();
-
 $controller = new WT_Controller_Media();
 $controller->init();
 
-print_header($controller->getPageTitle());
-
-if (!$controller->mediaobject) {
-	echo '<b>', WT_I18N::translate('Unable to find record with ID'), '</b><br /><br />';
+if ($controller->mediaobject && $controller->mediaobject->canDisplayName()) {
+	print_header($controller->getPageTitle());
+	if ($controller->mediaobject->isMarkedDeleted()) {
+		if (WT_USER_CAN_ACCEPT) {
+			echo '<p class="ui-state-highlight">', WT_I18N::translate('This media object has been deleted.  You should review the deletion and then <a href="%1$s">accept</a> or <a href="%2$s">reject</a> it.', $controller->mediaobject->getHtmlUrl().'&amp;action=accept', $controller->mediaobject->getHtmlUrl().'&amp;action=undo'), '</p>';
+		} elseif (WT_USER_CAN_EDIT) {
+			echo '<p class="ui-state-highlight">', WT_I18N::translate('This media object has been deleted.  The deletion will need to be reviewed by a moderator.'), '</p>';
+		}
+	} elseif (find_updated_record($controller->mediaobject->getXref(), WT_GED_ID)!==null) {
+		if (WT_USER_CAN_ACCEPT) {
+			echo '<p class="ui-state-highlight">', WT_I18N::translate('This media object has been edited.  You should review the changes and then <a href="%1$s">accept</a> or <a href="%2$s">reject</a> them.', $controller->mediaobject->getHtmlUrl().'&amp;action=accept', $controller->mediaobject->getHtmlUrl().'&amp;action=undo'), '</p>';
+		} elseif (WT_USER_CAN_EDIT) {
+			echo '<p class="ui-state-highlight">', WT_I18N::translate('This media object has been edited.  The changes need to be reviewed by a moderator.'), '</p>';
+		}
+	} elseif ($controller->accept_success) {
+		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been accepted.'), '</p>';
+	} elseif ($controller->reject_success) {
+		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been rejected.'), '</p>';
+	}
+} else {
+	print_header(WT_I18N::translate('Media object'));
+	echo '<p class="ui-state-error">', WT_I18N::translate('This media object does not exist or you do not have permission to view it.'), '</p>';
 	print_footer();
 	exit;
 }
 
-if (!$controller->mediaobject->canDisplayDetails()) {
-	print_privacy_error();
-	print_footer();
-	exit;
-}
+// We have finished writing session data, so release the lock
+Zend_Session::writeClose();
 
 if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 }
 
@@ -69,7 +80,6 @@ global $tmb;
 		<td class="name_head" colspan="2">
 			<?php echo PrintReady($controller->mediaobject->getFullName()); ?>
 			<?php echo PrintReady($controller->mediaobject->getAddName()); ?> <br /><br />
-			<?php if ($controller->mediaobject->isMarkedDeleted()) echo "<span class=\"error\">".WT_I18N::translate('This record has been marked for deletion upon admin approval.')."</span>"; ?>
 		</td>
 	</tr>
 	<tr>
@@ -87,7 +97,7 @@ global $tmb;
 					<td>
 						<table class="facts_table<?php echo $TEXT_DIRECTION=='ltr'?'':'_rtl'; ?>">
 							<?php
-								$facts = $controller->getFacts($SHOW_MEDIA_FILENAME);
+								$facts = $controller->getFacts(WT_USER_CAN_EDIT || WT_USER_CAN_ACCEPT);
 								foreach ($facts as $f=>$factrec) {
 									print_fact($factrec);
 								}
@@ -158,10 +168,6 @@ function show_gedcom_record(shownew) {
 	fromfile="";
 	if (shownew=="yes") fromfile='&fromfile=1';
 	var recwin = window.open("gedrecord.php?pid=<?php echo $controller->pid; ?>"+fromfile, "_blank", "top=50, left=50, width=600, height=400, scrollbars=1, scrollable=1, resizable=1");
-}
-
-function showchanges() {
-	window.location = '<?php echo $controller->mediaobject->getRawUrl(); ?>&show_changes=yes';
 }
 
 function ilinkitem(mediaid, type) {

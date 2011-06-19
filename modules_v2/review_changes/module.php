@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 10239 2011-01-01 22:32:55Z greg $
+// @version $Id: module.php 11749 2011-06-09 08:57:26Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -130,7 +130,7 @@ class review_changes_WT_Module extends WT_Module implements WT_Module_Block {
 						case 'SOUR':
 						case 'OBJE':
 							$content.=$block ? '<br />' : ' ';
-							$content.='<a href="'.$record->getHtmlUrl().'&amp;show_changes=yes'.'">'.WT_I18N::translate('View Change Diff').'</a>';
+							$content.='<a href="'.$record->getHtmlUrl().'">'.WT_I18N::translate('View the changes').'</a>';
 							break;
 						}
 						$content.='<br />';

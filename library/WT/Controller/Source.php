@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Source.php 11671 2011-06-01 05:51:11Z nigel $
+// @version $Id: Source.php 11743 2011-06-09 00:00:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,6 +36,7 @@ class WT_Controller_Source extends WT_Controller_Base {
 	var $source = null;
 	var $diffsource = null;
 	var $accept_success = false;
+	var $reject_success = false;
 
 	function init() {
 		$this->sid = safe_GET_xref('sid');
@@ -71,7 +72,6 @@ class WT_Controller_Source extends WT_Controller_Base {
 		case 'accept':
 			if (WT_USER_CAN_ACCEPT) {
 				accept_all_changes($this->sid, WT_GED_ID);
-				$this->show_changes=false;
 				$this->accept_success=true;
 				//-- check if we just deleted the record and redirect to index
 				$gedrec = find_source_record($this->sid, WT_GED_ID);
@@ -86,8 +86,7 @@ class WT_Controller_Source extends WT_Controller_Base {
 		case 'undo':
 			if (WT_USER_CAN_ACCEPT) {
 				reject_all_changes($this->sid, WT_GED_ID);
-				$this->show_changes=false;
-				$this->accept_success=true;
+				$this->reject_success=true;
 				$gedrec = find_source_record($this->sid, WT_GED_ID);
 				//-- check if we just deleted the record and redirect to index
 				if (empty($gedrec)) {
@@ -101,7 +100,7 @@ class WT_Controller_Source extends WT_Controller_Base {
 		}
 
 		//-- if the user can edit and there are changes then get the new changes
-		if ($this->show_changes && WT_USER_CAN_EDIT) {
+		if (WT_USER_CAN_EDIT) {
 			$newrec = find_updated_record($this->sid, WT_GED_ID);
 			if (!empty($newrec)) {
 				$this->diffsource = new WT_Source($newrec);
@@ -109,9 +108,7 @@ class WT_Controller_Source extends WT_Controller_Base {
 			}
 		}
 
-		if ($this->show_changes) {
-			$this->source->diffMerge($this->diffsource);
-		}
+		$this->source->diffMerge($this->diffsource);
 	}
 
 	/**
@@ -147,38 +144,6 @@ class WT_Controller_Source extends WT_Controller_Base {
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_source');
 			$submenu->addId('menu-sour-edit');
 			$menu->addSubmenu($submenu);
-
-			$menu->addSeparator();
-		}
-
-		// show/hide changes
-		if (find_updated_record($this->sid, WT_GED_ID)!==null) {
-			if (!$this->show_changes) {
-				$submenu = new WT_Menu(WT_I18N::translate('This record has been updated.  Click here to show changes.'), "source.php?sid={$this->sid}&amp;show_changes=yes");
-				$submenu->addIcon('edit_sour');
-				$submenu->addId('menu-sour-showchan');
-			} else {
-				$submenu = new WT_Menu(WT_I18N::translate('Click here to hide changes.'), "source.php?sid={$this->sid}&amp;show_changes=no");
-				$submenu->addIcon('edit_sour');
-				$submenu->addId('menu-sour-hidechan');
-			}
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
-			$menu->addSubmenu($submenu);
-
-			if (WT_USER_CAN_ACCEPT) {
-				$submenu = new WT_Menu(WT_I18N::translate('Undo all changes'), "source.php?sid={$this->sid}&amp;action=undo");
-				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
-				$submenu->addIcon('edit_sour');
-				$submenu->addId('menu-sour-undochan');
-				$menu->addSubmenu($submenu);
-				$submenu = new WT_Menu(WT_I18N::translate('Approve all changes'), "source.php?sid={$this->sid}&amp;action=accept");
-				$submenu->addIcon('edit_sour');
-				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
-				$submenu->addId('menu-sour-savechan');
-				$menu->addSubmenu($submenu);
-			}
-
-			$menu->addSeparator();
 		}
 
 		// edit/view raw gedcom
@@ -192,7 +157,7 @@ class WT_Controller_Source extends WT_Controller_Base {
 		} elseif ($SHOW_GEDCOM_RECORD) {
 			$submenu = new WT_Menu(WT_I18N::translate('View GEDCOM Record'));
 			$submenu->addIcon('gedcom');
-			if ($this->show_changes && WT_USER_CAN_EDIT) {
+			if (WT_USER_CAN_EDIT) {
 				$submenu->addOnclick("return show_gedcom_record('new');");
 			} else {
 				$submenu->addOnclick("return show_gedcom_record();");

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_config.php 11699 2011-06-03 12:44:43Z greg $
+// $Id: admin_trees_config.php 11803 2011-06-12 21:18:03Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_config.php');
 
@@ -240,7 +240,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'SHOW_LIVING_NAMES',            safe_POST('SHOW_LIVING_NAMES'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_MARRIED_NAMES',           safe_POST_bool('NEW_SHOW_MARRIED_NAMES'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_MEDIA_DOWNLOAD',          safe_POST_bool('NEW_SHOW_MEDIA_DOWNLOAD'));
-	set_gedcom_setting(WT_GED_ID, 'SHOW_MEDIA_FILENAME',          safe_POST_bool('NEW_SHOW_MEDIA_FILENAME'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_NO_WATERMARK',            safe_POST('NEW_SHOW_NO_WATERMARK'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_PARENTS_AGE',             safe_POST_bool('NEW_SHOW_PARENTS_AGE'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_PEDIGREE_PLACES',         safe_POST('NEW_SHOW_PEDIGREE_PLACES'));
@@ -642,8 +641,7 @@ echo WT_JS_START;?>
 						<td>
 							<?php
 							echo
-								/* I18N: Extend privacy to dead people [who were] ... */
-								WT_I18N::translate(
+								/* I18N: Extend privacy to dead people [who were] ... */ WT_I18N::translate(
 									'born in the last %1$s years or died in the last %2$s years',
 									'<input type="text" name="KEEP_ALIVE_YEARS_BIRTH" value="'.get_gedcom_setting(WT_GED_ID, 'KEEP_ALIVE_YEARS_BIRTH').'" size="5" />',
 									'<input type="text" name="KEEP_ALIVE_YEARS_DEATH" value="'.get_gedcom_setting(WT_GED_ID, 'KEEP_ALIVE_YEARS_DEATH').'" size="5" />'
@@ -847,14 +845,6 @@ echo WT_JS_START;?>
 					</tr>
 					<tr>
 						<td>
-							<?php echo WT_I18N::translate('Show file name in media viewer'), help_link('SHOW_MEDIA_FILENAME'); ?>
-						</td>
-						<td>
-							<?php echo edit_field_yes_no('NEW_SHOW_MEDIA_FILENAME', get_gedcom_setting(WT_GED_ID, 'SHOW_MEDIA_FILENAME')); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
 							<?php echo WT_I18N::translate('Show download link in media viewer'), help_link('SHOW_MEDIA_DOWNLOAD'); ?>
 						</td>
 						<td>
@@ -996,7 +986,7 @@ echo WT_JS_START;?>
 							<?php echo WT_I18N::translate('Theme dropdown selector for theme changes'), help_link('ALLOW_THEME_DROPDOWN'); ?>
 						</td>
 						<td>
-							<?php echo radio_buttons('NEW_ALLOW_THEME_DROPDOWN', array(false=>WT_I18N::translate('hide'),true=>WT_I18N::translate('show')), $ALLOW_THEME_DROPDOWN); ?>
+							<?php echo radio_buttons('NEW_ALLOW_THEME_DROPDOWN', array(false=>WT_I18N::translate('hide'),true=>WT_I18N::translate('show')), get_gedcom_setting(WT_GED_ID, 'ALLOW_THEME_DROPDOWN')); ?>
 						</td>
 					</tr>
 					<tr>
@@ -1630,7 +1620,7 @@ echo WT_JS_START;?>
 				</tr>
 				<tr>
 					<td>
-						<?php echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), help_link('no_update_CHAN'); ?>
+						<?php echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN'); ?>
 					</td>
 					<td>
 						<?php echo edit_field_yes_no('NEW_NO_UPDATE_CHAN', get_gedcom_setting(WT_GED_ID, 'NO_UPDATE_CHAN')); ?>

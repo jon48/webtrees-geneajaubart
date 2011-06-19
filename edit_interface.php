@@ -1,33 +1,27 @@
 <?php
-/**
-* PopUp Window to provide editing features.
-*
-* webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
- *
- * Derived from PhpGedView
-* Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
-*
-* Modifications Copyright (c) 2010 Greg Roach
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* @package webtrees
-* @subpackage Edit
-* @version $Id: edit_interface.php 11585 2011-05-23 10:21:44Z greg $
-*/
+// PopUp Window to provide editing features.
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: edit_interface.php 11753 2011-06-09 16:39:50Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_interface.php');
 require './includes/session.php';
@@ -300,7 +294,7 @@ case 'editraw':
 			echo ' checked="checked"';
 		} 
 		echo ' />';
-		echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), help_link('no_update_CHAN');
+		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
 		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
 		echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 		echo '</td></tr>';
@@ -343,7 +337,7 @@ case 'edit':
 			echo ' checked="checked"';
 		} 
 		echo ' />';
-		echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), help_link('no_update_CHAN');
+		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
 		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
 		echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 		echo '</td></tr>';
@@ -393,7 +387,7 @@ case 'add':
 			echo ' checked="checked"';
 		} 
 		echo ' />';
-		echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), help_link('no_update_CHAN');
+		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
 		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
 		echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 		echo '</td></tr>';
@@ -465,7 +459,7 @@ case 'addfamlink':
 			echo ' checked="checked"';
 		} 
 		echo ' />';
-		echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), help_link('no_update_CHAN');
+		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
 		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
 		echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 		echo '</td></tr>';
@@ -504,7 +498,7 @@ case 'linkspouse':
 			echo ' checked="checked"';
 		} 
 		echo ' />';
-		echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), help_link('no_update_CHAN');
+		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
 		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
 		echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 		echo '</td></tr>';
@@ -655,7 +649,7 @@ case 'addnewsource':
 					echo ' checked="checked"';
 				} 
 				echo ' />';
-				echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), help_link('no_update_CHAN');
+				echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
 				echo '</td></tr>';
 			}
 		?>
@@ -734,7 +728,7 @@ case 'addsourceaction':
 		if (!empty($CALN)) $newgedrec .= "2 CALN $CALN\n";
 	}
 	$xref = append_gedrec($newgedrec, WT_GED_ID);
-	$link = "source.php?sid=$xref&show_changes=yes";
+	$link = "source.php?sid=$xref";
 	if ($xref) {
 		echo '<br /><br />', WT_I18N::translate('New source created successfully.'), '<br /><br />';
 		echo "<a href=\"javascript://SOUR $xref\" onclick=\"openerpasteid('$xref'); return false;\">", WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record '), " <b>$xref</b></a>";
@@ -767,7 +761,7 @@ case 'addnewnote':
 					echo ' checked="checked"';
 				} 
 				echo ' />';
-				echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), help_link('no_update_CHAN');
+				echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
 				echo "</td></tr>";
 			}
 			echo '</table>';
@@ -834,10 +828,7 @@ case 'addnoteaction':
 	}
 	// $xref = "Test";
 	$xref = append_gedrec($newgedrec, WT_GED_ID);
-
-	// Not sure if next line is needed ?? BH ?? --------
-	// $link = "note.php?nid=$xref&show_changes=yes";
-	// -------------------------------------------------
+	$link = "note.php?nid=$xref";
 
 	if ($xref != "none") {
 		echo "<br /><br />".WT_I18N::translate('New Shared Note created successfully.')." (".$xref.")<br /><br />";
@@ -937,7 +928,7 @@ case 'editsource':
 			echo ' checked="checked"';
 		} 
 		echo ' />';
-		echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), help_link('no_update_CHAN');
+		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
 		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
 		echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 		echo '</td></tr>';
@@ -994,7 +985,7 @@ case 'editnote':
 						echo ' checked="checked"';
 					} 
 					echo ' />';
-					echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), help_link('no_update_CHAN');
+					echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
 					echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
 					echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 					echo '</td></tr>';
@@ -1058,7 +1049,7 @@ case 'addnewrepository':
 					echo ' checked="checked"';
 				} 
 				echo ' />';
-				echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), help_link('no_update_CHAN');
+				echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
 				echo '</td></tr>';
 			}
 		?>
@@ -1100,7 +1091,7 @@ case 'addrepoaction':
 	if (!empty($WWW)) $newgedrec .= "1 WWW $WWW\n";
 
 	$xref = append_gedrec($newgedrec, WT_GED_ID);
-	$link = "repo.php?rid=$xref&show_changes=yes";
+	$link = "repo.php?rid=$xref";
 	if ($xref) {
 		echo '<br /><br />', WT_I18N::translate('New Repository created'), '<br /><br />';
 		echo "<a href=\"javascript://REPO $xref\" onclick=\"openerpasteid('$xref'); return false;\">", WT_I18N::translate('Paste the following Repository ID into your editing fields to reference this Repository '), " <b>$xref</b></a>";
@@ -1379,7 +1370,7 @@ case 'addchildaction':
 	}
 
 	$xref = append_gedrec($gedrec, WT_GED_ID);
-	$link = "individual.php?pid=$xref&show_changes=yes";
+	$link = "individual.php?pid=$xref";
 	if ($xref) {
 		echo "<br /><br />", WT_I18N::translate('Update successful');
 		$gedrec = "";
@@ -1434,7 +1425,7 @@ case 'addspouseaction':
 	}
 
 	$xref = append_gedrec($gedrec, WT_GED_ID);
-	$link = "individual.php?pid=$xref&show_changes=yes";
+	$link = "individual.php?pid=$xref";
 	if ($xref) {
 		echo "<br /><br />", WT_I18N::translate('Update successful');
 	} else {
@@ -1582,7 +1573,7 @@ case 'addnewparentaction':
 	}
 
 	$xref = append_gedrec($gedrec, WT_GED_ID);
-	$link = "individual.php?pid=$xref&show_changes=yes";
+	$link = "individual.php?pid=$xref";
 	if ($xref) {
 		echo "<br /><br />", WT_I18N::translate('Update successful');
 	} else {
@@ -1849,9 +1840,9 @@ case 'reorder_media_update': // Update sort using popup
 	echo "<br />", WT_I18N::translate('Update successful'), "<br /><br />";
 
 	if ($currtab=="album") {
-		$link = "individual.php?pid=$pid&show_changes=yes#lightbox";
+		$link = "individual.php?pid=$pid#lightbox";
 	} else {
-		$link = "individual.php?pid=$pid&show_changes=yes#media";
+		$link = "individual.php?pid=$pid#media";
 	}
 	echo WT_JS_START;
 	echo "edit_close('{$link}')";
@@ -1873,9 +1864,9 @@ case 'al_reset_media_update': // Reset sort using Album Page
 	}
 	echo "<br />", WT_I18N::translate('Update successful'), "<br /><br />";
 	if ($currtab=="album") {
-		$link = "individual.php?pid=$pid&show_changes=yes#lightbox";
+		$link = "individual.php?pid=$pid#lightbox";
 	} else {
-		$link = "individual.php?pid=$pid&show_changes=yes#media";
+		$link = "individual.php?pid=$pid#media";
 	}
 	echo WT_JS_START;
 	echo "edit_close('{$link}')";
@@ -1909,9 +1900,9 @@ case 'al_reorder_media_update': // Update sort using Album Page
 		$success=true;
 	}
 	if ($currtab=="album") {
-		$link = "individual.php?pid=$pid&show_changes=yes#lightbox";
+		$link = "individual.php?pid=$pid#lightbox";
 	} else {
-		$link = "individual.php?pid=$pid&show_changes=yes#media";
+		$link = "individual.php?pid=$pid#media";
 	}
 	echo WT_JS_START;
 	echo "edit_close('{$link}')";
@@ -1986,14 +1977,14 @@ case 'reorder_children':
 				echo ' checked="checked"';
 			} 
 			echo ' />';
-			echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), help_link('no_update_CHAN');
+			echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
 			echo WT_Gedcom_Tag::getLabelValue('DATE', $family->LastChangeTimestamp(false));
 			echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $family->LastChangeUser());
 			echo '</td></tr></table></center><br />';
 		}
 		?>
 		<button type="submit"><?php echo WT_I18N::translate('Save'); ?></button>
-		<button type="submit" onclick="document.reorder_form.action.value='reorder_children'; document.reorder_form.submit();"><?php echo WT_I18N::translate('Sort by birth dates'); ?></button>
+		<button type="submit" onclick="document.reorder_form.action.value='reorder_children'; document.reorder_form.submit();"><?php echo WT_I18N::translate('sort by date of birth'); ?></button>
 		<button type="submit" onclick="window.close();"><?php echo WT_I18N::translate('Cancel'); ?></button>
 	</form>
 	<br />
@@ -2356,7 +2347,7 @@ case 'reorder_fams':
 			);
 		<?php echo WT_JS_END; ?>
 		<button type="submit"><?php echo WT_I18N::translate('Save'); ?></button>
-		<button type="submit" onclick="document.reorder_form.action.value='reorder_fams'; document.reorder_form.submit();"><?php echo WT_I18N::translate('Sort by marriage date'); ?></button>
+		<button type="submit" onclick="document.reorder_form.action.value='reorder_fams'; document.reorder_form.submit();"><?php echo WT_I18N::translate('sort by date of marriage'); ?></button>
 		<button type="submit" onclick="window.close();"><?php echo WT_I18N::translate('Cancel'); ?></button>
 	</form>
 	<?php

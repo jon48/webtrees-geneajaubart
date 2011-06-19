@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: module.php 11330 2011-04-17 10:11:45Z veit $
+// @version $Id: module.php 11753 2011-06-09 16:39:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -155,12 +155,12 @@ class recent_changes_WT_Module extends WT_Module implements WT_Module_Block {
 
 		$sortStyle = get_block_setting($block_id, 'sortStyle', 'date');
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo /* I18N: label for a list box */WT_I18N::translate('Sort style'); //, help_link('sort_style');
+		echo WT_I18N::translate('Sort order');
 		echo '</td><td class="optionbox">';
 		echo select_edit_control('sortStyle', array(
-			'name'      => /* I18N: a list-box option, for sorting */ WT_I18N::translate('alphabetically'),
-			'date_asc'  => /* I18N: a list-box option, for sorting */ WT_I18N::translate('oldest first'),
-			'date_desc' => /* I18N: a list-box option, for sorting */ WT_I18N::translate('newest first')
+			'name'      => /* I18N: An option in a list-box */ WT_I18N::translate('sort by name'),
+			'date_asc'  => /* I18N: An option in a list-box */ WT_I18N::translate('sort by date, oldest first'),
+			'date_desc' => /* I18N: An option in a list-box */ WT_I18N::translate('sort by date, newest first')
 		), null, $sortStyle, '');
 		echo '</td></tr>';
 

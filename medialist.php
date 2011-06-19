@@ -1,5 +1,5 @@
 <?php
-// Displays a list of the multimedia objects
+// Displays a list of the media objects
 //
 // webtrees: Web based Family History software
 // Copyright (C) 2011 webtrees development team.
@@ -21,17 +21,19 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: medialist.php 11692 2011-06-02 14:10:33Z greg $
+// $Id: medialist.php 11785 2011-06-11 22:08:12Z greg $
 
 define('WT_SCRIPT_NAME', 'medialist.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_facts.php';
 
-// $LB_SS_SPEED = '5';
 $level = safe_GET('level', '', '0');
 $action = safe_GET('action');
 $search = safe_GET('search');
 $sortby = safe_GET('sortby', 'file', 'title');
+if (!WT_USER_CAN_EDIT && !WT_USER_CAN_ACCEPT) {
+	$sortby='title';
+}
 $max = safe_GET('max', array('10', '20', '30', '40', '50', '75', '100', '125', '150', '200'), '20');
 $folder = safe_GET('folder');
 $show = safe_GET('show');
@@ -49,7 +51,6 @@ $filter_type = safe_GET('filter_type', array($or, $and), $or);
 $columns = safe_GET('columns', array('1', '2'), '2');
 $currentdironly = (isset($_REQUEST['subdirs']) && $_REQUEST['subdirs']=='on') ? false : true;
 $show_thumbnail = (isset($_REQUEST['thumbnails']) && $_REQUEST['thumbnails']=='on') ? true : false;
-$exclude_links = (isset($_REQUEST['exclude_links']) && $_REQUEST['exclude_links']=='on') ? true : false;
 $subdirs = safe_GET('subdirs');
 $thumbnail = safe_GET('thumbnail');
 
@@ -64,58 +65,56 @@ if ($reset == 'Reset') {
 	$filter1 = '';
 	$filter2 = '';
 	$action = '';
-	unset($_SESSION['Medialist']);
-	unset($_SESSION['Filtered_medialist']);
+	unset($WT_SESSION->Medialist);
+	unset($WT_SESSION->Filtered_medialist);
 }
 
-if (empty($_SESSION['Medialist_ged'])) $_SESSION['Medialist_ged'] = WT_GEDCOM;
-if ($_SESSION['Medialist_ged'] != WT_GEDCOM) {
-	$_SESSION['Medialist_ged'] = WT_GEDCOM;
-	unset($_SESSION['Medialist']);
+if (empty($WT_SESSION->Medialist_ged)) $WT_SESSION->Medialist_ged = WT_GEDCOM;
+if ($WT_SESSION->Medialist_ged != WT_GEDCOM) {
+	$WT_SESSION->Medialist_ged = WT_GEDCOM;
+	unset($WT_SESSION->Medialist);
 }
 
 // If the $folder is empty this is a new visit, a return, or a reset
 if (empty($folder)) {
 	$folder = $MEDIA_DIRECTORY; // default setting
 	$show_thumbnail = true; // default setting
-	$exclude_links = false; // default setting
 }
 
 // If SESSION_medialist then it's a return
-if (isset($_SESSION['Medialist']) && isset($_SESSION['Filtered_medialist']) ) {
+if (isset($WT_SESSION->Medialist) && isset($WT_SESSION->Filtered_medialist) ) {
 	$show = 'yes';
 	$search = 'yes';
 	// Build a new array?
 	// Not if $action <> filter (ie It's either a layout/page change or a return visit)
 	// Load up the session variables
 	if ($action != 'filter') {
-		$medialist = ($_SESSION['Filtered_medialist']);
-		$folder=($_SESSION['Medialist_folder']);
-		$filter1=($_SESSION['Medialist_filter1']);
-		$filter2=($_SESSION['Medialist_filter2']);
-		$filter_type=($_SESSION['Filter_type']);
-		$sortby=($_SESSION['Medialist_sortby']);
-		$max=($_SESSION['Medialist_max']);
-		$columns=($_SESSION['Medialist_columns']);
-		$currentdironly=($_SESSION['Medialist_currentdironly']);
-		$show_thumbnail=($_SESSION['Medialist_thumbnail']);
-		$exclude_links=($_SESSION['Medialist_links']);
+		$medialist=($WT_SESSION->Filtered_medialist);
+		$folder=($WT_SESSION->Medialist_folder);
+		$filter1=($WT_SESSION->Medialist_filter1);
+		$filter2=($WT_SESSION->Medialist_filter2);
+		$filter_type=($WT_SESSION->Filter_type);
+		$sortby=($WT_SESSION->Medialist_sortby);
+		$max=($WT_SESSION->Medialist_max);
+		$columns=($WT_SESSION->Medialist_columns);
+		$currentdironly=($WT_SESSION->Medialist_currentdironly);
+		$show_thumbnail=($WT_SESSION->Medialist_thumbnail);
 
 	} else {
 		// This is a return visit and the FILTER button was used
 		// Check if the subdirectory and folder have changed
 		if ($MEDIA_DIRECTORY_LEVELS > 0) {
-			if ($folder != $_SESSION['Medialist_folder']) $build = 'yes';
-			if ($currentdironly != $_SESSION['Medialist_currentdironly']) $build ='yes';
+			if ($folder != $WT_SESSION->Medialist_folder) $build = 'yes';
+			if ($currentdironly != $WT_SESSION->Medialist_currentdironly) $build ='yes';
 		}
-		// Check if the 'Include media links' option has changed
-		if ($exclude_links != $_SESSION['Medialist_links']) $build ='yes';
 		// if same subdirectory and folder then use an existing medialist
 		if ($build != 'yes') {
-			if (($filter1 == $_SESSION['Medialist_filter1']) && ($filter2 == $_SESSION['Medialist_filter2']) && ($filter_type == $_SESSION['Filter_type'])) {
-				$medialist = $_SESSION['Filtered_medialist'];
+			if (($filter1 == $WT_SESSION->Medialist_filter1) && ($filter2 == $WT_SESSION->Medialist_filter2) && ($filter_type == $WT_SESSION->Filter_type)) {
+				$medialist = $WT_SESSION->Filtered_medialist;
 				$action = false;
-			} else $medialist = $_SESSION['Medialist'];
+			} else {
+				$medialist = $WT_SESSION->Medialist;
+			}
 		}
 	}
 } else {
@@ -133,12 +132,7 @@ print_header(WT_I18N::translate('Media objects'));
 echo '<div class="center"><h2>', WT_I18N::translate('Media objects'), '</h2></div>';
 // Get Javascript variables from lb_config.php ---------------------------
 if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
-}
-//-- automatically generate an image (NOT CURRENTLY USED)
-if (WT_USER_IS_ADMIN && $action=='generate' && !empty($file) && !empty($thumb)) {
-	generate_thumbnail($file, $thumb);
 }
 // ************************  BEGIN = 'Build the medialist array' ************************
 if ($build == 'yes') {
@@ -148,7 +142,7 @@ if ($build == 'yes') {
 	}
 	// show external links only if looking at top level directory
 	$showExternal = ($folder == $MEDIA_DIRECTORY) ? true : false;
-	$medialist=get_medialist2($currentdironly, $folder, true, false, $showExternal, $exclude_links);
+	$medialist=get_medialist2($currentdironly, $folder, true, false, $showExternal);
 
 	//-- remove all private media objects
 	foreach ($medialist as $key => $media) {
@@ -164,7 +158,7 @@ if ($build == 'yes') {
 	}
 	usort($medialist, 'mediasort'); // Reset numbering of medialist array
 // save the array
-$_SESSION['Medialist'] = $medialist;
+$WT_SESSION->Medialist = $medialist;
 }
 // ************************  END = 'Build the medialist array' ************************
 // ************************  BEGIN = 'Build the input form' ************************
@@ -184,7 +178,7 @@ $_SESSION['Medialist'] = $medialist;
 			<?php
 				//if ($MEDIA_DIRECTORY_LEVELS > 0) {
 				if (empty($folder)) {
-					if (!empty($_SESSION['upload_folder'])) $folder = $_SESSION['upload_folder'];
+					if (!empty($WT_SESSION->upload_folder)) $folder = $WT_SESSION->upload_folder;
 					else $folder = 'ALL';
 				}
 					$folders = array_merge(array('ALL'), get_media_folders());
@@ -204,16 +198,25 @@ $_SESSION['Medialist'] = $medialist;
 	<!-- // end select media folders -->
 <!-- // NOTE: Row 1 right: -->
 	<!-- begin sort files -->
-			<td class="descriptionbox wrap width25">
-					<?php echo WT_I18N::translate('Sort by title or file name'), help_link('sortby'); ?>
-			</td>
-			<td class="optionbox wrap width25"><select name="sortby">
-				<option value="title" <?php if ($sortby=='title') echo 'selected="selected"'; ?>>
-					<?php echo WT_I18N::translate('Sort by title'); ?></option>
-				<option value="file" <?php if ($sortby=='file') echo 'selected="selected"'; ?>>
-					<?php echo WT_I18N::translate('Sort by file name'); ?></option>
-				</select>
-			</td>
+			<?php	
+			if (WT_USER_CAN_EDIT || WT_USER_CAN_ACCEPT) {
+				echo '<td class="descriptionbox wrap width25">';
+				echo WT_I18N::translate('Sort order');
+				echo '</td><td class="optionbox wrap width25">';
+				echo '<select name="sortby">';
+				echo '<option value="title" ', ($sortby=='title') ? 'selected="selected"' : '', '>';
+				echo /* I18N: An option in a list-box */ WT_I18N::translate('sort by title');
+				echo '</option>';
+				echo '<option value="file" ', ($sortby=='file') ? 'selected="selected"' : '' , '>';
+				echo /* I18N: An option in a list-box */ WT_I18N::translate('sort by filename');
+				echo '</option>';
+				echo '</select>';
+				echo '</td>';
+			} else {
+				echo '<td class="descriptionbox wrap width25">&nbsp;</td>';
+				echo '<td class="optionbox wrap width25">&nbsp;</td>';
+			}
+			?>
 	<!-- //end sort files -->
 	</tr><tr>
 <!-- // NOTE: Row 2 left:-->
@@ -298,16 +301,9 @@ $_SESSION['Medialist'] = $medialist;
 	<!-- // end search buttons  -->
 <!-- // NOTE: Row 4 right:-->
 	<!-- // thumbnail option  -->
-			<td class="descriptionbox wrap width25">
-				<?php if (WT_USER_IS_ADMIN) { ?>
-					<?php echo WT_I18N::translate('Exclude media links'), help_link('media_links'); ?>
-				<?php } ?>
+			<td class="descriptionbox wrap width25">&nbsp;
 			</td>
-			<td class="optionbox wrap width25">
-			<?php if (WT_USER_IS_ADMIN) { ?>
-				<input type="checkbox" id="exclude_links" name="exclude_links"
-				<?php if ($exclude_links) { ?>checked="checked"<?php } ?> />
-			<?php } ?>
+			<td class="optionbox wrap width25">&nbsp;
 			</td>
 	<!-- // end thumbnail option -->
 	</tr></table>
@@ -345,17 +341,16 @@ $filter_type = $temp_filter;
 // ************************  END = 'Filter the medialist array' ************************
 // *****************************  BEGIN Set SESSION variables ********************************************
 if ($search=='yes') {
-	if ($filtered_medialist) $_SESSION['Filtered_medialist'] = $filtered_medialist;
-	$_SESSION['Filter_type']=$filter_type;
-	$_SESSION['Medialist_filter1']=$filter1;
-	$_SESSION['Medialist_filter2']=$filter2;
-	$_SESSION['Medialist_folder']=$folder;
-	$_SESSION['Medialist_sortby']=$sortby;
-	$_SESSION['Medialist_max']=$max;
-	$_SESSION['Medialist_columns']=$columns;
-	$_SESSION['Medialist_currentdironly']=$currentdironly;
-	$_SESSION['Medialist_thumbnail']=$show_thumbnail;
-	$_SESSION['Medialist_links']=$exclude_links;
+	if ($filtered_medialist) $WT_SESSION->Filtered_medialist = $filtered_medialist;
+	$WT_SESSION->Filter_type=$filter_type;
+	$WT_SESSION->Medialist_filter1=$filter1;
+	$WT_SESSION->Medialist_filter2=$filter2;
+	$WT_SESSION->Medialist_folder=$folder;
+	$WT_SESSION->Medialist_sortby=$sortby;
+	$WT_SESSION->Medialist_max=$max;
+	$WT_SESSION->Medialist_columns=$columns;
+	$WT_SESSION->Medialist_currentdironly=$currentdironly;
+	$WT_SESSION->Medialist_thumbnail=$show_thumbnail;
 }
 // *****************************  End Set SESSION variables ********************************************
 // ************************  BEGIN = 'Print the medialist array' ************************
@@ -493,51 +488,46 @@ Plus other Media Options - MediaViewer page'), '" />';
 				}
 			}
 		}
-		// -- new naming structure ---------
-		if ($sortby == 'title') {
-			$name_disp1 = $mediaobject->getFullName();
-			$name_disp2 = basename($mediaobject->getFilename());
-			if ($isExternal) $name_disp2 = 'URL';
-			$name_disp3 = $mediaobject->getLocalFilename();
-			$name_disp4 = WT_I18N::translate('Filename');
+		// If sorting by title, highlight the title.  If sorting by filename, highlight the filename
+		if ($sortby=='title') {
+			echo '<p><b><a href="', $mediaobject->getHtmlUrl(), '">';
+			echo $mediaobject->getFullName();
+			echo '</a></b></p>';
 		} else {
-			$name_disp1 = basename($mediaobject->getFilename());
-			if ($isExternal) $name_disp1 = 'URL';
-			$name_disp2 = $mediaobject->getFullName();
-			$name_disp3 = $mediaobject->getLocalFilename();
-			$name_disp4 = WT_I18N::translate('Title');
+			echo '<p><b><a href="', $mediaobject->getHtmlUrl(), '">';
+			echo basename($mediaobject->getFilename());
+			echo '</a></b></p>';
+			echo WT_Gedcom_Tag::getLabelValue('TITL', $mediaobject->getFullName());
 		}
-		echo '<a href="'.$mediaobject->getHtmlUrl().'">';
-		echo '<b>', PrintReady($name_disp1), '</b>';
-		echo '</a>';
-		if (WT_USER_CAN_EDIT) {
-				echo '<br /><br /><sub><span dir="ltr"><b>', PrintReady($name_disp4), ': </b>', PrintReady($name_disp2), '</span></sub>';
-				echo '<br /><sub><span dir="ltr"><b>', WT_I18N::translate('Location'), ': </b>', PrintReady($name_disp3), '</span></sub>';
-		}
-		echo '<br />';
-		if (!$isExternal) {
-			if (!$mediaobject->fileExists()) {
-				echo '<br /><span class="error">', WT_I18N::translate('File not found.'), ' <span dir="ltr">', PrintReady(basename($mediaobject->getFilename())), '</span></span>';
-			} else {
-				$imgsize = $mediaobject->getImageAttributes();
-				echo '<span class="label"><br />', WT_I18N::translate('Media Format'), ': </span>'; 
-				echo '<span class="field" style="direction: ltr;">', ($imgsize['ext']) ? $imgsize['ext'] : '--', '</span>';
-				echo '&nbsp;&nbsp;&nbsp;<span class="field" style="direction: ltr;">', $mediaobject->getFilesize(), '</span>';
-				if ($imgsize['WxH']) {
-					echo '<span class="label"><br />', WT_I18N::translate('Image Dimensions'), ': </span> <span class="field">', $imgsize['WxH'], '</span>';
+		// Show file details
+		if ($isExternal) {
+			echo WT_Gedcom_Tag::getLabelValue('URL', $mediaobject->getLocalFilename());
+		} else {
+			if ($mediaobject->fileExists()) {
+				if (WT_USER_CAN_EDIT || WT_USER_CAN_ACCEPT) {
+					echo WT_Gedcom_Tag::getLabelValue('FILE', $mediaobject->getLocalFilename());
 				}
+				echo WT_Gedcom_Tag::getLabelValue('FORM', $mediaobject->getMediaFormat());
+				echo WT_Gedcom_Tag::getLabelValue('__FILE_SIZE__', $mediaobject->getFilesize());
+				$imgsize = $mediaobject->getImageAttributes();
+				if ($imgsize['WxH']) {
+					echo WT_Gedcom_Tag::getLabelValue('__IMAGE_SIZE__', $imgsize['WxH']);
+				}
+			} else {
+				echo '<p class="ui-state-error">', /* I18N: %s is a filename */ WT_I18N::translate('The file “%s” does not exist.', $mediaobject->getLocalFilename()), '</p>';
 			}
 		}
-			echo '<div style="white-space: normal; width: 95%;">';
-			print_fact_sources($mediaobject->getGedcomRecord(), 1);
-			print_fact_notes($mediaobject->getGedcomRecord(), 1);
-			echo '</div>';
-			echo $mediaobject->printLinkedRecords('small');
-			echo '</td></tr></table>';
-			echo '</td>';
-			if ($columns == '1') echo '</tr><tr>';
-			if (($columns == '2') && ($i%2 == 1 && $i < ($count-1)))
-			echo '</tr><tr>';
+		echo '<br />';
+		echo '<div style="white-space: normal; width: 95%;">';
+		print_fact_sources($mediaobject->getGedcomRecord(), 1);
+		print_fact_notes($mediaobject->getGedcomRecord(), 1);
+		echo '</div>';
+		echo $mediaobject->printLinkedRecords('small');
+		echo '</td></tr></table>';
+		echo '</td>';
+		if ($columns == '1') echo '</tr><tr>';
+		if (($columns == '2') && ($i%2 == 1 && $i < ($count-1)))
+		echo '</tr><tr>';
 	} // end media loop
 	echo '</tr>';
 	// echo page back, page number, page forward controls

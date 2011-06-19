@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// @version $Id: Menu.php 11720 2011-06-06 05:36:01Z nigel $
+// @version $Id: Menu.php 11742 2011-06-08 22:22:44Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,7 +29,6 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Menu {
-	var $separator = false;
 	var $label = ' ';
 	var $labelpos = 'right';
 	var $link = '#';
@@ -60,11 +59,6 @@ class WT_Menu {
 		$this->addLabel($label, $pos);
 		$this->addFlyout($flyout);
 		$this->addId($id);
-	}
-
-	function isSeparator()
-	{
-		$this->separator = true;
 	}
 
 	function addLabel($label=' ', $pos='right')
@@ -125,18 +119,9 @@ class WT_Menu {
 		$this->submenus[] = $obj;
 	}
 
-	function addSeparator() {
-		$submenu = new WT_Menu();
-		$submenu->isSeparator();
-		$this->submenus[] = $submenu;
-	}
-
 	// Get the menu as a simple list - for accessible interfaces, search engines and CSS menus
 	function getMenuAsList() {
 		$link = '';
-		if ($this->separator) {
-			return '<li class="separator"><span></span></li>';
-		}
 		if ($this->link) {
 			if ($this->target !== null) {
 				$link .= ' target="'.$this->target.'"';
@@ -163,16 +148,18 @@ class WT_Menu {
 			}
 			$html.='</ul>';
 		}
+		//PERSO add menu class
 		if ($this->id) {
-			return '<li id="'.$this->id.'">'.$html.'</li>';
+			return '<li id="'.$this->id.'" class="'.$this->class.'">'.$html.'</li>';
 		} else {
-			return '<li>'.$html.'</li>';
+			return '<li class="'.$this->class.'">'.$html.'</li>';
 		}
+		//END PERSO
 	}
 
 	// Get the menu as a dropdown form element
 	function getMenuAsDropdown() {
-		if ($this->separator || !$this->link && !$this->submenus) {
+		if (!$this->link && !$this->submenus) {
 			return '';
 		}
 		if ($this->submenus) {
@@ -195,12 +182,6 @@ class WT_Menu {
 			$menucount++;
 		}
 		$id = $menucount.rand();
-		if ($this->separator) {
-			$output = "<div id=\"menu{$id}\" class=\"menu_separator center\">"
-			."<img src=\"{$WT_IMAGES['hline']}\" alt=\"\" />"
-			."</div>";
-			return $output;
-		}
 		$c = count($this->submenus);
 		$output = "<div id=\"menu{$id}\" class=\"{$this->class}\">\n";
 		if ($this->link=="#") $this->link = "javascript:;";

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11704 2011-06-04 09:09:12Z greg $
+// $Id: module.php 11734 2011-06-08 14:33:59Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -134,6 +134,24 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 		return $this->getTabContent() <> '';
 	}
 
+	// Implement WT_Module_Tab
+	public function isGrayedOut() {
+		$count_of_stories=
+			WT_DB::prepare(
+				"SELECT COUNT(block_id)".
+				" FROM `##block`".
+				" WHERE module_name=?".
+				" AND xref=?".
+				" AND gedcom_id=?"
+			)->execute(array(
+				$this->getName(),
+				$xref=$this->controller->indi->getXref(),
+				WT_GED_ID
+			))->fetchOne();
+			
+		return $count_of_stories==0;
+	}
+	
 	// Implement class WT_Module_Tab
 	public function canLoadAjax() {
 		return false;

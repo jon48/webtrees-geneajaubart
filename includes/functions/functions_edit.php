@@ -1,43 +1,35 @@
 <?php
-/**
-* Various functions used by the Edit interface
-*
-* webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
- *
- * Derived from PhpGedView
-* Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
-*
-* Modifications Copyright (c) 2010 Greg Roach
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* @package webtrees
-* @subpackage Edit
-* @see functions_places.php
-* @version $Id: functions_edit.php 11655 2011-05-30 18:02:32Z lukasz $
-* @version: p_$Revision$ $Date$
-* $HeadURL$
-*/
+// Various functions used by the Edit interface
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: functions_edit.php 11789 2011-06-12 09:24:50Z greg $
+// @version: p_$Revision$ $Date$
+// $HeadURL$
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-define('WT_FUNCTIONS_EDIT_PHP', '');
 
 require_once WT_ROOT.'includes/functions/functions_import.php';
 
@@ -872,13 +864,13 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 	}
 	if (WT_USER_IS_ADMIN) {
 		echo "<tr><td class=\"descriptionbox ", $TEXT_DIRECTION, " wrap width25\">";
-		echo WT_I18N::translate('Admin Option'), help_link('no_update_CHAN'), "</td><td class=\"optionbox wrap\">";
+		echo WT_Gedcom_Tag::getLabel('CHAN'), "</td><td class=\"optionbox wrap\">";
 		if ($NO_UPDATE_CHAN) {
 			echo "<input type=\"checkbox\" checked=\"checked\" name=\"preserve_last_changed\" />";
 		} else {
 			echo "<input type=\"checkbox\" name=\"preserve_last_changed\" />";
 		}
-		echo WT_I18N::translate('Do not update the CHAN (Last Change) record'), "<br />";
+		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN'), "<br />";
 		if (isset($famrec)) {
 			$event = new WT_Event(get_sub_record(1, "1 CHAN", $famrec));
 			echo format_fact_date($event, false, true);
@@ -1132,7 +1124,7 @@ function print_calendar_popup($id, $asString=false) {
 function print_addnewmedia_link($element_id) {
 	global $WT_IMAGES, $pid;
 
-	$text = WT_I18N::translate('Add a new media item');
+	$text = WT_I18N::translate('Add a new media object');
 	if (isset($WT_IMAGES["button_addmedia"])) $Link = "<img src=\"".$WT_IMAGES["button_addmedia"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 	else $Link = $text;
 	echo '&nbsp;&nbsp;&nbsp;<a href="javascript:;" onclick="pastefield=document.getElementById(\'', $element_id, '\'); window.open(\'addmedia.php?action=showmediaform&linktoid={$linkToID}&level={$level}\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">';
@@ -1628,7 +1620,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 				}
 			}
 			else if (($cols>20 || $fact=="NPFX") && $readOnly=='') print_specialchar_link($element_id, false);
-		}
+		} //END PERSO
 	}
 	// MARRiage TYPE : hide text field and show a selection list
 	if ($fact=='TYPE' && $level==2 && $tags[0]=='MARR') {
@@ -1898,7 +1890,7 @@ function print_add_layer($tag, $level=2, $printSaveButton=true) {
 	}
 	if ($tag=="OBJE") {
 		//-- Add new obje to fact
-		echo "<a href=\"javascript:;\" onclick=\"return expand_layer('newobje');\"><img id=\"newobje_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new Multimedia object'), "</a>";
+		echo "<a href=\"javascript:;\" onclick=\"return expand_layer('newobje');\"><img id=\"newobje_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new media object'), "</a>";
 		echo help_link('add_media');
 		echo "<br />";
 		echo "<div id=\"newobje\" style=\"display: none;\">";

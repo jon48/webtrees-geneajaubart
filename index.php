@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: index.php 10869 2011-02-18 16:00:33Z greg $
+// $Id: index.php 11785 2011-06-11 22:08:12Z greg $
 
 define('WT_SCRIPT_NAME', 'index.php');
 if (defined ('WT_ROOT')) {
@@ -77,9 +77,6 @@ if ($action=='ajax') {
 	exit;
 }
 
-// We have finished writing session data, so release the lock
-Zend_Session::writeClose();
-
 if ($ctype=='user') {
 	$helpindex = 'mypage_portal';
 	print_header(WT_I18N::translate('My Page'));
@@ -88,8 +85,10 @@ if ($ctype=='user') {
 	print_header(get_gedcom_setting(WT_GED_ID, 'title'));
 }
 
+// We have finished writing session data, so release the lock
+Zend_Session::writeClose();
+
 if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 }
 

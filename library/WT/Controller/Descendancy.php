@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Descendancy.php 11529 2011-05-14 10:58:32Z greg $
+// @version $Id: Descendancy.php 11743 2011-06-09 00:00:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,6 @@ class WT_Controller_Descendancy extends WT_Controller_Base {
 
 	var $diffindi = null;
 	var $NAME_LINENUM = 1;
-	var $accept_success = false;
 	var $canedit = false;
 	var $name_count = 0;
 	var $total_names = 0;
@@ -90,7 +89,6 @@ class WT_Controller_Descendancy extends WT_Controller_Base {
 	$pbwidth = $bwidth+12;
 	$pbheight = $bheight+14;
 
-	$this->show_changes=safe_GET('show_changes');
 	$this->action      =safe_GET('action');
 
 	// Validate form variables

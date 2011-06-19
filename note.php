@@ -1,62 +1,66 @@
 <?php
-/**
-* Displays the details about a shared note record.  Also shows how many people and families
-* reference this shared note.
-*
-* webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
- *
- * Derived from PhpGedView
-* Copyright (C) 2009 PGV Development Team.  All rights reserved.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* @package webtrees
-* @version $Id: note.php 11648 2011-05-30 06:43:31Z nigel $
-*/
+// Displays the details about a shared note record.  Also shows how many people and families
+// reference this shared note.
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2009 PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: note.php 11785 2011-06-11 22:08:12Z greg $
 
 define('WT_SCRIPT_NAME', 'note.php');
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_print_lists.php';
 
-// We have finished writing session data, so release the lock
-Zend_Session::writeClose();
-
 $controller=new WT_Controller_Note();
 $controller->init();
 
-print_header($controller->getPageTitle());
-
-if (!$controller->note) {
-	echo '<b>', WT_I18N::translate('Unable to find record with ID'), '</b><br /><br />';
+if ($controller->note && $controller->note->canDisplayName()) {
+	print_header($controller->getPageTitle());
+	if ($controller->note->isMarkedDeleted()) {
+		if (WT_USER_CAN_ACCEPT) {
+			echo '<p class="ui-state-highlight">', WT_I18N::translate('This note has been deleted.  You should review the deletion and then <a href="%1$s">accept</a> or <a href="%2$s">reject</a> it.', $controller->note->getHtmlUrl().'&amp;action=accept', $controller->note->getHtmlUrl().'&amp;action=undo'), '</p>';
+		} elseif (WT_USER_CAN_EDIT) {
+			echo '<p class="ui-state-highlight">', WT_I18N::translate('This note has been deleted.  The deletion will need to be reviewed by a moderator.'), '</p>';
+		}
+	} elseif (find_updated_record($controller->note->getXref(), WT_GED_ID)!==null) {
+		if (WT_USER_CAN_ACCEPT) {
+			echo '<p class="ui-state-highlight">', WT_I18N::translate('This note has been edited.  You should review the changes and then <a href="%1$s">accept</a> or <a href="%2$s">reject</a> them.', $controller->note->getHtmlUrl().'&amp;action=accept', $controller->note->getHtmlUrl().'&amp;action=undo'), '</p>';
+		} elseif (WT_USER_CAN_EDIT) {
+			echo '<p class="ui-state-highlight">', WT_I18N::translate('This note has been edited.  The changes need to be reviewed by a moderator.'), '</p>';
+		}
+	} elseif ($controller->accept_success) {
+		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been accepted.'), '</p>';
+	} elseif ($controller->reject_success) {
+		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been rejected.'), '</p>';
+	}
+} else {
+	print_header(WT_I18N::translate('Note'));
+	echo '<p class="ui-state-error">', WT_I18N::translate('This note does not exist or you do not have permission to view it.'), '</p>';
 	print_footer();
 	exit;
 }
 
-if (!$controller->note->canDisplayDetails()) {
-	print_privacy_error();
-	print_footer();
-	exit;
-}
-
-if ($controller->note->isMarkedDeleted()) {
-	echo '<span class="error">', WT_I18N::translate('This record has been marked for deletion upon admin approval.'), '</span>';
-}
+// We have finished writing session data, so release the lock
+Zend_Session::writeClose();
 
 if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/lb_defaultconfig.php';
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 }
 
@@ -67,7 +71,7 @@ echo 'function show_gedcom_record() {';
 echo ' var recwin=window.open("gedrecord.php?pid=', $controller->nid, '", "_blank", "top=0, left=0, width=600, height=400, scrollbars=1, scrollable=1, resizable=1");';
 echo '}';
 echo 'function showchanges() {';
-echo ' window.location="note.php?nid=', $controller->nid, '&show_changes=yes"';
+echo ' window.location="note.php?nid=', $controller->nid, '"';
 echo '}';
 echo 'function edit_note() {';
 echo ' var win04 = window.open("edit_interface.php?action=editnote&pid=', $linkToID, '", "win04", "top=70, left=70, width=620, height=500, resizable=1, scrollbars=1");';
@@ -76,9 +80,6 @@ echo '}';
 echo WT_JS_END;
 
 echo '<table class="list_table width80"><tr><td>';
-if ($controller->accept_success) {
-	echo '<b>', WT_I18N::translate('Changes successfully accepted into database'), '</b><br />';
-}
 echo '<span class="name_head">', PrintReady(htmlspecialchars($controller->note->getFullName()));
 echo '</span><br />';
 echo '<table class="facts_table">';
@@ -122,9 +123,9 @@ if ($controller->note->canEdit()) {
 	echo '<tr><td class="descriptionbox ', $TEXT_DIRECTION, '">';
 	echo WT_I18N::translate('Add media'), help_link('add_media');
 	echo '</td><td class="optionbox ', $TEXT_DIRECTION, '">';
-	echo '<a href="javascript: ', WT_I18N::translate('Add media'), '" onclick="window.open(\'addmedia.php?action=showmediaform&linktoid=', $controller->nid, '\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">', WT_I18N::translate('Add a new media item'), '</a>';
+	echo '<a href="javascript:;" onclick="window.open(\'addmedia.php?action=showmediaform&linktoid=', $controller->nid, '\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">', WT_I18N::translate('Add a new media object'), '</a>';
 	echo '<br />';
-	echo '<a href="javascript:;" onclick="window.open(\'inverselink.php?linktoid=', $controller->nid, '&linkto=note\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">', WT_I18N::translate('Link to an existing Media item'), '</a>';
+	echo '<a href="javascript:;" onclick="window.open(\'inverselink.php?linktoid=', $controller->nid, '&linkto=note\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">', WT_I18N::translate('Link to an existing media object'), '</a>';
 	echo '</td></tr>';
 }
 echo '</table><br /><br /></td></tr><tr class="center"><td colspan="2">';

@@ -1,31 +1,27 @@
 <?php
-/**
- * Interface to moderate pending changes.
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
- *
- * Derived from PhpGedView
- * Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @package webtrees
- * @subpackage Edit
- * @version $Id: edit_changes.php 10239 2011-01-01 22:32:55Z greg $
- */
+// Interface to moderate pending changes.
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: edit_changes.php 11750 2011-06-09 10:32:01Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_changes.php');
 require './includes/session.php';
@@ -41,7 +37,7 @@ $change_id=safe_GET('change_id');
 $index    =safe_GET('index');
 $ged      =safe_GET('ged');
 
-print_simple_header(/* I18N: Moderate as a verb, not adjective  */ WT_I18N::translate('Moderate pending changes'));
+print_simple_header(WT_I18N::translate('Pending changes'));
 echo WT_JS_START;
 ?>
 	function show_gedcom_record(xref) {
@@ -58,7 +54,7 @@ echo WT_JS_START;
 	}
 <?php
 echo WT_JS_END;
-echo '<div class="center"><span class="subheaders">', WT_I18N::translate('Moderate pending changes'), '</span><br /><br />';
+echo '<div class="center"><span class="subheaders">', WT_I18N::translate('Pending changes'), '</span><br /><br />';
 
 switch ($action) {
 case 'undo':
@@ -169,7 +165,7 @@ if ($changed_gedcoms) {
 				$record=new WT_GedcomRecord($change->gedcom);
 			}
 			$output.='<b>'.PrintReady($record->getFullName()).'</b> '.getLRM().'('.$record->getXref().')'.getLRM().'<br />';
-			$output.='<a href="javascript:;" onclick="return show_diff(\''.$record->getHtmlUrl().'&amp;show_changes=yes'.'\');">'.WT_I18N::translate('View Change Diff').'</a> | ';
+			$output.='<a href="javascript:;" onclick="return show_diff(\''.$record->getHtmlUrl().'\');">'.WT_I18N::translate('View the changes').'</a> | ';
 			$output.="<a href=\"javascript:show_gedcom_record('".$change->xref."');\">".WT_I18N::translate('View GEDCOM Record')."</a> | ";
 			$output.="<a href=\"javascript:;\" onclick=\"return edit_raw('".$change->xref."');\">".WT_I18N::translate('Edit raw GEDCOM record').'</a><br />';
 			$output.='<div class="indent">';

@@ -21,7 +21,7 @@
  *
  * @package webtrees
  * @subpackage Modules
- * @version $Id: Module.php 11055 2011-03-05 14:06:39Z greg $
+ * @version $Id: Module.php 11734 2011-06-08 14:33:59Z greg $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -68,6 +68,8 @@ interface WT_Module_Tab {
 	public function canLoadAjax();
 	public function getPreLoadContent();
 	public function getJSCallback();
+	public function isGrayedOut();
+
 }
 
 interface WT_Module_Theme {

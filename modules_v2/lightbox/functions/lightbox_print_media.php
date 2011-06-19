@@ -1,35 +1,29 @@
 <?php
-/**
- * Lightbox Album module for webtrees
- *
- * Display media Items using Lightbox
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
- *
- * Derived from PhpGedView
- * Copyright (C) 2007 to 2009  PGV Development Team.  All rights reserved.
- *
- * Modifications Copyright (c) 2010 Greg Roach
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @version $Id: lightbox_print_media.php 11573 2011-05-22 21:03:24Z greg $
- * @author Brian Holland
- *
- */
+// Lightbox Album module for webtrees
+//
+// Display media Items using Lightbox
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2007 to 2009  PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: lightbox_print_media.php 11766 2011-06-10 06:13:20Z larry $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -38,7 +32,7 @@ if (!defined('WT_WEBTREES')) {
 
 /**
  * -----------------------------------------------------------------------------
- * Print the links to multi-media objects
+ * Print the links to media objects
  * @param string $pid        The the xref id of the object to find media records related to
  * @param int $level        The level of media object to find
  * @param boolean $related        Whether or not to grab media from related records
@@ -231,6 +225,7 @@ function lightbox_print_media($pid, $level=1, $related=false, $kind=1, $noedit=f
 				$row['m_ext'] = $ext;
 				$row['mm_gid'] = $pid;
 				$row['mm_gedrec'] = $rowm['mm_gedrec'];
+				$row['m_gedfile'] = $rowm['m_gedfile'];
 				$rows['new'] = $row;
 				$rows['old'] = $rowm;
 			} else {
