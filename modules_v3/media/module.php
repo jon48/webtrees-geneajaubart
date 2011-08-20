@@ -1,0 +1,133 @@
+<?php
+// Classes and libraries for module system
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2010 John Finlay
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: module.php 11993 2011-07-11 20:26:20Z nigel $
+
+if (!defined('WT_WEBTREES')) {
+	header('HTTP/1.0 403 Forbidden');
+	exit;
+}
+
+class media_WT_Module extends WT_Module implements WT_Module_Tab {
+	// Extend WT_Module
+	public function getTitle() {
+		return /* I18N: Name of a module */ WT_I18N::translate('Media');
+	}
+
+	// Extend WT_Module
+	public function getDescription() {
+		return /* I18N: Description of the "Media" module */ WT_I18N::translate('A tab showing the media objects linked to an individual.');
+	}
+
+	// Implement WT_Module_Tab
+	public function defaultTabOrder() {
+		return 50;
+	}
+
+	protected $mediaCount = null;
+
+	// Implement WT_Module_Tab
+	public function hasTabContent() {
+		global $MULTI_MEDIA;
+		return $MULTI_MEDIA && (WT_USER_CAN_EDIT || $this->get_media_count()>0);
+	}
+	
+	// Implement WT_Module_Tab
+	public function isGrayedOut() {
+		return $this->get_media_count()==0;
+	}
+
+	// Implement WT_Module_Tab
+	public function getTabContent() {
+		global $MULTI_MEDIA, $NAV_MEDIA;
+
+		ob_start();
+		// For Reorder media ------------------------------------
+		if (WT_USER_GEDCOM_ADMIN) {
+			echo "<center>";
+			require_once './includes/media_tab_head.php';
+			echo "</center>";
+		}
+		?>
+		<div id="media_content">
+		<table class="facts_table">
+		<?php
+		$media_found = false;
+		if (!$this->controller->indi->canDisplayDetails()) {
+			echo "<tr><td class=\"facts_value\">";
+			print_privacy_error();
+			echo "</td></tr>";
+		}
+		else {
+			$media_found = print_main_media($this->controller->pid, 0, true);
+			if (!$media_found) echo "<tr><td id=\"no_tab4\" colspan=\"2\" class=\"facts_value\">".WT_I18N::translate('There are no media objects for this individual.')."</td></tr>";
+			//-- New Media link
+			if (WT_USER_CAN_EDIT && $this->controller->indi->canDisplayDetails()) {
+		?>
+				<tr>
+					<td class="facts_label"><?php echo WT_I18N::translate('Add media'), help_link('add_media'); ?></td>
+					<td class="facts_value">
+						<a href="javascript:;" onclick="window.open('addmedia.php?action=showmediaform&linktoid=<?php echo $this->controller->pid; ?>', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;"> <?php echo WT_I18N::translate('Add a new media object'); ?></a><br />
+						<a href="javascript:;" onclick="window.open('inverselink.php?linktoid=<?php echo $this->controller->pid; ?>&linkto=person', '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1'); return false;"><?php echo WT_I18N::translate('Link to an existing media object'); ?></a>
+					</td>
+				</tr>
+			<?php
+			}
+		}
+		?>
+		</table>
+			</div>
+	<?php
+		return '<div id="'.$this->getName().'_content">'.ob_get_clean().'</div>';
+	}
+
+	/**
+	* get the number of media items for this person
+	* @return int
+	*/
+	function get_media_count() {
+		if ($this->mediaCount===null) {
+			$ct = preg_match("/\d OBJE/", $this->controller->indi->getGedcomRecord());
+			foreach ($this->controller->indi->getSpouseFamilies() as $sfam)
+				$ct += preg_match("/\d OBJE/", $sfam->getGedcomRecord());
+			$this->mediaCount = $ct;
+		}
+		return $this->mediaCount;
+	}
+
+	// Implement WT_Module_Tab
+	public function canLoadAjax() {
+		return true;
+	}
+
+	// Implement WT_Module_Tab
+	public function getPreLoadContent() {
+		return '';
+	}
+
+	// Implement WT_Module_Tab
+	public function getJSCallback() {
+		return '';
+	}
+
+}

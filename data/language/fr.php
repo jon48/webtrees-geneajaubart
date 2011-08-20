@@ -21,6 +21,7 @@ return array(
 	//'LANGUAGE_LIST_SEPARATOR_LAST'	=>	' et ',
 	' and '							=>	' et ',
 	'My page'						=>	'Ma page',	
+	'%j %F %Y'						=> 	'%D %j %F %Y', 
 
 	//Hooks management
 	'Hooks'							=>	'<em>Hooks</em>',
