@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id: style.css 11779 2011-06-11 17:31:09Z greg $
+ * $Id: style.css 12095 2011-08-04 14:30:44Z rob $
  * @version: p_$Revision$ $Date$
  * $HeadURL$
  */
@@ -28,7 +28,8 @@ html { overflow-y:scroll; }
 /* general styles */
 body {font-family:Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; font-size:12px; margin:10px; min-width:800px;}
 input.ui-button { padding:1px 3px;}
-input, textarea {	color:black; padding-left:3px; padding-right:3px;}
+input, textarea { color:black; padding-left:3px; padding-right:0px; }
+html[dir='rtl'] input, html[dir='rtl'] textarea {padding-right: 3px; padding-left: 0px;}
 fieldset {margin:8px 8px 4px 8px;}
 legend {font-style:italic; font-weight:bold;	padding:0 5px 5px; align:top;}
 img {border:none; vertical-align:middle;}
@@ -46,7 +47,7 @@ td {vertical-align:top;}
 html[dir='rtl'] .indent {padding-right:15px;}
 .parentdeath {border:thin solid red; padding:1px;}
 .submenu { background-color:#EEE; border:thin solid #AAA; padding: 3px;}
-
+.rela { opacity : 0.4;}
 
 /* jQuery styling over-rides */
 .ui-widget-content a {text-decoration:none;}
@@ -57,6 +58,7 @@ html[dir='rtl'] .indent {padding-right:15px;}
 .ui-accordion .ui-accordion-content-active {display:block;}
 .css_right {float:right;}
 html[dir='rtl'] .css_right {float:left;}
+html[dir='rtl'] input {padding-right: 3px; padding-left: 0px;}
 
 /* jEditable styling over-rides */
 .editable {width:100%; display:block}
@@ -109,9 +111,9 @@ html[dir='rtl'] #links li ul {left:auto; right:0px;}
 #admin_content {min-width:830px;}
 
 /* SIDE MENU */
-
 #admin_menu {
-	padding:10px 0 10px 5px; 
+	padding:10px 0 10px 5px;
+	top: 92px; left: 10px; right: auto; 
 	width:200px; 
 	float:left; 
 	position:absolute; 
@@ -121,6 +123,7 @@ html[dir='rtl'] #links li ul {left:auto; right:0px;}
 	*position:relative;  /* - IE7 hack */
 }
 html[dir='rtl'] #admin_menu {
+	top: 92px; left: auto; right: 10px; 
 	padding:10px 5px 10px 0;
 	float:right;
 }
@@ -160,7 +163,6 @@ html[dir='rtl'] #admin_footer {float:right;}
 
 /* DASHBOARD BLOCKS */
 #content_container {background:OldLace; padding:5px; border:1px inset #D9D6C4; height:570px; overflow:auto;}
-#about {height:140px !important;}
 #users {white-space:nowrap;}
 #users ul {list-style-type:none; padding:0px; margin:0 0 0 20px;}
 html[dir='rtl'] #users ul {margin:0 20px 0 0;}
@@ -177,6 +179,7 @@ html[dir='rtl'] #tree_stats td, html[dir='rtl'] #recent td {padding:0 0 0 10px; 
 #tree_stats .ui-accordion-content, #recent2 .ui-accordion-content {padding:1em; min-height:140px;}
 #tree_stats.ui-widget, #changes.ui-widget {font-size:100% !important;}
 #trees span, #recent2 span {text-decoration:underline;}
+#x h2, #x h3 {padding:0 25px;}
 
 /*SITE CONFIG */
 #site table, #mail table {background:OldLace; border:1px inset #D9D6C4; border-collapse:separate; border-spacing:0; font-size:90%; padding:5px; width:100%;}

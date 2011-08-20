@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: set_gedcom_defaults.php 11786 2011-06-12 00:45:31Z greg $
+// $Id: set_gedcom_defaults.php 11872 2011-06-21 19:32:06Z greg $
 
 if (!defined('WT_WEBTREES') || empty($ged_id) || empty($ged_name)) {
 	header('HTTP/1.0 403 Forbidden');
@@ -145,7 +145,6 @@ set_gedcom_setting($ged_id, 'USE_MEDIA_FIREWALL',           false);
 set_gedcom_setting($ged_id, 'USE_MEDIA_VIEWER',             true);
 set_gedcom_setting($ged_id, 'USE_RIN',                      false);
 set_gedcom_setting($ged_id, 'USE_SILHOUETTE',               true);
-set_gedcom_setting($ged_id, 'USE_THUMBS_MAIN',              true);
 set_gedcom_setting($ged_id, 'WATERMARK_THUMB',              false);
 set_gedcom_setting($ged_id, 'WEBMASTER_USER_ID',            WT_USER_ID);
 set_gedcom_setting($ged_id, 'WEBTREES_EMAIL',               '');

@@ -21,11 +21,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: addmedia.php 11753 2011-06-09 16:39:50Z greg $
+// $Id: addmedia.php 11991 2011-07-11 05:45:33Z larry $
 
 define('WT_SCRIPT_NAME', 'addmedia.php');
 require './includes/session.php';
-require WT_ROOT.'includes/functions/functions_print_lists.php';
+require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
 // TODO use GET/POST, rather than $_REQUEST

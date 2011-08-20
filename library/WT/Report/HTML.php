@@ -26,7 +26,7 @@
  *
  * @package webtrees
  * @subpackage Reports
- * @version $Id: HTML.php 10576 2011-01-23 14:45:38Z veit $
+ * @version $Id: HTML.php 12082 2011-07-29 14:55:29Z lukasz $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -611,7 +611,7 @@ class CellHTML extends Cell {
 	*/
 	function render(&$html) {
 
-		if (strpos($this->text, "{{nb}}") !== false) {
+		if (strpos($this->text, "{{:ptp:}}") !== false) {
 			return;
 		}
 		$temptext = str_replace("#PAGENUM#", $html->PageNo(), $this->text);

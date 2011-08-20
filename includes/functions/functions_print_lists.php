@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print_lists.php 11801 2011-06-12 20:13:06Z greg $
+// $Id: functions_print_lists.php 12019 2011-07-15 22:18:47Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -1146,9 +1146,9 @@ function format_surname_table($surnames, $type, $extra = '') {
 		// Each surname links back to the indi/fam surname list
 		//PERSO Add $extra parameter for more complex urls
 		if ($surn) {
-			$url=$type.'.php?surname='.urlencode($surn).'&amp;ged='.rawurlencode($GEDCOM).$extra;
+			$url=$type.'.php?surname='.urlencode($surn).'&amp;ged='.WT_GEDURL.$extra;
 		} else {
-			$url=$type.'.php?alpha=,&amp;ged='.rawurlencode($GEDCOM).$extra;
+			$url=$type.'.php?alpha=,&amp;ged='.WT_GEDURL.$extra;
 			
 		}
 		//END PERSO
@@ -1410,12 +1410,11 @@ function print_changes_table($change_ids, $sort, $show_parents=false) {
         case 'date_desc':   //date descending
             $aaSorting = "[4,'desc'], [5,'asc']";
     }
-    echo WT_JS_START . 'var table_id = "' . $table_id . '"' . WT_JS_END;
 ?>
     <script type="text/javascript" src="js/jquery/jquery.dataTables.min.js"></script>
     <script type="text/javascript">
         jQuery(document).ready(function(){
-            jQuery('#'+table_id).dataTable( {
+					jQuery('#<?php echo $table_id; ?>').dataTable( {
                 "bAutoWidth":false,
                 "bPaginate": false,
                 "bLengthChange": false,
@@ -1535,12 +1534,11 @@ function print_changes_table($change_ids, $sort, $show_parents=false) {
 function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_living=false, $sort_by='anniv') {
 	global $TEXT_DIRECTION, $WT_IMAGES;
 	$table_id = "ID".floor(microtime()*1000000); // each table requires a unique ID
-	echo WT_JS_START.'var table_id = "'.$table_id.'"'.WT_JS_END;
 	?>
 	<script type="text/javascript" src="js/jquery/jquery.dataTables.min.js"></script>
 	<script type="text/javascript">
 		jQuery(document).ready(function(){
-			jQuery('#'+table_id).dataTable( {
+			jQuery('#<?php echo $table_id; ?>').dataTable( {
 				"bAutoWidth":false,
 				"bPaginate": false,
 				"bLengthChange": false,
@@ -1679,7 +1677,7 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 		$return .= $n;
 		$return .= '</td>';
 		//-- Anniversary
-		$return .= '<td class="list_value_wrap rela">';
+		$return .= '<td class="list_value_wrap">';
 		$anniv = $value['anniv'];
 //		if ($anniv==0) $return .= '<a name="-1">&nbsp;</a>';
 		if ($anniv==0) $return .= '&nbsp;';
@@ -1699,9 +1697,10 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 		$return .= '</tbody><tfoot><tr class="sortbottom">';
 		$return .= '<td class="list_label">';
 		$return .= "<input id=\"cb_parents_$table_id\" type=\"checkbox\" onclick=\"toggleByClassName('DIV', 'parents_$table_id');\" /><label for=\"cb_parents_$table_id\">&nbsp;&nbsp;".WT_I18N::translate('Show parents').'</label><br />';
-		$return .= '</td><td class="list_label" colspan="3">';
+		$return .= '</td><td class="list_label">';
 		$return .= /* I18N: A count of events */ WT_I18N::translate('Total events: %s', WT_I18N::number($output));
 		$return .= '</td>';
+		$return .= '<td class="list_label">&nbsp;</td><td class="list_label">&nbsp;</td>';//DataTables cannot work with colspan
 		$return .= '</tr></tfoot>';
 		$return .= '</table>';
 	}

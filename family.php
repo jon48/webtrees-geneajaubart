@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: family.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: family.php 12015 2011-07-14 11:26:08Z greg $
 
 define('WT_SCRIPT_NAME', 'family.php');
 require './includes/session.php';
@@ -31,25 +31,53 @@ require './includes/session.php';
 $controller = new WT_Controller_Family();
 $controller->init();
 
-if ($controller->family && $controller->family->canDisplayName()) {
+if ($controller->family && $controller->family->canDisplayDetails()) {
 	print_header($controller->getPageTitle());
 	if ($controller->family->isMarkedDeleted()) {
 		if (WT_USER_CAN_ACCEPT) {
-			echo '<p class="ui-state-highlight">', WT_I18N::translate('This family has been deleted.  You should review the deletion and then <a href="%1$s">accept</a> or <a href="%2$s">reject</a> it.', $controller->family->getHtmlUrl().'&amp;action=accept', $controller->family->getHtmlUrl().'&amp;action=undo'), '</p>';
+			echo
+				'<p class="ui-state-highlight">',
+				/* I18N: %1$s is "accept", %2$s is "reject".  These are links. */ WT_I18N::translate(
+					'This family has been deleted.  You should review the deletion and then %1$s or %2$s it.',
+					'<a href="' . $controller->family->getHtmlUrl() . '&amp;action=accept">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'accept') . '</a>',
+					'<a href="' . $controller->family->getHtmlUrl() . '&amp;action=undo">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'reject') . '</a>'
+				),
+				' ', help_link('pending_changes'),
+				'</p>';
 		} elseif (WT_USER_CAN_EDIT) {
-			echo '<p class="ui-state-highlight">', WT_I18N::translate('This family has been deleted.  The deletion will need to be reviewed by a moderator.'), '</p>';
+			echo
+				'<p class="ui-state-highlight">',
+				WT_I18N::translate('This family has been deleted.  The deletion will need to be reviewed by a moderator.'),
+				' ', help_link('pending_changes'),
+				'</p>';
 		}
 	} elseif (find_updated_record($controller->family->getXref(), WT_GED_ID)!==null) {
 		if (WT_USER_CAN_ACCEPT) {
-			echo '<p class="ui-state-highlight">', WT_I18N::translate('This family has been edited.  You should review the changes and then <a href="%1$s">accept</a> or <a href="%2$s">reject</a> them.', $controller->family->getHtmlUrl().'&amp;action=accept', $controller->family->getHtmlUrl().'&amp;action=undo'), '</p>';
+			echo
+				'<p class="ui-state-highlight">',
+				/* I18N: %1$s is "accept", %2$s is "reject".  These are links. */ WT_I18N::translate(
+					'This family has been edited.  You should review the changes and then %1$s or %2$s them.',
+					'<a href="' . $controller->family->getHtmlUrl() . '&amp;action=accept">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'accept') . '</a>',
+					'<a href="' . $controller->family->getHtmlUrl() . '&amp;action=undo">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'reject') . '</a>'
+				),
+				' ', help_link('pending_changes'),
+				'</p>';
 		} elseif (WT_USER_CAN_EDIT) {
-			echo '<p class="ui-state-highlight">', WT_I18N::translate('This family has been edited.  The changes need to be reviewed by a moderator.'), '</p>';
+			echo
+				'<p class="ui-state-highlight">',
+				WT_I18N::translate('This family has been edited.  The changes need to be reviewed by a moderator.'),
+				' ', help_link('pending_changes'),
+				'</p>';
 		}
 	} elseif ($controller->accept_success) {
 		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been accepted.'), '</p>';
 	} elseif ($controller->reject_success) {
 		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been rejected.'), '</p>';
 	}
+} elseif ($controller->family && $SHOW_PRIVATE_RELATIONSHIPS) {
+	print_header($controller->getPageTitle());
+	// Continue - to display the children/parents/grandparents.
+	// We'll check for showing the details again later
 } else {
 	print_header(WT_I18N::translate('Family'));
 	echo '<p class="ui-state-error">', WT_I18N::translate('This family does not exist or you do not have permission to view it.'), '</p>';
@@ -67,19 +95,14 @@ if (WT_USE_LIGHTBOX) {
 $PEDIGREE_FULL_DETAILS = "1"; // Override GEDCOM configuration
 $show_full = "1";
 
+echo WT_JS_START;
+echo 'function show_gedcom_record() {';
+echo ' var recwin=window.open("gedrecord.php?pid=', $controller->family->getXref(), '", "_blank", "top=0, left=0, width=600, height=400, scrollbars=1, scrollable=1, resizable=1");';
+echo '}';
+echo 'function showchanges() { window.location="'.$controller->family->getRawUrl().'"; }';
+echo WT_JS_END;
+
 ?>
-<script type="text/javascript">
-<!--
-	function show_gedcom_record(shownew) {
-		fromfile="";
-		if (shownew=="yes") fromfile='&fromfile=1';
-		var recwin = window.open("gedrecord.php?pid=<?php echo $controller->getFamilyID(); ?>"+fromfile, "_blank", "top=50, left=50, width=600, height=400, scrollbars=1, scrollable=1, resizable=1");
-	}
-	function showchanges() {
-		window.location = '<?php echo $controller->family->getRawUrl(); ?>';
-	}
-//-->
-</script>
 <table align="center" width="95%">
 	<tr>
 		<td>
@@ -127,8 +150,13 @@ $show_full = "1";
 				</tr>
 				<tr>
 					<td colspan="2">
-						<br /><hr />
-						<?php print_family_facts($controller->family); ?>
+						<?php
+							if ($controller->family->canDisplayDetails()) {
+								print_family_facts($controller->family);
+							} else {
+								echo '<p class="ui-state-highlight">', WT_I18N::translate('The details of this family are private.'), '</p>';
+							}
+						?>
 					</td>
 				</tr>
 			</table>

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_edit.php 11789 2011-06-12 09:24:50Z greg $
+// $Id: functions_edit.php 12074 2011-07-27 23:10:26Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -872,8 +872,8 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 		}
 		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN'), "<br />";
 		if (isset($famrec)) {
-			$event = new WT_Event(get_sub_record(1, "1 CHAN", $famrec));
-			echo format_fact_date($event, false, true);
+			$event = new WT_Event(get_sub_record(1, "1 CHAN", $famrec), null, 0);
+			echo format_fact_date($event, new WT_Person(''), false, true);
 		}
 		echo "</td></tr>";
 	}
@@ -1111,7 +1111,7 @@ function print_calendar_popup($id, $asString=false) {
 	if (isset($WT_IMAGES["button_calendar"])) $Link = "<img src=\"".$WT_IMAGES["button_calendar"]."\" name=\"img".$id."\" id=\"img".$id."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 	else $Link = $text;
 	$out = ' ';
-	$out .= "<a href=\"javascript: ".$text."\" onclick=\"cal_toggleDate('caldiv".$id."', '".$id."'); return false;\" tabindex=\"-1\">";
+	$out .= "<a href=\"javascript: ".$text."\" onclick=\"cal_toggleDate('caldiv".$id."', '".$id."'); return false;\">";
 	$out .= $Link;
 	$out .= "</a>";
 	$out .= "<div id=\"caldiv".$id."\" style=\"position:absolute;visibility:hidden;background-color:white;layer-background-color:white; z-index: 1000;\"></div>";
@@ -1446,6 +1446,8 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 				} else {
 					echo help_link('edit_add_SHARED_NOTE');
 				}
+			} elseif ($fact=="TYPE" && $upperlevel=='OBJE') {
+			// no help required for Media Type drop-down list
 			} else {
 				echo help_link($fact);
 			}
@@ -1531,34 +1533,34 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		case 'F': echo edit_field_pedi_f($element_name, $value); break;
 		default:  echo edit_field_pedi_u($element_name, $value); break;
 		}
-	} else if ($fact=="STAT") {
+	} else if ($fact=='STAT') {
 		echo select_edit_control($element_name, WT_Gedcom_Code_Stat::statusNames($upperlevel), '', $value);
-	} else if ($fact=="RELA") {
+	} else if ($fact=='RELA') {
 		echo edit_field_rela($element_name, strtolower($value));
-	} else if ($fact=="_WT_USER") {
+	} else if ($fact=='_WT_USER') {
 		echo edit_field_username($element_name, $value);
-	} else if ($fact=="RESN") {
+	} else if ($fact=='RESN') {
 		echo edit_field_resn($element_name, $value);
-	} else if ($fact=="_PRIM" or $fact=="_THUM") {
-		echo "<select id=\"", $element_id, "\" name=\"", $element_name, "\" >";
-		echo "<option value=\"\"></option>";
-		echo "<option value=\"Y\"";
-		if ($value=="Y") echo " selected=\"selected\"";
-		echo ">", WT_I18N::translate('Yes'), "</option>";
-		echo "<option value=\"N\"";
-		if ($value=="N") echo " selected=\"selected\"";
-		echo ">", WT_I18N::translate('No'), "</option>";
-		echo "</select>";
-	} else if ($fact=="SEX") {
-		echo "<select id=\"", $element_id, "\" name=\"", $element_name, "\"><option value=\"M\"";
-		if ($value=="M") echo " selected=\"selected\"";
-		echo ">", WT_I18N::translate('Male'), "</option><option value=\"F\"";
-		if ($value=="F") echo " selected=\"selected\"";
-		echo ">", WT_I18N::translate('Female'), "</option><option value=\"U\"";
-		if ($value=="U" || empty($value)) echo " selected=\"selected\"";
-		echo ">", WT_I18N::translate_c('unknown gender', 'Unknown'), "</option></select>";
-	} else if ($fact == "TYPE" && $level == '3') {
-		//-- Build the selector for the Media "TYPE" Fact
+	} else if ($fact=='_PRIM') {
+		echo '<select id="', $element_id, '" name="', $element_name, '" >';
+		echo '<option value=""></option>';
+		echo '<option value="Y"';
+		if ($value=='Y') echo ' selected="selected"';
+		echo '>', WT_I18N::translate('yes'), '</option>';
+		echo '<option value="N"';
+		if ($value=='N') echo ' selected="selected"';
+		echo '>', WT_I18N::translate('no'), '</option>';
+		echo '</select>';
+	} else if ($fact=='SEX') {
+		echo '<select id="', $element_id, '" name="', $element_name, '"><option value="M"';
+		if ($value=='M') echo ' selected="selected"';
+		echo '>', WT_I18N::translate('Male'), '</option><option value="F"';
+		if ($value=='F') echo ' selected="selected"';
+		echo '>', WT_I18N::translate('Female'), '</option><option value="U"';
+		if ($value=='U' || empty($value)) echo ' selected="selected"';
+		echo '>', WT_I18N::translate_c('unknown gender', 'Unknown'), '</option></select>';
+	} else if ($fact == 'TYPE' && $level == '3') {
+		//-- Build the selector for the Media 'TYPE' Fact
 		echo '<select name="text[]"><option selected="selected" value="" ></option>';
 		$selectedValue = strtolower($value);
 		if (!array_key_exists($selectedValue, WT_Gedcom_Tag::getFileFormTypes())) {
@@ -1599,7 +1601,6 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 					echo "<input type=\"text\" id=\"", $element_id, "\" name=\"", $element_name, "\" value=\"", PrintReady(htmlspecialchars($value)), "\" size=\"", $cols, "\" dir=\"ltr\"";
 				}
 				echo " class=\"{$fact}\"";
-				echo " autocomplete=\"off\"";
 				if (in_array($fact, $subnamefacts)) echo " onblur=\"updatewholename();\" onkeyup=\"updatewholename();\"";
 				if ($fact=="DATE") echo " onblur=\"valid_date(this);\" onmouseout=\"valid_date(this);\"";
 				if ($fact=="LATI") echo " onblur=\"valid_lati_long(this, 'N', 'S');\" onmouseout=\"valid_lati_long(this, 'N', 'S');\"";

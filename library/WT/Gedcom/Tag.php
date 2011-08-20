@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Tag.php 11713 2011-06-05 18:58:55Z lukasz $
+// $Id: Tag.php 12085 2011-07-31 07:30:38Z veit $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -84,7 +84,7 @@ class WT_Gedcom_Tag {
 		'_MARR_GCH1', '_MARR_GCH2', '_MARR_HSIB', '_MARR_PARE', '_MARR_SIBL', '_MBON',
 		'_MDCL', '_MEDC', '_MEND', '_MILI', '_MILT', '_MREL', '_MSTAT', '_NAME', '_NAMS',
 		'_NLIV', '_NMAR', '_NMR', '_WT_USER', '_PRMN', '_SCBK', '_SEPR', '_SSHOW', '_STAT',
-		'_SUBQ', '_THUM', '_TODO', '_TYPE', '_UID', '_URL', '_WEIG', '_YART', '__BRTM_CHIL',
+		'_SUBQ', '_TODO', '_TYPE', '_UID', '_URL', '_WEIG', '_YART', '__BRTM_CHIL',
 		'__BRTM_GCHI', '__BRTM_GCH1', '__BRTM_GCH2', '__BRTM_HSIB', '__BRTM_SIBL',
 		// These pseudo-tags are generated dynamically to display media object attributes
 		'__FILE_SIZE__', '__IMAGE_SIZE__',	
@@ -752,6 +752,7 @@ class WT_Gedcom_Tag {
 			}
 		case '_DEG': return /* I18N: gedcom tag _DEG */ WT_I18N::translate('Degree');
 		case '_DETS': return /* I18N: gedcom tag _DETS */ WT_I18N::translate('Death of one spouse');
+		case '_DNA': return /* I18N: gedcom tag _DNA (from FTM 2010) */ WT_I18N::translate('DNA Markers');
 		case '_EMAIL': return /* I18N: gedcom tag _EMAIL */ WT_I18N::translate('Email address');
 		case '_EYEC': return /* I18N: gedcom tag _EYEC */ WT_I18N::translate('Eye color');
 		case '_FA1': return WT_I18N::translate('Fact 1');
@@ -903,8 +904,7 @@ class WT_Gedcom_Tag {
 		case '_SSHOW': return /* I18N: gedcom tag _SSHOW */ WT_I18N::translate('Slide show');
 		case '_STAT': return /* I18N: gedcom tag _STAT */ WT_I18N::translate('Marriage status');
 		case '_SUBQ': return /* I18N: gedcom tag _SUBQ */ WT_I18N::translate('Short version');
-		case '_THUM': return /* I18N: gedcom tag _THUM */ WT_I18N::translate('Always use main image?');
-		case '_TODO': return /* I18N: gedcom tag _TODO */ WT_I18N::translate('To-do item');
+		case '_TODO':  return /* I18N: gedcom tag _TODO */  WT_I18N::translate('Research task');
 		case '_TYPE': return /* I18N: gedcom tag _TYPE */ WT_I18N::translate('Media type');
 		case '_UID': return /* I18N: gedcom tag _UID */ WT_I18N::translate('Globally unique identifier');
 		case '_URL': return /* I18N: gedcom tag _URL */ WT_I18N::translate('Web URL');

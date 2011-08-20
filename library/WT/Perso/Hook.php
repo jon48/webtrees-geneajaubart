@@ -192,7 +192,7 @@ class WT_Perso_Hook {
 		if(self::$_isModuleOperational == -1){
 			self::$_isModuleOperational = array_key_exists('perso_hooks', WT_Module::getActiveModules());
 			if(self::$_isModuleOperational){
-				self::$_isModuleOperational = WT_DB::table_exists('##phooks');
+				self::$_isModuleOperational = WT_Perso_Functions::doesTableExist('##phooks');
 			}
 		}
 		return self::$_isModuleOperational;

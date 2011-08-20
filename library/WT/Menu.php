@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// @version $Id: Menu.php 11742 2011-06-08 22:22:44Z greg $
+// $Id: Menu.php 11978 2011-07-08 07:17:28Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -52,13 +52,14 @@ class WT_Menu {
 	* @param string $pos The position of the label relative to the icon (right, left, top, bottom)
 	* @param string $flyout The direction where any submenus should appear relative to the menu item (right, down)
 	*/
-	function __construct($label=' ', $link='#', $pos='right', $flyout='down', $id=null)
+	function __construct($label=' ', $link='#', $id=null, $labelpos='right', $flyout='down')
 	{
-		$this->submenus = array();
-		$this->addLink($link);
-		$this->addLabel($label, $pos);
-		$this->addFlyout($flyout);
-		$this->addId($id);
+		$this->label   =$label;
+		$this->labelpos=$labelpos;
+		$this->link    =$link;
+		$this->id      =$id;
+		$this->flyout  =$flyout;
+		$this->submenus=array();
 	}
 
 	function addLabel($label=' ', $pos='right')
@@ -105,10 +106,6 @@ class WT_Menu {
 		$this->iconclass = $iconclass;
 	}
 
-	function addId($id) {
-		$this->id=$id;
-	}
-
 	function addTarget($target)
 	{
 		$this->target = $target;
@@ -141,20 +138,20 @@ class WT_Menu {
 		if ($this->submenus) {
 			$html.='<ul>';
 			foreach ($this->submenus as $submenu) {
-				if ($submenu->submenus) {
-					$submenu->iconclass.=' icon_arrow';
+				if ($submenu) {
+					if ($submenu->submenus) {
+						$submenu->iconclass.=' icon_arrow';
+					}
+					$html.=$submenu->getMenuAsList();
 				}
-				$html.=$submenu->getMenuAsList();
 			}
 			$html.='</ul>';
 		}
-		//PERSO add menu class
 		if ($this->id) {
-			return '<li id="'.$this->id.'" class="'.$this->class.'">'.$html.'</li>';
+			return '<li id="'.$this->id.'">'.$html.'</li>';
 		} else {
-			return '<li class="'.$this->class.'">'.$html.'</li>';
+			return '<li>'.$html.'</li>';
 		}
-		//END PERSO
 	}
 
 	// Get the menu as a dropdown form element
@@ -187,23 +184,23 @@ class WT_Menu {
 		if ($this->link=="#") $this->link = "javascript:;";
 		$link = "<a href=\"{$this->link}\" onmouseover=\"";
 		if ($c >= 0) {
-			$link .= "show_submenu('menu{$id}_subs', 'menu{$id}', '{$this->flyout}'); ";
+			$link .= "show_submenu('menu{$id}_subs', 'menu{$id}', '{$this->flyout}');";
 		}
 		if ($this->hoverclass !== null) {
-			$link .= "change_class('menu{$id}', '{$this->hoverclass}'); ";
+			$link .= "change_class('menu{$id}', '{$this->hoverclass}');";
 		}
 		if ($this->hovericon !== null) {
-			$link .= "change_icon('menu{$id}_icon', '{$this->hovericon}'); ";
+			$link .= "change_icon('menu{$id}_icon', '{$this->hovericon}');";
 		}
 		$link .= '" onmouseout="';
 		if ($c >= 0) {
-			$link .= "timeout_submenu('menu{$id}_subs'); ";
+			$link .= "timeout_submenu('menu{$id}_subs');";
 		}
 		if ($this->hoverclass !== null) {
-			$link .= "change_class('menu{$id}', '{$this->class}'); ";
+			$link .= "change_class('menu{$id}', '{$this->class}');";
 		}
 		if ($this->hovericon !== null) {
-			$link .= "change_icon('menu{$id}_icon', '{$this->icon}'); ";
+			$link .= "change_icon('menu{$id}_icon', '{$this->icon}');";
 		}
 		if ($this->onclick !== null) {
 			$link .= "\" onclick=\"{$this->onclick}";

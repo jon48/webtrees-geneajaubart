@@ -23,11 +23,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: calendar.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: calendar.php 11991 2011-07-11 05:45:33Z larry $
 
 define('WT_SCRIPT_NAME', 'calendar.php');
 require './includes/session.php';
-require WT_ROOT.'includes/functions/functions_print_lists.php';
+require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 if (isset($_REQUEST['cal'])) $cal = $_REQUEST['cal'];
 if (isset($_REQUEST['day'])) $day = $_REQUEST['day'];
@@ -151,7 +151,8 @@ for ($d=1; $d<=$days_in_month; $d++) {
 	echo ' | ';
 }
 $tmp=new WT_Date($today->Format('%@ %A %O %E')); // Need a WT_Date object to get localisation
-echo "<a href=\"calendar.php?cal={$cal}&amp;day={$today->d}&amp;month={$today_month}&amp;year={$today->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action={$action}\"><b>".$tmp->Display(true, NULL, array()).'</b></a>';
+echo "<a href=\"calendar.php?cal={$cal}&amp;day={$today->d}&amp;month={$today_month}&amp;year={$today->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action={$action}\"><b>".$tmp->Display(false, NULL, array()).'</b></a>';
+echo '</td></tr>';
 // Month selector
 echo '<tr><td class="descriptionbox vmiddle">';
 echo WT_I18N::translate('Month'), help_link('annivers_month_select'), '</td>';
@@ -276,7 +277,7 @@ echo '</select>';
 
 echo '</td></tr>';
 echo '</table></form>';
-echo "<table class=\"center {$TEXT_DIRECTION} width100\"><tr>";
+echo "<table class=\"center {$TEXT_DIRECTION} width100\">";
 
 // Day/Month/Year and calendar selector
 echo '<tr><td class="topbottombar width50">';
@@ -415,10 +416,10 @@ case 'today':
 	echo "<table class=\"center {$TEXT_DIRECTION} width100\"><tr>";
 	// Table headings
 	echo "<td class=\"descriptionbox center width50\">";
-		if (isset($WT_IMAGES['indis'])) echo "<img id=\"calendar_img\" src=\"{$WT_IMAGES['indis']}\" border=\"0\" title=\"", WT_I18N::translate('Individuals'), "\" alt=\"", WT_I18N::translate('Individuals'), "\" />&nbsp;&nbsp;&nbsp;";
+		if (isset($WT_IMAGES['indis'])) echo "<img id=\"calendar_img_indi\" src=\"{$WT_IMAGES['indis']}\" border=\"0\" title=\"", WT_I18N::translate('Individuals'), "\" alt=\"", WT_I18N::translate('Individuals'), "\" />&nbsp;&nbsp;&nbsp;";
 		echo WT_I18N::translate('Individuals'), "</td>";
 	echo "<td class=\"descriptionbox center width50\">";
-		if (isset($WT_IMAGES['cfamily'])) echo "<img id=\"calendar_img\" src=\"{$WT_IMAGES['cfamily']}\" border=\"0\" title=\"", WT_I18N::translate('Families'), "\" alt=\"", WT_I18N::translate('Families'), "\" />&nbsp;&nbsp;&nbsp;";
+		if (isset($WT_IMAGES['cfamily'])) echo "<img id=\"calendar_img_fam\" src=\"{$WT_IMAGES['cfamily']}\" border=\"0\" title=\"", WT_I18N::translate('Families'), "\" alt=\"", WT_I18N::translate('Families'), "\" />&nbsp;&nbsp;&nbsp;";
 		echo WT_I18N::translate('Families'), "</td>";
 	echo "</tr><tr>";
 	// Table rows

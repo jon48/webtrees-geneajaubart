@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Timeline.php 10361 2011-01-05 21:37:18Z greg $
+// @version $Id: Timeline.php 12069 2011-07-27 10:37:31Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -219,7 +219,7 @@ class WT_Controller_Timeline extends WT_Controller_Base {
 				echo $event->getLabel();
 				echo " -- ";
 				if ($record instanceof WT_Person) {
-					echo format_fact_date($event);
+					echo format_fact_date($event, $record, false, false);
 				} elseif ($record instanceof WT_Family) {
 					echo $gdate->Display(false);
 					if ($record->getHusband() && $record->getHusband()->getBirthDate()->isOK()) {

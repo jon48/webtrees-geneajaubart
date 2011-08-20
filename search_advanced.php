@@ -21,11 +21,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search_advanced.php 11250 2011-04-01 13:48:42Z greg $
+// $Id: search_advanced.php 12009 2011-07-13 22:24:46Z greg $
 
 define('WT_SCRIPT_NAME', 'search_advanced.php');
 require './includes/session.php';
-require WT_ROOT.'includes/functions/functions_print_lists.php';
+require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 $controller=new WT_Controller_AdvancedSearch();
 $controller->init();
@@ -137,7 +137,7 @@ echo WT_JS_END;
 <input type="hidden" name="isPostBack" value="true" />
 <table id="field_table" class="list_table <?php echo $TEXT_DIRECTION; ?>" width="35%" border="0">
 	<tr>
-		<td colspan="4" class="facts_label03" style="text-align:center; ">
+		<td colspan="4" class="facts_label03" style="text-align:center;">
 			<?php echo WT_I18N::translate('Advanced search'); ?>
 		</td>
 	</tr>
@@ -212,7 +212,7 @@ echo WT_JS_END;
 				<table>
 					<!--  father -->
 					<tr>
-						<td colspan="2" class="facts_label03" style="text-align:center; ">
+						<td colspan="2" class="facts_label03" style="text-align:center;">
 							<?php echo WT_I18N::translate('Father'); ?>
 						</td>
 					</tr>
@@ -249,7 +249,7 @@ echo WT_JS_END;
 					<?php $j++; ?>
 					<tr><td colspan="2">&nbsp;</td></tr>
 					<tr>
-						<td colspan="2" class="facts_label03" style="text-align:center; ">
+						<td colspan="2" class="facts_label03" style="text-align:center;">
 							<?php echo WT_I18N::translate('Mother'); ?>
 						</td>
 					</tr>

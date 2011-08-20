@@ -2,7 +2,7 @@
 // Header for webtrees administration theme
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2010 webtrees development team.
+// Copyright (C) 2011 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: header.php 11084 2011-03-08 04:10:38Z nigel $
+// $Id: header.php 11961 2011-07-05 10:22:37Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -43,10 +43,10 @@ echo
 	'<body id="body">',
 // Header
 	'<div id="admin_head" class="ui-widget-content">',
-	'<a href="', WT_WEBTREES_URL, '" title="', WT_WEBTREES, '" alt="', WT_WEBTREES, '"><img src="', $WT_IMAGES['webtrees'], '"/></a>',
+	'<img src="', $WT_IMAGES['webtrees'], '" alt="', WT_WEBTREES, '"/>',
 	'<div id="title"><a href="admin.php">', WT_I18N::translate('Administration'), '</a></div>',
 	'<div id="links">',
-	'<a href="index.php">', WT_I18N::translate('My Page'), '</a> | ',
+	'<a href="index.php">', WT_I18N::translate('My page'), '</a> | ',
 	logout_link(),
 	'<span>';
 	$language_menu=WT_MenuBar::getLanguageMenu();

@@ -21,11 +21,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edituser.php 11611 2011-05-26 11:38:54Z greg $
+// $Id: edituser.php 11991 2011-07-11 05:45:33Z larry $
 
 define('WT_SCRIPT_NAME', 'edituser.php');
 require './includes/session.php';
-require WT_ROOT.'includes/functions/functions_print_lists.php';
+require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
 // prevent users with editing account disabled from being able to edit their account
@@ -138,7 +138,7 @@ function paste_id(value) {
 
 // show the form to edit a user account details
 $tab=0;
-echo '<form name="editform" method="post" action="" onsubmit="return checkform(this);" autocomplete="off">';
+echo '<form name="editform" method="post" action="" onsubmit="return checkform(this);">';
 echo '<input type="hidden" name="form_action" value="update" />';
 echo '<table class="list_table center ', $TEXT_DIRECTION, '">';
 
@@ -193,7 +193,7 @@ echo '<input type="text" name="form_email" value="', getUserEmail(WT_USER_ID), '
 echo '<tr><td class="descriptionbox wrap">';
 echo WT_I18N::translate('Theme'), help_link('THEME'), '</td><td class="optionbox" valign="top">';
 echo '<select name="form_theme">';
-echo '<option value="">', /* I18N: default option in list of themes */ WT_I18N::translate('&lt;default theme&gt;'), '</option>';
+echo '<option value="">', htmlspecialchars(/* I18N: default option in list of themes */ WT_I18N::translate('<default theme>')), '</option>';
 foreach (get_theme_names() as $themename=>$themedir) {
 	echo '<option value="', $themedir, '"';
 	if ($themedir==get_user_setting(WT_USER_ID, 'theme')) {

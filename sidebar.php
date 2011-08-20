@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// @version $Id: sidebar.php 11681 2011-06-01 23:01:04Z greg $
+// @version $Id: sidebar.php 11987 2011-07-10 05:03:55Z nigel $
 
 if (!defined('WT_SCRIPT_NAME')) define('WT_SCRIPT_NAME', 'sidebar.php');
 require_once('includes/session.php');
@@ -116,30 +116,42 @@ if (isset($controller)) {
 	if (empty($famid)) $famid = safe_POST('famid', WT_REGEX_XREF, '');
 }
 
-	echo '<div id="sidebarAccordion2">';
-	foreach ($sidebarmods as $mod) {
-		if (isset($controller)) $mod->setController($controller);
-		if ($mod->hasSidebarContent()) {
-			if ($mod->getName()=="extra_info") {
-				echo '<h3 id="', $mod->getName(), '"><a href="#">', $mod->getTitle(), '</a></h3>',
-					'<div id="sb_content_', $mod->getName(), '">', $mod->getSidebarContent(), '</div>',
-					WT_JS_START,'jQuery("#sidebarAccordion2").accordion({active:0, autoHeight: false, collapsible: true});', WT_JS_END;
-			}
-		}
-	}
-	echo '</div>';
 
-	$counter = 0;
-	echo '<div id="sidebarAccordion">';
-	foreach ($sidebarmods as $mod) {
-		if (isset($controller)) $mod->setController($controller);
-		if ($mod->hasSidebarContent()) {
-			if ($mod->getName()!="extra_info") {
-				echo '<h3 id="', $mod->getName(), '"><a href="#">', $mod->getTitle(), '</a></h3>',
-					'<div id="sb_content_', $mod->getName(), '">', $mod->getSidebarContent(), '</div>';
-				$counter++;
-			}
+echo WT_JS_START; //jQuery code to remove table elements from INDI facts
+?>
+jQuery(document).ready(function() {
+	jQuery('#sb_content_extra_info table').replaceWith(function() { return jQuery(this).contents(); });
+	jQuery('#sb_content_extra_info tbody').replaceWith(function() { return jQuery(this).contents(); });
+	jQuery('#sb_content_extra_info tr').replaceWith(function() { return jQuery(this).contents();	});
+	jQuery('#sb_content_extra_info td').replaceWith(function() { return jQuery(this).contents();	});
+});
+<?php
+echo WT_JS_END;
+
+/*echo '<div id="sidebarAccordion2">';
+foreach ($sidebarmods as $mod) {
+	if (isset($controller)) $mod->setController($controller);
+	if ($mod->hasSidebarContent()) {
+		if ($mod->getName()=="extra_info") {
+			echo '<h3 id="', $mod->getName(), '"><a href="#">', $mod->getTitle(), '</a></h3>',
+				'<div id="sb_content_', $mod->getName(), '"><table><tbody>', $mod->getSidebarContent(), '</tbody></table></div>',
+				WT_JS_START,'jQuery("#sidebarAccordion2").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});', WT_JS_END;
 		}
 	}
+}
+echo '</div>';*/
+
+$counter = 0;
+echo '<div id="sidebarAccordion">';
+foreach ($sidebarmods as $mod) {
+	if (isset($controller)) $mod->setController($controller);
+	if ($mod->hasSidebarContent()) {
+//		if ($mod->getName()!="extra_info") {
+			echo '<h3 id="', $mod->getName(), '"><a href="#">', $mod->getTitle(), '</a></h3>',
+				'<div id="sb_content_', $mod->getName(), '">', $mod->getSidebarContent(), '</div>';
+			$counter++;
+//		}
+	}
+}
 echo '</div>';
-echo WT_JS_START,'jQuery("#sidebarAccordion").accordion({active:0, autoHeight: false, collapsible: true});', WT_JS_END;
+echo WT_JS_START,'jQuery("#sidebarAccordion").accordion({active:"#family_nav", autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});', WT_JS_END;

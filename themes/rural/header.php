@@ -54,7 +54,7 @@ echo '<link rel="stylesheet" href="', $extrastylesheet,'" type="text/css" media=
 //END PERSO
 
 switch ($BROWSERTYPE) {
-case 'chrome':
+//case 'chrome': uncomment when chrome.css file needs to be added, or add others as needed
 case 'msie':
 	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_DIR, $BROWSERTYPE, '.css" />';
 	break;
@@ -75,7 +75,7 @@ echo
 	'<link rel="stylesheet" type="text/css" href="', WT_THEME_DIR, 'modules.css" />',
 	$javascript,
 	'</head>',
-	'<body>';
+	'<body id="body">';
 
 // begin header section
 if ($view=='simple') {
@@ -114,11 +114,10 @@ else {
 		echo '</div>';
 		echo  '<div id="hcenterright">';
 		echo '<ul class="makeMenu">';
-		echo '<li>';
 		if (WT_USER_ID) {
-			echo '<a href="edituser.php">', WT_I18N::translate('Logged in as '), ' (', WT_USER_NAME, ')</a> | ', logout_link();
+			echo '<li><a href="edituser.php">', WT_I18N::translate('Logged in as '), ' ', getUserFullName(WT_USER_ID), '</a></li> <li>', logout_link(), '</li>';
 		} else {
-			echo login_link();
+			echo '<li>', login_link(), '</li> ';
 		}
 		echo '</li>';
 		echo '</ul>';
@@ -129,23 +128,12 @@ else {
 		$hook_print_header->execute();
 		//END PERSO
 		echo '<ul class="makeMenu">';
-		$favmenu = WT_MenuBar::getFavoritesMenu();
-		if (count($favmenu->submenus)>1) {
-			echo '<li>';
-			echo $favmenu->getMenuAsList();
-			echo '</li> | ';			
-		}
-		if (get_gedcom_setting(WT_GED_ID, 'ALLOW_THEME_DROPDOWN') && get_site_setting('ALLOW_USER_THEMES')) {
-			echo '<li>';
-			echo WT_MenuBar::getThemeMenu()->getMenuAsList();
-			echo '</li> | ';
-		}
-		$language_menu=WT_MenuBar::getLanguageMenu();
-		if ($language_menu) {
-			echo '<li>';
-			echo $language_menu->getMenuAsList();
-			echo '</li>';
-		}
+		$menu=WT_MenuBar::getFavoritesMenu();
+			if ($menu) {echo $menu->GetMenuAsList();}
+		$menu=WT_MenuBar::getThemeMenu();
+			if ($menu) {echo $menu->GetMenuAsList();}
+		$menu=WT_MenuBar::getLanguageMenu();
+			if ($menu) {echo $menu->GetMenuAsList();}
 		echo '</ul>';
 		echo '</div>';
 		//Prepare menu bar

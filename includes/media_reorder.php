@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_reorder.php 11789 2011-06-12 09:24:50Z greg $
+// $Id: media_reorder.php 12054 2011-07-21 17:08:36Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -193,8 +193,8 @@ require_once WT_ROOT.'includes/functions/functions_print_facts.php';
 			echo "<input type=\"checkbox\" name=\"preserve_last_changed\" />";
 		}
 		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN'), "<br />";
-		$event = new WT_Event(get_sub_record(1, "1 CHAN", $gedrec));
-		echo format_fact_date($event, false, true);
+		$event = new WT_Event(get_sub_record(1, "1 CHAN", $gedrec), null, 0);
+		echo format_fact_date($event, new WT_Person(''), false, true);
 		echo "</td></tr></table><br />";
 	}
 	?>

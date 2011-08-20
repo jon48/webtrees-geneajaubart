@@ -21,7 +21,7 @@
  *
  * @package webtrees
  * @subpackage Admin
- * @version $Id: admin_site_logs.php 11564 2011-05-21 12:30:45Z greg $
+ * @version $Id: admin_site_logs.php 12093 2011-08-04 12:27:18Z rob $
  */
 
 define('WT_SCRIPT_NAME', 'admin_site_logs.php');
@@ -171,7 +171,7 @@ case 'load_json':
 	$iTotalDisplayRecords=WT_DB::prepare("SELECT FOUND_ROWS()")->fetchColumn();
 	$iTotalRecords=WT_DB::prepare($SELECT2.$WHERE)->execute($args)->fetchColumn();
 
-	header('Content-type: application/json; charset=utf8');	
+	header('Content-type: application/json');
 	echo json_encode(array( // See http://www.datatables.net/usage/server-side
 		'sEcho'               =>(int)safe_GET('sEcho'),
 		'iTotalRecords'       =>$iTotalRecords,
@@ -210,7 +210,7 @@ echo WT_JS_START;
 			"bAutoWidth":false,
 			"aaSorting": [[ 0, "desc" ]],
 			"iDisplayLength": <?php echo get_user_setting(WT_USER_ID, 'admin_site_log_page_size', 20); ?>,
-			"sPaginationType": "full_numbers",
+			"sPaginationType": "full_numbers"
 		});
 	});
 
@@ -240,7 +240,7 @@ echo
 			'<tr>',
 				'<td>',
 					// I18N: %s are both user-input date fields
-					WT_I18N::translate('From %s to %s', '<input name="from" size="8" value="'.htmlspecialchars($from).'" /><br /><br />', '&nbsp;<input name="to" size="8" value="'.htmlspecialchars($to).'" />'),
+					WT_I18N::translate('From %s to %s', '<input name="from" size="10" value="'.htmlspecialchars($from).'" /><br /><br />', '&nbsp;<input name="to" size="10" value="'.htmlspecialchars($to).'" />'),
 				'</td>',
 				'<td>',
 					WT_I18N::translate('Type'), '<br />', select_edit_control('type', array(''=>'', 'auth'=>'auth','config'=>'config','debug'=>'debug','edit'=>'edit','error'=>'error','media'=>'media','search'=>'search'), null, $type, ''),

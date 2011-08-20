@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: expand_view.php 11544 2011-05-16 17:42:27Z greg $
+// $Id: expand_view.php 12042 2011-07-20 16:33:49Z greg $
 
 define('WT_SCRIPT_NAME', 'expand_view.php');
 require './includes/session.php';
@@ -70,7 +70,7 @@ foreach ($events as $event) {
 		case 'ASSO':
 			// Associates
 			echo '<div>';
-			print_asso_rela_record($event);
+			print_asso_rela_record($event, $person);
 			echo '</div>';
 		default:
 			// Simple version of print_fact()
@@ -81,7 +81,7 @@ foreach ($events as $event) {
 			if ($details!='Y' && $details!='N') {
 				echo PrintReady($details);
 			}
-			echo format_fact_date($event, false, false, $event->getTag(), $person->getXref(), $person->getGedcomRecord());
+			echo format_fact_date($event, $person, false, false);
 			// Show spouse/family for family events
 			$spouse=WT_Person::getInstance($event->getSpouseId());
 			if ($spouse) {

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: message.php 10603 2011-01-25 09:28:33Z greg $
+// $Id: message.php 11888 2011-06-22 14:17:31Z greg $
 
 define('WT_SCRIPT_NAME', 'message.php');
 require './includes/session.php';
@@ -41,14 +41,26 @@ $time      =isset($_REQUEST['time'      ]) ? $_REQUEST['time'      ] : '';
 $method    =isset($_REQUEST['method'    ]) ? $_REQUEST['method'    ] : '';
 
 if (empty($to)) {
-	echo "<span class=\"error\">".WT_I18N::translate('No recipient user was provided.  Cannot continue.')."</span><br />";
+	echo '<p class="ui-state-error">'.WT_I18N::translate('No recipient user was provided.  Cannot continue.').'</p>';
 	print_simple_footer();
 	exit;
 }
 if ($to=="all" && !WT_USER_IS_ADMIN) {
-	echo "<span class=\"error\">".WT_I18N::translate('No recipient user was provided.  Cannot continue.')."</span><br />";
+	echo '<p class="ui-state-error">'.WT_I18N::translate('No recipient user was provided.  Cannot continue.').'</p>';
 	print_simple_footer();
 	exit;
+}
+// Do not allow anonymous visitors to include links to external sites
+if (!WT_USER_ID) {
+	if (
+		preg_match('/(?!'.preg_quote(WT_SERVER_NAME, '/').')(((?:ftp|http|https):\/\/)[a-zA-Z0-9.-]+)/', $subject, $match) ||
+		preg_match('/(?!'.preg_quote(WT_SERVER_NAME, '/').')(((?:ftp|http|https):\/\/)[a-zA-Z0-9.-]+)/', $body, $match)
+	) {
+		echo '<p class="ui-state-error">'.WT_I18N::translate('You are not allowed to send messages that contain external links.').'</p>';
+		echo '<p class="ui-state-highlight">'./* I18N: e.g. "You should delete the “http://” from “http://www.example.com” and try again." */ WT_I18N::translate('You should delete the “%1$s” from “%2$s” and try again.', $match[2], $match[1]).'</p>';
+		AddToLog('Possible spam message from "'.$from_name.'"/"'.$from_email.'", IP="'.$_SERVER['REMOTE_ADDR'].'", subject="'.$subject.'", body="'.$body.'"', 'auth');
+		$action='compose';
+	}
 }
 
 if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_send"]===true)) {
@@ -61,21 +73,19 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 			if (function_exists("checkdnsrr")) {
 				$ip = checkdnsrr($host);
 				if ($ip === false) {
-					$host = "www.".$host;
+					//$host = "www.".$host;
 					$ip = checkdnsrr($host);
 					if ($ip === false) {
-						echo "<center><br /><span class=\"error\">".WT_I18N::translate('Please enter a valid email address.')."</span>";
-						echo "<br /><br /></center>";
-						$action="compose";
+						echo '<p class="ui-state-error">'.WT_I18N::translate('Please enter a valid email address.').'</p>';
+						$action='compose';
 						//print_simple_footer();
 						//exit;
 					}
 				}
 			}
 		} else {
-			echo "<center><br /><span class=\"error\">".WT_I18N::translate('Please enter a valid email address.')."</span>";
-			echo "<br /><br /></center>";
-			$action="compose";
+			echo '<p class="ui-state-error">'.WT_I18N::translate('Please enter a valid email address.').'</p>';
+			$action='compose';
 		}
 	}
 	//-- check referer for possible spam attack

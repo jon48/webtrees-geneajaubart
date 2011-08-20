@@ -21,11 +21,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: find.php 11769 2011-06-10 13:06:43Z greg $
+// $Id: find.php 11991 2011-07-11 05:45:33Z larry $
 
 define('WT_SCRIPT_NAME', 'find.php');
 require './includes/session.php';
-require WT_ROOT.'includes/functions/functions_print_lists.php';
+require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 $type           =safe_GET('type', WT_REGEX_ALPHA, 'indi');
 $filter         =safe_GET('filter');

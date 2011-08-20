@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Media.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: Media.php 11969 2011-07-05 12:29:35Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -300,15 +300,6 @@ class WT_Media extends WT_GedcomRecord {
 	public function isPrimary() {
 		$prim = get_gedcom_value("_PRIM", 1, $this->getGedcomRecord());
 		return $prim;
-	}
-
-	/**
-	 * get the media _THUM from the gedcom
-	 * @return string
-	 */
-	public function useMainImage() {
-		$thum = get_gedcom_value("_THUM", 1, $this->getGedcomRecord());
-		return $thum;
 	}
 
 	/**
@@ -599,7 +590,6 @@ class WT_Media extends WT_GedcomRecord {
 	 * @param array with optional parameters: 
 	 *    'download'=>true|false, default is false - whether or not to show a 'download file' link
 	 *    'align'=>'auto'|'none', default is 'auto' - if set to 'auto', will add align='left' or align='right', depending on TEXT_DIRECTION
-	 *    'which'=>'main'|'thumb', default is 'thumb' - which image to display
 	 *    'display_type'=>'normal'|'pedigree_person'|'treeview'|'googlemap' the type of image this is
 	 *    'img_id'=>string (optional) - if this image needs an id, set it here
 	 *    'class'=>string (optional) - class to assign to image
@@ -616,7 +606,6 @@ class WT_Media extends WT_GedcomRecord {
 		$default_config=array(
 			'download'=>false,
 			'align'=>'auto',
-			'which'=>'thumb',
 			'display_type'=>'normal',
 			'img_id'=>'',
 			'class'=>'thumbnail',
@@ -632,17 +621,13 @@ class WT_Media extends WT_GedcomRecord {
 		} else {
 
 			$spacestr='';
-			if ( ($config['which']=='main') && (!$this->fileExists('main'))) {
-				// if main image does not exist, display thumbnail instead
-				$config['which']='thumb';
-			}
 			if ($config['display_type']=='pedigree_person') {
 				// 
 				$config['align']='none';
 				$config['uselightbox_fallback']=false;
 				$config['clearbox']='general_2';        
 				$spacestr=' vspace="0" hspace="0" ';
-				$imgsizeped=$this->getImageAttributes($config['which']);
+				$imgsizeped=$this->getImageAttributes('thumb');
 				$config['class']='pedigree_image_'.$imgsizeped['aspect'];
 				if ($TEXT_DIRECTION == "rtl") $config['class'] .= "_rtl";
 			}
@@ -651,7 +636,7 @@ class WT_Media extends WT_GedcomRecord {
 				$config['align']='none';
 				$config['uselightbox_fallback']=false;
 				$spacestr=' vspace="0" hspace="0" ';
-				$imgsizeped=$this->getImageAttributes($config['which']);
+				$imgsizeped=$this->getImageAttributes('thumb');
 				$config['class']='tv_link pedigree_image_'.$imgsizeped['aspect'];
 				if ($TEXT_DIRECTION == "rtl") $config['class'] .= "_rtl";
 			}
@@ -661,7 +646,7 @@ class WT_Media extends WT_GedcomRecord {
 				$config['oktolink']=false;
 				$config['addslashes']=true;
 				$spacestr=' vspace="0" hspace="0" ';
-				$imgsizeped=$this->getImageAttributes($config['which']);
+				$imgsizeped=$this->getImageAttributes('thumb');
 				$config['class']='pedigree_image_'.$imgsizeped['aspect'];
 				if ($TEXT_DIRECTION == "rtl") $config['class'] .= "_rtl";
 			}
@@ -675,19 +660,15 @@ class WT_Media extends WT_GedcomRecord {
 			}
 			$sizestr='';
 			if ($config['class']=='thumbnail') {
-				if ($config['which']=='main') {
-					$config['class']='image';
-				} else {
-					// only set width/height when class==thumbnail, all other classes control the width/height
-					$imgsize=$this->getImageAttributes('thumb');
-					$sizestr=$imgsize['imgWH'];
-				}
+				// only set width/height when class==thumbnail, all other classes control the width/height
+				$imgsize=$this->getImageAttributes('thumb');
+				$sizestr=$imgsize['imgWH'];
 			}
 
 			$output='';
 			if ($config['oktolink'] && $mainexists) $output .= '<a href="'.$this->getHtmlUrlSnippet($config).'">';
-			$output .= '<img '.$idstr.' src="'.$this->getHtmlUrlDirect($config['which']).'" '.$sizestr.' class="'.$config['class'].'"';
-			$output .= $spacestr.' border="none" '.$alignstr.' alt="'.$config['img_title'].'" title="'.$config['img_title'].'" '.$stylestr.' />';
+			$output .= '<img '.$idstr.' src="'.$this->getHtmlUrlDirect('thumb').'" '.$sizestr.' class="'.$config['class'].'"';
+			$output .= $spacestr.' '.$alignstr.' alt="'.$config['img_title'].'" title="'.$config['img_title'].'" '.$stylestr.' />';
 			if ($config['oktolink'] && $mainexists) {
 				$output .= '</a>';
 				if ($config['download'] && $SHOW_MEDIA_DOWNLOAD) {

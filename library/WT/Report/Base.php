@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Base.php 11753 2011-06-09 16:39:50Z greg $
+// $Id: Base.php 12078 2011-07-28 12:40:56Z veit $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -188,7 +188,7 @@ class WT_Report_Base {
 	* @var string
 	* @todo add the author support
 	*/
-	//var $rauthor = "";
+	public $rauthor = WT_SERVER_NAME;
 	/**
 	* Keywords
 	* @see WT_Report_Base::setup()
@@ -1651,7 +1651,7 @@ function PageNumSHandler() {
 */
 function TotalPagesSHandler() {
 	global $currentElement;
-	$currentElement->addText("{{nb}}");
+	$currentElement->addText("{{:ptp:}}");
 }
 
 /**

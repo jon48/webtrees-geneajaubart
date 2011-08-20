@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_pgv_to_wt.php 11786 2011-06-12 00:45:31Z greg $
+// $Id: admin_pgv_to_wt.php 12037 2011-07-19 10:07:03Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_pgv_to_wt.php');
 require './includes/session.php';
@@ -313,6 +313,14 @@ if ($PGV_SCHEMA_VERSION>=12) {
 		"  WHEN 'themes/xenea/'       THEN 'xenea'".
 		"  ELSE 'themes/webtrees/'". // ocean, simplyred/blue/green, standard, wood
 		" END".
+		" WHEN 'defaulttab' THEN".
+		"  CASE setting_value".
+		"  WHEN '1' THEN 'notes'".
+		"  WHEN '2' THEN 'sources_tab'".
+		"  WHEN '3' THEN 'media'".
+		"  WHEN '4' THEN 'relatives'".
+		"  ELSE 'personal_facts'". // -1=all and -2=last are not supported
+		" END".
 		" ELSE".
 		"  CASE".
 		"  WHEN setting_value IN ('Y', 'yes') THEN 1 WHEN setting_value IN ('N', 'no') THEN 0 ELSE setting_value END".
@@ -464,7 +472,7 @@ if ($PGV_SCHEMA_VERSION>=12) {
 			" JOIN `##user` ON (user_name=CONVERT(u_username USING utf8) COLLATE utf8_unicode_ci)".
 			" UNION ALL".
 			" SELECT user_id, 'defaulttab', ".
-			" CASE WHEN u_defaulttab IN ('Y', 'yes') THEN 1 WHEN u_defaulttab IN ('N', 'no') THEN 0 ELSE u_defaulttab END".
+			" CASE u_defaulttab WHEN 1 THEN 'notes' WHEN 2 THEN 'sources_tab' WHEN 3 THEN 'media' WHEN 4 THEN 'relatives' ELSE 'personal_facts' END".
 			" FROM `{$DBNAME}`.`{$TBLPREFIX}users`".
 			" JOIN `##user` ON (user_name=CONVERT(u_username USING utf8) COLLATE utf8_unicode_ci)".
 			" UNION ALL".
@@ -720,7 +728,6 @@ foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
 	@set_gedcom_setting($ged_id, 'USE_RELATIONSHIP_PRIVACY',     $USE_RELATIONSHIP_PRIVACY);
 	@set_gedcom_setting($ged_id, 'USE_RIN',                      $USE_RIN);
 	@set_gedcom_setting($ged_id, 'USE_SILHOUETTE',               $USE_SILHOUETTE);
-	@set_gedcom_setting($ged_id, 'USE_THUMBS_MAIN',              $USE_THUMBS_MAIN);
 	@set_gedcom_setting($ged_id, 'WATERMARK_THUMB',              $WATERMARK_THUMB);
 	@set_gedcom_setting($ged_id, 'WEBMASTER_USER_ID',            get_user_id($WEBMASTER_EMAIL));
 	@set_gedcom_setting($ged_id, 'WELCOME_TEXT_AUTH_MODE',       $WELCOME_TEXT_AUTH_MODE);

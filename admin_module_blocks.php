@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: admin_module_blocks.php 10970 2011-02-25 17:13:30Z greg $
+// @version $Id: admin_module_blocks.php 11994 2011-07-11 23:10:36Z nigel $
 
 define('WT_SCRIPT_NAME', 'admin_module_blocks.php');
 
@@ -83,8 +83,13 @@ print_header(WT_I18N::translate('Module administration'));
 				<tbody>
 					<?php
 					$order = 1;
-					foreach (WT_Module::getInstalledBlocks() as $module) { ?>
-					<tr>
+					foreach (WT_Module::getInstalledBlocks() as $module) {
+						if (array_key_exists($module->getName(), $module->getActiveModules())) {
+							echo '<tr>';
+						} else {
+							echo '<tr class="rela">';
+						}
+					?>
 						<td class="<?php echo $TEXT_DIRECTION; ?>" ><?php echo $module->getTitle(); ?></td>
 						<td class="<?php echo $TEXT_DIRECTION; ?>" ><?php echo $module->getDescription(); ?></td>
 						<td>

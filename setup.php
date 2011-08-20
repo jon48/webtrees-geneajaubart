@@ -20,13 +20,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package webtrees
- * @version $Id: setup.php 11754 2011-06-09 17:55:03Z greg $
+ * @version $Id: setup.php 11967 2011-07-05 11:18:30Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'setup.php');
 define('WT_DATA_DIR',    'data/');
 define('WT_MEDIA_DIR',   'media/');
 define('WT_CONFIG_FILE', 'config.ini.php');
+define('WT_DEBUG_LANG',  false); // The translation library needs this
 define('WT_REQUIRED_MYSQL_VERSION', '5.0.13'); // For: prepared statements within stored procedures
 
 // magic quotes were deprecated in PHP5.3.0 and removed in PHP6.0.0
@@ -156,7 +157,7 @@ if (file_exists(WT_DATA_DIR.WT_CONFIG_FILE)) {
 	exit;
 }
 
-echo '<form name="config" action="', WT_SCRIPT_NAME, '" method="post" autocomplete="off">';
+echo '<form name="config" action="', WT_SCRIPT_NAME, '" method="post">';
 echo '<input type="hidden" name="lang" value="', WT_LOCALE, '">';
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: mediaviewer.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: mediaviewer.php 12015 2011-07-14 11:26:08Z greg $
 
 define('WT_SCRIPT_NAME', 'mediaviewer.php');
 require './includes/session.php';
@@ -32,19 +32,43 @@ require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 $controller = new WT_Controller_Media();
 $controller->init();
 
-if ($controller->mediaobject && $controller->mediaobject->canDisplayName()) {
+if ($controller->mediaobject && $controller->mediaobject->canDisplayDetails()) {
 	print_header($controller->getPageTitle());
 	if ($controller->mediaobject->isMarkedDeleted()) {
 		if (WT_USER_CAN_ACCEPT) {
-			echo '<p class="ui-state-highlight">', WT_I18N::translate('This media object has been deleted.  You should review the deletion and then <a href="%1$s">accept</a> or <a href="%2$s">reject</a> it.', $controller->mediaobject->getHtmlUrl().'&amp;action=accept', $controller->mediaobject->getHtmlUrl().'&amp;action=undo'), '</p>';
+			echo
+				'<p class="ui-state-highlight">',
+				/* I18N: %1$s is "accept", %2$s is "reject".  These are links. */ WT_I18N::translate(
+					'This media object has been deleted.  You should review the deletion and then %1$s or %2$s it.',
+					'<a href="' . $controller->mediaobject->getHtmlUrl() . '&amp;action=accept">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'accept') . '</a>',
+					'<a href="' . $controller->mediaobject->getHtmlUrl() . '&amp;action=undo">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'reject') . '</a>'
+				),
+				' ', help_link('pending_changes'),
+				'</p>';
 		} elseif (WT_USER_CAN_EDIT) {
-			echo '<p class="ui-state-highlight">', WT_I18N::translate('This media object has been deleted.  The deletion will need to be reviewed by a moderator.'), '</p>';
+			echo
+				'<p class="ui-state-highlight">',
+				WT_I18N::translate('This media object has been deleted.  The deletion will need to be reviewed by a moderator.'),
+				' ', help_link('pending_changes'),
+				'</p>';
 		}
 	} elseif (find_updated_record($controller->mediaobject->getXref(), WT_GED_ID)!==null) {
 		if (WT_USER_CAN_ACCEPT) {
-			echo '<p class="ui-state-highlight">', WT_I18N::translate('This media object has been edited.  You should review the changes and then <a href="%1$s">accept</a> or <a href="%2$s">reject</a> them.', $controller->mediaobject->getHtmlUrl().'&amp;action=accept', $controller->mediaobject->getHtmlUrl().'&amp;action=undo'), '</p>';
+			echo
+				'<p class="ui-state-highlight">',
+				/* I18N: %1$s is "accept", %2$s is "reject".  These are links. */ WT_I18N::translate(
+					'This media object has been edited.  You should review the changes and then %1$s or %2$s them.',
+					'<a href="' . $controller->mediaobject->getHtmlUrl() . '&amp;action=accept">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'accept') . '</a>',
+					'<a href="' . $controller->mediaobject->getHtmlUrl() . '&amp;action=undo">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'reject') . '</a>'
+				),
+				' ', help_link('pending_changes'),
+				'</p>';
 		} elseif (WT_USER_CAN_EDIT) {
-			echo '<p class="ui-state-highlight">', WT_I18N::translate('This media object has been edited.  The changes need to be reviewed by a moderator.'), '</p>';
+			echo
+				'<p class="ui-state-highlight">',
+				WT_I18N::translate('This media object has been edited.  The changes need to be reviewed by a moderator.'),
+				' ', help_link('pending_changes'),
+				'</p>';
 		}
 	} elseif ($controller->accept_success) {
 		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been accepted.'), '</p>';
@@ -60,6 +84,13 @@ if ($controller->mediaobject && $controller->mediaobject->canDisplayName()) {
 
 // We have finished writing session data, so release the lock
 Zend_Session::writeClose();
+
+echo WT_JS_START;
+echo 'function show_gedcom_record() {';
+echo ' var recwin=window.open("gedrecord.php?pid=', $controller->mediaobject->getXref(), '", "_blank", "top=0, left=0, width=600, height=400, scrollbars=1, scrollable=1, resizable=1");';
+echo '}';
+echo 'function showchanges() { window.location="'.$controller->mediaobject->getRawUrl().'"; }';
+echo WT_JS_END;
 
 if (WT_USE_LIGHTBOX) {
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
@@ -98,8 +129,8 @@ global $tmb;
 						<table class="facts_table<?php echo $TEXT_DIRECTION=='ltr'?'':'_rtl'; ?>">
 							<?php
 								$facts = $controller->getFacts(WT_USER_CAN_EDIT || WT_USER_CAN_ACCEPT);
-								foreach ($facts as $f=>$factrec) {
-									print_fact($factrec);
+								foreach ($facts as $f=>$fact) {
+									print_fact($fact, $controller->mediaobject);
 								}
 							?>
 						</table>

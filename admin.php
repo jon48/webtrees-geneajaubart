@@ -21,7 +21,7 @@
  *
  * @package webtrees
  * @subpackage Admin
- * @version $Id: admin.php 11722 2011-06-06 21:06:19Z greg $
+ * @version $Id: admin.php 12103 2011-08-04 19:03:17Z greg $
  */
 
 define('WT_SCRIPT_NAME', 'admin.php');
@@ -61,7 +61,7 @@ $stats=new WT_Stats(WT_GEDCOM);
 	
 // Display a series of "blocks" of general information, vary according to admin or manager.
 
-echo '<div id="content_container">';
+echo '<div id="content_container" style="visibility:hidden">';
 
 echo '<div id="x">';// div x - manages the accordion effect
 
@@ -248,7 +248,7 @@ foreach ($all_gedcoms as $ged_id=>$gedcom) {
 echo
 	'</div>', // id=tree_stats
 	WT_JS_START,
-	'jQuery("#tree_stats").accordion({active:',$accordion_element,', icons:false});',
+	'jQuery("#tree_stats").accordion({active:',$accordion_element,', icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});',
 	WT_JS_END,
 	'</div>'; // id=trees
 
@@ -280,14 +280,15 @@ foreach ($all_gedcoms as $ged_id=>$gedcom) {
 echo
 	'</div>', // id=changes
 	WT_JS_START,
-	'jQuery("#changes").accordion({active:',$accordion_element,', icons:false});',
+	'jQuery("#changes").accordion({active:',$accordion_element,', icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});',
 	WT_JS_END,
 	'</div>'; // id=recent
 
 echo
 	'</div>', //id = "x"
 	WT_JS_START,
-	'jQuery("#x").accordion({active:0, icons:false});',
+	'jQuery("#x").accordion({active:0, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }, autoHeight:false});',
+	'jQuery("#content_container").css(\'visibility\', \'visible\');',
 	WT_JS_END,
 	'</div>'; //id = content_container
 
@@ -305,10 +306,6 @@ function old_paths() {
 		// Removed in 1.0.4
 		WT_ROOT.'themes/fab/images/notes.gif',
 		// Removed in 1.0.5
-		WT_ROOT.'modules/lightbox/functions/lb_indi_doors_0.php',
-		WT_ROOT.'modules/lightbox/functions/lb_indi_doors_1.php',
-		WT_ROOT.'modules/lightbox/functions/lb_indi_tabs_0.php',
-		WT_ROOT.'modules/lightbox/functions/lb_indi_tabs_1.php',
 		// Removed in 1.0.6
 		WT_ROOT.'includes/extras',
 		// Removed in 1.1.0
@@ -348,7 +345,7 @@ function old_paths() {
 		WT_ROOT.'manageservers.php',
 		WT_ROOT.'media.php',
 		WT_ROOT.'module_admin.php',
-		WT_ROOT.'modules',
+		//WT_ROOT.'modules', // Do not delete - users may have stored custom modules/data here
 		WT_ROOT.'opensearch.php',
 		WT_ROOT.'PEAR.php',
 		WT_ROOT.'pgv_to_wt.php',
@@ -480,19 +477,6 @@ function old_paths() {
 		WT_ROOT.'js/jquery/jquery.ajaxQueue.js',
 		WT_ROOT.'js/treenav.js',
 		WT_ROOT.'library/WT/TreeNav.php',
-		WT_ROOT.'modules_v2/lightbox/pic/detail.gif',
-		WT_ROOT.'modules_v2/lightbox/pic/details.gif',
-		WT_ROOT.'modules_v2/lightbox/pic/next.gif',
-		WT_ROOT.'modules_v2/lightbox/pic/notes.gif',
-		WT_ROOT.'modules_v2/lightbox/pic/prev.gif',
-		WT_ROOT.'modules_v2/lightbox/pic/s_btmleft.png',
-		WT_ROOT.'modules_v2/lightbox/pic/s_btm.png',
-		WT_ROOT.'modules_v2/lightbox/pic/s_btmright.png',
-		WT_ROOT.'modules_v2/lightbox/pic/s_left.png',
-		WT_ROOT.'modules_v2/lightbox/pic/s_right.png',
-		WT_ROOT.'modules_v2/lightbox/pic/s_topleft.png',
-		WT_ROOT.'modules_v2/lightbox/pic/s_top.png',
-		WT_ROOT.'modules_v2/lightbox/pic/s_topright.png',
 		WT_ROOT.'themes/clouds/images/background.jpg',
 		WT_ROOT.'themes/clouds/images/buttons/refresh.gif',
 		WT_ROOT.'themes/clouds/images/buttons/view_all.gif',
@@ -661,7 +645,7 @@ function old_paths() {
 		WT_ROOT.'themes/xenea/images/zoomin.gif',
 		WT_ROOT.'themes/xenea/images/zoomout.gif',
 		WT_ROOT.'treenav.php',
-		// Removed in 1.1.3
+		// Removed in 1.2.0
 		WT_ROOT.'js/jquery/css/images/ui-bg_flat_0_aaaaaa_40x100.png',
 		WT_ROOT.'js/jquery/css/images/ui-bg_gloss-wave_16_121212_500x100.png',
 		WT_ROOT.'js/jquery/css/images/ui-bg_highlight-hard_15_888888_1x100.png',
@@ -678,7 +662,6 @@ function old_paths() {
 		WT_ROOT.'js/jquery/css/jquery_rtl.css',
 		WT_ROOT.'js/jquery/jquery.tablesorter.js',
 		WT_ROOT.'js/jquery/jquery.tablesorter.pager.js',
-		WT_ROOT.'modules_v2/googlemap/admin_config.php',
 		WT_ROOT.'themes/clouds/images/close.png',
 		WT_ROOT.'themes/clouds/images/copy.png',
 		WT_ROOT.'themes/clouds/images/jquery',
@@ -750,6 +733,137 @@ function old_paths() {
 		WT_ROOT.'themes/xenea/images/pin-in.png',
 		WT_ROOT.'themes/xenea/images/pin-out.png',
 		WT_ROOT.'themes/xenea/jquery',
+		// Removed in 1.2.1
+		// Removed in 1.2.2
+		WT_ROOT.'themes/clouds/chrome.css',
+		WT_ROOT.'themes/clouds/images/ancestry.gif',
+		WT_ROOT.'themes/clouds/images/calendar.gif',
+		WT_ROOT.'themes/clouds/images/charts.gif',
+		WT_ROOT.'themes/clouds/images/descendancy.gif',
+		WT_ROOT.'themes/clouds/images/edit_fam.gif',
+		WT_ROOT.'themes/clouds/images/edit_media.gif',
+		WT_ROOT.'themes/clouds/images/edit_note.gif',
+		WT_ROOT.'themes/clouds/images/edit_repo.gif',
+		WT_ROOT.'themes/clouds/images/edit_sm.png',
+		WT_ROOT.'themes/clouds/images/edit_sour.gif',
+		WT_ROOT.'themes/clouds/images/fambook.gif',
+		WT_ROOT.'themes/clouds/images/fanchart.gif',
+		WT_ROOT.'themes/clouds/images/gedcom.gif',
+		WT_ROOT.'themes/clouds/images/home.gif',
+		WT_ROOT.'themes/clouds/images/hourglass.gif',
+		WT_ROOT.'themes/clouds/images/indi_sprite.png',
+		WT_ROOT.'themes/clouds/images/menu_source.gif',
+		WT_ROOT.'themes/clouds/images/search.gif',
+		WT_ROOT.'themes/clouds/opera.css',
+		WT_ROOT.'themes/clouds/print.css',
+		WT_ROOT.'themes/clouds/style_rtl.css',
+		WT_ROOT.'themes/colors/chrome.css',
+		WT_ROOT.'themes/colors/css/common.css',
+		WT_ROOT.'themes/colors/images/ancestry.gif',
+		WT_ROOT.'themes/colors/images/buttons/addmedia.gif',
+		WT_ROOT.'themes/colors/images/buttons/addnote.gif',
+		WT_ROOT.'themes/colors/images/buttons/addrepository.gif',
+		WT_ROOT.'themes/colors/images/buttons/addsource.gif',
+		WT_ROOT.'themes/colors/images/buttons/autocomplete.gif',
+		WT_ROOT.'themes/colors/images/buttons/calendar.gif',
+		WT_ROOT.'themes/colors/images/buttons/family.gif',
+		WT_ROOT.'themes/colors/images/buttons/find_facts.png',
+		WT_ROOT.'themes/colors/images/buttons/head.gif',
+		WT_ROOT.'themes/colors/images/buttons/indi.gif',
+		WT_ROOT.'themes/colors/images/buttons/keyboard.gif',
+		WT_ROOT.'themes/colors/images/buttons/media.gif',
+		WT_ROOT.'themes/colors/images/buttons/note.gif',
+		WT_ROOT.'themes/colors/images/buttons/place.gif',
+		WT_ROOT.'themes/colors/images/buttons/repository.gif',
+		WT_ROOT.'themes/colors/images/buttons/source.gif',
+		WT_ROOT.'themes/colors/images/buttons/target.gif',
+		WT_ROOT.'themes/colors/images/calendar.gif',
+		WT_ROOT.'themes/colors/images/cfamily.gif',
+		WT_ROOT.'themes/colors/images/charts.gif',
+		WT_ROOT.'themes/colors/images/descendancy.gif',
+		WT_ROOT.'themes/colors/images/edit_fam.gif',
+		WT_ROOT.'themes/colors/images/edit_media.gif',
+		WT_ROOT.'themes/colors/images/edit_note.gif',
+		WT_ROOT.'themes/colors/images/edit_repo.gif',
+		WT_ROOT.'themes/colors/images/edit_sm.png',
+		WT_ROOT.'themes/colors/images/edit_sour.gif',
+		WT_ROOT.'themes/colors/images/fambook.gif',
+		WT_ROOT.'themes/colors/images/fanchart.gif',
+		WT_ROOT.'themes/colors/images/gedcom.gif',
+		WT_ROOT.'themes/colors/images/home.gif',
+		WT_ROOT.'themes/colors/images/hourglass.gif',
+		WT_ROOT.'themes/colors/images/indis.gif',
+		WT_ROOT.'themes/colors/images/indi_sprite.png',
+		WT_ROOT.'themes/colors/images/itree.gif',
+		WT_ROOT.'themes/colors/images/left1B.gif',
+		WT_ROOT.'themes/colors/images/left2.gif',
+		WT_ROOT.'themes/colors/images/left3.gif',
+		WT_ROOT.'themes/colors/images/li.gif',
+		WT_ROOT.'themes/colors/images/lists.gif',
+		WT_ROOT.'themes/colors/images/media/doc.gif',
+		WT_ROOT.'themes/colors/images/media/ged.gif',
+		WT_ROOT.'themes/colors/images/media/html.gif',
+		WT_ROOT.'themes/colors/images/media/pdf.gif',
+		WT_ROOT.'themes/colors/images/media/tex.gif',
+		WT_ROOT.'themes/colors/images/menu_help.gif',
+		WT_ROOT.'themes/colors/images/menu_note.gif',
+		WT_ROOT.'themes/colors/images/menu_source.gif',
+		WT_ROOT.'themes/colors/images/patriarch.gif',
+		WT_ROOT.'themes/colors/images/place.gif',
+		WT_ROOT.'themes/colors/images/relationship.gif',
+		WT_ROOT.'themes/colors/images/right1B.gif',
+		WT_ROOT.'themes/colors/images/right3.gif',
+		WT_ROOT.'themes/colors/images/search.gif',
+		WT_ROOT.'themes/colors/images/sfamily.gif',
+		WT_ROOT.'themes/colors/images/source.gif',
+		WT_ROOT.'themes/colors/images/statistic.gif',
+		WT_ROOT.'themes/colors/images/timeline.gif',
+		WT_ROOT.'themes/colors/images/wiki.png',
+		WT_ROOT.'themes/colors/opera.css',
+		WT_ROOT.'themes/colors/print.css',
+		WT_ROOT.'themes/colors/style_rtl.css',
+		WT_ROOT.'themes/fab/chrome.css',
+		WT_ROOT.'themes/fab/opera.css',
+		WT_ROOT.'themes/minimal/chrome.css',
+		WT_ROOT.'themes/minimal/opera.css',
+		WT_ROOT.'themes/minimal/print.css',
+		WT_ROOT.'themes/minimal/style_rtl.css',
+		WT_ROOT.'themes/webtrees/images/calendar.png',
+		WT_ROOT.'themes/webtrees/images/charts.png',
+		WT_ROOT.'themes/webtrees/images/edit_fam.png',
+		WT_ROOT.'themes/webtrees/images/edit_media.png',
+		WT_ROOT.'themes/webtrees/images/edit_note.png',
+		WT_ROOT.'themes/webtrees/images/edit_repo.png',
+		WT_ROOT.'themes/webtrees/images/edit_source.png',
+		WT_ROOT.'themes/webtrees/images/help.png',
+		WT_ROOT.'themes/webtrees/images/home.png',
+		WT_ROOT.'themes/webtrees/images/lists.png',
+		WT_ROOT.'themes/webtrees/images/reports.png',
+		WT_ROOT.'themes/xenea/chrome.css',
+		WT_ROOT.'themes/xenea/images/facts/ADDR.gif',
+		WT_ROOT.'themes/xenea/images/facts/BAPM.gif',
+		WT_ROOT.'themes/xenea/images/facts/BIRT.gif',
+		WT_ROOT.'themes/xenea/images/facts/BURI.gif',
+		WT_ROOT.'themes/xenea/images/facts/CEME.gif',
+		WT_ROOT.'themes/xenea/images/facts/CHAN.gif',
+		WT_ROOT.'themes/xenea/images/facts/CHR.gif',
+		WT_ROOT.'themes/xenea/images/facts/DEAT.gif',
+		WT_ROOT.'themes/xenea/images/facts/EDUC.gif',
+		WT_ROOT.'themes/xenea/images/facts/ENGA.gif',
+		WT_ROOT.'themes/xenea/images/facts/GRAD.gif',
+		WT_ROOT.'themes/xenea/images/facts/MARR.gif',
+		WT_ROOT.'themes/xenea/images/facts/_MDCL.if',
+		WT_ROOT.'themes/xenea/images/facts/_MILI.gif',
+		WT_ROOT.'themes/xenea/images/facts/OCCU.gif',
+		WT_ROOT.'themes/xenea/images/facts/ORDN.gif',
+		WT_ROOT.'themes/xenea/images/facts/PHON.gif',
+		WT_ROOT.'themes/xenea/images/facts/RELA.gif',
+		WT_ROOT.'themes/xenea/images/facts/RESI.gif',
+		WT_ROOT.'themes/xenea/opera.css',
+		WT_ROOT.'themes/xenea/print.css',
+		WT_ROOT.'themes/xenea/style_rtl.css',
+		// Removed in 1.2.3
+		//WT_ROOT.'modules_v2', // Do not delete - users may have stored custom modules/data here
 	);
 }
 

@@ -20,7 +20,7 @@ return array(
 	//'LANGUAGE_LIST_SEPARATOR'		=>	', ',
 	//'LANGUAGE_LIST_SEPARATOR_LAST'	=>	' et ',
 	' and '							=>	' et ',
-	'My Page'						=>	'Ma page',	
+	'My page'						=>	'Ma page',	
 
 	//Hooks management
 	'Hooks'							=>	'<em>Hooks</em>',

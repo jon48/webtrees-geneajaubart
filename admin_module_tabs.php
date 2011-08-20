@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: admin_module_tabs.php 10970 2011-02-25 17:13:30Z greg $
+// @version $Id: admin_module_tabs.php 11994 2011-07-11 23:10:36Z nigel $
 
 define('WT_SCRIPT_NAME', 'admin_module_tabs.php');
 
@@ -104,8 +104,13 @@ echo WT_JS_START; ?>
 				<tbody>
 					<?php
 					$order = 1;
-					foreach (WT_Module::getInstalledTabs() as $module) { ?>
-					<tr class="sortme">
+					foreach (WT_Module::getInstalledTabs() as $module) {
+						if (array_key_exists($module->getName(), $module->getActiveModules())) {
+							echo '<tr class="sortme">';
+						} else {
+							echo '<tr class="sortme rela">';
+						}
+						?>
 						<td class="<?php echo $TEXT_DIRECTION; ?>" ><?php echo $module->getTitle(); ?></td>
 						<td class="<?php echo $TEXT_DIRECTION; ?>" ><?php echo $module->getDescription(); ?></td>
 						<td><input type="text" size="3" value="<?php echo $order; ?>" name="taborder-<?php echo $module->getName(); ?>" />

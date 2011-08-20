@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 11791 2011-06-12 10:58:25Z greg $
+// $Id: header.php 12065 2011-07-25 04:20:57Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -40,7 +40,7 @@ echo
 	'<link rel="stylesheet" type="text/css" href="', $stylesheet, '" />';
 
 switch ($BROWSERTYPE) {
-case 'chrome':
+//case 'chrome': uncomment when chrome.css file needs to be added, or add others as needed
 case 'msie':
 	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_DIR, $BROWSERTYPE, '.css" />';
 	break;
@@ -61,13 +61,13 @@ echo
 	'<link rel="stylesheet" type="text/css" href="', WT_THEME_DIR, 'modules.css" />',
 	$javascript,
 	'</head>',
-	'<body>';
+	'<body id="body">';
 
 // begin header section
 if ($view!='simple') {
 	echo
 		'<div id="header">',
-		'<div class="header_img"><img src="', WT_THEME_DIR, 'images/webtrees.png" width="242" height="50" alt="" /></div>';
+		'<div class="header_img"><img src="', WT_THEME_DIR, 'images/webtrees.png" width="242" height="50" alt="', WT_WEBTREES, '" /></div>';
 	if ($SEARCH_SPIDER) {
 		// Search engines get a reduced menu
 		$menu_items=array(
@@ -77,20 +77,18 @@ if ($view!='simple') {
 		);
 	} else {
 		// Options for real users
-		echo '<ul id="extra-menu" class="makeMenu"><li>';
+		echo '<ul id="extra-menu" class="makeMenu">';
 		if (WT_USER_ID) {
-			echo '<a href="edituser.php">', WT_I18N::translate('Logged in as '), ' (', WT_USER_NAME, ')</a> | ', logout_link();
+			echo '<li><a href="edituser.php">', WT_I18N::translate('Logged in as '), ' ', getUserFullName(WT_USER_ID), '</a></li> <li>', logout_link(), '</li>';
 		} else {
-			echo login_link();
+			echo '<li>', login_link(), '</li> ';
 		}
-		echo ' | </li>', WT_MenuBar::getFavoritesMenu()->GetMenuAsList();
-		if (get_gedcom_setting(WT_GED_ID, 'ALLOW_THEME_DROPDOWN') && get_site_setting('ALLOW_USER_THEMES')) {
-			echo ' | ', WT_MenuBar::getThemeMenu()->GetMenuAsList();
-		}
-		$language_menu=WT_MenuBar::getLanguageMenu();
-		if ($language_menu) {
-			echo ' | ', $language_menu->GetMenuAsList();
-		}
+		$menu=WT_MenuBar::getFavoritesMenu();
+			if ($menu) {echo $menu->GetMenuAsList();}
+		$menu=WT_MenuBar::getThemeMenu();
+			if ($menu) {echo $menu->GetMenuAsList();}
+		$menu=WT_MenuBar::getLanguageMenu();
+			if ($menu) {echo $menu->GetMenuAsList();}
 		echo '</ul><div class="title">';
 		print_gedcom_title_link(true);
 		echo
@@ -99,8 +97,8 @@ if ($view!='simple') {
 			'<form action="search.php" method="post">',
 			'<input type="hidden" name="action" value="general" />',
 			'<input type="hidden" name="topsearch" value="yes" />',
-			'<input type="text" name="query" size="25" value="', WT_I18N::translate('Search'), '"',
-				'onfocus="if (this.value==\'', WT_I18N::translate('Search'), '\') this.value=\'\'; focusHandler();"',
+			'<input type="text" name="query" size="25" value="', WT_I18N::translate('Search'), '" ',
+				'onfocus="if (this.value==\'', WT_I18N::translate('Search'), '\') this.value=\'\'; focusHandler();" ',
 				'onblur="if (this.value==\'\') this.value=\'', WT_I18N::translate('Search'), '\';" />',
 			'<input type="image" class="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '" />',
 			'</form>',

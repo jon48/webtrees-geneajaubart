@@ -1,27 +1,24 @@
 <?php
-/**
- * Site Unavailable
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @package webtrees
- * @version $Id: site-unavailable.php 10816 2011-02-13 17:24:59Z larry $
- */
+// Site Unavailable
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: site-unavailable.php 11915 2011-06-27 22:05:25Z greg $
 
 define('WT_SCRIPT_NAME', 'site-unavailable.php');
 
@@ -32,6 +29,8 @@ define('WT_WEBTREES', true);
 define('WT_ROOT', '');
 define('WT_GED_ID', 0);
 define('WT_USER_ID', 0);
+define('WT_DATA_DIR', realpath('data').DIRECTORY_SEPARATOR);
+define('WT_DEBUG_LANG', false); // The translation library needs this
 // Invoke the Zend Framework Autoloader, so we can use Zend_XXXXX and WT_XXXXX classes
 set_include_path(WT_ROOT.'library'.PATH_SEPARATOR.get_include_path());
 require_once 'Zend/Loader/Autoloader.php';
@@ -59,7 +58,7 @@ echo
 		.good {color: green;}
 	</style>',
 	'</head><body>',
-	'<h1>', WT_I18N::translate('<b>webtrees</b> site unavailable'), '</h1>',
+	'<h1>', WT_I18N::translate('This website is temporarily unavailable'), '</h1>',
 	'<div class="content">',
 	'<p>', WT_I18N::translate('Oops!  The webserver is unable to connect to the database server.  It could be busy, undergoing maintenance, or simply broken.  You should <a href="index.php">try again</a> in a few minutes or contact the website administrator.'), '</p>';
 

@@ -25,7 +25,7 @@
  *
  * @package webtrees
  * @subpackage Admin
- * @version $Id: downloadgedcom.php 10258 2011-01-02 13:13:41Z greg $
+ * @version $Id: downloadgedcom.php 11841 2011-06-17 03:56:06Z nigel $
  */
 
 define('WT_SCRIPT_NAME', 'downloadgedcom.php');
@@ -67,7 +67,7 @@ if ($action == 'download') {
 }
 
 if ($action == "download" && $zip == "yes") {
-	require WT_ROOT.'library/pclzip.lib.php';
+//	require WT_ROOT.'library/pclzip.lib.php';
 
 	$temppath = get_site_setting('INDEX_DIRECTORY') . "tmp/";
 	$fileName = $ged;

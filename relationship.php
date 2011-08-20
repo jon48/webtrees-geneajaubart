@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: relationship.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: relationship.php 12080 2011-07-28 16:20:15Z greg $
 
 define('WT_SCRIPT_NAME', 'relationship.php');
 require './includes/session.php';
@@ -135,7 +135,7 @@ function paste_id(value) {
 
 	<!-- // Person 1 -->
 	<tr><td class="descriptionbox">
-	<?php echo WT_I18N::translate('Person 1'), help_link('relationship_id'); ?>
+	<?php echo WT_I18N::translate('Person 1'); ?>
 	</td>
 	<td class="optionbox vmiddle">
 	<input tabindex="1" class="pedigree_form" type="text" name="pid1" id="pid1" size="3" value="<?php echo $pid1; ?>" />
@@ -160,7 +160,7 @@ function paste_id(value) {
 
 	<!-- // Person 2 -->
 	<tr><td class="descriptionbox">
-	<?php echo WT_I18N::translate('Person 2'), help_link('relationship_id'); ?>
+	<?php echo WT_I18N::translate('Person 2'); ?>
 	</td>
 	<td class="optionbox vmiddle">
 	<input tabindex="2" class="pedigree_form" type="text" name="pid2" id="pid2" size="3" value="<?php echo $pid2; ?>" />

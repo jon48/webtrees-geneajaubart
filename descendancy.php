@@ -21,11 +21,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: descendancy.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: descendancy.php 11991 2011-07-11 05:45:33Z larry $
 
 define('WT_SCRIPT_NAME', 'descendancy.php');
 require './includes/session.php';
-require WT_ROOT.'includes/functions/functions_print_lists.php';
+require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 // -- array of GEDCOM elements that will be found but should not be displayed
 $nonfacts[] = "FAMS";

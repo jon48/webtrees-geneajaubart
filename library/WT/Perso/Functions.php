@@ -92,6 +92,21 @@ class WT_Perso_Functions {
 		
 	}
 	
+	/**
+	 * Checks if a table exist in the DB schema
+	 *
+	 * @param string $table Name of the table to look for
+	 * @return boolean Does the table exist
+	 */
+	public static function doesTableExist($table) {
+		try {
+			WT_DB::prepare("SELECT 1 FROM {$table}")->fetchOne();
+			return true;
+		} catch (PDOException $ex) {
+			return false;
+		}
+	}
+	
 }
 
 ?>

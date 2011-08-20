@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_interface.php 11753 2011-06-09 16:39:50Z greg $
+// $Id: edit_interface.php 11980 2011-07-08 09:47:59Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_interface.php');
 require './includes/session.php';
@@ -846,6 +846,9 @@ case 'addnewnote_assisted':
 	?>
 	<div class="center font11" style="width:100%;">
 		<b><?php echo WT_I18N::translate('Create a new Shared Note using Assistant'); ?></b>
+		<?php
+			echo wiki_help_link(/* I18N: This is a page on http://wiki.webtrees.net/  Only translate this when a translated page exists on the wiki. */ WT_I18N::translate_c('http://wiki.webtrees.net/', 'Census_Assistant_module'));
+		?>
 		<form method="post" action="edit_interface.php" onsubmit="return check_form(this);">
 			<input type="hidden" name="action" value="addnoteaction_assisted" />
 			<input type="hidden" name="noteid" value="newnote" />

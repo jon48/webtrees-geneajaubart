@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: compact.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: compact.php 11872 2011-06-21 19:32:06Z greg $
 
 define('WT_SCRIPT_NAME', 'compact.php');
 require './includes/session.php';
@@ -298,9 +298,8 @@ function print_td_person($n) {
 			$img_title=str_replace(chr(160), "", $img_title); // date->Display might return '&nbsp', which html_entity_decode converts to '0xa0' 
 			$img_id='box-'.$pid;
 			if (!empty($object)) {
-				$which=thumb_or_main($object); // Do we send the main image or a thumbnail?
 				$mediaobject=WT_Media::getInstance($object['mid']);
-				$text=$mediaobject->displayMedia(array('which'=>$which,'display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$img_title));
+				$text=$mediaobject->displayMedia(array('display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$img_title));
 			} else {
 				$text=display_silhouette(array('sex'=>$indi->getSex(),'display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$img_title)); // may return ''
 			}

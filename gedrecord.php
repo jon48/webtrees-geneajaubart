@@ -19,17 +19,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: gedrecord.php 11283 2011-04-07 09:29:06Z greg $
+// $Id: gedrecord.php 11863 2011-06-19 21:29:54Z greg $
 
 define('WT_SCRIPT_NAME', 'gedrecord.php');
 require './includes/session.php';
 
 $obj=WT_GedcomRecord::getInstance(safe_GET_xref('pid'));
-
-if (!$obj) {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
-	exit;
-}
 
 if (
 	$obj instanceof WT_Person ||
@@ -41,14 +36,17 @@ if (
 ) {
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$obj->getRawUrl());
 	exit;
+} elseif (!$obj || !$obj->canDisplayDetails()) {
+	print_header(WT_I18N::translate('Private'));
+	print_privacy_error();
+} else {
+	print_header($obj->getFullName());
+	echo
+		'<pre style="white-space:pre-wrap; word-wrap:break-word;">',
+		preg_replace(
+			'/@('.WT_REGEX_XREF.')@/', '@<a href="gedrecord.php?pid=$1">$1</a>@',
+			htmlspecialchars($obj->getGedcomRecord())
+		),
+		'</pre>';
 }
-
-print_header($obj->getFullName());
-echo
-	'<pre style="white-space:pre-wrap; word-wrap:break-word;">',
-	preg_replace(
-		'/@('.WT_REGEX_XREF.')@/', '@<a href="gedrecord.php?pid=$1">$1</a>@',
-		htmlspecialchars($obj->getGedcomRecord())
-	),
-	'</pre>';
 print_footer();

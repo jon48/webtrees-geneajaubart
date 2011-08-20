@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Name.php 11602 2011-05-25 08:06:53Z greg $
+// @version $Id: Name.php 12050 2011-07-21 09:00:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -204,7 +204,7 @@ class WT_Query_Name {
 			break;
 		}
 		// Easy cases: the MySQL collation rules take care of it
-		return "$field LIKE '".$letter."%' COLLATE ".WT_I18N::$collation;
+		return "$field LIKE '@".$letter."%' ESCAPE '@' COLLATE ".WT_I18N::$collation;
 	}
 
 	// Get a list of initial surname letters for indilist.php and famlist.php
@@ -360,7 +360,7 @@ class WT_Query_Name {
 			// All surnames
 			$sql.=" AND n_surn NOT IN ('', '@N.N.')";
 		}
-		$sql.=" GROUP BY n_surn, n_file) n2 USING (n_surn, n_file)";
+		$sql.=" GROUP BY n_surn COLLATE '".WT_I18N::$collation."', n_file) n2 ON (n1.n_surn=n2.n_surn COLLATE '".WT_I18N::$collation."' AND n1.n_file=n2.n_file)";
 	
 		$list=array();
 		foreach (WT_DB::prepare($sql)->fetchAll() as $row) {

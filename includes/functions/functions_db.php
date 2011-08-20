@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_db.php 11789 2011-06-12 09:24:50Z greg $
+// $Id: functions_db.php 11975 2011-07-07 21:42:34Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -1547,7 +1547,7 @@ function set_site_setting($setting_name, $setting_value) {
 		WT_DB::prepare("DELETE FROM `##site_setting` WHERE setting_name=?")
 			->execute(array($setting_name));
 	} else {
-		$rowcount=WT_DB::prepare("REPLACE INTO `##site_setting` (setting_name, setting_value) VALUES (?, ?)")
+		$rowcount=WT_DB::prepare("REPLACE INTO `##site_setting` (setting_name, setting_value) VALUES (?, LEFT(?, 255))")
 			->execute(array($setting_name, $setting_value));
 	}
 }
@@ -1639,7 +1639,7 @@ function set_gedcom_setting($ged_id, $setting_name, $setting_value) {
 		WT_DB::prepare("DELETE FROM `##gedcom_setting` WHERE gedcom_id=? AND setting_name=?")
 			->execute(array($ged_id, $setting_name));
 	} else {
-		WT_DB::prepare("REPLACE INTO `##gedcom_setting` (gedcom_id, setting_name, setting_value) VALUES (?, ?, ?)")
+		WT_DB::prepare("REPLACE INTO `##gedcom_setting` (gedcom_id, setting_name, setting_value) VALUES (?, ?, LEFT(?, 255))")
 			->execute(array($ged_id, $setting_name, $setting_value));
 	}
 }
@@ -1768,8 +1768,10 @@ function get_newest_registered_user() {
 }
 
 function set_user_password($user_id, $password) {
-	if (CRYPT_BLOWFISH==1) {
-		// PHP5.3 will always support BLOWFISH - see php.net/crypt
+	if (CRYPT_BLOWFISH==1 && version_compare(PHP_VERSION, '5.3')) {
+		// Some PHP5.2 implementations of crypt() appear to be broken - #802316
+		// PHP5.3 will always support BLOWFISH - see php.net/crypt - so the check
+		// for CRYPT_BLOWFISH is redundant.
 		// This salt will select the BLOWFISH algorithm with 2^12 rounds
 		$salt='$2a$12$';
 		$salt_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./';
@@ -1794,7 +1796,7 @@ function check_user_password($user_id, $password) {
 		->fetchOne();
 	if (crypt($password, $password_hash)==$password_hash) {
 		// Update older passwords to use BLOWFISH with 2^12 rounds
-		if (CRYPT_BLOWFISH==1 && substr($password_hash, 0, 7)!='$2a$12$') {
+		if (CRYPT_BLOWFISH==1 && version_compare(PHP_VERSION, '5.3') && substr($password_hash, 0, 7)!='$2a$12$') {
 			set_user_password($user_id, $password);
 		}
 		return true;
@@ -1818,7 +1820,7 @@ function set_user_setting($user_id, $setting_name, $setting_value) {
 		WT_DB::prepare("DELETE FROM `##user_setting` WHERE user_id=? AND setting_name=?")
 			->execute(array($user_id, $setting_name));
 	} else {
-		WT_DB::prepare("REPLACE INTO `##user_setting` (user_id, setting_name, setting_value) VALUES (?, ?, ?)")
+		WT_DB::prepare("REPLACE INTO `##user_setting` (user_id, setting_name, setting_value) VALUES (?, ?, LEFT(?, 255))")
 			->execute(array($user_id, $setting_name, $setting_value));
 	}
 }
@@ -1843,7 +1845,7 @@ function set_user_gedcom_setting($user_id, $ged_id, $setting_name, $setting_valu
 		WT_DB::prepare("DELETE FROM `##user_gedcom_setting` WHERE user_id=? AND gedcom_id=? AND setting_name=?")
 			->execute(array($user_id, $ged_id, $setting_name));
 	} else {
-		WT_DB::prepare("REPLACE INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value) VALUES (?, ?, ?, ?)")
+		WT_DB::prepare("REPLACE INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value) VALUES (?, ?, ?, LEFT(?, 255))")
 			->execute(array($user_id, $ged_id, $setting_name, $setting_value));
 	}
 }

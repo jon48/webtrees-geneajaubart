@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// @version $Id: Individual.php 11774 2011-06-11 00:05:10Z greg $
+// $Id: Individual.php 12048 2011-07-20 23:00:37Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -204,7 +204,15 @@ class WT_Controller_Individual extends WT_Controller_Base {
 	* @return string the title of the page to go in the <title> tags
 	*/
 	function getPageTitle() {
-		return $this->indi->getFullName();
+		if ($this->indi) {
+			if ($this->indi->canDisplayDetails()) {
+				return $this->indi->getFullName().' '.$this->indi->getLifespan();
+			} else {
+				return $this->indi->getFullName();
+			}
+		} else {
+			return WT_I18N::translate('Individual');
+		}
 	}
 
 	/**
@@ -241,9 +249,8 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		if ($this->canShowHighlightedObject()) {
 			$firstmediarec=$this->indi->findHighlightedMedia();
 			if (!empty($firstmediarec)) {
-				$which=thumb_or_main($firstmediarec); // Do we send the main image or a thumbnail?
 				$mediaobject=WT_Media::getInstance($firstmediarec['mid']);
-				$result=$mediaobject->displayMedia(array('which'=>$which,'uselightbox_fallback'=>false,'clearbox'=>'general_1'));
+				$result=$mediaobject->displayMedia(array('uselightbox_fallback'=>false,'clearbox'=>'general_1'));
 				return $result;
 			}
 		}
@@ -286,6 +293,15 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		echo '<div id="name1">';
 		echo '<dl><dt class="label">', WT_I18N::translate('Name'), '</dt>';
 		echo '<dd class="field">', $dummy->getFullName();
+		if ($this->name_count == 1) {
+			if (WT_USER_IS_ADMIN) {
+				$user_id=get_user_from_gedcom_xref(WT_GED_ID, $this->pid);
+				if ($user_id) {
+					$user_name=get_user_name($user_id);
+					echo '<span> - <a class="warning" href="admin_users.php?action=edituser&amp;username='.$user_name.'">'.$user_name.'</span></a>';
+				}
+			}
+		}
 		if ($this->indi->canEdit() && !strpos($factrec, "\nWT_OLD")) {
 			echo "<div class=\"deletelink\"><a class=\"font9 deleteicon\" href=\"javascript:;\" onclick=\"delete_record('".$this->pid."', ".$linenum."); return false;\" title=\"".WT_I18N::translate('Delete name')."\"><span class=\"link_text\">".WT_I18N::translate('Delete name')."</span></a></div>";
 			echo "<div class=\"editlink\"><a href=\"javascript:;\" class=\"font9 editicon\" onclick=\"edit_name('".$this->pid."', ".$linenum."); return false;\" title=\"".WT_I18N::translate('Edit name')."\"><span class=\"link_text\">".WT_I18N::translate('Edit name')."</span></a></div>";
@@ -297,7 +313,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		for ($i=0; $i<$ct; $i++) {
 			echo '<div>';
 				$fact = trim($nmatch[$i][1]);
-				if (($fact!="SOUR")&&($fact!="NOTE") && ($fact!="SPFX")) {
+				if (($fact!="SOUR") && ($fact!="NOTE") && ($fact!="SPFX")) {
 					echo '<dl><dt class="label">', WT_Gedcom_Tag::getLabel($fact, $this->indi), '</dt>';
 					echo '<dd class="field">';
 						if (isset($nmatch[$i][2])) {
@@ -383,15 +399,16 @@ class WT_Controller_Individual extends WT_Controller_Base {
 	* get edit menu
 	*/
 	function getEditMenu() {
-		global $SHOW_GEDCOM_RECORD;
+		$SHOW_GEDCOM_RECORD=get_gedcom_setting(WT_GED_ID, 'SHOW_GEDCOM_RECORD');
 
-		if (!$this->indi) return null;
+		if (!$this->indi || $this->indi->isMarkedDeleted()) {
+			return null;
+		}
 		// edit menu
-		$menu = new WT_Menu(WT_I18N::translate('Edit'));
+		$menu = new WT_Menu(WT_I18N::translate('Edit'), '#', 'menu-indi');
 		$menu->addIcon('edit_indi');
 		$menu->addClass('menuitem', 'menuitem_hover', 'submenu', 'icon_large_edit_indi');
 		$menu->addLabel($menu->label, 'down');
-		$menu->addId('menu-indi');
 
 		$this->getGlobalFacts(); // sets NAME_LINENUM and SEX_LINENUM.  individual.php doesn't do it early enough for us....
 
@@ -406,15 +423,14 @@ class WT_Controller_Individual extends WT_Controller_Base {
 
 		if (WT_USER_CAN_EDIT) {
 			//--make sure the totals are correct
-			$submenu = new WT_Menu(WT_I18N::translate('Add new Name'));
+			$submenu = new WT_Menu(WT_I18N::translate('Add new Name'), '#', 'menu-indi-addname');
 			$submenu->addOnclick("return add_name('".$this->pid."');");
 			$submenu->addIcon('edit_indi');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_add_indi');
-			$submenu->addId('menu-indi-addname');
 			$menu->addSubmenu($submenu);
 
 			if ($this->SEX_COUNT<2) {
-				$submenu = new WT_Menu(WT_I18N::translate('Edit gender'));
+				$submenu = new WT_Menu(WT_I18N::translate('Edit gender'), '#', 'menu-indi-editsex');
 				if ($this->SEX_LINENUM=="new") {
 					$submenu->addOnclick("return add_new_record('".$this->pid."', 'SEX');");
 				} else {
@@ -422,30 +438,27 @@ class WT_Controller_Individual extends WT_Controller_Base {
 				}
 				$submenu->addIcon('edit_indi');
 				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_sex');
-				$submenu->addId('menu-indi-editsex');
 				$menu->addSubmenu($submenu);
 			}
 
 			if (count($this->indi->getSpouseFamilies())>1) {
-				$submenu = new WT_Menu(WT_I18N::translate('Reorder families'));
+				$submenu = new WT_Menu(WT_I18N::translate('Reorder families'), '#', 'menu-indi-orderfam');
 				$submenu->addOnclick("return reorder_families('".$this->pid."');");
 				$submenu->addIcon('edit_fam');
 				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_fam');
-				$submenu->addId('menu-indi-orderfam');
 				$menu->addSubmenu($submenu);
 			}
 		}
 
 		// edit/view raw gedcom
 		if (WT_USER_IS_ADMIN || $this->canShowGedcomRecord()) {
-			$submenu = new WT_Menu(WT_I18N::translate('Edit raw GEDCOM record'));
+			$submenu = new WT_Menu(WT_I18N::translate('Edit raw GEDCOM record'), '#', 'menu-indi-editraw');
 			$submenu->addOnclick("return edit_raw('".$this->pid."');");
 			$submenu->addIcon('gedcom');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_raw');
-			$submenu->addId('menu-indi-editraw');
 			$menu->addSubmenu($submenu);
 		} elseif ($SHOW_GEDCOM_RECORD) {
-			$submenu = new WT_Menu(WT_I18N::translate('View GEDCOM Record'));
+			$submenu = new WT_Menu(WT_I18N::translate('View GEDCOM Record'), '#', 'menu-indi-viewraw');
 			$submenu->addIcon('gedcom');
 			if (WT_USER_CAN_EDIT) {
 				$submenu->addOnclick("return show_gedcom_record('new');");
@@ -453,26 +466,29 @@ class WT_Controller_Individual extends WT_Controller_Base {
 				$submenu->addOnclick("return show_gedcom_record();");
 			}
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_raw');
-			$submenu->addId('menu-indi-viewraw');
 			$menu->addSubmenu($submenu);
 		}
 
 		// delete
 		if (WT_USER_CAN_EDIT) {
-			$submenu = new WT_Menu(WT_I18N::translate('Delete this individual'));
+			$submenu = new WT_Menu(WT_I18N::translate('Delete this individual'), '#', 'menu-indi-del');
 			$submenu->addOnclick("return deleteperson('".$this->pid."');");
 			$submenu->addIcon('remove');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_delete');
-			$submenu->addId('menu-indi-del');
 			$menu->addSubmenu($submenu);
 		}
 
 		// add to favorites
-		$submenu = new WT_Menu(WT_I18N::translate('Add to My Favorites'), $this->indi->getHtmlUrl()."&amp;action=addfav&amp;gid=".$this->pid);
-		$submenu->addIcon('favorites');
-		$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_fav');
-		$submenu->addId('menu-indi-addfav');
-		$menu->addSubmenu($submenu);
+		if (array_key_exists('user_favorites', WT_Module::getActiveModules())) {
+			$submenu = new WT_Menu(
+				WT_I18N::translate('Add to favorites'),
+				$this->indi->getHtmlUrl()."&amp;action=addfav&amp;gid=".$this->pid,
+				'menu-indi-addfav'
+			);
+			$submenu->addIcon('favorites');
+			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_fav');
+			$menu->addSubmenu($submenu);
+		}
 
 		return $menu;
 	}
@@ -549,7 +565,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 	* @param Family $family the family we are building for
 	* @return array an array of Person that will be used to iterate through on the indivudal.php page
 	*/
-	function buildFamilyList($family, $type) {
+	function buildFamilyList($family, $type, $include_pedi=true) {
 		global $WT_IMAGES;
 
 		$labels = array();
@@ -748,10 +764,12 @@ class WT_Controller_Individual extends WT_Controller_Base {
 				if ($children[$i]->getXref()==$this->pid) {
 					$label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
 				}
-				$famcrec = get_sub_record(1, "1 FAMC @".$family->getXref()."@", $children[$i]->getGedcomRecord());
-				$pedi = get_gedcom_value("PEDI", 2, $famcrec, '', false);
-				if ($pedi) {
-					$label.='<br />('.WT_Gedcom_Code_Pedi::getValue($pedi, $children[$i]).')';
+				if ($include_pedi==true) {
+					$famcrec = get_sub_record(1, "1 FAMC @".$family->getXref()."@", $children[$i]->getGedcomRecord());
+					$pedi = get_gedcom_value("PEDI", 2, $famcrec, '', false);
+					if ($pedi) {
+						$label.='<br />('.WT_Gedcom_Code_Pedi::getValue($pedi, $children[$i]).')';
+					}
 				}
 				$children[$i]->setLabel($label);
 			}
@@ -765,11 +783,13 @@ class WT_Controller_Individual extends WT_Controller_Base {
 			}
 			if ($sex=="M") {
 				$label = $labels["brother"];
-		}
+			}
 			if ($newchildren[$i]->getXref()==$this->pid) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
-			$pedi = $newchildren[$i]->getChildFamilyPedigree($family->getXref());
-			if ($pedi) {
-				$label.='<br />('.WT_Gedcom_Code_Pedi::getValue($pedi, $newchildren[$i]).')';
+			if ($include_pedi==true) {
+				$pedi = $newchildren[$i]->getChildFamilyPedigree($family->getXref());
+				if ($pedi) {
+					$label.='<br />('.WT_Gedcom_Code_Pedi::getValue($pedi, $newchildren[$i]).')';
+				}
 			}
 			$newchildren[$i]->setLabel($label);
 		}
@@ -784,11 +804,14 @@ class WT_Controller_Individual extends WT_Controller_Base {
 				$label = $labels["brother"];
 			}
 			if ($delchildren[$i]->getXref()==$this->pid) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
-			$pedi = $delchildren[$i]->getChildFamilyPedigree($family->getXref());
-			if ($pedi) {
-				$label.='<br />('.WT_Gedcom_Code_Pedi::getValue($pedi, $delchildren[$i]).')';
+			if ($include_pedi==true) {
+				$pedi = $delchildren[$i]->getChildFamilyPedigree($family->getXref());
+				if ($pedi) {
+					$label.='<br />('.WT_Gedcom_Code_Pedi::getValue($pedi, $delchildren[$i]).')';
+				}
 			}
 			$delchildren[$i]->setLabel($label);
+			
 		}
 
 		$people = array();

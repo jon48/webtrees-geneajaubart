@@ -31,7 +31,7 @@ class WT_Perso_Functions_Sosa {
 		if(self::$_isModuleOperational == -1){
 			self::$_isModuleOperational = array_key_exists('perso_sosa', WT_Module::getActiveModules());
 			if(self::$_isModuleOperational){
-				self::$_isModuleOperational = WT_DB::table_exists('##psosa');
+				self::$_isModuleOperational = WT_Perso_Functions::doesTableExist('##psosa');
 			}
 		}
 		return self::$_isModuleOperational;

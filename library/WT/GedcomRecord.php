@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: GedcomRecord.php 11753 2011-06-09 16:39:50Z greg $
+// $Id: GedcomRecord.php 12042 2011-07-20 16:33:49Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -658,12 +658,12 @@ class WT_GedcomRecord {
 	public function format_first_major_fact($facts, $style) {
 		foreach ($this->getAllFactsByType(explode('|', $facts)) as $event) {
 			// Only display if it has a date or place (or both)
-			if (($event->getDate() || $event->getPlace()) && $event->canShow()) {
+			if (($event->getDate()->isOK() || $event->getPlace()) && $event->canShow()) {
 				switch ($style) {
 				case 1:
-					return '<br /><em>'.$event->getLabel().' '.format_fact_date($event).format_fact_place($event).'</em>';
+					return '<br /><em>'.$event->getLabel().' '.format_fact_date($event, $this, false, false).format_fact_place($event).'</em>';
 				case 2:
-					return '<dl><dt class="label">'.$event->getLabel().'</dt><dd class="field">'.format_fact_date($event).format_fact_place($event).'</dd></dl>';
+					return '<dl><dt class="label">'.$event->getLabel().'</dt><dd class="field">'.format_fact_date($event, $this, false, false).format_fact_place($event).'</dd></dl>';
 				}
 			}
 		}
@@ -828,10 +828,9 @@ class WT_GedcomRecord {
 			}
 			if ($i==$lct||$line{0}==1) {
 				if ($i>1) {
-					$event = new WT_Event($factrec, $linenum);
+					$event = new WT_Event($factrec, $this, $linenum);
 					$fact = $event->getTag();
 					if ($nfacts==NULL || !in_array($fact, $nfacts)) {
-						$event->setParentObject($this);
 						$this->facts[] = $event;
 					}
 				}

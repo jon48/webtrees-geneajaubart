@@ -1,7 +1,15 @@
 <?php
 // Class to support internationalisation (i18n) functionality.
 //
-// Copyright (C) 2010 Greg Roach
+// We use gettext to provide translation.  You should configure xgettext to
+// search for:
+// translate()
+// plural()
+//
+// We wrap the Zend_Translate gettext library, to allow us to add extra
+// functionality, such as mixed RTL and LTR text.
+//
+// Copyright (C) 2011 Greg Roach
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,16 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @author Greg Roach
-// @version $Id: I18N.php 11548 2011-05-17 13:14:15Z greg $
-//
-// We use gettext to provide translation.  You should configure xgettext to
-// search for:
-// translate()
-// plural()
-//
-// We wrap the Zend_Translate gettext library, to allow us to add extra
-// functionality, such as mixed RTL and LTR text.
+// $Id: I18N.php 12100 2011-08-04 14:55:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,6 +40,19 @@ class WT_I18N {
 	// Initialise the translation adapter with a locale setting.
 	// If null is passed, work out which language is needed from the environment.
 	static public function init($locale=null) {
+		// The translation libraries work much faster with a cache.  Try to create one.
+		if (!is_dir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache')) {
+			// We may not have permission - especially during setup, before we instruct
+			// the user to "chmod 777 /data"
+			@mkdir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache');
+		}
+		// If a cache directory exists, use it.
+		if (is_dir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache')) {
+			$cache=Zend_Cache::factory('Core', 'File', array('automatic_serialization'=>true), array('cache_dir'=>WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache'));
+			Zend_Locale::setCache($cache);
+			Zend_Translate::setCache($cache);
+		}
+
 		$installed_languages=self::installed_languages();
 		if (is_null($locale) || !array_key_exists($locale, $installed_languages)) {
 			// Automatic locale selection.
@@ -93,11 +105,10 @@ class WT_I18N {
 		}
 		// We now have a valid locale.  Remember it.
 		$_SESSION['locale']=$locale;
-		// The translation files are large and slow.  Use a cache
-		$cache=Zend_Cache::factory('Core', 'File', array('automatic_serialization'=>true), array());
-		Zend_Translate::setCache($cache);
+
 		// Load the translation file
 		$translate=new Zend_Translate('gettext', WT_ROOT.'language/'.$locale.'.mo', $locale);
+
 		// Make the locale and translation adapter available to the rest of the Zend Framework
 		Zend_Registry::set('Zend_Locale',    $locale);
 		Zend_Registry::set('Zend_Translate', $translate);
@@ -271,7 +282,11 @@ class WT_I18N {
 	// echo WT_I18N::translate('The %s sat on the mat', 'cat');
 	static public function translate(/* var_args */) {
 		$args=func_get_args();
-		$args[0]=Zend_Registry::get('Zend_Translate')->_($args[0]);
+		if (WT_DEBUG_LANG) {
+			$args[0]=WT_Debug::pseudoTranslate($args[0]);
+		} else {
+			$args[0]=Zend_Registry::get('Zend_Translate')->_($args[0]);
+		}
 		return call_user_func_array(array('WT_I18N', 'sprintf'), $args);
 	}
 
@@ -280,10 +295,14 @@ class WT_I18N {
 	// echo WT_I18N::translate_c('GENITIVE',   'January');
 	static public function translate_c(/* var_args */) {
 		$args=func_get_args();
-		$msgid=$args[0]."\x04".$args[1];
-		$msgtxt=Zend_Registry::get('Zend_Translate')->_($msgid);
-		if ($msgtxt==$msgid) {
-			$msgtxt=$args[1];
+		if (WT_DEBUG_LANG) {
+			$msgtxt=WT_Debug::pseudoTranslate($args[1]);
+		} else {
+			$msgid=$args[0]."\x04".$args[1];
+			$msgtxt=Zend_Registry::get('Zend_Translate')->_($msgid);
+			if ($msgtxt==$msgid) {
+				$msgtxt=$args[1];
+			}
 		}
 		$args[0]=$msgtxt;
 		unset ($args[1]);
@@ -302,7 +321,15 @@ class WT_I18N {
 	// echo WT_I18N::plural('There is %1$d %2$s cat', 'There are %1$d %2$s cats', $num, $num, $colour);
 	static public function plural(/* var_args */) {
 		$args=func_get_args();
-		$string=Zend_Registry::get('Zend_Translate')->plural($args[0], $args[1], $args[2]);
+		if (WT_DEBUG_LANG) {
+			if ($args[2]==1) {
+				$string=WT_Debug::pseudoTranslate($args[0]);
+			} else {
+				$string=WT_Debug::pseudoTranslate($args[1]);
+			}
+		} else {
+			$string=Zend_Registry::get('Zend_Translate')->plural($args[0], $args[1], $args[2]);
+		}
 		array_splice($args, 0, 3, array($string));
 		return call_user_func_array('sprintf', $args);
 	}

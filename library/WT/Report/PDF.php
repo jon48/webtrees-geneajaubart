@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: PDF.php 11753 2011-06-09 16:39:50Z greg $
+// $Id: PDF.php 12082 2011-07-29 14:55:29Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -95,7 +95,7 @@ class WT_Report_PDF extends WT_Report_Base {
 		}
 		$this->pdf->SetCreator($appversion." (".parent::wt_url.")");
 		// Not implemented yet - WT_Report_Base::setup()
-		//$this->pdf->SetAuthor($this->rauthor);
+		$this->pdf->SetAuthor($this->rauthor);
 		$this->pdf->SetTitle($this->title);
 		$this->pdf->SetSubject($this->rsubject);
 		$this->pdf->SetKeywords($this->rkeywords);
@@ -476,7 +476,7 @@ class PDF extends TCPDF {
 		$this->currentStyle = $s;
 		$style = $this->wt_report->getStyle($s);
 		$this->SetFont($style['font'], $style['style'], $style['size']);
-	}
+		} 
 
 	/**
 	* Get the style -PDF

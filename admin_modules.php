@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: admin_modules.php 11658 2011-05-31 10:21:38Z greg $
+// @version $Id: admin_modules.php 11843 2011-06-17 12:10:21Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_modules.php');
 
@@ -160,13 +160,13 @@ print_header(WT_I18N::translate('Module administration'));
 								'<tr><td>', two_state_checkbox('status-'.$module->getName(), $status=='enabled'), '</td>',
 								'<td>', $module->getTitle(), '</td>',
 								'<td>', $module->getDescription(), '</td>',
-								'<td>', $module instanceof WT_Module_Menu    ? WT_I18N::translate('yes') : WT_I18N::translate('no'), '</td>',
-								'<td>', $module instanceof WT_Module_Tab     ? WT_I18N::translate('yes') : WT_I18N::translate('no'), '</td>',
-								'<td>', $module instanceof WT_Module_Sidebar ? WT_I18N::translate('yes') : WT_I18N::translate('no'), '</td>',
-								'<td>', $module instanceof WT_Module_Block   ? WT_I18N::translate('yes') : WT_I18N::translate('no'), '</td>',
-								'<td>', $module instanceof WT_Module_Chart   ? WT_I18N::translate('yes') : WT_I18N::translate('no'), '</td>',
-								'<td>', $module instanceof WT_Module_Report  ? WT_I18N::translate('yes') : WT_I18N::translate('no'), '</td>',
-								'<td>', $module instanceof WT_Module_Theme   ? WT_I18N::translate('yes') : WT_I18N::translate('no'), '</td>',
+								'<td>', $module instanceof WT_Module_Menu    ? WT_I18N::translate('Menu') : '-', '</td>',
+								'<td>', $module instanceof WT_Module_Tab     ? WT_I18N::translate('Tab') : '-', '</td>',
+								'<td>', $module instanceof WT_Module_Sidebar ? WT_I18N::translate('Sidebar') : '-', '</td>',
+								'<td>', $module instanceof WT_Module_Block   ? (($module->isUserBlock() ? '<div>'.WT_I18N::translate('My page').'</div>' : '').($module->isGedcomBlock() ? '<div>'.WT_I18N::translate('Home page').'</div>' : '')) : '-', '</td>',
+								'<td>', $module instanceof WT_Module_Chart   ? WT_I18N::translate('Chart') : '-', '</td>',
+								'<td>', $module instanceof WT_Module_Report  ? WT_I18N::translate('Report') : '-', '</td>',
+								'<td>', $module instanceof WT_Module_Theme   ? WT_I18N::translate('Theme') : '-', '</td>',
 								'</tr>';
 						} else {
 							// Module can't be found on disk?

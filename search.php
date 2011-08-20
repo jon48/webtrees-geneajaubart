@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search.php 11326 2011-04-16 07:48:50Z veit $
+// $Id: search.php 12013 2011-07-14 09:58:41Z greg $
 
 define('WT_SCRIPT_NAME', 'search.php');
 require './includes/session.php';
@@ -106,10 +106,10 @@ if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 <table class="list_table $TEXT_DIRECTION" width="35%" border="0">
 	<tr>
 
-<!-- /**************************************************** General Search Form *************************************************************/ -->
+<!-- /**************************************************** General search Form *************************************************************/ -->
 			<?php if ($controller->action == "general") { ?>
 				<td colspan="3" class="facts_label03" style="text-align:center;">
-					<?php echo WT_I18N::translate('General Search'); ?>
+					<?php echo WT_I18N::translate('General search'); ?>
 				</td>
 	</tr>
 	<!-- // search terms -->
@@ -179,7 +179,7 @@ if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 			<?php
 
 }
-/**************************************************** Search and Replace Search Form ****************************************************/
+/**************************************************** Search and replace Search Form ****************************************************/
 if ($controller->action == "replace")
 {
 	if (WT_USER_CAN_EDIT) {
@@ -235,11 +235,11 @@ if ($controller->action == "replace")
 }
 }
 
-/**************************************************** Soundex Search Form *************************************************************/
+/**************************************************** Phonetic search Form *************************************************************/
 if ($controller->action == "soundex") {
 ?>
-				<td colspan="3" class="facts_label03" style="text-align:center; ">
-					<?php echo WT_I18N::translate('Search the way you think the name is written (Soundex)'), help_link('soundex_search'); ?>
+				<td colspan="3" class="facts_label03" style="text-align:center;">
+					<?php echo WT_I18N::translate('Phonetic search'); ?>
 				</td>
 	</tr>
 	<!-- // search terms -->
@@ -248,7 +248,7 @@ if ($controller->action == "soundex") {
 			<?php echo WT_I18N::translate('Given name'); ?>
 		</td>
 		<td class="list_value">
-			<input tabindex="3" type="text" id="firstfocus" name="firstname" autocomplete="off" value="<?php echo $controller->myfirstname; ?>" />
+			<input tabindex="3" type="text" id="firstfocus" name="firstname" value="<?php echo $controller->myfirstname; ?>" />
 		</td>
 		<td class="list_value" style="vertical-align: middle; text-align: center; padding: 5px;"  rowspan="6">
 			<input tabindex="7" type="submit" value="<?php echo WT_I18N::translate('Search'); ?>" />
@@ -259,7 +259,7 @@ if ($controller->action == "soundex") {
 			<?php echo WT_I18N::translate('Last name'); ?>
 		</td>
 		<td class="list_value">
-			<input tabindex="4" type="text" name="lastname" autocomplete="off" value="<?php echo $controller->mylastname; ?>" />
+			<input tabindex="4" type="text" name="lastname" value="<?php echo $controller->mylastname; ?>" />
 		</td>
 	</tr>
 	<tr>
@@ -281,15 +281,15 @@ if ($controller->action == "soundex") {
 	<!-- Soundex type options (Russell, DaitchM) -->
 	<tr>
 		<td class="list_label">
-			<?php echo WT_I18N::translate('Soundex type:'); ?>
+			<?php echo /* I18N: rules for matching names by sound, rather than spelling */ WT_I18N::translate('Phonetic algorithm'); ?>
 		</td>
 		<td class="list_value" >
 			<input type="radio" name="soundex" value="Russell"
 				<?php if ($controller->soundex == "Russell") echo ' checked="checked" '; ?>/>
-			<?php echo WT_I18N::translate('Basic'); ?><br />
+			<?php echo /* I18N: http://en.wikipedia.org/wiki/Soundex */ WT_I18N::translate('Russell'); ?><br />
 			<input type="radio" name="soundex" value="DaitchM"
 				<?php if ($controller->soundex == "DaitchM" || $controller->soundex == "") echo ' checked="checked" '; ?>/>
-			<?php echo WT_I18N::translate('Daitch-Mokotoff'); ?>
+			<?php echo /* I18N: http://en.wikipedia.org/wiki/Daitch–Mokotoff_Soundex */ WT_I18N::translate('Daitch-Mokotoff'); ?>
 		</td>
 	</tr>
 
@@ -379,21 +379,21 @@ if ($controller->action == "general" || $controller->action == "soundex") {
 		<td class="list_label" style="padding: 5px;" >
 			<?php echo WT_I18N::translate('Other Searches'); ?>
 		</td>
-		<td class="list_value" style="padding: 5px; text-align:center; " colspan="2" >
+		<td class="list_value" style="padding: 5px; text-align:center;" colspan="2" >
 			<?php
 
 if ($controller->action == "general") {
-	echo '<a href="?action=soundex">', WT_I18N::translate('Soundex Search'), '</a>';
+	echo '<a href="?action=soundex">', WT_I18N::translate('Phonetic search'), '</a>';
 	echo ' | <a href="search_advanced.php">', WT_I18N::translate('Advanced search'), '</a>';
 	if (WT_USER_CAN_EDIT) {
 		echo ' | <a href="?action=replace">', WT_I18N::translate('Search and replace'), '</a>';
 	}
 } else if ($controller->action == "replace") {
-	echo '<a href="?action=general">', WT_I18N::translate('General Search'), '</a> | ';
-	echo '<a href="?action=soundex">', WT_I18N::translate('Soundex Search'), '</a>';
+	echo '<a href="?action=general">', WT_I18N::translate('General search'), '</a> | ';
+	echo '<a href="?action=soundex">', WT_I18N::translate('Phonetic search'), '</a>';
 	echo ' | <a href="search_advanced.php">', WT_I18N::translate('Advanced search'), '</a>';
 } else if ($controller->action == "soundex") {
-		echo '<a href="?action=general">', WT_I18N::translate('General Search'), '</a>';
+		echo '<a href="?action=general">', WT_I18N::translate('General search'), '</a>';
 		echo ' | <a href="search_advanced.php">', WT_I18N::translate('Advanced search'), '</a>';
 		if (WT_USER_CAN_EDIT) {
 			echo ' | <a href="?action=replace">', WT_I18N::translate('Search and replace'), '</a>';

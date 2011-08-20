@@ -1,29 +1,27 @@
 <?php
-/**
- * Startup and session logic
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
- *
- * Derived from PhpGedView
- * Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @version $Id: session.php 11807 2011-06-13 09:13:27Z greg $
- */
+// Startup and session logic
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: session.php 12104 2011-08-04 19:18:49Z greg $
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
 if (!defined('WT_SCRIPT_NAME')) {
@@ -33,20 +31,21 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.2.1');
+define('WT_VERSION',         '1.2.3');
 define('WT_VERSION_RELEASE', ''); // 'svn', 'beta', 'rc1', '', etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
-define('WT_WEBTREES_URL',    'http://webtrees.net');
-define('WT_WEBTREES_WIKI',   'http://wiki.webtrees.net');
-define('WT_TRANSLATORS_URL', 'https://translations.launchpad.net/webtrees');
+define('WT_WEBTREES_URL',    'http://webtrees.net/');
+define('WT_WEBTREES_WIKI',   'http://wiki.webtrees.net/');
+define('WT_TRANSLATORS_URL', 'https://translations.launchpad.net/webtrees/');
 
 // Location of our modules and themes.  These are used as URLs and directory paths.
-define('WT_MODULES_DIR', 'modules_v2/');
+define('WT_MODULES_DIR', 'modules_v3/');
 define('WT_THEMES_DIR',  'themes/' );
 
 // Enable debugging output?
 define('WT_DEBUG',      false);
 define('WT_DEBUG_SQL',  false);
+define('WT_DEBUG_LANG', false);
 
 // Error reporting
 define('WT_ERROR_LEVEL', 2); // 0=none, 1=minimal, 2=full
@@ -197,8 +196,13 @@ set_error_handler('wt_error_handler');
 if (file_exists(WT_ROOT.'data/config.ini.php')) {
 	$dbconfig=parse_ini_file(WT_ROOT.'data/config.ini.php');
 	// Invalid/unreadable config file?
-	if (!is_array($dbconfig) || file_exists(WT_ROOT.'data/offline.txt')) {
+	if (!is_array($dbconfig)) {
 		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'site-unavailable.php');
+		exit;
+	}
+	// Down for maintenance?
+	if (file_exists(WT_ROOT.'data/offline.txt')) {
+		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'site-offline.php');
 		exit;
 	}
 } else {
@@ -259,8 +263,6 @@ $BROWSERTYPE = 'other';
 if (!empty($_SERVER['HTTP_USER_AGENT'])) {
 	if (stristr($_SERVER['HTTP_USER_AGENT'], 'Opera')) {
 		$BROWSERTYPE = 'opera';
-	} elseif (stristr($_SERVER['HTTP_USER_AGENT'], 'Netscape')) {
-		$BROWSERTYPE = 'netscape';
 	} elseif (stristr($_SERVER['HTTP_USER_AGENT'], 'KHTML')) {
 		$BROWSERTYPE = 'chrome';
 	} elseif (stristr($_SERVER['HTTP_USER_AGENT'], 'Gecko')) {
@@ -306,6 +308,8 @@ $cfg=array(
 	'name'            => WT_SESSION_NAME,
 	'cookie_lifetime' => 0,
 	'gc_maxlifetime'  => get_site_setting('SESSION_TIME'),
+	'gc_probability'  => 1,
+	'gc_divisor'      => 100,
 	'cookie_path'     => WT_SCRIPT_PATH,
 );
 

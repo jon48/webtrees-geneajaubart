@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Family.php 11539 2011-05-15 20:20:23Z greg $
+// @version $Id: Family.php 11868 2011-06-20 15:14:46Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -86,7 +86,7 @@ class WT_Family extends WT_GedcomRecord {
 		preg_match_all('/\n1 (?:CHIL|HUSB|WIFE) @('.WT_REGEX_XREF.')@/', $this->_gedrec, $matches, PREG_SET_ORDER);
 		foreach ($matches as $match) {
 			$rela=WT_Person::getInstance($match[1]);
-			if ($SHOW_PRIVATE_RELATIONSHIPS || $rela && $rela->canDisplayName($access_level)) {
+			if ($SHOW_PRIVATE_RELATIONSHIPS || $rela && $rela->canDisplayDetails($access_level)) {
 				$rec.=$match[0];
 			}
 		}
@@ -175,7 +175,7 @@ class WT_Family extends WT_GedcomRecord {
 			preg_match_all('/\n1 CHIL @('.WT_REGEX_XREF.')@/', $this->getGedcomRecord(), $match);
 			foreach ($match[1] as $pid) {
 				$child=WT_Person::getInstance($pid);
-				if ($SHOW_PRIVATE_RELATIONSHIPS || $child && $child->canDisplayName($access_level)) {
+				if ($SHOW_PRIVATE_RELATIONSHIPS || $child && $child->canDisplayDetails($access_level)) {
 					$this->_children[]=$child;
 				}
 			}
@@ -250,8 +250,7 @@ class WT_Family extends WT_GedcomRecord {
 	 * parse marriage record
 	 */
 	function _parseMarriageRecord() {
-		$this->marriage = new WT_Event(trim(get_sub_record(1, '1 MARR', $this->getGedcomRecord())), -1);
-		$this->marriage->setParentObject($this);
+		$this->marriage = new WT_Event(get_sub_record(1, '1 MARR', $this->getGedcomRecord()), $this, 0);
 	}
 
 	/**
