@@ -121,6 +121,7 @@ else {
 		}
 		echo '</li>';
 		echo '</ul>';
+		echo '<div class="gedtitle">',print_gedcom_title_link(true),'</div>';
 		echo '</div>';
 		echo  '<div id="hbottomright">';
 		//PERSO Extend header

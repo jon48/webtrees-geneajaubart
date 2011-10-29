@@ -25,7 +25,7 @@ WT_DB::exec(
 	" ps_gen			TINYINT				NULL,".
 	" ps_birth_year		SMALLINT			NULL,".
 	" ps_death_year		SMALLINT			NULL,".
-	" PRIMARY KEY (ps_file, ps_sosa),".
+	" PRIMARY KEY (ps_file, ps_sosa)".
 	") COLLATE utf8_unicode_ci ENGINE=InnoDB"
 );
 
