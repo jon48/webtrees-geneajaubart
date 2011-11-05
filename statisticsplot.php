@@ -25,7 +25,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: statisticsplot.php 11221 2011-03-27 19:53:00Z lukasz $
+ * @version $Id: statisticsplot.php 12262 2011-10-06 16:42:41Z lukasz $
  * @package webtrees
  * @subpackage Lists
  */
@@ -916,8 +916,8 @@ if ($action=='update') {
 }
 
 print_simple_header(WT_I18N::translate('Statistics plot'));
-echo '<center><h2>', WT_I18N::translate('Statistics plot'), '</h2>';
-echo '</center><br />';
+echo '<h2 class="center">', WT_I18N::translate('Statistics plot'), '</h2>';
+echo '<br />';
 
 $nrpers = $_SESSION[$GEDCOM.'nrpers'];
 $nrfam = $_SESSION[$GEDCOM.'nrfam'];

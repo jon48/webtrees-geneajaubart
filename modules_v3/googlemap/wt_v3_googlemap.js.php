@@ -1,34 +1,26 @@
 <?php
-/**
- * Google map module for phpGedView
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
- *
- * Modifications Copyright (c) 2010 Greg Roach
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @package webtrees
- * @subpackage Googlemaps v3
- * $Id: wt_v3_googlemap.js.php 12103 2011-08-04 19:03:17Z greg $
- * @version: p_$Revision$ $Date$
- * $HeadURL$
- *
- * @author Brian Holland
- */
+// Google map module for phpGedView
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: wt_v3_googlemap.js.php 12260 2011-10-06 16:18:21Z greg $
+// @version: p_$Revision$ $Date$
+// $HeadURL$
  
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -128,14 +120,14 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 		// === Use flag icon (if defined) instead of regular marker icon ===
 		//PERSO Resize flag
 		if (marker_icon && width!= undefined && width > 0 && height != undefined && height >0) {
-			var icon_image = new google.maps.MarkerImage('<?php echo WT_MODULES_DIR; ?>googlemap/'+marker_icon,
+			var icon_image = new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+'googlemap/'+marker_icon,
 				null,
 				new google.maps.Point(0,0),
 				new google.maps.Point(0, 44),
 				new google.maps.Size(width, height)
 		//END PERSO
 				);
-			var icon_shadow = new google.maps.MarkerImage('<?php echo WT_MODULES_DIR; ?>googlemap/images/flag_shadow.png',
+			var icon_shadow = new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+'googlemap/images/flag_shadow.png',
 				new google.maps.Size(35, 45),	// Shadow size
 				new google.maps.Point(0,0),		// Shadow origin
 				new google.maps.Point(1, 45)	// Shadow anchor is base of flagpole				
@@ -415,7 +407,7 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 
 	function loadMap() {
 		<?php
-			global $GOOGLEMAP_MAP_TYPE, $PEDIGREE_GENERATIONS, $MAX_PEDIGREE_GENERATIONS, $ENABLE_AUTOCOMPLETE, $MULTI_MEDIA, $SHOW_HIGHLIGHT_IMAGES, $WT_IMAGES, $GEDCOM;
+			global $GOOGLEMAP_MAP_TYPE, $PEDIGREE_GENERATIONS, $MAX_PEDIGREE_GENERATIONS, $ENABLE_AUTOCOMPLETE, $SHOW_HIGHLIGHT_IMAGES, $WT_IMAGES, $GEDCOM;
 		?>
 
 		// Create the map and mapOptions
@@ -486,7 +478,7 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 					} else {
 						$indirec = $this_person->getGedcomRecord();
 						$image = '';
-						if ($MULTI_MEDIA && $SHOW_HIGHLIGHT_IMAGES) {
+						if ($SHOW_HIGHLIGHT_IMAGES) {
 							if (!empty($pid)) {
 								$object = find_highlighted_object($pid, WT_GED_ID, $indirec);
 							}
@@ -505,7 +497,7 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 				if (!empty($person)) {
 					$indirec2 = $person->getGedcomRecord();
 					$image2 = '';
-					if ($MULTI_MEDIA && $SHOW_HIGHLIGHT_IMAGES) {
+					if ($SHOW_HIGHLIGHT_IMAGES) {
 						if (!empty($gmark['name'])) {
 							$object2 = find_highlighted_object($gmark['name'], WT_GED_ID, $indirec2);
 						}
@@ -526,7 +518,7 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 					"<?php echo $gmark['lng']; ?>",
 					"<?php if (!empty($gmark['date'])) { $date=new WT_Date($gmark['date']); echo addslashes($date->Display(true)); } else { echo WT_I18N::translate('Date not known'); } ?>",
 					"<?php if (!empty($gmark['info'])) { echo $gmark['info']; } else { echo NULL; } ?>",
-					"<?php if (!empty($gmark['name'])) { $person=WT_Person::getInstance($gmark['name']); if ($person) { echo '<a href=\"', $person->getHtmlUrl(), '\">', $person->canDisplayName() ? PrintReady(addcslashes($person->getFullName(), '"')) : WT_I18N::translate('Private'), '<\/a>'; } } ?>",
+					"<?php if (!empty($gmark['name'])) { $person=WT_Person::getInstance($gmark['name']); if ($person) { echo '<a href=\"', $person->getHtmlUrl(), '\">', addslashes($person->getFullName()), '<\/a>'; } } ?>",
 					"<?php if (preg_match('/2 PLAC (.*)/', $gmark['placerec']) == 0) { print_address_structure_map($gmark['placerec'], 1); } else { echo preg_replace('/\"/', '\\\"', print_fact_place_map($gmark['placerec'])); } ?>",
 					"<?php echo $gmark['index'].''; ?>",
 					"<?php echo $gmark['tabindex'].''; ?>",
@@ -536,7 +528,7 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 					"<?php echo strip_tags(preg_replace('/\"/', '\\\"', print_fact_place_map($gmark['placerec']))); ?>",
 
 					// Element 11. persons Name
-					"<?php if (!empty($gmark['name'])) { $person=WT_Person::getInstance($gmark['name']); if ($person) { echo $person->canDisplayName() ? PrintReady(addcslashes($person->getFullName(), '"')) : WT_I18N::translate('Private'); } } ?>",
+					"<?php if (!empty($gmark['name'])) { $person=WT_Person::getInstance($gmark['name']); if ($person) { echo addslashes($person->getFullName()); } } ?>",
 
 					// Element 12. Other people's Highlighted image.
 					"<?php if (!empty($gmark['name'])) { echo $image2; } else { echo ''; } ?>",
@@ -554,7 +546,7 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 					"<?php if (!empty($gmark['icon'])) { echo $gmark['icon']; } ?>",
 					//PERSO Resize flag
 					"<?php if (!empty($gmark['icon'])) { 
-						$icon_image = WT_MODULES_DIR . 'googlemap/' . $gmark['icon'];	
+						$icon_image = WT_STATIC_URL.WT_MODULES_DIR . 'googlemap/' . $gmark['icon'];	
 						list($flag_width, $flag_height) = WT_Perso_Functions::getResizedImageSize($icon_image, 25); 
 						echo $flag_width, '", "', $flag_height;
 					} ?>"
@@ -619,7 +611,7 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 
 			// === Employ of image tab function using an information image =====
 			if (media == null || media == '') {
-				media = WT_MODULES_DIR+'googlemap/images/facts/v3_image_info.png';
+				media = WT_STATIC_URL+WT_MODULES_DIR+'googlemap/images/facts/v3_image_info.png';
 			} else {
 				media = media;
 			}

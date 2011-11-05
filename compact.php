@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: compact.php 11872 2011-06-21 19:32:06Z greg $
+// $Id: compact.php 12415 2011-10-25 16:46:58Z stephen $
 
 define('WT_SCRIPT_NAME', 'compact.php');
 require './includes/session.php';
@@ -37,8 +37,9 @@ $rootid=check_rootid($rootid);
 $person =WT_Person::getInstance($rootid);
 $name   =$person->getFullName();
 $addname=$person->getAddName();
+$title = /* I18N: %s is a person's name */ WT_I18N::translate('Compact tree of %s', $person->getFullName());
 
-print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Compact tree of %s', $person->getFullName()));
+print_header($title);
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
@@ -48,10 +49,9 @@ if (WT_USE_LIGHTBOX) {
 }
 // ==========================================================================================
 
-if (strlen($name)<30) $cellwidth="420";
-else $cellwidth=(strlen($name)*14);
+$cellwidth = max(strlen($title)*4, "420");
 echo "<table class=\"list_table $TEXT_DIRECTION\"><tr><td width=\"{$cellwidth}px\" valign=\"top\">";
-echo '<h2>', WT_I18N::translate('Compact tree of %s', $person->getFullName()), '</h2>';
+echo '<h2>', $title, '</h2>';
 
 // -- print the form
 ?>
@@ -279,7 +279,7 @@ print_footer();
 
 function print_td_person($n) {
 	global $treeid, $WT_IMAGES;
-	global $MULTI_MEDIA, $SHOW_HIGHLIGHT_IMAGES;
+	global $SHOW_HIGHLIGHT_IMAGES;
 	global $showthumbs;
 
 	$text = "";
@@ -290,12 +290,11 @@ function print_td_person($n) {
 		$name=$indi->getFullName();
 		$addname=$indi->getAddName();
 
-		if ($showthumbs && $MULTI_MEDIA && $SHOW_HIGHLIGHT_IMAGES) {
+		if ($showthumbs && $SHOW_HIGHLIGHT_IMAGES) {
 			$object=find_highlighted_object($pid, WT_GED_ID, $indi->getGedcomRecord());
 			$birth_date=$indi->getBirthDate();
 			$death_date=$indi->getDeathDate();
-			$img_title=PrintReady(htmlspecialchars(strip_tags($name)))." - ".strip_tags(html_entity_decode($birth_date->Display(false)." - ".$death_date->Display(false)));
-			$img_title=str_replace(chr(160), "", $img_title); // date->Display might return '&nbsp', which html_entity_decode converts to '0xa0' 
+			$img_title=$name.' - '.$birth_date->Display(false).' - '.$death_date->Display(false);
 			$img_id='box-'.$pid;
 			if (!empty($object)) {
 				$mediaobject=WT_Media::getInstance($object['mid']);
@@ -306,8 +305,8 @@ function print_td_person($n) {
 		}
 
 		$text .= "<a class=\"name1\" href=\"".$indi->getHtmlUrl()."\">";
-		$text .= PrintReady(htmlspecialchars(strip_tags($name)));
-		if ($addname) $text .= "<br />" . PrintReady($addname);
+		$text .= $name;
+		if ($addname) $text .= "<br />" . $addname;
 		$text .= "</a>";
 		$text .= "<br />";
 		if ($indi->canDisplayDetails()) {

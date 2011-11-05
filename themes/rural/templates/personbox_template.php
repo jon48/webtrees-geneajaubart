@@ -2,12 +2,12 @@
 /**
  * Template for drawing person boxes
  * This template expects that the following variables will be set
- *  $pid, $boxID, $personlinks, $icons, $GEDCOM, $style,
+ *  $pid, $boxID, $icons, $GEDCOM, $style,
  * $name, $classfacts, $genderImage, $BirthDeath, $isF, $outBoxAdd,
  * $addname, $showid, $float
  *
  * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
+ * Copyright (C) 2011 webtrees development team.
  *
  * Derived from PhpGedView
  * Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -26,22 +26,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @package webtrees
- * @subpackage Themes
- * @version $Id: personbox_template.php 10239 2011-01-01 22:32:55Z greg $
- * @version: p_$Revision$ $Date$
- * $HeadURL$ 
+ * @version $Id: personbox_template.php 12461 2011-10-29 14:48:07Z rob $
  */
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
 ?>
-<div id="I<?php echo $boxID; ?>links"
-	style="position:absolute; left:0px; top:0px; width:<?php echo $lbwidth; ?>px; visibility:hidden; z-index:100;">
-<?php echo $personlinks; ?></div>
 <div id="out-<?php echo $boxID; ?>" <?php echo $outBoxAdd; ?>>
 <!--  table helps to maintain spacing -->
 <table width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td valign="top">
@@ -53,10 +45,10 @@ if (!defined('WT_WEBTREES')) {
 		<span id="namedef-<?php echo $boxID; ?>" class="name<?php echo $style; ?> <?php echo $classfacts; ?>">
 			<?php echo $name.$addname; ?>
 		</span>
-		<span class="name<?php echo $style; ?>"> <?php echo $genderImage; ?><?php /*PERSO Add Sosa Icon*/ echo WT_Perso_Functions_Print::formatSosaNumbers($dperson->getSosaNumbers(), 1, 'smaller') ?></span>
+		<span class="name<?php echo $style; ?>"> <?php echo $genderImage; ?></span>
 		<?php echo $showid; ?> </a>
 		<div id="fontdef-<?php echo $boxID; ?>" class="details<?php echo $style; ?>">
-			<div id="inout2-<?php echo $boxID; ?>" style="display: block;"><?php echo $BirthDeath; ?></div>
+			<div id="inout2-<?php echo $boxID; ?>" style="display: block; overflow:hidden; max-height: <?php echo $bheight-25; ?>px;"><?php echo $BirthDeath; ?></div>
 		</div>
 		<div id="inout-<?php echo $boxID; ?>" style="display: none;">
 			<div id="LOADING-inout-<?php echo $boxID; ?>"><?php echo WT_I18N::translate('Loading...'); ?></div>

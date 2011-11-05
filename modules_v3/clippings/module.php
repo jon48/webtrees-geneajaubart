@@ -21,14 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12465 2011-10-29 23:22:36Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-require_once WT_ROOT.WT_MODULES_DIR.'clippings/clippings_ctrl.php';
 
 class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Sidebar {
 	// Extend class WT_Module
@@ -126,6 +124,7 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 
 	// Impelement WT_Module_Sidebar
 	public function getSidebarContent() {
+		require_once WT_ROOT.WT_MODULES_DIR.'clippings/clippings_ctrl.php';
 		global $WT_IMAGES, $cart;
 
 		$out = '';
@@ -148,7 +147,7 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 				$root = WT_GedcomRecord::getInstance($this->controller->pid);
 				if ($root && $root->canDisplayDetails())
 					$out .= '<a href="sidebar.php?sb_action=clippings&amp;add='.$root->getXref().'" class="add_cart">
-					<img src="'.$WT_IMAGES['clippings'].'" width="20" /> '.WT_I18N::translate('Add %s to cart', $root->getListName()).'</a>';
+					<img src="'.$WT_IMAGES['clippings'].'" width="20" /> '.WT_I18N::translate('Add %s to cart', $root->getFullName()).'</a>';
 			}
 			$out .= '</div>';
 		}
@@ -157,6 +156,7 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 
 	// Impelement WT_Module_Sidebar
 	public function getSidebarAjaxContent() {
+		require_once WT_ROOT.WT_MODULES_DIR.'clippings/clippings_ctrl.php';
 		global $cart;
 		$controller = new WT_Controller_Clippings();
 		$this->controller = $controller;
@@ -239,7 +239,7 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 					if ($tag=='FAM' ) $icon = "sfamily";
 					//if ($tag=='SOUR') $icon = "source";
 					//if ($tag=='REPO') $icon = "repository";
-					//if ($tag=='NOTE') $icon = "notes";
+					//if ($tag=='NOTE') $icon = "note";
 					//if ($tag=='OBJE') $icon = "media";
 					if (!empty($icon)) {
 						$out .= '<li>';
@@ -252,7 +252,7 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 							if ($record->getType()=="INDI") $out .=$record->getSexImage();
 							$out .= ' '.$record->getFullName().' ';
 							if ($record->getType()=="INDI" && $record->canDisplayDetails()) {
-								$out .= PrintReady(' ('.$record->getLifeSpan().')');
+								$out .= ' ('.$record->getLifeSpan().')';
 							}
 							$out .= '</a>';
 						}

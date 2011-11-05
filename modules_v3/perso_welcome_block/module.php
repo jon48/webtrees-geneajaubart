@@ -30,6 +30,7 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		global $TEXT_DIRECTION, $WT_IMAGES, $ctype;
 
 		$id=$this->getName().$block_id;
+		$class=$this->getName().'_block';
 		$title = '';
 		if ($ctype=='gedcom' && WT_USER_GEDCOM_ADMIN) {
 			$title.='<a href="javascript: configure block" onclick="window.open(\'index_edit.php?action=configure&amp;ctype='.$ctype.'&amp;block_id='.$block_id.'\', \'_blank\', \'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1\'); return false;">';

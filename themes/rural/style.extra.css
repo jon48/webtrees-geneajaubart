@@ -146,22 +146,18 @@ html[dir='rtl'] .fact_flag { float: left;}
 
 .sosa_large {
 	height: 18px;
-	vertical-align: middle;
 }
 
 .sosa_normal {
 	height: 12px;
-	vertical-align: middle;
 }
 
 .sosa_smaller {
 	height: 9px;
-	vertical-align: middle;
 }
 
 .sosa_small {
 	height: 10px;
-	vertical-align: middle;
 }
 
 .left{

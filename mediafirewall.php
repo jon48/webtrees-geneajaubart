@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: mediafirewall.php 11541 2011-05-16 02:54:10Z larry $
+// @version $Id: mediafirewall.php 12260 2011-10-06 16:18:21Z greg $
 
 define('WT_SCRIPT_NAME', 'mediafirewall.php');
 require './includes/session.php';
@@ -176,7 +176,7 @@ function embedText($im, $text, $maxsize, $color, $font, $vpos, $hpos) {
 	if ($useTTF) {
 		// imagettftext is available, make sure the requested font exists
 		if (!isset($font)||($font=='')||!file_exists(WT_ROOT.'includes/fonts/'.$font)) {
-			$font = 'DejaVuSans.ttf'; // this font ships with PGV
+			$font = 'DejaVuSans.ttf'; // this font ships with webtrees
 			if (!file_exists(WT_ROOT.'includes/fonts/'.$font)) {
 				$useTTF = false;
 			}

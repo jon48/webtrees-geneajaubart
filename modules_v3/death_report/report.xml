@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report>
-	<!-- $Id: report.xml 11856 2011-06-19 15:43:34Z greg $ -->
+	<!-- $Id: report.xml 12395 2011-10-24 14:19:35Z greg $ -->
 	<Title><var var="WT_I18N::translate('Deaths')" /></Title>
 	<Description><var var="WT_I18N::translate('A report of individuals who died in a given time or place.')" /></Description>
 	<Input name="name" lookup="NAME" type="text"><var var="WT_I18N::translate('Name')" /></Input>
@@ -54,7 +54,7 @@
 		</Header>
 
 		<Body>
-			<List list="individual" filter1="DEAT:PLAC CONTAINS $deathplace" filter2="DEAT:DATE GTE $deathdate1" filter3="DEAT:DATE LTE $deathdate2" filter4="NAME CONTAINS $name" sortby="$sortby">
+			<List list="individual" filter1="DEAT:PLAC CONTAINS $deathplace" filter2="DEAT:DATE GTE $deathdate1" filter3="DEAT:DATE LTE $deathdate2" filter4="NAME CONTAINS $name" filter5="REGEXP /\n1 DEAT/" sortby="$sortby">
 				<TextBox width="200">
 					<Text style="text"><GetPersonName id="" />
 						<if condition="$adlist=='_MARNM'">
@@ -89,7 +89,7 @@
 								<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 							</Gedcom>
 							<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-							<GedcomValue tag="SOUR:DATA:TEXT" />
+							 <GedcomValue tag="SOUR:DATA:TEXT" />
 							<SetVar name="usebr" value="1"/>
 						</RepeatTag>
 					</Text>

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -43,6 +43,8 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 	public function getBlock($block_id, $template=true, $cfg=null) {
 		global $ctype, $TEXT_DIRECTION, $WT_IMAGES, $SHOW_MARRIED_NAMES;
 
+		require_once WT_ROOT.'includes/functions/functions_print_lists.php'; // for get_align()
+
 		$days=get_block_setting($block_id, 'days', 7);
 		$infoStyle=get_block_setting($block_id, 'infoStyle', 'table');
 		$block=get_block_setting($block_id, 'block', true);
@@ -58,6 +60,7 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 		$endjd  =WT_CLIENT_JD+$days-1;
 
 		$id=$this->getName().$block_id;
+		$class=$this->getName().'_block';
 		if ($ctype=='gedcom' && WT_USER_GEDCOM_ADMIN || $ctype=='user' && WT_USER_ID) {
 			$title="<a href=\"javascript: configure block\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\"><img class=\"adminicon\" src=\"".$WT_IMAGES["admin"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".WT_I18N::translate('Configure')."\" /></a>";
 		} else {
@@ -118,77 +121,74 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 			break;
 		case 'table':
 		default:
-			require_once WT_ROOT.'includes/functions/functions_print_lists.php';
-			require_once WT_ROOT.'js/sorttable.js.htm';
-			$table_id = "ID".floor(microtime()*1000000); // sorttable requires a unique ID
-			$content .= "<table id=\"{$table_id}\" class=\"sortable list_table center\">";
-			$content .= "<tr>";
-			$content .= "<th class=\"list_label\">".WT_Gedcom_Tag::getLabel('NAME')."</th>";
-			$content .= "<th style=\"display:none\">GIVN</th>";
-			$content .= "<th class=\"list_label\">".WT_Gedcom_Tag::getLabel('DATE')."</th>";
+			$table_id = "ID".floor(microtime()*1000000); // table requires a unique ID
+			?>
+			<script type="text/javascript" src="<?php echo WT_STATIC_URL; ?>js/jquery/jquery.dataTables.min.js"></script>
+			<script type="text/javascript">
+				jQuery(document).ready(function(){
+					jQuery('#<?php echo $table_id; ?>').dataTable( {
+						"sDom": '<"F"li>',
+						"bAutoWidth":false,
+						"bPaginate": false,
+						"bLengthChange": false,
+						"bFilter": false,
+						"bInfo": false,
+						"bJQueryUI": false,
+						"aaSorting": [[5,'asc']],
+						"aoColumns": [
+							/* 0-NAME */ null,
+							/* 1-DATE */ { "iDataSort": 2 },
+							/* 2-DATE */ { "bVisible": false },
+							/* 3-Aniv */ null,
+							/* 4-YART */ { "iDataSort": 5 },
+							/* 5-YART */ { "bVisible": false }
+						]
+					});		
+				});
+			</script>
+			<?php
+			$content .= '<table id="'.$table_id.'" class="list_table center width100">';
+			$content .= '<thead style="cursor:pointer;"><tr>';
+			$content .= '<th class="list_label">'.WT_Gedcom_Tag::getLabel('NAME').'</th>';
+			$content .= '<th class="list_label">'.WT_Gedcom_Tag::getLabel('DEAT').'</th>';
+			$content .= '<th>DEAT</th>';
 			$content .= '<th class="list_label"><img src="'.$WT_IMAGES['reminder'].'" alt="'.WT_I18N::translate('Anniversary').'" title="'.WT_I18N::translate('Anniversary').'" border="0" /></th>';
-			$content .= "<th class=\"list_label\">".WT_Gedcom_Tag::getLabel('_YART')."</th>";
-			$content .= "</tr>";
+			$content .= '<th class="list_label">'.WT_Gedcom_Tag::getLabel('_YART').'</th>';
+			$content .= '<th>_YART</th>';
+			$content .= '</tr></thead><tbody>';
 
-			$count=0;
 			foreach ($yahrzeits as $yahrzeit) {
 				if ($yahrzeit['jd']>=$startjd && $yahrzeit['jd']<$startjd+$days) {
-					++$count;
+					$content .= '<tr>';
 					$ind=WT_person::GetInstance($yahrzeit['id']);
-					$content .= "<tr>";
-					// Record name(s)
+					// Individual name(s)
 					$name=$ind->getFullName();
 					$url=$ind->getHtmlUrl();
-					$content .= "<td class=\"list_value_wrap\" align=\"".get_align($name)."\">";
-					$content .= "<a href=\"".$url."\" class=\"list_item name2\" dir=\"".$TEXT_DIRECTION."\">".PrintReady($name)."</a>";
+					$content .= '<td align="'.get_align($name).'">';
+					$content .= '<a href="'.$url.'" class="list_item name2" dir="'.$TEXT_DIRECTION.'">'.$name.'</a>';
 					$content .= $ind->getSexImage();
 					$addname=$ind->getAddName();
 					if ($addname) {
-						$content .= "<br /><a href=\"".$url."\" class=\"list_item\">".PrintReady($addname)."</a>";
+						$content .= '<br /><a href="'.$url.'" class="list_item">'.$addname.'</a>';
 					}
-					$content .= "</td>";
-
-					// GIVN for sorting
-					$content .= "<td style=\"display:none\">";
-					$exp = explode(",", str_replace('<', ',', $name).",");
-					$content .= $exp[1];
-					$content .= "</td>";
-
-					$today=new WT_Date_Jewish($yahrzeit['jd']);
-					$td=new WT_Date($today->Format('%@ %A %O %E'));
+					$content .= '</td>';
 
 					// death/yahrzeit event date
-					$content .= "<td class=\"list_value_wrap\">";
-					$content .= "<a name='{$yahrzeit['jd']}'>".$yahrzeit['date']->Display(true, NULL, array())."</a>";
-					$content .= "</td>";
+					$content .= '<td>'.$yahrzeit['date']->Display().'</td><td>'.$yahrzeit['date']->minJD().'</td>';
 
 					// Anniversary
-					$content .= "<td class=\"list_value_wrap rela\">";
-					$anniv = $yahrzeit['anniv'];
-					if ($anniv==0) {
-						$content .= '<a name="0">&nbsp;</a>';
-					} else {
-						$content .= "<a name=\"{$anniv}\">{$anniv}</a>";
-					}
+					$content .= '<td>'.$yahrzeit['anniv'].'</td>';
 
 					// upcomming yahrzeit dates
-					$content .= "<td class=\"list_value_wrap\">";
-					$content .= "<a href=\"".$url."\" class=\"list_item url\">".$td->Display(true, NULL, array('gregorian'))."</a>"; // hCalendar:url
-					$content .= "&nbsp;</td>";
+					$today=new WT_Date_Jewish($yahrzeit['jd']);
+					$td=new WT_Date($today->Format('%@ %A %O %E'));
+					$content .= '<td>'.$td->Display().'</td><td>'.$td->minJD().'</td>';
 
-					$content .= "</tr>";
+					$content .= '</tr>';
 				}
 			}
-
-			// table footer
-			$content .= "<tr class=\"sortbottom\">";
-			$content .= "<td class=\"list_label\">";
-			$content .= '<a href="javascript:;" onclick="sortByOtherCol(this,1)"><img src="images/topdown.gif" alt="" border="0" /> '.WT_Gedcom_Tag::getLabel('GIVN').'</a><br />';
-			$content .= WT_I18N::translate('Total individuals: %s', WT_I18N::number($count));
-			$content .= '</td>';
-			$content .= '<td style="display:none">GIVN</td>';
-			$content .= '<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
 			$content .= '</table>';
+
 			break;
 		}
 
@@ -242,7 +242,7 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 		echo '<tr><td class="descriptionbox wrap width33">';
 		echo WT_I18N::translate('Presentation style');
 		echo '</td><td class="optionbox">';
-		echo select_edit_control('infoStyle', array('list'=>WT_I18N::translate('List'), 'table'=>WT_I18N::translate('Table')), null, $infoStyle, '');
+		echo select_edit_control('infoStyle', array('list'=>WT_I18N::translate('list'), 'table'=>WT_I18N::translate('table')), null, $infoStyle, '');
 		echo '</td></tr>';
 
 		$block=get_block_setting($block_id, 'block', true);

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12313 2011-10-15 20:38:06Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -219,7 +219,7 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 		//-- search for INDI names
 		$rows=WT_DB::prepare(
-			"SELECT ? AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, i_isdead, i_sex".
+			"SELECT ? AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec".
 			" FROM `##individuals`, `##name`".
 			" WHERE (i_id LIKE ? OR n_sort LIKE ?)".
 			" AND i_id=n_id AND i_file=n_file AND i_file=?".
@@ -245,7 +245,7 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		}
 
 		$vars[]=WT_GED_ID;
-		$rows=WT_DB::prepare("SELECT ? AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec, f_husb, f_wife, f_numchil FROM `##families` WHERE {$where} AND f_file=? LIMIT ".WT_AUTOCOMPLETE_LIMIT)
+		$rows=WT_DB::prepare("SELECT ? AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec FROM `##families` WHERE {$where} AND f_file=? LIMIT ".WT_AUTOCOMPLETE_LIMIT)
 		->execute($vars)
 		->fetchAll(PDO::FETCH_ASSOC);
 

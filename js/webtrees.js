@@ -25,7 +25,7 @@
  *
  * @package webtrees
  * @subpackage Display
- * @version $Id: webtrees.js 11647 2011-05-30 01:15:50Z rob $
+ * @version $Id: webtrees.js 12439 2011-10-27 19:56:12Z greg $
  */
 if (!document.getElementById)	// Check if browser supports the getElementByID function
 {
@@ -447,13 +447,22 @@ function delete_family(famid) {
 	return false;
 }
 
-function deletesource(pid) {
-	 window.open('edit_interface.php?action=deletesource&pid='+pid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+function delete_note(pid) {
+	 window.open('edit_interface.php?action=deletenote&pid='+pid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	 return false;
 }
 
-function deletenote(pid) {
-	 window.open('edit_interface.php?action=deletenote&pid='+pid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+function delete_person(pid) {
+	window.open('edit_interface.php?action=deleteperson&pid='+pid+"&"+sessionname+"="+sessionid, '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1');
+	return false;
+}
+
+function delete_repository(pid) {
+		window.open('edit_interface.php?action=deleterepo&pid='+pid+"&"+sessionname+"="+sessionid, '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1');
+	return false;
+}
+function delete_source(pid) {
+	 window.open('edit_interface.php?action=deletesource&pid='+pid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	 return false;
 }
 
@@ -474,7 +483,7 @@ function addnewnote(field) {
 }
 function addnewnote_assisted(field, iid) {
 	pastefield = field;
-	window.open('edit_interface.php?action=addnewnote_assisted&noteid=newnote&pid='+iid, '_blank', 'top=70,left=70,width=870,height=726,scrollbars=no,resizable=no');
+	window.open('edit_interface.php?action=addnewnote_assisted&noteid=newnote&pid='+iid, '_blank', 'top=70,left=70,width=900,height=750,scrollbars=no,resizable=no');
 	return false;
 }
 function addmedia_links(field, iid, iname) {
@@ -510,7 +519,7 @@ function valid_date(datefield) {
 	}
 
 	// e.g. 17.11.1860, 03/04/2005 or 1999-12-31.  Use locale settings where DMY order is ambiguous.
-	var qsearch = /(.*)(\d+)[^\d](\d+)[^\d](\d+)(.*)/i;
+	var qsearch = /^([^\d]*)(\d+)[^\d](\d+)[^\d](\d+)$/i;
  	if (qsearch.exec(datestr)) {
  		var f0=RegExp.$1;
 		var f1=parseInt(RegExp.$2, 10);
@@ -525,11 +534,11 @@ function valid_date(datefield) {
 		var yy=yyyy % 100;
 		var cc=yyyy - yy;
 	 	if (dmy=='DMY' && f1<=31 && f2<=12 || f1>13 && f1<=31 && f2<=12 && f3>31)
-			datestr=f0+f1+" "+months[f2-1]+" "+(f3>=100?f3:(f3<=yy?f3+cc:f3+cc-100))+f4;
+			datestr=f0+f1+" "+months[f2-1]+" "+(f3>=100?f3:(f3<=yy?f3+cc:f3+cc-100));
 		else if (dmy=='MDY' && f1<=12 && f2<=31 || f2>13 && f2<=31 && f1<=12 && f3>31)
-			datestr=f0+f2+" "+months[f1-1]+" "+(f3>=100?f3:(f3<=yy?f3+cc:f3+cc-100))+f4;
+			datestr=f0+f2+" "+months[f1-1]+" "+(f3>=100?f3:(f3<=yy?f3+cc:f3+cc-100));
 		else if (dmy=='YMD' && f2<=12 && f3<=31 || f3>13 && f3<=31 && f2<=12 && f1>31)
-			datestr=f0+f3+" "+months[f2-1]+" "+(f1>=100?f1:(f1<=yy?f1+cc:f1+cc-100))+f4;
+			datestr=f0+f3+" "+months[f2-1]+" "+(f1>=100?f1:(f1<=yy?f1+cc:f1+cc-100));
 	}
 
 	// Shortcuts for date ranges

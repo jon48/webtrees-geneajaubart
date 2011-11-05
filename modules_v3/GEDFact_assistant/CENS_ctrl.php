@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: CENS_ctrl.php 11872 2011-06-21 19:32:06Z greg $
+// $Id: CENS_ctrl.php 12420 2011-10-25 22:04:49Z nigel $
 
 $controller = new WT_Controller_Individual();
 $controller->init();
@@ -31,6 +31,7 @@ $controller->init();
 global $tabno, $linkToID, $SEARCH_SPIDER, $GOOGLEMAP_PH_CONTROLS;
 global $WT_IMAGES, $SHOW_AGE_DIFF, $GEDCOM, $ABBREVIATE_CHART_LABELS;
 global $show_full, $famid;
+echo '<link type="text/css" href="', WT_STATIC_URL, WT_MODULES_DIR, 'GEDFact_assistant/css/cens_style.css" rel="stylesheet" />';
 
 $summary=$controller->indi->format_first_major_fact(WT_EVENTS_BIRT, 2);
 if (!($controller->indi->isDead())) {

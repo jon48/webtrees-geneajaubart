@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11998 2011-07-13 03:20:47Z nigel $
+// $Id: module.php 12306 2011-10-13 13:08:07Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -150,7 +150,9 @@ if (!$SHOW_LEVEL2_NOTES) {
 	}
 	// Implement WT_Module_Tab
 	public function canLoadAjax() {
-		return true;
+		global $SEARCH_SPIDER;
+
+		return !$SEARCH_SPIDER; // Search engines cannot use AJAX
 	}
 
 	// Implement WT_Module_Tab

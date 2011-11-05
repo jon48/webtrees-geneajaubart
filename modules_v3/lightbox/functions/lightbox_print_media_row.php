@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lightbox_print_media_row.php 11819 2011-06-15 15:23:44Z greg $
+// $Id: lightbox_print_media_row.php 12389 2011-10-23 17:09:06Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -49,10 +49,10 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 		if (!file_exists($rowm['m_file']) && !isset($rowm['m_file'])) {
 			echo '<tr>';
 			echo '<td valign="top" rowspan="2" >';
-			echo '<img src="', WT_MODULES_DIR, 'lightbox/images/transp80px.gif" height="82px" alt=""></img>';
+			echo '<img src="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/images/transp80px.gif" height="82px" alt=""></img>';
 			echo '</td>';
 			echo '<td class="description_box" valign="top" colspan="3" nowrap="nowrap">';
-			echo '<center><br /><img src="', WT_THEME_DIR, 'images/media.gif" height="30" border="0" />';
+			echo '<center><br /><img src="', WT_THEME_URL, 'images/media.gif" height="30" border="0" />';
 			echo '<p class="ui-state-error">', WT_I18N::translate('The file “%s” does not exist.', $rowm['m_file']), '</p>';
 			echo '</td>';
 			echo '</tr>';
@@ -61,10 +61,10 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 			echo '<table class="pic" width="50px" border="0" >';
 			echo '<tr>';
 			echo '<td valign="top" rowspan="2" >';
-			echo '<img src="', WT_MODULES_DIR, 'lightbox/images/transp80px.gif" height="100px" alt=""></img>';
+			echo '<img src="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/images/transp80px.gif" height="100px" alt=""></img>';
 			echo '</td>';
 			echo '<td class="description_box" valign="top" colspan="3" nowrap="nowrap" >';
-			echo '<center><br /><img src="', WT_THEME_DIR, 'images/media.gif" height="30" border="0" />';
+			echo '<center><br /><img src="', WT_THEME_URL, 'images/media.gif" height="30" border="0" />';
 			echo '<p class="ui-state-error">', WT_I18N::translate('The file “%s” does not exist.', $rowm['m_file']), '</p>';
 			echo '</td>';
 			echo '</tr>';
@@ -121,10 +121,7 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 
 		//  Get the title of the media
 		$media=WT_Media::getInstance($rowm['m_media']);
-		$rawTitle = $rowm['m_titl'];
-		if (empty($rawTitle)) $rawTitle = get_gedcom_value('TITL', 2, $rowm['mm_gedrec']);
-		if (empty($rawTitle)) $rawTitle = basename($rowm['m_file']);
-		$mediaTitle = PrintReady(htmlspecialchars($rawTitle));
+		$mediaTitle = $media->getFullName();
 
 		$mainMedia = check_media_depth($rowm['m_file'], 'NOTRUNC');
 		$mainFileExists = true;
@@ -133,7 +130,7 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 		$imgheight = $imgsize[1]+150;
 
 		// Get the tooltip link for source
-		$sour = get_gedcom_value('SOUR', 1, $rowm['m_gedrec']);
+		$sour = WT_Source::getInstance(get_gedcom_value('SOUR', 1, $rowm['m_gedrec']));
 
 		//Get media item Notes
 		$haystack = $rowm['m_gedrec'];
@@ -141,7 +138,7 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 		$before   = substr($haystack, 0, strpos($haystack, $needle));
 		$after    = substr(strstr($haystack, $needle), strlen($needle));
 		$final    = $before.$needle.$after;
-		$notes    = PrintReady(htmlspecialchars(print_fact_notes($final, 1, true, true)));
+		$notes    = PrintReady(htmlspecialchars(print_fact_notes($final, 1, true, true), ENT_QUOTES));
 
 		// Get info on how to handle this media file
 		$mediaInfo = mediaFileInfo($mainMedia, $thumbnail, $rowm['m_media'], $mediaTitle, $notes);
@@ -187,20 +184,23 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 		}
 		$menu = new WT_Menu();
 		// Truncate media title to 13 chars (45 chars if Streetview) and add ellipsis
-		$mtitle = $rawTitle;
+		$mtitle = $mediaTitle;
 		if (strpos($rowm['m_file'], 'http://maps.google.')===0) {
-			if (utf8_strlen($rawTitle)>16) $mtitle = utf8_substr($rawTitle, 0, 45).WT_I18N::translate('…');
+			if (utf8_strlen($mtitle)>16) {
+				$mtitle = utf8_substr($rowm['m_file'], 0, 45).WT_I18N::translate('…');
+			}
 		} else {
-			if (utf8_strlen($rawTitle)>16) $mtitle = utf8_substr($rawTitle, 0, 13).WT_I18N::translate('…');
+			if (utf8_strlen($mtitle)>16) {
+				$mtitle = utf8_substr($mtitle, 0, 13).WT_I18N::translate('…');
+			}
 		}
-		$mtitle = PrintReady(htmlspecialchars($mtitle));
 
 		// Continue menu construction
 		// If media file is missing from 'media' directory, but is referenced in Gedcom
 		if (!media_exists($rowm['m_file']) && !media_exists($mainMedia)) {
 			$menu->addLabel("<img src=\"{$thumbnail}\" style=\"display:none;\" alt=\"\" title=\"\" />" . WT_I18N::translate('Edit')." (". $rowm['m_media'].")", 'right');
 		} else {
-			$menu->addLabel("<img src=\"{$thumbnail}\" style=\"display:none;\" alt=\"\" title=\"\" />" . PrintReady($mtitle), 'right');
+			$menu->addLabel("<img src=\"{$thumbnail}\" style=\"display:none;\" alt=\"\" title=\"\" />" . $mtitle, 'right');
 		}
 		// Next line removed to avoid gallery thumbnail duplication
 		// $menu['link'] = mediaInfo['url'];
@@ -234,8 +234,8 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 			$submenu->addClass($submenu_class, $submenu_hoverclass);
 			$menu->addSubMenu($submenu);
 			//View Source
-			if (strpos($rowm['m_gedrec'], "\n1 SOUR") && WT_Source::getInstance($sour)->canDisplayDetails()) {
-				$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('View Source') . "&nbsp;&nbsp;", WT_SERVER_NAME.WT_SCRIPT_PATH . "source.php?sid=" . $sour, "right");
+			if ($sour && $sour->canDisplayDetails()) {
+				$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('View Source') . "&nbsp;&nbsp;", $sour->getHtmlUrl(), "right");
 				$submenu->addClass($submenu_class, $submenu_hoverclass);
 				$menu->addSubMenu($submenu);
 			}
@@ -300,7 +300,7 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 					echo "<table width=\"10px\" class=\"pic\" border=\"0\"><tr>";
 				}
 				echo "<td align=\"center\" rowspan=\"2\" >";
-				echo '<img src="', WT_MODULES_DIR, 'lightbox/images/transp80px.gif" height="100px" alt=""></img>';
+				echo '<img src="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/images/transp80px.gif" height="100px" alt=""></img>';
 				echo "</td>";
 
 				// Check for Notes associated media item

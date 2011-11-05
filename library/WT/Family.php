@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Family.php 11868 2011-06-20 15:14:46Z greg $
+// $Id: Family.php 12463 2011-10-29 21:41:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,27 +31,18 @@ if (!defined('WT_WEBTREES')) {
 class WT_Family extends WT_GedcomRecord {
 	private $husb = null;
 	private $wife = null;
-	private $_children = null;
 	private $marriage = null;
-	private $numChildren   = false;
-	private $_isDivorced   = null;
-	private $_isNotMarried = null;
 
 	// Create a Family object from either raw GEDCOM data or a database row
 	function __construct($data) {
 		if (is_array($data)) {
 			// Construct from a row from the database
-			if ($data['f_husb']) {
-				$this->husb=WT_Person::getInstance($data['f_husb']);
+			if (preg_match('/^1 HUSB @(.+)@/m', $data['gedrec'], $match)) {
+				$this->husb=WT_Person::getInstance($match[1]);
 			}
-			if ($data['f_wife']) {
-				$this->wife=WT_Person::getInstance($data['f_wife']);
+			if (preg_match('/^1 WIFE @(.+)@/m', $data['gedrec'], $match)) {
+				$this->wife=WT_Person::getInstance($match[1]);
 			}
-			$this->numChildren=$data['f_numchil'];
-			// Check for divorce, etc. *before* we privatize the data so
-			// we can correctly label spouses/ex-spouses/partners
-			$this->_isDivorced=(bool)preg_match('/\n1 ('.WT_EVENTS_DIV.')( Y|\n)/', $data['gedrec']);
-			$this->_isNotMarried=(bool)preg_match('/\n1 _NMR( Y|\n)/', $data['gedrec']);
 		} else {
 			// Construct from raw GEDCOM data
 			if (preg_match('/^1 HUSB @(.+)@/m', $data, $match)) {
@@ -60,13 +51,6 @@ class WT_Family extends WT_GedcomRecord {
 			if (preg_match('/^1 WIFE @(.+)@/m', $data, $match)) {
 				$this->wife=WT_Person::getInstance($match[1]);
 			}
-			if (preg_match('/^1 NCHI (\d+)/m', $data, $match)) {
-				$this->numChildren=$match[1];
-			}
-			// Check for divorce, etc. *before* we privatize the data so
-			// we can correctly label spouses/ex-spouses/partners
-			$this->_isDivorced=(bool)preg_match('/\n1 ('.WT_EVENTS_DIV.')( Y|\n)/', $data);
-			$this->_isNotMarried=(bool)preg_match('/\n1 _NMR( Y|\n)/', $data);
 		}
 
 		// Make sure husb/wife are the right way round.
@@ -86,11 +70,24 @@ class WT_Family extends WT_GedcomRecord {
 		preg_match_all('/\n1 (?:CHIL|HUSB|WIFE) @('.WT_REGEX_XREF.')@/', $this->_gedrec, $matches, PREG_SET_ORDER);
 		foreach ($matches as $match) {
 			$rela=WT_Person::getInstance($match[1]);
-			if ($SHOW_PRIVATE_RELATIONSHIPS || $rela && $rela->canDisplayDetails($access_level)) {
+			if ($rela && ($SHOW_PRIVATE_RELATIONSHIPS || $rela->canDisplayDetails($access_level))) {
 				$rec.=$match[0];
 			}
 		}
 		return $rec;
+	}
+
+	// Fetch the record from the database
+	protected static function fetchGedcomRecord($xref, $ged_id) {
+		static $statement=null;
+
+		if ($statement===null) {
+			$statement=WT_DB::prepare(
+				"SELECT 'FAM' AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec ".
+				"FROM `##families` WHERE f_id=? AND f_file=?"
+			);
+		}
+		return $statement->execute(array($xref, $ged_id))->fetchOneRow(PDO::FETCH_ASSOC);
 	}
 
 	/**
@@ -133,34 +130,28 @@ class WT_Family extends WT_GedcomRecord {
 	 * @param Person $person
 	 * @return Person
 	 */
-	function getSpouse($person) {
-		if (is_null($this->wife) || is_null($this->husb)) return null;
-		if ($this->wife->equals($person)) return $this->husb;
-		if ($this->husb->equals($person)) return $this->wife;
+	function getSpouse($person, $access_level=WT_USER_ACCESS_LEVEL) {
+		if (is_null($this->wife) || is_null($this->husb)) {
+			return null;
+		}
+		if ($this->wife->equals($person) && $this->husb->canDisplayDetails($access_level)) {
+			return $this->husb;
+		}
+		if ($this->husb->equals($person) && $this->wife->canDisplayDetails($access_level)) {
+			return $this->wife;
+		}
 		return null;
 	}
 
-	function getSpouses() {
+	function getSpouses($access_level=WT_USER_ACCESS_LEVEL) {
 		$spouses=array();
-		if ($this->husb) {
+		if ($this->husb && $this->husb->canDisplayDetails($access_level)) {
 			$spouses[]=$this->husb;
 		}
-		if ($this->wife) {
+		if ($this->wife && $this->wife->canDisplayDetails($access_level)) {
 			$spouses[]=$this->wife;
 		}
 		return $spouses;
-	}
-
-	/**
-	 * return the spouse id of the given person id
-	 * @param string $pid
-	 * @return string
-	 */
-	function getSpouseId($pid) {
-		if (is_null($this->wife) or is_null($this->husb)) return null;
-		if ($this->wife->getXref()==$pid) return $this->husb->getXref();
-		if ($this->husb->getXref()==$pid) return $this->wife->getXref();
-		return null;
 	}
 
 	/**
@@ -170,17 +161,15 @@ class WT_Family extends WT_GedcomRecord {
 	function getChildren($access_level=WT_USER_ACCESS_LEVEL) {
 		global $SHOW_PRIVATE_RELATIONSHIPS;
 
-		if ($this->_children===null) {
-			$this->_children=array();
-			preg_match_all('/\n1 CHIL @('.WT_REGEX_XREF.')@/', $this->getGedcomRecord(), $match);
-			foreach ($match[1] as $pid) {
-				$child=WT_Person::getInstance($pid);
-				if ($SHOW_PRIVATE_RELATIONSHIPS || $child && $child->canDisplayDetails($access_level)) {
-					$this->_children[]=$child;
-				}
+		$children=array();
+		preg_match_all('/\n1 CHIL @('.WT_REGEX_XREF.')@/', $this->_gedrec, $match);
+		foreach ($match[1] as $pid) {
+			$child=WT_Person::getInstance($pid);
+			if ($child && ($SHOW_PRIVATE_RELATIONSHIPS || $child->canDisplayDetails($access_level))) {
+				$children[]=$child;
 			}
 		}
-		return $this->_children;
+		return $children;
 	}
 
 	// Static helper function to sort an array of families by marriage date
@@ -197,7 +186,7 @@ class WT_Family extends WT_GedcomRecord {
 		$nchi1=(int)get_gedcom_value('NCHI', 1, $this->getGedcomRecord());
 		$nchi2=(int)get_gedcom_value('NCHI', 2, $this->getGedcomRecord());
 		$nchi3=count($this->getChildren());
-		return $this->numChildren=max($nchi1, $nchi2, $nchi3);
+		return max($nchi1, $nchi2, $nchi3);
 	}
 
 	/**
@@ -273,14 +262,13 @@ class WT_Family extends WT_GedcomRecord {
 	}
 
 	// Return whether or not this family ended in a divorce or was never married.
-	// Note that this is calculated prior to privatizing the data, so we can
-	// always distinguish spouses from ex-spouses.  This apparant leaking of
-	// private data was discussed and agreed on the pgv forum.
+	// Note that this is calculated using unprivatized data, so we can
+	// always distinguish spouses from ex-spouses.
 	function isDivorced() {
-		return $this->_isDivorced;
+		return (bool)preg_match('/\n1 ('.WT_EVENTS_DIV.')( Y|\n)/', $this->_gedrec);
 	}
 	function isNotMarried() {
-		return $this->_isNotMarried;
+		return (bool)preg_match('/\n1 _NMR( Y|\n)/', $this->_gedrec);
 	}
 
 	/**
@@ -390,9 +378,9 @@ class WT_Family extends WT_GedcomRecord {
 					if ($husb_name['type']!='_MARNM' && $wife_name['type']!='_MARNM' && $husb_name['script']==$wife_name['script']) {
 						$this->_getAllNames[]=array(
 							'type'=>$husb_name['type'],
-							'full'=>$husb_name['full'].' + '.$wife_name['full'],
-							'list'=>$husb_name['list'].$husb->getSexImage().'<br />'.$wife_name['list'].$wife->getSexImage(),
 							'sort'=>$husb_name['sort'].' + '.$wife_name['sort'],
+							'full'=>$husb_name['full'].' + '.$wife_name['full'],
+							// No need for a fullNN entry - we do not currently store FAM names in the database
 						);
 					}
 				}
@@ -403,9 +391,9 @@ class WT_Family extends WT_GedcomRecord {
 					if ($husb_name['type']!='_MARNM' && $wife_name['type']!='_MARNM'  && $husb_name['script']!=$wife_name['script']) {
 						$this->_getAllNames[]=array(
 							'type'=>$husb_name['type'],
-							'full'=>$husb_name['full'].' + '.$wife_name['full'],
-							'list'=>$husb_name['list'].$husb->getSexImage().'<br />'.$wife_name['list'].$wife->getSexImage(),
 							'sort'=>$husb_name['sort'].' + '.$wife_name['sort'],
+							'full'=>$husb_name['full'].' + '.$wife_name['full'],
+							// No need for a fullNN entry - we do not currently store FAM names in the database
 						);
 					}
 				}

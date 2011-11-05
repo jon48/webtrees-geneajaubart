@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @author Jonathan Jaubart ($Author$)
+// $Id: footer.php 11933 2011-07-01 10:16:07Z greg $
 // @version p_$Revision$ $Date$
 // $HeadURL$
 

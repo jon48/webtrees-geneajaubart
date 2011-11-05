@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11956 2011-07-05 08:42:32Z greg $
+// $Id: module.php 12203 2011-09-22 12:09:54Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -51,9 +51,9 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 	// Implement WT_Module_Sidebar
 	public function getSidebarAjaxContent() {
-		$search   =safe_GET('search');
+		$search=safe_GET('search');
 		$pid   =safe_GET('pid', WT_REGEX_XREF);
-		$famid   =safe_GET('famid', WT_REGEX_XREF);
+		$famid =safe_GET('famid', WT_REGEX_XREF);
 
 		$last = array('search'=>$search);
 		$_SESSION['sb_descendancy_last'] = $last;
@@ -144,9 +144,9 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		} else {
 			$out .= '<img src="'.$WT_IMAGES['plus'].'" border="0" class="plusminus" alt="" />';
 		}
-		$out .= $person->getSexImage().' '.$person->getListName().' ';
+		$out .= $person->getSexImage().' '.$person->getFullName().' ';
 		if ($person->canDisplayDetails()) {
-			$out .= PrintReady(' ('.$person->getLifeSpan().')');
+			$out .= ' ('.$person->getLifeSpan().')';
 		}
 		$out .= '</a> <a href="'.$person->getHtmlUrl().'"><img src="'.$WT_IMAGES['button_indi'].'" border="0" alt="indi" /></a>';
 		if ($generations>0) {
@@ -166,7 +166,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 		$out = '<li id="sb_desc_'.$family->getXref().'" class="sb_desc_indi_li"><a href="sidebar.php?sb_action=descendancy&amp;famid='.$family->getXref().'" title="'.$family->getXref().'" class="sb_desc_indi">';
 		$out .= '<img src="'.$WT_IMAGES['minus'].'" border="0" class="plusminus" alt="" />';
-		$out .= $person->getSexImage().$person->getListName();
+		$out .= $person->getSexImage().$person->getFullName();
 
 		$marryear = $family->getMarriageYear();
 		if (!empty($marryear)) {
@@ -186,7 +186,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 		if (strlen($query)<2) return '';
 		$rows=WT_DB::prepare(
-			"SELECT ? AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, i_isdead, i_sex".
+			"SELECT ? AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec".
 			" FROM `##individuals`, `##name`".
 			" WHERE (i_id LIKE ? OR n_sort LIKE ?)".
 			" AND i_id=n_id AND i_file=n_file AND i_file=?".

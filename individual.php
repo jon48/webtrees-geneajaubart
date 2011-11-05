@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: individual.php 12015 2011-07-14 11:26:08Z greg $
+// $Id: individual.php 12356 2011-10-21 15:03:42Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -79,10 +79,6 @@ if ($controller->indi && $controller->indi->canDisplayDetails()) {
 				' ', help_link('pending_changes'),
 				'</p>';
 		}
-	} elseif ($controller->accept_success) {
-		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been accepted.'), '</p>';
-	} elseif ($controller->reject_success) {
-		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been rejected.'), '</p>';
 	}
 } elseif ($controller->indi && $controller->indi->canDisplayName()) {
 	// Just show the name.
@@ -92,6 +88,7 @@ if ($controller->indi && $controller->indi->canDisplayDetails()) {
 	print_footer();
 	exit;
 } else {
+	header('HTTP/1.0 403 Forbidden');
 	print_header(WT_I18N::translate('Individual'));
 	echo '<p class="ui-state-error">', WT_I18N::translate('This individual does not exist or you do not have permission to view it.'), '</p>';
 	print_footer();
@@ -119,7 +116,7 @@ jQuery('#main').toggleClass('use-sidebar'); // Toggle
 var tabCache = new Array();
 
 jQuery(document).ready(function() {
-	jQuery('#tabs').tabs({ spinner: '<img src="images/loading.gif" height="18" border="0" alt="" />' });
+	jQuery('#tabs').tabs({ spinner: '<img src="<?php echo WT_STATIC_URL; ?>images/loading.gif" height="18" border="0" alt="" />' });
 	jQuery("#tabs").tabs({ cache: true });
 	var $tabs = jQuery('#tabs');
 	jQuery('#tabs').bind('tabsshow', function(event, ui) {
@@ -197,7 +194,7 @@ echo
 	'<div id="indi_header">';
 if ($controller->indi->canDisplayDetails()) {
 	echo '<div id="indi_mainimage">'; // Display highlight image
-	if ($MULTI_MEDIA && $controller->canShowHighlightedObject()) {
+	if ($controller->canShowHighlightedObject()) {
 		echo $controller->getHighlightedObject();
 	}
 	echo '</div>'; // close #indi_mainimage
@@ -239,7 +236,7 @@ if ($controller->indi->canDisplayDetails()) {
 		WT_JS_START,
 		'jQuery("#header_accordion1").accordion({',
 		' active: 0,',
-		' icons: {"header": "ui-icon-triangle-1-', $TEXT_DIRECTION=='ltr' ? 'e' : 'w', '", "headerSelected": "ui-icon-triangle-1-s" },',
+		' icons: {"header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" },',
 		' autoHeight: false,',
 		' collapsible: true',
 		'});',
@@ -256,17 +253,17 @@ foreach ($controller->tabs as $tab) {
 echo '<div id="tabs" >';
 echo '<ul>';
 foreach ($controller->tabs as $tab) {
+	if ($tab->isGrayedOut()) {
+		$greyed_out='rela';
+	} else {
 	$greyed_out='';
-	if ($tab->isGrayedOut()) $greyed_out = 'rela';
+	}
 	if ($tab->hasTabContent()) {
-		if ($tab->getName()==$controller->default_tab) {
-			// Default tab loads immediately
-			echo '<li class="'.$greyed_out.'"><a title="', $tab->getName(), '" href="#', $tab->getName(), '">';
-		} else if ($tab->canLoadAjax()) {
-			// AJAX tabs load later
+		if ($tab->canLoadAjax()) {
+			// AJAX tabs load only when selected
 			echo '<li class="'.$greyed_out.'"><a title="', $tab->getName(), '" href="',$controller->indi->getHtmlUrl(),'&amp;action=ajax&amp;module=', $tab->getName(), '">';
 		} else {
-			// Non-AJAX tabs load immediately (search engines don't load ajax)
+			// Non-AJAX tabs load immediately
 			echo '<li class="'.$greyed_out.'"><a title="', $tab->getName(), '" href="#', $tab->getName(), '">';
 		}
 		echo '<span title="', $tab->getTitle(), '">', $tab->getTitle(), '</span></a></li>';
@@ -275,10 +272,8 @@ foreach ($controller->tabs as $tab) {
 echo '</ul>';
 foreach ($controller->tabs as $tab) {
 	if ($tab->hasTabContent()) {
-		if ($tab->getName()==$controller->default_tab || !$tab->canLoadAjax()) {
-			echo '<div id="', $tab->getName(), '">';
-			echo $tab->getTabContent();
-			echo '</div>'; // close each tab div
+		if (!$tab->canLoadAjax()) {
+			echo '<div id="', $tab->getName(), '">', $tab->getTabContent(), '</div>';
 		}
 	}
 }

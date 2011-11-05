@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: timeline.php 11705 2011-06-04 09:13:59Z greg $
+// $Id: timeline.php 12207 2011-09-22 12:48:36Z greg $
 
 define('WT_SCRIPT_NAME', 'timeline.php');
 require './includes/session.php';
@@ -275,8 +275,8 @@ $controller->checkPrivacy();
 				echo $indi->getSexImage('large', '', WT_I18N::translate_c('unknown gender', 'Unknown'));
 			}
 		?>
-			<a href="<?php echo $indi->getHtmlUrl(); ?>">&nbsp;<?php echo PrintReady($indi->getFullName()); ?><br /><br />
-			<?php $addname = $indi->getAddName(); if (strlen($addname) > 0) echo PrintReady($addname); ?>
+			<a href="<?php echo $indi->getHtmlUrl(); ?>">&nbsp;<?php echo $indi->getFullName(); ?><br />
+			<?php echo $indi->getAddName(); ?><br />
 			</a>
 			<input type="hidden" name="pids[<?php echo $p; ?>]" value="<?php echo htmlspecialchars($pid); ?>" />
 				<a href="timeline.php?<?php echo $controller->pidlinks; ?>&amp;scale=<?php echo $controller->scale; ?>&amp;remove=<?php echo $pid; ?>&amp;ged=<?php echo WT_GEDURL; ?>" >

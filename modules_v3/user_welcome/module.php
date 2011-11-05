@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11892 2011-06-24 08:05:24Z greg $
+// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -44,9 +44,10 @@ class user_welcome_WT_Module extends WT_Module implements WT_Module_Block {
 		global $WT_IMAGES, $hitCount, $SHOW_COUNTER;
 
 		$id=$this->getName().$block_id;
+		$class=$this->getName().'_block';
 		$title=/* I18N: A greeting; %s is the user's name */ WT_I18N::translate('Welcome %s', getUserFullName(WT_USER_ID));
 
-		$content = "<table class=\"blockcontent\" cellspacing=\"0\" cellpadding=\"0\" style=\" width: 100%; direction:ltr;\"><tr>";
+		$content = "<table style=\"margin:auto;\"><tr>";
 		$content .= "<td class=\"tab_active_bottom\" colspan=\"3\" ></td></tr><tr>";
 		if (get_user_setting(WT_USER_ID, 'editaccount')) {
 			$content .= "<td class=\"center details2\" style=\" width: 33%; clear: none; vertical-align: top; margin-top: 2px;\"><a href=\"edituser.php\"><img class=\"block\" src=\"".$WT_IMAGES["mypage"]."\" border=\"0\" alt=\"".WT_I18N::translate('My account')."\" /><br />".WT_I18N::translate('My account')."</a></td>";

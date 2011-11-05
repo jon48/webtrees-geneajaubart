@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -94,13 +94,9 @@ class review_changes_WT_Module extends WT_Module implements WT_Module_Block {
 			}
 			if (WT_USER_CAN_EDIT) {
 				$id=$this->getName().$block_id;
+				$class=$this->getName().'_block';
 				$title='';
 				if ($ctype=="gedcom" && WT_USER_GEDCOM_ADMIN || $ctype=="user" && WT_USER_ID) {
-					if ($ctype=="gedcom") {
-						$name = WT_GEDCOM;
-					} else {
-						$name = WT_USER_NAME;
-					}
 					$title .= "<a href=\"javascript: configure block\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
 					$title .= "<img class=\"adminicon\" src=\"".$WT_IMAGES["admin"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".WT_I18N::translate('Configure')."\" /></a>";
 				}
@@ -123,7 +119,7 @@ class review_changes_WT_Module extends WT_Module implements WT_Module_Block {
 				foreach ($changes as $change) {
 					$record=WT_GedcomRecord::getInstance($change->xref);
 					if ($record->canDisplayDetails()) {
-						$content.='<b>'.PrintReady($record->getFullName()).'</b> '.getLRM().'('.$record->getXref().')'.getLRM();
+						$content.='<b>'.$record->getFullName().'</b>';
 						switch ($record->getType()) {
 						case 'INDI':
 						case 'FAM':

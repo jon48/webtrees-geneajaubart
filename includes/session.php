@@ -5,7 +5,7 @@
 // Copyright (C) 2011 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2011  PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: session.php 12104 2011-08-04 19:18:49Z greg $
+// $Id: session.php 12457 2011-10-29 13:16:29Z greg $
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
 if (!defined('WT_SCRIPT_NAME')) {
@@ -31,15 +31,42 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.2.3');
+define('WT_VERSION',         '1.2.4');
 define('WT_VERSION_RELEASE', ''); // 'svn', 'beta', 'rc1', '', etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
+
+// External URLs
 define('WT_WEBTREES_URL',    'http://webtrees.net/');
 define('WT_WEBTREES_WIKI',   'http://wiki.webtrees.net/');
 define('WT_TRANSLATORS_URL', 'https://translations.launchpad.net/webtrees/');
 
+// Optionally, specify a CDN server for static content (e.g. CSS, JS, PNG)
+// For example, "http://my.cdn.com/webtrees-static-1.2.3/"
+// Note that some servers (e.g. Amazon S3) require separate compressed/uncompressed data.
+if (isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')!==false) {
+	// Pre-compressed resources, served with a "Content-encoding: gzip" header.
+	define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-1.2.3z/"
+} else {
+	// Uncompressed resources, served without a "Content-encoding: gzip" header.
+	define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-1.2.3/"
+}
+
+// Optionally, load major JS libraries from Google's public CDN
+define ('WT_USE_GOOGLE_API', false);
+if (WT_USE_GOOGLE_API) {
+	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js');
+	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js');
+	define('WT_PROTOTYPE_URL',     'https://ajax.googleapis.com/ajax/libs/prototype/1.7.0.0/prototype.js');
+	define('WT_SCRIPTACULOUS_URL', 'https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/');
+} else {
+	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery/jquery.min.js');
+	define('WT_JQUERYUI_URL',      WT_STATIC_URL.'js/jquery/jquery-ui.min.js');
+	define('WT_PROTOTYPE_URL',     WT_STATIC_URL.'js/prototype/prototype.js');
+	define('WT_SCRIPTACULOUS_URL', WT_STATIC_URL.'js/scriptaculous/');
+}
+
 // Location of our modules and themes.  These are used as URLs and directory paths.
-define('WT_MODULES_DIR', 'modules_v3/');
+define('WT_MODULES_DIR', 'modules_v3/'); // Update the build script when this changes
 define('WT_THEMES_DIR',  'themes/' );
 
 // Enable debugging output?
@@ -51,7 +78,7 @@ define('WT_DEBUG_LANG', false);
 define('WT_ERROR_LEVEL', 2); // 0=none, 1=minimal, 2=full
 
 // Required version of database tables/columns/indexes/etc.
-define('WT_SCHEMA_VERSION', 12);
+define('WT_SCHEMA_VERSION', 15);
 
 // Regular expressions for validating user input, etc.
 define('WT_REGEX_XREF',     '[A-Za-z0-9:_-]+');
@@ -85,7 +112,7 @@ define('WT_UTF8_PDF',    "\xE2\x80\xAC"); // U+202C  (Pop directional formatting
 // Alternatives to BMD events for lists, charts, etc.
 define('WT_EVENTS_BIRT', 'BIRT|CHR|BAPM|_BRTM|ADOP');
 define('WT_EVENTS_DEAT', 'DEAT|BURI|CREM');
-define('WT_EVENTS_MARR', 'MARR|MARB');
+define('WT_EVENTS_MARR', 'MARR');
 define('WT_EVENTS_DIV',  'DIV|ANUL|_SEPR');
 
 // Use these line endings when writing files on the server
@@ -239,7 +266,7 @@ define('WT_DATA_DIR', realpath(get_site_setting('INDEX_DIRECTORY', 'data')).DIRE
 // www.isp.com/~example), then redirect to it.
 $SERVER_URL=get_site_setting('SERVER_URL');
 if ($SERVER_URL && $SERVER_URL != WT_SERVER_NAME.WT_SCRIPT_PATH) {
-	header('Location: '.$SERVER_URL.WT_SCRIPT_NAME.($QUERY_STRING ? '?'.$QUERY_STRING : ''), TRUE, 301);
+	header('Location: '.$SERVER_URL.WT_SCRIPT_NAME.($QUERY_STRING ? '?'.$QUERY_STRING : ''), true, 301);
 	exit;
 }
 
@@ -274,16 +301,6 @@ if (!empty($_SERVER['HTTP_USER_AGENT'])) {
 
 //-- load up the code to check for spiders
 require WT_ROOT.'includes/session_spider.php';
-
-// Search engines are only allowed to see certain pages.
-if ($SEARCH_SPIDER && !in_array(WT_SCRIPT_NAME , array(
-	'family.php', 'famlist.php', 'index.php', 'indilist.php', 'individual.php',
-	'medialist.php', 'note.php', 'notelist.php', 'repo.php', 'repolist.php',
-	'search_engine.php', 'site-unavailable.php', 'source.php', 'sourcelist.php'
-))) {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'search_engine.php');
-	exit;
-}
 
 // Store our session data in the database.
 // NOTE: this causes problems for sites using PHP/APC
@@ -338,9 +355,6 @@ if (!$SEARCH_SPIDER && !$WT_SESSION->initiated) {
 if (isset($_REQUEST['ged'])) {
 	// .... from the URL or form action
 	$GEDCOM=$_REQUEST['ged'];
-} elseif (isset($_REQUEST['GEDCOM'])) {
-	// .... is this used ????
-	$GEDCOM=$_REQUEST['GEDCOM'];
 } elseif (isset($_SESSION['GEDCOM'])) {
 	// .... the most recently used one
 	$GEDCOM=$_SESSION['GEDCOM'];
@@ -379,10 +393,7 @@ if (empty($WEBTREES_EMAIL)) {
 
 require WT_ROOT.'includes/functions/functions_print.php';
 require WT_ROOT.'includes/functions/functions_rtl.php';
-
-if ($MULTI_MEDIA) {
-	require WT_ROOT.'includes/functions/functions_mediadb.php';
-}
+require WT_ROOT.'includes/functions/functions_mediadb.php';
 require WT_ROOT.'includes/functions/functions_date.php';
 
 // Use the server date to calculate privacy, etc.
@@ -435,7 +446,7 @@ if (isset($_GET['show_context_help'])) {
 if (!isset($_SESSION['wt_user'])) $_SESSION['wt_user'] = '';
 
 if (WT_SCRIPT_NAME!='help_text.php') {
-	if (!get_gedcom_setting(WT_GED_ID, 'imported') && substr(WT_SCRIPT_NAME, 0, 5)!=='admin' && !in_array(WT_SCRIPT_NAME, array('help_text.php', 'downloadgedcom.php', 'login.php', 'login_register.php', 'gedcheck.php', 'export_gedcom.php', 'edit_changes.php', 'import.php', 'message.php', 'save.php'))) {
+	if (!get_gedcom_setting(WT_GED_ID, 'imported') && substr(WT_SCRIPT_NAME, 0, 5)!=='admin' && !in_array(WT_SCRIPT_NAME, array('help_text.php', 'downloadgedcom.php', 'login.php', 'login_register.php', 'export_gedcom.php', 'edit_changes.php', 'import.php', 'message.php', 'save.php'))) {
 		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_trees_manage.php');
 		exit;
 	}
@@ -508,7 +519,8 @@ if (substr(WT_SCRIPT_NAME, 0, 5)=='admin' || WT_SCRIPT_NAME=='module.php' && sub
 		$_SESSION['theme_dir']=$THEME_DIR;
 	}
 }
-
+// If we have specified a CDN, use it for static theme resources
+define('WT_THEME_URL', WT_STATIC_URL.WT_THEME_DIR);
 
 require WT_ROOT.WT_THEME_DIR.'theme.php';
 
@@ -529,4 +541,16 @@ if (substr(PHP_SAPI, 0, 3) == 'cgi') {  // cgi-mode, should only be writable by 
 }
 
 // Lightbox needs custom integration in many places.  Only check for the module once.
-define('WT_USE_LIGHTBOX', !$SEARCH_SPIDER && $MULTI_MEDIA && array_key_exists('lightbox', WT_Module::getActiveModules()));
+define('WT_USE_LIGHTBOX', !$SEARCH_SPIDER && array_key_exists('lightbox', WT_Module::getActiveModules()));
+
+// Search engines are only allowed to see certain pages.
+if ($SEARCH_SPIDER && !in_array(WT_SCRIPT_NAME , array(
+	'index.php', 'site-unavailable.php', 'indilist.php',
+	'individual.php', 'family.php', 'mediaviewer.php', 'note.php', 'repo.php', 'source.php',
+))) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	print_header(WT_I18N::translate('Search engine'));
+	echo '<p class="ui-state-error">', WT_I18N::translate('You do not have permission to view this page.'), '</p>';
+	print_footer();
+	exit;
+}

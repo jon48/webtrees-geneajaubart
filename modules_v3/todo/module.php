@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -58,6 +58,7 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 		}
 
 		$id=$this->getName().$block_id;
+		$class=$this->getName().'_block';
 		$title='';
 		if ($ctype=='gedcom' && WT_USER_GEDCOM_ADMIN || $ctype=='user' && WT_USER_ID) {
 			if ($ctype=='gedcom') {
@@ -69,20 +70,32 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 			$title.="<img class=\"adminicon\" src=\"".$WT_IMAGES["admin"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".WT_I18N::translate('Configure')."\" /></a>";
 		}
 		$title.=$this->getTitle().help_link('todo', $this->getName());
+		$table_id = 'ID'.floor(microtime()*1000000); // create a unique ID
+		?>
+		<script type="text/javascript" src="<?php echo WT_STATIC_URL; ?>js/jquery/jquery.dataTables.min.js"></script>
+		<script type="text/javascript">
+			jQuery(document).ready(function(){
+				jQuery('#<?php echo $table_id; ?>').dataTable( {
+				"bAutoWidth":false,
+				"bPaginate": false,
+				"bLengthChange": false,
+				"bFilter": false,
+				"bInfo": false,
+				"bJQueryUI": false
+				});		
+			});
+		</script>
+		<?php
 		$content='';
-
-		require_once WT_ROOT.'js/sorttable.js.htm';
-
-		$table_id = 'ID'.floor(microtime()*1000000); // sorttable requires a unique ID
-		$content .= '<table id="'.$table_id.'" class="sortable list_table center">';
-		$content .= '<tr>';
-		$content .= '<th class="list_label">'.WT_Gedcom_Tag::getLabel('DATE').'</th>';
-		$content .= '<th class="list_label">'.WT_I18N::translate('Record').'</th>';
+		$content .= '<table id="'.$table_id.'" class="list_table center">';
+		$content .= '<thead><tr>';
+		$content .= '<th class="list_label" style="cursor:pointer;">'.WT_Gedcom_Tag::getLabel('DATE').'</th>';
+		$content .= '<th class="list_label" style="cursor:pointer;">'.WT_I18N::translate('Record').'</th>';
 		if ($show_unassigned || $show_other) {
-			$content .= '<th class="list_label">'.WT_I18N::translate('User name').'</th>';
+			$content .= '<th class="list_label" style="cursor:pointer;">'.WT_I18N::translate('User name').'</th>';
 		}
-		$content .= '<th class="list_label">'.WT_Gedcom_Tag::getLabel('TEXT').'</th>';
-		$content .= '</tr>';
+		$content .= '<th class="list_label" style="cursor:pointer;">'.WT_Gedcom_Tag::getLabel('TEXT').'</th>';
+		$content .= '</tr></thead><tbody>';
 
 		$found=false;
 		$end_jd=$show_future ? 99999999 : WT_CLIENT_JD;
@@ -93,7 +106,7 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 				if ($user_name==WT_USER_NAME || !$user_name && $show_unassigned || $user_name && $show_other) {
 					$content.='<tr valign="top">';
 					$content.='<td class="list_value_wrap">'.str_replace('<a', '<a name="'.$todo['date']->MinJD().'"', $todo['date']->Display(false)).'</td>';
-					$name=$record->getListName();
+					$name=$record->getFullName();
 					$content.='<td class="list_value_wrap" align="'.get_align(WT_GEDCOM).'"><a href="'.$record->getHtmlUrl().'">'.PrintReady($name).'</a></td>';
 					if ($show_unassigned || $show_other) {
 						$content.='<td class="list_value_wrap">'.$user_name.'</td>';
@@ -106,7 +119,7 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 			}
 		}
 
-		$content .= '</table>';
+		$content .= '</tbody></table>';
 		if (!$found) {
 			$content.='<p>'.WT_I18N::translate('There are no research tasks in this family tree.').'</p>';
 		}
@@ -124,7 +137,7 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function loadAjax() {
-		return true;
+		return false;
 	}
 
 	// Implement class WT_Module_Block

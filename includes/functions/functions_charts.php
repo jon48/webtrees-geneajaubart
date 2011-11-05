@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_charts.php 11989 2011-07-10 22:34:26Z greg $
+// $Id: functions_charts.php 12398 2011-10-24 20:14:11Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -269,8 +269,8 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 		echo "<br />";
 		echo "<span class='nowrap font12'>";
 		echo "<a href=\"javascript:;\" onclick=\"return addnewchild('$famid','');\">" . WT_I18N::translate('Add a child to this family') . "</a>";
-		echo " <a href=\"javascript:;\" onclick=\"return addnewchild('$famid','M');\">[".WT_Person::sexImage('M', 'small', '', WT_I18N::translate('Son'     ))."]</a>";
-		echo " <a href=\"javascript:;\" onclick=\"return addnewchild('$famid','F');\">[".WT_Person::sexImage('F', 'small', '', WT_I18N::translate('Daughter'))."]</a>";
+		echo " <a href=\"javascript:;\" onclick=\"return addnewchild('$famid','M');\">[".WT_Person::sexImage('M', 'small', '', WT_I18N::translate('son'     ))."]</a>";
+		echo " <a href=\"javascript:;\" onclick=\"return addnewchild('$famid','F');\">[".WT_Person::sexImage('F', 'small', '', WT_I18N::translate('daughter'))."]</a>";
 		echo help_link('add_child');
 		echo "</span>";
 		echo "<br /><br />";
@@ -473,13 +473,15 @@ function print_family_facts($family) {
 			echo '</td></tr>';
 
 			// -- new media
-			echo '<tr><td class="descriptionbox">';
-			echo WT_I18N::translate('Add media'), help_link('add_media');
-			echo '</td><td class="optionbox">';
-			echo "<a href=\"javascript:;\" onclick=\"window.open('addmedia.php?action=showmediaform&linktoid={$famid}', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Add a new media object'), '</a>';
-			echo '<br />';
-			echo "<a href=\"javascript:;\" onclick=\"window.open('inverselink.php?linktoid={$famid}&linkto=family', '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Link to an existing media object'), '</a>';
-			echo '</td></tr>';
+			if (get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') >= WT_USER_ACCESS_LEVEL) {
+				echo '<tr><td class="descriptionbox">';
+				echo WT_I18N::translate('Add media'), help_link('add_media');
+				echo '</td><td class="optionbox">';
+				echo "<a href=\"javascript:;\" onclick=\"window.open('addmedia.php?action=showmediaform&linktoid={$famid}', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Add a new media object'), '</a>';
+				echo '<br />';
+				echo "<a href=\"javascript:;\" onclick=\"window.open('inverselink.php?linktoid={$famid}&linkto=family', '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Link to an existing media object'), '</a>';
+				echo '</td></tr>';
+			}
 
 			// -- new source citation
 			echo '<tr><td class="descriptionbox">';
@@ -657,7 +659,7 @@ function print_cousins($famid, $personcount=1) {
 	$kids = count($fchildren);
 	$save_show_full = $show_full;
 	if ($save_show_full) {
-		$bheight/=4;
+		$bheight=$bheight/4+10;
 		$bwidth-=40;
 	}
 	$show_full = false;
@@ -690,7 +692,7 @@ function print_cousins($famid, $personcount=1) {
 	}
 	$show_full = $save_show_full;
 	if ($save_show_full) {
-		$bheight*=4;
+		$bheight=($bheight-10)*4;
 		$bwidth+=40;
 	}
 	echo '</td>';

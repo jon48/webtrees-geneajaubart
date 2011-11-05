@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,7 +41,7 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $ctype, $WT_IMAGES, $MULTI_MEDIA, $top10_block_present;
+		global $ctype, $WT_IMAGES, $top10_block_present;
 
 		$show_last_update    =get_block_setting($block_id, 'show_last_update',     true);
 		$show_common_surnames=get_block_setting($block_id, 'show_common_surnames', true);
@@ -73,6 +73,7 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 		}
 
 		$id=$this->getName().$block_id;
+		$class=$this->getName().'_block';
 		$title='';
 		if ($ctype=='gedcom' && WT_USER_GEDCOM_ADMIN || $ctype=='user' && WT_USER_ID) {
 			$title .= "<a href=\"javascript: configure block\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
@@ -103,7 +104,7 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 		if ($stat_sour) {
 			$content .= '<tr><td class="facts_label">'.WT_I18N::translate('Sources').'</td><td class="facts_value" align="right"><a href="sourcelist.php?ged='.WT_GEDURL.'">'.WT_I18N::number($stats->totalSources()).'</a></td></tr>';
 		}
-		if ($stat_media && $MULTI_MEDIA==true) {
+		if ($stat_media) {
 			$content .= '<tr><td class="facts_label">'.WT_I18N::translate('Media objects').'</td><td class="facts_value" align="right"><a href="medialist.php?ged='.WT_GEDURL.'">'.WT_I18N::number($stats->totalMedia()).'</a></td></tr>';
 		}
 		if ($stat_repo) {

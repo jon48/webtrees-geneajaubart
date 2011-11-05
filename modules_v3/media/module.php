@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11993 2011-07-11 20:26:20Z nigel $
+// $Id: module.php 12306 2011-10-13 13:08:07Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -48,8 +48,7 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function hasTabContent() {
-		global $MULTI_MEDIA;
-		return $MULTI_MEDIA && (WT_USER_CAN_EDIT || $this->get_media_count()>0);
+		return WT_USER_CAN_EDIT || $this->get_media_count()>0;
 	}
 	
 	// Implement WT_Module_Tab
@@ -59,7 +58,7 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function getTabContent() {
-		global $MULTI_MEDIA, $NAV_MEDIA;
+		global $NAV_MEDIA;
 
 		ob_start();
 		// For Reorder media ------------------------------------
@@ -82,7 +81,7 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 			$media_found = print_main_media($this->controller->pid, 0, true);
 			if (!$media_found) echo "<tr><td id=\"no_tab4\" colspan=\"2\" class=\"facts_value\">".WT_I18N::translate('There are no media objects for this individual.')."</td></tr>";
 			//-- New Media link
-			if (WT_USER_CAN_EDIT && $this->controller->indi->canDisplayDetails()) {
+			if (WT_USER_CAN_EDIT && $this->controller->indi->canDisplayDetails() && get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') >= WT_USER_ACCESS_LEVEL) {
 		?>
 				<tr>
 					<td class="facts_label"><?php echo WT_I18N::translate('Add media'), help_link('add_media'); ?></td>
@@ -117,7 +116,9 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function canLoadAjax() {
-		return true;
+		global $SEARCH_SPIDER;
+
+		return !$SEARCH_SPIDER; // Search engines cannot use AJAX
 	}
 
 	// Implement WT_Module_Tab

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_users.php 12030 2011-07-17 19:38:57Z greg $
+// $Id: admin_users.php 12466 2011-10-30 01:13:24Z nigel $
 
 define('WT_SCRIPT_NAME', 'admin_users.php');
 require './includes/session.php';
@@ -64,7 +64,6 @@ $emailaddress            =safe_POST('emailaddress', WT_REGEX_EMAIL);
 $user_theme              =safe_POST('user_theme',               $ALL_THEME_DIRS);
 $user_language           =safe_POST('user_language',            array_keys(WT_I18N::installed_languages()), WT_LOCALE);
 $new_contact_method      =safe_POST('new_contact_method');
-$new_default_tab         =safe_POST('new_default_tab',          array_keys(WT_Module::getActiveTabs()), get_gedcom_setting(WT_GED_ID, 'GEDCOM_DEFAULT_TAB'));
 $new_comment             =safe_POST('new_comment',              WT_REGEX_UNSAFE);
 $new_auto_accept         =safe_POST_bool('new_auto_accept');
 $canadmin                =safe_POST_bool('canadmin');
@@ -224,9 +223,6 @@ case 'load1row':
 	echo '<dt>', WT_I18N::translate('Theme'), '</dt>';
 	echo '<dd>', select_edit_control_inline('user_setting-'.$user_id.'-theme', array_flip(get_theme_names()), WT_I18N::translate('<default theme>'), get_user_setting($user_id, 'theme')), '</dd>';
 
-	echo '<dt>', WT_I18N::translate('Default Tab to show on Individual Information page'), '</dt>';
-	echo '<dd>', edit_field_default_tab_inline('user_setting-'.$user_id.'-defaulttab', get_user_setting($user_id, 'defaulttab', 'personal_facts')), '</dd>';
-
 	echo '<dt>', WT_I18N::translate('Visible to other users when online'), '</dt>';
 	echo '<dd>', edit_field_yes_no_inline('user_setting-'.$user_id.'-visibleonline', get_user_setting($user_id, 'visibleonline')), '</dd>';
 
@@ -313,7 +309,6 @@ if ($action=='createuser' || $action=='edituser2') {
 			set_user_setting($user_id, 'theme',                $user_theme);
 			set_user_setting($user_id, 'language',             $user_language);
 			set_user_setting($user_id, 'contactmethod',        $new_contact_method);
-			set_user_setting($user_id, 'defaulttab',           $new_default_tab);
 			set_user_setting($user_id, 'comment',              $new_comment);
 			set_user_setting($user_id, 'auto_accept',          $new_auto_accept);
 			set_user_setting($user_id, 'canadmin',             $canadmin);
@@ -499,12 +494,6 @@ case 'createform':
 					</td>
 				</tr>
 			<?php } ?>
-			<tr>
-				<td><?php echo WT_I18N::translate('Default Tab to show on Individual Information page'), help_link('useradmin_user_default_tab'); ?></td>
-				<td colspan="3">
-					<?php echo edit_field_default_tab('new_default_tab', get_gedcom_setting(WT_GED_ID, 'GEDCOM_DEFAULT_TAB')); ?>
-				</td>
-			</tr>
 			<!-- access and relationship path details -->
 			<tr>
 				<th colspan="4"><?php print WT_I18N::translate('Family tree access and settings'); ?></th>
@@ -573,7 +562,7 @@ case 'createform':
 	break;
 case 'cleanup':
 	?>
-	<form name="cleanupform" method="post" action="admin_users.php&action=cleanup2">
+	<form name="cleanupform" method="post" action="admin_users.php?action=cleanup2">
 	<table id="clean" class="<?php echo $TEXT_DIRECTION; ?>">
 	<?php
 	// Check for idle users
@@ -711,21 +700,20 @@ default:
 		jQuery(document).ready(function(){
 			var oTable = jQuery('#list').dataTable( {
 				"oLanguage": {
-					"sLengthMenu": '<?php echo /* I18N: %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="5">5</option><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
+					"sLengthMenu": '<?php echo /* I18N: %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="5">5</option><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
 					"sZeroRecords": '<?php echo WT_I18N::translate('No records to display');?>',
 					"sInfo": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_'); ?>',
 					"sInfoEmpty": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '0', '0', '0'); ?>',
 					"sInfoFiltered": '<?php echo /* I18N: %s  is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_'); ?>',
 					"sProcessing": '<?php echo WT_I18N::translate('Loading...');?>',
-					"sSearch": '<?php echo WT_I18N::translate('Search');?>',
-					"oPaginate": {
+					"sSearch": '<?php echo WT_I18N::translate('Filter');?>',					"oPaginate": {
 						"sFirst": '<?php echo WT_I18N::translate_c('first page', 'first');?>',
 						"sLast": '<?php echo WT_I18N::translate('last');?>',
 						"sNext": '<?php echo WT_I18N::translate('next');?>',
 						"sPrevious": '<?php echo WT_I18N::translate('previous');?>'
 					}
 				},
-				"sDom"            : '<"H"prf>t<"F"li>',
+				"sDom"			  : '<"H"pf<"dt-clear">irl>t<"F"pl>',
 				"bProcessing"     : true,
 				"bServerSide"     : true,
 				"sAjaxSource"     : "<?php echo WT_SCRIPT_NAME.'?action=loadrows'; ?>",
@@ -757,9 +745,10 @@ default:
 					jQuery('#list script').each(function() {
 						var script=document.createElement('script');
 						script.type='text/javascript';
-						jQuery(script).text(jQuery(this).text());
+						jQuery('#list script').appendTo('body'); 
 						document.body.appendChild(script);
 					}).remove();
+					//
 				}
 				
 			});

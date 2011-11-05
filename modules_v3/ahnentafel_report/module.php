@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12256 2011-10-06 07:56:22Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -50,9 +50,14 @@ class ahnentafel_report_WT_Module extends WT_Module implements WT_Module_Report 
 	public function getReportMenus() {
 		global $controller;
 
-		if ($controller && isset($controller->pid)) {
+		if ($controller instanceof WT_Controller_Family) {
+			// We are on a family page
+			$pid='&amp;famid='.$controller->famid;
+		} elseif ($controller instanceof WT_Controller_Individual) {
+			// We are on an individual page
 			$pid='&amp;pid='.$controller->pid;
 		} elseif ($controller && isset($controller->rootid)) {
+			// We are on a chart page
 			$pid='&amp;pid='.$controller->rootid;
 		} else {
 			$pid='';

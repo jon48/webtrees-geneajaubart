@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: GedcomRecord.php 12042 2011-07-20 16:33:49Z greg $
+// $Id: GedcomRecord.php 12463 2011-10-29 21:41:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,9 @@ class WT_GedcomRecord {
 	private   $gedrec     =null;  // Raw gedcom text (privatised)
 	protected $facts      =null;
 	protected $changeEvent=null;
-	private   $disp       =null;  // Can we display details of this object
+	private   $disp_public=null;  // Can we display details of this record to WT_PRIV_PUBLIC
+	private   $disp_user  =null;  // Can we display details of this record to WT_PRIV_USER
+	private   $disp_none  =null;  // Can we display details of this record to WT_PRIV_NONE
 	private   $changed    =false; // Is this a new record, pending approval
 
 	// Cached results from various functions.
@@ -87,34 +89,13 @@ class WT_GedcomRecord {
 
 		// Look for the record in the database
 		if (!is_array($data)) {
-			if (version_compare(PHP_VERSION, '5.3', '>=')) {
-				// If we know what sort of object we are, we can query the table directly.
-				switch (get_called_class()) {
-				case 'WT_Person':
-					$data=fetch_person_record($pid, $ged_id);
-					break;
-				case 'WT_Family':
-					$data=fetch_family_record($pid, $ged_id);
-					break;
-				case 'WT_Source':
-					$data=fetch_source_record($pid, $ged_id);
-					break;
-				case 'WT_Media':
-					$data=fetch_media_record($pid, $ged_id);
-					break;
-				case 'WT_Repository':
-				case 'WT_Note':
-					$data=fetch_other_record($pid, $ged_id);
-					break;
-				default:
-					// Type unknown - try each of the five tables in turn....
-					$data=fetch_gedcom_record($pid, $ged_id);
-					break;
-				}
+			if (version_compare(PHP_VERSION, '5.3', '>')) {
+				// PHP 5.3 supports late static binding, but the syntax breaks PHP 5.2,
+				// so wrap it in eval() to hide it from PHP 5.2
+				eval('$data=static::fetchGedcomRecord($pid, $ged_id);');
 			} else {
-				// Late-static-binding is unavailable in PHP 5.2, so we do not what what
-				// sort of object we are - try each of the five tables in turn....
-				$data=fetch_gedcom_record($pid, $ged_id);
+				// PHP 5.2 does not - use a (slower) fallback.
+				$data=self::fetchGedcomRecord($pid, $ged_id);
 			}
 
 			// If we didn't find the record in the database, it may be new/pending
@@ -170,6 +151,45 @@ class WT_GedcomRecord {
 		// Store it in the cache
 		$gedcom_record_cache[$object->xref][$object->ged_id]=&$object;
 		return $object;
+	}
+
+	private static function fetchGedcomRecord($xref, $ged_id) {
+		static $statement=null;
+
+		// We don't know what type of object this is.  Try each one in turn.
+		$row=WT_Person::fetchGedcomRecord($xref, $ged_id);
+		if ($row) {
+			return $row;
+		}
+		$row=WT_Family::fetchGedcomRecord($xref, $ged_id);
+		if ($row) {
+			return $row;
+		}
+		$row=WT_Source::fetchGedcomRecord($xref, $ged_id);
+		if ($row) {
+			return $row;
+		}
+		$row=WT_Repository::fetchGedcomRecord($xref, $ged_id);
+		if ($row) {
+			return $row;
+		}
+		$row=WT_Media::fetchGedcomRecord($xref, $ged_id);
+		if ($row) {
+			return $row;
+		}
+		$row=WT_Note::fetchGedcomRecord($xref, $ged_id);
+		if ($row) {
+			return $row;
+		}
+		// Some other type of record...
+		if (is_null($statement)) {
+			$statement=WT_DB::prepare(
+				"SELECT o_type AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec ".
+				"FROM `##other` WHERE o_id=? AND o_file=? AND o_type NOT IN ('REPO', 'NOTE')"
+			);
+		}
+		return $statement->execute(array($xref, $ged_id))->fetchOneRow(PDO::FETCH_ASSOC);
+
 	}
 
 	/**
@@ -343,18 +363,32 @@ class WT_GedcomRecord {
 
 	// Can the details of this record be shown?
 	public function canDisplayDetails($access_level=WT_USER_ACCESS_LEVEL) {
-		// CACHING: this function can take four different parameters, 
-		// and therefore needs four different caches for the result.
-		// However, when we use a non-default value for $access_level,
-		// we use that access level exclusively.  This happens in
-		// 1) downloading a gedcom with privacy filtering
-		// 2) downloading a clipping cart with privacy filtering
-		// 3) generating a sitemap
-		// As a result, we currently need only the one cached value.
-		if ($this->disp===null) {
-			$this->disp=$this->_canDisplayDetails($access_level);
+		// CACHING: this function can take three different parameters, 
+		// and therefore needs three different caches for the result.
+		switch ($access_level) {
+		case WT_PRIV_PUBLIC: // visitor
+			if ($this->disp_public===null) {
+				$this->disp_public=$this->_canDisplayDetails(WT_PRIV_PUBLIC);
+			}
+			return $this->disp_public;
+		case WT_PRIV_USER: // member
+			if ($this->disp_user===null) {
+				$this->disp_user=$this->_canDisplayDetails(WT_PRIV_USER);
+			}
+			return $this->disp_user;
+		case WT_PRIV_NONE: // admin
+			if ($this->disp_none===null) {
+				$this->disp_none=$this->_canDisplayDetails(WT_PRIV_NONE);
+			}
+			return $this->disp_none;
+		case WT_PRIV_HIDE: // hidden from admins
+			// We use this value to bypass privacy checks.  For example,
+			// when downloading data or when calculating privacy itself.
+			return true;
+		default:
+			// Should never get here.
+			return false;
 		}
-		return $this->disp;
 	}
 
 	// Can the name of this record be shown?
@@ -378,16 +412,11 @@ class WT_GedcomRecord {
 	public function privatizeGedcom($access_level) {
 		global $global_facts, $person_facts;
 
-		if ($this->canDisplayDetails($access_level)) {
+		if ($access_level==WT_PRIV_HIDE) {
+			// We may need the original record, for example when downloading a GEDCOM or clippings cart
+			return array($this->_gedrec, '');
+		} elseif ($this->canDisplayDetails($access_level)) {
 			// The record is not private, but the individual facts may be.
-			if (
-				!strpos($this->_gedrec, "\n2 RESN") &&
-				!isset($person_facts[$this->xref]) &&
-				!preg_match('/\n1 (?:'.implode('|', array_keys($global_facts)).')/', $this->_gedrec)
-			) {
-				// Nothing to indicate fact privacy needed
-				return array($this->_gedrec, '');
-			}
 
 			// Include the entire first line (for NOTE records)
 			list($gedrec)=explode("\n", $this->_gedrec, 2);
@@ -404,6 +433,8 @@ class WT_GedcomRecord {
 			}
 			return array($gedrec, $private_gedrec);
 		} else {
+			// We cannot display the details, but we may be able to display
+			// limited data, such as links to other records.
 			return array($this->createPrivateGedcomRecord($access_level), '');
 		}
 	}
@@ -413,14 +444,25 @@ class WT_GedcomRecord {
 		return "0 @".$this->xref."@ ".$this->type."\n1 NOTE ".WT_I18N::translate('Private');
 	}
 
-	// Convert a name record into sortable and listable versions.  This default
-	// should be OK for simple record types.  INDI records will need to redefine it.
+	// Convert a name record into sortable and full/display versions.  This default
+	// should be OK for simple record types.  INDI/FAM records will need to redefine it.
 	protected function _addName($type, $value, $gedrec) {
+		global $TEXT_DIRECTION;
+		// RTL names on LTR pages (and vice-versa) cause problems when they contain
+		// weakly-directional characters such as punctuation.  Add markup to fix this.
+		$dir=utf8_direction($value);
+		if ($dir=='ltr' && $TEXT_DIRECTION=='rtl') {
+			$full='<span dir="ltr">'.htmlspecialchars($value).'</span>';
+		} elseif ($dir=='rtl' && $TEXT_DIRECTION=='ltr') {
+			$full='<span dir="rtl">'.htmlspecialchars($value).'</span>';
+		} else {
+			$full=htmlspecialchars($value);
+		}
 		$this->_getAllNames[]=array(
 			'type'=>$type,
-			'full'=>$value,
-			'list'=>$value,
-			'sort'=>preg_replace('/([0-9]+)/e', 'substr("000000000\\1", -10)', $value)
+			'sort'=>preg_replace('/([0-9]+)/e', 'substr("000000000\\1", -10)', $value),
+			'full'=>$full,    // This is used for display
+			'fullNN'=>$value, // This goes into the database
 		);
 	}
 
@@ -431,7 +473,6 @@ class WT_GedcomRecord {
 	// Return value: an array of name structures, each containing
 	// ['type'] = the gedcom fact, e.g. NAME, TITL, FONE, _HEB, etc.
 	// ['full'] = the name as specified in the record, e.g. 'Vincent van Gogh' or 'John Unknown'
-	// ['list'] = a version of the name as might appear in lists, e.g. 'van Gogh, Vincent' or 'Unknown, John'
 	// ['sort'] = a sortable version of the name (not for display), e.g. 'Gogh, Vincent' or '@N.N., John'
 	protected function _getAllNames($fact='!', $level=1) {
 		global $WORD_WRAPPED_NOTES;
@@ -611,14 +652,6 @@ class WT_GedcomRecord {
 		$tmp=$this->getAllNames();
 		return $tmp[$this->getPrimaryName()]['sort'];
 	}
-	public function getListName() {
-		if ($this->canDisplayName()) {
-			$tmp=$this->getAllNames();
-			return $tmp[$this->getPrimaryName()]['list'];
-		} else {
-			return WT_I18N::translate('Private');
-		}
-	}
 	// Get the fullname in an alternative character set
 	public function getAddName() {
 		if ($this->canDisplayName() && $this->getPrimaryName()!=$this->getSecondaryName()) {
@@ -636,7 +669,7 @@ class WT_GedcomRecord {
 	//////////////////////////////////////////////////////////////////////////////
 	public function format_list($tag='li', $find=false, $name=null) {
 		if (is_null($name)) {
-			$name=($tag=='li') ? $this->getListName() : $this->getFullName();
+			$name=$this->getFullName();
 		}
 		$html='<a href="'.$this->getHtmlUrl().'"';
 		if ($find) {

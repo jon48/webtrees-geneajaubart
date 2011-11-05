@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_reorder.php 12054 2011-07-21 17:08:36Z greg $
+// $Id: media_reorder.php 12170 2011-09-07 15:03:23Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,7 +33,7 @@ require_once WT_ROOT.'includes/functions/functions_print_facts.php';
 	echo "<br /><b>".WT_I18N::translate('Re-order media')."</b>";
 	echo "&nbsp --- &nbsp;" . WT_I18N::translate('Click a row, then drag-and-drop to re-order media ');
 
-	global $MULTI_MEDIA, $MEDIA_EXTERNAL, $MEDIATYPE;
+	global $MEDIA_EXTERNAL, $MEDIATYPE;
 	global $WORD_WRAPPED_NOTES, $MEDIA_DIRECTORY, $WT_IMAGES, $TEXT_DIRECTION;
 	global $is_media, $cntm1, $cntm2, $cntm3, $cntm4, $t, $mgedrec;
 	global $edit, $tabno, $currtab;

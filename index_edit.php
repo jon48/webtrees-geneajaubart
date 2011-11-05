@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index_edit.php 12038 2011-07-19 18:31:41Z lukasz $
+// $Id: index_edit.php 12129 2011-08-15 03:14:59Z nigel $
 
 define('WT_SCRIPT_NAME', 'index_edit.php');
 require './includes/session.php';
@@ -398,9 +398,10 @@ if ($action=="configure") {
 	echo "</div></td></tr>";
 	echo "<tr><td class=\"topbottombar\" colspan=\"7\">";
 
+	/* This section temporarily removed as it does not work (kiwi - 15/08/2011)
 	if (WT_USER_IS_ADMIN && $ctype=='user') {
 		echo WT_I18N::translate('Use these blocks as the default block configuration for all users?')."<input type=\"checkbox\" name=\"setdefault\" value=\"1\" /><br /><br />";
-	}
+	}*/
 
 	echo "<input type=\"button\" value=\"".WT_I18N::translate('Reset to Default Blocks')."\" onclick=\"window.location='index_edit.php?ctype=$ctype&amp;action=reset&amp;name=".str_replace("'", "\'", $name)."';\" />";
 	if ($ctype=='user') {

@@ -20,7 +20,7 @@
  *
  * @package webtrees
  * @subpackage Module
- * $Id: wt_v3_googlemap.css 10870 2011-02-18 19:18:01Z brian $
+ * $Id: wt_v3_googlemap.css 12362 2011-10-21 19:38:54Z greg $
  *
  * @author Brian Holland
 */
@@ -162,7 +162,7 @@ ul.tabs a {
 	position:relative;
 	top:1px;	
 	outline:0;
-	-moz-border-radius:4px 4px 0 0;	
+	border-radius:4px 4px 0 0;	
 }
 
 ul.tabs a:hover {

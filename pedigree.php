@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: pedigree.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: pedigree.php 12203 2011-09-22 12:09:54Z greg $
 
 define('WT_SCRIPT_NAME', 'pedigree.php');
 require './includes/session.php';
@@ -372,7 +372,7 @@ if ($controller->rootPerson->canDisplayDetails()) {
 				} else {
 					echo 'class="name1">';
 				}
-				echo PrintReady($name);
+				echo $name;
 				echo '<br /></span></a>';
 			}
 
@@ -385,7 +385,7 @@ if ($controller->rootPerson->canDisplayDetails()) {
 				} else {
 					echo "class=\"name1\">&lt; ";
 				}
-				echo PrintReady($name);
+				echo $name;
 				echo '<br /></span></a>';
 			}
 		}
@@ -402,17 +402,13 @@ if ($controller->rootPerson->canDisplayDetails()) {
 				foreach ($children as $child) {
 					if (!$controller->rootPerson->equals($child) && !is_null($child)) {
 						echo "&nbsp;&nbsp;<a href=\"pedigree.php?PEDIGREE_GENERATIONS={$controller->PEDIGREE_GENERATIONS}&amp;rootid=".$child->getXref()."&amp;show_full={$controller->show_full}&amp;talloffset={$talloffset}\"><span ";
-						if ($child->canDisplayName()) {
-							$name = $child->getFullName();
-						} else {
-							$name = WT_I18N::translate('Private');
-						}
+						$name = $child->getFullName();
 						if (hasRTLText($name)) {
 							echo 'class="name2"> ';
 						} else {
 							echo 'class="name1"> ';
 						}
-						echo PrintReady($name);
+						echo $name;
 						echo '<br /></span></a>';
 					}
 				}

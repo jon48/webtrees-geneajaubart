@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Ancestry.php 11738 2011-06-08 19:58:49Z greg $
+// @version $Id: Ancestry.php 12417 2011-10-25 17:01:05Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,7 +31,7 @@ if (!defined('WT_WEBTREES')) {
 require_once WT_ROOT.'includes/functions/functions_charts.php';
 
 class WT_Controller_Ancestry extends WT_Controller_Base {
-	var $pid = "";
+	var $pid = '';
 	var $user = false;
 	var $show_cousins;
 	var $rootid;
@@ -106,32 +106,33 @@ class WT_Controller_Ancestry extends WT_Controller_Base {
 			$label='';
 		}
 		// child
-		echo "<li>";
-		echo "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td><a name=\"sosa".$sosa."\"></a>";
-		if ($sosa==1) echo "<img src=\"".$WT_IMAGES["spacer"]."\" height=\"3\" width=\"$Dindent\" border=\"0\" alt=\"\" /></td><td>";
-		else {
-			echo "<img src=\"".$WT_IMAGES["spacer"]."\" height=\"3\" width=\"2\" border=\"0\" alt=\"\" />";
-			echo "<img src=\"".$WT_IMAGES["hline"]."\" height=\"3\" width=\"".($Dindent-2)."\" border=\"0\" alt=\"\" /></td><td>";
+		echo '<li>';
+		echo '<table border="0" cellpadding="0" cellspacing="0"><tr><td><a name="sosa', $sosa, '"></a>';
+		if ($sosa==1) {
+			echo '<img src="', $WT_IMAGES['spacer'], '" height="3" width="', $Dindent, '" border="0" alt="" /></td><td>';
+		} else {
+			echo '<img src="', $WT_IMAGES['spacer'], '" height="3" width="2" border="0" alt="" />';
+			echo '<img src="', $WT_IMAGES['hline'], '" height="3" width="', ($Dindent-2), '" border="0" alt="" /></td><td>';
 		}
 		print_pedigree_person($person, 1);
-		echo "</td>";
-		echo "<td>";
+		echo '</td>';
+		echo '<td>';
 		if ($sosa>1) {
 			print_url_arrow($pid, "?rootid={$pid}&amp;PEDIGREE_GENERATIONS={$OLD_PGENS}&amp;show_full={$this->show_full}&amp;box_width={$box_width}&amp;chart_style={$this->chart_style}", $label, 3);
 		}
-		echo "</td>";
-		echo "<td class=\"details1\">&nbsp;<span dir=\"ltr\" class=\"person_box". (($sosa==1)?"NN":(($sosa%2)?"F":"")) . "\">&nbsp;$sosa&nbsp;</span>&nbsp;";
-		echo "</td><td class=\"details1\">";
-		$relation ="";
-		$new=($pid=="" or !isset($pidarr["$pid"]));
-		if (!$new) $relation = "<br />[=<a href=\"#sosa".$pidarr["$pid"]."\">".$pidarr["$pid"]."</a> - ".get_sosa_name($pidarr["$pid"])."]";
-		else $pidarr["$pid"]=$sosa;
+		echo '</td>';
+		echo '<td class="details1">&nbsp;<span dir="ltr" class="person_box'. (($sosa==1)?'NN':(($sosa%2)?'F':'')) . '">&nbsp;', $sosa, '&nbsp;</span>&nbsp;';
+		echo '</td><td class="details1">';
+		$relation ='';
+		$new=($pid=='' or !isset($pidarr[$pid]));
+		if (!$new) $relation = '<br />[=<a href="#sosa'.$pidarr[$pid].'">'.$pidarr[$pid].'</a> - '.get_sosa_name($pidarr[$pid]).']';
+		else $pidarr[$pid]=$sosa;
 		echo get_sosa_name($sosa).$relation;
-		echo "</td>";
-		echo "</tr></table>";
+		echo '</td>';
+		echo '</tr></table>';
 
 		if (is_null($person)) {
-			echo "</li>";
+			echo '</li>';
 			return;
 		}
 		// parents
@@ -142,21 +143,23 @@ class WT_Controller_Ancestry extends WT_Controller_Base {
 
 		if ($family && $new && $depth>0) {
 			// print marriage info
-			echo "<span class=\"details1\" style=\"white-space: nowrap;\" >";
-			echo "<img src=\"".$WT_IMAGES["spacer"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" align=\"middle\" alt=\"\" /><a href=\"javascript: ".WT_I18N::translate('View Family')."\" onclick=\"expand_layer('sosa_".$sosa."'); return false;\" class=\"top\"><img id=\"sosa_".$sosa."_img\" src=\"".$WT_IMAGES["minus"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" border=\"0\" alt=\"".WT_I18N::translate('View Family')."\" /></a> ";
-			echo "&nbsp;<span class=\"person_box\">&nbsp;".($sosa*2)."&nbsp;</span>&nbsp;".WT_I18N::translate('and');
-			echo "&nbsp;<span class=\"person_boxF\">&nbsp;".($sosa*2+1)." </span>&nbsp;";
+			echo '<span class="details1" style="white-space: nowrap;" >';
+			echo '<img src="', $WT_IMAGES['spacer'], '" height="2" width="', $Dindent, '" border="0" align="middle" alt="" /><a href="javascript: ', WT_I18N::translate('View Family'), '" onclick="expand_layer(\'sosa_', $sosa, '\'); return false;" class="top"><img id="sosa_', $sosa, '_img" src="', $WT_IMAGES['minus'], '" align="middle" hspace="0" vspace="3" border="0" alt="', WT_I18N::translate('View Family'), '" /></a>';
+			echo '&nbsp;<span dir="ltr" class="person_box">&nbsp;', ($sosa*2), '&nbsp;</span>&nbsp;', WT_I18N::translate('and');
+			echo '&nbsp;<span dir="ltr" class="person_boxF">&nbsp;', ($sosa*2+1), '&nbsp;</span>&nbsp;';
 			$marriage = $family->getMarriage();
 			if ($marriage->canShow()) {
+				echo ' <a href="', $family->getHtmlUrl(), '" class="details1">';
 				$marriage->print_simple_fact();
+				echo '</a>';
 			}
-			echo "</span>";
+			echo '</span>';
 			// display parents recursively - or show empty boxes
-			echo "<ul style=\"list-style: none; display: block;\" id=\"sosa_$sosa\">";
+			echo '<ul style="list-style: none; display: block;" id="sosa_', $sosa, '">';
 			$this->print_child_ascendancy($family->getHusband(), $sosa*2, $depth-1);
 			$this->print_child_ascendancy($family->getWife(), $sosa*2+1, $depth-1);
-			echo "</ul>";
+			echo '</ul>';
 		}
-		echo "</li>";
+		echo '</li>';
 	}
 }

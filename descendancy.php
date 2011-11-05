@@ -21,24 +21,24 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: descendancy.php 11991 2011-07-11 05:45:33Z larry $
+// $Id: descendancy.php 12398 2011-10-24 20:14:11Z lukasz $
 
 define('WT_SCRIPT_NAME', 'descendancy.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 // -- array of GEDCOM elements that will be found but should not be displayed
-$nonfacts[] = "FAMS";
-$nonfacts[] = "FAMC";
-$nonfacts[] = "MAY";
-$nonfacts[] = "BLOB";
-$nonfacts[] = "CHIL";
-$nonfacts[] = "HUSB";
-$nonfacts[] = "WIFE";
-$nonfacts[] = "RFN";
-$nonfacts[] = "";
-$nonfamfacts[] = "UID";
-$nonfamfacts[] = "";
+$nonfacts[] = 'FAMS';
+$nonfacts[] = 'FAMC';
+$nonfacts[] = 'MAY';
+$nonfacts[] = 'BLOB';
+$nonfacts[] = 'CHIL';
+$nonfacts[] = 'HUSB';
+$nonfacts[] = 'WIFE';
+$nonfacts[] = 'RFN';
+$nonfacts[] = '';
+$nonfamfacts[] = 'UID';
+$nonfamfacts[] = '';
 
 $controller=new WT_Controller_Descendancy();
 $controller->init();
@@ -132,11 +132,13 @@ case 0: //-- list
 	echo '</ul>';
 	break;
 case 1: //-- booklet
+	echo '<div id="descendancy_chart">';
 	if ($show_full==0) {
 		echo '<span class="details2">', WT_I18N::translate('Click on any of the boxes to get more information about that person.'), '</span><br /><br />';
 	}
 	$show_cousins = true;
 	$controller->print_child_family($controller->descPerson, $controller->generations);
+	echo '</div>';
 	break;
 case 2: //-- Individual list
 	$descendants=indi_desc($controller->descPerson, $controller->generations, array());

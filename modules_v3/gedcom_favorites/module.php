@@ -21,21 +21,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-// Create tables, if not already present
-try {
-	WT_DB::updateSchema(WT_ROOT.WT_MODULES_DIR.'gedcom_favorites/db_schema/', 'FV_SCHEMA_VERSION', 1);
-} catch (PDOException $ex) {
-	// The schema update scripts should never fail.  If they do, there is no clean recovery.
-	die($ex);
-}
-
+// Note that the user favorites module simply extends this module, so ensure that the
+// logic works for both.
 class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 	// Extend class WT_Module
 	public function getTitle() {
@@ -51,6 +45,8 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 	public function getBlock($block_id, $template=true, $cfg=null) {
 		global $WT_IMAGES, $ctype, $TEXT_DIRECTION;
 		global $show_full, $PEDIGREE_FULL_DETAILS, $BROWSERTYPE, $ENABLE_AUTOCOMPLETE;
+
+		self::updateSchema(); // make sure the favorites table has been created
 
 		$action=safe_GET('action');
 		switch ($action) {
@@ -68,32 +64,28 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 			$favtitle=safe_GET('favtitle');
 
 			if ($gid) {
-				$indirec = find_gedcom_record($gid, WT_GED_ID);
-				$ct = preg_match('/0 @(.*)@ (.*)/', $indirec, $match);
-				if ($indirec && $ct>0) {
-					$favorite = array();
-					$favorite['username'] = WT_GEDCOM;
-					$favorite['gid'] = $gid;
-					$favorite['type'] = trim($match[2]);
-					$favorite['file'] = WT_GEDCOM;
-					$favorite['url'] = '';
-					$favorite['note'] = $favnote;
-					$favorite['title'] = '';
-					self::addFavorite($favorite);
+				$record=WT_GedcomRecord::getInstance($gid);
+				if ($record && $record->canDisplayDetails()) {
+					self::addFavorite(array(
+						'username'=>$ctype=='user' ? WT_USER_NAME : WT_GEDCOM,
+						'gid'     =>$record->getXref(),
+						'type'    =>$record->getType(),
+						'file'    =>WT_GEDCOM,
+						'url'     =>'',
+						'note'    =>$favnote,
+						'title'   =>$favtitle,
+					));
 				}
-			}
-			$url=safe_GET('url');
-			if ($url) {
-				if (empty($favtitle)) $favtitle = $url;
-				$favorite = array();
-				$favorite['username'] = WT_GEDCOM;
-				$favorite['gid'] = '';
-				$favorite['type'] = 'URL';
-				$favorite['file'] = WT_GEDCOM;
-				$favorite['url'] = $url;
-				$favorite['note'] = $favnote;
-				$favorite['title'] = $favtitle;
-				self::addFavorite($favorite);
+			} elseif ($url) {
+				self::addFavorite(array(
+					'username'=>$ctype=='user' ? WT_USER_NAME : WT_GEDCOM,
+					'gid'     =>'',
+					'type'    =>'URL',
+					'file'    =>WT_GEDCOM,
+					'url'     =>$url,
+					'note'    =>$favnote,
+					'title'   =>$favtitle ? $favtitle : $url,
+				));
 			}
 			unset($_GET['action']);
 			break;
@@ -114,15 +106,15 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 		$show_full = 1;
 		$PEDIGREE_FULL_DETAILS = 1;
 
-		$userfavs = self::getUserFavorites(WT_GEDCOM);
+		$userfavs = self::getUserFavorites($ctype=='user' ? WT_USER_NAME : WT_GEDCOM);
 		if (!is_array($userfavs)) $userfavs = array();
 
 		$id=$this->getName().$block_id;
+		$class=$this->getName().'_block';
 		$title=$this->getTitle();
 
-		if (WT_USER_IS_ADMIN && $ENABLE_AUTOCOMPLETE) {
-			$content = '<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
-			<script type="text/javascript" src="js/jquery/jquery.autocomplete.js"></script>
+		if (WT_USER_ID && $ENABLE_AUTOCOMPLETE) {
+			$content = '<script type="text/javascript" src="'.WT_STATIC_URL.'js/jquery/jquery.autocomplete.js"></script>
 			<script type="text/javascript">
 			jQuery(document).ready(function($) {
 				$("input[name^=gid]").autocomplete("autocomplete.php", {
@@ -153,23 +145,29 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 			$content .= "<table width=\"{$tableWidth}\" style=\"border:none\" cellspacing=\"{$cellSpacing}\" class=\"center $TEXT_DIRECTION\">";
 			foreach ($userfavs as $key=>$favorite) {
 				if (isset($favorite['id'])) $key=$favorite['id'];
-				$removeFavourite = "<a class=\"font9\" href=\"index.php?ctype=$ctype&amp;action=deletefav&amp;fv_id={$key}\" onclick=\"return confirm('".WT_I18N::translate('Are you sure you want to remove this item from your list of Favorites?')."');\">".WT_I18N::translate('Remove')."</a><br />";
+				$removeFavourite = "<a class=\"font9\" href=\"index.php?ctype={$ctype}&amp;action=deletefav&amp;fv_id={$key}\" onclick=\"return confirm('".WT_I18N::translate('Are you sure you want to remove this item from your list of Favorites?')."');\">".WT_I18N::translate('Remove')."</a><br />";
 				$content .= '<tr><td>';
 				if ($favorite['type']=='URL') {
 					$content .= "<div id=\"boxurl".$key.".0\" class=\"person_box\">";
 					if ($ctype=='user' || WT_USER_GEDCOM_ADMIN) $content .= $removeFavourite;
 					$content .= "<a href=\"".$favorite['url']."\"><b>".PrintReady($favorite['title']).'</b></a>';
-					$content .= "<br />".PrintReady($favorite["note"]);
-					$content .= "</div>";
+					$content .= '<br />'.PrintReady($favorite['note']);
+					$content .= '</div>';
 				} else {
 					$record=WT_GedcomRecord::getInstance($favorite['gid']);
 					if ($record && $record->canDisplayDetails()) {
-						if ($favorite["type"]=="INDI") {
-							$indirec = find_person_record($favorite["gid"], WT_GED_ID);
+						if ($record->getType()=='INDI') {
 							$content .= "<div id=\"box".$favorite["gid"].".0\" class=\"person_box";
-							if (strpos($indirec, "\n1 SEX F")!==false) $content .= "F";
-							elseif (strpos($indirec, "\n1 SEX M")!==false) $content .= "";
-							else $content .= "NN";
+							switch($record->getsex()) {
+								case 'M':
+									break;
+								case 'F':
+									$content.='F';
+									break;
+								case 'U':
+									$content.='NN';
+									break;
+							}
 							$content .= "\">";
 							if ($ctype=="user" || WT_USER_GEDCOM_ADMIN) $content .= $removeFavourite;
 							ob_start();
@@ -179,38 +177,30 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 							$content .= "</div>";
 						} else {
 							$record=WT_GedcomRecord::getInstance($favorite['gid']);
-							$content .= "<div id=\"box".$favorite["gid"].".0\" class=\"person_box\">";
-							if ($ctype=="user" || WT_USER_GEDCOM_ADMIN) $content .= $removeFavourite;
+							$content .= "<div id=\"box".$favorite['gid'].".0\" class=\"person_box\">";
+							if ($ctype=='user' || WT_USER_GEDCOM_ADMIN) $content .= $removeFavourite;
 							if ($record) {
 								$content.=$record->format_list('span');
 							} else {
 								$content.=WT_I18N::translate('No such ID exists in this GEDCOM file.');
 							}
-							$content .= "<br />".PrintReady($favorite["note"]);
-							$content .= "</div>";
+							$content .= '<br />'.PrintReady($favorite['note']);
+							$content .= '</div>';
 						}
 					}
 				}
-				$content .= "</td></tr>";
+				$content .= '</td></tr>';
 			}
-			$content .= "</table>";
+			$content .= '</table>';
 		}
-		if (WT_USER_GEDCOM_ADMIN) {
-		$content .= '
-			<script type="text/javascript">
-			<!--
-			var pastefield;
-			function paste_id(value) {
-				pastefield.value=value;
-			}
-			-->
-			</script>
-			<br />
-			';
-			$uniqueID = floor(microtime() * 1000000);
-			$content .= "<b><a href=\"javascript://".WT_I18N::translate('Add a new favorite')." \" onclick=\"expand_layer('add_ged_fav{$uniqueID}'); return false;\"><img id=\"add_ged_fav_img\" src=\"".$WT_IMAGES["plus"]."\" border=\"0\" alt=\"\" />&nbsp;".WT_I18N::translate('Add a new favorite')."</a></b>";
-			$content .= "<br /><div id=\"add_ged_fav{$uniqueID}\" style=\"display: none;\">";
-			$content .= "<form name=\"addgfavform\" method=\"get\" action=\"index.php\">";
+		if ($ctype=='user' || WT_USER_GEDCOM_ADMIN) {
+			$content .=
+			WT_JS_START.'var pastefield; function paste_id(value) {pastefield.value=value;}'.WT_JS_END.
+			'<br />';
+			$uniqueID = floor(microtime() * 1000000); // This block can theoretically appear multiple times, so use a unique ID.
+			$content .= "<b><a href=\"#\" onclick=\"expand_layer('add_fav{$uniqueID}'); return false;\"><img id=\"add_fav{$uniqueID}_img\" src=\"".$WT_IMAGES["plus"]."\" border=\"0\" alt=\"\" />&nbsp;".WT_I18N::translate('Add a new favorite')."</a></b>";
+			$content .= "<br /><div id=\"add_fav{$uniqueID}\" style=\"display: none;\">";
+			$content .= "<form name=\"addfavform\" method=\"get\" action=\"index.php\">";
 			$content .= "<input type=\"hidden\" name=\"action\" value=\"addfav\" />";
 			$content .= "<input type=\"hidden\" name=\"ctype\" value=\"$ctype\" />";
 			$content .= "<input type=\"hidden\" name=\"ged\" value=\"".WT_GEDCOM."\" />";
@@ -230,7 +220,7 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 			$content .= "<tr><td>".WT_I18N::translate('Title:')."</td><td><input type=\"text\" name=\"favtitle\" size=\"40\" value=\"\" /></td></tr></table>";
 			if ($block) $content .= "</td></tr><tr><td><br />";
 			else $content .= "</td><td>";
-			$content .= "".WT_I18N::translate('Enter an optional note about this favorite');
+			$content .= WT_I18N::translate('Enter an optional note about this favorite');
 			$content .= "<br /><textarea name=\"favnote\" rows=\"6\" cols=\"50\"></textarea>";
 			$content .= "</td></tr></table>";
 			$content .= "<br /><input type=\"submit\" value=\"".WT_I18N::translate('Add')."\" style=\"font-size: 8pt; \" />";
@@ -302,21 +292,21 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 	 */
 	public static function addFavorite($favorite) {
 		// -- make sure a favorite is added
-		if (empty($favorite["gid"]) && empty($favorite["url"]))
+		if (empty($favorite['gid']) && empty($favorite['url']))
 			return false;
 
 		//-- make sure this is not a duplicate entry
 		$sql = "SELECT 1 FROM `##favorites` WHERE";
-		if (!empty($favorite["gid"])) {
+		if (!empty($favorite['gid'])) {
 			$sql.=" fv_gid=?";
-			$vars=array($favorite["gid"]);
+			$vars=array($favorite['gid']);
 		} else {
 			$sql.=" fv_url=?";
-			$vars=array($favorite["url"]);
+			$vars=array($favorite['url']);
 		}
 		$sql.=" AND fv_file=? AND fv_username=?";
-		$vars[]=$favorite["file"];
-		$vars[]=$favorite["username"];
+		$vars[]=$favorite['file'];
+		$vars[]=$favorite['username'];
 
 		if (WT_DB::prepare($sql)->execute($vars)->fetchOne()) {
 			return false;
@@ -328,13 +318,25 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 				->execute(array($favorite['username'], $favorite['gid'], $favorite['type'], $favorite['file'], $favorite['url'], $favorite['title'], $favorite['note']));
 	}
 
-	// Get a family tree's favorites
-	public static function getUserFavorites($gedcom) {
+	// Get favorites for a user or family tree
+	public static function getUserFavorites($username) {
+		self::updateSchema(); // make sure the favorites table has been created
+
 		return
 			WT_DB::prepare(
 				"SELECT fv_id AS id, fv_username AS username, fv_gid AS gid, fv_type AS type, fv_file AS file, fv_title AS title, fv_note AS note, fv_url AS url".
-				" FROM `##favorites` WHERE fv_username=?")
-			->execute(array($gedcom))
+				" FROM `##favorites` WHERE fv_username=? AND fv_file=?")
+			->execute(array($username, WT_GEDCOM))
 			->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	private static function updateSchema() {
+		// Create tables, if not already present
+		try {
+			WT_DB::updateSchema(WT_ROOT.WT_MODULES_DIR.'gedcom_favorites/db_schema/', 'FV_SCHEMA_VERSION', 1);
+		} catch (PDOException $ex) {
+			// The schema update scripts should never fail.  If they do, there is no clean recovery.
+			die($ex);
+		}
 	}
 }

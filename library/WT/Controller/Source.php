@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Source.php 12048 2011-07-20 23:00:37Z greg $
+// $Id: Source.php 12212 2011-09-25 08:25:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -35,22 +35,27 @@ class WT_Controller_Source extends WT_Controller_Base {
 	var $sid;
 	var $source = null;
 	var $diffsource = null;
-	var $accept_success = false;
-	var $reject_success = false;
 
 	function init() {
-		$this->sid = safe_GET_xref('sid');
+		$this->sid=safe_GET_xref('sid');
 
-		$gedrec = find_source_record($this->sid, WT_GED_ID);
-
-		if (find_source_record($this->sid, WT_GED_ID) || find_updated_record($this->sid, WT_GED_ID)!==null) {
-			$this->source = new WT_Source($gedrec);
-			$this->source->ged_id=WT_GED_ID; // This record is from a file
-		} else if (!$gedrec) {
-			return false;
+		$gedrec=find_source_record($this->sid, WT_GED_ID);
+		if (WT_USER_CAN_EDIT) {
+			$newrec=find_updated_record($this->sid, WT_GED_ID);
+		} else {
+			$newrec=null;
 		}
 
-		$this->rid=$this->source->getXref(); // Correct upper/lower case mismatch
+		if ($gedrec===null) {
+			if ($newrec===null) {
+				// Nothing to see here.
+				return;
+			} else {
+				// Create a dummy record from the first line of the new record.
+				// We need it for diffMerge(), getXref(), etc.
+				list($gedrec)=explode("\n", $newrec);
+			}
+		}
 
 		//-- perform the desired action
 		switch($this->action) {
@@ -72,10 +77,9 @@ class WT_Controller_Source extends WT_Controller_Base {
 		case 'accept':
 			if (WT_USER_CAN_ACCEPT) {
 				accept_all_changes($this->sid, WT_GED_ID);
-				$this->accept_success=true;
-				//-- check if we just deleted the record and redirect to index
-				$gedrec = find_source_record($this->sid, WT_GED_ID);
-				if (empty($gedrec)) {
+				$gedrec=find_source_record($this->sid, WT_GED_ID);
+				$newrec=null;
+				if ($gedrec===null) {
 					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
 					exit;
 				}
@@ -86,29 +90,26 @@ class WT_Controller_Source extends WT_Controller_Base {
 		case 'undo':
 			if (WT_USER_CAN_ACCEPT) {
 				reject_all_changes($this->sid, WT_GED_ID);
-				$this->reject_success=true;
-				$gedrec = find_source_record($this->sid, WT_GED_ID);
-				//-- check if we just deleted the record and redirect to index
-				if (empty($gedrec)) {
+				$gedrec=find_source_record($this->sid, WT_GED_ID);
+				$newrec=null;
+				if ($gedrec===null) {
 					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
 					exit;
 				}
-				$this->source = new WT_Source($gedrec);
 			}
 			unset($_GET['action']);
 			break;
 		}
 
-		//-- if the user can edit and there are changes then get the new changes
-		if (WT_USER_CAN_EDIT) {
-			$newrec = find_updated_record($this->sid, WT_GED_ID);
-			if (!empty($newrec)) {
-				$this->diffsource = new WT_Source($newrec);
-				$this->diffsource->setChanged(true);
-			}
-		}
+		$this->source = new WT_Source($gedrec);
 
-		$this->source->diffMerge($this->diffsource);
+		// If there are pending changes, merge them in.
+		if ($newrec!==null) {
+			$this->diffsource=new WT_Source($newrec);
+			$this->diffsource->setChanged(true);
+			$this->source->diffMerge($this->diffsource);
+		}
+		$this->sid=$this->source->getXref(); // We may have requested X1234, but found x1234
 	}
 
 	/**
@@ -167,8 +168,8 @@ class WT_Controller_Source extends WT_Controller_Base {
 
 		// delete
 		if (WT_USER_CAN_EDIT) {
-			$submenu = new WT_Menu(WT_I18N::translate('Delete this Source'), '#', 'menu-sour-del');
-			$submenu->addOnclick("if (confirm('".WT_I18N::translate('Are you sure you want to delete this Source?')."')) return deletesource('".$this->sid."'); else return false;");
+			$submenu = new WT_Menu(WT_I18N::translate('Delete'), '#', 'menu-sour-del');
+			$submenu->addOnclick("if (confirm('".addslashes(WT_I18N::translate('Are you sure you want to delete “%s”?', $this->source->getFullName()))."')) return delete_source('".$this->source->getXref()."'); else return false;");
 			$submenu->addIcon('remove');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_delete');
 			$menu->addSubmenu($submenu);

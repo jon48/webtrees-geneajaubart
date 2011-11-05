@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Base.php 12078 2011-07-28 12:40:56Z veit $
+// $Id: Base.php 12426 2011-10-26 10:18:23Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -1677,7 +1677,8 @@ function GedcomSHandler($attrs) {
 	$tags = explode(":", $tag);
 	$newgedrec = "";
 	if (count($tags)<2) {
-		$newgedrec = find_gedcom_record($attrs['id'], WT_GED_ID);
+		$tmp=WT_GedcomRecord::getInstance($attrs['id']);
+		$newgedrec=$tmp ? $tmp->getGedcomRecord() : '';
 	}
 	if (empty($newgedrec)) {
 		$tgedrec = $gedrec;
@@ -1687,13 +1688,15 @@ function GedcomSHandler($attrs) {
 				if (isset($vars[$match[1]]['gedcom'])) {
 					$newgedrec = $vars[$match[1]]['gedcom'];
 				} else {
-					$newgedrec = find_gedcom_record($match[1], WT_GED_ID);
+					$tmp=WT_GedcomRecord::getInstance($match[1]);
+					$newgedrec=$tmp ? $tmp->getGedcomRecord() : '';
 				}
 			} else {
 				if (preg_match("/@(.+)/", $tag, $match)) {
 					$gmatch = array();
 					if (preg_match("/\d $match[1] @([^@]+)@/", $tgedrec, $gmatch)) {
-						$newgedrec = find_gedcom_record($gmatch[1], WT_GED_ID);
+						$tmp=WT_GedcomRecord::getInstance($gmatch[1]);
+						$newgedrec=$tmp ? $tmp->getGedcomRecord() : '';
 						$tgedrec = $newgedrec;
 					} else {
 						$newgedrec = "";
@@ -1709,9 +1712,8 @@ function GedcomSHandler($attrs) {
 		}
 	}
 	if (!empty($newgedrec)) {
-		$gedObj = new WT_GedcomRecord($newgedrec);
 		array_push($gedrecStack, array($gedrec, $fact, $desc));
-		$gedrec = $gedObj->getGedcomRecord();
+		$gedrec = $newgedrec;
 		if (preg_match("/(\d+) (_?[A-Z0-9]+) (.*)/", $gedrec, $match)) {
 			$ged_level = $match[1];
 			$fact = $match[2];
@@ -1953,7 +1955,12 @@ function GetPersonNameSHandler($attrs) {
 			$currentElement->addText(WT_I18N::translate('Private'));
 		} else {
 			$name = $record->getFullName();
-			$name = preg_replace("/<span class=\"starredname\">(.*)<\/span> ?/", "\\1* ", $name); //restores the * for underlining a given name
+/*
+echo "<br />";
+for ($ii=0; $ii<=strlen($name); $ii++)
+echo substr($name, $ii, 1)." ";
+*/
+			$name = preg_replace(array('/<span class="starredname">/','/<\/span><\/span>/','/<\/span>/'), array('«','','»'), $name);
 			if (!WT_RNEW) {
 				$name = strip_tags($name);
 			}
@@ -1979,9 +1986,14 @@ function GetPersonNameSHandler($attrs) {
 				}
 			} else {
 				$addname = $record->getAddName();
-				$addname = preg_replace("/<span class=\"starredname\">(.*)<\/span> ?/", "\\1* ", $addname); //@@ restores the * for underlining a given name
+/*
+echo "<br />".$addname."<br />";
+for ($ii=0; $ii<=strlen($addname); $ii++)
+echo substr($addname, $ii, 1)." ";
+*/
+				$addname = preg_replace(array('/<span class="starredname">/','/<\/span><\/span>/','/<\/span>/'), array('«','','»'), $addname);						
 				if (!WT_RNEW) {
-					$addname = strip_tags($addname);//@@
+					$addname = strip_tags($addname); //@@ unknown printed in other alignment with ... on wrong side
 				}
 				if (!empty($addname)) {
 					$name .= " ".$addname;
@@ -2039,6 +2051,7 @@ function GedcomValueSHandler($attrs) {
 			}
 			$tags = explode(":", $tag);
 			$value = get_gedcom_value($tag, $level, $gedrec, $truncate);
+//@@ do we still need?			
 			if ($useBreak == "1") {
 				// Insert <br /> when multiple dates exist.
 				// This works around a TCPDF bug that incorrectly wraps RTL dates on LTR pages
@@ -2784,7 +2797,7 @@ function HighlightedImageSHandler($attrs) {
 
 	$media = find_highlighted_object($id, WT_GED_ID, $gedrec);
 	if (!empty($media['file'])) {
-		if (preg_match("/(jpg)|(jpeg)|(png)$/i", $media['file'])) {
+		if (preg_match("/(jpg|jpeg|png|gif)$/i", $media['file'])) {
 			if (file_exists($media['file'])) {
 				$size = findImageSize($media['file']);
 				if (($width>0) and ($height==0)) {
@@ -2865,7 +2878,7 @@ function ImageSHandler($attrs) {
 			$filename = $MEDIA_DIRECTORY.$filename;
 			$filename = trim($filename);
 			if (!empty($filename)) {
-				if (preg_match("/(jpg)|(jpeg)|(png)$/i", $filename)) {
+				if (preg_match("/(jpg|jpeg|png|gif)$/i", $filename)) {
 					if (file_exists($filename)) {
 						$size = findImageSize($filename);
 						if (($width > 0) and ($height == 0)) {
@@ -2887,7 +2900,7 @@ function ImageSHandler($attrs) {
 	}
 	else {
 		$filename = $file;
-		if (preg_match("/(jpg)|(jpeg)|(png)|(gif)$/i", $filename)) {
+		if (preg_match("/(jpg|jpeg|png|gif)$/i", $filename)) {
 			if (file_exists($filename)) {
 				$size = findImageSize($filename);
 				if (($width>0) and ($height==0)) {
@@ -3054,6 +3067,12 @@ function ListSHandler($attrs) {
 							}
 						}
 						unset($attrs[$attr]); // This filter has been fully processed
+					} elseif (($listname=="individual") && (preg_match('/^REGEXP \/(.+)\//', $value, $match))) {
+						$sql_where[]="i_gedcom REGEXP '".$match[1]."'";
+						unset($attrs[$attr]); // This filter has been fully processed
+					} elseif (($listname=="family") && (preg_match('/^REGEXP \/(.+)\//', $value, $match))) {
+						$sql_where[]="f_gedcom REGEXP '".$match[1]."'";
+						unset($attrs[$attr]); // This filter has been fully processed
 					} elseif (($listname=="family") && (preg_match('/^NAME CONTAINS (.+)$/', $value, $match))) {
 						// Eventually, family "names" will be stored in wt_name.  Until then, an extra is needed....
 						$sql_join[]="JOIN `##link` AS {$attr}a ON ({$attr}a.l_file={$sql_col_prefix}file AND {$attr}a.l_from={$sql_col_prefix}id)";
@@ -3076,7 +3095,7 @@ function ListSHandler($attrs) {
 					* Place any other filter before these filters because they will pick up any filters that has not been processed
 					* Also, do not unset() these two filters. These are just the first primary filters to reduce the returned list from the DB
 					*/
-					elseif (($listname=="individual") and (preg_match('/^(\w*):*(\w*) CONTAINS (.*)$/', $value, $match))) {
+					elseif ($listname=="individual" && preg_match('/^(\w*):*(\w*) CONTAINS (.+)$/', $value, $match)) {
 						$query = "";
 						// Level 1 tag
 						if ($match[1] != "") $query .= "%1 {$match[1]}%";
@@ -3085,8 +3104,7 @@ function ListSHandler($attrs) {
 						// Contains what?
 						if ($match[3] != "") $query .= "%{$match[3]}%";
 						$sql_where[] = "i_gedcom LIKE ".WT_DB::quote(utf8_strtoupper($query));
-						unset($query);
-					} elseif (($listname=="family") and (preg_match('/^(\w*):*(\w*) CONTAINS (.*)$/', $value, $match))) {
+					} elseif ($listname=="family" && preg_match('/^(\w*):*(\w*) CONTAINS (.+)$/', $value, $match)) {
 						$query = "";
 						// Level 1 tag
 						if ($match[1] != "") $query .= "%1 {$match[1]}%";
@@ -3095,7 +3113,6 @@ function ListSHandler($attrs) {
 						// Contains what?
 						if ($match[3] != "") $query .= "%{$match[3]}%";
 						$sql_where[] = "f_gedcom LIKE ".WT_DB::quote(utf8_strtoupper($query));
-						unset($query);
 					} else {
 						// TODO: what other filters can we apply in SQL?
 					}
@@ -3146,43 +3163,43 @@ function ListSHandler($attrs) {
 						$val = $vars[$match[1]]['id'];
 						$val = trim($val);
 					}
-					$searchstr = "";
-					$tags = explode(":", $tag);
-					//-- only limit to a level number if we are specifically looking at a level
-					if (count($tags)>1) {
-						$level = 1;
-						foreach ($tags as $t) {
-							if (!empty($searchstr)) {
-								$searchstr.="[^\n]*(\n[2-9][^\n]*)*\n";
+					if ($val) {
+						$searchstr = "";
+						$tags = explode(":", $tag);
+						//-- only limit to a level number if we are specifically looking at a level
+						if (count($tags)>1) {
+							$level = 1;
+							foreach ($tags as $t) {
+								if (!empty($searchstr)) {
+									$searchstr.="[^\n]*(\n[2-9][^\n]*)*\n";
+								}
+								//-- search for both EMAIL and _EMAIL... silly double gedcom standard
+								if ($t=="EMAIL" || $t=="_EMAIL") {
+									$t="_?EMAIL";
+								}
+								$searchstr .= $level." ".$t;
+								$level++;
 							}
-							//-- search for both EMAIL and _EMAIL... silly double gedcom standard
-							if ($t=="EMAIL" || $t=="_EMAIL") {
-								$t="_?EMAIL";
+						} else {
+							if ($tag=="EMAIL" || $tag=="_EMAIL") {
+								$tag="_?EMAIL";
 							}
-							$searchstr .= $level." ".$t;
-							$level++;
+							$t = $tag;
+							$searchstr = "1 ".$tag;
 						}
-					} else {
-						if ($tag=="EMAIL" || $tag=="_EMAIL") {
-							$tag="_?EMAIL";
-						}
-						$t = $tag;
-						$searchstr = "1 ".$tag;
-					}
-					switch ($expr) {
-						case "CONTAINS":
-							if ($t=="PLAC") {
-								$searchstr.="[^\n]*[, ]*".$val;
-							} else {
-								$searchstr.="[^\n]*".$val;
-							}
-							$filters[] = $searchstr;
-							break;
-						default:
-							if (!empty($val)) {
+						switch ($expr) {
+							case "CONTAINS":
+								if ($t=="PLAC") {
+									$searchstr.="[^\n]*[, ]*".$val;
+								} else {
+									$searchstr.="[^\n]*".$val;
+								}
+								$filters[] = $searchstr;
+								break;
+							default:
 								$filters2[] = array("tag"=>$tag, "expr"=>$expr, "val"=>$val);
-							}
-							break;
+								break;
+						}
 					}
 				}
 			}

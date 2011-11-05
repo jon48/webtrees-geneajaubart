@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_places.php 12060 2011-07-22 19:07:33Z lukasz $
+// $Id: admin_places.php 12260 2011-10-06 16:18:21Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -612,7 +612,7 @@ foreach ($placelist as $place) {
 		}
 	} else {
 		//PERSO Resize flags
-		echo '<img class="flag_gm_25" src="', WT_MODULES_DIR, 'googlemap/', $place['icon'], '">';
+		echo '<img class="flag_gm_25" src="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/', $place['icon'], '">';
 		//END PERSO
 	}
 	echo '</td>';

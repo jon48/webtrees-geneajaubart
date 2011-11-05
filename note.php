@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: note.php 12015 2011-07-14 11:26:08Z greg $
+// $Id: note.php 12203 2011-09-22 12:09:54Z greg $
 
 define('WT_SCRIPT_NAME', 'note.php');
 require './includes/session.php';
@@ -69,12 +69,9 @@ if ($controller->note && $controller->note->canDisplayDetails()) {
 				' ', help_link('pending_changes'),
 				'</p>';
 		}
-	} elseif ($controller->accept_success) {
-		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been accepted.'), '</p>';
-	} elseif ($controller->reject_success) {
-		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been rejected.'), '</p>';
 	}
 } else {
+	header('HTTP/1.0 403 Forbidden');
 	print_header(WT_I18N::translate('Note'));
 	echo '<p class="ui-state-error">', WT_I18N::translate('This note does not exist or you do not have permission to view it.'), '</p>';
 	print_footer();
@@ -99,71 +96,95 @@ echo 'function edit_note() {';
 echo ' var win04 = window.open("edit_interface.php?action=editnote&pid=', $linkToID, '", "win04", "top=70, left=70, width=620, height=500, resizable=1, scrollbars=1");';
 echo ' if (window.focus) {win04.focus();}';
 echo '}';
+?>	jQuery(document).ready(function() {
+		jQuery("#note-tabs").tabs();
+		jQuery("#note-tabs").css('visibility', 'visible');
+	});
+<?php
 echo WT_JS_END;
 
-echo '<table class="list_table width80"><tr><td>';
-echo '<span class="name_head">', PrintReady(htmlspecialchars($controller->note->getFullName()));
-echo '</span><br />';
-echo '<table class="facts_table">';
+echo '<div id="note-details">';
+echo '<h2>', $controller->note->getFullName(), '</h2>';
+echo '<div id="note-tabs">
+	<ul>
+		<li><a href="#note-edit"><span>', WT_I18N::translate('Details'), '</span></a></li>';
+		if ($controller->note->countLinkedIndividuals()) {
+			echo '<li><a href="#indi-note"><span id="indisource">', WT_I18N::translate('Individuals'), '</span></a></li>';
+		}
+		if ($controller->note->countLinkedFamilies()) {
+			echo '<li><a href="#fam-note"><span id="famsource">', WT_I18N::translate('Families'), '</span></a></li>';
+		}
+		if ($controller->note->countLinkedMedia()) {
+			echo '<li><a href="#media-note"><span id="mediasource">', WT_I18N::translate('Media objects'), '</span></a></li>';
+		}
+		if ($controller->note->countLinkedSources()) {
+			echo '<li><a href="#source-note"><span id="notesource">', WT_I18N::translate('Sources'), '</span></a></li>';
+		}
+		echo '</ul>';
 
-// Shared Note details ---------------------
-$noterec=$controller->note->getGedcomRecord();
-preg_match("/0 @{$controller->nid}@ NOTE(.*)/", $noterec, $n1match);
-$note = print_note_record("<br />".$n1match[1], 1, $noterec, false, true, true);
+	// Shared Note details ---------------------
+	$noterec=$controller->note->getGedcomRecord();
+	preg_match("/0 @{$controller->nid}@ NOTE(.*)/", $noterec, $n1match);
+	$note = print_note_record("<br />".$n1match[1], 1, $noterec, false, true, true);
 
-echo '<tr><td align="left" class="descriptionbox ', $TEXT_DIRECTION, '">';
-	if (WT_USER_CAN_EDIT) {
-		echo '<a href="javascript: edit_note()" title="', WT_I18N::translate('Edit'), '">';
-		if (!empty($WT_IMAGES['note']) && $SHOW_FACT_ICONS) echo '<img src="', $WT_IMAGES['note'], '" alt="" align="top" />';
-		echo WT_I18N::translate('Shared note'), '</a>';
-		echo '<div class="editfacts">';
-			echo '<div class="editlink"><a class="editicon" href="javascript: edit_note()" title="', WT_I18N::translate('Edit'), '"><span class="link_text">', WT_I18N::translate('Edit'), '</span></div></a>';
-		echo '</div>';
-	} else { 
-		if (!empty($WT_IMAGES['note']) && $SHOW_FACT_ICONS) echo '<img src="', $WT_IMAGES['note'], '" alt="" align="top" />';
-		echo WT_I18N::translate('Shared note');
+	echo '<div id="note-edit">';
+		echo '<table class="facts_table">';
+			echo '<tr><td align="left" class="descriptionbox ', $TEXT_DIRECTION, '">';
+				if (WT_USER_CAN_EDIT) {
+					echo '<a href="javascript: edit_note()" title="', WT_I18N::translate('Edit'), '">';
+					if (!empty($WT_IMAGES['note']) && $SHOW_FACT_ICONS) echo '<img src="', $WT_IMAGES['note'], '" alt="" align="top" />';
+					echo WT_I18N::translate('Shared note'), '</a>';
+					echo '<div class="editfacts">';
+						echo '<div class="editlink"><a class="editicon" href="javascript: edit_note()" title="', WT_I18N::translate('Edit'), '"><span class="link_text">', WT_I18N::translate('Edit'), '</span></div></a>';
+					echo '</div>';
+				} else { 
+					if (!empty($WT_IMAGES['note']) && $SHOW_FACT_ICONS) echo '<img src="', $WT_IMAGES['note'], '" alt="" align="top" />';
+					echo WT_I18N::translate('Shared note');
+				}
+				echo '</td><td class="optionbox wrap width80 ', $TEXT_DIRECTION, '">';
+				echo $note;
+				echo "<br />";
+			echo "</td></tr>";
+
+			$notefacts=$controller->note->getFacts();
+			foreach ($notefacts as $fact) {
+				if ($fact->getTag()!='CONT') {
+					print_fact($fact, $controller->note);
+				}
+			}
+			// Print media
+			print_main_media($controller->nid);
+			// new fact link
+			if ($controller->note->canEdit()) {
+				print_add_new_fact($controller->nid, $notefacts, 'NOTE');
+			}
+		echo '</table>
+	</div>'; // close "note-edit"
+
+	// Individuals linked to this shared note
+	if ($controller->note->countLinkedIndividuals()) {
+		echo '<div id="indi-note">';
+		print_indi_table($controller->note->fetchLinkedIndividuals(), $controller->note->getFullName());
+		echo '</div>'; //close "indi-note"
 	}
-	echo '</td><td class="optionbox wrap width80 ', $TEXT_DIRECTION, '">';
-	echo $note;
-	echo "<br />";
-echo "</td></tr>";
-
-$notefacts=$controller->note->getFacts();
-foreach ($notefacts as $fact) {
-	if ($fact->getTag()!='CONT') {
-		print_fact($fact, $controller->note);
+	// Families linked to this shared note
+	if ($controller->note->countLinkedFamilies()) {
+		echo '<div id="fam-note">';
+		print_fam_table($controller->note->fetchLinkedFamilies(), $controller->note->getFullName());
+		echo '</div>'; //close "fam-note"
 	}
-}
-
-// Print media
-print_main_media($controller->nid);
-
-// new fact link
-if ($controller->note->canEdit()) {
-	print_add_new_fact($controller->nid, $notefacts, 'NOTE');
-}
-echo '</table><br /><br /></td></tr><tr class="center"><td colspan="2">';
-
-// Individuals linked to this shared note
-if ($controller->note->countLinkedIndividuals()) {
-	print_indi_table($controller->note->fetchLinkedIndividuals(), $controller->note->getFullName());
-}
-
-// Families linked to this shared note
-if ($controller->note->countLinkedFamilies()) {
-	print_fam_table($controller->note->fetchLinkedFamilies(), $controller->note->getFullName());
-}
-
-// Media Items linked to this shared note
-if ($controller->note->countLinkedMedia()) {
-	print_media_table($controller->note->fetchLinkedMedia(), $controller->note->getFullName());
-}
-
-// Sources linked to this shared note
-if ($controller->note->countLinkedSources()) {
-	print_sour_table($controller->note->fetchLinkedSources(), $controller->note->getFullName());
-}
-
-echo '</td></tr></table>';
-
+	// Media Items linked to this shared note
+	if ($controller->note->countLinkedMedia()) {
+		echo '<div id="media-note">';
+		print_media_table($controller->note->fetchLinkedMedia(), $controller->note->getFullName());
+		echo '</div>'; //close "media-note"
+	}
+	// Sources linked to this shared note
+	if ($controller->note->countLinkedSources()) {
+		echo '<div id="source-note">';
+		print_sour_table($controller->note->fetchLinkedSources(), $controller->note->getFullName());
+		echo '</div>'; //close "source-note"
+	}
+echo '</div>'; //close div "note-tabs"
+echo '</div>'; //close div "note-details"
 print_footer();

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_import.php 11789 2011-06-12 09:24:50Z greg $
+// $Id: functions_import.php 12203 2011-09-22 12:09:54Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -599,7 +599,7 @@ function import_record($gedrec, $ged_id, $update) {
 	static $sql_insert_other=null;
 	if (!$sql_insert_indi) {
 		$sql_insert_indi=WT_DB::prepare(
-			"INSERT INTO `##individuals` (i_id, i_file, i_rin, i_isdead, i_sex, i_gedcom) VALUES (?,?,?,?,?,?)"
+			"INSERT INTO `##individuals` (i_id, i_file, i_rin, i_sex, i_gedcom) VALUES (?,?,?,?,?)"
 		);
 		$sql_insert_fam=WT_DB::prepare(
 			"INSERT INTO `##families` (f_id, f_file, f_husb, f_wife, f_gedcom, f_numchil) VALUES (?,?,?,?,?,?)"
@@ -682,11 +682,7 @@ function import_record($gedrec, $ged_id, $update) {
 		} else {
 			$rin=$xref;
 		}
-		// Death events need a Y or a DATE or a PLAC.  Set the initial value to either
-		// dead (1) or unknown (-1).  We'll do a more detailed analysis when we have
-		// imported the rest of the gedcom.
-		$is_dead=preg_match('/\n1 (?:'.WT_EVENTS_DEAT.')(?: Y|(?:\n[2-9].+)*\n2 (?:PLAC |DATE ))/', $gedrec) ? 1 : -1;
-		$sql_insert_indi->execute(array($xref, $ged_id, $rin, $is_dead, $record->getSex(), $gedrec));
+		$sql_insert_indi->execute(array($xref, $ged_id, $rin, $record->getSex(), $gedrec));
 		break;
 	case 'FAM':
 		if (preg_match('/\n1 HUSB @('.WT_REGEX_XREF.')@/', $gedrec, $match)) {
@@ -906,7 +902,7 @@ function update_names($xref, $ged_id, $record) {
 				}
 				$sql_insert_name_indi->execute(array($ged_id, $xref, $n, $name['type'], $name['sort'], $name['fullNN'], $name['surname'], $name['surn'], $name['givn'], $soundex_givn_std, $soundex_surn_std, $soundex_givn_dm, $soundex_surn_dm));
 			} else {
-				$sql_insert_name_other->execute(array($ged_id, $xref, $n, $name['type'], $name['sort'], $name['full']));
+				$sql_insert_name_other->execute(array($ged_id, $xref, $n, $name['type'], $name['sort'], $name['fullNN']));
 			}
 		}
 	}
@@ -1177,6 +1173,7 @@ function accept_all_changes($xref, $ged_id) {
 			" WHERE status='pending' AND xref=? AND gedcom_id=?"
 		)->execute(array($xref, $ged_id));
 		AddToLog("Accepted change {$change->change_id} for {$xref} / {$change->gedcom_name} into database", 'edit');
+		//Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->addMessage(WT_I18N::translate('The changes have been accepted.'));
 	}
 }
 
@@ -1187,6 +1184,7 @@ function reject_all_changes($xref, $ged_id) {
 		" SET status='rejected'".
 		" WHERE status='pending' AND xref=? AND gedcom_id=?"
 	)->execute(array($xref, $ged_id));
+	//Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->addMessage(WT_I18N::translate('The changes have been rejected.'));
 }
 
 // Find a string in a file, preceded by a any form of line-ending.

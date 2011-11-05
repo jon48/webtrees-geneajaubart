@@ -21,7 +21,7 @@
  *
  * @package webtrees
  * @subpackage Admin
- * @version $Id: admin_site_logs.php 12093 2011-08-04 12:27:18Z rob $
+ * @version $Id: admin_site_logs.php 12466 2011-10-30 01:13:24Z nigel $
  */
 
 define('WT_SCRIPT_NAME', 'admin_site_logs.php');
@@ -187,19 +187,18 @@ echo WT_JS_START;
 ?>
 	jQuery(document).ready(function(){
 		var oTable = jQuery('#log_list').dataTable( {
-			"sDom": '<"H"prf>t<"F"li>',
+			"sDom": '<"H"pf<"dt-clear">irl>t<"F"pl>',
 			"bProcessing": true,
 			"bServerSide": true,
 			"sAjaxSource": "<?php echo WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'?action=load_json&from=', $from,'&to=', $to, '&type=', $type, '&text=', rawurlencode($text), '&ip=', rawurlencode($ip), '&user=', rawurlencode($user), '&gedc=', rawurlencode($gedc); ?>",
 			"oLanguage": {
-				"sLengthMenu": '<?php echo /* I18N: Display %s [records per page], %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="10">10<option value="20">20</option><option value="30">30</option><option value="50">50</option><option value="100">100</option></select>'); ?>',
+				"sLengthMenu": '<?php echo /* I18N: Display %s [records per page], %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="10">10<option value="20">20</option><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="1000">1000</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
 				"sZeroRecords": '<?php echo WT_I18N::translate('No records to display');?>',
 				"sInfo": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_'); ?>',
 				"sInfoEmpty": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '0', '0', '0'); ?>',
 				"sInfoFiltered": '<?php echo /* I18N: %s is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_'); ?>',
 				"sProcessing": '<?php echo WT_I18N::translate('Loading...');?>',
-				"sSearch": '<?php echo WT_I18N::translate('Search');?>',
-				"oPaginate": {
+				"sSearch": '<?php echo WT_I18N::translate('Filter');?>',				"oPaginate": {
 					"sFirst":    '<?php echo /* I18N: button label, first page    */ WT_I18N::translate('first');    ?>',
 					"sLast":     '<?php echo /* I18N: button label, last page     */ WT_I18N::translate('last');     ?>',
 					"sNext":     '<?php echo /* I18N: button label, next page     */ WT_I18N::translate('next');     ?>',
@@ -238,18 +237,19 @@ echo
 		'<input type="hidden" name="action", value="show"/>',
 		'<table class="site_logs">',
 			'<tr>',
-				'<td>',
+				'<td colspan="6">',
 					// I18N: %s are both user-input date fields
-					WT_I18N::translate('From %s to %s', '<input name="from" size="10" value="'.htmlspecialchars($from).'" /><br /><br />', '&nbsp;<input name="to" size="10" value="'.htmlspecialchars($to).'" />'),
+					WT_I18N::translate('From %s to %s', '<input class="log-date" name="from" value="'.htmlspecialchars($from).'" />', '<input class="log-date" name="to" value="'.htmlspecialchars($to).'" />'),
 				'</td>',
+			'</tr><tr>',
 				'<td>',
 					WT_I18N::translate('Type'), '<br />', select_edit_control('type', array(''=>'', 'auth'=>'auth','config'=>'config','debug'=>'debug','edit'=>'edit','error'=>'error','media'=>'media','search'=>'search'), null, $type, ''),
 				'</td>',
 				'<td>',
-					WT_I18N::translate('Message'), '<br /><input name="text" size="12" value="', htmlspecialchars($text), '" /> ',
+					WT_I18N::translate('Message'), '<br /><input class="log-filter" name="text" value="', htmlspecialchars($text), '" /> ',
 				'</td>',
 				'<td>',
-					WT_I18N::translate('IP address'), '<br /><input name="ip" size="12" value="', htmlspecialchars($ip), '" /> ',
+					WT_I18N::translate('IP address'), '<br /><input class="log-filter" name="ip" value="', htmlspecialchars($ip), '" /> ',
 				'</td>',
 				'<td>',
 					WT_I18N::translate('User'), '<br />', select_edit_control('user', $users_array, '', $user, ''),

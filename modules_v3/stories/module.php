@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11927 2011-06-29 00:23:52Z nigel $
+// $Id: module.php 12464 2011-10-29 23:02:06Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -393,7 +393,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				if ($indi->canDisplayDetails()) {
 					echo '<tr>
 						<td class="list_value">', get_block_setting($story->block_id, 'title'), '</td>
-						<td class="list_value_wrap">', $name, '</td>
+						<td class="list_value wrap">', $name, '</td>
 						</tr>';
 				}
 			}

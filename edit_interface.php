@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_interface.php 11980 2011-07-08 09:47:59Z greg $
+// $Id: edit_interface.php 12378 2011-10-22 22:58:47Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_interface.php');
 require './includes/session.php';
@@ -189,17 +189,17 @@ if (!isset($type)) {
 $level0type = $type;
 if ($type=='INDI') {
 	$record=WT_Person::getInstance($pid);
-	echo '<b>', PrintReady($record->getFullName()), '</b><br />';
+	echo '<b>', $record->getFullName(), '</b><br />';
 } elseif ($type=='FAM') {
 	if (!empty($pid)) {
 		$record=WT_Family::getInstance($pid);
 	} else {
 		$record=WT_Family::getInstance($famid);
 	}
-	echo '<b>', PrintReady($record->getFullName()), '</b><br />';
+	echo '<b>', $record->getFullName(), '</b><br />';
 } elseif ($type=='SOUR') {
 	$record=WT_Source::getInstance($pid);
-	echo '<b>', PrintReady($record->getFullName()), '&nbsp;&nbsp;&nbsp;';
+	echo '<b>', $record->getFullName(), '&nbsp;&nbsp;&nbsp;';
 	if ($TEXT_DIRECTION=='rtl') {
 		echo getRLM();
 	}
@@ -343,21 +343,46 @@ case 'edit':
 		echo '</td></tr>';
 	}
 	echo '</table>';
-	if ($level0type=="SOUR" || $level0type=="REPO" || $level0type=="OBJE") {
-		if ($level1type!="NOTE") print_add_layer("NOTE");
-	} else {
-		if ($level1type!="SEX") {
-			if ($level1type!="SOUR" && $level1type!="REPO" ) print_add_layer("SOUR");
-			if ($level1type!="OBJE" && $level1type!="REPO" && $MULTI_MEDIA) print_add_layer("OBJE");
-			if ($level1type!="NOTE") print_add_layer("NOTE");
-			// Shared Note addition ------------
-			if ($level1type!="SHARED_NOTE" && $level1type!="NOTE") print_add_layer("SHARED_NOTE");
-			if ($level1type!="ASSO" && $level1type!="REPO" && $level1type!="NOTE") print_add_layer("ASSO");
-			// allow to add godfather and godmother for CHR fact or best man and bridesmaid  for MARR fact in one window
-			if ($level1type=="CHR" || $level1type=="MARR") print_add_layer("ASSO2");
-			// RESN can be added to all level 1 tags
-			print_add_layer("RESN");
+	switch ($level0type) {
+	case 'OBJE':
+	case 'NOTE':
+		// OBJE and NOTE "facts" are all special, and none can take lower-level links
+		break;
+	case 'SOUR':
+	case 'REPO':
+		// SOUR and REPO "facts" may only take a NOTE
+		if ($level1type!='NOTE') {
+			print_add_layer('NOTE');
 		}
+		break;
+	case 'FAM':
+	case 'INDI':
+		// FAM and INDI records have "real facts".  They can take NOTE/SOUR/OBJE/etc.
+		if ($level1type!='SEX') {
+			if ($level1type!='SOUR' && $level1type!='REPO') {
+				print_add_layer('SOUR');
+			}
+			if ($level1type!='OBJE' && $level1type!='REPO') {
+				print_add_layer('OBJE');
+			}
+			if ($level1type!='NOTE') {
+				print_add_layer('NOTE');
+			}
+			// Shared Note addition ------------
+			if ($level1type!='SHARED_NOTE' && $level1type!='NOTE') {
+				print_add_layer('SHARED_NOTE');
+			}
+			if ($level1type!='ASSO' && $level1type!='REPO' && $level1type!='NOTE') {
+				print_add_layer('ASSO');
+			}
+			// allow to add godfather and godmother for CHR fact or best man and bridesmaid  for MARR fact in one window
+			if ($level1type=='CHR' || $level1type=='MARR') {
+				print_add_layer('ASSO2');
+			}
+			// RESN can be added to all level 1 tags
+			print_add_layer('RESN');
+		}
+		break;
 	}
 
 	echo '<br /><input type="submit" value="', WT_I18N::translate('Save'), '" /><br />';
@@ -394,22 +419,25 @@ case 'add':
 	}
 	echo '</table>';
 
-	if ($level0type=="SOUR" || $level0type=="REPO") {
-		if ($fact!="NOTE") print_add_layer("NOTE");
-	} else {
-		if ($fact!="OBJE") {
-			if ($fact!="SOUR" && $fact!="REPO" ) print_add_layer("SOUR");
-			if ($fact!="REPO") print_add_layer("OBJE");
-			if ($fact!="NOTE" && $fact!="SHARED_NOTE") print_add_layer("NOTE");
-			// Shared Note addition ------------
-			if ($fact!="SHARED_NOTE" && $fact!="NOTE") print_add_layer("SHARED_NOTE");
-			if ($fact!="ASSO" && $fact!="SOUR" && $fact!="REPO" && $fact!="SHARED_NOTE") print_add_layer("ASSO");
+	// Genealogical facts (e.g. for INDI and FAM records) can have 2 SOUR/NOTE/OBJE/ASSO/RESN ...
+	if ($level0type=='INDI' || $level0type=='FAM') {
+		// ... but not facts which are simply links to other records
+		if ($fact!='OBJE' && $fact!='SHARED_NOTE' && $fact!='OBJE' && $fact!='REPO' && $fact!='SOUR' && $fact!='ASSO') {
+			print_add_layer('SOUR');
+			print_add_layer('OBJE');
+			// Don't add notes to notes!
+			if ($fact!='NOTE') {
+				print_add_layer('NOTE');
+				print_add_layer('SHARED_NOTE');
+			}
+			print_add_layer('ASSO');
 			// allow to add godfather and godmother for CHR fact or best man and bridesmaid  for MARR fact in one window
-			if ($fact=="CHR" || $fact=="MARR") print_add_layer("ASSO2");
+			if ($fact=='CHR' || $fact=='MARR') {
+				print_add_layer('ASSO2');
+			}
+			print_add_layer('RESN');
 		}
 	}
-	// RESN can be added to all level 1 tags
-	print_add_layer("RESN");
 
 	echo '<br /><input type="submit" value="', WT_I18N::translate('Add'), '" /><br />';
 	echo '</form>';
@@ -847,7 +875,16 @@ case 'addnewnote_assisted':
 	<div class="center font11" style="width:100%;">
 		<b><?php echo WT_I18N::translate('Create a new Shared Note using Assistant'); ?></b>
 		<?php
-			echo wiki_help_link(/* I18N: This is a page on http://wiki.webtrees.net/  Only translate this when a translated page exists on the wiki. */ WT_I18N::translate_c('http://wiki.webtrees.net/', 'Census_Assistant_module'));
+			// When more languages are added to the wiki, we can expand or redesign this
+			switch (WT_LOCALE) {
+			case 'fr':
+				echo wiki_help_link('fr:Module_Assistant_Recensement');
+				break;
+			case 'en':
+			default:
+				echo wiki_help_link('Census_Assistant_module');
+				break;
+			}
 		?>
 		<form method="post" action="edit_interface.php" onsubmit="return check_form(this);">
 			<input type="hidden" name="action" value="addnoteaction_assisted" />
@@ -1156,9 +1193,16 @@ case 'update':
 		$tmp=new WT_GedcomRecord($gedrec);
 		list($gedrec, $private_gedrec)=$tmp->privatizeGedcom(WT_USER_ACCESS_LEVEL);
 			
-		// add or remove Y
-		if ($text[0]=="Y" or $text[0]=="y") $text[0]="";
-		if (in_array($tag[0], $emptyfacts) && array_unique($text)==array("") && !$islink[0]) $text[0]="Y";
+		// If the fact has a DATE or PLAC, then delete any value of Y
+		if ($text[0]=='Y') {
+			for ($n=1; $n<count($tag); ++$n) {
+				if ($glevels[$n]==2 && ($tag[$n]=='DATE' || $tag[$n]=='PLAC') && $text[$n]) {
+					$text[0]='';
+					break;
+				}
+			}
+		}
+
 		//-- check for photo update
 		if (count($_FILES)>0) {
 			if (isset($_REQUEST['folder'])) $folder = $_REQUEST['folder'];
@@ -2002,46 +2046,46 @@ case 'changefamily':
 	if (count($children)>0) {
 		if (!is_null($father)) {
 			if ($father->getSex()=="F") {
-				$father->setLabel(WT_I18N::translate('Mother'));
+				$father->setLabel(WT_I18N::translate('mother'));
 			} else {
-				$father->setLabel(WT_I18N::translate('Father'));
+				$father->setLabel(WT_I18N::translate('father'));
 			}
 		}
 		if (!is_null($mother)) {
 			if ($mother->getSex()=="M") {
-				$mother->setLabel(WT_I18N::translate('Father'));
+				$mother->setLabel(WT_I18N::translate('father'));
 			} else {
-				$mother->setLabel(WT_I18N::translate('Mother'));
+				$mother->setLabel(WT_I18N::translate('mother'));
 			}
 		}
 		for ($i=0; $i<count($children); $i++) {
 			if (!is_null($children[$i])) {
 				if ($children[$i]->getSex()=="M") {
-					$children[$i]->setLabel(WT_I18N::translate('Son'));
+					$children[$i]->setLabel(WT_I18N::translate('son'));
 				} elseif ($children[$i]->getSex()=="F") {
-					$children[$i]->setLabel(WT_I18N::translate('Daughter'));
+					$children[$i]->setLabel(WT_I18N::translate('daughter'));
 				} else {
-					$children[$i]->setLabel(WT_I18N::translate('Child'));
+					$children[$i]->setLabel(WT_I18N::translate('child'));
 				}
 			}
 		}
 	} else {
 		if (!is_null($father)) {
 			if ($father->getSex()=="F") {
-				$father->setLabel(WT_I18N::translate('Wife'));
+				$father->setLabel(WT_I18N::translate('wife'));
 			} elseif ($father->getSex()=="M") {
-				$father->setLabel(WT_I18N::translate('Husband'));
+				$father->setLabel(WT_I18N::translate('husband'));
 			} else {
-				$father->setLabel(WT_I18N::translate('Spouse'));
+				$father->setLabel(WT_I18N::translate('spouse'));
 			}
 		}
 		if (!is_null($mother)) {
 			if ($mother->getSex()=="F") {
-				$mother->setLabel(WT_I18N::translate('Wife'));
+				$mother->setLabel(WT_I18N::translate('wife'));
 			} elseif ($mother->getSex()=="M") {
-				$mother->setLabel(WT_I18N::translate('Husband'));
+				$mother->setLabel(WT_I18N::translate('husband'));
 			} else {
-				$father->setLabel(WT_I18N::translate('Spouse'));
+				$father->setLabel(WT_I18N::translate('spouse'));
 			}
 		}
 	}
@@ -2070,11 +2114,11 @@ case 'changefamily':
 			if (!is_null($father)) {
 			?>
 				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo $father->getLabel(); ?></b><input type="hidden" name="HUSB" value="<?php echo $father->getXref(); ?>" /></td>
-				<td id="HUSBName" class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>"><?php echo PrintReady($father->getFullName()); ?></td>
+				<td id="HUSBName" class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>"><?php echo $father->getFullName(); ?></td>
 			<?php
 			} else {
 			?>
-				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo WT_I18N::translate('Spouse'); ?></b><input type="hidden" name="HUSB" value="" /></td>
+				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo WT_I18N::translate('spouse'); ?></b><input type="hidden" name="HUSB" value="" /></td>
 				<td id="HUSBName" class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>"></td>
 			<?php
 			}
@@ -2089,11 +2133,11 @@ case 'changefamily':
 			if (!is_null($mother)) {
 			?>
 				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo $mother->getLabel(); ?></b><input type="hidden" name="WIFE" value="<?php echo $mother->getXref(); ?>" /></td>
-				<td id="WIFEName" class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>"><?php echo PrintReady($mother->getFullName()); ?></td>
+				<td id="WIFEName" class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>"><?php echo $mother->getFullName(); ?></td>
 			<?php
 			} else {
 			?>
-				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo WT_I18N::translate('Spouse'); ?></b><input type="hidden" name="WIFE" value="" /></td>
+				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo WT_I18N::translate('spouse'); ?></b><input type="hidden" name="WIFE" value="" /></td>
 				<td id="WIFEName" class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>"></td>
 			<?php
 			}
@@ -2110,7 +2154,7 @@ case 'changefamily':
 				?>
 			<tr>
 				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo $child->getLabel(); ?></b><input type="hidden" name="CHIL<?php echo $i; ?>" value="<?php echo $child->getXref(); ?>" /></td>
-				<td id="CHILName<?php echo $i; ?>" class="optionbox wrap"><?php echo PrintReady($child->getFullName()); ?></td>
+				<td id="CHILName<?php echo $i; ?>" class="optionbox wrap"><?php echo $child->getFullName(); ?></td>
 				<td class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>">
 					<a href="javascript:;" id="childrem<?php echo $i; ?>" style="display: block;" onclick="document.changefamform.CHIL<?php echo $i; ?>.value=''; document.getElementById('CHILName<?php echo $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
 					<a href="javascript:;" onclick="nameElement = document.getElementById('CHILName<?php echo $i; ?>'); remElement = document.getElementById('childrem<?php echo $i; ?>'); return findIndi(document.changefamform.CHIL<?php echo $i; ?>);"><?php echo WT_I18N::translate('Change'); ?></a><br />
@@ -2122,7 +2166,7 @@ case 'changefamily':
 			}
 				?>
 			<tr>
-				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo WT_I18N::translate('Add child'); ?></b><input type="hidden" name="CHIL<?php echo $i; ?>" value="" /></td>
+				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo WT_I18N::translate('child'); ?></b><input type="hidden" name="CHIL<?php echo $i; ?>" value="" /></td>
 				<td id="CHILName<?php echo $i; ?>" class="optionbox wrap"></td>
 				<td class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>">
 					<a href="javascript:;" id="childrem<?php echo $i; ?>" style="display: none;" onclick="document.changefamform.CHIL<?php echo $i; ?>.value=''; document.getElementById('CHILName<?php echo $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>

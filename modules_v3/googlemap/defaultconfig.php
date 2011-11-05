@@ -24,7 +24,7 @@
  *
  * @package webtrees
  * @subpackage GoogleMap
- * @version $Id: defaultconfig.php 11676 2011-06-01 16:45:40Z greg $
+ * @version $Id: defaultconfig.php 12146 2011-08-20 10:09:33Z brian $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -46,7 +46,7 @@ $GOOGLEMAP_MAP_TYPE    = get_module_setting('googlemap', 'GM_MAP_TYPE',    'G_NO
 global $GOOGLEMAP_MIN_ZOOM;
 $GOOGLEMAP_MIN_ZOOM    = get_module_setting('googlemap', 'GM_MIN_ZOOM',    '2');  // min zoom level
 global $GOOGLEMAP_MAX_ZOOM;
-$GOOGLEMAP_MAX_ZOOM    = get_module_setting('googlemap', 'GM_MAX_ZOOM',    '13'); // max zoom level
+$GOOGLEMAP_MAX_ZOOM    = get_module_setting('googlemap', 'GM_MAX_ZOOM',    '20'); // max zoom level
 
 global $GOOGLEMAP_XSIZE;
 $GOOGLEMAP_XSIZE       = get_module_setting('googlemap', 'GM_XSIZE',       '600');      // X-size of Google map

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: googlemap.php 12046 2011-07-20 22:30:42Z greg $
+// $Id: googlemap.php 12260 2011-10-06 16:18:21Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -424,14 +424,14 @@ function build_indiv_map($indifacts, $famids) {
 										$i = $i + 1;
 										$markers[$i]=array('index'=>'', 'tabindex'=>'', 'placed'=>'no');
 										if (strpos($srec, "\n1 SEX F")!==false) {
-											$markers[$i]['fact'] = WT_I18N::translate('Daughter');
+											$markers[$i]['fact'] = WT_I18N::translate('daughter');
 											$markers[$i]['class'] = 'person_boxF';
 										} else {
 											if (strpos($srec, "\n1 SEX M")!==false) {
-												$markers[$i]['fact'] = WT_I18N::translate('Son');
+												$markers[$i]['fact'] = WT_I18N::translate('son');
 												$markers[$i]['class'] = 'person_box';
 											} else {
-												$markers[$i]['fact']  = WT_Gedcom_Tag::getLabel('CHIL');
+												$markers[$i]['fact']  = WT_I18N::translate('child');
 												$markers[$i]['class'] = 'person_boxNN';
 											}
 										}
@@ -457,14 +457,14 @@ function build_indiv_map($indifacts, $famids) {
 										if ((count($latlongval) != 0) && ($latlongval['lati'] != NULL) && ($latlongval['long'] != NULL)) {
 											$i = $i + 1;
 											$markers[$i]=array('index'=>'', 'tabindex'=>'', 'placed'=>'no');
-											$markers[$i]['fact']	= WT_Gedcom_Tag::getLabel('CHIL');
+											$markers[$i]['fact']	= WT_I18N::translate('child');
 											$markers[$i]['class']	= 'option_boxNN';
 											if (strpos($srec, "\n1 SEX F")!==false) {
-												$markers[$i]['fact'] = WT_I18N::translate('Daughter');
+												$markers[$i]['fact'] = WT_I18N::translate('daughter');
 												$markers[$i]['class'] = 'person_boxF';
 											}
 											if (strpos($srec, "\n1 SEX M")!==false) {
-												$markers[$i]['fact'] = WT_I18N::translate('Son');
+												$markers[$i]['fact'] = WT_I18N::translate('son');
 												$markers[$i]['class'] = 'person_box';
 											}
 											$markers[$i]['icon'] = $latlongval['icon'];
@@ -561,7 +561,7 @@ function build_indiv_map($indifacts, $famids) {
 		$pid=$controller->indi->getXref();
 
 		// === Include css and js files ============================================================
-		echo '<link type="text/css" href="', WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet" />';
+		echo '<link type="text/css" href="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet" />';
 		require_once WT_ROOT.WT_MODULES_DIR.'googlemap/wt_v3_googlemap.js.php';
 
 		// === Create the normal googlemap sidebar of events and children ==========================
@@ -580,7 +580,7 @@ function build_indiv_map($indifacts, $famids) {
 			if (!empty($marker['name'])) {
 				$person=WT_Person::getInstance($marker['name']);
 				if ($person) {
-					echo '<a href="', $person->getHtmlUrl(), '">', $person->canDisplayName() ? PrintReady($person->getFullName()) : WT_I18N::translate('Private'), '</a>';
+					echo '<a href="', $person->getHtmlUrl(), '">', $person->getFullName(), '</a>';
 				}
 				echo '<br />';
 			}

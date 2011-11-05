@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report>
-	<!-- $Id: report.xml 11856 2011-06-19 15:43:34Z greg $ -->
+	<!-- $Id: report.xml 12396 2011-10-24 14:32:17Z greg $ -->
 	<Title><var var="WT_I18N::translate('Occupations')" /></Title>
 	<Description><var var="WT_I18N::translate('A report of individuals who had a given occupation.')" /></Description>
 	<Input name="occupation" lookup="OCCU" type="text"><var var="WT_Gedcom_Tag::getLabel('OCCU')" /> </Input>
@@ -63,7 +63,7 @@
 			</TextBox>
 		</Header>
 		<Body>
-			<List list="individual" filter1="OCCU CONTAINS $occupation" sortby="$sortby">
+			<List list="individual" filter1="OCCU CONTAINS $occupation" filter2="REGEXP /\n1 OCCU/" sortby="$sortby">
 				<SetVar name="moreoccupation" value="0" />
 				<!-- Printed List counter -->
 				<SetVar name="printedoccupation" value="$printedoccupation + 1" />

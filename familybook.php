@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: familybook.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: familybook.php 12216 2011-09-26 07:38:04Z greg $
 
 define('WT_SCRIPT_NAME', 'familybook.php');
 require './includes/session.php';
@@ -260,7 +260,7 @@ else echo "0\" onclick=\"document.people.show_full.value='1';"; ?>" />
 </td>
 
 <td rowspan="4" class="topbottombar vmiddle">
-<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>" />
+<input type="submit" value="<?php echo /* I18N: Submit button, on a form */ WT_I18N::translate('View'); ?>" />
 </td></tr>
 
 <tr><td class="descriptionbox">

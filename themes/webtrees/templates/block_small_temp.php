@@ -5,10 +5,11 @@
  * This template expects that the following variables will be set
  * $id - the DOM id for the block div
  * $title - the title of the block
+ * $class - the additional class of the block
  * $content - the content of the block
  *
  * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
+ * Copyright (C) 2011 webtrees development team.
  *
  * Derived from PhpGedView
  * Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -29,7 +30,7 @@
  *
  * @package webtrees
  * @subpackage Themes
- * @version $Id: block_small_temp.php 9742 2010-10-30 17:24:31Z greg $
+ * @version $Id: block_small_temp.php 12397 2011-10-24 15:19:35Z lukasz $
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -48,7 +49,7 @@ if (!defined('WT_WEBTREES')) {
 			<td class="blockh3"></td>
 		</tr>
 	</table>
-	<div class="blockcontent">
+	<div class="blockcontent <?php echo $class; ?>">
 		<div class="small_inner_block">
 		<?php echo $content; ?>
 		</div>

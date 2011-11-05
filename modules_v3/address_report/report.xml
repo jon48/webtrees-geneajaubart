@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report>
-	<!-- $Id: report.xml 12084 2011-07-30 12:39:05Z lukasz $ -->
+	<!-- $Id: report.xml 12426 2011-10-26 10:18:23Z greg $ -->
 	<Title><var var="WT_I18N::translate('Addresses')" /></Title>
 	<Description><var var="WT_I18N::translate('A report of addresses, telephone numbers, and email addresses.')" /></Description>
 	<Input name="address" type="text"><var var="WT_I18N::translate('Show addresses that contain:')" /> </Input>
@@ -68,7 +68,7 @@
 						<SetVar name="email" value="" />
 					</if>
 				</if>
-				<List list="individual" filter1="$addrfilter" filter2="$addrfilter2" filter3="$email" sortby="NAME">
+				<List list="individual" filter1="$addrfilter" filter2="$addrfilter2" filter3="$email" filter4="REGEXP /\n[12] ADDR/" sortby="NAME">
 					<TextBox width="40" height="52" border="1">
 						<Text style="text"><GedcomValue tag="@id" /></Text>
 					</TextBox>

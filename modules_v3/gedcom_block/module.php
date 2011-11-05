@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -44,6 +44,7 @@ class gedcom_block_WT_Module extends WT_Module implements WT_Module_Block {
 		global $hitCount, $SHOW_COUNTER;
 
 		$id=$this->getName().$block_id;
+		$class=$this->getName().'_block';
 		$title=get_gedcom_setting(WT_GED_ID, 'title');
 		$content = "<div class=\"center\">";
 		$content .= "<br />".format_timestamp(client_time())."<br />";

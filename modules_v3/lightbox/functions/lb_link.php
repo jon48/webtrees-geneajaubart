@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lb_link.php 11665 2011-05-31 21:50:19Z greg $
+// $Id: lb_link.php 12260 2011-10-06 16:18:21Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -40,7 +40,7 @@ if (!defined('WT_WEBTREES')) {
 global $TEXT_DIRECTION, $WT_IMAGES;
 $mediaid=$media['XREF'];
 if (!isset($WT_IMAGES['image_link'])) {
-	$WT_IMAGES['image_link']=WT_MODULES_DIR.'lightbox/images/image_link.gif';
+	$WT_IMAGES['image_link']=WT_STATIC_URL.WT_MODULES_DIR.'lightbox/images/image_link.gif';
 }
 $classSuffix = '';
 if ($TEXT_DIRECTION=='rtl') $classSuffix = '_rtl';

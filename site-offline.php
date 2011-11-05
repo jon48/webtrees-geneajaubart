@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: site-offline.php 11915 2011-06-27 22:05:25Z greg $
+// $Id: site-offline.php 12362 2011-10-21 19:38:54Z greg $
 
 define('WT_SCRIPT_NAME', 'site-offline.php');
 
@@ -46,9 +46,8 @@ if (file_exists(WT_DATA_DIR.'offline.txt')) {
 	exit;
 }
 
-
 header('Content-Type: text/html; charset=UTF-8');
-header($_SERVER["SERVER_PROTOCOL"].' 503 Service Temporarily Unavailable');
+header($_SERVER['SERVER_PROTOCOL'].' 503 Service Temporarily Unavailable');
 
 echo
 	'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
@@ -63,7 +62,7 @@ echo
 		h1 {color: #81A9CB; font-weight:normal; text-align:center;}
 		li {line-height:2;}
 		blockquote {color:red;}
-		.content { /*margin:auto; width:800px;*/ border:1px solid gray; padding:15px; -moz-border-radius:15px; -webkit-border-radius:15px;}
+		.content { /*margin:auto; width:800px;*/ border:1px solid gray; padding:15px; border-radius:15px;}
 		.good {color: green;}
 	</style>',
 	'</head><body>',

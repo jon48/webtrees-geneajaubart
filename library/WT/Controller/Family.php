@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Family.php 12048 2011-07-20 23:00:37Z greg $
+// $Id: Family.php 12212 2011-09-25 08:25:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,8 +36,6 @@ class WT_Controller_Family extends WT_Controller_Base {
 	var $famid = '';
 	var $family = null;
 	var $difffam = null;
-	var $accept_success = false;
-	var $reject_success = false;
 	var $user = null;
 	var $display = false;
 	var $famrec = '';
@@ -86,7 +84,6 @@ class WT_Controller_Family extends WT_Controller_Base {
 		case 'accept':
 			if (WT_USER_CAN_ACCEPT) {
 				accept_all_changes($this->famid, WT_GED_ID);
-				$this->accept_success=true;
 				//-- check if we just deleted the record and redirect to index
 				$gedrec = find_family_record($this->famid, WT_GED_ID);
 				if (empty($gedrec)) {
@@ -100,7 +97,6 @@ class WT_Controller_Family extends WT_Controller_Base {
 		case 'undo':
 			if (WT_USER_CAN_ACCEPT) {
 				reject_all_changes($this->famid, WT_GED_ID);
-				$this->reject_success=true;
 				$gedrec = find_family_record($this->famid, WT_GED_ID);
 				//-- check if we just deleted the record and redirect to index
 				if (empty($gedrec)) {
@@ -163,7 +159,8 @@ class WT_Controller_Family extends WT_Controller_Base {
 		// edit menu
 		$menu = new WT_Menu(WT_I18N::translate('Edit'), '#', 'menu-fam');
 		$menu->addIcon('edit_fam');
-		$menu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_large_edit_fam');
+		$menu->addClass('menuitem', 'menuitem_hover', 'submenu', 'icon_large_edit_fam');
+		$menu->addLabel($menu->label, 'down');
 
 		if (WT_USER_CAN_EDIT) {
 			// edit_fam / members
@@ -211,7 +208,7 @@ class WT_Controller_Family extends WT_Controller_Base {
 
 		// delete
 		if (WT_USER_CAN_EDIT) {
-			$submenu = new WT_Menu(WT_I18N::translate('Delete family'), '#', 'menu-fam-del');
+			$submenu = new WT_Menu(WT_I18N::translate('Delete'), '#', 'menu-fam-del');
 			$submenu->addOnclick("if (confirm('".WT_I18N::translate('Deleting the family will unlink all of the individuals from each other but will leave the individuals in place.  Are you sure you want to delete this family?')."')) return delete_family('".$this->getFamilyID()."'); else return false;");
 			$submenu->addIcon('remove');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_delete');

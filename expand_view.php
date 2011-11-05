@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: expand_view.php 12042 2011-07-20 16:33:49Z greg $
+// $Id: expand_view.php 12203 2011-09-22 12:09:54Z greg $
 
 define('WT_SCRIPT_NAME', 'expand_view.php');
 require './includes/session.php';
@@ -85,7 +85,7 @@ foreach ($events as $event) {
 			// Show spouse/family for family events
 			$spouse=WT_Person::getInstance($event->getSpouseId());
 			if ($spouse) {
-				echo ' <a href="', $spouse->getHtmlUrl(), '">', PrintReady($spouse->getFullName()), '</a> - ';
+				echo ' <a href="', $spouse->getHtmlUrl(), '">', $spouse->getFullName(), '</a> - ';
 			}
 			$family=WT_Family::getInstance($event->getFamilyId());
 			if ($family) {

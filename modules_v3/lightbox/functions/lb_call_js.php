@@ -23,15 +23,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lb_call_js.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: lb_call_js.php 12376 2011-10-22 22:02:37Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
+require_once WT_ROOT.'js/prototype.js.htm';
+
 global $TEXT_DIRECTION;
-$LB_MUSIC_FILE=get_module_setting('lightbox', 'LB_MUSIC_FILE', WT_MODULES_DIR.'lightbox/music/music.mp3');
+$LB_MUSIC_FILE=get_module_setting('lightbox', 'LB_MUSIC_FILE', WT_STATIC_URL.WT_MODULES_DIR.'lightbox/music/music.mp3');
 ?>
 <script language="javascript" type="text/javascript">
 	var CB_ImgDetails = "<?php echo WT_I18N::translate('Details'); ?>";
@@ -63,19 +65,19 @@ $LB_MUSIC_FILE=get_module_setting('lightbox', 'LB_MUSIC_FILE', WT_MODULES_DIR.'l
 </script>
 
 <?php if ($TEXT_DIRECTION == 'rtl') { ?>
-	<script src="<?php echo WT_MODULES_DIR; ?>lightbox/js/Sound.js"  type="text/javascript"></script>
-	<script src="<?php echo WT_MODULES_DIR; ?>lightbox/js/clearbox.js"  type="text/javascript"></script>
+	<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/js/Sound.js"  type="text/javascript"></script>
+	<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/js/clearbox.js"  type="text/javascript"></script>
 	<!--[if lte IE 7]>
-	<link href ="<?php echo WT_MODULES_DIR; ?>lightbox/css/album_page_RTL.css"  rel="stylesheet" type="text/css" media="screen" />
+	<link href ="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/css/album_page_RTL.css"  rel="stylesheet" type="text/css" media="screen" />
 	<![endif]-->
 <?php } else { ?>
-	<script src="<?php echo WT_MODULES_DIR; ?>lightbox/js/Sound.js"  type="text/javascript"></script>
-	<script src="<?php echo WT_MODULES_DIR; ?>lightbox/js/clearbox.js"  type="text/javascript"></script>
+	<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/js/Sound.js"  type="text/javascript"></script>
+	<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/js/clearbox.js"  type="text/javascript"></script>
 <?php } ?>
-<script src="<?php echo WT_MODULES_DIR; ?>lightbox/js/wz_tooltip.js"  type="text/javascript"></script>
-<script src="<?php echo WT_MODULES_DIR; ?>lightbox/js/tip_centerwindow.js"  type="text/javascript"></script>
+<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/js/wz_tooltip.js"  type="text/javascript"></script>
+<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/js/tip_centerwindow.js"  type="text/javascript"></script>
 <?php if ($TEXT_DIRECTION=='rtl') { ?>
-	<script src="<?php echo WT_MODULES_DIR; ?>lightbox/js/tip_balloon_RTL.js"  type="text/javascript"></script>
+	<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/js/tip_balloon_RTL.js"  type="text/javascript"></script>
 <?php } else { ?>
-	<script src="<?php echo WT_MODULES_DIR; ?>lightbox/js/tip_balloon.js"  type="text/javascript"></script>
+	<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/js/tip_balloon.js"  type="text/javascript"></script>
 <?php }

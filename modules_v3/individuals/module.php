@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12200 2011-09-21 10:34:40Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -198,7 +198,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		$out = '<ul>';
 		foreach ($indis as $person) {
 			if ($person->canDisplayName()) {
-				$out .= '<li><a href="'.$person->getHtmlUrl().'">'.$person->getSexImage().' '.$person->getListName().' ';
+				$out .= '<li><a href="'.$person->getHtmlUrl().'">'.$person->getSexImage().' '.$person->getFullName().' ';
 				if ($person->canDisplayDetails()) {
 					$bd = $person->getLifeSpan();
 					if (!empty($bd)) {
@@ -218,7 +218,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		}
 		$rows=
 			WT_DB::prepare(
-				"SELECT ? AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, i_isdead, i_sex".
+				"SELECT ? AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec".
 				" FROM `##individuals`, `##name`".
 				" WHERE (i_id LIKE ? OR n_sort LIKE ?)".
 				" AND i_id=n_id AND i_file=n_file AND i_file=?".
@@ -232,7 +232,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		foreach ($rows as $row) {
 			$person=WT_Person::getInstance($row);
 			if ($person->canDisplayName()) {
-				$out .= '<li><a href="'.$person->getHtmlUrl().'">'.$person->getSexImage().' '.$person->getListName().' ';
+				$out .= '<li><a href="'.$person->getHtmlUrl().'">'.$person->getSexImage().' '.$person->getFullName().' ';
 				if ($person->canDisplayDetails()) {
 					$bd = $person->getLifeSpan();
 					if (!empty($bd)) $out .= PrintReady(' ('.$bd.')');

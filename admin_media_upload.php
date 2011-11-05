@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_media_upload.php 10603 2011-01-25 09:28:33Z greg $
+// $Id: admin_media_upload.php 12224 2011-09-27 10:35:39Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_media_upload.php');
 require './includes/session.php';
@@ -71,12 +71,12 @@ if ($action == "upload") {
 	process_uploadMedia_form();
 }
 
-// Check if Media Directory is writeable or if Media features are enabled
-// If one of these is not true then do not continue
-if (!dir_is_writable($MEDIA_DIRECTORY) || !$MULTI_MEDIA) {
-	echo "<span class=\"error\"><b>";
-	echo WT_I18N::translate('Uploading media files is not allowed because multi-media items have been disabled or because the media directory is not writable.');
-	echo "</b></span><br />";
+// Check if Media Directory is writeable.
+// If not, then do not continue
+if (!dir_is_writable($MEDIA_DIRECTORY)) {
+	echo '<p class="ui-state-error">';
+	echo WT_I18N::translate('Uploading media files is not allowed because the media folder is not writable.');
+	echo '</p>';
 } else {
 	show_mediaUpload_form(WT_SCRIPT_NAME, false); // We have the green light to upload media, print the form
 }

@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: pedigree_map.php 11675 2011-06-01 16:31:35Z greg $
+// $Id: pedigree_map.php 12260 2011-10-06 16:18:21Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -35,7 +35,7 @@ if (!defined('WT_WEBTREES')) {
 
 require WT_ROOT.WT_MODULES_DIR.'googlemap/defaultconfig.php';
 
-global $PEDIGREE_GENERATIONS, $MAX_PEDIGREE_GENERATIONS, $ENABLE_AUTOCOMPLETE, $MULTI_MEDIA, $SHOW_HIGHLIGHT_IMAGES, $WT_IMAGES;
+global $PEDIGREE_GENERATIONS, $MAX_PEDIGREE_GENERATIONS, $ENABLE_AUTOCOMPLETE, $SHOW_HIGHLIGHT_IMAGES, $WT_IMAGES;
 
 // Default is show for both of these.
 $hideflags = safe_GET('hideflags');
@@ -65,7 +65,7 @@ global $TEXT_DIRECTION;
 
 print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Pedigree map of %s', $controller->getPersonName()));
 
-echo '<link type="text/css" href ="', WT_MODULES_DIR, 'googlemap/css/googlemap_style.css" rel="stylesheet" />';
+echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/googlemap_style.css" rel="stylesheet" />';
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 echo '<div><table><tr><td valign="middle">';
@@ -217,9 +217,9 @@ for ($i=0; $i<($controller->treesize); $i++) {
 echo '<table class="tabs_table" cellspacing="0" cellpadding="0" border="0" width="100%">';
 echo "<tr>\n";
 echo "<td valign=\"top\">\n";
-echo "<img src=\"images/spacer.gif\" width=\"".$GOOGLEMAP_XSIZE."\" height=\"0\" alt=\"\" border=\"0\"/>\n";
+echo "<img src=\"", WT_STATIC_URL, "images/spacer.gif\" width=\"".$GOOGLEMAP_XSIZE."\" height=\"0\" alt=\"\" border=\"0\"/>\n";
 echo "<div id=\"pm_map\" style=\"border: 1px solid gray; height: ".$GOOGLEMAP_YSIZE."px; font-size: 0.9em;";
-echo " background-image: url('images/loading.gif'); background-position: center; background-repeat: no-repeat; overflow: hidden;\"></div>\n";
+echo " background-image: url('", WT_STATIC_URL, "images/loading.gif'); background-position: center; background-repeat: no-repeat; overflow: hidden;\"></div>\n";
 if (WT_USER_IS_ADMIN) {
 	echo "<table width=\"100%\">";
 	echo "<tr><td align=\"left\">\n";
@@ -264,8 +264,7 @@ if (isset($curgen)) {
 		if ($miscount == 0) {
 			echo WT_I18N::translate('No ancestors in the database.'), "<br />\n";
 		} else {
-			// I18N: %1$d is a count of individuals, %2$s is a list of their names
-			echo " ".WT_I18N::plural(
+			echo /* I18N: %1$d is a count of individuals, %2$s is a list of their names */ WT_I18N::plural(
 				'%1$d individual is missing birthplace map coordinates: %2$s.',
 				'%1$d individuals are missing birthplace map coordinates: %2$s.',
 				$miscount, $miscount, $missing),

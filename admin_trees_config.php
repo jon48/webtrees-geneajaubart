@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_config.php 12045 2011-07-20 21:24:29Z greg $
+// $Id: admin_trees_config.php 12382 2011-10-23 13:42:48Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_config.php');
 
@@ -77,8 +77,8 @@ function GetGEDFromZIP($zipfile, $extract=true) {
  * The media firewall should always be enabled. This function adds media firewall code to the media/.htaccess file if it is not already there
  */
 function fix_media_htaccess() {
-	global $errors, $error_msg, $MEDIA_DIRECTORY, $MULTI_MEDIA;
-	if (!$MULTI_MEDIA) return; // don't create an htaccess flie if media is disabled
+	global $errors, $error_msg, $MEDIA_DIRECTORY;
+
 	$whichFile = $MEDIA_DIRECTORY.".htaccess";
 	$httext = "";
 	if (file_exists($whichFile)) {
@@ -185,7 +185,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'FAM_FACTS_UNIQUE',             str_replace(' ', '', safe_POST('NEW_FAM_FACTS_UNIQUE')));
 	set_gedcom_setting(WT_GED_ID, 'FAM_ID_PREFIX',                safe_POST('NEW_FAM_ID_PREFIX'));
 	set_gedcom_setting(WT_GED_ID, 'FULL_SOURCES',                 safe_POST_bool('NEW_FULL_SOURCES'));
-	set_gedcom_setting(WT_GED_ID, 'GEDCOM_DEFAULT_TAB',           safe_POST('NEW_GEDCOM_DEFAULT_TAB'));
 	set_gedcom_setting(WT_GED_ID, 'GEDCOM_ID_PREFIX',             safe_POST('NEW_GEDCOM_ID_PREFIX'));
 	set_gedcom_setting(WT_GED_ID, 'GENERATE_UIDS',                safe_POST_bool('NEW_GENERATE_UIDS'));
 	set_gedcom_setting(WT_GED_ID, 'HIDE_GEDCOM_ERRORS',          !safe_POST_bool('NEW_HIDE_GEDCOM_ERRORS'));
@@ -196,7 +195,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'KEEP_ALIVE_YEARS_BIRTH',       safe_POST('KEEP_ALIVE_YEARS_BIRTH', WT_REGEX_INTEGER, 0));
 	set_gedcom_setting(WT_GED_ID, 'KEEP_ALIVE_YEARS_DEATH',       safe_POST('KEEP_ALIVE_YEARS_DEATH', WT_REGEX_INTEGER, 0));
 	set_gedcom_setting(WT_GED_ID, 'LANGUAGE',                     safe_POST('GEDCOMLANG'));
-	set_gedcom_setting(WT_GED_ID, 'LINK_ICONS',                   safe_POST('NEW_LINK_ICONS'));
 	set_gedcom_setting(WT_GED_ID, 'MAX_ALIVE_AGE',                safe_POST('MAX_ALIVE_AGE', WT_REGEX_INTEGER, 100));
 	set_gedcom_setting(WT_GED_ID, 'MAX_DESCENDANCY_GENERATIONS',  safe_POST('NEW_MAX_DESCENDANCY_GENERATIONS'));
 	set_gedcom_setting(WT_GED_ID, 'MAX_PEDIGREE_GENERATIONS',     safe_POST('NEW_MAX_PEDIGREE_GENERATIONS'));
@@ -204,9 +202,9 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'MEDIA_EXTERNAL',               safe_POST_bool('NEW_MEDIA_EXTERNAL'));
 	set_gedcom_setting(WT_GED_ID, 'MEDIA_FIREWALL_THUMBS',        safe_POST_bool('NEW_MEDIA_FIREWALL_THUMBS'));
 	set_gedcom_setting(WT_GED_ID, 'MEDIA_ID_PREFIX',              safe_POST('NEW_MEDIA_ID_PREFIX'));
+	set_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD',                 safe_POST('NEW_MEDIA_UPLOAD'));
 	set_gedcom_setting(WT_GED_ID, 'META_DESCRIPTION',             safe_POST('NEW_META_DESCRIPTION'));
 	set_gedcom_setting(WT_GED_ID, 'META_TITLE',                   safe_POST('NEW_META_TITLE'));
-	set_gedcom_setting(WT_GED_ID, 'MULTI_MEDIA',                  safe_POST_bool('NEW_MULTI_MEDIA'));
 	set_gedcom_setting(WT_GED_ID, 'NOTE_ID_PREFIX',               safe_POST('NEW_NOTE_ID_PREFIX'));
 	set_gedcom_setting(WT_GED_ID, 'NO_UPDATE_CHAN',               safe_POST_bool('NEW_NO_UPDATE_CHAN'));
 	set_gedcom_setting(WT_GED_ID, 'PEDIGREE_FULL_DETAILS',        safe_POST_bool('NEW_PEDIGREE_FULL_DETAILS'));
@@ -270,7 +268,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_AUTH_MODE_'.WT_LOCALE, safe_POST('NEW_WELCOME_TEXT_AUTH_MODE_4', WT_REGEX_UNSAFE));
 	set_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_CUST_HEAD',       safe_POST_bool('NEW_WELCOME_TEXT_CUST_HEAD'));
 	set_gedcom_setting(WT_GED_ID, 'WORD_WRAPPED_NOTES',           safe_POST_bool('NEW_WORD_WRAPPED_NOTES'));
-	set_gedcom_setting(WT_GED_ID, 'ZOOM_BOXES',                   safe_POST('NEW_ZOOM_BOXES'));
 	if (safe_POST('gedcom_title', WT_REGEX_UNSAFE)) {
 		set_gedcom_setting(WT_GED_ID, 'title',                        safe_POST('gedcom_title', WT_REGEX_UNSAFE));
 	}
@@ -399,7 +396,7 @@ echo WT_JS_START;?>
 					<li><a href="#access-options"><span><?php echo WT_I18N::translate('Access'); ?></span></a></li>
 					<li><a href="#layout-options"><span><?php echo WT_I18N::translate('Layout'); ?></span></a></li>
 					<li><a href="#hide-show"><span><?php echo WT_I18N::translate('Hide &amp; Show'); ?></span></a></li>
-					<li><a href="#edit-options"><span><?php echo WT_I18N::translate('Edit Options'); ?></span></a></li>
+					<li><a href="#edit-options"><span><?php echo WT_I18N::translate('Edit options'); ?></span></a></li>
 				</ul>
 			<!-- GEDCOM BASICS -->
 			<div id="file-options">
@@ -729,19 +726,17 @@ echo WT_JS_START;?>
 				if ($row->xref) {
 					$record=WT_GedcomRecord::getInstance($row->xref);
 					if ($record) {
-						$name=$record->getFullName();
+						echo '<a href="', $record->getHtmlUrl(), '">', $record->getFullName(), '</a>';
 					} else {
-						$name=WT_I18N::translate('this record does not exist');
+						echo WT_I18N::translate('this record does not exist');
 					}
-					// I18N: e.g. John DOE (I1234)
-					echo WT_I18N::translate('%1$s (%2$s)', $name, $row->xref);
 				} else {
 					echo '&nbsp;';
 				}
 				echo '</td><td width="*">';
 				if ($row->tag_type) {
 					// I18N: e.g. Marriage (MARR)
-					echo WT_I18N::translate('%1$s [%2$s]', WT_Gedcom_Tag::getLabel($row->tag_type), $row->tag_type);
+					echo WT_Gedcom_Tag::getLabel($row->tag_type);
 				} else {
 					echo '&nbsp;';
 				}
@@ -757,14 +752,6 @@ echo WT_JS_START;?>
 			<!--  MULTIMEDIA -->
 			<div id="config-media">
 				<table>
-					<tr>
-						<td>
-							<?php echo WT_I18N::translate('Enable multimedia features'), help_link('MULTI_MEDIA'); ?>
-						</td>
-						<td>
-							<?php  echo edit_field_yes_no('NEW_MULTI_MEDIA', get_gedcom_setting(WT_GED_ID, 'MULTI_MEDIA')); ?>
-						</td>
-					</tr>
 					<tr>
 						<th colspan="2"><?php echo WT_I18N::translate('General'); ?></th>
 					</tr>
@@ -905,6 +892,18 @@ echo WT_JS_START;?>
 						</td>
 						<td>
 							<?php echo edit_field_yes_no('NEW_SAVE_WATERMARK_THUMB', get_gedcom_setting(WT_GED_ID, 'SAVE_WATERMARK_THUMB')); ?>
+						</td>
+					</tr>
+					<tr>
+						<th colspan="2"><?php echo WT_I18N::translate('Access'); ?></th>
+					</tr>
+					<tr>
+						<td>
+							<?php echo WT_I18N::translate('Who can upload new media files?'), help_link('MEDIA_UPLOAD'); ?>
+						</td>
+						<td>
+							<?php echo select_edit_control('NEW_MEDIA_UPLOAD', array(WT_PRIV_USER=>WT_I18N::translate('Show to members'),
+ WT_PRIV_NONE=>WT_I18N::translate('Show to managers'), WT_PRIV_HIDE=>WT_I18N::translate('Hide from everyone')), null, get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD')); ?>
 						</td>
 					</tr>
 				</table>
@@ -1129,41 +1128,8 @@ echo WT_JS_START;?>
 						</td>
 					</tr>
 					<tr>
-						<td>
-							<?php echo WT_I18N::translate('Zoom boxes on charts'), help_link('ZOOM_BOXES'); ?>
-						</td>
-						<td>
-							<select name="NEW_ZOOM_BOXES">
-								<option value="disabled" <?php if ($ZOOM_BOXES=='disabled') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('Disabled'); ?></option>
-								<option value="mouseover" <?php if ($ZOOM_BOXES=='mouseover') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('On Mouse Over'); ?></option>
-								<option value="mousedown" <?php if ($ZOOM_BOXES=='mousedown') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('On Mouse Down'); ?></option>
-								<option value="click" <?php if ($ZOOM_BOXES=='click') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('On Mouse Click'); ?></option>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<?php echo WT_I18N::translate('PopUp links on charts'), help_link('LINK_ICONS'); ?>
-						</td>
-						<td>
-							<select name="NEW_LINK_ICONS">
-								<option value="disabled" <?php if ($LINK_ICONS=='disabled') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('Disabled'); ?></option>
-								<option value="mouseover" <?php if ($LINK_ICONS=='mouseover') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('On Mouse Over'); ?></option>
-								<option value="click" <?php if ($LINK_ICONS=='click') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('On Mouse Click'); ?></option>
-							</select>
-						</td>
-					</tr>
-					<tr>
 						<th colspan="2">
 							<?php echo WT_I18N::translate('Individual pages'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<?php echo WT_I18N::translate('Default tab to show on individual page'), help_link('GEDCOM_DEFAULT_TAB'); ?>
-						</td>
-						<td>
-							<?php echo edit_field_default_tab('NEW_GEDCOM_DEFAULT_TAB', get_gedcom_setting(WT_GED_ID, 'GEDCOM_DEFAULT_TAB')); ?>
 						</td>
 					</tr>
 					<tr>

@@ -1,6 +1,5 @@
-/*
- * @version $Id: chrome.css 10442 2011-01-12 13:18:45Z rob $$
- */
+/* $Id: chrome.css 12366 2011-10-21 23:24:43Z greg $ */
+
 html[dir='rtl'] #pedigree_chart {
 left:auto;
 right:20px;

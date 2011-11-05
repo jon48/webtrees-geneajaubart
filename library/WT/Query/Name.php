@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Name.php 12050 2011-07-21 09:00:05Z greg $
+// @version $Id: Name.php 12408 2011-10-25 11:55:08Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -204,7 +204,7 @@ class WT_Query_Name {
 			break;
 		}
 		// Easy cases: the MySQL collation rules take care of it
-		return "$field LIKE '@".$letter."%' ESCAPE '@' COLLATE ".WT_I18N::$collation;
+		return "$field LIKE '@".$letter."%' COLLATE ".WT_I18N::$collation." ESCAPE '@'";
 	}
 
 	// Get a list of initial surname letters for indilist.php and famlist.php
@@ -229,9 +229,9 @@ class WT_Query_Name {
 		}
 
 		// Now fetch initial letters that are not in our alphabet,
-		// including "@" (for "@N.N.") and "" for no surname
+		// including "@" (for "@N.N.") and "" for no surname.
 		$sql=
-			"SELECT LEFT(n_surn, 1), COUNT(n_id)".
+			"SELECT UPPER(LEFT(n_surn, 1)), COUNT(n_id)".
 			" FROM `##name` ".
 			($fams ? " JOIN `##link` ON (n_id=l_from AND n_file=l_file AND l_type='FAMS') " : "").
 			" WHERE n_file={$ged_id} AND n_surn<>''".
@@ -301,7 +301,7 @@ class WT_Query_Name {
 		// Now fetch initial letters that are not in our alphabet,
 		// including "@" (for "@N.N.") and "" for no surname
 		$sql=
-			"SELECT LEFT(n_givn, 1), COUNT(DISTINCT n_id)".
+			"SELECT UPPER(LEFT(n_givn, 1)), COUNT(DISTINCT n_id)".
 			" FROM `##name` ".
 			($fams ? " JOIN `##link` ON (n_id=l_from AND n_file=l_file AND l_type='FAMS') " : "").
 			" WHERE n_file={$ged_id} ".
@@ -384,7 +384,7 @@ class WT_Query_Name {
 	// To search for names with no surnames, use $salpha=","
 	public static function individuals($surn, $salpha, $galpha, $marnm, $fams, $ged_id) {
 		$sql=
-			"SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, i_isdead, i_sex, n_full ".
+			"SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, n_full ".
 			"FROM `##individuals` ".
 			"JOIN `##name` ON (n_id=i_id AND n_file=i_file) ".
 			($fams ? "JOIN `##link` ON (n_id=l_from AND n_file=l_file AND l_type='FAMS') " : "").

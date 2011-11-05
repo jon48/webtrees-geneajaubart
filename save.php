@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: save.php 11611 2011-05-26 11:38:54Z greg $
+// @version $Id: save.php 12356 2011-10-21 15:03:42Z greg $
 
 define('WT_SCRIPT_NAME', 'save.php');
 require './includes/session.php';
@@ -190,7 +190,7 @@ case 'user_setting':
 	//////////////////////////////////////////////////////////////////////////////
 
 	// Authorisation
-	if (!(WT_USER_IS_ADMIN || WT_USER_ID && get_user_setting($id1, 'editaccount') && _array($id2, array('language','defaulttab','visible_online','contact_method')))) {
+	if (!(WT_USER_IS_ADMIN || WT_USER_ID && get_user_setting($id1, 'editaccount') && _array($id2, array('language','visible_online','contact_method')))) {
 		fail();
 	}
 
@@ -212,7 +212,6 @@ case 'user_setting':
 		break;
 	case 'contactmethod':
 	case 'comment':
-	case 'defaulttab':
 	case 'language':
 	case 'theme':
 		break;

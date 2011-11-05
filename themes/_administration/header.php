@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 11961 2011-07-05 10:22:37Z greg $
+// $Id: header.php 12291 2011-10-11 10:25:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,15 +31,21 @@ echo
 	'<head>',
 	'<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />',
 	'<title>', htmlspecialchars($title), '</title>',
-	'<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />',
-	'<link rel="stylesheet" href="', WT_THEME_DIR, 'jquery/jquery-ui_theme.css" type="text/css" />',
+	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png" />',
+	'<link rel="stylesheet" href="', WT_THEME_URL, 'jquery/jquery-ui_theme.css" type="text/css" />',
 	'<link rel="stylesheet" href="', $stylesheet, '" type="text/css" media="all" />',
-	'<meta name="robots" content="noindex,nofollow" />',
+	'<meta name="robots" content="noindex,nofollow" />';
+	
+switch ($BROWSERTYPE) {
+//case 'chrome': uncomment when chrome.css file needs to be added, or add others as needed
+case 'msie':
+	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_URL, $BROWSERTYPE, '.css" />';
+	break;
+}
+
+echo
 	$javascript,
-	'</head>';
-?>
-<?php
-echo	
+	'</head>',
 	'<body id="body">',
 // Header
 	'<div id="admin_head" class="ui-widget-content">',
@@ -85,7 +91,7 @@ if (WT_USER_IS_ADMIN) {
 		'<li><a ', (WT_SCRIPT_NAME=="admin_site_info.php" ? 'class="current" ' : ''), 'href="admin_site_info.php?action=phpinfo">', WT_I18N::translate('PHP information'), '</a></li>',
 		'<li><a ', (WT_SCRIPT_NAME=="admin_site_ipaddress.php" ? 'class="current" ' : ''), 'href="admin_site_ipaddress.php">', WT_I18N::translate('Manage sites'), '</a></li>',
 		'<li><a ', (WT_SCRIPT_NAME=="admin_site_clean.php" ? 'class="current" ' : ''), 'href="admin_site_clean.php">', WT_I18N::translate('Cleanup data directory'), '</a></li>',
-		'</ul></li>',
+		'<li><a ', (WT_SCRIPT_NAME=="admin_mysqldumper.php" ? 'class="current" ' : ''), 'href="admin_mysqldumper.php">',
 		'<li><a ', (WT_SCRIPT_NAME=="admin_trees_manage.php" ? 'class="current" ' : ''), 'href="admin_trees_manage.php">',
 		WT_I18N::translate('Family trees'),
 		'</a></li>';

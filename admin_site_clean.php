@@ -1,30 +1,25 @@
 <?php
-/**
- * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
- *
- * Derived from PhpGedView
- * Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @author Dparker
- * @package webtrees
- * @subpackage Admin
- * @version $Id: admin_site_clean.php 11316 2011-04-13 20:11:01Z greg $
- */
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// version $Id: admin_site_clean.php 12332 2011-10-18 03:01:06Z nigel $
 
 define('WT_SCRIPT_NAME', 'admin_site_clean.php');
 require './includes/session.php';
@@ -84,7 +79,7 @@ print_header(WT_I18N::translate('Cleanup data directory'));
 echo
 	'<h3>', WT_I18N::translate('Cleanup data directory'), '</h3>',
 	'<p>',
-	WT_I18N::translate('To delete a file or subdirectory from the data directory drag it to the wastebasket or select its checkbox.  Click the Delete button to permanently remove the indicated files.'),
+	WT_I18N::translate('To delete a file or subdirectory from the data directory select its checkbox.  Click the Delete button to permanently remove the indicated files.'),
 	'</p><p>',
 	WT_I18N::translate('Files marked with %s are required for proper operation and cannot be removed.', '<img src="./images/RESN_confidential.gif" alt="" />'),
 	'</p>';
@@ -105,7 +100,8 @@ if (isset($_REQUEST['to_delete'])) {
 require_once WT_ROOT.'js/prototype.js.htm';
 require_once WT_ROOT.'js/scriptaculous.js.htm';
 
-echo '<form name="delete_form" method="post" action=""><table id="cleanup"><tr><td>';
+echo '<form name="delete_form" method="post" action="">';
+echo '<div id="cleanup"><ul>';
 
 $dir=dir(WT_DATA_DIR);
 $entries=array();
@@ -113,66 +109,24 @@ while (false !== ($entry=$dir->read())) {
 	$entries[]=$entry;
 }
 sort($entries);
-echo '<div id="cleanup2"><ul id="reorder_list">';
 foreach ($entries as $entry) {
 	if ($entry[0] != '.') {
 		if (in_array($entry, $locked_by_context)) {
-			echo "<li class=\"facts_value\" name=\"$entry\" style=\"margin-bottom:2px;\" id=\"lock_$entry\" >";
+			echo "<li class=\"facts_value\" name=\"$entry\" id=\"lock_$entry\" >";
 			echo '<img src="./images/RESN_confidential.gif" alt="" /> <span>', $entry, '</span>';
 		} else {
-			echo "<li class=\"facts_value\" name=\"$entry\" style=\"cursor:move;margin-bottom:2px;\" id=\"li_$entry\" >";
+			echo "<li class=\"facts_value\" name=\"$entry\" id=\"li_$entry\" >";
 			echo '<input type="checkbox" name="to_delete[]" value="', $entry, '" />', $entry;
 			$element[] = "li_".$entry;
 		}
 		echo '</li>';
 	}
 }
-echo '</ul></div>';
 $dir->close();
 echo
-	'</td><td valign="top" id="trash" class="facts_value02">',
-	'<div id="cleanup3">',
-	'<table><tr><td>',
-	'<div class="icon-trashcan">&nbsp;</div>',
-	'</td>',
-	'<td><ul id="trashlist">',
-	'</ul></td></tr></table>',
-	'</div>',
-	WT_JS_START;
-	foreach($element as $val) {
-		echo "new Draggable('".$val."', {revert:true});";
-	}
-echo
-	'Droppables.add("trash", {',
-	'hoverclass: "facts_valuered",',
-	'onDrop: function(element) {',
-	' $("trashlist").innerHTML +=',
-	'  \'<li class="facts_value">\'+ element.attributes.name.value +\'<input type="hidden" name="to_delete[]" value="\'+element.attributes.name.value+\'"/></li>\' ;',
-	'  element.style.display = \'none\';',
-	'}});',
-	'function ul_clear() {',
-	' $("trashlist").innerHTML = "";',
-	' list = document.getElementById("reorder_list");',
-	' children = list.childNodes;',
-	' for(i=0; i<children.length; i++) {',
-	'  node = children[i];',
-	'  if (node.tagName=="li" || node.tagName=="LI") {',
-	'   node.style.display="list-item";',
-	'  }',
-	' }',
-	'}',
-	'function removeAll() {',
-	' var elements = document.getElementsByName("to_delete[]");',
-	' for(i=0; i<elements.length; i++) {',
-	'  node = elements[i];',
-	'  node.checked = true;',
-	' }',
-	' document.delete_form.submit();',
-	'}',
-	WT_JS_END,
+	'</ul>',
 	'<button type="submit">', WT_I18N::translate('Delete'), '</button>',
-	'<button type="button" onclick="ul_clear(); return false;">', WT_I18N::translate('Cancel'), '</button><br /><br />',
-	'<button type="button" onclick="removeAll(); return false;">', WT_I18N::translate('Remove all nonessential files'), '</button>',
-	'</td></tr></table></form>';
+	'</div>',
+	'</form>';
 
 print_footer();

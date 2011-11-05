@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_edit.php 12074 2011-07-27 23:10:26Z nigel $
+// $Id: functions_edit.php 12375 2011-10-22 21:58:33Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -290,22 +290,6 @@ function edit_field_rela($name, $selected='', $extra='') {
 		$rela_codes[$selected]=$selected;
 	}
 	return select_edit_control($name, $rela_codes, '', $selected, $extra);
-}
-
-// Print an edit control for a default tab field
-function edit_field_default_tab($name, $selected='', $extra='') {
-	$tabs=array();
-	foreach (WT_Module::getActiveTabs() as $module) {
-		$tabs[$module->getName()]=$module->getTitle();
-	}
-	return select_edit_control($name, $tabs, null, $selected, $extra);
-}
-function edit_field_default_tab_inline($name, $selected='', $extra='') {
-	$tabs=array();
-	foreach (WT_Module::getActiveTabs() as $module) {
-		$tabs[$module->getName()]=$module->getTitle();
-	}
-	return select_edit_control_inline($name, $tabs, null, $selected, $extra);
 }
 
 /**
@@ -897,14 +881,6 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 	<script type="text/javascript">
 	<!--
 	function trim(str) {
-		// Commas are used in the GIVN and SURN field to separate lists of surnames.
-		// For example, to differentiate the two Spanish surnames from an English
-		// double-barred name.
-		// Commas *may* be used in the NAME field, and will form part of the displayed
-		// name.  This is not encouraged, as it may confuse some logic that assumes
-		// "list" format names are always "surn, givn".
-		str=str.replace(/,/g," ");
-
 		str=str.replace(/\s\s+/g, " ");
 		return str.replace(/(^\s+)|(\s+$)/g, '');
 	}
@@ -931,15 +907,19 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 			surn=surn.replace(/dzki$/, 'dzka');
 			surn=surn.replace(/żki$/, 'żka');
 		<?php } ?>
+		// Commas are used in the GIVN and SURN field to separate lists of surnames.
+		// For example, to differentiate the two Spanish surnames from an English
+		// double-barred name.
+		// Commas *may* be used in other fields, and will form part of the NAME.
 		if (WT_LOCALE=='vi' || WT_LOCALE=='hu') {
 			// Default format: /SURN/ GIVN
-			return trim(npfx+" /"+trim(spfx+" "+surn.replace(/ *, */, " "))+"/ "+givn+" "+nsfx);
+			return trim(npfx+" /"+trim(spfx+" "+surn).replace(/ *, */, " ")+"/ "+givn.replace(/ *, */, " ")+" "+nsfx);
 		} else if (WT_LOCALE=='zh') {
 			// Default format: /SURN/GIVN
-			return trim(npfx+" /"+trim(spfx+" "+surn.replace(/ *, */, " "))+"/"+givn+" "+nsfx);
+			return trim(npfx+" /"+trim(spfx+" "+surn).replace(/ *, */, " ")+"/"+givn.replace(/ *, */, " ")+" "+nsfx);
 		} else {
 			// Default format: GIVN /SURN/
-			return trim(npfx+" "+givn+" /"+trim(spfx+" "+surn.replace(/ *, */, " "))+"/ "+nsfx);
+			return trim(npfx+" "+givn.replace(/ *, */, " ")+" /"+trim(spfx+" "+surn).replace(/ *, */, " ")+"/ "+nsfx);
 		}
 	}
 
@@ -1421,7 +1401,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		if ($fact=="NOTE" && $islink) {
 			echo WT_Gedcom_Tag::getLabel('SHARED_NOTE');
 			/*
-			if (file_exists(WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_CENS/census_1_ctrl.php') && $pid && $label=="GEDFact Assistant") {
+			if ($pid && $label=='GEDFact Assistant' && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 				// use $label (GEDFact Assistant);
 			} else {
 				echo WT_I18N::translate('Shared note');
@@ -1441,7 +1421,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 			if ($fact=="FORM" && $upperlevel!='OBJE') {
 				echo help_link('FORM');
 			} elseif ($fact=="NOTE" && $islink) {
-				if (file_exists(WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_CENS/census_1_ctrl.php') && $pid && $label=="GEDFact Assistant") {
+				if ($pid && $label=='GEDFact Assistant' && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 					echo help_link('edit_add_GEDFact_ASSISTED');
 				} else {
 					echo help_link('edit_add_SHARED_NOTE');
@@ -1494,15 +1474,13 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		}		
 	}
 
-	if (in_array($fact, $emptyfacts)&& (empty($value) || $value=="y" || $value=="Y")) {
-		$value = strtoupper($value);
-		//-- don't default anything to Y when adding events through people
-		//-- default to Y when specifically adding one of these events
-		if ($level==1) $value="Y"; // default YES
+	if (in_array($fact, $emptyfacts) && ($value=='' || $value=='Y' || $value=='y')) {
 		echo "<input type=\"hidden\" id=\"", $element_id, "\" name=\"", $element_name, "\" value=\"", $value, "\" />";
 		if ($level<=1) {
-			echo "<input type=\"checkbox\" ";
-			if ($value=="Y") echo " checked=\"checked\"";
+			echo '<input type="checkbox" ';
+			if ($value) {
+				echo ' checked="checked"';
+			}
 			echo " onclick=\"if (this.checked) ", $element_id, ".value='Y'; else ", $element_id, ".value=''; \" />";
 			echo WT_I18N::translate('Yes');
 		}
@@ -1510,7 +1488,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		// If GEDFAct_assistant/_CENS/ module exists && we are on the INDI page && action is ADD a new CENS event
 		// Then show the add Shared note input field and the GEDFact assisted icon.
 		// If GEDFAct_assistant/_CENS/ module not installed  ... do not show
-		if (file_exists(WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_CENS/census_1_ctrl.php') && $pid && $fact=="CENS") {
+		if ($pid && $fact=='CENS' && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 			$type_pid=GedcomRecord::getInstance($pid);
 			if ($type_pid->getType()=="INDI" && $action=="add" ) {
 				add_simple_tag("2 SHARED_NOTE", "", "GEDFact Assistant");
@@ -1646,7 +1624,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		if ($fact=="DATE") {
 			print_calendar_popup($element_id);
 			// If GEDFact_assistant/_CENS/ module is installed -------------------------------------------------
-			if ($action=="add" && file_exists(WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_CENS/census_1_ctrl.php') ) {
+			if ($action=='add' && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 				if (isset($CensDate) && $CensDate=="yes") {
 					require_once WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_CENS/census_asst_date.php';
 				}
@@ -1726,7 +1704,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 			}
 			// If GEDFact_assistant/_CENS/ module exists && we are on the INDI page and the action is a GEDFact CENS assistant addition.
 			// Then show the add Shared note assisted icon, if not  ... show regular Shared note icons.
-			if (file_exists(WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_CENS/census_1_ctrl.php') && ($action=="add" || $action=="edit" ) && $pid) {
+			if (($action=='add' || $action=='edit') && $pid && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 				// Check if a CENS event ---------------------------
 				if ($event_add=="census_add") {
 					$type_pid=WT_GedcomRecord::getInstance($pid);
@@ -1762,7 +1740,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		if (($fact=="ASSO" || $fact=="SOUR" || $fact=="OBJE" || ($fact=="NOTE" && $islink)) && $value) {
 			$record=WT_GedcomRecord::getInstance($value);
 			if ($record) {
-				echo ' ', PrintReady($record->getFullName()), ' (', $value, ')';
+				echo ' ', $record->getFullName(), ' (', $value, ')';
 			}
 			else if ($value!="new") {
 				echo ' ', $value;
@@ -1776,7 +1754,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		if (($fact=="ASSO" || $fact=="SOUR" || $fact=="OBJE" || ($fact=="NOTE" && $islink)) && $value) {
 			$record=WT_GedcomRecord::getInstance($value);
 			if ($record) {
-				echo getRLM(), PrintReady($record->getFullName()), ' ', getLRM(), '(', $value, ') ', getLRM(), getRLM();
+				echo getRLM(), $record->getFullName(), ' ', getLRM(), '(', $value, ') ', getLRM(), getRLM();
 			}
 			else if ($value!="new") {
 				echo getRLM(), $value, ' ', getRLM();
@@ -1802,6 +1780,9 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 */
 function print_add_layer($tag, $level=2, $printSaveButton=true) {
 	global $WT_IMAGES, $MEDIA_DIRECTORY, $TEXT_DIRECTION, $gedrec, $FULL_SOURCES, $islink;
+	if ($tag=='OBJE' && get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') < WT_USER_ACCESS_LEVEL) {
+		return;
+	}
 
 	if ($tag=="SOUR") {
 		//-- Add new source to fact
@@ -2320,7 +2301,7 @@ function unlinkMedia($linktoid, $linenum, $mediaid, $level=1, $chan=true) {
 * @param string $fact the new fact we are adding
 */
 function create_add_form($fact) {
-	global $tags, $FULL_SOURCES;
+	global $tags, $FULL_SOURCES, $emptyfacts;
 
 	$tags = array();
 
@@ -2345,7 +2326,11 @@ function create_add_form($fact) {
 		if (in_array($fact, array('ASSO'))) {
 			$fact.=' @';
 		}
-		add_simple_tag("1 ".$fact);
+		if (in_array($fact, $emptyfacts)) {
+			add_simple_tag('1 '.$fact.' Y');
+		} else {
+			add_simple_tag('1 '.$fact);
+		}
 		insert_missing_subtags($tags[0]);
 		//-- handle the special SOURce case for level 1 sources [ 1759246 ]
 		if ($fact=="SOUR") {

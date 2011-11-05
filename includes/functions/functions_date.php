@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_date.php 11789 2011-06-12 09:24:50Z greg $
+// $Id: functions_date.php 12397 2011-10-24 15:19:35Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -42,6 +42,10 @@ if (!defined('WT_WEBTREES')) {
 * @see http://homepages.rootsweb.com/~pmcbride/gedcom/55gcch2.htm#AGE_AT_EVENT
 */
 function get_age_at_event($agestring, $show_years) {
+	switch (WT_LOCALE) {
+		case 'pl':
+			$show_years = true;
+	}
 	return preg_replace(
 		array(
 			'/\bchi(ld)?\b/i',

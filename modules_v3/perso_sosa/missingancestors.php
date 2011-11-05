@@ -91,7 +91,7 @@ if($maxGen>0){
 								$tableMissing .= 	'<tr>';
 								$tableMissing .= 	'<td class="list_value_wrap transparent">'.$sosa.'</td>';
 								$tableMissing .= 	'<td class="list_value_wrap transparent">'.$indi->getXrefLink().'</td>';
-								$tableMissing .= 	'<td class="list_value_wrap left"><a href="'.$indi->getHtmlUrl().'" class="list_item name2">'.PrintReady($indi->getListName()).'</a></td>';
+								$tableMissing .= 	'<td class="list_value_wrap left"><a href="'.$indi->getHtmlUrl().'" class="list_item name2">'.$indi->getFullName().'</a></td>';
 								$estimatedDate = 	$indi->getEstimatedBirthDate();
 								$tableMissing .=	'<td class="list_value_wrap" sorttable_customkey="'.$estimatedDate->JD().'">&nbsp;'.$estimatedDate->Display(true, "%d %M %Y").'&nbsp;</td>';
 								$tableMissing .=	'<td class="list_value_wrap">';

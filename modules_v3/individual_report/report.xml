@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report>
-	<!-- $Id: report.xml 11856 2011-06-19 15:43:34Z greg $ -->
+	<!-- $Id: report.xml 12265 2011-10-06 17:23:50Z lukasz $ -->
 	<Title><var var="WT_I18N::translate('Individual')" /></Title>
 	<Description><var var="WT_I18N::translate('A report of an individual’s details.')" /></Description>
 	<Input name="pid" lookup="INDI" type="text" default=""><var var="WT_I18N::translate('Enter Individual ID')" /></Input>
@@ -107,7 +107,7 @@
 									<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 								</Gedcom>
 								<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-								<GedcomValue tag="SOUR:DATA:TEXT" />
+								 <GedcomValue tag="SOUR:DATA:TEXT" />
 							</Footnote>
 							<SetVar name="source_exist" value="1"/>
 						</RepeatTag>
@@ -120,7 +120,7 @@
 									<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 								</Gedcom>
 								<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-								<GedcomValue tag="SOUR:DATA:TEXT" />
+								 <GedcomValue tag="SOUR:DATA:TEXT" />
 							</Footnote>
 							<SetVar name="source_exist" value="1" />
 						</RepeatTag>
@@ -158,7 +158,7 @@
 										<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 									</Gedcom>
 									<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-									<GedcomValue tag="SOUR:DATA:TEXT" />
+									 <GedcomValue tag="SOUR:DATA:TEXT" />
 								</Footnote>
 								<SetVar name="source_exist" value="1" />
 							</RepeatTag>
@@ -169,10 +169,10 @@
 						<TextBox bgcolor="$fbbgcolor" border="1" newline="1" width="$width2">
 							<Text color="$tcolor" style="text">
 								<if condition="@desc=='Y'">
-									<var var="WT_I18N::translate('Yes')" />  <GedcomValue tag="@fact:PLAC"/>
+									<var var="WT_I18N::translate('yes')" />  <GedcomValue tag="@fact:PLAC"/>
 								</if>
 								<if condition="@desc=='N'">
-									<var var="WT_I18N::translate('No')" />  <GedcomValue tag="@fact:PLAC"/>
+									<var var="WT_I18N::translate('no')" />  <GedcomValue tag="@fact:PLAC"/>
 								</if>
 								<if condition="@desc!='Y' and @desc!='N'">
 									<GedcomValue tag="@desc"/>  <GedcomValue tag="@fact:PLAC"/>
@@ -238,7 +238,7 @@
 												<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 											</Gedcom>
 											<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-											<GedcomValue tag="SOUR:DATA:TEXT" />
+											 <GedcomValue tag="SOUR:DATA:TEXT" />
 										</Footnote>
 										<SetVar name="source_exist" value="1"/>
 									</RepeatTag>
@@ -251,7 +251,7 @@
 												<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 											</Gedcom>
 											<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-											<GedcomValue tag="SOUR:DATA:TEXT" />
+											 <GedcomValue tag="SOUR:DATA:TEXT" />
 										</Footnote>
 										<SetVar name="source_exist" value="1" />
 									</RepeatTag>
@@ -274,7 +274,7 @@
 												<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 											</Gedcom>
 											<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-											<GedcomValue tag="SOUR:DATA:TEXT" />
+											 <GedcomValue tag="SOUR:DATA:TEXT" />
 										</Footnote>
 										<SetVar name="source_exist" value="1"/>
 									</RepeatTag>
@@ -287,7 +287,7 @@
 												<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 											</Gedcom>
 											<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-											<GedcomValue tag="SOUR:DATA:TEXT" />
+											 <GedcomValue tag="SOUR:DATA:TEXT" />
 										</Footnote>
 										<SetVar name="source_exist" value="1" />
 									</RepeatTag>
@@ -314,7 +314,7 @@
 														<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 													</Gedcom>
 													<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-													<GedcomValue tag="SOUR:DATA:TEXT" />
+													 <GedcomValue tag="SOUR:DATA:TEXT" />
 												</Footnote>
 												<SetVar name="source_exist" value="1"/>
 											</RepeatTag>
@@ -327,7 +327,7 @@
 														<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 													</Gedcom>
 													<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-													<GedcomValue tag="SOUR:DATA:TEXT" />
+													 <GedcomValue tag="SOUR:DATA:TEXT" />
 												</Footnote>
 												<SetVar name="source_exist" value="1" />
 											</RepeatTag>
@@ -350,7 +350,7 @@
 														<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 													</Gedcom>
 													<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-													<GedcomValue tag="SOUR:DATA:TEXT" />
+													 <GedcomValue tag="SOUR:DATA:TEXT" />
 												</Footnote>
 												<SetVar name="source_exist" value="1"/>
 											</RepeatTag>
@@ -363,7 +363,7 @@
 														<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 													</Gedcom>
 													<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-													<GedcomValue tag="SOUR:DATA:TEXT" />
+													 <GedcomValue tag="SOUR:DATA:TEXT" />
 												</Footnote>
 												<SetVar name="source_exist" value="1" />
 											</RepeatTag>
@@ -386,7 +386,7 @@
 														<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 													</Gedcom>
 													<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-													<GedcomValue tag="SOUR:DATA:TEXT" />
+													 <GedcomValue tag="SOUR:DATA:TEXT" />
 												</Footnote>
 												<SetVar name="source_exist" value="1"/>
 											</RepeatTag>
@@ -399,7 +399,7 @@
 														<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 													</Gedcom>
 													<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-													<GedcomValue tag="SOUR:DATA:TEXT" />
+													 <GedcomValue tag="SOUR:DATA:TEXT" />
 												</Footnote>
 												<SetVar name="source_exist" value="1" />
 											</RepeatTag>
@@ -444,7 +444,7 @@
 													<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 												</Gedcom>
 												<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-												<GedcomValue tag="SOUR:DATA:TEXT" />
+												 <GedcomValue tag="SOUR:DATA:TEXT" />
 											</Footnote>
 											<SetVar name="source_exist" value="1"/>
 										</RepeatTag>
@@ -457,7 +457,7 @@
 													<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 												</Gedcom>
 												<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-												<GedcomValue tag="SOUR:DATA:TEXT" />
+												 <GedcomValue tag="SOUR:DATA:TEXT" />
 											</Footnote>
 											<SetVar name="source_exist" value="1" />
 										</RepeatTag>
@@ -480,7 +480,7 @@
 													<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 												</Gedcom>
 												<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-												<GedcomValue tag="SOUR:DATA:TEXT" />
+												 <GedcomValue tag="SOUR:DATA:TEXT" />
 											</Footnote>
 											<SetVar name="source_exist" value="1"/>
 										</RepeatTag>
@@ -493,7 +493,7 @@
 													<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 												</Gedcom>
 												<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-												<GedcomValue tag="SOUR:DATA:TEXT" />
+												 <GedcomValue tag="SOUR:DATA:TEXT" />
 											</Footnote>
 											<SetVar name="source_exist" value="1" />
 										</RepeatTag>
@@ -521,7 +521,7 @@
 														<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 													</Gedcom>
 													<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-													<GedcomValue tag="SOUR:DATA:TEXT" />
+													 <GedcomValue tag="SOUR:DATA:TEXT" />
 												</Footnote>
 												<SetVar name="source_exist" value="1"/>
 											</RepeatTag>
@@ -534,7 +534,7 @@
 														<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 													</Gedcom>
 													<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-													<GedcomValue tag="SOUR:DATA:TEXT" />
+													 <GedcomValue tag="SOUR:DATA:TEXT" />
 												</Footnote>
 												<SetVar name="source_exist" value="1" />
 											</RepeatTag>
@@ -557,7 +557,7 @@
 														<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 													</Gedcom>
 													<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-													<GedcomValue tag="SOUR:DATA:TEXT" />
+													 <GedcomValue tag="SOUR:DATA:TEXT" />
 												</Footnote>
 												<SetVar name="source_exist" value="1"/>
 											</RepeatTag>
@@ -570,7 +570,7 @@
 														<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 													</Gedcom>
 													<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-													<GedcomValue tag="SOUR:DATA:TEXT" />
+													 <GedcomValue tag="SOUR:DATA:TEXT" />
 												</Footnote>
 												<SetVar name="source_exist" value="1" />
 											</RepeatTag>
@@ -593,7 +593,7 @@
 														<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 													</Gedcom>
 													<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-													<GedcomValue tag="SOUR:DATA:TEXT" />
+													 <GedcomValue tag="SOUR:DATA:TEXT" />
 												</Footnote>
 												<SetVar name="source_exist" value="1"/>
 											</RepeatTag>
@@ -606,7 +606,7 @@
 														<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 													</Gedcom>
 													<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-													<GedcomValue tag="SOUR:DATA:TEXT" />
+													 <GedcomValue tag="SOUR:DATA:TEXT" />
 												</Footnote>
 												<SetVar name="source_exist" value="1" />
 											</RepeatTag>

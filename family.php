@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: family.php 12015 2011-07-14 11:26:08Z greg $
+// $Id: family.php 12397 2011-10-24 15:19:35Z lukasz $
 
 define('WT_SCRIPT_NAME', 'family.php');
 require './includes/session.php';
@@ -69,16 +69,13 @@ if ($controller->family && $controller->family->canDisplayDetails()) {
 				' ', help_link('pending_changes'),
 				'</p>';
 		}
-	} elseif ($controller->accept_success) {
-		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been accepted.'), '</p>';
-	} elseif ($controller->reject_success) {
-		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been rejected.'), '</p>';
 	}
 } elseif ($controller->family && $SHOW_PRIVATE_RELATIONSHIPS) {
 	print_header($controller->getPageTitle());
 	// Continue - to display the children/parents/grandparents.
 	// We'll check for showing the details again later
 } else {
+	header('HTTP/1.0 403 Forbidden');
 	print_header(WT_I18N::translate('Family'));
 	echo '<p class="ui-state-error">', WT_I18N::translate('This family does not exist or you do not have permission to view it.'), '</p>';
 	print_footer();
@@ -110,7 +107,7 @@ echo WT_JS_END;
 		</td>
 	</tr>
 </table>
-<table align="center" width="95%">
+<table id="family_page" align="center" width="95%">
 	<tr valign="top">
 		<td valign="top" style="width: <?php echo $pbwidth+30; ?>px;"><!--//List of children//-->
 			<?php print_family_children($controller->getFamilyID()); ?>

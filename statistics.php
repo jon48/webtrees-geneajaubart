@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: statistics.php 11758 2011-06-09 19:09:41Z greg $
+// $Id: statistics.php 12262 2011-10-06 16:42:41Z lukasz $
 
 define('WT_SCRIPT_NAME', 'statistics.php');
 require './includes/session.php';
@@ -186,7 +186,7 @@ if (isset($content) && $content==1) {
 					</tr>
 					<tr>
 						<td class="facts_value" align="center"><?php echo $stats->totalMarriages(); ?></td>
-						<td class="facts_value" align="center"><?php echo $stats->totalEventsDivorce(); ?></td>
+						<td class="facts_value" align="center"><?php echo $stats->totalDivorces(); ?></td>
 					</tr>
 					<tr>
 						<td class="facts_label"><?php echo WT_I18N::translate('Marriages by century'); ?></td>
@@ -743,7 +743,7 @@ if (isset($content) && $content==1) {
 
 	jQuery(document).ready(function() {
 		// TODO: change images directory when the common images will be deleted.
-		jQuery('#tabs').tabs({ spinner: '<img src="images/loading.gif" height="18" border="0" />' });
+		jQuery('#tabs').tabs({ spinner: '<img src="<?php echo WT_STATIC_URL; ?>images/loading.gif" height="18" border="0" />' });
 		jQuery("#tabs").tabs({ cache: true, selected: selectedTab });
 		var $tabs = jQuery('#tabs');
 		jQuery('#tabs').bind('tabsshow', function(event, ui) {

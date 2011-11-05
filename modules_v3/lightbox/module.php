@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12376 2011-10-22 22:02:37Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -64,8 +64,7 @@ class lightbox_WT_Module extends WT_Module implements WT_Module_Config, WT_Modul
 
 	// Implement WT_Module_Tab
 	public function hasTabContent() {
-		global $MULTI_MEDIA;
-		return $MULTI_MEDIA && (WT_USER_CAN_EDIT || $this->get_media_count()>0);
+		return WT_USER_CAN_EDIT || $this->get_media_count()>0;
 	}
 
 	// Implement WT_Module_Tab
@@ -93,7 +92,9 @@ class lightbox_WT_Module extends WT_Module implements WT_Module_Config, WT_Modul
 
 	// Implement WT_Module_Tab
 	public function canLoadAjax() {
-		return true;
+		global $SEARCH_SPIDER;
+
+		return !$SEARCH_SPIDER; // Search engines cannot use AJAX
 	}
 
 	// Implement WT_Module_Tab

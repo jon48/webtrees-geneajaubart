@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// @version $Id: sidebar.php 11987 2011-07-10 05:03:55Z nigel $
+// @version $Id: sidebar.php 12260 2011-10-06 16:18:21Z greg $
 
 if (!defined('WT_SCRIPT_NAME')) define('WT_SCRIPT_NAME', 'sidebar.php');
 require_once('includes/session.php');
@@ -73,7 +73,7 @@ if ($sb_action!='none') {
 				if ($counter==0) {
 					echo $mod->getSidebarContent();
 				} else {
-					echo '<img src="', WT_THEME_DIR, 'images/loading.gif" />';
+					echo '<img src="', WT_THEME_URL, 'images/loading.gif" />';
 				}
 				echo '</div>';
 				$counter++;

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: Individual.php 12048 2011-07-20 23:00:37Z greg $
+// $Id: Individual.php 12379 2011-10-22 23:04:59Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -35,10 +35,6 @@ class WT_Controller_Individual extends WT_Controller_Base {
 	var $pid = '';
 	var $indi = null;
 	var $diffindi = null;
-	var $accept_success = false;
-	var $reject_success = false;
-	var $default_tab = '';
-
 	var $name_count = 0;
 	var $total_names = 0;
 	var $SEX_COUNT = 0;
@@ -49,7 +45,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 	var $globalfacts = null;
 
 	function init() {
-		global $USE_RIN, $MAX_ALIVE_AGE;
+		global $USE_RIN, $MAX_ALIVE_AGE, $SEARCH_SPIDER;
 		global $DEFAULT_PIN_STATE, $DEFAULT_SB_CLOSED_STATE;
 		global $Fam_Navigator;
 
@@ -63,14 +59,6 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		}
 		if (empty($gedrec)) {
 			$gedrec = "0 @".$this->pid."@ INDI\n";
-		}
-
-		if (WT_USER_ID) {
-			// Start with the user's default tab
-			$this->default_tab=get_user_setting(WT_USER_ID, 'defaulttab');
-		} else {
-			// Start with the gedcom's default tab
-			$this->default_tab=get_gedcom_setting(WT_GED_ID, 'GEDCOM_DEFAULT_TAB');
 		}
 
 		if (find_person_record($this->pid, WT_GED_ID) || find_updated_record($this->pid, WT_GED_ID)!==null) {
@@ -102,7 +90,6 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		case 'accept':
 			if (WT_USER_CAN_ACCEPT) {
 				accept_all_changes($this->pid, WT_GED_ID);
-				$this->accept_success=true;
 				//-- check if we just deleted the record and redirect to index
 				$gedrec = find_person_record($this->pid, WT_GED_ID);
 				if (empty($gedrec)) {
@@ -116,7 +103,6 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		case 'undo':
 			if (WT_USER_CAN_ACCEPT) {
 				reject_all_changes($this->pid, WT_GED_ID);
-				$this->reject_success=true;
 				$gedrec = find_person_record($this->pid, WT_GED_ID);
 				//-- check if we just deleted the record and redirect to index
 				if (empty($gedrec)) {
@@ -144,11 +130,6 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		$this->tabs = WT_Module::getActiveTabs();
 		foreach ($this->tabs as $mod) {
 			$mod->setController($this);
-			if ($mod->hasTabContent()) {
-				if (empty($this->default_tab)) {
-					$this->default_tab=$mod->getName();
-				}
-			}
 		}
 
 		if (!isset($_SESSION['WT_pin']) && $DEFAULT_PIN_STATE)
@@ -162,9 +143,14 @@ class WT_Controller_Individual extends WT_Controller_Base {
 			$tab = 0;
 			if (isset($_REQUEST['module'])) {
 				$tabname = $_REQUEST['module'];
+				if ($SEARCH_SPIDER) {
+					// Search engines should not make AJAX requests
+					header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+					exit;
+				}
 				if (!array_key_exists($tabname, $this->tabs)) {
 					// An AJAX request for a non-existant tab?
-					header('HTTP/1.0 404 Not Found');
+					header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
 					exit;
 				}
 				header("Content-Type: text/html; charset=UTF-8"); //AJAX calls do not have the meta tag headers and need this set
@@ -179,11 +165,6 @@ class WT_Controller_Individual extends WT_Controller_Base {
 					}
 					echo WT_JS_END;
 				}
-			}
-
-			if (isset($_REQUEST['pin'])) {
-				if ($_REQUEST['pin']=='true') $_SESSION['WT_pin'] = true;
-				else $_SESSION['WT_pin'] = false;
 			}
 
 			if (isset($_REQUEST['sb_closed'])) {
@@ -220,9 +201,9 @@ class WT_Controller_Individual extends WT_Controller_Base {
 	* @return boolean
 	*/
 	function canShowHighlightedObject() {
-		global $MULTI_MEDIA, $SHOW_HIGHLIGHT_IMAGES, $USE_SILHOUETTE;
+		global $SHOW_HIGHLIGHT_IMAGES, $USE_SILHOUETTE;
 
-		if (($this->indi->canDisplayDetails()) && ($MULTI_MEDIA && $SHOW_HIGHLIGHT_IMAGES)) {
+		if (($this->indi->canDisplayDetails()) && $SHOW_HIGHLIGHT_IMAGES) {
 			$firstmediarec = $this->indi->findHighlightedMedia();
 			if ($firstmediarec) return true;
 		}
@@ -292,6 +273,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 
 		echo '<div id="name1">';
 		echo '<dl><dt class="label">', WT_I18N::translate('Name'), '</dt>';
+		$dummy->setPrimaryName(0);
 		echo '<dd class="field">', $dummy->getFullName();
 		if ($this->name_count == 1) {
 			if (WT_USER_IS_ADMIN) {
@@ -471,8 +453,8 @@ class WT_Controller_Individual extends WT_Controller_Base {
 
 		// delete
 		if (WT_USER_CAN_EDIT) {
-			$submenu = new WT_Menu(WT_I18N::translate('Delete this individual'), '#', 'menu-indi-del');
-			$submenu->addOnclick("return deleteperson('".$this->pid."');");
+			$submenu = new WT_Menu(WT_I18N::translate('Delete'), '#', 'menu-indi-del');
+			$submenu->addOnclick("if (confirm('".addslashes(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($this->indi->getFullName())))."')) return delete_person('".$this->indi->getXref()."'); else return false;");
 			$submenu->addIcon('remove');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_delete');
 			$menu->addSubmenu($submenu);

@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: source.php 12015 2011-07-14 11:26:08Z greg $
+// $Id: source.php 12203 2011-09-22 12:09:54Z greg $
 
 define('WT_SCRIPT_NAME', 'source.php');
 require './includes/session.php';
@@ -69,12 +69,9 @@ if ($controller->source && $controller->source->canDisplayDetails()) {
 				' ', help_link('pending_changes'),
 				'</p>';
 		}
-	} elseif ($controller->accept_success) {
-		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been accepted.'), '</p>';
-	} elseif ($controller->reject_success) {
-		echo '<p class="ui-state-highlight">', WT_I18N::translate('The changes have been rejected.'), '</p>';
 	}
 } else {
+	header('HTTP/1.0 403 Forbidden');
 	print_header(WT_I18N::translate('Source'));
 	echo '<p class="ui-state-error">', WT_I18N::translate('This source does not exist or you do not have permission to view it.'), '</p>';
 	print_footer();
@@ -95,55 +92,82 @@ echo 'function show_gedcom_record() {';
 echo ' var recwin=window.open("gedrecord.php?pid=', $controller->source->getXref(), '", "_blank", "top=0, left=0, width=600, height=400, scrollbars=1, scrollable=1, resizable=1");';
 echo '}';
 echo 'function showchanges() { window.location="', $controller->source->getRawUrl(), '"; }';
+?>	jQuery(document).ready(function() {
+		jQuery("#source-tabs").tabs();
+		jQuery("#source-tabs").css('visibility', 'visible');
+	});
+<?php
 echo WT_JS_END;
+echo '<div id="source-details">';
+echo '<h2>', $controller->source->getFullName(), '</h2>';
+echo '<div id="source-tabs">
+	<ul>
+		<li><a href="#source-edit"><span>', WT_I18N::translate('Details'), '</span></a></li>';
+		if ($controller->source->countLinkedIndividuals()) {
+			echo '<li><a href="#indi-sources"><span id="indisource">', WT_I18N::translate('Individuals'), '</span></a></li>';
+		}
+		if ($controller->source->countLinkedFamilies()) {
+			echo '<li><a href="#fam-sources"><span id="famsource">', WT_I18N::translate('Families'), '</span></a></li>';
+		}
+		if ($controller->source->countLinkedMedia()) {
+			echo '<li><a href="#media-sources"><span id="mediasource">', WT_I18N::translate('Media objects'), '</span></a></li>';
+		}
+		if ($controller->source->countLinkedNotes()) {
+			echo '<li><a href="#note-sources"><span id="notesource">', WT_I18N::translate('Notes'), '</span></a></li>';
+		}
+		echo '</ul>';
+	// Edit this source
+	echo '<div id="source-edit">';
+		echo '<table class="facts_table">';
 
-echo '<table width="70%" class="list_table"><tr><td>';
-echo '<span class="name_head">', PrintReady(htmlspecialchars($controller->source->getFullName()));
-echo '</span><br />';
-echo '<table class="facts_table">';
+		$sourcefacts=$controller->source->getFacts();
+		foreach ($sourcefacts as $fact) {
+			print_fact($fact, $controller->source);
+		}
 
-$sourcefacts=$controller->source->getFacts();
-foreach ($sourcefacts as $fact) {
-	print_fact($fact, $controller->source);
-}
+		// Print media
+		print_main_media($controller->sid);
 
-// Print media
-print_main_media($controller->sid);
-
-// new fact link
-if ($controller->source->canEdit()) {
-	print_add_new_fact($controller->sid, $sourcefacts, 'SOUR');
-	// new media
-	echo '<tr><td class="descriptionbox">';
-	echo WT_I18N::translate('Add media'), help_link('add_media');
-	echo '</td><td class="optionbox">';
-	echo '<a href="javascript:;" onclick="window.open(\'addmedia.php?action=showmediaform&linktoid=', $controller->sid, '\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">', WT_I18N::translate('Add a new media object'), '</a>';
-	echo '<br />';
-	echo '<a href="javascript:;" onclick="window.open(\'inverselink.php?linktoid=', $controller->sid, '&linkto=source\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">', WT_I18N::translate('Link to an existing media object'), '</a>';
-	echo '</td></tr>';
-}
-echo '</table><br /><br /></td></tr><tr class="center"><td colspan="2">';
-
-// Individuals linked to this source
-if ($controller->source->countLinkedIndividuals()) {
-	print_indi_table($controller->source->fetchLinkedIndividuals(), $controller->source->getFullName());
-}
-
-// Families linked to this source
-if ($controller->source->countLinkedFamilies()) {
-	print_fam_table($controller->source->fetchLinkedFamilies(), $controller->source->getFullName());
-}
-
-// Media Items linked to this source
-if ($controller->source->countLinkedMedia()) {
-	print_media_table($controller->source->fetchLinkedMedia(), $controller->source->getFullName());
-}
-
-// Shared Notes linked to this source
-if ($controller->source->countLinkedNotes()) {
-	print_note_table($controller->source->fetchLinkedNotes(), $controller->source->getFullName());
-}
-
-echo '</td></tr></table>';
-
+		// new fact link
+		if ($controller->source->canEdit()) {
+			print_add_new_fact($controller->sid, $sourcefacts, 'SOUR');
+			// new media
+			if (get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') >= WT_USER_ACCESS_LEVEL) {
+				echo '<tr><td class="descriptionbox">';
+				echo WT_I18N::translate('Add media'), help_link('add_media');
+				echo '</td><td class="optionbox">';
+				echo '<a href="javascript:;" onclick="window.open(\'addmedia.php?action=showmediaform&linktoid=', $controller->sid, '\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">', WT_I18N::translate('Add a new media object'), '</a>';		
+				echo '<br />';
+				echo '<a href="javascript:;" onclick="window.open(\'inverselink.php?linktoid=', $controller->sid, '&linkto=source\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">', WT_I18N::translate('Link to an existing media object'), '</a>';
+				echo '</td></tr>';
+			}
+		}
+		echo '</table>
+	</div>'; // close "details"
+	// Individuals linked to this source
+	if ($controller->source->countLinkedIndividuals()) {
+		echo '<div id="indi-sources">';
+		print_indi_table($controller->source->fetchLinkedIndividuals(), $controller->source->getFullName());
+		echo '</div>'; //close "indi-sources"
+	}
+	// Families linked to this source
+	if ($controller->source->countLinkedFamilies()) {
+		echo '<div id="fam-sources">';
+		print_fam_table($controller->source->fetchLinkedFamilies(), $controller->source->getFullName());
+		echo '</div>'; //close "fam-sources"
+	}
+	// Media Items linked to this source
+	if ($controller->source->countLinkedMedia()) {
+		echo '<div id="media-sources">';
+		print_media_table($controller->source->fetchLinkedMedia(), $controller->source->getFullName());
+		echo '</div>'; //close "media-sources"
+	}
+	// Shared Notes linked to this source
+	if ($controller->source->countLinkedNotes()) {
+		echo '<div id="note-sources">';
+		print_note_table($controller->source->fetchLinkedNotes(), $controller->source->getFullName());
+		echo '</div>'; //close "note-sources"
+	}
+echo '</div>'; //close div "source-tabs"
+echo '</div>'; //close div "source-details"
 print_footer();

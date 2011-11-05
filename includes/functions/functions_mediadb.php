@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_mediadb.php 12053 2011-07-21 17:07:39Z greg $
+// $Id: functions_mediadb.php 12441 2011-10-27 20:56:26Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -263,6 +263,11 @@ if (!$excludeLinks) {
 		}
 		foreach (fetch_linked_sour($media["XREF"], 'OBJE', WT_GED_ID) as $sour) {
 			$medialist[$key]["LINKS"][$sour->getXref()]='SOUR';
+			$medialist[$key]["LINKED"]=true;
+		}
+		// Notes cannot link to media objects directly - but source citations may link to them.
+		foreach (fetch_linked_note($media["XREF"], 'OBJE', WT_GED_ID) as $note) {
+			$medialist[$key]["LINKS"][$note->getXref()]='NOTE';
 			$medialist[$key]["LINKED"]=true;
 		}
 	}
@@ -926,7 +931,7 @@ function display_silhouette(array $config = array()) {
 		$config['class']='pedigree_image_portrait';
 		$spacestr=' vspace="0" hspace="0" ';
 	}
-
+	$config['img_title']=strip_tags($config['img_title']);
 	$classstr='';
 	if ($config['class']) {
 		if ($TEXT_DIRECTION == "rtl") $config['class'] .= "_rtl";
@@ -1841,7 +1846,13 @@ function PrintMediaLinks($links, $size = "small") {
 				$linkItem['record']=$record;
 				$linkList[] = $linkItem;
 				break;
-
+			case 'NOTE':
+				// Notes cannot link to media objects directly - but source citations may link to them.
+				$linkItem = array ();
+				$linkItem['name']='D'.$record->getSortName();
+				$linkItem['record']=$record;
+				$linkList[] = $linkItem;
+				break;
 			}
 		}
 	}
@@ -1870,6 +1881,10 @@ function PrintMediaLinks($links, $size = "small") {
 			break;
 		case 'SOUR':
 			echo WT_I18N::translate('View Source');
+			break;
+		case 'NOTE':
+			// Notes cannot link to media objects directly - but source citations may link to them.
+			echo WT_I18N::translate('View Note');
 			break;
 		}
 		echo ' -- ';

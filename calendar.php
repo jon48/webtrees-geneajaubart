@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: calendar.php 11991 2011-07-11 05:45:33Z larry $
+// $Id: calendar.php 12203 2011-09-22 12:09:54Z greg $
 
 define('WT_SCRIPT_NAME', 'calendar.php');
 require './includes/session.php';
@@ -586,7 +586,7 @@ function calendar_list_text($list, $tag1, $tag2, $show_sex_symbols) {
 
 	foreach ($list as $id=>$facts) {
 		$tmp=WT_GedcomRecord::GetInstance($id);
-		echo $tag1, '<a href="', $tmp->getHtmlUrl(), '">', PrintReady($tmp->getFullName()), '</a> ';
+		echo $tag1, '<a href="', $tmp->getHtmlUrl(), '">', $tmp->getFullName(), '</a> ';
 		if ($show_sex_symbols && $tmp->getType()=='INDI')
 			switch ($tmp->getSex()) {
 			case 'M':

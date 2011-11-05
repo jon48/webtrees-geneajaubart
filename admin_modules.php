@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: admin_modules.php 11843 2011-06-17 12:10:21Z greg $
+// @version $Id: admin_modules.php 12466 2011-10-30 01:13:24Z nigel $
 
 define('WT_SCRIPT_NAME', 'admin_modules.php');
 
@@ -96,12 +96,12 @@ print_header(WT_I18N::translate('Module administration'));
   
 	var oTable = jQuery('#installed_table').dataTable( {
 		"oLanguage": {
-			"sLengthMenu": '<?php echo /* I18N: %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="30">30</option><option value="40">40</option><option value="50">50</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
+			"sLengthMenu": '<?php echo /* I18N: %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
 			"sZeroRecords": '<?php echo WT_I18N::translate('No records to display');?>',
 			"sInfo": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_'); ?>',
 			"sInfoEmpty": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '0', '0', '0'); ?>',
 			"sInfoFiltered": '<?php echo /* I18N: %s is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_'); ?>',
-			"sSearch": '<?php echo WT_I18N::translate('Search');?>',
+			"sSearch": '<?php echo WT_I18N::translate('Filter');?>',
 			"oPaginate": {
 				"sFirst": '<?php echo /* I18N: button label, first page    */ WT_I18N::translate('first'); ?>',
 				"sLast": '<?php echo /* I18N: button label, last page     */ WT_I18N::translate('last'); ?>',
@@ -109,7 +109,7 @@ print_header(WT_I18N::translate('Module administration'));
 				"sPrevious": '<?php echo /* I18N: button label, previous page */ WT_I18N::translate('previous'); ?>'
 			}
 		},
-		"sDom": '<"H"prf>t<"F"li>',
+		"sDom": '<"H"pf<"dt-clear">irl>t<"F"pl>',
 		"bJQueryUI": true,
 		"bAutoWidth":false,
 		"aaSorting": [[ 1, "asc" ]],

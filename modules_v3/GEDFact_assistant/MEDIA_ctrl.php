@@ -23,11 +23,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: MEDIA_ctrl.php 11872 2011-06-21 19:32:06Z greg $
+// $Id: MEDIA_ctrl.php 12260 2011-10-06 16:18:21Z greg $
 
 $controller = new WT_Controller_Individual();
 $controller->init();
-echo '<link href="'.WT_MODULES_DIR.'GEDFact_assistant/css/gf_styles.css" rel="stylesheet" type="text/css" media="screen" />';
+echo '<link href="'.WT_STATIC_URL.WT_MODULES_DIR.'GEDFact_assistant/css/gf_styles.css" rel="stylesheet" type="text/css" media="screen" />';
 
 global $tabno, $linkToID, $SEARCH_SPIDER, $GOOGLEMAP_PH_CONTROLS;
 global $WT_IMAGES, $SHOW_AGE_DIFF;

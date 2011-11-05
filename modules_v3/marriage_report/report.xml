@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report>
-	<!-- $Id: report.xml 12088 2011-07-31 19:30:20Z lukasz $ -->
+	<!-- $Id: report.xml 12426 2011-10-26 10:18:23Z greg $ -->
 	<Title><var var="WT_I18N::translate('Marriages')" /></Title>
 	<Description><var var="WT_I18N::translate('A report of individuals who were married in a given time or place.')" /></Description>
 	<Input name="name" lookup="NAME" type="text"><var var="WT_I18N::translate('Name')" /></Input>
@@ -55,7 +55,7 @@
 
 		<Body>
 			<SetVar name="printedFamilies" value="0" />
-			<List list="family" filter1="MARR:PLAC CONTAINS $marrplace" filter2="MARR:DATE GTE $marrdate1" filter3="MARR:DATE LTE $marrdate2" sortby="$sortby">
+			<List list="family" filter1="MARR:PLAC CONTAINS $marrplace" filter2="MARR:DATE GTE $marrdate1" filter3="MARR:DATE LTE $marrdate2" filter4="REGEXP /\n1 MARR/" sortby="$sortby">
 			<!-- filter4 should be: filter4="NAME CONTAINS $name", but the family name doesn't exist as a field in the database,
 					so we can't use that.  -->
 				<SetVar name="skipFamily" value="no" />
@@ -101,7 +101,7 @@
 									<if condition="@PUBL!=''"> (<GedcomValue tag="PUBL" />)</if>
 								</Gedcom>
 								<if condition="@PAGE!=''">: <GedcomValue tag="SOUR:PAGE" /></if>
-								<GedcomValue tag="SOUR:DATA:TEXT" />
+								 <GedcomValue tag="SOUR:DATA:TEXT" />
 								<SetVar name="usebr" value="1"/>
 							</RepeatTag>
 						</Text>

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_export.php 11789 2011-06-12 09:24:50Z greg $
+// $Id: functions_export.php 12360 2011-10-21 16:45:57Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -149,22 +149,32 @@ function remove_custom_tags($gedrec) {
 	return preg_replace('/\n\d _(WT|THUM ).*/', '', $gedrec);
 }
 
-/**
- * Convert media path by:
- * - removing current media directory
- * - adding a new prefix
- * - making directory name separators consistent
- */
+// Convert media path by:
+// - removing current media directory
+// - adding a new prefix
+// - making directory name separators consistent
 function convert_media_path($rec, $path, $slashes) {
 	global $MEDIA_DIRECTORY;
 
-	$file = get_gedcom_value("FILE", 1, $rec);
-	if (preg_match("~^https?://~i", $file)) return $rec; // don't modify URLs
-
-	$rec = str_replace('FILE '.$MEDIA_DIRECTORY, 'FILE '.trim($path).'/', $rec);
-	$rec = str_replace('\\', '/', $rec);
-	$rec = str_replace('//', '/', $rec);
-	if ($slashes=='backward') $rec = str_replace('/', '\\', $rec);
+	if (preg_match('/\n1 FILE (.+)/', $rec, $match)) {
+		$old_file_name=$match[1];
+		if (!preg_match('~^(https?|ftp):~', $old_file_name)) { // Don't modify external links
+			if (strpos($old_file_name, $MEDIA_DIRECTORY)===0) {
+				$new_file_name=substr_replace($old_file_name, $path, 0, strlen($MEDIA_DIRECTORY));
+			} else {
+				$new_file_name=$old_file_name;
+			}
+			switch ($slashes) {
+			case 'backward':
+				$new_file_name=preg_replace('~/+~', '\\', $new_file_name);
+				break;
+			case 'forward':
+				$new_file_name=preg_replace('~\\+~', '/', $new_file_name);
+				break;
+			}
+			$rec=str_replace('\n1 FILE '.$old_file_name, '\n1 FILE '.$new_file_name, $rec);
+		}
+	}
 	return $rec;
 }
 
@@ -200,7 +210,7 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 		$access_level=WT_PRIV_PUBLIC;
 		break;
 	case 'none':
-		$access_level=WT_USER_ACCESS_LEVEL;
+		$access_level=WT_PRIV_HIDE;
 		break;
 	}
 
@@ -214,15 +224,11 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 	$buffer=reformat_record_export($head);
 
 	$rows=WT_DB::prepare(
-		"SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, i_isdead, i_sex".
+		"SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec".
 		" FROM `##individuals` WHERE i_file=? ORDER BY i_id"
 	)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
 	foreach ($rows as $row) {
-		if ($exportOptions['privatize']=='none') {
-			$rec=$row['gedrec'];
-		} else {
-			list($rec)=WT_Person::getInstance($row)->privatizeGedcom($access_level);
-		}
+		list($rec)=WT_Person::getInstance($row)->privatizeGedcom($access_level);
 		if ($exportOptions['noCustomTags']=='yes') {
 			$rec=remove_custom_tags($rec);
 		}
@@ -237,15 +243,11 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 	}
 
 	$rows=WT_DB::prepare(
-		"SELECT 'FAM' AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec, f_husb, f_wife, f_numchil".
+		"SELECT 'FAM' AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec".
 		" FROM `##families` WHERE f_file=? ORDER BY f_id"
 	)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
 	foreach ($rows as $row) {
-		if ($exportOptions['privatize']=='none') {
-			$rec=$row['gedrec'];
-		} else {
-			list($rec)=WT_Family::getInstance($row)->privatizeGedcom($access_level);
-		}
+		list($rec)=WT_Family::getInstance($row)->privatizeGedcom($access_level);
 		if ($exportOptions['noCustomTags']=='yes') {
 			$rec=remove_custom_tags($rec);
 		}
@@ -264,11 +266,7 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 		" FROM `##sources` WHERE s_file=? ORDER BY s_id"
 	)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
 	foreach ($rows as $row) {
-		if ($exportOptions['privatize']=='none') {
-			$rec=$row['gedrec'];
-		} else {
-			list($rec)=WT_Source::getInstance($row)->privatizeGedcom($access_level);
-		}
+		list($rec)=WT_Source::getInstance($row)->privatizeGedcom($access_level);
 		if ($exportOptions['noCustomTags']=='yes') {
 			$rec=remove_custom_tags($rec);
 		}
@@ -287,11 +285,7 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 		" FROM `##other` WHERE o_file=? AND o_type!=? AND o_type!=? ORDER BY o_id"
 	)->execute(array($ged_id, 'HEAD', 'TRLR'))->fetchAll(PDO::FETCH_ASSOC);
 	foreach ($rows as $row) {
-		if ($exportOptions['privatize']=='none') {
-			$rec=$row['gedrec'];
-		} else {
-			list($rec)=WT_GedcomRecord::getInstance($row)->privatizeGedcom($access_level);
-		}
+		list($rec)=WT_GedcomRecord::getInstance($row)->privatizeGedcom($access_level);
 		if ($exportOptions['noCustomTags']=='yes') {
 			$rec=remove_custom_tags($rec);
 		}
@@ -310,11 +304,7 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 		" FROM `##media` WHERE m_gedfile=? ORDER BY m_media"
 	)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
 	foreach ($rows as $row) {
-		if ($exportOptions['privatize']=='none') {
-			$rec=$row['gedrec'];
-		} else {
-			list($rec)=WT_Media::getInstance($row)->privatizeGedcom($access_level);
-		}
+		list($rec)=WT_Media::getInstance($row)->privatizeGedcom($access_level);
 		$rec = convert_media_path($rec, $exportOptions['path'], $exportOptions['slashes']);
 		if ($exportOptions['noCustomTags']=='yes') {
 			$rec=remove_custom_tags($rec);

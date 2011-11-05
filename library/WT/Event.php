@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Event.php 12042 2011-07-20 16:33:49Z greg $
+// $Id: Event.php 12325 2011-10-16 21:22:41Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -246,7 +246,17 @@ class WT_Event {
 		if ($abbreviate) {
 			return WT_Gedcom_Tag::getAbbreviation($this->tag);
 		} else {
-			return WT_Gedcom_Tag::getLabel($this->tag, $this->parentObject);
+			switch($this->tag) {
+			case 'EVEN':
+			case 'FACT':
+				if ($this->getType()) {
+					// Custom FACT/EVEN - with a TYPE
+					return WT_I18N::translate(htmlspecialchars($this->type));
+				}
+				// no break - drop into next case
+			default:
+				return WT_Gedcom_Tag::getLabel($this->tag, $this->parentObject);
+			}
 		}
 	}
 
@@ -264,7 +274,7 @@ class WT_Event {
 		if ($this->gedcomRecord != "1 DEAT") {
 		   $data .= "<span class=\"details_label\">".$this->getLabel($ABBREVIATE_CHART_LABELS)."</span> ";
 		}
-		$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
+		$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
 		if (!in_array($this->tag, $emptyfacts))
 			$data .= PrintReady($this->detail);
 		if (!$this->dest)
@@ -282,10 +292,10 @@ class WT_Event {
 		$tag=$this->getTag();
 		$file=$tag.'.png';
 		if (file_exists($dir.$file)) {
-			return '<img src="'.$dir.$file.'" title="'.WT_Gedcom_Tag::getLabel($tag).'" align="middle"/>';
+			return '<img src="'.WT_STATIC_URL.$dir.$file.'" title="'.WT_Gedcom_Tag::getLabel($tag).'" align="middle"/>';
 		} elseif (file_exists($dir.'NULL.png')) {
 			// Spacer image - for alignment - until we move to a sprite.
-			return '<img src="'.$dir.'NULL.png" align="middle" />';
+			return '<img src="'.WT_STATIC_URL.$dir.'NULL.png" align="middle" />';
 		} else {
 			return '';
 		}

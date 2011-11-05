@@ -10,8 +10,6 @@
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
 //
-// Modifications Copyright (c) 2010 Greg Roach
-//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
@@ -26,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Stats.php 11996 2011-07-12 18:54:09Z lukasz $
+// $Id: Stats.php 12437 2011-10-27 17:50:19Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -673,10 +671,15 @@ class WT_Stats {
 		}
 	}
 
+	// The totalLiving/totalDeceased queries assume that every dead person will
+	// have a DEAT record.  It will not include individuals who were born more
+	// than MAX_ALIVE_AGE years ago, and who have no DEAT record.
+	// A good reason to run the "Add missing DEAT records" batch-update!
+	// However, SQL cannot provide the same logic used by Person::isDead().
 	function totalLiving() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=? AND i_isdead=?")
-			->execute(array($this->_ged_id, 0))
+			WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=? AND i_gedcom NOT REGEXP '\\n1 (".WT_EVENTS_DEAT.")'")
+			->execute(array($this->_ged_id))
 			->fetchOne();
 	}
 
@@ -686,30 +689,13 @@ class WT_Stats {
 
 	function totalDeceased() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=? AND i_isdead=?")
-			->execute(array($this->_ged_id, 1))
+			WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=? AND i_gedcom REGEXP '\\n1 (".WT_EVENTS_DEAT.")'")
+			->execute(array($this->_ged_id))
 			->fetchOne();
 	}
 
 	function totalDeceasedPercentage() {
 		return $this->_getPercentage($this->totalDeceased(), 'individual');
-	}
-
-	function totalMortalityUnknown() {
-		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=? AND i_isdead=?")
-			->execute(array($this->_ged_id, -1))
-			->fetchOne();
-	}
-
-	function totalMortalityUnknownPercentage() {
-		return $this->_getPercentage($this->totalMortalityUnknown(), 'individual');
-	}
-
-	function mortalityUnknown() {
-		$rows=self::_runSQL("SELECT i_id AS id FROM `##individuals` WHERE i_file={$this->_ged_id} AND i_isdead=-1");
-		if (!isset($rows[0])) {return '';}
-		return $rows;
 	}
 
 	function chartMortality($params=null) {
@@ -718,24 +704,11 @@ class WT_Stats {
 		if (isset($params[0]) && $params[0] != '') {$size = strtolower($params[0]);} else {$size = $WT_STATS_S_CHART_X."x".$WT_STATS_S_CHART_Y;}
 		if (isset($params[1]) && $params[1] != '') {$color_living = strtolower($params[1]);} else {$color_living = 'ffffff';}
 		if (isset($params[2]) && $params[2] != '') {$color_dead = strtolower($params[2]);} else {$color_dead = 'cccccc';}
-		if (isset($params[3]) && $params[3] != '') {$color_unknown = strtolower($params[3]);} else {$color_unknown = '777777';}
 		$sizes = explode('x', $size);
 		$tot_l = $this->totalLivingPercentage();
 		$tot_d = $this->totalDeceasedPercentage();
-		$tot_u = $this->totalMortalityUnknownPercentage();
-		if ($tot_l == 0 && $tot_d == 0 && $tot_u == 0) {
+		if ($tot_l == 0 && $tot_d == 0) {
 			return '';
-		} else if ($tot_u > 0) {
-			$chd = self::_array_to_extended_encoding(array($tot_u, $tot_l, $tot_d));
-			$chl =
-				WT_I18N::translate_c('unknown people', 'Unknown').' - '.round($tot_u,1).'%|'.
-				WT_I18N::translate('Living').' - '.round($tot_l,1).'%|'.
-				WT_I18N::translate('Dead').' - '.round($tot_d,1).'%';
-			$chart_title =
-				WT_I18N::translate('Living').' ['.round($tot_l,1).'%], '.
-				WT_I18N::translate('Dead').' ['.round($tot_d,1).'%], '.
-				WT_I18N::translate_c('unknown people', 'Unknown').' ['.round($tot_u,1).'%]';
-			return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_unknown},{$color_living},{$color_dead}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
 		} else {
 			$chd = self::_array_to_extended_encoding(array($tot_l, $tot_d));
 			$chl =
@@ -764,9 +737,7 @@ class WT_Stats {
 	}
 
 	function _totalMediaType($type='all') {
-		global $MULTI_MEDIA;
-
-		if (!$MULTI_MEDIA || !in_array($type, self::$_media_types) && $type != 'all' && $type != 'unknown') {
+		if (!in_array($type, self::$_media_types) && $type != 'all' && $type != 'unknown') {
 			return 0;
 		}
 		$sql="SELECT COUNT(*) AS tot FROM `##media` WHERE m_gedfile=?";
@@ -1536,37 +1507,36 @@ class WT_Stats {
 		global $TEXT_DIRECTION;
 
 		if ($sex == 'F') {
-			$sex_search = " AND i_sex='F'";
+			$sex_search = " AND i_sex='F' ";
 		} elseif ($sex == 'M') {
-			$sex_search = " AND i_sex='M'";
+			$sex_search = " AND i_sex='M' ";
 		} else {
 			$sex_search = '';
 		}
 		if ($params !== null && isset($params[0])) {$total = $params[0];} else {$total = 10;}
 		$total=(int)$total;
-		$rows=self::_runSQL(''
-			.' SELECT '
-				.' MAX(death.d_julianday2-birth.d_julianday1) AS age,'
-				.' death.d_gid AS deathdate'
-			.' FROM'
-				." `##dates` AS death,"
-				." `##dates` AS birth,"
-				." `##individuals` AS indi"
-			.' WHERE'
-				.' indi.i_id=birth.d_gid AND'
-				.' birth.d_gid=death.d_gid AND'
-				." death.d_file={$this->_ged_id} AND"
-				.' birth.d_file=death.d_file AND'
-				.' birth.d_file=indi.i_file AND'
-				." birth.d_fact IN ('BIRT', 'CHR', 'BAPM', '_BRTM') AND"
-				." death.d_fact IN ('DEAT', 'BURI', 'CREM') AND"
-				.' birth.d_julianday1<>0 AND'
-				.' death.d_julianday1>birth.d_julianday2'
-				.$sex_search
-			.' GROUP BY'
-				.' deathdate'
-			.' ORDER BY'
-				.' age DESC LIMIT '.$total
+		$rows=self::_runSQL(
+			'SELECT '.
+			' MAX(death.d_julianday2-birth.d_julianday1) AS age, '.
+			' death.d_gid AS deathdate '.
+			'FROM '.
+			" `##dates` AS death, ".
+			" `##dates` AS birth, ".
+			" `##individuals` AS indi ".
+			'WHERE '.
+			' indi.i_id=birth.d_gid AND '.
+			' birth.d_gid=death.d_gid AND '.
+			" death.d_file={$this->_ged_id} AND ".
+			' birth.d_file=death.d_file AND '.
+			' birth.d_file=indi.i_file AND '.
+			" birth.d_fact='BIRT' AND ". // Only use BIRT/DEAT.  Using CHR/BURI can give spurious results.
+			" death.d_fact='DEAT' AND ".
+			' birth.d_julianday1<>0 AND '.
+			' death.d_julianday1>birth.d_julianday2 '.
+			$sex_search.
+			'GROUP BY deathdate '.
+			'ORDER BY age DESC '.
+			'LIMIT '.$total
 		);
 		if (!isset($rows[0])) {return '';}
 		$top10 = array();
@@ -1583,9 +1553,9 @@ class WT_Stats {
 			$age = get_age_at_event($age, true);
 			if ($person->canDisplayDetails()) {
 				if ($type == 'list') {
-					$top10[]="\t<li><a href=\"".$person->getHtmlUrl()."\">".PrintReady($person->getFullName()."</a> [".$age."]")."</li>\n";
+					$top10[]="\t<li><a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> [".$age."]"."</li>\n";
 				} else {
-					$top10[]="<a href=\"".$person->getHtmlUrl()."\">".PrintReady($person->getFullName()."</a> [".$age."]");
+					$top10[]="<a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> [".$age."]";
 				}
 			}
 		}
@@ -1617,24 +1587,23 @@ class WT_Stats {
 		if ($params !== null && isset($params[0])) {$total = $params[0];} else {$total = 10;}
 		$total=(int)$total;
 		$rows=self::_runSQL(''
-			.' SELECT'
-				.' birth.d_gid AS id,'
-				.' MIN(birth.d_julianday1) AS age'
-			.' FROM'
-				." `##dates` AS birth,"
-				." `##individuals` AS indi"
-			.' WHERE'
-				.' indi.i_id=birth.d_gid AND'
-				.' indi.i_isdead=0 AND'
-				." birth.d_file={$this->_ged_id} AND"
-				.' birth.d_file=indi.i_file AND'
-				." birth.d_fact IN ('BIRT', 'CHR', 'BAPM', '_BRTM') AND"
-				.' birth.d_julianday1<>0'
-				.$sex_search
+			." SELECT"
+			." birth.d_gid AS id,"
+			." MIN(birth.d_julianday1) AS age"
+			." FROM"
+			." `##dates` AS birth," // assume all events occur *after* birth
+			." `##individuals` AS indi"
+			." WHERE"
+			." indi.i_id=birth.d_gid AND"
+			." indi.i_gedcom NOT REGEXP '\n1 (".WT_EVENTS_DEAT.")' AND"
+			." birth.d_file={$this->_ged_id} AND"
+			." birth.d_file=indi.i_file AND"
+			." birth.d_julianday1<>0"
+			.$sex_search
 			.' GROUP BY'
-				.' id'
+			.' id'
 			.' ORDER BY'
-				.' age ASC LIMIT '.$total
+			.' age ASC LIMIT '.$total
 		);
 		if (!isset($rows)) {return 0;}
 		$top10 = array();
@@ -1650,9 +1619,9 @@ class WT_Stats {
 			}
 			$age = get_age_at_event($age, true);
 			if ($type == 'list') {
-				$top10[]="\t<li><a href=\"".$person->getHtmlUrl()."\">".PrintReady($person->getFullName()."</a> [".$age."]")."</li>\n";
+				$top10[]="\t<li><a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> [".$age."]"."</li>\n";
 			} else {
-				$top10[]="<a href=\"".$person->getHtmlUrl()."\">".PrintReady($person->getFullName()."</a> [".$age."]");
+				$top10[]="<a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> [".$age."]";
 			}
 		}
 		if ($type == 'list') {
@@ -1671,30 +1640,30 @@ class WT_Stats {
 
 	function _averageLifespanQuery($sex='BOTH', $show_years=false) {
 		if ($sex == 'F') {
-			$sex_search = " AND i_sex='F'";
+			$sex_search = " AND i_sex='F' ";
 		} elseif ($sex == 'M') {
-			$sex_search = " AND i_sex='M'";
+			$sex_search = " AND i_sex='M' ";
 		} else {
 			$sex_search = '';
 		}
-		$rows=self::_runSQL(''
-			.' SELECT'
-				.' AVG(death.d_julianday2-birth.d_julianday1) AS age'
-			.' FROM'
-				." `##dates` AS death,"
-				." `##dates` AS birth,"
-				." `##individuals` AS indi"
-			.' WHERE'
-				.' indi.i_id=birth.d_gid AND'
-				.' birth.d_gid=death.d_gid AND'
-				." death.d_file={$this->_ged_id} AND"
-				.' birth.d_file=death.d_file AND'
-				.' birth.d_file=indi.i_file AND'
-				." birth.d_fact IN ('BIRT', 'CHR', 'BAPM', '_BRTM') AND"
-				." death.d_fact IN ('DEAT', 'BURI', 'CREM') AND"
-				.' birth.d_julianday1<>0 AND'
-				.' death.d_julianday1>birth.d_julianday2'
-				.$sex_search
+		$rows=self::_runSQL(
+			"SELECT ".
+			" AVG(death.d_julianday2-birth.d_julianday1) AS age ".
+			"FROM ".
+			" `##dates` AS death, ".
+			" `##dates` AS birth, ".
+			" `##individuals` AS indi ".
+			"WHERE ".
+			" indi.i_id=birth.d_gid AND ".
+			" birth.d_gid=death.d_gid AND ".
+			" death.d_file=".$this->_ged_id. " AND ".
+			" birth.d_file=death.d_file AND ".
+			" birth.d_file=indi.i_file AND ".
+			" birth.d_fact='BIRT' AND ". // Use only BIRT and DEAT.  Using CHR/BURI can give spurious results.
+			" death.d_fact='DEAT' AND ".
+			" birth.d_julianday1<>0 AND ".
+			" death.d_julianday1>birth.d_julianday2 ".
+			$sex_search
 		);
 		if (!isset($rows[0])) {return '';}
 		$row = $rows[0];
@@ -1924,7 +1893,7 @@ class WT_Stats {
 				}
 				break;
 			case 'name':
-				$result="<a href=\"".$record->getHtmlUrl()."\">".PrintReady($record->getFullName())."</a>";
+				$result="<a href=\"".$record->getHtmlUrl()."\">".$record->getFullName()."</a>";
 				break;
 			case 'place':
 				$fact=$record->getFactByType($row['fact']);
@@ -2203,9 +2172,9 @@ class WT_Stats {
 			if (($husb->getAllDeathDates() && $wife->getAllDeathDates()) || !$husb->isDead() || !$wife->isDead()) {
 				if ($family->canDisplayDetails()) {
 					if ($type == 'list') {
-						$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".PrintReady($family->getFullName()."</a> [".$age."]")."</li>\n";
+						$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [".$age."]"."</li>\n";
 					} else {
-						$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".PrintReady($family->getFullName()."</a> [".$age."]");
+						$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [".$age."]";
 					}
 				}
 				if (++$i==$total) break;
@@ -2278,9 +2247,9 @@ class WT_Stats {
 			$age = get_age_at_event($age, true);
 			if ($family->canDisplayDetails()) {
 				if ($type == 'list') {
-					$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".PrintReady($family->getFullName()."</a> [".$age."]")."</li>\n";
+					$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [".$age."]"."</li>\n";
 				} else {
-					$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".PrintReady($family->getFullName()."</a> [".$age."]");
+					$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [".$age."]";
 				}
 			}
 		}
@@ -2546,32 +2515,35 @@ class WT_Stats {
 		if ($simple) {
 			if (isset($params[0]) && $params[0] != '') {$size = strtolower($params[0]);} else {$size = '200x250';}
 			$sizes = explode('x', $size);
-			$rows=self::_runSQL(''
-				.' SELECT'
-					.' ROUND(AVG(married.d_julianday2-birth.d_julianday1-182.5)/365.25,1) AS age,'
-					.' ROUND((married.d_year+49.1)/100) AS century,'
-					.' indi.i_sex AS sex'
-				.' FROM'
-					." `##families` AS fam"
-				.' LEFT JOIN'
-					." `##dates` AS birth ON birth.d_file = {$this->_ged_id}"
-				.' LEFT JOIN'
-					." `##dates` AS married ON married.d_file = {$this->_ged_id}"
-				.' LEFT JOIN'
-					." `##individuals` AS indi ON indi.i_file = {$this->_ged_id}"
-				.' WHERE'
-					.' birth.d_gid = indi.i_id AND'
-					.' married.d_gid = fam.f_id AND'
-					." (indi.i_id = fam.f_wife OR"
-					." indi.i_id = fam.f_husb) AND"
-					." fam.f_file = {$this->_ged_id} AND"
-					." birth.d_fact = 'BIRT' AND"
-					." married.d_fact = 'MARR' AND"
-					.' birth.d_julianday1 <> 0 AND'
-					." birth.d_type='@#DGREGORIAN@' AND"
-					." married.d_type='@#DGREGORIAN@' AND"
-					.' married.d_julianday2 > birth.d_julianday1'
-				.' GROUP BY century, sex ORDER BY century, sex');
+			$rows=self::_runSQL(
+				"SELECT ".
+				" ROUND(AVG(married.d_julianday2-birth.d_julianday1-182.5)/365.25,1) AS age, ".
+				" ROUND((married.d_year+49.1)/100) AS century, ".
+				" 'M' AS sex ".
+				"FROM `wt_dates` AS married ".
+				"JOIN `wt_families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
+				"JOIN `wt_dates` AS birth ON (birth.d_gid=fam.f_husb AND birth.d_file=fam.f_file) ".
+				"WHERE ".
+				" '{$sex}' IN ('M', 'BOTH') AND ".
+				" married.d_file={$this->_ged_id} AND married.d_type='@#DGREGORIAN@' AND married.d_fact='MARR' AND ".
+				" birth.d_type='@#DGREGORIAN@' AND birth.d_fact='BIRT' AND ".
+				" married.d_julianday1>birth.d_julianday1 AND birth.d_julianday1<>0 ".
+				"GROUP BY century, sex ".
+				"UNION ALL ".
+				"SELECT ".
+				" ROUND(AVG(married.d_julianday2-birth.d_julianday1-182.5)/365.25,1) AS age, ".
+				" ROUND((married.d_year+49.1)/100) AS century, ".
+				" 'F' AS sex ".
+				"FROM `wt_dates` AS married ".
+				"JOIN `wt_families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
+				"JOIN `wt_dates` AS birth ON (birth.d_gid=fam.f_wife AND birth.d_file=fam.f_file) ".
+				"WHERE ".
+				" '{$sex}' IN ('F', 'BOTH') AND ".
+				" married.d_file={$this->_ged_id} AND married.d_type='@#DGREGORIAN@' AND married.d_fact='MARR' AND ".
+				" birth.d_type='@#DGREGORIAN@' AND birth.d_fact='BIRT' AND ".
+				" married.d_julianday1>birth.d_julianday1 AND birth.d_julianday1<>0 ".
+				" GROUP BY century, sex"
+			);
 			if (empty($rows)) return'';
 			$max = 0;
 			foreach ($rows as $values) {
@@ -2636,47 +2608,38 @@ class WT_Stats {
 			}
 			return "<img src=\""."http://chart.apis.google.com/chart?cht=bvg&amp;chs={$sizes[0]}x{$sizes[1]}&amp;chm=D,FF0000,2,0,3,1|{$chmm}{$chmf}&amp;chf=bg,s,ffffff00|c,s,ffffff00&amp;chtt=".rawurlencode($chtt)."&amp;chd={$chd}&amp;chco=0000FF,FFA0CB,FF0000&amp;chbh=20,3&amp;chxt=x,x,y,y&amp;chxl=".rawurlencode($chxl)."&amp;chdl=".rawurlencode(WT_I18N::translate('Males')."|".WT_I18N::translate('Females')."|".WT_I18N::translate('Average age'))."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Average age in century of marriage')."\" title=\"".WT_I18N::translate('Average age in century of marriage')."\" />";
 		} else {
-			$years = '';
 			if ($year1>=0 && $year2>=0) {
-				$years = " AND married.d_year BETWEEN '{$year1}' AND '{$year2}'";
+				$years=" married.d_year BETWEEN {$year1} AND {$year2} AND ";
+			} else {
+				$years='';
 			}
-			if ($sex == 'F') {
-				$sex_field = 'fam.f_wife,';
-				$sex_field2 = " indi.i_id = fam.f_wife AND";
-				$sex_search = " AND i_sex='F'";
-			}
-			else if ($sex == 'M') {
-				$sex_field = 'fam.f_husb,';
-				$sex_field2 = " indi.i_id = fam.f_husb AND";
-				$sex_search = " AND i_sex='M'";
-			}
-			$rows=self::_runSQL(''
-				.' SELECT'
-					.' fam.f_id,'
-					.$sex_field
-					.' married.d_julianday2-birth.d_julianday1 AS age,'
-					.' indi.i_id AS indi'
-				.' FROM'
-					." `##families` AS fam"
-				.' LEFT JOIN'
-					." `##dates` AS birth ON birth.d_file = {$this->_ged_id}"
-				.' LEFT JOIN'
-					." `##dates` AS married ON married.d_file = {$this->_ged_id}"
-				.' LEFT JOIN'
-					." `##individuals` AS indi ON indi.i_file = {$this->_ged_id}"
-				.' WHERE'
-					.' birth.d_gid = indi.i_id AND'
-					.' married.d_gid = fam.f_id AND'
-					.$sex_field2
-					." fam.f_file = {$this->_ged_id} AND"
-					." birth.d_fact = 'BIRT' AND"
-					." married.d_fact = 'MARR' AND"
-					.' birth.d_julianday1 <> 0 AND'
-					.' married.d_julianday2 > birth.d_julianday1'
-					.$sex_search
-					.$years
-				.' ORDER BY indi, age ASC');
-			if (!isset($rows)) {return 0;}
+			$rows=self::_runSQL(
+				"SELECT ".
+				" fam.f_id, ".
+				" birth.d_gid, ".
+				" married.d_julianday2-birth.d_julianday1 AS age ".
+				"FROM `wt_dates` AS married ".
+				"JOIN `wt_families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
+				"JOIN `wt_dates` AS birth ON (birth.d_gid=fam.f_husb AND birth.d_file=fam.f_file) ".
+				"WHERE ".
+				" '{$sex}' IN ('M', 'BOTH') AND {$years} ".
+				" married.d_file={$this->_ged_id} AND married.d_type='@#DGREGORIAN@' AND married.d_fact='MARR' AND ".
+				" birth.d_type='@#DGREGORIAN@' AND birth.d_fact='BIRT' AND ".
+				" married.d_julianday1>birth.d_julianday1 AND birth.d_julianday1<>0 ".
+				"UNION ALL ".
+				"SELECT ".
+				" ROUND(AVG(married.d_julianday2-birth.d_julianday1-182.5)/365.25,1) AS age, ".
+				" ROUND((married.d_year+49.1)/100) AS century, ".
+				" 'F' AS sex ".
+				"FROM `wt_dates` AS married ".
+				"JOIN `wt_families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
+				"JOIN `wt_dates` AS birth ON (birth.d_gid=fam.f_wife AND birth.d_file=fam.f_file) ".
+				"WHERE ".
+				" '{$sex}' IN ('F', 'BOTH') AND {$years} ".
+				" married.d_file={$this->_ged_id} AND married.d_type='@#DGREGORIAN@' AND married.d_fact='MARR' AND ".
+				" birth.d_type='@#DGREGORIAN@' AND birth.d_fact='BIRT' AND ".
+				" married.d_julianday1>birth.d_julianday1 AND birth.d_julianday1<>0 "
+			);
 			return $rows;
 		}
 	}
@@ -2806,7 +2769,7 @@ class WT_Stats {
 				$result=$row['tot'];
 				break;
 			case 'name':
-				$result="<a href=\"".$family->getHtmlUrl()."\">".PrintReady($family->getFullName()).'</a>';
+				$result="<a href=\"".$family->getHtmlUrl()."\">".$family->getFullName().'</a>';
 				break;
 		}
 		// Statistics are used by RSS feeds, etc., so need absolute URLs.
@@ -2835,9 +2798,9 @@ class WT_Stats {
 			$family=WT_Family::getInstance($rows[$c]['id']);
 			if ($family->canDisplayDetails()) {
 				if ($type == 'list') {
-					$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".PrintReady($family->getFullName()."</a> [{$rows[$c]['tot']} ".WT_I18N::translate('children')."]")."</li>\n";
+					$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [{$rows[$c]['tot']} ".WT_I18N::translate('children')."]"."</li>\n";
 				} else {
-					$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".PrintReady($family->getFullName()."</a> [{$rows[$c]['tot']} ".WT_I18N::translate('children')."]");
+					$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [{$rows[$c]['tot']} ".WT_I18N::translate('children')."]";
 				}
 			}
 		}
@@ -2899,9 +2862,9 @@ class WT_Stats {
 			$child2 = WT_Person::getInstance($fam['ch2']);
 			if ($type == 'name') {
 				if ($child1->canDisplayDetails() && $child2->canDisplayDetails()) {
-					$return = "<a href=\"".$child2->getHtmlUrl()."\">".PrintReady($child2->getFullName())."</a> ";
+					$return = "<a href=\"".$child2->getHtmlUrl()."\">".$child2->getFullName()."</a> ";
 					$return .= WT_I18N::translate('and')." ";
-					$return .= "<a href=\"".$child1->getHtmlUrl()."\">".PrintReady($child1->getFullName())."</a>";
+					$return .= "<a href=\"".$child1->getHtmlUrl()."\">".$child1->getFullName()."</a>";
 					$return .= " <a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View Family')."]</a>\n";
 				} else {
 					$return = WT_I18N::translate('This information is private and cannot be shown.');
@@ -2924,9 +2887,9 @@ class WT_Stats {
 				if ($one && !in_array($fam['family'], $dist)) {
 					if ($child1->canDisplayDetails() && $child2->canDisplayDetails()) {
 						$return = "\t<li>";
-						$return .= "<a href=\"".$child2->getHtmlUrl()."\">".PrintReady($child2->getFullName())."</a> ";
+						$return .= "<a href=\"".$child2->getHtmlUrl()."\">".$child2->getFullName()."</a> ";
 						$return .= WT_I18N::translate('and')." ";
-						$return .= "<a href=\"".$child1->getHtmlUrl()."\">".PrintReady($child1->getFullName())."</a>";
+						$return .= "<a href=\"".$child1->getHtmlUrl()."\">".$child1->getFullName()."</a>";
 						$return .= " [".$age."]";
 						$return .= " <a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View Family')."]</a>";
 						$return .= "\t</li>\n";
@@ -2935,9 +2898,9 @@ class WT_Stats {
 					}
 				} else if (!$one && $child1->canDisplayDetails() && $child2->canDisplayDetails()) {
 					$return = "\t<li>";
-					$return .= "<a href=\"".$child2->getHtmlUrl()."\">".PrintReady($child2->getFullName())."</a> ";
+					$return .= "<a href=\"".$child2->getHtmlUrl()."\">".$child2->getFullName()."</a> ";
 					$return .= WT_I18N::translate('and')." ";
-					$return .= "<a href=\"".$child1->getHtmlUrl()."\">".PrintReady($child1->getFullName())."</a>";
+					$return .= "<a href=\"".$child1->getHtmlUrl()."\">".$child1->getFullName()."</a>";
 					$return .= " [".$age."]";
 					$return .= " <a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View Family')."]</a>";
 					$return .= "\t</li>\n";
@@ -3262,9 +3225,9 @@ class WT_Stats {
 			$family=WT_Family::getInstance($row['family']);
 			if ($family->canDisplayDetails()) {
 				if ($type == 'list') {
-					$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".PrintReady($family->getFullName())."</a></li>\n";
+					$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a></li>\n";
 				} else {
-					$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".PrintReady($family->getFullName())."</a>";
+					$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a>";
 				}
 			}
 		}
@@ -3386,9 +3349,9 @@ class WT_Stats {
 			$family=WT_Family::getInstance($row['id']);
 			if ($family->canDisplayDetails()) {
 				if ($type == 'list') {
-					$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".PrintReady($family->getFullName()."</a> [{$row['tot']} ".WT_I18N::translate('grandchildren')."]")."</li>\n";
+					$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [{$row['tot']} ".WT_I18N::translate('grandchildren')."]"."</li>\n";
 				} else {
-					$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".PrintReady($family->getFullName()."</a> [{$row['tot']} ".WT_I18N::translate('grandchildren')."]");
+					$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [{$row['tot']} ".WT_I18N::translate('grandchildren')."]";
 				}
 			}
 		}
@@ -3803,8 +3766,8 @@ class WT_Stats {
 				if (is_array($params) && isset($params[0]) && $params[0] != '') {$datestamp = $params[0];} else {$datestamp = str_replace('%', '', $TIME_FORMAT);}
 				return date($datestamp, get_user_setting($user_id, 'reg_timestamp'));
 			case 'loggedin':
-				if (is_array($params) && isset($params[0]) && $params[0] != '') {$yes = $params[0];} else {$yes = WT_I18N::translate('Yes');}
-				if (is_array($params) && isset($params[1]) && $params[1] != '') {$no = $params[1];} else {$no = WT_I18N::translate('No');}
+				if (is_array($params) && isset($params[0]) && $params[0] != '') {$yes = $params[0];} else {$yes = WT_I18N::translate('yes');}
+				if (is_array($params) && isset($params[1]) && $params[1] != '') {$no = $params[1];} else {$no = WT_I18N::translate('no');}
 				return WT_DB::prepare("SELECT 1 FROM `##session` WHERE user_id=? LIMIT 1")->execute(array($user_id))->fetchOne() ? $yes : $no;
 		}
 	}

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12065 2011-07-25 04:20:57Z nigel $
+// $Id: module.php 12287 2011-10-11 03:09:44Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -312,14 +312,13 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 				$row_color = ($row_count % 2) ? 'odd' : 'even';
 				// NOTE: Print the header of the current item
 				echo '<tr class="', $row_color, '"><td style="padding: 5px;">';
-				echo '<a href="#faq', $id, '">', $id+1, ' ', $faq->header, '</a>';
+				echo '<a href="#faq', $id, '">', $faq->header, '</a>';
 				echo '</td></tr>';
 				$row_count++;
 			}
 		}
 		echo '</table><hr>';
 		// Detailed entries
-		echo '<table>';
 		foreach ($faqs as $id => $faq) {
 			$header   =get_block_setting($faq->block_id, 'header');
 			$faqbody  =get_block_setting($faq->block_id, 'faqbody');
@@ -335,8 +334,6 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 				echo '<hr />';
 			}
 		}
-		echo '</table>';
-
 		print_footer();
 	}
 

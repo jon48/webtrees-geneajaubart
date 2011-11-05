@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: relationship.php 12080 2011-07-28 16:20:15Z greg $
+// $Id: relationship.php 12333 2011-10-18 09:28:58Z greg $
 
 define('WT_SCRIPT_NAME', 'relationship.php');
 require './includes/session.php';
@@ -351,9 +351,12 @@ if ((!empty($pid1))&&(!empty($pid2))) {
 				$linex = $xoffset;
 				$liney = $yoffset;
 				$mfstyle = "NN";
-				$indirec = find_person_record($pid, WT_GED_ID);
-				if (strpos($indirec, "1 SEX F")!==false) $mfstyle="F";
-				if (strpos($indirec, "1 SEX M")!==false) $mfstyle="";
+				$person=WT_Person::getInstance($pid);
+				switch ($person->getSex()) {
+				case 'M': $mfstyle='';   break;
+				case 'F': $mfstyle='F';  break;
+				case 'U': $mfstyle='NN'; break;
+				}
 				$arrow_img = $WT_IMAGES["darrow"];
 				if ($node["relations"][$index]=="father" || $node["relations"][$index]=="mother" || $node["relations"][$index]=="parent") {
 					$line = $WT_IMAGES["vline"];

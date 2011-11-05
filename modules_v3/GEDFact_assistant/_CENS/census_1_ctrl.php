@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_1_ctrl.php 11518 2011-05-13 19:21:22Z lukasz $
+// $Id: census_1_ctrl.php 12420 2011-10-25 22:04:49Z nigel $
 
  if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -55,8 +55,8 @@ $wholename = $fulln;
 
 $currpid=$pid;
 
-echo '<script src="', WT_MODULES_DIR, 'GEDFact_assistant/_CENS/js/dynamicoptionlist.js" type="text/javascript"></script>';
-echo '<script src="', WT_MODULES_DIR, 'GEDFact_assistant/_CENS/js/date.js" type="text/javascript"></script>';
+echo '<script src="', WT_STATIC_URL, WT_MODULES_DIR, 'GEDFact_assistant/_CENS/js/dynamicoptionlist.js" type="text/javascript"></script>';
+echo '<script src="', WT_STATIC_URL, WT_MODULES_DIR, 'GEDFact_assistant/_CENS/js/date.js" type="text/javascript"></script>';
 
 echo WT_JS_START;
 echo "var TheCenYear = opener.document.getElementById('setyear').value;";
@@ -98,7 +98,7 @@ echo '</div>';
 		<input type="button" value="<?php echo WT_I18N::translate('Add/Insert Blank Row'); ?>" onclick="insertRowToTable('', '', '', '', '', '', '', '', 'Age', '', '', '', '', '', '');" />
 	</div>
 	<div class="cens_textinput_right">
-		<?php echo WT_I18N::translate('Add'); ?><br>
+		<?php echo WT_I18N::translate('Add'); ?>
 		<input  type="radio" name="totallyrad" value="0" checked="checked" />
 	</div>
 	<?php

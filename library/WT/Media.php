@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Media.php 11969 2011-07-05 12:29:35Z greg $
+// $Id: Media.php 12313 2011-10-15 20:38:06Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -77,6 +77,19 @@ class WT_Media extends WT_GedcomRecord {
 
 		// ... otherwise apply default behaviour
 		return parent::_canDisplayDetailsByType($access_level);
+	}
+
+	// Fetch the record from the database
+	protected static function fetchGedcomRecord($xref, $ged_id) {
+		static $statement=null;
+
+		if ($statement===null) {
+			$statement=WT_DB::prepare(
+				"SELECT 'OBJE' AS type, m_media AS xref, m_gedfile AS ged_id, m_gedrec AS gedrec, m_titl, m_file ".
+				"FROM `##media` WHERE m_media=? AND m_gedfile=?"
+			);
+		}
+		return $statement->execute(array($xref, $ged_id))->fetchOneRow(PDO::FETCH_ASSOC);
 	}
 
 	/**
@@ -479,8 +492,10 @@ class WT_Media extends WT_GedcomRecord {
 
 		$urltype = get_url_type($this->getLocalFilename());
 		$notes=($this->getNote()) ? htmlspecialchars(print_fact_notes("1 NOTE ".$this->getNote(), 1, true, true)) : '';
-		if (!$config['img_title']) {
-			$config['img_title']=PrintReady(htmlspecialchars($this->getFullName()));
+		if ($config['img_title']) {
+			$config['img_title']=strip_tags($config['img_title']);
+		} else {
+			$config['img_title']=strip_tags($this->getFullName());
 		}
 
 		// -- Determine the correct URL to open this media file
@@ -655,8 +670,10 @@ class WT_Media extends WT_GedcomRecord {
 			$idstr=($config['img_id']) ? 'id="'.$config['img_id'].'"' : '';
 			$alignstr=($config['align']=='auto') ? 'align="'.($TEXT_DIRECTION=="rtl" ? "right":"left").'"' : ''; 
 			$stylestr=($config['show_full']) ? '' : ' style="display: none;" ';
-			if (!$config['img_title']) {
-				$config['img_title']=PrintReady(htmlspecialchars($this->getFullName()));
+			if ($config['img_title']) {
+				$config['img_title']=strip_tags($config['img_title']);
+			} else {
+				$config['img_title']=strip_tags($this->getFullName());
 			}
 			$sizestr='';
 			if ($config['class']=='thumbnail') {

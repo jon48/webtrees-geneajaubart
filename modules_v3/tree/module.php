@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12305 2011-10-13 12:38:33Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -34,19 +34,19 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 	
 	function __construct() {
 		// define the module inclusions for the page header
-  	$this->headers = '<link rel="stylesheet" type="text/css" href="'.WT_MODULES_DIR.$this->getName().'/css/treeview.css" />';
-  	$this->js = '<script type="text/javascript" language="javascript" src="'.WT_MODULES_DIR.$this->getName().'/js/treeview.js"></script>';
+  	$this->headers = '<link rel="stylesheet" type="text/css" href="'.WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/css/treeview.css" />';
+  	$this->js = '<script type="text/javascript" language="javascript" src="'.WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/treeview.js"></script>';
   	
 		// Retrieve the user's personalized style
     if (isset($_COOKIE['tvStyle'])) {
     	$this->style = $_COOKIE['tvStyle'];
-    	$this->css = '<link id="tvCSS" rel="stylesheet" type="text/css" href="'.WT_MODULES_DIR.$this->getName().'/css/styles/'.$this->style.'/'.$this->style.'.css" />';
+    	$this->css = '<link id="tvCSS" rel="stylesheet" type="text/css" href="'.WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/css/styles/'.$this->style.'/'.$this->style.'.css" />';
     }
     else {
     	$this->style = false;
     	$this->css = '';
     }
-    $this->css .= '<link rel="stylesheet" type="text/css" href="'.WT_MODULES_DIR.$this->getName().'/css/treeview_print.css" media="print" />';
+    $this->css .= '<link rel="stylesheet" type="text/css" href="'.WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/css/treeview_print.css" media="print" />';
 	}
 	
 	// Extend WT_Module. This title should be normalized when this module will be added officially
@@ -79,7 +79,9 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function hasTabContent() {
-		return true;
+		global $SEARCH_SPIDER;
+			
+		return !$SEARCH_SPIDER;
 	}
 	// Implement WT_Module_Tab
 	public function isGrayedOut() {
@@ -94,7 +96,7 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 	public function getPreLoadContent() {
 		// a workaround to the lack of a proper method of class Module to insert css and scripts in <head> where needed
 		// the required loading order is : headers, theme, css
-	  return $this->js.'<script language="javascript" type="text/javascript">jQuery("head").prepend(\''.$this->headers.'\').append(\''.$this->css.'\');</script>';
+	  return $this->js.$this->headers;
 	}
 
   // Extend WT_Module

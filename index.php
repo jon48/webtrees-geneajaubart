@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index.php 11897 2011-06-24 21:58:30Z greg $
+// $Id: index.php 12338 2011-10-19 15:51:08Z lukasz $
 
 define('WT_SCRIPT_NAME', 'index.php');
 if (defined ('WT_ROOT')) {
@@ -114,8 +114,6 @@ echo WT_JS_END;
 if ($ctype=='user') {
 	echo '<h1 align="center">', WT_I18N::translate('My page'), '</h1>';
 }
-echo '<script src="js/jquery/jquery.min.js" type="text/javascript"></script>';
-echo '<script type="text/javascript">jQuery.noConflict();</script>';
 if ($blocks['main']) {
 	if ($blocks['side']) {
 		echo '<div id="index_main_blocks">';
@@ -130,7 +128,7 @@ if ($blocks['main']) {
 			$module->getBlock($block_id);
 		} else {
 			// Load the block asynchronously
-			echo '<div id="block_', $block_id, '"><img src="images/loading.gif" alt="', htmlspecialchars(WT_I18N::translate('Loading...')),  '"/></div>';
+			echo '<div id="block_', $block_id, '"><img src="', WT_STATIC_URL, 'images/loading.gif" alt="', htmlspecialchars(WT_I18N::translate('Loading...')),  '"/></div>';
 			echo WT_JS_START, "jQuery('#block_{$block_id}').load('index.php?ctype={$ctype}&action=ajax&block_id={$block_id}');", WT_JS_END;
 		}
 	}
@@ -151,7 +149,7 @@ if ($blocks['side']) {
 			$module->getBlock($block_id);
 		} else {
 			// Load the block asynchronously
-			echo '<div id="block_', $block_id, '"><img src="images/loading.gif" alt="', htmlspecialchars(WT_I18N::translate('Loading...')),  '"/></div>';
+			echo '<div id="block_', $block_id, '"><img src="', WT_STATIC_URL, 'images/loading.gif" alt="', htmlspecialchars(WT_I18N::translate('Loading...')),  '"/></div>';
 			echo WT_JS_START, "jQuery('#block_{$block_id}').load('index.php?ctype={$ctype}&action=ajax&block_id={$block_id}');", WT_JS_END;
 		}
 	}

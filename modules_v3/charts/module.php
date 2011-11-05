@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12414 2011-10-25 16:31:47Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -44,7 +44,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 		global $ctype, $WT_IMAGES, $PEDIGREE_ROOT_ID, $PEDIGREE_FULL_DETAILS, $show_full, $bwidth, $bheight;
 
 		$details=get_block_setting($block_id, 'details', false);
-		$type   =get_block_setting($block_id, 'type', 'treenav');
+		$type   =get_block_setting($block_id, 'type', 'pedigree');
 		$pid    =get_block_setting($block_id, 'pid', WT_USER_ID ? (WT_USER_GEDCOM_ID ? WT_USER_GEDCOM_ID : $PEDIGREE_ROOT_ID) : $PEDIGREE_ROOT_ID);
 		$block  =get_block_setting($block_id, 'block');
 		if ($cfg) {
@@ -81,6 +81,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 		}
 
 		$id=$this->getName().$block_id;
+		$class=$this->getName().'_block';
 		$title='';
 		if ($ctype=="gedcom" && WT_USER_GEDCOM_ADMIN || $ctype=="user" && WT_USER_ID) {
 			$title .= "<a href=\"javascript: configure block\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1'); return false;\">";
@@ -102,7 +103,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 					break;
 			}
 			$title .= help_link('index_charts', $this->getName());
-			$content = "<script src=\"js/webtrees.js\" language=\"JavaScript\" type=\"text/javascript\"></script>";
+			$content = "<script src=\"".WT_STATIC_URL."js/webtrees.js\" type=\"text/javascript\"></script>";
 			$content .= '<table cellspacing="0" cellpadding="0" border="0"><tr>';
 			if ($type=='descendants' || $type=='hourglass') {
 				$content .= "<td valign=\"middle\">";
@@ -135,7 +136,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 				$mod=new tree_WT_Module;
 				$nav=new TreeView;
 				$content .= '<td>';
-				$content .= '<script type="text/javascript" src="js/jquery/jquery.min.js"></script><script type="text/javascript" src="js/jquery/jquery-ui.min.js"></script>';
+				$content .= '<script type="text/javascript" src="'.WT_JQUERY_URL.'"></script><script type="text/javascript" src="'.WT_JQUERYUI_URL.'"></script>';
 
 				$content .= $mod->css;
 				$content .= $mod->headers;
@@ -185,14 +186,14 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 
 		if (safe_POST_bool('save')) {
 			set_block_setting($block_id, 'details', safe_POST_bool('details'));
-			set_block_setting($block_id, 'type',    safe_POST('type', array('pedigree', 'descendants', 'hourglass', 'treenav'), 'treenav'));
+			set_block_setting($block_id, 'type',    safe_POST('type', array('pedigree', 'descendants', 'hourglass', 'treenav'), 'pedigree'));
 			set_block_setting($block_id, 'pid',     safe_POST('pid', WT_REGEX_XREF));
 			echo WT_JS_START, 'window.opener.location.href=window.opener.location.href;window.close();', WT_JS_END;
 			exit;
 		}
 
 		$details=get_block_setting($block_id, 'details', false);
-		$type   =get_block_setting($block_id, 'type',    'treenav');
+		$type   =get_block_setting($block_id, 'type',    'pedigree');
 		$pid    =get_block_setting($block_id, 'pid', WT_USER_ID ? (WT_USER_GEDCOM_ID ? WT_USER_GEDCOM_ID : $PEDIGREE_ROOT_ID) : $PEDIGREE_ROOT_ID);
 
 		if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
@@ -210,8 +211,8 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 			<td class="descriptionbox wrap width33"><?php echo WT_I18N::translate('Show Details'); ?></td>
 		<td class="optionbox">
 			<select name="details">
-					<option value="no" <?php if (!$details) echo " selected=\"selected\""; ?>><?php echo WT_I18N::translate('No'); ?></option>
-					<option value="yes" <?php if ($details) echo " selected=\"selected\""; ?>><?php echo WT_I18N::translate('Yes'); ?></option>
+					<option value="no" <?php if (!$details) echo " selected=\"selected\""; ?>><?php echo WT_I18N::translate('no'); ?></option>
+					<option value="yes" <?php if ($details) echo " selected=\"selected\""; ?>><?php echo WT_I18N::translate('yes'); ?></option>
 			</select>
 			</td>
 		</tr>

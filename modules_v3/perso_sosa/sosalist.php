@@ -70,7 +70,7 @@ if($maxGen>0){
 					$tableSosa .= 	'<tr>';
 					$tableSosa .= 	'<td class="list_value_wrap transparent">'.$sosa.'</td>';
 					$tableSosa .= 	'<td class="list_value_wrap transparent">'.$indi->getXrefLink().'</td>';
-					$tableSosa .= 	'<td class="list_value_wrap left"><a href="'.$indi->getHtmlUrl().'" class="list_item name2">'.PrintReady($indi->getListName()).'</a></td>';
+					$tableSosa .= 	'<td class="list_value_wrap left"><a href="'.$indi->getHtmlUrl().'" class="list_item name2">'.$indi->getFullName().'</a></td>';
 					$estimatedDate = 	$indi->getEstimatedBirthDate();
 					$tableSosa .=	'<td class="list_value_wrap" sorttable_customkey="'.$estimatedDate->JD().'">&nbsp;'.$estimatedDate->Display(true, "%d %M %Y").'&nbsp;</td>';
 					$estimatedDate = 	$indi->getEstimatedDeathDate();

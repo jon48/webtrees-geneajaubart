@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_media.php 11969 2011-07-05 12:29:35Z greg $
+// $Id: admin_media.php 12466 2011-10-30 01:13:24Z nigel $
 
  /* TODO:
  * Add check for missing index.php files when creating a directory
@@ -51,16 +51,6 @@ require_once WT_ROOT.'includes/functions/functions_mediadb.php';
 // Only admin users can access this page
 if (!WT_USER_IS_ADMIN) {
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.WT_SCRIPT_NAME);
-	exit;
-}
-
-// media must be enabled
-if (!$MULTI_MEDIA) {
-	print_header(WT_I18N::translate('Manage multimedia'));
-	echo "<span class=\"error\"><b>";
-	echo WT_I18N::translate('Uploading media files is not allowed because multi-media items have been disabled or because the media directory is not writable.');
-	echo "</b></span><br />";
-	print_footer();
 	exit;
 }
 
@@ -327,15 +317,15 @@ function showchanges() {
 
 //-->
 </script>
-<script src="js/webtrees.js" type="text/javascript"></script>
+<script src="<?php echo WT_STATIC_URL; ?>js/webtrees.js" type="text/javascript"></script>
 <?php
 if (check_media_structure()) {
-	echo "<div id=\"uploadmedia\" style=\"display:none\">";
+	echo '<div id="uploadmedia" style="display:none">';
 	// Check if Standard Media Directory is writeable, doesn't matter if we upload to protected directory
-	if ((!$is_std_media_writable && !$USE_MEDIA_FIREWALL ) || !$MULTI_MEDIA) {
-		echo "<p class=\"error\"><b>";
-		echo WT_I18N::translate('Uploading media files is not allowed because multi-media items have been disabled or because the media directory is not writable.');
-		echo "</b></p>";
+	if (!$is_std_media_writable && !$USE_MEDIA_FIREWALL) {
+		echo '<p class="ui-state-error">';
+		echo WT_I18N::translate('Uploading media files is not allowed because the media folder is not writable.');
+		echo '</p>';
 	} else {
 		show_mediaUpload_form(WT_SCRIPT_NAME, $showthumb); // We have the green light to upload media, echo the form
 	}
@@ -1054,20 +1044,19 @@ echo WT_JS_START; ?>
 	jQuery(document).ready(function() {
 		jQuery('#media_table').dataTable( {
 			"oLanguage": {
-				"sLengthMenu": '<?php echo /* I18N: %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="10">10</option><option value="20">20</option><option value="30">30</option><option value="40">40</option><option value="50">50</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
+				"sLengthMenu": '<?php echo /* I18N: %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
 				"sZeroRecords": '<?php echo WT_I18N::translate('No records to display');?>',
 				"sInfo": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_'); ?>',
 				"sInfoEmpty": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '0', '0', '0'); ?>',
 				"sInfoFiltered": '<?php echo /* I18N: %s is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_'); ?>',
-				"sSearch": '<?php echo WT_I18N::translate('Search');?>',
-				"oPaginate": {
+				"sSearch": '<?php echo WT_I18N::translate('Filter');?>',				"oPaginate": {
 					"sFirst": '<?php echo WT_I18N::translate_c('first page', 'first');?>',
 					"sLast": '<?php echo WT_I18N::translate('last');?>',
 					"sNext": '<?php echo WT_I18N::translate('next');?>',
 					"sPrevious": '<?php echo WT_I18N::translate('previous');?>'
 				}
 			},
-			"sDom": '<"H"prf>t<"F"li>',
+			"sDom": '<"H"pf<"dt-clear">irl>t<"F"pl>',
 			"bJQueryUI": true,
 			"bAutoWidth":false,
 			"aaSorting": [[ 1, "asc" ]],
@@ -1269,40 +1258,39 @@ echo WT_JS_START; ?>
 						}
 
 
-							if ($media["EXISTS"]) {
-								echo "<br />";
-								switch ($media["EXISTS"]) {
-								case 1:
-									echo "<br />".WT_I18N::translate('This media object is located on an external server');
-									break;
-								case 2:
-									echo "<br />".WT_I18N::translate('This media object is in the standard media directory');
-									break;
-								case 3:
-									echo "<br />".WT_I18N::translate('This media object is in the protected media directory');
-									break;
-								}
-								echo '<br />';
+						echo '<br />';
+						if ($media["EXISTS"]) {
+							echo '<br />';
+							switch ($media["EXISTS"]) {
+							case 1:
+								echo WT_I18N::translate('This media object is located on an external server');
+								break;
+							case 2:
+								echo WT_I18N::translate('This media object is in the standard media directory');
+								break;
+							case 3:
+								echo WT_I18N::translate('This media object is in the protected media directory');
+								break;
 							}
-							if ($media["THUMBEXISTS"]) {
-								switch ($media["THUMBEXISTS"]) {
-								case 1:
-									echo WT_I18N::translate('This thumbnail is located on an external server');
-									break;
-								case 2:
-									echo WT_I18N::translate('This thumbnail is in the standard media directory');
-									break;
-								case 3:
-									echo WT_I18N::translate('This thumbnail is in the protected media directory');
-									break;
-								}
-								echo '<br />';
+						}
+						if ($media["THUMBEXISTS"]) {
+							echo '<br />';
+							switch ($media["THUMBEXISTS"]) {
+							case 1:
+								echo WT_I18N::translate('This thumbnail is located on an external server');
+								break;
+							case 2:
+								echo WT_I18N::translate('This thumbnail is in the standard media directory');
+								break;
+							case 3:
+								echo WT_I18N::translate('This thumbnail is in the protected media directory');
+								break;
 							}
+						}
 						echo "</td></tr>";
 						break;
 					}
 				}
-				if ($passCount==1 && !$isExternal && $printDone) echo "<tr><td class=\"\" colspan=\"3\">&nbsp;</td></tr>";
 			}
 			?>
 		</tbody>

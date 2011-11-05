@@ -22,7 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: help_text.php 11700 2011-06-03 16:51:05Z greg $
+ * @version $Id: help_text.php 12416 2011-10-25 16:47:04Z lukasz $
  */
 
 if (!defined('WT_WEBTREES') || !defined('WT_SCRIPT_NAME') || WT_SCRIPT_NAME!='help_text.php') {
@@ -121,7 +121,7 @@ case 'GOOGLEMAP_COORD':
 
 case 'PLE_PLACES':
 	$title=WT_I18N::translate('Enter place name');
-	$text=WT_I18N::translate('Here you can enter or change the name of the place.<br />The \'Search on this level\' option allow to search the latitude and longitude of entered place name only among the places with that level.<br />The \'Search on this level\' option allow to search the latitude and longitude of all places having entered name. Some the lower levels places can not be displayed with this method of search.');
+	$text=WT_I18N::translate('Here you can enter or change the name of the place and find it\'s position on the map.').'<br />'.WT_I18N::translate('The “Search on this level” option allow to search the latitude and longitude of entered place name only among the places with that level').'<br />'.WT_I18N::translate('The “Search all” option allow to search the latitude and longitude of all places having entered name. Some the lower levels places can not be displayed with this method of search.');
 	break;
 
 case 'PLE_PRECISION':

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_changes.php 11750 2011-06-09 10:32:01Z greg $
+// $Id: edit_changes.php 12203 2011-09-22 12:09:54Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_changes.php');
 require './includes/session.php';
@@ -164,7 +164,7 @@ if ($changed_gedcoms) {
 				// version of the record.
 				$record=new WT_GedcomRecord($change->gedcom);
 			}
-			$output.='<b>'.PrintReady($record->getFullName()).'</b> '.getLRM().'('.$record->getXref().')'.getLRM().'<br />';
+			$output.='<b>'.$record->getFullName().'</b><br />';
 			$output.='<a href="javascript:;" onclick="return show_diff(\''.$record->getHtmlUrl().'\');">'.WT_I18N::translate('View the changes').'</a> | ';
 			$output.="<a href=\"javascript:show_gedcom_record('".$change->xref."');\">".WT_I18N::translate('View GEDCOM Record')."</a> | ";
 			$output.="<a href=\"javascript:;\" onclick=\"return edit_raw('".$change->xref."');\">".WT_I18N::translate('Edit raw GEDCOM record').'</a><br />';

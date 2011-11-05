@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_3_find.php 11769 2011-06-10 13:06:43Z greg $
+// $Id: census_3_find.php 12369 2011-10-22 08:31:41Z greg $
 
 global $MEDIA_DIRECTORY, $MEDIA_DIRECTORY_LEVELS, $TEXT_DIRECTION, $ABBREVIATE_CHART_LABELS; 
 
@@ -303,7 +303,7 @@ if ($type == "fam") {
 }
 
 // Show media and hide the rest
-if ($type == "media" && $MULTI_MEDIA) {
+if ($type == 'media') {
 	echo "<div align=\"center\">";
 	echo "<form name=\"filtermedia\" method=\"get\" onsubmit=\"return checknames(this);\" action=\"find.php\">";
 	echo "<input type=\"hidden\" name=\"choose\" value=\"", $choose, "\" />";
@@ -755,10 +755,10 @@ if ($action=="filter") {
 		echo "<table class=\"tabs_table $TEXT_DIRECTION width90\"><tr>";
 		// Get the famrecs with hits on names from the family table
 		// Get the famrecs with hits in the gedcom record from the family table
-		$myfamlist = wt_array_merge(
+		$myfamlist = array_unique(array_merge(
 			search_fams_names($filter_array, array(WT_GED_ID), 'AND'),
 			search_fams($filter_array, array(WT_GED_ID), 'AND', true)
-		);
+		));
 		if ($myfamlist) {
 			$curged = $GEDCOM;
 			echo "<td class=\"list_value_wrap $TEXT_DIRECTION\"><ul>";
@@ -908,7 +908,7 @@ if ($action=="filter") {
 									echo WT_I18N::translate('View Object'), ' - ';
 									break;
 								}
-								echo PrintReady($record->getFullName()), '</a>';
+								echo $record->getFullName(), '</a>';
 							}
 						} else {
 							echo WT_I18N::translate('This media object is not linked to any GEDCOM record.');
@@ -972,7 +972,7 @@ if ($action=="filter") {
 		if ($repo_list) {
 			echo "<td class=\"list_value_wrap\"><ul>";
 			foreach ($repo_list as $repo) {
-				echo '<li><a href="', $repo->getHtmlUrl(), '" onclick="pasteid(\'', $repo->getXref(), '\');"><span class="list_item">', $repo->getListName(),'</span></a></li>';
+				echo '<li><a href="', $repo->getHtmlUrl(), '" onclick="pasteid(\'', $repo->getXref(), '\');"><span class="list_item">', $repo->getFullName(),'</span></a></li>';
 			}
 			echo "</ul></td></tr>";
 			echo "<tr><td class=\"list_label\">", WT_I18N::translate('Repositories found'), " ", count($repo_list);
@@ -998,7 +998,7 @@ if ($action=="filter") {
 			usort($mynotelist, array('WT_GedcomRecord', 'Compare'));
 			echo '<tr><td class="list_value_wrap"><ul>';
 			foreach ($mynotelist as $note) {
-				echo '<li><a href="', $note->getHtmlUrl(), '" onclick="pasteid(\'', $note->getXref(), '\');"><span class="list_item">', $note->getListName(),'</span></a></li>';
+				echo '<li><a href="', $note->getHtmlUrl(), '" onclick="pasteid(\'', $note->getXref(), '\');"><span class="list_item">', $note->getFullName(),'</span></a></li>';
 			}
 			echo '</ul></td></tr><tr><td class="list_label">', WT_I18N::translate('Shared Notes found'), ' ', count($mynotelist), '</td></tr>';
 		}
@@ -1020,7 +1020,7 @@ if ($action=="filter") {
 			usort($mysourcelist, array('WT_GedcomRecord', 'Compare'));
 			echo '<tr><td class="list_value_wrap"><ul>';
 			foreach ($mysourcelist as $source) {
-				echo '<li><a href="', $source->getHtmlUrl(), '" onclick="pasteid(\'', $source->getXref(), '\');"><span class="list_item">', $source->getListName(),'</span></a></li>';
+				echo '<li><a href="', $source->getHtmlUrl(), '" onclick="pasteid(\'', $source->getXref(), '\');"><span class="list_item">', $source->getFullName(),'</span></a></li>';
 			}
 			echo '</ul></td></tr><tr><td class="list_label">', WT_I18N::translate('Total sources: %s', count($mysourcelist)), '</td></tr>';
 		}

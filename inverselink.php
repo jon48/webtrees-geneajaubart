@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: inverselink.php 11704 2011-06-04 09:09:12Z greg $
+// $Id: inverselink.php 12260 2011-10-06 16:18:21Z greg $
 
 define('WT_SCRIPT_NAME', 'inverselink.php');
 require './includes/session.php';
@@ -36,7 +36,7 @@ $linkto   = safe_GET     ('linkto', array('person', 'source', 'family', 'manage'
 $action   = safe_GET     ('action', WT_REGEX_ALPHA, 'choose');
 
 // If GedFAct_assistant/_MEDIA/ installed ======================
-if (WT_USER_IS_ADMIN && $linkto=='manage' && file_exists(WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_MEDIA/media_1_ctrl.php')) {
+if (WT_USER_IS_ADMIN && $linkto=='manage' && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 	require WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_MEDIA/media_0_inverselink.php';
 } else {
 
@@ -96,7 +96,7 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && file_exists(WT_ROOT.WT_MODULES_DIR.
 		}
 		//-->
 		</script>
-	<script src="js/webtrees.js" type="text/javascript"></script>
+	<script src="<?php echo WT_STATIC_URL; ?>js/webtrees.js" type="text/javascript"></script>
 
 		<?php
 		echo '<form name="link" method="get" action="inverselink.php">';
@@ -142,7 +142,7 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && file_exists(WT_ROOT.WT_MODULES_DIR.
 				print_findindi_link("linktopid", "");
 			} else {
 				$record=WT_Person::getInstance($linktoid);
-				echo PrintReady($record->format_list('span', false, $record->getFullName()));
+				echo $record->format_list('span', false, $record->getFullName());
 			}
 		}
 
@@ -154,7 +154,7 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && file_exists(WT_ROOT.WT_MODULES_DIR.
 				print_findfamily_link("linktofamid");
 			} else {
 				$record=WT_Family::getInstance($linktoid);
-				echo PrintReady($record->format_list('span', false, $record->getFullName()));
+				echo $record->format_list('span', false, $record->getFullName());
 			}
 		}
 
@@ -166,7 +166,7 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && file_exists(WT_ROOT.WT_MODULES_DIR.
 				print_findsource_link("linktosid");
 			} else {
 				$record=WT_Source::getInstance($linktoid);
-				echo PrintReady($record->format_list('span', false, $record->getFullName()));
+				echo $record->format_list('span', false, $record->getFullName());
 			}
 		}
 		if ($linkto == "repository") {
@@ -176,7 +176,7 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && file_exists(WT_ROOT.WT_MODULES_DIR.
 				echo '<input class="pedigree_form" type="text" name="linktoid" id="linktorid" size="3" value="', $linktoid, '" />';
 			} else {
 				$record=WT_Repository::getInstance($linktoid);
-				echo PrintReady($record->format_list('span', false, $record->getFullName()));
+				echo $record->format_list('span', false, $record->getFullName());
 			}
 		}
 
@@ -187,7 +187,7 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && file_exists(WT_ROOT.WT_MODULES_DIR.
 				echo '<input class="pedigree_form" type="text" name="linktoid" id="linktonid" size="3" value="', $linktoid, '" />';
 			} else {
 				$record=WT_Note::getInstance($linktoid);
-				echo PrintReady($record->format_list('span', false, $record->getFullName()));
+				echo $record->format_list('span', false, $record->getFullName());
 			}
 		}
 

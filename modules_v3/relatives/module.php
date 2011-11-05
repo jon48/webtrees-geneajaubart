@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11998 2011-07-13 03:20:47Z nigel $
+// $Id: module.php 12306 2011-10-13 13:08:07Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -238,9 +238,9 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 						$factdetail = explode(' ', trim($family->getMarriageRecord()));
 						if (isset($factdetail) && count($factdetail) == 3) {
 							if (strtoupper($factdetail[2]) == "Y") {
-								echo '<span class="details_label">', $marr_fact, ': </span>', WT_I18N::translate('Yes');
+								echo '<span class="details_label">', $marr_fact, ': </span>', WT_I18N::translate('yes');
 							} else if (strtoupper($factdetail[2]) == "N") {
-								echo '<span class="details_label">', $marr_fact, ': </span>', WT_I18N::translate('No');
+								echo '<span class="details_label">', $marr_fact, ': </span>', WT_I18N::translate('no');
 							}
 						} else {
 							echo '<span class="details_label">', $marr_fact, '</span>';
@@ -316,18 +316,18 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 		if (isset($family) && $this->controller->indi->canEdit()) {
 			if ($type == "spouse") {
 				$child_u = WT_I18N::translate('Add a son or daughter');
-				$child_m = WT_I18N::translate('Son');
-				$child_f = WT_I18N::translate('Daughter');
+				$child_m = WT_I18N::translate('son');
+				$child_f = WT_I18N::translate('daughter');
 			} else {
 				$child_u = WT_I18N::translate('Add a brother or sister');
-				$child_m = WT_I18N::translate('Brother');
-				$child_f = WT_I18N::translate('Sister');
+				$child_m = WT_I18N::translate('brother');
+				$child_f = WT_I18N::translate('sister');
 			}
 		?>
 			<tr>
 				<td class="facts_label">
 					<?php if (WT_USER_CAN_EDIT && isset($people["children"][1])) { ?>
-					<a href="javascript:;" onclick="reorder_children('<?php echo $family->getXref(); ?>');tabswitch(5);"><img src="images/topdown.gif" alt="" border="0" /> <?php echo WT_I18N::translate('Re-order children'); ?></a>
+					<a href="javascript:;" onclick="reorder_children('<?php echo $family->getXref(); ?>');tabswitch(5);"><img src="<?php echo WT_STATIC_URL; ?>images/topdown.gif" alt="" border="0" /> <?php echo WT_I18N::translate('Re-order children'); ?></a>
 					<?php } ?>
 				</td>
 				<td class="facts_value">
@@ -518,7 +518,9 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 	}
 	// Implement WT_Module_Tab
 	public function canLoadAjax() {
-		return true;
+		global $SEARCH_SPIDER;
+
+		return !$SEARCH_SPIDER; // Search engines cannot use AJAX
 	}
 
 	// Implement WT_Module_Tab

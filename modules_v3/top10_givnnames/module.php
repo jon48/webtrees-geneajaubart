@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -58,6 +58,7 @@ class top10_givnnames_WT_Module extends WT_Module implements WT_Module_Block {
 		$stats=new WT_Stats(WT_GEDCOM);
 
 		$id=$this->getName().$block_id;
+		$class=$this->getName().'_block';
 		$title='';
 		if ($ctype=="gedcom" && WT_USER_GEDCOM_ADMIN || $ctype=="user" && WT_USER_ID) {
 			$title .= "<a href=\"javascript: configure block\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
@@ -91,8 +92,9 @@ class top10_givnnames_WT_Module extends WT_Module implements WT_Module_Block {
 			break;
 		case "table": // Style 2: Tabular format.  Narrow, 2 or 3 column table, good on right side of page
 			$params=array(1,$num,'rcount');
-			$content.='<table class="center"><tr valign="top"><td>'.$stats->commonGivenFemaleTable($params).'</td>';
-			$content.='<td>'.$stats->commonGivenMaleTable($params).'</td>';
+			$content.='<table class="center">
+						<tr valign="top"><td>'.$stats->commonGivenFemaleTable($params).'</td>
+						<td>'.$stats->commonGivenMaleTable($params).'</td>';
 			if ($showUnknown) {
 				$content.='<td>'.$stats->commonGivenUnknownTable($params).'</td>';
 			}
@@ -151,7 +153,7 @@ class top10_givnnames_WT_Module extends WT_Module implements WT_Module_Block {
 		echo '<tr><td class="descriptionbox wrap width33">';
 		echo WT_I18N::translate('Presentation style');
 		echo '</td><td class="optionbox">';
-		echo select_edit_control('infoStyle', array('list'=>WT_I18N::translate('List'), 'table'=>WT_I18N::translate('Table')), null, $infoStyle, '');
+		echo select_edit_control('infoStyle', array('list'=>WT_I18N::translate('list'), 'table'=>WT_I18N::translate('table')), null, $infoStyle, '');
 		echo '</td></tr>';
 
 		$showUnknown=get_block_setting($block_id, 'showUnknown', true);

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Note.php 11410 2011-04-29 18:22:37Z greg $
+// @version $Id: Note.php 12313 2011-10-15 20:38:06Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -51,6 +51,19 @@ class WT_Note extends WT_GedcomRecord {
 		return '0 @'.$this->xref.'@  NOTE '.WT_I18N::translate('Private');
 	}
 
+	// Fetch the record from the database
+	protected static function fetchGedcomRecord($xref, $ged_id) {
+		static $statement=null;
+
+		if ($statement===null) {
+			$statement=WT_DB::prepare(
+				"SELECT o_type AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec ".
+				"FROM `##other` WHERE o_id=? AND o_file=? AND o_type='NOTE'"
+			);
+		}
+		return $statement->execute(array($xref, $ged_id))->fetchOneRow(PDO::FETCH_ASSOC);
+	}
+	
 	// Generate a URL to this record, suitable for use in HTML
 	public function getHtmlUrl() {
 		return parent::_getLinkUrl('note.php?nid=', '&amp;');

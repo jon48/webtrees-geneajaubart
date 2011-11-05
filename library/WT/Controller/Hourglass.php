@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Hourglass.php 11738 2011-06-08 19:58:49Z greg $
+// $Id: Hourglass.php 12463 2011-10-29 21:41:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -354,7 +354,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 							$name = $spouse->getFullName();
 							if (hasRTLText($name)) echo 'class="name2">';
 							else echo 'class="name1">';
-							echo PrintReady($name);
+							echo $name;
 							echo "<br /></span></a>";
 
 						}
@@ -366,7 +366,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 							$name = $child->getFullName();
 							if (hasRTLText($name)) echo 'class="name2">';
 							else echo 'class="name1">';
-							echo '<img src="'.$WT_IMAGES["larrow"].'" height="10" alt="" />  ', PrintReady($name);
+							echo '<img src="'.$WT_IMAGES["larrow"].'" height="10" alt="" />  ', $name;
 							echo "<br /></span></a>";
 						}
 					}
@@ -385,7 +385,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 								$name = rtrim($name);
 								if (hasRTLText($name)) echo 'class="name2">';
 								else echo 'class="name1">';
-								echo PrintReady($name);
+								echo $name;
 								echo "<br /></span></a>";
 							}
 							$husb = $family->getWife();
@@ -396,7 +396,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 								$name = rtrim($name);
 								if (hasRTLText($name)) echo 'class="name2">';
 								else echo 'class="name1">';
-								echo PrintReady($name);
+								echo $name;
 								echo "<br /></span></a>";
 							}
 						}
@@ -412,7 +412,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 								$name = rtrim($name);
 								if (hasRTLText($name)) echo 'class="name2">';
 								else echo 'class="name1">';
-								echo PrintReady($name);
+								echo $name;
 								echo "<br /></span></a>";
 							}
 						}
@@ -440,14 +440,10 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 		if ($depth > $this->generations) return $depth;
 		$person = WT_Person::getInstance($pid);
 		if (is_null($person)) return $depth;
-		$famids = $person->getSpouseFamilies();
-		if ($person->getNumberOfChildren()==0) return $depth-1;
 		$maxdc = $depth;
-		foreach ($famids as $family) {
-			$ct = preg_match_all("/1 CHIL @(.*)@/", $family->getGedcomRecord(), $match, PREG_SET_ORDER);
-			for ($i=0; $i<$ct; $i++) {
-				$chil = trim($match[$i][1]);
-				$dc = $this->max_descendency_generations($chil, $depth+1);
+		foreach ($person->getSpouseFamilies() as $family) {
+			foreach ($family->getChildren() as $child) {
+				$dc = $this->max_descendency_generations($child->getXref(), $depth+1);
 				if ($dc >= $this->generations) return $dc;
 				if ($dc > $maxdc) $maxdc = $dc;
 			}
