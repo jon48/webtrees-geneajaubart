@@ -117,10 +117,10 @@ html[dir='rtl'] .fact_flag { float: left;}
 }
 
 .certif_image {
-	max-width: 80%;
+	max-width: 85%;
 	padding: 5px;
 	border: solid black 1px;
-	margin: 2px;
+	margin: 10px;
 }
 
 .patrolin_tree li {

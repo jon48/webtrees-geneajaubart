@@ -79,10 +79,18 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 	 * Returns an estimated birth place based on statistics on the base
 	 *
 	 * @param boolean $perc Should the coefficient of reliability be returned
-	 * @return string Estimated birth place if found, null otherwise
+	 * @return string|array Estimated birth place if found, null otherwise
 	 */
 	public function getEstimatedBirthPlace($perc=false){
-		return $this->gedcomrecord->getBirthPlace();
+		if($bplace = $this->gedcomrecord->getBirthPlace()){
+			if($perc){
+				return array ($bplace, 1);
+			}
+			else{
+				return $bplace;
+			}
+		}
+		return null;
 	}
 	
 	/**

@@ -103,8 +103,8 @@ function print_indi_table($datalist, $legend='', $option='') {
 
 		jQuery("div.filtersF").html('<?php echo addcslashes(
 			'<button type="button" class="ui-state-default" id="GIVEN_SORT_'.$table_id.'">'.WT_I18N::translate('Sort by given names').'</button>'.
-			'<button type="button" class="ui-state-default" id="cb_parents_indi_list_table" onclick="toggleByClassName(\'DIV\', \'parents_indi_list_table_'.$table_id.'\');">'.WT_I18N::translate('Show parents').'</button>'.
-			'<button type="button" class="ui-state-default" id="charts_indi_list_table" onclick="toggleByClassName(\'DIV\', \'indi_list_table-charts_'.$table_id.'\');">'.WT_I18N::translate('Show statistics charts').'</button>',
+			'<input type="button" class="ui-state-default" id="cb_parents_indi_list_table" onclick="toggleByClassName(\'DIV\', \'parents_indi_list_table_'.$table_id.'\');" value="'.WT_I18N::translate('Show parents').'" title="'.WT_I18N::translate('Show parents').'" />'.
+			'<input type="button" class="ui-state-default" id="charts_indi_list_table" onclick="toggleByClassName(\'DIV\', \'indi_list_table-charts_'.$table_id.'\');" value="'.WT_I18N::translate('Show statistics charts').'" title="'.WT_I18N::translate('Show statistics charts').'" />',
 			"'");
 		?>');
 		
@@ -548,8 +548,8 @@ function print_fam_table($datalist, $legend='', $option='') {
 	   jQuery("div.filtersF").html('<?php echo addcslashes(
 			'<button type="button" class="ui-state-default" id="GIVEN_SORT_M_'.$table_id.'">'.WT_I18N::translate('Sort by given names').'</button>'.
 			'<button type="button" class="ui-state-default" id="GIVEN_SORT_F_'.$table_id.'">'.WT_I18N::translate('Sort by given names').'</button>'.
-			'<button type="button" class="ui-state-default" id="cb_parents_'.$table_id.'" onclick="toggleByClassName(\'DIV\', \'parents_'.$table_id.'\');">'.WT_I18N::translate('Show parents').'</button>'.
-			'<button type="button" class="ui-state-default" id="charts_fam_list_table" onclick="toggleByClassName(\'DIV\', \'fam_list_table-charts_'.$table_id.'\');">'. WT_I18N::translate('Show statistics charts').'</button>',
+			'<input type="button" class="ui-state-default" id="cb_parents_fam_list_table" onclick="toggleByClassName(\'DIV\', \'parents_'.$table_id.'\');" value="'.WT_I18N::translate('Show parents').'" title="'.WT_I18N::translate('Show parents').'" />'.
+			'<input type="button" class="ui-state-default" id="charts_fam_list_table" onclick="toggleByClassName(\'DIV\', \'fam_list_table-charts_'.$table_id.'\');" value="'.WT_I18N::translate('Show statistics charts').'" title="'.WT_I18N::translate('Show statistics charts').'" />',
 			"'");
 		?>');
 		

@@ -182,6 +182,7 @@ $WT_IMAGES=array(
 	// Certificates Module
 	'certificate'=>WT_THEME_URL.'images/certificate.png',
 	'menu_certificate'=>WT_THEME_URL.'images/certificate.png',
+	'certificate-list'=>WT_THEME_URL.'images/certificate.png',
 	// Patronymic Lineage Module
 	'menu_patronymiclineage'=>WT_THEME_URL.'images/perso_patronymiclineage.png',
 	// Sosa Module
@@ -193,7 +194,8 @@ $WT_IMAGES=array(
 	'recompute_sosa'=>WT_THEME_URL.'images/edit_fam.png',
 	'menu_sosa_list'=>WT_THEME_URL.'images/family.png',
 	'menu_missing_ancestors'=>WT_THEME_URL.'images/patriarch.png',
-
+	'sosa-list'=>WT_THEME_URL.'images/family.png',
+	'smissing-list'=>WT_THEME_URL.'images/patriarch.png'
 	// END PERSO
 
 );

@@ -231,7 +231,7 @@ return array(
 	'Number of distinct ancestors found in generation G. A same individual is counted only once.'
 									=>	'Nombre d\'ancêtres différents trouvés à la génération G. Un même individu n\'est compté qu\'une seule fois.',									
 	'The <strong>%%</strong> column displays the ratio of distinct individuals compared to the number of ancestors found in generation G.'
-									=>	'La colonne <string>%%</strong> affiche la proportion d\'individus distincts par rapport au nombre d\ancêtres trouvés à la génération G.',
+									=>	'La colonne <string>%%</strong> affiche la proportion d\'individus distincts par rapport au nombre d\'ancêtres trouvés à la génération G.',
 	'Number of cumulative distinct ancestors found up to generation G. A same individual is counted only once in the total number, even if present in different generations.'
 									=>	'Nombre cumulé d\'ancêtres différents trouvés jusqu\'à la génération G. Un même individu n\'est compté qu\'une seule fois, même s\'il apparait dans plusieurs générations.',
 	'Pedigree collapse at generation G.'
@@ -241,6 +241,7 @@ return array(
 	'Generation-equivalent: %.2f generations'
 									=>	'Équivalent-génération : %.2f générations',
 	'Missing Ancestors'				=>	'Ancêtres manquants',
+	'%s\'s missing ancestors'		=>	'Ancêtres manquants de %s',
 	'Choose generation'				=>	'Choisir une génération',
 	'Generation %d'					=>	'Génération %d',
 	'Previous generation'			=>	'Génération précédente',
@@ -248,7 +249,7 @@ return array(
 	'Birth place (known or supposed)'
 									=>	'Lieu de naissance (connu ou supposé)',
 	'Number of different missing ancestors: %d'
-									=>	'Nombre d\ancêtres manquants différents: %d',
+									=>	'Nombre d\'ancêtres manquants différents: %d',
 	'%d hidden'						=>	'%d cachés',
 	'Generation complete at %.2f %%'
 									=>	'Génération complète à %.2f %%',
