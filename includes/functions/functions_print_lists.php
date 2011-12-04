@@ -78,8 +78,13 @@ function print_indi_table($datalist, $legend='', $option='') {
 				{"iDataSort": 2, "aTargets": [ 0 ] },
 				{"iDataSort": 5, "aTargets": [ 4 ] },
 				{"iDataSort": 8, "aTargets": [ 7 ] },
-				{"iDataSort": 11, "aTargets": [ 10 ] },
-				{"iDataSort": 15, "aTargets": [ 14 ] }
+				/* PERSO Modify table to include IsSourced module */
+				{"iDataSort": 10, "aTargets": [ 9 ] },
+				{"iDataSort": 13, "aTargets": [ 12 ] },
+				{"iDataSort": 17, "aTargets": [ 16 ] },
+				{"iDataSort": 19, "aTargets": [ 18 ] },	
+				{"bVisible" : false, "aTargets" : [10, 19 <?php if(!WT_Perso_Functions::isIsSourcedModuleOperational()) echo ', 9, 18'; ?> ]	}		
+				/* END PERSO */
 			],
 			"iDisplayLength": 20,
 			"sPaginationType": "full_numbers"
@@ -111,21 +116,23 @@ function print_indi_table($datalist, $legend='', $option='') {
 	   oTable<?php echo $table_id; ?>.fnSortListener('#GIVEN_SORT_<?php echo $table_id; ?>',1);
 
 	   /* Add event listeners for filtering inputs */
-		jQuery('#SEX_M_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'M', 17 );});
-		jQuery('#SEX_F_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'F', 17 );});
-		jQuery('#SEX_U_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'U', 17 );});
-		jQuery('#BIRT_YES_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'YES', 18 );});
-		jQuery('#BIRT_Y100_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'Y100', 18 );});
-		jQuery('#DEAT_N_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'N', 19 );});
-		jQuery('#DEAT_Y_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( '^Y', 19, true, false );});
-		jQuery('#DEAT_YES_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'YES', 19 );});
-		jQuery('#DEAT_Y100_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'Y100', 19 );});
-		jQuery('#TREE_R_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'R', 20 );});
-		jQuery('#TREE_L_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'L', 20 );});	
+	   /* PERSO Modify table to include IsSourced module */
+		jQuery('#SEX_M_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'M', 21 );});
+		jQuery('#SEX_F_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'F', 21 );});
+		jQuery('#SEX_U_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'U', 21 );});
+		jQuery('#BIRT_YES_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'YES', 22 );});
+		jQuery('#BIRT_Y100_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'Y100', 22 );});
+		jQuery('#DEAT_N_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'N', 23 );});
+		jQuery('#DEAT_Y_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( '^Y', 23, true, false );});
+		jQuery('#DEAT_YES_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'YES', 23 );});
+		jQuery('#DEAT_Y100_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'Y100', 23 );});
+		jQuery('#TREE_R_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'R', 24 );});
+		jQuery('#TREE_L_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'L', 24 );});	
 		
 		jQuery('#RESET_<?php echo $table_id; ?>').click( function() {
-			for(i = 0; i < 21; i++){oTable<?php echo $table_id; ?>.fnFilter( '', i );};
+			for(i = 0; i < 25; i++){oTable<?php echo $table_id; ?>.fnFilter( '', i );};
 		});
+		/* END PERSO */
 
 		jQuery(".indi-list").css('visibility', 'visible');
 		jQuery(".loading-image").css('display', 'none');
@@ -171,6 +178,14 @@ function print_indi_table($datalist, $legend='', $option='') {
 	}
 	echo '<th>', WT_Gedcom_Tag::getLabel('PLAC'), '</th>';
 	echo '<th style="display:none;">BIRT_PLAC_SORT</th>';
+	//PERSO Modify table to include IsSourced module
+	if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+		echo '<th><img src="', $WT_IMAGES['source'], '" alt="', WT_I18N::translate('Sourced birth'), '" title="', WT_I18N::translate('Sourced birth'), '" border="0" /></th>',
+		'<th>SORT_BIRTSC</th>';
+	} else {
+		echo '<th></th><th></th>';
+	}
+	//END PERSO
 	if ($tiny) {
 		echo '<th><img src="', $WT_IMAGES['children'], '" alt="', WT_I18N::translate('Children'), '" title="', WT_I18N::translate('Children'), '" border="0" /></th>';
 	} else {
@@ -186,6 +201,14 @@ function print_indi_table($datalist, $legend='', $option='') {
 	echo '<th>', WT_Gedcom_Tag::getLabel('AGE'), '</th>';
 	echo '<th>', WT_Gedcom_Tag::getLabel('PLAC'), '</th>';
 	echo '<th style="display:none;">DEAT_PLAC_SORT</th>';
+	//PERSO Modify table to include IsSourced module
+	if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+		echo '<th><img src="', $WT_IMAGES['source'], '" alt="', WT_I18N::translate('Sourced death'), '" title="', WT_I18N::translate('Sourced death'), '" border="0" /></th>',
+				'<th>SORT_DEATSC</th>';
+	} else {
+		echo '<th></th><th></th>';
+	}
+	//END PERSO
 	if ($tiny && $SHOW_LAST_CHANGE) {
 		echo '<th>', WT_Gedcom_Tag::getLabel('CHAN'), '</th>';
 	} else {
@@ -219,6 +242,9 @@ function print_indi_table($datalist, $legend='', $option='') {
 		if (!$person->canDisplayName()) {
 			continue;
 		}
+		//PERSO Create decorator for Individual
+		$dperson = new WT_Perso_Person($person);
+		//END PERSO
 		//-- place filtering
 		if ($option=='BIRT_PLAC' && strstr($person->getBirthPlace(), $filter)===false) continue;
 		if ($option=='DEAT_PLAC' && strstr($person->getDeathPlace(), $filter)===false) continue;
@@ -264,7 +290,6 @@ function print_indi_table($datalist, $legend='', $option='') {
 				$sex_image='';
 			}
 			//PERSO Add Sosa Image
-			$dperson = new WT_Perso_Person($person);
 			echo '<a ', $title, ' href="', $person->getHtmlUrl(), '" class="', $class, '">', highlight_search_hits($name['full']), '</a>', $sex_image, WT_Perso_Functions_Print::formatSosaNumbers($dperson->getSosaNumbers(), 1, 'smaller') ,"<br/>";
 			//END PERSO
 		}
@@ -343,6 +368,16 @@ function print_indi_table($datalist, $legend='', $option='') {
 		echo '</td>';
 		//-- Birth place (sortable)hidden by datatables code
 		echo '<td style="display:none">', $birth_place, '</td>';
+		//PERSO Modify table to include IsSourced module
+		if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+			$isBSourced = $dperson->isBirthSourced();
+			echo '<td>'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $isBSourced, 'BIRT', 1, 'medium').'</td>',
+				'<td>'.$isBSourced.'</td>';
+		} else {
+			echo '<td></td>',
+				'<td></td>';
+		}
+		//END PERSO
 		//-- Number of children
 		if ($tiny) {
 			echo '<td class="center">';
@@ -423,6 +458,22 @@ function print_indi_table($datalist, $legend='', $option='') {
 		echo '</td>';
 		//-- Death place (sortable)hidden by datatables code
 		echo '<td style="display:none">', $death_place, '</td>';
+		//PERSO Modify table to include IsSourced module
+		if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+			if($person->isDead()){
+				$isDSourced = $dperson->isDeathSourced();
+				echo '<td>'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $isDSourced, 'DEAT', 1, 'medium').'</td>',
+							'<td>'.$isDSourced.'</td>';
+			}
+			else{
+				echo '<td>&nbsp;</td>',
+					'<td>-99</td>';
+			}
+		} else {
+			echo '<td></td>',
+				'<td></td>';
+		}
+		//END PERSO
 		//-- Last change
 		if ($tiny && $SHOW_LAST_CHANGE) {
 			echo '<td>', $person->LastChangeTimestamp(empty($SEARCH_SPIDER)), '</td>';
@@ -522,10 +573,11 @@ function print_fam_table($datalist, $legend='', $option='') {
 			"bStateSave": true,
 			"aoColumnDefs": [
 				{"iDataSort": 2, "aTargets": [ 0 ] },
-				{"iDataSort": 5, "aTargets": [ 4 ] },
-				{"iDataSort": 8, "aTargets": [ 7 ] },
-				{"iDataSort": 11, "aTargets": [ 10 ] },
-				{"iDataSort": 15, "aTargets": [ 14 ] }
+				{"iDataSort": 6, "aTargets": [ 4 ] },
+				/* PERSO Modify table to include IsSourced module */
+				{"iDataSort": 12, "aTargets": [ 11 ] },
+				{"bVisible" : false, "aTargets" : [12 <?php if(!WT_Perso_Functions::isIsSourcedModuleOperational()) echo ', 11'; ?> ]	}		
+				/* END PERSO */
 			],
 			"iDisplayLength": 20,
 			"sPaginationType": "full_numbers"
@@ -557,20 +609,22 @@ function print_fam_table($datalist, $legend='', $option='') {
 		oTable<?php echo $table_id; ?>.fnSortListener('#GIVEN_SORT_F_<?php echo $table_id; ?>',5);
 		
 	   /* Add event listeners for filtering inputs */
-		jQuery('#DEAT_N_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'N', 14 );});
-		jQuery('#DEAT_W_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'W', 14 );});
-		jQuery('#DEAT_H_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'H', 14 );});
-		jQuery('#DEAT_Y_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'Y', 14 );});
-		jQuery('#TREE_R_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'R', 15 );});
-		jQuery('#TREE_L_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'L', 15 );});	
-		jQuery('#MARR_U_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'U', 13 );});
-		jQuery('#MARR_YES_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'YES', 13 );});
-		jQuery('#MARR_Y100_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'Y100', 13 );});
-		jQuery('#MARR_DIV_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'DIV', 13 );});
+	   /* PERSO Modify table to include IsSourced module */
+		jQuery('#DEAT_N_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'N', 16 );});
+		jQuery('#DEAT_W_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'W', 16 );});
+		jQuery('#DEAT_H_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'H', 16 );});
+		jQuery('#DEAT_Y_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'Y', 16 );});
+		jQuery('#TREE_R_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'R', 17 );});
+		jQuery('#TREE_L_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'L', 17 );});	
+		jQuery('#MARR_U_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'U', 15 );});
+		jQuery('#MARR_YES_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'YES', 15 );});
+		jQuery('#MARR_Y100_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'Y100', 15 );});
+		jQuery('#MARR_DIV_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'DIV', 15 );});
 		
 		jQuery('#RESET_<?php echo $table_id; ?>').click( function() {
-			for(i = 0; i < 17; i++){oTable<?php echo $table_id; ?>.fnFilter( '', i );};
+			for(i = 0; i < 18; i++){oTable<?php echo $table_id; ?>.fnFilter( '', i );};
 		});
+		/* END PERSO */
 		
 		jQuery(".fam-list").css('visibility', 'visible');
 		jQuery(".loading-image").css('display', 'none');
@@ -612,6 +666,14 @@ function print_fam_table($datalist, $legend='', $option='') {
 		echo '<th style="display:none;""></th>';
 	}
 	echo '<th>', WT_Gedcom_Tag::getLabel('PLAC'), '</th>';
+	//PERSO Modify table to include IsSourced module
+	if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+		echo '<th><img src="', $WT_IMAGES['source'], '" alt="', WT_I18N::translate('Sourced marriage'), '" title="', WT_I18N::translate('Sourced marriage'), '" border="0" /></th>',
+			'<th>SORT_MARRSC</th>';
+	} else {
+		echo '<th></th><th></th>';
+	}
+	//END PERSO
 	if ($tiny) {
 		echo '<th><img src="', $WT_IMAGES['children'], '" alt="', WT_I18N::translate('Children'), '" title="', WT_I18N::translate('Children'), '" border="0" /></th>';
 	} else {
@@ -643,6 +705,9 @@ function print_fam_table($datalist, $legend='', $option='') {
 		}
 		if (is_null($family)) continue;
 		if ($family->getType() !== 'FAM') continue;
+		//PERSO Create decorator for Family
+		$dfamily = new WT_Perso_Family($family);
+		//END PERSO
 		//-- Retrieve husband and wife
 		$husb = $family->getHusband();
 		if (is_null($husb)) $husb = new WT_Person('');
@@ -826,6 +891,16 @@ function print_fam_table($datalist, $legend='', $option='') {
 			echo '&nbsp;';
 		}
 		echo '</td>';
+		//PERSO Modify table to include IsSourced module
+		if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+			$isMSourced = $dfamily->isMarriageSourced();
+			echo '<td>'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $isMSourced, 'MARR', 1, 'medium').'</td>',
+				'<td>'.$isMSourced.'</td>';
+		} else {
+			echo '<td></td>',
+				'<td></td>';
+		}
+		//END PERSO
 		//-- Number of children
 		if ($tiny) {
 			echo '<td>';

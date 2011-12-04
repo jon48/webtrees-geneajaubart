@@ -16,6 +16,8 @@ if (!defined('WT_WEBTREES')) {
 
 class WT_Perso_Functions {
 
+	private static $_isIsSourcedModuleOperational = -1;
+	
 	/**
 	 * Debug tool: prompt a Javascript pop-up with a text
 	 *
@@ -105,6 +107,18 @@ class WT_Perso_Functions {
 		} catch (PDOException $ex) {
 			return false;
 		}
+	}
+	
+	/**
+	* Return whether the IsSourced module is active or not.
+	*
+	* @return bool True if module active, false otherwise
+	*/
+	public static function isIsSourcedModuleOperational(){
+		if(self::$_isIsSourcedModuleOperational == -1){
+			self::$_isIsSourcedModuleOperational = array_key_exists('perso_issourced', WT_Module::getActiveModules());
+		}
+		return self::$_isIsSourcedModuleOperational;
 	}
 	
 }

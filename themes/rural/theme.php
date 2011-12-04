@@ -195,7 +195,17 @@ $WT_IMAGES=array(
 	'menu_sosa_list'=>WT_THEME_URL.'images/family.png',
 	'menu_missing_ancestors'=>WT_THEME_URL.'images/patriarch.png',
 	'sosa-list'=>WT_THEME_URL.'images/family.png',
-	'smissing-list'=>WT_THEME_URL.'images/patriarch.png'
+	'smissing-list'=>WT_THEME_URL.'images/patriarch.png',
+	//IsSourced Module
+	'event_unknown'=>WT_THEME_URL.'images/perso_question.png',
+	'event_notprecise'=>WT_THEME_URL.'images/perso_dquestion.png',
+	'event_notsourced'=>WT_THEME_URL.'images/perso_error.png',
+	'event_sourced'=>WT_THEME_URL.'images/perso_tick.png',
+	'event_sourcedcertif'=>WT_THEME_URL.'images/perso_certsourced.png',
+	'event_sourcedcertifdate'=>WT_THEME_URL.'images/perso_dcertsourced.png',
+	'record_notsourced'=>WT_THEME_URL.'images/perso_rnotsourced.png',
+	'record_sourced'=>WT_THEME_URL.'images/perso_tick.png',
+	'record_sourcedcertif'=>WT_THEME_URL.'images/perso_certsourced.png',
 	// END PERSO
 
 );

@@ -15,26 +15,26 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Perso_Functions_Print {
-	
+
 	/**
 	 * Get an array converted to a list. For example
 	 * array("red", "green", "yellow", "blue") => "red, green, yellow and blue"
-	 * 
+	 *
 	 * @param array $array Array to convert
 	 * @return string List of elements
 	 */
 	static public function getListFromArray($array) {
 		$n=count($array);
 		switch ($n) {
-		case 0:
-			return '';
-		case 1:
-			return $array[0];
-		default:
-			return implode(WT_I18N::noop(', '), array_slice($array, 0, $n-1)).WT_I18N::noop(' and ').$array[$n-1];
+			case 0:
+				return '';
+			case 1:
+				return $array[0];
+			default:
+				return implode(WT_I18N::noop(', '), array_slice($array, 0, $n-1)).WT_I18N::noop(' and ').$array[$n-1];
 		}
 	}
-	
+
 	/**
 	 * Return HTML code to include a flag icon in facts description
 	 *
@@ -52,20 +52,20 @@ class WT_Perso_Functions_Print {
 		}
 		return $html;
 	}
-	
+
 	/**
 	 * Returns HTML code to include a place cloud
-	 * 
+	 *
 	 * @param array $places Array of places to display in the cloud
 	 * @param bool $totals Display totals for a place
 	 * @return string Place Cloud HTML Code
 	 */
 	public static function getPlacesCloud($places, $totals) {
-		
+
 		require_once WT_ROOT.'includes/functions/functions_places.php';
-		
+
 		$cloud=new Zend_Tag_Cloud(
-			array(
+		array(
 				'tagDecorator'=>array(
 					'decorator'=>'HtmlTag',
 					'options'=>array(
@@ -73,19 +73,19 @@ class WT_Perso_Functions_Print {
 						'fontSizeUnit'=>'%',
 						'minFontSize'=>100,
 						'maxFontSize'=>180
-					)
-				),
+		)
+		),
 				'cloudDecorator'=>array(
 					'decorator'=>'HtmlCloud',
 					'options'=>array(
 						'htmlTags'=>array(
 							'div'=>array(
 								'class'=>'tag_cloud'
-							)
-						)
-					)
-				)
-			)
+		)
+		)
+		)
+		)
+		)
 		);
 		foreach ($places as $place=>$count) {
 			$shortplace = self::formatPlaceShort($place, '%1 (%2)');
@@ -94,12 +94,12 @@ class WT_Perso_Functions_Print {
 				'weight'=>$count,
 				'params'=>array(
 					'url'=> get_place_url($place)
-				)
+			)
 			));
 		}
 		return (string)$cloud;
 	}
-	
+
 	/**
 	 * Return HTML Code to display individual in non structured list (e.g. Patronymic Lineages)
 	 *
@@ -107,7 +107,7 @@ class WT_Perso_Functions_Print {
 	 * @param bool $isStrong Bolden the name ?
 	 * @return string HTML Code for individual item
 	 */
-	public static function getIndividualForList(WT_Person $individual, $isStrong = true){		
+	public static function getIndividualForList(WT_Person $individual, $isStrong = true){
 		$html = '';
 		$tag = 'em';
 		if($isStrong) $tag = 'strong';
@@ -115,9 +115,9 @@ class WT_Perso_Functions_Print {
 			$dindi = new WT_Perso_Person($individual);
 			$html = $individual->getSexImage();
 			$html .= '<a class="list_item" href="'.
-				$individual->getHtmlUrl().
+			$individual->getHtmlUrl().
 				'" title="'.
-				WT_I18N::translate('Informations for individual %s', $individual->getXref()).
+			WT_I18N::translate('Informations for individual %s', $individual->getXref()).
 				'">';
 			$html .= '<'.$tag.'>'.$individual->getFullName().'</'.$tag.'>&nbsp;('.$individual->getXref().')&nbsp;';
 			$html .= WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1, 'small');
@@ -130,7 +130,7 @@ class WT_Perso_Functions_Print {
 		}
 		return $html;
 	}
-	
+
 	/**
 	 * Format date to display short (just years)
 	 *
@@ -138,10 +138,10 @@ class WT_Perso_Functions_Print {
 	 * @param boolean $anchor option to print a link to calendar
 	 * @return string HTML code for short date
 	 */
-	public static function formatFactDateShort(&$eventObj, $anchor=false) {	
+	public static function formatFactDateShort(&$eventObj, $anchor=false) {
 		global $SEARCH_SPIDER;
-		
-		$html='';	
+
+		$html='';
 		if (!is_object($eventObj)) trigger_error("Must use Event object", E_USER_WARNING);
 		$factrec = $eventObj->getGedcomRecord();
 		if (preg_match('/2 DATE (.+)/', $factrec, $match)) {
@@ -156,12 +156,12 @@ class WT_Perso_Functions_Print {
 			$factdetail = explode(' ', trim($factrec));
 			if (isset($factdetail)) if (count($factdetail) == 3) if (strtoupper($factdetail[2]) == 'Y') {
 				$html.=WT_I18N::translate('Yes');
-			}		
+			}
 		}
 		return $html;
 	}
-	
-/**
+
+	/**
 	 * Format place to display short.
 	 * The format string should used %n with n to describe the level of division to be printed (in the order of the GEDCOM place).
 	 * For instance "%1 (%2)" will display "Subdivision (Town)".
@@ -187,7 +187,7 @@ class WT_Perso_Functions_Print {
 			else{
 				$displayPlace = str_replace($match2, '' , $displayPlace);
 			}
-		}			
+		}
 		if ($anchor && (empty($SEARCH_SPIDER))) {
 			// reverse the array so that we get the top level first
 			$levels = array_reverse($levels);
@@ -202,7 +202,7 @@ class WT_Perso_Functions_Print {
 		}
 		return $html;
 	}
-	
+
 	/**
 	 * Format fact place to display short
 	 *
@@ -213,23 +213,23 @@ class WT_Perso_Functions_Print {
 	 */
 	public static function formatFactPlaceShort(&$eventObj, $format, $anchor=false){
 		global $SEARCH_SPIDER;
-	
+
 		if ($eventObj==null) return '';
 		if (!is_object($eventObj)) {
 			trigger_error("Object was not sent in, please use Event object", E_USER_WARNING);
 			$factrec = $eventObj;
 		}
 		else $factrec = $eventObj->getGedcomRecord();
-	
+
 		$html='';
-	
+
 		$ct = preg_match("/2 PLAC (.*)/", $factrec, $match);
 		if ($ct>0) {
 			$html .= self::formatPlaceShort($match[1], $format);
 		}
 		return $html;
 	}
-	
+
 	/**
 	 * Format Sosa number to display next to individual details
 	 * Possible format are:
@@ -243,7 +243,7 @@ class WT_Perso_Functions_Print {
 	 */
 	public static function formatSosaNumbers($sosatab, $format = 1, $size = 'small'){
 		global $WT_IMAGES;
-		
+
 		$html = '';
 		switch($format){
 			case 1:
@@ -266,7 +266,88 @@ class WT_Perso_Functions_Print {
 		}
 		return $html;
 	}
-	
-} 
+
+	/**
+	 * Format IsSourced icons for display
+	 * Possible format are:
+	 * 	- 1 (default) : display an icon depending on the level of sources
+	 *
+	 * @param string $sourceType Type of the record : 'E', 'R'
+	 * @param int $isSourced Level to display
+	 * @param string $tag Fact to display status
+	 * @param int $format Format to apply to the IsSourced parameter
+	 * @param string $size CSS size for the icon. A CSS style css_$size is required
+	 * @return string HTML code for IsSourced icon
+	 */
+	public static function formatIsSourcedIcon($sourceType, $isSourced, $tag='EVEN', $format = 1, $size='normal'){
+		global $WT_IMAGES;
+
+		$html='';
+		$image=null;
+		$title=null;
+		switch($format){
+			case 1:
+				switch($sourceType){
+					case 'E':
+						switch($isSourced){
+							case 0:
+								$image = 'event_unknown';
+								$title = WT_I18N::translate('%s not found', WT_Gedcom_Tag::getLabel($tag));
+								break;
+							case -1:
+								$image = 'event_notprecise';
+								$title = WT_I18N::translate('%s not precise', WT_Gedcom_Tag::getLabel($tag));
+								break;
+							case -2:
+								$image = 'event_notsourced';
+								$title = WT_I18N::translate('%s not sourced', WT_Gedcom_Tag::getLabel($tag));
+								break;
+							case 1:
+								$image = 'event_sourced';
+								$title = WT_I18N::translate('%s sourced', WT_Gedcom_Tag::getLabel($tag));
+								break;
+							case 2:
+								$image = 'event_sourcedcertif';
+								$title = WT_I18N::translate('%s sourced with a certificate', WT_Gedcom_Tag::getLabel($tag));
+								break;
+							case 3:
+								$image = 'event_sourcedcertifdate';
+								$title = WT_I18N::translate('%s sourced with exact certificate', WT_Gedcom_Tag::getLabel($tag));
+								break;
+							default:
+								break;
+						}
+						break;
+					case 'R':
+						switch($isSourced){
+							case -1:
+								$image = 'record_notsourced';
+								$title = WT_I18N::translate('%s not sourced', WT_Gedcom_Tag::getLabel($tag));
+								break;
+							case 1:
+								$image = 'record_sourced';
+								$title = WT_I18N::translate('%s sourced', WT_Gedcom_Tag::getLabel($tag));
+								break;
+							case 2:
+								$image = 'record_sourcedcertif';
+								$title = WT_I18N::translate('%s sourced with a certificate', WT_Gedcom_Tag::getLabel($tag));
+								break;
+							default:
+								break;
+						}
+						break;
+						break;
+					default:
+						break;
+				}
+				if($image && $title) $html = '<img src="'.$WT_IMAGES[$image].'" title="'.$title.'" alt="'.$title.'" class="sourced_'.$size.'" />';
+				break;
+			default:
+				break;
+		}
+		return $html;
+	}
+
+}
 
 ?>

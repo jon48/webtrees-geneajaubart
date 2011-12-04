@@ -268,6 +268,22 @@ return array(
 	'Sosa Ancestors'				=>	'Ancêtres Sosa',	
 	'Number of Sosa ancestors: %1$d known / %2$d theoretical (%3$0.2f %%)'
 									=>	'Nombre d\'ancêtres Sosa : %1$d connus / %2$d théoriques (%3$0.2f %%)',																
+
+	//Perso IsSourced
+	'Sourced events'				=>	'Événements documentés',
+	'Sourced individual'			=>	'Individu documenté',
+	'Sourced birth'					=>	'Naissance documentée',
+	'Sourced death'					=>	'Décès documenté',
+	'Sourced marriage'				=>	'Mariage documenté',
+	'Indicate if events related to an record are sourced.'
+									=>	'Indique si les événements liés à un enregistrement sont documentés',
+	'%s not found'					=>	'%s non trouvé(e)',
+	'%s not precise'				=>	'%s imprécis(e)',
+	'%s not sourced'				=>	'%s non documenté(e)',
+	'%s sourced'					=>	'%s documenté(e)',
+	'%s sourced with a certificate'	=>	'%s documenté(e) avec un acte',
+	'%s sourced with exact certificate'	
+									=>	'%s documenté(e) avec l\'acte exact',	
 									
 	//Titles
 	'Titles'						=>	'Titres',

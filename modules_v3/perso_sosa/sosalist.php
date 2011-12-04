@@ -63,16 +63,22 @@ function print_sosa_table($sosalist, $gen, $legend='') {
                 /* 6-SORT_BIRT */	{ "bVisible" : false},
                 /* 7-BIRT_PLAC */	{ "iDataSort" : 8 },
                 /* 8-SORT_BIRTPL */	{ "bVisible" : false},
-                /* 9-Death */		{ "iDataSort" : 10 , "sClass": "center"},
-                /* 10-SORT_DEAT */	{ "bVisible" : false},
-                /* 11-Age */		{ "iDataSort" : 12 , "sClass": "center"},
-                /* 12-AGE */		{ "sType": "numeric", "bVisible": false},
-                /* 13-DEAT_PLAC */	{ "iDataSort" : 14 },
-                /* 14-SORT_DEATPL */{ "bVisible" : false},
-                /* 15-SEX */		{ "bVisible" : false},
-                /* 16-BIRT */		{ "bVisible" : false},
-                /* 17-DEAT */		{ "bVisible" : false},
-                /* 18-TREE */		{ "bVisible" : false}
+                /* PERSO Modify table to include IsSourced module */
+                /* 9-BIRT_SOUR */	{ "iDataSort" : 10 <?php if(!WT_Perso_Functions::isIsSourcedModuleOperational()) echo ', "bVisible" : false'; ?>},
+                /* 10-SORT_BIRTSC */{ "bVisible" : false},
+                /* 11-Death */		{ "iDataSort" : 12 , "sClass": "center"},
+                /* 12-SORT_DEAT */	{ "bVisible" : false},
+                /* 13-Age */		{ "iDataSort" : 14 , "sClass": "center"},
+                /* 14-AGE */		{ "sType": "numeric", "bVisible": false},
+                /* 15-DEAT_PLAC */	{ "iDataSort" : 16 },
+                /* 16-SORT_DEATPL */{ "bVisible" : false},
+                /* 17-DEAT_SOUR */	{ "iDataSort" : 18 <?php if(!WT_Perso_Functions::isIsSourcedModuleOperational()) echo ', "bVisible" : false'; ?>},
+                /* 18-SORT_DEATSC */{ "bVisible" : false},
+                /* 19-SEX */		{ "bVisible" : false},
+                /* 20-BIRT */		{ "bVisible" : false},
+                /* 21-DEAT */		{ "bVisible" : false},
+                /* 22-TREE */		{ "bVisible" : false}
+                /* END PERSO */
 			],			
             "aaSorting": [[0,'asc']],
 			"iDisplayLength": 16,
@@ -101,20 +107,22 @@ function print_sosa_table($sosalist, $gen, $legend='') {
 		?>');
 
 	   /* Add event listeners for filtering inputs */
-		jQuery('#SEX_M_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'M', 15 );});
-		jQuery('#SEX_F_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'F', 15 );});
-		jQuery('#SEX_U_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'U', 15 );});
-		jQuery('#BIRT_YES_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'YES', 16 );});
-		jQuery('#BIRT_Y100_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'Y100', 16 );});
-		jQuery('#DEAT_N_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'N', 17 );});
-		jQuery('#DEAT_Y_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( '^Y', 17, true, false );});
-		jQuery('#DEAT_YES_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'YES', 17 );});
-		jQuery('#DEAT_Y100_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'Y100', 17 );});
-		jQuery('#TREE_R_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'R', 18 );});
+	   /* PERSO Modify table to include IsSourced module */
+		jQuery('#SEX_M_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'M', 19 );});
+		jQuery('#SEX_F_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'F', 19 );});
+		jQuery('#SEX_U_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'U', 19 );});
+		jQuery('#BIRT_YES_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'YES', 20 );});
+		jQuery('#BIRT_Y100_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'Y100', 20 );});
+		jQuery('#DEAT_N_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'N', 21 );});
+		jQuery('#DEAT_Y_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( '^Y', 21, true, false );});
+		jQuery('#DEAT_YES_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'YES', 21 );});
+		jQuery('#DEAT_Y100_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'Y100', 21 );});
+		jQuery('#TREE_R_<?php echo $table_id; ?>').click( function() { oTable<?php echo $table_id; ?>.fnFilter( 'R', 21 );});
 		
 		jQuery('#RESET_<?php echo $table_id; ?>').click( function() {
-			for(i = 0; i < 19; i++){oTable<?php echo $table_id; ?>.fnFilter( '', i );};
+			for(i = 0; i < 23; i++){oTable<?php echo $table_id; ?>.fnFilter( '', i );};
 		});
+		/* END PERSO */
 		
 		/* Add event listeners for toogling inputs */
 		jQuery('#cb_parents_sosa_list_table<?php echo $table_id; ?>').click( function() { toggleByClassName('DIV', 'parents_sosa_list_table_<?php echo $table_id; ?>'); });
@@ -155,12 +163,28 @@ function print_sosa_table($sosalist, $gen, $legend='') {
 	echo '<th>SORT_BIRT</th>';
 	echo '<th>', WT_Gedcom_Tag::getLabel('PLAC'), '</th>';
 	echo '<th>BIRT_PLAC_SORT</th>';
+	//PERSO Modify table to include IsSourced module
+	if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+		echo '<th><img src="', $WT_IMAGES['source'], '" alt="', WT_I18N::translate('Sourced birth'), '" title="', WT_I18N::translate('Sourced birth'), '" border="0" /></th>',
+		'<th>SORT_BIRTSC</th>';
+	} else {
+		echo '<th></th><th></th>';
+	}
+	//END PERSO
 	echo '<th>', WT_Gedcom_Tag::getLabel('DEAT'), '</th>';
 	echo '<th>SORT_DEAT</th>';
 	echo '<th>', WT_Gedcom_Tag::getLabel('AGE'), '</th>';
 	echo '<th>AGE</th>';
 	echo '<th>', WT_Gedcom_Tag::getLabel('PLAC'), '</th>';
 	echo '<th>DEAT_PLAC_SORT</th>';
+	//PERSO Modify table to include IsSourced module
+	if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+		echo '<th><img src="', $WT_IMAGES['source'], '" alt="', WT_I18N::translate('Sourced death'), '" title="', WT_I18N::translate('Sourced death'), '" border="0" /></th>',
+			'<th>SORT_DEATSC</th>';
+	} else {
+		echo '<th></th><th></th>';
+	}
+	//END PERSO
 	echo '<th>SEX</th>';
 	echo '<th>BIRT</th>';
 	echo '<th>DEAT</th>';
@@ -282,6 +306,16 @@ function print_sosa_table($sosalist, $gen, $legend='') {
 		echo '</td>';
 		//-- Birth place (sortable)hidden by datatables code
 		echo '<td>', $birth_place, '</td>';
+		//PERSO Modify table to include IsSourced module
+		if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+			$isBSourced = $dperson->isBirthSourced();
+			echo '<td>'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $isBSourced, 'BIRT', 1, 'medium').'</td>',
+				'<td>'.$isBSourced.'</td>';
+		} else {
+			echo '<td></td>',
+				'<td></td>';
+		}
+		//END PERSO
 		//-- Death date
 		echo '<td>';
 		if ($death_dates=$person->getAllDeathDates()) {
@@ -341,6 +375,22 @@ function print_sosa_table($sosalist, $gen, $legend='') {
 		echo '</td>';
 		//-- Death place (sortable)hidden by datatables code
 		echo '<td>', $death_place, '</td>';
+		//PERSO Modify table to include IsSourced module
+		if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+			if($person->isDead()){
+				$isDSourced = $dperson->isDeathSourced();
+				echo '<td>'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $isDSourced, 'DEAT', 1, 'medium').'</td>',
+					'<td>'.$isDSourced.'</td>';
+			}
+			else{
+				echo '<td>&nbsp;</td>',
+					'<td>-99</td>';
+			}
+		} else {
+			echo '<td></td>',
+				'<td></td>';
+		}
+		//END PERSO
 		//-- Sorting by gender
 		echo '<td>', $person->getSex(), '</td>';
 		//-- Filtering by birth date
@@ -380,8 +430,10 @@ function print_sosa_table($sosalist, $gen, $legend='') {
 	$nbSosa = count($sosalist);
 	$thSosa = pow(2, $gen-1);
 	$perc = WT_Perso_Functions::getPercentage($nbSosa, $thSosa);
+	//PERSO Modify table to include IsSourced module
 	echo '<tfoot>',
-		'<tr><td class="ui-state-default" colspan="19">'.WT_I18N::translate('Number of Sosa ancestors: %1$d known / %2$d theoretical (%3$0.2f %%)',$nbSosa, $thSosa, $perc);
+		'<tr><td class="ui-state-default" colspan="23">'.WT_I18N::translate('Number of Sosa ancestors: %1$d known / %2$d theoretical (%3$0.2f %%)',$nbSosa, $thSosa, $perc);
+	//END PERSO
 	if($n != $nbSosa) echo ' ['.WT_I18N::translate('%d hidden', $nbSosa - $n).']';
 	echo '</td></tr></tfoot>';
 	echo '</table>';

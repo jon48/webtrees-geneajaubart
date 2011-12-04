@@ -70,7 +70,7 @@ class WT_Perso_Controller_Individual {
 		$hook_extend_indi_header_icons = $hook_extend_indi_header_icons->execute($this->ctrlIndividual);
 		
 		echo '<span id="indi_perso_icons">&nbsp;',
-			implode('', $hook_extend_indi_header_icons),
+			implode('&nbsp;', $hook_extend_indi_header_icons),
 			'</span>';
 	}
 

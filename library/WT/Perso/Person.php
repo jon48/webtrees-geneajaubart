@@ -17,9 +17,11 @@ if (!defined('WT_WEBTREES')) {
 class WT_Perso_Person extends WT_Perso_GedcomRecord {
 
 	// Cached results from various functions.
-	private $_titles=null;
-	private $_unprotectedPrimarySurname = null;
-	private $_sosa = null;
+	protected $_titles=null;
+	protected $_unprotectedPrimarySurname = null;
+	protected $_sosa = null;
+	protected $_isbirthsourced = null;
+	protected $_isdeathsourced = null;
 	
 	/**
 	 * Extend WT_Person getInstance, in order to retrieve directly a WT_Perso_Person object 
@@ -226,6 +228,28 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 			return $this->_sosa;
 		}
 		return null;
+	}
+		
+	/** 
+	 * Check if this individual's birth is sourced
+	 *
+	 * @return int Level of sources
+	 * */
+	function isBirthSourced(){
+		if($this->_isbirthsourced != null) return $this->_isbirthsourced;
+		$this->_isbirthsourced = $this->isEventSourced(WT_EVENTS_BIRT);
+		return $this->_isbirthsourced;
+	}
+	
+	/**
+	* Check if this individual's death is sourced
+	*
+	* @return int Level of sources
+	* */
+	function isDeathSourced(){
+		if($this->_isdeathsourced != null) return $this->_isdeathsourced;
+		$this->_isdeathsourced = $this->isEventSourced(WT_EVENTS_DEAT);
+		return $this->_isdeathsourced;
 	}
 	
 }

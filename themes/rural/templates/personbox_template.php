@@ -27,6 +27,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @version $Id: personbox_template.php 12461 2011-10-29 14:48:07Z rob $
+ * @version: p_$Revision$ $Date$
+ * $HeadURL$
  */
 
 if (!defined('WT_WEBTREES')) {
@@ -46,6 +48,14 @@ if (!defined('WT_WEBTREES')) {
 			<?php echo $name.$addname; ?>
 		</span>
 		<span class="name<?php echo $style; ?>"> <?php echo $genderImage; ?></span>
+		<!-- PERSO Append record name text -->
+		<span class="rn_append">
+		<?php 
+			$hook_rn_append = new WT_Perso_Hook('h_rn_append');
+			echo implode('&nbsp;', $hook_rn_append->execute($person)) ;
+		?>
+		</span>
+		<!-- END PERSO -->
 		<?php echo $showid; ?> </a>
 		<div id="fontdef-<?php echo $boxID; ?>" class="details<?php echo $style; ?>">
 			<div id="inout2-<?php echo $boxID; ?>" style="display: block; overflow:hidden; max-height: <?php echo $bheight-25; ?>px;"><?php echo $BirthDeath; ?></div>
