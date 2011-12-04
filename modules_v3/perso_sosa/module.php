@@ -23,7 +23,7 @@ try {
 	die($ex);
 }
 
-class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso_Module_HookSubscriber, WT_Perso_Module_Configurable, WT_Perso_Module_IndividualHeaderExtender {
+class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso_Module_HookSubscriber, WT_Perso_Module_Configurable, WT_Perso_Module_IndividualHeaderExtender, WT_Perso_Module_RecordNameTextExtender {
 	
 	// Extend class WT_Module
 	public function getTitle() {
@@ -116,7 +116,8 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			'h_config_tab_name' => 30,
 			'h_config_tab_content' => 30,
 			'h_extend_indi_header_icons' => 20,
-			'h_extend_indi_header_right' => 20
+			'h_extend_indi_header_right' => 20,
+			'h_rn_append' => 20
 		);
 	}
 	
@@ -170,6 +171,20 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			return array('indi-header-sosa',  WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 2, 'normal'));
 		}
 		return '';
+	}
+	
+	//Implement WT_Perso_Module_RecordNameTextExtender
+	public function h_rn_prepend(WT_GedcomRecord $grec){
+	}
+	
+	//Implement WT_Perso_Module_RecordNameTextExtender
+	public function h_rn_append(WT_GedcomRecord $grec){
+		$html = '';
+		if($grec instanceof WT_Person){ // Only apply to individuals
+			$dindi = new WT_Perso_Person($grec);
+			$html .= WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1, 'small');
+		}
+		return $html;
 	}
 	
 	/**

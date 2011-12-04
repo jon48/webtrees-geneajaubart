@@ -181,14 +181,18 @@ if($requestedCity){
 						'<img src="',$pathCertif,'" class="certif_image" alt="',$certificate,'" title="',$certificate,'" /></a>';
 			echo '</div>'; // close "certificate-edit"
 		}
-		echo '<ul>';
-				if (count($tabIndi)>0) {
-					echo '<li><a href="#indi-certificate"><span id="indisource">', WT_I18N::translate('Individuals'), '</span></a></li>';
-				}
-				if (count($tabFam)) {
-					echo '<li><a href="#fam-certificate"><span id="famsource">', WT_I18N::translate('Families'), '</span></a></li>';
-				}
-		echo '</ul>';
+		$hasIndi = (count($tabIndi)>0);
+		$hasFam = (count($tabFam)> 0);
+		if( $hasIndi || $hasFam ){ // Do not display anything if neither a family nor a individual is related
+			echo '<ul>';
+			if ($hasIndi) {
+				echo '<li><a href="#indi-certificate"><span id="indisource">', WT_I18N::translate('Individuals'), '</span></a></li>';
+			}
+			if (count($tabFam)) {
+				echo '<li><a href="#fam-certificate"><span id="famsource">', WT_I18N::translate('Families'), '</span></a></li>';
+			}
+			echo '</ul>';
+		}
 
 		//Populate related individuals tab
 		if(count($tabIndi)>0){

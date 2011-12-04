@@ -1710,10 +1710,10 @@ html[dir='rtl'] .main-menu-item  li li a {float:right;padding:1px 5px 1px 10px;}
 
 html[dir='rtl'] #extra-menu {	float:left;	margin:20px 0 0 10px ;}
 html[dir='rtl'] #extra-menu.makeMenu li ul {left:0px;right:auto;}
-html[dir='rtl'] .makeMenu li ul {left:auto; right:0px;}
+html[dir='rtl'] .makeMenu li ul {left:0px; right:auto;}
 html[dir='rtl'] .makeMenu li ul li {text-align:right;}
 html[dir='rtl'] .makeMenu li {border-left:none; border-right: 2px solid;}
-html[dir='rtl'] .makeMenu li:first-child, html[dir='rtl'] .makeMenu li ul li  {border:none;}
+html[dir='rtl'] .makeMenu li:last-child, html[dir='rtl'] .makeMenu li ul li  {border:none;}
 
 
 /* ========= Positioning edit, copy, delete links ============= */
@@ -1822,7 +1822,6 @@ html[dir='rtl'] #extra-menu.makeMenu li ul {left: 0px;right: auto;}
 html[dir='rtl'] .popup dt {float:none;}
 html[dir='rtl'] .popup dd {margin-right:10px;}
 html[dir='rtl'] .itr:hover .popup {left:0; right:auto;}
-
 
 /* ========= jquery-ui.custom.css changes ============ */
 .ui-tabs {padding:0;}
@@ -1954,7 +1953,6 @@ html[dir='rtl'] .desc_tree_div ul {margin-right:10px;margin-left:0px;}
 #sb_content_extra_info a {display:block;}
 #sb_content_extra_info span {font-weight:normal; white-space:nowrap;}
 #sb_content_extra_info span a {display:inline;}
-#sb_content_extra_info #hitcounter {border-top: 1px solid #B2C7D7; font-weight: bold; padding-top: 5px;}
+#sb_content_extra_info #hitcounter {border-top: 1px solid #A28765; font-weight: bold; padding-top: 5px;}
 
 html[dir='rtl'] #sb_content_extra_info .editfacts {float:left;}
-
