@@ -32,7 +32,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // @author Greg Roach
-// @version $Id: Date.php 11689 2011-06-02 10:20:27Z veit $
+// @version $Id: Date.php 12854 2011-11-22 15:19:51Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -299,11 +299,13 @@ class WT_Date {
 	// Calculate the number of full years between two events.
 	// Return the result as either a number of years (for indi lists, etc.)
 	static function GetAgeYears($d1, $d2=null, $warn_on_negative=true) {
-		if (!is_object($d1)) return;
-		if (!is_object($d2))
+		if (!is_object($d1)) {
+			return '';
+		} elseif (!is_object($d2)) {
 			return $d1->date1->GetAge(false, WT_CLIENT_JD, $warn_on_negative );
-		else
+		} else {
 			return $d1->date1->GetAge(false, $d2->MinJD(), $warn_on_negative);
+		}
 	}
 
 	// Calculate the years/months/days between two events

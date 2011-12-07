@@ -21,17 +21,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_config.php 12382 2011-10-23 13:42:48Z greg $
+// $Id: admin_trees_config.php 12843 2011-11-21 14:22:45Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_config.php');
 
 require './includes/session.php';
-require WT_ROOT.'includes/functions/functions_edit.php';
 
-if (!WT_USER_GEDCOM_ADMIN) {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'admin.php');
-	exit;
-}
+$controller=new WT_Controller_Base();
+$controller
+	->requireManagerLogin()
+	->setPageTitle(WT_I18N::translate('Family tree configuration'));
+
+require WT_ROOT.'includes/functions/functions_edit.php';
 
 /**
  * find the name of the first GEDCOM file in a zipfile
@@ -236,7 +237,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'SHOW_LEVEL2_NOTES',            safe_POST_bool('NEW_SHOW_LEVEL2_NOTES'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_LIST_PLACES',             safe_POST('NEW_SHOW_LIST_PLACES'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_LIVING_NAMES',            safe_POST('SHOW_LIVING_NAMES'));
-	set_gedcom_setting(WT_GED_ID, 'SHOW_MARRIED_NAMES',           safe_POST_bool('NEW_SHOW_MARRIED_NAMES'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_MEDIA_DOWNLOAD',          safe_POST_bool('NEW_SHOW_MEDIA_DOWNLOAD'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_NO_WATERMARK',            safe_POST('NEW_SHOW_NO_WATERMARK'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_PARENTS_AGE',             safe_POST_bool('NEW_SHOW_PARENTS_AGE'));
@@ -361,7 +361,9 @@ default:
 	break;
 
 }
-print_header(WT_I18N::translate('Family tree configuration'));
+
+$controller->pageHeader();
+
 if (get_gedcom_count()==1) { //Removed because it doesn't work here for multiple GEDCOMs. Can be reinstated when fixed (https://bugs.launchpad.net/webtrees/+bug/613235)
 	if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm'; 
 }
@@ -385,14 +387,14 @@ echo WT_JS_START;?>
 	$i = 0;
 ?>
 
-<table class="center <?php echo $TEXT_DIRECTION; ?>">
+<table>
 	<tr>
 		<td colspan="2">
 			<div id="tabs" style="display:none">
 				<ul>
 					<li><a href="#file-options"><span><?php echo WT_I18N::translate('GEDCOM Basics'); ?></span></a></li>
 					<li><a href="#privacy"><span><?php echo WT_I18N::translate('Privacy'); ?></span></a></li>
-					<li><a href="#config-media"><span><?php echo WT_I18N::translate('Multimedia'); ?></span></a></li>
+					<li><a href="#config-media"><span><?php echo WT_I18N::translate('Media'); ?></span></a></li>
 					<li><a href="#access-options"><span><?php echo WT_I18N::translate('Access'); ?></span></a></li>
 					<li><a href="#layout-options"><span><?php echo WT_I18N::translate('Layout'); ?></span></a></li>
 					<li><a href="#hide-show"><span><?php echo WT_I18N::translate('Hide &amp; Show'); ?></span></a></li>
@@ -1020,14 +1022,6 @@ echo WT_JS_START;?>
 							<?php echo edit_field_yes_no('NEW_UNDERLINE_NAME_QUOTES', get_gedcom_setting(WT_GED_ID, 'UNDERLINE_NAME_QUOTES')); ?>
 						</td>
 					</tr>
-					<tr>
-						<td>
-							<?php echo WT_I18N::translate('Show married names on individual list'), help_link('SHOW_MARRIED_NAMES'); ?>
-						</td>
-						<td>
-							<?php echo edit_field_yes_no('NEW_SHOW_MARRIED_NAMES', get_gedcom_setting(WT_GED_ID, 'SHOW_MARRIED_NAMES')); ?>
-						</td>
-					</tr>
 						<td>
 							<?php echo WT_I18N::translate('Min. no. of occurrences to be a "common surname"'), help_link('COMMON_NAMES_THRESHOLD'); ?>
 						</td>
@@ -1607,5 +1601,3 @@ echo WT_JS_START;?>
 	</tr>
 </table>
 </form>
-<?php
-print_footer();

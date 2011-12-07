@@ -21,17 +21,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_users.php 12466 2011-10-30 01:13:24Z nigel $
+// $Id: admin_users.php 12887 2011-11-23 18:40:41Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_users.php');
 require './includes/session.php';
-require_once WT_ROOT.'includes/functions/functions_edit.php';
 
-// Only admin users can access this page
-if (!WT_USER_IS_ADMIN) {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.WT_SCRIPT_NAME);
-	exit;
-}
+$controller=new WT_Controller_Base();
+$controller
+	->requireAdminLogin()
+	->setPageTitle(WT_I18N::translate('User administration'));
+
+require_once WT_ROOT.'includes/functions/functions_edit.php';
 
 // Valid values for form variables
 $ALL_ACTIONS=array('cleanup', 'cleanup2', 'createform', 'createuser', 'deleteuser', 'edituser', 'edituser2', 'listusers', 'loadrows', 'load1row');
@@ -267,7 +267,8 @@ case 'load1row':
 	exit;
 }
 
-print_header(WT_I18N::translate('User administration'));
+$controller->pageHeader();
+
 // Save new user info to the database
 if ($action=='createuser' || $action=='edituser2') {
 	if (($action=='createuser' || $action=='edituser2' && $username!=$oldusername) && get_user_id($username)) {
@@ -365,39 +366,37 @@ if ($action=='createuser' || $action=='edituser2') {
 switch ($action) {
 case 'createform':
 	init_calendar_popup();
-	?>
-	<script type="text/javascript">
-	<!--
+	$controller->addInlineJavaScript('
 		function checkform(frm) {
 			if (frm.username.value=="") {
-				alert("<?php echo WT_I18N::translate('You must enter a user name.'); ?>");
+				alert("'.addslashes(WT_I18N::translate('You must enter a user name.')).'");
 				frm.username.focus();
 				return false;
 			}
 			if (frm.realname.value=="") {
-				alert("<?php echo WT_I18N::translate('You must enter a real name.'); ?>");
+				alert("'.addslashes(WT_I18N::translate('You must enter a real name.')).'");
 				frm.realname.focus();
 				return false;
 			}
 			if (frm.pass1.value=="") {
-				alert("<?php echo WT_I18N::translate('You must enter a password.'); ?>");
+				alert("'.addslashes(WT_I18N::translate('You must enter a password.')).'");
 				frm.pass1.focus();
 				return false;
 			}
 			if (frm.pass2.value=="") {
-				alert("<?php echo WT_I18N::translate('You must confirm the password.'); ?>");
+				alert("'.addslashes(WT_I18N::translate('You must confirm the password.')).'");
 				frm.pass2.focus();
 				return false;
 			}
 			if (frm.pass1.value.length < 6) {
-				alert("<?php echo WT_I18N::translate('Passwords must contain at least 6 characters.'); ?>");
+				alert("'.addslashes(WT_I18N::translate('Passwords must contain at least 6 characters.')).'");
 				frm.pass1.value = "";
 				frm.pass2.value = "";
 				frm.pass1.focus();
 				return false;
 			}
 			if (frm.emailaddress.value.indexOf("@")==-1) {
-				alert("<?php echo WT_I18N::translate('You must enter an email address.'); ?>");
+				alert("'.addslashes(WT_I18N::translate('You must enter an email address.')).'");
 				frm.emailaddress.focus();
 				return false;
 			}
@@ -407,41 +406,38 @@ case 'createform':
 		function paste_id(value) {
 			pastefield.value=value;
 		}
-		jQuery(document).ready(function() {
-			jQuery('.relpath').change(function() {
-				var fieldIDx = jQuery(this).attr('id');
-				var idNum = fieldIDx.replace('RELATIONSHIP_PATH_LENGTH','');
-				var newIDx = "gedcomid"+idNum;
-				if (jQuery('#'+newIDx).val()=='') {
-					alert("<?php echo WT_I18N::translate('You must specify an individual record before you can restrict the user to their immediate family.'); ?>");
-					jQuery(this).val('');
-				}
-			});
+		jQuery(".relpath").change(function() {
+			var fieldIDx = jQuery(this).attr("id");
+			var idNum = fieldIDx.replace("RELATIONSHIP_PATH_LENGTH","");
+			var newIDx = "gedcomid"+idNum;
+			if (jQuery("#"+newIDx).val()=="") {
+				alert("'.addslashes(WT_I18N::translate('You must specify an individual record before you can restrict the user to their immediate family.')).'");
+				jQuery(this).val("");
+			}
 		});
-		
-	//-->
-	</script>
+	');
 
+	?>
 	<form name="newform" method="post" action="admin_users.php?action=createuser" onsubmit="return checkform(this);">
 		<!--table-->
 		<table id="adduser">
 			<tr>
-				<td><?php echo WT_I18N::translate('User name'), help_link('useradmin_username'); ?></td>
+				<td><?php echo WT_I18N::translate('Username'), help_link('username'); ?></td>
 				<td colspan="3" ><input type="text" name="username" autofocus /></td>
 			</tr>
 			<tr>
-				<td><?php echo WT_I18N::translate('Real name'), help_link('useradmin_realname'); ?></td>
+				<td><?php echo WT_I18N::translate('Real name'), help_link('real_name'); ?></td>
 				<td colspan="3" ><input type="text" name="realname" size="50" /></td>
 			</tr>
 			<tr>
-				<td><?php echo WT_I18N::translate('Password'), help_link('useradmin_password'); ?></td>
+				<td><?php echo WT_I18N::translate('Password'), help_link('password'); ?></td>
 				<td ><input type="password" name="pass1" /></td>
-				<td><?php echo WT_I18N::translate('Confirm password'), help_link('useradmin_conf_password'); ?></td>
+				<td><?php echo WT_I18N::translate('Confirm password'), help_link('password_confirm'); ?></td>
 				<td ><input type="password" name="pass2" /></td>
 			</tr>
 			<tr>
 			<tr>
-				<td><?php echo WT_I18N::translate('Email address'), help_link('useradmin_email'); ?></td>
+				<td><?php echo WT_I18N::translate('Email address'), help_link('email'); ?></td>
 				<td ><input type="text" name="emailaddress" value="" size="50" /></td>
 				<td><?php echo WT_I18N::translate('Preferred contact method'), help_link('useradmin_user_contact'); ?></td>
 				<td >
@@ -563,7 +559,7 @@ case 'createform':
 case 'cleanup':
 	?>
 	<form name="cleanupform" method="post" action="admin_users.php?action=cleanup2">
-	<table id="clean" class="<?php echo $TEXT_DIRECTION; ?>">
+	<table id="clean">
 	<?php
 	// Check for idle users
 	//if (!isset($month)) $month = 1;
@@ -678,7 +674,7 @@ default:
 				'<tr>',
 					'<th style="margin:0 -2px 1px 1px; padding:6px 0 5px;"> </th>',
 					'<th> user-id </th>',
-					'<th>', WT_I18N::translate('User name'), '</th>',
+					'<th>', WT_I18N::translate('Username'), '</th>',
 					'<th>', WT_I18N::translate('Real name'), '</th>',
 					'<th>', WT_I18N::translate('Email'), '</th>',
 					'<th> </th>', /* COLSPAN does not work? */
@@ -695,33 +691,21 @@ default:
 			'<tbody>',
 			'</tbody>',
 		'</table>';
-	echo WT_JS_START;
-	?>
-		jQuery(document).ready(function(){
-			var oTable = jQuery('#list').dataTable( {
-				"oLanguage": {
-					"sLengthMenu": '<?php echo /* I18N: %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="5">5</option><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
-					"sZeroRecords": '<?php echo WT_I18N::translate('No records to display');?>',
-					"sInfo": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_'); ?>',
-					"sInfoEmpty": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '0', '0', '0'); ?>',
-					"sInfoFiltered": '<?php echo /* I18N: %s  is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_'); ?>',
-					"sProcessing": '<?php echo WT_I18N::translate('Loading...');?>',
-					"sSearch": '<?php echo WT_I18N::translate('Filter');?>',					"oPaginate": {
-						"sFirst": '<?php echo WT_I18N::translate_c('first page', 'first');?>',
-						"sLast": '<?php echo WT_I18N::translate('last');?>',
-						"sNext": '<?php echo WT_I18N::translate('next');?>',
-						"sPrevious": '<?php echo WT_I18N::translate('previous');?>'
-					}
-				},
-				"sDom"			  : '<"H"pf<"dt-clear">irl>t<"F"pl>',
+	
+	$controller
+		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavaScript('
+			var oTable = jQuery("#list").dataTable({
+				"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
+				'.WT_I18N::datatablesI18N().',
 				"bProcessing"     : true,
 				"bServerSide"     : true,
-				"sAjaxSource"     : "<?php echo WT_SCRIPT_NAME.'?action=loadrows'; ?>",
+				"sAjaxSource"     : "'.WT_SCRIPT_NAME.'?action=loadrows",
 				"bJQueryUI": true,
 				"bAutoWidth":false,
-				"iDisplayLength": <?php echo get_user_setting(WT_USER_ID, 'admin_users_page_size', 10); ?>,
+				"iDisplayLength": '.get_user_setting(WT_USER_ID, 'admin_users_page_size', 10).',
 				"sPaginationType": "full_numbers",
-				"aaSorting": [[2,'asc']],
+				"aaSorting": [[2,"asc"]],
 				"aoColumns": [
 					/* details           */ { bSortable:false, sClass:"icon-open" },
 					/* user-id           */ { bVisible:false },
@@ -742,44 +726,37 @@ default:
 					// Our JSON responses include JavaScript as well as HTML.  This does not get
 					// executed (except for some versions of Firefox?).  So, extract it, and add
 					// it to its own DOM element
-					jQuery('#list script').each(function() {
-						var script=document.createElement('script');
-						script.type='text/javascript';
-						jQuery('#list script').appendTo('body'); 
+					jQuery("#list script").each(function() {
+						var script=document.createElement("script");
+						script.type="text/javascript";
+						jQuery("#list script").appendTo("body"); 
 						document.body.appendChild(script);
 					}).remove();
-					//
-				}
-				
+				}				
 			});
 			
 			/* When clicking on the +/- icon, we expand/collapse the details block */
-			jQuery('#list tbody td.icon-close').live('click', function () {
+			jQuery("#list tbody td.icon-close").live("click", function () {
 				var nTr=this.parentNode;
 				jQuery(this).removeClass("icon-close");
 				oTable.fnClose(nTr);
 				jQuery(this).addClass("icon-open");
 			});
-			jQuery('#list tbody td.icon-open').live('click', function () {
+			jQuery("#list tbody td.icon-open").live("click", function () {
 				var nTr=this.parentNode;
 				jQuery(this).removeClass("icon-open");
 				var aData=oTable.fnGetData(nTr);
-				jQuery.get("<?php echo WT_SCRIPT_NAME.'?action=load1row&user_id='; ?>"+aData[1], function(data) {
+				jQuery.get("'.WT_SCRIPT_NAME.'?action=load1row&user_id="+aData[1], function(data) {
 					oTable.fnOpen(nTr, data, "details");
 				});
 				jQuery(this).addClass("icon-close");
 			});
-			
-			/* Filter immediately for single user name */
-			<?php if ($action=='edituser') { $username=safe_GET('username'); ?>
-				oTable = jQuery('#list').dataTable();			
-				oTable.fnFilter( '<?php echo $username; ?>' );
-			<?php } ?>
-	
-		});
-	<?php
-	echo WT_JS_END;
+		');
+
+	/* Filter immediately for single user name */
+	if ($action=='edituser') {
+		$username=safe_GET('username');
+		$controller->addInlineJavaScript('oTable.fnFilter("'.$username.'");');
+	}	
 	break;
 }
-
-print_footer();

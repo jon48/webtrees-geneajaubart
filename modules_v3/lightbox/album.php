@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: album.php 12380 2011-10-22 23:25:31Z lukasz $
+// $Id: album.php 12503 2011-11-03 11:58:38Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,7 +33,6 @@ if (!defined('WT_WEBTREES')) {
 global $edit, $sort_i;
 
 $reorder=safe_get('reorder', '1', '0');
-$pid=$this->controller->indi->getXref();
 
 require_once WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lightbox_print_media.php';
 require_once WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lightbox_print_media_row.php';
@@ -76,12 +75,12 @@ if ($reorder==1) {
 	</script>
 	<form name="reorder_form" method="post" action="edit_interface.php">
 		<input type="hidden" name="action" value="al_reorder_media_update" />
-		<input type="hidden" name="pid" value="<?php echo $pid; ?>" />
+		<input type="hidden" name="pid" value="<?php echo $controller->record->getXref(); ?>" />
 		<input type="hidden" id="ord2" name="order2" value="" />
 		<center>
 			<button type="submit" title="<?php echo WT_I18N::translate('Saves the sorted media to the database'); ?>" onclick="saveOrder();" ><?php echo WT_I18N::translate('Save'); ?></button>&nbsp;
 			<button type="submit" title="<?php echo WT_I18N::translate('Reset to the original order'); ?>" onclick="document.reorder_form.action.value='al_reset_media_update'; document.reorder_form.submit();"><?php echo WT_I18N::translate('Reset'); ?></button>&nbsp;
-			<button type="button" title="<?php echo WT_I18N::translate('Quit and return'); ?>" onClick="location.href='<?php echo WT_SCRIPT_NAME, '?pid=', $pid, '#lightbox'; ?>'"><?php echo WT_I18N::translate('Cancel'); ?></button>
+			<button type="button" title="<?php echo WT_I18N::translate('Quit and return'); ?>" onClick="location.href='<?php echo WT_SCRIPT_NAME, '?pid=', $controller->record->getXref(), '#lightbox'; ?>'"><?php echo WT_I18N::translate('Cancel'); ?></button>
 			<?php
 			/*
 			// Debug ---------------------------------------------------------------------------
@@ -96,10 +95,10 @@ if ($reorder==1) {
 }
 echo '<table width="100%" cellpadding="0" border="0"><tr>';
 echo '<td width="100%" valign="top" >';
-lightbox_print_media($pid, 0, true, 1); // map, painting, photo, tombstone)
-lightbox_print_media($pid, 0, true, 2); // card, certificate, document, magazine, manuscript, newspaper
-lightbox_print_media($pid, 0, true, 3); // electronic, fiche, film
-lightbox_print_media($pid, 0, true, 4); // audio, book, coat, video, other
-lightbox_print_media($pid, 0, true, 5); // footnotes
+lightbox_print_media($controller->record->getXref(), 0, true, 1); // map, painting, photo, tombstone)
+lightbox_print_media($controller->record->getXref(), 0, true, 2); // card, certificate, document, magazine, manuscript, newspaper
+lightbox_print_media($controller->record->getXref(), 0, true, 3); // electronic, fiche, film
+lightbox_print_media($controller->record->getXref(), 0, true, 4); // audio, book, coat, video, other
+lightbox_print_media($controller->record->getXref(), 0, true, 5); // footnotes
 echo '</td>';
 echo '</tr></table>';

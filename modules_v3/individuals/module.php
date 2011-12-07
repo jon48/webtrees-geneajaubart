@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12200 2011-09-21 10:34:40Z greg $
+// $Id: module.php 12734 2011-11-14 11:52:48Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -37,6 +37,20 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	// Extend class WT_Module
 	public function getDescription() {
 		return /* I18N: Description of "Individuals" module */ WT_I18N::translate('A sidebar showing an alphabetic list of all the individuals in the family tree.');
+	}
+
+	// Implement WT_Module
+	public function modAction($modAction) {
+		switch ($modAction) {
+		case 'ajax':
+			header('Content-Type: text/html; charset=UTF-8');
+			echo $this->getSidebarAjaxContent();
+			break;
+		default:
+			header('HTTP/1.0 404 Not Found');
+			break;
+		}
+		exit;
 	}
 
 	// Implement WT_Module_Sidebar
@@ -71,10 +85,10 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 	// Implement WT_Module_Sidebar
 	public function getSidebarContent() {
-		global $SHOW_MARRIED_NAMES, $WT_IMAGES, $UNKNOWN_NN;
+		global $WT_IMAGES, $UNKNOWN_NN;
 
 		// Fetch a list of the initial letters of all surnames in the database
-		$initials=WT_Query_Name::surnameAlpha($SHOW_MARRIED_NAMES, false, WT_GED_ID);
+		$initials=WT_Query_Name::surnameAlpha(true, false, WT_GED_ID);
 
 		$out = '<script type="text/javascript">
 		<!--
@@ -83,7 +97,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		function isearchQ() {
 			var query = jQuery("#sb_indi_name").attr("value");
 			if (query.length>1) {
-				jQuery("#sb_indi_content").load("sidebar.php?sb_action=individuals&search="+query);
+				jQuery("#sb_indi_content").load("module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=individuals&search="+query);
 			}
 		}
 
@@ -105,7 +119,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 				if (!loadedNames[surname]) {
 					jQuery.ajax({
-					  url: "sidebar.php?sb_action=individuals&alpha="+alpha+"&surname="+surname,
+					  url: "module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=individuals&alpha="+alpha+"&surname="+surname,
 					  cache: false,
 					  success: function(html) {
 					    jQuery("#sb_indi_"+surname+" div").html(html);
@@ -130,7 +144,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		});
 		//-->
 		</script>
-		<form method="post" action="sidebar.php" onsubmit="return false;">
+		<form method="post" action="module.php?mod='.$this->getName().'&mod_action=ajax" onsubmit="return false;">
 		<input type="text" name="sb_indi_name" id="sb_indi_name" value="'.WT_I18N::translate('Search').'" />
 		<p>';
 		foreach ($initials as $letter=>$count) {
@@ -148,7 +162,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 					$html=$letter;
 					break;
 			}
-			$html='<a href="sidebar.php?sb_action=individuals&amp;alpha='.urlencode($letter).'" class="sb_indi_letter">'.PrintReady($html).'</a>';
+			$html='<a href="module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=individuals&amp;alpha='.urlencode($letter).'" class="sb_indi_letter">'.PrintReady($html).'</a>';
 			$out .= $html." ";
 		}
 
@@ -174,8 +188,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	}
 
 	public function getAlphaSurnames($alpha, $surname1='') {
-		global $SHOW_MARRIED_NAMES;
-		$surns=WT_Query_Name::surnames('', $alpha, $SHOW_MARRIED_NAMES, false, WT_GED_ID);
+		$surns=WT_Query_Name::surnames('', $alpha, true, false, WT_GED_ID);
 		$out = '<ul>';
 		foreach ($surns as $surname=>$surns) {
 			$out .= '<li id="sb_indi_'.$surname.'" class="sb_indi_surname_li"><a href="'.$surname.'" title="'.$surname.'" alt="'.$alpha.'" class="sb_indi_surname">'.$surname.'</a>';
@@ -193,8 +206,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	}
 
 	public function getSurnameIndis($alpha, $surname) {
-		global $SHOW_MARRIED_NAMES;
-		$indis=WT_Query_Name::individuals($surname, $alpha, '', $SHOW_MARRIED_NAMES, false, WT_GED_ID);
+		$indis=WT_Query_Name::individuals($surname, $alpha, '', true, false, WT_GED_ID);
 		$out = '<ul>';
 		foreach ($indis as $person) {
 			if ($person->canDisplayName()) {

@@ -1,7 +1,7 @@
 <?php
 // Report Engine
 //
-// Processes PGV XML Reports and generates a report
+// Processes webtrees XML Reports and generates a report
 //
 // webtrees: Web based Family History software
 // Copyright (C) 2011 webtrees development team.
@@ -23,10 +23,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: reportengine.php 12221 2011-09-27 09:54:17Z greg $
+// $Id: reportengine.php 12812 2011-11-19 13:02:05Z greg $
 
 define('WT_SCRIPT_NAME', 'reportengine.php');
 require './includes/session.php';
+
+$controller=new WT_Controller_Base();
 
 $famid=safe_GET('famid');
 $pid  =safe_GET('pid');
@@ -130,7 +132,8 @@ if (!empty($report)) {
 
 //-- choose a report to run
 if ($action=='choose') {
-	print_header(WT_I18N::translate('Choose a report to run'));
+	$controller->setPageTitle(WT_I18N::translate('Choose a report to run'));
+	$controller->pageHeader();
 
 	echo '<br /><br /><form name="choosereport" method="get" action="reportengine.php">';
 	echo '<input type="hidden" name="action" value="setup" />';
@@ -145,8 +148,6 @@ if ($action=='choose') {
 	echo '</select></td></tr>';
 	echo '<tr><td class="topbottombar" colspan="2"><input type="submit" value="', WT_I18N::translate('Click here to continue'), '" /></td></tr>';
 	echo '</table></form><br /><br />';
-
-	print_footer();
 }
 
 //-- setup report to run
@@ -174,7 +175,8 @@ elseif ($action=='setup') {
 	}
 	xml_parser_free($xml_parser);
 
-	print_header($report_array['title']);
+	$controller->setPageTitle($report_array['title']);
+	$controller->pageHeader();
 
 	if ($ENABLE_AUTOCOMPLETE) {
 		require_once WT_ROOT.'js/autocomplete.js.htm';
@@ -195,7 +197,7 @@ elseif ($action=='setup') {
 	echo '<input type="hidden" name="action" value="run" />';
 	echo '<input type="hidden" name="report" value="', $report, '" />';
 
-	echo '<table class="facts_table width50 center ', $TEXT_DIRECTION, ' ">';
+	echo '<table class="facts_table width50 center">';
 	echo '<tr><td class="topbottombar" colspan="2">', WT_I18N::translate('Enter report values'), '</td></tr>';
 	echo '<tr><td class="descriptionbox width30 wrap">', WT_I18N::translate('Selected Report'), '</td><td class="optionbox">', $report_array['title'], '<br/>', $report_array['description'], '</td></tr>';
 
@@ -286,13 +288,13 @@ elseif ($action=='setup') {
 				} elseif ($input['lookup']=='DATE') {
 					$text = WT_I18N::translate('Select a date');
 					if (isset($WT_IMAGES['button_calendar'])) {
-						$Link = '<img src="'.$WT_IMAGES['button_calendar'].'" name="a_'.$input['name'].'" id="a_'.$input['name'].'" alt="'.$text.'" title="'.$text.'" border="0" align="middle" />';
+						$Link = '<img src="'.$WT_IMAGES['button_calendar'].'" name="a_'.$input['name'].'" id="a_'.$input['name'].'" alt="'.$text.'" title="'.$text.'" align="middle">';
 					} else {
 						$Link = $text;
 					}
 
 					?>
-					<a href="javascript: <?php echo $input['name']; ?>" onclick="cal_toggleDate('div_<?php echo $input['name']; ?>', '<?php echo $input['name']; ?>'); return false;">
+					<a href="#" onclick="cal_toggleDate('div_<?php echo $input['name']; ?>', '<?php echo $input['name']; ?>'); return false;">
 					<?php echo $Link; ?>
 					</a>
 					<div id="div_<?php echo $input['name']; ?>" style="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></div>
@@ -317,13 +319,9 @@ elseif ($action=='setup') {
 	echo '<tr><td class="topbottombar" colspan="2">';
 	echo '<input type="submit" value="', WT_I18N::translate('Download report'), '" ;"/>';
 	echo '</td></tr></table></form>';
-	print_footer();
 }
 //-- run the report
 elseif ($action=='run') {
-	// We have finished writing session data, so release the lock
-	Zend_Session::writeClose();
-
 	if (strstr($report, 'report_singlepage.xml')!==false) {
 		$DEBUG=false;
 		$pedigree=new ReportPedigree();

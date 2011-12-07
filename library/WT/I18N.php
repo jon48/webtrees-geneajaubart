@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: I18N.php 12100 2011-08-04 14:55:30Z greg $
+// $Id: I18N.php 12967 2011-12-03 10:02:28Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -40,6 +40,8 @@ class WT_I18N {
 	// Initialise the translation adapter with a locale setting.
 	// If null is passed, work out which language is needed from the environment.
 	static public function init($locale=null) {
+		global $WT_SESSION;
+
 		// The translation libraries work much faster with a cache.  Try to create one.
 		if (!is_dir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache')) {
 			// We may not have permission - especially during setup, before we instruct
@@ -63,9 +65,9 @@ class WT_I18N {
 				if (WT_USER_ID) {
 					set_user_setting(WT_USER_ID, 'language', $locale);
 				}
-			} elseif (isset($_SESSION['locale']) && array_key_exists($_SESSION['locale'], $installed_languages)) {
+			} elseif (array_key_exists($WT_SESSION->locale, $installed_languages)) {
 				// Rembered from a previous visit?
-				$locale=$_SESSION['locale'];
+				$locale=$WT_SESSION->locale;
 			} else {
 				// Browser preference takes priority over gedcom default
 				if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
@@ -104,7 +106,7 @@ class WT_I18N {
 			}
 		}
 		// We now have a valid locale.  Remember it.
-		$_SESSION['locale']=$locale;
+		$WT_SESSION->locale=$locale;
 
 		// Load the translation file
 		$translate=new Zend_Translate('gettext', WT_ROOT.'language/'.$locale.'.mo', $locale);
@@ -136,7 +138,7 @@ class WT_I18N {
 		global $DATE_FORMAT; // I18N: This is the format string for full dates.  See http://php.net/date for codes
 		$DATE_FORMAT=self::noop('%j %F %Y');
 		global $TIME_FORMAT; // I18N: This a the format string for the time-of-day.  See http://php.net/date for codes
-		$TIME_FORMAT=self::noop('%g:%i:%s%a');
+		$TIME_FORMAT=self::noop('%g:%i:%s %a');
 		global $ALPHABET_upper; // Alphabetic sorting sequence (upper-case letters), used by webtrees to sort strings
 		$ALPHABET_upper=self::noop('ALPHABET_upper=ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 		list(, $ALPHABET_upper)=explode('=', $ALPHABET_upper);
@@ -208,7 +210,7 @@ class WT_I18N {
 		$localeData=Zend_Locale_Data::getList(self::$locale, 'layout');
 		$dir=$localeData['characters']=='right-to-left' ? 'rtl' : 'ltr';
 		list($lang)=explode('_', self::$locale);
-		return 'lang="'.$lang.'" xml:lang="'.$lang.'" dir="'.$dir.'"';
+		return 'lang="'.$lang.'" dir="'.$dir.'"';
 	}
 
 	// Add I18N features to sprintf()
@@ -257,11 +259,13 @@ class WT_I18N {
 	// fr: 12 345,67
 	// de: 12.345,67
 	static public function number($n, $precision=0) {
-		// Add "punctuation"
-		$n=Zend_Locale_Format::toNumber($n, array('locale'=>WT_LOCALE, 'precision'=>$precision));
-		// Convert digits
-		if (WT_LOCALE=='ar' || WT_LOCALE=='fa') {
-			$n=Zend_Locale_Format::convertNumerals($n, 'Latn', 'Arab');
+		if (is_numeric($n)) {
+			// Add "punctuation"
+			$n=Zend_Locale_Format::toNumber($n, array('locale'=>WT_LOCALE, 'precision'=>$precision));
+			// Convert digits.
+			if (WT_NUMBERING_SYSTEM!='latn') {
+				$n=Zend_Locale_Format::convertNumerals($n, 'latn', WT_NUMBERING_SYSTEM);
+			}
 		}
 		return $n;
 	}
@@ -451,5 +455,71 @@ class WT_I18N {
 		} else {
 			return WT_I18N::plural('%d second ago', '%d seconds ago', $seconds, $seconds);
 		}
+	}
+
+	// Generate consistent I18N for datatables.js
+	static function datatablesI18N(array $lengths=null) {
+		if ($lengths===null) {
+			$lengths=array(10, 20, 30, 50, 100, -1);
+		}
+
+		$length_menu='';
+		foreach ($lengths as $length) {
+			$length_menu.=
+				'<option value="'.$length.'">'.
+				($length==-1 ? /* I18N: listbox option, e.g. "10,25,50,100,all" */ WT_I18N::translate('All') : WT_I18N::number($length)).
+				'</option>';
+		}
+		$length_menu='<select>'.$length_menu.'</select>';
+		$length_menu=/* I18N: Display %s [records per page], %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', $length_menu);
+
+		// Which symbol is used for separating numbers into groups
+		$symbols = Zend_Locale_Data::getList(WT_LOCALE, 'symbols');
+		// Which digits are used for numbers
+		$numbering_system=Zend_Locale_Data::getContent(WT_LOCALE, 'defaultnumberingsystem');
+		$digits=Zend_Locale_Data::getContent(WT_LOCALE, 'numberingsystem', $numbering_system);
+
+		if ($digits=='0123456789') {
+			$callback='';
+		} else {
+			$callback=',
+				"fnInfoCallback": function(oSettings, iStart, iEnd, iMax, iTotal, sPre) {
+					return sPre
+						.replace(/0/g, "'.utf8_substr($digits, 0, 1).'")
+						.replace(/1/g, "'.utf8_substr($digits, 1, 1).'")
+						.replace(/2/g, "'.utf8_substr($digits, 2, 1).'")
+						.replace(/3/g, "'.utf8_substr($digits, 3, 1).'")
+						.replace(/4/g, "'.utf8_substr($digits, 4, 1).'")
+						.replace(/5/g, "'.utf8_substr($digits, 5, 1).'")
+						.replace(/6/g, "'.utf8_substr($digits, 6, 1).'")
+						.replace(/7/g, "'.utf8_substr($digits, 7, 1).'")
+						.replace(/8/g, "'.utf8_substr($digits, 8, 1).'")
+						.replace(/9/g, "'.utf8_substr($digits, 9, 1).'");
+    			}
+			';
+		}
+
+		return
+			'"oLanguage": {'.
+			' "oPaginate": {'.
+			'  "sFirst":    "'./* I18N: button label, first page    */ WT_I18N::translate('first').'",'.
+			'  "sLast":     "'./* I18N: button label, last page     */ WT_I18N::translate('last').'",'.
+			'  "sNext":     "'./* I18N: button label, next page     */ WT_I18N::translate('next').'",'.
+			'  "sPrevious": "'./* I18N: button label, previous page */ WT_I18N::translate('previous').'"'.
+			' },'.
+			' "sEmptyTable":     "'.WT_I18N::translate('No records to display').'",'.
+			' "sInfo":           "'./* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_').'",'.
+			' "sInfoEmpty":      "'.WT_I18N::translate('Showing %1$s to %2$s of %3$s', 0, 0, 0).'",'.
+			' "sInfoFiltered":   "'./* I18N: %s is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_').'",'.
+			' "sInfoPostfix":    "",'.
+			' "sInfoThousands":  "'.$symbols['group'].'",'.
+			' "sLengthMenu":     "'.addslashes($length_menu).'",'.
+			' "sLoadingRecords": "'.WT_I18N::translate('Loading...').'",'.
+			' "sProcessing":     "'.WT_I18N::translate('Loading...').'",'.
+			' "sSearch":         "'.WT_I18N::translate('Filter').'",'.
+			' "sUrl":            "",'.
+			' "sZeroRecords":    "'.WT_I18N::translate('No records to display').'"'.
+			'}'.
+			$callback;
 	}
 }

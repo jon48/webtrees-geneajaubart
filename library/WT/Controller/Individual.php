@@ -1,5 +1,5 @@
 <?php
-// Controller for the Individual Page
+// Controller for the individual page
 //
 // webtrees: Web based Family History software
 // Copyright (C) 2011 webtrees development team.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: Individual.php 12379 2011-10-22 23:04:59Z greg $
+// $Id: Individual.php 12808 2011-11-19 08:55:45Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,168 +31,116 @@ if (!defined('WT_WEBTREES')) {
 require_once WT_ROOT.'includes/functions/functions_print_facts.php';
 require_once WT_ROOT.'includes/functions/functions_import.php';
 
-class WT_Controller_Individual extends WT_Controller_Base {
-	var $pid = '';
-	var $indi = null;
-	var $diffindi = null;
+class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 	var $name_count = 0;
 	var $total_names = 0;
 	var $SEX_COUNT = 0;
-	var $tabs;
 	var $Fam_Navigator = 'YES';
 	var $NAME_LINENUM = null;
 	var $SEX_LINENUM = null;
 	var $globalfacts = null;
+	public $tabs;
 
-	function init() {
+	function __construct() {
 		global $USE_RIN, $MAX_ALIVE_AGE, $SEARCH_SPIDER;
 		global $DEFAULT_PIN_STATE, $DEFAULT_SB_CLOSED_STATE;
 		global $Fam_Navigator;
 
-		$this->pid = safe_GET_xref('pid');
+		$xref = safe_GET_xref('pid');
 
-		$gedrec = find_person_record($this->pid, WT_GED_ID);
+		$gedrec = find_person_record($xref, WT_GED_ID);
 
 		if ($USE_RIN && $gedrec==false) {
-			$this->pid = find_rin_id($this->pid);
-			$gedrec = find_person_record($this->pid, WT_GED_ID);
+			$xref = find_rin_id($xref);
+			$gedrec = find_person_record($xref, WT_GED_ID);
 		}
 		if (empty($gedrec)) {
-			$gedrec = "0 @".$this->pid."@ INDI\n";
+			$gedrec = "0 @".$xref."@ INDI\n";
 		}
 
-		if (find_person_record($this->pid, WT_GED_ID) || find_updated_record($this->pid, WT_GED_ID)!==null) {
-				$this->indi = new WT_Person($gedrec);
-				$this->indi->ged_id=WT_GED_ID; // This record is from a file
-		} else if (!$this->indi) {
+		if (find_person_record($xref, WT_GED_ID) || find_updated_record($xref, WT_GED_ID)!==null) {
+				$this->record = new WT_Person($gedrec);
+				$this->record->ged_id=WT_GED_ID; // This record is from a file
+		} else if (!$this->record) {
 			return false;
-		}
-
-		$this->pid=$this->indi->getXref(); // Correct upper/lower case mismatch
-
-		//-- perform the desired action
-		switch($this->action) {
-		case 'addfav':
-			if (WT_USER_ID && !empty($_REQUEST['gid']) && array_key_exists('user_favorites', WT_Module::getActiveModules())) {
-				$favorite = array(
-					'username' => WT_USER_NAME,
-					'gid'      => $_REQUEST['gid'],
-					'type'     => 'INDI',
-					'file'     => WT_GEDCOM,
-					'url'      => '',
-					'note'     => '',
-					'title'    => ''
-				);
-				user_favorites_WT_Module::addFavorite($favorite);
-			}
-			unset($_GET['action']);
-			break;
-		case 'accept':
-			if (WT_USER_CAN_ACCEPT) {
-				accept_all_changes($this->pid, WT_GED_ID);
-				//-- check if we just deleted the record and redirect to index
-				$gedrec = find_person_record($this->pid, WT_GED_ID);
-				if (empty($gedrec)) {
-					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
-					exit;
-				}
-				$this->indi = new WT_Person($gedrec);
-			}
-			unset($_GET['action']);
-			break;
-		case 'undo':
-			if (WT_USER_CAN_ACCEPT) {
-				reject_all_changes($this->pid, WT_GED_ID);
-				$gedrec = find_person_record($this->pid, WT_GED_ID);
-				//-- check if we just deleted the record and redirect to index
-				if (empty($gedrec)) {
-					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
-					exit;
-				}
-				$this->indi = new WT_Person($gedrec);
-			}
-			unset($_GET['action']);
-			break;
 		}
 
 		//-- if the user can edit and there are changes then get the new changes
 		if (WT_USER_CAN_EDIT || WT_USER_CAN_ACCEPT) {
-			$newrec = find_updated_record($this->pid, WT_GED_ID);
+			$newrec = find_updated_record($xref, WT_GED_ID);
 			if (!empty($newrec)) {
-				$this->diffindi = new WT_Person($newrec);
-				$this->diffindi->setChanged(true);
+				$diff_record = new WT_Person($newrec);
+				$diff_record->setChanged(true);
+				$this->record->diffMerge($diff_record);
 			}
 		}
 
-		$this->indi->diffMerge($this->diffindi);
+		$this->tabs=WT_Module::getActiveTabs();
 
-		// Initialise tabs
-		$this->tabs = WT_Module::getActiveTabs();
-		foreach ($this->tabs as $mod) {
-			$mod->setController($this);
-		}
+		// Our parent needs $this->record
+		parent::__construct();
 
-		if (!isset($_SESSION['WT_pin']) && $DEFAULT_PIN_STATE)
-			$_SESSION['WT_pin'] = true;
-
-		if (!isset($_SESSION['WT_sb_closed']) && $DEFAULT_SB_CLOSED_STATE)
-			$_SESSION['WT_sb_closed'] = true;
-
-		//-- handle ajax calls
-		if ($this->action=="ajax") {
-			$tab = 0;
-			if (isset($_REQUEST['module'])) {
-				$tabname = $_REQUEST['module'];
-				if ($SEARCH_SPIDER) {
-					// Search engines should not make AJAX requests
-					header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
-					exit;
-				}
-				if (!array_key_exists($tabname, $this->tabs)) {
-					// An AJAX request for a non-existant tab?
-					header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
-					exit;
-				}
-				header("Content-Type: text/html; charset=UTF-8"); //AJAX calls do not have the meta tag headers and need this set
-				header("X-Robots-Tag: noindex,follow"); //AJAX pages should not show up in search results, any links can be followed though
-				$mod = $this->tabs[$tabname];
-				if ($mod) {
-					echo $mod->getTabContent();
-					// Allow the other tabs to modify this one - e.g. lightbox does this.
-					echo WT_JS_START;
-					foreach (WT_Module::getActiveTabs() as $module) {
-						echo $module->getJSCallback();
-					}
-					echo WT_JS_END;
-				}
-			}
-
-			if (isset($_REQUEST['sb_closed'])) {
-				if ($_REQUEST['sb_closed']=='true') $_SESSION['WT_sb_closed'] = true;
-				else $_SESSION['WT_sb_closed'] = false;
-			}
-
-			//-- only get the requested tab and then exit
-			if (WT_DEBUG_SQL) {
-				echo WT_DB::getQueryLog();
-			}
-			exit;
+		// If we can display the details, add them to the page header		
+		if ($this->record && $this->record->canDisplayDetails()) {
+			$this->setPageTitle($this->record->getFullName().' '.$this->record->getLifespan());
 		}
 	}
 
-	/**
-	* return the title of this page
-	* @return string the title of the page to go in the <title> tags
-	*/
-	function getPageTitle() {
-		if ($this->indi) {
-			if ($this->indi->canDisplayDetails()) {
-				return $this->indi->getFullName().' '.$this->indi->getLifespan();
-			} else {
-				return $this->indi->getFullName();
+	// Get significant information from this page, to allow other pages such as
+	// charts and reports to initialise with the same records
+	public function getSignificantIndividual() {
+		if ($this->record) {
+			return $this->record;
+		}
+		return parent::getSignificantIndividual();
+	}
+	public function getSignificantFamily() {
+		if ($this->record) {
+			foreach ($this->record->getChildFamilies() as $family) {
+				return $family;
 			}
+			foreach ($this->record->getSpouseFamilies() as $family) {
+				return $family;
+			}
+		}
+		return parent::getSignifcantFamily();
+	}
+
+	// Handle AJAX requests - to generate the tab content
+	public function ajaxRequest() {
+		global $SEARCH_SPIDER;
+
+		// Search engines should not make AJAX requests
+		if ($SEARCH_SPIDER) {
+			header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+			exit;
+		}
+
+		// Initialise tabs
+		$tab=safe_GET('module');
+
+		// A request for a non-existant tab?
+		if (array_key_exists($tab, $this->tabs)) {
+			$mod=$this->tabs[$tab];
 		} else {
-			return WT_I18N::translate('Individual');
+			header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
+			exit;
+		}
+
+		header("Content-Type: text/html; charset=UTF-8"); // AJAX calls do not have the meta tag headers and need this set
+		header("X-Robots-Tag: noindex,follow"); // AJAX pages should not show up in search results, any links can be followed though
+
+		echo $mod->getTabContent();
+		
+		// Allow the other tabs to modify this one - e.g. lightbox does this.
+		echo WT_JS_START;
+		foreach ($this->tabs as $module) {
+			echo $module->getJSCallback();
+		}
+		echo WT_JS_END;
+
+		if (WT_DEBUG_SQL) {
+			echo WT_DB::getQueryLog();
 		}
 	}
 
@@ -203,21 +151,12 @@ class WT_Controller_Individual extends WT_Controller_Base {
 	function canShowHighlightedObject() {
 		global $SHOW_HIGHLIGHT_IMAGES, $USE_SILHOUETTE;
 
-		if (($this->indi->canDisplayDetails()) && $SHOW_HIGHLIGHT_IMAGES) {
-			$firstmediarec = $this->indi->findHighlightedMedia();
+		if (($this->record->canDisplayDetails()) && $SHOW_HIGHLIGHT_IMAGES) {
+			$firstmediarec = $this->record->findHighlightedMedia();
 			if ($firstmediarec) return true;
 		}
 		if ($USE_SILHOUETTE) { return true; }
 		return false;
-	}
-	/**
-	* check if we can show the gedcom record
-	* @return boolean
-	*/
-	function canShowGedcomRecord() {
-		global $SHOW_GEDCOM_RECORD;
-		if (WT_USER_CAN_EDIT && $SHOW_GEDCOM_RECORD && $this->indi->canDisplayDetails())
-			return true;
 	}
 
 	/**
@@ -228,7 +167,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		global $sex;
 
 		if ($this->canShowHighlightedObject()) {
-			$firstmediarec=$this->indi->findHighlightedMedia();
+			$firstmediarec=$this->record->findHighlightedMedia();
 			if (!empty($firstmediarec)) {
 				$mediaobject=WT_Media::getInstance($firstmediarec['mid']);
 				$result=$mediaobject->displayMedia(array('uselightbox_fallback'=>false,'clearbox'=>'general_1'));
@@ -236,7 +175,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 			}
 		}
 
-		$sex=$this->indi->getSex();
+		$sex=$this->record->getSex();
 		return display_silhouette(array('sex'=>$sex)); // may return ''
 
 	}
@@ -277,16 +216,16 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		echo '<dd class="field">', $dummy->getFullName();
 		if ($this->name_count == 1) {
 			if (WT_USER_IS_ADMIN) {
-				$user_id=get_user_from_gedcom_xref(WT_GED_ID, $this->pid);
+				$user_id=get_user_from_gedcom_xref(WT_GED_ID, $this->record->getXref());
 				if ($user_id) {
 					$user_name=get_user_name($user_id);
 					echo '<span> - <a class="warning" href="admin_users.php?action=edituser&amp;username='.$user_name.'">'.$user_name.'</span></a>';
 				}
 			}
 		}
-		if ($this->indi->canEdit() && !strpos($factrec, "\nWT_OLD")) {
-			echo "<div class=\"deletelink\"><a class=\"font9 deleteicon\" href=\"javascript:;\" onclick=\"delete_record('".$this->pid."', ".$linenum."); return false;\" title=\"".WT_I18N::translate('Delete name')."\"><span class=\"link_text\">".WT_I18N::translate('Delete name')."</span></a></div>";
-			echo "<div class=\"editlink\"><a href=\"javascript:;\" class=\"font9 editicon\" onclick=\"edit_name('".$this->pid."', ".$linenum."); return false;\" title=\"".WT_I18N::translate('Edit name')."\"><span class=\"link_text\">".WT_I18N::translate('Edit name')."</span></a></div>";
+		if ($this->record->canEdit() && !strpos($factrec, "\nWT_OLD")) {
+			echo "<div class=\"deletelink\"><a class=\"font9 deleteicon\" href=\"#\" onclick=\"delete_record('".$this->record->getXref()."', ".$linenum."); return false;\" title=\"".WT_I18N::translate('Delete name')."\"><span class=\"link_text\">".WT_I18N::translate('Delete name')."</span></a></div>";
+			echo "<div class=\"editlink\"><a href=\"#\" class=\"font9 editicon\" onclick=\"edit_name('".$this->record->getXref()."', ".$linenum."); return false;\" title=\"".WT_I18N::translate('Edit name')."\"><span class=\"link_text\">".WT_I18N::translate('Edit name')."</span></a></div>";
 		}
 		echo '</dd>';
 		echo '</dl>';
@@ -296,7 +235,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 			echo '<div>';
 				$fact = trim($nmatch[$i][1]);
 				if (($fact!="SOUR") && ($fact!="NOTE") && ($fact!="SPFX")) {
-					echo '<dl><dt class="label">', WT_Gedcom_Tag::getLabel($fact, $this->indi), '</dt>';
+					echo '<dl><dt class="label">', WT_Gedcom_Tag::getLabel($fact, $this->record), '</dt>';
 					echo '<dd class="field">';
 						if (isset($nmatch[$i][2])) {
 							$name = trim($nmatch[$i][2]);
@@ -307,7 +246,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 							}
 							$name=preg_replace('/(\S*)\*/', '<span class="starredname">\\1</span>', $name);
 							if ($fact=='TYPE') {
-								echo WT_Gedcom_Code_Name::getValue($name, $this->indi);
+								echo WT_Gedcom_Code_Name::getValue($name, $this->record);
 							} else {
 								echo PrintReady($name);
 							}
@@ -362,12 +301,12 @@ class WT_Controller_Individual extends WT_Controller_Base {
 			}
 			echo '>&nbsp;';
 			if ($this->SEX_COUNT>1) {
-				if ($this->indi->canEdit() && strpos($factrec, "\nWT_OLD")===false) {
+				if ($this->record->canEdit() && strpos($factrec, "\nWT_OLD")===false) {
 					if ($event->getLineNumber()=="new") {
-						echo "<a class=\"font9\" href=\"javascript:;\" onclick=\"add_new_record('".$this->pid."', 'SEX'); return false;\">".WT_I18N::translate('Edit')."</a>";
+						echo "<a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$this->record->getXref()."', 'SEX'); return false;\">".WT_I18N::translate('Edit')."</a>";
 					} else {
-							echo "<a class=\"font9\" href=\"javascript:;\" onclick=\"edit_record('".$this->pid."', ".$event->getLineNumber()."); return false;\">".WT_I18N::translate('Edit')."</a> | ";
-							echo "<a class=\"font9\" href=\"javascript:;\" onclick=\"delete_record('".$this->pid."', ".$event->getLineNumber()."); return false;\">".WT_I18N::translate('Delete')."</a>";
+							echo "<a class=\"font9\" href=\"#\" onclick=\"edit_record('".$this->record->getXref()."', ".$event->getLineNumber()."); return false;\">".WT_I18N::translate('Edit')."</a> | ";
+							echo "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$this->record->getXref()."', ".$event->getLineNumber()."); return false;\">".WT_I18N::translate('Delete')."</a>";
 					}
 				}
 			}
@@ -383,7 +322,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 	function getEditMenu() {
 		$SHOW_GEDCOM_RECORD=get_gedcom_setting(WT_GED_ID, 'SHOW_GEDCOM_RECORD');
 
-		if (!$this->indi || $this->indi->isMarkedDeleted()) {
+		if (!$this->record || $this->record->isMarkedDeleted()) {
 			return null;
 		}
 		// edit menu
@@ -398,7 +337,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		// will copy the first submenu - which may be edit-raw or delete.
 		// As a temporary solution, make it edit the name
 		if (WT_USER_CAN_EDIT && $this->NAME_LINENUM) {
-			$menu->addOnclick("return edit_name('".$this->pid."', ".$this->NAME_LINENUM.");");
+			$menu->addOnclick("return edit_name('".$this->record->getXref()."', ".$this->NAME_LINENUM.");");
 		} else {
 			$menu->addOnclick("return false;");
 		}
@@ -406,7 +345,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		if (WT_USER_CAN_EDIT) {
 			//--make sure the totals are correct
 			$submenu = new WT_Menu(WT_I18N::translate('Add new Name'), '#', 'menu-indi-addname');
-			$submenu->addOnclick("return add_name('".$this->pid."');");
+			$submenu->addOnclick("return add_name('".$this->record->getXref()."');");
 			$submenu->addIcon('edit_indi');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_add_indi');
 			$menu->addSubmenu($submenu);
@@ -414,18 +353,18 @@ class WT_Controller_Individual extends WT_Controller_Base {
 			if ($this->SEX_COUNT<2) {
 				$submenu = new WT_Menu(WT_I18N::translate('Edit gender'), '#', 'menu-indi-editsex');
 				if ($this->SEX_LINENUM=="new") {
-					$submenu->addOnclick("return add_new_record('".$this->pid."', 'SEX');");
+					$submenu->addOnclick("return add_new_record('".$this->record->getXref()."', 'SEX');");
 				} else {
-					$submenu->addOnclick("return edit_record('".$this->pid."', ".$this->SEX_LINENUM.");");
+					$submenu->addOnclick("return edit_record('".$this->record->getXref()."', ".$this->SEX_LINENUM.");");
 				}
 				$submenu->addIcon('edit_indi');
 				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_sex');
 				$menu->addSubmenu($submenu);
 			}
 
-			if (count($this->indi->getSpouseFamilies())>1) {
+			if (count($this->record->getSpouseFamilies())>1) {
 				$submenu = new WT_Menu(WT_I18N::translate('Reorder families'), '#', 'menu-indi-orderfam');
-				$submenu->addOnclick("return reorder_families('".$this->pid."');");
+				$submenu->addOnclick("return reorder_families('".$this->record->getXref()."');");
 				$submenu->addIcon('edit_fam');
 				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_fam');
 				$menu->addSubmenu($submenu);
@@ -433,9 +372,9 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		}
 
 		// edit/view raw gedcom
-		if (WT_USER_IS_ADMIN || $this->canShowGedcomRecord()) {
+		if (WT_USER_IS_ADMIN || $SHOW_GEDCOM_RECORD) {
 			$submenu = new WT_Menu(WT_I18N::translate('Edit raw GEDCOM record'), '#', 'menu-indi-editraw');
-			$submenu->addOnclick("return edit_raw('".$this->pid."');");
+			$submenu->addOnclick("return edit_raw('".$this->record->getXref()."');");
 			$submenu->addIcon('gedcom');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_raw');
 			$menu->addSubmenu($submenu);
@@ -454,7 +393,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		// delete
 		if (WT_USER_CAN_EDIT) {
 			$submenu = new WT_Menu(WT_I18N::translate('Delete'), '#', 'menu-indi-del');
-			$submenu->addOnclick("if (confirm('".addslashes(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($this->indi->getFullName())))."')) return delete_person('".$this->indi->getXref()."'); else return false;");
+			$submenu->addOnclick("if (confirm('".addslashes(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($this->record->getFullName())))."')) jQuery.post('action.php',{action:'delete-individual',xref:'".$this->record->getXref()."'},function(){location.reload();})");
 			$submenu->addIcon('remove');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_delete');
 			$menu->addSubmenu($submenu);
@@ -463,10 +402,11 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		// add to favorites
 		if (array_key_exists('user_favorites', WT_Module::getActiveModules())) {
 			$submenu = new WT_Menu(
-				WT_I18N::translate('Add to favorites'),
-				$this->indi->getHtmlUrl()."&amp;action=addfav&amp;gid=".$this->pid,
+				/* I18N: Menu option.  Add [the current page] to the list of favorites */ WT_I18N::translate('Add to favorites'),
+				'#',
 				'menu-indi-addfav'
 			);
+			$submenu->addOnclick("jQuery.post('module.php?mod=user_favorites&amp;mod_action=menu-add-favorite',{xref:'".$this->record->getXref()."'},function(){location.reload();})");
 			$submenu->addIcon('favorites');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_fav');
 			$menu->addSubmenu($submenu);
@@ -482,7 +422,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 	*/
 	function getGlobalFacts() {
 		if ($this->globalfacts==null) {
-			$this->globalfacts = $this->indi->getGlobalFacts();
+			$this->globalfacts = $this->record->getGlobalFacts();
 			foreach ($this->globalfacts as $key => $value) {
 				$fact = $value->getTag();
 				if ($fact=="SEX") {
@@ -506,7 +446,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 	* @return array
 	*/
 	function getIndiFacts() {
-		$indifacts = $this->indi->getIndiFacts();
+		$indifacts = $this->record->getIndiFacts();
 		sort_facts($indifacts);
 		return $indifacts;
 	}
@@ -515,7 +455,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 	* @return array
 	*/
 	function getOtherFacts() {
-		$otherfacts = $this->indi->getOtherFacts();
+		$otherfacts = $this->record->getOtherFacts();
 		return $otherfacts;
 	}
 
@@ -570,13 +510,13 @@ class WT_Controller_Individual extends WT_Controller_Base {
 			break;
 		case 'spouse':
 			if ($family->isNotMarried()) {
-				$labels["parent"] = WT_I18N::translate('Partner');
-				$labels["mother"] = WT_I18N::translate('Partner');
-				$labels["father"] = WT_I18N::translate('Partner');
+				$labels["parent"] = /* I18N: A life partner - like a spouse, but not married */  WT_I18N::translate_c('MALE/FEMALE', 'partner');
+				$labels["mother"] = /* I18N: A life partner - like a wife, but not married */    WT_I18N::translate_c('FEMALE',      'partner');
+				$labels["father"] = /* I18N: A life partner - like a husband, but not married */ WT_I18N::translate_c('MALE',        'partner');
 			} elseif ($family->isDivorced()) {
-				$labels["parent"] = WT_I18N::translate('Ex-Spouse');
-				$labels["mother"] = WT_I18N::translate('Ex-Wife');
-				$labels["father"] = WT_I18N::translate('Ex-Husband');
+				$labels["parent"] = /* I18N: A previous spouse, now divorced  */ WT_I18N::translate('ex-spouse');
+				$labels["mother"] = /* I18N: A previous wife, now divorced    */ WT_I18N::translate('ex-wife');
+				$labels["father"] = /* I18N: A previous husband, now divorced */ WT_I18N::translate('ex-husband');
 			} else {
 				$marr_rec = $family->getMarriageRecord();
 				if (!empty($marr_rec)) {
@@ -586,9 +526,9 @@ class WT_Controller_Individual extends WT_Controller_Base {
 						$labels["mother"] = get_relationship_name_from_path('wif', null, null);
 						$labels["father"] = get_relationship_name_from_path('hus', null, null);
 					} else {
-						$labels["parent"] = WT_I18N::translate('Partner');
-						$labels["mother"] = WT_I18N::translate('Partner');
-						$labels["father"] = WT_I18N::translate('Partner');
+						$labels["parent"] = WT_I18N::translate_c('MALE/FEMALE', 'partner');
+						$labels["mother"] = WT_I18N::translate_c('FEMALE',      'partner');
+						$labels["father"] = WT_I18N::translate_c('MALE',        'partner');
 					}
 				} else {
 					$labels["parent"] = get_relationship_name_from_path('spo', null, null);
@@ -601,7 +541,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 			$labels["brother"] = get_relationship_name_from_path('son', null, null);
 			break;
 		case 'step-children':
-			if ($this->indi->equals($family->getHusband())) {
+			if ($this->record->equals($family->getHusband())) {
 				$labels["parent"] = '';
 				$labels["mother"] = '';
 				$labels["father"] = get_relationship_name_from_path('hus', null, null);
@@ -629,7 +569,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		}
 		//-- step families : set the label for the common parent
 		if ($type=="step-parents") {
-			$fams = $this->indi->getChildFamilies();
+			$fams = $this->record->getChildFamilies();
 			foreach ($fams as $key=>$fam) {
 				if ($fam->hasParent($husb)) $labels["father"] = get_relationship_name_from_path('fat', null, null);
 				if ($fam->hasParent($wife)) $labels["mother"] = get_relationship_name_from_path('mot', null, null);
@@ -645,7 +585,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 			if ($sex=="M") {
 				$label = $labels["father"];
 			}
-			if ($husb->getXref()==$this->pid) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
+			if ($husb->getXref()==$this->record->getXref()) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
 			$husb->setLabel($label);
 		}
 		//-- set the label for the wife
@@ -658,7 +598,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 			if ($sex=="M") {
 				$label = $labels["father"];
 			}
-			if ($wife->getXref()==$this->pid) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
+			if ($wife->getXref()==$this->record->getXref()) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
 			$wife->setLabel($label);
 		}
 		if (WT_USER_CAN_EDIT || WT_USER_CAN_ACCEPT) {
@@ -675,7 +615,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 					if ($sex=="M") {
 						$label = $labels["father"];
 					}
-					if ($newhusb->getXref()==$this->pid) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
+					if ($newhusb->getXref()==$this->record->getXref()) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
 					$newhusb->setLabel($label);
 				}
 				else $newhusb = null;
@@ -690,7 +630,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 					if ($sex=="M") {
 						$label = $labels["father"];
 					}
-					if ($newwife->getXref()==$this->pid) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
+					if ($newwife->getXref()==$this->record->getXref()) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
 					$newwife->setLabel($label);
 				}
 				else $newwife = null;
@@ -743,7 +683,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 				if ($sex=="M") {
 					$label = $labels["brother"];
 				}
-				if ($children[$i]->getXref()==$this->pid) {
+				if ($children[$i]->getXref()==$this->record->getXref()) {
 					$label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
 				}
 				if ($include_pedi==true) {
@@ -766,7 +706,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 			if ($sex=="M") {
 				$label = $labels["brother"];
 			}
-			if ($newchildren[$i]->getXref()==$this->pid) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
+			if ($newchildren[$i]->getXref()==$this->record->getXref()) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
 			if ($include_pedi==true) {
 				$pedi = $newchildren[$i]->getChildFamilyPedigree($family->getXref());
 				if ($pedi) {
@@ -785,7 +725,7 @@ class WT_Controller_Individual extends WT_Controller_Base {
 			if ($sex=="M") {
 				$label = $labels["brother"];
 			}
-			if ($delchildren[$i]->getXref()==$this->pid) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
+			if ($delchildren[$i]->getXref()==$this->record->getXref()) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\" />";
 			if ($include_pedi==true) {
 				$pedi = $delchildren[$i]->getChildFamilyPedigree($family->getXref());
 				if ($pedi) {
@@ -805,6 +745,48 @@ class WT_Controller_Individual extends WT_Controller_Base {
 		$people['newchildren'] = $newchildren;
 		$people['delchildren'] = $delchildren;
 		return $people;
+	}
+
+	// Get significant information from this page, to allow other pages such as
+	// charts and reports to initialise with the same records
+	public function getSignificantSurname() {
+		if ($this->record) {
+			list($surn, $givn)=explode(',', $this->record->getSortname());
+			return $surn;
+		} else {
+			return '';
+		}
+	}
+
+	// Get the contents of sidebar.
+	// TODO?? - only load one block immediately - load the others by AJAX.
+	public function getSideBarContent() {
+		global $controller;
+
+		$html='';
+		foreach (WT_Module::getActiveSidebars() as $mod) {
+			if ($mod->hasSidebarContent()) {
+				$html.='<h3 id="'.$mod->getName().'"><a href="#">'.$mod->getTitle().'</a></h3>';
+				$html.='<div id="sb_content_'.$mod->getName().'">'.$mod->getSidebarContent().'</div>';
+			}
+		}
+
+		$controller
+			->addInlineJavaScript('
+				jQuery("#sidebarAccordion").accordion({
+					active:"#family_nav",
+					autoHeight: false,
+					collapsible: true,
+					icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }
+				});
+				//jQuery code to remove table elements from INDI facts
+				jQuery("#sb_content_extra_info table").replaceWith(function() { return jQuery(this).contents(); });
+				jQuery("#sb_content_extra_info tbody").replaceWith(function() { return jQuery(this).contents(); });
+				jQuery("#sb_content_extra_info tr").replaceWith(function() { return jQuery(this).contents();	});
+				jQuery("#sb_content_extra_info td").replaceWith(function() { return jQuery(this).contents();	});
+			');
+
+		return '<div id="sidebar"><div id="sidebarAccordion">'.$html.'</div></div>';
 	}
 
 // -----------------------------------------------------------------------------

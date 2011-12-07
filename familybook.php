@@ -21,29 +21,33 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: familybook.php 12216 2011-09-26 07:38:04Z greg $
+// $Id: familybook.php 12918 2011-11-25 22:38:33Z rob $
 
 define('WT_SCRIPT_NAME', 'familybook.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_charts.php';
 
+$controller=new WT_Controller_Base();
+
 // Extract form variables
-$pid        =safe_GET_xref('pid');
+$pid        =safe_GET_xref('rootid');
 $show_full  =safe_GET('show_full',     array('0', '1'), $PEDIGREE_FULL_DETAILS);
 $show_spouse=safe_GET('show_spouse',   '1', '0');
 $descent    =safe_GET_integer('descent',       0, 9, 5);
 $generations=safe_GET_integer('generations',   2, $MAX_DESCENDANCY_GENERATIONS, 2);
 $box_width  =safe_GET_integer('box_width',     50, 300, 100);
 
-
-// -- size of the boxes
-if (!$show_full) $bwidth = ($bwidth / 1.5);
-$bwidth = (int) ($bwidth * $box_width/100);
-
+// -- size of the detailed boxes based upon optional width parameter
+$Dbwidth=($box_width*$bwidth)/100;
+$Dbheight=($box_width*$bheight)/100;
+$bwidth=$Dbwidth;
+$bheight=$Dbheight;
+		
+// -- adjust size of the non-detailed boxes
 if ($show_full==false) {
-	$bheight = (int) ($bheight / 2.5);
+	$bwidth = $bwidth / 1.5;
+	$bheight = $bheight / 2 ;
 }
-$bhalfheight = (int) ($bheight / 2);
 
 // -- root id
 $pid   =check_rootid($pid);
@@ -90,10 +94,10 @@ function print_descendency($person, $count) {
 					if (count($children)==1) {
 						$twidth+=3;
 					}
-					echo "<td rowspan=\"$rowspan\"><img src=\"".$WT_IMAGES["hline"]."\" width=\"$twidth\" height=\"3\" alt=\"\" /></td>";
+					echo "<td rowspan=\"$rowspan\"><img class=\"line4\" src=\"".$WT_IMAGES["hline"]."\" width=\"$twidth\" height=\"3\" alt=\"\" /></td>";
 					if (count($children)>1) {
 						if ($i==0) {
-							echo "<td height=\"".($bhalfheight+3)."\"><img src=\"".$WT_IMAGES["spacer"]."\" width=\"3\" alt=\"\" /></td></tr>";
+							echo "<td height=\"".($bhalfheight+3)."\"><img class=\"lineb\" src=\"".$WT_IMAGES["spacer"]."\" width=\"3\" alt=\"\" /></td></tr>";
 							echo "<tr><td height=\"".($bhalfheight+3)."\" style=\"background: url('".$WT_IMAGES["vline"]."');\"><img src=\"".$WT_IMAGES["spacer"]."\" width=\"3\" alt=\"\" /></td>";
 						}
 						else if ($i==count($children)-1) {
@@ -208,7 +212,8 @@ function print_family_book($person, $descent) {
 	}
 }
 
-print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Family book of %s', $person->getFullName()));
+$controller->setPageTitle(/* I18N: %s is a person's name */ WT_I18N::translate('Family book of %s', $person->getFullName()));
+$controller->pageHeader();
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
@@ -242,15 +247,15 @@ $gencount=0;
 <table><tr>
 
 <td class="descriptionbox">
-	<?php echo WT_I18N::translate('Root Person ID'), help_link('desc_rootid'); ?>
+	<?php echo WT_I18N::translate('Individual'); ?>
 </td>
 <td class="optionbox">
-	<input class="pedigree_form" type="text" name="pid" id="pid" size="3" value="<?php echo $pid; ?>" />
+	<input class="pedigree_form" type="text" name="rootid" id="rootid" size="3" value="<?php echo $pid; ?>" />
 	<?php print_findindi_link("pid",""); ?>
 </td>
 
 <td class="descriptionbox">
-<?php echo WT_I18N::translate('Show Details'), help_link('show_full'); ?>
+<?php echo WT_I18N::translate('Show Details'); ?>
 </td>
 <td class="optionbox">
 <input type="hidden" name="show_full" value="<?php echo $show_full; ?>" />
@@ -264,7 +269,7 @@ else echo "0\" onclick=\"document.people.show_full.value='1';"; ?>" />
 </td></tr>
 
 <tr><td class="descriptionbox">
-<?php echo WT_I18N::translate('Generations'), help_link('desc_generations'); ?>
+<?php echo WT_I18N::translate('Generations'); ?>
 </td>
 <td class="optionbox">
 <select name="generations">
@@ -272,7 +277,7 @@ else echo "0\" onclick=\"document.people.show_full.value='1';"; ?>" />
 for ($i=2; $i<=$MAX_DESCENDANCY_GENERATIONS; $i++) {
 	echo "<option value=\"".$i."\"" ;
 	if ($i == $generations) echo " selected=\"selected\"";
-	echo ">".$i."</option>";
+	echo ">".WT_I18N::number($i)."</option>";
 }
 ?>
 </select>
@@ -311,9 +316,8 @@ if ($show_spouse) echo " checked=\"checked\""; ?> />
 echo
 	'<div id="familybook_chart',
 	($TEXT_DIRECTION=="ltr")?"":"_rtl",
-	'" style="width:98%; direction:"', $TEXT_DIRECTION, ';z-index:1;">';
+	'" style="width:98%; z-index:1;">';
 
 print_family_book($person, $descent);
 
 echo '</div>';
-print_footer();

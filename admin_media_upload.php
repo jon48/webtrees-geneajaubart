@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_media_upload.php 12224 2011-09-27 10:35:39Z greg $
+// $Id: admin_media_upload.php 12888 2011-11-23 20:57:54Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_media_upload.php');
 require './includes/session.php';
@@ -43,12 +43,13 @@ function dir_is_writable($dir) {
 	return($err_write);
 }
 
-if (!WT_USER_CAN_EDIT) {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.WT_SCRIPT_NAME);
-	exit;
-}
+$controller=new WT_Controller_Base();
+$controller
+	->requireManagerLogin()
+	->requireEditorLogin() /* Why this check? */
+	->setPageTitle(WT_I18N::translate('Upload media files'))
+	->pageHeader();
 
-print_header(WT_I18N::translate('Upload media files'));
 ?>
 <script type="text/javascript">
 <!--
@@ -80,4 +81,3 @@ if (!dir_is_writable($MEDIA_DIRECTORY)) {
 } else {
 	show_mediaUpload_form(WT_SCRIPT_NAME, false); // We have the green light to upload media, print the form
 }
-print_footer();

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
+// $Id: module.php 12696 2011-11-11 00:56:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -68,9 +68,9 @@ class logged_in_WT_Module extends WT_Module implements WT_Module_Block {
 		}
 		if (WT_USER_ID) {
 			foreach ($loggedusers as $user_id=>$user_name) {
-				$content .= "<tr><td><br />".PrintReady(getUserFullName($user_id))." - ".$user_name;
+				$content .= "<tr><td>".PrintReady(getUserFullName($user_id))." - ".$user_name;
 				if (WT_USER_ID!=$user_id && get_user_setting($user_id, 'contactmethod')!="none") {
-					$content .= "<br /><a href=\"javascript:;\" onclick=\"return message('" . $user_name . "');\">" . WT_I18N::translate('Send Message') . "</a>";
+					$content .= "<br /><a href=\"#\" onclick=\"return message('" . $user_name . "');\">" . WT_I18N::translate('Send Message') . "</a>";
 				}
 				$content .= "</td></tr>";
 			}

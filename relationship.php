@@ -21,11 +21,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: relationship.php 12333 2011-10-18 09:28:58Z greg $
+// $Id: relationship.php 12983 2011-12-04 20:48:54Z rob $
 
 define('WT_SCRIPT_NAME', 'relationship.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_charts.php';
+
+$controller=new WT_Controller_Base();
 
 $show_full=$PEDIGREE_FULL_DETAILS;
 if (isset($_REQUEST['show_full'])) $show_full = $_REQUEST['show_full'];
@@ -39,17 +41,22 @@ if ($path_to_find == -1) {
 	unset($_SESSION["relationships"]);
 }
 
+$Dbxspacing = ($bwidth-240)/2;
+
+
 //-- previously these variables were set in theme.php, now they are no longer required to be set there
 $Dbasexoffset = 0;
 $Dbaseyoffset = 0;
 
+$Dbheight = 78+($bheight-80); // Set distance between vertical blocks
 if ($show_full==false) {
-	$Dbheight=25;
-	$Dbwidth-=40;
-}
+	$Dbwidth = $Dbwidth - 50;
+	$bwidth = $bwidth / 1.5;
+	$bheight = $bheight / 2 ;
+	$Dbheight= $bheight-10;
+	$Dbwidth = $bwidth;
 
-$bwidth = $Dbwidth;
-$bheight = $Dbheight;
+}
 
 $title_string = "";
 
@@ -95,7 +102,8 @@ if (!empty($_SESSION["pid2"]) && $_SESSION["pid2"]!=$pid2) {
 	$path_to_find=0;
 }
 // -- print html header information
-print_header($title_string);
+$controller->setPageTitle($title_string);
+$controller->pageHeader();
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
@@ -116,9 +124,10 @@ function paste_id(value) {
 <?php
 	$Dbaseyoffset += 110; ?>
 	<form name="people" method="get" action="relationship.php">
+	<input type="hidden" name="ged" value="<?php echo WT_GEDCOM; ?>" />
 	<input type="hidden" name="path_to_find" value="<?php echo $path_to_find; ?>" />
 
-	<table class="list_table <?php echo $TEXT_DIRECTION; ?>" style="text-align:<?php echo ($TEXT_DIRECTION=="ltr"?"left":"right"); ?>; margin:0;">
+	<table class="list_table">
 
 	<!-- // Relationship header -->
 	<tr><td colspan="2" class="topbottombar center">
@@ -148,7 +157,7 @@ function paste_id(value) {
 
 	<!-- // Show details -->
 	<td class="descriptionbox">
-	<?php echo WT_I18N::translate('Show Details'), help_link('show_full'); ?>
+	<?php echo WT_I18N::translate('Show Details'); ?>
 	</td>
 	<td class="optionbox vmiddle">
 	<input type="hidden" name="show_full" value="<?php echo $show_full; ?>" />
@@ -282,8 +291,7 @@ function paste_id(value) {
 </div>
 <?php
 if ($check_node===false) {
-	print_footer();
-	return;
+	exit;
 }
 if ($show_full==0) {
 	echo '<br /><span class="details2">', WT_I18N::translate('Click on any of the boxes to get more information about that person.'), '</span><br />';
@@ -508,5 +516,3 @@ $maxyoffset += 100;
 		relationship_chart_div.style.width = "100%";
 	}
 </script>
-<?php
-print_footer();

@@ -24,10 +24,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: statistics.php 12262 2011-10-06 16:42:41Z lukasz $
+// $Id: statistics.php 12844 2011-11-21 16:58:13Z lukasz $
 
 define('WT_SCRIPT_NAME', 'statistics.php');
 require './includes/session.php';
+
+$controller=new WT_Controller_Base();
+$controller->setPageTitle(WT_I18N::translate('Statistics'));
 
 // check for on demand content loading
 if (isset($_REQUEST['tab'])) {
@@ -276,8 +279,8 @@ if (isset($content) && $content==1) {
 						<td class="facts_label"><?php echo WT_I18N::translate('Number of families without children'); ?></td>
 					</tr>
 					<tr>
-						<td class="facts_value" align="center"><?php echo $stats->averageChildren(); ?></td>
-						<td class="facts_value" align="center"><?php echo $stats->noChildrenFamilies(); ?></td>
+						<td class="facts_value" align="center"><?php echo WT_I18N::number($stats->averageChildren(), 2); ?></td>
+						<td class="facts_value" align="center"><?php echo WT_I18N::number($stats->noChildrenFamilies()); ?></td>
 					</tr>
 					<tr>
 						<td class="facts_value statistics_chart"><?php echo $stats->statsChildren(); ?></td>
@@ -719,7 +722,8 @@ if (isset($content) && $content==1) {
 		</div>
 	<?php }
 } else {
-	print_header(WT_I18N::translate('Statistics'));
+	$controller->pageHeader();
+
 	$ble = false;
 	?>
 	<h2 class="center"><?php echo WT_I18N::translate('Statistics'); ?></h2>
@@ -733,22 +737,11 @@ if (isset($content) && $content==1) {
 	</script>
 	<script type="text/javascript">
 	//<![CDATA[
-	var selectedTab = '';
-	if (selectedTab != '' && selectedTab != 'undefined' && selectedTab != null) {
-		var selectedTab = selectedTab;
-	} else {
-		var selectedTab = <?php echo $tab; ?>;
-	}
-	var tabCache = new Array();
-
 	jQuery(document).ready(function() {
 		// TODO: change images directory when the common images will be deleted.
-		jQuery('#tabs').tabs({ spinner: '<img src="<?php echo WT_STATIC_URL; ?>images/loading.gif" height="18" border="0" />' });
-		jQuery("#tabs").tabs({ cache: true, selected: selectedTab });
-		var $tabs = jQuery('#tabs');
+		jQuery('#tabs').tabs({ spinner: '<img src="<?php echo WT_STATIC_URL; ?>images/loading.gif" height="18">' });
+		jQuery("#tabs").tabs({ cache: true });
 		jQuery('#tabs').bind('tabsshow', function(event, ui) {
-			selectedTab = ui.tab.name;
-			tabCache[selectedTab] = true;
 		});
 	});
 	//]]>
@@ -778,5 +771,4 @@ if (isset($content) && $content==1) {
 	<?php
 	$ble = true;
 	echo '<br/><br/>';
-	print_footer();
 }

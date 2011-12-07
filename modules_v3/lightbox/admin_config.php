@@ -21,22 +21,20 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_config.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: admin_config.php 12557 2011-11-05 17:08:46Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
+$controller=new WT_Controller_Base();
+$controller
+	->requireAdminLogin()
+	->setPageTitle(WT_I18N::translate('Lightbox-Album Configuration'))
+	->pageHeader();
+
 $action = safe_POST('action');
-
-print_header(WT_I18N::translate('Lightbox-Album Configuration'));
-
-if (!WT_USER_IS_ADMIN) {
-	echo'<div class="warning">', WT_I18N::translate('Page only for Administrators'), '</div>';
-	print_footer();
-	exit;
-}
 
 if ($action=='update' && !isset($security_user)) {
 	set_module_setting('lightbox', 'LB_MUSIC_FILE',     $_POST['NEW_LB_MUSIC_FILE']);
@@ -117,4 +115,3 @@ $LB_URL_HEIGHT=get_module_setting('lightbox', 'LB_URL_HEIGHT', '600'); //  URL W
 	&nbsp;&nbsp;
 	<input type="reset" value="<?php echo WT_I18N::translate('Reset'); ?>" />
 </form>
-<?php print_footer();

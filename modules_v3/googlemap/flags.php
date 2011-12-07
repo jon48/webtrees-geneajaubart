@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: flags.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: flags.php 12696 2011-11-11 00:56:58Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -33,6 +33,10 @@ if (!defined('WT_WEBTREES')) {
 require WT_ROOT.WT_MODULES_DIR.'googlemap/defaultconfig.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
+$controller=new WT_Controller_Simple();
+$controller->setPageTitle(WT_I18N::translate('Select flag'));
+$controller->pageHeader();
+
 $countries=WT_Stats::get_all_countries();
 $action=safe_REQUEST($_REQUEST, 'action');
 
@@ -40,8 +44,6 @@ if (isset($_REQUEST['countrySelected'])) $countrySelected = $_REQUEST['countrySe
 if (!isset($countrySelected)) $countrySelected='Countries';
 if (isset($_REQUEST['stateSelected'])) $stateSelected = $_REQUEST['stateSelected'];
 if (!isset($stateSelected)) $stateSelected='States';
-
-print_simple_header(WT_I18N::translate('Select flag'));
 
 $country = array();
 $rep = opendir(WT_ROOT.WT_MODULES_DIR.'googlemap/places/flags/');
@@ -87,13 +89,13 @@ if ($action == 'ChangeFlag') {
 		function edit_close() {
 <?php if ($_POST['selcountry'] == 'Countries') { ?>
 			window.opener.document.editplaces.icon.value = 'places/flags/<?php echo $flags[$_POST['FLAGS']]; ?>.png';
-			window.opener.document.getElementById('flagsDiv').innerHTML = "<img class=\"flag_gm_30\" src=\"<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/places/flags/<?php echo $country[$_POST["FLAGS"]]; ?>.png\">&nbsp;&nbsp;<a href=\"javascript:;\" onclick=\"change_icon();return false;\"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;<a href=\"javascript:;\" onclick=\"remove_icon();return false;\"><?php echo WT_I18N::translate('Remove flag'); ?></a>";
+			window.opener.document.getElementById('flagsDiv').innerHTML = "<img class=\"flag_gm_30\" src=\"<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/places/flags/<?php echo $country[$_POST['FLAGS']]; ?>.png\">&nbsp;&nbsp;<a href=\"#\" onclick=\"change_icon();return false;\"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;<a href=\"#\" onclick=\"remove_icon();return false;\"><?php echo WT_I18N::translate('Remove flag'); ?></a>";
 <?php } else if ($_POST["selstate"] != "States"){ ?>
 			window.opener.document.editplaces.icon.value = 'places/<?php echo $countrySelected, '/flags/', $_POST['selstate'], '/', $flags_s[$_POST['FLAGS']]; ?>.png';
-			window.opener.document.getElementById('flagsDiv').innerHTML = "<img class=\"flag_gm_30\" src=\"<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/places/<?php echo $countrySelected, "/flags/", $_POST["selstate"], "/", $flags_s[$_POST["FLAGS"]]; ?>.png\">&nbsp;&nbsp;<a href=\"javascript:;\" onclick=\"change_icon();return false;\"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;<a href=\"javascript:;\" onclick=\"remove_icon();return false;\"><?php echo WT_I18N::translate('Remove flag'); ?></a>";
+			window.opener.document.getElementById('flagsDiv').innerHTML = "<img class=\"flag_gm_30\" src=\"<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/places/<?php echo $countrySelected, "/flags/", $_POST["selstate"], "/", $flags_s[$_POST['FLAGS']]; ?>.png\">&nbsp;&nbsp;<a href=\"#\" onclick=\"change_icon();return false;\"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;<a href=\"#\" onclick=\"remove_icon();return false;\"><?php echo WT_I18N::translate('Remove flag'); ?></a>";
 <?php } else { ?>
 			window.opener.document.editplaces.icon.value = "places/<?php echo $countrySelected, "/flags/", $flags[$_POST['FLAGS']]; ?>.png";
-			window.opener.document.getElementById('flagsDiv').innerHTML = "<img class=\"flag_gm_30\" src=\"<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/places/<?php echo $countrySelected, "/flags/", $flags[$_POST["FLAGS"]]; ?>.png\">&nbsp;&nbsp;<a href=\"javascript:;\" onclick=\"change_icon();return false;\"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;<a href=\"javascript:;\" onclick=\"remove_icon();return false;\"><?php echo WT_I18N::translate('Remove flag'); ?></a>";
+			window.opener.document.getElementById('flagsDiv').innerHTML = "<img class=\"flag_gm_30\" src=\"<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/places/<?php echo $countrySelected, "/flags/", $flags[$_POST['FLAGS']]; ?>.png\">&nbsp;&nbsp;<a href=\"#\" onclick=\"change_icon();return false;\"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;<a href=\"#\" onclick=\"remove_icon();return false;\"><?php echo WT_I18N::translate('Remove flag'); ?></a>";
 <?php } ?>
 			window.close();
 		}
@@ -105,8 +107,7 @@ if ($action == 'ChangeFlag') {
 	if (!WT_DEBUG) {
 		echo "\n<script type=\"text/javascript\">\n<!--\nedit_close();\n//-->\n</script>";
 	}
-	echo "<div class=\"center\"><a href=\"javascript:;\" onclick=\"edit_close();\">", WT_I18N::translate('Close Window'), "</a></div><br />\n";
-	print_simple_footer();
+	echo "<div class=\"center\"><a href=\"#\" onclick=\"edit_close();\">", WT_I18N::translate('Close Window'), "</a></div><br />\n";
 	exit;
 }
 else {
@@ -253,6 +254,4 @@ else {
 	<input id="savebutton" name="save2" type="submit" disabled="true" value="<?php echo WT_I18N::translate('Save'); ?>" /><br />
 </form>
 <?php
-echo '<div class="center"><a href="javascript:;" onclick="edit_close();">', WT_I18N::translate('Close Window'), '</a></div><br />';
-
-print_simple_footer();
+echo '<div class="center"><a href="#" onclick="edit_close();">', WT_I18N::translate('Close Window'), '</a></div><br />';

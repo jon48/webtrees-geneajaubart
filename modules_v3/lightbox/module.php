@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12376 2011-10-22 22:02:37Z lukasz $
+// $Id: module.php 12762 2011-11-16 20:40:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -74,19 +74,13 @@ class lightbox_WT_Module extends WT_Module implements WT_Module_Config, WT_Modul
 
 	// Implement WT_Module_Tab
 	public function getTabContent() {
+		global $controller;
+
 		ob_start();
 		require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_head.php';
 
 		$media_found = false;
-		if (!$this->controller->indi->canDisplayDetails()) {
-			echo '<table class="facts_table" cellpadding="0">';
-			echo '<tr><td class="facts_value">';
-			print_privacy_error();
-			echo '</td></tr>';
-			echo '</table>';
-		} else {
-			require WT_ROOT.WT_MODULES_DIR.'lightbox/album.php';
-		}
+		require WT_ROOT.WT_MODULES_DIR.'lightbox/album.php';
 		return '<div id="'.$this->getName().'_content">'.ob_get_clean().'</div>';
 	}
 
@@ -112,10 +106,12 @@ class lightbox_WT_Module extends WT_Module implements WT_Module_Config, WT_Modul
 	protected $mediaCount = null;
 
 	private function get_media_count() {
+		global $controller;
+
 		if ($this->mediaCount===null) {
-			$ct = preg_match("/\d OBJE/", $this->controller->indi->getGedcomRecord());
-			foreach ($this->controller->indi->getSpouseFamilies() as $sfam)
-				$ct += preg_match("/\d OBJE/", $sfam->getGedcomRecord());
+			$ct = preg_match_all("/\d OBJE/", $controller->record->getGedcomRecord(), $match);
+			foreach ($controller->record->getSpouseFamilies() as $sfam)
+				$ct += preg_match_all("/\d OBJE/", $sfam->getGedcomRecord(), $match);
 			$this->mediaCount = $ct;
 		}
 		return $this->mediaCount;

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Timeline.php 12203 2011-09-22 12:09:54Z greg $
+// $Id: Timeline.php 12679 2011-11-10 09:12:46Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -30,7 +30,7 @@ if (!defined('WT_WEBTREES')) {
 
 require_once WT_ROOT.'includes/functions/functions_charts.php';
 
-class WT_Controller_Timeline extends WT_Controller_Base {
+class WT_Controller_Timeline extends WT_Controller_Chart {
 	var $bheight = 30;
 	var $placements = array();
 	var $familyfacts = array();
@@ -47,10 +47,11 @@ class WT_Controller_Timeline extends WT_Controller_Base {
 	// GEDCOM elements that may have DATE data, but should not be displayed
 	var $nonfacts = array("BAPL","ENDL","SLGC","SLGS","_TODO","CHAN");
 
-	/**
-	* Initialization function
-	*/
-	function init() {
+	function __construct() {
+		parent::__construct();
+
+		$this->setPageTitle(WT_I18N::translate('Timeline'));
+	
 		$this->baseyear = date("Y");
 		//-- new pid
 		$newpid=safe_GET_xref('newpid');
@@ -90,7 +91,7 @@ class WT_Controller_Timeline extends WT_Controller_Base {
 		foreach ($this->people as $p=>$indi) {
 			if (!is_null($indi) && $indi->canDisplayDetails()) {
 				//-- setup string of valid pids for links
-				$this->pidlinks .= "pids[]=".$indi->getXref()."&amp;";
+				$this->pidlinks .= "pids%5B%5D=".$indi->getXref()."&amp;";
 				$bdate = $indi->getBirthDate();
 				if ($bdate->isOK()) {
 					$date = $bdate->MinDate();
@@ -136,6 +137,7 @@ class WT_Controller_Timeline extends WT_Controller_Base {
 		$this->baseyear -= 5;
 		$this->topyear += 5;
 	}
+
 	/**
 	* check the privacy of the incoming people to make sure they can be shown
 	*/
@@ -208,7 +210,7 @@ class WT_Controller_Timeline extends WT_Controller_Base {
 
 				echo "<div id=\"fact$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($xoffset):"right: ".($xoffset))."px; top:".($yoffset)."px; font-size: 8pt; height: ".($this->bheight)."px; \" onmousedown=\"factMD(this, '".$factcount."', ".($yoffset-$tyoffset).");\">";
 				echo "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"cursor: hand;\"><tr><td>";
-				echo "<img src=\"".$WT_IMAGES["hline"]."\" name=\"boxline$factcount\" id=\"boxline$factcount\" height=\"3\" align=\"left\" hspace=\"0\" width=\"10\" vspace=\"0\" alt=\"\" style=\"padding-";
+				echo "<img src=\"".$WT_IMAGES["hline"]."\" name=\"boxline$factcount\" id=\"boxline$factcount\" height=\"3\" align=\"left\" width=\"10\" alt=\"\" style=\"padding-";
 				if ($TEXT_DIRECTION=="ltr") echo "left";
 				else echo "right";
 				echo ": 3px;\" />";

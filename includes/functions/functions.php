@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions.php 12463 2011-10-29 21:41:55Z greg $
+// $Id: functions.php 12734 2011-11-14 11:52:48Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -265,7 +265,6 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $SHOW_LEVEL2_NOTES;            $SHOW_LEVEL2_NOTES            =get_gedcom_setting($ged_id, 'SHOW_LEVEL2_NOTES');
 	global $SHOW_LIST_PLACES;             $SHOW_LIST_PLACES             =get_gedcom_setting($ged_id, 'SHOW_LIST_PLACES');
 	global $SHOW_LIVING_NAMES;            $SHOW_LIVING_NAMES            =get_gedcom_setting($ged_id, 'SHOW_LIVING_NAMES');
-	global $SHOW_MARRIED_NAMES;           $SHOW_MARRIED_NAMES           =get_gedcom_setting($ged_id, 'SHOW_MARRIED_NAMES');
 	global $SHOW_MEDIA_DOWNLOAD;          $SHOW_MEDIA_DOWNLOAD          =get_gedcom_setting($ged_id, 'SHOW_MEDIA_DOWNLOAD');
 	global $SHOW_NO_WATERMARK;            $SHOW_NO_WATERMARK            =get_gedcom_setting($ged_id, 'SHOW_NO_WATERMARK');
 	global $SHOW_PARENTS_AGE;             $SHOW_PARENTS_AGE             =get_gedcom_setting($ged_id, 'SHOW_PARENTS_AGE');
@@ -2779,7 +2778,7 @@ function get_query_url($overwrite=null) {
 			$query_string.='&amp;' . rawurlencode($key) . '=' . rawurlencode($value);
 		} else {
 			foreach ($value as $k=>$v) {
-				$query_string.='&amp;' . rawurlencode($key) . '[' . rawurlencode($k) . ']=' . rawurlencode($v);
+				$query_string.='&amp;' . rawurlencode($key) . '%5B' . rawurlencode($k) . '%5D=' . rawurlencode($v);
 			}
 		}
 	}
@@ -3081,35 +3080,35 @@ function mediaFileInfo($fileName, $thumbName, $mid, $name='', $notes='', $admin=
 		// Lightbox is not installed or Lightbox is not appropriate for this media type
 		switch ($type) {
 		case 'url_flv':
-			$url = "javascript:;\" onclick=\" var winflv = window.open('".'js/jw_player/flvVideo.php?flvVideo='.rawurlencode($fileName) . "', 'winflv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winflv.focus();}";
+			$url = "#\" onclick=\" var winflv = window.open('".'js/jw_player/flvVideo.php?flvVideo='.rawurlencode($fileName) . "', 'winflv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winflv.focus();}";
 			break 2;
 		case 'local_flv':
-			$url = "javascript:;\" onclick=\" var winflv = window.open('".'js/jw_player/flvVideo.php?flvVideo='.rawurlencode(WT_SERVER_NAME.WT_SCRIPT_PATH.$fileName) . "', 'winflv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winflv.focus();}";
+			$url = "#\" onclick=\" var winflv = window.open('".'js/jw_player/flvVideo.php?flvVideo='.rawurlencode(WT_SERVER_NAME.WT_SCRIPT_PATH.$fileName) . "', 'winflv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winflv.focus();}";
 			break 2;
 		case 'url_wmv':
-			$url = "javascript:;\" onclick=\" var winwmv = window.open('".'js/jw_player/wmvVideo.php?wmvVideo='.rawurlencode($fileName) . "', 'winwmv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winwmv.focus();}";
+			$url = "#\" onclick=\" var winwmv = window.open('".'js/jw_player/wmvVideo.php?wmvVideo='.rawurlencode($fileName) . "', 'winwmv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winwmv.focus();}";
 			break 2;
 		case 'local_wmv':
 		case 'local_audio':
-			$url = "javascript:;\" onclick=\" var winwmv = window.open('".'js/jw_player/wmvVideo.php?wmvVideo='.rawurlencode(WT_SERVER_NAME.WT_SCRIPT_PATH.$fileName) . "', 'winwmv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winwmv.focus();}";
+			$url = "#\" onclick=\" var winwmv = window.open('".'js/jw_player/wmvVideo.php?wmvVideo='.rawurlencode(WT_SERVER_NAME.WT_SCRIPT_PATH.$fileName) . "', 'winwmv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winwmv.focus();}";
 			break 2;
 		case 'url_image':
 		case 'local_image':
 			$imgsize = findImageSize($fileName);
 			$imgwidth = $imgsize[0]+40;
 			$imgheight = $imgsize[1]+150;
-			$url = "javascript:;\" onclick=\"var winimg = window.open('".$fileName."', 'winimg', 'width=".$imgwidth.", height=".$imgheight.", left=200, top=200'); if (window.focus) {winimg.focus();}";
+			$url = "#\" onclick=\"var winimg = window.open('".$fileName."', 'winimg', 'width=".$imgwidth.", height=".$imgheight.", left=200, top=200'); if (window.focus) {winimg.focus();}";
 			break 2;
 		case 'url_picasa':
 		case 'url_page':
 		case 'url_pdf':
 		case 'url_other':
 		case 'local_other';
-			$url = "javascript:;\" onclick=\"var winurl = window.open('".$fileName."', 'winurl', 'width=900, height=600, left=200, top=200'); if (window.focus) {winurl.focus();}";
+			$url = "#\" onclick=\"var winurl = window.open('".$fileName."', 'winurl', 'width=900, height=600, left=200, top=200'); if (window.focus) {winurl.focus();}";
 			break 2;
 		case 'local_page':
 		case 'local_pdf':
-			$url = "javascript:;\" onclick=\"var winurl = window.open('".WT_SERVER_NAME.WT_SCRIPT_PATH.$fileName."', 'winurl', 'width=900, height=600, left=200, top=200'); if (window.focus) {winurl.focus();}";
+			$url = "#\" onclick=\"var winurl = window.open('".WT_SERVER_NAME.WT_SCRIPT_PATH.$fileName."', 'winurl', 'width=900, height=600, left=200, top=200'); if (window.focus) {winurl.focus();}";
 			break 2;
 		case 'url_streetview':
 			//echo '<iframe style="float:left; padding:5px;" width="264" height="176" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="', $fileName, '&amp;output=svembed"></iframe>';
@@ -3122,7 +3121,7 @@ function mediaFileInfo($fileName, $thumbName, $mid, $name='', $notes='', $admin=
 			$imgsize = findImageSize($fileName);
 			$imgwidth = $imgsize[0]+40;
 			$imgheight = $imgsize[1]+150;
-			$url = "javascript:;\" onclick=\"return openImage('".urlencode($fileName)."', $imgwidth, $imgheight);";
+			$url = "#\" onclick=\"return openImage('".urlencode($fileName)."', $imgwidth, $imgheight);";
 		}
 		break;
 	}

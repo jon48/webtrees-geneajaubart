@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: branches.php 12411 2011-10-25 16:00:46Z lukasz $
+// $Id: branches.php 12948 2011-11-29 18:51:28Z nigel $
 
 define('WT_SCRIPT_NAME', 'branches.php');
 require './includes/session.php';
@@ -32,7 +32,7 @@ define('WT_ICON_RINGS', '<img src="'.$WT_IMAGES['rings'].'" alt="'.WT_Gedcom_Tag
 define('WT_ICON_BRANCHES', '<img src="'.$WT_IMAGES['patriarch'].'" alt="" align="middle" />');
 
 //-- args
-$surn = safe_GET('surn', '[^<>&%{};]*');
+$surn = safe_GET('surname', '[^<>&%{};]*');
 $surn = utf8_strtoupper($surn);
 $soundex_std = safe_GET_bool('soundex_std');
 $soundex_dm = safe_GET_bool('soundex_dm');
@@ -46,29 +46,26 @@ if (WT_USER_GEDCOM_ID) {
 	load_ancestors_array(WT_Person::getInstance(WT_USER_GEDCOM_ID), 1);
 }
 
-//-- random surname
-if ($surn=='*') {
-	$surn = array_rand(WT_Query_Name::surnames('', '', false, true, WT_GED_ID));
-}
+$controller=new WT_Controller_Base();
+$controller->setPageTitle(WT_I18N::translate('Branches').' - '.$surn);
+$controller->pageHeader();
 
-//-- form
-print_header(WT_I18N::translate('Branches').' - '.$surn);
 if ($ENABLE_AUTOCOMPLETE) {
 	require WT_ROOT.'/js/autocomplete.js.htm';
 }
 ?>
+<div id="branches-page">
 <form name="surnlist" id="surnlist" action="?">
-	<table class="center facts_table width50">
+	<table class="facts_table width50">
 		<tr>
-			<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>">
+			<td class="descriptionbox">
 				<?php echo WT_Gedcom_Tag::getLabel('SURN'), help_link('surname'); ?></td>
-			<td class="optionbox <?php echo $TEXT_DIRECTION; ?>">
-				<input type="text" name="surn" id="SURN" value="<?php echo $surn; ?>" />
+			<td class="optionbox">
+				<input type="text" name="surname" id="SURN" value="<?php echo $surn; ?>" />
 				<input type="hidden" name="ged" id="ged" value="<?php echo $ged; ?>" />
 				<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>" />
-				<input type="submit" value="<?php echo WT_I18N::translate('Random surname'); ?>" onclick="document.surnlist.surn.value='*';" />
-				<p class="details1">
-					<?php echo WT_I18N::translate('Phonetic search'); ?><br />
+				<p><?php echo WT_I18N::translate('Phonetic search'); ?></p>
+				<p>
 					<input type="checkbox" name="soundex_std" id="soundex_std" value="1" <?php if ($soundex_std) echo ' checked="checked"'; ?> />
 					<label for="soundex_std"><?php echo WT_I18N::translate('Russell'); ?></label>
 					<input type="checkbox" name="soundex_dm" id="soundex_dm" value="1" <?php if ($soundex_dm) echo ' checked="checked"'; ?> />
@@ -84,13 +81,14 @@ if ($surn) {
 	$surn_script = utf8_script($surn);
 	echo '<fieldset><legend>', WT_ICON_BRANCHES, ' ', PrintReady($surn), '</legend>';
 	$indis = indis_array($surn, $soundex_std, $soundex_dm);
+	usort($indis, array('WT_Person', 'CompareBirtDate'));
 	echo '<ol>';
 	foreach ($indis as $person) {
 		$famc = $person->getPrimaryChildFamily();
 		// Don't show INDIs with parents in the list, as they will be shown twice.
 		if ($famc) {
 			foreach ($famc->getSpouses() as $parent) {
-				if (array_key_exists($parent->getXref(), $indis)) {
+				if (in_array($parent, $indis)) {
 					continue 2;
 				}
 			}
@@ -100,10 +98,10 @@ if ($surn) {
 	echo '</ol>';
 	echo '</fieldset>';
 }
-print_footer();
+echo '</div>'; // close branches-page
 
 function print_fams($person, $famid=null) {
-	global $UNKNOWN_NN, $surn, $surn_script, $TEXT_DIRECTION, $user_ancestors;
+	global $UNKNOWN_NN, $surn, $surn_script, $user_ancestors;
 	// select person name according to searched surname
 	$person_name = "";
 	foreach ($person->getAllNames() as $n=>$name) {
@@ -196,28 +194,28 @@ function load_ancestors_array($person, $sosa=1) {
 
 function indis_array($surn, $soundex_std, $soundex_dm) {
 	$sql=
-		'SELECT DISTINCT n_id'.
-		' FROM `##name`'.
-		' WHERE n_file=?'.
-		' AND n_type!=?'.
-		' AND (n_surn=? OR n_surname=?';
+		"SELECT DISTINCT n_id".
+		" FROM `##name`".
+		" WHERE n_file=?".
+		" AND n_type!=?".
+		" AND (n_surn=? OR n_surname=?";
 	$args=array(WT_GED_ID, '_MARNM', $surn, $surn);
 	if ($soundex_std) {
-		$sql .= ' OR n_soundex_surn_std=?';
+		$sql .= " OR n_soundex_surn_std LIKE CONCAT('%', ?, '%')";
 		$args[]=soundex_std($surn);
 	}
 	if ($soundex_dm) {
-		$sql .= ' OR n_soundex_surn_dm=?';
+		$sql .= " OR n_soundex_surn_dm LIKE CONCAT('%', ?, '%')";
 		$args[]=soundex_dm($surn);
 	}
-	$sql .= ') ORDER BY n_sort';
+	$sql .= ')';
 	$rows=
 		WT_DB::prepare($sql)
 		->execute($args)
 		->fetchAll();
 	$data=array();
 	foreach ($rows as $row) {
-		$data[$row->n_id]=WT_Person::getInstance($row->n_id);
+		$data[]=WT_Person::getInstance($row->n_id);
 	}
 	return $data;
 }

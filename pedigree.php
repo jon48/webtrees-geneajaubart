@@ -24,16 +24,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: pedigree.php 12203 2011-09-22 12:09:54Z greg $
+// $Id: pedigree.php 12970 2011-12-03 14:57:50Z rob $
 
 define('WT_SCRIPT_NAME', 'pedigree.php');
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$controller = new WT_Controller_Pedigree();
-$controller->init();
-
-print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Pedigree tree of %s', $controller->name));
+$controller=new WT_Controller_Pedigree();
+$controller->pageHeader();
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
@@ -56,7 +54,7 @@ echo '<h2>', WT_I18N::translate('Pedigree tree of %s', $controller->name), help_
 	</script>
 	</td><td width="50px">&nbsp;</td><td><form name="people" id="people" method="get" action="?">
 	<input type="hidden" name="show_full" value="<?php echo $controller->show_full; ?>" />
-		<table class="list_table <?php echo $TEXT_DIRECTION; ?>" width="500" align="center">
+		<table class="list_table" width="500" align="center">
 			<tr>
 				<td colspan="4" class="topbottombar" style="text-align:center; ">
 					<?php echo WT_I18N::translate('Options:'); ?>
@@ -64,16 +62,16 @@ echo '<h2>', WT_I18N::translate('Pedigree tree of %s', $controller->name), help_
 			</tr>
 			<tr>
 				<td class="descriptionbox wrap">
-					<?php echo WT_I18N::translate('Root Person ID'), help_link('rootid'); ?>
+					<?php echo WT_I18N::translate('Individual'); ?>
 				</td>
 				<td class="descriptionbox wrap">
-					<?php echo WT_I18N::translate('Generations'), help_link('PEDIGREE_GENERATIONS'); ?>
+					<?php echo WT_I18N::translate('Generations'); ?>
 				</td>
 				<td class="descriptionbox wrap">
-					<?php echo WT_I18N::translate('Orientation'), help_link('talloffset'); ?>
+					<?php echo WT_I18N::translate('Layout'); ?>
 				</td>
 				<td class="descriptionbox wrap">
-					<?php echo WT_I18N::translate('Show Details'), help_link('show_full'); ?>
+					<?php echo WT_I18N::translate('Show Details'); ?>
 				</td>
 			</tr>
 
@@ -157,38 +155,38 @@ for ($i=($controller->treesize-1); $i>=0; $i--) {
 				}
 				$linexoffset = $xoffset;
 				if ($talloffset < 2) {
-					echo '<div id="line' .$i . '" dir="';
+					echo '<div id="line', $i, '" dir="';
 					if ($TEXT_DIRECTION=="rtl") {
 						echo 'rtl" style="position:absolute; right:';
 					} else {
 						echo 'ltr" style="position:absolute; left:';
 					}
 					echo $linexoffset, 'px; top:', ($yoffset+1+$controller->pbheight/2), 'px; z-index: 0;">';
-					echo '<img src="', $WT_IMAGES["vline"], '" width="', $linesize, '" height="', ($vlength-1), '\" alt="" />';
+					echo '<img src="', $WT_IMAGES['vline'], '" width="', $linesize, '" height="', ($vlength-1), '" alt="" >';
 					echo '</div>';
 				} else {
-					echo '<div id="vline$i" dir="';
+					echo '<div id="vline', $i, '" dir="';
 					if ($TEXT_DIRECTION=="rtl") {
 						echo 'rtl" style="position:absolute; right:';
 					} else {
 						echo 'ltr" style="position:absolute; left:';
 					}
 					if ($talloffset > 2) {
-						echo ($linexoffset-2+$controller->pbwidth/2+$vlength/2), 'px; top:', ($yoffset+1-$controller->pbheight/2), 'px; z-index: 0;">';
-						echo '<img src="', $WT_IMAGES["vline"], '" width="', $linesize, '" height="', ($controller->pbheight), '" alt="" />';
+						echo ($linexoffset-2+$controller->pbwidth/2+$vlength/2), 'px; top:', ($yoffset+1-$controller->pbheight/2+10), 'px; z-index: 0;">';
+						echo '<img src="', $WT_IMAGES['vline'], '" width="', $linesize, '" height="', ($controller->pbheight), '" alt="" >';
 					} else {
-						echo ($linexoffset-2+$controller->pbwidth/2+$vlength/2), "px; top:", ($yoffset+1+$controller->pbheight/2), "px; z-index: 0;\">";
-						echo '<img src="', $WT_IMAGES["vline"], '" width="', $linesize, '" height="', ($controller->pbheight), '" alt="" />';
+						echo ($linexoffset-2+$controller->pbwidth/2+$vlength/2), 'px; top:', ($yoffset+1+$controller->pbheight/2+10), 'px; z-index: 0;">';
+						echo '<img src="', $WT_IMAGES['vline'], '" width="', $linesize, '" height="', ($controller->pbheight), '" alt="" >';
 					}
 					echo '</div>';
-					echo '<div id="line$i" dir="';
+					echo '<div id="line', $i, '" dir="';
 					if ($TEXT_DIRECTION=="rtl") {
 						echo 'rtl" style="position:absolute; right:';
 					} else {
 						echo 'ltr" style="position:absolute; left:';
 					}
 					echo ($linexoffset+$controller->pbwidth), 'px; top:', ($yoffset+1+$controller->pbheight/2), 'px; z-index: 0;\">';
-					echo '<img src="', $WT_IMAGES["hline"], '" width="', ($vlength-$controller->pbwidth), '" height="', $linesize, '" alt="" />';
+					echo '<img src="', $WT_IMAGES['hline'], '" width="', ($vlength-$controller->pbwidth), '" height="', $linesize, '" alt="" />';
 					echo '</div>';
 				}
 			}
@@ -236,11 +234,12 @@ for ($i=($controller->treesize-1); $i>=0; $i--) {
 				}
 				echo '<a href=pedigree.php?PEDIGREE_GENERATIONS=', $controller->PEDIGREE_GENERATIONS, '&amp;rootid=', $controller->treeid[$did], '&amp;show_full=', $controller->show_full, '&amp;talloffset=', $controller->talloffset, ' ';
 				echo "onmouseover=\"swap_image('arrow$i', 2);\" onmouseout=\"swap_image('arrow$i', 2);\">";
-				echo "<img id=\"arrow$i\" src=\"", $WT_IMAGES["uarrow"], '" border="0" alt="" />';
+				echo "<img id=\"arrow$i\" src=\"", $WT_IMAGES["uarrow"], '" alt="">';
 				echo '</a>';
 			}
 			echo "</div>";
 		}
+		// beginning of box setup and display
 		echo "<div id=\"box";
 		if (empty($controller->treeid[$i])) {
 			echo "$iref";
@@ -258,13 +257,22 @@ for ($i=($controller->treesize-1); $i>=0; $i--) {
 		} else {
 			$zindex = 0;
 		}
+		//Correct box spacing for Oldest on bottom
+		if (($talloffset == 3) && ($curgen ==1)) {
+			$yoffset +=25;
+
+		}
+		
+		if (($talloffset == 3) && ($curgen ==2)) {
+			$yoffset +=10;
+		}
 
 		echo $xoffset, "px; top:", $yoffset, "px; width:", ($controller->pbwidth+$widthadd), "px; height:", $controller->pbheight, "px; ";
 		echo "z-index: ", $zindex, ";\">";
 		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\" dir=\"$TEXT_DIRECTION\">";
 		if (($talloffset < 2) && ($curgen > $talloffset) && ($curgen < $controller->PEDIGREE_GENERATIONS)) {
 			echo "<tr><td>";
-			echo "<img src=\"", $WT_IMAGES["hline"], "\" align=\"left\" hspace=\"0\" vspace=\"0\" alt=\"\" />";
+			echo "<img src=\"", $WT_IMAGES["hline"], "\" align=\"left\" alt=\"\" />";
 			echo "</td><td width=\"100%\">";
 		} else {
 			echo "<tr><td width=\"100%\">";
@@ -322,10 +330,10 @@ if ($controller->rootPerson->canDisplayDetails()) {
 			}
 			echo $addxoffset, "px; top:", $yoffset, "px; width:10px; height:10px; \">";
 			if ($TEXT_DIRECTION=="rtl") {
-				echo "<a href=\"javascript: ", WT_I18N::translate('Show'), "\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow', 1);\" onmouseout=\"swap_image('larrow', 1);\">";
+				echo "<a href=\"#\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow', 1);\" onmouseout=\"swap_image('larrow', 1);\">";
 				echo "<img id=\"larrow\" src=\"", $WT_IMAGES["rarrow"], "\" border=\"0\" alt=\"\" />";
 			} else {
-				echo "<a href=\"javascript: ", WT_I18N::translate('Show'), "\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow', 0);\" onmouseout=\"swap_image('larrow', 0);\">";
+				echo "<a href=\"#\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow', 0);\" onmouseout=\"swap_image('larrow', 0);\">";
 				echo "<img id=\"larrow\" src=\"", $WT_IMAGES["larrow"], "\" border=\"0\" alt=\"\" />";
 			}
 			break;
@@ -333,21 +341,21 @@ if ($controller->rootPerson->canDisplayDetails()) {
 			if ($PEDIGREE_GENERATIONS<4) $basexoffset += 60;
 			echo $basexoffset, "px; top:", $yoffset, "px; width:10px; height:10px; \">";
 			if ($TEXT_DIRECTION=="rtl") {
-				echo "<a href=\"javascript: ", WT_I18N::translate('Show'), "\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow', 1);\" onmouseout=\"swap_image('larrow', 1);\">";
+				echo "<a href=\"#\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow', 1);\" onmouseout=\"swap_image('larrow', 1);\">";
 				echo "<img id=\"larrow\" src=\"", $WT_IMAGES["rarrow"], "\" border=\"0\" alt=\"\" />";
 			} else {
-				echo "<a href=\"javascript: ", WT_I18N::translate('Show'), "\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow', 0);\" onmouseout=\"swap_image('larrow', 0);\">";
+				echo "<a href=\"#\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow', 0);\" onmouseout=\"swap_image('larrow', 0);\">";
 				echo "<img id=\"larrow\" src=\"", $WT_IMAGES["larrow"], "\" border=\"0\" alt=\"\" />";
 			}
 			break;
 		case 2:
 			echo ($linexoffset-10+$controller->pbwidth/2+$vlength/2), "px; top:", ($yoffset+$controller->pbheight/2+10), "px; width:10px; height:10px; \">";
-			echo "<a href=\"javascript: ", WT_I18N::translate('Show'), "\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('darrow', 3);\" onmouseout=\"swap_image('darrow', 3);\">";
+			echo "<a href=\"#\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('darrow', 3);\" onmouseout=\"swap_image('darrow', 3);\">";
 			echo "<img id=\"darrow\" src=\"", $WT_IMAGES["darrow"], "\" border=\"0\" alt=\"\" />";
 			break;
 		case 3:
 			echo ($linexoffset-10+$controller->pbwidth/2+$vlength/2), "px; top:", ($yoffset-$controller->pbheight/2-10), "px; width:10px; height:10px; \">";
-			echo "<a href=\"javascript: ", WT_I18N::translate('Show'), "\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('uarrow', 2);\" onmouseout=\"swap_image('uarrow', 2);\">";
+			echo "<a href=\"#\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('uarrow', 2);\" onmouseout=\"swap_image('uarrow', 2);\">";
 			echo "<img id=\"uarrow\" src=\"", $WT_IMAGES["uarrow"], "\" border=\"0\" alt=\"\" />";
 			break;
 		}
@@ -428,5 +436,3 @@ $maxyoffset+=30;
 		content_div.style.height = <?php echo $maxyoffset; ?> + "px";
 	}
 </script>
-<?php
-print_footer();

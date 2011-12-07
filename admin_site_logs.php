@@ -1,40 +1,34 @@
 <?php
-/**
- * Log viewer.
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @package webtrees
- * @subpackage Admin
- * @version $Id: admin_site_logs.php 12466 2011-10-30 01:13:24Z nigel $
- */
+// Log viewer.
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: admin_site_logs.php 12887 2011-11-23 18:40:41Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_logs.php');
-
 require './includes/session.php';
-require WT_ROOT.'includes/functions/functions_edit.php';
 
-// Only managers can access this page
-if (!WT_USER_GEDCOM_ADMIN) {
-	// TODO: Check if we are a manager in *any* gedcom, not just the current one
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.WT_SCRIPT_NAME);
-	exit;
-}
+$controller=new WT_Controller_Base();
+$controller
+	->requireManagerLogin()
+	->setPageTitle(WT_I18N::translate('Logs'));
+
+require WT_ROOT.'includes/functions/functions_edit.php';
 
 $earliest=WT_DB::prepare("SELECT DATE(MIN(log_time)) FROM `##log`")->execute(array())->fetchOne();
 $latest  =WT_DB::prepare("SELECT DATE(MAX(log_time)) FROM `##log`")->execute(array())->fetchOne();
@@ -181,39 +175,23 @@ case 'load_json':
 	exit;
 }
 
-print_header(WT_I18N::translate('Logs'));
-echo WT_JS_START;
-
-?>
-	jQuery(document).ready(function(){
-		var oTable = jQuery('#log_list').dataTable( {
-			"sDom": '<"H"pf<"dt-clear">irl>t<"F"pl>',
+$controller
+	->pageHeader()
+	->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+	->addInlineJavaScript('
+		var oTable=jQuery("#log_list").dataTable( {
+			"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
 			"bProcessing": true,
 			"bServerSide": true,
-			"sAjaxSource": "<?php echo WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'?action=load_json&from=', $from,'&to=', $to, '&type=', $type, '&text=', rawurlencode($text), '&ip=', rawurlencode($ip), '&user=', rawurlencode($user), '&gedc=', rawurlencode($gedc); ?>",
-			"oLanguage": {
-				"sLengthMenu": '<?php echo /* I18N: Display %s [records per page], %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="10">10<option value="20">20</option><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="1000">1000</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
-				"sZeroRecords": '<?php echo WT_I18N::translate('No records to display');?>',
-				"sInfo": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_'); ?>',
-				"sInfoEmpty": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '0', '0', '0'); ?>',
-				"sInfoFiltered": '<?php echo /* I18N: %s is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_'); ?>',
-				"sProcessing": '<?php echo WT_I18N::translate('Loading...');?>',
-				"sSearch": '<?php echo WT_I18N::translate('Filter');?>',				"oPaginate": {
-					"sFirst":    '<?php echo /* I18N: button label, first page    */ WT_I18N::translate('first');    ?>',
-					"sLast":     '<?php echo /* I18N: button label, last page     */ WT_I18N::translate('last');     ?>',
-					"sNext":     '<?php echo /* I18N: button label, next page     */ WT_I18N::translate('next');     ?>',
-					"sPrevious": '<?php echo /* I18N: button label, previous page */ WT_I18N::translate('previous'); ?>'
-				}
-			},
+			"sAjaxSource": "'.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'?action=load_json&from='.$from.'&to='.$to.'&type='.$type.'&text='.rawurlencode($text).'&ip='.rawurlencode($ip).'&user='.rawurlencode($user).'&gedc='.rawurlencode($gedc).'",
+			'.WT_I18N::datatablesI18N(array(10,20,50,100,500,1000,-1)).',
 			"bJQueryUI": true,
 			"bAutoWidth":false,
 			"aaSorting": [[ 0, "desc" ]],
-			"iDisplayLength": <?php echo get_user_setting(WT_USER_ID, 'admin_site_log_page_size', 20); ?>,
+			"iDisplayLength": '.get_user_setting(WT_USER_ID, 'admin_site_log_page_size', 20).',
 			"sPaginationType": "full_numbers"
 		});
-	});
-
-<?php
+	');
 
 $url=
 	WT_SCRIPT_NAME.'?from='.rawurlencode($from).
@@ -232,7 +210,6 @@ $users_array=array_combine(get_all_users(), get_all_users());
 uksort($users_array, 'strnatcasecmp');
 
 echo
-	WT_JS_END,
 	'<form name="logs" method="get" action="'.WT_SCRIPT_NAME.'">',
 		'<input type="hidden" name="action", value="show"/>',
 		'<table class="site_logs">',
@@ -285,5 +262,3 @@ if ($action) {
 	 	'</tbody>',
 		'</table>';
 }
-
-print_footer();

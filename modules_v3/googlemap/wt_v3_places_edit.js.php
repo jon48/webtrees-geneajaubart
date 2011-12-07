@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: wt_v3_places_edit.js.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: wt_v3_places_edit.js.php 12914 2011-11-24 19:57:59Z brian $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
  
@@ -34,7 +34,8 @@ if (!defined('WT_WEBTREES')) {
 <head>
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript" src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/wt_v3_places_edit_overlays.js.php"></script>
-	<link type="text/css" href="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/css/wt_v3_places_edit.css" rel="stylesheet" />
+	<!-- <link type="text/css" href="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/css/wt_v3_places_edit.css" rel="stylesheet" /> -->
+	<link type="text/css" href="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/css/wt_v3_googlemap.css" rel="stylesheet" />
 
 	<script type="text/javascript">
 	var map;
@@ -397,7 +398,7 @@ if (!defined('WT_WEBTREES')) {
 
 	function remove_icon() {
 		document.editplaces.icon.value = '';
-		document.getElementById('flagsDiv').innerHTML = '<a href="javascript:;" onclick="change_icon();return false;"><?php echo WT_I18N::translate('Change flag'); ?></a>';
+		document.getElementById('flagsDiv').innerHTML = '<a href="#" onclick="change_icon();return false;"><?php echo WT_I18N::translate('Change flag'); ?></a>';
 	}
 	
 	function addAddressToMap(response) {
@@ -408,7 +409,7 @@ if (!defined('WT_WEBTREES')) {
 			if (response.length > 0) {
 				for (i=0; i<response.length; i++) {					
 					var name  = '<div id="gname" class="iwstyle">'+response[i].address_components[0].short_name+'<br /> '+response[i].geometry.location+''
-						name +=	'<br /><a href="javascript:;" onclick="setLoc(' + response[i].geometry.location.lat() + ', ' + response[i].geometry.location.lng() + ');"><div id="namelink"><?php echo PrintReady(WT_I18N::translate('Use this value')); ?></div></a>'
+						name +=	'<br /><a href="#" onclick="setLoc(' + response[i].geometry.location.lat() + ', ' + response[i].geometry.location.lng() + ');"><div id="namelink"><?php echo PrintReady(WT_I18N::translate('Use this value')); ?></div></a>'
 						name += '</div>'
 					var point = response[i].geometry.location;
 					var marker = createMarker(i, point, name);	
@@ -441,19 +442,13 @@ if (!defined('WT_WEBTREES')) {
 		}
 	}
 
-	function showLocation_level(address) {
-		address += '<?php if ($level>0) echo ', ', addslashes(PrintReady(implode(', ', array_reverse($where_am_i, true)))); ?>';
+	function showLocation(address) {
 		geocoder.geocode({'address': address}, addAddressToMap);
+		return false;
 	}
 
-	function showLocation_all(address) {
-		geocoder.geocode({'address': address}, addAddressToMap);
-	}
-
-	function paste_char(value, lang, mag) {
+	function paste_char(value) {
 		document.editplaces.NEW_PLACE_NAME.value += value;
-		language_filter = lang;
-		magnify = mag;
 	}
 </script>
 </head>

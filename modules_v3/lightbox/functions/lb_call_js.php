@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lb_call_js.php 12376 2011-10-22 22:02:37Z lukasz $
+// $Id: lb_call_js.php 12523 2011-11-04 12:00:17Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -35,7 +35,7 @@ require_once WT_ROOT.'js/prototype.js.htm';
 global $TEXT_DIRECTION;
 $LB_MUSIC_FILE=get_module_setting('lightbox', 'LB_MUSIC_FILE', WT_STATIC_URL.WT_MODULES_DIR.'lightbox/music/music.mp3');
 ?>
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 	var CB_ImgDetails = "<?php echo WT_I18N::translate('Details'); ?>";
 	var CB_Detail_Info = "<?php echo WT_I18N::translate('View image details'); ?>";
 	var CB_ImgNotes = "<?php echo WT_I18N::translate('Notes'); ?>";

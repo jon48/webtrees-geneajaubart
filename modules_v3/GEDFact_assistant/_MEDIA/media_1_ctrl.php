@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_1_ctrl.php 12382 2011-10-23 13:42:48Z greg $
+// $Id: media_1_ctrl.php 12812 2011-11-19 13:02:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,7 +31,7 @@ if (!defined('WT_WEBTREES')) {
 }
 
 require_once WT_ROOT.'includes/functions/functions_charts.php';
-global $summary, $TEXT_DIRECTION, $censyear, $censdate;
+global $summary, $censyear, $censdate;
 
 $pid = safe_get('pid');
 
@@ -65,7 +65,7 @@ if ($pid=="") {
 	}
 	$currpid=$pid;
 
-	echo '<table width=400 class="facts_table center ', $TEXT_DIRECTION, '">';
+	echo '<table width=400 class="facts_table center">';
 	echo '<tr><td class="topbottombar" colspan="1">';
 	echo '<b>', WT_I18N::translate('Family navigator'), '</b>';
 	echo '</td></tr>';
@@ -104,7 +104,7 @@ if ($pid=="") {
 				</script>
 				<?php
 				echo '<input id="personid" type="text" value="" />';
-				echo '<a href="javascript: onclick=findindi()">' ;
+				echo '<a href="#" onclick="onclick=findindi()">' ;
 				echo '&nbsp;<font size="2">&nbsp;', WT_I18N::translate('Search'), '</font>';
 				echo '</a>';
 				?>
@@ -118,7 +118,7 @@ if ($pid=="") {
 	
 		<?php
 		//-- Add Family Members to Census  -------------------------------------------
-		global $WT_IMAGES, $spouselinks, $parentlinks, $DeathYr, $BirthYr, $TEXT_DIRECTION, $censyear, $censdate;
+		global $WT_IMAGES, $spouselinks, $parentlinks, $DeathYr, $BirthYr, $censyear, $censdate;
 		// echo "CENS = " . $censyear;
 		?>
 		<tr>
@@ -147,9 +147,9 @@ if ($pid=="") {
 			<?php
 			//-- Build Parent Family ---------------------------------------------------
 			$personcount=0;
-			$families = $this->indi->getChildFamilies();
+			$families = $this->record->getChildFamilies();
 			foreach ($families as $family) {
-				$label = $this->indi->getChildFamilyLabel($family);
+				$label = $this->record->getChildFamilyLabel($family);
 				$people = $this->buildFamilyList($family, "parents");
 				$marrdate = $family->getMarriageDate();
 	
@@ -438,8 +438,8 @@ if ($pid=="") {
 			}
 	
 			//-- Build step families ----------------------------------------------------------------
-			foreach ($this->indi->getChildStepFamilies() as $family) {
-				$label = $this->indi->getStepFamilyLabel($family);
+			foreach ($this->record->getChildStepFamilies() as $family) {
+				$label = $this->record->getStepFamilyLabel($family);
 				$people = $this->buildFamilyList($family, "step-parents");
 				if ($people) {
 					echo "<tr><td><br /></td><td></td></tr>";
@@ -717,11 +717,11 @@ if ($pid=="") {
 			echo "<tr><td><font size=1><br /></font></td></tr>";
 	
 			//-- Build Spouse Family ---------------------------------------------------
-			$families = $this->indi->getSpouseFamilies();
+			$families = $this->record->getSpouseFamilies();
 			//$personcount = 0;
 			foreach ($families as $family) {
 				$people = $this->buildFamilyList($family, "spouse");
-				if ($this->indi->equals($people["husb"])) {
+				if ($this->record->equals($people["husb"])) {
 					$spousetag = 'WIFE';
 				} else {
 					$spousetag = 'HUSB';
@@ -1121,7 +1121,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 								$fulmn = rtrim($nam[1]['givn'],'*')."&nbsp;".$nam[1]['surn'];
 								$marn  = $nam[1]['surn'];
 							}
-							$parentlinks .= "<a href=\"javascript:opener.insertRowToTable(";
+							$parentlinks .= "<a href=\"#\" onclick=\"opener.insertRowToTable(";
 							$parentlinks .= "'".$husb->getXref()."', "; // pid = PID
 							$parentlinks .= "'".$fulln."', "; // nam = Name
 							if ($currpid=="Wife" || $currpid=="Husband") {
@@ -1167,7 +1167,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 								$fulmn = $nam[1]['fullNN'];
 								$marn  = $nam[1]['surname'];
 							}
-							$parentlinks .= "<a href=\"javascript:opener.insertRowToTable(";
+							$parentlinks .= "<a href=\"#\" onclick=\"opener.insertRowToTable(";
 							$parentlinks .= "'".$wife->getXref()."',"; // pid = PID
 							// $parentlinks .= "'".$fulln."',"; // nam = Name
 
@@ -1304,7 +1304,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 								$fulmn = rtrim($nam[1]['givn'],'*')."&nbsp;".$nam[1]['surname'];
 								$marn  = $nam[1]['surname'];
 							}
-							$spouselinks .= "<a href=\"javascript:opener.insertRowToTable(";
+							$spouselinks .= "<a href=\"#\" onclick=\"opener.insertRowToTable(";
 							$spouselinks .= "'".$spouse->getXref()."',"; // pid = PID
 							//$spouselinks .= "'".$fulln."',"; // nam = Name
 							//if ($married>=0 && isset($nam[1])) {
@@ -1356,7 +1356,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 
 				// Children ------------------------------   @var $child Person
 				$spouselinks .= "<div id='spouseFam'>";
-				$spouselinks .= "<ul class=\"clist ".$TEXT_DIRECTION."\">";
+				$spouselinks .= "<ul class=\"clist\">";
 				foreach ($children as $c=>$child) {
 					$cpid = $child->getXref();
 					if ($child) {
@@ -1371,7 +1371,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 									$marn  = $nam[1]['surname'];
 								}
 								$spouselinks .= "<li>";
-								$spouselinks .= "<a href=\"javascript:opener.insertRowToTable(";
+								$spouselinks .= "<a href=\"#\" onclick=\"opener.insertRowToTable(";
 								$spouselinks .= "'".$child->getXref()."',"; // pid = PID
 								//$spouselinks .= "'".$child->getFullName()."',"; // nam = Name
 								$spouselinks .= "'".$fulln."',"; // nam = Name

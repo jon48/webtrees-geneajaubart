@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: descendancy.php 12398 2011-10-24 20:14:11Z lukasz $
+// $Id: descendancy.php 12982 2011-12-04 20:18:24Z greg $
 
 define('WT_SCRIPT_NAME', 'descendancy.php');
 require './includes/session.php';
@@ -41,9 +41,7 @@ $nonfamfacts[] = 'UID';
 $nonfamfacts[] = '';
 
 $controller=new WT_Controller_Descendancy();
-$controller->init();
-
-print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Descendants of %s', $controller->name));
+$controller->pageHeader();
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
@@ -60,20 +58,21 @@ echo WT_JS_END;
 
 $gencount=0;
 echo '</td><td width="50px">&nbsp;</td><td><form method="get" name="people" action="?">';
+echo '<input type="hidden" name="ged" value="', WT_GEDCOM, '" />';
 echo '<input type="hidden" name="show_full" value="', $controller->show_full, '" />';
-echo '<table class="list_table ', $TEXT_DIRECTION, '">';
+echo '<table class="list_table">';
 echo '<tr><td class="descriptionbox">';
-echo WT_I18N::translate('Root Person ID'), help_link('desc_rootid'), '</td>';
+echo WT_I18N::translate('Individual'), '</td>';
 echo '<td class="optionbox">';
-echo '<input class="pedigree_form" type="text" id="pid" name="pid" size="3" value="', $controller->pid, '" />';
-print_findindi_link("pid", "");
+echo '<input class="pedigree_form" type="text" id="rootid" name="rootid" size="3" value="', $controller->rootid, '" />';
+print_findindi_link("rootid", "");
 echo '</td>';
 echo '<td class="descriptionbox">';
 echo WT_I18N::translate('Box width'), help_link('box_width'), '</td>';
 echo '<td class="optionbox"><input type="text" size="3" name="box_width" value="', $controller->box_width, '" />';
 echo '<b>%</b></td>';
 echo '<td rowspan="2" class="descriptionbox">';
-echo WT_I18N::translate('Layout'), help_link('chart_style');
+echo WT_I18N::translate('Layout');
 echo '</td><td rowspan="2" class="optionbox">';
 echo '<input type="radio" name="chart_style" value="0"';
 if ($controller->chart_style==0) {
@@ -99,17 +98,17 @@ echo '</td><td rowspan="2" class="topbottombar">';
 echo '<input type="submit" value="', WT_I18N::translate('View'), '" />';
 echo '</td></tr>';
 echo '<tr><td class="descriptionbox">';
-echo WT_I18N::translate('Generations'), help_link('desc_generations'), '</td>';
+echo WT_I18N::translate('Generations'), '</td>';
 echo '<td class="optionbox"><select name="generations">';
 for ($i=2; $i<=$MAX_DESCENDANCY_GENERATIONS; $i++) {
 	echo '<option value="', $i, '"';
 	if ($i==$controller->generations) {
 		echo ' selected="selected"';
 	}
-	echo '>', $i, '</option>';
+	echo '>', WT_I18N::number($i), '</option>';
 }
 echo '</select></td><td class="descriptionbox">';
-echo WT_I18N::translate('Show Details'), help_link('show_full');
+echo WT_I18N::translate('Show Details');
 echo '</td><td class="optionbox"><input type="checkbox" value="';
 if ($controller->show_full) {
 	echo '1" checked="checked" onclick="document.people.show_full.value=\'0\';"';
@@ -142,18 +141,17 @@ case 1: //-- booklet
 	break;
 case 2: //-- Individual list
 	$descendants=indi_desc($controller->descPerson, $controller->generations, array());
-	echo '<div class="center">';
-	print_indi_table($descendants, WT_I18N::translate('Descendants of %s', $controller->name));
+	echo '<div id="descendancy-list">';
+	echo format_indi_table($descendants, WT_I18N::translate('Descendants of %s', $controller->name));
 	echo '</div>';
 	break;
 case 3: //-- Family list
 	$descendants=fam_desc($controller->descPerson, $controller->generations, array());
-	echo '<div class="center">';
-	print_fam_table($descendants, WT_I18N::translate('Descendants of %s', $controller->name));
+	echo '<div id="descendancy-list">';
+	echo format_fam_table($descendants, WT_I18N::translate('Descendants of %s', $controller->name));
 	echo '</div>';
 	break;
 }
-print_footer();
 
 function indi_desc($person, $n, $array) {
 	if ($n<1) {
@@ -182,5 +180,3 @@ function fam_desc($person, $n, $array) {
 	}
 	return $array;
 }
-
-?>

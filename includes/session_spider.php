@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: session_spider.php 12029 2011-07-17 19:30:20Z greg $
+// $Id: session_spider.php 12740 2011-11-14 16:07:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -308,7 +308,7 @@ if (!$real) {
 //   they are not automatically detected above.   Setting his own IP address
 //   in the ip_address table allows him to see exactly what the search engine receives.
 //   To return to normal, the admin MUST use a different IP to get to admin
-//   mode or update the table pgv_ip_address directly.
+//   mode or update the table wt_ip_address directly.
 try {
 	$search_engine=WT_DB::prepare(
 		"SELECT ip_address, comment FROM `##ip_address`".

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lightbox_print_media_row.php 12389 2011-10-23 17:09:06Z greg $
+// $Id: lightbox_print_media_row.php 12708 2011-11-11 11:23:19Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -51,20 +51,20 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 			echo '<td valign="top" rowspan="2" >';
 			echo '<img src="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/images/transp80px.gif" height="82px" alt=""></img>';
 			echo '</td>';
-			echo '<td class="description_box" valign="top" colspan="3" nowrap="nowrap">';
-			echo '<center><br /><img src="', WT_THEME_URL, 'images/media.gif" height="30" border="0" />';
+			echo '<td class="description_box nowrap" valign="top" colspan="3">';
+			echo '<center><br /><img src="', WT_THEME_URL, 'images/media.gif" height="30">';
 			echo '<p class="ui-state-error">', WT_I18N::translate('The file “%s” does not exist.', $rowm['m_file']), '</p>';
 			echo '</td>';
 			echo '</tr>';
 		} else if (!file_exists($rowm['m_file'])) {
 			echo '<li class="li_norm" >';
-			echo '<table class="pic" width="50px" border="0" >';
+			echo '<table class="pic" width="50px" border="0">';
 			echo '<tr>';
 			echo '<td valign="top" rowspan="2" >';
 			echo '<img src="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/images/transp80px.gif" height="100px" alt=""></img>';
 			echo '</td>';
-			echo '<td class="description_box" valign="top" colspan="3" nowrap="nowrap" >';
-			echo '<center><br /><img src="', WT_THEME_URL, 'images/media.gif" height="30" border="0" />';
+			echo '<td class="description_box nowrap" valign="top" colspan="3">';
+			echo '<center><br /><img src="', WT_THEME_URL, 'images/media.gif" height="30">';
 			echo '<p class="ui-state-error">', WT_I18N::translate('The file “%s” does not exist.', $rowm['m_file']), '</p>';
 			echo '</td>';
 			echo '</tr>';
@@ -338,7 +338,7 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 				// If not reordering media print View or View-Edit Menu
 				echo "<tr>";
 				echo "<td width=\"5px\"></td>";
-				echo "<td valign=\"bottom\" align=\"center\" nowrap=\"nowrap\">";
+				echo "<td valign=\"bottom\" align=\"center\" class=\"nowrap\">";
 				echo $menu->getMenu();
 				echo "</td>";
 				echo "<td width=\"5px\"></td>";
@@ -353,7 +353,7 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 	if (!media_exists($mainMedia) && !media_exists($rowm['m_file'])) {
 		echo '<tr>';
 		echo '<td ></td>';
-		echo '<td valign="bottom" align="center" nowrap="nowrap">';
+		echo '<td valign="bottom" align="center" class="nowrap">';
 		echo $menu->getMenu();
 		echo '</td>';
 		echo '<td ></td>';

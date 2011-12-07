@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_3_search_add.php 12382 2011-10-23 13:42:48Z greg $
+// $Id: census_3_search_add.php 12964 2011-12-02 17:04:45Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -57,7 +57,7 @@ if (!defined('WT_WEBTREES')) {
 				</script>
 				<?php
 				echo "<input id=personid type=\"text\" size=\"20\" STYLE=\"color: #000000;\" value=\"\" />";
-				echo "<a href=\"javascript: onclick=findindi()\">" ;
+				echo "<a href=\"#\" onclick=\"findindi()\">" ;
 				echo "&nbsp;<font size=\"2\">&nbsp;".WT_I18N::translate('Search')."</font>";
 				echo '</a>';
 				?>
@@ -71,7 +71,7 @@ if (!defined('WT_WEBTREES')) {
 
 				<?php
 				//-- Add Family Members to Census  -------------------------------------------
-				global $WT_IMAGES, $spouselinks, $parentlinks, $DeathYr, $BirthYr, $TEXT_DIRECTION;
+				global $WT_IMAGES, $spouselinks, $parentlinks, $DeathYr, $BirthYr;
 				?>
 
 				<tr>
@@ -104,9 +104,9 @@ if (!defined('WT_WEBTREES')) {
 
 					//-- Build Parents Family --------------------------------------
 					$personcount=0;
-					$families = $this->indi->getChildFamilies();
+					$families = $this->record->getChildFamilies();
 					foreach ($families as $famid=>$family) {
-						$label = $this->indi->getChildFamilyLabel($family);
+						$label = $this->record->getChildFamilyLabel($family);
 						$people = $this->buildFamilyList($family, "parents", false);
 						$marrdate = $family->getMarriageDate();
 
@@ -176,7 +176,7 @@ if (!defined('WT_WEBTREES')) {
 										?>
 									</font>
 								</td>
-								<td align="left" class="facts_value" nowrap="nowrap">
+								<td align="left" class="facts_value nowrap">
 									<font size=1>
 									<?php
 									if (($people["husb"]->canDisplayDetails())) {
@@ -308,7 +308,7 @@ if (!defined('WT_WEBTREES')) {
 										?>
 									</font>
 								</td>
-								<td align="left" class="facts_value" nowrap="nowrap">
+								<td align="left" class="facts_value nowrap">
 									<font size=1>
 									<?php
 									if (($people["wife"]->canDisplayDetails())) {
@@ -456,7 +456,7 @@ if (!defined('WT_WEBTREES')) {
 												?>
 											</font>
 										</td>
-										<td align="left" class="facts_value" nowrap="nowrap">
+										<td align="left" class="facts_value nowrap">
 											<font size=1>
 											<?php
 											if (($child->canDisplayDetails())) {
@@ -539,8 +539,8 @@ if (!defined('WT_WEBTREES')) {
 					//-- Step families ---------------------------------------------------------
 
 					//-- Build step families ---------------------------------------------------
-					foreach ($this->indi->getChildStepFamilies() as $famid=>$family) {
-						$label = $this->indi->getStepFamilyLabel($family);
+					foreach ($this->record->getChildStepFamilies() as $famid=>$family) {
+						$label = $this->record->getStepFamilyLabel($family);
 						$people = $this->buildFamilyList($family, "step-parents", false);
 						if ($people) {
 							echo "<tr><td><br /></td><td></td></tr>";
@@ -620,7 +620,7 @@ if (!defined('WT_WEBTREES')) {
 										?>
 									</font>
 								</td>
-								<td align="left" class="facts_value" nowrap="nowrap">
+								<td align="left" class="facts_value nowrap">
 									<font size=1>
 									<?php
 									if (($people["husb"]->canDisplayDetails())) {
@@ -764,7 +764,7 @@ if (!defined('WT_WEBTREES')) {
 										?>
 									</font>
 								</td>
-								<td align="left" class="facts_value" nowrap="nowrap">
+								<td align="left" class="facts_value nowrap">
 									<font size=1>
 									<?php
 									if (($people["wife"]->canDisplayDetails())) {
@@ -898,7 +898,7 @@ if (!defined('WT_WEBTREES')) {
 											?>
 										</font>
 									</td>
-									<td align="left" class="facts_value" nowrap="nowrap">
+									<td align="left" class="facts_value nowrap">
 										<font size=1>
 										<?php
 										if (($child->canDisplayDetails())) {
@@ -972,11 +972,11 @@ if (!defined('WT_WEBTREES')) {
 					echo "<tr><td><font size=1><br /></font></td></tr>";
 
 					//-- Build Spouse Family ---------------------------------------------------
-					$families = $this->indi->getSpouseFamilies();
+					$families = $this->record->getSpouseFamilies();
 					//$personcount = 0;
 					foreach ($families as $family) {
 						$people = $this->buildFamilyList($family, "spouse", false);
-						if ($this->indi->equals($people["husb"])) {
+						if ($this->record->equals($people["husb"])) {
 							$spousetag = 'WIFE';
 						} else {
 							$spousetag = 'HUSB';
@@ -1036,7 +1036,7 @@ if (!defined('WT_WEBTREES')) {
 							if ($people["husb"]->getBirthYear() == 0) { $BirthYr = ""; } else { $BirthYr = $people["husb"]->getBirthYear(); }
 							?>
 							<tr class="fact_value">
-								<td align="left" nowrap="nowrap" class="linkcell optionbox">
+								<td align="left" class="linkcell optionbox nowrap">
 									<font size=1>
 										<?php
 										if ($people["husb"]->getXref()==$pid) {
@@ -1056,7 +1056,7 @@ if (!defined('WT_WEBTREES')) {
 										?>
 									</font>
 								</td>
-								<td align="left" class="facts_value" nowrap="nowrap">
+								<td align="left" class="facts_value nowrap">
 									<font size=1>
 									<?php
 									if (($people["husb"]->canDisplayDetails())) {
@@ -1181,7 +1181,7 @@ if (!defined('WT_WEBTREES')) {
 							if ($people["wife"]->getBirthYear() == 0) { $BirthYr = ""; } else { $BirthYr = $people["wife"]->getBirthYear(); }
 							?>
 							<tr>
-								<td align="left" nowrap="nowrap" class="linkcell optionbox">
+								<td align="left" class="linkcell optionbox nowrap">
 									<font size=1>
 										<?php
 										if ($people["wife"]->getXref()==$pid) {
@@ -1201,7 +1201,7 @@ if (!defined('WT_WEBTREES')) {
 										?>
 									</font>
 								</td>
-								<td align="left" class="facts_value" nowrap="nowrap">
+								<td align="left" class="facts_value nowrap">
 									<font size=1>
 									<?php
 									if (($people["wife"]->canDisplayDetails())) {
@@ -1339,7 +1339,7 @@ if (!defined('WT_WEBTREES')) {
 										?>
 									</font>
 								</td>
-								<td align="left" class="facts_value" nowrap="nowrap">
+								<td align="left" class="facts_value nowrap">
 									<font size=1>
 									<?php
 									if (($child->canDisplayDetails())) {
@@ -1474,18 +1474,18 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 		//-- draw a box for the family popup
 
 		if ($TEXT_DIRECTION=="rtl") {
-		$spouselinks .= "<table class=\"rtlnav person_box$isF\"><tr><td align=\"right\" style=\"font-size:10px;font-weight:normal;\" class=\"name2\" nowrap=\"nowrap\">";
+		$spouselinks .= "<table class=\"rtlnav person_box$isF\"><tr><td align=\"right\" style=\"font-size:10px;font-weight:normal;\" class=\"name2 nowrap\">";
 		$spouselinks .= "<b>" . WT_I18N::translate('Family') . "</b> (" .$person->getFullName(). ")<br />";
-		$parentlinks .= "<table class=\"rtlnav person_box$isF\"><tr><td align=\"right\" style=\"font-size:10px;font-weight:normal;\" class=\"name2\" nowrap=\"nowrap\">";
+		$parentlinks .= "<table class=\"rtlnav person_box$isF\"><tr><td align=\"right\" style=\"font-size:10px;font-weight:normal;\" class=\"name2 nowrap\">";
 		$parentlinks .= "<b>" . WT_I18N::translate('Parents') . "</b> (" .$person->getFullName(). ")<br />";
-		$step_parentlinks .= "<table class=\"rtlnav person_box$isF\"><tr><td align=\"right\" style=\"font-size:10px;font-weight:normal;\" class=\"name2\" nowrap=\"nowrap\">";
+		$step_parentlinks .= "<table class=\"rtlnav person_box$isF\"><tr><td align=\"right\" style=\"font-size:10px;font-weight:normal;\" class=\"name2 nowrap\">";
 		$step_parentlinks .= "<b>" . WT_I18N::translate('Parents') . "</b> (" .$person->getFullName(). ")<br />";
 		} else {
-		$spouselinks .= "<table class=\"ltrnav person_box$isF\"><tr><td align=\"left\" style=\"font-size:10px;font-weight:normal;\" class=\"name2\" nowrap=\"nowrap\">";
+		$spouselinks .= "<table class=\"ltrnav person_box$isF\"><tr><td align=\"left\" style=\"font-size:10px;font-weight:normal;\" class=\"name2 nowrap\">";
 		$spouselinks .= "<b>" . WT_I18N::translate('Family') . "</b> (" .$person->getFullName(). ")<br />";
-		$parentlinks .= "<table class=\"ltrnav person_box$isF\"><tr><td align=\"left\" style=\"font-size:10px;font-weight:normal;\" class=\"name2\" nowrap=\"nowrap\">";
+		$parentlinks .= "<table class=\"ltrnav person_box$isF\"><tr><td align=\"left\" style=\"font-size:10px;font-weight:normal;\" class=\"name2 nowrap\">";
 		$parentlinks .= "<b>" . WT_I18N::translate('Parents') . "</b> (" .$person->getFullName(). ")<br />";
-		$step_parentlinks .= "<table class=\"ltrnav person_box$isF\"><tr><td align=\"left\" style=\"font-size:10px;font-weight:normal;\" class=\"name2\" nowrap=\"nowrap\">";
+		$step_parentlinks .= "<table class=\"ltrnav person_box$isF\"><tr><td align=\"left\" style=\"font-size:10px;font-weight:normal;\" class=\"name2 nowrap\">";
 		$step_parentlinks .= "<b>" . WT_I18N::translate('Parents') . "</b> (" .$person->getFullName(). ")<br />";
 		}
 
@@ -1551,7 +1551,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 									$fulmn = rtrim($nam[$i]['givn'],'*')."&nbsp;".$nam[$i]['surname'];
 								}									
 							}
-							$parentlinks .= "<a class=\"linka\" href=\"javascript:insertRowToTable(";
+							$parentlinks .= "<a class=\"linka\" href=\"#\" onclick=\"insertRowToTable(";
 							$parentlinks .= "'".$husb->getXref()."',"; // pid = PID
 							$parentlinks .= "'".addslashes(strip_tags($fulln))."',"; // nam = Name
 							if (isset($fulmn)) {
@@ -1571,7 +1571,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 							}
 							$parentlinks .= "'".(($husb->getBirthDate()->minJD()+$husb->getBirthDate()->maxJD())/2)."',"; // dob = Date of Birth
 							if ($husb->getbirthyear()>=1) {
-								$parentlinks .= "'".$censyear-$husb->getbirthyear()."',"; // age =  Census Year - Year of Birth
+								$parentlinks .= "'".($censyear-$husb->getbirthyear())."',"; // age =  Census Year - Year of Birth
 							} else {
 								$parentlinks .= "''".","; // age =  Undefined
 							}
@@ -1646,7 +1646,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 								}									
 							}
 							
-							$parentlinks .= "<a class=\"linka\" href=\"javascript:insertRowToTable(";
+							$parentlinks .= "<a class=\"linka\" href=\"#\" onclick=\"insertRowToTable(";
 							$parentlinks .= "'".$wife->getXref()."',"; // pid = PID
 							$parentlinks .= "'".addslashes(strip_tags($fulln))."',"; // nam = Name
 							if (isset($fulmn)) {
@@ -1666,7 +1666,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 							}
 							$parentlinks .= "'".(($wife->getBirthDate()->minJD()+$wife->getBirthDate()->maxJD())/2)."',"; // dob = Date of Birth
 							if ($wife->getbirthyear()>=1) {
-								$parentlinks .= "'".$censyear-$wife->getbirthyear()."',"; // age =  Census Year - Year of Birth
+								$parentlinks .= "'".($censyear-$wife->getbirthyear())."',"; // age =  Census Year - Year of Birth
 							} else {
 								$parentlinks .= "''".","; // age =  Undefined
 							}
@@ -1761,7 +1761,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 										$fulmn = rtrim($nam[$i]['givn'],'*')."&nbsp;".$nam[$i]['surname'];
 									}									
 								}
-								$parentlinks .= "<a class=\"linka\" href=\"javascript:insertRowToTable(";
+								$parentlinks .= "<a class=\"linka\" href=\"#\" onclick=\"insertRowToTable(";
 								$parentlinks .= "'".$husb->getXref()."',"; // pid = PID
 								$parentlinks .= "'".addslashes(strip_tags($fulln))."',"; // nam = Name
 								if (isset($fulmn)) {
@@ -1781,7 +1781,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 								}
 								$parentlinks .= "'".(($husb->getBirthDate()->minJD()+$husb->getBirthDate()->maxJD())/2)."',"; // dob = Date of Birth
 								if ($husb->getbirthyear()>=1) {
-									$parentlinks .= "'".$censyear-$husb->getbirthyear()."',"; // age =  Census Year - Year of Birth
+									$parentlinks .= "'".($censyear-$husb->getbirthyear())."',"; // age =  Census Year - Year of Birth
 								} else {
 									$parentlinks .= "''".","; // age =  Undefined
 								}
@@ -1859,7 +1859,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 									}									
 								}
 								
-								$parentlinks .= "<a class=\"linka\" href=\"javascript:insertRowToTable(";
+								$parentlinks .= "<a class=\"linka\" href=\"#\" onclick=\"insertRowToTable(";
 								$parentlinks .= "'".$wife->getXref()."',"; // pid = PID
 								$parentlinks .= "'".addslashes(strip_tags($fulln))."',"; // nam = Name
 								if (isset($fulmn)) {
@@ -1879,7 +1879,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 								}
 								$parentlinks .= "'".(($wife->getBirthDate()->minJD()+$wife->getBirthDate()->maxJD())/2)."',"; // dob = Date of Birth
 								if ($wife->getbirthyear()>=1) {
-									$parentlinks .= "'".$censyear-$wife->getbirthyear()."',"; // age =  Census Year - Year of Birth
+									$parentlinks .= "'".($censyear-$wife->getbirthyear())."',"; // age =  Census Year - Year of Birth
 								} else {
 									$parentlinks .= "''".","; // age =  Undefined
 								}
@@ -1977,7 +1977,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 								}
 							}
 
-							$spouselinks .= "<a href=\"javascript:insertRowToTable(";
+							$spouselinks .= "<a href=\"#\" onclick=\"insertRowToTable(";
 							$spouselinks .= "'".$spouse->getXref()."',"; // pid = PID
 							$spouselinks .= "'".addslashes(strip_tags($fulln))."',"; // nam = Name
 							if (isset($fulmn)) {
@@ -2005,7 +2005,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 							}
 							$spouselinks .= "'".(($spouse->getBirthDate()->minJD()+$spouse->getBirthDate()->maxJD())/2)."',"; // dob = Date of Birth
 							if ($spouse->getbirthyear()>=1) {
-								$spouselinks .= "'".$censyear-$spouse->getbirthyear()."',"; // age =  Census Year - Year of Birth
+								$spouselinks .= "'".($censyear-$spouse->getbirthyear())."',"; // age =  Census Year - Year of Birth
 							} else {
 								$spouselinks .= "''".","; // age =  Undefined
 							}
@@ -2042,7 +2042,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 				}
 
 				// Children -------------------------------------
-				$spouselinks .= "<ul class=\"clist ".$TEXT_DIRECTION."\">";
+				$spouselinks .= "<ul class=\"clist\">";
 				foreach ($children as $c=>$child) {
 					$cpid = $child->getXref();
 					if ($child) {
@@ -2115,7 +2115,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 								}									
 							}
 
-							$spouselinks .= "<a href=\"javascript:insertRowToTable(";
+							$spouselinks .= "<a href=\"#\" onclick=\"insertRowToTable(";
 							$spouselinks .= "'".$child->getXref()."',"; // pid = PID
 							$spouselinks .= "'".addslashes(strip_tags($fulln))."',"; // nam = Name
 							if (isset($chfulmn)) {
@@ -2145,7 +2145,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 							}
 							$spouselinks .= "'".(($child->getBirthDate()->minJD()+$child->getBirthDate()->maxJD())/2)."',"; // dob = Date of Birth
 							if ($child->getbirthyear()>=1) {
-								$spouselinks .= "'".$censyear-$child->getbirthyear()."',"; // age =  Census Year - Year of Birth
+								$spouselinks .= "'".($censyear-$child->getbirthyear())."',"; // age =  Census Year - Year of Birth
 							} else {
 								$spouselinks .= "''".","; // age =  Undefined
 							}

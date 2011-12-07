@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
+// $Id: module.php 12696 2011-11-11 00:56:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -183,7 +183,7 @@ class random_media_WT_Module extends WT_Module implements WT_Module_Block {
 			$title='';
 			$content = '';
 			if ($ctype=="gedcom" && WT_USER_GEDCOM_ADMIN || $ctype=="user" && WT_USER_ID) {
-				$title .= "<a href=\"javascript: configure block\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
+				$title .= "<a href=\"#\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
 				$title .= "<img class=\"adminicon\" src=\"{$WT_IMAGES['admin']}\" width=\"15\" height=\"15\" border=\"0\" alt=\"".WT_I18N::translate('Configure').'" /></a>';
 			}
 			$title .= $this->getTitle();
@@ -194,11 +194,11 @@ class random_media_WT_Module extends WT_Module implements WT_Module_Block {
 				} else {
 					$image = "rarrow";
 				}
-				$linkNextImage = "<a href=\"javascript: ".WT_I18N::translate('Next image')."\" onclick=\"jQuery('#block_{$block_id}').load('index.php?ctype={$ctype}&amp;action=ajax&amp;block_id={$block_id}');return false;\"><img src=\"{$WT_IMAGES['rdarrow']}\" border=\"0\" alt=\"".WT_I18N::translate('Next image')."\" title=\"".WT_I18N::translate('Next image')."\" /></a>";
+				$linkNextImage = "<a href=\"#\" onclick=\"jQuery('#block_{$block_id}').load('index.php?ctype={$ctype}&amp;action=ajax&amp;block_id={$block_id}');return false;\"><img src=\"{$WT_IMAGES['rdarrow']}\" border=\"0\" alt=\"".WT_I18N::translate('Next image')."\" title=\"".WT_I18N::translate('Next image')."\" /></a>";
 
 				$content .= "<div class=\"center\" id=\"random_picture_controls$block_id\"><br />";
 				if ($TEXT_DIRECTION=="rtl") $content .= $linkNextImage;
-				$content .= "<a href=\"javascript: ".WT_I18N::translate('Play')."/".WT_I18N::translate('Stop')."\" onclick=\"togglePlay(); return false;\">";
+				$content .= "<a href=\"#\" onclick=\"togglePlay(); return false;\">";
 				if (isset($WT_IMAGES[$image])) $content .= "<img id=\"play_stop\" src=\"{$WT_IMAGES[$image]}\" border=\"0\" alt=\"".WT_I18N::translate('Play')."/".WT_I18N::translate('Stop')."\" title=\"".WT_I18N::translate('Play')."/".WT_I18N::translate('Stop')."\" />";
 				else $content .= WT_I18N::translate('Play')."/".WT_I18N::translate('Stop');
 				$content .= "</a>";

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_edit.php 12375 2011-10-22 21:58:33Z greg $
+// $Id: functions_edit.php 12829 2011-11-20 16:33:02Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -282,6 +282,21 @@ function edit_field_pedi_m($name, $selected='', $extra='') {
 	return select_edit_control($name, WT_Gedcom_Code_Pedi::getValues(new WT_Person("0 @XXX@ INDI\n1 SEX M")), '', $selected, $extra);
 }
 
+// Print an edit control for a NAME TYPE field
+function edit_field_name_type_u($name, $selected='', $extra='') {
+	return select_edit_control($name, WT_Gedcom_Code_Name::getValues(), '', $selected, $extra);
+}
+
+// Print an edit control for a female NAME TYPE field
+function edit_field_name_type_f($name, $selected='', $extra='') {
+	return select_edit_control($name, WT_Gedcom_Code_Name::getValues(new WT_Person("0 @XXX@ INDI\n1 SEX F")), '', $selected, $extra);
+}
+
+// Print an edit control for a male NAME TYPE field
+function edit_field_name_type_m($name, $selected='', $extra='') {
+	return select_edit_control($name, WT_Gedcom_Code_Name::getValues(new WT_Person("0 @XXX@ INDI\n1 SEX M")), '', $selected, $extra);
+}
+
 // Print an edit control for a RELA field
 function edit_field_rela($name, $selected='', $extra='') {
 	$rela_codes=WT_Gedcom_Code_Rela::getValues();
@@ -321,7 +336,6 @@ function checkChangeTime($pid, $gedrec, $last_time) {
 		echo "<span class=\"error\">", WT_I18N::translate('The record with id %s was changed by another user since you last accessed it.', $pid), "<br /><br />";
 		if (!empty($changeUser)) echo /* I18N: %s placeholders are a user-ID and a timestamp */ WT_I18N::translate('This record was last changed by <i>%s</i> at %s', $changeUser, date("d M Y H:i:s", $changeTime)), "<br /><br />";
 		echo WT_I18N::translate('Please reload the previous page to make sure you are working with the most recent record.'), "</span>";
-		print_simple_footer();
 		exit;
 	}
 }
@@ -532,7 +546,7 @@ function remove_subline($oldrecord, $linenum) {
 function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag="CHIL", $sextag='') {
 	global $pid, $WT_IMAGES, $WORD_WRAPPED_NOTES;
 	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept;
-	global $bdm, $TEXT_DIRECTION, $STANDARD_NAME_FACTS, $REVERSED_NAME_FACTS, $ADVANCED_NAME_FACTS, $ADVANCED_PLAC_FACTS;
+	global $bdm, $STANDARD_NAME_FACTS, $REVERSED_NAME_FACTS, $ADVANCED_NAME_FACTS, $ADVANCED_PLAC_FACTS;
 	global $QUICK_REQUIRED_FACTS, $QUICK_REQUIRED_FAMFACTS, $NO_UPDATE_CHAN;
 
 	$SURNAME_TRADITION=get_gedcom_setting(WT_GED_ID, 'SURNAME_TRADITION');
@@ -554,9 +568,13 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 
 	// When adding a new child, specify the pedigree
 	if ($nextaction=='addchildaction') {
-		add_simple_tag("0 PEDI");
+		add_simple_tag('0 PEDI');
 	}
 
+	if ($nextaction=='update') {
+		$name_type=get_gedcom_value('TYPE', 2, $namerec);
+		add_simple_tag('0 TYPE '.$name_type);
+	}
 	// Populate the standard NAME field and subfields
 	$name_fields=array();
 	foreach ($STANDARD_NAME_FACTS as $tag) {
@@ -744,11 +762,14 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 	if (preg_match_all('/('.WT_REGEX_TAG.')/', $ADVANCED_NAME_FACTS, $match))
 		foreach ($match[1] as $tag)
 			$adv_name_fields[$tag]='';
-	// This is a custom tag, but PGV uses it extensively.
+	// This is a custom tag, but webtrees uses it extensively.
 	if ($SURNAME_TRADITION=='paternal' || $SURNAME_TRADITION=='polish' || $SURNAME_TRADITION=='lithuanian' || (strpos($namerec, '2 _MARNM')!==false)) {
 		$adv_name_fields['_MARNM']='';
 	}
 	$person = WT_Person::getInstance($pid);
+	if (isset($adv_name_fields['TYPE'])) {
+		unset($adv_name_fields['TYPE']);
+	}
 	foreach ($adv_name_fields as $tag=>$dummy) {
 		// Edit existing tags
 		if (preg_match_all("/2 $tag (.+)/", $namerec, $match))
@@ -807,7 +828,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 				$level = $fields[0];
 				if (isset($fields[1])) $type = $fields[1];
 			}
-		} while (($level>$glevel)&&($i<count($gedlines)));
+		} while (($level>$glevel)&&($i<count($gedlines))&&($type!='TYPE'));
 	}
 
 	// If we are adding a new individual, add the basic details
@@ -847,7 +868,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 		}
 	}
 	if (WT_USER_IS_ADMIN) {
-		echo "<tr><td class=\"descriptionbox ", $TEXT_DIRECTION, " wrap width25\">";
+		echo "<tr><td class=\"descriptionbox wrap width25\">";
 		echo WT_Gedcom_Tag::getLabel('CHAN'), "</td><td class=\"optionbox wrap\">";
 		if ($NO_UPDATE_CHAN) {
 			echo "<input type=\"checkbox\" checked=\"checked\" name=\"preserve_last_changed\" />";
@@ -1091,7 +1112,7 @@ function print_calendar_popup($id, $asString=false) {
 	if (isset($WT_IMAGES["button_calendar"])) $Link = "<img src=\"".$WT_IMAGES["button_calendar"]."\" name=\"img".$id."\" id=\"img".$id."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 	else $Link = $text;
 	$out = ' ';
-	$out .= "<a href=\"javascript: ".$text."\" onclick=\"cal_toggleDate('caldiv".$id."', '".$id."'); return false;\">";
+	$out .= "<a href=\"#\" onclick=\"cal_toggleDate('caldiv".$id."', '".$id."'); return false;\">";
 	$out .= $Link;
 	$out .= "</a>";
 	$out .= "<div id=\"caldiv".$id."\" style=\"position:absolute;visibility:hidden;background-color:white;layer-background-color:white; z-index: 1000;\"></div>";
@@ -1107,7 +1128,7 @@ function print_addnewmedia_link($element_id) {
 	$text = WT_I18N::translate('Add a new media object');
 	if (isset($WT_IMAGES["button_addmedia"])) $Link = "<img src=\"".$WT_IMAGES["button_addmedia"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 	else $Link = $text;
-	echo '&nbsp;&nbsp;&nbsp;<a href="javascript:;" onclick="pastefield=document.getElementById(\'', $element_id, '\'); window.open(\'addmedia.php?action=showmediaform&linktoid={$linkToID}&level={$level}\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">';
+	echo '&nbsp;&nbsp;&nbsp;<a href="#" onclick="pastefield=document.getElementById(\'', $element_id, '\'); window.open(\'addmedia.php?action=showmediaform&linktoid={$linkToID}&level={$level}\', \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\'); return false;">';
 	echo $Link;
 	echo "</a>";
 }
@@ -1120,7 +1141,7 @@ function print_addnewrepository_link($element_id) {
 	$text = WT_I18N::translate('Create Repository');
 	if (isset($WT_IMAGES["button_addrepository"])) $Link = "<img src=\"".$WT_IMAGES["button_addrepository"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 	else $Link = $text;
-	echo "&nbsp;&nbsp;&nbsp;<a href=\"javascript:;\" onclick=\"addnewrepository(document.getElementById('", $element_id, "')); return false;\">";
+	echo "&nbsp;&nbsp;&nbsp;<a href=\"#\" onclick=\"addnewrepository(document.getElementById('", $element_id, "')); return false;\">";
 	echo $Link;
 	echo "</a>";
 }
@@ -1134,7 +1155,7 @@ function print_addnewnote_link($element_id) {
 	$text = WT_I18N::translate('Create a new Shared Note');
 	if (isset($WT_IMAGES["button_addnote"])) $Link = "<img src=\"".$WT_IMAGES["button_addnote"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 	else $Link = $text;
-	echo "&nbsp;&nbsp;&nbsp;<a href=\"javascript:ADD;\" onclick=\"addnewnote(document.getElementById('", $element_id, "')); return false;\">";
+	echo "&nbsp;&nbsp;&nbsp;<a href=\"#\" onclick=\"addnewnote(document.getElementById('", $element_id, "')); return false;\">";
 	echo $Link;
 	echo "</a>";
 }
@@ -1148,7 +1169,7 @@ function print_addnewnote_assisted_link($element_id) {
 	$text = WT_I18N::translate('Create a new Shared Note using Assistant');
 	if (isset($WT_IMAGES["button_addnote"])) $Link = "<img src=\"".$WT_IMAGES["button_addnote"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 	else $Link = $text;
-	echo "&nbsp;&nbsp;&nbsp;<a href=\"javascript:ADD;\" onclick=\"addnewnote_assisted(document.getElementById('", $element_id, "'), '", $pid, "' ); return false;\">";
+	echo "&nbsp;&nbsp;&nbsp;<a href=\"#\" onclick=\"addnewnote_assisted(document.getElementById('", $element_id, "'), '", $pid, "' ); return false;\">";
 	echo $Link;
 	echo "</a>";
 }
@@ -1163,7 +1184,7 @@ function print_editnote_link($note_id) {
 	$text = WT_I18N::translate('Edit Shared Note');
 	if (isset($WT_IMAGES["button_note"])) $Link = "<img src=\"".$WT_IMAGES["button_note"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 	else $Link = $text;
-	echo "<a href=\"javascript: var win02=window.open('edit_interface.php?action=editnote&pid=$note_id', 'win02', 'top=70, left=70, width=620, height=500, resizable=1, scrollbars=1 ' )\">";
+	echo "<a href=\"#\" onclick=\"var win02=window.open('edit_interface.php?action=editnote&pid=$note_id', 'win02', 'top=70, left=70, width=620, height=500, resizable=1, scrollbars=1 ' )\">";
 	echo $Link;
 	echo "</a>";
 }
@@ -1177,7 +1198,7 @@ function print_addnewsource_link($element_id) {
 	$text = WT_I18N::translate('Create a new source');
 	if (isset($WT_IMAGES["button_addsource"])) $Link = "<img src=\"".$WT_IMAGES["button_addsource"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 	else $Link = $text;
-	echo "&nbsp;&nbsp;&nbsp;<a href=\"javascript:;\" onclick=\"addnewsource(document.getElementById('", $element_id, "')); return false;\">";
+	echo "&nbsp;&nbsp;&nbsp;<a href=\"#\" onclick=\"addnewsource(document.getElementById('", $element_id, "')); return false;\">";
 	echo $Link;
 	echo "</a>";
 }
@@ -1379,9 +1400,9 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 	echo " >";
 
 	if (in_array($fact, $subnamefacts) || $fact=="LATI" || $fact=="LONG") {
-		echo "<td class=\"optionbox $TEXT_DIRECTION wrap width25\">";
+		echo "<td class=\"optionbox wrap width25\">";
 	} else {
-		echo "<td class=\"descriptionbox $TEXT_DIRECTION wrap width25\">";
+		echo "<td class=\"descriptionbox wrap width25\">";
 	}
 
 
@@ -1482,7 +1503,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 				echo ' checked="checked"';
 			}
 			echo " onclick=\"if (this.checked) ", $element_id, ".value='Y'; else ", $element_id, ".value=''; \" />";
-			echo WT_I18N::translate('Yes');
+			echo WT_I18N::translate('yes');
 		}
 /*
 		// If GEDFAct_assistant/_CENS/ module exists && we are on the INDI page && action is ADD a new CENS event
@@ -1592,7 +1613,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 				print_specialchar_link($element_id, false);
 				print_findplace_link($element_id);
 				echo "</div>";
-				echo "<a href=\"javascript:;\" onclick=\"toggle_lati_long();\"><img src=\"", $WT_IMAGES["target"], "\" border=\"0\" align=\"middle\" alt=\"", WT_Gedcom_Tag::getLabel('LATI'), " / ", WT_Gedcom_Tag::getLabel('LONG'), "\" title=\"", WT_Gedcom_Tag::getLabel('LATI'), " / ", WT_Gedcom_Tag::getLabel('LONG'), "\" /></a>";
+				echo "<a href=\"#\" onclick=\"toggle_lati_long();\"><img src=\"", $WT_IMAGES["target"], "\" border=\"0\" align=\"middle\" alt=\"", WT_Gedcom_Tag::getLabel('LATI'), " / ", WT_Gedcom_Tag::getLabel('LONG'), "\" title=\"", WT_Gedcom_Tag::getLabel('LATI'), " / ", WT_Gedcom_Tag::getLabel('LONG'), "\" /></a>";
 				if (array_key_exists('places_assistant', WT_Module::getActiveModules())) {
 					places_assistant_WT_Module::setup_place_subfields($element_id);
 					places_assistant_WT_Module::print_place_subfields($element_id);
@@ -1603,9 +1624,9 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 	}
 	// MARRiage TYPE : hide text field and show a selection list
 	if ($fact=='TYPE' && $level==2 && $tags[0]=='MARR') {
-		echo "<script type='text/javascript'>";
+		echo WT_JS_START;
 		echo "document.getElementById('", $element_id, "').style.display='none'";
-		echo "</script>";
+		echo WT_JS_END;
 		echo "<select id=\"", $element_id, "_sel\" onchange=\"document.getElementById('", $element_id, "').value=this.value;\" >";
 		foreach (array("Unknown", "Civil", "Religious", "Partners") as $indexval => $key) {
 			if ($key=="Unknown") echo "<option value=\"\"";
@@ -1617,6 +1638,18 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 			echo ">", WT_Gedcom_Tag::getLabel($tmp), "</option>";
 		}
 		echo "</select>";
+	}
+	// NAME TYPE : hide text field and show a selection list
+	else if ($fact=='TYPE' && $level==0) {
+		$extra = 'onchange="document.getElementById(\''.$element_id.'\').value=this.value;"';
+		switch (WT_Person::getInstance($pid)->getSex()) {
+			case 'M': echo edit_field_name_type_m($element_name, $value, $extra); break;
+			case 'F': echo edit_field_name_type_f($element_name, $value, $extra); break;
+			default:  echo edit_field_name_type_u($element_name, $value, $extra); break;
+		}
+		echo WT_JS_START;
+		echo "document.getElementById('", $element_id, "').style.display='none';";
+		echo WT_JS_END;
 	}
 
 	// popup links
@@ -1711,7 +1744,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 					if ($type_pid->getType()=="INDI" ) {
 						echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 						echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-						echo "<a href=\"javascript:ADD;\" onclick=\"addnewnote_assisted(document.getElementById('", $element_id, "'), '", $pid, "' ); return false;\" title=\"".WT_I18N::translate('Create a new Shared Note using Assistant')."\" alt=\"".WT_I18N::translate('Create a new Shared Note using Assistant')."\">";
+						echo "<a href=\"#\" onclick=\"addnewnote_assisted(document.getElementById('", $element_id, "'), '", $pid, "' ); return false;\" title=\"".WT_I18N::translate('Create a new Shared Note using Assistant')."\" alt=\"".WT_I18N::translate('Create a new Shared Note using Assistant')."\">";
 						echo WT_I18N::translate('Shared Note using Assistant');
 						echo "</a>";
 						print_addnewnote_assisted_link($element_id);
@@ -1780,18 +1813,19 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 */
 function print_add_layer($tag, $level=2, $printSaveButton=true) {
 	global $WT_IMAGES, $MEDIA_DIRECTORY, $TEXT_DIRECTION, $gedrec, $FULL_SOURCES, $islink;
+
 	if ($tag=='OBJE' && get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') < WT_USER_ACCESS_LEVEL) {
 		return;
 	}
 
 	if ($tag=="SOUR") {
 		//-- Add new source to fact
-		echo "<a href=\"javascript:;\" onclick=\"return expand_layer('newsource');\"><img id=\"newsource_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new source citation'), "</a>";
+		echo "<a href=\"#\" onclick=\"return expand_layer('newsource');\"><img id=\"newsource_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new source citation'), "</a>";
 		echo help_link('edit_add_SOUR');
 		echo "<br />";
 		echo "<div id=\"newsource\" style=\"display: none;\">";
 		if ($printSaveButton) echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\" />";
-		echo "<table class=\"facts_table center $TEXT_DIRECTION\">";
+		echo "<table class=\"facts_table\">";
 		// 2 SOUR
 		$source = "SOUR @";
 		add_simple_tag("$level $source");
@@ -1821,18 +1855,18 @@ function print_add_layer($tag, $level=2, $printSaveButton=true) {
 	if ($tag=="ASSO" || $tag=="ASSO2") {
 		//-- Add a new ASSOciate
 		if ($tag=="ASSO") {
-			echo "<a href=\"javascript:;\" onclick=\"return expand_layer('newasso');\"><img id=\"newasso_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new associate'), "</a>";
+			echo "<a href=\"#\" onclick=\"return expand_layer('newasso');\"><img id=\"newasso_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new associate'), "</a>";
 			echo help_link('edit_add_ASSO');
 			echo "<br />";
 			echo "<div id=\"newasso\" style=\"display: none;\">";
 		} else {
-			echo "<a href=\"javascript:;\" onclick=\"return expand_layer('newasso2');\"><img id=\"newasso2_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new associate'), "</a>";
+			echo "<a href=\"#\" onclick=\"return expand_layer('newasso2');\"><img id=\"newasso2_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new associate'), "</a>";
 			echo help_link('edit_add_ASSO');
 			echo "<br />";
 			echo "<div id=\"newasso2\" style=\"display: none;\">";
 		}
 		if ($printSaveButton) echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\" />";
-		echo "<table class=\"facts_table center $TEXT_DIRECTION\">";
+		echo "<table class=\"facts_table\">";
 		// 2 ASSO
 		add_simple_tag(($level)." ASSO @");
 		// 3 RELA
@@ -1846,12 +1880,12 @@ function print_add_layer($tag, $level=2, $printSaveButton=true) {
 	if ($tag=="NOTE") {
 		//-- Retrieve existing note or add new note to fact
 		$text = '';
-		echo "<a href=\"javascript:;\" onclick=\"return expand_layer('newnote');\"><img id=\"newnote_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new note'), "</a>";
+		echo "<a href=\"#\" onclick=\"return expand_layer('newnote');\"><img id=\"newnote_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new note'), "</a>";
 		echo help_link('edit_add_NOTE');
 		echo "<br />";
 		echo "<div id=\"newnote\" style=\"display: none;\">";
 		if ($printSaveButton) echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\" />";
-		echo "<table class=\"facts_table center $TEXT_DIRECTION\">";
+		echo "<table class=\"facts_table\">";
 		// 2 NOTE
 		add_simple_tag(($level)." NOTE ".$text);
 		echo "</table></div>";
@@ -1859,12 +1893,12 @@ function print_add_layer($tag, $level=2, $printSaveButton=true) {
 	if ($tag=="SHARED_NOTE") {
 		//-- Retrieve existing shared note or add new shared note to fact
 		$text = '';
-		echo "<a href=\"javascript:;\" onclick=\"return expand_layer('newshared_note');\"><img id=\"newshared_note_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new shared note'), "</a>";
+		echo "<a href=\"#\" onclick=\"return expand_layer('newshared_note');\"><img id=\"newshared_note_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new shared note'), "</a>";
 		echo help_link('edit_add_SHARED_NOTE');
 		echo "<br />";
 		echo "<div id=\"newshared_note\" style=\"display: none;\">";
 		if ($printSaveButton) echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\" />";
-		echo "<table class=\"facts_table center $TEXT_DIRECTION\">";
+		echo "<table class=\"facts_table\">";
 		// 2 SHARED NOTE
 		add_simple_tag(($level)." SHARED_NOTE ");
 
@@ -1872,24 +1906,24 @@ function print_add_layer($tag, $level=2, $printSaveButton=true) {
 	}
 	if ($tag=="OBJE") {
 		//-- Add new obje to fact
-		echo "<a href=\"javascript:;\" onclick=\"return expand_layer('newobje');\"><img id=\"newobje_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new media object'), "</a>";
-		echo help_link('add_media');
+		echo "<a href=\"#\" onclick=\"return expand_layer('newobje');\"><img id=\"newobje_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_I18N::translate('Add a new media object'), "</a>";
+		echo help_link('OBJE');
 		echo "<br />";
 		echo "<div id=\"newobje\" style=\"display: none;\">";
 		if ($printSaveButton) echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\" />";
-		echo "<table class=\"facts_table center $TEXT_DIRECTION\">";
+		echo "<table class=\"facts_table\">";
 		add_simple_tag($level." OBJE");
 		echo "</table></div>";
 	}
 	if ($tag=="RESN") {
 		//-- Retrieve existing resn or add new resn to fact
 		$text = '';
-		echo "<a href=\"javascript:;\" onclick=\"return expand_layer('newresn');\"><img id=\"newresn_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_Gedcom_Tag::getLabel('RESN'), "</a>";
+		echo "<a href=\"#\" onclick=\"return expand_layer('newresn');\"><img id=\"newresn_img\" src=\"", $WT_IMAGES["plus"], "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ", WT_Gedcom_Tag::getLabel('RESN'), "</a>";
 		echo help_link('RESN');
 		echo "<br />";
 		echo "<div id=\"newresn\" style=\"display: none;\">";
 		if ($printSaveButton) echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\" />";
-		echo "<table class=\"facts_table center $TEXT_DIRECTION\">";
+		echo "<table class=\"facts_table\">";
 		// 2 RESN
 		add_simple_tag(($level)." RESN ".$text);
 		echo "</table></div>";
@@ -2358,7 +2392,7 @@ function create_add_form($fact) {
 function create_edit_form($gedrec, $linenum, $level0type) {
 	global $WORD_WRAPPED_NOTES;
 	global $pid, $tags, $ADVANCED_PLAC_FACTS, $date_and_time;
-	global $FULL_SOURCES, $TEXT_DIRECTION;
+	global $FULL_SOURCES;
 
 	$tags=array();
 	$gedlines = explode("\n", $gedrec); // -- find the number of lines in the record
@@ -2607,107 +2641,4 @@ function insert_missing_subtags($level1tag, $add_date=false) {
 					add_simple_tag("4 LONG");
 				}
 			}
-}
-
-/**
-* Delete a person and update all records that link to that person
-* @param string $pid the id of the person to delete
-* @param string $gedrec the gedcom record of the person to delete
-* @return boolean true or false based on the successful completion of the deletion
-*/
-function delete_person($pid, $gedrec='') {
-	if (WT_DEBUG) {
-		phpinfo(INFO_VARIABLES);
-		echo "<pre>$gedrec</pre>";
-	}
-
-	if (empty($gedrec)) $gedrec = find_person_record($pid, WT_GED_ID);
-	if (!empty($gedrec)) {
-		$success = true;
-		$ct = preg_match_all("/1 FAM. @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
-		for ($i=0; $i<$ct; $i++) {
-			$famid = $match[$i][1];
-			$famrec = find_gedcom_record($famid, WT_GED_ID, true);
-			if (!empty($famrec)) {
-				$lines = explode("\n", $famrec);
-				$newfamrec = '';
-				$lastlevel = -1;
-				foreach ($lines as $indexval => $line) {
-					$ct = preg_match("/^(\d+)/", $line, $levelmatch);
-					if ($ct>0) $level = $levelmatch[1];
-					else $level = 1;
-					//-- make sure we don't add any sublevel records
-					if ($level<=$lastlevel) $lastlevel = -1;
-					if ((strpos($line, "@$pid@")===false) && ($lastlevel==-1)) $newfamrec .= $line."\n";
-					else {
-						$lastlevel=$level;
-					}
-				}
-				//-- if there is not at least two people in a family then the family is deleted
-				$pt = preg_match_all("/1 (?:HUSB|WIFE|CHIL) @(.*)@/", $newfamrec, $pmatch, PREG_SET_ORDER);
-				if ($pt<2) {
-					for ($j=0; $j<$pt; $j++) {
-						$xref = $pmatch[$j][1];
-						if ($xref!=$pid) {
-							$indirec = find_gedcom_record($xref, WT_GED_ID, true);
-							$indirec = preg_replace("/1.*@$famid@.*/", '', $indirec);
-							if (WT_DEBUG) {
-								echo "<pre>$indirec</pre>";
-							}
-							replace_gedrec($xref, WT_GED_ID, $indirec);
-						}
-					}
-					delete_gedrec($famid, WT_GED_ID);
-				}
-				else replace_gedrec($famid, WT_GED_ID, $newfamrec);
-			}
-		}
-		delete_gedrec($pid, WT_GED_ID);
-		return true;
-	}
-	return false;
-}
-
-/**
-* Delete a person and update all records that link to that person
-* @param string $pid the id of the person to delete
-* @param string $gedrec the gedcom record of the person to delete
-* @return boolean true or false based on the successful completion of the deletion
-*/
-function delete_family($pid, $gedrec='') {
-	if (empty($gedrec)) $gedrec = find_family_record($pid, WT_GED_ID);
-	if (!empty($gedrec)) {
-		$success = true;
-		$ct = preg_match_all("/1 (\w+) @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
-		for ($i=0; $i<$ct; $i++) {
-			$type = $match[$i][1];
-			$id = $match[$i][2];
-			if (WT_DEBUG) {
-				echo $type, ' ', $id, ' ';
-			}
-			$indirec = find_gedcom_record($id, WT_GED_ID, true);
-			if (!empty($indirec)) {
-				$lines = explode("\n", $indirec);
-				$newindirec = '';
-				$lastlevel = -1;
-				foreach ($lines as $indexval => $line) {
-					$lct = preg_match("/^(\d+)/", $line, $levelmatch);
-					if ($lct>0) $level = $levelmatch[1];
-					else $level = 1;
-					//-- make sure we don't add any sublevel records
-					if ($level<=$lastlevel) $lastlevel = -1;
-					if ((strpos($line, "@$pid@")===false) && ($lastlevel==-1)) $newindirec .= $line."\n";
-					else {
-						$lastlevel=$level;
-					}
-				}
-				replace_gedrec($id, WT_GED_ID, $newindirec);
-			}
-		}
-		if ($success) {
-			delete_gedrec($pid, WT_GED_ID);
-		}
-		return true;
-	}
-	return false;
 }

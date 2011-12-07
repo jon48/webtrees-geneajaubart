@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report>
-	<!-- $Id: report.xml 12265 2011-10-06 17:23:50Z lukasz $ -->
+	<!-- $Id: report.xml 12919 2011-11-26 14:40:33Z lukasz $ -->
 	<Title><var var="WT_I18N::translate('Family')" /></Title>
 	<Description><var var="WT_I18N::translate('A report of family members and their details.')" /></Description>
 	<!-- User inputs for the report -->
@@ -249,10 +249,13 @@
 									<if condition="@desc=='N'">
 										<var var="WT_I18N::translate('no')" />  <GedcomValue tag="@fact:PLAC"/>
 									</if>
-									<if condition="@desc!='Y' and @desc!='N'">
+									<if condition="@fact!='ASSO' and @desc!='Y' and @desc!='N'">
 										<GedcomValue tag="@desc"/>  <GedcomValue tag="@fact:PLAC"/>
 									</if>
 								</Text>
+								<Gedcom id="@ASSO">
+									<GetPersonName id=""/>
+								</Gedcom>
 							</TextBox>
 						</if>
 						<if condition="@desc==''">
@@ -406,10 +409,13 @@
 										<if condition="@desc=='N'">
 											<var var="WT_I18N::translate('no')" />  <GedcomValue tag="@fact:PLAC"/> <GedcomValue tag="@fact:TEMP" />
 										</if>
-										<if condition="@desc!='Y' and @desc!='N'">
+										<if condition="@fact!='ASSO' and @desc!='Y' and @desc!='N'">
 											<GedcomValue tag="@desc"/>  <GedcomValue tag="@fact:PLAC"/> <GedcomValue tag="@fact:TEMP" />
 										</if>
 									</Text>
+									<Gedcom id="@ASSO">
+										<GetPersonName id=""/>
+									</Gedcom>
 								</TextBox>
 							</if>
 							<if condition="@desc==''">
@@ -566,10 +572,13 @@
 									<if condition="@desc=='N'">
 										<var var="WT_I18N::translate('no')" />  <GedcomValue tag="@fact:PLAC"/>
 									</if>
-									<if condition="@desc!='Y' and @desc!='N'">
+									<if condition="@fact!='ASSO' and @desc!='Y' and @desc!='N'">
 										<GedcomValue tag="@desc"/>  <GedcomValue tag="@fact:PLAC"/>
 									</if>
 								</Text>
+								<Gedcom id="@ASSO">
+									<GetPersonName id=""/>
+								</Gedcom>
 							</TextBox>
 						</if>
 						<if condition="@desc==''">
@@ -893,10 +902,13 @@
 										<if condition="@desc=='N'">
 											<var var="WT_I18N::translate('no')" />  <GedcomValue tag="@fact:PLAC"/>
 										</if>
-										<if condition="@desc!='Y' and @desc!='N'">
+										<if condition="@fact!='ASSO' and @desc!='Y' and @desc!='N'">
 											<GedcomValue tag="@desc"/>  <GedcomValue tag="@fact:PLAC"/>
 										</if>
 									</Text>
+									<Gedcom id="@ASSO">
+										<GetPersonName id=""/>
+									</Gedcom>
 								</TextBox>
 							</if>
 							<if condition="@desc==''">

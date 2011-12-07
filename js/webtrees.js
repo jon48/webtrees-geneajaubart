@@ -1,32 +1,29 @@
-/**
- * Common javascript functions
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
- *
- * Derived from PhpGedView
- * Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
- *
- * Modifications Copyright (c) 2010 Greg Roach
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @package webtrees
- * @subpackage Display
- * @version $Id: webtrees.js 12439 2011-10-27 19:56:12Z greg $
- */
+// Common javascript functions
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+//
+// Modifications Copyright (c) 2010 Greg Roach
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: webtrees.js 12813 2011-11-19 14:18:05Z greg $
+
 if (!document.getElementById)	// Check if browser supports the getElementByID function
 {
 	curloc = window.location.toString();
@@ -412,11 +409,6 @@ function addnewparentfamily(pid, famtag, famid) {
 	return false;
 }
 
-function copy_record(pid, linenum) {
-	window.open('edit_interface.php?action=copy&pid='+pid+'&linenum='+linenum+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
 function reorder_children(famid) {
 	window.open('edit_interface.php?action=reorder_children&pid='+famid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
@@ -440,30 +432,6 @@ function reply(username, subject) {
 function delete_message(id) {
 	window.open('message.php?action=delete&id='+id+"&"+sessionname+"="+sessionid, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
-}
-
-function delete_family(famid) {
-	window.open('edit_interface.php?famid='+famid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime+"&action=deletefamily", '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-function delete_note(pid) {
-	 window.open('edit_interface.php?action=deletenote&pid='+pid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
-	 return false;
-}
-
-function delete_person(pid) {
-	window.open('edit_interface.php?action=deleteperson&pid='+pid+"&"+sessionname+"="+sessionid, '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1');
-	return false;
-}
-
-function delete_repository(pid) {
-		window.open('edit_interface.php?action=deleterepo&pid='+pid+"&"+sessionname+"="+sessionid, '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1');
-	return false;
-}
-function delete_source(pid) {
-	 window.open('edit_interface.php?action=deletesource&pid='+pid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
-	 return false;
 }
 
 function change_family_members(famid) {
@@ -1334,33 +1302,6 @@ function findFact(field, ged) {
 	left = screen.width-555;
 	window.open('find.php?type=facts&tags='+tags+'&ged='+ged, '_blank', 'top=55,left='+left+',width=500,height=500,scrollbars=1,resizeable=1');
 	return false;
-}
-
-function toggleByClassName(tagName, className) {
-	var disp = "";
-	var elements = document.getElementsByTagName(tagName.toUpperCase());
-	for (var i = 0; i < elements.length; i++) {
-		var ecn = elements[i].className;
-		if (ecn && ecn.match(new RegExp("(^|\\s)" + className + "(\\s|$)"))) {
-			disp = elements[i].style.display;
-			if (disp == "none") {
-				if (tagName == "TR") {
-					disp = "table-row";
-					if (document.all && !window.opera) disp = "inline"; // IE
-				}
-				else disp = "block";
-				if (tagName == "SPAN") disp = "inline";
-			}
-			else disp = "none";
-			elements[i].style.display = disp;
-		}
-	}
-	// save status in a cookie
-	/*if (!navigator.cookieEnabled) return;
-	var cookieName = className;
-	var cookieValue = (disp=="none")? 0 : 1;
-	var cookieDate = new Date(2020,0,1);
-	document.cookie = cookieName+"="+cookieValue+"; expires="+cookieDate.toGMTString();*/
 }
 
 /**

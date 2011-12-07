@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12306 2011-10-13 13:08:07Z greg $
+// $Id: module.php 12788 2011-11-18 14:18:45Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -58,45 +58,46 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function getTabContent() {
-		global $NAV_MEDIA;
-
-		ob_start();
-		// For Reorder media ------------------------------------
-		if (WT_USER_GEDCOM_ADMIN) {
-			echo "<center>";
-			require_once './includes/media_tab_head.php';
-			echo "</center>";
-		}
+		global $NAV_MEDIA, $WT_IMAGES, $controller;
 		?>
-		<div id="media_content">
-		<table class="facts_table">
-		<?php
-		$media_found = false;
-		if (!$this->controller->indi->canDisplayDetails()) {
-			echo "<tr><td class=\"facts_value\">";
-			print_privacy_error();
-			echo "</td></tr>";
-		}
-		else {
-			$media_found = print_main_media($this->controller->pid, 0, true);
-			if (!$media_found) echo "<tr><td id=\"no_tab4\" colspan=\"2\" class=\"facts_value\">".WT_I18N::translate('There are no media objects for this individual.')."</td></tr>";
-			//-- New Media link
-			if (WT_USER_CAN_EDIT && $this->controller->indi->canDisplayDetails() && get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') >= WT_USER_ACCESS_LEVEL) {
-		?>
-				<tr>
-					<td class="facts_label"><?php echo WT_I18N::translate('Add media'), help_link('add_media'); ?></td>
-					<td class="facts_value">
-						<a href="javascript:;" onclick="window.open('addmedia.php?action=showmediaform&linktoid=<?php echo $this->controller->pid; ?>', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;"> <?php echo WT_I18N::translate('Add a new media object'); ?></a><br />
-						<a href="javascript:;" onclick="window.open('inverselink.php?linktoid=<?php echo $this->controller->pid; ?>&linkto=person', '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1'); return false;"><?php echo WT_I18N::translate('Link to an existing media object'); ?></a>
-					</td>
-				</tr>
-			<?php
+		<script type="text/javascript">
+		<!--
+			function reorder_media() {
+			var win02 = window.open("edit_interface.php?action=reorder_media&pid=<?php echo $controller->record->getXref(); ?>", "win02", "resizable=1, menubar=0, scrollbars=1, top=20, height=840, width=450 ");
+			if (window.focus) {win02.focus();}
 			}
+		-->
+		</script>
+		<?php
+		ob_start();
+		echo '<table class="facts_table">';
+		// Reorder media ------------------------------------
+		if (WT_USER_GEDCOM_ADMIN && $this->get_media_count()>1) {
+			echo '<tr><td colspan="2" class="descriptionbox rela">';
+			echo '<span><a href="#" onclick="reorder_media()">';
+			if (isset($WT_IMAGES['reorder'])) {echo '<img src="', $WT_IMAGES['reorder'],'" id="head_icon" class="icon" title="', WT_I18N::translate('Re-order media'), '" alt="', WT_I18N::translate('Re-order media'), '" />';}
+			echo WT_I18N::translate('Re-order media');
+			echo '</a></span>';
+			echo '</td></tr>';
+		}
+		$media_found = false;
+		$media_found = print_main_media($controller->record->getXref(), 0, true);
+		if (!$media_found) echo "<tr><td id=\"no_tab4\" colspan=\"2\" class=\"facts_value\">".WT_I18N::translate('There are no media objects for this individual.')."</td></tr>";
+		//-- New Media link
+		if (WT_USER_CAN_EDIT && $controller->record->canDisplayDetails() && get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') >= WT_USER_ACCESS_LEVEL) {
+		?>
+			<tr>
+				<td class="facts_label"><?php echo WT_I18N::translate('Add media'), help_link('OBJE'); ?></td>
+				<td class="facts_value">
+					<a href="#" onclick="window.open('addmedia.php?action=showmediaform&linktoid=<?php echo $controller->record->getXref(); ?>', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;"> <?php echo WT_I18N::translate('Add a new media object'); ?></a><br />
+					<a href="#" onclick="window.open('inverselink.php?linktoid=<?php echo $controller->record->getXref(); ?>&linkto=person', '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1'); return false;"><?php echo WT_I18N::translate('Link to an existing media object'); ?></a>
+				</td>
+			</tr>
+		<?php
 		}
 		?>
 		</table>
-			</div>
-	<?php
+		<?php
 		return '<div id="'.$this->getName().'_content">'.ob_get_clean().'</div>';
 	}
 
@@ -105,10 +106,12 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 	* @return int
 	*/
 	function get_media_count() {
+		global $controller;
+
 		if ($this->mediaCount===null) {
-			$ct = preg_match("/\d OBJE/", $this->controller->indi->getGedcomRecord());
-			foreach ($this->controller->indi->getSpouseFamilies() as $sfam)
-				$ct += preg_match("/\d OBJE/", $sfam->getGedcomRecord());
+			$ct = preg_match_all("/\d OBJE/", $controller->record->getGedcomRecord(), $match);
+			foreach ($controller->record->getSpouseFamilies() as $sfam)
+				$ct += preg_match_all("/\d OBJE/", $sfam->getGedcomRecord(), $match);
 			$this->mediaCount = $ct;
 		}
 		return $this->mediaCount;

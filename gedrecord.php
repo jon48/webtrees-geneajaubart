@@ -19,10 +19,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: gedrecord.php 11863 2011-06-19 21:29:54Z greg $
+// $Id: gedrecord.php 12761 2011-11-16 20:30:05Z greg $
 
 define('WT_SCRIPT_NAME', 'gedrecord.php');
 require './includes/session.php';
+
+$controller=new WT_Controller_Base();
 
 $obj=WT_GedcomRecord::getInstance(safe_GET_xref('pid'));
 
@@ -37,10 +39,10 @@ if (
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$obj->getRawUrl());
 	exit;
 } elseif (!$obj || !$obj->canDisplayDetails()) {
-	print_header(WT_I18N::translate('Private'));
+	$controller->pageHeader();
 	print_privacy_error();
 } else {
-	print_header($obj->getFullName());
+	$controller->pageHeader();
 	echo
 		'<pre style="white-space:pre-wrap; word-wrap:break-word;">',
 		preg_replace(
@@ -49,4 +51,3 @@ if (
 		),
 		'</pre>';
 }
-print_footer();

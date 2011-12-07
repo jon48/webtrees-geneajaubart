@@ -23,15 +23,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: timeline.php 12207 2011-09-22 12:48:36Z greg $
+// $Id: timeline.php 12812 2011-11-19 13:02:05Z greg $
 
 define('WT_SCRIPT_NAME', 'timeline.php');
 require './includes/session.php';
 
-$controller = new WT_Controller_Timeline();
-$controller->init();
-
-print_header(WT_I18N::translate('Timeline'));
+$controller=new WT_Controller_Timeline();
+$controller->pageHeader();
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 ?>
@@ -246,7 +244,7 @@ document.onmouseup = MU;
 <?php
 $controller->checkPrivacy();
 ?>
-<table class="<?php echo $TEXT_DIRECTION; ?>">
+<table>
 	<tr>
 	<?php
 	$i=0;
@@ -316,8 +314,8 @@ $controller->checkPrivacy();
 		$scalemod = round($controller->scale*.2) + 1;
 		?>
 		<td class="list_value" style="padding: 5px">
-			<a href="<?php echo WT_SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale+$scalemod); ?>&amp;ged=<?php echo WT_GEDURL; ?>"><img src="<?php echo $WT_IMAGES['zoomin']; ?>" title="<?php echo WT_I18N::translate('Zoom in'); ?>" alt="<?php echo WT_I18N::translate('Zoom in'); ?>" border="0" /></a><br />
-			<a href="<?php echo WT_SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale-$scalemod); ?>&amp;ged=<?php echo WT_GEDURL; ?>"><img src="<?php echo $WT_IMAGES['zoomout']; ?>" title="<?php echo WT_I18N::translate('Zoom out'); ?>" alt="<?php echo WT_I18N::translate('Zoom out'); ?>" border="0" /></a><br />
+			<a href="<?php echo WT_SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale+$scalemod); ?>&amp;ged=<?php echo WT_GEDURL; ?>"><img src="<?php echo $WT_IMAGES['zoomin']; ?>" title="<?php echo WT_I18N::translate('Zoom in'); ?>" alt="<?php echo WT_I18N::translate('Zoom in'); ?>"></a><br />
+			<a href="<?php echo WT_SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale-$scalemod); ?>&amp;ged=<?php echo WT_GEDURL; ?>"><img src="<?php echo $WT_IMAGES['zoomout']; ?>" title="<?php echo WT_I18N::translate('Zoom out'); ?>" alt="<?php echo WT_I18N::translate('Zoom out'); ?>"></a><br />
 			<input type="button" value="<?php echo WT_I18N::translate('Clear Chart'); ?>" onclick="window.location = 'timeline.php?ged=<?php echo WT_GEDURL; ?>&amp;clear=1';" />
 		</td>
 	<?php } ?>
@@ -368,7 +366,7 @@ if (count($controller->people)>0) {
 			<table cellspacing="0" cellpadding="0">
 				<tr>
 					<td>
-						<img src="<?php echo $WT_IMAGES["hline"]; ?>" name="ageline<?php echo $p; ?>" id="ageline<?php echo $p; ?>" align="left" hspace="0" vspace="0" width="25" height="3" alt="" />
+						<img src="<?php echo $WT_IMAGES["hline"]; ?>" name="ageline<?php echo $p; ?>" id="ageline<?php echo $p; ?>" align="left" width="25" height="3" alt="" />
 					</td>
 					<td valign="top">
 						<?php
@@ -423,5 +421,3 @@ if (count($controller->people)>0) {
 	if (timeline_chart_div) timeline_chart_div.style.height = '<?php echo $baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale*1.1); ?>px';
 //-->
 </script>
-<?php
-print_footer();

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edituser.php 12356 2011-10-21 15:03:42Z greg $
+// $Id: edituser.php 12943 2011-11-29 13:24:11Z greg $
 
 define('WT_SCRIPT_NAME', 'edituser.php');
 require './includes/session.php';
@@ -33,6 +33,10 @@ if (!get_user_setting(WT_USER_ID, 'editaccount')) {
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
 	exit;
 }
+
+$controller=new WT_Controller_Base();
+$controller->setPageTitle(WT_I18N::translate('User administration'));
+
 
 // Valid values for form variables
 $ALL_THEMES_DIRS=array();
@@ -56,10 +60,10 @@ $form_visible_online=safe_POST_bool('form_visible_online');
 // Respond to form action
 if ($form_action=='update') {
 	if ($form_username!=WT_USER_NAME && get_user_id($form_username)) {
-		print_header(WT_I18N::translate('User administration'));
+		$controller->pageHeader();
 		echo '<span class="error">', WT_I18N::translate('Duplicate user name.  A user with that user name already exists.  Please choose another user name.'), '</span><br />';
 	} elseif ($form_email!=getUserEmail(WT_USER_ID) && get_user_by_email($form_email)) {
-		print_header(WT_I18N::translate('User administration'));
+		$controller->pageHeader();
 		echo '<span class="error">', WT_I18N::translate('Duplicate email address.  A user with that email already exists.'), '</span><br />';
 	} else {
 		// Change password
@@ -72,9 +76,9 @@ if ($form_action=='update') {
 		setUserFullName(WT_USER_ID, $form_realname);
 		setUserEmail   (WT_USER_ID, $form_email);
 		set_user_setting(WT_USER_ID, 'theme',         $form_theme);
-		$_SESSION['theme_dir']=$form_theme; // switch to the new theme right away
+		$WT_SESSION->theme_dir=$form_theme; // switch to the new theme right away
 		set_user_setting(WT_USER_ID, 'language',      $form_language);
-		$_SESSION['locale']=$form_language; // switch to the new language right away
+		$WT_SESSION->locale=$form_language; // switch to the new language right away
 		set_user_setting(WT_USER_ID, 'contactmethod', $form_contact_method);
 		set_user_setting(WT_USER_ID, 'visibleonline', $form_visible_online);
 		set_user_gedcom_setting(WT_USER_ID, WT_GED_ID, 'rootid', $form_rootid);
@@ -89,7 +93,7 @@ if ($form_action=='update') {
 		exit;
 	}
 } else {
-	print_header(WT_I18N::translate('User administration'));
+	$controller->pageHeader();
 
 	if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 }
@@ -138,12 +142,12 @@ function paste_id(value) {
 $tab=0;
 echo '<form name="editform" method="post" action="" onsubmit="return checkform(this);">';
 echo '<input type="hidden" name="form_action" value="update" />';
-echo '<table class="list_table center ', $TEXT_DIRECTION, '">';
+echo '<table class="list_table">';
 
 echo '<tr><td class="topbottombar" colspan="2"><h2>', WT_I18N::translate('My account'), '</h2></td></tr>';
 
 echo '<tr><td class="descriptionbox width20 wrap">';
-echo WT_I18N::translate('User name'), help_link('edituser_username'), '</td><td class="optionbox">';
+echo WT_I18N::translate('Username'), help_link('username'), '</td><td class="optionbox">';
 echo '<input type="text" name="form_username" value="', WT_USER_NAME, '" autofocus />';
 echo '</td></tr>';
 
@@ -171,11 +175,11 @@ if ($person) {
 echo '</td></tr>';
 
 echo '<tr><td class="descriptionbox wrap">';
-echo WT_I18N::translate('Password'), '</td><td class="optionbox">';
-echo '<input type="password" name="form_pass1" /> ', WT_I18N::translate('Leave password blank if you want to keep the current password.'), help_link('edituser_password'), '</td></tr>';
+echo WT_I18N::translate('Password'), help_link('password'), '</td><td class="optionbox">';
+echo '<input type="password" name="form_pass1" /> ', WT_I18N::translate('Leave password blank if you want to keep the current password.'), '</td></tr>';
 
 echo '<tr><td class="descriptionbox wrap">';
-echo WT_I18N::translate('Confirm password'), help_link('edituser_conf_password'), '</td><td class="optionbox">';
+echo WT_I18N::translate('Confirm password'), help_link('password_confirm'), '</td><td class="optionbox">';
 echo '<input type="password" name="form_pass2" /></td></tr>';
 
 echo '<tr><td class="descriptionbox wrap">';
@@ -185,7 +189,7 @@ echo edit_field_language('form_language', get_user_setting(WT_USER_ID, 'language
 echo '</td></tr>';
 
 echo '<tr><td class="descriptionbox wrap">';
-echo WT_I18N::translate('Email address'), help_link('edituser_email'), '</td><td class="optionbox" valign="top">';
+echo WT_I18N::translate('Email address'), help_link('email'), '</td><td class="optionbox" valign="top">';
 echo '<input type="text" name="form_email" value="', getUserEmail(WT_USER_ID), '" size="50" /></td></tr>';
 
 echo '<tr><td class="descriptionbox wrap">';
@@ -216,5 +220,3 @@ echo '</td></tr>';
 echo '<tr><td class="topbottombar" colspan="2"><input type="submit" value="', WT_I18N::translate('Save'), '" /></td></tr>';
 
 echo '</table></form>';
-
-print_footer();

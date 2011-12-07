@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print_facts.php 12393 2011-10-24 13:08:37Z greg $
+// $Id: functions_print_facts.php 12708 2011-11-11 11:23:19Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -164,11 +164,11 @@ function print_fact(WT_Event $fact, WT_GedcomRecord $record) {
 
 	if (WT_USER_CAN_EDIT && $styleadd!='change_old' && $fact->getLineNumber()>0 && $fact->canEdit()) {
 		echo
-			'<a onclick="return edit_record(\'', $pid, '\', ', $fact->getLineNumber(), ');" href="javascript:;" title="', WT_I18N::translate('Edit'), '">',  $label,  '</a>',
+			'<a onclick="return edit_record(\'', $pid, '\', ', $fact->getLineNumber(), ');" href="#" title="', WT_I18N::translate('Edit'), '">',  $label,  '</a>',
 			'<div class="editfacts">',
-			'<div class="editlink"><a class="editicon" onclick="return edit_record(\'', $pid, '\', ', $fact->getLineNumber(), ');" href="javascript:;" title="', WT_I18N::translate('Edit'), '"><span class="link_text">', WT_I18N::translate('Edit'), '</span></a></div>',
-			'<div class="copylink"><a class="copyicon" onclick="return copy_record(\'', $pid, '\', ', $fact->getLineNumber(), ');" href="javascript:;" title="', WT_I18N::translate('Copy'), '"><span class="link_text">', WT_I18N::translate('Copy'), '</span></a></div>',
-			'<div class="deletelink"><a class="deleteicon" onclick="return delete_record(\'', $pid, '\', ', $fact->getLineNumber(), ');" href="javascript:;" title="', WT_I18N::translate('Delete'), '"><span class="link_text">', WT_I18N::translate('Delete'), '</span></a></div>',
+			'<div class="editlink"><a class="editicon" onclick="return edit_record(\'', $pid, '\', ', $fact->getLineNumber(), ');" href="#" title="', WT_I18N::translate('Edit'), '"><span class="link_text">', WT_I18N::translate('Edit'), '</span></a></div>',
+			'<div class="copylink"><a class="copyicon" href="#" onclick="jQuery.post(\'action.php\',{action:\'copy-fact\', type:\''.$fact->getParentObject()->getType().'\',factgedcom:\''.rawurlencode($fact->getGedcomRecord()).'\'},function(){location.reload();})" title="', WT_I18N::translate('Copy'), '"><span class="link_text">', WT_I18N::translate('Copy'), '</span></a></div>',
+			'<div class="deletelink"><a class="deleteicon" onclick="return delete_record(\'', $pid, '\', ', $fact->getLineNumber(), ');" href="#" title="', WT_I18N::translate('Delete'), '"><span class="link_text">', WT_I18N::translate('Delete'), '</span></a></div>',
 			'</div>';
 	} else {
 		echo $label;
@@ -184,7 +184,7 @@ function print_fact(WT_Event $fact, WT_GedcomRecord $record) {
 		echo '<br />', WT_I18N::translate('#%d', ++$n_gchi);
 		break;
 	}
-	
+
 	echo '</td><td class="optionbox ', $styleadd, ' wrap">';
 
 	//PERSO
@@ -497,9 +497,9 @@ function print_fact_sources($factrec, $level, $return=false) {
 					$plusminus='plus';
 				}
 				if ($lt>0) {
-					$data .= "<a href=\"javascript:;\" onclick=\"expand_layer('$elementID'); return false;\"><img id=\"{$elementID}_img\" src=\"".$WT_IMAGES[$plusminus].'" border="0" width="11" height="11" alt="';
-					if ($plusminus=='plus') $data .= WT_I18N::translate('Show Details').'" title="'.WT_I18N::translate('Show Details').'" /></a> ';
-					else $data .= WT_I18N::translate('Hide Details').'" title="'.WT_I18N::translate('Hide Details').'" /></a> ';
+					$data .= "<a href=\"#\" onclick=\"expand_layer('$elementID'); return false;\"><img id=\"{$elementID}_img\" src=\"".$WT_IMAGES[$plusminus].'" width="11" height="11" alt="';
+					if ($plusminus=='plus') $data .= WT_I18N::translate('Show Details').'" title="'.WT_I18N::translate('Show Details').'"></a> ';
+					else $data .= WT_I18N::translate('Hide Details').'" title="'.WT_I18N::translate('Hide Details').'"></a> ';
 				}
 				//PERSO Prepend fact source text
 				$hook_fs_prepend = new WT_Perso_Hook('h_fs_prepend');
@@ -547,6 +547,7 @@ function print_media_links($factrec, $level, $pid='') {
 	global $SEARCH_SPIDER;
 	global $THUMBNAIL_WIDTH, $USE_MEDIA_VIEWER;
 	global $GEDCOM;
+
 	$ged_id=get_id_from_gedcom($GEDCOM);
 	$nlevel = $level+1;
 	if ($level==1) $size=50;
@@ -605,7 +606,7 @@ function print_media_links($factrec, $level, $pid='') {
 					echo '<a href="mediaviewer.php?mid=', $media_id, '">';
 				}
 
-				echo '<img src="', $thumbnail, '" border="0" align="' , $TEXT_DIRECTION== 'rtl'?'right':'left', '" class="thumbnail"';
+				echo '<img src="', $thumbnail, '" align="' , $TEXT_DIRECTION== 'rtl'?'right':'left', '" class="thumbnail"';
 				if (strpos($mainMedia, 'http://maps.google.')===0) {
 					// Do not print Streetview title here (PF&D tab)
 				} else {
@@ -619,7 +620,7 @@ function print_media_links($factrec, $level, $pid='') {
 					echo'title="', basename($row['m_file']), '"';
 				}
 				// ---------------------------------------------------------------------------------------------
-				echo '/>';
+				echo '>';
 				echo '</a>';
 			}
 			echo '</div>'; // close div "media-display-image"
@@ -844,15 +845,15 @@ function print_main_sources($factrec, $level, $pid, $linenum, $noedit=false) {
 				}
 			} else
 			if (!$noedit && WT_USER_CAN_EDIT && !FactEditRestricted($pid, $factrec) && $styleadd!="red") {
-				echo "<a onclick=\"return edit_record('$pid', $linenum);\" href=\"javascript:;\" title=\"", WT_I18N::translate('Edit'), '">';
+				echo "<a onclick=\"return edit_record('$pid', $linenum);\" href=\"#\" title=\"", WT_I18N::translate('Edit'), '">';
 					if ($SHOW_FACT_ICONS) {
 						if ($level==1) echo '<img class="icon" src="', $WT_IMAGES['source'], '" alt="" />';
 					}
 					echo WT_Gedcom_Tag::getLabel($factname, $parent), '</a>';
 					echo '<div class="editfacts">';
-					echo "<div class=\"editlink\"><a class=\"editicon\" onclick=\"return edit_record('$pid', $linenum);\" href=\"javascript:;\" title=\"".WT_I18N::translate('Edit')."\"><span class=\"link_text\">".WT_I18N::translate('Edit')."</span></a></div>";
-					echo "<div class=\"copylink\"><a class=\"copyicon\" onclick=\"return copy_record('$pid', $linenum);\" href=\"javascript:;\" title=\"".WT_I18N::translate('Copy')."\"><span class=\"link_text\">".WT_I18N::translate('Copy')."</span></a></div>";
-					echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_record('$pid', $linenum);\" href=\"javascript:;\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
+					echo "<div class=\"editlink\"><a class=\"editicon\" onclick=\"return edit_record('$pid', $linenum);\" href=\"#\" title=\"".WT_I18N::translate('Edit')."\"><span class=\"link_text\">".WT_I18N::translate('Edit')."</span></a></div>";
+					echo '<div class="copylink"><a class="copyicon" href="#" onclick="jQuery.post(\'action.php\',{action:\'copy-fact\', type:\'\', factgedcom:\''.rawurlencode($factrec).'\'},function(){location.reload();})" title="'.WT_I18N::translate('Copy').'"><span class="link_text">'.WT_I18N::translate('Copy').'</span></a></div>';
+					echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_record('$pid', $linenum);\" href=\"#\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
 				echo '</div>';
 			} else {
 				echo WT_Gedcom_Tag::getLabel($factname, $parent);
@@ -904,16 +905,16 @@ function print_main_sources($factrec, $level, $pid, $linenum, $noedit=false) {
 					$cs = preg_match("/".($nlevel+1)." ROLE (.*)/", $srec, $cmatch);
 					if ($cs>0) echo '<br />&nbsp;&nbsp;&nbsp;&nbsp;<span class="label">', WT_Gedcom_Tag::getLabel('ROLE'), ' </span><span class="field">', $cmatch[1], '</span>';
 				}
-					echo printSourceStructure(getSourceStructure($srec));
+				echo printSourceStructure(getSourceStructure($srec));
 				echo '<div class="indent">';
-					print_media_links($srec, $nlevel);
-					if ($nlevel==2) {
-						print_media_links($source->getGedcomRecord(), 1);
-					}
-					print_fact_notes($srec, $nlevel);
-					if ($nlevel==2) {
-						print_fact_notes($source->getGedcomRecord(), 1);
-					}
+				print_media_links($srec, $nlevel);
+				if ($nlevel==2) {
+					print_media_links($source->getGedcomRecord(), 1);
+				}
+				print_fact_notes($srec, $nlevel);
+				if ($nlevel==2) {
+					print_fact_notes($source->getGedcomRecord(), 1);
+				}
 				echo '</div>';
 			} else {
 				echo $sid;
@@ -1048,7 +1049,7 @@ function print_main_notes($factrec, $level, $pid, $linenum, $noedit=false) {
 		if ($level>=2) echo ' rela';
 		echo ' ', $styleadd, ' width20">';
 		if (!$noedit && WT_USER_CAN_EDIT && !FactEditRestricted($pid, $factrec) && $styleadd!='change_old') {
-			echo "<a onclick=\"return edit_record('$pid', $linenum);\" href=\"javascript:;\" title=\"", WT_I18N::translate('Edit'), '\">';
+			echo "<a onclick=\"return edit_record('$pid', $linenum);\" href=\"#\" title=\"", WT_I18N::translate('Edit'), '\">';
 			if ($level<2) {
 				if ($SHOW_FACT_ICONS) {
 					echo '<img class="icon" src="', $WT_IMAGES['note'], '" alt="" />';
@@ -1060,9 +1061,9 @@ function print_main_notes($factrec, $level, $pid, $linenum, $noedit=false) {
 				}
 				echo '</a>';
 				echo '<div class="editfacts">';
-				echo "<div class=\"editlink\"><a class=\"editicon\" onclick=\"return edit_record('$pid', $linenum);\" href=\"javascript:;\" title=\"".WT_I18N::translate('Edit')."\"><span class=\"link_text\">".WT_I18N::translate('Edit')."</span></a></div>";
-				echo "<div class=\"copylink\"><a class=\"copyicon\" onclick=\"return copy_record('$pid', $linenum);\" href=\"javascript:;\" title=\"".WT_I18N::translate('Copy')."\"><span class=\"link_text\">".WT_I18N::translate('Copy')."</span></a></div>";
-				echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_record('$pid', $linenum);\" href=\"javascript:;\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
+				echo "<div class=\"editlink\"><a class=\"editicon\" onclick=\"return edit_record('$pid', $linenum);\" href=\"#\" title=\"".WT_I18N::translate('Edit')."\"><span class=\"link_text\">".WT_I18N::translate('Edit')."</span></a></div>";
+					echo '<div class="copylink"><a class="copyicon" href="#" onclick="jQuery.post(\'action.php\',{action:\'copy-fact\', type:\'\', factgedcom:\''.rawurlencode($factrec).'\'},function(){location.reload();})" title="'.WT_I18N::translate('Copy').'"><span class="link_text">'.WT_I18N::translate('Copy').'</span></a></div>';
+				echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_record('$pid', $linenum);\" href=\"#\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
 				echo '</div>';
 			}
 		} else {
@@ -1131,12 +1132,8 @@ function print_main_notes($factrec, $level, $pid, $linenum, $noedit=false) {
 				}
 			}
 
-			$align = '';
-			if (!empty($text)) {
-				if ($TEXT_DIRECTION=='rtl' && !hasRTLText($text) && hasLTRText($text)) $align=' align="left"';
-				if ($TEXT_DIRECTION=='ltr' && !hasLTRText($text) && hasRTLText($text)) $align=' align="right"';
-			}
 		echo '<td class="optionbox', $styleadd, ' wrap" align="', $TEXT_DIRECTION== "rtl"?"right": "left" , '">';
+		
 		if (!empty($text)) {
 			echo $text;
 			if (!empty($noterec)) print_fact_sources($noterec, 1);
@@ -1353,15 +1350,15 @@ function print_main_media_row($rtype, $rowm, $pid) {
 	$linenum = 0;
 	echo '<tr><td class="descriptionbox', $styleadd,' width20">';
 	if ($rowm['mm_gid']==$pid && WT_USER_CAN_EDIT && (!FactEditRestricted($mediaobject->getXref(), $mediaobject->getGedcomRecord())) && ($styleadd!='change_old') && $rowm['m_gedrec']!='') {
-		echo "<a onclick=\"return window.open('addmedia.php?action=editmedia&pid=", $mediaobject->getXref(), "&linktoid={$rowm['mm_gid']}', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1');\" href=\"javascript:;\" title=\"", WT_I18N::translate('Edit'), "\">";
+		echo "<a onclick=\"return window.open('addmedia.php?action=editmedia&pid=", $mediaobject->getXref(), "&linktoid={$rowm['mm_gid']}', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1');\" href=\"#\" title=\"", WT_I18N::translate('Edit'), "\">";
 		if ($SHOW_FACT_ICONS) {
 			echo '<img class="icon" src="', $WT_IMAGES['media'], '" alt="" />';
 		}
 		echo WT_Gedcom_Tag::getLabel('OBJE'), '</a>';
 		echo '<div class="editfacts">';
-		echo "<div class=\"editlink\"><a class=\"editicon\" onclick=\"return window.open('addmedia.php?action=editmedia&pid=".$mediaobject->getXref()."&linktoid={$rowm['mm_gid']}', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1');\" href=\"javascript:;\" title=\"".WT_I18N::translate('Edit')."\"><span class=\"link_text\">".WT_I18N::translate('Edit')."</span></a></div>";
-		echo "<div class=\"copylink\"><a class=\"copyicon\" onclick=\"return copy_record('".$mediaobject->getXref()."', 'media');\" href=\"javascript:;\" title=\"".WT_I18N::translate('Copy')."\"><span class=\"link_text\">".WT_I18N::translate('Copy')."</span></a></div>";
-		echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_record('$pid', 'OBJE', '".$mediaobject->getXref()."');\" href=\"javascript:;\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
+		echo "<div class=\"editlink\"><a class=\"editicon\" onclick=\"return window.open('addmedia.php?action=editmedia&pid=".$mediaobject->getXref()."&linktoid={$rowm['mm_gid']}', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1');\" href=\"#\" title=\"".WT_I18N::translate('Edit')."\"><span class=\"link_text\">".WT_I18N::translate('Edit')."</span></a></div>";
+		echo '<div class="copylink"><a class="copyicon" href="#" onclick="jQuery.post(\'action.php\',{action:\'copy-fact\', type:\'\', factgedcom:\'1 OBJE @'.$mediaobject->getXref().'@\'},function(){location.reload();})" title="'.WT_I18N::translate('Copy').'"><span class="link_text">'.WT_I18N::translate('Copy').'</span></a></div>';
+		echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_record('$pid', 'OBJE', '".$mediaobject->getXref()."');\" href=\"#\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
 		echo '</div>';
 		echo '</td>';
 	}
@@ -1414,11 +1411,12 @@ function print_main_media_row($rtype, $rowm, $pid) {
 	if (WT_USER_GEDCOM_ADMIN) {
 		$prim=$mediaobject->isPrimary();
 		if ($prim) {
-			echo WT_Gedcom_Tag::getLabelValue('_PRIM', $prim=='Y' ? WT_I18N::translate('Yes') : WT_I18N::translate('No'));
+			echo WT_Gedcom_Tag::getLabelValue('_PRIM', $prim=='Y' ? WT_I18N::translate('yes') : WT_I18N::translate('no'));
 		}
 	}
 	print_fact_notes($mediaobject->getGedcomRecord(), 1);
 	print_fact_sources($mediaobject->getGedcomRecord(), 1);
+
 	echo '</td></tr>';
 
 	// echo '<pre>'; print_r($rowm); print_r($mediaobject); echo '</pre>';

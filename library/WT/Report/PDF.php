@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: PDF.php 12265 2011-10-06 17:23:50Z lukasz $
+// $Id: PDF.php 12547 2011-11-05 08:44:59Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -73,7 +73,7 @@ class WT_Report_PDF extends WT_Report_Base {
 		parent::setup();
 
 		// Setup the PDF class with custom size pages because WT supports more page sizes. If WT sends an unknown size name then the default would be A4
-		$this->pdf = new PDF($this->orientation, parent::unit, array($this->pagew, $this->pageh), self::unicode, $this->charset, self::diskcache);
+		$this->pdf = new PDF($this->orientation, parent::unit, array($this->pagew, $this->pageh), self::unicode, "UTF-8", self::diskcache);
 
 		// Setup the PDF margins
 		$this->pdf->setMargins($this->leftmargin, $this->topmargin, $this->rightmargin);

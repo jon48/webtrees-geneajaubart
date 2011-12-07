@@ -21,11 +21,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: medialist.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: medialist.php 12901 2011-11-24 02:32:59Z nigel $
 
 define('WT_SCRIPT_NAME', 'medialist.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_facts.php';
+
+$controller=new WT_Controller_Base();
+$controller->setPageTitle(WT_I18N::translate('Media objects'));
 
 $action = safe_GET('action');
 $search = safe_GET('search');
@@ -165,12 +168,9 @@ if ($build == 'yes') {
 	$WT_SESSION->Medialist_user=WT_USER_ID;
 }
 
-// We have finished writing session data, so release the lock
-Zend_Session::writeClose();
-// ************************  END = 'Build the medialist array' ************************
+$controller->pageHeader();
 
-print_header(WT_I18N::translate('Media objects'));
-echo '<div class="center"><h2>', WT_I18N::translate('Media objects'), '</h2></div>';
+echo '<div id="media-list-page"><h2>', $controller->getPageTitle(), '</h2>';
 if (WT_USE_LIGHTBOX) {
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 }
@@ -180,7 +180,7 @@ if (WT_USE_LIGHTBOX) {
 <form action="medialist.php" method="get">
 	<input type="hidden" name="action" value="filter" />
 	<input type="hidden" name="search" value="yes" />
-	<table class="list-table center width75 <?php echo $TEXT_DIRECTION; ?>">
+	<table class="list-table width75">
 	<!-- Build the form cells -->
 	<tr>
 <!-- // NOTE: Row 1, left: -->
@@ -342,17 +342,17 @@ if ($show == 'yes') {
   if ($ct>0) {
 	$currentPage = ((int) ($start / $max)) + 1;
 	$lastPage = (int) (($ct + $max - 1) / $max);
-	$IconRarrow = '<img src="'.$WT_IMAGES['rarrow'].'" width="20" height="20" border="0" alt="" />';
-	$IconLarrow = '<img src="'.$WT_IMAGES['larrow'].'" width="20" height="20" border="0" alt="" />';
-	$IconRDarrow = '<img src="'.$WT_IMAGES['rdarrow'].'" width="20" height="20" border="0" alt="" />';
-	$IconLDarrow = '<img src="'.$WT_IMAGES['ldarrow'].'" width="20" height="20" border="0" alt="" />';
+	$IconRarrow = '<img src="'.$WT_IMAGES['rarrow'].'" width="20" height="20" alt="">';
+	$IconLarrow = '<img src="'.$WT_IMAGES['larrow'].'" width="20" height="20" alt="">';
+	$IconRDarrow = '<img src="'.$WT_IMAGES['rdarrow'].'" width="20" height="20" alt="">';
+	$IconLDarrow = '<img src="'.$WT_IMAGES['ldarrow'].'" width="20" height="20" alt="">';
 
 	echo '<table class="list_table">';
 	// echo page back, page number, page forward controls
 	echo '<tr><td colspan="2">';
 	echo '<table class="list_table width100">';
 	echo '<tr>';
-	echo '<td class="width30" align="', $TEXT_DIRECTION == 'ltr'?'left':'right', '">';
+	echo '<td class="width30">';
 	if ($TEXT_DIRECTION=='ltr') {
 		if ($ct>$max) {
 			if ($currentPage > 1) {
@@ -379,7 +379,7 @@ if ($show == 'yes') {
 	}
 	echo '</td>';
 	echo '<td align="center">', WT_I18N::translate('Page %s of %s', $currentPage, $lastPage), '</td>';
-	echo '<td class="width30" align="', $TEXT_DIRECTION == 'ltr'?'right':'left', '">';
+	echo '<td class="width30">';
 	if ($TEXT_DIRECTION=='ltr') {
 		if ($ct>$max) {
 			if ($start+$max < $ct) {
@@ -420,7 +420,7 @@ if ($show == 'yes') {
 		if ($columns == '1') echo '<td class="list_value_wrap" width="80%">';
 		if ($columns == '2') echo '<td class="list_value_wrap" width="50%">';
 
-		echo '<table class="', $TEXT_DIRECTION, '"><tr><td valign="top" style="white-space: normal;">';
+		echo '<table><tr><td valign="top" style="white-space: normal;">';
 
 		//-- Thumbnail field
 		if ($show_thumbnail) {
@@ -432,7 +432,7 @@ if ($show == 'yes') {
 					echo '<table border=0><tr>';
 					// ---------- Edit Media --------------------
 					echo '<td class="width33 wrap center font9" valign="top">';
-					echo "<a href=\"javascript:;\" title=\"" . WT_I18N::translate('Edit this Media Item\'s Details') . "\" onclick=\" return window.open('addmedia.php?action=editmedia&pid=".$mediaobject->getXref()."&linktoid=', '_blank', 'top=50, left=50, width=600, height=600, resizable=1, scrollbars=1');\">";
+					echo "<a href=\"#\" title=\"" . WT_I18N::translate('Edit this Media Item\'s Details') . "\" onclick=\" return window.open('addmedia.php?action=editmedia&pid=".$mediaobject->getXref()."&linktoid=', '_blank', 'top=50, left=50, width=600, height=600, resizable=1, scrollbars=1');\">";
 					echo '<img src="'.WT_STATIC_URL.WT_MODULES_DIR.'lightbox/images/image_edit.gif" alt="" class="icon" title="', WT_I18N::translate('Edit this Media Item\'s Details'), '" />&nbsp;&nbsp;&nbsp;';
 					echo '<br />';
 					echo WT_I18N::translate('Edit Details') ;
@@ -504,7 +504,7 @@ Plus other Media Options - MediaViewer page'), '" />';
 	echo '<tr><td colspan="2">';
 	echo '<table class="list_table width100">';
 	echo '<tr>';
-	echo '<td class="width30" align="', $TEXT_DIRECTION == 'ltr'?'left':'right', '">';
+	echo '<td class="width30">';
 	if ($TEXT_DIRECTION=='ltr') {
 		if ($ct>$max) {
 			if ($currentPage > 1) {
@@ -531,7 +531,7 @@ Plus other Media Options - MediaViewer page'), '" />';
 	}
 	echo '</td>';
 	echo '<td align="center">', WT_I18N::translate('Page %s of %s', $currentPage, $lastPage), '</td>';
-	echo '<td class="width30" align="', $TEXT_DIRECTION == 'ltr'?'right':'left', '">';
+	echo '<td class="width30">';
 	if ($TEXT_DIRECTION=='ltr') {
 		if ($ct>$max) {
 			if ($start+$max < $ct) {
@@ -561,7 +561,6 @@ Plus other Media Options - MediaViewer page'), '" />';
 	echo '</tr></table></td></tr>';
 	echo '</table><br />';
   }
-  echo '</div>';
+  echo '</div>
+  </div>';// close media-list-page
 }
-// ************************  END = 'Print the medialist array' ************************
-print_footer();

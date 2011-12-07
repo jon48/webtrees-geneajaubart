@@ -1,5 +1,5 @@
 <?php
-// Controller for the Ancestry Page
+// Controller for the ancestry chart
 //
 // webtrees: Web based Family History software
 // Copyright (C) 2011 webtrees development team.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Ancestry.php 12417 2011-10-25 17:01:05Z lukasz $
+// $Id: Ancestry.php 12815 2011-11-19 16:02:11Z rob $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -30,7 +30,7 @@ if (!defined('WT_WEBTREES')) {
 
 require_once WT_ROOT.'includes/functions/functions_charts.php';
 
-class WT_Controller_Ancestry extends WT_Controller_Base {
+class WT_Controller_Ancestry extends WT_Controller_Chart {
 	var $pid = '';
 	var $user = false;
 	var $show_cousins;
@@ -42,13 +42,12 @@ class WT_Controller_Ancestry extends WT_Controller_Base {
 	var $show_full;
 	var $cellwidth;
 
-	/**
-	 * Initialization function
-	 */
-	function init() {
+	function __construct() {
 		global $USE_RIN, $MAX_ALIVE_AGE, $GEDCOM, $bwidth, $bheight, $pbwidth, $pbheight, $PEDIGREE_FULL_DETAILS, $MAX_DESCENDANCY_GENERATIONS;
 		global $DEFAULT_PEDIGREE_GENERATIONS, $PEDIGREE_GENERATIONS, $MAX_PEDIGREE_GENERATIONS, $OLD_PGENS, $box_width, $Dbwidth, $Dbheight;
 		global $show_full;
+
+		parent::__construct();
 
 		// Extract form parameters
 		$this->rootid        =safe_GET_xref('rootid');
@@ -66,15 +65,16 @@ class WT_Controller_Ancestry extends WT_Controller_Base {
 		// Validate form parameters
 		$this->rootid = check_rootid($this->rootid);
 
-		// -- size of the boxes
-		$Dbwidth*=$box_width/100;
+		// -- size of the detailed boxes based upon optional width parameter
+		$Dbwidth=($box_width*$bwidth)/100;
+		$Dbheight=($box_width*$bheight)/100;
 		$bwidth=$Dbwidth;
+		$bheight=$Dbheight;
+		
+		// -- adjust size of the non-detailed boxes
 		if (!$this->show_full) {
 			$bwidth = $bwidth / 1.5;
-		}
-		$bheight=$Dbheight;
-		if (!$this->show_full) {
-			$bheight = $bheight / 1.5;
+			$bheight = $bheight / 2 ;
 		}
 
 		$pbwidth = $bwidth+12;
@@ -83,6 +83,8 @@ class WT_Controller_Ancestry extends WT_Controller_Base {
 		$this->ancestry = WT_Person::getInstance($this->rootid);
 		$this->name     = $this->ancestry->getFullName();
 		$this->addname  = $this->ancestry->getAddName();
+
+		$this->setPageTitle(/* I18N: %s is a person's name */ WT_I18N::translate('Ancestors of %s', $this->name));
 
 		if (strlen($this->name)<30) $this->cellwidth="420";
 		else $this->cellwidth=(strlen($this->name)*14);
@@ -96,7 +98,7 @@ class WT_Controller_Ancestry extends WT_Controller_Base {
 	 * @param int $depth the ascendancy depth to show
 	 */
 	function print_child_ascendancy($person, $sosa, $depth) {
-		global $TEXT_DIRECTION, $OLD_PGENS, $WT_IMAGES, $Dindent, $SHOW_EMPTY_BOXES, $pidarr, $box_width;
+		global $OLD_PGENS, $WT_IMAGES, $Dindent, $SHOW_EMPTY_BOXES, $pidarr, $box_width;
 
 		if ($person) {
 			$pid=$person->getXref();
@@ -109,10 +111,10 @@ class WT_Controller_Ancestry extends WT_Controller_Base {
 		echo '<li>';
 		echo '<table border="0" cellpadding="0" cellspacing="0"><tr><td><a name="sosa', $sosa, '"></a>';
 		if ($sosa==1) {
-			echo '<img src="', $WT_IMAGES['spacer'], '" height="3" width="', $Dindent, '" border="0" alt="" /></td><td>';
+			echo '<img src="', $WT_IMAGES['spacer'], '" height="3" width="', $Dindent, '" alt=""></td><td>';
 		} else {
-			echo '<img src="', $WT_IMAGES['spacer'], '" height="3" width="2" border="0" alt="" />';
-			echo '<img src="', $WT_IMAGES['hline'], '" height="3" width="', ($Dindent-2), '" border="0" alt="" /></td><td>';
+			echo '<img src="', $WT_IMAGES['spacer'], '" height="3" width="2" alt="">';
+			echo '<img src="', $WT_IMAGES['hline'], '" height="3" width="', ($Dindent-2), '" alt=""></td><td>';
 		}
 		print_pedigree_person($person, 1);
 		echo '</td>';
@@ -144,7 +146,7 @@ class WT_Controller_Ancestry extends WT_Controller_Base {
 		if ($family && $new && $depth>0) {
 			// print marriage info
 			echo '<span class="details1" style="white-space: nowrap;" >';
-			echo '<img src="', $WT_IMAGES['spacer'], '" height="2" width="', $Dindent, '" border="0" align="middle" alt="" /><a href="javascript: ', WT_I18N::translate('View Family'), '" onclick="expand_layer(\'sosa_', $sosa, '\'); return false;" class="top"><img id="sosa_', $sosa, '_img" src="', $WT_IMAGES['minus'], '" align="middle" hspace="0" vspace="3" border="0" alt="', WT_I18N::translate('View Family'), '" /></a>';
+			echo '<img src="', $WT_IMAGES['spacer'], '" height="2" width="', $Dindent, '" align="middle" alt=""><a href="#" onclick="expand_layer(\'sosa_', $sosa, '\'); return false;" class="top"><img id="sosa_', $sosa, '_img" src="', $WT_IMAGES['minus'], '" align="middle" hspace="0" vspace="3" alt="', WT_I18N::translate('View Family'), '"></a>';
 			echo '&nbsp;<span dir="ltr" class="person_box">&nbsp;', ($sosa*2), '&nbsp;</span>&nbsp;', WT_I18N::translate('and');
 			echo '&nbsp;<span dir="ltr" class="person_boxF">&nbsp;', ($sosa*2+1), '&nbsp;</span>&nbsp;';
 			$marriage = $family->getMarriage();

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
+// $Id: module.php 12716 2011-11-11 19:48:28Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -45,8 +45,8 @@ class user_welcome_WT_Module extends WT_Module implements WT_Module_Block {
 
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
-		$title=/* I18N: A greeting; %s is the user's name */ WT_I18N::translate('Welcome %s', getUserFullName(WT_USER_ID));
-
+		$title='';
+		$title .=/* I18N: A greeting; %s is the user's name */ WT_I18N::translate('Welcome %s', getUserFullName(WT_USER_ID));
 		$content = "<table style=\"margin:auto;\"><tr>";
 		$content .= "<td class=\"tab_active_bottom\" colspan=\"3\" ></td></tr><tr>";
 		if (get_user_setting(WT_USER_ID, 'editaccount')) {
@@ -57,7 +57,7 @@ class user_welcome_WT_Module extends WT_Module implements WT_Module_Block {
 			$content .= "<td class=\"center details2\" style=\" width: 33%; clear: none; vertical-align: top; margin-top: 2px;\"><a href=\"individual.php?pid=".WT_USER_GEDCOM_ID."&amp;ged=".WT_GEDURL."\"><img class=\"block\" src=\"".$WT_IMAGES["indis"]."\" border=\"0\" alt=\"".WT_I18N::translate('My individual record')."\" /><br />".WT_I18N::translate('My individual record')."</a></td>";
 		}
 		$content .= "</tr><tr><td class=\"center\" colspan=\"3\">";
-		$content .= "<a href=\"javascript:;\" onclick=\"window.open('index_edit.php?name=".WT_USER_NAME."&amp;ctype=user"."', '_blank', 'top=50,left=10,width=705,height=355,scrollbars=1,resizable=1');\">".WT_I18N::translate('Change the blocks on this page')."</a>";
+		$content .= "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".WT_USER_NAME."&amp;ctype=user"."', '_blank', 'top=50,left=10,width=705,height=355,scrollbars=1,resizable=1');\">".WT_I18N::translate('Change the blocks on this page')."</a>";
 		$content .= "<br />".format_timestamp(client_time())."<br />";
 		if ($SHOW_COUNTER)
 			$content .=  WT_I18N::translate('Hit Count:')." ".$hitCount."<br />";

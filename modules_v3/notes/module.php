@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12306 2011-10-13 13:08:07Z greg $
+// $Id: module.php 12762 2011-11-16 20:40:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -48,92 +48,78 @@ class notes_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function getTabContent() {
-		global $FACT_COUNT, $SHOW_LEVEL2_NOTES, $NAV_NOTES;
+		global $FACT_COUNT, $SHOW_LEVEL2_NOTES, $NAV_NOTES, $controller;
 
 		ob_start();
 		?>
-<table class="facts_table">
-<?php
-if (!$this->controller->indi->canDisplayDetails()) {
-	echo "<tr><td class=\"facts_value\">";
-	print_privacy_error();
-	echo "</td></tr>";
-} else {
-	?>
-	<tr>
-		<td colspan="2" class="descriptionbox rela"><input id="checkbox_note2"
-			type="checkbox"
-			<?php if ($SHOW_LEVEL2_NOTES) echo " checked=\"checked\""; ?>
-			onclick="toggleByClassName('TR', 'row_note2');" /> <label
-			for="checkbox_note2"><?php echo WT_I18N::translate('Show all notes'); ?></label>
-			<?php echo help_link('show_fact_sources'); ?>
-		</td>
-	</tr>
-	<?php
-	$globalfacts = $this->controller->getGlobalFacts();
-	foreach ($globalfacts as $key => $event) {
-		$fact = $event->getTag();
-		if ($fact=="NAME") {
-			print_main_notes($event->getGedcomRecord(), 2, $this->controller->pid, $event->getLineNumber(), true);
+		<table class="facts_table">
+			<tr>
+				<td colspan="2" class="descriptionbox rela">
+					<input id="checkbox_note2" type="checkbox" <?php if ($SHOW_LEVEL2_NOTES) echo " checked=\"checked\""; ?> onclick="jQuery('tr.row_note2').toggle();" />
+					<label for="checkbox_note2"><?php echo WT_I18N::translate('Show all notes'); ?></label>
+					<?php echo help_link('show_fact_sources'); ?>
+				</td>
+			</tr>
+		<?php
+		$globalfacts = $controller->getGlobalFacts();
+		foreach ($globalfacts as $key => $event) {
+			$fact = $event->getTag();
+			if ($fact=="NAME") {
+				print_main_notes($event->getGedcomRecord(), 2, $controller->record->getXref(), $event->getLineNumber(), true);
+			}
+			$FACT_COUNT++;
 		}
-		$FACT_COUNT++;
-	}
-	$otherfacts = $this->controller->getOtherFacts();
-	foreach ($otherfacts as $key => $event) {
-		$fact = $event->getTag();
-		if ($fact=="NOTE") {
-			print_main_notes($event->getGedcomRecord(), 1, $this->controller->pid, $event->getLineNumber());
+		$otherfacts = $controller->getOtherFacts();
+		foreach ($otherfacts as $key => $event) {
+			$fact = $event->getTag();
+			if ($fact=="NOTE") {
+				print_main_notes($event->getGedcomRecord(), 1, $controller->record->getXref(), $event->getLineNumber());
+			}
+			$FACT_COUNT++;
 		}
-		$FACT_COUNT++;
-	}
-	// 2nd to 5th level notes/sources
-	$this->controller->indi->add_family_facts(false);
-	foreach ($this->controller->getIndiFacts() as $key => $factrec) {
-		for ($i=2; $i<6; $i++) {
-			print_main_notes($factrec->getGedcomRecord(), $i, $this->controller->pid, $factrec->getLineNumber(), true);
+		// 2nd to 5th level notes/sources
+		$controller->record->add_family_facts(false);
+		foreach ($controller->getIndiFacts() as $key => $factrec) {
+			for ($i=2; $i<6; $i++) {
+				print_main_notes($factrec->getGedcomRecord(), $i, $controller->record->getXref(), $factrec->getLineNumber(), true);
+			}
 		}
-	}
-	if ($this->get_note_count()==0) echo "<tr><td id=\"no_tab2\" colspan=\"2\" class=\"facts_value\">".WT_I18N::translate('There are no Notes for this individual.')."</td></tr>";
-	//-- New Note Link
-	if ($this->controller->indi->canEdit()) {
+		if ($this->get_note_count()==0) echo "<tr><td id=\"no_tab2\" colspan=\"2\" class=\"facts_value\">".WT_I18N::translate('There are no Notes for this individual.')."</td></tr>";
+		//-- New Note Link
+		if ($controller->record->canEdit()) {
+			?>
+		<tr>
+			<td class="facts_label"><?php echo WT_I18N::translate('Add Note'), help_link('add_note'); ?></td>
+			<td class="facts_value"><a href="#"
+				onclick="add_new_record('<?php echo $controller->record->getXref(); ?>','NOTE'); return false;"><?php echo WT_I18N::translate('Add a new note'); ?></a>
+			<br />
+			</td>
+		</tr>
+		<tr>
+			<td class="facts_label"><?php echo WT_I18N::translate('Add Shared Note'), help_link('add_shared_note'); ?></td>
+			<td class="facts_value"><a href="#"
+				onclick="add_new_record('<?php echo $controller->record->getXref(); ?>','SHARED_NOTE'); return false;"><?php echo WT_I18N::translate('Add a new shared note'); ?></a>
+			<br />
+			</td>
+		</tr>
+		<?php
+		}
 		?>
-	<tr>
-		<td class="facts_label"><?php echo WT_I18N::translate('Add Note'), help_link('add_note'); ?></td>
-		<td class="facts_value"><a href="javascript:;"
-			onclick="add_new_record('<?php echo $this->controller->pid; ?>','NOTE'); return false;"><?php echo WT_I18N::translate('Add a new note'); ?></a>
+		</table>
 		<br />
-		</td>
-	</tr>
-	<tr>
-		<td class="facts_label"><?php echo WT_I18N::translate('Add Shared Note'), help_link('add_shared_note'); ?></td>
-		<td class="facts_value"><a href="javascript:;"
-			onclick="add_new_record('<?php echo $this->controller->pid; ?>','SHARED_NOTE'); return false;"><?php echo WT_I18N::translate('Add a new shared note'); ?></a>
-		<br />
-		</td>
-	</tr>
-	<?php
-	}
-}
-?>
-</table>
-<br />
-<?php
-if (!$SHOW_LEVEL2_NOTES) {
-	?>
-<script type="text/javascript">
-			<!--
-			toggleByClassName('TR', 'row_note2');
-			//-->
-			</script>
-	<?php
+		<?php
+		if (!$SHOW_LEVEL2_NOTES)  {
+			echo WT_JS_START, 'jQuery("tr.row_note2").toggle();', WT_JS_END;
 		}
 		return '<div id="'.$this->getName().'_content">'.ob_get_clean().'</div>';
 	}
 
 	function get_note_count() {
+		global $controller;
+
 		if ($this->noteCount===null) {
-			$ct = preg_match_all("/\d NOTE /", $this->controller->indi->getGedcomRecord(), $match, PREG_SET_ORDER);
-			foreach ($this->controller->indi->getSpouseFamilies() as $sfam)
+			$ct = preg_match_all("/\d NOTE /", $controller->record->getGedcomRecord(), $match, PREG_SET_ORDER);
+			foreach ($controller->record->getSpouseFamilies() as $sfam)
 			$ct += preg_match("/\d NOTE /", $sfam->getGedcomRecord());
 			$this->noteCount = $ct;
 		}

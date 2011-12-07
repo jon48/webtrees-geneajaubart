@@ -1,4 +1,6 @@
 <?php
+//	Controller for the pedigree chart
+//
 // webtrees: Web based Family History software
 // Copyright (C) 2011 webtrees development team.
 //
@@ -19,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Pedigree.php 11417 2011-04-30 11:17:30Z greg $
+// $Id: Pedigree.php 12970 2011-12-03 14:57:50Z rob $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -28,7 +30,7 @@ if (!defined('WT_WEBTREES')) {
 
 require_once WT_ROOT.'includes/functions/functions_charts.php';
 
-class WT_Controller_Pedigree extends WT_Controller_Base {
+class WT_Controller_Pedigree extends WT_Controller_Chart {
 	var $log2;
 	var $rootid;
 	var $name;
@@ -48,20 +50,19 @@ class WT_Controller_Pedigree extends WT_Controller_Base {
 	var $offsetarray;
 	var $minyoffset;
 
-	/**
-	 * Initialization function
-	 */
-	function init() {
+	public function __construct() {
 		global $PEDIGREE_FULL_DETAILS, $PEDIGREE_LAYOUT, $MAX_PEDIGREE_GENERATIONS;
 		global $DEFAULT_PEDIGREE_GENERATIONS, $SHOW_EMPTY_BOXES;
 		global $bwidth, $bheight, $baseyoffset, $basexoffset, $byspacing, $bxspacing;
-		global $TEXT_DIRECTION, $BROWSER_TYPE, $show_full, $talloffset;
+		global $BROWSER_TYPE, $show_full, $talloffset;
 
+		parent::__construct();
 		$this->log2 = log(2);
 
 		$this->rootid    =safe_GET_xref('rootid');
 		$this->show_full =safe_GET('show_full', array('0', '1'), $PEDIGREE_FULL_DETAILS);
 		$this->talloffset=safe_GET('talloffset', array('0', '1', '2', '3'), $PEDIGREE_LAYOUT);
+		$this->box_width  =safe_GET_integer('box_width',   50, 300, 100);
 		$this->PEDIGREE_GENERATIONS=safe_GET_integer('PEDIGREE_GENERATIONS', 2, $MAX_PEDIGREE_GENERATIONS, $DEFAULT_PEDIGREE_GENERATIONS);
 
 		if ($this->talloffset==1) $this->talloffset=1; // Make SURE this is an integer
@@ -71,7 +72,7 @@ class WT_Controller_Pedigree extends WT_Controller_Base {
 		// Passing a function parameter would be much better.
 		global $PEDIGREE_GENERATIONS;
 		$PEDIGREE_GENERATIONS=$this->PEDIGREE_GENERATIONS;
-
+		
 		// This is passed as a global.  A parameter would be better...
 		$this->show_full = ($this->show_full) ? 1 : 0; // Make SURE this is an integer
 		if ($this->talloffset>3) {
@@ -90,20 +91,24 @@ class WT_Controller_Pedigree extends WT_Controller_Base {
 		$this->name     = $this->rootPerson->getFullName();
 		$this->addname  = $this->rootPerson->getAddName();
 
+		$this->setPageTitle(/* I18N: %s is a person's name */ WT_I18N::translate('Pedigree tree of %s', $this->name));
+		
+
 		//-- adjustments for hide details
 		if ($this->show_full==false) {
-			$bheight=30;
+			$bheight=$bheight/2;
 			if ($this->talloffset < 2) {
-				$bwidth-=30;
+				$bwidth=$bwidth/1.5; 
 			}
 			else {
-				$bwidth-=50;
+				$bwidth = $bwidth/1.5; //Problem item correct vaoue is -=50  offset #3
+
 			}
 		}
 		//-- adjustments for portrait mode
 		if ($this->talloffset==0) {
 			$bxspacing+=12;
-			$bwidth+=20;
+			//$bwidth+=20;
 			$baseyoffset -= 20*($this->PEDIGREE_GENERATIONS-1);
 		}
 

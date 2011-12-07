@@ -1,51 +1,45 @@
 <?php
-/**
- * Perform an incremental import of a gedcom file.
- *
- * For each gedcom that needs importing, admin_trees_manage.php will create
- * a <div id="importNNN"></div>, where NNN is the gedcom ID.
- * It will then call import.php to load the div's contents using AJAX.
- *
- * We import small blocks of data from wt_gedcom_chunks, working for
- * a couple of seconds.  When each block is loaded, we set its status
- * flag.
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @version $Id: import.php 10258 2011-01-02 13:13:41Z greg $
- */
+// Perform an incremental import of a gedcom file.
+//
+// For each gedcom that needs importing, admin_trees_manage.php will create
+// a <div id="importNNN"></div>, where NNN is the gedcom ID.
+// It will then call import.php to load the div's contents using AJAX.
+//
+// We import small blocks of data from wt_gedcom_chunks, working for
+// a couple of seconds.  When each block is loaded, we set its status
+// flag.
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: import.php 12975 2011-12-03 20:51:48Z greg $
 
 define('WT_SCRIPT_NAME', 'import.php');
 require './includes/session.php';
-
 require_once WT_ROOT.'includes/functions/functions_import.php';
+
+$controller=new WT_Controller_Ajax();
+$controller
+	->requireManagerLogin()
+	->pageHeader();
 
 // Don't use ged=XX as we want to be able to run without changing the current gedcom.
 // This will let us load several gedcoms together, or to edit one while loading another.
 $gedcom_id=safe_GET('gedcom_id');
-
-if (!userGedcomAdmin(WT_USER_ID, $gedcom_id)) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
-
-// AJAX responses require a header
-header('Content-type: text/html; charset=UTF-8');
 
 // Don't allow the user to cancel the request.  We do not want to be left
 // with an incomplete transaction.
@@ -69,11 +63,10 @@ if ($row->import_offset==$row->import_total) {
 	set_gedcom_setting($gedcom_id, 'imported', true);
 	// Finished?  Show the maintenance links, similar to admin_trees_manage.php
 	WT_DB::exec("COMMIT");
-	echo
-		WT_JS_START,
-		'jQuery("#import',  $gedcom_id, '").toggle();',
-		'jQuery("#actions', $gedcom_id, '").toggle();',
-		WT_JS_END;
+	$controller->addInlineJavaScript(
+		'jQuery("#import'. $gedcom_id.'").toggle();'.
+		'jQuery("#actions'.$gedcom_id.'").toggle();'
+	);
 	exit;
 }
 
@@ -81,12 +74,10 @@ if ($row->import_offset==$row->import_total) {
 $percent=100*(($row->import_offset) / $row->import_total);
 $status=WT_I18N::translate('Loading data from GEDCOM: %.1f%%', $percent);
 
-echo
-	'<div id="progressbar', $gedcom_id, '"><div style="position:absolute;">', $status, '</div></div>',
-	WT_JS_START,
-	' jQuery("#progressbar', $gedcom_id, '").progressbar({value: ', round($percent, 1), '});',
-	WT_JS_END;
-flush();
+echo '<div id="progressbar', $gedcom_id, '"><div style="position:absolute;">', $status, '</div></div>';
+$controller->addInlineJavaScript(
+	'jQuery("#progressbar'.$gedcom_id.'").progressbar({value: '.round($percent, 1).'});'
+);
 
 $first_time=($row->import_offset==0);
 // Run for one second.  This keeps the resource requirements low.
@@ -100,7 +91,7 @@ for ($end_time=microtime(true)+1.0; microtime(true)<$end_time; ) {
 	)->execute(array($gedcom_id))->fetchOneRow();
 	// If we are at the start position, do some tidying up
 	if ($first_time) {
-		$keep_media=safe_GET_bool('keep_media');
+		$keep_media=safe_GET_bool('keep_media'.$gedcom_id);
 		// Delete any existing genealogical data
 		empty_database($gedcom_id, $keep_media);
 		set_gedcom_setting($gedcom_id, 'imported', false);
@@ -119,7 +110,7 @@ for ($end_time=microtime(true)+1.0; microtime(true)<$end_time; ) {
 		if (substr($data->chunk_data, 0, 6)!='0 HEAD') {
 			WT_DB::exec("ROLLBACK");
 			echo WT_I18N::translate('Invalid GEDCOM file - no header record found.');
-			echo WT_JS_START, 'jQuery("#actions', $gedcom_id, '").toggle();', WT_JS_END;
+			$controller->addInlineJavaScript('jQuery("#actions'.$gedcom_id.'").toggle();');
 			exit;
 		}
 		// What character set is this?  Need to convert it to UTF8
@@ -150,10 +141,9 @@ for ($end_time=microtime(true)+1.0; microtime(true)<$end_time; ) {
 			)->execute(array($gedcom_id));
 			break;
 		case 'ANSI': // ANSI could be anything.  Most applications seem to treat it as latin1.
-			echo
-				WT_JS_START,
-				'alert("', /* I18N: %1$s and %2$s are the names of character encodings, such as ISO-8859-1 or ASCII */ WT_I18N::translate('This GEDCOM is encoded using %1$s.  Assume this to mean %2$s.', $charset, 'ISO-8859-1'), '");',
-				WT_JS_END;
+			$controller->addInlineJavaScript(
+				'alert("', /* I18N: %1$s and %2$s are the names of character encodings, such as ISO-8859-1 or ASCII */ WT_I18N::translate('This GEDCOM is encoded using %1$s.  Assume this to mean %2$s.', $charset, 'ISO-8859-1'), '");'
+			);
 		case 'WINDOWS':
 		case 'CP1252':
 		case 'ISO8859-1':
@@ -196,7 +186,7 @@ for ($end_time=microtime(true)+1.0; microtime(true)<$end_time; ) {
 		default:
 			WT_DB::exec("ROLLBACK");
 			echo '<span class="error">',  WT_I18N::translate('Error: converting GEDCOM files from %s encoding to UTF-8 encoding not currently supported.', $charset), '</span>';
-			echo WT_JS_START, 'jQuery("#actions', $gedcom_id, '").toggle();', WT_JS_END;
+			$controller->addInlineJavaScript('jQuery("#actions'.$gedcom_id.'").toggle();');
 			exit;
 		}
 		$first_time=false;
@@ -227,17 +217,11 @@ for ($end_time=microtime(true)+1.0; microtime(true)<$end_time; ) {
 			// "SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction"
 			// The documentation says that if you get this error, wait and try again.....
 			sleep(1);
-			echo
-				WT_JS_START,
-				'jQuery("#import', $gedcom_id, '").load("import.php?gedcom_id=', $gedcom_id, '");',
-				WT_JS_END;
+			$controller->addInlineJavaScript('jQuery("#import'.$gedcom_id.'").load("import.php?gedcom_id='.$gedcom_id.'");');
 		} else {
 			// A fatal error.  Nothing we can do?
-			echo
-				'<span class="error">', $ex->getMessage(), '</span>',
-				WT_JS_START,
-				'jQuery("#actions', $gedcom_id, '").toggle();',
-				WT_JS_END;
+			echo '<span class="error">', $ex->getMessage(), '</span>';
+			$controller->addInlineJavaScript('jQuery("#actions'.$gedcom_id.'").toggle();');
 		}
 		exit;
 	}
@@ -246,7 +230,4 @@ for ($end_time=microtime(true)+1.0; microtime(true)<$end_time; ) {
 WT_DB::exec("COMMIT");
 
 // Reload.....
-echo
-	WT_JS_START,
-	'jQuery("#import', $gedcom_id, '").load("import.php?gedcom_id=', $gedcom_id, '");',
-	WT_JS_END;
+$controller->addInlineJavaScript('jQuery("#import'.$gedcom_id.'").load("import.php?gedcom_id='.$gedcom_id.'");');

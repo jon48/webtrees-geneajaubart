@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: Menu.php 11978 2011-07-08 07:17:28Z greg $
+// $Id: Menu.php 12696 2011-11-11 00:56:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -124,7 +124,6 @@ class WT_Menu {
 				$link .= ' target="'.$this->target.'"';
 			}
 			if ($this->link=='#') {
-				$this->link = "javascript:;";
 				if ($this->onclick !== null) {
 					$link .= ' onclick="'.$this->onclick.'"';
 				}
@@ -181,7 +180,6 @@ class WT_Menu {
 		$id = $menucount.rand();
 		$c = count($this->submenus);
 		$output = "<div id=\"menu{$id}\" class=\"{$this->class}\">\n";
-		if ($this->link=="#") $this->link = "javascript:;";
 		$link = "<a href=\"{$this->link}\" onmouseover=\"";
 		if ($c >= 0) {
 			$link .= "show_submenu('menu{$id}_subs', 'menu{$id}', '{$this->flyout}');";

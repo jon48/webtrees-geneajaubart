@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: setup.php 12177 2011-09-10 17:07:52Z greg $
+// $Id: setup.php 12809 2011-11-19 09:01:30Z greg $
 
 define('WT_SCRIPT_NAME', 'setup.php');
 define('WT_DATA_DIR',    'data/');
@@ -65,9 +65,10 @@ header('Content-Type: text/html; charset=UTF-8');
 if (version_compare(PHP_VERSION, '5.2')<0) {
 	// Our translation system requires PHP 5.2, so we cannot translate this message :-(
 	echo
-		'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
-		'<html xmlns="http://www.w3.org/1999/xhtml">',
+		'<!DOCTYPE html>',
+		'<html lang="en" dir="ltr">',
 		'<head>',
+		'<meta charset="UTF-8">',
 		'<title>webtrees setup wizard</title>',
 		'<h1>Sorry, the setup wizard cannot start.</h1>',
 		'<p>This server is running PHP version ', PHP_VERSION, '</p>',
@@ -94,8 +95,8 @@ require 'includes/functions/functions_edit.php';
 define('WT_LOCALE', WT_I18N::init(safe_POST('lang', '[@a-zA-Z_]+')));
 
 echo
-	'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
-	'<html xmlns="http://www.w3.org/1999/xhtml" ', WT_I18N::html_markup(), '>',
+	'<!DOCTYPE html>',
+	'<html ', WT_I18N::html_markup(), '>',
 	'<head>',
 	'<title>webtrees setup wizard</title>',
 	'<style type="text/css">
@@ -458,7 +459,7 @@ if (empty($_POST['wtname']) || empty($_POST['wtuser']) || strlen($_POST['wtpass'
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Email address'), '</td><td>',
 		'<input type="text" name="wtemail" value="', htmlspecialchars($_POST['wtemail']), '"></td><td>',
-		WT_I18N::translate('This will be used to send you password reminders, site notifications and messages from other family members who register on your site.'),
+		WT_I18N::translate('This email address will be used to send you password reminders, site notifications, and messages from other family members who are registered on the site.'),
 		'</td></tr><tr><td>',
 		'</td></tr></table>',
 		'</fieldset>',
@@ -527,10 +528,10 @@ if (empty($_POST['wtname']) || empty($_POST['wtuser']) || strlen($_POST['wtpass'
 		'>', WT_I18N::translate('none'), '</option>',
 		'<option value="tls" ',
 		$_POST['smtpsecure']=='tls' ? 'selected="selected"' : '',
-		'>', /* I18n: Transport Layer Security - a secure communications protocol */ WT_I18N::translate('tls'), '</option>',
+		'>', /* I18N: Transport Layer Security - a secure communications protocol */ WT_I18N::translate('tls'), '</option>',
 		'<option value="ssl" ',
 		$_POST['smtpsecure']=='ssl' ? 'selected="selected"' : '',
-		'>', /* I18n: Secure Sockets Layer - a secure communications protocol*/ WT_I18N::translate('ssl'), '</option>',
+		'>', /* I18N: Secure Sockets Layer - a secure communications protocol*/ WT_I18N::translate('ssl'), '</option>',
 		'</select></td><td>',
 		WT_I18N::translate('Most servers do not use secure connections.'),
 		'</td></tr><tr><td>',
@@ -686,6 +687,8 @@ try {
 		" xref            VARCHAR(20)                                            NULL,".
 		" tag_type        VARCHAR(15)                                            NULL,".
 		" resn            ENUM ('none', 'privacy', 'confidential', 'hidden') NOT NULL,".
+		" comment         VARCHAR(255)                                           NULL,".
+		" updated         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,".
 		" PRIMARY KEY     (default_resn_id),".
 		" UNIQUE  KEY ux1 (gedcom_id, xref, tag_type),".
 		" FOREIGN KEY fk1 (gedcom_id)  REFERENCES `{$TBLPREFIX}gedcom` (gedcom_id)".
@@ -951,6 +954,20 @@ try {
 		" FOREIGN KEY fk1 (gedcom_id) REFERENCES `{$TBLPREFIX}gedcom` (gedcom_id) /* ON DELETE CASCADE */".
 		") COLLATE utf8_unicode_ci ENGINE=InnoDB"
 	);
+	//$dbh->exec(
+	//	"CREATE TABLE IF NOT EXISTS `{$TBLPREFIX}language` (".
+	//	" language_tag       VARCHAR(16)                      NOT NULL,".
+	//	" iso15924_code      CHAR(4)                          NOT NULL,".
+	//	" cldr_code          VARCHAR(16)                      NOT NULL,".
+	//	" launchpad_code     VARCHAR(16)                      NOT NULL,".
+	//	" collation          VARCHAR(16)                      NOT NULL,".
+	//	" language_name      VARCHAR(64)                      NOT NULL,".
+	//	" language_name_base VARCHAR(64)                      NOT NULL,".
+	//	" enabled            ENUM ('yes', 'no') DEFAULT 'yes' NOT NULL,".
+	//	" PRIMARY KEY        (language_tag),".
+	//	" INDEX              (language_name_base, language_name)".
+	//	") COLLATE utf8_unicode_ci ENGINE=InnoDB"
+	//);
 
 	$dbh->prepare(
 		"INSERT IGNORE INTO `{$TBLPREFIX}user` (user_id, user_name, real_name, email, password) VALUES ".
@@ -974,7 +991,7 @@ try {
 
 	$dbh->prepare(
 		"INSERT IGNORE INTO `{$TBLPREFIX}site_setting` (setting_name, setting_value) VALUES ".
-		"('WT_SCHEMA_VERSION',               '12'),".
+		"('WT_SCHEMA_VERSION',               '-1'),".
 		"('INDEX_DIRECTORY',                 'data/'),".
 		"('STORE_MESSAGES',                  '1'),".
 		"('USE_REGISTRATION_MODULE',         '1'),".

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_name.php 11799 2011-06-12 17:00:44Z greg $
+// $Id: functions_name.php 12720 2011-11-13 00:33:47Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -164,7 +164,7 @@ function DMSoundex($name) {
 
 	// Initialize
 	$name_script = utf8_script($name);
-	if ($name_script == 'hebrew' || $name_script == 'arabic') $noVowels = true;
+	if ($name_script == 'Hebr' || $name_script == 'Arab') $noVowels = true;
 	else $noVowels = false;
 	$lastPos = strlen($name) - 1;
 	$currPos = 0;

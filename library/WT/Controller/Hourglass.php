@@ -1,5 +1,5 @@
 <?php
-// Controller for the Hourglass Page
+// Controller for the hourglass chart
 //
 // webtrees: Web based Family History software
 // Copyright (C) 2011 webtrees development team.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Hourglass.php 12463 2011-10-29 21:41:55Z greg $
+// $Id: Hourglass.php 12895 2011-11-24 00:16:45Z rob $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -43,7 +43,7 @@ $nonfacts[] = "";
 $nonfamfacts[] = "UID";
 $nonfamfacts[] = "";
 
-class WT_Controller_Hourglass extends WT_Controller_Base {
+class WT_Controller_Hourglass extends WT_Controller_Chart {
 	var $pid = "";
 
 	var $canedit = false;
@@ -60,26 +60,24 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 	var $ARID;
 	var $arrwidth;
 	var $arrheight;
-	///////////////////////////////////////
 
-	/**
-	 * Initialization function
-	 */
-	function init($rootid='', $show_full=1, $generations=3) {
+	function __construct($rootid='', $show_full=1, $generations=3) {
 		global $USE_RIN, $MAX_ALIVE_AGE, $GEDCOM, $bheight, $bwidth, $bhalfheight, $PEDIGREE_FULL_DETAILS, $MAX_DESCENDANCY_GENERATIONS;
 		global $WT_IMAGES, $TEXT_DIRECTION, $show_full;
 
+		parent::__construct();
+
 		// Extract parameters from from
-		$this->pid        =safe_GET_xref('pid');
+		$this->pid        =safe_GET_xref('rootid');
 		$this->show_full  =safe_GET('show_full',   array('0', '1'), $PEDIGREE_FULL_DETAILS);
 		$this->show_spouse=safe_GET('show_spouse', array('0', '1'), '0');
 		$this->generations=safe_GET_integer('generations', 2, $MAX_DESCENDANCY_GENERATIONS, 3);
 		$this->box_width  =safe_GET_integer('box_width',   50, 300, 100);
+		$box_width           =safe_GET_integer('box_width',            50, 300, 100);
 
 		// This is passed as a global.  A parameter would be better...
 		$show_full=$this->show_full;
 
-		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
 		if (!empty($rootid)) $this->pid = $rootid;
 
 		//-- flip the arrows for RTL languages
@@ -94,14 +92,21 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 			$this->arrwidth = $temp[0];
 			$this->arrheight= $temp[1];
 		}
+		
+		// -- size of the detailed boxes based upon optional width parameter
+		$Dbwidth=($box_width*$bwidth)/100;
+		$Dbheight=($box_width*$bheight)/100;
+		$bwidth=$Dbwidth;
+		$bheight=$Dbheight;
+		
+		// -- adjust size of the non-detailed boxes
+		if (!$this->show_full) {
+			$bwidth = $bwidth / 1.5;
+			$bheight = $bheight / 2 ;
+		}
 
-		// -- Sets the sizes of the boxes
-		if (!$this->show_full) $bwidth *= $this->box_width / 150;
-		else $bwidth*=$this->box_width/100;
-
-		if (!$this->show_full) $bheight = (int)($bheight / 2);
 		$bhalfheight = (int)($bheight / 2);
-
+		
 		// Validate parameters
 		$this->pid=check_rootid($this->pid);
 
@@ -111,6 +116,8 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 		//Checks how many generations of descendency is for the person for formatting purposes
 		$this->dgenerations = $this->max_descendency_generations($this->pid, 0);
 		if ($this->dgenerations<1) $this->dgenerations=1;
+
+		$this->setPageTitle(/* I18N: %s is a person's name */ WT_I18N::translate('Hourglass chart of %s', $this->name));
 	}
 
 	/**
@@ -132,8 +139,8 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 			echo "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"empty-cells: show;\">";
 			$height="100%";
 			echo "<tr>";
-			echo "<td valign=\"bottom\"><img name=\"pvline\" src=\"".$WT_IMAGES["vline"]."\" width=\"3\" height=\"$lh\" alt=\"\" /></td>";
-			echo "<td><img src=\"".$WT_IMAGES["hline"]."\" width=\"7\" height=\"3\" alt=\"\" /></td>";
+			echo "<td valign=\"bottom\"><img class=\"line3\" name=\"pvline\" src=\"".$WT_IMAGES["vline"]."\" width=\"3\" height=\"$lh\" alt=\"\" /></td>";
+			echo "<td><img class=\"line4\" src=\"".$WT_IMAGES["hline"]."\" width=\"7\" height=\"3\" alt=\"\" /></td>";
 			echo "<td>";
 			//-- print the father box
 			print_pedigree_person($family->getHusband());
@@ -144,7 +151,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 
 				//-- print an Ajax arrow on the last generation of the adult male
 				if ($count==$this->generations-1 && $family->getHusband()->getChildFamilies()) {
-					echo "<a href=\"#\" onclick=\"return ChangeDiv('td_".$ARID."','".$ARID."','".$this->show_full."','".$this->show_spouse."','".$this->box_width."')\"><img src=\"".$WT_IMAGES["rarrow"]."\" border=\"0\" alt=\"\" /></a> ";
+					echo "<a href=\"#\" onclick=\"return ChangeDiv('td_".$ARID."','".$ARID."','".$this->show_full."','".$this->show_spouse."','".$this->box_width."')\"><img src=\"".$WT_IMAGES["rarrow"]."\" alt=\"\"></a> ";
 				}
 				//-- recursively get the father's family
 				$this->print_person_pedigree($family->getHusband(), $count+1);
@@ -163,7 +170,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 
 				//-- print an ajax arrow on the last generation of the adult female
 				if ($count==$this->generations-1 && $family->getWife()->getChildFamilies()) {
-					echo "<a href=\"#\" onclick=\"ChangeDiv('td_".$ARID."','".$ARID."','".$this->show_full."','".$this->show_spouse."','".$this->box_width."'); return false;\"><img src=\"".$WT_IMAGES["rarrow"]."\" border=\"0\" alt=\"\" /></a> ";
+					echo "<a href=\"#\" onclick=\"ChangeDiv('td_".$ARID."','".$ARID."','".$this->show_full."','".$this->show_spouse."','".$this->box_width."'); return false;\"><img src=\"".$WT_IMAGES["rarrow"]."\" alt=\"\"></a> ";
 				}
 	
 				//-- recursively print the mother's family
@@ -229,7 +236,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 					$person2 = $children[$i];
 					$chil = $person2->getXref();
 					echo "<tr>";
-					echo "<td id=\"td_$chil\" class=\"$TEXT_DIRECTION\" align=\"$tablealign\">";
+					echo "<td id=\"td_$chil\" class=\"$TEXT_DIRECTION\" align=\"$otablealign\">";
 					$kids = $this->print_descendency($person2, $count+1);
 					$numkids += $kids;
 					echo "</td>";
@@ -241,7 +248,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 						if ($i==0) {
 							//-- adjust for the number of kids
 							$h = ($bhalfheight+3)*$numkids;
-							echo "<td valign=\"bottom\"><img name=\"tvertline\" id=\"vline_$chil\" src=\"".$WT_IMAGES["vline"]."\" width=\"3\" height=\"$h\" alt=\"\" /></td>";
+							echo "<td valign=\"bottom\"><img class=\"line1\" name=\"tvertline\" id=\"vline_$chil\" src=\"".$WT_IMAGES["vline"]."\" width=\"3\" height=\"$h\" alt=\"\" /></td>";
 						} else if ($i==$ct-1) {
 							$h = ($bhalfheight+3)*$kids;
 							if ($count<$this->dgenerations-1) {
@@ -296,7 +303,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 
 		echo "<table id=\"table2_$pid\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td>";
 		print_pedigree_person($person);
-		echo "</td><td><img src=\"".$WT_IMAGES["hline"]."\" width=\"7\" height=\"3\" alt=\"\" />";
+		echo "</td><td><img class=\"line2\" src=\"".$WT_IMAGES["hline"]."\" width=\"7\" height=\"3\" alt=\"\" />";
 
 		//----- Print the spouse
 		if ($this->show_spouse) {
@@ -340,7 +347,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 				if ($num>0) {
 					echo "<div class=\"center\" id=\"childarrow\" dir=\"".$TEXT_DIRECTION."\"";
 					echo " style=\"position:absolute; width:".$bwidth."px; \">";
-					echo "<a href=\"javascript: ".WT_I18N::translate('Show')."\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow',3);\" onmouseout=\"swap_image('larrow',3);\">";
+					echo "<a href=\"#\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow',3);\" onmouseout=\"swap_image('larrow',3);\">";
 					echo "<img id=\"larrow\" src=\"".$WT_IMAGES["darrow"]."\" border=\"0\" alt=\"\" />";
 					echo "</a><br />";
 					echo "<div id=\"childbox\" dir=\"".$TEXT_DIRECTION."\" style=\"width:".$bwidth."px; height:".$bheight."px; visibility: hidden;\">";
@@ -350,7 +357,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 						$spouse = $family->getSpouse($person);
 						if (!empty($spouse)) {
 							$spid = $spouse->getXref();
-							echo "<a href=\"hourglass.php?pid={$spid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\"><span ";
+							echo "<a href=\"hourglass.php?rootid={$spid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\"><span ";
 							$name = $spouse->getFullName();
 							if (hasRTLText($name)) echo 'class="name2">';
 							else echo 'class="name1">';
@@ -362,7 +369,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 						$children = $family->getChildren();
 						foreach ($children as $id=>$child) {
 							$cid = $child->getXref();
-							echo "&nbsp;&nbsp;<a href=\"hourglass.php?pid={$cid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\"><span ";
+							echo "&nbsp;&nbsp;<a href=\"hourglass.php?rootid={$cid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\"><span ";
 							$name = $child->getFullName();
 							if (hasRTLText($name)) echo 'class="name2">';
 							else echo 'class="name1">';
@@ -380,7 +387,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 							$husb = $family->getHusband();
 							if (!empty($husb)) {
 								$spid = $husb->getXref();
-								echo "&nbsp;&nbsp;<a href=\"hourglass.php?pid={$spid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\"><span ";
+								echo "&nbsp;&nbsp;<a href=\"hourglass.php?rootid={$spid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\"><span ";
 								$name = $husb->getFullName();
 								$name = rtrim($name);
 								if (hasRTLText($name)) echo 'class="name2">';
@@ -391,7 +398,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 							$husb = $family->getWife();
 							if (!empty($husb)) {
 								$spid = $husb->getXref();
-								echo "&nbsp;&nbsp;<a href=\"hourglass.php?pid={$spid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\"><span ";
+								echo "&nbsp;&nbsp;<a href=\"hourglass.php?rootid={$spid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\"><span ";
 								$name = $husb->getFullName();
 								$name = rtrim($name);
 								if (hasRTLText($name)) echo 'class="name2">';
@@ -407,7 +414,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 						foreach ($children as $id=>$child) {
 							$cid = $child->getXref();
 							if ($cid!=$pid) {
-								echo "&nbsp;&nbsp;<a href=\"hourglass.php?pid={$cid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\"><span ";
+								echo "&nbsp;&nbsp;<a href=\"hourglass.php?rootid={$cid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\"><span ";
 								$name = $child->getFullName();
 								$name = rtrim($name);
 								if (hasRTLText($name)) echo 'class="name2">';
@@ -461,8 +468,32 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 	function setupJavascript() {
 		global $bhalfheight;
 ?>
+
 <script type="text/javascript">
-<!--
+		// code to fix chart lines in block
+		var vlines;
+		vlines = document.getElementsByName("tvertline");
+		for (i=0; i < vlines.length; i++) {
+			var pid = vlines[i].id.substr(vlines[i].id.indexOf("_")+1);
+			var hline = document.getElementById("table_"+pid);
+			var hline2 = document.getElementById("table2_"+pid);
+			var newHeight = Math.abs(hline.offsetHeight - (hline2.offsetTop + <?php echo $bhalfheight+9; ?>));
+			vlines[i].style.height=newHeight+'px';
+		}
+
+		vlines = document.getElementsByName("bvertline");
+		for (i=0; i < vlines.length; i++) {
+			var pid = vlines[i].id.substr(vlines[i].id.indexOf("_")+1);
+			var hline = document.getElementById("table_"+pid);
+			var hline2 = document.getElementById("table2_"+pid);
+			vlines[i].style.height=(hline.offsetTop+hline2.offsetTop + <?php echo $bhalfheight+9; ?>)+'px';
+		}
+
+		vlines = document.getElementsByName("pvline");
+		for (i=0; i < vlines.length; i++) {
+			vlines[i].style.height=(vlines[i].parentNode.offsetHeight/2)+'px';
+		}
+
 	var pastefield;
 	function paste_id(value) {
 		pastefield.value=value;
@@ -472,7 +503,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 	function ChangeDiv(div_id, ARID, full, spouse, width) {
 		var divelement = document.getElementById(div_id);
 		var oXmlHttp = createXMLHttp();
-		oXmlHttp.open("get", "hourglass_ajax.php?show_full="+full+"&pid="+ ARID + "&generations=1&box_width="+width+"&show_spouse="+spouse, true);
+		oXmlHttp.open("get", "hourglass_ajax.php?show_full="+full+"&rootid="+ ARID + "&generations=1&box_width="+width+"&show_spouse="+spouse, true);
 		oXmlHttp.onreadystatechange=function()
 		{
 			if (oXmlHttp.readyState==4)
@@ -489,7 +520,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 	function ChangeDis(div_id, ARID, full, spouse, width) {
 		var divelement = document.getElementById(div_id);
 		var oXmlHttp = createXMLHttp();
-		oXmlHttp.open("get", "hourglass_ajax.php?type=desc&show_full="+full+"&pid="+ ARID + "&generations=1&box_width="+width+"&show_spouse="+spouse, true);
+		oXmlHttp.open("get", "hourglass_ajax.php?type=desc&show_full="+full+"&rootid="+ ARID + "&generations=1&box_width="+width+"&show_spouse="+spouse, true);
 		oXmlHttp.onreadystatechange=function()
 		{
 			if (oXmlHttp.readyState==4)
@@ -509,7 +540,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 			var pid = vlines[i].id.substr(vlines[i].id.indexOf("_")+1);
 			var hline = document.getElementById("table_"+pid);
 			var hline2 = document.getElementById("table2_"+pid);
-			var newHeight = Math.abs(hline.offsetHeight - (hline2.offsetTop + <?php echo $bhalfheight+2; ?>));
+			var newHeight = Math.abs(hline.offsetHeight - (hline2.offsetTop + <?php echo $bhalfheight+9; ?>));
 			vlines[i].style.height=newHeight+'px';
 		}
 
@@ -518,7 +549,7 @@ class WT_Controller_Hourglass extends WT_Controller_Base {
 			var pid = vlines[i].id.substr(vlines[i].id.indexOf("_")+1);
 			var hline = document.getElementById("table_"+pid);
 			var hline2 = document.getElementById("table2_"+pid);
-			vlines[i].style.height=(hline.offsetTop+hline2.offsetTop + <?php echo $bhalfheight+2; ?>)+'px';
+			vlines[i].style.height=(hline.offsetTop+hline2.offsetTop + <?php echo $bhalfheight+9; ?>)+'px';
 		}
 
 		vlines = document.getElementsByName("pvline");

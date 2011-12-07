@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 12291 2011-10-11 10:25:30Z greg $
+// $Id: header.php 12962 2011-12-02 02:47:13Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -26,10 +26,10 @@ if (!defined('WT_WEBTREES')) {
 }
 
 echo
-	'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
-	'<html xmlns="http://www.w3.org/1999/xhtml" ', WT_I18N::html_markup(), '>',
+	'<!DOCTYPE html>',
+	'<html ', WT_I18N::html_markup(), '>',
 	'<head>',
-	'<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />',
+	'<meta charset="UTF-8">',
 	'<title>', htmlspecialchars($title), '</title>',
 	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png" />',
 	'<link rel="stylesheet" href="', WT_THEME_URL, 'jquery/jquery-ui_theme.css" type="text/css" />',
@@ -61,7 +61,7 @@ echo
 		}
 	echo '</span>';
 	if (WT_USER_CAN_ACCEPT && exists_pending_change()) {
-	echo ' | <li><a href="javascript:;" onclick="window.open(\'edit_changes.php\',\'_blank\',\'width=600,height=500,resizable=1,scrollbars=1\'); return false;" style="color:red;">', WT_I18N::translate('Pending changes'), '</a></li>';
+	echo ' | <li><a href="#" onclick="window.open(\'edit_changes.php\',\'_blank\',\'width=600,height=500,resizable=1,scrollbars=1\'); return false;" style="color:red;">', WT_I18N::translate('Pending changes'), '</a></li>';
 	}
 	echo '</div>',
 	'<div id="info">',
@@ -81,29 +81,27 @@ echo
 if (WT_USER_IS_ADMIN) {
 	echo
 		'<li><ul>',
-		'<li><a ', (WT_SCRIPT_NAME=="admin_site_config.php" ? 'class="current" ' : ''), 'href="admin_site_config.php">',
-		WT_I18N::translate('Site configuration'),
-		'</a></li>',
-		'<li><a ', (WT_SCRIPT_NAME=="admin_site_logs.php" ? 'class="current" ' : ''), 'href="admin_site_logs.php">',
-		WT_I18N::translate('Logs'),
-		'</a></li>',
+		'<li><a ', (WT_SCRIPT_NAME=="admin_site_config.php" ? 'class="current" ' : ''), 'href="admin_site_config.php">',WT_I18N::translate('Site configuration'),'</a></li>',
+		'<li><a ', (WT_SCRIPT_NAME=="admin_site_logs.php" ? 'class="current" ' : ''), 'href="admin_site_logs.php">',WT_I18N::translate('Logs'),'</a></li>',
 		'<li><a ', (WT_SCRIPT_NAME=="admin_site_readme.php" ? 'class="current" ' : ''), 'href="admin_site_readme.php">', WT_I18N::translate('README documentation'), '</a></li>',
-		'<li><a ', (WT_SCRIPT_NAME=="admin_site_info.php" ? 'class="current" ' : ''), 'href="admin_site_info.php?action=phpinfo">', WT_I18N::translate('PHP information'), '</a></li>',
+		'<li><a ', (WT_SCRIPT_NAME=="admin_site_info.php" ? 'class="current" ' : ''), 'href="admin_site_info.php">', WT_I18N::translate('PHP information'), '</a></li>',
 		'<li><a ', (WT_SCRIPT_NAME=="admin_site_ipaddress.php" ? 'class="current" ' : ''), 'href="admin_site_ipaddress.php">', WT_I18N::translate('Manage sites'), '</a></li>',
 		'<li><a ', (WT_SCRIPT_NAME=="admin_site_clean.php" ? 'class="current" ' : ''), 'href="admin_site_clean.php">', WT_I18N::translate('Cleanup data directory'), '</a></li>',
-		'<li><a ', (WT_SCRIPT_NAME=="admin_mysqldumper.php" ? 'class="current" ' : ''), 'href="admin_mysqldumper.php">',
-		'<li><a ', (WT_SCRIPT_NAME=="admin_trees_manage.php" ? 'class="current" ' : ''), 'href="admin_trees_manage.php">',
+		'</ul></li></ul>',
+		'<ul><li><a ', (WT_SCRIPT_NAME=="admin_trees_manage.php" ? 'class="current" ' : ''), 'href="admin_trees_manage.php">',
 		WT_I18N::translate('Family trees'),
 		'</a></li>';
-} else {
-	echo '<li>', WT_I18N::translate('Family trees'), '</li>';
+	} else {
+	echo '<ul><li>', WT_I18N::translate('Family trees'), '</li>';
 }
 echo '<li><ul>';
 //-- gedcom list
 foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
 	if (userGedcomAdmin(WT_USER_ID, $ged_id)) {
 		echo
-			'<li><span><a ', (WT_SCRIPT_NAME=="admin_trees_config.php" && WT_GED_ID==$ged_id ? 'class="current" ' : ''), 'href="admin_trees_config.php?ged='.rawurlencode($gedcom).'">',
+			'<li><span><a ', (WT_SCRIPT_NAME=="admin_trees_config.php" && WT_GED_ID==$ged_id ? 'class="current" ' : ''), 'href="admin_trees_config.php?ged='.rawurlencode($gedcom).'" title="',
+			WT_I18N::translate('%s', htmlspecialchars(get_gedcom_setting($ged_id, 'title'))),
+			'">',
 			WT_I18N::translate('%s', htmlspecialchars(get_gedcom_setting($ged_id, 'title'))),
 			'</a></span></li>';
 	}
@@ -111,10 +109,10 @@ foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
 echo
 	'<li><a ', (WT_SCRIPT_NAME=="admin_site_merge.php" ? 'class="current" ' : ''), 'href="admin_site_merge.php">', WT_I18N::translate('Merge records'), '</a></li>',
 	'<li><a ', (WT_SCRIPT_NAME=="admin_site_other.php" ? 'class="current" ' : ''), 'href="admin_site_other.php">', WT_I18N::translate('Add unlinked records'), '</a></li>',
-	'</ul></li>';
+	'</ul></li></ul>';
 if (WT_USER_IS_ADMIN) {
 	echo
-		'<li><a ', (WT_SCRIPT_NAME=="admin_users.php" && safe_GET('action')!="cleanup"&& safe_GET('action')!="createform" ? 'class="current" ' : ''), 'href="admin_users.php">',
+		'<ul><li><a ', (WT_SCRIPT_NAME=="admin_users.php" && safe_GET('action')!="cleanup"&& safe_GET('action')!="createform" ? 'class="current" ' : ''), 'href="admin_users.php">',
 		WT_I18N::translate('Users'),
 		'</a></li>',
 		'<li><ul>',
@@ -124,16 +122,16 @@ if (WT_USER_IS_ADMIN) {
 		'<li><a ', (WT_SCRIPT_NAME=="admin_users.php" && safe_GET('action')=="cleanup" ? 'class="current" ' : ''), 'href="admin_users.php?action=cleanup">',
 		WT_I18N::translate('Delete inactive users'),
 		'</a></li>',
-		'</ul></li>',
-		'<li><a ', (WT_SCRIPT_NAME=="admin_media.php" ? 'class="current" ' : ''), 'href="admin_media.php">',
+		'</ul></li></ul>',
+		'<ul><li><a ', (WT_SCRIPT_NAME=="admin_media.php" ? 'class="current" ' : ''), 'href="admin_media.php">',
 		WT_I18N::translate('Media'),
 		'</a></li>',
 		'<li><ul>',
 		'<li><a ', (WT_SCRIPT_NAME=="admin_media_upload.php" ? 'class="current" ' : ''), 'href="admin_media_upload.php">',
 		WT_I18N::translate('Upload media files'),
 		'</a></li>',
-		'</ul></li>',
-		'<li><a ', (WT_SCRIPT_NAME=="admin_modules.php" ? 'class="current" ' : ''), 'href="admin_modules.php">',
+		'</ul></li></ul>',
+		'<ul><li><a ', (WT_SCRIPT_NAME=="admin_modules.php" ? 'class="current" ' : ''), 'href="admin_modules.php">',
 		WT_I18N::translate('Modules'),
 		'</a></li>',
 		'<li><ul>',
@@ -152,15 +150,17 @@ if (WT_USER_IS_ADMIN) {
 		'<li><a ', (WT_SCRIPT_NAME=="admin_module_reports.php" ? 'class="current" ' : ''), 'href="admin_module_reports.php">',
 		WT_I18N::translate('Reports'),
 		'</a></li>',
-		'</ul></li>';
+		'</ul></li></ul>';
+	echo '<ul>';
 	foreach (WT_Module::getActiveModules(true) as $module) {
 		if ($module instanceof WT_Module_Config) {
 			echo '<li><span><a ', (WT_SCRIPT_NAME=="module.php" && safe_GET('mod')==$module->getName() ? 'class="current" ' : ''), 'href="', $module->getConfigLink(), '">', $module->getTitle(), '</a></span></li>';
 		}
 	}
+		echo '</ul>';
+
 }
 echo
-	'</ul>',
 	'</div>',
 	// Content -->
 	'<div id="admin_content" class="ui-widget-content">';

@@ -23,11 +23,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: inverselink.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: inverselink.php 12812 2011-11-19 13:02:05Z greg $
 
 define('WT_SCRIPT_NAME', 'inverselink.php');
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
+
+$controller=new WT_Controller_Simple();
+$controller->setPageTitle(WT_I18N::translate('Link media'));
+$controller->pageHeader();
 
 //-- page parameters and checking
 $linktoid = safe_GET_xref('linktoid');
@@ -40,31 +44,6 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && array_key_exists('GEDFact_assistant
 	require WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_MEDIA/media_0_inverselink.php';
 } else {
 
-	if (empty($linktoid) || empty($linkto)) {
-		$paramok = false;
-		$toitems = "";
-	} else {
-		switch ($linkto) {
-		case 'person':
-			$toitems = WT_I18N::translate('To Person');
-			break;
-		case 'family':
-			$toitems = WT_I18N::translate('To Family');
-			break;
-		case 'source':
-			$toitems = WT_I18N::translate('To Source');
-			break;
-		case 'repository':
-			$toitems = WT_I18N::translate('To Repository');
-			break;
-		case 'note':
-			$toitems = WT_I18N::translate('To Shared Note');
-			break;
-		}
-	}
-
-	print_simple_header(WT_I18N::translate('Link media')." ".$toitems);
-
 	if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
 	//-- check for admin
@@ -76,9 +55,6 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && array_key_exists('GEDFact_assistant
 		<script type="text/javascript">
 		<!--
 		var pastefield;
-		var language_filter, magnify;
-		language_filter = "";
-		magnify = "";
 
 		function openerpasteid(id) {
 			window.opener.paste_id(id);
@@ -89,10 +65,8 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && array_key_exists('GEDFact_assistant
 			pastefield.value = value;
 		}
 
-		function paste_char(value, lang, mag) {
+		function paste_char(value) {
 			pastefield.value += value;
-			language_filter = lang;
-			magnify = mag;
 		}
 		//-->
 		</script>
@@ -109,9 +83,9 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && array_key_exists('GEDFact_assistant
 		}
 		echo '<input type="hidden" name="linkto" value="', $linkto, '" />';
 		echo '<input type="hidden" name="ged" value="', $GEDCOM, '" />';
-		echo '<table class="facts_table center ', $TEXT_DIRECTION, '">';
+		echo '<table class="facts_table center">';
 		echo '<tr><td class="topbottombar" colspan="2">';
-		echo WT_I18N::translate('Link media'), help_link('add_media_linkid'), ' ', $toitems;
+		echo WT_I18N::translate('Link media'), help_link('add_media_linkid');
 		echo '</td></tr><tr><td class="descriptionbox width20 wrap">', WT_I18N::translate('Media'), '</td>';
 		echo '<td class="optionbox wrap">';
 		if (!empty($mediaid)) {
@@ -195,15 +169,12 @@ if (WT_USER_IS_ADMIN && $linkto=='manage' && array_key_exists('GEDFact_assistant
 		echo '<tr><td class="topbottombar" colspan="2"><input type="submit" value="', WT_I18N::translate('Set link'), '" /></td></tr>';
 		echo '</table>';
 		echo '</form>';
-		echo '<br/><br/><center><a href="javascript:;" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a><br /></center>';
-		print_simple_footer();
+		echo '<br/><br/><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a><br /></center>';
 	} elseif ($action == "update" && $paramok) {
 		linkMedia($mediaid, $linktoid);
-		echo '<br/><br/><center><a href="javascript:;" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a><br /></center>';
-		print_simple_footer();
+		echo '<br/><br/><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a><br /></center>';
 	} else {
 		echo '<center>nothing to do<center>';
-		echo '<br/><br/><center><a href="javascript:;" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a><br /></center>';
-		print_simple_footer();
+		echo '<br/><br/><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a><br /></center>';
 	}
 }

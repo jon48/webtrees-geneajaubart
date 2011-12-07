@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: session.php 12457 2011-10-29 13:16:29Z greg $
+// $Id: session.php 12990 2011-12-05 08:44:34Z greg $
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
 if (!defined('WT_SCRIPT_NAME')) {
@@ -31,7 +31,7 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.2.4');
+define('WT_VERSION',         '1.2.5');
 define('WT_VERSION_RELEASE', ''); // 'svn', 'beta', 'rc1', '', etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
 
@@ -57,12 +57,10 @@ if (WT_USE_GOOGLE_API) {
 	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js');
 	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js');
 	define('WT_PROTOTYPE_URL',     'https://ajax.googleapis.com/ajax/libs/prototype/1.7.0.0/prototype.js');
-	define('WT_SCRIPTACULOUS_URL', 'https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/');
 } else {
 	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery/jquery.min.js');
 	define('WT_JQUERYUI_URL',      WT_STATIC_URL.'js/jquery/jquery-ui.min.js');
 	define('WT_PROTOTYPE_URL',     WT_STATIC_URL.'js/prototype/prototype.js');
-	define('WT_SCRIPTACULOUS_URL', WT_STATIC_URL.'js/scriptaculous/');
 }
 
 // Location of our modules and themes.  These are used as URLs and directory paths.
@@ -406,6 +404,8 @@ define('WT_USER_ID', getUserId());
 
 // With no parameters, init() looks to the environment to choose a language
 define('WT_LOCALE', WT_I18N::init());
+// Non-latin languages may need non-latin digits
+define('WT_NUMBERING_SYSTEM', Zend_Locale_Data::getContent(WT_LOCALE, 'defaultnumberingsystem'));
 
 // Application configuration data - things that aren't (yet?) user-editable
 require WT_ROOT.'includes/config_data.php';
@@ -427,7 +427,8 @@ define('WT_USER_ROOT_ID',      getUserRootId     (WT_USER_ID, WT_GED_ID));
 define('WT_USER_PATH_LENGTH',  get_user_gedcom_setting(WT_USER_ID, WT_GED_ID, 'RELATIONSHIP_PATH_LENGTH'));
 
 // If we are logged in, and logout=1 has been added to the URL, log out
-if (WT_USER_ID && safe_GET_bool('logout')) {
+// If we were logged in, but our account has been deleted, log out.
+if (WT_USER_ID && (safe_GET_bool('logout') || !WT_USER_NAME)) {
 	userLogout(WT_USER_ID);
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
 	exit;
@@ -435,12 +436,12 @@ if (WT_USER_ID && safe_GET_bool('logout')) {
 
 // Do we show context help on the page?
 if (isset($_GET['show_context_help'])) {
-	$_SESSION['show_context_help']=safe_GET_bool('show_context_help');
+	$WT_SESSION->show_context_help=safe_GET_bool('show_context_help');
 	unset($_GET['show_context_help']);
 } elseif ($SEARCH_SPIDER) {
-	$_SESSION['show_context_help']=false;
-} elseif (!isset($_SESSION['show_context_help'])) {
-	$_SESSION['show_context_help']=get_gedcom_setting(WT_GED_ID, 'SHOW_CONTEXT_HELP', true);
+	$WT_SESSION->show_context_help=false;
+} elseif (!isset($WT_SESSION->show_context_help)) {
+	$WT_SESSION->show_context_help=get_gedcom_setting(WT_GED_ID, 'SHOW_CONTEXT_HELP', true);
 }
 
 if (!isset($_SESSION['wt_user'])) $_SESSION['wt_user'] = '';
@@ -460,12 +461,6 @@ if (WT_SCRIPT_NAME!='help_text.php') {
 		header('Location: '.get_site_setting('LOGIN_URL').'?url='.rawurlencode($url));
 		exit;
 	}
-
-	// -- setup session information for tree clippings cart features
-	if ((!isset($_SESSION['cart'])) || (!empty($_SESSION['last_spider_name']))) { // reset cart everytime for spiders
-		$_SESSION['cart'] = array();
-	}
-	$cart = $_SESSION['cart'];
 
 	if (!isset($_SESSION['timediff'])) {
 		$_SESSION['timediff'] = 0;
@@ -490,8 +485,8 @@ if (substr(WT_SCRIPT_NAME, 0, 5)=='admin' || WT_SCRIPT_NAME=='module.php' && sub
 		$THEME_DIR=safe_GET('theme', get_theme_names());
 		unset($_GET['theme']);
 		// Last theme used?
-		if (!$THEME_DIR && isset($_SESSION['theme_dir']) && in_array($_SESSION['theme_dir'], get_theme_names())) {
-			$THEME_DIR=$_SESSION['theme_dir'];
+		if (!$THEME_DIR && in_array($WT_SESSION->theme_dir, get_theme_names())) {
+			$THEME_DIR=$WT_SESSION->theme_dir;
 		}
 	} else {
 		$THEME_DIR='';
@@ -516,7 +511,7 @@ if (substr(WT_SCRIPT_NAME, 0, 5)=='admin' || WT_SCRIPT_NAME=='module.php' && sub
 	define('WT_THEME_DIR', WT_THEMES_DIR.$THEME_DIR.'/');
 	// Remember this setting
 	if (WT_THEME_DIR!=WT_THEMES_DIR.'_administration/') {
-		$_SESSION['theme_dir']=$THEME_DIR;
+		$WT_SESSION->theme_dir=$THEME_DIR;
 	}
 }
 // If we have specified a CDN, use it for static theme resources
@@ -549,8 +544,9 @@ if ($SEARCH_SPIDER && !in_array(WT_SCRIPT_NAME , array(
 	'individual.php', 'family.php', 'mediaviewer.php', 'note.php', 'repo.php', 'source.php',
 ))) {
 	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
-	print_header(WT_I18N::translate('Search engine'));
+	$controller=new WT_Controller_Base();
+	$controller->setPageTitle(WT_I18N::translate('Search engine'));
+	$controller->pageHeader();
 	echo '<p class="ui-state-error">', WT_I18N::translate('You do not have permission to view this page.'), '</p>';
-	print_footer();
 	exit;
 }

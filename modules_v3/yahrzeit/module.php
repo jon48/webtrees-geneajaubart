@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
+// $Id: module.php 12987 2011-12-05 07:58:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,19 +31,17 @@ if (!defined('WT_WEBTREES')) {
 class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 	// Extend class WT_Module
 	public function getTitle() {
-		return /* I18N: Name of a module.  Yahrzeiten (the plural of Yahrzeit) are special anniversaries of deaths in the Hebrew faith. */ WT_I18N::translate('Yahrzeiten');
+		return /* I18N: Name of a module.  Yahrzeiten (the plural of Yahrzeit) are special anniversaries of deaths in the Hebrew faith/calendar. */ WT_I18N::translate('Yahrzeiten');
 	}
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Yahrzeiten" module */ WT_I18N::translate('A list of the Hebrew death anniversaries that will occur in the near future.');
+		return /* I18N: Description of the "Yahrzeiten" module.  A "Hebrew death" is a death where the date is recorded in the Hebrew calendar. */ WT_I18N::translate('A list of the Hebrew death anniversaries that will occur in the near future.');
 	}
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $ctype, $TEXT_DIRECTION, $WT_IMAGES, $SHOW_MARRIED_NAMES;
-
-		require_once WT_ROOT.'includes/functions/functions_print_lists.php'; // for get_align()
+		global $ctype, $WT_IMAGES, $controller;
 
 		$days=get_block_setting($block_id, 'days', 7);
 		$infoStyle=get_block_setting($block_id, 'infoStyle', 'table');
@@ -62,7 +60,7 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
 		if ($ctype=='gedcom' && WT_USER_GEDCOM_ADMIN || $ctype=='user' && WT_USER_ID) {
-			$title="<a href=\"javascript: configure block\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\"><img class=\"adminicon\" src=\"".$WT_IMAGES["admin"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".WT_I18N::translate('Configure')."\" /></a>";
+			$title="<a href=\"#\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\"><img class=\"adminicon\" src=\"".$WT_IMAGES["admin"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".WT_I18N::translate('Configure')."\" /></a>";
 		} else {
 			$title='';
 		}
@@ -122,38 +120,41 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 		case 'table':
 		default:
 			$table_id = "ID".floor(microtime()*1000000); // table requires a unique ID
-			?>
-			<script type="text/javascript" src="<?php echo WT_STATIC_URL; ?>js/jquery/jquery.dataTables.min.js"></script>
-			<script type="text/javascript">
-				jQuery(document).ready(function(){
-					jQuery('#<?php echo $table_id; ?>').dataTable( {
-						"sDom": '<"F"li>',
+			$controller
+				->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+				->addInlineJavaScript('
+					jQuery("#'.$table_id.'").dataTable({
+						"sDom": \'t\',
 						"bAutoWidth":false,
 						"bPaginate": false,
 						"bLengthChange": false,
 						"bFilter": false,
-						"bInfo": false,
-						"bJQueryUI": false,
-						"aaSorting": [[5,'asc']],
+						"bInfo": true,
+						"bJQueryUI": true,
+						"aaSorting": [[5,"asc"]],
 						"aoColumns": [
-							/* 0-NAME */ null,
-							/* 1-DATE */ { "iDataSort": 2 },
-							/* 2-DATE */ { "bVisible": false },
-							/* 3-Aniv */ null,
-							/* 4-YART */ { "iDataSort": 5 },
-							/* 5-YART */ { "bVisible": false }
+							/* 0-name */ { "iDataSort": 1 },
+							/* 1-NAME */ { "bVisible": false },
+							/* 2-date */ { "iDataSort": 3 },
+							/* 3-DATE */ { "bVisible": false },
+							/* 4-Aniv */ { "sClass": "center"},
+							/* 5-yart */ { "iDataSort": 6 },
+							/* 6-YART */ { "bVisible": false }
 						]
-					});		
-				});
-			</script>
-			<?php
-			$content .= '<table id="'.$table_id.'" class="list_table center width100">';
-			$content .= '<thead style="cursor:pointer;"><tr>';
-			$content .= '<th class="list_label">'.WT_Gedcom_Tag::getLabel('NAME').'</th>';
-			$content .= '<th class="list_label">'.WT_Gedcom_Tag::getLabel('DEAT').'</th>';
+					});
+					jQuery("#'.$table_id.'").css("visibility", "visible");
+					jQuery(".loading-image").css("display", "none");
+				');
+			$content='';
+			$content .= '<div class="loading-image">&nbsp;</div>';
+			$content .= '<table id="'.$table_id.'" class="width100" style="visibility:hidden;">';
+			$content .= '<thead><tr>';
+			$content .= '<th>'.WT_Gedcom_Tag::getLabel('NAME').'</th>';
+			$content .= '<th>'.WT_Gedcom_Tag::getLabel('NAME').'</th>';
+			$content .= '<th>'.WT_Gedcom_Tag::getLabel('DEAT').'</th>';
 			$content .= '<th>DEAT</th>';
-			$content .= '<th class="list_label"><img src="'.$WT_IMAGES['reminder'].'" alt="'.WT_I18N::translate('Anniversary').'" title="'.WT_I18N::translate('Anniversary').'" border="0" /></th>';
-			$content .= '<th class="list_label">'.WT_Gedcom_Tag::getLabel('_YART').'</th>';
+			$content .= '<th><img src="'.$WT_IMAGES['reminder'].'" alt="'.WT_I18N::translate('Anniversary').'" title="'.WT_I18N::translate('Anniversary').'"></th>';
+			$content .= '<th>'.WT_Gedcom_Tag::getLabel('_YART').'</th>';
 			$content .= '<th>_YART</th>';
 			$content .= '</tr></thead><tbody>';
 
@@ -164,17 +165,19 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 					// Individual name(s)
 					$name=$ind->getFullName();
 					$url=$ind->getHtmlUrl();
-					$content .= '<td align="'.get_align($name).'">';
-					$content .= '<a href="'.$url.'" class="list_item name2" dir="'.$TEXT_DIRECTION.'">'.$name.'</a>';
+					$content .= '<td>';
+					$content .= '<a href="'.$url.'">'.$name.'</a>';
 					$content .= $ind->getSexImage();
 					$addname=$ind->getAddName();
 					if ($addname) {
-						$content .= '<br /><a href="'.$url.'" class="list_item">'.$addname.'</a>';
+						$content .= '<br /><a href="'.$url.'">'.$addname.'</a>';
 					}
 					$content .= '</td>';
+					$content .= '<td>'.$ind->getSortName().'</td>';
 
 					// death/yahrzeit event date
-					$content .= '<td>'.$yahrzeit['date']->Display().'</td><td>'.$yahrzeit['date']->minJD().'</td>';
+					$content .= '<td>'.$yahrzeit['date']->Display().'</td>';
+					$content .= '<td>'.$yahrzeit['date']->minJD().'</td>';// sortable date
 
 					// Anniversary
 					$content .= '<td>'.$yahrzeit['anniv'].'</td>';
@@ -182,12 +185,13 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 					// upcomming yahrzeit dates
 					$today=new WT_Date_Jewish($yahrzeit['jd']);
 					$td=new WT_Date($today->Format('%@ %A %O %E'));
-					$content .= '<td>'.$td->Display().'</td><td>'.$td->minJD().'</td>';
+					$content .= '<td>'.$td->Display().'</td>';
+					$content .= '<td>'.$td->minJD().'</td>';// sortable date
 
 					$content .= '</tr>';
 				}
 			}
-			$content .= '</table>';
+			$content .= '</tbody></table>';
 
 			break;
 		}

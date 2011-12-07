@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: ancestry.php 12398 2011-10-24 20:14:11Z lukasz $
+// $Id: ancestry.php 12982 2011-12-04 20:18:24Z greg $
 
 define('WT_SCRIPT_NAME', 'ancestry.php');
 require './includes/session.php';
@@ -43,9 +43,7 @@ $nonfamfacts[] = 'UID';
 $nonfamfacts[] = '';
 
 $controller=new WT_Controller_Ancestry();
-$controller->init();
-
-print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Ancestors of %s', $controller->name));
+$controller->pageHeader();
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
@@ -60,16 +58,17 @@ echo '<h2>', WT_I18N::translate('Ancestors of %s', $controller->name), help_link
 echo WT_JS_START, 'var pastefield; function paste_id(value) {pastefield.value=value;}', WT_JS_END;
 ?>
 </td><td width="50px">&nbsp;</td><td><form name="people" id="people" method="get" action="?">
+<input type="hidden" name="ged" value="<?php echo WT_GEDCOM; ?>" />
 <input type="hidden" name="show_full" value="<?php echo $controller->show_full; ?>" />
 <input type="hidden" name="show_cousins" value="<?php echo $controller->show_cousins; ?>" />
-<table class="list_table <?php echo $TEXT_DIRECTION; ?>">
+<table class="list_table">
 
 	<!-- // NOTE: Root ID -->
 <tr>
-	<td class="descriptionbox"><?php echo WT_I18N::translate('Root Person ID'), help_link('rootid'); ?></td>
+	<td class="descriptionbox"><?php echo WT_I18N::translate('Individual'); ?></td>
 <td class="optionbox">
 <input class="pedigree_form" type="text" name="rootid" id="rootid" size="3" value="<?php echo htmlspecialchars($controller->rootid); ?>" />
-<?php print_findindi_link("rootid", ""); ?>
+<?php print_findindi_link('rootid', ''); ?>
 </td>
 
 <!-- // NOTE: Box width -->
@@ -78,17 +77,17 @@ echo WT_JS_START, 'var pastefield; function paste_id(value) {pastefield.value=va
 </td>
 
 <!-- // NOTE: chart style -->
-<td rowspan="2" class="descriptionbox"><?php echo WT_I18N::translate('Layout'), help_link('chart_style'); ?></td>
+<td rowspan="2" class="descriptionbox"><?php echo WT_I18N::translate('Layout'); ?></td>
 <td rowspan="2" class="optionbox">
 <input type="radio" name="chart_style" value="0"
 <?php
-if ($controller->chart_style=="0") {
+if ($controller->chart_style==0) {
 	echo ' checked="checked"';
 }
 echo ' onclick="statusDisable(\'cousins\');';
 echo '" />', WT_I18N::translate('List');
 echo '<br /><input type="radio" name="chart_style" value="1"';
-if ($controller->chart_style=="1") {
+if ($controller->chart_style==1) {
 	echo ' checked="checked"';
 }
 echo ' onclick="statusEnable(\'cousins\');';
@@ -99,7 +98,7 @@ echo '" />', WT_I18N::translate('Booklet');
 <br />
 <?php
 echo '<input ';
-if ($controller->chart_style=="0") {
+if ($controller->chart_style==0) {
 	echo 'disabled="disabled" ';
 }
 echo 'id="cousins" type="checkbox" value="';
@@ -112,14 +111,14 @@ echo ' />';
 echo WT_I18N::translate('Show cousins');
 
 echo '<br /><input type="radio" name="chart_style" value="2"';
-if ($controller->chart_style=="2") {
+if ($controller->chart_style==2) {
 	echo ' checked="checked" ';
 }
 echo ' onclick="statusDisable(\'cousins\');"';
 echo ' />', WT_I18N::translate('Individuals');
 echo '<br /><input type="radio" name="chart_style" value="3"';
 echo ' onclick="statusDisable(\'cousins\');"';
-if ($controller->chart_style=="3") {
+if ($controller->chart_style==3) {
 	echo ' checked="checked" ';
 }
 echo ' />', WT_I18N::translate('Families');
@@ -134,7 +133,7 @@ echo ' />', WT_I18N::translate('Families');
 <!-- // NOTE: generations -->
 <tr><td class="descriptionbox">
 <?php
-echo WT_I18N::translate('Generations'), help_link('PEDIGREE_GENERATIONS'); ?></td>
+echo WT_I18N::translate('Generations'); ?></td>
 
 <td class="optionbox">
 <select name="PEDIGREE_GENERATIONS">
@@ -144,18 +143,15 @@ echo '<option value="', $i, '"';
 if ($i==$OLD_PGENS) {
 	echo ' selected="selected"';
 }
-	echo '>', $i, '</option>';
+	echo '>', WT_I18N::number($i), '</option>';
 }
 ?>
 </select>
-
 </td>
-
 <!-- // NOTE: show full -->
-
 <td class="descriptionbox">
 <?php
-echo WT_I18N::translate('Show Details'), help_link('show_full');
+echo WT_I18N::translate('Show Details');
 ?>
 </td>
 <td class="optionbox">
@@ -171,9 +167,7 @@ if ($controller->show_full) {
 </td></tr>
 </table>
 </form>
-
 </td></tr></table>
-
 <?php
 if ($show_full==0) {
 	echo '<span class="details2">', WT_I18N::translate('Click on any of the boxes to get more information about that person.'), '</span><br /><br />';
@@ -214,8 +208,8 @@ case 1:
 case 2:
 	// Individual list
 	$treeid=ancestry_array($controller->rootid, $PEDIGREE_GENERATIONS);
-	echo '<div class="center">';
-	print_indi_table($treeid, WT_I18N::translate('Ancestors of %s', $controller->name), 'sosa');
+	echo '<div id="ancestry-list">';
+	echo format_indi_table($treeid, 'sosa');
 	echo '</div>';
 	break;
 case 3:
@@ -231,9 +225,8 @@ case 3:
 			$famlist[$famc->getXref()]=$famc;
 		}
 	}
-	echo '<div class="center">';
-	print_fam_table($famlist, WT_I18N::translate('Ancestors of %s', $controller->name));
+	echo '<div id="ancestry-list">';
+	echo format_fam_table($famlist, WT_I18N::translate('Ancestors of %s', $controller->name));
 	echo '</div>';
 	break;
 }
-print_footer();

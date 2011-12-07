@@ -18,21 +18,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin.php 12456 2011-10-29 13:13:52Z greg $
+// $Id: admin.php 12988 2011-12-05 08:38:41Z greg $
 
 define('WT_SCRIPT_NAME', 'admin.php');
 
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-// Only managers can access this page
-if (!WT_USER_GEDCOM_ADMIN) {
-	// TODO: Check if we are a manager in *any* gedcom, not just the current one
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.WT_SCRIPT_NAME);
-	exit;
-}
-
-print_header(WT_I18N::translate('Administration'));
+$controller=new WT_Controller_Base();
+$controller
+	->requireManagerLogin()
+	->setPageTitle(WT_I18N::translate('Administration'))
+	->pageHeader();
 
 // Check for updates
 $latest_version_txt=fetch_latest_version();
@@ -76,7 +73,7 @@ if (WT_USER_IS_ADMIN && $latest_version && version_compare(WT_VERSION, $latest_v
 		'<div>',
 		'<h3>', WT_I18N::translate('Upgrade instructions'), '</h3>',
 		'<ul>',
-		'<li>', /* I18N: %s is a URL/link to a .ZIP file */ WT_I18n::translate('Download %s and extract the files.', '<a class="current" href="'.$download_url.'">'.basename($download_url).'</a>'), '</li>';
+		'<li>', /* I18N: %s is a URL/link to a .ZIP file */ WT_I18N::translate('Download %s and extract the files.', '<a class="current" href="'.$download_url.'">'.basename($download_url).'</a>'), '</li>';
 	if (version_compare(WT_VERSION, $earliest_version)<0) {
 		echo '<li>', WT_I18N::translate('Accept or reject any pending changes.'), '</li>';
 		echo '<li>', WT_I18N::translate('Save all your family trees to disk, by using the "export" function for each one.'), '</li>';
@@ -288,7 +285,6 @@ echo
 	WT_JS_END,
 	'</div>'; //id = content_container
 
-print_footer();
 
 // This is a list of old files and directories, from earlier versions of webtrees, that can be deleted
 // It was generated with the help of a command like this
@@ -1239,6 +1235,26 @@ function old_paths() {
 		WT_ROOT.'themes/xenea/images/pixel.gif',
 		WT_ROOT.'themes/xenea/images/remove.gif',
 		WT_ROOT.'themes/xenea/modules.css',
+		// Removed in 1.2.5
+		WT_ROOT.'includes/media_reorder_count.php',
+		WT_ROOT.'includes/media_tab_head.php',
+		WT_ROOT.'js/behaviour.js.htm',
+		WT_ROOT.'js/bennolan',
+		WT_ROOT.'js/bosrup',
+		WT_ROOT.'js/kryogenix',
+		WT_ROOT.'js/overlib.js.htm',
+		WT_ROOT.'js/scriptaculous',
+		WT_ROOT.'js/scriptaculous.js.htm',
+		WT_ROOT.'js/sorttable.js.htm',
+		WT_ROOT.'library/WT/JS.php',
+		WT_ROOT.'modules_v3/clippings/index.php',
+		WT_ROOT.'modules_v3/googlemap/css/googlemap_style.css',
+		WT_ROOT.'modules_v3/googlemap/css/wt_v3_places_edit.css',
+		WT_ROOT.'modules_v3/googlemap/index.php',
+		WT_ROOT.'modules_v3/lightbox/index.php',
+		WT_ROOT.'modules_v3/recent_changes/help_text.php',
+		WT_ROOT.'modules_v3/todays_events/help_text.php',
+		WT_ROOT.'sidebar.php',
 	);
 }
 

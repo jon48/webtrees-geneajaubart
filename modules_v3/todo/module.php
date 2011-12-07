@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
+// $Id: module.php 12967 2011-12-03 10:02:28Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,9 +41,7 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $ctype, $WT_IMAGES;
-
-		require_once WT_ROOT.'includes/functions/functions_print_lists.php';
+		global $ctype, $WT_IMAGES, $controller;
 
 		$show_unassigned=get_block_setting($block_id, 'show_unassigned', true);
 		$show_other     =get_block_setting($block_id, 'show_other',      true);
@@ -66,35 +64,45 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 			} else {
 				$name = WT_USER_NAME;
 			}
-			$title.="<a href=\"javascript: configure block\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
+			$title.="<a href=\"#\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
 			$title.="<img class=\"adminicon\" src=\"".$WT_IMAGES["admin"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".WT_I18N::translate('Configure')."\" /></a>";
 		}
 		$title.=$this->getTitle().help_link('todo', $this->getName());
 		$table_id = 'ID'.floor(microtime()*1000000); // create a unique ID
-		?>
-		<script type="text/javascript" src="<?php echo WT_STATIC_URL; ?>js/jquery/jquery.dataTables.min.js"></script>
-		<script type="text/javascript">
-			jQuery(document).ready(function(){
-				jQuery('#<?php echo $table_id; ?>').dataTable( {
+		$controller
+			->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+			->addInlineJavaScript('
+				jQuery("#'.$table_id.'").dataTable( {
+				"sDom": \'t\',
+				'.WT_I18N::datatablesI18N().',
 				"bAutoWidth":false,
 				"bPaginate": false,
 				"bLengthChange": false,
 				"bFilter": false,
-				"bInfo": false,
-				"bJQueryUI": false
+				"bInfo": true,
+				"bJQueryUI": true,
+				"aoColumns": [
+					/* 0-DATE */   		{ "bVisible": false },
+					/* 1-Date */		{ "iDataSort": 0 },
+					/* 1-Record */ 		{},
+					/* 2-Username */	{},
+					/* 3-Text */		{}
+				]
 				});		
-			});
-		</script>
-		<?php
+			jQuery("#'.$table_id.'").css("visibility", "visible");
+			jQuery(".loading-image").css("display", "none");
+			');
 		$content='';
-		$content .= '<table id="'.$table_id.'" class="list_table center">';
+		$content .= '<div class="loading-image">&nbsp;</div>';
+		$content .= '<table id="'.$table_id.'" style="visibility:hidden;">';
 		$content .= '<thead><tr>';
-		$content .= '<th class="list_label" style="cursor:pointer;">'.WT_Gedcom_Tag::getLabel('DATE').'</th>';
-		$content .= '<th class="list_label" style="cursor:pointer;">'.WT_I18N::translate('Record').'</th>';
+		$content .= '<th>DATE</th>'; //hidden by datables code
+		$content .= '<th>'.WT_Gedcom_Tag::getLabel('DATE').'</th>';
+		$content .= '<th>'.WT_I18N::translate('Record').'</th>';
 		if ($show_unassigned || $show_other) {
-			$content .= '<th class="list_label" style="cursor:pointer;">'.WT_I18N::translate('User name').'</th>';
+			$content .= '<th>'.WT_I18N::translate('Username').'</th>';
 		}
-		$content .= '<th class="list_label" style="cursor:pointer;">'.WT_Gedcom_Tag::getLabel('TEXT').'</th>';
+		$content .= '<th>'.WT_Gedcom_Tag::getLabel('TEXT').'</th>';
 		$content .= '</tr></thead><tbody>';
 
 		$found=false;
@@ -104,15 +112,19 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 			if ($record && $record->canDisplayDetails()) {
 				$user_name=get_gedcom_value('_WT_USER', 2, $todo['factrec']);
 				if ($user_name==WT_USER_NAME || !$user_name && $show_unassigned || $user_name && $show_other) {
-					$content.='<tr valign="top">';
-					$content.='<td class="list_value_wrap">'.str_replace('<a', '<a name="'.$todo['date']->MinJD().'"', $todo['date']->Display(false)).'</td>';
+					$content.='<tr>';
+					//-- Event date (sortable)
+					$content .= '<td>'; //hidden by datables code
+					$content .= $todo['date']->JD();
+					$content .= '</td>';
+					$content.='<td class="wrap">'. $todo['date']->Display(empty($SEARCH_SPIDER)).'</td>';
 					$name=$record->getFullName();
-					$content.='<td class="list_value_wrap" align="'.get_align(WT_GEDCOM).'"><a href="'.$record->getHtmlUrl().'">'.PrintReady($name).'</a></td>';
+					$content.='<td class="wrap"><a href="'.$record->getHtmlUrl().'">'.PrintReady($name).'</a></td>';
 					if ($show_unassigned || $show_other) {
-						$content.='<td class="list_value_wrap">'.$user_name.'</td>';
+						$content.='<td class="wrap">'.$user_name.'</td>';
 					}
 					$text=get_gedcom_value('_TODO', 1, $todo['factrec']);
-					$content.='<td class="list_value_wrap" align="'.get_align($text).'">'.PrintReady($text).'</td>';
+					$content.='<td class="wrap">'.$text.'</td>';
 					$content.='</tr>';
 					$found=true;
 				}

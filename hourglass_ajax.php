@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: hourglass_ajax.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: hourglass_ajax.php 12503 2011-11-03 11:58:38Z greg $
 
 define('WT_SCRIPT_NAME', 'hourglass_ajax.php');
 require './includes/session.php';
@@ -34,8 +34,7 @@ require './includes/session.php';
  * label the pair as a pair.
  */
 
-$controller = new WT_Controller_Hourglass();
-$controller->init();
+$controller=new WT_Controller_Hourglass();
 
 header('Content-type: text/html; charset=UTF-8');
 // -- print html header information

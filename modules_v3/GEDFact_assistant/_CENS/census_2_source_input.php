@@ -1,39 +1,35 @@
 <?php
-/**
- * Census Assistant Control module for webtrees
- *
- * Census and Souce Input Area File File
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
- *
- * Derived from PhpGedView
- * Copyright (C) 2007 to 2010  PGV Development Team.  All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @package webtrees
- * @subpackage GEDFact_assistant
- * @version $Id: census_2_source_input.php 11107 2011-03-12 20:34:20Z greg $
- * @author Brian Holland
- */
+// Census Assistant Control module for webtrees
+//
+// Census and Souce Input Area File File
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2007 to 2010  PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: census_2_source_input.php 12813 2011-11-19 14:18:05Z greg $
+
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-global $TEXT_DIRECTION;
+
 ?>
 
 <script>
@@ -124,10 +120,8 @@ global $TEXT_DIRECTION;
 		pastefield.value = value;
 	}
 
-	function paste_char(value,lang,mag) {
+	function paste_char(value) {
 		pastefield.value += value;
-		language_filter = lang;
-		magnify = mag;
 	}
 
 	function edit_close(newurl) {
@@ -994,7 +988,7 @@ global $TEXT_DIRECTION;
 		</script>
 
 		<div>
-			<table><tr><td nowrap="nowrap">
+			<table><tr><td class="nowrap">
 			<br />
 			<?php
 				// echo "&nbsp;".WT_I18N::translate('Date').":&nbsp;&nbsp;";

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12382 2011-10-23 13:42:48Z greg $
+// $Id: module.php 12812 2011-11-19 13:02:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -53,80 +53,44 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 	// Implement WT_Module_Sidebar
 	public function getSidebarContent() {
-		global $WT_IMAGES;
-
-		$out = '<div id="sb_family_nav_content">';
-
-		if ($this->controller) {
-			$root = null;
-			if ($this->controller->pid) {
-				$root = WT_Person::getInstance($this->controller->pid);
-			}
-			else if ($this->controller->famid) {
-				$fam = WT_Family::getInstance($this->controller->famid);
-				if ($fam) $root = $fam->getHusband();
-				if (!$root) $root = $fam->getWife();
-			}
-			if ($root!=null) {
-				$this->controller = new WT_Controller_Individual();
-				$this->controller->indi=$root;
-				$this->controller->pid=$root->getXref();
-				$this->setController($this->controller);
-				$out .= $this->getTabContent();
-			}
-		}
-		$out .= '</div>';
-		return $out;
+		return '<div id="sb_family_nav_content">'.$this->getTabContent().'</div>';
 	}
 
 	// Implement WT_Module_Sidebar
 	public function getSidebarAjaxContent() {
-		return "";
+		return '';
 	}
 
 	// TODO: This function isn't part of the WT_Module_Tab interface, as
 	// this module no longer provides a tab.
 	public function getTabContent() {
+		global $controller;
+
 		$out = '';
 		ob_start();
-		// -----------------------------------------------------------------------------
-		// Function Family Nav for PHPGedView - called by individual_ctrl.php
-		// -----------------------------------------------------------------------------
-		// function family_nav() {
-		// ------------------------------------------------------------------------------
 
-		global $edit, $tabno, $GEDCOM, $pid;
-		$edit=$edit;
-		global $show_full, $tabno;
+		global $show_full, $edit, $GEDCOM, $pid;
 		$show_full="1";
 
 		// =====================================================================
 
-		echo WT_JS_START;
-		echo 'function familyNavLoad(url) {
-			window.location = url+"#"+jQuery("#tabs li:eq("+jQuery("#tabs").tabs("option", "selected")+") a").attr("title");
-			return false;
-		}
-		';
-		echo WT_JS_END;
-
 		// Start Family Nav Table ----------------------------
-		echo "<table class=\"nav_content\" cellpadding=\"0\">";
-		global $WT_IMAGES, $spouselinks, $parentlinks, $TEXT_DIRECTION;
+		echo '<table class="nav_content">';
+		global $WT_IMAGES, $spouselinks, $parentlinks;
 
 		$personcount=0;
-		$families = $this->controller->indi->getChildFamilies();
+		$families = $controller->record->getChildFamilies();
 
 		//-- parent families -------------------------------------------------------------
 		foreach ($families as $famid=>$family) {
-			$label = $this->controller->indi->getChildFamilyLabel($family);
-			$people = $this->controller->buildFamilyList($family, "parents");
+			$label = $controller->record->getChildFamilyLabel($family);
+			$people = $controller->buildFamilyList($family, "parents");
 			$styleadd = "";
 			?>
 			<tr>
-				<td style="padding-bottom:4px;" align="center" colspan="2">
+				<td style="padding-bottom:4px;" class="center" colspan="2">
 				<?php
-				echo "<a class=\"famnav_link\" href=\"".$family->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$family->getHtmlUrl()."');\">";
+				echo "<a class=\"famnav_link\" href=\"".$family->getHtmlUrl()."\">";
 				echo "<b>".$label."</b>";
 				echo "</a>";
 				?>
@@ -142,12 +106,12 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				$menu->addSubMenu($submenu);
 				?>
 				<tr>
-					<td class="facts_label<?php echo $styleadd; ?>" nowrap="nowrap" style="width:75px;">
+					<td class="facts_label<?php echo $styleadd; ?> nowrap" style="width:75px;">
 						<?php echo $menu->getMenu(); ?>
 					</td>
-					<td align="center" class="<?php echo $this->controller->getPersonStyle($people["husb"]); ?> nam">
+					<td class="center <?php echo $controller->getPersonStyle($people["husb"]); ?> nam">
 						<?php
-						echo "<a class=\"famnav_link\" href=\"".$people["husb"]->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$people['husb']->getHtmlUrl()."');\">";
+						echo "<a class=\"famnav_link\" href=\"".$people["husb"]->getHtmlUrl()."\">";
 						echo $people["husb"]->getFullName();
 						echo "</a>";
 						echo "<div class=\"font9\">" . $people["husb"]->getLifeSpan() . "</div>";
@@ -166,12 +130,12 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				$menu->addSubMenu($submenu);
 				?>
 				<tr>
-					<td class="facts_label<?php echo $styleadd; ?>" nowrap="nowrap" style="width:75px;">
+					<td class="facts_label<?php echo $styleadd; ?> nowrap" style="width:75px;">
 						<?php echo $menu->getMenu(); ?>
 					</td>
-					<td align="center" class="<?php echo $this->controller->getPersonStyle($people["wife"]); ?> nam">
+					<td class="center <?php echo $controller->getPersonStyle($people["wife"]); ?> nam">
 						<?php
-						echo "<a class=\"famnav_link\" href=\"".$people["wife"]->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$people['wife']->getHtmlUrl()."');\">";
+						echo "<a class=\"famnav_link\" href=\"".$people["wife"]->getHtmlUrl()."\">";
 						echo $people["wife"]->getFullName();
 						echo "</a>";
 						echo "<div class=\"font9\">" . $people["wife"]->getLifeSpan() . "</div>";
@@ -194,7 +158,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 					}
 					?>
 					<tr>
-						<td class="facts_label<?php echo $styleadd; ?>" nowrap="nowrap" style="width:75px;">
+						<td class="facts_label<?php echo $styleadd; ?> nowrap" style="width:75px;">
 							<?php
 							if ($pid == $child->getXref() ) {
 								echo $child->getLabel();
@@ -203,7 +167,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 							}
 							?>
 						</td>
-						<td align="center" class="<?php echo $this->controller->getPersonStyle($child); ?> nam">
+						<td class="center <?php echo $controller->getPersonStyle($child); ?> nam">
 							<?php
 							if ($pid == $child->getXref()) {
 								echo "<a class=\"famnav_link\" href=\"#\">";
@@ -211,7 +175,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 								echo "</a>";
 								echo "<div class=\"font9\">".$child->getLifeSpan() . "</div>";
 							} else {
-								echo "<a class=\"famnav_link\" href=\"".$child->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$child->getHtmlUrl()."');\">";
+								echo "<a class=\"famnav_link\" href=\"".$child->getHtmlUrl()."\">";
 								echo $child->getFullName();
 								echo "</a>";
 								echo "<div class=\"font9\">" . $child->getLifeSpan() . "</div>";
@@ -226,9 +190,9 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		}
 
 		//-- step parents ----------------------------------------------------------------
-		foreach ($this->controller->indi->getChildStepFamilies() as $famid=>$family) {
-			$label = $this->controller->indi->getStepFamilyLabel($family);
-			$people = $this->controller->buildFamilyList($family, "step-parents");
+		foreach ($controller->record->getChildStepFamilies() as $famid=>$family) {
+			$label = $controller->record->getStepFamilyLabel($family);
+			$people = $controller->buildFamilyList($family, "step-parents");
 			if ($people) {
 				echo "<tr><td><br /></td><td></td></tr>";
 			}
@@ -236,9 +200,9 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			$elderdate = "";
 			?>
 			<tr>
-				<td style="padding-bottom: 4px;" align="center" colspan="2">
+				<td style="padding-bottom: 4px;" class="center" colspan="2">
 				<?php
-				echo "<a class=\"famnav_link\" href=\"".$family->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$family->getHtmlUrl()."');\">";
+				echo "<a class=\"famnav_link\" href=\"".$family->getHtmlUrl()."\">";
 				echo "<b>".$label."</b>";
 				echo "</a>";
 				?>
@@ -261,12 +225,12 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				$menu->addSubMenu($submenu);
 				?>
 				<tr>
-					<td class="facts_label<?php echo $styleadd; ?>"  nowrap="nowrap" style="width:75px;">
+					<td class="facts_label<?php echo $styleadd; ?> nowrap" style="width:75px;">
 						<?php echo $menu->getMenu(); ?>
 					</td>
-					<td align="center" class="<?php echo $this->controller->getPersonStyle($people["husb"]); ?> nam">
+					<td class="center <?php echo $controller->getPersonStyle($people["husb"]); ?> nam">
 						<?php
-						echo "<a class=\"famnav_link\" href=\"".$people["husb"]->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$people['husb']->getHtmlUrl()."');\">";
+						echo "<a class=\"famnav_link\" href=\"".$people["husb"]->getHtmlUrl()."\">";
 						echo $people["husb"]->getFullName();
 						echo "</a>";
 						echo "<div class=\"font9\">" . $people["husb"]->getLifeSpan() . "</div>";
@@ -294,12 +258,12 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				$menu->addSubMenu($submenu);
 				?>
 				<tr>
-					<td class="facts_label<?php echo $styleadd; ?>" nowrap="nowrap" style="width:75px;">
+					<td class="facts_label<?php echo $styleadd; ?> nowrap" style="width:75px;">
 						<?php echo $menu->getMenu(); ?>
 					</td>
-					<td align="center" class="<?php echo $this->controller->getPersonStyle($people["wife"]); ?> nam">
+					<td class="center <?php echo $controller->getPersonStyle($people["wife"]); ?> nam">
 						<?php
-						echo "<a class=\"famnav_link\" href=\"".$people["wife"]->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$people['wife']->getHtmlUrl()."');\">";
+						echo "<a class=\"famnav_link\" href=\"".$people["wife"]->getHtmlUrl()."\">";
 						echo $people["wife"]->getFullName();
 						echo "</a>";
 						echo "<div class=\"font9\">" . $people["wife"]->getLifeSpan() . "</div>";
@@ -320,12 +284,12 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 					$menu->addSubMenu($submenu);
 					?>
 					<tr>
-						<td class="facts_label<?php echo $styleadd; ?>" nowrap="nowrap" style="width:75px;">
+						<td class="facts_label<?php echo $styleadd; ?> nowrap" style="width:75px;">
 							<?php echo $menu->getMenu(); ?>
 						</td>
-						<td align="center" class="<?php echo $this->controller->getPersonStyle($child); ?> nam">
+						<td class="center <?php echo $controller->getPersonStyle($child); ?> nam">
 							<?php
-							echo "<a class=\"famnav_link\" href=\"".$child->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$child->getHtmlUrl()."');\">";
+							echo "<a class=\"famnav_link\" href=\"".$child->getHtmlUrl()."\">";
 							echo $child->getFullName();
 							echo "</a>";
 							echo "<div class=\"font9\">" . $child->getLifeSpan() . "</div>";
@@ -339,14 +303,14 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		}
 
 		//-- spouse and children --------------------------------------------------
-		$families = $this->controller->indi->getSpouseFamilies();
+		$families = $controller->record->getSpouseFamilies();
 		foreach ($families as $family) {
 			echo "<tr><td><br /></td><td></td></tr>";
 			?>
 			<tr>
-				<td style="padding-bottom: 4px;" align="center" colspan="2">
+				<td style="padding-bottom: 4px;" class="center" colspan="2">
 				<?php
-				echo "<a class=\"famnav_link\" href=\"".$family->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$family->getHtmlUrl()."');\">";
+				echo "<a class=\"famnav_link\" href=\"".$family->getHtmlUrl()."\">";
 				echo "<b>".WT_I18N::translate('Immediate Family')."</b>";
 				echo "</a>";
 				?>
@@ -354,8 +318,8 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			</tr>
 			<?php
 			//$personcount = 0;
-			$people = $this->controller->buildFamilyList($family, "spouse");
-			if (isset($people["husb"]) && $this->controller->indi->equals($people["husb"])) {
+			$people = $controller->buildFamilyList($family, "spouse");
+			if (isset($people["husb"]) && $controller->record->equals($people["husb"])) {
 				$spousetag = 'WIFE';
 			} else {
 				$spousetag = 'HUSB';
@@ -370,10 +334,10 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				$menu->addSubMenu($submenu);
 				?>
 				<tr>
-					<td class="facts_label<?php echo $styleadd; ?>" nowrap="nowrap" style="width:75px;">
+					<td class="facts_label<?php echo $styleadd; ?> nowrap" style="width:75px;">
 						<?php echo $menu->getMenu(); ?>
 					</td>
-					<td align="center" class="<?php echo $this->controller->getPersonStyle($people["husb"]); ?> nam">
+					<td class="center <?php echo $controller->getPersonStyle($people["husb"]); ?> nam">
 						<?php
 						if ($pid == $people["husb"]->getXref()) {
 							echo "<a class=\"famnav_link\" href=\"#\">";
@@ -381,7 +345,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 							echo "</a>";
 							echo "<div class=\"font9\">" . $people["husb"]->getLifeSpan() . "</div>";
 						} else {
-							echo "<a class=\"famnav_link\" href=\"".$people["husb"]->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$people['husb']->getHtmlUrl()."');\">";
+							echo "<a class=\"famnav_link\" href=\"".$people["husb"]->getHtmlUrl()."\">";
 							echo $people["husb"]->getFullName();
 							echo "</a>";
 							echo "<div class=\"font9\">" . $people["husb"]->getLifeSpan() . "</div>";
@@ -401,10 +365,10 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				$menu->addSubMenu($submenu);
 				?>
 				<tr>
-					<td class="facts_label<?php echo $styleadd; ?>" nowrap="nowrap" style="width:75px;">
+					<td class="facts_label<?php echo $styleadd; ?> nowrap" style="width:75px;">
 						<?php echo $menu->getMenu(); ?>
 					</td>
-					<td align="center" class="<?php echo $this->controller->getPersonStyle($people["wife"]); ?> nam">
+					<td class="center <?php echo $controller->getPersonStyle($people["wife"]); ?> nam">
 						<?php
 						if ($pid == $people["wife"]->getXref()) {
 							echo "<a class=\"famnav_link\" href=\"#\">";
@@ -412,7 +376,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 							echo "</a>";
 							echo "<div class=\"font9\">" . $people["wife"]->getLifeSpan() . "</div>";
 						} else {
-							echo "<a class=\"famnav_link\" href=\"".$people["wife"]->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$people['wife']->getHtmlUrl()."');\">";
+							echo "<a class=\"famnav_link\" href=\"".$people["wife"]->getHtmlUrl()."\">";
 							echo $people["wife"]->getFullName();
 							echo "</a>";
 							echo "<div class=\"font9\">" . $people["wife"]->getLifeSpan() . "</div>";
@@ -434,12 +398,12 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 					$menu->addSubmenu($submenu);
 					?>
 					<tr>
-						<td class="facts_label<?php echo $styleadd; ?>" nowrap="nowrap" style="width:75px;">
+						<td class="facts_label<?php echo $styleadd; ?> nowrap" style="width:75px;">
 							<?php echo $menu->getMenu(); ?>
 						</td>
-						<td align="center" class="<?php echo $this->controller->getPersonStyle($child); ?> nam">
+						<td class="center <?php echo $controller->getPersonStyle($child); ?> nam">
 							<?php
-							echo "<a class=\"famnav_link\" href=\"".$child->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$child->getHtmlUrl()."');\">";
+							echo "<a class=\"famnav_link\" href=\"".$child->getHtmlUrl()."\">";
 							echo $child->getFullName();
 							echo "</a>";
 							echo "<div class=\"font9\">" . $child->getLifeSpan() . "</div>";
@@ -452,9 +416,9 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 		}
 		//-- step children ----------------------------------------------------------------
-		foreach ($this->controller->indi->getSpouseStepFamilies() as $famid=>$family) {
+		foreach ($controller->record->getSpouseStepFamilies() as $famid=>$family) {
 			$label = $family->getFullName();
-			$people = $this->controller->buildFamilyList($family, "step-children");
+			$people = $controller->buildFamilyList($family, "step-children");
 			if ($people) {
 				echo "<tr><td><br /></td><td></td></tr>";
 			}
@@ -462,9 +426,9 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			$elderdate = "";
 			?>
 			<tr>
-				<td style="padding-bottom: 4px;" align="center" colspan="2">
+				<td style="padding-bottom: 4px;" class="center" colspan="2">
 				<?php
-				echo "<a class=\"famnav_link\" href=\"".$family->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$family->getHtmlUrl()."');\">";
+				echo "<a class=\"famnav_link\" href=\"".$family->getHtmlUrl()."\">";
 				echo "<b>".$label."</b>";
 				echo "</a>";
 				?>
@@ -482,12 +446,12 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				$menu->addSubMenu($submenu);
 				?>
 				<tr>
-					<td class="facts_label<?php echo $styleadd; ?>"  nowrap="nowrap" style="width:75px;">
+					<td class="facts_label<?php echo $styleadd; ?> nowrap" style="width:75px;">
 						<?php echo $menu->getMenu(); ?>
 					</td>
-					<td align="center" class="<?php echo $this->controller->getPersonStyle($people["husb"]); ?> nam">
+					<td class="center <?php echo $controller->getPersonStyle($people["husb"]); ?> nam">
 						<?php
-						echo "<a class=\"famnav_link\" href=\"".$people["husb"]->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$people['husb']->getHtmlUrl()."');\">";
+						echo "<a class=\"famnav_link\" href=\"".$people["husb"]->getHtmlUrl()."\">";
 						echo $people["husb"]->getFullName();
 						echo "</a>";
 						echo "<div class=\"font9\">" . $people["husb"]->getLifeSpan() . "</div>";
@@ -509,12 +473,12 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				$menu->addSubMenu($submenu);
 				?>
 				<tr>
-					<td class="facts_label<?php echo $styleadd; ?>" nowrap="nowrap" style="width:75px;">
+					<td class="facts_label<?php echo $styleadd; ?> nowrap" style="width:75px;">
 						<?php echo $menu->getMenu(); ?>
 					</td>
-					<td align="center" class="<?php echo $this->controller->getPersonStyle($people["wife"]); ?> nam">
+					<td class="center <?php echo $controller->getPersonStyle($people["wife"]); ?> nam">
 						<?php
-						echo "<a class=\"famnav_link\" href=\"".$people["wife"]->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$people['wife']->getHtmlUrl()."');\">";
+						echo "<a class=\"famnav_link\" href=\"".$people["wife"]->getHtmlUrl()."\">";
 						echo $people["wife"]->getFullName();
 						echo "</a>";
 						echo "<div class=\"font9\">" . $people["wife"]->getLifeSpan() . "</div>";
@@ -535,12 +499,12 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 					$menu->addSubMenu($submenu);
 					?>
 					<tr>
-						<td class="facts_label<?php echo $styleadd; ?>" nowrap="nowrap" style="width:75px;">
+						<td class="facts_label<?php echo $styleadd; ?> nowrap" style="width:75px;">
 							<?php echo $menu->getMenu(); ?>
 						</td>
-						<td align="center" class="<?php echo $this->controller->getPersonStyle($child); ?> nam">
+						<td class="center <?php echo $controller->getPersonStyle($child); ?> nam">
 							<?php
-							echo "<a class=\"famnav_link\" href=\"".$child->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$child->getHtmlUrl()."');\">";
+							echo "<a class=\"famnav_link\" href=\"".$child->getHtmlUrl()."\">";
 							echo $child->getFullName();
 							echo "</a>";
 							echo "<div class=\"font9\">" . $child->getLifeSpan() . "</div>";
@@ -570,7 +534,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	function print_pedigree_person_nav($pid, $style=1, $count=0, $personcount="1") {
 		global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $SCRIPT_NAME, $GEDCOM;
 		global $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $PEDIGREE_FULL_DETAILS, $SHOW_PEDIGREE_PLACES;
-		global $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
+		global $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
 		global $WT_IMAGES, $ABBREVIATE_CHART_LABELS, $USE_MEDIA_VIEWER;
 		global $chart_style, $box_width, $generations, $show_spouse, $show_full;
 		global $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE, $PEDIGREE_SHOW_GENDER;
@@ -625,7 +589,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 					if ($husb || $num>0) {
 						if ($husb) {
 							$person_parent="Yes";
-							$parentlinks .= "<a class=\"flyout3\" href=\"".$husb->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$husb->getHtmlUrl()."');\">";
+							$parentlinks .= "<a class=\"flyout3\" href=\"".$husb->getHtmlUrl()."\">";
 							$parentlinks .= "&nbsp;".$husb->getFullName();
 							$parentlinks .= "</a>";
 							$parentlinks .= "<br />";
@@ -637,7 +601,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 					if ($wife || $num>0) {
 						if ($wife) {
 							$person_parent="Yes";
-							$parentlinks .= "<a class=\"flyout3\" href=\"".$wife->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$wife->getHtmlUrl()."');\">";
+							$parentlinks .= "<a class=\"flyout3\" href=\"".$wife->getHtmlUrl()."\">";
 							$parentlinks .= "&nbsp;".$wife->getFullName();
 							$parentlinks .= "</a>";
 							$parentlinks .= "<br />";
@@ -663,7 +627,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 						if ($husb || $num>0) {
 							if ($husb) {
 								$person_step="Yes";
-								$parentlinks .= "<a class=\"flyout3\" href=\"".$husb->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$husb->getHtmlUrl()."');\">";
+								$parentlinks .= "<a class=\"flyout3\" href=\"".$husb->getHtmlUrl()."\">";
 								$parentlinks .= "&nbsp;".$husb->getFullName();
 								$parentlinks .= "</a>";
 								$parentlinks .= "<br />";
@@ -676,7 +640,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 						if ($wife || $num>0) {
 							if ($wife) {
 								$person_step="Yes";
-								$parentlinks .= "<a class=\"flyout3\" href=\"".$wife->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$wife->getHtmlUrl()."');\">";
+								$parentlinks .= "<a class=\"flyout3\" href=\"".$wife->getHtmlUrl()."\">";
 								$parentlinks .= "&nbsp;".$wife->getFullName();
 								$parentlinks .= "</a>";
 								$parentlinks .= "<br />";
@@ -695,7 +659,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				// Spouse ------------------------------
 				if ($spouse || $num>0) {
 					if ($spouse) {
-						$spouselinks .= "<a class=\"flyout3\" href=\"".$spouse->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$spouse->getHtmlUrl()."');\">";
+						$spouselinks .= "<a class=\"flyout3\" href=\"".$spouse->getHtmlUrl()."\">";
 						$spouselinks .= "&nbsp;".$spouse->getFullName();
 						$spouselinks .= "</a>";
 						$spouselinks .= "<br />";
@@ -713,9 +677,9 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 							$hasChildren = true;
 						}
 						$persons="Yes";
-						$spouselinks .= "<ul class=\"clist ".$TEXT_DIRECTION."\">";
+						$spouselinks .= "<ul class=\"clist\">";
 						$spouselinks .= "<li class=\"flyout3\">";
-						$spouselinks .= "<a href=\"".$child->getHtmlUrl()."\" onclick=\"return familyNavLoad('".$child->getHtmlUrl()."');\">";
+						$spouselinks .= "<a href=\"".$child->getHtmlUrl()."\">";
 						$spouselinks .= $child->getFullName();
 						$spouselinks .= "</a>";
 						$spouselinks .= "</li>";

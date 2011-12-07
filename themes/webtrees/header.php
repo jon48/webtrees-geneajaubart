@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 12453 2011-10-28 23:09:00Z greg $
+// $Id: header.php 12825 2011-11-20 09:54:10Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,10 +29,10 @@ if (!defined('WT_WEBTREES')) {
 }
 
 echo
-	'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
-	'<html xmlns="http://www.w3.org/1999/xhtml" ', WT_I18N::html_markup(), '>',
+	'<!DOCTYPE html>',
+	'<html ', WT_I18N::html_markup(), '>',
 	'<head>',
-	'<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />',
+	'<meta charset="UTF-8">',
 	'<title>', htmlspecialchars($title), '</title>',
 	header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
 	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png" />',
@@ -52,7 +52,6 @@ if (WT_USE_LIGHTBOX) {
 }
 
 echo
-	$javascript,
 	'</head>',
 	'<body id="body">';
 
@@ -79,17 +78,14 @@ if ($view!='simple') {
 	if ($menu) {
 		echo $menu->GetMenuAsList();
 	}
-	echo '</ul><div class="title">';
-	print_gedcom_title_link();
-	echo
+	echo '</ul><div class="title">',
+		htmlspecialchars($GEDCOM_TITLE),
 		'</div>',
 		'<div class="header_search">',
 		'<form action="search.php" method="post">',
 		'<input type="hidden" name="action" value="general" />',
 		'<input type="hidden" name="topsearch" value="yes" />',
-		'<input type="text" name="query" size="25" value="', WT_I18N::translate('Search'), '" ',
-			'onfocus="if (this.value==\'', WT_I18N::translate('Search'), '\') this.value=\'\'; focusHandler();" ',
-			'onblur="if (this.value==\'\') this.value=\'', WT_I18N::translate('Search'), '\';" />',
+		'<input type="text" name="query" size="25" placeholder="', WT_I18N::translate('Search'), '"/>',
 		'<input type="image" class="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '" />',
 		'</form>',
 		'</div>';
@@ -108,7 +104,6 @@ if ($view!='simple') {
 	$menu_items[]=WT_MenuBar::getHelpMenu();
 	// Print the menu bar
 	echo
-		'<img src="', $WT_IMAGES['hline'], '" width="100%" height="3" alt="" />',
 		'<div id="topMenu">',
 		'<ul id="main-menu">';
 	foreach ($menu_items as $menu) {
@@ -119,8 +114,14 @@ if ($view!='simple') {
 	unset($menu_items, $menu);
 	echo
 		'</ul>',  // <ul id="main-menu">
-		'</div>', // <div id="topMenu">
-		'<img src="', $WT_IMAGES['hline'], '" width="100%" height="3" alt="" />',
-		'</div>', // <div id="header">
-		'<div id="content">';
+		'</div>'; // <div id="topMenu">
+	// Display feedback from asynchronous actions
+	echo '<div id="flash-messages">';
+	foreach (Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->getMessages() as $message) {
+		echo '<p class="ui-state-highlight">', $message, '</p>';
+	}
+	echo '</div>'; // <div id="flash-messages">
+	echo '</div>'; // <div id="header">
 }
+echo $javascript, '<div id="content">';
+

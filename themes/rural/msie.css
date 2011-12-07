@@ -1,4 +1,4 @@
-/* $Id: msie.css 12366 2011-10-21 23:24:43Z greg $ */
+/* $Id: msie.css 12828 2011-11-20 15:43:11Z rob $ */
 
 form {
 	margin-top: 0px; margin-bottom: 0px;
@@ -11,7 +11,7 @@ form {
 .normal_inner_block {
 	width: 100%;
 }
-
+.ltr {text-align: left;}
 /*
  * The following style definitions can be removed when IE supports the "opacity"
  * specification in place of its proprietary and non-standard method.
@@ -23,6 +23,4 @@ form {
 a.showit:hover > span {
 	filter: alpha(opacity=85);
 }
-.makeMenu li ul {
-	top: 2px;
-}
+

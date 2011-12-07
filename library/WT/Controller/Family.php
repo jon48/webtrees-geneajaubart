@@ -1,5 +1,5 @@
 <?php
-// Controller for the Family Page
+// Controller for the family page
 //
 // webtrees: Web based Family History software
 // Copyright (C) 2011 webtrees development team.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Family.php 12212 2011-09-25 08:25:29Z greg $
+// $Id: Family.php 12647 2011-11-09 16:19:32Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -32,118 +32,77 @@ require_once WT_ROOT.'includes/functions/functions_print_facts.php';
 require_once WT_ROOT.'includes/functions/functions_import.php';
 require_once WT_ROOT.'includes/functions/functions_charts.php';
 
-class WT_Controller_Family extends WT_Controller_Base {
-	var $famid = '';
-	var $family = null;
-	var $difffam = null;
+class WT_Controller_Family extends WT_Controller_GedcomRecord {
+	var $diff_record;
+	var $record = null;
 	var $user = null;
 	var $display = false;
 	var $famrec = '';
 	var $title = '';
 
-	function init() {
+	public function __construct() {
 		global $Dbwidth, $bwidth, $pbwidth, $pbheight, $bheight;
 		$bwidth = $Dbwidth;
 		$pbwidth = $bwidth + 12;
 		$pbheight = $bheight + 14;
 
-		$this->famid = safe_GET_xref('famid');
+		$xref = safe_GET_xref('famid');
 
-		$gedrec = find_family_record($this->famid, WT_GED_ID);
+		$gedrec = find_family_record($xref, WT_GED_ID);
 
 		if (empty($gedrec)) {
-			$gedrec = "0 @".$this->famid."@ FAM\n";
+			$gedrec = "0 @".$xref."@ FAM\n";
 		}
 
-		if (find_family_record($this->famid, WT_GED_ID) || find_updated_record($this->famid, WT_GED_ID)!==null) {
-			$this->family = new WT_Family($gedrec);
-			$this->family->ged_id=WT_GED_ID; // This record is from a file
-		} else if (!$this->family) {
+		if (find_family_record($xref, WT_GED_ID) || find_updated_record($xref, WT_GED_ID)!==null) {
+			$this->record = new WT_Family($gedrec);
+			$this->record->ged_id=WT_GED_ID; // This record is from a file
+		} else if (!$this->record) {
 			return false;
 		}
 
-		$this->famid=$this->family->getXref(); // Correct upper/lower case mismatch
-
-		//-- perform the desired action
-		switch($this->action) {
-		case 'addfav':
-			if (WT_USER_ID && !empty($_REQUEST['gid']) && array_key_exists('user_favorites', WT_Module::getActiveModules())) {
-				$favorite = array(
-					'username' => WT_USER_NAME,
-					'gid'      => $_REQUEST['gid'],
-					'type'     => 'FAM',
-					'file'     => WT_GEDCOM,
-					'url'      => '',
-					'note'     => '',
-					'title'    => ''
-				);
-				user_favorites_WT_Module::addFavorite($favorite);
-			}
-			unset($_GET['action']);
-			break;
-		case 'accept':
-			if (WT_USER_CAN_ACCEPT) {
-				accept_all_changes($this->famid, WT_GED_ID);
-				//-- check if we just deleted the record and redirect to index
-				$gedrec = find_family_record($this->famid, WT_GED_ID);
-				if (empty($gedrec)) {
-					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
-					exit;
-				}
-				$this->family = new WT_Family($gedrec);
-			}
-			unset($_GET['action']);
-			break;
-		case 'undo':
-			if (WT_USER_CAN_ACCEPT) {
-				reject_all_changes($this->famid, WT_GED_ID);
-				$gedrec = find_family_record($this->famid, WT_GED_ID);
-				//-- check if we just deleted the record and redirect to index
-				if (empty($gedrec)) {
-					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
-					exit;
-				}
-				$this->family = new WT_Family($gedrec);
-			}
-			unset($_GET['action']);
-			break;
-		}
+		$xref=$this->record->getXref(); // Correct upper/lower case mismatch
 
 		//-- if the user can edit and there are changes then get the new changes
 		if (WT_USER_CAN_EDIT) {
-			$newrec = find_updated_record($this->famid, WT_GED_ID);
+			$newrec = find_updated_record($xref, WT_GED_ID);
 			if (!empty($newrec)) {
-				$this->difffam = new WT_Family($newrec);
-				$this->difffam->setChanged(true);
+				$this->diff_record = new WT_Family($newrec);
+				$this->diff_record->setChanged(true);
+				$this->record->diffMerge($this->diff_record);
 			}
 		}
 
-		$this->family->diffMerge($this->difffam);
+		parent::__construct();
 	}
 
-	function getFamilyID() {
-		return $this->famid;
+	// Get significant information from this page, to allow other pages such as
+	// charts and reports to initialise with the same records
+	public function getSignificantIndividual() {
+		if ($this->record) {
+			foreach ($this->record->getSpouses() as $individual) {
+				return $individual;
+			}
+			foreach ($this->record->getChildren() as $individual) {
+				return $individual;
+			}
+		}
+		return parent::getSignificantIndividual();
+	}
+	public function getSignificantFamily() {
+		if ($this->record) {
+			return $this->record;
+		}
+		return parent::getSignifcantFamily();
 	}
 
 	// $tags is an array of HUSB/WIFE/CHIL
 	function getTimelineIndis($tags) {
-		preg_match_all('/\n1 (?:'.implode('|', $tags).') @('.WT_REGEX_XREF.')@/', $this->family->getGedcomRecord(), $matches);
+		preg_match_all('/\n1 (?:'.implode('|', $tags).') @('.WT_REGEX_XREF.')@/', $this->record->getGedcomRecord(), $matches);
 		foreach ($matches[1] as &$match) {
 			$match='pids[]='.$match;
 		}
 		return implode('&amp;', $matches[1]);
-	}
-
-	/**
-	* return the title of this page
-	* @return string the title of the page to go in the <title> tags
-	*/
-	function getPageTitle() {
-		if ($this->family) {
-			return $this->family->getFullName();
-		} else {
-			return WT_I18N::translate('Family');
-		}
 	}
 
 	/**
@@ -152,7 +111,7 @@ class WT_Controller_Family extends WT_Controller_Base {
 	function getEditMenu() {
 		$SHOW_GEDCOM_RECORD=get_gedcom_setting(WT_GED_ID, 'SHOW_GEDCOM_RECORD');
 
-		if (!$this->family || $this->family->isMarkedDeleted()) {
+		if (!$this->record || $this->record->isMarkedDeleted()) {
 			return null;
 		}
 
@@ -165,22 +124,22 @@ class WT_Controller_Family extends WT_Controller_Base {
 		if (WT_USER_CAN_EDIT) {
 			// edit_fam / members
 			$submenu = new WT_Menu(WT_I18N::translate('Change Family Members'), '#', 'menu-fam-change');
-			$submenu->addOnclick("return change_family_members('".$this->getFamilyID()."');");
+			$submenu->addOnclick("return change_family_members('".$this->record->getXref()."');");
 			$submenu->addIcon('edit_fam');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_fam');
 			$menu->addSubmenu($submenu);
 
 			// edit_fam / add child
 			$submenu = new WT_Menu(WT_I18N::translate('Add a child to this family'), '#', 'menu-fam-addchil');
-			$submenu->addOnclick("return addnewchild('".$this->getFamilyID()."');");
+			$submenu->addOnclick("return addnewchild('".$this->record->getXref()."');");
 			$submenu->addIcon('edit_fam');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_add_fam');
 			$menu->addSubmenu($submenu);
 
 			// edit_fam / reorder_children
-			if ($this->family->getNumberOfChildren() > 1) {
+			if ($this->record->getNumberOfChildren() > 1) {
 				$submenu = new WT_Menu(WT_I18N::translate('Re-order children'), '#', 'menu-fam-orderchil');
-				$submenu->addOnclick("return reorder_children('".$this->getFamilyID()."');");
+				$submenu->addOnclick("return reorder_children('".$this->record->getXref()."');");
 				$submenu->addIcon('edit_fam');
 				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_reord_fam');
 				$menu->addSubmenu($submenu);
@@ -190,7 +149,7 @@ class WT_Controller_Family extends WT_Controller_Base {
 		// edit/view raw gedcom
 		if (WT_USER_IS_ADMIN || $SHOW_GEDCOM_RECORD) {
 			$submenu = new WT_Menu(WT_I18N::translate('Edit raw GEDCOM record'), '#', 'menu-fam-editraw');
-			$submenu->addOnclick("return edit_raw('".$this->getFamilyID()."');");
+			$submenu->addOnclick("return edit_raw('".$this->record->getXref()."');");
 			$submenu->addIcon('gedcom');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_raw');
 			$menu->addSubmenu($submenu);
@@ -209,7 +168,7 @@ class WT_Controller_Family extends WT_Controller_Base {
 		// delete
 		if (WT_USER_CAN_EDIT) {
 			$submenu = new WT_Menu(WT_I18N::translate('Delete'), '#', 'menu-fam-del');
-			$submenu->addOnclick("if (confirm('".WT_I18N::translate('Deleting the family will unlink all of the individuals from each other but will leave the individuals in place.  Are you sure you want to delete this family?')."')) return delete_family('".$this->getFamilyID()."'); else return false;");
+			$submenu->addOnclick("if (confirm('".WT_I18N::translate('Deleting the family will unlink all of the individuals from each other but will leave the individuals in place.  Are you sure you want to delete this family?')."')) jQuery.post('action.php',{action:'delete-family',xref:'".$this->record->getXref()."'},function(){location.reload();})");
 			$submenu->addIcon('remove');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_delete');
 			$menu->addSubmenu($submenu);
@@ -219,9 +178,10 @@ class WT_Controller_Family extends WT_Controller_Base {
 		if (array_key_exists('user_favorites', WT_Module::getActiveModules())) {
 			$submenu = new WT_Menu(
 				/* I18N: Menu option.  Add [the current page] to the list of favorites */ WT_I18N::translate('Add to favorites'),
-				$this->family->getHtmlUrl()."&amp;action=addfav&amp;gid=".$this->getFamilyID(),
+				'#',
 				'menu-fam-addfav'
 			);
+			$submenu->addOnclick("jQuery.post('module.php?mod=user_favorites&amp;mod_action=menu-add-favorite',{xref:'".$this->record->getXref()."'},function(){location.reload();})");
 			$submenu->addIcon('favorites');
 			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_fav');
 			$menu->addSubmenu($submenu);
@@ -233,5 +193,16 @@ class WT_Controller_Family extends WT_Controller_Base {
 			$menu->addOnclick($link);
 		}
 		return $menu;
+	}
+
+	// Get significant information from this page, to allow other pages such as
+	// charts and reports to initialise with the same records
+	public function getSignificantSurname() {
+		if ($this->record && $this->record->getHusband()) {
+			list($surn, $givn)=explode(',', $this->record->getHusband()->getSortname());
+			return $surn;
+		} else {
+			return '';
+		}
 	}
 }

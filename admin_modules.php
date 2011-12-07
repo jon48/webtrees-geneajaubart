@@ -18,18 +18,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: admin_modules.php 12466 2011-10-30 01:13:24Z nigel $
+// $Id: admin_modules.php 12887 2011-11-23 18:40:41Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_modules.php');
-
 require 'includes/session.php';
-require WT_ROOT.'includes/functions/functions_edit.php';
 
-// Only admin users can access this page
-if (!WT_USER_IS_ADMIN) {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.WT_SCRIPT_NAME);
-	exit;
-}
+$controller=new WT_Controller_Base();
+$controller
+	->requireAdminLogin()
+	->setPageTitle(WT_I18N::translate('Module administration'));
+
+require WT_ROOT.'includes/functions/functions_edit.php';
 
 // New modules may have been added...
 $installed_modules=WT_Module::getInstalledModules();
@@ -80,58 +79,40 @@ case 'delete_module':
 	break;
 }
 
-print_header(WT_I18N::translate('Module administration'));
+$controller
+	->pageHeader()
+	->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+	->addInlineJavaScript('
+	  function reindexMods(id) {
+			jQuery("#"+id+" input").each(
+				function (index, value) {
+					value.value = index+1;
+				});
+	  }
+
+		var oTable = jQuery("#installed_table").dataTable( {
+			"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
+			'.WT_I18N::datatablesI18N().',
+			"bJQueryUI": true,
+			"bAutoWidth":false,
+			"aaSorting": [[ 1, "asc" ]],
+			"iDisplayLength": 10,
+			"sPaginationType": "full_numbers",
+			"aoColumns" : [
+				{ bSortable: false, sClass: "center" },
+				null,
+				null,
+				{ sClass: "center" },
+				{ sClass: "center" },
+				{ sClass: "center" },
+				{ sClass: "center" },
+				{ sClass: "center", bVisible: false }, // The WT_Module system does not yet include charts
+				{ sClass: "center" },
+				{ sClass: "center", bVisible: false } // The WT_Module system does not yet include themes
+			]
+		});
+	');
 ?>
-<script type="text/javascript">
-//<![CDATA[
-
-  function reindexMods(id) {
-		jQuery('#'+id+' input').each(
-			function (index, value) {
-				value.value = index+1;
-			});
-  }
-
-  jQuery(document).ready(function() {
-  
-	var oTable = jQuery('#installed_table').dataTable( {
-		"oLanguage": {
-			"sLengthMenu": '<?php echo /* I18N: %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
-			"sZeroRecords": '<?php echo WT_I18N::translate('No records to display');?>',
-			"sInfo": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_'); ?>',
-			"sInfoEmpty": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '0', '0', '0'); ?>',
-			"sInfoFiltered": '<?php echo /* I18N: %s is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_'); ?>',
-			"sSearch": '<?php echo WT_I18N::translate('Filter');?>',
-			"oPaginate": {
-				"sFirst": '<?php echo /* I18N: button label, first page    */ WT_I18N::translate('first'); ?>',
-				"sLast": '<?php echo /* I18N: button label, last page     */ WT_I18N::translate('last'); ?>',
-				"sNext": '<?php echo /* I18N: button label, next page     */ WT_I18N::translate('next'); ?>',
-				"sPrevious": '<?php echo /* I18N: button label, previous page */ WT_I18N::translate('previous'); ?>'
-			}
-		},
-		"sDom": '<"H"pf<"dt-clear">irl>t<"F"pl>',
-		"bJQueryUI": true,
-		"bAutoWidth":false,
-		"aaSorting": [[ 1, "asc" ]],
-		"iDisplayLength": 10,
-		"sPaginationType": "full_numbers",
-		"aoColumns" : [
-			{ bSortable: false, sClass: "center" },
-			null,
-			null,
-			{ sClass: "center" },
-			{ sClass: "center" },
-			{ sClass: "center" },
-			{ sClass: "center" },
-			{ sClass: "center", bVisible: false }, // The WT_Module system does not yet include charts
-			{ sClass: "center" },
-			{ sClass: "center", bVisible: false } // The WT_Module system does not yet include themes
-		]
-	});
-});
-//]]>
-</script>
-
 <div align="center">
 	<div id="tabs">
 	<form method="post" action="<?php echo WT_SCRIPT_NAME; ?>">
@@ -185,5 +166,3 @@ print_header(WT_I18N::translate('Module administration'));
 		</form>
 	</div>
 </div>
-<?php
-print_footer();

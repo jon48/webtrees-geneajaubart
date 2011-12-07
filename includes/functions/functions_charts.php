@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_charts.php 12398 2011-10-24 20:14:11Z lukasz $
+// $Id: functions_charts.php 12979 2011-12-04 13:10:56Z rob $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -76,8 +76,7 @@ function print_sosa_number($sosa, $pid = "", $arrowDirection = "up") {
  * @param string $gparid optional gd-parent ID (descendancy booklet)
  */
 function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="", $personcount="1") {
-	global $show_full, $TEXT_DIRECTION, $SHOW_EMPTY_BOXES, $pbwidth, $pbheight, $WT_IMAGES, $GEDCOM;
-
+	global $show_full, $SHOW_EMPTY_BOXES, $pbwidth, $pbheight, $WT_IMAGES, $GEDCOM;
 	$ged_id=get_id_from_gedcom($GEDCOM);
 
 	$family = WT_Family::getInstance($famid);
@@ -129,8 +128,8 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
 	$hparents = false;
 	$upfamid = "";
 	if (count($hfams) > 0 or ($sosa != 0 and $SHOW_EMPTY_BOXES)) {
-		echo "<td rowspan=\"2\"><img src=\"".$WT_IMAGES["hline"]."\" alt=\"\" /></td><td rowspan=\"2\"><img src=\"".$WT_IMAGES["vline"]."\" width=\"3\" height=\"" . ($pbheight) . "\" alt=\"\" /></td>";
-		echo "<td><img src=\"".$WT_IMAGES["hline"]."\" alt=\"\" /></td><td>";
+		echo "<td rowspan=\"2\"><img src=\"".$WT_IMAGES["hline"]."\" alt=\"\" /></td><td rowspan=\"2\"><img src=\"".$WT_IMAGES["vline"]."\" width=\"3\" height=\"" . ($pbheight+9) . "\" alt=\"\" /></td>";
+		echo "<td><img class=\"line5\" src=\"".$WT_IMAGES["hline"]."\" alt=\"\" /></td><td>";
 		$hparents = false;
 		foreach ($hfams as $hfamily) {
 			$hparents = find_parents_in_record($hfamily->getGedcomRecord());
@@ -155,7 +154,7 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
 	}
 	if ($hparents or ($sosa != 0 and $SHOW_EMPTY_BOXES)) {
 		// husband's mother
-		echo "</tr><tr><td><img src=\"".$WT_IMAGES["hline"]."\" alt=\"\" /></td><td>";
+		echo "</tr><tr><td><img <img src=\"".$WT_IMAGES["hline"]."\" alt=\"\" /></td><td>";
 		echo "<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
 		if ($sosa > 0) print_sosa_number($sosa * 4 + 1, $hparents['WIFE'], "down");
 		if (!empty($gparid) and $hparents['WIFE']==$gparid) print_sosa_number(trim(substr($label,0,-3),".").".");
@@ -200,8 +199,8 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
 	$hparents = false;
 	$upfamid = "";
 	if (count($hfams) > 0 or ($sosa != 0 and $SHOW_EMPTY_BOXES)) {
-		echo "<td rowspan=\"2\"><img src=\"".$WT_IMAGES["hline"]."\" alt=\"\" /></td><td rowspan=\"2\"><img src=\"".$WT_IMAGES["vline"]."\" width=\"3\" height=\"" . ($pbheight) . "\" alt=\"\" /></td>";
-		echo "<td><img src=\"".$WT_IMAGES["hline"]."\" alt=\"\" /></td><td>";
+		echo "<td rowspan=\"2\"><img <img src=\"".$WT_IMAGES["hline"]."\" alt=\"\" /></td><td rowspan=\"2\"><img src=\"".$WT_IMAGES["vline"]."\" width=\"3\" height=\"" . ($pbheight+9) . "\" alt=\"\" /></td>";
+		echo "<td><img <img class=\"line5\" src=\"".$WT_IMAGES["hline"]."\" alt=\"\" /></td><td>";
 		$j = 0;
 		foreach ($hfams as $hfamily) {
 			$hparents = find_parents_in_record($hfamily->getGedcomRecord());
@@ -268,9 +267,9 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 	if ($sosa==0 && WT_USER_CAN_EDIT) {
 		echo "<br />";
 		echo "<span class='nowrap font12'>";
-		echo "<a href=\"javascript:;\" onclick=\"return addnewchild('$famid','');\">" . WT_I18N::translate('Add a child to this family') . "</a>";
-		echo " <a href=\"javascript:;\" onclick=\"return addnewchild('$famid','M');\">[".WT_Person::sexImage('M', 'small', '', WT_I18N::translate('son'     ))."]</a>";
-		echo " <a href=\"javascript:;\" onclick=\"return addnewchild('$famid','F');\">[".WT_Person::sexImage('F', 'small', '', WT_I18N::translate('daughter'))."]</a>";
+		echo "<a href=\"#\" onclick=\"return addnewchild('$famid','');\">" . WT_I18N::translate('Add a child to this family') . "</a>";
+		echo " <a href=\"#\" onclick=\"return addnewchild('$famid','M');\">[".WT_Person::sexImage('M', 'small', '', WT_I18N::translate('son'     ))."]</a>";
+		echo " <a href=\"#\" onclick=\"return addnewchild('$famid','F');\">[".WT_Person::sexImage('F', 'small', '', WT_I18N::translate('daughter'))."]</a>";
 		echo help_link('add_child');
 		echo "</span>";
 		echo "<br /><br />";
@@ -354,7 +353,7 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 							$ct = preg_match("/2 DATE.*(\d\d\d\d)/", $divrec, $match);
 							if ($ct>0) echo "-<span class=\"date\">".trim($match[1])."</span>";
 						}
-						echo "<br /><img width=\"100%\" height=\"3\" src=\"".$WT_IMAGES["hline"]."\" alt=\"\" />";
+						echo "<br /><img width=\"100%\" class=\"line5\" height=\"3\" src=\"".$WT_IMAGES["hline"]."\" alt=\"\" />";
 						// family link
 						if ($famid_child) {
 							$family_child = WT_Family::getInstance($famid_child);
@@ -462,24 +461,24 @@ function print_family_facts($family) {
 			echo '<tr><td class="descriptionbox">';
 			echo WT_I18N::translate('Add Note'), help_link('add_note');
 			echo '</td><td class="optionbox">';
-			echo "<a href=\"javascript:;\" onclick=\"return add_new_record('$famid','NOTE');\">", WT_I18N::translate('Add a new note'), '</a>';
+			echo "<a href=\"#\" onclick=\"return add_new_record('$famid','NOTE');\">", WT_I18N::translate('Add a new note'), '</a>';
 			echo '</td></tr>';
 
 			// -- new shared note
 			echo '<tr><td class="descriptionbox">';
 			echo WT_I18N::translate('Add Shared Note'), help_link('add_shared_note');
 			echo '</td><td class="optionbox">';
-			echo "<a href=\"javascript:;\" onclick=\"return add_new_record('$famid','SHARED_NOTE');\">", WT_I18N::translate('Add a new shared note'), '</a>';
+			echo "<a href=\"#\" onclick=\"return add_new_record('$famid','SHARED_NOTE');\">", WT_I18N::translate('Add a new shared note'), '</a>';
 			echo '</td></tr>';
 
 			// -- new media
 			if (get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') >= WT_USER_ACCESS_LEVEL) {
 				echo '<tr><td class="descriptionbox">';
-				echo WT_I18N::translate('Add media'), help_link('add_media');
+				echo WT_I18N::translate('Add media'), help_link('OBJE');
 				echo '</td><td class="optionbox">';
-				echo "<a href=\"javascript:;\" onclick=\"window.open('addmedia.php?action=showmediaform&linktoid={$famid}', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Add a new media object'), '</a>';
+				echo "<a href=\"#\" onclick=\"window.open('addmedia.php?action=showmediaform&linktoid={$famid}', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Add a new media object'), '</a>';
 				echo '<br />';
-				echo "<a href=\"javascript:;\" onclick=\"window.open('inverselink.php?linktoid={$famid}&linkto=family', '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Link to an existing media object'), '</a>';
+				echo "<a href=\"#\" onclick=\"window.open('inverselink.php?linktoid={$famid}&linkto=family', '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Link to an existing media object'), '</a>';
 				echo '</td></tr>';
 			}
 
@@ -487,7 +486,7 @@ function print_family_facts($family) {
 			echo '<tr><td class="descriptionbox">';
 			echo WT_I18N::translate('Add Source Citation'), help_link('add_source');
 			echo '</td><td class="optionbox">';
-			echo "<a href=\"javascript:;\" onclick=\"return add_new_record('$famid','SOUR');\">", WT_I18N::translate('Add a new source citation'), '</a>';
+			echo "<a href=\"#\" onclick=\"return add_new_record('$famid','SOUR');\">", WT_I18N::translate('Add a new source citation'), '</a>';
 			echo '</td></tr>';
 			// -- end new objects
 		}
@@ -619,7 +618,7 @@ function print_url_arrow($id, $url, $label, $dir=2) {
 	$array_style=array("larrow", "rarrow", "uarrow", "darrow");
 	$astyle=$array_style[$adir];
 
-	echo "<a href=\"$url\" onmouseover=\"swap_image('".$astyle.$id."',$adir); window.status ='" . $label . "'; return true;\" onmouseout=\"swap_image('".$astyle.$id."',$adir); window.status=''; return true;\"><img id=\"".$astyle.$id."\" src=\"".$WT_IMAGES[$astyle]."\" hspace=\"0\" vspace=\"0\" border=\"0\" alt=\"$label\" title=\"$label\" /></a>";
+	echo "<a href=\"$url\" onmouseover=\"swap_image('".$astyle.$id."',$adir); window.status ='" . $label . "'; return true;\" onmouseout=\"swap_image('".$astyle.$id."',$adir); window.status=''; return true;\"><img id=\"".$astyle.$id."\" src=\"".$WT_IMAGES[$astyle]."\" border=\"0\" alt=\"$label\" title=\"$label\" /></a>";
 }
 
 /**
@@ -652,7 +651,6 @@ function print_cousins($famid, $personcount=1) {
 	global $show_full, $bheight, $bwidth, $WT_IMAGES, $TEXT_DIRECTION, $GEDCOM;
 
 	$ged_id=get_id_from_gedcom($GEDCOM);
-
 	$family=WT_Family::getInstance($famid);
 	$fchildren=$family->getChildren();
 
@@ -661,16 +659,21 @@ function print_cousins($famid, $personcount=1) {
 	if ($save_show_full) {
 		$bheight=$bheight/4+10;
 		$bwidth-=40;
-	}
+	} 
+	
 	$show_full = false;
 	echo '<td valign="middle" height="100%">';
 	if ($kids) {
 		echo '<table cellspacing="0" cellpadding="0" border="0" ><tr valign="middle">';
-		if ($kids>1) echo '<td rowspan="', $kids, '" valign="middle" align="right"><img width="3px" height="', (($bheight+5)*($kids-1)), 'px" src="', $WT_IMAGES["vline"], '" alt="" /></td>';
+		if ($kids>1) echo '<td rowspan="', $kids, '" valign="middle" align="right"><img width="3px" height="', (($bheight+9)*($kids-1)), 'px" src="', $WT_IMAGES["vline"], '" alt="" /></td>';
 		$ctkids = count($fchildren);
 		$i = 1;
 		foreach ($fchildren as $fchil) {
+			if ($i==1) {
+			echo '<td><img width="10px" height="3px" align="top" style="padding-';
+		} else {
 			echo '<td><img width="10px" height="3px" style="padding-';
+		}
 			if ($TEXT_DIRECTION=='ltr') echo 'right';
 			else echo 'left';
 			echo ': 2px;" src="', $WT_IMAGES["hline"], '" alt="" /></td><td>';

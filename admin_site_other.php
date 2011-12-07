@@ -1,37 +1,34 @@
 <?php
-/**
-* Miscellaneous administrative functions
-*
-*
-* webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
- *
- * Partly Derived from PhpGedView
-* Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* @package webtrees
-* @subpackage admin
-* @version $Id: admin_site_other.php 11261 2011-04-02 17:16:37Z greg $
-*/
+// Miscellaneous administrative functions
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Partly Derived from PhpGedView
+// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: admin_site_other.php 12696 2011-11-11 00:56:58Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_other.php');
 require './includes/session.php';
 
-print_header(WT_I18N::translate('Add unlinked records'));
+$controller=new WT_Controller_Base();
+$controller->setPageTitle(WT_I18N::translate('Add unlinked records'));
+$controller->pageHeader();
 
 // The addnewXXX() functions work only for the default tree.
 // Choose one...
@@ -61,18 +58,16 @@ echo
 	$html,
 	'<table id="other">',
 	'<tr><td>',
-	'<a href="javascript:;" onclick="addnewchild(\'\'); return false;">', WT_I18N::translate('Add an unlinked person'), '</a>',
+	'<a href="#" onclick="addnewchild(\'\'); return false;">', WT_I18N::translate('Add an unlinked person'), '</a>',
 	help_link('edit_add_unlinked_person'),
 	'</td></tr>',
 	'<tr><td>',
-	'<a href="javascript:;" onclick="addnewnote(\'\'); return false;">', WT_I18N::translate('Add an unlinked note'), '</a>',
+	'<a href="#" onclick="addnewnote(\'\'); return false;">', WT_I18N::translate('Add an unlinked note'), '</a>',
 	help_link('edit_add_unlinked_note'),
 	'</td></tr>',
 	'<tr><td>',
-	'<a href="javascript:;" onclick="addnewsource(\'\'); return false;">', WT_I18N::translate('Add an unlinked source'), '</a>',
+	'<a href="#" onclick="addnewsource(\'\'); return false;">', WT_I18N::translate('Add an unlinked source'), '</a>',
 	help_link('edit_add_unlinked_source'),
 	'</td></tr>',
 	'</table>',
 	'</div>';
-
-print_footer();

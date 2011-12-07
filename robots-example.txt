@@ -24,7 +24,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-# $Id: robots-example.txt 11618 2011-05-26 19:17:53Z greg $
+# $Id: robots-example.txt 12989 2011-12-05 08:40:55Z greg $
 
 ################################################################################
 # Instructions for unfriendly robots ...
@@ -182,7 +182,7 @@ Disallow: /expand_view.php
 Disallow: /export_gedcom.php
 Allow:    /family.php
 Disallow: /familybook.php
-Allow:    /famlist.php
+Disallow: /famlist.php
 Disallow: /fanchart.php
 Disallow: /find.php
 Disallow: /gedcheck.php
@@ -214,23 +214,22 @@ Disallow: /message.php
 Disallow: /module.php
 Disallow: /modules
 Allow:    /note.php
-Allow:    /notelist.php
+Disallow: /notelist.php
 Disallow: /pedigree.php
 Disallow: /placelist.php
 Disallow: /places/
 Disallow: /relationship.php
 Allow:    /repo.php
-Allow:    /repolist.php
+Disallow: /repolist.php
 Disallow: /reportengine.php
 Disallow: /save.php
 Disallow: /search.php
 Disallow: /search_advanced.php
 Allow:    /search_engine.php
 Disallow: /setup.php
-Disallow: /sidebar.php
 Allow:    /site-unavailable.php
 Allow:    /source.php
-Allow:    /sourcelist.php
+Disallow: /sourcelist.php
 Disallow: /statistics.php
 Disallow: /statisticsplot.php
 Disallow: /themes/

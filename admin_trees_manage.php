@@ -18,17 +18,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_manage.php 12322 2011-10-16 16:44:25Z greg $
+// $Id: admin_trees_manage.php 12975 2011-12-03 20:51:48Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_manage.php');
-
 require './includes/session.php';
 
-// The gedcom admin page is for managers only!
-if (!WT_USER_GEDCOM_ADMIN) {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.WT_SCRIPT_NAME);
-	exit;
-}
+$controller=new WT_Controller_Base();
+$controller
+	->requireManagerLogin()
+	->setPageTitle(WT_I18N::translate('Family trees'));
 
 // Don't allow the user to cancel the request.  We do not want to be left
 // with an incomplete transaction.
@@ -116,7 +114,7 @@ case 'replace_upload':
 			}
 		}
 	}
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME);
+	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'?keep_media'.$gedcom_id.'='.safe_POST_bool('keep_media'.$gedcom_id));
 	exit;
 case 'replace_import':
 	$gedcom_id=safe_POST('gedcom_id');
@@ -125,13 +123,13 @@ case 'replace_import':
 		$ged_name=basename(safe_POST('ged_name'));
 		import_gedcom_file($gedcom_id, WT_DATA_DIR.$ged_name, $ged_name);
 	}
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME);
+	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'?keep_media'.$gedcom_id.'='.safe_POST_bool('keep_media'.$gedcom_id));
 	exit;
 }
 
 $gedcoms=get_all_gedcoms();
 
-print_header(WT_I18N::translate('Family trees'));
+$controller->pageHeader();
 
 // "Help for this page" link
 echo '<div id="page_help">', help_link('gedcom_administration'), '</div>';
@@ -181,15 +179,13 @@ case 'importform':
 		} else {
 			echo '<p>', WT_I18N::translate('No GEDCOM files found.  You need to copy files to the <b>%s</b> directory on your server.', WT_DATA_DIR);
 			echo '</form>';
-			print_footer();
 			exit;
 		}
 	}
 	echo '<br /><br /><input type="checkbox" name="keep_media', $gedcom_id, '" value="1">';
 	echo WT_I18N::translate('If you have created media objects in webtrees, and have edited your gedcom off-line using a program that deletes media objects, then check this box to merge the current media objects with the new GEDCOM.');
-	echo '<br /><br /><input type="submit" value="', WT_I18N::translate('Save'), '" /></form>';
+	echo '<br /><br /><input type="submit" value="', WT_I18N::translate('Continue'), '" />';
 	echo '</form>';
-	print_footer();
 	exit;
 }
 
@@ -211,19 +207,28 @@ foreach ($gedcoms as $gedcom_id=>$gedcom_name) {
 			"SELECT 1 FROM `##gedcom_chunk` WHERE gedcom_id=? AND imported=0 LIMIT 1"
 		)->execute(array($gedcom_id))->fetchOne();
 		if ($importing) {
-			echo
-				'<div id="import', $gedcom_id, '"></div>',
-				WT_JS_START,
-				'jQuery("#import', $gedcom_id, '").load("import.php?gedcom_id=', $gedcom_id, '&keep_media=', safe_POST('keep_media'.$gedcom_id), '");',
-				WT_JS_END,
-				'<table border="0" width="100%" id="actions', $gedcom_id, '" style="display:none">';
+			$in_progress=WT_DB::prepare(
+				"SELECT 1 FROM `##gedcom_chunk` WHERE gedcom_id=? AND imported=1 LIMIT 1"
+			)->execute(array($gedcom_id))->fetchOne();
+			if (!$in_progress) {
+				echo '<div id="import', $gedcom_id, '"><div id="progressbar', $gedcom_id, '"><div style="position:absolute;">', WT_I18N::translate('Deleting old genealogy data…'), '</div></div></div>';
+			$controller->addInlineJavaScript(
+				'jQuery("#progressbar'.$gedcom_id.'").progressbar({value: 0});'
+			);
+			} else {
+				echo '<div id="import', $gedcom_id, '"></div>';
+			}
+			$controller->addInlineJavaScript(
+				'jQuery("#import'.$gedcom_id.'").load("import.php?gedcom_id='.$gedcom_id.'&keep_media'.$gedcom_id.'='.safe_GET('keep_media'.$gedcom_id).'");'
+			);
+			echo '<table border="0" width="100%" id="actions', $gedcom_id, '" style="display:none">';
 		} else {
 			echo '<table border="0" width="100%" id="actions', $gedcom_id, '">';
 		}
 		echo
 			'<tr align="center">',
 			// export
-			'<td><a href="javascript:" onclick="window.open(\'', "export_gedcom.php?export=", rawurlencode($gedcom_name), '\', \'_blank\',\'left=50,top=50,width=500,height=500,resizable=1,scrollbars=1\');">', WT_I18N::translate('Export'), '</a>',
+			'<td><a href="#" onclick="window.open(\'', "export_gedcom.php?export=", rawurlencode($gedcom_name), '\', \'_blank\',\'left=50,top=50,width=500,height=500,resizable=1,scrollbars=1\');">', WT_I18N::translate('Export'), '</a>',
 			help_link('export_gedcom'),
 			'</td>',
 			// import
@@ -289,4 +294,3 @@ if (WT_USER_IS_ADMIN) {
 				'</div>';
 		}
 }
-print_footer();

@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
+// $Id: module.php 12726 2011-11-13 20:53:38Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -49,7 +49,6 @@ class recent_changes_WT_Module extends WT_Module implements WT_Module_Block {
 
 		$days = get_block_setting($block_id, 'days', 7);
 		$infoStyle = get_block_setting($block_id, 'infoStyle', 'table');
-		$show_parents = get_block_setting($block_id, 'show_parents', false);
 		$sortStyle = get_block_setting($block_id, 'sortStyle', 'date_desc');
 		$hide_empty = get_block_setting($block_id, 'hide_empty', false);
 		$block = get_block_setting($block_id, 'block', true);
@@ -71,7 +70,7 @@ class recent_changes_WT_Module extends WT_Module implements WT_Module_Block {
 		$class=$this->getName().'_block';
 		$title = '';
 		if ($ctype == "gedcom" && WT_USER_GEDCOM_ADMIN || $ctype == 'user') {
-			$title .= "<a href=\"javascript: configure block\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
+			$title .= "<a href=\"#\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
 			$title .= "<img class=\"adminicon\" src=\"" . $WT_IMAGES["admin"] . "\" width=\"15\" height=\"15\" border=\"0\" alt=\"" . WT_I18N::translate('Configure') . "\" /></a>";
 		}
 		$title.= /* I18N: title for list of recent changes */ WT_I18N::plural('Changes in the last %d day', 'Changes in the last %d days', $days, $days);
@@ -83,11 +82,11 @@ class recent_changes_WT_Module extends WT_Module implements WT_Module_Block {
 			ob_start();
 			switch ($infoStyle) {
 				case 'list':
-					$content .= print_changes_list($found_facts, $sortStyle, $show_parents);
+					$content .= print_changes_list($found_facts, $sortStyle);
 					break;
 				case 'table':
 					// sortable table
-					$content .= print_changes_table($found_facts, $sortStyle, $show_parents);
+					$content .= print_changes_table($found_facts, $sortStyle);
 					break;
 			}
 			$content .= ob_get_clean();
@@ -124,7 +123,6 @@ class recent_changes_WT_Module extends WT_Module implements WT_Module_Block {
 		if (safe_POST_bool('save')) {
 			set_block_setting($block_id, 'days', safe_POST_integer('days', 1, 30, 7));
 			set_block_setting($block_id, 'infoStyle', safe_POST('infoStyle', array('list', 'table'), 'table'));
-			set_block_setting($block_id, 'show_parents', safe_POST_bool('show_parents'));
 			set_block_setting($block_id, 'sortStyle', safe_POST('sortStyle', array('name', 'date_asc', 'date_desc'), 'date_desc'));
 			set_block_setting($block_id, 'hide_empty', safe_POST_bool('hide_empty'));
 			set_block_setting($block_id, 'block', safe_POST_bool('block'));
@@ -158,13 +156,6 @@ class recent_changes_WT_Module extends WT_Module implements WT_Module_Block {
 			'date_asc'  => /* I18N: An option in a list-box */ WT_I18N::translate('sort by date, oldest first'),
 			'date_desc' => /* I18N: An option in a list-box */ WT_I18N::translate('sort by date, newest first')
 		), null, $sortStyle, '');
-		echo '</td></tr>';
-
-		$show_parents = get_block_setting($block_id, 'show_parents', true);
-		echo '<tr><td class="descriptionbox wrap width33">';
-		echo /* I18N: label for a yes/no option */ WT_I18N::translate('Show parents');
-		echo '</td><td class="optionbox">';
-		echo edit_field_yes_no('show_parents', $show_parents);
 		echo '</td></tr>';
 
 		$block = get_block_setting($block_id, 'block', true);

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: class_treeview.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: class_treeview.php 12634 2011-11-08 19:22:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -61,7 +61,7 @@ class TreeView {
   * @param int $generations number of generations to draw
 	*/
 	public function drawViewport($rootPersonId, $generations, $style) {
-		global $GEDCOM, $WT_IMAGES;
+		global $GEDCOM, $WT_IMAGES, $controller;
 
     $rootPersonId = check_rootid($rootPersonId);
     $rootPerson = WT_Person::getInstance($rootPersonId);
@@ -128,8 +128,10 @@ class TreeView {
     $parent = null;
     $r.=$this->drawPerson($rootPerson, $generations, 0, $parent, '', true);
     $r.='</div></div>'; // Close the tv_in and the tv_out div
-		$r.='<script type="text/javascript">var '.$this->name.'Handler = new TreeViewHandler("'.$this->name.'", '.($this->allPartners ? 'true' : 'false').', '.$nbStyles.');</script>';
-    return $r;
+		return array(
+			$r,
+			'var '.$this->name.'Handler = new TreeViewHandler("'.$this->name.'", '.($this->allPartners ? 'true' : 'false').', '.$nbStyles.');'
+		);
 	}
 
   /**

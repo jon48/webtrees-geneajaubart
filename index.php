@@ -22,13 +22,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index.php 12338 2011-10-19 15:51:08Z lukasz $
+// $Id: index.php 12954 2011-11-30 11:31:07Z greg $
 
 define('WT_SCRIPT_NAME', 'index.php');
-if (defined ('WT_ROOT')) {
-	require WT_ROOT.'includes/session.php';
-} else
-	require './includes/session.php';
+require './includes/session.php';
 
 // The only option for action is "ajax"
 $action=safe_REQUEST($_REQUEST, 'action', 'ajax');
@@ -36,14 +33,8 @@ $action=safe_REQUEST($_REQUEST, 'action', 'ajax');
 // The default view depends on whether we are logged in
 $ctype=safe_REQUEST($_REQUEST, 'ctype', array('gedcom', 'user'), WT_USER_ID ? 'user' : 'gedcom');
 
-// A request to see a user page, but not logged in?
-if (!WT_USER_ID && $ctype=='user') {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.rawurlencode('index.php?ctype=user'));
-	exit;
-}
-
 //-- get the blocks list
-if ($ctype=='user') {
+if (WT_USER_ID && $ctype=='user') {
 	$blocks=get_user_blocks(WT_USER_ID);
 } else {
 	$blocks=get_gedcom_blocks(WT_GED_ID);
@@ -53,9 +44,12 @@ $all_blocks=WT_Module::getActiveBlocks();
 
 // We generate individual blocks using AJAX
 if ($action=='ajax') {
-	// We have finished writing session data, so release the lock
-	Zend_Session::writeClose();
-	header('Content-Type: text/html; charset=UTF-8');
+	$controller=new WT_Controller_Ajax();
+	$controller
+		->pageHeader()
+		->addExternalJavaScript(WT_JQUERY_URL)
+		->addExternalJavaScript(WT_JQUERYUI_URL);
+
 	// Check we're displaying an allowable block.
 	$block_id=safe_GET('block_id');
 	if (array_key_exists($block_id, $blocks['main'])) {
@@ -79,38 +73,21 @@ if ($action=='ajax') {
 	exit;
 }
 
+$controller=new WT_Controller_Base();
 if ($ctype=='user') {
-	print_header(WT_I18N::translate('My page'));
-} else {
-	print_header(get_gedcom_setting(WT_GED_ID, 'title'));
+	$controller->requireMemberLogin();
 }
-
-// We have finished writing session data, so release the lock
-Zend_Session::writeClose();
+$controller
+	->setPageTitle($ctype=='user' ? WT_I18N::translate('My page') : get_gedcom_setting(WT_GED_ID, 'title'))
+	->pageHeader()
+	// By default jQuery modifies AJAX URLs to disable caching, causing JS libraries to be loaded many times.
+	->addInlineJavaScript('jQuery.ajaxSetup({cache:true});');
 
 if (WT_USE_LIGHTBOX) {
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 }
 
-// TODO: these should be moved to their respective module/block
-echo WT_JS_START;
-?>
-	function refreshpage() {
-		window.location = 'index.php?ctype=<?php echo $ctype; ?>';
-	}
-	function addnews(uname) {
-		window.open('editnews.php?username='+uname, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
-	}
-	function editnews(news_id) {
-		window.open('editnews.php?news_id='+news_id, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
-	}
-	var pastefield;
-	function paste_id(value) {
-		pastefield.value=value;
-	}
-<?php
-echo WT_JS_END;
-//-- start of main content section
+echo '<div id="home-page">';
 if ($ctype=='user') {
 	echo '<h1 align="center">', WT_I18N::translate('My page'), '</h1>';
 }
@@ -128,13 +105,14 @@ if ($blocks['main']) {
 			$module->getBlock($block_id);
 		} else {
 			// Load the block asynchronously
-			echo '<div id="block_', $block_id, '"><img src="', WT_STATIC_URL, 'images/loading.gif" alt="', htmlspecialchars(WT_I18N::translate('Loading...')),  '"/></div>';
-			echo WT_JS_START, "jQuery('#block_{$block_id}').load('index.php?ctype={$ctype}&action=ajax&block_id={$block_id}');", WT_JS_END;
+			echo '<div id="block_', $block_id, '"><div class="loading-image">&nbsp;</div></div>';
+			$controller->addInlineJavaScript(
+				'jQuery("#block_'.$block_id.'").load("index.php?ctype='.$ctype.'&action=ajax&block_id='.$block_id.'");'
+			);
 		}
 	}
 	echo '</div>';
 }
-
 if ($blocks['side']) {
 	if ($blocks['main']) {
 		echo '<div id="index_small_blocks">';
@@ -149,8 +127,10 @@ if ($blocks['side']) {
 			$module->getBlock($block_id);
 		} else {
 			// Load the block asynchronously
-			echo '<div id="block_', $block_id, '"><img src="', WT_STATIC_URL, 'images/loading.gif" alt="', htmlspecialchars(WT_I18N::translate('Loading...')),  '"/></div>';
-			echo WT_JS_START, "jQuery('#block_{$block_id}').load('index.php?ctype={$ctype}&action=ajax&block_id={$block_id}');", WT_JS_END;
+			echo '<div id="block_', $block_id, '"><div class="loading-image">&nbsp;</div></div>';
+			$controller->addInlineJavaScript(
+				'jQuery("#block_'.$block_id.'").load("index.php?ctype='.$ctype.'&action=ajax&block_id='.$block_id.'");'
+			);
 		}
 	}
 	echo '</div>';
@@ -159,13 +139,12 @@ if ($blocks['side']) {
 // Ensure there is always way to configure the blocks
 if ($ctype=='user' && !in_array('user_welcome', $blocks['main']) && !in_array('user_welcome', $blocks['side'])) {
 	echo '<div align="center">';
-	echo "<a href=\"javascript:;\" onclick=\"window.open('index_edit.php?name=".rawurlencode(WT_USER_NAME)."&amp;ctype=user', '_blank', 'top=50,left=10,width=600,height=500,scrollbars=1,resizable=1');\">".WT_I18N::translate('Change the blocks on this page').'</a>';
+	echo "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".rawurlencode(WT_USER_NAME)."&amp;ctype=user', '_blank', 'top=50,left=10,width=600,height=500,scrollbars=1,resizable=1');\">".WT_I18N::translate('Change the blocks on this page').'</a>';
 	echo '</div>';
 }
 if (WT_USER_IS_ADMIN && $ctype=='gedcom' && !in_array('gedcom_block', $blocks['main']) && !in_array('gedcom_block', $blocks['side'])) {
 	echo '<div align="center">';
-	echo "<a href=\"javascript:;\" onclick=\"window.open('index_edit.php?name=".WT_GEDURL."&amp;ctype=gedcom', '_blank', 'top=50,left=10,width=600,height=500,scrollbars=1,resizable=1');\">".WT_I18N::translate('Change the blocks on this page').'</a>';
+	echo "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".WT_GEDURL."&amp;ctype=gedcom', '_blank', 'top=50,left=10,width=600,height=500,scrollbars=1,resizable=1');\">".WT_I18N::translate('Change the blocks on this page').'</a>';
 	echo '</div>';
 }
-
-print_footer();
+echo '</div>'; // <div id="home-page">

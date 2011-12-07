@@ -26,13 +26,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: help_text.php 12382 2011-10-23 13:42:48Z greg $
+// $Id: help_text.php 12959 2011-12-01 18:35:13Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
 define('WT_SCRIPT_NAME', 'help_text.php');
-
 require './includes/session.php';
+
+$controller=new WT_Controller_Simple();
 
 $help=safe_GET('help');
 switch ($help) {
@@ -374,80 +375,80 @@ case 'DATE':
 		'<p>'.WT_I18N::translate('Dates are stored using English abbreviations and keywords.  Shortcuts are available as alternatives to these abbreviations and keywords.').'</p>'.
 		'<table border="1">'.
 		'<tr><th>'.WT_I18N::translate('Date').'</th><th>'.WT_I18N::translate('Format').'</th><th>'.WT_I18N::translate('Shortcut').'</th></tr>'.
-		'<tr><td>'.$dates['1900'].'</td><td><tt>1900</tt></td><td>&nbsp;</td></tr>'.
-		'<tr><td>'.$dates['JAN 1900'].'<br/>'.$dates['FEB 1900'].'<br/>'.$dates['MAR 1900'].'<br/>'.$dates['APR 1900'].'<br/>'.$dates['MAY 1900'].'<br/>'.$dates['JUN 1900'].'<br/>'.$dates['JUL 1900'].'<br/>'.$dates['AUG 1900'].'<br/>'.$dates['SEP 1900'].'<br/>'.$dates['OCT 1900'].'<br/>'.$dates['NOV 1900'].'<br/>'.$dates['DEC 1900'].'</td><td><tt>JAN 1900<br/>FEB 1900<br/>MAR 1900<br/>APR 1900<br/>MAY 1900<br/>JUN 1900<br/>JUL 1900<br/>AUG 1900<br/>SEP 1900<br/>OCT 1900<br/>NOV 1900<br/>DEC 1900</tt></td><td>&nbsp;</td></tr>'.
-		'<tr><td>'.$dates['11 DEC 1913'].'</td><td><tt>11 DEC 1913</tt></td><td><tt>'.$example1.'</tt></td></tr>'.
-		'<tr><td>'.$dates['01 FEB 2003'].'</td><td><tt>01 FEB 2003</tt></td><td><tt>'.$example2.'</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT 1900'].'</td><td><tt>ABT 1900</tt></td><td><tt>~1900</tt></td></tr>'.
-		'<tr><td>'.$dates['EST 1900'].'</td><td><tt>EST 1900</tt></td><td><tt>*1900</tt></td></tr>'.
-		'<tr><td>'.$dates['CAL 1900'].'</td><td><tt>CAL 1900</tt></td><td><tt>#1900</tt></td></tr>'.
-		'<tr><td>'.$dates['INT 1900 (...)'].'</td><td><tt>INT 1900 (...)</tt></td><td>&nbsp;</td></tr>'.
+		'<tr><td>'.$dates['1900'].'</td><td><tt dir="ltr" lang="en">1900</tt></td><td>&nbsp;</td></tr>'.
+		'<tr><td>'.$dates['JAN 1900'].'<br/>'.$dates['FEB 1900'].'<br/>'.$dates['MAR 1900'].'<br/>'.$dates['APR 1900'].'<br/>'.$dates['MAY 1900'].'<br/>'.$dates['JUN 1900'].'<br/>'.$dates['JUL 1900'].'<br/>'.$dates['AUG 1900'].'<br/>'.$dates['SEP 1900'].'<br/>'.$dates['OCT 1900'].'<br/>'.$dates['NOV 1900'].'<br/>'.$dates['DEC 1900'].'</td><td><tt dir="ltr" lang="en">JAN 1900<br/>FEB 1900<br/>MAR 1900<br/>APR 1900<br/>MAY 1900<br/>JUN 1900<br/>JUL 1900<br/>AUG 1900<br/>SEP 1900<br/>OCT 1900<br/>NOV 1900<br/>DEC 1900</tt></td><td>&nbsp;</td></tr>'.
+		'<tr><td>'.$dates['11 DEC 1913'].'</td><td><tt dir="ltr" lang="en">11 DEC 1913</tt></td><td><tt dir="ltr" lang="en">'.$example1.'</tt></td></tr>'.
+		'<tr><td>'.$dates['01 FEB 2003'].'</td><td><tt dir="ltr" lang="en">01 FEB 2003</tt></td><td><tt dir="ltr" lang="en">'.$example2.'</tt></td></tr>'.
+		'<tr><td>'.$dates['ABT 1900'].'</td><td><tt dir="ltr" lang="en">ABT 1900</tt></td><td><tt dir="ltr" lang="en">~1900</tt></td></tr>'.
+		'<tr><td>'.$dates['EST 1900'].'</td><td><tt dir="ltr" lang="en">EST 1900</tt></td><td><tt dir="ltr" lang="en">*1900</tt></td></tr>'.
+		'<tr><td>'.$dates['CAL 1900'].'</td><td><tt dir="ltr" lang="en">CAL 1900</tt></td><td><tt dir="ltr" lang="en">#1900</tt></td></tr>'.
+		'<tr><td>'.$dates['INT 1900 (...)'].'</td><td><tt dir="ltr" lang="en">INT 1900 (...)</tt></td><td>&nbsp;</td></tr>'.
 		'</table>'.
 		'<p>'.WT_I18N::translate('Date ranges are used to indicate that an event, such as a birth, happened on a unknown date within a possible range.').'</p>'.
 		'<table border="1">'.
 		'<tr><th>'.WT_I18N::translate('Date range').'</th><th>'.WT_I18N::translate('Format').'</th><th>'.WT_I18N::translate('Shortcut').'</th></tr>'.
-		'<tr><td>'.$dates['BET 1900 AND 1910'].'</td><td><tt>BET 1900 AND 1910</tt></td><td><tt>1900-1910</tt></td></tr>'.
-		'<tr><td>'.$dates['AFT 1900'].'</td><td><tt>AFT 1900</tt></td><td><tt>&gt;1900</tt></td></tr>'.
-		'<tr><td>'.$dates['BEF 1910'].'</td><td><tt>BEF 1910</tt></td><td><tt>&lt;1910</tt></td></tr>'.
-		'<tr><td>'.$dates['BET JAN 1900 AND MAR 1900'].'</td><td><tt>BET JAN 1900 AND MAR 1900</tt></td><td><tt>Q1 1900</tt></td></tr>'.
-		'<tr><td>'.$dates['BET APR 1900 AND JUN 1900'].'</td><td><tt>BET APR 1900 AND JUN 1900</tt></td><td><tt>Q2 1900</tt></td></tr>'.
-		'<tr><td>'.$dates['BET JUL 1900 AND SEP 1900'].'</td><td><tt>BET JUL 1900 AND SEP 1900</tt></td><td><tt>Q3 1900</tt></td></tr>'.
-		'<tr><td>'.$dates['BET OCT 1900 AND DEC 1900'].'</td><td><tt>BET OCT 1900 AND DEC 1900</tt></td><td><tt>Q4 1900</tt></td></tr>'.
+		'<tr><td>'.$dates['BET 1900 AND 1910'].'</td><td><tt dir="ltr" lang="en">BET 1900 AND 1910</tt></td><td><tt dir="ltr" lang="en">1900-1910</tt></td></tr>'.
+		'<tr><td>'.$dates['AFT 1900'].'</td><td><tt dir="ltr" lang="en">AFT 1900</tt></td><td><tt dir="ltr" lang="en">&gt;1900</tt></td></tr>'.
+		'<tr><td>'.$dates['BEF 1910'].'</td><td><tt dir="ltr" lang="en">BEF 1910</tt></td><td><tt dir="ltr" lang="en">&lt;1910</tt></td></tr>'.
+		'<tr><td>'.$dates['BET JAN 1900 AND MAR 1900'].'</td><td><tt dir="ltr" lang="en">BET JAN 1900 AND MAR 1900</tt></td><td><tt dir="ltr" lang="en">Q1 1900</tt></td></tr>'.
+		'<tr><td>'.$dates['BET APR 1900 AND JUN 1900'].'</td><td><tt dir="ltr" lang="en">BET APR 1900 AND JUN 1900</tt></td><td><tt dir="ltr" lang="en">Q2 1900</tt></td></tr>'.
+		'<tr><td>'.$dates['BET JUL 1900 AND SEP 1900'].'</td><td><tt dir="ltr" lang="en">BET JUL 1900 AND SEP 1900</tt></td><td><tt dir="ltr" lang="en">Q3 1900</tt></td></tr>'.
+		'<tr><td>'.$dates['BET OCT 1900 AND DEC 1900'].'</td><td><tt dir="ltr" lang="en">BET OCT 1900 AND DEC 1900</tt></td><td><tt dir="ltr" lang="en">Q4 1900</tt></td></tr>'.
 		'</table>'.
 		'<p>'.WT_I18N::translate('Date periods are used to indicate that a fact, such as an occupation, continued for a period of time.').'</p>'.
 		'<table border="1">'.
 		'<tr><th>'.WT_I18N::translate('Date period').'</th><th>'.WT_I18N::translate('Format').'</th><th>'.WT_I18N::translate('Shortcut').'</th></tr>'.
-		'<tr><td>'.$dates['FROM 1900 TO 1910'].'</td><td><tt>FROM 1900 TO 1910</tt></td><td><tt>1900~1910</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM 1900'].'</td><td><tt>FROM 1900</tt></td><td><tt>-1900</tt></td></tr>'.
-		'<tr><td>'.$dates['TO 1910'].'</td><td><tt>TO 1910</tt></td><td><tt>1900-</tt></td></tr>'.
+		'<tr><td>'.$dates['FROM 1900 TO 1910'].'</td><td><tt dir="ltr" lang="en">FROM 1900 TO 1910</tt></td><td><tt dir="ltr" lang="en">1900~1910</tt></td></tr>'.
+		'<tr><td>'.$dates['FROM 1900'].'</td><td><tt dir="ltr" lang="en">FROM 1900</tt></td><td><tt dir="ltr" lang="en">1900-</tt></td></tr>'.
+		'<tr><td>'.$dates['TO 1910'].'</td><td><tt dir="ltr" lang="en">TO 1910</tt></td><td><tt dir="ltr" lang="en">-1900</tt></td></tr>'.
 		'</table>'.
 		'<p>'.WT_I18N::translate('Simple dates are assumed to be in the gregorian calendar.  To specify a date in another calendar, add a keyword before the date.  This keyword is optional if the month or year format make the date unambiguous.').'</p>'.
 		'<table border="1">'.
 		'<tr><th>'.WT_I18N::translate('Date').'</th><th>'.WT_I18N::translate('Format').'</th></tr>'.
 		'<tr><td colspan="2" align="center">'.WT_I18N::translate('Julian').'</td></tr>'.
-		'<tr><td>'.$dates['@#DJULIAN@ 14 JAN 1700'].'</td><td><tt>@#DJULIAN@ 14 JAN 1700</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DJULIAN@ 44 B.C.'].'</td><td><tt>@#DJULIAN@ 44 B.C.</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DJULIAN@ 20 FEB 1742/43'].'</td><td><tt>@#DJULIAN@ 20 FEB 1742/43</tt></td></tr>'.
-		'<tr><td>'.$dates['BET @#DJULIAN@ 01 SEP 1752 AND @#DGREGORIAN@ 30 SEP 1752'].'</td><td><tt>BET @#DJULIAN@ 01 SEP 1752 AND @#DGREGORIAN@ 30 SEP 1752</tt></td></tr>'.
+		'<tr><td>'.$dates['@#DJULIAN@ 14 JAN 1700'].'</td><td><tt dir="ltr" lang="en">@#DJULIAN@ 14 JAN 1700</tt></td></tr>'.
+		'<tr><td>'.$dates['@#DJULIAN@ 44 B.C.'].'</td><td><tt dir="ltr" lang="en">@#DJULIAN@ 44 B.C.</tt></td></tr>'.
+		'<tr><td>'.$dates['@#DJULIAN@ 20 FEB 1742/43'].'</td><td><tt dir="ltr" lang="en">@#DJULIAN@ 20 FEB 1742/43</tt></td></tr>'.
+		'<tr><td>'.$dates['BET @#DJULIAN@ 01 SEP 1752 AND @#DGREGORIAN@ 30 SEP 1752'].'</td><td><tt dir="ltr" lang="en">BET @#DJULIAN@ 01 SEP 1752 AND @#DGREGORIAN@ 30 SEP 1752</tt></td></tr>'.
 		'<tr><td colspan="2" align="center">'.WT_I18N::translate('Jewish').'</td></tr>'.
-		'<tr><td>'.$dates['@#DHEBREW@ 5481'].'</td><td><tt>@#DHEBREW@ 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DHEBREW@ TSH 5481'].'</td><td><tt>@#DHEBREW@ TSH 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT @#DHEBREW@ CSH 5481'].'</td><td><tt>ABT @#DHEBREW@ CSH 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['BET @#DHEBREW@ KSL 5481 AND @#DHEBREW@ TVT 5481'].'</td><td><tt>BET @#DHEBREW@ KSL 5481 AND @#DHEBREW@ TVT 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM @#DHEBREW@ SHV 5481 TO @#DHEBREW@ ADR 5481'].'</td><td><tt>FROM @#DHEBREW@ SHV 5481 TO @#DHEBREW@ ADR 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['AFT @#DHEBREW@ ADR 5481'].'</td><td><tt>AFT @#DHEBREW@ ADR 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['AFT @#DHEBREW@ ADS 5480'].'</td><td><tt>AFT @#DHEBREW@ ADS 5480</tt></td></tr>'.
-		'<tr><td>'.$dates['BEF @#DHEBREW@ NSN 5481'].'</td><td><tt>BEF @#DHEBREW@ NSN 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT @#DHEBREW@ IYR 5481'].'</td><td><tt>ABT @#DHEBREW@ IYR 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM @#DHEBREW@ SVN 5481'].'</td><td><tt>FROM @#DHEBREW@ SVN 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['TO @#DHEBREW@ TMZ 5481'].'</td><td><tt>TO @#DHEBREW@ TMZ 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['EST @#DHEBREW@ AAV 5481'].'</td><td><tt>EST @#DHEBREW@ AAV 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DHEBREW@ 03 ELL 5481'].'</td><td><tt>@#DHEBREW@ 03 ELL 5481</tt></td></tr>'.
+		'<tr><td>'.$dates['@#DHEBREW@ 5481'].'</td><td><tt dir="ltr" lang="en">@#DHEBREW@ 5481</tt></td></tr>'.
+		'<tr><td>'.$dates['@#DHEBREW@ TSH 5481'].'</td><td><tt dir="ltr" lang="en">@#DHEBREW@ TSH 5481</tt></td></tr>'.
+		'<tr><td>'.$dates['ABT @#DHEBREW@ CSH 5481'].'</td><td><tt dir="ltr" lang="en">ABT @#DHEBREW@ CSH 5481</tt></td></tr>'.
+		'<tr><td>'.$dates['BET @#DHEBREW@ KSL 5481 AND @#DHEBREW@ TVT 5481'].'</td><td><tt dir="ltr" lang="en">BET @#DHEBREW@ KSL 5481 AND @#DHEBREW@ TVT 5481</tt></td></tr>'.
+		'<tr><td>'.$dates['FROM @#DHEBREW@ SHV 5481 TO @#DHEBREW@ ADR 5481'].'</td><td><tt dir="ltr" lang="en">FROM @#DHEBREW@ SHV 5481 TO @#DHEBREW@ ADR 5481</tt></td></tr>'.
+		'<tr><td>'.$dates['AFT @#DHEBREW@ ADR 5481'].'</td><td><tt dir="ltr" lang="en">AFT @#DHEBREW@ ADR 5481</tt></td></tr>'.
+		'<tr><td>'.$dates['AFT @#DHEBREW@ ADS 5480'].'</td><td><tt dir="ltr" lang="en">AFT @#DHEBREW@ ADS 5480</tt></td></tr>'.
+		'<tr><td>'.$dates['BEF @#DHEBREW@ NSN 5481'].'</td><td><tt dir="ltr" lang="en">BEF @#DHEBREW@ NSN 5481</tt></td></tr>'.
+		'<tr><td>'.$dates['ABT @#DHEBREW@ IYR 5481'].'</td><td><tt dir="ltr" lang="en">ABT @#DHEBREW@ IYR 5481</tt></td></tr>'.
+		'<tr><td>'.$dates['FROM @#DHEBREW@ SVN 5481'].'</td><td><tt dir="ltr" lang="en">FROM @#DHEBREW@ SVN 5481</tt></td></tr>'.
+		'<tr><td>'.$dates['TO @#DHEBREW@ TMZ 5481'].'</td><td><tt dir="ltr" lang="en">TO @#DHEBREW@ TMZ 5481</tt></td></tr>'.
+		'<tr><td>'.$dates['EST @#DHEBREW@ AAV 5481'].'</td><td><tt dir="ltr" lang="en">EST @#DHEBREW@ AAV 5481</tt></td></tr>'.
+		'<tr><td>'.$dates['@#DHEBREW@ 03 ELL 5481'].'</td><td><tt dir="ltr" lang="en">@#DHEBREW@ 03 ELL 5481</tt></td></tr>'.
 		'<tr><td colspan="2" align="center">'.WT_I18N::translate('Hijri').'</td></tr>'.
-		'<tr><td>'.$dates['@#DHIJRI@ 1497'].'</td><td><tt>@#DHIJRI@ 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DHIJRI@ MUHAR 1497'].'</td><td><tt>@#DHIJRI@ MUHAR 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT @#DHIJRI@ SAFAR 1497'].'</td><td><tt>ABT @#DHIJRI@ SAFAR 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['BET @#DHIJRI@ RABIA 1497 AND @#DHIJRI@ RABIT 1497'].'</td><td><tt>BET @#DHIJRI@ RABIA 1497 AND @#DHIJRI@ RABIT 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM @#DHIJRI@ JUMAA 1497 TO @#DHIJRI@ JUMAT 1497'].'</td><td><tt>FROM @#DHIJRI@ JUMAA 1497 TO @#DHIJRI@ JUMAT 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['AFT @#DHIJRI@ RAJAB 1497'].'</td><td><tt>AFT @#DHIJRI@ RAJAB 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['BEF @#DHIJRI@ SHAAB 1497'].'</td><td><tt>BEF @#DHIJRI@ SHAAB 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT @#DHIJRI@ RAMAD 1497'].'</td><td><tt>ABT @#DHIJRI@ RAMAD 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM @#DHIJRI@ SHAWW 1497'].'</td><td><tt>FROM @#DHIJRI@ SHAWW 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['TO @#DHIJRI@ DHUAQ 1497'].'</td><td><tt>TO @#DHIJRI@ DHUAQ 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DHIJRI@ 03 DHUAH 1497'].'</td><td><tt>@#DHIJRI@ 03 DHUAH 1497</tt></td></tr>'.
+		'<tr><td>'.$dates['@#DHIJRI@ 1497'].'</td><td><tt dir="ltr" lang="en">@#DHIJRI@ 1497</tt></td></tr>'.
+		'<tr><td>'.$dates['@#DHIJRI@ MUHAR 1497'].'</td><td><tt dir="ltr" lang="en">@#DHIJRI@ MUHAR 1497</tt></td></tr>'.
+		'<tr><td>'.$dates['ABT @#DHIJRI@ SAFAR 1497'].'</td><td><tt dir="ltr" lang="en">ABT @#DHIJRI@ SAFAR 1497</tt></td></tr>'.
+		'<tr><td>'.$dates['BET @#DHIJRI@ RABIA 1497 AND @#DHIJRI@ RABIT 1497'].'</td><td><tt dir="ltr" lang="en">BET @#DHIJRI@ RABIA 1497 AND @#DHIJRI@ RABIT 1497</tt></td></tr>'.
+		'<tr><td>'.$dates['FROM @#DHIJRI@ JUMAA 1497 TO @#DHIJRI@ JUMAT 1497'].'</td><td><tt dir="ltr" lang="en">FROM @#DHIJRI@ JUMAA 1497 TO @#DHIJRI@ JUMAT 1497</tt></td></tr>'.
+		'<tr><td>'.$dates['AFT @#DHIJRI@ RAJAB 1497'].'</td><td><tt dir="ltr" lang="en">AFT @#DHIJRI@ RAJAB 1497</tt></td></tr>'.
+		'<tr><td>'.$dates['BEF @#DHIJRI@ SHAAB 1497'].'</td><td><tt dir="ltr" lang="en">BEF @#DHIJRI@ SHAAB 1497</tt></td></tr>'.
+		'<tr><td>'.$dates['ABT @#DHIJRI@ RAMAD 1497'].'</td><td><tt dir="ltr" lang="en">ABT @#DHIJRI@ RAMAD 1497</tt></td></tr>'.
+		'<tr><td>'.$dates['FROM @#DHIJRI@ SHAWW 1497'].'</td><td><tt dir="ltr" lang="en">FROM @#DHIJRI@ SHAWW 1497</tt></td></tr>'.
+		'<tr><td>'.$dates['TO @#DHIJRI@ DHUAQ 1497'].'</td><td><tt dir="ltr" lang="en">TO @#DHIJRI@ DHUAQ 1497</tt></td></tr>'.
+		'<tr><td>'.$dates['@#DHIJRI@ 03 DHUAH 1497'].'</td><td><tt dir="ltr" lang="en">@#DHIJRI@ 03 DHUAH 1497</tt></td></tr>'.
 		'<tr><td colspan="2" align="center">'.WT_I18N::translate('French').'</td></tr>'.
-		'<tr><td>'.$dates['@#DFRENCH R@ 12'].'</td><td><tt>@#DFRENCH R@ 12</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DFRENCH R@ VEND 12'].'</td><td><tt>@#DFRENCH R@ VEND 12</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT @#DFRENCH R@ BRUM 12'].'</td><td><tt>ABT @#DFRENCH R@ BRUM 12</tt></td></tr>'.
-		'<tr><td>'.$dates['BET @#DFRENCH R@ FRIM 12 AND @#DFRENCH R@ NIVO 12'].'</td><td><tt>BET @#DFRENCH R@ FRIM 12 AND @#DFRENCH R@ NIVO 12</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM @#DFRENCH R@ PLUV 12 TO @#DFRENCH R@ VENT 12'].'</td><td><tt>FROM @#DFRENCH R@ PLUV 12 TO @#DFRENCH R@ VENT 12</tt></td></tr>'.
-		'<tr><td>'.$dates['AFT @#DFRENCH R@ GERM 12'].'</td><td><tt>AFT @#DFRENCH R@ GERM 12</tt></td></tr>'.
-		'<tr><td>'.$dates['BEF @#DFRENCH R@ FLOR 12'].'</td><td><tt>BEF @#DFRENCH R@ FLOR 12</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT @#DFRENCH R@ PRAI 12'].'</td><td><tt>ABT @#DFRENCH R@ PRAI 12</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM @#DFRENCH R@ MESS 12'].'</td><td><tt>FROM @#DFRENCH R@ MESS 12</tt></td></tr>'.
-		'<tr><td>'.$dates['TO @#DFRENCH R@ THER 12'].'</td><td><tt>TO @#DFRENCH R@ THER 12</tt></td></tr>'.
-		'<tr><td>'.$dates['EST @#DFRENCH R@ FRUC 12'].'</td><td><tt>EST @#DFRENCH R@ FRUC 12</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DFRENCH R@ 03 COMP 12'].'</td><td><tt>@#DFRENCH R@ 03 COMP 12</tt></td></tr>'.
+		'<tr><td>'.$dates['@#DFRENCH R@ 12'].'</td><td><tt dir="ltr" lang="en">@#DFRENCH R@ 12</tt></td></tr>'.
+		'<tr><td>'.$dates['@#DFRENCH R@ VEND 12'].'</td><td><tt dir="ltr" lang="en">@#DFRENCH R@ VEND 12</tt></td></tr>'.
+		'<tr><td>'.$dates['ABT @#DFRENCH R@ BRUM 12'].'</td><td><tt dir="ltr" lang="en">ABT @#DFRENCH R@ BRUM 12</tt></td></tr>'.
+		'<tr><td>'.$dates['BET @#DFRENCH R@ FRIM 12 AND @#DFRENCH R@ NIVO 12'].'</td><td><tt dir="ltr" lang="en">BET @#DFRENCH R@ FRIM 12 AND @#DFRENCH R@ NIVO 12</tt></td></tr>'.
+		'<tr><td>'.$dates['FROM @#DFRENCH R@ PLUV 12 TO @#DFRENCH R@ VENT 12'].'</td><td><tt dir="ltr" lang="en">FROM @#DFRENCH R@ PLUV 12 TO @#DFRENCH R@ VENT 12</tt></td></tr>'.
+		'<tr><td>'.$dates['AFT @#DFRENCH R@ GERM 12'].'</td><td><tt dir="ltr" lang="en">AFT @#DFRENCH R@ GERM 12</tt></td></tr>'.
+		'<tr><td>'.$dates['BEF @#DFRENCH R@ FLOR 12'].'</td><td><tt dir="ltr" lang="en">BEF @#DFRENCH R@ FLOR 12</tt></td></tr>'.
+		'<tr><td>'.$dates['ABT @#DFRENCH R@ PRAI 12'].'</td><td><tt dir="ltr" lang="en">ABT @#DFRENCH R@ PRAI 12</tt></td></tr>'.
+		'<tr><td>'.$dates['FROM @#DFRENCH R@ MESS 12'].'</td><td><tt dir="ltr" lang="en">FROM @#DFRENCH R@ MESS 12</tt></td></tr>'.
+		'<tr><td>'.$dates['TO @#DFRENCH R@ THER 12'].'</td><td><tt dir="ltr" lang="en">TO @#DFRENCH R@ THER 12</tt></td></tr>'.
+		'<tr><td>'.$dates['EST @#DFRENCH R@ FRUC 12'].'</td><td><tt dir="ltr" lang="en">EST @#DFRENCH R@ FRUC 12</tt></td></tr>'.
+		'<tr><td>'.$dates['@#DFRENCH R@ 03 COMP 12'].'</td><td><tt dir="ltr" lang="en">@#DFRENCH R@ 03 COMP 12</tt></td></tr>'.
 		'</table>';
 	break;
 
@@ -736,7 +737,10 @@ case 'NSFX':
 
 case 'OBJE':
 	$title=WT_Gedcom_Tag::getLabel('OBJE');
-	$text='';
+	$text=
+		'<p>'.
+		WT_I18N::translate('A media object is a record in the family tree which contains information about a media file.  This information may include a title, a copyright notice, a transcript, privacy restrictions, etc.  The media file, such as the photo or video, can be stored locally (on this webserver) or remotely (on a different webserver).').
+		'</p>';
 	break;
 
 case 'OCCU':
@@ -1263,7 +1267,6 @@ case '_SUBQ':
 	$text='';
 	break;
 
-
 case '_TODO':
 	$title=WT_Gedcom_Tag::getLabel('_TODO');
 	$text='';
@@ -1442,7 +1445,6 @@ case 'FULL_SOURCES':
 	$text=WT_I18N::translate('Source citations can include fields to record the quality of the data (primary, secondary, etc.) and the date the event was recorded in the source.  If you don\'t use these fields, you can disable them when creating new source citations.');
 	break;
 
-
 case 'GEDCOM_ID_PREFIX':
 	$title=WT_I18N::translate('Individual ID prefix');
 	$text=WT_I18N::translate('When a new individual record is added online in <b>webtrees</b>, a new ID for that individual will be generated automatically. The individual ID will have this prefix.');
@@ -1450,7 +1452,7 @@ case 'GEDCOM_ID_PREFIX':
 
 case 'GENERATE_GUID':
 	$title=WT_I18N::translate('Automatically create globally unique IDs');
-	$text=WT_I18N::translate('<b>GUID</b> in this context is an acronym for ´Globally Unique IDª.<br /><br />GUIDs are intended to help identify each individual in a manner that is repeatable, so that central organizations such as the Family History Center of the LDS Church in Salt Lake City, or even compatible programs running on your own server, can determine whether they are dealing with the same person no matter where the GEDCOM originates.  The goal of the Family History Center is to have a central repository of genealogical data and expose it through web services. This will enable any program to access the data and update their data within it.<br /><br />If you do not intend to share this GEDCOM with anyone else, you do not need to let <b>webtrees</b> create these GUIDs; however, doing so will do no harm other than increasing the size of your GEDCOM.');
+	$text=WT_I18N::translate('<b>GUID</b> in this context is an acronym for ¬´Globally Unique ID¬ª.<br /><br />GUIDs are intended to help identify each individual in a manner that is repeatable, so that central organizations such as the Family History Center of the LDS Church in Salt Lake City, or even compatible programs running on your own server, can determine whether they are dealing with the same person no matter where the GEDCOM originates.  The goal of the Family History Center is to have a central repository of genealogical data and expose it through web services. This will enable any program to access the data and update their data within it.<br /><br />If you do not intend to share this GEDCOM with anyone else, you do not need to let <b>webtrees</b> create these GUIDs; however, doing so will do no harm other than increasing the size of your GEDCOM.');
 	break;
 
 case 'HIDE_GEDCOM_ERRORS':
@@ -1553,11 +1555,11 @@ case 'MEDIA_DIRECTORY':
 	$text=
 		'<p>'.
 		/* I18N: %1$s is an example media directory, such as "media/", %2$s is an example URL, such as "http://localhost/webtrees/media/img123.jpg", and %3$s is an example file path, such as "/home/greg/public_html/webtrees/media/img123.jpg" */
-		WT_I18N::translate('The media directory is used to create URLs for your media items.  It is also the sub-directory in which the media items are stored.  For example, a media directory of %1$s will create URLs of the form %2$s and store these items as %3$s.', '<tt style="white-space:nowrap; color:#0000ff; font-weight:bold;">'.$MEDIA_DIRECTORY.'</tt>', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_SERVER_NAME.WT_SCRIPT_PATH.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span>img123.jpg</tt>', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span>img123.jpg</tt>').
+		WT_I18N::translate('The media directory is used to create URLs for your media items.  It is also the sub-directory in which the media items are stored.  For example, a media directory of %1$s will create URLs of the form %2$s and store these items as %3$s.', '<tt dir="ltr" lang="en" style="white-space:nowrap; color:#0000ff; font-weight:bold;">'.$MEDIA_DIRECTORY.'</tt>', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_SERVER_NAME.WT_SCRIPT_PATH.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span>img123.jpg</tt>', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span>img123.jpg</tt>').
 		'</p><p>'.
-		/* I18N: %1$s and %2$s are both directory names */ WT_I18N::translate('If your server supports it, you can enable the media firewall.  This changes the location of the media directory from the public directory %1$s to a private directory such as %2$s.  This allows webtrees to apply privacy filtering to media items.', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span></tt>', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_DATA_DIR.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span></tt>').
+		/* I18N: %1$s and %2$s are both directory names */ WT_I18N::translate('If your server supports it, you can enable the media firewall.  This changes the location of the media directory from the public directory %1$s to a private directory such as %2$s.  This allows webtrees to apply privacy filtering to media items.', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span></tt>', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_DATA_DIR.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span></tt>').
 		'</p><p>'.
-		/* I18N: %s is a directory name */ WT_I18N::translate('The media directory %s must exist, and the webserver must have read and write access to it.', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span></tt>').
+		/* I18N: %s is a directory name */ WT_I18N::translate('The media directory %s must exist, and the webserver must have read and write access to it.', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span></tt>').
 		'</p><p>'.
 		WT_I18N::translate('If two family trees share the same media directory, then they will be able to share media items.  If they use different media directories, then they will be able to use the same filename to access different media items.').
 		'</p>';
@@ -1618,11 +1620,6 @@ case 'NOTE_ID_PREFIX':
 case 'PEDIGREE_FULL_DETAILS':
 	$title=WT_I18N::translate('Birth and death details on charts');
 	$text=WT_I18N::translate('This option controls whether or not to show the Birth and Death details of an individual on charts.');
-	break;
-
-case 'PEDIGREE_GENERATIONS':
-	$title=WT_I18N::translate('Number of generations');
-	$text=WT_I18N::translate('Here you can set the number of generations to display on this page.<br /><br />The right number for you depends of the size of your screen and whether you show details or not.  Processing time will increase as you increase the number of generations.');
 	break;
 
 case 'PEDIGREE_LAYOUT':
@@ -1850,16 +1847,10 @@ case 'SHOW_LIVING_NAMES':
 	$text=WT_I18N::translate('Should the names of living people be shown to visitors?');
 	break;
 
-case 'SHOW_MARRIED_NAMES':
-	$title=WT_I18N::translate('Show married names on individual list');
-	$text=WT_I18N::translate('This option will show the married names of females on the Individual list.  This option requires that you calculate the married names when you import the GEDCOM file.');
-	break;
-
 case 'SHOW_MEDIA_DOWNLOAD':
 	$title=WT_I18N::translate('Show download link in media viewer');
 	$text=WT_I18N::translate('The Media Viewer can show a link which, when clicked, will download the Media file to the local PC.<br /><br />You may want to hide the download link for security reasons.');
 	break;
-
 
 case 'SHOW_NO_WATERMARK':
 	$title=WT_I18N::translate('Who can view non-watermarked images?');
@@ -1882,8 +1873,8 @@ case 'SHOW_PRIVATE_RELATIONSHIPS':
 	break;
 
 case 'SHOW_REGISTER_CAUTION':
-	$title=WT_I18N::translate('Show acceptable use agreement on ´Request new user accountª page');
-	$text=WT_I18N::translate('When set to <b>Yes</b>, the following message will appear above the input fields on the ´Request new user accountª page:<div class="list_value_wrap"><div class="largeError">Notice:</div><div class="error">By completing and submitting this form, you agree:<ul><li>to protect the privacy of living people listed on our site;</li><li>and in the text box below, to explain to whom you are related, or to provide us with information on someone who should be listed on our site.</li></ul></div></div>');
+	$title=WT_I18N::translate('Show acceptable use agreement on ¬´Request new user account¬ª page');
+	$text=WT_I18N::translate('When set to <b>Yes</b>, the following message will appear above the input fields on the ¬´Request new user account¬ª page:<div class="list_value_wrap"><div class="largeError">Notice:</div><div class="error">By completing and submitting this form, you agree:<ul><li>to protect the privacy of living people listed on our site;</li><li>and in the text box below, to explain to whom you are related, or to provide us with information on someone who should be listed on our site.</li></ul></div></div>');
 	break;
 
 case 'SHOW_RELATIVES_EVENTS':
@@ -2016,7 +2007,6 @@ case 'USE_SILHOUETTE':
 	." </td><td><img src=\"".$WT_IMAGES["default_image_U"]."\" width=\"40\" alt=\"\" title=\"\" /></td></tr></table>";
 	break;
 
-
 case 'WATERMARK_THUMB':
 	$title=WT_I18N::translate('Add watermarks to thumbnails?');
 	$text=WT_I18N::translate('If the Media Firewall is enabled, should thumbnails be watermarked? Your media lists will load faster if you don\'t watermark the thumbnails.');
@@ -2068,11 +2058,6 @@ case 'add_facts':
 case 'add_husband':
 	$title=WT_I18N::translate('Add a new husband');
 	$text=WT_I18N::translate('By clicking this link, you can add a <u>new</u> male person and link this person to the principal individual as a new husband.<br /><br />Just click the link, and you will get a pop up window to add the new person.  Fill out as many boxes as you can and click the <b>Save</b> button.<br /><br />That\'s all.');
-	break;
-
-case 'add_media':
-	$title=WT_I18N::translate('Add a new media object');
-	$text=WT_I18N::translate('Adding multimedia files (MM) to the GEDCOM is a very nice feature.  Although this program already has a great look without media, if you add pictures or other MM to your relatives, it will only get better.<br /><br /><b>What you should understand about MM.</b><br />There are many formats of MM. Although <b>webtrees</b> can handle most of them, there some things to consider.<br /><ul><li><b>Formats</b><br />Pictures can be edited and saved in many formats.  For example, .jpg, .png, .bmp, .gif, etc.  If the same original picture was used to create each of the formats, the viewed image will appear to be the same size no matter which format is used.  However, the image files stored in the database will vary considerably in size.  Generally, .jpg images are considered to the most efficient in terms of storage space.</li><li><b>Image size</b><br />The larger the original image, the larger will be the resultant file\'s size. The picture should fit on the screen without scrolling; the maximum width or height should not be more than the width or height of the screen. <b>webtrees</b> is designed for screens of 1024x768 pixels but not all of this space is available for viewing pictures; the picture\'s size should be set accordingly.  To reduce file sizes, smaller pictures are more desirable.</li><li><b>Resolution</b><br />The resolution of a picture is usually measured in "dpi" (dots/inch), but this is valid only for printed pictures.  When considering pictures shown on screen, the only correct way is to use total dots or pixels. When printed, the picture could have a resolution of 150 - 300 dpi or more depending on the printer. Screen resolutions are rarely better than 50 pixels per inch.  If your picture will never be printed, you can safely lower its resolution (and consequently its file size) without affecting picture quality.  If a low-resolution picture is printed with too great a magnification, its quality will suffer; it will have a grainy appearance.</li><li><b>Color depth</b><br />Another way to keep a file small is to decrease the number of colors that you use.  The number of colors can differ from pure black and white (two colors) to true colors (millions of colors) and anything in between.  You can see that the more colors are used, the bigger the size of the files.</li></ul><b>Why is it important to keep the file size small?</b><br /><ul><li>First of all: Our webspace is limited.  The more large files there are, the more web space we need on the server. The more space we need, the higher our costs.</li><li>Bandwidth.  The more data our server has to send to the remote location (your location), the more we have to pay.  This is because the carrying capacity of the server\'s connection to the Internet is limited, and the link has to be shared (and paid for) by all of the applications running on the server.  <b>webtrees</b> is one of many applications that share the server.  The cost is normally apportioned according to the amount of data each application sends and receives.</li><li>Download time. If you have large files, the user (also you) will have to wait long for the page to download from the server.  Not everybody is blessed with a cable connection, broadband or DSL.</li></ul><b>How to upload your MM</b><br />There are two ways to upload media to the site.  If you have a lot of media items to upload you should contact the site administrator to discuss the best ways.  If it has been enabled by your site administrator, you can use the Upload Media form under your My Page menu.  You can also use the Upload option on the Multimedia form to upload media items.');
 	break;
 
 case 'add_media_linkid':
@@ -2128,19 +2113,7 @@ case 'add_wife':
 
 case 'age_differences':
 	$title=WT_I18N::translate('Show date differences');
-	$text=WT_I18N::translate('When this option box is checked, the ´Close Relativesª tab will show date differences as follows:<br /><ul><li>birth dates of partners.<br />A negative value indicates that the second partner is older than the first.<br /><br /></li><li>marriage date and birth date of the first child.<br />A negative value here indicates that the child was born before the marriage date or that either the birth date or the marriage date is wrong.<br /><br /></li><li>birth dates of siblings.<br />A negative value here indicates that either the order of the children is wrong or that one of the birth dates is wrong.</li></ul>');
-	break;
-
-case 'alpha':
-	$title=
-		/* I18N: Replace A-Z with the first/last letters from your own alphabet. */
-		WT_I18N::translate('A-Z list of names');
-	$text=
-		/* I18N: Replace A-Z with the first/last letters from your own alphabet. Note "Ö" and "None" should be the same as your translation of these individual terms. */
-		WT_I18N::translate('The A-Z list allows you to select all names beginning with a certain letter.  Unknown names are listed under ìÖî and people who do not have a surname are listed under ìNoneî.').
-		'</p><p>'.
-		WT_I18N::translate('If a personís name is not known, it should be left blank.  If you enter ìUnknownî as a name, it will be listed under ìUî.').
-		'</p>';
+	$text=WT_I18N::translate('When this option box is checked, the ¬´Close Relatives¬ª tab will show date differences as follows:<br /><ul><li>birth dates of partners.<br />A negative value indicates that the second partner is older than the first.<br /><br /></li><li>marriage date and birth date of the first child.<br />A negative value here indicates that the child was born before the marriage date or that either the birth date or the marriage date is wrong.<br /><br /></li><li>birth dates of siblings.<br />A negative value here indicates that either the order of the children is wrong or that one of the birth dates is wrong.</li></ul>');
 	break;
 
 case 'ancestry_chart':
@@ -2203,11 +2176,6 @@ case 'box_width':
 	$text=WT_I18N::translate('Here you can change the box width from 50 percent to 300 percent.  At 100 percent each box is about 270 pixels wide.');
 	break;
 
-case 'chart_style':
-	$title=WT_I18N::translate('Chart style');
-	$text=WT_I18N::translate('Two chart styles are available:<ul><li><b>List</b><br />Vertical tree, with collapsible/expandable families.</li><li><b>Booklet</b><br />One family per page, with parents, grandparents, and all recorded children.<br /><br />This format is easy to print to give to your relatives.</li></ul>');
-	break;
-
 case 'chart_type':
 	$title=WT_I18N::translate('Chart type');
 	$text=WT_I18N::translate('Select what you want to see on the map chart. You can choose:<p style="padding-left: 25px"><b>Individual distribution chart</b>&nbsp;&nbsp;shows the countries in which persons from this database occur.<br /><b>Surname distribution chart</b>&nbsp;&nbsp;shows the countries in which the specified surname occurs.</p>');
@@ -2231,16 +2199,6 @@ case 'day_month':
 case 'default_gedcom':
 	$title=WT_I18N::translate('Default family tree');
 	$text=WT_I18N::translate('This option selects the family tree that is shown to visitors when they first arrive at the site.');
-	break;
-
-case 'desc_generations':
-	$title=WT_I18N::translate('Number of generations');
-	$text=WT_I18N::translate('Here you can set the number of generations to display on this page.<br /><br />The right number for you depends of the size of your screen and whether you show details or not.  Processing time will increase as you increase the number of generations.');
-	break;
-
-case 'desc_rootid':
-	$title=WT_I18N::translate('Root individual');
-	$text=WT_I18N::translate('If you want to display a chart with a new starting (root) person, the ID of that new starting person is typed here.<br /><br />If you don\'t know the ID of that person, use the <b>Find ID</b> link.<br /><br /><b>ID NUMBER</b><br />The ID numbers used inside <b>webtrees</b> are <u>not</u> the identification numbers issued by various governments (driving permit or passport numbers, for instance).  The ID number referred to here is simply a number used within the database to uniquely identify each individual; it was assigned by the ancestry program that created the GEDCOM file which was imported into <b>webtrees</b>.');
 	break;
 
 case 'download_gedcom':
@@ -2334,11 +2292,6 @@ case 'edituser_change_lang':
 	$text=WT_I18N::translate('Here you can change the language in which <b>webtrees</b> will display all its pages and messages after you have logged in.<br /><br />When you first access the site, <b>webtrees</b> assumes that you want to see everything in the language configured as the Preferred Language in your browser.  If that assumption is incorrect, you would override it here.  For example, your browser might be set to English because that is the most prevalent language on the Internet.  However, for genealogical purposes, you would prefer to see everything in Finnish or Hebrew.  Here\'s where you do that.<br /><br />The administrator controls what language choices are available to you.  If your preference isn\'t listed, you need to contact the administrator.<br /><br />Please remember that <b>webtrees</b> is very much a project staffed by an international team of unpaid volunteers.  Experts come and go.  Consequently, support for languages other than English is sometimes not as good as it should be.<br /><br />If you see something that has not been translated, has been translated incorrectly, or could be phrased better, let your administrator know.  The administrator will know how to get in touch with the <b>webtrees</b> developer team to have your concerns addressed.  Better still, volunteer some of your time.  We can use the help.');
 	break;
 
-case 'edituser_conf_password':
-	$title=WT_I18N::translate('Confirm password');
-	$text=WT_I18N::translate('If you have changed your password, you need to confirm it as well.  This is just to make sure that you did not make a typing error in the password field.<br /><br />If the password and its confirmation are not identical, you will get a suitable error message.  You will have to re-type both the original password and its confirmation.');
-	break;
-
 case 'edituser_contact_meth':
 	$title=WT_I18N::translate('Preferred contact method');
 	$text=WT_I18N::translate('<b>webtrees</b> has several different contact methods.  The administrator determines which method will be used to contact him.  You have control over the method to be used to contact <u>you</u>.  Depending on site configuration, some of the listed methods may not be available to you.');
@@ -2361,24 +2314,9 @@ case 'edituser_contact_meth':
 	$text.='</dd></dl>';
 	break;
 
-case 'edituser_email':
-	$title=WT_I18N::translate('Email address');
-	$text=WT_I18N::translate('Your correct email address is important to us to keep in touch with you.<br /><br />If you get a new email address, as usually happens when you change your Internet provider, please do not forget to change the address here as well.  You won\'t get a confirmation message from this site when you change this address, but any future messages directed to you will go this new address.');
-	break;
-
 case 'edituser_gedcomid':
 	$title=WT_I18N::translate('Individual record');
 	$text=WT_I18N::translate('This is a link to your own record in the family tree.  If this is the wrong person, contact an administrator.');
-	break;
-
-case 'edituser_realname':
-	$title=WT_I18N::translate('Real name');
-	$text=WT_I18N::translate('In this box you can change your real name.  This is the name that other users see when you are logged in.<br /><br />Although the choice of what to put into this field is yours, you should inform the administrator when you change it.  When others see an unknown person on-line, they might wonder and ask questions.  The admin can find out without having received your notice, but you should save him that unnecessary work.');
-	break;
-
-case 'edituser_password':
-	$title=WT_I18N::translate('Password');
-	$text=WT_I18N::translate('Passwords must be at least 6 characters long and are case-sensitive, so that "s3CR#t" is different to "S3CR#t".');
 	break;
 
 case 'edituser_rootid':
@@ -2386,9 +2324,9 @@ case 'edituser_rootid':
 	$text=WT_I18N::translate('This is the starting (Root) person of all your charts.<br /><br />If, for example, you were to click the link to the Pedigree, you would see this root person in the leftmost box.  This root person does not have to be you; you can start with any person (your grandfather or your mother\'s aunt, for instance), as long you have the rights to see that person.<br /><br />This changes the default Root person for most charts.  You can change the Root person on many charts, but that is just for that page at that particular invocation.');
 	break;
 
-case 'edituser_username':
-	$title=WT_I18N::translate('Username');
-	$text=WT_I18N::translate('You can change your username by updating it here.  Usernames are case insensitive and ignore accented letters, so that "chloe", "chlo&euml;" and "CHLOE" are considered to be the same.  Usernames may not contain the following characters: &lt;&gt;"%%{};');
+case 'email':
+	$title=WT_I18N::translate('Email address');
+	$text=WT_I18N::translate('This email address will be used to send you password reminders, site notifications, and messages from other family members who are registered on the site.');
 	break;
 
 case 'export_gedcom':
@@ -2407,11 +2345,6 @@ case 'fambook_descent':
 case 'family_book_chart':
 	$title=WT_I18N::translate('Family book');
 	$text=WT_I18N::translate('This chart is very similar to the Hourglass chart.  It will show the ancestors and descendants of the selected root person on the same chart.  It will also show the descendants of the root person in the same Hourglass format.<br /><br />The root person is centered in the middle of the page with his descendants listed to the left and his ancestors listed to the right.  In this view, each generation is lined up across the page starting with the earliest generation and ending with the latest.<br /><br />Each descendant of the root person will become the root person of an additional hourglass chart, printed on the same page.  This process repeats until the specified number of descendant generations have been printed.');
-	break;
-
-case 'fan_style':
-	$title=WT_I18N::translate('Fan chart');
-	$text=WT_I18N::translate('This option controls the appearance of the diagram.<ul><li><b>1/2</b><br />Half circle 180&deg; diagram</li><li><b>3/4</b><br />Three-quarter 270&deg; diagram, sometimes called <i>Angel wing</i></li><li><b>4/4</b><br />Full circle 360&deg; diagram</li></ul>');
 	break;
 
 case 'fan_width':
@@ -2476,8 +2409,8 @@ case 'help_contents_help':
 			<ul><li><a href="?help=ancestry.php">'.WT_I18N::translate('Ancestors').'</a></li><li><a href="?help=fanchart.php">'.WT_I18N::translate('Fan chart').'</a></li><li><a href="?help=familybook.php">'
 			.WT_I18N::translate('Family book').'</a></li><li><a href="?help=gedcom_info">'.WT_I18N::translate('GEDCOM information').'</a></li><li><a href="?help=index_portal">'.WT_I18N::translate('Home page').'</a></li><li><a href="?help=hourglass.php">'.WT_I18N::translate('Hourglass chart').'</a></li><li><a href="?help=individual.php">'
 			.WT_I18N::translate('Individual information').'</a></li><li><a href="?help=indilist.php">'.WT_I18N::translate('Individuals').'</a></li><li><a href="?help=treenav">'.WT_I18N::translate('Interactive tree').'</a></li><li><a href="?help=login.php">'
-			.WT_I18N::translate('Login').'</a></li><li><a href="?help=pls_note11">'.WT_I18N::translate('Lost password request').'</a></li><li><a href="?help=medialist.php">'.WT_I18N::translate('Multimedia').'</a></li><li><a href="?help=edituser.php">'
-			.WT_I18N::translate('My account').'</a></li><li><a href="?help=mypage_portal">'.WT_I18N::translate('My Page').'</a></li><li><a href="?help=edituser_password">'.WT_I18N::translate('Password').'</a></li><li><a href="?help=pedigree.php">'.WT_I18N::translate('Pedigree').'</a></li><li><a href="?help=timeline.php">'.WT_I18N::translate('Timeline').'</a></li><li><a href="?help=edituser_username">'.WT_I18N::translate('Username').'</a></li></ul></td>';
+			.WT_I18N::translate('Login').'</a></li><li><a href="?help=pls_note11">'.WT_I18N::translate('Lost password request').'</a></li><li><a href="?help=medialist.php">'.WT_I18N::translate('Media').'</a></li><li><a href="?help=edituser.php">'
+			.WT_I18N::translate('My account').'</a></li><li><a href="?help=mypage_portal">'.WT_I18N::translate('My page').'</a></li><li><a href="?help=edituser_password">'.WT_I18N::translate('Password').'</a></li><li><a href="?help=pedigree.php">'.WT_I18N::translate('Pedigree').'</a></li><li><a href="?help=timeline.php">'.WT_I18N::translate('Timeline').'</a></li><li><a href="?help=edituser_username">'.WT_I18N::translate('Username').'</a></li></ul></td>';
 		if (WT_USER_IS_ADMIN) {
 			$text.='<td valign="top"><span class="helpstart">'.WT_I18N::translate('Administrator help items').'</span><ul><li><a href="?help=admin.php">'.WT_I18N::translate('Administration').'</a></li><li><a href="?help=help_editconfig.php">'.WT_I18N::translate('Configure').'</a></li><li><a href="?help=help_faq.php">'
 			.WT_I18N::translate('FAQ List: Edit').'</a></li><li><a href="?help=edit_gedcoms">'.WT_I18N::translate('GEDCOM: Administration page').'</a></li><li><a href="?help=edit_config_gedcom">'.WT_I18N::translate('GEDCOM: Configure').'</a></li><li><a href="?help=default_gedcom">'.WT_I18N::translate('GEDCOM: Default').'</a></li><li><a href="readme.html">'.WT_I18N::translate('View readme.html file').'</a></li><li><a href="?help=help_admin_users.php">'.WT_I18N::translate('User administration').'</a></li></ul></td>';
@@ -2534,7 +2467,7 @@ case 'link_wife':
 	break;
 
 case 'manage_media':
-	$title=WT_I18N::translate('Manage multimedia');
+	$title=WT_I18N::translate('Media');
 	$text=WT_I18N::translate('On this page you can easily manage your Media files and directories.<br /><br />When you create new Media subdirectories, <b>webtrees</b> will ensure that the identical directory structure is maintained within the <b>%sthumbs</b> directory.  When you upload new Media files, <b>webtrees</b> can automatically create the thumbnails for you.<br /><br />Beside each image in the Media list you\'ll find the following options.  The options actually shown depend on the current status of the Media file.<ul><li><b>Edit</b>&nbsp;&nbsp;When you click on this option, you\'ll see a page where you can change the title of the Media object.  If the Media object is not yet linked to a person, family, or source in the currently active database, you can establish this link here.  You can rename the file or even change its location within the <b>%s</b> directory structure.  When necessary, <b>webtrees</b> will automatically create the required subdirectories or any missing thumbnails.</li><li><b>Edit raw GEDCOM record</b>&nbsp;&nbsp;This option is only available when the administrator has enabled it.  You can view or edit the raw GEDCOM data associated with this Media object.  You should be very careful when you use this option.</li><li><b>Delete file</b>&nbsp;&nbsp;This option lets you erase all knowledge of the Media file from the current database.  Other databases will not be affected.  If this Media file is not mentioned in any other database, it, and its associated thumbnail, will be deleted.</li><li><b>Remove object</b>&nbsp;&nbsp;This option lets you erase all knowledge of the Media file from the current database.  Other databases will not be affected.  The Media file, and its associated thumbnail, will not be deleted.</li><li><b>Remove links</b>&nbsp;&nbsp;This option lets you remove all links to the media object from the current database.  The file will not be deleted, and the Media object by which this file is known to the current database will be retained.  Other databases will not be affected.</li><li><b>Set link</b>&nbsp;&nbsp;This option lets you establish links between the media file and persons, families, or sources of the current database.  When necessary, <b>webtrees</b> will also create the Media object by which the Media file is known to the database.</li><li><b>Create thumbnail</b>&nbsp;&nbsp;When you select this option, <b>webtrees</b> will create the missing thumbnail.</li></ul>', $MEDIA_DIRECTORY, $MEDIA_DIRECTORY);
 	break;
 
@@ -2558,18 +2491,13 @@ case 'new_user':
 	$text=WT_I18N::translate('If you are a visitor to this site and wish to request a user account, you can click this link.<br /><br />You will be taken to the "Register" page.');
 	break;
 
-case 'new_user_realname':
-	$title=WT_I18N::translate('Real name');
-	$text=WT_I18N::translate('In this box you have to type your real name.<br /><br />We need your first and last names to determine whether you qualify for an account at this site, and what your rights should be.  This name will be visible to other logged-in family members and users.');
-	break;
-
 case 'next_path':
 	$title=WT_I18N::translate('Find next relationship path');
 	$text=WT_I18N::translate('You can click this button to see whether there is another relationship path between the two people.  Previously found paths can be displayed again by clicking the link with the path number.');
 	break;
 
 case 'no_update_CHAN':
-	$title=WT_I18N::translate('Do not update the ìlast changeî record');
+	$title=WT_I18N::translate('Do not update the ‚Äúlast change‚Äù record');
 	$text=WT_I18N::translate('Administrators sometimes need to clean up and correct the data submitted by users.  For example, they might need to correct the PLAC location to include the country.  When Administrators make such corrections, information about the original change is normally replaced.  This may not be desirable.<br /><br />When this option is selected, <b>webtrees</b> will retain the original Change information instead of replacing it with that of the current session.  With this option selected, Administrators also have the ability to modify or delete the information associated with the original CHAN tag.');
 	break;
 
@@ -2580,7 +2508,12 @@ case 'oldest_top':
 
 case 'password':
 	$title=WT_I18N::translate('Password');
-	$text=WT_I18N::translate('In this box you type your password.<br /><br /><b>The password is case sensitive.</b>  This means that <b>MyPassword</b> is <u>not</u> the same as <b>mypassword</b> or <b>MYPASSWORD</b>.');
+	$text=WT_I18N::translate('Passwords must be at least 6 characters long and are case-sensitive, so that ‚Äúsecret‚Äù is different to ‚ÄúSECRET‚Äù.');
+	break;
+
+case 'password_confirm':
+	$title=WT_I18N::translate('Confirm password');
+	$text=WT_I18N::translate('Type your password again, to make sure you have typed it correctly.');
 	break;
 
 case 'pedigree_tree':
@@ -2608,7 +2541,7 @@ case 'PGV_WIZARD':
 	$text .= '</p>';
 	break;
 
-	case 'phpinfo':
+case 'phpinfo':
 	$title=WT_I18N::translate('PHP information');
 	$text=WT_I18N::translate('This page provides extensive information about the server on which <b>webtrees</b> is being hosted.  Many configuration details about the server\'s software, as it relates to PHP and <b>webtrees</b>, can be viewed.');
 	break;
@@ -2617,16 +2550,16 @@ case 'pending_changes':
 	$title=WT_I18N::translate('Pending changes');
 	$text=
 		'<p>'.
-		WT_I18N::translate('When you add, edit, or delete information, the changes are not saved immediately.  Instead, they are kept in a ìpendingî area.  These pending changes need to be reviewed by a moderator before they are accepted.').
+		WT_I18N::translate('When you add, edit, or delete information, the changes are not saved immediately.  Instead, they are kept in a ‚Äúpending‚Äù area.  These pending changes need to be reviewed by a moderator before they are accepted.').
 		'</p><p>'.
-		WT_I18N::translate('This process allows the siteís owner to ensure that the new information follows the siteís standards and conventions, has proper source attributions, etc.').
+		WT_I18N::translate('This process allows the site‚Äôs owner to ensure that the new information follows the site‚Äôs standards and conventions, has proper source attributions, etc.').
 		'</p><p>'.
 		WT_I18N::translate('Pending changes are only shown when your account has permission to edit.  When you log out, you will no longer be able to see them.  Also, pending changes are only shown on certain pages.  For example, they are not shown in lists, reports, or search results.').
 		'</p>';
 	if (WT_USER_IS_ADMIN) {
 		$text.=
 			'<p>'.
-			WT_I18N::translate('Each user account has an option to ìautomatically accept changesî.  When this is enabled, any changes made by that user are saved immediately.  Many administrators enable this for their own user account.').
+			WT_I18N::translate('Each user account has an option to ‚Äúautomatically accept changes‚Äù.  When this is enabled, any changes made by that user are saved immediately.  Many administrators enable this for their own user account.').
 			'</p>';
 	}
 
@@ -2658,8 +2591,13 @@ case 'random_media_persons_or_all':
 	break;
 
 case 'random_media_start_slide':
-	$title=WT_I18N::translate('Start slideshow on page load?');
+	$title=WT_I18N::translate('Start slide show on page load?');
 	$text=WT_I18N::translate('Should the slideshow start automatically when the page is loaded.<br /><br />The slideshow changes the contents of the block without preloading information from the server and without reloading the entire page.');
+	break;
+
+case 'real_name':
+	$title=WT_I18N::translate('Real name');
+	$text=WT_I18N::translate('This is your real name, as you would like it displayed on screen.');
 	break;
 
 case 'register_comments':
@@ -2675,11 +2613,6 @@ case 'register_gedcomid':
 case 'remove_person':
 	$title=WT_I18N::translate('Remove person');
 	$text=WT_I18N::translate('Click this link to remove the person from the timeline.');
-	break;
-
-case 'remove_tags':
-	$title=WT_I18N::translate('Remove custom tags');
-	$text=WT_I18N::translate('Checking this option will remove any custom tags that may have been added to the records by <b>webtrees</b>.<br /><br />Custom tags used by <b>webtrees</b> include the <b>_WT_USER</b> tag which identifies the user who changed a record online and the <b>_THUM</b> tag which tells <b>webtrees</b> that the image should be used as a thumbnail.<br /><br />Custom tags may cause errors when importing the downloaded GEDCOM to another genealogy application.');
 	break;
 
 case 'reorder_children':
@@ -2723,11 +2656,6 @@ case 'role':
 		'</dd>';
 	break;
 
-case 'rootid':
-	$title=WT_I18N::translate('Pedigree chart root person');
-	$text=WT_I18N::translate('If you want to display a chart with a new starting (root) person, the ID of that new starting person is typed here.<br /><br />If you don\'t know the ID of that person, use the <b>Find ID</b> link.<br /><br /><b>ID NUMBER</b><br />The ID numbers used inside <b>webtrees</b> are <u>not</u> the identification numbers issued by various governments (driving permit or passport numbers, for instance).  The ID number referred to here is simply a number used within the database to uniquely identify each individual; it was assigned by the ancestry program that created the GEDCOM file which was imported into <b>webtrees</b>.');
-	break;
-
 case 'search_exclude_tags':
 	$title=WT_I18N::translate('Exclude filter');
 	$text=WT_I18N::translate('The <b>Exclude some non-genealogical data</b> choice will cause the Search function to ignore the following GEDCOM tags:<div style="padding-left:30px;"><b>_WT_USER</b> - Last change by<br /><b>CHAN</b> - Last change date<br /><b>FILE</b> - External File<br /><b>FORM</b> - Format<br /><b>TYPE</b> - Type<br /><b>SUBM</b> - Submitter<br /><b>REFN</b> - Reference Number</div><br />In addition to these optionally excluded tags, the Search function always excludes these tags:<div style="padding-left:30px;"><b>_UID</b> - Globally unique Identifier<br /><b>RESN</b> - Restriction</div>');
@@ -2748,16 +2676,6 @@ case 'show_fact_sources':
 	$text=WT_I18N::translate('When this option is checked, you can see all Source or Note records for this person.  When this option is unchecked, Source or Note records that are associated with other facts for this person will not be shown.');
 	break;
 
-case 'show_full':
-	$title=WT_I18N::translate('Hide or show details');
-	$text=WT_I18N::translate('With this option you can either show or hide all details in the Name boxes.  You can display more boxes on one screen when the details are hidden.<br /><br />When all details are hidden, the Zoom icon described below is not shown.  However, if the administrator has enabled the Zoom function, the entire box will act like a Zoom icon to reveal full details about the person.<br /><br />When the details are not hidden and the Zoom function, identified by a magnifying glass icon, has been enabled by the administrator, you can reveal even more details about that person.  If you normally have to click on the Zoom icon to zoom in, you can reveal additional hidden details by clicking that icon here.  Similarly, if you can zoom in by hovering over the Zoom icon, hidden details will be revealed by hovering over that icon here.<br /><br />If you have clicked on the Zoom icon to reveal more details, you can restore the box to its normal level of detail by clicking on the Zoom icon again.  If you have revealed more details by simply moving the mouse pointer over the Zoom icon, the box will be restored to its normal level of detail when you move the mouse pointer away from the Zoom icon.');
-	break;
-
-case 'show_marnm':
-	$title=WT_I18N::translate('Include married names');
-	$text=WT_I18N::translate('The individual and family list pages can either include or exclude married names.  This option can be helpful when searching for individuals or families where you only know the married name.  Married names can only be included if they already exist in the database.<br /><br />On the family list, this value defaults to exclude.  On the individual list, the default value is set in the GEDCOM Configuration page.<br /><br />When you change this option, your selection will be remembered until you log off or your session ends.');
-	break;
-
 case 'show_spouse':
 	$title=WT_I18N::translate('Show spouses');
 	$text=WT_I18N::translate('By default this chart does not show spouses for the descendants because it makes the chart harder to read and understand.  Turning this option on will show spouses on the chart.');
@@ -2766,11 +2684,6 @@ case 'show_spouse':
 case 'simple_filter':
 	$title=WT_I18N::translate('Simple search filter');
 	$text=WT_I18N::translate('Simple search filter based on the characters entered, no wildcards are accepted.');
-	break;
-
-case 'skip_sublist':
-	$title=WT_I18N::translate('Skip surname lists');
-	$text=WT_I18N::translate('The standard setting is that, after you have clicked a letter of the Alphabetical index, you will get a sub-list with surnames.  If you click this link, all individuals with surnames that have the currently selected initial letter will be displayed immediately. Thereafter, the list of individuals will be displayed directly whenever you click on a new initial letter in the Alphabetical list.<br /><br />To reverse this action, click on the Show Surname lists link.');
 	break;
 
 case 'stat_gax':
@@ -2798,11 +2711,6 @@ case 'stat_gwx':
 case 'stat_gwz':
 	$title=WT_I18N::translate('Boundaries for Z axis');
 	$text=WT_I18N::translate('Select the desired starting year and interval<br /><br />For example, <b>from 1700 interval 50 years</b> describes the following set of date ranges:<div style="padding-left:30px;">before 1700<br />1700 to 1749<br />1750 to 1799<br />1800 to 1849<br />1850 to 1899<br />1900 to 1949<br />1950 to 1999<br />2000 or later</div>');
-	break;
-
-case 'talloffset':
-	$title=WT_I18N::translate('Page layout');
-	$text=WT_I18N::translate('With this option you determine the page layout orientation.<br /><br />Changing this setting might be useful if you want to make a screen print or if you have a different type of screen.<ul><li><b>Portrait</b> mode will make the tree taller, such that a 4 generation chart should fit on a single page printed vertically.</li><li><b>Landscape</b> mode will make a wider tree that should print on a single page printed horizontally.</li><li><b>Oldest at top</b> mode rotates the chart, but not its boxes, by 90 degrees counter-clockwise, so that the oldest generation is at the top of the chart.</li><li><b>Oldest at bottom</b> mode rotates the chart, but not its boxes, by 90 degrees clockwise, so that the oldest generation is at the bottom of the chart.</li></ul>');
 	break;
 
 case 'timeline_chart':
@@ -2906,7 +2814,12 @@ case 'useradmin_visibleonline':
 
 case 'username':
 	$title=WT_I18N::translate('Username');
-	$text=WT_I18N::translate('<br />In this box you type your user name.<br /><br /><b>The user name is case sensitive.</b>  This means that <b>MyName</b> is <u>not</u> the same as <b>myname</b> or <b>MYNAME</b>.');
+	$text=
+		'<p>'.
+		WT_I18N::translate('Usernames are case-insensitive and ignore accented letters, so that ‚Äúchloe‚Äù, ‚Äúchlo√´‚Äù, and ‚ÄúChloe‚Äù are considered to be the same.').
+		'</p><p>'.
+		WT_I18N::translate('Usernames may not contain the following characters: &lt; &gt; " %% { } ;').
+		'</p>';
 	break;
 
 case 'utf8_ansi':
@@ -2951,13 +2864,14 @@ default:
 	} //END PERSO
 }
 
-print_simple_header($title);
+$controller->setPageTitle($title);
+$controller->pageHeader();
+
 echo '<div class="helpheader">', $title, '</div>';
 echo '<div class="helpcontent">', $text,'</div>';
 echo '<div class="helpfooter">';
 if ($help!='help_contents_help') {
 	echo '<a href="help_text.php?help=help_contents_help">', WT_I18N::translate('Help contents'), '</a><br />';
 }
-echo '<a href="javascript:;" onclick="window.close();">', WT_I18N::translate('Close Window'), '</a>';
+echo '<a href="#" onclick="window.close();">', WT_I18N::translate('Close Window'), '</a>';
 echo '</div>';
-print_simple_footer();

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
+// $Id: module.php 12846 2011-11-22 05:24:46Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,14 +41,13 @@ class top10_givnnames_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $TEXT_DIRECTION, $ctype, $WT_IMAGES;
+		global $TEXT_DIRECTION, $ctype, $WT_IMAGES, $controller;
 
 		$num=get_block_setting($block_id, 'num', 10);
 		$infoStyle=get_block_setting($block_id, 'infoStyle', 'table');
-		$showUnknown=get_block_setting($block_id, 'showUnknown', true);
 		$block=get_block_setting($block_id, 'block', false);
 		if ($cfg) {
-			foreach (array('num', 'infoStyle', 'showUnknown', 'block') as $name) {
+			foreach (array('num', 'infoStyle', 'block') as $name) {
 				if (array_key_exists($name, $cfg)) {
 					$$name=$cfg[$name];
 				}
@@ -61,7 +60,7 @@ class top10_givnnames_WT_Module extends WT_Module implements WT_Module_Block {
 		$class=$this->getName().'_block';
 		$title='';
 		if ($ctype=="gedcom" && WT_USER_GEDCOM_ADMIN || $ctype=="user" && WT_USER_ID) {
-			$title .= "<a href=\"javascript: configure block\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
+			$title .= "<a href=\"#\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
 			$title .= "<img class=\"adminicon\" src=\"".$WT_IMAGES["admin"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".WT_I18N::translate('Configure')."\" /></a>";
 		}
 		// I18N: There are separate lists of male/female names, containing %d names each
@@ -84,20 +83,13 @@ class top10_givnnames_WT_Module extends WT_Module implements WT_Module_Block {
 			if ($totals) {
 				$content.='<b>'.WT_I18N::translate('Males').'</b><div class="wrap" style="'.$padding.'">'.$totals.'</div><br />';
 			}
-			//List Unknown names
-			$totals=$stats->commonGivenUnknownTotals($params);
-			if ($totals && $showUnknown) {
-				$content.='<b>'.WT_I18N::translate('Unknown').'</b><div class="wrap" style="'.$padding.'">'.$totals.'</div><br />';
-			}
 			break;
 		case "table": // Style 2: Tabular format.  Narrow, 2 or 3 column table, good on right side of page
 			$params=array(1,$num,'rcount');
-			$content.='<table class="center">
-						<tr valign="top"><td>'.$stats->commonGivenFemaleTable($params).'</td>
+			$content.='<table style="margin:auto;">
+						<tr valign="top">
+						<td>'.$stats->commonGivenFemaleTable($params).'</td>
 						<td>'.$stats->commonGivenMaleTable($params).'</td>';
-			if ($showUnknown) {
-				$content.='<td>'.$stats->commonGivenUnknownTable($params).'</td>';
-			}
 			$content.='</tr></table>';
 			break;
 		}
@@ -134,7 +126,6 @@ class top10_givnnames_WT_Module extends WT_Module implements WT_Module_Block {
 		if (safe_POST_bool('save')) {
 			set_block_setting($block_id, 'num', safe_POST_integer('num', 1, 10000, 10));
 			set_block_setting($block_id, 'infoStyle', safe_POST('infoStyle', array('list', 'table'), 'table'));
-			set_block_setting($block_id, 'showUnknown', safe_POST_bool('showUnknown'));
 			set_block_setting($block_id, 'block',  safe_POST_bool('block'));
 			echo WT_JS_START, 'window.opener.location.href=window.opener.location.href;window.close();', WT_JS_END;
 			exit;
@@ -154,13 +145,6 @@ class top10_givnnames_WT_Module extends WT_Module implements WT_Module_Block {
 		echo WT_I18N::translate('Presentation style');
 		echo '</td><td class="optionbox">';
 		echo select_edit_control('infoStyle', array('list'=>WT_I18N::translate('list'), 'table'=>WT_I18N::translate('table')), null, $infoStyle, '');
-		echo '</td></tr>';
-
-		$showUnknown=get_block_setting($block_id, 'showUnknown', true);
-		echo '<tr><td class="descriptionbox wrap width33">';
-		echo /* I18N: label for yes/no option */ WT_I18N::translate('Include people whose gender is unknown');
-		echo '</td><td class="optionbox">';
-		echo edit_field_yes_no('showUnknown', $showUnknown);
 		echo '</td></tr>';
 
 		$block=get_block_setting($block_id, 'block', false);

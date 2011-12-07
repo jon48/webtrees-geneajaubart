@@ -1,33 +1,29 @@
 <?php
-/**
- * HTML Report Generator
- *
- * used by the SAX parser to generate HTML reports from the XML report file.
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
- *
- * Derived from PhpGedView
- * Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @package webtrees
- * @subpackage Reports
- * @version $Id: HTML.php 12265 2011-10-06 17:23:50Z lukasz $
- */
+// HTML Report Generator
+//
+// used by the SAX parser to generate HTML reports from the XML report file.
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2011 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// $Id: HTML.php 12547 2011-11-05 08:44:59Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -182,11 +178,11 @@ class WT_Report_HTML extends WT_Report_Base {
 		global $stylesheet, $TEXT_DIRECTION;
 
 		echo "
-<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
-<html xmlns=\"http://www.w3.org/1999/xhtml\" ", WT_I18N::html_markup(), ">
+<!DOCTYPE html>
+<html ", WT_I18N::html_markup(), ">
 <head>
-<meta http-equiv=\"Content-Type\" content=\"text/html; charset=", $this->charset, "\" />
-<meta name=Generator content=\"", $this->generatedby, "\" />
+<meta charset=\"UTF-8\">
+<meta name=\"generator\" content=\"", WT_WEBTREES, ' ', WT_VERSION_TEXT, "\" />
 <meta name=\"keywords\" content=\"", $this->rkeywords, "\" />
 <meta name=\"description\" content=\"", $this->rsubject, "\" />
 <title>", $this->title, "</title>

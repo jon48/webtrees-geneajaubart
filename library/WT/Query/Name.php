@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Name.php 12408 2011-10-25 11:55:08Z greg $
+// @version $Id: Name.php 12735 2011-11-14 11:56:43Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -204,7 +204,7 @@ class WT_Query_Name {
 			break;
 		}
 		// Easy cases: the MySQL collation rules take care of it
-		return "$field LIKE '@".$letter."%' COLLATE ".WT_I18N::$collation." ESCAPE '@'";
+		return "$field LIKE CONCAT('@',".WT_DB::quote($letter).",'%') COLLATE ".WT_I18N::$collation." ESCAPE '@'";
 	}
 
 	// Get a list of initial surname letters for indilist.php and famlist.php
@@ -349,7 +349,7 @@ class WT_Query_Name {
 			($marnm ? "" : " AND n_type!='_MARNM'");
 			
 		if ($surn) {
-			$sql.=" AND n_surn=".WT_DB::quote($surn)." COLLATE '".WT_I18N::$collation."'";
+			$sql.=" AND n_surn COLLATE '".WT_I18N::$collation."' =".WT_DB::quote($surn);
 		} elseif ($salpha==',') {
 			$sql.=" AND n_surn=''";
 		} elseif ($salpha=='@') {
@@ -361,6 +361,9 @@ class WT_Query_Name {
 			$sql.=" AND n_surn NOT IN ('', '@N.N.')";
 		}
 		$sql.=" GROUP BY n_surn COLLATE '".WT_I18N::$collation."', n_file) n2 ON (n1.n_surn=n2.n_surn COLLATE '".WT_I18N::$collation."' AND n1.n_file=n2.n_file)";
+		if (!$marnm) {
+			$sql.=" AND n_type!='_MARNM'";
+		}
 	
 		$list=array();
 		foreach (WT_DB::prepare($sql)->fetchAll() as $row) {
@@ -392,7 +395,7 @@ class WT_Query_Name {
 			($marnm ? "" : "AND n_type!='_MARNM'");
 	
 		if ($surn) {
-			$sql.=" AND n_surn=".WT_DB::quote($surn);
+			$sql.=" AND n_surn COLLATE '".WT_I18N::$collation."'=".WT_DB::quote($surn);
 		} elseif ($salpha==',') {
 			$sql.=" AND n_surn=''";
 		} elseif ($salpha=='@') {

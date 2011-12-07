@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_places.php 11789 2011-06-12 09:24:50Z greg $
+// $Id: functions_places.php 12530 2011-11-04 13:06:27Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -38,7 +38,7 @@ function get_place_url($gedcom_place) {
 	$level = count($exp);
 	$url = "placelist.php?action=show&amp;level=".$level;
 	for ($i=0; $i<$level; $i++) {
-		$url .= "&amp;parent[".$i."]=".rawurlencode($exp[$level-$i-1]);
+		$url .= "&amp;parent%5B".$i."%5D=".rawurlencode($exp[$level-$i-1]);
 	}
 	$url .= "&amp;ged=".rawurlencode($GEDCOM);
 	return $url;

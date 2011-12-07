@@ -35,10 +35,10 @@ if (!defined('WT_WEBTREES')) {
 }
 
 echo
-	'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
-	'<html xmlns="http://www.w3.org/1999/xhtml" ', WT_I18N::html_markup(), '>',
+	'<!DOCTYPE html>',
+	'<html ', WT_I18N::html_markup(), '>',
 	'<head>',
-	'<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />',
+	'<meta charset="UTF-8">',
 	'<title>', htmlspecialchars($title), '</title>',
 header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
 	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png" />',
@@ -63,7 +63,6 @@ if (WT_USE_LIGHTBOX) {
 }
 
 echo
-$javascript,
 	'</head>',
 	'<body id="body">';
 
@@ -72,11 +71,11 @@ if ($view=='simple') {
 
 	echo '<div id="header_simple" > </div>';
 	echo '<div id="main_content">';
-	echo '<div class="top_center_box"/>';
+	echo '<div class="top_center_box">';
 	echo '<div class="top_center_box_left" ></div><div class="top_center_box_right" ></div><div class="top_center_box_center"></div>';
 	echo '</div>';
 	echo '<div class="content_box">';
-	echo '<div id="content">';
+	echo  $javascript, '<div id="content">';
 
 }
 else {
@@ -87,9 +86,7 @@ else {
 	echo 	'<form action="search.php" method="post">',
 			'<input type="hidden" name="action" value="general" />',
 			'<input type="hidden" name="topsearch" value="yes" />',
-			'<input type="text" name="query" size="25" value="', WT_I18N::translate('Search'), '"',
-				'onfocus="if (this.value==\'', WT_I18N::translate('Search'), '\') this.value=\'\'; focusHandler();"',
-				'onblur="if (this.value==\'\') this.value=\'', WT_I18N::translate('Search'), '\';" />',
+			'<input type="text" name="query" size="25" placeholder="', WT_I18N::translate('Search'), '"/>',
 			'<input type="image" class="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '" />',
 			'</form>';
 	echo '</div>';
@@ -102,7 +99,7 @@ else {
 	}
 	echo '</li>';
 	echo '</ul>';
-	echo '<div class="gedtitle">',print_gedcom_title_link(true),'</div>';
+	echo '<div class="gedtitle">',htmlspecialchars($GEDCOM_TITLE),'</div>';
 	echo '</div>';
 	echo  '<div id="hbottomright">';
 	//PERSO Extend header
@@ -166,9 +163,15 @@ else {
 	unset($menu_items, $menu);
 	echo '</tr>',
 		'</table>',
-		'</div>',
-	'</div>', // close menu
+		'</div>', // close topMenu_center
+	'</div>'; // close topmenu
+	// Display feedback from asynchronous actions
+	echo '<div id="flash-messages">';
+	foreach (Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->getMessages() as $message) {
+		echo '<p class="ui-state-highlight">', $message, '</p>';
+	}
+	echo '</div>'; // <div id="flash-messages">
 	// begin content section -->
-'<div id="content">';
+	echo  $javascript, '<div id="content">';
 }
 ?>

@@ -1,5 +1,5 @@
 <?php
-// Controller for the Advanced Search Page
+// Controller for the advanced search page
 //
 // webtrees: Web based Family History software
 // Copyright (C) 2011 webtrees development team.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: AdvancedSearch.php 12453 2011-10-28 23:09:00Z greg $
+// $Id: AdvancedSearch.php 12893 2011-11-23 23:26:31Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,12 +36,9 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 
 	function __construct() {
 		parent::__construct();
-	}
-	/**
-	 * Initialization function
-	 */
-	function init() {
-		parent :: init();
+
+		$this->setPageTitle(WT_I18N::translate('Advanced search'));
+		
 		if (empty($_REQUEST['action'])) {
 			$this->action="advanced";
 		}
@@ -118,11 +115,6 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 		return $ofields;
 	}
 
-	function getPageTitle() {
-		if ($this->action=="advanced") return WT_I18N::translate('Advanced search');
-		else parent :: getPageTitle();
-	}
-
 	function getValue($i) {
 		$val = "";
 		if (isset($this->values[$i])) $val = $this->values[$i];
@@ -195,7 +187,7 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 			$parts = preg_split("/:/", $field);
 			//-- handle names seperately
 			if ($parts[0]=="NAME") {
-				// The pgv_name table contains both names and soundex values
+				// The wt_name table contains both names and soundex values
 				if (!$namesTable) {
 					$sqltables.=" JOIN `##name` ON (i_file=n_file AND i_id=n_id) ";
 					$namesTable = true;
@@ -441,15 +433,13 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 		require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 		$ret = true;
 		if (count($this->myindilist)>0) {
-			echo '<br /><div class="center">';
 			uasort($this->myindilist, array('WT_GedcomRecord', 'Compare'));
-			print_indi_table($this->myindilist, WT_I18N::translate('Individuals')." @ ".PrintReady(get_gedcom_setting(WT_GEDCOM, 'title')));
-			echo "</div>";
+			echo format_indi_table($this->myindilist);
 		}
 		else {
 			$ret = false;
 			if ($this->isPostBack) {
-				echo '<br /><div class="warning" style=" text-align: center;"><em>', WT_I18N::translate('No results found.'), '</em><br /></div>';
+				echo '<br /><div class="warning center"><em>', WT_I18N::translate('No results found.'), '</em><br /></div>';
 			}
 		}
 		return $ret;

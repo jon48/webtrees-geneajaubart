@@ -23,22 +23,19 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: lifespan.php 11705 2011-06-04 09:13:59Z greg $
+// $Id: lifespan.php 12708 2011-11-11 11:23:19Z greg $
 
 define('WT_SCRIPT_NAME', 'lifespan.php');
 require './includes/session.php';
 
 // GEDCOM elements that will be found but should not be displayed
-$nonfacts = array("FAMS", "FAMC", "MAY", "BLOB", "OBJE", "SEX", "NAME", "SOUR", "NOTE", "BAPL", "ENDL", "SLGC", "SLGS", "_TODO", "_WT_OBJE_SORT", "CHAN", "HUSB", "WIFE", "CHIL", "BIRT", "DEAT", "BURI");// DEATH OF SIBLING:  DEATH OF HALF SIBLING DEATH OF MOTHER DEATH OF FATHER DEATH OF CHILD
-$nonfamfacts = array("CHAN", "HUSB", "WIFE", "CHIL");
+$nonfacts=array("FAMS", "FAMC", "MAY", "BLOB", "OBJE", "SEX", "NAME", "SOUR", "NOTE", "BAPL", "ENDL", "SLGC", "SLGS", "_TODO", "_WT_OBJE_SORT", "CHAN", "HUSB", "WIFE", "CHIL", "BIRT", "DEAT", "BURI");// DEATH OF SIBLING:  DEATH OF HALF SIBLING DEATH OF MOTHER DEATH OF FATHER DEATH OF CHILD
+$nonfamfacts=array("CHAN", "HUSB", "WIFE", "CHIL");
 
-$controller = new WT_Controller_Lifespan();
-$controller->init();
+$zoomfactor=10;
 
-$zoomfactor = 10;
-//if peeps !null then pass new array for zooming
-
-print_header(WT_I18N::translate('Lifespans'));
+$controller=new WT_Controller_Lifespan();
+$controller->pageHeader();
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 ?>
@@ -333,18 +330,18 @@ var oldMx = 0;
 		<table style="margin-left: 20px" dir="ltr" border="0" cellpadding="0">
 		<tr>
 			<td></td>
-			<td colspan="2" align="center"><a href="#" onclick="return false;" onmousedown="startScroll('down')" onmouseup="stopScroll()"><img src="<?php echo $WT_IMAGES["lsuparrow"]; ?>" border="0" alt="" /></a></td>
+			<td colspan="2" align="center"><a href="#" onclick="return false;" onmousedown="startScroll('down')" onmouseup="stopScroll()"><img src="<?php echo $WT_IMAGES["lsuparrow"]; ?>" alt=""></a></td>
 			<td></td>
 		</tr>
 		<tr>
-			<td><a href="#" onclick="return false;" onmousedown="startScroll('right')" onmouseup="stopScroll()"><img src="<?php echo $WT_IMAGES["lsltarrow"]; ?>" border="0" alt="" /></a></td>
-			<td align="center"><!-- <a href="#" onclick="return false;" onmousedown="startZoom('increase')"><img src="<?php echo $WT_IMAGES["zoomin"]; ?>" border="0" alt="" /></a> --></td>
-			<td align="center"><!-- <a href="#" onclick="return false;" onmousedown="startZoom('decrease')"><img src="<?php echo $WT_IMAGES["zoomout"]; ?>" border="0" alt="" /></a> --></td>
-			<td><a href="#" onclick="return false;" onmousedown="startScroll('left')" onmouseup="stopScroll()"><img src="<?php echo $WT_IMAGES["lsrtarrow"]; ?>" border="0" alt="" /></a></td>
+			<td><a href="#" onclick="return false;" onmousedown="startScroll('right')" onmouseup="stopScroll()"><img src="<?php echo $WT_IMAGES["lsltarrow"]; ?>" alt=""></a></td>
+			<td align="center"><!-- <a href="#" onclick="return false;" onmousedown="startZoom('increase')"><img src="<?php echo $WT_IMAGES["zoomin"]; ?>" alt=""></a> --></td>
+			<td align="center"><!-- <a href="#" onclick="return false;" onmousedown="startZoom('decrease')"><img src="<?php echo $WT_IMAGES["zoomout"]; ?>" alt=""></a> --></td>
+			<td><a href="#" onclick="return false;" onmousedown="startScroll('left')" onmouseup="stopScroll()"><img src="<?php echo $WT_IMAGES["lsrtarrow"]; ?>" alt=""></a></td>
 		</tr>
 		<tr>
 		<td> </td>
-		<td colspan="2" align="center"><a href="#" onclick="return false;" onmousedown="startScroll('up')" onmouseup="stopScroll()"><img src="<?php echo $WT_IMAGES["lsdnarrow"]; ?>" border="0" alt="" /></a></td>
+		<td colspan="2" align="center"><a href="#" onclick="return false;" onmousedown="startScroll('up')" onmouseup="stopScroll()"><img src="<?php echo $WT_IMAGES["lsdnarrow"]; ?>" alt=""></a></td>
 	<td> </td>
 	</tr>
 	</table>
@@ -358,5 +355,3 @@ var maxX = <?php if (!isset($maxX)) $maxX = 0; echo $maxX; ?>;  // Sets the boun
 
 //-->
 </script>
-
-<?php print_footer();

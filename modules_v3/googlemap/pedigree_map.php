@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: pedigree_map.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: pedigree_map.php 12914 2011-11-24 19:57:59Z brian $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -37,12 +37,13 @@ require WT_ROOT.WT_MODULES_DIR.'googlemap/defaultconfig.php';
 
 global $PEDIGREE_GENERATIONS, $MAX_PEDIGREE_GENERATIONS, $ENABLE_AUTOCOMPLETE, $SHOW_HIGHLIGHT_IMAGES, $WT_IMAGES;
 
+
 // Default is show for both of these.
 $hideflags = safe_GET('hideflags');
 $hidelines = safe_GET('hidelines');
 
-$controller = new WT_Controller_Pedigree();
-$controller->init();
+global $controller;
+$controller=new WT_Controller_Pedigree();
 
 // Default of 5
 $clustersize = 5;
@@ -61,15 +62,16 @@ $MAX_PEDIGREE_GENERATIONS = min($MAX_PEDIGREE_GENERATIONS, 8);
 
 // End of internal configuration variables
 
-global $TEXT_DIRECTION;
+$controller->setPageTitle(/* I18N: %s is a person's name */ WT_I18N::translate('Pedigree map of %s', $controller->getPersonName()));
+$controller->pageHeader();
 
-print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Pedigree map of %s', $controller->getPersonName()));
+// echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/googlemap_style.css" rel="stylesheet" />';
+echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet" />';
 
-echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/googlemap_style.css" rel="stylesheet" />';
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 echo '<div><table><tr><td valign="middle">';
-echo '<h2>', WT_I18N::translate('Pedigree map of %s', $controller->getPersonName()), '</h2>';
+echo '<h2>', $controller->getPageTitle(), '</h2>';
 
 // -- print the form to change the number of displayed generations
 ?>
@@ -85,13 +87,13 @@ echo '<h2>', WT_I18N::translate('Pedigree map of %s', $controller->getPersonName
 	  <form name="people" method="get" action="module.php?ged=<?php echo WT_GEDURL; ?>&amp;mod=googlemap&amp;mod_action=pedigree_map">
 		<input type="hidden" name="mod" value="googlemap" />
 		<input type="hidden" name="mod_action" value="pedigree_map" />
-		<table class="pedigree_table <?php echo $TEXT_DIRECTION; ?>" width="555">
+		<table class="pedigree_table" width="555">
 			<tr>
 				<td class="descriptionbox wrap">
-					<?php echo WT_I18N::translate('Root Person ID'), help_link('rootid'); ?>
+					<?php echo WT_I18N::translate('Individual'); ?>
 				</td>
 				<td class="descriptionbox wrap">
-					<?php echo WT_I18N::translate('Generations'), help_link('PEDIGREE_GENERATIONS'); ?>
+					<?php echo WT_I18N::translate('Generations'); ?>
 				</td>
 				<td class="descriptionbox wrap">
 					<?php echo WT_I18N::translate('Cluster size'), help_link('PEDIGREE_MAP_clustersize','googlemap'); ?>
@@ -283,5 +285,3 @@ echo "</div>";
 <?php
 echo '<script src="http://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>';
 require_once WT_ROOT.WT_MODULES_DIR.'googlemap/wt_v3_pedigree_map.js.php';
-
-print_footer();

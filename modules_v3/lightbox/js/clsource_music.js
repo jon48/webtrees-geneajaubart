@@ -221,7 +221,6 @@ var CB_Close_Win		= CB_Close_Win;
 	}
 // End function keyboard ----------------------------------------------
 
-
 // Mousewheel for zooming ---------------------------------------------
 // if (zoomSet == 2) {
 	function handle(delta) {
@@ -266,7 +265,6 @@ var CB_Close_Win		= CB_Close_Win;
 	window.onmousewheel = document.onmousewheel = wheel;
 //}
 // End Mousewheel for zooming ---------------------------------------------
-
 
 // Music Player Class ----------------------------------------------
 	function Player () {
@@ -686,7 +684,6 @@ var CB_Close_Win		= CB_Close_Win;
 
 	OnLoad("load", CB_Init);
 
-
 	function CB_Init() {
 		//BH --------------- Changed following lines for IE7 arrow keys -------------
 		if (navigator.appVersion.indexOf("MSIE")!=-1){
@@ -959,7 +956,6 @@ var CB_Close_Win		= CB_Close_Win;
 			CB_Close();
 		}
 	}
-
 
 	function CB_ClickURL(a) {
 		CB_iFr.src = "";
@@ -1336,7 +1332,7 @@ var CB_Close_Win		= CB_Close_Win;
 				} else {
 					CB_Txt3.innerHTML = "";
 					CB_Txt3a.innerHTML = "";
-					}
+				}
 				CB_Txt2.onclick  = function () { window.location.href = 'mediaviewer.php?mid='+MIDa+'&ged='+GEDCOMa; return false; };
 				CB_Txt2a.onclick = function () { window.location.href = 'mediaviewer.php?mid='+MIDa+'&ged='+GEDCOM; return false; };
 			} else {
@@ -1524,8 +1520,6 @@ var CB_Close_Win		= CB_Close_Win;
 		CB_Win.style.top = "50%";
 		return;
 	}
-
-
 
 	function closeZoom() {
 		CB_ImgWidthOld = CB_ImgWidthOrig;
@@ -1752,12 +1746,10 @@ var CB_Close_Win		= CB_Close_Win;
 			CB_Txt2.onclick  = function () { window.location.href = 'mediaviewer.php?mid='+MID+'&ged='+GEDCOM; return false; };
 			CB_Txt2a.onclick = function () { window.location.href = 'mediaviewer.php?mid='+MID+'&ged='+GEDCOM; return false; };
 			//CB_Txt3.onclick = function () { alert(CB_Gallery[CB_ActImgId][5]); };
-
 		}else{
 			CB_Txt2.onclick  = function () { CB_Close(); };
 			CB_Txt2a.onclick = function () { CB_Close(); };
 		}
-
 		return true;
 	}
 
@@ -2070,8 +2062,6 @@ var CB_Close_Win		= CB_Close_Win;
 			}
 		}
 	}
-
-
 // ---------------------------------------------------
 
 function showFlash(){
@@ -2087,7 +2077,6 @@ function showFlash(){
 }
 
 // ---------------------------------------------------
-
 
 function hideFlash(){
 	var flashObjects = document.getElementsByTagName("object");
@@ -2229,7 +2218,6 @@ dragDrop = {
 
 	},
 
-
 	releaseElement: function() {
 		removeEventSimple(document,'mousemove',dragDrop.dragMouse);
 		removeEventSimple(document,'mouseup',dragDrop.releaseElement);
@@ -2240,7 +2228,6 @@ dragDrop = {
 		dragDrop.draggedObject = null;
 	}
 }
-
 
 function addEventSimple(obj,evt,fn) {
 	if (obj.addEventListener)
@@ -2255,5 +2242,4 @@ function removeEventSimple(obj,evt,fn) {
 	else if (obj.detachEvent)
 		obj.detachEvent('on'+evt,fn);
 }
-
 // --------------------------------------------------------------------------------------

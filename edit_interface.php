@@ -21,10 +21,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_interface.php 12378 2011-10-22 22:58:47Z greg $
+// $Id: edit_interface.php 12812 2011-11-19 13:02:05Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_interface.php');
 require './includes/session.php';
+
+$controller=new WT_Controller_Simple();
+$controller
+	->setPageTitle(WT_I18N::translate('Edit'))
+	->pageHeader()
+	->requireMemberLogin();
+
 require WT_ROOT.'includes/functions/functions_edit.php';
 
 // TODO work out whether to use GET/POST for these
@@ -54,8 +61,6 @@ $pids_array_edit=safe_REQUEST($_REQUEST, 'pids_array_edit', WT_REGEX_XREF);
 $update_CHAN=!safe_POST_bool('preserve_last_changed');
 
 $uploaded_files = array();
-
-print_simple_header(WT_I18N::translate('Edit'));
 
 if ($ENABLE_AUTOCOMPLETE) {
 	require WT_ROOT.'js/autocomplete.js.htm';
@@ -118,10 +123,8 @@ echo WT_JS_START;
 		pastefield.value = value;
 	}
 
-	function paste_char(value, lang, mag) {
+	function paste_char(value) {
 		pastefield.value += value;
-		language_filter = lang;
-		magnify = mag;
 		if (pastefield.id=='NPFX' || pastefield.id=='GIVN' || pastefield.id=='SPFX' || pastefield.id=='SURN' || pastefield.id=='NSFX') {
 			updatewholename();
 		}
@@ -169,7 +172,6 @@ if (!empty($pid)) {
 	}
 } elseif (($action!="addchild")&&($action!="addchildaction")&&($action!="addnewsource")&&($action!="mod_edit_fact")&&($action!="addnewnote")&&($action!="addmedia_links")&&($action!="addnoteaction")&&($action!="addnoteaction_assisted")) {
 	// No $pid?  Internal error of some sort
-	print_simple_footer();
 	$edit = true;
 } else {
 	$edit = true;
@@ -178,8 +180,7 @@ if (!empty($pid)) {
 if (!WT_USER_CAN_EDIT || !$edit || !$ALLOW_EDIT_GEDCOM) {
 	echo
 		'<p class="error">', WT_I18N::translate('Privacy settings prevent you from editing this record.'), '</p>',
-		'<p><a href="javascript: ', WT_I18N::translate('Close Window'), '" onclick="window.close();">', WT_I18N::translate('Close Window'), '</a></p>';
-	print_simple_footer();
+		'<p><a href="#" onclick="window.close();">', WT_I18N::translate('Close Window'), '</a></p>';
 	exit;
 }
 
@@ -189,25 +190,17 @@ if (!isset($type)) {
 $level0type = $type;
 if ($type=='INDI') {
 	$record=WT_Person::getInstance($pid);
-	echo '<b>', $record->getFullName(), '</b><br />';
+	echo '<b>', $record->getFullName(), '</b><br>';
 } elseif ($type=='FAM') {
 	if (!empty($pid)) {
 		$record=WT_Family::getInstance($pid);
 	} else {
 		$record=WT_Family::getInstance($famid);
 	}
-	echo '<b>', $record->getFullName(), '</b><br />';
+	echo '<b>', $record->getFullName(), '</b><br>';
 } elseif ($type=='SOUR') {
 	$record=WT_Source::getInstance($pid);
-	echo '<b>', $record->getFullName(), '&nbsp;&nbsp;&nbsp;';
-	if ($TEXT_DIRECTION=='rtl') {
-		echo getRLM();
-	}
-	echo '(', $pid, ')';
-	if ($TEXT_DIRECTION=='rtl') {
-		echo getRLM();
-	}
-	echo '</b><br />';
+	echo '<b>', $record->getFullName(),  '</b><br>';
 }
 
 if (strstr($action, 'addchild')) {
@@ -287,7 +280,7 @@ case 'editraw':
 	echo '<textarea name="newgedrec2" rows="20" cols="80" dir="ltr">', $gedrec2, "</textarea><br />";
 	if (WT_USER_IS_ADMIN) {
 		echo '<table class="facts_table">';
-		echo '<tr><td class="descriptionbox ', $TEXT_DIRECTION, ' wrap width25">';
+		echo '<tr><td class="descriptionbox  wrap width25">';
 		echo WT_Gedcom_Tag::getLabel('CHAN'), '</td><td class="optionbox wrap">';
 		echo '<input type="checkbox" name="preserve_last_changed"';
 		if ($NO_UPDATE_CHAN) {
@@ -330,7 +323,7 @@ case 'edit':
 	echo "<table class=\"facts_table\">";
 	$level1type = create_edit_form($gedrec, $linenum, $level0type);
 	if (WT_USER_IS_ADMIN) {
-		echo '<tr><td class="descriptionbox ', $TEXT_DIRECTION, ' wrap width25">';
+		echo '<tr><td class="descriptionbox wrap width25">';
 		echo WT_Gedcom_Tag::getLabel('CHAN'), '</td><td class="optionbox wrap">';
 		echo '<input type="checkbox" name="preserve_last_changed"';
 		if ($NO_UPDATE_CHAN) {
@@ -405,7 +398,7 @@ case 'add':
 	create_add_form($fact);
 
 	if (WT_USER_IS_ADMIN) {
-		echo '<tr><td class="descriptionbox ', $TEXT_DIRECTION, ' wrap width25">';
+		echo '<tr><td class="descriptionbox wrap width25">';
 		echo WT_Gedcom_Tag::getLabel('CHAN'), '</td><td class="optionbox wrap">';
 		echo '<input type="checkbox" name="preserve_last_changed"';
 		if ($NO_UPDATE_CHAN) {
@@ -480,7 +473,7 @@ case 'addfamlink':
 		echo '</td></tr>';
 	}
 	if (WT_USER_IS_ADMIN) {
-		echo '<tr><td class="descriptionbox ', $TEXT_DIRECTION, ' wrap width25">';
+		echo '<tr><td class="descriptionbox wrap width25">';
 		echo WT_Gedcom_Tag::getLabel('CHAN'), '</td><td class="optionbox wrap">';
 		echo '<input type="checkbox" name="preserve_last_changed"';
 		if ($NO_UPDATE_CHAN) {
@@ -519,7 +512,7 @@ case 'linkspouse':
 	add_simple_tag("0 DATE", "MARR");
 	add_simple_tag("0 PLAC", "MARR");
 	if (WT_USER_IS_ADMIN) {
-		echo "<tr><td class=\"descriptionbox ", $TEXT_DIRECTION, " wrap width25\">";
+		echo "<tr><td class=\"descriptionbox wrap width25\">";
 		echo WT_Gedcom_Tag::getLabel('CHAN'), '</td><td class="optionbox wrap">';
 		echo '<input type="checkbox" name="preserve_last_changed"';
 		if ($NO_UPDATE_CHAN) {
@@ -648,29 +641,29 @@ case 'addnewsource':
 		<input type="hidden" name="action" value="addsourceaction" />
 		<input type="hidden" name="pid" value="newsour" />
 		<table class="facts_table">
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ABBR'), help_link('ABBR'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ABBR'), help_link('ABBR'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="ABBR" id="ABBR" value="" size="40" maxlength="255" /> <?php print_specialchar_link("ABBR", false); ?></td></tr>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('TITL'), help_link('TITL'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('TITL'), help_link('TITL'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="TITL" id="TITL" value="" size="60" /> <?php print_specialchar_link("TITL", false); ?></td></tr>
 			<?php if (strstr($ADVANCED_NAME_FACTS, "_HEB")!==false) { ?>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('_HEB'), help_link('_HEB'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('_HEB'), help_link('_HEB'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="_HEB" id="_HEB" value="" size="60" /> <?php print_specialchar_link("_HEB", false); ?></td></tr>
 			<?php } ?>
 			<?php if (strstr($ADVANCED_NAME_FACTS, "ROMN")!==false) { ?>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ROMN'), help_link('ROMN'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ROMN'), help_link('ROMN'); ?></td>
 			<td class="optionbox wrap"><input  type="text" name="ROMN" id="ROMN" value="" size="60" /> <?php print_specialchar_link("ROMN", false); ?></td></tr>
 			<?php } ?>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('AUTH'), help_link('AUTH'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('AUTH'), help_link('AUTH'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="AUTH" id="AUTH" value="" size="40" maxlength="255" /> <?php print_specialchar_link("AUTH", false); ?></td></tr>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('PUBL'), help_link('PUBL'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('PUBL'), help_link('PUBL'); ?></td>
 			<td class="optionbox wrap"><textarea name="PUBL" id="PUBL" rows="5" cols="60"></textarea><br /><?php print_specialchar_link("PUBL", true); ?></td></tr>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('REPO'), help_link('REPO'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('REPO'), help_link('REPO'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="REPO" id="REPO" value="" size="10" /> <?php print_findrepository_link("REPO"); echo help_link('REPO'); print_addnewrepository_link("REPO"); ?></td></tr>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('CALN'), help_link('CALN'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('CALN'), help_link('CALN'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="CALN" id="CALN" value="" /></td></tr>
 		<?php
 			if (WT_USER_IS_ADMIN) {
-				echo '<tr><td class="descriptionbox ', $TEXT_DIRECTION, ' wrap width25">';
+				echo '<tr><td class="descriptionbox wrap width25">';
 				echo WT_Gedcom_Tag::getLabel('CHAN'), '</td><td class="optionbox wrap">';
 				echo '<input type="checkbox" name="preserve_last_changed"';
 				if ($NO_UPDATE_CHAN) {
@@ -682,12 +675,12 @@ case 'addnewsource':
 			}
 		?>
 		</table>
-			<a href="#"  onclick="return expand_layer('events');"><img id="events_img" src="<?php echo $WT_IMAGES["plus"]; ?>" border="0" width="11" height="11" alt="" title="" />
+			<a href="#"  onclick="return expand_layer('events');"><img id="events_img" src="<?php echo $WT_IMAGES["plus"]; ?>" width="11" height="11" alt="" title="">
 			<?php echo WT_I18N::translate('Associate events with this source'); ?></a><?php echo help_link('edit_SOUR_EVEN'); ?>
 			<div id="events" style="display: none;">
 			<table class="facts_table">
 			<tr>
-				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_I18N::translate('Select Events'), help_link('edit_SOUR_EVEN'); ?></td>
+				<td class="descriptionbox wrap width25"><?php echo WT_I18N::translate('Select Events'), help_link('edit_SOUR_EVEN'); ?></td>
 				<td class="optionbox wrap"><select name="EVEN[]" multiple="multiple" size="5">
 					<?php
 					$parts = explode(',', get_gedcom_setting(WT_GED_ID, 'INDI_FACTS_ADD'));
@@ -759,7 +752,7 @@ case 'addsourceaction':
 	$link = "source.php?sid=$xref";
 	if ($xref) {
 		echo '<br /><br />', WT_I18N::translate('New source created successfully.'), '<br /><br />';
-		echo "<a href=\"javascript://SOUR $xref\" onclick=\"openerpasteid('$xref'); return false;\">", WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record '), " <b>$xref</b></a>";
+		echo "<a href=\"#\" onclick=\"openerpasteid('$xref'); return false;\">", WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record '), " <b>$xref</b></a>";
 	}
 	break;
 //------------------------------------------------------------------------------
@@ -774,7 +767,7 @@ case 'addnewnote':
 		<?php
 			echo '<table class="facts_table">';
 				echo '<tr>';
-					echo '<td class="descriptionbox" ', $TEXT_DIRECTION, ' wrap=\"nowrap\">';
+					echo '<td class="descriptionbox nowrap">';
 					echo WT_I18N::translate('Shared note'), help_link('SHARED_NOTE');
 					echo '</td>';
 					echo '<td class="optionbox wrap" ><textarea name="NOTE" id="NOTE" rows="15" cols="87"></textarea>';
@@ -782,7 +775,7 @@ case 'addnewnote':
 					echo '</td>';
 				echo '</tr>';
 			if (WT_USER_IS_ADMIN) {
-				echo '<tr><td class="descriptionbox ', $TEXT_DIRECTION, ' wrap width25">';
+				echo '<tr><td class="descriptionbox wrap width25">';
 				echo WT_Gedcom_Tag::getLabel('CHAN'), '</td><td class="optionbox wrap">';
 				echo '<input type="checkbox" name="preserve_last_changed"';
 				if ($NO_UPDATE_CHAN) {
@@ -860,7 +853,7 @@ case 'addnoteaction':
 
 	if ($xref != "none") {
 		echo "<br /><br />".WT_I18N::translate('New Shared Note created successfully.')." (".$xref.")<br /><br />";
-		echo "<a href=\"javascript://NOTE $xref\" onclick=\"openerpasteid('$xref'); return false;\">".WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record ')." <b>$xref</b></a>";
+		echo "<a href=\"#\" onclick=\"openerpasteid('$xref'); return false;\">".WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record ')." <b>$xref</b></a>";
 		echo "<br /><br /><br /><br />";
 		echo "<br /><br /><br /><br />";
 	}
@@ -961,7 +954,7 @@ case 'editsource':
 	}
 
 	if (WT_USER_IS_ADMIN) {
-		echo '<tr><td class="descriptionbox ', $TEXT_DIRECTION, ' wrap width25">';
+		echo '<tr><td class="descriptionbox wrap width25">';
 		echo WT_Gedcom_Tag::getLabel('CHAN'), '</td><td class="optionbox wrap">';
 		echo '<input type="checkbox" name="preserve_last_changed"';
 		if ($NO_UPDATE_CHAN) {
@@ -1009,7 +1002,7 @@ case 'editnote':
 		?>
 		<table class="facts_table">
 			<tr>
-				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_I18N::translate('Shared note'), help_link('SHARED_NOTE'); ?></td>
+				<td class="descriptionbox wrap width25"><?php echo WT_I18N::translate('Shared note'), help_link('SHARED_NOTE'); ?></td>
 				<td class="optionbox wrap">
 					<textarea name="NOTE" id="NOTE" rows="15" cols="90"><?php
 						echo htmlspecialchars($note_content);
@@ -1018,7 +1011,7 @@ case 'editnote':
 			</tr>
 			<?php
 				if (WT_USER_IS_ADMIN) {
-					echo '<tr><td class="descriptionbox ', $TEXT_DIRECTION, ' wrap width25">';
+					echo '<tr><td class="descriptionbox wrap width25">';
 					echo WT_Gedcom_Tag::getLabel('CHAN'), '</td><td class="optionbox wrap">';
 					echo '<input type="checkbox" name="preserve_last_changed"';
 					if ($NO_UPDATE_CHAN) {
@@ -1060,29 +1053,29 @@ case 'addnewrepository':
 		<input type="hidden" name="action" value="addrepoaction" />
 		<input type="hidden" name="pid" value="newrepo" />
 		<table class="facts_table">
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_I18N::translate('Repository name'), help_link('edit_REPO_NAME'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_I18N::translate('Repository name'), help_link('edit_REPO_NAME'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="NAME" id="NAME" value="" size="40" maxlength="255" /> <?php print_specialchar_link("NAME", false); ?></td></tr>
 			<?php if (strstr($ADVANCED_NAME_FACTS, "_HEB")!==false) { ?>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('_HEB'), help_link('_HEB'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('_HEB'), help_link('_HEB'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="_HEB" id="_HEB" value="" size="40" maxlength="255" /> <?php print_specialchar_link("_HEB", false); ?></td></tr>
 			<?php } ?>
 			<?php if (strstr($ADVANCED_NAME_FACTS, "ROMN")!==false) { ?>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ROMN'), help_link('ROMN'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ROMN'), help_link('ROMN'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="ROMN" id="ROMN" value="" size="40" maxlength="255" /> <?php print_specialchar_link("ROMN", false); ?></td></tr>
 			<?php } ?>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ADDR'), help_link('ADDR'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ADDR'), help_link('ADDR'); ?></td>
 			<td class="optionbox wrap"><textarea name="ADDR" id="ADDR" rows="5" cols="60"></textarea><?php print_specialchar_link("ADDR", true); ?> </td></tr>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('PHON'), help_link('PHON'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('PHON'), help_link('PHON'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="PHON" id="PHON" value="" size="40" maxlength="255" /> </td></tr>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('FAX'), help_link('FAX'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('FAX'), help_link('FAX'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="FAX" id="FAX" value="" size="40" /></td></tr>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('EMAIL'), help_link('EMAIL'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('EMAIL'), help_link('EMAIL'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="EMAIL" id="EMAIL" value="" size="40" maxlength="255" /></td></tr>
-			<tr><td class="descriptionbox <?php echo $TEXT_DIRECTION; ?> wrap width25"><?php echo WT_Gedcom_Tag::getLabel('WWW'), help_link('URL'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('WWW'), help_link('URL'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="WWW" id="WWW" value="" size="40" maxlength="255" /> </td></tr>
 		<?php
 			if (WT_USER_IS_ADMIN) {
-				echo '<tr><td class="descriptionbox ', $TEXT_DIRECTION, ' wrap width25">';
+				echo '<tr><td class="descriptionbox wrap width25">';
 				echo WT_Gedcom_Tag::getLabel('CHAN'), '</td><td class="optionbox wrap">';
 				echo '<input type="checkbox" name="preserve_last_changed"';
 				if ($NO_UPDATE_CHAN) {
@@ -1134,7 +1127,7 @@ case 'addrepoaction':
 	$link = "repo.php?rid=$xref";
 	if ($xref) {
 		echo '<br /><br />', WT_I18N::translate('New Repository created'), '<br /><br />';
-		echo "<a href=\"javascript://REPO $xref\" onclick=\"openerpasteid('$xref'); return false;\">", WT_I18N::translate('Paste the following Repository ID into your editing fields to reference this Repository '), " <b>$xref</b></a>";
+		echo "<a href=\"#\" onclick=\"openerpasteid('$xref'); return false;\">", WT_I18N::translate('Paste the following Repository ID into your editing fields to reference this Repository '), " <b>$xref</b></a>";
 	}
 	break;
 //------------------------------------------------------------------------------
@@ -1728,61 +1721,6 @@ case 'addopfchildaction':
 	}
 	break;
 //------------------------------------------------------------------------------
-case 'deleteperson':
-	if (delete_person($pid, $gedrec)) {
-		$success=true;
-	}
-	break;
-//------------------------------------------------------------------------------
-case 'deletefamily':
-	if (delete_family($famid, $gedrec)) {
-		$success=true;
-	}
-	break;
-
-
-//----------------------------------------------------------------------------------
-// This case will now delete Shared notes as well, as $pid is passed with call
-// from source_ctrl.php or note_ctrl.php (line 208  submenu->addOnclick ..... etc)
-// ---------------------------------------------------------------------------------
-case 'deletenote':
-case 'deletesource':
-case 'deleterepo':
-
-if (isset($_REQUEST['action'])) $action = $_REQUEST['action'];
-
-	if (!empty($gedrec)) {
-		// Delete links to this record
-		foreach (fetch_all_links($pid, WT_GED_ID) as $xref) {
-			$gedrec=find_gedcom_record($xref, WT_GED_ID, true);
-			$lines = explode("\n", $gedrec);
-			$newrec = "";
-			$skipline = false;
-			$glevel = 0;
-			foreach ($lines as $indexval => $line) {
-				if ((preg_match("/^\d ".WT_REGEX_TAG." @$pid@/", $line)==0)&&(!$skipline)) {
-					$newrec .= $line."\n";
-				} else {
-					if (!$skipline) {
-						$glevel = $line{0};
-						$skipline = true;
-					} else {
-						if ($line{0}<=$glevel) {
-							$skipline = false;
-							$newrec .= $line."\n";
-						}
-					}
-				}
-			}
-			if (replace_gedrec($xref, WT_GED_ID, $newrec, $update_CHAN)) {
-				$success=true;
-			}
-		}
-		delete_gedrec($pid, WT_GED_ID);
-		$success=true;
-	}
-	break;
-//------------------------------------------------------------------------------
 case 'editname':
 	// Hide the private data
 	$tmp=new WT_GedcomRecord($gedrec);
@@ -1804,40 +1742,8 @@ case 'addname':
 	print_indi_form("update", "", "new", "NEW");
 	break;
 //------------------------------------------------------------------------------
-case 'copy':
-	//-- handle media differently now :P
-	if ($linenum=='media') {
-		$factrec = "1 OBJE @".$pid."@";
-		$type="all";
-		echo "<br />";
-	} else {
-		$gedlines = explode("\n", trim($gedrec));
-		$fields = explode(' ', $gedlines[$linenum]);
-		$glevel = $fields[0];
-		$i = $linenum+1;
-		$factrec = $gedlines[$linenum];
-		while (($i<count($gedlines))&&($gedlines[$i]{0}>$glevel)) {
-			$factrec.="\n".$gedlines[$i];
-			$i++;
-		}
-	}
-	if (!isset($_SESSION["clipboard"])) $_SESSION["clipboard"] = array();
-	$ft = preg_match("/1 (_?[A-Z]{3,5})(.*)/", $factrec, $match);
-	if ($ft>0) {
-		$fact = trim($match[1]);
-		if ($fact=="EVEN" || $fact=="FACT") {
-			$ct = preg_match("/2 TYPE (.*)/", $factrec, $match);
-			if ($ct>0) $fact = trim($match[1]);
-		}
-		if (count($_SESSION["clipboard"])>9) array_pop($_SESSION["clipboard"]);
-		$_SESSION["clipboard"][] = array("type"=>$type, "factrec"=>$factrec, "fact"=>$fact);
-		echo "<b>", WT_I18N::translate('Record copied to clipboard'), "</b>";
-		$success = true;
-	}
-	break;
-//------------------------------------------------------------------------------
 case 'paste':
-	$gedrec .= "\n".$_SESSION["clipboard"][$fact]["factrec"]."\n";
+	$gedrec .= "\n".$WT_SESSION->clipboard[$fact]["factrec"]."\n";
 	if (replace_gedrec($pid, WT_GED_ID, $gedrec, $NO_UPDATE_CHAN)) {
 		$success=true;
 	}
@@ -1848,8 +1754,6 @@ case 'paste':
 
 //------------------------------------------------------------------------------
 case 'reorder_media': // Sort page using Popup
-	require_once WT_ROOT.'js/prototype.js.htm';
-	require_once WT_ROOT.'js/scriptaculous.js.htm';
 	require_once WT_ROOT.'includes/media_reorder.php';
 	break;
 
@@ -1961,8 +1865,20 @@ case 'al_reorder_media_update': // Update sort using Album Page
 
 //------------------------------------------------------------------------------
 case 'reorder_children':
-	require_once WT_ROOT.'js/prototype.js.htm';
-	require_once WT_ROOT.'js/scriptaculous.js.htm';
+	echo WT_JS_START; ?>
+	  jQuery(document).ready(function() {
+		jQuery("#reorder_list").sortable({forceHelperSize: true, forcePlaceholderSize: true, opacity: 0.7, cursor: 'move', axis: 'y'});
+
+		//-- update the order numbers after drag-n-drop sorting is complete
+		jQuery('#reorder_list').bind('sortupdate', function(event, ui) {
+				jQuery('#'+jQuery(this).attr('id')+' input').each(
+					function (index, value) {
+						value.value = index+1;
+					}
+				);
+			});
+		});
+	<?php echo WT_JS_END;
 	echo '<br /><b>', WT_I18N::translate('Re-order children'), '</b>', help_link('reorder_children');
 	?>
 	<form name="reorder_form" method="post" action="edit_interface.php">
@@ -1971,7 +1887,7 @@ case 'reorder_children':
 		<input type="hidden" name="option" value="bybirth" />
 		<ul id="reorder_list">
 		<?php
-			// reorder children in modified families [ 1840895 ]
+			// reorder children in modified families
 			$family = WT_Family::getInstance($pid);
 			$ids = array();
 			foreach ($family->getChildren() as $child) {
@@ -1994,31 +1910,18 @@ case 'reorder_children':
 			$i=0;
 			$show_full = 1; // Force details to show for each child
 			foreach ($children as $id=>$child) {
-				echo "<li style=\"cursor:move; margin-bottom:2px;\"";
-				if (!in_array($id, $ids)) echo " class=\"facts_valueblue\"";
-				echo " id=\"li_$id\" >";
+				echo '<li style="cursor:move; margin-bottom:2px; position:relative;"';
+				if (!in_array($id, $ids)) echo ' class="facts_valueblue"';
+				echo ' id="li_',$id,'" >';
 				print_pedigree_person(WT_Person::getInstance($id), 2);
-				echo "<input type=\"hidden\" name=\"order[$id]\" value=\"$i\"/>";
-				echo "</li>";
+				echo '<input type="hidden" name="order[',$id,']" value="',$i,'"/>';
+				echo '</li>';
 				$i++;
 			}
-		?>
-		</ul>
-		<?php echo WT_JS_START; ?>
-			new Effect.BlindDown('reorder_list', {duration: 1});
-			Sortable.create('reorder_list',
-				{
-					scroll:window,
-					onUpdate : function() {
-						inputs = $('reorder_list').getElementsByTagName("input");
-						for (var i = 0; i < inputs.length; i++) inputs[i].value = i;
-					}
-				}
-			);
-		<?php echo WT_JS_END;
+		echo '</ul>';
 		if (WT_USER_IS_ADMIN) {
-			echo "<center><table width=93%><tr><td class=\"descriptionbox ", $TEXT_DIRECTION, " wrap width25\">";
-			echo WT_Gedcom_Tag::getLabel('CHAN'), "</td><td class=\"optionbox ", $TEXT_DIRECTION, " wrap\">";
+			echo "<center><table width=93%><tr><td class=\"descriptionbox wrap width25\">";
+			echo WT_Gedcom_Tag::getLabel('CHAN'), "</td><td class=\"optionbox wrap\">";
 			echo '<input type="checkbox" name="preserve_last_changed"';
 			if ($NO_UPDATE_CHAN) {
 				echo ' checked="checked"';
@@ -2107,44 +2010,44 @@ case 'changefamily':
 	<form name="changefamform" method="post" action="edit_interface.php">
 		<input type="hidden" name="action" value="changefamily_update" />
 		<input type="hidden" name="famid" value="<?php echo $famid; ?>" />
-		<table class="width50 <?php echo $TEXT_DIRECTION; ?>">
+		<table class="width50">
 			<tr><td colspan="3" class="topbottombar"><?php echo WT_I18N::translate('Change Family Members'); ?></td></tr>
 			<tr>
 			<?php
 			if (!is_null($father)) {
 			?>
-				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo $father->getLabel(); ?></b><input type="hidden" name="HUSB" value="<?php echo $father->getXref(); ?>" /></td>
-				<td id="HUSBName" class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>"><?php echo $father->getFullName(); ?></td>
+				<td class="descriptionbox"><b><?php echo $father->getLabel(); ?></b><input type="hidden" name="HUSB" value="<?php echo $father->getXref(); ?>" /></td>
+				<td id="HUSBName" class="optionbox wrap"><?php echo $father->getFullName(); ?></td>
 			<?php
 			} else {
 			?>
-				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo WT_I18N::translate('spouse'); ?></b><input type="hidden" name="HUSB" value="" /></td>
-				<td id="HUSBName" class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>"></td>
+				<td class="descriptionbox"><b><?php echo WT_I18N::translate('spouse'); ?></b><input type="hidden" name="HUSB" value="" /></td>
+				<td id="HUSBName" class="optionbox wrap"></td>
 			<?php
 			}
 			?>
-				<td class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>">
-					<a href="javascript:;" id="husbrem" style="display: <?php echo is_null($father) ? 'none':'block'; ?>;" onclick="document.changefamform.HUSB.value=''; document.getElementById('HUSBName').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
-					<a href="javascript:;" onclick="nameElement = document.getElementById('HUSBName'); remElement = document.getElementById('husbrem'); return findIndi(document.changefamform.HUSB);"><?php echo WT_I18N::translate('Change'); ?></a><br />
+				<td class="optionbox wrap">
+					<a href="#" id="husbrem" style="display: <?php echo is_null($father) ? 'none':'block'; ?>;" onclick="document.changefamform.HUSB.value=''; document.getElementById('HUSBName').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
+					<a href="#" onclick="nameElement = document.getElementById('HUSBName'); remElement = document.getElementById('husbrem'); return findIndi(document.changefamform.HUSB);"><?php echo WT_I18N::translate('Change'); ?></a><br />
 				</td>
 			</tr>
 			<tr>
 			<?php
 			if (!is_null($mother)) {
 			?>
-				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo $mother->getLabel(); ?></b><input type="hidden" name="WIFE" value="<?php echo $mother->getXref(); ?>" /></td>
-				<td id="WIFEName" class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>"><?php echo $mother->getFullName(); ?></td>
+				<td class="descriptionbox"><b><?php echo $mother->getLabel(); ?></b><input type="hidden" name="WIFE" value="<?php echo $mother->getXref(); ?>" /></td>
+				<td id="WIFEName" class="optionbox wrap"><?php echo $mother->getFullName(); ?></td>
 			<?php
 			} else {
 			?>
-				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo WT_I18N::translate('spouse'); ?></b><input type="hidden" name="WIFE" value="" /></td>
-				<td id="WIFEName" class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>"></td>
+				<td class="descriptionbox"><b><?php echo WT_I18N::translate('spouse'); ?></b><input type="hidden" name="WIFE" value="" /></td>
+				<td id="WIFEName" class="optionbox wrap"></td>
 			<?php
 			}
 			?>
-				<td class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>">
-					<a href="javascript:;" id="wiferem" style="display: <?php echo is_null($mother) ? 'none':'block'; ?>;" onclick="document.changefamform.WIFE.value=''; document.getElementById('WIFEName').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
-					<a href="javascript:;" onclick="nameElement = document.getElementById('WIFEName'); remElement = document.getElementById('wiferem'); return findIndi(document.changefamform.WIFE);"><?php echo WT_I18N::translate('Change'); ?></a><br />
+				<td class="optionbox wrap">
+					<a href="#" id="wiferem" style="display: <?php echo is_null($mother) ? 'none':'block'; ?>;" onclick="document.changefamform.WIFE.value=''; document.getElementById('WIFEName').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
+					<a href="#" onclick="nameElement = document.getElementById('WIFEName'); remElement = document.getElementById('wiferem'); return findIndi(document.changefamform.WIFE);"><?php echo WT_I18N::translate('Change'); ?></a><br />
 				</td>
 			</tr>
 			<?php
@@ -2153,11 +2056,11 @@ case 'changefamily':
 				if (!is_null($child)) {
 				?>
 			<tr>
-				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo $child->getLabel(); ?></b><input type="hidden" name="CHIL<?php echo $i; ?>" value="<?php echo $child->getXref(); ?>" /></td>
+				<td class="descriptionbox"><b><?php echo $child->getLabel(); ?></b><input type="hidden" name="CHIL<?php echo $i; ?>" value="<?php echo $child->getXref(); ?>" /></td>
 				<td id="CHILName<?php echo $i; ?>" class="optionbox wrap"><?php echo $child->getFullName(); ?></td>
-				<td class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>">
-					<a href="javascript:;" id="childrem<?php echo $i; ?>" style="display: block;" onclick="document.changefamform.CHIL<?php echo $i; ?>.value=''; document.getElementById('CHILName<?php echo $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
-					<a href="javascript:;" onclick="nameElement = document.getElementById('CHILName<?php echo $i; ?>'); remElement = document.getElementById('childrem<?php echo $i; ?>'); return findIndi(document.changefamform.CHIL<?php echo $i; ?>);"><?php echo WT_I18N::translate('Change'); ?></a><br />
+				<td class="optionbox wrap">
+					<a href="#" id="childrem<?php echo $i; ?>" style="display: block;" onclick="document.changefamform.CHIL<?php echo $i; ?>.value=''; document.getElementById('CHILName<?php echo $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
+					<a href="#" onclick="nameElement = document.getElementById('CHILName<?php echo $i; ?>'); remElement = document.getElementById('childrem<?php echo $i; ?>'); return findIndi(document.changefamform.CHIL<?php echo $i; ?>);"><?php echo WT_I18N::translate('Change'); ?></a><br />
 				</td>
 			</tr>
 				<?php
@@ -2166,15 +2069,15 @@ case 'changefamily':
 			}
 				?>
 			<tr>
-				<td class="descriptionbox <?php echo $TEXT_DIRECTION; ?>"><b><?php echo WT_I18N::translate('child'); ?></b><input type="hidden" name="CHIL<?php echo $i; ?>" value="" /></td>
+				<td class="descriptionbox"><b><?php echo WT_I18N::translate('child'); ?></b><input type="hidden" name="CHIL<?php echo $i; ?>" value="" /></td>
 				<td id="CHILName<?php echo $i; ?>" class="optionbox wrap"></td>
-				<td class="optionbox wrap <?php echo $TEXT_DIRECTION; ?>">
-					<a href="javascript:;" id="childrem<?php echo $i; ?>" style="display: none;" onclick="document.changefamform.CHIL<?php echo $i; ?>.value=''; document.getElementById('CHILName<?php echo $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
-					<a href="javascript:;" onclick="nameElement = document.getElementById('CHILName<?php echo $i; ?>'); remElement = document.getElementById('childrem<?php echo $i; ?>'); return findIndi(document.changefamform.CHIL<?php echo $i; ?>);"><?php echo WT_I18N::translate('Add'); ?></a><br />
+				<td class="optionbox wrap">
+					<a href="#" id="childrem<?php echo $i; ?>" style="display: none;" onclick="document.changefamform.CHIL<?php echo $i; ?>.value=''; document.getElementById('CHILName<?php echo $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
+					<a href="#" onclick="nameElement = document.getElementById('CHILName<?php echo $i; ?>'); remElement = document.getElementById('childrem<?php echo $i; ?>'); return findIndi(document.changefamform.CHIL<?php echo $i; ?>);"><?php echo WT_I18N::translate('Add'); ?></a><br />
 				</td>
 			</tr>
 		</table>
-		<!-- <a href="javascript: <?php echo WT_I18N::translate('Add an unlinked person'); ?>" onclick="addnewchild(''); return false;"><?php echo WT_I18N::translate('Add an unlinked person'); ?></a><br />-->
+		<!-- <a href="#" onclick="addnewchild(''); return false;"><?php echo WT_I18N::translate('Add an unlinked person'); ?></a><br />-->
 		<br />
 		<input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>" /><input type="button" value="<?php echo WT_I18N::translate('Cancel'); ?>" onclick="window.close();" />
 	</form>
@@ -2355,8 +2258,20 @@ case 'reorder_update':
 	break;
 //------------------------------------------------------------------------------
 case 'reorder_fams':
-	require_once WT_ROOT.'js/prototype.js.htm';
-	require_once WT_ROOT.'js/scriptaculous.js.htm';
+	echo WT_JS_START; ?>
+	  jQuery(document).ready(function() {
+		jQuery("#reorder_list").sortable({forceHelperSize: true, forcePlaceholderSize: true, opacity: 0.7, cursor: 'move', axis: 'y'});
+
+		//-- update the order numbers after drag-n-drop sorting is complete
+		jQuery('#reorder_list').bind('sortupdate', function(event, ui) {
+				jQuery('#'+jQuery(this).attr('id')+' input').each(
+					function (index, value) {
+						value.value = index+1;
+					}
+				);
+			});
+		});
+	<?php echo WT_JS_END;
 	echo "<br /><b>", WT_I18N::translate('Reorder families'), "</b>", help_link('reorder_families');
 	?>
 	<form name="reorder_form" method="post" action="edit_interface.php">
@@ -2381,18 +2296,6 @@ case 'reorder_fams':
 			}
 		?>
 		</ul>
-		<?php echo WT_JS_START; ?>
-			new Effect.BlindDown('reorder_list', {duration: 1});
-			Sortable.create('reorder_list',
-				{
-					scroll:window,
-					onUpdate : function() {
-						inputs = $('reorder_list').getElementsByTagName("input");
-						for (var i = 0; i < inputs.length; i++) inputs[i].value = i;
-					}
-				}
-			);
-		<?php echo WT_JS_END; ?>
 		<button type="submit"><?php echo WT_I18N::translate('Save'); ?></button>
 		<button type="submit" onclick="document.reorder_form.action.value='reorder_fams'; document.reorder_form.submit();"><?php echo WT_I18N::translate('sort by date of marriage'); ?></button>
 		<button type="submit" onclick="window.close();"><?php echo WT_I18N::translate('Cancel'); ?></button>
@@ -2450,11 +2353,9 @@ if ($success && !WT_DEBUG ) {
 // Decide whether to print footer or not
 if ($action == 'addmedia_links' || $action == 'addnewnote_assisted' ) {
 	// Do not print footer.
-	echo "<br /><div class=\"center\"><a href=\"javascript:;\" onclick=\"edit_close('{$link}');\">", WT_I18N::translate('Close Window'), '</a></div>';
+	echo "<br /><div class=\"center\"><a href=\"#\" onclick=\"edit_close('{$link}');\">", WT_I18N::translate('Close Window'), '</a></div>';
 } elseif (isset($closeparent) && $closeparent=="yes" ) {
-	echo "<div class=\"center\"><a href=\"javascript:;\" onclick=\"edit_close('{$link}');\">", WT_I18N::translate('Close Window'), '</a></div><br />';
-	print_simple_footer();
+	echo "<div class=\"center\"><a href=\"#\" onclick=\"edit_close('{$link}');\">", WT_I18N::translate('Close Window'), '</a></div><br />';
 } else {
-	echo "<div class=\"center\"><a href=\"javascript:;\" onclick=\"edit_close('{$link}');\">", WT_I18N::translate('Close Window'), '</a></div><br />';
-	print_simple_footer();
+	echo "<div class=\"center\"><a href=\"#\" onclick=\"edit_close('{$link}');\">", WT_I18N::translate('Close Window'), '</a></div><br />';
 }

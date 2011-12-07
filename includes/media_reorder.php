@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_reorder.php 12170 2011-09-07 15:03:23Z greg $
+// $Id: media_reorder.php 12812 2011-11-19 13:02:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,12 +29,26 @@ if (!defined('WT_WEBTREES')) {
 }
 
 require_once WT_ROOT.'includes/functions/functions_print_facts.php';
+echo WT_JS_START; ?>
+  jQuery(document).ready(function() {
+	jQuery("#reorder_media_list").sortable({forceHelperSize: true, forcePlaceholderSize: true, opacity: 0.7, cursor: 'move', axis: 'y'});
+
+	//-- update the order numbers after drag-n-drop sorting is complete
+	jQuery('#reorder_media_list').bind('sortupdate', function(event, ui) {
+			jQuery('#'+jQuery(this).attr('id')+' input').each(
+				function (index, value) {
+					value.value = index+1;
+				}
+			);
+		});
+	});
+<?php echo WT_JS_END;
 
 	echo "<br /><b>".WT_I18N::translate('Re-order media')."</b>";
 	echo "&nbsp --- &nbsp;" . WT_I18N::translate('Click a row, then drag-and-drop to re-order media ');
 
 	global $MEDIA_EXTERNAL, $MEDIATYPE;
-	global $WORD_WRAPPED_NOTES, $MEDIA_DIRECTORY, $WT_IMAGES, $TEXT_DIRECTION;
+	global $WORD_WRAPPED_NOTES, $MEDIA_DIRECTORY, $WT_IMAGES;
 	global $is_media, $cntm1, $cntm2, $cntm3, $cntm4, $t, $mgedrec;
 	global $edit, $tabno, $currtab;
 	global $ids, $pid, $related, $level, $gedrec, $media_data, $order, $order1, $order2, $j;
@@ -164,29 +178,11 @@ require_once WT_ROOT.'includes/functions/functions_print_facts.php';
 	}
 	?>
 </ul>
-<?php
-?>
-	<script type="text/javascript" language="javascript">
-	// <![CDATA[
-		new Effect.BlindDown('reorder_media_list', {duration: .5});
-		Sortable.create('reorder_media_list',
-			{
-				scroll:window,
-				onUpdate : function() {
-					inputs = $('reorder_media_list').getElementsByTagName('input');
-					for (var i = 0; i < inputs.length; i++) {
-						inputs[i].value = i;
-					}
-				}
-			}
-		);
-	// ]]>
-	</script>
 	<center>
 	<?php
 	if (WT_USER_IS_ADMIN) {
-		echo "<table width=97%><tr><td class=\"descriptionbox ", $TEXT_DIRECTION, " wrap width25\">";
-		echo WT_Gedcom_Tag::getLabel('CHAN'), "</td><td class=\"optionbox ", $TEXT_DIRECTION, " wrap\">";
+		echo "<table width=97%><tr><td class=\"descriptionbox wrap width25\">";
+		echo WT_Gedcom_Tag::getLabel('CHAN'), "</td><td class=\"optionbox wrap\">";
 		if ($NO_UPDATE_CHAN) {
 			echo "<input type=\"checkbox\" checked=\"checked\" name=\"preserve_last_changed\" />";
 		} else {

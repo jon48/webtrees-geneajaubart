@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_media_reorder.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: functions_media_reorder.php 12811 2011-11-19 11:03:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ if (!defined('WT_WEBTREES')) {
  * @param string $pid        The record id this media item was attached to
  */
 function media_reorder_row($rtype, $rowm, $pid) {
-	global $WT_IMAGES, $MEDIA_DIRECTORY, $TEXT_DIRECTION;
+	global $WT_IMAGES, $MEDIA_DIRECTORY;
 	global $GEDCOM, $THUMBNAIL_WIDTH, $USE_MEDIA_VIEWER;
 	global $SEARCH_SPIDER;
 	global $t, $n, $item, $items, $p, $edit, $reorder, $note, $rowm;

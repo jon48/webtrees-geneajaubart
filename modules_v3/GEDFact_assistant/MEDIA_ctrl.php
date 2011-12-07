@@ -23,10 +23,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: MEDIA_ctrl.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: MEDIA_ctrl.php 12550 2011-11-05 14:25:38Z greg $
 
-$controller = new WT_Controller_Individual();
-$controller->init();
+$controller=new WT_Controller_Individual();
+
 echo '<link href="'.WT_STATIC_URL.WT_MODULES_DIR.'GEDFact_assistant/css/gf_styles.css" rel="stylesheet" type="text/css" media="screen" />';
 
 global $tabno, $linkToID, $SEARCH_SPIDER, $GOOGLEMAP_PH_CONTROLS;
@@ -35,19 +35,15 @@ global $GEDCOM, $ABBREVIATE_CHART_LABELS;
 global $show_full;
 global $famid, $censyear, $censdate;
 
-// print_simple_header("Census");
-
-$summary=$controller->indi->format_first_major_fact(WT_EVENTS_BIRT, 2);
-if (!($controller->indi->isDead())) {
+$summary=$controller->record->format_first_major_fact(WT_EVENTS_BIRT, 2);
+if (!($controller->record->isDead())) {
 	// If alive display age
-	$bdate=$controller->indi->getBirthDate();
+	$bdate=$controller->record->getBirthDate();
 	$age = WT_Date::GetAgeGedcom($bdate);
 	//if ($age!="") {
 		//$summary.= "<span class=\"label\">".WT_I18N::translate('Age').":</span><span class=\"field\"> ".get_age_at_event($age, true)."</span>";
 	//}
 }
-$summary.=$controller->indi->format_first_major_fact(WT_EVENTS_DEAT, 2);
+$summary.=$controller->record->format_first_major_fact(WT_EVENTS_DEAT, 2);
 
 $controller->medialink_assistant();
-
-// print_footer();

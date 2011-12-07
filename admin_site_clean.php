@@ -19,16 +19,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// version $Id: admin_site_clean.php 12332 2011-10-18 03:01:06Z nigel $
+// version $Id: admin_site_clean.php 12765 2011-11-16 21:38:45Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_clean.php');
 require './includes/session.php';
-require WT_ROOT.'includes/functions/functions_edit.php';
 
-if (!WT_USER_IS_ADMIN) {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.WT_SCRIPT_NAME);
-	exit;
-}
+$controller=new WT_Controller_Base();
+$controller
+	->requireAdminLogin()
+	->setPageTitle(WT_I18N::translate('Cleanup data directory'))
+	->pageHeader();
+
+require WT_ROOT.'includes/functions/functions_edit.php';
 
 function full_rmdir($dir) {
 	if (!is_writable($dir)) {
@@ -75,12 +77,9 @@ foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
 	}
 }
 
-print_header(WT_I18N::translate('Cleanup data directory'));
 echo
 	'<h3>', WT_I18N::translate('Cleanup data directory'), '</h3>',
 	'<p>',
-	WT_I18N::translate('To delete a file or subdirectory from the data directory select its checkbox.  Click the Delete button to permanently remove the indicated files.'),
-	'</p><p>',
 	WT_I18N::translate('Files marked with %s are required for proper operation and cannot be removed.', '<img src="./images/RESN_confidential.gif" alt="" />'),
 	'</p>';
 
@@ -96,9 +95,6 @@ if (isset($_REQUEST['to_delete'])) {
 		echo '<div class="error">', $v, '</div>';
 	}
 }
-
-require_once WT_ROOT.'js/prototype.js.htm';
-require_once WT_ROOT.'js/scriptaculous.js.htm';
 
 echo '<form name="delete_form" method="post" action="">';
 echo '<div id="cleanup"><ul>';
@@ -128,5 +124,3 @@ echo
 	'<button type="submit">', WT_I18N::translate('Delete'), '</button>',
 	'</div>',
 	'</form>';
-
-print_footer();

@@ -21,17 +21,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search.php 12013 2011-07-14 09:58:41Z greg $
+// $Id: search.php 12823 2011-11-20 01:53:14Z nigel $
 
 define('WT_SCRIPT_NAME', 'search.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
-$controller = new WT_Controller_Search();
-$controller->init();
-
-// Print the top header
-print_header(WT_I18N::translate('Search'));
+$controller=new WT_Controller_Search();
+$controller->pageHeader();
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 ?>
@@ -91,19 +88,18 @@ if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
 //-->
 </script>
-
+<div id="search-page">
 <h2 class="center"><?php echo $controller->getPageTitle(); ?></h2>
-<?php $somethingPrinted = $controller->printResults(); ?>
 <!-- /*************************************************** Search Form Outer Table **************************************************/ -->
 <form method="post" name="searchform" onsubmit="return checknames(this);" action="search.php">
 <input type="hidden" name="action" value="<?php echo $controller->action; ?>" />
 <input type="hidden" name="isPostBack" value="true" />
 <script type="text/javascript">
-	function paste_char(value,lang,mag) {
+	function paste_char(value) {
 		document.searchform.query.value+=value;
 	}
 </script>
-<table class="list_table $TEXT_DIRECTION" width="35%" border="0">
+<table class="list_table" width="35%">
 	<tr>
 
 <!-- /**************************************************** General search Form *************************************************************/ -->
@@ -115,10 +111,10 @@ if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 	<!-- // search terms -->
 	<tr>
 		<td class="list_label" style="padding: 5px;">
-			<label for="firstfocus"><?php echo WT_I18N::translate('Enter search terms'); ?></label>
+			<label for="firstfocus"><?php echo WT_I18N::translate('Search for'); ?></label>
 		</td>
 		<td class="list_value" style="padding: 5px;">
-			<input tabindex="1" id="firstfocus" type="text" name="query" value="<?php if (isset($controller->myquery)) echo $controller->myquery; ?>" size="40" />
+			<input tabindex="1" id="firstfocus" type="text" name="query" value="<?php if (isset($controller->myquery)) echo $controller->myquery; ?>" size="40" autofocus/>
 			<?php print_specialchar_link('firstfocus', false); ?>
 		</td>
 		<td class="list_value" style="vertical-align: middle; text-align: center; padding: 5px;"  rowspan="4">
@@ -128,24 +124,24 @@ if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 	<!-- // Choice where to search -->
 	<tr>
 		<td class="list_label" style="padding: 5px;">
-			<?php echo WT_I18N::translate('Search for'); ?>
+			<?php echo /* I18N: Genealogy records, such as Individual, Source, Repository */ WT_I18N::translate('Records'); ?>
 		</td>
 		<td class="list_value" style="padding: 5px;">
 			<input type="checkbox"<?php
 	if (isset ($controller->srindi) || !$controller->isPostBack)
-		echo ' checked="checked" '; ?>value="yes" id="srindi" name="srindi" />
-				<label for="srindi"><?php echo WT_I18N::translate('Individuals'); ?></label><br />
+		echo ' checked="checked"'; ?> value="yes" id="srindi" name="srindi" />
+				<label for="srindi"><?php echo WT_I18N::translate('Individuals'); ?></label><br >
 			<input type="checkbox"<?php
 	if (isset ($controller->srfams))
-		echo ' checked="checked" '; ?>value="yes" id="srfams" name="srfams" />
+		echo ' checked="checked"'; ?> value="yes" id="srfams" name="srfams" />
 				<label for="srfams"><?php echo WT_I18N::translate('Families'); ?></label><br />
 			<input type="checkbox"<?php
 	if (isset ($controller->srsour))
-		echo ' checked="checked" '; ?>value="yes" id="srsour" name="srsour" />
+		echo ' checked="checked"'; ?> value="yes" id="srsour" name="srsour" />
 				<label for="srsour"><?php echo WT_I18N::translate('Sources'); ?></label><br />
 			<input type="checkbox"<?php
 	if (isset ($controller->srnote))
-		echo ' checked="checked" '; ?>value="yes" id="srnote" name="srnote" />
+		echo ' checked="checked"'; ?> value="yes" id="srnote" name="srnote" />
 				<label for="srnote"><?php echo WT_I18N::translate('Shared notes'); ?></label><br />
 		</td>
 	</tr>
@@ -191,7 +187,7 @@ if ($controller->action == "replace")
 	<!-- // search terms -->
 	<tr>
 		<td class="list_label" style="padding: 5px;"><?php echo WT_I18N::translate('Search for'); ?></td>
-		<td class="list_value" style="padding: 5px;"><input tabindex="1" id="firstfocus" name="query" value="" type="text"/></td>
+		<td class="list_value" style="padding: 5px;"><input tabindex="1" id="firstfocus" name="query" value="" type="text" autofocus/></td>
 			<td class="list_value" style="vertical-align: middle; text-align: center; padding: 5px;"  rowspan="3">
 			<input tabindex="2" type="submit" value="<?php echo WT_I18N::translate('Search'); ?>" />
 		</td>
@@ -248,7 +244,7 @@ if ($controller->action == "soundex") {
 			<?php echo WT_I18N::translate('Given name'); ?>
 		</td>
 		<td class="list_value">
-			<input tabindex="3" type="text" id="firstfocus" name="firstname" value="<?php echo $controller->myfirstname; ?>" />
+			<input tabindex="3" type="text" id="firstfocus" name="firstname" value="<?php echo $controller->myfirstname; ?>" autofocus/>
 		</td>
 		<td class="list_value" style="vertical-align: middle; text-align: center; padding: 5px;"  rowspan="6">
 			<input tabindex="7" type="submit" value="<?php echo WT_I18N::translate('Search'); ?>" />
@@ -359,22 +355,6 @@ if ($controller->action == "general" || $controller->action == "soundex") {
 	}
 }
 ?>
-<!--  not currently used
-	<tr>
-		<td class="list_label" style="padding: 5px;" >
-			<?php echo WT_I18N::translate('Results per page'); ?>
-		</td>
-		<td class="list_value" style="padding: 5px;" colspan="2">
-			<select name="resultsPerPage">
-				<option value="10" <?php if ($controller->resultsPerPage == 10) echo ' selected="selected"'; ?> >10</option>
-				<option value="20" <?php if ($controller->resultsPerPage == 20) echo ' selected="selected"'; ?> >20</option>
-				<option value="30" <?php if ($controller->resultsPerPage == 30) echo ' selected="selected"'; ?> >30</option>
-				<option value="50" <?php if ($controller->resultsPerPage == 50) echo ' selected="selected"'; ?> >50</option>
-				<option value="100"<?php if ($controller->resultsPerPage == 100)echo ' selected="selected"'; ?>>100</option>
-			</select>
-		</td>
-	</tr>
-	-->
 	<tr>
 		<td class="list_label" style="padding: 5px;" >
 			<?php echo WT_I18N::translate('Other Searches'); ?>
@@ -404,19 +384,7 @@ if ($controller->action == "general") {
 	</tr>
 </table>
 </form>
-<br />
-<?php
 
-echo '<br /><br /><br />';
-// set the focus on the first field unless some search results have been printed
-if (!$somethingPrinted) {
-?>
-	<script type="text/javascript">
-	<!--
-		document.getElementById('firstfocus').focus();
-	//-->
-	</script>
-<?php
-}
+<?php $somethingPrinted = $controller->printResults(); ?>
 
-print_footer();
+</div> <!-- close div id "search-page" -->

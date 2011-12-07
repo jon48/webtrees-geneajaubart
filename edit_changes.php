@@ -21,23 +21,23 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_changes.php 12203 2011-09-22 12:09:54Z greg $
+// $Id: edit_changes.php 12888 2011-11-23 20:57:54Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_changes.php');
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-if (!WT_USER_CAN_ACCEPT) {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.WT_SCRIPT_NAME);
-	exit;
-}
+$controller=new WT_Controller_Simple();
+$controller
+	->requireAcceptLogin()
+	->setPageTitle(WT_I18N::translate('Pending changes'))
+	->pageHeader();
 
 $action   =safe_GET('action');
 $change_id=safe_GET('change_id');
 $index    =safe_GET('index');
 $ged      =safe_GET('ged');
 
-print_simple_header(WT_I18N::translate('Pending changes'));
 echo WT_JS_START;
 ?>
 	function show_gedcom_record(xref) {
@@ -54,7 +54,7 @@ echo WT_JS_START;
 	}
 <?php
 echo WT_JS_END;
-echo '<div class="center"><span class="subheaders">', WT_I18N::translate('Pending changes'), '</span><br /><br />';
+echo '<div id="pending"><h2>', WT_I18N::translate('Pending changes'), '</h2>';
 
 switch ($action) {
 case 'undo':
@@ -153,7 +153,7 @@ if ($changed_gedcoms) {
 			}
 			$prev_xref     =$change->xref;
 			$prev_gedcom_id=$change->gedcom_id;
-			$output.='<tr><td class="list_value '.$TEXT_DIRECTION.'">';
+			$output.='<tr><td class="list_value">';
 			$GEDCOM=$change->gedcom_name;
 			$record=WT_GedcomRecord::getInstance($change->xref);
 			if (!$record) {
@@ -165,9 +165,9 @@ if ($changed_gedcoms) {
 				$record=new WT_GedcomRecord($change->gedcom);
 			}
 			$output.='<b>'.$record->getFullName().'</b><br />';
-			$output.='<a href="javascript:;" onclick="return show_diff(\''.$record->getHtmlUrl().'\');">'.WT_I18N::translate('View the changes').'</a> | ';
-			$output.="<a href=\"javascript:show_gedcom_record('".$change->xref."');\">".WT_I18N::translate('View GEDCOM Record')."</a> | ";
-			$output.="<a href=\"javascript:;\" onclick=\"return edit_raw('".$change->xref."');\">".WT_I18N::translate('Edit raw GEDCOM record').'</a><br />';
+			$output.='<a href="#" onclick="return show_diff(\''.$record->getHtmlUrl().'\');">'.WT_I18N::translate('View the changes').'</a> | ';
+			$output.="<a href=\"#\" onclick=\"show_gedcom_record('".$change->xref."');\">".WT_I18N::translate('View GEDCOM Record')."</a> | ";
+			$output.="<a href=\"#\" onclick=\"return edit_raw('".$change->xref."');\">".WT_I18N::translate('Edit raw GEDCOM record').'</a><br />';
 			$output.='<div class="indent">';
 			$output.=WT_I18N::translate('The following changes were made to this record:').'<br />';
 			$output.='<table class="list_table"><tr>';
@@ -189,7 +189,7 @@ if ($changed_gedcoms) {
 			$output.=WT_I18N::translate('Replace record');
 		}
 		echo '</b></td>';
-		$output .= "<td class=\"list_value\"><a href=\"javascript:;\" onclick=\"return reply('".$change->user_name."', '".WT_I18N::translate('Moderate pending changes')."')\" alt=\"".WT_I18N::translate('Send Message')."\">";
+		$output .= "<td class=\"list_value\"><a href=\"#\" onclick=\"return reply('".$change->user_name."', '".WT_I18N::translate('Moderate pending changes')."')\" alt=\"".WT_I18N::translate('Send Message')."\">";
 		$output .= PrintReady($change->real_name);
 		$output .= PrintReady('&nbsp;('.$change->user_name.')').'</a></td>';
 		$output .= '<td class="list_value">'.$change->change_time.'</td>';
@@ -228,8 +228,9 @@ if ($changed_gedcoms) {
 	$output2 .= '</td></tr></table>';
 
 	echo
-		$output2, $output, $output2, '<br /><br />',
-		'<a href="javascript:;" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">',
+		$output2, $output, $output2,
+		'<h3>',
+		'<a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">',
 		WT_I18N::translate('Close Window'),
 		'</a>';
 } else {
@@ -238,8 +239,8 @@ if ($changed_gedcoms) {
 		WT_JS_START,
 		'if (window.opener.showchanges)	window.opener.showchanges();',
 		'window.close();',
-		WT_JS_END;
+		WT_JS_END,
+		'</h3>';
 }
 
 echo '</div>';
-print_simple_footer();

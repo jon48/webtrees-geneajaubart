@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12203 2011-09-22 12:09:54Z greg $
+// $Id: module.php 12942 2011-11-29 11:58:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -37,6 +37,20 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	// Extend WT_Module
 	public function getDescription() {
 		return /* I18N: Description of the "Descendants" module */ WT_I18N::translate('A sidebar showing the descendants of an individual.');
+	}
+
+	// Implement WT_Module
+	public function modAction($modAction) {
+		switch ($modAction) {
+		case 'ajax':
+			header('Content-Type: text/html; charset=UTF-8');
+			echo $this->getSidebarAjaxContent();
+			break;
+		default:
+			header('HTTP/1.0 404 Not Found');
+			break;
+		}
+		exit;
 	}
 
 	// Implement WT_Module_Sidebar
@@ -55,17 +69,20 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		$pid   =safe_GET('pid', WT_REGEX_XREF);
 		$famid =safe_GET('famid', WT_REGEX_XREF);
 
-		$last = array('search'=>$search);
-		$_SESSION['sb_descendancy_last'] = $last;
-
-		if (!empty($search)) return $this->search($search);
-		else if (!empty($pid)) return $this->loadSpouses($pid, 1);
-		else if (!empty($famid)) return $this->loadChildren($famid, 1);
+		if ($search) {
+			return $this->search($search);
+		} elseif ($pid) {
+			return $this->loadSpouses($pid, 1);
+		} elseif ($famid) {
+			return $this->loadChildren($famid, 1);
+		} else {
+			return '';
+		}
 	}
 
 	// Implement WT_Module_Sidebar
 	public function getSidebarContent() {
-		global $WT_IMAGES;
+		global $WT_IMAGES, $controller;
 
 		$out = '<script type="text/javascript">
 		<!--
@@ -74,7 +91,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		function dsearchQ() {
 			var query = jQuery("#sb_desc_name").attr("value");
 			if (query.length>1) {
-				jQuery("#sb_desc_content").load("sidebar.php?sb_action=descendancy&search="+query);
+				jQuery("#sb_desc_content").load("module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=descendancy&search="+query);
 			}
 		}
 
@@ -110,27 +127,11 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		});
 		//-->
 		</script>
-		<form method="post" action="sidebar.php" onsubmit="return false;">
+		<form method="post" action="module.php?mod='.$this->getName().'&mod_action=ajax" onsubmit="return false;">
 		<input type="text" name="sb_desc_name" id="sb_desc_name" value="'.WT_I18N::translate('Search').'" />';
-		$out .= '</form><div id="sb_desc_content">';
-
-		if ($this->controller) {
-			$root = null;
-			if ($this->controller->pid) {
-				$root = WT_Person::getInstance($this->controller->pid);
-			} elseif ($this->controller->famid) {
-				$fam = WT_Family::getInstance($this->controller->famid);
-				if ($fam) {
-					$root = $fam->getHusband();
-				}
-				if (!$root) {
-					$root = $fam->getWife();
-				}
-			}
-			if ($root) {
-				$out .= '<ul>'.$this->getPersonLi($root, 1).'</ul>';
-			}
-		}
+		$out .= '</form>';
+		$out .= '<div id="sb_desc_content">';
+		$out .= '<ul>'.$this->getPersonLi($controller->record, 1).'</ul>';
 		$out .= '</div>';
 		return $out;
 	}
@@ -138,17 +139,17 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	public function getPersonLi(WT_Person $person, $generations=0) {
 		global $WT_IMAGES;
 
-		$out = '<li id="sb_desc_'.$person->getXref().'" class="sb_desc_indi_li"><a href="sidebar.php?sb_action=descendancy&amp;pid='.$person->getXref().'" title="'.$person->getXref().'" class="sb_desc_indi">';
+		$out = '<li id="sb_desc_'.$person->getXref().'" class="sb_desc_indi_li"><a href="module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=descendancy&amp;pid='.$person->getXref().'" title="'.$person->getXref().'" class="sb_desc_indi">';
 		if ($generations>0) {
-			$out .= '<img src="'.$WT_IMAGES['minus'].'" border="0" class="plusminus" alt="" />';
+			$out .= '<img src="'.$WT_IMAGES['minus'].'" class="plusminus" alt="">';
 		} else {
-			$out .= '<img src="'.$WT_IMAGES['plus'].'" border="0" class="plusminus" alt="" />';
+			$out .= '<img src="'.$WT_IMAGES['plus'].'" class="plusminus" alt="">';
 		}
 		$out .= $person->getSexImage().' '.$person->getFullName().' ';
 		if ($person->canDisplayDetails()) {
 			$out .= ' ('.$person->getLifeSpan().')';
 		}
-		$out .= '</a> <a href="'.$person->getHtmlUrl().'"><img src="'.$WT_IMAGES['button_indi'].'" border="0" alt="indi" /></a>';
+		$out .= '</a> <a href="'.$person->getHtmlUrl().'"><img src="'.$WT_IMAGES['button_indi'].'" alt="indi"></a>';
 		if ($generations>0) {
 			$out .= '<div class="desc_tree_div_visible">';
 			$out .= $this->loadSpouses($person->getXref());
@@ -164,16 +165,16 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	public function getFamilyLi(WT_Family $family, WT_Person $person, $generations=0) {
 		global $WT_IMAGES;
 
-		$out = '<li id="sb_desc_'.$family->getXref().'" class="sb_desc_indi_li"><a href="sidebar.php?sb_action=descendancy&amp;famid='.$family->getXref().'" title="'.$family->getXref().'" class="sb_desc_indi">';
-		$out .= '<img src="'.$WT_IMAGES['minus'].'" border="0" class="plusminus" alt="" />';
+		$out = '<li id="sb_desc_'.$family->getXref().'" class="sb_desc_indi_li"><a href="module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=descendancy&amp;famid='.$family->getXref().'" title="'.$family->getXref().'" class="sb_desc_indi">';
+		$out .= '<img src="'.$WT_IMAGES['minus'].'" class="plusminus" alt="">';
 		$out .= $person->getSexImage().$person->getFullName();
 
 		$marryear = $family->getMarriageYear();
 		if (!empty($marryear)) {
 			$out .= ' ('.WT_Gedcom_Tag::getLabel('MARR').' '.$marryear.')';
 		}
-		$out .= '</a> <a href="'.$person->getHtmlUrl().'"><img src="'.$WT_IMAGES['button_indi'].'" border="0" alt="indi" /></a>';
-		$out .= '<a href="'.$family->getHtmlUrl().'"><img src="'.$WT_IMAGES['button_family'].'" border="0" alt="family" /></a>';
+		$out .= '</a> <a href="'.$person->getHtmlUrl().'"><img src="'.$WT_IMAGES['button_indi'].'" alt="indi"></a>';
+		$out .= '<a href="'.$family->getHtmlUrl().'"><img src="'.$WT_IMAGES['button_family'].'" alt="family"></a>';
 		$out .= '<div class="desc_tree_div_visible">';
 		$out .= $this->loadChildren($family->getXref(), $generations);
 		$out .= '</div><script type="text/javascript">dloadedNames["'.$family->getXref().'"]=2;</script>';
@@ -217,6 +218,10 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				$spouse = $family->getSpouse($person);
 				if ($spouse) {
 					$out .= $this->getFamilyLi($family, $spouse, $generations-1);
+				} else {
+					foreach($family->getChildren() as $child) {
+						$out .= $this->getPersonLi($child, $generations-1);
+					}
 				}
 			}
 		}

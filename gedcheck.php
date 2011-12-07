@@ -1,10 +1,9 @@
 <?php
-//
 // Check a GEDCOM file for compliance with the 5.5.1 specification
 // and other common errors.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2010 webtrees development team.
+// Copyright (C) 2011 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2006-2009 Greg Roach, all rights reserved
@@ -23,21 +22,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @author Greg Roach
-// @package webtrees
-// @subpackage Admin
-// @version $Id: gedcheck.php 10701 2011-02-05 16:52:29Z greg $
-//
+//$Id: gedcheck.php 12812 2011-11-19 13:02:05Z greg $
 
 define('WT_SCRIPT_NAME', 'gedcheck.php');
 require './includes/session.php';
 
-// Must be an admin user to use this module
-if (!WT_USER_GEDCOM_ADMIN) {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.WT_SCRIPT_NAME);
-	exit;
-}
-print_header(WT_I18N::translate('GEDCOM checker').' - '.$GEDCOM);
+$controller=new WT_Controller_Base();
+$controller
+	->requireManagerLogin()
+	->setPageTitle(WT_I18N::translate('GEDCOM checker').' - '.$GEDCOM)
+	->pageHeader();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Scan the data directory for gedcom files
@@ -88,7 +82,7 @@ $context_lines=safe_POST('context_lines','[0-5]', '2');    // Lines of context t
 $showall      =safe_POST('showall',      '[01]',  '0');    // Show details of records with no problems
 
 echo '<form method="post" name="gedcheck" action="gedcheck.php">';
-echo '<table class="list_table ', $TEXT_DIRECTION, '">';
+echo '<table class="list_table">';
 echo '<tr><td class="list_label">', WT_I18N::translate('GEDCOM File:'), '</td>';
 echo '<td class="optionbox"><select name="ged">';
 foreach ($all_geds as $key=>$value) {
@@ -123,13 +117,12 @@ echo '</table></form><hr />';
 // Instead, show some useful help info.
 if (!isset($_POST['action'])) {
 	echo '<p>', WT_I18N::translate('This module checks the format of a GEDCOM file against the <a href="http://phpgedview.sourceforge.net/ged551-5.pdf">5.5.1 GEDCOM Specification</a>.  It also checks for a number of common errors in your data.  Note that there are lots of versions, extensions and variations on the specification so you should not be concerned with any issues other than those flagged as "Critical".  The explanation for all the line-by-line errors can be found in the specification, so please check there before asking for help.'), '</p><hr />';
-	print_footer();
 	exit();
 }
 
 // If we're checking a gedcom that is imported into the database, check that the file is synchronised
 if ($ged==WT_GEDCOM) {
-	$ged_link='href="javascript:" onclick="window.open(\''."export_gedcom.php?export=".rawurlencode($ged).'\', \'_blank\',\'left=50,top=50,width=500,height=500,resizable=1,scrollbars=1\');"';
+	$ged_link='href="#" onclick="window.open(\''."export_gedcom.php?export=".rawurlencode($ged).'\', \'_blank\',\'left=50,top=50,width=500,height=500,resizable=1,scrollbars=1\');"';
 	echo '<div class="error">', WT_I18N::translate('Edits made to the database are not synchronized to the file %s.  The file contents may be out-of-date.  You can synchronize it with the database now by performing an <b><a "%s">export</a></b>.', $ged, $ged_link), '</div><hr/>';
 }
 
@@ -942,5 +935,3 @@ if (isset($last_err_num)) {
 	echo WT_I18N::translate('No errors found at this level.');
 }
 echo '</div>'; // language/direction/alignment
-
-print_footer();

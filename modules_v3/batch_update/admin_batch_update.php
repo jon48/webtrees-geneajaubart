@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_batch_update.php 12248 2011-10-05 15:58:04Z greg $
+// $Id: admin_batch_update.php 12740 2011-11-14 16:07:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -48,11 +48,10 @@ class batch_update {
 	var $next_xref=null; // The next xref to process
 	var $record   =null; // A GedcomRecord object corresponding to $curr_xref
 
-	// Main entry point - called by the PGV framework in response to module.php?mod=batch_update
+	// Main entry point - called by the webtrees framework in response to module.php?mod=batch_update
 	function main() {
 		// HTML common to all pages
 		$html=
-			print_header(WT_I18N::translate('Batch update')).
 			self::getJavascript().
 			'<form id="batch_update_form" action="module.php" method="get">'.
 			'<input type="hidden" name="mod" value="batch_update">'.
@@ -116,9 +115,7 @@ class batch_update {
 			}
 		}
 		$html.='</table></form>';
-		ob_start();
-		print_footer();
-		return $html.ob_get_clean();
+		return $html;
 	}
 
 	// Constructor - initialise variables and validate user-input
@@ -437,7 +434,7 @@ class base_plugin {
 	static function createEditLinks($gedrec) {
 		return preg_replace(
 			"/@([^#@\n]+)@/m",
-			'<a href="javascript:;" onclick="return edit_raw(\'\\1\');">@\\1@</a>',
+			'<a href="#" onclick="return edit_raw(\'\\1\');">@\\1@</a>',
 			$gedrec
 		);
 	}

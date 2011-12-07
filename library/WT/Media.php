@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Media.php 12313 2011-10-15 20:38:06Z greg $
+// $Id: Media.php 12812 2011-11-19 13:02:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -323,7 +323,7 @@ class WT_Media extends WT_GedcomRecord {
 	 * @return array
 	 */
 	public function getImageAttributes($which='main',$addWidth=0,$addHeight=0) {
-		global $THUMBNAIL_WIDTH, $TEXT_DIRECTION;
+		global $THUMBNAIL_WIDTH;
 		$var=$which.'imagesize';
 		if (!empty($this->$var)) return $this->$var;
 		$imgsize = array();
@@ -541,24 +541,24 @@ class WT_Media extends WT_GedcomRecord {
 				// Lightbox is not installed or Lightbox is not appropriate for this media type
 				switch ($urltype) {
 				case 'url_flv':
-					$url = "javascript:;\" onclick=\" var winflv = window.open('".'js/jw_player/flvVideo.php?flvVideo='.$this->getRawUrlDirect('main') . "', 'winflv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winflv.focus();}";
+					$url = "#\" onclick=\" var winflv = window.open('".'js/jw_player/flvVideo.php?flvVideo='.$this->getRawUrlDirect('main') . "', 'winflv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winflv.focus();}";
 					break 2;
 				case 'local_flv':
-					$url = "javascript:;\" onclick=\" var winflv = window.open('".'js/jw_player/flvVideo.php?flvVideo='.WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main') . "', 'winflv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winflv.focus();}";
+					$url = "#\" onclick=\" var winflv = window.open('".'js/jw_player/flvVideo.php?flvVideo='.WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main') . "', 'winflv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winflv.focus();}";
 					break 2;
 				case 'url_audio':
 				case 'url_wmv':
-					$url = "javascript:;\" onclick=\" var winwmv = window.open('".'js/jw_player/wmvVideo.php?wmvVideo='.$this->getRawUrlDirect('main') . "', 'winwmv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winwmv.focus();}";
+					$url = "#\" onclick=\" var winwmv = window.open('".'js/jw_player/wmvVideo.php?wmvVideo='.$this->getRawUrlDirect('main') . "', 'winwmv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winwmv.focus();}";
 					break 2;
 				case 'local_audio':
 				case 'local_wmv':
-					$url = "javascript:;\" onclick=\" var winwmv = window.open('".'js/jw_player/wmvVideo.php?wmvVideo='.WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main') . "', 'winwmv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winwmv.focus();}";
+					$url = "#\" onclick=\" var winwmv = window.open('".'js/jw_player/wmvVideo.php?wmvVideo='.WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main') . "', 'winwmv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winwmv.focus();}";
 					break 2;
 				case 'url_image':
 				case 'local_image':
 					$imgsize = $this->getImageAttributes('main',40,150);
 					if ($imgsize['0']) {
-						$url = "javascript:;\" onclick=\"var winimg = window.open('".$this->getRawUrlDirect('main')."', 'winimg', 'width=".$imgsize['adjW'].", height=".$imgsize['adjH'].", left=200, top=200'); if (window.focus) {winimg.focus();}";
+						$url = "#\" onclick=\"var winimg = window.open('".$this->getRawUrlDirect('main')."', 'winimg', 'width=".$imgsize['adjW'].", height=".$imgsize['adjH'].", left=200, top=200'); if (window.focus) {winimg.focus();}";
 					} else {
 						$url = $this->getHtmlUrl();
 					}
@@ -568,13 +568,13 @@ class WT_Media extends WT_GedcomRecord {
 				case 'url_pdf':
 				case 'url_other':
 				case 'url_document':
-					$url = "javascript:;\" onclick=\"var winurl = window.open('".$this->getRawUrlDirect('main')."', 'winurl', 'width=900, height=600, left=200, top=200'); if (window.focus) {winurl.focus();}";
+					$url = "#\" onclick=\"var winurl = window.open('".$this->getRawUrlDirect('main')."', 'winurl', 'width=900, height=600, left=200, top=200'); if (window.focus) {winurl.focus();}";
 					break 2;
 				case 'local_other';
 				case 'local_page':
 				case 'local_pdf':
 				case 'local_document':
-					$url = "javascript:;\" onclick=\"var winurl = window.open('".WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main')."', 'winurl', 'width=900, height=600, left=200, top=200'); if (window.focus) {winurl.focus();}";
+					$url = "#\" onclick=\"var winurl = window.open('".WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main')."', 'winurl', 'width=900, height=600, left=200, top=200'); if (window.focus) {winurl.focus();}";
 					break 2;
 				case 'url_streetview':
 					// need to call getHtmlForStreetview() instead of getHtmlUrlSnippet()
@@ -589,7 +589,7 @@ class WT_Media extends WT_GedcomRecord {
 				$imgsize = $this->getImageAttributes('main',40,150);
 				if ($imgsize['0']) {
 					$jsurl = str_replace('mediaviewer.php?','imageview.php?', $this->getRawUrl());
-					$url = "javascript:;\" onclick=\"return openImage('".$jsurl."', ".$imgsize['adjW'].", ".$imgsize['adjH'].");";
+					$url = "#\" onclick=\"return openImage('".$jsurl."', ".$imgsize['adjW'].", ".$imgsize['adjH'].");";
 				} else {
 					$url = $this->getHtmlUrl();
 				}
@@ -635,13 +635,11 @@ class WT_Media extends WT_GedcomRecord {
 			$output=$this->getHtmlForStreetview();
 		} else {
 
-			$spacestr='';
 			if ($config['display_type']=='pedigree_person') {
 				// 
 				$config['align']='none';
 				$config['uselightbox_fallback']=false;
 				$config['clearbox']='general_2';        
-				$spacestr=' vspace="0" hspace="0" ';
 				$imgsizeped=$this->getImageAttributes('thumb');
 				$config['class']='pedigree_image_'.$imgsizeped['aspect'];
 				if ($TEXT_DIRECTION == "rtl") $config['class'] .= "_rtl";
@@ -650,7 +648,6 @@ class WT_Media extends WT_GedcomRecord {
 				// 
 				$config['align']='none';
 				$config['uselightbox_fallback']=false;
-				$spacestr=' vspace="0" hspace="0" ';
 				$imgsizeped=$this->getImageAttributes('thumb');
 				$config['class']='tv_link pedigree_image_'.$imgsizeped['aspect'];
 				if ($TEXT_DIRECTION == "rtl") $config['class'] .= "_rtl";
@@ -660,7 +657,6 @@ class WT_Media extends WT_GedcomRecord {
 				$config['align']='none';
 				$config['oktolink']=false;
 				$config['addslashes']=true;
-				$spacestr=' vspace="0" hspace="0" ';
 				$imgsizeped=$this->getImageAttributes('thumb');
 				$config['class']='pedigree_image_'.$imgsizeped['aspect'];
 				if ($TEXT_DIRECTION == "rtl") $config['class'] .= "_rtl";
@@ -685,7 +681,7 @@ class WT_Media extends WT_GedcomRecord {
 			$output='';
 			if ($config['oktolink'] && $mainexists) $output .= '<a href="'.$this->getHtmlUrlSnippet($config).'">';
 			$output .= '<img '.$idstr.' src="'.$this->getHtmlUrlDirect('thumb').'" '.$sizestr.' class="'.$config['class'].'"';
-			$output .= $spacestr.' '.$alignstr.' alt="'.$config['img_title'].'" title="'.$config['img_title'].'" '.$stylestr.' />';
+			$output .= ' '.$alignstr.' alt="'.$config['img_title'].'" title="'.$config['img_title'].'" '.$stylestr.' />';
 			if ($config['oktolink'] && $mainexists) {
 				$output .= '</a>';
 				if ($config['download'] && $SHOW_MEDIA_DOWNLOAD) {

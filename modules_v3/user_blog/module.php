@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
+// $Id: module.php 12834 2011-11-20 20:31:38Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -49,7 +49,7 @@ class user_blog_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $ctype, $WT_IMAGES, $TEXT_DIRECTION;
+		global $ctype, $WT_IMAGES;
 
 		switch (safe_GET('action')) {
 		case 'deletenews':
@@ -81,7 +81,7 @@ class user_blog_WT_Module extends WT_Module implements WT_Module_Block {
 			$day = date('j', $news['date']);
 			$mon = date('M', $news['date']);
 			$year = date('Y', $news['date']);
-			$content .= "<div class=\"person_box\">";
+			$content .= "<div class=\"journal_box\">";
 			$content .= "<div class=\"news_title\">".$news['title'].'</div>';
 			$content .= "<div class=\"news_date\">".format_timestamp($news['date']).'</div>';
 			if ($news["text"]==strip_tags($news["text"])) {
@@ -89,12 +89,12 @@ class user_blog_WT_Module extends WT_Module implements WT_Module_Block {
 				$news["text"]=nl2br($news["text"]);
 			}
 			$content .= $news["text"]."<br /><br />";
-			$content .= "<a href=\"javascript:;\" onclick=\"editnews('$key'); return false;\">".WT_I18N::translate('Edit')."</a> | ";
+			$content .= "<a href=\"#\" onclick=\"window.open('editnews.php?news_id='+".$key.", '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;\">".WT_I18N::translate('Edit')."</a> | ";
 			$content .= "<a href=\"index.php?action=deletenews&amp;news_id={$key}&amp;ctype={$ctype}\" onclick=\"return confirm('".WT_I18N::translate('Are you sure you want to delete this Journal entry?')."');\">".WT_I18N::translate('Delete')."</a><br />";
 			$content .= "</div><br />";
 		}
 		if (WT_USER_ID) {
-			$content .= "<br /><a href=\"javascript:;\" onclick=\"addnews('".WT_USER_ID."'); return false;\">".WT_I18N::translate('Add a new Journal entry')."</a>";
+			$content .= "<br /><a href=\"#\" onclick=\"window.open('editnews.php?username='+WT_USER_ID, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;\">".WT_I18N::translate('Add a new Journal entry')."</a>";
 		}
 
 		if ($template) {

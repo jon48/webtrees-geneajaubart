@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 12581 2011-11-06 22:45:43Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -40,6 +40,12 @@ class batch_update_WT_Module extends WT_Module implements WT_Module_Config{
 	public function modAction($mod_action) {
 		switch($mod_action) {
 		case 'admin_batch_update':
+			$controller=new WT_Controller_Base();
+			$controller
+				->setPageTitle(WT_I18N::translate('Batch update'))
+				->requireAdminLogin()
+				->pageHeader();
+
 			// TODO: these files should be methods in this class
 			require WT_ROOT.WT_MODULES_DIR.$this->getName().'/'.$mod_action.'.php';
 			$mod=new batch_update;

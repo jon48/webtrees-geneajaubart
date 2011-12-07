@@ -23,15 +23,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: hourglass.php 11785 2011-06-11 22:08:12Z greg $
+// $Id: hourglass.php 12866 2011-11-22 18:21:14Z greg $
 
 define('WT_SCRIPT_NAME', 'hourglass.php');
 require './includes/session.php';
 
-$controller = new WT_Controller_Hourglass();
-$controller->init();
-
-print_header(/* I18N: %s is a person's name */ WT_I18N::translate('Hourglass chart of %s', $controller->name));
+$controller=new WT_Controller_Hourglass();
+$controller->pageHeader();
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
@@ -55,16 +53,16 @@ $gencount=0;
 
 		<!-- // NOTE: Root ID -->
 	<td class="descriptionbox">
-	<?php echo WT_I18N::translate('Root Person ID'), help_link('desc_rootid'); ?>
+	<?php echo WT_I18N::translate('Individual'); ?>
 	</td>
 	<td class="optionbox">
-	<input class="pedigree_form" type="text" name="pid" id="pid" size="3" value="<?php echo $controller->pid; ?>" />
+	<input class="pedigree_form" type="text" name="rootid" id="rootid" size="3" value="<?php echo $controller->pid; ?>" />
 	<?php print_findindi_link("pid",""); ?>
 	</td>
 
 	<!-- // NOTE: Show Details -->
 	<td class="descriptionbox">
-	<?php echo WT_I18N::translate('Show Details'), help_link('show_full'); ?>
+	<?php echo WT_I18N::translate('Show Details'); ?>
 	</td>
 	<td class="optionbox">
 	<input type="checkbox" value="
@@ -81,7 +79,7 @@ $gencount=0;
 
 	<!-- // NOTE: Generations -->
 	<tr><td class="descriptionbox" >
-	<?php echo WT_I18N::translate('Generations'), help_link('desc_generations'); ?>
+	<?php echo WT_I18N::translate('Generations'); ?>
 	</td>
 	<td class="optionbox">
 	<select name="generations">
@@ -89,7 +87,7 @@ $gencount=0;
 	for ($i=2; $i<=$MAX_DESCENDANCY_GENERATIONS; $i++) {
 		echo "<option value=\"".$i."\"" ;
 		if ($i == $controller->generations) echo " selected=\"selected\"";
-		echo ">".$i."</option>";
+		echo ">".WT_I18N::number($i)."</option>";
 	}
 	?>
 	</select>
@@ -146,5 +144,3 @@ $controller->print_person_pedigree(WT_Person::getInstance($controller->pid), 1);
 sizeLines();
 //-->
 </script>
-<?php
-print_footer();

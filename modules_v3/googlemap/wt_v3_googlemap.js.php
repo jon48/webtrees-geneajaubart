@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: wt_v3_googlemap.js.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: wt_v3_googlemap.js.php 12696 2011-11-11 00:56:58Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
  
@@ -223,75 +223,75 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 					document.tabLayerEV.style.paddingBottom = '1px';
 					<?php if ($STREETVIEW) { ?>
 					document.tabLayerSV = eval('document.getElementById("SV")');
-				document.tabLayerSV.style.background = '#cccccc';
-				document.tabLayerSV.style.paddingBottom = '0px';
-				<?php } ?>
-		// Please leave (windmillway) ==========================================
-		//		document.tabLayerPH = eval('document.getElementById("PH")');
-		//		document.tabLayerPH.style.background = '#cccccc';
-		//		document.tabLayerPH.style.paddingBottom = '0px';
-		// =====================================================================
-				document.panelLayer1 = eval('document.getElementById("pane1")');
-				document.panelLayer1.style.display = 'block';
-				<?php if ($STREETVIEW) { ?>
-				document.panelLayer2 = eval('document.getElementById("pane2")');
-				document.panelLayer2.style.display = 'none';
-				<?php } ?>
-		// Please leave (windmillway) ==========================================
-		//		document.panelLayer3 = eval('document.getElementById("pane3")');
-		//		document.panelLayer3.style.display = 'none';
-		// =====================================================================
-			});
+					document.tabLayerSV.style.background = '#cccccc';
+					document.tabLayerSV.style.paddingBottom = '0px';
+					<?php } ?>
+			// Please leave (windmillway) ==========================================
+			//		document.tabLayerPH = eval('document.getElementById("PH")');
+			//		document.tabLayerPH.style.background = '#cccccc';
+			//		document.tabLayerPH.style.paddingBottom = '0px';
+			// =====================================================================
+					document.panelLayer1 = eval('document.getElementById("pane1")');
+					document.panelLayer1.style.display = 'block';
+					<?php if ($STREETVIEW) { ?>
+					document.panelLayer2 = eval('document.getElementById("pane2")');
+					document.panelLayer2.style.display = 'none';
+					<?php } ?>
+			// Please leave (windmillway) ==========================================
+			//		document.panelLayer3 = eval('document.getElementById("pane3")');
+			//		document.panelLayer3.style.display = 'none';
+			// =====================================================================
+				});
 
-			jQuery('#SV').click(function() {
-				document.tabLayerEV = eval('document.getElementById("EV")');
-				document.tabLayerEV.style.background = '#cccccc';
-				document.tabLayerEV.style.paddingBottom = '0px';
-				<?php if ($STREETVIEW) { ?>
-				document.tabLayerSV = eval('document.getElementById("SV")');
-				document.tabLayerSV.style.background = '#ffffff';
-				document.tabLayerSV.style.paddingBottom = '1px';
-				<?php } ?>
-		// Please leave (windmillway) ==========================================
-		//		document.tabLayerPH = eval('document.getElementById("PH")');
-		//		document.tabLayerPH.style.background = '#cccccc';
-		//		document.tabLayerPH.style.paddingBottom = '0px';
-		// =====================================================================
-				document.panelLayer1 = eval('document.getElementById("pane1")');
-				document.panelLayer1.style.display = 'none';
-				<?php if ($STREETVIEW) { ?>
-				document.panelLayer2 = eval('document.getElementById("pane2")');
-				document.panelLayer2.style.display = 'block';
-				<?php } ?>
-		// Please leave (windmillway) ==========================================
-		//		document.panelLayer3 = eval('document.getElementById("pane3")');
-		//		document.panelLayer3.style.display = "none";
-		// =====================================================================
-				var panorama = new google.maps.StreetViewPanorama(document.getElementById("pano"), panoramaOptions);
-				setTimeout(function() { panorama.setVisible(true); }, 100);
-      			setTimeout(function() { panorama.setVisible(true); }, 500);				
-			});
+				jQuery('#SV').click(function() {			
+					document.tabLayerEV = eval('document.getElementById("EV")');
+					document.tabLayerEV.style.background = '#cccccc';
+					document.tabLayerEV.style.paddingBottom = '0px';
+					<?php if ($STREETVIEW) { ?>
+					document.tabLayerSV = eval('document.getElementById("SV")');
+					document.tabLayerSV.style.background = '#ffffff';
+					document.tabLayerSV.style.paddingBottom = '1px';
+					<?php } ?>			
+			// Please leave (windmillway) ==========================================
+			//		document.tabLayerPH = eval('document.getElementById("PH")');
+			//		document.tabLayerPH.style.background = '#cccccc';
+			//		document.tabLayerPH.style.paddingBottom = '0px';
+			// =====================================================================				
+					document.panelLayer1 = eval('document.getElementById("pane1")');
+					document.panelLayer1.style.display = 'none';
+					<?php if ($STREETVIEW) { ?>
+					document.panelLayer2 = eval('document.getElementById("pane2")');
+					document.panelLayer2.style.display = 'block';
+					<?php } ?>		
+			// Please leave (windmillway) ==========================================
+			//		document.panelLayer3 = eval('document.getElementById("pane3")');
+			//		document.panelLayer3.style.display = "none";
+			// =====================================================================
+					var panorama = new google.maps.StreetViewPanorama(document.getElementById("pano"), panoramaOptions);
+					setTimeout(function() { panorama.setVisible(true); }, 100);
+      				setTimeout(function() { panorama.setVisible(true); }, 500);				
+				});
 
-			jQuery('#PH').click(function() {
-				document.tabLayerEV = eval('document.getElementById("EV")');
-				document.tabLayerEV.style.background = '#cccccc';
-				document.tabLayerEV.style.paddingBottom = '0px';
-				<?php if ($STREETVIEW) { ?>
-				document.tabLayerSV = eval('document.getElementById("SV")');
-				document.tabLayerSV.style.background = '#cccccc';
-				document.tabLayerSV.style.paddingBottom = '0px';
-				<?php } ?>
-		// Please leave (windmillway) ==========================================
-		//		document.tabLayerPH = eval('document.getElementById("PH")');
-		//		document.tabLayerPH.style.background = '#ffffff';
-		//		document.tabLayerPH.style.paddingBottom = '1px';
-		// =================================================================
-				document.panelLayer1 = eval('document.getElementById("pane1")');
-				document.panelLayer1.style.display = 'none';
-				<?php if ($STREETVIEW) { ?>
-				document.panelLayer2 = eval('document.getElementById("pane2")');
-				document.panelLayer2.style.display = 'none';
-				<?php } ?>
+				jQuery('#PH').click(function() {
+					document.tabLayerEV = eval('document.getElementById("EV")');
+					document.tabLayerEV.style.background = '#cccccc';
+					document.tabLayerEV.style.paddingBottom = '0px';
+					<?php if ($STREETVIEW) { ?>
+					document.tabLayerSV = eval('document.getElementById("SV")');
+					document.tabLayerSV.style.background = '#cccccc';
+					document.tabLayerSV.style.paddingBottom = '0px';
+					<?php } ?>
+			// Please leave (windmillway) ==========================================
+			//		document.tabLayerPH = eval('document.getElementById("PH")');
+			//		document.tabLayerPH.style.background = '#ffffff';
+			//		document.tabLayerPH.style.paddingBottom = '1px';
+			// =================================================================
+					document.panelLayer1 = eval('document.getElementById("pane1")');
+					document.panelLayer1.style.display = 'none';
+					<?php if ($STREETVIEW) { ?>
+					document.panelLayer2 = eval('document.getElementById("pane2")');
+					document.panelLayer2.style.display = 'none';
+					<?php } ?>
 			// Please leave (windmillway) ==========================================
 			//		document.panelLayer3 = eval('document.getElementById("pane3")');
 			//		document.panelLayer3.style.display = 'block';
@@ -299,9 +299,10 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 				});
 			
 		  	}); 
+			
 		});
 	}
-
+	
 	// == shows all markers of a particular category, and ensures the checkbox is checked ==
 	function show(category) {
 		for (var i=0; i<gmarkers.length; i++) {
@@ -355,15 +356,15 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 			if (gmarkers[i].getVisible()) {
 				// if (x==gmarkers[i].myindex) {
 				if (x==i ) {
-					html += '<a style="text-decoration:none; color:black; background:white; " href="javascript:myclick('+i+', '+gmarkers[i].mytab+')">' + gmarkers[i].myevent + '<\/a><br>';
+					html += '<a style="text-decoration:none; color:black; background:white; " href="#" onclick="myclick('+i+', '+gmarkers[i].mytab+')">' + gmarkers[i].myevent + '<\/a><br>';
 				} else if (gmarkers[i].mycategory=='theatre') {
-					html += '<a style="text-decoration:none; color:red;" href="javascript:myclick('+i+', '+gmarkers[i].mytab+')">' + gmarkers[i].myevent + '<\/a><br>';
+					html += '<a style="text-decoration:none; color:red;" href="#" onclick="myclick('+i+', '+gmarkers[i].mytab+')">' + gmarkers[i].myevent + '<\/a><br>';
 				} else if (gmarkers[i].mycategory=='golf') {
-					html += '<a style="text-decoration:none; color:green;" href="javascript:myclick('+i+', '+gmarkers[i].mytab+')">' + gmarkers[i].myevent + '<\/a><br>';
+					html += '<a style="text-decoration:none; color:green;" href="#" onclick="myclick('+i+', '+gmarkers[i].mytab+')">' + gmarkers[i].myevent + '<\/a><br>';
 				} else if (gmarkers[i].mycategory=='info') {
-					html += '<a style="text-decoration:none; color:yellow;" href="javascript:myclick('+i+', '+gmarkers[i].mytab+')">' + gmarkers[i].myevent + '<\/a><br>';
+					html += '<a style="text-decoration:none; color:yellow;" href="#" onclick="myclick('+i+', '+gmarkers[i].mytab+')">' + gmarkers[i].myevent + '<\/a><br>';
 				} else {
-					html += '<a style="text-decoration:none; color:black;" href="javascript:myclick('+i+', '+gmarkers[i].mytab+')">'+ gmarkers[i].myevent + '<\/a><br>';
+					html += '<a style="text-decoration:none; color:black;" href="#" onclick="myclick('+i+', '+gmarkers[i].mytab+')">'+ gmarkers[i].myevent + '<\/a><br>';
 				}
 			}
 		}

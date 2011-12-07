@@ -23,11 +23,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: calendar.php 12203 2011-09-22 12:09:54Z greg $
+// $Id: calendar.php 12925 2011-11-27 22:50:14Z nigel $
 
 define('WT_SCRIPT_NAME', 'calendar.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
+
+$controller=new WT_Controller_Base();
+$controller->setPageTitle(WT_I18N::translate('Anniversary calendar'));
+$controller->pageHeader();
 
 if (isset($_REQUEST['cal'])) $cal = $_REQUEST['cal'];
 if (isset($_REQUEST['day'])) $day = $_REQUEST['day'];
@@ -103,9 +107,6 @@ $today_month=$today->Format('%O');
 // Invalid dates?  Go to monthly view, where they'll be found.
 if ($cal_date->d>$days_in_month && $action=='today')
 	$action='calendar';
-
-// Print the header stuff
-print_header(WT_I18N::translate('Anniversary calendar'));
 echo "<div>";
 
 // Calendar form
@@ -118,7 +119,7 @@ echo "<input type=\"hidden\" name=\"action\" value=\"{$action}\" />";
 echo "<input type=\"hidden\" name=\"filterev\" value=\"{$filterev}\" />";
 echo "<input type=\"hidden\" name=\"filtersx\" value=\"{$filtersx}\" />";
 echo "<input type=\"hidden\" name=\"filterof\" value=\"{$filterof}\" />";
-echo '<table class="facts_table '.$TEXT_DIRECTION.' width100">';
+echo '<table class="facts_table width100">';
 echo '<tr><td class="facts_label" colspan="4"><h2>';
 
 // All further uses of $cal are to generate URLs
@@ -188,15 +189,15 @@ echo '<td class="descriptionbox vmiddle">';
 echo '<td class="optionbox vmiddle">';
 	echo '<select class="list_value" name="filterof" onchange="document.dateform.submit();">';
 	echo '<option value="all"';
-	if ($filterof == "all") echo 'selected="selected"';
+	if ($filterof == "all") echo ' selected="selected"';
 	echo '>', WT_I18N::translate('All People'), '</option>';
 	if (!$HIDE_LIVE_PEOPLE || WT_USER_ID) {
 		echo '<option value="living"';
-	if ($filterof == "living") echo 'selected="selected"';
+	if ($filterof == "living") echo ' selected="selected"';
 		echo '>', WT_I18N::translate('Living People'), '</option>';
 	}
 	echo '<option value="recent"';
-	if ($filterof == "recent") echo 'selected="selected"';
+	if ($filterof == "recent") echo ' selected="selected"';
 	echo '>', WT_I18N::translate('Recent Years (&lt; 100 yrs)'), '</option>';
 	echo '</select>';
 	
@@ -228,56 +229,56 @@ else {
 	echo "<input type=\"hidden\" name=\"filterev\" value=\"$filterev\" />";
 echo '<select class="list_value" name="filterev" onchange="document.dateform.submit();">';
 echo '<option value="bdm"';
-if ($filterev == "bdm") echo 'selected="selected"';
+if ($filterev == "bdm") echo ' selected="selected"';
 echo '>', WT_I18N::translate('Births, Deaths, Marriages'), '</option>';
 echo '<option value="all"';
-if ($filterev == "all") echo 'selected="selected"';
+if ($filterev == "all") echo ' selected="selected"';
 echo '>', WT_I18N::translate('All'), '</option>';
 echo '<option value="BIRT"';
-if ($filterev == "BIRT") echo 'selected="selected"';
+if ($filterev == "BIRT") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('BIRT'), '</option>';
 echo '<option value="CHR"';
-if ($filterev == "CHR") echo 'selected="selected"';
+if ($filterev == "CHR") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('CHR'), '</option>';
 echo '<option value="CHRA"';
-if ($filterev == "CHRA") echo 'selected="selected"';
+if ($filterev == "CHRA") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('CHRA'), '</option>';
 echo '<option value="BAPM"';
-if ($filterev == "BAPM") echo 'selected="selected"';
+if ($filterev == "BAPM") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('BAPM'), '</option>';
 echo '<option value="_COML"';
-if ($filterev == "_COML") echo 'selected="selected"';
+if ($filterev == "_COML") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('_COML'), '</option>';
 echo '<option value="MARR"';
-if ($filterev == "MARR") echo 'selected="selected"';
+if ($filterev == "MARR") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('MARR'), '</option>';
 echo '<option value="_SEPR"';
-if ($filterev == "_SEPR") echo 'selected="selected"';
+if ($filterev == "_SEPR") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('_SEPR'), '</option>';
 echo '<option value="DIV"';
-if ($filterev == "DIV") echo 'selected="selected"';
+if ($filterev == "DIV") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('DIV'), '</option>';
 echo '<option value="DEAT"';
-if ($filterev == "DEAT") echo 'selected="selected"';
+if ($filterev == "DEAT") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('DEAT'), '</option>';
 echo '<option value="BURI"';
-if ($filterev == "BURI") echo 'selected="selected"';
+if ($filterev == "BURI") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('BURI'), '</option>';
 echo '<option value="IMMI"';
-if ($filterev == "IMMI") echo 'selected="selected"';
+if ($filterev == "IMMI") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('IMMI'), '</option>';
 echo '<option value="EMIG"';
-if ($filterev == "EMIG") echo 'selected="selected"';
+if ($filterev == "EMIG") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('EMIG'), '</option>';
 echo '<option value="EVEN"';
-if ($filterev == "EVEN") echo 'selected="selected"';
+if ($filterev == "EVEN") echo ' selected="selected"';
 echo '>', WT_I18N::translate('Custom Event'), '</option>';
 echo '</select>';
 
 
 echo '</td></tr>';
 echo '</table></form>';
-echo "<table class=\"center {$TEXT_DIRECTION} width100\">";
+echo "<table class=\"width100\">";
 
 // Day/Month/Year and calendar selector
 echo '<tr><td class="topbottombar width50">';
@@ -413,20 +414,20 @@ case 'calendar':
 switch ($action) {
 case 'year':
 case 'today':
-	echo "<table class=\"center {$TEXT_DIRECTION} width100\"><tr>";
+	echo "<table class=\"width100\"><tr>";
 	// Table headings
-	echo "<td class=\"descriptionbox center width50\">";
-		if (isset($WT_IMAGES['indis'])) echo "<img id=\"calendar_img_indi\" src=\"{$WT_IMAGES['indis']}\" border=\"0\" title=\"", WT_I18N::translate('Individuals'), "\" alt=\"", WT_I18N::translate('Individuals'), "\" />&nbsp;&nbsp;&nbsp;";
+	echo "<td class=\"descriptionbox width50\">";
+		if (isset($WT_IMAGES['indis'])) echo "<img id=\"calendar_img_indi\" src=\"{$WT_IMAGES['indis']}\" title=\"", WT_I18N::translate('Individuals'), "\" alt=\"", WT_I18N::translate('Individuals'), "\">&nbsp;&nbsp;&nbsp;";
 		echo WT_I18N::translate('Individuals'), "</td>";
 	echo "<td class=\"descriptionbox center width50\">";
-		if (isset($WT_IMAGES['cfamily'])) echo "<img id=\"calendar_img_fam\" src=\"{$WT_IMAGES['cfamily']}\" border=\"0\" title=\"", WT_I18N::translate('Families'), "\" alt=\"", WT_I18N::translate('Families'), "\" />&nbsp;&nbsp;&nbsp;";
+		if (isset($WT_IMAGES['cfamily'])) echo "<img id=\"calendar_img_fam\" src=\"{$WT_IMAGES['cfamily']}\" title=\"", WT_I18N::translate('Families'), "\" alt=\"", WT_I18N::translate('Families'), "\">&nbsp;&nbsp;&nbsp;";
 		echo WT_I18N::translate('Families'), "</td>";
 	echo "</tr><tr>";
 	// Table rows
 	$males=0;
 	$females=0;
 	$numfams=0;
-	echo "<td class=\"optionbox {$TEXT_DIRECTION} wrap\">";
+	echo "<td class=\"optionbox wrap\">";
 
 	// Avoid an empty unordered list
 	ob_start();
@@ -437,7 +438,7 @@ case 'today':
 	}
 
 	echo '</td>';
-	echo "<td class=\"optionbox {$TEXT_DIRECTION} wrap\">";
+	echo "<td class=\"optionbox wrap\">";
 
 	// Avoid an empty unordered list
 	ob_start();
@@ -469,7 +470,7 @@ case 'calendar':
 	if ($days_in_week==10) {
 		$week_start=0;
 	}
-	echo "<table class=\"list_table width100 $TEXT_DIRECTION\"><tr>";
+	echo "<table class=\"list_table width100\"><tr>";
 	for ($week_day=0; $week_day<$days_in_week; ++$week_day) {
 		$day_name=$cal_date->LONG_DAYS_OF_WEEK(($week_day+$week_start) % $days_in_week);
 		echo "<td class=\"descriptionbox\" width=\"".floor(100/$days_in_week)."%\">{$day_name}</td>";
@@ -526,7 +527,6 @@ case 'calendar':
 	break;
 }
 echo '</div><br />';
-print_footer();
 
 /////////////////////////////////////////////////////////////////////////////////
 // Filter a list of facts

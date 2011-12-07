@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Tag.php 12253 2011-10-06 06:57:46Z greg $
+// $Id: Tag.php 12923 2011-11-26 16:26:03Z veit $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -77,14 +77,14 @@ class WT_Gedcom_Tag {
 		'_DBID', '_DEAT_CHIL', '_DEAT_GCHI', '_DEAT_GCH1', '_DEAT_GCH2', '_DEAT_GPAR', '_DEAT_GPA1', '_DEAT_GPA2',
 		'_DEAT_HSIB', '_DEAT_PARE', '_DEAT_SIBL', '_DEAT_SPOU', '_DEG', '_DETS',
 		'_EMAIL', '_EYEC', '_FA1', '_FA2', '_FA3', '_FA4', '_FA5', '_FA6', '_FA7', '_FA8',
-		'_FA9', '_FA10', '_FA11', '_FA12', '_FA13', '_FNRL', '_FREL', '_GEDF', '_HAIR',
+		'_FA9', '_FA10', '_FA11', '_FA12', '_FA13', '_FNRL', '_FREL', '_GEDF', '_GODP', '_HAIR',
 		'_HEB', '_HEIG', '_HNM', '_HOL', '_INTE', '_MARB_CHIL', '_MARB_FAMC', '_MARB_GCHI',
 		'_MARB_GCH1', '_MARB_GCH2', '_MARB_HSIB', '_MARB_PARE', '_MARB_SIBL', '_MARI',
 		'_MARNM', '_PRIM', '_MARNM_SURN', '_MARR_CHIL', '_MARR_FAMC', '_MARR_GCHI',
 		'_MARR_GCH1', '_MARR_GCH2', '_MARR_HSIB', '_MARR_PARE', '_MARR_SIBL', '_MBON',
 		'_MDCL', '_MEDC', '_MEND', '_MILI', '_MILT', '_MREL', '_MSTAT', '_NAME', '_NAMS',
 		'_NLIV', '_NMAR', '_NMR', '_WT_USER', '_PRMN', '_SCBK', '_SEPR', '_SSHOW', '_STAT',
-		'_SUBQ', '_TODO', '_TYPE', '_UID', '_URL', '_WEIG', '_YART', '__BRTM_CHIL',
+		'_SUBQ', '_TODO', '_TYPE', '_UID', '_URL', '_WEIG', '_WITN', '_YART', '__BRTM_CHIL',
 		'__BRTM_GCHI', '__BRTM_GCH1', '__BRTM_GCH2', '__BRTM_HSIB', '__BRTM_SIBL',
 		// These pseudo-tags are generated dynamically to display media object attributes
 		'__FILE_SIZE__', '__IMAGE_SIZE__',	
@@ -752,7 +752,7 @@ class WT_Gedcom_Tag {
 			}
 		case '_DEG': return /* I18N: gedcom tag _DEG */ WT_I18N::translate('Degree');
 		case '_DETS': return /* I18N: gedcom tag _DETS */ WT_I18N::translate('Death of one spouse');
-		case '_DNA': return /* I18N: gedcom tag _DNA (from FTM 2010) */ WT_I18N::translate('DNA Markers');
+		case '_DNA': return /* I18N: gedcom tag _DNA (from FTM 2010) */ WT_I18N::translate('DNA markers');
 		case '_EMAIL': return /* I18N: gedcom tag _EMAIL */ WT_I18N::translate('Email address');
 		case '_EYEC': return /* I18N: gedcom tag _EYEC */ WT_I18N::translate('Eye color');
 		case '_FA1': return WT_I18N::translate('Fact 1');
@@ -771,6 +771,7 @@ class WT_Gedcom_Tag {
 		case '_FNRL': return /* I18N: gedcom tag _FNRL */ WT_I18N::translate('Funeral');
 		case '_FREL': return /* I18N: gedcom tag _FREL */ WT_I18N::translate('Relationship to father');
 		case '_GEDF': return /* I18N: gedcom tag _GEDF */ WT_I18N::translate('GEDCOM file');
+		case '_GODP': return /* I18N: gedcom tag _GODP */ WT_I18N::translate('Godparent');
 		case '_HAIR': return /* I18N: gedcom tag _HAIR */ WT_I18N::translate('Hair color');
 		case '_HEB': return /* I18N: gedcom tag _HEB */ WT_I18N::translate('Hebrew');
 		case '_HEIG': return /* I18N: gedcom tag _HEIG */ WT_I18N::translate('Height');
@@ -854,28 +855,29 @@ class WT_Gedcom_Tag {
 			default:  return /* I18N: gedcom tag _NMR */ WT_I18N::translate  (          'Not married');
 			}
 		case '_WT_USER': return WT_I18N::translate('by');
-		case '_PRMN': return /* I18N: gedcom tag _PRMN */ WT_I18N::translate('Permanent number');
-		case '_SCBK': return /* I18N: gedcom tag _SCBK */ WT_I18N::translate('Scrapbook');
-		case '_SEPR': return /* I18N: gedcom tag _SEPR */ WT_I18N::translate('Separated');
+		case '_PRMN':  return /* I18N: gedcom tag _PRMN */  WT_I18N::translate('Permanent number');
+		case '_SCBK':  return /* I18N: gedcom tag _SCBK */  WT_I18N::translate('Scrapbook');
+		case '_SEPR':  return /* I18N: gedcom tag _SEPR */  WT_I18N::translate('Separated');
 		case '_SSHOW': return /* I18N: gedcom tag _SSHOW */ WT_I18N::translate('Slide show');
-		case '_STAT': return /* I18N: gedcom tag _STAT */ WT_I18N::translate('Marriage status');
-		case '_SUBQ': return /* I18N: gedcom tag _SUBQ */ WT_I18N::translate('Short version');
+		case '_STAT':  return /* I18N: gedcom tag _STAT */  WT_I18N::translate('Marriage status');
+		case '_SUBQ':  return /* I18N: gedcom tag _SUBQ */  WT_I18N::translate('Short version');
 		case '_TODO':  return /* I18N: gedcom tag _TODO */  WT_I18N::translate('Research task');
-		case '_TYPE': return /* I18N: gedcom tag _TYPE */ WT_I18N::translate('Media type');
-		case '_UID': return /* I18N: gedcom tag _UID */ WT_I18N::translate('Globally unique identifier');
-		case '_URL': return /* I18N: gedcom tag _URL */ WT_I18N::translate('Web URL');
-		case '_WEIG': return /* I18N: gedcom tag _WEIG */ WT_I18N::translate('Weight');
-		case '_YART': return /* I18N: gedcom tag _YART */ WT_I18N::translate('Yahrzeit');
+		case '_TYPE':  return /* I18N: gedcom tag _TYPE */  WT_I18N::translate('Media type');
+		case '_UID':   return /* I18N: gedcom tag _UID */   WT_I18N::translate('Globally unique identifier');
+		case '_URL':   return /* I18N: gedcom tag _URL */   WT_I18N::translate('Web URL');
+		case '_WEIG':  return /* I18N: gedcom tag _WEIG */  WT_I18N::translate('Weight');
+		case '_WITN':  return /* I18N: gedcom tag _WITN */  WT_I18N::translate('Witness');
+		case '_YART':  return /* I18N: gedcom tag _YART */  WT_I18N::translate('Yahrzeit');
 		// Brit milah applies only to males, no need for male/female translations
-		case '__BRTM_CHIL': return WT_I18N::translate ( 'Brit milah of a son');
-		case '__BRTM_GCHI': return WT_I18N::translate ( 'Brit milah of a grandson');
+		case '__BRTM_CHIL': return WT_I18N::translate  ('Brit milah of a son');
+		case '__BRTM_GCHI': return WT_I18N::translate  ('Brit milah of a grandson');
 		case '__BRTM_GCH1': return WT_I18N::translate_c('daughter\'s son', 'Brit milah of a grandson');
 		case '__BRTM_GCH2': return WT_I18N::translate_c('son\'s son', 'Brit milah of a grandson');
-		case '__BRTM_HSIB': return WT_I18N::translate ( 'Brit milah of a half-brother');
-		case '__BRTM_SIBL': return WT_I18N::translate ( 'Brit milah of a brother');
+		case '__BRTM_HSIB': return WT_I18N::translate  ('Brit milah of a half-brother');
+		case '__BRTM_SIBL': return WT_I18N::translate  ('Brit milah of a brother');
 		// These "pseudo" tags are generated internally to present information about a media object
 		case '__FILE_SIZE__':  return WT_I18N::translate('File size');
-		case '__IMAGE_SIZE__': return WT_I18N::translate('Image dimensions');		
+		case '__IMAGE_SIZE__': return WT_I18N::translate('Image dimensions');
 		//PERSO Add Perso Tag
 		case '_ACT' : return WT_I18N::translate('Certificate');
 		//END PERSO

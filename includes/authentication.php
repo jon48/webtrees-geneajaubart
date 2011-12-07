@@ -28,23 +28,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: authentication.php 12436 2011-10-27 17:33:16Z lukasz $
+// $Id: authentication.php 12740 2011-11-14 16:07:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-/**
- * authenticate a username and password
- *
- * This function takes the given <var>$username</var> and <var>$password</var> and authenticates
- * them against the database.  The passwords are encrypted using the crypt() function.
- * The username is stored in the <var>$_SESSION["wt_user"]</var> session variable.
- * @param string $user_name the username for the user attempting to login
- * @param string $password the plain text password to test
- * @return the user_id if successful, false otherwise
- */
+// authenticate a username and password
+//
+// On success, store the user-id in the session and return it
+// On failure, return an error code
 function authenticateUser($user_name, $password) {
 	// If we were already logged in, log out first
 	if (getUserId()) {
@@ -53,17 +47,29 @@ function authenticateUser($user_name, $password) {
 
 	if ($user_id=get_user_id($user_name)) {
 		if (check_user_password($user_id, $password)) {
-			if (get_user_setting($user_id, 'verified') && get_user_setting($user_id, 'verified_by_admin') || get_user_setting($user_id, 'canadmin')) {
+			$is_admin=get_user_setting($user_id, 'canadmin');
+			$verified=get_user_setting($user_id, 'verified');
+			$approved=get_user_setting($user_id, 'verified_by_admin');
+			if ($verified && $approved || $is_admin) {
 				// Whenever we change our authorisation level change the session ID
 				Zend_Session::regenerateId();
 				$_SESSION['wt_user'] = $user_id;
 				AddToLog('Login successful', 'auth');
 				return $user_id;
+			} elseif (!$is_admin && !$verified) {
+				AddToLog('Login failed ->'.$user_name.'<- not verified', 'auth');
+				return -1;
+			} elseif (!$is_admin && !$approved) {
+				AddToLog('Login failed ->'.$user_name.'<- not approved', 'auth');
+				return -2;
 			}
+		} else {
+			AddToLog('Login failed ->'.$user_name.'<- bad password', 'auth');
+			return -3;
 		}
 	}
-	AddToLog('Login failed ->'.$user_name.'<-', 'auth');
-	return false;
+	AddToLog('Login failed ->'.$user_name.'<- bad username', 'auth');
+	return -4;
 }
 
 /**
@@ -93,9 +99,9 @@ function userUpdateLogin($user_id) {
  *
  * Returns 0 and NULL if we are not logged in.
  *
- * If you want to embed PGV within a content management system, you would probably
+ * If you want to embed webtrees within a content management system, you would probably
  * rewrite these functions to extract the data from the parent system, and then
- * populate PGV's user/user_setting/user_gedcom_setting tables as appropriate.
+ * populate webtrees' user/user_setting/user_gedcom_setting tables as appropriate.
  *
  */
 
@@ -255,8 +261,8 @@ function getUserGedcomId($user_id, $ged_id) {
 }
 
 // add a message into the log-file
-// Note that while transfering data from PGV to WT, we delete the WT users and
-// replace with PGV users.  Hence the current user_id is not always available.
+// Note that while transfering data from PhpGedView to WT, we delete the WT users and
+// replace with PhpGedView users.  Hence the current user_id is not always available.
 function AddToLog($log_message, $log_type='error') {
 	WT_DB::prepare(
 		"INSERT INTO `##log` (log_type, log_message, ip_address, user_id, gedcom_id) VALUES (?, ?, ?, ?, ?)"

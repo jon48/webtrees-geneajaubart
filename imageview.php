@@ -21,28 +21,23 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: imageview.php 11772 2011-06-10 15:56:22Z greg $
+// $Id: imageview.php 12764 2011-11-16 21:19:16Z greg $
 
 define('WT_SCRIPT_NAME', 'imageview.php');
 require './includes/session.php';
 
-$controller = new WT_Controller_Media();
-$controller->init();
+$controller=new WT_Controller_Media();
 
-print_simple_header(WT_I18N::translate('Image viewer'));
+$view='simple'; // TODO, this is a "full screen" controller, but this is a "simple" page.
+$controller->pageHeader();
 
-// We have finished writing session data, so release the lock
-Zend_Session::writeClose();
-
-if (!$controller->mediaobject) {
-	echo '<b>', WT_I18N::translate('Unable to find record with ID'), '</b><br /><br />';
-	print_footer();
+if (!$controller->record) {
+	echo '<b>', WT_I18N::translate('Unable to find record with ID'), '</b>';
 	exit;
 }
 
-if (!$controller->mediaobject->canDisplayDetails()) {
+if (!$controller->record->canDisplayDetails()) {
 	print_privacy_error();
-	print_footer();
 	exit;
 }
 ?>
@@ -184,15 +179,15 @@ if (!$controller->mediaobject->canDisplayDetails()) {
 <?php
 
 echo "<form name=\"zoomform\" onsubmit=\"setzoom(document.getElementById('zoomval').value); return false;\" action=\"imageview.php\">";
-if (!$controller->mediaobject->isExternal() && !$controller->mediaobject->fileExists() ) {
-	echo '<p class="ui-state-error">', WT_I18N::translate('The file “%s” does not exist.', $controller->mediaobject->getLocalFilename()), '</p>';
+if (!$controller->record->isExternal() && !$controller->record->fileExists() ) {
+	echo '<p class="ui-state-error">', WT_I18N::translate('The file “%s” does not exist.', $controller->record->getLocalFilename()), '</p>';
 } else {
-	echo "<center><font size=\"6\"><a href=\"javascript:;\" onclick=\"zoomin(); return false;\">+</a> <a href=\"javascript:;\" onclick=\"zoomout();\">&ndash;</a> </font>";
+	echo "<center><font size=\"6\"><a href=\"#\" onclick=\"zoomin(); return false;\">+</a> <a href=\"#\" onclick=\"zoomout();\">&ndash;</a> </font>";
 	echo "<input type=\"text\" size=\"2\" name=\"zoomval\" id=\"zoomval\" value=\"100\" />%";
 	echo "<input type=\"button\" value=\"".WT_I18N::translate('Reset')."\" onclick=\"resetimage(); return false;\" />";
-	echo "<br /><a href=\"javascript:;\" onclick=\"window.opener.location='".$controller->mediaobject->getRawUrl()."'; window.close();\">".WT_I18N::translate('View image details')."</a>";
+	echo "<br /><a href=\"#\" onclick=\"window.opener.location='".$controller->record->getRawUrl()."'; window.close();\">".WT_I18N::translate('View image details')."</a>";
 	echo "</center>";
-	$imgsize = $controller->mediaobject->getImageAttributes('main',2,2);
+	$imgsize = $controller->record->getImageAttributes('main',2,2);
 	$imgwidth = $imgsize['adjW'];
 	$imgheight = $imgsize['adjH'];
 	echo "<script language=\"JavaScript\" type=\"text/javascript\">";
@@ -201,11 +196,10 @@ if (!$controller->mediaobject->isExternal() && !$controller->mediaobject->fileEx
 	echo "if (imgwidth > imgheight) landscape = true;";
 	echo "</script>";
 	echo '<br /><center><div id="imagecropper" style="position: relative; border: outset white 3px; background-color: black; overflow: auto; vertical-align: middle; text-align: center; width: '.$imgwidth.'px; height: '.$imgheight.'px; ">';
-	echo "<img id=\"theimage\" src=\"".$controller->mediaobject->getHtmlUrlDirect()."\" style=\"position: absolute; left: 1px; top: 1px; cursor: move;\" onmousedown=\"panimage(); return false;\" alt=\"\" />";
+	echo "<img id=\"theimage\" src=\"".$controller->record->getHtmlUrlDirect()."\" style=\"position: absolute; left: 1px; top: 1px; cursor: move;\" onmousedown=\"panimage(); return false;\" alt=\"\" />";
 	echo '</div></center>';
 }
 echo "</form>";
 echo "<div style=\"position: relative; \">";
 echo "</div>";
-echo "<div class=\"center\"><br /><a href=\"javascript:;\" onclick=\"window.close();\">".WT_I18N::translate('Close Window')."</a></div><br />";
-print_simple_footer();
+echo "<div class=\"center\"><br /><a href=\"#\" onclick=\"window.close();\">".WT_I18N::translate('Close Window')."</a></div>";

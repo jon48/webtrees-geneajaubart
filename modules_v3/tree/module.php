@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12305 2011-10-13 12:38:33Z greg $
+// $Id: module.php 12634 2011-11-08 19:22:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -34,8 +34,8 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 	
 	function __construct() {
 		// define the module inclusions for the page header
-  	$this->headers = '<link rel="stylesheet" type="text/css" href="'.WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/css/treeview.css" />';
-  	$this->js = '<script type="text/javascript" language="javascript" src="'.WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/treeview.js"></script>';
+  	$this->headers= '<link rel="stylesheet" type="text/css" href="'.WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/css/treeview.css" />';
+  	$this->js = WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/treeview.js';
   	
 		// Retrieve the user's personalized style
     if (isset($_COOKIE['tvStyle'])) {
@@ -71,10 +71,12 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function getTabContent() {
+		global $controller;
+
 		require_once WT_MODULES_DIR.$this->getName().'/class_treeview.php';
     $tv = new TreeView('tvTab');
-    $r = $tv->drawViewport($this->controller->pid, 3, $this->style);
-		return $r;
+    list($html, $js) = $tv->drawViewport($controller->record->getXref(), 3, $this->style);
+		return $html.WT_JS_START.$js.WT_JS_END;
 	}
 
 	// Implement WT_Module_Tab
@@ -96,7 +98,7 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 	public function getPreLoadContent() {
 		// a workaround to the lack of a proper method of class Module to insert css and scripts in <head> where needed
 		// the required loading order is : headers, theme, css
-	  return $this->js.$this->headers;
+	  return '<script type="text/javascript" src="'.$this->js.'"></script>'.$this->headers;
 	}
 
   // Extend WT_Module
@@ -111,22 +113,23 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
         $tv = new TreeView('tv');
 				ob_start();
 				$person=WT_Person::getInstance($rootid);
-	       print_header(WT_I18N::translate('Interactive tree of %s', $person->getFullName()));
+
+				list($html, $js)=$tv->drawViewport($rootid, 4, $this->style);
+
+				global $controller;
+				$controller=new WT_Controller_Base();
+				$controller
+					->setPageTitle(WT_I18N::translate('Interactive tree of %s', $person->getFullName()))
+					->pageHeader()
+					->addExternalJavaScript($this->js)
+					->addInlineJavaScript('jQuery("head").append(\''.$this->headers.$this->css.'\');')
+					->addInlineJavaScript($js);
+
         if (WT_USE_LIGHTBOX) {
         	require WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 				}
-        $header = ob_get_clean();
-        // we do this trick to insert headers js calls and css
-        // should be improved as soon as webtrees will have provided a way to do that
-        // in a more proper way (a method of Module object to insert its css and scripts calls in the <head>)
-        // The CSS inserted here could be overided by cascading style sheet mechanism
-        // when relevant properties are defined in the theme's CSS
-        $header = str_replace('<head>', '<head>'.$this->headers, $header);
-        // If TreeView was personalized, include the custom CSS at the end of the header, to "cascade" previously loaded CSS
-       	$header = str_replace('</head>', $this->js.$this->css.'</head>', $header);
-        echo $header;
-        echo $tv->drawViewport($rootid, 4, $this->style);
-        print_footer();
+
+				echo $html;
         break;
 
       case 'getDetails':

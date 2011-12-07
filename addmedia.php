@@ -21,12 +21,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: addmedia.php 11991 2011-07-11 05:45:33Z larry $
+// $Id: addmedia.php 12696 2011-11-11 00:56:58Z greg $
 
 define('WT_SCRIPT_NAME', 'addmedia.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
+
+$controller=new WT_Controller_Simple();
+$controller->setPageTitle(WT_I18N::translate('Add a new media object'));
+$controller->pageHeader();
 
 // TODO use GET/POST, rather than $_REQUEST
 // TODO decide what validation is required on these input parameters
@@ -49,7 +53,6 @@ $update_CHAN=!safe_POST_bool('preserve_last_changed');
 
 $success=false; // If successful, we close this window automatically
 
-print_simple_header(WT_I18N::translate('Add a new media object'));
 $disp = true;
 if (empty($pid) && !empty($mid)) $pid = $mid;
 if (!empty($pid)) {
@@ -79,8 +82,7 @@ if (!WT_USER_CAN_EDIT || !$disp || !$ALLOW_EDIT_GEDCOM) {
 			echo '<br />', WT_I18N::translate('You have no access to'), ' pid ', $pid;
 		}
 	}
-	echo '<br /><br /><div class="center"><a href="javascript: ', WT_I18N::translate('Close Window'), '" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a></div>';
-	print_simple_footer();
+	echo '<br /><br /><div class="center"><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a></div>';
 	exit;
 }
 
@@ -93,10 +95,7 @@ echo WT_JS_START;
 		findwin = window.open('find.php?type=note', '_blank', 'left=50, top=50, width=600, height=520, resizable=1, scrollbars=1');
 		return false;
 	}
-	var language_filter, magnify;
 	var pastefield;
-	language_filter = "";
-	magnify = "";
 	function openerpasteid(id) {
 		window.opener.paste_id(id);
 		window.close();
@@ -104,10 +103,8 @@ echo WT_JS_START;
 	function paste_id(value) {
 		pastefield.value = value;
 	}
-	function paste_char(value, lang, mag) {
+	function paste_char(value) {
 		pastefield.value += value;
-		language_filter = lang;
-		magnify = mag;
 	}
 	function checkpath(folder) {
 		value = folder.value;
@@ -418,7 +415,7 @@ if ($action=='newentry') {
 				AddToLog('Media ID '.$media_id." successfully added to $linktoid.", 'edit');
 				$success=true;
 			} else {
-				echo "<a href=\"javascript://OBJE $mediaid\" onclick=\"openerpasteid('$mediaid'); return false;\">", WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record '), " <b>$mediaid</b></a><br /><br />";
+				echo "<a href=\"#\" onclick=\"openerpasteid('$mediaid'); return false;\">", WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record '), " <b>$mediaid</b></a><br /><br />";
 				echo WT_JS_START;
 				echo "openerpasteid('", $mediaid, "');";
 				echo WT_JS_END;
@@ -630,4 +627,3 @@ if ($success && !WT_DEBUG) {
 	echo '<div class="center"><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">'.WT_I18N::translate('Close Window').'</a></div>';
 	echo '<br />';
 }
-print_simple_footer();

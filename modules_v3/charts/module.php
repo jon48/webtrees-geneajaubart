@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12414 2011-10-25 16:31:47Z lukasz $
+// $Id: module.php 12861 2011-11-22 17:16:21Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -68,8 +68,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 		$PEDIGREE_FULL_DETAILS = $show_full;
 
 		if ($type!='treenav') {
-			$controller = new WT_Controller_Hourglass();
-			$controller->init($pid,0,3);
+			$controller=new WT_Controller_Hourglass($pid,0,3);
 			$controller->setupJavascript();
 		}
 
@@ -84,7 +83,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 		$class=$this->getName().'_block';
 		$title='';
 		if ($ctype=="gedcom" && WT_USER_GEDCOM_ADMIN || $ctype=="user" && WT_USER_ID) {
-			$title .= "<a href=\"javascript: configure block\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1'); return false;\">";
+			$title .= "<a href=\"#\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1'); return false;\">";
 			$title .= "<img class=\"adminicon\" src=\"".$WT_IMAGES["admin"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".WT_I18N::translate('Configure')."\" /></a>";
 		}
 		if ($person) {
@@ -134,14 +133,15 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 				require_once WT_MODULES_DIR.'tree/module.php';
 				require_once WT_MODULES_DIR.'tree/class_treeview.php';
 				$mod=new tree_WT_Module;
-				$nav=new TreeView;
+				$tv=new TreeView;
 				$content .= '<td>';
 				$content .= '<script type="text/javascript" src="'.WT_JQUERY_URL.'"></script><script type="text/javascript" src="'.WT_JQUERYUI_URL.'"></script>';
 
 				$content .= $mod->css;
 				$content .= $mod->headers;
-				$content .= $mod->js;
-				$content .= $nav->drawViewport($person->getXref(), 2, '');
+				$content .= '<script type="text/javascript" src="'.$mod->js.'"></script>';
+		    list($html, $js) = $tv->drawViewport($person->getXref(), 2, '');
+				$content .= $html.WT_JS_START.$js.WT_JS_END;
 				$content .= '</td>';
 			}
 			$content .= "</tr></table>";
@@ -167,7 +167,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function loadAjax() {
-		return false;
+		return true;
 	}
 
 	// Implement class WT_Module_Block
@@ -182,7 +182,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function configureBlock($block_id) {
-		global $ctype, $TEXT_DIRECTION, $PEDIGREE_ROOT_ID, $ENABLE_AUTOCOMPLETE;
+		global $ctype, $PEDIGREE_ROOT_ID, $ENABLE_AUTOCOMPLETE;
 
 		if (safe_POST_bool('save')) {
 			set_block_setting($block_id, 'details', safe_POST_bool('details'));
@@ -217,7 +217,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 			</td>
 		</tr>
 		<tr>
-			<td class="descriptionbox wrap width33"><?php echo WT_I18N::translate('Root Person ID'); ?></td>
+			<td class="descriptionbox wrap width33"><?php echo WT_I18N::translate('Individual'); ?></td>
 			<td class="optionbox">
 				<input type="text" name="pid" id="pid" value="<?php echo $pid; ?>" size="5" />
 				<?php

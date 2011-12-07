@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Person.php 12463 2011-10-29 21:41:55Z greg $
+// $Id: Person.php 12929 2011-11-28 09:28:14Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -680,7 +680,7 @@ class WT_Person extends WT_GedcomRecord {
 	* @return string
 	*/
 	function getLabel($elderdate='', $counter=0) {
-		global $TEXT_DIRECTION, $WT_IMAGES;
+		global $WT_IMAGES;
 
 		$label = '';
 		$gap = 0;
@@ -688,7 +688,7 @@ class WT_Person extends WT_GedcomRecord {
 			$p2 = $this->getBirthDate();
 			if ($p2->isOK()) {
 				$gap = $p2->MinJD()-$elderdate->MinJD(); // days
-				$label .= "<div class=\"elderdate age $TEXT_DIRECTION\">";
+				$label .= "<div class=\"elderdate age\">";
 				// warning if negative gap : wrong order
 				if ($gap<0 && $counter>0) $label .= '<img alt="" src="'.$WT_IMAGES['warning'].'" /> ';
 				// warning if gap<6 months
@@ -712,7 +712,7 @@ class WT_Person extends WT_GedcomRecord {
 			}
 		}
 		// I18N: This is an abbreviation for a number.  i.e. #7 means number 7
-		if ($counter) $label .= '<div class="'.$TEXT_DIRECTION.'">'.WT_I18N::translate('#%d', $counter).'</div>';
+		if ($counter) $label .= '<div>'.WT_I18N::translate('#%d', $counter).'</div>';
 		$label .= $this->label;
 		if ($gap!=0 && $counter<1) $label .= '<br />&nbsp;';
 		return $label;
@@ -734,6 +734,7 @@ class WT_Person extends WT_GedcomRecord {
 			}
 			return $families;
 		}
+
 		if ($this->_spouseFamilies===null) {
 			$this->_spouseFamilies=array();
 			preg_match_all('/\n1 FAMS @('.WT_REGEX_XREF.')@/', $this->_gedrec, $match);
@@ -794,6 +795,7 @@ class WT_Person extends WT_GedcomRecord {
 			}
 			return $families;
 		}
+
 		if ($this->_childFamilies===null) {
 			$this->_childFamilies=array();
 			preg_match_all('/\n1 FAMC @('.WT_REGEX_XREF.')@/', $this->_gedrec, $match);
@@ -1090,8 +1092,11 @@ class WT_Person extends WT_GedcomRecord {
 						if (!is_null($spouse)) $factrec.="\n2 _WTS @".$spouse->getXref().'@';
 						$factrec.="\n2 _WTFS @".$family->getXref()."@\n";
 						$event->gedcomRecord = $factrec;
-						if ($fact!='OBJE') $this->indifacts[] = $event;
-						else $this->otherfacts[]=$event;
+						if ($fact!='OBJE') {
+							$this->indifacts[]=$event;
+						} else {
+							$this->otherfacts[]=$event;
+						}
 					}
 				}
 			}
@@ -1415,7 +1420,7 @@ class WT_Person extends WT_GedcomRecord {
 					}
 					if (preg_match('/\n2 PLAC .*/', $srec, $match)) {
 						$factrec.=$match[0];
-						}
+					}
 					if ($associate instanceof WT_Family) {
 						foreach ($associate->getSpouses() as $spouse) {
 							$factrec.="\n2 ASSO @".$spouse->getXref().'@';
@@ -1678,11 +1683,7 @@ class WT_Person extends WT_GedcomRecord {
 		}
 
 		// GEDCOM uses "//" to indicate an unknown surname
-		// Some people use /---/ or /___/ or /???/ to indicate an unknown surname
-		$full=preg_replace('/\/(|_{3,}|\?{3,}|-{3,})\//', '/@N.N./', $full);
-
-		// Some people use --- or ___ or ??? to indicate an unknown given name
-		$full=preg_replace('/(_{3,}|\?{3,}|-{3,})/', '/@P.N./', $full);
+		$full=preg_replace('/\/\//', '/@N.N./', $full);
 
 		// Extract the surname.
 		// Note, there may be multiple surnames, e.g. Jean /Vasquez/ y /Cortes/

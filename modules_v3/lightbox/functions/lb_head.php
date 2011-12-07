@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lb_head.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: lb_head.php 12699 2011-11-11 04:03:13Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,30 +33,27 @@ if (!defined('WT_WEBTREES')) {
 global $GEDCOM;
 $reorder=safe_get('reorder', '1', '0');
 ?>
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 <!--
 	function reorder_media() {
 		var win02 = window.open(
-		'edit_interface.php?action=reorder_media&pid=<?php echo $this->controller->indi->getXref(); ?>&currtab=album', 'win02', 'resizable=1, menubar=0, scrollbars=1, top=20, HEIGHT=840, WIDTH=450 ');
+		'edit_interface.php?action=reorder_media&pid=<?php echo $controller->record->getXref(); ?>&currtab=album', 'win02', 'resizable=1, menubar=0, scrollbars=1, top=20, HEIGHT=840, WIDTH=450 ');
 		if (window.focus) {win02.focus();}
 	}
 	function album_add() {
 		win03 = window.open(
-		'addmedia.php?action=showmediaform&linktoid=<?php echo $this->controller->indi->getXref(); ?>', 'win03', 'resizable=1, scrollbars=1, top=50, HEIGHT=780, WIDTH=600 ');
+		'addmedia.php?action=showmediaform&linktoid=<?php echo $controller->record->getXref(); ?>', 'win03', 'resizable=1, scrollbars=1, top=50, HEIGHT=780, WIDTH=600 ');
 		if (window.focus) {win03.focus();}
 	}
 	function album_link() {
 		win04 = window.open(
-		'inverselink.php?linktoid=<?php echo $this->controller->indi->getXref(); ?>&linkto=person', 'win04', 'resizable=1, scrollbars=1, top=50, HEIGHT=300, WIDTH=450 ');
+		'inverselink.php?linktoid=<?php echo $controller->record->getXref(); ?>&linkto=person', 'win04', 'resizable=1, scrollbars=1, top=50, HEIGHT=300, WIDTH=450 ');
 		win04.focus()
 	}
 -->
 </script>
 
 <?php
-// Find if indi and family associated media exists and then count them ( $tot_med_ct)
-require_once WT_ROOT.'includes/media_reorder_count.php';
-
 // If in re-order mode do not show header links, but instead, show drag and drop title.
 if (isset($reorder) && $reorder==1) {
 	echo '<center><b>', WT_I18N::translate('Drag-and-drop thumbnails to re-order media items'), '</b></center>';
@@ -68,19 +65,19 @@ if (isset($reorder) && $reorder==1) {
 		echo '<td class="descriptionbox rela">';
 		// Add a new media object
 		if (get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') >= WT_USER_ACCESS_LEVEL) {
-			echo '<span><a href="javascript: album_add()">';
+			echo '<span><a href="#" onclick="album_add()">';
 			echo '<img src="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/images/image_add.gif" id="head_icon" class="icon" title="', WT_I18N::translate('Add a new media object'), '" alt="', WT_I18N::translate('Add a new media object'), '" />';
 			echo WT_I18N::translate('Add a new media object');
 			echo '</a></span>';
 			// Link to an existing item
-			echo '<span><a href="javascript: album_link()">';
+			echo '<span><a href="#" onclick="album_link()">';
 			echo '<img src="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/images/image_link.gif" id="head_icon" class="icon" title="', WT_I18N::translate('Link to an existing media object'), '" alt="', WT_I18N::translate('Link to an existing media object'), '" />';
 			echo WT_I18N::translate('Link to an existing media object');
 			echo '</a></span>';
 		}
-		if (WT_USER_GEDCOM_ADMIN) {
+		if (WT_USER_GEDCOM_ADMIN && $this->get_media_count()>1) {
 			// Popup Reorder Media
-			echo '<span><a href="javascript: reorder_media()">';
+			echo '<span><a href="#" onclick="reorder_media()">';
 			echo '<img src="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/images/images.gif" id="head_icon" class="icon" title="', WT_I18N::translate('Re-order media'), '" alt="', WT_I18N::translate('Re-order media'), '" />';
 			echo WT_I18N::translate('Re-order media');
 			echo '</a></span>';

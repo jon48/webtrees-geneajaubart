@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_media.php 12466 2011-10-30 01:13:24Z nigel $
+// $Id: admin_media.php 12887 2011-11-23 18:40:41Z greg $
 
  /* TODO:
  * Add check for missing index.php files when creating a directory
@@ -42,25 +42,24 @@
 
 define('WT_SCRIPT_NAME', 'admin_media.php');
 require './includes/session.php';
+
+$controller=new WT_Controller_Base();
+$controller
+	->requireAdminLogin()
+	->setPageTitle(WT_I18N::translate('Media'));
+
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 require_once WT_ROOT.'includes/functions/functions_print_facts.php';
 require_once WT_ROOT.'includes/functions/functions_edit.php';
 require_once WT_ROOT.'includes/functions/functions_import.php';
 require_once WT_ROOT.'includes/functions/functions_mediadb.php';
 
-// Only admin users can access this page
-if (!WT_USER_IS_ADMIN) {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.WT_SCRIPT_NAME);
-	exit;
-}
-
 // editing must be enabled
 if (!$ALLOW_EDIT_GEDCOM) {
-	print_header(WT_I18N::translate('Manage multimedia'));
+	$controller->pageHeader();
 	echo "<span class=\"error\"><b>";
 	echo WT_I18N::translate('Media management features are not available when online editing is disabled.');
 	echo "</b></span><br />";
-	print_footer();
 	exit;
 }
 
@@ -101,15 +100,15 @@ function move_file($src, $dest) {
 	if (!is_dir($destdir)) {
 		@mkdirs($destdir);
 		if (!is_dir($destdir)) {
-			echo "<div class=\"error\">".WT_I18N::translate('Directory could not be created')." [".$destdir."]</div>";
+			echo '<div class="error">', WT_I18N::translate('Directory could not be created'), ' (', $destdir, ')</div>';
 			return false;
 		}
 	}
 	if (!rename($src, $dest)) {
-		echo "<div class=\"error\">".WT_I18N::translate('Media file could not be moved.')." [".$src."]</div>";
+		echo '<div class="error">', WT_I18N::translate('Media file could not be moved.'), ' (', $src, ')</div>';
 		return false;
 	}
-	echo "<div>".WT_I18N::translate('Media file moved.')." [".$src."]</div>";
+	echo '<div>', WT_I18N::translate('Media file moved.'), ' (', $src, ')</div>';
 	return true;
 }
 
@@ -191,21 +190,21 @@ function set_perms($path) {
 				return;
 			}
 			// do not set perms on certain files...
-			if ($element!= "." && $element!= ".." && $element!=".svn") {
-				$fullpath = $path."/".$element;
+			if ($element!= '.' && $element!= '..' && $element!='.svn') {
+				$fullpath = $path.'/'.$element;
 				if (is_dir($fullpath)) {
 					if (@chmod($fullpath, WT_PERM_EXE)) {
-						echo "<div>".WT_I18N::translate('Permissions Set')." [".decoct(WT_PERM_EXE)."] [".$fullpath."]</div>";
+						echo '<div>', WT_I18N::translate('Permissions Set'), ' (', decoct(WT_PERM_EXE), ') (', $fullpath, ')</div>';
 					} else {
-						echo "<div>".WT_I18N::translate('Permissions Not Set')." [".decoct(WT_PERM_EXE)."] [".$fullpath."]</div>";
+						echo '<div>', WT_I18N::translate('Permissions Not Set'), ' (', decoct(WT_PERM_EXE), ') (', $fullpath, ')</div>';
 					}
 					// call this function recursively on this directory
 					set_perms($fullpath);
 				} else {
 					if (@chmod($fullpath, WT_PERM_FILE)) {
-						echo "<div>".WT_I18N::translate('Permissions Set')." [".decoct(WT_PERM_FILE)."] [".$fullpath."]</div>";
+						echo '<div>', WT_I18N::translate('Permissions Set'), ' (', decoct(WT_PERM_FILE), ') (', $fullpath, ')</div>';
 					} else {
-						echo "<div>".WT_I18N::translate('Permissions Not Set')." [".decoct(WT_PERM_FILE)."] [".$fullpath."]</div>";
+						echo '<div>', WT_I18N::translate('Permissions Not Set'), ' (', decoct(WT_PERM_FILE), ') (', $fullpath, ')</div>';
 					}
 					$operation_count++;
 					if ($operation_count % 10) {
@@ -246,8 +245,8 @@ if (count($_POST) == 0) $showthumb = true;
 
 $is_std_media_writable = dir_is_writable($MEDIA_DIRECTORY);
 
-$thumbget = "";
-if ($showthumb) $thumbget = "&amp;showthumb=true";
+$thumbget = '';
+if ($showthumb) $thumbget = '&amp;showthumb=true';
 
 //-- prevent script from accessing an area outside of the media directory
 //-- and keep level consistency
@@ -259,7 +258,7 @@ if (($level < 0) || ($level > $MEDIA_DIRECTORY_LEVELS)) {
 	$level = 0;
 }
 
-$thumbdir = str_replace($MEDIA_DIRECTORY, $MEDIA_DIRECTORY."thumbs/", $directory);
+$thumbdir = str_replace($MEDIA_DIRECTORY, $MEDIA_DIRECTORY.'thumbs/', $directory);
 $directory_fw = get_media_firewall_path($directory);
 $thumbdir_fw = get_media_firewall_path($thumbdir);
 
@@ -271,7 +270,7 @@ if (WT_USER_IS_ADMIN) {
 }
 
 // echo the header of the page
-print_header(WT_I18N::translate('Manage multimedia'));
+$controller->pageHeader();
 ?>
 <script type="text/javascript">
 <!--
@@ -463,7 +462,7 @@ if (check_media_structure()) {
  * @name $action->thumbnail
  */
 	if ($action == "thumbnail") {
-		echo "<table class=\"media_items $TEXT_DIRECTION\">";
+		echo "<table class=\"media_items\">";
 		echo "<tr><td class=\"messagebox wrap\">";
 		// TODO: add option to generate thumbnails for all images on page
 		// Cycle through $medialist and skip all exisiting thumbs
@@ -512,7 +511,7 @@ if (check_media_structure()) {
 
 	// Move single file and optionally its corresponding thumbnail to protected dir
 	if ($action == "moveprotected") {
-		echo "<table class=\"media_items $TEXT_DIRECTION\">";
+		echo "<table class=\"media_items\">";
 		echo "<tr><td class=\"messagebox wrap\">";
 		if (strpos($filename, "../") !== false) {
 			// don't allow user to access directories outside of media dir
@@ -534,7 +533,7 @@ if (check_media_structure()) {
 
 	// Move single file and its corresponding thumbnail to standard dir
 	if ($action == "movestandard") {
-		echo "<table class=\"media_items $TEXT_DIRECTION\">";
+		echo "<table class=\"media_items\">";
 		echo "<tr><td class=\"messagebox wrap\">";
 		if (strpos($filename, "../") !== false) {
 			// don't allow user to access directories outside of media dir
@@ -554,7 +553,7 @@ if (check_media_structure()) {
 
 	// Move entire dir and all subdirs to protected dir
 	if ($action == "movedirprotected") {
-		echo "<table class=\"media_items $TEXT_DIRECTION\">";
+		echo "<table class=\"media_items\">";
 		echo "<tr><td class=\"messagebox wrap\">";
 		echo "<strong>".WT_I18N::translate('Move to protected')."<br />";
 		move_files(substr($directory, 0, -1), true);
@@ -564,7 +563,7 @@ if (check_media_structure()) {
 
 	// Move entire dir and all subdirs to standard dir
 	if ($action == "movedirstandard") {
-		echo "<table class=\"media_items $TEXT_DIRECTION\">";
+		echo "<table class=\"media_items\">";
 		echo "<tr><td class=\"messagebox wrap\">";
 		echo "<strong>".WT_I18N::translate('Move to standard')."<br />";
 		move_files(substr(get_media_firewall_path($directory), 0, -1), false);
@@ -573,7 +572,7 @@ if (check_media_structure()) {
 	}
 
 	if ($action == "setpermsfix") {
-		echo "<table class=\"media_items $TEXT_DIRECTION\">";
+		echo "<table class=\"media_items\">";
 		echo "<tr><td class=\"messagebox wrap\">";
 		echo "<strong>".WT_I18N::translate('Correct read/write/execute permissions')."<br />";
 		set_perms(substr($directory, 0, -1));
@@ -607,7 +606,7 @@ if (check_media_structure()) {
 
 	// Delete file
 	if ($action == "deletefile") {
-		echo "<table class=\"media_items $TEXT_DIRECTION\">";
+		echo "<table class=\"media_items\">";
 		echo "<tr><td class=\"messagebox wrap\">";
 		$xrefs = array($xref);
 		$onegedcom = true;
@@ -787,7 +786,7 @@ if (check_media_structure()) {
 	<input type="hidden" name="level" value="<?php echo $level; ?>" />
 	<input type="hidden" name="all" value="true" />
 	<input type="hidden" name="subclick" value="<?php echo $subclick; ?>"/>
-	<table class="media_items <?php echo $TEXT_DIRECTION; ?>">
+	<table class="media_items">
 		<tr align="center">
 			<td class="wrap"><?php echo /* I18N: Label for list of sort options */ WT_I18N::translate('Sort order'); ?>
 				<select name="sortby">
@@ -803,7 +802,7 @@ if (check_media_structure()) {
 				<?php echo "<a href=\"#\" onclick=\"expand_layer('uploadmedia');\">".WT_I18N::translate('Upload media files')."</a>". help_link('upload_media'); ?>
 			</td>-->
 			<td class="wrap">
-				<a href="javascript:;" onclick="window.open('addmedia.php?action=showmediaform&amp;linktoid=new', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1'); return false;"> <?php echo WT_I18N::translate('Add a new media object')."</a>". help_link('add_media'); ?>
+				<a href="#" onclick="window.open('addmedia.php?action=showmediaform&amp;linktoid=new', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1'); return false;"> <?php echo WT_I18N::translate('Add a new media object')."</a>". help_link('OBJE'); ?>
 			</td>
 				<?php
 					$tempURL = WT_SCRIPT_NAME.'?';
@@ -817,7 +816,7 @@ if (check_media_structure()) {
 		</tr>
 <!--	</table>
 
-	<table class="media_items <?php echo $TEXT_DIRECTION; ?>">-->
+	<table class="media_items">-->
 		<tr align="center">
 			<td colspan="2">
 				<?php echo WT_I18N::translate('Folder')."</td><td>". WT_I18N::translate('Filter'), help_link('simple_filter'); ?>
@@ -855,7 +854,7 @@ if (check_media_structure()) {
 		if (empty($directory)) $directory = $MEDIA_DIRECTORY;
 
 		// Start of media directory table
-		echo "<table class=\"media_items $TEXT_DIRECTION\">";
+		echo "<table class=\"media_items\">";
 		// Tell the user where he is
 		echo "<tr>";
 		echo "<td colspan=\"4\">";
@@ -985,7 +984,7 @@ if (check_media_structure()) {
 					echo "<td class=\" center\" width=\"10\">";
 						echo $uplink2;
 					echo "</td>";
-					echo "<td class=\"$TEXT_DIRECTION\">";
+					echo "<td>";
 						echo $uplink;
 					echo "</td>";
 				echo "</tr>";
@@ -1012,7 +1011,7 @@ if (check_media_structure()) {
 
 						echo "</form>";
 			//	echo "</td>";
-					echo "<td class=\"$TEXT_DIRECTION\">";
+					echo "<td>";
 						echo "<a href=\"".WT_SCRIPT_NAME."?directory=".rawurlencode($directory.$dir)."/&amp;sortby={$sortby}&amp;level=".($level+1).$thumbget."&amp;subclick={$subclick}\">";
 						if ($TEXT_DIRECTION=="rtl") echo getRLM();
 						echo $dir;
@@ -1040,35 +1039,23 @@ if (check_media_structure()) {
 
 			// Set up for two passes, the first showing URLs, the second normal files
 
-echo WT_JS_START; ?>
-	jQuery(document).ready(function() {
-		jQuery('#media_table').dataTable( {
-			"oLanguage": {
-				"sLengthMenu": '<?php echo /* I18N: %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
-				"sZeroRecords": '<?php echo WT_I18N::translate('No records to display');?>',
-				"sInfo": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_'); ?>',
-				"sInfoEmpty": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '0', '0', '0'); ?>',
-				"sInfoFiltered": '<?php echo /* I18N: %s is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_'); ?>',
-				"sSearch": '<?php echo WT_I18N::translate('Filter');?>',				"oPaginate": {
-					"sFirst": '<?php echo WT_I18N::translate_c('first page', 'first');?>',
-					"sLast": '<?php echo WT_I18N::translate('last');?>',
-					"sNext": '<?php echo WT_I18N::translate('next');?>',
-					"sPrevious": '<?php echo WT_I18N::translate('previous');?>'
-				}
-			},
-			"sDom": '<"H"pf<"dt-clear">irl>t<"F"pl>',
-			"bJQueryUI": true,
-			"bAutoWidth":false,
-			"aaSorting": [[ 1, "asc" ]],
-			"iDisplayLength": 10,
-			"sPaginationType": "full_numbers",
-			"aoColumnDefs": [
-				{ "bSortable": false, "aTargets": [ 0,1 ] }
-			]
-		});
-	});
-<?php echo WT_JS_END;?>
-
+			$controller
+				->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+				->addInlineJavaScript('
+					jQuery("#media_table").dataTable( {
+						"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
+						'.WT_I18N::datatablesI18N().',
+						"bJQueryUI": true,
+						"bAutoWidth":false,
+						"aaSorting": [[ 1, "asc" ]],
+						"iDisplayLength": 10,
+						"sPaginationType": "full_numbers",
+						"aoColumnDefs": [
+							{ "bSortable": false, "aTargets": [ 0,1 ] }
+						]
+					});
+				');
+?>
 <form method="post" action="<?php echo WT_SCRIPT_NAME; ?>">
 		<table id="media_table">
 			<thead>
@@ -1108,7 +1095,7 @@ echo WT_JS_START; ?>
 
 						// Show column with file operations options
 						$printDone = true;
-						echo "<tr><td class=\" $changeClass $TEXT_DIRECTION\">";
+						echo "<tr><td>";
 
 						if ($media["CHANGE"]!="delete") {
 							// Edit File
@@ -1124,11 +1111,11 @@ echo WT_JS_START; ?>
 							} else {
 								$tempURL .= 'showmediaform&amp;filename='.rawurlencode($media['FILE']).'&amp;linktoid=new';
 							}
-							echo "<a href=\"javascript:", WT_I18N::translate('Edit'), "\" onclick=\"window.open('", $tempURL, "', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1'); return false;\">", WT_I18N::translate('Edit'), "</a><br />";
+							echo "<a href=\"#\" onclick=\"window.open('", $tempURL, "', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1'); return false;\">", WT_I18N::translate('Edit'), "</a><br />";
 
 							// Edit Raw
 							if ($media["XREF"] != "") {
-								echo "<a href=\"javascript:".WT_I18N::translate('Edit raw GEDCOM record')."\" onclick=\"return edit_raw('".$media['XREF']."');\">".WT_I18N::translate('Edit raw GEDCOM record')."</a><br />";
+								echo "<a href=\"#\" onclick=\"return edit_raw('".$media['XREF']."');\">".WT_I18N::translate('Edit raw GEDCOM record')."</a><br />";
 							}
 
 							// Delete File
@@ -1220,7 +1207,7 @@ echo WT_JS_START; ?>
 
 						//-- Thumbnail field
 						if ($showthumb) {
-							echo "<td class=\" $changeClass $TEXT_DIRECTION\">";
+							echo "<td>";
 							// if Streetview object
 							if (strpos($media["FILE"], 'http://maps.google.')===0) {
 								echo '<iframe style="float:left; padding:5px;" width="264" height="176" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="', $media["FILE"], '&amp;output=svembed"></iframe>';
@@ -1234,7 +1221,7 @@ echo WT_JS_START; ?>
 						}
 
 						//-- name and size field
-						echo "<td class=\" $changeClass $TEXT_DIRECTION wrap\">";
+						echo "<td>";
 						if ($media["TITL"]!="") echo "<b>".PrintReady($media["TITL"])."</b><br />";
 						if (!$isExternal && !$media["EXISTS"]) echo "<span dir=\"ltr\">".PrintReady($media["FILE"])."</span><br /><span class=\"error\">".WT_I18N::translate('The filename entered does not exist.')."</span><br />";
 						else {
@@ -1303,4 +1290,3 @@ echo WT_JS_START; ?>
 } else {
 	echo WT_I18N::translate('The media folder is corrupted.');
 }
-print_footer();

@@ -22,13 +22,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_rtl.php 12346 2011-10-20 21:04:30Z greg $
+// $Id: functions_rtl.php 12740 2011-11-14 16:07:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
 $SpecialChar = array(' ','.',',','"','\'','/','\\','|',':',';','+','&','#','@','-','=','*','%','!','?','$','<','>',"\n");
 $SpecialPar = array('(',')','[',']','{','}');
 $SpecialNum  = array('0','1','2','3','4','5','6','7','8','9');
@@ -393,7 +392,7 @@ function spanLTRRTL($inputText, $direction='BOTH', $class='') {
 		}
 		$textSpan = stripLRMRLM(substr($result, $lenStart+3, $spanEnd-$lenStart-3));
 		$langSpan = utf8_script($textSpan);
-		if ($langSpan == 'hebrew' || $langSpan == 'arabic') {
+		if ($langSpan == 'Hebr' || $langSpan == 'Arab') {
 			break;
 		}
 		$result = $startLTR . substr($result, $lenStart, $spanEnd-$lenStart) . substr($result, $spanEnd+$lenStart+$lenEnd);
@@ -1078,13 +1077,10 @@ function unhtmlentities($string)  {
  */
 function hasRTLText($text) {
 	global $RTLOrd;
-	//--- What if gedcom in ANSI?
-	// if (!(strpos($text, chr(215))=== false)) return true;  // OK?
 	for ($i=0; $i<strlen($text); $i++) {
 		if (in_array(ord(substr(trim($text),$i,2)),$RTLOrd)) return true;
 	}
 	return false;
-
 }
 
 /**
@@ -1095,8 +1091,6 @@ function hasRTLText($text) {
  */
 function hasLTRText($text) {
 	global $SpecialChar, $SpecialPar, $SpecialNum, $RTLOrd;
-	//--- What if gedcom in ANSI?
-	//--- Should have one fullspecial characters array in PGV -
 
 	for ($i=0; $i<strlen($text); $i++) {
 		if (in_array(ord(substr(trim($text),$i,2)),$RTLOrd) || in_array(ord(substr(trim($text),$i-1,2)),$RTLOrd)) $i++;
@@ -1127,7 +1121,7 @@ function reverseText($text) {
 	$text = strip_tags(html_entity_decode($text,ENT_COMPAT,'UTF-8'));
 	$text = str_replace(array('&lrm;', '&rlm;', WT_UTF8_LRM, WT_UTF8_RLM), '', $text);
 	$textLanguage = utf8_script($text);
-	if ($textLanguage!='hebrew' && $textLanguage!='arabic') return $text;
+	if ($textLanguage!='Hebr' && $textLanguage!='Arab') return $text;
 
 	$reversedText = '';
 	$numbers = '';

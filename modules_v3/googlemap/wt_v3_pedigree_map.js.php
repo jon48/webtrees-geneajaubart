@@ -29,7 +29,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: wt_v3_pedigree_map.js.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: wt_v3_pedigree_map.js.php 12821 2011-11-20 00:17:02Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -400,7 +400,7 @@ function createMarker(point, name, html, mhtml, icontype) {
 	// save the info we need to use later for the side_bar
 	gmarkers[i] = marker;
 	// add a line to the side_bar html
-	side_bar_html += '<br /><div id="'+linkid+'"><a href="javascript:myclick(' + i + ')">' + html +'</a><br></div>';
+	side_bar_html += '<br /><div id="'+linkid+'"><a href="#" onclick="myclick(' + i + ')">' + html +'</a><br></div>';
 	i++;
 	return marker;	
 };
@@ -492,8 +492,7 @@ for ($i=0; $i<($controller->treesize); $i++) {
 		$dataleft  = $image . $event . addslashes($name);
 		$datamid   = " <span><a href='".$person->getHtmlUrl()."' id='alturl' title='" . WT_I18N::translate('Individual information') . "'>";
 		
-		if ($TEXT_DIRECTION == 'rtl') $datamid .= '('.WT_I18N::translate('View Person').')';
-		else $datamid .= '('.WT_I18N::translate('View Person').')';
+		$datamid .= '('.WT_I18N::translate('View Person').')';
 		$datamid  .= '</a></span>';
 		$dataright = '<br /><strong>'. WT_I18N::translate('Birth:') . '&nbsp;</strong>' .
 				addslashes($bdate->Display(false)).'<br />'.$bplace;
@@ -614,11 +613,11 @@ document.getElementById('side_bar').innerHTML = side_bar_html;
 // === create the context menu div ===
 var contextmenu = document.createElement('div');
 	contextmenu.style.visibility='hidden';
-	contextmenu.innerHTML = '<a href="javascript:zoomIn()"><div class="optionbox">&nbsp;&nbsp;<?php echo WT_I18N::translate('Zoom in'); ?>&nbsp;&nbsp;</div></a>'
-						  + '<a href="javascript:zoomOut()"><div class="optionbox">&nbsp;&nbsp;<?php echo WT_I18N::translate('Zoom out'); ?>&nbsp;&nbsp;</div></a>'
-						  + '<a href="javascript:zoomInHere()"><div class="optionbox">&nbsp;&nbsp;<?php echo WT_I18N::translate('Zoom in here'); ?>&nbsp;&nbsp;</div></a>'
-						  + '<a href="javascript:zoomOutHere()"><div class="optionbox">&nbsp;&nbsp;<?php echo WT_I18N::translate('Zoom out here'); ?>&nbsp;&nbsp;</div></a>'
-						  + '<a href="javascript:centreMapHere()"><div class="optionbox">&nbsp;&nbsp;<?php echo WT_I18N::translate('Center map here'); ?>&nbsp;&nbsp;</div></a>';
+	contextmenu.innerHTML = '<a href="#" onclick="zoomIn()"><div class="optionbox">&nbsp;&nbsp;<?php echo WT_I18N::translate('Zoom in'); ?>&nbsp;&nbsp;</div></a>'
+						  + '<a href="#" onclick="zoomOut()"><div class="optionbox">&nbsp;&nbsp;<?php echo WT_I18N::translate('Zoom out'); ?>&nbsp;&nbsp;</div></a>'
+						  + '<a href="#" onclick="zoomInHere()"><div class="optionbox">&nbsp;&nbsp;<?php echo WT_I18N::translate('Zoom in here'); ?>&nbsp;&nbsp;</div></a>'
+						  + '<a href="#" onclick="zoomOutHere()"><div class="optionbox">&nbsp;&nbsp;<?php echo WT_I18N::translate('Zoom out here'); ?>&nbsp;&nbsp;</div></a>'
+						  + '<a href="#" onclick="centreMapHere()"><div class="optionbox">&nbsp;&nbsp;<?php echo WT_I18N::translate('Center map here'); ?>&nbsp;&nbsp;</div></a>';
 //BH pm_map.getContainer().appendChild(contextmenu);
 
 // === listen for singlerightclick ===

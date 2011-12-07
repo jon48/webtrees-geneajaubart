@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Lifespan.php 12208 2011-09-22 15:00:02Z greg $
+// $Id: Lifespan.php 12641 2011-11-08 23:42:44Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -34,7 +34,7 @@ function compare_people($a, $b) {
 	return WT_Date::Compare($a->getEstimatedBirthDate(), $b->getEstimatedBirthDate());
 }
 
-class WT_Controller_Lifespan extends WT_Controller_Base {
+class WT_Controller_Lifespan extends WT_Controller_Chart {
 	var $pids = array ();
 	var $people = array();
 	var $scale = 2;
@@ -66,11 +66,12 @@ class WT_Controller_Lifespan extends WT_Controller_Base {
 	var $startDate;
 	var $currentsex;
 
-	/**
-	* Initialization function
-	*/
-	function init() {
+	function __construct() {
 		global $GEDCOM_ID_PREFIX;
+
+		parent::__construct();
+		$this->setPageTitle(WT_I18N::translate('Lifespans'));
+
 		$this->colorindex = 0;
 		$this->Fcolorindex = 0;
 		$this->Mcolorindex = 0;
@@ -437,7 +438,7 @@ class WT_Controller_Lifespan extends WT_Controller_Base {
 					echo '<table><tr><td width="15"><a class="showit" href="#"><b>';
 					echo WT_Gedcom_Tag::getAbbreviation('BIRT');
 					echo '</b><span>', $value->getSexImage(), $indiName, '<br/>', WT_Gedcom_Tag::getLabel('BIRT'), ' ', strip_tags($bdate->Display(false)), ' ', $value->getBirthPlace(), '</span></a></div>',
-						'<td align="left" width="100%"><a href="', $value->getHtmlUrl(), '">', $value->getSexImage(), $indiName, ':  ', $lifespan, ' </a></td>' ,
+						'<td align="left" width="100%"><a href="', $value->getHtmlUrl(), '">', $value->getSexImage(), $indiName, '  ', $lifespan, ' </a></td>' ,
 						'<td width="15">';
 					if ($value->isDead()) {
 						if ($deathReal || $value->isDead()) {

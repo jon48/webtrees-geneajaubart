@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
+// $Id: module.php 12734 2011-11-14 11:52:48Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -81,7 +81,7 @@ class top10_surnames_WT_Module extends WT_Module implements WT_Module_Block {
 		$class=$this->getName().'_block';
 		$title='';
 		if ($ctype=="gedcom" && WT_USER_GEDCOM_ADMIN || $ctype=="user" && WT_USER_ID) {
-			$title .= "<a href=\"javascript: configure block\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
+			$title .= "<a href=\"#\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
 			$title .= "<img class=\"adminicon\" src=\"".$WT_IMAGES["admin"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".WT_I18N::translate('Configure')."\" /></a>";
 		}
 		// I18N: There are separate lists of male/female names, containing %d names each
@@ -90,20 +90,20 @@ class top10_surnames_WT_Module extends WT_Module implements WT_Module_Block {
 		switch ($infoStyle) {
 		case 'tagcloud':
 			uksort($all_surnames,'utf8_strcasecmp');
-			$content=format_surname_tagcloud($all_surnames, 'indilist', true);
+			$content=format_surname_tagcloud($all_surnames, 'indilist.php', true);
 			break;
 		case 'list':
 			uasort($all_surnames,array('top10_surnames_WT_Module', 'top_surname_sort'));
-			$content=format_surname_list($all_surnames, '1', true, 'indilist');
+			$content=format_surname_list($all_surnames, '1', true, 'indilist.php');
 			break;
 		case 'array':
 			uasort($all_surnames,array('top10_surnames_WT_Module', 'top_surname_sort'));
-			$content=format_surname_list($all_surnames, '2', true, 'indilist');
+			$content=format_surname_list($all_surnames, '2', true, 'indilist.php');
 			break;
 		case 'table':
 		default:
 			uasort($all_surnames, array('top10_surnames_WT_Module', 'top_surname_sort'));
-			$content=format_surname_table($all_surnames, 'indilist');
+			$content=format_surname_table($all_surnames, 'indilist.php');
 			break;
 		}
 

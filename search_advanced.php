@@ -21,17 +21,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search_advanced.php 12009 2011-07-13 22:24:46Z greg $
+// $Id: search_advanced.php 12812 2011-11-19 13:02:05Z greg $
 
 define('WT_SCRIPT_NAME', 'search_advanced.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 $controller=new WT_Controller_AdvancedSearch();
-$controller->init();
+$controller->pageHeader();
 
-// Print the top header
-print_header(WT_I18N::translate('Advanced search'));
 echo WT_JS_START;
 ?>
 	function checknames(frm) {
@@ -135,7 +133,7 @@ echo WT_JS_END;
 <form method="post" name="searchform" onsubmit="return checknames(this);" action="search_advanced.php">
 <input type="hidden" name="action" value="<?php echo $controller->action; ?>" />
 <input type="hidden" name="isPostBack" value="true" />
-<table id="field_table" class="list_table <?php echo $TEXT_DIRECTION; ?>" width="35%" border="0">
+<table id="field_table" class="list_table" width="35%" border="0">
 	<tr>
 		<td colspan="4" class="facts_label03" style="text-align:center;">
 			<?php echo WT_I18N::translate('Advanced search'); ?>
@@ -312,6 +310,3 @@ if (!$somethingPrinted ) {
 	</script>
 <?php
 }
-//-- somewhere the session gedcom gets changed, so we will change it back
-$_SESSION['GEDCOM'] = $GEDCOM;
-print_footer();

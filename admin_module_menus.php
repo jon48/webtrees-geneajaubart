@@ -18,18 +18,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: admin_module_menus.php 11994 2011-07-11 23:10:36Z nigel $
+// $Id: admin_module_menus.php 12812 2011-11-19 13:02:05Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_module_menus.php');
-
 require 'includes/session.php';
-require WT_ROOT.'includes/functions/functions_edit.php';
 
-// Only admin users can access this page
-if (!WT_USER_IS_ADMIN) {
-	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php?url='.WT_SCRIPT_NAME);
-	exit;
-}
+$controller=new WT_Controller_Base();
+$controller
+	->requireAdminLogin()
+	->setPageTitle(WT_I18N::translate('Module administration'))
+	->pageHeader();
+
+require WT_ROOT.'includes/functions/functions_edit.php';
 
 // New modules may have been added...
 $installed_modules=WT_Module::getInstalledModules();
@@ -68,8 +68,6 @@ if ($action=='update_mods') {
 		}
 	}
 }
-
-print_header(WT_I18N::translate('Module administration'));
 
 echo WT_JS_START; ?>
 
@@ -111,8 +109,8 @@ echo WT_JS_START; ?>
 							echo '<tr class="sortme rela">';
 						}
 						?>
-							<td class="<?php echo $TEXT_DIRECTION; ?>" ><?php echo $module->getTitle(); ?></td>
-							<td class="<?php echo $TEXT_DIRECTION; ?>" ><?php echo $module->getDescription(); ?></td>
+							<td><?php echo $module->getTitle(); ?></td>
+							<td><?php echo $module->getDescription(); ?></td>
 							<td><input type="text" size="3" value="<?php echo $order; ?>" name="menuorder-<?php echo $module->getName(); ?>" />
 							</td>
 							<td>
@@ -143,5 +141,3 @@ echo WT_JS_START; ?>
 		</form>
 	</div>
 </div>
-<?php
-print_footer();

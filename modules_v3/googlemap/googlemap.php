@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: googlemap.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: googlemap.php 12811 2011-11-19 11:03:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -284,7 +284,7 @@ function setup_map() {
 function build_indiv_map($indifacts, $famids) {
 	global $GOOGLEMAP_MAP_TYPE, $GOOGLEMAP_MIN_ZOOM, $GOOGLEMAP_MAX_ZOOM, $GEDCOM;
 	global $GOOGLEMAP_XSIZE, $GOOGLEMAP_YSIZE, $SHOW_LIVING_NAMES;
-	global $TEXT_DIRECTION, $GM_DEFAULT_TOP_VALUE, $GOOGLEMAP_COORD;
+	global $GM_DEFAULT_TOP_VALUE, $GOOGLEMAP_COORD;
 
 	$zoomLevel = $GOOGLEMAP_MAX_ZOOM;
 	// Create the markers list array ===============================================================
@@ -501,7 +501,7 @@ function build_indiv_map($indifacts, $famids) {
 		echo '<tr><td colspan="2" class="facts_value">', WT_I18N::translate('No map data for this person');
 		echo '</td></tr>';
 		if (WT_USER_IS_ADMIN) {
-			echo '<tr><td align="center" colspan="2">';
+			echo '<tr><td class="center" colspan="2">';
 			echo '<a href="module.php?mod=googlemap&mod_action=admin_editconfig">', WT_I18N::translate('Google Maps configuration'), '</a>';
 			echo '</td></tr>';
 		}
@@ -558,7 +558,7 @@ function build_indiv_map($indifacts, $famids) {
 		$gmarks = $markers;
 
 		global $controller;
-		$pid=$controller->indi->getXref();
+		$pid=$controller->record->getXref();
 
 		// === Include css and js files ============================================================
 		echo '<link type="text/css" href="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet" />';
@@ -571,7 +571,7 @@ function build_indiv_map($indifacts, $famids) {
 		foreach($markers as $marker) {
 			echo '<tr>';
 			echo '<td class="facts_label">';
-			echo '<a href="javascript:myclick(', $z, ', ', $marker['index'], ', ', $marker['tabindex'], ')">', $marker['fact'], '</a></td>';
+			echo '<a href="#" onclick="myclick(', $z, ', ', $marker['index'], ', ', $marker['tabindex'], ')">', $marker['fact'], '</a></td>';
 			$z++;
 			echo '<td class="', $marker['class'], '" style="white-space: normal">';
 			if (!empty($marker['info'])) {

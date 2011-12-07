@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_0_inverselink.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: media_0_inverselink.php 12812 2011-11-19 13:02:05Z greg $
 
 // GEDFact Media assistant replacement code for inverselink.php: ===========================
 
@@ -33,32 +33,7 @@ $exist_links = safe_REQUEST($_REQUEST, 'exist_links', WT_REGEX_UNSAFE);
 $gid = safe_GET_xref('gid');
 $update_CHAN = safe_REQUEST($_REQUEST, 'preserve_last_changed', WT_REGEX_UNSAFE);
 
-
-if (empty($linktoid) || empty($linkto)) {
-	$paramok = false;
-	$toitems = "";
-} else {
-	switch ($linkto) {
-	case 'person':
-		$toitems = WT_I18N::translate('To Person');
-		break;
-	case 'family':
-		$toitems = WT_I18N::translate('To Family');
-		break;
-	case 'source':
-		$toitems = WT_I18N::translate('To Source');
-		break;
-	}
-}
-if (WT_USER_IS_ADMIN) {
-	print_simple_header(WT_I18N::translate('Link media')." ".$toitems);
-} else {
-	print_simple_header(WT_I18N::translate('Administration'));
-	echo WT_I18N::translate('Unable to authenticate user.');
-}
-
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
-
 
 //-- check for admin
 //$paramok =  WT_USER_CAN_EDIT;
@@ -74,9 +49,6 @@ if ($action == "choose" && $paramok) {
 	var id_empty = "<?php echo WT_I18N::translate('When adding a Link, the ID field cannot be empty.'); ?>";
 
 	var pastefield;
-	var language_filter, magnify;
-	language_filter = "";
-	magnify = "";
 
 	function openerpasteid(id) {
 		window.opener.paste_id(id);
@@ -87,10 +59,8 @@ if ($action == "choose" && $paramok) {
 		pastefield.value = value;
 	}
 
-	function paste_char(value, lang, mag) {
+	function paste_char(value) {
 		pastefield.value += value;
-		language_filter = lang;
-		magnify = mag;
 	}
 
 	function blankwin() {
@@ -120,9 +90,9 @@ if ($action == "choose" && $paramok) {
 	}
 	echo '<input type="hidden" name="linkto" value="', $linkto, '" />';
 	echo '<input type="hidden" name="ged" value="', $GEDCOM, '" />';
-	echo '<table class="facts_table center ', $TEXT_DIRECTION, '">';
+	echo '<table class="facts_table center">';
 	echo '<tr><td class="topbottombar" colspan="2">';
-	echo WT_I18N::translate('Link media'), ' ', $toitems, help_link('add_media_linkid');
+	echo WT_I18N::translate('Link media'), help_link('add_media_linkid');
 	echo '</td></tr><tr><td class="descriptionbox width20 wrap">', WT_I18N::translate('Media'), '</td>';
 	echo '<td class="optionbox wrap">';
 	if (!empty($mediaid)) {
@@ -176,7 +146,7 @@ if ($action == "choose" && $paramok) {
 	
 			if ($record->getType()=='INDI') {
 				?>
-				<td align="center"><a href="#"><img style="border-style:none; margin-top:5px;" src="<?php echo $WT_IMAGES['button_family']; ?>" alt="<?php echo WT_I18N::translate('Open Family Navigator'); ?>" title="<?php echo WT_I18N::translate('Open Family Navigator'); ?>" name="family_'<?php echo $link; ?>'" onclick="javascript:openFamNav('<?php echo $link; ?>');" /></a></td>
+				<td align="center"><img style="border-style:none; margin-top:5px;" src="<?php echo $WT_IMAGES['button_family']; ?>" alt="<?php echo WT_I18N::translate('Open Family Navigator'); ?>" title="<?php echo WT_I18N::translate('Open Family Navigator'); ?>" name="family_'<?php echo $link; ?>'" onclick="openFamNav('<?php echo $link; ?>');" /></td>
 				<?php
 			} elseif ($record->getType()=='FAM') {
 				if ($record->getHusband()) {
@@ -187,7 +157,7 @@ if ($action == "choose" && $paramok) {
 					$head='';
 				}
 				?>
-				<td align="center"><a href="#"><img style="border-style:none; margin-top:5px;" src="<?php echo $WT_IMAGES['button_family']; ?>" alt="<?php echo WT_I18N::translate('Open Family Navigator'); ?>" title="<?php echo WT_I18N::translate('Open Family Navigator'); ?>" name="family_'<?php echo $link; ?>'" onclick="javascript:openFamNav('<?php echo $head; ?>');" /></a></td>
+				<td align="center"><img style="border-style:none; margin-top:5px;" src="<?php echo $WT_IMAGES['button_family']; ?>" alt="<?php echo WT_I18N::translate('Open Family Navigator'); ?>" title="<?php echo WT_I18N::translate('Open Family Navigator'); ?>" name="family_'<?php echo $link; ?>'" onclick="openFamNav('<?php echo $head; ?>');" /></td>
 				<?php
 			} else {
 				echo '<td></td>';
@@ -218,9 +188,9 @@ if ($action == "choose" && $paramok) {
 	echo '</td><td style=" padding-bottom:2px; vertical-align:middle">';
 		echo '&nbsp;';
 		if (isset($WT_IMAGES["add"])) {
-			echo '<a href="#"><img style="border-style:none;" src="', $WT_IMAGES["add"], '" alt="', WT_I18N::translate('Add'), ' "title="', WT_I18N::translate('Add'), '" align="middle" name="addLink" value="" onClick="javascript:blankwin(); return false;" />';
+			echo '<img style="border-style:none;" src="', $WT_IMAGES["add"], '" alt="', WT_I18N::translate('Add'), ' "title="', WT_I18N::translate('Add'), '" align="middle" name="addLink" value="" onclick="blankwin(); return false;" />';
 			} else {
-			echo '<button name="addLink" value="" type="button" onClick="javascript:blankwin(); return false;">', WT_I18N::translate('Add'), '</button>';
+			echo '<button name="addLink" value="" type="button" onclick="blankwin(); return false;">', WT_I18N::translate('Add'), '</button>';
 		}
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;';
 		print_findindi_link("gid", "");
@@ -235,7 +205,7 @@ if ($action == "choose" && $paramok) {
 	echo '<br /><br />';
 	echo '<input type="hidden" name="idName" id="idName" size="36" value="Name of ID" />';
 ?>
-<script language="javascript">
+<script type="text/javascript">
 
 	function addlinks(iname) {
 		// iid=document.getElementById('gid').value;
@@ -272,7 +242,7 @@ if ($action == "choose" && $paramok) {
 <?php
 
 // Various JavaScript variables required --------------------------------- ?>
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 	var ifamily = "<?php echo WT_I18N::translate('Open Family Navigator'); ?>";
 	var remove = "<?php echo WT_I18N::translate('Remove'); ?>";
 	var linkExists = "<?php echo WT_I18N::translate('This link already exists'); ?>";
@@ -607,7 +577,7 @@ function openInNewWindow(frm)
 	echo '</td></tr>';
 	// Admin Option CHAN log update override =======================
 	if (WT_USER_IS_ADMIN) {
-		echo "<tr><td class=\"descriptionbox ", $TEXT_DIRECTION, " wrap width25\">";
+		echo "<tr><td class=\"descriptionbox wrap width25\">";
 		echo WT_Gedcom_Tag::getLabel('CHAN'), "</td><td class=\"optionbox wrap\">";
 		if ($NO_UPDATE_CHAN) {
 			echo "<input type=\"checkbox\" checked=\"checked\" name=\"preserve_last_changed\" />";
@@ -623,7 +593,7 @@ function openInNewWindow(frm)
 	echo '<tr><td colspan="2">';
 	echo '</td></tr>';
 	echo '<tr><td class="topbottombar" colspan="2">';
-	echo '<center><input type="submit" value="', WT_I18N::translate('Save'), '" onclick="javascript:shiftlinks();" />';
+	echo '<center><input type="submit" value="', WT_I18N::translate('Save'), '" onclick="shiftlinks();" />';
 	echo '</center></td></tr>';
 ?>
 <script>
@@ -698,8 +668,7 @@ function shiftlinks() {
 <?php
 	echo '</table>';
 	echo '</form>';
-	echo '<br/><br/><center><a href="javascript:;" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close(); winNav.close(); ">', WT_I18N::translate('Close Window'), '</a><br /></center>';
-	// print_simple_footer();
+	echo '<br/><br/><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close(); winNav.close(); ">', WT_I18N::translate('Close Window'), '</a><br /></center>';
 
 } elseif ($action == "update" && $paramok) {
 
@@ -743,11 +712,8 @@ function shiftlinks() {
 		echo '<br />';
 	}
 
-	echo '<br/><br/><center><a href="javascript:;" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close(); winNav.close(); ">', WT_I18N::translate('Close Window'), '</a><br /></center>';
-	print_simple_footer();
-
+	echo '<br/><br/><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close(); winNav.close(); ">', WT_I18N::translate('Close Window'), '</a><br /></center>';
 } else {
 	// echo '<center>You must be logged in as an Administrator<center>';
-	echo '<br/><br/><center><a href="javascript:;" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close(); winNav.close();">', WT_I18N::translate('Close Window'), '</a><br /></center>';
-	//print_simple_footer();
+	echo '<br/><br/><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close(); winNav.close();">', WT_I18N::translate('Close Window'), '</a><br /></center>';
 }

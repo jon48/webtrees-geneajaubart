@@ -1,5 +1,5 @@
 <?php
-// Controller for the Descendancy Page
+// Controller for the descendancy chart
 //
 // webtrees: Web based Family History software
 // Copyright (C) 2011 webtrees development team.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Descendancy.php 11743 2011-06-09 00:00:50Z greg $
+// $Id: Descendancy.php 12847 2011-11-22 07:56:59Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -30,8 +30,7 @@ if (!defined('WT_WEBTREES')) {
 
 require_once WT_ROOT.'includes/functions/functions_charts.php';
 
-class WT_Controller_Descendancy extends WT_Controller_Base {
-	var $pid = "";
+class WT_Controller_Descendancy extends WT_Controller_Chart {
 	var $descPerson = null;
 
 	var $diffindi = null;
@@ -56,49 +55,49 @@ class WT_Controller_Descendancy extends WT_Controller_Base {
 	var $cellwidth;
 	var $show_cousins;
 
-	/**
-	 * Initialization function
-	 */
-	function init() {
-	global $USE_RIN, $MAX_ALIVE_AGE, $bwidth, $bheight, $pbwidth, $pbheight, $GEDCOM, $PEDIGREE_FULL_DETAILS, $MAX_DESCENDANCY_GENERATIONS, $DEFAULT_PEDIGREE_GENERATIONS, $show_full;
+	function __construct() {
+		global $USE_RIN, $MAX_ALIVE_AGE, $bwidth, $bheight, $pbwidth, $pbheight, $GEDCOM, $PEDIGREE_FULL_DETAILS, $MAX_DESCENDANCY_GENERATIONS, $DEFAULT_PEDIGREE_GENERATIONS, $show_full;
 
-	// Extract parameters from form
-	$this->pid        =safe_GET_xref('pid');
-	$this->show_full  =safe_GET('show_full', array('0', '1'), $PEDIGREE_FULL_DETAILS);
-	$this->chart_style=safe_GET_integer('chart_style', 0, 3, 0);
-	$this->generations=safe_GET_integer('generations', 2, $MAX_DESCENDANCY_GENERATIONS, $DEFAULT_PEDIGREE_GENERATIONS);
-	$this->box_width  =safe_GET_integer('box_width',   50, 300, 100);
+		parent::__construct();
 
-	// This is passed as a global.  A parameter would be better...
-	$show_full=$this->show_full;
+		// Extract parameters from form
+		$this->rootid     =safe_GET_xref('rootid');
+		$this->show_full  =safe_GET('show_full', array('0', '1'), $PEDIGREE_FULL_DETAILS);
+		$this->chart_style=safe_GET_integer('chart_style', 0, 3, 0);
+		$this->generations=safe_GET_integer('generations', 2, $MAX_DESCENDANCY_GENERATIONS, $DEFAULT_PEDIGREE_GENERATIONS);
+		$this->box_width  =safe_GET_integer('box_width',   50, 300, 100);
+		$box_width           =safe_GET_integer('box_width',            50, 300, 100);
 
-	if (!isset($this->personcount)) $this->personcount = 1;
+		// This is passed as a global.  A parameter would be better...
+		$show_full=$this->show_full;
 
-	$this->Dbwidth*=$this->box_width/100;
+		if (!isset($this->personcount)) $this->personcount = 1;
 
-	if (!$this->show_full) {
-		$bwidth *= $this->box_width / 150;
-	} else {
-		$bwidth*=$this->box_width/100;
-	}
+		// -- size of the detailed boxes based upon optional width parameter
+		$Dbwidth=($box_width*$bwidth)/100;
+		$Dbheight=($box_width*$bheight)/100;
+		$bwidth=$Dbwidth;
+		$bheight=$Dbheight;
+		
+		// -- adjust size of the non-detailed boxes
+		if (!$this->show_full) {
+			$bwidth = $bwidth / 1.5;
+			$bheight = $bheight / 2 ;
+		}
+		
+		$pbwidth = $bwidth+12;
+		$pbheight = $bheight+14;
 
-	if (!$this->show_full) {
-		$bheight = $bheight / 1.5;
-	}
+		// Validate form variables
+		$this->rootid=check_rootid($this->rootid);
 
-	$pbwidth = $bwidth+12;
-	$pbheight = $bheight+14;
+		if (strlen($this->name)<30) $this->cellwidth="420";
+		else $this->cellwidth=(strlen($this->name)*14);
 
-	$this->action      =safe_GET('action');
+		$this->descPerson = WT_Person::getInstance($this->rootid);
+		$this->name=$this->descPerson->getFullName();
 
-	// Validate form variables
-	$this->pid=check_rootid($this->pid);
-
-	if (strlen($this->name)<30) $this->cellwidth="420";
-	else $this->cellwidth=(strlen($this->name)*14);
-
-	$this->descPerson = WT_Person::getInstance($this->pid);
-	$this->name=$this->descPerson->getFullName();
+		$this->setPageTitle(/* I18N: %s is a person's name */ WT_I18N::translate('Descendants of %s', $this->name));
 	}
 
 	/**
@@ -148,7 +147,7 @@ class WT_Controller_Descendancy extends WT_Controller_Base {
 		echo "<td>";
 		foreach ($person->getChildFamilies() as $cfamily) {
 			foreach ($cfamily->getSpouses() as $parent) {
-				print_url_arrow($parent->getXref().$personcount.$person->getXref(), "?pid=".$parent->getXref()."&amp;generations={$this->generations}&amp;chart_style={$this->chart_style}&amp;show_full={$this->show_full}&amp;box_width={$this->box_width}", WT_I18N::translate('Start at parents'), 2);
+				print_url_arrow($parent->getXref().$personcount.$person->getXref(), "?rootid=".$parent->getXref()."&amp;generations={$this->generations}&amp;chart_style={$this->chart_style}&amp;show_full={$this->show_full}&amp;box_width={$this->box_width}", WT_I18N::translate('Start at parents'), 2);
 				$personcount++;
 				// only show the arrow for one of the parents
 				break;
@@ -226,7 +225,7 @@ class WT_Controller_Descendancy extends WT_Controller_Base {
 		echo "<td>";
 		foreach ($spouse->getChildFamilies() as $cfamily) {
 			foreach ($cfamily->getSpouses() as $parent) {
-				print_url_arrow($parent->getXref().$personcount.$person->getXref(), "?pid=".$parent->getXref()."&amp;generations={$this->generations}&amp;chart_style={$this->chart_style}&amp;show_full={$this->show_full}&amp;box_width={$this->box_width}", WT_I18N::translate('Start at parents'), 2);
+				print_url_arrow($parent->getXref().$personcount.$person->getXref(), "?rootid=".$parent->getXref()."&amp;generations={$this->generations}&amp;chart_style={$this->chart_style}&amp;show_full={$this->show_full}&amp;box_width={$this->box_width}", WT_I18N::translate('Start at parents'), 2);
 				$personcount++;
 				// only show the arrow for one of the parents
 				break;

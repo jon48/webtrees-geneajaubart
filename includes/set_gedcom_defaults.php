@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: set_gedcom_defaults.php 12382 2011-10-23 13:42:48Z greg $
+// $Id: set_gedcom_defaults.php 12734 2011-11-14 11:52:48Z greg $
 
 if (!defined('WT_WEBTREES') || empty($ged_id) || empty($ged_name)) {
 	header('HTTP/1.0 403 Forbidden');
@@ -111,7 +111,6 @@ set_gedcom_setting($ged_id, 'SHOW_LDS_AT_GLANCE',           false);
 set_gedcom_setting($ged_id, 'SHOW_LEVEL2_NOTES',            true);
 set_gedcom_setting($ged_id, 'SHOW_LIST_PLACES',             '1');
 set_gedcom_setting($ged_id, 'SHOW_LIVING_NAMES',            WT_PRIV_USER);
-set_gedcom_setting($ged_id, 'SHOW_MARRIED_NAMES',           true);
 set_gedcom_setting($ged_id, 'SHOW_MEDIA_DOWNLOAD',          false);
 set_gedcom_setting($ged_id, 'SHOW_NO_WATERMARK',            WT_PRIV_USER);
 set_gedcom_setting($ged_id, 'SHOW_PARENTS_AGE',             true);

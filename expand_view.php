@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: expand_view.php 12203 2011-09-22 12:09:54Z greg $
+// $Id: expand_view.php 12955 2011-11-30 17:56:39Z lukasz $
 
 define('WT_SCRIPT_NAME', 'expand_view.php');
 require './includes/session.php';
@@ -69,13 +69,12 @@ foreach ($events as $event) {
 			break;
 		case 'ASSO':
 			// Associates
-			echo '<div>';
-			print_asso_rela_record($event, $person);
-			echo '</div>';
+			echo '<div><span class="details_label">', $event->getLabel(), '</span> ';
+			echo print_asso_rela_record($event, $person), '</div>';
+			break;
 		default:
 			// Simple version of print_fact()
 			echo '<div>';
-			$details=$event->getDetail();
 			echo '<span class="details_label">', $event->getLabel(), '</span> ';
 			$details=$event->getDetail();
 			if ($details!='Y' && $details!='N') {
@@ -89,7 +88,7 @@ foreach ($events as $event) {
 			}
 			$family=WT_Family::getInstance($event->getFamilyId());
 			if ($family) {
-				echo '<a href="', $family->getHtmlUrl(), '">',WT_I18N::translate('View Family'), '</a>';
+				echo '<a href="', $family->getHtmlUrl(), '">', WT_I18N::translate('View Family'), '</a>';
 			}
 			echo format_fact_place($event, true, true);
 			echo '</div>';

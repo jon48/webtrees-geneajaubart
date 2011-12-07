@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
+// $Id: module.php 12768 2011-11-16 21:53:47Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -99,7 +99,7 @@ class user_messages_WT_Module extends WT_Module implements WT_Module_Block {
 			$content .= 'return false;}'.WT_JS_END;
 			$content .= '<input type="hidden" name="action" value="deletemessage" />';
 			$content .= '<table class="list_table"><tr>';
-			$content .= '<td class="list_label">'.WT_I18N::translate('Delete')."<br /><a href=\"javascript:;\" onclick=\"return select_all();\">".WT_I18N::translate('All').'</a></td>';
+			$content .= '<td class="list_label">'.WT_I18N::translate('Delete')."<br /><a href=\"#\" onclick=\"return select_all();\">".WT_I18N::translate('All').'</a></td>';
 			$content .= '<td class="list_label">'.WT_I18N::translate('Subject:').'</td>';
 			$content .= '<td class="list_label">'.WT_I18N::translate('Date Sent:').'</td>';
 			$content .= '<td class="list_label">'.WT_I18N::translate('Email Address:').'</td>';
@@ -110,7 +110,7 @@ class user_messages_WT_Module extends WT_Module implements WT_Module_Block {
 				$content .= "<td class=\"list_value_wrap\"><input type=\"checkbox\" id=\"cb_message$key\" name=\"message_id[]\" value=\"$key\" /></td>";
 				$showmsg=preg_replace("/(\w)\/(\w)/","\$1/<span style=\"font-size:1px;\"> </span>\$2",PrintReady($message['subject']));
 				$showmsg=str_replace("@","@<span style=\"font-size:1px;\"> </span>",$showmsg);
-				$content .= "<td class=\"list_value_wrap\"><a href=\"javascript:;\" onclick=\"expand_layer('message{$key}'); return false;\"><img id=\"message{$key}_img\" src=\"".$WT_IMAGES['plus']."\" border=\"0\" alt=\"".WT_I18N::translate('Show Details')."\" title=\"".WT_I18N::translate('Show Details')."\" /> <b>".$showmsg."</b></a></td>";
+				$content .= "<td class=\"list_value_wrap\"><a href=\"#\" onclick=\"expand_layer('message{$key}'); return false;\"><img id=\"message{$key}_img\" src=\"".$WT_IMAGES['plus']."\" border=\"0\" alt=\"".WT_I18N::translate('Show Details')."\" title=\"".WT_I18N::translate('Show Details')."\" /> <b>".$showmsg."</b></a></td>";
 				$content .= '<td class="list_value_wrap">'.format_timestamp($message['created']).'</td>';
 				$content .= '<td class="list_value_wrap">';
 				$user_id=get_user_id($message['from']);
@@ -131,11 +131,11 @@ class user_messages_WT_Module extends WT_Module implements WT_Module_Block {
 				$message['body'] = expand_urls($message['body']);
 
 				$content .= PrintReady($message['body']).'<br /><br />';
-				if (strpos($message['subject'], /* I18N: Shortcut for answer the message */ WT_I18N::translate('RE:'))===false) {
-					$message['subject']= /* I18N: Shortcut for answer the message */ WT_I18N::translate('RE:').$message['subject'];
+				if (strpos($message['subject'], /* I18N: When replying to an email, the subject becomes "RE: <subject>" */ WT_I18N::translate('RE: '))!==0) {
+					$message['subject']= WT_I18N::translate('RE: ').$message['subject'];
 				}
 				if ($user_id) {
-					$content .= "<a href=\"javascript:;\" onclick=\"reply('".addslashes($message['from'])."', '".addslashes($message['subject'])."'); return false;\">".WT_I18N::translate('Reply').'</a> | ';
+					$content .= "<a href=\"#\" onclick=\"reply('".addslashes($message['from'])."', '".addslashes($message['subject'])."'); return false;\">".WT_I18N::translate('Reply').'</a> | ';
 				}
 				$content .= "<a href=\"index.php?action=deletemessage&amp;message_id={$key}\" onclick=\"return confirm('".WT_I18N::translate('Are you sure you want to delete this message?  It cannot be retrieved later.')."');\">".WT_I18N::translate('Delete').'</a></div></td></tr>';
 			}

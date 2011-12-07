@@ -1,7 +1,7 @@
 /* clearbox.js - Author Brian Holland .... email webman@windmillway.f2s.com    -  (modified from Clearbox.js - Author Pyro ... email pyrex@chello.hu)
  * @package webtrees
  * @subpackage Module
- * @version $Id: clearbox.js 12260 2011-10-06 16:18:21Z greg $
+ * @version $Id: clearbox.js 12523 2011-11-04 12:00:17Z greg $
  * @author Brian Holland
 */
 
@@ -365,7 +365,6 @@
 			}
 		}
 		document.write('<' + 'script');
-		document.write(' language="javascript"');
 		document.write(' type="text/javascript"');
 		document.write(' src="'+CB_jsdir+'clsource_music.js">');
 		document.write('</' + 'script' + '>');

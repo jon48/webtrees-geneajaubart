@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: site-unavailable.php 12362 2011-10-21 19:38:54Z greg $
+// $Id: site-unavailable.php 12957 2011-12-01 18:15:07Z greg $
 
 define('WT_SCRIPT_NAME', 'site-unavailable.php');
 
@@ -31,6 +31,8 @@ define('WT_GED_ID', 0);
 define('WT_USER_ID', 0);
 define('WT_DATA_DIR', realpath('data').DIRECTORY_SEPARATOR);
 define('WT_DEBUG_LANG', false); // The translation library needs this
+$WT_SESSION=new stdClass();
+$WT_SESSION->locale='';
 // Invoke the Zend Framework Autoloader, so we can use Zend_XXXXX and WT_XXXXX classes
 set_include_path(WT_ROOT.'library'.PATH_SEPARATOR.get_include_path());
 require_once 'Zend/Loader/Autoloader.php';
@@ -42,9 +44,10 @@ header('Content-Type: text/html; charset=UTF-8');
 header($_SERVER["SERVER_PROTOCOL"].' 503 Service Temporarily Unavailable');
 
 echo
-	'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
-	'<html xmlns="http://www.w3.org/1999/xhtml" ', WT_I18N::html_markup(), '>',
+	'<!DOCTYPE html>',
+	'<html ', WT_I18N::html_markup(), '>',
 	'<head>',
+	'<meta charset="UTF-8">',
 	'<title>Site Unavailable - webtrees</title>',
 	'<meta name="robots" content="noindex,follow" />',
 	'<style type="text/css">
