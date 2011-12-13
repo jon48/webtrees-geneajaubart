@@ -14,7 +14,12 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-print_header(WT_I18N::translate('Sosa Statistics'));
+global $controller;
+
+$controller=new WT_Controller_Base();
+$controller
+	->setPageTitle(WT_I18N::translate('Sosa Statistics'))
+	->pageHeader();
 
 echo '<div class="center"><h2>', WT_I18N::translate('Sosa Statistics'), '</h2>';
 
@@ -112,7 +117,5 @@ else{
 }
 
 echo '</div>';
-
-print_footer();
 
 ?>

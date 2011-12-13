@@ -27,7 +27,7 @@ class WT_Perso_Functions_PatronymicLineage {
 	 * @param int $gedcomid Gedcom ID
 	 */
 	public static function printLineages($surname, $legend, $gedcomid) {
-		global $TEXT_DIRECTION, $_tabPlaces, $_usedIndis;
+		global $_tabPlaces, $_usedIndis;
 
 		$indilist = WT_Query_Name::individuals(strtoupper($surname), null, null, false, false, $gedcomid);
 
@@ -43,7 +43,7 @@ class WT_Perso_Functions_PatronymicLineage {
 		if(!$_tabPlaces) $_tabPlaces = array();
 
 		//Initialise table and print title
-		echo '<table class="list_table '.$TEXT_DIRECTION.'">',
+		echo '<table class="list_table">',
 			'<tr><td class="list_label">',
 		$legend,
 			'</td></tr>';
@@ -108,7 +108,7 @@ class WT_Perso_Functions_PatronymicLineage {
 	 * @param WT_Person $indi_root Root individual to start the lineage from
 	 */
 	private static function printIndiLineage(WT_Person $indi_root){
-		global $TEXT_DIRECTION, $_usedIndis, $_tabPlaces;
+		global $_usedIndis, $_tabPlaces;
 
 		if($indi_root){
 			$dindi = new WT_Perso_Person($indi_root);
@@ -140,7 +140,7 @@ class WT_Perso_Functions_PatronymicLineage {
 							$marrdate = strip_tags($fam->getMarriageDate()->Display());
 							$marryear = $fam->getMarriageYear();
 						}
-						echo '<span dir='.$TEXT_DIRECTION.' class="details1" title="'.$marrdate.'">'.WT_ICON_RINGS.$marryear.'</span></a>&nbsp;';
+						echo '<span class="details1" title="'.$marrdate.'">'.WT_ICON_RINGS.$marryear.'</span></a>&nbsp;';
 						echo WT_Perso_Functions_Print::getIndividualForList($spouse);
 					}
 					// Get the children to print

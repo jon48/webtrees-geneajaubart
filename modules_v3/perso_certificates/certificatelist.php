@@ -14,6 +14,9 @@ if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
+
+global $controller;
+
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 /**
@@ -21,95 +24,78 @@ require_once WT_ROOT.'includes/functions/functions_print_lists.php';
  *
  * @param array $certificates contain certificates list.
  * @param string $city Certificate city
+ * @return string HTML code for table of certificates
  */
-function print_certificate_table($certificates, $city) {
-	global $SHOW_LAST_CHANGE, $TEXT_DIRECTION, $WT_IMAGES, $SEARCH_SPIDER;
+function format_certificate_table($certificates, $city) {
+	global $SHOW_LAST_CHANGE, $TEXT_DIRECTION, $WT_IMAGES, $SEARCH_SPIDER, $controller;
 
 	if (!$certificates) {
 		return;
 	}
+	$html = '';
 	$table_id = "ID".floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
-	echo WT_JS_START;?>
-	jQuery(document).ready(function(){
-		jQuery('#<?php echo $table_id; ?>').dataTable( {
-			"sDom": '<"H"pf<"dt-clear">irl>t<"F"pl>',
-			"oLanguage": {
-				"sLengthMenu": '<?php echo /* I18N: Display %s [records per page], %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="10">10<option value="20">20</option><option value="30">30</option><option value="50">50</option><option value="100">100</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
-				"sZeroRecords": '<?php echo WT_I18N::translate('No records to display');?>',
-				"sInfo": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_'); ?>',
-				"sInfoEmpty": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '0', '0', '0'); ?>',
-				"sInfoFiltered": '<?php echo /* I18N: %s is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_'); ?>',
-				"sProcessing": '<?php echo WT_I18N::translate('Loading...');?>',
-				"sSearch": '<?php echo WT_I18N::translate('Filter');?>',				"oPaginate": {
-					"sFirst":    '<?php echo /* I18N: button label, first page    */ WT_I18N::translate('first');    ?>',
-					"sLast":     '<?php echo /* I18N: button label, last page     */ WT_I18N::translate('last');     ?>',
-					"sNext":     '<?php echo /* I18N: button label, next page     */ WT_I18N::translate('next');     ?>',
-					"sPrevious": '<?php echo /* I18N: button label, previous page */ WT_I18N::translate('previous'); ?>'
-				}
-			},
-			"bJQueryUI": true,
-			"bAutoWidth":false,
-			"bProcessing": true,
-			"bStateSave": true,
-			"aoColumns": [
-                    /* 0-Date */  			{ "sWidth": "15%" },
-                    /* 1-Type */ 			{ "sWidth": "5%", "bSearchable": false },
-                    /* 2-CertificateSort */ { "bVisible" : false },
-                    /* 3-Certificate */     { "iDataSort" : 2 }
-                ],
-            "aaSorting": [[0,'asc'], [2,'asc']],
-			"iDisplayLength": 20,
-			"sPaginationType": "full_numbers"
-	   });
-		jQuery(".certificate-list").css('visibility', 'visible');
-		jQuery(".loading-image").css('display', 'none');
-	});
-	<?php echo WT_JS_END;
+	$controller
+			->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+			->addInlineJavaScript('
+				/* Initialise datatables */
+				jQuery.fn.dataTableExt.oSort["unicode-asc"  ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
+				jQuery.fn.dataTableExt.oSort["unicode-desc" ]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
+				jQuery.fn.dataTableExt.oSort["num-html-asc" ]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a<b) ? -1 : (a>b ? 1 : 0);};
+				jQuery.fn.dataTableExt.oSort["num-html-desc"]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a>b) ? -1 : (a<b ? 1 : 0);};
+				oTable'.$table_id.' = jQuery("#'.$table_id.'").dataTable( {
+					"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
+					'.WT_I18N::datatablesI18N().',
+					"bJQueryUI": true,
+					"bAutoWidth":false,
+					"bProcessing": true,
+					"aoColumns": [
+		                    /* 0-Date */  			{ "sWidth": "15%" },
+		                    /* 1-Type */ 			{ "sWidth": "5%", "bSearchable": false },
+		                    /* 2-CertificateSort */ { "sType": "unicode", "bVisible" : false },
+		                    /* 3-Certificate */     { "iDataSort" : 2, "sClass": "left" }
+		                ],
+		            "aaSorting": [[0,"asc"], [2,"asc"]],
+					"iDisplayLength": 20,
+					"sPaginationType": "full_numbers"
+			   });
+				jQuery(".certificate-list").css("visibility", "visible");
+				jQuery(".loading-image").css("display", "none");
+			');
 	//--table wrapper
-	echo '<div class="loading-image">&nbsp;</div>';
-	echo '<div class="certificate-list">';
-	echo '<fieldset><legend>';
-	if (isset($WT_IMAGES['certificate-list'])) {
-		echo '<img src="'.$WT_IMAGES['certificate-list'].'" alt="" align="middle" /> ';
-	}
-	if ($city != '') {
-		echo $city;
-	} else {
-		echo WT_I18N::translate('Certificates');
-	}
-	echo '</legend>';
-
+	$html .= '<div class="loading-image">&nbsp;</div>';
+	$html .=  '<div class="certificate-list">';
 	//-- table header
-	echo '<table id="', $table_id, '"><thead><tr>';
-	echo '<th>', WT_I18N::translate('Date'), '</th>';
-	echo '<th>', WT_I18N::translate('Type'), '</th>';
-	echo '<th>certificatesort</th>';
-	echo '<th>', WT_I18N::translate('Certificate'), '</th>';
-	echo '</tr></thead>';
+	$html .= '<table id="'.$table_id.'"><thead><tr>';
+	$html .= '<th>'.WT_I18N::translate('Date').'</th>';
+	$html .= '<th>'.WT_I18N::translate('Type').'</th>';
+	$html .= '<th>certificatesort</th>';
+	$html .= '<th>'.WT_I18N::translate('Certificate').'</th>';
+	$html .= '</tr></thead>';
 	//-- table body
-	echo '<tbody>';
-	$n=0;
+	$html .= '<tbody>';
 	foreach ($certificates as $certificate) {
-		echo '<tr>';
+		$html .= '<tr>';
 		//-- Certificate date
 		$date = $certificate[1];
-		echo '<td>', htmlspecialchars($date), '</td>';
+		$html .= '<td>'.htmlspecialchars($date).'</td>';
 		//-- Certificate type
 		$type = $certificate[2];
-		echo '<td>', htmlspecialchars($type), '</td>';
+		$html .= '<td>'.htmlspecialchars($type).'</td>';
 		//-- Certificate name
 		$name = $certificate[3];
 		$sortname = "";
 		$ct_names=preg_match("/([A-Z]{2,})/", $name, $match);
 		if($ct_names>0) $sortname = $match[1].'_';
 		$sortname .= $name;
-		echo '<td>', htmlspecialchars($sortname), '</td>';
-		echo '<td align="', get_align($name), '"><a href="module.php?mod=perso_certificates&mod_action=certificatelist&city=',rawurlencode($city),'&certif=',rawurlencode($certificate[0]),'">',$name,'</a></td>';
-		echo '</tr>';
+		$html .= '<td>'.htmlspecialchars($sortname).'</td>';
+		$html .= '<td><a href="module.php?mod=perso_certificates&mod_action=certificatelist&city='.rawurlencode($city).'&certif='.rawurlencode($certificate[0]).'">'.$name.'</a></td>';
+		$html .= '</tr>';
 	}
-	echo '</tbody>';
-	echo '</table></fieldset>';
-	echo '</div>';
+	$html .= '</tbody>';
+	$html .= '</table>';
+	$html .= '</div>';
+	
+	return $html;
 }
 
 $requestedCity = str_replace(@"\'", "'", safe_POST('city'));
@@ -122,10 +108,12 @@ if(get_module_setting($this->getName(), 'PC_SHOW_CERT', WT_PRIV_HIDE) < WT_USER_
 	exit;
 }
 
-// -- print html header information
-print_header(WT_I18N::translate('Certificates'));
+$controller=new WT_Controller_Base();
+$controller
+	->setPageTitle(WT_I18N::translate('Certificates'))
+	->pageHeader();
 
-echo '<div class="center"><h2>', WT_I18N::translate('Certificates'), '</h2>';
+echo '<div class="pcertif-list-page center"><h2>', WT_I18N::translate('Certificates'), '</h2>';
 
 // Get Javascript variables from lb_config.php ---------------------------
 if (WT_USE_LIGHTBOX) {
@@ -148,16 +136,14 @@ echo '</select>',
 if($requestedCity){	
 	if(!$requestedCertif){
 		$tabCertifs=WT_Perso_Functions_Certificates::getCertificatesList($requestedCity);
-		print_certificate_table($tabCertifs, $requestedCity);
+		echo format_certificate_table($tabCertifs, $requestedCity);
 	}
 	else{
-		echo WT_JS_START;
-		?>	jQuery(document).ready(function() {
+		$controller
+			->addInlineJavaScript('
 				jQuery("#certificate-tabs").tabs();
-				jQuery("#certificate-tabs").css('visibility', 'visible');
-			});
-		<?php
-		echo WT_JS_END;
+				jQuery("#certificate-tabs").css("visibility", "visible");
+			');
 		
 		//Prepare data for images and linked records
 		$certificate = $requestedCertif;
@@ -197,14 +183,14 @@ if($requestedCity){
 		//Populate related individuals tab
 		if(count($tabIndi)>0){
 			echo '<div id="indi-certificate">';
-			print_indi_table($tabIndi, WT_I18N::translate('Individuals linked to this certificate'));
+			echo format_indi_table($tabIndi, WT_I18N::translate('Individuals linked to this certificate'));
 			echo '</div>'; // close "indi-certificate"
 		}
 		
 		//Populate related families tab
 		if(count($tabFam)>0){
 			echo '<div id="fam-certificate">';
-			print_fam_table($tabFam, WT_I18N::translate('Families linked to this certificate'));
+			echo format_fam_table($tabFam, WT_I18N::translate('Families linked to this certificate'));
 			echo '</div>'; // close "fam-certificate"
 		}
 		
@@ -215,7 +201,5 @@ if($requestedCity){
 }
 
 echo '</div>';
-
-print_footer();
 
 ?>

@@ -46,7 +46,7 @@ class perso_issourced_WT_Module extends WT_Module implements WT_Module_Sidebar, 
 	//Implement WT_Perso_IndividualHeaderExtender
 	public function h_extend_indi_header_icons(WT_Controller_Individual $ctrlIndi) {
 		if($ctrlIndi){
-			$dindi = new WT_Perso_Person($ctrlIndi->indi);
+			$dindi = new WT_Perso_Person($ctrlIndi->getSignificantIndividual());
 			if ($dindi->canDisplayIsSourced()) return WT_Perso_Functions_Print::formatIsSourcedIcon('R', $dindi->isSourced(), 'INDI', 1, 'large');
 		}
 		return '';
@@ -87,36 +87,35 @@ class perso_issourced_WT_Module extends WT_Module implements WT_Module_Sidebar, 
 	
 	// Implement WT_Module_Sidebar
 	public function getSidebarContent() {	
-		$root = WT_Person::getInstance($this->controller->pid);
-		if ($root!=null) {
-			$this->controller = new WT_Controller_Individual();
-			$this->controller->indi=$root;
-			$this->controller->pid=$root->getXref();
-			$this->setController($this->controller);
-		}
-		
-		$dindi = new WT_Perso_Person($this->controller->indi);
+		global $controller;
+				
+		ob_start();
+		$root = $controller->getSignificantIndividual();
+		if ($root) {		
+			$dindi = new WT_Perso_Person($root);
 			
-		if (!$dindi->canDisplayIsSourced()) {
-			print_privacy_error();
-		} else {
-			echo '<table class="issourcedtable">';
-			echo '<tr><td class="slabel">'.WT_Gedcom_Tag::getLabel('INDI').'</td><td class="svalue">'.WT_Perso_Functions_Print::formatIsSourcedIcon('R', $dindi->isSourced(), 'INDI', 1).'</td></tr>';
-			echo '<tr><td class="slabel">'.WT_Gedcom_Tag::getLabel('BIRT').'</td><td class="svalue">'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $dindi->isBirthSourced(), 'BIRT', 1).'</td></tr>';
-			$fams = $this->controller->indi->getSpouseFamilies();
-			($ct = count($fams)) > 1 ? $nb=1 : $nb=' ';
-			foreach($fams as $fam){
-				$dfam = new WT_Perso_Family($fam);
-				echo '<tr><td class="slabel right"><a href="'.$fam->getHtmlUrl().'"> '.WT_Gedcom_Tag::getLabel('MARR');
-				if($ct > 1){
-					echo ' ',$nb;
-					$nb++;
-				}
-				echo '</a></td><td class="svalue">'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $dfam->isMarriageSourced(), 'MARR', 1).'</td></tr>';
-			}			
-			if($this->controller->indi->isDead()) echo '<tr><td class="slabel">'.WT_Gedcom_Tag::getLabel('DEAT').'</td><td class="svalue">'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $dindi->isDeathSourced(), 'DEAT', 1).'</td></tr>';	
-			echo '</table>';
-		}
+			if (!$dindi->canDisplayIsSourced()) {
+				print_privacy_error();
+			} else {
+				echo '<table class="issourcedtable">';
+				echo '<tr><td class="slabel">'.WT_Gedcom_Tag::getLabel('INDI').'</td><td class="svalue">'.WT_Perso_Functions_Print::formatIsSourcedIcon('R', $dindi->isSourced(), 'INDI', 1).'</td></tr>';
+				echo '<tr><td class="slabel">'.WT_Gedcom_Tag::getLabel('BIRT').'</td><td class="svalue">'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $dindi->isBirthSourced(), 'BIRT', 1).'</td></tr>';
+				$fams = $root->getSpouseFamilies();
+				($ct = count($fams)) > 1 ? $nb=1 : $nb=' ';
+				foreach($fams as $fam){
+					$dfam = new WT_Perso_Family($fam);
+					echo '<tr><td class="slabel right"><a href="'.$fam->getHtmlUrl().'"> '.WT_Gedcom_Tag::getLabel('MARR');
+					if($ct > 1){
+						echo ' ',$nb;
+						$nb++;
+					}
+					echo '</a></td><td class="svalue">'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $dfam->isMarriageSourced(), 'MARR', 1).'</td></tr>';
+				}			
+				if($root->isDead()) echo '<tr><td class="slabel">'.WT_Gedcom_Tag::getLabel('DEAT').'</td><td class="svalue">'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $dindi->isDeathSourced(), 'DEAT', 1).'</td></tr>';	
+				echo '</table>';
+			}
+		}		
+		return ob_get_clean();
 	}
 	
 	// Implement WT_Module_Sidebar

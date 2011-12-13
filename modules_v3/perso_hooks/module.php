@@ -141,96 +141,76 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 	 * Display an editable list of installed hooks in order for the admin to configure statuses and priorities.
 	 */
 	private function config() {
-
-		if(WT_USER_IS_ADMIN) {
 		
-			require WT_ROOT.'includes/functions/functions_edit.php';
-			
-			print_header($this->getTitle());
-	
-			$hooks= WT_Perso_Hook::getRawInstalledHooks();
-	
-			?>
-			<script type="text/javascript">
-			//<![CDATA[
-			
-			  function reindexMods(id) {
-					jQuery('#'+id+' input').each(
-						function (index, value) {
-							value.value = index+1;
-						});
-			  }
-			
-			  jQuery(document).ready(function() {
-	
-				  var oTable = jQuery('#installed_table').dataTable( {
-						"oLanguage": {
-						"sLengthMenu": '<?php echo /* I18N: %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', '<select><option value="10">10</option><option value="20">20</option><option value="30">30</option><option value="40">40</option><option value="50">50</option><option value="-1">'.WT_I18N::translate('All').'</option></select>'); ?>',
-						"sZeroRecords": '<?php echo WT_I18N::translate('No records to display');?>',
-						"sInfo": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_'); ?>',
-						"sInfoEmpty": '<?php echo /* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '0', '0', '0'); ?>',
-						"sInfoFiltered": '<?php echo /* I18N: %s is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_'); ?>',
-						"sSearch": '<?php echo WT_I18N::translate('Search');?>',
-						"oPaginate": {
-							"sFirst": '<?php echo /* I18N: button label, first page    */ WT_I18N::translate('first'); ?>',
-							"sLast": '<?php echo /* I18N: button label, last page     */ WT_I18N::translate('last'); ?>',
-							"sNext": '<?php echo /* I18N: button label, next page     */ WT_I18N::translate('next'); ?>',
-							"sPrevious": '<?php echo /* I18N: button label, previous page */ WT_I18N::translate('previous'); ?>'
-						}
-						},
-						"sDom": '<"H"prf>t<"F"li>',
-						"bJQueryUI": true,
-						"bAutoWidth":false,
-						"aaSorting": [[ 1, "asc" ], [ 2, "asc" ]],
-						"iDisplayLength": 10,
-						"sPaginationType": "full_numbers",
-						"aoColumnDefs": [
-							{ "bSortable": false, "aTargets": [ 0, 4 ] }
-						]
-				  });
-	
-			});
-			//]]>
-			</script>
-			
-			<?php
-			
-			echo '<div align="center">',
-				'<div id="tabs">';
-			echo WT_I18N::translate('Help').help_link('admin_config', $this->getName());
-			echo '<form method="post" action="#">',
-						'<table id="installed_table" class="tablesorter" border="0" cellpadding="0" cellspacing="1">',
-							'<thead>',
-								'<tr>',
-								'<th>',WT_I18N::translate('Enabled'),'</th>',
-								'<th>',WT_I18N::translate('Hook Function'),'</th>',
-								'<th>',WT_I18N::translate('Hook Context'),'</th>',
-								'<th>',WT_I18N::translate('Module Name'),'</th>',
-								'<th>',WT_I18N::translate('Priority (1 is high)'),'</th>',
-								'</tr>',
-							'</thead>',
-							'<tbody>';
-								foreach ($hooks as $id => $hook) {
-									echo '<tr><td>', two_state_checkbox('status-'.($hook->id), ($hook->status)=='enabled'), '</td>',
-										'<td>',$hook->hook,'</td>',
-										'<td>',$hook->context,'</td>',
-										'<td>',$hook->module,'</td>',
-										'<td><input type="text" class="center" size="2" value="',$hook->priority,'" name="moduleorder-',$hook->id,'" /></td>',
-										'</tr>';
-								}
-			echo 			'</tbody>',
-						'</table>',
-						'<input type="submit" value="',WT_I18N::translate('Save'),'" />',
-					'</form>',
-				'</div>',
-			'</div>';
-	
-			print_footer();
+		$controller=new WT_Controller_Base();
+		$controller
+			->requireAdminLogin()
+			->setPageTitle($this->getTitle())
+			->pageHeader();
 		
-		} else {
-			header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
-			exit;
-		}
+		require WT_ROOT.'includes/functions/functions_edit.php';
+	
+		$hooks= WT_Perso_Hook::getRawInstalledHooks();
+		
+		echo '<div align="center">',
+			'<div id="tabs">';
+		echo WT_I18N::translate('Help').help_link('admin_config', $this->getName());
+		echo '<form method="post" action="#">',
+					'<table id="installed_table" class="tablesorter" border="0" cellpadding="0" cellspacing="1">',
+						'<thead>',
+							'<tr>',
+							'<th>',WT_I18N::translate('Enabled'),'</th>',
+							'<th>ENABLED_SORT</th>',
+							'<th>',WT_I18N::translate('Hook Function'),'</th>',
+							'<th>',WT_I18N::translate('Hook Context'),'</th>',
+							'<th>',WT_I18N::translate('Module Name'),'</th>',
+							'<th>',WT_I18N::translate('Priority (1 is high)'),'</th>',
+							'<th>PRIORITY_SORT</th>',
+							'</tr>',
+						'</thead>',
+						'<tbody>';
+							foreach ($hooks as $id => $hook) {
+								echo '<tr><td>', two_state_checkbox('status-'.($hook->id), ($hook->status)=='enabled'), '</td>',
+									'<td>',(($hook->status)=='enabled'),'</td>',
+									'<td>',$hook->hook,'</td>',
+									'<td>',$hook->context,'</td>',
+									'<td>',$hook->module,'</td>',
+									'<td><input type="text" class="center" size="2" value="',$hook->priority,'" name="moduleorder-',$hook->id,'" /></td>',
+									'<td>',$hook->priority,'</td>',
+									'</tr>';
+							}
+		echo 			'</tbody>',
+					'</table>',
+					'<input type="submit" value="',WT_I18N::translate('Save'),'" />',
+				'</form>',
+			'</div>',
+		'</div>';
+		
+		$controller
+		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavaScript('
+				  	jQuery(document).ready(function() {
+		
+					  var oTable = jQuery("#installed_table").dataTable( {
+							"sDom": \'<"H"prf>t<"F"li>\',
+							'.WT_I18N::datatablesI18N().',
+							"bJQueryUI": true,
+							"bAutoWidth":false,
+							"aaSorting": [[ 2, "asc" ], [ 3, "asc" ]],
+							"iDisplayLength": 10,
+							"sPaginationType": "full_numbers",
+							"aoColumns": [
+								/* 0 Enabled 		*/	{ "iDataSort": 1, "sClass": "center" },
+								/* 1 Enabled sort	*/	{ "bVisible": false},
+								/* 2 Hook function	*/	null,
+								/* 3 Hook context	*/	null,
+								/* 4 Module name	*/	null,						
+								/* 5 Priority		*/	{ "iDataSort": 6, "sClass": "center" },
+								/* 6 Priority sort	*/	{ "sType": "numeric", "bVisible": false},
+							]
+					  });
+					});
+				');	
 	}
 
 }

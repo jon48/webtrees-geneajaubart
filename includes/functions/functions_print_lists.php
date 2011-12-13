@@ -767,14 +767,13 @@ function format_fam_table($datalist, $option='') {
 				$sex_image='';
 			}
 			// Only show married names if they are the name we are filtering by.
-			if ($name['type']!='_MARNM' || $num==$husb->getPrimaryName()) {
-				$html .= '<a '. $title. ' href="'. $family->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image. '<br/>';
+			if ($name['type']!='_MARNM' || $num==$husb->getPrimaryName()) {			
+				//PERSO Add Sosa Icon
+				$dhusb = new WT_Perso_Person($husb);
+				$html .= '<a '. $title. ' href="'. $family->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image.WT_Perso_Functions_Print::formatSosaNumbers($dhusb->getSosaNumbers(), 1, 'smaller'). '<br/>';
+				//END PERSO
 			}
 		}
-		//PERSO Add Sosa Icon
-		$dhusb = new WT_Perso_Person($husb);
-		$html .= WT_Perso_Functions_Print::formatSosaNumbers($dhusb->getSosaNumbers(), 1, 'smaller');
-		//END PERSO
 		// Husband parents
 		$html .= $husb->getPrimaryParentsNames('parents_'.$table_id.' details1', 'none');
 		$html .= '</td>';
@@ -820,13 +819,12 @@ function format_fam_table($datalist, $option='') {
 			}
 			// Only show married names if they are the name we are filtering by.
 			if ($name['type']!='_MARNM' || $num==$wife->getPrimaryName()) {
-				$html .= '<a '. $title. ' href="'. $family->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image. '<br/>';
+				//PERSO Add Sosa Icon
+				$dwife = new WT_Perso_Person($wife);
+				$html .= '<a '. $title. ' href="'. $family->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image.WT_Perso_Functions_Print::formatSosaNumbers($dwife->getSosaNumbers(), 1, 'smaller'). '<br/>';
+				//END PERSO
 			}
 		}
-		//PERSO Add Sosa Icon
-		$dwife = new WT_Perso_Person($wife);
-		$html .= WT_Perso_Functions_Print::formatSosaNumbers($dwife->getSosaNumbers(), 1, 'smaller');
-		//END PERSO
 		// Wife parents
 		$html .= $wife->getPrimaryParentsNames("parents_".$table_id." details1", 'none');
 		$html .= '</td>';

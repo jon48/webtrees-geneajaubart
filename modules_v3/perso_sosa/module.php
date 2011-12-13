@@ -68,12 +68,11 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 		
 		$menu = null;
 		if(WT_Perso_Functions_Sosa::isModuleOperational()){
-			echo WT_JS_START;
-			echo 'function compute_sosa(pid) {',
-					'window.open(\'module.php?mod=perso_sosa&mod_action=computesosainterface&pid=\' + pid, \'_blank\', \'top=50,left=50,width=510,height=520,resizable=1,scrollbars=1\');',
-					'return false;',
-				'}';
-			echo WT_JS_END;
+			$controller->addInlineJavaScript(
+				'function compute_sosa(pid) {'.
+					'window.open(\'module.php?mod=perso_sosa&mod_action=computesosainterface&pid=\' + pid, \'_blank\', \'top=50,left=50,width=510,height=520,resizable=1,scrollbars=1\');'.
+					'return false;'.
+				'}');
 			
 			//-- main menu
 			$menu = new WT_Menu(WT_I18N::translate('Sosa Statistics'), 'module.php?mod=perso_sosa&mod_action=statistics', 'menu-sosa', 'down');
@@ -101,7 +100,7 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			//-- recompute Sosa submenu
 			if (WT_USER_CAN_EDIT && !empty($controller) && $controller instanceof WT_Controller_Individual ) {
 				$submenu = new WT_Menu(WT_I18N::translate('Complete Sosas'), '#');
-				$submenu->addOnclick('return compute_sosa(\''.$controller->pid.'\');');
+				$submenu->addOnclick('return compute_sosa(\''.$controller->getSignificantIndividual()->getXref().'\');');
 				$submenu->addIcon('recompute_sosa');
 				$submenu->addClass('submenuitem separator_top', 'submenuitem_hover', '', 'icon_small_recompute_sosa', 'menu-sosa-recompute');
 				$menu->addSubMenu($submenu);
@@ -154,7 +153,7 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 	//Implement WT_Perso_IndividualHeaderExtender
 	public function h_extend_indi_header_icons(WT_Controller_Individual $ctrlIndi) {
 		if($ctrlIndi){
-			$dindi = new WT_Perso_Person($ctrlIndi->indi);
+			$dindi = new WT_Perso_Person($ctrlIndi->getSignificantIndividual());
 			return WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1, 'large');
 		}
 		return '';
@@ -167,7 +166,7 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 	//Implement WT_Perso_IndividualHeaderExtender
 	public function h_extend_indi_header_right(WT_Controller_Individual $ctrlIndi) {
 		if($ctrlIndi){
-			$dindi = new WT_Perso_Person($ctrlIndi->indi);
+			$dindi = new WT_Perso_Person($ctrlIndi->getSignificantIndividual());
 			return array('indi-header-sosa',  WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 2, 'normal'));
 		}
 		return '';
@@ -267,7 +266,11 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 	 */
 	private function computeSosaEditInterface(){
 		
-		print_simple_header(WT_I18N::translate('Compute Sosas'));
+		$controller=new WT_Controller_Simple();
+		$controller
+		->setPageTitle(WT_I18N::translate('Compute Sosas'))
+		->pageHeader()
+		->requireMemberLogin();
 		
 		echo '<div class="helpheader">', WT_I18N::translate('Compute Sosas'), '</div>';
 		
@@ -277,7 +280,6 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			
 			echo '<div id="loadingarea"></div>';
 		}
-		print_simple_footer();
 		
 	}
 	

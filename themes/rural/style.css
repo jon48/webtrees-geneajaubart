@@ -35,7 +35,7 @@
 /* Add a permanent scrollbar, to prevent "flickering" when hover effects lengthen page */
 html { overflow-y:scroll; }
 
-body {
+#body {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 10px;
 	margin: 0px auto auto auto;
@@ -48,6 +48,8 @@ body {
 	height: auto;
 	margin: auto;
 }
+
+#headerdiv, #bodydiv, #footerdiv { color: #555555; font: 12px tahoma,arial,helvetica,sans-serif;}
 
 #header_simple{
 	height:1em;
@@ -1000,7 +1002,7 @@ html[dir='rtl'] .header_search {
 	float:left;
 }
 
-#flash-messages { clear:both; }
+#flash-messages { clear:both; width: 98%; margin: auto;}
 
 /* Style for the subbar in  */ /* facts_value */
 .subbar {
@@ -1521,7 +1523,7 @@ dd {display:inline; margin:0;}
 .givn-list th{cursor:pointer;white-space: nowrap;padding:2px;text-align:center;}
 .givn-list th{cursor:pointer;white-space: nowrap;padding:2px;text-align:center;}
 #source-details h2,#source-list-page h2, #note-details h2, #note-list-page h2, #repo-details h2, #repo-list-page h2, #media-details h2, #media-list-page h2  {margin-bottom:20px; text-align:center;}
-#source-tabs, #note-tabs, #repo-tabs, #media-tabs, #certificate-tabs {margin:auto; visibility:hidden; width:90%;}
+#source-tabs, #note-tabs, #repo-tabs, #media-tabs, #certificate-tabs {margin:auto; visibility:hidden; width:95%;}
 #source-edit, #note-edit, #repo-edit, #media-edit, #certificate-edit {overflow-x:auto;}
 .media-list td img {display:block; height:40px; margin:3px auto;}
 .loading-image{background:transparent url(../../images/loading.gif) 50% 50% no-repeat; height:50px; margin:50px;}
@@ -1727,7 +1729,7 @@ html[dir='rtl'] #extra-menu.makeMenu li ul {left:0px;right:auto;}
 html[dir='rtl'] .makeMenu li ul {left:0px; right:auto;}
 html[dir='rtl'] .makeMenu li ul li {text-align:right;}
 html[dir='rtl'] .makeMenu li {border-left:none; border-right: 2px solid;}
-html[dir='rtl'] .makeMenu li:last-child, html[dir='rtl'] .makeMenu li ul li  {border:none;}
+html[dir='rtl'] .makeMenu li:first-child, html[dir='rtl'] .makeMenu li ul li  {border:none;}
 
 
 /* ========= Positioning edit, copy, delete links ============= */
@@ -1859,6 +1861,7 @@ html[dir='rtl'] .itr:hover .popup {left:0; right:auto;}
 .ui-accordion .ui-accordion-content {overflow:visible;}
 .ui-accordion .ui-accordion-header {text-align:center; margin-top:0;}
 .ui-accordion .ui-accordion-header a {padding: 2px;}
+
 .ui-helper-reset {line-height: 1.5;}
 
 html[dir='rtl'] .ui-tabs {direction:rtl;}
@@ -1876,6 +1879,8 @@ html[dir='rtl'] .ui-accordion .ui-accordion-header .ui-icon {right: 0.5em;}
 .ui-tabs-nav li.ui-tabs-selected 			 { background: #f4f0ed;}
 .ui-tabs-nav li.ui-tabs-selected a	 		 { font-weight:600; color: #62584D; }
 .ui-tabs-nav li.ui-tabs-selected a:hover	 { font-weight:600; color: #62584D; }
+
+.ui-state-highlight { padding: 3px; text-align: center;}
 
 /* jQuery.datatable styling general over-rides */
 .odd {background-color:#E9E2DB;}
@@ -1895,7 +1900,7 @@ html[dir='rtl'] .ui-accordion .ui-accordion-header .ui-icon {right: 0.5em;}
 #loading {text-align:center;}
 .DataTables_sort_wrapper {position:relative; margin: 0 20px;}
 .DataTables_sort_wrapper span {left:0; margin-left:-20px; margin-top:-8px; position:absolute; top:50%;}
-.dataTables_wrapper {margin-bottom:10px;}
+.dataTables_wrapper {margin-bottom:10px; text-align: left;}
 .dataTables_wrapper .ui-widget-header {background-color: #F3EFEF;}
 .dataTables_wrapper, .dataTables_wrapper a, .dataTables_wrapper .ui-state-default, .dataTables_wrapper .ui-state-default a {color:#62584D}
 .dataTables_wrapper a:hover, .dataTables_wrapper .ui-state-default a:hover {color:#9f8c77}
@@ -1905,6 +1910,7 @@ html[dir='rtl'] .ui-accordion .ui-accordion-header .ui-icon {right: 0.5em;}
 .dataTables_wrapper .ui-state-active {opacity:0.67;border-color: #CCC;}
 .fg-toolbar {text-align:center; }
 /*.dataTables_wrapper .ui-state-default {background: none #D3C6B8}*/
+.ui-accordeon-header .ui-state-default, .ui-accordeon-header .ui-state-active  { border:1px solid #A28765;background: #D3C6B8; } 
 
 html[dir='rtl'] .css_right {float:right;}
 html[dir='rtl'] .dataTables_paginate {float:right;}
@@ -1914,6 +1920,10 @@ html[dir='rtl'] .dataTables_info {float:right}
 html[dir='rtl'] .dataTables_length {float:left;}
 html[dir='rtl'] .DataTables_sort_wrapper {margin-right:20px;}
 html[dir='rtl'] .DataTables_sort_wrapper span {left:auto; right:0; margin-right:-20px;}
+
+/* =======Search results======== */
+#search-result-tabs h3 { border:1px solid #A28765;background: #D3C6B8; }
+#search-result-tabs h3 .ui-icon { background-image: url("../../js/jquery/css/images/ui-icons_ffffff_256x240.png") }
 
 /* ========= Tabs ============== */
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {

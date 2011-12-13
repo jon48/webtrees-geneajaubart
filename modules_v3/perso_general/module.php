@@ -122,7 +122,7 @@ class perso_general_WT_Module extends WT_Module implements WT_Perso_Module_HookS
 	public function h_extend_indi_header_left(WT_Controller_Individual $ctrlIndi) {
 		$res = '';
 		if($ctrlIndi){
-			$dindi = new WT_Perso_Person($ctrlIndi->indi);
+			$dindi = new WT_Perso_Person($ctrlIndi->getSignificantIndividual());
 			$tab=$dindi->getTitles();
 			$countTitles = count($tab);
 			if($countTitles>0){
