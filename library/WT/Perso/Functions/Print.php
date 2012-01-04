@@ -155,7 +155,7 @@ class WT_Perso_Functions_Print {
 			$factrec = str_replace("\nWT_NEW\n", '', $factrec);
 			$factdetail = explode(' ', trim($factrec));
 			if (isset($factdetail)) if (count($factdetail) == 3) if (strtoupper($factdetail[2]) == 'Y') {
-				$html.=WT_I18N::translate('Yes');
+				$html.=WT_I18N::translate('yes');
 			}
 		}
 		return $html;

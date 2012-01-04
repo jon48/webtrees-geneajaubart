@@ -133,7 +133,7 @@ class WT_Perso_Functions_PatronymicLineage {
 					$spouse=$fam->getSpouse($indi_root);
 					//Print the spouse if relevant
 					if($spouse){
-						$marrdate = WT_I18N::translate('Yes');
+						$marrdate = WT_I18N::translate('yes');
 						$marryear = '';
 						echo '&nbsp;<a href="'.$fam->getHtmlUrl().'">';
 						if ($fam->getMarriageYear()){
