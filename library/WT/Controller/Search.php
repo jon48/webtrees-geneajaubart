@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Search.php 12899 2011-11-24 02:10:42Z nigel $
+// $Id: Search.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -598,7 +598,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 		// ---- section to search and display results on a general keyword search
 		if ($this->action=="general" || $this->action=="soundex" || $this->action=="replace") {
 			if ($this->myindilist || $this->myfamlist || $this->mysourcelist || $this->mynotelist) {
-				echo '<br />';
+				echo '<br>';
 			echo WT_JS_START;
 			?>	jQuery(document).ready(function() {
 					jQuery("#search-result-tabs").tabs();
@@ -716,9 +716,9 @@ class WT_Controller_Search extends WT_Controller_Base {
 				load_gedcom_settings(WT_GED_ID);
 				echo '</div>'; //#search-result-tabs
 			} elseif (isset ($this->query)) {
-				echo '<br /><div class="warning center"><em>'.WT_I18N::translate('No results found.').'</em><br />';
+				echo '<br><div class="warning center"><em>'.WT_I18N::translate('No results found.').'</em><br>';
 				if (!isset ($this->srindi) && !isset ($this->srfams) && !isset ($this->srsour) && !isset ($this->srnote)) {
-					echo '<em>'.WT_I18N::translate('Be sure to select an option to search for.').'</em><br />';
+					echo '<em>'.WT_I18N::translate('Be sure to select an option to search for.').'</em><br>';
 				}
 				echo '</div>';
 			}

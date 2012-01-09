@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_media_reorder.php 12811 2011-11-19 11:03:50Z greg $
+// $Id: functions_media_reorder.php 13123 2011-12-21 22:41:06Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -82,19 +82,19 @@ function media_reorder_row($rtype, $rowm, $pid) {
 		$mediaInfo = mediaFileInfo($mainMedia, $thumbnail, $rowm["m_media"], $mediaTitle, '');
 
 		//-- Thumbnail field
-		echo "<img src=\"".$mediaInfo['thumb']."\" height=\"38\" border=\"0\" " ;
+		echo "<img src=\"".$mediaInfo['thumb']."\" height=\"38\"";
 
 		if (strpos($rowm['m_gedrec'], "1 SOUR")!==false) {
-			echo " alt=\"" . PrintReady($mediaTitle) . "\" title=\"" . PrintReady($mediaTitle) . " Source info available\" />";
+			echo " alt=\"" . PrintReady($mediaTitle) . "\" title=\"" . PrintReady($mediaTitle) . " Source info available\">";
 		} else {
-			echo " alt=\"" . PrintReady($mediaTitle) . "\" title=\"" . PrintReady($mediaTitle) . "\" />";
+			echo " alt=\"" . PrintReady($mediaTitle) . "\" title=\"" . PrintReady($mediaTitle) . "\">";
 		}
 
 		//print media info
 		$ttype2 = preg_match("/\d TYPE (.*)/", $rowm["m_gedrec"], $match);
 		if ($ttype2>0) {
 			$mediaType = WT_Gedcom_Tag::getFileFormTypeValue($match[1]);
-			// echo "<br /><span class=\"label\">".WT_I18N::translate('Type').": </span> <span class=\"field\">$mediaType</span>";
+			// echo "<br><span class=\"label\">".WT_I18N::translate('Type').": </span> <span class=\"field\">$mediaType</span>";
 		}
 
 		echo "</td><td>&nbsp;</td>";
@@ -119,7 +119,7 @@ function media_reorder_row($rtype, $rowm, $pid) {
 		$j=$j;
 	}
 	$media_data = $rowm['m_media'];
-	echo "<input type=\"hidden\" name=\"order1[", $media_data, "]\" value=\"", $j, "\" />";
+	echo "<input type=\"hidden\" name=\"order1[", $media_data, "]\" value=\"", $j, "\">";
 
 	echo "</li>";
 	return true;

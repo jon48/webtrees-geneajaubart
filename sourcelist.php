@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: sourcelist.php 12898 2011-11-24 01:57:55Z nigel $
+// $Id: sourcelist.php 13043 2011-12-12 22:42:25Z nigel $
 
 define('WT_SCRIPT_NAME', 'sourcelist.php');
 require './includes/session.php';
@@ -31,7 +31,7 @@ $controller=new WT_Controller_Base();
 $controller->setPageTitle(WT_I18N::translate('Sources'));
 $controller->pageHeader();
 
-echo '<div id="source-list-page">',
+echo '<div id="sourcelist-page">',
 	'<h2>', WT_I18N::translate('Sources'), '</h2>';
 	echo format_sour_table(get_source_list(WT_GED_ID));
 echo '</div>';

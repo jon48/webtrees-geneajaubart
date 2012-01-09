@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions.php 12734 2011-11-14 11:52:48Z greg $
+// $Id: functions.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -243,7 +243,6 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $NO_UPDATE_CHAN;               $NO_UPDATE_CHAN               =get_gedcom_setting($ged_id, 'NO_UPDATE_CHAN');
 	global $PEDIGREE_FULL_DETAILS;        $PEDIGREE_FULL_DETAILS        =get_gedcom_setting($ged_id, 'PEDIGREE_FULL_DETAILS');
 	global $PEDIGREE_LAYOUT;              $PEDIGREE_LAYOUT              =get_gedcom_setting($ged_id, 'PEDIGREE_LAYOUT');
-	global $PEDIGREE_ROOT_ID;             $PEDIGREE_ROOT_ID             =get_gedcom_setting($ged_id, 'PEDIGREE_ROOT_ID');
 	global $PEDIGREE_SHOW_GENDER;         $PEDIGREE_SHOW_GENDER         =get_gedcom_setting($ged_id, 'PEDIGREE_SHOW_GENDER');
 	global $POSTAL_CODE;                  $POSTAL_CODE                  =get_gedcom_setting($ged_id, 'POSTAL_CODE');
 	global $PREFER_LEVEL2_SOURCES;        $PREFER_LEVEL2_SOURCES        =get_gedcom_setting($ged_id, 'PREFER_LEVEL2_SOURCES');
@@ -324,7 +323,7 @@ function wt_error_handler($errno, $errstr, $errfile, $errline) {
 		if (stristr($errstr, "by reference")==true) {
 			return;
 		}
-		$fmt_msg="<br />ERROR {$errno}: {$errstr}<br />";
+		$fmt_msg="<br>ERROR {$errno}: {$errstr}<br>";
 		$log_msg="ERROR {$errno}: {$errstr};";
 		// Although debug_backtrace should always exist in PHP5, without this check, PHP sometimes crashes.
 		// Possibly calling it generates an error, which causes infinite recursion??
@@ -350,7 +349,7 @@ function wt_error_handler($errno, $errstr, $errfile, $errline) {
 					$fmt_msg.=" in function <b>".$backtrace[$i+1]['function']."</b>";
 					$log_msg.=" in function ".$backtrace[$i+1]['function'];
 				}
-				$fmt_msg.="<br />";
+				$fmt_msg.="<br>";
 			}
 		}
 		echo $fmt_msg;
@@ -620,7 +619,7 @@ function get_gedcom_value($tag, $level, $gedrec, $truncate='', $convert=true) {
 			$value .= get_cont($level+1, $subrec);
 		}
 		$value = preg_replace("'\n'", "", $value);
-		$value = preg_replace("'<br />'", "\n", $value);
+		$value = preg_replace("'<br>'", "\n", $value);
 		$value = trim($value);
 		//-- if it is a date value then convert the date
 		if ($convert && $t=="DATE") {
@@ -743,7 +742,7 @@ function get_cont($nlevel, $nrec, $tobr=true) {
 	global $WORD_WRAPPED_NOTES;
 	$text = "";
 	if ($tobr) {
-		$newline = "<br />";
+		$newline = "<br>";
 	} else {
 		$newline = "\n";
 	}

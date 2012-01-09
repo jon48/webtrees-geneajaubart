@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12822 2011-11-20 00:17:37Z nigel $
+// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -120,8 +120,8 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 				));
 				$block_id=WT_DB::getInstance()->lastInsertId();
 			}
-			set_block_setting($block_id, 'header', safe_POST('header', WT_REGEX_UNSAFE));
-			set_block_setting($block_id, 'faqbody',   safe_POST('faqbody', WT_REGEX_UNSAFE)); // allow html
+			set_block_setting($block_id, 'header',  safe_POST('header',  WT_REGEX_UNSAFE));
+			set_block_setting($block_id, 'faqbody', safe_POST('faqbody', WT_REGEX_UNSAFE)); // allow html
 			$languages=array();
 			foreach (WT_I18N::installed_languages() as $code=>$name) {
 				if (safe_POST_bool('lang_'.$code)) {
@@ -157,12 +157,12 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 			// "Help for this page" link
 			echo '<div id="page_help">', help_link('add_faq_item', $this->getName()), '</div>';
 			echo '<form name="faq" method="post" action="#">';
-			echo '<input type="hidden" name="save" value="1" />';
-			echo '<input type="hidden" name="block_id" value="', $block_id, '" />';
+			echo '<input type="hidden" name="save" value="1">';
+			echo '<input type="hidden" name="block_id" value="', $block_id, '">';
 			echo '<table id="faq_module">';
 			echo '<tr><th>';
 			echo WT_I18N::translate('Question');
-			echo '</th></tr><tr><td><input type="text" name="header" size="90" tabindex="1" value="'.htmlspecialchars($header).'"/></td></tr>';
+			echo '</th></tr><tr><td><input type="text" name="header" size="90" tabindex="1" value="'.htmlspecialchars($header).'"></td></tr>';
 			echo '<tr><th>';
 			echo WT_I18N::translate('Answer');
 			echo '</th></tr><tr><td>';
@@ -191,17 +191,17 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 			$languages=get_block_setting($block_id, 'languages');
 			echo edit_language_checkboxes('lang_', $languages);
 			echo '</td><td>';
-			echo '<input type="text" name="block_order" size="3" tabindex="3" value="', $block_order, '" /></td>';
+			echo '<input type="text" name="block_order" size="3" tabindex="3" value="', $block_order, '"></td>';
 			echo '</td><td>';
-				echo '<select name="gedcom_id" tabindex="4" />';
+				echo '<select name="gedcom_id" tabindex="4">';
 					echo '<option value="">', WT_I18N::translate('All'), '</option>';
 					echo '<option value="', WT_GED_ID, '" selected="selected">', WT_I18N::translate('%s', get_gedcom_setting(WT_GED_ID, 'title')), '</option';
 				echo '</select>';
 			echo '</td></tr>';
 			echo '</table>';
 
-			echo '<p><input type="submit" value="', WT_I18N::translate('Save'), '" tabindex="5"/>';
-			echo '&nbsp;<input type="button" value="', WT_I18N::translate('Cancel'), '" onclick="window.location=\''.$this->getConfigLink().'\';" tabindex="6" /></p>';
+			echo '<p><input type="submit" value="', WT_I18N::translate('Save'), '" tabindex="5">';
+			echo '&nbsp;<input type="button" value="', WT_I18N::translate('Cancel'), '" onclick="window.location=\''.$this->getConfigLink().'\';" tabindex="6"></p>';
 			echo '</form>';
 			exit;
 		}
@@ -209,10 +209,6 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 
 	private function delete() {
 		$block_id=safe_GET('block_id');
-
-		$block_order=WT_DB::prepare(
-			"SELECT block_order FROM `##block` WHERE block_id=?"
-		)->execute(array($block_id))->fetchOne();
 
 		WT_DB::prepare(
 			"DELETE FROM `##block_setting` WHERE block_id=?"
@@ -235,9 +231,9 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 			" FROM `##block`".
 			" WHERE block_order=(".
 			"  SELECT MAX(block_order) FROM `##block` WHERE block_order < ? AND module_name=?".
-			" )".
+			" ) AND module_name=?".
 			" LIMIT 1"
-		)->execute(array($block_order, $this->getName()))->fetchOneRow();
+		)->execute(array($block_order, $this->getName(), $this->getName()))->fetchOneRow();
 		if ($swap_block) {
 			WT_DB::prepare(
 				"UPDATE `##block` SET block_order=? WHERE block_id=?"
@@ -260,9 +256,9 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 			" FROM `##block`".
 			" WHERE block_order=(".
 			"  SELECT MIN(block_order) FROM `##block` WHERE block_order>? AND module_name=?".
-			" )".
+			" ) AND module_name=?".
 			" LIMIT 1"
-		)->execute(array($block_order, $this->getName()))->fetchOneRow();
+		)->execute(array($block_order, $this->getName(), $this->getName()))->fetchOneRow();
 		if ($swap_block) {
 			WT_DB::prepare(
 				"UPDATE `##block` SET block_order=? WHERE block_id=?"
@@ -297,7 +293,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 		echo '<div class="faq_italic">', WT_I18N::translate('Click on a title to go straight to it, or scroll down to read them all');
 			if (WT_USER_GEDCOM_ADMIN) {
 				echo '<div class="faq_edit">',
-						'<a href="module.php?mod=faq&mod_action=admin_config">', WT_I18N::translate('Click here to Add, Edit, or Delete'), '</a>',
+						'<a href="module.php?mod=faq&amp;mod_action=admin_config">', WT_I18N::translate('Click here to Add, Edit, or Delete'), '</a>',
 				'</div>';
 			}
 		echo '</div>';
@@ -332,7 +328,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 				echo '</div>';
 				echo '</div>';
 				echo '<div class="faq_body">', substr($faqbody, 0, 1)=='<' ? $faqbody : nl2br($faqbody), '</div>';
-				echo '<hr />';
+				echo '<hr>';
 			}
 		}
 	}
@@ -378,7 +374,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 				if ($faq->gedcom_id==null) {
 					echo WT_I18N::translate('All');
 				} else {
-					echo get_gedcom_from_id($faq->gedcom_id);
+					echo WT_I18N::translate('%s', get_gedcom_setting($faq->gedcom_id, 'title'));
 				}
 				echo '</td>';
 				// NOTE: Print the edit options of the current item
@@ -386,14 +382,14 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 				if ($faq->block_order==$min_block_order) {
 					echo '&nbsp;';
 				} else {
-					echo '<a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_moveup&amp;block_id=', $faq->block_id, '"><img src="', $WT_IMAGES["uarrow"], '" alt=""></a>';
+					echo '<a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_moveup&amp;block_id=', $faq->block_id, '"><img src="', $WT_IMAGES['uarrow'], '" alt=""></a>';
 					echo help_link('moveup_faq_item', $this->getName());
 				}
 				echo '</td><td>';
 				if ($faq->block_order==$max_block_order) {
 					echo '&nbsp;';
 				} else {
-					echo '<a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_movedown&amp;block_id=', $faq->block_id, '"><img src="', $WT_IMAGES["darrow"], '" alt=""></a>';
+					echo '<a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_movedown&amp;block_id=', $faq->block_id, '"><img src="', $WT_IMAGES['darrow'], '" alt=""></a>';
 					echo help_link('movedown_faq_item', $this->getName());
 				}
 				echo '</td><td>';
@@ -406,7 +402,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 				// NOTE: Print the title text of the current item
 				echo '<tr><td colspan="5">';
 				echo '<div class="faq_edit_item">';
-				echo '<div  class="faq_edit_title">', $faq->header, '</div>';
+				echo '<div class="faq_edit_title">', $faq->header, '</div>';
 				// NOTE: Print the body text of the current item
 				echo '<div>', substr($faq->faqbody, 0, 1)=='<' ? $faq->faqbody : nl2br($faq->faqbody), '</div></div></td></tr>';
 			}

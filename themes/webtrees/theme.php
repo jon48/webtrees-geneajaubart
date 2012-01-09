@@ -23,7 +23,7 @@
 //
 // PNG Icons By:Alessandro Rei; License: GPL; http://www.kde-look.org/content/show.php/Dark-Glass+reviewed?content=67902
 //
-// $Id: theme.php 12978 2011-12-04 12:24:37Z rob $
+// $Id: theme.php 13045 2011-12-13 09:49:52Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -103,7 +103,6 @@ $WT_IMAGES=array(
 	'wiki'=>WT_THEME_URL.'images/w_22.png',
 	'itree'=>WT_THEME_URL.'images/tree.png',
 	// - Interactive Chart Icons
-	'fscreen'=>WT_THEME_URL.'images/fscreen.png',
 	'center'=>WT_THEME_URL.'images/center.png',
 	'itree'=>WT_THEME_URL.'images/tree.png',
 

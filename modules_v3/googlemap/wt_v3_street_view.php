@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: wt_v3_street_view.php 12696 2011-11-11 00:56:58Z greg $
+// $Id: wt_v3_street_view.php 13034 2011-12-12 13:10:58Z greg $
 
 header('Content-type: text/html; charset=UTF-8');
 
@@ -26,7 +26,7 @@ header('Content-type: text/html; charset=UTF-8');
  
 <html>
 <head>
-<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 
 <script type="text/javascript">

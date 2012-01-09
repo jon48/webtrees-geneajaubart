@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_asst_date.php 12813 2011-11-19 14:18:05Z greg $
+// $Id: census_asst_date.php 13034 2011-12-12 13:10:58Z greg $
 
 ?>
 
@@ -72,5 +72,5 @@
 		<option value=""></option>
 	</select>
 
-	<input type="hidden" id="setctry" name="setctry" value="" />
-	<input type="hidden" id="setyear" name="setyear" value="" />
+	<input type="hidden" id="setctry" name="setctry" value="">
+	<input type="hidden" id="setyear" name="setyear" value="">

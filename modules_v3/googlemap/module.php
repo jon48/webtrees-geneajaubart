@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12811 2011-11-19 11:03:50Z greg $
+// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -113,7 +113,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		echo '<table width="100%" border="0" class="facts_table">';
 		echo '<tr><td valign="top">';
 		echo '<div id="googlemap_left">';
-		echo '<img src="', $WT_IMAGES['hline'], '" width="', $GOOGLEMAP_XSIZE, '" height="0" alt="" />';
+		echo '<img src="', $WT_IMAGES['hline'], '" width="', $GOOGLEMAP_XSIZE, '" height="0" alt="">';
 		echo '<div id="map_pane" style="border: 1px solid gray; color: black; width: 100%; height: ', $GOOGLEMAP_YSIZE, 'px"></div>';
 		if (WT_USER_IS_ADMIN) {
 			echo '<table width="100%"><tr>';
@@ -143,7 +143,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		echo '</td>';
 		echo '</tr></table>';
 		// start
-		echo '<img src="', $WT_IMAGES['spacer'], '" id="marker6" width="1" height="1" alt="" />';
+		echo '<img src="', $WT_IMAGES['spacer'], '" id="marker6" width="1" height="1" alt="">';
 		// end
 		echo '</td></tr></table>';
 		return '<div id="'.$this->getName().'_content">'.ob_get_clean().'</div>';

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: autocomplete.php 12313 2011-10-15 20:38:06Z greg $
+// $Id: autocomplete.php 13034 2011-12-12 13:10:58Z greg $
 
 define('WT_SCRIPT_NAME', 'autocomplete.php');
 require './includes/session.php';
@@ -414,7 +414,7 @@ function autocomplete_OBJE($FILTER) {
 				$media->getXref().
 				"\" src=\"".
 				$media->getThumbnail().
-				"\" width=\"40\" /> ".
+				"\" width=\"40\"> ".
 				$media->getFullName();
 		}
 	}

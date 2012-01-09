@@ -32,7 +32,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // @author Greg Roach
-// @version $Id: Date.php 12854 2011-11-22 15:19:51Z greg $
+// @version $Id: Date.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -216,7 +216,7 @@ class WT_Date {
 						if ($CALENDAR_FORMAT!="none") {
 							$conv1.=' <span dir="'.$TEXT_DIRECTION.'">(<a href="'.$d1conv->CalendarURL($date_fmt).'">'.$d1tmp.'</a>)</span>';
 						} else {
-							$conv1.=' <span dir="'.$TEXT_DIRECTION.'"><br /><a href="'.$d1conv->CalendarURL($date_fmt).'">'.$d1tmp.'</a></span>';
+							$conv1.=' <span dir="'.$TEXT_DIRECTION.'"><br><a href="'.$d1conv->CalendarURL($date_fmt).'">'.$d1tmp.'</a></span>';
 						}
 					} else {
 						$conv1.=' <span dir="'.$TEXT_DIRECTION.'">('.$d1tmp.')</span>';

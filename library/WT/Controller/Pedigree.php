@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Pedigree.php 12970 2011-12-03 14:57:50Z rob $
+// $Id: Pedigree.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -83,11 +83,11 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 		$show_full = $this->show_full;
 		$talloffset = $this->talloffset;
 
-		// Validate parameters
-		$this->rootid=check_rootid($this->rootid);
-
 		$this->rootPerson = WT_Person::getInstance($this->rootid);
-		if (is_null($this->rootPerson)) $this->rootPerson = new WT_Person('');
+		if (!$this->rootPerson) {
+			$this->rootPerson=$this->getSignificantIndividual();
+			$this->rootid=$this->rootPerson->getXref();
+		}
 		$this->name     = $this->rootPerson->getFullName();
 		$this->addname  = $this->rootPerson->getAddName();
 
@@ -274,7 +274,7 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 	function collapse_tree($index, $curgen, $diff) {
 		global $offsetarray, $treeid, $log2, $talloffset,$boxspacing, $mdiff, $minyoffset;
 
-		//print "$index:$curgen:$diff<br />\n";
+		//print "$index:$curgen:$diff<br>\n";
 		$f = ($index*2)+1; //-- father index
 		$m = $f+1; //-- mother index
 		if (empty($treeid[$index])) {
@@ -291,19 +291,19 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 		}
 		if ($curgen==$this->PEDIGREE_GENERATIONS) {
 			$offsetarray[$index]["y"] -= $boxspacing*$diff;
-			//print "UP $index BY $diff<br />\n";
+			//print "UP $index BY $diff<br>\n";
 			return $diff;
 		}
 		$odiff=$diff;
 		$fdiff = collapse_tree($f, $curgen+1, $diff);
 		if (($curgen<($this->PEDIGREE_GENERATIONS-1))||($index%2==1)) $diff=$fdiff;
 		if (isset($offsetarray[$index]["y"])) $offsetarray[$index]["y"] -= $boxspacing*$diff;
-		//print "UP $index BY $diff<br />\n";
+		//print "UP $index BY $diff<br>\n";
 		$mdiff = collapse_tree($m, $curgen+1, $diff);
 		$zdiff = $mdiff - $fdiff;
 		if (($zdiff>0)&&($curgen<$this->PEDIGREE_GENERATIONS-2)) {
 			$offsetarray[$index]["y"] -= $boxspacing*$zdiff/2;
-			//print "UP $index BY ".($zdiff/2)."<br />\n";
+			//print "UP $index BY ".($zdiff/2)."<br>\n";
 			if ((empty($treeid[$m]))&&(!empty($treeid[$f]))) adjust_subtree($f, -1*($boxspacing*$zdiff/4));
 			$diff+=($zdiff/2);
 		}

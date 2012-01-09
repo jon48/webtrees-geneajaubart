@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12972 2011-12-03 19:49:51Z nigel $
+// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -116,17 +116,17 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			$languages=get_block_setting($block_id, 'languages');
 			if (!$languages || in_array(WT_LOCALE, explode(',', $languages))) {
 				$html.='<div class="news_title center">'.get_block_setting($block_id, 'title').'</div>';
-				$html.='<div>'.get_block_setting($block_id, 'story_body').'</div><br />';
+				$html.='<div>'.get_block_setting($block_id, 'story_body').'</div><br>';
 				if (WT_USER_CAN_EDIT) {
 					$html.='<div><a href="module.php?mod='.$this->getName().'&amp;mod_action=admin_edit&amp;block_id='.$block_id.'">';
-					$html.=WT_I18N::translate('Edit story').'</a></div><br />';
+					$html.=WT_I18N::translate('Edit story').'</a></div><br>';
 				}
 			}
 		}
 		if (WT_USER_GEDCOM_ADMIN && !$html) {
 			$html.='<div class="news_title center">'.$this->getTitle().'</div>';
 			$html.='<div><a href="module.php?mod='.$this->getName().'&amp;mod_action=admin_edit&amp;xref='.$controller->record->getXref().'">';
-			$html.=WT_I18N::translate('Add story').'</a>'.help_link('add_story', $this->getName()).'</div><br />';
+			$html.=WT_I18N::translate('Add story').'</a>'.help_link('add_story', $this->getName()).'</div><br>';
 		}
 		return $html;
 	}
@@ -241,9 +241,9 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				// "Help for this page" link
 				echo '<div id="page_help">', help_link('add_story', $this->getName()), '</div>';
 				echo '<form name="story" method="post" action="#">';
-				echo '<input type="hidden" name="save" value="1" />';
-				echo '<input type="hidden" name="block_id" value="', $block_id, '" />';
-				echo '<input type="hidden" name="gedcom_id" value="', WT_GED_ID, '" />';
+				echo '<input type="hidden" name="save" value="1">';
+				echo '<input type="hidden" name="block_id" value="', $block_id, '">';
+				echo '<input type="hidden" name="gedcom_id" value="', WT_GED_ID, '">';
 				echo '<table id="story_module">';
 				echo '<tr><th>';
 				echo WT_I18N::translate('Story title'), help_link('story_title', $this->getName());
@@ -273,7 +273,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				echo '</tr>';
 				echo '<tr>';
 				echo '<td class="optionbox">';
-				echo '<input type="text" name="xref" id="pid" size="4" value="'.$xref.'" />';
+				echo '<input type="text" name="xref" id="pid" size="4" value="'.$xref.'">';
 				print_findindi_link("pid", "xref");
 				if ($xref) {
 					$person=WT_Person::getInstance($xref);
@@ -286,8 +286,8 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				echo '<td class="optionbox">';
 				echo edit_language_checkboxes('lang_', $languages);
 				echo '</td></tr></table>';
-				echo '<p><input type="submit" value="', WT_I18N::translate('Save'), '" tabindex="5"/>';
-				echo '&nbsp;<input type="button" value="', WT_I18N::translate('Cancel'), '" onclick="window.location=\''.$this->getConfigLink().'\';" tabindex="6" />';
+				echo '<p><input type="submit" value="', WT_I18N::translate('Save'), '" tabindex="5">';
+				echo '&nbsp;<input type="button" value="', WT_I18N::translate('Cancel'), '" onclick="window.location=\''.$this->getConfigLink().'\';" tabindex="6">';
 				echo '</p>';
 				echo '</form>';
 
@@ -328,6 +328,27 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			$controller=new WT_Controller_Base();
 			$controller->setPageTitle($this->getTitle());
 			$controller->pageHeader();
+			$controller
+				->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+				->addInlineJavaScript('
+					jQuery("#story_table").dataTable({
+						"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
+						"bAutoWidth":false,
+						"bPaginate": true,
+						"sPaginationType": "full_numbers",
+						"bLengthChange": true,
+						"bFilter": true,
+						"bInfo": true,
+						"bJQueryUI": true,
+						"aaSorting": [[0,"asc"]],
+						"aoColumns": [
+							/* 0-name */ null,
+							/* 1-NAME */ null,
+							/* 2-NAME */ { bSortable:false },
+							/* 3-NAME */ { bSortable:false }
+						]
+					});
+				');
 
 			$stories=WT_DB::prepare(
 				"SELECT block_id, xref".
@@ -336,20 +357,18 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				" AND gedcom_id=?".
 				" ORDER BY xref"
 			)->execute(array($this->getName(), WT_GED_ID))->fetchAll();
-
-			echo '<table class="list_table">';
-			echo '<tr><td class="list_label" colspan="4">';
-			echo '<a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_edit">', WT_I18N::translate('Add story'), '</a>';
-			echo help_link('add_story', $this->getName());
-			echo '</td></tr>';
+			
+			echo '<h3><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_edit">', WT_I18N::translate('Add story'), '</a>', help_link('add_story', $this->getName()), '</h3>';
 			if (count($stories)>0) {
-				echo '<tr>
-					<th class="center width50">', WT_I18N::translate('Story title'), '</th>
-					<th class="center width30">', WT_I18N::translate('Individual'), '</th>
-					<th class="center width10">', WT_I18N::translate('Edit story'), '</th>
-					<th class="center width10">', WT_I18N::translate('Delete'), '</th>
-					</tr>';
+			echo '<table id="story_table">';
+				echo '<thead><tr>
+					<th>', WT_I18N::translate('Story title'), '</th>
+					<th>', WT_I18N::translate('Individual'), '</th>
+					<th>&nbsp;</th>
+					<th>&nbsp;</th>
+					</tr></thead>';
 			}
+			echo '<tbody>';
 			foreach ($stories as $story) {
 				$story_title = get_block_setting($story->block_id, 'title');
 				$indi=WT_Person::getInstance($story->xref);
@@ -361,13 +380,13 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 					$name=$story->xref;
 				}
 				echo '<tr>
-					<td>',$title, '</td>
+					<td>', $title, '</td>
 					<td>', $name, '</td>
-					<td><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_edit&amp;block_id=', $story->block_id, '">', WT_I18N::translate('Edit'), '</a></td>
-					<td><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_delete&amp;block_id=', $story->block_id, '" onclick="return confirm(\'', WT_I18N::translate('Are you sure you want to delete this story?'), '\');">', WT_I18N::translate('Delete'), '</a></td>
+					<td><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_edit&amp;block_id=', $story->block_id, '"><div class="icon-edit">&nbsp;</div></a></td>
+					<td><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_delete&amp;block_id=', $story->block_id, '" onclick="return confirm(\'', WT_I18N::translate('Are you sure you want to delete this story?'), '\');"><div class="icon-delete">&nbsp;</div></a></td>
 					</tr>';
 			}
-			echo '</table>';
+			echo '</tbody></table>';
 		} else {
 			header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
 			exit;
@@ -380,6 +399,25 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 		$controller=new WT_Controller_Base();
 		$controller->setPageTitle($this->getTitle());
 		$controller->pageHeader();
+		$controller
+			->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+			->addInlineJavaScript('
+				jQuery("#story_table").dataTable({
+					"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
+					"bAutoWidth":false,
+					"bPaginate": true,
+					"sPaginationType": "full_numbers",
+					"bLengthChange": true,
+					"bFilter": true,
+					"bInfo": true,
+					"bJQueryUI": true,
+					"aaSorting": [[0,"asc"]],
+					"aoColumns": [
+						/* 0-name */ null,
+						/* 1-NAME */ null
+					]
+				});
+			');
 
 		$stories=WT_DB::prepare(
 			"SELECT block_id, xref".
@@ -388,32 +426,34 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			" AND gedcom_id=?".
 			" ORDER BY xref"
 		)->execute(array($this->getName(), WT_GED_ID))->fetchAll();
-
-		echo '<table class="list_table width90">';
+		
+		echo '<h2 class="center">', WT_I18N::translate('Stories'), '</h2>';
 		if (count($stories)>0) {
-			echo '<tr>
-				<th class="list_label">', WT_I18N::translate('Story title'), '</th>
-				<th class="list_label">', WT_I18N::translate('Individual'), '</th>
-				</tr>';
-		}
-		foreach ($stories as $story) {
-			$indi=WT_Person::getInstance($story->xref);
-			$story_title = get_block_setting($story->block_id, 'title');
-			if ($indi) {
-				$title="<a href=\"".$indi->getHtmlUrl()."#stories\">".$story_title."</a>";
-				$name="<a href=\"".$indi->getHtmlUrl()."#stories\">".$indi->getFullName()."</a>";
-			} else {
-				$title=$story_title;
-				$name=$story->xref;
+			echo '<table id="story_table" class="width100">';
+			echo '<thead><tr>
+				<th>', WT_I18N::translate('Story title'), '</th>
+				<th>', WT_I18N::translate('Individual'), '</th>
+				</tr></thead>
+				<tbody>';
+			foreach ($stories as $story) {
+				$indi=WT_Person::getInstance($story->xref);
+				$story_title = get_block_setting($story->block_id, 'title');
+				if ($indi) {
+					$title="<a href=\"".$indi->getHtmlUrl()."#stories\">".$story_title."</a>";
+					$name="<a href=\"".$indi->getHtmlUrl()."#stories\">".$indi->getFullName()."</a>";
+				} else {
+					$title=$story_title;
+					$name=$story->xref;
+				}
+				if ($indi->canDisplayDetails()) {
+					echo '<tr>
+						<td>', $title, '</td>
+						<td>', $name, '</td>
+						</tr>';
+				}
 			}
-			if ($indi->canDisplayDetails()) {
-				echo '<tr>
-					<td class="list_value">', $title, '</td>
-					<td class="list_value wrap">', $name, '</td>
-					</tr>';
-			}
+			echo '</tbody></table>';
 		}
-		echo '</table>';
 	}
 
 		// Implement WT_Module_Menu

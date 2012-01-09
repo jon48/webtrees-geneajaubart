@@ -21,19 +21,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: branches.php 12948 2011-11-29 18:51:28Z nigel $
+// $Id: branches.php 13060 2011-12-14 16:13:41Z greg $
 
 define('WT_SCRIPT_NAME', 'branches.php');
 require './includes/session.php';
 
 //-- const
 $fact='MARR';
-define('WT_ICON_RINGS', '<img src="'.$WT_IMAGES['rings'].'" alt="'.WT_Gedcom_Tag::getLabel('MARR').'" title="'.WT_Gedcom_Tag::getLabel('MARR').'" />');
-define('WT_ICON_BRANCHES', '<img src="'.$WT_IMAGES['patriarch'].'" alt="" align="middle" />');
+define('WT_ICON_RINGS', '<img src="'.$WT_IMAGES['rings'].'" alt="'.WT_Gedcom_Tag::getLabel('MARR').'" title="'.WT_Gedcom_Tag::getLabel('MARR').'">');
+define('WT_ICON_BRANCHES', '<img src="'.$WT_IMAGES['patriarch'].'" alt="" align="middle">');
 
 //-- args
 $surn = safe_GET('surname', '[^<>&%{};]*');
-$surn = utf8_strtoupper($surn);
 $soundex_std = safe_GET_bool('soundex_std');
 $soundex_dm = safe_GET_bool('soundex_dm');
 $ged = safe_GET('ged');
@@ -47,12 +46,17 @@ if (WT_USER_GEDCOM_ID) {
 }
 
 $controller=new WT_Controller_Base();
-$controller->setPageTitle(WT_I18N::translate('Branches').' - '.$surn);
+if ($surn) {
+	$controller->setPageTitle(/* I18N: %s is a surname */ WT_I18N::translate('Branches of the %s family', $surn));
+} else {
+	$controller->setPageTitle(WT_I18N::translate('Branches'));
+}
 $controller->pageHeader();
 
 if ($ENABLE_AUTOCOMPLETE) {
 	require WT_ROOT.'/js/autocomplete.js.htm';
 }
+
 ?>
 <div id="branches-page">
 <form name="surnlist" id="surnlist" action="?">
@@ -61,14 +65,14 @@ if ($ENABLE_AUTOCOMPLETE) {
 			<td class="descriptionbox">
 				<?php echo WT_Gedcom_Tag::getLabel('SURN'), help_link('surname'); ?></td>
 			<td class="optionbox">
-				<input type="text" name="surname" id="SURN" value="<?php echo $surn; ?>" />
-				<input type="hidden" name="ged" id="ged" value="<?php echo $ged; ?>" />
-				<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>" />
+				<input type="text" name="surname" id="SURN" value="<?php echo $surn; ?>">
+				<input type="hidden" name="ged" id="ged" value="<?php echo $ged; ?>">
+				<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>">
 				<p><?php echo WT_I18N::translate('Phonetic search'); ?></p>
 				<p>
-					<input type="checkbox" name="soundex_std" id="soundex_std" value="1" <?php if ($soundex_std) echo ' checked="checked"'; ?> />
+					<input type="checkbox" name="soundex_std" id="soundex_std" value="1" <?php if ($soundex_std) echo ' checked="checked"'; ?>>
 					<label for="soundex_std"><?php echo WT_I18N::translate('Russell'); ?></label>
-					<input type="checkbox" name="soundex_dm" id="soundex_dm" value="1" <?php if ($soundex_dm) echo ' checked="checked"'; ?> />
+					<input type="checkbox" name="soundex_dm" id="soundex_dm" value="1" <?php if ($soundex_dm) echo ' checked="checked"'; ?>>
 					<label for="soundex_dm"><?php echo WT_I18N::translate('Daitch-Mokotoff'); ?></label>
 				</p>
 			</td>
@@ -88,7 +92,7 @@ if ($surn) {
 		// Don't show INDIs with parents in the list, as they will be shown twice.
 		if ($famc) {
 			foreach ($famc->getSpouses() as $parent) {
-				if (in_array($parent, $indis)) {
+				if (in_array($parent, $indis, true)) {
 					continue 2;
 				}
 			}
@@ -99,6 +103,13 @@ if ($surn) {
 	echo '</fieldset>';
 }
 echo '</div>'; // close branches-page
+
+if (false) {
+	// These messages were added (briefly) and translated.
+	// Keep them in the translation template, as we will want them in the future
+	WT_I18N::translate('Collapse all');
+	WT_I18N::translate('Expand all');
+}
 
 function print_fams($person, $famid=null) {
 	global $UNKNOWN_NN, $surn, $surn_script, $user_ancestors;
@@ -130,7 +141,7 @@ function print_fams($person, $famid=null) {
 	$sosa = array_search($person->getXref(), $user_ancestors);
 	if ($sosa) {
 		$class = 'search_hit';
-		$sosa = '<a target="_blank" dir="ltr" class="details1 '.$person->getBoxStyle().'" title="'.WT_I18N::translate('Sosa').'" href="relationship.php?pid2='.WT_USER_ROOT_ID.'&pid1='.$person->getXref().'">&nbsp;'.$sosa.'&nbsp;</a>'.sosa_gen($sosa);
+		$sosa = '<a target="_blank" dir="ltr" class="details1 '.$person->getBoxStyle().'" title="'.WT_I18N::translate('Sosa').'" href="relationship.php?pid2='.WT_USER_ROOT_ID.'&amp;pid1='.$person->getXref().'">&nbsp;'.$sosa.'&nbsp;</a>'.sosa_gen($sosa);
 	}
 	$current = $person->getSexImage().
 		'<a target="_blank" class="'.$class.'" href="'.$person->getHtmlUrl().'">'.PrintReady($person_name).'</a> '.
@@ -156,15 +167,15 @@ function print_fams($person, $famid=null) {
 			$sosa2 = array_search($spouse->getXref(), $user_ancestors);
 			if ($sosa2) {
 				$class = 'search_hit';
-				$sosa2 = '<a target="_blank" dir="ltr" class="details1 '.$spouse->getBoxStyle().'" title="'.WT_I18N::translate('Sosa').'" href="relationship.php?pid2='.WT_USER_ROOT_ID.'&pid1='.$spouse->getXref().'">&nbsp;'.$sosa2.'&nbsp;</a>'.sosa_gen($sosa2);
+				$sosa2 = '<a target="_blank" dir="ltr" class="details1 '.$spouse->getBoxStyle().'" title="'.WT_I18N::translate('Sosa').'" href="relationship.php?pid2='.WT_USER_ROOT_ID.'&amp;pid1='.$spouse->getXref().'">&nbsp;'.$sosa2.'&nbsp;</a>'.sosa_gen($sosa2);
 			}
 			if ($family->getMarriageYear()) {
-				$txt .= '&nbsp;<a href="'.$family->getHtmlUrl().'">';
-				$txt .= '<span class="details1" title="'.strip_tags($family->getMarriageDate()->Display()).'">'.WT_ICON_RINGS.$family->getMarriageYear().'</span></a>&nbsp;';
+				$txt .= ' <a href="'.$family->getHtmlUrl().'">';
+				$txt .= '<span class="details1" title="'.strip_tags($family->getMarriageDate()->Display()).'">'.WT_ICON_RINGS.$family->getMarriageYear().'</span></a>';
 			}
 			else if ($family->getMarriage()) {
-				$txt .= '&nbsp;<a href="'.$family->getHtmlUrl().'">';
-				$txt .= '<span class="details1" title="'.WT_I18N::translate('yes').'">'.WT_ICON_RINGS.'</span></a>&nbsp;';
+				$txt .= ' <a href="'.$family->getHtmlUrl().'">';
+				$txt .= '<span class="details1" title="'.WT_I18N::translate('yes').'">'.WT_ICON_RINGS.'</span></a>';
 			}
 		$txt .=
 			$spouse->getSexImage().

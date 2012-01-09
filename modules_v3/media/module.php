@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12788 2011-11-18 14:18:45Z greg $
+// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -63,7 +63,7 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 		<script type="text/javascript">
 		<!--
 			function reorder_media() {
-			var win02 = window.open("edit_interface.php?action=reorder_media&pid=<?php echo $controller->record->getXref(); ?>", "win02", "resizable=1, menubar=0, scrollbars=1, top=20, height=840, width=450 ");
+			var win02 = window.open("edit_interface.php?action=reorder_media&amp;pid=<?php echo $controller->record->getXref(); ?>", "win02", "resizable=1, menubar=0, scrollbars=1, top=20, height=840, width=450 ");
 			if (window.focus) {win02.focus();}
 			}
 		-->
@@ -75,7 +75,7 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 		if (WT_USER_GEDCOM_ADMIN && $this->get_media_count()>1) {
 			echo '<tr><td colspan="2" class="descriptionbox rela">';
 			echo '<span><a href="#" onclick="reorder_media()">';
-			if (isset($WT_IMAGES['reorder'])) {echo '<img src="', $WT_IMAGES['reorder'],'" id="head_icon" class="icon" title="', WT_I18N::translate('Re-order media'), '" alt="', WT_I18N::translate('Re-order media'), '" />';}
+			if (isset($WT_IMAGES['reorder'])) {echo '<img src="', $WT_IMAGES['reorder'],'" id="head_icon" class="icon" title="', WT_I18N::translate('Re-order media'), '" alt="', WT_I18N::translate('Re-order media'), '">';}
 			echo WT_I18N::translate('Re-order media');
 			echo '</a></span>';
 			echo '</td></tr>';
@@ -89,8 +89,8 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 			<tr>
 				<td class="facts_label"><?php echo WT_I18N::translate('Add media'), help_link('OBJE'); ?></td>
 				<td class="facts_value">
-					<a href="#" onclick="window.open('addmedia.php?action=showmediaform&linktoid=<?php echo $controller->record->getXref(); ?>', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;"> <?php echo WT_I18N::translate('Add a new media object'); ?></a><br />
-					<a href="#" onclick="window.open('inverselink.php?linktoid=<?php echo $controller->record->getXref(); ?>&linkto=person', '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1'); return false;"><?php echo WT_I18N::translate('Link to an existing media object'); ?></a>
+					<a href="#" onclick="window.open('addmedia.php?action=showmediaform&amp;linktoid=<?php echo $controller->record->getXref(); ?>', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;"> <?php echo WT_I18N::translate('Add a new media object'); ?></a><br>
+					<a href="#" onclick="window.open('inverselink.php?linktoid=<?php echo $controller->record->getXref(); ?>&amp;linkto=person', '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1'); return false;"><?php echo WT_I18N::translate('Link to an existing media object'); ?></a>
 				</td>
 			</tr>
 		<?php

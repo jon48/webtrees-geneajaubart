@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Event.php 12325 2011-10-16 21:22:41Z greg $
+// $Id: Event.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -280,7 +280,7 @@ class WT_Event {
 		if (!$this->dest)
 			$data .= format_fact_date($this, $this->getParentObject(), $anchor, false);
 		$data .= format_fact_place($this, $anchor, false, false);
-		$data .= "<br />";
+		$data .= "<br>";
 		if (!$return) echo $data;
 		else return $data;
 	}
@@ -292,10 +292,10 @@ class WT_Event {
 		$tag=$this->getTag();
 		$file=$tag.'.png';
 		if (file_exists($dir.$file)) {
-			return '<img src="'.WT_STATIC_URL.$dir.$file.'" title="'.WT_Gedcom_Tag::getLabel($tag).'" align="middle"/>';
+			return '<img src="'.WT_STATIC_URL.$dir.$file.'" title="'.WT_Gedcom_Tag::getLabel($tag).'" align="middle">';
 		} elseif (file_exists($dir.'NULL.png')) {
 			// Spacer image - for alignment - until we move to a sprite.
-			return '<img src="'.WT_STATIC_URL.$dir.'NULL.png" align="middle" />';
+			return '<img src="'.WT_STATIC_URL.$dir.'NULL.png" align="middle">';
 		} else {
 			return '';
 		}

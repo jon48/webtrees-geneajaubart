@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Base.php 12928 2011-11-28 09:27:56Z greg $
+// $Id: Base.php 12997 2011-12-05 22:33:32Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -309,11 +309,16 @@ class WT_Controller_Base {
 	// Get significant information from this page, to allow other pages such as
 	// charts and reports to initialise with the same records
 	public function getSignificantIndividual() {
-		global $PEDIGREE_ROOT_ID;
+		static $individual; // Only query the DB once.
 
-		$individual=WT_Person::getInstance(WT_USER_GEDCOM_ID);
-		if (!$individual) {
+		if (!$individual && WT_USER_GEDCOM_ID) {
+			$individual=WT_Person::getInstance(WT_USER_GEDCOM_ID);
+		}
+		if (!$individual && WT_USER_ROOT_ID) {
 			$individual=WT_Person::getInstance(WT_USER_ROOT_ID);
+		}
+		if (!$individual) {
+			$individual=WT_Person::getInstance(get_gedcom_setting(WT_GED_ID, 'PEDIGREE_ROOT_ID'));
 		}
 		if (!$individual) {
 			$individual=WT_Person::getInstance(

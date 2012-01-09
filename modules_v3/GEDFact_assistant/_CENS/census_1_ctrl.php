@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_1_ctrl.php 12420 2011-10-25 22:04:49Z nigel $
+// $Id: census_1_ctrl.php 13034 2011-12-12 13:10:58Z greg $
 
  if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -95,11 +95,11 @@ echo '</div>';
 ?>
 <div class="optionbox cens_textinput">
 	<div class="cens_textinput_left">
-		<input type="button" value="<?php echo WT_I18N::translate('Add/Insert Blank Row'); ?>" onclick="insertRowToTable('', '', '', '', '', '', '', '', 'Age', '', '', '', '', '', '');" />
+		<input type="button" value="<?php echo WT_I18N::translate('Add/Insert Blank Row'); ?>" onclick="insertRowToTable('', '', '', '', '', '', '', '', 'Age', '', '', '', '', '', '');">
 	</div>
 	<div class="cens_textinput_right">
 		<?php echo WT_I18N::translate('Add'); ?>
-		<input  type="radio" name="totallyrad" value="0" checked="checked" />
+		<input  type="radio" name="totallyrad" value="0" checked="checked">
 	</div>
 	<?php
 	//-- Census Add Rows Area =========================================================

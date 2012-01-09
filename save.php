@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: save.php 12503 2011-11-03 11:58:38Z greg $
+// $Id: save.php 13012 2011-12-08 20:36:46Z greg $
 
 define('WT_SCRIPT_NAME', 'save.php');
 require './includes/session.php';
@@ -85,7 +85,6 @@ case 'site_setting':
 	case 'REQUIRE_ADMIN_AUTH_REGISTRATION':
 	case 'ALLOW_USER_THEMES':
 	case 'ALLOW_CHANGE_GEDCOM':
-	case 'SMTP_SIMPLE_MAIL':
 	case 'SMTP_AUTH':
 		$value=(int)$value;
 		break;

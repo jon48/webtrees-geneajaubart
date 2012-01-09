@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: site-unavailable.php 12957 2011-12-01 18:15:07Z greg $
+// $Id: site-unavailable.php 13034 2011-12-12 13:10:58Z greg $
 
 define('WT_SCRIPT_NAME', 'site-unavailable.php');
 
@@ -49,7 +49,7 @@ echo
 	'<head>',
 	'<meta charset="UTF-8">',
 	'<title>Site Unavailable - webtrees</title>',
-	'<meta name="robots" content="noindex,follow" />',
+	'<meta name="robots" content="noindex,follow">',
 	'<style type="text/css">
 		body {color: gray; background-color: white; font: 14px tahoma, arial, helvetica, sans-serif; padding:10px; }
 		a {color: #81A9CB; font-weight: bold; text-decoration: none;}

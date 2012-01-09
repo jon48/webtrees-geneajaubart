@@ -81,6 +81,7 @@ $WT_IMAGES=array(
 	'pedigree'=>WT_THEME_URL.'images/pedigree.png',
 	'place'=>WT_THEME_URL.'images/place.png',
 	'relationship'=>WT_THEME_URL.'images/relationship.png',
+	'reorder'=>WT_THEME_URL.'images/reorder_images.png',
 	'reports'=>WT_THEME_URL.'images/reports.png',
 	'repository'=>WT_THEME_URL.'images/repository.png',
 	'repo-list'=>WT_THEME_URL.'images/repository.png',
@@ -104,7 +105,6 @@ $WT_IMAGES=array(
 	'wiki'=>WT_THEME_URL.'images/w_22.png',
 	'itree'=>WT_THEME_URL.'images/tree.png',
 	// - Interactive Chart Icons
-	'fscreen'=>WT_THEME_URL.'images/fscreen.png',
 	'center'=>WT_THEME_URL.'images/center.png',
 	'itree'=>WT_THEME_URL.'images/tree.png',
 

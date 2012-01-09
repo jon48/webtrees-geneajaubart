@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_import.php 12740 2011-11-14 16:07:16Z greg $
+// $Id: functions_import.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -631,7 +631,7 @@ function import_record($gedrec, $ged_id, $update) {
 		$xref=$match[1];
 		$type=$match[1];
 	} else {
-		echo WT_I18N::translate('Invalid GEDCOM format'), '<br /><pre>', $gedrec, '</pre>';
+		echo WT_I18N::translate('Invalid GEDCOM format'), '<br><pre>', $gedrec, '</pre>';
 		return;
 	}
 
@@ -642,7 +642,7 @@ function import_record($gedrec, $ged_id, $update) {
 		if (preg_match('/0 @('.WT_REGEX_XREF.')@ ('.WT_REGEX_TAG.')/', $gedrec, $match)) {
 			list(,$xref, $type)=$match;
 		} else {
-			echo WT_I18N::translate('Invalid GEDCOM format'), '<br /><pre>', $gedrec, '</pre>';
+			echo WT_I18N::translate('Invalid GEDCOM format'), '<br><pre>', $gedrec, '</pre>';
 			return;
 		}
 	}
@@ -1024,7 +1024,7 @@ function update_media($gid, $ged_id, $gedrec, $update = false) {
 		}
 		**/
 		$new_m_media = $old_m_media;
-		//echo "RECORD: old $old_m_media new $new_m_media<br />";
+		//echo "RECORD: old $old_m_media new $new_m_media<br>";
 		$gedrec = str_replace("@" . $old_m_media . "@", "@" . $new_m_media . "@", $gedrec);
 		$media = new WT_Media($gedrec);
 		//--check if we already have a similar object

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Timeline.php 12679 2011-11-10 09:12:46Z greg $
+// $Id: Timeline.php 13118 2011-12-21 22:07:33Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -72,7 +72,7 @@ class WT_Controller_Timeline extends WT_Controller_Chart {
 		if (!empty($newpid) && !in_array($newpid, $this->pids)) {
 			$this->pids[] = $newpid;
 		}
-		if (count($this->pids)==0) $this->pids[] = check_rootid("");
+		if (count($this->pids)==0) $this->pids[] = $this->getSignificantIndividual()->getXref();
 		$remove = safe_GET_xref('remove');
 		//-- cleanup user input
 		$newpids = array();
@@ -149,12 +149,12 @@ class WT_Controller_Timeline extends WT_Controller_Chart {
 					if ($this->people[$i]->canDisplayName()) {
 						echo "&nbsp;<a href=\"".$this->people[$i]->getHtmlUrl()."\">".$this->people[$i]->getFullName()."</a>";
 						print_privacy_error();
-						echo "<br />";
+						echo "<br>";
 						$printed = true;
 					}
 					else if (!$printed) {
 						print_privacy_error();
-						echo "<br />";
+						echo "<br>";
 					}
 				}
 			}
@@ -208,12 +208,12 @@ class WT_Controller_Timeline extends WT_Controller_Chart {
 				$xoffset += abs($tyoffset);
 				$placements[$place] = $yoffset;
 
-				echo "<div id=\"fact$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($xoffset):"right: ".($xoffset))."px; top:".($yoffset)."px; font-size: 8pt; height: ".($this->bheight)."px; \" onmousedown=\"factMD(this, '".$factcount."', ".($yoffset-$tyoffset).");\">";
+				echo "<div id=\"fact$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($xoffset):"right: ".($xoffset))."px; top:".($yoffset)."px; font-size: 8pt; height: ".($this->bheight)."px;\" onmousedown=\"factMD(this, '".$factcount."', ".($yoffset-$tyoffset).");\">";
 				echo "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"cursor: hand;\"><tr><td>";
 				echo "<img src=\"".$WT_IMAGES["hline"]."\" name=\"boxline$factcount\" id=\"boxline$factcount\" height=\"3\" align=\"left\" width=\"10\" alt=\"\" style=\"padding-";
 				if ($TEXT_DIRECTION=="ltr") echo "left";
 				else echo "right";
-				echo ": 3px;\" />";
+				echo ": 3px;\">";
 				$col = $event->temp % 6;
 				echo "</td><td valign=\"top\" class=\"person".$col."\">";
 				if (count($this->pids) > 6) echo $event->getParentObject()->getFullName()." - ";
@@ -301,7 +301,7 @@ class WT_Controller_Timeline extends WT_Controller_Chart {
 				//-- print the diagnal line
 				echo "<div id=\"dbox$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+25):"right: ".($basexoffset+25))."px; top:".($dyoffset)."px; font-size: 8pt; height: ".(abs($tyoffset))."px; width: ".(abs($tyoffset))."px;";
 				echo " background-image: url('".$WT_IMAGES[$img]."');";
-				echo " background-position: 0% $ypos; \" >";
+				echo " background-position: 0% $ypos;\">";
 				echo "</div>";
 	}
 }

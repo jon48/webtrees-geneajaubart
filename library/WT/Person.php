@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Person.php 12929 2011-11-28 09:28:14Z greg $
+// $Id: Person.php 13035 2011-12-12 13:12:42Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -614,7 +614,7 @@ class WT_Person extends WT_GedcomRecord {
 
 	/**
 	* get the person's sex image
-	* @return string  <img ... />
+	* @return string  <img ...>
 	*/
 	function getSexImage($size='small', $style='', $title='') {
 		return self::sexImage($this->getSex(), $size, $style, $title);
@@ -636,19 +636,19 @@ class WT_Person extends WT_GedcomRecord {
 		switch ($sex) {
 		case 'M':
 			if (isset($WT_IMAGES[$image])) {
-				return '<img src="'.$WT_IMAGES[$image].'" class="gender_image" style="'.$style.'" alt="'.WT_I18N::translate('Male').'"'.$title.' />';
+				return '<img src="'.$WT_IMAGES[$image].'" class="gender_image" style="'.$style.'" alt="'.WT_I18N::translate('Male').'"'.$title.'>';
 			} else {
 				return '<span style="size:'.$size.'">'.WT_UTF8_MALE.'</span>';
 			}
 		case 'F':
 			if (isset($WT_IMAGES[$image])) {
-				return '<img src="'.$WT_IMAGES[$image].'" class="gender_image" style="'.$style.'" alt="'.WT_I18N::translate('Female').'"'.$title.' />';
+				return '<img src="'.$WT_IMAGES[$image].'" class="gender_image" style="'.$style.'" alt="'.WT_I18N::translate('Female').'"'.$title.'>';
 			} else {
 				return '<span style="size:'.$size.'">'.WT_UTF8_FEMALE.'</span>';
 			}
 		default:
 			if (isset($WT_IMAGES[$image])) {
-				return '<img src="'.$WT_IMAGES[$image].'" class="gender_image" style="'.$style.'" alt="'.WT_I18N::translate_c('unknown gender', 'Unknown').'"'.$title.' />';
+				return '<img src="'.$WT_IMAGES[$image].'" class="gender_image" style="'.$style.'" alt="'.WT_I18N::translate_c('unknown gender', 'Unknown').'"'.$title.'>';
 			} else {
 				return '<span style="size:'.$size.'">?</span>';
 			}
@@ -690,9 +690,9 @@ class WT_Person extends WT_GedcomRecord {
 				$gap = $p2->MinJD()-$elderdate->MinJD(); // days
 				$label .= "<div class=\"elderdate age\">";
 				// warning if negative gap : wrong order
-				if ($gap<0 && $counter>0) $label .= '<img alt="" src="'.$WT_IMAGES['warning'].'" /> ';
+				if ($gap<0 && $counter>0) $label .= '<img alt="" src="'.$WT_IMAGES['warning'].'"> ';
 				// warning if gap<6 months
-				if ($gap>1 && $gap<180 && $counter>0) $label .= '<img alt="" src="'.$WT_IMAGES['warning'].'" /> ';
+				if ($gap>1 && $gap<180 && $counter>0) $label .= '<img alt="" src="'.$WT_IMAGES['warning'].'"> ';
 				// children with same date means twin
 				/**if ($gap==0 && $counter>1) {
 					if ($this->getSex()=='M') $label .= WT_I18N::translate('Twin brother');
@@ -714,7 +714,7 @@ class WT_Person extends WT_GedcomRecord {
 		// I18N: This is an abbreviation for a number.  i.e. #7 means number 7
 		if ($counter) $label .= '<div>'.WT_I18N::translate('#%d', $counter).'</div>';
 		$label .= $this->label;
-		if ($gap!=0 && $counter<1) $label .= '<br />&nbsp;';
+		if ($gap!=0 && $counter<1) $label .= '<br>&nbsp;';
 		return $label;
 	}
 
@@ -1596,7 +1596,7 @@ class WT_Person extends WT_GedcomRecord {
 			// want the default name, not the one selected for display on the indilist.
 			$primary=$husb->getPrimaryName();
 			$husb->setPrimaryName(null);
-			$txt .= /* I18N: %s is the name of a person's father */ WT_I18N::translate('Father: %s', $husb->getFullName()).'<br />';
+			$txt .= /* I18N: %s is the name of a person's father */ WT_I18N::translate('Father: %s', $husb->getFullName()).'<br>';
 			$husb->setPrimaryName($primary);
 		}
 		$wife = $fam->getWife();

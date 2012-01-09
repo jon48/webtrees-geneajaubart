@@ -3,7 +3,7 @@
  * Header for Rural theme
  *
  * webtrees: Web based Family History software
- * Copyright (C) 2010 webtrees development team.
+ * Copyright (C) 2011 webtrees development team.
  *
  * Derived from PhpGedView
  * Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -40,26 +40,26 @@ echo
 	'<head>',
 	'<meta charset="UTF-8">',
 	'<title>', htmlspecialchars($title), '</title>',
-header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
-	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png" />',
-	'<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css" />',
-	'<link rel="stylesheet" type="text/css" href="', $stylesheet, '" />';
+	header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
+	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
+	'<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css">',
+	'<link rel="stylesheet" type="text/css" href="', $stylesheet, '">';
 
 //PERSO Add extra style sheet for personal additions
 $extrastylesheet= str_replace('.css', '.extra.css', $stylesheet);
-echo '<link rel="stylesheet" type="text/css" href="', $extrastylesheet, '" />';
+echo '<link rel="stylesheet" type="text/css" href="', $extrastylesheet, '">';
 //END PERSO
 
 switch ($BROWSERTYPE) {
-	//case 'chrome': uncomment when chrome.css file needs to be added, or add others as needed
-	case 'msie':
-	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_URL, $BROWSERTYPE, '.css" />';
-		break;
+//case 'chrome': uncomment when chrome.css file needs to be added, or add others as needed
+case 'msie':
+	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_URL, $BROWSERTYPE, '.css">';
+	break;
 }
 
 // Additional css files required (Only if Lightbox installed)
 if (WT_USE_LIGHTBOX) {
-		echo '<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/css/album_page.css" media="screen" />';
+		echo '<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/css/album_page.css" media="screen">';
 }
 
 echo
@@ -84,10 +84,10 @@ else {
 	echo  '<div id="htopright">';
 	//echo '<div class="header_search">',
 	echo 	'<form action="search.php" method="post">',
-			'<input type="hidden" name="action" value="general" />',
-			'<input type="hidden" name="topsearch" value="yes" />',
-			'<input type="text" name="query" size="25" placeholder="', WT_I18N::translate('Search'), '"/>',
-			'<input type="image" class="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '" />',
+			'<input type="hidden" name="action" value="general">',
+			'<input type="hidden" name="topsearch" value="yes">',
+			'<input type="text" name="query" size="25" placeholder="', WT_I18N::translate('Search'), '">',
+			'<input type="image" class="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '">',
 			'</form>';
 	echo '</div>';
 	echo  '<div id="hcenterright">';

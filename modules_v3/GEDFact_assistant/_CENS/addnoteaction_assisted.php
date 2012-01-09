@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: addnoteaction_assisted.php 12696 2011-11-11 00:56:58Z greg $
+// $Id: addnoteaction_assisted.php 13034 2011-12-12 13:10:58Z greg $
 
 // This file is required by the addnoteaction_assisted function in edit_interface.php
 
@@ -99,19 +99,19 @@ if ($pid_array != '') {
 	$xref = append_gedrec($newgedrec, WT_GED_ID);
 } else {
 	$xref='none';
-	echo '<br /><br /><br />';
+	echo '<br><br><br>';
 	echo '<div class="indent"> No individuals entered, close and try again </div>';
-	echo '<br /><br /><br />';
+	echo '<br><br><br>';
 }
 
 if ($xref != "none") {
-	echo "<br /><br />\n".WT_I18N::translate('New Shared Note created successfully.')." (".$xref.")<br /><br />";
-	echo '<br /><br />';
+	echo "<br><br>".WT_I18N::translate('New Shared Note created successfully.')." (".$xref.")<br><br>";
+	echo '<br><br>';
 	echo " &nbsp;&nbsp;&nbsp; The Census event (when saved) will be linked to Indi id's: &nbsp;&nbsp;&nbsp;&nbsp; ". $pid_array;
-	echo '<br /><br />';
-	echo '<br /><br />';
+	echo '<br><br>';
+	echo '<br><br>';
 	echo "&nbsp;&nbsp;&nbsp; <a href=\"#\" onclick=\"openerpasteid('$xref'); return false;\">".WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record ')." <b>$xref</b></a>\n";
-	echo '<br /><br /><br /><br />';
+	echo '<br><br><br><br>';
 
 	?>
 	<script>
@@ -133,5 +133,5 @@ if ($xref != "none") {
 	}
 	</script>
 	<?php
-	echo '<br /><br /><br /><br />';
+	echo '<br><br><br><br>';
 }

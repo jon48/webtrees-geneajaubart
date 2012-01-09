@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: help_text.php 12959 2011-12-01 18:35:13Z greg $
+// $Id: help_text.php 13066 2011-12-14 21:12:57Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -1673,13 +1673,15 @@ case 'SMTP_AUTH':
 	break;
 
 case 'SMTP_FROM_NAME':
-	$title=WT_I18N::translate('Sender name');
-	$text=WT_I18N::translate('Enter the name to be used in the &laquo;From:&raquo; field of e-mails originating at this site.<br /><br />For example, if your name is <b>John Smith</b> and you are the site administrator for a site that is  known as <b>Jones Genealogy</b>, you could enter something like <b>John Smith</b> or <b>Jones Genealogy</b> or even <b>John Smith, Administrator: Jones Genealogy</b>.  You may enter whatever you wish, but HTML is not permitted.');
+	$title=WT_I18N::translate('From email address');
+	// This text also exists in setup.php
+	$text=WT_I18N::translate('This is used in the "From:" header when sending mails.');
 	break;
 
 case 'SMTP_HELO':
-	$title=WT_I18N::translate('Sending domain name');
-	$text=WT_I18N::translate('This is the domain part of a valid e-mail address on the SMTP server.<br /><br />For example, if you have an e-mail account such as <b>yourname@abc.xyz.com</b>, you would enter <b>abc.xyz.com</b> here.');
+	$title=WT_I18N::translate('Sender email address');
+	// This text also exists in setup.php
+	$text=WT_I18N::translate('This is used in the "Sender:" header when sending mails.  It is often the same as the "From:" header.');
 	break;
 
 case 'SMTP_HOST':
@@ -1690,11 +1692,6 @@ case 'SMTP_HOST':
 case 'SMTP_PORT':
 	$title=WT_I18N::translate('SMTP port');
 	$text=WT_I18N::translate('The port number to be used for connections to the SMTP server.  Generally, this is port <b>25</b>.');
-	break;
-
-case 'SMTP_SIMPLE_MAIL':
-	$title=WT_I18N::translate('Use simple mail headers in external mails');
-	$text=WT_I18N::translate('In normal mail headers for external mails, the email address as well as the name are used. Some mail systems will not accept this. When set to <b>Yes</b>, only the email address will be used.');
 	break;
 
 case 'SMTP_SSL':
@@ -1843,8 +1840,9 @@ case 'SHOW_LIST_PLACES':
 	break;
 
 case 'SHOW_LIVING_NAMES':
-	$title=WT_I18N::translate('Show living names');
-	$text=WT_I18N::translate('Should the names of living people be shown to visitors?');
+	$title=WT_I18N::translate('Names of private individuals');
+	$text=WT_I18N::translate('This option will show the names (but no other details) of private individuals.  Individuals are private if they are still alive or if a privacy restriction has been added to their individual record.  To hide a specific name, add a privacy restriction to that name record.');
+
 	break;
 
 case 'SHOW_MEDIA_DOWNLOAD':
@@ -2116,11 +2114,6 @@ case 'age_differences':
 	$text=WT_I18N::translate('When this option box is checked, the «Close Relatives» tab will show date differences as follows:<br /><ul><li>birth dates of partners.<br />A negative value indicates that the second partner is older than the first.<br /><br /></li><li>marriage date and birth date of the first child.<br />A negative value here indicates that the child was born before the marriage date or that either the birth date or the marriage date is wrong.<br /><br /></li><li>birth dates of siblings.<br />A negative value here indicates that either the order of the children is wrong or that one of the birth dates is wrong.</li></ul>');
 	break;
 
-case 'ancestry_chart':
-	$title=WT_I18N::translate('Ancestors');
-	$text=WT_I18N::translate('The Ancestry page is very similar to the <a href="?help=pedigree.php">Pedigree Tree</a>, but with more details and alternate <a href="?help=chart_style">Chart style</a> displays.<br /><br />Each ancestry is shown with a unique number, calculated according to the <i>Sosa-Stradonitz</i> system:<div style="padding-left:30px;"><b>Even</b> numbers for men (child*2)<br /><b>Odd</b> numbers for women (husband+1) except for <b>1</b></div><br />Example:<br /><div style="padding-left:30px;">The root person is <b>1</b>, regardless of gender.<br /><b>1</b>\'s father is <b>2</b> (<b>1</b> * 2), mother is <b>3</b> (<b>2</b> + 1).<br /><b>2</b>\'s father is <b>4</b> (<b>2</b> * 2), mother is <b>5</b> (<b>4</b> + 1).<br /><b>3</b>\'s father is <b>6</b> (<b>3</b> * 2), mother is <b>7</b> (<b>6</b> + 1).<br /><b>7</b>\'s father is <b>14</b> (<b>7</b> * 2), mother is <b>15</b> (<b>14</b> +1).</div><br />etc.');
-	break;
-
 case 'annivers_date_select':
 	$title=WT_I18N::translate('Day selector');
 	$text=WT_I18N::translate('The top row of the Selector table is the <b>Day</b> selector.  Its meaning is obvious: You select a <u>day</u>.<br /><br />The result of clicking on a certain day depends of whether you are in <b>Day</b> or in <b>Month</b> mode.<br /><dl><dt><b>Day mode</b></dt><dd>In this mode, you click a day, the screen will refresh, and the list for that day will be displayed.</dd><dt><b>Month mode</b></dt><dd>You have the calendar of a certain month on the screen.  You click a day and the screen will refresh, but you will still see the month that you had on the screen before.  The reason for this is that you can still decide to select another month, year, or event before you either click the <b>View Day</b> or <b>View Month</b> button.<br /><br />At the end of the Day row you will see a <b>Quick Link</b> with today\'s date.  Clicking that <b>Quick Link</b> will display the list for today in <b>Day</b> mode, no matter whether you are in <b>Month</b> or in <b>Day</b> mode.</dd></dl>');
@@ -2174,11 +2167,6 @@ case 'block_move_up':
 case 'box_width':
 	$title=WT_I18N::translate('Box width');
 	$text=WT_I18N::translate('Here you can change the box width from 50 percent to 300 percent.  At 100 percent each box is about 270 pixels wide.');
-	break;
-
-case 'chart_type':
-	$title=WT_I18N::translate('Chart type');
-	$text=WT_I18N::translate('Select what you want to see on the map chart. You can choose:<p style="padding-left: 25px"><b>Individual distribution chart</b>&nbsp;&nbsp;shows the countries in which persons from this database occur.<br /><b>Surname distribution chart</b>&nbsp;&nbsp;shows the countries in which the specified surname occurs.</p>');
 	break;
 
 case 'convertPath':
@@ -2342,11 +2330,6 @@ case 'fambook_descent':
 	$text=WT_I18N::translate('This value determines the number of descendant generations of the root person that will be printed in Hourglass format.');
 	break;
 
-case 'family_book_chart':
-	$title=WT_I18N::translate('Family book');
-	$text=WT_I18N::translate('This chart is very similar to the Hourglass chart.  It will show the ancestors and descendants of the selected root person on the same chart.  It will also show the descendants of the root person in the same Hourglass format.<br /><br />The root person is centered in the middle of the page with his descendants listed to the left and his ancestors listed to the right.  In this view, each generation is lined up across the page starting with the earliest generation and ending with the latest.<br /><br />Each descendant of the root person will become the root person of an additional hourglass chart, printed on the same page.  This process repeats until the specified number of descendant generations have been printed.');
-	break;
-
 case 'fan_width':
 	$title=WT_I18N::translate('Width');
 	$text=WT_I18N::translate('Here you can change the diagram width from 50 percent to 300 percent.  At 100 percent the output image is about 640 pixels wide.');
@@ -2416,11 +2399,6 @@ case 'help_contents_help':
 			.WT_I18N::translate('FAQ List: Edit').'</a></li><li><a href="?help=edit_gedcoms">'.WT_I18N::translate('GEDCOM: Administration page').'</a></li><li><a href="?help=edit_config_gedcom">'.WT_I18N::translate('GEDCOM: Configure').'</a></li><li><a href="?help=default_gedcom">'.WT_I18N::translate('GEDCOM: Default').'</a></li><li><a href="readme.html">'.WT_I18N::translate('View readme.html file').'</a></li><li><a href="?help=help_admin_users.php">'.WT_I18N::translate('User administration').'</a></li></ul></td>';
 		}
 	$text.=('</tr></table>');
-	break;
-
-case 'hourglass_chart':
-	$title=WT_I18N::translate('Hourglass chart');
-	$text=WT_I18N::translate('The Hourglass chart will show the ancestors and descendants of the selected root person on the same chart.  This chart is a mix between the Descendancy chart and the Pedigree chart.<br /><br />The root person is centered in the middle of the page with his descendants listed to the left and his ancestors listed to the right.  In this view, each generation is lined up across the page starting with the earliest generation and ending with the latest.<br /><br />If there is a downwards arrow on the screen under the root person, clicking on it will display a list of the root person\'s close family members that you can use the navigate down the chart.  Selecting a name from this list will reload the chart with the selected person as the new root person.');
 	break;
 
 case 'import_gedcom':
@@ -2516,11 +2494,6 @@ case 'password_confirm':
 	$text=WT_I18N::translate('Type your password again, to make sure you have typed it correctly.');
 	break;
 
-case 'pedigree_tree':
-	$title=WT_I18N::translate('Pedigree');
-	$text=WT_I18N::translate('A pedigree is an enumeration of all ancestors of the starting person.  Users who are not logged in see the pedigree of the starting (root) person chosen by the site administrator.  Logged in users can select their own starting (root) person.<br /><br />In this context, "All ancestors" means the father and mother, their parents, and so on.  The pedigree is displayed graphically; you don\'t have to struggle through pages of text to determine your ancestors.<br /><br />All individuals are displayed in Name boxes on the screen.<br /><ul><li><b>Name boxes on the pedigree</b><br />If the Pedigree page is set to show details, you will see the person\'s name and birth and death dates.  You can click on a person\'s name to take you directly to the Individual Information page of that person.<br /><br />When <b>Show details</b> is on there are two icons inside the name box.</li><li><b>Pedigree icon inside the Name box</b><br />When the option <b>Show Details</b> is on, you see a Pedigree icon in the Name box. Depending on the site settings, you have to hover over the icon or click on it.  When you click on or hover over this icon, a small sub-menu appears.<br /><br />The items <b>Pedigree Tree</b> and <b>Descendancy Chart</b> are similar to those items in the main menu, but the difference is that the starting person is now the individual of mentioned in the Name box.  You also see <b>Family with Spouse</b>. Underneath that you see the name of the spouse followed by the names of the children.  All names are clickable.</li><li><b>Magnifying glass inside the Name box</b><br />Depending on the site settings, you have to hover over the icon or click on it.  This magnifies the Name box so that more details will be displayed.  You will see more dates and events. Names are clickable.</li><li><b>Arrows</b><br />On the left or right of the leftmost or rightmost Name boxes you may see arrows.  When you click on these arrows the screen display will shift in the direction of the arrow.</li></ul>');
-	break;
-
 case 'PGV_WIZARD':
 	$title=WT_I18N::translate('PhpGedView to <b>webtrees</b> transfer wizard');
 	$text =WT_I18N::translate('The PGV to <b>webtrees</b> wizard is an automated process to assist administrators make the move from a PGV installation to a new <b>webtrees</b> one. It will transfer all PGV GEDCOM and other database information directly to your new <b>webtrees</b> database. The following requirements are necessary:');
@@ -2573,26 +2546,6 @@ case 'pls_note11':
 case 'ppp_view_records':
 	$title=WT_I18N::translate('View all records');
 	$text=WT_I18N::translate('Clicking on this link will show you a list of all of the individuals and families that have events occurring in this place.  When you get to the end of a place hierarchy, which is normally a town or city, the name list will be shown automatically.');
-	break;
-
-case 'random_media_ajax_controls':
-	$title=WT_I18N::translate('Show slideshow controls?');
-	$text=WT_I18N::translate('You can use this setting to show or hide the slideshow controls of the Random Media block.<br /><br />These controls allow the user to jump to another random object or to play through randomly selected media like a slideshow. The slideshow changes the contents of the block without preloading information from the server and without reloading the entire page.');
-	break;
-
-case 'random_media_filter':
-	$title=WT_I18N::translate('Media filter');
-	$text=WT_I18N::translate('You can restrict what the Random Media block is permitted to show according to the format and type of media item.  When a given checkbox is checked, the Random Media block is allowed to display media items of that format or type.<br /><br />Format or Type codes that exist in your database but are not in these checkbox lists are assumed to have the corresponding checkbox checked.  For example, if your database contains Media objects of format <b><i>pdf</i></b>, the Random Media block is always permitted to display them.  Similarly, if your database contains Media objects of type <b><i>special</i></b>, the Random Media block is always permitted to display them.');
-	break;
-
-case 'random_media_persons_or_all':
-	$title=WT_I18N::translate('Show only persons, events, or all?');
-	$text=WT_I18N::translate('This option lets you determine the type of media to show.<br /><br />When you select <b>Persons</b>, only media associated with persons will be shown.  Usually, this would be a person\'s photograph.  When you select <b>Events</b>, only media associated with facts or events will be shown.  This might be an image of a certificate.  When you select <b>ALL</b>, this block will show all types of media.');
-	break;
-
-case 'random_media_start_slide':
-	$title=WT_I18N::translate('Start slide show on page load?');
-	$text=WT_I18N::translate('Should the slideshow start automatically when the page is loaded.<br /><br />The slideshow changes the contents of the block without preloading information from the server and without reloading the entire page.');
 	break;
 
 case 'real_name':
@@ -2684,38 +2637,6 @@ case 'show_spouse':
 case 'simple_filter':
 	$title=WT_I18N::translate('Simple search filter');
 	$text=WT_I18N::translate('Simple search filter based on the characters entered, no wildcards are accepted.');
-	break;
-
-case 'stat_gax':
-	$title=WT_I18N::translate('Select the desired age interval');
-	$text=WT_I18N::translate('For example, <b>interval 10 years</b> describes the following set of age ranges:<div style="padding-left:30px;">younger than one year<br />one year to 5 years<br />6 to 10<br />11 to 20<br />21 to 30<br />31 to 40<br />41 to 50<br />51 to 60<br />61 to 70<br />71 to 80<br />81 to 90<br />91 to 100<br />older than 100 years</div>');
-	break;
-
-case 'stat_gbx':
-	$title=WT_I18N::translate('Select the desired age interval');
-	$text=WT_I18N::translate('For example, <b>interval 2 years</b> describes the following set of age ranges:<div style="padding-left:30px;">younger than 16 years<br />16 to 18<br />19 to 20<br />21 to 22<br />23 to 24<br />25 to 26<br />27 to 28<br />29 to 30<br />31 to 32<br />33 to 35<br />36 to 40<br />41 to 50<br />older than 50 years</div>');
-	break;
-
-case 'stat_gcx':
-	$title=WT_I18N::translate('Select the desired count interval');
-	$text=WT_I18N::translate('For example, <b>interval one child</b> describes the following set of child count ranges:<div style="padding-left:30px;">without children<br />one child<br />two children<br />3, 4, 5, 6, 7, 8, 9, 10 children<br />more than 10 children</div>');
-	break;
-
-case 'stat_gwx':
-	// Commented out due the bug #741367
-	// When the ststistics will be written it will be easy to restore
-	//$title=WT_I18N::translate('Select the desired age interval');
-	//$text=WT_I18N::translate('For example, <b>months after marriage</b> describes the following set of month ranges:<div style="padding-left:30px;">before the marriage<br />from the marriage to 8 months after<br />from 8 to 12<br />from 12 to 15<br />from 15 to 18<br />from 18 to 24<br />from 24 to 48<br />over 48 months after the marriage</div><br /><br />When you want to show quarters you have to choose: <b>quarters</b>');
-	break;
-
-case 'stat_gwz':
-	$title=WT_I18N::translate('Boundaries for Z axis');
-	$text=WT_I18N::translate('Select the desired starting year and interval<br /><br />For example, <b>from 1700 interval 50 years</b> describes the following set of date ranges:<div style="padding-left:30px;">before 1700<br />1700 to 1749<br />1750 to 1799<br />1800 to 1849<br />1850 to 1899<br />1900 to 1949<br />1950 to 1999<br />2000 or later</div>');
-	break;
-
-case 'timeline_chart':
-	$title=WT_I18N::translate('Timeline');
-	$text=WT_I18N::translate('On this chart you can display one or more persons along a timeline.  You can, for example, visualize the status of two or more persons at a certain moment.<br /><br />If you click the <b>Time Line</b> link on an other page you will already see one person on the Time Line.  If you clicked the <b>Time Line</b> menu item in a page header, you have to supply the starting person\'s ID.');
 	break;
 
 case 'treenav':

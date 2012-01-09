@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: setup.php 12809 2011-11-19 09:01:30Z greg $
+// $Id: setup.php 13044 2011-12-13 09:22:10Z greg $
 
 define('WT_SCRIPT_NAME', 'setup.php');
 define('WT_DATA_DIR',    'data/');
@@ -213,13 +213,13 @@ if (empty($_POST['lang'])) {
 	echo
 		'<p>',
 		WT_I18N::translate('The memory and CPU time requirements depend on the number of individuals in your family tree.'),
-		'<br/>',
+		'<br>',
 		WT_I18N::translate('The following list shows typical requirements.'),
 		'</p><p>',
 		WT_I18N::translate('Small systems (500 individuals): 16-32MB, 10-20 seconds'),
-		'<br/>',
+		'<br>',
 		WT_I18N::translate('Medium systems (5000 individuals): 32-64MB, 20-40 seconds'),
-		'<br/>',
+		'<br>',
 		WT_I18N::translate('Large systems (50000 individuals): 64-128MB, 40-80 seconds'),
 		'</p>',
 		($maxmem<32 || $maxcpu<20) ? '<p class="bad">' : '<p class="good">',
@@ -232,7 +232,7 @@ if (empty($_POST['lang'])) {
 	if (!$errors) {
 		echo '<input type="hidden" name="maxcpu" value="'.$maxcpu.'">';
 		echo '<input type="hidden" name="maxmem" value="'.$maxmem.'">';
-		echo '<br/><hr/><input type="submit" value="'.WT_I18N::translate('Continue').'">';
+		echo '<br><hr><input type="submit" value="'.WT_I18N::translate('Continue').'">';
 
 	}
 	echo '</form></body></html>';
@@ -286,7 +286,7 @@ if (empty($_POST['dbuser']) || !$dbh || !$db_version_ok) {
 		'<fieldset><legend>', WT_I18N::translate('Database connection'), '</legend>',
 		'<table border="0"><tr><td>',
 		WT_I18N::translate('Server name'), '</td><td>',
-		'<input type="text" name="dbhost" value="', htmlspecialchars($_POST['dbhost']), '"></td><td>',
+		'<input type="text" name="dbhost" value="', htmlspecialchars($_POST['dbhost']), '" dir="ltr"></td><td>',
 		WT_I18N::translate('Most sites are configured to use localhost.  This means that your database runs on the same computer as your web server.'),
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Port number'), '</td><td>',
@@ -303,7 +303,7 @@ if (empty($_POST['dbuser']) || !$dbh || !$db_version_ok) {
 		'</td></tr><tr><td>',
 		'</td></tr></table>',
 		'</fieldset>',
-		'<br/><hr/><input type="submit" value="'.WT_I18N::translate('Continue').'">',
+		'<br><hr><input type="submit" value="'.WT_I18N::translate('Continue').'">',
 		'</form>',
 		"\n<script type=\"text/javascript\">\n//<![CDATA[\n",
 		'document.config.dbuser.focus();',
@@ -394,7 +394,7 @@ if (!$dbname_ok) {
 		WT_I18N::translate('The prefix is optional, but recommended.  By giving the table names a unique prefix you can let several different applications share the same database. "wt_" is suggested, but can be anything you want.'),
 		'</td></tr></table>',
 		'</fieldset>',
-		'<br/><hr/><input type="submit" value="'.WT_I18N::translate('Continue').'">',
+		'<br><hr><input type="submit" value="'.WT_I18N::translate('Continue').'">',
 		'</form>',
 		"\n<script type=\"text/javascript\">\n//<![CDATA[\n",
 		'document.config.dbname.focus();',
@@ -422,7 +422,6 @@ if (empty($_POST['smtpport'  ])) $_POST['smtpport'  ]='25';
 if (empty($_POST['smtpusepw' ])) $_POST['smtpusepw' ]=1;
 if (empty($_POST['smtpuser'  ])) $_POST['smtpuser'  ]='';
 if (empty($_POST['smtppass'  ])) $_POST['smtppass'  ]='';
-if (empty($_POST['smtpsmpl'  ])) $_POST['smtpsmpl'  ]=0;
 if (empty($_POST['smtpsecure'])) $_POST['smtpsecure']='none';
 if (empty($_POST['smtpfrom'  ])) $_POST['smtpfrom'  ]='webmaster@localhost';
 if (empty($_POST['smtpsender'])) $_POST['smtpsender']=$_POST['smtpfrom'];
@@ -463,7 +462,7 @@ if (empty($_POST['wtname']) || empty($_POST['wtuser']) || strlen($_POST['wtpass'
 		'</td></tr><tr><td>',
 		'</td></tr></table>',
 		'</fieldset>',
-		'<br /><br />',
+		'<br><br>',
 		'<h3>', WT_I18N::translate('Email'), '</h3>',
 		'<p>', WT_I18N::translate('<b>webtrees</b> needs to send emails, such as password reminders and site notifications.  To do this, it can use this server\'s built in PHP mail facility (which is not always available) or an external SMTP (mail-relay) service, for which you will need to provide the connection details.'), '</p>',
 		'<p>', WT_I18N::translate('To use a Google mail account, use the following settings: server=smtp.gmail.com, port=587, security=tls, username=xxxxx@gmail.com, password=[your gmail password]'), '</p>',
@@ -471,7 +470,7 @@ if (empty($_POST['wtname']) || empty($_POST['wtuser']) || strlen($_POST['wtpass'
 		'<fieldset><legend>', WT_I18N::translate('SMTP mail server'), '</legend>',
 		'<table border="0"><tr><td>',
 		WT_I18N::translate('Messages'), '</td><td>',
-		'<select name="smtpuse" onchange="document.config.smtpserv.disabled=(this.value!=\'external\');document.config.smtpport.disabled=(this.value!=\'external\');document.config.smtpusepw.disabled=(this.value!=\'external\');document.config.smtpuser.disabled=(this.value!=\'external\');document.config.smtppass.disabled=(this.value!=\'external\');document.config.smtpsmpl.disabled=(this.value!=\'external\');document.config.smtpsecure.disabled=(this.value!=\'external\');document.config.smtpfrom.disabled=(this.value!=\'external\');document.config.smtpsender.disabled=(this.value!=\'external\');">',
+		'<select name="smtpuse" onchange="document.config.smtpserv.disabled=(this.value!=\'external\');document.config.smtpport.disabled=(this.value!=\'external\');document.config.smtpusepw.disabled=(this.value!=\'external\');document.config.smtpuser.disabled=(this.value!=\'external\');document.config.smtppass.disabled=(this.value!=\'external\');document.config.smtpsecure.disabled=(this.value!=\'external\');document.config.smtpfrom.disabled=(this.value!=\'external\');document.config.smtpsender.disabled=(this.value!=\'external\');">',
 		'<option value="internal" ',
 		$_POST['smtpuse']=='internal' ? 'selected="selected"' : '',
 		'>', WT_I18N::translate('Use PHP mail to send messages'), '</option>',
@@ -485,11 +484,11 @@ if (empty($_POST['wtname']) || empty($_POST['wtuser']) || strlen($_POST['wtpass'
 		WT_I18N::translate('If you don\'t want to send mail, for example when running webtrees with a single user or on a standalone computer, you can disable this feature.'),
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Server'), '</td><td>',
-		'<input type="text" name="smtpserv" value="', htmlspecialchars($_POST['smtpserv']), '"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', ' /></td><td>',
+		'<input type="text" name="smtpserv" value="', htmlspecialchars($_POST['smtpserv']), '"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', '></td><td>',
 		WT_I18N::translate('This is the name of the SMTP server. \'localhost\' means that the mail service is running on the same computer as your web server.'),
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Port'), '</td><td>',
-		'<input type="text" name="smtpport" value="', htmlspecialchars($_POST['smtpport']), '"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', ' /></td><td>',
+		'<input type="text" name="smtpport" value="', htmlspecialchars($_POST['smtpport']), '"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', '></td><td>',
 		WT_I18N::translate('By default, SMTP works on port 25.'),
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Use password'), '</td><td>',
@@ -504,22 +503,12 @@ if (empty($_POST['wtname']) || empty($_POST['wtuser']) || strlen($_POST['wtpass'
 		WT_I18N::translate('Most SMTP servers require a password.'),
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Username'), '</td><td>',
-		'<input type="text" name="smtpuser" value="', htmlspecialchars($_POST['smtpuser']), '"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', ' /></td><td>',
+		'<input type="text" name="smtpuser" value="', htmlspecialchars($_POST['smtpuser']), '"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', '></td><td>',
 		'&nbsp;',
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Password'), '</td><td>',
-		'<input type="password" name="smtppass" value="', htmlspecialchars($_POST['smtppass']), '"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', ' /></td><td>',
+		'<input type="password" name="smtppass" value="', htmlspecialchars($_POST['smtppass']), '"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', '></td><td>',
 		'&nbsp;',
-		'</td></tr><tr><td>',
-		WT_I18N::translate('Use simple mail headers'), '</td><td>',
-		'<select name="smtpsmpl"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', '>',
-		'<option value="yes" ',
-		$_POST['smtpsmpl'] ? 'selected="selected"' : '',
-		'>', WT_I18N::translate('yes'), '</option>',
-		'<option value="no" ',
-		!$_POST['smtpsmpl'] ? 'selected="selected"' : '',
-		'>', WT_I18N::translate('no'), '</option>',
-		'</select></td><td>',
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Security'), '</td><td>',
 		'<select name="smtpsecure"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', '>',
@@ -536,16 +525,16 @@ if (empty($_POST['wtname']) || empty($_POST['wtuser']) || strlen($_POST['wtpass'
 		WT_I18N::translate('Most servers do not use secure connections.'),
 		'</td></tr><tr><td>',
 		/* I18N: the "From:" header in an email */ WT_I18N::translate('From email address'), '</td><td>',
-		'<input type="text" name="smtpfrom" size="40" value="', htmlspecialchars($_POST['smtpfrom']), '"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', ' /></td><td>',
+		'<input type="text" name="smtpfrom" size="40" value="', htmlspecialchars($_POST['smtpfrom']), '"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', '></td><td>',
 		WT_I18N::translate('This is used in the "From:" header when sending mails.'),
 		'</td></tr><tr><td>',
 		/* I18N: the "Sender:" header in an email */ WT_I18N::translate('Sender email address'), '</td><td>',
-		'<input type="text" name="smtpsender" size="40" value="', htmlspecialchars($_POST['smtpsender']), '"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', ' /></td><td>',
+		'<input type="text" name="smtpsender" size="40" value="', htmlspecialchars($_POST['smtpsender']), '"', $_POST['smtpuse']=='exernal' ? '' : 'disabled', '></td><td>',
 		WT_I18N::translate('This is used in the "Sender:" header when sending mails.  It is often the same as the "From:" header.'),
 		'</td></tr><tr><td>',
 		'</td></tr></table>',
 		'</fieldset>',
-		'<br/><hr/><input type="submit" value="'.WT_I18N::translate('Continue').'">',
+		'<br><hr><input type="submit" value="'.WT_I18N::translate('Continue').'">',
 		'</form>',
 		"\n<script type=\"text/javascript\">\n//<![CDATA[\n",
 		'document.config.wtname.focus();',
@@ -1009,11 +998,10 @@ try {
 		"('SMTP_AUTH_USER',                  ?),".
 		"('SMTP_AUTH_PASS',                  ?),".
 		"('SMTP_SSL',                        ?),".
-		"('SMTP_SIMPLE_MAIL',                ?),".
 		"('SMTP_FROM_NAME',                  ?)"
 	)->execute(array(
 		$_POST['smtpuse'], $_POST['smtpserv'], $_POST['smtpsender'], $_POST['smtpport'], $_POST['smtpusepw'],
-		$_POST['smtpuser'], $_POST['smtppass'], $_POST['smtpsecure'], $_POST['smtpsmpl'], $_POST['smtpfrom']
+		$_POST['smtpuser'], $_POST['smtppass'], $_POST['smtpsecure'], $_POST['smtpfrom']
 	));
 
 	echo

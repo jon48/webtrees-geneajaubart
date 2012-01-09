@@ -28,7 +28,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: authentication.php 12740 2011-11-14 16:07:16Z greg $
+// $Id: authentication.php 13012 2011-12-08 20:36:46Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -325,11 +325,7 @@ function addMessage($message) {
 		$fromFullName = $message['from'];
 	} else {
 		$fromFullName = getUserFullName($user_id_from);
-		if (!get_site_setting('SMTP_SIMPLE_MAIL')) {
-			$from = hex4email($fromFullName, 'UTF-8')." <".getUserEmail($user_id_from).">";
-		} else {
-			$from = getUserEmail($user_id_from);
-		}
+		$from = hex4email($fromFullName, 'UTF-8')." <".getUserEmail($user_id_from).">";
 		$toFullName=getUserFullName($user_id_to);
 		$copy_email = WT_I18N::translate('You sent the following message to a webtrees user:').' '.$toFullName."\r\n\r\n".$copy_email;
 
@@ -393,11 +389,7 @@ function addMessage($message) {
 			$oryginal_email .= $fromFullName."\r\n\r\n".$message['body'];
 		}
 		$toFullName=getUserFullName($user_id_to);
-		if (!get_site_setting('SMTP_SIMPLE_MAIL')) {
-			$to = hex4email($toFullName, 'UTF-8'). " <".getUserEmail($user_id_to).">";
-		} else {
-			$to = getUserEmail($user_id_to);
-		}
+		$to = hex4email($toFullName, 'UTF-8'). " <".getUserEmail($user_id_to).">";
 		if (getUserEmail($user_id_to)) {
 			// send the original message
 			if (!webtreesMail($to, $from, $oryginal_subject, $oryginal_email)) {

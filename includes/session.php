@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: session.php 12990 2011-12-05 08:44:34Z greg $
+// $Id: session.php 13132 2011-12-23 15:25:32Z greg $
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
 if (!defined('WT_SCRIPT_NAME')) {
@@ -31,7 +31,7 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.2.5');
+define('WT_VERSION',         '1.2.6');
 define('WT_VERSION_RELEASE', ''); // 'svn', 'beta', 'rc1', '', etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
 
@@ -404,6 +404,8 @@ define('WT_USER_ID', getUserId());
 
 // With no parameters, init() looks to the environment to choose a language
 define('WT_LOCALE', WT_I18N::init());
+$WT_SESSION->locale=WT_I18N::$locale;
+
 // Non-latin languages may need non-latin digits
 define('WT_NUMBERING_SYSTEM', Zend_Locale_Data::getContent(WT_LOCALE, 'defaultnumberingsystem'));
 

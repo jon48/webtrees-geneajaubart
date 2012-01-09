@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_db.php 12313 2011-10-15 20:38:06Z greg $
+// $Id: functions_db.php 13098 2011-12-20 23:33:04Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -895,6 +895,66 @@ function search_notes($query, $geds, $match, $skip) {
 	}
 
 	$sql="SELECT 'NOTE' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec FROM `##other` WHERE (".implode(" {$match} ", $querysql).") AND o_type='NOTE' AND o_file IN (".implode(',', $geds).')';
+
+	// Group results by gedcom, to minimise switching between privacy files
+	$sql.=' ORDER BY ged_id';
+
+	$list=array();
+	$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+	$GED_ID=WT_GED_ID;
+	foreach ($rows as $row) {
+		// Switch privacy file if necessary
+		if ($row['ged_id']!=$GED_ID) {
+			$GEDCOM=get_gedcom_from_id($row['ged_id']);
+			load_gedcom_settings($row['ged_id']);
+			$GED_ID=$row['ged_id'];
+		}
+		$record=WT_Note::getInstance($row);
+		// SQL may have matched on private data or gedcom tags, so check again against privatized data.
+		$gedrec=utf8_strtoupper($record->getGedcomRecord());
+		if ($skip) {
+			$gedrec=preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|SUBM|REFN|RESN) .*/', '', $gedrec);
+		}
+		foreach ($queryregex as $regex) {
+			if (!preg_match('/\n\d '.WT_REGEX_TAG.' .*'.$regex.'/', $gedrec)) {
+				continue 2;
+			}
+		}
+		$list[]=$record;
+	}
+	// Switch privacy file if necessary
+	if ($GED_ID!=WT_GED_ID) {
+		$GEDCOM=WT_GEDCOM;
+		load_gedcom_settings(WT_GED_ID);
+	}
+	return $list;
+}
+
+
+// Search the gedcom records of repositories
+// $query - array of search terms
+// $geds - array of gedcoms to search
+// $match - AND or OR
+// $skip - ignore data in certain tags
+function search_repos($query, $geds, $match, $skip) {
+	global $GEDCOM;
+
+	// No query => no results
+	if (!$query) {
+		return array();
+	}
+
+	// Convert the query into a SQL expression
+	$querysql=array();
+	// Convert the query into a regular expression
+	$queryregex=array();
+
+	foreach ($query as $q) {
+		$queryregex[]=preg_quote(utf8_strtoupper($q), '/');
+		$querysql[]="o_gedcom LIKE ".WT_DB::quote("%{$q}%")." COLLATE '".WT_I18N::$collation."'";
+	}
+
+	$sql="SELECT 'REPO' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec FROM `##other` WHERE (".implode(" {$match} ", $querysql).") AND o_type='REPO' AND o_file IN (".implode(',', $geds).')';
 
 	// Group results by gedcom, to minimise switching between privacy files
 	$sql.=' ORDER BY ged_id';

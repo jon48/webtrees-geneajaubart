@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: login_register.php 12963 2011-12-02 14:46:14Z greg $
+// $Id: login_register.php 13043 2011-12-12 22:42:25Z nigel $
 
 define('WT_SCRIPT_NAME', 'login_register.php');
 require './includes/session.php';
@@ -56,7 +56,7 @@ case 'pwlost' :
 		->setPageTitle(WT_I18N::translate('Lost password request'))
 		->pageHeader();
 	?>
-		<div id="register-page">
+		<div id="login-register-page">
 			<form name="requestpwform" action="login_register.php" method="post" onsubmit="t = new Date(); document.requestpwform.time.value=t.toUTCString(); return checkform(this);">
 			<input type="hidden" name="time" value="">
 			<input type="hidden" name="action" value="requestpw">
@@ -89,7 +89,7 @@ case 'requestpw' :
 	$controller
 		->setPageTitle(WT_I18N::translate('Lost password request'))
 		->pageHeader();
-	echo '<div id="register-page">';
+	echo '<div id="login-register-page">';
 	$user_id=get_user_id($user_name);
 	if (!$user_id) {
 		AddToLog('New password requests for user '.$user_name.' that does not exist', 'auth');
@@ -141,7 +141,7 @@ case 'requestpw' :
 			AddToLog('Password request was sent to user: '.$user_name, 'auth');
 		}
 	}
-	echo '</div>'; // <div id="register-page">
+	echo '</div>'; // <div id="login-register-page">
 	break;
 
 case 'register' :
@@ -259,7 +259,7 @@ case 'register' :
 				}
 			');
 
-		echo '<div id="register-page">';
+		echo '<div id="login-register-page">';
 		if ($SHOW_REGISTER_CAUTION) {
 			echo '<table class="width50"><tr><td>';
 			echo WT_I18N::translate('<div class="largeError">Notice:</div><div class="error">By completing and submitting this form, you agree:<ul><li>to protect the privacy of living people listed on our site;</li><li>and in the text box below, to explain to whom you are related, or to provide us with information on someone who should be listed on our site.</li></ul></div>');
@@ -279,7 +279,7 @@ case 'register' :
 					</tr>
 					<tr>
 						<td class="descriptionbox wrap"><label for="user_email"><?php echo WT_I18N::translate('Email address'), '</label>', help_link('email'); ?></td>
-						<td class="optionbox"><input type="text" size="30" id="user_email" name="user_email" value="<?php if (!$user_email_false) echo $user_email; ?>"/> *</td>
+						<td class="optionbox"><input type="text" size="30" id="user_email" name="user_email" value="<?php if (!$user_email_false) echo $user_email; ?>"> *</td>
 					</tr>
 					<tr>
 						<td class="descriptionbox wrap"><label for="username"><?php echo WT_I18N::translate('Desired user name'), '</label>', help_link('username'); ?></td>
@@ -369,7 +369,7 @@ case 'registernew' :
 
 		$controller->setPageTitle(WT_I18N::translate('New Account confirmation'));
 		$controller->pageHeader();
-		echo '<div id="register-page"><table><tr><td>';
+		echo '<div id="login-register-page"><table><tr><td>';
 		$user_created_ok = false;
 
 		AddToLog('User registration requested for: '.$user_name, 'auth');
@@ -472,7 +472,7 @@ case 'userverify' :
 	$controller->setPageTitle(WT_I18N::translate('User verification'));
 	$controller->pageHeader();
 
-	echo '<div id="register-page">';
+	echo '<div id="login-register-page">';
 	?>
 	<form name="verifyform" method="post" action="" onsubmit="t = new Date(); document.verifyform.time.value=t.toUTCString();">
 		<input type="hidden" name="action" value="verify_hash">
@@ -548,7 +548,7 @@ case 'verify_hash' :
 	$controller->setPageTitle(WT_I18N::translate('User verification'));
 	$controller->pageHeader();
 
-	echo '<div id="register-page">';
+	echo '<div id="login-register-page">';
 	echo '<table class="facts_table wrap width50">';
 	echo '<tr><td class="topbottombar">'.WT_I18N::translate('User verification').'</td></tr>';
 	echo '<tr><td class="optionbox">';

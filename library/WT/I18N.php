@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: I18N.php 12967 2011-12-03 10:02:28Z greg $
+// $Id: I18N.php 13096 2011-12-20 22:13:15Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,9 +33,14 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_I18N {
-	static private $locale='';
+	const UTF8_RLE="\xE2\x80\xAA"; // U+202A  (Left to Right embedding: treat everything following as LTR text)
+	const UTF8_LRE="\xE2\x80\xAB"; // U+202B  (Right to Left embedding: treat everything following as RTL text)
+	const UTF8_PDF="\xE2\x80\xAC"; // U+202C  (Pop directional formatting: restore state prior to last LRO, RLO, LRE, RLE)
+
+	static public  $locale='';
 	static private $dir='';
 	static public  $collation;
+	static public  $list_separator;
 
 	// Initialise the translation adapter with a locale setting.
 	// If null is passed, work out which language is needed from the environment.
@@ -105,9 +110,6 @@ class WT_I18N {
 				}
 			}
 		}
-		// We now have a valid locale.  Remember it.
-		$WT_SESSION->locale=$locale;
-
 		// Load the translation file
 		$translate=new Zend_Translate('gettext', WT_ROOT.'language/'.$locale.'.mo', $locale);
 
@@ -155,6 +157,9 @@ class WT_I18N {
 
 		self::$locale=$locale;
 		self::$dir=$TEXT_DIRECTION;
+
+		// I18N: This punctuation is used to separate lists of items.
+		self::$list_separator=WT_I18N::translate(', ');
 
 		// I18N: This is the name of the MySQL collation that applies to your language.  A list is available at http://dev.mysql.com/doc/refman/5.0/en/charset-unicode-sets.html
 		self::$collation=WT_I18N::translate('utf8_unicode_ci');
@@ -230,7 +235,7 @@ class WT_I18N {
 						$arg=$arg[0];
 					default:
 						// TODO: add LTR/RTL markup to each element?
-						$arg=implode(', ', $arg);
+						$arg=implode(self::$list_separator, $arg);
 					}
 				} else {
 					// For each embedded string, if the text-direction is the opposite of the
@@ -241,11 +246,11 @@ class WT_I18N {
 					// markup is not permitted.
 					if (self::$dir=='ltr') {
 						if (utf8_direction($arg)=='rtl') {
-							$arg=WT_UTF8_RLE.$arg.WT_UTF8_PDF;
+							$arg=self::UTF8_RLE.$arg.self::UTF8_PDF;
 						}
 					} else {
 						if (utf8_direction($arg)=='ltr') {
-							$arg=WT_UTF8_LRE.$arg.WT_UTF8_PDF;
+							$arg=self::UTF8_LRE.$arg.self::UTF8_PDF;
 						}
 					}
 				}

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: flags.php 12696 2011-11-11 00:56:58Z greg $
+// $Id: flags.php 13034 2011-12-12 13:10:58Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -107,7 +107,7 @@ if ($action == 'ChangeFlag') {
 	if (!WT_DEBUG) {
 		echo "\n<script type=\"text/javascript\">\n<!--\nedit_close();\n//-->\n</script>";
 	}
-	echo "<div class=\"center\"><a href=\"#\" onclick=\"edit_close();\">", WT_I18N::translate('Close Window'), "</a></div><br />\n";
+	echo "<div class=\"center\"><a href=\"#\" onclick=\"edit_close();\">", WT_I18N::translate('Close Window'), "</a></div><br>\n";
 	exit;
 }
 else {
@@ -174,11 +174,11 @@ else {
 	}
 ?>
 
-<form method="post" id="flags" name="flags" action="module.php?mod=googlemap&mod_action=flags&countrySelected=<?php echo $countrySelected; ?>&stateSelected=<?php echo $stateSelected; ?>">
-	<input type="hidden" name="action" value="ChangeFlag" />
-	<input type="hidden" name="selcountry" value="<?php echo $countrySelected; ?>" />
-	<input type="hidden" name="selstate" value="<?php echo $stateSelected; ?>" />
-	<input id="savebutton" name="save1" type="submit" disabled="true" value="<?php echo WT_I18N::translate('Save'); ?>" /><br />
+<form method="post" id="flags" name="flags" action="module.php?mod=googlemap&amp;mod_action=flags&amp;countrySelected=<?php echo $countrySelected; ?>&amp;stateSelected=<?php echo $stateSelected; ?>">
+	<input type="hidden" name="action" value="ChangeFlag">
+	<input type="hidden" name="selcountry" value="<?php echo $countrySelected; ?>">
+	<input type="hidden" name="selstate" value="<?php echo $stateSelected; ?>">
+	<input id="savebutton" name="save1" type="submit" disabled="true" value="<?php echo WT_I18N::translate('Save'); ?>"><br>
 	<table class="facts_table">
 		<tr>
 			<td class="optionbox" colspan="4">
@@ -251,7 +251,7 @@ else {
 ?>
 		</tr>
 	</table>
-	<input id="savebutton" name="save2" type="submit" disabled="true" value="<?php echo WT_I18N::translate('Save'); ?>" /><br />
+	<input id="savebutton" name="save2" type="submit" disabled="true" value="<?php echo WT_I18N::translate('Save'); ?>"><br>
 </form>
 <?php
-echo '<div class="center"><a href="#" onclick="edit_close();">', WT_I18N::translate('Close Window'), '</a></div><br />';
+echo '<div class="center"><a href="#" onclick="edit_close();">', WT_I18N::translate('Close Window'), '</a></div><br>';

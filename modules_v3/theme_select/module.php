@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12397 2011-10-24 15:19:35Z lukasz $
+// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -46,7 +46,7 @@ class theme_select_WT_Module extends WT_Module implements WT_Module_Block {
 		$title=$this->getTitle();
 		$menu=WT_MenuBar::getThemeMenu();
 		if ($menu) {
-			$content='<br /><div class="center theme_form">'.WT_MenuBar::getThemeMenu()->getMenuAsDropdown().'</div><br />';
+			$content='<br><div class="center theme_form">'.WT_MenuBar::getThemeMenu()->getMenuAsDropdown().'</div><br>';
 
 			if ($template) {
 				require WT_THEME_DIR.'templates/block_main_temp.php';

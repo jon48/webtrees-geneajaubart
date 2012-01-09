@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: album.php 12503 2011-11-03 11:58:38Z greg $
+// $Id: album.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -74,9 +74,9 @@ if ($reorder==1) {
 	//-->
 	</script>
 	<form name="reorder_form" method="post" action="edit_interface.php">
-		<input type="hidden" name="action" value="al_reorder_media_update" />
-		<input type="hidden" name="pid" value="<?php echo $controller->record->getXref(); ?>" />
-		<input type="hidden" id="ord2" name="order2" value="" />
+		<input type="hidden" name="action" value="al_reorder_media_update">
+		<input type="hidden" name="pid" value="<?php echo $controller->record->getXref(); ?>">
+		<input type="hidden" id="ord2" name="order2" value="">
 		<center>
 			<button type="submit" title="<?php echo WT_I18N::translate('Saves the sorted media to the database'); ?>" onclick="saveOrder();" ><?php echo WT_I18N::translate('Save'); ?></button>&nbsp;
 			<button type="submit" title="<?php echo WT_I18N::translate('Reset to the original order'); ?>" onclick="document.reorder_form.action.value='al_reset_media_update'; document.reorder_form.submit();"><?php echo WT_I18N::translate('Reset'); ?></button>&nbsp;

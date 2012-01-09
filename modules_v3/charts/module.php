@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12861 2011-11-22 17:16:21Z greg $
+// $Id: module.php 13109 2011-12-21 20:52:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,7 +41,9 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $ctype, $WT_IMAGES, $PEDIGREE_ROOT_ID, $PEDIGREE_FULL_DETAILS, $show_full, $bwidth, $bheight;
+		global $ctype, $WT_IMAGES, $PEDIGREE_FULL_DETAILS, $show_full, $bwidth, $bheight;
+
+		$PEDIGREE_ROOT_ID=get_gedcom_setting(WT_GED_ID, 'PEDIGREE_ROOT_ID');
 
 		$details=get_block_setting($block_id, 'details', false);
 		$type   =get_block_setting($block_id, 'type', 'pedigree');
@@ -73,7 +75,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 		}
 
 		$person = WT_Person::getInstance($pid);
-		if ($person==null) {
+		if (!$person) {
 			$pid = $PEDIGREE_ROOT_ID;
 			set_block_setting($block_id, 'pid', $pid);
 			$person = WT_Person::getInstance($pid);
@@ -81,11 +83,12 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
-		$title='';
-		if ($ctype=="gedcom" && WT_USER_GEDCOM_ADMIN || $ctype=="user" && WT_USER_ID) {
-			$title .= "<a href=\"#\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1'); return false;\">";
-			$title .= "<img class=\"adminicon\" src=\"".$WT_IMAGES["admin"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".WT_I18N::translate('Configure')."\" /></a>";
+		if ($ctype=='gedcom' && WT_USER_GEDCOM_ADMIN || $ctype=='user' && WT_USER_ID) {
+			$title='<img class="adminicon" src="'.$WT_IMAGES['admin'].'" width="15" height="15" alt="'.WT_I18N::translate('Configure').'"  onclick="window.open(\'index_edit.php?action=configure&amp;ctype='.$ctype.'&amp;block_id='.$block_id.'\', \'_blank\', \'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1\');">';
+		} else {
+			$title='';
 		}
+
 		if ($person) {
 			switch($type) {
 				case 'pedigree':
@@ -140,7 +143,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 				$content .= $mod->css;
 				$content .= $mod->headers;
 				$content .= '<script type="text/javascript" src="'.$mod->js.'"></script>';
-		    list($html, $js) = $tv->drawViewport($person->getXref(), 2, '');
+		    list($html, $js) = $tv->drawViewport($person->getXref(), 2);
 				$content .= $html.WT_JS_START.$js.WT_JS_END;
 				$content .= '</td>';
 			}
@@ -182,7 +185,9 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function configureBlock($block_id) {
-		global $ctype, $PEDIGREE_ROOT_ID, $ENABLE_AUTOCOMPLETE;
+		global $ctype, $ENABLE_AUTOCOMPLETE;
+
+		$PEDIGREE_ROOT_ID=get_gedcom_setting(WT_GED_ID, 'PEDIGREE_ROOT_ID');
 
 		if (safe_POST_bool('save')) {
 			set_block_setting($block_id, 'details', safe_POST_bool('details'));
@@ -219,7 +224,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 		<tr>
 			<td class="descriptionbox wrap width33"><?php echo WT_I18N::translate('Individual'); ?></td>
 			<td class="optionbox">
-				<input type="text" name="pid" id="pid" value="<?php echo $pid; ?>" size="5" />
+				<input type="text" name="pid" id="pid" value="<?php echo $pid; ?>" size="5">
 				<?php
 				print_findindi_link('pid','');
 				$root=WT_Person::getInstance($pid);

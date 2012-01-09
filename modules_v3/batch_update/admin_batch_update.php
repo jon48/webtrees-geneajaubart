@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_batch_update.php 12740 2011-11-14 16:07:16Z greg $
+// $Id: admin_batch_update.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -78,7 +78,7 @@ class batch_update {
 		}
 		$html.='</select>';
 		if ($this->PLUGIN) {
-			$html.='<br/><em>'.$this->PLUGIN->getDescription().'</em>';
+			$html.='<br><em>'.$this->PLUGIN->getDescription().'</em>';
 		}
 		$html.='</td></tr>';
 
@@ -105,7 +105,7 @@ class batch_update {
 						'</td><th><a href="'.$object->getHtmlUrl().'">'.$object->getFullName().'</a>'.
 						'</th>'.
 						'</tr><tr><td valign="top">'.
-						'<br/>'.implode('<br/>',$this->PLUGIN->getActionButtons($this->curr_xref, $this->record)).'<br/>'.
+						'<br>'.implode('<br>',$this->PLUGIN->getActionButtons($this->curr_xref, $this->record)).'<br>'.
 						'</td><td dir="ltr" align="left">'.
 						$this->PLUGIN->getActionPreview($this->curr_xref, $this->record);
 						'</td></tr>';

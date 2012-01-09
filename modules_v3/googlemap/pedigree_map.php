@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: pedigree_map.php 12914 2011-11-24 19:57:59Z brian $
+// $Id: pedigree_map.php 13122 2011-12-21 22:34:22Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -65,8 +65,8 @@ $MAX_PEDIGREE_GENERATIONS = min($MAX_PEDIGREE_GENERATIONS, 8);
 $controller->setPageTitle(/* I18N: %s is a person's name */ WT_I18N::translate('Pedigree map of %s', $controller->getPersonName()));
 $controller->pageHeader();
 
-// echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/googlemap_style.css" rel="stylesheet" />';
-echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet" />';
+// echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/googlemap_style.css" rel="stylesheet">';
+echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet">';
 
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
@@ -85,8 +85,8 @@ echo '<h2>', $controller->getPageTitle(), '</h2>';
 </script>
 </td><td width="50px">&nbsp;</td><td>
 	  <form name="people" method="get" action="module.php?ged=<?php echo WT_GEDURL; ?>&amp;mod=googlemap&amp;mod_action=pedigree_map">
-		<input type="hidden" name="mod" value="googlemap" />
-		<input type="hidden" name="mod_action" value="pedigree_map" />
+		<input type="hidden" name="mod" value="googlemap">
+		<input type="hidden" name="mod_action" value="pedigree_map">
 		<table class="pedigree_table" width="555">
 			<tr>
 				<td class="descriptionbox wrap">
@@ -111,7 +111,7 @@ echo '<h2>', $controller->getPageTitle(), '</h2>';
 			</tr>
 			<tr>
 				<td class="optionbox">
-					<input class="pedigree_form" type="text" id="rootid" name="rootid" size="3" value="<?php echo $controller->rootid; ?>" />
+					<input class="pedigree_form" type="text" id="rootid" name="rootid" size="3" value="<?php echo $controller->rootid; ?>">
 					<?php print_findindi_link("rootid",""); ?>
 				</td>
 				<td class="optionbox">
@@ -140,20 +140,20 @@ echo '<h2>', $controller->getPageTitle(), '</h2>';
 					<?php
 					echo "<input name=\"hideflags\" type=\"checkbox\"";
 					if ($hideflags) {echo " checked=\"checked\"";}
-						echo " />";
+						echo ">";
 					?>
 				</td>
 				<td class="optionbox">
 					<?php
 					echo "<input name=\"hidelines\" type=\"checkbox\"";
 					if ($hidelines) {echo " checked=\"checked\"";}
-					echo " />";
+					echo ">";
 					?>
 				</td>
 			</tr>
 			<tr>
 				<td class="topbottombar" colspan="5">
-					<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>" />
+					<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>">
 				</td>
 			</tr>
 		</table>
@@ -196,7 +196,7 @@ for ($i=0; $i<($controller->treesize); $i++) {
 			}
 			else { // The place is in the table but has empty values
 				if (!empty($name)) {
-					if (!empty($missing)) $missing .= ",\n ";
+					if (!empty($missing)) $missing .= ", ";
 					$addlist = '<a href="'.$person->getHtmlUrl().'">'. $name . '</a>';
 					$missing .= $addlist;
 					$miscount++;
@@ -205,7 +205,7 @@ for ($i=0; $i<($controller->treesize); $i++) {
 		}
 		else { // There was no place, or not listed in the map table
 			if (!empty($name)) {
-				if (!empty($missing)) $missing .= ",\n ";
+				if (!empty($missing)) $missing .= ", ";
 				$addlist = '<a href="'.$person->getHtmlUrl().'">'. $name . '</a>';
 				$missing .= $addlist;
 				$miscount++;
@@ -217,31 +217,31 @@ for ($i=0; $i<($controller->treesize); $i++) {
 
 //<!-- start of map display -->
 echo '<table class="tabs_table" cellspacing="0" cellpadding="0" border="0" width="100%">';
-echo "<tr>\n";
-echo "<td valign=\"top\">\n";
-echo "<img src=\"", WT_STATIC_URL, "images/spacer.gif\" width=\"".$GOOGLEMAP_XSIZE."\" height=\"0\" alt=\"\" border=\"0\"/>\n";
+echo "<tr>";
+echo "<td valign=\"top\">";
+echo "<img src=\"", WT_STATIC_URL, "images/spacer.gif\" width=\"".$GOOGLEMAP_XSIZE."\" height=\"0\" alt=\"\">";
 echo "<div id=\"pm_map\" style=\"border: 1px solid gray; height: ".$GOOGLEMAP_YSIZE."px; font-size: 0.9em;";
-echo " background-image: url('", WT_STATIC_URL, "images/loading.gif'); background-position: center; background-repeat: no-repeat; overflow: hidden;\"></div>\n";
+echo " background-image: url('", WT_STATIC_URL, "images/loading.gif'); background-position: center; background-repeat: no-repeat; overflow: hidden;\"></div>";
 if (WT_USER_IS_ADMIN) {
 	echo "<table width=\"100%\">";
-	echo "<tr><td align=\"left\">\n";
-	echo "<a href=\"module.php?mod=googlemap&mod_action=admin_editconfig\">", WT_I18N::translate('Google Maps configuration'), "</a>";
-	echo "</td>\n";
-	echo "<td align=\"center\">\n";
-	echo "<a href=\"module.php?mod=googlemap&mod_action=admin_places\">", WT_I18N::translate('Edit geographic place locations'), "</a>";
-	echo "</td>\n";
-	echo "<td align=\"right\">\n";
-	echo "<a href=\"module.php?mod=googlemap&mod_action=admin_placecheck\">", WT_I18N::translate('Place Check'), "</a>";
-	echo "</td></tr>\n";
-	echo "</table>\n";
+	echo "<tr><td align=\"left\">";
+	echo "<a href=\"module.php?mod=googlemap&amp;mod_action=admin_editconfig\">", WT_I18N::translate('Google Maps configuration'), "</a>";
+	echo "</td>";
+	echo "<td align=\"center\">";
+	echo "<a href=\"module.php?mod=googlemap&amp;mod_action=admin_places\">", WT_I18N::translate('Edit geographic place locations'), "</a>";
+	echo "</td>";
+	echo "<td align=\"right\">";
+	echo "<a href=\"module.php?mod=googlemap&amp;mod_action=admin_placecheck\">", WT_I18N::translate('Place Check'), "</a>";
+	echo "</td></tr>";
+	echo "</table>";
 }
-echo "</td><td width=\"15px\">&nbsp;</td>\n";
-echo "<td width=\"310px\" valign=\"top\">\n";
-echo "<div id=\"side_bar\" style=\"width: 300px; font-size: 0.9em; overflow: auto; overflow-x: hidden; overflow-y: auto; height: ".$GOOGLEMAP_YSIZE."px; \"></div></td>\n";
-echo "</tr>\n";
-echo "</table>\n";
+echo "</td><td width=\"15px\">&nbsp;</td>";
+echo "<td width=\"310px\" valign=\"top\">";
+echo "<div id=\"side_bar\" style=\"width: 300px; font-size: 0.9em; overflow: auto; overflow-x: hidden; overflow-y: auto; height: ".$GOOGLEMAP_YSIZE."px;\"></div></td>";
+echo "</tr>";
+echo "</table>";
 // display info under map
-echo "<hr />";
+echo "<hr>";
 echo "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" width=\"100%\">";
 echo "  <tr>";
 echo " <td valign=\"top\">";
@@ -254,29 +254,29 @@ if (isset($curgen)) {
 		'%1$d individuals displayed, out of the normal total of %2$d, from %3$d generations.',
 		$count,
 		$count, $total, $curgen
-	), '<br/>';
-	echo "</td>\n";
-	echo "  </tr>\n";
-	echo "  <tr>\n";
-	echo " <td valign=\"top\">\n";
+	), '<br>';
+	echo "</td>";
+	echo "  </tr>";
+	echo "  <tr>";
+	echo " <td valign=\"top\">";
 	if ($priv) {
-		echo WT_I18N::plural('%s individual is private.', '%s individuals are private.', $priv, $priv), '<br/>';
+		echo WT_I18N::plural('%s individual is private.', '%s individuals are private.', $priv, $priv), '<br>';
 	}
 	if ($count+$priv != $total) {
 		if ($miscount == 0) {
-			echo WT_I18N::translate('No ancestors in the database.'), "<br />\n";
+			echo WT_I18N::translate('No ancestors in the database.'), "<br>";
 		} else {
 			echo /* I18N: %1$d is a count of individuals, %2$s is a list of their names */ WT_I18N::plural(
 				'%1$d individual is missing birthplace map coordinates: %2$s.',
 				'%1$d individuals are missing birthplace map coordinates: %2$s.',
 				$miscount, $miscount, $missing),
-				'<br />';
+				'<br>';
 		}
 	}
 }
-echo " </td>\n";
-echo "  </tr>\n";
-echo "</table>\n";
+echo " </td>";
+echo "  </tr>";
+echo "</table>";
 echo "</div>";
 ?>
 <!-- end of map display -->

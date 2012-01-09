@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_4_text.php 12813 2011-11-19 14:18:05Z greg $
+// $Id: census_4_text.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -34,17 +34,17 @@ if (!defined('WT_WEBTREES')) {
 <div class="optionbox cens_text wrap">
 <!--[if IE]><style>.cens_text{margin-top:-1.3em;}</style><![EndIf]-->
 	<span><?php echo WT_I18N::translate('Click &quot;Preview&quot; to copy Edit Input Fields'); ?></span>
-	<span><input type="button" value="<?php echo WT_I18N::translate('Preview'); ?>" onclick="preview();" /></span>
+	<span><input type="button" value="<?php echo WT_I18N::translate('Preview'); ?>" onclick="preview();"></span>
 	<span><b><?php echo WT_I18N::translate('Proposed Census Text&nbsp;&nbsp;'); ?></b></span>
-	<span><input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>" onclick="caSave();" /></span>
-	<br /><br />
+	<span><input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>" onclick="caSave();"></span>
+	<br><br>
 	<span class="descriptionbox width15 nowrap">
 		<?php
 			echo WT_I18N::translate('Shared note'), help_link('SHARED_NOTE');
 		?>
 	</span>
 	<div class="optionbox">
-		<textarea wrap="off" name="NOTE" id="NOTE"></textarea><br />
+		<textarea wrap="off" name="NOTE" id="NOTE"></textarea><br>
 		<center>
 		<?php print_specialchar_link('NOTE',true); ?>
 		</center>

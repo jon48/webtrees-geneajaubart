@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: DB.php 12689 2011-11-10 17:54:28Z greg $
+// $Id: DB.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -162,7 +162,7 @@ class WT_DB {
 
 	// Display the query log as a table, for debugging
 	public static function getQueryLog() {
-		$html='<table border="1"><col span="3"/><col align="char"/><thead><tr><th>#</th><th>Query</th><th>Rows</th><th>Time (ms)</th></tr><tbody/>'.implode('', self::$log).'</table>';
+		$html='<table border="1"><col span="3"><col align="char"><thead><tr><th>#</th><th>Query</th><th>Rows</th><th>Time (ms)</th></tr></thead><tbody>'.implode('', self::$log).'</tbody></table>';
 		self::$log=array();
 		return $html;
 	}

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Descendancy.php 12847 2011-11-22 07:56:59Z greg $
+// $Id: Descendancy.php 13122 2011-12-21 22:34:22Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -89,12 +89,17 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 		$pbheight = $bheight+14;
 
 		// Validate form variables
-		$this->rootid=check_rootid($this->rootid);
-
-		if (strlen($this->name)<30) $this->cellwidth="420";
-		else $this->cellwidth=(strlen($this->name)*14);
+		if (strlen($this->name)<30) {
+			$this->cellwidth=420;
+		} else {
+			$this->cellwidth=(strlen($this->name)*14);
+		}
 
 		$this->descPerson = WT_Person::getInstance($this->rootid);
+		if (!$this->descPerson) {
+			$this->descPerson=$this->getSignificantIndividual();
+			$this->rootid=$this->descPerson->getXref();
+		}
 		$this->name=$this->descPerson->getFullName();
 
 		$this->setPageTitle(/* I18N: %s is a person's name */ WT_I18N::translate('Descendants of %s', $this->name));
@@ -134,10 +139,10 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 		//print_r($person);
 		echo "<li>";
 		echo "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td>";
-		if ($depth==$this->generations) echo "<img src=\"".$WT_IMAGES["spacer"]."\" height=\"3\" width=\"$Dindent\" border=\"0\" alt=\"\" /></td><td>";
+		if ($depth==$this->generations) echo "<img src=\"".$WT_IMAGES["spacer"]."\" height=\"3\" width=\"$Dindent\" alt=\"\"></td><td>";
 		else {
-			echo "<img src=\"".$WT_IMAGES["spacer"]."\" height=\"3\" width=\"3\" border=\"0\" alt=\"\" />";
-			echo "<img src=\"".$WT_IMAGES["hline"]."\" height=\"3\" width=\"".($Dindent-3)."\" border=\"0\" alt=\"\" /></td><td>";
+			echo "<img src=\"".$WT_IMAGES["spacer"]."\" height=\"3\" width=\"3\" alt=\"\">";
+			echo "<img src=\"".$WT_IMAGES["hline"]."\" height=\"3\" width=\"".($Dindent-3)."\" alt=\"\"></td><td>";
 		}
 		print_pedigree_person($person, 1, 0, $personcount);
 		echo "</td>";
@@ -156,7 +161,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 	
 		// d'Aboville child number
 		$level =$this->generations-$depth;
-		if ($this->show_full) echo "<br /><br />&nbsp;";
+		if ($this->show_full) echo "<br><br>&nbsp;";
 		echo "<span dir=\"ltr\">"; //needed so that RTL languages will display this properly
 		if (!isset($this->dabo_num[$level])) $this->dabo_num[$level]=0;
 		$this->dabo_num[$level]++;
@@ -202,9 +207,9 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 	
 		// print marriage info
 		echo "<li>";
-		echo "<img src=\"".$WT_IMAGES["spacer"]."\" height=\"2\" width=\"".($Dindent+4)."\" border=\"0\" alt=\"\" />";
-		echo "<span class=\"details1\" style=\"white-space: nowrap; \" >";
-		echo "<a href=\"#\" onclick=\"expand_layer('".$family->getXref().$personcount."'); return false;\" class=\"top\"><img id=\"".$family->getXref().$personcount."_img\" src=\"".$WT_IMAGES["minus"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" border=\"0\" alt=\"".WT_I18N::translate('View Family')."\" /></a>";
+		echo "<img src=\"".$WT_IMAGES["spacer"]."\" height=\"2\" width=\"".($Dindent+4)."\" alt=\"\">";
+		echo "<span class=\"details1\" style=\"white-space: nowrap;\">";
+		echo "<a href=\"#\" onclick=\"expand_layer('".$family->getXref().$personcount."'); return false;\" class=\"top\"><img id=\"".$family->getXref().$personcount."_img\" src=\"".$WT_IMAGES["minus"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" alt=\"".WT_I18N::translate('View Family')."\"></a>";
 		$marriage = $family->getMarriage();
 		if ($marriage->canShow()) {
 			echo ' <a href="', $family->getHtmlUrl(), '" class="details1">';
@@ -231,7 +236,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 				break;
 			}
 		}
-		if ($this->show_full) echo "<br /><br />&nbsp;";
+		if ($this->show_full) echo "<br><br>&nbsp;";
 		echo "</td></tr>";
 	
 		// children

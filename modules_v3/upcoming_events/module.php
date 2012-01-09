@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12724 2011-11-13 19:06:16Z greg $
+// $Id: module.php 13109 2011-12-21 20:52:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -65,12 +65,12 @@ class upcoming_events_WT_Module extends WT_Module implements WT_Module_Block {
 		// Output starts here
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
-		$title='';
-		if ($ctype=="gedcom" && WT_USER_GEDCOM_ADMIN || $ctype=="user" && WT_USER_ID) {
-			$title.="<a href=\"#\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
-			$title.="<img class=\"adminicon\" src=\"".$WT_IMAGES["admin"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".WT_I18N::translate('Configure')."\" /></a>";
+		if ($ctype=='gedcom' && WT_USER_GEDCOM_ADMIN || $ctype=='user' && WT_USER_ID) {
+			$title='<img class="adminicon" src="'.$WT_IMAGES['admin'].'" width="15" height="15" alt="'.WT_I18N::translate('Configure').'"  onclick="window.open(\'index_edit.php?action=configure&amp;ctype='.$ctype.'&amp;block_id='.$block_id.'\', \'_blank\', \'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1\');">';
+		} else {
+			$title='';
 		}
-		$title.= $this->getTitle();
+		$title.=$this->getTitle();
 
 		$content = '';
 		switch ($infoStyle) {
@@ -131,7 +131,7 @@ class upcoming_events_WT_Module extends WT_Module implements WT_Module_Block {
 		echo '<tr><td class="descriptionbox wrap width33">';
 		echo WT_I18N::translate('Number of days to show');
 		echo '</td><td class="optionbox">';
-		echo '<input type="text" name="days" size="2" value="', $days, '" />';
+		echo '<input type="text" name="days" size="2" value="', $days, '">';
 		echo ' <em>', WT_I18N::plural('maximum %d day', 'maximum %d days', 30, 30) ,'</em>';
 		echo '</td></tr>';
 

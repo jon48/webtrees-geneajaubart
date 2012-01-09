@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: family.php 12696 2011-11-11 00:56:58Z greg $
+// $Id: family.php 13043 2011-12-12 22:42:25Z nigel $
 
 define('WT_SCRIPT_NAME', 'family.php');
 require './includes/session.php';
@@ -95,6 +95,7 @@ echo 'function showchanges() { window.location="'.$controller->record->getRawUrl
 echo WT_JS_END;
 
 ?>
+<div id="family-page">
 <table align="center" width="95%">
 	<tr>
 		<td>
@@ -102,7 +103,7 @@ echo WT_JS_END;
 		</td>
 	</tr>
 </table>
-<table id="family_page" align="center" width="95%">
+<table id="family-table" align="center" width="95%">
 	<tr valign="top">
 		<td valign="top" style="width: <?php echo $pbwidth+30; ?>px;"><!--//List of children//-->
 			<?php print_family_children($controller->record->getXref()); ?>
@@ -125,7 +126,7 @@ echo WT_JS_END;
 								$husb=$controller->record->getHusband();
 							}
 							if (!$husb) {
-								echo '<a href="#" onclick="return addnewparentfamily(\'\', \'HUSB\', \'', $controller->record->getXref(), '\');">', WT_I18N::translate('Add a new father'), help_link('edit_add_parent'), '</a><br />';
+								echo '<a href="#" onclick="return addnewparentfamily(\'\', \'HUSB\', \'', $controller->record->getXref(), '\');">', WT_I18N::translate('Add a new father'), help_link('edit_add_parent'), '</a><br>';
 							}
 							if ($controller->diff_record) {
 								$wife=$controller->diff_record->getWife();
@@ -133,7 +134,7 @@ echo WT_JS_END;
 								$wife=$controller->record->getWife();
 							}
 							if (!$wife)  {
-								echo '<a href="#" onclick="return addnewparentfamily(\'\', \'WIFE\', \'', $controller->record->getXref(), '\');">', WT_I18N::translate('Add a new mother'), help_link('edit_add_parent'), '</a><br />';
+								echo '<a href="#" onclick="return addnewparentfamily(\'\', \'WIFE\', \'', $controller->record->getXref(), '\');">', WT_I18N::translate('Add a new mother'), help_link('edit_add_parent'), '</a><br>';
 							}
 						}
 						?>
@@ -155,3 +156,4 @@ echo WT_JS_END;
 		</td>
 	</tr>
 </table>
+</div> <!-- Close <div id="family-page"> -->

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: repolist.php 12900 2011-11-24 02:16:25Z nigel $
+// $Id: repolist.php 13043 2011-12-12 22:42:25Z nigel $
 
 define('WT_SCRIPT_NAME', 'repolist.php');
 require './includes/session.php';
@@ -31,7 +31,7 @@ $controller=new WT_Controller_Base();
 $controller->setPageTitle(WT_I18N::translate('Repositories'));
 $controller->pageHeader();
 
-echo '<div id="repo-list-page">',
+echo '<div id="repolist-page">',
 	'<h2>', WT_I18N::translate('Repositories'), '</h2>';
 	echo format_repo_table(get_repo_list(WT_GED_ID));
 echo '</div>';

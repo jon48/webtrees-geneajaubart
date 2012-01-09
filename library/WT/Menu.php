@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: Menu.php 12696 2011-11-11 00:56:58Z greg $
+// $Id: Menu.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -209,7 +209,7 @@ class WT_Menu {
 		$link .= "\">";
 		if ($this->icon !== null) {
 			$tempTitle = str_replace("\"", '', $this->label);
-			$MenuIcon = "<img id=\"menu{$id}_icon\" src=\"{$this->icon}\" class=\"icon\" alt=\"{$tempTitle}\" title=\"{$tempTitle}\" />";
+			$MenuIcon = "<img id=\"menu{$id}_icon\" src=\"{$this->icon}\" class=\"icon\" alt=\"{$tempTitle}\" title=\"{$tempTitle}\">";
 			switch ($this->labelpos) {
 			case "right":
 				$output .= $link;
@@ -226,14 +226,14 @@ class WT_Menu {
 			case "down":
 				$output .= $link;
 				$output .= $MenuIcon;
-				$output .= "<br />";
+				$output .= "<br>";
 				$output .= $this->label;
 				$output .= "</a>";
 				break;
 			case "up":
 				$output .= $link;
 				$output .= $this->label;
-				$output .= "<br />";
+				$output .= "<br>";
 				$output .= $MenuIcon;
 				$output .= "</a>";
 				break;

@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print_lists.php 12984 2011-12-04 22:07:03Z greg $
+// $Id: functions_print_lists.php 13076 2011-12-15 09:39:11Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -88,7 +88,7 @@ function format_indi_table($datalist, $option='') {
 					/* 26 TREE      */ {"bVisible": false}
 					/* END PERSO */
 				],
-				"aaSorting": [[1, "asc"]],
+				"aaSorting": [['.($option=='sosa'?'4, "asc"':'1, "asc"').']],
 				"iDisplayLength": 20,
 				"sPaginationType": "full_numbers"
 			});
@@ -298,7 +298,7 @@ function format_indi_table($datalist, $option='') {
 				$sex_image='';
 			}
 			//PERSO Add Sosa Image
-			$html .= '<a '. $title. ' href="'. $person->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image.WT_Perso_Functions_Print::formatSosaNumbers($dperson->getSosaNumbers(), 1, 'smaller').'<br/>';
+			$html .= '<a '. $title. ' href="'. $person->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image.WT_Perso_Functions_Print::formatSosaNumbers($dperson->getSosaNumbers(), 1, 'smaller').'<br>';
 			//END PERSO
 		}
 		// Indi parents
@@ -323,7 +323,7 @@ function format_indi_table($datalist, $option='') {
 		if ($birth_dates=$person->getAllBirthDates()) {
 			foreach ($birth_dates as $num=>$birth_date) {
 				if ($num) {
-					$html .= '<br/>';
+					$html .= '<br>';
 				}
 				$html .= $birth_date->Display(!$SEARCH_SPIDER);
 			}
@@ -383,7 +383,7 @@ function format_indi_table($datalist, $option='') {
 		if ($death_dates=$person->getAllDeathDates()) {
 			foreach ($death_dates as $num=>$death_date) {
 				if ($num) {
-					$html .= '<br/>';
+					$html .= '<br>';
 				}
 				$html .= $death_date->Display(!$SEARCH_SPIDER);
 			}
@@ -767,10 +767,10 @@ function format_fam_table($datalist, $option='') {
 				$sex_image='';
 			}
 			// Only show married names if they are the name we are filtering by.
-			if ($name['type']!='_MARNM' || $num==$husb->getPrimaryName()) {			
+			if ($name['type']!='_MARNM' || $num==$husb->getPrimaryName()) {
 				//PERSO Add Sosa Icon
 				$dhusb = new WT_Perso_Person($husb);
-				$html .= '<a '. $title. ' href="'. $family->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image.WT_Perso_Functions_Print::formatSosaNumbers($dhusb->getSosaNumbers(), 1, 'smaller'). '<br/>';
+				$html .= '<a '. $title. ' href="'. $family->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image.WT_Perso_Functions_Print::formatSosaNumbers($dhusb->getSosaNumbers(), 1, 'smaller'). '<br>';
 				//END PERSO
 			}
 		}
@@ -821,7 +821,7 @@ function format_fam_table($datalist, $option='') {
 			if ($name['type']!='_MARNM' || $num==$wife->getPrimaryName()) {
 				//PERSO Add Sosa Icon
 				$dwife = new WT_Perso_Person($wife);
-				$html .= '<a '. $title. ' href="'. $family->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image.WT_Perso_Functions_Print::formatSosaNumbers($dwife->getSosaNumbers(), 1, 'smaller'). '<br/>';
+				$html .= '<a '. $title. ' href="'. $family->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image.WT_Perso_Functions_Print::formatSosaNumbers($dwife->getSosaNumbers(), 1, 'smaller'). '<br>';
 				//END PERSO
 			}
 		}
@@ -858,7 +858,7 @@ function format_fam_table($datalist, $option='') {
 		if ($marriage_dates=$family->getAllMarriageDates()) {
 			foreach ($marriage_dates as $n=>$marriage_date) {
 				if ($n) {
-					$html .= '<br/>';
+					$html .= '<br>';
 				}
 				$html .= '<div>'. $marriage_date->Display(!$SEARCH_SPIDER). '</div>';
 			}
@@ -1086,7 +1086,7 @@ function format_sour_table($datalist) {
 		$html .= '<td>';
 		foreach ($source->getAllNames() as $n=>$name) {
 			if ($n) {
-				$html .= '<br/>';
+				$html .= '<br>';
 			}
 			if ($n==$source->getPrimaryName()) {
 				$html .= '<a class="name2" href="'. $source->getHtmlUrl(). '">'. highlight_search_hits($name['full']). '</a>';
@@ -1276,7 +1276,7 @@ function format_repo_table($repos) {
 		$html .= '<td>';
 		foreach ($repo->getAllNames() as $n=>$name) {
 			if ($n) {
-				$html .= '<br/>';
+				$html .= '<br>';
 			}
 			if ($n==$repo->getPrimaryName()) {
 				$html .= '<a class="name2" href="'. $repo->getHtmlUrl(). '">'. highlight_search_hits($name['full']). '</a>';
@@ -1371,14 +1371,14 @@ function format_media_table($datalist) {
 			$name = $media->getFullName();
 			$html .= "<tr>";
 			//-- Object thumbnail
-			$html .= '<td><img src="'. $media->getThumbnail(). '" alt="'. htmlspecialchars(strip_tags($name)). '" /></td>';
+			$html .= '<td><img src="'. $media->getThumbnail(). '" alt="'. htmlspecialchars(strip_tags($name)). '"></td>';
 			//-- Object name(s)
 			$html .= '<td>';
 			$html .= '<a href="'. $media->getHtmlUrl(). '" class="list_item name2">';
 			$html .= highlight_search_hits($name). '</a>';
 			if (WT_USER_CAN_EDIT || WT_USER_CAN_ACCEPT)
-				$html .= '<br /><a href="'. $media->getHtmlUrl(). '">'. basename($media->getFilename()). '</a>';
-			if ($media->getNote()) $html .= '<br />'. print_fact_notes('1 NOTE ', $media->getNote(), 1);
+				$html .= '<br><a href="'. $media->getHtmlUrl(). '">'. basename($media->getFilename()). '</a>';
+			if ($media->getNote()) $html .= '<br>'. print_fact_notes('1 NOTE ', $media->getNote(), 1);
 			$html .= '</td>';
 
 			//-- Linked INDIs
@@ -1446,8 +1446,6 @@ function format_surname_table($surnames, $script, $extra = '') {
 		'<th>&nbsp;</th>'.
 		'</tr></thead>';
 
-	$unique_surn=array();
-	$unique_indi=array();
 	$n=0; // We have already sorted the data - use this as a surrogate sort key
 	$html .= '<tbody>';
 	foreach ($surnames as $surn=>$surns) {
@@ -1463,43 +1461,27 @@ function format_surname_table($surnames, $script, $extra = '') {
 		$html.='<tr>';
 		// Surname
 		$html.='<td>';
-		if (count($surns)==1) {
-			// Single surname variant
-			foreach ($surns as $spfxsurn=>$indis) {
-				$html.='<a href="'.$url.'">'.htmlspecialchars($spfxsurn).'</a>';
-				$unique_surn[$spfxsurn]=true;
-				foreach (array_keys($indis) as $pid) {
-					$unique_indi[$pid]=true;
-				}
-			}
-		} else {
-			// Multiple surname variants, e.g. von Groot, van Groot, van der Groot, etc.
-			foreach ($surns as $spfxsurn=>$indis) {
+		// Multiple surname variants, e.g. von Groot, van Groot, van der Groot, etc.
+		foreach ($surns as $spfxsurn=>$indis) {
+			if ($spfxsurn) {
 				$html.='<a href="'.$url.'">'.htmlspecialchars($spfxsurn).'</a><br>';
-				$unique_surn[$spfxsurn]=true;
-				foreach (array_keys($indis) as $pid) {
-					$unique_indi[$pid]=true;
-				}
+			} else {
+				// No surname, but a value from "2 SURN"?  A common workaround for toponyms, etc.
+				$html.='<a href="'.$url.'">'.htmlspecialchars($surn).'</a><br>';
 			}
 		}
 		$html.='</td>';
-		// Sort column for name
+		// Surrogate sort column for name
 		$html.='<td>'.$n++.'</td>';
 		// Surname count
 		$html.='<td>';
-		if (count($surns)==1) {
-			// Single surname variant
-			foreach ($surns as $spfxsurn=>$indis) {
-				$subtotal=count($indis);
-				$html.= WT_I18N::number($subtotal);
-			}
-		} else {
-			$subtotal=0;
-			// Multiple surname variants, e.g. von Groot, van Groot, van der Groot, etc.
-			foreach ($surns as $spfxsurn=>$indis) {
-				$subtotal+=count($indis);
-				$html.=WT_I18N::number(count($indis)).'<br>';
-			}
+		$subtotal=0;
+		foreach ($surns as $spfxsurn=>$indis) {
+			$subtotal+=count($indis);
+			$html.=WT_I18N::number(count($indis)).'<br>';
+		}
+		// More than one surname variant? Show a subtotal
+		if (count($surns)>1) {
 			$html.=WT_I18N::number($subtotal);
 		}
 		$html.='</td>';
@@ -1592,7 +1574,7 @@ function format_surname_list($surnames, $style, $totals, $script, $extra = '') {
 				$first_spfxsurn=$spfxsurn;
 			}
 		}
-		$subhtml='<a href="'.$url.'">'.htmlspecialchars(implode(', ', array_keys($surns))).'</a>';
+		$subhtml='<a href="'.$url.'">'.htmlspecialchars(implode(WT_I18N::$list_separator, array_keys($surns))).'</a>';
 
 		if ($totals) {
 			$subtotal=0;
@@ -1622,7 +1604,7 @@ function format_surname_list($surnames, $style, $totals, $script, $extra = '') {
 		$html2.='<td class="list_value" style="padding: 14px;">';
 
 		foreach ($html as $surn=>$surns) {
-			$html2.= $surns.'<br />';
+			$html2.= $surns.'<br>';
 			$i++;
 			if ($i==$newcol && $i<$count) {
 				$html2.='</td><td class="list_value" style="padding: 14px;">';
@@ -1747,19 +1729,19 @@ function print_changes_table($change_ids, $sort) {
 				$indi = true;
 				break;
 			case "FAM":
-				$html .= '<img src="' . $WT_IMAGES['cfamily'] . '" title="" alt="" height="12" />';
+				$html .= '<img src="' . $WT_IMAGES['cfamily'] . '" title="" alt="" height="12">';
 				break;
 			case "OBJE":
-				$html .= '<img src="' . $record->getMediaIcon() . '" title="" alt="" height="12" />';
+				$html .= '<img src="' . $record->getMediaIcon() . '" title="" alt="" height="12">';
 				break;
 			case "NOTE":
-				$html .= '<img src="' . $WT_IMAGES['note'] . '" title="" alt="" height="12" />';
+				$html .= '<img src="' . $WT_IMAGES['note'] . '" title="" alt="" height="12">';
 				break;
 			case "SOUR":
-				$html .= '<img src="' . $WT_IMAGES['source'] . '" title="" alt="" height="12" />';
+				$html .= '<img src="' . $WT_IMAGES['source'] . '" title="" alt="" height="12">';
 				break;
 			case "REPO":
-				$html .= '<img src="' . $WT_IMAGES['repository'] . '" title="" alt="" height="12" />';
+				$html .= '<img src="' . $WT_IMAGES['repository'] . '" title="" alt="" height="12">';
 				break;
 			default:
 				$html .= '&nbsp;';
@@ -2142,7 +2124,7 @@ function print_chart_by_age($data, $title) {
 	for ($age=0; $age<=$agemax; $age++) {
 		$chart_url .= $CHART_ENCODING61[floor(substr_count($data[$age], "F")*61/$vmax)];
 	}
-	$html = '<img src="'. $chart_url. '" alt="'. $title. '" title="'. $title. '" class="gchart" />';
+	$html = '<img src="'. $chart_url. '" alt="'. $title. '" title="'. $title. '" class="gchart">';
 	return $html;
 }
 
@@ -2192,6 +2174,6 @@ function print_chart_by_decade($data, $title) {
 	for ($y=1570; $y<2030; $y+=10) {
 		$chart_url .= $CHART_ENCODING61[floor(substr_count($data[$y], "F")*61/$vmax)];
 	}
-	$html = '<img src="'. $chart_url. '" alt="'. $title. '" title="'. $title. '" class="gchart" />';
+	$html = '<img src="'. $chart_url. '" alt="'. $title. '" title="'. $title. '" class="gchart">';
 	return $html;
 }

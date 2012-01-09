@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: GedcomRecord.php 12751 2011-11-15 17:09:21Z greg $
+// $Id: GedcomRecord.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -694,7 +694,7 @@ class WT_GedcomRecord {
 			if (($event->getDate()->isOK() || $event->getPlace()) && $event->canShow()) {
 				switch ($style) {
 				case 1:
-					return '<br /><em>'.$event->getLabel().' '.format_fact_date($event, $this, false, false).format_fact_place($event).'</em>';
+					return '<br><em>'.$event->getLabel().' '.format_fact_date($event, $this, false, false).format_fact_place($event).'</em>';
 				case 2:
 					return '<dl><dt class="label">'.$event->getLabel().'</dt><dd class="field">'.format_fact_date($event, $this, false, false).format_fact_place($event).'</dd></dl>';
 				}

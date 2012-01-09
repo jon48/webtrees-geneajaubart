@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12708 2011-11-11 11:23:19Z greg $
+// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -182,10 +182,10 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 			}
 			?>
 			<tr>
-				<td class="facts_label"><br />
+				<td class="facts_label"><br>
 				</td>
 				<td class="facts_value<?php echo $styleadd; ?>">
-					<?php //echo "<span class=\"details_label\">".WT_Gedcom_Tag::getLabel('NCHI').": </span>".$family->getNumberOfChildren()."<br />"; ?>
+					<?php //echo "<span class=\"details_label\">".WT_Gedcom_Tag::getLabel('NCHI').": </span>".$family->getNumberOfChildren()."<br>"; ?>
 					<?php $marr_type = strtoupper($family->getMarriageType());
 					if ($marr_type=='CIVIL' || $marr_type=='PARTNERS' || $marr_type=='RELIGIOUS' || $marr_type=='UNKNOWN') {
 						$marr_fact = WT_Gedcom_Tag::getLabel("MARR_".$marr_type);
@@ -362,7 +362,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 		ob_start();
 		?>
 		<table class="facts_table"><tr><td colspan="2" class="descriptionbox rela">
-		<input id="checkbox_elder" type="checkbox" onclick="jQuery('div.elderdate').toggle();" <?php if ($SHOW_AGE_DIFF) echo "checked=\"checked\""; ?>/>
+		<input id="checkbox_elder" type="checkbox" onclick="jQuery('div.elderdate').toggle();" <?php if ($SHOW_AGE_DIFF) echo "checked=\"checked\""; ?>>
 		<label for="checkbox_elder"><?php echo WT_I18N::translate('Show date differences'), help_link('age_differences'); ?></label>
 		</td></tr></table>
 		<?php
@@ -430,7 +430,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 
 		if ($controller->record->canEdit()) {
 		?>
-		<br/><table class="facts_table">
+		<br><table class="facts_table">
 		<?php
 			if (count($families)>1) { ?>
 			<tr>
@@ -494,7 +494,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 			</tr>
 		</table>
 		<?php } ?>
-		<br />
+		<br>
 		<?php
 
 		$ABBREVIATE_CHART_LABELS = $saved_ABBREVIATE_CHART_LABELS; // Restore GEDCOM configuration

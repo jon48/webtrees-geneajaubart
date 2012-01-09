@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_module_blocks.php 12812 2011-11-19 13:02:05Z greg $
+// $Id: admin_module_blocks.php 13034 2011-12-12 13:10:58Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_module_blocks.php');
 require 'includes/session.php';
@@ -70,7 +70,7 @@ $controller->pageHeader();
 <div align="center">
 	<div id="tabs">
 		<form method="post" action="<?php echo WT_SCRIPT_NAME; ?>">
-			<input type="hidden" name="action" value="update_mods" />
+			<input type="hidden" name="action" value="update_mods">
 			<table id="blocks_table" class="modules_table">
 				<thead>
 					<tr>
@@ -83,39 +83,41 @@ $controller->pageHeader();
 					<?php
 					$order = 1;
 					foreach (WT_Module::getInstalledBlocks() as $module) {
-						if (array_key_exists($module->getName(), $module->getActiveModules())) {
-							echo '<tr>';
-						} else {
-							echo '<tr class="rela">';
-						}
-					?>
-						<td><?php echo $module->getTitle(); ?></td>
-						<td><?php echo $module->getDescription(); ?></td>
-						<td>
-							<table class="modules_table2">
-								<?php
-								foreach (get_all_gedcoms() as $ged_id=>$ged_name) {
-									$varname = 'blockaccess-'.$module->getName().'-'.$ged_id;
-									$access_level=WT_DB::prepare(
-										"SELECT access_level FROM `##module_privacy` WHERE gedcom_id=? AND module_name=? AND component='block'"
-									)->execute(array($ged_id, $module->getName()))->fetchOne();
-									if ($access_level===null) {
-										$access_level=$module->defaultAccessLevel();
-									}
-									echo '<tr><td>',  WT_I18N::translate('%s', get_gedcom_setting($ged_id, 'title')), '</td><td>';
-									echo edit_field_access_level($varname, $access_level);
-								}
+						if ($module->isUserBlock() || $module->isGedcomBlock()) {
+							if (array_key_exists($module->getName(), $module->getActiveModules())) {
+								echo '<tr>';
+							} else {
+								echo '<tr class="rela">';
+							}
 							?>
-							</table>
-						</td>
-					</tr>
-					<?php
-					$order++;
+							<td><?php echo $module->getTitle(); ?></td>
+							<td><?php echo $module->getDescription(); ?></td>
+							<td>
+								<table class="modules_table2">
+									<?php
+									foreach (get_all_gedcoms() as $ged_id=>$ged_name) {
+										$varname = 'blockaccess-'.$module->getName().'-'.$ged_id;
+										$access_level=WT_DB::prepare(
+											"SELECT access_level FROM `##module_privacy` WHERE gedcom_id=? AND module_name=? AND component='block'"
+										)->execute(array($ged_id, $module->getName()))->fetchOne();
+										if ($access_level===null) {
+											$access_level=$module->defaultAccessLevel();
+										}
+										echo '<tr><td>',  WT_I18N::translate('%s', get_gedcom_setting($ged_id, 'title')), '</td><td>';
+										echo edit_field_access_level($varname, $access_level);
+									}
+								?>
+								</table>
+							</td>
+							</tr>
+							<?php
+							$order++;
+						}
 					}
 					?>
 				</tbody>
 			</table>
-			<input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>" />
+			<input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>">
 		</form>
 	</div>
 </div>

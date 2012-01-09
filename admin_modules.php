@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_modules.php 12887 2011-11-23 18:40:41Z greg $
+// $Id: admin_modules.php 13034 2011-12-12 13:10:58Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_modules.php');
 require 'includes/session.php';
@@ -116,7 +116,7 @@ $controller
 <div align="center">
 	<div id="tabs">
 	<form method="post" action="<?php echo WT_SCRIPT_NAME; ?>">
-			<input type="hidden" name="action" value="update_mods" />
+			<input type="hidden" name="action" value="update_mods">
 			<table id="installed_table" border="0" cellpadding="0" cellspacing="1">
 				<thead>
 					<tr>
@@ -162,7 +162,7 @@ $controller
 					?>
 				</tbody>
 			</table>
-			<input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>" />
+			<input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>">
 		</form>
 	</div>
 </div>

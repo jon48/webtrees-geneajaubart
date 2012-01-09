@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin.php 12988 2011-12-05 08:38:41Z greg $
+// $Id: admin.php 13129 2011-12-23 14:50:30Z greg $
 
 define('WT_SCRIPT_NAME', 'admin.php');
 
@@ -1255,6 +1255,28 @@ function old_paths() {
 		WT_ROOT.'modules_v3/recent_changes/help_text.php',
 		WT_ROOT.'modules_v3/todays_events/help_text.php',
 		WT_ROOT.'sidebar.php',
+		// Removed in 1.2.6
+		WT_ROOT.'modules_v3/sitemap/admin_index.php',
+		WT_ROOT.'modules_v3/sitemap/help_text.php',
+		WT_ROOT.'modules_v3/tree/css/styles',
+		WT_ROOT.'modules_v3/tree/css/treebottom.gif',
+		WT_ROOT.'modules_v3/tree/css/treebottomleft.gif',
+		WT_ROOT.'modules_v3/tree/css/treebottomright.gif',
+		WT_ROOT.'modules_v3/tree/css/tree.jpg',
+		WT_ROOT.'modules_v3/tree/css/treeleft.gif',
+		WT_ROOT.'modules_v3/tree/css/treeright.gif',
+		WT_ROOT.'modules_v3/tree/css/treetop.gif',
+		WT_ROOT.'modules_v3/tree/css/treetopleft.gif',
+		WT_ROOT.'modules_v3/tree/css/treetopright.gif',
+		WT_ROOT.'modules_v3/tree/css/treeview_print.css',
+		WT_ROOT.'modules_v3/tree/help_text.php',
+		WT_ROOT.'modules_v3/tree/images/print.png',
+		WT_ROOT.'themes/clouds/images/fscreen.png',
+		WT_ROOT.'themes/colors/images/fscreen.png',
+		WT_ROOT.'themes/fab/images/fscreen.png',
+		WT_ROOT.'themes/minimal/images/fscreen.png',
+		WT_ROOT.'themes/webtrees/images/fscreen.png',
+		WT_ROOT.'themes/xenea/images/fscreen.png',
 	);
 }
 

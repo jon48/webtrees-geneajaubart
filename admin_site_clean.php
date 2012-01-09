@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// version $Id: admin_site_clean.php 12765 2011-11-16 21:38:45Z greg $
+// version $Id: admin_site_clean.php 13034 2011-12-12 13:10:58Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_clean.php');
 require './includes/session.php';
@@ -80,7 +80,7 @@ foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
 echo
 	'<h3>', WT_I18N::translate('Cleanup data directory'), '</h3>',
 	'<p>',
-	WT_I18N::translate('Files marked with %s are required for proper operation and cannot be removed.', '<img src="./images/RESN_confidential.gif" alt="" />'),
+	WT_I18N::translate('Files marked with %s are required for proper operation and cannot be removed.', '<img src="./images/RESN_confidential.gif" alt="">'),
 	'</p>';
 
 //post back
@@ -109,10 +109,10 @@ foreach ($entries as $entry) {
 	if ($entry[0] != '.') {
 		if (in_array($entry, $locked_by_context)) {
 			echo "<li class=\"facts_value\" name=\"$entry\" id=\"lock_$entry\" >";
-			echo '<img src="./images/RESN_confidential.gif" alt="" /> <span>', $entry, '</span>';
+			echo '<img src="./images/RESN_confidential.gif" alt=""> <span>', $entry, '</span>';
 		} else {
 			echo "<li class=\"facts_value\" name=\"$entry\" id=\"li_$entry\" >";
-			echo '<input type="checkbox" name="to_delete[]" value="', $entry, '" />', $entry;
+			echo '<input type="checkbox" name="to_delete[]" value="', $entry, '">', $entry;
 			$element[] = "li_".$entry;
 		}
 		echo '</li>';

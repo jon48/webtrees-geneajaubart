@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index.php 12954 2011-11-30 11:31:07Z greg $
+// $Id: index.php 13109 2011-12-21 20:52:29Z greg $
 
 define('WT_SCRIPT_NAME', 'index.php');
 require './includes/session.php';
@@ -89,7 +89,7 @@ if (WT_USE_LIGHTBOX) {
 
 echo '<div id="home-page">';
 if ($ctype=='user') {
-	echo '<h1 align="center">', WT_I18N::translate('My page'), '</h1>';
+	echo '<h1 class="center">', WT_I18N::translate('My page'), '</h1>';
 }
 if ($blocks['main']) {
 	if ($blocks['side']) {

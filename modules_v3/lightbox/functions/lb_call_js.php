@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lb_call_js.php 12523 2011-11-04 12:00:17Z greg $
+// $Id: lb_call_js.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -68,7 +68,7 @@ $LB_MUSIC_FILE=get_module_setting('lightbox', 'LB_MUSIC_FILE', WT_STATIC_URL.WT_
 	<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/js/Sound.js"  type="text/javascript"></script>
 	<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/js/clearbox.js"  type="text/javascript"></script>
 	<!--[if lte IE 7]>
-	<link href ="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/css/album_page_RTL.css"  rel="stylesheet" type="text/css" media="screen" />
+	<link href ="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/css/album_page_RTL.css"  rel="stylesheet" type="text/css" media="screen">
 	<![endif]-->
 <?php } else { ?>
 	<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/js/Sound.js"  type="text/javascript"></script>

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: clippings_ctrl.php 12710 2011-11-11 12:04:08Z greg $
+// $Id: clippings_ctrl.php 13094 2011-12-20 08:36:46Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -203,6 +203,18 @@ class WT_Controller_Clippings {
 						$record=str_replace($match[0], '', $record);
 					}
 				}
+				preg_match_all('/\n2 '.WT_REGEX_TAG.' @('.WT_REGEX_XREF.')@(\n[3-9].*)*/', $record, $matches, PREG_SET_ORDER);
+				foreach ($matches as $match) {
+					if (!array_key_exists($match[1], $WT_SESSION->cart[WT_GED_ID])) {
+						$record=str_replace($match[0], '', $record);
+					}
+				}
+				preg_match_all('/\n3 '.WT_REGEX_TAG.' @('.WT_REGEX_XREF.')@(\n[4-9].*)*/', $record, $matches, PREG_SET_ORDER);
+				foreach ($matches as $match) {
+					if (!array_key_exists($match[1], $WT_SESSION->cart[WT_GED_ID])) {
+						$record=str_replace($match[0], '', $record);
+					}
+				}
 				$record = convert_media_path($record, $this->conv_path, $this->conv_slashes);
 				$savedRecord = $record; // Save this for the "does this file exist" check
 				if ($convert=='yes') {
@@ -288,7 +300,7 @@ class WT_Controller_Clippings {
 			}
 			unlink(WT_DATA_DIR.$tempFileName);
 		} else {
-			echo WT_I18N::translate('Cannot create')." ".WT_DATA_DIR."$tempFileName ".WT_I18N::translate('Check access rights on this directory.')."<br /><br />";
+			echo WT_I18N::translate('Cannot create')." ".WT_DATA_DIR."$tempFileName ".WT_I18N::translate('Check access rights on this directory.')."<br><br>";
 		}
 	}
 
@@ -324,12 +336,13 @@ class WT_Controller_Clippings {
 	}
 
 	// --------------------------------- Recursive function to traverse the tree
-	function add_family_descendancy($family, $level) {
+	function add_family_descendancy($family, $level=PHP_INT_MAX) {
 		if (!$family) {
 			return;
 		}
-		$this->add_clipping($family->getHusband());
-		$this->add_clipping($family->getWife());
+		foreach ($family->getSpouses() as $spouse) {
+			$this->add_clipping($spouse);
+		}
 		foreach ($family->getChildren() as $child) {
 			$this->add_clipping($child);
 			foreach ($child->getSpouseFamilies() as $child_family) {
@@ -385,7 +398,7 @@ class WT_Controller_Clippings {
 	}
 
 	// Helper function to sort records by type/name
-	function compare_clippings($a, $b) {
+	static function compare_clippings($a, $b) {
 		$a=WT_GedcomRecord::getInstance($a);
 		$b=WT_GedcomRecord::getInstance($b);
 		if ($a && $b) {

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Family.php 12647 2011-11-09 16:19:32Z greg $
+// $Id: Family.php 13006 2011-12-07 05:27:28Z stephen $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -93,7 +93,7 @@ class WT_Controller_Family extends WT_Controller_GedcomRecord {
 		if ($this->record) {
 			return $this->record;
 		}
-		return parent::getSignifcantFamily();
+		return parent::getSignificantFamily();
 	}
 
 	// $tags is an array of HUSB/WIFE/CHIL

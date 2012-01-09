@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12503 2011-11-03 11:58:38Z greg $
+// $Id: module.php 12993 2011-12-05 18:13:17Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -50,23 +50,10 @@ class descendancy_report_WT_Module extends WT_Module implements WT_Module_Report
 	public function getReportMenus() {
 		global $controller;
 
-		if ($controller instanceof WT_Controller_Family && $controller->record instanceof WT_Family) {
-			// We are on a family page
-			$pid='&amp;famid='.$controller->record->getXref();
-		} elseif ($controller instanceof WT_Controller_Individual && $controller->record instanceof WT_Individual) {
-			// We are on an individual page
-			$pid='&amp;pid='.$controller->record->getXref();
-		} elseif ($controller && isset($controller->rootid)) {
-			// We are on a chart page
-			$pid='&amp;pid='.$controller->rootid;
-		} else {
-			$pid='';
-		}
-
 		$menus=array();
 		$menu=new WT_Menu(
 			$this->getTitle(),
-			'reportengine.php?ged='.WT_GEDURL.'&amp;action=setup&amp;report='.WT_MODULES_DIR.$this->getName().'/report.xml'.$pid,
+			'reportengine.php?ged='.WT_GEDURL.'&amp;action=setup&amp;report='.WT_MODULES_DIR.$this->getName().'/report.xml&amp;pid='.$controller->getSignificantIndividual()->getXref(),
 			'menu-report-'.$this->getName()
 		);
 		$menu->addIcon('place');

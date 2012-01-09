@@ -23,10 +23,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_note_decode.php 12813 2011-11-19 14:18:05Z greg $
+// $Id: census_note_decode.php 13074 2011-12-15 05:43:22Z nigel $
 
-	$text = "xCxAx<table cellpadding=\"0\"><tr><td>" . $text;
-	$text = str_replace("<br />.start_formatted_area.<br />", "</td></tr></table><table cellpadding=\"0\"><tr><td class=\"notecell\">&nbsp;", $text);
+	$text = "xCxAx<table><tr><td>" . $text;
+	$text = str_replace("<br>.start_formatted_area.<br>", "</td></tr></table><table><tr><td class=\"notecell\">", $text);
 
 		// -- Create View Header Tooltip explanations (Use embolden) -----------
 		$text = str_replace(".b.".'Name',   "<span class=\"note2\" alt=\"".'Full Name or Married name if married'."\"   title=\"".'Full Name or Married name if married'."\">  <b>".'Name'."</span>",   $text);
@@ -88,8 +88,8 @@
 		// Replace "pipe" with </td><td> ------------------------
 		$text = str_replace("|", "&nbsp;&nbsp;</td><td class=\"notecell\">", $text);
 
-	$text = str_replace(".end_formatted_area.<br />", "</td></tr></table><table cellpadding=\"0\"><tr><td>", $text);
-	$text = str_replace("<br />", "</td></tr><tr><td class=\"notecell\">&nbsp;", $text);
+	$text = str_replace(".end_formatted_area.<br>", "</td></tr></table><table><tr><td>", $text);
+	$text = str_replace("<br>", "</td></tr><tr><td class=\"notecell\">", $text);
 	$text = $text . "</td></tr></table>";
-	$text = str_replace("xCxAx", $centitl."<br />", $text);
+	$text = str_replace("xCxAx", $centitl."<br>", $text);
 	$text = str_replace("Notes:", "<b>Notes:</b>", $text);

@@ -26,9 +26,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // $Id: personbox_template.php 12926 2011-11-27 23:00:42Z rob $
-// @version: p_$Revision$ $Date$
-// $HeadURL$
-
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;

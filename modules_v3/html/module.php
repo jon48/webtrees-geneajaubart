@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12811 2011-11-19 11:03:50Z greg $
+// $Id: module.php 13109 2011-12-21 20:52:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -96,17 +96,17 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		*/
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
-		$title='';
 		if ($ctype=='gedcom' && WT_USER_GEDCOM_ADMIN || $ctype=='user' && WT_USER_ID) {
-			$title .= "<a href=\"#\" onclick=\"window.open('index_edit.php?action=configure&amp;ctype={$ctype}&amp;block_id={$block_id}', '_blank', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">"
-			."<img class=\"adminicon\" src=\"{$WT_IMAGES['admin']}\" width=\"15\" height=\"15\" alt=\"".WT_I18N::translate('Configure').'"></a>';
+			$title='<img class="adminicon" src="'.$WT_IMAGES['admin'].'" width="15" height="15" alt="'.WT_I18N::translate('Configure').'"  onclick="window.open(\'index_edit.php?action=configure&amp;ctype='.$ctype.'&amp;block_id='.$block_id.'\', \'_blank\', \'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1\');">';
+		} else {
+			$title='';
 		}
 		$title.=$title_tmp;
 
 		$content = $html;
 
 		if (get_block_setting($block_id, 'show_timestamp', false)) {
-			$content.='<br/>'.format_timestamp(get_block_setting($block_id, 'timestamp', time()));
+			$content.='<br>'.format_timestamp(get_block_setting($block_id, 'timestamp', time()));
 		}
 
 		if ($template) {
@@ -165,7 +165,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 
 			WT_I18N::translate('GEDCOM statistics')=>
 			'<div class="gedcom_stats">
-				<span style="font-weight: bold"><a href="index.php?command=gedcom">#gedcomTitle#</a></span><br />
+				<span style="font-weight: bold"><a href="index.php?command=gedcom">#gedcomTitle#</a></span><br>
 				'.WT_I18N::translate('This GEDCOM was created using <b>%1$s</b> on <b>%2$s</b>.', '#gedcomCreatedSoftware#', '#gedcomDate#').'
 				<table id="keywords">
 					<tr>
@@ -177,11 +177,11 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Males').'</td>
-									<td class="facts_value" align="right">#totalSexMales#<br />#totalSexMalesPercentage#</td>
+									<td class="facts_value" align="right">#totalSexMales#<br>#totalSexMalesPercentage#</td>
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Females').'</td>
-									<td class="facts_value" align="right">#totalSexFemales#<br />#totalSexFemalesPercentage#</td>
+									<td class="facts_value" align="right">#totalSexFemales#<br>#totalSexFemalesPercentage#</td>
 								</tr>
 								<tr>
 									<td class="facts_label">'.WT_I18N::translate('Total surnames').'</td>
@@ -217,7 +217,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 								</tr>
 							</table>
 						</td>
-						<td><br /></td>
+						<td><br></td>
 						<td valign="top">
 							<table cellspacing="1" cellpadding="0" border="0">
 								<tr>
@@ -263,8 +263,8 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 							</table>
 						</td>
 					</tr>
-				</table><br />
-				<span style="font-weight: bold">'.WT_I18N::translate('Most Common Surnames').'</span><br />
+				</table><br>
+				<span style="font-weight: bold">'.WT_I18N::translate('Most Common Surnames').'</span><br>
 				#commonSurnames#
 			</div>'
 		);
@@ -274,7 +274,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		// title
 		echo '<tr><td class="descriptionbox wrap width33">',
 			WT_Gedcom_Tag::getLabel('TITL'),
-			'</td><td class="optionbox"><input type="text" name="title" size="30" value="', htmlspecialchars($title), '" /></td></tr>';
+			'</td><td class="optionbox"><input type="text" name="title" size="30" value="', htmlspecialchars($title), '"></td></tr>';
 
 		// templates
 		echo '<tr><td class="descriptionbox wrap width33">',
@@ -322,7 +322,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		echo '<tr><td class="descriptionbox wrap width33">',
 			WT_I18N::translate('Content'),
 			help_link('block_html_content', $this->getName()),
-			'<br /><br /></td>',
+			'<br><br></td>',
 			'<td class="optionbox">';
 		if (array_key_exists('ckeditor', WT_Module::getActiveModules())) {
 			// use CKeditor module

@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_placecheck.php 12696 2011-11-11 00:56:58Z greg $
+// $Id: admin_placecheck.php 13034 2011-12-12 13:10:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -77,9 +77,9 @@ $controller
 $target=$openinnew ? 'target="_blank"' : '';
 
 echo '<table id="gm_config"><tr>',
-	'<th><a ', (safe_GET('mod_action')=="admin_editconfig" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_editconfig">', WT_I18N::translate('Google Maps configuration'), '</a>', '</th>',
-	'<th><a ', (safe_GET('mod_action')=="admin_places" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_places">', WT_I18N::translate('Edit geographic place locations'), '</a>', '</th>',
-	'<th><a ', (safe_GET('mod_action')=="admin_placecheck" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&mod_action=admin_placecheck">', WT_I18N::translate('Place Check'), '</a>', help_link('GOOGLEMAP_PLACECHECK','googlemap'), '</th>',
+	'<th><a ', (safe_GET('mod_action')=="admin_editconfig" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&amp;mod_action=admin_editconfig">', WT_I18N::translate('Google Maps configuration'), '</a>', '</th>',
+	'<th><a ', (safe_GET('mod_action')=="admin_places" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&amp;mod_action=admin_places">', WT_I18N::translate('Edit geographic place locations'), '</a>', '</th>',
+	'<th><a ', (safe_GET('mod_action')=="admin_placecheck" ? 'class="current" ' : ''), 'href="module.php?mod=googlemap&amp;mod_action=admin_placecheck">', WT_I18N::translate('Place Check'), '</a>', help_link('GOOGLEMAP_PLACECHECK','googlemap'), '</th>',
 '</tr></table>';
 
 //Start of User Defined options
@@ -161,7 +161,7 @@ echo '</td>';
 echo '</tr>';
 echo '</form>';
 echo '</table>';
-echo '<hr />';
+echo '<hr>';
 
 switch ($action) {
 case 'go':

@@ -26,7 +26,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // @author Greg Roach
-// @version $Id: Hijri.php 10887 2011-02-19 10:11:36Z greg $
+// @version $Id: Hijri.php 13105 2011-12-21 17:14:52Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -148,13 +148,13 @@ class WT_Date_Hijri extends WT_Date_Calendar {
 	}
 
 	static function YMDtoJD($y, $m, $d) {
-		return $d+29*($m-1)+floor((6*$m-1)/11)+$y*354+floor((3+11*$y)/30)+1948085;
+		return $d+29*($m-1)+floor((6*$m-1)/11)+$y*354+floor((3+11*$y)/30)+1948084;
 	}
 
 	static function JDtoYMD($j) {
-		$y=floor((30*($j-1948440)+10646)/10631);
-		$m=floor((11*($j-$y*354-floor((3+11*$y)/30)-1948086)+330)/325);
-		$d=$j-29*($m-1)-floor((6*$m-1)/11)-$y*354-floor((3+11*$y)/30)-1948085;
+		$y=floor((30*($j-1948439)+10646)/10631);
+		$m=floor((11*($j-$y*354-floor((3+11*$y)/30)-1948085)+330)/325);
+		$d=$j-29*($m-1)-floor((6*$m-1)/11)-$y*354-floor((3+11*$y)/30)-1948084;
 		return array($y, $m, $d);
 	}
 }

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: reportengine.php 12812 2011-11-19 13:02:05Z greg $
+// $Id: reportengine.php 13043 2011-12-12 22:42:25Z nigel $
 
 define('WT_SCRIPT_NAME', 'reportengine.php');
 require './includes/session.php';
@@ -135,19 +135,20 @@ if ($action=='choose') {
 	$controller->setPageTitle(WT_I18N::translate('Choose a report to run'));
 	$controller->pageHeader();
 
-	echo '<br /><br /><form name="choosereport" method="get" action="reportengine.php">';
-	echo '<input type="hidden" name="action" value="setup" />';
-	echo '<input type="hidden" name="output" value="', $output, '" />';
-	echo '<table class="facts_table width40 center">';
-	echo '<tr><td class="topbottombar" colspan="2">', WT_I18N::translate('Choose a report to run'), '</td></tr>';
-	echo '<tr><td class="descriptionbox wrap width33 vmiddle">', WT_I18N::translate('Select report'), '</td>';
-	echo '<td class="optionbox"><select onchange="this.form.submit();" name="report">';
+	echo '<div id="reportengine-page">
+		<form name="choosereport" method="get" action="reportengine.php">
+		<input type="hidden" name="action" value="setup">
+		<input type="hidden" name="output" value="', $output, '">
+		<table class="facts_table width40">
+		<tr><td class="topbottombar" colspan="2">', WT_I18N::translate('Choose a report to run'), '</td></tr>
+		<tr><td class="descriptionbox wrap width33 vmiddle">', WT_I18N::translate('Select report'), '</td>
+		<td class="optionbox"><select onchange="this.form.submit();" name="report">';
 	foreach ($reports as $file=>$report) {
 			echo '<option value="', $file, '">', $report, '</option>';
 	}
-	echo '</select></td></tr>';
-	echo '<tr><td class="topbottombar" colspan="2"><input type="submit" value="', WT_I18N::translate('Click here to continue'), '" /></td></tr>';
-	echo '</table></form><br /><br />';
+	echo '</select></td></tr>
+		<tr><td class="topbottombar" colspan="2"><input type="submit" value="', WT_I18N::translate('Click here to continue'), '"></td></tr>
+		</table></form></div>';
 }
 
 //-- setup report to run
@@ -193,13 +194,13 @@ elseif ($action=='setup') {
 	echo WT_JS_END;
 
 	init_calendar_popup();
-	echo '<form name="setupreport" method="get" target="_blank" action="reportengine.php">';
-	echo '<input type="hidden" name="action" value="run" />';
-	echo '<input type="hidden" name="report" value="', $report, '" />';
-
-	echo '<table class="facts_table width50 center">';
-	echo '<tr><td class="topbottombar" colspan="2">', WT_I18N::translate('Enter report values'), '</td></tr>';
-	echo '<tr><td class="descriptionbox width30 wrap">', WT_I18N::translate('Selected Report'), '</td><td class="optionbox">', $report_array['title'], '<br/>', $report_array['description'], '</td></tr>';
+	echo '<div id="reportengine-page">
+		<form name="setupreport" method="get" target="_blank" action="reportengine.php">
+		<input type="hidden" name="action" value="run">
+		<input type="hidden" name="report" value="', $report, '">
+		<table class="facts_table width50">
+		<tr><td class="topbottombar" colspan="2">', WT_I18N::translate('Enter report values'), '</td></tr>
+		<tr><td class="descriptionbox width30 wrap">', WT_I18N::translate('Selected Report'), '</td><td class="optionbox">', $report_array['title'], '<br>', $report_array['description'], '</td></tr>';
 
 	if (!isset($report_array['inputs'])) {
 		$report_array['inputs'] = array();
@@ -211,7 +212,7 @@ elseif ($action=='setup') {
 				$input['default']=$_REQUEST[$input['name']];
 			}
 			echo '<tr><td class="descriptionbox wrap">';
-			echo '<input type="hidden" name="varnames[]" value="', $input["name"], '" />';
+			echo '<input type="hidden" name="varnames[]" value="', $input["name"], '">';
 			echo WT_I18N::translate($input['value']), '</td><td class="optionbox">';
 			if (!isset($input['type'])) {
 				$input['type'] = 'text';
@@ -224,21 +225,14 @@ elseif ($action=='setup') {
 					if (!empty($pid)) {
 						$input['default'] = $pid;
 					} else {
-						$input['default'] = check_rootid($input['default']);
+						$input['default'] = $controller->getSignificantIndividual()->getXref();
 					}
 				}
 				if ($input['lookup']=='FAM') {
 					if (!empty($famid)) {
 						$input['default'] = $famid;
 					} else {
-						// Default the FAM to the first spouse family of the default INDI
-						$person=WT_Person::getInstance(check_rootid($input['default']));
-						if ($person) {
-							$sfams=$person->getSpouseFamilies();
-							if ($sfams) {
-								$input['default'] = reset($sfams)->getXref();
-							}
-						}
+						$input['default'] = $controller->getSignificantFamily()->getXref();
 					}
 				}
 				if ($input['lookup']=='SOUR') {
@@ -248,15 +242,15 @@ elseif ($action=='setup') {
 				}
 			}
 			if ($input['type']=='text') {
-				echo '<input type="text" name="vars[', $input['name'], ']" id="', $input['name'], '" ';
-				echo 'value="', $input['default'], '" style="direction: ltr;" />';
+				echo '<input type="text" name="vars[', $input['name'], ']" id="', $input['name'], '" 
+						value="', $input['default'], '" style="direction: ltr;">';
 			}
 			if ($input['type']=='checkbox') {
 				echo '<input type="checkbox" name="vars[', $input['name'], ']" id="', $input['name'], '" value="1"';
 				if ($input['default']=='1') {
 					echo ' checked="checked"';
 				}
-				echo ' />';
+				echo '>';
 			}
 			if ($input['type']=='select') {
 				echo '<select name="vars[', $input['name'], ']" id="', $input['name'], '_var">';
@@ -276,7 +270,7 @@ elseif ($action=='setup') {
 				echo '</select>';
 			}
 			if (isset($input['lookup'])) {
-				echo '<input type="hidden" name="type[', $input['name'], ']" value="', $input['lookup'], '" />';
+				echo '<input type="hidden" name="type[', $input['name'], ']" value="', $input['lookup'], '">';
 				if ($input['lookup']=='INDI') {
 					print_findindi_link('pid','');
 				} elseif ($input['lookup']=='PLAC') {
@@ -293,32 +287,32 @@ elseif ($action=='setup') {
 						$Link = $text;
 					}
 
-					?>
-					<a href="#" onclick="cal_toggleDate('div_<?php echo $input['name']; ?>', '<?php echo $input['name']; ?>'); return false;">
-					<?php echo $Link; ?>
-					</a>
-					<div id="div_<?php echo $input['name']; ?>" style="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></div>
-					<?php
+			echo '<a href="#" onclick="cal_toggleDate(\'div_', $input['name'], '\', ', $input['name'], '\'); return false;">', $Link, '</a>
+					<div id="div_', $input['name'], '" style="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></div>';
 				}
 			}
-			echo "</td></tr>";
+			echo '</td></tr>';
 		}
 	}
-	?>
-	<tr><td class="descriptionbox width30 wrap"></td>
-	<td class="optionbox">
-	<table><tr>
-	<td><img src="<?php echo $WT_IMAGES['media_pdf']; ?>" alt="PDF" title="PDF" /></td>
-	<td><img src="<?php echo $WT_IMAGES['media_html']; ?>" alt="HTML" title="HTML" /></td>
-	</tr><tr>
-	<td><center><input type="radio" name="output" value="PDF" checked="checked" /></center></td>
-	<td><center><input type="radio" name="output" value="HTML" <?php if ($output=='HTML') echo ' checked="checked"'; ?> /></center></td>
-	</tr></table>
-	</td></tr>
-	<?php
-	echo '<tr><td class="topbottombar" colspan="2">';
-	echo '<input type="submit" value="', WT_I18N::translate('Download report'), '" ;"/>';
-	echo '</td></tr></table></form>';
+	echo '<tr>
+		<td colspan="2" class="optionbox">
+		<div class="report-type">
+		<div>
+		<img src="', $WT_IMAGES['media_pdf'], '" alt="PDF" title="PDF">
+		<p><input type="radio" name="output" value="PDF" checked="checked"></p>
+		</div>
+		<div>
+		<img src="', $WT_IMAGES['media_html'], '" alt="HTML" title="HTML">
+		<p><input type="radio" name="output" value="HTML"';
+		if ($output=='HTML') echo ' checked="checked"', '>';
+	echo '</p>
+		</div>
+		</div>
+		</td>
+		</tr>
+		<tr><td class="topbottombar" colspan="2">
+		<input type="submit" value="', WT_I18N::translate('Download report'), '" ;">
+		</td></tr></table></form></div>';
 }
 //-- run the report
 elseif ($action=='run') {

@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_module_menus.php 12812 2011-11-19 13:02:05Z greg $
+// $Id: admin_module_menus.php 13034 2011-12-12 13:10:58Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_module_menus.php');
 require 'includes/session.php';
@@ -89,7 +89,7 @@ echo WT_JS_START; ?>
 <div align="center">
 	<div id="tabs">
 		<form method="post" action="<?php echo WT_SCRIPT_NAME; ?>">
-			<input type="hidden" name="action" value="update_mods" />
+			<input type="hidden" name="action" value="update_mods">
 			<table id="menus_table" class="modules_table">
 				<thead>
 					<tr>
@@ -111,7 +111,7 @@ echo WT_JS_START; ?>
 						?>
 							<td><?php echo $module->getTitle(); ?></td>
 							<td><?php echo $module->getDescription(); ?></td>
-							<td><input type="text" size="3" value="<?php echo $order; ?>" name="menuorder-<?php echo $module->getName(); ?>" />
+							<td><input type="text" size="3" value="<?php echo $order; ?>" name="menuorder-<?php echo $module->getName(); ?>">
 							</td>
 							<td>
 								<table class="modules_table2">
@@ -137,7 +137,7 @@ echo WT_JS_START; ?>
 					?>
 				</tbody>
 			</table>
-			<input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>" />
+			<input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>">
 		</form>
 	</div>
 </div>

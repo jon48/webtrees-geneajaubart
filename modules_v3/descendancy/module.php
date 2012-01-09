@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12942 2011-11-29 11:58:29Z greg $
+// $Id: module.php 13033 2011-12-12 11:47:53Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -84,18 +84,16 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	public function getSidebarContent() {
 		global $WT_IMAGES, $controller;
 
-		$out = '<script type="text/javascript">
-		<!--
-		var dloadedNames = new Array();
+		$controller->addInlineJavaScript('
+			var dloadedNames = new Array();
 
-		function dsearchQ() {
-			var query = jQuery("#sb_desc_name").attr("value");
-			if (query.length>1) {
-				jQuery("#sb_desc_content").load("module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=descendancy&search="+query);
+			function dsearchQ() {
+				var query = jQuery("#sb_desc_name").attr("value");
+				if (query.length>1) {
+					jQuery("#sb_desc_content").load("module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=descendancy&search="+query);
+				}
 			}
-		}
 
-		jQuery(document).ready(function(){
 			jQuery("#sb_desc_name").focus(function(){this.select();});
 			jQuery("#sb_desc_name").blur(function(){if (this.value=="") this.value="'.WT_I18N::translate('Search').'";});
 			var dtimerid = null;
@@ -124,22 +122,21 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				}
 				return false;
 			});
-		});
-		//-->
-		</script>
-		<form method="post" action="module.php?mod='.$this->getName().'&mod_action=ajax" onsubmit="return false;">
-		<input type="text" name="sb_desc_name" id="sb_desc_name" value="'.WT_I18N::translate('Search').'" />';
-		$out .= '</form>';
-		$out .= '<div id="sb_desc_content">';
-		$out .= '<ul>'.$this->getPersonLi($controller->record, 1).'</ul>';
-		$out .= '</div>';
-		return $out;
+		');
+
+		return
+			'<form method="post" action="module.php?mod='.$this->getName().'&amp;mod_action=ajax" onsubmit="return false;">'.
+			'<input type="text" name="sb_desc_name" id="sb_desc_name" placeholder="'.WT_I18N::translate('Search').'">'.
+			'</form>'.
+			'<div id="sb_desc_content">'.
+			'<ul>'.$this->getPersonLi($controller->record, 1).'</ul>'.
+			'</div>';
 	}
 
 	public function getPersonLi(WT_Person $person, $generations=0) {
 		global $WT_IMAGES;
 
-		$out = '<li id="sb_desc_'.$person->getXref().'" class="sb_desc_indi_li"><a href="module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=descendancy&amp;pid='.$person->getXref().'" title="'.$person->getXref().'" class="sb_desc_indi">';
+		$out = '<li id="sb_desc_'.$person->getXref().'" class="sb_desc_indi_li"><a href="module.php?mod='.$this->getName().'&amp;mod_action=ajax&amp;sb_action=descendancy&amp;pid='.$person->getXref().'" title="'.$person->getXref().'" class="sb_desc_indi">';
 		if ($generations>0) {
 			$out .= '<img src="'.$WT_IMAGES['minus'].'" class="plusminus" alt="">';
 		} else {
@@ -165,7 +162,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	public function getFamilyLi(WT_Family $family, WT_Person $person, $generations=0) {
 		global $WT_IMAGES;
 
-		$out = '<li id="sb_desc_'.$family->getXref().'" class="sb_desc_indi_li"><a href="module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=descendancy&amp;famid='.$family->getXref().'" title="'.$family->getXref().'" class="sb_desc_indi">';
+		$out = '<li id="sb_desc_'.$family->getXref().'" class="sb_desc_indi_li"><a href="module.php?mod='.$this->getName().'&amp;mod_action=ajax&amp;sb_action=descendancy&amp;famid='.$family->getXref().'" title="'.$family->getXref().'" class="sb_desc_indi">';
 		$out .= '<img src="'.$WT_IMAGES['minus'].'" class="plusminus" alt="">';
 		$out .= $person->getSexImage().$person->getFullName();
 

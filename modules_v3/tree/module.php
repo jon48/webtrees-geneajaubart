@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 12634 2011-11-08 19:22:30Z greg $
+// $Id: module.php 13046 2011-12-13 10:24:32Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -28,25 +28,12 @@ if (!defined('WT_WEBTREES')) {
 
 class tree_WT_Module extends WT_Module implements WT_Module_Tab {	
 	var $headers; // CSS and script to include in the top of <head> section, before theme's CSS
-	var $style; // the name of the active style, or false
-	var $css; // a customized CSS to load AFTER theme's CSS if $style is defined
 	var $js; // the TreeViewHandler javascript
 	
 	function __construct() {
 		// define the module inclusions for the page header
-  	$this->headers= '<link rel="stylesheet" type="text/css" href="'.WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/css/treeview.css" />';
-  	$this->js = WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/treeview.js';
-  	
-		// Retrieve the user's personalized style
-    if (isset($_COOKIE['tvStyle'])) {
-    	$this->style = $_COOKIE['tvStyle'];
-    	$this->css = '<link id="tvCSS" rel="stylesheet" type="text/css" href="'.WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/css/styles/'.$this->style.'/'.$this->style.'.css" />';
-    }
-    else {
-    	$this->style = false;
-    	$this->css = '';
-    }
-    $this->css .= '<link rel="stylesheet" type="text/css" href="'.WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/css/treeview_print.css" media="print" />';
+		$this->css=WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/css/treeview.css';
+  	$this->js =WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/treeview.js';
 	}
 	
 	// Extend WT_Module. This title should be normalized when this module will be added officially
@@ -75,8 +62,18 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 
 		require_once WT_MODULES_DIR.$this->getName().'/class_treeview.php';
     $tv = new TreeView('tvTab');
-    list($html, $js) = $tv->drawViewport($controller->record->getXref(), 3, $this->style);
-		return $html.WT_JS_START.$js.WT_JS_END;
+    list($html, $js) = $tv->drawViewport($controller->record->getXref(), 3);
+		return
+			'<script type="text/javascript" src="'.$this->js.'"></script>'.
+			$html.
+			WT_JS_START.'
+			if (document.createStyleSheet) {
+				document.createStyleSheet("'.$this->css.'"); // For Internet Explorer
+			} else {
+				jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="'.$this->css.'">\');
+			}'.
+			$js.
+			WT_JS_END;
 	}
 
 	// Implement WT_Module_Tab
@@ -96,9 +93,6 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function getPreLoadContent() {
-		// a workaround to the lack of a proper method of class Module to insert css and scripts in <head> where needed
-		// the required loading order is : headers, theme, css
-	  return '<script type="text/javascript" src="'.$this->js.'"></script>'.$this->headers;
 	}
 
   // Extend WT_Module
@@ -107,23 +101,33 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 		require_once WT_MODULES_DIR.$this->getName().'/class_treeview.php';
     switch($mod_action) {
       case 'treeview':
+				global $controller;
+				$controller=new WT_Controller_Base();
+
         $tvName = 'tv';
         $rootid = safe_GET('rootid');
-				$rootid = check_rootid($rootid);
         $tv = new TreeView('tv');
 				ob_start();
 				$person=WT_Person::getInstance($rootid);
 
-				list($html, $js)=$tv->drawViewport($rootid, 4, $this->style);
+				if (!$person) {
+					$person=$controller->getSignificantIndividual();
+				}
 
-				global $controller;
-				$controller=new WT_Controller_Base();
+				list($html, $js)=$tv->drawViewport($rootid, 4);
+
 				$controller
 					->setPageTitle(WT_I18N::translate('Interactive tree of %s', $person->getFullName()))
 					->pageHeader()
 					->addExternalJavaScript($this->js)
-					->addInlineJavaScript('jQuery("head").append(\''.$this->headers.$this->css.'\');')
-					->addInlineJavaScript($js);
+					->addInlineJavaScript($js)
+					->addInlineJavaScript('
+					if (document.createStyleSheet) {
+						document.createStyleSheet("'.$this->css.'"); // For Internet Explorer
+					} else {
+						jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="'.$this->css.'">\');
+					}
+				');
 
         if (WT_USE_LIGHTBOX) {
         	require WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
