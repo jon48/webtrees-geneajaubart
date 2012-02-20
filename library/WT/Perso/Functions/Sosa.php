@@ -21,6 +21,7 @@ class WT_Perso_Functions_Sosa {
 	private static $_isModuleOperational = -1;
 	private static $_statistictab = null;
 	private static $_sosaListByGen = null;
+	private static $_sosaListWithGen = null;
 	
 	/**
 	 * Return whether the Sosa module is active and the table has been created. 
@@ -46,7 +47,23 @@ class WT_Perso_Functions_Sosa {
 		WT_DB::prepare('DELETE FROM ##psosa WHERE ps_file=?')
 			->execute(array($ged_id));
 	}
-		
+
+	/**
+	 * Return the list of all sosas, with the generations it belongs to
+	 *
+	 * @param int $ged_id ID of the gedcom file
+	 * @return array Associative array of Sosa ancestors, with their generation, comma separated
+	 */
+	public static function getAllSosaWithGenerations($ged_id){
+		if(!self::$_sosaListWithGen) self::$_sosaListWithGen= array();
+		if($ged_id){
+			self::$_sosaListWithGen = WT_DB::prepare('SELECT ps_i_id AS indi, GROUP_CONCAT(DISTINCT ps_gen ORDER BY ps_gen ASC SEPARATOR ",") AS generations FROM ##psosa WHERE ps_file=? GROUP BY ps_i_id')
+				->execute(array($ged_id))
+				->fetchAssoc();
+		}
+		return self::$_sosaListWithGen;
+	}
+	
 	/**
 	 * Returns the generation associated with a Sosa number
 	 *

@@ -34,6 +34,15 @@ class WT_Perso_GedcomRecord {
 	}
 
 	/**
+	 * Return the native gedcom record embedded within the decorator
+	 *
+	 * @return WT_GedcomRecord Embedded gedcom record
+	 */
+	public function getDerivedRecord(){
+		return $this->gedcomrecord;
+	}
+	
+	/**
 	 * Add additional options to the core format_first_major_facts function.
 	 * If no option is suitable, it will try returning the core function.
 	 *

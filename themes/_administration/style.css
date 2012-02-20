@@ -459,4 +459,7 @@ html[dir='rtl'] #story_module2 th, html[dir='rtl'] #story_module2 td {text-align
 .progressbutton{width: 130px;height: 30px;}
 .progressbutton img {max-height: 20px;}
 .progressbutton .progressicon {max-height: 16px;}
+
+#perso_geodispersion td {padding: 10px 50px 10px 50px;}
+#perso_geodispersion .dataTables_wrapper td { padding: 0px;  }
 /* END PERSO */

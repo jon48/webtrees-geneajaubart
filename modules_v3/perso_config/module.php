@@ -50,6 +50,7 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 	 * 
 	 */
 	private function config(){
+		global $controller;
 		
 		$controller=new WT_Controller_Base();
 		$controller

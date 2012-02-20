@@ -42,6 +42,7 @@
 #menu-sosa-missing		   		{background-position:left    -450px;} html[dir=rtl] #menu-sosa-missing		 		{background-position:right    -450px;}
 #menu-sosa-stats		   		{background-position:left    -630px;} html[dir=rtl] #menu-sosa-stats		 		{background-position:right    -630px;}
 #menu-sosa-recompute	   		{background-position:left   -1210px;} html[dir=rtl] #menu-sosa-recompute	 		{background-position:right   -1210px;}
+#menu-sosa-geodispersion	   	{background-position:left    -510px;} html[dir=rtl] #menu-sosa-recompute	 		{background-position:right    -510px;}
 
 #indi_perso_header{
 	float: right;
@@ -103,6 +104,10 @@ html[dir='rtl'] #indi_perso_icons { float: left;}
 
 .flag_gm_h50 {
 	max-height: 50px;	
+}
+
+.flag_gm_h25 {
+	max-height: 25px;	
 }
 
 .fact_flag{
@@ -203,3 +208,20 @@ html[dir='rtl'] .right { float: left;}
 .issourcedtable .slabel, html[dir='rtl'] .svalue { text-align: right; padding-right: 5px;}
 .issourcedtable .svalue, html[dir='rtl'] .slabel { text-align: left; padding-left: 5px;}
 .issourcedtable .svalue { width:40%; }
+
+#geodispersion_tip{ position : absolute; border : 1px solid gray; background-color : #efefef; padding : 3px; z-index: 1000; /* set this to create word wrap */ max-width: 200px;}
+#geodispersion_flag{ padding: 4px;}
+#geodispersion_gen .optionbox { font-size: 10px;}
+#geodispersion_gen div { padding: 10px;}
+#geodispersion_gentable {width: 90%;}
+#geodispersion_gentable td {vertical-align: middle;}
+#geodispersion_gentable .descriptionbox {width: 15%;}
+#geodispersion_gentable .geodispersion_bigrow {width: 100%;}
+#geodispersion_gentable .geodispersion_bigrow .small {font-size: 8px;}
+#geodispersion_gentable .geodispersion_rowitem{ border: 1px solid #d3c6b8;}
+#geodispersion_gentable .geodispersion_rowitem table{ width: 100%; }
+#geodispersion_gentable .geodispersion_rowitem table td{ padding: 0px;}
+#geodispersion_gentable .geodispersion_rowitem .geodispersion_flag{ width: 1%; }
+#geodispersion_gentable .geodispersion_unknownitem { background-color: #D3C6B8; color: #62584D;}
+
+}
