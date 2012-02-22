@@ -5,7 +5,7 @@
 // to use an SQL database as its datastore.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_db.php 13098 2011-12-20 23:33:04Z nigel $
+// $Id: functions_db.php 13420 2012-02-10 15:03:43Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -1041,21 +1041,41 @@ function get_place_list($parent, $level) {
 * @param int $level
 * @return array
 */
-function get_place_positions($parent, $level='') {
+function get_place_positions($parent, $level=null) {
 	// TODO: this function needs splitting into two
 
-	if ($level!=='') {
-		return
+	if ($level!==null) {
+		// placelist.php - we know the exact hierarchy
+		$rows=
 			WT_DB::prepare("SELECT DISTINCT pl_gid FROM `##placelinks` WHERE pl_p_id=? AND pl_file=?")
 			->execute(array(get_place_parent_id($parent, $level), WT_GED_ID))
 			->fetchOneColumn();
+		$place_regex='\n2 PLAC '.'(.*)'.preg_quote(implode(', ', array_reverse($parent)), '/').'(\n|$)';
+		// The placelinks table does not take account of private records.
+		$xrefs=array();
+		foreach ($rows as $row) {
+			$record=WT_GedcomRecord::getInstance($row);
+			if ($record && preg_match('/'.$place_regex.'/i', $record->getGedcomRecord())) {
+				$xrefs[]=$row;
+			}
+		}
 	} else {
-		//-- we don't know the level so get the any matching place
-		return
+		// lifespan.php - we don't know the level so get the any matching place
+		$rows=
 			WT_DB::prepare("SELECT DISTINCT pl_gid FROM `##placelinks`, `##places` WHERE p_place LIKE ? AND p_file=pl_file AND p_id=pl_p_id AND p_file=?")
 			->execute(array($parent, WT_GED_ID))
 			->fetchOneColumn();
+		$place_regex='\n2 PLAC '.preg_quote($parent, '/').'(\n|,|$)';
+		// The placelinks table does not take account of private person records.
+		$xrefs=array();
+		foreach ($rows as $row) {
+			$indi=WT_Person::getInstance($row);
+			if ($indi && preg_match('/'.$place_regex.'/i', $indi->getGedcomRecord())) {
+				$xrefs[]=$row;
+			}
+		}
 	}
+	return $xrefs;
 }
 
 //-- find all of the places
@@ -1704,10 +1724,9 @@ function get_newest_registered_user() {
 }
 
 function set_user_password($user_id, $password) {
-	if (CRYPT_BLOWFISH==1 && version_compare(PHP_VERSION, '5.3')) {
+	if (version_compare(PHP_VERSION, '5.3')>0) {
 		// Some PHP5.2 implementations of crypt() appear to be broken - #802316
-		// PHP5.3 will always support BLOWFISH - see php.net/crypt - so the check
-		// for CRYPT_BLOWFISH is redundant.
+		// PHP5.3 will always support BLOWFISH - see php.net/crypt
 		// This salt will select the BLOWFISH algorithm with 2^12 rounds
 		$salt='$2a$12$';
 		$salt_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./';
@@ -1732,7 +1751,7 @@ function check_user_password($user_id, $password) {
 		->fetchOne();
 	if (crypt($password, $password_hash)==$password_hash) {
 		// Update older passwords to use BLOWFISH with 2^12 rounds
-		if (CRYPT_BLOWFISH==1 && version_compare(PHP_VERSION, '5.3') && substr($password_hash, 0, 7)!='$2a$12$') {
+		if (version_compare(PHP_VERSION, '5.3')>0 && substr($password_hash, 0, 7)!='$2a$12$') {
 			set_user_password($user_id, $password);
 		}
 		return true;

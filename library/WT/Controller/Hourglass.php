@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Hourglass.php 13113 2011-12-21 21:32:34Z greg $
+// $Id: Hourglass.php 13336 2012-01-31 21:50:29Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -62,7 +62,7 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 	var $arrheight;
 
 	function __construct($rootid='', $show_full=1, $generations=3) {
-		global $USE_RIN, $MAX_ALIVE_AGE, $GEDCOM, $bheight, $bwidth, $bhalfheight, $PEDIGREE_FULL_DETAILS, $MAX_DESCENDANCY_GENERATIONS;
+		global $USE_RIN, $MAX_ALIVE_AGE, $GEDCOM, $bheight, $bwidth, $cbwidth, $cbheight, $bhalfheight, $PEDIGREE_FULL_DETAILS, $MAX_DESCENDANCY_GENERATIONS;
 		global $WT_IMAGES, $TEXT_DIRECTION, $show_full;
 
 		parent::__construct();
@@ -99,10 +99,10 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 		$bwidth=$Dbwidth;
 		$bheight=$Dbheight;
 		
-		// -- adjust size of the non-detailed boxes
+		// -- adjust size of the compact box
 		if (!$this->show_full) {
-			$bwidth = $bwidth / 1.5;
-			$bheight = $bheight / 2 ;
+			$bwidth = $cbwidth;
+			$bheight = $cbheight;
 		}
 
 		$bhalfheight = (int)($bheight / 2);

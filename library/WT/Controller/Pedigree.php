@@ -2,7 +2,7 @@
 //	Controller for the pedigree chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Pedigree.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: Pedigree.php 13336 2012-01-31 21:50:29Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -35,7 +35,6 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 	var $rootid;
 	var $name;
 	var $addname;
-	var $rootPerson;
 	var $show_full;
 	var $talloffset;
 	var $PEDIGREE_GENERATIONS;
@@ -53,13 +52,12 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 	public function __construct() {
 		global $PEDIGREE_FULL_DETAILS, $PEDIGREE_LAYOUT, $MAX_PEDIGREE_GENERATIONS;
 		global $DEFAULT_PEDIGREE_GENERATIONS, $SHOW_EMPTY_BOXES;
-		global $bwidth, $bheight, $baseyoffset, $basexoffset, $byspacing, $bxspacing;
+		global $bwidth, $bheight, $cbwidth, $cbheight, $baseyoffset, $basexoffset, $byspacing, $bxspacing;
 		global $BROWSER_TYPE, $show_full, $talloffset;
 
 		parent::__construct();
 		$this->log2 = log(2);
 
-		$this->rootid    =safe_GET_xref('rootid');
 		$this->show_full =safe_GET('show_full', array('0', '1'), $PEDIGREE_FULL_DETAILS);
 		$this->talloffset=safe_GET('talloffset', array('0', '1', '2', '3'), $PEDIGREE_LAYOUT);
 		$this->box_width  =safe_GET_integer('box_width',   50, 300, 100);
@@ -83,27 +81,19 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 		$show_full = $this->show_full;
 		$talloffset = $this->talloffset;
 
-		$this->rootPerson = WT_Person::getInstance($this->rootid);
-		if (!$this->rootPerson) {
-			$this->rootPerson=$this->getSignificantIndividual();
-			$this->rootid=$this->rootPerson->getXref();
+		if ($this->root && $this->root->canDisplayName()) {
+			$this->setPageTitle(
+				/* I18N: %s is a person's name */
+				WT_I18N::translate('Pedigree tree of %s', $this->root->getFullName())
+			);
+		} else {
+			$this->setPageTitle(WT_I18N::translate('Pedigree'));
 		}
-		$this->name     = $this->rootPerson->getFullName();
-		$this->addname  = $this->rootPerson->getAddName();
 
-		$this->setPageTitle(/* I18N: %s is a person's name */ WT_I18N::translate('Pedigree tree of %s', $this->name));
-		
-
-		//-- adjustments for hide details
-		if ($this->show_full==false) {
-			$bheight=$bheight/2;
-			if ($this->talloffset < 2) {
-				$bwidth=$bwidth/1.5; 
-			}
-			else {
-				$bwidth = $bwidth/1.5; //Problem item correct vaoue is -=50  offset #3
-
-			}
+		// -- adjust size of the compact box
+		if (!$this->show_full) {
+			$bwidth = $cbwidth;
+			$bheight = $cbheight;
 		}
 		//-- adjustments for portrait mode
 		if ($this->talloffset==0) {
@@ -252,10 +242,10 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 	}
 
 	function getPersonName() {
-		if (is_null($this->rootPerson)) {
+		if (is_null($this->root)) {
 			return WT_I18N::translate('unknown');
 		} else {
-			return $this->rootPerson->getFullName();
+			return $this->root->getFullName();
 		}
 	}
 

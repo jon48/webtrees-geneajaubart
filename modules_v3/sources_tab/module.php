@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: module.php 13143 2011-12-28 08:47:24Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -48,7 +48,7 @@ class sources_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function getTabContent() {
-		global $FACT_COUNT, $SHOW_LEVEL2_NOTES, $NAV_SOURCES, $controller;
+		global $SHOW_LEVEL2_NOTES, $NAV_SOURCES, $controller;
 
 		ob_start();
 		?>
@@ -62,8 +62,9 @@ class sources_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 			<?php
 			$otheritems = $controller->getOtherFacts();
 				foreach ($otheritems as $key => $event) {
-					if ($event->getTag()=="SOUR") print_main_sources($event->getGedcomRecord(), 1, $controller->record->getXref(), $event->getLineNumber());
-				$FACT_COUNT++;
+					if ($event->getTag()=='SOUR') {
+						print_main_sources($event->getGedcomRecord(), 1, $controller->record->getXref(), $event->getLineNumber());
+					}
 			}
 			// 2nd level sources [ 1712181 ]
 			$controller->record->add_family_facts(false);

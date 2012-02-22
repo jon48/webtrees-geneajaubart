@@ -2,7 +2,7 @@
 // Base controller for all other controllers
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Base.php 12997 2011-12-05 22:33:32Z greg $
+// $Id: Base.php 13393 2012-02-05 23:18:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -90,7 +90,7 @@ class WT_Controller_Base {
 	public function requireAdminLogin() {
 		require_once WT_ROOT.'includes/functions/functions.php'; // for get_query_url
 		if (!WT_USER_IS_ADMIN) {
-			header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.get_site_setting('LOGIN_URL', 'login.php').'?url='.rawurlencode(get_query_url()));
+			header('Location: '.WT_LOGIN_URL.'?url='.rawurlencode(get_query_url()));
 			exit;
 		}
 		return $this;
@@ -103,7 +103,7 @@ class WT_Controller_Base {
 			$ged_id==WT_GED_ID && !WT_USER_GEDCOM_ADMIN ||
 			$ged_id!=WT_GED_ID && userGedcomAdmin(WT_USER_ID, $gedcom_id)
 		) {
-			header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.get_site_setting('LOGIN_URL', 'login.php').'?url='.rawurlencode(get_query_url()));
+			header('Location: '.WT_LOGIN_URL.'?url='.rawurlencode(get_query_url()));
 			exit;
 		}
 		return $this;
@@ -113,7 +113,7 @@ class WT_Controller_Base {
 	public function requireAcceptLogin() {
 		require_once WT_ROOT.'includes/functions/functions.php'; // for get_query_url
 		if (!WT_USER_CAN_ACCEPT) {
-			header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.get_site_setting('LOGIN_URL', 'login.php').'?url='.rawurlencode(get_query_url()));
+			header('Location: '.WT_LOGIN_URL.'?url='.rawurlencode(get_query_url()));
 			exit;
 		}
 		return $this;
@@ -123,7 +123,7 @@ class WT_Controller_Base {
 	public function requireEditorLogin() {
 		require_once WT_ROOT.'includes/functions/functions.php'; // for get_query_url
 		if (!WT_USER_CAN_EDIT) {
-			header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.get_site_setting('LOGIN_URL', 'login.php').'?url='.rawurlencode(get_query_url()));
+			header('Location: '.WT_LOGIN_URL.'?url='.rawurlencode(get_query_url()));
 			exit;
 		}
 		return $this;
@@ -133,7 +133,7 @@ class WT_Controller_Base {
 	public function requireMemberLogin() {
 		require_once WT_ROOT.'includes/functions/functions.php'; // for get_query_url
 		if (!WT_USER_ID) {
-			header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.get_site_setting('LOGIN_URL', 'login.php').'?url='.rawurlencode(get_query_url()));
+			header('Location: '.WT_LOGIN_URL.'?url='.rawurlencode(get_query_url()));
 			exit;
 		}
 		return $this;
@@ -196,7 +196,7 @@ class WT_Controller_Base {
 
 		// The title often includes the names of records, which may have markup
 		// that cannot be used in the page title.
-		$title=htmlspecialchars_decode(strip_tags($this->page_title));
+		$title=html_entity_decode(strip_tags($this->page_title), ENT_QUOTES, 'UTF-8');
 
 		// Initialise variables for the theme's header.php
 		$LINK_CANONICAL  =$this->canonical_url;
@@ -224,9 +224,6 @@ class WT_Controller_Base {
 			var browserType    = "'.$BROWSERTYPE.'";
 			var WT_SCRIPT_NAME = "'.WT_SCRIPT_NAME.'";
 			var WT_LOCALE      = "'.WT_LOCALE.'";
-			/* keep the session id when opening new windows */
-			var sessionid   = "'.Zend_Session::getId().'";
-			var sessionname = "'.WT_SESSION_NAME.'";
 			var accesstime  = '.WT_DB::prepare("SELECT UNIX_TIMESTAMP(NOW())")->fetchOne().';
 			var plusminus = new Array();
 			plusminus[0] = new Image();
@@ -253,7 +250,7 @@ class WT_Controller_Base {
 		function delete_record(pid, linenum, mediaid) {
 			if (!mediaid) mediaid="";
 			if (confirm(\''.WT_I18N::translate('Are you sure you want to delete this fact?').'\')) {
-				window.open(\'edit_interface.php?action=delete&pid=\'+pid+\'&linenum=\'+linenum+\'&mediaid=\'+mediaid+"&"+sessionname+"="+sessionid, \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\');
+				window.open(\'edit_interface.php?action=delete&pid=\'+pid+\'&linenum=\'+linenum+\'&mediaid=\'+mediaid, \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\');
 			}
 			return false;
 		}
@@ -261,7 +258,7 @@ class WT_Controller_Base {
 		function message(username, method, url, subject) {
 			if ((!url)||(url=="")) url=\''.addslashes(urlencode(get_query_url())).'\';
 			if ((!subject)||(subject=="")) subject="";
-			window.open(\'message.php?to=\'+username+\'&method=\'+method+\'&url=\'+url+\'&subject=\'+subject+"&"+sessionname+"="+sessionid, \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\');
+			window.open(\'message.php?to=\'+username+\'&method=\'+method+\'&url=\'+url+\'&subject=\'+subject, \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\');
 			return false;
 		}
 

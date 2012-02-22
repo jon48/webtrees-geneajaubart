@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Base.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: Base.php 13220 2012-01-12 18:35:53Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -2789,6 +2789,9 @@ function HighlightedImageSHandler($attrs) {
 	$media = find_highlighted_object($id, WT_GED_ID, $gedrec);
 	if (!empty($media['file'])) {
 		if (preg_match("/(jpg|jpeg|png|gif)$/i", $media['file'])) {
+			if (!file_exists($media['file'])) {
+				$media['file']=get_media_firewall_path($media['file']);
+			}
 			if (file_exists($media['file'])) {
 				$size = findImageSize($media['file']);
 				if (($width>0) and ($height==0)) {

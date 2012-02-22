@@ -2,7 +2,7 @@
 // Log viewer.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_logs.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: admin_site_logs.php 13430 2012-02-11 18:12:46Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_logs.php');
 require './includes/session.php';
@@ -160,6 +160,9 @@ case 'load_json':
 
 	// This becomes a JSON list, not array, so need to fetch with numeric keys.
 	$aaData=WT_DB::prepare($SELECT1.$WHERE.$ORDER_BY.$LIMIT)->execute($args)->fetchAll(PDO::FETCH_NUM);
+	foreach ($aaData as &$row) {
+		$row[2]=htmlspecialchars($row[2]);
+	}
 	
 	// Total filtered/unfiltered rows
 	$iTotalDisplayRecords=WT_DB::prepare("SELECT FOUND_ROWS()")->fetchColumn();

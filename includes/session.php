@@ -2,7 +2,7 @@
 // Startup and session logic
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2011  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: session.php 13132 2011-12-23 15:25:32Z greg $
+// $Id: session.php 13438 2012-02-13 10:23:47Z greg $
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
 if (!defined('WT_SCRIPT_NAME')) {
@@ -31,7 +31,7 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.2.6');
+define('WT_VERSION',         '1.2.7');
 define('WT_VERSION_RELEASE', ''); // 'svn', 'beta', 'rc1', '', etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
 
@@ -48,7 +48,7 @@ if (isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCO
 	define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-1.2.3z/"
 } else {
 	// Uncompressed resources, served without a "Content-encoding: gzip" header.
-	define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-1.2.3/"
+	define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-1.2.3z/"
 }
 
 // Optionally, load major JS libraries from Google's public CDN
@@ -76,7 +76,7 @@ define('WT_DEBUG_LANG', false);
 define('WT_ERROR_LEVEL', 2); // 0=none, 1=minimal, 2=full
 
 // Required version of database tables/columns/indexes/etc.
-define('WT_SCHEMA_VERSION', 15);
+define('WT_SCHEMA_VERSION', 16);
 
 // Regular expressions for validating user input, etc.
 define('WT_REGEX_XREF',     '[A-Za-z0-9:_-]+');
@@ -301,20 +301,14 @@ if (!empty($_SERVER['HTTP_USER_AGENT'])) {
 require WT_ROOT.'includes/session_spider.php';
 
 // Store our session data in the database.
-// NOTE: this causes problems for sites using PHP/APC
-// For APC sites, we skip this, and rely on default
-// session handling.  This will stop us from detecting
-// who is logged in.
-if (ini_get('apc.enabled')==false) {
-	session_set_save_handler(
-		create_function('', 'return true;'), // open
-		create_function('', 'return true;'), // close
-		create_function('$id', 'return WT_DB::prepare("SELECT session_data FROM `##session` WHERE session_id=?")->execute(array($id))->fetchOne();'), // read
-		create_function('$id,$data', 'WT_DB::prepare("REPLACE INTO `##session` (session_id, user_id, ip_address, session_data) VALUES (?,?,?,?)")->execute(array($id, WT_USER_ID, $_SERVER["REMOTE_ADDR"], $data));return true;'), // write
-		create_function('$id', 'WT_DB::prepare("DELETE FROM `##session` WHERE session_id=?")->execute(array($id));return true;'), // destroy
-		create_function('$maxlifetime', 'WT_DB::prepare("DELETE FROM `##session` WHERE session_time < DATE_SUB(NOW(), INTERVAL ? SECOND)")->execute(array($maxlifetime));return true;') // gc
-	);
-}
+session_set_save_handler(
+	create_function('', 'return true;'), // open
+	create_function('', 'return true;'), // close
+	create_function('$id', 'return WT_DB::prepare("SELECT session_data FROM `##session` WHERE session_id=?")->execute(array($id))->fetchOne();'), // read
+	create_function('$id,$data', 'WT_DB::prepare("REPLACE INTO `##session` (session_id, user_id, ip_address, session_data) VALUES (?,?,?,?)")->execute(array($id, WT_USER_ID, $_SERVER["REMOTE_ADDR"], $data));return true;'), // write
+	create_function('$id', 'WT_DB::prepare("DELETE FROM `##session` WHERE session_id=?")->execute(array($id));return true;'), // destroy
+	create_function('$maxlifetime', 'WT_DB::prepare("DELETE FROM `##session` WHERE session_time < DATE_SUB(NOW(), INTERVAL ? SECOND)")->execute(array($maxlifetime));return true;') // gc
+);
 
 // Use the Zend_Session object to start the session.
 // This allows all the other Zend Framework components to integrate with the session
@@ -326,6 +320,7 @@ $cfg=array(
 	'gc_probability'  => 1,
 	'gc_divisor'      => 100,
 	'cookie_path'     => WT_SCRIPT_PATH,
+	'cookie_httponly' => true,
 );
 
 // Search engines don't send cookies, and so create a new session with every visit.
@@ -436,31 +431,24 @@ if (WT_USER_ID && (safe_GET_bool('logout') || !WT_USER_NAME)) {
 	exit;
 }
 
-// Do we show context help on the page?
-if (isset($_GET['show_context_help'])) {
-	$WT_SESSION->show_context_help=safe_GET_bool('show_context_help');
-	unset($_GET['show_context_help']);
-} elseif ($SEARCH_SPIDER) {
-	$WT_SESSION->show_context_help=false;
-} elseif (!isset($WT_SESSION->show_context_help)) {
-	$WT_SESSION->show_context_help=get_gedcom_setting(WT_GED_ID, 'SHOW_CONTEXT_HELP', true);
-}
+// The login URL must be an absolute URL, and can be user-defined
+define('WT_LOGIN_URL', get_site_setting('LOGIN_URL', WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php'));
 
 if (!isset($_SESSION['wt_user'])) $_SESSION['wt_user'] = '';
 
 if (WT_SCRIPT_NAME!='help_text.php') {
-	if (!get_gedcom_setting(WT_GED_ID, 'imported') && substr(WT_SCRIPT_NAME, 0, 5)!=='admin' && !in_array(WT_SCRIPT_NAME, array('help_text.php', 'downloadgedcom.php', 'login.php', 'login_register.php', 'export_gedcom.php', 'edit_changes.php', 'import.php', 'message.php', 'save.php'))) {
+	if (!get_gedcom_setting(WT_GED_ID, 'imported') && substr(WT_SCRIPT_NAME, 0, 5)!=='admin' && !in_array(WT_SCRIPT_NAME, array('help_text.php', 'downloadgedcom.php', 'login.php', 'export_gedcom.php', 'edit_changes.php', 'import.php', 'message.php', 'save.php'))) {
 		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_trees_manage.php');
 		exit;
 	}
 
-	if ($REQUIRE_AUTHENTICATION && !WT_USER_ID && !in_array(WT_SCRIPT_NAME, array('login.php', 'login_register.php', 'help_text.php', 'message.php'))) {
+	if ($REQUIRE_AUTHENTICATION && !WT_USER_ID && !in_array(WT_SCRIPT_NAME, array('login.php', 'help_text.php', 'message.php'))) {
 		if (WT_SCRIPT_NAME=='index.php') {
 			$url='index.php?ged='.WT_GEDCOM;
 		} else {
 			$url=WT_SCRIPT_NAME.'?'.$QUERY_STRING;
 		}
-		header('Location: '.get_site_setting('LOGIN_URL').'?url='.rawurlencode($url));
+		header('Location: '.WT_LOGIN_URL.'?url='.rawurlencode($url));
 		exit;
 	}
 
@@ -542,7 +530,7 @@ define('WT_USE_LIGHTBOX', !$SEARCH_SPIDER && array_key_exists('lightbox', WT_Mod
 
 // Search engines are only allowed to see certain pages.
 if ($SEARCH_SPIDER && !in_array(WT_SCRIPT_NAME , array(
-	'index.php', 'site-unavailable.php', 'indilist.php',
+	'index.php', 'indilist.php', 'module.php', 'mediafirewall.php',
 	'individual.php', 'family.php', 'mediaviewer.php', 'note.php', 'repo.php', 'source.php',
 ))) {
 	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');

@@ -2,7 +2,7 @@
 // UI for online updating of the GEDCOM config file.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_config.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: admin_trees_config.php 13299 2012-01-20 20:40:31Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_config.php');
 
@@ -224,7 +224,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'SAVE_WATERMARK_IMAGE',         safe_POST_bool('NEW_SAVE_WATERMARK_IMAGE'));
 	set_gedcom_setting(WT_GED_ID, 'SAVE_WATERMARK_THUMB',         safe_POST_bool('NEW_SAVE_WATERMARK_THUMB'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_AGE_DIFF',                safe_POST_bool('NEW_SHOW_AGE_DIFF'));
-	set_gedcom_setting(WT_GED_ID, 'SHOW_CONTEXT_HELP',            safe_POST_bool('NEW_SHOW_CONTEXT_HELP'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_COUNTER',                 safe_POST_bool('NEW_SHOW_COUNTER'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_DEAD_PEOPLE',             safe_POST('SHOW_DEAD_PEOPLE'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_EMPTY_BOXES',             safe_POST_bool('NEW_SHOW_EMPTY_BOXES'));
@@ -235,12 +234,12 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'SHOW_LAST_CHANGE',             safe_POST_bool('NEW_SHOW_LAST_CHANGE'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_LDS_AT_GLANCE',           safe_POST_bool('NEW_SHOW_LDS_AT_GLANCE'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_LEVEL2_NOTES',            safe_POST_bool('NEW_SHOW_LEVEL2_NOTES'));
-	set_gedcom_setting(WT_GED_ID, 'SHOW_LIST_PLACES',             safe_POST('NEW_SHOW_LIST_PLACES'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_LIVING_NAMES',            safe_POST('SHOW_LIVING_NAMES'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_MEDIA_DOWNLOAD',          safe_POST_bool('NEW_SHOW_MEDIA_DOWNLOAD'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_NO_WATERMARK',            safe_POST('NEW_SHOW_NO_WATERMARK'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_PARENTS_AGE',             safe_POST_bool('NEW_SHOW_PARENTS_AGE'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_PEDIGREE_PLACES',         safe_POST('NEW_SHOW_PEDIGREE_PLACES'));
+	set_gedcom_setting(WT_GED_ID, 'SHOW_PEDIGREE_PLACES_SUFFIX',  safe_POST_bool('NEW_SHOW_PEDIGREE_PLACES_SUFFIX'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_PRIVATE_RELATIONSHIPS',   safe_POST('SHOW_PRIVATE_RELATIONSHIPS'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_REGISTER_CAUTION',        safe_POST_bool('NEW_SHOW_REGISTER_CAUTION'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_RELATIVES_EVENTS',        safe_POST('NEW_SHOW_RELATIVES_EVENTS'));
@@ -577,7 +576,7 @@ echo WT_JS_START;?>
 					</tr>
 					<tr>
 						<td>
-							<?php echo WT_I18N::translate('Support contact'), help_link('WEBMASTER_USER_ID'); ?>
+							<?php echo WT_I18N::translate('Technical help contact'), help_link('WEBMASTER_USER_ID'); ?>
 						</td>
 						<td><select name="NEW_WEBMASTER_USER_ID">
 						<?php
@@ -950,7 +949,7 @@ echo WT_JS_START;?>
 							<?php echo WT_I18N::translate('Custom welcome text'), help_link('WELCOME_TEXT_AUTH_MODE_CUST'); ?>
 						</td>
 						<td>
-							<textarea name="NEW_WELCOME_TEXT_AUTH_MODE_4" rows="5" cols="60"><?php echo get_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_AUTH_MODE_'.WT_LOCALE); ?></textarea>
+							<input name="NEW_WELCOME_TEXT_AUTH_MODE_4" size="60" maxlength="255" value="<?php echo htmlspecialchars(get_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_AUTH_MODE_'.WT_LOCALE)); ?>">
 						</td>
 					</tr>
 					<tr>
@@ -965,14 +964,6 @@ echo WT_JS_START;?>
 						<th colspan="2">
 							<?php echo WT_I18N::translate('User options'); ?>
 						</th>
-					</tr>
-					<tr>
-						<td>
-							<?php echo WT_I18N::translate('Contextual Help links'), help_link('SHOW_CONTEXT_HELP'); ?>
-						</td>
-						<td>
-							<?php echo radio_buttons('NEW_SHOW_CONTEXT_HELP', array(false=>WT_I18N::translate('hide'),true=>WT_I18N::translate('show')), get_gedcom_setting(WT_GED_ID, 'SHOW_CONTEXT_HELP')); ?>
-						</td>
 					</tr>
 					<tr>
 						<td>
@@ -1112,14 +1103,6 @@ echo WT_JS_START;?>
 						</td>
 					</tr>
 					<tr>
-						<td>
-							<?php echo WT_I18N::translate('Place levels to show in person boxes'), help_link('SHOW_PEDIGREE_PLACES'); ?>
-						</td>
-						<td>
-							<input type="text" name="NEW_SHOW_PEDIGREE_PLACES" value="<?php echo $SHOW_PEDIGREE_PLACES; ?>" size="5" maxlength="2">
-						</td>
-					</tr>
-					<tr>
 						<th colspan="2">
 							<?php echo WT_I18N::translate('Individual pages'); ?>
 						</td>
@@ -1179,10 +1162,37 @@ echo WT_JS_START;?>
 					</tr>
 					<tr>
 						<td>
-							<?php echo WT_I18N::translate('Place levels to show on lists'), help_link('SHOW_LIST_PLACES'); ?>
+							<?php echo WT_I18N::translate('Abbreviate place names'), help_link('SHOW_PEDIGREE_PLACES'); ?>
 						</td>
 						<td>
-							<input type="text" name="NEW_SHOW_LIST_PLACES" value="<?php echo $SHOW_LIST_PLACES; ?>" size="5" maxlength="2">
+							<?php
+							echo /* I18N: The placeholders are edit controls.  Show the [first/last] [1/2/3/4/5] parts of a place name */ WT_I18N::translate(
+								'Show the %1$s %2$s parts of a place name.',
+								select_edit_control('NEW_SHOW_PEDIGREE_PLACES_SUFFIX',
+									array(
+										false=>WT_I18N::translate_c('Show the [first/last] [N] parts of a place name.', 'first'),
+										true =>WT_I18N::translate_c('Show the [first/last] [N] parts of a place name.', 'last')
+									),
+									null,
+									get_gedcom_setting(WT_GED_ID, 'SHOW_PEDIGREE_PLACES_SUFFIX')
+								),
+								select_edit_control('NEW_SHOW_PEDIGREE_PLACES',
+									array(
+										1=>WT_I18N::number(1),
+										2=>WT_I18N::number(2),
+										3=>WT_I18N::number(3),
+										4=>WT_I18N::number(4),
+										5=>WT_I18N::number(5),
+										6=>WT_I18N::number(6),
+										7=>WT_I18N::number(7),
+										8=>WT_I18N::number(8),
+										9=>WT_I18N::number(9),
+									),
+									null,
+									get_gedcom_setting(WT_GED_ID, 'SHOW_PEDIGREE_PLACES')
+								)
+							);
+							?>
 						</td>
 					</tr>
 					<tr>

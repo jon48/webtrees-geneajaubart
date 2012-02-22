@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_placecheck.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: admin_placecheck.php 13275 2012-01-18 07:55:04Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -221,12 +221,12 @@ case 'go':
 	<script type="text/javascript">
 	<!--
 	function edit_place_location(placeid) {
-		window.open('module.php?mod=googlemap&mod_action=places_edit&action=update&placeid='+placeid+"&"+sessionname+"="+sessionid, '_blank', 'top=50, left=50, width=680, height=550, resizable=1, scrollbars=1');
+		window.open('module.php?mod=googlemap&mod_action=places_edit&action=update&placeid='+placeid, '_blank', 'top=50, left=50, width=680, height=550, resizable=1, scrollbars=1');
 		return false;
 	}
 
 	function add_place_location(placeid) {
-		window.open('module.php?mod=googlemap&mod_action=places_edit&action=add&placeid='+placeid+"&"+sessionname+"="+sessionid, '_blank', 'top=50, left=50, width=680, height=550, resizable=1, scrollbars=1');
+		window.open('module.php?mod=googlemap&mod_action=places_edit&action=add&placeid='+placeid, '_blank', 'top=50, left=50, width=680, height=550, resizable=1, scrollbars=1');
 		return false;
 	}
 	function showchanges() {

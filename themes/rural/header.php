@@ -134,7 +134,6 @@ else {
 	foreach (WT_MenuBar::getModuleMenus() as $menu) {
 		$menu_items[]=$menu;
 	}
-	$menu_items[]=WT_MenuBar::getHelpMenu();
 	echo '</div>'; // close header
 	//end header section
 	echo '<div class="top_center_box"/>';

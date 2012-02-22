@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search.php 13104 2011-12-21 02:39:09Z nigel $
+// $Id: search.php 13198 2012-01-06 13:15:41Z greg $
 
 define('WT_SCRIPT_NAME', 'search.php');
 require './includes/session.php';
@@ -225,8 +225,8 @@ echo '<div id="search-page">
 				if (count($all_gedcoms)>3) {
 					echo '<div class="label">&nbsp;</div>
 						<div class="value">
-							<input type="button" value="', WT_I18N::translate('select all'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).attr(\'checked\', true);});return false;">
-							<input type="button" value="', WT_I18N::translate('select none'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).attr(\'checked\', false);});return false;">';							
+						<input type="button" value="', /* I18N: select all (of the family trees) */ WT_I18N::translate('select all'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).attr(\'checked\', true);});return false;">
+							<input type="button" value="', /* I18N: select none (of the family trees) */ WT_I18N::translate('select none'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).attr(\'checked\', false);});return false;">';							
 							// More Than 10 Gedcom Files enable invert selection button
 							if (count($all_gedcoms)>10) {
 								echo '<input type="button" value="', WT_I18N::translate('invert selection'), '" onclick="jQuery(\'#search_trees :checkbox\').each(function(){jQuery(this).attr(\'checked\', !jQuery(this).attr(\'checked\'));});return false;">';
@@ -234,7 +234,7 @@ echo '<div id="search-page">
 						echo '</div>';
 				}			
 				echo '<div class="label">' , WT_I18N::translate('Family trees'), '</div>
-				<div class="value">';	
+				<div id="search_trees" class="value">';	
 					//-- sorting menu by gedcom filename
 					asort($all_gedcoms);
 					foreach ($all_gedcoms as $ged_id=>$gedcom) {

@@ -4,7 +4,7 @@
 // ($rootid=1, father=2, mother=3 ...)
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: ancestry.php 13121 2011-12-21 22:27:07Z greg $
+// $Id: ancestry.php 13276 2012-01-18 08:11:02Z greg $
 
 define('WT_SCRIPT_NAME', 'ancestry.php');
 require './includes/session.php';
@@ -43,7 +43,9 @@ $nonfamfacts[] = 'UID';
 $nonfamfacts[] = '';
 
 $controller=new WT_Controller_Ancestry();
-$controller->pageHeader();
+$controller
+	->pageHeader()
+	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }'); // For the "find indi" link
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
@@ -53,9 +55,7 @@ if (WT_USE_LIGHTBOX) {
 }
 
 echo '<table><tr><td valign="middle">';
-echo '<h2>', WT_I18N::translate('Ancestors of %s', $controller->name), '</h2>';
-// -- print the form to change the number of displayed generations
-echo WT_JS_START, 'var pastefield; function paste_id(value) {pastefield.value=value;}', WT_JS_END;
+echo '<h2>', $controller->getPageTitle(), '</h2>';
 ?>
 </td><td width="50px">&nbsp;</td><td><form name="people" id="people" method="get" action="?">
 <input type="hidden" name="ged" value="<?php echo WT_GEDCOM; ?>">
@@ -67,12 +67,12 @@ echo WT_JS_START, 'var pastefield; function paste_id(value) {pastefield.value=va
 <tr>
 	<td class="descriptionbox"><?php echo WT_I18N::translate('Individual'); ?></td>
 <td class="optionbox">
-<input class="pedigree_form" type="text" name="rootid" id="rootid" size="3" value="<?php echo htmlspecialchars($controller->rootid); ?>">
+<input class="pedigree_form" type="text" name="rootid" id="rootid" size="3" value="<?php echo $controller->rootid; ?>">
 <?php print_findindi_link('rootid', ''); ?>
 </td>
 
 <!-- // NOTE: Box width -->
-<td class="descriptionbox"><?php echo WT_I18N::translate('Box width'), help_link('box_width'); ?></td>
+<td class="descriptionbox"><?php echo WT_I18N::translate('Box width'); ?></td>
 <td class="optionbox"><input type="text" size="3" name="box_width" value="<?php echo htmlspecialchars($box_width); ?>"> <b>%</b>
 </td>
 
@@ -167,9 +167,12 @@ if ($controller->show_full) {
 </table>
 </form>
 </td></tr></table>
+
 <?php
-if ($show_full==0) {
-	echo '<span class="details2">', WT_I18N::translate('Click on any of the boxes to get more information about that person.'), '</span><br><br>';
+
+if ($controller->error_message) {
+	echo '<p class="ui-state-error">', $controller->error_message, '</p>';
+	exit;
 }
 
 switch ($controller->chart_style) {
@@ -177,7 +180,7 @@ case 0:
 	// List
 	$pidarr=array();
 	echo '<ul id="ancestry_chart">';
-	$controller->print_child_ascendancy(WT_Person::getInstance($controller->rootid), 1, $OLD_PGENS-1);
+	$controller->print_child_ascendancy($controller->root, 1, $OLD_PGENS-1);
 	echo '</ul>';
 	echo '<br>';
 	break;
@@ -187,11 +190,11 @@ case 1:
 	echo '<div id="ancestry_chart">';
 	// Booklet
 	// first page : show indi facts
-	print_pedigree_person(WT_Person::getInstance($controller->rootid), 1, 1);
+	print_pedigree_person($controller->root, 1, 1);
 	// expand the layer
-	echo WT_JS_START, 'expandbox("', $controller->rootid, '.1", 2);', WT_JS_END;
+	echo WT_JS_START, 'expandbox("', $controller->root->getXref(), '.1", 2);', WT_JS_END;
 	// process the tree
-	$treeid=ancestry_array($controller->rootid, $PEDIGREE_GENERATIONS-1);
+	$treeid=ancestry_array($controller->root->getXref(), $PEDIGREE_GENERATIONS-1);
 	foreach ($treeid as $i=>$pid) {
 		if ($pid) {
 			$person=WT_Person::getInstance($pid);
@@ -206,14 +209,14 @@ case 1:
 	break;
 case 2:
 	// Individual list
-	$treeid=ancestry_array($controller->rootid, $PEDIGREE_GENERATIONS);
+	$treeid=ancestry_array($controller->root->getXref(), $PEDIGREE_GENERATIONS);
 	echo '<div id="ancestry-list">';
 	echo format_indi_table($treeid, 'sosa');
 	echo '</div>';
 	break;
 case 3:
 	// Family list
-	$treeid=ancestry_array($controller->rootid, $PEDIGREE_GENERATIONS-1);
+	$treeid=ancestry_array($controller->root->getXref(), $PEDIGREE_GENERATIONS-1);
 	$famlist=array();
 	foreach ($treeid as $pid) {
 		$person=WT_Person::getInstance($pid);
@@ -225,7 +228,7 @@ case 3:
 		}
 	}
 	echo '<div id="ancestry-list">';
-	echo format_fam_table($famlist, WT_I18N::translate('Ancestors of %s', $controller->name));
+	echo format_fam_table($famlist, $controller->getPageTitle());
 	echo '</div>';
 	break;
 }

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: placehierarchy.php 13040 2011-12-12 15:29:58Z greg $
+// $Id: placehierarchy.php 13398 2012-02-06 22:57:50Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -196,13 +196,7 @@ function create_map($placelevels) {
 				var svbear = document.getElementById("sv_bearText").value.slice(0, -1);
 				var svelev = document.getElementById("sv_elevText").value.slice(0, -1);
 				var svzoom = document.getElementById("sv_zoomText").value;
-				win03 = window.open("module.php?mod=googlemap&mod_action=places_edit&action=update_sv_params&placeid="+placeid+"&"+sessionname+"="+sessionid+
-					"&svlati="+svlati+
-					"&svlong="+svlong+
-					"&svbear="+svbear+
-					"&svelev="+svelev+
-					"&svzoom="+svzoom, 
-				"win03", "top=50, left=50, width=680, height=550, resizable=1, scrollbars=1");	
+				win03 = window.open("module.php?mod=googlemap&mod_action=places_edit&action=update_sv_params&placeid="+placeid+"&svlati="+svlati+"&svlong="+svlong+"&svbear="+svbear+"&svelev="+svelev+"&svzoom="+svzoom, "win03", "top=50, left=50, width=680, height=550, resizable=1, scrollbars=1");	
 				if (window.focus) {win03.focus();}
 			}
 		');
@@ -310,13 +304,13 @@ function print_how_many_people($level, $parent) {
 			$place_count_fam=$place['tot'];
 		}
 	}
-	echo "<br /><br />", WT_I18N::translate('Individuals'), ": ", $place_count_indi, ", ", WT_I18N::translate('Families'), ": ", $place_count_fam;
+	echo "<br><br>", WT_I18N::translate('Individuals'), ": ", $place_count_indi, ", ", WT_I18N::translate('Families'), ": ", $place_count_fam;
 }
 
 function print_gm_markers($place2, $level, $parent, $levelm, $linklevels, $placelevels, $lastlevel=false) {
 	global $GOOGLEMAP_COORD, $GOOGLEMAP_PH_MARKER, $GM_DISP_SHORT_PLACE, $GM_DISP_COUNT;
-
-	if (($place2['lati'] == NULL) || ($place2['long'] == NULL) || (($place2['lati'] == "0") && ($place2['long'] == "0"))) {
+	
+	if (($place2['lati'] == NULL) || ($place2['long'] == NULL) || (($place2['lati'] == '0') && ($place2['long'] == '0'))) {
 		//PERSO
 		$icon_image = WT_STATIC_URL.WT_MODULES_DIR. 'googlemap/images/marker_yellow.png';
 		//END PERSO
@@ -472,7 +466,7 @@ function print_gm_markers($place2, $level, $parent, $levelm, $linklevels, $place
 }
 
 function map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $place_names) {
-	global $GOOGLEMAP_MAP_TYPE, $GM_MAX_NOF_LEVELS, $GOOGLEMAP_PH_WHEEL, $GOOGLEMAP_PH_CONTROLS, $GOOGLEMAP_PH_MARKER, $plzoom, $controller;
+	global $GOOGLEMAP_MAP_TYPE, $GOOGLEMAP_PH_WHEEL, $GOOGLEMAP_PH_CONTROLS, $GOOGLEMAP_PH_MARKER, $plzoom, $controller;
 
 	$controller->addInlineJavaScript('
 		jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/css/wt_v3_googlemap.css" />\');

@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-//$Id: gedcheck.php 13034 2011-12-12 13:10:58Z greg $
+//$Id: gedcheck.php 13238 2012-01-15 03:12:29Z nigel $
 
 define('WT_SCRIPT_NAME', 'gedcheck.php');
 require './includes/session.php';
@@ -162,7 +162,8 @@ $WT_LINK=array(
 	'FAM'=>'family.php?famid=',
 	'SOUR'=>'source.php?sid=',
 	'REPO'=>'repo.php?rid=',
-	'OBJE'=>'mediaviewer.php?mid='
+	'OBJE'=>'mediaviewer.php?mid=',
+	'NOTE'=>'note.php?nid='
 );
 $target=($openinnew==1 ? ' target="_new"' : '');
 function wt_href($tag, $xref, $name='')

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: married_names.php 12813 2011-11-19 14:18:05Z greg $
+// $Id: married_names.php 13137 2011-12-27 05:19:50Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -102,7 +102,7 @@ class married_names_bu_plugin extends base_plugin {
 	function getOptionsForm() {
 		return
 			parent::getOptionsForm().
-			'<tr valign="top"><td class="list_label width20">'.WT_I18N::translate('Surname Option').'</td>'.
+			'<tr valign="top"><th>'.WT_I18N::translate('Surname Option').'</th>'.
 			'<td class="optionbox"><select name="surname" onchange="reset_reload();"><option value="replace"'.
 			($this->surname=='replace' ? ' selected="selected"' : '').
 			'">'.WT_I18N::translate('Wife\'s surname replaced by husband\'s surname').'</option><option value="add"'.

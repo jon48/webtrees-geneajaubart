@@ -3,7 +3,7 @@
 // to keep bookmarks, see a list of upcoming events, etc.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index.php 13109 2011-12-21 20:52:29Z greg $
+// $Id: index.php 13329 2012-01-30 16:50:25Z greg $
 
 define('WT_SCRIPT_NAME', 'index.php');
 require './includes/session.php';
@@ -79,6 +79,7 @@ if ($ctype=='user') {
 }
 $controller
 	->setPageTitle($ctype=='user' ? WT_I18N::translate('My page') : get_gedcom_setting(WT_GED_ID, 'title'))
+	->setMetaRobots('index,follow')
 	->pageHeader()
 	// By default jQuery modifies AJAX URLs to disable caching, causing JS libraries to be loaded many times.
 	->addInlineJavaScript('jQuery.ajaxSetup({cache:true});');

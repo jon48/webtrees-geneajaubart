@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_config.php 12977 2011-12-04 02:15:15Z nigel $
+// $Id: admin_site_config.php 13248 2012-01-16 12:21:42Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_config.php');
 require './includes/session.php';
@@ -80,8 +80,6 @@ echo
 			'<dd>', edit_field_inline('site_setting-SMTP_HOST', get_site_setting('SMTP_HOST')), '</dd>',
 			'<dt>', WT_I18N::translate('SMTP port'), help_link('SMTP_PORT'), '</dt>',
 			'<dd>', edit_field_inline('site_setting-SMTP_PORT', get_site_setting('SMTP_PORT')), '</dd>',
-			'<dt>', WT_I18N::translate('Use simple mail headers'), help_link('SMTP_SIMPLE_MAIL'), '</dt>',
-			'<dd>', edit_field_yes_no_inline('site_setting-SMTP_SIMPLE_MAIL', get_site_setting('SMTP_SIMPLE_MAIL')), '</dd>',
 			'<dt>', WT_I18N::translate('Use password'), help_link('SMTP_AUTH'), '</dt>',
 			'<dd>', edit_field_yes_no_inline('site_setting-SMTP_AUTH', get_site_setting('SMTP_AUTH')), '</dd>',
 			'<dt>', WT_I18N::translate('Username'), help_link('SMTP_AUTH_USER'), '</dt>',

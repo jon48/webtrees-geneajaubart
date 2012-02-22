@@ -2,7 +2,7 @@
 // Startup and session logic for handling Bots and Spiders
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2008 to 2009  PGV Development Team.  All rights reserved.
@@ -21,53 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: session_spider.php 12740 2011-11-14 16:07:16Z greg $
+// $Id: session_spider.php 13431 2012-02-11 18:14:19Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-/**
- * Changes the session same for known spiders
- * session names are limited to alphanum upper and lower only.
- * $outname = '__Spider-name-:/alphanum_only__';
- * Example  =  sess_xxGOOGLEBOTfsHTTPcffWWWdGOOGLxx
- * Matchable by "ls sess_xx??????????????????????????xx"
- *
- * @param string $bot_name
- * @param string $bot_language
- * @return string
- */
-function gen_spider_session_name($bot_name, $bot_language) {
-	$outname = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-
-	$bot_limit = strlen($bot_name);
-	if ($bot_limit > 27) {
-		$bot_limit = 27;
-	}
-	for ($x=0; $x < $bot_limit; $x++) {
-		if (preg_match('/^[a-zA-Z0-9]+$/', $bot_name{$x})) {
-			$outname{$x+2} = strtoupper($bot_name{$x});
-		} elseif ($bot_name{$x} == '.') {
-			$outname{$x+2} = 'd';
-		} elseif ($bot_name{$x} == ':') {
-			$outname{$x+2} = 'c';
-		} elseif ($bot_name{$x} == '/') {
-			$outname{$x+2} = 'f';
-		} elseif ($bot_name{$x} == ' ') {
-			$outname{$x+2} = 's';
-		} elseif ($bot_name{$x} == '-') {
-			$outname{$x+2} = 't';
-		} elseif ($bot_name{$x} == '_') {
-			$outname{$x+2} = 'u';
-		} else {
-			$outname{$x+2} = 'o';
-		}
-	}
-	return($outname);
-}
-
 
 // Block sites by IP address.
 // Convert user-friendly such as '123.45.*.*' into SQL '%' wildcards.
@@ -101,10 +60,13 @@ $SEARCH_SPIDER = false; // set empty at start
 $ua = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "";
 
 $worms = array(
+	'Gigabot',    // http://www.gigablast.com/spider.html           - Ignores robots.txt
+	'Sogou',      // http://www.sogou.com/docs/help/webmasters.htm  - Ignores robots.txt
+	'facebook',   // http://www.facebook.com/externalhit_uatext.php - Ignores robots.txt
+	'SeznamBot',  // http://fulltext.sblog.cz - Fetches robots.txt, but then ignores it!
 	'oBot',
 	'Indy Library',
 	'XXX',
-// 'robotgenius',
 	'Super_Ale',
 	'Wget',
 	'DataCha',
@@ -112,13 +74,11 @@ $worms = array(
 	'LWP::Simple',
 	'lwp-trivial',
 	'MJ.*bot',
-// 'ru.*rv',
 	'DotBot',
 	'HTTrack',
 	'AISearchBot',
 	'panscient.com',
 	'Plonebot',
-// 'Mozilla([^\/])|(\/[\D])', // legitimate Mozilla-based browsers have something like "Mozilla/5.0"
 	'Mozilla[^\/]',  // legitimate Mozilla-based browsers have something like "Mozilla/5.0"
 	'Mozilla\/[^456]', // legitimate Mozilla-based browsers have something like "Mozilla/5.0"
 	'^Mozilla\/[456]\.0$', // legitimate Mozilla-based browsers have something following "Mozilla/5.0"
@@ -130,12 +90,6 @@ $worms = array(
 	);
 
 $quitReason = "";
-
-// check for attempt to redirect
-if (preg_match("/=.*:\/\//i", rawurldecode($_SERVER["REQUEST_URI"]))) {
-	//Removed (temporarily?) - this just hides badly escaped code elsewhere.  We should fix the real problem!?
-	//$quitReason = "Embedded URL detected";
-}
 
 // check for worms and bad bots
 if ($quitReason == "") {
@@ -187,14 +141,17 @@ $real_browsers = array(
 $known_spiders = array(
 	'Googlebot',
 	'Yahoo Slurp',
+	'YahooCacheSystem',
 	'msnbot',
 	'bingbot',
 	'Ask Jeeves',
 	'Mediapartners-Google',
 	'Feedfetcher-Google',
 	'Twiceler',
-	'YandexBot',   // Popular Russian/cyrillic search engine
-	'Baiduspider', // Popular Chinese search engine
+	'Netcraft Web Server Survey', // Long-established, respectable survey tool
+	'ia_archive',                 // http://www.archive.org/
+	'YandexBot',                  // Popular Russian/cyrillic search engine
+	'Baiduspider',                // Popular Chinese search engine
 );
 
 // We overlay the following name with carefully selected characters.
@@ -230,77 +187,7 @@ if ($ua != "") {
 }
 
 if (!$real) {
-	$bot_name = $ua;
-	// strip out several common strings that clutter the User Agent.
-	$bot_name = preg_replace("/Mozilla\/... \(compatible;/i", "", $bot_name);
-	$bot_name = preg_replace("/Mozilla\/... /i", "", $bot_name);
-	$bot_name = preg_replace("/Windows NT/i", "", $bot_name);
-	$bot_name = preg_replace("/Windows; U;/i", "", $bot_name);
-	$bot_name = preg_replace("/Windows/i", "", $bot_name);
-
-	// Copy in characters, stripping out unwanteds until we are full, stopping at 70.
-	$y = 0;
-	$valid_char = false;
-	$bot_limit = strlen($bot_name);
-	for ($x=0; $x < $bot_limit; $x++) {
-		if (preg_match('/^[a-zA-Z]+$/', $bot_name{$x})) {
-			$spider_name{$y} = $bot_name{$x};
-			$valid_char = true;
-			$y++;
-			if ($y > 70) break;
-		}
-		else if ($bot_name{$x} == ' ') {
-			if ($valid_char) {
-				$spider_name{$y} = ' ';
-				$valid_char = false;
-				$y++;
-				if ($y > 70) break;
-			}
-		}
-		else if ($bot_name{$x} == '.') {
-			if ($valid_char) {
-				$spider_name{$y} = '.';
-				$valid_char = true;
-				$y++;
-				if ($y > 70) break;
-			}
-		}
-		else if ($bot_name{$x} == ':') {
-			$spider_name{$y} = ':';
-			$valid_char = true;
-			$y++;
-			if ($y > 70) break;
-		}
-		else if ($bot_name{$x} == '/') {
-			$spider_name{$y} = '/';
-			$valid_char = true;
-			$y++;
-			if ($y > 70) break;
-		}
-		else if ($bot_name{$x} == '-') {
-			$spider_name{$y} = '-';
-			$valid_char = true;
-			$y++;
-			if ($y > 70) break;
-		}
-		else if ($bot_name{$x} == '_') {
-			$spider_name{$y} = '_';
-			$valid_char = true;
-			$y++;
-			if ($y > 70) break;
-		}
-		else { // Compress consecutive invalids down to one space char.
-			if ($valid_char) {
-				$spider_name{$y} = ' ';
-				$valid_char = false;
-				$y++;
-				if ($y > 70) break;
-			}
-		}
-	}
-	// The SEARCH_SPIDER is set to 70 vetted chars, the session to 26 chars.
-	$SEARCH_SPIDER = $spider_name;
-	Zend_Session::setId(gen_spider_session_name($spider_name, ""));
+	$SEARCH_SPIDER = $ua;
 }
 
 // Manual Search Engine IP Address tagging

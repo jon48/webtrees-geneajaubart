@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edituser.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: edituser.php 13248 2012-01-16 12:21:42Z greg $
 
 define('WT_SCRIPT_NAME', 'edituser.php');
 require './includes/session.php';
@@ -152,7 +152,7 @@ echo '<input type="text" name="form_username" value="', WT_USER_NAME, '" autofoc
 echo '</td></tr>';
 
 echo '<tr><td class="descriptionbox wrap">';
-echo WT_I18N::translate('Real name'), help_link('edituser_realname'), '</td><td class="optionbox">';
+echo WT_I18N::translate('Real name'), help_link('real_name'), '</td><td class="optionbox">';
 echo '<input type="text" name="form_realname" value="', getUserFullName(WT_USER_ID), '">';
 echo '</td></tr>';
 

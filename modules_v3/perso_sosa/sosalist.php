@@ -320,7 +320,7 @@ function format_sosa_table($sosalist, $gen, $legend='') {
 				$html .= '<br>';
 			}
 			if ($SEARCH_SPIDER) {
-				$html .= get_place_short($birth_place). ' ';
+				$html .= get_place_short($birth_place);
 			} else {
 				$html .= '<a href="'. get_place_url($birth_place). '" title="'. $birth_place. '">';
 				$html .= highlight_search_hits(get_place_short($birth_place)). '</a>';
@@ -365,16 +365,12 @@ function format_sosa_table($sosalist, $gen, $legend='') {
 		//-- Event date (sortable)hidden by datatables code
 		$html .= '<td>'. $death_date->JD(). '</td>';
 		//-- Age at death
-		if ($birth_dates[0]->isOK() && $death_dates[0]->isOK()) {
-			$age=WT_Date::GetAgeYears($birth_dates[0], $death_dates[0]);
-			if (!isset($unique_indis[$person->getXref()])) {
-				$deat_by_age[max(0, min($max_age, $age))] .= $person->getSex();
-			}
-		} else {
-			$age='';
-		}
+		$age=WT_Date::getAge($birth_dates[0], $death_dates[0], 0);
+		if (!isset($unique_indis[$person->getXref()]) && $age>=0 && $age<=$max_age) {
+			$deat_by_age[$age].=$person->getSex();
+		}		
 		// Need both display and sortable age
-		$html .= '<td>' . WT_I18N::number($age) . '</td><td>' . $age . '</td>';
+		$html .= '<td>' . WT_Date::getAge($birth_dates[0], $death_dates[0], 2) . '</td><td>' . WT_Date::getAge($birth_dates[0], $death_dates[0], 1) . '</td>';
 		//-- Death place
 		$html .= '<td>';
 		foreach ($person->getAllDeathPlaces() as $n=>$death_place) {
@@ -382,7 +378,7 @@ function format_sosa_table($sosalist, $gen, $legend='') {
 				$html .= '<br>';
 			}
 			if ($SEARCH_SPIDER) {
-				$html .= get_place_short($death_place). ' ';
+				$html .= get_place_short($death_place);
 			} else {
 				$html .= '<a href="'. get_place_url($death_place). '" title="'. $death_place. '">';
 				$html .= highlight_search_hits(get_place_short($death_place)). '</a>';

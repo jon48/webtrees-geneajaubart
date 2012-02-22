@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Pedi.php 11090 2011-03-08 20:51:50Z greg $
+// $Id: Pedi.php 13417 2012-02-10 09:36:35Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -27,7 +27,7 @@ if (!defined('WT_WEBTREES')) {
 
 class WT_Gedcom_Code_Pedi {
 	
-	private static $TYPES=array('adopted', 'birth', 'foster', 'sealing');
+	private static $TYPES=array('adopted', 'birth', 'foster', 'rada', 'sealing');
 
 	// Translate a code, for an (optional) record
 	public static function getValue($type, $record=null) {
@@ -40,27 +40,36 @@ class WT_Gedcom_Code_Pedi {
 		switch ($type) {
 		case 'birth':
 			switch ($sex) {
+			case 'U': return WT_I18N::translate_c('Pedigree',        'Birth');
 			case 'M': return WT_I18N::translate_c('Male pedigree',   'Birth');
 			case 'F': return WT_I18N::translate_c('Female pedigree', 'Birth');
-			default:  return WT_I18N::translate_c('Pedigree',        'Birth');
 			}
 		case 'adopted':
 			switch ($sex) {
+			case 'U': return WT_I18N::translate_c('Pedigree',        'Adopted');
 			case 'M': return WT_I18N::translate_c('Male pedigree',   'Adopted');
 			case 'F': return WT_I18N::translate_c('Female pedigree', 'Adopted');
-			default:  return WT_I18N::translate_c('Pedigree',        'Adopted');
 			}
 		case 'foster':
 			switch ($sex) {
+			case 'U': return WT_I18N::translate_c('Pedigree',        'Foster');
 			case 'M': return WT_I18N::translate_c('Male pedigree',   'Foster');
 			case 'F': return WT_I18N::translate_c('Female pedigree', 'Foster');
-			default:  return WT_I18N::translate_c('Pedigree',        'Foster');
 			}
 		case 'sealing':
 			switch ($sex) {
+			case 'U': return WT_I18N::translate_c('Pedigree',        'Sealing');
 			case 'M': return WT_I18N::translate_c('Male pedigree',   'Sealing');
 			case 'F': return WT_I18N::translate_c('Female pedigree', 'Sealing');
-			default:  return WT_I18N::translate_c('Pedigree',        'Sealing');
+			}
+		case 'rada':
+			switch ($sex) {
+			case 'U':
+			case 'M':
+			case 'F':
+				// This is an arabic word which does not exist in other languages.
+				// So, it will not have any inflected forms.
+				return /* I18N: This is an Arabic word, pronounced "ra DAH".  It is child-to-parent pedigree, established by wet-nursing. */ WT_I18N::translate('Rada');
 			}
 		default:
 			return $type;

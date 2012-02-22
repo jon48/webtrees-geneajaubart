@@ -4,7 +4,7 @@
 // Media Link information about an individual
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_0_inverselink.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: media_0_inverselink.php 13419 2012-02-10 13:23:41Z greg $
 
 // GEDFact Media assistant replacement code for inverselink.php: ===========================
 
@@ -35,9 +35,7 @@ $update_CHAN = safe_REQUEST($_REQUEST, 'preserve_last_changed', WT_REGEX_UNSAFE)
 
 if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
-//-- check for admin
-//$paramok =  WT_USER_CAN_EDIT;
-$paramok =  WT_USER_GEDCOM_ADMIN;
+$paramok =  true;
 if (!empty($linktoid)) $paramok = WT_GedcomRecord::getInstance($linktoid)->canDisplayDetails();
 
 if ($action == "choose" && $paramok) {

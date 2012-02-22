@@ -2,7 +2,7 @@
 // Used by AJAX to load the expanded view inside person boxes
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2008 PGV Development Team. All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: expand_view.php 12955 2011-11-30 17:56:39Z lukasz $
+// $Id: expand_view.php 13296 2012-01-20 16:59:10Z greg $
 
 define('WT_SCRIPT_NAME', 'expand_view.php');
 require './includes/session.php';
@@ -88,9 +88,9 @@ foreach ($events as $event) {
 			}
 			$family=WT_Family::getInstance($event->getFamilyId());
 			if ($family) {
-				echo '<a href="', $family->getHtmlUrl(), '">', WT_I18N::translate('View Family'), '</a>';
+				echo '<a href="', $family->getHtmlUrl(), '">', WT_I18N::translate('View Family'), ' - </a>';
 			}
-			echo format_fact_place($event, true, true);
+			echo ' ',format_fact_place($event, true, true);
 			echo '</div>';
 			break;
 		}

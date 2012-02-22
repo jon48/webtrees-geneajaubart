@@ -2,7 +2,7 @@
 // Base controller for all chart pages
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Chart.php 12503 2011-11-03 11:58:38Z greg $
+// $Id: Chart.php 13258 2012-01-17 07:56:11Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -26,4 +26,28 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Controller_Chart extends WT_Controller_Base {
+	public $root;
+	public $rootid;
+	public $error_message=null;
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->rootid=safe_GET_xref('rootid');
+		$this->root=WT_Person::getInstance($this->rootid);
+		
+		if (!$this->root || !$this->root->canDisplayName()) {
+			header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+			$this->error_message=WT_I18N::translate('This individual does not exist or you do not have permission to view it.');
+			$this->rootid=null;
+		}
+	}
+
+	public function getSignificantIndividual() {
+		if ($this->root) {
+			return $this->root;
+		} else {
+			return parent::getSignificantIndividual();
+		}
+	}
 }

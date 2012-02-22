@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: set_gedcom_defaults.php 12734 2011-11-14 11:52:48Z greg $
+// $Id: set_gedcom_defaults.php 13299 2012-01-20 20:40:31Z greg $
 
 if (!defined('WT_WEBTREES') || empty($ged_id) || empty($ged_name)) {
 	header('HTTP/1.0 403 Forbidden');
@@ -99,7 +99,6 @@ set_gedcom_setting($ged_id, 'REQUIRE_AUTHENTICATION',       false);
 set_gedcom_setting($ged_id, 'SAVE_WATERMARK_IMAGE',         false);
 set_gedcom_setting($ged_id, 'SAVE_WATERMARK_THUMB',         false);
 set_gedcom_setting($ged_id, 'SHOW_AGE_DIFF',                false);
-set_gedcom_setting($ged_id, 'SHOW_CONTEXT_HELP',            true);
 set_gedcom_setting($ged_id, 'SHOW_COUNTER',                 true);
 set_gedcom_setting($ged_id, 'SHOW_DEAD_PEOPLE',             WT_PRIV_PUBLIC);
 set_gedcom_setting($ged_id, 'SHOW_EMPTY_BOXES',             true);
@@ -109,12 +108,12 @@ set_gedcom_setting($ged_id, 'SHOW_GEDCOM_RECORD',           false);
 set_gedcom_setting($ged_id, 'SHOW_HIGHLIGHT_IMAGES',        true);
 set_gedcom_setting($ged_id, 'SHOW_LDS_AT_GLANCE',           false);
 set_gedcom_setting($ged_id, 'SHOW_LEVEL2_NOTES',            true);
-set_gedcom_setting($ged_id, 'SHOW_LIST_PLACES',             '1');
 set_gedcom_setting($ged_id, 'SHOW_LIVING_NAMES',            WT_PRIV_USER);
 set_gedcom_setting($ged_id, 'SHOW_MEDIA_DOWNLOAD',          false);
 set_gedcom_setting($ged_id, 'SHOW_NO_WATERMARK',            WT_PRIV_USER);
 set_gedcom_setting($ged_id, 'SHOW_PARENTS_AGE',             true);
 set_gedcom_setting($ged_id, 'SHOW_PEDIGREE_PLACES',         '9');
+set_gedcom_setting($ged_id, 'SHOW_PEDIGREE_PLACES_SUFFIX',  false);
 set_gedcom_setting($ged_id, 'SHOW_PRIVATE_RELATIONSHIPS',   true);
 set_gedcom_setting($ged_id, 'SHOW_REGISTER_CAUTION',        true);
 set_gedcom_setting($ged_id, 'SHOW_RELATIVES_EVENTS',        '_BIRT_CHIL,_BIRT_SIBL,_MARR_CHIL,_MARR_PARE,_DEAT_CHIL,_DEAT_PARE,_DEAT_GPAR,_DEAT_SIBL,_DEAT_SPOU');

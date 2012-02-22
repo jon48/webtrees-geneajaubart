@@ -21,26 +21,19 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_date.php 12884 2011-11-23 13:04:37Z greg $
+// $Id: functions_date.php 13213 2012-01-09 16:19:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-/**
-* translate gedcom age string
-*
-* Examples:
-* 4y 8m 10d.
-* Chi
-* INFANT
-*
-* @param string $agestring gedcom AGE field value
-* @param bool $show_years;
-* @return string age in user language
-* @see http://homepages.rootsweb.com/~pmcbride/gedcom/55gcch2.htm#AGE_AT_EVENT
-*/
+// translate gedcom age string
+//
+// Examples:
+// 4y 8m 10d.
+// Chi
+// INFANT
 function get_age_at_event($agestring, $show_years) {
 	switch (WT_LOCALE) {
 		case 'pl':
@@ -60,10 +53,10 @@ function get_age_at_event($agestring, $show_years) {
 			WT_I18N::translate('Child'),
 			WT_I18N::translate('Infant'),
 			WT_I18N::translate('Stillborn'),
-			($show_years || preg_match('/[dm]/', $agestring)) ? "WT_I18N::plural('%d year', '%d years', '$1' , '$1')" : '$1',
-			"WT_I18N::plural('%d month', '%d months', '$1' , '$1')",
-			"WT_I18N::plural('%d day', '%d days', '$1' , '$1')",
-			"WT_I18N::plural('%d week', '%d weeks', '$1' , '$1')"
+			($show_years || preg_match('/[dm]/', $agestring)) ? "WT_I18N::plural('%s year', '%s years', $1 , WT_I18N::digits($1))" : "WT_I18N::digits($1)",
+			"WT_I18N::plural('%s month', '%s months', $1 , WT_I18N::digits($1))",
+			"WT_I18N::plural('%s day', '%s days', $1 , WT_I18N::digits($1))",
+			"WT_I18N::plural('%s week', '%s weeks', $1 , WT_I18N::digits($1))"
 		),
 		$agestring
 	);
@@ -127,7 +120,7 @@ function format_timestamp($time) {
 			}
 				break;
 		default:
-			$time_fmt=str_replace($match, WT_I18N::number(date(substr($match, -1), $time)), $time_fmt);
+			$time_fmt=str_replace($match, WT_I18N::digits(date(substr($match, -1), $time)), $time_fmt);
 		}
 	}
 

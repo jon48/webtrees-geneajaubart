@@ -2,7 +2,7 @@
  * Style for Standard theme
  *
  * webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
+ * Copyright (C) 2012 webtrees development team.
  *
  * Derived from PhpGedView
  * Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id: style.css 13124 2011-12-22 01:57:23Z nigel $
+ * $Id: style.css 13409 2012-02-07 23:39:46Z rob $
  */
 
 /* Add a permanent scrollbar, to prevent "flickering" when hover effects lengthen page */
@@ -38,10 +38,11 @@ ul {padding-left:15px; padding-right:15px; margin:8px;}
 img {border:none;}
 legend img {height:20px; vertical-align:middle; width:20px;}
 img.block, #calendar_img_indi, #calendar_img_fam, #biglink img, #mycart img  {border:none; height:25px; vertical-align:middle;}
-input, button, textarea {border-top-color:#fff; border-left-color:#fff; border-right-color:#006; border-bottom-color:#006; border-width:1px; font-size:12px;}
+input, button, textarea {border-top-color:#fff; border-left-color:#fff; border-right-color:#555; border-bottom-color:#555; border-width:1px; font-size:12px;}
 input, textarea {padding-left:3px; padding-right:3px;}
+textarea {border-style:inset;}
 input.image {width:17px; height:17px; border:none; padding:0; vertical-align:top;}
-select {border:solid #84beff 1px; font-size:12px;}
+select {border:1px solid #555; font-size:12px; margin:0 7px; padding:1px;}
 form {font-size:12px;}
 h2 {color:#006; font-weight:bold; font-size:18px;}
 h4 {color:#006; font-weight:bold; font-size:12px;}
@@ -62,6 +63,9 @@ h4 {color:#006; font-weight:bold; font-size:12px;}
 .person_boxF {background-color:#e9daf1; border:1px solid #ff2080; padding:3px;}
 .person_boxNN {background-color:#fff; border:dashed #81a9cb 1px; padding:3px;}
 .person_box:target, .news_box:target, #gedcom_stats:target {background-color:#ffc;}
+.person_box_lifespan {display: inline;}
+/* families tab person box */
+#relatives_content  .person_box > .person_box, #relatives_content .person_boxF  > .person_boxF, #relatives_content .person_boxNN  > .person_boxNN {  border:none;min-height:50px;} 
 
 
 .center {text-align:center;}
@@ -172,40 +176,23 @@ html[dir='rtl'] .icon, html[dir='rtl'] .adminicon {padding-left:5pt; padding-rig
 
 /*-- pedigree chart specific stylesheets --*/
 #pedigree_chart {position:relative; top:-200px; left:0;}
-
-/*-- pedigree chart rtl specific stylesheets --*/
 html[dir='rtl'] #pedigree_chart {left:auto; right:10px;}
 
 /*-- descendancy chart specific stylesheets --*/
-#descendancy_chart ul {background-image:url(images/vline.png); background-repeat:repeat-y; background-position:left top; list-style:none; margin:0 0 5px 15px; /* top right bottom left */
-	padding-top:0; padding-right:0; padding-bottom:0;}
-
-#descendancy_chart li {list-style:none; margin:0 0 0 -15px; /* top right bottom left */
-	padding-top:0; padding-right:0; padding-bottom:0;}
-
-/*-- descendancy chart rtl specific stylesheets --*/
+#descendancy_chart ul {background-image:url(images/vline.png); background-repeat:repeat-y; background-position:left top; list-style:none; margin:0 0 5px 15px; padding-top:0; padding-right:0; padding-bottom:0;}
+#descendancy_chart li {list-style:none; margin:0 0 0 -15px; padding-top:0; padding-right:0; padding-bottom:0;}
 html[dir='rtl'] #descendancy_chart ul {background-position:right top; margin:0 15px 0 0; left:auto;}
 
-/*-- relationship chart specific stylesheets --*/
-#relationship_chart {position:relative; top:-40px; left:0;}
-
-html[dir='rtl'] #relationship_chart {left:auto; right:10px;}
-
 /*-- ancestry chart specific stylesheets --*/
-#ancestry_chart ul {background-image:url(images/vline.png); background-repeat:repeat-y; background-position:left top; list-style:none; display:block; margin:0 0 0 15px; /* top right bottom left */
-	padding-top:0; padding-right:0; padding-bottom:0;}
-
-#ancestry_chart li {list-style:none; margin:0 0 2px -13px; /* top right bottom left */
-	padding-top:0; padding-right:0; padding-bottom:0;}
-
-/*-- ancestry chart rtl specific stylesheets --*/
+#ancestry_chart table div p {font-size:90%; margin:0;}
+#ancestry_chart ul {background-image:url(images/vline.png); background-repeat:repeat-y; background-position:left top; list-style:none; display:block; margin:0 0 0 15px; padding-top:0; padding-right:0; padding-bottom:0;}
+#ancestry_chart li {list-style:none; margin:0 0 2px -13px; padding-top:0; padding-right:0; padding-bottom:0;}
+#ancestry_chart li table {margin: 5px 0;}
 html[dir='rtl'] #ancestry_chart ul {background-position:right top; margin:0 15px 0 0; left:auto;}
-
 html[dir='rtl'] #ancestry_chart li {margin:0; padding:0 2px 0 0; left:auto;}
 
 /*-- timeline chart specific styles --*/
 #timeline_chart {position:relative; top:0; left:0;}
-
 .timeline_table {}
 .person0 {background-color:#aaf; border:outset #aaf 1px; vertical-align:top;}
 .person1 {background-color:#afa; border:outset #afa 1px; vertical-align:top;}
@@ -213,6 +200,8 @@ html[dir='rtl'] #ancestry_chart li {margin:0; padding:0 2px 0 0; left:auto;}
 .person3 {background-color:#55f; border:outset #55f 1px; vertical-align:top;}
 .person4 {background-color:#f55; border:outset #f55 1px; vertical-align:top;}
 .person5 {background-color:#5f5; border:outset #5f5 1px; vertical-align:top;}
+
+.compact_view p {font-size:90%; margin:0;}
 
 .listlog {line-height:20pt;}
 
@@ -248,7 +237,7 @@ html[dir='rtl'] .header_search {float:left;}
 
 /* Colors */
 .red {color:#f00;}
-.rela {opacity:0.67;}
+.rela, .histo {opacity:0.67;}
 /* Width settings */
 .width10 {width:10%;}
 .width20 {width:20%;}
@@ -350,31 +339,55 @@ td.descriptionbox  a {color:#fff;}/* this keeps the tag color the same when it i
 .place {padding-top:5px;}
 .logo {text-align:center;}
 
-.itr {position:absolute; top:3em;line-height:1.5;}
-.block .itr, #family-table .itr, #ancestry_chart .itr, #descendancy_chart .itr, #familybook_chart .itr, #familybook_chart_rtl .itr, #hourglass_chart .itr, #hourglass_chart_rtl .itr, #relatives_content .itr {position:relative;top:0;}
-
 #pending h2 {text-align:center; margin-bottom:20px;}
 #pending h3 {text-align:center; margin-top:20px;}
 
 .gedcom_favorites_block  .person_box .details2, .gedcom_favorites_block  .person_boxF.details2, .gedcom_favorites_block  .person_boxNN.details2 {min-height:40px;}
 .user_favorites_block  .person_box .details2, .user_favorites_block  .person_boxF.details2, .user_favorites_block  .person_boxNN.details2 {min-height:40px;}
-.user_favorites_block, .gedcom_favorites_block,
-#family-table .person_box, #family-table .person_boxF, #family-table .person_boxNN,
+
+.charts_block .person_box, .charts_block .person_boxF, .charts_block .person_boxNN,
+.gedcom_favorites_block,.user_favorites_block, 
 #ancestry_chart .person_box, #ancestry_chart .person_boxF, #ancestry_chart .person_boxNN,
 #descendancy_chart .person_box, #descendancy_chart .person_boxF, #descendancy_chart .person_boxNN,
+#family-table .person_box, #family-table .person_boxF, #family-table .person_boxNN,
 #familybook_chart .person_box, #familybook_chart .person_boxF, #familybook_chart .person_boxNN,
-#familybook_chart_rtl .person_box, #familybook_chart_rtl .person_boxF, #familybook_chart_rtl .person_boxNN,
 #hourglass_chart .person_box, #hourglass_chart .person_boxF, #hourglass_chart .person_boxNN,
-#hourglass_chart_rtl .person_box, #hourglass_chart_rtl .person_boxF, #hourglass_chart_rtl .person_boxNN,
+#pedigree_chart .person_box, #pedigree_chart .person_boxF, #pedigree_chart .person_boxNN,
 #relatives_content .person_box, #relatives_content .person_boxF, #relatives_content .person_boxNN,
-.charts_block .person_box, .charts_block .person_boxF, .charts_block .person_boxNN {overflow: visible !important;}
+#relationship_chart .person_box, #relationship_chart .person_boxF, #relationship_chart .person_boxNN {overflow: visible !important;}
 
-#login-register-page table, #login-page table, #branches-page table, #medialist-page .list_table {margin:auto;}
-#login-register-page table a {display:block; text-align:center;}
+#branches-page table, #medialist-page .list_table {margin:auto;}
+
+/* ============== login.php ======================= */
+#login-register-page h2 {text-align:center;}
+#login-register-page .warning  {margin:20px auto; text-align:center;}
+#login-register-page .back  {font-weight:bold; font-size:14px; text-align:center;}
+#login-register-page .confirm {margin: 20px auto; text-align: justify; width: 500px;}
+#login-register-page .confirm p  {font-size:14px;font-weight:bold;}
+#login-register-page .confirm p+p  {font-size:12px;font-weight:normal;}
+#login-text, #register-text, #user-verify {margin:20px auto; width: 610px; text-align: justify;}
+#login-box, #register-box { text-align:center;}
+#login-form, #new_passwd_form, #register-form {background-color:#edf7fd; border:1px outset #81A9CB; display: inline-block; margin:10px auto 0 auto; padding:5px;}
+#login-form div, #login-form div a, #new_passwd_form div, #register-form div, #verify-form div {margin:auto; padding:5px; text-align: center;}
+#login-form label, #new_passwd_form label, #verify-form  label {display:block; text-align:right;}
+#login-form label input, #new_passwd_form label input, #verify-form  input {width:140px; margin: 0 10px;}
+#new_passwd_form h4, #register-form h4 {font-weight:normal; text-align:center;}
+#register-form div, #verify-form  div {text-align:right;}
+#register-form label input, #register-form label select, #register-form textarea {width:220px; margin: 0 10px;}
+#register-form label select {margin:0 10px; width:228px;}
+#register-form textarea {vertical-align: top;}
+#register-form div#registration-submit {text-align:center;}
+.login_block_block #login-form, .login_block_block #new_passwd_form{border:0; background:none;}
+html[dir='rtl'] #login-form label, html[dir='rtl'] #new_passwd_form label, html[dir='rtl'] #register-form label, html[dir='rtl'] #verify-form  label {text-align:left;}
+
+/* ============== reportengine.php ======================= */
 #reportengine-page table {margin:20px auto;}
 #reportengine-page .report-type {overflow:hidden; margin:auto; width:180px;}
 #reportengine-page .report-type div {float:left;margin: 0 20px;}
 #reportengine-page .report-type p {margin: 0; text-align:center;}
+
+.itr {position: absolute;line-height:1.5;}
+.block .itr, #family-table .itr, #ancestry_chart .itr, #descendancy_chart .itr, #familybook_chart .itr, #hourglass_chart .itr, #relatives_content .itr {position:relative;top:0;}
 
 .popup {display:none;}
 .popup dl {padding:5px; font-size:9px;}
@@ -413,8 +426,9 @@ html[dir='rtl'] .itr:hover .popup {left:0; right:auto;}
 .source-list th:last-child, .note-list th:last-child, .repo-list th:last-child {margin:0 -2px 1px 1px; padding:3px 0 4px; width:24px;}
 .givn-list th{cursor:pointer;white-space: nowrap;padding:2px;text-align:center;}
 .givn-list th{cursor:pointer;white-space: nowrap;padding:2px;text-align:center;}
-#source-details h2,#sourcelist-page h2, #note-details h2, #notelist-page h2, #repo-details h2, #repolist-page h2, #media-details h2, #medialist-page h2  {margin-bottom:20px; text-align:center;}
+#source-details h2, #sourcelist-page h2, #note-details h2, #notelist-page h2, #repo-details h2, #repolist-page h2, #media-details h2, #medialist-page h2, #stats-details h2 {margin-bottom:20px; text-align:center;}
 #source-tabs, #note-tabs, #repo-tabs, #media-tabs {margin:auto; visibility:hidden; width:80%;}
+#stats-tabs {margin:auto; visibility:hidden; width:90%;}
 #source-edit, #note-edit, #repo-edit, #media-edit {overflow-x:auto;}
 .media-list td img {display:block; height:40px; margin:3px auto;}
 .filtersH, .filtersF {margin:4px}
@@ -824,4 +838,5 @@ html[dir='rtl'] #search-page-table .value {margin:0 170px 0 0;}
 	form, button, input {display:none;} /* buttons and input are used out of forms in sortable tables*/
 	.lifespan_outer {position:relative; width:auto; height:auto; overflow:visible; border:none;}
 	.lifespan_people {position:absolute;	width:auto;	left:-10px;	top:-60px; z-index:1;}
+	#CB_All {display:none;}
 }

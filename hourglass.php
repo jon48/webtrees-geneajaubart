@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: hourglass.php 13113 2011-12-21 21:32:34Z greg $
+// $Id: hourglass.php 13277 2012-01-18 08:14:39Z greg $
 
 define('WT_SCRIPT_NAME', 'hourglass.php');
 require './includes/session.php';
@@ -104,7 +104,7 @@ $gencount=0;
 
 	<!-- // NOTE: Box width -->
 	<tr><td class="descriptionbox">
-	<?php echo WT_I18N::translate('Box width'), help_link('box_width'); ?>
+	<?php echo WT_I18N::translate('Box width'); ?>
 	</td>
 	<td class="optionbox"><input type="text" size="3" name="box_width" value="<?php echo $controller->box_width; ?>">
 	<b>%</b>
@@ -118,12 +118,7 @@ $gencount=0;
 
 	<!-- // NOTE: Close table header -->
 	</td></tr></table>
-<?php
-	if ($show_full==0) {
-		echo '<br><span class="details2">', WT_I18N::translate('Click on any of the boxes to get more information about that person.'), '</span><br>';
-	}
-?>
-<div id="hourglass_chart<?php if ($TEXT_DIRECTION=="rtl") echo "_rtl"; ?>" <?php echo "style=\"width:98%; direction:".$TEXT_DIRECTION."; z-index:1;\""; ?> >
+<div id="hourglass_chart" <?php echo "style=\"width:98%; direction:".$TEXT_DIRECTION."; z-index:1;\""; ?> >
 <table cellspacing="0" cellpadding="0" border="0"><tr>
 <!-- // descendancy -->
 <td valign="middle">

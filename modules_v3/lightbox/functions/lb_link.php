@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lb_link.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: lb_link.php 13275 2012-01-18 07:55:04Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -71,7 +71,7 @@ echo $menu->getMenu();
 ?>
 <script type="text/javascript">
   function ilinkitem(mediaid, type) {
-	window.open('inverselink.php?mediaid='+mediaid+'&linkto='+type+'&'+sessionname+'='+sessionid, '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1');
+	window.open('inverselink.php?mediaid='+mediaid+'&linkto='+type, '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1');
 	return false;
   }
 </script>

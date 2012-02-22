@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: find.php 13124 2011-12-22 01:57:23Z nigel $
+// $Id: find.php 13412 2012-02-09 13:06:56Z greg $
 
 define('WT_SCRIPT_NAME', 'find.php');
 require './includes/session.php';
@@ -104,23 +104,18 @@ case "fam":
 	break;
 case "media":
 	$controller->setPageTitle(WT_I18N::translate('Find media'));
-	$action="filter";
 	break;
 case "place":
 	$controller->setPageTitle(WT_I18N::translate('Find Place'));
-	$action="filter";
 	break;
 case "repo":
 	$controller->setPageTitle(WT_I18N::translate('Repositories'));
-	$action="filter";
 	break;
 case "note":
 	$controller->setPageTitle(WT_I18N::translate('Find Shared Note'));
-	$action="filter";
 	break;
 case "source":
 	$controller->setPageTitle(WT_I18N::translate('Find Source'));
-	$action="filter";
 	break;
 case "specialchar":
 	// Users will probably always want the same language, so remember their setting

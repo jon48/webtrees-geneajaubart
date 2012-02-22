@@ -2,7 +2,7 @@
 // Change the blocks on "My page" and "Home page"
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index_edit.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: index_edit.php 13293 2012-01-20 16:47:46Z greg $
 
 define('WT_SCRIPT_NAME', 'index_edit.php');
 require './includes/session.php';
@@ -95,6 +95,7 @@ if ($ctype=='user') {
 } else {
 	if ($action=='reset') {
 		WT_DB::prepare("DELETE `##block_setting` FROM `##block_setting` JOIN `##block` USING (block_id) WHERE gedcom_id=?")->execute(array(WT_GED_ID));
+		WT_DB::prepare("DELETE FROM `##block` WHERE gedcom_id=?")->execute(array(WT_GED_ID));
 	}
 	$blocks=get_gedcom_blocks(WT_GED_ID);
 }
@@ -395,7 +396,6 @@ if ($action=="configure") {
 	if (WT_USER_IS_ADMIN && $ctype=='user') {
 		echo WT_I18N::translate('Use these blocks as the default block configuration for all users?'), '<input type="checkbox" name="setdefault" value="1"><br><br>';
 	}*/
-
 	echo '<input type="button" value="', WT_I18N::translate('Reset to Default Blocks'), '" onclick="window.location=\'index_edit.php?ctype=', $ctype, '&amp;action=reset&amp;name=', addslashes($name), '\';">';
 	echo '&nbsp;&nbsp;';
 	echo '<input type="button" value="', WT_I18N::translate('Save'), '" onclick="select_options(); save_form();">';

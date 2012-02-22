@@ -15,7 +15,7 @@
 // are all for internal use only.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,8 +31,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @author Greg Roach
-// @version $Id: Date.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: Date.php 13427 2012-02-11 15:07:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -296,15 +295,48 @@ class WT_Date {
 		return $tmp;
 	}
 
-	// Calculate the number of full years between two events.
-	// Return the result as either a number of years (for indi lists, etc.)
-	static function GetAgeYears($d1, $d2=null, $warn_on_negative=true) {
-		if (!is_object($d1)) {
-			return '';
-		} elseif (!is_object($d2)) {
-			return $d1->date1->GetAge(false, WT_CLIENT_JD, $warn_on_negative );
+	// Calculate the the age of a person, on a date.
+	// If $d2 is null, today's date is used.
+	static function getAge(WT_Date $d1, WT_Date $d2=null, $format) {
+		global $WT_IMAGES;
+
+		if ($d2) {
+			if ($d2->MaxJD()>=$d1->MinJD() && $d2->MinJD()<=$d1->MinJD()) {
+				// Overlapping dates
+				$jd=$d1->MinJD();
+			} else {
+				// Non-overlapping dates
+				$jd=$d2->MinJD();
+			}
 		} else {
-			return $d1->date1->GetAge(false, $d2->MinJD(), $warn_on_negative);
+			// If second date not specified, use today’s date
+			$jd=WT_CLIENT_JD;
+		}
+
+		switch ($format) {
+		case 0: // Years - integer only (for statistics, rather than for display)
+			if ($jd && $d1->MinJD()>=$jd) {
+				return $d1->MinDate()->GetAge(false, $jd, false);
+			} else {
+				return -1;
+			}
+		case 1: // Days - integer only (for sorting, rather than for display)
+			if ($jd && $d1->MinJD()) {
+				return $jd-$d1->MinJD();
+			} else {
+				return -1;
+			}
+		case 2: // Just years, in local digits, with warning for negative
+			if ($jd && $d1->MinJD()) {
+				if ($d1->MinJD()>$jd) {
+					return '<img alt="" src="'.$WT_IMAGES['warning'].'">';
+				} else {
+					return WT_I18N::number($d1->MinDate()->GetAge(false, $jd));
+				}
+			} else {
+				return '&nbsp;';
+			}
+		// TODO: combine GetAgeGedcom() into this function
 		}
 	}
 
@@ -315,9 +347,9 @@ class WT_Date {
 			return $d1->date1->GetAge(true, WT_CLIENT_JD, $warn_on_negative);
 		} else {
 			// If dates overlap, then can't calculate age.
-			if (WT_Date::Compare($d1, $d2)) {
+			if (self::Compare($d1, $d2)) {
 				return $d1->date1->GetAge(true, $d2->MinJD(), $warn_on_negative);
-			} if (WT_Date::Compare($d1, $d2)==0 && $d1->date1->minJD==$d2->MinJD()) {
+			} if (self::Compare($d1, $d2)==0 && $d1->date1->minJD==$d2->MinJD()) {
 				return '0d';
 			} else {
 				return '';

@@ -10,7 +10,7 @@
 // GEDCOM '2 PLAC' tag (within the '1 BIRT' event) and the place_locations table.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team. All rights reserved.
@@ -29,7 +29,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: wt_v3_pedigree_map.js.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: wt_v3_pedigree_map.js.php 13252 2012-01-16 20:53:46Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -470,7 +470,7 @@ for ($i=0; $i<($controller->treesize); $i++) {
 		if ($i+1 >= pow(2, $curgen)) {
 			$curgen++;
 		}
-		$relationship=get_relationship_name(get_relationship($controller->rootid, $pid, false, 0, true));
+		$relationship=get_relationship_name(get_relationship($controller->root->getXref(), $pid, false, 0, true));
 		if (empty($relationship)) $relationship=WT_I18N::translate('self');
 		$event = '<img src=\"'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/images/sq'.$curgen.'.png\" width=\"10\" height=\"10\">'.
 			 '<strong>&nbsp;'.$relationship.':&nbsp;</strong>';

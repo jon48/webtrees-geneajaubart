@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: header.php 13299 2012-01-20 20:40:31Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -101,7 +101,6 @@ if ($view!='simple') {
 	foreach (WT_MenuBar::getModuleMenus() as $menu) {
 		$menu_items[]=$menu;
 	}
-	$menu_items[]=WT_MenuBar::getHelpMenu();
 	// Print the menu bar
 	echo
 		'<div id="topMenu">',

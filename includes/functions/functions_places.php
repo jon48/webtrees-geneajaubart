@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_places.php 12530 2011-11-04 13:06:27Z greg $
+// $Id: functions_places.php 13226 2012-01-13 18:24:59Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -50,18 +50,18 @@ function get_place_url($gedcom_place) {
  * @return string  a shortened version of the place
  */
 function get_place_short($gedcom_place) {
-	global $GEDCOM, $SHOW_LIST_PLACES;
-	if ($SHOW_LIST_PLACES==9) {
-		return $gedcom_place;
+	global $SHOW_PEDIGREE_PLACES, $SHOW_PEDIGREE_PLACES_SUFFIX;
+
+	$name_parts=explode(', ', $gedcom_place);
+	
+	// Abbreviate the place name, for lists
+	if ($SHOW_PEDIGREE_PLACES_SUFFIX) {
+		// The *last* $SHOW_PEDIGREE_PLACES components
+		return implode(', ', array_slice($name_parts, -$SHOW_PEDIGREE_PLACES));
+	} else {
+		// The *first* $SHOW_PEDIGREE_PLACES components
+		return implode(', ', array_slice($name_parts, 0, $SHOW_PEDIGREE_PLACES));
 	}
-	$gedcom_place = trim($gedcom_place, " ,");
-	$exp = explode(",", $gedcom_place);
-	$place = "";
-	for ($i=0; $i<$SHOW_LIST_PLACES && $i<count($exp); $i++) {
-		if ($i>0) $place .= ", ";
-		$place.=trim($exp[$i]);
-	}
-	return $place;
 }
 
 /**

@@ -1,4 +1,4 @@
-/* $Id: msie.css 12828 2011-11-20 15:43:11Z rob $ */
+/* $Id: msie.css 13409 2012-02-07 23:39:46Z rob $ */
 
 form {
 	margin-top: 0px; margin-bottom: 0px;
@@ -23,4 +23,5 @@ form {
 a.showit:hover > span {
 	filter: alpha(opacity=85);
 }
-
+.itr {height: 30px;}
+.itr:hover .popup {top: 20px;}

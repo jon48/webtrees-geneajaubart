@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_batch_update.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: admin_batch_update.php 13137 2011-12-27 05:19:50Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -340,7 +340,7 @@ class base_plugin {
 	// Default option is just the "don't update CHAN record"
 	function getOptionsForm() {
 		return
-			'<tr><th>'.WT_I18N::translate('Update the CHAN record').':</th>'.
+			'<tr><th>'.WT_I18N::translate('Update the CHAN record').'</th>'.
 			'<td><select name="chan" onchange="this.form.submit();">'.
 			'<option value="no"' .($this->chan ? '' : ' selected="selected"').'>'.WT_I18N::translate('no') .'</option>'.
 			'<option value="yes"'.($this->chan ? ' selected="selected"' : '').'>'.WT_I18N::translate('yes').'</option>'.

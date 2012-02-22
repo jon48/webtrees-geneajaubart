@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: module.php 13408 2012-02-07 21:37:12Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,12 +41,20 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
+		global $controller;
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
+		$controller
+			->addInlineJavaScript('
+				  jQuery("#new_passwd").hide();
+				  jQuery("#passwd_click").click(function()
+				  {
+					jQuery("#new_passwd").slideToggle(100);
+				  });
+			');
 		if (WT_USER_ID) {
 			$title = WT_I18N::translate('Logout');
-
-
+			$content='';
 			$content = '<div class="center"><form method="post" action="index.php?logout=1" name="logoutform" onsubmit="return true;">';
 			$content .= '<br><a href="edituser.php" class="name2">'.WT_I18N::translate('Logged in as ').' ('.WT_USER_NAME.')</a><br><br>';
 
@@ -55,65 +63,50 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 			$content .= "<br><br></form></div>";
 		} else {
 			$title = WT_I18N::translate('Login');
-			$LOGIN_URL=get_site_setting('LOGIN_URL');
-			$content = "<div class=\"center\"><form method=\"post\" action=\"$LOGIN_URL\" name=\"loginform\" onsubmit=\"t = new Date(); document.loginform.usertime.value=t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate()+' '+t.getHours()+':'+t.getMinutes()+':'+t.getSeconds(); return true;\">";
-			$content .= "<input type=\"hidden\" name=\"url\" value=\"index.php\">";
-			$content .= "<input type=\"hidden\" name=\"ged\" value=\"";
-			$content .= WT_GEDCOM;
-			$content .= "\">";
-			$content .= "<input type=\"hidden\" name=\"pid\" value=\"";
-			if (isset($pid)) $content .= $pid;
-			$content .= "\">";
-			$content .= "<input type=\"hidden\" name=\"usertime\" value=\"\">";
-			$content .= "<input type=\"hidden\" name=\"action\" value=\"login\">";
-			$content .= "<table class=\"center\">";
-
-			// Row 1: Userid
-			$content .= "<tr><td>";
-			$content .= WT_I18N::translate('Username');
-			$content .= help_link('username');
-			$content .= "</td><td><input type=\"text\" name=\"username\"  size=\"20\" class=\"formField\">";
-			$content .= "</td></tr>";
-
-			// Row 2: Password
-			$content .= "<tr><td>";
-			$content .= WT_I18N::translate('Password');
-			$content .= help_link('password');
-			$content .= "</td><td ";
-			$content .= "><input type=\"password\" name=\"password\"  size=\"20\" class=\"formField\">";
-			$content .= "</td></tr>";
-
-			// Row 3: "Login" link
-			$content .= "<tr><td colspan=\"2\" class=\"center\">";
-			$content .= "<input type=\"submit\" value=\"".WT_I18N::translate('Login')."\">&nbsp;";
-			$content .= "</td></tr>";
-			$content .= "</table><table class=\"center\">";
-
+			$content='';
+			$content='<div id="login-box">
+				<form id="login-form" name="login-form" method="post" action="'.WT_LOGIN_URL.'" onsubmit="t = new Date(); document.login-form.usertime.value=t.getFullYear()+\'-\'+(t.getMonth()+1)+\'-\'+t.getDate()+\' \'+t.getHours()+\':\'+t.getMinutes()+\':\'+t.getSeconds(); return true;">
+				<input type="hidden" name="action" value="login">
+				<input type="hidden" name="url" value="index.php">
+				<input type="hidden" name="ged" value="'; if (isset($ged)) $content.= htmlspecialchars($ged); else $content.= htmlentities(WT_GEDCOM); $content.= '">
+				<input type="hidden" name="pid" value="'; if (isset($pid)) $content.= htmlspecialchars($pid); $content.= '">
+				<input type="hidden" name="usertime" value="">';
+			$content.= '<div>
+				<label for="username">'. WT_I18N::translate('Username').
+					'<input type="text" id="username" name="username" class="formField">
+				</label>
+				</div>
+				<div>
+					<label for="password">'. WT_I18N::translate('Password').
+						'<input type="password" id="password" name="password" class="formField">
+					</label>
+				</div>
+				<div>
+					<input type="submit" value="'. WT_I18N::translate('Login'). '">
+				</div>
+				<div>
+					<a href="#" id="passwd_click">'. WT_I18N::translate('Request new password').'</a>
+				</div>';
 			if (get_site_setting('USE_REGISTRATION_MODULE')) {
-
-				// Row 4: "Request Account" link
-				$content .= "<tr><td><br>";
-				$content .= WT_I18N::translate('No account?');
-				$content .= help_link('new_user');
-				$content .= "</td><td><br>";
-				$content .= "<a href=\"login_register.php?action=register\">";
-				$content .= WT_I18N::translate('Request new user account');
-				$content .= "</a>";
-				$content .= "</td></tr>";
-
-				// Row 5: "Lost Password" link
-				$content .= "<tr><td>";
-				$content .= WT_I18N::translate('Lost your password?');
-				$content .= help_link('new_password');
-				$content .= "</td><td>";
-				$content .= "<a href=\"login_register.php?action=pwlost\">";
-				$content .= WT_I18N::translate('Request new password');
-				$content .= "</a>";
-				$content .= "</td></tr>";
+				$content.= '<div><a href="'.WT_LOGIN_URL.'?action=register">'. WT_I18N::translate('Request new user account').'</a></div>';
 			}
-
-			$content .= "</table>";
-			$content .= "</form></div>";
+		$content.= '</form>'; // close "login-form"
+		
+		// hidden New Password block
+		$content.= '<div id="new_passwd">
+			<form id="new_passwd_form" name="new_passwd_form" action="'.WT_LOGIN_URL.'" method="post" onsubmit="t = new Date(); document.new_passwd_form.time.value=t.toUTCString(); return checkform(this);">
+			<input type="hidden" name="time" value="">
+			<input type="hidden" name="action" value="requestpw">
+			<h4>'. WT_I18N::translate('Lost password request').'</h4>
+			<div>
+				<label for="username">'. WT_I18N::translate('Username or email address').
+					'<input type="text" id="username" name="username" value="" autofocus>
+				</label>
+			</div>
+			<div><input type="submit" value="'. WT_I18N::translate('Continue'). '"></div>
+			</form>
+		</div>'; //"new_passwd"
+		$content.= '</div>';//"login-box"
 		}
 
 		if ($template) {

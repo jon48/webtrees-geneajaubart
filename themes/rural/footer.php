@@ -43,7 +43,7 @@ if ($view!='simple') {
 	//PERSO Add Extra footer
 	$f_hook = new WT_Perso_Hook('h_print_footer');
 	$f_hook->execute();
-	//
+	//END PERSO
 	
 	echo '<p class="logo">';
 	echo '<a href="', WT_WEBTREES_URL, '" target="_blank">';

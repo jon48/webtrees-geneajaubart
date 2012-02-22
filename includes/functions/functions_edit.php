@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_edit.php 13123 2011-12-21 22:41:06Z greg $
+// $Id: functions_edit.php 13278 2012-01-18 10:00:19Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -123,9 +123,6 @@ function edit_field_yes_no($name, $selected=false, $extra='') {
 	return radio_buttons(
 		$name, array(false=>WT_I18N::translate('no'),true=>WT_I18N::translate('yes')), $selected, $extra
 	);
-	//return select_edit_control(
-		//$name, array(true=>WT_I18N::translate('yes'), false=>WT_I18N::translate('no')), null, $selected, $extra
-	//);
 }
 
 // An inline-editing version of edit_field_yes_no()
@@ -237,6 +234,15 @@ function edit_field_language_inline($name, $selected=false, $extra='') {
 	return select_edit_control_inline(
 		$name, WT_I18N::installed_languages(), null, $selected, $extra
 	);
+}
+
+// Print an edit control for a range of integers
+function edit_field_integers($name, $selected='', $min, $max, $extra='') {
+	$array=array();
+	for ($i=$min; $i<=$max; ++$i) {
+		$array[$i]=WT_I18N::number($i);
+	}
+	return select_edit_control($name, $array, null, $selected, $extra);
 }
 
 // Print an edit control for a username
@@ -1437,20 +1443,70 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 	if ($action=="addnewnote_assisted") {
 		// Do not print on GEDFact Assistant window
 	} else {
-		if (!in_array($fact, $emptyfacts)) {
-			if ($fact=="FORM" && $upperlevel!='OBJE') {
-				echo help_link('FORM');
-			} elseif ($fact=="NOTE" && $islink) {
+		// Not all facts have help text.
+		switch ($fact) {
+		case 'FORM':
+			if ($upperlevel!='OBJE') {
+				echo help_link($fact);
+			}
+			break;
+		case 'NOTE':
+			if ($islink) {
 				if ($pid && $label=='GEDFact Assistant' && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 					echo help_link('edit_add_GEDFact_ASSISTED');
 				} else {
 					echo help_link('edit_add_SHARED_NOTE');
 				}
-			} elseif ($fact=="TYPE" && $upperlevel=='OBJE') {
-			// no help required for Media Type drop-down list
 			} else {
 				echo help_link($fact);
 			}
+			break;
+		case 'NAME':
+			if ($upperlevel=='INDI') {
+				echo help_link($fact);
+			}
+			break;
+		case 'ABBR':
+		case 'ADDR':
+		case 'AGNC':
+		case 'ASSO':
+		case 'CAUS':
+		case 'CEME':
+		case 'DATE':
+		case 'EMAI':
+		case 'EMAIL':
+		case 'EMAL':
+		case '_EMAIL':
+		case 'FAX':
+		case 'GIVN':
+		case 'NICK':
+		case 'NPFX':
+		case 'NSPX':
+		case 'OBJE':
+		case 'PAGE':
+		case 'PEDI':
+		case 'PHON':
+		case 'PLAC':
+		case 'QUAY':
+		case 'RELA':
+		case 'RESN':
+		case 'ROMN':
+		case 'SEX':
+		case 'SOUR':
+		case 'SPFX':
+		case 'STAT':
+		case 'SURN':
+		case 'TEMP':
+		case 'TEXT':
+		case 'TIME':
+		case 'TITL':
+		case 'TYPE':
+		case 'URL':
+		case '_HEB':
+		case '_MARNM':
+		case '_PRIM':
+			echo help_link($fact);
+			break;
 		}
 	}
 	// tag level

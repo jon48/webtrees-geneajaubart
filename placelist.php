@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: placelist.php 13126 2011-12-22 18:17:19Z lukasz $
+// $Id: placelist.php 13248 2012-01-16 12:21:42Z greg $
 
 define('WT_SCRIPT_NAME', 'placelist.php');
 require './includes/session.php';
@@ -368,7 +368,6 @@ if ($display=='list') {
 		echo ' colspan="', $ct>20 ? 3 : 2, '">&nbsp;';
 		echo '<img src="', $WT_IMAGES['place'], '" title="', WT_I18N::translate('Place'), '" alt="', WT_I18N::translate('Place'), '">&nbsp;&nbsp;';
 		echo WT_I18N::translate('Place List');
-		echo help_link('ppp_placelist');
 		echo '</td></tr><tr><td class="list_value_wrap"><ul>';
 		$i=0;
 		foreach ($placelist as $indexval => $revplace) {

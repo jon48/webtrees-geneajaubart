@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13109 2011-12-21 20:52:29Z greg $
+// $Id: module.php 13184 2012-01-05 08:53:45Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -125,6 +125,7 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 				->addInlineJavaScript('
 					jQuery("#'.$table_id.'").dataTable({
 						"sDom": \'t\',
+						'.WT_I18N::datatablesI18N().',
 						"bAutoWidth":false,
 						"bPaginate": false,
 						"bLengthChange": false,

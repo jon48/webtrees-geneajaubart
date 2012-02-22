@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: mediaviewer.php 13115 2011-12-21 21:46:32Z greg $
+// $Id: mediaviewer.php 13275 2012-01-18 07:55:04Z greg $
 
 define('WT_SCRIPT_NAME', 'mediaviewer.php');
 require './includes/session.php';
@@ -191,7 +191,7 @@ echo '</div>'; //close div "media-details"
 <!--
 
 function ilinkitem(mediaid, type) {
-	window.open('inverselink.php?mediaid='+mediaid+'&linkto='+type+'&'+sessionname+'='+sessionid, '_blank', 'top=50, left=50, width=570, height=630, resizable=1, scrollbars=1');
+	window.open('inverselink.php?mediaid='+mediaid+'&linkto='+type, '_blank', 'top=50, left=50, width=570, height=630, resizable=1, scrollbars=1');
 	return false;
 }
 //-->

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_charts.php 13121 2011-12-21 22:27:07Z greg $
+// $Id: functions_charts.php 13387 2012-02-05 15:40:35Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -58,12 +58,12 @@ function print_sosa_number($sosa, $pid = "", $arrowDirection = "up") {
 		} elseif ($arrowDirection== "down") {
 			$dir = 3;
 		} else {
-			$dir = 2; // either "blank" or "up"
+			$dir = 2; // either 'blank' or 'up'
 		}
-		echo "<br>";
-		print_url_arrow($pid, "#$pid", "$pid", $dir);
+		echo '<br>';
+		print_url_arrow($pid, '#'.$pid, $pid, $dir);
 	}
-	echo "</td>";
+	echo '</td>';
 }
 
 /**
@@ -75,8 +75,8 @@ function print_sosa_number($sosa, $pid = "", $arrowDirection = "up") {
  * @param string $parid optional parent ID (descendancy booklet)
  * @param string $gparid optional gd-parent ID (descendancy booklet)
  */
-function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="", $personcount="1") {
-	global $show_full, $SHOW_EMPTY_BOXES, $pbwidth, $pbheight, $WT_IMAGES, $GEDCOM;
+function print_family_parents($famid, $sosa=0, $label='', $parid='', $gparid='', $personcount=1) {
+	global $SHOW_EMPTY_BOXES, $pbwidth, $pbheight, $WT_IMAGES, $GEDCOM;
 	$ged_id=get_id_from_gedcom($GEDCOM);
 
 	$family = WT_Family::getInstance($famid);
@@ -149,9 +149,9 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
 		echo "</td>";
 	}
 	if (!empty($upfamid) and ($sosa!=-1)) {
-		echo "<td valign=\"middle\" rowspan=\"2\">";
-		print_url_arrow($upfamid, ($sosa==0 ? "?famid=$upfamid&amp;show_full=$show_full" : "#$upfamid"), "$upfamid", 1);
-		echo "</td>";
+		echo '<td valign="middle" rowspan="2">';
+		print_url_arrow($upfamid, ($sosa==0 ? '?famid='.$upfamid.'&amp;ged='.WT_GEDURL : '#'.$upfamid), $upfamid, 1);
+		echo '</td>';
 	}
 	if ($hparents or ($sosa != 0 and $SHOW_EMPTY_BOXES)) {
 		// husband's mother
@@ -220,9 +220,9 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
 		echo "</td>";
 	}
 	if (!empty($upfamid) and ($sosa!=-1)) {
-		echo "<td valign=\"middle\" rowspan=\"2\">";
-		print_url_arrow($upfamid, ($sosa==0 ? "?famid=$upfamid&amp;show_full=$show_full" : "#$upfamid"), "$upfamid", 1);
-		echo "</td>";
+		echo '<td valign="middle" rowspan="2">';
+		print_url_arrow($upfamid, ($sosa==0 ? '?famid='.$upfamid.'&amp;ged='.WT_GEDURL : '#'.$upfamid), $upfamid, 1);
+		echo '</td>';
 	}
 	if ($hparents or ($sosa != 0 and $SHOW_EMPTY_BOXES)) {
 		// wife's mother
@@ -247,7 +247,7 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
  * @param string $label optional indi label (descendancy booklet)
  */
 function print_family_children($famid, $childid = "", $sosa = 0, $label="", $personcount="1") {
-	global $pbwidth, $pbheight, $show_cousins, $WT_IMAGES, $GEDCOM, $TEXT_DIRECTION;
+	global $bwidth, $bheight, $pbwidth, $pbheight, $cbheight, $cbwidth, $show_cousins, $WT_IMAGES, $GEDCOM, $TEXT_DIRECTION;
 
 	$family=WT_Family::getInstance($famid);
 	$children=array();
@@ -344,13 +344,17 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 							$family=WT_Family::getInstance($famid_child);
 							$fchildren=$family->getChildren();
 							$kids = count($fchildren);
-							$PBheight = ($pbheight-14)/2;
-							if ($kids==0) $kids+=1;
-							if ($kids>1) $kids-=1;
-							// Adjustment for block hights greater than 80
-							$PBadj = (((($PBheight-40)/2)*$kids)-5);
+							$PBheight = $bheight;
+							$Pheader = ($cbheight*$kids)-$bheight;
+							$PBadj = 6;	// default
+							if ($show_cousins>0) {
+								if (($cbheight * $kids) > $bheight) {
+									$PBadj = ($Pheader/2+$kids*4.5);
+								} 
+							}
+
 							if ($PBadj<0) $PBadj=0;
-							if ($f==$maxfam) echo "<img height=\"".(( (($PBheight)+($kids-2)*22) +28)+$PBadj)."px\"";
+							if ($f==$maxfam) echo "<img height=\"".( (($bheight/2))+$PBadj)."px\"";
 							else echo "<img height=\"".$pbheight."px\"";
 							echo " width=\"3\" src=\"".$WT_IMAGES["vline"]."\" alt=\"\">";
 							echo "</td>";
@@ -628,7 +632,7 @@ function get_sosa_name($sosa) {
  * @param string $famid family ID
  */
 function print_cousins($famid, $personcount=1) {
-	global $show_full, $bheight, $bwidth, $WT_IMAGES, $TEXT_DIRECTION, $GEDCOM;
+	global $show_full, $bheight, $bwidth, $cbheight, $cbwidth, $WT_IMAGES, $TEXT_DIRECTION, $GEDCOM;
 
 	$ged_id=get_id_from_gedcom($GEDCOM);
 	$family=WT_Family::getInstance($famid);
@@ -636,10 +640,12 @@ function print_cousins($famid, $personcount=1) {
 
 	$kids = count($fchildren);
 	$save_show_full = $show_full;
+	$sbheight = $bheight;
+	$sbwidth = $bwidth;
 	if ($save_show_full) {
-		$bheight=(($bheight)/2)-4; /* adjust for padding and border, should 1/2 larger block size  */
-		$bwidth-=40;
-	} 
+		$bheight = $cbheight;
+		$bwidth  = $cbwidth;
+	}  
 	
 	$show_full = false;
 	echo '<td valign="middle" height="100%">';
@@ -675,8 +681,8 @@ function print_cousins($famid, $personcount=1) {
 	}
 	$show_full = $save_show_full;
 	if ($save_show_full) {
-		$bheight=($bheight+4)*2;
-		$bwidth+=40;
+		$bheight = $sbheight;
+		$bwidth  = $sbwidth;
 	}
 	echo '</td>';
 }

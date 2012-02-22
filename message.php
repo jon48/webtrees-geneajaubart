@@ -2,7 +2,7 @@
 // Send a message to a user in the system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2007  John Finlay and Others
@@ -21,11 +21,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: message.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: message.php 13346 2012-02-01 19:00:11Z greg $
 
 define('WT_SCRIPT_NAME', 'message.php');
 require './includes/session.php';
-
 $subject   =isset($_REQUEST['subject'   ]) ? $_REQUEST['subject'   ] : '';
 $url       =isset($_REQUEST['url'       ]) ? $_REQUEST['url'       ] : '';
 $method    =isset($_REQUEST['method'    ]) ? $_REQUEST['method'    ] : 'messaging2';
@@ -34,14 +33,17 @@ $to        =isset($_REQUEST['to'        ]) ? $_REQUEST['to'        ] : '';
 $action    =isset($_REQUEST['action'    ]) ? $_REQUEST['action'    ] : 'compose';
 $time      =isset($_REQUEST['time'      ]) ? $_REQUEST['time'      ] : '';
 $method    =isset($_REQUEST['method'    ]) ? $_REQUEST['method'    ] : '';
+$method    =isset($_REQUEST['method'    ]) ? $_REQUEST['method'    ] : '';
+$from_email=isset($_REQUEST['from_email']) ? $_REQUEST['from_email'] : '';
+$from_name =isset($_REQUEST['from_name' ]) ? $_REQUEST['from_name' ] : '';
 
 $controller=new WT_Controller_Simple();
 $controller->setPageTitle(WT_I18N::translate('webtrees Message'));
 
 $to_user_id=get_user_id($to);
 
-// This should never happen?  All links to this page contain valid recipients....
-if (!$to_user_id || ($to=='all' || $to=='last_6mo' || $to=='never_logged') && !WT_USER_IS_ADMIN) {
+// Only admins can send broadcast messages
+if ((!$to_user_id || $to=='all' || $to=='last_6mo' || $to=='never_logged') && !WT_USER_IS_ADMIN) {
 	// TODO, what if we have a user called "all" or "last_6mo" or "never_logged" ???
 	Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->addMessage(WT_I18N::translate('Message was not sent'));
 	$controller->pageHeader();
@@ -55,9 +57,6 @@ $errors='';
 if (WT_USER_ID) {
 	$from=WT_USER_NAME;
 } else {
-	$from_email=isset($_REQUEST['from_email']) ? $_REQUEST['from_email'] : '';
-	$from_name =isset($_REQUEST['from_name' ]) ? $_REQUEST['from_name' ] : '';
-
 	// Visitors must provide a valid email address
 	if ($from_email && (!preg_match("/(.+)@(.+)/", $from_email, $match) || function_exists('checkdnsrr') && checkdnsrr($match[2])===false)) {
 		$errors.='<p class="ui-state-error">'.WT_I18N::translate('Please enter a valid email address.').'</p>';

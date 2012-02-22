@@ -4,7 +4,7 @@
 // Various printing functions used by all scripts and included by the functions.php file.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print.php 13079 2011-12-15 11:52:22Z greg $
+// $Id: functions_print.php 13354 2012-02-01 22:02:22Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -33,6 +33,7 @@ if (!defined('WT_WEBTREES')) {
 }
 
 require_once WT_ROOT.'includes/functions/functions_charts.php';
+require_once WT_ROOT.'includes/functions/functions_places.php';
 
 /**
 * print the information for an individual chart box
@@ -80,6 +81,7 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 	$classfacts = "";
 	$genderImage = "";
 	$BirthDeath = "";
+	$birthplace = "";
 	$outBoxAdd = "";
 	$thumbnail = "";
 	$showid = "";
@@ -118,7 +120,7 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 				$num = count($children);
 				$personlinks .= '<dt>';
 				if ((!empty($spouse))||($num>0)) {
-					$personlinks .= '<a href="'.$family->getHtmlUrl().'&amp;show_full=1"><b>'.WT_I18N::translate('Family with spouse').'</b></a><br>';
+					$personlinks .= '<a href="'.$family->getHtmlUrl().'"><b>'.WT_I18N::translate('Family with spouse').'</b></a><br>';
 					if (!empty($spouse)) {
 						$personlinks .= '<a href="'.$spouse->getHtmlUrl().'">';
 						$personlinks .= $spouse->getFullName();
@@ -164,20 +166,23 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 		}
 	}
 	//-- find the name
-	$name = $person->getFullName();
+		$name = $person->getFullName();
+		$shortname = $person->getShortName();
+	
 	if ($SHOW_HIGHLIGHT_IMAGES) {
 		$object=$person->findHighlightedMedia();
 		$img_id='box-'.$boxID.'.-thumb';
 		if (!empty($object)) {
 			$mediaobject=WT_Media::getInstance($object['mid']);
-			$thumbnail=$mediaobject->displayMedia(array('display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$name,'show_full'=>$show_full));
+			$thumbnail=$mediaobject->displayMedia(array('display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$name));
 		} else {
-			$thumbnail=display_silhouette(array('sex'=>$person->getSex(),'display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$name,'show_full'=>$show_full)); // may return ''
+			$thumbnail=display_silhouette(array('sex'=>$person->getSex(),'display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$name)); // may return ''
 		}
 	}
-	//-- find additional name
+	
+	//-- find additional name, e.g. Hebrew
 	$addname=$person->getAddName();
-
+	
 	// add optional CSS style for each fact
 	$indirec = $person->getGedcomRecord();
 	$cssfacts = array("BIRT", "CHR", "DEAT", "BURI", "CREM", "ADOP", "BAPM", "BARM", "BASM", "BLES", "CHRA", "CONF", "FCOM", "ORDN", "NATU", "EMIG", "IMMI", "CENS", "PROB", "WILL", "GRAD", "RETI", "CAST", "DSCR", "EDUC", "IDNO",
@@ -185,34 +190,39 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 	foreach ($cssfacts as $indexval => $fact) {
 		if (strpos($indirec, "1 $fact")!==false) $classfacts .= " $fact";
 	}
-	if ($PEDIGREE_SHOW_GENDER)
+	
+	if ($PEDIGREE_SHOW_GENDER && $show_full) {
 		$genderImage = " ".$person->getSexImage('small', "box-$boxID-gender");
+	}
+	
+	// Here for alternate name2
 	if (strlen($addname) > 0) {
 		$tempStyle = $style;
-		if (hasRTLText($addname) && $style=='1') $tempStyle = '2';
+		if (hasRTLText($addname) && $style=='1') {
+			$tempStyle = '2';
+		}
 		$addname = "<br><span id=\"addnamedef-$boxID\" class=\"name$tempStyle\"> ".PrintReady($addname)."</span>";
 	}
-	if ($SHOW_LDS_AT_GLANCE) {
+	
+	if ($SHOW_LDS_AT_GLANCE && $show_full) {
 		$addname = ' <span class="details$style">'.get_lds_glance($indirec).'</span>' . $addname;
 	}
-
-		if ($show_full) {
-
-			$opt_tags=preg_split('/\W/', $CHART_BOX_TAGS, 0, PREG_SPLIT_NO_EMPTY);
-
-			// Show BIRT or equivalent event
-			foreach (explode('|', WT_EVENTS_BIRT) as $birttag) {
+	
+	// Show BIRT or equivalent event
+	$opt_tags=preg_split('/\W/', $CHART_BOX_TAGS, 0, PREG_SPLIT_NO_EMPTY);
+	if ($show_full) {
+		foreach (explode('|', WT_EVENTS_BIRT) as $birttag) {
 			if (!in_array($birttag, $opt_tags)) {
 				$event = $person->getFactByType($birttag);
 				if (!is_null($event) && ($event->getDate()->isOK() || $event->getPlace()) && $event->canShow()) {
 					$BirthDeath .= $event->print_simple_fact(true);
 					break;
-					}
 				}
 			}
-
-			// Show optional events (before death)
-			foreach ($opt_tags as $key=>$tag) {
+		}
+	}
+		// Show optional events (before death)
+		foreach ($opt_tags as $key=>$tag) {
 			if (!preg_match('/^('.WT_EVENTS_DEAT.')$/', $tag)) {
 				$event = $person->getFactByType($tag);
 				if (!is_null($event) && $event->canShow()) {
@@ -221,28 +231,43 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 				}
 			}
 		}
-
-			// Show DEAT or equivalent event
-			foreach (explode('|', WT_EVENTS_DEAT) as $deattag) {
+	// Show DEAT or equivalent event
+	if ($show_full) {
+		foreach (explode('|', WT_EVENTS_DEAT) as $deattag) {
 			$event = $person->getFactByType($deattag);
 			if (!is_null($event) && ($event->getDate()->isOK() || $event->getPlace() || $event->getDetail()=='Y') && $event->canShow()) {
 				$BirthDeath .= $event->print_simple_fact(true);
-					if (in_array($deattag, $opt_tags)) {
-						unset ($opt_tags[array_search($deattag, $opt_tags)]);
-					}
-					break;
+				if (in_array($deattag, $opt_tags)) {
+					unset ($opt_tags[array_search($deattag, $opt_tags)]);
 				}
-			}
-
-			// Show remaining optional events (after death)
-			foreach ($opt_tags as $tag) {
-			$event = $person->getFactByType($tag);
-			if (!is_null($event) && $event->canShow()) {
-				$BirthDeath .= $event->print_simple_fact(true);
-				}
+				break;
 			}
 		}
-	require WT_THEME_DIR.'templates/personbox_template.php';
+	}
+	// Show remaining optional events (after death)
+	foreach ($opt_tags as $tag) {
+		$event = $person->getFactByType($tag);
+		if (!is_null($event) && $event->canShow()) {
+			$BirthDeath .= $event->print_simple_fact(true);
+		}
+	}
+	// Find the short birth place for compact chart
+	$opt_tags=preg_split('/\W/', $CHART_BOX_TAGS, 0, PREG_SPLIT_NO_EMPTY);
+	foreach (explode('|', WT_EVENTS_BIRT) as $birttag) {
+		if (!in_array($birttag, $opt_tags)) {
+			$event = $person->getFactByType($birttag);
+			if (!is_null($event) && ($event->getDate()->isOK() || $event->getPlace()) && $event->canShow()) {
+				$birthplace .= get_place_short($event->getPlace());
+				break;
+			}
+		}
+	}
+	// Output to template
+	if ($show_full) {
+	   require WT_THEME_DIR.'templates/personbox_template.php';
+	} else {
+	   require WT_THEME_DIR.'templates/compactbox_template.php';
+	}
 }
 
 // print HTML header meta links 
@@ -291,12 +316,10 @@ function login_link($extra='') {
 	if ($SEARCH_SPIDER) {
 		return '';
 	} else {
-		if (WT_SCRIPT_NAME=='login.php') {
-			$href='#';
-		} else {
-			$href=get_site_setting('LOGIN_URL', 'login.php').'?url='.rawurlencode(get_query_url());
-		}
-		return '<a href="' . $href . '" ' . $extra . ' class="link">' . WT_I18N::translate('Login') . '</a>';
+		return
+			'<a href="'.WT_LOGIN_URL.'?url='.rawurlencode(get_query_url()).'" '.$extra.' class="link">'.
+			WT_I18N::translate('Login').
+			'</a>';
 	}
 }
 
@@ -326,24 +349,6 @@ function user_contact_link($user_id) {
 		return '<a href="mailto:'.htmlspecialchars($email).'">'.htmlspecialchars($fullname).'</a>';
 	default:
 		return "<a href='#' onclick='message(\"".get_user_name($user_id)."\", \"{$method}\");return false;'>{$fullname}</a>";
-	}
-}
-
-// Print a menu item to allow email/messaging contact with a user
-// Optionally specify a method (used for webmaster/genealogy contacts)
-function user_contact_menu($user_id) {
-	$method=get_user_setting($user_id, 'contactmethod');
-
-	$fullname=getUserFullName($user_id);
-
-	switch ($method) {
-	case 'none':
-		return array();
-	case 'mailto':
-		$email=getUserEmail($user_id);
-		return array('label'=>$fullname, 'labelpos'=>'right', 'class'=>'submenuitem', 'hoverclass'=>'submenuitem_hover', 'link'=>"mailto:{$email}");
-	default:
-		return array('label'=>$fullname, 'labelpos'=>'right', 'class'=>'submenuitem', 'hoverclass'=>'submenuitem_hover', 'link'=>'#', 'onclick'=>"message('".get_user_name($user_id)."', '{$method}');return false;");
 	}
 }
 
@@ -381,35 +386,6 @@ function contact_links($ged_id=WT_GED_ID) {
 		$returnText .= '</div>';
 		return $returnText;
 	}
-}
-
-function contact_menus($ged_id=WT_GED_ID) {
-	$contact_user_id  =get_gedcom_setting($ged_id, 'CONTACT_USER_ID');
-	$webmaster_user_id=get_gedcom_setting($ged_id, 'WEBMASTER_USER_ID');
-
-	$support_menu=user_contact_menu($webmaster_user_id);
-	$contact_menu=user_contact_menu($contact_user_id);
-
-	if (!$support_menu) {
-		$support_menu=$contact_menu;
-	}
-	if (!$contact_menu) {
-		$contact_menu=$support_menu;
-	}
-	if (!$support_menu) {
-		return array();
-	}
-	$menuitems=array();
-	if ($support_menu==$contact_menu) {
-		$support_menu['label']=WT_I18N::translate('Technical help contact');
-		$menuitems['menu-help-technical']=$support_menu;
-	} else {
-		$support_menu['label']=WT_I18N::translate('Technical help contact');
-		$menuitems['menu-help-technical']=$support_menu;
-		$contact_menu['label']=WT_I18N::translate('Genealogy contact');
-		$menuitems['menu-help-genealogy']=$contact_menu;
-	}
-	return $menuitems;
 }
 
 //-- print user favorites
@@ -620,30 +596,23 @@ function print_privacy_error() {
 
 // Print a link for a popup help window
 function help_link($help_topic, $module='') {
-	global $WT_USE_HELPIMG, $WT_IMAGES, $WT_SESSION;
+	global $WT_USE_HELPIMG, $WT_IMAGES;
 
-	if ($WT_SESSION->show_context_help) {
-		return
-			'<a class="help icon-help-15" href="#" onclick="helpPopup(\''.$help_topic.'\',\''.$module.'\'); return false;">&nbsp;'.
-			($WT_USE_HELPIMG ?  '<img src="'.$WT_IMAGES['help'].'" class="icon" width="15" height="15" alt="">' : WT_I18N::translate('?')).
-			'&nbsp;</a>';
-	} else {
-		return '';
-	}
+	return
+		'<span class="help icon-help-15" onclick="helpPopup(\''.$help_topic.'\',\''.$module.'\'); return false;">&nbsp;'.
+		($WT_USE_HELPIMG ?  '<img src="'.$WT_IMAGES['help'].'" class="icon" width="15" height="15" alt="">' : WT_I18N::translate('?')).
+		'&nbsp;</span>';
 }
+
 
 // Print an external help link to the wiki site, in a new window
 function wiki_help_link($topic) {
-	global $WT_USE_HELPIMG, $WT_IMAGES, $WT_SESSION;
+	global $WT_USE_HELPIMG, $WT_IMAGES;
 
-	if ($WT_SESSION->show_context_help) {
-		return
-			'<a class="help icon-help-15" href="'.WT_WEBTREES_WIKI.$topic.'" target="_new">&nbsp;'.
-			($WT_USE_HELPIMG ?  '<img src="'.$WT_IMAGES['help'].'" class="icon" width="15" height="15" alt="">' : WT_I18N::translate('?')).
-			'&nbsp;</a>';
-	} else {
-		return '';
-	}
+	return
+		'<a class="help icon-help-15" href="'.WT_WEBTREES_WIKI.$topic.'" target="_new">&nbsp;'.
+		($WT_USE_HELPIMG ?  '<img src="'.$WT_IMAGES['help'].'" class="icon" width="15" height="15" alt="">' : WT_I18N::translate('?')).
+		'&nbsp;</a>';
 }
 
 // When a user has searched for text, highlight any matches in
@@ -803,38 +772,31 @@ function format_parents_age($pid, $birth_date=null) {
 		// Multiple sets of parents (e.g. adoption) cause complications, so ignore.
 		if ($birth_date->isOK() && count($families)==1) {
 			$family=current($families);
-			// Allow for same-sex parents
-			foreach (array($family->getHusband(), $family->getWife()) as $parent) {
-				if ($parent && $age=WT_Date::GetAgeYears($parent->getBirthDate(), $birth_date)) {
+			foreach ($family->getSpouses() as $parent) {
+				if ($parent->getBirthDate()->isOK()) {
+					$sex=$parent->getSexImage();
+					$age=WT_Date::getAge($parent->getBirthDate(), $birth_date, 2);
 					$deatdate=$parent->getDeathDate();
-					$class='';
 					switch ($parent->getSex()) {
 					case 'F':
 						// Highlight mothers who die in childbirth or shortly afterwards
 						if ($deatdate->isOK() && $deatdate->MinJD()<$birth_date->MinJD()+90) {
-							$class='parentdeath';
-							$title=WT_Gedcom_Tag::getLabel('_DEAT_PARE', $parent);
+							$html.=' <span title="'.WT_Gedcom_Tag::getLabel('_DEAT_PARE', $parent).'" class="parentdeath">'.$sex.$age.'</span>';
 						} else {
-							$title=WT_I18N::translate('Mother\'s age');
+							$html.=' <span title="'.WT_I18N::translate('Mother\'s age').'">'.$sex.$age.'</span>';
 						}
 						break;
 					case 'M':
 						// Highlight fathers who die before the birth
 						if ($deatdate->isOK() && $deatdate->MinJD()<$birth_date->MinJD()) {
-							$class='parentdeath';
-							$title=WT_Gedcom_Tag::getLabel('_DEAT_PARE', $parent);
+							$html.=' <span title="'.WT_Gedcom_Tag::getLabel('_DEAT_PARE', $parent).'" class="parentdeath">'.$sex.$age.'</span>';
 						} else {
-							$title=WT_I18N::translate('Father\'s age');
+							$html.=' <span title="'.WT_I18N::translate('Father\'s age').'">'.$sex.$age.'</span>';
 						}
 						break;
 					default:
-						$title=WT_I18N::translate('Parent\'s age');
+						$html.=' <span title="'.WT_I18N::translate('Parent\'s age').'">'.$sex.$age.'</span>';
 						break;
-					}
-					if ($class) {
-						$html.=' <span class="'.$class.'" title="'.$title.'">'.$parent->getSexImage().$age.'</span>';
-					} else {
-						$html.=' <span title="'.$title.'">'.$parent->getSexImage().$age.'</span>';
 					}
 				}
 			}
@@ -980,40 +942,42 @@ function format_fact_date(WT_Event $event, WT_GedcomRecord $record, $anchor=fals
 * @param boolean $lds option to print LDS TEMPle and STATus
 */
 function format_fact_place(WT_Event $event, $anchor=false, $sub=false, $lds=false) {
-	global $SHOW_PEDIGREE_PLACES, $SEARCH_SPIDER;
+	global $SHOW_PEDIGREE_PLACES, $SHOW_PEDIGREE_PLACES_SUFFIX, $SEARCH_SPIDER;
 
 	$factrec = $event->getGedcomRecord();
-	$html='';
 
-	$ct = preg_match("/2 PLAC (.*)/", $factrec, $match);
-	if ($ct>0) {
-		$html.=' ';
-		// reverse the array so that we get the top level first
-		$levels = array_reverse(explode(', ', $match[1]));
-		if ($anchor && (empty($SEARCH_SPIDER))) {
-			$place = trim($match[1]);
-			$tempURL = "placelist.php?action=show&amp;";
-			foreach ($levels as $pindex=>$ppart) {
-				$tempURL .= "parent[{$pindex}]=".rawurlencode($ppart).'&amp;';
+	$name_parts=explode(', ', $event->getPlace());
+	$ct=count($name_parts);
+
+	if ($anchor) {
+		// Show the full place name, for facts/events tab
+		$html=$event->getPlace();
+		if (!$SEARCH_SPIDER) {
+			$n=count($name_parts);
+			$url='placelist.php?action=show&amp;level='.$n;
+			for ($i=0; $i<$n; ++$i) {
+				$url.='&amp;parent%5B'.$i.'%5D='.rawurlencode($name_parts[$n-$i-1]);
 			}
-			$tempURL .= 'level='.count($levels);
-			$html .= '<a href="'.$tempURL.'"> '.PrintReady($place).'</a>';
-		} else {
-			if (!$SEARCH_SPIDER) {
-				$html.=' -- ';
-			}
-			for ($level=$SHOW_PEDIGREE_PLACES-1; $level>=0; $level--) {
-				if (!empty($levels[$level])) {
-					$html.=PrintReady($levels[$level]);
-					if ($level>0) {
-						$html.=", ";
-					}
-				}
-			}
+			$html='<a href="'.$url.'">'.$html.'</a>';
 		}
 	} else {
-		$place='???';
+		// Abbreviate the place name, for chart boxes
+		if ($SHOW_PEDIGREE_PLACES_SUFFIX) {
+			// The *last* $SHOW_PEDIGREE_PLACES components
+			$html=implode(', ', array_slice($name_parts, -$SHOW_PEDIGREE_PLACES));
+		} else {
+			// The *first* $SHOW_PEDIGREE_PLACES components
+			$html=implode(', ', array_slice($name_parts, 0, $SHOW_PEDIGREE_PLACES));
+		}
+
+		// If we abbreviated the place, show the full name as a tooltip
+		if ($ct>$SHOW_PEDIGREE_PLACES) {
+			$html=' – <span title="'.htmlspecialchars($event->getPlace()).'">'.$html.'</span>';
+		}
+		// Chart boxes don't have room for temple names, alternate place names, etc.
+		return $html;
 	}
+
 	$ctn=0;
 	if ($sub) {
 		$placerec = get_sub_record(2, '2 PLAC', $factrec);
@@ -1021,14 +985,14 @@ function format_fact_place(WT_Event $event, $anchor=false, $sub=false, $lds=fals
 			$cts = preg_match('/\d ROMN (.*)/', $placerec, $match);
 			if ($cts>0) {
 				if ($ct>0) {
-					$html.=" - ";
+					$html.=" – ";
 				}
 				$html.=' '.PrintReady($match[1]);
 			}
 			$cts = preg_match('/\d _HEB (.*)/', $placerec, $match);
 			if ($cts>0) {
 				if ($ct>0) {
-					$html.=' - ';
+					$html.=' – ';
 				}
 				$html.=' '.PrintReady($match[1]);
 			}
@@ -1047,6 +1011,11 @@ function format_fact_place(WT_Event $event, $anchor=false, $sub=false, $lds=fals
 			if ($map_lati && $map_long && empty($SEARCH_SPIDER)) {
 				$map_lati=trim(strtr($map_lati, "NSEW,�", " - -. ")); // S5,6789 ==> -5.6789
 				$map_long=trim(strtr($map_long, "NSEW,�", " - -. ")); // E3.456� ==> 3.456
+				if ($name_parts) {
+					$place=$name_parts[0];
+				} else {
+					$place='';
+				}
 				$html.=' <a target="_BLANK" href="'."http://www.mapquest.com/maps/map.adp?searchtype=address&amp;formtype=latlong&amp;latlongtype=decimal&amp;latitude={$map_lati}&amp;longitude={$map_long}".'"><img src="images/mapq.gif" alt="Mapquest" title="Mapquest"></a>';
 				$html.=' <a target="_BLANK" href="'."http://maps.google.com/maps?q={$map_lati},{$map_long}(".rawurlencode($place).")".'"><img src="images/bubble.gif" alt="'.WT_I18N::translate('Google Maps™').'" title="'.WT_I18N::translate('Google Maps™').'"></a>';
 				$html.=' <a target="_BLANK" href="'."http://www.multimap.com/map/browse.cgi?lat={$map_lati}&amp;lon={$map_long}&amp;scale=&amp;icon=x".'"><img src="images/multim.gif" alt="Multimap" title="Multimap"></a>';
@@ -1089,7 +1058,7 @@ function format_first_major_fact($key, $majorfacts = array("BIRT", "CHR", "BAPM"
 		if (!is_null($event) && $event->hasDatePlace() && $event->canShow()) {
 			$html.='<br><em>';
 			$html .= $event->getLabel();
-			$html.=' '.format_fact_date($event, $person, false, false).format_fact_place($event).'</em>';
+			$html.=' '.format_fact_date($event, $person, false, false).' '.format_fact_place($event).'</em>';
 			break;
 		}
 	}
@@ -1141,7 +1110,6 @@ function print_add_new_fact($id, $usedfacts, $type) {
 				if ($newRow) {
 					$newRow = false;
 					echo '<tr><td class="descriptionbox">';
-					echo help_link('add_from_clipboard');
 					echo WT_I18N::translate('Add from clipboard'), '</td>';
 					echo '<td class="optionbox wrap"><form method="get" name="newFromClipboard" action="" onsubmit="return false;">';
 					echo '<select id="newClipboardFact" name="newClipboardFact">';

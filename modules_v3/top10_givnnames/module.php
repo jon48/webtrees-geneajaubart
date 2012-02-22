@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13109 2011-12-21 20:52:29Z greg $
+// $Id: module.php 13197 2012-01-06 12:55:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -63,8 +63,13 @@ class top10_givnnames_WT_Module extends WT_Module implements WT_Module_Block {
 		} else {
 			$title='';
 		}
-		// I18N: There are separate lists of male/female names, containing %d names each
-		$title .= WT_I18N::plural('Top given name', 'Top %d given names', $num, $num);
+		if ($num==1) {
+			// I18N: i.e. most popular given name.
+			$title.=WT_I18N::translate('Top given name');
+		} else {
+			// I18N: Title for a list of the most common given names, %s is a number.  Note that a separate translation exists when %s is 1
+			$title.=WT_I18N::plural('Top %s given name', 'Top %s given names', $num, WT_I18N::number($num));
+		}
 
 		$content = '<div class="normal_inner_block">';
 		//Select List or Table

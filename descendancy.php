@@ -2,7 +2,7 @@
 // Displays a descendancy tree.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: descendancy.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: descendancy.php 13276 2012-01-18 08:11:02Z greg $
 
 define('WT_SCRIPT_NAME', 'descendancy.php');
 require './includes/session.php';
@@ -41,22 +41,19 @@ $nonfamfacts[] = 'UID';
 $nonfamfacts[] = '';
 
 $controller=new WT_Controller_Descendancy();
-$controller->pageHeader();
+$controller
+	->pageHeader()
+	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }'); // For the "find indi" link
 
-if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
+if ($ENABLE_AUTOCOMPLETE) {
+	require WT_ROOT.'js/autocomplete.js.htm';
+}
 
-// LBox =====================================================================================
 if (WT_USE_LIGHTBOX) {
 	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
 }
-// ==========================================================================================
 
-echo '<table><tr><td valign="top"><h2>', WT_I18N::translate('Descendants of %s', $controller->name), '</h2>';
-echo WT_JS_START;
-echo 'var pastefield; function paste_id(value) {pastefield.value=value;}';
-echo WT_JS_END;
-
-$gencount=0;
+echo '<table><tr><td valign="top"><h2>', $controller->getPageTitle(), '</h2>';
 echo '</td><td width="50px">&nbsp;</td><td><form method="get" name="people" action="?">';
 echo '<input type="hidden" name="ged" value="', WT_GEDCOM, '">';
 echo '<input type="hidden" name="show_full" value="', $controller->show_full, '">';
@@ -68,7 +65,7 @@ echo '<input class="pedigree_form" type="text" id="rootid" name="rootid" size="3
 print_findindi_link("rootid", "");
 echo '</td>';
 echo '<td class="descriptionbox">';
-echo WT_I18N::translate('Box width'), help_link('box_width'), '</td>';
+echo WT_I18N::translate('Box width'), '</td>';
 echo '<td class="optionbox"><input type="text" size="3" name="box_width" value="', $controller->box_width, '">';
 echo '<b>%</b></td>';
 echo '<td rowspan="2" class="descriptionbox">';
@@ -117,36 +114,32 @@ if ($controller->show_full) {
 }
 echo '></td></tr></table></form>';
 echo '</td></tr></table>';
-if (is_null($controller->descPerson)) {
-	echo '<span class="error">', WT_I18N::translate('The requested GEDCOM record could not be found.  This could be caused by a link to an invalid person or by a corrupt GEDCOM file.'), '</span>';
+
+if ($controller->error_message) {
+	echo '<p class="ui-state-error">', $controller->error_message, '</p>';
+	exit;
 }
 
 switch ($controller->chart_style) {
 case 0: //-- list
-	if ($show_full==0) {
-		echo '<span class="details2">', WT_I18N::translate('Click on any of the boxes to get more information about that person.'), '</span><br><br>';
-	}
 	echo '<ul style="list-style: none; display: block;" id="descendancy_chart">';
-	$controller->print_child_descendancy($controller->descPerson, $controller->generations);
+	$controller->print_child_descendancy($controller->root, $controller->generations);
 	echo '</ul>';
 	break;
 case 1: //-- booklet
 	echo '<div id="descendancy_chart">';
-	if ($show_full==0) {
-		echo '<span class="details2">', WT_I18N::translate('Click on any of the boxes to get more information about that person.'), '</span><br><br>';
-	}
 	$show_cousins = true;
-	$controller->print_child_family($controller->descPerson, $controller->generations);
+	$controller->print_child_family($controller->root, $controller->generations);
 	echo '</div>';
 	break;
 case 2: //-- Individual list
-	$descendants=indi_desc($controller->descPerson, $controller->generations, array());
+	$descendants=indi_desc($controller->root, $controller->generations, array());
 	echo '<div id="descendancy-list">';
 	echo format_indi_table($descendants, WT_I18N::translate('Descendants of %s', $controller->name));
 	echo '</div>';
 	break;
 case 3: //-- Family list
-	$descendants=fam_desc($controller->descPerson, $controller->generations, array());
+	$descendants=fam_desc($controller->root, $controller->generations, array());
 	echo '<div id="descendancy-list">';
 	echo format_fam_table($descendants, WT_I18N::translate('Descendants of %s', $controller->name));
 	echo '</div>';

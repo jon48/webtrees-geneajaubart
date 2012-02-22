@@ -2,7 +2,7 @@
 // Online UI for editing site configuration variables
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team. All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_editconfig.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: admin_editconfig.php 13425 2012-02-11 14:49:47Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -32,60 +32,6 @@ require WT_ROOT.WT_MODULES_DIR.'googlemap/defaultconfig.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
 $action=safe_REQUEST($_REQUEST, 'action');
-
-function print_level_config_table($level) {
-	global $GM_MARKER_COLOR, $GM_MARKER_SIZE, $GM_PREFIX;
-	global $GM_POSTFIX, $GM_PRE_POST_MODE, $GM_MAX_NOF_LEVELS;
-?>
-	<div id="level<?php echo $level; ?>" style="display:<?php if ($GM_MAX_NOF_LEVELS >= $level) {echo "block";} else {echo "none";} ?>">
-		<table id="gm_levels">
-			<tr>
-				<th colspan="2">
-					<?php
-					if ($level==1) {
-						echo WT_I18N::translate('Country');
-					} else {
-						echo WT_I18N::translate('Level'), " ", $level;
-					}
-					?>
-				</th>
-			</tr>
-			<tr>
-				<td>
-					<?php echo WT_I18N::translate('Prefix'), help_link('GM_NAME_PREFIX','googlemap'); ?>
-				</td>
-				<td>
-					<input type="text" name="NEW_GM_PREFIX_<?php echo $level; ?>" value="<?php echo $GM_PREFIX[$level]; ?>" size="20">
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<?php echo WT_I18N::translate('Postfix'), help_link('GM_NAME_POSTFIX','googlemap'); ?>
-				</td>
-				<td>
-					<input type="text" name="NEW_GM_POSTFIX_<?php echo $level; ?>" value="<?php echo $GM_POSTFIX[$level]; ?>" size="20">
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<?php echo WT_I18N::translate('Prefix / Postfix order'), help_link('GM_NAME_PRE_POST','googlemap'); ?>
-				</td>
-				<td>
-					<select name="NEW_GM_PRE_POST_MODE_<?php echo $level; ?>" dir="ltr" onchange="showSelectedLevels()">
-						<option value="0"<?php if ($GM_PRE_POST_MODE[$level] == 0) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('No pre/postfix'); ?></option>
-						<option value="1"<?php if ($GM_PRE_POST_MODE[$level] == 1) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('Normal, prefix, postfix, both'); ?></option>
-						<option value="2"<?php if ($GM_PRE_POST_MODE[$level] == 2) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('Normal, postfix, prefix, both'); ?></option>
-						<option value="3"<?php if ($GM_PRE_POST_MODE[$level] == 3) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('Prefix, postfix, both, normal'); ?></option>
-						<option value="4"<?php if ($GM_PRE_POST_MODE[$level] == 4) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('Postfix, prefix, both, normal'); ?></option>
-						<option value="5"<?php if ($GM_PRE_POST_MODE[$level] == 5) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('Prefix, postfix, normal, both'); ?></option>
-						<option value="6"<?php if ($GM_PRE_POST_MODE[$level] == 6) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('Postfix, prefix, normal, both'); ?></option>
-					</select>
-				</td>
-			</tr>
-		</table>
-	</div>
-<?php
-}
 
 $controller=new WT_Controller_Base();
 $controller
@@ -113,7 +59,6 @@ if ($action=="update" && !isset($security_user)) {
 	set_module_setting('googlemap', 'GM_PRECISION_4',       $_POST['NEW_GM_PRECISION_4']);
 	set_module_setting('googlemap', 'GM_PRECISION_5',       $_POST['NEW_GM_PRECISION_5']);
 	set_module_setting('googlemap', 'GM_DEFAULT_TOP_VALUE', $_POST['NEW_GM_DEFAULT_TOP_LEVEL']);
-	set_module_setting('googlemap', 'GM_MAX_NOF_LEVELS',    $_POST['NEW_GM_LEVEL_COUNT']);
 	set_module_setting('googlemap', 'GM_COORD',             $_POST['NEW_GM_COORD']);
 	set_module_setting('googlemap', 'GM_PLACE_HIERARCHY',   $_POST['NEW_GM_PLACE_HIERARCHY']);
 	set_module_setting('googlemap', 'GM_PH_XSIZE',          $_POST['NEW_GM_PH_XSIZE']);
@@ -295,7 +240,7 @@ echo '<div id="tabs">',
 <div id="gm_advanced">
 <table class="gm_edit_config">
 	<tr>
-		<th><?php echo WT_I18N::translate('Precision of the latitude and longitude'), help_link('GOOGLEMAP_PRECISION','googlemap'); ?></th>
+		<th colspan="2"><?php echo WT_I18N::translate('Precision of the latitude and longitude'), help_link('GOOGLEMAP_PRECISION','googlemap'); ?></th>
 		<td>
 			<table>
 				<tr>
@@ -351,40 +296,47 @@ echo '<div id="tabs">',
 				</tr>
 			</table>
 		</td>
+		<td>&nbsp;</td>
 	</tr>
 	<tr>
-		<th><?php echo WT_I18N::translate('Default value for top-level'), help_link('GM_DEFAULT_LEVEL_0','googlemap'); ?></th>
+		<th colspan="2"><?php echo WT_I18N::translate('Default value for top-level'), help_link('GM_DEFAULT_LEVEL_0','googlemap'); ?></th>
 		<td><input type="text" name="NEW_GM_DEFAULT_TOP_LEVEL" value="<?php echo $GM_DEFAULT_TOP_VALUE; ?>" size="20"></td>
+		<td>&nbsp;</td>
 	</tr>
 	<tr>
-		<th><?php echo WT_I18N::translate('Number of levels'), help_link('GM_NOF_LEVELS','googlemap'); ?></th>
+		<th class="gm_prefix" colspan="4"><?php echo WT_I18N::translate('Configuration per level');?></th>
+	</tr>
+	<tr id="gm_level_titles">
+		<th>&nbsp;</th>
+		<th><?php echo WT_I18N::translate('Prefix'), help_link('GM_NAME_PREFIX','googlemap'); ?></th>
+		<th><?php echo WT_I18N::translate('Postfix'), help_link('GM_NAME_POSTFIX','googlemap'); ?></th>
+		<th><?php echo WT_I18N::translate('Prefix / Postfix order'), help_link('GM_NAME_PRE_POST','googlemap'); ?></th>
+	<?php for ($level=1; $level < 10; $level++) { ?>
+	<tr  class="gm_levels">
+		<th>
+			<?php 
+			if ($level==1) {
+				echo WT_I18N::translate('Country');
+			} else {
+				echo WT_I18N::translate('Level'), " ", $level;
+			}
+			?>
+		</th>
+		<td><input type="text" name="NEW_GM_PREFIX_<?php echo $level; ?>" value="<?php echo $GM_PREFIX[$level]; ?>"></td>
+		<td><input type="text" name="NEW_GM_POSTFIX_<?php echo $level; ?>" value="<?php echo $GM_POSTFIX[$level]; ?>"></td>
 		<td>
-			<select name="NEW_GM_LEVEL_COUNT" dir="ltr" onchange="showSelectedLevels()">
-				<option value="1"<?php if ($GM_MAX_NOF_LEVELS == 1) echo " selected=\"selected\""; ?>>1</option>
-				<option value="2"<?php if ($GM_MAX_NOF_LEVELS == 2) echo " selected=\"selected\""; ?>>2</option>
-				<option value="3"<?php if ($GM_MAX_NOF_LEVELS == 3) echo " selected=\"selected\""; ?>>3</option>
-				<option value="4"<?php if ($GM_MAX_NOF_LEVELS == 4) echo " selected=\"selected\""; ?>>4</option>
-				<option value="5"<?php if ($GM_MAX_NOF_LEVELS == 5) echo " selected=\"selected\""; ?>>5</option>
-				<option value="6"<?php if ($GM_MAX_NOF_LEVELS == 6) echo " selected=\"selected\""; ?>>6</option>
-				<option value="7"<?php if ($GM_MAX_NOF_LEVELS == 7) echo " selected=\"selected\""; ?>>7</option>
-				<option value="8"<?php if ($GM_MAX_NOF_LEVELS == 8) echo " selected=\"selected\""; ?>>8</option>
-				<option value="9"<?php if ($GM_MAX_NOF_LEVELS == 9) echo " selected=\"selected\""; ?>>9</option>
+			<select name="NEW_GM_PRE_POST_MODE_<?php echo $level; ?>" dir="ltr" onchange="showSelectedLevels()">
+				<option value="0"<?php if ($GM_PRE_POST_MODE[$level] == 0) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('No pre/postfix'); ?></option>
+				<option value="1"<?php if ($GM_PRE_POST_MODE[$level] == 1) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('Normal, prefix, postfix, both'); ?></option>
+				<option value="2"<?php if ($GM_PRE_POST_MODE[$level] == 2) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('Normal, postfix, prefix, both'); ?></option>
+				<option value="3"<?php if ($GM_PRE_POST_MODE[$level] == 3) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('Prefix, postfix, both, normal'); ?></option>
+				<option value="4"<?php if ($GM_PRE_POST_MODE[$level] == 4) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('Postfix, prefix, both, normal'); ?></option>
+				<option value="5"<?php if ($GM_PRE_POST_MODE[$level] == 5) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('Prefix, postfix, normal, both'); ?></option>
+				<option value="6"<?php if ($GM_PRE_POST_MODE[$level] == 6) echo ' selected="selected"'; ?>><?php echo WT_I18N::translate('Postfix, prefix, normal, both'); ?></option>
 			</select>
 		</td>
 	</tr>
-	<tr><th colspan="2"><?php echo WT_I18N::translate('Configuration per level'); ?></th></tr>
-	<tr><td colspan="2">
-		<table id="gm_levels">				
-		<?php
-			echo
-				'<tr><td>', print_level_config_table(1), '</td><td>', print_level_config_table(2), '</td></tr>',
-				'<tr><td>', print_level_config_table(3), '</td><td>', print_level_config_table(4), '</td></tr>',
-				'<tr><td>', print_level_config_table(5), '</td><td>', print_level_config_table(6), '</td></tr>',
-				'<tr><td>', print_level_config_table(7), '</td><td>', print_level_config_table(8), '</td></tr>',
-				'<tr><td>', print_level_config_table(9), '</td><td>&nbsp;</td></tr>';
-		?>
-		</table>
-	</td></tr>
+	<?php } ?>
 </table>
 </div>
 </div>

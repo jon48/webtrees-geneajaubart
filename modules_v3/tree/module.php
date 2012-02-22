@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13046 2011-12-13 10:24:32Z greg $
+// $Id: module.php 13144 2011-12-28 09:29:10Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -102,19 +102,15 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
     switch($mod_action) {
       case 'treeview':
 				global $controller;
-				$controller=new WT_Controller_Base();
+				$controller=new WT_Controller_Chart();
 
         $tvName = 'tv';
-        $rootid = safe_GET('rootid');
         $tv = new TreeView('tv');
 				ob_start();
-				$person=WT_Person::getInstance($rootid);
 
-				if (!$person) {
-					$person=$controller->getSignificantIndividual();
-				}
+				$person=$controller->getSignificantIndividual();
 
-				list($html, $js)=$tv->drawViewport($rootid, 4);
+				list($html, $js)=$tv->drawViewport($person->getXref(), 4);
 
 				$controller
 					->setPageTitle(WT_I18N::translate('Interactive tree of %s', $person->getFullName()))

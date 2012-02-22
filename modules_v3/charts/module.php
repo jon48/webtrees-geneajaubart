@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13109 2011-12-21 20:52:29Z greg $
+// $Id: module.php 13257 2012-01-17 07:36:53Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -56,6 +56,9 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 				}
 			}
 		}
+
+		// Override the request
+		$_GET['rootid']=$pid;
 
 		// Override GEDCOM configuration temporarily
 		if (isset($show_full)) $saveShowFull = $show_full;

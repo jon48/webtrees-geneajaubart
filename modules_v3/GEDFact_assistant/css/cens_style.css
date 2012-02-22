@@ -23,7 +23,7 @@
  *
  * @package webtrees
  * @subpackage GEDFact_assistant
- * @version $Id: cens_style.css 12424 2011-10-26 03:46:52Z nigel $
+ * @version $Id: cens_style.css 13231 2012-01-14 03:34:09Z nigel $
  */
  
 .cens_header {text-align:left; margin:5px; height:40px;}
@@ -37,7 +37,7 @@
 .cens_text {font-size:11px; text-align:left;}
 textarea#NOTE {font-size: 12px;height:250px; width:98.5%; overflow:auto;}
 .cens_header_left {float:left; font-weight:bold;}
-.cens_header_right {float: right;}
+.cens_header_right {float: right; width:50%;}
 .cens_sour_1 {width:100%; margin:0; padding:0;}
 .cens_sour_2 {clear:left;width:20%; float:left; margin-top:0.25em;}
 .cens_container input {padding:0;}

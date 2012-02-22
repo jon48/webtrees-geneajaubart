@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: branches.php 13060 2011-12-14 16:13:41Z greg $
+// $Id: branches.php 13166 2012-01-03 15:15:20Z lukasz $
 
 define('WT_SCRIPT_NAME', 'branches.php');
 require './includes/session.php';
@@ -63,7 +63,7 @@ if ($ENABLE_AUTOCOMPLETE) {
 	<table class="facts_table width50">
 		<tr>
 			<td class="descriptionbox">
-				<?php echo WT_Gedcom_Tag::getLabel('SURN'), help_link('surname'); ?></td>
+				<?php echo WT_Gedcom_Tag::getLabel('SURN'); ?></td>
 			<td class="optionbox">
 				<input type="text" name="surname" id="SURN" value="<?php echo $surn; ?>">
 				<input type="hidden" name="ged" id="ged" value="<?php echo $ged; ?>">
@@ -179,7 +179,7 @@ function print_fams($person, $famid=null) {
 			}
 		$txt .=
 			$spouse->getSexImage().
-			'<a class="'.$class.'" href="'.$spouse->getHtmlUrl().'">'.$spouse->getFullName().' </a>'.$spouse->getLifeSpan().' '.$sosa2;
+			' <a class="'.$class.'" href="'.$spouse->getHtmlUrl().'">'.$spouse->getFullName().'</a> '.$spouse->getLifeSpan().' '.$sosa2;
 		}
 		echo $txt;
 		echo '<ol>';

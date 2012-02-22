@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin.php 13129 2011-12-23 14:50:30Z greg $
+// $Id: admin.php 13416 2012-02-10 09:23:58Z greg $
 
 define('WT_SCRIPT_NAME', 'admin.php');
 
@@ -1276,7 +1276,17 @@ function old_paths() {
 		WT_ROOT.'themes/fab/images/fscreen.png',
 		WT_ROOT.'themes/minimal/images/fscreen.png',
 		WT_ROOT.'themes/webtrees/images/fscreen.png',
-		WT_ROOT.'themes/xenea/images/fscreen.png',
+		WT_ROOT.'themes/xenea/images/fscreen.png',		
+		// Removed in 1.2.7
+		WT_ROOT.'login_register.php',
+		WT_ROOT.'modules_v3/top10_givnnames/help_text.php',
+		WT_ROOT.'modules_v3/top10_surnames/help_text.php',
+		WT_ROOT.'themes/clouds/images/center.png',
+		WT_ROOT.'themes/colors/images/center.png',
+		WT_ROOT.'themes/fab/images/center.png',
+		WT_ROOT.'themes/minimal/images/center.png',
+		WT_ROOT.'themes/webtrees/images/center.png',
+		WT_ROOT.'themes/xenea/images/center.png',
 	);
 }
 

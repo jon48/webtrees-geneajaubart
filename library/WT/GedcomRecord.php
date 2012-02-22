@@ -2,7 +2,7 @@
 // Base class for all gedcom records
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: GedcomRecord.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: GedcomRecord.php 13395 2012-02-06 08:19:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -638,7 +638,7 @@ class WT_GedcomRecord {
 		}
 	}
 
-	// Get the three variants of the name
+	// Get variants of the name
 	public function getFullName() {
 		if ($this->canDisplayName()) {
 			$tmp=$this->getAllNames();
@@ -659,6 +659,43 @@ class WT_GedcomRecord {
 			return $all_names[$this->getSecondaryName()]['full'];
 		} else {
 			return null;
+		}
+	}
+	// create a short name for compact display on charts
+	public function getShortName() {
+		global $bwidth, $SHOW_HIGHLIGHT_IMAGES;
+		// Estimate number of characters that can fit in box. Calulates to 28 characters in webtrees theme, or 34 if no thumbnail used.
+		if ($SHOW_HIGHLIGHT_IMAGES) {
+			$char = intval(($bwidth-40)/6.5); 
+		} else {
+			$char = ($bwidth/6.5);
+		}
+		if ($this->canDisplayName()) {
+			$tmp=$this->getAllNames();
+			$givn = $tmp[$this->getPrimaryName()]['givn'];
+			$surn = $tmp[$this->getPrimaryName()]['surn'];
+			$new_givn = explode(' ', $givn);
+			$count_givn = count($new_givn);
+			$len_givn = utf8_strlen($givn);
+			$len_surn = utf8_strlen($surn);
+			$len = $len_givn + $len_surn;
+			$i = 1;
+			while ($len > $char && $i<=$count_givn) {
+				$new_givn[$count_givn-$i] = utf8_substr($new_givn[$count_givn-$i],0,1);
+				$givn = implode(' ', $new_givn);
+				$len_givn = utf8_strlen($givn);
+				$len = $len_givn + $len_surn;
+				$i++;
+			}
+			$max_surn = $char-$i*2;
+			if ($len_surn > $max_surn) {
+				$surn = substr($surn, 0, $max_surn).'...';
+				$len_surn = utf8_strlen($surn);
+			}			
+			$shortname =  check_NN($givn.' '.$surn);
+			return $shortname;
+		} else {
+			return WT_I18N::translate('Private');
 		}
 	}
 
@@ -694,9 +731,9 @@ class WT_GedcomRecord {
 			if (($event->getDate()->isOK() || $event->getPlace()) && $event->canShow()) {
 				switch ($style) {
 				case 1:
-					return '<br><em>'.$event->getLabel().' '.format_fact_date($event, $this, false, false).format_fact_place($event).'</em>';
+					return '<br><em>'.$event->getLabel().' '.format_fact_date($event, $this, false, false).' '.format_fact_place($event).'</em>';
 				case 2:
-					return '<dl><dt class="label">'.$event->getLabel().'</dt><dd class="field">'.format_fact_date($event, $this, false, false).format_fact_place($event).'</dd></dl>';
+					return '<dl><dt class="label">'.$event->getLabel().'</dt><dd class="field">'.format_fact_date($event, $this, false, false).' '.format_fact_place($event).'</dd></dl>';
 				}
 			}
 		}
@@ -937,39 +974,39 @@ class WT_GedcomRecord {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
-	// Get the last-change timestamp for this record - optionally wrapped in a
-	// link to ourself, sorting - used in recent changes table for time sorting
+	// Get the last-change timestamp for this record, either as a formatted string
+	// (for display) or as a unix timestamp (for sorting)
 	//////////////////////////////////////////////////////////////////////////////
-	public function LastChangeTimestamp($add_url, $sorting=false) {
-		global $DATE_FORMAT, $TIME_FORMAT;
-
+	public function LastChangeTimestamp($sorting=false) {
 		$chan = $this->getChangeEvent();
 
-		if (is_null($chan)) {
-			return '&nbsp;';
-		}
-
-		$d = $chan->getDate();
-		if (preg_match('/^(\d\d):(\d\d):(\d\d)/', get_gedcom_value('DATE:TIME', 2, $chan->getGedcomRecord(), '', false).':00', $match)) {
-			$sort=$d->MinJD().$match[1].$match[2].$match[3];
-			if ($sorting) return $sort;
-			$t=mktime($match[1], $match[2], $match[3]);
-			$text=strip_tags($d->Display(false, "{$DATE_FORMAT} - ", array()).date(str_replace('%', '', $TIME_FORMAT), $t));
+		if ($chan) {
+			// The record does have a CHAN event
+			$d = $chan->getDate()->MinDate();
+			if (preg_match('/^(\d\d):(\d\d):(\d\d)/', get_gedcom_value('DATE:TIME', 2, $chan->getGedcomRecord(), '', false).':00', $match)) {
+				$t=mktime((int)$match[1], (int)$match[2], (int)$match[3], (int)$d->Format('%n'), (int)$d->Format('%j'), (int)$d->Format('%Y'));
+			} else {
+				$t=mktime(0, 0, 0, (int)$d->MinDate()->Format('%n'), (int)$d->MinDate()->Format('%j'), (int)$d->MinDate()->Format('%Y'));
+			}
+			if ($sorting) {
+				return $t;
+			} else {
+				return strip_tags(format_timestamp($t));
+			}
 		} else {
-			$sort=$d->MinJD().'000000';
-			if ($sorting) return $sort;
-			$text=strip_tags($d->Display(false, "{$DATE_FORMAT}", array()));
+			// The record does not have a CHAN event
+			if ($sorting) {
+				return 0;
+			} else {
+				return '&nbsp;';
+			}
 		}
-		if ($add_url) {
-			$text='<a name="'.$sort.'" href="'.$this->getHtmlUrl().'">'.$text.'</a>';
-		}
-		return $text;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
 	// Get the last-change user for this record
 	//////////////////////////////////////////////////////////////////////////////
-	public function LastchangeUser() {
+	public function LastChangeUser() {
 		$chan = $this->getChangeEvent();
 
 		if (is_null($chan)) {

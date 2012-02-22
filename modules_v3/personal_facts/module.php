@@ -51,7 +51,7 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 	
 	// Implement WT_Module_Tab
 	public function getTabContent() {
-		global $FACT_COUNT, $EXPAND_RELATIVES_EVENTS, $controller;
+		global $EXPAND_RELATIVES_EVENTS, $controller;
 
 		/*if (isset($_COOKIE['row_rela'])) $EXPAND_RELATIVES_EVENTS = ($_COOKIE['row_rela']);
 		if (isset($_COOKIE['row_histo'])) $EXPAND_HISTO_EVENTS = ($_COOKIE['row_histo']);
@@ -89,20 +89,19 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 		}
 		$yetdied=false;
 		foreach ($indifacts as $fact) {
-			if (strstr(WT_EVENTS_DEAT, $fact->getTag()) && $fact->getParentObject()->getXref()==$controller->record->getXref()) {
+			if (strstr(WT_EVENTS_DEAT, $fact->getTag()) && $fact->getParentObject()->getXref()==$controller->record->getXref() ) {
 				$yetdied = true;
 			}
 			if (!is_null($fact->getFamilyId())) {
-				if (!$yetdied) {
+				if (!$yetdied || $fact->getTag()=='_TODO') {
 					print_fact($fact, $controller->record);
 				}
 			} else {
-				//$reftags = array ('CHAN', 'IDNO', 'RFN', 'AFN', 'REFN', 'RIN', '_UID');// list of tags used in "Extra information" sidebar module
+				// Reference information, such as CHAN, IDNO, RFN, AFN, REFN, RIN, _UID can be shown in the sidebar
 				if (!in_array($fact->getTag(), WT_Gedcom_Tag::getReferenceFacts()) || !array_key_exists('extra_info', WT_Module::getActiveSidebars())) {
 					print_fact($fact, $controller->record);
 				}
 			}
-			$FACT_COUNT++;
 		}
 		//-- new fact link
 		if ($controller->record->canEdit()) {

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_media.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: admin_media.php 13341 2012-02-01 08:57:14Z greg $
 
  /* TODO:
  * Add check for missing index.php files when creating a directory
@@ -88,11 +88,11 @@ function move_file($src, $dest) {
 
 	// sometimes thumbnail files are set to something like "images/media.gif", this ensures we do not move them
 	// check to make sure the src file is in the standard or protected media directories
-	if (preg_match("'^($MEDIA_FIREWALL_ROOTDIR)?$MEDIA_DIRECTORY'", $src)==0) {
+	if (strpos($src, $MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY)!==0 && strpos($src, $MEDIA_DIRECTORY)!==0) {
 		return false;
 	}
 	// check to make sure the dest file is in the standard or protected media directories
-	if (preg_match("'^($MEDIA_FIREWALL_ROOTDIR)?$MEDIA_DIRECTORY'", $dest)==0) {
+	if (strpos($dest, $MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY)!==0 && strpos($dest, $MEDIA_DIRECTORY)!==0) {
 		return false;
 	}
 
@@ -108,7 +108,7 @@ function move_file($src, $dest) {
 		echo '<div class="error">', WT_I18N::translate('Media file could not be moved.'), ' (', $src, ')</div>';
 		return false;
 	}
-	echo '<div>', WT_I18N::translate('Media file moved.'), ' (', $src, ')</div>';
+	echo '<div>', WT_I18N::translate('Media file moved.'), ' (', $src, ' - ', $dest, ')</div>';
 	return true;
 }
 
@@ -177,7 +177,7 @@ function move_files($path, $protect) {
 */
 function set_perms($path) {
 	global $MEDIA_FIREWALL_ROOTDIR, $MEDIA_DIRECTORY, $starttime, $operation_count;
-	if (preg_match("'^($MEDIA_FIREWALL_ROOTDIR)?$MEDIA_DIRECTORY'", $path."/")==0) {
+	if (strpos($path."/", $MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY)!==0 && strpos($path."/", $MEDIA_DIRECTORY)!==0) {
 		return false;
 	}
 	$timelimit=get_site_setting('MAX_EXECUTION_TIME');
@@ -280,7 +280,7 @@ function pasteid(id) {
 }
 
 function ilinkitem(mediaid, type) {
-	window.open('inverselink.php?mediaid='+mediaid+'&linkto='+type+'&'+sessionname+'='+sessionid, '_blank', 'top=50, left=50, width=570, height=650, resizable=1, scrollbars=1');
+	window.open('inverselink.php?mediaid='+mediaid+'&linkto='+type, '_blank', 'top=50, left=50, width=570, height=650, resizable=1, scrollbars=1');
 	return false;
 }
 

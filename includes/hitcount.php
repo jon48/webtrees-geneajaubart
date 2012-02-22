@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: hitcount.php 12882 2011-11-23 10:58:34Z greg $
+// $Id: hitcount.php 13428 2012-02-11 17:14:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -69,8 +69,8 @@ if ($page_parameter) {
 	)->execute(array(WT_GED_ID, WT_SCRIPT_NAME, $page_parameter))->fetchOne();
 
 	// Only record one hit per session
-	if ($page_parameter && empty($_SESSION['SESSION_PAGE_HITS'][WT_SCRIPT_NAME.$page_parameter])) {
-		$_SESSION['SESSION_PAGE_HITS'][WT_SCRIPT_NAME.$page_parameter]=true;
+	if ($page_parameter && empty($WT_SESSION->SESSION_PAGE_HITS[WT_SCRIPT_NAME.$page_parameter])) {
+		$WT_SESSION->SESSION_PAGE_HITS[WT_SCRIPT_NAME.$page_parameter]=true;
 		if (is_null($hitCount)) {
 			$hitCount=1;
 			WT_DB::prepare(

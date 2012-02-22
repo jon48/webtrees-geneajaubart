@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: config_data.php 11789 2011-06-12 09:24:50Z greg $
+// $Id: config_data.php 13164 2012-01-02 20:17:16Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -279,11 +279,11 @@ $level2_tags=array(
 		'DEAT',
 		'DIV',
 		'DIVF',
+		'DSCR',
 		'EDUC',
 		'EMIG',
 		'ENDL',
 		'ENGA',
-		'EVEN',
 		'EVEN',
 		'FCOM',
 		'GRAD',
@@ -299,7 +299,6 @@ $level2_tags=array(
 		'PROB',
 		'PROP',
 		'RELI',
-		'RESI',
 		'RESI',
 		'RETI',
 		'SLGC',
@@ -325,7 +324,6 @@ $level2_tags=array(
 		'BLES',
 		'BURI',
 		'CENS',
-		'CENS',
 		'CHR',
 		'CHRA',
 		'CONF',
@@ -338,7 +336,6 @@ $level2_tags=array(
 		'EMIG',
 		'ENDL',
 		'ENGA',
-		'EVEN',
 		'EVEN',
 		'FCOM',
 		'GRAD',
@@ -354,7 +351,6 @@ $level2_tags=array(
 		'PROB',
 		'PROP',
 		'RELI',
-		'RESI',
 		'RESI',
 		'RETI',
 		'SLGC',

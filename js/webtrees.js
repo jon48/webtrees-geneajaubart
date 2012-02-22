@@ -1,7 +1,7 @@
 // Common javascript functions
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: webtrees.js 12813 2011-11-19 14:18:05Z greg $
+// $Id: webtrees.js 13367 2012-02-02 22:33:45Z greg $
 
 if (!document.getElementById)	// Check if browser supports the getElementByID function
 {
@@ -32,7 +32,6 @@ if (!document.getElementById)	// Check if browser supports the getElementByID fu
 
 var helpWin;
 function helpPopup(which, mod) {
-	if (which==null) which = "help_contents_help";
 	if (mod!='') which=which+'&mod='+mod;
 	if ((!helpWin)||(helpWin.closed)) {
 		helpWin = window.open('help_text.php?help='+which,'_blank','left=50,top=50,width=500,height=320,resizable=1,scrollbars=1');
@@ -311,22 +310,22 @@ function getMouseXY(e) {
 }
 
 function edit_record(pid, linenum) {
-	window.open('edit_interface.php?action=edit&pid='+pid+'&linenum='+linenum+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=edit&pid='+pid+'&linenum='+linenum+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function edit_raw(pid) {
-	window.open('edit_interface.php?action=editraw&pid='+pid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=510,height=520,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=editraw&pid='+pid+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=510,height=520,resizable=1,scrollbars=1');
 	return false;
 }
 
 function edit_note(pid) {
-	window.open('edit_interface.php?action=editnote&pid='+pid+'&linenum=1&'+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=editnote&pid='+pid+'&linenum=1&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function edit_source(pid) {
-	window.open('edit_interface.php?action=editsource&pid='+pid+'&linenum=1&'+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=editsource&pid='+pid+'&linenum=1&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
@@ -335,7 +334,7 @@ function add_record(pid, fact) {
 	if (factfield) {
 		factvalue = factfield.options[factfield.selectedIndex].value;
 		if (factvalue == "OBJE") window.open('addmedia.php?action=showmediaform&linkid='+pid, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
-		else window.open('edit_interface.php?action=add&pid='+pid+'&fact='+factvalue+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+		else window.open('edit_interface.php?action=add&pid='+pid+'&fact='+factvalue+"&"+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	}
 	return false;
 }
@@ -344,78 +343,78 @@ function addClipboardRecord(pid, fact) {
 	factfield = document.getElementById(fact);
 	if (factfield) {
 		factvalue = factfield.options[factfield.selectedIndex].value;
-		window.open('edit_interface.php?action=paste&pid='+pid+'&fact='+factvalue.substr(10)+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+		window.open('edit_interface.php?action=paste&pid='+pid+'&fact='+factvalue.substr(10)+'&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	}
 	return false;
 }
 
 function add_new_record(pid, fact) {
-		window.open('edit_interface.php?action=add&pid='+pid+'&fact='+fact+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+		window.open('edit_interface.php?action=add&pid='+pid+'&fact='+fact+'&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function addnewchild(famid,gender) {
-	window.open('edit_interface.php?action=addchild&gender='+gender+'&famid='+famid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=addchild&gender='+gender+'&famid='+famid+'&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function addnewspouse(famid, famtag) {
-	window.open('edit_interface.php?action=addspouse&famid='+famid+'&famtag='+famtag+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=addspouse&famid='+famid+'&famtag='+famtag+'&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function addopfchild(pid, gender) {
-	window.open('edit_interface.php?action=addopfchild&pid='+pid+'&gender='+gender+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=addopfchild&pid='+pid+'&gender='+gender+'&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function addspouse(pid, famtag) {
-	window.open('edit_interface.php?action=addspouse&pid='+pid+'&famtag='+famtag+'&famid=new&'+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=addspouse&pid='+pid+'&famtag='+famtag+'&famid=new&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function linkspouse(pid, famtag) {
-	window.open('edit_interface.php?action=linkspouse&pid='+pid+'&famtag='+famtag+'&famid=new&'+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=linkspouse&pid='+pid+'&famtag='+famtag+'&famid=new&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function add_famc(pid) {
-	 window.open('edit_interface.php?action=addfamlink&pid='+pid+'&famtag=CHIL'+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	 window.open('edit_interface.php?action=addfamlink&pid='+pid+'&famtag=CHIL'+'&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function add_fams(pid, famtag) {
-	 window.open('edit_interface.php?action=addfamlink&pid='+pid+'&famtag='+famtag+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	 window.open('edit_interface.php?action=addfamlink&pid='+pid+'&famtag='+famtag+'&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function edit_name(pid, linenum) {
-	window.open('edit_interface.php?action=editname&pid='+pid+'&linenum='+linenum+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=editname&pid='+pid+'&linenum='+linenum+'&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function add_name(pid) {
-	window.open('edit_interface.php?action=addname&pid='+pid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=addname&pid='+pid+'&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function addnewparent(pid, famtag) {
-	window.open('edit_interface.php?action=addnewparent&pid='+pid+'&famtag='+famtag+'&famid=new'+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=addnewparent&pid='+pid+'&famtag='+famtag+'&famid=new'+'&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function addnewparentfamily(pid, famtag, famid) {
-	window.open('edit_interface.php?action=addnewparent&pid='+pid+'&famtag='+famtag+'&famid='+famid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=addnewparent&pid='+pid+'&famtag='+famtag+'&famid='+famid+'&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function reorder_children(famid) {
-	window.open('edit_interface.php?action=reorder_children&pid='+famid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=reorder_children&pid='+famid+'&'+'&accesstime='+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function reorder_families(pid) {
-	window.open('edit_interface.php?action=reorder_fams&pid='+pid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=reorder_fams&pid='+pid+"&"+"&accesstime="+accesstime, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
@@ -425,17 +424,17 @@ function chat(username) {
 }
 
 function reply(username, subject) {
-	window.open('message.php?to='+username+'&subject='+subject+"&"+sessionname+"="+sessionid, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('message.php?to='+username+'&subject='+subject, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function delete_message(id) {
-	window.open('message.php?action=delete&id='+id+"&"+sessionname+"="+sessionid, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('message.php?action=delete&id='+id, '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function change_family_members(famid) {
-	window.open('edit_interface.php?famid='+famid+"&"+sessionname+"="+sessionid+"&accesstime="+accesstime+"&action=changefamily", '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?famid='+famid+"&"+"&accesstime="+accesstime+"&action=changefamily", '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
@@ -544,7 +543,6 @@ function valid_date(datefield) {
 	}
 	datefield.value=datestr;
 }
-
 var oldheight = 0;
 var oldwidth = 0;
 var oldz = 0;
@@ -564,9 +562,19 @@ var oldiconsdislpay = 0;
 
 function expandbox(boxid, bstyle) {
 	if (big==1) {
+		if (document.getElementsByClassName) { // Check if browser supports the getElementByClassName function
+			if (compact_count.length>0) { // True only if compact chart
+				fontdef.style.display='none';
+			}
+		} 
 		restorebox(oldboxid, bstyle);
 		if (boxid==oldboxid) return true;
 	}
+	if (document.getElementsByClassName) {  // Check if browser supports the getElementByClassName function
+		compact_count = document.getElementsByClassName("compact_view");
+		ie8=0;
+	}   
+
 	url = window.location.toString();
 	divbox = document.getElementById("out-"+boxid);
 	inbox = document.getElementById("inout-"+boxid);
@@ -598,8 +606,8 @@ function expandbox(boxid, bstyle) {
 		oldz = parentbox.style.zIndex;
 		if (url.indexOf("descendancy.php")==-1) parentbox.style.zIndex='100';
 		if (bstyle!=2) {
-			divbox.style.width='350px';
-			diff = 350-parseInt(oldwidth);
+			divbox.style.width='300px';
+			diff = 300-parseInt(oldwidth);
 			if (famlinks) {
 				famleft = parseInt(famlinks.style.left);
 				famlinks.style.left = (famleft+diff)+"px";
@@ -614,10 +622,6 @@ function expandbox(boxid, bstyle) {
 		if (divleft<0) {
 			repositioned = 1;
 			divleft=0;
-		}
-		if (url.indexOf("pedigree.php")!=-1) {
-			if (textDirection=="ltr") parentbox.style.left=divleft+"px";
-			//else parentbox.style.right=divleft+"px";
 		}
 		divbox.style.height='auto';
 		if (inbox)
@@ -644,12 +648,15 @@ function expandbox(boxid, bstyle) {
 			inbox.style.display='none';
 		}
 
+		
+
 		if (inbox2) inbox2.style.display='none';
 
 		fontdef = document.getElementById("fontdef-"+boxid);
 		if (fontdef) {
 			oldfont = fontdef.className;
 			fontdef.className = 'detailsZoom';
+			fontdef.style.display='block';
 		}
 		namedef = document.getElementById("namedef-"+boxid);
 		if (namedef) {
@@ -810,10 +817,6 @@ function restorebox(boxid, bstyle) {
 			//if (parentbox!=divbox) parentbox.style.width = parseInt(parentbox.style.width)-diff;
 			//alert("here");
 			parentbox.style.zIndex=oldz;
-			if (url.indexOf("pedigree.php")!=-1) {
-				if (textDirection=="ltr") parentbox.style.left=oldleft+"px";
-				else parentbox.style.right=oldleft+"px";
-			}
 		}
 		if (inbox) inbox.style.display='none';
 		if (inbox2) inbox2.style.display='block';

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Lifespan.php 13118 2011-12-21 22:07:33Z greg $
+// $Id: Lifespan.php 13144 2011-12-28 09:29:10Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -522,6 +522,14 @@ class WT_Controller_Lifespan extends WT_Controller_Chart {
 						echo "<br>";
 					}
 			}
+		}
+	}
+
+	public function getSignificantIndividual() {
+		if ($this->people) {
+			return $this->people[0];
+		} else {
+			return parent::getSignificantIndividual();
 		}
 	}
 }

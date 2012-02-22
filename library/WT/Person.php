@@ -2,7 +2,7 @@
 // Class file for a person
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Person.php 13035 2011-12-12 13:12:42Z greg $
+// $Id: Person.php 13373 2012-02-03 07:57:43Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -1151,7 +1151,7 @@ class WT_Person extends WT_GedcomRecord {
 			foreach ($family->getSpouses() as $parent) {
 				if (strstr($SHOW_RELATIVES_EVENTS, '_DEAT'.($sosa==1 ? '_PARE' : '_GPAR'))) {
 					foreach ($parent->getAllFactsByType(explode('|', WT_EVENTS_DEAT)) as $sEvent) {
-						if (WT_Date::Compare($bDate, $sEvent->getDate())<=0 && WT_Date::Compare($sEvent->getDate(), $dDate)<=0) {
+						if ($sEvent->getDate()->isOK() && WT_Date::Compare($bDate, $sEvent->getDate())<=0 && WT_Date::Compare($sEvent->getDate(), $dDate)<=0) {
 							switch ($sosa) {
 							case 1:
 								// Convert the event to a close relatives event
@@ -1181,7 +1181,7 @@ class WT_Person extends WT_GedcomRecord {
 				foreach ($family->getSpouses() as $parent) {
 					foreach ($parent->getSpouseFamilies() as $sfamily) {
 						foreach ($sfamily->getAllFactsByType(explode('|', WT_EVENTS_MARR)) as $sEvent) {
-							if (WT_Date::Compare($bDate, $sEvent->getDate())<=0 && WT_Date::Compare($sEvent->getDate(), $dDate)<=0) {
+							if ($sEvent->getDate()->isOK() && WT_Date::Compare($bDate, $sEvent->getDate())<=0 && WT_Date::Compare($sEvent->getDate(), $dDate)<=0) {
 								if ($sfamily->equals($family)) {
 									if ($parent->getSex()=='F') {
 										// show current family marriage only once
@@ -1737,14 +1737,34 @@ class WT_Person extends WT_GedcomRecord {
 			$full="$full $NSFX";
 		}
 
-		// The NICK field might be present, but not appear in the NAME.
-		// Nicknames must be surrounded by spaces or standard quotation marks (ones with HTML entities)
-		if ($NICK && !preg_match('/(^| |"|«|“|\'|‹|‘)'.preg_quote($NICK, '/').'( |"|»|”|\'|›|’|$)/', $full)) {
-			$pos=strpos($full, '/');
-			if ($pos===false) {
-				$full.=' "'.$NICK.'"';
+		// GEDCOM nicknames should be specificied in a NICK field, or in the
+		// NAME filed, surrounded by ASCII quotes (or both).
+		if ($NICK) {
+			// NICK field found.  Add localised quotation marks.
+
+			// GREG 28/Jan/12 - these localised quotation marks apparantly cause problems with LTR names on RTL
+			// pages and vice-versa.  Just use straight ASCII quotes.  Keep the old code, so that we keep the
+			// translations.
+			if (false) {
+				$QNICK=/* I18N: Place a nickname in quotation marks */ WT_I18N::translate('“%s”', $NICK);
 			} else {
-				$full=substr($full, 0, $pos).'"'.$NICK.'" '.substr($full, $pos);
+				$QNICK='"'.$NICK.'"';
+			}
+
+			if (preg_match('/(^| |"|«|“|\'|‹|‘|„)'.preg_quote($NICK, '/').'( |"|»|”|\'|›|’|”|$)/', $full)) {
+				// NICK present in name.  Localise ASCII quotes (but leave others).
+				// GREG 28/Jan/12 - redundant - see comment above.
+				// $full=str_replace('"'.$NICK.'"', $QNICK, $full);
+			} else {
+				// NICK not present in NAME.
+				$pos=strpos($full, '/');
+				if ($pos===false) {
+					// No surname - append it
+					$full.=' '.$QNICK;
+				} else {
+					// Insert before surname
+					$full=substr($full, 0, $pos).$QNICK.' '.substr($full, $pos);
+				}
 			}
 		}
 

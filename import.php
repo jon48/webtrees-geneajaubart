@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: import.php 12975 2011-12-03 20:51:48Z greg $
+// $Id: import.php 13309 2012-01-24 23:22:50Z nigel $
 
 define('WT_SCRIPT_NAME', 'import.php');
 require './includes/session.php';
@@ -142,7 +142,7 @@ for ($end_time=microtime(true)+1.0; microtime(true)<$end_time; ) {
 			break;
 		case 'ANSI': // ANSI could be anything.  Most applications seem to treat it as latin1.
 			$controller->addInlineJavaScript(
-				'alert("', /* I18N: %1$s and %2$s are the names of character encodings, such as ISO-8859-1 or ASCII */ WT_I18N::translate('This GEDCOM is encoded using %1$s.  Assume this to mean %2$s.', $charset, 'ISO-8859-1'), '");'
+				'alert("'. /* I18N: %1$s and %2$s are the names of character encodings, such as ISO-8859-1 or ASCII */ WT_I18N::translate('This GEDCOM is encoded using %1$s.  Assume this to mean %2$s.', $charset, 'ISO-8859-1'). '");'
 			);
 		case 'WINDOWS':
 		case 'CP1252':

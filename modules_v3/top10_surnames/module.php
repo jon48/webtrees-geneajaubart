@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13109 2011-12-21 20:52:29Z greg $
+// $Id: module.php 13197 2012-01-06 12:55:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -85,9 +85,14 @@ class top10_surnames_WT_Module extends WT_Module implements WT_Module_Block {
 			$title='';
 		}
 
-		// I18N: There are separate lists of male/female names, containing %d names each
-		$title .= WT_I18N::plural('Top surname', 'Top %d surnames', $num, $num);
-		$title .= help_link('top_surnames', $this->getName());
+		if ($num==1) {
+			// I18N: i.e. most popular surname.
+			$title.=WT_I18N::translate('Top surname');
+		} else {
+			// I18N: Title for a list of the most common surnames, %s is a number.  Note that a separate translation exists when %s is 1
+			$title.=WT_I18N::plural('Top %s surname', 'Top %s surnames', $num, WT_I18N::number($num));
+		}
+
 		switch ($infoStyle) {
 		case 'tagcloud':
 			uksort($all_surnames,'utf8_strcasecmp');

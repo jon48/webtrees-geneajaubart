@@ -2,7 +2,7 @@
 // Standard theme
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 //
 // PNG Icons By:Alessandro Rei; License: GPL; http://www.kde-look.org/content/show.php/Dark-Glass+reviewed?content=67902
 //
-// $Id: theme.php 13045 2011-12-13 09:49:52Z greg $
+// $Id: theme.php 13414 2012-02-09 22:42:50Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -101,9 +101,6 @@ $WT_IMAGES=array(
 	'tree'=>WT_THEME_URL.'images/tree.png',
 	'warning'=>WT_THEME_URL.'images/warning.png',
 	'wiki'=>WT_THEME_URL.'images/w_22.png',
-	'itree'=>WT_THEME_URL.'images/tree.png',
-	// - Interactive Chart Icons
-	'center'=>WT_THEME_URL.'images/center.png',
 	'itree'=>WT_THEME_URL.'images/tree.png',
 
 	//- buttons for data entry pages
@@ -191,8 +188,8 @@ $bwidth=250;     // -- width of boxes on pedigree chart
 $bheight=80;     // -- height of boxes on pedigree chart
 $baseyoffset=10; // -- position the entire pedigree tree relative to the top of the page
 $basexoffset=10; // -- position the entire pedigree tree relative to the left of the page
-$bxspacing=0;    // -- horizontal spacing between boxes on the pedigree chart
-$byspacing=5;    // -- vertical spacing between boxes on the pedigree chart
+$bxspacing=10;    // -- horizontal spacing between boxes on the pedigree chart
+$byspacing=10;    // -- vertical spacing between boxes on the pedigree chart
 $brborder=1;     // -- box right border thickness
 
 // -- descendancy - relationship chart variables
@@ -200,10 +197,14 @@ $Dbaseyoffset=20; // -- position the entire descendancy tree relative to the top
 $Dbasexoffset=20; // -- position the entire descendancy tree relative to the left of the page
 $Dbxspacing=5;   // -- horizontal spacing between boxes
 $Dbyspacing=10;   // -- vertical spacing between boxes
-$Dbwidth=240;    // -- width of DIV layer boxes
-$Dbheight=70;    // -- height of DIV layer boxes
+$Dbwidth=260;    // -- width of DIV layer boxes
+$Dbheight=80;    // -- height of DIV layer boxes
 $Dindent=15;     // -- width to indent descendancy boxes
 $Darrowwidth=30; // -- additional width to include for the up arrows
+
+// -- Dimensions for compact version of chart displays
+$cbwidth=240;
+$cbheight=50;
 
 // --  The largest possible area for charts is 300,000 pixels. As the maximum height or width is 1000 pixels
 $WT_STATS_S_CHART_X=440;

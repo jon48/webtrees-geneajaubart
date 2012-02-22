@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: calendar.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: calendar.php 13335 2012-01-31 19:49:01Z nigel $
 
 define('WT_SCRIPT_NAME', 'calendar.php');
 require './includes/session.php';
@@ -107,7 +107,7 @@ $today_month=$today->Format('%O');
 // Invalid dates?  Go to monthly view, where they'll be found.
 if ($cal_date->d>$days_in_month && $action=='today')
 	$action='calendar';
-echo "<div>";
+echo '<div id="calendar-page">';
 
 // Calendar form
 echo '<form name="dateform" method="get" action="calendar.php">';
@@ -526,7 +526,7 @@ case 'calendar':
 	echo '</table>';
 	break;
 }
-echo '</div>';
+echo '</div>'; //close "calendar-page"
 
 /////////////////////////////////////////////////////////////////////////////////
 // Filter a list of facts

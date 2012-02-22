@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,14 +21,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: module.php 13299 2012-01-20 20:40:31Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Config {
+class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block, WT_Module_Config {
 	// Extend class WT_Module
 	public function getTitle() {
 		return /* I18N: Name of a module.  Abbreviation for "Frequently Asked Questions" */ WT_I18N::translate('FAQ');
@@ -370,7 +370,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 			foreach ($faqs as $faq) {
 				// NOTE: Print the position of the current item
 				echo '<tr class="faq_edit_pos"><td>';
-				echo WT_I18N::translate('Position item'), ': ', $faq->block_order, ', ';
+				echo WT_I18N::translate('Position item'), ': ', ($faq->block_order+1), ', ';
 				if ($faq->gedcom_id==null) {
 					echo WT_I18N::translate('All');
 				} else {
@@ -408,5 +408,29 @@ class faq_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_Conf
 			}
 			echo '</table>';
 		}
+	}
+
+	// Implement WT_Module_Menu
+	public function defaultMenuOrder() {
+		return 40;
+	}
+
+	// Implement WT_Module_Menu
+	public function getMenu() {
+		global $SEARCH_SPIDER;
+
+		if ($SEARCH_SPIDER) {
+			return null;
+		}
+
+		$menu = new WT_Menu(WT_I18N::translate('FAQ'), 'module.php?mod=faq&amp;mod_action=show', 'menu-help', 'down');
+		$menu->addIcon('menu_help');
+		$menu->addClass('menuitem', 'menuitem_hover', 'submenu', 'icon_large_help');
+
+		$submenu = new WT_Menu(WT_I18N::translate('FAQ'), 'module.php?mod=faq&amp;mod_action=show', 'menu-help-faq');
+		$submenu->addIcon('help');
+		$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_menu_help');
+		$menu->addSubmenu($submenu);
+		return $menu;
 	}
 }

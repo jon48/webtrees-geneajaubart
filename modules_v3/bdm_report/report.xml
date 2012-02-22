@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report>
-	<!-- $Id: report.xml 12084 2011-07-30 12:39:05Z lukasz $ -->
+	<!-- $Id: report.xml 13381 2012-02-04 08:56:29Z lukasz $ -->
 	<Title><var var="WT_I18N::translate('Vital records')" /></Title>
 	<Description><var var="WT_I18N::translate('A report of vital records for a given date or place.')" /></Description>
 	<Input name="name" lookup="NAME" type="text"><var var="WT_I18N::translate('Name')" /></Input>
@@ -149,7 +149,7 @@
 							<Gedcom id="@FAMS">
 								<if condition="$more==1">
 									<br />
-									---------------------------
+									________________________________
 									<br />
 								</if>
 								<!-- todo: print the dates, places and sources of all the FAM MARR records -->

@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: I18N.php 13096 2011-12-20 22:13:15Z greg $
+// $Id: I18N.php 13426 2012-02-11 14:51:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -159,10 +159,10 @@ class WT_I18N {
 		self::$dir=$TEXT_DIRECTION;
 
 		// I18N: This punctuation is used to separate lists of items.
-		self::$list_separator=WT_I18N::translate(', ');
+		self::$list_separator=self::translate(', ');
 
 		// I18N: This is the name of the MySQL collation that applies to your language.  A list is available at http://dev.mysql.com/doc/refman/5.0/en/charset-unicode-sets.html
-		self::$collation=WT_I18N::translate('utf8_unicode_ci');
+		self::$collation=self::translate('utf8_unicode_ci');
 
 		return $locale;
 	}
@@ -264,15 +264,19 @@ class WT_I18N {
 	// fr: 12 345,67
 	// de: 12.345,67
 	static public function number($n, $precision=0) {
-		if (is_numeric($n)) {
-			// Add "punctuation"
-			$n=Zend_Locale_Format::toNumber($n, array('locale'=>WT_LOCALE, 'precision'=>$precision));
-			// Convert digits.
-			if (WT_NUMBERING_SYSTEM!='latn') {
-				$n=Zend_Locale_Format::convertNumerals($n, 'latn', WT_NUMBERING_SYSTEM);
-			}
-		}
+		// Add "punctuation" and convert digits
+		$n=Zend_Locale_Format::toNumber($n, array('locale'=>WT_LOCALE, 'precision'=>$precision));
+		$n=self::digits($n);
 		return $n;
+	}
+	// Convert the digits 0-9 into the local script
+	// Used for years, etc., where we do not want thousands-separators, decimals, etc.
+	static public function digits($n) {
+		if (WT_NUMBERING_SYSTEM!='latn') {
+			return Zend_Locale_Format::convertNumerals($n, 'latn', WT_NUMBERING_SYSTEM);
+		} else {
+			return $n;
+		}
 	}
 
 	// Translate a fraction into a percentage.  e.g. 0.123 becomes
@@ -281,14 +285,12 @@ class WT_I18N {
 	// de: 12,3%
 	static public function percentage($n, $precision=0) {
 		return
- 			/* I18N: This is a percentage, such as "32.5%". "%s" is the number, "%%" is the percent symbol.  Some languages require a (non-breaking) space between the two, or a different symbol. */
-			WT_I18N::translate('%s%%', WT_I18N::number($n*100.0, $precision));
+			/* I18N: This is a percentage, such as "32.5%". "%s" is the number, "%%" is the percent symbol.  Some languages require a (non-breaking) space between the two, or a different symbol. */
+			self::translate('%s%%', self::number($n*100.0, $precision));
 	}
 
-
-
-	// echo WT_I18N::translate('Hello World!');
-	// echo WT_I18N::translate('The %s sat on the mat', 'cat');
+	// echo self::translate('Hello World!');
+	// echo self::translate('The %s sat on the mat', 'cat');
 	static public function translate(/* var_args */) {
 		$args=func_get_args();
 		if (WT_DEBUG_LANG) {
@@ -300,8 +302,8 @@ class WT_I18N {
 	}
 
 	// Context sensitive version of translate.
-	// echo WT_I18N::translate_c('NOMINATIVE', 'January');
-	// echo WT_I18N::translate_c('GENITIVE',   'January');
+	// echo self::translate_c('NOMINATIVE', 'January');
+	// echo self::translate_c('GENITIVE',   'January');
 	static public function translate_c(/* var_args */) {
 		$args=func_get_args();
 		if (WT_DEBUG_LANG) {
@@ -325,9 +327,9 @@ class WT_I18N {
 		return Zend_Registry::get('Zend_Translate')->_($string);
 	}
 
-	// echo WT_I18N::plural('There is an error', 'There are errors', $num_errors);
-	// echo WT_I18N::plural('There is one error', 'There are %d errors', $num_errors);
-	// echo WT_I18N::plural('There is %1$d %2$s cat', 'There are %1$d %2$s cats', $num, $num, $colour);
+	// echo self::plural('There is an error', 'There are errors', $num_errors);
+	// echo self::plural('There is one error', 'There are %s errors', $num_errors);
+	// echo self::plural('There is %1$d %2$s cat', 'There are %1$d %2$s cats', $num, $num, $colour);
 	static public function plural(/* var_args */) {
 		$args=func_get_args();
 		if (WT_DEBUG_LANG) {
@@ -346,37 +348,38 @@ class WT_I18N {
 	// Convert a GEDCOM age string into translated_text
 	// NB: The import function will have normalised this, so we don't need
 	// to worry about badly formatted strings
+	// NOTE: this function is not yet complete - eventually it will replace get_age_at_event()
 	static public function gedcom_age($string) {
 		switch ($string) {
 		case 'STILLBORN':
 			// I18N: Description of someone's age at an event.  e.g Died 14 Jan 1900 (stillborn)
-			return WT_I18N::translate('(stillborn)');
+			return self::translate('(stillborn)');
 		case 'INFANT':
 			// I18N: Description of someone's age at an event.  e.g Died 14 Jan 1900 (in infancy)
-			return WT_I18N::translate('(in infancy)');
+			return self::translate('(in infancy)');
 		case 'CHILD':
 			// I18N: Description of someone's age at an event.  e.g Died 14 Jan 1900 (in childhood)
-			return WT_I18N::translate('(in childhood)');
+			return self::translate('(in childhood)');
 		}
 		$age=array();
 		if (preg_match('/(\d+)y/', $string, $match)) {
 			// I18N: Part of an age string. e.g 5 years, 4 months and 3 days
 			$years=$match[1];
-			$age[]=WT_I18N::plural('%d year', '%d years', $years, $years);
+			$age[]=self::plural('%s year', '%s years', $years, self::number($years));
 		} else {
 			$years=-1;
 		}
 		if (preg_match('/(\d+)m/', $string, $match)) {
 			// I18N: Part of an age string. e.g 5 years, 4 months and 3 days
-			$age[]=WT_I18N::plural('%d month', '%d months', $match[1], $match[1]);
+			$age[]=self::plural('%s month', '%s months', $match[1], self::number($match[1]));
 		}
 		if (preg_match('/(\d+)w/', $string, $match)) {
 			// I18N: Part of an age string. e.g 7 weeks and 3 days
-			$age[]=WT_I18N::plural('%d week', '%d weeks', $match[1], $match[1]);
+			$age[]=self::plural('%s week', '%s weeks', $match[1], self::number($match[1]));
 		}
 		if (preg_match('/(\d+)d/', $string, $match)) {
 			// I18N: Part of an age string. e.g 5 years, 4 months and 3 days
-			$age[]=WT_I18N::plural('%d day', '%d days', $match[1], $match[1]);
+			$age[]=self::plural('%s day', '%s days', $match[1], self::number($match[1]));
 		}
 		// If an age is just a number of years, only show the number
 		if (count($age)==1 && $years>=0) {
@@ -385,48 +388,17 @@ class WT_I18N {
 		if ($age) {
 			if (!substr_compare($string, '<', 0, 1)) {
 				// I18N: Description of someone's age at an event.  e.g Died 14 Jan 1900 (aged less than 21 years)
-				return WT_I18N::translate('(aged less than %s)', $age);
+				return self::translate('(aged less than %s)', $age);
 			} elseif (!substr_compare($string, '>', 0, 1)) {
 				// I18N: Description of someone's age at an event.  e.g Died 14 Jan 1900 (aged more than 21 years)
-				return WT_I18N::translate('(aged more than %s)', $age);
+				return self::translate('(aged more than %s)', $age);
 			} else {
 				// I18N: Description of someone's age at an event.  e.g Died 14 Jan 1900 (aged 43 years)
-				return WT_I18N::translate('(aged %s)', $age);
+				return self::translate('(aged %s)', $age);
 			}
 		} else {
 			// Not a valid string?
-			return WT_I18N::translate('(aged %s)', $string);
-		}
-	}
-
-	// century name, English => 21st, Polish => XXI, etc.
-	static function century_name($century) {
-		if ($century<0) {
-			return str_replace(-$century, self::century_name(-$century), self::translate('%d B.C.', -$century));
-		}
-		switch ($century) {
-		case 21: return self::translate_c('CENTURY', '21st');
-		case 20: return self::translate_c('CENTURY', '20th');
-		case 19: return self::translate_c('CENTURY', '19th');
-		case 18: return self::translate_c('CENTURY', '18th');
-		case 17: return self::translate_c('CENTURY', '17th');
-		case 16: return self::translate_c('CENTURY', '16th');
-		case 15: return self::translate_c('CENTURY', '15th');
-		case 14: return self::translate_c('CENTURY', '14th');
-		case 13: return self::translate_c('CENTURY', '13th');
-		case 12: return self::translate_c('CENTURY', '12th');
-		case 11: return self::translate_c('CENTURY', '11th');
-		case 10: return self::translate_c('CENTURY', '10th');
-		case  9: return self::translate_c('CENTURY', '9th');
-		case  8: return self::translate_c('CENTURY', '8th');
-		case  7: return self::translate_c('CENTURY', '7th');
-		case  6: return self::translate_c('CENTURY', '6th');
-		case  5: return self::translate_c('CENTURY', '5th');
-		case  4: return self::translate_c('CENTURY', '4th');
-		case  3: return self::translate_c('CENTURY', '3rd');
-		case  2: return self::translate_c('CENTURY', '2nd');
-		case  1: return self::translate_c('CENTURY', '1st');
-		default: return ($century-1).'01-'.$century.'00';
+			return self::translate('(aged %s)', $string);
 		}
 	}
 
@@ -439,26 +411,26 @@ class WT_I18N {
 		$minute=60;
 
 		// TODO: Display two units (years+months), (months+days), etc.
-		// This requires "contexts".  i.e. "%d months" has a different translation
+		// This requires "contexts".  i.e. "%s months" has a different translation
 		// in different contexts.
 		// We must AVOID combining phrases to make sentences.
 		if ($seconds>$year) {
 			$years=floor($seconds/$year);
-			return WT_I18N::plural('%d year ago', '%d years ago', $years, $years);
+			return self::plural('%s year ago', '%s years ago', $years, self::number($years));
 		} elseif ($seconds>$month) {
 			$months=floor($seconds/$month);
-			return WT_I18N::plural('%d month ago', '%d months ago', $months, $months);
+			return self::plural('%s month ago', '%s months ago', $months, self::number($months));
 		} elseif ($seconds>$day) {
 			$days=floor($seconds/$day);
-			return WT_I18N::plural('%d day ago', '%d days ago', $days, $days);
+			return self::plural('%s day ago', '%s days ago', $days, self::number($days));
 		} elseif ($seconds>$hour) {
 			$hours=floor($seconds/$hour);
-			return WT_I18N::plural('%d hour ago', '%d hours ago', $hours, $hours);
+			return self::plural('%s hour ago', '%s hours ago', $hours, self::number($hours));
 		} elseif ($seconds>$minute) {
 			$minutes=floor($seconds/$minute);
-			return WT_I18N::plural('%d minute ago', '%d minutes ago', $minutes, $minutes);
+			return self::plural('%s minute ago', '%s minutes ago', $minutes, self::number($minutes));
 		} else {
-			return WT_I18N::plural('%d second ago', '%d seconds ago', $seconds, $seconds);
+			return self::plural('%s second ago', '%s seconds ago', $seconds, self::number($seconds));
 		}
 	}
 
@@ -472,11 +444,11 @@ class WT_I18N {
 		foreach ($lengths as $length) {
 			$length_menu.=
 				'<option value="'.$length.'">'.
-				($length==-1 ? /* I18N: listbox option, e.g. "10,25,50,100,all" */ WT_I18N::translate('All') : WT_I18N::number($length)).
+				($length==-1 ? /* I18N: listbox option, e.g. "10,25,50,100,all" */ self::translate('All') : self::number($length)).
 				'</option>';
 		}
 		$length_menu='<select>'.$length_menu.'</select>';
-		$length_menu=/* I18N: Display %s [records per page], %s is a placeholder for listbox containing numeric options */ WT_I18N::translate('Display %s', $length_menu);
+		$length_menu=/* I18N: Display %s [records per page], %s is a placeholder for listbox containing numeric options */ self::translate('Display %s', $length_menu);
 
 		// Which symbol is used for separating numbers into groups
 		$symbols = Zend_Locale_Data::getList(WT_LOCALE, 'symbols');
@@ -500,6 +472,19 @@ class WT_I18N {
 						.replace(/7/g, "'.utf8_substr($digits, 7, 1).'")
 						.replace(/8/g, "'.utf8_substr($digits, 8, 1).'")
 						.replace(/9/g, "'.utf8_substr($digits, 9, 1).'");
+    			},
+				"fnFormatNumber": function(iIn) {
+					return String(iIn)
+						.replace(/0/g, "'.utf8_substr($digits, 0, 1).'")
+						.replace(/1/g, "'.utf8_substr($digits, 1, 1).'")
+						.replace(/2/g, "'.utf8_substr($digits, 2, 1).'")
+						.replace(/3/g, "'.utf8_substr($digits, 3, 1).'")
+						.replace(/4/g, "'.utf8_substr($digits, 4, 1).'")
+						.replace(/5/g, "'.utf8_substr($digits, 5, 1).'")
+						.replace(/6/g, "'.utf8_substr($digits, 6, 1).'")
+						.replace(/7/g, "'.utf8_substr($digits, 7, 1).'")
+						.replace(/8/g, "'.utf8_substr($digits, 8, 1).'")
+						.replace(/9/g, "'.utf8_substr($digits, 9, 1).'");
     			}
 			';
 		}
@@ -507,23 +492,23 @@ class WT_I18N {
 		return
 			'"oLanguage": {'.
 			' "oPaginate": {'.
-			'  "sFirst":    "'./* I18N: button label, first page    */ WT_I18N::translate('first').'",'.
-			'  "sLast":     "'./* I18N: button label, last page     */ WT_I18N::translate('last').'",'.
-			'  "sNext":     "'./* I18N: button label, next page     */ WT_I18N::translate('next').'",'.
-			'  "sPrevious": "'./* I18N: button label, previous page */ WT_I18N::translate('previous').'"'.
+			'  "sFirst":    "'./* I18N: button label, first page    */ self::translate('first').'",'.
+			'  "sLast":     "'./* I18N: button label, last page     */ self::translate('last').'",'.
+			'  "sNext":     "'./* I18N: button label, next page     */ self::translate('next').'",'.
+			'  "sPrevious": "'./* I18N: button label, previous page */ self::translate('previous').'"'.
 			' },'.
-			' "sEmptyTable":     "'.WT_I18N::translate('No records to display').'",'.
-			' "sInfo":           "'./* I18N: %s are placeholders for numbers */ WT_I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_').'",'.
-			' "sInfoEmpty":      "'.WT_I18N::translate('Showing %1$s to %2$s of %3$s', 0, 0, 0).'",'.
-			' "sInfoFiltered":   "'./* I18N: %s is a placeholder for a number */ WT_I18N::translate('(filtered from %s total entries)', '_MAX_').'",'.
+			' "sEmptyTable":     "'.self::translate('No records to display').'",'.
+			' "sInfo":           "'./* I18N: %s are placeholders for numbers */ self::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_').'",'.
+			' "sInfoEmpty":      "'.self::translate('Showing %1$s to %2$s of %3$s', 0, 0, 0).'",'.
+			' "sInfoFiltered":   "'./* I18N: %s is a placeholder for a number */ self::translate('(filtered from %s total entries)', '_MAX_').'",'.
 			' "sInfoPostfix":    "",'.
 			' "sInfoThousands":  "'.$symbols['group'].'",'.
 			' "sLengthMenu":     "'.addslashes($length_menu).'",'.
-			' "sLoadingRecords": "'.WT_I18N::translate('Loading...').'",'.
-			' "sProcessing":     "'.WT_I18N::translate('Loading...').'",'.
-			' "sSearch":         "'.WT_I18N::translate('Filter').'",'.
+			' "sLoadingRecords": "'.self::translate('Loading...').'",'.
+			' "sProcessing":     "'.self::translate('Loading...').'",'.
+			' "sSearch":         "'.self::translate('Filter').'",'.
 			' "sUrl":            "",'.
-			' "sZeroRecords":    "'.WT_I18N::translate('No records to display').'"'.
+			' "sZeroRecords":    "'.self::translate('No records to display').'"'.
 			'}'.
 			$callback;
 	}

@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_manage.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: admin_trees_manage.php 13248 2012-01-16 12:21:42Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_manage.php');
 require './includes/session.php';
@@ -245,7 +245,6 @@ foreach ($gedcoms as $gedcom_id=>$gedcom_name) {
 			'</td>',
 			// delete
 			'<td><a href="', WT_SCRIPT_NAME, '?action=delete&amp;ged=', rawurlencode($gedcom_name), '" onclick="return confirm(\''.htmlspecialchars(WT_I18N::translate('Permanently delete the GEDCOM %s and all its settings?', $gedcom_name)),'\');">', WT_I18N::translate('Delete'), '</a>',
-			help_link('delete_gedcom'),
 			'</td></tr></table></td></tr></table><br>';
 	}
 }

@@ -104,9 +104,6 @@ $WT_IMAGES=array(
 	'warning'=>WT_THEME_URL.'images/warning.png',
 	'wiki'=>WT_THEME_URL.'images/w_22.png',
 	'itree'=>WT_THEME_URL.'images/tree.png',
-	// - Interactive Chart Icons
-	'center'=>WT_THEME_URL.'images/center.png',
-	'itree'=>WT_THEME_URL.'images/tree.png',
 
 	//- buttons for data entry pages
 	'button_addmedia'=>WT_THEME_URL.'images/buttons/addmedia.png',
@@ -225,8 +222,8 @@ $bwidth=250;     // -- width of boxes on pedigree chart
 $bheight=80;     // -- height of boxes on pedigree chart
 $baseyoffset=10; // -- position the entire pedigree tree relative to the top of the page
 $basexoffset=10; // -- position the entire pedigree tree relative to the left of the page
-$bxspacing=0;    // -- horizontal spacing between boxes on the pedigree chart
-$byspacing=5;    // -- vertical spacing between boxes on the pedigree chart
+$bxspacing=10;    // -- horizontal spacing between boxes on the pedigree chart
+$byspacing=10;    // -- vertical spacing between boxes on the pedigree chart
 $brborder=1;     // -- box right border thickness
 
 // -- descendancy - relationship chart variables
@@ -234,10 +231,14 @@ $Dbaseyoffset=20; // -- position the entire descendancy tree relative to the top
 $Dbasexoffset=20; // -- position the entire descendancy tree relative to the left of the page
 $Dbxspacing=5;   // -- horizontal spacing between boxes
 $Dbyspacing=10;   // -- vertical spacing between boxes
-$Dbwidth=240;    // -- width of DIV layer boxes
-$Dbheight=70;    // -- height of DIV layer boxes
+$Dbwidth=260;    // -- width of DIV layer boxes
+$Dbheight=80;    // -- height of DIV layer boxes
 $Dindent=15;     // -- width to indent descendancy boxes
 $Darrowwidth=30; // -- additional width to include for the up arrows
+
+// -- Dimensions for compact version of chart displays
+$cbwidth=240;
+$cbheight=50;
 
 // --  The largest possible area for charts is 300,000 pixels. As the maximum height or width is 1000 pixels
 $WT_STATS_S_CHART_X=440;

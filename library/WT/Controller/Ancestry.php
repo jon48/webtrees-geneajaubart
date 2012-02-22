@@ -2,7 +2,7 @@
 // Controller for the ancestry chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Ancestry.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: Ancestry.php 13387 2012-02-05 15:40:35Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -43,14 +43,13 @@ class WT_Controller_Ancestry extends WT_Controller_Chart {
 	var $cellwidth;
 
 	function __construct() {
-		global $USE_RIN, $MAX_ALIVE_AGE, $GEDCOM, $bwidth, $bheight, $pbwidth, $pbheight, $PEDIGREE_FULL_DETAILS, $MAX_DESCENDANCY_GENERATIONS;
+		global $USE_RIN, $MAX_ALIVE_AGE, $GEDCOM, $bwidth, $bheight, $cbwidth, $cbheight, $pbwidth, $pbheight, $PEDIGREE_FULL_DETAILS, $MAX_DESCENDANCY_GENERATIONS;
 		global $DEFAULT_PEDIGREE_GENERATIONS, $PEDIGREE_GENERATIONS, $MAX_PEDIGREE_GENERATIONS, $OLD_PGENS, $box_width, $Dbwidth, $Dbheight;
 		global $show_full;
 
 		parent::__construct();
 
 		// Extract form parameters
-		$this->rootid        =safe_GET_xref('rootid');
 		$this->show_full     =safe_GET('show_full',    array('0', '1'), $PEDIGREE_FULL_DETAILS);
 		$this->show_cousins  =safe_GET('show_cousins', array('0', '1'), '0');
 		$this->chart_style   =safe_GET_integer('chart_style',          0, 3, 0);
@@ -68,24 +67,23 @@ class WT_Controller_Ancestry extends WT_Controller_Chart {
 		$bwidth=$Dbwidth;
 		$bheight=$Dbheight;
 		
-		// -- adjust size of the non-detailed boxes
+		// -- adjust size of the compact box
 		if (!$this->show_full) {
-			$bwidth = $bwidth / 1.5;
-			$bheight = $bheight / 2 ;
+			$bwidth = $cbwidth;
+			$bheight = $cbheight;
 		}
 
 		$pbwidth = $bwidth+12;
 		$pbheight = $bheight+14;
 
-		$this->ancestry = WT_Person::getInstance($this->rootid);
-		if (!$this->ancestry) {
-			$this->ancestry=$this->getSignificantIndividual();
-			$this->rootid=$this->ancestry->getXref();
+		if ($this->root && $this->root->canDisplayName()) {
+			$this->setPageTitle(
+				/* I18N: %s is a person's name */
+				WT_I18N::translate('Ancestors of %s', $this->root->getFullName())
+			);
+		} else {
+			$this->setPageTitle(WT_I18N::translate('Ancestors'));
 		}
-		$this->name     = $this->ancestry->getFullName();
-		$this->addname  = $this->ancestry->getAddName();
-
-		$this->setPageTitle(/* I18N: %s is a person's name */ WT_I18N::translate('Ancestors of %s', $this->name));
 
 		if (strlen($this->name)<30) $this->cellwidth="420";
 		else $this->cellwidth=(strlen($this->name)*14);
@@ -121,7 +119,7 @@ class WT_Controller_Ancestry extends WT_Controller_Chart {
 		echo '</td>';
 		echo '<td>';
 		if ($sosa>1) {
-			print_url_arrow($pid, "?rootid={$pid}&amp;PEDIGREE_GENERATIONS={$OLD_PGENS}&amp;show_full={$this->show_full}&amp;box_width={$box_width}&amp;chart_style={$this->chart_style}", $label, 3);
+			print_url_arrow($pid, '?rootid='.$pid.'&amp;PEDIGREE_GENERATIONS='.$OLD_PGENS.'&amp;show_full='.$this->show_full.'&amp;box_width='.$box_width.'&amp;chart_style='.$this->chart_style.'&amp;ged='.WT_GEDURL, $label, 3);
 		}
 		echo '</td>';
 		echo '<td class="details1">&nbsp;<span dir="ltr" class="person_box'. (($sosa==1)?'NN':(($sosa%2)?'F':'')) . '">&nbsp;', $sosa, '&nbsp;</span>&nbsp;';

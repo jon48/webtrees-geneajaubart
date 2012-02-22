@@ -2,7 +2,7 @@
 // Show help text in a popup window.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // This file also serves as a database of fact and label descriptions,
 // allowing them to be discovered by xgettext, so we may use them dynamically
@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: help_text.php 13066 2011-12-14 21:12:57Z greg $
+// $Id: help_text.php 13418 2012-02-10 10:17:15Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -45,6 +45,8 @@ switch ($help) {
 	// text.  These are only used for translating labels.
 	//
 	// Tags such as _BIRT_CHIL are pseudo-tags, used to create family events.
+	//
+	// Generally, these tags need to be lists explicitly in add_simple_tag()
 	//////////////////////////////////////////////////////////////////////////////
 
 case 'ABBR':
@@ -57,117 +59,14 @@ case 'ADDR':
 	$text=WT_I18N::translate('Enter the address into the field just as you would write it on an envelope.<br /><br />Leave this field blank if you do not want to include an address.');
 	break;
 
-case 'ADR1':
-	$title=WT_Gedcom_Tag::getLabel('ADR1');
-	$text='';
-	break;
-
-case 'ADR2':
-	$title=WT_Gedcom_Tag::getLabel('ADR2');
-	$text='';
-	break;
-
-case 'ADOP':
-	$title=WT_Gedcom_Tag::getLabel('ADOP');
-	$text=''; //('Pertaining to creation of a legally approved child-parent relationship that does not exist biologically.');
-	break;
-
-case 'AFN':
-	$title=WT_Gedcom_Tag::getLabel('AFN');
-	$text=''; //('A unique permanent record file number of an individual record stored in Ancestral File.');
-	break;
-
-case 'AGE':
-	$title=WT_Gedcom_Tag::getLabel('AGE');
-	$text=''; //('The age of the individual at the time an event occurred, or the age listed in the document.');
-	break;
-
 case 'AGNC':
 	$title=WT_Gedcom_Tag::getLabel('AGNC');
 	$text=WT_I18N::translate('The organization, institution, corporation, person, or other entity that has authority.<br /><br />For example, an employer of a person, or a church that administered rites or events, or an organization responsible for creating and/or archiving records.');
 	break;
 
-case 'ALIA':
-	$title=WT_Gedcom_Tag::getLabel('ALIA');
-	$text=''; //('An indicator to link different record descriptions of a person who may be the same person.');
-	break;
-
-case 'ANCE':
-	$title=WT_Gedcom_Tag::getLabel('ANCE');
-	$text=''; //('Pertaining to forbearers of an individual.');
-	break;
-
-case 'ANCI':
-	$title=WT_Gedcom_Tag::getLabel('ANCI');
-	$text=''; //('Indicates an interest in additional research for ancestors of this individual.');
-	break;
-
-case 'ANUL':
-	$title=WT_Gedcom_Tag::getLabel('ANUL');
-	$text=''; //('Declaring a marriage void from the beginning (never existed).');
-	break;
-
 case 'ASSO':
 	$title=WT_Gedcom_Tag::getLabel('ASSO');
 	$text=WT_I18N::translate('Enter associate GEDCOM ID.');
-	break;
-
-case 'AUTH':
-	$title=WT_Gedcom_Tag::getLabel('AUTH');
-	$text=''; //('The name of the individual who created or compiled information.');
-	break;
-
-case 'BAPL':
-	$title=WT_Gedcom_Tag::getLabel('BAPL');
-	$text=''; //('The event of baptism performed at age eight or later by priesthood authority of the LDS Church.');
-	break;
-
-case 'BAPM':
-	$title=WT_Gedcom_Tag::getLabel('BAPM');
-	$text=''; //('The event of baptism, performed in infancy or later.');
-	// I omitted "(not LDS)" since many people choose to use this
-	// for all baptisms, rather than treat LDS as a special case.
-	// (Wes Groleau)
-	break;
-
-case 'BARM':
-	$title=WT_Gedcom_Tag::getLabel('BARM');
-	$text=''; //('The ceremonial event held when a Jewish boy reaches age 13.');
-	break;
-
-case 'BASM':
-	$title=WT_Gedcom_Tag::getLabel('BASM');
-	$text=''; //('The ceremonial event held when a Jewish girl reaches age 13, also known as "Bat Mitzvah."');
-	break;
-
-case 'BIRT':
-	$title=WT_Gedcom_Tag::getLabel('BIRT');
-	$text=''; //('The event of entering into life.');
-	break;
-
-case 'BLES':
-	$title=WT_Gedcom_Tag::getLabel('BLES');
-	$text=''; //('A religious event of bestowing divine care or intercession.  'Sometimes given in connection with a naming ceremony.');
-	break;
-
-case 'BLOB':
-	$title=WT_Gedcom_Tag::getLabel('BLOB');
-	$text=''; //('"Binary Large OBject"--No longer used in GEDCOM 5.5.1');
-	break;
-
-case 'BURI':
-	$title=WT_Gedcom_Tag::getLabel('BURI');
-	$text=''; //('The event of the proper disposing of the mortal remains of a deceased person.');
-	break;
-
-case 'CALN':
-	$title=WT_Gedcom_Tag::getLabel('CALN');
-	$text=''; //('The number used by a repository to identify the specific items in its collections.');
-	break;
-
-case 'CAST':
-	$title=WT_Gedcom_Tag::getLabel('CAST');
-	$text=''; //('The name of an individual\'s rank or status in society which is sometimes based on racial or religious differences, or differences in wealth, inherited rank, profession, occupation, etc.');
 	break;
 
 case 'CAUS':
@@ -178,98 +77,6 @@ case 'CAUS':
 case 'CEME':
 	$title=WT_Gedcom_Tag::getLabel('Cemetery');
 	$text=WT_I18N::translate('Enter the name of the cemetery or other resting place where individual is buried.');
-	break;
-
-case 'CENS':
-	$title=WT_Gedcom_Tag::getLabel('CENS');
-	$text=''; //('The event of the periodic count of the population for a designated locality, such as a national or state Census.');
-	break;
-
-case 'CHAN':
-	$title=WT_Gedcom_Tag::getLabel('CHAN');
-	$text=''; //('Indicates a change, correction, or modification. Typically used in connection with a DATE to specify when a change in information occurred.');
-	break;
-
-case 'CHAR':
-	$title=WT_Gedcom_Tag::getLabel('CHAR');
-	$text=''; //('An indicator of the character set used in writing this automated information.');
-	break;
-
-case 'CHIL':
-	$title=WT_Gedcom_Tag::getLabel('CHIL');
-	$text=''; //('The natural, adopted, or sealed (LDS) child of a father and a mother.');
-	break;
-
-case 'CHR':
-	$title=WT_Gedcom_Tag::getLabel('CHR');
-	$text=''; //('The religious event of baptizing and/or naming a child.');
-	break;
-
-case 'CHRA':
-	$title=WT_Gedcom_Tag::getLabel('CHRA');
-	$text=''; //('The religious event of baptizing and/or naming an adult person.');
-	break;
-
-case 'CITN':
-	// This tag is not in the 5.5.1 spec
-	$title=WT_Gedcom_Tag::getLabel('CITN');
-	$text='';
-	break;
-
-case 'CITY':
-	$title=WT_Gedcom_Tag::getLabel('CITY');
-	$text=''; //('A lower level jurisdictional unit. Normally an incorporated municipal unit.');
-	break;
-
-case 'COMM':
-	// This tag is not in the 5.5.1 spec
-	$title=WT_Gedcom_Tag::getLabel('COMM');
-	$text='';
-	break;
-
-case 'CONC':
-	$title=WT_Gedcom_Tag::getLabel('CONC');
-	$text=''; //('An indicator that additional data belongs to the superior value.  The information from the CONC value is to be connected to the value of the superior preceding line without a space and without a carriage return and/or new line character.  Values that are split for a CONC tag must always be split at a non- space.  If the value is split on a space the space will be lost when concatenation takes place.  This is because of the treatment that spaces get as a GEDCOM delimiter, many GEDCOM values are trimmed of trailing spaces and some systems look for the first non-space starting after the tag to determine the beginning of the value.');
-	break;
-
-case 'CONT':
-	$title=WT_Gedcom_Tag::getLabel('CONT');
-	$text=''; //('An indicator that additional data belongs to the superior value.  The information from the CONT value is to be connected to the value of the superior preceding line with a carriage return and/or new line character.  Leading spaces could be important to the formatting of the resultant text.  When importing values from CONT lines the reader should assume only one delimiter character following the CONT tag.  Assume that the rest of the leading spaces are to be a part of the value.');
-	break;
-
-case 'CONF':
-	$title=WT_Gedcom_Tag::getLabel('CONF');
-	$text=''; //('The religious event of conferring the gift of the Holy Ghost and, among protestants, full church membership.');
-	break;
-
-case 'CONL':
-	$title=WT_Gedcom_Tag::getLabel('CONL');
-	$text=''; //('The religious event by which a person receives membership in the LDS Church.');
-	break;
-
-case 'COPR':
-	$title=WT_Gedcom_Tag::getLabel('COPR');
-	$text=''; //('A statement that accompanies data to protect it from unlawful duplication and distribution.');
-	break;
-
-case 'CORP':
-	$title=WT_Gedcom_Tag::getLabel('CORP');
-	$text=''; //('A name of an institution, agency, corporation, or company.');
-	break;
-
-case 'CREM':
-	$title=WT_Gedcom_Tag::getLabel('CREM');
-	$text=''; //('Disposal of the remains of a person\'s body by fire.');
-	break;
-
-case 'CTRY':
-	$title=WT_Gedcom_Tag::getLabel('CTRY');
-	$text=''; //('The name or code of the country.');
-	break;
-
-case 'DATA':
-	$title=WT_Gedcom_Tag::getLabel('DATA');
-	$text=''; //('Pertaining to stored automated information.');
 	break;
 
 case 'DATE':
@@ -452,46 +259,6 @@ case 'DATE':
 		'</table>';
 	break;
 
-case 'DEAT':
-	$title=WT_Gedcom_Tag::getLabel('DEAT');
-	$text=''; //('The event when mortal life terminates.');
-	break;
-
-case 'DESC':
-	$title=WT_Gedcom_Tag::getLabel('DESC');
-	$text=''; //('Pertaining to offspring of an individual.');
-	break;
-
-case 'DESI':
-	$title=WT_Gedcom_Tag::getLabel('DESI');
-	$text=''; //('Indicates an interest in research to identify additional descendants of this individual.');
-	break;
-
-case 'DEST':
-	$title=WT_Gedcom_Tag::getLabel('DEST');
-	$text=''; //('A system receiving data.');
-	break;
-
-case 'DIV':
-	$title=WT_Gedcom_Tag::getLabel('DIV');
-	$text=''; //('An event of dissolving a marriage through civil action.');
-	break;
-
-case 'DIVF':
-	$title=WT_Gedcom_Tag::getLabel('DIVF');
-	$text=''; //('An event of filing for a divorce by a spouse.');
-	break;
-
-case 'DSCR':
-	$title=WT_Gedcom_Tag::getLabel('DSCR');
-	$text=''; //('The physical characteristics of a person, place, or thing.');
-	break;
-
-case 'EDUC':
-	$title=WT_Gedcom_Tag::getLabel('EDUC');
-	$text=''; //('Indicator of a level of education attained.');
-	break;
-
 case 'EMAI':
 case 'EMAIL':
 case 'EMAL':
@@ -500,69 +267,9 @@ case '_EMAIL':
 	$text=WT_I18N::translate('Enter the email address.<br /><br />An example email address looks like this: <b>name@hotmail.com</b>  Leave this field blank if you do not want to include an email address.');
 	break;
 
-case 'EMIG':
-	$title=WT_Gedcom_Tag::getLabel('EMIG');
-	$text=''; //('An event of leaving one\'s homeland with the intent of residing elsewhere.');
-	break;
-
-case 'ENDL':
-	$title=WT_Gedcom_Tag::getLabel('ENDL');
-	$text=''; //('A religious event where an endowment ordinance for an individual was performed by priesthood authority in an LDS temple.');
-	break;
-
-case 'ENGA':
-	$title=WT_Gedcom_Tag::getLabel('ENGA');
-	$text=''; //('An event of recording or announcing an agreement between two people to become married.');
-	break;
-
-case 'EVEN':
-	$title=WT_Gedcom_Tag::getLabel('EVEN');
-	$text=''; //('Pertaining to a noteworthy happening related to an individual, a group, or an organization.  An EVENt structure is usually qualified or classified by a subordinate use of the TYPE tag.');
-	break;
-
-case 'FACT':
-	$title=WT_Gedcom_Tag::getLabel('FACT');
-	$text=''; //('Pertaining to a noteworthy attribute or fact concerning an individual, a group, or an organization.  A FACT structure is usually qualified or classified by a subordinate use of the TYPE tag.');
-	break;
-
-case 'FAM':
-	$title=WT_Gedcom_Tag::getLabel('FAM');
-	$text=''; //('Identifies a legal, common law, or other customary relationship of man and woman and their children, if any, or a family created by virtue of the birth of a child to its biological father and mother.');
-	break;
-
-case 'FAMC':
-	$title=WT_Gedcom_Tag::getLabel('FAMC');
-	$text=''; //('Identifies the family in which an individual appears as a child.');
-	break;
-
-case 'FAMF':
-	$title=WT_Gedcom_Tag::getLabel('FAMF');
-	$text=''; //('Pertaining to, or the name of, a family file. Names stored in a file that are assigned to a family for doing temple ordinance work.');
-	break;
-
-case 'FAMS':
-	$title=WT_Gedcom_Tag::getLabel('FAMS');
-	$text=''; //('Identifies the family in which an individual appears as a spouse.');
-	break;
-
 case 'FAX':
 	$title=WT_Gedcom_Tag::getLabel('FAX');
 	$text=WT_I18N::translate('Enter the FAX number including the country and area code.<br /><br />Leave this field blank if you do not want to include a FAX number.  For example, a number in Germany might be +49 25859 56 76 89 and a number in USA or Canada might be +1 888 555-1212.');
-	break;
-
-case 'FCOM':
-	$title=WT_Gedcom_Tag::getLabel('FCOM');
-	$text=''; //('A religious rite, the first act of sharing in the Lord\'s supper as part of church worship.');
-	break;
-
-case 'FILE':
-	$title=WT_Gedcom_Tag::getLabel('FILE');
-	$text=''; //('This is the most important field in the multimedia object record.  It indicates which file to use.  At the very minimum, you need to enter the file\'s name.  Depending on your settings, more information about the file\'s location may be helpful.<br /><br />You can use the <b>Find Media</b> link to help you locate media items that have already been uploaded to the site.');
-	break;
-
-case 'FONE':
-	$title=WT_Gedcom_Tag::getLabel('FONE');
-	$text=''; //('A phonetic variation of a superior text string');
 	break;
 
 case 'FORM':
@@ -570,124 +277,9 @@ case 'FORM':
 	$text=WT_I18N::translate('This is an optional field that can be used to enter the file format of the multimedia object.  Some genealogy programs may look at this field to determine how to handle the item.  However, since media do not transfer across computer systems very well, this field is not very important.');
 	break;
 
-case 'GEDC':
-	$title=WT_Gedcom_Tag::getLabel('GEDC');
-	$text=''; //('Information about the use of GEDCOM in a transmission.');
-	break;
-
 case 'GIVN':
 	$title=WT_Gedcom_Tag::getLabel('GIVN');
 	$text=WT_I18N::translate('In this field you should enter the given names for the person.  As an example, in the name "John Robert Finlay", the given names that should be entered here are "John Robert"');
-	break;
-
-case 'GRAD':
-	$title=WT_Gedcom_Tag::getLabel('GRAD');
-	$text=''; //('An event of awarding educational diplomas or degrees to individuals.');
-	break;
-
-case 'HEAD':
-	$title=WT_Gedcom_Tag::getLabel('HEAD');
-	$text=''; //('Identifies information pertaining to an entire GEDCOM transmission.');
-	break;
-
-case 'HUSB':
-	$title=WT_Gedcom_Tag::getLabel('HUSB');
-	$text=''; //('An individual in the family role of a married man or father.');
-	break;
-
-case 'IDNO':
-	$title=WT_Gedcom_Tag::getLabel('IDNO');
-	$text='';
-	break;
-
-case 'IMMI':
-	$title=WT_Gedcom_Tag::getLabel('IMMI');
-	$text='';
-	break;
-
-case 'INDI':
-	$title=WT_Gedcom_Tag::getLabel('INDI');
-	$text='';
-	break;
-
-case 'INFL':
-	$title=WT_Gedcom_Tag::getLabel('INFL');
-	$text='';
-	break;
-
-case 'LANG':
-	$title=WT_Gedcom_Tag::getLabel('LANG');
-	$text='';
-	break;
-
-case 'LATI':
-	$title=WT_Gedcom_Tag::getLabel('LATI');
-	$text='';
-	break;
-
-case 'LEGA':
-	$title=WT_Gedcom_Tag::getLabel('LEGA');
-	$text='';
-	break;
-
-case 'LONG':
-	$title=WT_Gedcom_Tag::getLabel('LONG');
-	$text='';
-	break;
-
-case 'MAP':
-	$title=WT_Gedcom_Tag::getLabel('MAP');
-	$text='';
-	break;
-
-case 'MARB':
-	$title=WT_Gedcom_Tag::getLabel('MARB');
-	$text='';
-	break;
-
-case 'MARC':
-	$title=WT_Gedcom_Tag::getLabel('MARC');
-	$text='';
-	break;
-
-case 'MARL':
-	$title=WT_Gedcom_Tag::getLabel('MARL');
-	$text='';
-	break;
-
-case 'MARR':
-	$title=WT_Gedcom_Tag::getLabel('MARR');
-	$text='';
-	break;
-
-case 'MARR_CIVIL':
-	$title=WT_Gedcom_Tag::getLabel('MARR_CIVIL');
-	$text='';
-	break;
-
-case 'MARR_PARTNERS':
-	$title=WT_Gedcom_Tag::getLabel('MARR_PARTNERS');
-	$text='';
-	break;
-
-case 'MARR_RELIGIOUS':
-	$title=WT_Gedcom_Tag::getLabel('MARR_RELIGIOUS');
-	$text='';
-	break;
-
-case 'MARR_UNKNOWN':
-	$title=WT_Gedcom_Tag::getLabel('MARR_UNKNOWN');
-	$text='';
-	break;
-
-case 'MARS':
-	$title=WT_Gedcom_Tag::getLabel('MARS');
-	$text='';
-	break;
-
-case 'MEDI':
-	$title=WT_Gedcom_Tag::getLabel('MEDI');
-	$text='';
 	break;
 
 case 'NAME':
@@ -695,29 +287,9 @@ case 'NAME':
 	$text=WT_I18N::translate('This is the most important field in a person\'s Name record.<br /><br />This field should be filled automatically as the other fields are filled in, but it is provided so that you can edit the information according to your personal preference.<br /><br />The name in this field should be entered according to the GEDCOM 5.5.1 standards with the surname surrounded by forward slashes "/".  As an example, the name "John Robert Finlay Jr." should be entered like this: "John Robert /Finlay/ Jr.".');
 	break;
 
-case 'NATI':
-	$title=WT_Gedcom_Tag::getLabel('NATI');
-	$text='';
-	break;
-
-case 'NATU':
-	$title=WT_Gedcom_Tag::getLabel('NATU');
-	$text='';
-	break;
-
-case 'NCHI':
-	$title=WT_Gedcom_Tag::getLabel('NCHI');
-	$text=WT_I18N::translate('Enter the number of children for this individual or family. This is an optional field.');
-	break;
-
 case 'NICK':
 	$title=WT_Gedcom_Tag::getLabel('NICK');
 	$text=WT_I18N::translate('In this field you should enter any nicknames for the person.<br />This is an optional field.<br /><br />Ways to add a nickname:<ul><li>Select <b>modify name</b> then enter nickname and save</li><li>Select <b>add new name</b> then enter nickname AND name and save</li><li>Select <b>edit GEDCOM record</b> to add multiple [2&nbsp;NICK] records subordinate to the main [1&nbsp;NAME] record.</li></ul>');
-	break;
-
-case 'NMR':
-	$title=WT_Gedcom_Tag::getLabel('NMR');
-	$text='';
 	break;
 
 case 'NOTE':
@@ -743,21 +315,6 @@ case 'OBJE':
 		'</p>';
 	break;
 
-case 'OCCU':
-	$title=WT_Gedcom_Tag::getLabel('OCCU');
-	$text='';
-	break;
-
-case 'ORDI':
-	$title=WT_Gedcom_Tag::getLabel('ORDI');
-	$text='';
-	break;
-
-case 'ORDN':
-	$title=WT_Gedcom_Tag::getLabel('ORDN');
-	$text='';
-	break;
-
 case 'PAGE':
 	$title=WT_Gedcom_Tag::getLabel('PAGE');
 	$text=WT_I18N::translate('In the Citation Details field you would enter the page number or other information that might help someone find the information in the source.');
@@ -765,7 +322,7 @@ case 'PAGE':
 
 case 'PEDI':
 	$title=WT_Gedcom_Tag::getLabel('PEDI');
-	$text=WT_I18N::translate('This field describes the relationship of the child to its family.  The possibilities are:<ul><li><b>unknown</b>&nbsp;&nbsp;&nbsp;The child\'s relationship to its family cannot be determined.  When this option is selected, the Pedigree field will not be copied into the database.<br /><br /></li><li><b>Birth</b>&nbsp;&nbsp;&nbsp;This option indicates that the child is related to its family by birth.<br /><br /></li><li><b>Adopted</b>&nbsp;&nbsp;&nbsp;This option indicates that the child was adopted by its family.  This does <i>not</i> indicate that there is no blood relationship between the child and its family; it shows that the child was adopted by the family in question sometime after the child\'s birth.<br /><br /></li><li><b>Foster</b>&nbsp;&nbsp;&nbsp;This option indicates that the child is a foster child of the family.  Usually, there is no blood relationship between the child and its family.<br /><br /></li><li><b>Sealing</b>&nbsp;&nbsp;&nbsp;The child was sealed to its family in an LDS <i>sealing</i> ceremony.  A child sealing is performed when the parents were sealed to each other after the birth of the child.  Children born after the parents\' sealing are automatically sealed to the family.<br /><br /></li></ul>');
+	$text=WT_I18N::translate('A child may have more than one set of parents.  The relationship between the child and the parents can be biological, legal, or based on local culture and tradition.  If no pedigree is specified, then a biological relationship will be assumed.');
 	break;
 
 case 'PHON':
@@ -778,54 +335,14 @@ case 'PLAC':
 	$text=WT_I18N::translate('Places should be entered according to the standards for genealogy.  In genealogy, places are recorded with the most specific information about the place first and then working up to the least specific place last, using commas to separate the different place levels.  The level at which you record the place information should represent the levels of government or church where vital records for that place are kept.<br /><br />For example, a place like Salt Lake City would be entered as "Salt Lake City, Salt Lake, Utah, USA".<br /><br />Let\'s examine each part of this place.  The first part, "Salt Lake City," is the city or township where the event occurred.  In some countries, there may be municipalities or districts inside a city which are important to note.  In that case, they should come before the city.  The next part, "Salt Lake," is the county.  "Utah" is the state, and "USA" is the country.  It is important to note each place because genealogical records are kept by the governments of each level.<br /><br />If a level of the place is unknown, you should leave a space between the commas.  Suppose, in the example above, you didn\'t know the county for Salt Lake City.  You should then record it like this: "Salt Lake City, , Utah, USA".  Suppose you only know that a person was born in Utah.  You would enter the information like this: ", , Utah, USA".  <br /><br />You can use the <b>Find Place</b> link to help you find places that already exist in the database.');
 	break;
 
-case 'POST':
-	$title=WT_Gedcom_Tag::getLabel('POST');
-	$text='';
-	break;
-
-case 'PROB':
-	$title=WT_Gedcom_Tag::getLabel('PROB');
-	$text='';
-	break;
-
-case 'PROP':
-	$title=WT_Gedcom_Tag::getLabel('PROP');
-	$text='';
-	break;
-
-case 'PUBL':
-	$title=WT_Gedcom_Tag::getLabel('PUBL');
-	$text='';
-	break;
-
 case 'QUAY':
 	$title=WT_Gedcom_Tag::getLabel('QUAY');
 	$text=WT_I18N::translate('You would use this field to record the quality or reliability of the data found in this source.  Many genealogy applications use a number in the field. <b>3</b> might mean that the data is a primary source, <b>2</b> might mean that it was a secondary source, <b>1</b> might mean the information is questionable, and <b>0</b> might mean that the source is unreliable.');
 	break;
 
-case 'REFN':
-	$title=WT_Gedcom_Tag::getLabel('REFN');
-	$text='';
-	break;
-
 case 'RELA':
 	$title=WT_Gedcom_Tag::getLabel('RELA');
 	$text=WT_I18N::translate('Select a relationship name from the list. Selecting <b>Godfather</b> means: <i>This associate is the Godfather of the current individual</i>.');
-	break;
-
-case 'RELI':
-	$title=WT_Gedcom_Tag::getLabel('RELI');
-	$text='';
-	break;
-
-case 'REPO':
-	$title=WT_Gedcom_Tag::getLabel('REPO');
-	$text='';
-	break;
-
-case 'RESI':
-	$title=WT_Gedcom_Tag::getLabel('RESI');
-	$text='';
 	break;
 
 case 'RESN':
@@ -836,34 +353,9 @@ case 'RESN':
 		WT_I18N::translate('Note that if a user account is linked to a record, then that user will always be able to view that record.');
 	break;
 
-case 'RETI':
-	$title=WT_Gedcom_Tag::getLabel('RETI');
-	$text='';
-	break;
-
-case 'RFN':
-	$title=WT_Gedcom_Tag::getLabel('RFN');
-	$text='';
-	break;
-
-case 'RIN':
-	$title=WT_Gedcom_Tag::getLabel('RIN');
-	$text='';
-	break;
-
-case 'ROLE':
-	$title=WT_Gedcom_Tag::getLabel('ROLE');
-	$text='';
-	break;
-
 case 'ROMN':
 	$title=WT_Gedcom_Tag::getLabel('ROMN');
 	$text=WT_I18N::translate('In many cultures it is customary to have a traditional name spelled in the traditional characters and also a romanized version of the name as it would be spelled or pronounced in languages based on the Latin alphabet, such as English.<br /><br />If you prefer to use a non-Latin alphabet such as Hebrew, Greek, Russian, Chinese, or Arabic to enter the name in the standard name fields, then you can use this field to enter the same name using the Latin alphabet.  Both versions of the name will appear in lists and charts.<br /><br />Although this field is labeled "Romanized", it is not restricted to containing only characters based on the Latin alphabet.  This might be of use with Japanese names, where three different alphabets may occur.');
-	break;
-
-case 'SERV':
-	$title=WT_Gedcom_Tag::getLabel('SERV');
-	$text='';
 	break;
 
 case 'SEX':
@@ -876,16 +368,6 @@ case 'SHARED_NOTE':
 	$text=WT_I18N::translate('Shared Notes are free-form text and will appear in the Fact Details section of the page.<br /><br />Each shared note can be linked to more than one person, family, source, or event.');
 	break;
 
-case 'SLGC':
-	$title=WT_Gedcom_Tag::getLabel('SLGC');
-	$text='';
-	break;
-
-case 'SLGS':
-	$title=WT_Gedcom_Tag::getLabel('SLGS');
-	$text='';
-	break;
-
 case 'SOUR':
 	$title=WT_Gedcom_Tag::getLabel('SOUR');
 	$text=WT_I18N::translate('This field allows you to change the source record that this fact\'s source citation links to.  This field takes a Source ID.  Beside the field will be listed the title of the current source ID.  Use the <b>Find ID</b> link to look up the source\'s ID number.  To remove the entire citation, make this field blank.');
@@ -896,29 +378,9 @@ case 'SPFX':
 	$text=WT_I18N::translate('Enter or select from the list words that precede the main part of the Surname.  Examples of such words are <b>von</b> Braun, <b>van der</b> Kloot, <b>de</b> Graaf, etc.');
 	break;
 
-case 'SSN':
-	$title=WT_Gedcom_Tag::getLabel('SSN');
-	$text='';
-	break;
-
-case 'STAE':
-	$title=WT_Gedcom_Tag::getLabel('STAE');
-	$text='';
-	break;
-
 case 'STAT':
 	$title=WT_Gedcom_Tag::getLabel('STAT');
 	$text=WT_I18N::translate('This is an optional status field and is used mostly for LDS ordinances as they are run through the TempleReady program.');
-	break;
-
-case 'SUBM':
-	$title=WT_Gedcom_Tag::getLabel('SUBM');
-	$text='';
-	break;
-
-case 'SUBN':
-	$title=WT_Gedcom_Tag::getLabel('SUBN');
-	$text='';
 	break;
 
 case 'SURN':
@@ -951,11 +413,6 @@ case 'TITL':
 	$text=WT_I18N::translate('Enter a title for the item you are editing.  If this is a title for a multimedia item, enter a descriptive title that will identify that item to the user.');
 	break;
 
-case 'TRLR':
-	$title=WT_Gedcom_Tag::getLabel('TRLR');
-	$text='';
-	break;
-
 case 'TYPE':
 	$title=WT_Gedcom_Tag::getLabel('TYPE');
 	$text=WT_I18N::translate('The Type field is used to enter additional information about the item.  In most cases, the field is completely free-form, and you can enter anything you want.');
@@ -966,195 +423,9 @@ case 'URL':
 	$text=WT_I18N::translate('Enter the URL address including the http://.<br /><br />An example URL looks like this: <b>http://www.webtrees.net/</b> Leave this field blank if you do not want to include a URL.');
 	break;
 
-case 'VERS':
-	$title=WT_Gedcom_Tag::getLabel('VERS');
-	$text='';
-	break;
-
-case 'WIFE':
-	$title=WT_Gedcom_Tag::getLabel('WIFE');
-	$text='';
-	break;
-
-case 'WILL':
-	$title=WT_Gedcom_Tag::getLabel('WILL');
-	$text='';
-	break;
-
-case 'WWW':
-	$title=WT_Gedcom_Tag::getLabel('WWW');
-	$text='';
-	break;
-
-case '_ADPF':
-	$title=WT_Gedcom_Tag::getLabel('_ADPF');
-	$text='';
-	break;
-
-case '_ADPM':
-	$title=WT_Gedcom_Tag::getLabel('_ADPM');
-	$text='';
-	break;
-
-case '_AKA':
-case '_AKAN':
-	$title=WT_Gedcom_Tag::getLabel('_AKA');
-	$text='';
-	break;
-
-case '_BIBL':
-	$title=WT_Gedcom_Tag::getLabel('_BIBL');
-	$text='';
-	break;
-
-case '_BRTM':
-	$title=WT_Gedcom_Tag::getLabel('_BRTM');
-	$text='';
-	break;
-
-case '_COML':
-	$title=WT_Gedcom_Tag::getLabel('_COML');
-	$text='';
-	break;
-
-case '_DBID':
-	$title=WT_Gedcom_Tag::getLabel('_DBID');
-	$text='';
-	break;
-
-case '_DEG':
-	$title=WT_Gedcom_Tag::getLabel('_DEG');
-	$text='';
-	break;
-
-case '_DETS':
-	$title=WT_Gedcom_Tag::getLabel('_DETS');
-	$text='';
-	break;
-
-case '_EMAIL':
-	$title=WT_Gedcom_Tag::getLabel('_EMAIL');
-	$text='';
-	break;
-
-case '_EYEC':
-	$title=WT_Gedcom_Tag::getLabel('_EYEC');
-	$text='';
-	break;
-
-case '_FA1':
-	$title=WT_Gedcom_Tag::getLabel('_FA1');
-	$text='';
-	break;
-
-case '_FA2':
-	$title=WT_Gedcom_Tag::getLabel('_FA2');
-	$text='';
-	break;
-
-case '_FA3':
-	$title=WT_Gedcom_Tag::getLabel('_FA3');
-	$text='';
-	break;
-
-case '_FA4':
-	$title=WT_Gedcom_Tag::getLabel('_FA4');
-	$text='';
-	break;
-
-case '_FA5':
-	$title=WT_Gedcom_Tag::getLabel('_FA5');
-	$text='';
-	break;
-
-case '_FA6':
-	$title=WT_Gedcom_Tag::getLabel('_FA6');
-	$text='';
-	break;
-
-case '_FA7':
-	$title=WT_Gedcom_Tag::getLabel('_FA7');
-	$text='';
-	break;
-
-case '_FA8':
-	$title=WT_Gedcom_Tag::getLabel('_FA8');
-	$text='';
-	break;
-
-case '_FA9':
-	$title=WT_Gedcom_Tag::getLabel('_FA9');
-	$text='';
-	break;
-
-case '_FA10':
-	$title=WT_Gedcom_Tag::getLabel('_FA10');
-	$text='';
-	break;
-
-case '_FA11':
-	$title=WT_Gedcom_Tag::getLabel('_FA11');
-	$text='';
-	break;
-
-case '_FA12':
-	$title=WT_Gedcom_Tag::getLabel('_FA12');
-	$text='';
-	break;
-
-case '_FA13':
-	$title=WT_Gedcom_Tag::getLabel('_FA13');
-	$text='';
-	break;
-
-case '_FNRL':
-	$title=WT_Gedcom_Tag::getLabel('_FNRL');
-	$text='';
-	break;
-
-case '_FREL':
-	$title=WT_Gedcom_Tag::getLabel('_FREL');
-	$text='';
-	break;
-
-case '_GEDF':
-	$title=WT_Gedcom_Tag::getLabel('_GEDF');
-	$text='';
-	break;
-
-case '_HAIR':
-	$title=WT_Gedcom_Tag::getLabel('_HAIR');
-	$text='';
-	break;
-
 case '_HEB':
 	$title=WT_Gedcom_Tag::getLabel('_HEB');
 	$text=WT_I18N::translate('In many cultures it is customary to have a traditional name spelled in the traditional characters and also a romanized version of the name as it would be spelled or pronounced in languages based on the Latin alphabet, such as English.<br /><br />If you prefer to use the Latin alphabet to enter the name in the standard name fields, then you can use this field to enter the same name in the non-Latin alphabet such as Greek, Hebrew, Russian, Arabic, or Chinese.  Both versions of the name will appear in lists and charts.<br /><br />Although this field is labeled "Hebrew", it is not restricted to containing only Hebrew characters.');
-	break;
-
-case '_HEIG':
-	$title=WT_Gedcom_Tag::getLabel('_HEIG');
-	$text='';
-	break;
-
-case '_HNM':
-	$title=WT_Gedcom_Tag::getLabel('_HNM');
-	$text='';
-	break;
-
-case '_HOL':
-	$title=WT_Gedcom_Tag::getLabel('_HOL');
-	$text='';
-	break;
-
-case '_INTE':
-	$title=WT_Gedcom_Tag::getLabel('_INTE');
-	$text='';
-	break;
-
-case '_MARI':
-	$title=WT_Gedcom_Tag::getLabel('_MARI');
-	$text='';
 	break;
 
 case '_MARNM':
@@ -1162,139 +433,9 @@ case '_MARNM':
 	$text=WT_I18N::translate('Enter the married name for this person, using the same formatting rules that apply to the Name field.  This field is optional.<br /><br />For example, if Mary Jane Brown married John White, you might enter (without the quotation marks, of course)<ul><li>American usage:&nbsp;&nbsp;"Mary Jane Brown /White/"</li><li>European usage:&nbsp;&nbsp;"Mary Jane /White/"</li><li>Alternate European usage:&nbsp;&nbsp;"Mary Jane /White-Brown/" or "Mary Jane /Brown-White/"</li></ul>You should do this only if Mary Brown began calling herself by the new name after marrying John White.  In some places, Quebec (Canada) for example, it\'s illegal for names to be changed in this way.<br /><br />Men sometimes change their name after marriage, most often using the hyphenated form but occasionally taking the wife\'s surname.');
 	break;
 
-case '_MBON':
-	$title=WT_Gedcom_Tag::getLabel('_MBON');
-	$text='';
-	break;
-
-case '_MDCL':
-	$title=WT_Gedcom_Tag::getLabel('_MDCL');
-	$text='';
-	break;
-
-case '_MEDC':
-	$title=WT_Gedcom_Tag::getLabel('_MEDC');
-	$text='';
-	break;
-
-case '_MEND':
-	$title=WT_Gedcom_Tag::getLabel('_MEND');
-	$text='';
-	break;
-
-case '_MILI':
-	$title=WT_Gedcom_Tag::getLabel('_MILI');
-	$text='';
-	break;
-
-case '_MILT':
-	$title=WT_Gedcom_Tag::getLabel('_MILT');
-	$text='';
-	break;
-
-case '_MREL':
-	$title=WT_Gedcom_Tag::getLabel('_MREL');
-	$text='';
-	break;
-
-case '_MSTAT':
-	$title=WT_Gedcom_Tag::getLabel('_MSTAT');
-	$text='';
-	break;
-
-case '_NAME':
-	$title=WT_Gedcom_Tag::getLabel('_NAME');
-	$text='';
-	break;
-
-case '_NAMS':
-	$title=WT_Gedcom_Tag::getLabel('_NAMS');
-	$text='';
-	break;
-
-case '_NLIV':
-	$title=WT_Gedcom_Tag::getLabel('_NLIV');
-	$text='';
-	break;
-
-case '_NMAR':
-	$title=WT_Gedcom_Tag::getLabel('_NMAR');
-	$text='';
-	break;
-
-case '_NMR':
-	$title=WT_Gedcom_Tag::getLabel('_NMR');
-	$text='';
-	break;
-
 case '_PRIM':
 	$title=WT_Gedcom_Tag::getLabel('_PRIM');
 	$text=WT_I18N::translate('Use this field to signal that this media item is the highlighted or primary item for the person it is attached to.  The highlighted image is the one that will be used on charts and on the Individual page.');
-	break;
-
-case '_WT_USER':
-	$title=WT_Gedcom_Tag::getLabel('_WT_USER');
-	$text='';
-	break;
-
-case '_PRMN':
-	$title=WT_Gedcom_Tag::getLabel('_PRMN');
-	$text='';
-	break;
-
-case '_SCBK':
-	$title=WT_Gedcom_Tag::getLabel('_SCBK');
-	$text='';
-	break;
-
-case '_SEPR':
-	$title=WT_Gedcom_Tag::getLabel('_SEPR');
-	$text='';
-	break;
-
-case '_SSHOW':
-	$title=WT_Gedcom_Tag::getLabel('_SSHOW');
-	$text='';
-	break;
-
-case '_STAT':
-	$title=WT_Gedcom_Tag::getLabel('_STAT');
-	$text='';
-	break;
-
-case '_SUBQ':
-	$title=WT_Gedcom_Tag::getLabel('_SUBQ');
-	$text='';
-	break;
-
-case '_TODO':
-	$title=WT_Gedcom_Tag::getLabel('_TODO');
-	$text='';
-	break;
-
-case '_TYPE':
-	$title=WT_Gedcom_Tag::getLabel('_TYPE');
-	$text='';
-	break;
-
-case '_UID':
-	$title=WT_Gedcom_Tag::getLabel('_UID');
-	$text='';
-	break;
-
-case '_URL':
-	$title=WT_Gedcom_Tag::getLabel('_URL');
-	$text='';
-	break;
-
-case '_WEIG':
-	$title=WT_Gedcom_Tag::getLabel('_WEIG');
-	$text='';
-	break;
-
-case '_YART':
-	$title=WT_Gedcom_Tag::getLabel('_YART');
-	$text='';
 	break;
 
 	//////////////////////////////////////////////////////////////////////////////
@@ -1779,11 +920,6 @@ case 'SHOW_AGE_DIFF':
 	$text=WT_I18N::translate('This option controls whether or not the Close Relatives tab should show differences between birth dates of spouses, between marriage date and birth date of first child, and between birth dates of children.');
 	break;
 
-case 'SHOW_CONTEXT_HELP':
-	$title=WT_I18N::translate('Contextual Help links');
-	$text=WT_I18N::translate('This option will enable links, identified by question marks, next to items on many pages.  These links allow users to get information or help about those items.');
-	break;
-
 case 'SHOW_COUNTER':
 	$title=WT_I18N::translate('Hit counters');
 	$text=WT_I18N::translate('Show hit counters on Portal and Individual pages.');
@@ -1834,11 +970,6 @@ case 'SHOW_LEVEL2_NOTES':
 	$text=WT_I18N::translate('This option controls whether Notes and Source references that are attached to Facts should be shown on the Notes and Sources tabs of the Individual page.<br /><br />Ordinarily, the Notes and Sources tabs show only Notes and Source references that are attached directly to the individual\'s database record.  These are <i>level 1</i> Notes and Source references.<br /><br />The <b>Yes</b> option causes these tabs to also show Notes and Source references that are part of the various Facts in the individual\'s database record.  These are <i>level 2</i> Notes and Source references because the various Facts are at level 1.');
 	break;
 
-case 'SHOW_LIST_PLACES':
-	$title=WT_I18N::translate('Place levels to show on lists');
-	$text=WT_I18N::translate('This determines how much of the Place information is shown in the Place fields on lists.<br /><br />Setting the value to <b>9</b> will ensure that all Place information will be shown.  Setting the value to <b>0</b> (zero) will hide places completely.  Setting the value to <b>1</b> will show the topmost level, which is normally the country.  Setting it to <b>2</b> will show the topmost two levels.  The second topmost level, below the country, is often the state, province, or territory. Etc.');
-	break;
-
 case 'SHOW_LIVING_NAMES':
 	$title=WT_I18N::translate('Names of private individuals');
 	$text=WT_I18N::translate('This option will show the names (but no other details) of private individuals.  Individuals are private if they are still alive or if a privacy restriction has been added to their individual record.  To hide a specific name, add a privacy restriction to that name record.');
@@ -1861,8 +992,8 @@ case 'SHOW_PARENTS_AGE':
 	break;
 
 case 'SHOW_PEDIGREE_PLACES':
-	$title=WT_I18N::translate('Place levels to show in person boxes');
-	$text=WT_I18N::translate('This sets how much of the place information is shown in the person boxes on charts.<br /><br />Setting the value to 9 will guarantee to show all place levels.  Setting the value to 0 will hide places completely.  Setting the value to 1 will show the first level, setting it to 2 will show the first two levels, etc.');
+	$title=WT_I18N::translate('Abbreviate place names');
+	$text=WT_I18N::translate('Place names are frequently too long to fit on charts, lists, etc.  They can be abbreviated by showing just the first few parts of the name, such as <i>village, county</i>, or the last few part of it, such as <i>region, country</i>.');
 	break;
 
 case 'SHOW_PRIVATE_RELATIONSHIPS':
@@ -2011,7 +1142,7 @@ case 'WATERMARK_THUMB':
 	break;
 
 case 'WEBMASTER_USER_ID':
-	$title=WT_I18N::translate('Support contact');
+	$title=WT_I18N::translate('Technical help contact');
 	$text=WT_I18N::translate('The person to be contacted about technical questions or errors encountered on your site.');
 	break;
 
@@ -2162,11 +1293,6 @@ case 'block_move_right':
 case 'block_move_up':
 	$title=WT_I18N::translate('Move list entries');
 	$text=WT_I18N::translate('Use these buttons to re-arrange the order of the entries within the list.  The blocks will be printed in the order in which they are listed.<br /><br />Highlight the entry to be moved, and then click a button to move that entry up or down.');
-	break;
-
-case 'box_width':
-	$title=WT_I18N::translate('Box width');
-	$text=WT_I18N::translate('Here you can change the box width from 50 percent to 300 percent.  At 100 percent each box is about 270 pixels wide.');
 	break;
 
 case 'convertPath':
@@ -2340,11 +1466,6 @@ case 'gedcom_administration':
 	$text=WT_I18N::translate('The GEDCOM Administration page is the control center for administering all of your genealogical databases.');
 	break;
 
-case 'gedcom_info':
-	$title=WT_I18N::translate('GEDCOM information');
-	$text=''; // This need rewriting.  The old text was: '<span class="helpstart">GEDCOM definition</span><br /><br />A quote from the Introduction to the GEDCOM 5.5.1 Standard:<div class="list_value_wrap">GEDCOM was developed by the Family History Department of The Church of Jesus Christ of Latter-day Saints (LDS Church) to provide a flexible, uniform format for exchanging computerized genealogical data.&nbsp; GEDCOM is an acronym for <i><b>GE</b></i>nealogical <i><b>D</b></i>ata <i><b>Com</b></i>munication.&nbsp; Its purpose is to foster the sharing of genealogical information and the development of a wide range of inter-operable software products to assist genealogists, historians, and other researchers.</div><br />A copy of the GEDCOM 5.5.1 <u>draft</u> Standard, to which <b>webtrees</b> adheres, can be downloaded in PDF format here:&nbsp; <a href="http://www.phpgedview.net/ged551-5.pdf" target="_blank">GEDCOM 5.5.1 Standard</a>  This Standard is only available in English.<br /><br />The GEDCOM file contains all the information about the family. All facts, dates, events, etc. are stored here. GEDCOM files have to follow strict rules because they must be exchangeable between many programs, independent of platforms or operating systems.<br /><br /><span class="helpstart">Dates in a GEDCOM file</span><br /><br />Although the date field allows for free-form entry (meaning you can type in whatever you want), there are some rules about how dates should be entered according to the GEDCOM 5.5.1 standard.<ol><li>A full date is entered in the form DD MMM YYYY.  For example, <b>01&nbsp;MAR&nbsp;1801</b> or <b>14&nbsp;DEC&nbsp;1950</b>.</li><li>If you are missing a part of the date, you can omit that part.  E.g. <b>MAR&nbsp;1801</b> or <b>14&nbsp;DEC</b>.</li><li>If you are not sure or the date is not confirmed, you could enter <b>ABT&nbsp;MAR&nbsp;1801</b> (abt = about), <b>BEF&nbsp;20&nbsp;DEC&nbsp;1950</b> (bef = before), <b>AFT&nbsp;1949</b> (aft = after)</li><li>Date ranges are entered as <b>FROM&nbsp;MAR&nbsp;1801&nbsp;TO&nbsp;20&nbsp;DEC&nbsp;1810</b> or as <b>BET&nbsp;MAR&nbsp;1801&nbsp;AND&nbsp;20&nbsp;DEC&nbsp;1810</b> (bet = between)<br /><br />The <b>FROM</b> form indicates that the event being described happened continuously between the stated dates and is used with events such as employment. The <b>BET</b> form indicates a single occurrence of the event, sometime between the stated dates and is used with events such as birth.<br /><br />Imprecise dates, where the day of the month or the month is missing, are always interpreted as the first or last possible date, depending on whether that imprecise date occurs before or after the separating keyword.  For example, <b>FEB&nbsp;1804</b> is interpreted as <b>01&nbsp;FEB&nbsp;1804</b> when it occurs before the TO or AND, and as <b>29&nbsp;FEB&nbsp;1804</b> when it occurs after the TO or AND.</li></ol><b>Be sure to enter dates and abbreviations in <u>English</u>,</b> because then the GEDCOM file is exchangeable and <b>webtrees</b> can translate all dates and abbreviations properly into the currently active language.  Furthermore, <b>webtrees</b> does calculations using these dates. If improper dates are entered into date fields, <b>webtrees</b> will not be able to calculate properly.<br /><br />You can click on the Calendar icon for help selecting a date.<br /><br /><span class="helpstart">Location levels</span><br /><br />This shows the levels that are displayed now.  The list box showing places is actually a sublist of the leftmost level.<br /><br />EXAMPLE:<br />The default order is City, County, State/Province, Country.<br />If the current level is "Top Level", the box will list all the countries in the database.<br />If the current level is "U.S.A., Top Level", the box will list all the states in the U.S.A.<br />etc.<br /><br />You can click a level to go back one or more steps.'
-	break;
-
 case 'gedcom_news_archive':
 	$title=WT_I18N::translate('View archive');
 	$text=WT_I18N::translate('To reduce the height of the News block, the administrator has hidden some articles.  You can reveal these hidden articles by clicking the <b>View archive</b> link.');
@@ -2383,22 +1504,6 @@ case 'google_chart_surname':
 case 'header_favorites':
 	$title=WT_I18N::translate('Favorites');
 	$text=WT_I18N::translate('The Favorites drop-down list shows the favorites that you have selected on your personalized My Page.  It also shows the favorites that the site administrator has selected for the currently active GEDCOM.  Clicking on one of the favorites entries will take you directly to the Individual Information page of that person.<br /><br />More help about adding Favorites is available in your personalized My Page.');
-	break;
-
-case 'help_contents_help':
-	$title=WT_I18N::translate('Help contents');
-	$text=
-			'<table><tr><td><span class="helpstart">'.WT_I18N::translate('Help items').'</span>
-			<ul><li><a href="?help=ancestry.php">'.WT_I18N::translate('Ancestors').'</a></li><li><a href="?help=fanchart.php">'.WT_I18N::translate('Fan chart').'</a></li><li><a href="?help=familybook.php">'
-			.WT_I18N::translate('Family book').'</a></li><li><a href="?help=gedcom_info">'.WT_I18N::translate('GEDCOM information').'</a></li><li><a href="?help=index_portal">'.WT_I18N::translate('Home page').'</a></li><li><a href="?help=hourglass.php">'.WT_I18N::translate('Hourglass chart').'</a></li><li><a href="?help=individual.php">'
-			.WT_I18N::translate('Individual information').'</a></li><li><a href="?help=indilist.php">'.WT_I18N::translate('Individuals').'</a></li><li><a href="?help=treenav">'.WT_I18N::translate('Interactive tree').'</a></li><li><a href="?help=login.php">'
-			.WT_I18N::translate('Login').'</a></li><li><a href="?help=pls_note11">'.WT_I18N::translate('Lost password request').'</a></li><li><a href="?help=medialist.php">'.WT_I18N::translate('Media').'</a></li><li><a href="?help=edituser.php">'
-			.WT_I18N::translate('My account').'</a></li><li><a href="?help=mypage_portal">'.WT_I18N::translate('My page').'</a></li><li><a href="?help=edituser_password">'.WT_I18N::translate('Password').'</a></li><li><a href="?help=pedigree.php">'.WT_I18N::translate('Pedigree').'</a></li><li><a href="?help=timeline.php">'.WT_I18N::translate('Timeline').'</a></li><li><a href="?help=edituser_username">'.WT_I18N::translate('Username').'</a></li></ul></td>';
-		if (WT_USER_IS_ADMIN) {
-			$text.='<td valign="top"><span class="helpstart">'.WT_I18N::translate('Administrator help items').'</span><ul><li><a href="?help=admin.php">'.WT_I18N::translate('Administration').'</a></li><li><a href="?help=help_editconfig.php">'.WT_I18N::translate('Configure').'</a></li><li><a href="?help=help_faq.php">'
-			.WT_I18N::translate('FAQ List: Edit').'</a></li><li><a href="?help=edit_gedcoms">'.WT_I18N::translate('GEDCOM: Administration page').'</a></li><li><a href="?help=edit_config_gedcom">'.WT_I18N::translate('GEDCOM: Configure').'</a></li><li><a href="?help=default_gedcom">'.WT_I18N::translate('GEDCOM: Default').'</a></li><li><a href="readme.html">'.WT_I18N::translate('View readme.html file').'</a></li><li><a href="?help=help_admin_users.php">'.WT_I18N::translate('User administration').'</a></li></ul></td>';
-		}
-	$text.=('</tr></table>');
 	break;
 
 case 'import_gedcom':
@@ -2457,16 +1562,6 @@ case 'medialist_recursive':
 case 'move_mediadirs':
 	$title=WT_I18N::translate('Move media directories');
 	$text=WT_I18N::translate('When the Media Firewall is enabled, Multi-Media files can be stored in a server directory that is not accessible from the Internet.<br /><br />These buttons allow you to easily move an entire Media directory structure between the protected (not web-addressable) <b>%s%s</b> and the normal <b>%s</b> directories.', $MEDIA_FIREWALL_ROOTDIR, $MEDIA_DIRECTORY, $MEDIA_DIRECTORY);
-	break;
-
-case 'new_password':
-	$title=WT_I18N::translate('Request new password');
-	$text=WT_I18N::translate('If you have forgotten your password, you can click this link to request a new password.<br /><br />You will be taken to the "Lost Password Request" page.');
-	break;
-
-case 'new_user':
-	$title=WT_I18N::translate('Request user account');
-	$text=WT_I18N::translate('If you are a visitor to this site and wish to request a user account, you can click this link.<br /><br />You will be taken to the "Register" page.');
 	break;
 
 case 'next_path':
@@ -2536,11 +1631,6 @@ case 'pending_changes':
 			'</p>';
 	}
 
-	break;
-
-case 'pls_note11':
-	$title=WT_I18N::translate('Lost password request');
-	$text=WT_I18N::translate('To have your password reset, enter your user name.<br /><br />We will respond by sending you an email to the address registered with your account.  The email will contain a URL and confirmation code for your account. When you visit this URL, you can change your password and login to this site. For security reasons, you should not give this confirmation code to anyone.<br /><br />If you require assistance from the site administrator, please use the contact link below.');
 	break;
 
 case 'ppp_view_records':
@@ -2791,8 +1881,5 @@ $controller->pageHeader();
 echo '<div class="helpheader">', $title, '</div>';
 echo '<div class="helpcontent">', $text,'</div>';
 echo '<div class="helpfooter">';
-if ($help!='help_contents_help') {
-	echo '<a href="help_text.php?help=help_contents_help">', WT_I18N::translate('Help contents'), '</a><br />';
-}
 echo '<a href="#" onclick="window.close();">', WT_I18N::translate('Close Window'), '</a>';
 echo '</div>';

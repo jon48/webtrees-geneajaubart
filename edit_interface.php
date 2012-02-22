@@ -2,7 +2,7 @@
 // PopUp Window to provide editing features.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_interface.php 13092 2011-12-19 16:39:14Z lukasz $
+// $Id: edit_interface.php 13418 2012-02-10 10:17:15Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_interface.php');
 require './includes/session.php';
@@ -52,7 +52,6 @@ $gender =safe_REQUEST($_REQUEST, 'gender',  WT_REGEX_UNSAFE);
 
 $assist =safe_REQUEST($_REQUEST, 'assist',  WT_REGEX_UNSAFE);
 $noteid =safe_REQUEST($_REQUEST, 'noteid',  WT_REGEX_UNSAFE);
-$currtab=safe_REQUEST($_REQUEST, 'currtab', WT_REGEX_UNSAFE);
 
 $pid_array      =safe_REQUEST($_REQUEST, 'pid_array',       WT_REGEX_XREF);
 $pids_array_add =safe_REQUEST($_REQUEST, 'pids_array_add',  WT_REGEX_XREF);
@@ -288,7 +287,7 @@ case 'editraw':
 		} 
 		echo '>';
 		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
-		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
+		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp());
 		echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 		echo '</td></tr>';
 		echo '</table>';
@@ -331,7 +330,7 @@ case 'edit':
 		} 
 		echo '>';
 		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
-		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
+		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp());
 		echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 		echo '</td></tr>';
 	}
@@ -406,7 +405,7 @@ case 'add':
 		} 
 		echo '>';
 		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
-		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
+		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp());
 		echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 		echo '</td></tr>';
 	}
@@ -470,6 +469,7 @@ case 'addfamlink':
 		case 'F': echo edit_field_pedi_f('pedigree'); break;
 		case 'U': echo edit_field_pedi_u('pedigree'); break;
 		}
+		echo help_link('PEDI');
 		echo '</td></tr>';
 	}
 	if (WT_USER_IS_ADMIN) {
@@ -481,7 +481,7 @@ case 'addfamlink':
 		} 
 		echo '>';
 		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
-		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
+		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp());
 		echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 		echo '</td></tr>';
 	}
@@ -520,7 +520,7 @@ case 'linkspouse':
 		} 
 		echo '>';
 		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
-		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
+		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp());
 		echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 		echo '</td></tr>';
 	}
@@ -962,7 +962,7 @@ case 'editsource':
 		} 
 		echo '>';
 		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
-		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
+		echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp());
 		echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 		echo '</td></tr>';
 	}
@@ -1019,7 +1019,7 @@ case 'editnote':
 					} 
 					echo '>';
 					echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
-					echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp(false));
+					echo WT_Gedcom_Tag::getLabelValue('DATE', $tmp->LastChangeTimestamp());
 					echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $tmp->LastChangeUser());
 					echo '</td></tr>';
 				}
@@ -1053,7 +1053,7 @@ case 'addnewrepository':
 		<input type="hidden" name="action" value="addrepoaction">
 		<input type="hidden" name="pid" value="newrepo">
 		<table class="facts_table">
-			<tr><td class="descriptionbox wrap width25"><?php echo WT_I18N::translate('Repository name'), help_link('edit_REPO_NAME'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_I18N::translate('Repository name'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="NAME" id="NAME" value="" size="40" maxlength="255"> <?php print_specialchar_link("NAME", false); ?></td></tr>
 			<?php if (strstr($ADVANCED_NAME_FACTS, "_HEB")!==false) { ?>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('_HEB'), help_link('_HEB'); ?></td>
@@ -1775,7 +1775,6 @@ case 'reset_media_update': // Reset sort using popup
 //------------------------------------------------------------------------------
 case 'reorder_media_update': // Update sort using popup
 	if (isset($_REQUEST['order1'])) $order1 = $_REQUEST['order1'];
-	if (isset($_POST['currtab'])) $currtab = $_POST['currtab'];
 	$lines = explode("\n", $gedrec);
 	$newgedrec = "";
 	foreach ($lines as $line) {
@@ -1791,11 +1790,7 @@ case 'reorder_media_update': // Update sort using popup
 	}
 	echo '<br>', WT_I18N::translate('Update successful'), '<br><br>';
 
-	if ($currtab=='album') {
-		$link = "individual.php?pid=$pid#lightbox";
-	} else {
-		$link = "individual.php?pid=$pid#media";
-	}
+	$link = "individual.php?pid=$pid";
 	echo WT_JS_START;
 	echo "edit_close('{$link}')";
 	echo WT_JS_END;
@@ -1803,7 +1798,6 @@ case 'reorder_media_update': // Update sort using popup
 
 //------------------------------------------------------------------------------
 case 'al_reset_media_update': // Reset sort using Album Page
-    if (isset($_POST['currtab'])) $currtab = $_POST['currtab'];
 	$lines = explode("\n", $gedrec);
 	$newgedrec = "";
 	foreach ($lines as $line) {
@@ -1815,11 +1809,7 @@ case 'al_reset_media_update': // Reset sort using Album Page
 		$success=true;
 	}
 	echo "<br>", WT_I18N::translate('Update successful'), "<br><br>";
-	if ($currtab=="album") {
-		$link = "individual.php?pid=$pid#lightbox";
-	} else {
-		$link = "individual.php?pid=$pid#media";
-	}
+	$link = "individual.php?pid=$pid";
 	echo WT_JS_START;
 	echo "edit_close('{$link}')";
 	echo WT_JS_END;
@@ -1828,7 +1818,6 @@ case 'al_reset_media_update': // Reset sort using Album Page
 //------------------------------------------------------------------------------
 case 'al_reorder_media_update': // Update sort using Album Page
 	if (isset($_REQUEST['order1'])) $order1 = $_REQUEST['order1'];
-    if (isset($_POST['currtab'])) $currtab = $_POST['currtab'];
 	function SwapArray($Array) {
 		$Values = array();
 		while (list($Key, $Val) = each($Array))
@@ -1851,11 +1840,7 @@ case 'al_reorder_media_update': // Update sort using Album Page
 	if (replace_gedrec($pid, WT_GED_ID, $newgedrec, $update_CHAN)) {
 		$success=true;
 	}
-	if ($currtab=="album") {
-		$link = "individual.php?pid=$pid#lightbox";
-	} else {
-		$link = "individual.php?pid=$pid#media";
-	}
+	$link = "individual.php?pid=$pid";
 	echo WT_JS_START;
 	echo "edit_close('{$link}')";
 	echo WT_JS_END;
@@ -1929,7 +1914,7 @@ case 'reorder_children':
 			} 
 			echo '>';
 			echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
-			echo WT_Gedcom_Tag::getLabelValue('DATE', $family->LastChangeTimestamp(false));
+			echo WT_Gedcom_Tag::getLabelValue('DATE', $family->LastChangeTimestamp());
 			echo WT_Gedcom_Tag::getLabelValue('_WT_USER', $family->LastChangeUser());
 			echo '</td></tr></table></center><br>';
 		}

@@ -5,7 +5,7 @@
 // about the family tree.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Stats.php 13085 2011-12-17 09:50:10Z greg $
+// $Id: Stats.php 13410 2012-02-08 22:00:11Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -172,13 +172,7 @@ class WT_Stats {
 			// Generate the replacement value for the tag
 			if (method_exists($this, $tags[$i])) {
 				$new_tags[] = "#{$full_tag}#";
-				$new_value=call_user_func_array(array($this, $tags[$i]), array($params));
-				// Numeric values need "translating" to local formats
-				if (is_numeric($new_value)) {
-					$new_values[]=WT_I18N::number($new_value);
-				} else {
-					$new_values[]=$new_value;
-				}
+				$new_values[]=call_user_func_array(array($this, $tags[$i]), array($params));
 			} elseif ($tags[$i] == 'help') {
 				// re-merge, just in case
 				$new_tags[] = "#{$full_tag}#";
@@ -345,7 +339,7 @@ class WT_Stats {
 		switch($type) {
 			default:
 			case 'all':
-				$type = $this->_totalIndividuals() + $this->_totalFamilies() + $this->_totalSources() + $this->_totalOtherRecords();
+				$type = $this->_totalIndividuals() + $this->_totalFamilies() + $this->_totalSources();
 				break;
 			case 'individual':
 				$type = $this->_totalIndividuals();
@@ -359,9 +353,6 @@ class WT_Stats {
 			case 'note':
 				$type = $this->_totalNotes();
 				break;
-			case 'other':
-				$type = $this->_totalOtherRecords();
-				break;
 			default:
 				return WT_I18N::percentage(0, 1);
 		}
@@ -373,7 +364,7 @@ class WT_Stats {
 	}
 
 	function totalRecords() {
-		return WT_I18N::number($this->_totalIndividuals() + $this->_totalFamilies() + $this->_totalSources() + $this->_totalOtherRecords());
+		return WT_I18N::number($this->_totalIndividuals() + $this->_totalFamilies() + $this->_totalSources());
 	}
 
 	function _totalIndividuals() {
@@ -387,9 +378,13 @@ class WT_Stats {
 		return WT_I18N::number($this->_totalIndividuals());
 	}
 
-	function totalIndisWithSources() {
+	function _totalIndisWithSources() {
 		$rows=self::_runSQL("SELECT COUNT(DISTINCT i_id) AS tot FROM `##link`, `##individuals` WHERE i_id=l_from AND i_file=l_file AND l_file=".$this->_ged_id." AND l_type='SOUR'");
-		return WT_I18N::number($rows[0]['tot']);
+		return $rows[0]['tot'];
+	}
+
+	function totalIndisWithSources() {
+		return WT_I18N::number(self::_totalIndisWithSources());
 	}
 
 	function chartIndisWithSources($params=null) {
@@ -403,12 +398,12 @@ class WT_Stats {
 		if ($tot_indi==0) {
 			return '';
 		} else {
-			$tot_sindi_per = round($this->totalIndisWithSources()/$tot_indi, 3);
+			$tot_sindi_per = round($this->_totalIndisWithSources()/$tot_indi, 3);
 			$chd = self::_array_to_extended_encoding(array(100-100*$tot_sindi_per, 100*$tot_sindi_per));
 			$chl =  WT_I18N::translate('Without sources').' - '.WT_I18N::percentage(1-$tot_sindi_per,1).'|'.
 					WT_I18N::translate('With sources').' - '.WT_I18N::percentage($tot_sindi_per,1);
 			$chart_title = WT_I18N::translate('Individuals with sources');
-			return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
+			return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
 		}
 	}
 
@@ -427,9 +422,13 @@ class WT_Stats {
 		return WT_I18N::number($this->_totalFamilies());
 	}
 
-	function totalFamsWithSources() {
+	function _totalFamsWithSources() {
 		$rows=self::_runSQL("SELECT COUNT(DISTINCT f_id) AS tot FROM `##link`, `##families` WHERE f_id=l_from AND f_file=l_file AND l_file=".$this->_ged_id." AND l_type='SOUR'");
-		return WT_I18N::number($rows[0]['tot']);
+		return $rows[0]['tot'];
+	}
+
+	function totalFamsWithSources() {
+		return WT_I18N::number(self::_totalFamsWithSources());
 	}
 
 	function chartFamsWithSources($params=null) {
@@ -443,12 +442,12 @@ class WT_Stats {
 		if ($tot_fam==0) {
 			return '';
 		} else {
-			$tot_sfam_per = round($this->totalFamsWithSources()/$tot_fam, 3);
+			$tot_sfam_per = round($this->_totalFamsWithSources()/$tot_fam, 3);
 			$chd = self::_array_to_extended_encoding(array(100-100*$tot_sfam_per, 100*$tot_sfam_per));
 			$chl =  WT_I18N::translate('Without sources').' - '.WT_I18N::percentage(1-$tot_sfam_per,1).'|'.
 					WT_I18N::translate('With sources').' - '.WT_I18N::percentage($tot_sfam_per,1);
 			$chart_title = WT_I18N::translate('Families with sources');
-			return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
+			return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
 		}
 	}
 
@@ -499,21 +498,6 @@ class WT_Stats {
 
 	function totalRepositoriesPercentage() {
 		return $this->_getPercentage($this->_totalRepositories(), 'all');
-	}
-
-	function _totalOtherRecords() {
-		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##other` WHERE o_type NOT IN ('NOTE', 'REPO') AND o_file=?")
-			->execute(array($this->_ged_id))
-			->fetchOne();
-	}
-
-	function totalOtherRecords() {
-		return WT_I18N::number($this->_totalOtherRecords());
-	}
-
-	function totalOtherPercentage() {
-		return $this->_getPercentage($this->_totalOtherRecords(), 'all');
 	}
 
 	function totalSurnames($params = null) {
@@ -676,30 +660,36 @@ class WT_Stats {
 		if (isset($params[2]) && $params[2] != '') {$color_male = strtolower($params[2]);} else {$color_male = '84beff';}
 		if (isset($params[3]) && $params[3] != '') {$color_unknown = strtolower($params[3]);} else {$color_unknown = '777777';}
 		$sizes = explode('x', $size);
-		$tot_f = $this->totalSexFemalesPercentage();
-		$tot_m = $this->totalSexMalesPercentage();
-		$tot_u = $this->totalSexUnknownPercentage();
-		if ($tot_f == 0 && $tot_m == 0 && $tot_u == 0) {
+		// Raw data - for calculation
+		$tot_f = $this->_totalSexFemales();
+		$tot_m = $this->_totalSexMales();
+		$tot_u = $this->_totalSexUnknown();
+		$tot=$tot_f+$tot_m+$tot_u;
+		// I18N data - for display
+		$per_f = $this->totalSexFemalesPercentage();
+		$per_m = $this->totalSexMalesPercentage();
+		$per_u = $this->totalSexUnknownPercentage();
+		if ($tot==0) {
 			return '';
 		} else if ($tot_u > 0) {
-			$chd = self::_array_to_extended_encoding(array($tot_u, $tot_f, $tot_m));
+			$chd = self::_array_to_extended_encoding(array(4095*$tot_u/$tot, 4095*$tot_f/$tot, 4095*$tot_m/$tot));
 			$chl =
-				WT_I18N::translate_c('unknown people', 'Unknown').' - '.$tot_u.'|'.
-				WT_I18N::translate('Females').' - '.$tot_f.'|'.
-				WT_I18N::translate('Males').' - '.$tot_m;
+				WT_I18N::translate_c('unknown people', 'Unknown').' - '.$per_u.'|'.
+				WT_I18N::translate('Females').' - '.$per_f.'|'.
+				WT_I18N::translate('Males').' - '.$per_m;
 			$chart_title =
-				WT_I18N::translate('Males').' - '.$tot_m.WT_I18N::$list_separator.
-				WT_I18N::translate('Females').' - '.$tot_f.WT_I18N::$list_separator.
-				WT_I18N::translate_c('unknown people', 'Unknown').' - '.$tot_u;
-			return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_unknown},{$color_female},{$color_male}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
+				WT_I18N::translate('Males').' - '.$per_m.WT_I18N::$list_separator.
+				WT_I18N::translate('Females').' - '.$per_f.WT_I18N::$list_separator.
+				WT_I18N::translate_c('unknown people', 'Unknown').' - '.$per_u;
+			return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_unknown},{$color_female},{$color_male}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
 		} else {
 			$chd = self::_array_to_extended_encoding(array($tot_f, $tot_m));
 			$chl =
-				WT_I18N::translate('Females').' - '.$tot_f.'|'.
-				WT_I18N::translate('Males').' - '.$tot_m;
-			$chart_title =  WT_I18N::translate('Males').' - '.$tot_m.WT_I18N::$list_separator.
-							WT_I18N::translate('Females').' - '.$tot_f;
-			return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_female},{$color_male}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
+				WT_I18N::translate('Females').' - '.$per_f.'|'.
+				WT_I18N::translate('Males').' - '.$per_m;
+			$chart_title =  WT_I18N::translate('Males').' - '.$per_m.WT_I18N::$list_separator.
+							WT_I18N::translate('Females').' - '.$per_f;
+			return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_female},{$color_male}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
 		}
 	}
 
@@ -745,18 +735,23 @@ class WT_Stats {
 		if (isset($params[1]) && $params[1] != '') {$color_living = strtolower($params[1]);} else {$color_living = 'ffffff';}
 		if (isset($params[2]) && $params[2] != '') {$color_dead = strtolower($params[2]);} else {$color_dead = 'cccccc';}
 		$sizes = explode('x', $size);
-		$tot_l = $this->totalLivingPercentage();
-		$tot_d = $this->totalDeceasedPercentage();
-		if ($tot_l == 0 && $tot_d == 0) {
+		// Raw data - for calculation
+		$tot_l = $this->_totalLiving();
+		$tot_d = $this->_totalDeceased();
+		$tot=$tot_l+$tot_d;
+		// I18N data - for display
+		$per_l = $this->totalLivingPercentage();
+		$per_d = $this->totalDeceasedPercentage();
+		if ($tot==0) {
 			return '';
 		} else {
-			$chd = self::_array_to_extended_encoding(array($tot_l, $tot_d));
+			$chd = self::_array_to_extended_encoding(array(4095*$tot_l/$tot, 4095*$tot_d/$tot));
 			$chl =
-				WT_I18N::translate('Living').' - '.$tot_l.'|'.
-				WT_I18N::translate('Dead').' - '.$tot_d.'|';
-			$chart_title =  WT_I18N::translate('Living').' - '.$tot_l.WT_I18N::$list_separator.
-							WT_I18N::translate('Dead').' - '.$tot_d;
-			return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_living},{$color_dead}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
+				WT_I18N::translate('Living').' - '.$per_l.'|'.
+				WT_I18N::translate('Dead').' - '.$per_d.'|';
+			$chart_title =  WT_I18N::translate('Living').' - '.$per_l.WT_I18N::$list_separator.
+							WT_I18N::translate('Dead').' - '.$per_d;
+			return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_living},{$color_dead}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
 		}
 	}
 
@@ -838,6 +833,7 @@ class WT_Stats {
 		$chart_title = "";
 		$c = 0;
 		$max = 0;
+		$media=array();
 		foreach (self::$_media_types as $type) {
 			$count = $this->_totalMediaType($type);
 			if ($count>0) {
@@ -848,7 +844,7 @@ class WT_Stats {
 				$c += $count;
 			}
 		}
-		$count = $this->totalMediaUnknown();
+		$count = $this->_totalMediaType('unknown');
 		if ($count>0) {
 			$media['unknown'] = $tot-$c;
 			if ($tot-$c > $max) {
@@ -877,7 +873,7 @@ class WT_Stats {
 		$chart_title = substr($chart_title,0,-2);
 		$chd = self::_array_to_extended_encoding($mediaCounts);
 		$chl = substr($mediaTypes,0,-1);
-		return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
+		return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
 	}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1190,7 +1186,7 @@ class WT_Stats {
 			}
 			break;
 		}
-		$chart_url ="http://chart.apis.google.com/chart?cht=t&amp;chtm=".$chart_shows;
+		$chart_url ="https://chart.googleapis.com/chart?cht=t&amp;chtm=".$chart_shows;
 		$chart_url.="&amp;chco=".$WT_STATS_CHART_COLOR1.",".$WT_STATS_CHART_COLOR3.",".$WT_STATS_CHART_COLOR2; // country colours
 		$chart_url.="&amp;chf=bg,s,ECF5FF"; // sea colour
 		$chart_url.="&amp;chs=".$WT_STATS_MAP_X."x".$WT_STATS_MAP_Y;
@@ -1238,12 +1234,12 @@ class WT_Stats {
 		// get all the user's countries names
 		$all_countries = self::get_all_countries();
 		foreach ($all_db_countries as $country_code=>$country) {
-			$top10[]="\t<li>";
+			$top10[]='<li>';
 			foreach ($country as $country_name=>$tot) {
 				$place = '<a href="'.get_place_url($country_name).'" class="list_item">'.$all_countries[$country_code].'</a>';
-				$top10[].=$place." ".PrintReady("[".$tot."]");
+				$top10[].=$place.' - '.WT_I18N::number($tot);
 			}
-			$top10[].="</li>\n";
+			$top10[].='</li>';
 			if ($i++==10) break;
 		}
 		$top10=join("\n", $top10);
@@ -1285,7 +1281,7 @@ class WT_Stats {
 		arsort($places);
 		foreach ($places as $place=>$count) {
 			$place = '<a href="'.get_place_url($place).'" class="list_item">'.PrintReady($place).'</a>';
-			$top10[]="\t<li>".$place." ".PrintReady("[".$count."]")."</li>\n";
+			$top10[]='<li>'.$place.' - '.WT_I18N::number($count).'</li>';
 			if ($i++==10) break;
 		}
 		$top10=join("\n", $top10);
@@ -1296,7 +1292,7 @@ class WT_Stats {
 		global $WT_STATS_CHART_COLOR1, $WT_STATS_CHART_COLOR2, $WT_STATS_S_CHART_X, $WT_STATS_S_CHART_Y;
 
 		if ($simple) {
-			$sql = "SELECT ROUND((d_year+49.1)/100) AS century, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT FLOOR(d_year/100+1) AS century, COUNT(*) AS total FROM `##dates` "
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						.'d_year<>0 AND '
@@ -1340,11 +1336,11 @@ class WT_Stats {
 			$centuries = "";
 			foreach ($rows as $values) {
 				$counts[] = round(100 * $values['total'] / $tot, 0);
-				$centuries .= WT_I18N::century_name($values['century']).' - '.WT_I18N::number($values['total']).'|';
+				$centuries .= self::_centuryName($values['century']).' - '.WT_I18N::number($values['total']).'|';
 			}
 			$chd = self::_array_to_extended_encoding($counts);
 			$chl = rawurlencode(substr($centuries,0,-1));
-			return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Births by century')."\" title=\"".WT_I18N::translate('Births by century')."\" />";
+			return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Births by century')."\" title=\"".WT_I18N::translate('Births by century')."\" />";
 		}
 		if (!isset($rows)) return 0;
 		return $rows;
@@ -1354,7 +1350,7 @@ class WT_Stats {
 		global $WT_STATS_CHART_COLOR1, $WT_STATS_CHART_COLOR2, $WT_STATS_S_CHART_X, $WT_STATS_S_CHART_Y;
 
 		if ($simple) {
-			$sql = "SELECT ROUND((d_year+49.1)/100) AS century, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT FLOOR(d_year/100+1) AS century, COUNT(*) AS total FROM `##dates` "
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						.'d_year<>0 AND '
@@ -1398,11 +1394,11 @@ class WT_Stats {
 			$centuries = "";
 			foreach ($rows as $values) {
 				$counts[] = round(100 * $values['total'] / $tot, 0);
-				$centuries .= WT_I18N::century_name($values['century']).' - '.WT_I18N::number($values['total']).'|';
+				$centuries .= self::_centuryName($values['century']).' - '.WT_I18N::number($values['total']).'|';
 			}
 			$chd = self::_array_to_extended_encoding($counts);
 			$chl = rawurlencode(substr($centuries,0,-1));
-			return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Deaths by century')."\" title=\"".WT_I18N::translate('Deaths by century')."\" />";
+			return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Deaths by century')."\" title=\"".WT_I18N::translate('Deaths by century')."\" />";
 		}
 		if (!isset($rows)) {return 0;}
 		return $rows;
@@ -1585,17 +1581,17 @@ class WT_Stats {
 			$age = $row['age'];
 			if (floor($age/365.25)>0) {
 				$age = floor($age/365.25).'y';
-			} else if (floor($age/12)>0) {
-				$age = floor($age/12).'m';
+			} else if (floor($age/30.4375)>0) {
+				$age = floor($age/30.4375).'m';
 			} else {
 				$age = $age.'d';
 			}
 			$age = get_age_at_event($age, true);
 			if ($person->canDisplayDetails()) {
 				if ($type == 'list') {
-					$top10[]="\t<li><a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> [".$age."]"."</li>\n";
+					$top10[]="\t<li><a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> (".$age.")"."</li>\n";
 				} else {
-					$top10[]="<a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> [".$age."]";
+					$top10[]="<a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> (".$age.")";
 				}
 			}
 		}
@@ -1605,7 +1601,7 @@ class WT_Stats {
 			$top10=join(';&nbsp; ', $top10);
 		}
 		if ($TEXT_DIRECTION=='rtl') {
-			$top10=str_replace(array("[", "]", "(", ")", "+"), array("&rlm;[", "&rlm;]", "&rlm;(", "&rlm;)", "&rlm;+"), $top10);
+			$top10=str_replace(array('[', ']', '(', ')', '+'), array('&rlm;[', '&rlm;]', '&rlm;(', '&rlm;)', '&rlm;+'), $top10);
 		}
 		if ($type == 'list') {
 			return "<ul>\n{$top10}</ul>\n";
@@ -1652,16 +1648,16 @@ class WT_Stats {
 			$age = (WT_CLIENT_JD-$row['age']);
 			if (floor($age/365.25)>0) {
 				$age = floor($age/365.25).'y';
-			} else if (floor($age/12)>0) {
-				$age = floor($age/12).'m';
+			} else if (floor($age/30.4375)>0) {
+				$age = floor($age/30.4375).'m';
 			} else {
 				$age = $age.'d';
 			}
 			$age = get_age_at_event($age, true);
 			if ($type == 'list') {
-				$top10[]="\t<li><a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> [".$age."]"."</li>\n";
+				$top10[]="\t<li><a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> (".$age.")"."</li>\n";
 			} else {
-				$top10[]="<a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> [".$age."]";
+				$top10[]="<a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> (".$age.")";
 			}
 		}
 		if ($type == 'list') {
@@ -1670,7 +1666,7 @@ class WT_Stats {
 			$top10=join(';&nbsp; ', $top10);
 		}
 		if ($TEXT_DIRECTION=='rtl') {
-			$top10=str_replace(array("[", "]", "(", ")", "+"), array("&rlm;[", "&rlm;]", "&rlm;(", "&rlm;)", "&rlm;+"), $top10);
+			$top10=str_replace(array('[', ']', '(', ')', '+'), array('&rlm;[', '&rlm;]', '&rlm;(', '&rlm;)', '&rlm;+'), $top10);
 		}
 		if ($type == 'list') {
 			return "<ul>\n{$top10}</ul>\n";
@@ -1711,14 +1707,14 @@ class WT_Stats {
 		if ($show_years) {
 			if (floor($age/365.25)>0) {
 				$age = floor($age/365.25).'y';
-			} else if (floor($age/12)>0) {
-				$age = floor($age/12).'m';
+			} else if (floor($age/30.4375)>0) {
+				$age = floor($age/30.4375).'m';
 			} else if (!empty($age)) {
 				$age = $age.'d';
 			}
 			return get_age_at_event($age, true);
 		} else {
-			return floor($age/365.25);
+			return WT_I18N::number($age/365.25);
 		}
 	}
 
@@ -1729,7 +1725,7 @@ class WT_Stats {
 			$rows=self::_runSQL(''
 				.' SELECT'
 					.' ROUND(AVG(death.d_julianday2-birth.d_julianday1)/365.25,1) AS age,'
-					.' ROUND((death.d_year+49.1)/100) AS century,'
+					.' FLOOR(death.d_year/100+1) AS century,'
 					.' i_sex AS sex'
 				.' FROM'
 					." `##dates` AS death,"
@@ -1758,7 +1754,7 @@ class WT_Stats {
 			}
 			foreach ($out as $century=>$values) {
 				if ($sizes[0]<980) $sizes[0] += 50;
-				$chxl .= WT_I18N::century_name($century).'|';
+				$chxl .= self::_centuryName($century).'|';
 				$average = 0;
 				if (isset($values['F'])) {
 					$countsf .= $values['F'].',';
@@ -1780,7 +1776,11 @@ class WT_Stats {
 			$countsf = substr($countsf,0,-1);
 			$countsa = substr($countsa,0,-1);
 			$chd = 't2:'.$countsm.'|'.$countsf.'|'.$countsa;
-			$chxl .= '1:||'.WT_I18N::translate('century').'|2:|0|10|20|30|40|50|60|70|80|90|100|3:||'.WT_I18N::translate('Age').'|';
+			$decades='';
+			for ($i=0; $i<=100; $i+=10) {
+				$decades.='|'.WT_I18N::number($i);
+			}
+			$chxl .= '1:||'.WT_I18N::translate('century').'|2:'.$decades.'|3:||'.WT_I18N::translate('Age').'|';
 			$title = WT_I18N::translate('Average age related to death century');
 			if (count($rows)>6 || utf8_strlen($title)<30) {
 				$chtt = $title;
@@ -1793,7 +1793,7 @@ class WT_Stats {
 				$half = floor(count($counter)/2);
 				$chtt = substr_replace($title, '|', $counter[$half], 1);
 			}
-			return '<img src="'."http://chart.apis.google.com/chart?cht=bvg&amp;chs={$sizes[0]}x{$sizes[1]}&amp;chm=D,FF0000,2,0,3,1|N*f1*,000000,0,-1,11,1|N*f1*,000000,1,-1,11,1&amp;chf=bg,s,ffffff00|c,s,ffffff00&amp;chtt=".rawurlencode($chtt)."&amp;chd={$chd}&amp;chco=0000FF,FFA0CB,FF0000&amp;chbh=20,3&amp;chxt=x,x,y,y&amp;chxl=".rawurlencode($chxl)."&amp;chdl=".rawurlencode(WT_I18N::translate('Males').'|'.WT_I18N::translate('Females').'|'.WT_I18N::translate('Average age at death'))."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Average age related to death century')."\" title=\"".WT_I18N::translate('Average age related to death century')."\" />";
+			return '<img src="'."https://chart.googleapis.com/chart?cht=bvg&amp;chs={$sizes[0]}x{$sizes[1]}&amp;chm=D,FF0000,2,0,3,1|N*f1*,000000,0,-1,11,1|N*f1*,000000,1,-1,11,1&amp;chf=bg,s,ffffff00|c,s,ffffff00&amp;chtt=".rawurlencode($chtt)."&amp;chd={$chd}&amp;chco=0000FF,FFA0CB,FF0000&amp;chbh=20,3&amp;chxt=x,x,y,y&amp;chxl=".rawurlencode($chxl)."&amp;chdl=".rawurlencode(WT_I18N::translate('Males').'|'.WT_I18N::translate('Females').'|'.WT_I18N::translate('Average age at death'))."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Average age related to death century')."\" title=\"".WT_I18N::translate('Average age related to death century')."\" />";
 		} else {
 			$sex_search = '';
 			$years = '';
@@ -2084,15 +2084,15 @@ class WT_Stats {
 				}
 				break;
 			case 'name':
-				$result="<a href=\"".$family->getHtmlUrl()."\">".$person->getFullName().'</a>';
+				$result='<a href="'.$family->getHtmlUrl().'">'.$person->getFullName().'</a>';
 				break;
 			case 'age':
 				$age = $row['age'];
 				if ($show_years) {
 					if (floor($age/365.25)>0) {
 						$age = floor($age/365.25).'y';
-					} else if (floor($age/12)>0) {
-						$age = floor($age/12).'m';
+					} else if (floor($age/30.4375)>0) {
+						$age = floor($age/30.4375).'m';
 					} else {
 						$age = $age.'d';
 					}
@@ -2122,7 +2122,7 @@ class WT_Stats {
 			.' WHERE'
 				." fam.f_file = {$this->_ged_id} AND"
 				.' husbdeath.d_gid = fam.f_husb AND'
-				." husbdeath.d_fact IN ('DEAT', 'BURI', 'CREM') AND"
+				." husbdeath.d_fact = 'DEAT' AND"
 				.' married.d_gid = fam.f_id AND'
 				." married.d_fact = 'MARR' AND"
 				.' married.d_julianday1 < husbdeath.d_julianday2 AND'
@@ -2144,7 +2144,7 @@ class WT_Stats {
 			.' WHERE'
 				." fam.f_file = {$this->_ged_id} AND"
 				.' wifedeath.d_gid = fam.f_wife AND'
-				." wifedeath.d_fact IN ('DEAT', 'BURI', 'CREM') AND"
+				." wifedeath.d_fact = 'DEAT' AND"
 				.' married.d_gid = fam.f_id AND'
 				." married.d_fact = 'MARR' AND"
 				.' married.d_julianday1 < wifedeath.d_julianday2 AND'
@@ -2201,8 +2201,8 @@ class WT_Stats {
 			}
 			if (floor($age/365.25)>0) {
 				$age = floor($age/365.25).'y';
-			} else if (floor($age/12)>0) {
-				$age = floor($age/12).'m';
+			} else if (floor($age/30.4375)>0) {
+				$age = floor($age/30.4375).'m';
 			} else {
 				$age = $age.'d';
 			}
@@ -2215,9 +2215,9 @@ class WT_Stats {
 			if (($husb->getAllDeathDates() && $wife->getAllDeathDates()) || !$husb->isDead() || !$wife->isDead()) {
 				if ($family->canDisplayDetails()) {
 					if ($type == 'list') {
-						$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [".$age."]"."</li>\n";
+						$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> (".$age.")"."</li>\n";
 					} else {
-						$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [".$age."]";
+						$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> (".$age.")";
 					}
 				}
 				if (++$i==$total) break;
@@ -2282,17 +2282,17 @@ class WT_Stats {
 			$age = $fam['age'];
 			if (floor($age/365.25)>0) {
 				$age = floor($age/365.25).'y';
-			} else if (floor($age/12)>0) {
-				$age = floor($age/12).'m';
+			} else if (floor($age/30.4375)>0) {
+				$age = floor($age/30.4375).'m';
 			} else {
 				$age = $age.'d';
 			}
 			$age = get_age_at_event($age, true);
 			if ($family->canDisplayDetails()) {
 				if ($type == 'list') {
-					$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [".$age."]"."</li>\n";
+					$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> (".$age.")"."</li>\n";
 				} else {
-					$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [".$age."]";
+					$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> (".$age.")";
 				}
 			}
 		}
@@ -2352,15 +2352,15 @@ class WT_Stats {
 				}
 				break;
 			case 'name':
-				$result="<a href=\"".$person->getHtmlUrl()."\">".$person->getFullName().'</a>';
+				$result='<a href="'.$person->getHtmlUrl().'">'.$person->getFullName().'</a>';
 				break;
 			case 'age':
 				$age = $row['age'];
 				if ($show_years) {
 					if (floor($age/365.25)>0) {
 						$age = floor($age/365.25).'y';
-					} else if (floor($age/12)>0) {
-						$age = floor($age/12).'m';
+					} else if (floor($age/30.4375)>0) {
+						$age = floor($age/30.4375).'m';
 					} else {
 						$age = $age.'d';
 					}
@@ -2377,7 +2377,7 @@ class WT_Stats {
 		global $WT_STATS_CHART_COLOR1, $WT_STATS_CHART_COLOR2, $WT_STATS_S_CHART_X, $WT_STATS_S_CHART_Y;
 
 		if ($simple) {
-			$sql = "SELECT ROUND((d_year+49.1)/100) AS century, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT FLOOR(d_year/100+1) AS century, COUNT(*) AS total FROM `##dates` "
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						.'d_year<>0 AND '
@@ -2440,11 +2440,11 @@ class WT_Stats {
 			$counts=array();
 			foreach ($rows as $values) {
 				$counts[] = round(100 * $values['total'] / $tot, 0);
-				$centuries .= WT_I18N::century_name($values['century']).' - '.WT_I18N::number($values['total']).'|';
+				$centuries .= self::_centuryName($values['century']).' - '.WT_I18N::number($values['total']).'|';
 			}
 			$chd = self::_array_to_extended_encoding($counts);
 			$chl = substr($centuries,0,-1);
-			return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Marriages by century')."\" title=\"".WT_I18N::translate('Marriages by century')."\" />";
+			return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Marriages by century')."\" title=\"".WT_I18N::translate('Marriages by century')."\" />";
 		}
 		return $rows;
 	}
@@ -2453,7 +2453,7 @@ class WT_Stats {
 		global $WT_STATS_CHART_COLOR1, $WT_STATS_CHART_COLOR2, $WT_STATS_S_CHART_X, $WT_STATS_S_CHART_Y;
 
 		if ($simple) {
-			$sql = "SELECT ROUND((d_year+49.1)/100) AS century, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT FLOOR(d_year/100+1) AS century, COUNT(*) AS total FROM `##dates` "
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						.'d_year<>0 AND '
@@ -2516,11 +2516,11 @@ class WT_Stats {
 			$counts=array();
 			foreach ($rows as $values) {
 				$counts[] = round(100 * $values['total'] / $tot, 0);
-				$centuries .= WT_I18N::century_name($values['century']).' - '.$values['total'].'|';
+				$centuries .= self::_centuryName($values['century']).' - '.WT_I18N::number($values['total']).'|';
 			}
 			$chd = self::_array_to_extended_encoding($counts);
 			$chl = substr($centuries,0,-1);
-			return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Divorces by century')."\" title=\"".WT_I18N::translate('Divorces by century')."\" />";
+			return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Divorces by century')."\" title=\"".WT_I18N::translate('Divorces by century')."\" />";
 		}
 		return $rows;
 	}
@@ -2561,7 +2561,7 @@ class WT_Stats {
 			$rows=self::_runSQL(
 				"SELECT ".
 				" ROUND(AVG(married.d_julianday2-birth.d_julianday1-182.5)/365.25,1) AS age, ".
-				" ROUND((married.d_year+49.1)/100) AS century, ".
+				" FLOOR(married.d_year/100+1) AS century, ".
 				" 'M' AS sex ".
 				"FROM `wt_dates` AS married ".
 				"JOIN `wt_families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
@@ -2575,7 +2575,7 @@ class WT_Stats {
 				"UNION ALL ".
 				"SELECT ".
 				" ROUND(AVG(married.d_julianday2-birth.d_julianday1-182.5)/365.25,1) AS age, ".
-				" ROUND((married.d_year+49.1)/100) AS century, ".
+				" FLOOR(married.d_year/100+1) AS century, ".
 				" 'F' AS sex ".
 				"FROM `wt_dates` AS married ".
 				"JOIN `wt_families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
@@ -2604,7 +2604,7 @@ class WT_Stats {
 			}
 			foreach ($out as $century=>$values) {
 				if ($sizes[0]<1000) $sizes[0] += 50;
-				$chxl .= WT_I18N::century_name($century).'|';
+				$chxl .= self::_centuryName($century).'|';
 				$average = 0;
 				if (isset($values['F'])) {
 					if ($max<=50) $value = $values['F']*2;
@@ -2649,7 +2649,7 @@ class WT_Stats {
 				$half = floor(count($counter)/2);
 				$chtt = substr_replace(WT_I18N::translate('Average age in century of marriage'), '|', $counter[$half], 1);
 			}
-			return "<img src=\""."http://chart.apis.google.com/chart?cht=bvg&amp;chs={$sizes[0]}x{$sizes[1]}&amp;chm=D,FF0000,2,0,3,1|{$chmm}{$chmf}&amp;chf=bg,s,ffffff00|c,s,ffffff00&amp;chtt=".rawurlencode($chtt)."&amp;chd={$chd}&amp;chco=0000FF,FFA0CB,FF0000&amp;chbh=20,3&amp;chxt=x,x,y,y&amp;chxl=".rawurlencode($chxl)."&amp;chdl=".rawurlencode(WT_I18N::translate('Males')."|".WT_I18N::translate('Females')."|".WT_I18N::translate('Average age'))."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Average age in century of marriage')."\" title=\"".WT_I18N::translate('Average age in century of marriage')."\" />";
+			return "<img src=\""."https://chart.googleapis.com/chart?cht=bvg&amp;chs={$sizes[0]}x{$sizes[1]}&amp;chm=D,FF0000,2,0,3,1|{$chmm}{$chmf}&amp;chf=bg,s,ffffff00|c,s,ffffff00&amp;chtt=".rawurlencode($chtt)."&amp;chd={$chd}&amp;chco=0000FF,FFA0CB,FF0000&amp;chbh=20,3&amp;chxt=x,x,y,y&amp;chxl=".rawurlencode($chxl)."&amp;chdl=".rawurlencode(WT_I18N::translate('Males')."|".WT_I18N::translate('Females')."|".WT_I18N::translate('Average age'))."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Average age in century of marriage')."\" title=\"".WT_I18N::translate('Average age in century of marriage')."\" />";
 		} else {
 			if ($year1>=0 && $year2>=0) {
 				$years=" married.d_year BETWEEN {$year1} AND {$year2} AND ";
@@ -2672,7 +2672,7 @@ class WT_Stats {
 				"UNION ALL ".
 				"SELECT ".
 				" ROUND(AVG(married.d_julianday2-birth.d_julianday1-182.5)/365.25,1) AS age, ".
-				" ROUND((married.d_year+49.1)/100) AS century, ".
+				" FLOOR(married.d_year/100+1) AS century, ".
 				" 'F' AS sex ".
 				"FROM `wt_dates` AS married ".
 				"JOIN `wt_families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
@@ -2838,9 +2838,13 @@ class WT_Stats {
 			$family=WT_Family::getInstance($rows[$c]['id']);
 			if ($family->canDisplayDetails()) {
 				if ($type == 'list') {
-					$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [{$rows[$c]['tot']} ".WT_I18N::translate('children')."]"."</li>\n";
+					$top10[]=
+						'<li><a href="'.$family->getHtmlUrl().'">'.$family->getFullName().'</a> - '.
+						WT_I18N::plural('%s child', '%s children', $rows[$c]['tot'], WT_I18N::number($rows[$c]['tot']));
 				} else {
-					$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [{$rows[$c]['tot']} ".WT_I18N::translate('children')."]";
+					$top10[]=
+						'<a href="'.$family->getHtmlUrl().'">'.$family->getFullName().'</a> - '.
+						WT_I18N::plural('%s child', '%s children', $rows[$c]['tot'], WT_I18N::number($rows[$c]['tot']));
 				}
 			}
 		}
@@ -2902,10 +2906,10 @@ class WT_Stats {
 			$child2 = WT_Person::getInstance($fam['ch2']);
 			if ($type == 'name') {
 				if ($child1->canDisplayDetails() && $child2->canDisplayDetails()) {
-					$return = "<a href=\"".$child2->getHtmlUrl()."\">".$child2->getFullName()."</a> ";
-					$return .= WT_I18N::translate('and')." ";
-					$return .= "<a href=\"".$child1->getHtmlUrl()."\">".$child1->getFullName()."</a>";
-					$return .= " <a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View Family')."]</a>\n";
+					$return = '<a href="'.$child2->getHtmlUrl().'">'.$child2->getFullName().'</a> ';
+					$return .= WT_I18N::translate('and').' ';
+					$return .= '<a href="'.$child1->getHtmlUrl().'">'.$child1->getFullName().'</a>';
+					$return .= ' <a href="'.$family->getHtmlUrl().'">['.WT_I18N::translate('View Family').']</a>';
 				} else {
 					$return = WT_I18N::translate('This information is private and cannot be shown.');
 				}
@@ -2914,8 +2918,8 @@ class WT_Stats {
 			$age = $fam['age'];
 			if (floor($age/365.25)>0) {
 				$age = floor($age/365.25).'y';
-			} else if (floor($age/12)>0) {
-				$age = floor($age/12).'m';
+			} else if (floor($age/30.4375)>0) {
+				$age = floor($age/30.4375).'m';
 			} else {
 				$age = $age.'d';
 			}
@@ -2930,7 +2934,7 @@ class WT_Stats {
 						$return .= "<a href=\"".$child2->getHtmlUrl()."\">".$child2->getFullName()."</a> ";
 						$return .= WT_I18N::translate('and')." ";
 						$return .= "<a href=\"".$child1->getHtmlUrl()."\">".$child1->getFullName()."</a>";
-						$return .= " [".$age."]";
+						$return .= " (".$age.")";
 						$return .= " <a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View Family')."]</a>";
 						$return .= "\t</li>\n";
 						$top10[] = $return;
@@ -2941,7 +2945,7 @@ class WT_Stats {
 					$return .= "<a href=\"".$child2->getHtmlUrl()."\">".$child2->getFullName()."</a> ";
 					$return .= WT_I18N::translate('and')." ";
 					$return .= "<a href=\"".$child1->getHtmlUrl()."\">".$child1->getFullName()."</a>";
-					$return .= " [".$age."]";
+					$return .= " (".$age.")";
 					$return .= " <a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View Family')."]</a>";
 					$return .= "\t</li>\n";
 					$top10[] = $return;
@@ -2951,7 +2955,7 @@ class WT_Stats {
 					$return = $child2->format_list('span', false, $child2->getFullName());
 					$return .= "<br />".WT_I18N::translate('and')."<br />";
 					$return .= $child1->format_list('span', false, $child1->getFullName());
-					//$return .= "<br />[".$age."]";
+					//$return .= "<br />(".$age.")";
 					$return .= "<br /><a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View Family')."]</a>\n";
 					return $return;
 				}
@@ -3078,7 +3082,7 @@ class WT_Stats {
 			}
 			$chd = self::_array_to_extended_encoding($counts);
 			$chl = substr($text,0,-1);
-			return '<img src="http://chart.apis.google.com/chart?cht=p3&amp;chd=e:'.$chd.'&amp;chs='.$size.'&amp;chco='.$color_from.','.$color_to.'&amp;chf=bg,s,ffffff00&amp;chl='.$chl.'" width="'.$sizes[0].'" height="'.$sizes[1].'" alt="'.WT_I18N::translate('Month of birth of first child in a relation').'" title="'.WT_I18N::translate('Month of birth of first child in a relation').'" />';
+			return '<img src="https://chart.googleapis.com/chart?cht=p3&amp;chd=e:'.$chd.'&amp;chs='.$size.'&amp;chco='.$color_from.','.$color_to.'&amp;chf=bg,s,ffffff00&amp;chl='.$chl.'" width="'.$sizes[0].'" height="'.$sizes[1].'" alt="'.WT_I18N::translate('Month of birth of first child in a relation').'" title="'.WT_I18N::translate('Month of birth of first child in a relation').'" />';
 		}
 		if (!isset($rows)) return 0;
 		return $rows;
@@ -3130,7 +3134,7 @@ class WT_Stats {
 		}
 		$chl = rawurlencode(join('|', $chl));
 
-		return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Largest families')."\" title=\"".WT_I18N::translate('Largest families')."\" />";
+		return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Largest families')."\" title=\"".WT_I18N::translate('Largest families')."\" />";
 	}
 
 	function totalChildren() {
@@ -3153,7 +3157,7 @@ class WT_Stats {
 			$rows=self::_runSQL(''
 				.' SELECT'
 					.' ROUND(AVG(f_numchil),2) AS num,'
-					.' ROUND((married.d_year+49.1)/100) AS century'
+					.' FLOOR(married.d_year/100+1) AS century'
 				.' FROM'
 					." `##families` AS fam"
 				.' LEFT JOIN'
@@ -3174,7 +3178,7 @@ class WT_Stats {
 			$counts=array();
 			foreach ($rows as $values) {
 				if ($sizes[0]<980) $sizes[0] += 38;
-				$chxl .= WT_I18N::century_name($values['century'])."|";
+				$chxl .= self::_centuryName($values['century'])."|";
 				if ($max<=5) $counts[] = round($values['num']*819.2-1, 1);
 				else $counts[] = round($values['num']*409.6, 1);
 				$chm .= 't'.$values['num'].',000000,0,'.$i.',11,1|';
@@ -3184,7 +3188,7 @@ class WT_Stats {
 			$chm = substr($chm,0,-1);
 			if ($max<=5) $chxl .= "1:||".WT_I18N::translate('century')."|2:|0|1|2|3|4|5|3:||".WT_I18N::translate('Number of children')."|";
 			else $chxl .= "1:||".WT_I18N::translate('century')."|2:|0|1|2|3|4|5|6|7|8|9|10|3:||".WT_I18N::translate('Number of children')."|";
-			return "<img src=\"http://chart.apis.google.com/chart?cht=bvg&amp;chs={$sizes[0]}x{$sizes[1]}&amp;chf=bg,s,ffffff00|c,s,ffffff00&amp;chm=D,FF0000,0,0,3,1|{$chm}&amp;chd=e:{$chd}&amp;chco=0000FF&amp;chbh=30,3&amp;chxt=x,x,y,y&amp;chxl=".rawurlencode($chxl)."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Average number of children per family')."\" title=\"".WT_I18N::translate('Average number of children per family')."\" />";
+			return "<img src=\"https://chart.googleapis.com/chart?cht=bvg&amp;chs={$sizes[0]}x{$sizes[1]}&amp;chf=bg,s,ffffff00|c,s,ffffff00&amp;chm=D,FF0000,0,0,3,1|{$chm}&amp;chd=e:{$chd}&amp;chco=0000FF&amp;chbh=30,3&amp;chxt=x,x,y,y&amp;chxl=".rawurlencode($chxl)."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Average number of children per family')."\" title=\"".WT_I18N::translate('Average number of children per family')."\" />";
 		} else {
 			if ($sex=='M') {
 				$sql = "SELECT num, COUNT(*) AS total FROM "
@@ -3243,7 +3247,7 @@ class WT_Stats {
 				.' f_numchil = 0 AND'
 				." fam.f_file = {$this->_ged_id}");
 		$row=$rows[0];
-		return $row['tot'];
+		return WT_I18N::number($row['tot']);
 	}
 
 
@@ -3296,22 +3300,22 @@ class WT_Stats {
 		}
 		$max = 0;
 		$tot = 0;
-		$rows=self::_runSQL(''
-			.' SELECT'
-				.' COUNT(*) AS count,'
-				.' ROUND((married.d_year+49.1)/100) AS century'
-			.' FROM'
-				." `##families` AS fam"
-			.' LEFT JOIN'
-				." `##dates` AS married ON married.d_file = {$this->_ged_id}"
-			.' WHERE'
-				.' f_numchil = 0 AND'
-				.' married.d_gid = fam.f_id AND'
-				." fam.f_file = {$this->_ged_id} AND"
-				.$years
-				." married.d_fact = 'MARR' AND"
-				." married.d_type='@#DGREGORIAN@'"
-			.' GROUP BY century ORDER BY century');
+		$rows=self::_runSQL(
+			"SELECT".
+			" COUNT(*) AS count,".
+			" FLOOR(married.d_year/100+1) AS century".
+			" FROM".
+			" `##families` AS fam".
+			" JOIN".
+			" `##dates` AS married ON (married.d_file = fam.f_file AND married.d_gid = fam.f_id)".
+			" WHERE".
+			" f_numchil = 0 AND".
+			" fam.f_file = {$this->_ged_id} AND".
+			$years.
+			" married.d_fact = 'MARR' AND".
+			" married.d_type = '@#DGREGORIAN@'".
+			" GROUP BY century ORDER BY century"
+		);
 		if (empty($rows)) return '';
 		foreach ($rows as $values) {
 			if ($max<$values['count']) $max = $values['count'];
@@ -3324,7 +3328,7 @@ class WT_Stats {
 		$i = 0;
 		foreach ($rows as $values) {
 			if ($sizes[0]<980) $sizes[0] += 38;
-			$chxl .= WT_I18N::century_name($values['century'])."|";
+			$chxl .= self::_centuryName($values['century'])."|";
 			$counts[] = round(4095*$values['count']/($max+1));
 			$chm .= 't'.$values['count'].',000000,0,'.$i.',11,1|';
 			$i++;
@@ -3350,7 +3354,7 @@ class WT_Stats {
 			$chxl .= $n."|";
 		}
 		$chxl .= "3:||".WT_I18N::translate('Total families')."|";
-		return "<img src=\"http://chart.apis.google.com/chart?cht=bvg&amp;chs={$sizes[0]}x{$sizes[1]}&amp;chf=bg,s,ffffff00|c,s,ffffff00&amp;chm=D,FF0000,0,0:".($i-1).",3,1|{$chm}&amp;chd=e:{$chd}&amp;chco=0000FF,ffffff00&amp;chbh=30,3&amp;chxt=x,x,y,y&amp;chxl=".rawurlencode($chxl)."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Number of families without children')."\" title=\"".WT_I18N::translate('Number of families without children')."\" />";
+		return "<img src=\"https://chart.googleapis.com/chart?cht=bvg&amp;chs={$sizes[0]}x{$sizes[1]}&amp;chf=bg,s,ffffff00|c,s,ffffff00&amp;chm=D,FF0000,0,0:".($i-1).",3,1|{$chm}&amp;chd=e:{$chd}&amp;chco=0000FF,ffffff00&amp;chbh=30,3&amp;chxt=x,x,y,y&amp;chxl=".rawurlencode($chxl)."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Number of families without children')."\" title=\"".WT_I18N::translate('Number of families without children')."\" />";
 	}
 
 	function _topTenGrandFamilyQuery($type='list', $params=null) {
@@ -3388,9 +3392,13 @@ class WT_Stats {
 			$family=WT_Family::getInstance($row['id']);
 			if ($family->canDisplayDetails()) {
 				if ($type == 'list') {
-					$top10[] = "\t<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [{$row['tot']} ".WT_I18N::translate('grandchildren')."]"."</li>\n";
+					$top10[]=
+						'<li><a href="'.$family->getHtmlUrl().'">'.$family->getFullName().'</a> - '.
+						WT_I18N::plural('%s grandchild', '%s grandchildren', $row['tot'], WT_I18N::number($row['tot']));
 				} else {
-					$top10[] = "<a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> [{$row['tot']} ".WT_I18N::translate('grandchildren')."]";
+					$top10[]=
+						'<a href="'.$family->getHtmlUrl().'">'.$family->getFullName().'</a> - '.
+						WT_I18N::plural('%s grandchild', '%s grandchildren', $row['tot'], WT_I18N::number($row['tot']));
 				}
 			}
 		}
@@ -3486,7 +3494,6 @@ class WT_Stats {
 		$tot = 0;
 		$per = 0;
 		foreach ($surnames as $indexval=>$surname) {$tot += $surname['match'];}
-		$chart_title = '';
 		$chd = '';
 		$chl = array();
 		foreach ($all_surnames as $surn=>$surns) {
@@ -3510,16 +3517,15 @@ class WT_Stats {
 			$chd .= self::_array_to_extended_encoding($per);
 			//ToDo: RTL names are often printed LTR when also LTR names are present
 			$chl[] = $top_name.' - '.WT_I18N::number($count_per);
-			$chart_title .= $top_name.' - '.$count_per.WT_I18N::$list_separator;
 
 		}
 		$per = round(100 * ($tot_indi-$tot) / $tot_indi, 0);
 		$chd .= self::_array_to_extended_encoding($per);
-		$chl[] = WT_I18N::translate('Other').' - '.($tot_indi-$tot);
-		$chart_title .= WT_I18N::translate('Other').' - '.($tot_indi-$tot);
+		$chl[] = WT_I18N::translate('Other').' - '.WT_I18N::number($tot_indi-$tot);
 
-		$chl = join('|', $chl);
-		return '<img src="http://chart.apis.google.com/chart?cht=p3&amp;chd=e:'.$chd.'&amp;chs='.$size.'&amp;chco='.$color_from.','.$color_to.'&amp;chf=bg,s,ffffff00&amp;chl='.rawurlencode($chl).'" width="'.$sizes[0].'" height="'.$sizes[1].'" alt="'.$chart_title.'" title="'.$chart_title.'" />';
+		$chart_title=implode(WT_I18N::$list_separator, $chl);
+		$chl=implode('|', $chl);
+		return '<img src="https://chart.googleapis.com/chart?cht=p3&amp;chd=e:'.$chd.'&amp;chs='.$size.'&amp;chco='.$color_from.','.$color_to.'&amp;chf=bg,s,ffffff00&amp;chl='.rawurlencode($chl).'" width="'.$sizes[0].'" height="'.$sizes[1].'" alt="'.$chart_title.'" title="'.$chart_title.'" />';
 	}
 
 
@@ -3596,7 +3602,7 @@ class WT_Stats {
 			}
 			switch ($type) {
 			case 'table':
-				$common[] = '<tr><td>'.PrintReady(utf8_substr($given,0,1).utf8_strtolower(utf8_substr($given,1))).'</td><td>'.$total.'</td></tr>';
+				$common[] = '<tr><td>'.PrintReady(utf8_substr($given,0,1).utf8_strtolower(utf8_substr($given,1))).'</td><td>'.WT_I18N::number($total).'</td><td>'.$total.'</td></tr>';
 				break;
 			case 'list':
 				$common[] = "\t<li>{$totL}".PrintReady(utf8_substr($given,0,1).utf8_strtolower(utf8_substr($given,1)))."{$totR}</li>\n";
@@ -3625,13 +3631,14 @@ class WT_Stats {
 						"aaSorting": [[1,"desc"]],
 						"aoColumns": [
 							/* 0-name */ {},
-							/* 1-count */ { "sClass": "center"}
+							/* 1-count */ { sClass:"center", iDataSort:2},
+							/* 2-COUNT */ { bVisible:false}
 						]
 					});
 					jQuery("#'.$table_id.'").css("visibility", "visible");
 				');
 				$lookup=array('M'=>WT_I18N::translate('Male'), 'F'=>WT_I18N::translate('Female'), 'U'=>WT_I18N::translate_c('unknown gender', 'Unknown'), 'B'=>WT_I18N::translate('All'));
-				return '<table id="'.$table_id.'" class="givn-list"><thead><tr><th class="ui-state-default" colspan="2">'.$lookup[$sex].'</th></tr><tr><th>'.WT_I18N::translate('Name').'</th><th>'.WT_I18N::translate('Count').'</th></tr></thead><tbody>'.join('', $common).'</tbody></table>';
+				return '<table id="'.$table_id.'" class="givn-list"><thead><tr><th class="ui-state-default" colspan="3">'.$lookup[$sex].'</th></tr><tr><th>'.WT_I18N::translate('Name').'</th><th>'.WT_I18N::translate('Count').'</th><th>COUNT</th></tr></thead><tbody>'.join('', $common).'</tbody></table>';
 			case 'list':
 				return '<ul>\n'.join("\n", $common).'</ul>\n';
 			case 'nolist':
@@ -3682,7 +3689,6 @@ class WT_Stats {
 		if (count($given) <= 0) {return '';}
 		$tot = 0;
 		foreach ($given as $givn=>$count) {$tot += $count;}
-		$chart_title = '';
 		$chd = '';
 		$chl = array();
 		foreach ($given as $givn=>$count) {
@@ -3693,17 +3699,15 @@ class WT_Stats {
 			}
 			$chd .= self::_array_to_extended_encoding($per);
 			//ToDo: RTL names are often printed LTR when also LTR names are present
-			$chl[] = $givn.' - '.$count;
-			$chart_title .= $givn.' - '.$count.WT_I18N::$list_separator;
-
+			$chl[] = $givn.' - '.WT_I18N::number($count);
 		}
 		$per = round(100 * ($tot_indi-$tot) / $tot_indi, 0);
 		$chd .= self::_array_to_extended_encoding($per);
-		$chl[] = WT_I18N::translate('Other').' - '.($tot_indi-$tot);
-		$chart_title .= WT_I18N::translate('Other').' - '.($tot_indi-$tot);
+		$chl[] = WT_I18N::translate('Other').' - '.WT_I18N::number($tot_indi-$tot);
 
-		$chl = join('|', $chl);
-		return "<img src=\"http://chart.apis.google.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl=".rawurlencode($chl)."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
+		$chart_title=implode(WT_I18N::$list_separator, $chl);
+		$chl=implode('|', $chl);
+		return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl=".rawurlencode($chl)."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
 	}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3928,7 +3932,9 @@ class WT_Stats {
 
 	// http://bendodson.com/news/google-extended-encoding-made-easy/
 	static function _array_to_extended_encoding($a) {
-		if (!is_array($a)) {$a = array($a);}
+		if (!is_array($a)) {
+			$a = array($a);
+		}
 		$encoding = '';
 		foreach ($a as $value) {
 			if ($value<0) $value = 0;
@@ -4303,6 +4309,7 @@ class WT_Stats {
 			'SMR'=>WT_I18N::translate('San Marino'),
 			'SOM'=>WT_I18N::translate('Somalia'),
 			'SPM'=>WT_I18N::translate('Saint Pierre and Miquelon'),
+			'SSD'=>WT_I18N::translate('South Sudan'),
 			'STP'=>WT_I18N::translate('Sao Tome and Principe'),
 			'SUN'=>WT_I18N::translate('USSR'),
 			'SUR'=>WT_I18N::translate('Suriname'),
@@ -4353,4 +4360,36 @@ class WT_Stats {
 			'ZWE'=>WT_I18N::translate('Zimbabwe'),
 		);
 	}
+
+	// century name, English => 21st, Polish => XXI, etc.
+	private static function _centuryName($century) {
+		if ($century<0) {
+			return str_replace(-$century, WT_I18N::_centuryName(-$century), WT_I18N::translate('%s&nbsp;BCE', WT_I18N::number(-$century)));
+		}
+		switch ($century) {
+		case 21: return WT_I18N::translate_c('CENTURY', '21st');
+		case 20: return WT_I18N::translate_c('CENTURY', '20th');
+		case 19: return WT_I18N::translate_c('CENTURY', '19th');
+		case 18: return WT_I18N::translate_c('CENTURY', '18th');
+		case 17: return WT_I18N::translate_c('CENTURY', '17th');
+		case 16: return WT_I18N::translate_c('CENTURY', '16th');
+		case 15: return WT_I18N::translate_c('CENTURY', '15th');
+		case 14: return WT_I18N::translate_c('CENTURY', '14th');
+		case 13: return WT_I18N::translate_c('CENTURY', '13th');
+		case 12: return WT_I18N::translate_c('CENTURY', '12th');
+		case 11: return WT_I18N::translate_c('CENTURY', '11th');
+		case 10: return WT_I18N::translate_c('CENTURY', '10th');
+		case  9: return WT_I18N::translate_c('CENTURY', '9th');
+		case  8: return WT_I18N::translate_c('CENTURY', '8th');
+		case  7: return WT_I18N::translate_c('CENTURY', '7th');
+		case  6: return WT_I18N::translate_c('CENTURY', '6th');
+		case  5: return WT_I18N::translate_c('CENTURY', '5th');
+		case  4: return WT_I18N::translate_c('CENTURY', '4th');
+		case  3: return WT_I18N::translate_c('CENTURY', '3rd');
+		case  2: return WT_I18N::translate_c('CENTURY', '2nd');
+		case  1: return WT_I18N::translate_c('CENTURY', '1st');
+		default: return ($century-1).'01-'.$century.'00';
+		}
+	}
+
 }
