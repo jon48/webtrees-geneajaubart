@@ -68,12 +68,6 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 		
 		$menu = null;
 		if(WT_Perso_Functions_Sosa::isModuleOperational()){
-			$controller->addInlineJavaScript(
-				'function compute_sosa(pid) {'.
-					'window.open(\'module.php?mod=perso_sosa&mod_action=computesosainterface&pid=\' + pid, \'_blank\', \'top=50,left=50,width=510,height=520,resizable=1,scrollbars=1\');'.
-					'return false;'.
-				'}');
-			
 			//-- main menu
 			$menu = new WT_Menu(WT_I18N::translate('Sosa Statistics'), 'module.php?mod=perso_sosa&mod_action=statistics', 'menu-sosa', 'down');
 			$menu->addIcon('menu_sosa');
@@ -116,6 +110,11 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			
 			//-- recompute Sosa submenu
 			if (WT_USER_CAN_EDIT && !empty($controller) && $controller instanceof WT_Controller_Individual ) {
+				$controller
+					->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/computesosaindi.js')
+					->addInlineJavaScript('var PS_Dialog_Title = "'.WT_I18N::translate('Sosas computation').'";');
+				;
+					
 				$submenu = new WT_Menu(WT_I18N::translate('Complete Sosas'), '#', 'menu-sosa-recompute');
 				$submenu->addOnclick('return compute_sosa(\''.$controller->getSignificantIndividual()->getXref().'\');');
 				$submenu->addIcon('recompute_sosa');
@@ -211,8 +210,10 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 	 */
 	private function computeSosaAjax(){
 		global $GEDCOM, $tmp_sosatable;
+				
+		$controller=new WT_Controller_Ajax();
 		
-		$html = '<i class="icon-perso-error" alt="'.WT_I18N::translate('Error').'"></i>';
+		$html = '<i class="icon-perso-error" title="'.WT_I18N::translate('Error').'"></i>';
 		
 		$ged_id = safe_GET_integer('gid', 0, 1000000, WT_GED_ID);
 		if($ged_id && userGedcomAdmin(WT_USER_ID, $ged_id)){		
@@ -234,6 +235,7 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 		
 		$html .= '&nbsp;'.WT_I18N::translate('Recompute');
 		
+		$controller->pageHeader();
 		echo $html;		
 	}
 	
@@ -245,7 +247,9 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 	private function computeSosaFromIndiAjax(){
 		global $tmp_removeSosaTab, $tmp_sosatable;
 		
-		$html = '<i class="icon-perso-error" alt="'.WT_I18N::translate('Error').'"></i>';
+		$controller=new WT_Controller_Ajax();
+		
+		$html = '<i class="icon-perso-error" title="'.WT_I18N::translate('Error').'"></i>';
 		
 		$pid = safe_GET_xref('pid');
 		if(WT_USER_CAN_EDIT && $pid){
@@ -276,32 +280,10 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			$html .= '&nbsp;'.WT_I18N::translate('You are not allowed to perform this operation.');	
 		}
 		
+		$controller->pageHeader();		
 		echo $html;		
 	}
 	
-	/**
-	 * Display the pop-up window to compute Sosa list from an individual.
-	 */
-	private function computeSosaEditInterface(){
-		
-		$controller=new WT_Controller_Simple();
-		$controller		
-			->requireMemberLogin()
-			->setPageTitle(WT_I18N::translate('Compute Sosas'))
-			->pageHeader();
-		
-		echo '<div class="helpheader">', WT_I18N::translate('Compute Sosas'), '</div>';
-		
-		$pid = safe_GET_xref('pid');
-		if($pid){
-			$controller
-				->addInlineJavaScript('var sosa_pid = "'.$pid.'";')
-				->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/computesosaindi.js');
-			
-			echo '<div id="loadingarea"></div>';
-		}
-		
-	}
 	
 }
 

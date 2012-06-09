@@ -17,6 +17,7 @@ if (!defined('WT_WEBTREES')) {
 class WT_Perso_Functions {
 
 	private static $_isIsSourcedModuleOperational = -1;
+	private static $_isUrlAlive = array();
 	
 	/**
 	 * Debug tool: prompt a Javascript pop-up with a text
@@ -67,6 +68,9 @@ class WT_Perso_Functions {
 	 * @return boolean Is the URL active ?
 	 */
 	static public function isUrlAlive($url){
+		if(isset($_isUrlAlive[$url])) return true;
+		
+		$url_ini = $url;		
 		$url = @parse_url($url);
 		
 		if (!$url) {
@@ -88,7 +92,10 @@ class WT_Perso_Functions {
 		{
 			$headers = get_headers("$url[scheme]://$url[host]:$url[port]$path");
 			$headers = ( is_array ( $headers ) ) ? implode ( "\n", $headers ) : $headers;
-			return ( bool ) preg_match ( '#^HTTP/.*\s+[(200|301|302)]+\s#i', $headers );
+			if(preg_match ( '#^HTTP/.*\s+[(200|301|302)]+\s#i', $headers )){
+				$_isUrlAlive[$url_ini] = true;
+				return true;
+			}
 		}
 		return false;
 		

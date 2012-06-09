@@ -122,7 +122,9 @@ if (WT_USE_LIGHTBOX) {
 
 $tabCities=WT_Perso_Functions_Certificates::getCitiesList();
 
-echo '<form method="post" name="selcity" action="module.php?mod=perso_certificates&mod_action=certificatelist">',
+echo '<form method="get" name="selcity" action="module.php">',
+	'<input type="hidden" name="mod" value="perso_certificates">',
+	'<input type="hidden" name="mod_action" value="certificatelist">',
 	'<select name="city">';
 foreach($tabCities as $cities){
 	$selectedCity="";

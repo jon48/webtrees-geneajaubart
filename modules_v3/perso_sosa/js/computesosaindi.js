@@ -8,18 +8,24 @@
  * $HeadURL$
  */
 
-jQuery(document).ready(function() {
-   $('#loadingarea').empty().html('<i class="icon-loading-small"></i>');
-   $('#loadingarea').load('module.php?mod=perso_sosa&mod_action=computesosaindi&pid=' + sosa_pid, 
-		function(){
-      		 var date = new Date();
-      		 var curDate = null;
-      		 
-      		do { curDate = new Date(); } 
-      		while(curDate-date < 2000);
-
-	 		window.opener.location='individual.php?pid='+sosa_pid+'&show_changes=yes';
-	 		window.close();
-   		}	   
-   );
- });
+function compute_sosa(sosa_pid){
+	if($('#computesosadlg').length == 0) {
+		$('body').append('<div id="computesosadlg" title="' + PS_Dialog_Title + '"><div id="sosaloadingarea"></div></div>');
+	}
+	$('#computesosadlg').dialog({
+		modal: true,
+		closeOnEscape: false,
+		width: 300,
+		open: function(event, ui) {
+			$("div[aria-labelledby^='ui-dialog-title-computesosadlg'] .ui-dialog-titlebar-close").hide();
+			$('#sosaloadingarea').empty().html('<i class="icon-loading-small"></i>');
+			$('#sosaloadingarea').load('module.php?mod=perso_sosa&mod_action=computesosaindi&pid=' + sosa_pid, 
+					function(){
+						$("div[aria-labelledby^='ui-dialog-title-computesosadlg'] .ui-dialog-titlebar-close").show();
+						setTimeout(function(){
+							$('#computesosadlg').dialog('close');
+						}, 2000);
+			});		
+		}
+	});	
+}

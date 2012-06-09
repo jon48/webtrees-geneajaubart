@@ -82,7 +82,18 @@ if(WT_Perso_Functions_Sosa::isModuleOperational()){
 		
 	}
 	else{
-		// Display the list of available maps;
+		echo '<p class="center">'.WT_I18N::translate('Choose a geographical dispersion analysis:').'<p>';		
+		
+		echo '<form method="get" name="selgeodisp" action="module.php">',
+			'<input type="hidden" name="mod" value="perso_geodispersion">',
+			'<input type="hidden" name="mod_action" value="geodispersion">',
+			'<select name="geoid">';
+		foreach (WT_Perso_Functions_Map::getEnabledGeoDispersionMaps() as $map) {
+			echo '<option value="'.$map['id'].'" />'.$map['title'].'</option>';
+		}
+		echo '</select>',
+			'<input type="submit" value="'.WT_I18N::translate('Show').'" />',
+		'</form>';		
 	}
 		
 }

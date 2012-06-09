@@ -83,7 +83,8 @@ html[dir='rtl'] .fact_flag {float: left;}
 .patrolin_places {width: 60%;margin-left: auto;margin-right: auto;text-align: center;border: solid #d3c6b8 1px;background-color: #f4f0ed;}
 
 /* Sosa */
-#loadingarea{margin-top: 10px; margin-bottom: 10px;}
+#computesosadlg {text-align: center;}
+#sosaloadingarea {margin: 10px 0px;}
 
 .icon-perso-sosa_large{width:18px;height:18px;background-image:url(images/perso/sosa_18x18.png);}
 .icon-perso-sosa_normal {width:12px;height:12px;background-image:url(images/perso/sosa_12x12.png);}

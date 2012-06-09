@@ -317,7 +317,9 @@ $maxGen = WT_Perso_Functions_Sosa::getLastGeneration();
 if($maxGen>0){
 	$selectedgen = safe_REQUEST($_REQUEST, 'gen', WT_REGEX_INTEGER, null);
 	
-	echo '<form method="post" name="setgen" action="module.php?mod=perso_sosa&mod_action=missingancestors">',
+	echo '<form method="get" name="setgen" action="module.php">',
+		'<input type="hidden" name="mod" value="perso_sosa">',
+		'<input type="hidden" name="mod_action" value="missingancestors">',
 		'<table class="list_table">',
 		'<td colspan="2" class="topbottombar center">',WT_I18N::translate('Choose generation'),'</td>',
 		'<tr><td class="descriptionbox">',WT_I18N::translate('Generation'),'</td>',

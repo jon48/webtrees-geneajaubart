@@ -25,6 +25,17 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		return WT_I18N::translate('The Perso Welcome block welcomes the visitor to the site, allows a quick login to the site, and displays statistics on visits.');
 	}
 
+	// Extend WT_Module
+	public function modAction($mod_action) {
+		switch($mod_action) {
+			case 'getpiwikstats':
+				$this->getPiwikStats();
+				break;
+			default:
+				header('HTTP/1.0 404 Not Found');
+		}
+	}
+	
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
 		global $ctype, $controller;
@@ -59,13 +70,8 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		
 		$content .= '<div class="center">';		
 		if ($piwik_enabled){
-			$visitCountYear = $this->getNumberOfVisitsPiwik($block_id);
-			if($visitCountYear){
-				$visitCountToday = max(0, $this->getNumberOfVisitsPiwik($block_id, 'day'));
-				$visitCountYear = max( 0, $visitCountYear);
-				$currentYear = date('Y');
-				$content .=  WT_I18N::translate('<span class="hit-counter">%1$s</span> visits since the beginning of %2$s<br/>(<span class="hit-counter">%3$s</span> today)', $visitCountYear + $visitCountToday, $currentYear, $visitCountToday);
-			}
+			$controller->addInlineJavaScript('$("#piwik_stats").load("module.php?mod=perso_welcome_block&mod_action=getpiwikstats&block_id='.$block_id.'");');		
+			$content .= '<div id="piwik_stats"><i class="icon-loading-small"></i>&nbsp;'.WT_I18N::translate('Retrieving Piwik statistics...').'</div>';
 		}
 		$content .=  '</div>';
 		
@@ -141,7 +147,7 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 
 	// Implement class WT_Module_Block
 	public function loadAjax() {
-		return true;
+		return false;
 	}
 
 	// Implement class WT_Module_Block
@@ -204,33 +210,55 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 	 * @return int|NULL Number of visits, if defined, null otherwise
 	 */
 	private function getNumberOfVisitsPiwik($block_id, $period='year'){
-			
+		
 		$piwik_url=get_block_setting($block_id, 'piwik_url', '');
 		$piwik_siteid=get_block_setting($block_id, 'piwik_siteid', '');
 		$piwik_token=get_block_setting($block_id, 'piwik_token', '');
 		
 		// calling Piwik REST API
-		if(WT_Perso_Functions::isUrlAlive($piwik_url)){
-			$url = $piwik_url;
-			$url .= '?module=API&method=VisitsSummary.getVisits';
-			$url .= '&idSite='.$piwik_siteid.'&period='.$period.'&date=today';
-			$url .= '&format=PHP';
-			$url .= '&token_auth='.$piwik_token;
-			
-			$fetched = file_get_contents($url);
-			$content = unserialize($fetched);
-			
-			// case error
-			if($content && is_numeric($content))
-			{
-				return $content;
+		$url = $piwik_url;
+		$url .= '?module=API&method=VisitsSummary.getVisits';
+		$url .= '&idSite='.$piwik_siteid.'&period='.$period.'&date=today';
+		$url .= '&format=PHP';
+		$url .= '&token_auth='.$piwik_token;
+		
+		$fetched = file_get_contents($url);
+		$content = unserialize($fetched);
+		
+		// case error
+		if($content && is_numeric($content))
+		{
+			return $content;
+		}
+		
+		return null;	
+	}
+
+	private function getPiwikStats(){			
+		$controller=new WT_Controller_Ajax();
+		
+		$html = WT_I18N::translate('No statistics could be retrieved from Piwik.');
+		$block_id = safe_GET('block_id');
+		$piwik_url=get_block_setting($block_id, 'piwik_url', '');
+		if($block_id && WT_Perso_Functions::isUrlAlive($piwik_url)){
+			if(WT_Perso_Cache::isCached('piwikCountYear', $this)) {
+				$visitCountYear = WT_Perso_Cache::get('piwikCountYear', $this);
+			}
+			else{
+				$visitCountYear = $this->getNumberOfVisitsPiwik($block_id);
+				WT_Perso_Cache::save('piwikCountYear', $visitCountYear, $this);
+			}
+			if($visitCountYear){
+				$visitCountToday = max(0, $this->getNumberOfVisitsPiwik($block_id, 'day'));
+				$visitCountYear = max( 0, $visitCountYear);
+				$currentYear = date('Y');
+				$html = WT_I18N::translate('<span class="hit-counter">%1$s</span> visits since the beginning of %2$s<br/>(<span class="hit-counter">%3$s</span> today)', $visitCountYear + $visitCountToday, $currentYear, $visitCountToday);
 			}
 		}
 		
-		return null;
-	
+		$controller->pageHeader();
+		echo $html;
 	}
-
 	
 }
 

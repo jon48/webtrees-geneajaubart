@@ -163,7 +163,11 @@ return array(
 									=>	'Token fourni par l\'installation Piwik, sous la section API.',
 	'Piwik Site ID'					=>	'ID Piwik du site',		
 	'Piwik Site ID of the website to follow.'	
-									=>	'ID Piwik du site à suivre.',																		
+									=>	'ID Piwik du site à suivre.',	
+	'Retrieving Piwik statistics...'
+									=>	'Récupération des statistiques Piwik...',
+	'No statistics could be retrieved from Piwik.'
+									=>	'Les statistiques Piwik ne peuvent être récupérées.',
 	'<span class="hit-counter">%1$s</span> visits since the beginning of %2$s<br/>(<span class="hit-counter">%3$s</span> today)'
 									=>	'<span class="hit-counter">%1$s</span> visiteurs depuis le début de l\'année %2$s<br/>dont <span class="hit-counter">%3$s</span> aujourd\'hui',
 	
@@ -183,6 +187,7 @@ return array(
 	'Compute all Sosas for <em>%s</em>'
 									=>	'Calculer les Sosas pour <em>%s</em>',
 	'Compute Sosas'					=>	'Calculer les ancêtres Sosas',
+	'Sosas computation'				=>	'Calcul des ancêtres Sosas',
 	'Compute all Sosas'				=>	'Calculer tous les ancêtres Sosas',
 	'Compute all Sosa ancestors for the specified GEDCOM, from the set Sosa root individual.'
 									=>	'Calculer les ancêtres Sosa pour le GEDCOM spécifié à partir de l\'individu de-cujus défini.',									
@@ -292,7 +297,7 @@ return array(
 									=>	'Affiche la répartition géographique des ancêtres Sosa de l’individu de-cujus',
 	'GeoDispersion'					=>	'GéoRépartition',
 	'No map'						=>	'Pas de carte',
-	'Sosa Geographical dispersion'	=>	'Répartion géographique des ancêtres Sosa',
+	'Sosa Geographical dispersion'	=>	'Répartition géographique des ancêtres Sosa',
 	'General data'					=>	'Données générales',
 	'Data by Generations'			=>	'Données par générations',
 	'The required dispersion analysis does not exist.'
@@ -326,6 +331,8 @@ return array(
 	'Map Top level'					=>	'Subdivision supérieure',
 	'Use Flags'						=>	'Drapeaux ?',
 	'Place Details'					=>	'Détail des lieux',
+	'Choose a geographical dispersion analysis:'
+									=>	'Choisir une analyse de répartition géographique :',
 	'The Perso Sosa module is required for this module to run. Please activate it.'
 									=>	'Le module Perso Sosa est requis pour ce module. Veuillez l\'activer.',
 	'Other places'					=>	'Autres lieux',
