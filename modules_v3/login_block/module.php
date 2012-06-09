@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13408 2012-02-07 21:37:12Z greg $
+// $Id: module.php 13744 2012-04-02 04:58:29Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -44,13 +44,13 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 		global $controller;
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
-		$controller
-			->addInlineJavaScript('
-				  jQuery("#new_passwd").hide();
-				  jQuery("#passwd_click").click(function()
-				  {
-					jQuery("#new_passwd").slideToggle(100);
-				  });
+		$controller->addInlineJavaScript('
+				jQuery("#new_passwd").hide();
+				jQuery("#passwd_click").click(function() {
+					jQuery("#new_passwd").slideToggle(100, function() {
+						jQuery("#new_passwd_username").focus();
+					});
+				});
 			');
 		if (WT_USER_ID) {
 			$title = WT_I18N::translate('Logout');
@@ -65,7 +65,7 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 			$title = WT_I18N::translate('Login');
 			$content='';
 			$content='<div id="login-box">
-				<form id="login-form" name="login-form" method="post" action="'.WT_LOGIN_URL.'" onsubmit="t = new Date(); document.login-form.usertime.value=t.getFullYear()+\'-\'+(t.getMonth()+1)+\'-\'+t.getDate()+\' \'+t.getHours()+\':\'+t.getMinutes()+\':\'+t.getSeconds(); return true;">
+				<form id="login-form" name="login-form" method="post" action="'. WT_LOGIN_URL. '" onsubmit="t = new Date(); this.usertime.value=t.getFullYear()+\'-\'+(t.getMonth()+1)+\'-\'+t.getDate()+\' \'+t.getHours()+\':\'+t.getMinutes()+\':\'+t.getSeconds();return true;">
 				<input type="hidden" name="action" value="login">
 				<input type="hidden" name="url" value="index.php">
 				<input type="hidden" name="ged" value="'; if (isset($ged)) $content.= htmlspecialchars($ged); else $content.= htmlentities(WT_GEDCOM); $content.= '">
@@ -99,8 +99,8 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 			<input type="hidden" name="action" value="requestpw">
 			<h4>'. WT_I18N::translate('Lost password request').'</h4>
 			<div>
-				<label for="username">'. WT_I18N::translate('Username or email address').
-					'<input type="text" id="username" name="username" value="" autofocus>
+				<label for="new_passwd_username">'. WT_I18N::translate('Username or email address').
+					'<input type="text" id="new_passwd_username" name="new_passwd_username" value="">
 				</label>
 			</div>
 			<div><input type="submit" value="'. WT_I18N::translate('Continue'). '"></div>

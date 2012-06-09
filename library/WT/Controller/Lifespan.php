@@ -2,7 +2,7 @@
 // Controller for the timeline chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
@@ -21,22 +21,23 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Lifespan.php 13144 2011-12-28 09:29:10Z greg $
+// $Id: Lifespan.php 13950 2012-05-29 06:28:25Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-require_once WT_ROOT.'includes/functions/functions_charts.php';
-
 function compare_people($a, $b) {
 	return WT_Date::Compare($a->getEstimatedBirthDate(), $b->getEstimatedBirthDate());
 }
 
-class WT_Controller_Lifespan extends WT_Controller_Chart {
+class WT_Controller_Lifespan extends WT_Controller_Base {
 	var $pids = array ();
 	var $people = array();
+	var $place = '';
+	var $beginYear = '';
+	var $endYear = '';
 	var $scale = 2;
 	var $YrowLoc = 125;
 	var $minYear = 0;
@@ -66,6 +67,8 @@ class WT_Controller_Lifespan extends WT_Controller_Chart {
 	var $startDate;
 	var $currentsex;
 
+	private $nonfacts=array('FAMS', 'FAMC', 'MAY', 'BLOB', 'OBJE', 'SEX', 'NAME', 'SOUR', 'NOTE', 'BAPL', 'ENDL', 'SLGC', 'SLGS', '_TODO', '_WT_OBJE_SORT', 'CHAN', 'HUSB', 'WIFE', 'CHIL', 'BIRT', 'DEAT', 'BURI');
+
 	function __construct() {
 		global $GEDCOM_ID_PREFIX;
 
@@ -88,6 +91,8 @@ class WT_Controller_Lifespan extends WT_Controller_Chart {
 		$clear =safe_GET_bool('clear');
 		$addfam=safe_GET_bool('addFamily');
 		$place =safe_GET('place');
+		$beginYear=safe_GET_integer('beginYear', 0, date('Y')+100, 0);
+		$endYear  =safe_GET_integer('endYear',   0, date('Y')+100, 0);
 
 		if ($clear) {
 			// Empty list
@@ -98,6 +103,7 @@ class WT_Controller_Lifespan extends WT_Controller_Chart {
 		} elseif ($place) {
 			// All records found in a place
 			$this->pids=get_place_positions($place);
+			$this->place=$place;
 		} else {
 			// Modify an existing list of records
 			if (isset($_SESSION['timeline_pids'])) {
@@ -120,12 +126,11 @@ class WT_Controller_Lifespan extends WT_Controller_Chart {
 		}
 		$_SESSION['timeline_pids']=$this->pids;
 
-
-		$beginYear  =safe_GET_integer('beginYear', 0, date('Y')+100, 0);
-		$endYear    =safe_GET_integer('endYear',   0, date('Y')+100, 0);
+		$this->beginYear=$beginYear;
+		$this->endYear=$endYear;
 		if ($beginYear==0 || $endYear==0) {
-		//-- cleanup user input
-		$this->pids = array_unique($this->pids);  //removes duplicates
+			//-- cleanup user input
+			$this->pids = array_unique($this->pids);  //removes duplicates
 			foreach ($this->pids as $key => $value) {
 				if ($value != $remove) {
 					$this->pids[$key] = $value;
@@ -134,7 +139,6 @@ class WT_Controller_Lifespan extends WT_Controller_Chart {
 					if ($person && $person->getType()=='INDI') {
 						$bdate = $person->getEstimatedBirthDate();
 						$ddate = $person->getEstimatedDeathDate();
-
 						//--Checks to see if the details of that person can be viewed
 						if ($bdate->isOK() && $person->canDisplayDetails()) {
 							$this->people[] = $person;
@@ -143,7 +147,6 @@ class WT_Controller_Lifespan extends WT_Controller_Chart {
 				}
 			}
 		}
-
 
 		//--Finds if the begin year and end year textboxes are not empty
 		else {
@@ -154,7 +157,7 @@ class WT_Controller_Lifespan extends WT_Controller_Chart {
 
 			//Variables to restrict the person boxes to the year searched.
 			//--Searches for individuals who had an even between the year begin and end years
-			$indis = search_indis_year_range($beginYear, $endYear);
+			$indis = self::search_indis_year_range($beginYear, $endYear);
 			//--Populates an array of people that had an event within those years
 
 			foreach ($indis as $person) {
@@ -267,7 +270,7 @@ class WT_Controller_Lifespan extends WT_Controller_Chart {
 		$timelineTick = $totalYears / $yearSpan; //calculates the length of the timeline
 
 		for ($i = 0; $i < $timelineTick; $i ++) { //prints the timeline
-			echo "<div class=\"sublinks_cell\" style=\"text-align: left; position: absolute; top: ", $top, "px; left: ", $leftPosition, "px; width: ", $tickDistance, "px;\">$newStartYear<img src=\"images/timelineChunk.gif\"  alt=\"\"></div>";  //onclick="zoomToggle('100px', '100px', '200px', '200px', this);"
+			echo "<div class=\"sublinks_cell\" style=\"text-align: left; position: absolute; top: ", $top, "px; left: ", $leftPosition, "px; width: ", $tickDistance, "px;\">$newStartYear<i class=\"icon-lifespan-chunk\"></i></div>";  //onclick="zoomToggle('100px', '100px', '200px', '200px', this);"
 			$leftPosition += $tickDistance;
 			$newStartYear += $yearSpan;
 
@@ -393,7 +396,13 @@ class WT_Controller_Lifespan extends WT_Controller_Chart {
 				//$event[][]  = {"Cell 1 will hold events"}{"cell2 will hold time between that and the next value"};
 				//$value->add_historical_facts();
 				$value->add_family_facts(false);
-				$unparsedEvents = $value->getIndiFacts();
+				$unparsedEvents = array();
+
+				foreach ($value->getIndiFacts() as $fact) {
+					if (!in_array($fact->getTag(), $this->nonfacts)) {
+						$unparsedEvents[]=$fact;
+					}
+				}
 				sort_facts($unparsedEvents);
 
 				$eventinformation = Array();
@@ -503,33 +512,35 @@ class WT_Controller_Lifespan extends WT_Controller_Chart {
 		return $maxY;
 	}
 
-	/**
-	* check the privacy of the incoming people to make sure they can be shown
-	*/
-	function checkPrivacy() {
-		$printed = false;
-		for ($i = 0; $i < count($this->people); $i ++) {
-			if (!$this->people[$i]->canDisplayDetails()) {
-				if ($this->people[$i]->canDisplayName()) {
-					$indiName = PrintReady(str_replace(array('<span class="starredname">', '</span>'), array('<u>', '</u>'), $this->people[$i]->getFullName()));
-					echo "&nbsp;<a href=\"".$this->people[$i]->getHtmlUrl()."\">".$indiName."</a>";
-					print_privacy_error();
-					echo "<br>";
-					$printed = true;
-				} else
-					if (!$printed) {
-						print_privacy_error();
-						echo "<br>";
-					}
-			}
-		}
-	}
-
 	public function getSignificantIndividual() {
 		if ($this->people) {
 			return $this->people[0];
 		} else {
 			return parent::getSignificantIndividual();
 		}
+	}
+
+	// Search for people who had events in a given year range
+	private static function search_indis_year_range($startyear, $endyear) {
+		// TODO: We should use Julian-days, rather than gregorian years,
+		// to allow the lifespan chart, etc., to use other calendars.
+		$startjd=WT_Date_Gregorian::YMDtoJD($startyear, 1, 1);
+		$endjd  =WT_Date_Gregorian::YMDtoJD($endyear+1, 1, 1)-1;
+
+		$sql=
+			"SELECT DISTINCT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec".
+			" FROM `##individuals`".
+			" JOIN `##dates` ON i_id=d_gid AND i_file=d_file".
+			" WHERE i_file=? AND d_julianday1 BETWEEN ? AND ?";
+
+		$rows=WT_DB::prepare($sql)
+			->execute(array(WT_GED_ID, $startjd, $endjd))
+			->fetchAll(PDO::FETCH_ASSOC);
+
+		$list=array();
+		foreach ($rows as $row) {
+			$list[]=WT_Person::getInstance($row);
+		}
+		return $list;
 	}
 }

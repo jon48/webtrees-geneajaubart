@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: login.php 13411 2012-02-09 12:44:25Z greg $
+// $Id: login.php 13611 2012-03-18 23:27:51Z greg $
 
 define('WT_SCRIPT_NAME', 'login.php');
 require './includes/session.php';
@@ -39,7 +39,6 @@ $REQUIRE_ADMIN_AUTH_REGISTRATION=get_site_setting('REQUIRE_ADMIN_AUTH_REGISTRATI
 
 $action         =safe_POST('action');
 $user_realname  =safe_POST('user_realname');
-$time           =safe_POST('time');
 $user_name      =safe_POST('user_name',       WT_REGEX_USERNAME);
 $user_email     =safe_POST('user_email',      WT_REGEX_EMAIL);
 $user_password01=safe_POST('user_password01', WT_REGEX_PASSWORD);
@@ -104,23 +103,6 @@ default:
 			Zend_Session::writeClose();
 			exit;
 		}
-	} else {
-		$tSERVER_URL = preg_replace(array("'https?://'", "'www.'", "'/$'"), array("","",""), WT_SERVER_NAME.WT_SCRIPT_PATH);
-		$tLOGIN_URL = preg_replace(array("'https?://'", "'www.'", "'/$'"), array("","",""), get_site_setting('LOGIN_URL'));
-		if (empty($url)) {
-			if ((isset($_SERVER['HTTP_REFERER'])) && ((stristr($_SERVER['HTTP_REFERER'],$tSERVER_URL)!==false)||(stristr($_SERVER['HTTP_REFERER'],$tLOGIN_URL)!==false))) {
-				$url = basename($_SERVER['HTTP_REFERER']);
-				if (stristr($url, ".php")===false) {
-					$url = "index.php?ged=$GEDCOM";
-				}
-			}
-			else {
-				if (isset($url)) {
-					if (stristr($url,WT_SERVER_NAME.WT_SCRIPT_PATH)!==false) $url = WT_SERVER_NAME.WT_SCRIPT_PATH;
-				}
-				else $url = "individual.php";
-			}
-		}
 	}
 
 	$controller=new WT_Controller_Base();
@@ -128,11 +110,12 @@ default:
 	$controller->pageHeader();
 	$controller
 		->addInlineJavaScript('
-			  jQuery("#new_passwd_form").hide();
-			  jQuery("#passwd_click").click(function()
-			  {
-				jQuery("#new_passwd_form").slideToggle(100);
-			  });
+			jQuery("#new_passwd_form").hide();
+			jQuery("#passwd_click").click(function() {
+				jQuery("#new_passwd_form").slideToggle(100, function() {
+					jQuery("#new_passwd_username").focus()
+				});
+			});
 		');
 
 	echo '<div id="login-page">';
@@ -166,14 +149,14 @@ default:
 
 	echo '</div>'; //close "login-text"
 	echo '<div id="login-box">
-		<form id="login-form" name="login-form" method="post" action="', WT_LOGIN_URL, '" onsubmit="t = new Date(); document.login-form.usertime.value=t.getFullYear()+\'-\'+(t.getMonth()+1)+\'-\'+t.getDate()+\' \'+t.getHours()+\':\'+t.getMinutes()+\':\'+t.getSeconds(); return true;">
+		<form id="login-form" name="login-form" method="post" action="', WT_LOGIN_URL, '" onsubmit="t = new Date(); this.usertime.value=t.getFullYear()+\'-\'+(t.getMonth()+1)+\'-\'+t.getDate()+\' \'+t.getHours()+\':\'+t.getMinutes()+\':\'+t.getSeconds();return true;">
 		<input type="hidden" name="action" value="login">
 		<input type="hidden" name="url" value="', htmlspecialchars($url), '">
 		<input type="hidden" name="usertime" value="">';
 		if (!empty($message)) echo '<span class="error"><br><b>', $message, '</b><br><br></span>';
 		echo '<div>
 			<label for="username">', WT_I18N::translate('Username'),
-			'<input type="text" id="username" name="username" value="', htmlspecialchars($username), '" class="formField">
+			'<input type="text" id="username" name="username" value="', htmlspecialchars($username), '" class="formField" autofocus>
 			</label>
 		</div>
 		<div>
@@ -194,13 +177,12 @@ default:
 	
 	// hidden New Password block
 	echo '<div id="new_passwd">
-		<form id="new_passwd_form" name="new_passwd_form" action="'.WT_LOGIN_URL.'" method="post" onsubmit="t = new Date(); document.new_passwd_form.time.value=t.toUTCString(); return checkform(this);">
-		<input type="hidden" name="time" value="">
+		<form id="new_passwd_form" name="new_passwd_form" action="'.WT_LOGIN_URL.'" method="post">
 		<input type="hidden" name="action" value="requestpw">
 		<h4>', WT_I18N::translate('Lost password request'), '</h4>
 		<div>
-			<label for="username">', WT_I18N::translate('Username or email address'),
-				'<input type="text" id="username" name="username" value="" autofocus>
+			<label for="new_passwd_username">', WT_I18N::translate('Username or email address'),
+				'<input type="text" id="new_passwd_username" name="new_passwd_username" value="">
 			</label>
 		</div>
 		<div><input type="submit" value="', /* I18N: button label */ WT_I18N::translate('Continue'), '"></div>
@@ -209,9 +191,6 @@ default:
 	echo '</div>'; //"login-box"
 		
 	echo '</div>'; // close "login-page"
-	echo '<script type="text/javascript">
-		document.login-form.username.focus();
-	</script>';
 	break;
 
 case 'requestpw':
@@ -219,6 +198,7 @@ case 'requestpw':
 		->setPageTitle(WT_I18N::translate('Lost password request'))
 		->pageHeader();
 	echo '<div id="login-page">';
+	$user_name=safe_POST('new_passwd_username', WT_REGEX_USERNAME);
 
 	$user_id=WT_DB::prepare(
 		"SELECT user_id FROM `##user` WHERE ? IN (user_name, email)"
@@ -496,11 +476,6 @@ case 'register':
 						frm.user_realname.focus();
 						return false;
 					}
-					if ((frm.user_email.value == "")||(frm.user_email.value.indexOf("@")==-1)) {
-						alert("' . WT_I18N::translate('You must enter an email address.') . '");
-						frm.user_email.focus();
-						return false;
-					}
 					if (frm.user_comments.value == "") {
 						alert("' . WT_I18N::translate('Please enter your relationship to the data in the Comments field.') . '");
 						frm.user_comments.focus();
@@ -518,9 +493,8 @@ case 'register':
 				echo '</div>';
 			}
 			echo '<div id="register-box">
-				<form id="register-form" name="register-form" method="post" action="'.WT_LOGIN_URL.'" onsubmit="t = new Date(); document.register-form.time.value=t.toUTCString(); return checkform(this);">
+				<form id="register-form" name="register-form" method="post" action="'.WT_LOGIN_URL.'">
 				<input type="hidden" name="action" value="register">
-				<input type="hidden" name="time" value="">
 				<h4>', WT_I18N::translate('All fields must be completed.'), '</h4><hr>
 				<div>
 					<label for="user_realname">', WT_I18N::translate('Real name'), help_link('real_name'),
@@ -531,7 +505,7 @@ case 'register':
 				</div>
 				<div>
 					<label for="user_email">', WT_I18N::translate('Email address'), help_link('email'),
-						'<input type="text" id="user_email" name="user_email" value="';
+						'<input type="email" id="user_email" name="user_email" value="';
 							if (!$user_email_false) echo $user_email;
 						echo '">
 					</label>
@@ -589,9 +563,8 @@ case 'userverify':
 	$controller->pageHeader();
 
 	echo '<div id="login-register-page">
-		<form id="verify-form" name="verify-form" method="post" action="" onsubmit="t = new Date(); document.verify-form.time.value=t.toUTCString();">
+		<form id="verify-form" name="verify-form" method="post" action="', WT_LOGIN_URL, '">
 			<input type="hidden" name="action" value="verify_hash">
-			<input type="hidden" name="time" value="">
 			<h4>', WT_I18N::translate('User verification'), '</h4>
 			<div>
 				<label for="username">', WT_I18N::translate('Username'), '</label>
@@ -635,9 +608,9 @@ case 'verify_hash':
 	}
 	if ($TEXT_DIRECTION=='rtl') {
 		$mail1_body .= "<a href=\"";
-		$mail1_body .= WT_SERVER_NAME.WT_SCRIPT_PATH."admin_users.php?action=edituser&username=" . rawurlencode($user_name) . "\">";
+		$mail1_body .= WT_SERVER_NAME.WT_SCRIPT_PATH."admin_users.php?filter=" . rawurlencode($user_name) . "\">";
 	}
-	$mail1_body .= WT_SERVER_NAME.WT_SCRIPT_PATH."admin_users.php?action=edituser&username=" . rawurlencode($user_name);
+	$mail1_body .= WT_SERVER_NAME.WT_SCRIPT_PATH."admin_users.php?filter=" . rawurlencode($user_name);
 	if ($TEXT_DIRECTION=="rtl") {
 		$mail1_body .= "</a>";
 	}

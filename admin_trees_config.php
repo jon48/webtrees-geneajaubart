@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_config.php 13299 2012-01-20 20:40:31Z greg $
+// $Id: admin_trees_config.php 13920 2012-05-06 04:47:36Z nigel $
 
 define('WT_SCRIPT_NAME', 'admin_trees_config.php');
 
@@ -177,7 +177,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'COMMON_NAMES_THRESHOLD',       safe_POST('NEW_COMMON_NAMES_THRESHOLD', WT_REGEX_INTEGER, 40));
 	set_gedcom_setting(WT_GED_ID, 'CONTACT_USER_ID',              safe_POST('NEW_CONTACT_USER_ID'));
 	set_gedcom_setting(WT_GED_ID, 'DEFAULT_PEDIGREE_GENERATIONS', safe_POST('NEW_DEFAULT_PEDIGREE_GENERATIONS'));
-	set_gedcom_setting(WT_GED_ID, 'ENABLE_AUTOCOMPLETE',          safe_POST_bool('NEW_ENABLE_AUTOCOMPLETE'));
 	set_gedcom_setting(WT_GED_ID, 'EXPAND_NOTES',                 safe_POST_bool('NEW_EXPAND_NOTES'));
 	set_gedcom_setting(WT_GED_ID, 'EXPAND_RELATIVES_EVENTS',      safe_POST_bool('NEW_EXPAND_RELATIVES_EVENTS'));
 	set_gedcom_setting(WT_GED_ID, 'EXPAND_SOURCES',               safe_POST_bool('NEW_EXPAND_SOURCES'));
@@ -254,7 +253,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'SURNAME_TRADITION',            safe_POST('NEW_SURNAME_TRADITION'));
 	set_gedcom_setting(WT_GED_ID, 'THEME_DIR',                    safe_POST('NEW_THEME_DIR'));
 	set_gedcom_setting(WT_GED_ID, 'THUMBNAIL_WIDTH',              safe_POST('NEW_THUMBNAIL_WIDTH'));
-	set_gedcom_setting(WT_GED_ID, 'UNDERLINE_NAME_QUOTES',        safe_POST_bool('NEW_UNDERLINE_NAME_QUOTES'));
 	set_gedcom_setting(WT_GED_ID, 'USE_GEONAMES',                 safe_POST_bool('NEW_USE_GEONAMES'));
 	set_gedcom_setting(WT_GED_ID, 'USE_MEDIA_FIREWALL',           safe_POST_bool('NEW_USE_MEDIA_FIREWALL'));
 	set_gedcom_setting(WT_GED_ID, 'USE_MEDIA_VIEWER',             safe_POST_bool('NEW_USE_MEDIA_VIEWER'));
@@ -341,15 +339,6 @@ case 'update':
 	fix_media_htaccess();
 
 	if (!$errors) {
-		$gednews = getUserNews(WT_GEDCOM);
-		if (count($gednews)==0) {
-			$news = array();
-			$news["title"] = WT_I18N::translate('Welcome to Your Genealogy');
-			$news["username"] = WT_GEDCOM;
-			$news["text"] = WT_I18N::translate('The genealogy information on this website is powered by <a href="http://webtrees.net/" target="_blank">webtrees</a>.  This page provides an introduction and overview to this genealogy.<br /><br />To begin working with the data, choose one of the charts from the Charts menu, go to the Individual list, or search for a name or place.<br /><br />If you have trouble using the site, you can click on the Help icon to give you information on how to use the page that you are currently viewing.<br /><br />Thank you for visiting this site.');
-			$news["date"] = client_time();
-			addNews($news);
-		}
 		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME);
 		exit;
 	}
@@ -364,7 +353,7 @@ default:
 $controller->pageHeader();
 
 if (get_gedcom_count()==1) { //Removed because it doesn't work here for multiple GEDCOMs. Can be reinstated when fixed (https://bugs.launchpad.net/webtrees/+bug/613235)
-	if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm'; 
+	$controller->addExternalJavaScript('js/autocomplete.js');
 }
 
 echo WT_JS_START;?>
@@ -392,9 +381,9 @@ echo WT_JS_START;?>
 			<div id="tabs" style="display:none">
 				<ul>
 					<li><a href="#file-options"><span><?php echo WT_I18N::translate('GEDCOM Basics'); ?></span></a></li>
+					<li><a href="#access-options"><span><?php echo WT_I18N::translate('Access'); ?></span></a></li>
 					<li><a href="#privacy"><span><?php echo WT_I18N::translate('Privacy'); ?></span></a></li>
 					<li><a href="#config-media"><span><?php echo WT_I18N::translate('Media'); ?></span></a></li>
-					<li><a href="#access-options"><span><?php echo WT_I18N::translate('Access'); ?></span></a></li>
 					<li><a href="#layout-options"><span><?php echo WT_I18N::translate('Layout'); ?></span></a></li>
 					<li><a href="#hide-show"><span><?php echo WT_I18N::translate('Hide &amp; Show'); ?></span></a></li>
 					<li><a href="#edit-options"><span><?php echo WT_I18N::translate('Edit options'); ?></span></a></li>
@@ -416,12 +405,12 @@ echo WT_JS_START;?>
 					</tr>
 					<tr>
 						<td>
-							<?php echo WT_I18N::translate('Default person for pedigree and descendancy charts'), help_link('PEDIGREE_ROOT_ID'); ?>
+							<?php echo WT_I18N::translate('Default individual'), help_link('default_individual'); ?>
 						</td>
 						<td class="wrap">
 							<input type="text" name="NEW_PEDIGREE_ROOT_ID" id="NEW_PEDIGREE_ROOT_ID" value="<?php echo get_gedcom_setting(WT_GED_ID, 'PEDIGREE_ROOT_ID'); ?>" size="5" maxlength="20">
 							<?php
-								print_findindi_link("NEW_PEDIGREE_ROOT_ID", "");
+								echo print_findindi_link('NEW_PEDIGREE_ROOT_ID');
 								$person=WT_Person::getInstance(get_gedcom_setting(WT_GED_ID, 'PEDIGREE_ROOT_ID'));
 								if ($person) {
 									echo ' <span class="list_item">', $person->getFullName(), ' ', $person->format_first_major_fact(WT_EVENTS_BIRT, 1), '</span>';
@@ -699,12 +688,12 @@ echo WT_JS_START;?>
 
 			echo '<tr><td width="*">';
 			echo '<input type="text" class="pedigree_form" name="xref" id="xref" size="6" maxlength="20">';
-			print_findindi_link("xref","");
-			print_findfamily_link("xref");
-			print_findsource_link("xref");
-			print_findrepository_link("xref");
-			print_findnote_link("xref");
-			print_findmedia_link("xref", "1media");
+			echo ' ', print_findindi_link('xref');
+			echo ' ', print_findfamily_link('xref');
+			echo ' ', print_findsource_link('xref');
+			echo ' ', print_findrepository_link('xref');
+			echo ' ', print_findnote_link('xref');
+			echo ' ', print_findmedia_link('xref', '1media');
 			echo '</td><td width="*">';
 			echo select_edit_control('tag_type', $all_tags, '', null, null);
 			echo '</td><td width="1">';
@@ -809,7 +798,7 @@ echo WT_JS_START;?>
 					</tr>
 					<tr>
 						<td>
-							<?php echo WT_I18N::translate('Show highlight images in people boxes'), help_link('SHOW_HIGHLIGHT_IMAGES'); ?>
+							<?php echo WT_I18N::translate('Show highlight images in people boxes'); ?>
 						</td>
 						<td>
 							<?php echo edit_field_yes_no('NEW_SHOW_HIGHLIGHT_IMAGES', get_gedcom_setting(WT_GED_ID, 'SHOW_HIGHLIGHT_IMAGES')); ?>
@@ -949,7 +938,7 @@ echo WT_JS_START;?>
 							<?php echo WT_I18N::translate('Custom welcome text'), help_link('WELCOME_TEXT_AUTH_MODE_CUST'); ?>
 						</td>
 						<td>
-							<input name="NEW_WELCOME_TEXT_AUTH_MODE_4" size="60" maxlength="255" value="<?php echo htmlspecialchars(get_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_AUTH_MODE_'.WT_LOCALE)); ?>">
+							<textarea name="NEW_WELCOME_TEXT_AUTH_MODE_4" maxlength="255" value="<?php echo htmlspecialchars(get_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_AUTH_MODE_'.WT_LOCALE)); ?>"></textarea>
 						</td>
 					</tr>
 					<tr>
@@ -1001,16 +990,9 @@ echo WT_JS_START;?>
 					<tr>
 						<th colspan="2">
 							<?php echo WT_I18N::translate('Names'); ?>
-						</td>
+						</th>
 					</tr>
 					<tr>
-						<td>
-							<?php echo WT_I18N::translate('Underline names in quotes'), help_link('UNDERLINE_NAME_QUOTES'); ?>
-						</td>
-						<td>
-							<?php echo edit_field_yes_no('NEW_UNDERLINE_NAME_QUOTES', get_gedcom_setting(WT_GED_ID, 'UNDERLINE_NAME_QUOTES')); ?>
-						</td>
-					</tr>
 						<td>
 							<?php echo WT_I18N::translate('Min. no. of occurrences to be a "common surname"'), help_link('COMMON_NAMES_THRESHOLD'); ?>
 						</td>
@@ -1065,7 +1047,7 @@ echo WT_JS_START;?>
 					<tr>
 						<th colspan="2">
 							<?php echo WT_I18N::translate('Charts'); ?>
-						</td>
+						</th>
 					</tr>
 					<tr>
 						<td>
@@ -1105,7 +1087,7 @@ echo WT_JS_START;?>
 					<tr>
 						<th colspan="2">
 							<?php echo WT_I18N::translate('Individual pages'); ?>
-						</td>
+						</th>
 					</tr>
 					<tr>
 						<td>
@@ -1158,7 +1140,7 @@ echo WT_JS_START;?>
 					<tr>
 						<th colspan="2">
 							<?php echo WT_I18N::translate('Other'); ?>
-						</td>
+						</th>
 					</tr>
 					<tr>
 						<td>
@@ -1213,8 +1195,8 @@ echo WT_JS_START;?>
 				<table>
 					<tr>
 						<th colspan="2">
-							<?php echo WT_I18N::translate('On charts'); ?>
-						</td>
+							<?php echo WT_I18N::translate('Charts'); ?>
+						</th>
 					</tr>
 					<tr>
 						<td>
@@ -1269,13 +1251,13 @@ echo WT_JS_START;?>
 							<?php echo WT_I18N::translate('Other facts to show in charts'), help_link('CHART_BOX_TAGS'); ?>
 						</td>
 						<td>
-							<input type="text" id="NEW_CHART_BOX_TAGS" name="NEW_CHART_BOX_TAGS" value="<?php echo $CHART_BOX_TAGS; ?>" dir="ltr" size="50" maxlength="255"><?php print_findfact_link("NEW_CHART_BOX_TAGS", $GEDCOM); ?>
+							<input type="text" id="NEW_CHART_BOX_TAGS" name="NEW_CHART_BOX_TAGS" value="<?php echo $CHART_BOX_TAGS; ?>" dir="ltr" size="50" maxlength="255"><?php echo print_findfact_link('NEW_CHART_BOX_TAGS'); ?>
 						</td>
 					</tr>
 					<tr>
 						<th colspan="2">
-							<?php echo WT_I18N::translate('On individual pages'); ?>
-						</td>
+							<?php echo WT_I18N::translate('Individual pages'); ?>
+						</th>
 					</tr>
 					<tr>
 						<td>
@@ -1328,7 +1310,7 @@ echo WT_JS_START;?>
 					<tr>
 						<th colspan="2">
 							<?php echo WT_I18N::translate('General'); ?>
-						</td>
+						</th>
 					</tr>
 					<tr>
 						<td>
@@ -1385,14 +1367,14 @@ echo WT_JS_START;?>
 				<tr>
 					<th colspan="2">
 						<?php echo WT_I18N::translate('Facts for Individual records'); ?>
-					</td>
+					</th>
 				</tr>
 				<tr>
 					<td>
 						<?php echo WT_I18N::translate('All facts'), help_link('INDI_FACTS_ADD'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_INDI_FACTS_ADD" name="NEW_INDI_FACTS_ADD" value="<?php echo get_gedcom_setting(WT_GED_ID, 'INDI_FACTS_ADD'); ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_INDI_FACTS_ADD", $GEDCOM); ?>
+						<input type="text" id="NEW_INDI_FACTS_ADD" name="NEW_INDI_FACTS_ADD" value="<?php echo get_gedcom_setting(WT_GED_ID, 'INDI_FACTS_ADD'); ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_INDI_FACTS_ADD'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -1400,7 +1382,7 @@ echo WT_JS_START;?>
 						<?php echo WT_I18N::translate('Unique facts'), help_link('INDI_FACTS_UNIQUE'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_INDI_FACTS_UNIQUE" name="NEW_INDI_FACTS_UNIQUE" value="<?php echo get_gedcom_setting(WT_GED_ID, 'INDI_FACTS_UNIQUE'); ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_INDI_FACTS_UNIQUE", $GEDCOM); ?>
+						<input type="text" id="NEW_INDI_FACTS_UNIQUE" name="NEW_INDI_FACTS_UNIQUE" value="<?php echo get_gedcom_setting(WT_GED_ID, 'INDI_FACTS_UNIQUE'); ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_INDI_FACTS_UNIQUE'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -1408,7 +1390,7 @@ echo WT_JS_START;?>
 						<?php echo WT_I18N::translate('New entry facts'), help_link('QUICK_REQUIRED_FACTS'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_QUICK_REQUIRED_FACTS" name="NEW_QUICK_REQUIRED_FACTS" value="<?php echo $QUICK_REQUIRED_FACTS; ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_QUICK_REQUIRED_FACTS", $GEDCOM); ?>
+						<input type="text" id="NEW_QUICK_REQUIRED_FACTS" name="NEW_QUICK_REQUIRED_FACTS" value="<?php echo $QUICK_REQUIRED_FACTS; ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_QUICK_REQUIRED_FACTS'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -1416,20 +1398,20 @@ echo WT_JS_START;?>
 						<?php echo WT_I18N::translate('Quick facts'), help_link('INDI_FACTS_QUICK'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_INDI_FACTS_QUICK" name="NEW_INDI_FACTS_QUICK" value="<?php echo get_gedcom_setting(WT_GED_ID, 'INDI_FACTS_QUICK'); ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_INDI_FACTS_QUICK", $GEDCOM); ?>
+						<input type="text" id="NEW_INDI_FACTS_QUICK" name="NEW_INDI_FACTS_QUICK" value="<?php echo get_gedcom_setting(WT_GED_ID, 'INDI_FACTS_QUICK'); ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_INDI_FACTS_QUICK'); ?>
 					</td>
 				</tr>
 				<tr>
 					<th colspan="2">
 						<?php echo WT_I18N::translate('Facts for Family records'); ?>
-					</td>
+					</th>
 				</tr>
 				<tr>
 					<td>
 						<?php echo WT_I18N::translate('All facts'), help_link('FAM_FACTS_ADD'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_FAM_FACTS_ADD" name="NEW_FAM_FACTS_ADD" value="<?php echo get_gedcom_setting(WT_GED_ID, 'FAM_FACTS_ADD'); ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_FAM_FACTS_ADD", $GEDCOM); ?>
+						<input type="text" id="NEW_FAM_FACTS_ADD" name="NEW_FAM_FACTS_ADD" value="<?php echo get_gedcom_setting(WT_GED_ID, 'FAM_FACTS_ADD'); ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_FAM_FACTS_ADD'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -1437,7 +1419,7 @@ echo WT_JS_START;?>
 						<?php echo WT_I18N::translate('Unique facts'), help_link('FAM_FACTS_UNIQUE'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_FAM_FACTS_UNIQUE" name="NEW_FAM_FACTS_UNIQUE" value="<?php echo get_gedcom_setting(WT_GED_ID, 'FAM_FACTS_UNIQUE'); ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_FAM_FACTS_UNIQUE", $GEDCOM); ?>
+						<input type="text" id="NEW_FAM_FACTS_UNIQUE" name="NEW_FAM_FACTS_UNIQUE" value="<?php echo get_gedcom_setting(WT_GED_ID, 'FAM_FACTS_UNIQUE'); ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_FAM_FACTS_UNIQUE'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -1445,7 +1427,7 @@ echo WT_JS_START;?>
 						<?php echo WT_I18N::translate('New entry facts'), help_link('QUICK_REQUIRED_FAMFACTS'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_QUICK_REQUIRED_FAMFACTS" name="NEW_QUICK_REQUIRED_FAMFACTS" value="<?php echo $QUICK_REQUIRED_FAMFACTS; ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_QUICK_REQUIRED_FAMFACTS", $GEDCOM); ?>
+						<input type="text" id="NEW_QUICK_REQUIRED_FAMFACTS" name="NEW_QUICK_REQUIRED_FAMFACTS" value="<?php echo $QUICK_REQUIRED_FAMFACTS; ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_QUICK_REQUIRED_FAMFACTS'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -1453,20 +1435,20 @@ echo WT_JS_START;?>
 						<?php echo WT_I18N::translate('Quick facts'), help_link('FAM_FACTS_QUICK'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_FAM_FACTS_QUICK" name="NEW_FAM_FACTS_QUICK" value="<?php echo get_gedcom_setting(WT_GED_ID, 'FAM_FACTS_QUICK'); ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_FAM_FACTS_QUICK", $GEDCOM); ?>
+						<input type="text" id="NEW_FAM_FACTS_QUICK" name="NEW_FAM_FACTS_QUICK" value="<?php echo get_gedcom_setting(WT_GED_ID, 'FAM_FACTS_QUICK'); ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_FAM_FACTS_QUICK'); ?>
 					</td>
 				</tr>
 				<tr>
 					<th colspan="2">
 						<?php echo WT_I18N::translate('Facts for Source records'); ?>
-					</td>
+					</th>
 				</tr>
 				<tr>
 					<td>
 						<?php echo WT_I18N::translate('All facts'), help_link('SOUR_FACTS_ADD'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_SOUR_FACTS_ADD" name="NEW_SOUR_FACTS_ADD" value="<?php echo get_gedcom_setting(WT_GED_ID, 'SOUR_FACTS_ADD'); ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_SOUR_FACTS_ADD", $GEDCOM); ?>
+						<input type="text" id="NEW_SOUR_FACTS_ADD" name="NEW_SOUR_FACTS_ADD" value="<?php echo get_gedcom_setting(WT_GED_ID, 'SOUR_FACTS_ADD'); ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_SOUR_FACTS_ADD'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -1474,7 +1456,7 @@ echo WT_JS_START;?>
 						<?php echo WT_I18N::translate('Unique facts'), help_link('SOUR_FACTS_UNIQUE'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_SOUR_FACTS_UNIQUE" name="NEW_SOUR_FACTS_UNIQUE" value="<?php echo get_gedcom_setting(WT_GED_ID, 'SOUR_FACTS_UNIQUE'); ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_SOUR_FACTS_UNIQUE", $GEDCOM); ?>
+						<input type="text" id="NEW_SOUR_FACTS_UNIQUE" name="NEW_SOUR_FACTS_UNIQUE" value="<?php echo get_gedcom_setting(WT_GED_ID, 'SOUR_FACTS_UNIQUE'); ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_SOUR_FACTS_UNIQUE'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -1482,20 +1464,20 @@ echo WT_JS_START;?>
 						<?php echo WT_I18N::translate('Quick facts'), help_link('SOUR_FACTS_QUICK'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_SOUR_FACTS_QUICK" name="NEW_SOUR_FACTS_QUICK" value="<?php echo get_gedcom_setting(WT_GED_ID, 'SOUR_FACTS_QUICK'); ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_SOUR_FACTS_QUICK", $GEDCOM); ?>
+						<input type="text" id="NEW_SOUR_FACTS_QUICK" name="NEW_SOUR_FACTS_QUICK" value="<?php echo get_gedcom_setting(WT_GED_ID, 'SOUR_FACTS_QUICK'); ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_SOUR_FACTS_QUICK'); ?>
 					</td>
 				</tr>
 				<tr>
 					<th colspan="2">
 						<?php echo WT_I18N::translate('Facts for Repository records'); ?>
-					</td>
+					</th>
 				</tr>
 				<tr>
 					<td>
 						<?php echo WT_I18N::translate('All facts'), help_link('REPO_FACTS_ADD'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_REPO_FACTS_ADD" name="NEW_REPO_FACTS_ADD" value="<?php echo get_gedcom_setting(WT_GED_ID, 'REPO_FACTS_ADD'); ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_REPO_FACTS_ADD", $GEDCOM); ?>
+						<input type="text" id="NEW_REPO_FACTS_ADD" name="NEW_REPO_FACTS_ADD" value="<?php echo get_gedcom_setting(WT_GED_ID, 'REPO_FACTS_ADD'); ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_REPO_FACTS_ADD'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -1503,7 +1485,7 @@ echo WT_JS_START;?>
 						<?php echo WT_I18N::translate('Unique facts'), help_link('REPO_FACTS_UNIQUE'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_REPO_FACTS_UNIQUE" name="NEW_REPO_FACTS_UNIQUE" value="<?php echo get_gedcom_setting(WT_GED_ID, 'REPO_FACTS_UNIQUE'); ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_REPO_FACTS_UNIQUE", $GEDCOM); ?>
+						<input type="text" id="NEW_REPO_FACTS_UNIQUE" name="NEW_REPO_FACTS_UNIQUE" value="<?php echo get_gedcom_setting(WT_GED_ID, 'REPO_FACTS_UNIQUE'); ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_REPO_FACTS_UNIQUE'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -1511,20 +1493,20 @@ echo WT_JS_START;?>
 						<?php echo WT_I18N::translate('Quick facts'), help_link('REPO_FACTS_QUICK'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_REPO_FACTS_QUICK" name="NEW_REPO_FACTS_QUICK" value="<?php echo get_gedcom_setting(WT_GED_ID, 'REPO_FACTS_QUICK'); ?>" size="60" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_REPO_FACTS_QUICK", $GEDCOM); ?>
+						<input type="text" id="NEW_REPO_FACTS_QUICK" name="NEW_REPO_FACTS_QUICK" value="<?php echo get_gedcom_setting(WT_GED_ID, 'REPO_FACTS_QUICK'); ?>" size="60" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_REPO_FACTS_QUICK'); ?>
 					</td>
 				</tr>
 				<tr>
 					<th colspan="2">
 						<?php echo WT_I18N::translate('Advanced fact settings'); ?>
-					</td>
+					</th>
 				</tr>
 				<tr>
 					<td>
 						<?php echo WT_I18N::translate('Advanced name facts'), help_link('ADVANCED_NAME_FACTS'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_ADVANCED_NAME_FACTS" name="NEW_ADVANCED_NAME_FACTS" value="<?php echo $ADVANCED_NAME_FACTS; ?>" size="40" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_ADVANCED_NAME_FACTS", $GEDCOM); ?>
+						<input type="text" id="NEW_ADVANCED_NAME_FACTS" name="NEW_ADVANCED_NAME_FACTS" value="<?php echo $ADVANCED_NAME_FACTS; ?>" size="40" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_ADVANCED_NAME_FACTS'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -1532,13 +1514,13 @@ echo WT_JS_START;?>
 						<?php echo WT_I18N::translate('Advanced place name facts'), help_link('ADVANCED_PLAC_FACTS'); ?>
 					</td>
 					<td>
-						<input type="text" id="NEW_ADVANCED_PLAC_FACTS" name="NEW_ADVANCED_PLAC_FACTS" value="<?php echo $ADVANCED_PLAC_FACTS; ?>" size="40" maxlength="255" dir="ltr"><?php print_findfact_link("NEW_ADVANCED_PLAC_FACTS", $GEDCOM); ?>
+						<input type="text" id="NEW_ADVANCED_PLAC_FACTS" name="NEW_ADVANCED_PLAC_FACTS" value="<?php echo $ADVANCED_PLAC_FACTS; ?>" size="40" maxlength="255" dir="ltr"><?php echo print_findfact_link('NEW_ADVANCED_PLAC_FACTS'); ?>
 					</td>
 				</tr>
 				<tr>
 					<th colspan="2">
 						<?php echo WT_I18N::translate('Other settings'); ?>
-					</td>
+					</th>
 				</tr>
 				<tr>
 					<td>
@@ -1562,14 +1544,6 @@ echo WT_JS_START;?>
 					</td>
 					<td>
 						<?php echo select_edit_control('NEW_PREFER_LEVEL2_SOURCES', array(0=>WT_I18N::translate('none'), 1=>WT_I18N::translate('facts'), 2=>WT_I18N::translate('records')), null, get_gedcom_setting(WT_GED_ID, 'PREFER_LEVEL2_SOURCES')); ?>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<?php echo WT_I18N::translate('Autocomplete'), help_link('ENABLE_AUTOCOMPLETE'); ?>
-					</td>
-					<td>
-						<?php echo radio_buttons('NEW_ENABLE_AUTOCOMPLETE', array(false=>WT_I18N::translate('disable'),true=>WT_I18N::translate('enable')), get_gedcom_setting(WT_GED_ID, 'ENABLE_AUTOCOMPLETE')); ?>
 					</td>
 				</tr>
 				<tr>

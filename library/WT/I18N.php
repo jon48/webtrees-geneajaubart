@@ -9,7 +9,7 @@
 // We wrap the Zend_Translate gettext library, to allow us to add extra
 // functionality, such as mixed RTL and LTR text.
 //
-// Copyright (C) 2011 Greg Roach
+// Copyright (C) 2012 Greg Roach
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: I18N.php 13426 2012-02-11 14:51:55Z greg $
+// $Id: I18N.php 13523 2012-02-29 18:20:49Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,31 +33,40 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_I18N {
-	const UTF8_RLE="\xE2\x80\xAA"; // U+202A  (Left to Right embedding: treat everything following as LTR text)
-	const UTF8_LRE="\xE2\x80\xAB"; // U+202B  (Right to Left embedding: treat everything following as RTL text)
-	const UTF8_PDF="\xE2\x80\xAC"; // U+202C  (Pop directional formatting: restore state prior to last LRO, RLO, LRE, RLE)
-
 	static public  $locale='';
 	static private $dir='';
 	static public  $collation;
 	static public  $list_separator;
+	static private $cache=null;
 
 	// Initialise the translation adapter with a locale setting.
 	// If null is passed, work out which language is needed from the environment.
 	static public function init($locale=null) {
 		global $WT_SESSION;
 
-		// The translation libraries work much faster with a cache.  Try to create one.
-		if (!is_dir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache')) {
-			// We may not have permission - especially during setup, before we instruct
-			// the user to "chmod 777 /data"
-			@mkdir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache');
+		// The translation libraries only work with a cache.
+		$cache_options=array('automatic_serialization'=>true);
+
+		if (ini_get('apc.enabled')) {
+			self::$cache=Zend_Cache::factory('Core', 'Apc', $cache_options, array());
+		} else {
+			if (!is_dir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache')) {
+				// We may not have permission - especially during setup, before we instruct
+				// the user to "chmod 777 /data"
+				@mkdir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache');
+			}
+			if (is_dir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache')) {
+				self::$cache=Zend_Cache::factory('Core', 'File', $cache_options, array('cache_dir'=>WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache'));
+			} else {
+				// No cache available :-(
+				self::$cache=Zend_Cache::factory('Core', 'Zend_Cache_Backend_BlackHole', $cache_options, array(), false, true);
+			}
 		}
-		// If a cache directory exists, use it.
-		if (is_dir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache')) {
-			$cache=Zend_Cache::factory('Core', 'File', array('automatic_serialization'=>true), array('cache_dir'=>WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache'));
-			Zend_Locale::setCache($cache);
-			Zend_Translate::setCache($cache);
+
+		// If we created a cache, use it.
+		if (self::$cache) {
+			Zend_Locale::setCache(self::$cache);
+			Zend_Translate::setCache(self::$cache);
 		}
 
 		$installed_languages=self::installed_languages();
@@ -169,12 +178,13 @@ class WT_I18N {
 
 	// Check which languages are installed
 	static public function installed_languages() {
-		static $installed_languages;
-		if (!is_array($installed_languages)) {
+		$mo_files=glob(WT_ROOT.'language'.DIRECTORY_SEPARATOR.'*.mo');
+		$cache_key=md5(serialize($mo_files));
+
+		if (!($installed_languages=self::$cache->load($cache_key))) {
 			$installed_languages=array();
-			$d=opendir(WT_ROOT.'language');
-			while (($f=readdir($d))!==false) {
-				if (preg_match('/^(([a-z][a-z][a-z]?)(_[A-Z][A-Z])?)\.mo$/', $f, $match)) {
+			foreach ($mo_files as $mo_file) {
+				if (preg_match('/^(([a-z][a-z][a-z]?)(_[A-Z][A-Z])?)\.mo$/', basename($mo_file), $match)) {
 					// launchpad does not support language variants.
 					// Until it does, we cannot support languages such as sr@latin
 					// See http://zendframework.com/issues/browse/ZF-7485
@@ -190,7 +200,6 @@ class WT_I18N {
 					$installed_languages[$match[1]]=$tmp2.'|'.$tmp1;
 				}
 			}
-			closedir($d);
 			if (empty($installed_languages)) {
 				// We cannot translate this
 				die('There are no languages installed.  You must include at least one xx.mo file in /language/');
@@ -206,6 +215,7 @@ class WT_I18N {
 					list(,$value)=explode('|', $value);
 				}
 			}
+			self::$cache->save($installed_languages, $cache_key);
 		}
 		return $installed_languages;
 	}
@@ -216,47 +226,6 @@ class WT_I18N {
 		$dir=$localeData['characters']=='right-to-left' ? 'rtl' : 'ltr';
 		list($lang)=explode('_', self::$locale);
 		return 'lang="'.$lang.'" dir="'.$dir.'"';
-	}
-
-	// Add I18N features to sprintf()
-	// - Convert arrays into lists
-	// - Add directional markup for mixed LTR/RTL strings
-	static public function sprintf(/* var_args */) {
-		$args=func_get_args();
-		foreach ($args as $n=>&$arg) {
-			if ($n) {
-				if (is_array($arg)) {
-					// Is this actually used?
-					$n=count($arg);
-					switch ($n) {
-					case 0:
-						$arg='';
-					case 1:
-						$arg=$arg[0];
-					default:
-						// TODO: add LTR/RTL markup to each element?
-						$arg=implode(self::$list_separator, $arg);
-					}
-				} else {
-					// For each embedded string, if the text-direction is the opposite of the
-					// page language, then wrap it in directional indicators.  This will stop
-					// weakly-directional characters being displayed in the wrong sequence.
-					// We need to use unicode control characters instead of <span dir="rtl">
-					// because we must use it in contexts (such as titles, select/options) where
-					// markup is not permitted.
-					if (self::$dir=='ltr') {
-						if (utf8_direction($arg)=='rtl') {
-							$arg=self::UTF8_RLE.$arg.self::UTF8_PDF;
-						}
-					} else {
-						if (utf8_direction($arg)=='ltr') {
-							$arg=self::UTF8_LRE.$arg.self::UTF8_PDF;
-						}
-					}
-				}
-			}
-		}
-		return call_user_func_array('sprintf', $args);
 	}
 
 	// Translate a number into the local representation.  e.g. 12345.67 becomes
@@ -298,7 +267,7 @@ class WT_I18N {
 		} else {
 			$args[0]=Zend_Registry::get('Zend_Translate')->_($args[0]);
 		}
-		return call_user_func_array(array('WT_I18N', 'sprintf'), $args);
+		return call_user_func_array('sprintf', $args);
 	}
 
 	// Context sensitive version of translate.
@@ -317,7 +286,7 @@ class WT_I18N {
 		}
 		$args[0]=$msgtxt;
 		unset ($args[1]);
-		return call_user_func_array(array('WT_I18N', 'sprintf'), $args);
+		return call_user_func_array('sprintf', $args);
 	}
 
 	// Similar to translate, but do perform "no operation" on it.

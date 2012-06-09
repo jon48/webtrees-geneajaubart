@@ -2,7 +2,7 @@
 // Static GEDCOM data for Tags
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Tag.php 13072 2011-12-14 22:44:34Z greg $
+// $Id: Tag.php 13915 2012-05-05 16:45:02Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -327,7 +327,7 @@ class WT_Gedcom_Tag {
 		case 'ORDN:DATE': return WT_I18N::translate('Date of Ordination');
 		case 'ORDN:PLAC': return WT_I18N::translate('Place of Ordination');
 		case 'PAGE': return /* I18N: gedcom tag PAGE */ WT_I18N::translate('Citation details');
-		case 'PEDI': return /* I18N: gedcom tag PEDI */ WT_I18N::translate('Pedigree');
+		case 'PEDI': return /* I18N: gedcom tag PEDI */ WT_I18N::translate('Relationship to parents');
 		case 'PHON': return /* I18N: gedcom tag PHON */ WT_I18N::translate('Phone');
 		case 'PLAC': return /* I18N: gedcom tag PLAC */ WT_I18N::translate('Place');
 		case 'PLAC:FONE': return WT_I18N::translate('Phonetic place');
@@ -899,7 +899,7 @@ class WT_Gedcom_Tag {
 		return
 			'<div class="fact_'.preg_replace('/[^_A-Za-z0-9]/', '', $tag).'">'.
 			/* I18N: a label/value pair, such as "Occupation: Farmer".  Some languages may need to change the punctuation. */
-			WT_I18N::translate('<span class="label">%1$s:</span> <span class="field">%2$s</span>', self::getLabel($tag, $record), $value).
+			WT_I18N::translate('<span class="label">%1$s:</span> <span class="field" dir="auto">%2$s</span>', self::getLabel($tag, $record), $value).
 			'</div>';
 	}
 
@@ -928,7 +928,7 @@ class WT_Gedcom_Tag {
 	
 	// Get a list of reference facts that will be displayed in the "Extra information" sidebar module, and at the same time excluded from the personal_facts module
 	public static function getReferenceFacts() {
-		return array('CHAN', 'IDNO', 'RFN', 'AFN', 'REFN', 'RIN', '_UID');
+		return array('CHAN', 'IDNO', 'RFN', 'AFN', 'REFN', 'RIN', '_UID', 'SSN');
 	}
 
 

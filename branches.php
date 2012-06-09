@@ -2,7 +2,7 @@
 // List branches by surname
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,15 +21,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: branches.php 13166 2012-01-03 15:15:20Z lukasz $
+// $Id: branches.php 13766 2012-04-03 16:34:21Z greg $
 
 define('WT_SCRIPT_NAME', 'branches.php');
 require './includes/session.php';
-
-//-- const
-$fact='MARR';
-define('WT_ICON_RINGS', '<img src="'.$WT_IMAGES['rings'].'" alt="'.WT_Gedcom_Tag::getLabel('MARR').'" title="'.WT_Gedcom_Tag::getLabel('MARR').'">');
-define('WT_ICON_BRANCHES', '<img src="'.$WT_IMAGES['patriarch'].'" alt="" align="middle">');
 
 //-- args
 $surn = safe_GET('surname', '[^<>&%{};]*');
@@ -47,15 +42,13 @@ if (WT_USER_GEDCOM_ID) {
 
 $controller=new WT_Controller_Base();
 if ($surn) {
-	$controller->setPageTitle(/* I18N: %s is a surname */ WT_I18N::translate('Branches of the %s family', $surn));
+	$controller->setPageTitle(/* I18N: %s is a surname */ WT_I18N::translate('Branches of the %s family', htmlspecialchars($surn)));
 } else {
 	$controller->setPageTitle(WT_I18N::translate('Branches'));
 }
-$controller->pageHeader();
-
-if ($ENABLE_AUTOCOMPLETE) {
-	require WT_ROOT.'/js/autocomplete.js.htm';
-}
+$controller
+	->pageHeader()
+	->addExternalJavaScript('js/autocomplete.js');
 
 ?>
 <div id="branches-page">
@@ -65,7 +58,7 @@ if ($ENABLE_AUTOCOMPLETE) {
 			<td class="descriptionbox">
 				<?php echo WT_Gedcom_Tag::getLabel('SURN'); ?></td>
 			<td class="optionbox">
-				<input type="text" name="surname" id="SURN" value="<?php echo $surn; ?>">
+				<input type="text" name="surname" id="SURN" value="<?php echo htmlspecialchars($surn); ?>" dir="auto">
 				<input type="hidden" name="ged" id="ged" value="<?php echo $ged; ?>">
 				<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>">
 				<p><?php echo WT_I18N::translate('Phonetic search'); ?></p>
@@ -82,8 +75,7 @@ if ($ENABLE_AUTOCOMPLETE) {
 <?php
 //-- results
 if ($surn) {
-	$surn_script = utf8_script($surn);
-	echo '<fieldset><legend>', WT_ICON_BRANCHES, ' ', PrintReady($surn), '</legend>';
+	echo '<fieldset><legend><i class="icon-patriarch"></i> ', $surn, '</legend>';
 	$indis = indis_array($surn, $soundex_std, $soundex_dm);
 	usort($indis, array('WT_Person', 'CompareBirtDate'));
 	echo '<ol>';
@@ -112,29 +104,27 @@ if (false) {
 }
 
 function print_fams($person, $famid=null) {
-	global $UNKNOWN_NN, $surn, $surn_script, $user_ancestors;
+	global $surn, $soundex_std, $soundex_dm, $user_ancestors;
 	// select person name according to searched surname
 	$person_name = "";
 	foreach ($person->getAllNames() as $n=>$name) {
 		list($surn1) = explode(",", $name['sort']);
-		if (stripos($surn1, $surn)===false
-			&& stripos($surn, $surn1)===false
-			&& soundex_std($surn1)!==soundex_std($surn)
-			&& soundex_dm($surn1)!==soundex_dm($surn)
-			) {
-			continue;
+		if (
+			// one name is a substring of the other
+			stripos($surn1, $surn)!==false ||
+			stripos($surn, $surn1)!==false ||
+			// one name sounds like the other
+			$soundex_std && WT_Soundex::compare(WT_Soundex::soundex_std($surn1), WT_Soundex::soundex_std($surn)) ||
+			$soundex_dm  && WT_Soundex::compare(WT_Soundex::soundex_dm ($surn1), WT_Soundex::soundex_dm ($surn))
+		) {
+			$person_name = $name['full'];
+			break;
 		}
-		if (utf8_script($surn1)!==$surn_script) {
-			continue;
-		}
-		$person_name = $name['full'];
-		break;
 	}
 	if (empty($person_name)) {
 		echo '<li title="', strip_tags($person->getFullName()), '">', $person->getSexImage(), '…</li>';
 		return;
 	}
-	$person_script = utf8_script($person_name);
 	// current indi
 	echo '<li>';
 	$class = '';
@@ -144,7 +134,7 @@ function print_fams($person, $famid=null) {
 		$sosa = '<a target="_blank" dir="ltr" class="details1 '.$person->getBoxStyle().'" title="'.WT_I18N::translate('Sosa').'" href="relationship.php?pid2='.WT_USER_ROOT_ID.'&amp;pid1='.$person->getXref().'">&nbsp;'.$sosa.'&nbsp;</a>'.sosa_gen($sosa);
 	}
 	$current = $person->getSexImage().
-		'<a target="_blank" class="'.$class.'" href="'.$person->getHtmlUrl().'">'.PrintReady($person_name).'</a> '.
+		'<a target="_blank" class="'.$class.'" href="'.$person->getHtmlUrl().'">'.$person_name.'</a> '.
 		$person->getLifeSpan().' '.$sosa;
 	if ($famid && $person->getChildFamilyPedigree($famid)) {
 		$sex = $person->getSex();
@@ -169,13 +159,14 @@ function print_fams($person, $famid=null) {
 				$class = 'search_hit';
 				$sosa2 = '<a target="_blank" dir="ltr" class="details1 '.$spouse->getBoxStyle().'" title="'.WT_I18N::translate('Sosa').'" href="relationship.php?pid2='.WT_USER_ROOT_ID.'&amp;pid1='.$spouse->getXref().'">&nbsp;'.$sosa2.'&nbsp;</a>'.sosa_gen($sosa2);
 			}
-			if ($family->getMarriageYear()) {
+			$marriage_year=$family->getMarriageYear();
+			if ($marriage_year) {
 				$txt .= ' <a href="'.$family->getHtmlUrl().'">';
-				$txt .= '<span class="details1" title="'.strip_tags($family->getMarriageDate()->Display()).'">'.WT_ICON_RINGS.$family->getMarriageYear().'</span></a>';
+				$txt .= '<span class="details1" title="'.strip_tags($family->getMarriageDate()->Display()).'"><i class="icon-rings"></i>'.$marriage_year.'</span></a>';
 			}
 			else if ($family->getMarriage()) {
 				$txt .= ' <a href="'.$family->getHtmlUrl().'">';
-				$txt .= '<span class="details1" title="'.WT_I18N::translate('yes').'">'.WT_ICON_RINGS.'</span></a>';
+				$txt .= '<span class="details1" title="'.WT_I18N::translate('yes').'"><i class="icon-rings"></i></span></a>';
 			}
 		$txt .=
 			$spouse->getSexImage().
@@ -205,28 +196,33 @@ function load_ancestors_array($person, $sosa=1) {
 
 function indis_array($surn, $soundex_std, $soundex_dm) {
 	$sql=
-		"SELECT DISTINCT n_id".
-		" FROM `##name`".
+		"SELECT DISTINCT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec".
+		" FROM `##individuals`".
+		" JOIN `##name` ON (i_id=n_id AND i_file=n_file)".
 		" WHERE n_file=?".
 		" AND n_type!=?".
 		" AND (n_surn=? OR n_surname=?";
 	$args=array(WT_GED_ID, '_MARNM', $surn, $surn);
 	if ($soundex_std) {
-		$sql .= " OR n_soundex_surn_std LIKE CONCAT('%', ?, '%')";
-		$args[]=soundex_std($surn);
+		foreach (explode(':', WT_Soundex::soundex_std($surn)) as $value) {
+			$sql .= " OR n_soundex_surn_std LIKE CONCAT('%', ?, '%')";
+			$args[]=$value;
+		}
 	}
 	if ($soundex_dm) {
-		$sql .= " OR n_soundex_surn_dm LIKE CONCAT('%', ?, '%')";
-		$args[]=soundex_dm($surn);
+		foreach (explode(':', WT_Soundex::soundex_dm($surn)) as $value) {
+			$sql .= " OR n_soundex_surn_dm LIKE CONCAT('%', ?, '%')";
+			$args[]=$value;
+		}
 	}
 	$sql .= ')';
 	$rows=
 		WT_DB::prepare($sql)
 		->execute($args)
-		->fetchAll();
+		->fetchAll(PDO::FETCH_ASSOC);
 	$data=array();
 	foreach ($rows as $row) {
-		$data[]=WT_Person::getInstance($row->n_id);
+		$data[]=WT_Person::getInstance($row);
 	}
 	return $data;
 }

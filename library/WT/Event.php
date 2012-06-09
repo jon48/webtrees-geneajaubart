@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Event.php 13432 2012-02-11 18:20:31Z greg $
+// $Id: Event.php 13949 2012-05-28 21:03:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -53,6 +53,10 @@ class WT_Event {
 	var $sortDate = NULL;
 	//-- temporary state variable that can be used by other scripts
 	var $temp = NULL;
+
+	// Is this an old/new pending record?
+	private $is_old = false;
+	private $is_new = false;
 
 	/**
 	 * Get the value for the first given GEDCOM tag
@@ -247,6 +251,21 @@ class WT_Event {
 		}
 	}
 
+	public function setIsOld() {
+		$this->is_old=true;
+		$this->is_new=false;
+	}
+	public function getIsOld() {
+		return $this->is_old;
+	}
+	public function setIsNew() {
+		$this->is_new=true;
+		$this->is_old=false;
+	}
+	public function getIsNew() {
+		return $this->is_new;
+	}
+
 	/**
 	 * Print a simple fact version of this event
 	 *
@@ -257,17 +276,14 @@ class WT_Event {
 		global $SHOW_PEDIGREE_PLACES, $ABBREVIATE_CHART_LABELS;
 
 		if (!$this->canShow()) return "";
-		$data = "";
-		if ($this->gedcomRecord != "1 DEAT") {
-		   $data .= "<span class=\"details_label\">".$this->getLabel($ABBREVIATE_CHART_LABELS)."</span> ";
+		$data = '<span class="details_label">'.$this->getLabel($ABBREVIATE_CHART_LABELS).'</span>';
+		// Don't display "yes", because format_fact_date() does this for us.  (Should it?)
+		if ($this->detail && $this->detail!='Y') {
+			$data .= ' <span dir="auto">'.htmlspecialchars($this->detail).'</span>';
 		}
-		$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
-		if (!in_array($this->tag, $emptyfacts)) {
-			$data .= PrintReady($this->detail);
-		}
-		$data .= format_fact_date($this, $this->getParentObject(), $anchor, false);
+		$data .= ' '.format_fact_date($this, $this->getParentObject(), $anchor, false);
 		$data .= ' '.format_fact_place($this, $anchor, false, false);
-		$data .= "<br>";
+		$data .= '<br>';
 		if ($return) {
 			return $data;
 		} else {

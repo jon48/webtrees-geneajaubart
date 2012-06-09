@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index.php 13329 2012-01-30 16:50:25Z greg $
+// $Id: index.php 13965 2012-06-02 20:41:44Z greg $
 
 define('WT_SCRIPT_NAME', 'index.php');
 require './includes/session.php';
@@ -41,6 +41,10 @@ if (WT_USER_ID && $ctype=='user') {
 }
 
 $all_blocks=WT_Module::getActiveBlocks();
+
+// The latest version is shown on the administration page.  This updates it every 3 days.
+// TODO: send an email notification to the admin when new versions are available.
+fetch_latest_version();
 
 // We generate individual blocks using AJAX
 if ($action=='ajax') {
@@ -85,13 +89,16 @@ $controller
 	->addInlineJavaScript('jQuery.ajaxSetup({cache:true});');
 
 if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
+	$album = new lightbox_WT_Module();
+	$album->getPreLoadContent();
 }
 
-echo '<div id="home-page">';
 if ($ctype=='user') {
+	echo '<div id="my-page">';
 	echo '<h1 class="center">', WT_I18N::translate('My page'), '</h1>';
-}
+} else {
+	echo '<div id="home-page">';
+}	
 if ($blocks['main']) {
 	if ($blocks['side']) {
 		echo '<div id="index_main_blocks">';
@@ -137,15 +144,10 @@ if ($blocks['side']) {
 	echo '</div>';
 }
 
-// Ensure there is always way to configure the blocks
-if ($ctype=='user' && !in_array('user_welcome', $blocks['main']) && !in_array('user_welcome', $blocks['side'])) {
-	echo '<div align="center">';
-	echo "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".rawurlencode(WT_USER_NAME)."&amp;ctype=user', '_blank', 'top=50,left=10,width=600,height=500,scrollbars=1,resizable=1');\">".WT_I18N::translate('Change the blocks on this page').'</a>';
-	echo '</div>';
-}
-if (WT_USER_IS_ADMIN && $ctype=='gedcom' && !in_array('gedcom_block', $blocks['main']) && !in_array('gedcom_block', $blocks['side'])) {
-	echo '<div align="center">';
-	echo "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".WT_GEDURL."&amp;ctype=gedcom', '_blank', 'top=50,left=10,width=600,height=500,scrollbars=1,resizable=1');\">".WT_I18N::translate('Change the blocks on this page').'</a>';
-	echo '</div>';
-}
-echo '</div>'; // <div id="home-page">
+// link for changing blocks
+echo '<div id="link_change_blocks">';
+	if ($ctype=='user') echo '<a href="index_edit.php?user_id='.WT_USER_ID.'" onclick="return modalDialog(\'index_edit.php?user_id='.WT_USER_ID.'\', \'', WT_I18N::translate('Change the blocks on this page'), '\');">', WT_I18N::translate('Change the blocks on this page'), '</a>';
+	if (WT_USER_GEDCOM_ADMIN && $ctype=='gedcom') echo '<a href="index_edit.php?gedcom_id='.WT_GED_ID.'" onclick="return modalDialog(\'index_edit.php?gedcom_id='.WT_GED_ID.'\', \'', WT_I18N::translate('Change the blocks on this page'), '\');">', WT_I18N::translate('Change the blocks on this page'), '</a>';
+	if ($SHOW_COUNTER) {echo '<span>'.WT_I18N::translate('Hit Count:').' '.$hitCount.'</span>';}
+echo '</div>', // <div id="link_change_blocks">
+	 '</div>'; // <div id="home-page">

@@ -4,7 +4,7 @@
 // This page will allow you to merge 2 gedcom records
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -23,13 +23,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_merge.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: admin_site_merge.php 13728 2012-03-31 21:13:20Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_merge.php');
 require './includes/session.php';
 
 $controller=new WT_Controller_Base;
-$controller->setPageTitle(WT_I18N::translate('Merge records'));
+$controller
+	->requireManagerLogin()
+	->setPageTitle(WT_I18N::translate('Merge records'))
+	->pageHeader();
 
 require_once WT_ROOT.'includes/functions/functions_edit.php';
 require_once WT_ROOT.'includes/functions/functions_import.php';
@@ -44,16 +47,8 @@ $keep2=safe_POST('keep2', WT_REGEX_UNSAFE);
 if (empty($keep1)) $keep1=array();
 if (empty($keep2)) $keep2=array();
 
-$controller->pageHeader();
-
 if (get_gedcom_count()==1) { //Removed becasue it doesn't work here for multiple GEDCOMs. Can be reinstated when fixed (https://bugs.launchpad.net/webtrees/+bug/613235)
-	if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm'; 
-}
-
-//-- make sure they have accept access privileges
-if (!WT_USER_CAN_ACCEPT) {
-	echo '<span class="error">', WT_I18N::translate('<b>Access Denied</b><br />You do not have access to this resource.'), '</span>';
-	exit;
+	$controller->addExternalJavaScript('js/autocomplete.js');
 }
 
 if ($action!='choose') {
@@ -250,17 +245,17 @@ if ($action=='choose') {
 	function iopen_find(textbox, gedselect) {
 		pasteto = textbox;
 		ged = gedselect.options[gedselect.selectedIndex].value;
-		findwin = window.open('find.php?type=indi&ged='+ged, '_blank', 'left=50, top=50, width=600, height=500, resizable=1,  scrollbars=1');
+		findwin = window.open('find.php?type=indi&ged='+ged, '_blank', find_window_specs);
 	}
 	function fopen_find(textbox, gedselect) {
 		pasteto = textbox;
 		ged = gedselect.options[gedselect.selectedIndex].value;
-		findwin = window.open('find.php?type=fam&ged='+ged, '_blank', 'left=50, top=50, width=600, height=500, resizable=1, scrollbars=1');
+		findwin = window.open('find.php?type=fam&ged='+ged, '_blank', find_window_specs);
 	}
 	function sopen_find(textbox, gedselect) {
 		pasteto = textbox;
 		ged = gedselect.options[gedselect.selectedIndex].value;
-		findwin = window.open('find.php?type=source&ged='+ged, '_blank', 'left=50, top=50, width=600, height=500, resizable=1, scrollbars=1');
+		findwin = window.open('find.php?type=source&ged='+ged, '_blank', find_window_specs);
 	}
 	function paste_id(value) {
 		pasteto.value=value;
@@ -277,9 +272,8 @@ if ($action=='choose') {
 		<td>',
 		WT_I18N::translate('Merge To ID:'),
 		'</td><td>
-		<input type="text" name="gid1" id="gid1" value="', $gid1, '" size="10" tabindex="1">
-		<script type="text/javascript">document.getElementById("gid1").focus();</script>',
-		'<select name="ged" tabindex="4"';
+		<input type="text" name="gid1" id="gid1" value="', $gid1, '" size="10" tabindex="1" autofocus="autofocus">
+		<select name="ged" tabindex="4"';
 	if (get_gedcom_count()==1) {
 		echo 'style="width:1px;visibility:hidden;"';
 	}
@@ -291,19 +285,13 @@ if ($action=='choose') {
 		if (empty($ged) && $ged_id==WT_GED_ID || !empty($ged) && $ged==$ged_name) {
 			echo ' selected="selected"';
 		}
-		echo '>', PrintReady(strip_tags(get_gedcom_setting($ged_id, 'title'))), '</option>';
+		echo ' dir="auto">', htmlspecialchars(get_gedcom_setting($ged_id, 'title')), '</option>';
 	}
-	$inditext = WT_I18N::translate('Find individual ID');
-	if (isset($WT_IMAGES['button_indi'])) $inditext = '<img src="'.$WT_IMAGES['button_indi'].'" alt="'.$inditext.'" title="'.$inditext.'" align="middle">';
-	$famtext = WT_I18N::translate('Find Family ID');
-	if (isset($WT_IMAGES['button_family'])) $famtext = '<img src="'.$WT_IMAGES['button_family'].'" alt="'.$famtext.'" title="'.$famtext.'" align="middle">';
-	$sourtext = WT_I18N::translate('Find Source ID');
-	if (isset($WT_IMAGES['button_source'])) $sourtext = '<img src="'.$WT_IMAGES['button_source'].'" alt="'.$sourtext.'" title="'.$sourtext.'" align="middle">';
 	echo
 		'</select>
-		<a href="#" onclick="iopen_find(document.merge.gid1, document.merge.ged);" tabindex="6">', $inditext, '</a>
-		<a href="#" onclick="fopen_find(document.merge.gid1, document.merge.ged);" tabindex="8">', $famtext, '</a>
-		<a href="#" onclick="sopen_find(document.merge.gid1, document.merge.ged);" tabindex="10">', $sourtext, '</a>
+		<a href="#" onclick="iopen_find(document.merge.gid1, document.merge.ged);" tabindex="6" class="icon-button_indi" title="'.WT_I18N::translate('Find an individual').'"></a>
+		<a href="#" onclick="fopen_find(document.merge.gid1, document.merge.ged);" tabindex="8" class="icon-button_family" title="'.WT_I18N::translate('Find a family').'"></a>
+		<a href="#" onclick="sopen_find(document.merge.gid1, document.merge.ged);" tabindex="10" class="icon-button_source" title="'.WT_I18N::translate('Find a source').'"></a>
 		</td></tr><tr><td>',
 		WT_I18N::translate('Merge From ID:'),
 		'</td><td>
@@ -318,13 +306,13 @@ if ($action=='choose') {
 		if (empty($ged2) && $ged_id==WT_GED_ID || !empty($ged2) && $ged2==$ged_name) {
 			echo ' selected="selected"';
 		}
-		echo '>', PrintReady(strip_tags(get_gedcom_setting($ged_id, 'title'))), '</option>';
+		echo ' dir="auto">', htmlspecialchars(get_gedcom_setting($ged_id, 'title')), '</option>';
 	}
 	echo
 		'</select>
-		<a href="#" onclick="iopen_find(document.merge.gid2, document.merge.ged2);" tabindex="7">', $inditext, '</a>
-		<a href="#" onclick="fopen_find(document.merge.gid2, document.merge.ged2);" tabindex="9">', $famtext, '</a>
-		<a href="#" onclick="sopen_find(document.merge.gid2, document.merge.ged2);" tabindex="11">',  $sourtext, '</a>
+		<a href="#" onclick="iopen_find(document.merge.gid2, document.merge.ged2);" tabindex="7" class="icon-button_indi" title="'.WT_I18N::translate('Find an individual').'"></a>
+		<a href="#" onclick="fopen_find(document.merge.gid2, document.merge.ged2);" tabindex="9" class="icon-button_family" title="'.WT_I18N::translate('Find a family').'"></a>
+		<a href="#" onclick="sopen_find(document.merge.gid2, document.merge.ged2);" tabindex="11" class="icon-button_source" title="'.WT_I18N::translate('Find a source').'"></a>
 		</td></tr></table>
 		<input type="submit" value="', WT_I18N::translate('Merge records'), '" tabindex="3">
 		</form></div>';

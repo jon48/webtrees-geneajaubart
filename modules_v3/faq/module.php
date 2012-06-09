@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13299 2012-01-20 20:40:31Z greg $
+// $Id: module.php 13656 2012-03-24 17:33:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -283,9 +283,9 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 			" WHERE module_name=?".
 			" AND bs1.setting_name='header'".
 			" AND bs2.setting_name='faqbody'".
-			" AND (gedcom_id IS NULL OR gedcom_id=?)".
+			" AND IFNULL(gedcom_id, ?)=?".
 			" ORDER BY block_order"
-		)->execute(array($this->getName(), WT_GED_ID))->fetchAll();
+		)->execute(array($this->getName(), WT_GED_ID, WT_GED_ID))->fetchAll();
 
 		// Define your colors for the alternating rows
 		echo '<h2 class="center">', WT_I18N::translate('Frequently asked questions'), '</h2>';
@@ -334,8 +334,6 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 	}
 
 	private function config() {
-		global $WT_IMAGES;
-
 		$controller=new WT_Controller_Base();
 		$controller->setPageTitle($this->getTitle());
 		$controller->pageHeader();
@@ -348,9 +346,9 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 			" WHERE module_name=?".
 			" AND bs1.setting_name='header'".
 			" AND bs2.setting_name='faqbody'".
-			" AND (gedcom_id IS NULL OR gedcom_id=?)".
+			" AND IFNULL(gedcom_id, ?)=?".
 			" ORDER BY block_order"
-		)->execute(array($this->getName(), WT_GED_ID))->fetchAll();
+		)->execute(array($this->getName(), WT_GED_ID, WT_GED_ID))->fetchAll();
 
 		$min_block_order=WT_DB::prepare(
 			"SELECT MIN(block_order) FROM `##block` WHERE module_name=?"
@@ -382,14 +380,14 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 				if ($faq->block_order==$min_block_order) {
 					echo '&nbsp;';
 				} else {
-					echo '<a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_moveup&amp;block_id=', $faq->block_id, '"><img src="', $WT_IMAGES['uarrow'], '" alt=""></a>';
+					echo '<a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_moveup&amp;block_id=', $faq->block_id, '" class="icon-uarrow"></a>';
 					echo help_link('moveup_faq_item', $this->getName());
 				}
 				echo '</td><td>';
 				if ($faq->block_order==$max_block_order) {
 					echo '&nbsp;';
 				} else {
-					echo '<a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_movedown&amp;block_id=', $faq->block_id, '"><img src="', $WT_IMAGES['darrow'], '" alt=""></a>';
+					echo '<a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_movedown&amp;block_id=', $faq->block_id, '" class="icon-darrow"></a>';
 					echo help_link('movedown_faq_item', $this->getName());
 				}
 				echo '</td><td>';
@@ -404,7 +402,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 				echo '<div class="faq_edit_item">';
 				echo '<div class="faq_edit_title">', $faq->header, '</div>';
 				// NOTE: Print the body text of the current item
-				echo '<div>', substr($faq->faqbody, 0, 1)=='<' ? $faq->faqbody : nl2br($faq->faqbody), '</div></div></td></tr>';
+				echo '<div class="faq_edit_content">', substr($faq->faqbody, 0, 1)=='<' ? $faq->faqbody : nl2br($faq->faqbody), '</div></div></td></tr>';
 			}
 			echo '</table>';
 		}
@@ -423,13 +421,17 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 			return null;
 		}
 
+		$faqs=WT_DB::prepare(
+			"SELECT block_id FROM `##block` b WHERE module_name=? AND IFNULL(gedcom_id, ?)=?"
+		)->execute(array($this->getName(), WT_GED_ID, WT_GED_ID))->fetchAll();
+		
+		if (!$faqs) {
+			return null;
+		}
+
 		$menu = new WT_Menu(WT_I18N::translate('FAQ'), 'module.php?mod=faq&amp;mod_action=show', 'menu-help', 'down');
-		$menu->addIcon('menu_help');
-		$menu->addClass('menuitem', 'menuitem_hover', 'submenu', 'icon_large_help');
 
 		$submenu = new WT_Menu(WT_I18N::translate('FAQ'), 'module.php?mod=faq&amp;mod_action=show', 'menu-help-faq');
-		$submenu->addIcon('help');
-		$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_menu_help');
 		$menu->addSubmenu($submenu);
 		return $menu;
 	}

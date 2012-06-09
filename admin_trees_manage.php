@@ -2,7 +2,7 @@
 // UI for online updating of the GEDCOM configuration.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_manage.php 13248 2012-01-16 12:21:42Z greg $
+// $Id: admin_trees_manage.php 13913 2012-05-05 15:45:29Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_manage.php');
 require './includes/session.php';
@@ -131,9 +131,6 @@ $gedcoms=get_all_gedcoms();
 
 $controller->pageHeader();
 
-// "Help for this page" link
-echo '<div id="page_help">', help_link('gedcom_administration'), '</div>';
-
 // Process GET actions
 switch (safe_GET('action')) {
 case 'uploadform':
@@ -228,7 +225,7 @@ foreach ($gedcoms as $gedcom_id=>$gedcom_name) {
 		echo
 			'<tr align="center">',
 			// export
-			'<td><a href="#" onclick="window.open(\'', "export_gedcom.php?export=", rawurlencode($gedcom_name), '\', \'_blank\',\'left=50,top=50,width=500,height=500,resizable=1,scrollbars=1\');">', WT_I18N::translate('Export'), '</a>',
+			'<td><a href="admin_trees_export.php?export=', rawurlencode($gedcom_name), '" onclick="return modalDialog(\'admin_trees_export.php?export=', rawurlencode($gedcom_name), '\', \'', WT_I18N::translate('Export'), '\');">', WT_I18N::translate('Export'), '</a>',
 			help_link('export_gedcom'),
 			'</td>',
 			// import
@@ -236,7 +233,7 @@ foreach ($gedcoms as $gedcom_id=>$gedcom_name) {
 			help_link('import_gedcom'),
 			'</td>',
 			// download
-			'<td><a href="downloadgedcom.php?ged=', rawurlencode($gedcom_name),'">', WT_I18N::translate('Download'), '</a>',
+			'<td><a href="admin_trees_download.php?ged=', rawurlencode($gedcom_name),'">', WT_I18N::translate('Download'), '</a>',
 			help_link('download_gedcom'),
 			'</td>',
 			// upload
@@ -292,4 +289,5 @@ if (WT_USER_IS_ADMIN) {
 				help_link('PGV_WIZARD'),
 				'</div>';
 		}
-}
+}	
+

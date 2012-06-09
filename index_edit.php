@@ -21,91 +21,74 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index_edit.php 13293 2012-01-20 16:47:46Z greg $
+// $Id: index_edit.php 13642 2012-03-24 13:06:08Z greg $
 
 define('WT_SCRIPT_NAME', 'index_edit.php');
 require './includes/session.php';
 
-$controller=new WT_Controller_Simple();
+$controller=new WT_Controller_Ajax();
 
-$ctype=safe_REQUEST($_REQUEST, 'ctype', array('user', 'gedcom'));
-
-if (!$ctype) {
-	die("Internal error - missing ctype parameter");
+// Only one of $user_id and $gedcom_id should be set
+$user_id=safe_REQUEST($_REQUEST, 'user_id');
+if ($user_id) {
+	$gedcom_id=null;
+} else {
+	$gedcom_id=safe_REQUEST($_REQUEST, 'gedcom_id');
 }
 
-if (isset($_REQUEST['action'])) $action = $_REQUEST['action'];
-if (isset($_REQUEST['main'])) $main = $_REQUEST['main'];
-if (isset($_REQUEST['right'])) $right = $_REQUEST['right'];
-if (isset($_REQUEST['setdefault'])) $setdefault = $_REQUEST['setdefault'];
-if (isset($_REQUEST['side'])) $side = $_REQUEST['side'];
-if (isset($_REQUEST['index'])) $index = $_REQUEST['index'];
-if (isset($_REQUEST['name'])) $name = $_REQUEST['name'];
-
-//-- make sure that they have user status before they can use this page
-//-- otherwise have them login again
-if (!WT_USER_ID) {
+// Only managers can edit the "home page"
+// Only a user or an admin can edit a user's "my page"
+if (
+	$gedcom_id && !userGedcomAdmin(WT_USER_ID, $gedcom_id) ||
+	$user_id && WT_USER_ID!=$user_id && !WT_USER_IS_ADMIN
+) {
 	$controller->pageHeader();
-	echo WT_I18N::translate('<b>Access Denied</b><br />You do not have access to this resource.');
-	echo '<div class="center"><a href="#" onclick="self.close();">', WT_I18N::translate('Close Window').'</a></div>';
+	$controller->addInlineJavaScript('window.location.reload();');
 	exit;
 }
-if (!WT_USER_IS_ADMIN) $setdefault=false;
 
-if (!isset($action)) $action='';
-if (!isset($main)) $main=array();
-if (!isset($right)) $right=array();
-if (!isset($setdefault)) $setdefault=false;
-if (!isset($side)) $side='main';
-if (!isset($index)) $index=1;
+$action=safe_GET('action');
 
-$block_id=safe_REQUEST($_REQUEST, 'block_id');
+if (isset($_REQUEST['main'])) {
+	$main=$_REQUEST['main'];
+} else {
+	$main=array();
+}
+if (isset($_REQUEST['right'])) {
+	$right=$_REQUEST['right'];
+} else {
+	$right=array();
+}
 
 // Define all the icons we're going to use
+$IconUarrow = 'icon-uarrow';
+$IconDarrow = 'icon-darrow';
 if($TEXT_DIRECTION=='ltr') {
-	$IconUarrow = '<img src="'.$WT_IMAGES['uarrow'].'" width="20" height="20" alt="">';
-	$IconDarrow = '<img src="'.$WT_IMAGES['darrow'].'" width="20" height="20" alt="">';
-	$IconRarrow = '<img src="'.$WT_IMAGES['rarrow'].'" width="20" height="20" alt="">';
-	$IconLarrow = '<img src="'.$WT_IMAGES['larrow'].'" width="20" height="20" alt="">';
-	$IconRDarrow = '<img src="'.$WT_IMAGES['rdarrow'].'" width="20" height="20" alt="">';
-	$IconLDarrow = '<img src="'.$WT_IMAGES['ldarrow'].'" width="20" height="20" alt="">';
+	$IconRarrow = 'icon-rarrow';
+	$IconLarrow = 'icon-larrow';
+	$IconRDarrow = 'icon-rdarrow';
+	$IconLDarrow = 'icon-ldarrow';
 } else {
-	$IconUarrow = '<img src="'.$WT_IMAGES['uarrow'].'" width="20" height="20" alt="">';
-	$IconDarrow = '<img src="'.$WT_IMAGES['darrow'].'" width="20" height="20" alt="">';
-	$IconRarrow = '<img src="'.$WT_IMAGES['larrow'].'" width="20" height="20" alt="">';
-	$IconLarrow = '<img src="'.$WT_IMAGES['rarrow'].'" width="20" height="20" alt="">';
-	$IconRDarrow = '<img src="'.$WT_IMAGES['ldarrow'].'" width="20" height="20" alt="">';
-	$IconLDarrow = '<img src="'.$WT_IMAGES['rdarrow'].'" width="20" height="20" alt="">';
+	$IconRarrow = 'icon-larrow';
+	$IconLarrow = 'icon-rarrow';
+	$IconRDarrow = 'icon-ldarrow';
+	$IconLDarrow = 'icon-rdarrow';
 }
 
 $all_blocks=array();
 foreach (WT_Module::getActiveBlocks() as $name=>$block) {
-	if ($ctype=='user' && $block->isUserBlock() || $ctype=='gedcom' && $block->isGedcomBlock()) {
+	if ($user_id && $block->isUserBlock() || $gedcom_id && $block->isGedcomBlock()) {
 		$all_blocks[$name]=$block;
 	}
 }
 
-//-- get the blocks list
-if ($ctype=='user') {
-	if ($action=='reset') {
-		WT_DB::prepare("DELETE `##block_setting` FROM `##block_setting` JOIN `##block` USING (block_id) WHERE user_id=?")->execute(array(WT_USER_ID));
-		WT_DB::prepare("DELETE FROM `##block` WHERE user_id=?")->execute(array(WT_USER_ID));
-	}
-	$blocks=get_user_blocks(WT_USER_ID);
-} else {
-	if ($action=='reset') {
-		WT_DB::prepare("DELETE `##block_setting` FROM `##block_setting` JOIN `##block` USING (block_id) WHERE gedcom_id=?")->execute(array(WT_GED_ID));
-		WT_DB::prepare("DELETE FROM `##block` WHERE gedcom_id=?")->execute(array(WT_GED_ID));
-	}
-	$blocks=get_gedcom_blocks(WT_GED_ID);
-}
-
-if ($ctype=='user') {
+if ($user_id) {
 	$controller->setPageTitle(WT_I18N::translate('My page'));
-} else {
+	$blocks=get_user_blocks($user_id);
+} elseif ($gedcom_id) {
 	$controller->setPageTitle(WT_I18N::translate(get_gedcom_setting(WT_GED_ID, 'title')));
+	$blocks=get_gedcom_blocks($gedcom_id);
 }
-$controller->pageHeader();
 
 if ($action=='update') {
 	foreach (array('main', 'side') as $location) {
@@ -122,10 +105,10 @@ if ($action=='update') {
 				WT_DB::prepare("UPDATE `##block` SET location=? WHERE block_id=?")->execute(array($location, $block_name));
 			} else {
 				// new block
-				if ($ctype=='user') {
-					WT_DB::prepare("INSERT INTO `##block` (user_id, location, block_order, module_name) VALUES (?, ?, ?, ?)")->execute(array(WT_USER_ID, $location, $order, $block_name));
+				if ($user_id) {
+					WT_DB::prepare("INSERT INTO `##block` (user_id, location, block_order, module_name) VALUES (?, ?, ?, ?)")->execute(array($user_id, $location, $order, $block_name));
 				} else {
-					WT_DB::prepare("INSERT INTO `##block` (gedcom_id, location, block_order, module_name) VALUES (?, ?, ?, ?)")->execute(array(WT_GED_ID, $location, $order, $block_name));
+					WT_DB::prepare("INSERT INTO `##block` (gedcom_id, location, block_order, module_name) VALUES (?, ?, ?, ?)")->execute(array($gedcom_id, $location, $order, $block_name));
 				}
 			}
 		}
@@ -137,52 +120,18 @@ if ($action=='update') {
 			}
 		}
 	}
-	if (isset($_POST['nextaction'])) $action = $_POST['nextaction'];
-	echo WT_JS_START, 'opener.window.location.reload(); window.close();', WT_JS_END;
 	exit;
 }
 
-if ($action=="configure") {
-	if (array_key_exists($block_id, $blocks['main'])) {
-		$block_name=$blocks['main'][$block_id];
-	} elseif (array_key_exists($block_id, $blocks['side'])) {
-		$block_name=$blocks['side'][$block_id];
-	} else {
-		echo WT_JS_START, 'window.close();', WT_JS_END;
-		exit;
-	}
-	$class_name=$block_name.'_WT_Module';
-	$block=new $class_name;
-	echo '<table class="facts_table" width="99%">';
-	echo '<tr><td class="facts_label">';
-	echo '<h2>', WT_I18N::translate('Configure'), '</h2>';
-	echo '</td></tr>';
-	echo '<tr><td class="facts_label03">';
-	echo '<b>', $block->getTitle(), ' - ', $block->getDescription(), '</b>';
-	echo '</td></tr>';
-	echo '</table>';
-	echo '<form name="block" method="post" action="index_edit.php?action=configure&amp;ctype=', $ctype, '&amp;block_id=', $block_id, '">';
-	echo '<input type="hidden" name="save" value="1">';
-	echo '<table border="0" class="facts_table">';
-	$block->configureBlock($block_id);
-	echo '<tr><td colspan="2" class="topbottombar">';
-	echo '<input type="button" value="', WT_I18N::translate('Save'), '" onclick="document.block.submit();">';
-	echo '&nbsp;&nbsp;<input type ="button" value="', WT_I18N::translate('Cancel'), '" onclick="window.close()">';
-	echo '</td></tr>';
-	echo '</table>';
-	echo '</form>';
-	echo WT_JS_START;
-	echo 'var pastefield; function paste_id(value) {pastefield.value=value;}';
-	echo WT_JS_END;
-} else { ?>
-	<script type="text/javascript">
-	<!--
-/**
- * Move Up Block JavaScript function
- *
- * This function moves the selected option up in the given select list
- * @param String section_name the name of the select to move the options
- */
+$controller
+	->pageHeader()
+	->addInlineJavaScript('
+	/**
+	* Move Up Block JavaScript function
+	*
+	* This function moves the selected option up in the given select list
+	* @param String section_name the name of the select to move the options
+	*/
 	function move_up_block(section_name) {
 		section_select = document.getElementById(section_name);
 		if (section_select) {
@@ -195,12 +144,12 @@ if ($action=="configure") {
 		}
 	}
 
-/**
- * Move Down Block JavaScript function
- *
- * This function moves the selected option down in the given select list
- * @param String section_name the name of the select to move the options
- */
+	/**
+	* Move Down Block JavaScript function
+	*
+	* This function moves the selected option down in the given select list
+	* @param String section_name the name of the select to move the options
+	*/
 	function move_down_block(section_name) {
 		section_select = document.getElementById(section_name);
 		if (section_select) {
@@ -214,41 +163,41 @@ if ($action=="configure") {
 		}
 	}
 
-/**
- * Move Block from one column to the other JavaScript function
- *
- * This function moves the selected option down in the given select list
- * @author KosherJava
- * @param String from_column the name of the select to move the option from
- * @param String to_column the name of the select to remove the option to
- */
+	/**
+	* Move Block from one column to the other JavaScript function
+	*
+	* This function moves the selected option down in the given select list
+	* @author KosherJava
+	* @param String from_column the name of the select to move the option from
+	* @param String to_column the name of the select to remove the option to
+	*/
 	function move_left_right_block(from_column, to_column) {
 		to_select = document.getElementById(to_column);
 		from_select = document.getElementById(from_column);
-		instruct = document.getElementById('instructions');
+		instruct = document.getElementById("instructions");
 		if ((to_select) && (from_select)) {
 			add_option = from_select.options[from_select.selectedIndex];
-			if (to_column != 'available_select') {
+			if (to_column != "available_select") {
 				to_select.options[to_select.length] = new Option(add_option.text, add_option.value);
 			}
-			if (from_column != 'available_select') {
+			if (from_column != "available_select") {
 				from_select.options[from_select.selectedIndex] = null; //remove from list
 			}
 		}
 	}
-/**
- * Select Options JavaScript function
- *
- * This function selects all the options in the multiple select lists
- */
+	/**
+	* Select Options JavaScript function
+	*
+	* This function selects all the options in the multiple select lists
+	*/
 	function select_options() {
-		section_select = document.getElementById('main_select');
+		section_select = document.getElementById("main_select");
 		if (section_select) {
 			for (i=0; i<section_select.length; i++) {
 				section_select.options[i].selected=true;
 			}
 		}
-		section_select = document.getElementById('right_select');
+		section_select = document.getElementById("right_select");
 		if (section_select) {
 			for (i=0; i<section_select.length; i++) {
 				section_select.options[i].selected=true;
@@ -256,152 +205,135 @@ if ($action=="configure") {
 		}
 		return true;
 	}
-
-/**
- * Load Block Description array for use by javascript
- */
-	<?php
-	echo "var block_descr = new Array();";
-	foreach ($all_blocks as $block_name=>$block) {
-		echo "block_descr['$block_name'] = '".addslashes($block->getDescription())."';";
-	}
-	echo "block_descr['advice1'] = '".addslashes(WT_I18N::translate('Highlight a  block name and then click on one of the arrow icons to move that highlighted block in the indicated direction.'))."';";
-	?>
-/**
- * Show Block Description JavaScript function
- *
- * This function shows a description for the selected option
- * @param String list_name the name of the select to get the option from
- */
+	/**
+	* Show Block Description JavaScript function
+	*
+	* This function shows a description for the selected option
+	* @param String list_name the name of the select to get the option from
+	*/
 	function show_description(list_name) {
 		list_select = document.getElementById(list_name);
-		instruct = document.getElementById('instructions');
+		instruct = document.getElementById("instructions");
 		if (block_descr[list_select.options[list_select.selectedIndex].value] && instruct) {
 			instruct.innerHTML = block_descr[list_select.options[list_select.selectedIndex].value];
 		} else {
-			instruct.innerHTML = block_descr['advice1'];
+			instruct.innerHTML = block_descr["advice1"];
 		}
-		list1 = document.getElementById('main_select');
-		list2 = document.getElementById('available_select');
-		list3 = document.getElementById('right_select');
-		if (list_name=='main_select') {
+		list1 = document.getElementById("main_select");
+		list2 = document.getElementById("available_select");
+		list3 = document.getElementById("right_select");
+		if (list_name=="main_select") {
 			list2.selectedIndex = -1;
 			list3.selectedIndex = -1;
 		}
-		if (list_name=='available_select') {
+		if (list_name=="available_select") {
 			list1.selectedIndex = -1;
 			list3.selectedIndex = -1;
 		}
-		if (list_name=='right_select') {
+		if (list_name=="right_select") {
 			list1.selectedIndex = -1;
 			list2.selectedIndex = -1;
 		}
 	}
+	var block_descr = new Array();
+	');
 
-	function save_form() {
-		document.config_setup.submit();
+	
+	// Load Block Description array for use by javascript
+	foreach ($all_blocks as $block_name=>$block) {
+		$controller->addInlineJavaScript(
+			'block_descr["'.$block_name.'"] = "'.addslashes($block->getDescription()).'";'
+		);
 	}
-	//-->
-	</script>
-	<form name="config_setup" method="post" action="index_edit.php">
-	<input type="hidden" name="ctype" value="<?php echo $ctype; ?>">
-	<input type="hidden" name="action" value="update">
-	<input type="hidden" name="name" value="<?php echo $name; ?>">
-	<table border="1" width="400px">
-	<tr><td class="topbottombar" colspan="7">
-	<?php
-	echo '<b>', WT_I18N::translate('Change the blocks on this page'), '</b>';
-	echo '</td></tr>';
-	// NOTE: Row 1: Column legends
-	echo '<tr>';
-		echo '<td class="descriptionbox center vmiddle" colspan="2">';
-			echo '<b>', WT_I18N::translate('Main Section Blocks'), '</b>';
-		echo '</td>';
-		echo '<td class="descriptionbox center vmiddle" colspan="3">';
-			echo '<b>', WT_I18N::translate('Available Blocks'), '</b>';
-		echo '</td>';
-		echo '<td class="descriptionbox center vmiddle" colspan="2">';
-			echo '<b>', WT_I18N::translate('Right Section Blocks'), '</b>';
-		echo '</td>';
-	echo '</tr>';
-	echo '<tr>';
-	// NOTE: Row 2 column 1: Up/Down buttons for left (main) block list
-	echo '<td class="optionbox width20px center vmiddle">';
-		echo '<a onclick="move_up_block(\'main_select\');" title="', WT_I18N::translate('Move up'), '">', $IconUarrow, '</a>';
-		echo '<br>';
-		echo '<a onclick="move_down_block(\'main_select\');" title="', WT_I18N::translate('Move down'), '">', $IconDarrow, '</a>';
-		echo '<br><br>';
-		echo help_link('block_move_up');
-	echo '</td>';
-	// NOTE: Row 2 column 2: Left (Main) block list
-	echo '<td class="optionbox">';
-		echo '<select multiple="multiple" id="main_select" name="main[]" size="10" onchange="show_description(\'main_select\');">';
-		foreach ($blocks['main'] as $block_id=>$block_name) {
-			echo '<option value="', $block_id, '">', $all_blocks[$block_name]->getTitle(), '</option>';
-		}
-		echo '</select>';
-	echo '</td>';
-	// NOTE: Row 2 column 3: Left/Right buttons for left (main) block list
-	echo '<td class="optionbox width20 vmiddle">';
-		echo '<a onclick="move_left_right_block(\'main_select\', \'right_select\');" title="', WT_I18N::translate('Move Right'), '">', $IconRDarrow, '</a>';
-		echo '<br>';
-		echo '<a onclick="move_left_right_block(\'main_select\', \'available_select\');" title="', WT_I18N::translate('Remove'), '">', $IconRarrow, '</a>';
-		echo '<br>';
-		echo '<a onclick="move_left_right_block(\'available_select\', \'main_select\');" title="', WT_I18N::translate('Add'), '">', $IconLarrow, '</a>';
-		echo '<br><br>';
-		echo help_link('block_move_right');
-	echo '</td>';
-	// Row 2 column 4: Middle (Available) block list
-	echo '<td class="optionbox">';
-		echo '<select id="available_select" name="available[]" size="10" onchange="show_description(\'available_select\');">';
-		foreach ($all_blocks as $block_name=>$block) {
-			echo '<option value="', $block_name, '">', $block->getTitle(), '</option>';
-		}
-		echo '</select>';
-	echo '</td>';
-	// NOTE: Row 2 column 5: Left/Right buttons for right block list
-	echo '<td class="optionbox width20 vmiddle">';
-		echo '<a onclick="move_left_right_block(\'right_select\', \'main_select\');" title="', WT_I18N::translate('Move Left'), '">', $IconLDarrow, '</a>';
-		echo '<br>';
-		echo '<a onclick="move_left_right_block(\'right_select\', \'available_select\');" title="', WT_I18N::translate('Remove'), '">', $IconLarrow, '</a>';
-		echo '<br>';
-		echo '<a onclick="move_left_right_block(\'available_select\', \'right_select\');" title="', WT_I18N::translate('Add'), '">', $IconRarrow, '</a>';
-		echo '<br><br>';
-		echo help_link('block_move_right');
-	echo '</td>';
-	// NOTE: Row 2 column 6: Right block list
-	echo '<td class="optionbox">';
-		echo '<select multiple="multiple" id="right_select" name="right[]" size="10" onchange="show_description(\'right_select\');">';
-		foreach ($blocks['side'] as $block_id=>$block_name) {
-			echo '<option value="', $block_id, '">', $all_blocks[$block_name]->getTitle(), '</option>';
-		}
-		echo '</select>';
-	echo '</td>';
-	// NOTE: Row 2 column 7: Up/Down buttons for right block list
-	echo '<td class="optionbox width20 vmiddle">';
-		echo '<a onclick="move_up_block(\'right_select\');" title="', WT_I18N::translate('Move up'), '">', $IconUarrow, '</a>';
-		echo '<br>';
-		echo '<a onclick="move_down_block(\'right_select\');" title="', WT_I18N::translate('Move down'), '">', $IconDarrow. '</a>';
-		echo '<br><br>';
-		echo help_link('block_move_up');
-	echo '</td>';
-	echo '</tr>';
-	// NOTE: Row 3 columns 1-7: Summary description of currently selected block
-	echo '<tr><td class="descriptionbox wrap" colspan="7"><div id="instructions">';
-	echo WT_I18N::translate('Highlight a  block name and then click on one of the arrow icons to move that highlighted block in the indicated direction.');
-	echo '</div></td></tr>';
-	echo '<tr><td class="topbottombar" colspan="7">';
+	$controller->addInlineJavaScript(
+		'block_descr["advice1"] = "'.WT_I18N::translate('Highlight a  block name and then click on one of the arrow icons to move that highlighted block in the indicated direction.').'";'
+	);
 
-	/* This section temporarily removed as it does not work (kiwi - 15/08/2011)
-	if (WT_USER_IS_ADMIN && $ctype=='user') {
-		echo WT_I18N::translate('Use these blocks as the default block configuration for all users?'), '<input type="checkbox" name="setdefault" value="1"><br><br>';
-	}*/
-	echo '<input type="button" value="', WT_I18N::translate('Reset to Default Blocks'), '" onclick="window.location=\'index_edit.php?ctype=', $ctype, '&amp;action=reset&amp;name=', addslashes($name), '\';">';
-	echo '&nbsp;&nbsp;';
-	echo '<input type="button" value="', WT_I18N::translate('Save'), '" onclick="select_options(); save_form();">';
-	echo '&nbsp;&nbsp;';
-	echo '<input type ="button" value="', WT_I18N::translate('Cancel'), '" onclick="window.close();">';
-	echo '</td></tr></table>';
-	echo '</form>';
-}
-echo '</body></html>'; // Yes! Absolutely NOTHING at page bottom, please.
+?>
+<form name="config_setup" method="post" action="index_edit.php?action=update" onsubmit="select_options(); return modalDialogSubmitAjax(this);" >
+<input type="hidden" name="user_id"   value="<?php echo $user_id; ?>">
+<input type="hidden" name="gedcom_id" value="<?php echo $gedcom_id; ?>">
+<table border="1" id="change_blocks">
+<?php
+// NOTE: Row 1: Column legends
+echo '<tr>';
+	echo '<td class="descriptionbox center vmiddle" colspan="2">';
+		echo '<b>', WT_I18N::translate('Main Section Blocks'), '</b>';
+	echo '</td>';
+	echo '<td class="descriptionbox center vmiddle" colspan="3">';
+		echo '<b>', WT_I18N::translate('Available Blocks'), '</b>';
+	echo '</td>';
+	echo '<td class="descriptionbox center vmiddle" colspan="2">';
+		echo '<b>', WT_I18N::translate('Right Section Blocks'), '</b>';
+	echo '</td>';
+echo '</tr>';
+echo '<tr>';
+// NOTE: Row 2 column 1: Up/Down buttons for left (main) block list
+echo '<td class="optionbox center vmiddle">';
+	echo '<a onclick="move_up_block(\'main_select\');" title="', WT_I18N::translate('Move up'), '"class="', $IconUarrow, '"></a>';
+	echo '<br>';
+	echo '<a onclick="move_down_block(\'main_select\');" title="', WT_I18N::translate('Move down'), '"class="', $IconDarrow, '"></a>';
+	echo '<br><br>';
+	echo help_link('block_move_up');
+echo '</td>';
+// NOTE: Row 2 column 2: Left (Main) block list
+echo '<td class="optionbox center">';
+	echo '<select multiple="multiple" id="main_select" name="main[]" size="10" onchange="show_description(\'main_select\');">';
+	foreach ($blocks['main'] as $block_id=>$block_name) {
+		echo '<option value="', $block_id, '">', $all_blocks[$block_name]->getTitle(), '</option>';
+	}
+	echo '</select>';
+echo '</td>';
+// NOTE: Row 2 column 3: Left/Right buttons for left (main) block list
+echo '<td class="optionbox center vmiddle">';
+	echo '<a onclick="move_left_right_block(\'main_select\', \'right_select\');" title="', WT_I18N::translate('Move Right'), '"class="', $IconRDarrow, '"></a>';
+	echo '<br>';
+	echo '<a onclick="move_left_right_block(\'main_select\', \'available_select\');" title="', WT_I18N::translate('Remove'), '"class="', $IconRarrow, '"></a>';
+	echo '<br>';
+	echo '<a onclick="move_left_right_block(\'available_select\', \'main_select\');" title="', WT_I18N::translate('Add'), '"class="', $IconLarrow, '"></a>';
+	echo '<br><br>';
+	echo help_link('block_move_right');
+echo '</td>';
+// Row 2 column 4: Middle (Available) block list
+echo '<td class="optionbox center">';
+	echo '<select id="available_select" name="available[]" size="10" onchange="show_description(\'available_select\');">';
+	foreach ($all_blocks as $block_name=>$block) {
+		echo '<option value="', $block_name, '">', $block->getTitle(), '</option>';
+	}
+	echo '</select>';
+echo '</td>';
+// NOTE: Row 2 column 5: Left/Right buttons for right block list
+echo '<td class="optionbox center vmiddle">';
+	echo '<a onclick="move_left_right_block(\'right_select\', \'main_select\');" title="', WT_I18N::translate('Move Left'), '"class="', $IconLDarrow, '"></a>';
+	echo '<br>';
+	echo '<a onclick="move_left_right_block(\'right_select\', \'available_select\');" title="', WT_I18N::translate('Remove'), '"class="', $IconLarrow, '"></a>';
+	echo '<br>';
+	echo '<a onclick="move_left_right_block(\'available_select\', \'right_select\');" title="', WT_I18N::translate('Add'), '"class="', $IconRarrow, '"></a>';
+	echo '<br><br>';
+	echo help_link('block_move_right');
+echo '</td>';
+// NOTE: Row 2 column 6: Right block list
+echo '<td class="optionbox center">';
+	echo '<select multiple="multiple" id="right_select" name="right[]" size="10" onchange="show_description(\'right_select\');">';
+	foreach ($blocks['side'] as $block_id=>$block_name) {
+		echo '<option value="', $block_id, '">', $all_blocks[$block_name]->getTitle(), '</option>';
+	}
+	echo '</select>';
+echo '</td>';
+// NOTE: Row 2 column 7: Up/Down buttons for right block list
+echo '<td class="optionbox center vmiddle">';
+	echo '<a onclick="move_up_block(\'right_select\');" title="', WT_I18N::translate('Move up'), '"class="', $IconUarrow, '"></a>';
+	echo '<br>';
+	echo '<a onclick="move_down_block(\'right_select\');" title="', WT_I18N::translate('Move down'), '"class="', $IconDarrow, '"></a>';
+	echo '<br><br>';
+	echo help_link('block_move_up');
+echo '</td>';
+echo '</tr>';
+// NOTE: Row 3 columns 1-7: Summary description of currently selected block
+echo '<tr><td class="descriptionbox wrap" colspan="7"><div id="instructions">';
+echo WT_I18N::translate('Highlight a  block name and then click on one of the arrow icons to move that highlighted block in the indicated direction.');
+echo '</div></td></tr>';
+echo '<tr><td class="topbottombar" colspan="7">';
+echo '<input type="submit" value="', WT_I18N::translate('Save'), '">';
+echo '</td></tr></table>';
+echo '</form>';

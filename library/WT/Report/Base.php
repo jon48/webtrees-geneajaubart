@@ -4,7 +4,7 @@
 // used by the SAX parser to generate reports from the XML report file.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Base.php 13220 2012-01-12 18:35:53Z lukasz $
+// $Id: Base.php 13950 2012-05-29 06:28:25Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -2254,7 +2254,7 @@ function varSHandler($attrs) {
 			$tfact = $type;
 		}
 		$var = str_replace(array("@fact", "@desc"), array(WT_Gedcom_Tag::getLabel($tfact), $desc), $var);
-		if (substr($var, 0, 18) == 'WT_I18N::translate' || substr($var, 0, 23)=='WT_Gedcom_Tag::getLabel') {
+		if (substr($var, 0, 18) == 'WT_I18N::translate' || substr($var, 0, 15) == 'WT_I18N::number' || substr($var, 0, 23)=='WT_Gedcom_Tag::getLabel') {
 			eval("\$var=$var;");
 		}
 	}
@@ -2327,20 +2327,19 @@ function FactsSHandler($attrs) {
 
 	if (empty($attrs['diff']) && !empty($id)) {
 		$record = WT_GedcomRecord::getInstance($id);
-		$facts = $record->getFacts(explode(",", $tag));
+		$facts = $record->getFacts();
 		if (!is_array($facts)) {
 			$facts = array($facts);
 		}
 		sort_facts($facts);
 		$repeats = array();
+		$nonfacts=explode(',', $tag);
 		foreach ($facts as $event) {
-			if (strpos($tag.",", $event->getTag())===false) {
+			if (!in_array($event->getTag(), $nonfacts)) {
 				$repeats[]=$event->getGedComRecord();
 			}
 		}
 	} else {
-		global $nonfacts;
-		$nonfacts = preg_split("/[\s,;:]/", $tag);
 		$record = new WT_GedcomRecord($gedrec);
 		switch ($record->getType()) {
 			case "INDI":
@@ -2363,7 +2362,7 @@ function FactsSHandler($attrs) {
 		$oldrecord->diffMerge($record);
 		$facts = $oldrecord->getFacts();
 		foreach ($facts as $fact) {
-			if (strpos($fact->getGedcomRecord(), "WT_NEW")!==false) {
+			if ($fact->getIsNew() && $fact->getTag()<>'CHAN') {
 				$repeats[]=$fact->getGedcomRecord();
 			}
 		}
@@ -2497,7 +2496,7 @@ function SetVarSHandler($attrs) {
 		$value = preg_replace("/\\$".$match[$i][1]."/", $t, $value, 1);
 		$i++;
 	}
-	if (substr($value, 0, 18) == 'WT_I18N::translate' || substr($value, 0, 23)=='WT_Gedcom_Tag::getLabel') {
+	if (substr($value, 0, 18) == 'WT_I18N::translate' || substr($value, 0, 15) == 'WT_I18N::number' || substr($value, 0, 23)=='WT_Gedcom_Tag::getLabel') {
 		eval("\$value = $value;");
 	}
 	// Arithmetic functions
@@ -2559,7 +2558,7 @@ function ifSHandler($attrs) {
 		} elseif ($id=="fact") {
 			$value = "\"$fact\"";
 		} elseif ($id=="desc") {
-			$value = "\"$desc\"";
+			$value = "\"".addslashes($desc)."\"";
 		} elseif ($id=="generation") {
 			$value = "\"$generation\"";
 		} else {
@@ -2574,7 +2573,7 @@ function ifSHandler($attrs) {
 				$level++;
 				$value = get_gedcom_value($id, $level, $gedrec, "", false);
 			}
-			$value = "\"".str_replace(array("'", '"'), array("\'", '\"'), $value)."\"";
+			$value = "\"".addslashes($value)."\"";
 		}
 		$condition = str_replace("@$id", $value, $condition);
 		$i++;

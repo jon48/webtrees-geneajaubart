@@ -36,7 +36,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: action.php 12851 2011-11-22 13:43:11Z greg $
+// $Id: action.php 13825 2012-04-17 20:24:28Z greg $
 
 define('WT_SCRIPT_NAME', 'action.php');
 require './includes/session.php';
@@ -147,3 +147,4 @@ case 'theme':
 	}
 	break;
 }
+Zend_Session::writeClose();

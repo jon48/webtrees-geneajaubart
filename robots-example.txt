@@ -22,7 +22,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-# $Id: robots-example.txt 13131 2011-12-23 15:22:30Z greg $
+# $Id: robots-example.txt 13503 2012-02-25 21:51:37Z greg $
 
 # Well-behaved robots understand "Allow" directives.
 User-Agent: bingbot       # Bing
@@ -47,6 +47,7 @@ Allow: /repo.php
 Allow: /site-offline.php
 Allow: /site-unavailable.php
 Allow: /source.php
+Disallow: /
 
 # Disallow all other robots
 User-Agent: *

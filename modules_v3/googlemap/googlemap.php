@@ -2,7 +2,7 @@
 // Google map module for phpGedView
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: googlemap.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: googlemap.php 13885 2012-05-01 13:49:05Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,10 +41,10 @@ function print_fact_place_map($factrec) {
 		foreach ($levels as $pindex=>$ppart) {
 			// routine for replacing ampersands
 			$ppart = preg_replace("/amp\%3B/", "", trim($ppart));
-			$retStr .= "parent[$pindex]=".PrintReady($ppart)."&amp;";
+			$retStr .= "parent[$pindex]=".$ppart."&amp;";
 		}
 		$retStr .= 'level='.count($levels);
-		$retStr .= '"> '.PrintReady($place).'</a>';
+		$retStr .= '"> '.htmlspecialchars($place).'</a>';
 		return $retStr;
 	}
 	return '';
@@ -52,7 +52,6 @@ function print_fact_place_map($factrec) {
 
 
 function print_address_structure_map($factrec, $level) {
-	global $WORD_WRAPPED_NOTES;
 	global $POSTAL_CODE;
 
 	//  $POSTAL_CODE = 'false' - before city, 'true' - after city and/or state
@@ -68,9 +67,9 @@ function print_address_structure_map($factrec, $level) {
 		$resultText = '';
 		$cn = preg_match("/$nlevel _NAME (.*)/", $arec, $cmatch);
 		if ($cn>0) $resultText .= str_replace("/", "", $cmatch[1]).'<br>';
-		$resultText .= PrintReady(trim($omatch[$i][1]));
+		$resultText .= $omatch[$i][1];
 		$cont = get_cont($nlevel, $arec);
-		if (!empty($cont)) $resultText .= str_replace(array(' ', "<br&nbsp;"), array("&nbsp;", "<br "), PrintReady($cont));
+		if (!empty($cont)) $resultText .= str_replace(array(' ', "<br&nbsp;"), array("&nbsp;", "<br "), $cont);
 		else {
 			if (strlen(trim($omatch[$i][1])) > 0) echo '<br>';
 				$cs = preg_match("/$nlevel ADR1 (.*)/", $arec, $cmatch);
@@ -79,7 +78,7 @@ function print_address_structure_map($factrec, $level) {
 					$resultText .= '<br>';
 					$cn=0;
 				}
-				$resultText .= PrintReady($cmatch[1]);
+				$resultText .= $cmatch[1];
 			}
 			$cs = preg_match("/$nlevel ADR2 (.*)/", $arec, $cmatch);
 			if ($cs>0) {
@@ -87,27 +86,27 @@ function print_address_structure_map($factrec, $level) {
 					$resultText .= '<br>';
 					$cn=0;
 				}
-				$resultText .= PrintReady($cmatch[1]);
+				$resultText .= $cmatch[1];
 			}
 
 			if ($POSTAL_CODE) {
 				if (preg_match("/$nlevel CITY (.*)/", $arec, $cmatch))
-					$resultText.=' '.PrintReady($cmatch[1]);
+					$resultText.=' '.$cmatch[1];
 				if (preg_match("/$nlevel STAE (.*)/", $arec, $cmatch))
-					$resultText.=', '.PrintReady($cmatch[1]);
+					$resultText.=', '.$cmatch[1];
 				if (preg_match("/$nlevel POST (.*)/", $arec, $cmatch))
-					$resultText.='<br>'.PrintReady($cmatch[1]);
+					$resultText.='<br>'.$cmatch[1];
 			} else {
 				if (preg_match("/$nlevel POST (.*)/", $arec, $cmatch))
-					$resultText.='<br>'.PrintReady($cmatch[1]);
+					$resultText.='<br>'.$cmatch[1];
 				if (preg_match("/$nlevel CITY (.*)/", $arec, $cmatch))
-					$resultText.=' '.PrintReady($cmatch[1]);
+					$resultText.=' '.$cmatch[1];
 				if (preg_match("/$nlevel STAE (.*)/", $arec, $cmatch))
-					$resultText.=', '.PrintReady($cmatch[1]);
+					$resultText.=', '.$cmatch[1];
 			}
 		}
 		if (preg_match("/$nlevel CTRY (.*)/", $arec, $cmatch))
-			$resultText.='<br>'.PrintReady($cmatch[1]);
+			$resultText.='<br>'.$cmatch[1];
 		$resultText.= '<br>';
 		// Here we can examine the resultant text and remove empty tags
 		echo str_replace(chr(10), ' ' , $resultText);
@@ -115,25 +114,25 @@ function print_address_structure_map($factrec, $level) {
 	$resultText = "<table>";
 	$ct = preg_match_all("/$level PHON (.*)/", $factrec, $omatch, PREG_SET_ORDER);
 	for ($i=0; $i<$ct; $i++) {
-		$resultText .= '<tr><td><span class="label"><b>'.WT_Gedcom_Tag::getLabel('PHON').': </b></span></td><td><span class="field">';
-		$resultText .= getLRM() . $omatch[$i][1]. getLRM();
+		$resultText .= '<tr><td><span class="label"><b>'.WT_Gedcom_Tag::getLabel('PHON').': </b></span></td><td><span class="field" dir="auto">';
+		$resultText .= $omatch[$i][1];
 		$resultText .= '</span></td></tr>';
 	}
 	$ct = preg_match_all("/$level FAX (.*)/", $factrec, $omatch, PREG_SET_ORDER);
 	for ($i=0; $i<$ct; $i++) {
-		$resultText .= '<tr><td><span class="label"><b>'.WT_Gedcom_Tag::getLabel('FAX').': </b></span></td><td><span class="field">';
-		$resultText .= getLRM() . $omatch[$i][1] . getLRM();
+		$resultText .= '<tr><td><span class="label"><b>'.WT_Gedcom_Tag::getLabel('FAX').': </b></span></td><td><span class="field" dir="auto">';
+		$resultText .= $omatch[$i][1];
 		$resultText .= '</span></td></tr>';
 	}
 	$ct = preg_match_all("/$level EMAIL (.*)/", $factrec, $omatch, PREG_SET_ORDER);
 	for ($i=0; $i<$ct; $i++) {
-		$resultText .= '<tr><td><span class="label"><b>'.WT_Gedcom_Tag::getLabel('EMAIL').': </b></span></td><td><span class="field">';
+		$resultText .= '<tr><td><span class="label"><b>'.WT_Gedcom_Tag::getLabel('EMAIL').': </b></span></td><td><span class="field" dir="auto">';
 		$resultText .= '<a href="mailto:'.$omatch[$i][1].'">'.$omatch[$i][1].'</a>';
 		$resultText .= '</span></td></tr>';
 	}
 	$ct = preg_match_all("/$level (WWW|URL) (.*)/", $factrec, $omatch, PREG_SET_ORDER);
 	for ($i=0; $i<$ct; $i++) {
-		$resultText .= '<tr><td><span class="label"><b>'.WT_Gedcom_Tag::getLabel('URL').': </b></span></td><td><span class="field">';
+		$resultText .= '<tr><td><span class="label"><b>'.WT_Gedcom_Tag::getLabel('URL').': </b></span></td><td><span class="field" dir="auto">';
 		$resultText .= '<a href="'.$omatch[$i][2].'" target="_blank">'.$omatch[$i][2].'</a>';
 		$resultText .= '</span></td></tr>';
 	}
@@ -141,33 +140,35 @@ function print_address_structure_map($factrec, $level) {
 	if ($resultText!='<table></table>') echo str_replace(chr(10), ' ' , $resultText);
 }
 
-function rem_prefix_from_placename($prefix_list, $place, &$placelist) {
-	$prefix_split = explode(';', $prefix_list);
-	foreach ($prefix_split as $prefix) {
-		if ($prefix && substr($place, 0, strlen($prefix)+1)==$prefix.' ') {
-			$placelist[] = substr($place, strlen($prefix)+1);
+function rem_prefix_from_placename($prefix_list, $place, $placelist) {
+	if ($prefix_list) {
+		foreach (explode(';', $prefix_list) as $prefix) {
+			if ($prefix && substr($place, 0, strlen($prefix)+1)==$prefix.' ') {
+				$placelist[] = substr($place, strlen($prefix)+1);
+			}
 		}
 	}
 	return $placelist;
 }
 
-function rem_postfix_from_placename($postfix_list, $place, &$placelist) {
-	$postfix_split = explode (';', $postfix_list);
-	foreach ($postfix_split as $postfix) {
-		if ($postfix && substr($place, -strlen($postfix)-1)==' '.$postfix) {
-			$placelist[] = substr($place, 0, strlen($place)-strlen($postfix)-1);
+function rem_postfix_from_placename($postfix_list, $place, $placelist) {
+	if ($postfix_list) {
+		foreach (explode (';', $postfix_list) as $postfix) {
+			if ($postfix && substr($place, -strlen($postfix)-1)==' '.$postfix) {
+				$placelist[] = substr($place, 0, strlen($place)-strlen($postfix)-1);
+			}
 		}
 	}
 	return $placelist;
 }
 
-function rem_prefix_postfix_from_placename($prefix_list, $postfix_list, $place, &$placelist) {
-	$prefix_split = explode (";", $prefix_list);
-	$postfix_split = explode (";", $postfix_list);
-	foreach ($prefix_split as $prefix) {
-		foreach ($postfix_split as $postfix) {
-			if ($prefix && $postfix && substr($place, 0, strlen($prefix)+1)==$prefix.' ' && substr($place, -strlen($postfix)-1)==' '.$postfix) {
-				$placelist[] = substr($place, strlen($prefix)+1, strlen($place)-strlen($prefix)-strlen($postfix)-2);
+function rem_prefix_postfix_from_placename($prefix_list, $postfix_list, $place, $placelist) {
+	if ($prefix_list && $postfix_list) {
+		foreach (explode (";", $prefix_list) as $prefix) {
+			foreach (explode (";", $postfix_list) as $postfix) {
+				if ($prefix && $postfix && substr($place, 0, strlen($prefix)+1)==$prefix.' ' && substr($place, -strlen($postfix)-1)==' '.$postfix) {
+					$placelist[] = substr($place, strlen($prefix)+1, strlen($place)-strlen($prefix)-strlen($postfix)-2);
+				}
 			}
 		}
 	}
@@ -175,51 +176,16 @@ function rem_prefix_postfix_from_placename($prefix_list, $postfix_list, $place, 
 }
 
 function create_possible_place_names ($placename, $level) {
-	global $GM_PREFIX, $GM_POSTFIX, $GM_PRE_POST_MODE;
+	global $GM_PREFIX, $GM_POSTFIX;
 
 	$retlist = array();
-
-	switch (@$GM_PRE_POST_MODE[$level]) {
-	case 0:     // 0: no pre/postfix
-		$retlist[] = $placename;
-		break;
-	case 1:     // 1 = Normal name, Prefix, Postfix, Both
-		$retlist[] = $placename;
-		$retlist = rem_prefix_from_placename($GM_PREFIX[$level], $placename, $retlist);
-		$retlist = rem_postfix_from_placename($GM_POSTFIX[$level], $placename, $retlist);
-		$retlist = rem_prefix_postfix_from_placename($GM_PREFIX[$level], $GM_POSTFIX[$level], $placename, $retlist);
-		break;
-	case 2:     // 2 = Normal name, Postfix, Prefix, Both
-		$retlist[] = $placename;
-		$retlist = rem_postfix_from_placename($GM_POSTFIX[$level], $placename, $retlist);
-		$retlist = rem_prefix_from_placename($GM_PREFIX[$level], $placename, $retlist);
-		$retlist = rem_prefix_postfix_from_placename($GM_PREFIX[$level], $GM_POSTFIX[$level], $placename, $retlist);
-		break;
-	case 3:     // 3 = Prefix, Postfix, Both, Normal name
-		$retlist = rem_prefix_from_placename($GM_PREFIX[$level], $placename, $retlist);
-		$retlist = rem_postfix_from_placename($GM_POSTFIX[$level], $placename, $retlist);
-		$retlist = rem_prefix_postfix_from_placename($GM_PREFIX[$level], $GM_POSTFIX[$level], $placename, $retlist);
-		$retlist[] = $placename;
-		break;
-	case 4:     // 4 = Postfix, Prefix, Both, Normal name
-		$retlist = rem_postfix_from_placename($GM_POSTFIX[$level], $placename, $retlist);
-		$retlist = rem_prefix_from_placename($GM_PREFIX[$level], $placename, $retlist);
-		$retlist = rem_prefix_postfix_from_placename($GM_PREFIX[$level], $GM_POSTFIX[$level], $placename, $retlist);
-		$retlist[] = $placename;
-		break;
-	case 5:     // 5 = Prefix, Postfix, Normal name, Both
-		$retlist = rem_prefix_from_placename($GM_PREFIX[$level], $placename, $retlist);
-		$retlist = rem_postfix_from_placename($GM_POSTFIX[$level], $placename, $retlist);
-		$retlist[] = $placename;
-		$retlist = rem_prefix_postfix_from_placename($GM_PREFIX[$level], $GM_POSTFIX[$level], $placename, $retlist);
-		break;
-	case 6:     // 6 = Postfix, Prefix, Normal name, Both
-		$retlist = rem_postfix_from_placename($GM_POSTFIX[$level], $placename, $retlist);
-		$retlist = rem_prefix_from_placename($GM_PREFIX[$level], $placename, $retlist);
-		$retlist[] = $placename;
-		$retlist = rem_prefix_postfix_from_placename($GM_PREFIX[$level], $GM_POSTFIX[$level], $placename, $retlist);
-		break;
+	if ($level<=9) {
+		$retlist = rem_prefix_postfix_from_placename($GM_PREFIX[$level], $GM_POSTFIX[$level], $placename, $retlist); // Remove both
+		$retlist = rem_prefix_from_placename($GM_PREFIX[$level], $placename, $retlist); // Remove prefix
+		$retlist = rem_postfix_from_placename($GM_POSTFIX[$level], $placename, $retlist); // Remove suffix
 	}
+	$retlist[]=$placename; // Exact
+
 	return $retlist;
 }
 
@@ -267,12 +233,10 @@ function get_lati_long_placelocation ($place) {
 }
 
 function setup_map() {
-	global $GOOGLEMAP_MAP_TYPE, $GOOGLEMAP_MIN_ZOOM, $GOOGLEMAP_MAX_ZOOM;
+	global $GOOGLEMAP_MIN_ZOOM, $GOOGLEMAP_MAX_ZOOM;
 
 	?>
-	<!--  V3 ============ -->
 	<script src="http://maps.google.com/maps/api/js?v=3.2&amp;sensor=false&amp;language=<?php echo WT_LOCALE; ?>" type="text/javascript"></script>
-	<!--  V3 ============ -->
 	<script type="text/javascript">
 		var minZoomLevel = <?php echo $GOOGLEMAP_MIN_ZOOM;?>;
 		var maxZoomLevel = <?php echo $GOOGLEMAP_MAX_ZOOM;?>;
@@ -282,14 +246,11 @@ function setup_map() {
 }
 
 function build_indiv_map($indifacts, $famids) {
-	global $GOOGLEMAP_MAP_TYPE, $GOOGLEMAP_MIN_ZOOM, $GOOGLEMAP_MAX_ZOOM, $GEDCOM;
-	global $GOOGLEMAP_XSIZE, $GOOGLEMAP_YSIZE, $SHOW_LIVING_NAMES;
-	global $GM_DEFAULT_TOP_VALUE, $GOOGLEMAP_COORD;
+	global $controller, $GOOGLEMAP_MAX_ZOOM, $GOOGLEMAP_YSIZE, $GM_DEFAULT_TOP_VALUE;
 
-	$zoomLevel = $GOOGLEMAP_MAX_ZOOM;
-	// Create the markers list array ===============================================================
+	// Create the markers list array
 	$markers=array();
-	// Add the events to the markers list array=====================================================
+	// Add the events to the markers list array
 	//-- sort the facts into date order
 	sort_facts($indifacts);
 	$i = 0;
@@ -319,7 +280,7 @@ function build_indiv_map($indifacts, $famids) {
 				$useThisItem = true;
 			}
 			if (($ctla>0) && ($ctlo>0) && ($useThisItem==true)) {
-				$i = $i + 1;
+				$i++;
 				$markers[$i]=array('class'=>'optionbox', 'index'=>'', 'tabindex'=>'', 'placed'=>'no');
 				if ($fact == "EVEN" || $fact=="FACT") {
 					$eventrec = get_sub_record(1, '2 TYPE', $factrec);
@@ -358,7 +319,7 @@ function build_indiv_map($indifacts, $famids) {
 						}
 					}
 					if ((count($latlongval) != 0) && ($latlongval['lati'] != NULL) && ($latlongval['long'] != NULL)) {
-						$i = $i + 1;
+						$i++;
 						$markers[$i]=array('class'=>'optionbox', 'index'=>'', 'tabindex'=>'', 'placed'=>'no');
 						if ($fact == "EVEN" || $fact=="FACT") {
 							$eventrec = get_sub_record(1, '2 TYPE', $factrec);
@@ -375,8 +336,8 @@ function build_indiv_map($indifacts, $famids) {
 						}
 						$markers[$i]['icon'] = $latlongval['icon'];
 						$markers[$i]['placerec'] = $placerec;
-						if ($zoomLevel > $latlongval['zoom']) {
-							$zoomLevel = $latlongval['zoom'];
+						if ($GOOGLEMAP_MAX_ZOOM > $latlongval['zoom']) {
+							$GOOGLEMAP_MAX_ZOOM = $latlongval['zoom'];
 						}
 						$markers[$i]['lati'] = str_replace(array('N', 'S', ','), array('', '-', '.') , $latlongval['lati']);
 						$markers[$i]['lng'] = str_replace(array('E', 'W', ','), array('', '-', '.') , $latlongval['long']);
@@ -399,7 +360,7 @@ function build_indiv_map($indifacts, $famids) {
 		}
 	}
 
-	// Add children to the markers list array ======================================================
+	// Add children to the markers list array
 	if (count($famids)>0) {
 		$hparents=false;
 		for ($f=0; $f<count($famids); $f++) {
@@ -421,7 +382,7 @@ function build_indiv_map($indifacts, $famids) {
 									$ctla = preg_match("/\d LATI (.*)/", $placerec, $match1);
 									$ctlo = preg_match("/\d LONG (.*)/", $placerec, $match2);
 									if (($ctla>0) && ($ctlo>0)) {
-										$i = $i + 1;
+										$i++;
 										$markers[$i]=array('index'=>'', 'tabindex'=>'', 'placed'=>'no');
 										if (strpos($srec, "\n1 SEX F")!==false) {
 											$markers[$i]['fact'] = WT_I18N::translate('daughter');
@@ -455,7 +416,7 @@ function build_indiv_map($indifacts, $famids) {
 											}
 										}
 										if ((count($latlongval) != 0) && ($latlongval['lati'] != NULL) && ($latlongval['long'] != NULL)) {
-											$i = $i + 1;
+											$i++;
 											$markers[$i]=array('index'=>'', 'tabindex'=>'', 'placed'=>'no');
 											$markers[$i]['fact']	= WT_I18N::translate('child');
 											$markers[$i]['class']	= 'option_boxNN';
@@ -469,8 +430,8 @@ function build_indiv_map($indifacts, $famids) {
 											}
 											$markers[$i]['icon'] = $latlongval['icon'];
 											$markers[$i]['placerec'] = $placerec;
-											if ($zoomLevel > $latlongval['zoom']) {
-												$zoomLevel = $latlongval['zoom'];
+											if ($GOOGLEMAP_MAX_ZOOM > $latlongval['zoom']) {
+												$GOOGLEMAP_MAX_ZOOM = $latlongval['zoom'];
 											}
 											$markers[$i]['lati'] = str_replace(array('N', 'S', ','), array('', '-', '.'), $latlongval['lati']);
 											$markers[$i]['lng']  = str_replace(array('E', 'W', ','), array('', '-', '.'), $latlongval['long']);
@@ -495,17 +456,8 @@ function build_indiv_map($indifacts, $famids) {
 		}
 	}
 
-	// Prepare the $markers array for use by the following "required" file/files ===================
-	if ($i == 0) {
-		echo '<table class="facts_table">';
-		echo '<tr><td colspan="2" class="facts_value">', WT_I18N::translate('No map data for this person');
-		echo '</td></tr>';
-		if (WT_USER_IS_ADMIN) {
-			echo '<tr><td class="center" colspan="2">';
-			echo '<a href="module.php?mod=googlemap&amp;mod_action=admin_editconfig">', WT_I18N::translate('Google Maps configuration'), '</a>';
-			echo '</td></tr>';
-		}
-	} else {
+	// Prepare the $markers array for use by the following "required" file/files
+	if ($i != 0) {
 		$indexcounter = 0;
 		for ($j=1; $j<=$i; $j++) {
 			if ($markers[$j]['placed'] == 'no') {
@@ -518,10 +470,9 @@ function build_indiv_map($indifacts, $famids) {
 				}
 				// If only one location with this long/lati combination
 				if ($multimarker == 0) {
-					// --- NOTE for V3 api, following line is changed from "yes" to "no" -----------
+					// --- NOTE for V3 api, following line is changed from "yes" to "no"
 					// --- This aids in identifying multi-event locations
 					$markers[$j]['placed'] = 'no';
-					// -----------------------------------------------------------------------------
 					$markers[$j]['index'] = $indexcounter;
 					$markers[$j]['tabindex'] = 0;
 					$indexcounter = $indexcounter + 1;
@@ -553,18 +504,11 @@ function build_indiv_map($indifacts, $famids) {
 				}
 			}
 		}
-
-		// === add $gmarks array to the required wt_v3_googlemap.js.php ============================
+		// add $gmarks array to the required wt_v3_googlemap.js.php
 		$gmarks = $markers;
-
-		global $controller;
 		$pid=$controller->record->getXref();
-
-		// === Include css and js files ============================================================
-		echo '<link type="text/css" href="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet">';
 		require_once WT_ROOT.WT_MODULES_DIR.'googlemap/wt_v3_googlemap.js.php';
-
-		// === Create the normal googlemap sidebar of events and children ==========================
+		// Create the normal googlemap sidebar of events and children
 		echo '<div style="overflow: auto; overflow-x: hidden; overflow-y: auto; height:', $GOOGLEMAP_YSIZE, 'px;"><table class="facts_table">';
 		$z=0;
 
@@ -597,9 +541,9 @@ function build_indiv_map($indifacts, $famids) {
 			echo '</tr>';
 		}
 		echo '</table></div><br>';
-	} // end prepare markers array =================================================================
+	} // end prepare markers array
 
-	// ======= More V3 api stuff (not displayed now) but will be sorted later ==========
+	// More V3 api stuff (not displayed now) but will be sorted later
 	?>
 	<table id="s_bar" style="display:none;">
 		<tr>
@@ -617,7 +561,7 @@ function build_indiv_map($indifacts, $famids) {
 					<!-- Other Map:<input type="checkbox" id="infobox" onclick="boxclick(this,'info')"> -->
 
 					<?php
-					// --------- Maybe for later use ---------------
+					// Maybe for later use
 					/*
 					 Other Map:<input type="checkbox" id="infobox" onclick="boxclick(this,'info')">
 					<b>Pedigree Map:</b><input id="sel2" name="select" type=radio>
@@ -634,7 +578,6 @@ function build_indiv_map($indifacts, $famids) {
 		</tr>
 	</table>
 	<?php
-	// =================================================================================
 	echo '<br>';
 	return $i;
 } // end build_indiv_map function

@@ -72,8 +72,10 @@ html[dir='rtl'] #indi_perso_icons { float: left;}
 html[dir='rtl'] .fact_flag {float: left;}
 
 /* Certificates */
-.certif_icon {height: 15px;margin: 0px 2px 0px 2px;}
+.icon-perso-certificate{width:15px;height:15px;background-image:url(images/perso/certificate_15x15.png);}
+.margin-h-2 {margin: 0px 2px 0px 2px;}
 .certif_image {max-width: 85%;padding: 5px;border: solid black 1px;margin: 10px;}
+._CITY {margin:0px;}
 
 /* Patronymic lineage */
 .patrolin_tree li {list-style-type: circle;}
@@ -83,10 +85,12 @@ html[dir='rtl'] .fact_flag {float: left;}
 /* Sosa */
 #loadingarea{margin-top: 10px; margin-bottom: 10px;}
 
-.sosa_large{height: 18px;}
-.sosa_normal {height: 12px;}
-.sosa_smaller {height: 9px;}
-.sosa_small {height: 10px;}
+.icon-perso-sosa_large{width:18px;height:18px;background-image:url(images/perso/sosa_18x18.png);}
+.icon-perso-sosa_normal {width:12px;height:12px;background-image:url(images/perso/sosa_12x12.png);}
+.icon-perso-sosa_smaller {width:9px;height:9px;background-image:url(images/perso/sosa_9x9.png);}
+.icon-perso-sosa_small {width:10px;height:10px;background-image:url(images/perso/sosa_10x10.png);}
+.icon-perso-success{width:16px;height:16px;background-image:url(images/perso/success.png);}
+.icon-perso-error{width:16px;height:16px;background-image:url(images/perso/error.png);}
 
 .left{text-align: left;}
 html[dir='rtl'] .left {float: right;}
@@ -103,15 +107,58 @@ html[dir='rtl'] .right { float: left;}
 
 .rn_append {vertical-align: middle;}
 
-.sourced_large {height: 18px;}
-.sourced_normal {height: 15px;}
-.sourced_medium {height: 12px;}
-.sourced_small {height: 10px;}
+/* IsSourced */
+
+[class^="icon-perso-sourced-large"], [class*=" icon-perso-sourced-large"] {display:inline-block; background-image:url(images/perso/sourced-sprite-large.png);background-color:transparent;background-repeat:no-repeat;width:18px;height:18px;}
+.icon-perso-sourced-large_event_unknown{background-position: 0px 0px;}
+.icon-perso-sourced-large_event_notprecise{background-position: 0px -18px;}
+.icon-perso-sourced-large_event_notsourced{background-position: 0px -36px;}
+.icon-perso-sourced-large_event_sourced{background-position: 0px -54px;}
+.icon-perso-sourced-large_event_sourcedcertif{background-position: 0px -72px;}
+.icon-perso-sourced-large_event_sourcedcertifdate{background-position: 0px -90px;}
+.icon-perso-sourced-large_record_notsourced{background-position: 0px -108px;}
+.icon-perso-sourced-large_record_sourced{background-position: 0px -126px;}
+.icon-perso-sourced-large_record_sourcedcertif{background-position: 0px -144px;}
+
+[class^="icon-perso-sourced-normal"], [class*=" icon-perso-sourced-normal"] {display:inline-block; background-image:url(images/perso/sourced-sprite-normal.png);background-color:transparent;background-repeat:no-repeat;width:15px;height:15px;}
+.icon-perso-sourced-normal_event_unknown{background-position: 0px 0px;}
+.icon-perso-sourced-normal_event_notprecise{background-position: 0px -15px;}
+.icon-perso-sourced-normal_event_notsourced{background-position: 0px -30px;}
+.icon-perso-sourced-normal_event_sourced{background-position: 0px -45px;}
+.icon-perso-sourced-normal_event_sourcedcertif{background-position: 0px -60px;}
+.icon-perso-sourced-normal_event_sourcedcertifdate{background-position: 0px -75px;}
+.icon-perso-sourced-normal_record_notsourced{background-position: 0px -90px;}
+.icon-perso-sourced-normal_record_sourced{background-position: 0px -105px;}
+.icon-perso-sourced-normal_record_sourcedcertif{background-position: 0px -120px;}
+
+[class^="icon-perso-sourced-medium"], [class*=" icon-perso-sourced-medium"] {display:inline-block; background-image:url(images/perso/sourced-sprite-medium.png);background-color:transparent;background-repeat:no-repeat;width:12px;height:12px;}
+.icon-perso-sourced-medium_event_unknown{background-position: 0px 0px;}
+.icon-perso-sourced-medium_event_notprecise{background-position: 0px -12px;}
+.icon-perso-sourced-medium_event_notsourced{background-position: 0px -24px;}
+.icon-perso-sourced-medium_event_sourced{background-position: 0px -36px;}
+.icon-perso-sourced-medium_event_sourcedcertif{background-position: 0px -48px;}
+.icon-perso-sourced-medium_event_sourcedcertifdate{background-position: 0px -60px;}
+.icon-perso-sourced-medium_record_notsourced{background-position: 0px -72px;}
+.icon-perso-sourced-medium_record_sourced{background-position: 0px -84px;}
+.icon-perso-sourced-medium_record_sourcedcertif{background-position: 0px -96px;}
+
+[class^="icon-perso-sourced-small"], [class*=" icon-perso-sourced-small"] {display:inline-block; background-image:url(images/perso/sourced-sprite-small.png);background-color:transparent;background-repeat:no-repeat;width:10px;height:10px;}
+.icon-perso-sourced-small_event_unknown{background-position: 0px 0px;}
+.icon-perso-sourced-small_event_notprecise{background-position: 0px -10px;}
+.icon-perso-sourced-small_event_notsourced{background-position: 0px -20px;}
+.icon-perso-sourced-small_event_sourced{background-position: 0px -30px;}
+.icon-perso-sourced-small_event_sourcedcertif{background-position: 0px -40px;}
+.icon-perso-sourced-small_event_sourcedcertifdate{background-position: 0px -50px;}
+.icon-perso-sourced-small_record_notsourced{background-position: 0px -60px;}
+.icon-perso-sourced-small_record_sourced{background-position: 0px -70px;}
+.icon-perso-sourced-small_record_sourcedcertif{background-position: 0px -80px;}
 
 .issourcedtable{width: 100%;margin: auto;}
 .issourcedtable .slabel, html[dir='rtl'] .svalue { text-align: right; padding-right: 5px;}
 .issourcedtable .svalue, html[dir='rtl'] .slabel { text-align: left; padding-left: 5px;}
 .issourcedtable .svalue { width:40%; }
+
+/* GeoDispersion */
 
 #geodispersion_tip{ position : absolute; border : 1px solid gray; background-color : #efefef; padding : 3px; z-index: 1000; /* set this to create word wrap */ max-width: 200px;}
 #geodispersion_flag{ padding: 4px;}
@@ -129,6 +176,9 @@ html[dir='rtl'] .right { float: left;}
 #geodispersion_gentable .geodispersion_unknownitem { background-color: #D3C6B8; color: #62584D;}
 
 /* Perso Welcome block */
+.perso_welcome_block_block  table{margin:auto;}
+.perso_welcome_block_block  td{width:33%;text-align:center;vertical-align: top;}
+
 .perso_welcome_block_block #perso-login-form, .perso_welcome_block_block #perso-new_passwd_form{border:0; background:none;}
 #perso-login-box{ text-align:center; color: black;}
 #perso-login-box aa {color : #62584D;}

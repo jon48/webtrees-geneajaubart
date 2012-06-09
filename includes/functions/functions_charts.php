@@ -2,7 +2,7 @@
 // Functions used for charts
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_charts.php 13387 2012-02-05 15:40:35Z greg $
+// $Id: functions_charts.php 13747 2012-04-02 15:20:21Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ if (!defined('WT_WEBTREES')) {
  * @param string $arrowDirection   direction of link arrow
  */
 function print_sosa_number($sosa, $pid = "", $arrowDirection = "up") {
-	global $pbwidth, $pbheight, $WT_IMAGES;
+	global $pbwidth, $pbheight;
 
 	if (substr($sosa,-1,1)==".") {
 		$personLabel = substr($sosa,0,-1);
@@ -49,7 +49,7 @@ function print_sosa_number($sosa, $pid = "", $arrowDirection = "up") {
 		$visibility = "normal";
 	}
 	echo "<td class=\"subheaders center\" style=\"vertical-align: middle; text-indent: 0px; margin-top: 0px; white-space: nowrap; visibility: ", $visibility, ";\">";
-	echo getLRM(), $personLabel, getLRM();
+	echo $personLabel;
 	if ($sosa != "1" && $pid != "") {
 		if ($arrowDirection=="left") {
 			$dir = 0;
@@ -266,18 +266,19 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 	echo '</span>';
 
 	if ($sosa==0 && WT_USER_CAN_EDIT) {
-		echo "<br>";
-		echo "<span class='nowrap font12'>";
+		echo '<br>';
+		echo '<span class="nowrap font12">';
 		echo "<a href=\"#\" onclick=\"return addnewchild('$famid','');\">" . WT_I18N::translate('Add a child to this family') . "</a>";
-		echo " <a href=\"#\" onclick=\"return addnewchild('$famid','M');\">[".WT_Person::sexImage('M', 'small', '', WT_I18N::translate('son'     ))."]</a>";
-		echo " <a href=\"#\" onclick=\"return addnewchild('$famid','F');\">[".WT_Person::sexImage('F', 'small', '', WT_I18N::translate('daughter'))."]</a>";
-		echo help_link('add_child');
-		echo "</span>";
-		echo "<br><br>";
+		echo ' <a class="icon-sex_m_15x15" href="#" onclick="return addnewchild(\'', $famid, '\',\'M\');" title="',WT_I18N::translate('son'), '"></a>';
+		echo ' <a class="icon-sex_f_15x15" href="#" onclick="return addnewchild(\'', $famid, '\',\'F\');" title="',WT_I18N::translate('daughter'), '"></a>';
+		echo '</span>';
+		echo '<br><br>';
 	}
-	echo "</td>";
-	if ($sosa>0) echo "<td></td><td></td>";
-	echo "</tr>";
+	echo '</td>';
+	if ($sosa>0) {
+		echo '<td></td><td></td>';
+	}
+	echo '</tr>';
 
 	$newchildren = array();
 	$oldchildren = array();
@@ -415,24 +416,11 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 			echo "</td></tr>";
 		}
 		// message 'no children' except for sosa
-	}
-	else if ($sosa<1) {
-		echo "<tr><td valign=\"top\" >";
-
-		$nchi = "";
-		$famrec = find_gedcom_record($famid, WT_GED_ID, true);
-		$ct = preg_match("/1 NCHI (\w+)/", $famrec, $match);
-		if ($ct>0) $nchi = $match[1];
-		else {
-			$famrec = find_family_record($famid, WT_GED_ID);
-			$ct = preg_match("/1 NCHI (\w+)/", $famrec, $match);
-			if ($ct>0) $nchi = $match[1];
+	} elseif ($sosa<1) {
+		if (preg_match('/\n1 NCHI (\d+)/', $family->getGedcomRecord(), $match) && $match[1]==0) {
+			echo '<tr><td><i class="icon-childless"></i> '.WT_I18N::translate('This family remained childless').'</td></tr>';
 		}
-		if ($nchi=="0") echo '<img src="'.$WT_IMAGES['childless'].'" alt="'.WT_I18N::translate('This family remained childless').'" title="'.WT_I18N::translate('This family remained childless').'"> '.WT_I18N::translate('This family remained childless');
-		//else echo WT_I18N::translate('No children');
-		echo "</td></tr>";
-	}
-	else {
+	} else {
 		echo "<tr>";
 		print_sosa_number($sosa, WT_Person::getInstance($chil));
 		echo "<td valign=\"top\">";
@@ -494,9 +482,9 @@ function print_family_facts($family) {
 				echo '<tr><td class="descriptionbox">';
 				echo WT_I18N::translate('Add media'), help_link('OBJE');
 				echo '</td><td class="optionbox">';
-				echo "<a href=\"#\" onclick=\"window.open('addmedia.php?action=showmediaform&amp;linktoid={$famid}', '_blank', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Add a new media object'), '</a>';
+				echo "<a href=\"#\" onclick=\"window.open('addmedia.php?action=showmediaform&amp;linktoid={$famid}', '_blank', edit_window_specs); return false;\">", WT_I18N::translate('Add a new media object'), '</a>';
 				echo '<br>';
-				echo "<a href=\"#\" onclick=\"window.open('inverselink.php?linktoid={$famid}&amp;linkto=family', '_blank', 'top=50,left=50,width=400,height=300,resizable=1,scrollbars=1'); return false;\">", WT_I18N::translate('Link to an existing media object'), '</a>';
+				echo "<a href=\"#\" onclick=\"window.open('inverselink.php?linktoid={$famid}&amp;linkto=family', '_blank', find_window_specs); return false;\">", WT_I18N::translate('Link to an existing media object'), '</a>';
 				echo '</td></tr>';
 			}
 
@@ -586,7 +574,7 @@ function ancestry_array($rootid, $maxgen=0) {
  * @param string $dir arrow direction 0=left 1=right 2=up 3=down (default=2)
  */
 function print_url_arrow($id, $url, $label, $dir=2) {
-	global $WT_IMAGES, $TEXT_DIRECTION;
+	global $TEXT_DIRECTION;
 
 	if ($id=="" or $url=="") return;
 
@@ -595,14 +583,13 @@ function print_url_arrow($id, $url, $label, $dir=2) {
 	if ($TEXT_DIRECTION=="rtl" and $dir==0) $adir=1;
 	if ($TEXT_DIRECTION=="rtl" and $dir==1) $adir=0;
 
-	// Labels include people's names, which may contain markup
-	$label=htmlspecialchars(strip_tags($label));
 
 	// arrow style     0         1         2         3
-	$array_style=array("larrow", "rarrow", "uarrow", "darrow");
+	$array_style=array("icon-larrow", "icon-rarrow", "icon-uarrow", "icon-darrow");
 	$astyle=$array_style[$adir];
 
-	echo "<a href=\"$url\" onmouseover=\"swap_image('".$astyle.$id."',$adir); window.status ='" . $label . "'; return true;\" onmouseout=\"swap_image('".$astyle.$id."',$adir); window.status=''; return true;\"><img id=\"".$astyle.$id."\" src=\"".$WT_IMAGES[$astyle]."\" alt=\"$label\" title=\"$label\"></a>";
+	// Labels include people's names, which may contain markup
+	echo '<a href="'.$url.'" title="'.strip_tags($label).'" class="'.$astyle.'"></a>';
 }
 
 /**
@@ -673,11 +660,10 @@ function print_cousins($famid, $personcount=1) {
 		}
 		echo '</table>';
 	} else {
-		$famrec = find_family_record($famid, $ged_id);
-		$ct = preg_match("/1 NCHI (\w+)/", $famrec, $match);
-		if ($ct>0) $nchi = $match[1];
-		else $nchi = "";
-		if ($nchi=='0') echo '&nbsp;<img src="', $WT_IMAGES['childless'], '" alt="', WT_I18N::translate('This family remained childless'), '" title="', WT_I18N::translate('This family remained childless'), '">';
+		// If there is known that there are no children (as opposed to no known children)
+		if (preg_match('/\n1 NCHI (\d+)/', $family->getGedcomRecord(), $match) && $match[1]==0) {
+			echo ' <i class="icon-childless" title="', WT_I18N::translate('This family remained childless'), '"></i>';
+		}
 	}
 	$show_full = $save_show_full;
 	if ($save_show_full) {

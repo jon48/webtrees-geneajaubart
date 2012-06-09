@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_4_text.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: census_4_text.php 13709 2012-03-28 13:33:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -46,7 +46,7 @@ if (!defined('WT_WEBTREES')) {
 	<div class="optionbox">
 		<textarea wrap="off" name="NOTE" id="NOTE"></textarea><br>
 		<center>
-		<?php print_specialchar_link('NOTE',true); ?>
+		<?php echo print_specialchar_link('NOTE'); ?>
 		</center>
 	</div>
 </div>

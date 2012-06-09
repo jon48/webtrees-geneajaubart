@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_5_input.js.php 12260 2011-10-06 16:18:21Z greg $
+// $Id: census_5_input.js.php 13946 2012-05-27 00:32:22Z nigel $
 
 // modified from tabledeleterow.js version 1.2 2006-02-21
 // mredkj.com
@@ -274,8 +274,23 @@ function preview() {
 			}
 
 		} else if (NoteCtry.value=="USA") {
+			// USA 1940 ===============
+			if (NoteYear.value=="1940") {
+				for (var j=2; j<tr.cells.length-3; j++) { // == j=2 means miss out cols 0 and 1 (# and pid), cells.length-3 means miss out del, ins and item #
+					if ( (j>=4 && j<=8) || j==11 || (j>=13 && j<=50) || (j>=52 && j<=59) || j>=62 && j<=73) {
+							continue;
+					} else {
+						if (i==0) {
+							strRow += (strRow==''?'':'|') + tr.cells[j].childNodes[0].id;
+						} else {
+							strRow += (strRow==''?'':'|') + tr.cells[j].childNodes[0].value;
+						}
+					}
+				}
+			}
+
 			// USA 1930 ===============
-			if (NoteYear.value=="1930") {
+			else if (NoteYear.value=="1930") {
 				for (var j=2; j<tr.cells.length-3; j++) { // == j=2 means miss out cols 0 and 1 (# and pid), cells.length-3 means miss out del, ins and item #
 					if (j==4 || j==5 || j==7 || j==8 || j==11 || j==13 || j==14 || (j>=16 && j<=19) || (j>=21 && j<=45) || (j>=47 && j<=50) || j==52 || j==53 || j==63 || j==64 || j>=67 && j<=73) {
 							continue;

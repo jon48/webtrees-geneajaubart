@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13127 2011-12-22 20:54:34Z lukasz $
+// $Id: module.php 13679 2012-03-25 17:34:35Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -122,33 +122,33 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 		
 		switch ($type) {
 		case "indi":
-			$controller->setPageTitle(WT_I18N::translate('Find individual ID'));
+			$controller->setPageTitle(WT_I18N::translate('Find an individual'));
 			break;
 		case "fam":
-			$controller->setPageTitle(WT_I18N::translate('Find Family List'));
+			$controller->setPageTitle(WT_I18N::translate('Find a family'));
 			break;
 		case "media":
-			$controller->setPageTitle(WT_I18N::translate('Find media'));
+			$controller->setPageTitle(WT_I18N::translate('Find a media object'));
 			$action="filter";
 			break;
 		case "place":
-			$controller->setPageTitle(WT_I18N::translate('Find Place'));
+			$controller->setPageTitle(WT_I18N::translate('Find a place'));
 			$action="filter";
 			break;
 		case "repo":
-			$controller->setPageTitle(WT_I18N::translate('Repositories'));
+			$controller->setPageTitle(WT_I18N::translate('Find a repository'));
 			$action="filter";
 			break;
 		case "note":
-			$controller->setPageTitle(WT_I18N::translate('Find Shared Note'));
+			$controller->setPageTitle(WT_I18N::translate('Find a note'));
 			$action="filter";
 			break;
 		case "source":
-			$controller->setPageTitle(WT_I18N::translate('Find Source'));
+			$controller->setPageTitle(WT_I18N::translate('Find a source'));
 			$action="filter";
 			break;
 		case "specialchar":
-			$controller->setPageTitle(WT_I18N::translate('Find Special Characters'));
+			$controller->setPageTitle(WT_I18N::translate('Find a special character'));
 			$action="filter";
 			break;
 		}
@@ -173,7 +173,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 						// Check if Indi, Fam or source ===================
 						/*
 						if (id.match("I")=="I") {
-							var win01 = window.opener.window.open('edit_interface.php?action=addmedia_links&noteid=newnote&pid='+id, 'win01', 'top=50, left=600, width=420, height=650, resizable=1, scrollbars=1');
+							var win01 = window.opener.window.open('edit_interface.php?action=addmedia_links&noteid=newnote&pid='+id, 'win01', edit_window_specs);
 							if (window.focus) {win01.focus();}
 						} else if (id.match("F")=="F") {
 							// TODO --- alert('Opening Navigator with family id entered will come later');
@@ -225,28 +225,28 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 		
 		switch ($type) {
 		case "indi":
-			echo WT_I18N::translate('Find individual ID');
+			echo WT_I18N::translate('Find an individual');
 			break;
 		case "fam":
-			echo WT_I18N::translate('Find Family List');
+			echo WT_I18N::translate('Find a family');
 			break;
 		case "media":
-			echo WT_I18N::translate('Find media');
+			echo WT_I18N::translate('Find a media object');
 			break;
 		case "place":
-			echo WT_I18N::translate('Find Place');
+			echo WT_I18N::translate('Find a place');
 			break;
 		case "repo":
-			echo WT_I18N::translate('Repositories');
+			echo WT_I18N::translate('Find a repository');
 			break;
 		case "note":
-			echo WT_I18N::translate('Find Shared Note');
+			echo WT_I18N::translate('Find a note');
 			break;
 		case "source":
-			echo WT_I18N::translate('Find Source');
+			echo WT_I18N::translate('Find a source');
 			break;
 		case "specialchar":
-			echo WT_I18N::translate('Find Special Characters');
+			echo WT_I18N::translate('Find a special character');
 			break;
 		}
 		
@@ -608,7 +608,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 								//-- name and size field
 								echo "<td class=\"list_value\">";
 								if ($media["TITL"] != "") {
-									echo "<b>", PrintReady($media["TITL"]), "</b><br>";
+									echo "<b>", htmlspecialchars($media["TITL"]), "</b><br>";
 								}
 								if (!$embed) {
 									echo "<a href=\"#\" onclick=\"pasteid('", addslashes($media["FILE"]), "');\"><span dir=\"ltr\">", $media["FILE"], "</span></a> -- ";
@@ -681,7 +681,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 						uasort($revplacelist, "utf8_strcasecmp");
 						echo "<td class=\"list_value_wrap\"><ul>";
 						foreach ($revplacelist as $place) {
-							echo "<li><a href=\"#\" onclick=\"pasteid('", str_replace(array("'", '"'), array("\'", '&quot;'), $place), "');\">", PrintReady($place), "</a></li>";
+							echo "<li><a href=\"#\" onclick=\"pasteid('", str_replace(array("'", '"'), array("\'", '&quot;'), $place), "');\">", htmlspecialchars($place), "</a></li>";
 						}
 						echo "</ul></td></tr>";
 						echo "<tr><td class=\"list_label\">", WT_I18N::translate('Places found'), " ", $ctplace;

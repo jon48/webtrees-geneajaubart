@@ -21,14 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Ancestry.php 13387 2012-02-05 15:40:35Z greg $
+// $Id: Ancestry.php 13820 2012-04-17 08:25:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-require_once WT_ROOT.'includes/functions/functions_charts.php';
 
 class WT_Controller_Ancestry extends WT_Controller_Chart {
 	var $pid = '';
@@ -145,7 +143,7 @@ class WT_Controller_Ancestry extends WT_Controller_Chart {
 		if ($family && $new && $depth>0) {
 			// print marriage info
 			echo '<span class="details1" style="white-space: nowrap;" >';
-			echo '<img src="', $WT_IMAGES['spacer'], '" height="2" width="', $Dindent, '" align="middle" alt=""><a href="#" onclick="expand_layer(\'sosa_', $sosa, '\'); return false;" class="top"><img id="sosa_', $sosa, '_img" src="', $WT_IMAGES['minus'], '" align="middle" hspace="0" vspace="3" alt="', WT_I18N::translate('View Family'), '"></a>';
+			echo '<img src="', $WT_IMAGES['spacer'], '" height="2" width="', $Dindent, '" align="middle" alt=""><a href="#" onclick="return expand_layer(\'sosa_', $sosa, '\');" class="top"><i id="sosa_', $sosa, '_img" class="icon-minus" title="', WT_I18N::translate('View Family'), '"></i></a>';
 			echo '&nbsp;<span dir="ltr" class="person_box">&nbsp;', ($sosa*2), '&nbsp;</span>&nbsp;', WT_I18N::translate('and');
 			echo '&nbsp;<span dir="ltr" class="person_boxF">&nbsp;', ($sosa*2+1), '&nbsp;</span>&nbsp;';
 			$marriage = $family->getMarriage();

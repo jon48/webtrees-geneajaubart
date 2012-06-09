@@ -2,7 +2,7 @@
 // Displays a place hierachy
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team. All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: placelist.php 13248 2012-01-16 12:21:42Z greg $
+// $Id: placelist.php 13811 2012-04-16 09:46:47Z greg $
 
 define('WT_SCRIPT_NAME', 'placelist.php');
 require './includes/session.php';
@@ -43,13 +43,10 @@ function case_in_array($value, $array) {
 	}
 	return false;
 }
-$action = safe_GET('action');
-$display = safe_GET('display');
-$parent = safe_GET('parent', WT_REGEX_UNSAFE);
-$level = safe_GET('level');
-
-if (empty($action)) $action = 'find';
-if (empty($display)) $display = 'hierarchy';
+$action =safe_GET('action',  array('find', 'show'), 'find');
+$display=safe_GET('display', array('hierarchy', 'list'), 'hierarchy');
+$parent =safe_GET('parent');
+$level  =safe_GET('level');
 
 if ($display=='hierarchy') {
 	$controller->setPageTitle(WT_I18N::translate('Place hierarchy'));
@@ -90,10 +87,6 @@ else {
 	if (!is_array($parent)) $parent = array();
 	else $parent = array_values($parent);
 }
-// Remove slashes
-foreach ($parent as $p => $child) {
-	$parent[$p] = stripLRMRLM($child);
-}
 
 if (!isset($level)) {
 	$level=0;
@@ -123,7 +116,6 @@ if ($display=='hierarchy') {
 		$action='show';
 	}
 	
-	echo '<link type="text/css" href="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet">';
 
 	// -- echo the breadcrumb hierarchy
 	echo '<h4>';
@@ -136,12 +128,6 @@ if ($display=='hierarchy') {
 		//-- breadcrumb
 		$numls = count($parent)-1;
 		$num_place='';
-		//-- place and page text orientation is opposite -> top level added at the beginning of the place text
-		echo '<a href="?level=0">';
-		if ($numls>=0 && (($TEXT_DIRECTION=='ltr' && hasRtLText($parent[$numls])) || ($TEXT_DIRECTION=='rtl' && !hasRtLText($parent[$numls])))) { 
-			echo WT_I18N::translate('Top Level'), ', ';
-		}
-		echo '</a>';
 		for ($i=$numls; $i>=0; $i--) {
 			echo '<a href="?level=', ($i+1);
 			for ($j=0; $j<=$i; $j++) {
@@ -157,30 +143,23 @@ if ($display=='hierarchy') {
 					echo '&amp;parent%5B', $j, '%5D=', $ppart;
 				}
 			}
-			echo '">';
+			echo '"><bdi dir="auto">';
 			if (trim($parent[$i])=='') {
 				echo WT_I18N::translate('unknown');
 			} else if ($i == $numls) {
 				echo $base_parent; 
 			} else {
-				echo PrintReady($parent[$i]);
+				echo htmlspecialchars($parent[$i]);
 			}
-			echo '</a>';
-			if ($i>0) {
-				echo ', ';
-			} elseif (($TEXT_DIRECTION=='rtl' && hasRtLText($parent[$i])) || ($TEXT_DIRECTION=='ltr' &&  !hasRtLText($parent[$i]))) {
-				echo ', ';
-			}
+			echo '</bdi></a>';
+			echo ', ';
 			if (empty($num_place)) {
 				$num_place=$parent[$i];
 			}
 		}
 	}
 	echo '<a href="?level=0">';
-	//-- place and page text orientation is the same -> top level added at the end of the place text
-	if ($level==0 || ($numls>=0 && (($TEXT_DIRECTION=='rtl' && hasRtLText($parent[$numls])) || ($TEXT_DIRECTION=='ltr' && !hasRtLText($parent[$numls]))))) {
-		echo WT_I18N::translate('Top Level');
-	}
+	echo WT_I18N::translate('Top Level');
 	echo '</a>',
 		'</h4>';
 
@@ -225,8 +204,7 @@ if ($display=='hierarchy') {
 			} elseif ($ct1 > 4) {
 				echo 'colspan="2"';
 			}
-			echo '>&nbsp;';
-			echo '<img src="', $WT_IMAGES['place'], '" title="', WT_I18N::translate('Place'), '" alt="', WT_I18N::translate('Place'), '">&nbsp;&nbsp;';
+			echo '><i class="icon-place"></i> ';
 			if ($level>0) {
 				echo /* I18N: %s is a country or region */WT_I18N::translate('Places in %s', $num_place);
 			} else {
@@ -239,9 +217,10 @@ if ($display=='hierarchy') {
 		echo '&amp;parent%5B', $level, '%5D=', urlencode($value), '" class="list_item">';
 
 		if (trim($value)=='') echo WT_I18N::translate('unknown');
-		else echo PrintReady($value);
+		else echo htmlspecialchars($value);
 		if ($use_googlemap) $place_names[$i]=trim($value);
 		echo '</a></li>';
+		$i++;
 		if ($ct1 > 20) {
 			if ($i == floor($ct1 / 3)) {
 				echo '</ul></td><td class="list_value"><ul>';
@@ -252,7 +231,6 @@ if ($display=='hierarchy') {
 		} elseif ($ct1 > 4 && $i == floor($ct1 / 2)) {
 			echo '</ul></td><td class="list_value"><ul>';
 		}
-		$i++;
 	}
 	if ($i>0) {
 		echo '</ul></td></tr>';
@@ -281,7 +259,7 @@ if ($display=='hierarchy') {
 			if (trim($value)=='') {
 				echo WT_I18N::translate('unknown');
 			} else {
-				echo PrintReady($value);
+				echo htmlspecialchars($value);
 			}
 			echo '</span></a>';
 			echo '</td></tr>';
@@ -365,8 +343,7 @@ if ($display=='list') {
 		echo '<table class="list_table">';
 		echo '<tr><td class="list_label" ';
 		$ct = count($placelist);
-		echo ' colspan="', $ct>20 ? 3 : 2, '">&nbsp;';
-		echo '<img src="', $WT_IMAGES['place'], '" title="', WT_I18N::translate('Place'), '" alt="', WT_I18N::translate('Place'), '">&nbsp;&nbsp;';
+		echo ' colspan="', $ct>20 ? 3 : 2, '"><i class="icon-place"></i> ';
 		echo WT_I18N::translate('Place List');
 		echo '</td></tr><tr><td class="list_value_wrap"><ul>';
 		$i=0;
@@ -384,7 +361,7 @@ if ($display=='list') {
 				else $revplace .= $place;
 			}
 			echo '<li><a href="?action=show&amp;display=hierarchy&amp;level=', $level, $linklevels, '">';
-			echo PrintReady($revplace), '</a></li>';
+			echo htmlspecialchars($revplace), '</a></li>';
 			$i++;
 			if ($ct > 20) {
 				if ($i == floor($ct / 3)) {
@@ -418,5 +395,6 @@ if ($display=='list') {
 echo '</a></h4></div>';
 
 if ($use_googlemap && $display=='hierarchy') {
+	echo '<link type="text/css" href="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet">';
 	map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $place_names);
 }

@@ -21,30 +21,28 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: relationship.php 13366 2012-02-02 10:48:18Z greg $
+// $Id: relationship.php 13867 2012-04-26 16:30:59Z lukasz $
 
 define('WT_SCRIPT_NAME', 'relationship.php');
 require './includes/session.php';
-require_once WT_ROOT.'includes/functions/functions_charts.php';
+require WT_ROOT.'includes/functions/functions_edit.php';
 
 $controller=new WT_Controller_Base();
 
-if (isset($_REQUEST['show_full'])) {
-	$show_full = $_REQUEST['show_full'];
-} else {
-	$show_full=$PEDIGREE_FULL_DETAILS;
-}
-if (!isset($_REQUEST['path_to_find'])) {
-	$path_to_find = 0;
-	unset($_SESSION['relationships']);
-} else {
-	$path_to_find = $_REQUEST['path_to_find'];
-}
-if ($path_to_find == -1) {
-	$path_to_find = 0;
+$pid1        =safe_GET_xref('pid1');
+$pid2        =safe_GET_xref('pid2');
+$show_full   =safe_GET('show_full', array('0', '1'), $PEDIGREE_FULL_DETAILS);
+$path_to_find=safe_GET('path_to_find', '[0-9]+', 0);
+$followspouse=safe_GET_bool('followspouse');
+$asc         =safe_GET_bool('asc');
+
+$asc = $asc ? -1 : 1;
+
+if ($path_to_find==0) {
 	unset($_SESSION['relationships']);
 }
-if ($show_full==false) {
+
+if (!$show_full) {
 	$bwidth  = $cbwidth;
 	$bheight = $cbheight;
 	$Dbwidth = $cbwidth;
@@ -56,24 +54,8 @@ $Dbyspacing		= 0;
 $Dbasexoffset	= 0;
 $Dbaseyoffset	= 0;
 
-$pid1=safe_GET_xref('pid1');
-$pid2=safe_GET_xref('pid2');
-
-if (!isset($_REQUEST['followspouse'])) {
-	$followspouse = 0;
-} else {
-	$followspouse = $_REQUEST['followspouse'];
-}
-if (!isset($_REQUEST['asc'])) {
-	$asc=1;
-} else {
-	$asc = $_REQUEST['asc'];
-}
-if ($asc=='') {
-	$asc=1;
-}
-if (empty($pid1)) {
-	$followspouse = 1;
+if (!$pid1) {
+	$followspouse = true;
 }
 $check_node = true;
 $disp = true;
@@ -110,15 +92,13 @@ if (!empty($_SESSION['pid2']) && $_SESSION['pid2']!=$pid2) {
 
 // -- print html header information
 $controller
+	->pageHeader()
 	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
-	->pageHeader();
-
-if ($ENABLE_AUTOCOMPLETE) {
-	require WT_ROOT.'js/autocomplete.js.htm';
-}
+	->addExternalJavaScript('js/autocomplete.js');
 
 if (WT_USE_LIGHTBOX) {
-	require_once WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
+	$album = new lightbox_WT_Module();
+	$album->getPreLoadContent();
 }
 
 ?>
@@ -142,14 +122,13 @@ if (WT_USE_LIGHTBOX) {
 			</td>
 			<td class="optionbox vmiddle">
 				<input tabindex="1" class="pedigree_form" type="text" name="pid1" id="pid1" size="3" value="<?php echo $pid1; ?>">
-				<?php print_findindi_link('pid1',''); ?>
+				<?php echo print_findindi_link('pid1'); ?>
 			</td>
 			<td class="descriptionbox">
 				<?php echo WT_I18N::translate('Show Details'); ?>
 			</td>
 			<td class="optionbox vmiddle">
-				<input type="hidden" name="show_full" value="<?php echo $show_full; ?>">
-				<input tabindex="3" type="checkbox" name="showfull" value="0" <?php if ($show_full) { echo ' checked="checked"'; } ?> onclick="document.people.show_full.value='<?php echo !$show_full; ?>';">
+				<?php echo two_state_checkbox('show_full', $show_full); ?>
 			</td>
 		</tr>
 		<tr>
@@ -158,13 +137,13 @@ if (WT_USE_LIGHTBOX) {
 			</td>
 			<td class="optionbox vmiddle">
 				<input tabindex="2" class="pedigree_form" type="text" name="pid2" id="pid2" size="3" value="<?php echo $pid2; ?>">
-				<?php print_findindi_link('pid2',''); ?>
+				<?php echo print_findindi_link('pid2'); ?>
 			</td>
 			<td class="descriptionbox">
 				<?php echo WT_I18N::translate('Show oldest top'), help_link('oldest_top'); ?>
 			</td>
 			<td class="optionbox">
-				<input tabindex="4" type="checkbox" name="asc" value="-1" <?php if ($asc==-1) echo ' checked="checked"'; ?>>
+				<input tabindex="4" type="checkbox" name="asc" value="1" <?php if ($asc==-1) echo ' checked="checked"'; ?>>
 			</td>
 		</tr>
 		<tr>
@@ -333,12 +312,19 @@ if ($pid1 && $pid2) {
 			$rowNum = ($asc==-1) ? $depth : 0;
 			$maxxoffset = -1*$Dbwidth-20;
 			$maxyoffset = $yoffset;
+			// Left and right get reversed on RTL pages
 			if ($TEXT_DIRECTION=='ltr') {
-				$rArrow = $WT_IMAGES['rarrow'];
-				$lArrow = $WT_IMAGES['larrow'];
+				$right_arrow='icon-rarrow';
 			} else {
-				$rArrow = $WT_IMAGES['larrow'];
-				$lArrow = $WT_IMAGES['rarrow'];
+				$right_arrow='icon-larrow';
+			}
+			// Up and down get reversed, for the "oldest at top" option
+			if ($asc==1) {
+				$up_arrow   ='icon-uarrow';
+				$down_arrow ='icon-darrow';
+			} else {
+				$up_arrow   ='icon-darrow';
+				$down_arrow ='icon-uarrow';
 			}
 			foreach ($node['path'] as $index=>$pid) {
 				$linex = $xoffset;
@@ -350,20 +336,16 @@ if ($pid1 && $pid2) {
 				case 'F': $mfstyle='F';  break;
 				case 'U': $mfstyle='NN'; break;
 				}
-				$arrow_img = $WT_IMAGES['darrow'];
-				if ($node['relations'][$index]=='father' || $node['relations'][$index]=='mother' || $node['relations'][$index]=='parent') {
+				switch ($node['relations'][$index]) {
+				case 'father':
+				case 'mother':
+				case 'parent':
+					$arrow_img = $down_arrow;
 					$line = $WT_IMAGES['vline'];
 					$liney += $Dbheight;
 					$linex += $Dbwidth/2;
 					$lh = 54;
 					$lw = 3;
-					//check for paternal grandparent relationship
-					if ($asc==0) {
-						$asc=1;
-					}
-					if ($asc==-1) {
-						$arrow_img = $WT_IMAGES['uarrow'];
-					}
 					$lh=$ys;
 					$linex=$xoffset+$Dbwidth/2;
 					// put the box up or down ?
@@ -389,17 +371,22 @@ if ($pid1 && $pid2) {
 						}
 						$joinx = $xoffset-$xs;
 						$joiny = $liney-2-($asc-1)/2*$lh;
-						echo "<div id=\"joina", $index, "\" style=\"position:absolute; ", $TEXT_DIRECTION=='ltr'?'left':'right', ':', $joinx + $Dbxspacing, 'px; top:', $joiny + $Dbyspacing, "px; z-index:-100; \" align=\"center\"><img src=\"", $WT_IMAGES['hline'], "\" align=\"left\" width=\"", $joinw, "\" height=\"", $joinh, "\" alt=\"\"></div>";
+						echo "<div id=\"joina", $index, "\" style=\"position:absolute; ", $TEXT_DIRECTION=='ltr'?'left':'right', ':', $joinx + $Dbxspacing, 'px; top:', $joiny + $Dbyspacing, "px;\" align=\"center\"><img src=\"", $WT_IMAGES['hline'], "\" align=\"left\" width=\"", $joinw, "\" height=\"", $joinh, "\" alt=\"\"></div>";
 						$joinw = $xs/2+2;
 						$joinx = $joinx+$xs/2;
 						$joiny = $joiny+$asc*$lh;
-						echo "<div id=\"joinb", $index, "\" style=\"position:absolute; ", $TEXT_DIRECTION=='ltr'?'left':'right', ':', $joinx + $Dbxspacing, 'px; top:', $joiny + $Dbyspacing, "px; z-index:-100; \" align=\"center\"><img src=\"", $WT_IMAGES["hline"], "\" align=\"left\" width=\"", $joinw, "\" height=\"", $joinh, "\" alt=\"\"></div>";
+						echo "<div id=\"joinb", $index, "\" style=\"position:absolute; ", $TEXT_DIRECTION=='ltr'?'left':'right', ':', $joinx + $Dbxspacing, 'px; top:', $joiny + $Dbyspacing, "px;\" align=\"center\"><img src=\"", $WT_IMAGES["hline"], "\" align=\"left\" width=\"", $joinw, "\" height=\"", $joinh, "\" alt=\"\"></div>";
 					}
 					$previous2=$previous;
 					$previous='parent';
-				}
-				if ($node['relations'][$index]=='brother' || $node['relations'][$index]=='sister' || $node['relations'][$index]=='sibling') {
-					$arrow_img = $rArrow;
+					break;
+				case 'brother':
+				case 'sister':
+				case 'sibling':
+				case 'husband':
+				case 'wife':
+				case 'spouse':
+					$arrow_img = $right_arrow;
 					$xoffset += $Dbwidth+$Dbxspacing+70;
 					$colNum ++;
 					//$rowNum is inherited from the box immediately to the left
@@ -413,31 +400,16 @@ if ($pid1 && $pid2) {
 					$liney = $yoffset+$Dbheight/4;
 					$previous2=$previous;
 					$previous='';
-				}
-				if ($node['relations'][$index]=='husband' || $node['relations'][$index]=='wife' || $node['relations'][$index]=='spouse') {
-					$arrow_img = $rArrow;
-					$xoffset += $Dbwidth+$Dbxspacing+70;
-					$colNum ++;
-					//$rowNum is inherited from the box immediately to the left
-					$line = $WT_IMAGES['hline'];
-					$linex += $Dbwidth;
-					$liney += $Dbheight/2;
-					$lh = 3;
-					$lw = 70;
-					$lw = $xs;
-					$linex = $xoffset-$lw;
-					$liney = $yoffset+$Dbheight/4;
-					$previous2=$previous;
-					$previous='';
-				}
-				if ($node['relations'][$index]=='son' || $node['relations'][$index]=='daughter' || $node['relations'][$index]=='child') {
+					break;
+				case 'son':
+				case 'daughter':
+				case 'child':
+					$arrow_img = $up_arrow;
 					$line = $WT_IMAGES['vline'];
 					$liney += $Dbheight;
 					$linex += $Dbwidth/2;
 					$lh = 54;
 					$lw = 3;
-					if ($asc==0) $asc=-1;
-					if ($asc==1) $arrow_img = $WT_IMAGES['uarrow'];
 					$lh=$ys;
 					$linex = $xoffset+$Dbwidth/2;
 					// put the box up or down ?
@@ -463,14 +435,15 @@ if ($pid1 && $pid2) {
 						}
 						$joinx = $xoffset-$xs;
 						$joiny = $liney-2+($asc+1)/2*$lh;
-						echo '<div id="joina', $index, '" style="position:absolute; ', $TEXT_DIRECTION=='ltr'?'left':'right', ':', $joinx+$Dbxspacing, 'px; top:', $joiny+$Dbyspacing, 'px; z-index:-100;" align="center"><img src="', $WT_IMAGES['hline'], '" align="left" width="', $joinw, '" height="', $joinh, '" alt=""></div>';
+						echo '<div id="joina', $index, '" style="position:absolute; ', $TEXT_DIRECTION=='ltr'?'left':'right', ':', $joinx+$Dbxspacing, 'px; top:', $joiny+$Dbyspacing, 'px;" align="center"><img src="', $WT_IMAGES['hline'], '" align="left" width="', $joinw, '" height="', $joinh, '" alt=""></div>';
 						$joinw = $xs/2+2;
 						$joinx = $joinx+$xs/2;
 						$joiny = $joiny-$asc*$lh;
-						echo '<div id="joinb', $index, '" style="position:absolute; ', $TEXT_DIRECTION=='ltr'?'left':'right', ':', $joinx+$Dbxspacing, 'px; top:', $joiny+$Dbyspacing, 'px; z-index:-100; " align="center"><img src="', $WT_IMAGES['hline'], '" align="left" width="', $joinw, '" height="', $joinh, '" alt=""></div>';
+						echo '<div id="joinb', $index, '" style="position:absolute; ', $TEXT_DIRECTION=='ltr'?'left':'right', ':', $joinx+$Dbxspacing, 'px; top:', $joiny+$Dbyspacing, 'px;" align="center"><img src="', $WT_IMAGES['hline'], '" align="left" width="', $joinw, '" height="', $joinh, '" alt=""></div>';
 					}
 					$previous2=$previous;
 					$previous='child';
+					break;
 				}
 				if ($yoffset > $maxyoffset) {
 					$maxyoffset = $yoffset;
@@ -483,15 +456,15 @@ if ($pid1 && $pid2) {
 
 				if ($index>0) {
 					if ($TEXT_DIRECTION=='rtl' && $line!=$WT_IMAGES['hline']) {
-						echo '<div id="line', $index, '" style="background:none; position:absolute; right:', $plinex+$Dbxspacing, 'px; top:', $liney+$Dbyspacing, 'px; width:', $lw+$lh*2, 'px; z-index:-100;" align="right">';
+						echo '<div id="line', $index, '" style="background:none; position:absolute; right:', $plinex+$Dbxspacing, 'px; top:', $liney+$Dbyspacing, 'px; width:', $lw+$lh*2, 'px;" align="right">';
 						echo '<img src="', $line, '" align="right" width="', $lw, '" height="', $lh, '" alt="">';
 						echo '<br>';
 						echo WT_I18N::translate($node['relations'][$index]);
-						echo '<img src="', $arrow_img, '" align="middle" alt="">';
+						echo '<i class="', $arrow_img, '"></i>';
 					} else {
-						echo '<div id="line', $index, '" style="background:none; position:absolute; ', $TEXT_DIRECTION=='ltr'?'left':'right', ':', $plinex+$Dbxspacing, 'px; top:', $liney+$Dbyspacing, 'px; width:', $lw+$lh*2, 'px; z-index:-100;" align="', $lh==3?'center':'left', '"><img src="', $line, '" align="left" width="', $lw, '" height="', $lh, '" alt="">';
+						echo '<div id="line', $index, '" style="background:none; position:absolute; ', $TEXT_DIRECTION=='ltr'?'left':'right', ':', $plinex+$Dbxspacing, 'px; top:', $liney+$Dbyspacing, 'px; width:', $lw+$lh*2, 'px;" align="', $lh==3?'center':'left', '"><img src="', $line, '" align="left" width="', $lw, '" height="', $lh, '" alt="">';
 						echo '<br>';
-						echo '<img src="', $arrow_img, '" align="middle" alt="">';
+						echo '<i class="', $arrow_img, '"></i>';
 						if ($lh == 3) {
 							echo '<br>'; // note: $lh==3 means horiz arrow
 						}
@@ -513,7 +486,7 @@ if ($pid1 && $pid2) {
 }
 
 // The contents of <div id="relationship_chart"> use relative positions.
-// Need to expand the dive to include the children, or we'll overlap the footer.
+// Need to expand the div to include the children, or we'll overlap the footer.
 // $maxyoffset is the top edge of the lowest box.
 $controller
 	->addInlineJavaScript('

@@ -2,7 +2,7 @@
 // RTL Functions
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_rtl.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: functions_rtl.php 13527 2012-03-01 22:29:18Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -39,14 +39,6 @@ $numbers = '0123456789';
 $numberPrefix = '+-'; // Treat these like numbers when at beginning or end of numeric strings
 $numberPunctuation = '- ,.:/'; // Treat these like numbers when inside numeric strings
 $punctuation = ',.:;?!';
-
-function getLRM() {
-	return "&lrm;";
-}
-
-function getRLM() {
-	return "&rlm;";
-}
 
 /**
  * This function strips &lrm; and &rlm; from the input string.  It should be used for all
@@ -1067,43 +1059,6 @@ function unhtmlentities($string)  {
 	$trans_tbl['&lrm;']=WT_UTF8_LRM;
 	$trans_tbl['&rlm;']=WT_UTF8_RLM;
 	return preg_replace('/&#(\d+);/e', "chr(\\1)", strtr($string, $trans_tbl));
-}
-
-/**
- * Verify if text is RtL
- *
- * This will verify if text has RtL characters
- * @param string $text to verify
- */
-function hasRTLText($text) {
-	global $RTLOrd;
-	for ($i=0; $i<strlen($text); $i++) {
-		if (in_array(ord(substr(trim($text),$i,2)),$RTLOrd)) return true;
-	}
-	return false;
-}
-
-/**
- * Verify if text is LtR
- *
- * This will verify if text has LtR characters that are not special characters
- * @param string $text to verify
- */
-function hasLTRText($text) {
-	global $SpecialChar, $SpecialPar, $SpecialNum, $RTLOrd;
-
-	for ($i=0; $i<strlen($text); $i++) {
-		if (in_array(ord(substr(trim($text),$i,2)),$RTLOrd) || in_array(ord(substr(trim($text),$i-1,2)),$RTLOrd)) $i++;
-		else {
-			if (substr($text,$i,26)=='<span class="starredname">') $i+=25;
-			else if (substr($text,$i,7)=="</span>") $i+=6;
-			else {
-				$byte = substr(trim($text),$i,1);
-				if (!in_array($byte,$SpecialChar) && !in_array($byte,$SpecialPar) && !in_array($byte,$SpecialNum)) return true;
-			}
-		}
-	}
-	return false;
 }
 
 /*

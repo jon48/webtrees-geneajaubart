@@ -2,7 +2,7 @@
 // Add media to gedcom file
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: addmedia.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: addmedia.php 13888 2012-05-01 16:21:26Z lukasz $
 
 define('WT_SCRIPT_NAME', 'addmedia.php');
 require './includes/session.php';
@@ -29,8 +29,39 @@ require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
 $controller=new WT_Controller_Simple();
-$controller->setPageTitle(WT_I18N::translate('Add a new media object'));
-$controller->pageHeader();
+$controller
+	->setPageTitle(WT_I18N::translate('Add a new media object'))
+	->pageHeader()
+	->addExternalJavaScript('js/autocomplete.js')
+	->addInlineJavaScript('
+	// Shared Notes =========================
+	function findnote(field) {
+		pastefield = field;
+		findwin = window.open("find.php?type=note", "_blank", find_window_specs);
+		return false;
+	}
+	var pastefield;
+	function openerpasteid(id) {
+		window.opener.paste_id(id);
+		window.close();
+	}
+	function paste_id(value) {
+		pastefield.value = value;
+	}
+	function paste_char(value) {
+		pastefield.value += value;
+	}
+	function checkpath(folder) {
+		value = folder.value;
+		if (value.substr(value.length-1, 1) == "/") value = value.substr(0, value.length-1);
+		if (value.substr(0, 1) == "/") value = value.substr(1, value.length-1);
+		result = value.split("/");
+		if (result.length > <?php echo $MEDIA_DIRECTORY_LEVELS; ?>) {
+			alert("' . WT_I18N::translate('You can enter no more than %s subdirectory names', $MEDIA_DIRECTORY_LEVELS) . '");
+			folder.focus();
+		}
+	}
+	');
 
 // TODO use GET/POST, rather than $_REQUEST
 // TODO decide what validation is required on these input parameters
@@ -85,40 +116,6 @@ if (!WT_USER_CAN_EDIT || !$disp || !$ALLOW_EDIT_GEDCOM) {
 	echo '<br><br><div class="center"><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a></div>';
 	exit;
 }
-
-if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'/js/autocomplete.js.htm';
-echo WT_JS_START;
-?>
-	// Shared Notes =========================
-	function findnote(field) {
-		pastefield = field;
-		findwin = window.open('find.php?type=note', '_blank', 'left=50, top=50, width=600, height=520, resizable=1, scrollbars=1');
-		return false;
-	}
-	var pastefield;
-	function openerpasteid(id) {
-		window.opener.paste_id(id);
-		window.close();
-	}
-	function paste_id(value) {
-		pastefield.value = value;
-	}
-	function paste_char(value) {
-		pastefield.value += value;
-	}
-	function checkpath(folder) {
-		value = folder.value;
-		if (value.substr(value.length-1, 1) == "/") value = value.substr(0, value.length-1);
-		if (value.substr(0, 1) == "/") value = value.substr(1, value.length-1);
-		result = value.split("/");
-		if (result.length > <?php echo $MEDIA_DIRECTORY_LEVELS; ?>) {
-			alert('<?php echo WT_I18N::translate('You can enter no more than %s subdirectory names', $MEDIA_DIRECTORY_LEVELS); ?>');
-			folder.focus();
-			return false;
-		}
-	}
-<?php
-echo WT_JS_END;
 
 // Naming conventions used in this script:
 // folderName - this is the link to the folder in the standard media directory; the one that is stored in the gedcom.
@@ -415,10 +412,10 @@ if ($action=='newentry') {
 				AddToLog('Media ID '.$media_id." successfully added to $linktoid.", 'edit');
 				$success=true;
 			} else {
-				echo "<a href=\"#\" onclick=\"openerpasteid('$mediaid'); return false;\">", WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record '), " <b>$mediaid</b></a><br><br>";
-				echo WT_JS_START;
-				echo "openerpasteid('", $mediaid, "');";
-				echo WT_JS_END;
+				if (!WT_DEBUG) {
+					echo WT_JS_START, 'if (window.opener.showchanges) window.opener.showchanges(); window.opener.paste_id("'.$mediaid.'"); window.close();', WT_JS_END;
+				} 
+				echo '<a href="#" onclick="window.opener.paste_id(\'', $mediaid, '\'); return false;">', WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record '), ' <b>', $mediaid, '</b></a><br><br>';
 			}
 		}
 		echo WT_I18N::translate('Update successful');

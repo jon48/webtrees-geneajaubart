@@ -4,7 +4,7 @@
 // Processes webtrees XML Reports and generates a report
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,15 +23,30 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: reportengine.php 13179 2012-01-04 08:37:27Z greg $
+// $Id: reportengine.php 13835 2012-04-18 16:56:09Z lukasz $
 
 define('WT_SCRIPT_NAME', 'reportengine.php');
 require './includes/session.php';
 
 $controller=new WT_Controller_Base();
 
-$famid=safe_GET('famid');
-$pid  =safe_GET('pid');
+$famid   =safe_GET('famid');
+$pid     =safe_GET('pid');
+$action  =safe_GET('action', array('choose', 'setup', 'run'), 'choose');
+$report  =safe_GET('report');
+$output  =safe_GET('output', array('HTML', 'PDF'), 'PDF');
+$vars    =safe_GET('vars');
+$varnames=safe_GET('varnames');
+$type    =safe_GET('type');
+if (!is_array($vars)) {
+	$vars=array();
+}
+if (!is_array($varnames)) {
+	$varnames=array();
+}
+if (!is_array($type)) {
+	$type=array();
+}
 
 /**
  * function to get the values for the given tag
@@ -45,40 +60,6 @@ function get_tag_values($tag) {
 		$vals[] = $values[$i];
 	}
 	return $vals;
-}
-
-if (isset($_REQUEST['action'])) {
-	$action = $_REQUEST['action'];
-	if (empty($action)) {
-		$action = 'choose';
-	}
-} else {
-	$action = 'choose';
-}
-if (isset($_REQUEST['report'])) {
-	$report = $_REQUEST['report'];
-} else {
-	$report = '';
-}
-if (isset($_REQUEST['output'])) {
-	$output = $_REQUEST['output'];
-} else {
-	$output = 'PDF';
-}
-if (isset($_REQUEST['vars'])) {
-	$vars = $_REQUEST['vars'];
-} else {
-	$vars = array();
-}
-if (isset($_REQUEST['varnames'])) {
-	$varnames = $_REQUEST['varnames'];
-} else {
-	$varnames = array();
-}
-if (isset($_REQUEST['type'])) {
-	$type = $_REQUEST['type'];
-} else {
-	$type = array();
 }
 
 //-- setup the arrays
@@ -176,22 +157,11 @@ elseif ($action=='setup') {
 	}
 	xml_parser_free($xml_parser);
 
-	$controller->setPageTitle($report_array['title']);
-	$controller->pageHeader();
-
-	if ($ENABLE_AUTOCOMPLETE) {
-		require_once WT_ROOT.'js/autocomplete.js.htm';
-	}
-
-	// Paste Found ID from a pop-up window
-	echo WT_JS_START;
-		?>
-		var pastefield;
-		function paste_id(value) {
-			pastefield.value=value;
-		}
-		<?php
-	echo WT_JS_END;
+	$controller
+		->setPageTitle($report_array['title'])
+		->pageHeader()
+		->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
+		->addExternalJavaScript('js/autocomplete.js');
 
 	init_calendar_popup();
 	echo '<div id="reportengine-page">
@@ -206,104 +176,96 @@ elseif ($action=='setup') {
 		$report_array['inputs'] = array();
 	}
 	foreach ($report_array['inputs'] as $indexval => $input) {
-		if ($input['name'] == 'sources' || $input['name'] != 'sources') {
-			// url forced default value ?
-			if (isset($_REQUEST[$input['name']])) {
-				$input['default']=$_REQUEST[$input['name']];
-			}
-			echo '<tr><td class="descriptionbox wrap">';
-			echo '<input type="hidden" name="varnames[]" value="', $input["name"], '">';
-			echo WT_I18N::translate($input['value']), '</td><td class="optionbox">';
-			if (!isset($input['type'])) {
-				$input['type'] = 'text';
-			}
-			if (!isset($input['default'])) {
-				$input['default'] = '';
-			}
-			if (isset($input['lookup'])) {
-				if ($input['lookup']=='INDI') {
-					if (!empty($pid)) {
-						$input['default'] = $pid;
-					} else {
-						$input['default'] = $controller->getSignificantIndividual()->getXref();
-					}
-				}
-				if ($input['lookup']=='FAM') {
-					if (!empty($famid)) {
-						$input['default'] = $famid;
-					} else {
-						$input['default'] = $controller->getSignificantFamily()->getXref();
-					}
-				}
-				if ($input['lookup']=='SOUR') {
-					if (!empty($sid)) {
-						$input['default'] = $sid;
-					}
-				}
-			}
-			if ($input['type']=='text') {
-				echo '<input type="text" name="vars[', $input['name'], ']" id="', $input['name'], '" 
-						value="', $input['default'], '" style="direction: ltr;">';
-			}
-			if ($input['type']=='checkbox') {
-				echo '<input type="checkbox" name="vars[', $input['name'], ']" id="', $input['name'], '" value="1"';
-				if ($input['default']=='1') {
-					echo ' checked="checked"';
-				}
-				echo '>';
-			}
-			if ($input['type']=='select') {
-				echo '<select name="vars[', $input['name'], ']" id="', $input['name'], '_var">';
-				$options = preg_split('/[|]+/', $input['options']);
-				foreach ($options as $indexval => $option) {
-					$opt = explode('=>', $option);
-					list($value, $display)=$opt;
-					if (substr($display, 0, 18)=='WT_I18N::translate' || substr($display, 0, 23)=='WT_Gedcom_Tag::getLabel') {
-						eval("\$display=$display;");
-					}
-					echo '<option value="', htmlspecialchars($value), '"';
-					if ($opt[0]==$input['default']) {
-						echo ' selected="selected"';
-					}
-					echo '>', $display, '</option>';
-				}
-				echo '</select>';
-			}
-			if (isset($input['lookup'])) {
-				echo '<input type="hidden" name="type[', $input['name'], ']" value="', $input['lookup'], '">';
-				if ($input['lookup']=='INDI') {
-					print_findindi_link('pid','');
-				} elseif ($input['lookup']=='PLAC') {
-					print_findplace_link($input['name']);
-				} elseif ($input['lookup']=='FAM') {
-					print_findfamily_link('famid');
-				} elseif ($input['lookup']=='SOUR') {
-					print_findsource_link($input['name']);
-				} elseif ($input['lookup']=='DATE') {
-					$text = WT_I18N::translate('Select a date');
-					if (isset($WT_IMAGES['button_calendar'])) {
-						$Link = '<img src="'.$WT_IMAGES['button_calendar'].'" name="a_'.$input['name'].'" id="a_'.$input['name'].'" alt="'.$text.'" title="'.$text.'" align="middle">';
-					} else {
-						$Link = $text;
-					}
-
-			echo '<a href="#" onclick="cal_toggleDate(\'div_', $input['name'], '\', ', $input['name'], '\'); return false;">', $Link, '</a>
-					<div id="div_', $input['name'], '" style="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></div>';
-				}
-			}
-			echo '</td></tr>';
+		echo '<tr><td class="descriptionbox wrap">';
+		echo '<input type="hidden" name="varnames[]" value="', $input["name"], '">';
+		echo WT_I18N::translate($input['value']), '</td><td class="optionbox">';
+		if (!isset($input['type'])) {
+			$input['type'] = 'text';
 		}
+		if (!isset($input['default'])) {
+			$input['default'] = '';
+		}
+		if (isset($input['lookup'])) {
+			if ($input['lookup']=='INDI') {
+				if (!empty($pid)) {
+					$input['default'] = $pid;
+				} else {
+					$input['default'] = $controller->getSignificantIndividual()->getXref();
+				}
+			}
+			if ($input['lookup']=='FAM') {
+				if (!empty($famid)) {
+					$input['default'] = $famid;
+				} else {
+					$input['default'] = $controller->getSignificantFamily()->getXref();
+				}
+			}
+			if ($input['lookup']=='SOUR') {
+				if (!empty($sid)) {
+					$input['default'] = $sid;
+				}
+			}
+			if ($input['lookup']=='DATE') {
+				if (isset($input['default'])) {
+					$input['default'] = strtoupper($input['default']);
+				}
+			}
+		}
+		if ($input['type']=='text') {
+			echo '<input type="text" name="vars[', $input['name'], ']" id="', $input['name'], '" 
+					value="', $input['default'], '" style="direction: ltr;">';
+		}
+		if ($input['type']=='checkbox') {
+			echo '<input type="checkbox" name="vars[', $input['name'], ']" id="', $input['name'], '" value="1"';
+			if ($input['default']=='1') {
+				echo ' checked="checked"';
+			}
+			echo '>';
+		}
+		if ($input['type']=='select') {
+			echo '<select name="vars[', $input['name'], ']" id="', $input['name'], '_var">';
+			$options = preg_split('/[|]+/', $input['options']);
+			foreach ($options as $indexval => $option) {
+				$opt = explode('=>', $option);
+				list($value, $display)=$opt;
+				if (substr($display, 0, 18)=='WT_I18N::translate' || substr($display, 0, 15) == 'WT_I18N::number' || substr($display, 0, 23)=='WT_Gedcom_Tag::getLabel') {
+					eval("\$display=$display;");
+				}
+				echo '<option value="', htmlspecialchars($value), '"';
+				if ($opt[0]==$input['default']) {
+					echo ' selected="selected"';
+				}
+				echo '>', $display, '</option>';
+			}
+			echo '</select>';
+		}
+		if (isset($input['lookup'])) {
+			echo '<input type="hidden" name="type[', $input['name'], ']" value="', $input['lookup'], '">';
+			if ($input['lookup']=='INDI') {
+				echo print_findindi_link('pid');
+			} elseif ($input['lookup']=='PLAC') {
+				echo print_findplace_link($input['name']);
+			} elseif ($input['lookup']=='FAM') {
+				echo print_findfamily_link('famid');
+			} elseif ($input['lookup']=='SOUR') {
+				echo print_findsource_link($input['name']);
+			} elseif ($input['lookup']=='DATE') {
+				echo ' <a href="#" onclick="cal_toggleDate(\'div_', $input['name'], '\', \'', $input['name'], '\'); return false;" class="icon-button_calendar" title="', WT_I18N::translate('Select a date'), '"></a>';
+				echo '<div id="div_', $input['name'], '" style="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></div>';
+			}
+		}
+		echo '</td></tr>';
 	}
 	echo '<tr>
 		<td colspan="2" class="optionbox">
 		<div class="report-type">
 		<div>
-		<img src="', $WT_IMAGES['media_pdf'], '" alt="PDF" title="PDF">
-		<p><input type="radio" name="output" value="PDF" checked="checked"></p>
+		<label for="PDF"><i class="icon-mime-application-pdf"></i></label>
+		<p><input type="radio" name="output" value="PDF" id="PDF" checked="checked"></p>
 		</div>
 		<div>
-		<img src="', $WT_IMAGES['media_html'], '" alt="HTML" title="HTML">
-		<p><input type="radio" name="output" value="HTML"';
+		<label for="HTML"><i class="icon-mime-text-html"></i></label>
+		<p><input type="radio" name="output" id="HTML" value="HTML"';
 		if ($output=='HTML') echo ' checked="checked"', '>';
 	echo '</p>
 		</div>

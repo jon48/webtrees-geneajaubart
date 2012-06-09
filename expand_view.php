@@ -21,10 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: expand_view.php 13296 2012-01-20 16:59:10Z greg $
+// $Id: expand_view.php 13931 2012-05-12 04:41:34Z greg $
 
 define('WT_SCRIPT_NAME', 'expand_view.php');
 require './includes/session.php';
+
+Zend_Session::writeClose();
 
 header('Content-Type: text/html; charset=UTF-8');
 $person = WT_Person::getInstance(safe_GET_xref('pid'));
@@ -78,7 +80,7 @@ foreach ($events as $event) {
 			echo '<span class="details_label">', $event->getLabel(), '</span> ';
 			$details=$event->getDetail();
 			if ($details!='Y' && $details!='N') {
-				echo PrintReady($details);
+				echo '<span dir="auto">', $details, '</span>';
 			}
 			echo format_fact_date($event, $person, false, false);
 			// Show spouse/family for family events

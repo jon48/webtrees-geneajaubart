@@ -4,7 +4,7 @@
 // Serves images from the index directory
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,10 +23,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: mediafirewall.php 13216 2012-01-11 19:33:16Z lukasz $
+// $Id: mediafirewall.php 13523 2012-02-29 18:20:49Z greg $
 
 define('WT_SCRIPT_NAME', 'mediafirewall.php');
 require './includes/session.php';
+
+Zend_Session::writeClose();
 
 $controller=new WT_Controller_Media();
 
@@ -146,8 +148,8 @@ function sendErrorAndExit($type, $line1, $line2 = false) {
 		echo "<!-- filler space so IE will display the custom 404 error -->";
 		echo "\n<div align=\"center\">", $line1, "</div>\n";
 		if ($line2) {
-			// line2 comes from url, wrap in PrintReady
-			echo "<div align=\"center\">", PrintReady($line2), "</div>\n";
+			// line2 comes from url, so escape
+			echo "<div align=\"center\">", htmlspecialchars($line2), "</div>\n";
 		}
 		echo "</body></html>\n";
 	}

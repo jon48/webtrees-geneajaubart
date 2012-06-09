@@ -2,7 +2,7 @@
 // Included script file for Interface to edit place locations
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team. All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: wt_v3_places_edit.js.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: wt_v3_places_edit.js.php 13897 2012-05-04 10:12:48Z lukasz $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
  
@@ -392,7 +392,7 @@ if (!defined('WT_WEBTREES')) {
 	}
 		
 	function change_icon() {
-		window.open('module.php?mod=googlemap&mod_action=flags&countrySelected=<?php echo $selected_country; ?>', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1');
+		window.open('module.php?mod=googlemap&mod_action=flags&countrySelected=<?php echo $selected_country; ?>', '_blank', indx_window_specs);
 		return false;
 	}
 
@@ -409,7 +409,7 @@ if (!defined('WT_WEBTREES')) {
 			if (response.length > 0) {
 				for (i=0; i<response.length; i++) {					
 					var name  = '<div id="gname" class="iwstyle">'+response[i].address_components[0].short_name+'<br> '+response[i].geometry.location+''
-						name +=	'<br><a href="#" onclick="setLoc(' + response[i].geometry.location.lat() + ', ' + response[i].geometry.location.lng() + ');"><div id="namelink"><?php echo PrintReady(WT_I18N::translate('Use this value')); ?></div></a>'
+						name +=	'<br><a href="#" onclick="setLoc(' + response[i].geometry.location.lat() + ', ' + response[i].geometry.location.lng() + ');"><div id="namelink"><?php echo WT_I18N::translate('Use this value'); ?></div></a>'
 						name += '</div>'
 					var point = response[i].geometry.location;
 					var marker = createMarker(i, point, name);	
@@ -443,7 +443,7 @@ if (!defined('WT_WEBTREES')) {
 	}
 
 	function showLocation_level(address) {
-		address += '<?php if ($level>0) echo ', ', addslashes(PrintReady(implode(', ', array_reverse($where_am_i, true)))); ?>';
+		address += '<?php if ($level>0) echo ', ', addslashes(implode(', ', array_reverse($where_am_i, true))); ?>';
 		geocoder.geocode({'address': address}, addAddressToMap);
 	}
 

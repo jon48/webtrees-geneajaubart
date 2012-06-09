@@ -3,7 +3,7 @@
 //
 // Tip : you could change the number of generations loaded before ajax calls both in individual page and in treeview page to optimize speed and server load 
 //
-// Copyright (C) 2011 webtrees development team
+// Copyright (C) 2012 webtrees development team
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13144 2011-12-28 09:29:10Z greg $
+// $Id: module.php 13867 2012-04-26 16:30:59Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,12 +29,6 @@ if (!defined('WT_WEBTREES')) {
 class tree_WT_Module extends WT_Module implements WT_Module_Tab {	
 	var $headers; // CSS and script to include in the top of <head> section, before theme's CSS
 	var $js; // the TreeViewHandler javascript
-	
-	function __construct() {
-		// define the module inclusions for the page header
-		$this->css=WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/css/treeview.css';
-  	$this->js =WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/treeview.js';
-	}
 	
 	// Extend WT_Module. This title should be normalized when this module will be added officially
 	public function getTitle() {
@@ -61,16 +55,16 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 		global $controller;
 
 		require_once WT_MODULES_DIR.$this->getName().'/class_treeview.php';
-    $tv = new TreeView('tvTab');
-    list($html, $js) = $tv->drawViewport($controller->record->getXref(), 3);
+		$tv = new TreeView('tvTab');
+		list($html, $js) = $tv->drawViewport($controller->record->getXref(), 3);
 		return
-			'<script type="text/javascript" src="'.$this->js.'"></script>'.
+			'<script type="text/javascript" src="'.$this->js().'"></script>'.
 			$html.
 			WT_JS_START.'
 			if (document.createStyleSheet) {
-				document.createStyleSheet("'.$this->css.'"); // For Internet Explorer
+				document.createStyleSheet("'.$this->css().'"); // For Internet Explorer
 			} else {
-				jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="'.$this->css.'">\');
+				jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="'.$this->css().'">\');
 			}'.
 			$js.
 			WT_JS_END;
@@ -95,17 +89,17 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 	public function getPreLoadContent() {
 	}
 
-  // Extend WT_Module
-  // We define here actions to proceed when called, either by Ajax or not
-  public function modAction($mod_action) {  
+	// Extend WT_Module
+	// We define here actions to proceed when called, either by Ajax or not
+	public function modAction($mod_action) {
 		require_once WT_MODULES_DIR.$this->getName().'/class_treeview.php';
-    switch($mod_action) {
-      case 'treeview':
+		switch($mod_action) {
+		case 'treeview':
 				global $controller;
 				$controller=new WT_Controller_Chart();
 
-        $tvName = 'tv';
-        $tv = new TreeView('tv');
+				$tvName = 'tv';
+				$tv = new TreeView('tv');
 				ob_start();
 
 				$person=$controller->getSignificantIndividual();
@@ -115,48 +109,56 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 				$controller
 					->setPageTitle(WT_I18N::translate('Interactive tree of %s', $person->getFullName()))
 					->pageHeader()
-					->addExternalJavaScript($this->js)
+					->addExternalJavaScript($this->js())
 					->addInlineJavaScript($js)
 					->addInlineJavaScript('
 					if (document.createStyleSheet) {
-						document.createStyleSheet("'.$this->css.'"); // For Internet Explorer
+						document.createStyleSheet("'.$this->css().'"); // For Internet Explorer
 					} else {
-						jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="'.$this->css.'">\');
+						jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="'.$this->css().'">\');
 					}
 				');
 
-        if (WT_USE_LIGHTBOX) {
-        	require WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
-				}
+			if (WT_USE_LIGHTBOX) {
+				$album = new lightbox_WT_Module();
+				$album->getPreLoadContent();
+			}
+			echo $html;
+		break;
 
-				echo $html;
-        break;
+		case 'getDetails':
+			header('Content-Type: text/html; charset=UTF-8');
+			$pid = safe_GET('pid');
+			$i = safe_GET('instance');
+			$tv = new TreeView($i);
+			echo $tv->getDetails($pid);
+		break;
 
-      case 'getDetails':
-				header('Content-Type: text/html; charset=UTF-8');
-        $pid = safe_GET('pid');
-        $i = safe_GET('instance');
-        $tv = new TreeView($i);
-        echo $tv->getDetails($pid);
-        break;
+		case 'getPersons':
+			$q = $_REQUEST["q"];
+			$i = safe_GET('instance');
+			$tv = new TreeView($i);
+			echo $tv->getPersons($q);
+		break;
 
-      case 'getPersons':
-        $q = $_REQUEST["q"];
-        $i = safe_GET('instance');
-        $tv = new TreeView($i);
-        echo $tv->getPersons($q);
-        break;
+		// dynamically load full medias instead of thumbnails for opened boxes before printing
+		case 'getMedias':
+			$q = $_REQUEST["q"];
+			$i = safe_GET('instance');
+			$tv = new TreeView($i);
+			echo $tv->getMedias($q);
+		break;
 
-			// dynamically load full medias instead of thumbnails for opened boxes before printing
-      case 'getMedias':
-        $q = $_REQUEST["q"];
-        $i = safe_GET('instance');
-        $tv = new TreeView($i);
-        echo $tv->getMedias($q);
-      	break;
+		default:
+			header('HTTP/1.0 404 Not Found');
+		}
+	}
 
-      default:
-				header('HTTP/1.0 404 Not Found');
-    }
-  }
+	private function css() {
+		return WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/css/treeview.css';
+	}
+	
+	private function js() {
+		return WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/treeview.js';
+	}
 }

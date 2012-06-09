@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: session.php 13438 2012-02-13 10:23:47Z greg $
+// $Id: session.php 13970 2012-06-04 10:15:13Z greg $
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
 if (!defined('WT_SCRIPT_NAME')) {
@@ -31,7 +31,7 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.2.7');
+define('WT_VERSION',         '1.3.0');
 define('WT_VERSION_RELEASE', ''); // 'svn', 'beta', 'rc1', '', etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
 
@@ -48,23 +48,21 @@ if (isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCO
 	define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-1.2.3z/"
 } else {
 	// Uncompressed resources, served without a "Content-encoding: gzip" header.
-	define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-1.2.3z/"
+	define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-1.2.3/"
 }
 
 // Optionally, load major JS libraries from Google's public CDN
 define ('WT_USE_GOOGLE_API', false);
 if (WT_USE_GOOGLE_API) {
-	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js');
+	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js');
 	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js');
-	define('WT_PROTOTYPE_URL',     'https://ajax.googleapis.com/ajax/libs/prototype/1.7.0.0/prototype.js');
 } else {
 	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery/jquery.min.js');
 	define('WT_JQUERYUI_URL',      WT_STATIC_URL.'js/jquery/jquery-ui.min.js');
-	define('WT_PROTOTYPE_URL',     WT_STATIC_URL.'js/prototype/prototype.js');
 }
 
 // Location of our modules and themes.  These are used as URLs and directory paths.
-define('WT_MODULES_DIR', 'modules_v3/'); // Update the build script when this changes
+define('WT_MODULES_DIR', 'modules_v3/'); // Update setup.php and build/Makefile when this changes
 define('WT_THEMES_DIR',  'themes/' );
 
 // Enable debugging output?
@@ -76,7 +74,7 @@ define('WT_DEBUG_LANG', false);
 define('WT_ERROR_LEVEL', 2); // 0=none, 1=minimal, 2=full
 
 // Required version of database tables/columns/indexes/etc.
-define('WT_SCHEMA_VERSION', 16);
+define('WT_SCHEMA_VERSION', 18);
 
 // Regular expressions for validating user input, etc.
 define('WT_REGEX_XREF',     '[A-Za-z0-9:_-]+');
@@ -94,9 +92,6 @@ define('WT_REGEX_UNSAFE',   '[\x00-\xFF]*'); // Use with care and apply addition
 
 // UTF8 representation of various characters
 define('WT_UTF8_BOM',    "\xEF\xBB\xBF"); // U+FEFF
-define('WT_UTF8_MALE',   "\xE2\x99\x82"); // U+2642
-define('WT_UTF8_FEMALE', "\xE2\x99\x80"); // U+2640
-define('WT_UTF8_NO_SEX', "\xE2\x9A\xAA"); // U+26AA
 
 // UTF8 control codes affecting the BiDirectional algorithm (see http://www.unicode.org/reports/tr9/)
 define('WT_UTF8_LRM',    "\xE2\x80\x8E"); // U+200E  (Left to Right mark:  zero-width character with LTR directionality)
@@ -120,14 +115,11 @@ define('WT_EOL', "\r\n");
 define ('WT_GEDCOM_LINE_LENGTH', 255-strlen(WT_EOL)); // Characters, not bytes
 
 // Use these tags to wrap embedded javascript consistently
-define('WT_JS_START', "\n<script type=\"text/javascript\">\n//<![CDATA[\n");
-define('WT_JS_END',   "\n//]]>\n</script>\n");
+define('WT_JS_START', '<script>');
+define('WT_JS_END',   '</script>');
 
 // Used in Google charts
 define ('WT_GOOGLE_CHART_ENCODING', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.');
-
-// Maximum number of results in auto-complete fields
-define('WT_AUTOCOMPLETE_LIMIT', 500);
 
 // Privacy constants
 define('WT_PRIV_PUBLIC',  2); // Allows visitors to view the marked information
@@ -212,8 +204,15 @@ if (!isset($_SERVER['REQUEST_URI']))  {
 
 // Common functions
 require WT_ROOT.'includes/functions/functions.php';
-require WT_ROOT.'includes/functions/functions_name.php';
 require WT_ROOT.'includes/functions/functions_db.php';
+// TODO: Not all pages require all of these.  Only load them in scripts that need them?
+require WT_ROOT.'includes/functions/functions_print.php';
+require WT_ROOT.'includes/functions/functions_rtl.php';
+require WT_ROOT.'includes/functions/functions_mediadb.php';
+require WT_ROOT.'includes/functions/functions_date.php';
+require WT_ROOT.'includes/functions/functions_charts.php';
+require WT_ROOT.'includes/functions/functions_places.php';
+require WT_ROOT.'includes/functions/functions_utf-8.php';
 
 set_error_handler('wt_error_handler');
 
@@ -284,21 +283,50 @@ if (!ini_get('safe_mode')) {
 }
 
 // Determine browser type
-$BROWSERTYPE = 'other';
-if (!empty($_SERVER['HTTP_USER_AGENT'])) {
-	if (stristr($_SERVER['HTTP_USER_AGENT'], 'Opera')) {
-		$BROWSERTYPE = 'opera';
-	} elseif (stristr($_SERVER['HTTP_USER_AGENT'], 'KHTML')) {
-		$BROWSERTYPE = 'chrome';
-	} elseif (stristr($_SERVER['HTTP_USER_AGENT'], 'Gecko')) {
-		$BROWSERTYPE = 'mozilla';
-	} elseif (stristr($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
-		$BROWSERTYPE = 'msie';
-	}
+if (!isset($_SERVER['HTTP_USER_AGENT'])) {
+	$_SERVER['HTTP_USER_AGENT']='';
+}
+// TODO: Browser sniffing is bad.  We should use capability detection.
+if (stristr($_SERVER['HTTP_USER_AGENT'], 'Opera')) {
+	$BROWSERTYPE = 'opera';
+} elseif (stristr($_SERVER['HTTP_USER_AGENT'], 'KHTML')) {
+	$BROWSERTYPE = 'chrome';
+} elseif (stristr($_SERVER['HTTP_USER_AGENT'], 'Gecko')) {
+	$BROWSERTYPE = 'mozilla';
+} elseif (stristr($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
+	$BROWSERTYPE = 'msie';
+} else {
+	$BROWSERTYPE = 'other';
 }
 
-//-- load up the code to check for spiders
-require WT_ROOT.'includes/session_spider.php';
+$rule=WT_DB::prepare(
+	"SELECT SQL_CACHE rule FROM `##site_access_rule`".
+	" WHERE IFNULL(INET_ATON(?), 0) BETWEEN ip_address_start AND ip_address_end".
+	" AND ? LIKE user_agent_pattern".
+	" ORDER BY ip_address_end-ip_address_start"
+)->execute(array( $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT']))->fetchOne();
+
+switch ($rule) {
+case 'allow':
+	$SEARCH_SPIDER=false;
+	break;
+case 'deny':
+	header('HTTP/1.1 403 Access Denied');
+	exit;
+case 'robot':
+case 'unknown':
+	// Search engines don't send cookies, and so create a new session with every visit.
+	// Make sure they always use the same one
+	Zend_Session::setId('search-engine-'.str_replace('.', '-', $_SERVER['REMOTE_ADDR']));
+	$SEARCH_SPIDER=true;
+	break;
+case '':
+	WT_DB::prepare(
+		"INSERT INTO `##site_access_rule` (ip_address_start, ip_address_end, user_agent_pattern) VALUES (IFNULL(INET_ATON(?), 0), IFNULL(INET_ATON(?), 4294967295), ?)"
+	)->execute(array($_SERVER['REMOTE_ADDR'], $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT']));
+	$SEARCH_SPIDER=true;
+	break;
+}
 
 // Store our session data in the database.
 session_set_save_handler(
@@ -384,15 +412,10 @@ if (empty($WEBTREES_EMAIL)) {
 	$WEBTREES_EMAIL='webtrees-noreply@'.preg_replace('/^www\./i', '', $_SERVER['SERVER_NAME']);
 }
 
-require WT_ROOT.'includes/functions/functions_print.php';
-require WT_ROOT.'includes/functions/functions_rtl.php';
-require WT_ROOT.'includes/functions/functions_mediadb.php';
-require WT_ROOT.'includes/functions/functions_date.php';
-
 // Use the server date to calculate privacy, etc.
 // Use the client date to show ages, etc.
-define('WT_SERVER_JD', timestamp_to_jd(time()));
-define('WT_CLIENT_JD', timestamp_to_jd(client_time()));
+define('WT_SERVER_JD', 2440588+floor(time()/86400));
+define('WT_CLIENT_JD', 2440588+floor(client_time()/86400));
 
 // Who are we?
 define('WT_USER_ID', getUserId());
@@ -437,7 +460,7 @@ define('WT_LOGIN_URL', get_site_setting('LOGIN_URL', WT_SERVER_NAME.WT_SCRIPT_PA
 if (!isset($_SESSION['wt_user'])) $_SESSION['wt_user'] = '';
 
 if (WT_SCRIPT_NAME!='help_text.php') {
-	if (!get_gedcom_setting(WT_GED_ID, 'imported') && substr(WT_SCRIPT_NAME, 0, 5)!=='admin' && !in_array(WT_SCRIPT_NAME, array('help_text.php', 'downloadgedcom.php', 'login.php', 'export_gedcom.php', 'edit_changes.php', 'import.php', 'message.php', 'save.php'))) {
+	if (!get_gedcom_setting(WT_GED_ID, 'imported') && substr(WT_SCRIPT_NAME, 0, 5)!=='admin' && !in_array(WT_SCRIPT_NAME, array('help_text.php', 'login.php', 'edit_changes.php', 'import.php', 'message.php', 'save.php'))) {
 		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_trees_manage.php');
 		exit;
 	}
@@ -489,7 +512,7 @@ if (substr(WT_SCRIPT_NAME, 0, 5)=='admin' || WT_SCRIPT_NAME=='module.php' && sub
 		// 4) first one found
 		$THEME_DIR=get_gedcom_setting(WT_GED_ID, 'THEME_DIR');
 		if (!in_array($THEME_DIR, get_theme_names())) {
-			$THEME_DIR=get_site_setting('THEME_DIR', 'webtrees');
+			$THEME_DIR=get_site_setting('THEME_DIR');
 		}
 		if (!in_array($THEME_DIR, get_theme_names())) {
 			$THEME_DIR='webtrees';

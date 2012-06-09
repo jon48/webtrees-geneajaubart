@@ -24,12 +24,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: statisticsplot.php 13192 2012-01-05 23:49:40Z lukasz $
+// $Id: statisticsplot.php 13905 2012-05-05 07:11:12Z lukasz $
 
 define('WT_SCRIPT_NAME', 'statisticsplot.php');
 require './includes/session.php';
 
-$controller=new WT_Controller_Simple();
+$controller=new WT_Controller_Ajax();
 $controller->setPageTitle(WT_I18N::translate('Statistics plot'));
 $controller->pageHeader();
 
@@ -723,7 +723,7 @@ function calc_legend($grenzen_zas) {
 	$zgrenzen[0] = $hulpar[0]-1;
 	while (isset($hulpar[$i])) {
 		$i1 = $i-1;
-		$legend[$i] = $hulpar[$i1].'-'.($hulpar[$i]-1);
+		$legend[$i] = WT_I18N::number($hulpar[$i1]).'-'.($hulpar[$i]-1);
 		$zgrenzen[$i] = $hulpar[$i]-1;
 		$i++;
 	}
@@ -814,35 +814,13 @@ function set_params($current, $indfam, $xg, $zg, $titstr, $xt, $yt, $gx, $gz, $m
 		}
 		$myfunc();
 		if ($indfam == 'IND') {
-			$hstr = $title.'|' .WT_I18N::translate('Counts ').' '.$n1.' '.WT_I18N::translate('of').' '.$stats->_totalIndividuals();
+			$hstr = $title.'|' .WT_I18N::translate('Counts ').' '.WT_I18N::number($n1).' '.WT_I18N::translate('of').' '.WT_I18N::number($stats->_totalIndividuals());
 		} else if ($x_as==21) {
-			$hstr = $title.'|' .WT_I18N::translate('Counts ').' '.$n1.' '.WT_I18N::translate('of').' '.$stats->totalChildren();
+			$hstr = $title.'|' .WT_I18N::translate('Counts ').' '.WT_I18N::number($n1).' '.WT_I18N::translate('of').' '.WT_I18N::number($stats->totalChildren());
 		} else {
-			$hstr = $title.'|' .WT_I18N::translate('Counts ').' '.$n1.' '.WT_I18N::translate('of').' '.$stats->_totalFamilies();
+			$hstr = $title.'|' .WT_I18N::translate('Counts ').' '.WT_I18N::number($n1).' '.WT_I18N::translate('of').' '.WT_I18N::number($stats->_totalFamilies());
 		}
 		myplot($hstr, $zmax, $xdata, $xtitle, $ydata, $ytitle, $legend);
-	}
-}
-
-function print_sources_stats_chart($type) {
-	global $stats;
-
-	$params[0] = '700x200';
-	$params[1] = 'ffffff';
-	$params[2] = '84beff';
-	switch ($type) {
-	case '9':
-		echo '<div id="google_charts" class="center">';
-		echo '<b>', WT_I18N::translate('Individuals with sources'), '</b><br><br>';
-		echo $stats->chartIndisWithSources($params);
-		echo '</div><br>';
-		break;
-	case '8':
-		echo '<div id="google_charts" class="center">';
-		echo '<b>', WT_I18N::translate('Families with sources'), '</b><br><br>';
-		echo $stats->chartFamsWithSources($params);
-		echo '</div><br>';
-		break;
 	}
 }
 
@@ -895,10 +873,6 @@ if ($action=='update') {
 	$WT_SESSION->statisticsplot[$GEDCOM] = $savedInput;
 	unset($savedInput);
 } else {
-	if (!isset($WT_SESSION->statisticsplot[$GEDCOM])) {
-		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'statistics.php');
-		exit;
-	}
 	// Recover the saved input variables
 	$savedInput = $WT_SESSION->statisticsplot[$GEDCOM];
 	$x_as = $savedInput['x_as'];
@@ -915,18 +889,8 @@ if ($action=='update') {
 	unset($savedInput);
 }
 
+echo '<div id="statistics-plot">';
 echo '<h2 class="center">', WT_I18N::translate('Statistics plot'), '</h2>';
-echo '<br>';
-
-//-- out of range values
-if (($y_as < 201) || ($y_as > 202)) {
-	echo WT_I18N::translate('%s not implemented', $y_as), '<br>';
-	exit;
-}
-if (($z_as < 300) || ($z_as > 302)) {
-	echo WT_I18N::translate('%s not implemented', $z_as), '<br>';
-	exit;
-}
 
 //-- Set params for request out of the information for plot
 $g_xas = '1,2,3,4,5,6,7,8,9,10,11,12'; //should not be needed. but just for month
@@ -978,14 +942,8 @@ case '3':
 case '4':
 	echo $stats->chartDistribution(array($chart_shows, 'marriage_distribution_chart'));
 	break;
-case '8':
-case '9':
-	print_sources_stats_chart($x_as);
-	break;
 default:
-	echo WT_I18N::translate('%s not implemented', $x_as), '<br>';
+	echo '<i class="icon-loading-large"></i>';
 	exit;
 }
-echo '<br><div class ="center noprint">';
-echo '<input type="button" value="', WT_I18N::translate('Close Window'), '" onclick="window.close()"><br><br>';
 echo '</div>';

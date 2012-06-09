@@ -2,7 +2,7 @@
 // Reorder media Items using drag and drop
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,13 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_media_reorder.php 13123 2011-12-21 22:41:06Z greg $
+// $Id: functions_media_reorder.php 13703 2012-03-27 18:33:45Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
 
 /**
  * print a media row in a table
@@ -36,15 +35,9 @@ if (!defined('WT_WEBTREES')) {
  * @param string $pid        The record id this media item was attached to
  */
 function media_reorder_row($rtype, $rowm, $pid) {
-	global $WT_IMAGES, $MEDIA_DIRECTORY;
-	global $GEDCOM, $THUMBNAIL_WIDTH, $USE_MEDIA_VIEWER;
-	global $SEARCH_SPIDER;
-	global $t, $n, $item, $items, $p, $edit, $reorder, $note, $rowm;
-	global $order1, $mediaType;
+	global $MEDIA_DIRECTORY, $GEDCOM, $THUMBNAIL_WIDTH, $USE_MEDIA_VIEWER, $SEARCH_SPIDER;
+	global $t, $n, $item, $items, $p, $edit, $reorder, $note, $rowm, $order1, $mediaType;
 
-	if (!isset($rowm)) {
-		$rowm=$row;
-	}
 	echo "<li class=\"facts_value\" style=\"list-style:none;cursor:move;margin-bottom:2px;\" id=\"li_" . $rowm['m_media'] . "\" >";
 
     //echo $rtype." ".$rowm["m_media"]." ".$pid;
@@ -85,9 +78,9 @@ function media_reorder_row($rtype, $rowm, $pid) {
 		echo "<img src=\"".$mediaInfo['thumb']."\" height=\"38\"";
 
 		if (strpos($rowm['m_gedrec'], "1 SOUR")!==false) {
-			echo " alt=\"" . PrintReady($mediaTitle) . "\" title=\"" . PrintReady($mediaTitle) . " Source info available\">";
+			echo " alt=\"" . htmlspecialchars($mediaTitle) . "\" title=\"" . htmlspecialchars($mediaTitle) . " Source info available\">";
 		} else {
-			echo " alt=\"" . PrintReady($mediaTitle) . "\" title=\"" . PrintReady($mediaTitle) . "\">";
+			echo " alt=\"" . htmlspecialchars($mediaTitle) . "\" title=\"" . htmlspecialchars($mediaTitle) . "\">";
 		}
 
 		//print media info

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: Menu.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: Menu.php 13857 2012-04-24 16:57:38Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -129,7 +129,7 @@ class WT_Menu {
 				}
 				$html='<a class="'.$this->iconclass.'" href="'.$this->link.'"'.$link.'>'.$this->label.'</a>';
 			} else {
-				$html='<a class="'.$this->iconclass.'" href="'.$this->link.'">'.$this->label.'</a>';
+				$html='<a class="'.$this->iconclass.'" href="'.$this->link.'"'.$link.'>'.$this->label.'</a>';
 			}
 		} else {
 			$html=$this->label;

@@ -4,7 +4,7 @@
 // Census and Souce Input Area File File
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2007 to 2010  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_2_source_input.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: census_2_source_input.php 13946 2012-05-27 00:32:22Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -98,7 +98,7 @@ if (!defined('WT_WEBTREES')) {
 		} else if (prevcenyear == 1910) { var prevcendate = new Date(1910, 3, 15);    // 15 APR 1910
 		} else if (prevcenyear == 1920) { var prevcendate = new Date(1920, 0, 01);    // 01 JAN 1920
 		} else if (prevcenyear == 1930) { var prevcendate = new Date(1930, 3, 01);    // 01 APR 1930
-		} else if (prevcenyear == 1940) { var prevcendate = new Date(1940, 3, 01);    // 01 APR 1940
+		} else if (prevcenyear == 1940) { var prevcendate = new Date(1940, 4, 01);    // 01 APR 1940
 		// Default Date
 		} else {
 			var prevcendate = new Date(1901, 2, 31);
@@ -108,7 +108,7 @@ if (!defined('WT_WEBTREES')) {
 
 	function findSource(field) {
 		pastefield = field;
-		findwin = window.open('find.php?type=source', '_blank', 'left=50,top=50,width=600,height=500,resizable=1,scrollbars=1');
+		findwin = window.open('find.php?type=source', '_blank', find_window_specs);
 		return false;
 	}
 	function openerpasteid(id) {
@@ -175,7 +175,7 @@ if (!defined('WT_WEBTREES')) {
 				censyear = new DynamicOptionList();
 				censyear.addDependentFields("censCtry","censYear");
 				censyear.forValue("UK").addOptions("", "1841", "1851", "1861", "1871", "1881", "1891", "1901", "1911", "1921", "1931");
-				censyear.forValue("USA").addOptions("", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", cenyear);
+				censyear.forValue("USA").addOptions("", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940", cenyear);
 				censyear.forValue("UK").setDefaultOptions("");
 				censyear.forValue("USA").setDefaultOptions(cenyear);
 				initDynamicOptionLists();
@@ -186,7 +186,7 @@ if (!defined('WT_WEBTREES')) {
 				censyear = new DynamicOptionList();
 				censyear.addDependentFields("censCtry","censYear");
 				censyear.forValue("UK").addOptions("", "1841", "1851", "1861", "1871", "1881", "1891", "1901", "1911", "1921", "1931", cenyear);
-				censyear.forValue("USA").addOptions("", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930");
+				censyear.forValue("USA").addOptions("", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940");
 				censyear.forValue("UK").setDefaultOptions(cenyear);
 				censyear.forValue("USA").setDefaultOptions("");
 				initDynamicOptionLists();
@@ -200,7 +200,7 @@ if (!defined('WT_WEBTREES')) {
 				censyear = new DynamicOptionList();
 				censyear.addDependentFields("censCtry","censYear");
 				censyear.forValue("UK").addOptions("", "1841", "1851", "1861", "1871", "1881", "1891", "1901", "1911", "1921", "1931", cenyear);
-				censyear.forValue("USA").addOptions("", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930");
+				censyear.forValue("USA").addOptions("", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940");
 				censyear.forValue("UK").setDefaultOptions(cenyear);
 				censyear.forValue("USA").setDefaultOptions("");
 				initDynamicOptionLists();
@@ -211,7 +211,7 @@ if (!defined('WT_WEBTREES')) {
 				censyear = new DynamicOptionList();
 				censyear.addDependentFields("censCtry","censYear");
 				censyear.forValue("UK").addOptions("", "1841", "1851", "1861", "1871", "1881", "1891", "1901", "1911", "1921", "1931");
-				censyear.forValue("USA").addOptions("", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", cenyear);
+				censyear.forValue("USA").addOptions("", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940", cenyear);
 				censyear.forValue("UK").setDefaultOptions("");
 				censyear.forValue("USA").setDefaultOptions(cenyear);
 				initDynamicOptionLists();
@@ -320,8 +320,8 @@ if (!defined('WT_WEBTREES')) {
 				tr.cells[j].childNodes[0].value = marrcond;
 				tr.cells[16].childNodes[0].value = yrsmarr;
 
-				//-- If single and USA 1930, set Years married to "-" ------------------
-				if (marrcond=="S" && cenyear=="1930") {
+				//-- If single and USA 1930 or 1940, set Years married to "-" ------------------
+				if (marrcond=="S" && (cenyear=="1930" || cenyear=="1940")) {
 					tr.cells[20].childNodes[0].value = "-";
 				}
 				//-- If married or widowed set name to married name --------------------
@@ -715,6 +715,15 @@ if (!defined('WT_WEBTREES')) {
 			}
 
 		} else if (cens_ctry=="USA") {
+			if (cenyear=="1940") {
+				flip_3 = "";
+				flip_9 = "";
+				flip_10 = "";
+				flip_12 = "";
+				flip_51 = "";
+				flip_60 = "";
+				flip_61 = "";
+			} else
 			if (cenyear=="1930") {
 				flip_3 = "";
 				flip_6 = "";
@@ -961,7 +970,7 @@ if (!defined('WT_WEBTREES')) {
 			var censyear = new DynamicOptionList();
 			censyear.addDependentFields("censCtry","censYear");
 			censyear.forValue("UK").addOptions( "", "1841", "1851", "1861", "1871", "1881", "1891", "1901", "1911", "1921", "1931");
-			censyear.forValue("USA").addOptions( "", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930");
+			censyear.forValue("USA").addOptions( "", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940");
 			censyear.forValue("UK").setDefaultOptions("");
 			censyear.forValue("USA").setDefaultOptions("");
 		}
@@ -969,7 +978,7 @@ if (!defined('WT_WEBTREES')) {
 			var censyear = new DynamicOptionList();
 			censyear.addDependentFields("censCtry","censYear");
 			censyear.forValue("UK").addOptions( "", "1841", "1851", "1861", "1871", "1881", "1891", "1901", "1911", "1921", "1931", TheCenYear);
-			censyear.forValue("USA").addOptions( "", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930");
+			censyear.forValue("USA").addOptions( "", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940");
 			censyear.forValue("UK").setDefaultOptions(TheCenYear);
 			censyear.forValue("USA").setDefaultOptions("");
 			document.getElementById("UKOPT").selected = true;
@@ -979,7 +988,7 @@ if (!defined('WT_WEBTREES')) {
 			var censyear = new DynamicOptionList();
 			censyear.addDependentFields("censCtry","censYear");
 			censyear.forValue("UK").addOptions( "", "1841", "1851", "1861", "1871", "1881", "1891", "1901", "1911", "1921", "1931");
-			censyear.forValue("USA").addOptions( "", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", TheCenYear);
+			censyear.forValue("USA").addOptions( "", "1790", "1800", "1810", "1820", "1830", "1840", "1850", "1860", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940", TheCenYear);
 			censyear.forValue("UK").setDefaultOptions("");
 			censyear.forValue("USA").setDefaultOptions(TheCenYear);
 			document.getElementById("UKOPT").selected = false;

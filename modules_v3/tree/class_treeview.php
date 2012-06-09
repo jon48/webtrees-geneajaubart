@@ -21,14 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: class_treeview.php 13285 2012-01-19 16:20:42Z lukasz $
+// $Id: class_treeview.php 13961 2012-06-02 07:49:11Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-require_once 'includes/functions/functions_charts.php';
 
 class TreeView {
 	var $name;
@@ -61,7 +59,7 @@ class TreeView {
 	* @param int $generations number of generations to draw
 	*/
 	public function drawViewport($rootPersonId, $generations) {
-		global $GEDCOM, $WT_IMAGES, $controller;
+		global $GEDCOM, $controller;
 
 		$rootPerson = WT_Person::getInstance($rootPersonId);
 		if (is_null($rootPerson)) {
@@ -75,14 +73,11 @@ class TreeView {
 		$r = '<a name="tv_content"></a><div id="'.$this->name.'_out" class="tv_out">';
 
 		// Add the toolbar
-		$r.='<div id="tv_tools"><ul>'.
+		$r.='<div id="tv_tools" class="noprint"><ul>'.
 			'<li id="tvbCompact" class="tv_button"><img src="'.WT_STATIC_URL.WT_MODULES_DIR.'tree/images/compact.png" alt="'.WT_I18N::translate('Use compact layout').'" title="'.WT_I18N::translate('Use compact layout').'"></li>'.
-			// TODO: this is temporarily disabled (as it sends a flood of AJAX requests?)
-			//'<li id="tvbOpen" class="tv_button"><img src="'.$WT_IMAGES["media"].'" alt="o" title="'.WT_I18N::translate('Show all details').'"></li>'.
-			//'<li id="tvbClose" class="tv_button"><img src="'.$WT_IMAGES["fambook"].'" alt="f" title="'.WT_I18N::translate('Hide all details').'"></li>'.
-			'<li class="tv_button'.($this->allPartners ? ' tvPressed' : '').'"><a href="'.$path.'"><img src="'.$WT_IMAGES["sfamily"].'" alt="'.WT_I18N::translate('Show all spouses and ancestors').'" title="'.WT_I18N::translate('Show all spouses and ancestors').'"></a></li>';
+			'<li class="tv_button'.($this->allPartners ? ' tvPressed' : '').'"><a class="icon-sfamily" href="'.$path.'" title="'.WT_I18N::translate('Show all spouses and ancestors').'"></a></li>';
 		// Hidden loading image
-		$r.='<li class="tv_button" id="'.$this->name.'_loading"><img src="'.WT_STATIC_URL.'images/loading.gif" alt="Loading..."></li></ul>';
+		$r.='<li class="tv_button" id="'.$this->name.'_loading"><i class="icon-loading-small"></i></li></ul>';
 		$r.='</div><h2 id="tree-title">'.
 			WT_I18N::translate('Interactive tree of %s',$rootPerson->getFullName()).
 			'</h2><div id="'.$this->name.'_in" class="tv_in" dir="ltr">';
@@ -164,14 +159,12 @@ class TreeView {
 	* @param Person $person the person to return the details for
 	*/
 	private function getPersonDetails($personGroup, $person, $family) {
-		global $WT_IMAGES;
-
 		$r = '<div class="tv'.$person->getSex().' tv_person_expanded">';
 		$r .= $this->getThumbnail($personGroup, $person);
-		$r .= '<a class="tv_link" href="'.$person->getHtmlUrl().'">'.$person->getFullName().'</a> <a href="module.php?mod=tree&amp;mod_action=treeview&allPartners='.($this->allPartners ? 'true' : 'false').'&amp;rootid='.$person->getXref().'" title="'.WT_I18N::translate('Interactive tree of %s', strip_tags($person->getFullName())).'"><img src="'.$WT_IMAGES['tree'].'" class="tv_link tv_treelink"></a>';
+		$r .= '<a class="tv_link" href="'.$person->getHtmlUrl().'">'.$person->getFullName().'</a> <a href="module.php?mod=tree&amp;mod_action=treeview&allPartners='.($this->allPartners ? 'true' : 'false').'&amp;rootid='.$person->getXref().'" title="'.WT_I18N::translate('Interactive tree of %s', strip_tags($person->getFullName())).'" class="icon-button_indi tv_link tv_treelink"></a>';
 		$r .= '<br><b>'.WT_Gedcom_Tag::getAbbreviation('BIRT').'</b> '.$person->getBirthDate()->Display().' '.$person->getBirthPlace();
 		if ($family) {
-			$r .= '<br><b>'.WT_Gedcom_Tag::getAbbreviation('MARR').'</b> '.$family->getMarriageDate()->Display().' <a href="'.$family->getHtmlUrl().'"><img src="'.$WT_IMAGES['button_family'].'" class="tv_link tv_treelink" title="'.strip_tags($family->getFullName()).'"></a>'.$family->getMarriagePlace();
+			$r .= '<br><b>'.WT_Gedcom_Tag::getAbbreviation('MARR').'</b> '.$family->getMarriageDate()->Display().' <a href="'.$family->getHtmlUrl().'" class="icon-button_family tv_link tv_treelink" title="'.strip_tags($family->getFullName()).'"></a>'.$family->getMarriagePlace();
 		}
 		if ($person->isDead()) {
 			$r .= '<br><b>'.WT_Gedcom_Tag::getAbbreviation('DEAT').'</b> '.$person->getDeathDate()->Display().' '.$person->getDeathPlace();
@@ -279,6 +272,7 @@ class TreeView {
 		$fop = Array(); // $fop is fathers of partners
 		if (!is_null($partner)) {
 			$sfams = $person->getSpouseFamilies();
+			$dashed = '';
 			foreach ($sfams as $famid=>$family) {
 				$p = $family->getSpouse($person);
 				if (!empty($p)) {
@@ -287,10 +281,11 @@ class TreeView {
 						if (!empty($pf)) {
 							$fop[] = Array($pf->getHusband(), $pf);
 						}
-						$r .= $this->drawPersonName($p);
+						$r .= $this->drawPersonName($p, $dashed);
 						if (!$this->allPartners) {
 							break; // we can stop here the foreach loop
 						}
+						$dashed = 'dashed';
 					}
 				}
 			}
@@ -341,8 +336,9 @@ class TreeView {
 	/**
 	* Draw a person name preceded by sex icon, with parents as tooltip
 	* @param WT_Person $p a person
+	* @param $dashed if = 'dashed' print dashed top border to separate multiple spuses
 	*/
-	private function drawPersonName($p) {
+	private function drawPersonName($p, $dashed='') {
 		if ($this->allPartners) {
 			$f = $p->getPrimaryChildFamily();
 			if ($f) {
@@ -364,7 +360,7 @@ class TreeView {
 			$title = '';
 		}
 		$sex = $p->getSex();
-		$r = '<div class="tv'.$sex.'"'.$title.'><a href="'.$p->getHtmlUrl().'"></a>'.$p->getFullName().' <span class="dates">'.$p->getLifeSpan().'</span></div>';
+		$r = '<div class="tv'.$sex.' '.$dashed.'"'.$title.'><a href="'.$p->getHtmlUrl().'"></a>'.$p->getFullName().' <span class="dates">'.$p->getLifeSpan().'</span></div>';
 		return $r;
 	}
 

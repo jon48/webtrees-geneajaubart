@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lb_horiz_sort.php 11559 2011-05-20 19:01:33Z lukasz $
+// $Id: lb_horiz_sort.php 13869 2012-04-26 17:38:40Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,10 +31,10 @@ if (!defined('WT_WEBTREES')) {
 }
 
 ?>
-<script type="text/javascript">
+<script>
 	function getGroupOrder() {
 		// var sections = document.getElementsByClassName('section');
-		var sections = $$('.section');
+		var sections = $('.section');
 
 		var alerttext = '';
 		var order = '';
@@ -62,11 +62,10 @@ if (!defined('WT_WEBTREES')) {
 		cursor: move;
 		border: none;
 		text-align: center;
-    }
+	}
 </style>
-<script type="text/javascript">
-// <![CDATA[
-    //sections = [ 'group1','group2' ];
+<script>
+	//sections = [ 'group1','group2' ];
 	<?php if ($rownum1>0) { ?>
 		Sortable.create( 'thumblist_1', { tag:'li', dropOnEmpty: false, constraint: false, only:'facts_value' } );
 	<?php } ?>
@@ -79,6 +78,5 @@ if (!defined('WT_WEBTREES')) {
 	<?php if ($rownum4>0) { ?>
 		Sortable.create( "thumblist_4", { tag:'li', dropOnEmpty: false, constraint: false, only:'facts_value' } );
 	<?php } ?>
-// Sortable.create( "thumblist", { tag:'li', dropOnEmpty: false, constraint: false, only:'facts_value' } );
-	// ]]>
+	// Sortable.create( "thumblist", { tag:'li', dropOnEmpty: false, constraint: false, only:'facts_value' } );
 </script>

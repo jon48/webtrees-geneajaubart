@@ -2,7 +2,7 @@
 // Popup window that will allow a user to search for a family id, person id
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: find.php 13412 2012-02-09 13:06:56Z greg $
+// $Id: find.php 13723 2012-03-31 07:09:33Z greg $
 
 define('WT_SCRIPT_NAME', 'find.php');
 require './includes/session.php';
@@ -37,7 +37,6 @@ $create         =safe_GET('create');
 $media          =safe_GET('media');
 $external_links =safe_GET('external_links');
 $directory      =safe_GET('directory', WT_REGEX_NOSCRIPT, $MEDIA_DIRECTORY);
-$multiple       =safe_GET_bool('multiple');
 $showthumb      =safe_GET_bool('showthumb');
 $all            =safe_GET_bool('all');
 $subclick       =safe_GET('subclick');
@@ -97,41 +96,43 @@ if (($level < 0) || ($level > $MEDIA_DIRECTORY_LEVELS)) {
 
 switch ($type) {
 case "indi":
-	$controller->setPageTitle(WT_I18N::translate('Find individual ID'));
+	$controller->setPageTitle(WT_I18N::translate('Find an individual'));
 	break;
 case "fam":
-	$controller->setPageTitle(WT_I18N::translate('Find Family List'));
+	$controller->setPageTitle(WT_I18N::translate('Find a family'));
 	break;
 case "media":
-	$controller->setPageTitle(WT_I18N::translate('Find media'));
+	$controller->setPageTitle(WT_I18N::translate('Find a media object'));
 	break;
 case "place":
-	$controller->setPageTitle(WT_I18N::translate('Find Place'));
+	$controller->setPageTitle(WT_I18N::translate('Find a place'));
 	break;
 case "repo":
-	$controller->setPageTitle(WT_I18N::translate('Repositories'));
+	$controller->setPageTitle(WT_I18N::translate('Find a repository'));
 	break;
 case "note":
-	$controller->setPageTitle(WT_I18N::translate('Find Shared Note'));
+	$controller->setPageTitle(WT_I18N::translate('Find a note'));
 	break;
 case "source":
-	$controller->setPageTitle(WT_I18N::translate('Find Source'));
+	$controller->setPageTitle(WT_I18N::translate('Find a source'));
 	break;
 case "specialchar":
-	// Users will probably always want the same language, so remember their setting
+	$controller->setPageTitle(WT_I18N::translate('Find a special character'));
 	$language_filter=safe_GET('language_filter');
-	if (!$language_filter) {
-		$language_filter=get_user_setting(WT_USER_ID, 'default_language_filter');
-	} else {
-		set_user_setting(WT_USER_ID, 'default_language_filter', $language_filter);
+	if (WT_USER_ID) {
+		// Users will probably always want the same language, so remember their setting
+		if (!$language_filter) {
+			$language_filter=get_user_setting(WT_USER_ID, 'default_language_filter');
+		} else {
+			set_user_setting(WT_USER_ID, 'default_language_filter', $language_filter);
+		}
 	}
 	require WT_ROOT.'includes/specialchars.php';
-	$controller->setPageTitle(WT_I18N::translate('Find Special Characters'));
 	$action="filter";
 	break;
 case "facts":
 	$controller
-		->setPageTitle(WT_I18N::translate('Find fact tags'))
+		->setPageTitle(WT_I18N::translate('Find a fact or event'))
 		->addInlineJavaScript('initPickFact();');
 	break;
 }
@@ -142,7 +143,7 @@ echo WT_JS_START;
 	function pasteid(id, name, thumb) {
 		if (thumb) {
 			window.opener.<?php echo $callback; ?>(id, name, thumb);
-			<?php if (!$multiple) echo "window.close();"; ?>
+			<?php echo "window.close();"; ?>
 		} else {
 			// GEDFact_assistant ========================
 			if (window.opener.document.getElementById('addlinkQueue')) {
@@ -150,7 +151,7 @@ echo WT_JS_START;
 				// Check if Indi, Fam or source ===================
 				/*
 				if (id.match("I")=="I") {
-					var win01 = window.opener.window.open('edit_interface.php?action=addmedia_links&noteid=newnote&pid='+id, 'win01', 'top=50, left=600, width=420, height=650, resizable=1, scrollbars=1');
+					var win01 = window.opener.window.open('edit_interface.php?action=addmedia_links&noteid=newnote&pid='+id, 'win01', edit_window_specs);
 					if (window.focus) {win01.focus();}
 				} else if (id.match("F")=="F") {
 					// TODO --- alert('Opening Navigator with family id entered will come later');
@@ -159,7 +160,7 @@ echo WT_JS_START;
 			}
 			window.opener.<?php echo $callback; ?>(id);
 			if (window.opener.pastename) window.opener.pastename(name);
-			<?php if (!$multiple) echo "window.close();"; ?>
+			<?php echo "window.close();"; ?>
 		}
 	}
 	function checknames(frm) {
@@ -197,41 +198,7 @@ $options["form"][]= "formnote";
 $options["form"][]= "formsource";
 $options["form"][]= "formspecialchar";
 
-echo '<div id="find-page">
-<h3>'; // header title
-
-switch ($type) {
-case "indi":
-	echo WT_I18N::translate('Find individual ID');
-	break;
-case "fam":
-	echo WT_I18N::translate('Find Family List');
-	break;
-case "media":
-	echo WT_I18N::translate('Find media');
-	break;
-case "place":
-	echo WT_I18N::translate('Find Place');
-	break;
-case "repo":
-	echo WT_I18N::translate('Repositories');
-	break;
-case "note":
-	echo WT_I18N::translate('Find Shared Note');
-	break;
-case "source":
-	echo WT_I18N::translate('Find Source');
-	break;
-case "specialchar":
-	echo WT_I18N::translate('Find Special Characters');
-	break;
-case "facts":
-	echo WT_I18N::translate('Find fact tags');
-	break;
-}
-
-echo "</h3>"; // close header title
-
+echo '<div id="find-page"><h3>', $controller->getPageTitle(), '</h3>';
 
 // Show indi and hide the rest
 if ($type == "indi") {
@@ -240,7 +207,6 @@ if ($type == "indi") {
 	<input type="hidden" name="callback" value="'.$callback.'">
 	<input type="hidden" name="action" value="filter">
 	<input type="hidden" name="type" value="indi">
-	<input type="hidden" name="multiple" value="$multiple">
 	<span>', WT_I18N::translate('Name contains:'), '&nbsp;</span>
 	<input type="text" name="filter" value="';
 	if ($filter) echo $filter;
@@ -256,7 +222,6 @@ if ($type == "fam") {
 	<input type="hidden" name="callback" value="'.$callback.'">
 	<input type="hidden" name="action" value="filter">
 	<input type="hidden" name="type" value="fam">
-	<input type="hidden" name="multiple" value="$multiple">
 	<span>', WT_I18N::translate('Name contains:'), '&nbsp;</span>
 	<input type="text" name="filter" value="';
 	if ($filter) echo $filter;
@@ -619,7 +584,7 @@ if ($action=="filter") {
 			$levels = explode("/", $thumbdir);
 			$pthumb = "";
 			for ($i=0; $i<count($levels)-2; $i++) $pthumb.=$levels[$i]."/";
-			$uplink = "<a href=\"find.php?directory={$pdir}&amp;thumbdir={$pthumb}&amp;level=".($level-1)."{$thumbget}&amp;type=media&amp;choose={$choose}\">&nbsp;&nbsp;&nbsp;&lt;-- <span dir=\"ltr\">".$pdir."</span>&nbsp;&nbsp;&nbsp;</a>";
+			$uplink = '<a href="find.php?directory='.$pdir.'&amp;thumbdir='.$pthumb.'&amp;level='.($level-1).$thumbget.'&amp;type=media&amp;choose='.$choose.'&amp;filter='.htmlspecialchars($filter).'&amp;action=filter">&nbsp;&nbsp;&nbsp;&lt;-- <span dir="ltr">'.$pdir.'</span>&nbsp;&nbsp;&nbsp;</a>';
 		}
 
 		// Start of media directory table
@@ -633,11 +598,11 @@ if ($action=="filter") {
 				echo '<div class="find-media-dirs">', $uplink, '</div>';
 			}
 			echo '<div class="find-media-dirs">
-				<a href="find.php?directory=', $directory, '&amp;thumbdir='.str_replace($MEDIA_DIRECTORY, $MEDIA_DIRECTORY.'thumbs', $directory).'&amp;level=',$level,$thumbget, '&amp;external_links=http&amp;type=media&amp;choose=', $choose, '">', WT_I18N::translate('External objects'), '</a>';
+				<a href="find.php?directory=', $directory, '&amp;thumbdir='.str_replace($MEDIA_DIRECTORY, $MEDIA_DIRECTORY.'thumbs', $directory).'&amp;level=',$level,$thumbget, '&amp;external_links=http&amp;type=media&amp;choose=', $choose, '&amp;filter=', htmlspecialchars($filter), '&amp;action=filter">', WT_I18N::translate('External objects'), '</a>';
 			echo '</div>';
 			foreach ($dirs as $indexval => $dir) {
 				echo '<div class="find-media-dirs">
-					<a href="find.php?directory=', $directory.$dir, '/&amp;thumbdir=', $directory.$dir, '&amp;level=', ($level+1).$thumbget, '&amp;type=media&amp;choose=', $choose, '"><span dir="ltr">', $dir, '</span></a>
+					<a href="find.php?directory=', $directory.$dir, '/&amp;thumbdir=', $directory.$dir, '&amp;level=', ($level+1).$thumbget, '&amp;type=media&amp;choose=', $choose, '&amp;filter=', htmlspecialchars($filter), '&amp;action=filter"><span dir="ltr">', $dir, '</span></a>
 				</div>';
 			}
 		}
@@ -690,10 +655,10 @@ if ($action=="filter") {
 						//-- name and size field
 						echo '<div class="find-media-details">';
 							if ($media["TITL"] != '') {
-								echo '<p class="find-media-title">', PrintReady($media["TITL"]), '</p>';
+								echo '<p class="find-media-title">', htmlspecialchars($media["TITL"]), '</p>';
 							}
 							if (!$embed) {
-								echo '<p><a href="#" onclick="pasteid(\'', addslashes($media["FILE"]), '\span dir="ltr">', $media["FILE"], '</span></a> -- </p>';
+								echo '<p><a href="#" dir="auto" onclick="pasteid(\'', htmlspecialchars($media['FILE']), '\');">', $media["FILE"], '</a></p>';
 							}
 							else echo '<p><a href="#" onclick="pasteid(\'', $media["XREF"], '\', \'', addslashes($media["TITL"]), '\', \'', addslashes($media["THUMB"]), '\');"><span dir="ltr">', $media["FILE"], '</span></a> -- ';
 							echo "<a href=\"#\" onclick=\"return openImage('", rawurlencode($media["FILE"]), "', $imgwidth, $imgheight);\">", WT_I18N::translate('View'), "</a></p>";
@@ -765,7 +730,7 @@ if ($action=="filter") {
 				uasort($revplacelist, "utf8_strcasecmp");
 				echo '<ul>';
 				foreach ($revplacelist as $place) {
-					echo "<li><a href=\"#\" onclick=\"pasteid('", str_replace(array("'", '"'), array("\'", '&quot;'), $place), "');\">", PrintReady($place), "</a></li>";
+					echo "<li><a href=\"#\" onclick=\"pasteid('", str_replace(array("'", '"'), array("\'", '&quot;'), $place), "');\">", htmlspecialchars($place), "</a></li>";
 				}
 				echo '</ul>
 				<p>', WT_I18N::translate('Places found'), '&nbsp;', $ctplace, '</p>';

@@ -2,7 +2,7 @@
 // Class that defines a media object
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Media.php 13115 2011-12-21 21:46:32Z greg $
+// $Id: Media.php 13875 2012-04-29 15:08:08Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -337,7 +337,6 @@ class WT_Media extends WT_GedcomRecord {
 				$imgsize['adjH']=$imgsize[1]+$addHeight; // adjusted height
 				$imageTypes=array('','GIF','JPG','PNG','SWF','PSD','BMP','TIFF','TIFF','JPC','JP2','JPX','JB2','SWC','IFF','WBMP','XBM');
 				$imgsize['ext']=$imageTypes[0+$imgsize[2]];
-				$imgsize['aspect']=($imgsize[0]>$imgsize[1]) ? 'landscape' : 'portrait';
 				// this is for display purposes, always show non-adjusted info
 				$imgsize['WxH']=/* I18N: image dimensions, width x height */ WT_I18N::translate('%1$s × %2$s pixels', WT_I18N::number($imgsize['0']), WT_I18N::number($imgsize['1']));
 				$imgsize['imgWH']=' width="'.$imgsize['adjW'].'" height="'.$imgsize['adjH'].'" ';
@@ -355,7 +354,6 @@ class WT_Media extends WT_GedcomRecord {
 			$imgsize['adjW']=0;
 			$imgsize['adjH']=0;
 			$imgsize['ext']='';
-			$imgsize['aspect']='';
 			$imgsize['mime']='';
 			$imgsize['WxH']='';
 			$imgsize['imgWH']='';
@@ -426,7 +424,6 @@ class WT_Media extends WT_GedcomRecord {
 				return 'mediafirewall.php?mid='.$this->getXref().$thumbstr.$downloadstr.$separator.'ged='.rawurlencode(get_gedcom_from_id($this->ged_id)).$separator.'cb='.$this->getEtag($which);
 			} else {
 				// file is in standard media directory (or doesn't exist), no need to use media firewall script
-				// definitely don't want icons defined in $WT_IMAGES going through the media firewall
 				if ($separator == '&') {
 					return rawurlencode($this->getLocalFilename($which));
 				} else {
@@ -474,7 +471,7 @@ class WT_Media extends WT_GedcomRecord {
 	 *    'uselightbox_fallback'=>true|false,  default is true - if lb is not available, should we use  fallback javascript (true) or link directly to media viewer (false)
 	 *    'usejavascript'=>true|false,  default is true - set to false to ensure no javascript will be used in the link
 	 *    'clearbox'=>'general'|'general_1' etc
-	 *    'img_title'=>string (optional) - image title to override the default.  must run PrintReady(htmlspecialchars()) priort to sending
+	 *    'img_title'=>string (optional) - image title to override the default.  must run htmlspecialchars() priort to sending
 	 * @return string, suitable for use inside an a tag: '<a href="'.$this->getHtmlUrlSnippet().'">';
 	 */
 	public function getHtmlUrlSnippet(array $config = array()) {
@@ -504,22 +501,22 @@ class WT_Media extends WT_GedcomRecord {
 				// Lightbox is installed
 				switch ($urltype) {
 				case 'url_flv':
-					$url = 'js/jw_player/flvVideo.php?flvVideo='.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . $config['img_title'] . "::" . $notes;
+					$url = 'js/jw_player/flvVideo.php?flvVideo='.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . htmlspecialchars($config['img_title']) . "::" . htmlspecialchars($notes);
 					break 2;
 				case 'local_flv':
-					$url = 'js/jw_player/flvVideo.php?flvVideo='.WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . $config['img_title'] . "::" . $notes;
+					$url = 'js/jw_player/flvVideo.php?flvVideo='.WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . htmlspecialchars($config['img_title']) . "::" . htmlspecialchars($notes);
 					break 2;
 				case 'url_audio':
 				case 'url_wmv':
-					$url = 'js/jw_player/wmvVideo.php?wmvVideo='.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . $config['img_title'] . "::" . $notes;
+					$url = 'js/jw_player/wmvVideo.php?wmvVideo='.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . htmlspecialchars($config['img_title']) . "::" . htmlspecialchars($notes);
 					break 2;
 				case 'local_audio':
 				case 'local_wmv':
-					$url = 'js/jw_player/wmvVideo.php?wmvVideo='.WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . $config['img_title'] . "::" . $notes;
+					$url = 'js/jw_player/wmvVideo.php?wmvVideo='.WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . htmlspecialchars($config['img_title']) . "::" . htmlspecialchars($notes);
 					break 2;
 				case 'url_image':
 				case 'local_image':
-					$url = $this->getHtmlUrlDirect('main') . "\" rel=\"clearbox[" . $config['clearbox'] . "]\" rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . $config['img_title'] . "::" . $notes;
+					$url = $this->getHtmlUrlDirect('main') . "\" rel=\"clearbox[" . $config['clearbox'] . "]\" rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . htmlspecialchars($config['img_title']) . "::" . htmlspecialchars($notes);
 					break 2;
 				case 'url_picasa':
 				case 'url_page':
@@ -530,7 +527,7 @@ class WT_Media extends WT_GedcomRecord {
 				case 'local_page':
 				case 'local_pdf':
 				case 'local_document':
-					$url = $this->getHtmlUrlDirect('main') . "\" rel='clearbox(" . get_module_setting('lightbox', 'LB_URL_WIDTH',  '1000') . ',' . get_module_setting('lightbox', 'LB_URL_HEIGHT', '600') . ", click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . $config['img_title'] . "::" . $notes;
+					$url = $this->getHtmlUrlDirect('main') . "\" rel='clearbox(" . get_module_setting('lightbox', 'LB_URL_WIDTH',  '1000') . ',' . get_module_setting('lightbox', 'LB_URL_HEIGHT', '600') . ", click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . htmlspecialchars($config['img_title']) . "::" . htmlspecialchars($notes);
 					break 2;
 				case 'url_streetview':
 					// need to call getHtmlForStreetview() instead of getHtmlUrlSnippet()
@@ -588,8 +585,8 @@ class WT_Media extends WT_GedcomRecord {
 			} else {
 				$imgsize = $this->getImageAttributes('main',40,150);
 				if ($imgsize['0']) {
-					$jsurl = str_replace('mediaviewer.php?','imageview.php?', $this->getRawUrl());
-					$url = "#\" onclick=\"return openImage('".$jsurl."', ".$imgsize['adjW'].", ".$imgsize['adjH'].");";
+					$url = str_replace('mediaviewer.php?','imageview.php?', $this->getHtmlUrl());
+					$url = "#\" onclick=\"return openImage('".$url."', ".$imgsize['adjW'].", ".$imgsize['adjH'].");";
 				} else {
 					$url = $this->getHtmlUrl();
 				}
@@ -607,7 +604,7 @@ class WT_Media extends WT_GedcomRecord {
 	 *    'display_type'=>'normal'|'pedigree_person'|'treeview'|'googlemap' the type of image this is
 	 *    'img_id'=>string (optional) - if this image needs an id, set it here
 	 *    'class'=>string (optional) - class to assign to image
-	 *    'img_title'=>string (optional) - image title to override the default.  must run PrintReady(htmlspecialchars()) priort to sending
+	 *    'img_title'=>string (optional) - image title to override the default.  must run htmlspecialchars() priort to sending
 	 *    'addslashes'=>true|false, default is false - if result will be stored in javascript array (such as googlemaps) set to true
 	 *    'oktolink'=>true|false, default is true - whether to include link to main image
 	 *    'alertnotfound'=>true|false, default is false - whether to display error when main image is missing
@@ -638,23 +635,20 @@ class WT_Media extends WT_GedcomRecord {
 				$config['uselightbox_fallback']=false;
 				$config['clearbox']='general_2';        
 				$imgsizeped=$this->getImageAttributes('thumb');
-				$config['class']='pedigree_image_'.$imgsizeped['aspect'];
-				if ($TEXT_DIRECTION == "rtl") $config['class'] .= "_rtl";
+				$config['class']='pedigree_image';
 			}
 			if ($config['display_type']=='treeview') {
 				// 
 				$config['uselightbox_fallback']=false;
 				$imgsizeped=$this->getImageAttributes('thumb');
-				$config['class']='tv_link pedigree_image_'.$imgsizeped['aspect'];
-				if ($TEXT_DIRECTION == "rtl") $config['class'] .= "_rtl";
+				$config['class']='tv_link pedigree_image';
 			}
 			if ($config['display_type']=='googlemap') {
 				// used on google maps tab on indi page
 				$config['oktolink']=false;
 				$config['addslashes']=true;
 				$imgsizeped=$this->getImageAttributes('thumb');
-				$config['class']='pedigree_image_'.$imgsizeped['aspect'];
-				if ($TEXT_DIRECTION == "rtl") $config['class'] .= "_rtl";
+				$config['class']='pedigree_image';
 			}
 
 			$mainexists=$this->isExternal() || $this->fileExists('main');

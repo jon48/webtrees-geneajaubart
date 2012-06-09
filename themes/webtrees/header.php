@@ -2,7 +2,7 @@
 // Header for webtrees theme
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 13299 2012-01-20 20:40:31Z greg $
+// $Id: header.php 13709 2012-03-28 13:33:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -78,14 +78,15 @@ if ($view!='simple') {
 	if ($menu) {
 		echo $menu->GetMenuAsList();
 	}
-	echo '</ul><div class="title">',
+	global $WT_IMAGES;
+	echo '</ul><div class="title" dir="auto">',
 		htmlspecialchars($GEDCOM_TITLE),
 		'</div>',
 		'<div class="header_search">',
 		'<form action="search.php" method="post">',
 		'<input type="hidden" name="action" value="general">',
 		'<input type="hidden" name="topsearch" value="yes">',
-		'<input type="text" name="query" size="25" placeholder="', WT_I18N::translate('Search'), '">',
+		'<input type="search" name="query" size="25" placeholder="', WT_I18N::translate('Search'), '" dir="auto">',
 		'<input type="image" class="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '">',
 		'</form>',
 		'</div>';

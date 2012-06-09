@@ -21,36 +21,21 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: descendancy.php 13276 2012-01-18 08:11:02Z greg $
+// $Id: descendancy.php 13950 2012-05-29 06:28:25Z greg $
 
 define('WT_SCRIPT_NAME', 'descendancy.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
-// -- array of GEDCOM elements that will be found but should not be displayed
-$nonfacts[] = 'FAMS';
-$nonfacts[] = 'FAMC';
-$nonfacts[] = 'MAY';
-$nonfacts[] = 'BLOB';
-$nonfacts[] = 'CHIL';
-$nonfacts[] = 'HUSB';
-$nonfacts[] = 'WIFE';
-$nonfacts[] = 'RFN';
-$nonfacts[] = '';
-$nonfamfacts[] = 'UID';
-$nonfamfacts[] = '';
-
 $controller=new WT_Controller_Descendancy();
 $controller
 	->pageHeader()
-	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }'); // For the "find indi" link
-
-if ($ENABLE_AUTOCOMPLETE) {
-	require WT_ROOT.'js/autocomplete.js.htm';
-}
+	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the "find indi" link
+	->addExternalJavaScript('js/autocomplete.js');
 
 if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
+	$album = new lightbox_WT_Module();
+	$album->getPreLoadContent();
 }
 
 echo '<table><tr><td valign="top"><h2>', $controller->getPageTitle(), '</h2>';
@@ -61,8 +46,8 @@ echo '<table class="list_table">';
 echo '<tr><td class="descriptionbox">';
 echo WT_I18N::translate('Individual'), '</td>';
 echo '<td class="optionbox">';
-echo '<input class="pedigree_form" type="text" id="rootid" name="rootid" size="3" value="', $controller->rootid, '">';
-print_findindi_link("rootid", "");
+echo '<input class="pedigree_form" type="text" id="rootid" name="rootid" size="3" value="', $controller->rootid, '"> ';
+echo print_findindi_link('rootid');
 echo '</td>';
 echo '<td class="descriptionbox">';
 echo WT_I18N::translate('Box width'), '</td>';

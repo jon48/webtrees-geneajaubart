@@ -21,14 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Fanchart.php 13282 2012-01-18 21:22:37Z greg $
+// $Id: Fanchart.php 13820 2012-04-17 08:25:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-require_once WT_ROOT.'includes/functions/functions_charts.php';
 
 class WT_Controller_Fanchart extends WT_Controller_Chart {
 	// Variables for the view
@@ -131,7 +129,7 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 	 * print ancestors on a fan chart
 	 */
 	public function generate_fan_chart() {
-		global $WT_IMAGES, $GEDCOM, $fanChart;
+		global $GEDCOM, $fanChart;
 
 		$treeid=ancestry_array($this->root->getXref(), $this->generations);
 		$fanw  =640*$this->fan_width/100;
@@ -140,13 +138,9 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 
 		// check for GD 2.x library
 		if (!defined("IMG_ARC_PIE")) {
-			$html.= "<span class=\"error\">".WT_I18N::translate('PHP server misconfiguration: GD 2.x library required to use image functions.')."</span>";
-			$html.= " <a href=\"" . WT_I18N::translate('http://www.php.net/gd') . "\"><img src=\"".$WT_IMAGES["help"]."\" class=\"icon\" alt=\"\"></a><br><br>";
 			return false;
 		}
 		if (!function_exists("ImageTtfBbox")) {
-			$html.= "<span class=\"error\">".WT_I18N::translate('PHP server misconfiguration: FreeType library required to use TrueType fonts.')."</span>";
-			$html.= " <a href=\"" . WT_I18N::translate('http://www.php.net/gd') . "\"><img src=\"".$WT_IMAGES["help"]."\" class=\"icon\" alt=\"\"></a><br><br>";
 			return false;
 		}
 

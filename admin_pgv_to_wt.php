@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_pgv_to_wt.php 13299 2012-01-20 20:40:31Z greg $
+// $Id: admin_pgv_to_wt.php 13958 2012-06-01 17:38:56Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_pgv_to_wt.php');
 require './includes/session.php';
@@ -161,8 +161,8 @@ WT_DB::exec("START TRANSACTION");
 // Delete the existing user accounts, and any information associated with it
 WT_DB::exec("UPDATE `##log` SET user_id=NULL");
 WT_DB::exec("DELETE FROM `##change`");
-WT_DB::exec("DELETE FROM `##block_setting`");
-WT_DB::exec("DELETE FROM `##block`");
+WT_DB::exec("DELETE `##block_setting` FROM `##block_setting` JOIN  `##block` USING (block_id) WHERE user_id>0 OR gedcom_id>0");
+WT_DB::exec("DELETE FROM `##block`               WHERE user_id>0 OR gedcom_id>0");
 WT_DB::exec("DELETE FROM `##message`");
 WT_DB::exec("DELETE FROM `##user_gedcom_setting` WHERE user_id>0");
 WT_DB::exec("DELETE FROM `##user_setting`        WHERE user_id>0");
@@ -637,7 +637,6 @@ foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
 	@set_gedcom_setting($ged_id, 'COMMON_NAMES_THRESHOLD',       $COMMON_NAMES_THRESHOLD);
 	@set_gedcom_setting($ged_id, 'CONTACT_USER_ID',              get_user_id($CONTACT_EMAIL));
 	@set_gedcom_setting($ged_id, 'DEFAULT_PEDIGREE_GENERATIONS', $DEFAULT_PEDIGREE_GENERATIONS);
-	@set_gedcom_setting($ged_id, 'ENABLE_AUTOCOMPLETE',          $ENABLE_AUTOCOMPLETE);
 	@set_gedcom_setting($ged_id, 'EXPAND_NOTES',                 $EXPAND_NOTES);
 	@set_gedcom_setting($ged_id, 'EXPAND_RELATIVES_EVENTS',      $EXPAND_RELATIVES_EVENTS);
 	@set_gedcom_setting($ged_id, 'EXPAND_SOURCES',               $EXPAND_SOURCES);
@@ -756,7 +755,6 @@ foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
 	default:                   @set_gedcom_setting($ged_id, 'THEME_DIR', 'webtrees');
 	}
 	@set_gedcom_setting($ged_id, 'THUMBNAIL_WIDTH',              $THUMBNAIL_WIDTH);
-	@set_gedcom_setting($ged_id, 'UNDERLINE_NAME_QUOTES',        $UNDERLINE_NAME_QUOTES);
 	@set_gedcom_setting($ged_id, 'USE_GEONAMES',                 $USE_GEONAMES);
 	@set_gedcom_setting($ged_id, 'USE_MEDIA_FIREWALL',           $USE_MEDIA_FIREWALL);
 	@set_gedcom_setting($ged_id, 'USE_MEDIA_VIEWER',             $USE_MEDIA_VIEWER);
@@ -917,26 +915,14 @@ WT_DB::prepare(
 
 ////////////////////////////////////////////////////////////////////////////////
 
-echo '<p>pgv_favorites => wt_favorites ...</p>'; ob_flush(); flush(); usleep(50000);
+echo '<p>pgv_favorites => wt_favorite ...</p>'; ob_flush(); flush(); usleep(50000);
 try {
-	WT_DB::exec(
-		"CREATE TABLE IF NOT EXISTS `##favorites` (".
-		" fv_id       INTEGER AUTO_INCREMENT NOT NULL,".
-		" fv_username VARCHAR(32)            NOT NULL,".
-		" fv_gid      VARCHAR(20)                NULL,".
-		" fv_type     VARCHAR(15)                NULL,".
-		" fv_file     VARCHAR(100)               NULL,".
-		" fv_url      VARCHAR(255)               NULL,".
-		" fv_title    VARCHAR(255)               NULL,".
-		" fv_note     TEXT                       NULL,".
-		" PRIMARY KEY (fv_id),".
-		"         KEY ix1 (fv_username)".
-		") COLLATE utf8_unicode_ci ENGINE=InnoDB"
-	);
-
 	WT_DB::prepare(
-		"REPLACE INTO `##favorites` (fv_id, fv_username, fv_gid, fv_type, fv_file, fv_url, fv_title, fv_note)".
-		" SELECT fv_id, fv_username, fv_gid, fv_type, fv_file, fv_url, fv_title, fv_note FROM `{$DBNAME}`.`{$TBLPREFIX}favorites`"
+		"REPLACE INTO `##favorite` (favorite_id, user_id, gedcom_id, xref, favorite_type, url, title, note)".
+		" SELECT fv_id, u.user_id, g.gedcom_id, fv_gid, fv_type, fv_url, fv_title, fv_note".
+		" FROM `{$DBNAME}`.`{$TBLPREFIX}favorites` f".
+		" LEFT JOIN `##gedcom` g ON (f.fv_username=g.gedcom_name)".
+		" LEFT JOIN `##user`   u ON (f.fv_username=u.user_name)"
 	)->execute();
 } catch (PDOException $ex) {
 	// This table will only exist if the favorites module is installed in WT
@@ -946,21 +932,12 @@ try {
 
 echo '<p>pgv_news => wt_news ...</p>'; ob_flush(); flush(); usleep(50000);
 try {
-	WT_DB::exec(
-		"CREATE TABLE IF NOT EXISTS `##news` (".
-		" n_id       INTEGER AUTO_INCREMENT NOT NULL,".
-		" n_username VARCHAR(100)           NOT NULL,".
-		" n_date     INTEGER                NOT NULL,".
-		" n_title    VARCHAR(255)           NOT NULL,".
-		" n_text     TEXT                   NOT NULL,".
-		" PRIMARY KEY     (n_id),".
-		"         KEY ix1 (n_username)".
-		") COLLATE utf8_unicode_ci ENGINE=InnoDB"
-	);
-
 	WT_DB::prepare(
-		"REPLACE INTO `##news` (n_id, n_username, n_date, n_title, n_text)".
-		" SELECT n_id, n_username, n_date, n_title, n_text FROM `{$DBNAME}`.`{$TBLPREFIX}news`"
+		"REPLACE INTO `##news` (news_id, user_id, gedcom_id, subject, body, updated)".
+		" SELECT n_id, u.user_id, g.gedcom_id, n_title, n_text, FROM_UNIXTIME(n_date)".
+		" FROM `{$DBNAME}`.`{$TBLPREFIX}news` n".
+		" LEFT JOIN `##gedcom` g ON (n.n_username=g.gedcom_name)".
+		" LEFT JOIN `##user` u ON (n.n_username=u.user_name)"
 	)->execute();
 } catch (PDOException $ex) {
 	// This table will only exist if the news/blog module is installed in WT
@@ -971,7 +948,9 @@ try {
 echo '<p>pgv_nextid => wt_next_id ...</p>'; ob_flush(); flush(); usleep(50000);
 WT_DB::prepare(
 	"REPLACE INTO `##next_id` (gedcom_id, record_type, next_id)".
-	" SELECT ni_gedfile, ni_type, ni_id FROM `{$DBNAME}`.`{$TBLPREFIX}nextid`".
+	" SELECT ni_gedfile, ni_type, ni_id".
+	" FROM `{$DBNAME}`.`{$TBLPREFIX}nextid`".
+	" JOIN `##gedcom` ON (ni_gedfile = gedcom_id)".
 	" WHERE ni_type IN ('INDI', 'FAM', 'SOUR', 'REPO', 'OBJE', 'NOTE')"
 )->execute();
 
@@ -1058,32 +1037,11 @@ WT_DB::prepare(
 ////////////////////////////////////////////////////////////////////////////////
 
 try {
-	if ($DBNAME.$TBLPREFIX.'placelocation') {
-		echo '<p>pgv_placelocation => wt_placelocation ...</p>'; ob_flush(); flush(); usleep(50000);
-		WT_DB::exec(
-		"CREATE TABLE IF NOT EXISTS `##placelocation` (".
-		" pl_id        INTEGER      NOT NULL,".
-		" pl_parent_id INTEGER          NULL,".
-		" pl_level     INTEGER          NULL,".
-		" pl_place     VARCHAR(255)     NULL,".
-		" pl_long      VARCHAR(30)      NULL,".
-		" pl_lati      VARCHAR(30)      NULL,".
-		" pl_zoom      INTEGER          NULL,".
-		" pl_icon      VARCHAR(255)     NULL,".
-		" PRIMARY KEY     (pl_id),".
-		"         KEY ix1 (pl_level),".
-		"         KEY ix2 (pl_long),".
-		"         KEY ix3 (pl_lati),".
-		"         KEY ix4 (pl_place),".
-		"         KEY ix5 (pl_parent_id)".
-		") COLLATE utf8_unicode_ci ENGINE=InnoDB"
-		);
-
-		WT_DB::prepare(
-			"REPLACE INTO `##placelocation` (pl_id, pl_parent_id, pl_level, pl_place, pl_long, pl_lati, pl_zoom, pl_icon)".
-			" SELECT pl_id, pl_parent_id, pl_level, pl_place, pl_long, pl_lati, pl_zoom, pl_icon FROM `{$DBNAME}`.`{$TBLPREFIX}placelocation`"
-		)->execute();
-	}
+	echo '<p>pgv_placelocation => wt_placelocation ...</p>'; ob_flush(); flush(); usleep(50000);
+	WT_DB::prepare(
+		"REPLACE INTO `##placelocation` (pl_id, pl_parent_id, pl_level, pl_place, pl_long, pl_lati, pl_zoom, pl_icon)".
+		" SELECT pl_id, pl_parent_id, pl_level, pl_place, pl_long, pl_lati, pl_zoom, pl_icon FROM `{$DBNAME}`.`{$TBLPREFIX}placelocation`"
+	)->execute();
 } catch (PDOexception $ex) {
 	// This table will only exist if the gm module is installed in PGV/WT
 }

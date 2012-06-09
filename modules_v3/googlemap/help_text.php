@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: help_text.php 13398 2012-02-06 22:57:50Z nigel $
+// $Id: help_text.php 13722 2012-03-30 10:19:46Z greg $
 
 if (!defined('WT_WEBTREES') || !defined('WT_SCRIPT_NAME') || WT_SCRIPT_NAME!='help_text.php') {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,17 +29,6 @@ if (!defined('WT_WEBTREES') || !defined('WT_SCRIPT_NAME') || WT_SCRIPT_NAME!='he
 }
 
 switch ($help) {
-
-case 'GOOGLEMAP_MAP_TYPE':
-	$title=WT_I18N::translate('Default map type');
-	$text=WT_I18N::translate('The type of map that will be shown by default. This can be Map, Satellite, Hybrid or Terrain.');
-	break;
-
-case 'GOOGLEMAP_MAP_SIZE':
-	$title=WT_I18N::translate('Size of map (in pixels)');
-	$text=WT_I18N::translate('The size of the map (in pixels) as shown on the Individual pages.');
-	break;
-
 case 'GOOGLEMAP_MAP_ZOOM':
 	$title=WT_I18N::translate('Zoom factor of map');
 	$text=WT_I18N::translate('Minimum and maximum zoom factor for the Google map. 1 is the full map, 15 is single house. Note that 15 is only available in certain areas.');
@@ -55,54 +44,9 @@ case 'GM_DEFAULT_LEVEL_0':
 	$text=WT_I18N::translate('Here the default level for the highest level in the place-hierarchy can be defined. If a place cannot be found this name is added as the highest level (country) and the database is searched again.');
 	break;
 
-case 'GM_NAME_PREFIX':
-	$title=WT_I18N::translate('Prefix for names used on this level');
-	$text=WT_I18N::translate('This value will be added to the front of the names on this level. Multiple values can be used, seperated by semicolons.');
-	break;
-
-case 'GM_NAME_POSTFIX':
-	$title=WT_I18N::translate('Postfix for names used on this level');
-	$text=WT_I18N::translate('This value will be added to the back of the names on this level. Multiple values can be used, seperated by semilcolons.');
-	break;
-
-case 'GM_NAME_PRE_POST':
-	$title=WT_I18N::translate('Prefix / Postfix order');
-	$text=WT_I18N::translate('This field indicates the order in which names are tried using the prefix and postfix. The possible values are:<br /><ul><li>No pre/postfix</li><li>Normal name, Prefix, Postfix, both</li><li>Normal name, Postfix, Prefix, both</li><li>Prefix, Postfix, both, Normal name</li><li>Postfix, Prefix, both, Normal name</li><li>Prefix, Postfix, Normal name, both</li><li>Postfix, Prefix, Normal name, both</li></ul>');
-	break;
-
-case 'PL_EDIT_LOCATION':
-	$title=WT_I18N::translate('Edit or delete location');
-	$text=WT_I18N::translate('Here you can edit the location or delete the location. When you click on Edit a new window will open where you can change the values of the geographic location.<br />If you click on the delete-icon the record will be deleted. This can only be done if there are no records connected to this location. If no records are connected the delete-icon is active, otherwise it is inactive.');
-	break;
-
-case 'PL_ADD_LOCATION':
-	$title=WT_I18N::translate('Add geographic location');
-	$text=WT_I18N::translate('Use this to add a place to the location table. The location will be added at this level.');
-	break;
-
-case 'PL_IMPORT_GEDCOM':
-	$title=WT_I18N::translate('Import geographic locations from GEDCOM');
-	$text=WT_I18N::translate('Import geographic location-data from current GEDCOM. The current GEDCOM will be scanned and all places will be added to the table. If latitude and longitude are available these will also be imported.');
-	break;
-
-case 'PL_IMPORT_ALL_GEDCOM':
-	$title=WT_I18N::translate('Import geographic locations from all GEDCOMs');
-	$text=WT_I18N::translate('Import geographic location-data from all GEDCOMs. All GEDCOMs will be scanned and all places will be added to the table. If latitude and longitude are available these will also be imported.');
-	break;
-
-case 'PL_IMPORT_FILE':
-	$title=WT_I18N::translate('Import geographic locations from file');
-	$text=WT_I18N::translate('Import geographic location data from a file. The file should be formatted as CSV file on the local computer. The record separator used within the lines is \';\'.');
-	break;
-
-case 'PL_EXPORT_FILE':
-	$title=WT_I18N::translate('Export locations to file');
-	$text=WT_I18N::translate('Export location data to a file. This option will save the data from the current view and all dependant data to a file. This means that if a country is selected and the states are shown, this option will save the data of the states, all the counties that are defined in those states and all places within those counties.');
-	break;
-
-case 'PL_EXPORT_ALL_FILE':
-	$title=WT_I18N::translate('Export all locations to file');
-	$text=WT_I18N::translate('Export all location data to a file. This option will save all location data and transfer it to the local computer.');
+case 'GM_NAME_PREFIX_SUFFIX':
+	$title=WT_I18N::translate('Optional prefixes and suffixes');
+	$text=WT_I18N::translate('Some place names may be written with optional prefixes and suffixes.  For example “Orange” versus “Orange County”.  If the family tree contains the full place names, but the geographic database contains the short place names, then you should specify a list of the prefixes and suffixes to be disregarded.  Multiple options should be separated with semicolons.  For example “County;County of” or “Township;Twp;Twp.”.');
 	break;
 
 case 'GOOGLEMAP_COORD':
@@ -132,29 +76,9 @@ case 'PLE_FLAGS':
 	$text=WT_I18N::translate('Using the pull down menu it is possible to select a country, of which a flag can be selected. If no flags are shown, then there are no flags defined for this country.');
 	break;
 
-case 'PLIF_FILENAME':
-	$title=WT_I18N::translate('Enter filename');
-	$text=WT_I18N::translate('Browse for the file on your computer which contains the place locations in CSV format.');
-	break;
-
 case 'PLIF_LOCALFILE':
 	$title=WT_I18N::translate('Enter filename');
 	$text=WT_I18N::translate('Select a file from the list of files already on the server which contains the place locations in CSV format.');
-	break;
-
-case 'PLIF_CLEAN':
-	$title=WT_I18N::translate('Clear all place-locations before import?');
-	$text=WT_I18N::translate('When this option is selected the placelocation database will be cleared. This means that only the location stored in this table will be deleted. This will not change anything in the GEDCOM.');
-	break;
-
-case 'PLIF_UPDATE':
-	$title=WT_I18N::translate('Update existing records');
-	$text=WT_I18N::translate('Only update existing records.<br />When this option is selected only existing records will be updated. This can be used to fill in latitude and longitude of places that have been imported from a GEDCOM. No new places will be added to the database.');
-	break;
-
-case 'PLIF_OVERWRITE':
-	$title=WT_I18N::translate('Overwrite location data');
-	$text=WT_I18N::translate('Overwrite location data in the database with data from the file.<br />When this option is selected, the location data in the database (latitude, longitude, zoomlevel and flag) are overwritten with the data in the file, if available. If the record is not already in the database a new record will be created, unless the Update-only  option is also selected.');
 	break;
 
 case 'PLE_ACTIVE':
@@ -167,65 +91,7 @@ case 'PLE_ACTIVE':
 		'</p>';
 	break;
 
-// Help text for placecheck.php
-
-case 'GOOGLEMAP_PLACECHECK':
-	$title=WT_I18N::translate('Place Check');
-	$text=WT_I18N::translate('<strong>This tool</strong> provides a way to compare places in your gedcom file with the matching entries in the googlemaps \'placelocations\' table.<br /><br /><strong>The display</strong> can be structured for a specific gedcom file; for a specific country within that file; and for a particular area (e.g. state or county) within that country.<br /><br /><strong>Places</strong>are listed alphabetically so that minor spelling differences can be easily spotted, and corrected.<br /><br /><strong>From</strong> the results of the comparison you can click on place names for one of these three options:<br /><br /><strong>1 - </strong>For gedcom file places you will be taken to the Place Heirarchy view. Here you will see all records that are linked to that place.<br /><br /><strong>2 - </strong>For places that exist in the gedcom file, but not in the googlemap table (highlighted in red), you will get the googlemap \"Add place\" screen.<br /><br /><strong>3 - </strong>For places that exist in both the gedcom file and the googlemap table (perhaps without coordinates) you will get the googlemap \"edit place\" screen. Here you can edit any aspect of the place record for the googlemap display.<br /><br /><strong>Hovering</strong> over any place in the googlemap table columns will display the zoom level curently set for that place.');
-	break;
-
-case 'PLACECHECK_FILTER':
-	$title=WT_I18N::translate('Place Check - List Filtering Optons');
-	$text=WT_I18N::translate('This section includes options to limit or extend the scope of the listed places.<br /><br />It is hoped to add more options in the future.');
-	break;
-
-case 'PLACECHECK_MATCH':
-	$title=WT_I18N::translate('Include matched places');
-	$text=WT_I18N::translate('By default the list does NOT INCLUDE places that are fully matched between the GEDCOM file and the GoogleMap tables.<br />Fully matched means all levels exist in both the gedcom file and the GoogleMap tables; and the GoogleMap places have coordinates for every level.<br /><br />Check this block to include those matched places.');
-	break;
-
-case 'PLACECHECK_KEY':
-	$title=WT_I18N::translate('Key to colors used below');
-	$text=
-		'<table border="1" cellspacing="0" cellpadding="3"><tr><td style="color:red;">'.
-		WT_Gedcom_Tag::getLabel('PLAC').
-		'</td><td style="color:red;" class="center"><strong>X</strong></td><td class="center" style="color:red;"><strong>X</strong></td><td style="font-size:85%; white-space:normal;">'.
-		WT_I18N::translate('This place and its coordinates do not exist in the GoogleMap tables.').
-		'</td></tr><tr><td style="color:blue;">'.
-		WT_Gedcom_Tag::getLabel('PLAC').
-		'</td><td style="color:red;" class="center"><strong>X</strong></td><td class="center" style="color:red;"><strong>X</strong></td><td style="font-size:85%; white-space:normal;">'.
-		WT_I18N::translate('This place exists in the GoogleMap tables, but has no coordinates.').
-		'</td></tr><tr><td><strong>'.
-		WT_I18N::translate('unknown').
-		'</td><td style="color:red;" class="center"><strong>X</strong></td><td class="center" style="color:red;"><strong>X</strong></td><td style="font-size:85%; white-space:normal;">'.
-		WT_I18N::translate('This place level is blank in your GEDCOM file. It should be added to GoogleMap places as "unknown" with coordinates from its parent level before you add any place to the next level.').
-		'</td></tr><tr><td style="color:blue;">'.
-		WT_I18N::translate('unknown').
-		'</td><td class="center">N55.0</td><td class="center">W85.0</td><td style="font-size:85%; white-space:normal;">'.
-		WT_I18N::translate('This place level is blank in your GEDCOM file, but exists as "unknown" in the GoogleMap places table with coordinates. No action required until the missing level can be entered.').
-		'</td></tr></table>';
-
-	
-	
-	
-	break;
-
 // Help text for Place Hierarchy display
-
-case 'GOOGLEMAP_PH':
-	$title=WT_I18N::translate('Use Googlemap for Place Hierarchy');
-	$text=WT_I18N::translate('Use this option to enable (Yes) or disable (No) the ability to substitute Googlemap for <strong>webtrees</strong> usual Place Hierarchy. To be able to set this option to YES, the Googlemap module must be also be enabled. CAUTION: Before using this option, it is recommended that you insert all places currently existing in your GED into the Googlemap tables.');
-	break;
-
-case 'GOOGLEMAP_PH_MAP_SIZE':
-	$title=WT_I18N::translate('Size of Place Hierarchy map (in pixels)');
-	$text=WT_I18N::translate('The size of the map (in pixels) as shown on the Place Hierarchy pages.');
-	break;
-
-case 'GOOGLEMAP_PH_MARKER':
-	$title=WT_I18N::translate('Type of place markers in Place Hierarchy');
-	$text=WT_I18N::translate('Here you can specify what type of marker be able to use (standard or flag). If place has no flag, use standard marker.');
-	break;
 
 case 'GM_DISP_SHORT_PLACE':
 	$title=WT_I18N::translate('Display short placenames');

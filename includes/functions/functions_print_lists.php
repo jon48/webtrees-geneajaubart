@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print_lists.php 13436 2012-02-12 22:02:35Z nigel $
+// $Id: functions_print_lists.php 13943 2012-05-24 06:29:32Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -33,11 +33,9 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-require_once WT_ROOT.'includes/functions/functions_places.php';
-
 // print a table of individuals
 function format_indi_table($datalist, $option='') {
-	global $GEDCOM, $SHOW_LAST_CHANGE, $WT_IMAGES, $SEARCH_SPIDER, $MAX_ALIVE_AGE, $controller;
+	global $GEDCOM, $SHOW_LAST_CHANGE, $SEARCH_SPIDER, $MAX_ALIVE_AGE, $controller;
 
 	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$SHOW_EST_LIST_DATES=get_gedcom_setting(WT_GED_ID, 'SHOW_EST_LIST_DATES');
@@ -81,11 +79,12 @@ function format_indi_table($datalist, $option='') {
 					/* 19 deat plac */ {"sType": "unicode", "sClass": "center"},
 					/* 20 deat sour */ { "iDataSort" : 21, "sClass": "center", "bVisible": '.(WT_Perso_Functions::isIsSourcedModuleOperational() ? 'true' : 'false').' },
 					/* 21 sort sour */ { "bVisible": false},
-					/* 22 CHAN      */ {"bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
-					/* 23 SEX       */ {"bVisible": false},
-					/* 24 BIRT      */ {"bVisible": false},
-					/* 25 DEAT      */ {"bVisible": false},
-					/* 26 TREE      */ {"bVisible": false}
+					/* 22 CHAN      */ {"iDataSort": 23, "bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
+					/* 23 CHAN_sort */ {"bVisible": false},
+					/* 24 SEX       */ {"bVisible": false},
+					/* 25 BIRT      */ {"bVisible": false},
+					/* 26 DEAT      */ {"bVisible": false},
+					/* 27 TREE      */ {"bVisible": false}
 					/* END PERSO */
 				],
 				"aaSorting": [['.($option=='sosa'?'4, "asc"':'1, "asc"').']],
@@ -116,73 +115,73 @@ function format_indi_table($datalist, $option='') {
 			/* Add event listeners for filtering inputs */
 			/* PERSO Modify table to include IsSourced module */
 			jQuery("#SEX_M_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("M", 23 );
+				oTable'.$table_id.'.fnFilter("M", 24 );
 				jQuery("#SEX_M_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#SEX_F_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#SEX_U_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#SEX_F_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("F", 23 );
+				oTable'.$table_id.'.fnFilter("F", 24 );
 				jQuery("#SEX_M_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#SEX_F_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#SEX_U_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#SEX_U_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("U", 23 );
+				oTable'.$table_id.'.fnFilter("U", 24 );
 				jQuery("#SEX_M_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#SEX_F_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#SEX_U_'.$table_id.'").addClass("ui-state-active");
 			});
 			jQuery("#BIRT_YES_'. $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("YES", 24 );
+				oTable'.$table_id.'.fnFilter("YES", 25 );
 				jQuery("#BIRT_YES_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#BIRT_Y100_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#BIRT_Y100_'.$table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("Y100", 24 );
+				oTable'.$table_id.'.fnFilter("Y100", 25 );
 				jQuery("#BIRT_YES_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#BIRT_Y100_'.$table_id.'").addClass("ui-state-active");
 			});
 			jQuery("#DEAT_N_'.   $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("N", 25 );
+				oTable'.$table_id.'.fnFilter("N", 26 );
 				jQuery("#DEAT_N_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#DEAT_Y_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_YES_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_Y100_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#DEAT_Y_'.   $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("^Y", 25, true, false );
+				oTable'.$table_id.'.fnFilter("^Y", 26, true, false );
 				jQuery("#DEAT_N_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_Y_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#DEAT_YES_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_Y100_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#DEAT_YES_'. $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("YES", 25 );
+				oTable'.$table_id.'.fnFilter("YES", 26 );
 				jQuery("#DEAT_N_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_Y_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_YES_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#DEAT_Y100_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#DEAT_Y100_'.$table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("Y100", 25 );
+				oTable'.$table_id.'.fnFilter("Y100", 26 );
 				jQuery("#DEAT_N_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_Y_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_YES_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_Y100_'.$table_id.'").addClass("ui-state-active");
 			});
 			jQuery("#TREE_R_'.   $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("R", 26 );
+				oTable'.$table_id.'.fnFilter("R", 27 );
 				jQuery("#TREE_R_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#TREE_L_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#TREE_L_'.   $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("L", 26 );
+				oTable'.$table_id.'.fnFilter("L", 27 );
 				jQuery("#TREE_R_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#TREE_L_'.$table_id.'").addClass("ui-state-active");
 			});	
 			jQuery("#RESET_'.    $table_id.'").click( function() {
-				for (i=23; i<=26; i++){
+				for (i=24; i<=27; i++){
 					oTable'.$table_id.'.fnFilter("", i );
 				};
 				jQuery("div.filtersH_'.$table_id.' button").removeClass("ui-state-active");
@@ -221,33 +220,34 @@ function format_indi_table($datalist, $option='') {
 	$html .= '<th>SOSA</th>';
 	$html .= '<th>'. WT_Gedcom_Tag::getLabel('BIRT'). '</th>';
 	$html .= '<th>SORT_BIRT</th>';
-	$html .= '<th><img src="'. $WT_IMAGES['reminder']. '" alt="'. WT_I18N::translate('Anniversary'). '" title="'. WT_I18N::translate('Anniversary'). '"></th>';
+	$html .= '<th><i class="icon-reminder" title="'. WT_I18N::translate('Anniversary'). '"></i></th>';
 	$html .= '<th>'. WT_Gedcom_Tag::getLabel('PLAC'). '</th>';
 	//PERSO Modify table to include IsSourced module
 	if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
-		$html .= '<th><img src="'.$WT_IMAGES['source'].'" alt="'.WT_I18N::translate('Sourced birth').'" title="'.WT_I18N::translate('Sourced birth').'" border="0" /></th>'.
+		$html .= '<th><i class="icon-source" title="'.WT_I18N::translate('Sourced birth').'" border="0"></i></th>'.
 			'<th>SORT_BIRTSC</th>';
 	} else {
 		$html .=  '<th></th><th></th>';
 	}
 	//END PERSO
-	$html .= '<th><img src="'. $WT_IMAGES['children']. '" alt="'. WT_I18N::translate('Children'). '" title="'. WT_I18N::translate('Children'). '"></th>';
+	$html .= '<th><i class="icon-children" title="'. WT_I18N::translate('Children'). '"></i></th>';
 	$html .= '<th>NCHI</th>';
 	$html .= '<th>'. WT_Gedcom_Tag::getLabel('DEAT'). '</th>';
 	$html .= '<th>SORT_DEAT</th>';
-	$html .= '<th><img src="'. $WT_IMAGES['reminder']. '" alt="'. WT_I18N::translate('Anniversary'). '" title="'. WT_I18N::translate('Anniversary'). '"></th>';
+	$html .= '<th><i class="icon-reminder" title="'. WT_I18N::translate('Anniversary'). '"></i></th>';
 	$html .= '<th>'. WT_Gedcom_Tag::getLabel('AGE'). '</th>';
 	$html .= '<th>AGE</th>';
 	$html .= '<th>'. WT_Gedcom_Tag::getLabel('PLAC'). '</th>';
 	//PERSO Modify table to include IsSourced module
 	if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
-		$html .=  '<th><img src="'.$WT_IMAGES['source'].'" alt="'.WT_I18N::translate('Sourced death').'" title="'.WT_I18N::translate('Sourced death').'" border="0" /></th>'.
+		$html .=  '<th><i class="icon-source" title="'.WT_I18N::translate('Sourced death').'" border="0"></i></th>'.
 			'<th>SORT_DEATSC</th>';
 	} else {
 		$html .=  '<th></th><th></th>';
 	}
 	//END PERSO
 	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>'. WT_Gedcom_Tag::getLabel('CHAN'). '</th>';
+	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>CHAN</th>';
 	$html .= '<th>SEX</th>';
 	$html .= '<th>BIRT</th>';
 	$html .= '<th>DEAT</th>';
@@ -444,6 +444,12 @@ function format_indi_table($datalist, $option='') {
 		} else {
 			$html .= '<td>&nbsp;</td>';
 		}
+		//-- Last change hidden sort column
+		if ($SHOW_LAST_CHANGE) {
+			$html .= '<td>'. $person->LastChangeTimestamp(true). '</td>';
+		} else {
+			$html .= '<td>&nbsp;</td>';
+		}
 		//-- Sorting by gender
 		$html .= '<td>';
 		$html .= $person->getSex();
@@ -495,7 +501,7 @@ function format_indi_table($datalist, $option='') {
 
 // print a table of families
 function format_fam_table($datalist, $option='') {
-	global $GEDCOM, $SHOW_LAST_CHANGE, $WT_IMAGES, $SEARCH_SPIDER, $controller;
+	global $GEDCOM, $SHOW_LAST_CHANGE, $SEARCH_SPIDER, $controller;
 	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	if ($option=='BIRT_PLAC' || $option=='DEAT_PLAC') return;
 	$html = '';
@@ -534,10 +540,11 @@ function format_fam_table($datalist, $option='') {
 					/* 17 sort sour */ { "bVisible": false},
 					/* 18 children  */ {"iDataSort": 19, "sClass": "center"},
 					/* 19 NCHI      */ {"sType": "numeric", "bVisible": false},
-					/* 20 CHAN      */ {"bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
-					/* 21 MARR      */ {"bVisible": false},
-					/* 22 DEAT      */ {"bVisible": false},
-					/* 23 TREE      */ {"bVisible": false}
+					/* 20 CHAN      */ {"iDataSort": 21, "bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
+					/* 21 CHAN_sort */ {"bVisible": false},
+					/* 22 MARR      */ {"bVisible": false},
+					/* 23 DEAT      */ {"bVisible": false},
+					/* 24 TREE      */ {"bVisible": false}
 					/* END PERSO */
 				],
 				"aaSorting": [[1, "asc"]],
@@ -568,7 +575,7 @@ function format_fam_table($datalist, $option='') {
 			/* Add event listeners for filtering inputs */
 			/* PERSO Modify table to include IsSourced module */		
 			jQuery("#MARR_U_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("U", 21);
+				oTable'.$table_id.'.fnFilter("U", 22);
 				jQuery("#MARR_U_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#MARR_YES_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#MARR_Y100_'.$table_id.'").removeClass("ui-state-active");
@@ -576,7 +583,7 @@ function format_fam_table($datalist, $option='') {
 				jQuery("#MULTI_MARR_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#MARR_YES_'.  $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("YES", 21);
+				oTable'.$table_id.'.fnFilter("YES", 22);
 				jQuery("#MARR_U_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#MARR_YES_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#MARR_Y100_'.$table_id.'").removeClass("ui-state-active");
@@ -584,7 +591,7 @@ function format_fam_table($datalist, $option='') {
 				jQuery("#MULTI_MARR_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#MARR_Y100_'. $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("Y100", 21);
+				oTable'.$table_id.'.fnFilter("Y100", 22);
 				jQuery("#MARR_U_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#MARR_YES_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#MARR_Y100_'.$table_id.'").addClass("ui-state-active");
@@ -592,7 +599,7 @@ function format_fam_table($datalist, $option='') {
 				jQuery("#MULTI_MARR_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#MARR_DIV_'.  $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("D", 21);
+				oTable'.$table_id.'.fnFilter("D", 22);
 				jQuery("#MARR_U_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#MARR_YES_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#MARR_Y100_'.$table_id.'").removeClass("ui-state-active");
@@ -600,7 +607,7 @@ function format_fam_table($datalist, $option='') {
 				jQuery("#MULTI_MARR_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#MULTI_MARR_'.$table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("M", 21);
+				oTable'.$table_id.'.fnFilter("M", 22);
 				jQuery("#MARR_U_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#MARR_YES_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#MARR_Y100_'.$table_id.'").removeClass("ui-state-active");
@@ -608,45 +615,45 @@ function format_fam_table($datalist, $option='') {
 				jQuery("#MULTI_MARR_'.$table_id.'").addClass("ui-state-active");
 			});
 			jQuery("#DEAT_N_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("N", 22);
+				oTable'.$table_id.'.fnFilter("N", 23);
 				jQuery("#DEAT_N_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#DEAT_W_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_H_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_Y_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#DEAT_W_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("W", 22);
+				oTable'.$table_id.'.fnFilter("W", 23);
 				jQuery("#DEAT_N_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_W_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#DEAT_H_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_Y_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#DEAT_H_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("H", 22);
+				oTable'.$table_id.'.fnFilter("H", 23);
 				jQuery("#DEAT_N_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_W_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_H_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#DEAT_Y_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#DEAT_Y_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("Y", 22);
+				oTable'.$table_id.'.fnFilter("Y", 23);
 				jQuery("#DEAT_N_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_W_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_H_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#DEAT_Y_'.$table_id.'").addClass("ui-state-active");
 			});
 			jQuery("#TREE_R_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("R", 23);
+				oTable'.$table_id.'.fnFilter("R", 24);
 				jQuery("#TREE_R_'.$table_id.'").addClass("ui-state-active");
 				jQuery("#TREE_L_'.$table_id.'").removeClass("ui-state-active");
 			});
 			jQuery("#TREE_L_'.    $table_id.'").click( function() {
-				oTable'.$table_id.'.fnFilter("L", 23);
+				oTable'.$table_id.'.fnFilter("L", 24);
 				jQuery("#TREE_R_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#TREE_L_'.$table_id.'").addClass("ui-state-active");
 			});	
 			jQuery("#RESET_'.     $table_id.'").click( function() {
-				for (i=21; i<=23; i++) {
+				for (i=22; i<=24; i++) {
 					oTable'.$table_id.'.fnFilter("", i );
 				};
 				jQuery("div.filtersH_'.$table_id.' button").removeClass("ui-state-active");
@@ -686,19 +693,20 @@ function format_fam_table($datalist, $option='') {
 	$html .= '<th>AGE</th>';
 	$html .= '<th>'. WT_Gedcom_Tag::getLabel('MARR'). '</th>';
 	$html .= '<th>MARR:DATE</th>';
-	$html .= '<th><img src="'. $WT_IMAGES['reminder']. '" alt="'. WT_I18N::translate('Anniversary'). '" title="'. WT_I18N::translate('Anniversary'). '"></th>';
+	$html .= '<th><i class="icon-reminder" title="'. WT_I18N::translate('Anniversary'). '"></i></th>';
 	$html .= '<th>'. WT_Gedcom_Tag::getLabel('PLAC'). '</th>';
 	//PERSO Modify table to include IsSourced module
 	if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
-		$html .= '<th><img src="'.$WT_IMAGES['source'].'" alt="'.WT_I18N::translate('Sourced marriage').'" title="'.WT_I18N::translate('Sourced marriage').'" border="0" /></th>'.
+		$html .= '<th><i class="icon-source" title="'.WT_I18N::translate('Sourced marriage').'" border="0"></i></th>'.
 			'<th>SORT_MARRSC</th>';
 	} else {
 		$html .= '<th>&nbsp;</th><th></th>';
 	}
 	//END PERSO
-	$html .= '<th><img src="'. $WT_IMAGES['children']. '" alt="'. WT_I18N::translate('Children'). '" title="'. WT_I18N::translate('Children'). '"></th>';
+	$html .= '<th><i class="icon-children" title="'. WT_I18N::translate('Children'). '"></i></th>';
 	$html .= '<th>NCHI</th>';
-	$html .= '<th '.($SHOW_LAST_CHANGE?'':'').'>'. WT_Gedcom_Tag::getLabel('CHAN'). '</th>';
+	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>'. WT_Gedcom_Tag::getLabel('CHAN'). '</th>';
+	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>CHAN</th>';
 	$html .= '<th>MARR</th>';
 	$html .= '<th>DEAT</th>';
 	$html .= '<th>TREE</th>';
@@ -913,6 +921,12 @@ function format_fam_table($datalist, $option='') {
 		} else {
 			$html .= '<td>&nbsp;</td>';
 		}
+		//-- Last change hidden sort column
+		if ($SHOW_LAST_CHANGE) {
+			$html .= '<td>'. $family->LastChangeTimestamp(true). '</td>';
+		} else {
+			$html .= '<td>&nbsp;</td>';
+		}
 		//-- Sorting by marriage date
 		$html .= '<td>';
 		if (!$family->canDisplayDetails() || !$mdate->isOK()) {
@@ -971,7 +985,7 @@ function format_fam_table($datalist, $option='') {
 
 // print a table of sources
 function format_sour_table($datalist) {
-	global $SHOW_LAST_CHANGE, $WT_IMAGES, $controller;
+	global $SHOW_LAST_CHANGE, $controller;
 	$html = '';
 	$table_id = "ID".floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
@@ -986,19 +1000,20 @@ function format_sour_table($datalist) {
 				"bAutoWidth":false,
 				"bProcessing": true,
 				"aoColumns": [
-					/*  0 title  */ {"iDataSort": 1},
-					/*  1 TITL   */ {"bVisible": false, "sType": "unicode"},
-					/*  2 author */ {"sType": "unicode"},
-					/*  3 #indi  */ {"iDataSort": 4, "sClass": "center"},
-					/*  4 #INDI  */ {"sType": "numeric", "bVisible": false},
-					/*  5 #fam   */ {"iDataSort": 6, "sClass": "center"},
-					/*  6 #FAM   */ {"sType": "numeric", "bVisible": false},
-					/*  7 #obje  */ {"iDataSort": 8, "sClass": "center"},
-					/*  8 #OBJE  */ {"sType": "numeric", "bVisible": false},
-					/*  9 #note  */ {"iDataSort": 10, "sClass": "center"},
-					/* 10 #NOTE  */ {"sType": "numeric", "bVisible": false},
-					/* 11 CHAN   */ {"bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
-					/* 12 DELETE */ {"bVisible": '.(WT_USER_GEDCOM_ADMIN?'true':'false').', "bSortable": false}
+					/*  0 title		*/ {"iDataSort": 1},
+					/*  1 TITL		*/ {"bVisible": false, "sType": "unicode"},
+					/*  2 author 	*/ {"sType": "unicode"},
+					/*  3 #indi  	*/ {"iDataSort": 4, "sClass": "center"},
+					/*  4 #INDI  	*/ {"sType": "numeric", "bVisible": false},
+					/*  5 #fam   	*/ {"iDataSort": 6, "sClass": "center"},
+					/*  6 #FAM   	*/ {"sType": "numeric", "bVisible": false},
+					/*  7 #obje  	*/ {"iDataSort": 8, "sClass": "center"},
+					/*  8 #OBJE		*/ {"sType": "numeric", "bVisible": false},
+					/*  9 #note		*/ {"iDataSort": 10, "sClass": "center"},
+					/* 10 #NOTE		*/ {"sType": "numeric", "bVisible": false},
+					/* 11 CHAN      */ {"iDataSort": 12, "bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
+					/* 12 CHAN_sort */ {"bVisible": false},
+					/* 13 DELETE 	*/ {"bVisible": '.(WT_USER_GEDCOM_ADMIN?'true':'false').', "bSortable": false}
 				],
 				"iDisplayLength": 20,
 				"sPaginationType": "full_numbers"
@@ -1023,7 +1038,8 @@ function format_sour_table($datalist) {
 	$html .= '<th>#OBJE</th>';
 	$html .= '<th>'. WT_I18N::translate('Shared notes'). '</th>';
 	$html .= '<th>#NOTE</th>';
-	$html .= '<th>'. WT_Gedcom_Tag::getLabel('CHAN'). '</th>';
+	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>'. WT_Gedcom_Tag::getLabel('CHAN'). '</th>';
+	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>CHAN</th>';
 	$html .= '<th>&nbsp;</th>';//delete
 	$html .= '</tr></thead>';
 	//-- table body
@@ -1088,6 +1104,12 @@ function format_sour_table($datalist) {
 		} else {
 			$html .= '<td>&nbsp;</td>';
 		}
+		//-- Last change hidden sort column
+		if ($SHOW_LAST_CHANGE) {
+			$html .= '<td>'. $source->LastChangeTimestamp(true). '</td>';
+		} else {
+			$html .= '<td>&nbsp;</td>';
+		}
 		//-- Delete 
 		if (WT_USER_GEDCOM_ADMIN) {
 			$html .= '<td><div title="'. WT_I18N::translate('Delete'). '" class="deleteicon" onclick="if (confirm(\''. addslashes(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($source->getFullName()))). '\')) jQuery.post(\'action.php\',{action:\'delete-source\',xref:\''. $source->getXref(). '\'},function(){location.reload();})"><span class="link_text">'. WT_I18N::translate('Delete'). '</span></div></td>';
@@ -1103,7 +1125,7 @@ function format_sour_table($datalist) {
 
 // print a table of shared notes
 function format_note_table($datalist) {
-	global $SHOW_LAST_CHANGE, $WT_IMAGES, $controller;
+	global $SHOW_LAST_CHANGE, $controller;
 	$html = '';
 	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
@@ -1118,17 +1140,18 @@ function format_note_table($datalist) {
 			"bAutoWidth":false,
 			"bProcessing": true,
 			"aoColumns": [
-				/*  0 title  */ {"sType": "unicode"},
-				/*  1 #indi  */ {"iDataSort": 2, "sClass": "center"},
-				/*  2 #INDI  */ {"sType": "numeric", "bVisible": false},
-				/*  3 #fam   */ {"iDataSort": 4, "sClass": "center"},
-				/*  4 #FAM   */ {"sType": "numeric", "bVisible": false},
-				/*  5 #obje  */ {"iDataSort": 6, "sClass": "center"},
-				/*  6 #OBJE  */ {"sType": "numeric", "bVisible": false},
-				/*  7 #sour  */ {"iDataSort": 8, "sClass": "center"},
-				/*  8 #SOUR  */ {"sType": "numeric", "bVisible": false},
-				/*  9 CHAN   */ {"bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
-				/* 10 DELETE */ {"bVisible": '.(WT_USER_GEDCOM_ADMIN?'true':'false').', "bSortable": false}
+				/*  0 title  	*/ {"sType": "unicode"},
+				/*  1 #indi  	*/ {"iDataSort": 2, "sClass": "center"},
+				/*  2 #INDI  	*/ {"sType": "numeric", "bVisible": false},
+				/*  3 #fam   	*/ {"iDataSort": 4, "sClass": "center"},
+				/*  4 #FAM   	*/ {"sType": "numeric", "bVisible": false},
+				/*  5 #obje  	*/ {"iDataSort": 6, "sClass": "center"},
+				/*  6 #OBJE  	*/ {"sType": "numeric", "bVisible": false},
+				/*  7 #sour  	*/ {"iDataSort": 8, "sClass": "center"},
+				/*  8 #SOUR  	*/ {"sType": "numeric", "bVisible": false},
+				/*  9 CHAN      */ {"iDataSort": 10, "bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
+				/* 10 CHAN_sort */ {"bVisible": false},
+				/* 11 DELETE 	*/ {"bVisible": '.(WT_USER_GEDCOM_ADMIN?'true':'false').', "bSortable": false}
 			],
 			"iDisplayLength": 20,
 			"sPaginationType": "full_numbers"
@@ -1151,7 +1174,8 @@ function format_note_table($datalist) {
 	$html .= '<th>#OBJE</th>';
 	$html .= '<th>'. WT_I18N::translate('Sources'). '</th>';
 	$html .= '<th>#SOUR</th>';
-	$html .= '<th>'. WT_Gedcom_Tag::getLabel('CHAN'). '</th>';
+	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>'. WT_Gedcom_Tag::getLabel('CHAN'). '</th>';
+	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>CHAN</th>';
 	$html .= '<th>&nbsp;</th>';//delete
 	$html .= '</tr></thead>';
 	//-- table body
@@ -1181,6 +1205,12 @@ function format_note_table($datalist) {
 		} else {
 			$html .= '<td></td>';
 		}
+		//-- Last change hidden sort column
+		if ($SHOW_LAST_CHANGE) {
+			$html .= '<td>'. $note->LastChangeTimestamp(true). '</td>';
+		} else {
+			$html .= '<td>&nbsp;</td>';
+		}
 		//-- Delete 
 		if (WT_USER_GEDCOM_ADMIN) {
 			$html .= '<td><div title="'. WT_I18N::translate('Delete'). '" class="deleteicon" onclick="if (confirm(\''. addslashes(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($note->getFullName()))). '\')) jQuery.post(\'action.php\',{action:\'delete-note\',xref:\''. $note->getXref(). '\'},function(){location.reload();})"><span class="link_text">'. WT_I18N::translate('Delete'). '</span></div></td>';
@@ -1196,7 +1226,7 @@ function format_note_table($datalist) {
 
 // print a table of repositories
 function format_repo_table($repos) {
-	global $SHOW_LAST_CHANGE, $WT_IMAGES, $SEARCH_SPIDER, $controller;
+	global $SHOW_LAST_CHANGE, $SEARCH_SPIDER, $controller;
 	$html = '';
 	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
@@ -1211,11 +1241,12 @@ function format_repo_table($repos) {
 			"bAutoWidth":false,
 			"bProcessing": true,
 			"aoColumns": [
-				/* 0 name   */ {"sType": "unicode"},
-				/* 1 #sour  */ {"iDataSort": 2, "sClass": "center"},
-				/* 2 #SOUR  */ {"sType": "numeric", "bVisible": false},
-				/* 3 CHAN   */ {"bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
-				/* 4 DELETE */ {"bVisible": '.(WT_USER_GEDCOM_ADMIN?'true':'false').', "bSortable": false}
+				/* 0 name   	*/ {"sType": "unicode"},
+				/* 1 #sour  	*/ {"iDataSort": 2, "sClass": "center"},
+				/* 2 #SOUR		*/ {"sType": "numeric", "bVisible": false},
+				/* 3 CHAN		*/ {"iDataSort": 4, "bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
+				/* 4 CHAN_sort	*/ {"bVisible": false},
+				/* 5 DELETE 	*/ {"bVisible": '.(WT_USER_GEDCOM_ADMIN?'true':'false').', "bSortable": false}
 			],
 			"iDisplayLength": 20,
 			"sPaginationType": "full_numbers"
@@ -1232,7 +1263,8 @@ function format_repo_table($repos) {
 	$html .= '<th>'. WT_I18N::translate('Repository name'). '</th>';
 	$html .= '<th>'. WT_I18N::translate('Sources'). '</th>';
 	$html .= '<th>#SOUR</th>';
-	$html .= '<th>'. WT_Gedcom_Tag::getLabel('CHAN'). '</th>';
+	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>'. WT_Gedcom_Tag::getLabel('CHAN'). '</th>';
+	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>CHAN</th>';
 	$html .= '<th>&nbsp;</th>';//delete
 	$html .= '</tr></thead>';
 	//-- table body
@@ -1265,6 +1297,12 @@ function format_repo_table($repos) {
 		} else {
 			$html .= '<td>&nbsp;</td>';
 		}
+		//-- Last change hidden sort column
+		if ($SHOW_LAST_CHANGE) {
+			$html .= '<td>'. $repo->LastChangeTimestamp(true). '</td>';
+		} else {
+			$html .= '<td>&nbsp;</td>';
+		}
 		//-- Delete 
 		if (WT_USER_GEDCOM_ADMIN) {
 			$html .= '<td><div title="'. WT_I18N::translate('Delete'). '" class="deleteicon" onclick="if (confirm(\''. addslashes(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($repo->getFullName()))). '\')) jQuery.post(\'action.php\',{action:\'delete-repository\',xref:\''. $repo->getXref(). '\'},function(){location.reload();})"><span class="link_text">'. WT_I18N::translate('Delete'). '</span></div></td>';
@@ -1280,7 +1318,7 @@ function format_repo_table($repos) {
 
 // print a table of media objects
 function format_media_table($datalist) {
-	global $SHOW_LAST_CHANGE, $WT_IMAGES, $controller;
+	global $SHOW_LAST_CHANGE, $controller;
 	$html = '';
 	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
@@ -1295,15 +1333,16 @@ function format_media_table($datalist) {
 			"bAutoWidth":false,
 			"bProcessing": true,
 			"aoColumns": [
-				/* 0 media  */ {"bSortable": false},
-				/* 1 title  */ {"sType": "unicode"},
-				/* 2 #indi  */ {"iDataSort": 3, "sClass": "center"},
-				/* 3 #INDI  */ {"sType": "numeric", "bVisible": false},
-				/* 4 #fam   */ {"iDataSort": 5, "sClass": "center"},
-				/* 5 #FAM   */ {"sType": "numeric", "bVisible": false},
-				/* 6 #sour  */ {"iDataSort": 7, "sClass": "center"},
-				/* 7 #SOUR  */ {"sType": "numeric", "bVisible": false},
-				/* 8 CHAN   */ {"bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
+				/* 0 media		*/ {"bSortable": false},
+				/* 1 title		*/ {"sType": "unicode"},
+				/* 2 #indi		*/ {"iDataSort": 3, "sClass": "center"},
+				/* 3 #INDI		*/ {"sType": "numeric", "bVisible": false},
+				/* 4 #fam		*/ {"iDataSort": 5, "sClass": "center"},
+				/* 5 #FAM		*/ {"sType": "numeric", "bVisible": false},
+				/* 6 #sour		*/ {"iDataSort": 7, "sClass": "center"},
+				/* 7 #SOUR		*/ {"sType": "numeric", "bVisible": false},
+				/* 8 CHAN		*/ {"iDataSort": 9, "bVisible": '.($SHOW_LAST_CHANGE?'true':'false').'},
+				/* 9 CHAN_sort	*/ {"bVisible": false},
 			],
 			"iDisplayLength": 20,
 			"sPaginationType": "full_numbers"
@@ -1325,7 +1364,8 @@ function format_media_table($datalist) {
 	$html .= '<th>#FAM</th>';
 	$html .= '<th>'. WT_I18N::translate('Sources'). '</th>';
 	$html .= '<th>#SOUR</th>';
-	$html .= '<th>'. WT_Gedcom_Tag::getLabel('CHAN'). '</th>';
+	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>'. WT_Gedcom_Tag::getLabel('CHAN'). '</th>';
+	$html .= '<th' .($SHOW_LAST_CHANGE?'':''). '>CHAN</th>';
 	$html .= '</tr></thead>';
 	//-- table body
 	$html .= '<tbody>';
@@ -1349,7 +1389,6 @@ function format_media_table($datalist) {
 			$html .= highlight_search_hits($name). '</a>';
 			if (WT_USER_CAN_EDIT || WT_USER_CAN_ACCEPT)
 				$html .= '<br><a href="'. $media->getHtmlUrl(). '">'. basename($media->getFilename()). '</a>';
-			if ($media->getNote()) $html .= '<br>'. print_fact_notes('1 NOTE ', $media->getNote(), 1);
 			$html .= '</td>';
 
 			//-- Linked INDIs
@@ -1364,6 +1403,12 @@ function format_media_table($datalist) {
 			//-- Last change
 			if ($SHOW_LAST_CHANGE) {
 				$html .= '<td>'. $media->LastChangeTimestamp(). '</td>';
+			} else {
+				$html .= '<td>&nbsp;</td>';
+			}
+			//-- Last change hidden sort column
+			if ($SHOW_LAST_CHANGE) {
+				$html .= '<td>'. $media->LastChangeTimestamp(true). '</td>';
 			} else {
 				$html .= '<td>&nbsp;</td>';
 			}
@@ -1435,10 +1480,10 @@ function format_surname_table($surnames, $script, $extra = '') {
 		// Multiple surname variants, e.g. von Groot, van Groot, van der Groot, etc.
 		foreach ($surns as $spfxsurn=>$indis) {
 			if ($spfxsurn) {
-				$html.='<a href="'.$url.'">'.htmlspecialchars($spfxsurn).'</a><br>';
+				$html.='<a href="'.$url.'" dir="auto">'.htmlspecialchars($spfxsurn).'</a><br>';
 			} else {
 				// No surname, but a value from "2 SURN"?  A common workaround for toponyms, etc.
-				$html.='<a href="'.$url.'">'.htmlspecialchars($surn).'</a><br>';
+				$html.='<a href="'.$url.'" dir="auto">'.htmlspecialchars($surn).'</a><br>';
 			}
 		}
 		$html.='</td>';
@@ -1497,7 +1542,7 @@ function format_surname_tagcloud($surnames, $script, $totals, $extra ='') {
 	foreach ($surnames as $surn=>$surns) {
 		foreach ($surns as $spfxsurn=>$indis) {
 			$cloud->appendTag(array(
-				'title'=>$totals ? WT_I18N::translate('%1$s (%2$d)', $spfxsurn, count($indis)) : $spfxsurn,
+				'title'=>$totals ? WT_I18N::translate('%1$s (%2$d)', '<span dir="auto">'.$spfxsurn.'</span>', count($indis)) : $spfxsurn,
 				'weight'=>count($indis),
 				'params'=>array(
 					'url'=>$surn ?
@@ -1545,14 +1590,14 @@ function format_surname_list($surnames, $style, $totals, $script, $extra = '') {
 				$first_spfxsurn=$spfxsurn;
 			}
 		}
-		$subhtml='<a href="'.$url.'">'.htmlspecialchars(implode(WT_I18N::$list_separator, array_keys($surns))).'</a>';
+		$subhtml='<a href="'.$url.'" dir="auto">'.htmlspecialchars(implode(WT_I18N::$list_separator, array_keys($surns))).'</a>';
 
 		if ($totals) {
 			$subtotal=0;
 			foreach ($surns as $spfxsurn=>$indis) {
 				$subtotal+=count($indis);
 			}
-			$subhtml.='&nbsp;('.$subtotal.')';
+			$subhtml.='&nbsp;('.WT_I18N::number($subtotal).')';
 		}
 		$html[]=$subhtml;
 
@@ -1561,7 +1606,7 @@ function format_surname_list($surnames, $style, $totals, $script, $extra = '') {
 	case 1:
 		return '<ul><li>'.implode('</li><li>', $html).'</li></ul>';
 	case 2:
-		return implode('; ', $html);
+		return implode(WT_I18N::$list_separator, $html);
 	case 3:
 		$i = 0;
 		$count = count($html);
@@ -1633,7 +1678,7 @@ function print_changes_list($change_ids, $sort) {
 
 // print a table of recent changes
 function print_changes_table($change_ids, $sort) {
-	global $WT_IMAGES, $controller;
+	global $controller;
 
 	$return = '';
 	$n = 0;
@@ -1676,15 +1721,15 @@ function print_changes_table($change_ids, $sort) {
 		');
 
 		//-- table header
-		$html .= "<table id='" . $table_id . "' class='width100'>";
-		$html .= "<thead><tr>";
-		$html .= "<th>&nbsp;</th>";
-		$html .= "<th>" . WT_I18N::translate('Record') . "</th>";
-		$html .= "<th>" . WT_Gedcom_Tag::getLabel('CHAN') . "</th>";
-		$html .= "<th>" . WT_Gedcom_Tag::getLabel('_WT_USER') . "</th>";
-		$html .= "<th>DATE</th>";     //hidden by datatables code
-		$html .= "<th>SORTNAME</th>"; //hidden by datatables code
-		$html .= "</tr></thead><tbody>";
+		$html .= '<table id="' . $table_id . '" class="width100">';
+		$html .= '<thead><tr>';
+		$html .= '<th>&nbsp;</th>';
+		$html .= '<th>' . WT_I18N::translate('Record') . '</th>';
+		$html .= '<th>' . WT_Gedcom_Tag::getLabel('CHAN') . '</th>';
+		$html .= '<th>' . WT_Gedcom_Tag::getLabel('_WT_USER') . '</th>';
+		$html .= '<th>DATE</th>';     //hidden by datatables code
+		$html .= '<th>SORTNAME</th>'; //hidden by datatables code
+		$html .= '</tr></thead><tbody>';
 
 		//-- table body
 		foreach ($change_ids as $change_id) {
@@ -1700,19 +1745,19 @@ function print_changes_table($change_ids, $sort) {
 				$indi = true;
 				break;
 			case "FAM":
-				$icon = '<img src="' . $WT_IMAGES['cfamily'] . '" title="" alt="" height="12">';
+				$icon = '<i class="icon-button_family"></i>';
 				break;
 			case "OBJE":
-				$icon = '<img src="' . $record->getMediaIcon() . '" title="" alt="" height="12">';
+				$icon = '<i class="icon-button_media"></i>';
 				break;
 			case "NOTE":
-				$icon = '<img src="' . $WT_IMAGES['note'] . '" title="" alt="" height="12">';
+				$icon = '<i class="icon-button_note"></i>';
 				break;
 			case "SOUR":
-				$icon = '<img src="' . $WT_IMAGES['source'] . '" title="" alt="" height="12">';
+				$icon = '<i class="icon-button_source"></i>';
 				break;
 			case "REPO":
-				$icon = '<img src="' . $WT_IMAGES['repository'] . '" title="" alt="" height="12">';
+				$icon = '<i class="icon-button_repository"></i>';
 				break;
 			default:
 				$icon = '&nbsp;';
@@ -1749,7 +1794,7 @@ function print_changes_table($change_ids, $sort) {
 
 // print a table of events
 function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_living=false, $sort_by='anniv') {
-	global $WT_IMAGES, $controller;
+	global $controller;
 	$html = '';
 	$table_id = "ID".floor(microtime()*1000000); // each table requires a unique ID
 	$controller
@@ -1819,7 +1864,7 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 			$html .= '<th>NAME</th>'; //hidden by datatables code
 			$html .= '<th>'.WT_Gedcom_Tag::getLabel('DATE').'</th>';
 			$html .= '<th>DATE</th>'; //hidden by datatables code
-			$html .= '<th><img src="'.$WT_IMAGES["reminder"].'" alt="'.WT_I18N::translate('Anniversary').'" title="'.WT_I18N::translate('Anniversary').'"></th>';
+			$html .= '<th><i class="icon-reminder" title="'.WT_I18N::translate('Anniversary').'"></i></th>';
 			$html .= '<th>ANNIV</th>';
 			$html .= '<th>'.WT_Gedcom_Tag::getLabel('EVEN').'</th>';
 			$html .= '</tr></thead><tbody>'."\n";
@@ -2090,11 +2135,11 @@ function print_chart_by_age($data, $title) {
 	$chart_url .= "&amp;chd=s:"; // data : simple encoding from A=0 to 9=61
 	$CHART_ENCODING61 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	for ($age=0; $age<=$agemax; $age++) {
-		$chart_url .= $CHART_ENCODING61[floor(substr_count($data[$age], "M")*61/$vmax)];
+		$chart_url .= $CHART_ENCODING61[(int)floor(substr_count($data[$age], "M")*61/$vmax)];
 	}
 	$chart_url .= ",";
 	for ($age=0; $age<=$agemax; $age++) {
-		$chart_url .= $CHART_ENCODING61[floor(substr_count($data[$age], "F")*61/$vmax)];
+		$chart_url .= $CHART_ENCODING61[(int)floor(substr_count($data[$age], "F")*61/$vmax)];
 	}
 	$html = '<img src="'. $chart_url. '" alt="'. $title. '" title="'. $title. '" class="gchart">';
 	return $html;
@@ -2140,11 +2185,11 @@ function print_chart_by_decade($data, $title) {
 	$chart_url .= "&amp;chd=s:"; // data : simple encoding from A=0 to 9=61
 	$CHART_ENCODING61 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	for ($y=1570; $y<2030; $y+=10) {
-		$chart_url .= $CHART_ENCODING61[floor(substr_count($data[$y], "M")*61/$vmax)];
+		$chart_url .= $CHART_ENCODING61[(int)floor(substr_count($data[$y], "M")*61/$vmax)];
 	}
 	$chart_url .= ",";
 	for ($y=1570; $y<2030; $y+=10) {
-		$chart_url .= $CHART_ENCODING61[floor(substr_count($data[$y], "F")*61/$vmax)];
+		$chart_url .= $CHART_ENCODING61[(int)floor(substr_count($data[$y], "F")*61/$vmax)];
 	}
 	$html = '<img src="'. $chart_url. '" alt="'. $title. '" title="'. $title. '" class="gchart">';
 	return $html;

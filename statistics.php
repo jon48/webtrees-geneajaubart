@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: statistics.php 13289 2012-01-20 00:44:07Z nigel $
+// $Id: statistics.php 13728 2012-03-31 21:13:20Z greg $
 
 define('WT_SCRIPT_NAME', 'statistics.php');
 require './includes/session.php';
@@ -36,7 +36,7 @@ $ajax = safe_GET('ajax', WT_REGEX_NOSCRIPT, 0);
 if (!$ajax) {
 	$js='jQuery(document).ready(function() {
 		jQuery("#stats-tabs").tabs({
-			spinner: \'<img src="'.WT_STATIC_URL.'images/loading.gif" height="12" alt="">\',
+			spinner: \'<i class="icon-loading-small"></i>\',
 			cache: true
 		});
 		jQuery("#stats-tabs").css("visibility", "visible");
@@ -44,7 +44,8 @@ if (!$ajax) {
 	$controller=new WT_Controller_Base();
 	$controller->setPageTitle(WT_I18N::translate('Statistics'))
 		->addInlineJavaScript($js)
-		->pageHeader();
+		->pageHeader()
+		->addExternalJavaScript('js/autocomplete.js');
 	echo '<div id="stats-details"><h2>', WT_I18N::translate('Statistics'), '</h2>',
 		'<div id="stats-tabs">',
 		'<ul>',
@@ -62,7 +63,9 @@ if (!$ajax) {
 	'<br><br>';
 } else {
 	$controller=new WT_Controller_Ajax();
-	$controller->pageHeader();
+	$controller
+		->pageHeader()
+		->addExternalJavaScript('js/autocomplete.js');
 	$stats = new WT_Stats($GEDCOM);
 	if ($tab==0) {
 		echo '<fieldset>
@@ -408,7 +411,6 @@ if (!$ajax) {
 		</fieldset>';
 	} else if ($tab==3) {
 		require_once WT_ROOT.'includes/functions/functions_places.php';
-		if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 
 		echo '<fieldset>
 		<legend>', WT_I18N::translate('Create your own chart'), '</legend>';
@@ -449,14 +451,29 @@ if (!$ajax) {
 					box.style.display = 'none';
 				}
 			}
-			function openPopup() {
-				window.open('', '_popup', 'top=50, left=50, width=950, height=480, scrollbars=0, scrollable=0');
-				return true;
+			function statsModalDialog(url, title) {
+				var $form = jQuery('#own-stats-form');
+				jQuery.post($form.attr('action'), $form.serialize(), function(response) {
+					jQuery('div#statistics-plot').html(response);
+				});
+				dialog=jQuery('<div title="'+title+'"></div>')
+					.load(url)
+					.dialog({
+						modal: true,
+						width: 962,
+						position: ['center',50],
+						close: function(event, ui) { $(this).remove(); }
+					});
+				// Close the window when we click outside it.
+				jQuery(".ui-widget-overlay").live("click", function () {
+					jQuery("div:ui-dialog:visible").dialog("close");
+				});
+				return false;
 			}
 		//-->
 		</script>
 		<?php
-		echo '<form method="post" name="form" action="statisticsplot.php?action=newform" target="_popup" onsubmit="return openPopup()">';
+		echo '<div id="own-stats"><form method="post" id="own-stats-form" name="form" action="statisticsplot.php" onsubmit="statsModalDialog(\'statisticsplot.php?action=newform\', \'', WT_I18N::translate('Statistics plot'), '\'); return false;">';
 		echo '<input type="hidden" name="action" value="update">';
 		echo '<table width="100%">';
 		if (!isset($plottype)) $plottype = 11;
@@ -651,12 +668,12 @@ if (!$ajax) {
 			<table width="100%">
 			<tr align="center"><td>
 				<br>
-				<input type="submit" value="', WT_I18N::translate('show the plot'), ' " onclick="closeHelp();">
+				<input type="submit" value="', WT_I18N::translate('show the plot'), ' ">
 				<input type="reset"  value=" ', WT_I18N::translate('reset'), ' " onclick="{statusEnable(\'z_sex\'); statusHide(\'x_years\'); statusHide(\'x_months\'); statusHide(\'x_numbers\'); statusHide(\'map_opt\');}"><br>
 			</td>
 			</tr>
 		</table>
-		</form>
+		</form></div>
 		</fieldset>';
 	}
 }

@@ -20,7 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // @author Greg Roach
-// @version $Id: DBStatement.php 10225 2011-01-01 15:04:58Z greg $
+// @version $Id: DBStatement.php 13808 2012-04-11 11:24:51Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -122,14 +122,14 @@ class WT_DBStatement {
 	}
 
 	// Fetch one value and close the cursor.  e.g. SELECT MAX(foo) FROM bar
-	public function fetchOne($default=null) {
+	public function fetchOne() {
 		if (!$this->executed) {
 			$this->execute();
 		}
-		$row=$this->pdostatement->fetch(PDO::FETCH_NUM);
+		$value=$this->pdostatement->fetchColumn();
 		$this->pdostatement->closeCursor();
 		$this->executed=false;
-		return is_array($row) ? $row[0] : $default;
+		return $value===false ? null : $value;
 	}
 
 	// Fetch two columns, and return an associative array of col1=>col2

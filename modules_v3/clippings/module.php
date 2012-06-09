@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13042 2011-12-12 15:34:26Z greg $
+// $Id: module.php 13945 2012-05-26 17:22:40Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -48,11 +48,12 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 	public function modAction($mod_action) {
 		switch($mod_action) {
 		case 'ajax':
+			Zend_Session::writeClose();
 			header('Content-Type: text/html; charset=UTF-8');
 			echo $this->getSidebarAjaxContent();
 			break;
 		case 'index':
-			global $ENABLE_AUTOCOMPLETE, $MAX_PEDIGREE_GENERATIONS, $WT_IMAGES, $controller, $WT_SESSION;
+			global $MAX_PEDIGREE_GENERATIONS, $controller, $WT_SESSION;
 
 			require_once WT_ROOT.WT_MODULES_DIR.'clippings/clippings_ctrl.php';
 			require_once WT_ROOT.'includes/functions/functions_export.php';
@@ -62,9 +63,8 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 			$controller=new WT_Controller_Base();
 			$controller
 				->setPageTitle($this->getTitle())
-				->PageHeader();
-
-			if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
+				->PageHeader()
+				->addExternalJavaScript('js/autocomplete.js');;
 
 			echo WT_JS_START;
 			echo 'function radAncestors(elementid) {var radFamilies=document.getElementById(elementid);radFamilies.checked=true;}';
@@ -164,7 +164,7 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 							<input type="text" name="id" id="cart_item_id" size="5">
 						</td>
 						<td class="optionbox">
-							<?php print_findindi_link('cart_item_id', ''); ?>
+							<?php echo print_findindi_link('cart_item_id'); ?>
 							<?php print_findfamily_link('cart_item_id', ''); ?>
 							<?php print_findsource_link('cart_item_id', ''); ?>
 							<input type="submit" value="<?php echo WT_I18N::translate('Add'); ?>">
@@ -218,7 +218,7 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 					<td class="optionbox"><input type="checkbox" name="convert" value="yes"></td></tr>
 
 					<tr><td class="descriptionbox width50 wrap"><?php echo WT_I18N::translate('Convert media path to'), help_link('convertPath'); ?></td>
-					<td class="list_value"><input type="text" name="conv_path" size="30" value="<?php echo getLRM(), $clip_ctrl->conv_path, getLRM(); ?>"></td></tr>
+					<td class="list_value"><input type="text" name="conv_path" size="30" value="<?php echo $clip_ctrl->conv_path; ?>" dir="auto"></td></tr>
 
 					<tr><td class="descriptionbox width50 wrap"><?php echo WT_I18N::translate('Convert media folder separators to'), help_link('convertSlashes'); ?></td>
 					<td class="list_value">
@@ -259,9 +259,9 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 							<input type="text" name="id" id="cart_item_id" size="8">
 						</td>
 						<td class="optionbox">
-							<?php print_findindi_link('cart_item_id', ''); ?>
-							<?php print_findfamily_link('cart_item_id', ''); ?>
-							<?php print_findsource_link('cart_item_id', ''); ?>
+							<?php echo print_findindi_link('cart_item_id'); ?>
+							<?php echo print_findfamily_link('cart_item_id'); ?>
+							<?php echo print_findsource_link('cart_item_id'); ?>
 							<input type="submit" value="<?php echo WT_I18N::translate('Add'); ?>">
 
 						</td>
@@ -286,22 +286,23 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 				foreach (array_keys($WT_SESSION->cart[WT_GED_ID]) as $xref) {
 					$record=WT_GedcomRecord::getInstance($xref);
 					if ($record) {
-						$tag = $record->getType();
-						if ($tag=='INDI') $icon = "indis";
-						if ($tag=='FAM' ) $icon = "sfamily";
-						if ($tag=='SOUR') $icon = "source";
-						if ($tag=='REPO') $icon = "repository";
-						if ($tag=='NOTE') $icon = "note";
-						if ($tag=='OBJE') $icon = "media";
+						switch ($tag = $record->getType()) {
+						case 'INDI': $icon='icon-indis'; break;
+						case 'FAM': $icon='icon-sfamily'; break;
+						case 'SOUR': $icon='icon-source'; break;
+						case 'REPO': $icon='icon-repository'; break;
+						case 'NOTE': $icon='icon-note'; break;
+						case 'OBJE': $icon='icon-media'; break;
+						default:     $icon='icon-clippings'; break;
+						}
 						?>
 						<tr><td class="list_value">
-							<?php if (!empty($icon)) { ?><img src="<?php echo $WT_IMAGES[$icon]; ?>" alt="<?php echo $tag; ?>" title="<?php echo $tag; ?>"><?php } ?>
+							<i class="<?php echo $icon; ?>"></i>
 						<?php
-						$record=WT_GedcomRecord::getInstance($xref);
-						if ($record) echo '<a href="', $record->getHtmlUrl(), '">', $record->getFullName(), '</a>';
+						echo '<a href="', $record->getHtmlUrl(), '">', $record->getFullName(), '</a>';
 						?>
 						</td>
-						<td class="list_value center vmiddle"><a href="module.php?mod=clippings&amp;mod_action=index&amp;action=remove&amp;id=<?php echo $xref; ?>"><img src="<?php echo $WT_IMAGES["remove"]; ?>" alt="<?php echo WT_I18N::translate('Remove'); ?>" title="<?php echo WT_I18N::translate('Remove'); ?>"></a></td>
+						<td class="list_value center vmiddle"><a href="module.php?mod=clippings&amp;mod_action=index&amp;action=remove&amp;id=<?php echo $xref; ?>" class="icon-remove" title="<?php echo WT_I18N::translate('Remove'); ?>"></a></td>
 					</tr>
 					<?php
 					}
@@ -332,16 +333,10 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 		}
 		//-- main clippings menu item
 		$menu = new WT_Menu($this->getTitle(), 'module.php?mod=clippings&amp;mod_action=index&amp;ged='.WT_GEDURL, 'menu-clippings', 'down');
-		$menu->addIcon('clippings');
-		$menu->addClass('menuitem', 'menuitem_hover', 'submenu', 'icon_large_clippings');
 		$submenu = new WT_Menu($this->getTitle(), 'module.php?mod=clippings&amp;mod_action=index&amp;ged='.WT_GEDURL, 'menu-clippingscart');
-		$submenu->addIcon('clippings');
-		$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_clippings');
 		$menu->addSubmenu($submenu);
 		if (!empty($controller->record) && $controller->record->canDisplayDetails()) {
 			$submenu = new WT_Menu(WT_I18N::translate('Add to clippings cart'), 'module.php?mod=clippings&amp;mod_action=index&amp;action=add&amp;id='.$controller->record->getXref(), 'menu-clippingsadd');
-			$submenu->addIcon('clippings');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_add_clip');
 			$menu->addSubmenu($submenu);
 		}
 		return $menu;
@@ -439,7 +434,7 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 
 	// A list for the side bar.
 	public function getCartList() {
-		global $WT_IMAGES, $WT_SESSION;
+		global $WT_SESSION;
 
 		// Keep track of the INDI from the parent page, otherwise it will
 		// get lost after ajax updates
@@ -451,31 +446,29 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 			$out='<ul>';
 			foreach (array_keys($WT_SESSION->cart[WT_GED_ID]) as $xref) {
 				$record=WT_GedcomRecord::getInstance($xref);
-				if ($record) {
-					$tag = $record->getType();
-					$icon='';
-					if ($tag=='INDI') $icon = "indis";
-					if ($tag=='FAM' ) $icon = "sfamily";
-					//if ($tag=='SOUR') $icon = "source";
-					//if ($tag=='REPO') $icon = "repository";
-					//if ($tag=='NOTE') $icon = "note";
-					//if ($tag=='OBJE') $icon = "media";
-					if (!empty($icon)) {
-						$out .= '<li>';
-						if (!empty($icon)) {
-							$out .= '<img src="'.$WT_IMAGES[$icon].'" alt="'.$tag.'" title="'.$tag.'" width="20">';
-						}
-						$out .= '<a href="'.$record->getHtmlUrl().'">';
-						if ($record->getType()=="INDI") $out .=$record->getSexImage();
-						$out .= ' '.$record->getFullName().' ';
-						if ($record->getType()=="INDI" && $record->canDisplayDetails()) {
-							$out .= ' ('.$record->getLifeSpan().')';
-						}
-						$out .= '</a>';
-						$out .= '<a class="remove_cart" href="module.php?mod='.$this->getName().'&amp;mod_action=ajax&amp;sb_action=clippings&amp;remove='.$xref.'&amp;pid='.$pid.'">
-						<img src="'. $WT_IMAGES["remove"].'" alt="'.WT_I18N::translate('Remove').'" title="'.WT_I18N::translate('Remove').'"></a>';
-						$out .='</li>';
+				if ($record && ($record->getType()=='INDI' || $record->getType()=='FAM')) { // Just show INDI/FAM in the sidbar
+					switch ($tag = $record->getType()) {
+					case 'INDI': $icon='icon-indis'; break;
+					case 'FAM': $icon='icon-sfamily'; break;
+					case 'SOUR': $icon='icon-source'; break;
+					case 'REPO': $icon='icon-repository'; break;
+					case 'NOTE': $icon='icon-note'; break;
+					case 'OBJE': $icon='icon-media'; break;
+					default:     $icon='icon-clippings'; break;
 					}
+					$out .= '<li>';
+					if (!empty($icon)) {
+						$out .= '<i class="'.$icon.'"></i>';
+					}
+					$out .= '<a href="'.$record->getHtmlUrl().'">';
+					if ($record->getType()=="INDI") $out .=$record->getSexImage();
+					$out .= ' '.$record->getFullName().' ';
+					if ($record->getType()=="INDI" && $record->canDisplayDetails()) {
+						$out .= ' ('.$record->getLifeSpan().')';
+					}
+					$out .= '</a>';
+					$out .= '<a class="icon-remove remove_cart" href="module.php?mod='.$this->getName().'&amp;mod_action=ajax&amp;sb_action=clippings&amp;remove='.$xref.'&amp;pid='.$pid.'" title="'.WT_I18N::translate('Remove').'"></a>';
+					$out .='</li>';
 				}
 			}
 			$out.='</ul>';
@@ -493,7 +486,7 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 		}
 		$record=WT_Person::getInstance($pid);
 		if ($record && !array_key_exists($record->getXref(), $WT_SESSION->cart[WT_GED_ID])) {
-			$out .= '<br><a href="module.php?mod='.$this->getName().'&amp;mod_action=ajax&amp;sb_action=clippings&amp;add='.$pid.'&amp;pid='.$pid.'" class="add_cart"><img src="'.$WT_IMAGES['clippings'].'" alt="'.WT_I18N::translate('Clippings cart').'" width="20"> '.WT_I18N::translate('Add %s to cart', $record->getFullName()).'</a>';
+			$out .= '<br><a href="module.php?mod='.$this->getName().'&amp;mod_action=ajax&amp;sb_action=clippings&amp;add='.$pid.'&amp;pid='.$pid.'" class="add_cart"><i class="icon-clippings"></i> '.WT_I18N::translate('Add %s to cart', $record->getFullName()).'</a>';
 		}
 		return $out;
 	}
@@ -610,7 +603,7 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 		<tr><td class="descriptionbox width50 wrap">'.WT_I18N::translate('Convert from UTF-8 to ANSI (ISO-8859-1)').help_link('utf8_ansi').'</td>
 		<td class="optionbox"><input type="checkbox" name="convert" value="yes"></td></tr>
 
-		<input type="hidden" name="conv_path" value="'.getLRM(). $clip_ctrl->conv_path. getLRM().'"></td></tr>
+		<input type="hidden" name="conv_path" value="'.$clip_ctrl->conv_path.'"></td></tr>
 
 		<tr><td class="topbottombar" colspan="2">
 		<input type="button" value="'.WT_I18N::translate('Cancel').'" onclick="cancelDownload();">

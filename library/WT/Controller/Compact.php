@@ -21,14 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Compact.php 13259 2012-01-17 09:13:33Z greg $
+// $Id: Compact.php 13820 2012-04-17 08:25:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-require_once WT_ROOT.'includes/functions/functions_charts.php';
 
 class WT_Controller_Compact extends WT_Controller_Chart {
 	// Data for the view
@@ -112,7 +110,7 @@ class WT_Controller_Compact extends WT_Controller_Chart {
 	}
 
 	function sosa_arrow($n, $arrow_dir) {
-		global $TEXT_DIRECTION, $WT_IMAGES;
+		global $TEXT_DIRECTION;
 
 		$pid = $this->treeid[$n];
 
@@ -127,19 +125,14 @@ class WT_Controller_Compact extends WT_Controller_Chart {
 			}
 		}
 
-		$text = "";
 		if ($pid) {
 			$indi=WT_Person::getInstance($pid);
 			$title=WT_I18N::translate('Compact tree of %s', $indi->getFullName());
-			$title=htmlspecialchars(strip_tags($title));
-			$arrow_img = "<img id='arrow$n' src='".$WT_IMAGES[$arrow_dir."arrow"]."' align='middle' alt='$title' title='$title'>";
-			$text .= "<a href=\"?rootid=".$pid;
+			$text = '<a class="icon-'.$arrow_dir.'arrow" title="'.strip_tags($title).'" href="?rootid='.$pid;
 			if ($this->show_thumbs) $text .= "&amp;show_thumbs=".$this->show_thumbs;
-			$text .= "\" onmouseover=\"swap_image('arrow$n',".$arrow_swap[$arrow_dir].");\" onmouseout=\"swap_image('arrow$n',".$arrow_swap[$arrow_dir].");\" >";
-			$text .= $arrow_img."</a>";
+			$text .= "\" </a>";
 		} else {
-			// -- arrow to empty box does not have a url attached.
-			$text = "<img id='arrow$n' src='".$WT_IMAGES[$arrow_dir."arrow"]."' align='middle' alt='".WT_I18N::translate('Compact tree')."' title='".WT_I18N::translate('Compact tree')."' style='visibility:hidden;'>";
+			$text = '<i class="icon-'.$arrow_dir.'arrow"></i>';
 		}
 
 		return $text;

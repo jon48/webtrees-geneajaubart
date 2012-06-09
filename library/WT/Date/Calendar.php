@@ -12,7 +12,7 @@
 // midday.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // @author Greg Roach
-// @version $Id: Calendar.php 13139 2011-12-27 14:24:25Z greg $
+// @version $Id: Calendar.php 13649 2012-03-24 15:08:14Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -297,19 +297,17 @@ class WT_Date_Calendar {
 	// int $jd: date for calculation
 	// TODO: WT_Date_Jewish needs to redefine this to cope with leap months
 	function GetAge($full, $jd, $warn_on_negative=true) {
-		global $WT_IMAGES;
-
 		if ($this->y==0 || $jd==0) {
-			return '';
+			return $full?'':'0';
 		}
 		if ($this->minJD < $jd && $this->maxJD > $jd) {
-			return '';
+			return $full?'':'0';
 		}
 		if ($this->minJD==$jd) {
 			return $full?'':'0';
 		}
 		if ($warn_on_negative && $jd<$this->minJD) {
-			return '<img alt="" src="'.$WT_IMAGES['warning'].'">';
+			return '<i class="icon-warning"></i>';
 		}
 		list($y,$m,$d)=$this->JDtoYMD($jd);
 		$dy=$y-$this->y;

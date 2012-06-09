@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: calendar.php 13335 2012-01-31 19:49:01Z nigel $
+// $Id: calendar.php 13969 2012-06-04 01:43:43Z nigel $
 
 define('WT_SCRIPT_NAME', 'calendar.php');
 require './includes/session.php';
@@ -33,24 +33,14 @@ $controller=new WT_Controller_Base();
 $controller->setPageTitle(WT_I18N::translate('Anniversary calendar'));
 $controller->pageHeader();
 
-if (isset($_REQUEST['cal'])) $cal = $_REQUEST['cal'];
-if (isset($_REQUEST['day'])) $day = $_REQUEST['day'];
-if (isset($_REQUEST['month'])) $month = $_REQUEST['month'];
-if (isset($_REQUEST['year'])) $year = $_REQUEST['year'];
-if (isset($_REQUEST['action'])) $action = $_REQUEST['action'];
-if (isset($_REQUEST['filterev'])) $filterev = $_REQUEST['filterev'];
-if (isset($_REQUEST['filterof'])) $filterof = $_REQUEST['filterof'];
-if (isset($_REQUEST['filtersx'])) $filtersx = $_REQUEST['filtersx'];
-
-// Set undefined parameters to defaults
-if (empty($cal     )) $cal     ='';
-if (empty($day     )) $day     ='';
-if (empty($month   )) $month   ='';
-if (empty($year    )) $year    ='';
-if (empty($action  )) $action  ='today';
-if (empty($filterev)) $filterev='bdm';
-if (empty($filterof)) $filterof='all';
-if (empty($filtersx)) $filtersx='';
+$cal     =safe_GET('cal',      '@#D[A-Z ]+@');
+$day     =safe_GET('day',      '[0-9]+');
+$month   =safe_GET('month',    '[A-Z]{3,5}');
+$year    =safe_GET('year',     '[0-9]+');
+$action  =safe_GET('action',   array('year', 'today', 'calendar'), 'today');
+$filterev=safe_GET('filterev', array('all', 'bdm', WT_REGEX_TAG), 'bdm');
+$filterof=safe_GET('filterof', array('all', 'living', 'recent'), 'all');
+$filtersx=safe_GET('filtersx', array('M', 'F'), '');
 
 if ($cal.$day.$month.$year=='') {
 	// No date specified?  Use the most likely calendar
@@ -140,7 +130,7 @@ echo '</h2></td></tr>';
 
 // Day selector
 echo '<tr><td class="descriptionbox vmiddle">';
-echo WT_I18N::translate('Day'), help_link('annivers_date_select'), '</td><td colspan="3" class="optionbox">';
+echo WT_I18N::translate('Day'), '</td><td colspan="3" class="optionbox">';
 for ($d=1; $d<=$days_in_month; $d++) {
 	// Format the day number using the calendar
 	$tmp=new WT_Date($cal_date->Format("%@ {$d} %O %E"));
@@ -156,7 +146,7 @@ echo "<a href=\"calendar.php?cal={$cal}&amp;day={$today->d}&amp;month={$today_mo
 echo '</td></tr>';
 // Month selector
 echo '<tr><td class="descriptionbox vmiddle">';
-echo WT_I18N::translate('Month'), help_link('annivers_month_select'), '</td>';
+echo WT_I18N::translate('Month'), '</td>';
 echo '<td class="optionbox" colspan="3">';
 for ($n=1; $n<=$cal_date->NUM_MONTHS(); ++$n) {
 	$month_name=$cal_date->NUM_TO_MONTH_NOMINATIVE($n, $cal_date->IsLeapYear());
@@ -173,60 +163,59 @@ for ($n=1; $n<=$cal_date->NUM_MONTHS(); ++$n) {
 echo "<a href=\"calendar.php?cal={$cal}&amp;day=".min($cal_date->d, $today->DaysInMonth())."&amp;month={$today_month}&amp;year={$today->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action={$action}\"><b>".$today->Format('%F %Y').'</b></a></td></tr>';
 // Year selector
 echo '<tr><td class="descriptionbox vmiddle">';
-echo WT_I18N::translate('Year'), help_link('annivers_year_select'), '</td>';
+echo WT_I18N::translate('Year'), '</td>';
 echo '<td class="optionbox vmiddle">';
 echo "<a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year=".($cal_date->y==1?-1:$cal_date->y-1)."&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action={$action}\">-1</a>";
 echo " <input type=\"text\" name=\"year\" value=\"{$year}\" size=\"4\"> ";
 echo "<a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year=".($cal_date->y==-1?1:$cal_date->y+1)."&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action={$action}\">+1</a>";
 echo " | <a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year={$today->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action={$action}\"><b>".$today->Format('%Y')."</b></a>";
+echo help_link('annivers_year_select');
 echo '</td> ';
 
 // Filtering options
 
 echo '<td class="descriptionbox vmiddle">';
-	echo WT_I18N::translate('Show'), help_link('annivers_show'), '</td>';
+echo WT_I18N::translate('Show'), '</td>';
 
 echo '<td class="optionbox vmiddle">';
-	echo '<select class="list_value" name="filterof" onchange="document.dateform.submit();">';
-	echo '<option value="all"';
-	if ($filterof == "all") echo ' selected="selected"';
-	echo '>', WT_I18N::translate('All People'), '</option>';
-	if (!$HIDE_LIVE_PEOPLE || WT_USER_ID) {
-		echo '<option value="living"';
-	if ($filterof == "living") echo ' selected="selected"';
-		echo '>', WT_I18N::translate('Living People'), '</option>';
-	}
-	echo '<option value="recent"';
-	if ($filterof == "recent") echo ' selected="selected"';
-	echo '>', WT_I18N::translate('Recent Years (&lt; 100 yrs)'), '</option>';
-	echo '</select>';
+echo '<select class="list_value" name="filterof" onchange="document.dateform.submit();">';
+echo '<option value="all"';
+if ($filterof == "all") echo ' selected="selected"';
+echo '>', WT_I18N::translate('All People'), '</option>';
+if (!$HIDE_LIVE_PEOPLE || WT_USER_ID) {
+	echo '<option value="living"';
+if ($filterof == "living") echo ' selected="selected"';
+	echo '>', WT_I18N::translate('Living People'), '</option>';
+}
+echo '<option value="recent"';
+if ($filterof == "recent") echo ' selected="selected"';
+echo '>', WT_I18N::translate('Recent Years (&lt; 100 yrs)'), '</option>';
+echo '</select>';
 	
-	echo '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;';
+echo '&nbsp;&nbsp;&nbsp;';
 	
-	if ($filtersx=="") {
-	echo WT_Person::sexImage('M', 'large', 'vertical-align: middle', WT_I18N::translate('All People'));
-	echo WT_Person::sexImage('F', 'large', 'vertical-align: middle', WT_I18N::translate('All People')), ' | ';
+if ($filtersx=="") {
+	echo '<i class="icon-sex_m_15x15" title="', WT_I18N::translate('All People'), '"></i>';
+	echo '<i class="icon-sex_f_15x15" title="', WT_I18N::translate('All People'), '"></i> | ';
 } else {
-	echo "<a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year={$cal_date->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx=&amp;action={$action}\">";
-	echo WT_Person::sexImage('M', 'small', 'vertical-align: middle', WT_I18N::translate('All People'));
-	echo WT_Person::sexImage('F', 'small', 'vertical-align: middle', WT_I18N::translate('All People')), '</a> | ';
+	echo '<a href="calendar.php?cal=', $cal, '&amp;day=', $cal_date->d, '&amp;month=', $cal_month, '&amp;year=', $cal_date->y, '&amp;filterev=', $filterev, '&amp;filterof=', $filterof, '&amp;action=', $action, '">';
+	echo '<i class="icon-sex_m_9x9" title="', WT_I18N::translate('All People'), '"></i>';
+	echo '<i class="icon-sex_f_9x9" title="', WT_I18N::translate('All People'), '"></i></a> | ';
 }
 if ($filtersx=="M") {
-	echo WT_Person::sexImage('M', 'large', 'vertical-align: middle', WT_I18N::translate('Males')), ' | ';
+	echo '<i class="icon-sex_m_15x15" title="', WT_I18N::translate('Males'), '"></i> | ';
 } else {
-	echo "<a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year={$cal_date->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx=M&amp;action={$action}\">";
-	echo WT_Person::sexImage('M', 'small', 'vertical-align: middle', WT_I18N::translate('Males')), '</a> | ';
+	echo '<a class="icon-sex_m_9x9" title="', WT_I18N::translate('Males'), '" href="calendar.php?cal=', $cal, '&amp;day=', $cal_date->d, '&amp;month=', $cal_month, '&amp;year=', $cal_date->y, '&amp;filterev=', $filterev, '&amp;filterof=', $filterof, '&amp;filtersx=M&amp;action=', $action, '"></a> | ';
 }
 if ($filtersx=="F")
-	echo WT_Person::sexImage('F', 'large', 'vertical-align: middle', WT_I18N::translate('Females')), ' | ';
+	echo '<i class="icon-sex_f_15x15" title="', WT_I18N::translate('Females'), '"></i>';
 else {
-	echo "<a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year={$cal_date->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx=F&amp;action={$action}\">";
-	echo WT_Person::sexImage('F', 'small', 'vertical-align: middle', WT_I18N::translate('Females')), '</a>';
+	echo '<a class="icon-sex_f_9x9" title="', WT_I18N::translate('Females'), '" href="calendar.php?cal=', $cal, '&amp;day=', $cal_date->d, '&amp;month=', $cal_month, '&amp;year=', $cal_date->y, '&amp;filterev=', $filterev, '&amp;filterof=', $filterof, '&amp;filtersx=F&amp;action=', $action, '"></a>';
 }
 
-	echo '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;';
+echo '&nbsp;&nbsp;&nbsp;';
 
-	echo "<input type=\"hidden\" name=\"filterev\" value=\"$filterev\">";
+echo "<input type=\"hidden\" name=\"filterev\" value=\"$filterev\">";
 echo '<select class="list_value" name="filterev" onchange="document.dateform.submit();">';
 echo '<option value="bdm"';
 if ($filterev == "bdm") echo ' selected="selected"';
@@ -297,7 +286,6 @@ if ($action=='year') {
 } else {
 	echo " | <a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year={$cal_date->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action=year\">", WT_I18N::translate('View Year'), "</a>";
 }
-echo help_link('day_month');
 echo '</td><td class="topbottombar width50">';
 $n=0;
 foreach (array(
@@ -414,31 +402,27 @@ case 'calendar':
 switch ($action) {
 case 'year':
 case 'today':
-	echo "<table class=\"width100\"><tr>";
+	echo '<table class="width100"><tr>';
 	// Table headings
-	echo "<td class=\"descriptionbox width50\">";
-		if (isset($WT_IMAGES['indis'])) echo "<img id=\"calendar_img_indi\" src=\"{$WT_IMAGES['indis']}\" title=\"", WT_I18N::translate('Individuals'), "\" alt=\"", WT_I18N::translate('Individuals'), "\">&nbsp;&nbsp;&nbsp;";
-		echo WT_I18N::translate('Individuals'), "</td>";
-	echo "<td class=\"descriptionbox center width50\">";
-		if (isset($WT_IMAGES['cfamily'])) echo "<img id=\"calendar_img_fam\" src=\"{$WT_IMAGES['cfamily']}\" title=\"", WT_I18N::translate('Families'), "\" alt=\"", WT_I18N::translate('Families'), "\">&nbsp;&nbsp;&nbsp;";
-		echo WT_I18N::translate('Families'), "</td>";
-	echo "</tr><tr>";
+	echo '<td class="descriptionbox center width50"><i class="icon-indis"></i>', WT_I18N::translate('Individuals'), '</td>';
+	echo '<td class="descriptionbox center width50"><i class="icon-cfamily"></i>', WT_I18N::translate('Families'), '</td>';
+	echo '</tr><tr>';
 	// Table rows
 	$males=0;
 	$females=0;
 	$numfams=0;
-	echo "<td class=\"optionbox wrap\">";
+	echo '<td class="optionbox wrap">';
 
 	// Avoid an empty unordered list
 	ob_start();
-	echo calendar_list_text($indis, "<li>", "</li>", true);
+	echo calendar_list_text($indis, '<li>', '</li>', true);
 	$content = ob_get_clean();
 	if (!empty($content)) {
 		echo '<ul>', $content, '</ul>';
 	}
 
 	echo '</td>';
-	echo "<td class=\"optionbox wrap\">";
+	echo '<td class="optionbox wrap">';
 
 	// Avoid an empty unordered list
 	ob_start();
@@ -453,10 +437,11 @@ case 'today':
 	// Table footers
 	echo '<td class="descriptionbox">', WT_I18N::translate('Total individuals: %s', count($indis));
 	echo '<br>';
-	echo WT_Person::sexImage('M', 'small', 'vertical-align: middle', WT_I18N::translate('Males')), "&nbsp;{$males}&nbsp;&nbsp;&nbsp;&nbsp;";
-	echo WT_Person::sexImage('F', 'small', 'vertical-align: middle', WT_I18N::translate('Females')), "&nbsp;{$females}&nbsp;&nbsp;&nbsp;&nbsp;";
-	if (count($indis)!=$males+$females)
-		echo WT_Person::sexImage('U', 'small', 'vertical-align: middle', WT_I18N::translate('All People')), '&nbsp;', count($indis)-$males-$females;
+	echo '<i class="icon-sex_m_15x15" title="', WT_I18N::translate('Males'), '"></i> ', $males, '&nbsp;&nbsp;&nbsp;&nbsp;';
+	echo '<i class="icon-sex_f_15x15" title="', WT_I18N::translate('Males'), '"></i> ', $females, '&nbsp;&nbsp;&nbsp;&nbsp;';
+	if (count($indis)!=$males+$females) {
+		echo '<i class="icon-sex_u_15x15" title="', WT_I18N::translate('All People'), '"></i> ', count($indis)-$males-$females;
+	}
 	echo '</td>';
 	echo '<td class="descriptionbox">', WT_I18N::translate('Total families: %s', count($fams)), '</td>';
 	echo '</tr></table>';
@@ -582,7 +567,7 @@ function calendar_fact_text($fact, $show_places) {
 // Format a list of facts for display
 ////////////////////////////////////////////////////////////////////////////////
 function calendar_list_text($list, $tag1, $tag2, $show_sex_symbols) {
-	global $WT_IMAGES, $males, $females;
+	global $males, $females;
 
 	foreach ($list as $id=>$facts) {
 		$tmp=WT_GedcomRecord::GetInstance($id);
@@ -590,15 +575,15 @@ function calendar_list_text($list, $tag1, $tag2, $show_sex_symbols) {
 		if ($show_sex_symbols && $tmp->getType()=='INDI')
 			switch ($tmp->getSex()) {
 			case 'M':
-				echo WT_Person::sexImage('M', 'small', 'vertical-align: middle', WT_I18N::translate('Male'));
+				echo '<i class="icon-sex_m_9x9" title="', WT_I18N::translate('Male'), '"></i>';
 				++$males;
 				break;
 			case 'F':
-				echo WT_Person::sexImage('F', 'small', 'vertical-align: middle', WT_I18N::translate('Female'));
+				echo '<i class="icon-sex_f_9x9" title="', WT_I18N::translate('Female'), '"></i>';
 				++$females;
 				break;
 			default:
-				echo WT_Person::sexImage('U', 'small', 'vertical-align: middle', WT_I18N::translate_c('unknown gender', 'Unknown'));
+				echo '<i class="icon-sex_u_9x9" title="',  WT_I18N::translate_c('unknown gender', 'Unknown'), '"></i>';
 				break;
 			}
 			echo '<div class="indent">', $facts, '</div>', $tag2;

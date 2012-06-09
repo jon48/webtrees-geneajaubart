@@ -2,7 +2,7 @@
 // Facility for Census assistant that will allow a user to search for a person
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_3_find.php 13123 2011-12-21 22:41:06Z greg $
+// $Id: census_3_find.php 13932 2012-05-13 03:56:42Z nigel $
 
 $controller=new WT_Controller_Simple();
 
@@ -95,42 +95,39 @@ if (($level < 0) || ($level > $MEDIA_DIRECTORY_LEVELS)) {
 }
 // End variables for find media
 
-require WT_ROOT.'includes/specialchars.php';
-// End variables for Find Special Character
-
 switch ($type) {
 case "indi":
-	$controller->setPageTitle(WT_I18N::translate('Find individual ID'));
+	$controller->setPageTitle(WT_I18N::translate('Find an individual'));
 	break;
 case "fam":
-	$controller->setPageTitle(WT_I18N::translate('Find Family List'));
+	$controller->setPageTitle(WT_I18N::translate('Find a family'));
 	break;
 case "media":
-	$controller->setPageTitle(WT_I18N::translate('Find media'));
+	$controller->setPageTitle(WT_I18N::translate('Find a media object'));
 	$action="filter";
 	break;
 case "place":
-	$controller->setPageTitle(WT_I18N::translate('Find Place'));
+	$controller->setPageTitle(WT_I18N::translate('Find a place'));
 	$action="filter";
 	break;
 case "repo":
-	$controller->setPageTitle(WT_I18N::translate('Repositories'));
+	$controller->setPageTitle(WT_I18N::translate('Find a repository'));
 	$action="filter";
 	break;
 case "note":
-	$controller->setPageTitle(WT_I18N::translate('Find Shared Note'));
+	$controller->setPageTitle(WT_I18N::translate('Find a note'));
 	$action="filter";
 	break;
 case "source":
-	$controller->setPageTitle(WT_I18N::translate('Find Source'));
+	$controller->setPageTitle(WT_I18N::translate('Find a source'));
 	$action="filter";
 	break;
 case "specialchar":
-	$controller->setPageTitle(WT_I18N::translate('Find Special Characters'));
+	$controller->setPageTitle(WT_I18N::translate('Find a special character'));
 	$action="filter";
 	break;
 case "facts":
-	$controller->setPageTitle(WT_I18N::translate('Find fact tags'));
+	$controller->setPageTitle(WT_I18N::translate('Find a fact or event'));
 	echo
 		WT_JS_START,
 		'jQuery(document).ready(function(){ initPickFact(); });',
@@ -158,7 +155,7 @@ echo WT_JS_START;
 				// Check if Indi, Fam or source ===================
 				/*
 				if (id.match("I")=="I") {
-					var win01 = window.opener.window.open('edit_interface.php?action=addmedia_links&noteid=newnote&pid='+id, 'win01', 'top=50, left=600, width=420, height=650, resizable=1, scrollbars=1');
+					var win01 = window.opener.window.open('edit_interface.php?action=addmedia_links&noteid=newnote&pid='+id, 'win01', edit_window_specs);
 					if (window.focus) {win01.focus();}
 				} else if (id.match("F")=="F") {
 					// TODO --- alert('Opening Navigator with family id entered will come later');
@@ -211,31 +208,31 @@ echo "<tr><td style=\"padding: 10px;\" valign=\"top\" class=\"facts_label03 widt
 
 switch ($type) {
 case "indi":
-	echo WT_I18N::translate('Find individual ID');
+	echo WT_I18N::translate('Find an individual');
 	break;
 case "fam":
-	echo WT_I18N::translate('Find Family List');
+	echo WT_I18N::translate('Find a family');
 	break;
 case "media":
-	echo WT_I18N::translate('Find media');
+	echo WT_I18N::translate('Find a media object');
 	break;
 case "place":
-	echo WT_I18N::translate('Find Place');
+	echo WT_I18N::translate('Find a place');
 	break;
 case "repo":
-	echo WT_I18N::translate('Repositories');
+	echo WT_I18N::translate('Find a repository');
 	break;
 case "note":
-	echo WT_I18N::translate('Find Shared Note');
+	echo WT_I18N::translate('Find a note');
 	break;
 case "source":
-	echo WT_I18N::translate('Find Source');
+	echo WT_I18N::translate('Find a source');
 	break;
 case "specialchar":
-	echo WT_I18N::translate('Find Special Characters');
+	echo WT_I18N::translate('Find a special character');
 	break;
 case "facts":
-	echo WT_I18N::translate('Find fact tags');
+	echo WT_I18N::translate('Find a fact or event');
 	break;
 }
 
@@ -856,7 +853,7 @@ if ($action=="filter") {
 						//-- name and size field
 						echo "<td class=\"list_value\">";
 						if ($media["TITL"] != "") {
-							echo "<b>", PrintReady($media["TITL"]), "</b><br>";
+							echo "<b>", htmlspecialchars($media["TITL"]), "</b><br>";
 						}
 						if (!$embed) {
 							echo "<a href=\"#\" onclick=\"pasteid('", addslashes($media["FILE"]), "');\"><span dir=\"ltr\">", $media["FILE"], "</span></a> -- ";
@@ -929,7 +926,7 @@ if ($action=="filter") {
 				uasort($revplacelist, "utf8_strcasecmp");
 				echo "<td class=\"list_value_wrap\"><ul>";
 				foreach ($revplacelist as $place) {
-					echo "<li><a href=\"#\" onclick=\"pasteid('", str_replace(array("'", '"'), array("\'", '&quot;'), $place), "');\">", PrintReady($place), "</a></li>";
+					echo "<li><a href=\"#\" onclick=\"pasteid('", str_replace(array("'", '"'), array("\'", '&quot;'), $place), "');\">", htmlspecialchars($place), "</a></li>";
 				}
 				echo "</ul></td></tr>";
 				echo "<tr><td class=\"list_label\">", WT_I18N::translate('Places found'), " ", $ctplace;

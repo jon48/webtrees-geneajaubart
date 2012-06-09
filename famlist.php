@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: famlist.php 12909 2011-11-24 11:35:59Z greg $
+// $Id: famlist.php 13598 2012-03-17 13:03:02Z greg $
 
 define('WT_SCRIPT_NAME', 'famlist.php');
 require './includes/session.php';
@@ -126,6 +126,7 @@ if ($show_all=='yes') {
 	$url=WT_SCRIPT_NAME.'?ged='.WT_GEDURL;
 	$show='none'; // Don't show lists until something is chosen
 }
+$legend='<span dir="auto">'.$legend.'</span>';
 
 $controller
 	->setPageTitle(WT_I18N::translate('Families').' : '.$legend)
@@ -253,7 +254,7 @@ if ($show=='indi' || $show=='surn') {
 					}
 				}
 				if ($show_all=='no') {
-					echo '<h2 class="center">', WT_I18N::translate('Individuals with surname %s', check_NN($surname)), '</h2>';
+					echo '<h2 class="center">', WT_I18N::translate('Individuals with surname %s', $legend), '</h2>';
 				}
 				echo '<p class="center alpha_index">', join(' | ', $list), '</p>';
 			}

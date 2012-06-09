@@ -23,7 +23,7 @@
 //
 // PNG Icons By:Alessandro Rei; License: GPL; http://www.kde-look.org/content/show.php/Dark-Glass+reviewed?content=67902
 //
-// $Id: theme.php 13414 2012-02-09 22:42:50Z nigel $
+// $Id: theme.php 13942 2012-05-21 08:29:08Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,146 +31,46 @@ if (!defined('WT_WEBTREES')) {
 }
 
 $theme_name = "webtrees"; // need double quotes, as file is scanned/parsed by script
-$stylesheet       = WT_THEME_URL.'style.css';
-$print_stylesheet = WT_THEME_URL.'print.css';
-$headerfile       = WT_THEME_DIR.'header.php';
-$footerfile       = WT_THEME_DIR.'footer.php';
-$WT_USE_HELPIMG   = true;
-$WT_MENU_LOCATION = 'top';
+$stylesheet = WT_THEME_URL.'style.css';
+$headerfile = WT_THEME_DIR.'header.php';
+$footerfile = WT_THEME_DIR.'footer.php';
 
 //- main icons
 $WT_IMAGES=array(
-	'admin'=>WT_THEME_URL.'images/admin.png',
-	'ancestry'=>WT_THEME_URL.'images/ancestry.png',
-	'calendar'=>WT_THEME_URL.'images/calendar.png',
-	'cfamily'=> WT_THEME_URL.'images/family.png',
-	'charts'=>WT_THEME_URL.'images/charts.png',
-	'childless'=>WT_THEME_URL.'images/childless.png',
-	'clippings'=>WT_THEME_URL.'images/clippings.png',
-	'descendant'=>WT_THEME_URL.'images/descendancy.png',
-	'edit_fam'=>WT_THEME_URL.'images/edit_fam.png',
-	'edit_indi'=>WT_THEME_URL.'images/edit_indi.png',
-	'edit_media'=>WT_THEME_URL.'images/edit_media.png',
-	'edit_note'=>WT_THEME_URL.'images/edit_note.png',
-	'edit_repo'=>WT_THEME_URL.'images/edit_repo.png',
-	'edit_sour'=>WT_THEME_URL.'images/edit_source.png',
-	'fam-list'=>WT_THEME_URL.'images/family.png',
-	'fambook'=>WT_THEME_URL.'images/source.png',
-	'fanchart'=>WT_THEME_URL.'images/fanchart.png',
-	'favorites'=>WT_THEME_URL.'images/favorites.png',
-	'gedcom'=>WT_THEME_URL.'images/tree.png',
-	'help'=>WT_THEME_URL.'images/help2.png',
-	'home'=>WT_THEME_URL.'images/home.png',
-	'hourglass'=>WT_THEME_URL.'images/hourglass.png',
-	'indis'=>WT_THEME_URL.'images/indis.png',
-	'indi-list'=>WT_THEME_URL.'images/indis.png',
-	'lists'=>WT_THEME_URL.'images/lists.png',
-	'media'=>WT_THEME_URL.'images/media.png',
-	'media-list'=>WT_THEME_URL.'images/media.png',
-	'menu_help'=>WT_THEME_URL.'images/help.png',
-	'menu_media'=>WT_THEME_URL.'images/media.png',
-	'menu_note'=>WT_THEME_URL.'images/notes.png',
-	'menu_repository'=>WT_THEME_URL.'images/repository.png',
-	'menu_source'=>WT_THEME_URL.'images/source.png',
-	'mypage'=>WT_THEME_URL.'images/mypage.png',
-	'note'=>WT_THEME_URL.'images/notes.png',
-	'note-list'=>WT_THEME_URL.'images/notes.png',
-	'patriarch'=>WT_THEME_URL.'images/patriarch.png',
-	'pedigree'=>WT_THEME_URL.'images/pedigree.png',
-	'place'=>WT_THEME_URL.'images/place.png',
-	'relationship'=>WT_THEME_URL.'images/relationship.png',
-	'reorder'=>WT_THEME_URL.'images/reorder_images.png',
-	'reports'=>WT_THEME_URL.'images/reports.png',
-	'repository'=>WT_THEME_URL.'images/repository.png',
-	'repo-list'=>WT_THEME_URL.'images/repository.png',
-	'rings'=>WT_THEME_URL.'images/rings.png',
-	'search'=>WT_THEME_URL.'images/search.png',
-	'selected'=>WT_THEME_URL.'images/selected.png',
-	'sex_f_15x15'=>WT_THEME_URL.'images/sex_f_15x15.png',
-	'sex_f_9x9'=>WT_THEME_URL.'images/sex_f_9x9.png',
-	'sex_m_15x15'=>WT_THEME_URL.'images/sex_m_15x15.png',
-	'sex_m_9x9'=>WT_THEME_URL.'images/sex_m_9x9.png',
-	'sex_u_15x15'=>WT_THEME_URL.'images/sex_u_15x15.png',
-	'sex_u_9x9'=>WT_THEME_URL.'images/sex_u_9x9.png',
-	'sfamily'=>WT_THEME_URL.'images/family.png',
-	'source'=>WT_THEME_URL.'images/source.png',
-	'source-list'=>WT_THEME_URL.'images/source.png',
-	'statistic'=>WT_THEME_URL.'images/statistic.png',
-	'target'=>WT_THEME_URL.'images/buttons/target.png',
-	'timeline'=>WT_THEME_URL.'images/timeline.png',
-	'tree'=>WT_THEME_URL.'images/tree.png',
-	'warning'=>WT_THEME_URL.'images/warning.png',
-	'wiki'=>WT_THEME_URL.'images/w_22.png',
-	'itree'=>WT_THEME_URL.'images/tree.png',
+	// used to draw charts
+	'dline'          =>WT_THEME_URL.'images/dline.png',
+	'dline2'         =>WT_THEME_URL.'images/dline2.png',
+	'hline'          =>WT_THEME_URL.'images/hline.png',
+	'spacer'         =>WT_THEME_URL.'images/spacer.png',
+	'vline'          =>WT_THEME_URL.'images/vline.png',
 
-	//- buttons for data entry pages
-	'button_addmedia'=>WT_THEME_URL.'images/buttons/addmedia.png',
-	'button_addnote'=>WT_THEME_URL.'images/buttons/addnote.png',
-	'button_addrepository'=>WT_THEME_URL.'images/buttons/addrepository.png',
-	'button_addsource'=>WT_THEME_URL.'images/buttons/addsource.png',
-	'button_calendar'=>WT_THEME_URL.'images/buttons/calendar.png',
-	'button_family'=>WT_THEME_URL.'images/buttons/family.png',
-	'button_find_facts'=>WT_THEME_URL.'images/buttons/find_facts.png',
-	'button_head'=>WT_THEME_URL.'images/buttons/head.png',
-	'button_indi'=>WT_THEME_URL.'images/buttons/indi.png',
-	'button_keyboard'=>WT_THEME_URL.'images/buttons/keyboard.png',
-	'button_media'=>WT_THEME_URL.'images/buttons/media.png',
-	'button_note'=>WT_THEME_URL.'images/buttons/note.png',
-	'button_place'=>WT_THEME_URL.'images/buttons/place.png',
-	'button_repository'=>WT_THEME_URL.'images/buttons/repository.png',
-	'button_source'=>WT_THEME_URL.'images/buttons/source.png',
+	// used in button images and javascript
+	'add'            =>WT_THEME_URL.'images/add.png',
+	'button_family'  =>WT_THEME_URL.'images/buttons/family.png',
+	'minus'          =>WT_THEME_URL.'images/minus.png',
+	'plus'           =>WT_THEME_URL.'images/plus.png',
+	'remove'         =>WT_THEME_URL.'images/remove.png',
+	'search'         =>WT_THEME_URL.'images/search.png',
 
-	// media images
-	'media_audio'=>WT_THEME_URL.'images/media/audio.png',
-	'media_doc'=>WT_THEME_URL.'images/media/doc.png',
-	'media_flash'=>WT_THEME_URL.'images/media/flash.png',
-	'media_flashrem'=>WT_THEME_URL.'images/media/flashrem.png',
-	'media_ged'=>WT_THEME_URL.'images/media/unknown.png',
-	'media_globe'=>WT_THEME_URL.'images/media/www.png',
-	'media_html'=>WT_THEME_URL.'images/media/www.png',
-	'media_picasa'=>WT_THEME_URL.'images/media/picasa.png',
-	'media_pdf'=>WT_THEME_URL.'images/media/pdf.png',
-	'media_tex'=>WT_THEME_URL.'images/media/tex.png',
-	'media_wmv'=>WT_THEME_URL.'images/media/wmv.png',
-	'media_wmvrem'=>WT_THEME_URL.'images/media/wmvrem.png',
-
-	//- other images
-	'add'=>WT_THEME_URL.'images/add.png',
-	'darrow'=>WT_THEME_URL.'images/darrow.png',
-	'darrow2'=>WT_THEME_URL.'images/darrow2.png',
-	'ddarrow'=>WT_THEME_URL.'images/ddarrow.png',
-	'dline'=>WT_THEME_URL.'images/dline.png',
-	'dline2'=>WT_THEME_URL.'images/dline2.png',
-	'webtrees'=>WT_THEME_URL.'images/webtrees_s.png',
-	'hline'=>WT_THEME_URL.'images/hline.png',
-	'larrow'=>WT_THEME_URL.'images/larrow.png',
-	'larrow2'=>WT_THEME_URL.'images/larrow2.png',
-	'ldarrow'=>WT_THEME_URL.'images/ldarrow.png',
-	'minus'=>WT_THEME_URL.'images/minus.png',
-	'plus'=>WT_THEME_URL.'images/plus.png',
-	'rarrow'=>WT_THEME_URL.'images/rarrow.png',
-	'rarrow2'=>WT_THEME_URL.'images/rarrow2.png',
-	'rdarrow'=>WT_THEME_URL.'images/rdarrow.png',
-	'remove'=>WT_THEME_URL.'images/remove.png',
-	'spacer'=>WT_THEME_URL.'images/spacer.png',
-	'uarrow'=>WT_THEME_URL.'images/uarrow.png',
-	'uarrow2'=>WT_THEME_URL.'images/uarrow2.png',
-	'udarrow'=>WT_THEME_URL.'images/udarrow.png',
-	'vline'=>WT_THEME_URL.'images/vline.png',
-	'zoomin'=>WT_THEME_URL.'images/zoomin.png',
-	'zoomout'=>WT_THEME_URL.'images/zoomout.png',
-	'stop'=>WT_THEME_URL.'images/stop.png',
+	// need different sizes before moving to CSS
 	'default_image_M'=>WT_THEME_URL.'images/silhouette_male.png',
 	'default_image_F'=>WT_THEME_URL.'images/silhouette_female.png',
 	'default_image_U'=>WT_THEME_URL.'images/silhouette_unknown.png',
-	'reminder'=>WT_THEME_URL.'images/reminder.png',
-	'children'=>WT_THEME_URL.'images/children.png',
 
-	// - lifespan chart arrows
-	'lsltarrow'=>WT_THEME_URL.'images/lifespan-left.png',
-	'lsrtarrow'=>WT_THEME_URL.'images/lifespan-right.png',
-	'lsdnarrow'=>WT_THEME_URL.'images/lifespan-down.png',
-	'lsuparrow'=>WT_THEME_URL.'images/lifespan-up.png',
+	// need to replace with a system based on mime-types
+	'media'          =>WT_THEME_URL.'images/media/image-jpeg.png',
+	'media_audio'    =>WT_THEME_URL.'images/media/audio-x-generic.png',
+	'media_doc'      =>WT_THEME_URL.'images/media/gnome-mime-application-msword.png',
+	'media_flash'    =>WT_THEME_URL.'images/media/gnome-mime-application-x-shockwave-flash.png',
+	'media_flashrem' =>WT_THEME_URL.'images/media/gnome-mime-application-x-shockwave-flash.png',
+	'media_ged'      =>WT_THEME_URL.'images/media/text-x-gedcom.png',
+	'media_globe'     =>WT_THEME_URL.'images/media/text-html.png',
+	'media_html'     =>WT_THEME_URL.'images/media/text-html.png',
+	'media_pdf'      =>WT_THEME_URL.'images/media/gnome-mime-application-pdf.png',
+	'media_picasa'   =>WT_THEME_URL.'images/media/image-x-generic.png',
+	'media_tex'      =>WT_THEME_URL.'images/media/text-x-tex.png',
+	'media_wmv'      =>WT_THEME_URL.'images/media/video-x-ms-wmv.png',
+	'media_wmvrem'      =>WT_THEME_URL.'images/media/video-x-ms-wmv.png',
 );
 
 //-- variables for the fan chart

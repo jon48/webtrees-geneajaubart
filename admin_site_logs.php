@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_logs.php 13430 2012-02-11 18:12:46Z greg $
+// $Id: admin_site_logs.php 13824 2012-04-17 20:19:36Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_logs.php');
 require './includes/session.php';
@@ -105,6 +105,7 @@ case 'delete':
 	WT_DB::prepare($DELETE)->execute($args);
 	break;
 case 'export':
+	Zend_Session::writeClose();
 	header('Content-Type: text/csv');
 	header('Content-Disposition: attachment; filename="webtrees-logs.csv"');
 	$rows=WT_DB::prepare($SELECT1.$WHERE.' ORDER BY log_id')->execute($args)->fetchAll();
@@ -120,6 +121,7 @@ case 'export':
 	}
 	exit;
 case 'load_json':
+	Zend_Session::writeClose();
 	$iDisplayStart =(int)safe_GET('iDisplayStart');
 	$iDisplayLength=(int)safe_GET('iDisplayLength');
 	set_user_setting(WT_USER_ID, 'admin_site_log_page_size', $iDisplayLength);

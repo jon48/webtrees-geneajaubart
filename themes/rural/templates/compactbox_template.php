@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: compactbox_template.php 13354 2012-02-01 22:02:22Z nigel $
+// $Id: compactbox_template.php 13642 2012-03-24 13:06:08Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -35,7 +35,7 @@ if (!defined('WT_WEBTREES')) {
 }
 
 echo '<div id="out-', $boxID ,'" ', $outBoxAdd, '>
-	<div class="compact_view" style="cursor:url(\''.$WT_IMAGES["zoomin"].'\'),n-resize;">',
+	<div class="compact_view">',
 		$thumbnail,
 		'<a onclick="event.cancelBubble=true;" href="individual.php?pid=', $pid, '&amp;ged=', rawurlencode($GEDCOM), '" title="',strip_tags($name.$addname),'">
 			<span id="namedef-',$boxID, '" class="name',$style,' ',$classfacts,'">', $shortname, '</span>
@@ -49,13 +49,13 @@ echo '<div id="out-', $boxID ,'" ', $outBoxAdd, '>
 				<a onclick="event.cancelBubble=true;" href="individual.php?pid=', $pid, '&amp;ged=', rawurlencode($GEDCOM), '">',
 					'<span id="namedef-',$boxID, '.2" class="name',$style,' ',$classfacts,'">', $name.$addname, '</span>
 					<span class="name',$style,'">',$genderImage,'</span>';
-//PERSO Append record name text
-echo 				'<span class="rn_append">';
-$hook_rn_append = new WT_Perso_Hook('h_rn_append');
-echo 				implode('&nbsp;', $hook_rn_append->execute($person)) ;		
-echo				'</span>';
-//END PERSO
-echo 	'</a>',
+		//PERSO Append record name text
+		echo 			'<span class="rn_append">';
+		$hook_rn_append = new WT_Perso_Hook('h_rn_append');
+		echo 				implode('&nbsp;', $hook_rn_append->execute($person)) ;		
+		echo			'</span>';
+		//END PERSO
+		echo 		'</a>',
 			$BirthDeath,
 		'</div>
 		<div id="inout-',$boxID,'" style="display:none;">

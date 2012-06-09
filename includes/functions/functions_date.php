@@ -2,7 +2,7 @@
 // Date Functions that can be used by any page in webtrees
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_date.php 13213 2012-01-09 16:19:58Z greg $
+// $Id: functions_date.php 13841 2012-04-19 11:59:15Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -124,16 +124,7 @@ function format_timestamp($time) {
 		}
 	}
 
-	return
-		PrintReady(timestamp_to_gedcom_date($time)->Display(false, $DATE_FORMAT).
-		'<span class="date"> - '.$time_fmt.'</span>');
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Convert a unix-style timestamp into a julian-day
-////////////////////////////////////////////////////////////////////////////////
-function timestamp_to_jd($time) {
-	return timestamp_to_gedcom_date($time)->JD();
+	return timestamp_to_gedcom_date($time)->Display(false, $DATE_FORMAT).  '<span class="date"> - '.$time_fmt.'</span>';
 }
 
 ////////////////////////////////////////////////////////////////////////////////

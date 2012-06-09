@@ -21,14 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Pedigree.php 13336 2012-01-31 21:50:29Z nigel $
+// $Id: Pedigree.php 13820 2012-04-17 08:25:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-require_once WT_ROOT.'includes/functions/functions_charts.php';
 
 class WT_Controller_Pedigree extends WT_Controller_Chart {
 	var $log2;

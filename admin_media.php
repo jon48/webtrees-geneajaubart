@@ -2,7 +2,7 @@
 // Popup window that will allow a user to search for a media
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_media.php 13341 2012-02-01 08:57:14Z greg $
+// $Id: admin_media.php 13871 2012-04-29 04:37:29Z nigel $
 
  /* TODO:
  * Add check for missing index.php files when creating a directory
@@ -279,11 +279,6 @@ function pasteid(id) {
 	window.close();
 }
 
-function ilinkitem(mediaid, type) {
-	window.open('inverselink.php?mediaid='+mediaid+'&linkto='+type, '_blank', 'top=50, left=50, width=570, height=650, resizable=1, scrollbars=1');
-	return false;
-}
-
 function checknames(frm) {
 	if (document.managemedia.subclick) button = document.managemedia.subclick.value;
 	if (button == "all") {
@@ -316,20 +311,8 @@ function showchanges() {
 
 //-->
 </script>
-<script src="<?php echo WT_STATIC_URL; ?>js/webtrees.js" type="text/javascript"></script>
 <?php
 if (check_media_structure()) {
-	echo '<div id="uploadmedia" style="display:none">';
-	// Check if Standard Media Directory is writeable, doesn't matter if we upload to protected directory
-	if (!$is_std_media_writable && !$USE_MEDIA_FIREWALL) {
-		echo '<p class="ui-state-error">';
-		echo WT_I18N::translate('Uploading media files is not allowed because the media folder is not writable.');
-		echo '</p>';
-	} else {
-		show_mediaUpload_form(WT_SCRIPT_NAME, $showthumb); // We have the green light to upload media, echo the form
-	}
-	echo "</div>";
-
 	ob_start(); // Save output until action table has been printed
 
 	if ($action == "deletedir") {
@@ -798,11 +781,8 @@ if (check_media_structure()) {
 				<?php echo WT_I18N::translate('Show thumbnails'); ?>
 				<input type="checkbox" name="showthumb" value="true" <?php if ($showthumb) echo "checked=\"checked\""; ?> onclick="submit();">
 			</td>
-			<!--<td class="wrap">
-				<?php echo "<a href=\"#\" onclick=\"expand_layer('uploadmedia');\">".WT_I18N::translate('Upload media files')."</a>". help_link('upload_media'); ?>
-			</td>-->
 			<td class="wrap">
-				<a href="#" onclick="window.open('addmedia.php?action=showmediaform&amp;linktoid=new', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1'); return false;"> <?php echo WT_I18N::translate('Add a new media object')."</a>". help_link('OBJE'); ?>
+				<a href="#" onclick="window.open('addmedia.php?action=showmediaform&amp;linktoid=new', '_blank', edit_window_specs); return false;"> <?php echo WT_I18N::translate('Add a new media object')."</a>". help_link('OBJE'); ?>
 			</td>
 				<?php
 					$tempURL = WT_SCRIPT_NAME.'?';
@@ -854,16 +834,16 @@ if (check_media_structure()) {
 		if (empty($directory)) $directory = $MEDIA_DIRECTORY;
 
 		// Start of media directory table
-		echo "<table class=\"media_items\">";
+		echo '<table class="media_items">';
 		// Tell the user where he is
-		echo "<tr>";
-		echo "<td colspan=\"4\">";
+		echo '<tr>';
+		echo '<td colspan="4">';
 			echo WT_I18N::translate('Current directory');
-			echo ":&nbsp;&nbsp;&nbsp;";
+			echo ': ';
 //			if ($USE_MEDIA_FIREWALL) { echo $MEDIA_FIREWALL_ROOTDIR; }
 
-			echo PrintReady(substr($directory, 0, -1));
-			echo "<br>";
+			echo '<span dir="auto">'.substr($directory, 0, -1).'</span>';
+			echo '<br>';
 
 			// Calculation to determine whether files are protected or not -------------------------
 			// Check if media directory and thumbs directory are empty
@@ -965,15 +945,11 @@ if (check_media_structure()) {
 		$pdir = '';
 		for ($i=0; $i<count($levels)-2; $i++) $pdir.=$levels[$i].'/';
 		if ($pdir != '') {
-			$uplink = "<a href=\"".WT_SCRIPT_NAME."?directory={$pdir}&amp;sortby={$sortby}&amp;level=".($level-1).$thumbget."&amp;subclick=".$subclick."\">";
-			if ($TEXT_DIRECTION=="rtl") $uplink .= getLRM();
+			$uplink = '<a href="'.WT_SCRIPT_NAME."?directory={$pdir}&amp;sortby={$sortby}&amp;level=".($level-1).$thumbget."&amp;subclick=".$subclick.'" dir="auto">';
 			$uplink .= $pdir;
-			if ($TEXT_DIRECTION=="rtl") $uplink .= getLRM();
 			$uplink .= "</a>";
 
-			$uplink2 = "<a href=\"".WT_SCRIPT_NAME."?directory={$pdir}&amp;sortby={$sortby}&amp;level=".($level-1).$thumbget."&amp;subclick=".$subclick."\"><img class=\"icon-larrow\" src=\"";
-			$uplink2 .= $WT_IMAGES["larrow"];
-			$uplink2 .= "\" alt=\"".WT_I18N::translate('Back')."\" title=\"".WT_I18N::translate('Back')."\"></a>";
+			$uplink2 = "<a href=\"".WT_SCRIPT_NAME."?directory={$pdir}&amp;sortby={$sortby}&amp;level=".($level-1).$thumbget."&amp;subclick=".$subclick."\" class=\"icon-larrow\"  title=\"".WT_I18N::translate('Back')."\"></a>";
 		}
 
 		// display the directory list
@@ -991,46 +967,44 @@ if (check_media_structure()) {
 			}
 
 			foreach ($dirs as $indexval => $dir) {
-				if ($dir{0}!=".") {
-				echo "<tr>";
-					echo "<td class=\" center\" width=\"10\">";
+				if ($dir{0}!='.') {
+				echo '<tr>';
+					echo '<td class="center">';
 						// directory options
-						echo "<form name=\"blah\" action=\"".WT_SCRIPT_NAME."\" method=\"post\">";
-						echo "<input type=\"hidden\" name=\"directory\" value=\"".$directory.$dir."/\">";
-						echo "<input type=\"hidden\" name=\"parentdir\" value=\"".$directory."\">";
-						echo "<input type=\"hidden\" name=\"level\" value=\"".($level)."\">";
-						echo "<input type=\"hidden\" name=\"dir\" value=\"".$dir."\">";
-						echo "<input type=\"hidden\" name=\"action\" value=\"\">";
-						echo "<input type=\"hidden\" name=\"showthumb\" value=\"{$showthumb}\">";
-						echo "<input type=\"hidden\" name=\"sortby\" value=\"{$sortby}\">";
-						echo "<input type=\"image\" src=\"".$WT_IMAGES["remove"]."\" alt=\"".WT_I18N::translate('Delete')."\" title=\"".WT_I18N::translate('Delete')."\" onclick=\"this.form.action.value='deletedir';return confirm('".WT_I18N::translate('Are you sure you want to delete this folder?')."');\"></td>";
+						echo '<form name="blah" action="'.WT_SCRIPT_NAME.'" method="post">';
+						echo '<input type="hidden" name="directory" value="'.$directory.$dir.'/">';
+						echo '<input type="hidden" name="parentdir" value="'.$directory.'">';
+						echo '<input type="hidden" name="level" value="'.($level).'">';
+						echo '<input type="hidden" name="dir" value="'.$dir.'">';
+						echo '<input type="hidden" name="action" value="">';
+						echo '<input type="hidden" name="showthumb" value="'.$showthumb.'">';
+						echo '<input type="hidden" name="sortby" value="'.$sortby.'">';
+						echo '<input type="image" src="'.$WT_IMAGES['remove'].'" alt="'.WT_I18N::translate('Delete').'" title="'.WT_I18N::translate('Delete').'" onclick="this.form.action.value=\'deletedir\';return confirm(\''.WT_I18N::translate('Are you sure you want to delete this folder?').'\');"></td>';
 						if ($USE_MEDIA_FIREWALL && $is_std_media_writable) {
-							echo "<td width=\"120\"><input type=\"submit\" value=\"".WT_I18N::translate('Move to standard')."\" onclick=\"this.form.level.value=(this.form.level.value*1)+1;this.form.action.value='movedirstandard';\"></td>";
-							echo "<td width=\"120\"><input type=\"submit\" value=\"".WT_I18N::translate('Move to protected')."\" onclick=\"this.form.level.value=(this.form.level.value*1)+1;this.form.action.value='movedirprotected';\"></td>";
+							echo '<td width="120"><input type="submit" value="'.WT_I18N::translate('Move to standard').'" onclick="this.form.level.value=(this.form.level.value*1)+1;this.form.action.value=\'movedirstandard\';"></td>';
+							echo '<td width="120"><input type="submit" value="'.WT_I18N::translate('Move to protected').'" onclick="this.form.level.value=(this.form.level.value*1)+1;this.form.action.value=\'movedirprotected\';"></td>';
 						}
 
-						echo "</form>";
-			//	echo "</td>";
-					echo "<td>";
-						echo "<a href=\"".WT_SCRIPT_NAME."?directory=".rawurlencode($directory.$dir)."/&amp;sortby={$sortby}&amp;level=".($level+1).$thumbget."&amp;subclick={$subclick}\">";
-						if ($TEXT_DIRECTION=="rtl") echo getRLM();
+						echo '</form>';
+					echo '<td>';
+						echo '<a href="'.WT_SCRIPT_NAME.'?directory='.rawurlencode($directory.$dir).'/&amp;sortby='.$sortby.'&amp;level='.($level+1).$thumbget.'&amp;subclick='.$subclick.'" dir="auto">';
 						echo $dir;
-						if ($TEXT_DIRECTION=="rtl") echo getRLM();
-						echo "</a>";
-					echo "</td>";
-				echo "</tr>";
+						echo '</a>';
+					echo '</td>';
+				echo '</tr>';
 				}
 			}
 		}
-		echo "</table>\n";
-		echo "<br>";
+		echo '</table>';
+		echo '<br>';
 
 		// display the images
 		if (count($medialist) && ($subclick=='search' || $subclick=='all')) {
 			if (WT_USE_LIGHTBOX) {
 				// Get Lightbox config variables
 				// Following two lines are temporarily removed as they cause problems. BH 07/01/2011
-				//require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
+				//$album = new lightbox_WT_Module();
+				//$album->getPreLoadContent();
 			}
 
 			// Sort the media list according to the user's wishes
@@ -1111,7 +1085,7 @@ if (check_media_structure()) {
 							} else {
 								$tempURL .= 'showmediaform&amp;filename='.rawurlencode($media['FILE']).'&amp;linktoid=new';
 							}
-							echo "<a href=\"#\" onclick=\"window.open('", $tempURL, "', '_blank', 'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1'); return false;\">", WT_I18N::translate('Edit'), "</a><br>";
+							echo "<a href=\"#\" onclick=\"window.open('", $tempURL, "', '_blank', edit_window_specs); return false;\">", WT_I18N::translate('Edit'), "</a><br>";
 
 							// Edit Raw
 							if ($media["XREF"] != "") {
@@ -1196,7 +1170,7 @@ if (check_media_structure()) {
 						$after    = substr(strstr($haystack, $needle), strlen($needle));
 						$worked   = str_replace("1 NOTE", "1 NOTE<br>", $after);
 						$final    = $before.$needle.$worked;
-						$notes    = PrintReady(htmlspecialchars(addslashes(print_fact_notes($final, 1, true, true))));
+						$notes    = htmlspecialchars(addslashes(print_fact_notes($final, 1, true, true)));
 
 						// Get info on how to handle this media file
 						$mediaInfo = mediaFileInfo($media["FILE"], $media["THUMB"], $media["XREF"], $name, $notes, "ADMIN");			
@@ -1222,15 +1196,15 @@ if (check_media_structure()) {
 
 						//-- name and size field
 						echo "<td>";
-						if ($media["TITL"]!="") echo "<b>".PrintReady($media["TITL"])."</b><br>";
-						if (!$isExternal && !$media["EXISTS"]) echo "<span dir=\"ltr\">".PrintReady($media["FILE"])."</span><br><span class=\"error\">".WT_I18N::translate('The filename entered does not exist.')."</span><br>";
+						if ($media["TITL"]!="") echo "<b>".htmlspecialchars($media["TITL"])."</b><br>";
+						if (!$isExternal && !$media["EXISTS"]) echo '<span dir="auto">'.htmlspecialchars($media["FILE"])."</span><br><span class=\"error\">".WT_I18N::translate('The filename entered does not exist.')."</span><br>";
 						else {
 							if (substr($mediaInfo['type'], 0, 4) == 'url_') $tempText = 'URL';
-							else $tempText = PrintReady($media["FILE"]);
-							if (!empty($media["XREF"])) {
-								echo '<a href="', 'mediaviewer.php?mid=', $media["XREF"], '"><span dir="ltr">', $tempText, '</span></a><br>';
+							else $tempText = $media['FILE'];
+							if (!empty($media['XREF'])) {
+								echo '<a href="', 'mediaviewer.php?mid=', $media['XREF'], '"><span dir="auto">', $tempText, '</span></a><br>';
 							} else {
-								echo '<span dir="ltr">', $tempText, '</span><br>';
+								echo '<span dir="auto">', $tempText, '</span><br>';
 							}
 						}
 						if (substr($mediaInfo['type'], 0, 4) != 'url_' && !empty($imgsize[0])) {

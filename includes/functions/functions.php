@@ -21,14 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions.php 13279 2012-01-18 12:11:25Z greg $
+// $Id: functions.php 13968 2012-06-03 22:21:21Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-require_once WT_ROOT.'includes/functions/functions_utf-8.php';
 
 ////////////////////////////////////////////////////////////////////////////////
 // Extract, sanitise and validate FORM (POST), URL (GET) and COOKIE variables.
@@ -166,12 +164,16 @@ function fetch_remote_file($host, $path, $timeout=3) {
 }
 
 // Check with the webtrees.net server for the latest version of webtrees.
-// Fetching the remote file can be slow, and place an excessive load on
-// the webtrees.net server, so only check it infrequently, and cache the result.
+// Fetching the remote file can be slow, so check infrequently, and cache the result.
+// Pass the current versions of webtrees, PHP and MySQL, as the response
+// may be different for each.  The server logs are used to generate
+// installation statistics which can be found at http://svn.webtrees.net/statistics.html
 function fetch_latest_version() {
 	$last_update_timestamp=get_site_setting('LATEST_WT_VERSION_TIMESTAMP');
-	if ($last_update_timestamp < time()-24*60*60*3) {
-		$latest_version_txt=fetch_remote_file('webtrees.net', '/latest-version.txt');
+	if ($last_update_timestamp < time()-24*60*60) {
+		$row=WT_DB::prepare("SHOW VARIABLES LIKE 'version'")->fetchOneRow();
+		$params='?w='.WT_VERSION.WT_VERSION_RELEASE.'&p='.PHP_VERSION.'&m='.$row->value.'&o='.(DIRECTORY_SEPARATOR=='/'?'u':'w');
+		$latest_version_txt=fetch_remote_file('svn.webtrees.net', '/build/latest-version.txt'.$params);
 		if ($latest_version_txt) {
 			set_site_setting('LATEST_WT_VERSION', $latest_version_txt);
 			set_site_setting('LATEST_WT_VERSION_TIMESTAMP', time());
@@ -217,7 +219,6 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $CHART_BOX_TAGS;               $CHART_BOX_TAGS               =get_gedcom_setting($ged_id, 'CHART_BOX_TAGS');
 	global $CONTACT_USER_ID;              $CONTACT_USER_ID              =get_gedcom_setting($ged_id, 'CONTACT_USER_ID');
 	global $DEFAULT_PEDIGREE_GENERATIONS; $DEFAULT_PEDIGREE_GENERATIONS =get_gedcom_setting($ged_id, 'DEFAULT_PEDIGREE_GENERATIONS');
-	global $ENABLE_AUTOCOMPLETE;          $ENABLE_AUTOCOMPLETE          =get_gedcom_setting($ged_id, 'ENABLE_AUTOCOMPLETE');
 	global $EXPAND_NOTES;                 $EXPAND_NOTES                 =get_gedcom_setting($ged_id, 'EXPAND_NOTES');
 	global $EXPAND_RELATIVES_EVENTS;      $EXPAND_RELATIVES_EVENTS      =get_gedcom_setting($ged_id, 'EXPAND_RELATIVES_EVENTS');
 	global $EXPAND_SOURCES;               $EXPAND_SOURCES               =get_gedcom_setting($ged_id, 'EXPAND_SOURCES');
@@ -274,8 +275,6 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $SOURCE_ID_PREFIX;             $SOURCE_ID_PREFIX             =get_gedcom_setting($ged_id, 'SOURCE_ID_PREFIX');
 	global $SURNAME_LIST_STYLE;           $SURNAME_LIST_STYLE           =get_gedcom_setting($ged_id, 'SURNAME_LIST_STYLE');
 	global $THUMBNAIL_WIDTH;              $THUMBNAIL_WIDTH              =get_gedcom_setting($ged_id, 'THUMBNAIL_WIDTH');
-	global $UNDERLINE_NAME_QUOTES;        $UNDERLINE_NAME_QUOTES        =get_gedcom_setting($ged_id, 'UNDERLINE_NAME_QUOTES');
-	global $USE_GEONAMES;                 $USE_GEONAMES                 =get_gedcom_setting($ged_id, 'USE_GEONAMES');
 	global $USE_MEDIA_FIREWALL;           $USE_MEDIA_FIREWALL           =get_gedcom_setting($ged_id, 'USE_MEDIA_FIREWALL');
 	global $USE_MEDIA_VIEWER;             $USE_MEDIA_VIEWER             =get_gedcom_setting($ged_id, 'USE_MEDIA_VIEWER');
 	global $USE_RIN;                      $USE_RIN                      =get_gedcom_setting($ged_id, 'USE_RIN');
@@ -720,7 +719,7 @@ function breakConts($newline) {
 	}
 
 	$newged = "";
-	$newlines = preg_split("/\n/", rtrim(stripLRMRLM($newline)));
+	$newlines = preg_split("/\n/", rtrim($newline));
 	for ($k=0; $k<count($newlines); $k++) {
 		if ($k>0) {
 			$newlines[$k] = "{$level} CONT ".$newlines[$k];
@@ -2759,7 +2758,7 @@ function in_arrayr($needle, $haystack) {
 
 // Function to build an URL querystring from GET variables
 // Optionally, add/replace specified values
-function get_query_url($overwrite=null) {
+function get_query_url($overwrite=null, $separator='&') {
 	if (empty($_GET)) {
 		$get=array();
 	} else {
@@ -2774,14 +2773,14 @@ function get_query_url($overwrite=null) {
 	$query_string='';
 	foreach ($get as $key=>$value) {
 		if (!is_array($value)) {
-			$query_string.='&amp;' . rawurlencode($key) . '=' . rawurlencode($value);
+			$query_string.=$separator . rawurlencode($key) . '=' . rawurlencode($value);
 		} else {
 			foreach ($value as $k=>$v) {
-				$query_string.='&amp;' . rawurlencode($key) . '%5B' . rawurlencode($k) . '%5D=' . rawurlencode($v);
+				$query_string.=$separator . rawurlencode($key) . '%5B' . rawurlencode($k) . '%5D=' . rawurlencode($v);
 			}
 		}
 	}
-	$query_string=substr($query_string, 5); // Remove leading '&amp;'
+	$query_string=substr($query_string, strlen($separator)); // Remove leading '&amp;'
 	if ($query_string) {
 		return WT_SCRIPT_NAME.'?'.$query_string;
 	} else {
@@ -3043,21 +3042,21 @@ function mediaFileInfo($fileName, $thumbName, $mid, $name='', $notes='', $admin=
 			// Lightbox is installed
 			switch ($type) {
 			case 'url_flv':
-				$url = 'js/jw_player/flvVideo.php?flvVideo='.rawurlencode($fileName) . "\" rel='clearbox(500, 392, click)' rev=\"" . $mid . "::" . $GEDCOM . "::" . PrintReady(htmlspecialchars($name)) . "::" . htmlspecialchars($notes);
+				$url = 'js/jw_player/flvVideo.php?flvVideo='.rawurlencode($fileName) . "\" rel='clearbox(500, 392, click)' rev=\"" . $mid . "::" . $GEDCOM . "::" . htmlspecialchars($name) . "::" . htmlspecialchars($notes);
 				break 2;
 			case 'local_flv':
-				$url = 'js/jw_player/flvVideo.php?flvVideo='.rawurlencode(WT_SERVER_NAME.WT_SCRIPT_PATH.$fileName) . "\" rel='clearbox(500, 392, click)' rev=\"" . $mid . "::" . $GEDCOM . "::" . PrintReady(htmlspecialchars($name)) . "::" . htmlspecialchars($notes);
+				$url = 'js/jw_player/flvVideo.php?flvVideo='.rawurlencode(WT_SERVER_NAME.WT_SCRIPT_PATH.$fileName) . "\" rel='clearbox(500, 392, click)' rev=\"" . $mid . "::" . $GEDCOM . "::" . htmlspecialchars($name) . "::" . htmlspecialchars($notes);
 				break 2;
 			case 'url_wmv':
-				$url = 'js/jw_player/wmvVideo.php?wmvVideo='.rawurlencode($fileName) . "\" rel='clearbox(500, 392, click)' rev=\"" . $mid . "::" . $GEDCOM . "::" . PrintReady(htmlspecialchars($name)) . "::" . htmlspecialchars($notes);
+				$url = 'js/jw_player/wmvVideo.php?wmvVideo='.rawurlencode($fileName) . "\" rel='clearbox(500, 392, click)' rev=\"" . $mid . "::" . $GEDCOM . "::" . htmlspecialchars($name) . "::" . htmlspecialchars($notes);
 				break 2;
 			case 'local_audio':
 			case 'local_wmv':
-				$url = 'js/jw_player/wmvVideo.php?wmvVideo='.rawurlencode(WT_SERVER_NAME.WT_SCRIPT_PATH.$fileName) . "\" rel='clearbox(500, 392, click)' rev=\"" . $mid . "::" . $GEDCOM . "::" . PrintReady(htmlspecialchars($name)) . "::" . htmlspecialchars($notes);
+				$url = 'js/jw_player/wmvVideo.php?wmvVideo='.rawurlencode(WT_SERVER_NAME.WT_SCRIPT_PATH.$fileName) . "\" rel='clearbox(500, 392, click)' rev=\"" . $mid . "::" . $GEDCOM . "::" . htmlspecialchars($name) . "::" . htmlspecialchars($notes);
 				break 2;
 			case 'url_image':
 			case 'local_image':
-				$url = $fileName . "\" rel=\"clearbox[general]\" rev=\"" . $mid . "::" . $GEDCOM . "::" . PrintReady(htmlspecialchars($name)) . "::" . htmlspecialchars($notes);
+				$url = $fileName . "\" rel=\"clearbox[general]\" rev=\"" . $mid . "::" . $GEDCOM . "::" . htmlspecialchars($name) . "::" . htmlspecialchars($notes);
 				break 2;
 			case 'url_picasa':
 			case 'url_page':
@@ -3066,7 +3065,7 @@ function mediaFileInfo($fileName, $thumbName, $mid, $name='', $notes='', $admin=
 			case 'local_page':
 			case 'local_pdf':
 			// case 'local_other':
-				$url = $fileName . "\" rel='clearbox(" . get_module_setting('lightbox', 'LB_URL_WIDTH',  '1000') . ',' . get_module_setting('lightbox', 'LB_URL_HEIGHT', '600') . ", click)' rev=\"" . $mid . '::' . $GEDCOM . '::' . PrintReady(htmlspecialchars($name)) . "::" . htmlspecialchars($notes);
+				$url = $fileName . "\" rel='clearbox(" . get_module_setting('lightbox', 'LB_URL_WIDTH',  '1000') . ',' . get_module_setting('lightbox', 'LB_URL_HEIGHT', '600') . ", click)' rev=\"" . $mid . '::' . $GEDCOM . '::' . htmlspecialchars($name) . "::" . htmlspecialchars($notes);
 				break 2;
 			case 'url_streetview':
 				if (WT_SCRIPT_NAME != "admin_media.php") {

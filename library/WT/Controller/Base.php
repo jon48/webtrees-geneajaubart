@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Base.php 13393 2012-02-05 23:18:58Z greg $
+// $Id: Base.php 13930 2012-05-10 21:25:56Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -37,8 +37,6 @@ class WT_Controller_Base {
 	private   $page_title   =WT_WEBTREES;        // <head><title> $page_title </title></head>
 
 	// The controller accumulates JavaScript (inline and external), and renders it in the footer
-	const JS_START="\n<script type=\"text/javascript\">\n//<![CDATA[\n";
-	const JS_END  ="\n//]]>\n</script>\n";
 	const JS_PRIORITY_HIGH   = 0;
 	const JS_PRIORITY_NORMAL = 1;
 	const JS_PRIORITY_LOW    = 2;
@@ -169,13 +167,13 @@ class WT_Controller_Base {
 		}
 		// Process the scripts, in priority order
 		if ($this->inline_javascript) {
-			$html.=self::JS_START;
+			$html.='<script>';
 			foreach ($this->inline_javascript as $scripts) {
 				foreach ($scripts as $script) {
 					$html.=$script.PHP_EOL;
 				}
 			}
-			$html.=self::JS_END;
+			$html.='</script>';
 		}
 
 		$this->inline_javascript=array(
@@ -191,7 +189,7 @@ class WT_Controller_Base {
 	// Print the page header, using the theme
 	public function pageHeader() {
 		// Import global variables into the local scope, for the theme's header.php
-		global $BROWSERTYPE, $SEARCH_SPIDER, $WT_IMAGES, $TEXT_DIRECTION, $REQUIRE_AUTHENTICATION;
+		global $BROWSERTYPE, $SEARCH_SPIDER, $TEXT_DIRECTION, $REQUIRE_AUTHENTICATION;
 		global $stylesheet, $headerfile, $view;
 
 		// The title often includes the names of records, which may have markup
@@ -210,62 +208,41 @@ class WT_Controller_Base {
 		}
 
 		$javascript=
-			'<script type="text/javascript" src="'.WT_JQUERY_URL.'"></script>'.
-			'<script type="text/javascript" src="'.WT_JQUERYUI_URL.'"></script>'.
-			'<script type="text/javascript" src="'.WT_STATIC_URL.'js/jquery/jquery.jeditable.min.js"></script>'.
-			WT_JS_START.'
+			'<!--[if lt IE 9]><script src="'.WT_STATIC_URL.'js/html5.js"></script><![endif]-->
+			<script type="text/javascript" src="'.WT_JQUERY_URL.'"></script>
+			<script type="text/javascript" src="'.WT_JQUERYUI_URL.'"></script>
+			<script type="text/javascript" src="'.WT_STATIC_URL.'js/jquery/jquery.jeditable.min.js"></script>
+			<script>
 			// Give JavaScript access to some PHP constants
 			var WT_STATIC_URL  = "'.WT_STATIC_URL.'";
 			var WT_THEME_DIR   = "'.WT_THEME_DIR.'";
 			var WT_MODULES_DIR = "'.WT_MODULES_DIR.'";
 			var WT_GEDCOM      = "'.WT_GEDCOM.'";
+			var WT_GED_ID      = "'.WT_GED_ID.'";
 			var WT_USER_ID     = "'.WT_USER_ID.'";
 			var textDirection  = "'.$TEXT_DIRECTION.'";
 			var browserType    = "'.$BROWSERTYPE.'";
 			var WT_SCRIPT_NAME = "'.WT_SCRIPT_NAME.'";
 			var WT_LOCALE      = "'.WT_LOCALE.'";
-			var accesstime  = '.WT_DB::prepare("SELECT UNIX_TIMESTAMP(NOW())")->fetchOne().';
-			var plusminus = new Array();
-			plusminus[0] = new Image();
-			plusminus[0].src = "'.$WT_IMAGES["plus"].'";
-			plusminus[0].title = "'.WT_I18N::translate('Show Details').'";
-			plusminus[1] = new Image();
-			plusminus[1].src = "'.$WT_IMAGES["minus"].'";
-			plusminus[1].title = "'.WT_I18N::translate('Hide Details').'";
-			var zoominout = new Array();
-			zoominout[0] = new Image();
-			zoominout[0].src = "'.$WT_IMAGES["zoomin"].'";
-			zoominout[1] = new Image();
-			zoominout[1].src = "'.$WT_IMAGES["zoomout"].'";
-			var arrows = new Array();
-			arrows[0] = new Image();
-			arrows[0].src = "'.$WT_IMAGES["larrow2"].'";
-			arrows[1] = new Image();
-			arrows[1].src = "'.$WT_IMAGES["rarrow2"].'";
-			arrows[2] = new Image();
-			arrows[2].src = "'.$WT_IMAGES["uarrow2"].'";
-			arrows[3] = new Image();
-			arrows[3].src = "'.$WT_IMAGES["darrow2"].'";
+			var accesstime     = '.WT_DB::prepare("SELECT UNIX_TIMESTAMP(NOW())")->fetchOne().';
 	
+		// Temporary fix for access to main menu hover elements on android touch devices
+			var ua = navigator.userAgent.toLowerCase();
+			var isAndroid = ua.indexOf("android") > -1;
+			if(isAndroid) {
+				jQuery("#main-menu > li > a").attr("href", "#");
+				jQuery("a.icon_arrow").attr("href", "#");
+			}
+		
 		function delete_record(pid, linenum, mediaid) {
 			if (!mediaid) mediaid="";
 			if (confirm(\''.WT_I18N::translate('Are you sure you want to delete this fact?').'\')) {
-				window.open(\'edit_interface.php?action=delete&pid=\'+pid+\'&linenum=\'+linenum+\'&mediaid=\'+mediaid, \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\');
+				window.open(\'edit_interface.php?action=delete&pid=\'+pid+\'&linenum=\'+linenum+\'&mediaid=\'+mediaid, \'_blank\', edit_window_specs);
 			}
 			return false;
 		}
-
-		function message(username, method, url, subject) {
-			if ((!url)||(url=="")) url=\''.addslashes(urlencode(get_query_url())).'\';
-			if ((!subject)||(subject=="")) subject="";
-			window.open(\'message.php?to=\'+username+\'&method=\'+method+\'&url=\'+url+\'&subject=\'+subject, \'_blank\', \'top=50, left=50, width=600, height=500, resizable=1, scrollbars=1\');
-			return false;
-		}
-
-		var whichhelp = \'help_'.WT_SCRIPT_NAME.'\';
-		'.
-		WT_JS_END.
-		'<script src="'.WT_STATIC_URL.'js/webtrees.js" type="text/javascript"></script>';
+		</script>
+		<script src="'.WT_STATIC_URL.'js/webtrees.js" type="text/javascript"></script>';
 		
 		header('Content-Type: text/html; charset=UTF-8');
 		require WT_ROOT.$headerfile;
@@ -290,7 +267,7 @@ class WT_Controller_Base {
 
 	// Print the page footer, using the theme
 	protected function pageFooter() {
-		global $footerfile, $WT_IMAGES, $TEXT_DIRECTION, $view;
+		global $footerfile, $TEXT_DIRECTION, $view;
 
 		require WT_ROOT.$footerfile;
 
@@ -308,11 +285,11 @@ class WT_Controller_Base {
 	public function getSignificantIndividual() {
 		static $individual; // Only query the DB once.
 
-		if (!$individual && WT_USER_GEDCOM_ID) {
-			$individual=WT_Person::getInstance(WT_USER_GEDCOM_ID);
-		}
 		if (!$individual && WT_USER_ROOT_ID) {
 			$individual=WT_Person::getInstance(WT_USER_ROOT_ID);
+		}
+		if (!$individual && WT_USER_GEDCOM_ID) {
+			$individual=WT_Person::getInstance(WT_USER_GEDCOM_ID);
 		}
 		if (!$individual) {
 			$individual=WT_Person::getInstance(get_gedcom_setting(WT_GED_ID, 'PEDIGREE_ROOT_ID'));

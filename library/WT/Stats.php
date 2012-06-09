@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Stats.php 13410 2012-02-08 22:00:11Z greg $
+// $Id: Stats.php 13924 2012-05-06 17:23:52Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -54,7 +54,7 @@ class WT_Stats {
 
 	function _setGedcom($gedcom) {
 		$this->_gedcom = $gedcom;
-		$this->_ged_id = PrintReady(get_id_from_gedcom($gedcom));
+		$this->_ged_id = get_id_from_gedcom($gedcom);
 		$this->_gedcom_url = rawurlencode($gedcom);
 	}
 
@@ -201,7 +201,7 @@ class WT_Stats {
 
 	function gedcomID() {return $this->_ged_id;}
 
-	function gedcomTitle() {return PrintReady(get_gedcom_setting($this->_ged_id, 'title'));}
+	function gedcomTitle() {return htmlspecialchars(get_gedcom_setting($this->_ged_id, 'title'));}
 
 	function _gedcomHead() {
 		$title = "";
@@ -275,7 +275,7 @@ class WT_Stats {
 
 	function gedcomUpdated() {
 		$row=
-			WT_DB::prepare("SELECT d_year, d_month, d_day FROM `##dates` WHERE d_julianday1 = ( SELECT max( d_julianday1 ) FROM `##dates` WHERE d_file =? AND d_fact=? ) LIMIT 1")
+			WT_DB::prepare("SELECT SQL_CACHE d_year, d_month, d_day FROM `##dates` WHERE d_julianday1 = ( SELECT max( d_julianday1 ) FROM `##dates` WHERE d_file =? AND d_fact=? ) LIMIT 1")
 			->execute(array($this->_ged_id, 'CHAN'))
 			->fetchOneRow();
 		if ($row) {
@@ -369,7 +369,7 @@ class WT_Stats {
 
 	function _totalIndividuals() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=?")
+			WT_DB::prepare("SELECT SQL_CACHE COUNT(*) FROM `##individuals` WHERE i_file=?")
 			->execute(array($this->_ged_id))
 			->fetchOne();
 	}
@@ -379,7 +379,7 @@ class WT_Stats {
 	}
 
 	function _totalIndisWithSources() {
-		$rows=self::_runSQL("SELECT COUNT(DISTINCT i_id) AS tot FROM `##link`, `##individuals` WHERE i_id=l_from AND i_file=l_file AND l_file=".$this->_ged_id." AND l_type='SOUR'");
+		$rows=self::_runSQL("SELECT SQL_CACHE COUNT(DISTINCT i_id) AS tot FROM `##link`, `##individuals` WHERE i_id=l_from AND i_file=l_file AND l_file=".$this->_ged_id." AND l_type='SOUR'");
 		return $rows[0]['tot'];
 	}
 
@@ -403,7 +403,7 @@ class WT_Stats {
 			$chl =  WT_I18N::translate('Without sources').' - '.WT_I18N::percentage(1-$tot_sindi_per,1).'|'.
 					WT_I18N::translate('With sources').' - '.WT_I18N::percentage($tot_sindi_per,1);
 			$chart_title = WT_I18N::translate('Individuals with sources');
-			return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_from},{$color_to}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
+			return '<img src="https://chart.googleapis.com/chart?cht=p3&amp;chd=e:'.$chd.'&amp;chs='.$size.'&amp;chco='.$color_from.','.$color_to.'&amp;chf=bg,s,ffffff00&amp;chl='.rawurlencode($chl).'" width="'.$sizes[0].'" height="'.$sizes[1].'" alt="'.$chart_title.'" title="'.$chart_title.'">';
 		}
 	}
 
@@ -413,7 +413,7 @@ class WT_Stats {
 
 	function _totalFamilies() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##families` WHERE f_file=?")
+			WT_DB::prepare("SELECT SQL_CACHE COUNT(*) FROM `##families` WHERE f_file=?")
 			->execute(array($this->_ged_id))
 			->fetchOne();
 	}
@@ -423,7 +423,7 @@ class WT_Stats {
 	}
 
 	function _totalFamsWithSources() {
-		$rows=self::_runSQL("SELECT COUNT(DISTINCT f_id) AS tot FROM `##link`, `##families` WHERE f_id=l_from AND f_file=l_file AND l_file=".$this->_ged_id." AND l_type='SOUR'");
+		$rows=self::_runSQL("SELECT SQL_CACHE COUNT(DISTINCT f_id) AS tot FROM `##link`, `##families` WHERE f_id=l_from AND f_file=l_file AND l_file=".$this->_ged_id." AND l_type='SOUR'");
 		return $rows[0]['tot'];
 	}
 
@@ -457,7 +457,7 @@ class WT_Stats {
 
 	function _totalSources() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##sources` WHERE s_file=?")
+			WT_DB::prepare("SELECT SQL_CACHE COUNT(*) FROM `##sources` WHERE s_file=?")
 			->execute(array($this->_ged_id))
 			->fetchOne();
 	}
@@ -472,7 +472,7 @@ class WT_Stats {
 
 	function _totalNotes() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##other` WHERE o_type='NOTE' AND o_file=?")
+			WT_DB::prepare("SELECT SQL_CACHE COUNT(*) FROM `##other` WHERE o_type='NOTE' AND o_file=?")
 			->execute(array($this->_ged_id))
 			->fetchOne();
 	}
@@ -487,7 +487,7 @@ class WT_Stats {
 
 	function _totalRepositories() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##other` WHERE o_type='REPO' AND o_file=?")
+			WT_DB::prepare("SELECT SQL_CACHE COUNT(*) FROM `##other` WHERE o_type='REPO' AND o_file=?")
 			->execute(array($this->_ged_id))
 			->fetchOne();
 	}
@@ -514,7 +514,7 @@ class WT_Stats {
 		$vars[]=$this->_ged_id;
 		$total=
 			WT_DB::prepare(
-				"SELECT COUNT({$distinct} n_surn COLLATE '".WT_I18N::$collation."')".
+				"SELECT SQL_CACHE COUNT({$distinct} n_surn COLLATE '".WT_I18N::$collation."')".
 				" FROM `##name`".
 				" WHERE n_surn COLLATE '".WT_I18N::$collation."' {$opt} AND n_file=?")
 			->execute($vars)
@@ -535,14 +535,14 @@ class WT_Stats {
 		}
 		$vars[]=$this->_ged_id;
 		$total=
-			WT_DB::prepare("SELECT COUNT({$distinct} n_givn) FROM `##name` WHERE n_givn {$opt} AND n_file=?")
+			WT_DB::prepare("SELECT SQL_CACHE COUNT({$distinct} n_givn) FROM `##name` WHERE n_givn {$opt} AND n_file=?")
 			->execute($vars)
 			->fetchOne();
 		return WT_I18N::number($total);
 	}
 
 	function totalEvents($params = null) {
-		$sql="SELECT COUNT(*) AS tot FROM `##dates` WHERE d_file=?";
+		$sql="SELECT SQL_CACHE COUNT(*) AS tot FROM `##dates` WHERE d_file=?";
 		$vars=array($this->_ged_id);
 
 		$no_types=array('HEAD', 'CHAN');
@@ -609,7 +609,7 @@ class WT_Stats {
 
 	function _totalSexMales() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=? AND i_sex=?")
+			WT_DB::prepare("SELECT SQL_CACHE COUNT(*) FROM `##individuals` WHERE i_file=? AND i_sex=?")
 			->execute(array($this->_ged_id, 'M'))
 			->fetchOne();
 	}
@@ -624,7 +624,7 @@ class WT_Stats {
 
 	function _totalSexFemales() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=? AND i_sex=?")
+			WT_DB::prepare("SELECT SQL_CACHE COUNT(*) FROM `##individuals` WHERE i_file=? AND i_sex=?")
 			->execute(array($this->_ged_id, 'F'))
 			->fetchOne();
 	}
@@ -639,7 +639,7 @@ class WT_Stats {
 
 	function _totalSexUnknown() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=? AND i_sex=?")
+			WT_DB::prepare("SELECT SQL_CACHE COUNT(*) FROM `##individuals` WHERE i_file=? AND i_sex=?")
 			->execute(array($this->_ged_id, 'U'))
 			->fetchOne();
 	}
@@ -700,7 +700,7 @@ class WT_Stats {
 	// However, SQL cannot provide the same logic used by Person::isDead().
 	function _totalLiving() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=? AND i_gedcom NOT REGEXP '\\n1 (".WT_EVENTS_DEAT.")'")
+			WT_DB::prepare("SELECT SQL_CACHE COUNT(*) FROM `##individuals` WHERE i_file=? AND i_gedcom NOT REGEXP '\\n1 (".WT_EVENTS_DEAT.")'")
 			->execute(array($this->_ged_id))
 			->fetchOne();
 	}
@@ -715,7 +715,7 @@ class WT_Stats {
 
 	function _totalDeceased() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=? AND i_gedcom REGEXP '\\n1 (".WT_EVENTS_DEAT.")'")
+			WT_DB::prepare("SELECT SQL_CACHE COUNT(*) FROM `##individuals` WHERE i_file=? AND i_gedcom REGEXP '\\n1 (".WT_EVENTS_DEAT.")'")
 			->execute(array($this->_ged_id))
 			->fetchOne();
 	}
@@ -776,7 +776,7 @@ class WT_Stats {
 		if (!in_array($type, self::$_media_types) && $type != 'all' && $type != 'unknown') {
 			return 0;
 		}
-		$sql="SELECT COUNT(*) AS tot FROM `##media` WHERE m_gedfile=?";
+		$sql="SELECT SQL_CACHE COUNT(*) AS tot FROM `##media` WHERE m_gedfile=?";
 		$vars=array($this->_ged_id);
 
 		if ($type != 'all') {
@@ -903,7 +903,7 @@ class WT_Stats {
 			$life_dir = 'DESC';
 		}
 		$rows=self::_runSQL(''
-			."SELECT d_year, d_type, d_fact, d_gid"
+			."SELECT SQL_CACHE d_year, d_type, d_fact, d_gid"
 			." FROM `##dates`"
 			." WHERE d_file={$this->_ged_id} AND d_fact IN ({$query_field}) AND d_julianday1=("
 			." SELECT {$dmod}( d_julianday1 )"
@@ -979,13 +979,13 @@ class WT_Stats {
 		if ($fact) {
 			if ($what=='INDI') {
 				$rows=
-					WT_DB::prepare("SELECT i_gedcom AS ged FROM `##individuals` WHERE i_file=?")
+					WT_DB::prepare("SELECT SQL_CACHE i_gedcom AS ged FROM `##individuals` WHERE i_file=?")
 					->execute(array($this->_ged_id))
 					->fetchAll();
 			}
 			else if ($what=='FAM') {
 				$rows=
-					WT_DB::prepare("SELECT f_gedcom AS ged FROM `##families` WHERE f_file=?")
+					WT_DB::prepare("SELECT SQL_CACHE f_gedcom AS ged FROM `##families` WHERE f_file=?")
 					->execute(array($this->_ged_id))
 					->fetchAll();
 			}
@@ -1021,7 +1021,7 @@ class WT_Stats {
 				$join = "";
 			}
 			$rows=self::_runSQL(''
-				.' SELECT'
+				.' SELECT SQL_CACHE'
 				.' p_place AS place,'
 				.' COUNT(*) AS tot'
 				.' FROM'
@@ -1047,7 +1047,7 @@ class WT_Stats {
 				$join = "";
 			}
 			$rows=self::_runSQL(''
-					.' SELECT'
+					.' SELECT SQL_CACHE'
 						.' p_place AS country,'
 						.' COUNT(*) AS tot'
 					.' FROM'
@@ -1066,7 +1066,7 @@ class WT_Stats {
 
 	function _totalPlaces() {
 		return
-			WT_DB::prepare("SELECT COUNT(*) FROM `##places` WHERE p_file=?")
+			WT_DB::prepare("SELECT SQL_CACHE COUNT(*) FROM `##places` WHERE p_file=?")
 			->execute(array($this->_ged_id))
 			->fetchOne();
 	}
@@ -1252,7 +1252,7 @@ class WT_Stats {
 		$i = 1;
 		arsort($places);
 		foreach ($places as $place=>$count) {
-			$place = '<a href="'.get_place_url($place).'" class="list_item">'.PrintReady($place).'</a>';
+			$place = '<a href="'.get_place_url($place).'" class="list_item">'.htmlspecialchars($place).'</a>';
 			$top10[]='<li>'.$place.' - '.WT_I18N::number($count).'</li>';
 			if ($i++==10) break;
 		}
@@ -1266,7 +1266,7 @@ class WT_Stats {
 		$i = 1;
 		arsort($places);
 		foreach ($places as $place=>$count) {
-			$place = '<a href="'.get_place_url($place).'" class="list_item">'.PrintReady($place).'</a>';
+			$place = '<a href="'.get_place_url($place).'" class="list_item">'.htmlspecialchars($place).'</a>';
 			$top10[]='<li>'.$place.' - '.WT_I18N::number($count).'</li>';
 			if ($i++==10) break;
 		}
@@ -1280,7 +1280,7 @@ class WT_Stats {
 		$i = 1;
 		arsort($places);
 		foreach ($places as $place=>$count) {
-			$place = '<a href="'.get_place_url($place).'" class="list_item">'.PrintReady($place).'</a>';
+			$place = '<a href="'.get_place_url($place).'" class="list_item">'.htmlspecialchars($place).'</a>';
 			$top10[]='<li>'.$place.' - '.WT_I18N::number($count).'</li>';
 			if ($i++==10) break;
 		}
@@ -1292,25 +1292,25 @@ class WT_Stats {
 		global $WT_STATS_CHART_COLOR1, $WT_STATS_CHART_COLOR2, $WT_STATS_S_CHART_X, $WT_STATS_S_CHART_Y;
 
 		if ($simple) {
-			$sql = "SELECT FLOOR(d_year/100+1) AS century, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT SQL_CACHE FLOOR(d_year/100+1) AS century, COUNT(*) AS total FROM `##dates` "
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						.'d_year<>0 AND '
 						."d_fact='BIRT' AND "
-						."d_type='@#DGREGORIAN@'";
+						."d_type IN ('@#DGREGORIAN@', '@#DJULIAN@')";
 		} else if ($sex) {
-			$sql = "SELECT d_month, i_sex, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT SQL_CACHE d_month, i_sex, COUNT(*) AS total FROM `##dates` "
 					."JOIN `##individuals` ON d_file = i_file AND d_gid = i_id "
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						."d_fact='BIRT' AND "
-						."d_type='@#DGREGORIAN@'";
+						."d_type IN ('@#DGREGORIAN@', '@#DJULIAN@')";
 		} else {
-			$sql = "SELECT d_month, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT SQL_CACHE d_month, COUNT(*) AS total FROM `##dates` "
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						."d_fact='BIRT' AND "
-						."d_type='@#DGREGORIAN@'";
+						."d_type IN ('@#DGREGORIAN@', '@#DJULIAN@')";
 		}
 		if ($year1>=0 && $year2>=0) {
 			$sql .= " AND d_year BETWEEN '{$year1}' AND '{$year2}'";
@@ -1350,25 +1350,25 @@ class WT_Stats {
 		global $WT_STATS_CHART_COLOR1, $WT_STATS_CHART_COLOR2, $WT_STATS_S_CHART_X, $WT_STATS_S_CHART_Y;
 
 		if ($simple) {
-			$sql = "SELECT FLOOR(d_year/100+1) AS century, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT SQL_CACHE FLOOR(d_year/100+1) AS century, COUNT(*) AS total FROM `##dates` "
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						.'d_year<>0 AND '
 						."d_fact='DEAT' AND "
-						."d_type='@#DGREGORIAN@'";
+						."d_type IN ('@#DGREGORIAN@', '@#DJULIAN@')";
 		} else if ($sex) {
-			$sql = "SELECT d_month, i_sex, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT SQL_CACHE d_month, i_sex, COUNT(*) AS total FROM `##dates` "
 					."JOIN `##individuals` ON d_file = i_file AND d_gid = i_id "
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						."d_fact='DEAT' AND "
-						."d_type='@#DGREGORIAN@'";
+						."d_type IN ('@#DGREGORIAN@', '@#DJULIAN@')";
 		} else {
-			$sql = "SELECT d_month, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT SQL_CACHE d_month, COUNT(*) AS total FROM `##dates` "
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						."d_fact='DEAT' AND "
-						."d_type='@#DGREGORIAN@'";
+						."d_type IN ('@#DGREGORIAN@', '@#DJULIAN@')";
 		}
 		if ($year1>=0 && $year2>=0) {
 			$sql .= " AND d_year BETWEEN '{$year1}' AND '{$year2}'";
@@ -1496,7 +1496,7 @@ class WT_Stats {
 				.' age DESC'
 		*/
 		// use only BIRT and DEAT
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' death.d_gid AS id,'
 				.' death.d_julianday2-birth.d_julianday1 AS age'
 			.' FROM'
@@ -1552,7 +1552,7 @@ class WT_Stats {
 		if ($params !== null && isset($params[0])) {$total = $params[0];} else {$total = 10;}
 		$total=(int)$total;
 		$rows=self::_runSQL(
-			'SELECT '.
+			'SELECT SQL_CACHE '.
 			' MAX(death.d_julianday2-birth.d_julianday1) AS age, '.
 			' death.d_gid AS deathdate '.
 			'FROM '.
@@ -1623,16 +1623,17 @@ class WT_Stats {
 		if ($params !== null && isset($params[0])) {$total = $params[0];} else {$total = 10;}
 		$total=(int)$total;
 		$rows=self::_runSQL(''
-			." SELECT"
+			." SELECT SQL_CACHE"
 			." birth.d_gid AS id,"
 			." MIN(birth.d_julianday1) AS age"
 			." FROM"
-			." `##dates` AS birth," // assume all events occur *after* birth
+			." `##dates` AS birth,"
 			." `##individuals` AS indi"
 			." WHERE"
 			." indi.i_id=birth.d_gid AND"
 			." indi.i_gedcom NOT REGEXP '\n1 (".WT_EVENTS_DEAT.")' AND"
 			." birth.d_file={$this->_ged_id} AND"
+			." birth.d_fact='BIRT' AND"
 			." birth.d_file=indi.i_file AND"
 			." birth.d_julianday1<>0"
 			.$sex_search
@@ -1683,7 +1684,7 @@ class WT_Stats {
 			$sex_search = '';
 		}
 		$rows=self::_runSQL(
-			"SELECT ".
+			"SELECT SQL_CACHE ".
 			" AVG(death.d_julianday2-birth.d_julianday1) AS age ".
 			"FROM ".
 			" `##dates` AS death, ".
@@ -1723,7 +1724,7 @@ class WT_Stats {
 			if (isset($params[0]) && $params[0] != '') {$size = strtolower($params[0]);} else {$size = '230x250';}
 			$sizes = explode('x', $size);
 			$rows=self::_runSQL(''
-				.' SELECT'
+				.' SELECT SQL_CACHE'
 					.' ROUND(AVG(death.d_julianday2-birth.d_julianday1)/365.25,1) AS age,'
 					.' FLOOR(death.d_year/100+1) AS century,'
 					.' i_sex AS sex'
@@ -1740,8 +1741,8 @@ class WT_Stats {
 					." birth.d_fact='BIRT' AND"
 					." death.d_fact='DEAT' AND"
 					.' birth.d_julianday1<>0 AND'
-					." birth.d_type='@#DGREGORIAN@' AND"
-					." death.d_type='@#DGREGORIAN@' AND"
+					." birth.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND"
+					." death.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND"
 					.' death.d_julianday1>birth.d_julianday2'
 				.' GROUP BY century, sex ORDER BY century, sex');
 			if (empty($rows)) return '';
@@ -1811,7 +1812,7 @@ class WT_Stats {
 				}
 			}
 			$rows=self::_runSQL(''
-				.' SELECT'
+				.' SELECT SQL_CACHE'
 					.' death.d_julianday2-birth.d_julianday1 AS age'
 				.' FROM'
 					." `##dates` AS death,"
@@ -1897,7 +1898,7 @@ class WT_Stats {
 
 		if ($direction != 'ASC') {$direction = 'DESC';}
 		$rows=self::_runSQL(''
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' d_gid AS id,'
 				.' d_year AS year,'
 				.' d_fact AS fact,'
@@ -2044,7 +2045,7 @@ class WT_Stats {
 				." married.d_julianday2-birth.d_julianday1 {$age_dir}"
 		*/
 		// use only BIRT and MARR
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' fam.f_id AS famid,'
 				." fam.{$sex_field},"
 				.' married.d_julianday2-birth.d_julianday1 AS age,'
@@ -2110,7 +2111,7 @@ class WT_Stats {
 		if ($params !== null && isset($params[0])) {$total = $params[0];} else {$total = 10;}
 		if ($age_dir != 'ASC') {$age_dir = 'DESC';}
 		$hrows=self::_runSQL(''
-			.' SELECT DISTINCT'
+			.' SELECT SQL_CACHE DISTINCT'
 				.' fam.f_id AS family,'
 				.' MIN(husbdeath.d_julianday2-married.d_julianday1) AS age'
 			.' FROM'
@@ -2132,7 +2133,7 @@ class WT_Stats {
 			.' ORDER BY'
 				." age {$age_dir}");
 		$wrows=self::_runSQL(''
-			.' SELECT DISTINCT'
+			.' SELECT SQL_CACHE DISTINCT'
 				.' fam.f_id AS family,'
 				.' MIN(wifedeath.d_julianday2-married.d_julianday1) AS age'
 			.' FROM'
@@ -2154,7 +2155,7 @@ class WT_Stats {
 			.' ORDER BY'
 				." age {$age_dir}");
 		$drows=self::_runSQL(''
-			.' SELECT DISTINCT'
+			.' SELECT SQL_CACHE DISTINCT'
 				.' fam.f_id AS family,'
 				.' MIN(divorced.d_julianday2-married.d_julianday1) AS age'
 			.' FROM'
@@ -2251,7 +2252,7 @@ class WT_Stats {
 		}
 		$total=(int)$total;
 		$rows=self::_runSQL(''
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' fam.f_id AS family,'
 				.$query1
 			.' FROM'
@@ -2314,7 +2315,7 @@ class WT_Stats {
 		if ($sex == 'F') {$sex_field = 'WIFE';} else {$sex_field = 'HUSB';}
 		if ($age_dir != 'ASC') {$age_dir = 'DESC';}
 		$rows=self::_runSQL(''
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' parentfamily.l_to AS id,'
 				.' childbirth.d_julianday2-birth.d_julianday1 AS age'
 			.' FROM'
@@ -2377,12 +2378,12 @@ class WT_Stats {
 		global $WT_STATS_CHART_COLOR1, $WT_STATS_CHART_COLOR2, $WT_STATS_S_CHART_X, $WT_STATS_S_CHART_Y;
 
 		if ($simple) {
-			$sql = "SELECT FLOOR(d_year/100+1) AS century, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT SQL_CACHE FLOOR(d_year/100+1) AS century, COUNT(*) AS total FROM `##dates` "
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						.'d_year<>0 AND '
 						."d_fact='MARR' AND "
-						."d_type='@#DGREGORIAN@'";
+						."d_type IN ('@#DGREGORIAN@', '@#DJULIAN@')";
 						if ($year1>=0 && $year2>=0) {
 							$sql .= " AND d_year BETWEEN '{$year1}' AND '{$year2}'";
 						}
@@ -2393,7 +2394,7 @@ class WT_Stats {
 				$years = " married.d_year BETWEEN '{$year1}' AND '{$year2}' AND";
 			}
 			$sql=''
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' fam.f_id AS fams,'
 				.' fam.f_husb, fam.f_wife,'
 				.' married.d_julianday2 AS age,'
@@ -2414,7 +2415,7 @@ class WT_Stats {
 				.' (indi.i_id = fam.f_husb OR indi.i_id = fam.f_wife)'
 			.' ORDER BY fams, indi, age ASC';
 		} else {
-			$sql = "SELECT d_month, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT SQL_CACHE d_month, COUNT(*) AS total FROM `##dates` "
 				."WHERE "
 				."d_file={$this->_ged_id} AND "
 				."d_fact='MARR'";
@@ -2453,12 +2454,12 @@ class WT_Stats {
 		global $WT_STATS_CHART_COLOR1, $WT_STATS_CHART_COLOR2, $WT_STATS_S_CHART_X, $WT_STATS_S_CHART_Y;
 
 		if ($simple) {
-			$sql = "SELECT FLOOR(d_year/100+1) AS century, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT SQL_CACHE FLOOR(d_year/100+1) AS century, COUNT(*) AS total FROM `##dates` "
 					."WHERE "
 						."d_file={$this->_ged_id} AND "
 						.'d_year<>0 AND '
 						."d_fact = 'DIV' AND "
-						."d_type='@#DGREGORIAN@'";
+						."d_type IN ('@#DGREGORIAN@', '@#DJULIAN@')";
 						if ($year1>=0 && $year2>=0) {
 							$sql .= " AND d_year BETWEEN '{$year1}' AND '{$year2}'";
 						}
@@ -2469,7 +2470,7 @@ class WT_Stats {
 				$years = " divorced.d_year BETWEEN '{$year1}' AND '{$year2}' AND";
 			}
 			$sql=''
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' fam.f_id AS fams,'
 				.' fam.f_husb, fam.f_wife,'
 				.' divorced.d_julianday2 AS age,'
@@ -2490,7 +2491,7 @@ class WT_Stats {
 				.' (indi.i_id = fam.f_husb OR indi.i_id = fam.f_wife)'
 			.' ORDER BY fams, indi, age ASC';
 		} else {
-			$sql = "SELECT d_month, COUNT(*) AS total FROM `##dates` "
+			$sql = "SELECT SQL_CACHE d_month, COUNT(*) AS total FROM `##dates` "
 				."WHERE "
 				."d_file={$this->_ged_id} AND "
 				."d_fact = 'DIV'";
@@ -2559,7 +2560,7 @@ class WT_Stats {
 			if (isset($params[0]) && $params[0] != '') {$size = strtolower($params[0]);} else {$size = '200x250';}
 			$sizes = explode('x', $size);
 			$rows=self::_runSQL(
-				"SELECT ".
+				"SELECT SQL_CACHE ".
 				" ROUND(AVG(married.d_julianday2-birth.d_julianday1-182.5)/365.25,1) AS age, ".
 				" FLOOR(married.d_year/100+1) AS century, ".
 				" 'M' AS sex ".
@@ -2568,8 +2569,8 @@ class WT_Stats {
 				"JOIN `wt_dates` AS birth ON (birth.d_gid=fam.f_husb AND birth.d_file=fam.f_file) ".
 				"WHERE ".
 				" '{$sex}' IN ('M', 'BOTH') AND ".
-				" married.d_file={$this->_ged_id} AND married.d_type='@#DGREGORIAN@' AND married.d_fact='MARR' AND ".
-				" birth.d_type='@#DGREGORIAN@' AND birth.d_fact='BIRT' AND ".
+				" married.d_file={$this->_ged_id} AND married.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND married.d_fact='MARR' AND ".
+				" birth.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND birth.d_fact='BIRT' AND ".
 				" married.d_julianday1>birth.d_julianday1 AND birth.d_julianday1<>0 ".
 				"GROUP BY century, sex ".
 				"UNION ALL ".
@@ -2582,8 +2583,8 @@ class WT_Stats {
 				"JOIN `wt_dates` AS birth ON (birth.d_gid=fam.f_wife AND birth.d_file=fam.f_file) ".
 				"WHERE ".
 				" '{$sex}' IN ('F', 'BOTH') AND ".
-				" married.d_file={$this->_ged_id} AND married.d_type='@#DGREGORIAN@' AND married.d_fact='MARR' AND ".
-				" birth.d_type='@#DGREGORIAN@' AND birth.d_fact='BIRT' AND ".
+				" married.d_file={$this->_ged_id} AND married.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND married.d_fact='MARR' AND ".
+				" birth.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND birth.d_fact='BIRT' AND ".
 				" married.d_julianday1>birth.d_julianday1 AND birth.d_julianday1<>0 ".
 				" GROUP BY century, sex ORDER BY century"
 			);
@@ -2657,7 +2658,7 @@ class WT_Stats {
 				$years='';
 			}
 			$rows=self::_runSQL(
-				"SELECT ".
+				"SELECT SQL_CACHE ".
 				" fam.f_id, ".
 				" birth.d_gid, ".
 				" married.d_julianday2-birth.d_julianday1 AS age ".
@@ -2666,8 +2667,8 @@ class WT_Stats {
 				"JOIN `wt_dates` AS birth ON (birth.d_gid=fam.f_husb AND birth.d_file=fam.f_file) ".
 				"WHERE ".
 				" '{$sex}' IN ('M', 'BOTH') AND {$years} ".
-				" married.d_file={$this->_ged_id} AND married.d_type='@#DGREGORIAN@' AND married.d_fact='MARR' AND ".
-				" birth.d_type='@#DGREGORIAN@' AND birth.d_fact='BIRT' AND ".
+				" married.d_file={$this->_ged_id} AND married.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND married.d_fact='MARR' AND ".
+				" birth.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND birth.d_fact='BIRT' AND ".
 				" married.d_julianday1>birth.d_julianday1 AND birth.d_julianday1<>0 ".
 				"UNION ALL ".
 				"SELECT ".
@@ -2679,8 +2680,8 @@ class WT_Stats {
 				"JOIN `wt_dates` AS birth ON (birth.d_gid=fam.f_wife AND birth.d_file=fam.f_file) ".
 				"WHERE ".
 				" '{$sex}' IN ('F', 'BOTH') AND {$years} ".
-				" married.d_file={$this->_ged_id} AND married.d_type='@#DGREGORIAN@' AND married.d_fact='MARR' AND ".
-				" birth.d_type='@#DGREGORIAN@' AND birth.d_fact='BIRT' AND ".
+				" married.d_file={$this->_ged_id} AND married.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND married.d_fact='MARR' AND ".
+				" birth.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND birth.d_fact='BIRT' AND ".
 				" married.d_julianday1>birth.d_julianday1 AND birth.d_julianday1<>0 "
 			);
 			return $rows;
@@ -2747,31 +2748,17 @@ class WT_Stats {
 	function oldestFatherAge($show_years=false)   { return $this->_parentsQuery('age',  'DESC', 'M', $show_years); }
 
 	function totalMarriedMales() {
-		$rows = WT_DB::prepare("SELECT f_gedcom AS ged, f_husb AS husb FROM `##families` WHERE f_file=?")
-				->execute(array($this->_ged_id))
-				->fetchAll();
-		$husb = array();
-		foreach ($rows as $row) {
-			$factrec = trim(get_sub_record(1, "1 MARR", $row->ged, 1));
-			if (!empty($factrec)) {
-				$husb[] = $row->husb."<br />";
-			}
-		}
-		return WT_I18N::number(count(array_unique($husb)));
+		$n=WT_DB::prepare("SELECT SQL_CACHE COUNT(DISTINCT f_husb) FROM `##families` WHERE f_file=? AND f_gedcom LIKE '%\n1 MARR%'")
+			->execute(array($this->_ged_id))
+			->fetchOne();
+		return WT_I18N::number($n);
 	}
 
 	function totalMarriedFemales() {
-		$rows = WT_DB::prepare("SELECT f_gedcom AS ged, f_wife AS wife FROM `##families` WHERE f_file=?")
-				->execute(array($this->_ged_id))
-				->fetchAll();
-		$wife = array();
-		foreach ($rows as $row) {
-			$factrec = trim(get_sub_record(1, "1 MARR", $row->ged, 1));
-			if (!empty($factrec)) {
-				$wife[] = $row->wife."<br />";
-			}
-		}
-		return WT_I18N::number(count(array_unique($wife)));
+		$n=WT_DB::prepare("SELECT SQL_CACHE COUNT(DISTINCT f_wife) FROM `##families` WHERE f_file=? AND f_gedcom LIKE '%\n1 MARR%'")
+			->execute(array($this->_ged_id))
+			->fetchOne();
+		return WT_I18N::number($n);
 	}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2780,7 +2767,7 @@ class WT_Stats {
 
 	function _familyQuery($type='full') {
 		$rows=self::_runSQL(''
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' f_numchil AS tot,'
 				.' f_id AS id'
 			.' FROM'
@@ -2821,7 +2808,7 @@ class WT_Stats {
 		if ($params !== null && isset($params[0])) {$total = $params[0];} else {$total = 10;}
 		$total=(int)$total;
 		$rows=self::_runSQL(''
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' f_numchil AS tot,'
 				.' f_id AS id'
 			.' FROM'
@@ -2869,7 +2856,7 @@ class WT_Stats {
 		if (isset($params[1])) {$one = $params[1];} else {$one = false;} // each family only once if true
 		$total=(int)$total;
 		$rows=self::_runSQL(''
-			.' SELECT DISTINCT'
+			.' SELECT SQL_CACHE DISTINCT'
 				.' link1.l_from AS family,'
 				.' link1.l_to AS ch1,'
 				.' link2.l_to AS ch2,'
@@ -2991,7 +2978,7 @@ class WT_Stats {
 			$sql_sex1 = '';
 			$sql_sex2 = '';
 		}
-		$sql = "SELECT d_month{$sql_sex1}, COUNT(*) AS total"
+		$sql = "SELECT SQL_CACHE d_month{$sql_sex1}, COUNT(*) AS total"
 			.' FROM ('
 				." SELECT family{$sql_sex1}, MIN(date) AS d_date, d_month"
 					.' FROM ('
@@ -3011,7 +2998,7 @@ class WT_Stats {
 							." link1.l_type = 'CHIL' AND"
 							.' child1.d_gid = link1.l_to AND'
 							." child1.d_fact = 'BIRT' AND"
-							." d_type='@#DGREGORIAN@' AND"
+							." d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND"
 							.' child1.d_month <> ""'
 							.$sql_years
 						.' ORDER BY'
@@ -3105,7 +3092,7 @@ class WT_Stats {
 		$sizes = explode('x', $size);
 		$total=(int)$total;
 		$rows=self::_runSQL(''
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' f_numchil AS tot,'
 				.' f_id AS id'
 			.' FROM'
@@ -3138,13 +3125,13 @@ class WT_Stats {
 	}
 
 	function totalChildren() {
-		$rows=self::_runSQL("SELECT SUM(f_numchil) AS tot FROM `##families` WHERE f_file={$this->_ged_id}");
+		$rows=self::_runSQL("SELECT SQL_CACHE SUM(f_numchil) AS tot FROM `##families` WHERE f_file={$this->_ged_id}");
 		$row=$rows[0];
 		return WT_I18N::number($row['tot']);
 	}
 
 	function averageChildren() {
-		$rows=self::_runSQL("SELECT AVG(f_numchil) AS tot FROM `##families` WHERE f_file={$this->_ged_id}");
+		$rows=self::_runSQL("SELECT SQL_CACHE AVG(f_numchil) AS tot FROM `##families` WHERE f_file={$this->_ged_id}");
 		$row=$rows[0];
 		return WT_I18N::number($row['tot'], 2);
 	}
@@ -3155,7 +3142,7 @@ class WT_Stats {
 			$sizes = explode('x', $size);
 			$max = 0;
 			$rows=self::_runSQL(''
-				.' SELECT'
+				.' SELECT SQL_CACHE'
 					.' ROUND(AVG(f_numchil),2) AS num,'
 					.' FLOOR(married.d_year/100+1) AS century'
 				.' FROM'
@@ -3166,7 +3153,7 @@ class WT_Stats {
 					.' married.d_gid = fam.f_id AND'
 					." fam.f_file = {$this->_ged_id} AND"
 					." married.d_fact = 'MARR' AND"
-					." married.d_type='@#DGREGORIAN@'"
+					." married.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@')"
 				.' GROUP BY century ORDER BY century');
 			if (empty($rows)) return '';
 			foreach ($rows as $values) {
@@ -3191,7 +3178,7 @@ class WT_Stats {
 			return "<img src=\"https://chart.googleapis.com/chart?cht=bvg&amp;chs={$sizes[0]}x{$sizes[1]}&amp;chf=bg,s,ffffff00|c,s,ffffff00&amp;chm=D,FF0000,0,0,3,1|{$chm}&amp;chd=e:{$chd}&amp;chco=0000FF&amp;chbh=30,3&amp;chxt=x,x,y,y&amp;chxl=".rawurlencode($chxl)."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Average number of children per family')."\" title=\"".WT_I18N::translate('Average number of children per family')."\" />";
 		} else {
 			if ($sex=='M') {
-				$sql = "SELECT num, COUNT(*) AS total FROM "
+				$sql = "SELECT SQL_CACHE num, COUNT(*) AS total FROM "
 						."(SELECT count(i_sex) AS num FROM `##link` "
 							."LEFT OUTER JOIN `##individuals` "
 							."ON l_from=i_id AND l_file=i_file AND i_sex='M' AND l_type='FAMC' "
@@ -3200,7 +3187,7 @@ class WT_Stats {
 						." GROUP BY num ORDER BY num ASC";
 			}
 			else if ($sex=='F') {
-				$sql = "SELECT num, COUNT(*) AS total FROM "
+				$sql = "SELECT SQL_CACHE num, COUNT(*) AS total FROM "
 						."(SELECT count(i_sex) AS num FROM `##link` "
 							."LEFT OUTER JOIN `##individuals` "
 							."ON l_from=i_id AND l_file=i_file AND i_sex='F' AND l_type='FAMC' "
@@ -3209,7 +3196,7 @@ class WT_Stats {
 						." GROUP BY num ORDER BY num ASC";
 			}
 			else {
-				$sql = "SELECT f_numchil, COUNT(*) AS total FROM `##families` ";
+				$sql = "SELECT SQL_CACHE f_numchil, COUNT(*) AS total FROM `##families` ";
 				if ($year1>=0 && $year2>=0) {
 					$sql .= "AS fam LEFT JOIN `##dates` AS married ON married.d_file = {$this->_ged_id}"
 						.' WHERE'
@@ -3239,7 +3226,7 @@ class WT_Stats {
 
 	function noChildrenFamilies() {
 		$rows=self::_runSQL(''
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' COUNT(*) AS tot'
 			.' FROM'
 				." `##families` AS fam"
@@ -3255,7 +3242,7 @@ class WT_Stats {
 		global $TEXT_DIRECTION;
 		if (isset($params[0]) && $params[0] != '') {$type = strtolower($params[0]);} else {$type = 'list';}
 		$rows=self::_runSQL(''
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' f_id AS family'
 			.' FROM'
 				." `##families` AS fam"
@@ -3301,7 +3288,7 @@ class WT_Stats {
 		$max = 0;
 		$tot = 0;
 		$rows=self::_runSQL(
-			"SELECT".
+			"SELECT SQL_CACHE".
 			" COUNT(*) AS count,".
 			" FLOOR(married.d_year/100+1) AS century".
 			" FROM".
@@ -3313,7 +3300,7 @@ class WT_Stats {
 			" fam.f_file = {$this->_ged_id} AND".
 			$years.
 			" married.d_fact = 'MARR' AND".
-			" married.d_type = '@#DGREGORIAN@'".
+			" married.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@')".
 			" GROUP BY century ORDER BY century"
 		);
 		if (empty($rows)) return '';
@@ -3362,7 +3349,7 @@ class WT_Stats {
 		if ($params !== null && isset($params[0])) {$total = $params[0];} else {$total = 10;}
 		$total=(int)$total;
 		$rows=self::_runSQL(''
-			.' SELECT'
+			.' SELECT SQL_CACHE'
 				.' COUNT(*) AS tot,'
 				.' f_id AS id'
 			.' FROM'
@@ -3438,10 +3425,7 @@ class WT_Stats {
 		switch($sorting) {
 			default:
 			case 'alpha':
-				uasort($surname_list, array('WT_Stats', '_name_name_sort'));
-				break;
-			case 'ralpha':
-				uasort($surname_list, array('WT_Stats', '_name_name_rsort'));
+				uksort($surname_list, 'utf8_strcasecmp');
 				break;
 			case 'count':
 				uasort($surname_list, array('WT_Stats', '_name_total_sort'));
@@ -3562,14 +3546,13 @@ class WT_Stats {
 		}
 		$ged_id=get_id_from_gedcom($GEDCOM);
 
-		$rows=WT_DB::prepare("SELECT n_givn, COUNT(*) AS num FROM `##name` JOIN `##individuals` ON (n_id=i_id AND n_file=i_file) WHERE n_file={$ged_id} AND n_type<>'_MARNM' AND n_givn NOT IN ('@P.N.', '') AND LENGTH(n_givn)>1 AND {$sex_sql} GROUP BY n_id, n_givn")
+		$rows=WT_DB::prepare("SELECT SQL_CACHE n_givn, COUNT(*) AS num FROM `##name` JOIN `##individuals` ON (n_id=i_id AND n_file=i_file) WHERE n_file={$ged_id} AND n_type<>'_MARNM' AND n_givn NOT IN ('@P.N.', '') AND LENGTH(n_givn)>1 AND {$sex_sql} GROUP BY n_id, n_givn")
 			->fetchAll();
 		$nameList=array();
 		foreach ($rows as $row) {
 			// Split "John Thomas" into "John" and "Thomas" and count against both totals
 			foreach (explode(' ', $row->n_givn) as $given) {
-				$given=str_replace(array('*', '"'), '', $given);
-				if (strlen($given)>1) {
+				if (utf8_strlen($given)>1) {
 					if (array_key_exists($given, $nameList)) {
 						$nameList[$given]+=$row->num;
 					} else {
@@ -3588,27 +3571,19 @@ class WT_Stats {
 			if ($maxtoshow !== -1) {if ($maxtoshow-- <= 0) {break;}}
 			if ($total < $threshold) {break;}
 			if ($show_tot) {
-				$tot = PrintReady("[{$total}]");
-				if ($TEXT_DIRECTION=='ltr') {
-					$totL = '';
-					$totR = '&nbsp;'.$tot;
-				} else {
-					$totL = $tot.'&nbsp;';
-					$totR = '';
-				}
+				$tot = '&nbsp;('.WT_I18N::number($total).')';
 			} else {
-				$totL = '';
-				$totR = '';
+				$tot = '';
 			}
 			switch ($type) {
 			case 'table':
-				$common[] = '<tr><td>'.PrintReady(utf8_substr($given,0,1).utf8_strtolower(utf8_substr($given,1))).'</td><td>'.WT_I18N::number($total).'</td><td>'.$total.'</td></tr>';
+				$common[] = '<tr><td>'.$given.'</td><td>'.WT_I18N::number($total).'</td><td>'.$total.'</td></tr>';
 				break;
 			case 'list':
-				$common[] = "\t<li>{$totL}".PrintReady(utf8_substr($given,0,1).utf8_strtolower(utf8_substr($given,1)))."{$totR}</li>\n";
+				$common[] = '<li><span dir="auto">'.$given.'</span>'.$tot.'</li>';
 				break;
 			case 'nolist':
-				$common[] = $totL.PrintReady(utf8_substr($given,0,1).utf8_strtolower(utf8_substr($given,1))).$totR;
+				$common[] = '<span dir="auto">'.$given.'</span>'.$tot;
 				break;
 			}
 		}
@@ -3642,7 +3617,7 @@ class WT_Stats {
 			case 'list':
 				return '<ul>\n'.join("\n", $common).'</ul>\n';
 			case 'nolist':
-				return join(';&nbsp; ', $common);
+				return join(WT_I18N::$list_separator, $common);
 			}
 		} else {
 			return '';
@@ -3752,15 +3727,15 @@ class WT_Stats {
 		if (WT_USER_ID) {
 			foreach ($loggedusers as $user_id=>$user_name) {
 				if ($type == 'list') {
-					$content .= "\t<li>".PrintReady(getUserFullName($user_id))." - {$user_name}";
+					$content .= "\t<li>".htmlspecialchars(getUserFullName($user_id))." - {$user_name}";
 				} else {
-					$content .= PrintReady(getUserFullName($user_id))." - {$user_name}";
+					$content .= htmlspecialchars(getUserFullName($user_id))." - {$user_name}";
 				}
 				if (WT_USER_ID != $user_id && get_user_setting($user_id, 'contactmethod') != 'none') {
 					if ($type == 'list') {
-						$content .= "<br /><a href=\"#\" onclick=\"return message('{$user_id}');\">".WT_I18N::translate('Send Message')."</a>";
+						$content .= '<br /><a class="icon-email" href="#" onclick="return message(\''.$user_id.'\', \'\', \''.addslashes(urlencode(get_query_url())).'\', \'\');" title="'.WT_I18N::translate('Send Message').'"></a>';
 					} else {
-						$content .= " <a href=\"#\" onclick=\"return message('{$user_id}');\">".WT_I18N::translate('Send Message')."</a>";
+						$content .= ' <a class="icon-email" href="#" onclick="return message(\''.$user_id.'\', \'\', \''.addslashes(urlencode(get_query_url())).'\', \'\');" title="'.WT_I18N::translate('Send Message').'"></a>';
 					}
 				}
 				if ($type == 'list') {
@@ -3832,7 +3807,7 @@ class WT_Stats {
 			case 'loggedin':
 				if (is_array($params) && isset($params[0]) && $params[0] != '') {$yes = $params[0];} else {$yes = WT_I18N::translate('yes');}
 				if (is_array($params) && isset($params[1]) && $params[1] != '') {$no = $params[1];} else {$no = WT_I18N::translate('no');}
-				return WT_DB::prepare("SELECT 1 FROM `##session` WHERE user_id=? LIMIT 1")->execute(array($user_id))->fetchOne() ? $yes : $no;
+				return WT_DB::prepare("SELECT SQL_NO_CACHE 1 FROM `##session` WHERE user_id=? LIMIT 1")->execute(array($user_id))->fetchOne() ? $yes : $no;
 		}
 	}
 
@@ -3897,7 +3872,7 @@ class WT_Stats {
 		}
 		
 		$count=WT_DB::prepare(
-			"SELECT page_count FROM `##hit_counter`".
+			"SELECT SQL_NO_CACHE page_count FROM `##hit_counter`".
 			" WHERE gedcom_id=? AND page_name=? AND page_parameter=?"
 		)->execute(array(WT_GED_ID, $page_name, $page_parameter))->fetchOne();
 		return '<span class="hit-counter">'.WT_I18N::number($count).'</span>';
@@ -3940,17 +3915,9 @@ class WT_Stats {
 			if ($value<0) $value = 0;
 			$first = floor($value / 64);
 			$second = $value % 64;
-			$encoding .= self::$_xencoding[$first].self::$_xencoding[$second];
+			$encoding .= self::$_xencoding[(int)$first].self::$_xencoding[(int)$second];
 		}
 		return $encoding;
-	}
-
-	static function _name_name_sort($a, $b) {
-		return utf8_strcasecmp(strip_prefix($a['name']), strip_prefix($b['name']), true);  // Case-insensitive compare
-	}
-
-	static function _name_name_rsort($a, $b) {
-		return utf8_strcasecmp(strip_prefix($b['name']), strip_prefix($a['name']), true);  // Case-insensitive compare
 	}
 
 	static function _name_total_sort($a, $b) {
@@ -3995,8 +3962,8 @@ class WT_Stats {
 	static function gedcomFavorites() {return self::_getFavorites(true);}
 	static function userFavorites() {return self::_getFavorites(false);}
 
-	static function totalGedcomFavorites() {return count(gedcom_favorites_WT_Module::getUserFavorites(WT_GEDCOM));}
-	static function totalUserFavorites() {return count(user_favorites_WT_Module::getUserFavorites(WT_USER_NAME));}
+	static function totalGedcomFavorites() {return count(gedcom_favorites_WT_Module::getFavorites(WT_GED_ID));}
+	static function totalUserFavorites() {return count(user_favorites_WT_Module::getFavorites(WT_USER_ID));}
 
 	///////////////////////////////////////////////////////////////////////////////
 	// Other blocks                                                              //

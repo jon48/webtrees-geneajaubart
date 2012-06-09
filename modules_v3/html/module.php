@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13294 2012-01-20 16:52:40Z greg $
+// $Id: module.php 13642 2012-03-24 13:06:08Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,7 +41,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $ctype, $GEDCOM, $WT_IMAGES;
+		global $ctype, $GEDCOM;
 
 		// Only show this block for certain languages
 		$languages=get_block_setting($block_id, 'languages');
@@ -97,7 +97,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
 		if ($ctype=='gedcom' && WT_USER_GEDCOM_ADMIN || $ctype=='user' && WT_USER_ID) {
-			$title='<img class="adminicon" src="'.$WT_IMAGES['admin'].'" width="15" height="15" alt="'.WT_I18N::translate('Configure').'"  onclick="window.open(\'index_edit.php?action=configure&amp;ctype='.$ctype.'&amp;block_id='.$block_id.'\', \'_blank\', \'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1\');">';
+			$title='<i class="icon-admin" title="'.WT_I18N::translate('Configure').'" onclick="modalDialog(\'block_edit.php?block_id='.$block_id.'\', \''.$this->getTitle().'\');"></i>';
 		} else {
 			$title='';
 		}
@@ -309,7 +309,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 				'<option value="__default__"', $sel_default, '>', WT_I18N::translate('Default'), '</option>';
 			foreach ($gedcoms as $ged_id=>$ged_name) {
 				if ($ged_name == $gedcom) {$sel = ' selected="selected"';} else {$sel = '';}
-				echo '<option value="', $ged_name, '"', $sel, '>', PrintReady(get_gedcom_setting($ged_id, 'title')), '</option>';
+				echo '<option value="', $ged_name, '"', $sel, ' dir="auto">', htmlspecialchars(get_gedcom_setting($ged_id, 'title')), '</option>';
 			}
 			echo '</select></td></tr>';
 		}

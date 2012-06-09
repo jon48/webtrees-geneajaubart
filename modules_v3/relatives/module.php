@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13380 2012-02-04 03:10:09Z greg $
+// $Id: module.php 13776 2012-04-04 20:25:10Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -45,20 +45,11 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 	}
 
 	function printFamilyHeader($url, $label) {
-		global $WT_IMAGES, $SEARCH_SPIDER;
-
-		echo '<table>
-			<tr>';
-			if (isset($WT_IMAGES["cfamily"])) {
-				echo '<td><img src="', $WT_IMAGES["cfamily"], '" class="icon" alt=""></td>';
-			}
-			echo '<td><span class="subheaders">', $label, '</span>';
-			if (empty($SEARCH_SPIDER)) {
-				echo ' - <a href="', $url, '">', WT_I18N::translate('View Family'), '</a>';
-			 }
-			echo '</td>
-			</tr>
-		</table>';
+		echo '<table><tr>';
+		echo '<td><i class="icon-cfamily"></i></td>';
+		echo '<td><span class="subheaders">', $label, '</span>';
+		echo ' - <a href="', $url, '">', WT_I18N::translate('View Family'), '</a></td>';
+		echo '</tr></table>';
 	}
 
 	/**
@@ -69,7 +60,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 	* @return html table rows
 	*/
 	function printParentsRows($family, $people, $type) {
-		global $personcount, $WT_IMAGES, $SHOW_PEDIGREE_PLACES, $controller, $SEARCH_SPIDER;
+		global $personcount, $SHOW_PEDIGREE_PLACES, $controller, $SEARCH_SPIDER;
 
 		$elderdate = "";
 		//-- new father/husband
@@ -208,7 +199,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 									if ($level>0) {
 										$html.=", ";
 									}
-									$html.=PrintReady($levels[$level]);
+									$html.='<span dir="auto">'.htmlspecialchars($levels[$level]).'</span>';
 								}
 							}
 							if (!$SEARCH_SPIDER) {
@@ -261,7 +252,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 	* @return html table rows
 	*/
 	function printChildrenRows($family, $people, $type) {
-		global $personcount, $WT_IMAGES, $controller;
+		global $personcount, $controller;
 
 		$elderdate = $family->getMarriageDate();
 		$key=0;
@@ -315,11 +306,11 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 		}
 		if (isset($family) && $controller->record->canEdit()) {
 			if ($type == "spouse") {
-				$child_u = WT_I18N::translate('Add a son or daughter');
+				$child_u = WT_I18N::translate('Add a new son or daughter');
 				$child_m = WT_I18N::translate('son');
 				$child_f = WT_I18N::translate('daughter');
 			} else {
-				$child_u = WT_I18N::translate('Add a brother or sister');
+				$child_u = WT_I18N::translate('Add a new brother or sister');
 				$child_m = WT_I18N::translate('brother');
 				$child_f = WT_I18N::translate('sister');
 			}
@@ -327,22 +318,15 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 			<tr>
 				<td class="facts_label">
 					<?php if (WT_USER_CAN_EDIT && isset($people["children"][1])) { ?>
-					<a href="#" onclick="reorder_children('<?php echo $family->getXref(); ?>');tabswitch(5);"><img src="<?php echo WT_STATIC_URL; ?>images/topdown.gif" alt="" > <?php echo WT_I18N::translate('Re-order children'); ?></a>
+					<a href="#" onclick="reorder_children('<?php echo $family->getXref(); ?>');tabswitch(5);"><i class="icon-media-shuffle"></i> <?php echo WT_I18N::translate('Re-order children'); ?></a>
 					<?php } ?>
 				</td>
 				<td class="facts_value">
 					<a href="#" onclick="return addnewchild('<?php echo $family->getXref(); ?>');"><?php echo $child_u; ?></a>
 					<span style='white-space:nowrap;'>
-						<a href="#" onclick="return addnewchild('<?php echo $family->getXref(); ?>','M');"><?php echo WT_Person::sexImage('M', 'small', '', $child_m); ?></a>
-						<a href="#" onclick="return addnewchild('<?php echo $family->getXref(); ?>','F');"><?php echo WT_Person::sexImage('F', 'small', '', $child_f); ?></a>
+						<a href="#" class="icon-sex_m_15x15" onclick="return addnewchild('<?php echo $family->getXref(); ?>','M');"></a>
+						<a href="#" class="icon-sex_f_15x15" onclick="return addnewchild('<?php echo $family->getXref(); ?>','F');"></a>
 					</span>
-					<?php
-						if ($type=='spouse') {
-							echo help_link('add_son_daughter');
-						} else {
-							echo help_link('add_sibling');
-						}
-					?>
 				</td>
 			</tr>
 			<?php
@@ -351,7 +335,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function getTabContent() {
-		global $WT_IMAGES, $SHOW_AGE_DIFF, $GEDCOM, $ABBREVIATE_CHART_LABELS, $show_full, $personcount, $controller;
+		global $SHOW_AGE_DIFF, $GEDCOM, $ABBREVIATE_CHART_LABELS, $show_full, $personcount, $controller;
 
 		if (isset($show_full)) $saved_show_full = $show_full; // We always want to see full details here
 		$show_full = 1;

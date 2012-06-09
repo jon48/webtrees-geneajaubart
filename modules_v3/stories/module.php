@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: module.php 13845 2012-04-20 12:13:34Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -173,8 +173,6 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 
 	// Action from the configuration page
 	private function edit() {
-		global $ENABLE_AUTOCOMPLETE;
-
 		require_once WT_ROOT.'includes/functions/functions_edit.php';
 		if (WT_USER_CAN_EDIT) {
 
@@ -226,18 +224,12 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 					$gedcom_id=WT_GED_ID;
 					$xref=safe_GET('xref', WT_REGEX_XREF);
 				}
-				$controller->pageHeader();
-				?>
-				<script type="text/javascript">
-					var pastefield;
-					function paste_id(value) {
-						pastefield.value=value;
-					}
-				</script>
-				<?php
-				if ($ENABLE_AUTOCOMPLETE) {
-					require WT_ROOT.'/js/autocomplete.js.htm';
-				}
+				$controller
+					->pageHeader()
+					->addExternalJavaScript('js/autocomplete.js')
+					// for the findindi link
+					->addInlineJavaScript('var pastefield;function paste_id(value){pastefield.value=value;}');
+
 				// "Help for this page" link
 				echo '<div id="page_help">', help_link('add_story', $this->getName()), '</div>';
 				echo '<form name="story" method="post" action="#">';
@@ -274,7 +266,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				echo '<tr>';
 				echo '<td class="optionbox">';
 				echo '<input type="text" name="xref" id="pid" size="4" value="'.$xref.'">';
-				print_findindi_link("pid", "xref");
+				echo print_findindi_link('pid');
 				if ($xref) {
 					$person=WT_Person::getInstance($xref);
 					if ($person) {
@@ -321,8 +313,6 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 	}
 
 	private function config() {
-		global $WT_IMAGES;
-
 		if (WT_USER_GEDCOM_ADMIN) {
 
 			$controller=new WT_Controller_Base();
@@ -394,7 +384,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 	}
 
 	private function show_list() {
-		global $controller, $WT_IMAGES;
+		global $controller;
 
 		$controller=new WT_Controller_Base();
 		$controller->setPageTitle($this->getTitle());
@@ -472,9 +462,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			}
 			//-- Stories menu item
 			$menu = new WT_Menu($this->getTitle(), 'module.php?mod='.$this->getName().'&amp;mod_action=show_list', 'menu-story', 'down');
-			$menu->addClass('menuitem', 'menuitem_hover', 'submenu', '');		
 			$submenu = new WT_Menu($this->getTitle(), 'module.php?mod='.$this->getName().'&amp;mod_action=show_list', 'menu-story-sub');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', '');
 			$menu->addSubmenu($submenu);
 			return $menu;
 		}

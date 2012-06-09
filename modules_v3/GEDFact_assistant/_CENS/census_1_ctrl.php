@@ -4,7 +4,7 @@
 // Census information about an individual
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_1_ctrl.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: census_1_ctrl.php 13523 2012-02-29 18:20:49Z greg $
 
  if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -46,8 +46,8 @@ $married=-1;
 $person=WT_Person::getInstance($pid);
 // var_dump($person->getAllNames());
 $nam = $person->getAllNames();
-if (PrintReady($person->getDeathYear()) == 0) { $DeathYr = ""; } else { $DeathYr = PrintReady($person->getDeathYear()); }
-if (PrintReady($person->getBirthYear()) == 0) { $BirthYr = ""; } else { $BirthYr = PrintReady($person->getBirthYear()); }
+if ($person->getDeathYear() == 0) { $DeathYr = ""; } else { $DeathYr = $person->getDeathYear(); }
+if ($person->getBirthYear() == 0) { $BirthYr = ""; } else { $BirthYr = $person->getBirthYear(); }
 $fulln   = rtrim($nam[0]['givn'],'*')." ".$nam[0]['surname'];
 $fulln   = str_replace("@N.N.", "(".WT_I18N::translate('unknown').")", $fulln);
 $fulln   = str_replace("@P.N.", "(".WT_I18N::translate('unknown').")", $fulln);

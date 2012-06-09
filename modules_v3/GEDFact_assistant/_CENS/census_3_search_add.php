@@ -4,7 +4,7 @@
 // Census Search and Add Area File
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2007 to 2010  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_3_search_add.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: census_3_search_add.php 13820 2012-04-17 08:25:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -71,7 +71,7 @@ if (!defined('WT_WEBTREES')) {
 
 				<?php
 				//-- Add Family Members to Census  -------------------------------------------
-				global $WT_IMAGES, $spouselinks, $parentlinks, $DeathYr, $BirthYr;
+				global $spouselinks, $parentlinks, $DeathYr, $BirthYr;
 				?>
 
 				<tr>
@@ -82,11 +82,9 @@ if (!defined('WT_WEBTREES')) {
 								<font size=1>
 								<?php
 								// Header text with "Head" button =================================================
-								$headImg  = "<img class=\"headimg vmiddle\" src=\"".$WT_IMAGES["button_head"]."\">";
-								$headImg2 = "<img class=\"headimg2 vmiddle\" src=\"".$WT_IMAGES["button_head"]."\" alt=\"".WT_I18N::translate('Click to choose person as Head of family.')."\" title=\"".WT_I18N::translate('Click to choose person as Head of family.')."\">";
-								global $tempStringHead;
-								$tempStringHead = $headImg;
-								echo WT_I18N::translate('Click %s to choose person as Head of family.', $tempStringHead);
+								$headImg  = '<i class="headimg vmiddle icon-button_head"></i>';
+								$headImg2 = '<i class="headimg2 vmiddle icon-button_head" title="'.WT_I18N::translate('Click to choose person as Head of family.').'"></i>';
+								echo WT_I18N::translate('Click %s to choose person as Head of family.', $headImg);
 								?>
 								</font>
 								</td>
@@ -1424,7 +1422,7 @@ if (!defined('WT_WEBTREES')) {
 
 <?php
 // ==================================================================
-require_once 'includes/functions/functions_charts.php';
+
 /**
  * print the information for an individual chart box
  *
@@ -1439,7 +1437,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $SCRIPT_NAME;
 	global $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $PEDIGREE_FULL_DETAILS, $SHOW_PEDIGREE_PLACES;
 	global $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
-	global $WT_IMAGES, $ABBREVIATE_CHART_LABELS, $USE_MEDIA_VIEWER;
+	global $ABBREVIATE_CHART_LABELS, $USE_MEDIA_VIEWER;
 	global $chart_style, $box_width, $generations, $show_spouse, $show_full;
 	global $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE, $PEDIGREE_SHOW_GENDER;
 	global $SEARCH_SPIDER;

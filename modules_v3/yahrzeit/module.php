@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13184 2012-01-05 08:53:45Z greg $
+// $Id: module.php 13642 2012-03-24 13:06:08Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,7 +41,7 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $ctype, $WT_IMAGES, $controller;
+		global $ctype, $controller;
 
 		$days=get_block_setting($block_id, 'days', 7);
 		$infoStyle=get_block_setting($block_id, 'infoStyle', 'table');
@@ -60,7 +60,7 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
 		if ($ctype=='gedcom' && WT_USER_GEDCOM_ADMIN || $ctype=='user' && WT_USER_ID) {
-			$title='<img class="adminicon" src="'.$WT_IMAGES['admin'].'" width="15" height="15" alt="'.WT_I18N::translate('Configure').'"  onclick="window.open(\'index_edit.php?action=configure&amp;ctype='.$ctype.'&amp;block_id='.$block_id.'\', \'_blank\', \'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1\');">';
+			$title='<i class="icon-admin" title="'.WT_I18N::translate('Configure').'" onclick="modalDialog(\'block_edit.php?block_id='.$block_id.'\', \''.$this->getTitle().'\');"></i>';
 		} else {
 			$title='';
 		}
@@ -154,7 +154,7 @@ class yahrzeit_WT_Module extends WT_Module implements WT_Module_Block {
 			$content .= '<th>'.WT_Gedcom_Tag::getLabel('NAME').'</th>';
 			$content .= '<th>'.WT_Gedcom_Tag::getLabel('DEAT').'</th>';
 			$content .= '<th>DEAT</th>';
-			$content .= '<th><img src="'.$WT_IMAGES['reminder'].'" alt="'.WT_I18N::translate('Anniversary').'" title="'.WT_I18N::translate('Anniversary').'"></th>';
+			$content .= '<th><i class="icon-reminder" title="'.WT_I18N::translate('Anniversary').'"></i></th>';
 			$content .= '<th>'.WT_Gedcom_Tag::getLabel('_YART').'</th>';
 			$content .= '<th>_YART</th>';
 			$content .= '</tr></thead><tbody>';

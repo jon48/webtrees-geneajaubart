@@ -4,7 +4,7 @@
 // NOTE THAT THIS IS NOT A PAGE CONTROLLER, AND DOES NOT EXTEND WT_CONTROLLER_BASE
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,14 +23,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: clippings_ctrl.php 13094 2011-12-20 08:36:46Z greg $
+// $Id: clippings_ctrl.php 13820 2012-04-17 08:25:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-require_once WT_ROOT.'includes/functions/functions.php';
 require_once WT_ROOT.'includes/functions/functions_export.php';
 require_once WT_ROOT.'library/pclzip.lib.php';
 
@@ -89,7 +88,6 @@ class WT_Controller_Clippings {
 			$this->privatize_export='visitor';
 		}
 
-		$this->conv_path = stripLRMRLM($this->conv_path);
 		$_SESSION['exportConvPath'] = $this->conv_path; // remember this for the next Download
 		$_SESSION['exportConvSlashes'] = $this->conv_slashes;
 

@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: module.php 13945 2012-05-26 17:22:40Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -43,6 +43,7 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	public function modAction($modAction) {
 		switch ($modAction) {
 		case 'ajax':
+			Zend_Session::writeClose();
 			header('Content-Type: text/html; charset=UTF-8');
 			echo $this->getSidebarAjaxContent();
 			break;
@@ -140,7 +141,7 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		');
 		$out=
 			'<form method="post" action="module.php?mod='.$this->getName().'&amp;mod_action=ajax" onsubmit="return false;">'.
-			'<input type="text" name="sb_fam_name" id="sb_fam_name" placeholder="'.WT_I18N::translate('Search').'">'.
+			'<input type="search" name="sb_fam_name" id="sb_fam_name" placeholder="'.WT_I18N::translate('Search').'">'.
 			'<p>';
 		foreach ($initials as $letter=>$count) {
 			switch ($letter) {
@@ -157,7 +158,7 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 					$html=$letter;
 					break;
 			}
-			$html='<a href="module.php?mod='.$this->getName().'&amp;mod_action=ajax&amp;sb_action=families&amp;alpha='.urlencode($letter).'" class="sb_fam_letter">'.PrintReady($html).'</a>';
+			$html='<a href="module.php?mod='.$this->getName().'&amp;mod_action=ajax&amp;sb_action=families&amp;alpha='.urlencode($letter).'" class="sb_fam_letter">'.$html.'</a>';
 			$out .= $html." ";
 		}
 
@@ -207,9 +208,9 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			if ($family->canDisplayName()) {
 				$out .= '<li><a href="'.$family->getHtmlUrl().'">'.$family->getFullName().' ';
 				if ($family->canDisplayDetails()) {
-					$bd = $family->getMarriageYear();
-					if (!empty($bd)) {
-						$out .= PrintReady(' ('.$bd.')');
+					$marriage_year=$family->getMarriageYear();
+					if ($marriage_year) {
+						$out.=' ('.$marriage_year.')';
 					}
 				}
 				$out .= '</a></li>';
@@ -230,7 +231,7 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			" FROM `##individuals`, `##name`".
 			" WHERE (i_id LIKE ? OR n_sort LIKE ?)".
 			" AND i_id=n_id AND i_file=n_file AND i_file=?".
-			" ORDER BY n_sort LIMIT ".WT_AUTOCOMPLETE_LIMIT
+			" ORDER BY n_sort"
 		)
 		->execute(array('INDI', "%{$query}%", "%{$query}%", WT_GED_ID))
 		->fetchAll(PDO::FETCH_ASSOC);
@@ -252,7 +253,7 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		}
 
 		$vars[]=WT_GED_ID;
-		$rows=WT_DB::prepare("SELECT ? AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec FROM `##families` WHERE {$where} AND f_file=? LIMIT ".WT_AUTOCOMPLETE_LIMIT)
+		$rows=WT_DB::prepare("SELECT ? AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec FROM `##families` WHERE {$where} AND f_file=?")
 		->execute($vars)
 		->fetchAll(PDO::FETCH_ASSOC);
 
@@ -262,8 +263,10 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			if ($family->canDisplayName()) {
 				$out .= '<li><a href="'.$family->getHtmlUrl().'">'.$family->getFullName().' ';
 				if ($family->canDisplayDetails()) {
-					$bd = $family->getMarriageYear();
-					if (!empty($bd)) $out .= PrintReady(' ('.$bd.')');
+					$marriage_year=$family->getMarriageYear();
+					if ($marriage_year) {
+						$out.=' ('.$marriage_year.')';
+					}
 				}
 				$out .= '</a></li>';
 			}

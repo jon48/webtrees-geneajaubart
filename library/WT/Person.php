@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Person.php 13373 2012-02-03 07:57:43Z greg $
+// $Id: Person.php 13950 2012-05-29 06:28:25Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -429,8 +429,8 @@ class WT_Person extends WT_GedcomRecord {
 		return
 			/* I18N: A range of years, e.g. "1870–", "1870–1920", "–1920" */ WT_I18N::translate(
 				'%1$s–%2$s',
-				'<span title="'.htmlspecialchars(strip_tags($this->getBirthDate()->Display())).'">'.$this->getBirthDate()->MinDate()->Format('%Y').'</span>',
-				'<span title="'.htmlspecialchars(strip_tags($this->getDeathDate()->Display())).'">'.$this->getDeathDate()->MinDate()->Format('%Y').'</span>'
+				'<span title="'.strip_tags($this->getBirthDate()->Display()).'">'.$this->getBirthDate()->MinDate()->Format('%Y').'</span>',
+				'<span title="'.strip_tags($this->getDeathDate()->Display()).'">'.$this->getDeathDate()->MinDate()->Format('%Y').'</span>'
 			);
 	}
 
@@ -621,38 +621,7 @@ class WT_Person extends WT_GedcomRecord {
 	}
 
 	static function sexImage($sex, $size='small', $style='', $title='') {
-		global $WT_IMAGES;
-
-		if ($size=='small') {
-			$image='sex_'.strtolower($sex).'_9x9';
-		} else {
-			$image='sex_'.strtolower($sex).'_15x15';
-		}
-
-		if ($title) {
-			$title=' title="'.$title.'"';
-		}
-
-		switch ($sex) {
-		case 'M':
-			if (isset($WT_IMAGES[$image])) {
-				return '<img src="'.$WT_IMAGES[$image].'" class="gender_image" style="'.$style.'" alt="'.WT_I18N::translate('Male').'"'.$title.'>';
-			} else {
-				return '<span style="size:'.$size.'">'.WT_UTF8_MALE.'</span>';
-			}
-		case 'F':
-			if (isset($WT_IMAGES[$image])) {
-				return '<img src="'.$WT_IMAGES[$image].'" class="gender_image" style="'.$style.'" alt="'.WT_I18N::translate('Female').'"'.$title.'>';
-			} else {
-				return '<span style="size:'.$size.'">'.WT_UTF8_FEMALE.'</span>';
-			}
-		default:
-			if (isset($WT_IMAGES[$image])) {
-				return '<img src="'.$WT_IMAGES[$image].'" class="gender_image" style="'.$style.'" alt="'.WT_I18N::translate_c('unknown gender', 'Unknown').'"'.$title.'>';
-			} else {
-				return '<span style="size:'.$size.'">?</span>';
-			}
-		}
+		return '<i class="icon-sex_'.strtolower($sex).'_'.($size=='small' ? '9x9' : '15x15').'" title="'.$title.'"></i>';
 	}
 
 	function getBoxStyle() {
@@ -680,8 +649,6 @@ class WT_Person extends WT_GedcomRecord {
 	* @return string
 	*/
 	function getLabel($elderdate='', $counter=0) {
-		global $WT_IMAGES;
-
 		$label = '';
 		$gap = 0;
 		if (is_object($elderdate) && $elderdate->isOK()) {
@@ -690,9 +657,9 @@ class WT_Person extends WT_GedcomRecord {
 				$gap = $p2->MinJD()-$elderdate->MinJD(); // days
 				$label .= "<div class=\"elderdate age\">";
 				// warning if negative gap : wrong order
-				if ($gap<0 && $counter>0) $label .= '<img alt="" src="'.$WT_IMAGES['warning'].'"> ';
+				if ($gap<0 && $counter>0) $label .= '<i class="icon-warning"></i> ';
 				// warning if gap<6 months
-				if ($gap>1 && $gap<180 && $counter>0) $label .= '<img alt="" src="'.$WT_IMAGES['warning'].'"> ';
+				if ($gap>1 && $gap<180 && $counter>0) $label .= '<i class="icon-warning"></i> ';
 				// children with same date means twin
 				/**if ($gap==0 && $counter>1) {
 					if ($this->getSex()=='M') $label .= WT_I18N::translate('Twin brother');
@@ -909,8 +876,8 @@ class WT_Person extends WT_GedcomRecord {
 	* get indi facts
 	* @return array
 	*/
-	function getIndiFacts($nfacts=NULL) {
-		$this->parseFacts($nfacts);
+	function getIndiFacts() {
+		$this->parseFacts();
 		return $this->indifacts;
 	}
 
@@ -922,24 +889,18 @@ class WT_Person extends WT_GedcomRecord {
 		$this->parseFacts();
 		return $this->otherfacts;
 	}
-	/**
-	* get the correct label for a family
-	* @param Family $family the family to get the label for
-	* @return string
-	*/
-	function getChildFamilyLabel($family) {
-		if (!is_null($family)) {
-			$famlink = get_sub_record(1, '1 FAMC @'.$family->getXref().'@', $this->getGedcomRecord());
-			if (preg_match('/2 PEDI (.*)/', $famlink, $fmatch)) {
-				switch ($fmatch[1]) {
-				case 'adopted': return WT_I18N::translate('Family with adoptive parents');
-				case 'foster':  return WT_I18N::translate('Family with foster parents');
-				case 'sealing': return WT_I18N::translate('Family with sealing parents');
-				}
-			}
+	
+	// A label for a parental family group
+	function getChildFamilyLabel(WT_Family $family) {
+		if (preg_match('/\n1 FAMC @'.$family->getXref().'@(?:\n[2-9].*)*\n2 PEDI (.+)/', $this->getGedcomRecord(), $match)) {
+			// A specified pedigree
+			return WT_Gedcom_Code_Pedi::getChildFamilyLabel($match[1]);
+		} else {
+			// Default (birth) pedigree
+			return WT_Gedcom_Code_Pedi::getChildFamilyLabel('');
 		}
-		return WT_I18N::translate('Family with parents');
 	}
+
 	/**
 	* get the correct label for a step family
 	* @param Family $family the family to get the label for
@@ -1017,10 +978,8 @@ class WT_Person extends WT_GedcomRecord {
 	/**
 	* Parse the facts from the individual record
 	*/
-	function parseFacts($nfacts=NULL) {
-		global $nonfacts;
+	function parseFacts() {
 		parent::parseFacts();
-		if ($nfacts!=NULL) $nonfacts = $nfacts;
 		//-- only run this function once
 		if ($this->facts_parsed) return;
 		//-- don't run this function if privacy does not allow viewing of details
@@ -1032,25 +991,21 @@ class WT_Person extends WT_GedcomRecord {
 		//-- sort the fact info into different categories for people
 		foreach ($this->facts as $f=>$event) {
 			$fact = $event->getTag();
-			// -- handle special name fact case
 			if ($fact=='NAME') {
+				// -- handle special name fact case
 				$this->globalfacts[] = $event;
-			}
-			// -- handle special source fact case
-			else if ($fact=='SOUR') {
+			} elseif ($fact=='SOUR') {
+				// -- handle special source fact case
 				$this->otherfacts[] = $event;
-			}
-			// -- handle special note fact case
-			else if ($fact=='NOTE') {
+			} elseif ($fact=='NOTE') {
+				// -- handle special note fact case
 				$this->otherfacts[] = $event;
-			}
-			// -- handle special sex case
-			else if ($fact=='SEX') {
+			} elseif ($fact=='SEX') {
+				// -- handle special sex case
 				$this->globalfacts[] = $event;
 				$sexfound = true;
-			}
-			else if ($fact=='OBJE') {}
-			else if (!isset($nonfacts) || !in_array($fact, $nonfacts)) {
+			} elseif ($fact=='OBJE') {
+			}	else {
 				$this->indifacts[] = $event;
 			}
 		}
@@ -1475,7 +1430,7 @@ class WT_Person extends WT_GedcomRecord {
 			}
 			//-- fact was deleted?
 			if (!$found) {
-				$this->indifacts[$i]->gedcomRecord.="\nWT_OLD\n";
+				$this->indifacts[$i]->setIsOld();
 			}
 		}
 		//-- check for any new facts being added
@@ -1490,7 +1445,7 @@ class WT_Person extends WT_GedcomRecord {
 				}
 			}
 			if (!$found) {
-				$newfact->gedcomRecord.="\nWT_NEW\n";
+				$newfact->setIsNew();
 				$this->indifacts[]=$newfact;
 			}
 		}
@@ -1505,7 +1460,7 @@ class WT_Person extends WT_GedcomRecord {
 				}
 			}
 			if (!$found) {
-				$this->otherfacts[$i]->gedcomRecord.="\nWT_OLD\n";
+				$this->otherfacts[$i]->setIsOld();
 			}
 		}
 		foreach ($diff->otherfacts as $indexval => $newfact) {
@@ -1517,7 +1472,7 @@ class WT_Person extends WT_GedcomRecord {
 				}
 			}
 			if (!$found) {
-				$newfact->gedcomRecord.="\nWT_NEW\n";
+				$newfact->setIsNew();
 				$this->otherfacts[]=$newfact;
 			}
 		}
@@ -1533,7 +1488,7 @@ class WT_Person extends WT_GedcomRecord {
 				}
 			}
 			if (!$found) {
-				$this->globalfacts[$i]->gedcomRecord.="\nWT_OLD\n";
+				$this->globalfacts[$i]->setIsOld();
 			}
 		}
 		foreach ($diff->globalfacts as $indexval => $newfact) {
@@ -1545,7 +1500,7 @@ class WT_Person extends WT_GedcomRecord {
 				}
 			}
 			if (!$found) {
-				$newfact->gedcomRecord.="\nWT_NEW\n";
+				$newfact->setIsNew();
 				$this->globalfacts[]=$newfact;
 			}
 		}
@@ -1649,7 +1604,7 @@ class WT_Person extends WT_GedcomRecord {
 	// 2 GIVN Carlos
 	// 2 SURN Vasquez,Sante
 	protected function _addName($type, $full, $gedrec) {
-		global $UNDERLINE_NAME_QUOTES, $UNKNOWN_NN, $UNKNOWN_PN, $TEXT_DIRECTION;
+		global $UNKNOWN_NN, $UNKNOWN_PN, $TEXT_DIRECTION;
 
 		////////////////////////////////////////////////////////////////////////////
 		// Extract the structured name parts - use for "sortable" names and indexes
@@ -1699,8 +1654,8 @@ class WT_Person extends WT_GedcomRecord {
 				// There can be many surnames, each wrapped with '/'
 				$SURNS=$matches[1];
 				foreach ($SURNS as $n=>$SURN) {
-					// Remove surname prefix
-					$SURNS[$n]=preg_replace('/^(?:a |aan |ab |af |al |ap |as |auf |av |bat |bij |bin |bint |d\'|da |de |del |della |dem |den |der |di |du |el |fitz |het |ibn |l\'|la |las |le |les |los |onder |op |over |\'s |st |\'t |te |ten |ter |till |tot |uit |uijt |van |vanden |von |voor |vor )+/', '', $SURN);
+					// Remove surname prefixes, such as "van de ", "d'" and "'t " (lower case only)
+					$SURNS[$n]=preg_replace('/^(?:[a-z]+ |[a-z]+\' ?|\'[a-z]+ )+/', '', $SURN);
 				}
 			} else {
 				// It is valid not to have a surname at all
@@ -1710,14 +1665,21 @@ class WT_Person extends WT_GedcomRecord {
 
 		// If we don't have a GIVN record, extract it from the NAME
 		if (!$GIVN) {
-			// remove any prefix
-			$GIVN=preg_replace('/(?:(?:ADM|AMB|BRIG|CAN|CAPT|CHAN|CHAPLN|CMDR|COL|CPL|CPT|DR|GEN|GOV|HON|LADY|LORD|LT|MR|MRS|MS|MSGR|PFC|PRES|PROF|PVT|RABBI|REP|REV|SEN|SGT|SIR|SR|SRA|SRTA|VEN) )+$/', '', $full);
-			// remove any suffix
-			$GIVN=preg_replace('/(?: (?:ESQ|ESQUIRE|JR|JUNIOR|SR|SENIOR|[IVX]+))+$/', '', $GIVN);
-			// remove surname
-			$GIVN=preg_replace('/ ?\/.*\/ ?/', '', $GIVN);
-			// remove nickname
-			$GIVN=preg_replace('/ ?".+"/', '', $GIVN);
+			$GIVN=preg_replace(
+				array(
+					'/ ?\/.*\/ ?/', // remove surname
+					'/ ?".+"/',     // remove nickname
+					'/ {2,}/',      // multiple spaces, caused by the above
+					'/^ | $/',      // leading/trailing spaces, caused by the above
+				),
+				array(
+					' ',
+					' ',
+					' ',
+					'',
+				),
+				$full
+			);
 		}
 
 		// Add placeholder for unknown given name
@@ -1780,28 +1742,9 @@ class WT_Person extends WT_GedcomRecord {
 		if (strpos($full, '@P.N.')!==false) {
 			$full=str_replace('@P.N.', $UNKNOWN_PN, $full);
 		}
-		// RTL names on LTR pages (and vice-versa) cause problems when they contain
-		// weakly-directional characters such as punctuation.  Add markup to fix this.
-		switch (utf8_direction($full)) {
-		case 'ltr':
-			$dir=($TEXT_DIRECTION=='rtl') ? ' dir="ltr"' : '';
-			break;
-		case 'rtl':
-			$dir=($TEXT_DIRECTION=='ltr') ? ' dir="rtl"' : '';
-			break;
-		case 'unknown':
-			$dir='';
-			break;
-		}
-		$full='<span class="NAME"'.$dir.'>'.preg_replace('/\/([^\/]*)\//', '<span class="SURN">$1</span>', htmlspecialchars($full)).'</span>';
+		$full='<span class="NAME" dir="auto">'.preg_replace('/\/([^\/]*)\//', '<span class="SURN">$1</span>', htmlspecialchars($full)).'</span>';
 
-		// Some people put preferred names in quotes.  This is wrong - quotes indicate NICK names.
-		if ($UNDERLINE_NAME_QUOTES) {
-			// Note that we have already called htmlspecialchars(), so match the HTML entities.
-			$full=preg_replace('/&quot;(.*)&quot;(?![^<]*>)/', '<span class="starredname">\\1</span>', $full);
-		}
-
-		// The standards say you should use a suffix of '*'
+		// The standards say you should use a suffix of '*' for preferred name
 		$full=preg_replace('/([^ >]*)\*/', '<span class="starredname">\\1</span>', $full);
 
 		// Remove prefered-name indicater - they don't go in the database
@@ -1844,4 +1787,47 @@ class WT_Person extends WT_GedcomRecord {
 		$this->format_first_major_fact(WT_EVENTS_BIRT, 1).
 		$this->format_first_major_fact(WT_EVENTS_DEAT, 1);
 	}
+
+	// create a short name for compact display on charts
+	public function getShortName() {
+		global $bwidth, $SHOW_HIGHLIGHT_IMAGES, $UNKNOWN_NN, $UNKNOWN_PN;
+		// Estimate number of characters that can fit in box. Calulates to 28 characters in webtrees theme, or 34 if no thumbnail used.
+		if ($SHOW_HIGHLIGHT_IMAGES) {
+			$char = intval(($bwidth-40)/6.5); 
+		} else {
+			$char = ($bwidth/6.5);
+		}
+		if ($this->canDisplayName()) {
+			$tmp=$this->getAllNames();
+			$givn = $tmp[$this->getPrimaryName()]['givn'];
+			$surn = $tmp[$this->getPrimaryName()]['surname'];
+			$new_givn = explode(' ', $givn);
+			$count_givn = count($new_givn);
+			$len_givn = utf8_strlen($givn);
+			$len_surn = utf8_strlen($surn);
+			$len = $len_givn + $len_surn;
+			$i = 1;
+			while ($len > $char && $i<=$count_givn) {
+				$new_givn[$count_givn-$i] = utf8_substr($new_givn[$count_givn-$i],0,1);
+				$givn = implode(' ', $new_givn);
+				$len_givn = utf8_strlen($givn);
+				$len = $len_givn + $len_surn;
+				$i++;
+			}
+			$max_surn = $char-$i*2;
+			if ($len_surn > $max_surn) {
+				$surn = substr($surn, 0, $max_surn).'...';
+				$len_surn = utf8_strlen($surn);
+			}
+			$shortname =  str_replace(
+				array('@P.N.', '@N.N.'),
+				array($UNKNOWN_PN, $UNKNOWN_NN),
+				$givn.' '.$surn
+			);
+			return $shortname;
+		} else {
+			return WT_I18N::translate('Private');
+		}
+	}
+
 }

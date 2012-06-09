@@ -31,7 +31,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Date.php 13427 2012-02-11 15:07:55Z greg $
+// $Id: Date.php 13682 2012-03-26 08:06:35Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -298,8 +298,6 @@ class WT_Date {
 	// Calculate the the age of a person, on a date.
 	// If $d2 is null, today's date is used.
 	static function getAge(WT_Date $d1, WT_Date $d2=null, $format) {
-		global $WT_IMAGES;
-
 		if ($d2) {
 			if ($d2->MaxJD()>=$d1->MinJD() && $d2->MinJD()<=$d1->MinJD()) {
 				// Overlapping dates
@@ -315,7 +313,7 @@ class WT_Date {
 
 		switch ($format) {
 		case 0: // Years - integer only (for statistics, rather than for display)
-			if ($jd && $d1->MinJD()>=$jd) {
+			if ($jd && $d1->MinJD() && $d1->MinJD()<=$jd) {
 				return $d1->MinDate()->GetAge(false, $jd, false);
 			} else {
 				return -1;
@@ -326,10 +324,10 @@ class WT_Date {
 			} else {
 				return -1;
 			}
-		case 2: // Just years, in local digits, with warning for negative
+		case 2: // Just years, in local digits, with warning for negative/
 			if ($jd && $d1->MinJD()) {
 				if ($d1->MinJD()>$jd) {
-					return '<img alt="" src="'.$WT_IMAGES['warning'].'">';
+					return '<i class="icon-warning"></i>';
 				} else {
 					return WT_I18N::number($d1->MinDate()->GetAge(false, $jd));
 				}

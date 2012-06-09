@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: set_gedcom_defaults.php 13299 2012-01-20 20:40:31Z greg $
+// $Id: set_gedcom_defaults.php 13728 2012-03-31 21:13:20Z greg $
 
 if (!defined('WT_WEBTREES') || empty($ged_id) || empty($ged_name)) {
 	header('HTTP/1.0 403 Forbidden');
@@ -47,7 +47,6 @@ set_gedcom_setting($ged_id, 'COMMON_NAMES_REMOVE',          '');
 set_gedcom_setting($ged_id, 'COMMON_NAMES_THRESHOLD',       '40');
 set_gedcom_setting($ged_id, 'CONTACT_USER_ID',              WT_USER_ID);
 set_gedcom_setting($ged_id, 'DEFAULT_PEDIGREE_GENERATIONS', '4');
-set_gedcom_setting($ged_id, 'ENABLE_AUTOCOMPLETE',          true);
 set_gedcom_setting($ged_id, 'EXPAND_NOTES',                 false);
 set_gedcom_setting($ged_id, 'EXPAND_RELATIVES_EVENTS',      false);
 set_gedcom_setting($ged_id, 'EXPAND_SOURCES',               false);
@@ -135,7 +134,6 @@ default:   set_gedcom_setting($ged_id, 'SURNAME_TRADITION', 'paternal');   break
 }
 set_gedcom_setting($ged_id, 'THEME_DIR',                    'webtrees');
 set_gedcom_setting($ged_id, 'THUMBNAIL_WIDTH',              '100');
-set_gedcom_setting($ged_id, 'UNDERLINE_NAME_QUOTES',        false);
 set_gedcom_setting($ged_id, 'USE_GEONAMES',                 false);
 set_gedcom_setting($ged_id, 'USE_MEDIA_FIREWALL',           false);
 set_gedcom_setting($ged_id, 'USE_MEDIA_VIEWER',             true);

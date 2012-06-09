@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_0_inverselink.php 13419 2012-02-10 13:23:41Z greg $
+// $Id: media_0_inverselink.php 13798 2012-04-08 13:31:56Z greg $
 
 // GEDFact Media assistant replacement code for inverselink.php: ===========================
 
@@ -33,12 +33,12 @@ $exist_links = safe_REQUEST($_REQUEST, 'exist_links', WT_REGEX_UNSAFE);
 $gid = safe_GET_xref('gid');
 $update_CHAN = safe_REQUEST($_REQUEST, 'preserve_last_changed', WT_REGEX_UNSAFE);
 
-if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
+$controller->addExternalJavaScript('js/autocomplete.js');
 
 $paramok =  true;
 if (!empty($linktoid)) $paramok = WT_GedcomRecord::getInstance($linktoid)->canDisplayDetails();
 
-if ($action == "choose" && $paramok) {
+if ($action == 'choose' && $paramok) {
 
 	?>
 	<script type="text/javascript">
@@ -70,10 +70,9 @@ if ($action == "choose" && $paramok) {
 		}
 	}
 
-	var GEDFact_assist = "installed";
+	var GEDFact_assist = 'installed';
 //-->
 	</script>
-	<script src="<?php echo WT_STATIC_URL; ?>webtrees.js" type="text/javascript"></script>
 	<link href ="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>GEDFact_assistant/css/media_0_inverselink.css" rel="stylesheet" type="text/css" media="screen">
 
 	<?php
@@ -110,9 +109,8 @@ if ($action == "choose" && $paramok) {
 			WT_DB::prepare("SELECT m_file FROM `##media` where m_media=? AND m_gedfile=?")
 			->execute(array($mediaid, WT_GED_ID))
 			->fetchOne();
-		$filename = str_replace(" ", "%20", $filename);
 		$thumbnail = thumbnail_file($filename, false);
-		echo '<img src = ', $thumbnail, ' class="thumbheight">';
+		echo '<img src="', htmlspecialchars($thumbnail), '" class="thumbheight">';
 		echo '</td></tr></table>';
 		echo '</td></tr>';
 		echo '<tr><td class="descriptionbox width20 wrap">', WT_I18N::translate('Links'), '</td>';
@@ -144,7 +142,7 @@ if ($action == "choose" && $paramok) {
 	
 			if ($record->getType()=='INDI') {
 				?>
-				<td align="center"><img style="border-style:none; margin-top:5px;" src="<?php echo $WT_IMAGES['button_family']; ?>" alt="<?php echo WT_I18N::translate('Open Family Navigator'); ?>" title="<?php echo WT_I18N::translate('Open Family Navigator'); ?>" name="family_'<?php echo $link; ?>'" onclick="openFamNav('<?php echo $link; ?>');"></td>
+				<td align="center"><a href="#" class="icon-button_family" title="<?php echo WT_I18N::translate('Family navigator'); ?>" name="family_'<?php echo $link; ?>'" onclick="openFamNav('<?php echo $link; ?>'); return false;"></a></td>
 				<?php
 			} elseif ($record->getType()=='FAM') {
 				if ($record->getHusband()) {
@@ -155,7 +153,7 @@ if ($action == "choose" && $paramok) {
 					$head='';
 				}
 				?>
-				<td align="center"><img style="border-style:none; margin-top:5px;" src="<?php echo $WT_IMAGES['button_family']; ?>" alt="<?php echo WT_I18N::translate('Open Family Navigator'); ?>" title="<?php echo WT_I18N::translate('Open Family Navigator'); ?>" name="family_'<?php echo $link; ?>'" onclick="openFamNav('<?php echo $head; ?>');"></td>
+				<td align="center"><a href="#" class="icon-button_family" title="<?php echo WT_I18N::translate('Family navigator'); ?>" name="family_'<?php echo $link; ?>'" onclick="openFamNav('<?php echo $head; ?>');"></a></td>
 				<?php
 			} else {
 				echo '<td></td>';
@@ -186,16 +184,13 @@ if ($action == "choose" && $paramok) {
 	echo '</td><td style=" padding-bottom:2px; vertical-align:middle">';
 		echo '&nbsp;';
 		if (isset($WT_IMAGES["add"])) {
-			echo '<img style="border-style:none;" src="', $WT_IMAGES["add"], '" alt="', WT_I18N::translate('Add'), ' "title="', WT_I18N::translate('Add'), '" align="middle" name="addLink" value="" onclick="blankwin(); return false;">';
+			echo '<img style="border-style:none;" src="', $WT_IMAGES["add"], '" alt="', WT_I18N::translate('Add'), ' " title="', WT_I18N::translate('Add'), '" align="middle" name="addLink" value="" onclick="blankwin(); return false;">';
 			} else {
 			echo '<button name="addLink" value="" type="button" onclick="blankwin(); return false;">', WT_I18N::translate('Add'), '</button>';
 		}
-		echo '&nbsp;&nbsp;&nbsp;&nbsp;';
-		print_findindi_link("gid", "");
-		echo '&nbsp;';
-		print_findfamily_link("gid");
-		echo '&nbsp;';
-		print_findsource_link("gid");
+		echo ' ', print_findindi_link('gid');
+		echo ' ', print_findfamily_link('gid');
+		echo ' ', print_findsource_link('gid');
 	echo '</td></tr></table>';
 	echo "<sub>" . WT_I18N::translate('Enter or search for the ID of the person, family, or source to which this media item should be linked.') . "</sub>";
 
@@ -219,7 +214,7 @@ if ($action == "choose" && $paramok) {
 		//id=document.getElementById('gid').value;
 		if (id.match("I")=="I" || id.match("i")=="i") {
 			id = id.toUpperCase();
-			winNav = window.open('edit_interface.php?action=addmedia_links&noteid=newnote&pid='+id, 'winNav', 'top=50,left=640,width=300,height=630,resizable=1,scrollbars=1');
+			winNav = window.open('edit_interface.php?action=addmedia_links&noteid=newnote&pid='+id, 'winNav', edit_window_specs);
 			if (window.focus) {winNav.focus();}
 		} else if (id.match("F")=="F") {
 			id = id.toUpperCase();
@@ -411,8 +406,7 @@ function addRowToTable(num, pid, nam, head)
 				txtInp2.style.background='transparent';
 				txtInp2.style.border='0px';
 				txtInp2.style.fontSize="11px";
-				txtInp2.innerHTML = unescape(removeHTMLTags(nam)); //Required for IE
-				txtInp2.textContent = unescape(removeHTMLTags(nam));
+				txtInp2.innerHTML = removeHTMLTags(unescape(nam));
 			cell2.appendChild(txtInp2);
 
 			// cell btn - remove img button
@@ -596,67 +590,36 @@ function openInNewWindow(frm)
 ?>
 <script>
 function parseAddLinks() {
-	str = '';
+	// start with the "newly added" ID.		
+	var str = document.getElementById('gid').value;
+	// Add in the "keep" IDs.
 	var tbl = document.getElementById('addlinkQueue');
 	for (var i=1; i<tbl.rows.length; i++) { // start at i=1 because we need to avoid header
 		var tr = tbl.rows[i];
 		if (IE) {
-			str += (str==''?'':', ') + tr.cells[1].childNodes[0].innerHTML;
+			str += (str==''?'':',') + tr.cells[1].childNodes[0].innerHTML;
 		} else {
-			str += (str==''?'':', ') + tr.cells[1].childNodes[0].textContent;
+			str += (str==''?'':',') + tr.cells[1].childNodes[0].textContent;
 		}
 	}
+	document.link.more_links.value = str;
 }
 
 function parseRemLinks() {
-	remstr = "";
+	var remstr = "";
 	var tbl = document.getElementById('existLinkTbl');
 	for (var i=1; i<tbl.rows.length; i++) { // start at i=1 because we need to avoid header
 		var remtr = tbl.rows[i];
-		var remstrRow = '';
-		for (var j=1; j<remtr.cells.length; j++) { // Start at col 1 (j=1)
-			if (j!=4 ) {
-				// dont show col 0 index
-				// miss out  col 2 name
-				// miss out  col 3 keep radio button
-				// choose    col 4 remove radio button
-				continue;
-			} else {
-				 if (remtr.cells[j].childNodes[0].checked)  {
-					remstrRow += (remstrRow==''?'':'') + remtr.cells[j].childNodes[0].name + ', ';
-				 }
-			}
+		if (remtr.cells[4].childNodes[0].checked)  {
+			remstr += (remstr==''?'':',') + remtr.cells[4].childNodes[0].name;
 		}
-		remstr += (remstr==''?'':'') + remstrRow;
 	}
-	// remstr += (remstr==''?'':','); // Adds just final comma at end of string (\')
-}
-
-function preview() {
-	parseAddLinks();
-	alert (str);
+	document.link.exist_links.value = remstr;
 }
 
 function shiftlinks() {
-
 	parseRemLinks();
-	// alert('remstring = '+ remstr);
-	if (remstr) {
-		document.link.exist_links.value = remstr;
-	}
-
 	parseAddLinks();
-	// alert('string = '+ str);
-	if (str) {
-		document.link.more_links.value = str;
-	} else {
-		// leave hidden input morelinks as "No Values"
-		var inputField = document.getElementById('gid');
-	// alert(inputField.value)
-		if (inputField) {
-			document.link.more_links.value = inputField.value+',';
-		}
-	}
 	if (winNav) {
 		winNav.close();
 	}
@@ -673,10 +636,8 @@ function shiftlinks() {
 	echo "<b>", $mediaid, "</b><br><br>";
 
 	// Unlink records indicated by radio button =========
-	if (isset($exist_links) && $exist_links!="No_Values") {
-		$exist_links = substr($exist_links, 0, -1);
-		$rem_exist_links = (explode(", ", $exist_links));
-		foreach ($rem_exist_links as $remLinkId) {
+	if ($exist_links) {
+		foreach (explode(',', $exist_links) as $remLinkId) {
 			echo WT_I18N::translate('Link to %s deleted', $remLinkId);
 			echo '<br>';
 			if ($update_CHAN=='no_change') {
@@ -691,9 +652,8 @@ function shiftlinks() {
 	}
 
 	// Add new Links ====================================
-	if (isset($more_links) && $more_links!="No_Values" && $more_links!=",") {
-		$add_more_links = (explode(", ", $more_links));
-		foreach ($add_more_links as $addLinkId) {
+	if ($more_links) {
+		foreach (explode(',', $more_links) as $addLinkId) {
 			echo WT_I18N::translate('Link to %s added', $addLinkId);
 			if ($update_CHAN=='no_change') {
 				linkMedia($mediaid, $addLinkId, 1, false);
@@ -714,4 +674,31 @@ function shiftlinks() {
 } else {
 	// echo '<center>You must be logged in as an Administrator<center>';
 	echo '<br><br><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close(); winNav.close();">', WT_I18N::translate('Close Window'), '</a><br></center>';
+}
+
+/**
+* unLink Media ID to Indi, Family, or Source ID
+*
+* @param  string  $mediaid Media ID to be unlinked.
+* @param string $linktoid Indi, Family, or Source ID that the Media ID should be unlinked from.
+* @param $linenum should be ALWAYS set to 'OBJE'.
+* @param int $level Level where the Media Object reference should be removed from (not used)
+* @param boolean $chan Whether or not to update/add the CHAN record
+*
+* @return  bool success or failure
+*/
+function unlinkMedia($linktoid, $linenum, $mediaid, $level=1, $chan=true) {
+	if (empty($level)) $level = 1;
+	if ($level!=1) return false; // Level 2 items get unlinked elsewhere (maybe ??)
+	// find Indi, Family, or Source record to unlink from
+	$gedrec = find_gedcom_record($linktoid, WT_GED_ID, true);
+
+	//-- when deleting/unlinking a media link
+	//-- $linenum comes as an OBJE and the $mediaid to delete should be set
+	if (!is_numeric($linenum)) {
+		$newged = remove_subrecord($gedrec, $linenum, $mediaid);
+	} else {
+		$newged = remove_subline($gedrec, $linenum);
+	}
+	replace_gedrec($linktoid, WT_GED_ID, $newged, $chan);
 }

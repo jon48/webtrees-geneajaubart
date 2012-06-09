@@ -2,7 +2,7 @@
 // Displays a place hierachy
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team. All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: placehierarchy.php 13398 2012-02-06 22:57:50Z nigel $
+// $Id: placehierarchy.php 13885 2012-05-01 13:49:05Z lukasz $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -150,7 +150,7 @@ function create_map($placelevels) {
 	} else {
 		echo '<div id="place_map" style="border:1px solid gray; width:', $GOOGLEMAP_PH_XSIZE, 'px; height:', $GOOGLEMAP_PH_YSIZE, 'px; ';	
 	}
-	echo "background-image: url('", WT_STATIC_URL, "images/loading.gif'); background-position: center; background-repeat: no-repeat; overflow: hidden;\"></div>";
+	echo "\"><i class=\"icon-loading-large\"></i></div>";
 	echo '<script src="http://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>';
 	echo '</td>';
 	
@@ -169,9 +169,9 @@ function create_map($placelevels) {
 			$adminplaces_url .= '&amp;parent='.$latlng['pl_id'];
 		}
 		echo '</tr><tr><td>';
-		echo '<a href="module.php?mod=googlemap&amp;mod_action=admin_editconfig">', WT_I18N::translate('Google Maps configuration'), '</a>';
+		echo '<a href="module.php?mod=googlemap&amp;mod_action=admin_config">', WT_I18N::translate('Google Maps™ preferences'), '</a>';
 		echo '&nbsp;|&nbsp;';
-		echo '<a href="'.$adminplaces_url.'">', WT_I18N::translate('Edit geographic place locations'), '</a>';
+		echo '<a href="'.$adminplaces_url.'">', WT_I18N::translate('Geographic data'), '</a>';
 		echo '&nbsp;|&nbsp;';
 		echo '<a href="'.$placecheck_url.'">', WT_I18N::translate('Place Check'), '</a>';
 		if (array_key_exists('batch_update', WT_Module::getActiveModules())) {
@@ -196,7 +196,7 @@ function create_map($placelevels) {
 				var svbear = document.getElementById("sv_bearText").value.slice(0, -1);
 				var svelev = document.getElementById("sv_elevText").value.slice(0, -1);
 				var svzoom = document.getElementById("sv_zoomText").value;
-				win03 = window.open("module.php?mod=googlemap&mod_action=places_edit&action=update_sv_params&placeid="+placeid+"&svlati="+svlati+"&svlong="+svlong+"&svbear="+svbear+"&svelev="+svelev+"&svzoom="+svzoom, "win03", "top=50, left=50, width=680, height=550, resizable=1, scrollbars=1");	
+				win03 = window.open("module.php?mod=googlemap&mod_action=places_edit&action=update_sv_params&placeid="+placeid+"&svlati="+svlati+"&svlong="+svlong+"&svbear="+svbear+"&svelev="+svelev+"&svzoom="+svzoom, "win03", indx_window_specs);	
 				if (window.focus) {win03.focus();}
 			}
 		');
@@ -220,7 +220,7 @@ function create_map($placelevels) {
 					$sv_lat = $pl_lati;
 					$sv_lng = $pl_long;
 			}
-			// Set Street View parameters to numeric value if NULL (avoids problem with Google Street View Pane not rendering)
+			// Set Street View parameters to numeric value if NULL (avoids problem with Google Street View™ Pane not rendering)
 			if ($sv_dir==null) {
 				$sv_dir=0;
 			}
@@ -231,9 +231,9 @@ function create_map($placelevels) {
 				$sv_zoom=1;
 			}
 			
-			$_map = WT_I18N::translate('Google Maps');
+			$_map = WT_I18N::translate('Google Maps™');
 			$_reset = WT_I18N::translate('Reset');
-				$_streetview = /* I18N: http://en.wikipedia.org/wiki/Google_street_view */ WT_I18N::translate('Google Street View');
+				$_streetview = /* I18N: http://en.wikipedia.org/wiki/Google_street_view */ WT_I18N::translate('Google Street View™');
 			?>
 			<div>
 			<iframe style="background:transparent; margin-top:-3px; margin-left:2px; width:530px;height:405px;padding:0;border:solid 0px black" src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/wt_v3_street_view.php?x=<?php echo $sv_lng; ?>&amp;y=<?php echo $sv_lat; ?>&amp;z=18&amp;t=2&amp;c=1&amp;s=1&amp;b=<?php echo $sv_dir; ?>&amp;p=<?php echo $sv_pitch; ?>&amp;m=<?php echo $sv_zoom; ?>&amp;j=1&amp;k=1&amp;v=1&amp;map=<?php echo $_map; ?>&amp;reset=<?php echo $_reset; ?>&amp;streetview=<?php echo $_streetview; ?>" marginwidth="0" marginheight="0" frameborder="0" scrolling="no"></iframe>
@@ -367,7 +367,7 @@ function print_gm_markers($place2, $level, $parent, $levelm, $linklevels, $place
 		}
 		echo '<br>', WT_I18N::translate('This place has no coordinates');
 		if (WT_USER_IS_ADMIN)
-			echo "<br><a href='module.php?mod=googlemap&amp;mod_action=admin_places&amp;parent=", $levelm, "&amp;display=inactive'>", WT_I18N::translate('Edit geographic location'), "</a>";
+			echo "<br><a href='module.php?mod=googlemap&amp;mod_action=admin_places&amp;parent=", $levelm, "&amp;display=inactive'>", WT_I18N::translate('Geographic data'), "</a>";
 			//PERSO
 			echo "</div>\", \"$icon_image\", \"", str_replace(array('&lrm;', '&rlm;'), array(WT_UTF8_LRM, WT_UTF8_RLM), addslashes($place2['place'])), "\");\n";
 			//END PERSO
@@ -385,7 +385,7 @@ function print_gm_markers($place2, $level, $parent, $levelm, $linklevels, $place
 		} elseif ($long < 0) {
 			$long = '-'.abs($long);
 		}
-
+		
 		// flags by kiwi3685 ---
 		//PERSO Resize flags
 		$icon_image="";
@@ -511,6 +511,8 @@ function map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $pla
 		// If only one marker, set zoom level to that of place in database
 		if (mapLevel != 0) {
 			var pointZoom = placezoom;
+		} else {
+			var pointZoom = 1;
 		}
 	
 		// Creates a marker whose info window displays the given name

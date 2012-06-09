@@ -21,16 +21,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search.php 13198 2012-01-06 13:15:41Z greg $
+// $Id: search.php 13816 2012-04-16 15:30:31Z greg $
 
 define('WT_SCRIPT_NAME', 'search.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 $controller=new WT_Controller_Search();
-$controller->pageHeader();
+$controller
+	->pageHeader()
+	->addExternalJavaScript('js/autocomplete.js');
 
-if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 ?>
 
 <script type="text/javascript">
@@ -105,9 +106,9 @@ echo '<div id="search-page">
 		//========== General search Form ==========
 		if ($controller->action == "general") { 			
 			echo '<div class="label">' , WT_I18N::translate('Search for'), '</div>		
-			<div class="value"><input tabindex="1" id="firstfocus" type="text" name="query" value="';
+			<div class="value"><input tabindex="1" id="query" type="text" name="query" value="';
 				if (isset($controller->myquery)) 	echo $controller->myquery;
-				echo '" size="40">' , print_specialchar_link('firstfocus', false), '</div>		
+				echo '" size="40" autofocus> ', print_specialchar_link('query'), '</div>		
 			<div class="label">' ,  WT_I18N::translate('Records'), '</div>
 			<div class="value"><p>
 				<input type="checkbox"';
@@ -132,8 +133,8 @@ echo '<div id="search-page">
 			</p></div>
 			<div class="label">' , WT_I18N::translate('Exclude filter'), help_link('search_exclude_tags'), '</div>
 			<div class="value"><p>
-				<input type="radio" id="tagfilter_on" name="tagfilter" value="on" ';
-				if (($controller->tagfilter == "on") || ($controller->tagfilter == "")) echo ' checked="checked"';
+				<input type="radio" id="tagfilter_on" name="tagfilter" value="on"';
+				if (($controller->tagfilter == 'on') || ($controller->tagfilter == "")) echo ' checked="checked"';
 				echo '><label for="tagfilter_on">' , WT_I18N::translate('Exclude some non-genealogical data'), '</label>
 				</p><p>
 				<input type="radio" id="tagfilter_off" name="tagfilter" value="off"';
@@ -142,16 +143,16 @@ echo '<div id="search-page">
 			</p></div>
 			<div class="label">' , WT_I18N::translate('Associates'), help_link('search_include_ASSO'), '</div>
 			<div class="value"><input type="checkbox" id="showasso" name="showasso" value="on"';
-				if ($controller->showasso == "on") echo ' checked="checked" '; 
-			echo '<label for="showasso">' , WT_I18N::translate('Show related persons/families'), '</label></div>';
+				if ($controller->showasso == 'on') echo ' checked="checked"'; 
+			echo '><label for="showasso">' , WT_I18N::translate('Show related persons/families'), '</label></div>';
 		}	
 		//========== Search and replace Search Form ==========
 		if ($controller->action == "replace") {
 			if (WT_USER_CAN_EDIT) { 
 				echo '<div class="label">', WT_I18N::translate('Search for'), '</div>
-					<div class="value"><input tabindex="1" id="firstfocus" name="query" value="" type="text" autofocus></div>
+					<div class="value"><input tabindex="1" name="query" value="" type="text" autofocus></div>
 					<div class="label">',  WT_I18N::translate('Replace with'), '</div>
-					<div class="value"><input tabindex="1" name="replace" value="" type="text"></div>';			
+					<div class="value"><input tabindex="2" name="replace" value="" type="text"></div>';			
 				?>
 				<script type="text/javascript">
 				<!--
@@ -190,24 +191,24 @@ echo '<div id="search-page">
 		//========== Phonetic search Form //==========		
 		if ($controller->action == "soundex") {
 			echo '<div class="label">' , WT_I18N::translate('Given name'), '</div>
-				<div class="value"><input tabindex="3" type="text" id="firstfocus" name="firstname" value="' , $controller->myfirstname, '" autofocus></div>
+				<div class="value"><input tabindex="3" type="text" name="firstname" value="' , htmlspecialchars($controller->firstname), '" autofocus></div>
 				<div class="label">' , WT_I18N::translate('Last name'), '</div>
-				<div class="value"><input tabindex="4" type="text" name="lastname" value="' , $controller->mylastname, '"></div>
+				<div class="value"><input tabindex="4" type="text" name="lastname" value="' , htmlspecialchars($controller->lastname), '"></div>
 				<div class="label">' , WT_I18N::translate('Place'), '</div>
-				<div class="value"><input tabindex="5" type="text" name="place" value="' , $controller->myplace, '"></div>
+				<div class="value"><input tabindex="5" type="text" name="place" value="' , htmlspecialchars($controller->place), '"></div>
 				<div class="label">' , WT_I18N::translate('Year'), '</div>
-				<div class="value"><input tabindex="6" type="text" name="year" value="' , $controller->myyear, '"></div>';
+				<div class="value"><input tabindex="6" type="text" name="year" value="' , htmlspecialchars($controller->year), '"></div>';
 			
 			// ---- Soundex type options (Russell, DaitchM) --- 
 			echo '<div class="label">' , WT_I18N::translate('Phonetic algorithm'),  '</div>
 				<div class="value"><p>
 					<input type="radio" name="soundex" value="Russell"';
 						if ($controller->soundex == "Russell") echo ' checked="checked" ';
-						echo '>'  , WT_I18N::translate('Russell'); //* I18N: http://en.wikipedia.org/wiki/Soundex */
+						echo '>'  , WT_I18N::translate('Russell');
 					echo '</p><p>
 						<input type="radio" name="soundex" value="DaitchM"';
 						if ($controller->soundex == "DaitchM" || $controller->soundex == "") echo ' checked="checked" ';
-						echo'>' , WT_I18N::translate('Daitch-Mokotoff'); //* I18N: http://en.wikipedia.org/wiki/Daitch–Mokotoff_Soundex */
+						echo'>' , WT_I18N::translate('Daitch-Mokotoff');
 				echo '</p></div>';
 			// Associates Section
 			echo '<div class="label">' , WT_I18N::translate('Associates'), '</div>

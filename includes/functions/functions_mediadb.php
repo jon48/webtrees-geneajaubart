@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_mediadb.php 13413 2012-02-09 20:20:59Z lukasz $
+// $Id: functions_mediadb.php 13709 2012-03-28 13:33:58Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -917,20 +917,19 @@ function display_silhouette(array $config = array()) {
 	}
 
 	if ($config['display_type']=='pedigree_person') {
-		$config['class']='pedigree_image_portrait';
+		$config['class']='pedigree_image';
 	}
 	if ($config['display_type']=='treeview') {
-		$config['class']='default_thumbnail pedigree_image_portrait';
+		$config['class']='default_thumbnail pedigree_image';
 	}
 	if ($config['display_type']=='googlemap') {
 		$config['usejavascript']=false;
 		$config['addslashes']=true;
-		$config['class']='pedigree_image_portrait';
+		$config['class']='pedigree_image';
 	}
 	$config['img_title']=strip_tags($config['img_title']);
 	$classstr='';
 	if ($config['class']) {
-		if ($TEXT_DIRECTION == "rtl") $config['class'] .= "_rtl";
 		$classstr=' class="'.$config['class'].'" ';
 	}
 	$idstr=($config['img_id']) ? ' id="'.$config['img_id'].'" ' : '';
@@ -1448,9 +1447,9 @@ function show_media_form($pid, $action = "newentry", $filename = "", $linktoid =
 		echo "<tr><td class=\"descriptionbox wrap width25\">";
 		echo WT_I18N::translate('Enter a Person, Family, or Source ID'), help_link('add_media_linkid');
 		echo "</td><td class=\"optionbox wrap\"><input type=\"text\" name=\"gid\" id=\"gid\" size=\"6\" value=\"\">";
-		print_findindi_link("gid", "");
-		print_findfamily_link("gid");
-		print_findsource_link("gid");
+		echo ' ', print_findindi_link('gid');
+		echo ' ', print_findfamily_link('gid');
+		echo ' ', print_findsource_link('gid');
 		echo "<br><sub>", WT_I18N::translate('Enter or search for the ID of the person, family, or source to which this media item should be linked.'), "</sub></td></tr>";
 	}
 	$gedrec=find_gedcom_record($pid, WT_GED_ID, true);

@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,14 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: module.php 13820 2012-04-17 08:25:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
-
-require_once WT_ROOT.'includes/functions/functions_charts.php';
 
 class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	// Extend WT_Module
@@ -76,7 +74,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 		// Start Family Nav Table ----------------------------
 		echo '<table class="nav_content">';
-		global $WT_IMAGES, $spouselinks, $parentlinks;
+		global $spouselinks, $parentlinks;
 
 		$personcount=0;
 		$families = $controller->record->getChildFamilies();
@@ -535,7 +533,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $SCRIPT_NAME, $GEDCOM;
 		global $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $PEDIGREE_FULL_DETAILS, $SHOW_PEDIGREE_PLACES;
 		global $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
-		global $WT_IMAGES, $ABBREVIATE_CHART_LABELS, $USE_MEDIA_VIEWER;
+		global $ABBREVIATE_CHART_LABELS, $USE_MEDIA_VIEWER;
 		global $chart_style, $box_width, $generations, $show_spouse, $show_full;
 		global $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE, $PEDIGREE_SHOW_GENDER;
 		global $SEARCH_SPIDER;

@@ -2,7 +2,7 @@
 // Controller for the timeline chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -21,16 +21,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Timeline.php 13144 2011-12-28 09:29:10Z greg $
+// $Id: Timeline.php 13951 2012-05-29 19:55:39Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-require_once WT_ROOT.'includes/functions/functions_charts.php';
-
-class WT_Controller_Timeline extends WT_Controller_Chart {
+class WT_Controller_Timeline extends WT_Controller_Base {
 	var $bheight = 30;
 	var $placements = array();
 	var $familyfacts = array();
@@ -44,8 +42,9 @@ class WT_Controller_Timeline extends WT_Controller_Chart {
 	var $people = array();
 	var $pidlinks = "";
 	var $scale = 2;
+
 	// GEDCOM elements that may have DATE data, but should not be displayed
-	var $nonfacts = array("BAPL","ENDL","SLGC","SLGS","_TODO","CHAN");
+	private $nonfacts = array('BAPL', 'ENDL', 'SLGC', 'SLGS', '_TODO', 'CHAN');
 
 	function __construct() {
 		parent::__construct();
@@ -161,7 +160,7 @@ class WT_Controller_Timeline extends WT_Controller_Chart {
 		}
 	}
 
-	function print_time_fact($event) {
+	function print_time_fact(WT_Event $event) {
 		global $basexoffset, $baseyoffset, $factcount, $TEXT_DIRECTION, $WT_IMAGES, $SHOW_PEDIGREE_PLACES, $placements, $familyfacts;
 
 		/* @var $event Event */
@@ -242,7 +241,7 @@ class WT_Controller_Timeline extends WT_Controller_Chart {
 						echo '<span class="age"> ', WT_I18N::translate('Age'), ' ', $ageh, '</span>';
 					}
 				}
-				echo " ".PrintReady($desc);
+				echo " ".htmlspecialchars($desc);
 				if ($SHOW_PEDIGREE_PLACES>0) {
 					$place = $event->getPlace();
 					if ($place!=null) {
@@ -251,7 +250,7 @@ class WT_Controller_Timeline extends WT_Controller_Chart {
 						for ($plevel=0; $plevel<$SHOW_PEDIGREE_PLACES; $plevel++) {
 							if (!empty($plevels[$plevel])) {
 								if ($plevel>0) echo ", ";
-								echo PrintReady($plevels[$plevel]);
+								echo htmlspecialchars($plevels[$plevel]);
 							}
 						}
 					}

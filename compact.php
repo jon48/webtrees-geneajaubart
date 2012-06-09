@@ -21,23 +21,20 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: compact.php 13265 2012-01-17 11:10:55Z greg $
+// $Id: compact.php 13891 2012-05-02 10:33:34Z lukasz $
 
 define('WT_SCRIPT_NAME', 'compact.php');
 require './includes/session.php';
-require_once WT_ROOT.'includes/functions/functions_charts.php';
 
 $controller=new WT_Controller_Compact();
 $controller
 	->pageHeader()
-	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }'); // For the "find indi" link
-
-if ($ENABLE_AUTOCOMPLETE) {
-	require WT_ROOT.'js/autocomplete.js.htm';
-}
+	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the "find indi" link
+	->addExternalJavaScript('js/autocomplete.js');
 
 if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
+	$album = new lightbox_WT_Module();
+	$album->getPreLoadContent();
 }
 
 ?>
@@ -57,7 +54,7 @@ if (WT_USE_LIGHTBOX) {
 						</td>
 						<td class="optionbox vmiddle">
 							<input class="pedigree_form" type="text" name="rootid" id="rootid" size="3" value="<?php echo $controller->rootid; ?>">
-							<?php print_findindi_link('rootid',''); ?>
+							<?php echo print_findindi_link('rootid'); ?>
 						</td>
 							<td <?php echo $SHOW_HIGHLIGHT_IMAGES ? 'rowspan="2"' : ''; ?> class="facts_label03">
 								<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>">
@@ -66,7 +63,7 @@ if (WT_USE_LIGHTBOX) {
 						<?php if ($SHOW_HIGHLIGHT_IMAGES) { ?>
 						<tr>
 							<td class="descriptionbox">
-								<?php echo WT_I18N::translate('Show highlight images in people boxes'), help_link('SHOW_HIGHLIGHT_IMAGES'); ?>
+								<?php echo WT_I18N::translate('Show highlight images in people boxes'); ?>
 							</td>
 							<td class="optionbox">
 								<input name="show_thumbs" type="checkbox" value="1" <?php echo $controller->show_thumbs ? 'checked="checked"' : ''; ?>>

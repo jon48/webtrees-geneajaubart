@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13123 2011-12-21 22:41:06Z greg $
+// $Id: module.php 13798 2012-04-08 13:31:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,7 +41,7 @@ class random_media_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $ctype, $foundlist, $TEXT_DIRECTION, $WT_IMAGES;
+		global $ctype, $foundlist, $TEXT_DIRECTION;
 
 		$filter  =get_block_setting($block_id, 'filter',   'all');
 		$controls=get_block_setting($block_id, 'controls', true);
@@ -181,7 +181,7 @@ class random_media_WT_Module extends WT_Module implements WT_Module_Block {
 			$id=$this->getName().$block_id;
 			$class=$this->getName().'_block';
 			if ($ctype=='gedcom' && WT_USER_GEDCOM_ADMIN || $ctype=='user' && WT_USER_ID) {
-				$title='<img class="adminicon" src="'.$WT_IMAGES['admin'].'" width="15" height="15" alt="'.WT_I18N::translate('Configure').'"  onclick="window.open(\'index_edit.php?action=configure&amp;ctype='.$ctype.'&amp;block_id='.$block_id.'\', \'_blank\', \'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1\');">';
+				$title='<i class="icon-admin" title="'.WT_I18N::translate('Configure').'" onclick="modalDialog(\'block_edit.php?block_id='.$block_id.'\', \''.$this->getTitle().'\');"></i>';
 			} else {
 				$title='';
 			}
@@ -190,43 +190,37 @@ class random_media_WT_Module extends WT_Module implements WT_Module_Block {
 			$content = "<div id=\"random_picture_container$block_id\">";
 			if ($controls) {
 				if ($start) {
-					$image = "stop";
+					$icon_class = 'icon-media-stop';
 				} else {
-					$image = "rarrow";
+					$icon_class = 'icon-media-play';
 				}
-				$linkNextImage = "<a href=\"#\" onclick=\"jQuery('#block_{$block_id}').load('index.php?ctype={$ctype}&amp;action=ajax&amp;block_id={$block_id}');return false;\"><img src=\"{$WT_IMAGES['rdarrow']}\" alt=\"".WT_I18N::translate('Next image')."\" title=\"".WT_I18N::translate('Next image')."\"></a>";
-
+				$linkNextImage = '<a href="#" onclick="jQuery(\'#block_'.$block_id.'\').load(\'index.php?ctype='.$ctype.'&amp;action=ajax&amp;block_id='.$block_id.'\');return false;" title="'.WT_I18N::translate('Next image').'" class="icon-media-next"></a>';
 				$content .= "<div class=\"center\" id=\"random_picture_controls$block_id\"><br>";
 				if ($TEXT_DIRECTION=="rtl") $content .= $linkNextImage;
-				$content .= "<a href=\"#\" onclick=\"togglePlay(); return false;\">";
-				if (isset($WT_IMAGES[$image])) $content .= "<img id=\"play_stop\" src=\"{$WT_IMAGES[$image]}\" alt=\"".WT_I18N::translate('Play')."/".WT_I18N::translate('Stop')."\" title=\"".WT_I18N::translate('Play')."/".WT_I18N::translate('Stop')."\">";
-				else $content .= WT_I18N::translate('Play')."/".WT_I18N::translate('Stop');
-				$content .= "</a>";
+				$content .= "<a href=\"#\" onclick=\"togglePlay(); return false;\" id=\"play_stop\" class=\"".$icon_class."\" title=\"".WT_I18N::translate('Play')."/".WT_I18N::translate('Stop').'"></a>';
 				if ($TEXT_DIRECTION=="ltr") $content .= $linkNextImage;
 				$content .= '</div>'.WT_JS_START.'
 					var play = false;
 						function togglePlay() {
 							if (play) {
 								play = false;
-								imgid = document.getElementById("play_stop");
-								imgid.src = \''.$WT_IMAGES["rarrow"].'\';
+								jQuery("#play_stop").removeClass("icon-media-stop").addClass("icon-media-play");
 							}
 							else {
 								play = true;
 								playSlideShow();
-								imgid = document.getElementById("play_stop");
-								imgid.src = \''.$WT_IMAGES["stop"].'\';
+								jQuery("#play_stop").removeClass("icon-media-play").addClass("icon-media-stop");
 							}
 						}
 
 						function playSlideShow() {
 							if (play) {
-								window.setTimeout(\'reload_image()\', 6000);
+								window.setTimeout("reload_image()", 6000);
 							}
 						}
 						function reload_image() {
 							if (play) {
-								jQuery(\'#block_'.$block_id.'\').load(\'index.php?ctype='.$ctype.'&action=ajax&block_id='.$block_id.'&start=1\');
+								jQuery("#block_'.$block_id.'").load("index.php?ctype='.$ctype.'&action=ajax&block_id='.$block_id.'&start=1");
 							}
 						}
 					'.WT_JS_END;
@@ -234,12 +228,12 @@ class random_media_WT_Module extends WT_Module implements WT_Module_Block {
 			if ($start) {
 				$content .= WT_JS_START.'togglePlay();'.WT_JS_END;
 			}
-			$content .= "<div class=\"center\" id=\"random_picture_content$block_id\">";
-			$content .= "<table id=\"random_picture_box\" width=\"100%\"><tr><td valign=\"top\"";
+			$content .= '<div class="center" id="random_picture_content'.$block_id.'">';
+			$content .= '<table id="random_picture_box"><tr><td';
 
-			if ($block) $content .= " align=\"center\" class=\"details1\"";
-			else $content .= " class=\"details2\"";
-			$content .= " >";
+			if ($block) $content .= ' class="details1"';
+			else $content .= ' class="details2"';
+			$content .= ' >';
 			$content .= $mediaobject->displayMedia(array('align'=>'none', 'uselightbox'=>false, 'uselightbox_fallback'=>false));
 
 			if ($block) $content .= '<br>';
@@ -323,7 +317,7 @@ class random_media_WT_Module extends WT_Module implements WT_Module_Block {
 		echo '<tr><td class="descriptionbox wrap width33">';
 		echo WT_I18N::translate('Show only persons, events, or all?'), help_link('random_media_persons_or_all', $this->getName());
 		echo '</td><td class="optionbox">';
-		echo select_edit_control('filter', array('indi'=>WT_I18N::translate('Persons'), 'event'=>WT_I18N::translate('Events'), 'all'=>WT_I18N::translate('All')), null, $filter, '');
+		echo select_edit_control('filter', array('indi'=>WT_I18N::translate('Individuals'), 'event'=>WT_I18N::translate('Facts and events'), 'all'=>WT_I18N::translate('All')), null, $filter, '');
 		echo '</td></tr>';
 
 		$filters=array(

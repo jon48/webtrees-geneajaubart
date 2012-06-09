@@ -2,7 +2,7 @@
 // Searches based on user query.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team. All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search_advanced.php 13068 2011-12-14 21:38:31Z greg $
+// $Id: search_advanced.php 13865 2012-04-26 08:38:24Z nigel $
 
 define('WT_SCRIPT_NAME', 'search_advanced.php');
 require './includes/session.php';
@@ -126,7 +126,7 @@ echo WT_JS_START;
 <?php
 echo WT_JS_END;
 ?>
-
+<div id="search-page">
 <h2 class="center"><?php echo $controller->getPageTitle(); ?></h2>
 <?php $somethingPrinted = $controller->PrintResults(); ?>
 <!-- /*************************************************** Search Form Outer Table **************************************************/ -->
@@ -134,11 +134,6 @@ echo WT_JS_END;
 <input type="hidden" name="action" value="<?php echo $controller->action; ?>">
 <input type="hidden" name="isPostBack" value="true">
 <table id="field_table" class="list_table" width="35%" border="0">
-	<tr>
-		<td colspan="4" class="facts_label03" style="text-align:center;">
-			<?php echo WT_I18N::translate('Advanced search'); ?>
-		</td>
-	</tr>
 	<!-- // search terms -->
 	<?php
 	$fct = count($controller->fields);
@@ -205,7 +200,7 @@ echo WT_JS_END;
 				}
 			}
 			?>
-			<td rowspan="100" class="list_value">&nbsp;</td>
+
 			<td rowspan="100" class="list_value">
 				<table>
 					<!--  father -->
@@ -289,24 +284,14 @@ echo WT_JS_END;
 			</td>
 		<?php } ?>
 	</tr>
+
 	<?php } ?>
-	<tr>
-		<td class="list_value" style="vertical-align: middle; text-align: center; padding: 5px;"  colspan="10">
+	</table>
+		<div class="center" style="margin-top:10px;">
 			<a href="#" onclick="addFields();"><?php echo WT_I18N::translate('Add More Fields'); ?></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<input tabindex="<?php echo $i+1; ?>" type="submit" value="<?php echo WT_I18N::translate('Search'); ?>">
-		</td>
-	</tr>
-</table>
+		</div>
+		<div id="search_submit">
+		<input tabindex="<?php echo $i+1; ?>" type="submit" value="<?php echo WT_I18N::translate('Search'); ?>">
+		</div>
 </form>
-<br><br><br><br>
-<?php
-// set the focus on the first field unless multisite or some search results have been printed
-if (!$somethingPrinted ) {
-?>
-	<script type="text/javascript">
-	<!--
-		document.getElementById('value0').focus();
-	//-->
-	</script>
-<?php
-}
+</div> 

@@ -20,7 +20,7 @@
 // Other special characters are all listed at the bottom.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2007  PGV Development Team
@@ -39,7 +39,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: specialchars.php 12623 2011-11-08 15:23:42Z greg $
+// $Id: specialchars.php 13921 2012-05-06 08:03:39Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -1274,8 +1274,11 @@ default: // list all
 $otherspecialchars = array(
 	"&#161;" => "¡",
 	"&#191;" => "¿",
+	"&#x201E;" => "„",
 	"&#x201C;" => "“",
 	"&#x201D;" => "”",
+	"&#x201A;" => "‚",
+	"&#x201B;" => "‛",
 	"&#x2018;" => "‘",
 	"&#x2019;" => "’",
 	"&#x00AB;" => "«",

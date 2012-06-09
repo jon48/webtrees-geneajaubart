@@ -1,33 +1,30 @@
 <?php
-/**
- * Header for Rural theme
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
- *
- * Derived from PhpGedView
- * Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @package webtrees
- * @subpackage Themes
- * @author Jonathan Jaubart ($Author$)
- * @version p_$Revision$ $Date$
- * $HeadURL$
- */
+// Header for Rural theme
+//
+// webtrees: Web based Family History software
+// Copyright (C) 2012 webtrees development team.
+//
+// Derived from PhpGedView
+// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// @package webtrees
+// @subpackage Themes
+// @author Jonathan Jaubart ($Author$)
+// @version p_$Revision$ $Date$
+// $HeadURL$
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -82,11 +79,12 @@ else {
 	echo '<div id="main_content">';
 	echo '<div id="header">';
 	echo  '<div id="htopright">';
+	global $WT_IMAGES;
 	//echo '<div class="header_search">',
 	echo 	'<form action="search.php" method="post">',
 			'<input type="hidden" name="action" value="general">',
 			'<input type="hidden" name="topsearch" value="yes">',
-			'<input type="text" name="query" size="25" placeholder="', WT_I18N::translate('Search'), '">',
+			'<input type="search" name="query" size="25" placeholder="', WT_I18N::translate('Search'), '" dir="auto">',
 			'<input type="image" class="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '">',
 			'</form>';
 	echo '</div>';
@@ -99,7 +97,7 @@ else {
 	}
 	echo '</li>';
 	echo '</ul>';
-	echo '<div class="gedtitle">',htmlspecialchars($GEDCOM_TITLE),'</div>';
+	echo '<div class="gedtitle" dir="auto">',htmlspecialchars($GEDCOM_TITLE),'</div>';
 	echo '</div>';
 	echo  '<div id="hbottomright">';
 	//PERSO Extend header

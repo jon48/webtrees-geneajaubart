@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: GedcomRecord.php 13395 2012-02-06 08:19:20Z greg $
+// $Id: GedcomRecord.php 13950 2012-05-29 06:28:25Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -98,9 +98,15 @@ class WT_GedcomRecord {
 				$data=self::fetchGedcomRecord($pid, $ged_id);
 			}
 
-			// If we didn't find the record in the database, it may be new/pending
-			if (!$data && WT_USER_CAN_EDIT && ($data=find_updated_record($pid, $ged_id, true))!='') {
-				$is_pending=true;
+			// If we can edit, then we also need to be able to see pending records.
+			// Otherwise relationship privacy rules will not allow us to see
+			// newly added records.
+			if (WT_USER_CAN_EDIT) {
+				$tmp=find_updated_record($pid, $ged_id, true);
+				if ($tmp) {
+					$is_pending=true;
+					$data=$tmp;
+				}
 			}
 
 			// If we still didn't find it, it doesn't exist
@@ -447,21 +453,10 @@ class WT_GedcomRecord {
 	// Convert a name record into sortable and full/display versions.  This default
 	// should be OK for simple record types.  INDI/FAM records will need to redefine it.
 	protected function _addName($type, $value, $gedrec) {
-		global $TEXT_DIRECTION;
-		// RTL names on LTR pages (and vice-versa) cause problems when they contain
-		// weakly-directional characters such as punctuation.  Add markup to fix this.
-		$dir=utf8_direction($value);
-		if ($dir=='ltr' && $TEXT_DIRECTION=='rtl') {
-			$full='<span dir="ltr">'.htmlspecialchars($value).'</span>';
-		} elseif ($dir=='rtl' && $TEXT_DIRECTION=='ltr') {
-			$full='<span dir="rtl">'.htmlspecialchars($value).'</span>';
-		} else {
-			$full=htmlspecialchars($value);
-		}
 		$this->_getAllNames[]=array(
 			'type'=>$type,
 			'sort'=>preg_replace('/([0-9]+)/e', 'substr("000000000\\1", -10)', $value),
-			'full'=>$full,    // This is used for display
+			'full'=>'<span dir="auto">'.htmlspecialchars($value).'</span>',    // This is used for display
 			'fullNN'=>$value, // This goes into the database
 		);
 	}
@@ -661,43 +656,6 @@ class WT_GedcomRecord {
 			return null;
 		}
 	}
-	// create a short name for compact display on charts
-	public function getShortName() {
-		global $bwidth, $SHOW_HIGHLIGHT_IMAGES;
-		// Estimate number of characters that can fit in box. Calulates to 28 characters in webtrees theme, or 34 if no thumbnail used.
-		if ($SHOW_HIGHLIGHT_IMAGES) {
-			$char = intval(($bwidth-40)/6.5); 
-		} else {
-			$char = ($bwidth/6.5);
-		}
-		if ($this->canDisplayName()) {
-			$tmp=$this->getAllNames();
-			$givn = $tmp[$this->getPrimaryName()]['givn'];
-			$surn = $tmp[$this->getPrimaryName()]['surn'];
-			$new_givn = explode(' ', $givn);
-			$count_givn = count($new_givn);
-			$len_givn = utf8_strlen($givn);
-			$len_surn = utf8_strlen($surn);
-			$len = $len_givn + $len_surn;
-			$i = 1;
-			while ($len > $char && $i<=$count_givn) {
-				$new_givn[$count_givn-$i] = utf8_substr($new_givn[$count_givn-$i],0,1);
-				$givn = implode(' ', $new_givn);
-				$len_givn = utf8_strlen($givn);
-				$len = $len_givn + $len_surn;
-				$i++;
-			}
-			$max_surn = $char-$i*2;
-			if ($len_surn > $max_surn) {
-				$surn = substr($surn, 0, $max_surn).'...';
-				$len_surn = utf8_strlen($surn);
-			}			
-			$shortname =  check_NN($givn.' '.$surn);
-			return $shortname;
-		} else {
-			return WT_I18N::translate('Private');
-		}
-	}
 
 	//////////////////////////////////////////////////////////////////////////////
 	// Format this object for display in a list
@@ -851,8 +809,8 @@ class WT_GedcomRecord {
 	* returns an array of all of the facts
 	* @return Array
 	*/
-	public function getFacts($nfacts=NULL) {
-		$this->parseFacts($nfacts);
+	public function getFacts() {
+		$this->parseFacts();
 		return $this->facts;
 	}
 
@@ -871,7 +829,7 @@ class WT_GedcomRecord {
 	/**
 	* Parse the facts from the record
 	*/
-	public function parseFacts($nfacts=NULL) {
+	public function parseFacts() {
 		//-- only run this function once
 		if (!is_null($this->facts) && is_array($this->facts)) {
 			return;
@@ -898,11 +856,7 @@ class WT_GedcomRecord {
 			}
 			if ($i==$lct||$line{0}==1) {
 				if ($i>1) {
-					$event = new WT_Event($factrec, $this, $linenum);
-					$fact = $event->getTag();
-					if ($nfacts==NULL || !in_array($fact, $nfacts)) {
-						$this->facts[] = $event;
-					}
+					$this->facts[] = new WT_Event($factrec, $this, $linenum);
 				}
 				$factrec = $line;
 				$linenum = $i;
@@ -935,7 +889,7 @@ class WT_GedcomRecord {
 				}
 			}
 			if (!$found) {
-				$this->facts[$key]->gedcomRecord.="\nWT_OLD\n";
+				$this->facts[$key]->setIsOld();
 			}
 		}
 		//-- look for new facts
@@ -950,7 +904,7 @@ class WT_GedcomRecord {
 				}
 			}
 			if (!$found) {
-				$newevent->gedcomRecord.="\nWT_NEW\n";
+				$newevent->setIsNew();
 				$this->facts[]=$newevent;
 			}
 		}
@@ -986,7 +940,7 @@ class WT_GedcomRecord {
 			if (preg_match('/^(\d\d):(\d\d):(\d\d)/', get_gedcom_value('DATE:TIME', 2, $chan->getGedcomRecord(), '', false).':00', $match)) {
 				$t=mktime((int)$match[1], (int)$match[2], (int)$match[3], (int)$d->Format('%n'), (int)$d->Format('%j'), (int)$d->Format('%Y'));
 			} else {
-				$t=mktime(0, 0, 0, (int)$d->MinDate()->Format('%n'), (int)$d->MinDate()->Format('%j'), (int)$d->MinDate()->Format('%Y'));
+				$t=mktime(0, 0, 0, (int)$d->Format('%n'), (int)$d->Format('%j'), (int)$d->Format('%Y'));
 			}
 			if ($sorting) {
 				return $t;

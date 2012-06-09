@@ -18,10 +18,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: save.php 13415 2012-02-10 09:23:28Z greg $
+// $Id: save.php 13826 2012-04-17 20:33:11Z greg $
 
 define('WT_SCRIPT_NAME', 'save.php');
 require './includes/session.php';
+
+Zend_Session::writeClose();
 
 // The script must always end by calling one of these two functions.
 function ok() {
@@ -120,6 +122,34 @@ case 'site_setting':
 	set_site_setting($id1, $value);
 	ok();
 
+case 'site_access_rule':
+	//////////////////////////////////////////////////////////////////////////////
+	// Table name: WT_SITE_ACCESS_RULE
+	// ID format:  site_access_rule-{column_name}-{user_id}
+	//////////////////////////////////////////////////////////////////////////////
+
+	if (!WT_USER_IS_ADMIN) {
+		fail();
+	}
+	switch ($id1) {
+	case 'ip_address_start':
+	case 'ip_address_end':
+		WT_DB::prepare("UPDATE `##site_access_rule` SET {$id1}=INET_ATON(?) WHERE site_access_rule_id=?")
+			->execute(array($value, $id2));
+		$value=WT_DB::prepare(
+			"SELECT INET_NTOA({$id1}) FROM `##site_access_rule` WHERE site_access_rule_id=?"
+		)->execute(array($id2))->fetchOne();
+		ok();
+		break;
+	case 'user_agent_pattern':
+	case 'rule':
+	case 'comment':
+		WT_DB::prepare("UPDATE `##site_access_rule` SET {$id1}=? WHERE site_access_rule_id=?")
+			->execute(array($value, $id2));
+		ok();
+	}
+	fail();
+
 case 'user':
 	//////////////////////////////////////////////////////////////////////////////
 	// Table name: WT_USER
@@ -206,10 +236,22 @@ case 'user_setting':
 			fail();
 		}
 		break;
+	case 'verified_by_admin':
+		// Approving for the first time?  Send a confirmation email
+		if ($value && get_user_setting($id1, $id2)!=$value && get_user_setting($id1, 'sessiontime')==0) {
+			require_once WT_ROOT.'includes/functions/functions_mail.php';
+			WT_I18N::init(get_user_setting($id1, 'language'));
+			webtreesMail(
+				getUserEmail($id1),
+				$WEBTREES_EMAIL,
+				WT_I18N::translate('Approval of account at %s', WT_SERVER_NAME.WT_SCRIPT_PATH),
+				WT_I18N::translate('The administrator at the webtrees site %s has approved your application for an account.  You may now login by accessing the following link: %s', WT_SERVER_NAME.WT_SCRIPT_PATH, WT_SERVER_NAME.WT_SCRIPT_PATH)
+			);
+		}
+		break;
 	case 'auto_accept':
 	case 'editaccount':
 	case 'verified':
-	case 'verified_by_admin':
 	case 'visibleonline':
 	case 'max_relation_path':
 		$value=(int)$value;

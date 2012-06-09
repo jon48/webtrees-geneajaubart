@@ -2,7 +2,7 @@
 // User Account Edit Interface.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edituser.php 13248 2012-01-16 12:21:42Z greg $
+// $Id: edituser.php 13729 2012-03-31 21:49:39Z greg $
 
 define('WT_SCRIPT_NAME', 'edituser.php');
 require './includes/session.php';
@@ -93,9 +93,9 @@ if ($form_action=='update') {
 		exit;
 	}
 } else {
-	$controller->pageHeader();
-
-	if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
+	$controller
+		->pageHeader()
+		->addExternalJavaScript('js/autocomplete.js');
 }
 
 // Form validation
@@ -111,11 +111,6 @@ function checkform(frm) {
 	if (frm.form_realname.value=="") {
 		alert("<?php echo WT_I18N::translate('You must enter a real name.'); ?>");
 		frm.form_realname.focus();
-		return false;
-	}
-	if (frm.form_email.value.indexOf("@")==-1) {
-		alert("<?php echo WT_I18N::translate('You must enter an email address.'); ?>");
-		frm.user_email.focus();
 		return false;
 	}
 	if (frm.form_pass1.value!=frm.form_pass2.value) {
@@ -166,9 +161,9 @@ if ($person) {
 
 $person=WT_Person::getInstance(WT_USER_ROOT_ID);
 echo '<tr><td class="descriptionbox wrap">';
-echo WT_I18N::translate('Pedigree chart root person'), help_link('edituser_rootid'), '</td><td class="optionbox">';
+echo WT_I18N::translate('Default individual'), help_link('default_individual'), '</td><td class="optionbox">';
 echo '<input type="text" name="form_rootid" id="rootid" value="', WT_USER_ROOT_ID, '">';
-echo print_findindi_link('rootid', '', true), '<br>';
+echo print_findindi_link('rootid'), '<br>';
 if ($person) {
 	echo $person->format_list('span');
 }
@@ -190,7 +185,7 @@ echo '</td></tr>';
 
 echo '<tr><td class="descriptionbox wrap">';
 echo WT_I18N::translate('Email address'), help_link('email'), '</td><td class="optionbox" valign="top">';
-echo '<input type="text" name="form_email" value="', getUserEmail(WT_USER_ID), '" size="50"></td></tr>';
+echo '<input type="email" name="form_email" value="', getUserEmail(WT_USER_ID), '" size="50"></td></tr>';
 
 echo '<tr><td class="descriptionbox wrap">';
 echo WT_I18N::translate('Theme'), help_link('THEME'), '</td><td class="optionbox" valign="top">';

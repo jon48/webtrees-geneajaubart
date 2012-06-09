@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13147 2011-12-28 15:59:40Z greg $
+// $Id: module.php 13838 2012-04-19 07:41:26Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -49,6 +49,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 			$this->admin();
 			break;
 		case 'generate':
+			Zend_Session::writeClose();
 			$this->generate(safe_GET('file'));
 			break;
 		default:
@@ -169,7 +170,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 				break;
 			case 'r':
 				$rows=WT_DB::prepare(
-					"SELECT 'SOUR' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec".
+					"SELECT 'REPO' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec".
 					" FROM `##other`".
 					" WHERE o_file=? AND o_type='REPO'".
 					" ORDER BY o_id".
@@ -181,7 +182,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 				break;
 			case 'n':
 				$rows=WT_DB::prepare(
-					"SELECT 'SOUR' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec".
+					"SELECT 'NOTE' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec".
 					" FROM `##other`".
 					" WHERE o_file=? AND o_type='NOTE'".
 					" ORDER BY o_id".

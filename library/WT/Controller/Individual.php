@@ -2,7 +2,7 @@
 // Controller for the individual page
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team. All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: Individual.php 13110 2011-12-21 20:55:28Z greg $
+// $Id: Individual.php 13951 2012-05-29 19:55:39Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -130,6 +130,8 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		header("Content-Type: text/html; charset=UTF-8"); // AJAX calls do not have the meta tag headers and need this set
 		header("X-Robots-Tag: noindex,follow"); // AJAX pages should not show up in search results, any links can be followed though
 
+		Zend_Session::writeClose();
+
 		echo $mod->getTabContent();
 		
 		// Allow the other tabs to modify this one - e.g. lightbox does this.
@@ -187,8 +189,7 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 	* @see individual.php
 	* @param Event $event the event object
 	*/
-	function print_name_record($event) {
-		global $UNDERLINE_NAME_QUOTES;
+	function print_name_record(WT_Event $event) {
 
 		if (!$event->canShow()) {
 			return false;
@@ -202,10 +203,10 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		$this->name_count++;
 		if ($this->name_count >1) { echo '<h3 class="name_two">',$dummy->getFullName(), '</h3>'; } //Other names accordion element
 		echo '<div id="indi_name_details"';
-		if (strpos($factrec, "\nWT_OLD")!==false) {
+		if ($event->getIsOld()) {
 			echo " class=\"namered\"";
 		}
-		if (strpos($factrec, "\nWT_NEW")!==false) {
+		if ($event->getIsNew()) {
 			echo " class=\"nameblue\"";
 		}
 		echo ">";
@@ -219,11 +220,11 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 				$user_id=get_user_from_gedcom_xref(WT_GED_ID, $this->record->getXref());
 				if ($user_id) {
 					$user_name=get_user_name($user_id);
-					echo '<span> - <a class="warning" href="admin_users.php?action=edituser&amp;username='.$user_name.'">'.$user_name.'</a></span>';
+					echo '<span> - <a class="warning" href="admin_users.php?filter='.$user_name.'">'.$user_name.'</a></span>';
 				}
 			}
 		}
-		if ($this->record->canEdit() && !strpos($factrec, "\nWT_OLD")) {
+		if ($this->record->canEdit() && !$event->getIsOld()) {
 			echo "<div class=\"deletelink\"><a class=\"font9 deleteicon\" href=\"#\" onclick=\"delete_record('".$this->record->getXref()."', ".$linenum."); return false;\" title=\"".WT_I18N::translate('Delete name')."\"><span class=\"link_text\">".WT_I18N::translate('Delete name')."</span></a></div>";
 			echo "<div class=\"editlink\"><a href=\"#\" class=\"font9 editicon\" onclick=\"edit_name('".$this->record->getXref()."', ".$linenum."); return false;\" title=\"".WT_I18N::translate('Edit name')."\"><span class=\"link_text\">".WT_I18N::translate('Edit name')."</span></a></div>";
 		}
@@ -233,22 +234,18 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		$ct = preg_match_all('/\n2 (\w+) (.*)/', $factrec, $nmatch, PREG_SET_ORDER);
 		for ($i=0; $i<$ct; $i++) {
 			echo '<div>';
-				$fact = trim($nmatch[$i][1]);
+				$fact = $nmatch[$i][1];
 				if (($fact!="SOUR") && ($fact!="NOTE") && ($fact!="SPFX")) {
 					echo '<dl><dt class="label">', WT_Gedcom_Tag::getLabel($fact, $this->record), '</dt>';
-					echo '<dd class="field">';
-						if (isset($nmatch[$i][2])) {
-							$name = trim($nmatch[$i][2]);
-							$name = preg_replace("'/,'", ",", $name);
-							$name = preg_replace("'/'", " ", $name);
-							if ($UNDERLINE_NAME_QUOTES) {
-								$name=preg_replace('/"([^"]*)"/', '<span class="starredname">\\1</span>', $name);
-							}
+					echo '<dd class="field">'; // Before using dir="auto" on this field, note that Gecko treats this as an inline element but WebKit treats it as a block element
+					if (isset($nmatch[$i][2])) {
+							$name = htmlspecialchars($nmatch[$i][2]);
+							$name = str_replace('/', '', $name);
 							$name=preg_replace('/(\S*)\*/', '<span class="starredname">\\1</span>', $name);
 							if ($fact=='TYPE') {
 								echo WT_Gedcom_Code_Name::getValue($name, $this->record);
 							} else {
-								echo PrintReady($name);
+								echo $name;
 							}
 						}
 					echo '</dd>';
@@ -274,7 +271,7 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 	* @see individual.php
 	* @param Event $event the Event object
 	*/
-	function print_sex_record($event) {
+	function print_sex_record(WT_Event $event) {
 		global $sex;
 
 		if (!$event->canShow()) return false;
@@ -282,10 +279,10 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		$sex = $event->getDetail();
 		if (empty($sex)) $sex = 'U';
 		echo '<span id="sex"';
-			if (strpos($factrec, "\nWT_OLD")!==false) {
+			if ($event->getIsOld()) {
 				echo ' class="namered"';
 			}
-			if (strpos($factrec, "\nWT_NEW")!==false) {
+			if ($event->getIsNew()) {
 				echo ' class="nameblue"';
 			}
 			switch ($sex) {
@@ -301,7 +298,7 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 			}
 			echo '>&nbsp;';
 			if ($this->SEX_COUNT>1) {
-				if ($this->record->canEdit() && strpos($factrec, "\nWT_OLD")===false) {
+				if ($this->record->canEdit() && !$event->getIsOld()) {
 					if ($event->getLineNumber()=="new") {
 						echo "<a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$this->record->getXref()."', 'SEX'); return false;\">".WT_I18N::translate('Edit')."</a>";
 					} else {
@@ -327,8 +324,6 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		}
 		// edit menu
 		$menu = new WT_Menu(WT_I18N::translate('Edit'), '#', 'menu-indi');
-		$menu->addIcon('edit_indi');
-		$menu->addClass('menuitem', 'menuitem_hover', 'submenu', 'icon_large_edit_indi');
 		$menu->addLabel($menu->label, 'down');
 
 		$this->getGlobalFacts(); // sets NAME_LINENUM and SEX_LINENUM.  individual.php doesn't do it early enough for us....
@@ -346,8 +341,6 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 			//--make sure the totals are correct
 			$submenu = new WT_Menu(WT_I18N::translate('Add new Name'), '#', 'menu-indi-addname');
 			$submenu->addOnclick("return add_name('".$this->record->getXref()."');");
-			$submenu->addIcon('edit_indi');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_add_indi');
 			$menu->addSubmenu($submenu);
 
 			if ($this->SEX_COUNT<2) {
@@ -357,16 +350,12 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 				} else {
 					$submenu->addOnclick("return edit_record('".$this->record->getXref()."', ".$this->SEX_LINENUM.");");
 				}
-				$submenu->addIcon('edit_indi');
-				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_sex');
 				$menu->addSubmenu($submenu);
 			}
 
 			if (count($this->record->getSpouseFamilies())>1) {
 				$submenu = new WT_Menu(WT_I18N::translate('Reorder families'), '#', 'menu-indi-orderfam');
 				$submenu->addOnclick("return reorder_families('".$this->record->getXref()."');");
-				$submenu->addIcon('edit_fam');
-				$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_fam');
 				$menu->addSubmenu($submenu);
 			}
 		}
@@ -375,18 +364,14 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		if (WT_USER_IS_ADMIN || $SHOW_GEDCOM_RECORD) {
 			$submenu = new WT_Menu(WT_I18N::translate('Edit raw GEDCOM record'), '#', 'menu-indi-editraw');
 			$submenu->addOnclick("return edit_raw('".$this->record->getXref()."');");
-			$submenu->addIcon('gedcom');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_raw');
 			$menu->addSubmenu($submenu);
 		} elseif ($SHOW_GEDCOM_RECORD) {
 			$submenu = new WT_Menu(WT_I18N::translate('View GEDCOM Record'), '#', 'menu-indi-viewraw');
-			$submenu->addIcon('gedcom');
 			if (WT_USER_CAN_EDIT) {
 				$submenu->addOnclick("return show_gedcom_record('new');");
 			} else {
 				$submenu->addOnclick("return show_gedcom_record();");
 			}
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_edit_raw');
 			$menu->addSubmenu($submenu);
 		}
 
@@ -394,8 +379,6 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		if (WT_USER_CAN_EDIT) {
 			$submenu = new WT_Menu(WT_I18N::translate('Delete'), '#', 'menu-indi-del');
 			$submenu->addOnclick("if (confirm('".addslashes(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($this->record->getFullName())))."')) jQuery.post('action.php',{action:'delete-individual',xref:'".$this->record->getXref()."'},function(){location.reload();})");
-			$submenu->addIcon('remove');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_delete');
 			$menu->addSubmenu($submenu);
 		}
 
@@ -407,8 +390,6 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 				'menu-indi-addfav'
 			);
 			$submenu->addOnclick("jQuery.post('module.php?mod=user_favorites&amp;mod_action=menu-add-favorite',{xref:'".$this->record->getXref()."'},function(){location.reload();})");
-			$submenu->addIcon('favorites');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', 'submenu', 'icon_small_fav');
 			$menu->addSubmenu($submenu);
 		}
 
@@ -431,7 +412,7 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 				}
 				if ($fact=="NAME") {
 					$this->total_names++;
-					if ($this->NAME_LINENUM==null && strpos($value->getGedcomRecord(), "\nWT_OLD")===false) {
+					if ($this->NAME_LINENUM==null && !$value->getIsOld()) {
 						// This is the "primary" name and is edited from the menu
 						// Subsequent names get their own edit links
 						$this->NAME_LINENUM = $value->getLineNumber();
@@ -488,8 +469,6 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 	* @return array an array of Person that will be used to iterate through on the indivudal.php page
 	*/
 	function buildFamilyList($family, $type, $include_pedi=true) {
-		global $WT_IMAGES;
-
 		$labels = array();
 		switch ($type) {
 		case 'parents':
@@ -585,7 +564,9 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 			if ($sex=="M") {
 				$label = $labels["father"];
 			}
-			if ($husb->getXref()==$this->record->getXref()) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\">";
+			if ($husb->getXref()==$this->record->getXref()) {
+				$label = '<i class="icon-selected"></i>';
+			}
 			$husb->setLabel($label);
 		}
 		//-- set the label for the wife
@@ -598,7 +579,9 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 			if ($sex=="M") {
 				$label = $labels["father"];
 			}
-			if ($wife->getXref()==$this->record->getXref()) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\">";
+			if ($wife->getXref()==$this->record->getXref()) {
+				$label = '<i class="icon-selected"></i>';
+			}
 			$wife->setLabel($label);
 		}
 		if (WT_USER_CAN_EDIT || WT_USER_CAN_ACCEPT) {
@@ -615,7 +598,9 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 					if ($sex=="M") {
 						$label = $labels["father"];
 					}
-					if ($newhusb->getXref()==$this->record->getXref()) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\">";
+					if ($newhusb->getXref()==$this->record->getXref()) {
+						$label = '<i class="icon-selected"></i>';
+					}
 					$newhusb->setLabel($label);
 				}
 				else $newhusb = null;
@@ -630,7 +615,9 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 					if ($sex=="M") {
 						$label = $labels["father"];
 					}
-					if ($newwife->getXref()==$this->record->getXref()) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\">";
+					if ($newwife->getXref()==$this->record->getXref()) {
+						$label = '<i class="icon-selected"></i>';
+					}
 					$newwife->setLabel($label);
 				}
 				else $newwife = null;
@@ -684,7 +671,7 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 					$label = $labels["brother"];
 				}
 				if ($children[$i]->getXref()==$this->record->getXref()) {
-					$label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\">";
+					$label = '<i class="icon-selected"></i>';
 				}
 				if ($include_pedi==true) {
 					$famcrec = get_sub_record(1, "1 FAMC @".$family->getXref()."@", $children[$i]->getGedcomRecord());
@@ -706,7 +693,9 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 			if ($sex=="M") {
 				$label = $labels["brother"];
 			}
-			if ($newchildren[$i]->getXref()==$this->record->getXref()) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\">";
+			if ($newchildren[$i]->getXref()==$this->record->getXref()) {
+				$label = '<i class="icon-selected"></i>';
+			}
 			if ($include_pedi==true) {
 				$pedi = $newchildren[$i]->getChildFamilyPedigree($family->getXref());
 				if ($pedi) {
@@ -725,7 +714,9 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 			if ($sex=="M") {
 				$label = $labels["brother"];
 			}
-			if ($delchildren[$i]->getXref()==$this->record->getXref()) $label = "<img src=\"". $WT_IMAGES["selected"]. "\" alt=\"\">";
+			if ($delchildren[$i]->getXref()==$this->record->getXref()) {
+				$label = '<i class="icon-selected"></i>';
+			}
 			if ($include_pedi==true) {
 				$pedi = $delchildren[$i]->getChildFamilyPedigree($family->getXref());
 				if ($pedi) {

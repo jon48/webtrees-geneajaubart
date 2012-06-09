@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: module.php 13945 2012-05-26 17:22:40Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -43,6 +43,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	public function modAction($modAction) {
 		switch ($modAction) {
 		case 'ajax':
+			Zend_Session::writeClose();
 			header('Content-Type: text/html; charset=UTF-8');
 			echo $this->getSidebarAjaxContent();
 			break;
@@ -119,7 +120,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 					  cache: false,
 					  success: function(html) {
 					    jQuery("#sb_indi_"+surname+" div").html(html);
-					    jQuery("#sb_indi_"+surname+" div").show();
+					    jQuery("#sb_indi_"+surname+" div").show("fast");
 					    jQuery("#sb_indi_"+surname).css("list-style-image", "url('.$WT_IMAGES['minus'].')");
 					    loadedNames[surname]=2;
 					  }
@@ -127,12 +128,12 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				}
 				else if (loadedNames[surname]==1) {
 					loadedNames[surname]=2;
-					jQuery("#sb_indi_"+surname+" div").show();
+					jQuery("#sb_indi_"+surname+" div").show("fast");
 					jQuery("#sb_indi_"+surname).css("list-style-image", "url('.$WT_IMAGES['minus'].')");
 				}
 				else {
 					loadedNames[surname]=1;
-					jQuery("#sb_indi_"+surname+" div").hide();
+					jQuery("#sb_indi_"+surname+" div").hide("fast");
 					jQuery("#sb_indi_"+surname).css("list-style-image", "url('.$WT_IMAGES['plus'].')");
 				}
 				return false;
@@ -142,7 +143,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		
 		$out='
 		<form method="post" action="module.php?mod='.$this->getName().'&amp;mod_action=ajax" onsubmit="return false;">
-		<input type="text" name="sb_indi_name" id="sb_indi_name" placeholder="'.WT_I18N::translate('Search').'">
+		<input type="search" name="sb_indi_name" id="sb_indi_name" placeholder="'.WT_I18N::translate('Search').'">
 		<p>';
 		foreach ($initials as $letter=>$count) {
 			switch ($letter) {
@@ -159,7 +160,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 					$html=$letter;
 					break;
 			}
-			$html='<a href="module.php?mod='.$this->getName().'&amp;mod_action=ajax&amp;sb_action=individuals&amp;alpha='.urlencode($letter).'" class="sb_indi_letter">'.PrintReady($html).'</a>';
+			$html='<a href="module.php?mod='.$this->getName().'&amp;mod_action=ajax&amp;sb_action=individuals&amp;alpha='.urlencode($letter).'" class="sb_indi_letter">'.$html.'</a>';
 			$out .= $html." ";
 		}
 
@@ -211,7 +212,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				if ($person->canDisplayDetails()) {
 					$bd = $person->getLifeSpan();
 					if (!empty($bd)) {
-						$out .= PrintReady(' ('.$bd.')');
+						$out .= ' ('.$bd.')';
 					}
 				}
 				$out .= '</a></li>';
@@ -244,7 +245,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				$out .= '<li><a href="'.$person->getHtmlUrl().'">'.$person->getSexImage().' '.$person->getFullName().' ';
 				if ($person->canDisplayDetails()) {
 					$bd = $person->getLifeSpan();
-					if (!empty($bd)) $out .= PrintReady(' ('.$bd.')');
+					if (!empty($bd)) $out .= ' ('.$bd.')';
 				}
 				$out .= '</a></li>';
 			}

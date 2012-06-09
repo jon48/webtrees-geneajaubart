@@ -4,7 +4,7 @@
 // Set the root person using the $pid variable
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,24 +23,25 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: hourglass.php 13277 2012-01-18 08:14:39Z greg $
+// $Id: hourglass.php 13867 2012-04-26 16:30:59Z lukasz $
 
 define('WT_SCRIPT_NAME', 'hourglass.php');
 require './includes/session.php';
 
 $controller=new WT_Controller_Hourglass();
-$controller->pageHeader();
-
-if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
+$controller
+	->pageHeader()
+	->addExternalJavaScript('js/autocomplete.js')
+	->setupJavascript()
+	->addInlineJavaScript('sizeLines();');
 
 echo '<table><tr><td valign="top">';
 echo '<h2>', WT_I18N::translate('Hourglass chart of %s', $controller->name), '</h2>';
 
-$controller->setupJavascript();
-
 // LBox =====================================================================================
 if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
+	$album = new lightbox_WT_Module();
+	$album->getPreLoadContent();
 }
 // ==========================================================================================
 
@@ -57,7 +58,7 @@ $gencount=0;
 	</td>
 	<td class="optionbox">
 	<input class="pedigree_form" type="text" name="rootid" id="rootid" size="3" value="<?php echo $controller->pid; ?>">
-	<?php print_findindi_link("pid",""); ?>
+	<?php echo print_findindi_link('pid'); ?>
 	</td>
 
 	<!-- // NOTE: Show Details -->
@@ -132,9 +133,3 @@ $controller->print_person_pedigree(WT_Person::getInstance($controller->pid), 1);
 </td>
 </tr></table>
 </div>
-<br><br>
-<script type="text/javascript">
-<!--
-sizeLines();
-//-->
-</script>

@@ -23,27 +23,19 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: timeline.php 13118 2011-12-21 22:07:33Z greg $
+// $Id: timeline.php 13851 2012-04-21 06:47:46Z greg $
 
 define('WT_SCRIPT_NAME', 'timeline.php');
 require './includes/session.php';
 
 $controller=new WT_Controller_Timeline();
-$controller->pageHeader();
+$controller
+	->pageHeader()
+	->addExternalJavaScript('js/autocomplete.js');
 
-if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
 ?>
 <script type="text/javascript">
 <!--
-function showhide(divbox, checkbox) {
-	if (checkbox.checked) {
-		MM_showHideLayers(divbox, ' ', 'show', ' ');
-	}
-	else {
-		MM_showHideLayers(divbox, ' ', 'hide', ' ');
-	}
-}
-
 var pastefield = null;
 function paste_id(value) {
 	pastefield.value=value;
@@ -282,7 +274,7 @@ $controller->checkPrivacy();
 			<?php if (!empty($controller->birthyears[$pid])) { ?>
 				<span class="details1"><br>
 				<?php echo /* I18N: an age indicator, which can be dragged around the screen */ WT_I18N::translate('Show an age cursor?'); ?>
-				<input type="checkbox" name="agebar<?php echo $p; ?>" value="ON" onclick="showhide('agebox<?php echo $p; ?>', this);">
+				<input type="checkbox" name="agebar<?php echo $p; ?>" value="ON" onclick="jQuery('#agebox<?php echo $p; ?>').toggle();">
 				</span>
 			<?php }
 			?>
@@ -304,7 +296,7 @@ $controller->checkPrivacy();
 		<td class="person<?php echo $col; ?>" style="padding: 5px" valign="top">
 			<?php echo WT_I18N::translate('Add another person to the chart'), '<br>'; ?>
 			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid">
-			<?php print_findindi_link("newpid",""); ?>
+			<?php echo print_findindi_link('newpid'); ?>
 			<br>
 			<br>
 			<div style="text-align: center"><input type="submit" value="<?php echo WT_I18N::translate('Add'); ?>"></div>
@@ -314,8 +306,8 @@ $controller->checkPrivacy();
 		$scalemod = round($controller->scale*.2) + 1;
 		?>
 		<td class="list_value" style="padding: 5px">
-			<a href="<?php echo WT_SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale+$scalemod); ?>&amp;ged=<?php echo WT_GEDURL; ?>"><img src="<?php echo $WT_IMAGES['zoomin']; ?>" title="<?php echo WT_I18N::translate('Zoom in'); ?>" alt="<?php echo WT_I18N::translate('Zoom in'); ?>"></a><br>
-			<a href="<?php echo WT_SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale-$scalemod); ?>&amp;ged=<?php echo WT_GEDURL; ?>"><img src="<?php echo $WT_IMAGES['zoomout']; ?>" title="<?php echo WT_I18N::translate('Zoom out'); ?>" alt="<?php echo WT_I18N::translate('Zoom out'); ?>"></a><br>
+			<a href="<?php echo WT_SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale+$scalemod); ?>&amp;ged=<?php echo WT_GEDURL; ?>" class="icon-zoomin" title="<?php echo WT_I18N::translate('Zoom in'); ?>"></a><br>
+			<a href="<?php echo WT_SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale-$scalemod); ?>&amp;ged=<?php echo WT_GEDURL; ?>" class="icon-zoomout" title="<?php echo WT_I18N::translate('Zoom out'); ?>"></a><br>
 			<input type="button" value="<?php echo WT_I18N::translate('Clear Chart'); ?>" onclick="window.location = 'timeline.php?ged=<?php echo WT_GEDURL; ?>&amp;clear=1';">
 		</td>
 	<?php } ?>
@@ -362,7 +354,7 @@ if (count($controller->people)>0) {
 		$ageyoffset = $baseyoffset + ($controller->bheight*$p);
 		$col = $p % 6;
 		?>
-		<div id="agebox<?php echo $p; ?>" style="cursor:move; position:absolute; <?php echo ($TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20)); ?>px; top:<?php echo $ageyoffset; ?>px; height:<?php echo $controller->bheight; ?>px; visibility: hidden;" onmousedown="ageMD(this, <?php echo $p; ?>);">
+		<div id="agebox<?php echo $p; ?>" style="cursor:move; position:absolute; <?php echo ($TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20)); ?>px; top:<?php echo $ageyoffset; ?>px; height:<?php echo $controller->bheight; ?>px; display:none;" onmousedown="ageMD(this, <?php echo $p; ?>);">
 			<table cellspacing="0" cellpadding="0">
 				<tr>
 					<td>

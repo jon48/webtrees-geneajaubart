@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13109 2011-12-21 20:52:29Z greg $
+// $Id: module.php 13642 2012-03-24 13:06:08Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,27 +41,19 @@ class user_welcome_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $WT_IMAGES, $hitCount, $SHOW_COUNTER;
-
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
-		$title='';
-		$title .=/* I18N: A greeting; %s is the user's name */ WT_I18N::translate('Welcome %s', getUserFullName(WT_USER_ID));
-		$content = "<table style=\"margin:auto;\"><tr>";
-		$content .= "<td class=\"tab_active_bottom\" colspan=\"3\" ></td></tr><tr>";
+		$title = '<span dir="auto">'./* I18N: A greeting; %s is the user's name */ WT_I18N::translate('Welcome %s', getUserFullName(WT_USER_ID)).'</span>';
+		$content = '<table><tr>';
 		if (get_user_setting(WT_USER_ID, 'editaccount')) {
-			$content .= "<td class=\"center details2\" style=\"width:33%; clear:none; vertical-align:top; margin-top:2px;\"><a href=\"edituser.php\"><img class=\"block\" src=\"".$WT_IMAGES["mypage"]."\" alt=\"".WT_I18N::translate('My account')."\"><br>".WT_I18N::translate('My account')."</a></td>";
+			$content .= '<td><a href="edituser.php"><i class="icon-mypage"></i><br>'.WT_I18N::translate('My account').'</a></td>';
 		}
 		if (WT_USER_GEDCOM_ID) {
-			$content .= "<td class=\"center details2\" style=\"width:33%; clear:none; vertical-align:top; margin-top:2px;\"><a href=\"pedigree.php?rootid=".WT_USER_GEDCOM_ID."&amp;ged=".WT_GEDURL."\"><img class=\"block\" src=\"".$WT_IMAGES["pedigree"]."\" alt=\"".WT_I18N::translate('My pedigree')."\" title=\"".WT_I18N::translate('My pedigree')."\"><br>".WT_I18N::translate('My pedigree')."</a></td>";
-			$content .= "<td class=\"center details2\" style=\"width:33%; clear:none; vertical-align:top; margin-top:2px;\"><a href=\"individual.php?pid=".WT_USER_GEDCOM_ID."&amp;ged=".WT_GEDURL."\"><img class=\"block\" src=\"".$WT_IMAGES["indis"]."\" alt=\"".WT_I18N::translate('My individual record')."\"><br>".WT_I18N::translate('My individual record')."</a></td>";
+			$content .= '<td><a href="pedigree.php?rootid='.WT_USER_GEDCOM_ID.'&amp;ged='.WT_GEDURL.'"><i class="icon-pedigree"></i><br>'.WT_I18N::translate('My pedigree').'</a></td>';
+			$content .= '<td><a href="individual.php?pid='.WT_USER_GEDCOM_ID.'&amp;ged='.WT_GEDURL.'"><i class="icon-indis"></i><br>'.WT_I18N::translate('My individual record').'</a></td>';
 		}
-		$content .= "</tr><tr><td class=\"center\" colspan=\"3\">";
-		$content .= "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".WT_USER_NAME."&amp;ctype=user"."', '_blank', 'top=50,left=10,width=705,height=355,scrollbars=1,resizable=1');\">".WT_I18N::translate('Change the blocks on this page')."</a>";
-		$content .= "<br>".format_timestamp(client_time())."<br>";
-		if ($SHOW_COUNTER)
-			$content .=  WT_I18N::translate('Hit Count:')." ".$hitCount."<br>";
-		$content .= "</td></tr></table>";
+		$content .= '</tr>';
+		$content .= '</table>';
 
 		if ($template) {
 			require WT_THEME_DIR.'templates/block_main_temp.php';

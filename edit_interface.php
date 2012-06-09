@@ -21,16 +21,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_interface.php 13418 2012-02-10 10:17:15Z greg $
+// $Id: edit_interface.php 13789 2012-04-06 17:54:17Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_interface.php');
 require './includes/session.php';
 
 $controller=new WT_Controller_Simple();
 $controller
+	->requireMemberLogin()
 	->setPageTitle(WT_I18N::translate('Edit'))
 	->pageHeader()
-	->requireMemberLogin();
+	->addExternalJavaScript('js/autocomplete.js');
 
 require WT_ROOT.'includes/functions/functions_edit.php';
 
@@ -61,55 +62,52 @@ $update_CHAN=!safe_POST_bool('preserve_last_changed');
 
 $uploaded_files = array();
 
-if ($ENABLE_AUTOCOMPLETE) {
-	require WT_ROOT.'js/autocomplete.js.htm';
-}
 echo WT_JS_START;
 ?>
 	var locale_date_format='<?php echo preg_replace('/[^DMY]/', '', str_replace(array('J', 'F'), array('D', 'M'), strtoupper($DATE_FORMAT))); ?>';
 
 	function findIndi(field, indiname) {
 		pastefield = field;
-		findwin = window.open('find.php?type=indi', '_blank', 'left=50, top=50, width=600, height=500, resizable=1, scrollbars=1');
+		findwin = window.open('find.php?type=indi', '_blank', find_window_specs);
 		return false;
 	}
 	function findPlace(field) {
 		pastefield = field;
-		findwin = window.open('find.php?type=place', '_blank', 'left=50, top=50, width=600, height=500, resizable=1, scrollbars=1');
+		findwin = window.open('find.php?type=place', '_blank', find_window_specs);
 		return false;
 	}
 	function findMedia(field, choose, ged) {
 		pastefield = field;
 		if (!choose) choose="0all";
-		findwin = window.open('find.php?type=media&choose='+choose+'&ged='+ged, '_blank', 'left=50, top=50, width=600, height=500, resizable=1, scrollbars=1');
+		findwin = window.open('find.php?type=media&choose='+choose+'&ged='+ged, '_blank', find_window_specs);
 		return false;
 	}
 	function findSource(field) {
 		pastefield = field;
-		findwin = window.open('find.php?type=source', '_blank', 'left=50, top=50, width=600, height=500, resizable=1, scrollbars=1');
+		findwin = window.open('find.php?type=source', '_blank', find_window_specs);
 		return false;
 	}
 	// Shared Notes =========================
 	function findnote(field) {
 		pastefield = field;
-		findwin = window.open('find.php?type=note', '_blank', 'left=50, top=50, width=600, height=520, resizable=1, scrollbars=1');
+		findwin = window.open('find.php?type=note', '_blank', find_window_specs);
 		return false;
 	}
 	// =====================================
 	function findRepository(field) {
 		pastefield = field;
-		findwin = window.open('find.php?type=repo', '_blank', 'left=50, top=50, width=600, height=500, resizable=1, scrollbars=1');
+		findwin = window.open('find.php?type=repo', '_blank', find_window_specs);
 		return false;
 	}
 	function findFamily(field) {
 		pastefield = field;
-		findwin = window.open('find.php?type=fam', '_blank', 'left=50, top=50, width=600, height=500, resizable=1, scrollbars=1');
+		findwin = window.open('find.php?type=fam', '_blank', find_window_specs);
 		return false;
 	}
 
 	function addnewrepository(field) {
 		pastefield = field;
-		window.open('edit_interface.php?action=addnewrepository&pid=newrepo', '_blank', 'top=70, left=70, width=600, height=500, resizable=1, scrollbars=1');
+		window.open('edit_interface.php?action=addnewrepository&pid=newrepo', '_blank', find_window_specs);
 		return false;
 	}
 
@@ -241,14 +239,10 @@ case 'delete':
 			$tmp=new WT_GedcomRecord($gedrec);
 			list($gedcom, $private_gedrec)=$tmp->privatizeGedcom(WT_USER_ACCESS_LEVEL);
 			
-			$mediaid='';
-			if (isset($_REQUEST['mediaid'])) {
-				$mediaid = $_REQUEST['mediaid'];
-			}
 			//-- when deleting a media link
 			//-- $linenum comes is an OBJE and the $mediaid to delete should be set
-			if (!is_numeric($linenum)) {
-				$newged = remove_subrecord($gedrec, $linenum, $mediaid);
+			if ($linenum=='OBJE') {
+				$newged = remove_subrecord($gedrec, $linenum, $_REQUEST['mediaid']);
 			} else {
 				$newged = remove_subline($gedrec, $linenum);
 			}
@@ -276,7 +270,7 @@ case 'editraw':
 	$gedrec=preg_replace('/^(0 @'.WT_REGEX_XREF.'@ NOTE) (.+)/', "$1\n1 CONC $2", $gedrec);
 	list($gedrec1, $gedrec2)=explode("\n", $gedrec, 2);
 	echo '<textarea name="newgedrec1" rows="1"  cols="80" dir="ltr" readonly="readonly">', $gedrec1, '</textarea><br>';
-	echo '<textarea name="newgedrec2" rows="20" cols="80" dir="ltr">', $gedrec2, "</textarea><br>";
+	echo '<textarea name="newgedrec2" id="newgedrec2" rows="20" cols="80" dir="ltr">', htmlspecialchars($gedrec2), "</textarea><br>";
 	if (WT_USER_IS_ADMIN) {
 		echo '<table class="facts_table">';
 		echo '<tr><td class="descriptionbox  wrap width25">';
@@ -292,7 +286,7 @@ case 'editraw':
 		echo '</td></tr>';
 		echo '</table>';
 	}
-	print_specialchar_link("newgedrec", true);
+	echo print_specialchar_link('newgedrec2');
 	echo '<br>';
 	echo '<input id="savebutton" type="submit" value="', WT_I18N::translate('Save'), '"><br>';
 	echo '</form>';
@@ -459,15 +453,15 @@ case 'addfamlink':
 	echo '<input type="hidden" name="famtag" value="', $famtag, '">';
 	echo '<table class="facts_table">';
 	echo '<tr><td class="facts_label">', WT_I18N::translate('Family'), '</td>';
-	echo '<td class="facts_value"><input type="text" id="famid" name="famid" size="8">';
-	print_findfamily_link('famid');
+	echo '<td class="facts_value"><input type="text" id="famid" name="famid" size="8"> ';
+	echo print_findfamily_link('famid');
 	echo '</td></tr>';
 	if ($famtag=='CHIL') {
 		echo '<tr><td class="facts_label">', WT_Gedcom_Tag::getLabel('PEDI'), '</td><td class="facts_value">';
 		switch (WT_Person::getInstance($pid)->getSex()) {
-		case 'M': echo edit_field_pedi_m('pedigree'); break;
-		case 'F': echo edit_field_pedi_f('pedigree'); break;
-		case 'U': echo edit_field_pedi_u('pedigree'); break;
+		case 'M': echo edit_field_pedi_m('PEDI'); break;
+		case 'F': echo edit_field_pedi_f('PEDI'); break;
+		case 'U': echo edit_field_pedi_u('PEDI'); break;
 		}
 		echo help_link('PEDI');
 		echo '</td></tr>';
@@ -506,7 +500,7 @@ case 'linkspouse':
 	}
 	echo '</td>';
 	echo '<td class="facts_value"><input id="spouseid" type="text" name="spid" size="8"> ';
-	print_findindi_link("spouseid", "");
+	echo print_findindi_link('spouseid');
 	echo '</td></tr>';
 	add_simple_tag("0 MARR Y");
 	add_simple_tag("0 DATE", "MARR");
@@ -547,29 +541,18 @@ case 'linkfamaction':
 
 		//-- update the individual record for the person
 		if (strpos($gedrec, "1 $itag @$famid@")===false) {
-			$gedrec .= "\n";
-			if ($itag=="FAMC") {
-				$pedigree="";
-				if (isset($_REQUEST['pedigree'])) $pedigree = $_REQUEST['pedigree'];
-				switch ($pedigree) {
-				case 'birth':
-					$gedrec .= "1 FAMC @$famid@\n2 PEDI $pedigree";
-					break;
-				case 'adopted':
-					$gedrec .= "1 FAMC @$famid@\n2 PEDI $pedigree\n1 ADOP\n2 FAMC @$famid@\n3 ADOP BOTH";
-					break;
-				case 'sealing':
-					$gedrec .= "1 FAMC @$famid@\n2 PEDI $pedigree\n1 SLGC\n2 FAMC @$famid@";
-					break;
-				case 'foster':
-					$gedrec .= "1 FAMC @$famid@\n2 PEDI $pedigree\n1 EVEN\n2 TYPE $pedigree";
-					break;
-				default:
-					$gedrec .= "1 FAMC @$famid@";
-					break;
+			switch ($itag) {
+			case 'FAMC':
+				if (isset($_REQUEST['PEDI'])) {
+					$PEDI = $_REQUEST['PEDI'];
+				} else {
+					$PEDI='';
 				}
-			} else {
-				$gedrec .= "1 FAMS @$famid@";
+				$gedrec.="\n".WT_Gedcom_Code_Pedi::createNewFamcPedi($PEDI, $famid);
+				break;
+			case 'FAMS':
+				$gedrec.="\n1 FAMS @$famid@";
+				break;
 			}
 			if (replace_gedrec($pid, WT_GED_ID, $gedrec, $update_CHAN)) {
 				$success=true;
@@ -579,7 +562,7 @@ case 'linkfamaction':
 		//-- if it is adding a new child to a family
 		if ($famtag=="CHIL") {
 			if (strpos($famrec, "1 $famtag @$pid@")===false) {
-				$famrec = trim($famrec) . "\n1 $famtag @$pid@\n";
+				$famrec .= "\n1 $famtag @$pid@";
 				if (replace_gedrec($famid, WT_GED_ID, $famrec, $update_CHAN)) {
 					$success=true;
 				}
@@ -610,7 +593,7 @@ case 'linkfamaction':
 					}
 				}
 			} else {
-				$famrec .= "\n1 $famtag @$pid@\n";
+				$famrec .= "\n1 $famtag @$pid@";
 				if (replace_gedrec($famid, WT_GED_ID, $famrec, $update_CHAN)) {
 					$success=true;
 				}
@@ -642,23 +625,23 @@ case 'addnewsource':
 		<input type="hidden" name="pid" value="newsour">
 		<table class="facts_table">
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ABBR'), help_link('ABBR'); ?></td>
-			<td class="optionbox wrap"><input type="text" name="ABBR" id="ABBR" value="" size="40" maxlength="255"> <?php print_specialchar_link("ABBR", false); ?></td></tr>
+			<td class="optionbox wrap"><input type="text" name="ABBR" id="ABBR" value="" size="40" maxlength="255"> <?php echo print_specialchar_link('ABBR'); ?></td></tr>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('TITL'), help_link('TITL'); ?></td>
-			<td class="optionbox wrap"><input type="text" name="TITL" id="TITL" value="" size="60"> <?php print_specialchar_link("TITL", false); ?></td></tr>
+			<td class="optionbox wrap"><input type="text" name="TITL" id="TITL" value="" size="60"> <?php echo print_specialchar_link('TITL'); ?></td></tr>
 			<?php if (strstr($ADVANCED_NAME_FACTS, "_HEB")!==false) { ?>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('_HEB'), help_link('_HEB'); ?></td>
-			<td class="optionbox wrap"><input type="text" name="_HEB" id="_HEB" value="" size="60"> <?php print_specialchar_link("_HEB", false); ?></td></tr>
+			<td class="optionbox wrap"><input type="text" name="_HEB" id="_HEB" value="" size="60"> <?php echo print_specialchar_link('_HEB'); ?></td></tr>
 			<?php } ?>
 			<?php if (strstr($ADVANCED_NAME_FACTS, "ROMN")!==false) { ?>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ROMN'), help_link('ROMN'); ?></td>
-			<td class="optionbox wrap"><input  type="text" name="ROMN" id="ROMN" value="" size="60"> <?php print_specialchar_link("ROMN", false); ?></td></tr>
+			<td class="optionbox wrap"><input  type="text" name="ROMN" id="ROMN" value="" size="60"> <?php echo print_specialchar_link('ROMN'); ?></td></tr>
 			<?php } ?>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('AUTH'), help_link('AUTH'); ?></td>
-			<td class="optionbox wrap"><input type="text" name="AUTH" id="AUTH" value="" size="40" maxlength="255"> <?php print_specialchar_link("AUTH", false); ?></td></tr>
+			<td class="optionbox wrap"><input type="text" name="AUTH" id="AUTH" value="" size="40" maxlength="255"> <?php echo print_specialchar_link('AUTH'); ?></td></tr>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('PUBL'), help_link('PUBL'); ?></td>
-			<td class="optionbox wrap"><textarea name="PUBL" id="PUBL" rows="5" cols="60"></textarea><br><?php print_specialchar_link("PUBL", true); ?></td></tr>
+			<td class="optionbox wrap"><textarea name="PUBL" id="PUBL" rows="5" cols="60"></textarea><br><?php echo print_specialchar_link('PUBL'); ?></td></tr>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('REPO'), help_link('REPO'); ?></td>
-			<td class="optionbox wrap"><input type="text" name="REPO" id="REPO" value="" size="10"> <?php print_findrepository_link("REPO"); echo help_link('REPO'); print_addnewrepository_link("REPO"); ?></td></tr>
+			<td class="optionbox wrap"><input type="text" name="REPO" id="REPO" value="" size="10"> <?php echo print_findrepository_link('REPO'), ' ', print_addnewrepository_link('REPO'); ?></td></tr>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('CALN'), help_link('CALN'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="CALN" id="CALN" value=""></td></tr>
 		<?php
@@ -675,7 +658,7 @@ case 'addnewsource':
 			}
 		?>
 		</table>
-			<a href="#"  onclick="return expand_layer('events');"><img id="events_img" src="<?php echo $WT_IMAGES['plus']; ?>" width="11" height="11" alt="" title="">
+			<a href="#"  onclick="return expand_layer('events');"><i id="events_img" class="icon-plus"></i>
 			<?php echo WT_I18N::translate('Associate events with this source'); ?></a><?php echo help_link('edit_SOUR_EVEN'); ?>
 			<div id="events" style="display: none;">
 			<table class="facts_table">
@@ -711,14 +694,14 @@ case 'addnewsource':
 //------------------------------------------------------------------------------
 //-- create a source record from the incoming variables
 case 'addsourceaction':
-	$newgedrec = "0 @XREF@ SOUR\n";
+	$newgedrec = "0 @XREF@ SOUR";
 	if (isset($_REQUEST['EVEN'])) $EVEN = $_REQUEST['EVEN'];
 	if (!empty($EVEN) && count($EVEN)>0) {
-		$newgedrec .= "1 DATA\n";
-		$newgedrec .= "2 EVEN ".implode(",", $EVEN)."\n";
-		if (!empty($EVEN_DATE)) $newgedrec .= "3 DATE ".$EVEN_DATE."\n";
-		if (!empty($EVEN_PLAC)) $newgedrec .= "3 PLAC ".$EVEN_PLAC."\n";
-		if (!empty($AGNC))      $newgedrec .= "2 AGNC ".$AGNC."\n";
+		$newgedrec .= "\n1 DATA";
+		$newgedrec .= "\n2 EVEN ".implode(",", $EVEN);
+		if (!empty($EVEN_DATE)) $newgedrec .= "\n3 DATE ".$EVEN_DATE;
+		if (!empty($EVEN_PLAC)) $newgedrec .= "\n3 PLAC ".$EVEN_PLAC;
+		if (!empty($AGNC))      $newgedrec .= "\n2 AGNC ".$AGNC;
 	}
 	if (isset($_REQUEST['ABBR'])) $ABBR = $_REQUEST['ABBR'];
 	if (isset($_REQUEST['TITL'])) $TITL = $_REQUEST['TITL'];
@@ -728,25 +711,25 @@ case 'addsourceaction':
 	if (isset($_REQUEST['PUBL'])) $PUBL = $_REQUEST['PUBL'];
 	if (isset($_REQUEST['REPO'])) $REPO = $_REQUEST['REPO'];
 	if (isset($_REQUEST['CALN'])) $CALN = $_REQUEST['CALN'];
-	if (!empty($ABBR)) $newgedrec .= "1 ABBR $ABBR\n";
+	if (!empty($ABBR)) $newgedrec .= "\n1 ABBR $ABBR";
 	if (!empty($TITL)) {
-		$newgedrec .= "1 TITL $TITL\n";
-		if (!empty($_HEB)) $newgedrec .= "2 _HEB $_HEB\n";
-		if (!empty($ROMN)) $newgedrec .= "2 ROMN $ROMN\n";
+		$newgedrec .= "\n1 TITL $TITL";
+		if (!empty($_HEB)) $newgedrec .= "\n2 _HEB $_HEB";
+		if (!empty($ROMN)) $newgedrec .= "\n2 ROMN $ROMN";
 	}
-	if (!empty($AUTH)) $newgedrec .= "1 AUTH $AUTH\n";
+	if (!empty($AUTH)) $newgedrec .= "\n1 AUTH $AUTH";
 	if (!empty($PUBL)) {
 		foreach (preg_split("/\r?\n/", $PUBL) as $k=>$line) {
 			if ($k==0) {
-				$newgedrec .= "1 PUBL $line\n";
+				$newgedrec .= "\n1 PUBL $line";
 			} else {
-				$newgedrec .= "2 CONT $line\n";
+				$newgedrec .= "\n2 CONT $line";
 			}
 		}
 	}
 	if (!empty($REPO)) {
-		$newgedrec .= "1 REPO @$REPO@\n";
-		if (!empty($CALN)) $newgedrec .= "2 CALN $CALN\n";
+		$newgedrec .= "\n1 REPO @$REPO@";
+		if (!empty($CALN)) $newgedrec .= "\n2 CALN $CALN";
 	}
 	$xref = append_gedrec($newgedrec, WT_GED_ID);
 	$link = "source.php?sid=$xref";
@@ -771,7 +754,7 @@ case 'addnewnote':
 					echo WT_I18N::translate('Shared note'), help_link('SHARED_NOTE');
 					echo '</td>';
 					echo '<td class="optionbox wrap" ><textarea name="NOTE" id="NOTE" rows="15" cols="87"></textarea>';
-						print_specialchar_link("NOTE", true);
+					echo print_specialchar_link('NOTE');
 					echo '</td>';
 				echo '</tr>';
 			if (WT_USER_IS_ADMIN) {
@@ -795,59 +778,20 @@ case 'addnewnote':
 //------------------------------------------------------------------------------
 //-- create a shared note record from the incoming variables
 case 'addnoteaction':
-	$newgedrec  = "0 @XREF@ NOTE\n";
+	$newgedrec  = "0 @XREF@ NOTE";
 
-	if (isset($_REQUEST['EVEN'])) $EVEN = $_REQUEST['EVEN'];
-	if (!empty($EVEN) && count($EVEN)>0) {
-		$newgedrec .= "1 DATA\n";
-		$newgedrec .= "2 EVEN ".implode(",", $EVEN)."\n";
-		if (!empty($EVEN_DATE)) $newgedrec .= "3 DATE ".$EVEN_DATE."\n";
-		if (!empty($EVEN_PLAC)) $newgedrec .= "3 PLAC ".$EVEN_PLAC."\n";
-		if (!empty($AGNC))      $newgedrec .= "2 AGNC ".$AGNC."\n";
-	}
-	if (isset($_REQUEST['ABBR'])) $ABBR = $_REQUEST['ABBR'];
-	if (isset($_REQUEST['TITL'])) $TITL = $_REQUEST['TITL'];
-	if (isset($_REQUEST['DATE'])) $DATE = $_REQUEST['DATE'];
 	if (isset($_REQUEST['NOTE'])) $NOTE = $_REQUEST['NOTE'];
-	if (isset($_REQUEST['_HEB'])) $_HEB = $_REQUEST['_HEB'];
-	if (isset($_REQUEST['ROMN'])) $ROMN = $_REQUEST['ROMN'];
-	if (isset($_REQUEST['AUTH'])) $AUTH = $_REQUEST['AUTH'];
-	if (isset($_REQUEST['PUBL'])) $PUBL = $_REQUEST['PUBL'];
-	if (isset($_REQUEST['REPO'])) $REPO = $_REQUEST['REPO'];
-	if (isset($_REQUEST['CALN'])) $CALN = $_REQUEST['CALN'];
 
 	if (!empty($NOTE)) {
 		foreach (preg_split("/\r?\n/", $NOTE) as $k=>$line) {
 			if ($k==0) {
-				$newgedrec = "0 @XREF@ NOTE {$line}\n";
+				$newgedrec .= " {$line}";
 			} else {
-				$newgedrec .= "1 CONT {$line}\n";
+				$newgedrec .= "\n1 CONT {$line}";
 			}
 		}
 	}
 
-	if (!empty($ABBR)) $newgedrec .= "1 ABBR $ABBR\n";
-	if (!empty($TITL)) {
-		// $newgedrec .= "1 TITL $TITL\n";
-		// $newgedrec .= "2 DATE $DATE\n";
-		if (!empty($_HEB)) $newgedrec .= "2 _HEB $_HEB\n";
-		if (!empty($ROMN)) $newgedrec .= "2 ROMN $ROMN\n";
-	}
-	if (!empty($AUTH)) $newgedrec .= "1 AUTH $AUTH\n";
-	if (!empty($PUBL)) {
-		foreach (preg_split("/\r?\n/", $PUBL) as $k=>$line) {
-			if ($k==0) {
-				$newgedrec .= "1 PUBL $line\n";
-			} else {
-				$newgedrec .= "2 CONT $line\n";
-			}
-		}
-	}
-	if (!empty($NOTE)) {
-		//$newgedrec .= "1 NOTE @$NOTE@\n";
-		if (!empty($CALN)) $newgedrec .= "2 CALN $CALN\n";
-	}
-	// $xref = "Test";
 	$xref = append_gedrec($newgedrec, WT_GED_ID);
 	$link = "note.php?nid=$xref";
 
@@ -1006,7 +950,7 @@ case 'editnote':
 				<td class="optionbox wrap">
 					<textarea name="NOTE" id="NOTE" rows="15" cols="90"><?php
 						echo htmlspecialchars($note_content);
-					?></textarea><br><?php print_specialchar_link("NOTE", true); ?>
+					?></textarea><br><?php echo print_specialchar_link('NOTE'); ?>
 				</td>
 			</tr>
 			<?php
@@ -1054,17 +998,17 @@ case 'addnewrepository':
 		<input type="hidden" name="pid" value="newrepo">
 		<table class="facts_table">
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_I18N::translate('Repository name'); ?></td>
-			<td class="optionbox wrap"><input type="text" name="NAME" id="NAME" value="" size="40" maxlength="255"> <?php print_specialchar_link("NAME", false); ?></td></tr>
+			<td class="optionbox wrap"><input type="text" name="REPO_NAME" id="REPO_NAME" value="" size="40" maxlength="255"> <?php echo print_specialchar_link('REPO_NAME'); ?></td></tr>
 			<?php if (strstr($ADVANCED_NAME_FACTS, "_HEB")!==false) { ?>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('_HEB'), help_link('_HEB'); ?></td>
-			<td class="optionbox wrap"><input type="text" name="_HEB" id="_HEB" value="" size="40" maxlength="255"> <?php print_specialchar_link("_HEB", false); ?></td></tr>
+			<td class="optionbox wrap"><input type="text" name="_HEB" id="_HEB" value="" size="40" maxlength="255"> <?php echo print_specialchar_link('_HEB'); ?></td></tr>
 			<?php } ?>
 			<?php if (strstr($ADVANCED_NAME_FACTS, "ROMN")!==false) { ?>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ROMN'), help_link('ROMN'); ?></td>
-			<td class="optionbox wrap"><input type="text" name="ROMN" id="ROMN" value="" size="40" maxlength="255"> <?php print_specialchar_link("ROMN", false); ?></td></tr>
+			<td class="optionbox wrap"><input type="text" name="ROMN" id="ROMN" value="" size="40" maxlength="255"> <?php echo print_specialchar_link('ROMN'); ?></td></tr>
 			<?php } ?>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ADDR'), help_link('ADDR'); ?></td>
-			<td class="optionbox wrap"><textarea name="ADDR" id="ADDR" rows="5" cols="60"></textarea><?php print_specialchar_link("ADDR", true); ?> </td></tr>
+			<td class="optionbox wrap"><textarea name="ADDR" id="ADDR" rows="5" cols="60"></textarea><?php echo print_specialchar_link('ADDR'); ?> </td></tr>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('PHON'), help_link('PHON'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="PHON" id="PHON" value="" size="40" maxlength="255"> </td></tr>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('FAX'), help_link('FAX'); ?></td>
@@ -1094,8 +1038,8 @@ case 'addnewrepository':
 //------------------------------------------------------------------------------
 //-- create a repository record from the incoming variables
 case 'addrepoaction':
-	$newgedrec = "0 @XREF@ REPO\n";
-	if (isset($_REQUEST['NAME'])) $NAME = $_REQUEST['NAME'];
+	$newgedrec = "0 @XREF@ REPO";
+	if (isset($_REQUEST['REPO_NAME'])) $NAME = $_REQUEST['REPO_NAME'];
 	if (isset($_REQUEST['_HEB'])) $_HEB = $_REQUEST['_HEB'];
 	if (isset($_REQUEST['ROMN'])) $ROMN = $_REQUEST['ROMN'];
 	if (isset($_REQUEST['ADDR'])) $ADDR = $_REQUEST['ADDR'];
@@ -1105,23 +1049,23 @@ case 'addrepoaction':
 	if (isset($_REQUEST['WWW'])) $WWW = $_REQUEST['WWW'];
 
 	if (!empty($NAME)) {
-		$newgedrec .= "1 NAME $NAME\n";
-		if (!empty($_HEB)) $newgedrec .= "2 _HEB $_HEB\n";
-		if (!empty($ROMN)) $newgedrec .= "2 ROMN $ROMN\n";
+		$newgedrec .= "\n1 NAME $NAME";
+		if (!empty($_HEB)) $newgedrec .= "\n2 _HEB $_HEB";
+		if (!empty($ROMN)) $newgedrec .= "\n2 ROMN $ROMN";
 	}
 	if (!empty($ADDR)) {
 		foreach (preg_split("/\r?\n/", $ADDR) as $k=>$line) {
 			if ($k==0) {
-				$newgedrec .= "1 ADDR {$line}\n";
+				$newgedrec .= "\n1 ADDR {$line}";
 			} else {
-				$newgedrec .= "2 CONT {$line}\n";
+				$newgedrec .= "\n2 CONT {$line}";
 			}
 		}
 	}
-	if (!empty($PHON)) $newgedrec .= "1 PHON $PHON\n";
-	if (!empty($FAX)) $newgedrec .= "1 FAX $FAX\n";
-	if (!empty($EMAIL)) $newgedrec .= "1 EMAIL $EMAIL\n";
-	if (!empty($WWW)) $newgedrec .= "1 WWW $WWW\n";
+	if (!empty($PHON)) $newgedrec .= "\n1 PHON $PHON";
+	if (!empty($FAX)) $newgedrec .= "\n1 FAX $FAX";
+	if (!empty($EMAIL)) $newgedrec .= "\n1 EMAIL $EMAIL";
+	if (!empty($WWW)) $newgedrec .= "\n1 WWW $WWW";
 
 	$xref = append_gedrec($newgedrec, WT_GED_ID);
 	$link = "repo.php?rid=$xref";
@@ -1259,14 +1203,14 @@ case 'update':
 			if (isset($_REQUEST['_MARNM'])) $_MARNM = $_REQUEST['_MARNM'];
 			if (isset($_REQUEST['NOTE'])) $NOTE = $_REQUEST['NOTE'];
 
-			if (!empty($NAME)) $newged .= "1 NAME $NAME\n";
-			if (!empty($TYPE)) $newged .= "2 TYPE $TYPE\n";
-			if (!empty($NPFX)) $newged .= "2 NPFX $NPFX\n";
-			if (!empty($GIVN)) $newged .= "2 GIVN $GIVN\n";
-			if (!empty($NICK)) $newged .= "2 NICK $NICK\n";
-			if (!empty($SPFX)) $newged .= "2 SPFX $SPFX\n";
-			if (!empty($SURN)) $newged .= "2 SURN $SURN\n";
-			if (!empty($NSFX)) $newged .= "2 NSFX $NSFX\n";
+			if (!empty($NAME)) $newged .= "\n1 NAME $NAME";
+			if (!empty($TYPE)) $newged .= "\n2 TYPE $TYPE";
+			if (!empty($NPFX)) $newged .= "\n2 NPFX $NPFX";
+			if (!empty($GIVN)) $newged .= "\n2 GIVN $GIVN";
+			if (!empty($NICK)) $newged .= "\n2 NICK $NICK";
+			if (!empty($SPFX)) $newged .= "\n2 SPFX $SPFX";
+			if (!empty($SURN)) $newged .= "\n2 SURN $SURN";
+			if (!empty($NSFX)) $newged .= "\n2 NSFX $NSFX";
 			
 			if (!empty($NOTE)) {			
 				$cmpfunc = create_function('$e', 'return strpos($e,"0 @N") !==0 && strpos($e,"1 CONT") !==0;');
@@ -1281,17 +1225,17 @@ case 'update':
 
 			//-- Refer to Bug [ 1329644 ] Add Married Name - Wrong Sequence
 			//-- _HEB/ROMN/FONE have to be before _AKA, even if _AKA exists in input and the others are now added
-			if (!empty($ROMN)) $newged .= "2 ROMN $ROMN\n";
-			if (!empty($FONE)) $newged .= "2 FONE $FONE\n";
-			if (!empty($_HEB)) $newged .= "2 _HEB $_HEB\n";
+			if (!empty($ROMN)) $newged .= "\n2 ROMN $ROMN";
+			if (!empty($FONE)) $newged .= "\n2 FONE $FONE";
+			if (!empty($_HEB)) $newged .= "\n2 _HEB $_HEB";
 
 			$newged = handle_updates($newged);
 
-			if (!empty($_AKA)) $newged .= "2 _AKA $_AKA\n";
-			if (!empty($_MARNM)) $newged .= "2 _MARNM $_MARNM\n";
+			if (!empty($_AKA)) $newged .= "\n2 _AKA $_AKA";
+			if (!empty($_MARNM)) $newged .= "\n2 _MARNM $_MARNM";
 
 			while ($i<count($gedlines)) {
-				$newged .= trim($gedlines[$i])."\n";
+				$newged .= "\n".$gedlines[$i];
 				$i++;
 			}
 		} else {
@@ -1299,7 +1243,7 @@ case 'update':
 			$current = 0;
 			foreach ($linenum as $editline) {
 				for ($i=$current; $i<$editline; $i++) {
-					$newged .= $gedlines[$i]."\n";
+					$newged .= "\n".$gedlines[$i];
 				}
 				//-- for edits get the level from the line
 				if (isset($gedlines[$editline])) {
@@ -1325,14 +1269,14 @@ case 'update':
 				if (isset($_REQUEST['_MARNM'])) $_MARNM = $_REQUEST['_MARNM'];
 				if (isset($_REQUEST['NOTE'])) $NOTE = $_REQUEST['NOTE'];
 
-				if (!empty($NAME)) $newged .= "1 NAME $NAME\n";
-				if (!empty($TYPE)) $newged .= "2 TYPE $TYPE\n";
-				if (!empty($NPFX)) $newged .= "2 NPFX $NPFX\n";
-				if (!empty($GIVN)) $newged .= "2 GIVN $GIVN\n";
-				if (!empty($NICK)) $newged .= "2 NICK $NICK\n";
-				if (!empty($SPFX)) $newged .= "2 SPFX $SPFX\n";
-				if (!empty($SURN)) $newged .= "2 SURN $SURN\n";
-				if (!empty($NSFX)) $newged .= "2 NSFX $NSFX\n";
+				if (!empty($NAME)) $newged .= "\n1 NAME $NAME";
+				if (!empty($TYPE)) $newged .= "\n2 TYPE $TYPE";
+				if (!empty($NPFX)) $newged .= "\n2 NPFX $NPFX";
+				if (!empty($GIVN)) $newged .= "\n2 GIVN $GIVN";
+				if (!empty($NICK)) $newged .= "\n2 NICK $NICK";
+				if (!empty($SPFX)) $newged .= "\n2 SPFX $SPFX";
+				if (!empty($SURN)) $newged .= "\n2 SURN $SURN";
+				if (!empty($NSFX)) $newged .= "\n2 NSFX $NSFX";
 					
 				if (!empty($NOTE)) {				
 					$cmpfunc = create_function('$e', 'return strpos($e,"0 @N") !==0 && strpos($e,"1 CONT") !==0;');
@@ -1347,12 +1291,12 @@ case 'update':
 				
 				//-- Refer to Bug [ 1329644 ] Add Married Name - Wrong Sequence
 				//-- _HEB/ROMN/FONE have to be before _AKA, even if _AKA exists in input and the others are now added
-				if (!empty($ROMN)) $newged .= "2 ROMN $ROMN\n";
-				if (!empty($FONE)) $newged .= "2 FONE $FONE\n";
-				if (!empty($_HEB)) $newged .= "2 _HEB $_HEB\n";
+				if (!empty($ROMN)) $newged .= "\n2 ROMN $ROMN";
+				if (!empty($FONE)) $newged .= "\n2 FONE $FONE";
+				if (!empty($_HEB)) $newged .= "\n2 _HEB $_HEB";
 
-				if (!empty($_AKA)) $newged .= "2 _AKA $_AKA\n";
-				if (!empty($_MARNM)) $newged .= "2 _MARNM $_MARNM\n";
+				if (!empty($_AKA)) $newged .= "\n2 _AKA $_AKA";
+				if (!empty($_MARNM)) $newged .= "\n2 _MARNM $_MARNM";
 
 				$newged = handle_updates($newged);
 				$current = $editline;
@@ -1370,7 +1314,7 @@ case 'update':
 case 'addchildaction':
 	splitSOUR(); // separate SOUR record from the rest
 
-	$gedrec ="0 @REF@ INDI\n";
+	$gedrec ="0 @REF@ INDI";
 	$gedrec.=addNewName();
 	$gedrec.=addNewSex ();
 	if (preg_match_all('/([A-Z0-9_]+)/', $QUICK_REQUIRED_FACTS, $matches)) {
@@ -1380,27 +1324,12 @@ case 'addchildaction':
 	}
 
 	if (!empty($famid)) {
-		$gedrec .= "\n";
-		$PEDI="";
-		if (isset($_REQUEST['PEDI'])) $PEDI = $_REQUEST['PEDI'];
-		switch ($PEDI) {
-		case 'birth':
-			$gedrec.="1 FAMC @$famid@\n2 PEDI $PEDI";
-			break;
-		case 'adopted':
-			$gedrec.="1 FAMC @$famid@\n2 PEDI $PEDI\n1 ADOP\n2 FAMC @$famid@\n3 ADOP BOTH";
-			break;
-		case 'sealing':
-			$gedrec.="1 FAMC @$famid@\n2 PEDI $PEDI\n1 SLGC\n2 FAMC @$famid@";
-			break;
-		case 'foster':
-			$gedrec.="1 FAMC @$famid@\n2 PEDI $PEDI\n1 EVEN\n2 TYPE $PEDI";
-			break;
-		default:
-			$gedrec.="1 FAMC @$famid@";
-			break;
+		if (isset($_REQUEST['PEDI'])) {
+			$PEDI = $_REQUEST['PEDI'];
+		} else {
+			$PEDI='';
 		}
-		$gedrec .= "\n";
+		$gedrec.="\n".WT_Gedcom_Code_Pedi::createNewFamcPedi($PEDI, $famid);
 	}
 
 	if (safe_POST_bool('SOUR_INDI')) {
@@ -1449,7 +1378,7 @@ case 'addchildaction':
 case 'addspouseaction':
 	splitSOUR(); // separate SOUR record from the rest
 
-	$gedrec ="0 @REF@ INDI\n";
+	$gedrec ="0 @REF@ INDI";
 	$gedrec.=addNewName();
 	$gedrec.=addNewSex ();
 	if (preg_match_all('/([A-Z0-9_]+)/', $QUICK_REQUIRED_FACTS, $matches)) {
@@ -1473,16 +1402,16 @@ case 'addspouseaction':
 	}
 	$success = true;
 	if ($famid=="new") {
-		$famrec = "0 @new@ FAM\n";
+		$famrec = "0 @new@ FAM";
 		$SEX=safe_POST('SEX', '[MF]', 'U');
 		if ($SEX=="M") $famtag = "HUSB";
 		if ($SEX=="F") $famtag = "WIFE";
 		if ($famtag=="HUSB") {
-			$famrec .= "1 HUSB @$xref@\n";
-			$famrec .= "1 WIFE @$pid@\n";
+			$famrec .= "\n1 HUSB @$xref@";
+			$famrec .= "\n1 WIFE @$pid@";
 		} else {
-			$famrec .= "1 WIFE @$xref@\n";
-			$famrec .= "1 HUSB @$pid@\n";
+			$famrec .= "\n1 WIFE @$xref@";
+			$famrec .= "\n1 HUSB @$pid@";
 		}
 
 		if (preg_match_all('/([A-Z0-9_]+)/', $QUICK_REQUIRED_FAMFACTS, $matches)) {
@@ -1501,7 +1430,7 @@ case 'addspouseaction':
 	} elseif (!empty($famid)) {
 		$famrec = find_gedcom_record($famid, WT_GED_ID, true);
 		if (!empty($famrec)) {
-			$famrec = trim($famrec) . "\n1 $famtag @$xref@\n";
+			$famrec .= "\n1 $famtag @$xref@";
 
 			if (preg_match_all('/([A-Z0-9_]+)/', $QUICK_REQUIRED_FAMFACTS, $matches)) {
 				foreach ($matches[1] as $match) {
@@ -1529,7 +1458,7 @@ case 'addspouseaction':
 	if (!empty($pid)) {
 		$indirec = find_gedcom_record($pid, WT_GED_ID, true);
 		if ($indirec) {
-			$indirec = trim($indirec) . "\n1 FAMS @$famid@\n";
+			$indirec .= "\n1 FAMS @$famid@";
 			if (replace_gedrec($pid, WT_GED_ID, $indirec, $update_CHAN)) {
 				$success=true;
 			}
@@ -1545,29 +1474,29 @@ case 'linkspouseaction':
 		$gedrec = find_gedcom_record($spid, WT_GED_ID, true);
 		if ($gedrec) {
 			if ($famid=="new") {
-				$famrec = "0 @new@ FAM\n";
+				$famrec = "0 @new@ FAM";
 				$SEX = get_gedcom_value("SEX", 1, $gedrec, '', false);
 				if ($SEX=="M") $famtag = "HUSB";
 				if ($SEX=="F") $famtag = "WIFE";
 				if ($famtag=="HUSB") {
-					$famrec .= "1 HUSB @$spid@\n";
-					$famrec .= "1 WIFE @$pid@\n";
+					$famrec .= "\n1 HUSB @$spid@";
+					$famrec .= "\n1 WIFE @$pid@";
 				} else {
-					$famrec .= "1 WIFE @$spid@\n";
-					$famrec .= "1 HUSB @$pid@\n";
+					$famrec .= "\n1 WIFE @$spid@";
+					$famrec .= "\n1 HUSB @$pid@";
 				}
 				$famrec.=addNewFact('MARR');
 
 				if (safe_POST_bool('SOUR_FAM') || count($tagSOUR)>0) {
 					// before adding 2 SOUR it needs to add 1 MARR Y first
 					if (addNewFact('MARR')=='') {
-						$famrec .= "1 MARR Y\n";
+						$famrec .= "\n1 MARR Y";
 					}
 					$famrec = handle_updates($famrec);
 				} else {
 					// before adding level 2 facts it needs to add 1 MARR Y first
 					if (addNewFact('MARR')=='') {
-						$famrec .= "1 MARR Y\n";
+						$famrec .= "\n1 MARR Y";
 					}
 					$famrec = updateRest($famrec);
 				}
@@ -1575,7 +1504,7 @@ case 'linkspouseaction':
 				$famid = append_gedrec($famrec, WT_GED_ID);
 			}
 			if ((!empty($famid))&&($famid!="new")) {
-				$gedrec .= "\n1 FAMS @$famid@\n";
+				$gedrec .= "\n1 FAMS @$famid@";
 				if (replace_gedrec($spid, WT_GED_ID, $gedrec, $update_CHAN)) {
 					$success=true;
 				}
@@ -1584,7 +1513,7 @@ case 'linkspouseaction':
 			if (!empty($pid)) {
 				$indirec = find_gedcom_record($pid, WT_GED_ID, true);
 				if (!empty($indirec)) {
-					$indirec = trim($indirec) . "\n1 FAMS @$famid@\n";
+					$indirec = trim($indirec) . "\n1 FAMS @$famid@";
 					if (replace_gedrec($pid, WT_GED_ID, $indirec, $update_CHAN)) {
 						$success=true;
 					}
@@ -1597,7 +1526,7 @@ case 'linkspouseaction':
 case 'addnewparentaction':
 	splitSOUR(); // separate SOUR record from the rest
 
-	$gedrec ="0 @REF@ INDI\n";
+	$gedrec ="0 @REF@ INDI";
 	$gedrec.=addNewName();
 	$gedrec.=addNewSex ();
 	if (preg_match_all('/([A-Z0-9_]+)/', $QUICK_REQUIRED_FACTS, $matches)) {
@@ -1621,13 +1550,13 @@ case 'addnewparentaction':
 	}
 	$success = true;
 	if ($famid=="new") {
-		$famrec = "0 @new@ FAM\n";
+		$famrec = "0 @new@ FAM";
 		if ($famtag=="HUSB") {
-			$famrec .= "1 HUSB @$xref@\n";
-			$famrec .= "1 CHIL @$pid@\n";
+			$famrec .= "\n1 HUSB @$xref@";
+			$famrec .= "\n1 CHIL @$pid@";
 		} else {
-			$famrec .= "1 WIFE @$xref@\n";
-			$famrec .= "1 CHIL @$pid@\n";
+			$famrec .= "\n1 WIFE @$xref@";
+			$famrec .= "\n1 CHIL @$pid@";
 		}
 
 		if (preg_match_all('/([A-Z0-9_]+)/', $QUICK_REQUIRED_FAMFACTS, $matches)) {
@@ -1646,7 +1575,7 @@ case 'addnewparentaction':
 	} elseif (!empty($famid)) {
 		$famrec = find_gedcom_record($famid, WT_GED_ID, true);
 		if (!empty($famrec)) {
-			$famrec = trim($famrec) . "\n1 $famtag @$xref@\n";
+			$famrec .= "\n1 $famtag @$xref@";
 			if (preg_match_all('/([A-Z0-9_]+)/', $QUICK_REQUIRED_FAMFACTS, $matches)) {
 				foreach ($matches[1] as $match) {
 					$famrec.=addNewFact($match);
@@ -1673,7 +1602,7 @@ case 'addnewparentaction':
 		$indirec = find_gedcom_record($pid, WT_GED_ID, true);
 		if ($indirec) {
 			if (strpos($indirec, "1 FAMC @$famid@")===false) {
-				$indirec = trim($indirec) . "\n1 FAMC @$famid@\n";
+				$indirec .= "\n1 FAMC @$famid@";
 				if (replace_gedrec($pid, WT_GED_ID, $indirec, $update_CHAN)) {
 					$success=true;
 				}
@@ -1688,12 +1617,19 @@ case 'addopfchildaction':
 	$newindixref=get_new_xref('INDI');
 	$newfamxref=get_new_xref('FAM');
 
-	$gedrec ="0 @{$newindixref}@ INDI\n1 FAMC @{$newfamxref}@\n".addNewName().addNewSex ();
+	$gedrec ="0 @{$newindixref}@ INDI".addNewName().addNewSex ();
 	if (preg_match_all('/([A-Z0-9_]+)/', $QUICK_REQUIRED_FACTS, $matches)) {
 		foreach ($matches[1] as $match) {
 			$gedrec.=addNewFact($match);
 		}
 	}
+
+	if (isset($_REQUEST['PEDI'])) {
+		$PEDI = $_REQUEST['PEDI'];
+	} else {
+		$PEDI='';
+	}
+	$gedrec.="\n".WT_Gedcom_Code_Pedi::createNewFamcPedi($PEDI, $newfamxref);
 
 	if (safe_POST_bool('SOUR_INDI')) {
 		$gedrec=handle_updates($gedrec);
@@ -1744,7 +1680,7 @@ case 'addname':
 	break;
 //------------------------------------------------------------------------------
 case 'paste':
-	$gedrec .= "\n".$WT_SESSION->clipboard[$fact]['factrec']."\n";
+	$gedrec .= "\n".$WT_SESSION->clipboard[$fact]['factrec'];
 	if (replace_gedrec($pid, WT_GED_ID, $gedrec, $NO_UPDATE_CHAN)) {
 		$success=true;
 	}
@@ -1783,7 +1719,7 @@ case 'reorder_media_update': // Update sort using popup
 		}
 	}
 	foreach ($order1 as $m_media=>$num) {
-		$newgedrec .= '1 _WT_OBJE_SORT @'.$m_media."@\n";
+		$newgedrec .= "\n1 _WT_OBJE_SORT @".$m_media."@";
 	}
 	if (replace_gedrec($pid, WT_GED_ID, $newgedrec, $update_CHAN)) {
 		$success=true;
@@ -1835,7 +1771,7 @@ case 'al_reorder_media_update': // Update sort using Album Page
 		}
 	}
 	foreach ($order2 as $m_media=>$num) {
-		$newgedrec .= "1 _WT_OBJE_SORT @".$m_media."@\n";
+		$newgedrec .= "\n1 _WT_OBJE_SORT @".$m_media."@";
 	}
 	if (replace_gedrec($pid, WT_GED_ID, $newgedrec, $update_CHAN)) {
 		$success=true;
@@ -2082,11 +2018,11 @@ case 'changefamily_update':
 		if (strstr($gedrec, "1 HUSB")!==false) {
 			$gedrec = preg_replace("/1 HUSB @.*@/", "1 HUSB @$HUSB@", $gedrec);
 		} else {
-			$gedrec .= "\n1 HUSB @$HUSB@\n";
+			$gedrec .= "\n1 HUSB @$HUSB@";
 		}
 		$indirec = find_gedcom_record($HUSB, WT_GED_ID, true);
 		if (!empty($indirec) && (strpos($indirec, "1 FAMS @$famid@")===false)) {
-			$indirec .= "\n1 FAMS @$famid@\n";
+			$indirec .= "\n1 FAMS @$famid@";
 			replace_gedrec($HUSB, WT_GED_ID, $indirec, $update_CHAN);
 		}
 		$updated = true;
@@ -2126,11 +2062,11 @@ case 'changefamily_update':
 		if (strstr($gedrec, "1 WIFE")!==false) {
 			$gedrec = preg_replace("/1 WIFE @.*@/", "1 WIFE @$WIFE@", $gedrec);
 		} else {
-			$gedrec .= "\n1 WIFE @$WIFE@\n";
+			$gedrec .= "\n1 WIFE @$WIFE@";
 		}
 		$indirec = find_gedcom_record($WIFE, WT_GED_ID, true);
 		if (!empty($indirec) && (strpos($indirec, "1 FAMS @$famid@")===false)) {
-			$indirec .= "\n1 FAMS @$famid@\n";
+			$indirec .= "\n1 FAMS @$famid@";
 			replace_gedrec($WIFE, WT_GED_ID, $indirec, $update_CHAN);
 		}
 		$updated = true;
@@ -2174,11 +2110,11 @@ case 'changefamily_update':
 		if (!empty($CHIL)) {
 			$newchildren[] = $CHIL;
 			if (strpos($gedrec, "1 CHIL @$CHIL@")===false) {
-				$gedrec .= "\n1 CHIL @$CHIL@\n";
+				$gedrec .= "\n1 CHIL @$CHIL@";
 				$updated = true;
 				$indirec = find_gedcom_record($CHIL, WT_GED_ID, true);
 				if (!empty($indirec) && (strpos($indirec, "1 FAMC @$famid@")===false)) {
-					$indirec .= "\n1 FAMC @$famid@\n";
+					$indirec .= "\n1 FAMC @$famid@";
 					replace_gedrec($CHIL, WT_GED_ID, $indirec, $update_CHAN);
 				}
 			}
@@ -2301,7 +2237,7 @@ case 'reorder_fams_update':
 		}
 	}
 	foreach ($order as $famid=>$num) {
-		$newgedrec .= "1 FAMS @".$famid."@\n";
+		$newgedrec .= "\n1 FAMS @".$famid."@";
 	}
 	if (replace_gedrec($pid, WT_GED_ID, $newgedrec, $update_CHAN)) {
 		$success=true;

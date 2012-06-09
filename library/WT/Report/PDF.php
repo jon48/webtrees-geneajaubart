@@ -4,7 +4,7 @@
 // used by the SAX parser to generate PDF reports from the XML report file.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: PDF.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: PDF.php 13815 2012-04-16 12:37:45Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -131,7 +131,7 @@ class WT_Report_PDF extends WT_Report_Base {
 		header('Expires:');
 		header('Pragma:');
 		header('Cache-control:');
-		$this->pdf->Output('webtrees_'.basename(dirname($_REQUEST['report'])).'.pdf', 'I');
+		$this->pdf->Output('webtrees-'.uniqid().'.pdf', 'I');
 	}
 
 	/**
@@ -1331,9 +1331,7 @@ class FootnotePDF extends Footnote {
 			$temptext = "<span>".$this->num.". </span>".$temptext;
 		}
 //DumpString($temptext); //@@@
-//		$temptext = spanLTRRTL($temptext, "BOTH");
 		//do not add span to '<u>', '</u>' and to special characters (- . , : ?) What about + in phone numbers?. Day together with the rest of the date in page orientation.
-		$temptext = PrintReady($temptext); //@@ better than spanLTRRTL- not 100%
 		// underline «title» part of Source item
 		$temptext = str_replace(array('«', '»'), array('<u>', '</u>'), $temptext);
 //DumpString($temptext); //@@@

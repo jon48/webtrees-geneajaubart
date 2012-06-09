@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: compactbox_template.php 13354 2012-02-01 22:02:22Z nigel $
+// $Id: compactbox_template.php 13642 2012-03-24 13:06:08Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,7 +33,7 @@ if (!defined('WT_WEBTREES')) {
 }
 
 echo '<div id="out-', $boxID ,'" ', $outBoxAdd, '>
-	<div class="compact_view" style="cursor:url(\''.$WT_IMAGES["zoomin"].'\'),n-resize;">',
+	<div class="compact_view">',
 		$thumbnail,
 		'<a onclick="event.cancelBubble=true;" href="individual.php?pid=', $pid, '&amp;ged=', rawurlencode($GEDCOM), '" title="',strip_tags($name.$addname),'">
 			<span id="namedef-',$boxID, '" class="name',$style,' ',$classfacts,'">', $shortname, '</span>

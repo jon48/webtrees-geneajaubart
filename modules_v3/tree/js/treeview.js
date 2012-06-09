@@ -5,7 +5,7 @@
  * - for loops are much faster than using each
  * - return false is required in functions
  *
- * Copyright (C) 2011 webtrees development team
+ * Copyright (C) 2012 webtrees development team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,15 +92,6 @@ function TreeViewHandler(treeviewInstance, allPartners) {
 			});
 			b.removeClass("tvPressed");
 			tv.setComplete();
-		}
-	});
-	
-	// Intercept the scroll event to keep the toolbox available
-	jQuery(window).scroll(function(){
-		if (jQuery(window).scrollTop() > tv.container.offset().top) {
-			tv.toolbox.css("position", "fixed");
-		} else {
-			tv.toolbox.css("position", "absolute");
 		}
 	});
 	

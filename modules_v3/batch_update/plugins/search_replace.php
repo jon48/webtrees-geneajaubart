@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search_replace.php 13137 2011-12-27 05:19:50Z nigel $
+// $Id: search_replace.php 13590 2012-03-16 15:11:35Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -51,7 +51,9 @@ class search_replace_bu_plugin extends base_plugin {
 	}
 
 	function updateRecord($xref, $gedrec) {
-		return preg_replace('/'.$this->regex.'/'.$this->case, $this->replace, $gedrec);
+		// Allow "\n" to indicate a line-feed in replacement text.
+		// Back-references such as $1, $2 are handled automatically.
+		return preg_replace('/'.$this->regex.'/'.$this->case, str_replace('\n', "\n", $this->replace), $gedrec);
 	}
 
 	function getOptions() {

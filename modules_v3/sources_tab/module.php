@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13143 2011-12-28 08:47:24Z greg $
+// $Id: module.php 13949 2012-05-28 21:03:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -63,13 +63,13 @@ class sources_tab_WT_Module extends WT_Module implements WT_Module_Tab {
 			$otheritems = $controller->getOtherFacts();
 				foreach ($otheritems as $key => $event) {
 					if ($event->getTag()=='SOUR') {
-						print_main_sources($event->getGedcomRecord(), 1, $controller->record->getXref(), $event->getLineNumber());
+						print_main_sources($event, 1, $controller->record->getXref());
 					}
 			}
 			// 2nd level sources [ 1712181 ]
 			$controller->record->add_family_facts(false);
 			foreach ($controller->getIndiFacts() as $key => $factrec) {
-					print_main_sources($factrec->getGedcomRecord(), 2, $controller->record->getXref(), $factrec->getLineNumber(), true);
+					print_main_sources($factrec, 2, $controller->record->getXref(), true);
 			}
 			if ($this->get_source_count()==0) echo "<tr><td id=\"no_tab3\" colspan=\"2\" class=\"facts_value\">".WT_I18N::translate('There are no Source citations for this individual.')."</td></tr>";
 			//-- New Source Link

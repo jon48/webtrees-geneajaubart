@@ -2,7 +2,7 @@
 // Interface to moderate pending changes.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_changes.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: edit_changes.php 13523 2012-02-29 18:20:49Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_changes.php');
 require './includes/session.php';
@@ -41,7 +41,7 @@ $ged      =safe_GET('ged');
 echo WT_JS_START;
 ?>
 	function show_gedcom_record(xref) {
-		var recwin = window.open("gedrecord.php?fromfile=1&pid="+xref, "_blank", "top=50, left=50, width=600, height=400, scrollbars=1, scrollable=1, resizable=1");
+		var recwin = window.open("gedrecord.php?fromfile=1&pid="+xref, "_blank", edit_window_specs);
 	}
 
 	function showchanges() {
@@ -190,8 +190,8 @@ if ($changed_gedcoms) {
 		}
 		echo '</b></td>';
 		$output .= "<td class=\"list_value\"><a href=\"#\" onclick=\"return reply('".$change->user_name."', '".WT_I18N::translate('Moderate pending changes')."')\" alt=\"".WT_I18N::translate('Send Message')."\">";
-		$output .= PrintReady($change->real_name);
-		$output .= PrintReady('&nbsp;('.$change->user_name.')').'</a></td>';
+		$output .= htmlspecialchars($change->real_name);
+		$output .= ' - '.htmlspecialchars($change->user_name).'</a></td>';
 		$output .= '<td class="list_value">'.$change->change_time.'</td>';
 		$output .= '<td class="list_value">'.$change->gedcom_name.'</td>';
 		$output .= '<td class="list_value"><a href="edit_changes.php?action=undo&amp;ged='.rawurlencode($change->gedcom_name).'&amp;change_id='.$change->change_id.'">'.WT_I18N::translate('Undo').'</a></td>';

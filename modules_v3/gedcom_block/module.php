@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: module.php 13642 2012-03-24 13:06:08Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,20 +41,20 @@ class gedcom_block_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $hitCount, $SHOW_COUNTER;
+		global $controller;
 
+		$indi_xref=$controller->getSignificantIndividual()->getXref();
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
-		$title=get_gedcom_setting(WT_GED_ID, 'title');
-		$content = "<div class=\"center\">";
-		$content .= "<br>".format_timestamp(client_time())."<br>";
-		if ($SHOW_COUNTER)
-			$content .=  WT_I18N::translate('Hit Count:')." ".$hitCount."<br>";
-		$content .=  "<br>";
-		if (WT_USER_GEDCOM_ADMIN) {
-			$content .=  "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".WT_GEDURL."&amp;ctype=gedcom', '_blank', 'top=50,left=10,width=600,height=500,scrollbars=1,resizable=1'); return false;\">".WT_I18N::translate('Change the blocks on this page')."</a><br>";
+		$title='<span dir="auto">'.get_gedcom_setting(WT_GED_ID, 'title').'</span>';
+		$content = '<table><tr>';
+		$content .= '<td><a href="pedigree.php?rootid='.$indi_xref.'&amp;ged='.WT_GEDURL.'"><i class="icon-pedigree"></i><br>'.WT_I18N::translate('Default chart').'</a></td>';
+		$content .= '<td><a href="individual.php?pid='.$indi_xref.'&amp;ged='.WT_GEDURL.'"><i class="icon-indis"></i><br>'.WT_I18N::translate('Default individual').'</a></td>';
+		if (get_site_setting('USE_REGISTRATION_MODULE') && WT_USER_ID==false) {
+			$content .= '<td><a href="'.WT_LOGIN_URL.'?action=register"><i class="icon-user_add"></i><br>'.WT_I18N::translate('Request new user account').'</a></td>';
 		}
-		$content .=  "</div>";
+		$content .= "</tr>";
+		$content .= "</table>";
 
 		if ($template) {
 			require WT_THEME_DIR.'templates/block_main_temp.php';

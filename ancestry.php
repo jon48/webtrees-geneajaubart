@@ -23,35 +23,22 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: ancestry.php 13276 2012-01-18 08:11:02Z greg $
+// $Id: ancestry.php 13950 2012-05-29 06:28:25Z greg $
 
 define('WT_SCRIPT_NAME', 'ancestry.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
-// -- array of GEDCOM elements that will be found but should not be displayed
-$nonfacts[] = 'FAMS';
-$nonfacts[] = 'FAMC';
-$nonfacts[] = 'MAY';
-$nonfacts[] = 'BLOB';
-$nonfacts[] = 'CHIL';
-$nonfacts[] = 'HUSB';
-$nonfacts[] = 'WIFE';
-$nonfacts[] = 'RFN';
-$nonfacts[] = '';
-$nonfamfacts[] = 'UID';
-$nonfamfacts[] = '';
-
 $controller=new WT_Controller_Ancestry();
 $controller
 	->pageHeader()
-	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }'); // For the "find indi" link
-
-if ($ENABLE_AUTOCOMPLETE) require WT_ROOT.'js/autocomplete.js.htm';
+	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
+	->addExternalJavaScript('js/autocomplete.js');
 
 // LightBox
 if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
+	$album = new lightbox_WT_Module();
+	$album->getPreLoadContent();
 }
 
 echo '<table><tr><td valign="middle">';
@@ -68,7 +55,7 @@ echo '<h2>', $controller->getPageTitle(), '</h2>';
 	<td class="descriptionbox"><?php echo WT_I18N::translate('Individual'); ?></td>
 <td class="optionbox">
 <input class="pedigree_form" type="text" name="rootid" id="rootid" size="3" value="<?php echo $controller->rootid; ?>">
-<?php print_findindi_link('rootid', ''); ?>
+<?php echo print_findindi_link('rootid'); ?>
 </td>
 
 <!-- // NOTE: Box width -->

@@ -2,7 +2,7 @@
 // Welcome page for the administration module
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin.php 13416 2012-02-10 09:23:58Z greg $
+// $Id: admin.php 13966 2012-06-02 21:30:21Z greg $
 
 define('WT_SCRIPT_NAME', 'admin.php');
 
@@ -143,13 +143,11 @@ echo
 			}
 			foreach ($all_gedcoms as $ged_id=>$ged_name) {
 				if (get_user_gedcom_setting($user_id, $ged_id, 'canedit')=='admin') {
-					$title=PrintReady(strip_tags(get_gedcom_setting($ged_id, 'title')));
-					if (isset($gedadmin[$title])) {
-						$gedadmin[$title]["number"]++;
+					if (isset($gedadmin[$ged_id])) {
+						$gedadmin[$ged_id]["number"]++;
 					} else {
-						$gedadmin[$title]["name"] = $title;
-						$gedadmin[$title]["number"] = 1;
-						$gedadmin[$title]["ged"] = $ged_name;
+						$gedadmin[$ged_id]["number"] = 1;
+						$gedadmin[$ged_id]["ged"] = $ged_name;
 					}
 				}
 			}
@@ -168,8 +166,8 @@ echo
 		'<tr><td>', WT_I18N::translate('Total number of users'), '</td><td>', $totusers, '</td></tr>',
 		'<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="admin_users.php?action=listusers&amp;filter=adminusers">', WT_I18N::translate('Administrators'), '</a></td><td>', $adminusers, '</td></tr>',
 		'<tr><td colspan="2">', WT_I18N::translate('Managers'), '</td></tr>';
-		foreach ($gedadmin as $key=>$geds) {
-			echo '<tr><td><div><a href="admin_users.php?action=listusers&amp;filter=gedadmin&amp;ged='.rawurlencode($geds['ged']), '">', $geds['name'], '</a></div></td><td>', $geds['number'], '</td></tr>';
+		foreach ($gedadmin as $ged_id=>$geds) {
+			echo '<tr><td><div><a href="admin_users.php?action=listusers&amp;filter=gedadmin&amp;ged='.rawurlencode($geds['ged']), '" dir="auto">', htmlspecialchars(get_gedcom_setting($ged_id, 'title')), '</a></div></td><td>', $geds['number'], '</td></tr>';
 		}
 	echo '<tr><td>';
 	if ($warnusers == 0) {
@@ -309,24 +307,6 @@ function old_paths() {
 		WT_ROOT.'editgedcoms.php',
 		WT_ROOT.'edit_merge.php',
 		WT_ROOT.'genservice.php',
-		WT_ROOT.'images/buttons',
-		WT_ROOT.'images/checked.gif',
-		WT_ROOT.'images/checked_qm.gif',
-		WT_ROOT.'images/children.gif',
-		WT_ROOT.'images/feed-icon16x16.png',
-		WT_ROOT.'images/forbidden.gif',
-		WT_ROOT.'images/media',
-		WT_ROOT.'images/reminder.gif',
-		WT_ROOT.'images/selected.png',
-		WT_ROOT.'images/sex_f_15x15.gif',
-		WT_ROOT.'images/sex_f_9x9.gif',
-		WT_ROOT.'images/sex_m_15x15.gif',
-		WT_ROOT.'images/sex_m_9x9.gif',
-		WT_ROOT.'images/sex_u_15x15.gif',
-		WT_ROOT.'images/sex_u_9x9.gif',
-		WT_ROOT.'images/small',
-		WT_ROOT.'images/trashcan.gif',
-		WT_ROOT.'images/warning.gif',
 		WT_ROOT.'includes/classes',
 		WT_ROOT.'includes/controllers',
 		WT_ROOT.'includes/family_nav.php',
@@ -857,7 +837,6 @@ function old_paths() {
 		// Removed in 1.2.3
 		//WT_ROOT.'modules_v2', // Do not delete - users may have stored custom modules/data here
 		// Removed in 1.2.4
-		WT_ROOT.'images/indicator.gif',
 		WT_ROOT.'includes/cssparser.inc.php',
 		WT_ROOT.'js/strings.js',
 		WT_ROOT.'modules_v3/gedcom_favorites/help_text.php',
@@ -1287,6 +1266,132 @@ function old_paths() {
 		WT_ROOT.'themes/minimal/images/center.png',
 		WT_ROOT.'themes/webtrees/images/center.png',
 		WT_ROOT.'themes/xenea/images/center.png',
+		// Removed in 1.3.0
+		WT_ROOT.'admin_site_ipaddress.php',
+		WT_ROOT.'downloadgedcom.php',
+		WT_ROOT.'export_gedcom.php',
+		WT_ROOT.'gedcheck.php',
+		WT_ROOT.'images',
+		WT_ROOT.'includes/dmsounds_UTF8.php',
+		WT_ROOT.'includes/functions/functions_name.php',
+		WT_ROOT.'includes/grampsxml.rng',
+		WT_ROOT.'includes/session_spider.php',
+		WT_ROOT.'js/autocomplete.js.htm',
+		WT_ROOT.'js/jquery/jquery.autocomplete.js',
+		WT_ROOT.'js/prototype',
+		WT_ROOT.'js/prototype.js.htm',
+		WT_ROOT.'modules_v3/googlemap/admin_editconfig.php',
+		WT_ROOT.'modules_v3/googlemap/admin_placecheck.php',
+		WT_ROOT.'modules_v3/googlemap/flags.php',
+		WT_ROOT.'modules_v3/googlemap/images/pedigree_map.gif',
+		WT_ROOT.'modules_v3/googlemap/pedigree_map.php',
+		WT_ROOT.'modules_v3/lightbox/admin_config.php',
+		WT_ROOT.'modules_v3/lightbox/album.php',
+		WT_ROOT.'modules_v3/lightbox/functions/lb_call_js.php',
+		WT_ROOT.'modules_v3/lightbox/functions/lb_head.php',
+		WT_ROOT.'modules_v3/lightbox/functions/lb_link.php',
+		WT_ROOT.'modules_v3/lightbox/functions/lightbox_print_media_row.php',
+		WT_ROOT.'modules_v3/tree/css/vline.jpg',
+		WT_ROOT.'themes/_administration/images/darrow2.png',
+		WT_ROOT.'themes/_administration/images/darrow.png',
+		WT_ROOT.'themes/_administration/images/ddarrow.png',
+		WT_ROOT.'themes/_administration/images/delete_grey.png',
+		WT_ROOT.'themes/_administration/images/family.png',
+		WT_ROOT.'themes/_administration/images/find_facts.png',
+		WT_ROOT.'themes/_administration/images/header.png',
+		WT_ROOT.'themes/_administration/images/help.png',
+		WT_ROOT.'themes/_administration/images/indi.png',
+		WT_ROOT.'themes/_administration/images/larrow2.png',
+		WT_ROOT.'themes/_administration/images/larrow.png',
+		WT_ROOT.'themes/_administration/images/ldarrow.png',
+		WT_ROOT.'themes/_administration/images/media.png',
+		WT_ROOT.'themes/_administration/images/note.png',
+		WT_ROOT.'themes/_administration/images/rarrow2.png',
+		WT_ROOT.'themes/_administration/images/rarrow.png',
+		WT_ROOT.'themes/_administration/images/rdarrow.png',
+		WT_ROOT.'themes/_administration/images/repository.png',
+		WT_ROOT.'themes/_administration/images/source.png',
+		WT_ROOT.'themes/_administration/images/uarrow2.png',
+		WT_ROOT.'themes/_administration/images/uarrow.png',
+		WT_ROOT.'themes/_administration/images/udarrow.png',
+		WT_ROOT.'themes/clouds/images/favorites.png',
+		WT_ROOT.'themes/clouds/images/lists.png',
+		WT_ROOT.'themes/clouds/images/menu_media.png',
+		WT_ROOT.'themes/clouds/images/menu_note.png',
+		WT_ROOT.'themes/clouds/images/menu_repository.png',
+		WT_ROOT.'themes/clouds/images/relationship.png',
+		WT_ROOT.'themes/clouds/images/reorder_images.png',
+		WT_ROOT.'themes/clouds/images/report.png',
+		WT_ROOT.'themes/colors/images/favorites.png',
+		WT_ROOT.'themes/colors/images/menu_media.png',
+		WT_ROOT.'themes/colors/images/menu_note.png',
+		WT_ROOT.'themes/colors/images/menu_repository.png',
+		WT_ROOT.'themes/colors/images/reorder_images.png',
+		WT_ROOT.'themes/fab/images/ancestry.png',
+		WT_ROOT.'themes/fab/images/calendar.png',
+		WT_ROOT.'themes/fab/images/descendancy.png',
+		WT_ROOT.'themes/fab/images/edit_fam.png',
+		WT_ROOT.'themes/fab/images/edit_repo.png',
+		WT_ROOT.'themes/fab/images/edit_sour.png',
+		WT_ROOT.'themes/fab/images/fanchart.png',
+		WT_ROOT.'themes/fab/images/favorites.png',
+		WT_ROOT.'themes/fab/images/hourglass.png',
+		WT_ROOT.'themes/fab/images/itree.png',
+		WT_ROOT.'themes/fab/images/relationship.png',
+		WT_ROOT.'themes/fab/images/reorder_images.png',
+		WT_ROOT.'themes/fab/images/reports.png',
+		WT_ROOT.'themes/fab/images/statistic.png',
+		WT_ROOT.'themes/fab/images/timeline.png',
+		WT_ROOT.'themes/minimal/images/ancestry.png',
+		WT_ROOT.'themes/minimal/images/buttons',
+		WT_ROOT.'themes/minimal/images/descendancy.png',
+		WT_ROOT.'themes/minimal/images/fanchart.png',
+		WT_ROOT.'themes/minimal/images/itree.png',
+		WT_ROOT.'themes/minimal/images/relationship.png',
+		WT_ROOT.'themes/minimal/images/report.png',
+		WT_ROOT.'themes/minimal/images/timeline.png',
+		WT_ROOT.'themes/minimal/images/webtrees.png',
+		WT_ROOT.'themes/webtrees/images/ancestry.png',
+		WT_ROOT.'themes/webtrees/images/descendancy.png',
+		WT_ROOT.'themes/webtrees/images/fanchart.png',
+		WT_ROOT.'themes/webtrees/images/favorites.png',
+		WT_ROOT.'themes/webtrees/images/hourglass.png',
+		WT_ROOT.'themes/webtrees/images/media/audio.png',
+		WT_ROOT.'themes/webtrees/images/media/doc.png',
+		WT_ROOT.'themes/webtrees/images/media/flash.png',
+		WT_ROOT.'themes/webtrees/images/media/flashrem.png',
+		WT_ROOT.'themes/webtrees/images/media/pdf.png',
+		WT_ROOT.'themes/webtrees/images/media/picasa.png',
+		WT_ROOT.'themes/webtrees/images/media/tex.png',
+		WT_ROOT.'themes/webtrees/images/media/unknown.png',
+		WT_ROOT.'themes/webtrees/images/media/wmv.png',
+		WT_ROOT.'themes/webtrees/images/media/wmvrem.png',
+		WT_ROOT.'themes/webtrees/images/media/www.png',
+		WT_ROOT.'themes/webtrees/images/relationship.png',
+		WT_ROOT.'themes/webtrees/images/reorder_images.png',
+		WT_ROOT.'themes/webtrees/images/statistic.png',
+		WT_ROOT.'themes/webtrees/images/timeline.png',
+		WT_ROOT.'themes/webtrees/images/w_22.png',
+		WT_ROOT.'themes/xenea/images/ancestry.png',
+		WT_ROOT.'themes/xenea/images/calendar.png',
+		WT_ROOT.'themes/xenea/images/descendancy.png',
+		WT_ROOT.'themes/xenea/images/edit_fam.png',
+		WT_ROOT.'themes/xenea/images/edit_repo.png',
+		WT_ROOT.'themes/xenea/images/edit_sour.png',
+		WT_ROOT.'themes/xenea/images/fanchart.png',
+		WT_ROOT.'themes/xenea/images/gedcom.png',
+		WT_ROOT.'themes/xenea/images/hourglass.png',
+		WT_ROOT.'themes/xenea/images/menu_help.png',
+		WT_ROOT.'themes/xenea/images/menu_media.png',
+		WT_ROOT.'themes/xenea/images/menu_note.png',
+		WT_ROOT.'themes/xenea/images/menu_repository.png',
+		WT_ROOT.'themes/xenea/images/menu_source.png',
+		WT_ROOT.'themes/xenea/images/relationship.png',
+		WT_ROOT.'themes/xenea/images/reorder_images.png',
+		WT_ROOT.'themes/xenea/images/report.png',
+		WT_ROOT.'themes/xenea/images/statistic.png',
+		WT_ROOT.'themes/xenea/images/timeline.png',
+		WT_ROOT.'themes/xenea/images/w_22.png',
 	);
 }
 

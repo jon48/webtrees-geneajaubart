@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Family.php 12463 2011-10-29 21:41:55Z greg $
+// $Id: Family.php 13766 2012-04-03 16:34:21Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -285,28 +285,9 @@ class WT_Family extends WT_GedcomRecord {
 		return $this->marriage->getDate();
 	}
 
-	/**
-	 * get the marriage year
-	 * @return string
-	 */
-	function getMarriageYear($est = true, $cal = '') {
-		// TODO - change the design to use julian days, not gregorian years.
-		$mdate = $this->getMarriageDate();
-		$mdate = $mdate->MinDate();
-		if ($cal) $mdate = $mdate->convert_to_cal($cal);
-		return $mdate->y;
-	}
-
-	/**
-	 * get the marriage month
-	 * @return string
-	 */
-	function getMarriageMonth($est = true, $cal = '') {
-		// TODO - change the design to use julian days, not gregorian years.
-		$mdate = $this->getMarriageDate();
-		$mdate=$mdate->MinDate();
-		if ($cal) $mdate = $mdate->convert_to_cal($cal);
-		return $mdate->m;
+	// Get the marriage year - displayed on lists of families
+	function getMarriageYear() {
+		return $this->getMarriageDate()->MinDate()->y;
 	}
 
 	/**
