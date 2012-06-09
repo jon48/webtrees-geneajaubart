@@ -14,7 +14,7 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-global $WT_IMAGES, $controller;
+global $controller;
 
 require_once WT_ROOT.'includes/functions/functions_places.php';
 
@@ -27,7 +27,7 @@ require_once WT_ROOT.'includes/functions/functions_places.php';
 * @return string HTML code for the missing ancestors table
 */
 function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
-	global $GEDCOM, $SHOW_LAST_CHANGE, $WT_IMAGES, $SEARCH_SPIDER, $controller;
+	global $GEDCOM, $SHOW_LAST_CHANGE, $SEARCH_SPIDER, $controller;
 	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$SHOW_EST_LIST_DATES=get_gedcom_setting(WT_GED_ID, 'SHOW_EST_LIST_DATES');
 	if (count($sosalistG)<1) return;
@@ -257,7 +257,7 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 		$html2 .= '<th>SURN</th>';
 		//PERSO Modify table to include IsSourced module
 		if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
-			$html2 .= '<th><img src="'.$WT_IMAGES['source'].'" alt="'.WT_I18N::translate('Sourced individual').'" title="'.WT_I18N::translate('Sourced individual').'" border="0" /></th>'.
+			$html2 .= '<th><i class="icon-source" title="'.WT_I18N::translate('Sourced individual').'"></i></th>'.
 				'<th>SORT_INDISC</th>';
 		} else {
 			$html2 .= '<th></th><th></th>';
@@ -270,7 +270,7 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 		$html2 .= '<th>'.WT_Gedcom_Tag::getLabel('PLAC').'</th>';
 		//PERSO Modify table to include IsSourced module
 		if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
-			$html2 .= '<th><img src="'.$WT_IMAGES['source'].'" alt="'. WT_I18N::translate('Sourced birth').'" title="'.WT_I18N::translate('Sourced birth').'" border="0" /></th>'.
+			$html2 .= '<th><i class="icon-source" title="'.WT_I18N::translate('Sourced birth').'"></i></th>'.
 				'<th>SORT_BIRTSC</th>';
 		} else {
 			$html2 .= '<th></th><th></th>';
@@ -341,9 +341,9 @@ if($maxGen>0){
 		}
 		for ($gen = $mingen; $gen <= $maxgen; $gen++) {
 			echo '<h4>';
-			if($selectedgen > 1) echo '<a href="module.php?mod=perso_sosa&mod_action=missingancestors&gen='.($gen-1).'"><img src="'.$WT_IMAGES['ldarrow'].'" title="'.WT_I18N::translate('Previous generation').'" alt="'.WT_I18N::translate('Previous generation').'" />&nbsp;&nbsp;</a>';
+			if($selectedgen > 1) echo '<a href="module.php?mod=perso_sosa&mod_action=missingancestors&gen='.($gen-1).'"><i class="icon-ldarrow" title="',WT_I18N::translate('Previous generation'),'" ></i>&nbsp;&nbsp;</a>';
 			echo WT_I18N::translate('Generation %d', $gen);
-			if($selectedgen > 1) echo '<a href="module.php?mod=perso_sosa&mod_action=missingancestors&gen='.($gen+1).'">&nbsp;&nbsp;<img src="'.$WT_IMAGES['rdarrow'].'" title="'.WT_I18N::translate('Next generation').'" alt="'.WT_I18N::translate('Next generation').'" /></a>';
+			if($selectedgen > 1) echo '<a href="module.php?mod=perso_sosa&mod_action=missingancestors&gen='.($gen+1).'">&nbsp;&nbsp;<i class="icon-rdarrow" title="',WT_I18N::translate('Next generation'),'" ></i></a>';
 			echo '</h4>';
 			$listGenG=WT_Perso_Functions_Sosa::getSosaListAtGeneration($gen-1);
 			$listGenG1=WT_Perso_Functions_Sosa::getSosaListAtGeneration($gen);

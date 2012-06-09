@@ -139,8 +139,8 @@ class WT_Perso_Functions_Certificates {
 		
 		if(is_dir($dirPath)){
 			$dir=opendir($dirPath);
-			while($entry = readdir($dir)){
-				if($nbCert < $limit && $entry!='.' && $entry!='..' && $entry!='Thumbs.db' &&!is_dir($dirPath.$entry.'/') && stripos($entry, $contains)!== false){
+			while(($entry = readdir($dir)) && $nbCert < $limit){
+				if($entry!='.' && $entry!='..' && $entry!='Thumbs.db' &&!is_dir($dirPath.$entry.'/') && stripos($entry, $contains)!== false){
 					$tabFiles[]=utf8_encode($entry);
 					$nbCert++;
 				}
@@ -155,14 +155,11 @@ class WT_Perso_Functions_Certificates {
 	 *
 	 * @param string $city City to search in
 	 * @param string $contains Characters to match
-	 * @param string $limit Maximum number of results
 	 */
-	public static function printCertificateListBeginWith($city, $contains, $limit = 10) {	
-		$listCertif=WT_Perso_Functions_Certificates::getCertificateListBeginWith($city, $contains, $limit);
+	public static function printCertificateListBeginWith($city, $contains) {	
+		$listCertif=WT_Perso_Functions_Certificates::getCertificateListBeginWith($city, $contains, 10);
 		
-		foreach ($listCertif as $element) {
-			echo $element."\n";			
-		}
+		echo Zend_Json::encode($listCertif);
 	}
 	
 	/**

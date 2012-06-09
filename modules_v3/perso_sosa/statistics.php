@@ -35,7 +35,7 @@ if($indi_root){
 	$diffSosaCount = WT_Perso_Functions_Sosa::getDifferentSosaCount();
 	$percSosaBase = WT_Perso_Functions::getPercentage($diffSosaCount, $stats->_totalIndividuals());
 	$implex = 100-WT_Perso_Functions::getPercentage($diffSosaCount, $sosaCount);
-	if($indi_root->canDisplayDetails()) echo '<h4>'.WT_I18N::translate('%s\'s ancestors', PrintReady($indi_root->getFullName())).'</h4>';
+	if($indi_root->canDisplayDetails()) echo '<h4>'.WT_I18N::translate('%s\'s ancestors', $indi_root->getFullName()).'</h4>';
 	echo '<table class="list_table">',
 		'<td colspan="2" class="topbottombar center">',WT_I18N::translate('General statistics'),'</td>',
 		'<tr><td class="descriptionbox">', WT_I18N::translate('Number of ancestors'),'</td>',

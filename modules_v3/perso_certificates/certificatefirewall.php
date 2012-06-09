@@ -94,8 +94,8 @@ function sendErrorAndExit($type, $line1, $line2 = false) {
 		echo "<!-- filler space so IE will display the custom 404 error -->";
 		echo "\n<div align=\"center\">", $line1, "</div>\n";
 		if ($line2) {
-			// line2 comes from url, wrap in PrintReady
-			echo "<div align=\"center\">", PrintReady($line2), "</div>\n";
+			// line2 comes from url
+			echo "<div align=\"center\">", htmlspecialchars($line2), "</div>\n";
 		}
 		echo "</body></html>\n";
 	}

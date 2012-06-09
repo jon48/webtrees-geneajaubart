@@ -196,9 +196,9 @@ class WT_Perso_Functions_Print {
 				$tempURL .= "parent[{$pindex}]=".rawurlencode($ppart).'&amp;';
 			}
 			$tempURL .= 'level='.count($levels);
-			$html .= '<a href="'.$tempURL.'"> '.PrintReady($displayPlace).'</a>';
+			$html .= '<a href="'.$tempURL.'"> '.$displayPlace.'</a>';
 		} else {
-			$html.=PrintReady($displayPlace);
+			$html.=$displayPlace;
 		}
 		return $html;
 	}
@@ -242,13 +242,11 @@ class WT_Perso_Functions_Print {
 	 * @return string HTML code for the formatted Sosa numbers
 	 */
 	public static function formatSosaNumbers($sosatab, $format = 1, $size = 'small'){
-		global $WT_IMAGES;
-
 		$html = '';
 		switch($format){
 			case 1:
 				if($sosatab && count($sosatab)>0){
-					$html = '<img src="'.$WT_IMAGES['sosa'].'" title="'.WT_I18N::translate('Sosa').'" alt="'.WT_I18N::translate('Sosa').'" class="sosa_'.$size.'" />';
+					$html = '<i class="icon-perso-sosa_'.$size.'" title="'.WT_I18N::translate('Sosa').'"></i>';
 				}
 				break;
 			case 2:
@@ -256,7 +254,7 @@ class WT_Perso_Functions_Print {
 					ksort($sosatab);
 					$tmp_html = array();
 					foreach ($sosatab as $sosa => $gen) {
-						$tmp_html[] = '<img src="'.$WT_IMAGES['sosa'].'" title="'.WT_I18N::translate('Sosa').'" alt="'.WT_I18N::translate('Sosa').'" class="sosa_'.$size.'" />&nbsp;<strong>'.$sosa.'&nbsp;'.WT_I18N::translate('(G%s)', $gen).'</strong>';
+						$tmp_html[] = '<i class="icon-perso-sosa_'.$size.'" title="'.WT_I18N::translate('Sosa').'"></i>&nbsp;<strong>'.$sosa.'&nbsp;'.WT_I18N::translate('(G%s)', $gen).'</strong>';
 					}
 					$html = implode(' - ', $tmp_html);
 				}
@@ -280,8 +278,6 @@ class WT_Perso_Functions_Print {
 	 * @return string HTML code for IsSourced icon
 	 */
 	public static function formatIsSourcedIcon($sourceType, $isSourced, $tag='EVEN', $format = 1, $size='normal'){
-		global $WT_IMAGES;
-
 		$html='';
 		$image=null;
 		$title=null;
@@ -340,7 +336,7 @@ class WT_Perso_Functions_Print {
 					default:
 						break;
 				}
-				if($image && $title) $html = '<img src="'.$WT_IMAGES[$image].'" title="'.$title.'" alt="'.$title.'" class="sourced_'.$size.'" />';
+				if($image && $title) $html = '<i class="icon-perso-sourced-'.$size.'_'.$image.'" title="'.$title.'"></i>';
 				break;
 			default:
 				break;

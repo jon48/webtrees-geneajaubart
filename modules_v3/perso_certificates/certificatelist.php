@@ -27,7 +27,7 @@ require_once WT_ROOT.'includes/functions/functions_print_lists.php';
  * @return string HTML code for table of certificates
  */
 function format_certificate_table($certificates, $city) {
-	global $SHOW_LAST_CHANGE, $TEXT_DIRECTION, $WT_IMAGES, $SEARCH_SPIDER, $controller;
+	global $SHOW_LAST_CHANGE, $TEXT_DIRECTION, $SEARCH_SPIDER, $controller;
 
 	if (!$certificates) {
 		return;
@@ -115,9 +115,9 @@ $controller
 
 echo '<div class="pcertif-list-page center"><h2>', WT_I18N::translate('Certificates'), '</h2>';
 
-// Get Javascript variables from lb_config.php ---------------------------
 if (WT_USE_LIGHTBOX) {
-	require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_call_js.php';
+	$album = new lightbox_WT_Module();
+	$album->getPreLoadContent();
 }
 
 $tabCities=WT_Perso_Functions_Certificates::getCitiesList();

@@ -16,11 +16,9 @@ if (!defined('WT_WEBTREES')) {
 
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
-global $SEARCH_SPIDER, $SURNAME_LIST_STYLE, $WT_IMAGES, $UNKNOWN_NN, $controller;
+global $SEARCH_SPIDER, $SURNAME_LIST_STYLE, $UNKNOWN_NN, $controller;
 
 $controller=new WT_Controller_Base();
-
-define('WT_ICON_RINGS', '<img src="'.$WT_IMAGES['rings'].'" alt="'.WT_Gedcom_Tag::getLabel('MARR').'" title="'.WT_Gedcom_Tag::getLabel('MARR').'" />');
 
 // We show three different lists: initials, surnames and individuals
 // Note that the data may contain special chars, such as surname="<unknown>",
@@ -128,10 +126,10 @@ if ($show=='lineage' || $show=='surn') {
 		}
 	} else {
 		//Link to indilist
-		echo '<p class="center"><strong><a href="indilist.php?ged='.WT_GEDCOM.'&surname='.urlencode($surname).'">'.WT_I18N::translate('Go to the list of individuals with surname %s', check_NN($legend)).'</a></strong></p>';
+		echo '<p class="center"><strong><a href="indilist.php?ged='.WT_GEDCOM.'&surname='.urlencode($surname).'">'.WT_I18N::translate('Go to the list of individuals with surname %s', $legend).'</a></strong></p>';
 		
 		if ($legend && $show_all=='no') {
-			$legend=WT_I18N::translate('Individuals in %s lineages', check_NN($legend));
+			$legend=WT_I18N::translate('Individuals in %s lineages', $legend);
 		}
 		
 		WT_Perso_Functions_PatronymicLineage::printLineages($surname, $legend, WT_GED_ID);

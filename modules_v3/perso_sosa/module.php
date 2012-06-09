@@ -144,15 +144,16 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 	
 	// Implement WT_Perso_Module_Configurable
 	public function h_config_tab_content(){
-
-		require_once WT_ROOT.WT_MODULES_DIR.$this->getName().'/js/computesosa.js.htm';
+		global $controller;
+		
+		$controller->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/computesosa.js');
 		
 		echo '<div id="'.$this->getName().'"><table class="gm_edit_config"><tr><td><dl>';
 		// Load all available gedcoms
 		$all_gedcoms = get_all_gedcoms();
 		foreach($all_gedcoms as $ged_id => $ged_name){
 			if(userGedcomAdmin(WT_USER_ID, $ged_id)){
-				$title=PrintReady(strip_tags(get_gedcom_setting($ged_id, 'title')));
+				$title=strip_tags(get_gedcom_setting($ged_id, 'title'));
 				echo '<dt>', WT_I18N::translate('Root individual for <em>%s</em>', $title), help_link('config_root_indi', $this->getName()), '</dt>',
 					'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('gedcom_setting-PERSO_PS_ROOT_INDI-'.$ged_id, get_gedcom_setting($ged_id, 'PERSO_PS_ROOT_INDI')),'</dd>',
 					'<dt>', WT_I18N::translate('Compute all Sosas for <em>%s</em>', $title), help_link('config_computesosa', $this->getName()), '</dt>',
@@ -209,9 +210,9 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 	 * @return string HTML code result to display
 	 */
 	private function computeSosaAjax(){
-		global $WT_IMAGES, $GEDCOM, $tmp_sosatable;
+		global $GEDCOM, $tmp_sosatable;
 		
-		$html = '<img class="progressicon" src="'.$WT_IMAGES['error'].'" alt="'.WT_I18N::translate('Error').'" />';
+		$html = '<i class="icon-perso-error" alt="'.WT_I18N::translate('Error').'"></i>';
 		
 		$ged_id = safe_GET_integer('gid', 0, 1000000, WT_GED_ID);
 		if($ged_id && userGedcomAdmin(WT_USER_ID, $ged_id)){		
@@ -225,7 +226,7 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 					$tmp_sosatable = array();		
 					$dindi->addAndComputeSosa(1);
 					WT_Perso_Functions_Sosa::flushTmpSosaTable(true);
-					$html = '<img class="progressicon" src="'.$WT_IMAGES['success'].'" alt="'.WT_I18N::translate('Success').'" />';
+					$html = '<i class="icon-perso-success" title="'.WT_I18N::translate('Success').'"></i>';
 				}
 			}
 			$GEDCOM = $old_gedcom;			
@@ -237,14 +238,14 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 	}
 	
 	/**
-	 * Compute asynchronously the Sosa list from the individual enteres en parameter, and return the result.
+	 * Compute asynchronously the Sosa list from the individual enters in parameter, and return the result.
 	 *
 	 * @return string HTML code result to display
 	 */
 	private function computeSosaFromIndiAjax(){
-		global $WT_IMAGES, $tmp_removeSosaTab, $tmp_sosatable;
+		global $tmp_removeSosaTab, $tmp_sosatable;
 		
-		$html = '<img class="progressicon" src="'.$WT_IMAGES['error'].'" alt="'.WT_I18N::translate('Error').'" />';
+		$html = '<i class="icon-perso-error" alt="'.WT_I18N::translate('Error').'"></i>';
 		
 		$pid = safe_GET_xref('pid');
 		if(WT_USER_CAN_EDIT && $pid){
@@ -261,7 +262,7 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 						$dindi->addAndComputeSosa($sosa);
 					}
 					WT_Perso_Functions_Sosa::flushTmpSosaTable(true);
-					$html = '<img class="progressicon" src="'.$WT_IMAGES['success'].'" alt="'.WT_I18N::translate('Success').'" />&nbsp;'.WT_I18N::translate('Computed');
+					$html = '<i class="icon-perso-success" title="'.WT_I18N::translate('Success').'"></i>&nbsp;'.WT_I18N::translate('Computed');
 				}
 				else{
 					$html .= '&nbsp;'.WT_I18N::translate('Individual is not a Sosa');	
@@ -284,16 +285,18 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 	private function computeSosaEditInterface(){
 		
 		$controller=new WT_Controller_Simple();
-		$controller
-		->setPageTitle(WT_I18N::translate('Compute Sosas'))
-		->pageHeader()
-		->requireMemberLogin();
+		$controller		
+			->requireMemberLogin()
+			->setPageTitle(WT_I18N::translate('Compute Sosas'))
+			->pageHeader();
 		
 		echo '<div class="helpheader">', WT_I18N::translate('Compute Sosas'), '</div>';
 		
 		$pid = safe_GET_xref('pid');
 		if($pid){
-			require_once WT_ROOT.WT_MODULES_DIR.$this->getName().'/js/computesosaindi.js.htm';
+			$controller
+				->addInlineJavaScript('var sosa_pid = "'.$pid.'";')
+				->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/computesosaindi.js');
 			
 			echo '<div id="loadingarea"></div>';
 		}

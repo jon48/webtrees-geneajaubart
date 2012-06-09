@@ -27,8 +27,7 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $WT_IMAGES, $ctype;
-		global $controller;
+		global $ctype, $controller;
 		
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
@@ -42,17 +41,23 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 			');
 		
 		// Welcome section - gedcom title, date, statistics - based on gedcom_block
-		$title = '';
-		if ($ctype=='gedcom' && WT_USER_GEDCOM_ADMIN) {
-			$title.='<a href="javascript: configure block" onclick="window.open(\'index_edit.php?action=configure&amp;ctype='.$ctype.'&amp;block_id='.$block_id.'\', \'_blank\', \'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1\'); return false;">';
-			$title.='<img class="adminicon" src="'.$WT_IMAGES["admin"].'" width="15" height="15" border="0" alt="'.WT_I18N::translate('Configure').'" /></a>';
-		}
-		$title.=get_gedcom_setting(WT_GED_ID, 'title');
+		$indi_xref=$controller->getSignificantIndividual()->getXref();
+		$id=$this->getName().$block_id;
+		$class=$this->getName().'_block';
+		$title='<span dir="auto">'.get_gedcom_setting(WT_GED_ID, 'title').'</span>';
 		
 		$piwik_enabled=get_block_setting($block_id, 'piwik_enabled', false);
 		
-		$content = '<div class="center">';
-		$content .= '<br />'.format_timestamp(client_time()).'<br />';
+		$content = '<table><tr>';
+		$content .= '<td><a href="pedigree.php?rootid='.$indi_xref.'&amp;ged='.WT_GEDURL.'"><i class="icon-pedigree"></i><br>'.WT_I18N::translate('Default chart').'</a></td>';
+		$content .= '<td><a href="individual.php?pid='.$indi_xref.'&amp;ged='.WT_GEDURL.'"><i class="icon-indis"></i><br>'.WT_I18N::translate('Default individual').'</a></td>';
+		if (get_site_setting('USE_REGISTRATION_MODULE') && WT_USER_ID==false) {
+			$content .= '<td><a href="'.WT_LOGIN_URL.'?action=register"><i class="icon-user_add"></i><br>'.WT_I18N::translate('Request new user account').'</a></td>';
+		}
+		$content .= '</tr>';
+		$content .= '</table>';
+		
+		$content .= '<div class="center">';		
 		if ($piwik_enabled){
 			$visitCountYear = $this->getNumberOfVisitsPiwik($block_id);
 			if($visitCountYear){
@@ -69,14 +74,14 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		// Login section - based on login_block
 		if (WT_USER_ID) {
 			$content .= '<div class="center"><form method="post" action="index.php?logout=1" name="logoutform" onsubmit="return true;">';
-			$content .= '<br /><a href="edituser.php" class="name2">'.WT_I18N::translate('Logged in as ').' ('.WT_USER_NAME.')</a><br /><br />';
+			$content .= '<br><a href="edituser.php" class="name2">'.WT_I18N::translate('Logged in as ').' ('.WT_USER_NAME.')</a><br><br>';
 
-			$content .= '<input type="submit" value="'.WT_I18N::translate('Logout').'" />';
+			$content .= '<input type="submit" value="'.WT_I18N::translate('Logout').'">';
 
-			$content .= '<br /><br /></form></div>';
+			$content .= '<br><br></form></div>';
 		} else {
 			$content .= '<div id="perso-login-box">
-							<form id="perso-login-form" name="perso-login-form" method="post" action="'.WT_LOGIN_URL.'" onsubmit="t = new Date(); document.login-form.usertime.value=t.getFullYear()+\'-\'+(t.getMonth()+1)+\'-\'+t.getDate()+\' \'+t.getHours()+\':\'+t.getMinutes()+\':\'+t.getSeconds(); return true;">
+							<form id="perso-login-form" name="perso-login-form" method="post" action="'.WT_LOGIN_URL.'" onsubmit="t = new Date(); this.usertime.value=t.getFullYear()+\'-\'+(t.getMonth()+1)+\'-\'+t.getDate()+\' \'+t.getHours()+\':\'+t.getMinutes()+\':\'+t.getSeconds(); return true;">
 							<input type="hidden" name="action" value="login">
 							<input type="hidden" name="url" value="index.php">
 							<input type="hidden" name="ged" value="'; if (isset($ged)) $content.= htmlspecialchars($ged); else $content.= htmlentities(WT_GEDCOM); $content.= '">
@@ -111,7 +116,7 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 				<h4>'. WT_I18N::translate('Lost password request').'</h4>
 				<div>
 					<label for="perso-username">'. WT_I18N::translate('Username or email address').
-						'<input type="text" id="perso-username" name="username" value="" autofocus>
+						'<input type="text" id="perso-username" name="username" value="">
 					</label>
 				</div>
 				<div><input type="submit" value="'. WT_I18N::translate('Continue'). '"></div>

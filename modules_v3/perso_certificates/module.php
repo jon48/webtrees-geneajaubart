@@ -196,16 +196,18 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 	}
 	
 	//Implement WT_Perso_Module_CustomSimpleTagManager
-	public function h_get_simpletag_editor($tag, $value = null, $element_id = '', $element_name = '', $context = null, $contextid = null){
-		global $ENABLE_AUTOCOMPLETE;
+	public function h_get_simpletag_editor($tag, $value = null, $element_id = '', $element_name = '', $context = null, $contextid = null){		
+		global $controller;
 		
 		$html = '';
 		
 		switch($tag){
 			case '_ACT':
 				$element_id = $tag.floor(microtime()*1000000); //replace $element_id so that it is unique
-				if ($ENABLE_AUTOCOMPLETE) require_once WT_ROOT.WT_MODULES_DIR.$this->getName().'/js/autocomplete.js.htm';
-				require WT_ROOT.WT_MODULES_DIR.$this->getName().'/js/updatecertificatevalues.js.htm';
+				$controller
+					->addExternalJavaScript('js/autocomplete.js')
+					->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/autocomplete.js')
+					->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/updatecertificatevalues.js');
 				$city='';
 				$certif='';
 				if($value){
@@ -216,14 +218,14 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 					}
 				}
 				$tabCities = WT_Perso_Functions_Certificates::getCitiesList();
-				$html .= '<select id="certifCity'.$element_id.'" class="_CITY" onchange="updateTextCertifCity'.$element_id.'(\''.$element_id.'\')" >';
+				$html .= '<select id="certifCity'.$element_id.'" class="_CITY">';
 				foreach ($tabCities as $cities){
 					$selectedCity='';
 					if($cities==$city) $selectedCity='selected="true"';
 					$html .= '<option value="'.$cities.'" '.$selectedCity.' />'.$cities.'</option>';
 				}
 				$html .= '</select>';
-				$html .= '<input id="certifFile'.$element_id.'" autocomplete="off" class="_ACT ac_input" value="'.$certif.'" size="35" onchange="updateTextCertif'.$element_id.'(\''.$element_id.'\')"  onblur="updateTextCertif'.$element_id.'(\''.$element_id.'\')" onmouseout="updateTextCertif'.$element_id.'(\''.$element_id.'\')"/>';		
+				$html .= '<input id="certifFile'.$element_id.'" autocomplete="off" class="_ACT" value="'.$certif.'" size="35" />';		
 				$html .= '<input type="hidden" id="'.$element_id.'" name = "'.$element_name.'" value="'.$value.'" size="35"/>';
 		}
 		
@@ -262,9 +264,7 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 	 * @param string $certificatePath Path of the Certificate (as per the GEDCOM)
 	 * @param string $sid ID of the linked source, if it exists
 	 */
-	private function getDisplay_ACT($certificatePath, $sid = null){
-		global $WT_IMAGES;
-		
+	private function getDisplay_ACT($certificatePath, $sid = null){		
 		$certdetails = explode('/',$certificatePath,2);
 		$html = '';
 		if(count($certdetails)==2){
@@ -275,7 +275,7 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 			$html= '<a href="'.$pathCertif.'" title="'.$requestedCertif.'"'.
 					' rel="clearbox[certificate]"'.
 					' rev="PC::'.$requestedCity.'::'.$requestedCertif.'::">'.
-					'<img src="'.$WT_IMAGES["certificate"]."\" class=\"certif_icon\" /></a>";
+					'<i class="icon-perso-certificate margin-h-2"></i></a>';
 		}
 		return $html;
 	}	

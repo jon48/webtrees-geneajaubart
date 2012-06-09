@@ -14,7 +14,7 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-global $WT_IMAGES, $controller;
+global $controller;
 
 require_once WT_ROOT.'includes/functions/functions_places.php';
 
@@ -27,7 +27,7 @@ require_once WT_ROOT.'includes/functions/functions_places.php';
 * @return string HTML code for the sosa table
 */
 function format_sosa_table($sosalist, $gen, $legend='') {
-	global $GEDCOM, $SHOW_LAST_CHANGE, $WT_IMAGES, $SEARCH_SPIDER, $MAX_ALIVE_AGE, $controller;
+	global $GEDCOM, $SHOW_LAST_CHANGE, $SEARCH_SPIDER, $MAX_ALIVE_AGE, $controller;
 	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$SHOW_EST_LIST_DATES=get_gedcom_setting(WT_GED_ID, 'SHOW_EST_LIST_DATES');
 	if (count($sosalist)<1) return;
@@ -213,7 +213,7 @@ function format_sosa_table($sosalist, $gen, $legend='') {
 	$html .= '<th>'.WT_Gedcom_Tag::getLabel('PLAC').'</th>';
 	//PERSO Modify table to include IsSourced module
 	if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
-		$html .= '<th><img src="'.$WT_IMAGES['source'].'" alt="'.WT_I18N::translate('Sourced birth').'" title="'.WT_I18N::translate('Sourced birth').'" border="0" /></th>'.
+		$html .= '<th><i class="icon-source" title="'.WT_I18N::translate('Sourced birth').'" /></th>'.
 		'<th>SORT_BIRTSC</th>';
 	} else {
 		$html .= '<th></th><th></th>';
@@ -226,7 +226,7 @@ function format_sosa_table($sosalist, $gen, $legend='') {
 	$html .= '<th>'.WT_Gedcom_Tag::getLabel('PLAC').'</th>';
 	//PERSO Modify table to include IsSourced module
 	if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
-		$html .= '<th><img src="'.$WT_IMAGES['source'].'" alt="'.WT_I18N::translate('Sourced death').'" title="'.WT_I18N::translate('Sourced death').'" border="0" /></th>'.
+		$html .= '<th><i class="icon-source" title="'.WT_I18N::translate('Sourced death').'"></i></th>'.
 			'<th>SORT_DEATSC</th>';
 	} else {
 		$html .= '<th></th><th></th>';
@@ -490,9 +490,9 @@ if($maxGen>0){
 
 	if($selectedgen){
 		echo '<h4>',
-			'<a href="module.php?mod=perso_sosa&mod_action=sosalist&gen=',$selectedgen-1,'"><img src="',$WT_IMAGES['ldarrow'],'" title="',WT_I18N::translate('Previous generation'),'" alt="',WT_I18N::translate('Previous generation'),'" />&nbsp;&nbsp;</a>',
+			'<a href="module.php?mod=perso_sosa&mod_action=sosalist&gen=',$selectedgen-1,'"><i class="icon-ldarrow" title="',WT_I18N::translate('Previous generation'),'" ></i>&nbsp;&nbsp;</a>',
 			WT_I18N::translate('Generation %d', $selectedgen),
-			'<a href="module.php?mod=perso_sosa&mod_action=sosalist&gen=',$selectedgen+1,'">&nbsp;&nbsp;<img src="',$WT_IMAGES['rdarrow'],'" title="',WT_I18N::translate('Next generation'),'" alt="',WT_I18N::translate('Next generation'),'" /></a>',
+			'<a href="module.php?mod=perso_sosa&mod_action=sosalist&gen=',$selectedgen+1,'">&nbsp;&nbsp;<i class="icon-rdarrow" title="',WT_I18N::translate('Next generation'),'" ></i></a>',
 			'</h4>';
 		$listSosa=WT_Perso_Functions_Sosa::getSosaListAtGeneration($selectedgen);
 		if($listSosa){

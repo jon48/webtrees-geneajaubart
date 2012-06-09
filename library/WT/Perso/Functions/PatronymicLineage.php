@@ -140,7 +140,7 @@ class WT_Perso_Functions_PatronymicLineage {
 							$marrdate = strip_tags($fam->getMarriageDate()->Display());
 							$marryear = $fam->getMarriageYear();
 						}
-						echo '<span class="details1" title="'.$marrdate.'">'.WT_ICON_RINGS.$marryear.'</span></a>&nbsp;';
+						echo '<span class="details1" title="'.$marrdate.'"><i class="icon-rings"></i>'.$marryear.'</span></a>&nbsp;';
 						echo WT_Perso_Functions_Print::getIndividualForList($spouse);
 					}
 					// Get the children to print
