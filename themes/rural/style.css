@@ -401,23 +401,21 @@ html[dir="rtl"] dt {float: right;margin-right: auto;margin-left: 10px;}
 #tabAction td {width:50%; text-align:center;}
 
 /* ======= List styles =========== */
-/* PERSO Add module lists */
-.source-list, .note-list, .repo-list, .media-list, .indi-list, .fam-list, .certificate-list, .sosa-list, .smissing-list  {margin:5px auto; width:98%; visibility:hidden;}
+.source-list, .note-list, .repo-list, .media-list, .indi-list, .fam-list{margin:5px auto; width:98%; visibility:hidden;}
 .recent_changes_block, .upcoming_events_block, .todays_events_block, .todo_block  {width:99%;}
 .surname-list, .givn-list  {margin:5px auto;}
-.source-list table, .note-list table, .repo-list table, .media-list table, .indi-list table, .fam-list table, .certificate-list table, .sosa-list table, .smissing-list table  {width:100%;}
-.source-list td, .note-list td, .repo-list td, .media-list td, .indi-list td, .fam-list td, .recent_changes_block td, .upcoming_events_block td, .surname-list td, .givn-list td, .certificate-list td, .sosa-list td, .smissing-list td {padding:2px 5px;}
-.indi-list td, .fam-list td, .sosa-list td, .smissing-list td {}
+.source-list table, .note-list table, .repo-list table, .media-list table, .indi-list table, .fam-list table {width:100%;}
+.source-list td, .note-list td, .repo-list td, .media-list td, .indi-list td, .fam-list td, .recent_changes_block td, .upcoming_events_block td, .surname-list td, .givn-list td {padding:2px 5px;}
+.indi-list td, .fam-list td {}
 .surname-list  td {vertical-align:top;}
-.indi-list .stats, .fam-list .stats, .sosa-list .stats {margin:0 auto; width:auto;}
-.source-list th, .note-list th, .repo-list th, .media-list th, .indi-list th, .fam-list th, .recent_changes_block th, .upcoming_events_block th, .todays_events_block th, .todo_block th, .yahrzeit_block th, .surname-list th, .givn-list th, .certificate-list th, .sosa-list th, .smissing-list th {cursor:pointer; font-weight: 600; padding: 2px 4px; white-space: nowrap;}
-.sosa-list tfoot td, .smissing-list tfoot td {font-weight: 600; padding: 2px 4px; white-space: nowrap;}
-.source-list th:last-child, .note-list th:last-child, .repo-list th:last-child , .certificate-list th:last-child {margin:0 -2px 1px 1px; padding:3px 0 4px; width:24px;}
+.indi-list .stats, .fam-list .stats {margin:0 auto; width:auto;}
+.source-list th, .note-list th, .repo-list th, .media-list th, .indi-list th, .fam-list th, .recent_changes_block th, .upcoming_events_block th, .todays_events_block th, .todo_block th, .yahrzeit_block th, .surname-list th, .givn-list th {cursor:pointer; font-weight: 600; padding: 2px 4px; white-space: nowrap;}
+.source-list th:last-child, .note-list th:last-child, .repo-list th:last-child {margin:0 -2px 1px 1px; padding:3px 0 4px; width:24px;}
 .givn-list th{cursor:pointer;white-space: nowrap;padding:2px;text-align:center;}
 .givn-list th{cursor:pointer;white-space: nowrap;padding:2px;text-align:center;}
 #source-details h2, #sourcelist-page h2, #note-details h2, #notelist-page h2, #repo-details h2, #repolist-page h2, #media-details h2, #medialist-page h2, #stats-details h2 {margin-bottom:20px; text-align:center;}
-#source-tabs, #note-tabs, #repo-tabs, #media-tabs, #certificate-tabs {margin:auto; visibility:hidden; width:95%;}
-#source-edit, #note-edit, #repo-edit, #media-edit, #certificate-edit {overflow-x:auto;}
+#source-tabs, #note-tabs, #repo-tabs, #media-tabs {margin:auto; visibility:hidden; width:95%;}
+#source-edit, #note-edit, #repo-edit, #media-edit {overflow-x:auto;}
 #stats-tabs {margin:auto; visibility:hidden; width:90%;}
 .media-list td img {display:block; height:40px; margin:3px auto;}
 .loading-image{background:transparent url(images/loading.gif) 50% 50% no-repeat; height:50px; margin:50px;}
@@ -427,7 +425,7 @@ html[dir="rtl"] dt {float: right;margin-right: auto;margin-left: 10px;}
 #searchAccordion-indi, #searchAccordion-fam, #searchAccordion-source, #searchAccordion-note {margin:auto; width:99%;}
 #place-heirarchy h2, #place-heirarchy h4 {text-align:center;}
 
-html[dir='rtl'] .source-list th:last-child, html[dir='rtl'] .note-list th:last-child, html[dir='rtl'] .repo-list th:last-child, .certificate-list th:last-child, .sosa-list th:last-child, .smissing-list th:last-child {margin:0 1px 1px -2px;}
+html[dir='rtl'] .source-list th:last-child, html[dir='rtl'] .note-list th:last-child, html[dir='rtl'] .repo-list th:last-child {margin:0 1px 1px -2px;}
 
 /* ======= Block styles ========== */
 #index_main_blocks {clear:none; width:66%; float:left;}
@@ -555,7 +553,7 @@ html[dir='rtl'] .main-menu-item  li li a {float:right;padding:1px 5px 1px 10px;}
 #menu-story     {background-position:center -640px;}
 
 /* Sub-menu icons */
-#menu-admin                 {background-position:left     0px;} html[dir=rtl] #menu-admin                 {background-position:right     0px;}
+#menu-admin                 {background-position:left     0;}   html[dir=rtl] #menu-admin                 {background-position:right     0;}
 #menu-branches              {background-position:left  -450px;} html[dir=rtl] #menu-branches              {background-position:right  -450px;}
 #menu-calendar-day          {background-position:left   -60px;} html[dir=rtl] #menu-calendar-day          {background-position:right   -60px;}
 #menu-calendar-month        {background-position:left   -60px;} html[dir=rtl] #menu-calendar-month        {background-position:right   -60px;}
@@ -614,7 +612,6 @@ html[dir='rtl'] .main-menu-item  li li a {float:right;padding:1px 5px 1px 10px;}
 #menu-obje-del              {background-position:left  -840px;} html[dir=rtl] #menu-obje-del              {background-position:right  -840px;}
 #menu-obje-edit             {background-position:left -1110px;} html[dir=rtl] #menu-obje-edit             {background-position:right -1110px;}
 #menu-obje-editraw          {background-position:left  -240px;} html[dir=rtl] #menu-obje-editraw          {background-position:right  -240px;}
-#menu-obje-hidechan         {background-position:left -1110px;} html[dir=rtl] #menu-obje-hidechan         {background-position:right -1110px;}
 #menu-obje-link             {background-position:left -1140px;} html[dir=rtl] #menu-obje-link             {background-position:right -1140px;}
 #menu-obje-link-fam         {background-position:left   -90px;} html[dir=rtl] #menu-obje-link-fam         {background-position:right   -90px;}
 #menu-obje-link-indi        {background-position:left  -300px;} html[dir=rtl] #menu-obje-link-indi        {background-position:right  -300px;}
@@ -632,7 +629,7 @@ html[dir='rtl'] .main-menu-item  li li a {float:right;padding:1px 5px 1px 10px;}
 #menu-sour-del              {background-position:left  -840px;} html[dir=rtl] #menu-sour-del              {background-position:right  -840px;}
 #menu-sour-edit             {background-position:left  -960px;} html[dir=rtl] #menu-sour-edit             {background-position:right  -960px;}
 #menu-sour-editraw          {background-position:left  -240px;} html[dir=rtl] #menu-sour-editraw          {background-position:right  -240px;}
-#menu-story-sub          	{background-position:left -1240px;} html[dir=rtl] #menu-story-sub	          {background-position:right  -1240px;}
+#menu-story-sub          {background-position:left  -1208px;} html[dir=rtl] #menu-sour-editraw          {background-position:right  -1208px;}
 #menu-tree li               {background-position:left  -240px;} html[dir=rtl] #menu-tree li               {background-position:right  -240px;}
 
 #menu-language li {text-align:left;} /* The language menu is always LTR, even on RTL pages */
@@ -723,7 +720,7 @@ html[dir='rtl']  dd .editlink, html[dir='rtl']  dd .deletelink  {float:left;}
 .deleteicon {background-position: -100px -32px; width: 24px; height:16px;}
 
 .icon_arrow {display:block; background:url(images/small_menu_sprite.png) no-repeat left 0;}
-.icon_arrow {background-position: 90% -1168px;} html[dir='rtl'] .icon_arrow {background-position: 10% -1186px;}
+.icon_arrow {background-position:90% -1166px;} html[dir='rtl'] .icon_arrow {background-position:10% -1184px;}
 
 /* =========== Indi tabs ================== */
 /* Facts & Events tab */

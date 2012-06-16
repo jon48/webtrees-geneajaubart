@@ -1,0 +1,20 @@
+/* $Id: msie.css 13409 2012-02-07 23:39:46Z rob $ */
+
+/*
+ * The following style definitions can be removed when IE supports the "opacity"
+ * specification in place of its proprietary and non-standard method.
+ */
+
+.rela {filter: alpha(opacity=67);}
+a.showit:hover > span {filter: alpha(opacity=85);}
+.ltr {text-align: left;}
+
+
+#menu-theme, #menu-language, #menu-theme, #menu-favorites {*padding-right: 10px;}
+div.blockcontent {*margin-top:-2px;}
+#topMenu {*position: relative; *z-index: 1;}
+#header {*position: relative; *z-index: 2002; *height: 120px;}
+.makeMenu li ul { *top: 8px;}
+.itr {top: 30px;}
+.itr:hover .popup {top: 20px;}
+

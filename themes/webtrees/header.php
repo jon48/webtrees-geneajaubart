@@ -39,6 +39,11 @@ echo
 	'<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css">',
 	'<link rel="stylesheet" type="text/css" href="', $stylesheet, '">';
 
+	//PERSO Add extra style sheet for personal additions
+	$extrastylesheet= str_replace('.css', '.extra.css', $stylesheet);
+	echo '<link rel="stylesheet" type="text/css" href="', $extrastylesheet, '">';
+	//END PERSO
+
 switch ($BROWSERTYPE) {
 //case 'chrome': uncomment when chrome.css file needs to be added, or add others as needed
 case 'msie':
@@ -66,6 +71,12 @@ if ($view!='simple') {
 	} else {
 		echo '<li>', login_link(), '</li> ';
 	}
+	//PERSO Extend header
+	echo '<li>';
+	$hook_print_header = new WT_Perso_Hook('h_print_header');
+	$hook_print_header->execute();
+	echo '</li>';
+	//END PERSO
 	$menu=WT_MenuBar::getFavoritesMenu();
 	if ($menu) {
 		echo $menu->GetMenuAsList();

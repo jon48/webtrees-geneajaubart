@@ -33,17 +33,33 @@
  */
  
  /* Large menu icons */
- #menu-sosa       				{background-position:center  -600px;}
- 
+.main-menu-item > li[id^='menu-perso-'] {background-image:url(images/perso/large_menu_sprite.png);}
+#menu-perso-sosa       				{background-position:center  0px;}
+
  /* Small menu icon */
-#menu-list-perso-certificate   	{background-position:left    -570px;} html[dir=rtl] #menu-list-perso-certificate	{background-position:right    -570px;} 
-#menu-list-perso-lineage   		{background-position:left     -30px;} html[dir=rtl] #menu-list-perso-lineage 		{background-position:right     -30px;}
-#menu-sosa-list			   		{background-position:left     -90px;} html[dir=rtl] #menu-sosa-list			 		{background-position:right     -90px;}
-#menu-sosa-missing		   		{background-position:left    -450px;} html[dir=rtl] #menu-sosa-missing		 		{background-position:right    -450px;}
-#menu-sosa-stats		   		{background-position:left    -630px;} html[dir=rtl] #menu-sosa-stats		 		{background-position:right    -630px;}
-#menu-sosa-recompute	   		{background-position:left   -1210px;} html[dir=rtl] #menu-sosa-recompute	 		{background-position:right   -1210px;}
-#menu-sosa-geodispersion	   	{background-position:left    -510px;} html[dir=rtl] #menu-sosa-geodispersion 		{background-position:right    -510px;}
-#menu-sosa-geodispersion li	   	{background-position:left    -510px;} html[dir=rtl] #menu-sosa-geodispersion li		{background-position:right    -510px;}
+.main-menu-item li li[id^='menu-perso-'] {background-image:url(images/perso/small_menu_sprite.png);}
+#menu-perso-list-certificate   		{background-position:left    	0px;} html[dir=rtl] #menu-perso-list-certificate		{background-position:right    	 0px;} 
+#menu-perso-list-lineage   			{background-position:left     -30px;} html[dir=rtl] #menu-perso-list-lineage 			{background-position:right     -30px;}
+#menu-perso-sosa-list			   	{background-position:left     -60px;} html[dir=rtl] #menu-perso-sosa-list			 	{background-position:right     -60px;}
+#menu-perso-sosa-missing		   	{background-position:left     -90px;} html[dir=rtl] #menu-perso-sosa-missing		 	{background-position:right     -90px;}
+#menu-perso-sosa-stats		   		{background-position:left    -120px;} html[dir=rtl] #menu-perso-sosa-stats		 		{background-position:right    -120px;}
+#menu-perso-sosa-recompute	   		{background-position:left    -150px;} html[dir=rtl] #menu-perso-sosa-recompute	 		{background-position:right    -150px;}
+#menu-perso-sosa-geodispersion	   	{background-position:left    -180px;} html[dir=rtl] #menu-perso-sosa-geodispersion 		{background-position:right    -180px;}
+#menu-perso-sosa-geodispersion li	{background-position:left    -180px;} html[dir=rtl] #menu-perso-sosa-geodispersion li	{background-position:right    -180px;}
+
+/* Lists */
+.certificate-list, .sosa-list, .smissing-list  {margin:5px auto; width:98%; visibility:hidden;}
+.certificate-list table, .sosa-list table, .smissing-list table  {width:100%;}
+.certificate-list td, .sosa-list td, .smissing-list td {padding:2px 5px;}
+.sosa-list td, .smissing-list td {}
+.sosa-list .stats {margin:0 auto; width:auto;}
+.certificate-list th, .sosa-list th, .smissing-list th {cursor:pointer; font-weight: 600; padding: 2px 4px; white-space: nowrap;}
+.sosa-list tfoot td, .smissing-list tfoot td {font-weight: 600; padding: 2px 4px; white-space: nowrap;}
+.certificate-list th:last-child, .sosa-list th:last-child, .smissing-list th:last-child {margin:0 -2px 1px 1px; padding:3px 0 4px; width:24px;}
+#certificate-tabs {margin:auto; visibility:hidden; width:95%;}
+#certificate-edit {overflow-x:auto;}
+
+html[dir='rtl'] .certificate-list th:last-child, html[dir='rtl'] .sosa-list th:last-child, html[dir='rtl'] .smissing-list th:last-child {margin:0 1px 1px -2px;}
 
 /* Individual header extender hooks */
 #indi_perso_header{float: right;width: 84%;color: #62584D;font-size: 1.1em;margin-top: 5px;}
@@ -182,7 +198,7 @@ html[dir='rtl'] .right { float: left;}
 
 .perso_welcome_block_block #perso-login-form, .perso_welcome_block_block #perso-new_passwd_form{border:0; background:none;}
 #perso-login-box{ text-align:center; color: black;}
-#perso-login-box aa {color : #62584D;}
+#perso-login-box a {color : #62584D;}
 #perso-login-box a:hover {color : #9F8C77;}
 #perso-login-form, #perso-new_passwd_form {background-color:#E9E2DB; border:1px outset #D3C6B8; display: inline-block; margin:10px auto 0 auto; padding:5px;}
 #perso-login-form div, #perso-login-form div a, #perso-new_passwd_form div {margin:auto; padding:5px; text-align: center;}

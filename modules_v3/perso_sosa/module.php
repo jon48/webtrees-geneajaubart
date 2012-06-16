@@ -69,40 +69,28 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 		$menu = null;
 		if(WT_Perso_Functions_Sosa::isModuleOperational()){
 			//-- main menu
-			$menu = new WT_Menu(WT_I18N::translate('Sosa Statistics'), 'module.php?mod=perso_sosa&mod_action=statistics', 'menu-sosa', 'down');
-			$menu->addIcon('menu_sosa');
-			$menu->addClass('menuitem', 'menuitem_hover', 'submenu', 'icon_large_menu_sosa');
+			$menu = new WT_Menu(WT_I18N::translate('Sosa Statistics'), 'module.php?mod=perso_sosa&mod_action=statistics', 'menu-perso-sosa', 'down');
 	
 			//-- Sosa ancestors list
-			$submenu = new WT_Menu(WT_I18N::translate('Sosa Ancestors'), 'module.php?mod=perso_sosa&mod_action=sosalist', 'menu-sosa-list');
-			$submenu->addIcon('menu_sosa_list');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_menu_sosa_list');
+			$submenu = new WT_Menu(WT_I18N::translate('Sosa Ancestors'), 'module.php?mod=perso_sosa&mod_action=sosalist', 'menu-perso-sosa-list');
 			$menu->addSubMenu($submenu);
 			
 			//-- Missing ancestors list
-			$submenu = new WT_Menu(WT_I18N::translate('Missing Ancestors'), 'module.php?mod=perso_sosa&mod_action=missingancestors', 'menu-sosa-missing');
-			$submenu->addIcon('menu_missing_ancestors');
-			$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_menu_missing_ancestors');
+			$submenu = new WT_Menu(WT_I18N::translate('Missing Ancestors'), 'module.php?mod=perso_sosa&mod_action=missingancestors', 'menu-perso-sosa-missing');
 			$menu->addSubMenu($submenu);
 			
 			//-- Sosa statistics
-			$submenu = new WT_Menu(WT_I18N::translate('Sosa Statistics'), 'module.php?mod=perso_sosa&mod_action=statistics', 'menu-sosa-stats');
-			$submenu->addIcon('menu_sosa');
-			$submenu->addClass('submenuitem separator_top', 'submenuitem_hover', '', 'icon_small_sosa_statistics');
+			$submenu = new WT_Menu(WT_I18N::translate('Sosa Statistics'), 'module.php?mod=perso_sosa&mod_action=statistics', 'menu-perso-sosa-stats');
 			$menu->addSubMenu($submenu);
 			
 			// Add Geographical Dispersion, if active
 			if (array_key_exists('perso_geodispersion', WT_Module::getActiveModules()) && count(WT_Perso_Functions_Map::getEnabledGeoDispersionMaps())>0) {
-				$submenu = new WT_Menu(WT_I18N::translate('Geographical Dispersion'), 'module.php?mod=perso_geodispersion&mod_action=geodispersion', 'menu-sosa-geodispersion');
-				$submenu->addIcon('menu_geodispersion');
-				$submenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_sosa_geodispersion');
+				$submenu = new WT_Menu(WT_I18N::translate('Geographical Dispersion'), 'module.php?mod=perso_geodispersion&mod_action=geodispersion', 'menu-perso-sosa-geodispersion');
 				// Add a submenu showing all available geodispersion maps
 				foreach (WT_Perso_Functions_Map::getEnabledGeoDispersionMaps() as $map) {
 					$subsubmenu = new WT_Menu($map['title'], 'module.php?mod=perso_geodispersion&mod_action=geodispersion&geoid='.$map['id'],
-												'menu-sosa-geodispersion-'.$map['id'] // We don't use these, but a custom theme might
+												'menu-perso-sosa-geodispersion-'.$map['id'] // We don't use these, but a custom theme might
 					);
-					$subsubmenu->addIcon('menu_geodispersion');
-					$subsubmenu->addClass('submenuitem', 'submenuitem_hover', '', 'icon_small_sosa_geodispersion');
 					$submenu->addSubmenu($subsubmenu);
 				}
 				$menu->addSubMenu($submenu);
@@ -117,8 +105,6 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 					
 				$submenu = new WT_Menu(WT_I18N::translate('Complete Sosas'), '#', 'menu-sosa-recompute');
 				$submenu->addOnclick('return compute_sosa(\''.$controller->getSignificantIndividual()->getXref().'\');');
-				$submenu->addIcon('recompute_sosa');
-				$submenu->addClass('submenuitem separator_top', 'submenuitem_hover', '', 'icon_small_recompute_sosa');
 				$menu->addSubMenu($submenu);
 			}
 		}

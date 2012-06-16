@@ -131,13 +131,6 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 			$content.= '</div>';//"login-box"
 		}
 
-		// Reorganise blocks page
-		if (WT_USER_GEDCOM_ADMIN) {
-			$content .= '<div class="center">';
-			$content .=  '<a href="#" onclick="window.open(\'index_edit.php?name='.WT_GEDURL.'&amp;ctype=gedcom\', \'_blank\', \'top=50,left=10,width=600,height=500,scrollbars=1,resizable=1\'); return false;">'.WT_I18N::translate('Customize this GEDCOM Home Page').'</a><br />';
-			$content .=  '</div>';
-		}
-
 		if ($template) {
 			require WT_THEME_DIR.'templates/block_main_temp.php';
 		} else {

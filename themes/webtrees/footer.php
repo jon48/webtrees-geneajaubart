@@ -32,6 +32,10 @@ echo '</div>'; // <div id="content">
 if ($view!='simple') {
 	echo '<div id="footer">';
 	echo contact_links();
+	//PERSO Add Extra footer
+	$f_hook = new WT_Perso_Hook('h_print_footer');
+	$f_hook->execute();
+	//END PERSO
 	echo '<p class="logo">';
 	echo '<a href="', WT_WEBTREES_URL, '" target="_blank" class="icon-webtrees" title="', WT_WEBTREES, ' ', WT_VERSION_TEXT, '"></a>';
 	echo '</p>';

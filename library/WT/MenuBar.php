@@ -371,13 +371,13 @@ class WT_MenuBar {
 			//PERSO Add additional submenus : certificates, Patronymic Lineages
 			case 'perso_certificates':
 				$page='module.php?mod=perso_certificates&mod_action=certificatelist';
-				$submenu = new WT_Menu($name, $page.'&ged='.WT_GEDURL, 'menu-list-perso-certificate');
+				$submenu = new WT_Menu($name, $page.'&ged='.WT_GEDURL, 'menu-perso-list-certificate');
 				$menu->addSubmenu($submenu);
 				break;
 				
 			case 'perso_patronymiclineage':
 				$page='module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage';
-				$submenu = new WT_Menu($name, $page.str_replace('?', '&', $surname_url), 'menu-list-perso-lineage');
+				$submenu = new WT_Menu($name, $page.str_replace('?', '&', $surname_url), 'menu-perso-list-lineage');
 				$menu->addSubmenu($submenu);
 				break;
 				
