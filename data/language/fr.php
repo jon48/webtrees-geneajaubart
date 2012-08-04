@@ -268,14 +268,14 @@ return array(
 	'No Sosa root individual has been defined.'
 									=>	'L\'individu de-cujus n\'a pas été défini.',
 	'The Sosa ancestors have not been computed yet.'
-									=>	'La liste des ancêtres Sosa n\a pas été encore calculée.',
+									=>	'La liste des ancêtres Sosa n\'a pas été encore calculée.',
 	'No generation were found.'		=>	'Le nombre de générations est insuffisant',	
 	'Sosa Ancestors'				=>	'Ancêtres Sosa',	
 	'Number of Sosa ancestors: %1$d known / %2$d theoretical (%3$0.2f %%)'
 									=>	'Nombre d\'ancêtres Sosa : %1$d connus / %2$d théoriques (%3$0.2f %%)',																
 
 	//Perso IsSourced
-	'Sourced events'				=>	'Événements documentés',
+	'Sourced events'				=>	'Perso Événements documentés',
 	'Sourced individual'			=>	'Individu documenté',
 	'Sourced birth'					=>	'Naissance documentée',
 	'Sourced death'					=>	'Décès documenté',

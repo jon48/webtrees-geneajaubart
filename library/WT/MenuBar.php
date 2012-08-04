@@ -307,8 +307,8 @@ class WT_MenuBar {
 			$menulist['placelist.php']=WT_I18N::translate('Place hierarchy');
 			// Build a list of submenu items and then sort it in localized name order
 			//PERSO Add additional lists : Certificates, Patronymic Lineages
-			$menulist['perso_certificates']=WT_I18N::translate('Certificates');
-			$menulist['perso_patronymiclineage']=WT_I18N::translate('Patronymic Lineages');
+			if(array_key_exists('perso_certificates', WT_Module::getActiveModules())) $menulist['perso_certificates']=WT_I18N::translate('Certificates');
+			if(array_key_exists('perso_patronymiclineage', WT_Module::getActiveModules())) $menulist['perso_patronymiclineage']=WT_I18N::translate('Patronymic Lineages');
 			//END PERSO
 			if ($row->obje) {
 				$menulist['medialist.php']=WT_I18N::translate('Media objects');
