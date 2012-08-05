@@ -519,8 +519,8 @@ function map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $pla
 		//PERSO Add width and height
 		function createMarker(point, html, icon, name, width, height) {	
 			// Choose icon and shadow ============
-			if (icon.image) {
-				if (icon!='", WT_STATIC_URL, WT_MODULES_DIR, "googlemap/images/marker_yellow.png' && width != undefined && width > 0 && height !=undefined && height >0) {			
+			if (icon) {
+				if (icon!="'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/images/marker_yellow.png" && width != undefined && width > 0 && height !=undefined && height >0) {			
 					var iconImage = new google.maps.MarkerImage(icon,
 					null,
 					new google.maps.Point(0,0),
