@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13867 2012-04-26 16:30:59Z lukasz $
+// $Id: module.php 13999 2012-06-16 21:57:04Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -58,16 +58,16 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 		$tv = new TreeView('tvTab');
 		list($html, $js) = $tv->drawViewport($controller->record->getXref(), 3);
 		return
-			'<script type="text/javascript" src="'.$this->js().'"></script>'.
+			'<script src="'.$this->js().'"></script>'.
 			$html.
-			WT_JS_START.'
+			'<script>
 			if (document.createStyleSheet) {
 				document.createStyleSheet("'.$this->css().'"); // For Internet Explorer
 			} else {
 				jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="'.$this->css().'">\');
 			}'.
 			$js.
-			WT_JS_END;
+			'</script>';
 	}
 
 	// Implement WT_Module_Tab
@@ -109,9 +109,9 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 				$controller
 					->setPageTitle(WT_I18N::translate('Interactive tree of %s', $person->getFullName()))
 					->pageHeader()
-					->addExternalJavaScript($this->js())
-					->addInlineJavaScript($js)
-					->addInlineJavaScript('
+					->addExternalJavascript($this->js())
+					->addInlineJavascript($js)
+					->addInlineJavascript('
 					if (document.createStyleSheet) {
 						document.createStyleSheet("'.$this->css().'"); // For Internet Explorer
 					} else {
@@ -154,11 +154,11 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 		}
 	}
 
-	private function css() {
+	public function css() {
 		return WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/css/treeview.css';
 	}
 	
-	private function js() {
+	public function js() {
 		return WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/treeview.js';
 	}
 }

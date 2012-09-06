@@ -31,7 +31,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Date.php 13682 2012-03-26 08:06:35Z greg $
+// $Id: Date.php 14055 2012-06-30 10:39:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -279,7 +279,7 @@ class WT_Date {
 		return $tmp->maxJD;
 	}
 	function JD() {
-		return floor(($this->MinJD()+$this->MaxJD())/2);
+		return (int)(($this->MinJD()+$this->MaxJD())/2);
 	}
 
 	// Offset this date by N years, and round to the whole year

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: branches.php 13766 2012-04-03 16:34:21Z greg $
+// $Id: branches.php 14111 2012-07-18 12:25:09Z greg $
 
 define('WT_SCRIPT_NAME', 'branches.php');
 require './includes/session.php';
@@ -48,7 +48,7 @@ if ($surn) {
 }
 $controller
 	->pageHeader()
-	->addExternalJavaScript('js/autocomplete.js');
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
 ?>
 <div id="branches-page">

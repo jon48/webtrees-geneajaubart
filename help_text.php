@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: help_text.php 13956 2012-06-01 05:57:16Z greg $
+// $Id: help_text.php 14178 2012-08-17 21:02:13Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -915,11 +915,6 @@ case 'SHOW_DEAD_PEOPLE':
 	$text=WT_I18N::translate('Set the privacy access level for all dead people.');
 	break;
 
-case 'SHOW_EMPTY_BOXES':
-	$title=WT_I18N::translate('Empty boxes on pedigree charts');
-	$text=WT_I18N::translate('This option controls whether or not to show empty boxes on Pedigree charts.');
-	break;
-
 case 'SHOW_EST_LIST_DATES':
 	$title=WT_I18N::translate('Estimated dates for birth and death');
 	$text=WT_I18N::translate('This option controls whether or not to show estimated dates for birth and death instead of leaving blanks on individual lists and charts for individuals whose dates are not known.');
@@ -1326,11 +1321,6 @@ case 'edit_SOUR_EVEN':
 	$text=WT_I18N::translate('Each source records specific events, generally for a given date range and for a place jurisdiction.  For example a Census records census events and church records record birth, marriage, and death events.<br /><br />Select the events that are recorded by this source from the list of events provided. The date should be specified in a range format such as <i>FROM 1900 TO 1910</i>. The place jurisdiction is the name of the lowest jurisdiction that encompasses all lower-level places named in this source. For example, "Oneida, Idaho, USA" would be used as a source jurisdiction place for events occurring in the various towns within Oneida County. "Idaho, USA" would be the source jurisdiction place if the events recorded took place not only in Oneida County but also in other counties in Idaho.');
 	break;
 
-case 'edituser_change_lang':
-	$title=WT_I18N::translate('Language selector');
-	$text=WT_I18N::translate('Here you can change the language in which <b>webtrees</b> will display all its pages and messages after you have logged in.<br /><br />When you first access the site, <b>webtrees</b> assumes that you want to see everything in the language configured as the Preferred Language in your browser.  If that assumption is incorrect, you would override it here.  For example, your browser might be set to English because that is the most prevalent language on the Internet.  However, for genealogical purposes, you would prefer to see everything in Finnish or Hebrew.  Here\'s where you do that.<br /><br />The administrator controls what language choices are available to you.  If your preference isn\'t listed, you need to contact the administrator.<br /><br />Please remember that <b>webtrees</b> is very much a project staffed by an international team of unpaid volunteers.  Experts come and go.  Consequently, support for languages other than English is sometimes not as good as it should be.<br /><br />If you see something that has not been translated, has been translated incorrectly, or could be phrased better, let your administrator know.  The administrator will know how to get in touch with the <b>webtrees</b> developer team to have your concerns addressed.  Better still, volunteer some of your time.  We can use the help.');
-	break;
-
 case 'edituser_contact_meth':
 	$title=WT_I18N::translate('Preferred contact method');
 	$text=WT_I18N::translate('<b>webtrees</b> has several different contact methods.  The administrator determines which method will be used to contact him.  You have control over the method to be used to contact <u>you</u>.  Depending on site configuration, some of the listed methods may not be available to you.');
@@ -1394,11 +1384,6 @@ case 'gedcom_news_flag':
 case 'gedcom_news_limit':
 	$title=WT_I18N::translate('Limit display by:');
 	$text=WT_I18N::translate('You can limit the number of News articles displayed, thereby reducing the height of the GEDCOM News block.<br /><br />This option determines whether any limits should be applied or whether the limit should be according to the age of the article or according to the number of articles.');
-	break;
-
-case 'gedcom_title':
-	$title=WT_I18N::translate('GEDCOM title');
-	$text=WT_I18N::translate('Enter a descriptive title to be displayed when users are choosing among GEDCOM datasets at your site.');
 	break;
 
 case 'gen_missing_thumbs':
@@ -1612,11 +1597,6 @@ case 'role':
 		'<dt>'.WT_I18N::translate('Administrator').'</dt><dd>'.
 		WT_I18N::translate('This role has all the permissions of the manager role in all family trees, plus permission to change the settings/configuration of the site, users and modules.').
 		'</dd>';
-	break;
-
-case 'search_exclude_tags':
-	$title=WT_I18N::translate('Exclude filter');
-	$text=WT_I18N::translate('The <b>Exclude some non-genealogical data</b> choice will cause the Search function to ignore the following GEDCOM tags:<div style="padding-left:30px;"><b>_WT_USER</b> - Last change by<br /><b>CHAN</b> - Last change date<br /><b>FILE</b> - External File<br /><b>FORM</b> - Format<br /><b>TYPE</b> - Type<br /><b>SUBM</b> - Submitter<br /><b>REFN</b> - Reference Number</div><br />In addition to these optionally excluded tags, the Search function always excludes these tags:<div style="padding-left:30px;"><b>_UID</b> - Globally unique Identifier<br /><b>RESN</b> - Restriction</div>');
 	break;
 
 case 'search_include_ASSO':

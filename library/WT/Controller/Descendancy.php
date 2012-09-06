@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Descendancy.php 13820 2012-04-17 08:25:30Z greg $
+// $Id: Descendancy.php 14022 2012-06-20 06:30:55Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -238,7 +238,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 	
 		// children
 		$children = $family->getChildren();
-		echo '<tr><td colspan=\"3\" class=\"details1\" >&nbsp;&nbsp;';
+		echo '<tr><td colspan="3" class="details1" >&nbsp;&nbsp;';
 		if ($children) {
 			echo WT_Gedcom_Tag::getLabel('NCHI').': '.count($children);
 		} else {

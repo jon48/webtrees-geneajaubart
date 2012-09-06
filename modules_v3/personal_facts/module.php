@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13571 2012-03-08 01:43:27Z nigel $
+// $Id: module.php 14169 2012-08-12 17:50:01Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -54,14 +54,14 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 		global $EXPAND_RELATIVES_EVENTS, $controller;
 		$EXPAND_HISTO_EVENTS = false;
 
-		echo WT_JS_START;
+		echo '<script>';
 		if (!$EXPAND_RELATIVES_EVENTS) {
 			echo "jQuery('tr.row_rela').toggle();";
 		}
 		if (!$EXPAND_HISTO_EVENTS) {
 			echo "jQuery('tr.row_histo').toggle();";
 		}
-		echo WT_JS_END;
+		echo '</script>';
 
 		//-- only need to add family facts on this tab
 		if (!isset($controller->skipFamilyFacts)) {
@@ -75,31 +75,26 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 			echo '<tr><td colspan="2" class="facts_value">', WT_I18N::translate('There are no Facts for this individual.'), '</td></tr>';
 		}
 		if (!isset($controller->skipFamilyFacts)) {
-		echo '<tr id="row_top"><td colspan="2" class="descriptionbox rela">
-				<input id="checkbox_rela_facts" type="checkbox"';
-				if ($EXPAND_RELATIVES_EVENTS) echo ' checked="checked"';
-				echo 'onclick="jQuery(\'tr.row_rela\').toggle();">
-					<label for="checkbox_rela_facts">', WT_I18N::translate('Events of close relatives'), '</label>';
-				if (file_exists(get_site_setting('INDEX_DIRECTORY').'histo.'.WT_LOCALE.'.php')) {
-					echo '&nbsp;
-						<input id="checkbox_histo" type="checkbox"';
-						if ($EXPAND_HISTO_EVENTS) echo ' checked="checked"';
-					echo 'onclick="jQuery(\'tr.row_histo\').toggle();">
-					<label for="checkbox_histo">', WT_I18N::translate('Historical facts'), '</label>';
+			echo '<tr id="row_top"><td colspan="2" class="descriptionbox rela"><input id="checkbox_rela_facts" type="checkbox"';
+			if ($EXPAND_RELATIVES_EVENTS) {
+				echo ' checked="checked"';
+			}
+			echo 'onclick="jQuery(\'tr.row_rela\').toggle();"><label for="checkbox_rela_facts">', WT_I18N::translate('Events of close relatives'), '</label>';
+			if (file_exists(get_site_setting('INDEX_DIRECTORY').'histo.'.WT_LOCALE.'.php')) {
+				echo ' <input id="checkbox_histo" type="checkbox"';
+				if ($EXPAND_HISTO_EVENTS) {
+					echo ' checked="checked"';
 				}
+				echo 'onclick="jQuery(\'tr.row_histo\').toggle();"><label for="checkbox_histo">', WT_I18N::translate('Historical facts'), '</label>';
+			}
 			echo '</td></tr>';
 		}
-		$yetdied=false;
 		foreach ($indifacts as $fact) {
-			if (strstr(WT_EVENTS_DEAT, $fact->getTag()) && $fact->getParentObject()->getXref()==$controller->record->getXref() ) {
-				$yetdied = true;
-			}
-			if (!is_null($fact->getFamilyId())) {
-				if (!$yetdied || $fact->getTag()=='_TODO') {
-					print_fact($fact, $controller->record);
-				}
+			if ($fact->getFamilyId()) {
+				// Print all family facts
+				print_fact($fact, $controller->record);
 			} else {
-				// Reference information, such as CHAN, IDNO, RFN, AFN, REFN, RIN, _UID can be shown in the sidebar
+				// Individual/reference facts (e.g. CHAN, IDNO, RFN, AFN, REFN, RIN, _UID) can be shown in the sidebar
 				if (!in_array($fact->getTag(), WT_Gedcom_Tag::getReferenceFacts()) || !array_key_exists('extra_info', WT_Module::getActiveSidebars())) {
 					print_fact($fact, $controller->record);
 				}

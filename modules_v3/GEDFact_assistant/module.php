@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13679 2012-03-25 17:34:35Z greg $
+// $Id: module.php 14079 2012-07-07 06:11:43Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -154,7 +154,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 		}
 		$controller->pageHeader();
 		
-		echo WT_JS_START;
+		echo '<script>';
 		?>
 		
 			function pasterow(id, name, gend, yob, age, bpl) {
@@ -199,7 +199,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 				return true;
 			}
 		<?php
-		echo WT_JS_END;
+		echo '</script>';
 		
 		$options = array();
 		$options["option"][]= "findindi";
@@ -439,7 +439,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 		echo "</table>"; // Close table with find options
 		
 		echo "<br>";
-		echo "<a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">", WT_I18N::translate('Close Window'), "</a><br>";
+		echo "<a href=\"#\" onclick=\"window.close();\">", WT_I18N::translate('Close Window'), "</a><br>";
 		echo "<br>";
 		
 		if ($action=="filter") {
@@ -784,7 +784,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 		echo "</div>"; // Close div that centers table
 		
 		// Set focus to the input field
-		echo WT_JS_START, 'document.filter', $type, '.filter.focus();', WT_JS_END;
+		echo '<script>document.filter', $type, '.filter.focus();</script>';
 	}
 
 	private static function media_query_3a() {
@@ -805,7 +805,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 				}
 			}
 			?>
-			<script type="text/javascript">
+			'<script>'
 			function insertId() {
 				if (window.opener.document.getElementById('addlinkQueue')) {
 					// alert('Please move this alert window and examine the contents of the pop-up window, then click OK')
@@ -813,23 +813,21 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 					window.close();
 				}
 			}
-			</script>
+			'</script>'
 			<?php
 		
 		} else {
 			?>
-			<script type="text/javascript">
+			'<sccript>'
 			function insertId() {
 				window.opener.alert('<?php echo strtoupper($iid2); ?> - <?php echo WT_I18N::translate('Not a valid Individual, Family or Source ID'); ?>');
 				window.close();
 			}
-			</script>
+			'</script>'
 			<?php
 		}
 		?>		
-		<script type="text/javascript">
-		 window.onLoad = insertId();
-		</script>
+		'<script>'window.onLoad = insertId();'</script>'
 		<?php
 	}
 }

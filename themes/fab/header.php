@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 13837 2012-04-18 23:34:17Z nigel $
+// $Id: header.php 14176 2012-08-16 10:48:52Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -49,7 +49,6 @@ echo
 echo
 	'<link type="text/css" rel="stylesheet" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css">',
 	'<link type="text/css" rel="stylesheet" href="', $stylesheet, '">';
-
 	//PERSO Add extra style sheet for personal additions
 	$extrastylesheet= str_replace('.css', '.extra.css', $stylesheet);
 	echo '<link rel="stylesheet" type="text/css" href="', $extrastylesheet, '">';

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: Individual.php 13951 2012-05-29 19:55:39Z greg $
+// $Id: Individual.php 14202 2012-08-25 21:48:38Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -135,11 +135,11 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		echo $mod->getTabContent();
 		
 		// Allow the other tabs to modify this one - e.g. lightbox does this.
-		echo WT_JS_START;
+		echo '<script>';
 		foreach ($this->tabs as $module) {
 			echo $module->getJSCallback();
 		}
-		echo WT_JS_END;
+		echo '</script>';
 
 		if (WT_DEBUG_SQL) {
 			echo WT_DB::getQueryLog();
@@ -225,7 +225,7 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 			}
 		}
 		if ($this->record->canEdit() && !$event->getIsOld()) {
-			echo "<div class=\"deletelink\"><a class=\"font9 deleteicon\" href=\"#\" onclick=\"delete_record('".$this->record->getXref()."', ".$linenum."); return false;\" title=\"".WT_I18N::translate('Delete name')."\"><span class=\"link_text\">".WT_I18N::translate('Delete name')."</span></a></div>";
+			echo "<div class=\"deletelink\"><a class=\"font9 deleteicon\" href=\"#\" onclick=\"return delete_fact('".$this->record->getXref()."', ".$linenum.", '', '".WT_I18N::translate('Are you sure you want to delete this fact?')."');\" title=\"".WT_I18N::translate('Delete name')."\"><span class=\"link_text\">".WT_I18N::translate('Delete name')."</span></a></div>";
 			echo "<div class=\"editlink\"><a href=\"#\" class=\"font9 editicon\" onclick=\"edit_name('".$this->record->getXref()."', ".$linenum."); return false;\" title=\"".WT_I18N::translate('Edit name')."\"><span class=\"link_text\">".WT_I18N::translate('Edit name')."</span></a></div>";
 		}
 		echo '</dd>';
@@ -279,38 +279,42 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		$sex = $event->getDetail();
 		if (empty($sex)) $sex = 'U';
 		echo '<span id="sex"';
+			echo ' class="';
 			if ($event->getIsOld()) {
-				echo ' class="namered"';
+				echo 'namered ';
 			}
 			if ($event->getIsNew()) {
-				echo ' class="nameblue"';
+				echo 'nameblue ';
 			}
 			switch ($sex) {
 			case 'M':
-				echo ' class="male_gender" title="'.WT_I18N::translate('Male').'"';
+				echo 'male_gender"';
+				if ($this->record->canEdit() && !$event->getIsOld()) {
+					echo ' title="', WT_I18N::translate('Male'), ' - ', WT_I18N::translate('Edit'), '"';
+					echo ' onclick="edit_record(\''.$this->record->getXref().'\', '.$event->getLineNumber().'); return false;">&nbsp;';
+				 } else {
+					echo ' title="', WT_I18N::translate('Male'), '">&nbsp;';
+				 }
 				break;
 			case 'F':
-				echo ' class="female_gender" title="'.WT_I18N::translate('Female').'"';
+				echo 'female_gender"';
+				if ($this->record->canEdit() && !$event->getIsOld()) {
+					echo ' title="', WT_I18N::translate('Female'), ' - ', WT_I18N::translate('Edit'), '"';
+					echo ' onclick="edit_record(\''.$this->record->getXref().'\', '.$event->getLineNumber().'); return false;">&nbsp;';
+				 } else {
+					echo ' title="', WT_I18N::translate('Female'), '">&nbsp;';
+				 }
 				break;
 			case 'U':
-				echo ' class="unknown_gender" title="'.WT_I18N::translate('Unknown').'"';
+				echo 'unknown_gender"';
+				if ($this->record->canEdit() && !$event->getIsOld()) {
+					echo ' title="', WT_I18N::translate_c('unknown gender', 'Unknown'), ' - ', WT_I18N::translate('Edit'), '"';
+					echo ' onclick="edit_record(\''.$this->record->getXref().'\', '.$event->getLineNumber().'); return false;">&nbsp;';
+				 } else {
+					echo ' title="', WT_I18N::translate_c('unknown gender', 'Unknown'), '">&nbsp;';
+				 }
 				break;
 			}
-			echo '>&nbsp;';
-			if ($this->SEX_COUNT>1) {
-				if ($this->record->canEdit() && !$event->getIsOld()) {
-					if ($event->getLineNumber()=="new") {
-						echo "<a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$this->record->getXref()."', 'SEX'); return false;\">".WT_I18N::translate('Edit')."</a>";
-					} else {
-							echo "<a class=\"font9\" href=\"#\" onclick=\"edit_record('".$this->record->getXref()."', ".$event->getLineNumber()."); return false;\">".WT_I18N::translate('Edit')."</a> | ";
-							echo "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$this->record->getXref()."', ".$event->getLineNumber()."); return false;\">".WT_I18N::translate('Delete')."</a>";
-					}
-				}
-			}
-			// -- find sources
-//			print_fact_sources($event->getGedComRecord(), 2);
-			//-- find the notes
-			print_fact_notes($event->getGedComRecord(), 2);
 		echo '</span>';
 	}
 	/**
@@ -763,18 +767,13 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		}
 
 		$controller
-			->addInlineJavaScript('
+			->addInlineJavascript('
 				jQuery("#sidebarAccordion").accordion({
 					active:"#family_nav",
 					autoHeight: false,
 					collapsible: true,
 					icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }
 				});
-				//jQuery code to remove table elements from INDI facts
-				jQuery("#sb_content_extra_info table").replaceWith(function() { return jQuery(this).contents(); });
-				jQuery("#sb_content_extra_info tbody").replaceWith(function() { return jQuery(this).contents(); });
-				jQuery("#sb_content_extra_info tr").replaceWith(function() { return jQuery(this).contents();	});
-				jQuery("#sb_content_extra_info td").replaceWith(function() { return jQuery(this).contents();	});
 			');
 
 		return '<div id="sidebar"><div id="sidebarAccordion">'.$html.'</div></div>';

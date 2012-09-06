@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_reorder.php 13286 2012-01-19 17:14:38Z lukasz $
+// $Id: media_reorder.php 13999 2012-06-16 21:57:04Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,20 +29,18 @@ if (!defined('WT_WEBTREES')) {
 }
 
 require_once WT_ROOT.'includes/functions/functions_print_facts.php';
-echo WT_JS_START; ?>
-  jQuery(document).ready(function() {
-	jQuery("#reorder_media_list").sortable({forceHelperSize: true, forcePlaceholderSize: true, opacity: 0.7, cursor: 'move', axis: 'y'});
+$controller->addInlineJavascript('
+	jQuery("#reorder_media_list").sortable({forceHelperSize: true, forcePlaceholderSize: true, opacity: 0.7, cursor: "move", axis: "y"});
 
 	//-- update the order numbers after drag-n-drop sorting is complete
-	jQuery('#reorder_media_list').bind('sortupdate', function(event, ui) {
-			jQuery('#'+jQuery(this).attr('id')+' input').each(
+	jQuery("#reorder_media_list").bind("sortupdate", function(event, ui) {
+			jQuery("#"+jQuery(this).attr("id")+" input").each(
 				function (index, value) {
 					value.value = index+1;
 				}
 			);
 		});
-	});
-<?php echo WT_JS_END;
+	');
 
 	echo '<br><b>', WT_I18N::translate('Re-order media'), '</b>';
 	echo '&nbsp --- &nbsp;' . WT_I18N::translate('Click a row, then drag-and-drop to re-order media ');

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: wt_v3_places_edit.js.php 13897 2012-05-04 10:12:48Z lukasz $
+// $Id: wt_v3_places_edit.js.php 14079 2012-07-07 06:11:43Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
  
@@ -32,12 +32,12 @@ if (!defined('WT_WEBTREES')) {
 ?>
 
 <head>
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-	<script type="text/javascript" src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/wt_v3_places_edit_overlays.js.php"></script>
-	<!-- <link type="text/css" href="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/css/wt_v3_places_edit.css" rel="stylesheet"> -->
+	<script src="<?php echo WT_GM_SCRIPT; ?>"></script>
+	<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/wt_v3_places_edit_overlays.js.php"></script>
+	<script src="<?php echo WT_STATIC_URL; ?>js/webtrees.js"></script>
 	<link type="text/css" href="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/css/wt_v3_googlemap.css" rel="stylesheet">
 
-	<script type="text/javascript">
+	<script>
 	var map;
 	var marker;
 	var zoom;
@@ -326,11 +326,6 @@ if (!defined('WT_WEBTREES')) {
 		marker.setMap(null);
 	}
 
-	function edit_close() {
-		if (window.opener.showchanges) window.opener.showchanges();
-		window.close();
-	}
-
 	function setLoc(lat, lng) {
 		prec = 20;
 		for (i=0;i<document.editplaces.NEW_PRECISION.length;i++) {
@@ -357,7 +352,7 @@ if (!defined('WT_WEBTREES')) {
 	}
 
 	function createMarker(i, point, name) {	
-		var contentString = '<div id="iwcontent">'+name+'<\/div>';
+		var contentString = '<div id="iwcontent_edit">'+name+'<\/div>';
 		<?php
 		echo 'var image = new google.maps.MarkerImage("', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/images/marker_yellow.png",';
 			echo 'new google.maps.Size(20, 34),';	// Image size

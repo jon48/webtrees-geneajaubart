@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13744 2012-04-02 04:58:29Z nigel $
+// $Id: module.php 14049 2012-06-29 08:43:57Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -44,7 +44,7 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 		global $controller;
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
-		$controller->addInlineJavaScript('
+		$controller->addInlineJavascript('
 				jQuery("#new_passwd").hide();
 				jQuery("#passwd_click").click(function() {
 					jQuery("#new_passwd").slideToggle(100, function() {
@@ -94,7 +94,7 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 		
 		// hidden New Password block
 		$content.= '<div id="new_passwd">
-			<form id="new_passwd_form" name="new_passwd_form" action="'.WT_LOGIN_URL.'" method="post" onsubmit="t = new Date(); document.new_passwd_form.time.value=t.toUTCString(); return checkform(this);">
+			<form id="new_passwd_form" name="new_passwd_form" action="'.WT_LOGIN_URL.'" method="post">
 			<input type="hidden" name="time" value="">
 			<input type="hidden" name="action" value="requestpw">
 			<h4>'. WT_I18N::translate('Lost password request').'</h4>

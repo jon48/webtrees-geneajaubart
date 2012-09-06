@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13945 2012-05-26 17:22:40Z greg $
+// $Id: module.php 14164 2012-08-11 21:21:49Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -64,11 +64,11 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 			$controller
 				->setPageTitle($this->getTitle())
 				->PageHeader()
-				->addExternalJavaScript('js/autocomplete.js');;
+				->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
-			echo WT_JS_START;
+			echo '<script>';
 			echo 'function radAncestors(elementid) {var radFamilies=document.getElementById(elementid);radFamilies.checked=true;}';
-			echo WT_JS_END;
+			echo '</script>';
 
 			if (!$WT_SESSION->cart[WT_GED_ID]) {
 				echo '<h2>', WT_I18N::translate('Family Tree Clippings Cart'), '</h2>';
@@ -144,10 +144,10 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 
 					echo WT_I18N::translate('The Clippings Cart allows you to take extracts ("clippings") from this family tree and bundle them up into a single file for downloading and subsequent importing into your own genealogy program.  The downloadable file is recorded in GEDCOM format.<br /><ul><li>How to take clippings?<br />This is really simple. Whenever you see a clickable name (individual, family, or source) you can go to the Details page of that name. There you will see the <b>Add to Clippings Cart</b> option.  When you click that link you will be offered several options to download.</li><li>How to download?<br />Once you have items in your cart, you can download them just by clicking the <b>Download Now</b> link.  Follow the instructions and links.</li></ul>');
 
-					echo WT_JS_START;
+					echo '<script>';
 					echo 'var pastefield;';
 					echo 'function paste_id(value) {pastefield.value=value;}';
-					echo WT_JS_END;
+					echo '</script>';
 					?>
 					<form method="get" name="addin" action="module.php">
 					<input type="hidden" name="mod" value="clippings">
@@ -235,14 +235,12 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 					</table>
 					<br>
 
-					<script type="text/javascript">
-					<!--
+					<script>
 					var pastefield;
 					function paste_id(value)
 					{
 						pastefield.value=value;
 					}
-					//-->
 					</script>
 					<form method="get" name="addin" action="module.php">
 					<input type="hidden" name="mod" value="clippings">
@@ -274,7 +272,7 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 				<br><a href="module.php?mod=clippings&amp;mod_action=index&amp;action=empty"><?php echo WT_I18N::translate('Empty Cart'); ?></a><?php echo help_link('empty_cart', $this->getName()); ?>
 				</td></tr>
 
-				<tr><td class="topbottombar"><h2><?php echo WT_I18N::translate('Family Tree Clippings Cart'), help_link('clip_cart', $this->getName()); ?></h2></td></tr>
+				<tr><td class="topbottombar"><h2><?php echo WT_I18N::translate('Family Tree Clippings Cart'); ?></h2></td></tr>
 
 				<tr><td valign="top">
 				<table id="mycart" class="sortable list_table width100">
@@ -332,9 +330,11 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 			return null;
 		}
 		//-- main clippings menu item
-		$menu = new WT_Menu($this->getTitle(), 'module.php?mod=clippings&amp;mod_action=index&amp;ged='.WT_GEDURL, 'menu-clippings', 'down');
-		$submenu = new WT_Menu($this->getTitle(), 'module.php?mod=clippings&amp;mod_action=index&amp;ged='.WT_GEDURL, 'menu-clippingscart');
-		$menu->addSubmenu($submenu);
+		$menu = new WT_Menu($this->getTitle(), 'module.php?mod=clippings&amp;mod_action=index&amp;ged='.WT_GEDURL, 'menu-clippings');
+		if (isset($controller->record)) {
+			$submenu = new WT_Menu($this->getTitle(), 'module.php?mod=clippings&amp;mod_action=index&amp;ged='.WT_GEDURL, 'menu-clippingscart');
+			$menu->addSubmenu($submenu);
+		}
 		if (!empty($controller->record) && $controller->record->canDisplayDetails()) {
 			$submenu = new WT_Menu(WT_I18N::translate('Add to clippings cart'), 'module.php?mod=clippings&amp;mod_action=index&amp;action=add&amp;id='.$controller->record->getXref(), 'menu-clippingsadd');
 			$menu->addSubmenu($submenu);
@@ -359,18 +359,16 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 
 	// Impelement WT_Module_Sidebar
 	public function getSidebarContent() {
-		return
-			WT_JS_START.'		 	
-			jQuery(document).ready(function() {
+		global $controller;
+
+		$controller->addInlineJavascript('
 				jQuery(".add_cart, .remove_cart").live("click", function() {
 					jQuery("#sb_clippings_content").load(this.href);
 					return false;
 				});
-			});'.
-			WT_JS_END.
-			'<div id="sb_clippings_content">'.
-			$this->getCartList().
-			'</div>';
+			');
+
+		return '<div id="sb_clippings_content">' .  $this->getCartList() .  '</div>';
 	}
 
 	// Impelement WT_Module_Sidebar
@@ -493,14 +491,14 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 	public function askAddOptions($person) {
 		global $MAX_PEDIGREE_GENERATIONS;
 		$out = '<h3><a href="'.$person->getHtmlUrl().'">'.$person->getFullName().'</a></h3>';
-		$out .= WT_JS_START;
+		$out .= '<script>';
 		$out .= 'function radAncestors(elementid) {var radFamilies=document.getElementById(elementid);radFamilies.checked=true;}
 			function continueAjax(frm) {
 				var others = jQuery("input[name=\'others\']:checked").val();
 				var link = "module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=clippings&add1="+frm.pid.value+"&others="+others+"&level1="+frm.level1.value+"&level2="+frm.level2.value+"&level3="+frm.level3.value;
 				jQuery("#sb_clippings_content").load(link);
 			}';
-		$out .= WT_JS_END;
+		$out .= '</script>';
 		if ($person->getType()=='FAM') {
 
 			$out .= '<form action="module.php" method="get" onsubmit="continueAjax(this); return false;">
@@ -562,12 +560,12 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 	public function downloadForm($clip_ctrl) {
 		$pid=safe_GET_xref('pid');
 
-		$out = WT_JS_START;
+		$out = '<script>';
 		$out .= 'function cancelDownload() {
 				var link = "module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=clippings&pid='.$pid.'";
 				jQuery("#sb_clippings_content").load(link);
 			}';
-		$out .= WT_JS_END;
+		$out .= '</script>';
 		$out .= '<form method="get" action="module.php">
 		<input type="hidden" name="mod" value="clippings">
 		<input type="hidden" name="mod_action" value="index">

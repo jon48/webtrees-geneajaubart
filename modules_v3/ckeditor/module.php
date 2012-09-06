@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 11856 2011-06-19 15:43:34Z greg $
+// $Id: module.php 14165 2012-08-12 04:02:19Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -37,5 +37,34 @@ class ckeditor_WT_Module extends WT_Module {
 	// Extend WT_Module
 	public function getDescription() {
 		return /* I18N: Description of the "CKEditor" module.  WYSIWYG = "what you see is what you get" */ WT_I18N::translate('Allow other modules to edit text using a “WYSIWYG” editor, instead of using HTML codes.');
+	}
+
+	// Convert <textarea class="html-edit"> fields to CKEditor fields
+	public static function enableEditor($controller) {
+		$controller
+			->addExternalJavascript(WT_MODULES_DIR.'ckeditor/ckeditor.js')
+			->addExternalJavascript(WT_MODULES_DIR.'ckeditor/adapters/jquery.js')
+			// Need to specify the path before we load the libary
+			->addInlineJavascript('var CKEDITOR_BASEPATH="'.WT_MODULES_DIR.'ckeditor/";', WT_Controller_Base::JS_PRIORITY_HIGH)
+			// Activate the editor
+			->addInlineJavascript('jQuery(".html-edit").ckeditor(function(){}, {
+				toolbar:[
+					["Source"],
+					["Cut","Copy","Paste","PasteText","PasteFromWord"],
+					["Undo","Redo","-","Find","Replace","-","SelectAll"],
+					["Styles"],
+					["Link","Unlink","Anchor"],
+					"/",
+					["Bold","Italic","Underline","-","Subscript","Superscript","RemoveFormat"],
+					["NumberedList","BulletedList","-","Outdent","Indent","Blockquote","CreateDiv"],
+					["JustifyLeft","JustifyCenter","JustifyRight","JustifyBlock"],				
+					["Image","Table","HorizontalRule","SpecialChar"],
+					"/",
+					["Format","Font","FontSize"],
+					["TextColor","BGColor"],
+					["Maximize", "ShowBlocks"]
+				],
+				skin : "v2"
+			});');
 	}
 }

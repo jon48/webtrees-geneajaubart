@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13949 2012-05-28 21:03:05Z greg $
+// $Id: module.php 13999 2012-06-16 21:57:04Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -109,7 +109,7 @@ class notes_WT_Module extends WT_Module implements WT_Module_Tab {
 		<br>
 		<?php
 		if (!$SHOW_LEVEL2_NOTES)  {
-			echo WT_JS_START, 'jQuery("tr.row_note2").toggle();', WT_JS_END;
+			echo '<script>jQuery("tr.row_note2").toggle();</script>';
 		}
 		return '<div id="'.$this->getName().'_content">'.ob_get_clean().'</div>';
 	}

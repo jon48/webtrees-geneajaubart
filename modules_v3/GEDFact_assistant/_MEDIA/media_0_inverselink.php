@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_0_inverselink.php 13798 2012-04-08 13:31:56Z greg $
+// $Id: media_0_inverselink.php 14226 2012-08-30 05:18:45Z nigel $
 
 // GEDFact Media assistant replacement code for inverselink.php: ===========================
 
@@ -33,7 +33,7 @@ $exist_links = safe_REQUEST($_REQUEST, 'exist_links', WT_REGEX_UNSAFE);
 $gid = safe_GET_xref('gid');
 $update_CHAN = safe_REQUEST($_REQUEST, 'preserve_last_changed', WT_REGEX_UNSAFE);
 
-$controller->addExternalJavaScript('js/autocomplete.js');
+$controller->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
 $paramok =  true;
 if (!empty($linktoid)) $paramok = WT_GedcomRecord::getInstance($linktoid)->canDisplayDetails();
@@ -41,8 +41,7 @@ if (!empty($linktoid)) $paramok = WT_GedcomRecord::getInstance($linktoid)->canDi
 if ($action == 'choose' && $paramok) {
 
 	?>
-	<script type="text/javascript">
-	<!--
+	<script>
 	// Javascript variables
 	var id_empty = "<?php echo WT_I18N::translate('When adding a Link, the ID field cannot be empty.'); ?>";
 
@@ -71,12 +70,11 @@ if ($action == 'choose' && $paramok) {
 	}
 
 	var GEDFact_assist = 'installed';
-//-->
 	</script>
 	<link href ="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>GEDFact_assistant/css/media_0_inverselink.css" rel="stylesheet" type="text/css" media="screen">
 
 	<?php
-	echo '<form name="link" method="get" action="inverselink.php">';
+	echo '<form class="medialink" name="link" method="get" action="inverselink.php">';
 	// echo '<input type="hidden" name="action" value="choose">';
 	echo '<input type="hidden" name="action" value="update">';
 	if (!empty($mediaid)) {
@@ -198,7 +196,7 @@ if ($action == 'choose' && $paramok) {
 	echo '<br><br>';
 	echo '<input type="hidden" name="idName" id="idName" size="36" value="Name of ID">';
 ?>
-<script type="text/javascript">
+<script>
 
 	function addlinks(iname) {
 		// iid=document.getElementById('gid').value;
@@ -214,7 +212,7 @@ if ($action == 'choose' && $paramok) {
 		//id=document.getElementById('gid').value;
 		if (id.match("I")=="I" || id.match("i")=="i") {
 			id = id.toUpperCase();
-			winNav = window.open('edit_interface.php?action=addmedia_links&noteid=newnote&pid='+id, 'winNav', edit_window_specs);
+			winNav = window.open('edit_interface.php?action=addmedia_links&noteid=newnote&pid='+id, 'winNav', fam_nav_specs);
 			if (window.focus) {winNav.focus();}
 		} else if (id.match("F")=="F") {
 			id = id.toUpperCase();
@@ -234,8 +232,8 @@ if ($action == 'choose' && $paramok) {
 	
 <?php
 
-// Various JavaScript variables required --------------------------------- ?>
-<script type="text/javascript">
+// Various Javascript variables required --------------------------------- ?>
+<script>
 	var ifamily = "<?php echo WT_I18N::translate('Open Family Navigator'); ?>";
 	var remove = "<?php echo WT_I18N::translate('Remove'); ?>";
 	var linkExists = "<?php echo WT_I18N::translate('This link already exists'); ?>";
@@ -629,7 +627,7 @@ function shiftlinks() {
 <?php
 	echo '</table>';
 	echo '</form>';
-	echo '<br><br><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close(); winNav.close(); ">', WT_I18N::translate('Close Window'), '</a><br></center>';
+	echo '<br><br><center><a href="#" onclick="closePopupAndReloadParent(); winNav.close(); ">', WT_I18N::translate('Close Window'), '</a><br></center>';
 
 } elseif ($action == "update" && $paramok) {
 
@@ -670,10 +668,10 @@ function shiftlinks() {
 		echo '<br>';
 	}
 
-	echo '<br><br><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close(); winNav.close(); ">', WT_I18N::translate('Close Window'), '</a><br></center>';
+	echo '<br><br><center><a href="#" onclick="closePopupAndReloadParent(); winNav.close(); ">', WT_I18N::translate('Close Window'), '</a><br></center>';
 } else {
 	// echo '<center>You must be logged in as an Administrator<center>';
-	echo '<br><br><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close(); winNav.close();">', WT_I18N::translate('Close Window'), '</a><br></center>';
+	echo '<br><br><center><a href="#" onclick="closePopupAndReloadParent(); winNav.close();">', WT_I18N::translate('Close Window'), '</a><br></center>';
 }
 
 /**

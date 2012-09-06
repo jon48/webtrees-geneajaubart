@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_users.php 13934 2012-05-15 05:50:01Z nigel $
+// $Id: admin_users.php 14111 2012-07-18 12:25:09Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_users.php');
 require './includes/session.php';
@@ -315,34 +315,39 @@ case 'createuser':
 switch ($action) {
 case 'createform':
 	if (get_gedcom_count()==1) { //Removed becasue it doesn't work here for multiple GEDCOMs. Can be reinstated when fixed (https://bugs.launchpad.net/webtrees/+bug/613235)
-		$controller->addExternalJavaScript('js/autocomplete.js');
+		$controller->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 	}
 
 	init_calendar_popup();
-	$controller->addInlineJavaScript('
+	$controller->addInlineJavascript('
 		function checkform(frm) {
 			if (frm.username.value=="") {
-				alert("'.addslashes(WT_I18N::translate('You must enter a user name.')).'");
+				alert("'.WT_I18N::translate('You must enter a user name.').'");
 				frm.username.focus();
 				return false;
 			}
 			if (frm.realname.value=="") {
-				alert("'.addslashes(WT_I18N::translate('You must enter a real name.')).'");
+				alert("'.WT_I18N::translate('You must enter a real name.').'");
 				frm.realname.focus();
 				return false;
 			}
 			if (frm.pass1.value=="") {
-				alert("'.addslashes(WT_I18N::translate('You must enter a password.')).'");
+				alert("'.WT_I18N::translate('You must enter a password.').'");
 				frm.pass1.focus();
 				return false;
 			}
+			if (frm.emailaddress.value=="") {
+				alert("'.WT_I18N::translate('You must enter an email address.').'");
+				frm.emailaddress.focus();
+				return false;
+			}
 			if (frm.pass2.value=="") {
-				alert("'.addslashes(WT_I18N::translate('You must confirm the password.')).'");
+				alert("'.WT_I18N::translate('You must confirm the password.').'");
 				frm.pass2.focus();
 				return false;
 			}
 			if (frm.pass1.value.length < 6) {
-				alert("'.addslashes(WT_I18N::translate('Passwords must contain at least 6 characters.')).'");
+				alert("'.WT_I18N::translate('Passwords must contain at least 6 characters.').'");
 				frm.pass1.value = "";
 				frm.pass2.value = "";
 				frm.pass1.focus();
@@ -638,8 +643,9 @@ default:
 		'</table>';
 	
 	$controller
-		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addInlineJavaScript('
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.jeditable.min.js')
+		->addInlineJavascript('
 			var oTable = jQuery("#list").dataTable({
 				"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
 				'.WT_I18N::datatablesI18N().',
@@ -668,12 +674,11 @@ default:
 					/* delete            */ { bSortable:false }
 				],
 				"fnDrawCallback": function() {
-					// Our JSON responses include JavaScript as well as HTML.  This does not get
+					// Our JSON responses include Javascript as well as HTML.  This does not get
 					// executed (except for some versions of Firefox?).  So, extract it, and add
 					// it to its own DOM element
 					jQuery("#list script").each(function() {
 						var script=document.createElement("script");
-						script.type="text/javascript";
 						jQuery("#list script").appendTo("body"); 
 						document.body.appendChild(script);
 					}).remove();

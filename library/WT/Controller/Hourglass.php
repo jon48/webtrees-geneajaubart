@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Hourglass.php 13950 2012-05-29 06:28:25Z greg $
+// $Id: Hourglass.php 14067 2012-07-04 20:18:54Z rob $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -83,7 +83,7 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 		
 		// -- adjust size of the compact box
 		if (!$this->show_full) {
-			$bwidth = $cbwidth;
+			$bwidth = $this->box_width * $cbwidth  / 100;
 			$bheight = $cbheight;
 		}
 
@@ -114,12 +114,40 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 	 * @return void
 	 */
 	function print_person_pedigree($person, $count) {
-		global $SHOW_EMPTY_BOXES, $WT_IMAGES, $bhalfheight;
+		global $WT_IMAGES, $bheight, $bwidth, $bhalfheight;
 
 		if ($count>=$this->generations) return;
-		if (!$person) return;
+		//if (!$person) return;
+		$genoffset = $this->generations;  // handle pedigree n generations lines
 		//-- calculate how tall the lines should be
-		$lh = ($bhalfheight+3) * pow(2, ($this->generations-$count-1));
+		$lh = ($bhalfheight+3) * pow(2, ($genoffset-$count-1));
+		//
+		//Prints empty table columns for children w/o parents up to the max generation
+		//This allows vertical line spacing to be consistent
+		//
+		if (count($person->getChildFamilies())==0) { 
+			echo '<table>',
+				 '<tr>',
+				 '<td>',
+				 '<div style="width:',$bwidth,'px; height:',$bheight,'px;"></div>';
+			echo '</td>';
+			echo '<td>';
+				
+				//-- recursively get the father's family
+				$this->print_person_pedigree($person, $count+1);
+				echo '</td>';
+				echo '<td>';
+			echo '</tr><tr>',
+				 '<td>',
+				 '<div style="width:',$bwidth,'px; height:',$bheight,'px;"></div>';
+				 echo '</td>';
+			echo '<td>';
+				//-- recursively get the father's family
+				$this->print_person_pedigree($person, $count+1);
+				echo '</td>';
+				echo '<td>';
+			echo '</tr></table>';
+		}
 		foreach ($person->getChildFamilies() as $family) {
 			echo "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"empty-cells: show;\">";
 			$height="100%";
@@ -431,7 +459,7 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 		global $bhalfheight;
 ?>
 
-<script type="text/javascript">
+<script>
 		// code to fix chart lines in block
 		var vlines;
 		vlines = document.getElementsByName("tvertline");
@@ -518,10 +546,9 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 		//alert(vlines[0].parentNode.parentNode.parentNode);
 		for (i=0; i < vlines.length; i++) {
 			//vlines[i].parentNode.style.height="50%";
-			vlines[i].style.height=(vlines[i].parentNode.offsetHeight/2)+'px';
+			vlines[i].style.height=(vlines[i].parentNode.offsetHeight/2-1)+'px';
 		}
 	}
-//-->
 </script>
 <?php
 		return $this;

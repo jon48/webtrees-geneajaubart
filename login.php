@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: login.php 13611 2012-03-18 23:27:51Z greg $
+// $Id: login.php 14215 2012-08-26 21:12:54Z greg $
 
 define('WT_SCRIPT_NAME', 'login.php');
 require './includes/session.php';
@@ -83,11 +83,11 @@ default:
 
 		default: // Success
 			if ($usertime) {
-				$_SESSION['usertime']=@strtotime($usertime);
+				$WT_SESSION->usertime=@strtotime($usertime);
 			} else {
-				$_SESSION['usertime']=time();
+				$WT_SESSION->usertime=time();
 			}
-			$_SESSION['timediff']=time()-$_SESSION['usertime'];
+			$WT_SESSION->timediff=time()-$WT_SESSION->usertime;
 			$WT_SESSION->locale   =get_user_setting($user_id, 'language');
 			$WT_SESSION->theme_dir=get_user_setting($user_id, 'theme');
 
@@ -109,7 +109,7 @@ default:
 	$controller->setPageTitle(WT_I18N::translate('Login'));
 	$controller->pageHeader();
 	$controller
-		->addInlineJavaScript('
+		->addInlineJavascript('
 			jQuery("#new_passwd_form").hide();
 			jQuery("#passwd_click").click(function() {
 				jQuery("#new_passwd_form").slideToggle(100, function() {
@@ -251,7 +251,7 @@ case 'register':
 		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
 		exit;
 	}
-	$_SESSION['good_to_send'] = true;
+	$WT_SESSION->good_to_send = true;
 	if (!$user_name) {
 		$user_name_false = true;
 	} else {
@@ -314,11 +314,11 @@ case 'register':
 			exit;
 		}
 
-		if (!isset($_SESSION['good_to_send']) || $_SESSION['good_to_send']!==true) {
+		if ($WT_SESSION->good_to_send!==true) {
 			AddToLog('Invalid session reference while trying to register a user.  Possible spam attack.', 'auth');
 			exit;
 		}
-		$_SESSION['good_to_send'] = false;
+		$WT_SESSION->good_to_send = false;
 
 		if (isset($user_name)) {
 			// Generate an email in the admin's language
@@ -440,8 +440,18 @@ case 'register':
 		$controller
 			->setPageTitle(WT_I18N::translate('Request new user account'))
 			->pageHeader()
-			->addInlineJavaScript('
+			->addInlineJavascript('
 				function checkform(frm) {
+					if (frm.user_realname.value == "") {
+						alert("' . WT_I18N::translate('You must enter your real name.') . '");
+						frm.user_realname.focus();
+						return false;
+					}
+					if (frm.user_email.value=="") {
+						alert("'.WT_I18N::translate('You must enter an email address.').'");
+						frm.user_email.focus();
+						return false;
+					}
 					if (frm.user_name.value == "") {
 						alert("' . WT_I18N::translate('You must enter a user name.') . '");
 						frm.user_name.focus();
@@ -449,6 +459,13 @@ case 'register':
 					}
 					if (frm.user_password01.value == "") {
 						alert("' . WT_I18N::translate('You must enter a password.') . '");
+						frm.user_password01.focus();
+						return false;
+					}
+					if (frm.user_password01.value.length < 6) {
+						alert("' . WT_I18N::translate('Passwords must contain at least 6 characters.') . '");
+						frm.user_password01.value = "";
+						frm.user_password02.value = "";
 						frm.user_password01.focus();
 						return false;
 					}
@@ -462,18 +479,6 @@ case 'register':
 						frm.user_password01.value = "";
 						frm.user_password02.value = "";
 						frm.user_password01.focus();
-						return false;
-					}
-					if (frm.user_password01.value.length < 6) {
-						alert("' . WT_I18N::translate('Passwords must contain at least 6 characters.') . '");
-						frm.user_password01.value = "";
-						frm.user_password02.value = "";
-						frm.user_password01.focus();
-						return false;
-					}
-					if (frm.user_realname.value == "") {
-						alert("' . WT_I18N::translate('You must enter your real name.') . '");
-						frm.user_realname.focus();
 						return false;
 					}
 					if (frm.user_comments.value == "") {
@@ -493,7 +498,7 @@ case 'register':
 				echo '</div>';
 			}
 			echo '<div id="register-box">
-				<form id="register-form" name="register-form" method="post" action="'.WT_LOGIN_URL.'">
+				<form id="register-form" name="register-form" method="post" action="'.WT_LOGIN_URL.'" onsubmit="return checkform(this);">
 				<input type="hidden" name="action" value="register">
 				<h4>', WT_I18N::translate('All fields must be completed.'), '</h4><hr>
 				<div>
@@ -528,7 +533,7 @@ case 'register':
 					</label>
 				</div>
 				<div>
-					<label for="user_language">', WT_I18N::translate('Language'), help_link('edituser_change_lang'),
+					<label for="user_language">', WT_I18N::translate('Language'),
 						edit_field_language('user_language', WT_LOCALE),
 					'</label>
 				</div>

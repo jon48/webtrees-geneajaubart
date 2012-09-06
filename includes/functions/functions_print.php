@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print.php 13949 2012-05-28 21:03:05Z greg $
+// $Id: functions_print.php 14135 2012-07-31 09:31:32Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -86,7 +86,7 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 	if ($TEXT_DIRECTION=="rtl") $iconsStyleAdd="float: left; ";
 
 	$disp=$person->canDisplayDetails();
-	$uniqueID = floor(microtime() * 1000000);
+	$uniqueID = (int)(microtime() * 1000000);
 	$boxID = $pid.".".$personcount.".".$count.".".$uniqueID;
 	$mouseAction4 = " onclick=\"expandbox('".$boxID."', $style); return false;\"";
 	if ($person->canDisplayName()) {
@@ -134,8 +134,8 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 			}
 			$personlinks .= '</ul>';
 			// NOTE: Start div out-$pid.$personcount.$count
-			if ($style==1) $outBoxAdd .= " class=\"person_box$isF\" style=\"width: ".$bwidth."px; height: ".$bheight."px; overflow: hidden; z-index:-1;\"";
-			else $outBoxAdd .= " class=\"person_box$isF\" style=\"padding: 2px;\"";
+			if ($style==1) $outBoxAdd .= " class=\"person_box$isF person_box_template style1\" style=\"width: ".$bwidth."px; height: ".$bheight."px; z-index:-1;\"";
+			else $outBoxAdd .= " class=\"person_box$isF person_box_template style0\"";
 			// NOTE: Zoom
 			if (!$show_full) {
 				$outBoxAdd .= $mouseAction4;
@@ -156,9 +156,9 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 		}
 	} else {
 		if ($style==1) {
-			$outBoxAdd .= "class=\"person_box$isF\" style=\"width: ".$bwidth."px; height: ".$bheight."px; overflow: hidden;\"";
+			$outBoxAdd .= "class=\"person_box$isF person_box_template style1\" style=\"width: ".$bwidth."px; height: ".$bheight."px;\"";
 		} else {
-			$outBoxAdd .= "class=\"person_box$isF\" style=\" overflow: hidden;\"";
+			$outBoxAdd .= "class=\"person_box$isF person_box_template style0\"";
 		}
 	}
 	//-- find the name
@@ -249,7 +249,8 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 		if (!in_array($birttag, $opt_tags)) {
 			$event = $person->getFactByType($birttag);
 			if (!is_null($event) && ($event->getDate()->isOK() || $event->getPlace()) && $event->canShow()) {
-				$birthplace .= get_place_short($event->getPlace());
+				$tmp=new WT_Place($event->getPlace(), WT_GED_ID);
+				$birthplace .= $tmp->getShortName();
 				break;
 			}
 		}
@@ -422,25 +423,6 @@ function contact_links($ged_id=WT_GED_ID) {
 	}
 }
 
-//-- print user favorites
-function print_favorite_selector($option=0) {
-	$menu=WT_MenuBar::getFavoritesMenu();
-
-	if ($menu) {
-		echo '<div class="favorites_form">';
-		switch($option) {
-		case 1:
-			echo WT_MenuBar::getFavoritesMenu()->getMenu();
-			break;
-		default:
-			echo '<form class="favorites_form">';
-			echo WT_MenuBar::getFavoritesMenu()->getMenuAsDropdown();
-			echo '</form>';
-			break;
-		}
-		echo '</div>';
-	}
-}
 /**
 * print a note record
 * @param string $text
@@ -454,7 +436,7 @@ function print_favorite_selector($option=0) {
 function print_note_record($text, $nlevel, $nrec, $textOnly=false, $return=false, $npage=false) {
 	global $EXPAND_SOURCES, $EXPAND_NOTES;
 
-	$elementID = 'N-'.floor(microtime()*1000000);
+	$elementID = 'N-'.(int)(microtime()*1000000);
 	$text = trim($text);
 
 	// Check if Shared Note and if so enable url link on title -------------------
@@ -848,6 +830,10 @@ function format_fact_date(WT_Event $event, WT_GedcomRecord $record, $anchor=fals
 							$ageText = '('.WT_I18N::translate('on the date of death').')';
 						} else {
 							$ageText = '('.$age.' '.WT_I18N::translate('after death').')';
+							// Family events which occur after death are probably errors
+							if ($event->getFamilyId()) {
+								$ageText.='<i class="icon-warning"></i>';
+							}
 						}
 					}
 				}
@@ -906,55 +892,32 @@ function format_fact_place(WT_Event $event, $anchor=false, $sub=false, $lds=fals
 
 	$factrec = $event->getGedcomRecord();
 
+	$wt_place=new WT_Place($event->getPlace(), WT_GED_ID);
+
 	$name_parts=explode(', ', $event->getPlace());
 	$ct=count($name_parts);
 
 	if ($anchor) {
 		// Show the full place name, for facts/events tab
-		$html=$event->getPlace();
-		if (!$SEARCH_SPIDER) {
-			$n=count($name_parts);
-			$url='placelist.php?action=show&amp;level='.$n;
-			for ($i=0; $i<$n; ++$i) {
-				$url.='&amp;parent%5B'.$i.'%5D='.rawurlencode($name_parts[$n-$i-1]);
-			}
-			$html='<a href="'.$url.'">'.$html.'</a>';
+		if ($SEARCH_SPIDER) {
+			$html=$wt_place->getFullName();
+		} else {
+			$html='<a href="' . $wt_place->getURL() . '">' . $wt_place->getFullName() . '</a>';
 		}
 	} else {
 		// Abbreviate the place name, for chart boxes
-		if ($SHOW_PEDIGREE_PLACES_SUFFIX) {
-			// The *last* $SHOW_PEDIGREE_PLACES components
-			$html=implode(', ', array_slice($name_parts, -$SHOW_PEDIGREE_PLACES));
-		} else {
-			// The *first* $SHOW_PEDIGREE_PLACES components
-			$html=implode(', ', array_slice($name_parts, 0, $SHOW_PEDIGREE_PLACES));
-		}
-
-		// If we abbreviated the place, show the full name as a tooltip
-		if ($ct>$SHOW_PEDIGREE_PLACES) {
-			$html=' – <span title="'.htmlspecialchars($event->getPlace()).'">'.$html.'</span>';
-		}
-		// Chart boxes don't have room for temple names, alternate place names, etc.
-		return $html;
+		return ' - ' . $wt_place->getShortName();
 	}
 
 	$ctn=0;
 	if ($sub) {
 		$placerec = get_sub_record(2, '2 PLAC', $factrec);
 		if (!empty($placerec)) {
-			$cts = preg_match('/\d ROMN (.*)/', $placerec, $match);
-			if ($cts>0) {
-				if ($ct>0) {
-					$html.=" – ";
+			if (preg_match_all('/\n3 (?:_HEB|ROMN) (.+)/', $placerec, $matches)) {
+				foreach ($matches[1] as $match) {
+					$wt_place=new WT_Place($match, WT_GED_ID);
+					$html.=' - ' . $wt_place->getFullName();
 				}
-				$html.=' '.$match[1];
-			}
-			$cts = preg_match('/\d _HEB (.*)/', $placerec, $match);
-			if ($cts>0) {
-				if ($ct>0) {
-					$html.=' – ';
-				}
-				$html.=' '.$match[1];
 			}
 			$map_lati="";
 			$cts = preg_match('/\d LATI (.*)/', $placerec, $match);
@@ -976,10 +939,10 @@ function format_fact_place(WT_Event $event, $anchor=false, $sub=false, $lds=fals
 				} else {
 					$place='';
 				}
-				$html.=' <a target="_BLANK" href="'."http://www.mapquest.com/maps/map.adp?searchtype=address&amp;formtype=latlong&amp;latlongtype=decimal&amp;latitude={$map_lati}&amp;longitude={$map_long}".'" class="icon-mapquest" title="MapQuest™"></a>';
-				$html.=' <a target="_BLANK" href="'."http://maps.google.com/maps?q={$map_lati},{$map_long}(".rawurlencode($place).")".'" class="icon-googlemaps" title="'.WT_I18N::translate('Google Maps™').'"></a>';
-				$html.=' <a target="_BLANK" href="'."http://www.multimap.com/map/browse.cgi?lat={$map_lati}&amp;lon={$map_long}&amp;scale=&amp;icon=x".'" class="icon-bing" title="Bing Maps™"></a>';
-				$html.=' <a target="_BLANK" href="'."http://www.terraserver.com/imagery/image_gx.asp?cpx={$map_long}&amp;cpy={$map_lati}&amp;res=30&amp;provider_id=340".'" class="icon-terraserver" title="TerraServer™"></a>';
+				$html.=' <a target="_BLANK" href="'."//www.mapquest.com/maps/map.adp?searchtype=address&amp;formtype=latlong&amp;latlongtype=decimal&amp;latitude={$map_lati}&amp;longitude={$map_long}".'" class="icon-mapquest" title="MapQuest™"></a>';
+				$html.=' <a target="_BLANK" href="'."//maps.google.com/maps?q={$map_lati},{$map_long}(".rawurlencode($place).")".'" class="icon-googlemaps" title="'.WT_I18N::translate('Google Maps™').'"></a>';
+				$html.=' <a target="_BLANK" href="'."//www.multimap.com/map/browse.cgi?lat={$map_lati}&amp;lon={$map_long}&amp;scale=&amp;icon=x".'" class="icon-bing" title="Bing Maps™"></a>';
+				$html.=' <a target="_BLANK" href="'."//www.terraserver.com/imagery/image_gx.asp?cpx={$map_long}&amp;cpy={$map_lati}&amp;res=30&amp;provider_id=340".'" class="icon-terraserver" title="TerraServer™"></a>';
 			}
 			if (preg_match('/\d NOTE (.*)/', $placerec, $match)) {
 				ob_start();
@@ -1000,26 +963,6 @@ function format_fact_place(WT_Event $event, $anchor=false, $sub=false, $lds=fals
 				$date=new WT_Date($match[1]);
 				$html.=', '.WT_Gedcom_Tag::getLabel('STAT:DATE').': '.$date->Display(false);
 			}
-		}
-	}
-	return $html;
-}
-/**
-* print first major fact for an Individual
-*
-* @param string $key indi pid
-*/
-function format_first_major_fact($key, $majorfacts = array("BIRT", "CHR", "BAPM", "DEAT", "BURI", "BAPL", "ADOP")) {
-	$html='';
-	$person = WT_GedcomRecord::getInstance($key);
-	if (is_null($person)) return;
-	foreach ($majorfacts as $indexval => $fact) {
-		$event = $person->getFactByType($fact);
-		if (!is_null($event) && $event->hasDatePlace() && $event->canShow()) {
-			$html.='<br><em>';
-			$html .= $event->getLabel();
-			$html.=' '.format_fact_date($event, $person, false, false).' '.format_fact_place($event).'</em>';
-			break;
 		}
 	}
 	return $html;
@@ -1157,33 +1100,34 @@ function print_add_new_fact($id, $usedfacts, $type) {
 * @param none
 */
 function init_calendar_popup() {
-	global $WEEK_START;
+	global $WEEK_START, $controller;
 
-	echo
-		WT_JS_START,
-		'cal_setMonthNames(',
-			'"', WT_I18N::translate_c('NOMINATIVE', 'January'), '",',
-			'"', WT_I18N::translate_c('NOMINATIVE', 'February'), '",',
-			'"', WT_I18N::translate_c('NOMINATIVE', 'March'), '",',
-			'"', WT_I18N::translate_c('NOMINATIVE', 'April'), '",',
-			'"', WT_I18N::translate_c('NOMINATIVE', 'May'), '",',
-			'"', WT_I18N::translate_c('NOMINATIVE', 'June'), '",',
-			'"', WT_I18N::translate_c('NOMINATIVE', 'July'), '",',
-			'"', WT_I18N::translate_c('NOMINATIVE', 'August'), '",',
-			'"', WT_I18N::translate_c('NOMINATIVE', 'September'), '",',
-			'"', WT_I18N::translate_c('NOMINATIVE', 'October'), '",',
-			'"', WT_I18N::translate_c('NOMINATIVE', 'November'), '",',
-			'"', WT_I18N::translate_c('NOMINATIVE', 'December'), '");',
-			'cal_setDayHeaders(',
-			'"', WT_I18N::translate('Sun'), '",',
-			'"', WT_I18N::translate('Mon'), '",',
-			'"', WT_I18N::translate('Tue'), '",',
-			'"', WT_I18N::translate('Wed'), '",',
-			'"', WT_I18N::translate('Thu'), '",',
-			'"', WT_I18N::translate('Fri'), '",',
-			'"', WT_I18N::translate('Sat'), '");',
-			'cal_setWeekStart(', $WEEK_START, ');',
-			WT_JS_END;
+	$controller->addInlineJavascript('
+		cal_setMonthNames(
+			"' . WT_I18N::translate_c('NOMINATIVE', 'January') . '",
+			"' . WT_I18N::translate_c('NOMINATIVE', 'February') . '",
+			"' . WT_I18N::translate_c('NOMINATIVE', 'March') . '",
+			"' . WT_I18N::translate_c('NOMINATIVE', 'April') . '",
+			"' . WT_I18N::translate_c('NOMINATIVE', 'May') . '",
+			"' . WT_I18N::translate_c('NOMINATIVE', 'June') . '",
+			"' . WT_I18N::translate_c('NOMINATIVE', 'July') . '",
+			"' . WT_I18N::translate_c('NOMINATIVE', 'August') . '",
+			"' . WT_I18N::translate_c('NOMINATIVE', 'September') . '",
+			"' . WT_I18N::translate_c('NOMINATIVE', 'October') . '",
+			"' . WT_I18N::translate_c('NOMINATIVE', 'November') . '",
+			"' . WT_I18N::translate_c('NOMINATIVE', 'December') . '"
+		)
+		cal_setDayHeaders(
+			"' . WT_I18N::translate('Sun') . '",
+			"' . WT_I18N::translate('Mon') . '",
+			"' . WT_I18N::translate('Tue') . '",
+			"' . WT_I18N::translate('Wed') . '",
+			"' . WT_I18N::translate('Thu') . '",
+			"' . WT_I18N::translate('Fri') . '",
+			"' . WT_I18N::translate('Sat') . '"
+		)
+		cal_setWeekStart(' . $WEEK_START . ');
+	');
 }
 
 function print_findindi_link($element_id, $indiname='', $ged=WT_GEDCOM) {
@@ -1202,14 +1146,13 @@ function print_specialchar_link($element_id) {
 	return '<a href="#" onclick="findSpecialChar(document.getElementById(\''.$element_id.'\')); updatewholename(); return false;" class="icon-button_keyboard" title="'.WT_I18N::translate('Find a special character').'"></a>';
 }
 
-function print_autopaste_link($element_id, $choices, $concat=1, $name=1, $submit=0) {
+function print_autopaste_link($element_id, $choices, $updatewholename) {
 	echo "<small>";
 	foreach ($choices as $indexval => $choice) {
-		echo " &nbsp;<a href=\"#\" onclick=\"document.getElementById('", $element_id, "').value ";
-		if ($concat) echo "+=' "; else echo "='";
-		echo $choice, "'; ";
-		if ($name) echo " updatewholename();";
-		if ($submit) echo " document.forms[0].submit();";
+		echo " &nbsp;<a href=\"#\" onclick=\"document.getElementById('", $element_id, "').value='", $choice, "';";
+		if ($updatewholename) {
+			echo " updatewholename();";
+		}
 		echo " return false;\">", $choice, "</a>";
 	}
 	echo "</small>";

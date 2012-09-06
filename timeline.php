@@ -4,7 +4,7 @@
 // Use the $pids array to set which individuals to show on the chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: timeline.php 13851 2012-04-21 06:47:46Z greg $
+// $Id: timeline.php 14208 2012-08-26 06:56:57Z greg $
 
 define('WT_SCRIPT_NAME', 'timeline.php');
 require './includes/session.php';
@@ -31,10 +31,10 @@ require './includes/session.php';
 $controller=new WT_Controller_Timeline();
 $controller
 	->pageHeader()
-	->addExternalJavaScript('js/autocomplete.js');
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
 ?>
-<script type="text/javascript">
+<script>
 <!--
 var pastefield = null;
 function paste_id(value) {
@@ -229,7 +229,6 @@ if (N) {
 }
 document.onmousemove = MM;
 document.onmouseup = MU;
-//-->
 </script>
 <h2><?php echo WT_I18N::translate('Timeline'); ?></h2>
 <form name="people" action="timeline.php">
@@ -308,7 +307,7 @@ $controller->checkPrivacy();
 		<td class="list_value" style="padding: 5px">
 			<a href="<?php echo WT_SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale+$scalemod); ?>&amp;ged=<?php echo WT_GEDURL; ?>" class="icon-zoomin" title="<?php echo WT_I18N::translate('Zoom in'); ?>"></a><br>
 			<a href="<?php echo WT_SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale-$scalemod); ?>&amp;ged=<?php echo WT_GEDURL; ?>" class="icon-zoomout" title="<?php echo WT_I18N::translate('Zoom out'); ?>"></a><br>
-			<input type="button" value="<?php echo WT_I18N::translate('Clear Chart'); ?>" onclick="window.location = 'timeline.php?ged=<?php echo WT_GEDURL; ?>&amp;clear=1';">
+			<input type="button" value="<?php echo WT_I18N::translate('Clear Chart'); ?>" onclick="window.location = 'timeline.php?ged=<?php echo WT_GEDURL; ?>';">
 		</td>
 	<?php } ?>
 	</tr>
@@ -333,12 +332,12 @@ if (count($controller->people)>0) {
 	if ($mod<1) $mod = 1;
 	for ($i=$controller->baseyear+1; $i<$controller->topyear; $i++) {
 		if ($i % $mod == 0)  {
-			echo "<div id=\"scale$i\" style=\"font-family: Arial; position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset")."px; top:".floor($baseyoffset+(($i-$controller->baseyear)*$controller->scale)-$controller->scale/2)."px; font-size: 7pt; text-align:".($TEXT_DIRECTION =="ltr"?"left":"right").";\">";
+			echo "<div id=\"scale$i\" style=\"font-family: Arial; position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset")."px; top:".($baseyoffset+(($i-$controller->baseyear)*$controller->scale)-$controller->scale/2)."px; font-size: 7pt; text-align:".($TEXT_DIRECTION =="ltr"?"left":"right").";\">";
 			echo $i."--";
 			echo "</div>";
 		}
 	}
-	echo "<div id=\"scale{$controller->topyear}\" style=\"font-family: Arial; position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset")."px; top:".floor($baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale))."px; font-size: 7pt; text-align:".($TEXT_DIRECTION =="ltr"?"left":"right").";\">";
+	echo "<div id=\"scale{$controller->topyear}\" style=\"font-family: Arial; position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset")."px; top:".($baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale))."px; font-size: 7pt; text-align:".($TEXT_DIRECTION =="ltr"?"left":"right").";\">";
 	echo $controller->topyear."--";
 	echo "</div>";
 	sort_facts($controller->indifacts);
@@ -384,8 +383,7 @@ if (count($controller->people)>0) {
 			</table><br><br><br>
 		</div><br><br><br><br>
 	<?php } ?>
-	<script type="text/javascript">
-	<!--
+	<script>
 	var bottomy = <?php echo ($baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale)); ?>-5;
 	var topy = <?php echo $baseyoffset; ?>;
 	var baseyear = <?php echo $controller->baseyear-(25/$controller->scale); ?>;
@@ -403,13 +401,10 @@ if (count($controller->people)>0) {
 
 	var bheight=<?php echo $controller->bheight; ?>;
 	var scale=<?php echo $controller->scale; ?>;
-	//-->
 	</script>
 </div>
 <?php } ?>
-<script type="text/javascript">
-<!--
+<script>
 	timeline_chart_div = document.getElementById("timeline_chart");
 	if (timeline_chart_div) timeline_chart_div.style.height = '<?php echo $baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale*1.1); ?>px';
-//-->
 </script>

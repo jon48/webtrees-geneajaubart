@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Search.php 13870 2012-04-27 21:32:42Z greg $
+// $Id: Search.php 14115 2012-07-19 11:08:07Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -48,7 +48,6 @@ class WT_Controller_Search extends WT_Controller_Base {
 	var $soundex = "DaitchM";
 	var $subaction = "";
 	var $nameprt = "";
-	var $tagfilter = "on";
 	var $showasso = "off";
 	var $name="";
 	var $myname;
@@ -117,7 +116,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 
 		// TODO: fetch each variable independently, using appropriate validation
 		// Aquire all the variables values from the $_REQUEST
-		$varNames = array ("isPostBack", "srfams", "srindi", "srsour", "srnote", "view", "soundex", "subaction", "nameprt", "tagfilter", "showasso", "resultsPageNum", "resultsPerPage", "totalResults", "totalGeneralResults", "indiResultsPrinted", "famResultsPrinted", "srcResultsPrinted", "myindilist", "mysourcelist", "mynotelist", "myfamlist");
+		$varNames = array ("isPostBack", "srfams", "srindi", "srsour", "srnote", "view", "soundex", "subaction", "nameprt", "showasso", "resultsPageNum", "resultsPerPage", "totalResults", "totalGeneralResults", "indiResultsPrinted", "famResultsPrinted", "srcResultsPrinted", "myindilist", "mysourcelist", "mynotelist", "myfamlist");
 		$this->setRequestValues($varNames);
 
 		if (!$this->isPostBack) {
@@ -151,8 +150,8 @@ class WT_Controller_Search extends WT_Controller_Base {
 		} else {
 			$this->lastname="";
 		}
-		if (!empty ($_REQUEST["place"])) {
-			$this->place = $_REQUEST["place"];
+		if (!empty ($_REQUEST["place2"])) {
+			$this->place = $_REQUEST["place2"];
 		} else {
 			$this->place="";
 		}
@@ -231,7 +230,6 @@ class WT_Controller_Search extends WT_Controller_Base {
 		$this->inputFieldNames[] = "deathdate";
 		$this->inputFieldNames[] = "deathplace";
 		$this->inputFieldNames[] = "gender";
-		$this->inputFieldNames[] = "tagfilter";
 
 		// Get the search results based on the action
 		if ($topsearch) {
@@ -324,7 +322,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 
 			// Search the indi's
 			if (isset ($this->srindi)) {
-				$this->myindilist=search_indis($query_terms, array_keys($this->sgeds), 'AND', $this->tagfilter=='on');
+				$this->myindilist=search_indis($query_terms, array_keys($this->sgeds), 'AND');
 			} else {
 				$this->myindilist=array();
 			}
@@ -332,7 +330,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 			// Search the fams
 			if (isset ($this->srfams)) {
 				$this->myfamlist=array_merge(
-					search_fams($query_terms, array_keys($this->sgeds), 'AND', $this->tagfilter=='on'),
+					search_fams($query_terms, array_keys($this->sgeds), 'AND'),
 					search_fams_names($query_terms, array_keys($this->sgeds), 'AND')
 				);
 				$this->myfamlist=array_unique($this->myfamlist);
@@ -343,7 +341,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 			// Search the sources
 			if (isset ($this->srsour)) {
 				if (!empty ($this->query))
-				$this->mysourcelist=search_sources($query_terms, array_keys($this->sgeds), 'AND', $this->tagfilter=='on');
+				$this->mysourcelist=search_sources($query_terms, array_keys($this->sgeds), 'AND');
 			} else {
 				$this->mysourcelist=array();
 			}
@@ -351,7 +349,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 			// Search the notes
 			if (isset ($this->srnote)) {
 				if (!empty ($this->query))
-				$this->mynotelist=search_notes($query_terms, array_keys($this->sgeds), 'AND', $this->tagfilter=='on');
+				$this->mynotelist=search_notes($query_terms, array_keys($this->sgeds), 'AND');
 			} else {
 				$this->mynotelist=array();
 			}
@@ -583,22 +581,16 @@ class WT_Controller_Search extends WT_Controller_Base {
 		// ---- section to search and display results on a general keyword search
 		if ($this->action=="general" || $this->action=="soundex" || $this->action=="replace") {
 			if ($this->myindilist || $this->myfamlist || $this->mysourcelist || $this->mynotelist) {
+				$this->addInlineJavascript('jQuery("#search-result-tabs").tabs();');
+				$this->addInlineJavascript('jQuery("#search-result-tabs").css("visibility", "visible");');
+				$this->addInlineJavascript('jQuery(".loading-image").css("display", "none");');
 				echo '<br>';
-			echo WT_JS_START;
-			?>	jQuery(document).ready(function() {
-					jQuery("#search-result-tabs").tabs();
-					jQuery("#search-result-tabs").css("visibility", "visible");
-					jQuery(".loading-image").css("display", "none");
-				});
-			<?php
-			echo WT_JS_END;
-			echo '<div class="loading-image">&nbsp;</div>';
-			echo '<div id="search-result-tabs">
-				<ul>';
-					if ($this->myindilist) {echo '<li><a href="#searchAccordion-indi"><span id="indisource">', WT_I18N::translate('Individuals'), '</span></a></li>';}
-					if ($this->myfamlist) {echo '<li><a href="#searchAccordion-fam"><span id="famsource">', WT_I18N::translate('Families'), '</span></a></li>';}
-					if ($this->mysourcelist) {echo '<li><a href="#searchAccordion-source"><span id="mediasource">', WT_I18N::translate('Sources'), '</span></a></li>';}
-					if ($this->mynotelist) {echo '<li><a href="#searchAccordion-note"><span id="notesource">', WT_I18N::translate('Notes'), '</span></a></li>';}
+				echo '<div class="loading-image">&nbsp;</div>';
+				echo '<div id="search-result-tabs"><ul>';
+				if ($this->myindilist) {echo '<li><a href="#searchAccordion-indi"><span id="indisource">', WT_I18N::translate('Individuals'), '</span></a></li>';}
+				if ($this->myfamlist) {echo '<li><a href="#searchAccordion-fam"><span id="famsource">', WT_I18N::translate('Families'), '</span></a></li>';}
+				if ($this->mysourcelist) {echo '<li><a href="#searchAccordion-source"><span id="mediasource">', WT_I18N::translate('Sources'), '</span></a></li>';}
+				if ($this->mynotelist) {echo '<li><a href="#searchAccordion-note"><span id="notesource">', WT_I18N::translate('Notes'), '</span></a></li>';}
 				echo '</ul>';
 
 				// individual results
@@ -623,7 +615,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 						}
 					}
 				echo '</div>';//#searchAccordion-indi
-				echo WT_JS_START,'jQuery("#searchAccordion-indi").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});', WT_JS_END;
+				$this->addInlineJavascript('jQuery("#searchAccordion-indi").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 
 				// family results
 				echo '<div id="searchAccordion-fam">';
@@ -647,7 +639,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 						}
 					}
 				echo '</div>';//#searchAccordion-fam
-				echo WT_JS_START,'jQuery("#searchAccordion-fam").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});', WT_JS_END;
+				$this->addInlineJavascript('jQuery("#searchAccordion-fam").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 
 				// source results
 				echo '<div id="searchAccordion-source">';
@@ -671,7 +663,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 						}
 					}
 				echo '</div>';//#searchAccordion-source
-				echo WT_JS_START,'jQuery("#searchAccordion-source").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});', WT_JS_END;
+				$this->addInlineJavascript('jQuery("#searchAccordion-source").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 
 				// note results
 				echo '<div id="searchAccordion-note">';
@@ -695,7 +687,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 						}
 					}
 				echo '</div>';//#searchAccordion-note
-				echo WT_JS_START,'jQuery("#searchAccordion-note").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});', WT_JS_END;
+				$this->addInlineJavascript('jQuery("#searchAccordion-note").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 
 				$GEDCOM=WT_GEDCOM;
 				load_gedcom_settings(WT_GED_ID);

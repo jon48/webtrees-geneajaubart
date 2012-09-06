@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_change.php 13964 2012-06-02 20:33:56Z lukasz $
+// $Id: admin_site_change.php 13999 2012-06-16 21:57:04Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_change.php');
 require './includes/session.php';
@@ -181,7 +181,7 @@ case 'load_json':
 	$aaData=WT_DB::prepare($SELECT1.$WHERE.$ORDER_BY.$LIMIT)->execute($args)->fetchAll(PDO::FETCH_NUM);
 	foreach ($aaData as &$row) {
 		$row[1]=WT_I18N::translate($row[1]);
-		$row[2]='<a href="gedrecord.php?pid='.$row[2].'" target="_blank">'.$row[2].'</a>';
+		$row[2]='<a href="gedrecord.php?pid='.$row[2].'&ged='.$row[6].'" target="_blank">'.$row[2].'</a>';
 		$row[3]='<pre>'.htmlspecialchars($row[3]).'</pre>';
 		$row[4]='<pre>'.htmlspecialchars($row[4]).'</pre>';
 	}
@@ -202,8 +202,8 @@ case 'load_json':
 
 $controller
 	->pageHeader()
-	->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-	->addInlineJavaScript('
+	->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+	->addInlineJavascript('
 		var oTable=jQuery("#log_list").dataTable( {
 			"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
 			"bProcessing": true,
@@ -214,7 +214,16 @@ $controller
 			"bAutoWidth":false,
 			"aaSorting": [[ 0, "desc" ]],
 			"iDisplayLength": '.get_user_setting(WT_USER_ID, 'admin_site_change_page_size', 10).',
-			"sPaginationType": "full_numbers"
+			"sPaginationType": "full_numbers",
+			"aoColumns": [
+			/* Timestamp   */ {},
+			/* Status      */ {},
+			/* Record      */ {},
+			/* Old data    */ {"sClass":"raw_gedcom"},
+			/* New data    */ {"sClass":"raw_gedcom"},
+			/* User        */ {},
+			/* Family tree */ {}
+			]
 		});
 	');
 

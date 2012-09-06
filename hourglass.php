@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: hourglass.php 13867 2012-04-26 16:30:59Z lukasz $
+// $Id: hourglass.php 14111 2012-07-18 12:25:09Z greg $
 
 define('WT_SCRIPT_NAME', 'hourglass.php');
 require './includes/session.php';
@@ -31,9 +31,9 @@ require './includes/session.php';
 $controller=new WT_Controller_Hourglass();
 $controller
 	->pageHeader()
-	->addExternalJavaScript('js/autocomplete.js')
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
 	->setupJavascript()
-	->addInlineJavaScript('sizeLines();');
+	->addInlineJavascript('sizeLines();');
 
 echo '<table><tr><td valign="top">';
 echo '<h2>', WT_I18N::translate('Hourglass chart of %s', $controller->name), '</h2>';

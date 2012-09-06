@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: autocomplete.php 13766 2012-04-03 16:34:21Z greg $
+// $Id: autocomplete.php 14119 2012-07-24 21:11:28Z greg $
 
 define('WT_SCRIPT_NAME', 'autocomplete.php');
 require './includes/session.php';
@@ -40,9 +40,9 @@ case 'ASSO': // Associates of an individuals, whose name contains the search ter
 			"SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, n_full".
 			" FROM `##individuals`".
 			" JOIN `##name` ON (i_id=n_id AND i_file=n_file)".
-			" WHERE n_full LIKE CONCAT('%', REPLACE(?, ' ', '%'), '%') AND i_file=? ORDER BY n_full"
+			" WHERE (n_full LIKE CONCAT('%', REPLACE(?, ' ', '%'), '%') OR n_surn LIKE CONCAT('%', REPLACE(?, ' ', '%'), '%')) AND i_file=? ORDER BY n_full"
 		)
-		->execute(array($term, WT_GED_ID))
+		->execute(array($term, $term, WT_GED_ID))
 		->fetchAll(PDO::FETCH_ASSOC);
 	// Filter for privacy - and whether they could be alive at the right time
 	$pid=safe_GET_xref('pid');
@@ -139,7 +139,7 @@ case 'CEME': // Cemetery fields, that contain the search term
 	// Filter for privacy
 	foreach ($rows as $row) {
 		$person=WT_Person::getInstance($row);
-		if (preg_match('/\n2 CEME (.*'.preg_quote($term).'.*)/i', $person->getGedcomRecord(), $match)) {
+		if (preg_match('/\n2 CEME (.*'.preg_quote($term, '/').'.*)/i', $person->getGedcomRecord(), $match)) {
 			$data[]=$match[1];
 		}
 	}	
@@ -172,7 +172,7 @@ case 'GIVN': // Given names, that start with the search term
 			"SELECT SQL_CACHE DISTINCT n_givn".
 			" FROM `##name`".
 			" WHERE n_givn LIKE CONCAT(?, '%') AND n_file=?".
-			" ORDER BY LOCATE(' ', n_givn), n_givn"
+			" ORDER BY n_givn"
 		)
 		->execute(array($term, WT_GED_ID))
 		->fetchOneColumn()
@@ -187,9 +187,9 @@ case 'INDI': // Individuals, whose name contains the search terms
 			"SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, n_full".
 			" FROM `##individuals`".
 			" JOIN `##name` ON (i_id=n_id AND i_file=n_file)".
-			" WHERE n_full LIKE CONCAT('%', REPLACE(?, ' ', '%'), '%') AND i_file=? ORDER BY n_full"
+			" WHERE (n_full LIKE CONCAT('%', REPLACE(?, ' ', '%'), '%') OR n_surn LIKE CONCAT('%', REPLACE(?, ' ', '%'), '%')) AND i_file=? ORDER BY n_full"
 		)
-		->execute(array($term, WT_GED_ID))
+		->execute(array($term, $term, WT_GED_ID))
 		->fetchAll(PDO::FETCH_ASSOC);
 	// Filter for privacy
 	foreach ($rows as $row) {
@@ -231,23 +231,10 @@ case 'OBJE':
 
 case 'PLAC': // Place names (with hierarchy), that include the search term
 	// Do not filter by privacy.  Place names on their own do not identify individuals.
-	$data=
-		WT_DB::prepare(
-			"SELECT SQL_CACHE CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place)".
-			" FROM      `##places` AS p1".
-			" LEFT JOIN `##places` AS p2 ON (p1.p_parent_id=p2.p_id AND p1.p_file=p2.p_file)".
-			" LEFT JOIN `##places` AS p3 ON (p2.p_parent_id=p3.p_id AND p2.p_file=p3.p_file)".
-			" LEFT JOIN `##places` AS p4 ON (p3.p_parent_id=p4.p_id AND p3.p_file=p4.p_file)".
-			" LEFT JOIN `##places` AS p5 ON (p4.p_parent_id=p5.p_id AND p4.p_file=p5.p_file)".
-			" LEFT JOIN `##places` AS p6 ON (p5.p_parent_id=p6.p_id AND p5.p_file=p6.p_file)".
-			" LEFT JOIN `##places` AS p7 ON (p6.p_parent_id=p7.p_id AND p6.p_file=p7.p_file)".
-			" LEFT JOIN `##places` AS p8 ON (p7.p_parent_id=p8.p_id AND p7.p_file=p8.p_file)".
-			" LEFT JOIN `##places` AS p9 ON (p8.p_parent_id=p9.p_id AND p8.p_file=p9.p_file)".
-			" WHERE p1.p_place LIKE CONCAT('%', ?, '%') AND p1.p_file=?".
-			" ORDER BY p1.p_place"
-		)
-		->execute(array($term, WT_GED_ID))
-		->fetchOneColumn();
+	$data=array();
+	foreach (WT_Place::findPlaces($term, WT_GED_ID) as $place) {
+		$data[]=$place->getGedcomName();
+	}
 	if (!$data && get_gedcom_setting(WT_GED_ID, 'USE_GEONAMES')) {
 		// No place found?  Use an external gazetteer
 		$url=
@@ -352,10 +339,10 @@ case 'SOUR_PAGE': // Citation details, for a given source, that contain the sear
 	// Filter for privacy
 	foreach ($rows as $row) {
 		$person=WT_Person::getInstance($row);
-		if (preg_match('/\n1 SOUR @'.$sid.'@(?:\n[2-9].*)*\n2 PAGE (.*'.str_replace(' ', '.+', preg_quote($term)).'.*)/i', $person->getGedcomRecord(), $match)) {
+		if (preg_match('/\n1 SOUR @'.$sid.'@(?:\n[2-9].*)*\n2 PAGE (.*'.str_replace(' ', '.+', preg_quote($term, '/')).'.*)/i', $person->getGedcomRecord(), $match)) {
 			$data[]=$match[1];
 		}
-		if (preg_match('/\n2 SOUR @'.$sid.'@(?:\n[3-9].*)*\n3 PAGE (.*'.str_replace(' ', '.+', preg_quote($term)).'.*)/i', $person->getGedcomRecord(), $match)) {
+		if (preg_match('/\n2 SOUR @'.$sid.'@(?:\n[3-9].*)*\n3 PAGE (.*'.str_replace(' ', '.+', preg_quote($term, '/')).'.*)/i', $person->getGedcomRecord(), $match)) {
 			$data[]=$match[1];
 		}
 	}
@@ -371,10 +358,10 @@ case 'SOUR_PAGE': // Citation details, for a given source, that contain the sear
 	// Filter for privacy
 	foreach ($rows as $row) {
 		$family=WT_Family::getInstance($row);
-		if (preg_match('/\n1 SOUR @'.$sid.'@(?:\n[2-9].*)*\n2 PAGE (.*'.str_replace(' ', '.+', preg_quote($term)).'.*)/i', $family->getGedcomRecord(), $match)) {
+		if (preg_match('/\n1 SOUR @'.$sid.'@(?:\n[2-9].*)*\n2 PAGE (.*'.str_replace(' ', '.+', preg_quote($term, '/')).'.*)/i', $family->getGedcomRecord(), $match)) {
 			$data[]=$match[1];
 		}
-		if (preg_match('/\n2 SOUR @'.$sid.'@(?:\n[3-9].*)*\n3 PAGE (.*'.str_replace(' ', '.+', preg_quote($term)).'.*)/i', $family->getGedcomRecord(), $match)) {
+		if (preg_match('/\n2 SOUR @'.$sid.'@(?:\n[3-9].*)*\n3 PAGE (.*'.str_replace(' ', '.+', preg_quote($term, '/')).'.*)/i', $family->getGedcomRecord(), $match)) {
 			$data[]=$match[1];
 		}
 	}

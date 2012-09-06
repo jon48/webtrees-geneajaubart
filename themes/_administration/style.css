@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id: style.css 13937 2012-05-16 20:15:56Z nigel $
+ * $Id: style.css 14110 2012-07-18 10:49:35Z greg $
  * @version: p_$Revision$ $Date$
  * $HeadURL$
  */
@@ -27,7 +27,7 @@
 html {overflow-y:scroll;}
 
 /* general styles */
-body {font-family:Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; font-size:12px; margin:10px; min-width:800px;}
+body {font-family:"Trebuchet MS",Tahoma,Verdana,Arial,sans-serif; font-size:12px; margin:10px; min-width:800px;}
 input.ui-button {padding:1px 3px;}
 input, textarea, select {color:black; font:inherit; padding:0 3px; /*height:22px;*/}
 button, input[type="submit"], input[type="reset"], input[type="button"], input[type="file"] {background:url(jquery/images/ui-bg_fine-grain_10_f8f7f6_60x60.png) 50% 50% #F8F7F6; border:1px solid #CBC7BD; color:#654B24; font-weight:700; border-radius:3px; margin:0.3em;}
@@ -62,7 +62,6 @@ html[dir='rtl'] input {padding-right:3px; padding-left:0;}
 html[dir='rtl'] .ui-tabs .ui-tabs-nav li {float: right;}
 
 /* jEditable styling over-rides */
-.editable {width:100%; display:block}
 .editable:hover {color:red; cursor:pointer;} /* both cursors needed for cross-browser support */
 .editable input, select {padding:0;}
 .editable input {font-size:90%; height:18px !important;}
@@ -156,13 +155,13 @@ html[dir='rtl'] #tree_stats td, html[dir='rtl'] #recent td {padding:0 0 0 10px; 
 #x h2, #x h3 {padding:0 25px;}
 
 /* SITE ACCESS */
-.ip_address span, .ua_string span {direction:ltr;}
+.ip_address span, .ua_string span, .raw_gedcom {direction:ltr;}
 
 /*SITE CONFIG */
 #site table, #mail table {background:OldLace; border:1px inset #D9D6C4; border-collapse:separate; border-spacing:0; font-size:90%; padding:5px; width:100%;}
 .site_config h2 {font-size:125%; font-weight:bold; margin:10px 0 5px;}
 /* PERSO No max-width defined */
-.site_config dl {float:left;margin:0 0 0 20px;line-height:21px;}
+.site_config dl {float:left;margin:0 0 0 20px;line-height:25px;}
 /* END PERSO */
 .site_config dt {clear:left; float:left; min-width:170px; margin:0; padding:5px 5px 5px 0; border-bottom:1px solid #999; font-weight:bold;}
 .site_config dd {border-bottom:1px solid #999; margin-left:370px; min-width:370px; padding:5px;}
@@ -177,7 +176,7 @@ input.log-date {text-align:center; width:70px;}
 input.log-filter {width:120px;}
 table#log_list {width:100%}
 #log_list th {min-width:80px;white-space:nowrap;}
-#log_list pre {margin:0 0 20px 0;max-width:250px;white-space:pre-wrap;word-wrap: break-word;-ms-word-break: break-all;word-break: break-all; word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto; hyphens: auto;}
+#log_list pre {margin:0 0 20px 0;max-width:250px;white-space:pre-wrap;word-wrap: break-word;-ms-word-break: break-all;word-break: break-all;-webkit-hyphens: auto;-moz-hyphens: auto; hyphens: auto;}
  #log_list a {color:blue;}
  #log_list a:hover, #log_list a:visited {color:red;}
  
@@ -303,7 +302,6 @@ html[dir='rtl'] #clean th {text-align:right;}
 table#media_table {width:100%;}
 #media_table th {min-width:200px;}
 #media_table th+th {min-width:120px;}
-#media_table th+th+th {width:*;}
 #media_table td {padding:5px;}
 .media_items {width:100%; margin:0;}
 .media_items td {background:OldLace; border:1px inset #D9D6C4;}
@@ -430,7 +428,7 @@ table#story_table {width:100%}
 
 /* Autocomplete styles */
 .ui-autocomplete-input {background-color:#EEE8AA;}
-.ui-autocomplete {padding:0; border:1px solid black; background-color:white; z-index:99999;list-style-position:outside; list-style:none; padding:0; margin:0;;max-height:200px;overflow-y:auto;}
+.ui-autocomplete {padding:0; border:1px solid black; background-color:white; z-index:99999;list-style-position:outside; list-style:none; margin:0;;max-height:200px;overflow-y:auto;}
 .ui-autocomplete li {margin:0; padding:2px 5px; cursor:default; display:block; font:menu;font-size:12px; line-height:14px; overflow:hidden;}
 .ui-autocomplete-loading {background:white url(images/indicator.gif) right center no-repeat;}
 .ui-autocomplete li:nth-child(odd) {background-color:#eee;}

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13927 2012-05-07 14:50:50Z lukasz $
+// $Id: module.php 14111 2012-07-18 12:25:09Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -113,7 +113,8 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 		$title=$this->getTitle();
 
 		if (WT_USER_ID) {
-			$controller->addExternalJavaScript('js/autocomplete.js');
+			$controller
+				->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 		}
 
 		$content = '';
@@ -167,8 +168,8 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 			}
 		}
 		if ($ctype=='user' || WT_USER_GEDCOM_ADMIN) {
-			$uniqueID = floor(microtime() * 1000000); // This block can theoretically appear multiple times, so use a unique ID.
-			$content .= WT_JS_START.'var pastefield; function paste_id(value) {pastefield.value=value;}'.WT_JS_END;
+			$uniqueID = (int)(microtime() * 1000000); // This block can theoretically appear multiple times, so use a unique ID.
+			$content .= '<script>var pastefield; function paste_id(value) {pastefield.value=value;}</script>';
 			$content .= '<div class="add_fav_head">';
 			$content .= '<a href="#" onclick="return expand_layer(\'add_fav'.$uniqueID.'\');">'.WT_I18N::translate('Add a new favorite').'<i id="add_fav'.$uniqueID.'_img" class="icon-plus"></i></a>';
 			$content .= '</div>';
@@ -233,7 +234,6 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 	public function configureBlock($block_id) {
 		if (safe_POST_bool('save')) {
 			set_block_setting($block_id, 'block',  safe_POST_bool('block'));
-			echo WT_JS_START, 'window.opener.location.href=window.opener.location.href;window.close();', WT_JS_END;
 			exit;
 		}
 
@@ -275,6 +275,8 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 		if ($favorite['user_id']) {
 			$sql.=" AND user_id=?";
 			$vars[]=$favorite['user_id'];
+		} else {
+			$sql.=" AND user_id IS NULL";
 		}
 
 		if (WT_DB::prepare($sql)->execute($vars)->fetchOne()) {
@@ -302,7 +304,7 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 	protected static function updateSchema() {
 		// Create tables, if not already present
 		try {
-			WT_DB::updateSchema(WT_ROOT.WT_MODULES_DIR.'gedcom_favorites/db_schema/', 'FV_SCHEMA_VERSION', 2);
+			WT_DB::updateSchema(WT_ROOT.WT_MODULES_DIR.'gedcom_favorites/db_schema/', 'FV_SCHEMA_VERSION', 4);
 		} catch (PDOException $ex) {
 			// The schema update scripts should never fail.  If they do, there is no clean recovery.
 			die($ex);

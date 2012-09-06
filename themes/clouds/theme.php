@@ -22,11 +22,28 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: theme.php 13705 2012-03-28 09:07:45Z greg $
+// $Id: theme.php 14181 2012-08-18 21:23:39Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
+}
+
+// Convert a menu into our theme-specific format
+function getMenuAsCustomList($menu) {
+		// Create an inert menu - to use as a label
+		$tmp=new WT_Menu(strip_tags($menu->label), '');
+		// Insert the label into the submenu
+		if (is_array($menu->submenus)) {
+			array_unshift($menu->submenus, $tmp);
+		} else {
+			$menu->addSubmenu($tmp);
+		}
+		// Neutralise the top-level menu
+		$menu->label='';
+		$menu->onclick='';
+		$menu->iconclass='';
+		return $menu->getMenuAsList();
 }
 
 $theme_name = "clouds"; // need double quotes, as file is scanned/parsed by script
@@ -89,6 +106,11 @@ $basexoffset = 10; // -- position the pedigree and timeline charts relative to t
 $bxspacing = 4; // -- horizontal spacing between boxes on the pedigree chart
 $byspacing = 5; // -- vertical spacing between boxes on the pedigree chart
 $brborder = 1; // -- pedigree chart box right border thickness 
+$linewidth=1.5;			// width of joining lines
+$shadowcolor="";		// shadow color for joining lines
+$shadowblur=0;			// shadow blur for joining lines
+$shadowoffsetX=0;		// shadowOffsetX for joining lines
+$shadowoffsetY=0;		// shadowOffsetY for joining lines
 
 //-- Other settings that should not be touched
 $Dbxspacing = 5; // -- position vertical line between boxes in relationship chart

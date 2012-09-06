@@ -6,8 +6,6 @@
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
 //
-// Modifications Copyright (c) 2010 Greg Roach
-//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
@@ -22,18 +20,20 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: webtrees.js 13845 2012-04-20 12:13:34Z greg $
+// $Id: webtrees.js 14226 2012-08-30 05:18:45Z nigel $
 
 // Specifications for various types of popup edit window.
 // Choose positions to center in the smallest (1000x800) target screen
 var edit_window_specs='width=650,height=600,left=175,top=100,resizable=1,scrollbars=1'; // edit_interface.php, add_media.php, gedrecord.php
 var indx_window_specs='width=600,height=500,left=200,top=150,resizable=1,scrollbars=1'; // index_edit.php, module configuration
 var help_window_specs='width=500,height=400,left=250,top=200,resizable=1,scrollbars=1'; // help.php
-var find_window_specs='width=500,height=500,left=250,top=150,resizable=1,scrollbars=1'; // find.php, inverse_link.php
+var find_window_specs='width=550,height=600,left=250,top=150,resizable=1,scrollbars=1'; // find.php, inverse_link.php
 var mesg_window_specs='width=500,height=600,left=250,top=100,resizable=1,scrollbars=1'; // message.php
 var chan_window_specs='width=500,height=600,left=250,top=100,resizable=1,scrollbars=1'; // edit_changes.php
 var mord_window_specs='width=500,height=600,left=250,top=100,resizable=1,scrollbars=1'; // edit_interface.php, media reorder
 var assist_window_specs='width=900,height=800,left=70,top=70,resizable=1,scrollbars=1'; // edit_interface.php, used for census assistant
+var gmap_window_specs='width=600,height=620,left=200,top=150,resizable=1,scrollbars=1'; // googlemap module place editing
+var fam_nav_specs='width=300,height=600,left=817,top=150,resizable=1,scrollbars=1'; // media_0_inverselink.php
 
 // TODO: This function loads help_text.php twice.  It should only load it once.
 function helpDialog(which, mod) {
@@ -79,6 +79,17 @@ function modalDialogSubmitAjax(form) {
 	return false;
 }
 
+function closePopupAndReloadParent(url) {
+	if (parent.opener) {
+		if (url == null || url == "") {
+			parent.opener.location.reload();
+		} else {
+			parent.opener.location=url;
+		}
+	}
+	window.close();
+}
+
 function openImage(filename, width, height) {
 	height=height+50;
 	screenW = screen.width;
@@ -97,20 +108,12 @@ function openImage(filename, width, height) {
 	var msX = 0;
 	var msY = 0;
 
-//  the following javascript functions are for the positioning and hide/show of
+//  the following javascript function is for the positioning and hide/show of
 //  DIV layers used in the display of the pedigree chart.
-function MM_findObj(n, d) { //v4.01
-  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
-    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
-  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
-  for (i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
-  if(!x && d.getElementById) x=d.getElementById(n); return x;
-}
-
 function MM_showHideLayers() { //v6.0
   var i,p,v,obj,args=MM_showHideLayers.arguments;
   for (i=0; i<(args.length-3); i+=4) {
-	  if ((obj=MM_findObj(args[i]))!=null) {
+	  if ((obj=document.getElementById(args[i]))!=null) {
     	if (obj.style) {
 	      div=obj;
 	      obj=obj.style;
@@ -123,7 +126,7 @@ function MM_showHideLayers() { //v6.0
 	    v=(v=='show')?'visible':(v=='hide')?'hidden':v;
     	obj.visibility=v;
     	if (args[i+1]=='followmouse') {
-	    	pobj = MM_findObj(args[i+3]);
+	    	pobj = document.getElementById(args[i+3]);
 	    	if (pobj!=null) {
 //		    	if (pobj.style.top!="auto") {
 		    	if (pobj.style.top!="auto" && args[i+3]!="relatives") {
@@ -177,19 +180,6 @@ var show = false;
 		else {
 			MM_showHideLayers('childbox'+pid, ' ', 'show', ' ');
 			show=true;
-		}
-		return false;
-	}
-
-	function togglefavoritesbox() {
-		favsbox = document.getElementById("favs_popup");
-		if (favsbox) {
-			if (favsbox.style.visibility=="visible") {
-				MM_showHideLayers('favs_popup', ' ', 'hide',' ');
-			}
-			else {
-				MM_showHideLayers('favs_popup', ' ', 'show', ' ');
-			}
 		}
 		return false;
 	}
@@ -303,118 +293,230 @@ function getMouseXY(e) {
   return true;
 }
 
+/**
+ * @param params
+ *        Object containing URL parameters.
+ * @param {optional} windowspecs
+ *        Window features to use.  Defaults to edit_window_specs.
+ * @param {optional} pastefield
+ *        Field to paste a result into.
+ */
+function edit_interface(params, windowspecs, pastefield) {
+  var features = windowspecs || edit_window_specs;
+  var url = 'edit_interface.php?' + jQuery.param(params) + '&accesstime=' + accesstime;
+  window.open(url, '_blank', features);
+}
+
 function edit_record(pid, linenum) {
-	window.open('edit_interface.php?action=edit&pid='+pid+'&linenum='+linenum+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "edit",
+    "pid": pid,
+    "linenum": linenum
+  });
+  return false;
 }
 
 function edit_raw(pid) {
-	window.open('edit_interface.php?action=editraw&pid='+pid+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "editraw",
+    "pid": pid
+  });
+  return false;
 }
 
 function edit_note(pid) {
-	window.open('edit_interface.php?action=editnote&pid='+pid+'&linenum=1&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "editnote",
+    "pid": pid,
+    "linenum": 1
+  });
+  return false;
 }
 
 function edit_source(pid) {
-	window.open('edit_interface.php?action=editsource&pid='+pid+'&linenum=1&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "editsource",
+    "pid": pid,
+    "linenum": 1
+  });
+  return false;
 }
 
 function add_record(pid, fact) {
-	factfield = document.getElementById(fact);
+	var factfield = document.getElementById(fact);
 	if (factfield) {
-		factvalue = factfield.options[factfield.selectedIndex].value;
-		if (factvalue == "OBJE") window.open('addmedia.php?action=showmediaform&linkid='+pid, '_blank', edit_window_specs);
-		else window.open('edit_interface.php?action=add&pid='+pid+'&fact='+factvalue+"&"+"&accesstime="+accesstime, '_blank', edit_window_specs);
+		var factvalue = factfield.options[factfield.selectedIndex].value;
+		if (factvalue == "OBJE") {
+			window.open('addmedia.php?action=showmediaform&linkid='+pid, '_blank', edit_window_specs);
+		} else {
+			edit_interface({
+				"action": "add",
+				"pid": pid,
+				"fact": factvalue
+			});
+		}
 	}
 	return false;
 }
 
 function addClipboardRecord(pid, fact) {
-	factfield = document.getElementById(fact);
+	var factfield = document.getElementById(fact);
 	if (factfield) {
-		factvalue = factfield.options[factfield.selectedIndex].value;
-		window.open('edit_interface.php?action=paste&pid='+pid+'&fact='+factvalue.substr(10)+'&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
+		var factvalue = factfield.options[factfield.selectedIndex].value;
+	        edit_interface({
+			"action": "paste",
+			"pid": pid,
+			"fact": factvalue.substr(10)
+		});
 	}
 	return false;
 }
 
 function reorder_media(xref) {
-	window.open('edit_interface.php?action=reorder_media&pid='+xref, '_blank', mord_window_specs);
-	return false;
+  edit_interface({
+    "action": "reorder_media",
+    "pid": xref
+  }, mord_window_specs);
+  return false;
 }
 
 function add_new_record(pid, fact) {
-	window.open('edit_interface.php?action=add&pid='+pid+'&fact='+fact+'&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "add",
+    "pid": pid,
+    "fact": fact
+  });
+  return false;
 }
 
-function addnewchild(famid,gender) {
-	window.open('edit_interface.php?action=addchild&gender='+gender+'&famid='+famid+'&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+function addnewchild(famid, gender) {
+  edit_interface({
+    "action": "addchild",
+    "gender": gender,
+    "famid": famid
+  });
+  return false;
 }
 
 function addnewspouse(famid, famtag) {
-	window.open('edit_interface.php?action=addspouse&famid='+famid+'&famtag='+famtag+'&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "addspouse",
+    "famid": famid,
+    "famtag": famtag
+  });
+  return false;
 }
 
 function addopfchild(pid, gender) {
-	window.open('edit_interface.php?action=addopfchild&pid='+pid+'&gender='+gender+'&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "addopfchild",
+    "pid": pid,
+    "gender": gender
+  });
+  return false;
 }
 
 function addspouse(pid, famtag) {
-	window.open('edit_interface.php?action=addspouse&pid='+pid+'&famtag='+famtag+'&famid=new&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "addspouse",
+    "pid": pid,
+    "famtag": famtag,
+    "famid": "new"
+  });
+  return false;
 }
 
 function linkspouse(pid, famtag) {
-	window.open('edit_interface.php?action=linkspouse&pid='+pid+'&famtag='+famtag+'&famid=new&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "linkspouse",
+    "pid": pid,
+    "famtag": famtag,
+    "famid": "new"
+  });
+  return false;
 }
 
 function add_famc(pid) {
-	 window.open('edit_interface.php?action=addfamlink&pid='+pid+'&famtag=CHIL'+'&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "addfamlink",
+    "pid": pid,
+    "famtag": "CHIL"
+  });
+  return false;
 }
 
 function add_fams(pid, famtag) {
-	 window.open('edit_interface.php?action=addfamlink&pid='+pid+'&famtag='+famtag+'&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "addfamlink",
+    "pid": pid,
+    "famtag": famtag
+  });
+  return false;
 }
 
 function edit_name(pid, linenum) {
-	window.open('edit_interface.php?action=editname&pid='+pid+'&linenum='+linenum+'&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "editname",
+    "pid": pid,
+    "linenum": linenum
+  });
+  return false;
 }
 
 function add_name(pid) {
-	window.open('edit_interface.php?action=addname&pid='+pid+'&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "addname",
+    "pid": pid
+  });
+  return false;
 }
 
 function addnewparent(pid, famtag) {
-	window.open('edit_interface.php?action=addnewparent&pid='+pid+'&famtag='+famtag+'&famid=new'+'&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "addnewparent",
+    "pid": pid,
+    "famtag": famtag,
+    "famid": "new"
+  });
+  return false;
 }
 
 function addnewparentfamily(pid, famtag, famid) {
-	window.open('edit_interface.php?action=addnewparent&pid='+pid+'&famtag='+famtag+'&famid='+famid+'&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "addnewparent",
+    "pid": pid,
+    "famtag": famtag,
+    "famid": famid
+  });
+  return false;
+}
+
+function delete_fact(pid, linenum, mediaid, message) {
+  if (confirm(message)) {
+    edit_interface({
+      "action": "delete",
+      "pid": pid,
+      "linenum": linenum,
+      "mediaid": mediaid
+    });
+  }
+  return false;
 }
 
 function reorder_children(famid) {
-	window.open('edit_interface.php?action=reorder_children&pid='+famid+'&'+'&accesstime='+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "reorder_children",
+    "pid": famid
+  });
+  return false;
 }
 
 function reorder_families(pid) {
-	window.open('edit_interface.php?action=reorder_fams&pid='+pid+"&"+"&accesstime="+accesstime, '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "reorder_fams",
+    "pid": pid
+  });
+  return false;
 }
 
 function reply(username, subject) {
@@ -428,25 +530,41 @@ function delete_message(id) {
 }
 
 function change_family_members(famid) {
-	window.open('edit_interface.php?famid='+famid+"&"+"&accesstime="+accesstime+"&action=changefamily", '_blank', edit_window_specs);
-	return false;
+  edit_interface({
+    "action": "changefamily",
+    "famid": famid
+  });
+  return false;
 }
 
 function addnewsource(field) {
-	pastefield = field;
-	window.open('edit_interface.php?action=addnewsource&pid=newsour', '_blank', edit_window_specs);
+	pastefield=field;
+	edit_interface({
+		"action": "addnewsource",
+		"pid": "newsour"
+	}, null, field);
 	return false;
 }
+
 function addnewnote(field) {
-	pastefield = field;
-	window.open('edit_interface.php?action=addnewnote&noteid=newnote', '_blank', edit_window_specs);
+	pastefield=field;
+	edit_interface({
+		"action": "addnewnote",
+		"noteid": "newnote"
+	}, null, field);
 	return false;
 }
+
 function addnewnote_assisted(field, iid) {
-	pastefield = field;
-	window.open('edit_interface.php?action=addnewnote_assisted&noteid=newnote&pid='+iid, '_blank', assist_window_specs);
+	pastefield=field;
+	edit_interface({
+		"action": "addnewnote_assisted",
+		"noteid": "newnote",
+		"pid": iid
+	}, assist_window_specs, field);
 	return false;
 }
+
 function addmedia_links(field, iid, iname) {
 	pastefield = field;
 	insertRowToTable(iid, iname);
@@ -703,77 +821,6 @@ function createXMLHttp()
 	throw new Error("XMLHttp object could not be created.");
 };
 
-/**
- * function to extract JS code from a text string.  Useful to call when loading
- * content dynamically through AJAX which contains a mix of HTML and JavaScript.
- * retrieves all of the JS code between <script></script> tags and adds it as a <script> node
- * @param string text   the text that contains a mix of html and inline javascript
- * @param DOMElement parentElement	the element that the text and JavaScript will added to
- */
-function evalAjaxJavascript(text, parentElement) {
-	parentElement.innerHTML = "";
-	/* -- uncomment for debugging
-	debugelement = document.createElement("pre");
-	debugelement.appendChild(document.createTextNode(text));
-	parentElement.appendChild(debugelement);
-	*/
-	pos2 = -1;
-	//-- find the first occurrence of <script>
-	pos1 = text.indexOf("<script", pos2+1);
-	while(pos1>-1) {
-		//-- append the text up to the <script tag to the content of the parent element
-		parentElement.innerHTML += text.substring(0, pos1);
-
-		//-- find the close of the <script> tag
-		pos2 = text.indexOf(">",pos1+5);
-		if (pos2==-1) {
-			parentElement.innerHTML += "Error: incomplete text";
-			return;
-		}
-		//-- create a new <script> element to add to the parentElement
-		jselement = document.createElement("script");
-		jselement.type = "text/javascript";
-		//-- look for any src attributes
-		scripttag = text.substring(pos1, pos2);
-		regex = new RegExp("\\ssrc=\".*\"", "gi");
-		results = scripttag.match(regex);
-		if (results) {
-			for (i=0; i<results.length; i++) {
-				src = results[i].substring(results[i].indexOf("\"")+1, results[i].indexOf("\"", 6));
-				src = src.replace(/&amp;/gi, "&");
-				jselement.src = src;
-			}
-		}
-		opos1 = pos1;
-		pos1 = pos2;
-		//-- find the closing </script> tag
-		pos2 = text.indexOf("</script",pos1+1);
-		if (pos2==-1) {
-			parentElement.innerHTML += "Error: incomplete text";
-			return;
-		}
-		//-- get the JS code between the <script></script> tags
-		if (!results || results.length==0) {
-			jscode = text.substring(pos1+1, pos2);
-			if (jscode.length>0) {
-				ttext = document.createTextNode(jscode);
-				//-- add the JS code to the <script> element as a text node
-				jscode=jscode.replace(/<!--/g, ''); // remove html comment [ 1737256 ]
-				jscode=jscode.replace(/function ([^( ]*)/g,'window.$1 = function');
-				eval(jscode);
-			}
-		}
-		//-- add the javascript element to the parent element
-		parentElement.appendChild(jselement);
-		//-- shrink the text for the next iteration
-		text = text.substring(pos2+9, text.length);
-		//-- look for the next <script> tag
-		pos1 = text.indexOf("<script");
-	}
-	//-- make sure any HTML/text after the last </script> gets added
-	parentElement.innerHTML += text;
-}
-
 function restorebox(boxid, bstyle) {
 	divbox = document.getElementById("out-"+boxid);
 	inbox = document.getElementById("inout-"+boxid);
@@ -826,36 +873,7 @@ function restorebox(boxid, bstyle) {
 	return true;
 }
 
-/**
- * changes a CSS class for the given element
- *
- * @author John Finlay
- * @param string elementid the id for the dom element you want to give a new class
- * @param string newclass the name of the new class to apply to the element
- */
-function change_class(elementid, newclass) {
-	var element = document.getElementById(elementid);
-	if (element) {
-		element.className = newclass;
-	}
-}
-
-/**
- * changes the src of an image
- *
- * @author John Finlay
- * @param string elementid the id for the dom element you want to give a new icon
- * @param string newicon the src path of the new icon to apply to the element
- */
-function change_icon(elementid, newicon) {
-	var element = document.getElementById(elementid);
-	if (element) {
-		element.src = newicon;
-	}
-}
-
 var menutimeouts = new Array();
-var currentmenu = null;
 /**
  * Shows a submenu
  *
@@ -929,7 +947,6 @@ function show_submenu(elementid, parentid, dir) {
 			element.style.overflow = 'auto';
 		}
 
-		currentmenu = elementid;
 		element.style.visibility='visible';
 	}
 	clearTimeout(menutimeouts[elementid]);
@@ -986,21 +1003,6 @@ function loadHandler() {
 var IE = document.all?true:false;
 if (!IE) document.captureEvents(Event.MOUSEMOVE|Event.KEYDOWN|Event.KEYUP);
 document.onmousemove = getMouseXY;
-
-//Highlight image script - START
-//Highlight image script- By Dynamic Drive
-//For full source code and more DHTML scripts, visit http://www.dynamicdrive.com
-//This credit MUST stay intact for use
-
-function makevisible(cur,which){
-strength=(which==0)? 1 : 0.2
-
-if (cur.style.MozOpacity)
-cur.style.MozOpacity=strength
-else if (cur.filters)
-cur.filters.alpha.opacity=strength*100
-}
-//Highlight image script - END
 
 function toggleStatus(sel) {
 	var cbox = document.getElementById(sel);

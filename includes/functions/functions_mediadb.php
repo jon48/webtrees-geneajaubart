@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_mediadb.php 13709 2012-03-28 13:33:58Z greg $
+// $Id: functions_mediadb.php 14230 2012-08-31 11:50:13Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -1194,8 +1194,6 @@ function process_uploadMedia_form() {
 			$folderName = dirname($folderName)."/";
 			$thumbFolderName = str_replace($MEDIA_DIRECTORY, $MEDIA_DIRECTORY."thumbs/", $folderName);
 
-			$_SESSION["upload_folder"] = $folderName; // store standard media folder in session
-
 			$destFolder = $folderName;  // This is where the actual image will be stored
 			$destThumbFolder = $thumbFolderName;  // ditto for the thumbnail
 
@@ -1554,10 +1552,6 @@ function show_media_form($pid, $action = "newentry", $filename = "", $linktoid =
 	// Box for user to choose the folder to store the image
 	if (!$isExternal && $MEDIA_DIRECTORY_LEVELS > 0) {
 		echo '<tr><td class="descriptionbox wrap width25">';
-		if (empty($folder)) {
-			if (!empty($_SESSION['upload_folder'])) $folder = $_SESSION['upload_folder'];
-			else $folder = '';
-		}
 		// Strip $MEDIA_DIRECTORY from the folder name
 		if (substr($folder, 0, strlen($MEDIA_DIRECTORY)) == $MEDIA_DIRECTORY) $folder = substr($folder, strlen($MEDIA_DIRECTORY));
 		echo WT_I18N::translate('Folder name on server'), help_link('upload_server_folder'), '</td><td class="optionbox wrap">';
@@ -1622,60 +1616,62 @@ function show_media_form($pid, $action = "newentry", $filename = "", $linktoid =
 	add_simple_tag("3 $gedtype");
 
 	// 2 TITL
-	if ($gedrec == "")
+	if ($gedrec == "") {
 		$gedtitl = "TITL";
-	else {
+	} else {
 		$gedtitl = get_first_tag(2, "TITL", $gedrec);
-		if (empty($gedtitl))
+		if (empty($gedtitl)) {
 			$gedtitl = get_first_tag(1, "TITL", $gedrec);
-		if (empty($gedtitl))
+		}
+		if (empty($gedtitl)) {
 			$gedtitl = "TITL";
+		}
 	}
 	add_simple_tag("2 $gedtitl");
 
 	if (strstr($ADVANCED_NAME_FACTS, "_HEB")!==false) {
 		// 3 _HEB
-		if ($gedrec == "")
+		if ($gedrec == "") {
 			$gedtitl = "_HEB";
-		else {
+		} else {
 			$gedtitl = get_first_tag(3, "_HEB", $gedrec);
-			if (empty($gedtitl))
+			if (empty($gedtitl)) {
 				$gedtitl = "_HEB";
+			}
 		}
 		add_simple_tag("3 $gedtitl");
 	}
 
 	if (strstr($ADVANCED_NAME_FACTS, "ROMN")!==false) {
 		// 3 ROMN
-		if ($gedrec == "")
+		if ($gedrec == "") {
 			$gedtitl = "ROMN";
-		else {
+		} else {
 			$gedtitl = get_first_tag(3, "ROMN", $gedrec);
-			if (empty($gedtitl))
+			if (empty($gedtitl)) {
 				$gedtitl = "ROMN";
+			}
 		}
 		add_simple_tag("3 $gedtitl");
 	}
 
-	//-- don't show _PRIM option to regular users
-	//if (WT_USER_GEDCOM_ADMIN) {
-		// 2 _PRIM
-		if ($gedrec == "")
+	// 2 _PRIM
+	if ($gedrec == "") {
+		$gedprim = "_PRIM";
+	} else {
+		//  $gedprim = get_sub_record(1, "_PRIM", $gedrec);
+		$gedprim = get_first_tag(1, "_PRIM", $gedrec);
+		if (empty($gedprim)) {
 			$gedprim = "_PRIM";
-		else {
-			//  $gedprim = get_sub_record(1, "_PRIM", $gedrec);
-			$gedprim = get_first_tag(1, "_PRIM", $gedrec);
-			if (empty($gedprim))
-				$gedprim = "_PRIM";
 		}
-		add_simple_tag("1 $gedprim");
-	//}
+	}
+	add_simple_tag("1 $gedprim");
 
 	//-- print out editing fields for any other data in the media record
 	$sourceSOUR = "";
 	if (!empty($gedrec)) {
-		$subrecs = get_all_subrecords($gedrec, "FILE,FORM,TYPE,TITL,_PRIM,_THUM,CHAN,DATA");
-		foreach ($subrecs as $ind => $subrec) {
+		preg_match_all('/\n(1 (?!FILE|FORM|TYPE|TITL|_PRIM|_THUM|CHAN|DATA).*(\n[2-9] .*)*)/', $gedrec, $matches);
+		foreach ($matches[1] as $subrec) {
 			$pieces = explode("\n", $subrec);
 			foreach ($pieces as $piece) {
 				$ft = preg_match("/(\d) (\w+)(.*)/", $piece, $match);
@@ -1758,7 +1754,7 @@ function show_media_form($pid, $action = "newentry", $filename = "", $linktoid =
 	}
 	echo "</table>";
 ?>
-		<script type="text/javascript">
+		<script>
 			var formid = '<?php echo $formid; ?>';
 			function updateFormat(filename) {
 				var extsearch=/\.([a-zA-Z]{3,4})$/;

@@ -25,17 +25,18 @@
  *
  * @package webtrees
  * @subpackage GEDFact_assistant
- * @version $Id: gf_styles.css 10696 2011-02-04 21:27:30Z lukasz $
+ * @version $Id: gf_styles.css 14226 2012-08-30 05:18:45Z nigel $
  */
  
 /* --------- Styles used in /_MEDIA/media_3_search.php ---*/
 
 /* Outer border around nav elements */
 .outer_nav {
- width:270px;
- border:3px #808080 outset;
+  border:3px #808080 outset;
  }
 
+#media-links table.facts_table{width:270px;}
+ 
 /* Transparent cell border */
 .transparent {
 border: 0px solid transparent;
@@ -85,7 +86,7 @@ td #srch a {
 	right: 35px;
 }
 #flyoutFam td, #flyoutPar td, #flyoutStep td, #flyoutFamRTL td, #flyoutParRTL td, #flyoutStepRTL td {
-	white-space: nowrap; 
+	white-space: normal; 
 	font-size:10px;
 	font-weight:normal;
 	text-decoration: none;

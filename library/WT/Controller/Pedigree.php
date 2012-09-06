@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Pedigree.php 13820 2012-04-17 08:25:30Z greg $
+// $Id: Pedigree.php 14055 2012-06-30 10:39:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,7 +29,6 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Controller_Pedigree extends WT_Controller_Chart {
-	var $log2;
 	var $rootid;
 	var $name;
 	var $addname;
@@ -49,13 +48,20 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 
 	public function __construct() {
 		global $PEDIGREE_FULL_DETAILS, $PEDIGREE_LAYOUT, $MAX_PEDIGREE_GENERATIONS;
-		global $DEFAULT_PEDIGREE_GENERATIONS, $SHOW_EMPTY_BOXES;
+		global $DEFAULT_PEDIGREE_GENERATIONS;
 		global $bwidth, $bheight, $cbwidth, $cbheight, $baseyoffset, $basexoffset, $byspacing, $bxspacing;
+		global $linewidth, $shadowcolor, $shadowblur, $shadowoffsetX, $shadowoffsetY;
+
 		global $BROWSER_TYPE, $show_full, $talloffset;
 
 		parent::__construct();
-		$this->log2 = log(2);
-
+		
+		$this->linewidth = $linewidth;
+		$this->shadowcolor = $shadowcolor;
+		$this->shadowblur = $shadowblur;
+		$this->shadowoffsetX = $shadowoffsetX;
+		$this->shadowoffsetY = $shadowoffsetY;
+		
 		$this->show_full =safe_GET('show_full', array('0', '1'), $PEDIGREE_FULL_DETAILS);
 		$this->talloffset=safe_GET('talloffset', array('0', '1', '2', '3'), $PEDIGREE_LAYOUT);
 		$this->box_width  =safe_GET_integer('box_width',   50, 300, 100);
@@ -96,7 +102,6 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 		//-- adjustments for portrait mode
 		if ($this->talloffset==0) {
 			$bxspacing+=12;
-			//$bwidth+=20;
 			$baseyoffset -= 20*($this->PEDIGREE_GENERATIONS-1);
 		}
 
@@ -148,7 +153,7 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 		//-- calculation the box positions
 		for ($i=($this->treesize-1); $i>=0; $i--) {
 			// -- check to see if we have moved to the next generation
-			if ($i < floor($this->treesize / (pow(2, $this->curgen)))) {
+			if ($i < (int)($this->treesize / (pow(2, $this->curgen)))) {
 				$this->curgen++;
 			}
 			//-- box position in current generation
@@ -176,7 +181,7 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 				}
 				//-- compact the tree
 				if ($this->curgen<$this->PEDIGREE_GENERATIONS) {
-					$parent = floor(($i-1)/2);
+					$parent = (int)(($i-1)/2);
 					if ($i%2 == 0) $this->yoffset=$this->yoffset - (($boxspacing/2) * ($this->curgen-1));
 					else $this->yoffset=$this->yoffset + (($boxspacing/2) * ($this->curgen-1));
 					$pgen = $this->curgen;
@@ -190,7 +195,7 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 							if ($parent%2 == 0) $this->yoffset=$this->yoffset - (($boxspacing/2) * $temp);
 							else $this->yoffset=$this->yoffset + (($boxspacing/2) * $temp);
 						}
-						$parent = floor(($parent-1)/2);
+						$parent = (int)(($parent-1)/2);
 					}
 					if ($this->curgen>3) {
 						$temp=0;
@@ -220,18 +225,11 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 			$this->offsetarray[$i]["y"]=$this->yoffset;
 		}
 
-		//-- collapse the tree if boxes are missing
-		if (!$SHOW_EMPTY_BOXES) {
-			if ($this->PEDIGREE_GENERATIONS>1) $this->collapse_tree(0, 1, 0);
-		}
-
 		//-- calculate the smallest yoffset and adjust the tree to that offset
 		$minyoffset = 0;
 		for ($i=0; $i<count($this->treeid); $i++) {
-			if ($SHOW_EMPTY_BOXES || !empty($treeid[$i])) {
-				if (!empty($offsetarray[$i])) {
-					if (($minyoffset==0)||($minyoffset>$this->offsetarray[$i]["y"]))  $minyoffset = $this->offsetarray[$i]["y"];
-				}
+			if (!empty($offsetarray[$i])) {
+				if (($minyoffset==0)||($minyoffset>$this->offsetarray[$i]["y"]))  $minyoffset = $this->offsetarray[$i]["y"];
 			}
 		}
 
@@ -248,53 +246,13 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 	}
 
 	function adjust_subtree($index, $diff) {
-		global $offsetarray, $treeid, $log2, $talloffset,$boxspacing, $mdiff, $SHOW_EMPTY_BOXES;
+		global $offsetarray, $treeid;
 		$f = ($index*2)+1; //-- father index
 		$m = $f+1; //-- mother index
 
-		if (!$SHOW_EMPTY_BOXES && empty($treeid[$index])) return;
 		if (empty($offsetarray[$index])) return;
 		$offsetarray[$index]["y"] += $diff;
 		if ($f<count($treeid)) adjust_subtree($f, $diff);
 		if ($m<count($treeid)) adjust_subtree($m, $diff);
-	}
-
-	function collapse_tree($index, $curgen, $diff) {
-		global $offsetarray, $treeid, $log2, $talloffset,$boxspacing, $mdiff, $minyoffset;
-
-		//print "$index:$curgen:$diff<br>\n";
-		$f = ($index*2)+1; //-- father index
-		$m = $f+1; //-- mother index
-		if (empty($treeid[$index])) {
-			$pgen=$curgen;
-			$genoffset=0;
-			while ($pgen<=$this->PEDIGREE_GENERATIONS) {
-				$genoffset += pow(2, ($this->PEDIGREE_GENERATIONS-$pgen));
-				$pgen++;
-			}
-			if ($talloffset==1) $diff+=.5*$genoffset;
-			else $diff+=$genoffset;
-			if (isset($offsetarray[$index]["y"])) $offsetarray[$index]["y"]-=($boxspacing*$diff)/2;
-			return $diff;
-		}
-		if ($curgen==$this->PEDIGREE_GENERATIONS) {
-			$offsetarray[$index]["y"] -= $boxspacing*$diff;
-			//print "UP $index BY $diff<br>\n";
-			return $diff;
-		}
-		$odiff=$diff;
-		$fdiff = collapse_tree($f, $curgen+1, $diff);
-		if (($curgen<($this->PEDIGREE_GENERATIONS-1))||($index%2==1)) $diff=$fdiff;
-		if (isset($offsetarray[$index]["y"])) $offsetarray[$index]["y"] -= $boxspacing*$diff;
-		//print "UP $index BY $diff<br>\n";
-		$mdiff = collapse_tree($m, $curgen+1, $diff);
-		$zdiff = $mdiff - $fdiff;
-		if (($zdiff>0)&&($curgen<$this->PEDIGREE_GENERATIONS-2)) {
-			$offsetarray[$index]["y"] -= $boxspacing*$zdiff/2;
-			//print "UP $index BY ".($zdiff/2)."<br>\n";
-			if ((empty($treeid[$m]))&&(!empty($treeid[$f]))) adjust_subtree($f, -1*($boxspacing*$zdiff/4));
-			$diff+=($zdiff/2);
-		}
-		return $diff;
 	}
 }

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13656 2012-03-24 17:33:58Z greg $
+// $Id: module.php 14196 2012-08-23 07:00:44Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -104,7 +104,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 			$block_id=safe_POST('block_id');
 			if ($block_id) {
 				WT_DB::prepare(
-					"UPDATE `##block` SET gedcom_id=?, block_order=? WHERE block_id=?"
+					"UPDATE `##block` SET gedcom_id=NULLIF(?, ''), block_order=? WHERE block_id=?"
 				)->execute(array(
 					safe_POST('gedcom_id'),
 					(int)safe_POST('block_order'),
@@ -112,13 +112,14 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 				));
 			} else {
 				WT_DB::prepare(
-					"INSERT INTO `##block` (gedcom_id, module_name, block_order) VALUES (?, ?, ?)"
+					"INSERT INTO `##block` (gedcom_id, module_name, block_order) VALUES (NULLIF(?, ''), ?, ?)"
 				)->execute(array(
-					safe_POST('gedcom_id', array_keys(get_all_gedcoms())),
+					safe_POST('gedcom_id'),
 					$this->getName(),
 					(int)safe_POST('block_order')
 				));
 				$block_id=WT_DB::getInstance()->lastInsertId();
+				var_dump($block_id);
 			}
 			set_block_setting($block_id, 'header',  safe_POST('header',  WT_REGEX_UNSAFE));
 			set_block_setting($block_id, 'faqbody', safe_POST('faqbody', WT_REGEX_UNSAFE)); // allow html
@@ -153,6 +154,9 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 				$gedcom_id=WT_GED_ID;
 			}
 			$controller->pageHeader();
+			if (array_key_exists('ckeditor', WT_Module::getActiveModules())) {
+				ckeditor_WT_Module::enableEditor($controller);
+			}
 
 			// "Help for this page" link
 			echo '<div id="page_help">', help_link('add_faq_item', $this->getName()), '</div>';
@@ -166,20 +170,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 			echo '<tr><th>';
 			echo WT_I18N::translate('Answer');
 			echo '</th></tr><tr><td>';
-			if (array_key_exists('ckeditor', WT_Module::getActiveModules())) {
-			// use CKeditor module
-				require_once WT_ROOT.WT_MODULES_DIR.'ckeditor/ckeditor.php';
-				$oCKeditor = new CKEditor();
-				$oCKeditor->basePath =  WT_MODULES_DIR.'ckeditor/';
-				$oCKeditor->config['width'] = 900;
-				$oCKeditor->config['height'] = 400;
-				$oCKeditor->config['AutoDetectLanguage'] = false ;
-				$oCKeditor->config['DefaultLanguage'] = 'en';
-				$oCKeditor->editor('faqbody', $faqbody);
-			} else {
-			//use standard textarea
-			echo '<textarea name="faqbody" rows="10" cols="90" tabindex="2">', htmlspecialchars($faqbody), '</textarea>';
-			}
+			echo '<textarea name="faqbody" class="html-edit" rows="10" cols="90" tabindex="2">', htmlspecialchars($faqbody), '</textarea>';
 			echo '</td></tr>';
 			echo '</table><table id="faq_module2">';
 			echo '<tr>';
@@ -193,10 +184,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 			echo '</td><td>';
 			echo '<input type="text" name="block_order" size="3" tabindex="3" value="', $block_order, '"></td>';
 			echo '</td><td>';
-				echo '<select name="gedcom_id" tabindex="4">';
-					echo '<option value="">', WT_I18N::translate('All'), '</option>';
-					echo '<option value="', WT_GED_ID, '" selected="selected">', WT_I18N::translate('%s', get_gedcom_setting(WT_GED_ID, 'title')), '</option';
-				echo '</select>';
+			echo select_edit_control('gedcom_id', get_all_gedcoms(), '', $gedcom_id, 'tabindex="4"');
 			echo '</td></tr>';
 			echo '</table>';
 
@@ -334,6 +322,8 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 	}
 
 	private function config() {
+		require_once 'includes/functions/functions_edit.php';
+
 		$controller=new WT_Controller_Base();
 		$controller->setPageTitle($this->getTitle());
 		$controller->pageHeader();
@@ -357,6 +347,15 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 		$max_block_order=WT_DB::prepare(
 			"SELECT MAX(block_order) FROM `##block` WHERE module_name=?"
 		)->execute(array($this->getName()))->fetchOne();
+
+		echo
+			'<p><form method="get" action="', WT_SCRIPT_NAME ,'">',
+			WT_I18N::translate('Family tree'), ' ',
+			'<input type="hidden" name="mod", value="', $this->getName(), '">',
+			'<input type="hidden" name="mod_action", value="admin_config">',
+			select_edit_control('ged', array_combine(get_all_gedcoms(), get_all_gedcoms()), null, WT_GEDCOM),
+			'<input type="submit" value="', WT_I18N::translate('show'), '">',
+			'</form></p>';
 
 		echo '<a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_edit">', WT_I18N::translate('Add FAQ item'), '</a>';
 		echo help_link('add_faq_item', $this->getName());
@@ -429,10 +428,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 			return null;
 		}
 
-		$menu = new WT_Menu(WT_I18N::translate('FAQ'), 'module.php?mod=faq&amp;mod_action=show', 'menu-help', 'down');
-
-		$submenu = new WT_Menu(WT_I18N::translate('FAQ'), 'module.php?mod=faq&amp;mod_action=show', 'menu-help-faq');
-		$menu->addSubmenu($submenu);
+		$menu = new WT_Menu(WT_I18N::translate('FAQ'), 'module.php?mod=faq&amp;mod_action=show', 'menu-help');
 		return $menu;
 	}
 }

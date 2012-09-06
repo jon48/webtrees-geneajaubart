@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: inverselink.php 13728 2012-03-31 21:13:20Z greg $
+// $Id: inverselink.php 14226 2012-08-30 05:18:45Z nigel $
 
 define('WT_SCRIPT_NAME', 'inverselink.php');
 require './includes/session.php';
@@ -34,7 +34,10 @@ $controller
 	->requireEditorLogin()
 	->setPageTitle(WT_I18N::translate('Link media'))
 	->pageHeader()
-	->addExternalJavaScript('js/autocomplete.js');
+	->addExternalJavascript(WT_JQUERY_URL)
+	->addExternalJavascript(WT_JQUERYUI_URL)
+	->addExternalJavascript(WT_STATIC_URL.'js/webtrees.js')
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
 //-- page parameters and checking
 $linktoid = safe_GET_xref('linktoid');
@@ -53,8 +56,7 @@ if ($linkto=='manage' && array_key_exists('GEDFact_assistant', WT_Module::getAct
 
 	if ($action == "choose" && $paramok) {
 		?>
-		<script type="text/javascript">
-		<!--
+		<script>
 		var pastefield;
 
 		function openerpasteid(id) {
@@ -69,9 +71,8 @@ if ($linkto=='manage' && array_key_exists('GEDFact_assistant', WT_Module::getAct
 		function paste_char(value) {
 			pastefield.value += value;
 		}
-		//-->
 		</script>
-	<script src="<?php echo WT_STATIC_URL; ?>js/webtrees.js" type="text/javascript"></script>
+	<script src="<?php echo WT_STATIC_URL; ?>js/webtrees.js"></script>
 
 		<?php
 		echo '<form name="link" method="get" action="inverselink.php">';
@@ -84,7 +85,7 @@ if ($linkto=='manage' && array_key_exists('GEDFact_assistant', WT_Module::getAct
 		}
 		echo '<input type="hidden" name="linkto" value="', $linkto, '">';
 		echo '<input type="hidden" name="ged" value="', $GEDCOM, '">';
-		echo '<table class="facts_table center">';
+		echo '<table class="facts_table">';
 		echo '<tr><td class="topbottombar" colspan="2">';
 		echo WT_I18N::translate('Link media'), help_link('add_media_linkid');
 		echo '</td></tr><tr><td class="descriptionbox width20 wrap">', WT_I18N::translate('Media'), '</td>';
@@ -170,12 +171,12 @@ if ($linkto=='manage' && array_key_exists('GEDFact_assistant', WT_Module::getAct
 		echo '<tr><td class="topbottombar" colspan="2"><input type="submit" value="', WT_I18N::translate('Set link'), '"></td></tr>';
 		echo '</table>';
 		echo '</form>';
-		echo '<br><br><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a><br></center>';
+		echo '<p class="center"><a href="#" onclick="closePopupAndReloadParent();">', WT_I18N::translate('Close Window'), '</a></p>';
 	} elseif ($action == "update" && $paramok) {
 		linkMedia($mediaid, $linktoid);
-		echo '<br><br><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a><br></center>';
+		echo '<p class="center"><a href="#" onclick="closePopupAndReloadParent();">', WT_I18N::translate('Close Window'), '</a></p>';
 	} else {
 		echo '<center>nothing to do<center>';
-		echo '<br><br><center><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a><br></center>';
+		echo '<p class="center"><a href="#" onclick="closePopupAndReloadParent();">', WT_I18N::translate('Close Window'), '</a></p>';
 	}
 }

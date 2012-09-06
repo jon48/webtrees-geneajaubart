@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: addmedia.php 13888 2012-05-01 16:21:26Z lukasz $
+// $Id: addmedia.php 14227 2012-08-30 11:57:15Z greg $
 
 define('WT_SCRIPT_NAME', 'addmedia.php');
 require './includes/session.php';
@@ -30,10 +30,14 @@ require WT_ROOT.'includes/functions/functions_edit.php';
 
 $controller=new WT_Controller_Simple();
 $controller
+	->requireMemberLogin()
+	->addExternalJavascript(WT_JQUERY_URL)
+	->addExternalJavascript(WT_JQUERYUI_URL)
+	->addExternalJavascript(WT_STATIC_URL.'js/webtrees.js')
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
 	->setPageTitle(WT_I18N::translate('Add a new media object'))
 	->pageHeader()
-	->addExternalJavaScript('js/autocomplete.js')
-	->addInlineJavaScript('
+	->addInlineJavascript('
 	// Shared Notes =========================
 	function findnote(field) {
 		pastefield = field;
@@ -56,7 +60,7 @@ $controller
 		if (value.substr(value.length-1, 1) == "/") value = value.substr(0, value.length-1);
 		if (value.substr(0, 1) == "/") value = value.substr(1, value.length-1);
 		result = value.split("/");
-		if (result.length > <?php echo $MEDIA_DIRECTORY_LEVELS; ?>) {
+		if (result.length > '.$MEDIA_DIRECTORY_LEVELS.  ') {
 			alert("' . WT_I18N::translate('You can enter no more than %s subdirectory names', $MEDIA_DIRECTORY_LEVELS) . '");
 			folder.focus();
 		}
@@ -113,7 +117,7 @@ if (!WT_USER_CAN_EDIT || !$disp || !$ALLOW_EDIT_GEDCOM) {
 			echo '<br>', WT_I18N::translate('You have no access to'), ' pid ', $pid;
 		}
 	}
-	echo '<br><br><div class="center"><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a></div>';
+	echo '<p class="center"><a href="#" onclick="window.close();">', WT_I18N::translate('Close Window'), '</a></p>';
 	exit;
 }
 
@@ -140,7 +144,6 @@ if ($action=='newentry') {
 		$folderName = dirname($folderName).'/';
 		$thumbFolderName = str_replace($MEDIA_DIRECTORY, $MEDIA_DIRECTORY.'thumbs/', $folderName);
 
-		$_SESSION['upload_folder'] = $folderName; // store standard media folder in session
 		$realFolderName = $folderName;
 		$realThumbFolderName = $thumbFolderName;
 		if ($USE_MEDIA_FIREWALL) {
@@ -283,7 +286,6 @@ if ($action=='newentry') {
 			if ($oldFolder=='/') $oldFolder = '';
 			$oldFolder = check_media_depth($oldFolder.'y.z', 'BACK');
 			$oldFolder = dirname($oldFolder).'/';
-			$_SESSION['upload_folder'] = $folder; // store standard media folder in session
 
 			$finalResult = true;
 			if ($filename!=$oldFilename || $folder!=$oldFolder) {
@@ -413,9 +415,9 @@ if ($action=='newentry') {
 				$success=true;
 			} else {
 				if (!WT_DEBUG) {
-					echo WT_JS_START, 'if (window.opener.showchanges) window.opener.showchanges(); window.opener.paste_id("'.$mediaid.'"); window.close();', WT_JS_END;
+					echo '<script>if (window.opener.paste_id("'.$mediaid.'"); window.close();</script>';
 				} 
-				echo '<a href="#" onclick="window.opener.paste_id(\'', $mediaid, '\'); return false;">', WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record '), ' <b>', $mediaid, '</b></a><br><br>';
+				echo '<a href="#" onclick="window.opener.paste_id(\'', $mediaid, '\'); window.close();">', WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record '), ' <b>', $mediaid, '</b></a><br><br>';
 			}
 		}
 		echo WT_I18N::translate('Update successful');
@@ -549,8 +551,6 @@ if ($action == 'update') {
 	}
 
 	if ($finalResult) {
-		$_SESSION['upload_folder'] = $folder; // store standard media folder in session
-
 		// Insert the 1 FILE xxx record into the arrays used by function handle_updates()
 		$glevels = array_merge(array('1'), $glevels);
 		$tag = array_merge(array('FILE'), $tag);
@@ -613,14 +613,9 @@ if ($action=='editmedia') {
 }
 // **** end action 'editmedia'
 
+// autoclose window when update successful unless debug on
 if ($success && !WT_DEBUG) {
-	echo
-		WT_JS_START,
-		'if (window.opener.showchanges) window.opener.showchanges();',
-		'window.close();',
-		WT_JS_END;
+	$controller->addInlineJavascript('closePopupAndReloadParent();');
 } else {
-	echo '<br>';
-	echo '<div class="center"><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">'.WT_I18N::translate('Close Window').'</a></div>';
-	echo '<br>';
+	echo '<p class="center"><a href="#" onclick="window.close();">', WT_I18N::translate('Close Window'), '</a></p>';
 }

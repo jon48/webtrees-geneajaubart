@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: help_text.php 12813 2011-11-19 14:18:05Z greg $
+// $Id: help_text.php 14164 2012-08-11 21:21:49Z greg $
 
 if (!defined('WT_WEBTREES') || !defined('WT_SCRIPT_NAME') || WT_SCRIPT_NAME!='help_text.php') {
 	header('HTTP/1.0 403 Forbidden');
@@ -32,11 +32,6 @@ switch ($help) {
 case 'add_by_id':
 	$title=WT_I18N::translate('Add by ID');
 	$text=WT_I18N::translate('This input box lets you enter an individual\'s ID number so he can be added to the Clippings Cart.  Once added you\'ll be offered options to link that individual\'s relations to your Clippings Cart.<br /><br />If you do not know an individual\'s ID number, you can perform a search by name by pressing the Person icon next to the Add button.');
-	break;
-
-case 'clip_cart':
-	$title=WT_I18N::translate('Clippings cart');
-	$text=WT_I18N::translate('This box shows the contents of your Clippings Cart.  The <i>Types</i> column indicates the type of each entry, which can be Individual (INDI), Family (FAM), Source (SOUR), Repository (REPO), Note (NOTE), and Media (OBJE);  each is represented by its own icon.  The <i>ID</i> column shows the ID number for each item of that particular type.  The <i>Name / Description</i> column gives either the name of the family or individual, or a description of the item.  The Remove button will remove that record from the Clippings Cart.  <b>Confirmation to remove is NOT asked for.</b>');
 	break;
 
 case 'empty_cart':

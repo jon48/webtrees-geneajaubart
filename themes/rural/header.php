@@ -107,15 +107,15 @@ else {
 	echo '<ul class="makeMenu">';
 	$menu=WT_MenuBar::getFavoritesMenu();
 	if ($menu) {
-		echo $menu->GetMenuAsList();
+		echo $menu->getMenuAsList();
 	}
 	$menu=WT_MenuBar::getThemeMenu();
 	if ($menu) {
-		echo $menu->GetMenuAsList();
+		echo $menu->getMenuAsList();
 	}
 	$menu=WT_MenuBar::getLanguageMenu();
 	if ($menu) {
-		echo $menu->GetMenuAsList();
+		echo $menu->getMenuAsList();
 	}
 	echo '</ul>';
 	echo '</div>';

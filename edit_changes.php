@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_changes.php 13523 2012-02-29 18:20:49Z greg $
+// $Id: edit_changes.php 14125 2012-07-27 12:10:37Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_changes.php');
 require './includes/session.php';
@@ -31,6 +31,8 @@ $controller=new WT_Controller_Simple();
 $controller
 	->requireAcceptLogin()
 	->setPageTitle(WT_I18N::translate('Pending changes'))
+	->addExternalJavascript(WT_JQUERY_URL)
+	->addExternalJavascript(WT_STATIC_URL.'js/webtrees.js')
 	->pageHeader();
 
 $action   =safe_GET('action');
@@ -38,14 +40,10 @@ $change_id=safe_GET('change_id');
 $index    =safe_GET('index');
 $ged      =safe_GET('ged');
 
-echo WT_JS_START;
+echo '<script>';
 ?>
 	function show_gedcom_record(xref) {
 		var recwin = window.open("gedrecord.php?fromfile=1&pid="+xref, "_blank", edit_window_specs);
-	}
-
-	function showchanges() {
-		window.location = '<?php echo WT_SCRIPT_NAME; ?>';
 	}
 
 	function show_diff(diffurl) {
@@ -53,7 +51,7 @@ echo WT_JS_START;
 		return false;
 	}
 <?php
-echo WT_JS_END;
+echo '</script>';
 echo '<div id="pending"><h2>', WT_I18N::translate('Pending changes'), '</h2>';
 
 switch ($action) {
@@ -229,18 +227,10 @@ if ($changed_gedcoms) {
 
 	echo
 		$output2, $output, $output2,
-		'<h3>',
-		'<a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">',
-		WT_I18N::translate('Close Window'),
-		'</a>';
+		'<p class="center"><a href="#" onclick="closePopupAndReloadParent();">', WT_I18N::translate('Close Window'), '</a></p>';
 } else {
 	// No pending changes - refresh the parent window and close this one
-	echo
-		WT_JS_START,
-		'if (window.opener.showchanges)	window.opener.showchanges();',
-		'window.close();',
-		WT_JS_END,
-		'</h3>';
+	$controller->addInlineJavascript('closePopupAndReloadParent();');
 }
 
 echo '</div>';

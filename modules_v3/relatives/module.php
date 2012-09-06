@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13776 2012-04-04 20:25:10Z greg $
+// $Id: module.php 14106 2012-07-14 07:30:01Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -192,24 +192,8 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 							if (!empty($place)) echo ' -- ';
 						}
 						if (!empty($place)) {
-							$html='';
-							$levels = explode(', ', $place);
-							for ($level=0; $level<$SHOW_PEDIGREE_PLACES; $level++) {
-								if (!empty($levels[$level])) {
-									if ($level>0) {
-										$html.=", ";
-									}
-									$html.='<span dir="auto">'.htmlspecialchars($levels[$level]).'</span>';
-								}
-							}
-							if (!$SEARCH_SPIDER) {
-								$tempURL = 'placelist.php?level='.count($levels);
-								foreach (array_reverse($levels) as $pindex=>$ppart) {
-									$tempURL .= '&amp;parent%5B'.$pindex.'%5D='.rawurlencode($ppart);
-								}
-								$html = '<a href="'.$tempURL.'">'.$html.'</a>';
-							}
-							echo $html;
+							$tmp=new WT_Place($place, WT_GED_ID);
+							echo $tmp->getShortName();
 						}
 					} else if (get_sub_record(1, "1 _NMR", find_family_record($famid, WT_GED_ID))) {
 						$husb = $family->getHusband();
@@ -409,7 +393,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 		}
 
 		if (!$SHOW_AGE_DIFF) {
-			echo WT_JS_START, "jQuery('DIV.elderdate').toggle();", WT_JS_END;
+			echo '<script>jQuery("DIV.elderdate").toggle();</script>';
 		}
 
 		if ($controller->record->canEdit()) {

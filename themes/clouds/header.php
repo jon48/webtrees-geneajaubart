@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 13837 2012-04-18 23:34:17Z nigel $
+// $Id: header.php 14181 2012-08-18 21:23:39Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -77,7 +77,7 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 					'</form>',
 				'</div>',
 			'</div>',
-	'</div>';
+		'</div>';
 ?>
 <!-- end header section -->
 <!-- begin menu section -->
@@ -101,7 +101,7 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 		'<ul id="main-menu">'; 
 		foreach ($menu_items as $menu) {
 			if ($menu) {
-			echo $menu->getMenuAsList();
+				echo getMenuAsCustomList($menu);
 			}
 		}
 	echo 
@@ -116,7 +116,7 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 		}
 	} else {
 		echo '<li>', login_link(),'</li>';
-	}	
+	}
 	//PERSO Extend header
 	echo '<li>';
 	$hook_print_header = new WT_Perso_Hook('h_print_header');

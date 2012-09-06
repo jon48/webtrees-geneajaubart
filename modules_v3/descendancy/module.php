@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13953 2012-05-30 19:40:32Z greg $
+// $Id: module.php 13999 2012-06-16 21:57:04Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -85,7 +85,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	public function getSidebarContent() {
 		global $controller;
 
-		$controller->addInlineJavaScript('
+		$controller->addInlineJavascript('
 			var dloadedNames = new Array();
 
 			function dsearchQ() {
@@ -151,7 +151,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			$out .= $this->loadSpouses($person->getXref());
 			$out .= '</div>';
 			$base_controller=new WT_Controller_Base();
-			$base_controller->addInlineJavaScript('dloadedNames["'.$person->getXref().'"]=2;');
+			$base_controller->addInlineJavascript('dloadedNames["'.$person->getXref().'"]=2;');
 		} else {
 			$out .= '<div class="desc_tree_div">';
 			$out .= '</div>';
@@ -175,7 +175,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		$out .= $this->loadChildren($family->getXref(), $generations);
 		$out .= '</div>';
 		$base_controller=new WT_Controller_Base();
-		$base_controller->addInlineJavaScript('dloadedNames["'.$family->getXref().'"]=2;');
+		$base_controller->addInlineJavascript('dloadedNames["'.$family->getXref().'"]=2;');
 		$out .= '</li>';
 		return $out;
 	}

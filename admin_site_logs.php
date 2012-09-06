@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_logs.php 13824 2012-04-17 20:19:36Z greg $
+// $Id: admin_site_logs.php 13999 2012-06-16 21:57:04Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_logs.php');
 require './includes/session.php';
@@ -182,8 +182,8 @@ case 'load_json':
 
 $controller
 	->pageHeader()
-	->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-	->addInlineJavaScript('
+	->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+	->addInlineJavascript('
 		var oTable=jQuery("#log_list").dataTable( {
 			"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
 			"bProcessing": true,

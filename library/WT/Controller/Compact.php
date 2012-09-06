@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Compact.php 13820 2012-04-17 08:25:30Z greg $
+// $Id: Compact.php 14116 2012-07-23 19:40:08Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -130,7 +130,7 @@ class WT_Controller_Compact extends WT_Controller_Chart {
 			$title=WT_I18N::translate('Compact tree of %s', $indi->getFullName());
 			$text = '<a class="icon-'.$arrow_dir.'arrow" title="'.strip_tags($title).'" href="?rootid='.$pid;
 			if ($this->show_thumbs) $text .= "&amp;show_thumbs=".$this->show_thumbs;
-			$text .= "\" </a>";
+			$text .= "\"></a>";
 		} else {
 			$text = '<i class="icon-'.$arrow_dir.'arrow"></i>';
 		}

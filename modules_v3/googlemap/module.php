@@ -21,12 +21,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13957 2012-06-01 07:05:12Z nigel $
+// $Id: module.php 14224 2012-08-28 03:10:05Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
+
+define('WT_GM_SCRIPT', 'https://maps.google.com/maps/api/js?v=3.2&amp;sensor=false&amp;language='.WT_LOCALE);
 
 // http://www.google.com/permissions/guidelines.html
 //
@@ -198,7 +200,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			->requireAdminLogin()
 			->setPageTitle(WT_I18N::translate('Google Maps™'))
 			->pageHeader()
-			->addInlineJavaScript('jQuery("#tabs").tabs();');
+			->addInlineJavascript('jQuery("#tabs").tabs();');
 
 
 		if ($action=='update') {
@@ -263,7 +265,6 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					<li><a href="#gm_advanced"><span><?php echo WT_I18N::translate('Advanced'); ?></span></a></li>
 					<li><a href="#gm_ph"><span><?php echo WT_I18N::translate('Place hierarchy'); ?></span></a></li>
 				</ul>
-			
 				<div id="gm_basic">
 					<table class="gm_edit_config">
 						<tr>
@@ -384,7 +385,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 						<?php for ($level=1; $level < 10; $level++) { ?>
 						<tr  class="gm_levels">
 							<th>
-								<?php 
+								<?php
 								if ($level==1) {
 									echo WT_I18N::translate('Country');
 								} else {
@@ -458,8 +459,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		require WT_ROOT.'includes/functions/functions_edit.php';
 
 		$controller=new WT_Controller_Simple();
-		$controller->setPageTitle(WT_I18N::translate('Select flag'));
-		$controller->pageHeader();
+		$controller
+				->setPageTitle(WT_I18N::translate('Select flag'))
+				->pageHeader();
 
 		$countries=WT_Stats::get_all_countries();
 		$action=safe_REQUEST($_REQUEST, 'action');
@@ -507,37 +509,26 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 
 		if ($action == 'ChangeFlag') {
 		?>
-			<script type="text/javascript">
-			<!--
-				// PERSO Resize flag
-				function edit_close() {
+			<script>
 		<?php if ($_POST['selcountry'] == 'Countries') { ?>
 					window.opener.document.editplaces.icon.value = 'places/flags/<?php echo $flags[$_POST['FLAGS']]; ?>.png';
-					window.opener.document.getElementById('flagsDiv').innerHTML = "<img class=\"flag_gm_30\" src=\"<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/places/flags/<?php echo $country[$_POST['FLAGS']]; ?>.png\">&nbsp;&nbsp;<a href=\"#\" onclick=\"change_icon();return false;\"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;<a href=\"#\" onclick=\"remove_icon();return false;\"><?php echo WT_I18N::translate('Remove flag'); ?></a>";
+					window.opener.document.getElementById('flagsDiv').innerHTML = "<img src=\"<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/places/flags/<?php echo $country[$_POST['FLAGS']]; ?>.png\">&nbsp;&nbsp;<a href=\"#\" onclick=\"change_icon();return false;\"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;<a href=\"#\" onclick=\"remove_icon();return false;\"><?php echo WT_I18N::translate('Remove flag'); ?></a>";
 		<?php } else if ($_POST['selstate'] != "States"){ ?>
 					window.opener.document.editplaces.icon.value = 'places/<?php echo $countrySelected, '/flags/', $_POST['selstate'], '/', $flags_s[$_POST['FLAGS']]; ?>.png';
-					window.opener.document.getElementById('flagsDiv').innerHTML = "<img class=\"flag_gm_30\" src=\"<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/places/<?php echo $countrySelected, "/flags/", $_POST["selstate"], "/", $flags_s[$_POST['FLAGS']]; ?>.png\">&nbsp;&nbsp;<a href=\"#\" onclick=\"change_icon();return false;\"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;<a href=\"#\" onclick=\"remove_icon();return false;\"><?php echo WT_I18N::translate('Remove flag'); ?></a>";
+					window.opener.document.getElementById('flagsDiv').innerHTML = "<img src=\"<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/places/<?php echo $countrySelected, "/flags/", $_POST['selstate'], "/", $flags_s[$_POST['FLAGS']]; ?>.png\">&nbsp;&nbsp;<a href=\"#\" onclick=\"change_icon();return false;\"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;<a href=\"#\" onclick=\"remove_icon();return false;\"><?php echo WT_I18N::translate('Remove flag'); ?></a>";
 		<?php } else { ?>
 					window.opener.document.editplaces.icon.value = "places/<?php echo $countrySelected, "/flags/", $flags[$_POST['FLAGS']]; ?>.png";
-					window.opener.document.getElementById('flagsDiv').innerHTML = "<img class=\"flag_gm_30\" src=\"<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/places/<?php echo $countrySelected, "/flags/", $flags[$_POST['FLAGS']]; ?>.png\">&nbsp;&nbsp;<a href=\"#\" onclick=\"change_icon();return false;\"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;<a href=\"#\" onclick=\"remove_icon();return false;\"><?php echo WT_I18N::translate('Remove flag'); ?></a>";
+					window.opener.document.getElementById('flagsDiv').innerHTML = "<img src=\"<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/places/<?php echo $countrySelected, "/flags/", $flags[$_POST['FLAGS']]; ?>.png\">&nbsp;&nbsp;<a href=\"#\" onclick=\"change_icon();return false;\"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;<a href=\"#\" onclick=\"remove_icon();return false;\"><?php echo WT_I18N::translate('Remove flag'); ?></a>";
 		<?php } ?>
+					window.opener.updateMap();
 					window.close();
-				}
-				//END PERSO
-			//-->
 			</script>
 		<?php
-			// autoclose window when update successful unless debug on
-			if (!WT_DEBUG) {
-				echo '<script type="text/javascript\"><!--edit_close();//--></script>';
-			}
-			echo '<div class="center"><a href="#" onclick="edit_close();">', WT_I18N::translate('Close Window'), '</a></div><br>';
 			exit;
 		}
 		else {
 		?>
-		<script type="text/javascript">
-		<!--
+		<script>
 			function enableButtons() {
 				document.flags.save1.disabled = '';
 				document.flags.save2.disabled = '';
@@ -554,48 +545,37 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					window.location="module.php?mod=googlemap&mod_action=flags&countrySelected=" + document.flags.COUNTRYSELECT.value;
 				}
 			}
-
-			function edit_close() {
-				window.close();
-			}
-
-		//-->
 		</script>
 		<?php
 		}
-			if (!isset($_SESSION['flags_countrylist'])) {
-				$countryList = array();
-				$placesDir = scandir(WT_MODULES_DIR.'googlemap/places/');
-				for ($i = 0; $i < count($country); $i++) {
-					if (count(preg_grep('/'.$country[$i].'/', $placesDir)) != 0) {
-						$rep = opendir(WT_MODULES_DIR.'googlemap/places/'.$country[$i].'/');
-						while ($file = readdir($rep)) {
-							if (stristr($file, 'flags')) {
-								$countryList[$country[$i]] = $countries[$country[$i]];
-							}
-						}
-						closedir($rep);
+		$countryList = array();
+		$placesDir = scandir(WT_MODULES_DIR.'googlemap/places/');
+		for ($i = 0; $i < count($country); $i++) {
+			if (count(preg_grep('/'.$country[$i].'/', $placesDir)) != 0) {
+				$rep = opendir(WT_MODULES_DIR.'googlemap/places/'.$country[$i].'/');
+				while ($file = readdir($rep)) {
+					if (stristr($file, 'flags')) {
+						$countryList[$country[$i]] = $countries[$country[$i]];
 					}
 				}
-				asort($countryList);
-				$_SESSION['flags_countrylist'] = serialize($countryList);
-			} else {
-				$countryList = unserialize($_SESSION['flags_countrylist']);
+				closedir($rep);
 			}
-			$stateList = array();
-			if ($countrySelected != 'Countries') {
-				$placesDir = scandir(WT_MODULES_DIR.'googlemap/places/'.$countrySelected.'/flags/');
-				for ($i = 0; $i < count($flags); $i++) {
-					if (in_array($flags[$i], $placesDir)) {
-						$rep = opendir(WT_MODULES_DIR.'googlemap/places/'.$countrySelected.'/flags/'.$flags[$i].'/');
-						while ($file = readdir($rep)) {
-							$stateList[$flags[$i]] = $flags[$i];
-						}
-						closedir($rep);
+		}
+		asort($countryList);
+		$stateList = array();
+		if ($countrySelected != 'Countries') {
+			$placesDir = scandir(WT_MODULES_DIR.'googlemap/places/'.$countrySelected.'/flags/');
+			for ($i = 0; $i < count($flags); $i++) {
+				if (in_array($flags[$i], $placesDir)) {
+					$rep = opendir(WT_MODULES_DIR.'googlemap/places/'.$countrySelected.'/flags/'.$flags[$i].'/');
+					while ($file = readdir($rep)) {
+						$stateList[$flags[$i]] = $flags[$i];
 					}
+					closedir($rep);
 				}
-				asort($stateList);
 			}
+			asort($stateList);
+		}
 		?>
 		<form method="post" id="flags" name="flags" action="module.php?mod=googlemap&amp;mod_action=flags&amp;countrySelected=<?php echo $countrySelected; ?>&amp;stateSelected=<?php echo $stateSelected; ?>">
 			<input type="hidden" name="action" value="ChangeFlag">
@@ -621,9 +601,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				$j = 1;
 				for ($i = 0; $i < count($flags); $i++) {
 					if ($countrySelected == 'Countries') {
-						//PERSO Resize flags
-						$tempstr = '<td><input type="radio" dir="ltr" name="FLAGS" value="'.$i.'" onchange="enableButtons();"><img class="flag_gm_w25" src="'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/places/flags/'.$flags[$i].'.png" alt="'.$flags[$i].'"  title="';
-						//END PERSO
+						$tempstr = '<td><input type="radio" dir="ltr" name="FLAGS" value="'.$i.'" onchange="enableButtons();"><img src="'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/places/flags/'.$flags[$i].'.png" alt="'.$flags[$i].'"  title="';
 						if ($flags[$i]!='blank') {
 							if (isset($countries[$flags[$i]])) {
 								$tempstr.=$countries[$flags[$i]];
@@ -635,9 +613,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 						}
 						echo $tempstr, '">&nbsp;&nbsp;', $flags[$i], '</input></td>';
 					} else {
-						//PERSO Resize flags
-						echo '<td><input type="radio" dir="ltr" name="FLAGS" value="', $i, '" onchange="enableButtons();"><img class="flag_gm_w25" src="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/places/', $countrySelected, '/flags/', $flags[$i], '.png">&nbsp;&nbsp;', $flags[$i], '</input></td>';
-						//END PERSO
+						echo '<td><input type="radio" dir="ltr" name="FLAGS" value="', $i, '" onchange="enableButtons();"><img src="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/places/', $countrySelected, '/flags/', $flags[$i], '.png">&nbsp;&nbsp;', $flags[$i], '</input></td>';
 					}
 					if ($j == 4) {
 						echo '</tr><tr>';
@@ -668,9 +644,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				$j = 1;
 				for ($i = 0; $i < count($flags_s); $i++) {
 					if ($stateSelected != 'States') {
-						//PERSO Resize flags
-						echo '<td><input type="radio" dir="ltr" name="FLAGS" value="', $i, '" onchange="enableButtons();"><img class="flag_gm_w25" src="', WT_STATIC_URL.WT_MODULES_DIR, 'googlemap/places/', $countrySelected, '/flags/', $stateSelected, '/', $flags_s[$i], '.png">&nbsp;&nbsp;', $flags_s[$i], '</input></td>';
-						//END PERSO
+						echo '<td><input type="radio" dir="ltr" name="FLAGS" value="', $i, '" onchange="enableButtons();"><img src="', WT_STATIC_URL.WT_MODULES_DIR, 'googlemap/places/', $countrySelected, '/flags/', $stateSelected, '/', $flags_s[$i], '.png">&nbsp;&nbsp;', $flags_s[$i], '</input></td>';
 					}
 					if ($j == 4) {
 						echo '</tr><tr>';
@@ -684,7 +658,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			<input id="savebutton" name="save2" type="submit" disabled="true" value="<?php echo WT_I18N::translate('Save'); ?>"><br>
 		</form>
 		<?php
-		echo '<div class="center"><a href="#" onclick="edit_close();">', WT_I18N::translate('Close Window'), '</a></div><br>';
+		echo '<div class="center"><a href="#" onclick="closePopupAndReloadParent();">', WT_I18N::translate('Close Window'), '</a></div><br>';
 	}
 
 	private function pedigree_map() {
@@ -717,11 +691,8 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		$controller
 			->setPageTitle(/* I18N: %s is a person's name */ WT_I18N::translate('Pedigree map of %s', $controller->getPersonName()))
 			->pageHeader()
-			->addExternalJavaScript('js/autocomplete.js')
-			->addInLineJavaScript('var pastefield;
-			function paste_id(value) {
-				pastefield.value=value;
-			}');
+			->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
+			->addInLineJavascript('var pastefield; function paste_id(value) {pastefield.value=value;}');
 
 		echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet">';
 		echo '<div><table><tr><td valign="middle">';
@@ -933,44 +904,626 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		<!-- end of map display -->
 		<!-- Start of map scripts -->
 		<?php
-		echo '<script src="http://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>';
-		require_once WT_ROOT.WT_MODULES_DIR.'googlemap/wt_v3_pedigree_map.js.php';
+		echo '<script src="', WT_GM_SCRIPT, '"></script>';
+		$controller->addInlineJavascript($this->pedigree_map_js($hideflags, $hidelines, $clustersize));
+	}
+
+	private function pedigree_map_js($hideflags, $hidelines, $clustersize) {
+		global $controller, $SHOW_HIGHLIGHT_IMAGES, $PEDIGREE_GENERATIONS;
+		// The HomeControl returns the map to the original position and style
+		$js='function HomeControl(controlDiv, pm_map) {'.
+			// Set CSS styles for the DIV containing the control
+			// Setting padding to 5 px will offset the control from the edge of the map
+			'controlDiv.style.paddingTop = "5px";
+			controlDiv.style.paddingRight = "0px";'.
+			// Set CSS for the control border
+			'var controlUI = document.createElement("DIV");
+			controlUI.style.backgroundColor = "white";
+			controlUI.style.color = "black";
+			controlUI.style.borderColor = "black";
+			controlUI.style.borderColor = "black";
+			controlUI.style.borderStyle = "solid";
+			controlUI.style.borderWidth = "2px";
+			controlUI.style.cursor = "pointer";
+			controlUI.style.textAlign = "center";
+			controlUI.title = "";
+			controlDiv.appendChild(controlUI);'.
+			// Set CSS for the control interior
+			'var controlText = document.createElement("DIV");
+			controlText.style.fontFamily = "Arial,sans-serif";
+			controlText.style.fontSize = "12px";
+			controlText.style.paddingLeft = "15px";
+			controlText.style.paddingRight = "15px";
+			controlText.innerHTML = "<b>'.WT_I18N::translate('Redraw map').'<\/b>";
+			controlUI.appendChild(controlText);'.
+			// Setup the click event listeners: simply set the map to original LatLng
+			'google.maps.event.addDomListener(controlUI, "click", function() {
+				pm_map.setMapTypeId(google.maps.MapTypeId.TERRAIN),
+				pm_map.fitBounds(bounds),
+				pm_map.setCenter(bounds.getCenter()),
+				infowindow.close()
+				if (document.getElementById(lastlinkid) != null) {
+					document.getElementById(lastlinkid).className = "person_box:target";
+				}
+			});
+		}'.
+		// This function picks up the click and opens the corresponding info window
+		'function myclick(i) {
+			if (document.getElementById(lastlinkid) != null) {
+				document.getElementById(lastlinkid).className = "person_box:target";
+			}
+			google.maps.event.trigger(gmarkers[i], "click");
+		}'.
+		// this variable will collect the html which will eventually be placed in the side_bar
+		'var side_bar_html = "";'.
+		// arrays to hold copies of the markers and html used by the side_bar
+		// because the function closure trick doesnt work there
+		'var gmarkers = [];
+		var i = 0;
+		var lastlinkid;
+		var infowindow = new google.maps.InfoWindow({});'.
+		// === Create an associative array of GIcons()
+		'var gicons = [];
+		gicons["1"]			= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon1.png")
+		gicons["1"].shadow 	= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow50.png",
+									new google.maps.Size(37, 34),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(10, 34)	// Shadow anchor is base of image
+								);
+		gicons["2"]			= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon2.png")
+		gicons["2"].shadow 	= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow50.png",
+									new google.maps.Size(37, 34),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(10, 34)	// Shadow anchor is base of image
+								);
+		gicons["2L"]		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon2L.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(28, 28)	// Image anchor
+								);
+		gicons["2L"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-left-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(32, 27)	// Shadow anchor is base of image
+								);
+		gicons["2R"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon2R.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(4, 28)	// Image anchor
+								);
+		gicons["2R"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-right-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(15, 27)	// Shadow anchor is base of image
+								);
+		gicons["2Ls"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon2Ls.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(22, 22)	// Image anchor
+								);
+		gicons["2Rs"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon2Rs.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(2, 22)	// Image anchor
+								);
+		gicons["3"]			= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon3.png")
+		gicons["3"].shadow 	= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow50.png",
+									new google.maps.Size(37, 34),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(10, 34)	// Shadow anchor is base of image
+								);
+		gicons["3L"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon3L.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(28, 28)	// Image anchor
+								);
+		gicons["3L"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-left-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(32, 27)	// Shadow anchor is base of image
+								);
+		gicons["3R"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon3R.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(4, 28)	// Image anchor
+								);
+		gicons["3R"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-right-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(15, 27)	// Shadow anchor is base of image
+								);
+		gicons["3Ls"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon3Ls.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(22, 22)	// Image anchor
+								);
+		gicons["3Rs"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon3Rs.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(2, 22)	// Image anchor
+								);
+		gicons["4"]			= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon4.png")
+		gicons["4"].shadow 	= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow50.png",
+									new google.maps.Size(37, 34),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(10, 34)	// Shadow anchor is base of image
+								);
+		gicons["4L"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon4L.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(28, 28)	// Image anchor
+								);
+		gicons["4L"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-left-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(32, 27)	// Shadow anchor is base of image
+								);
+		gicons["4R"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon4R.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(4, 28)	// Image anchor
+								);
+		gicons["4R"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-right-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(15, 27)	// Shadow anchor is base of image
+								);
+		gicons["4Ls"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon4Ls.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(22, 22)	// Image anchor
+								);
+		gicons["4Rs"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon4Rs.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(2, 22)	// Image anchor
+								);
+		gicons["5"]			= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon5.png")
+		gicons["5"].shadow 	= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow50.png",
+									new google.maps.Size(37, 34),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(10, 34)	// Shadow anchor is base of image
+								);
+		gicons["5L"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon5L.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(28, 28)	// Image anchor
+								);
+		gicons["5L"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-left-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(32, 27)	// Shadow anchor is base of image
+								);
+		gicons["5R"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon5R.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(4, 28)	// Image anchor
+								);
+		gicons["5R"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-right-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(15, 27)	// Shadow anchor is base of image
+								);
+		gicons["5Ls"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon5Ls.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(22, 22)	// Image anchor
+								);
+		gicons["5Rs"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon5Rs.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(2, 22)	// Image anchor
+								);
+		gicons["6"]			= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon6.png")
+		gicons["6"].shadow 	= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow50.png",
+									new google.maps.Size(37, 34),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(10, 34)	// Shadow anchor is base of image
+								);
+		gicons["6L"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon6L.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(28, 28)	// Image anchor
+								);
+		gicons["6L"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-left-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(32, 27)	// Shadow anchor is base of image
+								);
+		gicons["6R"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon6R.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(4, 28)	// Image anchor
+								);
+		gicons["6R"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-right-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(15, 27)	// Shadow anchor is base of image
+								);
+		gicons["6Ls"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon6Ls.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(22, 22)	// Image anchor
+								);
+		gicons["6Rs"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon6Rs.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(2, 22)	// Image anchor
+								);
+		gicons["7"]			= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon7.png")
+		gicons["7"].shadow 	= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow50.png",
+									new google.maps.Size(37, 34),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(10, 34)	// Shadow anchor is base of image
+								);
+		gicons["7L"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon7L.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(28, 28)	// Image anchor
+								);
+		gicons["7L"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-left-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(32, 27)	// Shadow anchor is base of image
+								);
+		gicons["7R"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon7R.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(4, 28)	// Image anchor
+								);
+		gicons["7R"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-right-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(15, 27)	// Shadow anchor is base of image
+								);
+		gicons["7Ls"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon7Ls.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(22, 22)	// Image anchor
+								);
+		gicons["7Rs"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon7Rs.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(2, 22)	// Image anchor
+								);
+		gicons["8"]			= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon8.png")
+		gicons["8"].shadow 	= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow50.png",
+									new google.maps.Size(37, 34),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(10, 34)	// Shadow anchor is base of image
+								);
+		gicons["8L"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon8L.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(28, 28)	// Image anchor
+								);
+		gicons["8L"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-left-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(32, 27)	// Shadow anchor is base of image
+								);
+		gicons["8R"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon8R.png",
+									new google.maps.Size(32, 32),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(4, 28)	// Image anchor
+								);
+		gicons["8R"].shadow = 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/shadow-right-large.png",
+									new google.maps.Size(49, 32),	// Shadow size
+									new google.maps.Point(0, 0),	// Shadow origin
+									new google.maps.Point(15, 27)	// Shadow anchor is base of image
+								);
+		gicons["8Ls"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon8Ls.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(22, 22)	// Image anchor
+								);
+		gicons["8Rs"] 		= 	new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+"googlemap/images/icon8Rs.png",
+									new google.maps.Size(24, 24),	// Image size
+									new google.maps.Point(0, 0),	// Image origin
+									new google.maps.Point(2, 22)	// Image anchor
+								);'.
+		// / A function to create the marker and set up the event window
+		'function createMarker(point, name, html, mhtml, icontype) {
+			// alert(i+". "+name+", "+icontype);
+			var contentString = "<div id=\'iwcontent_edit\'>"+mhtml+"<\/div>";'.
+			//create a marker with the requested icon
+			'var marker = new google.maps.Marker({
+				icon: 		gicons[icontype],
+				shadow: 	gicons[icontype].shadow,
+				map: 		pm_map,
+				position: 	point,
+				zIndex: 	0
+			});
+			var linkid = "link"+i;
+			google.maps.event.addListener(marker, "click", function() {
+				infowindow.close();
+				infowindow.setContent(contentString);
+				infowindow.open(pm_map, marker);
+				document.getElementById(linkid).className = "person_box";
+				if (document.getElementById(lastlinkid) != null) {
+					document.getElementById(lastlinkid).className = "person_box:target";
+				}
+				lastlinkid=linkid;
+			});'.
+			// save the info we need to use later for the side_bar
+			'gmarkers[i] = marker;'.
+			// add a line to the side_bar html
+			'side_bar_html += "<br><div id=\'"+linkid+"\'><a href=\'#\' onclick=\'myclick(" + i + ")\'>" + html +"</a><br></div>";
+			i++;
+			return marker;
+		};'.
+		// create the map
+		'var myOptions = {
+			zoom: 6,
+			center: new google.maps.LatLng(0, 0),
+			mapTypeId: google.maps.MapTypeId.TERRAIN,					// ROADMAP, SATELLITE, HYBRID, TERRAIN
+			mapTypeControlOptions: {
+				style: google.maps.MapTypeControlStyle.DROPDOWN_MENU 	// DEFAULT, DROPDOWN_MENU, HORIZONTAL_BAR
+			},
+			navigationControlOptions: {
+				position: google.maps.ControlPosition.TOP_RIGHT,		// BOTTOM, BOTTOM_LEFT, LEFT, TOP, etc
+				style: google.maps.NavigationControlStyle.SMALL			// ANDROID, DEFAULT, SMALL, ZOOM_PAN
+			},
+			streetViewControl: false,									// Show Pegman or not
+			scrollwheel: true
+		};
+		var pm_map = new google.maps.Map(document.getElementById("pm_map"), myOptions);
+		google.maps.event.addListener(pm_map, "maptypechanged", function() {
+			map_type.refresh();
+		});
+		google.maps.event.addListener(pm_map, "click", function() {
+			if (document.getElementById(lastlinkid) != null) {
+				document.getElementById(lastlinkid).className = "person_box:target";
+			}
+		infowindow.close();
+		});'.
+		// Create the DIV to hold the control and call HomeControl() passing in this DIV. --
+		'var homeControlDiv = document.createElement("DIV");
+		var homeControl = new HomeControl(homeControlDiv, pm_map);
+		homeControlDiv.index = 1;
+		pm_map.controls[google.maps.ControlPosition.TOP_RIGHT].push(homeControlDiv);'.
+		// create the map bounds
+		'var bounds = new google.maps.LatLngBounds();';
+		// add the points
+		$curgen=1;
+		$priv=0;
+		$count=0;
+		$event = '<img src="'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/images/sq1.png" width="10" height="10">'.
+			 '<strong>&nbsp;'.WT_I18N::translate('Root').':&nbsp;</strong>';
+		$colored_line = array('1'=>'#FF0000','2'=>'#0000FF','3'=>'#00FF00',
+						'4'=>'#FFFF00','5'=>'#00FFFF','6'=>'#FF00FF',
+						'7'=>'#C0C0FF','8'=>'#808000');
+
+		for ($i=0; $i<($controller->treesize); $i++) {
+			// moved up to grab the sex of the individuals
+			$person = WT_Person::getInstance($controller->treeid[$i]);
+			if (!empty($person)) {
+				$pid = $controller->treeid[$i];
+				$indirec = $person->getGedcomRecord();
+				$sex = $person->getSex();
+				$bplace = trim($person->getBirthPlace());
+				$bdate = $person->getBirthDate();
+				$name = $person->getFullName();
+
+				// -- check to see if we have moved to the next generation
+				if ($i+1 >= pow(2, $curgen)) {
+					$curgen++;
+				}
+				$relationship=get_relationship_name(get_relationship($controller->root->getXref(), $pid, false, 0, true));
+				if (empty($relationship)) $relationship=WT_I18N::translate('self');
+				$event = '<img src=\"'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/images/sq'.$curgen.'.png\" width=\"10\" height=\"10\">'.
+					 '<strong>&nbsp;'.$relationship.':&nbsp;</strong>';
+				// add thumbnail image
+				$image = '';
+				if ($SHOW_HIGHLIGHT_IMAGES) {
+					$object = find_highlighted_object($pid, WT_GED_ID, $indirec);
+					if (!empty($object)) {
+						$mediaobject=WT_Media::getInstance($object['mid']);
+						$image=$mediaobject->displayMedia(array('display_type'=>'googlemap'));
+					} else {
+						$sex=$person->getSex();
+						$image=display_silhouette(array('sex'=>$sex,'display_type'=>'googlemap')); // may return ''
+					}
+				}
+				// end of add image
+
+				$dataleft  = $image . $event . addslashes($name);
+				$datamid   = " <span><a href='".$person->getHtmlUrl()."' id='alturl' title='" . WT_I18N::translate('Individual information') . "'>";
+				$datamid .= '('.WT_I18N::translate('View Person').')';
+				$datamid  .= '</a></span>';
+				$dataright = '<br><strong>'. WT_I18N::translate('Birth:') . '&nbsp;</strong>' .
+						addslashes($bdate->Display(false)).'<br>'.$bplace;
+
+				$latlongval[$i] = get_lati_long_placelocation($person->getBirthPlace());
+				if ($latlongval[$i] != NULL) {
+					$lat[$i] = str_replace(array('N', 'S', ','), array('', '-', '.'), $latlongval[$i]['lati']);
+					$lon[$i] = str_replace(array('E', 'W', ','), array('', '-', '.'), $latlongval[$i]['long']);
+					if (!($lat[$i] == NULL && $lon[$i] == NULL) && !($lat[$i] == 0 && $lon[$i] == 0)) {
+						if ((!$hideflags) && ($latlongval[$i]['icon'] != NULL)) {
+							$flags[$i] = $latlongval[$i]['icon'];
+							$ffile = strrchr($latlongval[$i]['icon'], '/');
+							$ffile = substr($ffile,1, strpos($ffile, '.')-1);
+							if (empty($flags[$ffile])) {
+								$flags[$ffile] = $i; // Only generate the flag once
+								if (($lat[$i] != NULL) && ($lon[$i] != NULL)) {
+									$js.= 'var point = new google.maps.LatLng(' . $lat[$i] . ',' . $lon[$i]. ');';
+									$js.= 'var Marker1_0_flag = new google.maps.MarkerImage();';
+									$js.= 'Marker1_0_flag.image = "'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/'.$flags[$i].'";';
+									$js.= 'Marker1_0_flag.shadow = "'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/images/flag_shadow.png";';
+									$js.= 'Marker1_0_flag.iconSize = new google.maps.Size(25, 15);';
+									$js.= 'Marker1_0_flag.shadowSize = new google.maps.Size(35, 45);';
+									$js.= 'Marker1_0_flag.iconAnchor = new google.maps.Point(1, 45);';
+									//BH	$js.= 'Marker1_0_flag.infoWindowAnchor = new google.maps.Point(5, 1);';
+									$js.= 'var Marker1_0 = new google.maps.LatLng(point, {icon:Marker1_0_flag});';
+									//BH  $js.= 'pm_map.addOverlay(Marker1_0);';
+								}
+							}
+						}
+						$marker_number = $curgen;
+						$dups=0;
+						for ($k=0; $k<$i; $k++) {
+							if ($latlongval[$i] == $latlongval[$k]) {
+								if ($clustersize == 1) {
+									$lon[$i] = $lon[$i]+0.0025;
+									$lat[$i] = $lat[$i]+0.0025;
+								} else {
+									$dups++;
+									switch($dups) {
+										case 1: $marker_number = $curgen . 'L'; break;
+										case 2: $marker_number = $curgen . 'R'; break;
+										case 3: if ($clustersize==5) {
+											$marker_number = $curgen . 'Ls'; break;
+											}
+										case 4: if ($clustersize==5) {
+											$marker_number = $curgen . 'Rs'; break;
+											}
+										case 5: //adjust position where markers have same coodinates
+										default: $marker_number = $curgen;
+											$lon[$i] = $lon[$i]+0.0025;
+											$lat[$i] = $lat[$i]+0.0025;
+											break;
+									}
+								}
+							}
+						}
+						$js.= 'var point = new google.maps.LatLng('.$lat[$i].','.$lon[$i].');';
+						$js.= "var marker = createMarker(point, \"".addslashes($name)."\",\n\t\"<div>".$dataleft.$datamid.$dataright."</div>\", \"";
+						$js.= "<div class='iwstyle'>";
+						$js.= "<a href='module.php?ged=".WT_GEDURL."&amp;mod=googlemap&amp;mod_action=pedigree_map&amp;rootid={$pid}&amp;PEDIGREE_GENERATIONS={$PEDIGREE_GENERATIONS}";
+						if ($hideflags) $js.= '&amp;hideflags=1';
+						if ($hidelines) $js.= '&amp;hidelines=1';
+						if ($clustersize != 5) $js.= '&amp;clustersize='.$clustersize; // ignoring the default of 5
+						$js.= "' title='".WT_I18N::translate('Pedigree map')."'>".$dataleft."</a>".$datamid.$dataright."</div>\", \"".$marker_number."\");";
+						//BH $js.= "pm_map.addOverlay(marker);\n";
+						// Construct the polygon lines
+						if (!$hidelines) {
+							$to_child = (intval(($i-1)/2)); // Draw a line from parent to child
+							if (isset($lat[$to_child]) && isset($lon[$to_child])) {
+								$js.='
+								var linecolor;
+								var plines;
+								var lines = [new google.maps.LatLng('.$lat[$i].','.$lon[$i].'),
+									new google.maps.LatLng('.$lat[$to_child].','.$lon[$to_child].')];
+								linecolor = "'.$colored_line[$curgen].'";
+								plines = new google.maps.Polygon({
+									paths: lines,
+									strokeColor: linecolor,
+									// strokeColor: '.$colored_line[$curgen].',
+									strokeOpacity: 0.8,
+									strokeWeight: 3,
+									fillColor: "#FF0000",
+									//fillOpacity: 0.35
+									fillOpacity: 0.1
+								});
+								plines.setMap(pm_map);';
+							}
+						}
+						// Extend and fit marker bounds
+						$js.='bounds.extend(point);';
+						$js.='pm_map.fitBounds(bounds);';
+						$count++;
+					}
+				}
+			} else {
+				$latlongval[$i] = NULL;
+			}
+		}
+		$js.='pm_map.setCenter(bounds.getCenter());'.
+		// Close the sidebar highlight when the infowindow is closed
+		'google.maps.event.addListener(infowindow, "closeclick", function() {
+			document.getElementById(lastlinkid).className = "person_box:target";
+		});'.
+		// put the assembled side_bar_html contents into the side_bar div
+		'document.getElementById("side_bar").innerHTML = side_bar_html;'.
+		// create the context menu div
+		'var contextmenu = document.createElement("div");
+			contextmenu.style.visibility="hidden";
+			contextmenu.innerHTML = "<a href=\'#\' onclick=\'zoomIn()\'><div class=\'optionbox\'>&nbsp;&nbsp;'.WT_I18N::translate('Zoom in').'&nbsp;&nbsp;</div></a>"
+								  + "<a href=\'#\' onclick=\'zoomOut()\'><div class=\'optionbox\'>&nbsp;&nbsp;'.WT_I18N::translate('Zoom out').'&nbsp;&nbsp;</div></a>"
+								  + "<a href=\'#\' onclick=\'zoomInHere()\'><div class=\'optionbox\'>&nbsp;&nbsp;'.WT_I18N::translate('Zoom in here').'</div></a>"
+								  + "<a href=\'#\' onclick=\'zoomOutHere()\'><div class=\'optionbox\'>&nbsp;&nbsp;'.WT_I18N::translate('Zoom out here').'&nbsp;&nbsp;</div></a>"
+								  + "<a href=\'#\' onclick=\'centreMapHere()\'><div class=\'optionbox\'>&nbsp;&nbsp;'.WT_I18N::translate('Center map here').'&nbsp;&nbsp;</div></a>";'.
+		// listen for singlerightclick
+		'google.maps.event.addListener(pm_map,"singlerightclick", function(pixel,tile) {'.
+			// store the "pixel" info in case we need it later
+			// adjust the context menu location if near an egde
+			// create a GControlPosition
+			// apply it to the context menu, and make the context menu visible
+			'clickedPixel = pixel;
+			var x=pixel.x;
+			var y=pixel.y;
+			if (x > pm_map.getSize().width - 120) { x = pm_map.getSize().width - 120 }
+			if (y > pm_map.getSize().height - 100) { y = pm_map.getSize().height - 100 }
+			var pos = new GControlPosition(G_ANCHOR_TOP_LEFT, new GSize(x,y));
+			pos.apply(contextmenu);
+			contextmenu.style.visibility = "visible";
+		});
+		'.
+		// functions that perform the context menu options
+		'function zoomIn() {'.
+			// perform the requested operation
+			'pm_map.zoomIn();'.
+			// hide the context menu now that it has been used
+			'contextmenu.style.visibility="hidden";
+		}
+		function zoomOut() {'.
+			// perform the requested operation
+			'pm_map.zoomOut();'.
+			// hide the context menu now that it has been used
+			'contextmenu.style.visibility="hidden";
+		}
+		function zoomInHere() {'.
+			// perform the requested operation
+			'var point = pm_map.fromContainerPixelToLatLng(clickedPixel)
+			pm_map.zoomIn(point,true);'.
+			// hide the context menu now that it has been used
+			'contextmenu.style.visibility="hidden";
+		}
+		function zoomOutHere() {'.
+			// perform the requested operation
+			'var point = pm_map.fromContainerPixelToLatLng(clickedPixel)
+			pm_map.setCenter(point,pm_map.getZoom()-1);'.
+			// There is no pm_map.zoomOut() equivalent
+			// hide the context menu now that it has been used
+			'contextmenu.style.visibility="hidden";
+		}
+		function centreMapHere() {'.
+			// perform the requested operation
+			'var point = pm_map.fromContainerPixelToLatLng(clickedPixel)
+			pm_map.setCenter(point);'.
+			// hide the context menu now that it has been used
+			'contextmenu.style.visibility="hidden";
+		}'.
+		// If the user clicks on the map, close the context menu
+		'google.maps.event.addListener(pm_map, "click", function() {
+			contextmenu.style.visibility="hidden";
+		});';
+		return $js;
 	}
 
 	private function admin_placecheck() {
 		require WT_ROOT.WT_MODULES_DIR.'googlemap/defaultconfig.php';
 		require_once WT_ROOT.WT_MODULES_DIR.'googlemap/googlemap.php';
-		$action   =safe_POST     ('action'                                              );
-		$gedcom_id=safe_POST     ('gedcom_id', array_keys(get_all_gedcoms()), WT_GED_ID );
-		$country  =safe_POST     ('country',   WT_REGEX_UNSAFE,              ''         );
-		if (!$country) {
-			// allow placelist to link directly to a specific country/state
-			$country=safe_GET    ('country',   WT_REGEX_UNSAFE,              'XYZ'      );
-		}
-		$state    =safe_POST     ('state',     WT_REGEX_UNSAFE,              ''         );
-		if (!$state) {
-			$state=safe_GET      ('state',     WT_REGEX_UNSAFE,              'XYZ'      );
-		}
-		if (isset($_REQUEST['show_changes']) && $_REQUEST['show_changes']=='yes') {
-			$show_changes = true;
-		} else {
-			$show_changes = false;
-		}
+		$action   =safe_GET('action'                                             );
+		$gedcom_id=safe_GET('gedcom_id', array_keys(get_all_gedcoms()), WT_GED_ID);
+		$country  =safe_GET('country',   WT_REGEX_UNSAFE,               'XYZ'    );
+		$state    =safe_GET('state',     WT_REGEX_UNSAFE,               'XYZ'    );
+		$matching =safe_GET_bool('matching');
 
-		if ($show_changes && !empty($_SESSION['placecheck_gedcom_id'])) {
-			$gedcom_id = $_SESSION['placecheck_gedcom_id'];
+		if (!empty($WT_SESSION['placecheck_gedcom_id'])) {
+			$gedcom_id = $WT_SESSION['placecheck_gedcom_id'];
 		} else {
-			$_SESSION['placecheck_gedcom_id'] = $gedcom_id;
+			$WT_SESSION['placecheck_gedcom_id'] = $gedcom_id;
 		}
-		if ($show_changes && !empty($_SESSION['placecheck_country'])) {
-			$country = $_SESSION['placecheck_country'];
+		if (!empty($WT_SESSION['placecheck_country'])) {
+			$country = $WT_SESSION['placecheck_country'];
 		} else {
-			$_SESSION['placecheck_country'] = $country;
+			$WT_SESSION['placecheck_country'] = $country;
 		}
-		if ($show_changes && !empty($_SESSION['placecheck_state'])) {
-			$state = $_SESSION['placecheck_state'];
+		if (!empty($WT_SESSION['placecheck_state'])) {
+			$state = $WT_SESSION['placecheck_state'];
 		} else {
-			$_SESSION['placecheck_state'] = $state;
+			$WT_SESSION['placecheck_state'] = $state;
 		}
 
 		$controller=new WT_Controller_Base();
@@ -979,32 +1532,31 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			->setPageTitle(WT_I18N::translate('Google Maps™'))
 			->pageHeader();
 
-		?>
-		<table id="gm_config">
-			<tr>
-				<th>
-					<a href="module.php?mod=googlemap&amp;mod_action=admin_config">
-						<?php echo WT_I18N::translate('Google Maps™ preferences'); ?>
-					</a>
-				</th>
-				<th>
-					<a href="module.php?mod=googlemap&amp;mod_action=admin_places">
-						<?php echo WT_I18N::translate('Geographic data'); ?>
-					</a>
-				</th>
-				<th>
-					<a class="current" href="module.php?mod=googlemap&amp;mod_action=admin_placecheck">
-						<?php echo WT_I18N::translate('Place Check'); ?>
-					</a>
-				</th>
-			</tr>
-		</table>
+		echo '
+			<table id="gm_config">
+				<tr>
+					<th>
+						<a href="module.php?mod=googlemap&amp;mod_action=admin_config">', WT_I18N::translate('Google Maps™ preferences'),'</a>
+					</th>
+					<th>
+						<a href="module.php?mod=googlemap&amp;mod_action=admin_places">
+							', WT_I18N::translate('Geographic data'),'
+						</a>
+					</th>
+					<th>
+						<a class="current" href="module.php?mod=googlemap&amp;mod_action=admin_placecheck">
+							', WT_I18N::translate('Place Check'),'
+						</a>
+					</th>
+				</tr>
+			</table>';
 
-		<?php
 
 		//Start of User Defined options
+		echo '<form method="get" name="placecheck" action="module.php">';
+		echo '<input type="hidden" name="mod" value="', $this->getName(), '">';
+		echo '<input type="hidden" name="mod_action" value="admin_placecheck">';
 		echo '<table id="gm_check_outer">';
-		echo '<form method="post" name="placecheck" action="module.php?mod=googlemap&amp;mod_action=admin_placecheck">';
 		echo '<tr valign="top">';
 		echo '<td>';
 		echo '<table class="gm_check_top" align="left">';
@@ -1052,19 +1604,15 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		echo '</table>';
 		echo '</td>';
 		//Show Filter table
-		if (!isset ($_POST['matching'])) {$matching=false;} else {$matching=true;}
 		echo '<td>';
 		echo '<table class="gm_check_top"  align="center">';
 		echo '<tr><th colspan="2">';
 		echo WT_I18N::translate('List filtering options');
 		echo '</th></tr><tr><td>';
 		echo WT_I18N::translate('Include fully matched places: ');
-		echo '</td><td><input type="checkbox" name="matching" value="active"';
+		echo '</td><td><input type="checkbox" name="matching" value="1"';
 		if ($matching) {
 			echo ' checked="checked"';
-		}
-		if ($show_changes) {
-			$action = 'go';
 		}
 		echo '></td></tr>';
 		echo '</table>';
@@ -1132,21 +1680,16 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 
 			//scripts for edit, add and refresh
 			?>
-			<script type="text/javascript">
-			<!--
+			<script>
 			function edit_place_location(placeid) {
-				window.open('module.php?mod=googlemap&mod_action=places_edit&action=update&placeid='+placeid, '_blank', indx_window_specs);
+				window.open('module.php?mod=googlemap&mod_action=places_edit&action=update&placeid='+placeid, '_blank', gmap_window_specs);
 				return false;
 			}
 
 			function add_place_location(placeid) {
-				window.open('module.php?mod=googlemap&mod_action=places_edit&action=add&placeid='+placeid, '_blank', indx_window_specs);
+				window.open('module.php?mod=googlemap&mod_action=places_edit&action=add&placeid='+placeid, '_blank', gmap_window_specs);
 				return false;
 			}
-			function showchanges() {
-				window.location='<?php echo $_SERVER["REQUEST_URI"]; ?>&show_changes=yes';
-			}
-			//-->
 			</script>
 			<?php
 
@@ -1179,12 +1722,11 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				$levels=explode(",", $place_list[$x]);
 				$parts=count($levels);
 				$levels=array_reverse($levels);
-				$placestr.="<a href=\"placelist.php?action=show&amp;";
+				$placestr.="<a href=\"placelist.php?action=show";
 				foreach ($levels as $pindex=>$ppart) {
 					$ppart=urlencode(trim($ppart));
-					$placestr.="parent[$pindex]=".$ppart."&amp;";
+					$placestr.="&amp;parent[$pindex]=".$ppart."";
 				}
-				$placestr.="level=".count($levels);
 				$placestr.="\">".$place_list[$x]."</a>";
 				$gedplace="<tr><td>".$placestr."</td>";
 				$z=0;
@@ -1273,7 +1815,6 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				}
 				$x++;
 			}
-
 			// echo final row of table
 			echo '<tr><td colspan="2" class="accepted">', /* I18N: A count of places */ WT_I18N::translate('Total places: %s', WT_I18N::number($countrows)), '</td></tr></table></div>';
 			break;

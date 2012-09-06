@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_pgv_to_wt.php 13958 2012-06-01 17:38:56Z greg $
+// $Id: admin_pgv_to_wt.php 14203 2012-08-26 06:10:17Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_pgv_to_wt.php');
 require './includes/session.php';
@@ -119,7 +119,7 @@ if ($error || empty($PGV_PATH)) {
 	$pgv_dirs=array();
 	$dir=opendir(realpath('..'));
 	while (($subdir=readdir($dir))!==false) {
-		if (preg_match('/pgv|gedview|gene/i', $subdir) && is_dir('../'.$subdir) && file_exists('../'.$subdir.'/config.php')) {
+		if (is_dir('../'.$subdir) && file_exists('../'.$subdir.'/config.php')) {
 			$pgv_dirs[]='../'.$subdir;
 		}
 	}
@@ -584,11 +584,6 @@ if ($PGV_SCHEMA_VERSION>=12) {
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Our user ID will have changed.  Switch to the PGV user with the same name.
-// If this does not exist, we'll get logged out by session.php on the next page.
-$_SESSION['wt_user']=get_user_id(WT_USER_NAME);
-
 define('PGV_PHPGEDVIEW', true);
 define('PGV_PRIV_PUBLIC', WT_PRIV_PUBLIC);
 define('PGV_PRIV_USER', WT_PRIV_USER);
@@ -711,7 +706,6 @@ foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
 	@set_gedcom_setting($ged_id, 'SHOW_AGE_DIFF',                $SHOW_AGE_DIFF);
 	@set_gedcom_setting($ged_id, 'SHOW_COUNTER',                 $SHOW_COUNTER);
 	@set_gedcom_setting($ged_id, 'SHOW_DEAD_PEOPLE',             $SHOW_DEAD_PEOPLE);
-	@set_gedcom_setting($ged_id, 'SHOW_EMPTY_BOXES',             $SHOW_EMPTY_BOXES);
 	@set_gedcom_setting($ged_id, 'SHOW_EST_LIST_DATES',          $SHOW_EST_LIST_DATES);
 	@set_gedcom_setting($ged_id, 'SHOW_FACT_ICONS',              $SHOW_FACT_ICONS);
 	@set_gedcom_setting($ged_id, 'SHOW_GEDCOM_RECORD',           $SHOW_GEDCOM_RECORD);
@@ -1050,8 +1044,8 @@ try {
 
 echo '<p>pgv_places => wt_places ...</p>'; ob_flush(); flush(); usleep(50000);
 WT_DB::prepare(
-	"REPLACE INTO `##places` (p_id, p_place, p_level, p_parent_id, p_file, p_std_soundex, p_dm_soundex)".
-	" SELECT p_id, p_place, p_level, p_parent_id, p_file, p_std_soundex, p_dm_soundex FROM `{$DBNAME}`.`{$TBLPREFIX}places`"
+	"REPLACE INTO `##places` (p_id, p_place, p_parent_id, p_file, p_std_soundex, p_dm_soundex)".
+	" SELECT p_id, p_place, p_parent_id, p_file, p_std_soundex, p_dm_soundex FROM `{$DBNAME}`.`{$TBLPREFIX}places`"
 )->execute();
 
 ////////////////////////////////////////////////////////////////////////////////

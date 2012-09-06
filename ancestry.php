@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: ancestry.php 13950 2012-05-29 06:28:25Z greg $
+// $Id: ancestry.php 14142 2012-08-06 23:37:14Z nigel $
 
 define('WT_SCRIPT_NAME', 'ancestry.php');
 require './includes/session.php';
@@ -32,15 +32,15 @@ require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 $controller=new WT_Controller_Ancestry();
 $controller
 	->pageHeader()
-	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
-	->addExternalJavaScript('js/autocomplete.js');
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
+	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }'); // For the 'find indi' link
 
 // LightBox
 if (WT_USE_LIGHTBOX) {
 	$album = new lightbox_WT_Module();
 	$album->getPreLoadContent();
 }
-
+echo '<div id="ancestry-page">';
 echo '<table><tr><td valign="middle">';
 echo '<h2>', $controller->getPageTitle(), '</h2>';
 ?>
@@ -179,7 +179,7 @@ case 1:
 	// first page : show indi facts
 	print_pedigree_person($controller->root, 1, 1);
 	// expand the layer
-	echo WT_JS_START, 'expandbox("', $controller->root->getXref(), '.1", 2);', WT_JS_END;
+	echo '<script>expandbox("', $controller->root->getXref(), '.1", 2);</script>';
 	// process the tree
 	$treeid=ancestry_array($controller->root->getXref(), $PEDIGREE_GENERATIONS-1);
 	foreach ($treeid as $i=>$pid) {
@@ -219,3 +219,4 @@ case 3:
 	echo '</div>';
 	break;
 }
+echo '</div>'; // close div ancestry-page

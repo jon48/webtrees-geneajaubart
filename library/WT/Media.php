@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Media.php 13875 2012-04-29 15:08:08Z lukasz $
+// $Id: Media.php 14055 2012-06-30 10:39:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -242,7 +242,7 @@ class WT_Media extends WT_GedcomRecord {
 	 */
 	public function getFilesize($which='main') {
 		$size = $this->getFilesizeraw($which);
-		if ($size) $size=floor(($size+1023)/1024); // add some bytes to be sure we never return "0 KB"
+		if ($size) $size=(int)(($size+1023)/1024); // add some bytes to be sure we never return "0 KB"
 		return /* I18N: size of file in KB */ WT_I18N::translate('%s KB', WT_I18N::number($size));
 	}
 

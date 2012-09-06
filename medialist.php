@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: medialist.php 13873 2012-04-29 05:30:32Z nigel $
+// $Id: medialist.php 14207 2012-08-26 06:46:23Z greg $
 
 define('WT_SCRIPT_NAME', 'medialist.php');
 require './includes/session.php';
@@ -189,12 +189,11 @@ if (WT_USE_LIGHTBOX) {
 		<td class="optionbox wrap width25">
 			<?php
 				//if ($MEDIA_DIRECTORY_LEVELS > 0) {
-				if (empty($folder)) {
-					if (!empty($WT_SESSION->upload_folder)) $folder = $WT_SESSION->upload_folder;
-					else $folder = 'ALL';
+				if (!$folder) {
+					$folder = 'ALL';
 				}
-					$folders = array_merge(array('ALL'), get_media_folders());
-					echo '<span dir="ltr"><select name="folder">';
+				$folders = array_merge(array('ALL'), get_media_folders());
+				echo '<span dir="ltr"><select name="folder">';
 				foreach ($folders as $f) {
 					echo '<option value="', $f, '"';
 					if ($folder==$f) echo ' selected="selected"';
@@ -487,7 +486,7 @@ if ($show == 'yes') {
 		if ($ct>$max) {
 			if ($currentPage < $lastPage) {
 				$lastStart = ((int) ($ct / $max)) * $max;
-				echo '<a href="medialist.php?action=no&amp;search=no&amp;folder=', rawurlencode($folder), '&amp;sortby=', $sortby, '&amp;subdirs=', $subdirs, '&amp;filter1=', rawurlencode($filter1), '&amp;filter_type=', $filter_type, '&amp;filter2=', rawurlencode($filter2), '&amp;columns=', $columns, '&amp;thumbnail=', $thumbnail, '&amp;apply_filter=', $apply_filter, '&amp;start=', $lastStart, '&amp;max=', $max, '">', $IconRDarrow, '</a>';
+				echo '<a href="medialist.php?action=no&amp;search=no&amp;folder=', rawurlencode($folder), '&amp;sortby=', $sortby, '&amp;subdirs=', $subdirs, '&amp;filter1=', rawurlencode($filter1), '&amp;filter_type=', $filter_type, '&amp;filter2=', rawurlencode($filter2), '&amp;columns=', $columns, '&amp;thumbnail=', $thumbnail, '&amp;apply_filter=', $apply_filter, '&amp;start=', $lastStart, '&amp;max=', $max, '" class="icon-rdarrow"></a>';
 			}
 			if ($start+$max < $ct) {
 				$newstart = $start+$count;

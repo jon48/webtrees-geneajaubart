@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: reportengine.php 13835 2012-04-18 16:56:09Z lukasz $
+// $Id: reportengine.php 14111 2012-07-18 12:25:09Z greg $
 
 define('WT_SCRIPT_NAME', 'reportengine.php');
 require './includes/session.php';
@@ -160,8 +160,8 @@ elseif ($action=='setup') {
 	$controller
 		->setPageTitle($report_array['title'])
 		->pageHeader()
-		->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
-		->addExternalJavaScript('js/autocomplete.js');
+		->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
+		->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
 	init_calendar_popup();
 	echo '<div id="reportengine-page">

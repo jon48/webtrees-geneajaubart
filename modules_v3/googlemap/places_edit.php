@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: places_edit.php 13709 2012-03-28 13:33:58Z greg $
+// $Id: places_edit.php 14221 2012-08-27 21:48:57Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -38,32 +38,13 @@ if (isset($_REQUEST['placeid'])) $placeid = $_REQUEST['placeid'];
 if (isset($_REQUEST['place_name'])) $place_name = $_REQUEST['place_name'];
 
 $controller=new WT_Controller_Simple();
-$controller->setPageTitle(WT_I18N::translate('Geographic data'));
-$controller->pageHeader();
+$controller
+		->requireAdminLogin()
+		->setPageTitle(WT_I18N::translate('Geographic data'))
+		->addExternalJavascript(WT_STATIC_URL.'js/webtrees.js')
+		->pageHeader();
 
-if (!WT_USER_IS_ADMIN) {
-	echo "<table class=\"facts_table\">\n";
-	echo "<tr><td colspan=\"2\" class=\"facts_value\">", WT_I18N::translate('Page only for Administrators');
-	echo "</td></tr></table>\n";
-	echo "<br><br><br>\n";
-	exit;
-}
-// echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/googlemap_style.css" rel="stylesheet">';
 echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet">';
-?>
-<script type="text/javascript">
-<!--
-function edit_close(newurl) {
-	if (newurl) window.opener.location=newurl;
-	else if (window.opener.showchanges) window.opener.showchanges();
-	window.close();
-}
-function showchanges() {
-	updateMap();
-}
-//-->
-</script>
-<?php
 
 // Take a place id and find its place in the hierarchy
 // Input: place ID
@@ -103,9 +84,9 @@ if ($action=='addrecord' && WT_USER_IS_ADMIN) {
 
 	// autoclose window when update successful unless debug on
 	if (!WT_DEBUG) {
-		echo "\n<script type=\"text/javascript\">\n<!--\nedit_close('');\n//-->\n</script>";
+		$controller->addInlineJavaScript('closePopupAndReloadParent();');
 	}
-	echo "<div class=\"center\"><a href=\"#\" onclick=\"edit_close('');return false;\">", WT_I18N::translate('Close Window'), "</a></div><br>\n";
+	echo "<div class=\"center\"><a href=\"#\" onclick=\"closePopupAndReloadParent();return false;\">", WT_I18N::translate('Close Window'), "</a></div><br>";
 	exit;
 }
 
@@ -121,9 +102,9 @@ if ($action=='updaterecord' && WT_USER_IS_ADMIN) {
 
 	// autoclose window when update successful unless debug on
 	if (!WT_DEBUG) {
-		echo "\n<script type=\"text/javascript\">\n<!--\nedit_close('');\n//-->\n</script>";
+		$controller->addInlineJavaScript('closePopupAndReloadParent();');
 	}
-	echo "<div class=\"center\"><a href=\"#\" onclick=\"edit_close('');return false;\">", WT_I18N::translate('Close Window'), "</a></div><br>\n";
+	echo "<div class=\"center\"><a href=\"#\" onclick=\"closePopupAndReloadParent();return false;\">", WT_I18N::translate('Close Window'), "</a></div><br>";
 	exit;
 }
 
@@ -141,9 +122,9 @@ if ($action=='update_sv_params' && WT_USER_IS_ADMIN) {
 		WT_DB::prepare("UPDATE `##placelocation` SET sv_lati=?, sv_long=?, sv_bearing=?, sv_elevation=?, sv_zoom=? WHERE pl_id=?");		
 	$statement->execute(array($_REQUEST['svlati'], $_REQUEST['svlong'], $_REQUEST['svbear'], $_REQUEST['svelev'], $_REQUEST['svzoom'], $placeid));
 	if (!WT_DEBUG) {
-		echo "\n<script type=\"text/javascript\">\n<!--\nedit_close();\n//-->\n</script>";
+		$controller->addInlineJavaScript('closePopupAndReloadParent();');
 	}
-	echo "<div class=\"center\"><a href=\"#\" onclick=\"edit_close();return false;\">", WT_I18N::translate('Close Window'), "</a></div><br>\n";
+	echo "<div class=\"center\"><a href=\"#\" onclick=\"closePopupAndReloadParent();return false;\">", WT_I18N::translate('Close Window'), "</a></div><br>";
 	exit;
 }
 
@@ -250,7 +231,6 @@ if ($action=='add') {
 	echo '</b><br>';
 }
 
-echo '<script src="http://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>';
 include_once 'wt_v3_places_edit.js.php';
 $api='v3';
 
@@ -366,4 +346,4 @@ $api='v3';
 	<input name="save2" type="submit" value="<?php echo WT_I18N::translate('Save'); ?>"><br>
 </form>
 <?php
-echo "<center><a href=\"#\" onclick=\"edit_close('')\">", WT_I18N::translate('Close Window'), "</a><br></center>\n";
+echo '<p class="center"><a href="#" onclick="closePopupAndReloadParent();">', WT_I18N::translate('Close Window'), '</a></p>';

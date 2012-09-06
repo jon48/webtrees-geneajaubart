@@ -6,11 +6,7 @@
 */
 function createXmlHttpRequest() {
  try {
-   if (typeof ActiveXObject != 'undefined') {
-     return new ActiveXObject('Microsoft.XMLHTTP');
-   } else if (window["XMLHttpRequest"]) {
-     return new XMLHttpRequest();
-   }
+   return createXMLHttp();
  } catch (e) {
    changeStatus(e);
  }
@@ -74,7 +70,7 @@ function xmlParse(str) {
 }
 
 /**
- * Appends a JavaScript file to the page.
+ * Appends a Javascript file to the page.
  * @param {string} url
  */
 function downloadScript(url) {

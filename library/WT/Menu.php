@@ -2,7 +2,7 @@
 // System for generating menus.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team. All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: Menu.php 13857 2012-04-24 16:57:38Z lukasz $
+// $Id: Menu.php 14176 2012-08-16 10:48:52Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,12 +33,9 @@ class WT_Menu {
 	var $labelpos = 'right';
 	var $link = '#';
 	var $onclick = null;
-	var $icon = null;
-	var $hovericon = null;
 	var $flyout = 'down';
 	var $class = '';
 	var $id=null;
-	var $hoverclass = '';
 	var $submenuclass = '';
 	var $iconclass = '';
 	var $target = null;
@@ -78,30 +75,14 @@ class WT_Menu {
 		$this->onclick = $onclick;
 	}
 
-	function addIcon($icon, $hovericon=null) {
-		global $WT_IMAGES;
-
-		if (isset($WT_IMAGES[$icon])) {
-			$this->icon = $WT_IMAGES[$icon];
-		} else {
-			$this->icon = null;
-		}
-		if (isset($WT_IMAGES[$hovericon])) {
-			$this->hovericon = $WT_IMAGES[$hovericon];
-		} else {
-			$this->hovericon = null;
-		}
-	}
-
 	function addFlyout($flyout='down')
 	{
 		$this->flyout = $flyout;
 	}
 
-	function addClass($class, $hoverclass='', $submenuclass='', $iconclass='icon_general')
+	function addClass($class, $submenuclass='', $iconclass='icon_general')
 	{
 		$this->class = $class;
-		$this->hoverclass = $hoverclass;
 		$this->submenuclass = $submenuclass;
 		$this->iconclass = $iconclass;
 	}
@@ -179,26 +160,14 @@ class WT_Menu {
 		}
 		$id = $menucount.rand();
 		$c = count($this->submenus);
-		$output = "<div id=\"menu{$id}\" class=\"{$this->class}\">\n";
+		$output = "<div id=\"menu{$id}\" class=\"{$this->class}\">";
 		$link = "<a href=\"{$this->link}\" onmouseover=\"";
 		if ($c >= 0) {
 			$link .= "show_submenu('menu{$id}_subs', 'menu{$id}', '{$this->flyout}');";
 		}
-		if ($this->hoverclass !== null) {
-			$link .= "change_class('menu{$id}', '{$this->hoverclass}');";
-		}
-		if ($this->hovericon !== null) {
-			$link .= "change_icon('menu{$id}_icon', '{$this->hovericon}');";
-		}
 		$link .= '" onmouseout="';
 		if ($c >= 0) {
 			$link .= "timeout_submenu('menu{$id}_subs');";
-		}
-		if ($this->hoverclass !== null) {
-			$link .= "change_class('menu{$id}', '{$this->class}');";
-		}
-		if ($this->hovericon !== null) {
-			$link .= "change_icon('menu{$id}_icon', '{$this->icon}');";
 		}
 		if ($this->onclick !== null) {
 			$link .= "\" onclick=\"{$this->onclick}";
@@ -207,46 +176,9 @@ class WT_Menu {
 			$link .= '" target="'.$this->target;
 		}
 		$link .= "\">";
-		if ($this->icon !== null) {
-			$tempTitle = str_replace("\"", '', $this->label);
-			$MenuIcon = "<img id=\"menu{$id}_icon\" src=\"{$this->icon}\" class=\"icon\" alt=\"{$tempTitle}\" title=\"{$tempTitle}\">";
-			switch ($this->labelpos) {
-			case "right":
-				$output .= $link;
-				$output .= $MenuIcon;
-				$output .= $this->label;
-				$output .= "</a>";
-				break;
-			case "left":
-				$output .= $link;
-				$output .= $this->label;
-				$output .= $MenuIcon;
-				$output .= "</a>";
-				break;
-			case "down":
-				$output .= $link;
-				$output .= $MenuIcon;
-				$output .= "<br>";
-				$output .= $this->label;
-				$output .= "</a>";
-				break;
-			case "up":
-				$output .= $link;
-				$output .= $this->label;
-				$output .= "<br>";
-				$output .= $MenuIcon;
-				$output .= "</a>";
-				break;
-			default:
-				$output .= $link;
-				$output .= $MenuIcon;
-				$output .= "</a>";
-			}
-		} else {
-			$output .= $link;
-			$output .= $this->label;
-			$output .= "</a>";
-		}
+		$output .= $link;
+		$output .= $this->label;
+		$output .= "</a>";
 
 		if ($c > 0) {
 			$submenuid = "menu{$id}_subs";
@@ -263,14 +195,14 @@ class WT_Menu {
 					$output .= ' right: 50px;';
 				}
 			}
-			$output .= "\" onmouseover=\"show_submenu('{$this->parentmenu}'); show_submenu('{$submenuid}');\" onmouseout=\"timeout_submenu('menu{$id}_subs');\">\n";
+			$output .= "\" onmouseover=\"show_submenu('{$this->parentmenu}'); show_submenu('{$submenuid}');\" onmouseout=\"timeout_submenu('menu{$id}_subs');\">";
 			foreach ($this->submenus as $submenu) {
 				$submenu->parentmenu = $submenuid;
 				$output .= $submenu->getMenu();
 			}
-			$output .= "</div></div>\n";
+			$output .= "</div></div>";
 		}
-		$output .= "</div>\n";
+		$output .= "</div>";
 		return $output;
 	}
 

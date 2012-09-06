@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 13709 2012-03-28 13:33:58Z greg $
+// $Id: header.php 14176 2012-08-16 10:48:52Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -77,7 +77,7 @@ if ($view!='simple') { // Use "simple" headers for popup windows
 			'<input type="submit" name="search" value="&gt;">',
 			'</form>',
 		'</div>',
-	'</div>'; // <div id="header">	
+	'</div>'; // <div id="header">
 	echo
 	'<div id="optionsmenu">',
 		'<div id="theme-menu">',

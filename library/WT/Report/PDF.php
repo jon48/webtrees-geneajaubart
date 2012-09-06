@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: PDF.php 13815 2012-04-16 12:37:45Z greg $
+// $Id: PDF.php 14055 2012-06-30 10:39:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -1229,7 +1229,7 @@ class TextPDF extends Text {
 		if ($this->wrapWidthRemaining > 0) {
 			// Check with line counter too!
 			// but floor the $wrapWidthRemaining first to keep it bugfree!
-			$wrapWidthRemaining = floor($this->wrapWidthRemaining);
+			$wrapWidthRemaining = (int)($this->wrapWidthRemaining);
 			if (($lw >= ($wrapWidthRemaining)) or ($lfct > 1)) {
 				$newtext = "";
 				$lines = explode("\n", $this->text);
@@ -1387,7 +1387,7 @@ class FootnotePDF extends Footnote {
 		if ($this->wrapWidthRemaining > 0) {
 			// Check with line counter too!
 			// but floor the $wrapWidthRemaining first to keep it bugfree!
-			$wrapWidthRemaining = floor($this->wrapWidthRemaining);
+			$wrapWidthRemaining = (int)($this->wrapWidthRemaining);
 			if (($lw >= $wrapWidthRemaining) or ($lfct > 1)) {
 				$newtext = "";
 				$lines = explode("\n", $this->numText);

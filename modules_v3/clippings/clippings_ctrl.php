@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: clippings_ctrl.php 13820 2012-04-17 08:25:30Z greg $
+// $Id: clippings_ctrl.php 14212 2012-08-26 08:12:42Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -57,23 +57,27 @@ class WT_Controller_Clippings {
 		global $SCRIPT_NAME, $MEDIA_DIRECTORY, $MEDIA_FIREWALL_ROOTDIR, $WT_SESSION;
 		
 		// Our cart is an array of items in the session
-		if (empty($WT_SESSION->cart)) {
+		if (!is_array($WT_SESSION->cart)) {
 			$WT_SESSION->cart=array();
 		}
 		if (!array_key_exists(WT_GED_ID, $WT_SESSION->cart)) {
 			$WT_SESSION->cart[WT_GED_ID]=array();
 		}
 
-		if (!isset($_SESSION['exportConvPath'])) $_SESSION['exportConvPath'] = $MEDIA_DIRECTORY;
-		if (!isset($_SESSION['exportConvSlashes'])) $_SESSION['exportConvSlashes'] = 'forward';
+		if (!$WT_SESSION->exportConvPath) {
+			$WT_SESSION->exportConvPath = $MEDIA_DIRECTORY;
+		}
+		if (!$WT_SESSION->exportConvSlashes) {
+			$WT_SESSION->exportConvSlashes = 'forward';
+		}
 
 		$this->action = safe_GET("action");
 		$this->id = safe_GET('id');
 		$convert = safe_GET('convert',"yes","no");
 		$this->Zip = safe_GET('Zip');
 		$this->IncludeMedia = safe_GET('IncludeMedia');
-		$this->conv_path = safe_GET('conv_path', WT_REGEX_NOSCRIPT, $_SESSION['exportConvPath']);
-		$this->conv_slashes = safe_GET('conv_slashes', array('forward', 'backward'), $_SESSION['exportConvSlashes']);
+		$this->conv_path = safe_GET('conv_path', WT_REGEX_NOSCRIPT, $WT_SESSION->exportConvPath);
+		$this->conv_slashes = safe_GET('conv_slashes', array('forward', 'backward'), $WT_SESSION->exportConvSlashes);
 		$this->privatize_export = safe_GET('privatize_export', array('none', 'visitor', 'user', 'gedadmin'), 'visitor');
 		$this->level1 = safe_GET('level1', WT_REGEX_INTEGER, PHP_INT_MAX);
 		$this->level2 = safe_GET('level2', WT_REGEX_INTEGER, PHP_INT_MAX);
@@ -88,8 +92,8 @@ class WT_Controller_Clippings {
 			$this->privatize_export='visitor';
 		}
 
-		$_SESSION['exportConvPath'] = $this->conv_path; // remember this for the next Download
-		$_SESSION['exportConvSlashes'] = $this->conv_slashes;
+		$WT_SESSION->exportConvPath = $this->conv_path; // remember this for the next Download
+		$WT_SESSION->exportConvSlashes = $this->conv_slashes;
 
 		if ($this->action == 'add') {
 			if (empty($this->type) && !empty($this->id)) {
@@ -193,67 +197,69 @@ class WT_Controller_Clippings {
 
 			foreach (array_keys($WT_SESSION->cart[WT_GED_ID]) as $xref) {
 				$object=WT_GedcomRecord::getInstance($xref);
-				list($record)=$object->privatizeGedcom($access_level);
-				// Remove links to objects that aren't in the cart
-				preg_match_all('/\n1 '.WT_REGEX_TAG.' @('.WT_REGEX_XREF.')@(\n[2-9].*)*/', $record, $matches, PREG_SET_ORDER);
-				foreach ($matches as $match) {
-					if (!array_key_exists($match[1], $WT_SESSION->cart[WT_GED_ID])) {
-						$record=str_replace($match[0], '', $record);
-					}
-				}
-				preg_match_all('/\n2 '.WT_REGEX_TAG.' @('.WT_REGEX_XREF.')@(\n[3-9].*)*/', $record, $matches, PREG_SET_ORDER);
-				foreach ($matches as $match) {
-					if (!array_key_exists($match[1], $WT_SESSION->cart[WT_GED_ID])) {
-						$record=str_replace($match[0], '', $record);
-					}
-				}
-				preg_match_all('/\n3 '.WT_REGEX_TAG.' @('.WT_REGEX_XREF.')@(\n[4-9].*)*/', $record, $matches, PREG_SET_ORDER);
-				foreach ($matches as $match) {
-					if (!array_key_exists($match[1], $WT_SESSION->cart[WT_GED_ID])) {
-						$record=str_replace($match[0], '', $record);
-					}
-				}
-				$record = convert_media_path($record, $this->conv_path, $this->conv_slashes);
-				$savedRecord = $record; // Save this for the "does this file exist" check
-				if ($convert=='yes') {
-					$record=utf8_decode($record);
-				}
-				switch ($object->getType()) {
-				case 'INDI':
-					$filetext .= $record."\n";
-					$filetext .= "1 SOUR @WEBTREES@\n";
-					$filetext .= "2 PAGE ".WT_SERVER_NAME.WT_SCRIPT_PATH.$object->getRawUrl()."\n";
-					break;
-				case 'FAM':
-					$filetext .= $record."\n";
-					$filetext .= "1 SOUR @WEBTREES@\n";
-					$filetext .= "2 PAGE ".WT_SERVER_NAME.WT_SCRIPT_PATH.$object->getRawUrl()."\n";
-					break;
-				case 'SOUR':
-					$filetext .= $record."\n";
-					$filetext .= "1 NOTE ".WT_SERVER_NAME.WT_SCRIPT_PATH.$object->getRawUrl()."\n";
-					break;
-				default:
-					$ft = preg_match_all("/\n\d FILE (.+)/", $savedRecord, $match, PREG_SET_ORDER);
-					for ($k = 0; $k < $ft; $k++) {
-						$filename = $MEDIA_DIRECTORY.extract_filename($match[$k][1]);
-						if (file_exists($filename)) {
-							$media[$mediacount] = array (PCLZIP_ATT_FILE_NAME => $filename);
-							$mediacount++;
-						} else {
-							$filename = $MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY.extract_filename($match[$k][1]);
-							if (file_exists($filename)) {
-								// Don't include firewall directory in zipfile.  It may start ../
-								$media[$mediacount] = array (
-									PCLZIP_ATT_FILE_NAME => $filename,
-									PCLZIP_ATT_FILE_NEW_FULL_NAME => $MEDIA_DIRECTORY.extract_filename($match[$k][1])
-								);
-								$mediacount++;
-							}
+				if ($object) { // The object may have been deleted since we added it to the cart....
+					list($record)=$object->privatizeGedcom($access_level);
+					// Remove links to objects that aren't in the cart
+					preg_match_all('/\n1 '.WT_REGEX_TAG.' @('.WT_REGEX_XREF.')@(\n[2-9].*)*/', $record, $matches, PREG_SET_ORDER);
+					foreach ($matches as $match) {
+						if (!array_key_exists($match[1], $WT_SESSION->cart[WT_GED_ID])) {
+							$record=str_replace($match[0], '', $record);
 						}
 					}
-					$filetext .= trim($record) . "\n";
-					break;
+					preg_match_all('/\n2 '.WT_REGEX_TAG.' @('.WT_REGEX_XREF.')@(\n[3-9].*)*/', $record, $matches, PREG_SET_ORDER);
+					foreach ($matches as $match) {
+						if (!array_key_exists($match[1], $WT_SESSION->cart[WT_GED_ID])) {
+							$record=str_replace($match[0], '', $record);
+						}
+					}
+					preg_match_all('/\n3 '.WT_REGEX_TAG.' @('.WT_REGEX_XREF.')@(\n[4-9].*)*/', $record, $matches, PREG_SET_ORDER);
+					foreach ($matches as $match) {
+						if (!array_key_exists($match[1], $WT_SESSION->cart[WT_GED_ID])) {
+							$record=str_replace($match[0], '', $record);
+						}
+					}
+					$record = convert_media_path($record, $this->conv_path, $this->conv_slashes);
+					$savedRecord = $record; // Save this for the "does this file exist" check
+					if ($convert=='yes') {
+						$record=utf8_decode($record);
+					}
+					switch ($object->getType()) {
+					case 'INDI':
+						$filetext .= $record."\n";
+						$filetext .= "1 SOUR @WEBTREES@\n";
+						$filetext .= "2 PAGE ".WT_SERVER_NAME.WT_SCRIPT_PATH.$object->getRawUrl()."\n";
+						break;
+					case 'FAM':
+						$filetext .= $record."\n";
+						$filetext .= "1 SOUR @WEBTREES@\n";
+						$filetext .= "2 PAGE ".WT_SERVER_NAME.WT_SCRIPT_PATH.$object->getRawUrl()."\n";
+						break;
+					case 'SOUR':
+						$filetext .= $record."\n";
+						$filetext .= "1 NOTE ".WT_SERVER_NAME.WT_SCRIPT_PATH.$object->getRawUrl()."\n";
+						break;
+					default:
+						$ft = preg_match_all("/\n\d FILE (.+)/", $savedRecord, $match, PREG_SET_ORDER);
+						for ($k = 0; $k < $ft; $k++) {
+							$filename = $MEDIA_DIRECTORY.extract_filename($match[$k][1]);
+							if (file_exists($filename)) {
+								$media[$mediacount] = array (PCLZIP_ATT_FILE_NAME => $filename);
+								$mediacount++;
+							} else {
+								$filename = $MEDIA_FIREWALL_ROOTDIR.$MEDIA_DIRECTORY.extract_filename($match[$k][1]);
+								if (file_exists($filename)) {
+									// Don't include firewall directory in zipfile.  It may start ../
+									$media[$mediacount] = array (
+										PCLZIP_ATT_FILE_NAME => $filename,
+										PCLZIP_ATT_FILE_NEW_FULL_NAME => $MEDIA_DIRECTORY.extract_filename($match[$k][1])
+									);
+									$mediacount++;
+								}
+							}
+						}
+						$filetext .= trim($record) . "\n";
+						break;
+					}
 				}
 			}
 

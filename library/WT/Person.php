@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Person.php 13950 2012-05-29 06:28:25Z greg $
+// $Id: Person.php 14116 2012-07-23 19:40:08Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -560,7 +560,7 @@ class WT_Person extends WT_GedcomRecord {
 					}
 				}
 				if ($min && $max) {
-					list($y)=WT_Date_Gregorian::JDtoYMD(floor((max($min)+min($max))/2));
+					list($y)=WT_Date_Gregorian::JDtoYMD((int)((max($min)+min($max))/2));
 					$this->_getEstimatedBirthDate=new WT_Date("EST {$y}");
 				} else {
 					$this->_getEstimatedBirthDate=new WT_Date(''); // always return a date object
@@ -1816,7 +1816,7 @@ class WT_Person extends WT_GedcomRecord {
 			}
 			$max_surn = $char-$i*2;
 			if ($len_surn > $max_surn) {
-				$surn = substr($surn, 0, $max_surn).'...';
+				$surn = substr($surn, 0, $max_surn).'…';
 				$len_surn = utf8_strlen($surn);
 			}
 			$shortname =  str_replace(

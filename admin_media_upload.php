@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_media_upload.php 13787 2012-04-06 16:52:49Z greg $
+// $Id: admin_media_upload.php 13999 2012-06-16 21:57:04Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_media_upload.php');
 require './includes/session.php';
@@ -49,7 +49,7 @@ $controller
 	->requireEditorLogin() /* Editing may be disabled, even for admins */
 	->setPageTitle(WT_I18N::translate('Upload media files'))
 	->pageHeader()
-	->addInlineJavaScript('
+	->addInlineJavascript('
 	function checkpath(folder) {
 		value = folder.value;
 		if (value.substr(value.length-1,1) == "/") value = value.substr(0, value.length-1);

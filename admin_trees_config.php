@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_config.php 13920 2012-05-06 04:47:36Z nigel $
+// $Id: admin_trees_config.php 14167 2012-08-12 07:54:23Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_config.php');
 
@@ -225,7 +225,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'SHOW_AGE_DIFF',                safe_POST_bool('NEW_SHOW_AGE_DIFF'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_COUNTER',                 safe_POST_bool('NEW_SHOW_COUNTER'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_DEAD_PEOPLE',             safe_POST('SHOW_DEAD_PEOPLE'));
-	set_gedcom_setting(WT_GED_ID, 'SHOW_EMPTY_BOXES',             safe_POST_bool('NEW_SHOW_EMPTY_BOXES'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_EST_LIST_DATES',          safe_POST_bool('NEW_SHOW_EST_LIST_DATES'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_FACT_ICONS',              safe_POST_bool('NEW_SHOW_FACT_ICONS'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_GEDCOM_RECORD',           safe_POST_bool('NEW_SHOW_GEDCOM_RECORD'));
@@ -350,23 +349,16 @@ default:
 
 }
 
-$controller->pageHeader();
+$controller
+	->pageHeader()
+	->addInlineJavascript('jQuery("#tabs").tabs(); jQuery("#tabs").css("display", "inline");')
+	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }');
 
 if (get_gedcom_count()==1) { //Removed because it doesn't work here for multiple GEDCOMs. Can be reinstated when fixed (https://bugs.launchpad.net/webtrees/+bug/613235)
-	$controller->addExternalJavaScript('js/autocomplete.js');
+	$controller->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 }
 
-echo WT_JS_START;?>
-	jQuery(document).ready(function() {
-		jQuery("#tabs").tabs();
-		jQuery("#tabs").css('display', 'inline');
-	});
-	var pastefield;
-	function paste_id(value) {
-		pastefield.value=value;
-	}
-<?php echo WT_JS_END; ?>
-
+?>
 <form enctype="multipart/form-data" method="post" id="configform" name="configform" action="<?php echo WT_SCRIPT_NAME; ?>">
 <input type="hidden" name="action" value="update">
 <input type="hidden" name="ged" value="<?php echo htmlspecialchars(WT_GEDCOM); ?>">
@@ -380,7 +372,7 @@ echo WT_JS_START;?>
 		<td colspan="2">
 			<div id="tabs" style="display:none">
 				<ul>
-					<li><a href="#file-options"><span><?php echo WT_I18N::translate('GEDCOM Basics'); ?></span></a></li>
+					<li><a href="#file-options"><span><?php echo WT_I18N::translate('General'); ?></span></a></li>
 					<li><a href="#access-options"><span><?php echo WT_I18N::translate('Access'); ?></span></a></li>
 					<li><a href="#privacy"><span><?php echo WT_I18N::translate('Privacy'); ?></span></a></li>
 					<li><a href="#config-media"><span><?php echo WT_I18N::translate('Media'); ?></span></a></li>
@@ -388,12 +380,12 @@ echo WT_JS_START;?>
 					<li><a href="#hide-show"><span><?php echo WT_I18N::translate('Hide &amp; Show'); ?></span></a></li>
 					<li><a href="#edit-options"><span><?php echo WT_I18N::translate('Edit options'); ?></span></a></li>
 				</ul>
-			<!-- GEDCOM BASICS -->
+			<!-- GENERAL -->
 			<div id="file-options">
 				<table>
 					<tr>
 						<td>
-							<?php echo WT_I18N::translate('GEDCOM title'), help_link('gedcom_title'); ?>
+							<?php echo WT_I18N::translate('Family tree title'); ?>
 						</td>
 						<td>
 							<input type="text" name="gedcom_title" dir="ltr" value="<?php echo htmlspecialchars(get_gedcom_setting(WT_GED_ID, 'title')); ?>" size="40" maxlength="255">
@@ -938,7 +930,7 @@ echo WT_JS_START;?>
 							<?php echo WT_I18N::translate('Custom welcome text'), help_link('WELCOME_TEXT_AUTH_MODE_CUST'); ?>
 						</td>
 						<td>
-							<textarea name="NEW_WELCOME_TEXT_AUTH_MODE_4" maxlength="255" value="<?php echo htmlspecialchars(get_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_AUTH_MODE_'.WT_LOCALE)); ?>"></textarea>
+							<textarea name="NEW_WELCOME_TEXT_AUTH_MODE_4" maxlength="255"><?php echo htmlspecialchars(get_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_AUTH_MODE_'.WT_LOCALE)); ?></textarea>
 						</td>
 					</tr>
 					<tr>
@@ -1197,14 +1189,6 @@ echo WT_JS_START;?>
 						<th colspan="2">
 							<?php echo WT_I18N::translate('Charts'); ?>
 						</th>
-					</tr>
-					<tr>
-						<td>
-							<?php echo WT_I18N::translate('Empty boxes on pedigree charts'), help_link('SHOW_EMPTY_BOXES'); ?>
-						</td>
-						<td>
-							<?php echo radio_buttons('NEW_SHOW_EMPTY_BOXES', array(false=>WT_I18N::translate('hide'),true=>WT_I18N::translate('show')), $SHOW_EMPTY_BOXES); ?>
-						</td>
 					</tr>
 					<tr>
 						<td>

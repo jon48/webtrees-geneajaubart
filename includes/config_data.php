@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: config_data.php 13164 2012-01-02 20:17:16Z nigel $
+// $Id: config_data.php 14185 2012-08-18 22:49:00Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -247,9 +247,6 @@ $level2_tags=array(
 		'ORDN',
 		'RETI',
 	),
-	'CAUS'=>array(
-		'DEAT',
-	),
 	'CALN'=>array(
 		'REPO',
 	),
@@ -305,6 +302,10 @@ $level2_tags=array(
 		'SLGS',
 		'WILL',
 		'_TODO',
+	),
+	'AGE'=>array(
+		'CENS',
+		'DEAT',
 	),
 	'TEMP'=>array(
 		'BAPL',
@@ -384,6 +385,9 @@ $level2_tags=array(
 		'PROP',
 		'RESI',
 	),
+	'CAUS'=>array(
+		'DEAT',
+	),
 	'PHON'=>array(
 		'OCCU',
 		'RESI',
@@ -399,10 +403,6 @@ $level2_tags=array(
 	'EMAIL'=>array(
 		'OCCU',
 		'RESI',
-	),
-	'AGE'=>array(
-		'CENS',
-		'DEAT',
 	),
 	'HUSB'=>array(
 		'MARR',

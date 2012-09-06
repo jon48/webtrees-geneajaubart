@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13642 2012-03-24 13:06:08Z greg $
+// $Id: module.php 13999 2012-06-16 21:57:04Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -145,7 +145,6 @@ class top10_surnames_WT_Module extends WT_Module implements WT_Module_Block {
 			set_block_setting($block_id, 'num',    safe_POST_integer('num', 1, 10000, 10));
 			set_block_setting($block_id, 'infoStyle', safe_POST('infoStyle', array('list', 'array', 'table', 'tagcloud'), 'table'));
 			set_block_setting($block_id, 'block',  safe_POST_bool('block'));
-			echo WT_JS_START, 'window.opener.location.href=window.opener.location.href;window.close();', WT_JS_END;
 			exit;
 		}
 

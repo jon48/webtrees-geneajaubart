@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: block_edit.php 13947 2012-05-27 07:42:04Z greg $
+// $Id: block_edit.php 14161 2012-08-11 06:18:18Z greg $
 
 define('WT_SCRIPT_NAME', 'block_edit.php');
 require './includes/session.php';
@@ -39,6 +39,10 @@ $block=new $class_name;
 
 $controller=new WT_Controller_Ajax();
 $controller->pageHeader();
+
+if (array_key_exists('ckeditor', WT_Module::getActiveModules())) {
+	ckeditor_WT_Module::enableEditor($controller);
+}
 
 ?>
 <form name="block" method="post" action="block_edit.php?block_id=<?php echo $block_id; ?>" onsubmit="return modalDialogSubmitAjax(this);" >

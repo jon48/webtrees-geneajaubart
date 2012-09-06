@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: HTML.php 13630 2012-03-22 17:05:59Z lukasz $
+// $Id: HTML.php 14055 2012-06-30 10:39:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -125,7 +125,7 @@ class WT_Report_HTML extends WT_Report_Base {
 			$this->pageh = $tmpw;
 		}
 		// Store the pagewidth without margins
-		$this->noMarginWidth = floor($this->pagew - $this->leftmargin - $this->rightmargin);
+		$this->noMarginWidth = (int)($this->pagew - $this->leftmargin - $this->rightmargin);
 		// If RTL
 		if ($this->rtl) {
 			$this->alignRTL = "right";
@@ -222,8 +222,7 @@ class WT_Report_HTML extends WT_Report_Base {
 		}
 		//-- body
 		echo "
-</div>", WT_JS_START, "document.getElementById('headerdiv').style.height='", $this->topmargin - $this->headermargin - 6, "pt';", WT_JS_END,
-"<div id=\"bodydiv\" style=\"position:relative; top:auto; width:", $this->noMarginWidth, "pt; height:100%;\">";
+</div><script>document.getElementById('headerdiv').style.height='", $this->topmargin - $this->headermargin - 6, "pt';</script><div id=\"bodydiv\" style=\"position:relative; top:auto; width:", $this->noMarginWidth, "pt; height:100%;\">";
 		$this->Y = 0;
 		$this->maxY = 0;
 		$this->runPageHeader();
@@ -238,8 +237,7 @@ class WT_Report_HTML extends WT_Report_Base {
 		}
 		//-- footer
 		echo "
-</div>", WT_JS_START, "document.getElementById('bodydiv').style.height='", $this->maxY, "pt';", WT_JS_END,
-"<div id=\"bottommargin\" style=\"position:relative; top:auto; height:", $this->bottommargin - $this->footermargin, "pt; width:", $this->noMarginWidth, "pt;\"></div>
+</div><script>document.getElementById('bodydiv').style.height='", $this->maxY, "pt';</script><div id=\"bottommargin\" style=\"position:relative; top:auto; height:", $this->bottommargin - $this->footermargin, "pt; width:", $this->noMarginWidth, "pt;\"></div>
 <div id=\"footerdiv\" style=\"position:relative; top:auto; width: ", $this->noMarginWidth, "pt; height:auto;\">";
 		$this->Y = 0;
 		$this->X = 0;
@@ -254,8 +252,7 @@ class WT_Report_HTML extends WT_Report_Base {
 			}
 		}
 		echo "
-</div>", WT_JS_START, "document.getElementById('footerdiv').style.height='", $this->maxY, "pt';", WT_JS_END,
-"<div id=\"footermargin\" style=\"position:relative; top:auto; height:", $this->footermargin, "pt; width:", $this->noMarginWidth, "pt;\"></div>
+</div><script>document.getElementById('footerdiv').style.height='", $this->maxY, "pt';</script><div id=\"footermargin\" style=\"position:relative; top:auto; height:", $this->footermargin, "pt; width:", $this->noMarginWidth, "pt;\"></div>
 </body>\n</html>\n";
 	}
 
@@ -427,7 +424,7 @@ class WT_Report_HTML extends WT_Report_Base {
 	* @return float
 	*/
 	function getRemainingWidth() {
-		return floor($this->noMarginWidth - $this->X);
+		return (int)($this->noMarginWidth - $this->X);
 	}
 
 	function getPageHeight() {
@@ -519,7 +516,7 @@ class WT_Report_HTML extends WT_Report_Base {
 	*/
 	function textWrap(&$str, $width) {
 		// Calculate the line width
-		$lw = floor($width / ($this->getCurrentStyleHeight() / 2));
+		$lw = (int)($width / ($this->getCurrentStyleHeight() / 2));
 		// Wordwrap each line
 			//@@ indi source texts, note text, indi sub-titles, footer texts	
 			$lines = explode("\n", $str);

@@ -21,16 +21,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search_advanced.php 13865 2012-04-26 08:38:24Z nigel $
+// $Id: search_advanced.php 13999 2012-06-16 21:57:04Z greg $
 
 define('WT_SCRIPT_NAME', 'search_advanced.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 $controller=new WT_Controller_AdvancedSearch();
-$controller->pageHeader();
+$controller
+	->pageHeader();
 
-echo WT_JS_START;
+echo '<script>';
 ?>
 	function checknames(frm) {
 		action = "<?php echo $controller->action; ?>";
@@ -124,7 +125,7 @@ echo WT_JS_START;
 		elm.appendChild(sel);
 	}
 <?php
-echo WT_JS_END;
+echo '</script>';
 ?>
 <div id="search-page">
 <h2 class="center"><?php echo $controller->getPageTitle(); ?></h2>

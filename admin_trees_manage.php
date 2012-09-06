@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_manage.php 13913 2012-05-05 15:45:29Z greg $
+// $Id: admin_trees_manage.php 13999 2012-06-16 21:57:04Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_manage.php');
 require './includes/session.php';
@@ -209,13 +209,13 @@ foreach ($gedcoms as $gedcom_id=>$gedcom_name) {
 			)->execute(array($gedcom_id))->fetchOne();
 			if (!$in_progress) {
 				echo '<div id="import', $gedcom_id, '"><div id="progressbar', $gedcom_id, '"><div style="position:absolute;">', WT_I18N::translate('Deleting old genealogy data…'), '</div></div></div>';
-			$controller->addInlineJavaScript(
+			$controller->addInlineJavascript(
 				'jQuery("#progressbar'.$gedcom_id.'").progressbar({value: 0});'
 			);
 			} else {
 				echo '<div id="import', $gedcom_id, '"></div>';
 			}
-			$controller->addInlineJavaScript(
+			$controller->addInlineJavascript(
 				'jQuery("#import'.$gedcom_id.'").load("import.php?gedcom_id='.$gedcom_id.'&keep_media'.$gedcom_id.'='.safe_GET('keep_media'.$gedcom_id).'");'
 			);
 			echo '<table border="0" width="100%" id="actions', $gedcom_id, '" style="display:none">';

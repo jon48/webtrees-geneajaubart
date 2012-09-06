@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Stats.php 13924 2012-05-06 17:23:52Z greg $
+// $Id: Stats.php 14229 2012-08-30 19:59:09Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -145,7 +145,7 @@ class WT_Stats {
 		isset($funcs) or $funcs = get_class_methods($this);
 
 		// Extract all tags from the provided text
-		$ct = preg_match_all("/#(.+)#/U", (string)$text, $match);
+		$ct = preg_match_all("/#([^#]+)(?=#)/", (string)$text, $match);
 		$tags = $match[1];
 		$c = count($tags);
 		$new_tags = array(); // tag to replace
@@ -330,6 +330,13 @@ class WT_Stats {
 		$imgsize=findImageSize($highlight);
 		return "<a href=\"{$this->_server_url}index.php?ctype=gedcom&amp;ged={$this->_gedcom_url}\" style=\"border-style:none;\"><img src=\"{$highlight}\" {$imgsize[3]} style=\"border:none; padding:2px 6px 2px 2px;\" align=\"right\" class=\"gedcom_highlight\" alt=\"\" /></a>";
 	}
+
+	function gedcomRootID() {
+		$root = WT_Person::getInstance(get_gedcom_setting(WT_GED_ID, 'PEDIGREE_ROOT_ID'));
+		$root = substr($root, 0, stripos($root, "@") );
+		return $root;
+	}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Totals                                                                    //
@@ -979,13 +986,13 @@ class WT_Stats {
 		if ($fact) {
 			if ($what=='INDI') {
 				$rows=
-					WT_DB::prepare("SELECT SQL_CACHE i_gedcom AS ged FROM `##individuals` WHERE i_file=?")
+					WT_DB::prepare("SELECT i_gedcom AS ged FROM `##individuals` WHERE i_file=?")
 					->execute(array($this->_ged_id))
 					->fetchAll();
 			}
 			else if ($what=='FAM') {
 				$rows=
-					WT_DB::prepare("SELECT SQL_CACHE f_gedcom AS ged FROM `##families` WHERE f_file=?")
+					WT_DB::prepare("SELECT f_gedcom AS ged FROM `##families` WHERE f_file=?")
 					->execute(array($this->_ged_id))
 					->fetchAll();
 			}
@@ -994,10 +1001,10 @@ class WT_Stats {
 				$factrec = trim(get_sub_record(1, "1 {$fact}", $row->ged, 1));
 				if (!empty($factrec) && preg_match("/2 PLAC (.+)/", $factrec, $match)) {
 					if ($country) {
-						$place = getPlaceCountry(trim($match[1]));
+						$place = end(explode(WT_Place::GEDCOM_SEPARATOR, $match[1]));
 					}
 					else {
-						$place = trim($match[1]);
+						$place = $match[1];
 					}
 					if (!isset($placelist[$place])) {
 						$placelist[$place] = 1;
@@ -1192,7 +1199,7 @@ class WT_Stats {
 		$chart_url.="&amp;chs=".$WT_STATS_MAP_X."x".$WT_STATS_MAP_Y;
 		$chart_url.="&amp;chld=".implode('', array_keys($surn_countries))."&amp;chd=s:";
 		foreach ($surn_countries as $count) {
-			$chart_url.=substr(WT_GOOGLE_CHART_ENCODING, floor($count/max($surn_countries)*61), 1);
+			$chart_url.=substr(WT_GOOGLE_CHART_ENCODING, (int)($count/max($surn_countries)*61), 1);
 		}
 		$chart = '<div id="google_charts" class="center">';
 		$chart .= '<b>'.$chart_title.'</b><br /><br />';
@@ -1236,7 +1243,8 @@ class WT_Stats {
 		foreach ($all_db_countries as $country_code=>$country) {
 			$top10[]='<li>';
 			foreach ($country as $country_name=>$tot) {
-				$place = '<a href="'.get_place_url($country_name).'" class="list_item">'.$all_countries[$country_code].'</a>';
+				$tmp=new WT_Place($country_name, $this->_ged_id);
+				$place = '<a href="' . $tmp->getURL() . '" class="list_item">'.$all_countries[$country_code].'</a>';
 				$top10[].=$place.' - '.WT_I18N::number($tot);
 			}
 			$top10[].='</li>';
@@ -1252,7 +1260,8 @@ class WT_Stats {
 		$i = 1;
 		arsort($places);
 		foreach ($places as $place=>$count) {
-			$place = '<a href="'.get_place_url($place).'" class="list_item">'.htmlspecialchars($place).'</a>';
+			$tmp=new WT_Place($place, $this->_ged_id);
+			$place = '<a href="' . $tmp->getURL() . '" class="list_item">' . $tmp->getFullName() . '</a>';
 			$top10[]='<li>'.$place.' - '.WT_I18N::number($count).'</li>';
 			if ($i++==10) break;
 		}
@@ -1266,7 +1275,8 @@ class WT_Stats {
 		$i = 1;
 		arsort($places);
 		foreach ($places as $place=>$count) {
-			$place = '<a href="'.get_place_url($place).'" class="list_item">'.htmlspecialchars($place).'</a>';
+			$tmp=new WT_Place($place, $this->_ged_id);
+			$place = '<a href="' . $tmp->getURL() . '" class="list_item">' . $tmp->getFullName() . '</a>';
 			$top10[]='<li>'.$place.' - '.WT_I18N::number($count).'</li>';
 			if ($i++==10) break;
 		}
@@ -1280,7 +1290,8 @@ class WT_Stats {
 		$i = 1;
 		arsort($places);
 		foreach ($places as $place=>$count) {
-			$place = '<a href="'.get_place_url($place).'" class="list_item">'.htmlspecialchars($place).'</a>';
+			$tmp=new WT_Place($place, $this->_ged_id);
+			$place = '<a href="' . $tmp->getURL() . '" class="list_item">' . $tmp->getFullName() . '</a>';
 			$top10[]='<li>'.$place.' - '.WT_I18N::number($count).'</li>';
 			if ($i++==10) break;
 		}
@@ -1530,7 +1541,7 @@ class WT_Stats {
 				}
 				break;
 			case 'age':
-				$result=WT_I18N::number(floor($row['age']/365.25));
+				$result=WT_I18N::number((int)($row['age']/365.25));
 				break;
 			case 'name':
 				$result="<a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a>";
@@ -1579,10 +1590,10 @@ class WT_Stats {
 		foreach ($rows as $row) {
 			$person = WT_Person::getInstance($row['deathdate']);
 			$age = $row['age'];
-			if (floor($age/365.25)>0) {
-				$age = floor($age/365.25).'y';
-			} else if (floor($age/30.4375)>0) {
-				$age = floor($age/30.4375).'m';
+			if ((int)($age/365.25)>0) {
+				$age = (int)($age/365.25).'y';
+			} else if ((int)($age/30.4375)>0) {
+				$age = (int)($age/30.4375).'m';
 			} else {
 				$age = $age.'d';
 			}
@@ -1647,10 +1658,10 @@ class WT_Stats {
 		foreach ($rows as $row) {
 			$person=WT_Person::getInstance($row['id']);
 			$age = (WT_CLIENT_JD-$row['age']);
-			if (floor($age/365.25)>0) {
-				$age = floor($age/365.25).'y';
-			} else if (floor($age/30.4375)>0) {
-				$age = floor($age/30.4375).'m';
+			if ((int)($age/365.25)>0) {
+				$age = (int)($age/365.25).'y';
+			} else if ((int)($age/30.4375)>0) {
+				$age = (int)($age/30.4375).'m';
 			} else {
 				$age = $age.'d';
 			}
@@ -1706,10 +1717,10 @@ class WT_Stats {
 		$row = $rows[0];
 		$age = $row['age'];
 		if ($show_years) {
-			if (floor($age/365.25)>0) {
-				$age = floor($age/365.25).'y';
-			} else if (floor($age/30.4375)>0) {
-				$age = floor($age/30.4375).'m';
+			if ((int)($age/365.25)>0) {
+				$age = (int)($age/365.25).'y';
+			} else if ((int)($age/30.4375)>0) {
+				$age = (int)($age/30.4375).'m';
 			} else if (!empty($age)) {
 				$age = $age.'d';
 			}
@@ -1791,7 +1802,7 @@ class WT_Stats {
 				while ($offset = strpos($title, ' ', $offset + 1)) {
 					$counter[] = $offset;
 				}
-				$half = floor(count($counter)/2);
+				$half = (int)(count($counter)/2);
 				$chtt = substr_replace($title, '|', $counter[$half], 1);
 			}
 			return '<img src="'."https://chart.googleapis.com/chart?cht=bvg&amp;chs={$sizes[0]}x{$sizes[1]}&amp;chm=D,FF0000,2,0,3,1|N*f1*,000000,0,-1,11,1|N*f1*,000000,1,-1,11,1&amp;chf=bg,s,ffffff00|c,s,ffffff00&amp;chtt=".rawurlencode($chtt)."&amp;chd={$chd}&amp;chco=0000FF,FFA0CB,FF0000&amp;chbh=20,3&amp;chxt=x,x,y,y&amp;chxl=".rawurlencode($chxl)."&amp;chdl=".rawurlencode(WT_I18N::translate('Males').'|'.WT_I18N::translate('Females').'|'.WT_I18N::translate('Average age at death'))."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Average age related to death century')."\" title=\"".WT_I18N::translate('Average age related to death century')."\" />";
@@ -2090,16 +2101,16 @@ class WT_Stats {
 			case 'age':
 				$age = $row['age'];
 				if ($show_years) {
-					if (floor($age/365.25)>0) {
-						$age = floor($age/365.25).'y';
-					} else if (floor($age/30.4375)>0) {
-						$age = floor($age/30.4375).'m';
+					if ((int)($age/365.25)>0) {
+						$age = (int)($age/365.25).'y';
+					} else if ((int)($age/30.4375)>0) {
+						$age = (int)($age/30.4375).'m';
 					} else {
 						$age = $age.'d';
 					}
 					$result = get_age_at_event($age, true);
 				} else {
-					$result = floor($age/365.25);
+					$result = (int)($age/365.25);
 				}
 				break;
 		}
@@ -2200,10 +2211,10 @@ class WT_Stats {
 			if ($type == 'name') {
 				return $family->format_list('span', false, $family->getFullName());
 			}
-			if (floor($age/365.25)>0) {
-				$age = floor($age/365.25).'y';
-			} else if (floor($age/30.4375)>0) {
-				$age = floor($age/30.4375).'m';
+			if ((int)($age/365.25)>0) {
+				$age = (int)($age/365.25).'y';
+			} else if ((int)($age/30.4375)>0) {
+				$age = (int)($age/30.4375).'m';
 			} else {
 				$age = $age.'d';
 			}
@@ -2281,10 +2292,10 @@ class WT_Stats {
 			$family=WT_Family::getInstance($fam['family']);
 			if ($fam['age']<0) break;
 			$age = $fam['age'];
-			if (floor($age/365.25)>0) {
-				$age = floor($age/365.25).'y';
-			} else if (floor($age/30.4375)>0) {
-				$age = floor($age/30.4375).'m';
+			if ((int)($age/365.25)>0) {
+				$age = (int)($age/365.25).'y';
+			} else if ((int)($age/30.4375)>0) {
+				$age = (int)($age/30.4375).'m';
 			} else {
 				$age = $age.'d';
 			}
@@ -2358,16 +2369,16 @@ class WT_Stats {
 			case 'age':
 				$age = $row['age'];
 				if ($show_years) {
-					if (floor($age/365.25)>0) {
-						$age = floor($age/365.25).'y';
-					} else if (floor($age/30.4375)>0) {
-						$age = floor($age/30.4375).'m';
+					if ((int)($age/365.25)>0) {
+						$age = (int)($age/365.25).'y';
+					} else if ((int)($age/30.4375)>0) {
+						$age = (int)($age/30.4375).'m';
 					} else {
 						$age = $age.'d';
 					}
 					$result = get_age_at_event($age, true);
 				} else {
-					$result = floor($age/365.25);
+					$result = (int)($age/365.25);
 				}
 				break;
 		}
@@ -2564,9 +2575,9 @@ class WT_Stats {
 				" ROUND(AVG(married.d_julianday2-birth.d_julianday1-182.5)/365.25,1) AS age, ".
 				" FLOOR(married.d_year/100+1) AS century, ".
 				" 'M' AS sex ".
-				"FROM `wt_dates` AS married ".
-				"JOIN `wt_families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
-				"JOIN `wt_dates` AS birth ON (birth.d_gid=fam.f_husb AND birth.d_file=fam.f_file) ".
+				"FROM `##dates` AS married ".
+				"JOIN `##families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
+				"JOIN `##dates` AS birth ON (birth.d_gid=fam.f_husb AND birth.d_file=fam.f_file) ".
 				"WHERE ".
 				" '{$sex}' IN ('M', 'BOTH') AND ".
 				" married.d_file={$this->_ged_id} AND married.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND married.d_fact='MARR' AND ".
@@ -2578,9 +2589,9 @@ class WT_Stats {
 				" ROUND(AVG(married.d_julianday2-birth.d_julianday1-182.5)/365.25,1) AS age, ".
 				" FLOOR(married.d_year/100+1) AS century, ".
 				" 'F' AS sex ".
-				"FROM `wt_dates` AS married ".
-				"JOIN `wt_families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
-				"JOIN `wt_dates` AS birth ON (birth.d_gid=fam.f_wife AND birth.d_file=fam.f_file) ".
+				"FROM `##dates` AS married ".
+				"JOIN `##families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
+				"JOIN `##dates` AS birth ON (birth.d_gid=fam.f_wife AND birth.d_file=fam.f_file) ".
 				"WHERE ".
 				" '{$sex}' IN ('F', 'BOTH') AND ".
 				" married.d_file={$this->_ged_id} AND married.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND married.d_fact='MARR' AND ".
@@ -2647,7 +2658,7 @@ class WT_Stats {
 				while ($offset = strpos(WT_I18N::translate('Average age in century of marriage'), ' ', $offset + 1)) {
 					$counter[] = $offset;
 				}
-				$half = floor(count($counter)/2);
+				$half = (int)(count($counter)/2);
 				$chtt = substr_replace(WT_I18N::translate('Average age in century of marriage'), '|', $counter[$half], 1);
 			}
 			return "<img src=\""."https://chart.googleapis.com/chart?cht=bvg&amp;chs={$sizes[0]}x{$sizes[1]}&amp;chm=D,FF0000,2,0,3,1|{$chmm}{$chmf}&amp;chf=bg,s,ffffff00|c,s,ffffff00&amp;chtt=".rawurlencode($chtt)."&amp;chd={$chd}&amp;chco=0000FF,FFA0CB,FF0000&amp;chbh=20,3&amp;chxt=x,x,y,y&amp;chxl=".rawurlencode($chxl)."&amp;chdl=".rawurlencode(WT_I18N::translate('Males')."|".WT_I18N::translate('Females')."|".WT_I18N::translate('Average age'))."\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".WT_I18N::translate('Average age in century of marriage')."\" title=\"".WT_I18N::translate('Average age in century of marriage')."\" />";
@@ -2662,9 +2673,9 @@ class WT_Stats {
 				" fam.f_id, ".
 				" birth.d_gid, ".
 				" married.d_julianday2-birth.d_julianday1 AS age ".
-				"FROM `wt_dates` AS married ".
-				"JOIN `wt_families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
-				"JOIN `wt_dates` AS birth ON (birth.d_gid=fam.f_husb AND birth.d_file=fam.f_file) ".
+				"FROM `##dates` AS married ".
+				"JOIN `##families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
+				"JOIN `##dates` AS birth ON (birth.d_gid=fam.f_husb AND birth.d_file=fam.f_file) ".
 				"WHERE ".
 				" '{$sex}' IN ('M', 'BOTH') AND {$years} ".
 				" married.d_file={$this->_ged_id} AND married.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND married.d_fact='MARR' AND ".
@@ -2675,9 +2686,9 @@ class WT_Stats {
 				" ROUND(AVG(married.d_julianday2-birth.d_julianday1-182.5)/365.25,1) AS age, ".
 				" FLOOR(married.d_year/100+1) AS century, ".
 				" 'F' AS sex ".
-				"FROM `wt_dates` AS married ".
-				"JOIN `wt_families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
-				"JOIN `wt_dates` AS birth ON (birth.d_gid=fam.f_wife AND birth.d_file=fam.f_file) ".
+				"FROM `##dates` AS married ".
+				"JOIN `##families` AS fam ON (married.d_gid=fam.f_id AND married.d_file=fam.f_file) ".
+				"JOIN `##dates` AS birth ON (birth.d_gid=fam.f_wife AND birth.d_file=fam.f_file) ".
 				"WHERE ".
 				" '{$sex}' IN ('F', 'BOTH') AND {$years} ".
 				" married.d_file={$this->_ged_id} AND married.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND married.d_fact='MARR' AND ".
@@ -2903,10 +2914,10 @@ class WT_Stats {
 				return $return;
 			}
 			$age = $fam['age'];
-			if (floor($age/365.25)>0) {
-				$age = floor($age/365.25).'y';
-			} else if (floor($age/30.4375)>0) {
-				$age = floor($age/30.4375).'m';
+			if ((int)($age/365.25)>0) {
+				$age = (int)($age/365.25).'y';
+			} else if ((int)($age/30.4375)>0) {
+				$age = (int)($age/30.4375).'m';
 			} else {
 				$age = $age.'d';
 			}
@@ -3325,13 +3336,13 @@ class WT_Stats {
 		$chm .= 't'.$unknown.',000000,0,'.$i.',11,1';
 		$chxl .= WT_I18N::translate_c('unknown century', 'Unknown')."|1:||".WT_I18N::translate('century')."|2:|0|";
 		$step = $max+1;
-		for ($d=floor($max+1); $d>0; $d--) {
+		for ($d=(int)($max+1); $d>0; $d--) {
 			if (($max+1)<($d*10+1) && fmod(($max+1),$d)==0) {
 				$step = $d;
 			}
 		}
-		if ($step==floor($max+1)) {
-			for ($d=floor($max); $d>0; $d--) {
+		if ($step==(int)($max+1)) {
+			for ($d=(int)($max); $d>0; $d--) {
 				if ($max<($d*10+1) && fmod($max,$d)==0) {
 					$step = $d;
 				}
@@ -3591,10 +3602,10 @@ class WT_Stats {
 			switch ($type) {
 			case 'table':
 			global $controller;
-				$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
+				$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 				$controller
-				->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-				->addInlineJavaScript('
+				->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+				->addInlineJavascript('
 					jQuery("#'.$table_id.'").dataTable({
 						"sDom": \'t\',
 						"bAutoWidth":false,
@@ -3913,7 +3924,7 @@ class WT_Stats {
 		$encoding = '';
 		foreach ($a as $value) {
 			if ($value<0) $value = 0;
-			$first = floor($value / 64);
+			$first = (int)($value / 64);
 			$second = $value % 64;
 			$encoding .= self::$_xencoding[(int)$first].self::$_xencoding[(int)$second];
 		}

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13642 2012-03-24 13:06:08Z greg $
+// $Id: module.php 14166 2012-08-12 04:36:39Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -150,7 +150,6 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 				}
 			}
 			set_block_setting($block_id, 'languages', implode(',', $languages));
-			echo WT_JS_START, 'window.opener.location.href=window.opener.location.href;window.close();', WT_JS_END;
 			exit;
 		}
 
@@ -268,27 +267,16 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		$title=get_block_setting($block_id, 'title');
 		$html=get_block_setting($block_id, 'html');
 		// title
-		echo '<tr><td class="descriptionbox wrap width33">',
+		echo '<tr><td class="descriptionbox wrap">',
 			WT_Gedcom_Tag::getLabel('TITL'),
 			'</td><td class="optionbox"><input type="text" name="title" size="30" value="', htmlspecialchars($title), '"></td></tr>';
 
 		// templates
-		echo '<tr><td class="descriptionbox wrap width33">',
+		echo '<tr><td class="descriptionbox wrap">',
 			WT_I18N::translate('Templates'),
 			help_link('block_html_template', $this->getName()),
-			'</td><td class="optionbox">'
-		;
-		if (array_key_exists('ckeditor', WT_Module::getActiveModules())) {
-			echo WT_JS_START,
-				'function loadTemplate(html) {',
-				' var oEditor = CKEDITOR.instances["html"];',
-				' oEditor.setData(html);',
-				'}',
-				WT_JS_END,
-				'<select name="template" onchange="loadTemplate(document.block.template.options[document.block.template.selectedIndex].value);">';
-		} else {
-			echo '<select name="template" onchange="document.block.html.value=document.block.template.options[document.block.template.selectedIndex].value;">';
-		}
+			'</td><td class="optionbox">';
+		echo '<select name="template" onchange="document.block.html.value=document.block.template.options[document.block.template.selectedIndex].value;">';
 		echo '<option value="', htmlspecialchars($html), '">', WT_I18N::translate('Custom'), '</option>';
 		foreach ($templates as $title=>$template) {
 			echo '<option value="', htmlspecialchars($template), '">', $title, '</option>';
@@ -301,7 +289,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		if (count($gedcoms) > 1) {
 			if ($gedcom == '__current__') {$sel_current = ' selected="selected"';} else {$sel_current = '';}
 			if ($gedcom == '__default__') {$sel_default = ' selected="selected"';} else {$sel_default = '';}
-			echo '<tr><td class="descriptionbox wrap width33">',
+			echo '<tr><td class="descriptionbox wrap">',
 				WT_I18N::translate('Family tree'),
 				'</td><td class="optionbox">',
 				'<select name="gedcom">',
@@ -315,29 +303,16 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		}
 
 		// html
-		echo '<tr><td class="descriptionbox wrap width33">',
+		echo '<tr><td colspan="2" class="descriptionbox">',
 			WT_I18N::translate('Content'),
 			help_link('block_html_content', $this->getName()),
-			'<br><br></td>',
-			'<td class="optionbox">';
-		if (array_key_exists('ckeditor', WT_Module::getActiveModules())) {
-			// use CKeditor module
-			require_once WT_ROOT.WT_MODULES_DIR.'ckeditor/ckeditor.php';
-			$oCKeditor = new CKEditor();
-			$oCKeditor->basePath =  WT_MODULES_DIR.'ckeditor/';
-			$oCKeditor->config['width'] = 700;
-			$oCKeditor->config['height'] = 400;
-			$oCKeditor->config['AutoDetectLanguage'] = false ;
-			$oCKeditor->config['DefaultLanguage'] = 'en';
-			$oCKeditor->editor('html', $html);
-		} else {
-			//use standard textarea
-			echo '<textarea name="html" rows="10" cols="80">', htmlspecialchars($html), '</textarea>';
-		}
+			'</td></tr><tr>',
+			'<td colspan="2" class="optionbox">';
+		echo '<textarea name="html" class="html-edit" rows="10" style="width:98%;">', htmlspecialchars($html), '</textarea>';
 		echo '</td></tr>';
 
 		$show_timestamp=get_block_setting($block_id, 'show_timestamp', false);
-		echo '<tr><td class="descriptionbox wrap width33">';
+		echo '<tr><td class="descriptionbox wrap">';
 		echo WT_I18N::translate('Show the date and time of update');
 		echo '</td><td class="optionbox">';
 		echo edit_field_yes_no('show_timestamp', $show_timestamp);
@@ -345,7 +320,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		echo '</td></tr>';
 
 		$languages=get_block_setting($block_id, 'languages');
-		echo '<tr><td class="descriptionbox wrap width33">';
+		echo '<tr><td class="descriptionbox wrap">';
 		echo WT_I18N::translate('Show this block for which languages?');
 		echo '</td><td class="optionbox">';
 		echo edit_language_checkboxes('lang_', $languages);

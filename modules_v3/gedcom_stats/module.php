@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13778 2012-04-04 22:30:08Z nigel $
+// $Id: module.php 14123 2012-07-27 02:41:16Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -122,7 +122,7 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 			$content .= '</td></tr>';
 		}
 		if (!$block) {
-			$content .= '</table></td><td><br></td><td><table>';
+			$content .= '</table></td><td><table class="facts_table">';
 		}
 		if ($stat_first_birth) {
 			$content .= '<tr><td class="facts_label">'.WT_I18N::translate('Earliest birth year').'</td><td class="facts_value stats_value">'.$stats->firstBirthYear().'</td>';
@@ -191,8 +191,8 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 		if ($show_common_surnames) {
 			$surnames = get_common_surnames(get_gedcom_setting(WT_GED_ID, 'COMMON_NAMES_THRESHOLD'));
 			if (count($surnames)>0) {
-				$content .= '<br><b>'.WT_I18N::translate('Most Common Surnames').'</b>';
-				$content .= '<br>';
+				$content .= '<p><b>'.WT_I18N::translate('Most Common Surnames').'</b></p>';
+				$content .= '<div class="common_surnames">';
 				$i=0;
 				foreach ($surnames as $indexval => $surname) {
 					if (stristr($surname['name'], '@N.N')===false) {
@@ -203,6 +203,7 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 						$i++;
 					}
 				}
+				$content .= '</div>';
 			}
 		}
 
@@ -251,7 +252,6 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 			set_block_setting($block_id, 'stat_most_chil',       safe_POST_bool('stat_most_chil'));
 			set_block_setting($block_id, 'stat_avg_chil',        safe_POST_bool('stat_avg_chil'));
 			set_block_setting($block_id, 'stat_link',            safe_POST_bool('stat_link'));
-			echo WT_JS_START, 'window.opener.location.href=window.opener.location.href;window.close();', WT_JS_END;
 			exit;
 		}
 

@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: wt_v3_googlemap.js.php 13884 2012-05-01 12:49:24Z lukasz $
+// $Id: wt_v3_googlemap.js.php 14139 2012-08-01 05:23:14Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
  
@@ -53,17 +53,17 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 	});
 
 	<?php
-	echo 'gicons["red"] = new google.maps.MarkerImage("http://maps.google.com/mapfiles/marker.png",';
+	echo 'gicons["red"] = new google.maps.MarkerImage("//maps.google.com/mapfiles/marker.png",';
 		echo 'new google.maps.Size(20, 34),';
 		echo 'new google.maps.Point(0,0),';
 		echo 'new google.maps.Point(9, 34));';
 
-	echo 'var iconImage = new google.maps.MarkerImage("http://maps.google.com/mapfiles/marker.png",';
+	echo 'var iconImage = new google.maps.MarkerImage("//maps.google.com/mapfiles/marker.png",';
 		echo 'new google.maps.Size(20, 34),';
 		echo 'new google.maps.Point(0,0),';
 		echo 'new google.maps.Point(9, 34));';
 
-	echo 'var iconShadow = new google.maps.MarkerImage("http://www.google.com/mapfiles/shadow50.png",';
+	echo 'var iconShadow = new google.maps.MarkerImage("//www.google.com/mapfiles/shadow50.png",';
 		echo 'new google.maps.Size(37, 34),';
 		echo 'new google.maps.Point(0,0),';
 		echo 'new google.maps.Point(9, 34));';
@@ -79,7 +79,7 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 			iconColor = 'red';
 		}
 		if (!gicons[iconColor]) {
-			gicons[iconColor] = new google.maps.MarkerImage('http://maps.google.com/mapfiles/marker'+ iconColor +'.png',
+			gicons[iconColor] = new google.maps.MarkerImage('//maps.google.com/mapfiles/marker'+ iconColor +'.png',
 			new google.maps.Size(20, 34),
 			new google.maps.Point(0,0),
 			new google.maps.Point(9, 34));
@@ -456,24 +456,8 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 				// The current indi ================================
 				if (!empty($this_person)) {
 					$class = 'pedigree_image';
-					if ($gmark['fact'] == 'Census') {
-						$image = "<i class='icon_cens'></i>";
-					} else if ($gmark['fact'] == 'Birth') {
-						$image = "<i class='icon_birt'></i>";
-					} else if ($gmark['fact'] == 'Baptism' || $gmark['fact'] == 'Christening') {
-						$image = "<i class='icon_bapm'></i>";
-					} else if ($gmark['fact'] == 'Military') {
-						$image = "<i class='icon_mili'></i>";
-					} else if ($gmark['fact'] == 'Occupation') {
-						$image = "<i class='icon_occu'></i>";
-					} else if ($gmark['fact'] == 'Residence') {
-						$image = "<i class='icon_resi'></i>";
-					} else if ($gmark['fact'] == 'Death') {
-						$image = "<i class='icon_deat'></i>";
-					} else if ($gmark['fact'] == 'Burial' || $gmark['fact'] == 'Cremation') {
-						$image = "<i class='icon_buri'></i>";
-					} else if ($gmark['fact'] == 'Retirement' ) {
-						$image = "<i class='icon_reti'></i>";
+					if (in_array($gmark['fact'], array('CENS', 'BIRT', 'BAPM', 'CHR', '_MILI', 'OCCU', 'RESI', 'DEAT', 'CREM', 'BURI', 'RETI'))) {
+						$image = "<i class='icon_".$gmark['fact']."'></i>";
 					} else {
 						$indirec = $this_person->getGedcomRecord();
 						$image = '';
@@ -490,7 +474,7 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 							}
 						} // end of add image
 					}
-				}
+			}
 
 				// Other people
 				if (!empty($person)) {
@@ -512,7 +496,7 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 			?>
 				[
 					// Elements 0-9. Basic parameters
-					"<?php echo $gmark['fact'].''; ?>",
+					"<?php echo $gmark['fact_label'].''; ?>",
 					"<?php echo $gmark['lati']; ?>",
 					"<?php echo $gmark['lng']; ?>",
 					"<?php if (!empty($gmark['date'])) { $date=new WT_Date($gmark['date']); echo addslashes($date->Display(true)); } else { echo WT_I18N::translate('Date not known'); } ?>",
@@ -727,12 +711,13 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 				bounds.extend(myLatLng);
 				map.fitBounds(bounds);
 				// Correct zoom level when multiple markers have the same coordinates ==
-				var listener1 = google.maps.event.addListener(map, "idle", function() { 
-  					if (map.getZoom() > zoomLevel) {
-  						map.setZoom(zoomLevel);
-  					}
-  					google.maps.event.removeListener(listener1); 
-				}); 
+				// This code commented out to reolve bug #1022362 "google maps won't zoom in occasionally"
+//				var listener1 = google.maps.event.addListener(map, "idle", function() { 
+//  					if (map.getZoom() > zoomLevel) {
+//  						map.setZoom(zoomLevel);
+//  					}
+// 					google.maps.event.removeListener(listener1); 
+//				}); 
 			}	
 		
 		}  // end loop through location markers

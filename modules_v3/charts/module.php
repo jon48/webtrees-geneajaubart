@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13728 2012-03-31 21:13:20Z greg $
+// $Id: module.php 14111 2012-07-18 12:25:09Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -72,16 +72,16 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 		}
 		$PEDIGREE_FULL_DETAILS = $show_full;
 
-		if ($type!='treenav') {
-			$controller=new WT_Controller_Hourglass($pid,0,3);
-			$controller->setupJavascript();
-		}
-
 		$person = WT_Person::getInstance($pid);
 		if (!$person) {
 			$pid = $PEDIGREE_ROOT_ID;
 			set_block_setting($block_id, 'pid', $pid);
 			$person = WT_Person::getInstance($pid);
+		}
+
+		if ($type!='treenav' && $person) {
+			$controller=new WT_Controller_Hourglass($person->getXref(),0,3);
+			$controller->setupJavascript();
 		}
 
 		$id=$this->getName().$block_id;
@@ -133,21 +133,16 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 				$content .= "</td>";
 			}
 			if ($type=='treenav') {
-				// TODO: we should
-				// 1) check whether the block is active
-				// 2) find out why it is necessary to load jquery, when it is already loaded
 				require_once WT_MODULES_DIR.'tree/module.php';
 				require_once WT_MODULES_DIR.'tree/class_treeview.php';
 				$mod=new tree_WT_Module;
 				$tv=new TreeView;
 				$content .= '<td>';
-				$content .= '<script type="text/javascript" src="'.WT_JQUERY_URL.'"></script><script type="text/javascript" src="'.WT_JQUERYUI_URL.'"></script>';
 
-				$content .= $mod->css;
-				$content .= $mod->headers;
-				$content .= '<script type="text/javascript" src="'.$mod->js.'"></script>';
+				$content .= '<script>$("head").append(\'<link rel="stylesheet" href="'.$mod->css().'" type="text/css" />\');</script>';
+				$content .= '<script src="'.$mod->js().'"></script>';
 		    list($html, $js) = $tv->drawViewport($person->getXref(), 2);
-				$content .= $html.WT_JS_START.$js.WT_JS_END;
+				$content .= $html.'<script>'.$js.'</script>';
 				$content .= '</td>';
 			}
 			$content .= "</tr></table>";
@@ -196,7 +191,6 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 			set_block_setting($block_id, 'details', safe_POST_bool('details'));
 			set_block_setting($block_id, 'type',    safe_POST('type', array('pedigree', 'descendants', 'hourglass', 'treenav'), 'pedigree'));
 			set_block_setting($block_id, 'pid',     safe_POST('pid', WT_REGEX_XREF));
-			echo WT_JS_START, 'window.opener.location.href=window.opener.location.href;window.close();', WT_JS_END;
 			exit;
 		}
 
@@ -204,7 +198,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 		$type   =get_block_setting($block_id, 'type',    'pedigree');
 		$pid    =get_block_setting($block_id, 'pid', WT_USER_ID ? (WT_USER_GEDCOM_ID ? WT_USER_GEDCOM_ID : $PEDIGREE_ROOT_ID) : $PEDIGREE_ROOT_ID);
 
-		$controller->addExternalJavaScript('js/autocomplete.js');
+		$controller->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 	?>
 		<tr><td class="descriptionbox wrap width33"><?php echo WT_I18N::translate('Chart type'); ?></td>
 		<td class="optionbox">

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13892 2012-05-02 13:29:09Z lukasz $
+// $Id: module.php 14118 2012-07-24 10:26:04Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -44,6 +44,22 @@ class lightbox_WT_Module extends WT_Module implements WT_Module_Config, WT_Modul
 		switch($mod_action) {
 		case 'admin_config':
 			$this->config();
+			break;
+		case 'js':
+			// tell browser to cache this javascript for 5 minutes
+			$expireOffset = 60 * 5;
+			$expireHeader = gmdate("D, d M Y H:i:s", time() + $expireOffset) . " GMT";
+			header('Content-type: application/javascript');
+			header('Cache-control:');
+			header('Pragma:');
+
+			header("Expires: " . $expireHeader);
+			echo file_get_contents(WT_MODULES_DIR.$this->getName().'/js/Sound.js');
+			echo file_get_contents(WT_MODULES_DIR.$this->getName().'/js/clearbox.js');
+			echo file_get_contents(WT_MODULES_DIR.$this->getName().'/js/wz_tooltip.js');
+			echo file_get_contents(WT_MODULES_DIR.$this->getName().'/js/tip_centerwindow.js');
+			echo file_get_contents(WT_MODULES_DIR.$this->getName().'/js/clsource_music.js');
+			echo file_get_contents(WT_MODULES_DIR.$this->getName().'/js/tip_balloon.js');
 			break;
 		default:
 			header('HTTP/1.0 404 Not Found');
@@ -123,7 +139,7 @@ class lightbox_WT_Module extends WT_Module implements WT_Module_Config, WT_Modul
 					document.getElementById("ord2").value = order;
 				});
 			};';
-			$controller->addInlineJavaScript($js);
+			$controller->addInlineJavascript($js);
 			$html.='<form name="reorder_form" method="post" action="edit_interface.php">
 				<input type="hidden" name="action" value="al_reorder_media_update">
 				<input type="hidden" name="pid" value="'.$controller->record->getXref().'">
@@ -208,16 +224,9 @@ class lightbox_WT_Module extends WT_Module implements WT_Module_Config, WT_Modul
 		}
 		$js.='var CB_SlShowTime  = "'.get_module_setting('lightbox', 'LB_SS_SPEED', '6').'"; // Slide show timer
 		var CB_Animation = "'.get_module_setting('lightbox', 'LB_TRANSITION', 'warp').'";'; // Next/Prev Image transition effect
-		$controller->addInlineJavaScript($js)
-			->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/Sound.js')
-			->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/clearbox.js')
-			->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/wz_tooltip.js')
-			->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/tip_centerwindow.js');
-		if ($TEXT_DIRECTION=='ltr') {
-			$controller->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/tip_balloon.js');
-		} else {
-			$controller->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/tip_balloon_RTL.js');
-		}
+
+		$controller->addExternalJavascript('module.php?mod='.$this->getName().'&mod_action=js');
+		$controller->addInlineJavascript($js);
 		return true;
 	}
 

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: session.php 13970 2012-06-04 10:15:13Z greg $
+// $Id: session.php 14231 2012-08-31 13:29:28Z greg $
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
 if (!defined('WT_SCRIPT_NAME')) {
@@ -31,7 +31,7 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.3.0');
+define('WT_VERSION',         '1.3.1');
 define('WT_VERSION_RELEASE', ''); // 'svn', 'beta', 'rc1', '', etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
 
@@ -41,21 +41,14 @@ define('WT_WEBTREES_WIKI',   'http://wiki.webtrees.net/');
 define('WT_TRANSLATORS_URL', 'https://translations.launchpad.net/webtrees/');
 
 // Optionally, specify a CDN server for static content (e.g. CSS, JS, PNG)
-// For example, "http://my.cdn.com/webtrees-static-1.2.3/"
-// Note that some servers (e.g. Amazon S3) require separate compressed/uncompressed data.
-if (isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')!==false) {
-	// Pre-compressed resources, served with a "Content-encoding: gzip" header.
-	define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-1.2.3z/"
-} else {
-	// Uncompressed resources, served without a "Content-encoding: gzip" header.
-	define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-1.2.3/"
-}
+// For example, "http://my.cdn.com/webtrees-static-1.3.1/"
+define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-1.3.1/"
 
 // Optionally, load major JS libraries from Google's public CDN
 define ('WT_USE_GOOGLE_API', false);
 if (WT_USE_GOOGLE_API) {
 	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js');
-	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js');
+	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js');
 } else {
 	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery/jquery.min.js');
 	define('WT_JQUERYUI_URL',      WT_STATIC_URL.'js/jquery/jquery-ui.min.js');
@@ -74,7 +67,7 @@ define('WT_DEBUG_LANG', false);
 define('WT_ERROR_LEVEL', 2); // 0=none, 1=minimal, 2=full
 
 // Required version of database tables/columns/indexes/etc.
-define('WT_SCHEMA_VERSION', 18);
+define('WT_SCHEMA_VERSION', 19);
 
 // Regular expressions for validating user input, etc.
 define('WT_REGEX_XREF',     '[A-Za-z0-9:_-]+');
@@ -85,7 +78,7 @@ define('WT_REGEX_ALPHANUM', '[a-zA-Z0-9]+');
 define('WT_REGEX_BYTES',    '[0-9]+[bBkKmMgG]?');
 define('WT_REGEX_USERNAME', '[^<>"%{};]+');
 define('WT_REGEX_PASSWORD', '.{6,}');
-define('WT_REGEX_NOSCRIPT', '[^<>"&%{};]+');
+define('WT_REGEX_NOSCRIPT', '[^<>"&%{};]*');
 define('WT_REGEX_URL',      '[\/0-9A-Za-z_!~*\'().;?:@&=+$,%#-]+'); // Simple list of valid chars
 define('WT_REGEX_EMAIL',    '[^\s<>"&%{};@]+@[^\s<>"&%{};@]+');
 define('WT_REGEX_UNSAFE',   '[\x00-\xFF]*'); // Use with care and apply additional validation!
@@ -113,10 +106,6 @@ define('WT_EOL', "\r\n");
 
 // Gedcom specification/definitions
 define ('WT_GEDCOM_LINE_LENGTH', 255-strlen(WT_EOL)); // Characters, not bytes
-
-// Use these tags to wrap embedded javascript consistently
-define('WT_JS_START', '<script>');
-define('WT_JS_END',   '</script>');
 
 // Used in Google charts
 define ('WT_GOOGLE_CHART_ENCODING', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.');
@@ -211,7 +200,6 @@ require WT_ROOT.'includes/functions/functions_rtl.php';
 require WT_ROOT.'includes/functions/functions_mediadb.php';
 require WT_ROOT.'includes/functions/functions_date.php';
 require WT_ROOT.'includes/functions/functions_charts.php';
-require WT_ROOT.'includes/functions/functions_places.php';
 require WT_ROOT.'includes/functions/functions_utf-8.php';
 
 set_error_handler('wt_error_handler');
@@ -322,7 +310,7 @@ case 'unknown':
 	break;
 case '':
 	WT_DB::prepare(
-		"INSERT INTO `##site_access_rule` (ip_address_start, ip_address_end, user_agent_pattern) VALUES (IFNULL(INET_ATON(?), 0), IFNULL(INET_ATON(?), 4294967295), ?)"
+		"INSERT INTO `##site_access_rule` (ip_address_start, ip_address_end, user_agent_pattern, comment) VALUES (IFNULL(INET_ATON(?), 0), IFNULL(INET_ATON(?), 4294967295), ?, '')"
 	)->execute(array($_SERVER['REMOTE_ADDR'], $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT']));
 	$SEARCH_SPIDER=true;
 	break;
@@ -376,9 +364,9 @@ if (!$SEARCH_SPIDER && !$WT_SESSION->initiated) {
 if (isset($_REQUEST['ged'])) {
 	// .... from the URL or form action
 	$GEDCOM=$_REQUEST['ged'];
-} elseif (isset($_SESSION['GEDCOM'])) {
+} elseif ($WT_SESSION->GEDCOM) {
 	// .... the most recently used one
-	$GEDCOM=$_SESSION['GEDCOM'];
+	$GEDCOM=$WT_SESSION->GEDCOM;
 } else {
 	// .... we'll need to query the DB to find one
 	$GEDCOM='';
@@ -406,7 +394,7 @@ define('WT_GEDURL', rawurlencode(WT_GEDCOM));
 load_gedcom_settings(WT_GED_ID);
 
 // Set our gedcom selection as a default for the next page
-$_SESSION['GEDCOM']=WT_GEDCOM;
+$WT_SESSION->GEDCOM=WT_GEDCOM;
 
 if (empty($WEBTREES_EMAIL)) {
 	$WEBTREES_EMAIL='webtrees-noreply@'.preg_replace('/^www\./i', '', $_SERVER['SERVER_NAME']);
@@ -414,8 +402,8 @@ if (empty($WEBTREES_EMAIL)) {
 
 // Use the server date to calculate privacy, etc.
 // Use the client date to show ages, etc.
-define('WT_SERVER_JD', 2440588+floor(time()/86400));
-define('WT_CLIENT_JD', 2440588+floor(client_time()/86400));
+define('WT_SERVER_JD', 2440588+(int)(time()/86400));
+define('WT_CLIENT_JD', 2440588+(int)(client_time()/86400));
 
 // Who are we?
 define('WT_USER_ID', getUserId());
@@ -457,8 +445,6 @@ if (WT_USER_ID && (safe_GET_bool('logout') || !WT_USER_NAME)) {
 // The login URL must be an absolute URL, and can be user-defined
 define('WT_LOGIN_URL', get_site_setting('LOGIN_URL', WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php'));
 
-if (!isset($_SESSION['wt_user'])) $_SESSION['wt_user'] = '';
-
 if (WT_SCRIPT_NAME!='help_text.php') {
 	if (!get_gedcom_setting(WT_GED_ID, 'imported') && substr(WT_SCRIPT_NAME, 0, 5)!=='admin' && !in_array(WT_SCRIPT_NAME, array('help_text.php', 'login.php', 'edit_changes.php', 'import.php', 'message.php', 'save.php'))) {
 		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_trees_manage.php');
@@ -474,17 +460,13 @@ if (WT_SCRIPT_NAME!='help_text.php') {
 		header('Location: '.WT_LOGIN_URL.'?url='.rawurlencode($url));
 		exit;
 	}
-
-	if (!isset($_SESSION['timediff'])) {
-		$_SESSION['timediff'] = 0;
-	}
 }
 
 if (WT_USER_ID) {
 	//-- update the login time every 5 minutes
-	if (!isset($_SESSION['activity_time']) || (time()-$_SESSION['activity_time'])>300) {
+	if ($WT_SESSION->activity_time && time()-$WT_SESSION->activity_time > 300) {
 		userUpdateLogin(WT_USER_ID);
-		$_SESSION['activity_time'] = time();
+		$WT_SESSION->activity_time = time();
 	}
 }
 

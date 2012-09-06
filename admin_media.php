@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_media.php 13871 2012-04-29 04:37:29Z nigel $
+// $Id: admin_media.php 14207 2012-08-26 06:46:23Z greg $
 
  /* TODO:
  * Add check for missing index.php files when creating a directory
@@ -272,8 +272,7 @@ if (WT_USER_IS_ADMIN) {
 // echo the header of the page
 $controller->pageHeader();
 ?>
-<script type="text/javascript">
-<!--
+<script>
 function pasteid(id) {
 	window.opener.paste_id(id);
 	window.close();
@@ -305,11 +304,6 @@ function checkpath(folder) {
 	}
 }
 
-function showchanges() {
-	window.location = '<?php echo WT_SCRIPT_NAME."?directory=".$directory."&level=".$level."&filter=".$filter."&subclick=".$subclick; ?>';
-}
-
-//-->
 </script>
 <?php
 if (check_media_structure()) {
@@ -740,19 +734,19 @@ if (check_media_structure()) {
 
 		} else {
 			$menu->addLabel(WT_I18N::translate('Set link'));
-			$menu->addClass("", "", "submenu");
+			$menu->addClass('', 'submenu');
 			$submenu = new WT_Menu(WT_I18N::translate('To Person'));
-			$submenu->addClass("submenuitem".$classSuffix, "submenuitem_hover".$classSuffix);
+			$submenu->addClass("submenuitem".$classSuffix);
 			$submenu->addOnClick("return ilinkitem('$mediaid', 'person')");
 			$menu->addSubMenu($submenu);
 
 			$submenu = new WT_Menu(WT_I18N::translate('To Family'));
-			$submenu->addClass("submenuitem".$classSuffix, "submenuitem_hover".$classSuffix);
+			$submenu->addClass("submenuitem".$classSuffix);
 			$submenu->addOnClick("return ilinkitem('$mediaid', 'family')");
 			$menu->addSubMenu($submenu);
 
 			$submenu = new WT_Menu(WT_I18N::translate('To Source'));
-			$submenu->addClass("submenuitem".$classSuffix, "submenuitem_hover".$classSuffix);
+			$submenu->addClass("submenuitem".$classSuffix);
 			$submenu->addOnClick("return ilinkitem('$mediaid', 'source')");
 			$menu->addSubMenu($submenu);
 		}
@@ -808,9 +802,8 @@ if (check_media_structure()) {
 		<tr align="center">	
 			<?php
 				// Directory pick list
-				if (empty($directory)) {
-					if (!empty($_SESSION['upload_folder'])) $directory = $_SESSION['upload_folder'];
-					else $directory = $MEDIA_DIRECTORY;
+				if (!$directory) {
+					$directory = $MEDIA_DIRECTORY;
 				}
 				if ($MEDIA_DIRECTORY_LEVELS >= 0) {
 					$folders = get_media_folders();
@@ -1014,8 +1007,8 @@ if (check_media_structure()) {
 			// Set up for two passes, the first showing URLs, the second normal files
 
 			$controller
-				->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-				->addInlineJavaScript('
+				->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+				->addInlineJavascript('
 					jQuery("#media_table").dataTable( {
 						"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
 						'.WT_I18N::datatablesI18N().',

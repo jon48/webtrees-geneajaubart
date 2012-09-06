@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Event.php 13949 2012-05-28 21:03:05Z greg $
+// $Id: Event.php 14089 2012-07-08 13:52:44Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -221,16 +221,6 @@ class WT_Event {
 	 */
 	function getDetail() {
 		return $this->detail;
-	}
-
-	/**
-	 * Check whether this fact has information to display
-	 * Checks for a date or a place
-	 *
-	 * @return boolean
-	 */
-	function hasDatePlace() {
-		return ($this->getDate() || $this->getPlace());
 	}
 
 	function getLabel($abbreviate=false) {

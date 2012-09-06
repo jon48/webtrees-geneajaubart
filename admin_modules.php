@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_modules.php 13600 2012-03-17 20:02:20Z greg $
+// $Id: admin_modules.php 14009 2012-06-17 06:19:58Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_modules.php');
 require 'includes/session.php';
@@ -29,8 +29,8 @@ $controller
 	->requireAdminLogin()
 	->setPageTitle(WT_I18N::translate('Module administration'))
 	->pageHeader()
-	->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-	->addInlineJavaScript('
+	->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+	->addInlineJavascript('
 	  function reindexMods(id) {
 			jQuery("#"+id+" input").each(
 				function (index, value) {

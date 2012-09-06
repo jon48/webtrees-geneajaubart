@@ -57,7 +57,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: autocomplete.js 13782 2012-04-06 15:11:55Z greg $
+$Id: autocomplete.js 14088 2012-07-08 07:49:02Z greg $
 */
 
 // INDI
@@ -122,12 +122,12 @@ jQuery("input[id$=xref], input[name^=gid], #cart_item_id").autocomplete({
 });
 
 // PLAC : with hierarchy
-jQuery(".PLAC, #place, input[id=place], input[name*=PLACS], input[name*=PLAC3], input[name^=PLAC], input[name$=PLAC]").autocomplete({
+jQuery(".PLAC, #place, input[name=place], input[id=place], input[name*=PLACS], input[name*=PLAC3], input[name^=PLAC], input[name$=PLAC]").autocomplete({
 	source: "autocomplete.php?field=PLAC"
 });
 
 // PLAC : without hierarchy
-jQuery("input[name=place], input[id=birthplace], input[id=marrplace], input[id=deathplace], input[id=bdmplace]").autocomplete({
+jQuery("input[name=place2], input[id=birthplace], input[id=marrplace], input[id=deathplace], input[id=bdmplace]").autocomplete({
 	source: "autocomplete.php?field=PLAC2"
 });
 

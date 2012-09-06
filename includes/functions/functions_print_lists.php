@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print_lists.php 13943 2012-05-24 06:29:32Z nigel $
+// $Id: functions_print_lists.php 14210 2012-08-26 07:45:52Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -37,13 +37,13 @@ if (!defined('WT_WEBTREES')) {
 function format_indi_table($datalist, $option='') {
 	global $GEDCOM, $SHOW_LAST_CHANGE, $SEARCH_SPIDER, $MAX_ALIVE_AGE, $controller;
 
-	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
+	$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$SHOW_EST_LIST_DATES=get_gedcom_setting(WT_GED_ID, 'SHOW_EST_LIST_DATES');
 	if ($option=='MARR_PLAC') return;
 	$html = '';
 	$controller
-		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addInlineJavaScript('
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc"  ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc" ]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["num-html-asc" ]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a<b) ? -1 : (a>b ? 1 : 0);};
@@ -307,7 +307,7 @@ function format_indi_table($datalist, $option='') {
 		// Dummy column to match colspan in header
 		$html .= '<td style="display:none;"></td>';
 		//-- GIVN/SURN
-		// Use "AAAA" as a separator (instead of ",") as JavaScript.localeCompare() ignores
+		// Use "AAAA" as a separator (instead of ",") as Javascript.localeCompare() ignores
 		// punctuation and "ANN,ROACH" would sort after "ANNE,ROACH", instead of before it.
 		// Similarly, @N.N. would sort as NN.
 		$html .= '<td>'. htmlspecialchars(str_replace('@P.N.', 'AAAA', $givn)). 'AAAA'. htmlspecialchars(str_replace('@N.N.', 'AAAA', $surn)). '</td>';
@@ -328,7 +328,7 @@ function format_indi_table($datalist, $option='') {
 				$html .= $birth_date->Display(!$SEARCH_SPIDER);
 			}
 			if ($birth_dates[0]->gregorianYear()>=1550 && $birth_dates[0]->gregorianYear()<2030 && !isset($unique_indis[$person->getXref()])) {
-				$birt_by_decade[floor($birth_dates[0]->gregorianYear()/10)*10] .= $person->getSex();
+				$birt_by_decade[(int)($birth_dates[0]->gregorianYear()/10)*10] .= $person->getSex();
 			}
 		} else {
 			$birth_date=$person->getEstimatedBirthDate();
@@ -348,14 +348,15 @@ function format_indi_table($datalist, $option='') {
 		//-- Birth place
 		$html .= '<td>';
 		foreach ($person->getAllBirthPlaces() as $n=>$birth_place) {
+			$tmp=new WT_Place($birth_place, WT_GED_ID);
 			if ($n) {
 				$html .= '<br>';
 			}
 			if ($SEARCH_SPIDER) {
-				$html .= get_place_short($birth_place);
+				$html .= $tmp->getShortName();
 			} else {
-				$html .= '<a href="'. get_place_url($birth_place). '" title="'. $birth_place. '">';
-				$html .= highlight_search_hits(get_place_short($birth_place)). '</a>';
+				$html .= '<a href="'. $tmp->getURL() . '" title="'. strip_tags($tmp->getFullName()) . '">';
+				$html .= highlight_search_hits($tmp->getShortName()). '</a>';
 			}
 		}
 		$html .= '</td>';
@@ -382,7 +383,7 @@ function format_indi_table($datalist, $option='') {
 				$html .= $death_date->Display(!$SEARCH_SPIDER);
 			}
 			if ($death_dates[0]->gregorianYear()>=1550 && $death_dates[0]->gregorianYear()<2030 && !isset($unique_indis[$person->getXref()])) {
-				$deat_by_decade[floor($death_dates[0]->gregorianYear()/10)*10] .= $person->getSex();
+				$deat_by_decade[(int)($death_dates[0]->gregorianYear()/10)*10] .= $person->getSex();
 			}
 		} else {
 			$death_date=$person->getEstimatedDeathDate();
@@ -411,14 +412,15 @@ function format_indi_table($datalist, $option='') {
 		//-- Death place
 		$html .= '<td>';
 		foreach ($person->getAllDeathPlaces() as $n=>$death_place) {
+			$tmp=new WT_Place($death_place, WT_GED_ID);
 			if ($n) {
 				$html .= '<br>';
 			}
 			if ($SEARCH_SPIDER) {
-				$html .= get_place_short($death_place);
+				$html .= $tmp->getShortName();
 			} else {
-				$html .= '<a href="'. get_place_url($death_place). '" title="'. $death_place. '">';
-				$html .= highlight_search_hits(get_place_short($death_place)). '</a>';
+				$html .= '<a href="'. $tmp->getURL() . '" title="'. strip_tags($tmp->getFullName()) . '">';
+				$html .= highlight_search_hits($tmp->getShortName()). '</a>';
 			}
 		}
 		$html .= '</td>';
@@ -456,7 +458,7 @@ function format_indi_table($datalist, $option='') {
 		$html .= '</td>';
 		//-- Filtering by birth date
 		$html .= '<td>';
-		if (!$person->canDisplayDetails() || WT_Date::Compare($birth_dates[0], $d100y)>0) {
+		if (!$person->canDisplayDetails() || WT_Date::Compare($birth_date, $d100y)>0) {
 			$html .= 'Y100';
 		} else {
 			$html .= 'YES';
@@ -464,12 +466,11 @@ function format_indi_table($datalist, $option='') {
 		$html .= '</td>';
 		//-- Filtering by death date
 		$html .= '<td>';
-		if ($person->isDead()) {
-			if (WT_Date::Compare($death_dates[0], $d100y)>0) {
-				$html .= 'Y100';
-			} else {
-				$html .= 'YES';
-			}
+		// Died in last 100 years?  Died?  Not dead?
+		if (WT_Date::Compare($death_date, $d100y)>0) {
+			$html .= 'Y100';
+		} elseif ($death_date->minJD() || $person->isDead()) {
+			$html .= 'YES';
 		} else {
 			$html .= 'N';
 		}
@@ -502,13 +503,13 @@ function format_indi_table($datalist, $option='') {
 // print a table of families
 function format_fam_table($datalist, $option='') {
 	global $GEDCOM, $SHOW_LAST_CHANGE, $SEARCH_SPIDER, $controller;
-	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
+	$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	if ($option=='BIRT_PLAC' || $option=='DEAT_PLAC') return;
 	$html = '';
 
 	$controller
-		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addInlineJavaScript('
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
 			var oTable'.$table_id.'=jQuery("#'.$table_id.'").dataTable( {
@@ -772,7 +773,7 @@ function format_fam_table($datalist, $option='') {
 		// Dummy column to match colspan in header
 		$html .= '<td style="display:none;"></td>';
 		//-- Husb GIVN
-		// Use "AAAA" as a separator (instead of ",") as JavaScript.localeCompare() ignores
+		// Use "AAAA" as a separator (instead of ",") as Javascript.localeCompare() ignores
 		// punctuation and "ANN,ROACH" would sort after "ANNE,ROACH", instead of before it.
 		// Similarly, @N.N. would sort as NN.
 		$html .= '<td>'. htmlspecialchars(str_replace('@P.N.', 'AAAA', $givn)). 'AAAA'. htmlspecialchars(str_replace('@N.N.', 'AAAA', $surn)). '</td>';
@@ -782,7 +783,7 @@ function format_fam_table($datalist, $option='') {
 		$hdate=$husb->getBirthDate();
 		if ($hdate->isOK() && $mdate->isOK()) {
 			if ($hdate->gregorianYear()>=1550 && $hdate->gregorianYear()<2030) {
-				$birt_by_decade[floor($hdate->gregorianYear()/10)*10] .= $husb->getSex();
+				$birt_by_decade[(int)($hdate->gregorianYear()/10)*10] .= $husb->getSex();
 			}
 			$hage=WT_Date::getAge($hdate, $mdate, 0);
 			if ($hage>=0 && $hage<=$max_age) {
@@ -821,7 +822,7 @@ function format_fam_table($datalist, $option='') {
 		$html .= '<td style="display:none;"></td>';
 		//-- Wife GIVN
 		//-- Husb GIVN
-		// Use "AAAA" as a separator (instead of ",") as JavaScript.localeCompare() ignores
+		// Use "AAAA" as a separator (instead of ",") as Javascript.localeCompare() ignores
 		// punctuation and "ANN,ROACH" would sort after "ANNE,ROACH", instead of before it.
 		// Similarly, @N.N. would sort as NN.
 		$html .= '<td>'. htmlspecialchars(str_replace('@P.N.', 'AAAA', $givn)). 'AAAA'. htmlspecialchars(str_replace('@N.N.', 'AAAA', $surn)). '</td>';
@@ -831,7 +832,7 @@ function format_fam_table($datalist, $option='') {
 		$wdate=$wife->getBirthDate();
 		if ($wdate->isOK() && $mdate->isOK()) {
 			if ($wdate->gregorianYear()>=1550 && $wdate->gregorianYear()<2030) {
-				$birt_by_decade[floor($wdate->gregorianYear()/10)*10] .= $wife->getSex();
+				$birt_by_decade[(int)($wdate->gregorianYear()/10)*10] .= $wife->getSex();
 			}
 			$wage=WT_Date::getAge($wdate, $mdate, 0);
 			if ($wage>=0 && $wage<=$max_age) {
@@ -849,7 +850,7 @@ function format_fam_table($datalist, $option='') {
 				$html .= '<div>'. $marriage_date->Display(!$SEARCH_SPIDER). '</div>';
 			}
 			if ($marriage_dates[0]->gregorianYear()>=1550 && $marriage_dates[0]->gregorianYear()<2030) {
-				$marr_by_decade[floor($marriage_dates[0]->gregorianYear()/10)*10] .= $husb->getSex().$wife->getSex();
+				$marr_by_decade[(int)($marriage_dates[0]->gregorianYear()/10)*10] .= $husb->getSex().$wife->getSex();
 			}
 		} else if (get_sub_record(1, '1 _NMR', $family->getGedcomRecord())) {
 			$hus = $family->getHusband();
@@ -891,14 +892,15 @@ function format_fam_table($datalist, $option='') {
 		//-- Marriage place
 		$html .= '<td>';
 		foreach ($family->getAllMarriagePlaces() as $n=>$marriage_place) {
+			$tmp=new WT_Place($marriage_place, WT_GED_ID);
 			if ($n) {
 				$html .= '<br>';
 			}
 			if ($SEARCH_SPIDER) {
-				$html .= get_place_short($marriage_place);
+				$html .= $tmp->getShortName();
 			} else {
-				$html .= '<a href="'. get_place_url($marriage_place). '" title="'. $marriage_place. '">';
-				$html .= highlight_search_hits(get_place_short($marriage_place)). '</a>';
+				$html .= '<a href="'. $tmp->getURL() . '" title="'. strip_tags($tmp->getFullName()) . '">';
+				$html .= highlight_search_hits($tmp->getShortName()). '</a>';
 			}
 		}
 		$html .= '</td>';
@@ -987,10 +989,10 @@ function format_fam_table($datalist, $option='') {
 function format_sour_table($datalist) {
 	global $SHOW_LAST_CHANGE, $controller;
 	$html = '';
-	$table_id = "ID".floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
+	$table_id = "ID".(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
-		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addInlineJavaScript('
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
 			jQuery("#'.$table_id.'").dataTable( {
@@ -1127,10 +1129,10 @@ function format_sour_table($datalist) {
 function format_note_table($datalist) {
 	global $SHOW_LAST_CHANGE, $controller;
 	$html = '';
-	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
+	$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
-		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addInlineJavaScript('
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
 			jQuery("#'.$table_id.'").dataTable({
@@ -1228,10 +1230,10 @@ function format_note_table($datalist) {
 function format_repo_table($repos) {
 	global $SHOW_LAST_CHANGE, $SEARCH_SPIDER, $controller;
 	$html = '';
-	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
+	$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
-		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addInlineJavaScript('
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
 			jQuery("#'.$table_id.'").dataTable({
@@ -1320,10 +1322,10 @@ function format_repo_table($repos) {
 function format_media_table($datalist) {
 	global $SHOW_LAST_CHANGE, $controller;
 	$html = '';
-	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
+	$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
-		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addInlineJavaScript('
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
 			jQuery("#'.$table_id.'").dataTable({
@@ -1429,8 +1431,8 @@ function format_surname_table($surnames, $script, $extra = '') {
 	global $controller;
 	$html = '';
 	$controller
-		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addInlineJavaScript('
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["num-asc" ]=function(a,b) {a=parseFloat(a); b=parseFloat(b); return (a<b) ? -1 : (a>b ? 1 : 0);};
 			jQuery.fn.dataTableExt.oSort["num-desc"]=function(a,b) {a=parseFloat(a); b=parseFloat(b); return (a>b) ? -1 : (a<b ? 1 : 0);};
 			jQuery(".surname-list").dataTable( {
@@ -1441,7 +1443,7 @@ function format_surname_table($surnames, $script, $extra = '') {
 			"aaSorting": [],
 			"aoColumns": [
 				/*  0 name  */ {iDataSort:1},
-				/*  1 NAME  */ {bVisible:false, sType:"num"},
+				/*  1 NAME  */ {bVisible:false},
 				/*  2 count */ {iDataSort:3, sClass:"center"},
 				/*  3 COUNT */ {bVisible:false}
 			],
@@ -1462,7 +1464,6 @@ function format_surname_table($surnames, $script, $extra = '') {
 		'<th>&nbsp;</th>'.
 		'</tr></thead>';
 
-	$n=0; // We have already sorted the data - use this as a surrogate sort key
 	$html .= '<tbody>';
 	foreach ($surnames as $surn=>$surns) {
 		// Each surname links back to the indi/fam surname list
@@ -1487,8 +1488,8 @@ function format_surname_table($surnames, $script, $extra = '') {
 			}
 		}
 		$html.='</td>';
-		// Surrogate sort column for name
-		$html.='<td>'.$n++.'</td>';
+		// Sort column for name
+		$html.='<td>'.$surn.'</td>';
 		// Surname count
 		$html.='<td>';
 		$subtotal=0;
@@ -1682,7 +1683,7 @@ function print_changes_table($change_ids, $sort) {
 
 	$return = '';
 	$n = 0;
-	$table_id = "ID" . floor(microtime() * 1000000); // create a unique ID
+	$table_id = "ID" . (int)(microtime() * 1000000); // create a unique ID
 	switch ($sort) {
 	case 'name':        //name
 		$aaSorting = "[5,'asc'], [4,'desc']";
@@ -1696,8 +1697,8 @@ function print_changes_table($change_ids, $sort) {
 	}
 	$html = '';
 	$controller
-		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addInlineJavaScript('
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
 			jQuery("#'.$table_id.'").dataTable({
@@ -1796,10 +1797,10 @@ function print_changes_table($change_ids, $sort) {
 function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_living=false, $sort_by='anniv') {
 	global $controller;
 	$html = '';
-	$table_id = "ID".floor(microtime()*1000000); // each table requires a unique ID
+	$table_id = "ID".(int)(microtime()*1000000); // each table requires a unique ID
 	$controller
-		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addInlineJavaScript('
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavascript('
 			jQuery("#'.$table_id.'").dataTable({
 				"sDom": \'t\',
 				'.WT_I18N::datatablesI18N().',
@@ -2046,7 +2047,10 @@ function print_events_list($startjd, $endjd, $events='BIRT MARR DEAT', $only_liv
 		$html .= "<br><div class=\"indent\">";
 		$html .= WT_Gedcom_Tag::getLabel($value['fact']).' - '.$value['date']->Display(true);
 		if ($value['anniv']!=0) $html .= " (" . WT_I18N::translate('%s year anniversary', $value['anniv']).")";
-		if (!empty($value['plac'])) $html .= " - <a href=\"".get_place_url($value['plac'])."\">".$value['plac']."</a>";
+		if (!empty($value['plac'])) {
+			$tmp=new WT_Place($value['plac'], WT_GED_ID);
+			$html .= " - <a href=\"".$tmp->getURL()."\">".$tmp->getFullName()."</a>";
+		}
 		$html .= "</div>";
 	}
 
@@ -2119,12 +2123,12 @@ function print_chart_by_age($data, $title) {
 	$chart_url .= "|1:||".rawurlencode(WT_I18N::percentage($vmax/$count)); // y axis
 	$chart_url .= "|2:||";
 	$step = $vmax;
-	for ($d=floor($vmax); $d>0; $d--) {
-		if ($vmax<($d*10+1) && fmod($vmax, $d)==0) $step = $d;
+	for ($d=$vmax; $d>0; $d--) {
+		if ($vmax<($d*10+1) && ($vmax % $d)==0) $step = $d;
 	}
-	if ($step==floor($vmax)) {
-		for ($d=floor($vmax-1); $d>0; $d--) {
-			if (($vmax-1)<($d*10+1) && fmod(($vmax-1), $d)==0) $step = $d;
+	if ($step==$vmax) {
+		for ($d=$vmax-1; $d>0; $d--) {
+			if (($vmax-1)<($d*10+1) && (($vmax-1) % $d)==0) $step = $d;
 		}
 	}
 	for ($n=$step; $n<$vmax; $n+=$step) {
@@ -2135,11 +2139,11 @@ function print_chart_by_age($data, $title) {
 	$chart_url .= "&amp;chd=s:"; // data : simple encoding from A=0 to 9=61
 	$CHART_ENCODING61 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	for ($age=0; $age<=$agemax; $age++) {
-		$chart_url .= $CHART_ENCODING61[(int)floor(substr_count($data[$age], "M")*61/$vmax)];
+		$chart_url .= $CHART_ENCODING61[(int)(substr_count($data[$age], "M")*61/$vmax)];
 	}
 	$chart_url .= ",";
 	for ($age=0; $age<=$agemax; $age++) {
-		$chart_url .= $CHART_ENCODING61[(int)floor(substr_count($data[$age], "F")*61/$vmax)];
+		$chart_url .= $CHART_ENCODING61[(int)(substr_count($data[$age], "F")*61/$vmax)];
 	}
 	$html = '<img src="'. $chart_url. '" alt="'. $title. '" title="'. $title. '" class="gchart">';
 	return $html;
@@ -2169,12 +2173,12 @@ function print_chart_by_decade($data, $title) {
 	$chart_url .= "|1:||".rawurlencode(WT_I18N::percentage($vmax/$count)); // y axis
 	$chart_url .= "|2:||";
 	$step = $vmax;
-	for ($d=floor($vmax); $d>0; $d--) {
-		if ($vmax<($d*10+1) && fmod($vmax, $d)==0) $step = $d;
+	for ($d=$vmax; $d>0; $d--) {
+		if ($vmax<($d*10+1) && ($vmax % $d)==0) $step = $d;
 	}
-	if ($step==floor($vmax)) {
-		for ($d=floor($vmax-1); $d>0; $d--) {
-			if (($vmax-1)<($d*10+1) && fmod(($vmax-1), $d)==0) $step = $d;
+	if ($step==$vmax) {
+		for ($d=$vmax-1; $d>0; $d--) {
+			if (($vmax-1)<($d*10+1) && (($vmax-1) % $d)==0) $step = $d;
 		}
 	}
 	for ($n=$step; $n<$vmax; $n+=$step) {
@@ -2185,11 +2189,11 @@ function print_chart_by_decade($data, $title) {
 	$chart_url .= "&amp;chd=s:"; // data : simple encoding from A=0 to 9=61
 	$CHART_ENCODING61 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	for ($y=1570; $y<2030; $y+=10) {
-		$chart_url .= $CHART_ENCODING61[(int)floor(substr_count($data[$y], "M")*61/$vmax)];
+		$chart_url .= $CHART_ENCODING61[(int)(substr_count($data[$y], "M")*61/$vmax)];
 	}
 	$chart_url .= ",";
 	for ($y=1570; $y<2030; $y+=10) {
-		$chart_url .= $CHART_ENCODING61[(int)floor(substr_count($data[$y], "F")*61/$vmax)];
+		$chart_url .= $CHART_ENCODING61[(int)(substr_count($data[$y], "F")*61/$vmax)];
 	}
 	$html = '<img src="'. $chart_url. '" alt="'. $title. '" title="'. $title. '" class="gchart">';
 	return $html;

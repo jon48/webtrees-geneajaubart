@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: setup.php 13954 2012-05-31 17:34:36Z greg $
+// $Id: setup.php 14088 2012-07-08 07:49:02Z greg $
 
 define('WT_SCRIPT_NAME', 'setup.php');
 define('WT_CONFIG_FILE', 'config.ini.php');
@@ -719,16 +719,13 @@ try {
 		"CREATE TABLE IF NOT EXISTS `##places` (".
 		" p_id          INTEGER AUTO_INCREMENT NOT NULL,".
 		" p_place       VARCHAR(150)               NULL,".
-		" p_level       INTEGER                    NULL,".
 		" p_parent_id   INTEGER                    NULL,".
 		" p_file        INTEGER               NOT  NULL,".
 		" p_std_soundex TEXT                       NULL,".
 		" p_dm_soundex  TEXT                       NULL,".
 		" PRIMARY KEY     (p_id),".
-		"         KEY ix1 (p_place),".
-		"         KEY ix2 (p_level),".
-		"         KEY ix3 (p_parent_id),".
-		"         KEY ix4 (p_file)".
+		"         KEY ix1 (p_file, p_place),".
+		" UNIQUE  KEY ux1 (p_parent_id, p_file, p_place)".
 		") COLLATE utf8_unicode_ci ENGINE=InnoDB"
 	);
 	WT_DB::exec(

@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: personbox_template.php 13401 2012-02-07 13:09:37Z rob $
+// $Id: personbox_template.php 14022 2012-06-20 06:30:55Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,8 +33,8 @@ if (!defined('WT_WEBTREES')) {
 }
 
 echo '<div id="out-',$boxID,'" ',$outBoxAdd,'>
-	<div class="noprint" id="icons-',$boxID,'" style="',$iconsStyleAdd,' width: 25px; height: 50px; position: relative;">', $icons, '</div>',
-	'<div class="chart_textbox" style="height:auto; max-height:', $bheight,'px; overflow: hidden; ">',
+	<div class="noprint" id="icons-',$boxID,'" style="',$iconsStyleAdd,'">', $icons, '</div>',
+	'<div class="chart_textbox" style="max-height:', $bheight,'px;">',
 	$thumbnail,
 	'<a onclick="event.cancelBubble=true;" href="individual.php?pid=', $pid, '&amp;ged=', rawurlencode($GEDCOM), '">
 		<span id="namedef-',$boxID, '" class="name',$style,' ',$classfacts,'">', $name.$addname,  '</span>
@@ -48,7 +48,7 @@ echo	'</span>';
 echo 	'
 	</a>
 	<div id="fontdef-',$boxID,'" class="details',$style,'">
-		<div id="inout2-',$boxID,'" style="display:block; max-height:', ($bheight*.9),'px;">',$BirthDeath,'</div>
+		<div id="inout2-',$boxID,'" style="max-height:', ($bheight*.9),'px;">',$BirthDeath,'</div>
 	</div>
 	</div>
 	<div id="inout-',$boxID,'" style="display:none;">

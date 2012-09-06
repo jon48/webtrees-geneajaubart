@@ -23,7 +23,7 @@
 //
 // PNG Icons By:Alessandro Rei; License: GPL; http://www.kde-look.org/content/show.php/Dark-Glass+reviewed?content=67902
 //
-// $Id: theme.php 13942 2012-05-21 08:29:08Z nigel $
+// $Id: theme.php 14034 2012-06-25 08:16:06Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -84,23 +84,27 @@ $fanChart = array(
 );
 
 //-- pedigree chart variables
-$bwidth=250;     // -- width of boxes on pedigree chart
-$bheight=80;     // -- height of boxes on pedigree chart
-$baseyoffset=10; // -- position the entire pedigree tree relative to the top of the page
-$basexoffset=10; // -- position the entire pedigree tree relative to the left of the page
-$bxspacing=10;    // -- horizontal spacing between boxes on the pedigree chart
-$byspacing=10;    // -- vertical spacing between boxes on the pedigree chart
-$brborder=1;     // -- box right border thickness
+$bwidth=250;			// width of boxes on pedigree chart
+$bheight=80;			// height of boxes on pedigree chart
+$baseyoffset=10;		// position the entire pedigree tree relative to the top of the page
+$basexoffset=10;		// position the entire pedigree tree relative to the left of the page
+$bxspacing=10;			// horizontal spacing between boxes on the pedigree chart
+$byspacing=10;			// vertical spacing between boxes on the pedigree chart
+$linewidth=1.5;			// width of joining lines
+$shadowcolor="";		// shadow color for joining lines
+$shadowblur=0;			// shadow blur for joining lines
+$shadowoffsetX=0;		// shadowOffsetX for joining lines
+$shadowoffsetY=0;		// shadowOffsetY for joining lines
 
-// -- descendancy - relationship chart variables
-$Dbaseyoffset=20; // -- position the entire descendancy tree relative to the top of the page
-$Dbasexoffset=20; // -- position the entire descendancy tree relative to the left of the page
-$Dbxspacing=5;   // -- horizontal spacing between boxes
-$Dbyspacing=10;   // -- vertical spacing between boxes
-$Dbwidth=260;    // -- width of DIV layer boxes
-$Dbheight=80;    // -- height of DIV layer boxes
-$Dindent=15;     // -- width to indent descendancy boxes
-$Darrowwidth=30; // -- additional width to include for the up arrows
+// descendancy - relationship chart variables
+$Dbaseyoffset=20;		// position the entire descendancy tree relative to the top of the page
+$Dbasexoffset=20;		// position the entire descendancy tree relative to the left of the page
+$Dbxspacing=5;			// horizontal spacing between boxes
+$Dbyspacing=10;			// vertical spacing between boxes
+$Dbwidth=260;			// width of DIV layer boxes
+$Dbheight=80;			// height of DIV layer boxes
+$Dindent=15;			// width to indent descendancy boxes
+$Darrowwidth=30;		// additional width to include for the up arrows
 
 // -- Dimensions for compact version of chart displays
 $cbwidth=240;

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: find.php 13723 2012-03-31 07:09:33Z greg $
+// $Id: find.php 14087 2012-07-07 21:34:26Z greg $
 
 define('WT_SCRIPT_NAME', 'find.php');
 require './includes/session.php';
@@ -133,12 +133,12 @@ case "specialchar":
 case "facts":
 	$controller
 		->setPageTitle(WT_I18N::translate('Find a fact or event'))
-		->addInlineJavaScript('initPickFact();');
+		->addInlineJavascript('initPickFact();');
 	break;
 }
 $controller->pageHeader();
 
-echo WT_JS_START;
+echo '<script>';
 ?>
 	function pasteid(id, name, thumb) {
 		if (thumb) {
@@ -177,7 +177,7 @@ echo WT_JS_START;
 		return true;
 	}
 <?php
-echo WT_JS_END;
+echo '</script>';
 
 $options = array();
 $options["option"][]= "findindi";
@@ -356,7 +356,7 @@ if ($type == "facts") {
 	<table class="list_table width100" border="0">
 	<tr><td class="list_label" style="padding: 5px; font-weight: normal; white-space: normal;">' ;
 	getPreselectedTags($preselDefault, $preselCustom);
-	echo WT_JS_START; ?>
+	echo '<script>'; ?>
 	// A class representing a default tag
 	function DefaultTag(id, name, selected) {
 		this.Id=id;
@@ -493,7 +493,7 @@ if ($type == "facts") {
 		window.close();
 		return false;
 	}
-	<?php echo WT_JS_END;
+	<?php echo '</script>';
 	echo '<div id="layDefinedTags"><table id="tabDefinedTags">
 		<thead><tr>
 			<th>&nbsp;</th>
@@ -709,35 +709,27 @@ if ($action=="filter") {
 	// Output Places
 	if ($type == "place") {
 		echo '<div id="find-output">';
-		$placelist = array();
-		if ($all || $filter) {
-			$placelist=find_place_list($filter);
-			$ctplace = count($placelist);
-			if ($ctplace>0) {
-				$revplacelist = array();
-				foreach ($placelist as $indexval => $place) {
-					$levels = explode(',', $place); // -- split the place into comma seperated values
-					$levels = array_reverse($levels); // -- reverse the array so that we get the top level first
-					$placetext = "";
-					$j=0;
-					foreach ($levels as $indexval => $level) {
-						if ($j>0) $placetext .= ", ";
-						$placetext .= trim($level);
-						$j++;
-					}
-					$revplacelist[] = $placetext;
+		if (!$filter || $all) {
+			$places=WT_Place::allPlaces(WT_GED_ID);
+		} else {
+			$places=WT_Place::findPlaces($filter, WT_GED_ID);
+		}
+		if ($places) {
+			echo '<ul>';
+			foreach ($places as $place) {
+				echo '<li><a href="#" onclick="pasteid(\'', htmlspecialchars($place->getGedcomName()), '\');">';
+				if (!$filter || $all) {
+					echo $place->getReverseName(); // When displaying all names, sort/display by the country, then region, etc.
+				} else {
+					echo $place->getFullName(); // When we've searched for a place, sort by this place
 				}
-				uasort($revplacelist, "utf8_strcasecmp");
-				echo '<ul>';
-				foreach ($revplacelist as $place) {
-					echo "<li><a href=\"#\" onclick=\"pasteid('", str_replace(array("'", '"'), array("\'", '&quot;'), $place), "');\">", htmlspecialchars($place), "</a></li>";
-				}
-				echo '</ul>
-				<p>', WT_I18N::translate('Places found'), '&nbsp;', $ctplace, '</p>';
+				echo '</a></li>';
 			}
-			else {
-				echo '<p>', WT_I18N::translate('No results found.'), '</p>';
-			}
+			echo '</ul>
+			<p>', WT_I18N::translate('Places found'), '&nbsp;', count($places), '</p>';
+		}
+		else {
+			echo '<p>', WT_I18N::translate('No results found.'), '</p>';
 		}
 		echo '</div>';
 	}
@@ -831,8 +823,8 @@ if ($action=="filter") {
 		echo '</p></div>';
 	}
 }
-echo '<h4><a href="#" onclick="if (window.opener.showchanges) window.opener.showchanges(); window.close();">', WT_I18N::translate('Close Window'), '</a></h4>';
+echo '<h4><a href="#" onclick="window.close();">', WT_I18N::translate('Close Window'), '</a></h4>';
 echo "</div>"; // Close div="find-page"
 
 // Set focus to the input field
-if ($type!='facts') echo WT_JS_START, 'document.filter', $type, '.filter.focus();', WT_JS_END;
+if ($type!='facts') echo '<script>', 'document.filter', $type, '.filter.focus();', '</script>';

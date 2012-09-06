@@ -28,7 +28,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: authentication.php 13843 2012-04-19 15:28:57Z greg $
+// $Id: authentication.php 14205 2012-08-26 06:28:09Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -40,6 +40,8 @@ if (!defined('WT_WEBTREES')) {
 // On success, store the user-id in the session and return it
 // On failure, return an error code
 function authenticateUser($user_name, $password) {
+	global $WT_SESSION;
+	
 	// If we were already logged in, log out first
 	if (getUserId()) {
 		userLogout(getUserId());
@@ -53,7 +55,7 @@ function authenticateUser($user_name, $password) {
 			if ($verified && $approved || $is_admin) {
 				// Whenever we change our authorisation level change the session ID
 				Zend_Session::regenerateId();
-				$_SESSION['wt_user'] = $user_id;
+				$WT_SESSION->wt_user = $user_id;
 				AddToLog('Login successful', 'auth');
 				return $user_id;
 			} elseif (!$is_admin && !$verified) {
@@ -106,11 +108,9 @@ function userUpdateLogin($user_id) {
  */
 
 function getUserId() {
-	if (empty($_SESSION['wt_user'])) {
-		return 0;
-	} else {
-		return $_SESSION['wt_user'];
-	}
+	global $WT_SESSION;
+
+	return (int)($WT_SESSION->wt_user);
 }
 
 function getUserName() {
@@ -431,7 +431,7 @@ function addNews($news) {
 		WT_DB::prepare("UPDATE `##news` SET subject=?, body=? WHERE news_id=?")
 		->execute(array($news['title'], $news['text'], $news['id']));
 	} else {
-		WT_DB::prepare("INSERT INTO `##news` (user_id, gedcom_id, subject, body) VALUES (?, ? ,? ,?)")
+		WT_DB::prepare("INSERT INTO `##news` (user_id, gedcom_id, subject, body) VALUES (NULLIF(?, ''), NULLIF(?, '') ,? ,?)")
 		->execute(array($news['user_id'], $news['gedcom_id'],  $news['title'], $news['text']));
 	}
 }

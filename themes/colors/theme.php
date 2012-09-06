@@ -22,7 +22,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // PNG Icons By: Alessandro Rei; License:  GPL; www.deviantdark.com
 //
-// $Id: theme.php 13705 2012-03-28 09:07:45Z greg $
+// $Id: theme.php 14183 2012-08-18 22:30:17Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -30,10 +30,16 @@ if (!defined('WT_WEBTREES')) {
 }
 // Convert a menu into our theme-specific format
 function getMenuAsCustomList($menu) {
-		// Create a inert menu - to use as a label
-		$tmp=new WT_Menu(strip_tags($menu->label), '');
-		// Insert the label into the submenu
-		array_unshift($menu->submenus, $tmp);
+		// Insert the label into the submenu, except for menus with only one item.
+		if (count($menu->submenus)>1) {
+			// Create a inert menu - to use as a label
+			$tmp=new WT_Menu(strip_tags($menu->label), '');
+			if ($menu->submenus) {
+				array_unshift($menu->submenus, $tmp);
+			} else {
+				$menu->addSubmenu($tmp);
+			}
+		}
 		// Neutralise the top-level menu
 		$menu->label='';
 		$menu->onclick='';
@@ -48,7 +54,7 @@ function color_theme_dropdown() {
 	$menu=new WT_Menu(/* I18N: A colour scheme */ WT_I18N::translate('Palette'), '#', 'menu-color');
 	uasort($COLOR_THEME_LIST, 'utf8_strcasecmp');
 	foreach ($COLOR_THEME_LIST as $colorChoice=>$colorName) {
-		$submenu=new WT_Menu($colorName, get_query_url(array('themecolor'=>$colorChoice)), 'menu-color-'.$colorChoice);
+		$submenu=new WT_Menu($colorName, get_query_url(array('themecolor'=>$colorChoice), '&amp;'), 'menu-color-'.$colorChoice);
 		$menu->addSubMenu($submenu);
 	}
 	return $menu->getMenuAsList();
@@ -170,6 +176,11 @@ $basexoffset = 10; // -- position the pedigree and timeline charts relative to t
 $bxspacing = 4; // -- horizontal spacing between boxes on the pedigree chart
 $byspacing = 5; // -- vertical spacing between boxes on the pedigree chart
 $brborder = 1; // -- pedigree chart box right border thickness 
+$linewidth=1.5;			// width of joining lines
+$shadowcolor="";		// shadow color for joining lines
+$shadowblur=0;			// shadow blur for joining lines
+$shadowoffsetX=0;		// shadowOffsetX for joining lines
+$shadowoffsetY=0;		// shadowOffsetY for joining lines
 
 //-- Other settings that should not be touched
 $Dbxspacing = 5; // -- position vertical line between boxes in relationship chart

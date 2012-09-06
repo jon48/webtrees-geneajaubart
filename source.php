@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: source.php 13867 2012-04-26 16:30:59Z lukasz $
+// $Id: source.php 14079 2012-07-07 06:11:43Z greg $
 
 define('WT_SCRIPT_NAME', 'source.php');
 require './includes/session.php';
@@ -83,17 +83,11 @@ if (WT_USE_LIGHTBOX) {
 
 $linkToID=$controller->record->getXref(); // Tell addmedia.php what to link to
 
-echo WT_JS_START;
-echo 'function show_gedcom_record() {';
-echo ' var recwin=window.open("gedrecord.php?pid=', $controller->record->getXref(), '", "_blank", edit_window_specs);';
-echo '}';
-echo 'function showchanges() { window.location="', $controller->record->getRawUrl(), '"; }';
-?>	jQuery(document).ready(function() {
-		jQuery("#source-tabs").tabs();
-		jQuery("#source-tabs").css('visibility', 'visible');
-	});
-<?php
-echo WT_JS_END;
+$controller
+	->addInlineJavascript('function show_gedcom_record() {var recwin=window.open("gedrecord.php?pid=' . $controller->record->getXref() . '", "_blank", edit_window_specs);}')
+	->addInlineJavascript('jQuery("#source-tabs").tabs();')
+	->addInlineJavascript('jQuery("#source-tabs").css("visibility", "visible");');
+
 echo '<div id="source-details">';
 echo '<h2>', $controller->record->getFullName(), '</h2>';
 echo '<div id="source-tabs">

@@ -2,7 +2,7 @@
 // Displays a streetview map
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: wt_v3_street_view.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: wt_v3_street_view.php 13988 2012-06-10 08:31:17Z greg $
+
+// This PHP script *really* ought to include session.php, so it picks up
+// language, access, etc...
+define('WT_GM_SCRIPT', 'https://maps.google.com/maps/api/js?v=3.2&amp;sensor=false');
 
 header('Content-type: text/html; charset=UTF-8');
 
@@ -27,9 +31,9 @@ header('Content-type: text/html; charset=UTF-8');
 <html>
 <head>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script src="<?php echo WT_GM_SCRIPT; ?>"></script>
 
-<script type="text/javascript">
+<script>
 
 	// Following function creates an array of the google map parameters passed ---------------------    
 	var qsParm = new Array();

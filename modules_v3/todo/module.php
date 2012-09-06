@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13642 2012-03-24 13:06:08Z greg $
+// $Id: module.php 14055 2012-06-30 10:39:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -64,10 +64,10 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 		}
 		$title.=$this->getTitle().help_link('todo', $this->getName());
 
-		$table_id = 'ID'.floor(microtime()*1000000); // create a unique ID
+		$table_id = 'ID'.(int)(microtime()*1000000); // create a unique ID
 		$controller
-			->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-			->addInlineJavaScript('
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+			->addInlineJavascript('
 				jQuery("#'.$table_id.'").dataTable( {
 				"sDom": \'t\',
 				'.WT_I18N::datatablesI18N().',
@@ -164,7 +164,6 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 			set_block_setting($block_id, 'show_unassigned', safe_POST_bool('show_unassigned'));
 			set_block_setting($block_id, 'show_future',     safe_POST_bool('show_future'));
 			set_block_setting($block_id, 'block',  safe_POST_bool('block'));
-			echo WT_JS_START, 'window.opener.location.href=window.opener.location.href;window.close();', WT_JS_END;
 			exit;
 		}
 

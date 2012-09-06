@@ -2,7 +2,7 @@
 // Searches based on user query.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search.php 13816 2012-04-16 15:30:31Z greg $
+// $Id: search.php 14115 2012-07-19 11:08:07Z greg $
 
 define('WT_SCRIPT_NAME', 'search.php');
 require './includes/session.php';
@@ -30,12 +30,10 @@ require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 $controller=new WT_Controller_Search();
 $controller
 	->pageHeader()
-	->addExternalJavaScript('js/autocomplete.js');
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
 ?>
-
-<script type="text/javascript">
-<!--
+<script>
 	function checknames(frm) {
 		action = "<?php echo $controller->action; ?>";
 		if (action == "general")
@@ -51,7 +49,7 @@ $controller
 			year = frm.year.value;
 			fname = frm.firstname.value;
 			lname = frm.lastname.value;
-			place = frm.place.value;
+			place = frm.place2.value;
 
 			// display an error message if there is insufficient data to perform a search on
 			if (year == "") {
@@ -60,7 +58,7 @@ $controller
 					message = false;
 				if (lname.length >= 2)
 					message = false;
-				if (place.length >= 2)
+				if (place2.length >= 2)
 					message = false;
 				if (message) {
 					alert("<?php echo WT_I18N::translate('Please enter more than one character'); ?>");
@@ -75,7 +73,7 @@ $controller
 					message = false;
 				if (lname != "")
 					message = false;
-				if (place != "")
+				if (place2 != "")
 					message = false;
 				if (message) {
 					alert("<?php echo WT_I18N::translate('Please enter a Given name, Last name, or Place in addition to Year'); ?>");
@@ -88,7 +86,6 @@ $controller
 		return true;
 	}
 
-//-->
 </script>
 <?php
 echo '<div id="search-page">
@@ -97,7 +94,7 @@ echo '<div id="search-page">
 	echo '<form method="post" name="searchform" onsubmit="return checknames(this);" action="search.php"><input type="hidden" name="action" value="', $controller->action, '"><input type="hidden" name="isPostBack" value="true">
 	<div id="search-page-table">';
   		?>      
-		<script type="text/javascript">
+		<script>
 	        function paste_char(value) {
 	            document.searchform.query.value+=value;
 	        }
@@ -131,16 +128,6 @@ echo '<div id="search-page">
 				echo ' value="yes" id="srnote" name="srnote">
 					<label for="srnote">' ,  WT_I18N::translate('Shared notes'), '</label>
 			</p></div>
-			<div class="label">' , WT_I18N::translate('Exclude filter'), help_link('search_exclude_tags'), '</div>
-			<div class="value"><p>
-				<input type="radio" id="tagfilter_on" name="tagfilter" value="on"';
-				if (($controller->tagfilter == 'on') || ($controller->tagfilter == "")) echo ' checked="checked"';
-				echo '><label for="tagfilter_on">' , WT_I18N::translate('Exclude some non-genealogical data'), '</label>
-				</p><p>
-				<input type="radio" id="tagfilter_off" name="tagfilter" value="off"';
-				if ($controller->tagfilter == "off") echo ' checked="checked"';
-				echo '><label for="tagfilter_off">' , WT_I18N::translate('Off'), '</label>
-			</p></div>
 			<div class="label">' , WT_I18N::translate('Associates'), help_link('search_include_ASSO'), '</div>
 			<div class="value"><input type="checkbox" id="showasso" name="showasso" value="on"';
 				if ($controller->showasso == 'on') echo ' checked="checked"'; 
@@ -154,8 +141,7 @@ echo '<div id="search-page">
 					<div class="label">',  WT_I18N::translate('Replace with'), '</div>
 					<div class="value"><input tabindex="2" name="replace" value="" type="text"></div>';			
 				?>
-				<script type="text/javascript">
-				<!--
+				<script>
 					function checkAll(box) {
 						if (!box.checked) {
 							box.form.replaceNames.disabled = false;
@@ -168,7 +154,6 @@ echo '<div id="search-page">
 							box.form.replacePlacesWord.disabled = true;
 						}
 					}
-				//-->
 				</script>
 				<?php
 				echo '<div class="label">', WT_I18N::translate('Search'), '</div>
@@ -195,7 +180,7 @@ echo '<div id="search-page">
 				<div class="label">' , WT_I18N::translate('Last name'), '</div>
 				<div class="value"><input tabindex="4" type="text" name="lastname" value="' , htmlspecialchars($controller->lastname), '"></div>
 				<div class="label">' , WT_I18N::translate('Place'), '</div>
-				<div class="value"><input tabindex="5" type="text" name="place" value="' , htmlspecialchars($controller->place), '"></div>
+				<div class="value"><input tabindex="5" type="text" name="place2" value="' , htmlspecialchars($controller->place), '"></div>
 				<div class="label">' , WT_I18N::translate('Year'), '</div>
 				<div class="value"><input tabindex="6" type="text" name="year" value="' , htmlspecialchars($controller->year), '"></div>';
 			

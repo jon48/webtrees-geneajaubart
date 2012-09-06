@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: editnews.php 13847 2012-04-20 13:18:48Z greg $
+// $Id: editnews.php 13999 2012-06-16 21:57:04Z greg $
 
 define('WT_SCRIPT_NAME', 'editnews.php');
 require './includes/session.php';
@@ -89,10 +89,10 @@ case 'save':
 	$message['title'] = $title;
 	$message['text'] = $text;
 	addNews($message);
-	$controller->addInlineJavaScript('window.opener.location.reload();window.close();');
+	$controller->addInlineJavascript('window.opener.location.reload();window.close();');
 	break;
 case 'delete':
 	deleteNews($news_id);
-	$controller->addInlineJavaScript('window.opener.location.reload();window.close();');
+	$controller->addInlineJavascript('window.opener.location.reload();window.close();');
 	break;
 }

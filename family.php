@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: family.php 13867 2012-04-26 16:30:59Z lukasz $
+// $Id: family.php 14079 2012-07-07 06:11:43Z greg $
 
 define('WT_SCRIPT_NAME', 'family.php');
 require './includes/session.php';
@@ -88,12 +88,11 @@ if (WT_USE_LIGHTBOX) {
 $PEDIGREE_FULL_DETAILS = '1'; // Override GEDCOM configuration
 $show_full = '1';
 
-echo WT_JS_START;
+echo '<script>';
 echo 'function show_gedcom_record() {';
 echo ' var recwin=window.open("gedrecord.php?pid=', $controller->record->getXref(), '", "_blank", edit_window_specs);';
 echo '}';
-echo 'function showchanges() { window.location="'.$controller->record->getRawUrl().'"; }';
-echo WT_JS_END;
+echo '</script>';
 
 ?>
 <div id="family-page">

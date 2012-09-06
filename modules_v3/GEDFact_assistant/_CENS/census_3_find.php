@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_3_find.php 13932 2012-05-13 03:56:42Z nigel $
+// $Id: census_3_find.php 14121 2012-07-26 08:24:30Z nigel $
 
 $controller=new WT_Controller_Simple();
 
@@ -127,16 +127,14 @@ case "specialchar":
 	$action="filter";
 	break;
 case "facts":
-	$controller->setPageTitle(WT_I18N::translate('Find a fact or event'));
-	echo
-		WT_JS_START,
-		'jQuery(document).ready(function(){ initPickFact(); });',
-		WT_JS_END;
+	$controller
+		->setPageTitle(WT_I18N::translate('Find a fact or event'))
+		->addInlineJavascript('initPickFact();');
 	break;
 }
 $controller->pageHeader();
 
-echo WT_JS_START;
+echo '<script>';
 ?>
 
 	function pasterow(id, nam, mnam, label, gend, cond, dom, dob, dod, occu, age, birthpl, fbirthpl, mbirthpl, chilBLD) {
@@ -180,8 +178,8 @@ echo WT_JS_START;
 		}
 		return true;
 	}
+</script>
 <?php
-echo WT_JS_END;
 
 $options = array();
 $options["option"][]= "findindi";
@@ -431,7 +429,7 @@ if ($type == "facts") {
 	echo "<tr><td class=\"list_label\" style=\"padding: 5px; font-weight: normal; white-space: normal;\">";
 	getPreselectedTags($preselDefault, $preselCustom);
 	?>
-	<?php echo WT_JS_START; ?>
+	<script>
 	// A class representing a default tag
 	function DefaultTag(id, name, selected) {
 		this.Id=id;
@@ -570,7 +568,7 @@ if ($type == "facts") {
 		window.close();
 		return false;
 	}
-	<?php echo WT_JS_END; ?>
+	</script>
 	<div id="layDefinedTags"><table id="tabDefinedTags">
 		<thead><tr>
 			<th>&nbsp;</th>
@@ -604,14 +602,14 @@ echo "</td></tr>";
 echo "</table>"; // Close table with find options
 
 echo "<br>";
-echo "<a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">", WT_I18N::translate('Close Window'), "</a><br>";
+echo "<a href=\"#\" onclick=\"window.close();\">", WT_I18N::translate('Close Window'), "</a><br>";
 echo "<br>";
 
 if ($action=="filter") {
 	$filter = trim($filter);
 	$filter_array=explode(' ', preg_replace('/ {2,}/', ' ', $filter));
 
-	// Output Individual fot GEDFact Assistant ======================
+	// Output Individual for GEDFact Assistant ======================
 	if ($type == "indi") {
 		echo "<table class=\"tabs_table width90\"><tr>";
 		$myindilist=search_indis_names($filter_array, array(WT_GED_ID), 'AND');
@@ -700,7 +698,7 @@ if ($action=="filter") {
 						echo "'".(1901-$indi->getbirthyear())."' ,"; // ~age~     - Census Date minus YOB (Preliminary)
 						echo "'".(($indi->getDeathDate()->minJD() + $indi->getDeathDate()->maxJD())/2)."' ,"; // dod       - Date of Death
 						echo "'', "; // occu      - Occupation
-						echo "'".addslashes($indi->getbirthplace())."', "; // birthpl   - Birthplace
+						echo "'".htmlspecialchars($indi->getbirthplace(), ENT_QUOTES)."', "; // birthpl   - Birthplace
 						echo "'".$FBP."', "; // fbirthpl  - Father's Birthplace
 						echo "'".$MBP."', "; // mbirthpl  - Mother's Birthplace
 						echo "'".$chBLDarray."'"; // chilBLD   - Array of Children (name, birthdate, deathdate)
@@ -1029,4 +1027,4 @@ if ($action=="filter") {
 echo "</div>"; // Close div that centers table
 
 // Set focus to the input field
-if ($type!='facts') echo WT_JS_START, 'document.filter', $type, '.filter.focus();', WT_JS_END;
+if ($type!='facts') echo '<script>document.filter', $type, '.filter.focus();</script>';

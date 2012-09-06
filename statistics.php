@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: statistics.php 13728 2012-03-31 21:13:20Z greg $
+// $Id: statistics.php 14117 2012-07-24 06:21:08Z greg $
 
 define('WT_SCRIPT_NAME', 'statistics.php');
 require './includes/session.php';
@@ -34,18 +34,13 @@ $tab = safe_GET('tab', WT_REGEX_NOSCRIPT, 0);
 $ajax = safe_GET('ajax', WT_REGEX_NOSCRIPT, 0);
 
 if (!$ajax) {
-	$js='jQuery(document).ready(function() {
-		jQuery("#stats-tabs").tabs({
-			spinner: \'<i class="icon-loading-small"></i>\',
-			cache: true
-		});
-		jQuery("#stats-tabs").css("visibility", "visible");
-	});';
 	$controller=new WT_Controller_Base();
 	$controller->setPageTitle(WT_I18N::translate('Statistics'))
-		->addInlineJavaScript($js)
-		->pageHeader()
-		->addExternalJavaScript('js/autocomplete.js');
+		->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
+		->addInlineJavascript('jQuery("#stats-tabs").tabs({ spinner: "<i class=\"icon-loading-small\"></i>", cache: true });')
+		->addInlineJavascript('jQuery("#stats-tabs").css("visibility", "visible");')
+		->pageHeader();
+
 	echo '<div id="stats-details"><h2>', WT_I18N::translate('Statistics'), '</h2>',
 		'<div id="stats-tabs">',
 		'<ul>',
@@ -65,7 +60,7 @@ if (!$ajax) {
 	$controller=new WT_Controller_Ajax();
 	$controller
 		->pageHeader()
-		->addExternalJavaScript('js/autocomplete.js');
+		->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 	$stats = new WT_Stats($GEDCOM);
 	if ($tab==0) {
 		echo '<fieldset>
@@ -410,13 +405,10 @@ if (!$ajax) {
 		</table>
 		</fieldset>';
 	} else if ($tab==3) {
-		require_once WT_ROOT.'includes/functions/functions_places.php';
-
 		echo '<fieldset>
 		<legend>', WT_I18N::translate('Create your own chart'), '</legend>';
 		?>
-		<script type="text/javascript">
-		<!--
+		<script>
 			function statusHide(sel) {
 				var box = document.getElementById(sel);
 				box.style.display = 'none';
@@ -452,25 +444,19 @@ if (!$ajax) {
 				}
 			}
 			function statsModalDialog(url, title) {
-				var $form = jQuery('#own-stats-form');
-				jQuery.post($form.attr('action'), $form.serialize(), function(response) {
-					jQuery('div#statistics-plot').html(response);
-				});
-				dialog=jQuery('<div title="'+title+'"></div>')
-					.load(url)
-					.dialog({
+				var form = jQuery('#own-stats-form');
+				jQuery.post(form.attr('action'), form.serialize(), function(response) {
+					jQuery(response).dialog({
 						modal: true,
-						width: 962,
-						position: ['center',50],
-						close: function(event, ui) { $(this).remove(); }
+						width: 964
 					});
-				// Close the window when we click outside it.
-				jQuery(".ui-widget-overlay").live("click", function () {
-					jQuery("div:ui-dialog:visible").dialog("close");
+					// Close the window when we click outside it.
+					jQuery(".ui-widget-overlay").live("click", function () {
+						jQuery("div:ui-dialog:visible").dialog("close");
+					});
 				});
 				return false;
 			}
-		//-->
 		</script>
 		<?php
 		echo '<div id="own-stats"><form method="post" id="own-stats-form" name="form" action="statisticsplot.php" onsubmit="statsModalDialog(\'statisticsplot.php?action=newform\', \'', WT_I18N::translate('Statistics plot'), '\'); return false;">';

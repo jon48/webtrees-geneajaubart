@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_1_ctrl.php 13820 2012-04-17 08:25:30Z greg $
+// $Id: media_1_ctrl.php 14226 2012-08-30 05:18:45Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -64,7 +64,8 @@ if ($pid=="") {
 	}
 	$currpid=$pid;
 
-	echo '<table width=400 class="facts_table center">';
+	echo '<div id="media-links">';
+	echo '<table class="facts_table center">';
 	echo '<tr><td class="topbottombar" colspan="1">';
 	echo '<b>', WT_I18N::translate('Family navigator'), '</b>';
 	echo '</td></tr>';
@@ -72,7 +73,7 @@ if ($pid=="") {
 	//echo '<td class="optionbox wrap" valign="top" align="left" width="50%" >';
 	//echo WT_I18N::translate('Add Family, and Search links');
 	//echo '</td>';
-	echo '<td valign="top" width=400>';
+	echo '<td valign="top">';
 	//-- Search  and Add Family Members Area =========================================
 	?>
 	<table class="outer_nav center">
@@ -163,7 +164,6 @@ if ($pid=="") {
 						$marn  = $nam[1]['surname'];
 					}
 					$menu = new WT_Menu("&nbsp;" . $people["husb"]->getLabel());
-					// $menu->addClass("", "", "submenu");
 					$slabel  = print_pedigree_person_nav2($people["husb"]->getXref(), 2, 0, $personcount++, $currpid, $censyear);
 					$slabel .= $parentlinks;
 					$submenu = new WT_Menu($slabel);
@@ -247,7 +247,6 @@ if ($pid=="") {
 					}
 	
 					$menu = new WT_Menu("&nbsp;" . $people["wife"]->getLabel());
-					//$menu->addClass("", "", "submenu");
 					$slabel  = print_pedigree_person_nav2($people["wife"]->getXref(), 2, 0, $personcount++, $currpid, $censyear);
 					$slabel .= $parentlinks;
 					$submenu = new WT_Menu($slabel);
@@ -341,7 +340,6 @@ if ($pid=="") {
 						}
 	
 						$menu = new WT_Menu("&nbsp;" . $child->getLabel());
-						//$menu->addClass("", "", "submenu");
 						$slabel  = print_pedigree_person_nav2($child->getXref(), 2, 0, $personcount++, $currpid, $censyear);
 						$slabel .= $spouselinks;
 						$submenu = new WT_Menu($slabel);
@@ -462,7 +460,6 @@ if ($pid=="") {
 					} else {
 						$menu->addLabel("&nbsp;" . $people["husb"]->getLabel());
 					}
-					//$menu->addClass("", "", "submenu");
 					$slabel  = print_pedigree_person_nav2($people["husb"]->getXref(), 2, 0, $personcount++, $currpid, $censyear);
 					$slabel .= $parentlinks;
 					$submenu = new WT_Menu($slabel);
@@ -552,7 +549,6 @@ if ($pid=="") {
 					} else {
 						$menu->addLabel("&nbsp;" . $people["wife"]->getLabel());
 					}
-					//$menu->addClass("", "", "submenu");
 					$slabel  = print_pedigree_person_nav2($people["wife"]->getXref(), 2, 0, $personcount++, $currpid, $censyear);
 					$slabel .= $parentlinks;
 					$submenu = new WT_Menu($slabel);
@@ -646,7 +642,6 @@ if ($pid=="") {
 							$marn  = $nam[1]['surname'];
 						}
 						$menu = new WT_Menu("&nbsp;" . $child->getLabel());
-						//$menu->addClass("", "", "submenu");
 						$slabel  = print_pedigree_person_nav2($child->getXref(), 2, 0, $personcount++, $currpid, $censyear);
 						$slabel .= $spouselinks;
 						$submenu = new WT_Menu($slabel);
@@ -738,7 +733,6 @@ if ($pid=="") {
 						$marn  = $nam[1]['surname'];
 					}
 					$menu = new WT_Menu("&nbsp;" . $people["husb"]->getLabel());
-					//$menu->addClass("", "", "submenu");
 					$slabel  = print_pedigree_person_nav2($people["husb"]->getXref(), 2, 0, $personcount++, $currpid, $censyear);
 					$slabel .= $parentlinks;
 					$submenu = new WT_Menu($slabel);
@@ -834,7 +828,6 @@ if ($pid=="") {
 						$marn  = $surn;
 					}
 					$menu = new WT_Menu("&nbsp;" . $people["wife"]->getLabel());
-					//$menu->addClass("", "", "submenu");
 					$slabel  = print_pedigree_person_nav2($people["wife"]->getXref(), 2, 0, $personcount++, $currpid, $censyear);
 					$slabel .= $parentlinks;
 					$submenu = new WT_Menu($slabel);
@@ -940,7 +933,6 @@ if ($pid=="") {
 							$marn  = $surn;
 						}
 						$menu = new WT_Menu("&nbsp;" . $child->getLabel());
-						//$menu->addClass("", "", "submenu");
 						$slabel = print_pedigree_person_nav2($child->getXref(), 2, 0, $personcount++, $child->getLabel(), $censyear);
 						$slabel .= $spouselinks;
 						$submenu = new WT_Menu($slabel);
@@ -1016,7 +1008,6 @@ if ($pid=="") {
 					</tr>
 					<?php
 				}
-				echo "<tr><td><font size=1><br></font></td></tr>";
 			}
 			?>
 	
@@ -1028,6 +1019,7 @@ if ($pid=="") {
 	echo '</td>';
 	echo '</tr>';
 	echo '</table>';
+	echo '</div>';// close "media-links"
 
 } // End IF test for Base pid
 

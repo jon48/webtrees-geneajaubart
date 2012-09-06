@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin.php 13966 2012-06-02 21:30:21Z greg $
+// $Id: admin.php 14231 2012-08-31 13:29:28Z greg $
 
 define('WT_SCRIPT_NAME', 'admin.php');
 
@@ -238,10 +238,9 @@ foreach ($all_gedcoms as $ged_id=>$gedcom) {
 }
 echo
 	'</div>', // id=tree_stats
-	WT_JS_START,
-	'jQuery("#tree_stats").accordion({active:',$accordion_element,', icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});',
-	WT_JS_END,
 	'</div>'; // id=trees
+
+$controller->addInlineJavascript('jQuery("#tree_stats").accordion({active:'.$accordion_element.', icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 
 echo
 	'<h2>', WT_I18N::translate('Recent changes'), '</h2>',
@@ -270,19 +269,14 @@ foreach ($all_gedcoms as $ged_id=>$gedcom) {
 	}
 echo
 	'</div>', // id=changes
-	WT_JS_START,
-	'jQuery("#changes").accordion({active:',$accordion_element,', icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});',
-	WT_JS_END,
-	'</div>'; // id=recent
-
-echo
+	'</div>', // id=recent
 	'</div>', //id = "x"
-	WT_JS_START,
-	'jQuery("#x").accordion({active:0, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }, autoHeight:false});',
-	'jQuery("#content_container").css(\'visibility\', \'visible\');',
-	WT_JS_END,
 	'</div>'; //id = content_container
 
+$controller
+	->addInlineJavascript('jQuery("#changes").accordion({active:' . $accordion_element . ', icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});')
+	->addInlineJavascript('jQuery("#x").accordion({active:0, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }, autoHeight:false});')
+	->addInlineJavascript('jQuery("#content_container").css("visibility", "visible");');
 
 // This is a list of old files and directories, from earlier versions of webtrees, that can be deleted
 // It was generated with the help of a command like this
@@ -1392,6 +1386,14 @@ function old_paths() {
 		WT_ROOT.'themes/xenea/images/statistic.png',
 		WT_ROOT.'themes/xenea/images/timeline.png',
 		WT_ROOT.'themes/xenea/images/w_22.png',
+		// Removed in 1.3.1
+		WT_ROOT.'imageflush.php',
+		WT_ROOT.'includes/functions/functions_places.php',
+		WT_ROOT.'js/html5.js',
+		WT_ROOT.'js/jquery/jquery.scrollfollow.js',
+		WT_ROOT.'modules_v3/googlemap/wt_v3_pedigree_map.js.php',
+		WT_ROOT.'modules_v3/lightbox/js/tip_balloon_RTL.js',
+		// Removed in 1.3.2
 	);
 }
 

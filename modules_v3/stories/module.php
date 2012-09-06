@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13845 2012-04-20 12:13:34Z greg $
+// $Id: module.php 14165 2012-08-12 04:02:19Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -226,10 +226,12 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				}
 				$controller
 					->pageHeader()
-					->addExternalJavaScript('js/autocomplete.js')
+					->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
 					// for the findindi link
-					->addInlineJavaScript('var pastefield;function paste_id(value){pastefield.value=value;}');
-
+					->addInlineJavascript('var pastefield;function paste_id(value){pastefield.value=value;}');
+				if (array_key_exists('ckeditor', WT_Module::getActiveModules())) {
+					ckeditor_WT_Module::enableEditor($controller);
+				}
 				// "Help for this page" link
 				echo '<div id="page_help">', help_link('add_story', $this->getName()), '</div>';
 				echo '<form name="story" method="post" action="#">';
@@ -243,20 +245,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				echo '<tr><th>';
 				echo WT_I18N::translate('Story'), help_link('add_story', $this->getName());
 				echo '</th></tr><tr><td>';
-				if (array_key_exists('ckeditor', WT_Module::getActiveModules())) {
-				// use CKeditor module
-					require_once WT_ROOT.WT_MODULES_DIR.'ckeditor/ckeditor.php';
-					$oCKeditor = new CKEditor();
-					$oCKeditor->basePath =  WT_MODULES_DIR.'ckeditor/';
-					$oCKeditor->config['width'] = 900;
-					$oCKeditor->config['height'] = 400;
-					$oCKeditor->config['AutoDetectLanguage'] = false ;
-					$oCKeditor->config['DefaultLanguage'] = 'en';
-					$oCKeditor->editor('story_body', $story_body);
-				} else {
-				//use standard textarea
-					echo '<textarea name="story_body" rows="10" cols="90" tabindex="2">', htmlspecialchars($story_body), '</textarea>';
-				}
+				echo '<textarea name="story_body" class="html-edit" rows="10" cols="90" tabindex="2">', htmlspecialchars($story_body), '</textarea>';
 				echo '</td></tr>';
 				echo '</table><table id="story_module2">';
 				echo '<tr>';
@@ -319,8 +308,8 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			$controller->setPageTitle($this->getTitle());
 			$controller->pageHeader();
 			$controller
-				->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-				->addInlineJavaScript('
+				->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+				->addInlineJavascript('
 					jQuery("#story_table").dataTable({
 						"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
 						"bAutoWidth":false,
@@ -390,8 +379,8 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 		$controller->setPageTitle($this->getTitle());
 		$controller->pageHeader();
 		$controller
-			->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-			->addInlineJavaScript('
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+			->addInlineJavascript('
 				jQuery("#story_table").dataTable({
 					"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
 					"bAutoWidth":false,
@@ -461,9 +450,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				return null;
 			}
 			//-- Stories menu item
-			$menu = new WT_Menu($this->getTitle(), 'module.php?mod='.$this->getName().'&amp;mod_action=show_list', 'menu-story', 'down');
-			$submenu = new WT_Menu($this->getTitle(), 'module.php?mod='.$this->getName().'&amp;mod_action=show_list', 'menu-story-sub');
-			$menu->addSubmenu($submenu);
+			$menu = new WT_Menu($this->getTitle(), 'module.php?mod='.$this->getName().'&amp;mod_action=show_list', 'menu-story');
 			return $menu;
 		}
 

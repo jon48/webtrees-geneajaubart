@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lifespan.php 13950 2012-05-29 06:28:25Z greg $
+// $Id: lifespan.php 14111 2012-07-18 12:25:09Z greg $
 
 define('WT_SCRIPT_NAME', 'lifespan.php');
 require './includes/session.php';
@@ -33,7 +33,8 @@ $zoomfactor=10;
 $controller=new WT_Controller_Lifespan();
 $controller
 	->pageHeader()
-	->addInlineJavaScript('
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
+	->addInlineJavascript('
 		var pastefield; function paste_id(value) { pastefield.value=value; }  // For the "find indi" link
 	
 		var timer;
@@ -249,8 +250,7 @@ $controller
 			document.onmousemove = getMouseXY;
 			document.onmouseup = releaseimage;
 			
-			')
-	->addExternalJavaScript('js/autocomplete.js');
+			');
 
 echo
 	'<h2>', WT_I18N::translate('Lifespans'), help_link('lifespan_chart'), '</h2>
@@ -336,11 +336,7 @@ echo
 		</div>
 		<!--  Floating div controls END-->
 	</div>';
-?>
-<script type="text/javascript">
-<!--
-var maxY = 80-<?php echo $maxY; ?>; // Sets the boundaries for how far the timeline can move in the up direction
-var maxX = <?php if (!isset($maxX)) $maxX = 0; echo $maxX; ?>;  // Sets the boundaries for how far the timeline can move in the left direction
-
-//-->
-</script>
+// Sets the boundaries for how far the timeline can move in the up direction
+$controller->addInlineJavascript('var maxY = 80-' . $maxY . ';');
+// Sets the boundaries for how far the timeline can move in the left direction
+$controller->addInlineJavascript('var maxX = ' . (isset($maxX)?$maxX:0) . ';');

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print_facts.php 13952 2012-05-29 20:10:19Z greg $
+// $Id: functions_print_facts.php 14169 2012-08-12 17:50:01Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -114,7 +114,7 @@ function print_fact(WT_Event $fact, WT_GedcomRecord $record) {
 	if ($fact->getLineNumber()==-1) $styleadd='histo'; // historical facts
 
 	if ($styleadd=='') {
-		$rowID = 'row_'.floor(microtime()*1000000);
+		$rowID = 'row_'.(int)(microtime()*1000000);
 	} else {
 		$rowID = 'row_'.$styleadd;
 	}
@@ -171,7 +171,7 @@ function print_fact(WT_Event $fact, WT_GedcomRecord $record) {
 			'<div class="editfacts">',
 			'<div class="editlink"><a class="editicon" onclick="return edit_record(\'', $pid, '\', ', $fact->getLineNumber(), ');" href="#" title="', WT_I18N::translate('Edit'), '"><span class="link_text">', WT_I18N::translate('Edit'), '</span></a></div>',
 			'<div class="copylink"><a class="copyicon" href="#" onclick="jQuery.post(\'action.php\',{action:\'copy-fact\', type:\''.$fact->getParentObject()->getType().'\',factgedcom:\''.rawurlencode($fact->getGedcomRecord()).'\'},function(){location.reload();})" title="', WT_I18N::translate('Copy'), '"><span class="link_text">', WT_I18N::translate('Copy'), '</span></a></div>',
-			'<div class="deletelink"><a class="deleteicon" onclick="return delete_record(\'', $pid, '\', ', $fact->getLineNumber(), ');" href="#" title="', WT_I18N::translate('Delete'), '"><span class="link_text">', WT_I18N::translate('Delete'), '</span></a></div>',
+			'<div class="deletelink"><a class="deleteicon" onclick="return delete_fact(\'', $pid, '\', ', $fact->getLineNumber(), ', \'\', \' ', WT_I18N::translate('Are you sure you want to delete this fact?'), '\');" href="#" title="', WT_I18N::translate('Delete'), '"><span class="link_text">', WT_I18N::translate('Delete'), '</span></a></div>',
 			'</div>';
 	} else {
 		echo $label;
@@ -488,7 +488,7 @@ function print_fact_sources($factrec, $level, $return=false) {
 				$lt = preg_match_all("/$nlevel \w+/", $srec, $matches);
 				$data .= '<div class="fact_SOUR">';
 				$data .= '<span class="label">';
-				$elementID = $sid."-".floor(microtime()*1000000);
+				$elementID = $sid."-".(int)(microtime()*1000000);
 				if ($EXPAND_SOURCES) {
 					$plusminus='icon-minus';
 				} else {
@@ -563,9 +563,8 @@ function print_media_links($factrec, $level, $pid='') {
 				$imgsize = findImageSize($mainMedia);
 				$imgwidth = $imgsize[0]+40;
 				$imgheight = $imgsize[1]+150;
-				if ($objectNum > 0) echo '<br clear="all">';
-				echo '<div id="media-display">
-					<div id="media-display-image">';;
+				if ($objectNum > 0) echo '<br class="media-separator" style="clear:both;">';
+				echo '<div id="media-display"><div id="media-display-image">';
 				if ($isExternal || media_exists($thumbnail)) {
 	
 					//LBox --------  change for Lightbox Album --------------------------------------------
@@ -819,7 +818,7 @@ function print_main_sources(WT_Event $fact, $level, $pid, $noedit=false) {
 					echo '<div class="editfacts">';
 					echo "<div class=\"editlink\"><a class=\"editicon\" onclick=\"return edit_record('$pid', $linenum);\" href=\"#\" title=\"".WT_I18N::translate('Edit')."\"><span class=\"link_text\">".WT_I18N::translate('Edit')."</span></a></div>";
 					echo '<div class="copylink"><a class="copyicon" href="#" onclick="jQuery.post(\'action.php\',{action:\'copy-fact\', type:\'\', factgedcom:\''.rawurlencode($factrec).'\'},function(){location.reload();})" title="'.WT_I18N::translate('Copy').'"><span class="link_text">'.WT_I18N::translate('Copy').'</span></a></div>';
-					echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_record('$pid', $linenum);\" href=\"#\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
+					echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_fact('$pid', $linenum, '', '".WT_I18N::translate('Are you sure you want to delete this fact?')."');\" href=\"#\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
 				echo '</div>';
 			} else {
 				echo WT_Gedcom_Tag::getLabel($factname, $parent);
@@ -1031,7 +1030,7 @@ function print_main_notes(WT_Event $fact, $level, $pid, $noedit=false) {
 				echo '<div class="editfacts">';
 				echo "<div class=\"editlink\"><a class=\"editicon\" onclick=\"return edit_record('$pid', $linenum);\" href=\"#\" title=\"".WT_I18N::translate('Edit')."\"><span class=\"link_text\">".WT_I18N::translate('Edit')."</span></a></div>";
 					echo '<div class="copylink"><a class="copyicon" href="#" onclick="jQuery.post(\'action.php\',{action:\'copy-fact\', type:\'\', factgedcom:\''.rawurlencode($factrec).'\'},function(){location.reload();})" title="'.WT_I18N::translate('Copy').'"><span class="link_text">'.WT_I18N::translate('Copy').'</span></a></div>';
-				echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_record('$pid', $linenum);\" href=\"#\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
+				echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_fact('$pid', $linenum, '', '".WT_I18N::translate('Are you sure you want to delete this fact?')."');\" href=\"#\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
 				echo '</div>';
 			}
 		} else {
@@ -1324,7 +1323,7 @@ function print_main_media_row($rtype, $rowm, $pid) {
 		echo '<div class="editfacts">';
 		echo "<div class=\"editlink\"><a class=\"editicon\" onclick=\"return window.open('addmedia.php?action=editmedia&amp;pid=".$mediaobject->getXref()."&amp;linktoid={$rowm['mm_gid']}', '_blank', edit_window_specs);\" href=\"#\" title=\"".WT_I18N::translate('Edit')."\"><span class=\"link_text\">".WT_I18N::translate('Edit')."</span></a></div>";
 		echo '<div class="copylink"><a class="copyicon" href="#" onclick="jQuery.post(\'action.php\',{action:\'copy-fact\', type:\'\', factgedcom:\'1 OBJE @'.$mediaobject->getXref().'@\'},function(){location.reload();})" title="'.WT_I18N::translate('Copy').'"><span class="link_text">'.WT_I18N::translate('Copy').'</span></a></div>';
-		echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_record('$pid', 'OBJE', '".$mediaobject->getXref()."');\" href=\"#\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
+		echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_fact('$pid', 'OBJE', '".$mediaobject->getXref()."', '".WT_I18N::translate('Are you sure you want to delete this fact?')."');\" href=\"#\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
 		echo '</div>';
 		echo '</td>';
 	}

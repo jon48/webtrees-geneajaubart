@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_merge.php 13728 2012-03-31 21:13:20Z greg $
+// $Id: admin_site_merge.php 14111 2012-07-18 12:25:09Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_merge.php');
 require './includes/session.php';
@@ -48,7 +48,7 @@ if (empty($keep1)) $keep1=array();
 if (empty($keep2)) $keep2=array();
 
 if (get_gedcom_count()==1) { //Removed becasue it doesn't work here for multiple GEDCOMs. Can be reinstated when fixed (https://bugs.launchpad.net/webtrees/+bug/613235)
-	$controller->addExternalJavaScript('js/autocomplete.js');
+	$controller->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 }
 
 if ($action!='choose') {
@@ -239,8 +239,7 @@ if ($action!='choose') {
 }
 if ($action=='choose') {
 	?>
-	<script type="text/javascript">
-	<!--
+	<script>
 	var pasteto;
 	function iopen_find(textbox, gedselect) {
 		pasteto = textbox;
@@ -260,7 +259,6 @@ if ($action=='choose') {
 	function paste_id(value) {
 		pasteto.value=value;
 	}
-	//-->
 	</script>
 	<?php
 	echo 

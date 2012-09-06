@@ -2,7 +2,7 @@
 // Popup window for viewing images
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: imageview.php 13034 2011-12-12 13:10:58Z greg $
+// $Id: imageview.php 13999 2012-06-16 21:57:04Z greg $
 
 define('WT_SCRIPT_NAME', 'imageview.php');
 require './includes/session.php';
@@ -41,8 +41,7 @@ if (!$controller->record->canDisplayDetails()) {
 	exit;
 }
 ?>
-<script type="text/javascript">
-<!--
+<script>
 	var zoom = 100;
 	function zoomin() {
 		i = document.getElementById('theimage');
@@ -174,7 +173,6 @@ if (!$controller->record->canDisplayDetails()) {
 
 	window.onresize = resizeViewport;
 	//window.onload = resizeWindow;
--->
 </script>
 <?php
 
@@ -190,7 +188,7 @@ if (!$controller->record->isExternal() && !$controller->record->fileExists() ) {
 	$imgsize = $controller->record->getImageAttributes('main',2,2);
 	$imgwidth = $imgsize['adjW'];
 	$imgheight = $imgsize['adjH'];
-	echo "<script language=\"JavaScript\" type=\"text/javascript\">";
+	echo '<script>';
 	echo "var imgwidth = $imgwidth-5; var imgheight = $imgheight-5;";
 	echo "var landscape = false;";
 	echo "if (imgwidth > imgheight) landscape = true;";

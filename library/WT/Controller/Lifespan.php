@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Lifespan.php 13950 2012-05-29 06:28:25Z greg $
+// $Id: Lifespan.php 14214 2012-08-26 17:32:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -70,7 +70,7 @@ class WT_Controller_Lifespan extends WT_Controller_Base {
 	private $nonfacts=array('FAMS', 'FAMC', 'MAY', 'BLOB', 'OBJE', 'SEX', 'NAME', 'SOUR', 'NOTE', 'BAPL', 'ENDL', 'SLGC', 'SLGS', '_TODO', '_WT_OBJE_SORT', 'CHAN', 'HUSB', 'WIFE', 'CHIL', 'BIRT', 'DEAT', 'BURI');
 
 	function __construct() {
-		global $GEDCOM_ID_PREFIX;
+		global $WT_SESSION;
 
 		parent::__construct();
 		$this->setPageTitle(WT_I18N::translate('Lifespans'));
@@ -102,12 +102,16 @@ class WT_Controller_Lifespan extends WT_Controller_Base {
 			$this->pids=$pids;
 		} elseif ($place) {
 			// All records found in a place
-			$this->pids=get_place_positions($place);
+			$wt_place=new WT_Place($place, WT_GED_ID);
+			$this->pids=
+				WT_DB::prepare("SELECT DISTINCT pl_gid FROM `##placelinks` WHERE pl_p_id=? AND pl_file=?")
+				->execute(array($wt_place->getPlaceId(), WT_GED_ID))
+				->fetchOneColumn();
 			$this->place=$place;
 		} else {
 			// Modify an existing list of records
-			if (isset($_SESSION['timeline_pids'])) {
-				$this->pids = $_SESSION['timeline_pids'];
+			if (is_array($WT_SESSION->timeline_pids)) {
+				$this->pids = $WT_SESSION->timeline_pids;
 			} else {
 				$this->pids=array();
 			}
@@ -124,7 +128,7 @@ class WT_Controller_Lifespan extends WT_Controller_Base {
 				$this->addFamily($this->getSignificantIndividual(), false);
 			}
 		}
-		$_SESSION['timeline_pids']=$this->pids;
+		$WT_SESSION->timeline_pids=$this->pids;
 
 		$this->beginYear=$beginYear;
 		$this->endYear=$endYear;
@@ -135,7 +139,7 @@ class WT_Controller_Lifespan extends WT_Controller_Base {
 				if ($value != $remove) {
 					$this->pids[$key] = $value;
 					$person = WT_Person::getInstance($value);
-					// get_place_positions() returns families as well as individuals.
+					// list of linked records includes families as well as individuals.
 					if ($person && $person->getType()=='INDI') {
 						$bdate = $person->getEstimatedBirthDate();
 						$ddate = $person->getEstimatedDeathDate();
@@ -170,7 +174,7 @@ class WT_Controller_Lifespan extends WT_Controller_Base {
 					}
 				}
 			}
-			unset($_SESSION['timeline_pids']);
+			$WT_SESSION->timeline_pids=null;
 		}
 
 		//--Sort the arrar in order of being year

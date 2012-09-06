@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions.php 13968 2012-06-03 22:21:21Z greg $
+// $Id: functions.php 14230 2012-08-31 11:50:13Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -256,7 +256,6 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $SHOW_AGE_DIFF;                $SHOW_AGE_DIFF                =get_gedcom_setting($ged_id, 'SHOW_AGE_DIFF');
 	global $SHOW_COUNTER;                 $SHOW_COUNTER                 =get_gedcom_setting($ged_id, 'SHOW_COUNTER');
 	global $SHOW_DEAD_PEOPLE;             $SHOW_DEAD_PEOPLE             =get_gedcom_setting($ged_id, 'SHOW_DEAD_PEOPLE');
-	global $SHOW_EMPTY_BOXES;             $SHOW_EMPTY_BOXES             =get_gedcom_setting($ged_id, 'SHOW_EMPTY_BOXES');
 	global $SHOW_FACT_ICONS;              $SHOW_FACT_ICONS              =get_gedcom_setting($ged_id, 'SHOW_FACT_ICONS');
 	global $SHOW_GEDCOM_RECORD;           $SHOW_GEDCOM_RECORD           =get_gedcom_setting($ged_id, 'SHOW_GEDCOM_RECORD');
 	global $SHOW_HIGHLIGHT_IMAGES;        $SHOW_HIGHLIGHT_IMAGES        =get_gedcom_setting($ged_id, 'SHOW_HIGHLIGHT_IMAGES');
@@ -436,86 +435,6 @@ function get_sub_record($level, $tag, $gedrec, $num=1) {
 	}
 	$subrec = substr($gedrec, $pos1, $pos2-$pos1);
 	return ltrim($subrec);
-}
-
-/**
- * find all of the level 1 subrecords of the given record
- * @param string $gedrec the gedcom record to get the subrecords from
- * @param string $ignore a list of tags to ignore
- * @param boolean $families whether to include any records from the family
- * @param boolean $sort whether or not to sort the record by date
- * @param boolean $ApplyPriv whether to apply privacy right now or later
- * @return array an array of the raw subrecords to return
- */
-function get_all_subrecords($gedrec, $ignore="", $families=true, $ApplyPriv=true) {
-	global $GEDCOM;
-	$ged_id=get_id_from_gedcom($GEDCOM);
-
-	$repeats = array();
-
-	$id = "";
-	$gt = preg_match('/0 @('.WT_REGEX_XREF.')@/', $gedrec, $gmatch);
-	if ($gt > 0) {
-		$id = $gmatch[1];
-	}
-
-	$hasResn = strstr($gedrec, " RESN ");
-	$prev_tags = array();
-	$ct = preg_match_all('/\n1 ('.WT_REGEX_TAG.')(.*)/', $gedrec, $match, PREG_SET_ORDER|PREG_OFFSET_CAPTURE);
-	for ($i=0; $i<$ct; $i++) {
-		$fact = trim($match[$i][1][0]);
-		$pos1 = $match[$i][0][1];
-		if ($i<$ct-1) {
-			$pos2 = $match[$i+1][0][1];
-		} else {
-			$pos2 = strlen($gedrec);
-		}
-		if (empty($ignore) || strpos($ignore, $fact)===false) {
-			$subrec = substr($gedrec, $pos1, $pos2-$pos1);
-			if (!$ApplyPriv || canDisplayFact($id, $ged_id, $subrec)) {
-				if (isset($prev_tags[$fact])) {
-					$prev_tags[$fact]++;
-				} else {
-					$prev_tags[$fact] = 1;
-				}
-				$repeats[] = trim($subrec)."\n";
-			}
-		}
-	}
-
-	//-- look for any records in FAMS records
-	if ($families) {
-		$ft = preg_match_all('/\n1 FAMS @('.WT_REGEX_XREF.')@/', $gedrec, $fmatch, PREG_SET_ORDER);
-		for ($f=0; $f<$ft; $f++) {
-			$famid = $fmatch[$f][1];
-			$famrec = find_family_record($fmatch[$f][1], $ged_id);
-			$parents = find_parents_in_record($famrec);
-			if ($id==$parents["HUSB"]) {
-				$spid = $parents["WIFE"];
-			} else {
-				$spid = $parents["HUSB"];
-			}
-			$prev_tags = array();
-			$ct = preg_match_all('/\n1 ('.WT_REGEX_TAG.')(.*)/', $famrec, $match, PREG_SET_ORDER);
-			for ($i=0; $i<$ct; $i++) {
-				$fact = trim($match[$i][1]);
-				if (empty($ignore) || strpos($ignore, $fact)===false) {
-					$subrec = get_sub_record(1, "1 $fact", $famrec, $prev_tags[$fact]);
-					$subrec .= "\n2 _WTS @$spid@\n2 _WTFS @$famid@\n";
-					if (!$ApplyPriv || canDisplayFact($id, $ged_id, $subrec)) {
-						if (isset($prev_tags[$fact])) {
-							$prev_tags[$fact]++;
-						} else {
-							$prev_tags[$fact] = 1;
-						}
-						$repeats[] = trim($subrec)."\n";
-					}
-				}
-			}
-		}
-	}
-
-	return $repeats;
 }
 
 /**
@@ -970,12 +889,7 @@ function extract_filename($fullpath) {
 function factsort($a, $b) {
 	return utf8_strcasecmp(WT_I18N::translate($a), WT_I18N::translate($b));
 }
-/**
- * Function to sort place names array
- */
-function placesort($a, $b) {
-	return utf8_strcasecmp($a['place'], $b['place']);
-}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Sort a list events for the today/upcoming blocks
 ////////////////////////////////////////////////////////////////////////////////

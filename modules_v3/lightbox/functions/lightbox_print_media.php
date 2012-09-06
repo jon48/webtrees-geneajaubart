@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lightbox_print_media.php 13884 2012-05-01 12:49:24Z lukasz $
+// $Id: lightbox_print_media.php 14096 2012-07-09 21:07:34Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -477,10 +477,8 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 		// Prepare Below Thumbnail  menu ----------------------------------------------------
 		if ($TEXT_DIRECTION== 'rtl') {
 			$submenu_class = 'submenuitem_rtl';
-			$submenu_hoverclass = 'submenuitem_hover_rtl';
 		} else {
 			$submenu_class = 'submenuitem';
-			$submenu_hoverclass = 'submenuitem_hover';
 		}
 		$menu = new WT_Menu();
 		// Truncate media title to 13 chars (45 chars if Streetview) and add ellipsis
@@ -509,7 +507,7 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 			// Do not print menu if item has changed and this is the old item
 		} else {
 			// Continue printing menu
-			$menu->addClass('', '', 'submenu');
+			$menu->addClass('', 'submenu');
 
 			// View Notes
 			if (strpos($rowm['m_gedrec'], "\n1 NOTE")) {
@@ -526,56 +524,57 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 				$sonclick .= ");";
 				$sonclick .= "return false;";
 				$submenu->addOnclick($sonclick);
-				$submenu->addClass($submenu_class, $submenu_hoverclass);
+				$submenu->addClass($submenu_class);
 				$menu->addSubMenu($submenu);
 			}
 			//View Details
 			$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('View Details') . "&nbsp;&nbsp;", WT_SERVER_NAME.WT_SCRIPT_PATH . "mediaviewer.php?mid=".$rowm['m_media'].'&amp;ged='.WT_GEDURL, 'right');
-			$submenu->addClass($submenu_class, $submenu_hoverclass);
+			$submenu->addClass($submenu_class);
 			$menu->addSubMenu($submenu);
 			//View Source
 			if ($sour && $sour->canDisplayDetails()) {
-				$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('View Source') . "&nbsp;&nbsp;", $sour->getHtmlUrl(), "right");
-				$submenu->addClass($submenu_class, $submenu_hoverclass);
+				$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('View Source') . "&nbsp;&nbsp;", $sour->getHtmlUrl());
+				$submenu->addClass($submenu_class);
 				$menu->addSubMenu($submenu);
 			}
 			if (WT_USER_CAN_EDIT) {
 				// Edit Media
-				$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Edit media') . "&nbsp;&nbsp;", "#", "right");
+				$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Edit media') . "&nbsp;&nbsp;");
 				$submenu->addOnclick("return window.open('addmedia.php?action=editmedia&amp;pid={$rowm['m_media']}&amp;linktoid={$rowm['mm_gid']}', '_blank', edit_window_specs);");
-				$submenu->addClass($submenu_class, $submenu_hoverclass);
+				$submenu->addClass($submenu_class);
 				$menu->addSubMenu($submenu);
 				if (WT_USER_IS_ADMIN) {
 					// Manage Links
 					if (array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
-						$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Manage links') . "&nbsp;&nbsp;", "#", "right");
+						$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Manage links') . "&nbsp;&nbsp;");
 						$submenu->addOnclick("return window.open('inverselink.php?mediaid={$rowm['m_media']}&amp;linkto=manage', '_blank', find_window_specs);");
-						$submenu->addClass($submenu_class, $submenu_hoverclass);
+						$submenu->addClass($submenu_class);
 						$menu->addSubMenu($submenu);
 					} else {
-						$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Set link') . "&nbsp;&nbsp;", "#", "right", "right");
+						$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Set link') . "&nbsp;&nbsp;", '#', null, 'right', 'right');
+						$submenu->addClass('submenuitem', 'submenu');
 
 						$ssubmenu = new WT_Menu(WT_I18N::translate('To Person'));
 						$ssubmenu->addOnclick("return window.open('inverselink.php?mediaid={$rowm['m_media']}&amp;linkto=person', '_blank', find_window_specs);");
-						$ssubmenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+						$ssubmenu->addClass('submenuitem', 'submenu');
 						$submenu->addSubMenu($ssubmenu);
 
 						$ssubmenu = new WT_Menu(WT_I18N::translate('To Family'));
 						$ssubmenu->addOnclick("return window.open('inverselink.php?mediaid={$rowm['m_media']}&amp;linkto=family', '_blank', find_window_specs);");
-						$ssubmenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+						$ssubmenu->addClass('submenuitem', 'submenu');
 						$submenu->addSubMenu($ssubmenu);
 
 						$ssubmenu = new WT_Menu(WT_I18N::translate('To Source'));
 						$ssubmenu->addOnclick("return window.open('inverselink.php?mediaid={$rowm['m_media']}&amp;linkto=source', '_blank', find_window_specs);");
-						$ssubmenu->addClass('submenuitem', 'submenuitem_hover', 'submenu');
+						$ssubmenu->addClass('submenuitem', 'submenu');
 						$submenu->addSubMenu($ssubmenu);
 
 						$menu->addSubMenu($submenu);
 					}
 					// Unlink Media
-					$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Unlink Media') . "&nbsp;&nbsp;", "#", "right");
-					$submenu->addOnclick("return delete_record('$pid', 'OBJE', '".$rowm['m_media']."');");
-					$submenu->addClass($submenu_class, $submenu_hoverclass);
+					$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Unlink Media') . "&nbsp;&nbsp;");
+					$submenu->addOnclick("return delete_fact('$pid', 'OBJE', '".$rowm['m_media']."', '".WT_I18N::translate('Are you sure you want to delete this fact?')."');");
+					$submenu->addClass($submenu_class);
 					$menu->addSubMenu($submenu);
 				}
 			}

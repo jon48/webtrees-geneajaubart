@@ -21,17 +21,26 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: fanchart.php 13728 2012-03-31 21:13:20Z greg $
+// $Id: fanchart.php 14198 2012-08-25 15:00:37Z greg $
 
 define('WT_SCRIPT_NAME', 'fanchart.php');
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
 $controller=new WT_Controller_Fanchart();
+
+if (safe_GET_bool('img')) {
+	$img=$controller->generate_fan_chart('png');
+	header('Content-type: image/png');
+	header('Content-length: '.strlen($img));
+	echo $img;
+	exit;
+}
+
 $controller
 	->pageHeader()
-	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
-	->addExternalJavaScript('js/autocomplete.js');
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
+	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }'); // For the 'find indi' link
 
 ?>
 <table class="list_table">
@@ -87,4 +96,6 @@ if ($controller->error_message) {
 	exit;
 }
 
-echo $controller->chart_html;
+if ($controller->root) {
+	echo $controller->generate_fan_chart('html');
+}

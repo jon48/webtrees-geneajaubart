@@ -1,5 +1,5 @@
 <?PHP
-// Special Character tables, for use by JavaScript to input characters
+// Special Character tables, for use by Javascript to input characters
 // that aren't on your keyboard
 //
 // THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost)
@@ -39,7 +39,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: specialchars.php 13921 2012-05-06 08:03:39Z lukasz $
+// $Id: specialchars.php 13999 2012-06-16 21:57:04Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: familybook.php 13867 2012-04-26 16:30:59Z lukasz $
+// $Id: familybook.php 14111 2012-07-18 12:25:09Z greg $
 
 define('WT_SCRIPT_NAME', 'familybook.php');
 require './includes/session.php';
@@ -29,8 +29,9 @@ require './includes/session.php';
 $controller=new WT_Controller_Familybook();
 $controller
 	->pageHeader()
-	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the "find indi" link
-	->addExternalJavaScript('js/autocomplete.js');
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
+	->setupJavascript()
+	->addInlineJavascript('sizeLines();');
 
 if (WT_USE_LIGHTBOX) {
 	$album = new lightbox_WT_Module();
@@ -41,7 +42,7 @@ if (WT_USE_LIGHTBOX) {
 
 <table>
 	<tr>
-		<td valign="top">
+		<td class="tdtop">
 			<h2><?php echo $controller->getPageTitle(); ?></h2>
 		</td>
 		<td width="50px">&nbsp;</td>

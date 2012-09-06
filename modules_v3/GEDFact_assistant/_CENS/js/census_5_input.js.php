@@ -4,7 +4,7 @@
 // Census information about an individual
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_5_input.js.php 13946 2012-05-27 00:32:22Z nigel $
+// $Id: census_5_input.js.php 14222 2012-08-27 22:43:52Z nigel $
 
 // modified from tabledeleterow.js version 1.2 2006-02-21
 // mredkj.com
@@ -31,7 +31,7 @@
 // CONFIG notes. Below are some comments that point to where this script can be customized.
 // Note: Make sure to include a <tbody></tbody> in your table's HTML
 
-echo '<script src="', WT_STATIC_URL, WT_MODULES_DIR, 'GEDFact_assistant/_CENS/js/chapman_codes.js" type="text/javascript"></script>';
+echo '<script src="', WT_STATIC_URL, WT_MODULES_DIR, 'GEDFact_assistant/_CENS/js/chapman_codes.js"></script>';
 ?>
 <script>
 
@@ -404,7 +404,23 @@ function preview() {
 				}
 			}
 
-		} else {
+		} else if (NoteCtry.value=="FR") {
+			// FR  ==========Modele FR  AD 2012=====
+			// Faire figurer les champs qui ne doivent pas apparaitre dans la zone texte
+			if (NoteYear.value !="1930") {
+				for (var j=2; j<tr.cells.length-3; j++) { // == j=2 means miss out cols 0 and 1 (# and pid), cells.length-3 means miss out del, ins and item #
+					if ( j==5 || j==6 || j==8  || j==10 || j==11 || (j>=12 &&  j<16) || (j>=17 &&  j<21) || (j>=22 &&  j<=29) || (j>=30 &&  j<33)|| (j>=34 &&  j<46) || (j>=47 &&  j<49)|| (j>=50 && j<=73) ) {
+							continue;
+					} else {
+						if (i==0) {
+							strRow += (strRow==''?'':'|') + tr.cells[j].childNodes[0].id;
+						} else {
+						
+							strRow += (strRow==''?'':'|') + tr.cells[j].childNodes[0].value;
+						}
+					}
+				}
+			}
 			// Other country stuff
 		}
 
@@ -662,11 +678,11 @@ function addRowToTable(num, pid, nam, mnam, label, gend, cond, dom, dob, age2, d
 		}
 
 		// Calculate birth places -----------------------------------------
-		 birthpl =  birthpl.split(', ');
+		 birthpl =  birthpl.split(", ");
 		ibirthpl =  birthpl.reverse();
-		fbirthpl = fbirthpl.split(', ');
+		fbirthpl = fbirthpl.split(", ");
 		fbirthpl = fbirthpl.reverse();
-		mbirthpl = mbirthpl.split(', ');
+		mbirthpl = mbirthpl.split(", ");
 		mbirthpl = mbirthpl.reverse();
 
 		// get Chapman Code for US ----------------------------------------

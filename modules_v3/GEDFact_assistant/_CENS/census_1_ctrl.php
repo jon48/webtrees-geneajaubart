@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_1_ctrl.php 13523 2012-02-29 18:20:49Z greg $
+// $Id: census_1_ctrl.php 13999 2012-06-16 21:57:04Z greg $
 
  if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -55,13 +55,13 @@ $wholename = $fulln;
 
 $currpid=$pid;
 
-echo '<script src="', WT_STATIC_URL, WT_MODULES_DIR, 'GEDFact_assistant/_CENS/js/dynamicoptionlist.js" type="text/javascript"></script>';
-echo '<script src="', WT_STATIC_URL, WT_MODULES_DIR, 'GEDFact_assistant/_CENS/js/date.js" type="text/javascript"></script>';
+echo '<script src="', WT_STATIC_URL, WT_MODULES_DIR, 'GEDFact_assistant/_CENS/js/dynamicoptionlist.js"></script>';
+echo '<script src="', WT_STATIC_URL, WT_MODULES_DIR, 'GEDFact_assistant/_CENS/js/date.js"></script>';
 
-echo WT_JS_START;
-echo "var TheCenYear = opener.document.getElementById('setyear').value;";
-echo "var TheCenCtry = opener.document.getElementById('setctry').value;";
-echo WT_JS_END;
+echo '<script>';
+echo 'var TheCenYear = opener.document.getElementById("setyear").value;';
+echo 'var TheCenCtry = opener.document.getElementById("setctry").value;';
+echo '</script>';
 
 // Header of assistant window =====================================================
 echo '<div class="cens_header">';
@@ -108,6 +108,4 @@ echo '</div>';
 	echo '</div>';
 	?>
 </div>
-<script type="text/javascript">
- window.onLoad = initDynamicOptionLists();
-</script>
+<script>window.onLoad = initDynamicOptionLists();</script>

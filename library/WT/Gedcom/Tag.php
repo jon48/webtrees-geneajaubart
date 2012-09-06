@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Tag.php 13915 2012-05-05 16:45:02Z greg $
+// $Id: Tag.php 14143 2012-08-07 20:14:39Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -895,12 +895,12 @@ class WT_Gedcom_Tag {
 	}
 
 	// Translate a label/value pair, such as "Occupation: Farmer"
-	public static function getLabelValue($tag, $value, $record=null) {
-		return
-			'<div class="fact_'.preg_replace('/[^_A-Za-z0-9]/', '', $tag).'">'.
+	public static function getLabelValue($tag, $value, $record=null, $element='div') {
+			return
+			'<'.$element.' class="fact_'.preg_replace('/[^_A-Za-z0-9]/', '', $tag).'">'.
 			/* I18N: a label/value pair, such as "Occupation: Farmer".  Some languages may need to change the punctuation. */
 			WT_I18N::translate('<span class="label">%1$s:</span> <span class="field" dir="auto">%2$s</span>', self::getLabel($tag, $record), $value).
-			'</div>';
+			'</'.$element.'>';
 	}
 
 	// Get a list of facts, for use in the "fact picker" edit control

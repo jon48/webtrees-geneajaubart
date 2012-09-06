@@ -20,7 +20,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: theme.php 13705 2012-03-28 09:07:45Z greg $
+// $Id: theme.php 14029 2012-06-24 04:07:56Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -87,6 +87,11 @@ $basexoffset=10; // position the entire pedigree tree relative to the left of th
 $bxspacing=0;    // horizontal spacing between boxes on the pedigree chart
 $byspacing=5;    // vertical spacing between boxes on the pedigree chart
 $brborder=1;     // box right border thickness
+$linewidth=1.5;			// width of joining lines
+$shadowcolor="";		// shadow color for joining lines
+$shadowblur=0;			// shadow blur for joining lines
+$shadowoffsetX=0;		// shadowOffsetX for joining lines
+$shadowoffsetY=0;		// shadowOffsetY for joining lines
 
 // -- descendancy - relationship chart variables
 $Dbaseyoffset=20; // -- position the entire descendancy tree relative to the top of the page

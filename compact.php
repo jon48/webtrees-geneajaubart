@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: compact.php 13891 2012-05-02 10:33:34Z lukasz $
+// $Id: compact.php 14111 2012-07-18 12:25:09Z greg $
 
 define('WT_SCRIPT_NAME', 'compact.php');
 require './includes/session.php';
@@ -29,8 +29,8 @@ require './includes/session.php';
 $controller=new WT_Controller_Compact();
 $controller
 	->pageHeader()
-	->addInlineJavaScript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the "find indi" link
-	->addExternalJavaScript('js/autocomplete.js');
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
+	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }'); // For the "find indi" link
 
 if (WT_USE_LIGHTBOX) {
 	$album = new lightbox_WT_Module();

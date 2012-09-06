@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: db_schema_1_2.php 13575 2012-03-09 08:26:31Z greg $
+// $Id: db_schema_1_2.php 14093 2012-07-09 08:05:28Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -41,7 +41,7 @@ try {
 		" CHANGE fv_type  favorite_type ENUM('INDI', 'FAM', 'SOUR', 'REPO', 'OBJE', 'NOTE', 'URL') NOT NULL,".
 		" CHANGE fv_url   url           VARCHAR(255) NULL,".
 		" CHANGE fv_title title         VARCHAR(255) NULL,".
-		" CHANGE fv_note  note          VARCHAR(255) NULL,".
+		" CHANGE fv_note  note          VARCHAR(1000) NULL,".
 		" ADD user_id   INTEGER     NULL AFTER favorite_id,".
 		" ADD gedcom_id INTEGER NOT NULL AFTER user_id,".
 		" DROP KEY ix1,".

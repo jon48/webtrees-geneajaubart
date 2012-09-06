@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_date.php 13841 2012-04-19 11:59:15Z greg $
+// $Id: functions_date.php 14206 2012-08-26 06:28:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -138,11 +138,8 @@ function timestamp_to_gedcom_date($time) {
 // Get the current timestamp of the client, not the server
 ////////////////////////////////////////////////////////////////////////////////
 function client_time() {
-	if (isset($_SESSION["timediff"])) {
-		return time()-$_SESSION["timediff"];
-	} else {
-		return time();
-	}
+	global $WT_SESSION;
+	return time()-$WT_SESSION->timediff;
 }
 
 ?>

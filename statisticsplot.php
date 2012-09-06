@@ -24,14 +24,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: statisticsplot.php 13905 2012-05-05 07:11:12Z lukasz $
+// $Id: statisticsplot.php 14055 2012-06-30 10:39:20Z greg $
 
 define('WT_SCRIPT_NAME', 'statisticsplot.php');
 require './includes/session.php';
 
 $controller=new WT_Controller_Ajax();
 $controller->setPageTitle(WT_I18N::translate('Statistics plot'));
-$controller->pageHeader();
+// TODO: why does this line break the modal dialog boxes?
+//$controller->pageHeader();
 
 $stats = new WT_Stats($GEDCOM);
 
@@ -264,7 +265,7 @@ function agbi() {
 		$num = $stats->_statsAge(false, 'BIRT');
 		foreach ($num as $values) {
 			foreach ($values as $age_value) {
-				fill_ydata(0, floor($age_value/365.25), 1);
+				fill_ydata(0, (int)($age_value/365.25), 1);
 				$n1++;
 			}
 		}
@@ -272,14 +273,14 @@ function agbi() {
 		$num = $stats->_statsAge(false, 'BIRT', 'M');
 		foreach ($num as $values) {
 			foreach ($values as $age_value) {
-				fill_ydata(0, floor($age_value/365.25), 1);
+				fill_ydata(0, (int)($age_value/365.25), 1);
 				$n1++;
 			}
 		}
 		$num = $stats->_statsAge(false, 'BIRT', 'F');
 		foreach ($num as $values) {
 			foreach ($values as $age_value) {
-				fill_ydata(1, floor($age_value/365.25), 1);
+				fill_ydata(1, (int)($age_value/365.25), 1);
 				$n1++;
 			}
 		}
@@ -289,7 +290,7 @@ function agbi() {
 			$num = $stats->_statsAge(false, 'BIRT', 'BOTH', $zstart, $boundary);
 			foreach ($num as $values) {
 				foreach ($values as $age_value) {
-					fill_ydata($boundary, floor($age_value/365.25), 1);
+					fill_ydata($boundary, (int)($age_value/365.25), 1);
 					$n1++;
 				}
 			}
@@ -306,7 +307,7 @@ function agde() {
 		$num = $stats->_statsAge(false, 'DEAT');
 		foreach ($num as $values) {
 			foreach ($values as $age_value) {
-				fill_ydata(0, floor($age_value/365.25), 1);
+				fill_ydata(0, (int)($age_value/365.25), 1);
 				$n1++;
 			}
 		}
@@ -314,14 +315,14 @@ function agde() {
 		$num = $stats->_statsAge(false, 'DEAT', 'M');
 		foreach ($num as $values) {
 			foreach ($values as $age_value) {
-				fill_ydata(0, floor($age_value/365.25), 1);
+				fill_ydata(0, (int)($age_value/365.25), 1);
 				$n1++;
 			}
 		}
 		$num = $stats->_statsAge(false, 'DEAT', 'F');
 		foreach ($num as $values) {
 			foreach ($values as $age_value) {
-				fill_ydata(1, floor($age_value/365.25), 1);
+				fill_ydata(1, (int)($age_value/365.25), 1);
 				$n1++;
 			}
 		}
@@ -331,7 +332,7 @@ function agde() {
 			$num = $stats->_statsAge(false, 'DEAT', 'BOTH', $zstart, $boundary);
 			foreach ($num as $values) {
 				foreach ($values as $age_value) {
-					fill_ydata($boundary, floor($age_value/365.25), 1);
+					fill_ydata($boundary, (int)($age_value/365.25), 1);
 					$n1++;
 				}
 			}
@@ -347,23 +348,23 @@ function agma() {
 	if ($z_as == 300) {
 		$num = $stats->_statsMarrAge(false, 'M');
 		foreach ($num as $values) {
-			fill_ydata(0, floor($values['age']/365.25), 1);
+			fill_ydata(0, (int)($values['age']/365.25), 1);
 			$n1++;
 		}
 		$num = $stats->_statsMarrAge(false, 'F');
 		foreach ($num as $values) {
-			fill_ydata(0, floor($values['age']/365.25), 1);
+			fill_ydata(0, (int)($values['age']/365.25), 1);
 			$n1++;
 		}
 	} else if ($z_as == 301) {
 		$num = $stats->_statsMarrAge(false, 'M');
 		foreach ($num as $values) {
-			fill_ydata(0, floor($values['age']/365.25), 1);
+			fill_ydata(0, (int)($values['age']/365.25), 1);
 			$n1++;
 		}
 		$num = $stats->_statsMarrAge(false, 'F');
 		foreach ($num as $values) {
-			fill_ydata(1, floor($values['age']/365.25), 1);
+			fill_ydata(1, (int)($values['age']/365.25), 1);
 			$n1++;
 		}
 	} else {
@@ -371,12 +372,12 @@ function agma() {
 		foreach ($zgrenzen as $boundary) {
 			$num = $stats->_statsMarrAge(false, 'M', $zstart, $boundary);
 			foreach ($num as $values) {
-				fill_ydata($boundary, floor($values['age']/365.25), 1);
+				fill_ydata($boundary, (int)($values['age']/365.25), 1);
 				$n1++;
 			}
 			$num = $stats->_statsMarrAge(false, 'F', $zstart, $boundary);
 			foreach ($num as $values) {
-				fill_ydata($boundary, floor($values['age']/365.25), 1);
+				fill_ydata($boundary, (int)($values['age']/365.25), 1);
 				$n1++;
 			}
 			$zstart=$boundary+1;
@@ -393,7 +394,7 @@ function agma1() {
 		$indi=array();
 		foreach ($num as $values) {
 			if (!in_array($values['d_gid'], $indi)) {
-				fill_ydata(0, floor($values['age']/365.25), 1);
+				fill_ydata(0, (int)($values['age']/365.25), 1);
 				$n1++;
 				$indi[]=$values['d_gid'];
 			}
@@ -402,7 +403,7 @@ function agma1() {
 		$indi=array();
 		foreach ($num as $values) {
 			if (!in_array($values['d_gid'], $indi)) {
-				fill_ydata(0, floor($values['age']/365.25), 1);
+				fill_ydata(0, (int)($values['age']/365.25), 1);
 				$n1++;
 				$indi[]=$values['d_gid'];
 			}
@@ -412,7 +413,7 @@ function agma1() {
 		$indi=array();
 		foreach ($num as $values) {
 			if (!in_array($values['d_gid'], $indi)) {
-				fill_ydata(0, floor($values['age']/365.25), 1);
+				fill_ydata(0, (int)($values['age']/365.25), 1);
 				$n1++;
 				$indi[]=$values['d_gid'];
 			}
@@ -421,7 +422,7 @@ function agma1() {
 		$indi=array();
 		foreach ($num as $values) {
 			if (!in_array($values['d_gid'], $indi)) {
-				fill_ydata(1, floor($values['age']/365.25), 1);
+				fill_ydata(1, (int)($values['age']/365.25), 1);
 				$n1++;
 				$indi[]=$values['d_gid'];
 			}
@@ -433,7 +434,7 @@ function agma1() {
 			$num = $stats->_statsMarrAge(false, 'M', $zstart, $boundary);
 			foreach ($num as $values) {
 				if (!in_array($values['d_gid'], $indi)) {
-					fill_ydata($boundary, floor($values['age']/365.25), 1);
+					fill_ydata($boundary, (int)($values['age']/365.25), 1);
 					$n1++;
 					$indi[]=$values['d_gid'];
 				}
@@ -441,7 +442,7 @@ function agma1() {
 			$num = $stats->_statsMarrAge(false, 'F', $zstart, $boundary);
 			foreach ($num as $values) {
 				if (!in_array($values['d_gid'], $indi)) {
-					fill_ydata($boundary, floor($values['age']/365.25), 1);
+					fill_ydata($boundary, (int)($values['age']/365.25), 1);
 					$n1++;
 					$indi[]=$values['d_gid'];
 				}
@@ -660,9 +661,7 @@ function myplot($mytitle, $n, $xdata, $xtitle, $ydata, $ytitle, $legend) {
 	// in PHP 5.3.0 we can use
 	//$title = strstr($mytitle, '|', true);
 	$title = substr($mytitle, 0, strpos($mytitle, '|'));
-	echo '<center><div class="statistics_chart">';
 	echo '<img src="', $imgurl, '" width="950" height="300" alt="', htmlspecialchars($title), '" title="', htmlspecialchars($title), '">';
-	echo '</div></center><br><br>';
 }
 
 function calc_axis($xas_grenzen) {
@@ -889,8 +888,7 @@ if ($action=='update') {
 	unset($savedInput);
 }
 
-echo '<div id="statistics-plot">';
-echo '<h2 class="center">', WT_I18N::translate('Statistics plot'), '</h2>';
+echo '<div class="statistics_chart" title="', WT_I18N::translate('Statistics plot'), '">';
 
 //-- Set params for request out of the information for plot
 $g_xas = '1,2,3,4,5,6,7,8,9,10,11,12'; //should not be needed. but just for month

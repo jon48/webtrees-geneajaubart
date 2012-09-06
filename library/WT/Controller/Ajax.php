@@ -2,7 +2,7 @@
 // Base controller for all popup pages
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Ajax.php 12724 2011-11-13 19:06:16Z greg $
+// $Id: Ajax.php 13999 2012-06-16 21:57:04Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -37,8 +37,8 @@ class WT_Controller_Ajax extends WT_Controller_Base {
 	}
 	
 	public function pageFooter() {
-		// Ajax responses may have JavaScript
-		echo $this->getJavaScript();
+		// Ajax responses may have Javascript
+		echo $this->getJavascript();
 		return $this;
 	}
 }
