@@ -78,11 +78,11 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			$tab_id = 'ID'.floor(microtime()*1000000);
 				
 			$controller
-			->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-			->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.jeditable.min.js')
-			->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.validate.min.js')
-			->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.editable.js')
-			->addInlineJavaScript('
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.jeditable.min.js')
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.validate.min.js')
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.editable.js')
+			->addInlineJavascript('
 					function updatePlaceHierarchy(){
 					// Create the display array for place hierarchy
 						jQuery.get(
@@ -400,7 +400,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							}
 						}
 						
-						$html.= WT_JS_START;	
+						$html.= '<script>';	
 						$html.= '							
 							var tip = null;
 							var tipText = "";
@@ -466,7 +466,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							}
 						}
 						$html .= '});';
-						$html.= WT_JS_END;						
+						$html.= '</script>';						
 						$html.= '<div id="geodispersion_map"></div>';
 						$html.= '<div id="geodispersion_tip"></div>';
 						

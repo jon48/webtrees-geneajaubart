@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-08-31 14:32+0100\n"
-"PO-Revision-Date: 2012-09-03 20:47+0000\n"
+"PO-Revision-Date: 2012-08-30 15:43+0000\n"
 "Last-Translator: Vitali Oleshkevich <mar2008m@rambler.ru>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-09-04 04:57+0000\n"
+"X-Launchpad-Export-Date: 2012-09-01 05:17+0000\n"
 "X-Generator: Launchpad (build 15890)\n"
 
 #: webtrees/mediafirewall.php:351 webtrees/mediafirewall.php:368
@@ -10062,7 +10062,7 @@ msgstr "Ваше справжнє ім'я, яке ви бажаєте бачит
 #: webtrees/help_text.php:1545 webtrees/login.php:334 webtrees/login.php:408
 #: webtrees/login.php:541 webtrees/admin_users.php:225
 msgid "Comments"
-msgstr "Коментар"
+msgstr "Коментарі"
 
 #: webtrees/help_text.php:1546
 msgid ""
@@ -16319,188 +16319,188 @@ msgstr ""
 #: webtrees/library/WT/Gedcom/Code/Rela.php:105
 msgctxt "MALE"
 msgid "Friend"
-msgstr "Друг"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:106
 msgctxt "FEMALE"
 msgid "Friend"
-msgstr "Подруга"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:107
 msgid "Friend"
-msgstr "Друг"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:111
 msgid "Godfather"
-msgstr "Хрещений батько"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:114
 msgid "Godmother"
-msgstr "Хрещена мати"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:120
 msgid "Godson"
-msgstr "Хрещеник"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:123
 msgid "Goddaughter"
-msgstr "Хресна дочка"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:126
 msgid "Godchild"
-msgstr "Хрещениці"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:129
 msgctxt "MALE"
 msgid "Guardian"
-msgstr "Опікун"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:130
 msgctxt "FEMALE"
 msgid "Guardian"
-msgstr "Опікунка"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:131
 msgid "Guardian"
-msgstr "Опікуни"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:135
 msgctxt "MALE"
 msgid "Informant"
-msgstr "Iнформант"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:136
 msgctxt "FEMALE"
 msgid "Informant"
-msgstr "Iнформант"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:137
 msgid "Informant"
-msgstr "Iнформант"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:141
 msgctxt "MALE"
 msgid "Lodger"
-msgstr "Квартирант"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:142
 msgctxt "FEMALE"
 msgid "Lodger"
-msgstr "Квартирантка"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:143
 msgid "Lodger"
-msgstr "Квартиранти"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:147
 msgid "Nanny"
-msgstr "Няня"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:150
 msgctxt "MALE"
 msgid "Nurse"
-msgstr "Годувальник"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:151
 msgctxt "FEMALE"
 msgid "Nurse"
-msgstr "Годувальниця"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:152
 msgid "Nurse"
-msgstr "Годувальниця"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:156
 msgctxt "MALE"
 msgid "Owner"
-msgstr "Власник"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:157
 msgctxt "FEMALE"
 msgid "Owner"
-msgstr "Власница"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:158
 msgid "Owner"
-msgstr "Власник"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:162
 msgid "Priest"
-msgstr "Священик"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:165
 msgid "Rabbi"
-msgstr "Рабин"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:168
 msgctxt "MALE"
 msgid "Registry Officer"
-msgstr "Офіційний реєстратор"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:169
 msgctxt "FEMALE"
 msgid "Registry Officer"
-msgstr "Офіційний реєстратор"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:170
 msgid "Registry Officer"
-msgstr "Офіційний реєстратор"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:174
 msgctxt "MALE"
 msgid "Seller"
-msgstr "Продавець"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:175
 msgctxt "FEMALE"
 msgid "Seller"
-msgstr "Продавщиця"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:176
 msgid "Seller"
-msgstr "Продавець"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:180
 msgctxt "MALE"
 msgid "Servant"
-msgstr "Слуга"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:181
 msgctxt "FEMALE"
 msgid "Servant"
-msgstr "Служниця"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:182
 msgid "Servant"
-msgstr "Слуга"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:186
 msgctxt "MALE"
 msgid "Slave"
-msgstr "Невільник"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:187
 msgctxt "FEMALE"
 msgid "Slave"
-msgstr "Невільниця"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:188
 msgid "Slave"
-msgstr "Невольник"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:192
 msgctxt "MALE"
 msgid "Ward"
-msgstr "Підопічний"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:193
 msgctxt "FEMALE"
 msgid "Ward"
-msgstr "Підопічна"
+msgstr ""
 
 #: webtrees/library/WT/Gedcom/Code/Rela.php:194
 msgid "Ward"
-msgstr "Підопічний"
+msgstr ""
 
 #. I18N: LDS sealing status; see http://en.wikipedia.org/wiki/Sealing_(Latter_Day_Saints)
 #: webtrees/library/WT/Gedcom/Code/Stat.php:56
@@ -16550,7 +16550,7 @@ msgstr ""
 #. I18N: LDS sealing status; see http://en.wikipedia.org/wiki/Sealing_(Latter_Day_Saints)
 #: webtrees/library/WT/Gedcom/Code/Stat.php:84
 msgid "Completed before 1970; date not available"
-msgstr "Завершено до 1970 року, дата не відома"
+msgstr ""
 
 #. I18N: LDS sealing status; see http://en.wikipedia.org/wiki/Sealing_(Latter_Day_Saints)
 #: webtrees/library/WT/Gedcom/Code/Stat.php:87
@@ -16571,198 +16571,198 @@ msgstr ""
 #: webtrees/includes/functions/functions_print.php:1102
 msgctxt "NOMINATIVE"
 msgid "January"
-msgstr "Січень"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:135
 #: webtrees/includes/functions/functions_print.php:1103
 msgctxt "NOMINATIVE"
 msgid "February"
-msgstr "Лютий"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:136
 #: webtrees/includes/functions/functions_print.php:1104
 msgctxt "NOMINATIVE"
 msgid "March"
-msgstr "Березень"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:137
 #: webtrees/includes/functions/functions_print.php:1105
 msgctxt "NOMINATIVE"
 msgid "April"
-msgstr "Квітень"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:138
 #: webtrees/includes/functions/functions_print.php:1106
 msgctxt "NOMINATIVE"
 msgid "May"
-msgstr "Травень"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:139
 #: webtrees/includes/functions/functions_print.php:1107
 msgctxt "NOMINATIVE"
 msgid "June"
-msgstr "Червень"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:140
 #: webtrees/includes/functions/functions_print.php:1108
 msgctxt "NOMINATIVE"
 msgid "July"
-msgstr "Липень"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:141
 #: webtrees/includes/functions/functions_print.php:1109
 msgctxt "NOMINATIVE"
 msgid "August"
-msgstr "Серпень"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:142
 #: webtrees/includes/functions/functions_print.php:1110
 msgctxt "NOMINATIVE"
 msgid "September"
-msgstr "Вересень"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:143
 #: webtrees/includes/functions/functions_print.php:1111
 msgctxt "NOMINATIVE"
 msgid "October"
-msgstr "Жовтень"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:144
 #: webtrees/includes/functions/functions_print.php:1112
 msgctxt "NOMINATIVE"
 msgid "November"
-msgstr "Листопад"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:145
 #: webtrees/includes/functions/functions_print.php:1113
 msgctxt "NOMINATIVE"
 msgid "December"
-msgstr "Грудень"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:151
 msgctxt "GENITIVE"
 msgid "January"
-msgstr "Січня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:152
 msgctxt "GENITIVE"
 msgid "February"
-msgstr "Лютого"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:153
 msgctxt "GENITIVE"
 msgid "March"
-msgstr "Березня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:154
 msgctxt "GENITIVE"
 msgid "April"
-msgstr "Квітня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:155
 msgctxt "GENITIVE"
 msgid "May"
-msgstr "Травня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:156
 msgctxt "GENITIVE"
 msgid "June"
-msgstr "Червня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:157
 msgctxt "GENITIVE"
 msgid "July"
-msgstr "Липня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:158
 msgctxt "GENITIVE"
 msgid "August"
-msgstr "Серпня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:159
 msgctxt "GENITIVE"
 msgid "September"
-msgstr "Вересня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:160
 msgctxt "GENITIVE"
 msgid "October"
-msgstr "Жовтня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:161
 msgctxt "GENITIVE"
 msgid "November"
-msgstr "Листопада"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:162
 msgctxt "GENITIVE"
 msgid "December"
-msgstr "Грудня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:168
 msgctxt "LOCATIVE"
 msgid "January"
-msgstr "Січня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:169
 msgctxt "LOCATIVE"
 msgid "February"
-msgstr "Лютого"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:170
 msgctxt "LOCATIVE"
 msgid "March"
-msgstr "Березня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:171
 msgctxt "LOCATIVE"
 msgid "April"
-msgstr "Квітня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:172
 msgctxt "LOCATIVE"
 msgid "May"
-msgstr "Травня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:173
 msgctxt "LOCATIVE"
 msgid "June"
-msgstr "Червня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:174
 msgctxt "LOCATIVE"
 msgid "July"
-msgstr "Липня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:175
 msgctxt "LOCATIVE"
 msgid "August"
-msgstr "Серпня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:176
 msgctxt "LOCATIVE"
 msgid "September"
-msgstr "Вересня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:177
 msgctxt "LOCATIVE"
 msgid "October"
-msgstr "Жовтня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:178
 msgctxt "LOCATIVE"
 msgid "November"
-msgstr "Листопада"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:179
 msgctxt "LOCATIVE"
 msgid "December"
-msgstr "Грудня"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:185
 msgctxt "INSTRUMENTAL"
 msgid "January"
-msgstr "Січнем"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:186
 msgctxt "INSTRUMENTAL"
@@ -16772,330 +16772,330 @@ msgstr ""
 #: webtrees/library/WT/Date/Calendar.php:187
 msgctxt "INSTRUMENTAL"
 msgid "March"
-msgstr "Березнем"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:188
 msgctxt "INSTRUMENTAL"
 msgid "April"
-msgstr "Квітнем"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:189
 msgctxt "INSTRUMENTAL"
 msgid "May"
-msgstr "Травнем"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:190
 msgctxt "INSTRUMENTAL"
 msgid "June"
-msgstr "Червнем"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:191
 msgctxt "INSTRUMENTAL"
 msgid "July"
-msgstr "Липнем"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:192
 msgctxt "INSTRUMENTAL"
 msgid "August"
-msgstr "Серпнем"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:193
 msgctxt "INSTRUMENTAL"
 msgid "September"
-msgstr "Вереснем"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:194
 msgctxt "INSTRUMENTAL"
 msgid "October"
-msgstr "Жовтнем"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:195
 msgctxt "INSTRUMENTAL"
 msgid "November"
-msgstr "Листопадом"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:196
 msgctxt "INSTRUMENTAL"
 msgid "December"
-msgstr "Груднем"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:202
 msgctxt "Abbreviation for January"
 msgid "Jan"
-msgstr "Січ"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:203
 msgctxt "Abbreviation for February"
 msgid "Feb"
-msgstr "Лют"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:204
 msgctxt "Abbreviation for March"
 msgid "Mar"
-msgstr "Бер"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:205
 msgctxt "Abbreviation for April"
 msgid "Apr"
-msgstr "Кві"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:206
 msgctxt "Abbreviation for May"
 msgid "May"
-msgstr "Трав"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:207
 msgctxt "Abbreviation for June"
 msgid "Jun"
-msgstr "Чер"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:208
 msgctxt "Abbreviation for July"
 msgid "Jul"
-msgstr "Лип"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:209
 msgctxt "Abbreviation for August"
 msgid "Aug"
-msgstr "Сер"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:210
 msgctxt "Abbreviation for September"
 msgid "Sep"
-msgstr "Вер"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:211
 msgctxt "Abbreviation for October"
 msgid "Oct"
-msgstr "Жов"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:212
 msgctxt "Abbreviation for November"
 msgid "Nov"
-msgstr "Лист"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:213
 msgctxt "Abbreviation for December"
 msgid "Dec"
-msgstr "Груд"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:245
 msgid "Monday"
-msgstr "Понеділок"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:246
 msgid "Tuesday"
-msgstr "Вівторок"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:247
 msgid "Wednesday"
-msgstr "Середа"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:248
 msgid "Thursday"
-msgstr "Четвер"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:249
 msgid "Friday"
-msgstr "П’ятниця"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:250
 msgid "Saturday"
-msgstr "Субота"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:251
 msgid "Sunday"
-msgstr "Неділя"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:256
 #: webtrees/includes/functions/functions_print.php:1117
 msgid "Mon"
-msgstr "Пнд"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:257
 #: webtrees/includes/functions/functions_print.php:1118
 msgid "Tue"
-msgstr "Втр"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:258
 #: webtrees/includes/functions/functions_print.php:1119
 msgid "Wed"
-msgstr "Срд"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:259
 #: webtrees/includes/functions/functions_print.php:1120
 msgid "Thu"
-msgstr "Чтв"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:260
 #: webtrees/includes/functions/functions_print.php:1121
 msgid "Fri"
-msgstr "Птн"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:261
 #: webtrees/includes/functions/functions_print.php:1122
 msgid "Sat"
-msgstr "Сбт"
+msgstr ""
 
 #: webtrees/library/WT/Date/Calendar.php:262
 #: webtrees/includes/functions/functions_print.php:1116
 msgid "Sun"
-msgstr "Нд"
+msgstr ""
 
 #. I18N: The gregorian calendar
 #: webtrees/library/WT/Date/Gregorian.php:43
 msgid "Gregorian"
-msgstr "Григоріанський"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Muharram
 #: webtrees/library/WT/Date/Hijri.php:55
 msgctxt "NOMINATIVE"
 msgid "Muharram"
-msgstr "Мухаррам"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Safar
 #: webtrees/library/WT/Date/Hijri.php:56
 msgctxt "NOMINATIVE"
 msgid "Safar"
-msgstr "Сафар"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Rabi%27_al-awwal
 #: webtrees/library/WT/Date/Hijri.php:57
 msgctxt "NOMINATIVE"
 msgid "Rabi' al-awwal"
-msgstr "Рабіуль-Аввал"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Rabi%27_al-thani
 #: webtrees/library/WT/Date/Hijri.php:58
 msgctxt "NOMINATIVE"
 msgid "Rabi' al-thani"
-msgstr "Рабі ас-сани"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Jumada_al-awwal
 #: webtrees/library/WT/Date/Hijri.php:59
 msgctxt "NOMINATIVE"
 msgid "Jumada al-awwal"
-msgstr "Джумада аль-уля"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Jumada_al-thani
 #: webtrees/library/WT/Date/Hijri.php:60
 msgctxt "NOMINATIVE"
 msgid "Jumada al-thani"
-msgstr "Джумада ас-сани"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Rajab
 #: webtrees/library/WT/Date/Hijri.php:61
 msgctxt "NOMINATIVE"
 msgid "Rajab"
-msgstr "Раджаб"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Sha%27aban
 #: webtrees/library/WT/Date/Hijri.php:62
 msgctxt "NOMINATIVE"
 msgid "Sha'aban"
-msgstr "Шаабан"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Ramadan_%28calendar_month%29
 #: webtrees/library/WT/Date/Hijri.php:63
 msgctxt "NOMINATIVE"
 msgid "Ramadan"
-msgstr "Рамадан"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Shawwal
 #: webtrees/library/WT/Date/Hijri.php:64
 msgctxt "NOMINATIVE"
 msgid "Shawwal"
-msgstr "Шавваль"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Dhu_al-Qi%27dah
 #: webtrees/library/WT/Date/Hijri.php:65
 msgctxt "NOMINATIVE"
 msgid "Dhu al-Qi'dah"
-msgstr "Зулькада"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Dhu_al-Hijjah
 #: webtrees/library/WT/Date/Hijri.php:66
 msgctxt "NOMINATIVE"
 msgid "Dhu al-Hijjah"
-msgstr "Зульхиджа"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Muharram
 #: webtrees/library/WT/Date/Hijri.php:72
 msgctxt "GENITIVE"
 msgid "Muharram"
-msgstr "Мухаррам"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Safar
 #: webtrees/library/WT/Date/Hijri.php:73
 msgctxt "GENITIVE"
 msgid "Safar"
-msgstr "Сафар"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Rabi%27_al-awwal
 #: webtrees/library/WT/Date/Hijri.php:74
 msgctxt "GENITIVE"
 msgid "Rabi' al-awwal"
-msgstr "Рабіуль-Аввал"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Rabi%27_al-thani
 #: webtrees/library/WT/Date/Hijri.php:75
 msgctxt "GENITIVE"
 msgid "Rabi' al-thani"
-msgstr "Рабі ас-сани"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Jumada_al-awwal
 #: webtrees/library/WT/Date/Hijri.php:76
 msgctxt "GENITIVE"
 msgid "Jumada al-awwal"
-msgstr "Джумада аль-уля"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Jumada_al-thani
 #: webtrees/library/WT/Date/Hijri.php:77
 msgctxt "GENITIVE"
 msgid "Jumada al-thani"
-msgstr "Джумада ас-сани"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Rajab
 #: webtrees/library/WT/Date/Hijri.php:78
 msgctxt "GENITIVE"
 msgid "Rajab"
-msgstr "Раджаб"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Sha%27aban
 #: webtrees/library/WT/Date/Hijri.php:79
 msgctxt "GENITIVE"
 msgid "Sha'aban"
-msgstr "Шаабан"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Ramadan_%28calendar_month%29
 #: webtrees/library/WT/Date/Hijri.php:80
 msgctxt "GENITIVE"
 msgid "Ramadan"
-msgstr "Рамадан"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Shawwal
 #: webtrees/library/WT/Date/Hijri.php:81
 msgctxt "GENITIVE"
 msgid "Shawwal"
-msgstr "Шавваль"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Dhu_al-Qi%27dah
 #: webtrees/library/WT/Date/Hijri.php:82
 msgctxt "GENITIVE"
 msgid "Dhu al-Qi'dah"
-msgstr "Зулькада"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Dhu_al-Hijjah
 #: webtrees/library/WT/Date/Hijri.php:83
 msgctxt "GENITIVE"
 msgid "Dhu al-Hijjah"
-msgstr "Зульхиджа"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Muharram
 #: webtrees/library/WT/Date/Hijri.php:89
 msgctxt "LOCATIVE"
 msgid "Muharram"
-msgstr "Мухаррам"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Safar
 #: webtrees/library/WT/Date/Hijri.php:90
@@ -17107,103 +17107,103 @@ msgstr ""
 #: webtrees/library/WT/Date/Hijri.php:91
 msgctxt "LOCATIVE"
 msgid "Rabi' al-awwal"
-msgstr "Рабіуль-Аввал"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Rabi%27_al-thani
 #: webtrees/library/WT/Date/Hijri.php:92
 msgctxt "LOCATIVE"
 msgid "Rabi' al-thani"
-msgstr "Рабі ас-сани"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Jumada_al-awwal
 #: webtrees/library/WT/Date/Hijri.php:93
 msgctxt "LOCATIVE"
 msgid "Jumada al-awwal"
-msgstr "Джумада аль-уля"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Jumada_al-thani
 #: webtrees/library/WT/Date/Hijri.php:94
 msgctxt "LOCATIVE"
 msgid "Jumada al-thani"
-msgstr "Джумада ас-сани"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Rajab
 #: webtrees/library/WT/Date/Hijri.php:95
 msgctxt "LOCATIVE"
 msgid "Rajab"
-msgstr "Раджаб"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Sha%27aban
 #: webtrees/library/WT/Date/Hijri.php:96
 msgctxt "LOCATIVE"
 msgid "Sha'aban"
-msgstr "Шаабан"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Ramadan_%28calendar_month%29
 #: webtrees/library/WT/Date/Hijri.php:97
 msgctxt "LOCATIVE"
 msgid "Ramadan"
-msgstr "Рамадан"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Shawwal
 #: webtrees/library/WT/Date/Hijri.php:98
 msgctxt "LOCATIVE"
 msgid "Shawwal"
-msgstr "Шавваль"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Dhu_al-Qi%27dah
 #: webtrees/library/WT/Date/Hijri.php:99
 msgctxt "LOCATIVE"
 msgid "Dhu al-Qi'dah"
-msgstr "Зулькада"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Dhu_al-Hijjah
 #: webtrees/library/WT/Date/Hijri.php:100
 msgctxt "LOCATIVE"
 msgid "Dhu al-Hijjah"
-msgstr "Зульхиджа"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Muharram
 #: webtrees/library/WT/Date/Hijri.php:106
 msgctxt "INSTRUMENTAL"
 msgid "Muharram"
-msgstr "Мухаррам"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Safar
 #: webtrees/library/WT/Date/Hijri.php:107
 msgctxt "INSTRUMENTAL"
 msgid "Safar"
-msgstr "Сафар"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Rabi%27_al-awwal
 #: webtrees/library/WT/Date/Hijri.php:108
 msgctxt "INSTRUMENTAL"
 msgid "Rabi' al-awwal"
-msgstr "Рабіуль-Аввал"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Rabi%27_al-thani
 #: webtrees/library/WT/Date/Hijri.php:109
 msgctxt "INSTRUMENTAL"
 msgid "Rabi' al-thani"
-msgstr "Рабі ас-сани"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Jumada_al-awwal
 #: webtrees/library/WT/Date/Hijri.php:110
 msgctxt "INSTRUMENTAL"
 msgid "Jumada al-awwal"
-msgstr "Джумада аль-уля"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Jumada_al-thani
 #: webtrees/library/WT/Date/Hijri.php:111
 msgctxt "INSTRUMENTAL"
 msgid "Jumada al-thani"
-msgstr "Джумада ас-сани"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Rajab
 #: webtrees/library/WT/Date/Hijri.php:112
 msgctxt "INSTRUMENTAL"
 msgid "Rajab"
-msgstr "Раджаб"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Sha%27aban
 #: webtrees/library/WT/Date/Hijri.php:113
@@ -17215,195 +17215,195 @@ msgstr ""
 #: webtrees/library/WT/Date/Hijri.php:114
 msgctxt "INSTRUMENTAL"
 msgid "Ramadan"
-msgstr "Рамадан"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Shawwal
 #: webtrees/library/WT/Date/Hijri.php:115
 msgctxt "INSTRUMENTAL"
 msgid "Shawwal"
-msgstr "Шавваль"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Dhu_al-Qi%27dah
 #: webtrees/library/WT/Date/Hijri.php:116
 msgctxt "INSTRUMENTAL"
 msgid "Dhu al-Qi'dah"
-msgstr "Зулькада"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Dhu_al-Hijjah
 #: webtrees/library/WT/Date/Hijri.php:117
 msgctxt "INSTRUMENTAL"
 msgid "Dhu al-Hijjah"
-msgstr "Зульхиджа"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:90
 msgctxt "NOMINATIVE"
 msgid "Tishrei"
-msgstr "Тішрей"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:91
 msgctxt "NOMINATIVE"
 msgid "Heshvan"
-msgstr "Хешван"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:92
 msgctxt "NOMINATIVE"
 msgid "Kislev"
-msgstr "Кіслев"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:93
 msgctxt "NOMINATIVE"
 msgid "Tevet"
-msgstr "Тевет"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:94
 msgctxt "NOMINATIVE"
 msgid "Shevat"
-msgstr "Шват"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:95
 msgctxt "NOMINATIVE"
 msgid "Adar I"
-msgstr "Адар I"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:95
 msgctxt "NOMINATIVE"
 msgid "Adar"
-msgstr "Адар"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:96
 msgctxt "NOMINATIVE"
 msgid "Adar II"
-msgstr "Адар II"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:97
 msgctxt "NOMINATIVE"
 msgid "Nissan"
-msgstr "Нісан"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:98
 msgctxt "NOMINATIVE"
 msgid "Iyar"
-msgstr "Іяр"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:99
 msgctxt "NOMINATIVE"
 msgid "Sivan"
-msgstr "Сіван"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:100
 msgctxt "NOMINATIVE"
 msgid "Tamuz"
-msgstr "Тамуз"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:101
 msgctxt "NOMINATIVE"
 msgid "Av"
-msgstr "Ав"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:102
 msgctxt "NOMINATIVE"
 msgid "Elul"
-msgstr "Елул"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:108
 msgctxt "GENITIVE"
 msgid "Tishrei"
-msgstr "Тішрея"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:109
 msgctxt "GENITIVE"
 msgid "Heshvan"
-msgstr "Хешвана"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:110
 msgctxt "GENITIVE"
 msgid "Kislev"
-msgstr "Кіслева"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:111
 msgctxt "GENITIVE"
 msgid "Tevet"
-msgstr "Тевета"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:112
 msgctxt "GENITIVE"
 msgid "Shevat"
-msgstr "Швата"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:113
 msgctxt "GENITIVE"
 msgid "Adar I"
-msgstr "Адара I"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:113
 msgctxt "GENITIVE"
 msgid "Adar"
-msgstr "Адара"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:114
 msgctxt "GENITIVE"
 msgid "Adar II"
-msgstr "Адара II"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:115
 msgctxt "GENITIVE"
 msgid "Nissan"
-msgstr "Нісана"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:116
 msgctxt "GENITIVE"
 msgid "Iyar"
-msgstr "Іяра"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:117
 msgctxt "GENITIVE"
 msgid "Sivan"
-msgstr "Сівана"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:118
 msgctxt "GENITIVE"
 msgid "Tamuz"
-msgstr "Тамуза"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:119
 msgctxt "GENITIVE"
 msgid "Av"
-msgstr "Ава"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:120
 msgctxt "GENITIVE"
 msgid "Elul"
-msgstr "Елула"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:126
 msgctxt "LOCATIVE"
 msgid "Tishrei"
-msgstr "Тішрея"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:127
 msgctxt "LOCATIVE"
 msgid "Heshvan"
-msgstr "Хешвана"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:128
 msgctxt "LOCATIVE"
 msgid "Kislev"
-msgstr "Кіслева"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:129
 msgctxt "LOCATIVE"
 msgid "Tevet"
-msgstr "Тевета"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:130
 msgctxt "LOCATIVE"
 msgid "Shevat"
-msgstr "Швата"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:131
 msgctxt "LOCATIVE"
 msgid "Adar I"
-msgstr "Адара I"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:131
 msgctxt "LOCATIVE"
@@ -17413,167 +17413,167 @@ msgstr ""
 #: webtrees/library/WT/Date/Jewish.php:132
 msgctxt "LOCATIVE"
 msgid "Adar II"
-msgstr "Адара II"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:133
 msgctxt "LOCATIVE"
 msgid "Nissan"
-msgstr "Нісана"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:134
 msgctxt "LOCATIVE"
 msgid "Iyar"
-msgstr "Іяра"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:135
 msgctxt "LOCATIVE"
 msgid "Sivan"
-msgstr "Сівана"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:136
 msgctxt "LOCATIVE"
 msgid "Tamuz"
-msgstr "Тамуза"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:137
 msgctxt "LOCATIVE"
 msgid "Av"
-msgstr "Ава"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:138
 msgctxt "LOCATIVE"
 msgid "Elul"
-msgstr "Элула"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:144
 msgctxt "INSTRUMENTAL"
 msgid "Tishrei"
-msgstr "Тишреем"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:145
 msgctxt "INSTRUMENTAL"
 msgid "Heshvan"
-msgstr "Хешваном"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:146
 msgctxt "INSTRUMENTAL"
 msgid "Kislev"
-msgstr "Кіслевом"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:147
 msgctxt "INSTRUMENTAL"
 msgid "Tevet"
-msgstr "Теветом"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:148
 msgctxt "INSTRUMENTAL"
 msgid "Shevat"
-msgstr "Шватам"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:149
 msgctxt "INSTRUMENTAL"
 msgid "Adar I"
-msgstr "Адаром I"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:149
 msgctxt "INSTRUMENTAL"
 msgid "Adar"
-msgstr "Адаром"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:150
 msgctxt "INSTRUMENTAL"
 msgid "Adar II"
-msgstr "Адаром II"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:151
 msgctxt "INSTRUMENTAL"
 msgid "Nissan"
-msgstr "Нісаном"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:152
 msgctxt "INSTRUMENTAL"
 msgid "Iyar"
-msgstr "Іяром"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:153
 msgctxt "INSTRUMENTAL"
 msgid "Sivan"
-msgstr "Сіваном"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:154
 msgctxt "INSTRUMENTAL"
 msgid "Tamuz"
-msgstr "Тамузом"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:155
 msgctxt "INSTRUMENTAL"
 msgid "Av"
-msgstr "Авом"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jewish.php:156
 msgctxt "INSTRUMENTAL"
 msgid "Elul"
-msgstr "Элулом"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:54
 msgctxt "NOMINATIVE"
 msgid "Vendémiaire"
-msgstr "Вандем'єр"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:55
 msgctxt "NOMINATIVE"
 msgid "Brumaire"
-msgstr "Брюмер"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:56
 msgctxt "NOMINATIVE"
 msgid "Frimaire"
-msgstr "Фрімер"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:57
 msgctxt "NOMINATIVE"
 msgid "Nivôse"
-msgstr "Нівоз"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:58
 msgctxt "NOMINATIVE"
 msgid "Pluviôse"
-msgstr "Плювіоз"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:59
 msgctxt "NOMINATIVE"
 msgid "Ventôse"
-msgstr "Вантоз"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:60
 msgctxt "NOMINATIVE"
 msgid "Germinal"
-msgstr "Жерміналь"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:61
 msgctxt "NOMINATIVE"
 msgid "Floréal"
-msgstr "Флореаль"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:62
 msgctxt "NOMINATIVE"
 msgid "Prairial"
-msgstr "Преріаль"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:63
 msgctxt "NOMINATIVE"
 msgid "Messidor"
-msgstr "Мессідор"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:64
 msgctxt "NOMINATIVE"
 msgid "Thermidor"
-msgstr "Термідор"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:65
 msgctxt "NOMINATIVE"
 msgid "Fructidor"
-msgstr "Фрюктідор"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:66
 msgctxt "NOMINATIVE"
@@ -17583,62 +17583,62 @@ msgstr ""
 #: webtrees/library/WT/Date/French.php:71
 msgctxt "GENITIVE"
 msgid "Vendémiaire"
-msgstr "Вандем'єр"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:72
 msgctxt "GENITIVE"
 msgid "Brumaire"
-msgstr "Брюмер"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:73
 msgctxt "GENITIVE"
 msgid "Frimaire"
-msgstr "Фрімер"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:74
 msgctxt "GENITIVE"
 msgid "Nivôse"
-msgstr "Нівоз"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:75
 msgctxt "GENITIVE"
 msgid "Pluviôse"
-msgstr "Плювіоза"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:76
 msgctxt "GENITIVE"
 msgid "Ventôse"
-msgstr "Вантоза"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:77
 msgctxt "GENITIVE"
 msgid "Germinal"
-msgstr "Жерміналя"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:78
 msgctxt "GENITIVE"
 msgid "Floréal"
-msgstr "Флореаля"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:79
 msgctxt "GENITIVE"
 msgid "Prairial"
-msgstr "Преріаля"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:80
 msgctxt "GENITIVE"
 msgid "Messidor"
-msgstr "Мессідора"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:81
 msgctxt "GENITIVE"
 msgid "Thermidor"
-msgstr "Термідора"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:82
 msgctxt "GENITIVE"
 msgid "Fructidor"
-msgstr "Фрюктідора"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:83
 msgctxt "GENITIVE"
@@ -17648,62 +17648,62 @@ msgstr ""
 #: webtrees/library/WT/Date/French.php:88
 msgctxt "LOCATIVE"
 msgid "Vendémiaire"
-msgstr "Вандем'єре"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:89
 msgctxt "LOCATIVE"
 msgid "Brumaire"
-msgstr "Брюмере"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:90
 msgctxt "LOCATIVE"
 msgid "Frimaire"
-msgstr "Фрімере"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:91
 msgctxt "LOCATIVE"
 msgid "Nivôse"
-msgstr "Нівозе"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:92
 msgctxt "LOCATIVE"
 msgid "Pluviôse"
-msgstr "Плювіозе"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:93
 msgctxt "LOCATIVE"
 msgid "Ventôse"
-msgstr "Вантозе"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:94
 msgctxt "LOCATIVE"
 msgid "Germinal"
-msgstr "Жермінале"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:95
 msgctxt "LOCATIVE"
 msgid "Floréal"
-msgstr "Флореале"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:96
 msgctxt "LOCATIVE"
 msgid "Prairial"
-msgstr "Преріале"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:97
 msgctxt "LOCATIVE"
 msgid "Messidor"
-msgstr "Мессідоре"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:98
 msgctxt "LOCATIVE"
 msgid "Thermidor"
-msgstr "Термідоре"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:99
 msgctxt "LOCATIVE"
 msgid "Fructidor"
-msgstr "Фрюктідоре"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:100
 msgctxt "LOCATIVE"
@@ -17713,62 +17713,62 @@ msgstr ""
 #: webtrees/library/WT/Date/French.php:105
 msgctxt "INSTRUMENTAL"
 msgid "Vendémiaire"
-msgstr "Вандем'єром"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:106
 msgctxt "INSTRUMENTAL"
 msgid "Brumaire"
-msgstr "Брюмером"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:107
 msgctxt "INSTRUMENTAL"
 msgid "Frimaire"
-msgstr "Фрімером"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:108
 msgctxt "INSTRUMENTAL"
 msgid "Nivôse"
-msgstr "Нівозом"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:109
 msgctxt "INSTRUMENTAL"
 msgid "Pluviôse"
-msgstr "Плювіозом"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:110
 msgctxt "INSTRUMENTAL"
 msgid "Ventôse"
-msgstr "Вантозом"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:111
 msgctxt "INSTRUMENTAL"
 msgid "Germinal"
-msgstr "Жерміналем"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:112
 msgctxt "INSTRUMENTAL"
 msgid "Floréal"
-msgstr "Флореалем"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:113
 msgctxt "INSTRUMENTAL"
 msgid "Prairial"
-msgstr "Преріалем"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:114
 msgctxt "INSTRUMENTAL"
 msgid "Messidor"
-msgstr "Мессідором"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:115
 msgctxt "INSTRUMENTAL"
 msgid "Thermidor"
-msgstr "Термідором"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:116
 msgctxt "INSTRUMENTAL"
 msgid "Fructidor"
-msgstr "Фрюктідором"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:117
 msgctxt "INSTRUMENTAL"
@@ -17777,120 +17777,120 @@ msgstr ""
 
 #: webtrees/library/WT/Date/French.php:146
 msgid "Primidi"
-msgstr "Примиди"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:147
 msgid "Duodi"
-msgstr "Дуоди"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:148
 msgid "Tridi"
-msgstr "Триди"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:149
 msgid "Quartidi"
-msgstr "Квартиди"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:150
 msgid "Quintidi"
-msgstr "Квинтиди"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:151
 msgid "Sextidi"
-msgstr "Секстиди"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:152
 msgid "Septidi"
-msgstr "Септиди"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:153
 msgid "Octidi"
-msgstr "Октиди"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:154
 msgid "Nonidi"
-msgstr "Нониди"
+msgstr ""
 
 #: webtrees/library/WT/Date/French.php:155
 msgid "Decidi"
-msgstr "Декади"
+msgstr ""
 
 #. I18N: The Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:40
 msgid "Jalali"
-msgstr "Джалалі"
+msgstr ""
 
 #. I18N:  1st month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:54
 msgctxt "NOMINATIVE"
 msgid "Farvardin"
-msgstr "Фарвардін"
+msgstr ""
 
 #. I18N:  2nd month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:55
 msgctxt "NOMINATIVE"
 msgid "Ordibehesht"
-msgstr "Ордібехешт"
+msgstr ""
 
 #. I18N:  3rd month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:56
 msgctxt "NOMINATIVE"
 msgid "Khordad"
-msgstr "Хордад"
+msgstr ""
 
 #. I18N:  4th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:57
 msgctxt "NOMINATIVE"
 msgid "Tir"
-msgstr "Тир"
+msgstr ""
 
 #. I18N:  5th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:58
 msgctxt "NOMINATIVE"
 msgid "Mordad"
-msgstr "Мордад"
+msgstr ""
 
 #. I18N:  6th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:59
 msgctxt "NOMINATIVE"
 msgid "Shahrivar"
-msgstr "Шахрівар"
+msgstr ""
 
 #. I18N:  7th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:60
 msgctxt "NOMINATIVE"
 msgid "Mehr"
-msgstr "Мехр"
+msgstr ""
 
 #. I18N:  8th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:61
 msgctxt "NOMINATIVE"
 msgid "Aban"
-msgstr "Абан"
+msgstr ""
 
 #. I18N:  9th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:62
 msgctxt "NOMINATIVE"
 msgid "Azar"
-msgstr "Азар"
+msgstr ""
 
 #. I18N: 10th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:63
 msgctxt "NOMINATIVE"
 msgid "Dey"
-msgstr "Дей"
+msgstr ""
 
 #. I18N: 11th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:64
 msgctxt "NOMINATIVE"
 msgid "Bahman"
-msgstr "Бахман"
+msgstr ""
 
 #. I18N: 12th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:65
 msgctxt "NOMINATIVE"
 msgid "Esfand"
-msgstr "Есфанд"
+msgstr ""
 
 #. I18N:  1st month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:72
@@ -17902,393 +17902,389 @@ msgstr ""
 #: webtrees/library/WT/Date/Jalali.php:73
 msgctxt "GENITIVE"
 msgid "Ordibehesht"
-msgstr "Ордібехешт"
+msgstr ""
 
 #. I18N:  3rd month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:74
 msgctxt "GENITIVE"
 msgid "Khordad"
-msgstr "Хордада"
+msgstr ""
 
 #. I18N:  4th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:75
 msgctxt "GENITIVE"
 msgid "Tir"
-msgstr "Тира"
+msgstr ""
 
 #. I18N:  5th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:76
 msgctxt "GENITIVE"
 msgid "Mordad"
-msgstr "Мордада"
+msgstr ""
 
 #. I18N:  6th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:77
 msgctxt "GENITIVE"
 msgid "Shahrivar"
-msgstr "Шахрівара"
+msgstr ""
 
 #. I18N:  7th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:78
 msgctxt "GENITIVE"
 msgid "Mehr"
-msgstr "Мехра"
+msgstr ""
 
 #. I18N:  8th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:79
 msgctxt "GENITIVE"
 msgid "Aban"
-msgstr "Абана"
+msgstr ""
 
 #. I18N:  9th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:80
 msgctxt "GENITIVE"
 msgid "Azar"
-msgstr "Азара"
+msgstr ""
 
 #. I18N: 10th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:81
 msgctxt "GENITIVE"
 msgid "Dey"
-msgstr "Дея"
+msgstr ""
 
 #. I18N: 11th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:82
 msgctxt "GENITIVE"
 msgid "Bahman"
-msgstr "Бахмана"
+msgstr ""
 
 #. I18N: 12th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:83
 msgctxt "GENITIVE"
 msgid "Esfand"
-msgstr "Есфанда"
+msgstr ""
 
 #. I18N:  1st month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:90
 msgctxt "LOCATIVE"
 msgid "Farvardin"
-msgstr "Фарвардіне"
+msgstr ""
 
 #. I18N:  2nd month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:91
 msgctxt "LOCATIVE"
 msgid "Ordibehesht"
-msgstr "Ордібехеште"
+msgstr ""
 
 #. I18N:  3rd month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:92
 msgctxt "LOCATIVE"
 msgid "Khordad"
-msgstr "Хордаде"
+msgstr ""
 
 #. I18N:  4th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:93
 msgctxt "LOCATIVE"
 msgid "Tir"
-msgstr "Тире"
+msgstr ""
 
 #. I18N:  5th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:94
 msgctxt "LOCATIVE"
 msgid "Mordad"
-msgstr "Мордаде"
+msgstr ""
 
 #. I18N:  6th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:95
 msgctxt "LOCATIVE"
 msgid "Shahrivar"
-msgstr "Шахріваре"
+msgstr ""
 
 #. I18N:  7th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:96
 msgctxt "LOCATIVE"
 msgid "Mehr"
-msgstr "Мехре"
+msgstr ""
 
 #. I18N:  8th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:97
 msgctxt "LOCATIVE"
 msgid "Aban"
-msgstr "Абане"
+msgstr ""
 
 #. I18N:  9th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:98
 msgctxt "LOCATIVE"
 msgid "Azar"
-msgstr "Азаре"
+msgstr ""
 
 #. I18N: 10th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:99
 msgctxt "LOCATIVE"
 msgid "Dey"
-msgstr "Дее"
+msgstr ""
 
 #. I18N: 11th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:100
 msgctxt "LOCATIVE"
 msgid "Bahman"
-msgstr "Бахмане"
+msgstr ""
 
 #. I18N: 12th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:101
 msgctxt "LOCATIVE"
 msgid "Esfand"
-msgstr "Есфанде"
+msgstr ""
 
 #. I18N:  1st month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:108
 msgctxt "INSTRUMENTAL"
 msgid "Farvardin"
-msgstr "Фарвардіном"
+msgstr ""
 
 #. I18N:  2nd month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:109
 msgctxt "INSTRUMENTAL"
 msgid "Ordibehesht"
-msgstr "Ордібехештом"
+msgstr ""
 
 #. I18N:  3rd month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:110
 msgctxt "INSTRUMENTAL"
 msgid "Khordad"
-msgstr "Хордадом"
+msgstr ""
 
 #. I18N:  4th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:111
 msgctxt "INSTRUMENTAL"
 msgid "Tir"
-msgstr "Тиром"
+msgstr ""
 
 #. I18N:  5th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:112
 msgctxt "INSTRUMENTAL"
 msgid "Mordad"
-msgstr "Мордадом"
+msgstr ""
 
 #. I18N:  6th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:113
 msgctxt "INSTRUMENTAL"
 msgid "Shahrivar"
-msgstr "Шахріваром"
+msgstr ""
 
 #. I18N:  7th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:114
 msgctxt "INSTRUMENTAL"
 msgid "Mehr"
-msgstr "Мехром"
+msgstr ""
 
 #. I18N:  8th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:115
 msgctxt "INSTRUMENTAL"
 msgid "Aban"
-msgstr "Абаном"
+msgstr ""
 
 #. I18N:  9th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:116
 msgctxt "INSTRUMENTAL"
 msgid "Azar"
-msgstr "Азаром"
+msgstr ""
 
 #. I18N: 10th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:117
 msgctxt "INSTRUMENTAL"
 msgid "Dey"
-msgstr "Деем"
+msgstr ""
 
 #. I18N: 11th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:118
 msgctxt "INSTRUMENTAL"
 msgid "Bahman"
-msgstr "Бахманом"
+msgstr ""
 
 #. I18N: 12th month in the Persian/Jalali calendar
 #: webtrees/library/WT/Date/Jalali.php:119
 msgctxt "INSTRUMENTAL"
 msgid "Esfand"
-msgstr "Есфандом"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jalali.php:126
 msgctxt "Abbreviation for Persian month: Farvardin"
 msgid "Far"
-msgstr "Фар"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jalali.php:127
 msgctxt "Abbreviation for Persian month: Ordibehesht"
 msgid "Ord"
-msgstr "Орд"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jalali.php:128
 msgctxt "Abbreviation for Persian month: Khordad"
 msgid "Khor"
-msgstr "Хор"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jalali.php:129
 msgctxt "Abbreviation for Persian month: Tir"
 msgid "Tir"
-msgstr "Тир"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jalali.php:130
 msgctxt "Abbreviation for Persian month: Mordad"
 msgid "Mor"
-msgstr "Мор"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jalali.php:131
 msgctxt "Abbreviation for Persian month: Shahrivar"
 msgid "Shah"
-msgstr "Шах"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jalali.php:132
 msgctxt "Abbreviation for Persian month: Mehr"
 msgid "Mehr"
-msgstr "Мехр"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jalali.php:133
 msgctxt "Abbreviation for Persian month: Aban"
 msgid "Aban"
-msgstr "Абан"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jalali.php:134
 msgctxt "Abbreviation for Persian month: Azar"
 msgid "Azar"
-msgstr "Азар"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jalali.php:135
 msgctxt "Abbreviation for Persian month: Dey"
 msgid "Dey"
-msgstr "Дей"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jalali.php:136
 msgctxt "Abbreviation for Persian month: Bahman"
 msgid "Bah"
-msgstr "Бах"
+msgstr ""
 
 #: webtrees/library/WT/Date/Jalali.php:137
 msgctxt "Abbreviation for Persian month: Esfand"
 msgid "Esf"
-msgstr "Есф"
+msgstr ""
 
 #. I18N: CE=Common Era, for Julian years > 0.  See http://en.wikipedia.org/wiki/Common_Era
 #: webtrees/library/WT/Date/Julian.php:100
 #: webtrees/library/WT/Date/Julian.php:102
 #, php-format
 msgid "%s&nbsp;CE"
-msgstr "%s&nbsp;н.е."
+msgstr ""
 
 #: webtrees/lifespan.php:265 webtrees/timeline.php:296
 msgid "Add another person to the chart"
-msgstr "Додати персону на графік"
+msgstr ""
 
 #: webtrees/lifespan.php:269
 msgid "Include the person's immediate family?"
-msgstr "Включаючи найближчих родичів персони?"
+msgstr ""
 
 #: webtrees/lifespan.php:276
 msgid "Show timeline"
-msgstr "Показати лінію часу"
+msgstr ""
 
 #: webtrees/lifespan.php:285
 msgid "Speed"
-msgstr "Швидкість"
+msgstr ""
 
 #: webtrees/lifespan.php:286
 msgid "Begin Year"
-msgstr "Рік початку"
+msgstr ""
 
 #: webtrees/lifespan.php:287
 msgid "End Year"
-msgstr "Рік кінця"
+msgstr ""
 
 #: webtrees/lifespan.php:302 webtrees/timeline.php:310
 msgid "Clear Chart"
-msgstr "Очистити діаграму"
+msgstr ""
 
 #: webtrees/lifespan.php:306
 #, php-format
 msgid "%d Individual"
 msgid_plural "%d Individuals"
-msgstr[0] "%d персона"
-msgstr[1] "%d персон"
-msgstr[2] "%d персоны"
+msgstr[0] ""
+msgstr[1] ""
 
 #. I18N: %s is a surname
 #: webtrees/branches.php:45
 #, php-format
 msgid "Branches of the %s family"
-msgstr "Гілки %s родини"
+msgstr ""
 
 #: webtrees/branches.php:102
 msgid "Collapse all"
-msgstr "Згорнути всі"
+msgstr ""
 
 #: webtrees/branches.php:103
 msgid "Expand all"
-msgstr "Розгорнути всі"
+msgstr ""
 
 #. I18N: Abbreviation for "Sosa-Stradonitz number".  This is a person's surname, so may need transliterating into non-latin alphabets.
 #: webtrees/branches.php:134 webtrees/branches.php:160
 #: webtrees/includes/functions/functions_print_lists.php:209
 msgid "Sosa"
-msgstr "Соса"
+msgstr ""
 
 #: webtrees/branches.php:232
 msgid "Generation"
-msgstr "Покоління"
+msgstr ""
 
 #. I18N: %s is the name of a person, source or other record
 #: webtrees/action.php:52
 #, php-format
 msgid "The changes to “%s” have been accepted."
-msgstr "Зміни для “%s” прийняті."
+msgstr ""
 
 #: webtrees/action.php:84
 msgid "Record copied to clipboard"
-msgstr "Запис скопійовано в буфер обміну"
+msgstr ""
 
 #. I18N: %s is the name of a family, e.g. Husband name + Wife name"
 #: webtrees/action.php:108
 #, php-format
 msgid "The family “%s” has been deleted, as it only has one member."
-msgstr "Родина “%s” видалено, вона складається з однієї людини."
+msgstr ""
 
 #. I18N: %s are names of records, such as sources, repositories or individuals
 #: webtrees/action.php:112
 #, php-format
 msgid "The link from “%1$s” to “%2$s” has been deleted."
-msgstr "Зв'язок між “%1$s” та “%2$s” була видалена."
+msgstr ""
 
 #. I18N: %s is the name of a person, source or other record
 #: webtrees/action.php:128
 #, php-format
 msgid "The changes to “%s” have been rejected."
-msgstr "Зміни для “%s” відхилені."
+msgstr ""
 
 #: webtrees/addmedia.php:106
 msgid "<b>Access Denied</b><br />You do not have access to this resource."
 msgstr ""
-"<b>Доступ заборонено.</b>\r\n"
-"<br/>\r\n"
-"У Вас немає доступу до цього джерела."
 
 #: webtrees/addmedia.php:109
 msgid "This user name cannot edit this GEDCOM."
-msgstr "Користувач з таким ім'ям не може редагувати цей GEDCOM файл."
+msgstr ""
 
 #: webtrees/addmedia.php:112
 msgid "Editing this GEDCOM has been disabled by the administrator."
-msgstr "Редагування цього GEDCOM-заборонено адміністратором."
+msgstr ""
 
 #: webtrees/addmedia.php:115 webtrees/edit_interface.php:134
 msgid "Privacy settings prevent you from editing this record."
-msgstr "Налаштування доступу не дозволяють Вам редагувати цю статтю."
+msgstr ""
 
 #: webtrees/addmedia.php:117
 msgid "You have no access to"
-msgstr "Ви не маєте доступу до"
+msgstr ""
 
 #: webtrees/addmedia.php:185
 msgid "Media file already exists."
-msgstr "Медиафайл з такою назвою вже існує."
+msgstr ""
 
 #: webtrees/addmedia.php:189 webtrees/addmedia.php:204
 #: webtrees/addmedia.php:215 webtrees/edit_interface.php:1107
@@ -18296,71 +18292,66 @@ msgstr "Медиафайл з такою назвою вже існує."
 #: webtrees/includes/functions/functions_mediadb.php:1247
 #: webtrees/includes/functions/functions_mediadb.php:1257
 msgid "There was an error uploading your file."
-msgstr "Помилка при завантаженні файлу."
+msgstr ""
 
 #: webtrees/addmedia.php:200
 msgid "Media thumbnail already exists."
-msgstr "Файл мініатюри вже існує."
+msgstr ""
 
 #: webtrees/addmedia.php:215
 #, php-format
 msgid "The file %s could not be copied from %s"
-msgstr "Файл %s не може бути скопійовано з %s"
+msgstr ""
 
 #: webtrees/addmedia.php:295 webtrees/addmedia.php:464
 msgid "Media file could not be moved or renamed."
-msgstr "Медиафайл перемістити або перейменувати не вдалося."
+msgstr ""
 
 #: webtrees/addmedia.php:334 webtrees/addmedia.php:503
 #, php-format
 msgid "Media file %s does not exist."
-msgstr "Медіафайл% s не існує."
+msgstr ""
 
 #: webtrees/addmedia.php:340 webtrees/addmedia.php:509
 #, php-format
 msgid "Media file %1$s successfully renamed to %2$s."
-msgstr "Медіафайл %1$s успішно перейменовано в %2$s."
+msgstr ""
 
 #: webtrees/addmedia.php:348 webtrees/addmedia.php:517
 #, php-format
 msgid "Media file %1$s could not be renamed to %2$s."
-msgstr "Медіафайл %1$s не може бути перейменовано в %2$s."
+msgstr ""
 
 #: webtrees/addmedia.php:359 webtrees/addmedia.php:528
 #, php-format
 msgid "Thumbnail file %s does not exist."
-msgstr "Мініатюра %s не існує."
+msgstr ""
 
 #: webtrees/addmedia.php:365 webtrees/addmedia.php:534
 #, php-format
 msgid "Thumbnail file %1$s successfully renamed to %2$s."
-msgstr "Мініатюра %1$s успішно перейменовано в %2$s."
+msgstr ""
 
 #: webtrees/addmedia.php:373 webtrees/addmedia.php:542
 #, php-format
 msgid "Thumbnail file %1$s could not be renamed to %2$s."
-msgstr "Мініатюра %1$s не може бути перейменовано в %2$s."
+msgstr ""
 
 #: webtrees/login.php:74
 msgid ""
 "This account has not been verified.  Please check your email for a "
 "verification message."
 msgstr ""
-"Ви не підтвердили адресу Вашої електронної пошти. Перевірте Вашу електронну "
-"пошту і дайте відповіді на лист верифікації."
 
 #: webtrees/login.php:77
 msgid ""
 "This account has not been approved.  Please wait for an administrator to "
 "approve it."
 msgstr ""
-"Ця обліковий запис не активована. Будь ласка, зачекайте поки адміністратор "
-"не активує її. Якщо обліковий запис не активується довгий час, зв'яжіться з "
-"адміністратором."
 
 #: webtrees/login.php:81
 msgid "The username or password is incorrect."
-msgstr "Неправильне ім'я користувача або пароль."
+msgstr ""
 
 #: webtrees/login.php:127
 msgid ""
@@ -18456,24 +18447,19 @@ msgid ""
 "cookies for this site before you can login.  You can consult your browser's "
 "help documentation for information on enabling cookies."
 msgstr ""
-"Цей сайт вимагає прийняття cookies для входу на сайт.\r\n"
-"<br/>\r\n"
-"<br/>\r\n"
-"Ваш браузер не приймає cookies. Якщо Ви хочете увійти на сайт, Ви повинні "
-"дозволити браузеру приймати cookies."
 
 #: webtrees/login.php:219 webtrees/login.php:391
 #, php-format
 msgid "Hello %s ..."
-msgstr "Здравствуйте,%s..."
+msgstr ""
 
 #: webtrees/login.php:220
 msgid "A new password was requested for your user name."
-msgstr "Для Вашого ім'я користувача зроблений запит на новий пароль!"
+msgstr ""
 
 #: webtrees/login.php:224
 msgid "Recommendation:"
-msgstr "Рада:"
+msgstr ""
 
 #: webtrees/login.php:225
 msgid ""
@@ -18481,16 +18467,12 @@ msgid ""
 "new password, and change it immediately to keep the integrity of your data "
 "secure."
 msgstr ""
-"Натисніть на нижчу посилання або скопіюйте її в адресний рядок браузера. "
-"Після входу з новим паролем рекомендується змінити пароль."
 
 #: webtrees/login.php:226
 msgid ""
 "After you have logged in, select the «My Account» link under the «My Page» "
 "menu and fill in the password fields to change your password."
 msgstr ""
-"Після того як Ви ввійдете, відкрийте «Мої параметри» в меню «Моя сторінка» і "
-"вкажіть новий пароль. Збережіть зміни."
 
 #. I18N: %s is a username
 #: webtrees/login.php:243
@@ -18499,25 +18481,21 @@ msgid ""
 "A new password has been created and emailed to %s.  You can change this "
 "password after you login."
 msgstr ""
-"Новий пароль був створений і відправлений на Вашу адресу ел. пошти %s. Ви "
-"можете змінити пароль після входу з новим паролем."
 
 #: webtrees/login.php:329 webtrees/login.php:606
 msgid "Hello Administrator ..."
-msgstr "Здравствуйте, администратор..."
+msgstr ""
 
 #: webtrees/login.php:330
 #, php-format
 msgid "A prospective user has registered with webtrees at %s."
-msgstr "Новий користувач зареєструвався в webtrees на %s."
+msgstr ""
 
 #: webtrees/login.php:335
 msgid ""
 "The user has been sent an e-mail with the information necessary to confirm "
 "the access request"
 msgstr ""
-"Користувачеві було відправлено повідомлення на поштову скриньку з "
-"інформацією необхідної для підтвердження реєстрації."
 
 #: webtrees/login.php:337
 msgid ""
@@ -18525,10 +18503,6 @@ msgid ""
 "request.  You can then complete the process by activating the user name.  "
 "The new user will not be able to login until you activate the account."
 msgstr ""
-"Ви отримаєте сповіщення на поштову скриньку як тільки новий користувач "
-"підтвердить реєстрацію. Потім Ви можете укласти процес реєстрації "
-"затвердивши користувача. Новий користувач не зможе увійти поки Ви не "
-"затвердите його."
 
 #: webtrees/login.php:339
 msgid ""
@@ -18536,39 +18510,36 @@ msgid ""
 "request.  After this, the user will be able to login without any action on "
 "your part."
 msgstr ""
-"Ви отримаєте сповіщення на поштову скриньку як тільки новий користувач "
-"підтвердить реєстрацію. Після цього користувач зможе увійти на сайт без "
-"Вашого втручання."
 
 #: webtrees/login.php:347
 #, php-format
 msgid "New registration at %s"
-msgstr "Нова реєстрація на %s"
+msgstr ""
 
 #: webtrees/login.php:353
 msgid "New Account confirmation"
-msgstr "Підтвердження нового користувача"
+msgstr ""
 
 #: webtrees/login.php:361 webtrees/edituser.php:64
 #: webtrees/admin_users.php:273
 msgid ""
 "Duplicate user name.  A user with that user name already exists.  Please "
 "choose another user name."
-msgstr "Користувач з таким іменем вже існує. Виберете інше ім'я користувача."
+msgstr ""
 
 #: webtrees/login.php:364 webtrees/edituser.php:67
 #: webtrees/admin_users.php:276
 msgid "Duplicate email address.  A user with that email already exists."
-msgstr "Користувач з цим email-адресою вже існує."
+msgstr ""
 
 #: webtrees/login.php:367 webtrees/login.php:478 webtrees/edituser.php:116
 #: webtrees/admin_users.php:279
 msgid "Passwords do not match."
-msgstr "Паролі не співпадають."
+msgstr ""
 
 #: webtrees/login.php:383
 msgid "Unable to add user.  Please try again."
-msgstr "Новий користувач не створений. Спробуйте ще раз."
+msgstr ""
 
 #. I18N: %1$s is the site URL and %2$s is an email address
 #: webtrees/login.php:393
@@ -18577,48 +18548,40 @@ msgid ""
 "You (or someone claiming to be you) has requested an account at %1$s using "
 "the email address %2$s."
 msgstr ""
-"Ви (або хто то, хто видає себе за Вас) запросив доступ на %1$s "
-"використовуючи адресу ел. пошти %2$s."
 
 #: webtrees/login.php:394
 msgid "Information about the request is shown under the link below."
-msgstr "Подробиці запиту під посиланням знизу."
+msgstr ""
 
 #: webtrees/login.php:395
 msgid ""
 "Please click on the following link and fill in the requested data to confirm "
 "your request and email address."
 msgstr ""
-"Натисніть на нижестоящую посилання і введіть запитувану інформацію для "
-"підтвердження Вашого запиту та адреси ел. пошти."
 
 #: webtrees/login.php:407 webtrees/login.php:583
 msgid "Verification code:"
-msgstr "Контрольний код:"
+msgstr ""
 
 #: webtrees/login.php:409
 msgid "If you didn't request an account, you can just delete this message."
-msgstr "Якщо Ви ці дані не запитували, то видаліть повідомлення."
+msgstr ""
 
 #: webtrees/login.php:410
 msgid ""
 "You won't get any more email from this site, because the account request "
 "will be deleted automatically after seven days."
 msgstr ""
-"Ви не отримаєте більше повідомлень, тому Ваше ім'я користувача не минуло "
-"підтвердження і було видалено через 7 днів."
 
 #: webtrees/login.php:411
 #, php-format
 msgid "Your registration at %s"
-msgstr "Ваша реєстрація на %s"
+msgstr ""
 
 #: webtrees/login.php:425
 #, php-format
 msgid "Hello %s ...<br />Thank you for your registration."
 msgstr ""
-"Здравствуйте, %s ... <br/>\r\n"
-"Дякуємо за Ваше звернення на наш сайт"
 
 #: webtrees/login.php:427
 #, php-format
@@ -18632,11 +18595,6 @@ msgid ""
 "before your account can be used.<br /><br />To login to this site, you will "
 "need to know your user name and password."
 msgstr ""
-"Ви отримаєте підтверджуючий лист на Ваш ел.адрес (%s). З даними з цього "
-"листа, Ви можете активізувати своє ім'я користувача. Якщо Ви це не зробите, "
-"по закінченню семи днів Ваш запит буде ліквідований. В цьому випадку Ви "
-"можете ім'я користувача запросити вдруге. Для реєстрації на цьому сайті Ви "
-"повинні мати ім'я користувача та пароль."
 
 #: webtrees/login.php:429
 #, php-format
@@ -18649,15 +18607,6 @@ msgid ""
 "confirmation email, you can login.  To login to this site, you will need to "
 "know your user name and password."
 msgstr ""
-"Ви отримаєте лист із підтвердженням на <b>%s</b>. Слідуючи інструкціям в "
-"цьому листі Ви повинні підтвердити Ваш ел. адрес. Якщо це не відбудеться "
-"протягом 7-ми днів Ваш запит буде автоматично відхилено і Вам потрібно буде "
-"реєструватися заново.\r\n"
-"<br/>\r\n"
-"<br/>\r\n"
-"Після того як Ви слідуючи інструкціям підтвердіть Ваш ел.адрес, Ви зможете "
-"увійти на сайт. Для входу потрібні ім'я користувача і пароль які Ви вказали "
-"при реєстрації."
 
 #: webtrees/login.php:446
 msgid "You must enter your real name."
@@ -18665,31 +18614,29 @@ msgstr ""
 
 #: webtrees/login.php:451 webtrees/admin_users.php:340
 msgid "You must enter an email address."
-msgstr "Введіть ел.адрес."
+msgstr ""
 
 #: webtrees/login.php:456 webtrees/edituser.php:106
 #: webtrees/admin_users.php:325
 msgid "You must enter a user name."
-msgstr "Введіть ім'я користувача."
+msgstr ""
 
 #: webtrees/login.php:461 webtrees/admin_users.php:335
 msgid "You must enter a password."
-msgstr "Введіть пароль."
+msgstr ""
 
 #: webtrees/login.php:466 webtrees/edituser.php:121
 #: webtrees/admin_users.php:350
 msgid "Passwords must contain at least 6 characters."
-msgstr "Пароль повинен бути мінімум 6 символів."
+msgstr ""
 
 #: webtrees/login.php:473 webtrees/admin_users.php:345
 msgid "You must confirm the password."
-msgstr "Введіть пароль два рази."
+msgstr ""
 
 #: webtrees/login.php:485
 msgid "Please enter your relationship to the data in the Comments field."
 msgstr ""
-"Вкажіть, будь ласка, в коментарі, детальну інформацію кому і ким Ви "
-"доводитеся родичем або інформацію про кого хотіли б повідомити."
 
 #: webtrees/login.php:497
 msgid ""
@@ -18699,32 +18646,23 @@ msgid ""
 "whom you are related, or to provide us with information on someone who "
 "should be listed on our site.</li></ul></div>"
 msgstr ""
-"<div class=\"largeError\">Примітка:</div><div class=\"error\"> Заповнивши та "
-"надіславши цей формуляр, ви погоджуєтесь:\r\n"
-"<ul>\r\n"
-"<li> захищати приватну інформацію живих персон перерахованих на нашому "
-"сайті;</li>\r\n"
-"<li> в текстовому полі \"Коментар\" вказати детальну інформацію кому ви "
-"доводитеся родичем або інформацію про кого хотіли б повідомити.</li>\r\n"
-"</ul>\r\n"
-"</ div>"
 
 #: webtrees/login.php:503
 msgid "All fields must be completed."
-msgstr "Всі поля мають бути заповнені."
+msgstr ""
 
 #: webtrees/login.php:519
 msgid "Desired user name"
-msgstr "Ім'я користувача"
+msgstr ""
 
 #: webtrees/login.php:526
 msgid "Desired password"
-msgstr "Виберіть пароль"
+msgstr ""
 
 #: webtrees/login.php:567 webtrees/login.php:573 webtrees/login.php:637
 #: webtrees/login.php:641
 msgid "User verification"
-msgstr "Перевірка користувача"
+msgstr ""
 
 #. I18N: %1$s is a real-name, %2$s is a username, %3$s is an email address
 #: webtrees/login.php:608
@@ -18733,91 +18671,76 @@ msgid ""
 "A new user (%1$s) has requested an account (%2$s) and verified an email "
 "address (%3$s)."
 msgstr ""
-"Новий користувач (%1$s) запросив доступ як (%2$s) і підтвердив адресу ел. "
-"пошти (%3$s)."
 
 #: webtrees/login.php:610
 msgid ""
 "You now need to review the account details, and set the “approved” status to "
 "“yes”."
 msgstr ""
-"Ви повинні перевірити дані користувача і вибрати \"Так\" у статусі "
-"\"Затверджено\"."
 
 #: webtrees/login.php:612
 msgid "You do not have to take any action; the user can now login."
 msgstr ""
-"Вам не потрібно робити ніяких дій, новий користувач тепер може сам увійти в "
-"систему."
 
 #: webtrees/login.php:631
 #, php-format
 msgid "New user at %s"
-msgstr "Новий користувач на %s"
+msgstr ""
 
 #: webtrees/login.php:643
 #, php-format
 msgid "The data for the user <b>%s</b> was checked."
-msgstr "Дані користувача %s перевірені."
+msgstr ""
 
 #: webtrees/login.php:664
 msgid "You have confirmed your request to become a registered user."
-msgstr "Ви відомі як зареєстрований користувач."
+msgstr ""
 
 #: webtrees/login.php:666
 msgid ""
 "The Administrator has been informed.  As soon as he gives you permission to "
 "login, you can login with your user name and password."
 msgstr ""
-"Адміністратор інформований. Як тільки він перевірить Ваші дані і дасть "
-"доступ, Ви зможете увійти на сайт, ввівши ім'я користувача та пароль."
 
 #: webtrees/login.php:668
 msgid "You can now login with your user name and password."
 msgstr ""
-"Тепер Ви можете увійти до системи, ввівши ім'я користувача та пароль."
 
 #: webtrees/login.php:674
 msgid "Data was not correct, please try again"
 msgstr ""
-"Дані не коректні!\r\n"
-"<br/>\r\n"
-"Спробуйте ще раз!"
 
 #: webtrees/login.php:680
 msgid ""
 "Could not verify the information you entered.  Please try again or contact "
 "the site administrator for more information."
 msgstr ""
-"Не вдалося перевірити інформацію, яку Ви ввели. Будь ласка, повторіть спробу "
-"або зв'яжіться з адміністратором сайту для отримання додаткової інформації."
 
 #. I18N: An access rule - allow access to the site
 #: webtrees/admin_site_access.php:109 webtrees/admin_site_access.php:298
 msgid "allow"
-msgstr "дозволити"
+msgstr ""
 
 #. I18N: An access rule - deny access to the site
 #: webtrees/admin_site_access.php:110 webtrees/admin_site_access.php:299
 msgid "deny"
-msgstr "відхилити"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Web_crawler
 #: webtrees/admin_site_access.php:111 webtrees/admin_site_access.php:300
 msgid "robot"
-msgstr "робот"
+msgstr ""
 
 #: webtrees/admin_site_access.php:114 webtrees/admin_users.php:177
 #, php-format
 msgid "Permanently delete \"%s\"?"
-msgstr "Безповоротно видалити \"%s\"?"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/User_agent
 #: webtrees/admin_site_access.php:268
 msgid ""
 "Restrict access to the site, using IP addresses and user-agent strings"
 msgstr ""
-"Обмеження доступу до сайту, використовуючи IP-адреси і User-Agent рядки"
 
 #: webtrees/admin_site_access.php:270
 msgid ""
@@ -18825,67 +18748,63 @@ msgid ""
 "(allow full access), a search-engine robot (allow restricted access) or an "
 "unwanted crawler (deny all access)."
 msgstr ""
-"Наступні правила використовуються для визначення, чи є відвідувач людиною "
-"(необмежений доступ), пошуковим роботом (обмежений доступ) або небажаний "
-"відвідувач (забороняє будь-який доступ)."
 
 #. I18N [...] of a range of addresses
 #: webtrees/admin_site_access.php:275
 msgid "Start IP address"
-msgstr "Початковий IP-адрес"
+msgstr ""
 
 #. I18N [...] of a range of addresses
 #: webtrees/admin_site_access.php:277
 msgid "End IP address"
-msgstr "Кінцевий IP-адрес"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/User_agent_string
 #: webtrees/admin_site_access.php:279 webtrees/admin_site_access.php:294
 msgid "User-agent string"
-msgstr "Рядок User-agent"
+msgstr ""
 
 #. I18N: noun
 #: webtrees/admin_site_access.php:280
 msgid "Rule"
-msgstr "Правило"
+msgstr ""
 
 #: webtrees/admin_site_access.php:287
 msgid ""
 "The following visitors were not recognised, and were assumed to be search "
 "engines."
 msgstr ""
-"Наступні відвідувачі не були визнані, і передбачалися пошуковими машинами."
 
 #: webtrees/admin_site_access.php:295
 msgid "Create a new rule"
-msgstr "Створити нове правило"
+msgstr ""
 
 #: webtrees/timeline.php:131 webtrees/timeline.php:133
 #: webtrees/timeline.php:134
 msgid "Month:"
-msgstr "Місяць:"
+msgstr ""
 
 #: webtrees/timeline.php:131 webtrees/timeline.php:133
 #: webtrees/timeline.php:134
 msgid "Day:"
-msgstr "День:"
+msgstr ""
 
 #: webtrees/timeline.php:133
 msgid "years"
-msgstr "року (років)"
+msgstr ""
 
 #: webtrees/timeline.php:134 webtrees/timeline.php:370
 msgid "Year:"
-msgstr "Рік:"
+msgstr ""
 
 #. I18N: an age indicator, which can be dragged around the screen
 #: webtrees/timeline.php:275
 msgid "Show an age cursor?"
-msgstr "Показати курсор віку?"
+msgstr ""
 
 #: webtrees/timeline.php:315
 msgid "Show lifespans"
-msgstr "Показати життєві відрізки"
+msgstr ""
 
 #. I18N: %1$s is "accept", %2$s is "reject".  These are links.
 #: webtrees/repo.php:40
@@ -18893,13 +18812,13 @@ msgstr "Показати життєві відрізки"
 msgid ""
 "This repository has been deleted.  You should review the deletion and then "
 "%1$s or %2$s it."
-msgstr "Цей архів був видалений. Ви повинні переглянути %1$s або %2$s зміни."
+msgstr ""
 
 #: webtrees/repo.php:49
 msgid ""
 "This repository has been deleted.  The deletion will need to be reviewed by "
 "a moderator."
-msgstr "Цей архів був видалений. Видалення потребує перевірки модератором."
+msgstr ""
 
 #. I18N: %1$s is "accept", %2$s is "reject".  These are links.
 #: webtrees/repo.php:58
@@ -18908,35 +18827,33 @@ msgid ""
 "This repository has been edited.  You should review the changes and then "
 "%1$s or %2$s them."
 msgstr ""
-"Цей архів було редагований. Ви повинні переглянути %1$s або %2$s зміни."
 
 #: webtrees/repo.php:67
 msgid ""
 "This repository has been edited.  The changes need to be reviewed by a "
 "moderator."
 msgstr ""
-"Цей архів було редагований. Зміни повинні бути розглянуті модератором."
 
 #: webtrees/repo.php:75
 msgid ""
 "This repository does not exist or you do not have permission to view it."
-msgstr "Цей архів не існує або у Вас немає прав на перегляд."
+msgstr ""
 
 #: webtrees/edit_interface.php:162
 msgid "Add daughter"
-msgstr "Додати дочку"
+msgstr ""
 
 #: webtrees/edit_interface.php:164
 msgid "Add son"
-msgstr "Додати сина"
+msgstr ""
 
 #: webtrees/edit_interface.php:166
 msgid "Add child"
-msgstr "Додати дитину"
+msgstr ""
 
 #: webtrees/edit_interface.php:568
 msgid "You must provide a source title"
-msgstr "Ви повинні вказати зміст джерела"
+msgstr ""
 
 #: webtrees/edit_interface.php:577 webtrees/edit_interface.php:645
 #: webtrees/includes/functions/functions_edit.php:1148
@@ -18945,73 +18862,71 @@ msgstr ""
 
 #: webtrees/edit_interface.php:621
 msgid "Select Events"
-msgstr "Обрати факти"
+msgstr ""
 
 #: webtrees/edit_interface.php:692
 msgid "New source created successfully."
-msgstr "Новий джерело успішно створений"
+msgstr ""
 
 #: webtrees/edit_interface.php:700
 #: webtrees/includes/functions/functions_edit.php:1135
 msgid "Create a new Shared Note"
-msgstr "Створити новий загальний коментар"
+msgstr ""
 
 #: webtrees/edit_interface.php:768
 #: webtrees/includes/functions/functions_edit.php:1140
 #: webtrees/includes/functions/functions_edit.php:1703
 msgid "Create a new Shared Note using Assistant"
-msgstr "Створити новий загальний коментар з використанням помічника"
+msgstr ""
 
 #: webtrees/edit_interface.php:884
 #: webtrees/includes/functions/functions_edit.php:1144
 msgid "Edit Shared Note"
-msgstr "Редагувати загальну посилання"
+msgstr ""
 
 #: webtrees/edit_interface.php:940
 msgid "You must provide a repository name"
-msgstr "Ви повинні вказати назву архіву"
+msgstr ""
 
 #: webtrees/edit_interface.php:949 webtrees/edit_interface.php:989
 #: webtrees/includes/functions/functions_edit.php:1131
 msgid "Create Repository"
-msgstr "Створити архів"
+msgstr ""
 
 #: webtrees/edit_interface.php:955
 #: webtrees/includes/functions/functions_print_lists.php:1176
 msgid "Repository name"
-msgstr "Назва архіву"
+msgstr ""
 
 #: webtrees/edit_interface.php:1028
 msgid "New Repository created"
-msgstr "Новий архів успішно створений."
+msgstr ""
 
 #: webtrees/edit_interface.php:1029
 msgid ""
 "Paste the following Repository ID into your editing fields to reference this "
 "Repository "
 msgstr ""
-"Вставте наступне ID архіву в редаговані рядки для посилання на цей "
-"Репозиторій "
 
 #: webtrees/edit_interface.php:1797 webtrees/edit_interface.php:1806
 #: webtrees/includes/functions/functions.php:1643
 msgid "mother"
-msgstr "матір"
+msgstr ""
 
 #: webtrees/edit_interface.php:1799 webtrees/edit_interface.php:1804
 #: webtrees/includes/functions/functions.php:1644
 msgid "father"
-msgstr "батько"
+msgstr ""
 
 #: webtrees/edit_interface.php:1823 webtrees/edit_interface.php:1832
 #: webtrees/includes/functions/functions.php:1647
 msgid "wife"
-msgstr "дружина"
+msgstr ""
 
 #: webtrees/edit_interface.php:1825 webtrees/edit_interface.php:1834
 #: webtrees/includes/functions/functions.php:1646
 msgid "husband"
-msgstr "чоловік"
+msgstr ""
 
 #: webtrees/edit_interface.php:1827 webtrees/edit_interface.php:1836
 #: webtrees/edit_interface.php:1869 webtrees/edit_interface.php:1888

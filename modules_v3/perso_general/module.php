@@ -45,26 +45,28 @@ class perso_general_WT_Module extends WT_Module implements WT_Perso_Module_HookS
 
 	// Implement WT_Perso_Module_Configurable
 	public function h_config_tab_content(){
+		global $controller;
+		
 		echo '<div id="'.$this->getName().'"><table class="gm_edit_config"><tr><td><dl>';
 		if(WT_USER_IS_ADMIN){
 			echo '<dt>', WT_I18N::translate('Title prefixes'), help_link('config_title_prefix', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PG_TITLE_PREFIX-'.$this->getName(), get_module_setting($this->getName(), 'PG_TITLE_PREFIX', '')), '</dd>';
+				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PG_TITLE_PREFIX-'.$this->getName(), get_module_setting($this->getName(), 'PG_TITLE_PREFIX', ''), $controller), '</dd>';
 			echo '<dt>', WT_I18N::translate('Include additional HTML in header'), help_link('config_add_html_header', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_field_yes_no_inline('module_setting-PG_ADD_HTML_HEADER-'.$this->getName(), get_module_setting($this->getName(), 'PG_ADD_HTML_HEADER', false)), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_field_yes_no_inline('module_setting-PG_ADD_HTML_HEADER-'.$this->getName(), get_module_setting($this->getName(), 'PG_ADD_HTML_HEADER', false), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Hide additional header'), help_link('config_show_html_header', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PG_SHOW_HTML_HEADER-'.$this->getName(), get_module_setting($this->getName(), 'PG_SHOW_HTML_HEADER', WT_PRIV_HIDE)), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PG_SHOW_HTML_HEADER-'.$this->getName(), get_module_setting($this->getName(), 'PG_SHOW_HTML_HEADER', WT_PRIV_HIDE), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Additional HTML in header'), help_link('config_html_header', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_longfield_inline('module_setting-PG_HTML_HEADER-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PG_HTML_HEADER', '')), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_module_longfield_inline('module_setting-PG_HTML_HEADER-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PG_HTML_HEADER', ''), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Display French <em>CNIL</em> disclaimer'), help_link('config_display_CNIL', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_field_yes_no_inline('module_setting-PG_DISPLAY_CNIL-'.$this->getName(), get_module_setting($this->getName(), 'PG_DISPLAY_CNIL', false)), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_field_yes_no_inline('module_setting-PG_DISPLAY_CNIL-'.$this->getName(), get_module_setting($this->getName(), 'PG_DISPLAY_CNIL', false), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('<em>CNIL</em> reference'), help_link('config_cnil_ref', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PG_CNIL_REFERENCE-'.$this->getName(), get_module_setting($this->getName(), 'PG_CNIL_REFERENCE', '')), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PG_CNIL_REFERENCE-'.$this->getName(), get_module_setting($this->getName(), 'PG_CNIL_REFERENCE', ''), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Include additional HTML in footer'), help_link('config_add_html_footer', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_field_yes_no_inline('module_setting-PG_ADD_HTML_FOOTER-'.$this->getName(), get_module_setting($this->getName(), 'PG_ADD_HTML_FOOTER', false)), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_field_yes_no_inline('module_setting-PG_ADD_HTML_FOOTER-'.$this->getName(), get_module_setting($this->getName(), 'PG_ADD_HTML_FOOTER', false), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Hide additional footer'), help_link('config_show_html_footer', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PG_SHOW_HTML_FOOTER-'.$this->getName(), get_module_setting($this->getName(), 'PG_SHOW_HTML_FOOTER', WT_PRIV_HIDE)), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PG_SHOW_HTML_FOOTER-'.$this->getName(), get_module_setting($this->getName(), 'PG_SHOW_HTML_FOOTER', WT_PRIV_HIDE), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Additional HTML in footer'), help_link('config_html_footer', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_longfield_inline('module_setting-PG_HTML_FOOTER-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PG_HTML_FOOTER', '')), '</dd>';
+				'<dd>', WT_Perso_Functions_Edit::edit_module_longfield_inline('module_setting-PG_HTML_FOOTER-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PG_HTML_FOOTER', ''), $controller), '</dd>';
 		}
 		echo '</dl></td></tr></table></div>';
 	}

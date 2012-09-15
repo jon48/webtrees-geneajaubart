@@ -99,8 +99,8 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			//-- recompute Sosa submenu
 			if (WT_USER_CAN_EDIT && !empty($controller) && $controller instanceof WT_Controller_Individual ) {
 				$controller
-					->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/computesosaindi.js')
-					->addInlineJavaScript('var PS_Dialog_Title = "'.WT_I18N::translate('Sosas computation').'";');
+					->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/computesosaindi.js')
+					->addInlineJavascript('var PS_Dialog_Title = "'.WT_I18N::translate('Sosas computation').'";');
 				;
 					
 				$submenu = new WT_Menu(WT_I18N::translate('Complete Sosas'), '#', 'menu-sosa-recompute');
@@ -131,7 +131,7 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 	public function h_config_tab_content(){
 		global $controller;
 		
-		$controller->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/computesosa.js');
+		$controller->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/computesosa.js');
 		
 		echo '<div id="'.$this->getName().'"><table class="gm_edit_config"><tr><td><dl>';
 		// Load all available gedcoms
@@ -140,7 +140,7 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			if(userGedcomAdmin(WT_USER_ID, $ged_id)){
 				$title=strip_tags(get_gedcom_setting($ged_id, 'title'));
 				echo '<dt>', WT_I18N::translate('Root individual for <em>%s</em>', $title), help_link('config_root_indi', $this->getName()), '</dt>',
-					'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('gedcom_setting-PERSO_PS_ROOT_INDI-'.$ged_id, get_gedcom_setting($ged_id, 'PERSO_PS_ROOT_INDI')),'</dd>',
+					'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('gedcom_setting-PERSO_PS_ROOT_INDI-'.$ged_id, get_gedcom_setting($ged_id, 'PERSO_PS_ROOT_INDI'), $controller),'</dd>',
 					'<dt>', WT_I18N::translate('Compute all Sosas for <em>%s</em>', $title), help_link('config_computesosa', $this->getName()), '</dt>',
 					'<dd><button id="bt_'.$ged_id.'" class="progressbutton" onClick="calculateSosa(\''.$ged_id.'\');"><div id="btsosa_'.$ged_id.'">'.WT_I18N::translate('Compute').'</div></button></dd>';
 			}

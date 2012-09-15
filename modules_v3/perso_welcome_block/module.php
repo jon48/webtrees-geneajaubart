@@ -43,7 +43,7 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
 		$controller
-			->addInlineJavaScript('
+			->addInlineJavascript('
 				  jQuery("#perso-new_passwd").hide();
 				  jQuery("#perso-passwd_click").click(function()
 				  {
@@ -55,7 +55,12 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		$indi_xref=$controller->getSignificantIndividual()->getXref();
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
-		$title='<span dir="auto">'.get_gedcom_setting(WT_GED_ID, 'title').'</span>';
+		if (WT_USER_IS_ADMIN) {
+			$title='<i class="icon-admin" title="'.WT_I18N::translate('Configure').'" onclick="modalDialog(\'block_edit.php?block_id='.$block_id.'\', \''.$this->getTitle().'\');"></i>';
+		} else {
+			$title='';
+		}		
+		$title.='<span dir="auto">'.get_gedcom_setting(WT_GED_ID, 'title').'</span>';
 		
 		$piwik_enabled=get_block_setting($block_id, 'piwik_enabled', false);
 		
@@ -70,7 +75,7 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		
 		$content .= '<div class="center">';		
 		if ($piwik_enabled){
-			$controller->addInlineJavaScript('$("#piwik_stats").load("module.php?mod=perso_welcome_block&mod_action=getpiwikstats&block_id='.$block_id.'");');		
+			$controller->addInlineJavascript('$("#piwik_stats").load("module.php?mod=perso_welcome_block&mod_action=getpiwikstats&block_id='.$block_id.'");');		
 			$content .= '<div id="piwik_stats"><i class="icon-loading-small"></i>&nbsp;'.WT_I18N::translate('Retrieving Piwik statistics...').'</div>';
 		}
 		$content .=  '</div>';
@@ -160,7 +165,6 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 			set_block_setting($block_id, 'piwik_url',  safe_POST('piwik_url'));
 			set_block_setting($block_id, 'piwik_siteid',  safe_POST('piwik_siteid'));
 			set_block_setting($block_id, 'piwik_token',  safe_POST('piwik_token'));
-			echo WT_JS_START, 'window.opener.location.href=window.opener.location.href;window.close();', WT_JS_END;
 			exit;
 		}
 		

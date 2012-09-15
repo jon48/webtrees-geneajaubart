@@ -3,7 +3,7 @@
  * Additional functions for Sosa (based on sosa module)
  *
  * @package webtrees
- * @subpackage Perso
+ * @subpackage PersoLbrary
  * @author: Jonathan Jaubart ($Author$)
  * @version: p_$Revision$ $Date$
  * $HeadURL$

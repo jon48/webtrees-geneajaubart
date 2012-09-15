@@ -16,8 +16,6 @@ if (!defined('WT_WEBTREES')) {
 
 global $controller;
 
-require_once WT_ROOT.'includes/functions/functions_places.php';
-
 /**
 * print a sortable table of missing sosa individuals
 *
@@ -28,7 +26,7 @@ require_once WT_ROOT.'includes/functions/functions_places.php';
 */
 function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 	global $GEDCOM, $SHOW_LAST_CHANGE, $SEARCH_SPIDER, $controller;
-	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
+	$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$SHOW_EST_LIST_DATES=get_gedcom_setting(WT_GED_ID, 'SHOW_EST_LIST_DATES');
 	if (count($sosalistG)<1) return;
 	
@@ -131,14 +129,15 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 		//-- Birth place
 		$html .= '<td>';
 		foreach ($person->getAllBirthPlaces() as $n=>$birth_place) {
+			$tmp=new WT_Place($birth_place, WT_GED_ID);
 			if ($n) {
 				$html .= '<br>';
 			}
 			if ($SEARCH_SPIDER) {
-				$html .= get_place_short($birth_place);
+				$html .= $tmp->getShortName();
 			} else {
-				$html .= '<a href="'. get_place_url($birth_place). '" title="'. $birth_place. '">';
-				$html .= highlight_search_hits(get_place_short($birth_place)). '</a>';
+				$html .= '<a href="'. $tmp->getURL() . '" title="'. strip_tags($tmp->getShortName()) . '">';
+				$html .= highlight_search_hits($tmp->getShortName()). '</a>';
 			}
 		}
 		$html .= '</td>';
@@ -164,8 +163,8 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 	$percSosa = WT_Perso_Functions::getPercentage(count($sosalistG1), pow(2, $gen-1));
 	if($areMissing){
 		$controller
-			->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-			->addInlineJavaScript('
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+			->addInlineJavascript('
 				/* Initialise datatables */
 				jQuery.fn.dataTableExt.oSort["unicode-asc"  ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 				jQuery.fn.dataTableExt.oSort["unicode-desc" ]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};

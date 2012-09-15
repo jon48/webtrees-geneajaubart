@@ -55,29 +55,21 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 		$controller=new WT_Controller_Base();
 		$controller
 			->requireAdminLogin()
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.jeditable.min.js')
+			->addInlineJavascript('jQuery("#tabs").tabs();')
 			->setPageTitle($this->getTitle())
 			->pageHeader();
-				
-		echo WT_JS_START;
-		?>
-		jQuery(document).ready(function() { jQuery("#tabs").tabs(); });
-		<?php
-		echo WT_JS_END;
-			
-		echo '<table class="site_config">',
-				'<tr>',
-					'<td>',
-						'<div id="tabs">',
-							'<ul>';
+		
+		echo '<div class="site_config">',
+				'<div id="tabs">',
+					'<ul>';
 		$h_config_tab_name = new WT_Perso_Hook('h_config_tab_name');
 		$h_config_tab_name->execute();
 		echo				'</ul>';
 		$h_config_tab_content = new WT_Perso_Hook('h_config_tab_content');
 		$h_config_tab_content->execute($this->getName());
-		echo			'</div>',
-					'</td>',
-				'</tr>',
-			'</table>';
+		echo	'</div>',
+			'</div>';
 	}
 	
 	/**

@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: Fab\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2012-08-31 14:32+0100\n"
-"PO-Revision-Date: 2012-09-01 21:42+0000\n"
-"Last-Translator: Leo Zwaga <Unknown>\n"
+"PO-Revision-Date: 2012-08-25 19:19+0000\n"
+"Last-Translator: JustCarmen <Unknown>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2012-09-02 04:47+0000\n"
+"X-Launchpad-Export-Date: 2012-09-01 05:07+0000\n"
 "X-Generator: Launchpad (build 15890)\n"
 "Language: \n"
 "X-Poedit-Language: Dutch\n"
@@ -471,7 +471,7 @@ msgstr "achter"
 #: webtrees/modules_v3/top10_givnnames/module.php:156
 #: webtrees/modules_v3/review_changes/module.php:188
 msgid "Add a scrollbar when block contents grow"
-msgstr "Voeg een scrollbalk toe wanneer de inhoud van het blok toeneemt"
+msgstr "Voeg een scrollbalk toe als de inhoud van het blok toeneemt"
 
 #: webtrees/modules_v3/top10_pageviews/help_text.php:33
 msgid "Most Viewed Items"
@@ -540,7 +540,7 @@ msgstr "Een zijbalk die de naaste familie en verwanten van de persoon toont."
 #: webtrees/includes/functions/functions.php:1735
 msgctxt "mother's husband"
 msgid "step-father"
-msgstr "stiefvader"
+msgstr "Stiefvader"
 
 #: webtrees/modules_v3/family_nav/module.php:190
 #: webtrees/modules_v3/GEDFact_assistant/_CENS/census_3_search_add.php:739
@@ -598,8 +598,8 @@ msgstr "Berichten"
 #: webtrees/modules_v3/user_messages/module.php:39
 msgid "Communicate directly with other users, using private messages."
 msgstr ""
-"Communiceer rechtstreeks met andere gebruikers door middel van "
-"privéberichten."
+"Communiceer rechtstreeks met andere gebruikers door middel van privé "
+"berichten."
 
 #: webtrees/modules_v3/user_messages/module.php:72
 #, php-format
@@ -612,8 +612,7 @@ msgstr[1] "%s berichten"
 #: webtrees/modules_v3/user_messages/module.php:119
 msgid ""
 "Are you sure you want to delete this message?  It cannot be retrieved later."
-msgstr ""
-"Weet u zeker dat u dit bericht wilt verwijderen? Herstellen is niet mogelijk."
+msgstr "Wilt u dit bericht echt verwijderen? Herstellen is niet mogelijk."
 
 #: webtrees/modules_v3/user_messages/module.php:75
 #: webtrees/library/WT/Stats.php:3747 webtrees/library/WT/Stats.php:3749
@@ -8898,7 +8897,7 @@ msgstr ""
 
 #: webtrees/help_text.php:1156
 msgid "Link ID"
-msgstr "koppeling ID"
+msgstr ""
 
 #: webtrees/help_text.php:1157
 msgid ""

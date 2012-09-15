@@ -87,9 +87,9 @@ return array(
 									=>	'Voir les détails de cet acte',
 	'Certificates directory'		=>	'Répertoire des actes',
 	'The certificates directory is used to create URLs for your certificates. You will access the certificates by using URL of the form %2$s, if the certificate directory is %1$s.'
-									=>	'Le Répertoire des actes est utilisée pour créer les adresses URL de vos actes. Vous accédez ainsi aux actes avec une URL du type %2$s, si le Répertoire des actes est %1$s',
+									=>	'Le Répertoire des actes est utilisé pour créer les adresses URL de vos actes. Vous accédez ainsi aux actes avec une URL du type %2$s, si le Répertoire des actes est %1$s',
 	'The certificates firewall changes the location of the certificates directory from the public directory %1$s to a private directory such as %2$s.  This allows webtrees to apply privacy filtering to certificates.'
-									=>	'Le pare-feu des actes transforme le Répertoire des actes public %1$s en un répertoire privé tel que %2$s. Cela permet d\appliquer des filtres d\'accès privés aux actes.',
+									=>	'Le pare-feu des actes transforme le Répertoire des actes public %1$s en un répertoire privé tel que %2$s. Cela permet d\'appliquer des filtres d\'accès privés aux actes.',
 	'The certificates directory %s must exist, and the webserver must have read and write access to it.'
 									=>	'Le Répertoire des actes %s doit exister, et le serveur web doit y avoir les droits de lecture et d\'écriture.',
 	'The certificates directory is shared by all family trees.'
@@ -275,7 +275,7 @@ return array(
 									=>	'Nombre d\'ancêtres Sosa : %1$d connus / %2$d théoriques (%3$0.2f %%)',																
 
 	//Perso IsSourced
-	'Sourced events'				=>	'Perso Événements documentés',
+	'Sourced events'				=>	'Événements documentés',
 	'Sourced individual'			=>	'Individu documenté',
 	'Sourced birth'					=>	'Naissance documentée',
 	'Sourced death'					=>	'Décès documenté',

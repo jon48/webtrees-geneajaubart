@@ -22,9 +22,9 @@ switch ($help) {
 			'<p>'.
 			WT_I18N::translate('The certificates directory is used to create URLs for your certificates. You will access the certificates by using URL of the form %2$s, if the certificate directory is %1$s.', '<tt style="white-space:nowrap; color:#0000ff; font-weight:bold;">'.$certif_directory.'</tt>', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_MODULES_DIR.'perso_certificates/<span style="color:#0000ff;">'.$certif_directory.'</span>certif123.jpg</tt>').
 			'</p><p>'.
-			WT_I18N::translate('The certificates firewall changes the location of the certificates directory from the public directory %1$s to a private directory such as %2$s.  This allows webtrees to apply privacy filtering to certificates.', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$certif_directory.'</span></tt>', '<tt style="white-space:nowrap; font-weight:bold;">'.get_module_setting('perso_certificates', 'PC_CERT_FW_ROOTDIR', 'data/').'<span style="color:#0000ff;">'.$certif_directory.'</span></tt>').
+			WT_I18N::translate('The certificates firewall changes the location of the certificates directory from the public directory %1$s to a private directory such as %2$s.  This allows webtrees to apply privacy filtering to certificates.', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.WT_MODULES_DIR.'perso_certificates/<span style="color:#0000ff;">'.$certif_directory.'</span></tt>', '<tt style="white-space:nowrap; font-weight:bold;">'.get_module_setting('perso_certificates', 'PC_CERT_FW_ROOTDIR', 'data/').'<span style="color:#0000ff;">'.$certif_directory.'</span></tt>').
 			'</p><p>'.
-			WT_I18N::translate('The certificates directory %s must exist, and the webserver must have read and write access to it.', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$certif_directory.'</span></tt>').
+			WT_I18N::translate('The certificates directory %s must exist, and the webserver must have read and write access to it.', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_MODULES_DIR.'perso_certificates/<span style="color:#0000ff;">'.$certif_directory.'</span></tt>').
 			'</p><p>'.
 			WT_I18N::translate('The certificates directory is shared by all family trees.').
 			'</p>';

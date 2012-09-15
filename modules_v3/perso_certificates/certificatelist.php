@@ -35,8 +35,8 @@ function format_certificate_table($certificates, $city) {
 	$html = '';
 	$table_id = "ID".floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
-			->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-			->addInlineJavaScript('
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+			->addInlineJavascript('
 				/* Initialise datatables */
 				jQuery.fn.dataTableExt.oSort["unicode-asc"  ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 				jQuery.fn.dataTableExt.oSort["unicode-desc" ]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
@@ -142,7 +142,7 @@ if($requestedCity){
 	}
 	else{
 		$controller
-			->addInlineJavaScript('
+			->addInlineJavascript('
 				jQuery("#certificate-tabs").tabs();
 				jQuery("#certificate-tabs").css("visibility", "visible");
 			');

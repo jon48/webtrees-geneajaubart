@@ -3,7 +3,7 @@
  * Class to provide a Cache to Perso Modules
  *
  * @package webtrees
- * @subpackage subpackage
+ * @subpackage PersoLibrary
  * @author: Jonathan Jaubart ($Author$)
  * @version: p_$Revision$ $Date$
  * $HeadURL$

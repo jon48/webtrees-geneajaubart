@@ -187,8 +187,8 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 		'</div>';
 		
 		$controller
-		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addInlineJavaScript('
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavascript('
 				  	jQuery(document).ready(function() {
 		
 					  var oTable = jQuery("#installed_table").dataTable( {

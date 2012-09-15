@@ -33,8 +33,8 @@ if(WT_Perso_Functions_Sosa::isModuleOperational()){
 		
 		if($title){
 			$controller
-			->addExternalJavaScript(WT_STATIC_URL.'js/raphaeljs/raphael.min.js')
-			->addInlineJavaScript('
+			->addExternalJavascript(WT_STATIC_URL.'js/raphaeljs/raphael.min.js')
+			->addInlineJavascript('
 					jQuery("#geodispersion-tabs").tabs();
 					jQuery("#geodispersion-tabs").css("visibility", "visible");
 					

@@ -74,36 +74,56 @@ class WT_Perso_Functions_Map {
 	 */
 	public static function getRandomPlaceExample($ged_id = WT_GED_ID){
 		$randomPlace = null;
-		$nbLevels = ($nb = WT_DB::prepare("SELECT MAX(p_level) FROM `##places` WHERE p_file=?")
-						->execute(array($ged_id))
-						->fetchOne(0))? $nb + 1 : 0;
-		if($nbLevels > 0){
-			$sample = WT_DB::prepare(
-				"SELECT pl_p_id AS place_id
-				FROM `##placelinks`
-				JOIN `##places` ON ##placelinks.pl_p_id = ##places.p_id
-				WHERE pl_file= ? AND ##places.p_level = ? AND LENGTH(##places.p_place) > 0 
-				ORDER BY RAND() LIMIT 1")
-				->execute(array($ged_id, $nbLevels - 1))
-				->fetchOne();
-			if($sample){
-				// Generate the SQL statement
-				$select = "p1.p_place";
-				$from = "`##places` p1";
-				for($i = 2; $i <= $nbLevels ; $i++) {
-					$select .= ", ', ', p".$i.".p_place";
-					$from .= " JOIN `##places` p".$i." ON (p".($i-1).".p_parent_id=p".$i.".p_id AND p".($i-1).".p_file=p".$i.".p_file)";
-				}
-				$sql = 
-					'SELECT CONCAT('.$select.')'.
-					' FROM '.$from.
-					' WHERE p1.p_id = ? AND p'.$nbLevels.'.p_parent_id=0 AND p1.p_file=?'.
-					' LIMIT 1';
-				
-				$dbresult = WT_DB::prepare($sql)->execute(array($sample, $ged_id))->fetchOne();
-				$randomPlace = array_reverse(array_map('trim',explode(',', $dbresult)));
+		$nbLevels = 0;
+		
+		//Select all '2 PLAC ' tags in the file and create array
+		$place_list=array();
+		$ged_data=WT_DB::prepare("SELECT i_gedcom FROM `##individuals` WHERE i_gedcom LIKE ? AND i_file=?")
+			->execute(array("%\n2 PLAC %", $ged_id))
+			->fetchOneColumn();
+		foreach ($ged_data as $ged_datum) {
+			preg_match_all('/\n2 PLAC (.+)/', $ged_datum, $matches);
+			foreach ($matches[1] as $match) {
+				$place_list[$match]=true;
 			}
 		}
+		$ged_data=WT_DB::prepare("SELECT f_gedcom FROM `##families` WHERE f_gedcom LIKE ? AND f_file=?")
+		->execute(array("%\n2 PLAC %", $ged_id))
+		->fetchOneColumn();
+		foreach ($ged_data as $ged_datum) {
+			preg_match_all('/\n2 PLAC (.+)/', $ged_datum, $matches);
+			foreach ($matches[1] as $match) {
+				$place_list[$match]=true;
+			}
+		}
+		// Unique list of places
+		$place_list=array_keys($place_list);		
+		
+		//sort the array, limit to unique values, and count them
+		$place_parts=array();
+		usort($place_list, "utf8_strcasecmp");
+		$i=count($place_list);
+		
+		//calculate maximum no. of levels to display
+		$x=0;
+		$goodexamplefound = false;
+		while ($x<$i) {
+			$levels=explode(",", $place_list[$x]);
+			$parts=count($levels);
+			if ($parts>=$nbLevels){
+				$nbLevels=$parts;
+				if(!$goodexamplefound){
+					$randomPlace = $place_list[$x];
+					if(min(array_map('strlen', $levels)) > 0){
+						$goodexamplefound = true;
+					}
+				}
+			}
+			$x++;
+		}
+		
+		$randomPlace = array_reverse(array_map('trim',explode(',', $randomPlace)));
+		
 		return array($nbLevels, $randomPlace);
 	}
 	

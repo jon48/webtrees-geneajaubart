@@ -62,24 +62,26 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 	
 	// Implement WT_Perso_Module_Configurable
 	public function h_config_tab_content(){
+		global $controller;
+		
 		echo '<div id="'.$this->getName().'"><table class="gm_edit_config"><tr><td><dl>';
 		if(WT_USER_IS_ADMIN){
 			echo '<dt>', WT_I18N::translate('Certificates directory'), help_link('config_cert_rootdir', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_CERT_ROOTDIR-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_CERT_ROOTDIR', 'certificates/')), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_CERT_ROOTDIR-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_CERT_ROOTDIR', 'certificates/'), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Show certificates'), help_link('config_show_cert', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PC_SHOW_CERT-'.$this->getName(), get_module_setting($this->getName(), 'PC_SHOW_CERT', WT_PRIV_HIDE)), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PC_SHOW_CERT-'.$this->getName(), get_module_setting($this->getName(), 'PC_SHOW_CERT', WT_PRIV_HIDE), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Certificates firewall root directory'), help_link('config_cert_fw_rootdir', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_CERT_FW_ROOTDIR-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_CERT_FW_ROOTDIR', 'data/')), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_CERT_FW_ROOTDIR-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_CERT_FW_ROOTDIR', 'data/'), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Show non-watermarked certificates'), help_link('config_show_no_watermark', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PC_SHOW_NO_WATERMARK-'.$this->getName(), get_module_setting($this->getName(), 'PC_SHOW_NO_WATERMARK', WT_PRIV_HIDE)), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PC_SHOW_NO_WATERMARK-'.$this->getName(), get_module_setting($this->getName(), 'PC_SHOW_NO_WATERMARK', WT_PRIV_HIDE), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Default watermark'), help_link('config_wm_default', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_WM_DEFAULT-'.$this->getName(), get_module_setting($this->getName(), 'PC_WM_DEFAULT', WT_I18N::translate('This image is protected under copyright law.'))), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_WM_DEFAULT-'.$this->getName(), get_module_setting($this->getName(), 'PC_WM_DEFAULT', WT_I18N::translate('This image is protected under copyright law.')), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Watermark font color'), help_link('config_wm_font_color', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_WM_FONT_COLOR-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_WM_FONT_COLOR', '77,109,243')), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_WM_FONT_COLOR-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_WM_FONT_COLOR', '77,109,243'), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Watermark minimum font size'), help_link('config_wm_font_minsize', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_WM_FONT_MINSIZE-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_WM_FONT_MINSIZE', 8)), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_WM_FONT_MINSIZE-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_WM_FONT_MINSIZE', 8), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Watermark maximum font size'), help_link('config_wm_font_maxsize', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_WM_FONT_MAXSIZE-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_WM_FONT_MAXSIZE', 18)), '</dd>';
+				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_WM_FONT_MAXSIZE-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_WM_FONT_MAXSIZE', 18), $controller), '</dd>';
 		}
 		echo '</dl></td></tr></table></div>';
 	}
@@ -205,9 +207,9 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 			case '_ACT':
 				$element_id = $tag.floor(microtime()*1000000); //replace $element_id so that it is unique
 				$controller
-					->addExternalJavaScript('js/autocomplete.js')
-					->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/autocomplete.js')
-					->addExternalJavaScript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/updatecertificatevalues.js');
+					->addExternalJavascript('js/autocomplete.js')
+					->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/autocomplete.js')
+					->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/updatecertificatevalues.js');
 				$city='';
 				$certif='';
 				if($value){

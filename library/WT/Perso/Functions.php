@@ -25,9 +25,9 @@ class WT_Perso_Functions {
 	 * @param string $text Text to display
 	 */
 	static public function promptAlert($text){
-		echo WT_JS_START;
+		echo '<script>';
 		echo 'alert("',htmlspecialchars($text),'")';
-		echo WT_JS_END;
+		echo '</script>';
 	}
 	
 	/**

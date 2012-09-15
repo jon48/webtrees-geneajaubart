@@ -81,7 +81,7 @@ html[dir='rtl'] #hcenterright { text-align: left; left:0px;}
 .top_center_box_center {background: url(images/top_box_center.png) repeat-x;margin-left: 24px;margin-right: 24px;height: 100%;}
 .top_center_box_left {width: 24px;height: 100%;background: url(images/top_box_left.png) no-repeat;float: left;}
 .top_center_box_right {width: 24px;height: 100%;background: url(images/top_box_right.png) no-repeat;float: right;}
-.content_box {width: 90%;background-color: #FFFFFF;position: absolute; z-index:-9999;}
+.content_box {width: 100%;background-color: #FFFFFF;position: relative; z-index:0;}
 
 /**
  * Person Box
@@ -794,7 +794,7 @@ html[dir='rtl'] #extra-menu.makeMenu li ul {left: 0px;right: auto;}
 #login-box, #register-box { text-align:center; color: black;}
 #login-box a, #register-box a {color : #62584D;}
 #login-box a:hover, #register-box a:hover {color : #9F8C77;}
-#login-form, #new_passwd_form, #register-form, , #verify-form  {background-color:#E9E2DB; border:1px outset #D3C6B8; display: inline-block; margin:10px auto 0 auto; padding:5px;}
+#login-form, #new_passwd_form, #register-form, #verify-form  {background-color:#E9E2DB; border:1px outset #D3C6B8; display: inline-block; margin:10px auto 0 auto; padding:5px;}
 #login-form div, #login-form div a, #new_passwd_form div, #register-form div, #verify-form div {margin:auto; padding:5px; text-align: center;}
 #login-form label, #new_passwd_form label, #verify-form  label {display:block; text-align:right;}
 #login-form label input, #new_passwd_form label input, #verify-form  input {width:140px; margin: 0 10px;}

@@ -62,10 +62,8 @@ class WT_Perso_Functions_Print {
 	 */
 	public static function getPlacesCloud($places, $totals) {
 
-		require_once WT_ROOT.'includes/functions/functions_places.php';
-
 		$cloud=new Zend_Tag_Cloud(
-		array(
+			array(
 				'tagDecorator'=>array(
 					'decorator'=>'HtmlTag',
 					'options'=>array(
@@ -73,28 +71,29 @@ class WT_Perso_Functions_Print {
 						'fontSizeUnit'=>'%',
 						'minFontSize'=>100,
 						'maxFontSize'=>180
-		)
-		),
+					)
+				),
 				'cloudDecorator'=>array(
 					'decorator'=>'HtmlCloud',
 					'options'=>array(
 						'htmlTags'=>array(
 							'div'=>array(
 								'class'=>'tag_cloud'
-		)
-		)
-		)
-		)
-		)
+							)
+						)
+					)
+				)
+			)
 		);
 		foreach ($places as $place=>$count) {
-			$shortplace = self::formatPlaceShort($place, '%1 (%2)');
+			$dplace = WT_Perso_Place::getIntance($place, WT_GED_ID);
+			$shortplace = $dplace->getFormattedName('%1 (%2)');
 			$cloud->appendTag(array(
 				'title'=>$totals ? WT_I18N::translate('%1$s (%2$d)', $shortplace, $count) : $shortplace,
 				'weight'=>$count,
 				'params'=>array(
-					'url'=> get_place_url($place)
-			)
+					'url'=> $dplace->getDerivedPlace()->getURL()
+				)
 			));
 		}
 		return (string)$cloud;
@@ -162,70 +161,22 @@ class WT_Perso_Functions_Print {
 	}
 
 	/**
-	 * Format place to display short.
-	 * The format string should used %n with n to describe the level of division to be printed (in the order of the GEDCOM place).
-	 * For instance "%1 (%2)" will display "Subdivision (Town)".
-	 *
-	 * @param Event $eventObj Event to display date
-	 * @param string $format Format of the place
-	 * @param boolean $anchor option to print a link to placelist
-	 * @return string HTML code for short place
-	 */
-	public static function formatPlaceShort($place, $format, $anchor=false){
-		global $SEARCH_SPIDER;
-
-		$html='';
-		$levels = explode(', ', $place);
-		$nbLevels = count($levels);
-		$displayPlace = $format;
-		preg_match_all('/%[^%]/', $displayPlace, $matches);
-		foreach ($matches[0] as $match2) {
-			$index = str_replace('%', '', $match2);
-			if(is_numeric($index) && $index >0 && $index <= $nbLevels){
-				$displayPlace = str_replace($match2, $levels[$index-1] , $displayPlace);
-			}
-			else{
-				$displayPlace = str_replace($match2, '' , $displayPlace);
-			}
-		}
-		if ($anchor && (empty($SEARCH_SPIDER))) {
-			// reverse the array so that we get the top level first
-			$levels = array_reverse($levels);
-			$tempURL = "placelist.php?action=show&amp;";
-			foreach ($levels as $pindex=>$ppart) {
-				$tempURL .= "parent[{$pindex}]=".rawurlencode($ppart).'&amp;';
-			}
-			$tempURL .= 'level='.count($levels);
-			$html .= '<a href="'.$tempURL.'"> '.$displayPlace.'</a>';
-		} else {
-			$html.=$displayPlace;
-		}
-		return $html;
-	}
-
-	/**
 	 * Format fact place to display short
 	 *
-	 * @param Event $eventObj Event to display date
+	 * @param WT_Event $eventObj Event to display date
 	 * @param string $format Format of the place
 	 * @param boolean $anchor option to print a link to placelist
 	 * @return string HTML code for short place
 	 */
-	public static function formatFactPlaceShort(&$eventObj, $format, $anchor=false){
-		global $SEARCH_SPIDER;
-
-		if ($eventObj==null) return '';
-		if (!is_object($eventObj)) {
-			trigger_error("Object was not sent in, please use Event object", E_USER_WARNING);
-			$factrec = $eventObj;
-		}
-		else $factrec = $eventObj->getGedcomRecord();
-
+	public static function formatFactPlaceShort(WT_Event $event, $format, $anchor=false){
 		$html='';
+		
+		if ($event==null) return $html;
 
-		$ct = preg_match("/2 PLAC (.*)/", $factrec, $match);
-		if ($ct>0) {
-			$html .= self::formatPlaceShort($match[1], $format);
+		$place = $event->getPlace();
+		if($place){
+			$dplace = WT_Perso_Place::getIntance($place, WT_GED_ID);
+			$html .= $dplace->getFormattedName($format, $anchor);
 		}
 		return $html;
 	}

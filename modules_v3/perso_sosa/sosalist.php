@@ -16,8 +16,6 @@ if (!defined('WT_WEBTREES')) {
 
 global $controller;
 
-require_once WT_ROOT.'includes/functions/functions_places.php';
-
 /**
 * print a sortable table of sosa individuals
 *
@@ -28,13 +26,13 @@ require_once WT_ROOT.'includes/functions/functions_places.php';
 */
 function format_sosa_table($sosalist, $gen, $legend='') {
 	global $GEDCOM, $SHOW_LAST_CHANGE, $SEARCH_SPIDER, $MAX_ALIVE_AGE, $controller;
-	$table_id = 'ID'.floor(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
+	$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$SHOW_EST_LIST_DATES=get_gedcom_setting(WT_GED_ID, 'SHOW_EST_LIST_DATES');
 	if (count($sosalist)<1) return;
 	$html = '';
 	$controller
-		->addExternalJavaScript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addInlineJavaScript('
+		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addInlineJavascript('
 			/* Initialise datatables */
 			jQuery.fn.dataTableExt.oSort["unicode-asc"  ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc" ]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
@@ -88,8 +86,8 @@ function format_sosa_table($sosalist, $gen, $legend='') {
 				'<button type="button" id="DEAT_Y100_'.$table_id.'" class="ui-state-default DEAT_Y100" title="'.WT_I18N::translate('Show people who died within the last 100 years.').'">'.WT_Gedcom_Tag::getLabel('DEAT').'&lt;=100</button>'.
 				'<button type="button" id="BIRT_YES_'. $table_id.'" class="ui-state-default BIRT_YES" title="'. WT_I18N::translate('Show persons born more than 100 years ago.').'">'.WT_Gedcom_Tag::getLabel('BIRT').'&gt;100</button>'.
 				'<button type="button" id="BIRT_Y100_'.$table_id.'" class="ui-state-default BIRT_Y100" title="'.WT_I18N::translate('Show persons born within the last 100 years.').'">'.WT_Gedcom_Tag::getLabel('BIRT').'&lt;=100</button>'.
-				'<button type="button" id="TREE_R_'   .$table_id.'" class="ui-state-default TREE_R" title="'.   WT_I18N::translate('Show «roots» couples or individuals.  These people may also be called «patriarchs».  They are individuals who have no parents recorded in the database.').'">'.WT_I18N::translate('Roots').'</button>'.
-				'<button type="button" id="TREE_L_'.   $table_id.'" class="ui-state-default TREE_L" title="'.   WT_I18N::translate('Show «leaves» couples or individuals.  These are individuals who are alive but have no children recorded in the database.').'">'.WT_I18N::translate('Leaves').'</button>'.
+				'<button type="button" id="TREE_R_'   .$table_id.'" class="ui-state-default TREE_R" title="'.   WT_I18N::translate('Show Â«rootsÂ» couples or individuals.  These people may also be called Â«patriarchsÂ».  They are individuals who have no parents recorded in the database.').'">'.WT_I18N::translate('Roots').'</button>'.
+				'<button type="button" id="TREE_L_'.   $table_id.'" class="ui-state-default TREE_L" title="'.   WT_I18N::translate('Show Â«leavesÂ» couples or individuals.  These are individuals who are alive but have no children recorded in the database.').'">'.WT_I18N::translate('Leaves').'</button>'.
 				'<button type="button" id="RESET_'.    $table_id.'" class="ui-state-default RESET" title="'.    WT_I18N::translate('Reset to the list defaults.').'">'.WT_I18N::translate('Reset').'</button>'
 			).'");
 	
@@ -298,7 +296,7 @@ function format_sosa_table($sosalist, $gen, $legend='') {
 				$html .= $birth_date->Display(!$SEARCH_SPIDER);
 			}
 			if ($birth_dates[0]->gregorianYear()>=1550 && $birth_dates[0]->gregorianYear()<2030 && !isset($unique_indis[$person->getXref()])) {
-				$birt_by_decade[floor($birth_dates[0]->gregorianYear()/10)*10] .= $person->getSex();
+				$birt_by_decade[(int)($birth_dates[0]->gregorianYear()/10)*10] .= $person->getSex();
 			}
 		} else {
 			$birth_date=$person->getEstimatedBirthDate();
@@ -316,14 +314,15 @@ function format_sosa_table($sosalist, $gen, $legend='') {
 		//-- Birth place
 		$html .= '<td>';
 		foreach ($person->getAllBirthPlaces() as $n=>$birth_place) {
+			$tmp=new WT_Place($birth_place, WT_GED_ID);
 			if ($n) {
 				$html .= '<br>';
 			}
 			if ($SEARCH_SPIDER) {
-				$html .= get_place_short($birth_place);
+				$html .= $tmp->getShortName();
 			} else {
-				$html .= '<a href="'. get_place_url($birth_place). '" title="'. $birth_place. '">';
-				$html .= highlight_search_hits(get_place_short($birth_place)). '</a>';
+				$html .= '<a href="'. $tmp->getURL() . '" title="'. strip_tags($tmp->getShortName()) . '">';
+				$html .= highlight_search_hits($tmp->getShortName()). '</a>';
 			}
 		}
 		$html .= '</td>';
@@ -347,7 +346,7 @@ function format_sosa_table($sosalist, $gen, $legend='') {
 				$html .= $death_date->Display(!$SEARCH_SPIDER);
 			}
 			if ($death_dates[0]->gregorianYear()>=1550 && $death_dates[0]->gregorianYear()<2030 && !isset($unique_indis[$person->getXref()])) {
-				$deat_by_decade[floor($death_dates[0]->gregorianYear()/10)*10] .= $person->getSex();
+				$deat_by_decade[(int)($death_dates[0]->gregorianYear()/10)*10] .= $person->getSex();
 			}
 		} else {
 			$death_date=$person->getEstimatedDeathDate();
@@ -374,14 +373,15 @@ function format_sosa_table($sosalist, $gen, $legend='') {
 		//-- Death place
 		$html .= '<td>';
 		foreach ($person->getAllDeathPlaces() as $n=>$death_place) {
+			$tmp=new WT_Place($death_place, WT_GED_ID);
 			if ($n) {
 				$html .= '<br>';
 			}
 			if ($SEARCH_SPIDER) {
-				$html .= get_place_short($death_place);
+				$html .= $tmp->getShortName();
 			} else {
-				$html .= '<a href="'. get_place_url($death_place). '" title="'. $death_place. '">';
-				$html .= highlight_search_hits(get_place_short($death_place)). '</a>';
+				$html .= '<a href="'. $tmp->getURL() . '" title="'. strip_tags($tmp->getShortName()) . '">';
+				$html .= highlight_search_hits($tmp->getShortName()). '</a>';
 			}
 		}
 		$html .= '</td>';
@@ -407,7 +407,7 @@ function format_sosa_table($sosalist, $gen, $legend='') {
 		$html .= '</td>';
 		//-- Filtering by birth date
 		$html .= '<td>';
-		if (!$person->canDisplayDetails() || WT_Date::Compare($birth_dates[0], $d100y)>0) {
+		if (!$person->canDisplayDetails() || WT_Date::Compare($birth_date, $d100y)>0) {
 			$html .= 'Y100';
 		} else {
 			$html .= 'YES';
@@ -415,12 +415,11 @@ function format_sosa_table($sosalist, $gen, $legend='') {
 		$html .= '</td>';
 		//-- Filtering by death date
 		$html .= '<td>';
-		if ($person->isDead()) {
-			if (WT_Date::Compare($death_dates[0], $d100y)>0) {
-				$html .= 'Y100';
-			} else {
-				$html .= 'YES';
-			}
+		// Died in last 100 years?  Died?  Not dead?
+		if (WT_Date::Compare($death_date, $d100y)>0) {
+			$html .= 'Y100';
+		} elseif ($death_date->minJD() || $person->isDead()) {
+			$html .= 'YES';
 		} else {
 			$html .= 'N';
 		}
