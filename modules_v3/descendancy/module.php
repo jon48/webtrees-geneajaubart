@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: module.php 14259 2012-09-11 20:39:52Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -238,7 +238,7 @@ class descendancy_WT_Module extends WT_Module implements WT_Module_Sidebar {
 					$out .= $this->getPersonLi($child, $generations-1);
 				}
 			} else {
-				$out .= WT_I18N::translate('No children');
+				$out .= '<li>'.WT_I18N::translate('No children').'</li>';
 			}
 		}
 		if ($out) {

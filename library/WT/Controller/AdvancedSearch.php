@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: AdvancedSearch.php 13866 2012-04-26 08:52:18Z nigel $
+// $Id: AdvancedSearch.php 14395 2012-10-06 22:52:12Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -216,7 +216,6 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 		$fam_plac        =false;
 		foreach ($this->fields as $n=>$field) {
 			if ($this->values[$n]) {
-			//var_dump($field);var_dump($this->values[$n]);
 				$anything_to_find=true;
 				if (substr($field, 0, 14)=='FAMC:HUSB:NAME') {
 					$father_name=true;
@@ -398,21 +397,15 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 					$bind[]=$jd2;
 				}
 			} elseif ($parts[1]=='PLAC') {
-				// *:DATE
+				// *:PLAC
 				// SQL can only link a place to a person/family, not to an event.
-				$places = preg_split("/[, ]+/", $value);
-				foreach ($places as $place) {
-					$sql.=" AND (i_p.p_place=?)";
-					$bind[]=$place;
-				}
+				$sql.=" AND i_p.p_place=?";
+				$bind[]=$value;
 			} elseif ($parts[0]=='FAMS' && $parts[2]=='PLAC') {
-				// *:DATE
+				// FAMS:*:PLAC
 				// SQL can only link a place to a person/family, not to an event.
-				$places = preg_split("/[, ]+/", $value);
-				foreach ($places as $place) {
-					$sql.=" AND (f_p.p_place=?)";
-					$bind[]=$place;
-				}
+				$sql.=" AND f_p.p_place=?";
+				$bind[]=$value;
 			} elseif ($parts[0]=='FAMC' && $parts[2]=='NAME') {
 				$table=$parts[1]=='HUSB' ? 'f_n' : 'm_n';
 				// NAME:*
@@ -494,7 +487,16 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 		}
 		$rows=WT_DB::prepare($sql)->execute($bind)->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($rows as $row) {
-			$this->myindilist[]=WT_Person::getInstance($row);
+			$person=WT_Person::getInstance($row);
+			// Check for XXXX:PLAC fields, which were only partially matched by SQL
+			foreach ($this->fields as $n=>$field) {
+				if (preg_match('/^('.WT_REGEX_TAG.'):PLAC$/', $field, $match)) {
+					if (!preg_match('/\n1 '.$match[1].'(\n[2-9].*)*\n2 PLAC .*'.preg_quote($this->values[$n], '/').'/i', $person->getGedcomRecord())) {
+						continue 2;
+				 }
+				}
+			}
+			$this->myindilist[]=$person;
 		}
 	}
 

@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Base.php 13950 2012-05-29 06:28:25Z greg $
+// $Id: Base.php 14432 2012-10-18 21:47:11Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -1619,7 +1619,7 @@ function CellEHandler() {
 function NowSHandler() {
 	global $currentElement;
 
-	$g = timestamp_to_gedcom_date(client_time());
+	$g = timestamp_to_gedcom_date(WT_CLIENT_TIMESTAMP);
 	$currentElement->addText($g->Display());
 }
 
@@ -2040,9 +2040,18 @@ function GedcomValueSHandler($attrs) {
 			if (isset($attrs['truncate'])) {
 				$truncate=$attrs['truncate'];
 			}
-			$tags = explode(":", $tag);
+			$tags = preg_split('/[: ]/', $tag);
 			$value = get_gedcom_value($tag, $level, $gedrec, $truncate);
-//@@ do we still need?			
+			switch (end($tags)) {
+			case 'DATE':
+				$tmp=new WT_Date($value);
+				$value=$tmp->Display();
+				break;
+			case 'PLAC':
+				$tmp=new WT_Place($value, WT_GED_ID);
+				$value=$tmp->getFullName();
+				break;
+			}
 			if ($useBreak == "1") {
 				// Insert <br> when multiple dates exist.
 				// This works around a TCPDF bug that incorrectly wraps RTL dates on LTR pages
@@ -2568,10 +2577,10 @@ function ifSHandler($attrs) {
 			if ($level==0) {
 				$level++;
 			}
-			$value = get_gedcom_value($id, $level, $gedrec, "", false);
+			$value = get_gedcom_value($id, $level, $gedrec);
 			if (empty($value)) {
 				$level++;
-				$value = get_gedcom_value($id, $level, $gedrec, "", false);
+				$value = get_gedcom_value($id, $level, $gedrec);
 			}
 			$value = "\"".addslashes($value)."\"";
 		}
@@ -2722,7 +2731,7 @@ function AgeAtDeathSHandler() {
 */
 function brSHandler() {
 	global $printData, $currentElement, $processGedcoms;
-	if ($printData && ($processGedcoms==0)) $currentElement->addText("<br>");
+	if ($printData && ($processGedcoms==0)) $currentElement->addText('<br>');
 }
 
 /**
@@ -2732,7 +2741,7 @@ function brSHandler() {
 */
 function spSHandler() {
 	global $printData, $currentElement, $processGedcoms;
-	if ($printData && ($processGedcoms==0)) $currentElement->addText(" ");
+	if ($printData && ($processGedcoms==0)) $currentElement->addText(' ');
 }
 
 /**
@@ -2742,42 +2751,42 @@ function spSHandler() {
 function HighlightedImageSHandler($attrs) {
 	global $gedrec, $wt_report, $ReportRoot;
 
-	$id = "";
+	$id = '';
 	$match = array();
 	if (preg_match("/0 @(.+)@/", $gedrec, $match)) {
 		$id = $match[1];
 	}
 
 	// mixed Position the top corner of this box on the page. the default is the current position
-	$top = ".";
+	$top = '.';
 	if (isset($attrs['top'])) {
-		if ($attrs['top'] === "0") {
+		if ($attrs['top'] === '0') {
 			$top = 0;
-		} elseif ($attrs['top'] === ".") {
-			$top = ".";
+		} elseif ($attrs['top'] === '.') {
+			$top = '.';
 		} elseif (!empty($attrs['top'])) {
 			$top = (int)$attrs['top'];
 		}
 	}
 
 	// mixed Position the left corner of this box on the page. the default is the current position
-	$left = ".";
+	$left = '.';
 	if (isset($attrs['left'])) {
-		if ($attrs['left'] === "0") {
+		if ($attrs['left'] === '0') {
 			$left = 0;
-		} elseif ($attrs['left'] === ".") {
-			$left = ".";
+		} elseif ($attrs['left'] === '.') {
+			$left = '.';
 		} elseif (!empty($attrs['left'])) {
 			$left = (int)$attrs['left'];
 		}
 	}
 
 	// string Align the image in left, center, right
-	$align = "";
+	$align = '';
 	if (!empty($attrs['align'])) $align = $attrs['align'];
 
 	// string Next Line should be T:next to the image, N:next line
-	$ln = "";
+	$ln = '';
 	if (!empty($attrs['ln'])) $ln = $attrs['ln'];
 
 	$width = 0;
@@ -2786,27 +2795,21 @@ function HighlightedImageSHandler($attrs) {
 	if (!empty($attrs['height'])) $height = (int)$attrs['height'];
 
 	$media = find_highlighted_object($id, WT_GED_ID, $gedrec);
-	if (!empty($media['file'])) {
-		if (preg_match("/(jpg|jpeg|png|gif)$/i", $media['file'])) {
-			if (!file_exists($media['file'])) {
-				$media['file']=get_media_firewall_path($media['file']);
-			}
-			if (file_exists($media['file'])) {
-				$size = findImageSize($media['file']);
-				if (($width>0) and ($height==0)) {
-					$perc = $width / $size[0];
-					$height= round($size[1]*$perc);
-				} elseif (($height>0) and ($width==0)) {
-					$perc = $height / $size[1];
-					$width= round($size[0]*$perc);
-				} else {
-					$width = $size[0];
-					$height = $size[1];
-				}
-				$image = $ReportRoot->createImage($media['file'], $left, $top, $width, $height, $align, $ln);
-				$wt_report->addElement($image);
-			}
+	$mediaobject=WT_Media::getInstance($media['mid']);
+	$attributes=$mediaobject->getImageAttributes('thumb');
+	if (in_array($attributes['ext'], array('GIF','JPG','PNG','SWF','PSD','BMP','TIFF','TIFF','JPC','JP2','JPX','JB2','SWC','IFF','WBMP','XBM')) && $mediaobject->canDisplayDetails() && $mediaobject->fileExists('thumb')) {
+		if (($width>0) and ($height==0)) {
+			$perc = $width / $attributes['adjW'];
+			$height= round($attributes['adjH']*$perc);
+		} elseif (($height>0) and ($width==0)) {
+			$perc = $height / $attributes['adjH'];
+			$width= round($attributes['adjW']*$perc);
+		} else {
+			$width = $attributes['adjW'];
+			$height = $attributes['adjH'];
 		}
+		$image = $ReportRoot->createImageFromObject($mediaobject, $left, $top, $width, $height, $align, $ln);
+		$wt_report->addElement($image);
 	}
 }
 
@@ -2818,35 +2821,35 @@ function ImageSHandler($attrs) {
 	global $gedrec, $wt_report, $MEDIA_DIRECTORY, $ReportRoot;
 
 	// mixed Position the top corner of this box on the page. the default is the current position
-	$top = ".";
+	$top = '.';
 	if (isset($attrs['top'])) {
 		if ($attrs['top'] === "0") {
 			$top = 0;
-		} elseif ($attrs['top'] === ".") {
-			$top = ".";
+		} elseif ($attrs['top'] === '.') {
+			$top = '.';
 		} elseif (!empty($attrs['top'])) {
 			$top = (int)$attrs['top'];
 		}
 	}
 
 	// mixed Position the left corner of this box on the page. the default is the current position
-	$left = ".";
+	$left = '.';
 	if (isset($attrs['left'])) {
-		if ($attrs['left'] === "0") {
+		if ($attrs['left'] === '0') {
 			$left = 0;
-		} elseif ($attrs['left'] === ".") {
-			$left = ".";
+		} elseif ($attrs['left'] === '.') {
+			$left = '.';
 		} elseif (!empty($attrs['left'])) {
 			$left = (int)$attrs['left'];
 		}
 	}
 
 	// string Align the image in left, center, right
-	$align = "";
+	$align = '';
 	if (!empty($attrs['align'])) $align = $attrs['align'];
 
 	// string Next Line should be T:next to the image, N:next line
-	$ln = "T";
+	$ln = 'T';
 	if (!empty($attrs['ln'])) $ln = $attrs['ln'];
 
 	$width = 0;
@@ -2854,61 +2857,44 @@ function ImageSHandler($attrs) {
 	if (!empty($attrs['width'])) $width = (int)$attrs['width'];
 	if (!empty($attrs['height'])) $height = (int)$attrs['height'];
 
-	$file = "";
+	$file = '';
 	if (!empty($attrs['file'])) $file = $attrs['file'];
-
 	if ($file=="@FILE") {
 		$match = array();
 		if (preg_match("/\d OBJE @(.+)@/", $gedrec, $match)) {
-			$orec = find_gedcom_record($match[1], WT_GED_ID);
-		} else {
-			$orec = $gedrec;
-		}
-		if (!empty($orec)) {
-			$fullpath = extract_fullpath($orec);
-			$filename = "";
-			$filename = extract_filename($fullpath);
-			$filename = $MEDIA_DIRECTORY.$filename;
-			$filename = trim($filename);
-			if (!empty($filename)) {
-				if (preg_match("/(jpg|jpeg|png|gif)$/i", $filename)) {
-					if (file_exists($filename)) {
-						$size = findImageSize($filename);
-						if (($width > 0) and ($height == 0)) {
-							$perc = $width / $size[0];
-							$height= round($size[1]*$perc);
-						} elseif (($height > 0) and ($width == 0)) {
-							$perc = $height / $size[1];
-							$width= round($size[0]*$perc);
-						} else {
-							$width = $size[0];
-							$height = $size[1];
-						}
-						$image = $ReportRoot->createImage($filename, $left, $top, $width, $height, $align, $ln);
-						$wt_report->addElement($image);
-					}
-				}
-			}
-		}
-	}
-	else {
-		$filename = $file;
-		if (preg_match("/(jpg|jpeg|png|gif)$/i", $filename)) {
-			if (file_exists($filename)) {
-				$size = findImageSize($filename);
+			$mediaobject=WT_Media::getInstance($match[1], WT_GED_ID);
+			$attributes=$mediaobject->getImageAttributes('thumb');
+			if (in_array($attributes['ext'], array('GIF','JPG','PNG','SWF','PSD','BMP','TIFF','TIFF','JPC','JP2','JPX','JB2','SWC','IFF','WBMP','XBM')) && $mediaobject->canDisplayDetails() && $mediaobject->fileExists('thumb')) {
 				if (($width>0) and ($height==0)) {
-					$perc = $width / $size[0];
-					$height= round($size[1]*$perc);
+					$perc = $width / $attributes['adjW'];
+					$height= round($attributes['adjH']*$perc);
 				} elseif (($height>0) and ($width==0)) {
-					$perc = $height / $size[1];
-					$width= round($size[0]*$perc);
+					$perc = $height / $attributes['adjH'];
+					$width= round($attributes['adjW']*$perc);
 				} else {
-					$width = $size[0];
-					$height = $size[1];
+					$width = $attributes['adjW'];
+					$height = $attributes['adjH'];
 				}
-				$image = $ReportRoot->createImage($filename, $left, $top, $width, $height, $align, $ln);
+				$image = $ReportRoot->createImageFromObject($mediaobject, $left, $top, $width, $height, $align, $ln);
 				$wt_report->addElement($image);
 			}
+		}
+	} else {
+		$filename = $file;
+		if (file_exists($filename) && preg_match("/(jpg|jpeg|png|gif)$/i", $filename)) {
+			$size = findImageSize($filename);
+			if (($width>0) and ($height==0)) {
+				$perc = $width / $size[0];
+				$height= round($size[1]*$perc);
+			} elseif (($height>0) and ($width==0)) {
+				$perc = $height / $size[1];
+				$width= round($size[0]*$perc);
+			} else {
+				$width = $size[0];
+				$height = $size[1];
+			}
+			$image = $ReportRoot->createImage($filename, $left, $top, $width, $height, $align, $ln);
+			$wt_report->addElement($image);
 		}
 	}
 }
@@ -3225,7 +3211,7 @@ function ListSHandler($attrs) {
 					}
 					$tags = explode(":", $tag);
 					$t = end($tags);
-					$v = get_gedcom_value($tag, 1, $grec, "", false);
+					$v = get_gedcom_value($tag, 1, $grec);
 					//-- check for EMAIL and _EMAIL (silly double gedcom standard :P)
 					if ($t=="EMAIL" && empty($v)) {
 						$tag = str_replace("EMAIL", "_EMAIL", $tag);
@@ -3254,17 +3240,6 @@ function ListSHandler($attrs) {
 								} elseif ($val >= $v) {
 									$keep=true;
 								}
-							break;
-						case "SUBCONTAINS":
-							$v = get_sub_record($level, $level." ".$tag, $grec);
-							if (empty($v) && $tag=="ADDR") {
-								$v = get_sub_record($level+1, ($level+1)." ".$tag, $grec);
-							}
-							if (strripos($v, $val)!==false) {
-								$keep = true;
-							} else {
-								$keep = false;
-							}
 							break;
 						default:
 							if ($v==$val) {

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: reportengine.php 14111 2012-07-18 12:25:09Z greg $
+// $Id: reportengine.php 14398 2012-10-07 13:38:28Z greg $
 
 define('WT_SCRIPT_NAME', 'reportengine.php');
 require './includes/session.php';
@@ -265,9 +265,7 @@ elseif ($action=='setup') {
 		</div>
 		<div>
 		<label for="HTML"><i class="icon-mime-text-html"></i></label>
-		<p><input type="radio" name="output" id="HTML" value="HTML"';
-		if ($output=='HTML') echo ' checked="checked"', '>';
-	echo '</p>
+		<p><input type="radio" name="output" id="HTML" value="HTML"></p>
 		</div>
 		</div>
 		</td>

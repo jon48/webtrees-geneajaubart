@@ -21,20 +21,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_download.php 13612 2012-03-19 10:04:13Z greg $
+// $Id: admin_trees_download.php 14276 2012-09-14 15:39:40Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_download.php');
 require './includes/session.php';
+require WT_ROOT.'includes/functions/functions_export.php';
 
 $controller=new WT_Controller_Base();
 $controller
 	->setPageTitle(WT_I18N::translate('Download GEDCOM'))
 	->requireManagerLogin();
 
-require_once WT_ROOT.'includes/functions/functions_export.php';
-
 // Validate user parameters
-$ged              = safe_GET('ged',              preg_quote_array(get_all_gedcoms()));
 $action           = safe_GET('action',           'download');
 $convert          = safe_GET('convert',          'yes', 'no');
 $zip              = safe_GET('zip',              'yes', 'no');
@@ -53,13 +51,13 @@ if ($action == 'download') {
 	$exportOptions['slashes'] = $conv_slashes;
 }
 
+$fileName = WT_GEDCOM;
 if ($action == "download" && $zip == "yes") {
 	require WT_ROOT.'library/pclzip.lib.php';
 
-	$temppath = get_site_setting('INDEX_DIRECTORY') . "tmp/";
-	$fileName = $ged;
+	$temppath = WT_Site::preference('INDEX_DIRECTORY') . "tmp/";
 	$zipname = "dl" . date("YmdHis") . $fileName . ".zip";
-	$zipfile = get_site_setting('INDEX_DIRECTORY') . $zipname;
+	$zipfile = WT_Site::preference('INDEX_DIRECTORY') . $zipname;
 	$gedname = $temppath . $fileName;
 
 	$removeTempDir = false;
@@ -91,11 +89,11 @@ if ($action == "download") {
 	header('Content-Type: text/plain; charset=UTF-8');
 	// We could open "php://compress.zlib" to create a .gz file or "php://compress.bzip2" to create a .bz2 file
 	$gedout = fopen('php://output', 'w');
-	if (strtolower(substr($ged, -4, 4))!='.ged') {
-		$ged.='.ged';
+	if (strtolower(substr($fileName, -4, 4))!='.ged') {
+		$fileName.='.ged';
 	}
-	header('Content-Disposition: attachment; filename="'.$ged.'"');
-	export_gedcom($GEDCOM, $gedout, $exportOptions);
+	header('Content-Disposition: attachment; filename="'.$fileName.'"');
+	export_gedcom(WT_GEDCOM, $gedout, $exportOptions);
 	fclose($gedout);
 	exit;
 }
@@ -103,10 +101,10 @@ if ($action == "download") {
 $controller->pageHeader();
 
 ?>
-<h2><?php echo WT_I18N::translate('Download GEDCOM'); ?> - <?php echo htmlspecialchars($ged); ?></h2>
+<h2><?php echo WT_I18N::translate('Download GEDCOM'); ?> - <?php echo htmlspecialchars(WT_GEDCOM); ?></h2>
 <form name="convertform" method="get">
 	<input type="hidden" name="action" value="download">
-	<input type="hidden" name="ged" value="<?php echo $ged; ?>">
+	<input type="hidden" name="ged" value="<?php echo WT_GEDCOM; ?>">
 	<div id="tree-download" class="ui-helper-clearfix">
 		<dl>
 			<dt>

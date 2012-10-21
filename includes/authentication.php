@@ -28,7 +28,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: authentication.php 14205 2012-08-26 06:28:09Z greg $
+// $Id: authentication.php 14314 2012-09-19 08:06:53Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -87,16 +87,6 @@ function userLogout($user_id) {
 }
 
 /**
- * Updates the login time in the database of the given user
- * The login time is used to automatically logout users who have been
- * inactive for the defined session time
- * @param string $username the username to update the login info for
- */
-function userUpdateLogin($user_id) {
-	set_user_setting($user_id, 'sessiontime', time());
-}
-
-/**
  * get the current user's ID and Name
  *
  * Returns 0 and NULL if we are not logged in.
@@ -137,7 +127,7 @@ function userIsAdmin($user_id=WT_USER_ID) {
  */
 function userGedcomAdmin($user_id=WT_USER_ID, $ged_id=WT_GED_ID) {
 	if ($user_id) {
-		return get_user_gedcom_setting($user_id, $ged_id, 'canedit')=='admin' || userIsAdmin($user_id);
+		return WT_Tree::get($ged_id)->userPreference($user_id, 'canedit')=='admin' || userIsAdmin($user_id);
 	} else {
 		return false;
 	}
@@ -151,7 +141,7 @@ function userCanAccess($user_id=WT_USER_ID, $ged_id=WT_GED_ID) {
 		if (userIsAdmin($user_id)) {
 			return true;
 		} else {
-			$tmp=get_user_gedcom_setting($user_id, $ged_id, 'canedit');
+			$tmp=WT_Tree::get($ged_id)->userPreference($user_id, 'canedit');
 			return $tmp=='admin' || $tmp=='accept' || $tmp=='edit' || $tmp=='access';
 		}
 	} else {
@@ -165,60 +155,15 @@ function userCanAccess($user_id=WT_USER_ID, $ged_id=WT_GED_ID) {
 function userCanEdit($user_id=WT_USER_ID, $ged_id=WT_GED_ID) {
 	global $ALLOW_EDIT_GEDCOM;
 
-	if ($ALLOW_EDIT_GEDCOM && $user_id) {
+	if ($user_id && WT_Tree::get($ged_id)->preference('ALLOW_EDIT_GEDCOM')) {
 		if (userIsAdmin($user_id)) {
 			return true;
 		} else {
-			$tmp=get_user_gedcom_setting($user_id, $ged_id, 'canedit');
+			$tmp=WT_Tree::get($ged_id)->userPreference($user_id, 'canedit');
 			return $tmp=='admin' || $tmp=='accept' || $tmp=='edit';
 		}
 	} else {
 		return false;
-	}
-}
-
-/**
- * check if the given user can accept changes for the given gedcom
- *
- * takes a username and checks if the user has write privileges to
- * change the gedcom data and accept changes
- * @param string $username the username of the user check privileges
- * @return boolean true if user can accept false if user cannot accept
- */
-function userCanAccept($user_id=WT_USER_ID, $ged_id=WT_GED_ID) {
-	global $ALLOW_EDIT_GEDCOM;
-
-	// An admin can always accept changes, even if editing is disabled
-	if (userGedcomAdmin($user_id, $ged_id)) {
-		return true;
-	}
-	if ($ALLOW_EDIT_GEDCOM) {
-		$tmp=get_user_gedcom_setting($user_id, $ged_id, 'canedit');
-		return $tmp=='admin' || $tmp=='accept';
-	} else {
-		return false;
-	}
-}
-
-// Should user's changed automatically be accepted
-function userAutoAccept($user_id=WT_USER_ID) {
-	return get_user_setting($user_id, 'auto_accept');
-}
-
-// Get current user's access level
-function getUserAccessLevel($user_id=WT_USER_ID, $ged_id=WT_GED_ID) {
-	if ($user_id) {
-		if (userGedcomAdmin($user_id, $ged_id)) {
-			return WT_PRIV_NONE;
-		} else {
-			if (userCanAccess($user_id, $ged_id)) {
-				return WT_PRIV_USER;
-			} else {
-				return WT_PRIV_PUBLIC;
-			}
-		}
-	} else {
-		return WT_PRIV_PUBLIC;
 	}
 }
 
@@ -242,24 +187,6 @@ function setUserEmail($user_id, $email) {
 	return WT_DB::prepare("UPDATE `##user` SET email=? WHERE user_id=?")->execute(array($email, $user_id));
 }
 
-// Get the root person for this gedcom
-function getUserRootId($user_id, $ged_id) {
-	if ($user_id) {
-		return get_user_gedcom_setting(WT_USER_ID, WT_GED_ID, 'rootid');
-	} else {
-		return getUserGedcomId($user_id, $ged_id);
-	}
-}
-
-// Get the user's ID in the given gedcom
-function getUserGedcomId($user_id, $ged_id) {
-	if ($user_id) {
-		return get_user_gedcom_setting(WT_USER_ID, WT_GED_ID, 'gedcomid');
-	} else {
-		return null;
-	}
-}
-
 // add a message into the log-file
 // Note that while transfering data from PhpGedView to WT, we delete the WT users and
 // replace with PhpGedView users.  Hence the current user_id is not always available.
@@ -270,23 +197,22 @@ function AddToLog($log_message, $log_type='error') {
 		$log_type,
 		$log_message,
 		$_SERVER['REMOTE_ADDR'],
-		getUserId() && WT_SCRIPT_NAME!='admin_pgv_to_wt.php' ? getUserId() : null,
-		defined('WT_GED_ID') ? WT_GED_ID : null // logs raised before we select the gedcom won't have this.
+		defined('WT_USER_ID') && WT_USER_ID && WT_SCRIPT_NAME!='admin_pgv_to_wt.php' ? WT_USER_ID : null,
+		defined('WT_GED_ID') ? WT_GED_ID : null
 	));
 }
 
 //----------------------------------- AddToSearchLog
 //-- requires a string to add into the searchlog-file
 function AddToSearchLog($log_message, $geds) {
-	$all_geds=get_all_gedcoms();
-	foreach ($geds as $ged_id=>$ged_name) {
+	foreach (WT_Tree::getAll() as $tree) {
 		WT_DB::prepare(
 			"INSERT INTO `##log` (log_type, log_message, ip_address, user_id, gedcom_id) VALUES ('search', ?, ?, ?, ?)"
 		)->execute(array(
-			(count($all_geds)==count($geds) ? 'Global search: ' : 'Gedcom search: ').$log_message,
+			(count(WT_Tree::getAll())==count($geds) ? 'Global search: ' : 'Gedcom search: ').$log_message,
 			$_SERVER['REMOTE_ADDR'],
 			WT_USER_ID ? WT_USER_ID : null,
-			$ged_id
+			$tree->tree_id
 		));
 	}
 }
@@ -371,7 +297,7 @@ function addMessage($message) {
 	}
 	if (empty($message['created']))
 		$message['created'] = gmdate ("D, d M Y H:i:s T");
-	if (get_site_setting('STORE_MESSAGES') && ($message['method']!='messaging3' && $message['method']!='mailto' && $message['method']!='none')) {
+	if (WT_Site::preference('STORE_MESSAGES') && ($message['method']!='messaging3' && $message['method']!='mailto' && $message['method']!='none')) {
 		WT_DB::prepare("INSERT INTO `##message` (sender, ip_address, user_id, subject, body) VALUES (? ,? ,? ,? ,?)")
 			->execute(array($message['from'], $_SERVER['REMOTE_ADDR'], get_user_id($message['to']), $message['subject'], $message['body']));
 	}

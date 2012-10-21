@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: MenuBar.php 14200 2012-08-25 16:21:33Z greg $
+// $Id: MenuBar.php 14328 2012-09-21 02:43:56Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -34,17 +34,14 @@ if (!defined('WT_WEBTREES')) {
 
 class WT_MenuBar {
 	public static function getGedcomMenu() {
-		//-- main menu
 		$menu = new WT_Menu(WT_I18N::translate('Home page'), 'index.php?ctype=gedcom&amp;ged='.WT_GEDURL, 'menu-tree');
-		//-- gedcom list
-		$gedcom_titles=get_gedcom_titles();
-		$ALLOW_CHANGE_GEDCOM=get_site_setting('ALLOW_CHANGE_GEDCOM');
-		foreach ($gedcom_titles as $gedcom_title) {
-			if (($gedcom_title->gedcom_id==WT_GED_ID || $ALLOW_CHANGE_GEDCOM) && count($gedcom_titles)>1) {
+		$ALLOW_CHANGE_GEDCOM=WT_Site::preference('ALLOW_CHANGE_GEDCOM') && count(WT_Tree::getAll())>1;
+		foreach (WT_Tree::getAll() as $tree) {
+			if ($tree->tree_id==WT_GED_ID || $ALLOW_CHANGE_GEDCOM) {
 				$submenu = new WT_Menu(
-					'<span dir="auto">'.htmlspecialchars($gedcom_title->gedcom_title).'</span>',
-					'index.php?ctype=gedcom&amp;ged='.rawurlencode($gedcom_title->gedcom_name),
-					'menu-tree-'.$gedcom_title->gedcom_id // Cannot use name - it must be a CSS identifier
+					$tree->tree_title_html,
+					'index.php?ctype=gedcom&amp;ged='.$tree->tree_name_url,
+					'menu-tree-'.$tree->tree_id // Cannot use name - it must be a CSS identifier
 				);
 				$menu->addSubmenu($submenu);
 			}
@@ -96,7 +93,7 @@ class WT_MenuBar {
 	public static function getChartsMenu() {
 		global $SEARCH_SPIDER, $controller;
 
-		if ($SEARCH_SPIDER) {
+		if ($SEARCH_SPIDER || !WT_GED_ID) {
 			return null;
 		}
 
@@ -470,10 +467,11 @@ class WT_MenuBar {
 	public static function getThemeMenu() {
 		global $SEARCH_SPIDER;
 
-		if (!$SEARCH_SPIDER && get_site_setting('ALLOW_USER_THEMES') && get_gedcom_setting(WT_GED_ID, 'ALLOW_THEME_DROPDOWN')) {
+		if (WT_GED_ID && !$SEARCH_SPIDER && WT_Site::preference('ALLOW_USER_THEMES') && get_gedcom_setting(WT_GED_ID, 'ALLOW_THEME_DROPDOWN')) {
 			$menu=new WT_Menu(WT_I18N::translate('Theme'), '#', 'menu-theme');
 			foreach (get_theme_names() as $themename=>$themedir) {
 				$submenu=new WT_Menu($themename, get_query_url(array('theme'=>$themedir), '&amp;'), 'menu-theme-'.$themedir);
+				if (WT_THEME_DIR == 'themes/'.$themedir.'/') {$submenu->addClass('','','theme-active');}
 				$menu->addSubMenu($submenu);
 			}
 			return $menu;
@@ -492,6 +490,7 @@ class WT_MenuBar {
 
 			foreach (WT_I18N::installed_languages() as $lang=>$name) {
 				$submenu=new WT_Menu($name, get_query_url(array('lang'=>$lang), '&amp;'), 'menu-language-'.$lang);
+				if (WT_LOCALE == $lang) {$submenu->addClass('','','lang-active');}
 				$menu->addSubMenu($submenu);
 			}
 			if (count($menu->submenus)>1) {

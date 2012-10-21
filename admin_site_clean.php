@@ -1,6 +1,6 @@
 <?php
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2012 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// version $Id: admin_site_clean.php 13693 2012-03-27 09:50:56Z greg $
+// version $Id: admin_site_clean.php 14294 2012-09-15 11:36:34Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_clean.php');
 require './includes/session.php';
@@ -69,9 +69,13 @@ $locked_by_context = array('index.php', 'config.ini.php');
 // If we are storing the media in the data directory (this is the
 // default for the media firewall), then don't delete it.
 // Need to consider the settings for all gedcoms
-foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
-	$MEDIA_FIREWALL_ROOTDIR=get_gedcom_setting($ged_id, 'MEDIA_FIREWALL_ROOTDIR', WT_DATA_DIR);
-	$MEDIA_DIRECTORY       =get_gedcom_setting($ged_id, 'MEDIA_DIRECTORY');
+foreach (WT_Tree::getAll() as $tree) {
+	$MEDIA_FIREWALL_ROOTDIR=$tree->preference('MEDIA_FIREWALL_ROOTDIR');
+	if (!$MEDIA_FIREWALL_ROOTDIR) {
+		$MEDIA_FIREWALL_ROOTDIR=WT_DATA_DIR;
+	}
+	$MEDIA_DIRECTORY=$tree->preference('MEDIA_DIRECTORY');
+
 	if (realpath($MEDIA_FIREWALL_ROOTDIR)==realpath(WT_DATA_DIR)) {
 		$locked_by_context[]=trim($MEDIA_DIRECTORY, '/');
 	}

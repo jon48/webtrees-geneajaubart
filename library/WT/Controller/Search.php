@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Search.php 14115 2012-07-19 11:08:07Z greg $
+// $Id: Search.php 14306 2012-09-16 06:48:51Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -126,12 +126,11 @@ class WT_Controller_Search extends WT_Controller_Base {
 		}
 
 		// Retrieve the gedcoms to search in
-		$all_gedcoms=get_all_gedcoms();
-		if (count($all_gedcoms)>1 && get_site_setting('ALLOW_CHANGE_GEDCOM')) {
-			foreach ($all_gedcoms as $ged_id=>$gedcom) {
-				$str = str_replace(array (".", "-", " "), array ("_", "_", "_"), $gedcom);
+		if (count(WT_Tree::getAll())>1 && WT_Site::preference('ALLOW_CHANGE_GEDCOM')) {
+			foreach (WT_Tree::getAll() as $tree) {
+				$str = str_replace(array (".", "-", " "), array ("_", "_", "_"), $tree->tree_name);
 				if (isset ($_REQUEST["$str"]) || $topsearch) {
-					$this->sgeds[$ged_id] = $gedcom;
+					$this->sgeds[$tree->tree_id] = $tree->tree_name;
 					$_REQUEST["$str"] = 'yes';
 				}
 			}
@@ -595,97 +594,98 @@ class WT_Controller_Search extends WT_Controller_Base {
 
 				// individual results
 				echo '<div id="searchAccordion-indi">';
-					// Split individuals by gedcom
-					foreach ($this->sgeds as $ged_id=>$gedcom) {
-						$datalist = array();
-						foreach ($this->myindilist as $individual) {
-							if ($individual->getGedId()==$ged_id) {
-								$datalist[]=$individual;
-							}
-						}
-						if ($datalist) {
-							$somethingPrinted = true;
-							usort($datalist, array('WT_GedcomRecord', 'Compare'));
-							$GEDCOM=$gedcom;
-							load_gedcom_settings($ged_id);
-							echo '<h3 class="indi-acc-header"><a href="#"><span class="search_item" dir="auto">'.$this->myquery.'</span> @ <span dir="auto">'.htmlspecialchars(get_gedcom_setting($ged_id, 'title')), '</span></a></h3>
-								<div class="indi-acc_content">',
-								format_indi_table($datalist);
-							echo '</div>';//indi-acc_content
+				// Split individuals by tree
+				$trees=WT_Tree::getAll();
+				foreach ($this->sgeds as $ged_id=>$gedcom) {
+					$datalist = array();
+					foreach ($this->myindilist as $individual) {
+						if ($individual->getGedId()==$ged_id) {
+							$datalist[]=$individual;
 						}
 					}
+					if ($datalist) {
+						$somethingPrinted = true;
+						usort($datalist, array('WT_GedcomRecord', 'Compare'));
+						$GEDCOM=$gedcom;
+						load_gedcom_settings($ged_id);
+						echo '<h3 class="indi-acc-header"><a href="#"><span class="search_item" dir="auto">', $this->myquery, '</span> @ <span>', $trees[$ged_id]->tree_title_html, '</span></a></h3>
+							<div class="indi-acc_content">',
+							format_indi_table($datalist);
+						echo '</div>';//indi-acc_content
+					}
+				}
 				echo '</div>';//#searchAccordion-indi
 				$this->addInlineJavascript('jQuery("#searchAccordion-indi").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 
 				// family results
 				echo '<div id="searchAccordion-fam">';
-					// Split families by gedcom
-					foreach ($this->sgeds as $ged_id=>$gedcom) {
-						$datalist = array();
-						foreach ($this->myfamlist as $family) {
-							if ($family->getGedId()==$ged_id) {
-								$datalist[]=$family;
-							}
-						}
-						if ($datalist) {
-							$somethingPrinted = true;
-							usort($datalist, array('WT_GedcomRecord', 'Compare'));
-							$GEDCOM=$gedcom;
-							load_gedcom_settings($ged_id);
-							echo '<h3 class="fam-acc-header"><a href="#"><span class="search_item" dir="auto">'.$this->myquery.'</span> @ <span dir="auto">'.htmlspecialchars(get_gedcom_setting($ged_id, 'title')), '</span></a></h3>
-								<div class="fam-acc_content">',
-								format_fam_table($datalist);
-							echo '</div>';//fam-acc_content
+				// Split families by gedcom
+				foreach ($this->sgeds as $ged_id=>$gedcom) {
+					$datalist = array();
+					foreach ($this->myfamlist as $family) {
+						if ($family->getGedId()==$ged_id) {
+							$datalist[]=$family;
 						}
 					}
+					if ($datalist) {
+						$somethingPrinted = true;
+						usort($datalist, array('WT_GedcomRecord', 'Compare'));
+						$GEDCOM=$gedcom;
+						load_gedcom_settings($ged_id);
+						echo '<h3 class="fam-acc-header"><a href="#"><span class="search_item" dir="auto">', $this->myquery, '</span> @ <span>', $trees[$ged_id]->tree_title_html, '</span></a></h3>
+							<div class="fam-acc_content">',
+							format_fam_table($datalist);
+						echo '</div>';//fam-acc_content
+					}
+				}
 				echo '</div>';//#searchAccordion-fam
 				$this->addInlineJavascript('jQuery("#searchAccordion-fam").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 
 				// source results
 				echo '<div id="searchAccordion-source">';
-					// Split sources by gedcom
-					foreach ($this->sgeds as $ged_id=>$gedcom) {
-						$datalist = array();
-						foreach ($this->mysourcelist as $source) {
-							if ($source->getGedId()==$ged_id) {
-								$datalist[]=$source;
-							}
-						}
-						if ($datalist) {
-							$somethingPrinted = true;
-							usort($datalist, array('WT_GedcomRecord', 'Compare'));
-							$GEDCOM=$gedcom;
-							load_gedcom_settings($ged_id);
-							echo '<h3 class="source-acc-header"><a href="#"><span class="search_item" dir="auto">'.$this->myquery.'</span> @ <span dir="auto">'.htmlspecialchars(get_gedcom_setting($ged_id, 'title')), '</span></a></h3>
-								<div class="source-acc_content">',
-								format_sour_table($datalist);
-							echo '</div>';//fam-acc_content
+				// Split sources by gedcom
+				foreach ($this->sgeds as $ged_id=>$gedcom) {
+					$datalist = array();
+					foreach ($this->mysourcelist as $source) {
+						if ($source->getGedId()==$ged_id) {
+							$datalist[]=$source;
 						}
 					}
+					if ($datalist) {
+						$somethingPrinted = true;
+						usort($datalist, array('WT_GedcomRecord', 'Compare'));
+						$GEDCOM=$gedcom;
+						load_gedcom_settings($ged_id);
+						echo '<h3 class="source-acc-header"><a href="#"><span class="search_item" dir="auto">', $this->myquery, '</span> @ <span>', $trees[$ged_id]->tree_title_html, '</span></a></h3>
+							<div class="source-acc_content">',
+							format_sour_table($datalist);
+						echo '</div>';//fam-acc_content
+					}
+				}
 				echo '</div>';//#searchAccordion-source
 				$this->addInlineJavascript('jQuery("#searchAccordion-source").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 
 				// note results
 				echo '<div id="searchAccordion-note">';
-					// Split notes by gedcom
-					foreach ($this->sgeds as $ged_id=>$gedcom) {
-						$datalist = array();
-						foreach ($this->mynotelist as $note) {
-							if ($note->getGedId()==$ged_id) {
-								$datalist[]=$note;
-							}
-						}
-						if ($datalist) {
-							$somethingPrinted = true;
-							usort($datalist, array('WT_GedcomRecord', 'Compare'));
-							$GEDCOM=$gedcom;
-							load_gedcom_settings($ged_id);
-							echo '<h3 class="note-acc-header"><a href="#"><span class="search_item" dir="auto">'.$this->myquery.'</span> @ <span dir="auto">'.htmlspecialchars(get_gedcom_setting($ged_id, 'title')), '</span></a></h3>
-								<div class="note-acc_content">',
-								format_note_table($datalist);
-							echo '</div>';//note-acc_content
+				// Split notes by gedcom
+				foreach ($this->sgeds as $ged_id=>$gedcom) {
+					$datalist = array();
+					foreach ($this->mynotelist as $note) {
+						if ($note->getGedId()==$ged_id) {
+							$datalist[]=$note;
 						}
 					}
+					if ($datalist) {
+						$somethingPrinted = true;
+						usort($datalist, array('WT_GedcomRecord', 'Compare'));
+						$GEDCOM=$gedcom;
+						load_gedcom_settings($ged_id);
+						echo '<h3 class="note-acc-header"><a href="#"><span class="search_item" dir="auto">', $this->myquery, '</span> @ <span>', $trees[$ged_id]->tree_title_html, '</span></a></h3>
+							<div class="note-acc_content">',
+							format_note_table($datalist);
+						echo '</div>';//note-acc_content
+					}
+				}
 				echo '</div>';//#searchAccordion-note
 				$this->addInlineJavascript('jQuery("#searchAccordion-note").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 

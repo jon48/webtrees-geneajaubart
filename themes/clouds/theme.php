@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: theme.php 14181 2012-08-18 21:23:39Z greg $
+// $Id: theme.php 14386 2012-10-03 17:35:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -47,7 +47,6 @@ function getMenuAsCustomList($menu) {
 }
 
 $theme_name = "clouds"; // need double quotes, as file is scanned/parsed by script
-$stylesheet = WT_THEME_URL . 'style.css';
 $headerfile = WT_THEME_DIR . 'header.php';
 $footerfile = WT_THEME_DIR . 'footer.php';
 

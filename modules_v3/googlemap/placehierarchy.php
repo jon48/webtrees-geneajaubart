@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: placehierarchy.php 14088 2012-07-08 07:49:02Z greg $
+// $Id: placehierarchy.php 14348 2012-09-23 23:41:36Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -48,7 +48,7 @@ function place_id_to_hierarchy($id) {
 }
 
 function get_placeid($place) {
-	$par = explode (",", $place);
+	$par = explode (",", strip_tags($place));
 	$par = array_reverse($par);
 	$place_id = 0;
 	for ($i=0; $i<count($par); $i++) {

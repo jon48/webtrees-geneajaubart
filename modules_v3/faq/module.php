@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14196 2012-08-23 07:00:44Z greg $
+// $Id: module.php 14275 2012-09-14 10:26:33Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -119,7 +119,6 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 					(int)safe_POST('block_order')
 				));
 				$block_id=WT_DB::getInstance()->lastInsertId();
-				var_dump($block_id);
 			}
 			set_block_setting($block_id, 'header',  safe_POST('header',  WT_REGEX_UNSAFE));
 			set_block_setting($block_id, 'faqbody', safe_POST('faqbody', WT_REGEX_UNSAFE)); // allow html
@@ -184,7 +183,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 			echo '</td><td>';
 			echo '<input type="text" name="block_order" size="3" tabindex="3" value="', $block_order, '"></td>';
 			echo '</td><td>';
-			echo select_edit_control('gedcom_id', get_all_gedcoms(), '', $gedcom_id, 'tabindex="4"');
+			echo select_edit_control('gedcom_id', WT_Tree::getIdList(), '', $gedcom_id, 'tabindex="4"');
 			echo '</td></tr>';
 			echo '</table>';
 
@@ -353,7 +352,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 			WT_I18N::translate('Family tree'), ' ',
 			'<input type="hidden" name="mod", value="', $this->getName(), '">',
 			'<input type="hidden" name="mod_action", value="admin_config">',
-			select_edit_control('ged', array_combine(get_all_gedcoms(), get_all_gedcoms()), null, WT_GEDCOM),
+			select_edit_control('ged', WT_Tree::getNameList(), null, WT_GEDCOM),
 			'<input type="submit" value="', WT_I18N::translate('show'), '">',
 			'</form></p>';
 
@@ -364,6 +363,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 		if (empty($faqs)) {
 			echo '<tr><td class="error center" colspan="5">', WT_I18N::translate('The FAQ list is empty.'), '</td></tr></table>';
 		} else {
+			$trees=WT_Tree::getAll();
 			foreach ($faqs as $faq) {
 				// NOTE: Print the position of the current item
 				echo '<tr class="faq_edit_pos"><td>';
@@ -371,7 +371,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 				if ($faq->gedcom_id==null) {
 					echo WT_I18N::translate('All');
 				} else {
-					echo WT_I18N::translate('%s', get_gedcom_setting($faq->gedcom_id, 'title'));
+					echo $trees[$faq->gedcom_id]->tree_title_html;
 				}
 				echo '</td>';
 				// NOTE: Print the edit options of the current item

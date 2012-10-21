@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: reportheader.php 11789 2011-06-12 09:24:50Z greg $
+// $Id: reportheader.php 14279 2012-09-14 21:46:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -190,7 +190,7 @@ function InputSHandler($attrs) {
 				if ($match[1]=="-") {
 					$plus = -1;
 				}
-				$input["default"] = date("d M Y", time()+$plus*60*60*24*$match[2]);
+				$input["default"] = date("d M Y", WT_TIMESTAMP + $plus*60*60*24*$match[2]);
 			} else {
 				$input["default"] = $attrs["default"];
 			}

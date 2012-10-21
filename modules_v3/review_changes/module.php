@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: module.php 14279 2012-09-14 21:46:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -63,16 +63,16 @@ class review_changes_WT_Module extends WT_Module implements WT_Module_Block {
 
 		if ($changes) {
 			//-- if the time difference from the last email is greater than 24 hours then send out another email
-			$LAST_CHANGE_EMAIL=get_site_setting('LAST_CHANGE_EMAIL');
-			if (time()-$LAST_CHANGE_EMAIL > (60*60*24*$days)) {
-				$LAST_CHANGE_EMAIL = time();
-				set_site_setting('LAST_CHANGE_EMAIL', $LAST_CHANGE_EMAIL);
+			$LAST_CHANGE_EMAIL=WT_Site::preference('LAST_CHANGE_EMAIL');
+			if (WT_TIMESTAMP - $LAST_CHANGE_EMAIL > (60*60*24*$days)) {
+				$LAST_CHANGE_EMAIL = WT_TIMESTAMP;
+				WT_Site::preference('LAST_CHANGE_EMAIL', $LAST_CHANGE_EMAIL);
 				if ($sendmail=="yes") {
 					// Which users have pending changes?
 					$users_with_changes=array();
 					foreach (get_all_users() as $user_id=>$user_name) {
-						foreach (get_all_gedcoms() as $ged_id=>$ged_name) {
-							if (exists_pending_change($user_id, $ged_id)) {
+						foreach (WT_Tree::getAll() as $tree) {
+							if (exists_pending_change($user_id, $tree->tree_id)) {
 								$users_with_changes[$user_id]=$user_name;
 								break;
 							}

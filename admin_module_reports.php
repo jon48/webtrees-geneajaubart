@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_module_reports.php 13726 2012-03-31 15:40:22Z greg $
+// $Id: admin_module_reports.php 14267 2012-09-13 19:54:18Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_module_reports.php');
 require 'includes/session.php';
@@ -36,11 +36,11 @@ $action = safe_POST('action');
 
 if ($action=='update_mods') {
 	foreach ($modules as $module_name=>$module) {
-		foreach (get_all_gedcoms() as $ged_id=>$ged_name) {
-			$value = safe_POST("reportaccess-{$module_name}-{$ged_id}", WT_REGEX_INTEGER, $module->defaultAccessLevel());
+		foreach (WT_Tree::getAll() as $tree) {
+			$value = safe_POST("reportaccess-{$module_name}-{$tree->tree_id}", WT_REGEX_INTEGER, $module->defaultAccessLevel());
 			WT_DB::prepare(
 				"REPLACE INTO `##module_privacy` (module_name, gedcom_id, component, access_level) VALUES (?, ?, 'report', ?)"
-			)->execute(array($module_name, $ged_id, $value));
+			)->execute(array($module_name, $tree->tree_id, $value));
 		}
 	}
 }
@@ -68,15 +68,15 @@ if ($action=='update_mods') {
 						<td>
 							<table class="modules_table2">
 								<?php
-								foreach (get_all_gedcoms() as $ged_id=>$ged_name) {
-									$varname = 'reportaccess-'.$module_name.'-'.$ged_id;
+								foreach (WT_Tree::getAll() as $tree) {
+									$varname = 'reportaccess-'.$module_name.'-'.$tree->tree_id;
 									$access_level=WT_DB::prepare(
 										"SELECT access_level FROM `##module_privacy` WHERE gedcom_id=? AND module_name=? AND component='report'"
-									)->execute(array($ged_id, $module_name))->fetchOne();
+									)->execute(array($tree->tree_id, $module_name))->fetchOne();
 									if ($access_level===null) {
 										$access_level=$module->defaultAccessLevel();
 									}
-									echo '<tr><td>',  WT_I18N::translate('%s', get_gedcom_setting($ged_id, 'title')), '</td><td>';
+									echo '<tr><td>', $tree->tree_title_html, '</td><td>';
 									echo edit_field_access_level($varname, $access_level);
 								}
 								?>

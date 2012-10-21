@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_places.php 14219 2012-08-27 14:54:50Z greg $
+// $Id: admin_places.php 14298 2012-09-15 19:28:34Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -194,12 +194,11 @@ $controller
 <?php
 
 if ($action=='ImportGedcom') {
-	$ged_id=safe_GET('ged_id');
 	$placelist=array();
 	$j=0;
 	$statement=
 		WT_DB::prepare("SELECT i_gedcom FROM `##individuals` WHERE i_file=? UNION ALL SELECT f_gedcom FROM `##families` WHERE f_file=?")
-		->execute(array($ged_id, $ged_id));
+		->execute(array(WT_GED_ID, WT_GED_ID));
 	while ($gedrec=$statement->fetchColumn()) {
 		$i = 1;
 		$placerec = get_sub_record(2, '2 PLAC', $gedrec, $i);
@@ -651,7 +650,7 @@ foreach ($placelist as $place) {
 				<input type="hidden" name="mod" value="googlemap">
 				<input type="hidden" name="mod_action" value="admin_places">
 				<input type="hidden" name="action" value="ImportGedcom">
-				<?php echo select_edit_control('ged_id', get_all_gedcoms(), null, WT_GED_ID); ?>
+				<?php echo select_edit_control('ged', WT_Tree::getNameList(), null, WT_GEDCOM); ?>
 				<input type="submit" value="<?php echo WT_I18N::translate('Import'); ?>">
 			</form>
 		</td>

@@ -1,16 +1,15 @@
 <?php
-// Show help text in a popup window.
+// Individual Page
+//
+// Display all of the information about an individual
 //
 // webtrees: Web based Family History software
 // Copyright (C) 2012 webtrees development team.
 //
-// This file also serves as a database of fact and label descriptions,
-// allowing them to be discovered by xgettext, so we may use them dynamically
-// in the rest of the code.
-// Help links are generated using help_link('help_topic')
+// Derived from PhpGedView
+// Copyright (C) 2002 to 2011  PGV Development Team.  All rights reserved.
 //
-// Help text for modules belongs in WT_MODULES_DIR/XXX/help_text.php
-// Module help links are generated using help_link('help_topic', 'module')
+// Sidebar controls courtesy of http://devheart.org/articles/jquery-collapsible-sidebar-layout/
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,1722 +25,252 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: help_text.php 14178 2012-08-17 21:02:13Z greg $
+// $Id: individual.php 14143 2012-08-07 20:14:39Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
-define('WT_SCRIPT_NAME', 'help_text.php');
+define('WT_SCRIPT_NAME', 'individual.php');
 require './includes/session.php';
-
-$controller=new WT_Controller_Ajax();
-
-$help=safe_GET('help');
-switch ($help) {
-	//////////////////////////////////////////////////////////////////////////////
-	// This is a list of all known gedcom tags.  We list them all here so that
-	// xgettext() may find them.
-	//
-	// Tags such as BIRT:PLAC are only used as labels, and do not require help
-	// text.  These are only used for translating labels.
-	//
-	// Tags such as _BIRT_CHIL are pseudo-tags, used to create family events.
-	//
-	// Generally, these tags need to be lists explicitly in add_simple_tag()
-	//////////////////////////////////////////////////////////////////////////////
-
-case 'ABBR':
-	$title=WT_Gedcom_Tag::getLabel('ABBR');
-	$text=WT_I18N::translate('Use this field for storing an abbreviated version of a title.  This field is used in conjunction with the title field on sources.  By default <b>webtrees</b> will first use the title and then the abbreviated title.<br /><br />According to the GEDCOM 5.5 specification, "this entry is to provide a short title used for sorting, filing, and retrieving source records (pg 62)."<br /><br />In <b>webtrees</b> the abbreviated title is optional, but in other genealogical programs it is required.');
-	break;
-
-case 'ADDR':
-	$title=WT_Gedcom_Tag::getLabel('ADDR');
-	$text=WT_I18N::translate('Enter the address into the field just as you would write it on an envelope.<br /><br />Leave this field blank if you do not want to include an address.');
-	break;
-
-case 'AGNC':
-	$title=WT_Gedcom_Tag::getLabel('AGNC');
-	$text=WT_I18N::translate('The organization, institution, corporation, person, or other entity that has authority.<br /><br />For example, an employer of a person, or a church that administered rites or events, or an organization responsible for creating and/or archiving records.');
-	break;
-
-case 'ASSO':
-	$title=WT_Gedcom_Tag::getLabel('ASSO');
-	$text=WT_I18N::translate('Enter associate GEDCOM ID.');
-	break;
-
-case 'CAUS':
-	$title=WT_Gedcom_Tag::getLabel('CAUS');
-	$text=WT_I18N::translate('A description of the cause of the associated event or fact, such as the cause of death.');
-	break;
-
-case 'CEME':
-	$title=WT_Gedcom_Tag::getLabel('Cemetery');
-	$text=WT_I18N::translate('Enter the name of the cemetery or other resting place where individual is buried.');
-	break;
-
-case 'DATE':
-	$title=WT_Gedcom_Tag::getLabel('DATE');
-	$CALENDAR_FORMAT=null; // Don't perform conversions here - it will confuse the examples!
-	$dates=array(
-		'1900'                     =>new WT_Date('1900'),
-		'JAN 1900'                 =>new WT_Date('JAN 1900'),
-		'FEB 1900'                 =>new WT_Date('FEB 1900'),
-		'MAR 1900'                 =>new WT_Date('MAR 1900'),
-		'APR 1900'                 =>new WT_Date('APR 1900'),
-		'MAY 1900'                 =>new WT_Date('MAY 1900'),
-		'JUN 1900'                 =>new WT_Date('JUN 1900'),
-		'JUL 1900'                 =>new WT_Date('JUL 1900'),
-		'AUG 1900'                 =>new WT_Date('AUG 1900'),
-		'SEP 1900'                 =>new WT_Date('SEP 1900'),
-		'OCT 1900'                 =>new WT_Date('OCT 1900'),
-		'NOV 1900'                 =>new WT_Date('NOV 1900'),
-		'DEC 1900'                 =>new WT_Date('DEC 1900'),
-		'11 DEC 1913'              =>new WT_Date('11 DEC 1913'),
-		'01 FEB 2003'              =>new WT_Date('01 FEB 2003'),
-		'ABT 1900'                 =>new WT_Date('ABT 1900'),
-		'EST 1900'                 =>new WT_Date('EST 1900'),
-		'CAL 1900'                 =>new WT_Date('CAL 1900'),
-		'INT 1900 (...)'           =>new WT_Date('INT 1900 (...)'),
-		'@#DJULIAN@ 44 B.C.'       =>new WT_Date('@#DJULIAN@ 44 B.C.'),
-		'@#DJULIAN@ 14 JAN 1700'   =>new WT_Date('@#DJULIAN@ 14 JAN 1700'),
-		'BET @#DJULIAN@ 01 SEP 1752 AND @#DGREGORIAN@ 30 SEP 1752'   =>new WT_Date('BET @#DJULIAN@ 01 SEP 1752 AND @#DGREGORIAN@ 30 SEP 1752'),
-		'@#DJULIAN@ 20 FEB 1742/43'=>new WT_Date('@#DJULIAN@ 20 FEB 1742/43'),
-		'FROM 1900 TO 1910'        =>new WT_Date('FROM 1900 TO 1910'),
-		'FROM 1900'                =>new WT_Date('FROM 1900'),
-		'TO 1910'                  =>new WT_Date('TO 1910'),
-		'BET 1900 AND 1910'        =>new WT_Date('BET 1900 AND 1910'),
-		'BET JAN 1900 AND MAR 1900'=>new WT_Date('BET JAN 1900 AND MAR 1900'),
-		'BET APR 1900 AND JUN 1900'=>new WT_Date('BET APR 1900 AND JUN 1900'),
-		'BET JUL 1900 AND SEP 1900'=>new WT_Date('BET JUL 1900 AND SEP 1900'),
-		'BET OCT 1900 AND DEC 1900'=>new WT_Date('BET OCT 1900 AND DEC 1900'),
-		'AFT 1900'                 =>new WT_Date('AFT 1900'),
-		'BEF 1910'                 =>new WT_Date('BEF 1910'),
-		// Hijri dates
-		'@#DHIJRI@ 1497'           =>new WT_Date('@#DHIJRI@ 1497'),
-		'@#DHIJRI@ MUHAR 1497'     =>new WT_Date('@#DHIJRI@ MUHAR 1497'),
-		'ABT @#DHIJRI@ SAFAR 1497' =>new WT_Date('ABT @#DHIJRI@ SAFAR 1497'),
-		'BET @#DHIJRI@ RABIA 1497 AND @#DHIJRI@ RABIT 1497'=>new WT_Date('BET @#DHIJRI@ RABIA 1497 AND @#DHIJRI@ RABIT 1497'),
-		'FROM @#DHIJRI@ JUMAA 1497 TO @#DHIJRI@ JUMAT 1497'=>new WT_Date('FROM @#DHIJRI@ JUMAA 1497 TO @#DHIJRI@ JUMAT 1497'),
-		'AFT @#DHIJRI@ RAJAB 1497' =>new WT_Date('AFT @#DHIJRI@ RAJAB 1497'),
-		'BEF @#DHIJRI@ SHAAB 1497' =>new WT_Date('BEF @#DHIJRI@ SHAAB 1497'),
-		'ABT @#DHIJRI@ RAMAD 1497' =>new WT_Date('ABT @#DHIJRI@ RAMAD 1497'),
-		'FROM @#DHIJRI@ SHAWW 1497'=>new WT_Date('FROM @#DHIJRI@ SHAWW 1497'),
-		'TO @#DHIJRI@ DHUAQ 1497'  =>new WT_Date('TO @#DHIJRI@ DHUAQ 1497'),
-		'@#DHIJRI@ 03 DHUAH 1497'  =>new WT_Date('@#DHIJRI@ 03 DHUAH 1497'),
-		// French dates
-		'@#DFRENCH R@ 12'          =>new WT_Date('@#DFRENCH R@ 12'),
-		'@#DFRENCH R@ VEND 12'     =>new WT_Date('@#DFRENCH R@ VEND 12'),
-		'ABT @#DFRENCH R@ BRUM 12' =>new WT_Date('ABT @#DFRENCH R@ BRUM 12'),
-		'BET @#DFRENCH R@ FRIM 12 AND @#DFRENCH R@ NIVO 12'=>new WT_Date('BET @#DFRENCH R@ FRIM 12 AND @#DFRENCH R@ NIVO 12'),
-		'FROM @#DFRENCH R@ PLUV 12 TO @#DFRENCH R@ VENT 12'=>new WT_Date('FROM @#DFRENCH R@ PLUV 12 TO @#DFRENCH R@ VENT 12'),
-		'AFT @#DFRENCH R@ GERM 12' =>new WT_Date('AFT @#DFRENCH R@ GERM 12'),
-		'BEF @#DFRENCH R@ FLOR 12' =>new WT_Date('BEF @#DFRENCH R@ FLOR 12'),
-		'ABT @#DFRENCH R@ PRAI 12' =>new WT_Date('ABT @#DFRENCH R@ PRAI 12'),
-		'FROM @#DFRENCH R@ MESS 12'=>new WT_Date('FROM @#DFRENCH R@ MESS 12'),
-		'TO @#DFRENCH R@ THER 12'  =>new WT_Date('TO @#DFRENCH R@ THER 12'),
-		'EST @#DFRENCH R@ FRUC 12' =>new WT_Date('EST @#DFRENCH R@ FRUC 12'),
-		'@#DFRENCH R@ 03 COMP 12'  =>new WT_Date('@#DFRENCH R@ 03 COMP 12'),
-		// Jewish dates
-		'@#DHEBREW@ 5481'          =>new WT_Date('@#DHEBREW@ 5481'),
-		'@#DHEBREW@ TSH 5481'      =>new WT_Date('@#DHEBREW@ TSH 5481'),
-		'ABT @#DHEBREW@ CSH 5481'  =>new WT_Date('ABT @#DHEBREW@ CSH 5481'),
-		'BET @#DHEBREW@ KSL 5481 AND @#DHEBREW@ TVT 5481'=>new WT_Date('BET @#DHEBREW@ KSL 5481 AND @#DHEBREW@ TVT 5481'),
-		'FROM @#DHEBREW@ SHV 5481 TO @#DHEBREW@ ADR 5481'=>new WT_Date('FROM @#DHEBREW@ SHV 5481 TO @#DHEBREW@ ADR 5481'),
-		'AFT @#DHEBREW@ ADR 5481'  =>new WT_Date('AFT @#DHEBREW@ ADR 5481'),
-		'AFT @#DHEBREW@ ADS 5480'  =>new WT_Date('AFT @#DHEBREW@ ADS 5480'),
-		'BEF @#DHEBREW@ NSN 5481'  =>new WT_Date('BEF @#DHEBREW@ NSN 5481'),
-		'ABT @#DHEBREW@ IYR 5481'  =>new WT_Date('ABT @#DHEBREW@ IYR 5481'),
-		'FROM @#DHEBREW@ SVN 5481' =>new WT_Date('FROM @#DHEBREW@ SVN 5481'),
-		'TO @#DHEBREW@ TMZ 5481'   =>new WT_Date('TO @#DHEBREW@ TMZ 5481'),
-		'EST @#DHEBREW@ AAV 5481'  =>new WT_Date('EST @#DHEBREW@ AAV 5481'),
-		'@#DHEBREW@ 03 ELL 5481'   =>new WT_Date('@#DHEBREW@ 03 ELL 5481'),
-	);
-
-	foreach ($dates as &$date) {
-		$date=strip_tags($date->Display());
+$controller=new WT_Controller_Individual();
+$controller
+	->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.cookie.js') // We use this to record the sidebar state
+	->addInlineJavascript('var catch_and_ignore; function paste_id(value) {catch_and_ignore = value;}'); // For the "find" links
+	
+if ($controller->record && $controller->record->canDisplayDetails()) {
+	if (safe_GET('action')=='ajax') {
+		$controller->ajaxRequest();
+		exit;
 	}
-	// These shortcuts work differently for different languages
-	switch (preg_replace('/[^DMY]/', '', str_replace(array('J', 'F'), array('D', 'M'), strtoupper($DATE_FORMAT)))) {
-	case 'YMD':
-		$example1='11/12/1913'; // Note: we ignore the DMY order if it doesn't make sense.
-		$example2='03/02/01';
-		break;
-	case 'MDY':
-		$example1='12/11/1913';
-		$example2='02/01/03';
-		break;
-	case 'DMY':
-	default:
-		$example1='11/12/1913';
-		$example2='01/02/03';
-		break;
-	}
-	$example1.='<br/>'.str_replace('/', '-', $example1).'<br/>'.str_replace('/', '.', $example1);
-	$example2.='<br/>'.str_replace('/', '-', $example2).'<br/>'.str_replace('/', '.', $example2);
-	$text=
-		'<p>'.WT_I18N::translate('Dates are stored using English abbreviations and keywords.  Shortcuts are available as alternatives to these abbreviations and keywords.').'</p>'.
-		'<table border="1">'.
-		'<tr><th>'.WT_I18N::translate('Date').'</th><th>'.WT_I18N::translate('Format').'</th><th>'.WT_I18N::translate('Shortcut').'</th></tr>'.
-		'<tr><td>'.$dates['1900'].'</td><td><tt dir="ltr" lang="en">1900</tt></td><td>&nbsp;</td></tr>'.
-		'<tr><td>'.$dates['JAN 1900'].'<br/>'.$dates['FEB 1900'].'<br/>'.$dates['MAR 1900'].'<br/>'.$dates['APR 1900'].'<br/>'.$dates['MAY 1900'].'<br/>'.$dates['JUN 1900'].'<br/>'.$dates['JUL 1900'].'<br/>'.$dates['AUG 1900'].'<br/>'.$dates['SEP 1900'].'<br/>'.$dates['OCT 1900'].'<br/>'.$dates['NOV 1900'].'<br/>'.$dates['DEC 1900'].'</td><td><tt dir="ltr" lang="en">JAN 1900<br/>FEB 1900<br/>MAR 1900<br/>APR 1900<br/>MAY 1900<br/>JUN 1900<br/>JUL 1900<br/>AUG 1900<br/>SEP 1900<br/>OCT 1900<br/>NOV 1900<br/>DEC 1900</tt></td><td>&nbsp;</td></tr>'.
-		'<tr><td>'.$dates['11 DEC 1913'].'</td><td><tt dir="ltr" lang="en">11 DEC 1913</tt></td><td><tt dir="ltr" lang="en">'.$example1.'</tt></td></tr>'.
-		'<tr><td>'.$dates['01 FEB 2003'].'</td><td><tt dir="ltr" lang="en">01 FEB 2003</tt></td><td><tt dir="ltr" lang="en">'.$example2.'</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT 1900'].'</td><td><tt dir="ltr" lang="en">ABT 1900</tt></td><td><tt dir="ltr" lang="en">~1900</tt></td></tr>'.
-		'<tr><td>'.$dates['EST 1900'].'</td><td><tt dir="ltr" lang="en">EST 1900</tt></td><td><tt dir="ltr" lang="en">*1900</tt></td></tr>'.
-		'<tr><td>'.$dates['CAL 1900'].'</td><td><tt dir="ltr" lang="en">CAL 1900</tt></td><td><tt dir="ltr" lang="en">#1900</tt></td></tr>'.
-		'<tr><td>'.$dates['INT 1900 (...)'].'</td><td><tt dir="ltr" lang="en">INT 1900 (...)</tt></td><td>&nbsp;</td></tr>'.
-		'</table>'.
-		'<p>'.WT_I18N::translate('Date ranges are used to indicate that an event, such as a birth, happened on a unknown date within a possible range.').'</p>'.
-		'<table border="1">'.
-		'<tr><th>'.WT_I18N::translate('Date range').'</th><th>'.WT_I18N::translate('Format').'</th><th>'.WT_I18N::translate('Shortcut').'</th></tr>'.
-		'<tr><td>'.$dates['BET 1900 AND 1910'].'</td><td><tt dir="ltr" lang="en">BET 1900 AND 1910</tt></td><td><tt dir="ltr" lang="en">1900-1910</tt></td></tr>'.
-		'<tr><td>'.$dates['AFT 1900'].'</td><td><tt dir="ltr" lang="en">AFT 1900</tt></td><td><tt dir="ltr" lang="en">&gt;1900</tt></td></tr>'.
-		'<tr><td>'.$dates['BEF 1910'].'</td><td><tt dir="ltr" lang="en">BEF 1910</tt></td><td><tt dir="ltr" lang="en">&lt;1910</tt></td></tr>'.
-		'<tr><td>'.$dates['BET JAN 1900 AND MAR 1900'].'</td><td><tt dir="ltr" lang="en">BET JAN 1900 AND MAR 1900</tt></td><td><tt dir="ltr" lang="en">Q1 1900</tt></td></tr>'.
-		'<tr><td>'.$dates['BET APR 1900 AND JUN 1900'].'</td><td><tt dir="ltr" lang="en">BET APR 1900 AND JUN 1900</tt></td><td><tt dir="ltr" lang="en">Q2 1900</tt></td></tr>'.
-		'<tr><td>'.$dates['BET JUL 1900 AND SEP 1900'].'</td><td><tt dir="ltr" lang="en">BET JUL 1900 AND SEP 1900</tt></td><td><tt dir="ltr" lang="en">Q3 1900</tt></td></tr>'.
-		'<tr><td>'.$dates['BET OCT 1900 AND DEC 1900'].'</td><td><tt dir="ltr" lang="en">BET OCT 1900 AND DEC 1900</tt></td><td><tt dir="ltr" lang="en">Q4 1900</tt></td></tr>'.
-		'</table>'.
-		'<p>'.WT_I18N::translate('Date periods are used to indicate that a fact, such as an occupation, continued for a period of time.').'</p>'.
-		'<table border="1">'.
-		'<tr><th>'.WT_I18N::translate('Date period').'</th><th>'.WT_I18N::translate('Format').'</th><th>'.WT_I18N::translate('Shortcut').'</th></tr>'.
-		'<tr><td>'.$dates['FROM 1900 TO 1910'].'</td><td><tt dir="ltr" lang="en">FROM 1900 TO 1910</tt></td><td><tt dir="ltr" lang="en">1900~1910</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM 1900'].'</td><td><tt dir="ltr" lang="en">FROM 1900</tt></td><td><tt dir="ltr" lang="en">1900-</tt></td></tr>'.
-		'<tr><td>'.$dates['TO 1910'].'</td><td><tt dir="ltr" lang="en">TO 1910</tt></td><td><tt dir="ltr" lang="en">-1900</tt></td></tr>'.
-		'</table>'.
-		'<p>'.WT_I18N::translate('Simple dates are assumed to be in the gregorian calendar.  To specify a date in another calendar, add a keyword before the date.  This keyword is optional if the month or year format make the date unambiguous.').'</p>'.
-		'<table border="1">'.
-		'<tr><th>'.WT_I18N::translate('Date').'</th><th>'.WT_I18N::translate('Format').'</th></tr>'.
-		'<tr><td colspan="2" align="center">'.WT_I18N::translate('Julian').'</td></tr>'.
-		'<tr><td>'.$dates['@#DJULIAN@ 14 JAN 1700'].'</td><td><tt dir="ltr" lang="en">@#DJULIAN@ 14 JAN 1700</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DJULIAN@ 44 B.C.'].'</td><td><tt dir="ltr" lang="en">@#DJULIAN@ 44 B.C.</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DJULIAN@ 20 FEB 1742/43'].'</td><td><tt dir="ltr" lang="en">@#DJULIAN@ 20 FEB 1742/43</tt></td></tr>'.
-		'<tr><td>'.$dates['BET @#DJULIAN@ 01 SEP 1752 AND @#DGREGORIAN@ 30 SEP 1752'].'</td><td><tt dir="ltr" lang="en">BET @#DJULIAN@ 01 SEP 1752 AND @#DGREGORIAN@ 30 SEP 1752</tt></td></tr>'.
-		'<tr><td colspan="2" align="center">'.WT_I18N::translate('Jewish').'</td></tr>'.
-		'<tr><td>'.$dates['@#DHEBREW@ 5481'].'</td><td><tt dir="ltr" lang="en">@#DHEBREW@ 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DHEBREW@ TSH 5481'].'</td><td><tt dir="ltr" lang="en">@#DHEBREW@ TSH 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT @#DHEBREW@ CSH 5481'].'</td><td><tt dir="ltr" lang="en">ABT @#DHEBREW@ CSH 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['BET @#DHEBREW@ KSL 5481 AND @#DHEBREW@ TVT 5481'].'</td><td><tt dir="ltr" lang="en">BET @#DHEBREW@ KSL 5481 AND @#DHEBREW@ TVT 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM @#DHEBREW@ SHV 5481 TO @#DHEBREW@ ADR 5481'].'</td><td><tt dir="ltr" lang="en">FROM @#DHEBREW@ SHV 5481 TO @#DHEBREW@ ADR 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['AFT @#DHEBREW@ ADR 5481'].'</td><td><tt dir="ltr" lang="en">AFT @#DHEBREW@ ADR 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['AFT @#DHEBREW@ ADS 5480'].'</td><td><tt dir="ltr" lang="en">AFT @#DHEBREW@ ADS 5480</tt></td></tr>'.
-		'<tr><td>'.$dates['BEF @#DHEBREW@ NSN 5481'].'</td><td><tt dir="ltr" lang="en">BEF @#DHEBREW@ NSN 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT @#DHEBREW@ IYR 5481'].'</td><td><tt dir="ltr" lang="en">ABT @#DHEBREW@ IYR 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM @#DHEBREW@ SVN 5481'].'</td><td><tt dir="ltr" lang="en">FROM @#DHEBREW@ SVN 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['TO @#DHEBREW@ TMZ 5481'].'</td><td><tt dir="ltr" lang="en">TO @#DHEBREW@ TMZ 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['EST @#DHEBREW@ AAV 5481'].'</td><td><tt dir="ltr" lang="en">EST @#DHEBREW@ AAV 5481</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DHEBREW@ 03 ELL 5481'].'</td><td><tt dir="ltr" lang="en">@#DHEBREW@ 03 ELL 5481</tt></td></tr>'.
-		'<tr><td colspan="2" align="center">'.WT_I18N::translate('Hijri').'</td></tr>'.
-		'<tr><td>'.$dates['@#DHIJRI@ 1497'].'</td><td><tt dir="ltr" lang="en">@#DHIJRI@ 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DHIJRI@ MUHAR 1497'].'</td><td><tt dir="ltr" lang="en">@#DHIJRI@ MUHAR 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT @#DHIJRI@ SAFAR 1497'].'</td><td><tt dir="ltr" lang="en">ABT @#DHIJRI@ SAFAR 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['BET @#DHIJRI@ RABIA 1497 AND @#DHIJRI@ RABIT 1497'].'</td><td><tt dir="ltr" lang="en">BET @#DHIJRI@ RABIA 1497 AND @#DHIJRI@ RABIT 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM @#DHIJRI@ JUMAA 1497 TO @#DHIJRI@ JUMAT 1497'].'</td><td><tt dir="ltr" lang="en">FROM @#DHIJRI@ JUMAA 1497 TO @#DHIJRI@ JUMAT 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['AFT @#DHIJRI@ RAJAB 1497'].'</td><td><tt dir="ltr" lang="en">AFT @#DHIJRI@ RAJAB 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['BEF @#DHIJRI@ SHAAB 1497'].'</td><td><tt dir="ltr" lang="en">BEF @#DHIJRI@ SHAAB 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT @#DHIJRI@ RAMAD 1497'].'</td><td><tt dir="ltr" lang="en">ABT @#DHIJRI@ RAMAD 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM @#DHIJRI@ SHAWW 1497'].'</td><td><tt dir="ltr" lang="en">FROM @#DHIJRI@ SHAWW 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['TO @#DHIJRI@ DHUAQ 1497'].'</td><td><tt dir="ltr" lang="en">TO @#DHIJRI@ DHUAQ 1497</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DHIJRI@ 03 DHUAH 1497'].'</td><td><tt dir="ltr" lang="en">@#DHIJRI@ 03 DHUAH 1497</tt></td></tr>'.
-		'<tr><td colspan="2" align="center">'.WT_I18N::translate('French').'</td></tr>'.
-		'<tr><td>'.$dates['@#DFRENCH R@ 12'].'</td><td><tt dir="ltr" lang="en">@#DFRENCH R@ 12</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DFRENCH R@ VEND 12'].'</td><td><tt dir="ltr" lang="en">@#DFRENCH R@ VEND 12</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT @#DFRENCH R@ BRUM 12'].'</td><td><tt dir="ltr" lang="en">ABT @#DFRENCH R@ BRUM 12</tt></td></tr>'.
-		'<tr><td>'.$dates['BET @#DFRENCH R@ FRIM 12 AND @#DFRENCH R@ NIVO 12'].'</td><td><tt dir="ltr" lang="en">BET @#DFRENCH R@ FRIM 12 AND @#DFRENCH R@ NIVO 12</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM @#DFRENCH R@ PLUV 12 TO @#DFRENCH R@ VENT 12'].'</td><td><tt dir="ltr" lang="en">FROM @#DFRENCH R@ PLUV 12 TO @#DFRENCH R@ VENT 12</tt></td></tr>'.
-		'<tr><td>'.$dates['AFT @#DFRENCH R@ GERM 12'].'</td><td><tt dir="ltr" lang="en">AFT @#DFRENCH R@ GERM 12</tt></td></tr>'.
-		'<tr><td>'.$dates['BEF @#DFRENCH R@ FLOR 12'].'</td><td><tt dir="ltr" lang="en">BEF @#DFRENCH R@ FLOR 12</tt></td></tr>'.
-		'<tr><td>'.$dates['ABT @#DFRENCH R@ PRAI 12'].'</td><td><tt dir="ltr" lang="en">ABT @#DFRENCH R@ PRAI 12</tt></td></tr>'.
-		'<tr><td>'.$dates['FROM @#DFRENCH R@ MESS 12'].'</td><td><tt dir="ltr" lang="en">FROM @#DFRENCH R@ MESS 12</tt></td></tr>'.
-		'<tr><td>'.$dates['TO @#DFRENCH R@ THER 12'].'</td><td><tt dir="ltr" lang="en">TO @#DFRENCH R@ THER 12</tt></td></tr>'.
-		'<tr><td>'.$dates['EST @#DFRENCH R@ FRUC 12'].'</td><td><tt dir="ltr" lang="en">EST @#DFRENCH R@ FRUC 12</tt></td></tr>'.
-		'<tr><td>'.$dates['@#DFRENCH R@ 03 COMP 12'].'</td><td><tt dir="ltr" lang="en">@#DFRENCH R@ 03 COMP 12</tt></td></tr>'.
-		'</table>';
-	break;
-
-case 'EMAI':
-case 'EMAIL':
-case 'EMAL':
-case '_EMAIL':
-	$title=WT_Gedcom_Tag::getLabel('EMAIL');
-	$text=WT_I18N::translate('Enter the email address.<br /><br />An example email address looks like this: <b>name@hotmail.com</b>  Leave this field blank if you do not want to include an email address.');
-	break;
-
-case 'FAX':
-	$title=WT_Gedcom_Tag::getLabel('FAX');
-	$text=WT_I18N::translate('Enter the FAX number including the country and area code.<br /><br />Leave this field blank if you do not want to include a FAX number.  For example, a number in Germany might be +49 25859 56 76 89 and a number in USA or Canada might be +1 888 555-1212.');
-	break;
-
-case 'FORM':
-	$title=WT_Gedcom_Tag::getLabel('FORM');
-	$text=WT_I18N::translate('This is an optional field that can be used to enter the file format of the multimedia object.  Some genealogy programs may look at this field to determine how to handle the item.  However, since media do not transfer across computer systems very well, this field is not very important.');
-	break;
-
-case 'GIVN':
-	$title=WT_Gedcom_Tag::getLabel('GIVN');
-	$text=WT_I18N::translate('In this field you should enter the given names for the person.  As an example, in the name "John Robert Finlay", the given names that should be entered here are "John Robert"');
-	break;
-
-case 'NAME':
-	$title=WT_Gedcom_Tag::getLabel('NAME');
-	$text=WT_I18N::translate('This is the most important field in a person\'s Name record.<br /><br />This field should be filled automatically as the other fields are filled in, but it is provided so that you can edit the information according to your personal preference.<br /><br />The name in this field should be entered according to the GEDCOM 5.5.1 standards with the surname surrounded by forward slashes "/".  As an example, the name "John Robert Finlay Jr." should be entered like this: "John Robert /Finlay/ Jr.".');
-	break;
-
-case 'NICK':
-	$title=WT_Gedcom_Tag::getLabel('NICK');
-	$text=WT_I18N::translate('In this field you should enter any nicknames for the person.<br />This is an optional field.<br /><br />Ways to add a nickname:<ul><li>Select <b>modify name</b> then enter nickname and save</li><li>Select <b>add new name</b> then enter nickname AND name and save</li><li>Select <b>edit GEDCOM record</b> to add multiple [2&nbsp;NICK] records subordinate to the main [1&nbsp;NAME] record.</li></ul>');
-	break;
-
-case 'NOTE':
-	$title=WT_Gedcom_Tag::getLabel('NOTE');
-	$text=WT_I18N::translate('Notes are free-form text and will appear in the Fact Details section of the page.');
-	break;
-
-case 'NPFX':
-	$title=WT_Gedcom_Tag::getLabel('NPFX');
-	$text=WT_I18N::translate('This optional field allows you to enter a name prefix such as "Dr." or "Adm."');
-	break;
-
-case 'NSFX':
-	$title=WT_Gedcom_Tag::getLabel('NSFX');
-	$text=WT_I18N::translate('In this optional field you should enter the name suffix for the person.  Examples of name suffixes are "Sr.", "Jr.", and "III".');
-	break;
-
-case 'OBJE':
-	$title=WT_Gedcom_Tag::getLabel('OBJE');
-	$text=
-		'<p>'.
-		WT_I18N::translate('A media object is a record in the family tree which contains information about a media file.  This information may include a title, a copyright notice, a transcript, privacy restrictions, etc.  The media file, such as the photo or video, can be stored locally (on this webserver) or remotely (on a different webserver).').
-		'</p>';
-	break;
-
-case 'PAGE':
-	$title=WT_Gedcom_Tag::getLabel('PAGE');
-	$text=WT_I18N::translate('In the Citation Details field you would enter the page number or other information that might help someone find the information in the source.');
-	break;
-
-case 'PEDI':
-	$title=WT_Gedcom_Tag::getLabel('PEDI');
-	$text=WT_I18N::translate('A child may have more than one set of parents.  The relationship between the child and the parents can be biological, legal, or based on local culture and tradition.  If no pedigree is specified, then a biological relationship will be assumed.');
-	break;
-
-case 'PHON':
-	$title=WT_Gedcom_Tag::getLabel('PHON');
-	$text=WT_I18N::translate('Enter the phone number including the country and area code.<br /><br />Leave this field blank if you do not want to include a phone number.  For example, a number in Germany might be +49 25859 56 76 89 and a number in USA or Canada might be +1 888 555-1212.');
-	break;
-
-case 'PLAC':
-	$title=WT_Gedcom_Tag::getLabel('PLAC');
-	$text=WT_I18N::translate('Places should be entered according to the standards for genealogy.  In genealogy, places are recorded with the most specific information about the place first and then working up to the least specific place last, using commas to separate the different place levels.  The level at which you record the place information should represent the levels of government or church where vital records for that place are kept.<br /><br />For example, a place like Salt Lake City would be entered as "Salt Lake City, Salt Lake, Utah, USA".<br /><br />Let\'s examine each part of this place.  The first part, "Salt Lake City," is the city or township where the event occurred.  In some countries, there may be municipalities or districts inside a city which are important to note.  In that case, they should come before the city.  The next part, "Salt Lake," is the county.  "Utah" is the state, and "USA" is the country.  It is important to note each place because genealogical records are kept by the governments of each level.<br /><br />If a level of the place is unknown, you should leave a space between the commas.  Suppose, in the example above, you didn\'t know the county for Salt Lake City.  You should then record it like this: "Salt Lake City, , Utah, USA".  Suppose you only know that a person was born in Utah.  You would enter the information like this: ", , Utah, USA".  <br /><br />You can use the <b>Find Place</b> link to help you find places that already exist in the database.');
-	break;
-
-case 'QUAY':
-	$title=WT_Gedcom_Tag::getLabel('QUAY');
-	$text=WT_I18N::translate('You would use this field to record the quality or reliability of the data found in this source.  Many genealogy applications use a number in the field. <b>3</b> might mean that the data is a primary source, <b>2</b> might mean that it was a secondary source, <b>1</b> might mean the information is questionable, and <b>0</b> might mean that the source is unreliable.');
-	break;
-
-case 'RELA':
-	$title=WT_Gedcom_Tag::getLabel('RELA');
-	$text=WT_I18N::translate('Select a relationship name from the list. Selecting <b>Godfather</b> means: <i>This associate is the Godfather of the current individual</i>.');
-	break;
-
-case 'RESN':
-	$title=WT_Gedcom_Tag::getLabel('RESN');
-	$text=
-		WT_I18N::translate('Restrictions can be added to records and/or facts.  They restrict who can view the data and who can edit it.').
-		'<br /><br />'.
-		WT_I18N::translate('Note that if a user account is linked to a record, then that user will always be able to view that record.');
-	break;
-
-case 'ROMN':
-	$title=WT_Gedcom_Tag::getLabel('ROMN');
-	$text=WT_I18N::translate('In many cultures it is customary to have a traditional name spelled in the traditional characters and also a romanized version of the name as it would be spelled or pronounced in languages based on the Latin alphabet, such as English.<br /><br />If you prefer to use a non-Latin alphabet such as Hebrew, Greek, Russian, Chinese, or Arabic to enter the name in the standard name fields, then you can use this field to enter the same name using the Latin alphabet.  Both versions of the name will appear in lists and charts.<br /><br />Although this field is labeled "Romanized", it is not restricted to containing only characters based on the Latin alphabet.  This might be of use with Japanese names, where three different alphabets may occur.');
-	break;
-
-case 'SEX':
-	$title=WT_Gedcom_Tag::getLabel('SEX');
-	$text=WT_I18N::translate('Choose the appropriate gender from the drop-down list.  The <b>unknown</b> option indicates that the gender is unknown.');
-	break;
-
-case 'SHARED_NOTE':
-	$title=WT_Gedcom_Tag::getLabel('SHARED_NOTE');
-	$text=WT_I18N::translate('Shared Notes are free-form text and will appear in the Fact Details section of the page.<br /><br />Each shared note can be linked to more than one person, family, source, or event.');
-	break;
-
-case 'SOUR':
-	$title=WT_Gedcom_Tag::getLabel('SOUR');
-	$text=WT_I18N::translate('This field allows you to change the source record that this fact\'s source citation links to.  This field takes a Source ID.  Beside the field will be listed the title of the current source ID.  Use the <b>Find ID</b> link to look up the source\'s ID number.  To remove the entire citation, make this field blank.');
-	break;
-
-case 'SPFX':
-	$title=WT_Gedcom_Tag::getLabel('SPFX');
-	$text=WT_I18N::translate('Enter or select from the list words that precede the main part of the Surname.  Examples of such words are <b>von</b> Braun, <b>van der</b> Kloot, <b>de</b> Graaf, etc.');
-	break;
-
-case 'STAT':
-	$title=WT_Gedcom_Tag::getLabel('STAT');
-	$text=WT_I18N::translate('This is an optional status field and is used mostly for LDS ordinances as they are run through the TempleReady program.');
-	break;
-
-case 'SURN':
-	$john_doe=WT_I18N::translate('John /DOE/'); // Same text used in admin_trees_manage.php
-	$fullname=str_replace('/', '', $john_doe);
-	list(,$surname)=explode('/', $john_doe);
-	$title=WT_Gedcom_Tag::getLabel('SURN');
-	$text=WT_I18N::translate('In this field you should enter the surname for the person.  In the name %1$s, the surname is %2$s.', "<b>{$fullname}</b>", "<b>{$surname}</b>");
-	$text.='<br/><br/>';
-	$text.=WT_I18N::translate('Individuals with multiple surnames, common in Spain and Portugal, should separate the surnames with a comma.  This indicates that the person is to be listed under each of the names.  For example, <b>Cortes,Vega</b> will be listed under both <b>C</b> and <b>V</b>, whereas <b>Cortes Vega</b> will only be listed under <b>C</b>.');
-	break;
-
-case 'TEMP':
-	$title=WT_Gedcom_Tag::getLabel('TEMP');
-	$text=WT_I18N::translate('For LDS ordinances, this field records the Temple where it was performed.');
-	break;
-
-case 'TEXT':
-	$title=WT_Gedcom_Tag::getLabel('TEXT');
-	$text=WT_I18N::translate('In this field you would enter the citation text for this source.  Examples of data may be a transcription of the text from the source, or a description of what was in the citation.');
-	break;
-
-case 'TIME':
-	$title=WT_Gedcom_Tag::getLabel('TIME');
-	$text=WT_I18N::translate('Enter the time for this event in 24-hour format with leading zeroes. Midnight is 00:00. Examples: 04:50 13:00 20:30.');
-	break;
-
-case 'TITL':
-	$title=WT_Gedcom_Tag::getLabel('TITL');
-	$text=WT_I18N::translate('Enter a title for the item you are editing.  If this is a title for a multimedia item, enter a descriptive title that will identify that item to the user.');
-	break;
-
-case 'TYPE':
-	$title=WT_Gedcom_Tag::getLabel('TYPE');
-	$text=WT_I18N::translate('The Type field is used to enter additional information about the item.  In most cases, the field is completely free-form, and you can enter anything you want.');
-	break;
-
-case 'URL':
-	$title=WT_Gedcom_Tag::getLabel('URL');
-	$text=WT_I18N::translate('Enter the URL address including the http://.<br /><br />An example URL looks like this: <b>http://www.webtrees.net/</b> Leave this field blank if you do not want to include a URL.');
-	break;
-
-case '_HEB':
-	$title=WT_Gedcom_Tag::getLabel('_HEB');
-	$text=WT_I18N::translate('In many cultures it is customary to have a traditional name spelled in the traditional characters and also a romanized version of the name as it would be spelled or pronounced in languages based on the Latin alphabet, such as English.<br /><br />If you prefer to use the Latin alphabet to enter the name in the standard name fields, then you can use this field to enter the same name in the non-Latin alphabet such as Greek, Hebrew, Russian, Arabic, or Chinese.  Both versions of the name will appear in lists and charts.<br /><br />Although this field is labeled "Hebrew", it is not restricted to containing only Hebrew characters.');
-	break;
-
-case '_MARNM':
-	$title=WT_Gedcom_Tag::getLabel('_MARNM');
-	$text=WT_I18N::translate('Enter the married name for this person, using the same formatting rules that apply to the Name field.  This field is optional.<br /><br />For example, if Mary Jane Brown married John White, you might enter (without the quotation marks, of course)<ul><li>American usage:&nbsp;&nbsp;"Mary Jane Brown /White/"</li><li>European usage:&nbsp;&nbsp;"Mary Jane /White/"</li><li>Alternate European usage:&nbsp;&nbsp;"Mary Jane /White-Brown/" or "Mary Jane /Brown-White/"</li></ul>You should do this only if Mary Brown began calling herself by the new name after marrying John White.  In some places, Quebec (Canada) for example, it\'s illegal for names to be changed in this way.<br /><br />Men sometimes change their name after marriage, most often using the hyphenated form but occasionally taking the wife\'s surname.');
-	break;
-
-case '_PRIM':
-	$title=WT_Gedcom_Tag::getLabel('_PRIM');
-	$text=WT_I18N::translate('Use this field to signal that this media item is the highlighted or primary item for the person it is attached to.  The highlighted image is the one that will be used on charts and on the Individual page.');
-	break;
-
-	//////////////////////////////////////////////////////////////////////////////
-	// This section contains an entry for every configuration item
-	//////////////////////////////////////////////////////////////////////////////
-
-case 'ABBREVIATE_CHART_LABELS':
-	$title=WT_I18N::translate('Abbreviate chart labels');
-	$text=WT_I18N::translate('This option controls whether or not to abbreviate labels like <b>Birth</b> on charts with just the first letter like <b>B</b>.');
-	break;
-
-case 'ADVANCED_NAME_FACTS':
-	$title=WT_I18N::translate('Advanced name facts');
-	$text=WT_I18N::translate('This is a comma separated list of GEDCOM fact tags that will be shown on the add/edit name form.  If you use non-Latin alphabets such as Hebrew, Greek, Cyrillic or Arabic, you may want to add tags such as _HEB, ROMN, FONE, etc. to allow you to store names in several different alphabets.');
-	break;
-
-case 'ADVANCED_PLAC_FACTS':
-	$title=WT_I18N::translate('Advanced place name facts');
-	$text=WT_I18N::translate('This is a comma separated list of GEDCOM fact tags that will be shown when you add or edit place names.  If you use non-Latin alphabets such as Hebrew, Greek, Cyrillic or Arabic, you may want to add tags such as _HEB, ROMN, FONE, etc. to allow you to store place names in several different alphabets.');
-	break;
-
-case 'ALLOW_CHANGE_GEDCOM':
-	$title=WT_I18N::translate('Allow GEDCOM switching');
-	$text=WT_I18N::translate('If you have an environment with multiple GEDCOMs, setting this value to <b>Yes</b> allows your site visitors <u>and</u> users to have the option of changing GEDCOMs.  Setting it to <b>No</b> disables GEDCOM switching for both visitors <u>and</u> logged in users.');
-	break;
-
-case 'ALLOW_EDIT_GEDCOM':
-	$title=WT_I18N::translate('Online editing');
-	$text=WT_I18N::translate('This option enables online editing features for this database so that users with Edit privileges may update data online.');
-	break;
-
-case 'ALLOW_THEME_DROPDOWN':
-	$title=WT_I18N::translate('Theme dropdown selector for theme changes');
-	$text=WT_I18N::translate('Gives users the option of selecting their own theme from a menu.<br /><br />Even with this option set, the theme currently in effect may not provide for such a menu.  To be effective, this option requires the <b>Allow users to select their own theme</b> option to be set as well.');
-	break;
-
-case 'ALLOW_USER_THEMES':
-	$title=WT_I18N::translate('Allow users to select their own theme');
-	$text=WT_I18N::translate('Gives users the option of selecting their own theme.');
-	break;
-
-case 'AUTO_GENERATE_THUMBS':
-	$title=WT_I18N::translate('Automatically generate thumbnails');
-	$text=WT_I18N::translate('Should the system automatically generate thumbnails for images that do not have them.  Your PHP installation might not support this functionality.');
-	break;
-
-case 'CALENDAR_FORMAT':
-	$d1=new WT_Date('22 SEP 1792'); $d1=$d1->Display(false, null, array());
-	$d2=new WT_Date('31 DEC 1805'); $d2=$d2->Display(false, null, array());
-	$d3=new WT_Date('15 OCT 1582'); $d3=$d3->Display(false, null, array());
-	$title=WT_I18N::translate('Calendar conversion');
-	$text=
-		'<p>'.
-		WT_I18N::translate('Different calendar systems are used in different parts of the world, and many other calendar systems have been used in the past.  Where possible, you should enter dates using the calendar in which the event was originally recorded.  You can then specify a conversion, to show these dates in a more familiar calendar.  If you regularly use two calendars, you can specify two conversions and dates will be converted to both the selected calendars.').
-		'<p>'.
-		WT_I18N::translate('The following calendars are supported:').
-		'</p><ul>'.
-		'<li>'.WT_Date_Gregorian::calendarName().'</li>'.
-		'<li>'.WT_Date_Julian::calendarName().'</li>'.
-		'<li>'.WT_Date_Jewish::calendarName().'</li>'.
-		'<li>'.WT_Date_French::calendarName().'</li>'.
-		'<li>'.WT_Date_Hijri::calendarName().'</li>'.
-		'<li>'.WT_Date_Jalali::calendarName().'</li>'.
-		'</ul><p>'.
-		/* I18N: The three place holders are all dates. */ WT_I18N::translate('Dates are only converted if they are valid for the calendar.  For example, only dates between %1$s and %2$s will be converted to the French calendar and only dates after %3$s will be converted to the Gregorian calendar.', $d1, $d2, $d3).
-		'</p><p>'.
-		WT_I18N::translate('In some calendars, days start at midnight.  In other calendars, days start at sunset.  The conversion process does not take account of the time, so for any event that occurs between sunset and midnight, the conversion between these types of calendar will be one day out.').
-		'</p>';
-	break;
-
-case 'CHART_BOX_TAGS':
-	$title=WT_I18N::translate('Other facts to show in charts');
-	$text=WT_I18N::translate('This should be a comma or space separated list of facts, in addition to Birth and Death, that you want to appear in chart boxes such as the Pedigree chart.  This list requires you to use fact tags as defined in the GEDCOM 5.5.1 Standard.  For example, if you wanted the occupation to show up in the box, you would add "OCCU" to this field.');
-	break;
-
-case 'CHECK_MARRIAGE_RELATIONS':
-	$title=WT_I18N::translate('Check relationships by marriage');
-	$text=WT_I18N::translate('When calculating relationships, this option controls whether <b>webtrees</b> will include spouses/partners as well as blood relatives.');
-	break;
-
-case 'COMMON_NAMES_ADD':
-	$title=WT_I18N::translate('Names to add to common surnames (comma separated)');
-	$text=WT_I18N::translate('If the number of times that a certain surname occurs is lower than the threshold, it will not appear in the list.  It can be added here manually.  If more than one surname is entered, they must be separated by a comma.  <b>Surnames are case-sensitive.</b>');
-	break;
-
-case 'COMMON_NAMES_REMOVE':
-	$title=WT_I18N::translate('Names to remove from common surnames (comma separated)');
-	$text=WT_I18N::translate('If you want to remove a surname from the Common Surname list without increasing the threshold value, you can do that by entering the surname here.  If more than one surname is entered, they must be separated by a comma. <b>Surnames are case-sensitive.</b>  Surnames entered here will also be removed from the Top-10 list on the Home Page.');
-	break;
-
-case 'COMMON_NAMES_THRESHOLD':
-	$title=WT_I18N::translate('Min. no. of occurrences to be a "common surname"');
-	$text=WT_I18N::translate('This is the number of times that a surname must occur before it shows up in the Common Surname list on the Home Page.');
-	break;
-
-case 'CONTACT_USER_ID':
-	$title=WT_I18N::translate('Genealogy contact');
-	$text=WT_I18N::translate('The person to contact about the genealogical data on this site.');
-	break;
-
-case 'DEFAULT_PEDIGREE_GENERATIONS':
-	$title=WT_I18N::translate('Default pedigree generations');
-	$text=WT_I18N::translate('Set the default number of generations to display on Descendancy and Pedigree charts.');
-	break;
-
-case 'EXPAND_NOTES':
-	$title=WT_I18N::translate('Automatically expand notes');
-	$text=WT_I18N::translate('This option controls whether or not to automatically display content of a <i>Note</i> record on the Individual page.');
-	break;
-
-case 'EXPAND_RELATIVES_EVENTS':
-	$title=WT_I18N::translate('Automatically expand list of events of close relatives');
-	$text=WT_I18N::translate('This option controls whether or not to automatically expand the <i>Events of close relatives</i> list.');
-	break;
-
-case 'EXPAND_SOURCES':
-	$title=WT_I18N::translate('Automatically expand sources');
-	$text=WT_I18N::translate('This option controls whether or not to automatically display content of a <i>Source</i> record on the Individual page.');
-	break;
-
-case 'FAM_FACTS_ADD':
-	$title=WT_I18N::translate('Family add facts');
-	$text=WT_I18N::translate('This is the list of GEDCOM facts that your users can add to families.  You can modify this list by removing or adding fact names, even custom ones, as necessary.  Fact names that appear in this list must not also appear in the <i>Unique Family Facts</i> list.');
-	break;
-
-case 'FAM_FACTS_QUICK':
-	$title=WT_I18N::translate('Quick family facts');
-	$text=WT_I18N::translate('This is the short list of GEDCOM family facts that appears next to the full list and can be added with a single click.');
-	break;
-
-case 'FAM_FACTS_UNIQUE':
-	$title=WT_I18N::translate('Unique family facts');
-	$text=WT_I18N::translate('This is the list of GEDCOM facts that your users can only add <u>once</u> to families.  For example, if MARR is in this list, users will not be able to add more than one MARR record to a family.  Fact names that appear in this list must not also appear in the <i>Family Add Facts</i> list.');
-	break;
-
-case 'FAM_ID_PREFIX':
-	$title=WT_I18N::translate('Family ID prefix');
-	$text=WT_I18N::translate('When a new family record is added online in <b>webtrees</b>, a new ID for that family will be generated automatically. The family ID will have this prefix.');
-	break;
-
-case 'FULL_SOURCES':
-	$title=WT_I18N::translate('Use full source citations');
-	$text=WT_I18N::translate('Source citations can include fields to record the quality of the data (primary, secondary, etc.) and the date the event was recorded in the source.  If you don\'t use these fields, you can disable them when creating new source citations.');
-	break;
-
-case 'GEDCOM_ID_PREFIX':
-	$title=WT_I18N::translate('Individual ID prefix');
-	$text=WT_I18N::translate('When a new individual record is added online in <b>webtrees</b>, a new ID for that individual will be generated automatically. The individual ID will have this prefix.');
-	break;
-
-case 'GENERATE_GUID':
-	$title=WT_I18N::translate('Automatically create globally unique IDs');
-	$text=WT_I18N::translate('<b>GUID</b> in this context is an acronym for «Globally Unique ID».<br /><br />GUIDs are intended to help identify each individual in a manner that is repeatable, so that central organizations such as the Family History Center of the LDS Church in Salt Lake City, or even compatible programs running on your own server, can determine whether they are dealing with the same person no matter where the GEDCOM originates.  The goal of the Family History Center is to have a central repository of genealogical data and expose it through web services. This will enable any program to access the data and update their data within it.<br /><br />If you do not intend to share this GEDCOM with anyone else, you do not need to let <b>webtrees</b> create these GUIDs; however, doing so will do no harm other than increasing the size of your GEDCOM.');
-	break;
-
-case 'HIDE_GEDCOM_ERRORS':
-	$title=WT_I18N::translate('GEDCOM errors');
-	$text=WT_I18N::translate('Many genealogy programs create GEDCOM files with custom tags, and <b>webtrees</b> understands most of them.  When unrecognised tags are found, this option lets you choose whether to ignore them or display a warning message.');
-	break;
-
-case 'HIDE_LIVE_PEOPLE':
-        $title=WT_I18N::translate('Privacy options');
-        $text=WT_I18N::translate('This option will enable all privacy settings and hide the details of living people, as defined or modified on the Privacy tab of each GEDCOM\'s configuration page.');
-        $text .= '<p>';
-		$text .= WT_I18N::plural('Note: "living" is defined (if no death or burial is known) as ending %d year after birth or estimated birth.','Note: "living" is defined (if no death or burial is known) as ending %d years after birth or estimated birth.', get_gedcom_setting(WT_GED_ID, 'MAX_ALIVE_AGE'), get_gedcom_setting(WT_GED_ID, 'MAX_ALIVE_AGE'));
-		$text .= ' ';
-		$text .= WT_I18N::translate('The length of time after birth can be set on the Privacy configuration tab option "Age at which to assume a person is dead".');
-		$text .= '</p>';
-        break;
-
-case 'INDEX_DIRECTORY':
-	$title=WT_I18N::translate('Data file directory');
-	$text=
-		WT_I18N::translate('<b>webtrees</b> requires a directory with read/write permission, where it can create temporary files and export data.  By default, it uses the data/ directory.').
-	'<br/><br/>'.
-		WT_I18N::translate('Some site administrators prefer not to have writable files or directories in the public HTML directory.  By specifying an alternative location to write data, you can make the existing data/ directory read-only.  Note that the file data/config.ini.php cannot be moved, and must remain in this location.').
-	'<br/><br/>'.
-		WT_I18N::translate('If your server does not support ".htaccess" files (e.g. Microsoft IIS), and you cannot set access controls for this directory, then you should move this directory to another location.').
-	'<br/><br/>'.
-		WT_I18N::translate('The directory can be specified in full (e.g. /home/user_name/genealogy_data/) or relative to the installation directory (e.g. ../../genealogy_data/).');
-	break;
-
-case 'INDI_FACTS_ADD':
-	$title=WT_I18N::translate('Individual add facts');
-	$text=WT_I18N::translate('This is the list of GEDCOM facts that your users can add to individuals.  You can modify this list by removing or adding fact names, even custom ones, as necessary.  Fact names that appear in this list must not also appear in the <i>Unique Individual Facts</i> list.');
-	break;
-
-case 'INDI_FACTS_QUICK':
-	$title=WT_I18N::translate('Quick individual facts');
-	$text=WT_I18N::translate('This is the short list of GEDCOM individual facts that appears next to the full list and can be added with a single click.');
-	break;
-
-case 'INDI_FACTS_UNIQUE':
-	$title=WT_I18N::translate('Unique individual facts');
-	$text=WT_I18N::translate('This is the list of GEDCOM facts that your users can only add <u>once</u> to individuals.  For example, if BIRT is in this list, users will not be able to add more than one BIRT record to an individual.  Fact names that appear in this list must not also appear in the <i>Individual Add Facts</i> list.');
-	break;
-
-case 'KEEP_ALIVE':
-	$title=WT_I18N::translate('Extend privacy to dead people');
-	$text=WT_I18N::translate('In some countries, privacy laws apply not only to living people, but also to those who have died recently.  This option will allow you to extend the privacy rules for living people to those who were born or died within a specified number of years.  Leave these values empty to disable this feature.');
-	break;
-
-case 'LANGUAGE':
-	$title=WT_I18N::translate('Language');
-	$text=WT_I18N::translate('If a visitor to the site has not specified a preferred language in their browser configuration, or they have specified an unsupported language, then this language will be used.  Typically, this setting applies to search engines.');
-	break;
-
-case 'LOGIN_URL':
-	$title=WT_I18N::translate('Login URL');
-	$text=WT_I18N::translate('You only need to enter a Login URL if you want to redirect to a different site or location when your users login.  This is very useful if you need to switch from http to https when your users login.  Include the full URL to <i>login.php</i>.  For example, https://www.yourserver.com/webtrees/login.php .');
-	break;
-
-case 'MAX_ALIVE_AGE':
-	$title=WT_I18N::translate('Age at which to assume a person is dead');
-	$text=WT_I18N::translate('If this person has any events other than Death, Burial, or Cremation more recent than this number of years, he is considered to be "alive".  Children\'s birth dates are considered to be such events for this purpose.');
-	break;
-
-case 'MAX_DESCENDANCY_GENERATIONS':
-	$title=WT_I18N::translate('Maximum descendancy generations');
-	$text=WT_I18N::translate('Set the maximum number of generations to display on Descendancy charts.');
-	break;
-
-case 'MAX_EXECUTION_TIME':
-	// Find the default value for max_execution_time
-	ini_restore('max_execution_time');
-	$dflt_cpu=ini_get('max_execution_time');
-	$title=WT_I18N::translate('PHP time limit');
-	$text=
-		WT_I18N::plural(
-			'By default, your server allows scripts to run for %s second.',
-			'By default, your server allows scripts to run for %s seconds.',
-			$dflt_cpu, $dflt_cpu
-		).
-		' '.
-		WT_I18N::translate('You can request a higher or lower limit, although the server may ignore this request.').
-		' '.
-		WT_I18N::translate('If you leave this setting empty, the default value will be used.');
-	break;
-
-case 'MAX_PEDIGREE_GENERATIONS':
-	$title=WT_I18N::translate('Maximum pedigree generations');
-	$text=WT_I18N::translate('Set the maximum number of generations to display on Pedigree charts.');
-	break;
-
-case 'MEDIA_DIRECTORY_LEVELS':
-	$title=WT_I18N::translate('Multimedia directory levels to keep');
-	$text=WT_I18N::translate('A value of 0 will ignore all directories in the file path for the media object.  A value of 1 will retain the first directory containing this image.  Increasing the numbers increases number of parent directories to retain in the path.<br /><br />For example, if you link an image in your GEDCOM with a path like <b>C:\Documents&nbsp;and&nbsp;Settings\User\My&nbsp;Documents\My&nbsp;Pictures\Genealogy\Surname&nbsp;Line\grandpa.jpg</b>, a value of 0 will translate this path to <b>./media/grandpa.jpg</b>.  A value of 1 will translate this to <b>./media/Surname&nbsp;Line/grandpa.jpg</b>, etc.  Most people will only need to use a 0.  However, it is possible that some media objects kept in different directories have identical names and would overwrite each other when this option is set to 0.  Non-zero settings allow you to keep some organization in your media thereby preventing name collisions.');
-	break;
-
-case 'MEDIA_DIRECTORY':
-	$MEDIA_DIRECTORY=get_gedcom_setting(WT_GED_ID, 'MEDIA_DIRECTORY');
-	$title=WT_I18N::translate('Media directory');
-	$text=
-		'<p>'.
-		/* I18N: %1$s is an example media directory, such as "media/", %2$s is an example URL, such as "http://localhost/webtrees/media/img123.jpg", and %3$s is an example file path, such as "/home/greg/public_html/webtrees/media/img123.jpg" */
-		WT_I18N::translate('The media directory is used to create URLs for your media items.  It is also the sub-directory in which the media items are stored.  For example, a media directory of %1$s will create URLs of the form %2$s and store these items as %3$s.', '<tt dir="ltr" lang="en" style="white-space:nowrap; color:#0000ff; font-weight:bold;">'.$MEDIA_DIRECTORY.'</tt>', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_SERVER_NAME.WT_SCRIPT_PATH.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span>img123.jpg</tt>', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span>img123.jpg</tt>').
-		'</p><p>'.
-		/* I18N: %1$s and %2$s are both directory names */ WT_I18N::translate('If your server supports it, you can enable the media firewall.  This changes the location of the media directory from the public directory %1$s to a private directory such as %2$s.  This allows webtrees to apply privacy filtering to media items.', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span></tt>', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_DATA_DIR.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span></tt>').
-		'</p><p>'.
-		/* I18N: %s is a directory name */ WT_I18N::translate('The media directory %s must exist, and the webserver must have read and write access to it.', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span></tt>').
-		'</p><p>'.
-		WT_I18N::translate('If two family trees share the same media directory, then they will be able to share media items.  If they use different media directories, then they will be able to use the same filename to access different media items.').
-		'</p>';
-	break;
-
-case 'MEDIA_EXTERNAL':
-	$title=WT_I18N::translate('Keep links');
-	$text=WT_I18N::translate('When a multimedia link is found starting with for example http://, ftp://, mms:// it will not be altered when set to <b>Yes</b>. For example, http://www.myfamily.com/photo/dad.jpg will stay http://www.myfamily.com/photo/dad.jpg.  When set to <b>No</b>, the link will be handled as a standard reference and the media depth will be used.  For example: http://www.myfamily.com/photo/dad.jpg will be changed to ./media/dad.jpg');
-	break;
-
-case 'MEDIA_FIREWALL_ROOTDIR':
-	$title=WT_I18N::translate('Media firewall root directory');
-	$text=WT_I18N::translate('Directory in which the protected Media directory can be created.  When this field is empty, the <b>%s</b> directory will be used.', get_site_setting('INDEX_DIRECTORY'));
-	break;
-
-case 'MEDIA_FIREWALL_THUMBS':
-	$title=WT_I18N::translate('Protect thumbnails of protected images');
-	$text=WT_I18N::translate('When an image is in the protected Media directory, should its thumbnail be protected as well?');
-	break;
-
-case 'MEDIA_ID_PREFIX':
-	$title=WT_I18N::translate('Media ID prefix');
-	$text=WT_I18N::translate('When a new media record is added online in <b>webtrees</b>, a new ID for that media will be generated automatically. The media ID will have this prefix.');
-	break;
-
-case 'MEDIA_UPLOAD':
-	$title=WT_I18N::translate('Who can upload new media files?');
-	$text=WT_I18N::translate('If you are concerned that users might upload inappropriate images, you can restrict media uploads to managers only.');
-	break;
-
-case 'MEMORY_LIMIT':
-	// Find the default value for max_execution_time
-	ini_restore('memory_limit');
-	$dflt_mem=ini_get('memory_limit');
-	$title=WT_I18N::translate('Memory limit');
-	$text= /* I18N: %s is an amount of memory, such as 32MB */ WT_I18N::translate('By default, your server allows scripts to use %s of memory.', $dflt_mem).
-		' '.
-		WT_I18N::translate('You can request a higher or lower limit, although the server may ignore this request.').
-		' '.
-		WT_I18N::translate('If you leave this setting empty, the default value will be used.');
-	break;
-
-case 'META_DESCRIPTION':
-	$title=WT_I18N::translate('Description META tag');
-	$text=WT_I18N::translate('The value to place in the Description meta tag in the HTML page header.  Leave this field empty to use the title of the currently active database.');
-	break;
-
-case 'META_TITLE':
-	$title=WT_I18N::translate('Add to TITLE header tag');
-	$text=WT_I18N::translate('This text will be appended to each page title.  It will be shown in the browser\'s title bar, bookmarks, etc.');
-	break;
-
-case 'NOTE_ID_PREFIX':
-	$title=WT_I18N::translate('Note ID prefix');
-	$text=WT_I18N::translate('When a new note record is added online in <b>webtrees</b>, a new ID for that note will be generated automatically. The note ID will have this prefix.');
-	break;
-
-case 'PEDIGREE_FULL_DETAILS':
-	$title=WT_I18N::translate('Birth and death details on charts');
-	$text=WT_I18N::translate('This option controls whether or not to show the Birth and Death details of an individual on charts.');
-	break;
-
-case 'PEDIGREE_LAYOUT':
-	$title=WT_I18N::translate('Default pedigree chart layout');
-	$text=WT_I18N::translate('This option indicates whether the Pedigree chart should be generated in landscape or portrait mode.');
-	break;
-
-case 'PEDIGREE_SHOW_GENDER':
-	$title=WT_I18N::translate('Gender icon on charts');
-	$text=WT_I18N::translate('This option controls whether or not to show the individual\'s gender icon on charts.<br /><br />Since the gender is also indicated by the color of the box, this option doesn\'t conceal the gender. The option simply removes some duplicate information from the box.');
-	break;
-
-case 'RELATIONSHIP_PATH_LENGTH':
-	$title=WT_I18N::translate('Restrict to immediate family');
-	$text=
-		WT_I18N::translate('Where a user is associated to an individual record in a family tree and has a role of member, editor, or moderator, you can prevent them from accessing the details of distant, living relations.  You specify the number of relationship steps that the user is allowed to see.').
-		'<br/><br/>'.
-		WT_I18N::translate('For example, if you specify a path length of 2, the person will be able to see their grandson (child, child), their aunt (parent, sibling), their step-daughter (spouse, child), but not their first cousin (parent, sibling, child).').
-		'<br/><br/>'.
-		WT_I18N::translate('Note: longer path lengths require a lot of calculation, which can make your site run slowly for these users.');
-	break;
-
-case 'SESSION_TIME':
-	$title=WT_I18N::translate('Session timeout');
-	$text=WT_I18N::translate('The time in seconds that a <b>webtrees</b> session remains active before requiring a login.  The default is 7200, which is 2 hours.');
-	break;
-
-case 'SMTP_ACTIVE':
-	$title=WT_I18N::translate('Use SMTP to send external mails');
-	$text=WT_I18N::translate('Use SMTP to send e-mails from <b>webtrees</b>.<br /><br />This option requires access to an SMTP mail server.  When set to <b>No</b> <b>webtrees</b> will use the e-mail system built into PHP on this server.');
-	break;
-
-case 'SMTP_AUTH_PASS':
-	$title=WT_I18N::translate('Password');
-	$text=WT_I18N::translate('The password required for authentication with the SMTP server.');
-	break;
-
-case 'SMTP_AUTH_USER':
-	$title=WT_I18N::translate('Username');
-	$text=WT_I18N::translate('The user name required for authentication with the SMTP server.');
-	break;
-
-case 'SMTP_AUTH':
-	$title=WT_I18N::translate('Use password');
-	$text=WT_I18N::translate('Use name and password authentication to connect to the SMTP server.<br /><br />Some SMTP servers require all connections to be authenticated before they will accept outbound e-mails.');
-	break;
-
-case 'SMTP_FROM_NAME':
-	$title=WT_I18N::translate('From email address');
-	// This text also exists in setup.php
-	$text=WT_I18N::translate('This is used in the "From:" header when sending mails.');
-	break;
-
-case 'SMTP_HELO':
-	$title=WT_I18N::translate('Sender email address');
-	// This text also exists in setup.php
-	$text=WT_I18N::translate('This is used in the "Sender:" header when sending mails.  It is often the same as the "From:" header.');
-	break;
-
-case 'SMTP_HOST':
-	$title=WT_I18N::translate('Outgoing server (SMTP) name');
-	$text=WT_I18N::translate('This is the name of the SMTP mail server.  Example: <b>smtp.foo.bar.com</b>.<br /><br />Configuration values for some e-mail providers:<br /><br /><b>Gmail<br /></b><br /><b>Outgoing server (SMTP) name:</b> smtp.gmail.com<br /><b>SMTP Port:</b> 465 or 587<br /><b>Secure connection:</b> SSL<br /><br /><b>Hotmail<br /></b><br /><b>Outgoing server (SMTP) name:</b> smtp.live.com<br /><b>SMTP Port:</b> 25 or 587<br /><b>Secure connection:</b> TLS<br /><br /><b>Yahoo Mail Plus (currently a paid service)<br /></b><br /><b>Outgoing server (SMTP) name:</b> smtp.mail.yahoo.com<br /><b>SMTP Port:</b> 25');
-	break;
-
-case 'SMTP_PORT':
-	$title=WT_I18N::translate('SMTP port');
-	$text=WT_I18N::translate('The port number to be used for connections to the SMTP server.  Generally, this is port <b>25</b>.');
-	break;
-
-case 'SMTP_SSL':
-	$title=WT_I18N::translate('Secure connection');
-	$text=WT_I18N::translate('Transport Layer Security (TLS) and Secure Sockets Layer (SSL) are Internet data encryption protocols.<br /><br />TLS 1.0, 1.1 and 1.2 are standardized developments of SSL 3.0. TLS 1.0 and SSL 3.1 are equivalent. Further work on SSL is now done under the new name, TLS.<br /><br />If your SMTP Server requires the SSL protocol during login, you should select the <b>SSL</b> option. If your SMTP Server requires the TLS protocol during login, you should select the <b>TLS</b> option.');
-	break;
-
-case 'STORE_MESSAGES':
-	$title=WT_I18N::translate('Allow messages to be stored online');
-	$text=WT_I18N::translate('Specifies whether messages sent through <b>webtrees</b> can be stored in the database.  If set to <b>Yes</b> users will be able to retrieve their messages when they login to <b>webtrees</b>.  If set to <b>No</b> messages will only be emailed.');
-	break;
-
-case 'WEBTREES_EMAIL':
-	$title=WT_I18N::translate('<b>webtrees</b> reply address');
-	$text=WT_I18N::translate('E-mail address to be used in the &laquo;From:&raquo; field of e-mails that <b>webtrees</b> creates automatically.<br /><br /><b>webtrees</b> can automatically create e-mails to notify administrators of changes that need to be reviewed.  <b>webtrees</b> also sends notification e-mails to users who have requested an account.<br /><br />Usually, the &laquo;From:&raquo; field of these automatically created e-mails is something like <i>From: webtrees-noreply@yoursite</i> to show that no response to the e-mail is required.  To guard against spam or other e-mail abuse, some e-mail systems require each message\'s &laquo;From:&raquo; field to reflect a valid e-mail account and will not accept messages that are apparently from account <i>webtrees-noreply</i>.');
-	break;
-
-case 'POSTAL_CODE':
-	$title=WT_I18N::translate('Postal code position');
-	$text=WT_I18N::translate('Different countries use different ways to write the address. This option will enable you to place the postal code either before or after the city name.');
-	break;
-
-case 'PREFER_LEVEL2_SOURCES':
-	$title=WT_I18N::translate('Source type');
-	$text=WT_I18N::translate('When adding new close relatives, you can add source citations to the records (e.g. INDI, FAM) or the facts (BIRT, MARR, DEAT).  This option controls which checkboxes are ticked by default.');
-	break;
-
-case 'QUICK_REQUIRED_FACTS':
-	$title=WT_I18N::translate('Facts for new individuals');
-	$text=WT_I18N::translate('This is a comma separated list of GEDCOM fact tags that will be shown when adding a new person.  For example, if BIRT is in the list, fields for birth date and birth place will be shown on the form.');
-	break;
-
-case 'QUICK_REQUIRED_FAMFACTS':
-	$title=WT_I18N::translate('Facts for new families');
-	$text=WT_I18N::translate('This is a comma separated list of GEDCOM fact tags that will be shown when adding a new family.  For example, if MARR is in the list, then fields for marriage date and marriage place will be shown on the form.');
-	break;
-
-case 'REPO_FACTS_ADD':
-	$title=WT_I18N::translate('Repository add facts');
-	$text=WT_I18N::translate('This is the list of GEDCOM facts that your users can add to repositories.  You can modify this list by removing or adding fact names, even custom ones, as necessary.  Fact names that appear in this list must not also appear in the <i>Unique Repository Facts</i> list.');
-	break;
-
-case 'REPO_FACTS_QUICK':
-	$title=WT_I18N::translate('Quick repository facts');
-	$text=WT_I18N::translate('This is the short list of GEDCOM repository facts that appears next to the full list and can be added with a single click.');
-	break;
-
-case 'REPO_FACTS_UNIQUE':
-	$title=WT_I18N::translate('Unique repository facts');
-	$text=WT_I18N::translate('This is the list of GEDCOM facts that your users can only add <u>once</u> to repositories.  For example, if NAME is in this list, users will not be able to add more than one NAME record to a repository.  Fact names that appear in this list must not also appear in the <i>Repository Add Facts</i> list.');
-	break;
-
-case 'REPO_ID_PREFIX':
-	$title=WT_I18N::translate('Repository ID prefix');
-	$text=WT_I18N::translate('When a new repository record is added online in <b>webtrees</b>, a new ID for that repository will be generated automatically. The repository ID will have this prefix.');
-	break;
-
-case 'REQUIRE_ADMIN_AUTH_REGISTRATION':
-	$title=WT_I18N::translate('Require an administrator to approve new user registrations');
-	$text=WT_I18N::translate('If the option <b>Allow visitors to request account registration</b> is enabled this setting controls whether the admin must approve the registration.<br /><br />Setting this to <b>Yes</b> will require that all new users first verify themselves and then be approved by an admin before they can login.  With this setting on <b>No</b>, the <b>User approved by Admin</b> checkbox will be checked automatically when users verify their account, thus allowing an immediate login afterwards without admin intervention.');
-	break;
-
-case 'REQUIRE_AUTHENTICATION':
-	$title=WT_I18N::translate('Require visitor authentication');
-	$text=WT_I18N::translate('Enabling this option will force all visitors to login before they can view any data on the site.');
-	break;
-
-case 'SAVE_WATERMARK_IMAGE':
-	$title=WT_I18N::translate('Store watermarked full size images on server?');
-	$text=WT_I18N::translate('If the Media Firewall is enabled, should copies of watermarked full size images be stored on the server in addition to the same images without watermarks?<br /><br />When set to <b>Yes</b>, full-sized watermarked images will be produced more quickly at the expense of higher server disk space requirements.');
-	break;
-
-case 'SAVE_WATERMARK_THUMB':
-	$title=WT_I18N::translate('Store watermarked thumbnails on server?');
-	$text=WT_I18N::translate('If the Media Firewall is enabled, should copies of watermarked thumbnails be stored on the server in addition to the same thumbnails without watermarks?<br /><br />When set to <b>Yes</b>, media lists containing watermarked thumbnails will be produced more quickly at the expense of higher server disk space requirements.');
-	break;
-
-case 'SERVER_URL':
-	$title=WT_I18N::translate('Website URL');
-	$text=WT_I18N::translate('If your site can be reached using more than one URL, such as <b>http://www.example.com/webtrees/</b> and <b>http://webtrees.example.com/</b>, you can specify the preferred URL.  Requests for the other URLs will be redirected to the preferred one.');
-	break;
-
-case 'SHOW_COUNTER':
-	$title=WT_I18N::translate('Hit counters');
-	$text=WT_I18N::translate('Show hit counters on Portal and Individual pages.');
-	break;
-
-case 'SHOW_DEAD_PEOPLE':
-	$title=WT_I18N::translate('Show dead people');
-	$text=WT_I18N::translate('Set the privacy access level for all dead people.');
-	break;
-
-case 'SHOW_EST_LIST_DATES':
-	$title=WT_I18N::translate('Estimated dates for birth and death');
-	$text=WT_I18N::translate('This option controls whether or not to show estimated dates for birth and death instead of leaving blanks on individual lists and charts for individuals whose dates are not known.');
-	break;
-
-case 'SHOW_FACT_ICONS':
-	$title=WT_I18N::translate('Show fact icons');
-	$text=WT_I18N::translate('Set this to <b>Yes</b> to display icons near Fact names on the Personal Facts and Details page.  Fact icons will be displayed only if they exist in the <i>images/facts</i> directory of the current theme.');
-	break;
-
-case 'SHOW_GEDCOM_RECORD':
-	$title=WT_I18N::translate('Allow users to see raw GEDCOM records');
-	$text=WT_I18N::translate('Setting this to <b>Yes</b> will place links on individuals, sources, and families to let users bring up another window containing the raw data taken right out of the GEDCOM file.');
-	break;
-
-case 'SHOW_LAST_CHANGE':
-	$title=WT_I18N::translate('Show GEDCOM record last change date on lists');
-	$text=WT_I18N::translate('This option controls whether or not to show GEDCOM record last change date on lists.');
-	break;
-
-case 'SHOW_LDS_AT_GLANCE':
-	$title=WT_I18N::translate('LDS ordinance codes in chart boxes');
-	$text=WT_I18N::translate('Setting this option to <b>Yes</b> will show status codes for LDS ordinances in chart boxes.<ul><li><b>B</b> - Baptism</li><li><b>E</b> - Endowed</li><li><b>S</b> - Sealed to spouse</li><li><b>P</b> - Sealed to parents</li></ul>A person who has all of the ordinances done will have <b>BESP</b> printed after their name.  Missing ordinances are indicated by <b>_</b> in place of the corresponding letter code.  For example, <b>BE__</b> indicates missing <b>S</b> and <b>P</b> ordinances.');
-	break;
-
-case 'SHOW_LEVEL2_NOTES':
-	$title=WT_I18N::translate('Show all notes and source references on notes and sources tabs');
-	$text=WT_I18N::translate('This option controls whether Notes and Source references that are attached to Facts should be shown on the Notes and Sources tabs of the Individual page.<br /><br />Ordinarily, the Notes and Sources tabs show only Notes and Source references that are attached directly to the individual\'s database record.  These are <i>level 1</i> Notes and Source references.<br /><br />The <b>Yes</b> option causes these tabs to also show Notes and Source references that are part of the various Facts in the individual\'s database record.  These are <i>level 2</i> Notes and Source references because the various Facts are at level 1.');
-	break;
-
-case 'SHOW_LIVING_NAMES':
-	$title=WT_I18N::translate('Names of private individuals');
-	$text=WT_I18N::translate('This option will show the names (but no other details) of private individuals.  Individuals are private if they are still alive or if a privacy restriction has been added to their individual record.  To hide a specific name, add a privacy restriction to that name record.');
-
-	break;
-
-case 'SHOW_MEDIA_DOWNLOAD':
-	$title=WT_I18N::translate('Show download link in media viewer');
-	$text=WT_I18N::translate('The Media Viewer can show a link which, when clicked, will download the Media file to the local PC.<br /><br />You may want to hide the download link for security reasons.');
-	break;
-
-case 'SHOW_NO_WATERMARK':
-	$title=WT_I18N::translate('Who can view non-watermarked images?');
-	$text=WT_I18N::translate('If the Media Firewall is enabled, users will see watermarks if they do not have the privilege level specified here.');
-	break;
-
-case 'SHOW_PARENTS_AGE':
-	$title=WT_I18N::translate('Show age of parents next to child\'s birthdate');
-	$text=WT_I18N::translate('This option controls whether or not to show age of father and mother next to child\'s birthdate on charts.');
-	break;
-
-case 'SHOW_PEDIGREE_PLACES':
-	$title=WT_I18N::translate('Abbreviate place names');
-	$text=WT_I18N::translate('Place names are frequently too long to fit on charts, lists, etc.  They can be abbreviated by showing just the first few parts of the name, such as <i>village, county</i>, or the last few part of it, such as <i>region, country</i>.');
-	break;
-
-case 'SHOW_PRIVATE_RELATIONSHIPS':
-	$title=WT_I18N::translate('Show private relationships');
-	$text=WT_I18N::translate('This option will retain family links in private records.  This means that you will see empty "private" boxes on the pedigree chart and on other charts with private people.');
-	break;
-
-case 'SHOW_REGISTER_CAUTION':
-	$title=WT_I18N::translate('Show acceptable use agreement on «Request new user account» page');
-	$text=WT_I18N::translate('When set to <b>Yes</b>, the following message will appear above the input fields on the «Request new user account» page:<div class="list_value_wrap"><div class="largeError">Notice:</div><div class="error">By completing and submitting this form, you agree:<ul><li>to protect the privacy of living people listed on our site;</li><li>and in the text box below, to explain to whom you are related, or to provide us with information on someone who should be listed on our site.</li></ul></div></div>');
-	break;
-
-case 'SHOW_RELATIVES_EVENTS':
-	$title=WT_I18N::translate('Show events of close relatives on individual page');
-	$text=WT_I18N::translate('Births, marriages, and deaths of relatives are important events in one\'s life. This option controls whether or not to show these events on the <i>Personal facts and details</i> tab on the Individual page.<br /><br />The events affected by this option are:<ul><li>Death of spouse</li><li>Birth and death of children</li><li>Death of parents</li><li>Birth and death of siblings</li><li>Death of grand-parents</li><li>Birth and death of parents\' siblings</li></ul>');
-	break;
-
-case 'SHOW_STATS':
-	$title=WT_I18N::translate('Execution statistics');
-	$text=WT_I18N::translate('Show runtime statistics and database queries at the bottom of every page.');
-	break;
-
-case 'SOURCE_ID_PREFIX':
-	$title=WT_I18N::translate('Source ID prefix');
-	$text=WT_I18N::translate('When a new source record is added online in <b>webtrees</b>, a new ID for that source will be generated automatically.  The source ID will have this prefix.');
-	break;
-
-case 'SOUR_FACTS_ADD':
-	$title=WT_I18N::translate('Source add facts');
-	$text=WT_I18N::translate('This is the list of GEDCOM facts that your users can add to sources.  You can modify this list by removing or adding fact names, even custom ones, as necessary.  Fact names that appear in this list must not also appear in the <i>Unique Source Facts</i> list.');
-	break;
-
-case 'SOUR_FACTS_QUICK':
-	$title=WT_I18N::translate('Quick source facts');
-	$text=WT_I18N::translate('This is the short list of GEDCOM source facts that appears next to the full list and can be added with a single click.');
-	break;
-
-case 'SOUR_FACTS_UNIQUE':
-	$title=WT_I18N::translate('Unique source facts');
-	$text=WT_I18N::translate('This is the list of GEDCOM facts that your users can only add <u>once</u> to sources.  For example, if TITL is in this list, users will not be able to add more than one TITL record to a source.  Fact names that appear in this list must not also appear in the <i>Source Add Facts</i> list.');
-	break;
-
-case 'SUBLIST_TRIGGER_F':
-	$title=WT_I18N::translate('Maximum number of surnames on family list');
-	$text=WT_I18N::translate('Long lists of families with the same name can be broken into smaller sub-lists according to the first letter of the given name.<br /><br />This option determines when sub-listing of family names will occur.  To disable sub-listing completely, set this option to zero.');
-	break;
-
-case 'SUBLIST_TRIGGER_I':
-	$title=WT_I18N::translate('Maximum number of surnames on individual list');
-	$text=WT_I18N::translate('Long lists of persons with the same surname can be broken into smaller sub-lists according to the first letter of the individual\'s given name.<br /><br />This option determines when sub-listing of surnames will occur.  To disable sub-listing completely, set this option to zero.');
-	break;
-
-case 'SURNAME_LIST_STYLE':
-	$title=WT_I18N::translate('Surname list style');
-	$text=WT_I18N::translate('<p>Lists of surnames, as they appear in the Top 10 Surnames block, the Individual lists, and the Family lists, can be shown in different styles.</p><dl><dt>Table</dt><dd>In this style, the surnames are shown in a table that can be sorted either by surname or by count.</dd><dt>Tag cloud</dt><dd>In this style, the surnames are shown in a list, and the font size used for each name depends on the number of occurrences of that name in the database.  The list is not sortable.</dd><dt>List</dt><dd>This is a simple list of names, with a count of each name, in a tabulated format of up to four columns</dd></dl>');
-	break;
-
-case 'SURNAME_TRADITION':
-	$title=WT_I18N::translate('Surname tradition');
-	$text=
-		WT_I18N::translate('When you add a new family member, a default surname can be provided.  This surname will depend on the local tradition.').
-		'<br /><br /><dl><dt>'.
-		WT_I18N::translate_c('Surname tradition', 'paternal').
-		'</dt><dd>'.
-		/* I18N: In the paternal surname tradition, ... */ WT_I18N::translate('All family members take the father\'s surname.').
-		'</dd></dl><dl><dt>'.
-		WT_I18N::translate_c('Surname tradition', 'Spanish').
-		'</dt><dd>'.
-		/* I18N: In the Spanish surname tradition, ... */ WT_I18N::translate('Children take one surname from the father and one surname from the mother.').
-		'</dd></dl><dl><dt>'.
-		WT_I18N::translate_c('Surname tradition', 'Portuguese').
-		'</dt><dd>'.
-		/* I18N: In the Portuguese surname tradition, ... */ WT_I18N::translate('Children take one surname from the mother and one surname from the father.').
-		'</dd></dl><dl><dt>'.
-		WT_I18N::translate_c('Surname tradition', 'Icelandic').
-		'</dt><dd>'.
-		/* I18N: In the Icelandic surname tradition, ... */ WT_I18N::translate('Children take a surname based on their father\'s given name.').
-		'</dd></dl><dl><dt>'.
-		WT_I18N::translate_c('Surname tradition', 'Polish').
-		'</dt><dd>'.
-		/* I18N: In the Polish surname tradition, ... */ WT_I18N::translate('All family members take the father\'s surname, but the suffix may change to indicate the person\'s gender.').
-		'</dd></dl><dl><dt>'.
-		WT_I18N::translate_c('Surname tradition', 'Lithuanian').
-		'</dt><dd>'.
-		/* I18N: In the Lithuanian surname tradition, ... */ WT_I18N::translate('All family members take the father\'s surname, but the suffix may change to indicate the person\'s gender and marital status.').
-		'</dd></dl>';
-	break;
-
-case 'THEME':
-	$title=WT_I18N::translate('Theme');
-	$text=
-		WT_I18N::translate('You can change the appearance of <b>webtrees</b> using "themes".  Each theme has a different style, layout, color scheme, etc.').
-		'<br/><br/>'.
-		WT_I18N::translate('Themes can be selected at three levels: user, GEDCOM, and site.  User settings take priority over GEDCOM settings, which in turn take priority over the site setting.  Selecting "default theme" at user level will give the setting for the current GEDCOM.  Selecting "default theme" at GEDCOM level will give the site setting.');
-	break;
-
-case 'THUMBNAIL_WIDTH':
-	$title=WT_I18N::translate('Width of generated thumbnails');
-	$text=WT_I18N::translate('This is the width (in pixels) that the program will use when automatically generating thumbnails.  The default setting is 100.');
-	break;
-
-case 'USE_GEONAMES':
-	$title=WT_I18N::translate('Use GeoNames database for autocomplete on places');
-	$text=WT_I18N::translate('Should the GeoNames database be used to provide more suggestions for place names?<br /><br />When this option is set to <b>Yes</b>, the GeoNames database will be queried to supply suggestions for the place name being entered.  When set to <b>No</b>, only the current genealogical database will be searched.  As you enter more of the place name, the suggestion will become more precise.  This option can slow down data entry, particularly if your Internet connection is slow.<br /><br />The GeoNames geographical database is accessible free of charge. It currently contains over 8,000,000 geographical names.');
-	break;
-
-case 'USE_MEDIA_FIREWALL':
-	$title=WT_I18N::translate('Automatically protect new images');
-	$text=WT_I18N::translate('Should new images automatically go in the protected media directory when they are uploaded?'); 
-	break;
-
-case 'USE_MEDIA_VIEWER':
-	$title=WT_I18N::translate('Use media viewer');
-	$text=WT_I18N::translate('When this option is <b>Yes</b>, clicking on images will produce the Media Viewer page.  This page shows the details of the image.  If you have sufficient rights, you can also edit these details.<br /><br />When this option is <b>No</b>, clicking on images will produce a full-size image in a new window.');
-	break;
-
-case 'USE_REGISTRATION_MODULE':
-	$title=WT_I18N::translate('Allow visitors to request account registration');
-	$text=WT_I18N::translate('Gives visitors the option of registering themselves for an account on the site.<br /><br />The visitor will receive an email message with a code to verify his application for an account.  After verification, the Administrator will have to approve the registration before it becomes active.');
-	break;
-
-case 'USE_RELATIONSHIP_PRIVACY':
-	$title=WT_I18N::translate('Use relationship privacy');
-	$text=WT_I18N::translate('<b>No</b> means that authenticated users can see the details of all living people.  <b>Yes</b> means that users can only see the private information of living people they are related to.<br /><br />This option sets the default for all users who have access to this genealogical database.  The Administrator can override this option for individual users by editing the user\'s account details.');
-	break;
-
-case 'USE_RIN':
-	$title=WT_I18N::translate('Use RIN number instead of GEDCOM ID');
-	$text=WT_I18N::translate('Set to <b>Yes</b> to use the RIN number instead of the GEDCOM ID when asked for Individual IDs in configuration files, user settings, and charts.  This is useful for genealogy programs that do not consistently export GEDCOMs with the same ID assigned to each individual but always use the same RIN.');
-	break;
-
-case 'USE_SILHOUETTE':
-	$title=WT_I18N::translate('Use silhouettes');
-	$text=WT_I18N::translate('Use silhouette images when no highlighted image for that person has been specified.  The images used are specific to the gender of the person in question.<br /><br /><table><tr><td wrap valign="middle">This image might be used when the gender of the person is unknown:')
-	." </td><td><img src=\"".$WT_IMAGES["default_image_U"]."\" width=\"40\" alt=\"\" title=\"\" /></td></tr></table>";
-	break;
-
-case 'WATERMARK_THUMB':
-	$title=WT_I18N::translate('Add watermarks to thumbnails?');
-	$text=WT_I18N::translate('If the Media Firewall is enabled, should thumbnails be watermarked? Your media lists will load faster if you don\'t watermark the thumbnails.');
-	break;
-
-case 'WEBMASTER_USER_ID':
-	$title=WT_I18N::translate('Technical help contact');
-	$text=WT_I18N::translate('The person to be contacted about technical questions or errors encountered on your site.');
-	break;
-
-case 'WELCOME_TEXT_AUTH_MODE_CUST_HEAD':
-	$title=WT_I18N::translate('Standard header for custom welcome text');
-	$text=WT_I18N::translate('Choose to display a standard header for your custom Welcome text.  When your users change language, this header will appear in the new language.<br /><br />If set to <b>Yes</b>, the header will look like this:<div class="list_value_wrap"><center><b>Welcome to this Genealogy website</b></center><br />Access is permitted to users who have an account and a password for this website.<br /></div>');
-	break;
-
-case 'WELCOME_TEXT_AUTH_MODE_CUST':
-	$title=WT_I18N::translate('Custom welcome text');
-	$text=WT_I18N::translate('If you have opted for custom welcome text, you can type that text here.  To set this text for other languages, you must switch to that language, and visit this page again.');
-	break;
-
-case 'WELCOME_TEXT_AUTH_MODE':
-	$title=WT_I18N::translate('Welcome text on login page');
-	$text=WT_I18N::translate('Here you can choose text to appear on the login screen. You must determine which predefined text is most appropriate.<br /><br />You can also choose to enter your own custom Welcome text.  Please refer to the Help text associated with the <b>Custom Welcome text</b> field for more information.<br /><br />The predefined texts are:<ul><li><b>Predefined text that states all users can request a user account:</b><div class="list_value_wrap"><center><b>Welcome to this Genealogy website</b></center><br />Access to this site is permitted to every visitor who has a user account.<br /><br />If you have a user account, you can login on this page.  If you don\'t have a user account, you can apply for one by clicking on the appropriate link below.<br /><br />After verifying your application, the site administrator will activate your account.  You will receive an email when your application has been approved.</div><br/></li><li><b>Predefined text that states admin will decide on each request for a user account:</b><div class="list_value_wrap"><center><b>Welcome to this Genealogy website</b></center><br />Access to this site is permitted to <u>authorized</u> users only.<br /><br />If you have a user account you can login on this page.  If you don\'t have a user account, you can apply for one by clicking on the appropriate link below.<br /><br />After verifying your information, the administrator will either approve or decline your account application.  You will receive an email message when your application has been approved.</div><br/></li><li><b>Predefined text that states only family members can request a user account:</b><div class="list_value_wrap"><center><b>Welcome to this Genealogy website</b></center><br />Access to this site is permitted to <u>family members only</u>.<br /><br />If you have a user account you can login on this page.  If you don\'t have a user account, you can apply for one by clicking on the appropriate link below.<br /><br />After verifying the information you provide, the administrator will either approve or decline your request for an account.  You will receive an email when your request is approved.</div></li></ul>');
-	break;
-
-case 'WORD_WRAPPED_NOTES':
-	$title=WT_I18N::translate('Add spaces where notes were wrapped');
-	$text=WT_I18N::translate('Some genealogy programs wrap notes at word boundaries while others wrap notes anywhere.  This can cause <b>webtrees</b> to run words together.  Setting this to <b>Yes</b> will add a space between words where they are wrapped in the original GEDCOM during the import process. If you have already imported the file you will need to re-import it.');
-	break;
-
-	//////////////////////////////////////////////////////////////////////////////
-	// This section contains all the other help items.
-	//////////////////////////////////////////////////////////////////////////////
-
-case 'add_facts':
-	$title=WT_I18N::translate('Add a fact');
-	$text=WT_I18N::translate('Here you can add a fact to the record being edited.<br /><br />First choose a fact from the drop-down list, then click the <b>Add</b> button.  All possible facts that you can add to the database are in that drop-down list.');
-	$text.='<br/><br/>';
-	$text.='<b>'.WT_I18N::translate('Add from clipboard').'</b>';
-	$text.='<br/><br/>';
-	$text.=WT_I18N::translate('<b>webtrees</b> allows you to copy up to 10 facts, with all their details, to a clipboard.  This clipboard is different from the Clippings Cart that you can use to export portions of your database.<br /><br />You can select any of the facts from the clipboard and copy the selected fact to the Individual, Family, Media, Source, or Repository record currently being edited.  However, you cannot copy facts of dissimilar record types.  For example, you cannot copy a Marriage fact to a Source or an Individual record since the Marriage fact is associated only with Family records.<br /><br />This is very helpful when entering similar facts, such as census facts, for many individuals or families.');
-	break;
-
-case 'add_husband':
-	$title=WT_I18N::translate('Add a new husband');
-	$text=WT_I18N::translate('By clicking this link, you can add a <u>new</u> male person and link this person to the principal individual as a new husband.<br /><br />Just click the link, and you will get a pop up window to add the new person.  Fill out as many boxes as you can and click the <b>Save</b> button.<br /><br />That\'s all.');
-	break;
-
-case 'add_media_linkid':
-	$title=WT_I18N::translate('Link ID');
-	$text=WT_I18N::translate('Each media item should be associated with one or more person, family, or source records in your database.<br /><br />To establish such a link, you can enter or search for the ID of the person, family, or source at the same time as you create the media item.  You can also establish the link later through editing options on the Manage MultiMedia page, or by adding media items through the Add Media link available on the Individual, Family, or Source Details pages.');
-	break;
-
-case 'add_new_gedcom':
-	$title=WT_I18N::translate('Create a new family tree');
-	$text=
-		WT_I18N::translate('This option creates a new family tree.  The name you give it will be used to generate URLs and filenames, so you should choose something short, simple, and avoid punctuation.').
-		'<br/><br/>'.
-		WT_I18N::translate('After creating the family tree, you will be able to upload or import data from a GEDCOM file.');
-	break;
-
-case 'add_note':
-	// This is a general help text for multiple pages
-	$title=WT_I18N::translate('Add a new note');
-	$text=WT_I18N::translate('If you have a note to add to this record, this is the place to do so.<br /><br />Just click the link, a window will open, and you can type your note.  When you are finished typing, just click the button below the box, close the window, and that\'s all.');
-	break;
-
-case 'add_opf_child':
-	$title=WT_I18N::translate('Add a child to create a one-parent family');
-	$text=WT_I18N::translate('By clicking this link, you can add a <u>new</u> child to this person, creating a one-parent family.<br /><br />Just click the link, and you will get a pop up window to add the new person.  Fill out as many boxes as you can and click the <b>Save</b> button.<br /><br />That\'s all.');
-	break;
-
-case 'add_shared_note':
-	// This is a general help text for multiple pages
-	$title=WT_I18N::translate('Add a new shared note');
-	$text=WT_I18N::translate('When you click the <b>Add a new Shared Note</b> link, a new window will open.  You can choose to link to an existing shared note, or you can create a new shared note and at the same time create a link to it.');
-	break;
-
-case 'add_source':
-	// This is a general help text for multiple pages
-	$title=WT_I18N::translate('Add a new source citation');
-	$text=WT_I18N::translate('Here you can add a source <b>Citation</b> to this record.<br /><br />Just click the link, a window will open, and you can choose the source from the list (Find ID) or create a new source and then add the Citation.<br /><br />Adding sources is an important part of genealogy because it allows other researchers to verify where you obtained your information.');
-	break;
-
-case 'add_wife':
-	$title=WT_I18N::translate('Add a new wife');
-	$text=WT_I18N::translate('By clicking this link, you can add a <u>new</u> female person and link this person to the principal individual as a new wife.<br /><br />Just click the link, and you will get a pop up window to add the new person.  Fill out as many boxes as you can and click the <b>Save</b> button.<br /><br />That\'s all.');
-	break;
-
-case 'annivers_year_select':
-	$title=WT_I18N::translate('Year input box');
-	$text=WT_I18N::translate('This input box lets you change that year of the calendar.  Type a year into the box and press <b>Enter</b> to change the calendar to that year.<br /><br /><b>Advanced features</b> for <b>View Year</b><dl><dt><b>More than one year</b></dt><dd>You can search for dates in a range of years.<br /><br />Year ranges are <u>inclusive</u>.  This means that the date range extends from 1 January of the first year of the range to 31 December of the last year mentioned.  Here are a few examples of year ranges:<br /><br /><b>1992-5</b> for all events from 1992 to 1995.<br /><b>1972-89</b> for all events from 1972 to 1989.<br /><b>1610-759</b> for all events from 1610 to 1759.<br /><b>1880-1905</b> for all events from 1880 to 1905.<br /><b>880-1105</b> for all events from 880 to 1105.<br /><br />To see all the events in a given decade or century, you can use <b>?</b> in place of the final digits. For example, <b>197?</b> for all events from 1970 to 1979 or <b>16??</b> for all events from 1600 to 1699.<br /><br/>Selecting a range of years will change the calendar to the year view.</dd></dl>');
-	break;
-
-case 'apply_privacy':
-	$title=WT_I18N::translate('Apply privacy settings?');
-	$text=WT_I18N::translate('This option will remove private data from the downloaded GEDCOM file.  The file will be filtered according to the privacy settings that apply to each access level.  Privacy settings are specified on the GEDCOM configuration page.');
-	break;
-
-case 'block_move_right':
-	$title=WT_I18N::translate('Move list entries');
-	$text=WT_I18N::translate('Use these buttons to move an entry from one list to another.<br /><br />Highlight the entry to be moved, and then click a button to move or copy that entry in the direction of the arrow.  Use the <b>&raquo;</b> and <b>&laquo;</b> buttons to move the highlighted entry from the leftmost to the rightmost list or vice-versa.  Use the <b>&gt;</b> and <b>&lt;</b> buttons to move the highlighted entry between the Available Blocks list and the list to its right or left.<br /><br />The entries in the Available Blocks list do not change, regardless of what you do with the Move Right and Move Left buttons.  This is so because the same block can appear several times on the same page.  The HTML block is a good example of why you might want to do this.');
-	break;
-
-case 'block_move_up':
-	$title=WT_I18N::translate('Move list entries');
-	$text=WT_I18N::translate('Use these buttons to re-arrange the order of the entries within the list.  The blocks will be printed in the order in which they are listed.<br /><br />Highlight the entry to be moved, and then click a button to move that entry up or down.');
-	break;
-
-case 'convertPath':
-	$title=WT_I18N::translate('Convert media path to');
-	$text=WT_I18N::translate('This option defines a constant path to be prefixed to all media paths in the output file.<br /><br />For example, if the media directory has been configured to be "/media" and if the media file being exported has a path "/media/pictures/xyz.jpg" and you have entered "c:\my pictures\my family" into this field, the resultant media path will be "c:\my pictures\my family/pictures/xyz.jpg".<br /><br />You will notice in this example:<ul><li>the current media directory name is stripped from the path</li><li>and the resultant path will not have correct folder name separators.</li></ul><br />If you wish to retain the media directory in media file paths of the output file, you will need to include that name in the <b>Convert media path to</b> field.<br /><br />You should also use the <b>Convert media folder separators to</b> option to ensure that the folder name separators are consistent and agree with the requirements of the receiving operating system.<br /><br />Media paths that are actually URLs will not be changed.');
-	break;
-
-case 'convertSlashes':
-	$title=WT_I18N::translate('Convert media folder separators to');
-	$text=WT_I18N::translate('This option determines whether folder names in the FILE specification of media objects should be separated by forward slashes or by backslashes.  Your choice depends on the requirements of the receiving operating system.<br /><br />The choice <b>Forward slashes : /</b> is appropriate for most operating systems other than Microsoft Windows.  The choice <b>Backslashes : \</b> should be used when the destination program is running on a Microsoft Windows system.<br /><br />Media paths that are actually URLs will not be changed.');
-	break;
-
-case 'default_gedcom':
-	$title=WT_I18N::translate('Default family tree');
-	$text=WT_I18N::translate('This option selects the family tree that is shown to visitors when they first arrive at the site.');
-	break;
-
-case 'default_individual':
-	$title=WT_I18N::translate('Default individual');
-	$text=WT_I18N::translate('This individual will be selected by default when viewing charts and reports.');
-	break;
-
-case 'download_gedcom':
-	$title=WT_I18N::translate('Download family tree');
-	$text=WT_I18N::translate('This option will download the family tree to a GEDCOM file on your computer.');
-	break;
-
-case 'download_zipped':
-	$title=WT_I18N::translate('Download ZIP file');
-	$text=WT_I18N::translate('When you check this option, a copy of the GEDCOM file will be compressed into ZIP format before the download begins. This will reduce its size considerably, but you will need to use a compatible Unzip program (WinZIP, for example) to decompress the transmitted GEDCOM file before you can use it.<br /><br />This is a useful option for downloading large GEDCOM files.  There is a risk that the download time for the uncompressed file may exceed the maximum allowed execution time, resulting in incompletely downloaded files.  The ZIP option should reduce the download time by 75 percent.');
-	break;
-
-case 'edit_add_ASSO':
-	$title=WT_I18N::translate('Add a new associate');
-	$text=WT_I18N::translate('Add a new Associate allows you to link a fact with an associated person in the site.  This is one way in which you might record that someone was the Godfather of another person.');
-	break;
-
-case 'edit_add_GEDFact_ASSISTED':
-	$title=WT_I18N::translate('GEDFact shared note assistant');
-	$text=WT_I18N::translate('Clicking the "+" icon will open the GEDFact Shared Note Assistant window.<br />Specific help will be found there.<br /><br />When you click the "Save" button, the ID of the Shared Note will be pasted here.');
-	break;
-
-case 'edit_add_NOTE':
-	$title=WT_I18N::translate('Add a new note');
-	$text=WT_I18N::translate('This section allows you to add a new Note to the fact that you are currently editing.  Notes are free-form text and will appear in the Fact Details section of the page.');
-	break;
-
-case 'edit_add_SHARED_NOTE':
-	$title=WT_I18N::translate('Add a new shared note');
-	$text=WT_I18N::translate('Shared notes, like regular notes, are free-form text.  Unlike regular notes, each shared note can be linked to more than one person, family, source, or fact.<br /><br />By clicking the appropriate icon, you can establish a link to an existing shared note or create a new shared note and at the same time link to it.  If a link to an existing shared note has already been established, you can also edit that note\'s contents.<br /><ul><li><b>Link to an existing shared note</b><div style="padding-left:20px;">If you already know the ID number of the desired shared note, you can enter that number directly into the field.<br /><br />When you click the <b>Find Shared Note</b> icon, you will be able to search the text of all existing shared notes and then choose one of them.  The ID number of the chosen note will be entered into the field automatically.<br /><br />You must click the <b>Add</b> button to update the original record.</div><br /></li><li><b>Create a new shared note</b><div style="padding-left:20px;">When you click the <b>Create a new Shared Note</b> icon, a new window will open.  You can enter the text of the new note as you wish.  As with regular notes, you can enter URLs.<br /><br />When you click the <b>Save</b> button, you will see a message with the ID number of the newly created shared note.  You should click on this message to close the editing window and also copy that new ID number directly into the ID number field.  If you just close the window, the newly created ID number will not be copied automatically.<br /><br />You must click the <b>Add</b> button to update the original record.</div><br /></li><li><b>Edit an existing shared note</b><div style="padding-left:20px;">When you click the <b>Edit Shared Note</b> icon, a new window will open.  You can change the text of the existing shared note as you wish.  As with regular notes, you can enter URLs.<br /><br />When you click the <b>Save</b> button, the text of the shared note will be updated.  You can close the window and then click the <b>Save</b> button again.<br /><br />When you change the text of a shared note, your change will be reflected in all places to which that shared note is currently linked.  New links that you establish after having made your change will also use the updated text.</div></li></ul>');
-	if (array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
-		$text.='<p class="warning">'.WT_I18N::translate('You should avoid using the vertical line character &ldquo;|&rdquo; in your notes.  It is used internally by webtrees and may cause your note to display incorrectly.').'</p>';
-	}
-	break;
-
-case 'edit_add_SOUR':
-	$title=WT_I18N::translate('Add a new source citation');
-	$text=WT_I18N::translate('This section allows you to add a new source citation to the fact that you are currently editing.<br /><br />In the Source field you enter the ID for the source.  Click the <b>Create a new source</b> link if you need to enter a new source.  In the Citation Details field you would enter the page number or other information that might help someone find the information in the source.  In the Text field you would enter the text transcription from the source.');
-	break;
-
-case 'edit_add_child':
-	$title=WT_I18N::translate('Add a new child');
-	$text=WT_I18N::translate('With this page you can add a new child to the selected family.  Fill out the name of the child and the birth and death information if it is known.  If you don\'t know some information leave it blank.<br /><br />To add other facts besides birth and death, first add the new child to the database by saving the changes.  Then click on the child\'s name in the updated Family page or Close Relatives tab to view the child\'s Individual Information page.  From the Individual Information page you can add more detailed information.');
-	break;
-
-case 'edit_add_parent':
-	$title=WT_I18N::translate('Add a new parent');
-	$text=WT_I18N::translate('With this page you can add a new mother or father to the selected person.  Fill out the new person\'s name and the birth and death information if it is known.  If you don\'t know some information, leave it blank.<br /><br />To add other facts besides birth and death, first add the new person to the database by saving the changes.  Then click on the person\'s name in the updated Family page or Close Relatives tab to view the person\'s Individual Information page.  From the Individual Information page you can add more detailed information.');
-	break;
-
-case 'edit_add_spouse':
-	$title=WT_I18N::translate('Add a new spouse');
-	$text=WT_I18N::translate('With this page you can add a new husband or wife to the selected person.  Fill out the new person\'s name and the birth and death information if it is known.  If you don\'t know some information leave it blank.<br /><br />To add other facts besides birth and death, first add the new person to the database by saving the changes.  Then click on the person\'s name in the updated Family page or Close Relatives tab to view the person\'s Individual Information page.  From the Individual Information page you can add more detailed information.');
-	break;
-
-case 'edit_add_unlinked_note':
-	$title=WT_I18N::translate('Add an unlinked shared note');
-	$text=WT_I18N::translate('Use this link to add a new shared note to your database without linking the note to any record.<br /><br />The new note will appear in the Shared Note list, but will not appear on any charts or anywhere else in the program until it is linked to an individual, family or event.');
-	break;
-
-case 'edit_add_unlinked_person':
-	$title=WT_I18N::translate('Add an unlinked person');
-	$text=WT_I18N::translate('Use this form to add an unlinked person.<br /><br />When you add an unlinked person to your family tree, the person will not be linked to any other people until you link them.  Later, you can link people together from the Close Relatives tab on the Individual Information page.');
-	break;
-
-case 'edit_add_unlinked_source':
-	$title=WT_I18N::translate('Add an unlinked source');
-	$text=WT_I18N::translate('Use this link to add a new source to your database without linking the source to a source citation in another record.  The new source will appear in the source list, but will not appear on any charts or anywhere else in the program until it is linked up to a source citation.');
-	break;
-
-case 'edit_edit_raw':
-	$title=WT_I18N::translate('Edit raw GEDCOM record');
-	$text=
-		WT_I18N::translate('This page allows you to bypass the usual forms, and edit the underlying data directly.  It is an advanced option, and you should not use it unless you understand the GEDCOM format.  If you make a mistake here, it can be difficult to fix.').
-		'<br/><br/>'.
-		/* I18N: %s is a URL */ WT_I18N::translate('You can download a copy of the GEDCOM specification from %s.', '<a href="http://wiki.webtrees.net/images/Ged551-5.pdf">http://wiki.webtrees.net/images/Ged551-5.pdf</a>');
-	break;
-
-case 'edit_merge':
-	$title=WT_I18N::translate('Merge records');
-	$text=WT_I18N::translate('This page will allow you to merge two GEDCOM records from the same GEDCOM file.<br /><br />This is useful for people who have merged GEDCOMs and now have many people, families, and sources that are the same.<br /><br />The page consists of three steps.<br /><ol><li>You enter two GEDCOM IDs.  The IDs <u>must</u> be of the same type.  You cannot merge an individual and a family or family and source, for example.<br />In the <b>Merge To ID:</b> field enter the ID of the record you want to be the new record after the merge is complete.<br />In the <b>Merge From ID:</b> field enter the ID of the record whose information will be merged into the Merge To ID: record.  This record will be deleted after the Merge.</li><li>You select what facts you want to keep from the two records when they are merged.  Just click the checkboxes next to the ones you want to keep.</li><li>You inspect the results of the merge, just like with all other changes made online.</li></ol>Someone with Accept rights will have to authorize your changes to make them permanent.');
-	break;
-
-case 'edit_SOUR_EVEN':
-	$title=WT_I18N::translate('Associate events with this source');
-	$text=WT_I18N::translate('Each source records specific events, generally for a given date range and for a place jurisdiction.  For example a Census records census events and church records record birth, marriage, and death events.<br /><br />Select the events that are recorded by this source from the list of events provided. The date should be specified in a range format such as <i>FROM 1900 TO 1910</i>. The place jurisdiction is the name of the lowest jurisdiction that encompasses all lower-level places named in this source. For example, "Oneida, Idaho, USA" would be used as a source jurisdiction place for events occurring in the various towns within Oneida County. "Idaho, USA" would be the source jurisdiction place if the events recorded took place not only in Oneida County but also in other counties in Idaho.');
-	break;
-
-case 'edituser_contact_meth':
-	$title=WT_I18N::translate('Preferred contact method');
-	$text=WT_I18N::translate('<b>webtrees</b> has several different contact methods.  The administrator determines which method will be used to contact him.  You have control over the method to be used to contact <u>you</u>.  Depending on site configuration, some of the listed methods may not be available to you.');
-	$text.='<br/><br/><dl><dt>';
-	$text.=WT_I18N::translate('Internal messaging');
-	$text.='</dt><dd>';
-	$text.=WT_I18N::translate('With this option, the <b>webtrees</b> internal messaging system will be used and no emails will be sent.<br /><br />You will receive only <u>internal</u> messages from the other users.  When another site user sends you a message, that message will appear in the Message block on your personal My Page.  If you have removed this block from your My Page, you will not see any messages.  They will, however, show up as soon as you configure My Page to again have the Message block.');
-	$text.='</dd><dt>';
-	$text.=WT_I18N::translate('Internal messaging with emails');
-	$text.='</dt><dd>';
-	$text.=WT_I18N::translate('This option is like <b>webtrees</b> internal messaging, with one addition.  As an extra, a copy of the message will also be sent to the email address you configured on your Account page.<br /><br />This is the default contact method.');
-	$text.='</dd><dt>';
-	$text.=WT_I18N::translate('Mailto link');
-	$text.='</dt><dd>';
-	$text.=WT_I18N::translate('With this option, you will only receive email messages at the address you configured on your Account page.  The messaging system internal to <b>webtrees</b> will not be used at all, and there will never be any messages in the Message block on your personal My Page.');
-	$text.='</dd><dt>';
-	$text.=WT_I18N::translate('No contact method');
-	$text.='</dt><dd>';
-	$text.=WT_I18N::translate('With this option, you will not receive any messages.  Even the administrator will not be able to reach you.');
-	$text.='</dd></dl>';
-	break;
-
-case 'edituser_gedcomid':
-	$title=WT_I18N::translate('Individual record');
-	$text=WT_I18N::translate('This is a link to your own record in the family tree.  If this is the wrong person, contact an administrator.');
-	break;
-
-case 'email':
-	$title=WT_I18N::translate('Email address');
-	$text=WT_I18N::translate('This email address will be used to send you password reminders, site notifications, and messages from other family members who are registered on the site.');
-	break;
-
-case 'export_gedcom':
-	$title=WT_I18N::translate('Export family tree');
-	$text=
-		WT_I18N::translate('This option will save the family tree to a GEDCOM file on the server.').
-		'<br/><br/>'.
-		/* I18N: %s is a directory name */ WT_I18N::translate('Files are stored in the %s directory.', '<b>'.WT_DATA_DIR.'</b>');
-	break;
-
-case 'fambook_descent':
-	$title=WT_I18N::translate('Descendant generations');
-	$text=WT_I18N::translate('This value determines the number of descendant generations of the root person that will be printed in Hourglass format.');
-	break;
-
-case 'fan_width':
-	$title=WT_I18N::translate('Width');
-	$text=WT_I18N::translate('Here you can change the diagram width from 50 percent to 300 percent.  At 100 percent the output image is about 640 pixels wide.');
-	break;
-
-case 'gedcom_news_archive':
-	$title=WT_I18N::translate('View archive');
-	$text=WT_I18N::translate('To reduce the height of the News block, the administrator has hidden some articles.  You can reveal these hidden articles by clicking the <b>View archive</b> link.');
-	break;
-
-case 'gedcom_news_flag':
-	$title=WT_I18N::translate('Limit:');
-	$text=WT_I18N::translate('Enter the limiting value here.<br /><br />If you have opted to limit the News article display according to age, any article older than the number of days entered here will be hidden from view.  If you have opted to limit the News article display by number, only the specified number of recent articles, ordered by age, will be shown.  The remaining articles will be hidden from view.<br /><br />Zeros entered here will disable the limit, causing all News articles to be shown.');
-	break;
-
-case 'gedcom_news_limit':
-	$title=WT_I18N::translate('Limit display by:');
-	$text=WT_I18N::translate('You can limit the number of News articles displayed, thereby reducing the height of the GEDCOM News block.<br /><br />This option determines whether any limits should be applied or whether the limit should be according to the age of the article or according to the number of articles.');
-	break;
-
-case 'gen_missing_thumbs':
-	$title=WT_I18N::translate('Create missing thumbnails');
-	$text=WT_I18N::translate('This option will generate thumbnails for all files in the current directory which don\'t already have a thumbnail.  This is much more convenient than clicking the <b>Create thumbnail</b> link for each such file.<br /><br />If you wish to retain control over which files should have corresponding thumbnails, you should not use this option.  Instead, click the appropriate <b>Create thumbnail</b> links.');
-	break;
-
-case 'generate_thumb':
-	$title=WT_I18N::translate('Automatic thumbnail');
-	$text=WT_I18N::translate('Your system can generate thumbnails for certain types of images automatically.  There may be support for BMP, GIF, JPG, and PNG files.  The types that your system supports are listed beside the checkbox.<br /><br />By clicking this checkbox, you signal the system that you are uploading images of this type and that you want it to try to generate thumbnails for them.  Leave the box unchecked if you want to provide your own thumbnails.');
-	break;
-
-case 'google_chart_surname':
-	$title=WT_I18N::translate('Surname');
-	$text=WT_I18N::translate('The number of occurrences of the specified name will be shown on the map. If you leave this field empty, the most common surname will be used.');
-	break;
-
-case 'header_favorites':
-	$title=WT_I18N::translate('Favorites');
-	$text=WT_I18N::translate('The Favorites drop-down list shows the favorites that you have selected on your personalized My Page.  It also shows the favorites that the site administrator has selected for the currently active GEDCOM.  Clicking on one of the favorites entries will take you directly to the Individual Information page of that person.<br /><br />More help about adding Favorites is available in your personalized My Page.');
-	break;
-
-case 'import_gedcom':
-	$title=WT_I18N::translate('Import family tree');
-	$text=
-		WT_I18N::translate('This option deletes all the genealogy data in your family tree and replaces it with data from a GEDCOM file on the server.').
-		'<br/><br/>'.
-		/* I18N: %s is a directory name */ WT_I18N::translate('Files are stored in the %s directory.', '<b>'.WT_DATA_DIR.'</b>');
-	break;
-
-case 'include_media':
-	$title=WT_I18N::translate('Include media (automatically zips files)');
-	$text=WT_I18N::translate('Select this option to include the media files associated with the records in your clippings cart.  Choosing this option will automatically zip the files during download.');
-	break;
-
-case 'lifespan_chart':
-	$title=WT_I18N::translate('Lifespans');
-	$text=WT_I18N::translate('On this chart you can display one or more persons along a horizontal timeline.  This chart allows you to see how the lives of different people overlapped.<br /><br />You can add people to the chart individually or by family groups by their IDs.  The previous list will be remembered as you add more people to the chart.  You can clear the chart at any time with the <b>Clear Chart</b> button.<br /><br />You can also add people to the chart by searching for them by date range or locality.');
-	break;
-
-case 'link_child':
-	$title=WT_I18N::translate('Link to an existing family as a child');
-	$text=WT_I18N::translate('You can link this person as a child to an existing family when you click this link.<br /><br />Suppose that at one time the parents of the person were unknown, and you discovered later that the parents have a record in this database.<br /><br />Just click the link, enter the ID of the family, and you have competed the task.  If you don\'t know the family\'s ID, you can search for it.');
-	break;
-
-case 'link_husband':
-	$title=WT_I18N::translate('Link to an existing family as a husband');
-	$text=WT_I18N::translate('This item will allow you to link the current individual as a husband to a family that is already in the database. By clicking this link you can add this person to an existing family, of which the husband was unknown until now. This person will take the place of the previously unknown husband. All events, marriage information, and children will keep their existing links to the family.<br /><br />Just click the link, enter the ID of the family, and you have competed the task. This is an advanced editing option that should only be used if the family you want to link to already exists.  If you want to add a <u>new</u> family to this individual, use the <b>Add a new wife</b> link.');
-	break;
-
-case 'link_new_husb':
-	$title=WT_I18N::translate('Add a husband using an existing person');
-	$text=WT_I18N::translate('This will allow you to link another individual, who already exists, as a new husband to this person.  This will create a new family with the husband you select.  You will also have the option of specifying a marriage for this new family.');
-	break;
-
-case 'link_new_wife':
-	$title=WT_I18N::translate('Add a wife using an existing person');
-	$text=WT_I18N::translate('This will allow you to link another individual, who already exists, as a new wife to this person.  This will create a new family with the wife you select.  You will also have the option of specifying a marriage for this new family.');
-	break;
-
-case 'link_wife':
-	$title=WT_I18N::translate('Link to an existing family as a wife');
-	$text=WT_I18N::translate('This item will allow you to link the current individual as a wife to a family that is already in the database.<br /><br />This is an advanced editing option that should only be used if the family you want to link to already exists.  If you want to add a <u>new</u> family to this individual, use the <b>Add a new husband</b> link.');
-	break;
-
-case 'manage_media':
-	$title=WT_I18N::translate('Media');
-	$text=WT_I18N::translate('On this page you can easily manage your Media files and directories.<br /><br />When you create new Media subdirectories, <b>webtrees</b> will ensure that the identical directory structure is maintained within the <b>%sthumbs</b> directory.  When you upload new Media files, <b>webtrees</b> can automatically create the thumbnails for you.<br /><br />Beside each image in the Media list you\'ll find the following options.  The options actually shown depend on the current status of the Media file.<ul><li><b>Edit</b>&nbsp;&nbsp;When you click on this option, you\'ll see a page where you can change the title of the Media object.  If the Media object is not yet linked to a person, family, or source in the currently active database, you can establish this link here.  You can rename the file or even change its location within the <b>%s</b> directory structure.  When necessary, <b>webtrees</b> will automatically create the required subdirectories or any missing thumbnails.</li><li><b>Edit raw GEDCOM record</b>&nbsp;&nbsp;This option is only available when the administrator has enabled it.  You can view or edit the raw GEDCOM data associated with this Media object.  You should be very careful when you use this option.</li><li><b>Delete file</b>&nbsp;&nbsp;This option lets you erase all knowledge of the Media file from the current database.  Other databases will not be affected.  If this Media file is not mentioned in any other database, it, and its associated thumbnail, will be deleted.</li><li><b>Remove object</b>&nbsp;&nbsp;This option lets you erase all knowledge of the Media file from the current database.  Other databases will not be affected.  The Media file, and its associated thumbnail, will not be deleted.</li><li><b>Remove links</b>&nbsp;&nbsp;This option lets you remove all links to the media object from the current database.  The file will not be deleted, and the Media object by which this file is known to the current database will be retained.  Other databases will not be affected.</li><li><b>Set link</b>&nbsp;&nbsp;This option lets you establish links between the media file and persons, families, or sources of the current database.  When necessary, <b>webtrees</b> will also create the Media object by which the Media file is known to the database.</li><li><b>Create thumbnail</b>&nbsp;&nbsp;When you select this option, <b>webtrees</b> will create the missing thumbnail.</li></ul>', $MEDIA_DIRECTORY, $MEDIA_DIRECTORY);
-	break;
-
-case 'medialist_recursive':
-	$title=WT_I18N::translate('List files in subdirectories');
-	$text=WT_I18N::translate('When this option is selected, the MultiMedia Objects will search not only the directory selected from the Filter list but all its subdirectories as well. When this option is not selected, only the selected directory is searched.<br /><br />The titles of all media objects found are then examined to determine whether they contain the text entered in the Filter.  The result of these two actions determines the multimedia objects to be listed.');
-	break;
-
-case 'move_mediadirs':
-	$title=WT_I18N::translate('Move media directories');
-	$text=WT_I18N::translate('When the Media Firewall is enabled, Multi-Media files can be stored in a server directory that is not accessible from the Internet.<br /><br />These buttons allow you to easily move an entire Media directory structure between the protected (not web-addressable) <b>%s%s</b> and the normal <b>%s</b> directories.', $MEDIA_FIREWALL_ROOTDIR, $MEDIA_DIRECTORY, $MEDIA_DIRECTORY);
-	break;
-
-case 'next_path':
-	$title=WT_I18N::translate('Find next relationship path');
-	$text=WT_I18N::translate('You can click this button to see whether there is another relationship path between the two people.  Previously found paths can be displayed again by clicking the link with the path number.');
-	break;
-
-case 'no_update_CHAN':
-	$title=WT_I18N::translate('Do not update the “last change” record');
-	$text=WT_I18N::translate('Administrators sometimes need to clean up and correct the data submitted by users.  For example, they might need to correct the PLAC location to include the country.  When Administrators make such corrections, information about the original change is normally replaced.  This may not be desirable.<br /><br />When this option is selected, <b>webtrees</b> will retain the original Change information instead of replacing it with that of the current session.  With this option selected, Administrators also have the ability to modify or delete the information associated with the original CHAN tag.');
-	break;
-
-case 'oldest_top':
-	$title=WT_I18N::translate('Show oldest top');
-	$text=WT_I18N::translate('When this check box is checked, the chart will be printed with oldest people at the top.  When it is unchecked, youngest people will appear at the top.');
-	break;
-
-case 'password':
-	$title=WT_I18N::translate('Password');
-	$text=WT_I18N::translate('Passwords must be at least 6 characters long and are case-sensitive, so that “secret” is different to “SECRET”.');
-	break;
-
-case 'password_confirm':
-	$title=WT_I18N::translate('Confirm password');
-	$text=WT_I18N::translate('Type your password again, to make sure you have typed it correctly.');
-	break;
-
-case 'PGV_WIZARD':
-	$title=WT_I18N::translate('PhpGedView to <b>webtrees</b> transfer wizard');
-	$text =WT_I18N::translate('The PGV to <b>webtrees</b> wizard is an automated process to assist administrators make the move from a PGV installation to a new <b>webtrees</b> one. It will transfer all PGV GEDCOM and other database information directly to your new <b>webtrees</b> database. The following requirements are necessary:');
-	$text .= '<ul><li>';
-	$text .= WT_I18N::translate('webtrees database must be on the same server as PGV\'s');
-	$text .= '</li><li>';
-	$text .= WT_I18N::translate('PGV must be version 4.2.3, or any SVN up to #6973');
-	$text .= '</li><li>';
-	$text .= WT_I18N::translate('All changes in PGV must be accepted');
-	$text .= '</li><li>';
-	$text .= WT_I18N::translate('You must export your latest GEDCOM data');
-	$text .= '</li><li>';
-	$text .= WT_I18N::translate('The current <b>webtrees</b> admin username must be the same as an existing PGV admin username');
-	$text .= '</li><li>';
-	$text .= WT_I18N::translate('All existing PGV users must have distinct email addresses');
-	$text .= '</li></ul><p>';
-	$text .= WT_I18N::translate('<b>Important Note:</b> The transfer wizard is not able to assist with moving media items. You will need to set up and move or copy your media configuration and objects separately after the transfer wizard is finished.');
-	$text .= '</p>';
-	break;
-
-case 'phpinfo':
-	$title=WT_I18N::translate('PHP information');
-	$text=WT_I18N::translate('This page provides extensive information about the server on which <b>webtrees</b> is being hosted.  Many configuration details about the server\'s software, as it relates to PHP and <b>webtrees</b>, can be viewed.');
-	break;
-
-case 'pending_changes':
-	$title=WT_I18N::translate('Pending changes');
-	$text=
-		'<p>'.
-		WT_I18N::translate('When you add, edit, or delete information, the changes are not saved immediately.  Instead, they are kept in a “pending” area.  These pending changes need to be reviewed by a moderator before they are accepted.').
-		'</p><p>'.
-		WT_I18N::translate('This process allows the site’s owner to ensure that the new information follows the site’s standards and conventions, has proper source attributions, etc.').
-		'</p><p>'.
-		WT_I18N::translate('Pending changes are only shown when your account has permission to edit.  When you log out, you will no longer be able to see them.  Also, pending changes are only shown on certain pages.  For example, they are not shown in lists, reports, or search results.').
-		'</p>';
-	if (WT_USER_IS_ADMIN) {
-		$text.=
-			'<p>'.
-			WT_I18N::translate('Each user account has an option to “automatically accept changes”.  When this is enabled, any changes made by that user are saved immediately.  Many administrators enable this for their own user account.').
-			'</p>';
-	}
-
-	break;
-
-case 'ppp_view_records':
-	$title=WT_I18N::translate('View all records');
-	$text=WT_I18N::translate('Clicking on this link will show you a list of all of the individuals and families that have events occurring in this place.  When you get to the end of a place hierarchy, which is normally a town or city, the name list will be shown automatically.');
-	break;
-
-case 'real_name':
-	$title=WT_I18N::translate('Real name');
-	$text=WT_I18N::translate('This is your real name, as you would like it displayed on screen.');
-	break;
-
-case 'register_comments':
-	$title=WT_I18N::translate('Comments');
-	$text=WT_I18N::translate('Use this field to tell the site administrator why you are requesting an account and how you are related to the genealogy displayed on this site.  You can also use this to enter any other comments you may have for the site administrator.');
-	break;
-
-case 'register_gedcomid':
-	$title=WT_I18N::translate('Individual record');
-	$text=WT_I18N::translate('Every person in the database has a unique ID number on this site.  If you know the ID number for your own record, please enter it here.  If you don\'t know your ID number or could not find it because of privacy settings, please provide enough information in the Comments field to help the site administrator identify who you are on this site so that he can set the ID for you.');
-	break;
-
-case 'remove_person':
-	$title=WT_I18N::translate('Remove person');
-	$text=WT_I18N::translate('Click this link to remove the person from the timeline.');
-	break;
-
-case 'reorder_children':
-	$title=WT_I18N::translate('Reorder children');
-	$text=WT_I18N::translate('Children are displayed in the order in which they appear in the family record.  Children are not automatically sorted by birth date because often the birth dates of some of the children are uncertain but the order of their birth <u>is</u> known.<br /><br />This option will allow you to change the order of the children within the family\'s record.  Since you might want to sort the children by their birth dates, there is a button you can press that will do this for you.<br /><br />You can also drag-and-drop any information box to change the order of the children.  As you move the mouse cursor over an information box, its shape will change to a pair of double-headed crossed arrows. If you push and hold the left mouse button before moving the mouse cursor, the information box will follow the mouse cursor up or down in the list.  As the information box is moved, the other boxes will make room.  When you release the left mouse button, the information box will take its new place in the list.');
-	break;
-
-case 'reorder_families':
-	$title=WT_I18N::translate('Reorder families');
-	$text=WT_I18N::translate('Families on the Close Relatives tab are displayed in the order in which they appear in the individual\'s GEDCOM record.  Families are not sorted by the marriage date because often the marriage dates are unknown but the order of the marriages <u>is</u> known.<br /><br />This option will allow you to change the order of the families in which they are listed on the Close Relatives tab.  If you want to sort the families by their marriage dates, there is a button you can press that will automatically do this for you.');
-	break;
-
-case 'role':
-	$title=WT_I18N::translate('Role');
-	$text=
-		WT_I18N::translate('A role is a set of access rights, which give permission to view data, change configuration settings, etc.  Access rights are assigned to roles, and roles are granted to users.  Each family tree can assign different access to each role, and users can have a different role in each family tree.').
-		'<br/><br>'.
-		'<dl>'.
-		'<dt>'.WT_I18N::translate('Visitors').'</dt><dd>'.
-		WT_I18N::translate('Everybody has this role, including visitors to the site and search engines.').
-		'</dd>'.
-		'<dl>'.
-		'<dt>'.WT_I18N::translate('Member').'</dt><dd>'.
-		WT_I18N::translate('This role has all the permissions of the visitor role, plus any additional access granted by the family tree configuration.').
-		'</dd>'.
-		'<dl>'.
-		'<dt>'.WT_I18N::translate('Editor').'</dt><dd>'.
-		WT_I18N::translate('This role has all the permissions of the member role, plus permission to add/change/delete data.  Any changes will need to be approved by a moderator, unless the user has the "automatically accept changes" option enabled.').
-		'</dd>'.
-		'<dl>'.
-		'<dt>'.WT_I18N::translate('Moderator').'</dt><dd>'.
-		WT_I18N::translate('This role has all the permissions of the editor role, plus permission to approve/reject changes made by other users.').
-		'</dd>'.
-		'<dl>'.
-		'<dt>'.WT_I18N::translate('Manager').'</dt><dd>'.
-		WT_I18N::translate('This role has all the permissions of the moderator role, plus any additional access granted by the family tree configuration, plus permission to change the settings/configuration of a family tree.').
-		'</dd>'.
-		'<dl>'.
-		'<dt>'.WT_I18N::translate('Administrator').'</dt><dd>'.
-		WT_I18N::translate('This role has all the permissions of the manager role in all family trees, plus permission to change the settings/configuration of the site, users and modules.').
-		'</dd>';
-	break;
-
-case 'search_include_ASSO':
-	$title=WT_I18N::translate('Associates');
-	$text=WT_I18N::translate('This option causes <b>webtrees</b> to show all individuals who are recorded as having an association relationship to the person or family that was found as a direct result of the search.  The inverse, where all persons or families are shown when a person found as a direct result of the search has an association relationship to these other persons or families, is not possible.<br /><br />Example:  Suppose person <b>A</b> is godparent to person <b>B</b>.  This relationship is recorded in the GEDCOM record of person <b>B</b> by means of an ASSO tag.  No corresponding tag exists in the GEDCOM record of person <b>A</b>.<br /><br />When this option is set to <b>Yes</b> and the Search results list includes <b>B</b>, <b>A</b> will be included automatically because of the ASSO tag in the GEDCOM record of <b>B</b>.  However, if the Search results list includes <b>A</b>, <b>B</b> will not be included automatically since there is no matching ASSO tag in the GEDCOM record of person <b>A</b>.');
-	break;
-
-case 'setperms':
-	$title=WT_I18N::translate('Set media permissions');
-	$text=WT_I18N::translate('Recursively set the permissions on the protected (not web-addressable) <b>%s%s</b> and the normal <b>%s</b> directories to either world-writable or read-only.', $MEDIA_FIREWALL_ROOTDIR, $MEDIA_DIRECTORY, $MEDIA_DIRECTORY);
-	break;
-
-case 'show_fact_sources':
-	$title=WT_I18N::translate('Show all sources');
-	$text=WT_I18N::translate('When this option is checked, you can see all Source or Note records for this person.  When this option is unchecked, Source or Note records that are associated with other facts for this person will not be shown.');
-	break;
-
-case 'show_spouse':
-	$title=WT_I18N::translate('Show spouses');
-	$text=WT_I18N::translate('By default this chart does not show spouses for the descendants because it makes the chart harder to read and understand.  Turning this option on will show spouses on the chart.');
-	break;
-
-case 'simple_filter':
-	$title=WT_I18N::translate('Simple search filter');
-	$text=WT_I18N::translate('Simple search filter based on the characters entered, no wildcards are accepted.');
-	break;
-
-case 'upload_gedcom':
-	$title=WT_I18N::translate('Upload family tree');
-	$text=WT_I18N::translate('This option deletes all the genealogy data in your family tree and replaces it with data from a GEDCOM file on your computer.');
-	break;
-
-case 'upload_media_file':
-	$title=WT_I18N::translate('Media file to upload');
-	$text=
-		WT_I18N::translate('Select the media file that you want to upload.  If a file already exists with the same name, it will be overwritten.').
-		'<br/><br/>'.
-		WT_I18N::translate('It is easier to manage your media files if you choose a consistent format for the filenames.  To organise media files into folders, you must first set the number of levels in the GEDCOM administration page.');
-	break;
-
-case 'upload_media':
-	$title=WT_I18N::translate('Upload media files');
-	$text=WT_I18N::translate('Upload one or more media files from your local computer.  Media files can be pictures, video, audio, or other formats.');
-	break;
-
-case 'upload_server_file':
-	$title=WT_I18N::translate('File name on server');
-	$text=WT_I18N::translate('The media file you are uploading can be, and probably should be, named differently on the server than it is on your local computer.  This is so because often the local file name has meaning to you but is much less meaningful to others visiting this site.  Consider also the possibility that you and someone else both try to upload different files called "granny.jpg".<br /><br />In this field, you specify the new name of the file you are uploading.  The name you enter here will also be used to name the thumbnail, which can be uploaded separately or generated automatically.  You do not need to enter the file name extension (jpg, gif, pdf, doc, etc.)<br /><br />Leave this field blank to keep the original name of the file you have uploaded from your local computer.');
-	break;
-
-case 'upload_server_folder':
-	$title=WT_I18N::translate('Folder name on server');
-	$text=WT_I18N::translate('The administrator has enabled up to %s folder levels below the default <b>%s</b>.  This helps to organize the media files and reduces the possibility of name collisions.<br /><br />In this field, you specify the destination folder where the uploaded media file should be stored.  The matching thumbnail file, either uploaded separately or generated automatically, will be stored in a similar folder structure starting at <b>%sthumbs/</b> instead of <b>%s</b>.  You do not need to enter the <b>%s</b> part of the destination folder name.<br /><br />If you are not sure about what to enter here, you should contact your site administrator for advice.', $MEDIA_DIRECTORY_LEVELS, $MEDIA_DIRECTORY, $MEDIA_DIRECTORY, $MEDIA_DIRECTORY, $MEDIA_DIRECTORY);
-	break;
-
-case 'upload_thumbnail_file':
-	$title=WT_I18N::translate('Thumbnail to upload');
-	$text=WT_I18N::translate('Choose the thumbnail image that you want to upload.  Although thumbnails can be generated automatically for images, you may wish to generate your own thumbnail, especially for other media types.  For example, you can provide a still image from a video, or a photograph of the person who made an audio recording.');
-	break;
-
-case 'useradmin_auto_accept':
-	$title=WT_I18N::translate('Automatically approve changes made by this user');
-	$text=WT_I18N::translate('Normally, any changes made to a family tree need to be approved by a moderator.  This option allows a user to make changes without needing a moderator\'s approval.');
-	break;
-
-
-case 'useradmin_editaccount':
-	$title=WT_I18N::translate('Edit account information');
-	$text=WT_I18N::translate('If this box is checked, this user will be able to edit his account information.  Although this is not generally recommended, you can create a single user name and password for multiple users.  When this box is unchecked for all users with the shared account, they are prevented from editing the account information and only an administrator can alter that account.');
-	break;
-
-case 'useradmin_gedcomid':
-	$title=WT_I18N::translate('Individual record');
-	$text=WT_I18N::translate('The individual record identifies the user in each family tree.  Since a user can view the details of their individual record, this can only be set by an administrator.  If the user does not have a record in a family tree, leave it empty.');
-	break;
-
-case 'useradmin_verification':
-	$title=WT_I18N::translate('Account approval and email verification');
-	$text=WT_I18N::translate('When a user registers for an account, an email is sent to their email address with a verification link.  When they click this link, we know the email address is correct, and the "email verified" option is selected automatically.').
-		'<br/><br/>'.
-		WT_I18N::translate('If an administrator creates a user account, the verification email is not sent, and the email must be verified manually.').
-		'<br/><br/>'.
-		WT_I18N::translate('You should not approve an account unless you know that the email address is correct.').
-		'<br/><br/>'.
-		WT_I18N::translate('A user will not be able to login until both the "email verified" and "approved by administrator" options are selected.');
-	break;
-
-case 'useradmin_visibleonline':
-	$title=WT_I18N::translate('Visible online');
-	$text=WT_I18N::translate('This checkbox controls your visibility to other users while you\'re online.  It also controls your ability to see other online users who are configured to be visible.<br /><br />When this box is unchecked, you will be completely invisible to others, and you will also not be able to see other online users.  When this box is checked, exactly the opposite is true.  You will be visible to others, and you will also be able to see others who are configured to be visible.');
-	break;
-
-case 'username':
-	$title=WT_I18N::translate('Username');
-	$text=
-		'<p>'.
-		WT_I18N::translate('Usernames are case-insensitive and ignore accented letters, so that “chloe”, “chloë”, and “Chloe” are considered to be the same.').
-		'</p><p>'.
-		WT_I18N::translate('Usernames may not contain the following characters: &lt; &gt; " %% { } ;').
-		'</p>';
-	break;
-
-case 'utf8_ansi':
-	$title=WT_I18N::translate('Convert from UTF-8 to ANSI');
-	$text=WT_I18N::translate('For optimal display on the Internet, <b>webtrees</b> uses the UTF-8 character set.  Some programs, Family Tree Maker for example, do not support importing GEDCOM files encoded in UTF-8.  Checking this box will convert the file from <b>UTF-8</b> to <b>ANSI (ISO-8859-1)</b>.<br /><br />The format you need depends on the program you use to work with your downloaded GEDCOM file.  If you aren\'t sure, consult the documentation of that program.<br /><br />Note that for special characters to remain unchanged, you will need to keep the file in UTF-8 and convert it to your program\'s method for handling these special characters by some other means.  Consult your program\'s manufacturer or author.<br /><br />This <a href=\'http://en.wikipedia.org/wiki/UTF-8\' target=\'_blank\' title=\'Wikipedia article\'><b>Wikipedia article</b></a> contains comprehensive information and links about UTF-8.');
-	break;
-
-case 'view_server_folder':
-	$title=WT_I18N::translate('View server folder');
-	$text=WT_I18N::translate('The administrator has enabled up to %s folder levels below the default <b>%s</b>.  This helps to organize the media files and reduces the possibility of name collisions.<br /><br />In this field, you select the media folder whose contents you wish to view.  When you select <b>ALL</b>, all media files will be shown without regard to the folder in which they are stored.  This can produce a very long list of media items.',
-		get_gedcom_setting(WT_GED_ID, 'MEDIA_DIRECTORY_LEVELS'),
-		get_gedcom_setting(WT_GED_ID, 'MEDIA_DIRECTORY')
-	);
-	break;
-
-case 'zip':
-	$title=WT_I18N::translate('Zip clippings');
-	$text=WT_I18N::translate('Select this option as to save your clippings in a ZIP file.  For more information about ZIP files, please visit <a href="http://www.winzip.com" target="_blank">http://www.winzip.com</a>.');
-	break;
-
-default:
-	//PERSO Implement custom tags management
-	$hook_get_help_text_tag = new WT_Perso_Hook('h_get_help_text_tag', $help);
-	if($hook_get_help_text_tag->hasAnyActiveModule()){
-		$result = $hook_get_help_text_tag->execute($help);
-		$title = ''; $text = '';
-		if(count($result)>0 && count($result[0])==2){
-			$title = $result[0][0];
-			$text = $result[0][1];
+	// Generate the sidebar content *before* we display the page header,
+	// as the clippings cart needs to have write access to the session.
+	$sidebar_html=$controller->getSideBarContent();
+
+	$controller->pageHeader();
+	if ($controller->record->isMarkedDeleted()) {
+		if (WT_USER_CAN_ACCEPT) {
+			echo
+				'<p class="ui-state-highlight">',
+				/* I18N: %1$s is "accept", %2$s is "reject".  These are links. */ WT_I18N::translate(
+					'This individual has been deleted.  You should review the deletion and then %1$s or %2$s it.',
+					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'accept') . '</a>',
+					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'reject') . '</a>'
+				),
+				' ', help_link('pending_changes'),
+				'</p>';
+		} elseif (WT_USER_CAN_EDIT) {
+			echo
+				'<p class="ui-state-highlight">',
+				WT_I18N::translate('This individual has been deleted.  The deletion will need to be reviewed by a moderator.'),
+				' ', help_link('pending_changes'),
+				'</p>';
+		}
+	} elseif (find_updated_record($controller->record->getXref(), WT_GED_ID)!==null) {
+		if (WT_USER_CAN_ACCEPT) {
+			echo
+				'<p class="ui-state-highlight">',
+				/* I18N: %1$s is "accept", %2$s is "reject".  These are links. */ WT_I18N::translate(
+					'This individual has been edited.  You should review the changes and then %1$s or %2$s them.',
+					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'accept') . '</a>',
+					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'reject') . '</a>'
+				),
+				' ', help_link('pending_changes'),
+				'</p>';
+		} elseif (WT_USER_CAN_EDIT) {
+			echo
+				'<p class="ui-state-highlight">',
+				WT_I18N::translate('This individual has been edited.  The changes need to be reviewed by a moderator.'),
+				' ', help_link('pending_changes'),
+				'</p>';
 		}
 	}
-	else{
-	//END PERSO
-		$title=WT_I18N::translate('Help');
-		$text=WT_I18N::translate('The help text has not been written for this item.');
-		// If we've been called from a module, allow the module to provide the help text
-		$mod=safe_GET('mod', '[A-Za-z0-9_]+');
-		if (file_exists(WT_ROOT.WT_MODULES_DIR.$mod.'/help_text.php')) {
-			require WT_ROOT.WT_MODULES_DIR.$mod.'/help_text.php';
-		}
-		break;
-	} //END PERSO
+} elseif ($controller->record && $controller->record->canDisplayName()) {
+	// Just show the name.
+	$controller->pageHeader();
+	echo '<h2>', $controller->record->getFullName(), '</h2>';
+	echo '<p class="ui-state-highlight">', WT_I18N::translate('The details of this individual are private.'), '</p>';
+	exit;
+} else {
+	header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
+	$controller->pageHeader();
+	echo '<p class="ui-state-error">', WT_I18N::translate('This individual does not exist or you do not have permission to view it.'), '</p>';
+	exit;
 }
 
-$controller->pageHeader();
+$linkToID=$controller->record->getXref(); // -- Tell addmedia.php what to link to
 
-echo '<div class="helpheader">', $title, '</div>';
-echo '<div class="helpcontent">', $text,'</div>';
+$callbacks='';
+foreach ($controller->tabs as $tab) {
+  $callbacks.=$tab->getJSCallback()."\n";
+}
+$controller->addInlineJavascript('
+	jQuery("#tabs").tabs({
+		spinner: \'<i class="icon-loading-small"></i>\',
+		cache: true
+	});
+	jQuery("#tabs").tabs("select",jQuery.cookie("indi-tab"));
+	jQuery("#tabs").bind("tabsshow", function(event, ui) {
+		jQuery.cookie("indi-tab", ui.panel.id);'.$callbacks.
+	'});
+
+	// sidebar settings 
+	// Variables
+	var objMain			= jQuery("#main");
+	var objTabs			= jQuery("#indi_left");
+	var objBar			= jQuery("#sidebar");
+	var objSeparator	= jQuery("#separator");
+	// Adjust header dimensions
+	function adjHeader(){
+		var indi_header_div = document.getElementById("indi_header").offsetWidth - 20;
+		var indi_mainimage_div = document.getElementById("indi_mainimage").offsetWidth +20;
+		var header_accordion_div = document.getElementById("header_accordion1");
+		header_accordion_div.style.width = indi_header_div - indi_mainimage_div +"px";
+
+		jQuery(window).bind("resize", function(){
+			var indi_header_div = document.getElementById("indi_header").offsetWidth - 20;
+			var indi_mainimage_div = document.getElementById("indi_mainimage").offsetWidth +20;
+			var header_accordion_div = document.getElementById("header_accordion1");
+			header_accordion_div.style.width = indi_header_div - indi_mainimage_div +"px";
+		 });
+	}
+	// Show sidebar
+	function showSidebar(){
+		objMain.addClass("use-sidebar");
+		objSeparator.css("height", objBar.outerHeight() + "px");
+		jQuery.cookie("hide-sb", null);
+	}
+	// Hide sidebar
+	function hideSidebar(){
+		objMain.removeClass("use-sidebar");
+		objSeparator.css("height", objTabs.outerHeight() + "px");
+		jQuery.cookie("hide-sb", "1");
+	}
+	// Sidebar separator
+	objSeparator.click(function(e){
+		e.preventDefault();
+		if ( objMain.hasClass("use-sidebar") ){
+			hideSidebar();
+			adjHeader();
+		} else {
+			showSidebar();
+			adjHeader();
+		}
+	});
+	// Load preference
+	if (jQuery.cookie("hide-sb")=="1"){
+		hideSidebar();
+	} else {
+		showSidebar();
+	}
+	adjHeader();
+	jQuery("#main").css("visibility", "visible");
+	
+	function show_gedcom_record() {
+		var recwin=window.open("gedrecord.php?pid='. $controller->record->getXref(). '", "_blank", edit_window_specs);
+	}	
+
+	jQuery("#header_accordion1").accordion({
+		active: 0,
+		icons: {"header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" },
+		autoHeight: false,
+		collapsible: true
+	});
+
+');
+
+// ===================================== header area
+echo
+	'<div id="main" class="use-sidebar sidebar-at-right" style="visibility:hidden;">', //overall page container
+	'<div id="indi_left">',
+	'<div id="indi_header">';
+if ($controller->record->canDisplayDetails()) {
+	echo '<div id="indi_mainimage" '; // Display highlight image
+	if ($USE_SILHOUETTE) {echo 'style="min-width:', $THUMBNAIL_WIDTH, 'px;">';} else {echo '>';}
+	if ($controller->canShowHighlightedObject()) {
+		echo $controller->getHighlightedObject();
+	}
+	echo '</div>'; // close #indi_mainimage
+	$globalfacts=$controller->getGlobalFacts();
+	echo '<div id="header_accordion1">'; // contain accordions for names
+	echo '<h3 class="name_one ', $controller->getPersonStyle($controller->record), '"><span>', $controller->record->getFullName(), '</span>'; // First name accordion header
+	$bdate=$controller->record->getBirthDate();
+	$ddate=$controller->record->getDeathDate();
+	echo '<span class="header_age">';
+	if ($bdate->isOK() && !$controller->record->isDead()) {
+		// If living display age
+		echo WT_Gedcom_Tag::getLabelValue('AGE', get_age_at_event(WT_Date::GetAgeGedcom($bdate), true), '', 'span');
+	} elseif ($bdate->isOK() && $ddate->isOK()) {
+		// If dead, show age at death
+		echo WT_Gedcom_Tag::getLabelValue('AGE', get_age_at_event(WT_Date::GetAgeGedcom($bdate, $ddate), false), '', 'span');
+	}
+	echo '</span>';
+	// Display summary birth/death info.
+	echo '<span id="dates">', $controller->record->getLifeSpan(), '</span>';
+	//Display gender icon
+	foreach ($globalfacts as $key=>$value) {
+		$fact = $value->getTag();
+		if ($fact=="SEX") $controller->print_sex_record($value);
+	}
+	//PERSO
+	$dcontroller = new WT_Perso_Controller_Individual($controller);
+	$dcontroller->print_extra_icons_header();
+	//END PERSO
+	echo '</h3>'; // close first name accordion header	
+	//Display name details
+	foreach ($globalfacts as $key=>$value) {
+		$fact = $value->getTag();
+		if ($fact=="NAME") $controller->print_name_record($value);
+	}
+	echo '</div>'; // close header_accordion1
+	//PERSO
+	$dcontroller->print_extensions_header();
+	//END PERSO
+}
+echo '</div>';// close #indi_header
+// ===================================== main content tabs
+foreach ($controller->tabs as $tab) {
+	echo $tab->getPreLoadContent();
+}
+echo '<div id="tabs">';
+echo '<ul>';
+foreach ($controller->tabs as $tab) {
+	if ($tab->isGrayedOut()) {
+		$greyed_out='rela';
+	} else {
+		$greyed_out='';
+	}
+	if ($tab->hasTabContent()) {
+		// jQueryUI/tabs.  The title attribute is used to uniquely identify each
+		// tab.  We need this identifier, so that we can remember/restore the last
+		// tab used.  Hence we must use the tab's name (not a numeric index, which
+		// will change from page to page).  But the title must also be a valid CSS
+		// id, which means that we cannot use the tab's title/description.  (The
+		// documentation suggests simply replacing spaces with underscores, but
+		// this will only work for English.)  We can wrap the tab's title in its
+		// own <div title="">, but jQueryUI gives the <a> element padding, which
+		// shows the correct title on the text but the wrong title on the padding.
+		// So,... move the padding from the <a> to the internal <div>
+		echo '<li class="'.$greyed_out.'"><a title="', $tab->getName(), '" href="';
+		if ($tab->canLoadAjax()) {
+			// AJAX tabs load only when selected
+			echo $controller->record->getHtmlUrl(),'&amp;action=ajax&amp;module=', $tab->getName();
+		} else {
+			// Non-AJAX tabs load immediately
+			echo '#', $tab->getName();
+		}
+		echo '"><div title="', $tab->getDescription(), '"><span>', $tab->getTitle(), '</span></div></a></li>';
+	}
+}
+echo '</ul>';
+foreach ($controller->tabs as $tab) {
+	if ($tab->hasTabContent()) {
+		if (!$tab->canLoadAjax()) {
+			echo '<div id="', $tab->getName(), '">', $tab->getTabContent(), '</div>';
+		}
+	}
+}
+echo
+	'</div>', // close #tabs
+	'</div>', //close indi_left
+	$sidebar_html,
+	'<a href="#" id="separator" title="', WT_I18N::translate('Click here to open or close the sidebar'), '"></a>',//clickable element to open/close sidebar
+	'<div style="clear:both;">&nbsp;</div></div>'; // close #main

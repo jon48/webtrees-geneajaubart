@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14224 2012-08-28 03:10:05Z nigel $
+// $Id: module.php 14431 2012-10-18 16:28:27Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -460,6 +460,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 
 		$controller=new WT_Controller_Simple();
 		$controller
+				->addExternalJavascript(WT_STATIC_URL.'js/webtrees.js')
 				->setPageTitle(WT_I18N::translate('Select flag'))
 				->pageHeader();
 
@@ -1504,8 +1505,10 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 	private function admin_placecheck() {
 		require WT_ROOT.WT_MODULES_DIR.'googlemap/defaultconfig.php';
 		require_once WT_ROOT.WT_MODULES_DIR.'googlemap/googlemap.php';
+		require_once WT_ROOT.'includes/functions/functions_edit.php';
+
 		$action   =safe_GET('action'                                             );
-		$gedcom_id=safe_GET('gedcom_id', array_keys(get_all_gedcoms()), WT_GED_ID);
+		$gedcom_id=safe_GET('gedcom_id', array_keys(WT_Tree::getAll()), WT_GED_ID);
 		$country  =safe_GET('country',   WT_REGEX_UNSAFE,               'XYZ'    );
 		$state    =safe_GET('state',     WT_REGEX_UNSAFE,               'XYZ'    );
 		$matching =safe_GET_bool('matching');
@@ -1563,11 +1566,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		echo '<tr><th colspan="2">', WT_I18N::translate('PlaceCheck List Options'), '</th></tr>';
 		//Option box to select gedcom
 		echo '<tr><td>', WT_I18N::translate('Family tree'), '</td>';
-		echo '<td><select name="gedcom_id">';
-		foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
-			echo '<option value="', $ged_id, '"', $ged_id==$gedcom_id?' selected="selected"':'', '>', get_gedcom_setting($ged_id, 'title'), '</option>';
-		}
-		echo '</select></td></tr>';
+		echo '<td>';
+		echo select_edit_control('gedcom_id', WT_Tree::getIdList(), null, $gedcom_id);
+		echo '</td></tr>';
 		//Option box to select Country within Gedcom
 		echo '<tr><td>', WT_I18N::translate('Country'), '</td>';
 		echo '<td><select name="country">';
@@ -1628,7 +1629,8 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		switch ($action) {
 		case 'go':
 			//Identify gedcom file
-			echo '<div id="gm_check_title"><span>', htmlspecialchars(get_gedcom_setting($gedcom_id, 'title')), '</span></div>';
+			$trees=WT_Tree::getAll();
+			echo '<div id="gm_check_title"><span>', $trees[$gedcom_id]->tree_title_html, '</span></div>';
 			//Select all '2 PLAC ' tags in the file and create array
 			$place_list=array();
 			$ged_data=WT_DB::prepare("SELECT i_gedcom FROM `##individuals` WHERE i_gedcom LIKE ? AND i_file=?")

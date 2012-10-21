@@ -21,12 +21,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 14183 2012-08-18 22:30:17Z greg $
+// $Id: header.php 14425 2012-10-15 17:00:24Z rob $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
+
+global $subColor;
+
 echo
 	'<!DOCTYPE html>',
 	'<html ', WT_I18N::html_markup(), '>',
@@ -37,15 +40,22 @@ echo
 	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
 	'<link rel="stylesheet" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css" type="text/css">',
 	'<link rel="stylesheet" href="', WT_THEME_URL, 'css/colors.css" type="text/css">',
-	'<link rel="stylesheet" href="', $stylesheet, '" type="text/css" media="all">';
+	'<link rel="stylesheet" href="', WT_THEME_URL,  'css/',  $subColor,  '.css" type="text/css" media="all">';
+
+if (stristr($_SERVER['HTTP_USER_AGENT'], 'iPad')) {
+	echo '<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.8, maximum-scale=2.0" />';
+	$BROWSERTYPE = 'ipad';
+}
 
 	//PERSO Add extra style sheet for personal additions
 	echo '<link rel="stylesheet" type="text/css" href="', WT_THEME_URL ,'css/colors.extra.css', '">';
 	//END PERSO
 
 switch ($BROWSERTYPE) {
-//case 'chrome': uncomment when chrome.css file needs to be added, or add others as needed
 case 'msie':
+	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_URL, $BROWSERTYPE, '.css">';
+	break;
+case 'ipad':
 	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_URL, $BROWSERTYPE, '.css">';
 	break;
 }
@@ -63,9 +73,8 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 	echo
 	// Top row left
 	'<div id="header">',
-	'<span class="title" dir="auto">',
-		htmlspecialchars($GEDCOM_TITLE),
-	'</span>';
+	'<div id="spacer""></div>',
+	'<span class="title" dir="auto">', WT_TREE_TITLE, '</span>';
 
 	// Top row right 
 	echo 
@@ -110,8 +119,8 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 			'<form style="display:inline;" action="search.php" method="post">',
 			'<input type="hidden" name="action" value="general">',
 			'<input type="hidden" name="topsearch" value="yes">',
-			'<input type="search" name="query" size="10" placeholder="', WT_I18N::translate('Search'), '" dir="auto">',
-			'<input type="image" src="', $WT_IMAGES['search'], '" align="top" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '">',
+			'<input type="search" name="query" size="15" placeholder="', WT_I18N::translate('Search'), '" dir="auto">',
+			'<input class="search-icon" type="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '">',
 			'</form>',
 		'</li>',
 	'</ul>',
@@ -156,5 +165,8 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 	}
 	echo '</div>'; // <div id="flash-messages">
 }
-
+// Remove list from home when only 1 gedcom 
+$this->addInlineJavaScript(
+	'if (jQuery("#menu-tree ul li").length == 2) jQuery("#menu-tree ul li:last-child").remove();'
+);
 echo $javascript, '<div id="content">';

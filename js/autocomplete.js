@@ -57,7 +57,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: autocomplete.js 14088 2012-07-08 07:49:02Z greg $
+$Id: autocomplete.js 14392 2012-10-05 05:08:43Z nigel $
 */
 
 // INDI
@@ -79,7 +79,7 @@ jQuery(".FAM, input[id*=famid], input[id*=FAMC], #famid").autocomplete({
 });
 
 // NOTE
-jQuery(".NOTE").autocomplete({
+jQuery(".NOTE, .SHARED_NOTE").autocomplete({
 	source: "autocomplete.php?field=NOTE",
 	html: true
 });

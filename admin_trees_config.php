@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_config.php 14167 2012-08-12 07:54:23Z greg $
+// $Id: admin_trees_config.php 14403 2012-10-09 08:23:56Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_config.php');
 
@@ -153,7 +153,7 @@ case 'add':
 		}
 		WT_DB::prepare(
 			"REPLACE INTO `##default_resn` (gedcom_id, xref, tag_type, resn) VALUES (?, ?, ?, ?)"
-		)->execute(array(WT_GED_ID, safe_POST('xref'), safe_POST('tag_type'), safe_POST('resn')));
+		)->execute(array(WT_GED_ID, safe_POST_xref('xref'), safe_POST('tag_type'), safe_POST('resn')));
 	}
 	// Reload the page, so that the new privacy restrictions are reflected in the header
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'#privacy');
@@ -246,7 +246,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'SOUR_FACTS_ADD',               str_replace(' ', '', safe_POST('NEW_SOUR_FACTS_ADD')));
 	set_gedcom_setting(WT_GED_ID, 'SOUR_FACTS_QUICK',             str_replace(' ', '', safe_POST('NEW_SOUR_FACTS_QUICK')));
 	set_gedcom_setting(WT_GED_ID, 'SOUR_FACTS_UNIQUE',            str_replace(' ', '', safe_POST('NEW_SOUR_FACTS_UNIQUE')));
-	set_gedcom_setting(WT_GED_ID, 'SUBLIST_TRIGGER_F',            safe_POST('NEW_SUBLIST_TRIGGER_F', WT_REGEX_INTEGER, 200));
 	set_gedcom_setting(WT_GED_ID, 'SUBLIST_TRIGGER_I',            safe_POST('NEW_SUBLIST_TRIGGER_I', WT_REGEX_INTEGER, 200));
 	set_gedcom_setting(WT_GED_ID, 'SURNAME_LIST_STYLE',           safe_POST('NEW_SURNAME_LIST_STYLE'));
 	set_gedcom_setting(WT_GED_ID, 'SURNAME_TRADITION',            safe_POST('NEW_SURNAME_TRADITION'));
@@ -354,7 +353,7 @@ $controller
 	->addInlineJavascript('jQuery("#tabs").tabs(); jQuery("#tabs").css("display", "inline");')
 	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }');
 
-if (get_gedcom_count()==1) { //Removed because it doesn't work here for multiple GEDCOMs. Can be reinstated when fixed (https://bugs.launchpad.net/webtrees/+bug/613235)
+if (count(WT_Tree::getAll())==1) { //Removed because it doesn't work here for multiple GEDCOMs. Can be reinstated when fixed (https://bugs.launchpad.net/webtrees/+bug/613235)
 	$controller->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 }
 
@@ -1009,8 +1008,13 @@ if (get_gedcom_count()==1) { //Removed because it doesn't work here for multiple
 						</td>
 					</tr>
 					<tr>
+						<th colspan="2">
+							<?php echo WT_I18N::translate('Individual list'), WT_I18N::$list_separator, WT_I18N::translate('Family list'); ?>
+						</th>
+					</tr>
+					<tr>
 						<td>
-							<?php echo WT_I18N::translate('Surname list style'), help_link('SURNAME_LIST_STYLE'); ?>
+							<?php echo WT_I18N::translate('Surname list style'); ?>
 						</td>
 						<td>
 							<select name="NEW_SURNAME_LIST_STYLE">
@@ -1026,14 +1030,6 @@ if (get_gedcom_count()==1) { //Removed because it doesn't work here for multiple
 						</td>
 						<td>
 							<input type="text" name="NEW_SUBLIST_TRIGGER_I" value="<?php echo get_gedcom_setting(WT_GED_ID, 'SUBLIST_TRIGGER_I'); ?>" size="5" maxlength="5">
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<?php echo WT_I18N::translate('Maximum number of surnames on family list'), help_link('SUBLIST_TRIGGER_F'); ?>
-						</td>
-						<td>
-							<input type="text" name="NEW_SUBLIST_TRIGGER_F" value="<?php echo get_gedcom_setting(WT_GED_ID, 'SUBLIST_TRIGGER_F'); ?>" size="5" maxlength="5">
 						</td>
 					</tr>
 					<tr>
@@ -1091,7 +1087,7 @@ if (get_gedcom_count()==1) { //Removed because it doesn't work here for multiple
 					</tr>
 					<tr>
 						<td colspan="2">
-							<?php echo WT_I18N::translate('Show events of close relatives on individual page'), help_link('SHOW_RELATIVES_EVENTS'); ?>
+							<?php echo WT_I18N::translate('Show events of close relatives on individual page'); ?>
 						</td>
 					</tr>
 					<tr>
@@ -1511,7 +1507,7 @@ if (get_gedcom_count()==1) { //Removed because it doesn't work here for multiple
 						<?php echo WT_I18N::translate('Surname tradition'), help_link('SURNAME_TRADITION'); ?>
 					</td>
 					<td>
-						<?php echo select_edit_control('NEW_SURNAME_TRADITION', array('paternal'=>WT_I18N::translate_c('Surname tradition', 'paternal'), 'spanish'=>WT_I18N::translate_c('Surname tradition', 'Spanish'), 'portuguese'=>WT_I18N::translate_c('Surname tradition', 'Portuguese'), 'icelandic'=>WT_I18N::translate_c('Surname tradition', 'Icelandic'), 'polish'=>WT_I18N::translate_c('Surname tradition', 'Polish'), 'lithuanian'=>WT_I18N::translate_c('Surname tradition', 'Lithuanian'), 'none'=>WT_I18N::translate_c('Surname tradition', 'none')), null, get_gedcom_setting(WT_GED_ID, 'SURNAME_TRADITION')); ?>
+						<?php echo select_edit_control('NEW_SURNAME_TRADITION', array('paternal'=>WT_I18N::translate_c('Surname tradition', 'paternal'), 'patrilineal'=>WT_I18N::translate('patrilineal'), 'matrilineal'=>WT_I18N::translate('matrilineal'), 'spanish'=>WT_I18N::translate_c('Surname tradition', 'Spanish'), 'portuguese'=>WT_I18N::translate_c('Surname tradition', 'Portuguese'), 'icelandic'=>WT_I18N::translate_c('Surname tradition', 'Icelandic'), 'polish'=>WT_I18N::translate_c('Surname tradition', 'Polish'), 'lithuanian'=>WT_I18N::translate_c('Surname tradition', 'Lithuanian'), 'none'=>WT_I18N::translate_c('Surname tradition', 'none')), null, get_gedcom_setting(WT_GED_ID, 'SURNAME_TRADITION')); ?>
 					</td>
 				</tr>
 				<tr>

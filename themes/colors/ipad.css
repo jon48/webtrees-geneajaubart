@@ -1,0 +1,11 @@
+/* $Id: ipad.css 14357 2012-09-25 22:28:19Z rob $ */
+
+/*
+ * iPad Specific style
+ */
+@media only screen and (orientation:portrait){
+   /* portrait styles here */
+   #wrap {width:768px;}
+}
+
+

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14166 2012-08-12 04:36:39Z nigel $
+// $Id: module.php 14368 2012-09-28 07:46:44Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -59,18 +59,16 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		case '':
 			break;
 		case '__default__':
-			$GEDCOM=get_site_setting('DEFAULT_GEDCOM');
+			$GEDCOM=WT_Site::preference('DEFAULT_GEDCOM');
 			if (!$GEDCOM) {
-				foreach (get_all_gedcoms() as $gedcom) {
-					$GEDCOM=$gedcom;
+				foreach (WT_Trees::getAll() as $tree) {
+					$GEDCOM=$tree->tree_name;
 					break;
 				}
 			}
 			break;
 		default:
-			if (get_gedcom_setting(get_gedcom_from_id($gedcom), 'imported')) {
-				$GEDCOM = $gedcom;
-			}
+			$GEDCOM = $gedcom;
 			break;
 		}
 
@@ -106,7 +104,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		$content = $html;
 
 		if (get_block_setting($block_id, 'show_timestamp', false)) {
-			$content.='<br>'.format_timestamp(get_block_setting($block_id, 'timestamp', time()));
+			$content.='<br>'.format_timestamp(get_block_setting($block_id, 'timestamp', WT_TIMESTAMP));
 		}
 
 		if ($template) {
@@ -276,7 +274,13 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 			WT_I18N::translate('Templates'),
 			help_link('block_html_template', $this->getName()),
 			'</td><td class="optionbox">';
-		echo '<select name="template" onchange="document.block.html.value=document.block.template.options[document.block.template.selectedIndex].value;">';
+		// The CK editor needs lots of help to load/save data :-(
+		if (array_key_exists('ckeditor', WT_Module::getActiveModules())) {
+			$ckeditor_onchange='CKEDITOR.instances.html.setData(document.block.html.value);';
+		} else {
+			$ckeditor_onchange='';
+		}
+		echo '<select name="template" onchange="document.block.html.value=document.block.template.options[document.block.template.selectedIndex].value;', $ckeditor_onchange, '">';
 		echo '<option value="', htmlspecialchars($html), '">', WT_I18N::translate('Custom'), '</option>';
 		foreach ($templates as $title=>$template) {
 			echo '<option value="', htmlspecialchars($template), '">', $title, '</option>';
@@ -284,9 +288,8 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		echo '</select></td></tr>';
 
 		// gedcom
-		$gedcoms = get_all_gedcoms();
 		$gedcom=get_block_setting($block_id, 'gedcom');
-		if (count($gedcoms) > 1) {
+		if (count(WT_Tree::getAll()) > 1) {
 			if ($gedcom == '__current__') {$sel_current = ' selected="selected"';} else {$sel_current = '';}
 			if ($gedcom == '__default__') {$sel_default = ' selected="selected"';} else {$sel_default = '';}
 			echo '<tr><td class="descriptionbox wrap">',
@@ -295,9 +298,9 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 				'<select name="gedcom">',
 				'<option value="__current__"', $sel_current, '>', WT_I18N::translate('Current'), '</option>',
 				'<option value="__default__"', $sel_default, '>', WT_I18N::translate('Default'), '</option>';
-			foreach ($gedcoms as $ged_id=>$ged_name) {
-				if ($ged_name == $gedcom) {$sel = ' selected="selected"';} else {$sel = '';}
-				echo '<option value="', $ged_name, '"', $sel, ' dir="auto">', htmlspecialchars(get_gedcom_setting($ged_id, 'title')), '</option>';
+			foreach (WT_Tree::getAll() as $tree) {
+				if ($tree->tree_name == $gedcom) {$sel = ' selected="selected"';} else {$sel = '';}
+				echo '<option value="', $tree->tree_name, '"', $sel, ' dir="auto">', $tree->tree_title_html, '</option>';
 			}
 			echo '</select></td></tr>';
 		}
@@ -316,7 +319,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		echo WT_I18N::translate('Show the date and time of update');
 		echo '</td><td class="optionbox">';
 		echo edit_field_yes_no('show_timestamp', $show_timestamp);
-		echo '<input type="hidden" name="timestamp" value="'.time().'">';
+		echo '<input type="hidden" name="timestamp" value="', WT_TIMESTAMP, '">';
 		echo '</td></tr>';
 
 		$languages=get_block_setting($block_id, 'languages');

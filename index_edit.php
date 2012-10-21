@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index_edit.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: index_edit.php 14299 2012-09-15 19:38:41Z greg $
 
 define('WT_SCRIPT_NAME', 'index_edit.php');
 require './includes/session.php';
@@ -36,10 +36,12 @@ if ($user_id) {
 	$gedcom_id=safe_REQUEST($_REQUEST, 'gedcom_id');
 }
 
+// Only an admin can edit the "default" page
 // Only managers can edit the "home page"
 // Only a user or an admin can edit a user's "my page"
 if (
-	$gedcom_id && !userGedcomAdmin(WT_USER_ID, $gedcom_id) ||
+	$gedcom_id<0 && !WT_USER_IS_ADMIN ||
+	$gedcom_id>0 && !userGedcomAdmin(WT_USER_ID, $gedcom_id) ||
 	$user_id && WT_USER_ID!=$user_id && !WT_USER_IS_ADMIN
 ) {
 	$controller->pageHeader();
@@ -83,10 +85,8 @@ foreach (WT_Module::getActiveBlocks() as $name=>$block) {
 }
 
 if ($user_id) {
-	$controller->setPageTitle(WT_I18N::translate('My page'));
 	$blocks=get_user_blocks($user_id);
 } elseif ($gedcom_id) {
-	$controller->setPageTitle(WT_I18N::translate(get_gedcom_setting(WT_GED_ID, 'title')));
 	$blocks=get_gedcom_blocks($gedcom_id);
 }
 

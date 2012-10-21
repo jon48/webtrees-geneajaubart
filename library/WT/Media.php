@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Media.php 14055 2012-06-30 10:39:20Z greg $
+// $Id: Media.php 14422 2012-10-14 20:59:51Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -667,7 +667,7 @@ class WT_Media extends WT_GedcomRecord {
 			}
 
 			$output='';
-			if ($config['oktolink'] && $mainexists) $output .= '<a href="'.$this->getHtmlUrlSnippet($config).'">';
+			if ($config['oktolink'] && $mainexists) $output .= '<a class="media_container" href="'.$this->getHtmlUrlSnippet($config).'">';
 			$output .= '<img '.$idstr.' src="'.$this->getHtmlUrlDirect('thumb').'" '.$sizestr.' class="'.$config['class'].'"';
 			$output .= ' alt="'.$config['img_title'].'" title="'.$config['img_title'].'" '.$stylestr.'>';
 			if ($config['oktolink'] && $mainexists) {
@@ -731,7 +731,7 @@ class WT_Media extends WT_GedcomRecord {
 			if ($prev_record && $prev_record->getType()!=$record->getType()) {
 				$output.='<br>';
 			}
-			$output.='<br><a href="'.$record->getHtmlUrl().'">';
+			$output.='<br><a class="media_link" href="'.$record->getHtmlUrl().'">';
 			switch ($record->getType()) {
 			case 'INDI':
 				$output.=WT_I18N::translate('View Person');

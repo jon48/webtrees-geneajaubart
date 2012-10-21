@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_3_search_add.php 14121 2012-07-26 08:24:30Z nigel $
+// $Id: census_3_search_add.php 14311 2012-09-18 22:20:48Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -50,7 +50,7 @@ if (!defined('WT_WEBTREES')) {
 							alert("<?php echo WT_I18N::translate('You must enter a name'); ?>");
 						} else {
 							var win02 = window.open(
-								"module.php?mod=GEDFact_assistant&mod_action=_CENS/census_3_find&callback=paste_id&action=filter&type=indi&multiple=&filter="+txt, "win02", "resizable=1, menubar=0, scrollbars=1, top=180, left=600, HEIGHT=400, WIDTH=450 ");
+								"module.php?mod=GEDFact_assistant&mod_action=_CENS/census_3_find&callback=paste_id&action=filter&filter="+txt, "win02", "resizable=1, menubar=0, scrollbars=1, top=180, left=600, HEIGHT=400, WIDTH=450 ");
 							if (window.focus) {win02.focus();}
 						}
 					}
@@ -429,106 +429,102 @@ if (!defined('WT_WEBTREES')) {
 								$submenu = new WT_Menu($slabel);
 								$menu->addSubMenu($submenu);
 
-								if ($child->getXref()==$pid) {
-									//Only print Head of Family in Immediate Family Block
-								} else {
-									?>
-									<tr>
-										<td align="left" class="linkcell optionbox">
-											<font size=1>
+								?>
+								<tr>
+									<td align="left" class="linkcell optionbox">
+										<font size=1>
+										<?php
+										if ($child->getXref()==$pid) {
+											echo $child->getLabel();
+										} else {
+											echo $menu->getMenu();
+										}
+										?>
+										</font>
+									</td>
+									<td align="left" class="facts_value">
+										<font size=1>
 											<?php
-											if ($child->getXref()==$pid) {
-												echo $child->getLabel();
-											} else {
-												echo $menu->getMenu();
-											}
+											echo "<a href=\"edit_interface.php?action=addnewnote_assisted&amp;noteid=newnote&amp;pid=".$child->getXref()."&amp;gedcom=".WT_GEDURL."\">";
+											echo $headImg2;
+											echo "</a>";
 											?>
-											</font>
-										</td>
-										<td align="left" class="facts_value">
-											<font size=1>
+										</font>
+									</td>
+									<td align="left" class="facts_value nowrap">
+										<font size=1>
+										<?php
+										if (($child->canDisplayDetails())) {
+											?>
+											<a href='javaScript:insertRowToTable("<?php
+													echo $child->getXref(); // pid = PID
+												?>", "<?php
+													echo addslashes($fulln); // nam = Full Name
+												?>", "<?php
+													if (isset($chfulmn)) {
+														echo addslashes($chfulmn); // mnam = Full Married Name
+													} else {
+														echo addslashes($fulln); // mnam = Full Name
+													}
+												?>", "<?php
+													if ($child->getXref()==$pid) {
+														echo "Head"; // label = Head
+													} else {
+														echo $child->getLabel(); // label = Relationship
+													}
+												?>", "<?php
+													echo $child->getSex(); // gend = Gender
+												?>", "<?php
+													if ($married>0) {
+														echo "M"; // cond = Condition (Married)
+													} else if ($married<0 || ($married=="0") ) {
+														echo "S"; // cond = Condition (Single)
+													}
+												?>", "<?php
+													if ($marrdate) {
+														echo ($marrdate->minJD()+$marrdate->maxJD())/2; // dom = Date of Marriage (Julian)
+													}
+												?>", "<?php
+													echo ($child->getBirthDate()->minJD()+$child->getBirthDate()->maxJD())/2; // dob = Date of Birth (Julian)
+												?>", "<?php
+													echo $censyear-$child->getbirthyear(); // age = Census Date minus YOB
+												?>", "<?php
+													echo ($child->getDeathDate()->minJD()+$child->getDeathDate()->maxJD())/2; // dod = Date of Death (Julian)
+												?>", "<?php
+													echo ""; // occu = Occupation
+												?>", "<?php
+													echo htmlspecialchars($child->getBirthPlace(), ENT_QUOTES); //  birthpl = Child Place of Birt
+												?>", "<?php
+													if (isset($people["husb"])) {
+														echo htmlspecialchars($people["husb"]->getBirthPlace(), ENT_QUOTES); // fbirthpl = Child Father's Place of Birth
+													} else {
+														echo 'UNK, UNK, UNK, UNK'; // fbirthpl = Child Father's Place of Birth Not known
+													}
+												?>", "<?php
+													if (isset($people["wife"])) {
+														echo htmlspecialchars($people["wife"]->getBirthPlace(), ENT_QUOTES); // mbirthpl = Child Mother's Place of Birth
+													} else {
+														echo 'UNK, UNK, UNK, UNK'; // mbirthpl = Child Mother's Place of Birth Not known
+													}
+												?>", "<?php
+													if (isset($chBLDarray) && $child->getSex()=="F") {
+														$chBLDarray = implode("::", $chBLDarray);
+														echo $chBLDarray; // Array of Children (name, birthdate, deathdate)
+													}
+												?>");'>
 												<?php
-												echo "<a href=\"edit_interface.php?action=addnewnote_assisted&amp;noteid=newnote&amp;pid=".$child->getXref()."&amp;gedcom=".WT_GEDURL."\">";
-												echo $headImg2;
-												echo "</a>";
+													echo $child->getFullName(); // Full Name (Link)
 												?>
-											</font>
-										</td>
-										<td align="left" class="facts_value nowrap">
-											<font size=1>
+											</a>
 											<?php
-											if (($child->canDisplayDetails())) {
-												?>
-												<a href='javaScript:insertRowToTable("<?php
-														echo $child->getXref(); // pid = PID
-													?>", "<?php
-														echo addslashes($fulln); // nam = Full Name
-													?>", "<?php
-														if (isset($chfulmn)) {
-															echo addslashes($chfulmn); // mnam = Full Married Name
-														} else {
-															echo addslashes($fulln); // mnam = Full Name
-														}
-													?>", "<?php
-														if ($child->getXref()==$pid) {
-															echo "Head"; // label = Head
-														} else {
-															echo $child->getLabel(); // label = Relationship
-														}
-													?>", "<?php
-														echo $child->getSex(); // gend = Gender
-													?>", "<?php
-														if ($married>0) {
-															echo "M"; // cond = Condition (Married)
-														} else if ($married<0 || ($married=="0") ) {
-															echo "S"; // cond = Condition (Single)
-														}
-													?>", "<?php
-														if ($marrdate) {
-															echo ($marrdate->minJD()+$marrdate->maxJD())/2; // dom = Date of Marriage (Julian)
-														}
-													?>", "<?php
-														echo ($child->getBirthDate()->minJD()+$child->getBirthDate()->maxJD())/2; // dob = Date of Birth (Julian)
-													?>", "<?php
-														echo $censyear-$child->getbirthyear(); // age = Census Date minus YOB
-													?>", "<?php
-														echo ($child->getDeathDate()->minJD()+$child->getDeathDate()->maxJD())/2; // dod = Date of Death (Julian)
-													?>", "<?php
-														echo ""; // occu = Occupation
-													?>", "<?php
-														echo htmlspecialchars($child->getBirthPlace(), ENT_QUOTES); //  birthpl = Child Place of Birt
-													?>", "<?php
-														if (isset($people["husb"])) {
-															echo htmlspecialchars($people["husb"]->getBirthPlace(), ENT_QUOTES); // fbirthpl = Child Father's Place of Birth
-														} else {
-															echo 'UNK, UNK, UNK, UNK'; // fbirthpl = Child Father's Place of Birth Not known
-														}
-													?>", "<?php
-														if (isset($people["wife"])) {
-															echo htmlspecialchars($people["wife"]->getBirthPlace(), ENT_QUOTES); // mbirthpl = Child Mother's Place of Birth
-														} else {
-															echo 'UNK, UNK, UNK, UNK'; // mbirthpl = Child Mother's Place of Birth Not known
-														}
-													?>", "<?php
-														if (isset($chBLDarray) && $child->getSex()=="F") {
-															$chBLDarray = implode("::", $chBLDarray);
-															echo $chBLDarray; // Array of Children (name, birthdate, deathdate)
-														}
-													?>");'>
-													<?php
-														echo $child->getFullName(); // Full Name (Link)
-													?>
-												</a>
-												<?php
-											} else {
-													echo WT_I18N::translate('Private');
-											}
-											?>
-											</font>
-										</td>
-									</tr>
-									<?php
-								}
+										} else {
+												echo WT_I18N::translate('Private');
+										}
+										?>
+										</font>
+									</td>
+								</tr>
+								<?php
 							}
 							$elderdate = $child->getBirthDate(false);
 						}

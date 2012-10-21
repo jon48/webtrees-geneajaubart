@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14106 2012-07-14 07:30:01Z greg $
+// $Id: module.php 14293 2012-09-15 11:30:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -163,20 +163,12 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 			$date = $family->getMarriageDate();
 			$place = $family->getMarriagePlace();
 			$famid = $family->getXref();
-			if (!$date && ($famrec = find_updated_record($famid))!==null) {
-				$marrrec = get_sub_record(1, "1 MARR", $famrec);
-				if ($marrrec!=$family->getMarriageRecord()) {
-					$date = new WT_Date(get_gedcom_value("MARR:DATE", 1, $marrrec, '', false));
-					$place = get_gedcom_value("MARR:PLAC", 1, $marrrec, '', false);
-					$styleadd = "blue";
-				}
-			}
 			?>
 			<tr>
-				<td class="facts_label"><br>
+				<td class="facts_label">
+					&nbsp;
 				</td>
 				<td class="facts_value<?php echo $styleadd; ?>">
-					<?php //echo "<span class=\"details_label\">".WT_Gedcom_Tag::getLabel('NCHI').": </span>".$family->getNumberOfChildren()."<br>"; ?>
 					<?php $marr_type = strtoupper($family->getMarriageType());
 					if ($marr_type=='CIVIL' || $marr_type=='PARTNERS' || $marr_type=='RELIGIOUS' || $marr_type=='UNKNOWN') {
 						$marr_fact = WT_Gedcom_Tag::getLabel("MARR_".$marr_type);

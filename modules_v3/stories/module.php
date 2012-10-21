@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14165 2012-08-12 04:02:19Z nigel $
+// $Id: module.php 14366 2012-09-27 23:28:52Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -186,7 +186,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 					WT_DB::prepare(
 						"INSERT INTO `##block` (gedcom_id, xref, module_name, block_order) VALUES (?, ?, ?, ?)"
 					)->execute(array(
-						safe_POST('gedcom_id', array_keys(get_all_gedcoms())),
+						safe_POST('gedcom_id'),
 						safe_POST('xref'),
 						$this->getName(),
 						0
@@ -351,19 +351,15 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			foreach ($stories as $story) {
 				$story_title = get_block_setting($story->block_id, 'title');
 				$indi=WT_Person::getInstance($story->xref);
-				if ($indi) {
-					$title="<a href=\"".$indi->getHtmlUrl()."#stories\">".$story_title."</a>";
-					$name="<a href=\"".$indi->getHtmlUrl()."#stories\">".$indi->getFullName()."</a>";
-				} else {
-					$title=$story_title;
-					$name=$story->xref;
-				}
-				echo '<tr>
-					<td>', $title, '</td>
-					<td>', $name, '</td>
-					<td><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_edit&amp;block_id=', $story->block_id, '"><div class="icon-edit">&nbsp;</div></a></td>
-					<td><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_delete&amp;block_id=', $story->block_id, '" onclick="return confirm(\'', WT_I18N::translate('Are you sure you want to delete this story?'), '\');"><div class="icon-delete">&nbsp;</div></a></td>
-					</tr>';
+					if ($indi) {
+						echo '<tr><td><a href="', $indi->getHtmlUrl().'#stories">', $story_title, '<a></td>
+							  <td><a href="', $indi->getHtmlUrl().'#stories">'.$indi->getFullName(), '</a></td>';
+					} else {
+						echo '<tr><td>', $story_title, '</td><td class="error">', $story->xref, '</td>';
+					}
+					echo '<td><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_edit&amp;block_id=', $story->block_id, '"><div class="icon-edit">&nbsp;</div></a></td>
+						 <td><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_delete&amp;block_id=', $story->block_id, '" onclick="return confirm(\'', WT_I18N::translate('Are you sure you want to delete this story?'), '\');"><div class="icon-delete">&nbsp;</div></a></td>
+						 </tr>';
 			}
 			echo '</tbody></table>';
 		} else {
@@ -418,17 +414,11 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				$indi=WT_Person::getInstance($story->xref);
 				$story_title = get_block_setting($story->block_id, 'title');
 				if ($indi) {
-					$title="<a href=\"".$indi->getHtmlUrl()."#stories\">".$story_title."</a>";
-					$name="<a href=\"".$indi->getHtmlUrl()."#stories\">".$indi->getFullName()."</a>";
+					if ($indi->canDisplayDetails()) {
+						echo '<tr><td><a href="'.$indi->getHtmlUrl().'#stories">'.$story_title.'</a></td><td><a href="'.$indi->getHtmlUrl().'#stories">'.$indi->getFullName().'</a></td></tr>';
+					}
 				} else {
-					$title=$story_title;
-					$name=$story->xref;
-				}
-				if ($indi->canDisplayDetails()) {
-					echo '<tr>
-						<td>', $title, '</td>
-						<td>', $name, '</td>
-						</tr>';
+					echo '<tr><td>', $story_title, '</td><td class="error">', $story->xref, '</td></tr>';
 				}
 			}
 			echo '</tbody></table>';

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_users.php 14111 2012-07-18 12:25:09Z greg $
+// $Id: admin_users.php 14358 2012-09-25 23:41:45Z nigel $
 
 define('WT_SCRIPT_NAME', 'admin_users.php');
 require './includes/session.php';
@@ -69,11 +69,6 @@ $visibleonline     =safe_POST_bool('visibleonline');
 $editaccount       =safe_POST_bool('editaccount');
 $verified          =safe_POST_bool('verified');
 $verified_by_admin =safe_POST_bool('verified_by_admin');
-
-// Load all available gedcoms
-$all_gedcoms = get_all_gedcoms();
-//-- sorting by gedcom filename
-asort($all_gedcoms);
 
 switch ($action) {
 case 'deleteuser':
@@ -166,7 +161,7 @@ case 'loadrows':
 		}
 		// $aData[9] is the sortable last-login timestamp
 		if ($aData[9]) {
-			$aData[10]=format_timestamp($aData[9]).'<br>'.WT_I18N::time_ago(time() - $aData[9]);
+			$aData[10]=format_timestamp($aData[9]).'<br>'.WT_I18N::time_ago(WT_TIMESTAMP - $aData[9]);
 		} else {
 			$aData[10]=WT_I18N::translate('Never');
 		}
@@ -243,21 +238,21 @@ case 'load1row':
 		'<th>', WT_I18N::translate('Restrict to immediate family'), help_link('RELATIONSHIP_PATH_LENGTH'), '</th>',
 		'</tr>';
 
-	foreach ($all_gedcoms as $ged_id=>$ged_name) {
+	foreach (WT_Tree::getAll() as $tree) {
 		echo
 			'<tr><td>',
-			WT_I18N::translate('%s', get_gedcom_setting($ged_id, 'title')), 
+			$tree->tree_title_html,
 			//Pedigree root person
 			'</td><td>',
 			// TODO: autocomplete/find/etc. for this field
-			edit_field_inline('user_gedcom_setting-'.$user_id.'-'.$ged_id.'-rootid', get_user_gedcom_setting($user_id, $ged_id, 'rootid')),
+			edit_field_inline('user_gedcom_setting-'.$user_id.'-'.$tree->tree_id.'-rootid', $tree->userPreference($user_id, 'rootid')),
 			'</td><td>',
 			// TODO: autocomplete/find/etc. for this field
-			edit_field_inline('user_gedcom_setting-'.$user_id.'-'.$ged_id.'-gedcomid', get_user_gedcom_setting($user_id, $ged_id, 'gedcomid')),
+			edit_field_inline('user_gedcom_setting-'.$user_id.'-'.$tree->tree_id.'-gedcomid', $tree->userPreference($user_id, 'gedcomid')),
 			'</td><td>',
-			select_edit_control_inline('user_gedcom_setting-'.$user_id.'-'.$ged_id.'-canedit', $ALL_EDIT_OPTIONS, null, get_user_gedcom_setting($user_id, $ged_id, 'canedit', 'none')),
+			select_edit_control_inline('user_gedcom_setting-'.$user_id.'-'.$tree->tree_id.'-canedit', $ALL_EDIT_OPTIONS, null, $tree->userPreference($user_id, 'canedit')),
 			'</td><td>',
-			select_edit_control_inline('user_gedcom_setting-'.$user_id.'-'.$ged_id.'-RELATIONSHIP_PATH_LENGTH', array(0=>WT_I18N::translate('no'), 1=>1, 2=>2, 3=>3, 4=>4, 5=>5, 6=>6, 7=>7, 8=>8, 9=>9, 10=>10), null, get_user_gedcom_setting($user_id, $ged_id, 'RELATIONSHIP_PATH_LENGTH', '0')),
+			select_edit_control_inline('user_gedcom_setting-'.$user_id.'-'.$tree->tree_id.'-RELATIONSHIP_PATH_LENGTH', array(0=>WT_I18N::translate('no'), 1=>1, 2=>2, 3=>3, 4=>4, 5=>5, 6=>6, 7=>7, 8=>8, 9=>9, 10=>10), null, $tree->userPreference($user_id, 'RELATIONSHIP_PATH_LENGTH')),
 			'</td></tr>';
 	}
 	echo '</table>';
@@ -295,15 +290,15 @@ case 'createuser':
 		set_user_setting($user_id, 'editaccount',          $editaccount);
 		set_user_setting($user_id, 'verified',             $verified);
 		set_user_setting($user_id, 'verified_by_admin',    $verified_by_admin);
-		foreach ($all_gedcoms as $ged_id=>$ged_name) {
-			set_user_gedcom_setting($user_id, $ged_id, 'gedcomid', safe_POST_xref('gedcomid'.$ged_id));
-			set_user_gedcom_setting($user_id, $ged_id, 'rootid',   safe_POST_xref('rootid'.$ged_id));
-			set_user_gedcom_setting($user_id, $ged_id, 'canedit',  safe_POST('canedit'.$ged_id, array_keys($ALL_EDIT_OPTIONS)));
-			if (safe_POST_xref('gedcomid'.$ged_id)) {
-				set_user_gedcom_setting($user_id, $ged_id, 'RELATIONSHIP_PATH_LENGTH', safe_POST_integer('RELATIONSHIP_PATH_LENGTH'.$ged_id, 0, 10, 0));
+		foreach (WT_Tree::getAll() as $tree) {
+			$tree->userPreference($user_id, 'gedcomid', safe_POST_xref('gedcomid'.$tree->tree_id));
+			$tree->userPreference($user_id, 'rootid',   safe_POST_xref('rootid'.$tree->tree_id));
+			$tree->userPreference($user_id, 'canedit',  safe_POST('canedit'.$tree->tree_id, array_keys($ALL_EDIT_OPTIONS)));
+			if (safe_POST_xref('gedcomid'.$tree->tree_id)) {
+				$tree->userPreference($user_id, 'RELATIONSHIP_PATH_LENGTH', safe_POST_integer('RELATIONSHIP_PATH_LENGTH'.$tree->tree_id, 0, 10, 0));
 			} else {
 				// Do not allow a path length to be set if the individual ID is not
-				set_user_gedcom_setting($user_id, $ged_id, 'RELATIONSHIP_PATH_LENGTH', null);
+				$tree->userPreference($user_id, 'RELATIONSHIP_PATH_LENGTH', null);
 			}
 		}
 		AddToLog("User ->{$username}<- created", 'auth');
@@ -314,7 +309,7 @@ case 'createuser':
 // Pass 2 - display page
 switch ($action) {
 case 'createform':
-	if (get_gedcom_count()==1) { //Removed becasue it doesn't work here for multiple GEDCOMs. Can be reinstated when fixed (https://bugs.launchpad.net/webtrees/+bug/613235)
+	if (count(WT_Tree::getAll())==1) { //Removed becasue it doesn't work here for multiple GEDCOMs. Can be reinstated when fixed (https://bugs.launchpad.net/webtrees/+bug/613235)
 		$controller->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 	}
 
@@ -370,107 +365,96 @@ case 'createform':
 		});
 	');
 
-	?>
-	<form name="newform" method="post" action="admin_users.php?action=createuser" onsubmit="return checkform(this);">
-		<!--table-->
+	echo '
+	<form name="newform" method="post" action="admin_users.php?action=createuser" onsubmit="return checkform(this);" autocomplete="off">
 		<table id="adduser">
 			<tr>
-				<td><?php echo WT_I18N::translate('Username'), help_link('username'); ?></td>
-				<td colspan="3"><input type="text" name="username" value="<?php echo htmlspecialchars($username); ?>" autofocus></td>
+				<td>', WT_I18N::translate('Real name'), help_link('real_name'), '</td>
+				<td><input type="text" name="realname" style="width:95%;" required maxlength="64" value="', htmlspecialchars($realname), '" autofocus></td>
+				<td>', WT_I18N::translate('Administrator'), help_link('role'), '</td>
+				<td><input type="checkbox" name="canadmin" value="1"></td>
 			</tr>
 			<tr>
-				<td><?php echo WT_I18N::translate('Real name'), help_link('real_name'); ?></td>
-				<td colspan="3"><input type="text" name="realname" size="40" value="<?php echo htmlspecialchars($realname); ?>"></td>
-			</tr>
-			<tr>
-				<td><?php echo WT_I18N::translate('Password'), help_link('password'); ?></td>
-				<td><input type="password" name="pass1" value="<?php echo htmlspecialchars($pass1); ?>"></td>
-				<td><?php echo WT_I18N::translate('Confirm password'), help_link('password_confirm'); ?></td>
-				<td><input type="password" name="pass2" value="<?php echo htmlspecialchars($pass2); ?>"></td>
-			</tr>
-			<tr>
-				<td><?php echo WT_I18N::translate('Email address'), help_link('email'); ?></td>
-				<td><input type="email" name="emailaddress" size="40" value="<?php echo htmlspecialchars($emailaddress); ?>"></td>
-				<td><?php echo WT_I18N::translate('Preferred contact method'); ?></td>
-				<td>
-					<?php
-						echo edit_field_contact('new_contact_method', $new_contact_method);
-					?>
-				</td>
-			</tr>
-			<tr>
-				<td><?php echo WT_I18N::translate('Email verified'), help_link('useradmin_verification'); ?></td>
-				<td><input type="checkbox" name="verified" value="1" checked="checked"></td>
-				<td><?php echo WT_I18N::translate('Approved by administrator'), help_link('useradmin_verification'); ?></td>
+				<td>', WT_I18N::translate('Username'), help_link('username'), '</td>
+				<td><input type="text" name="username" style="width:95%;" required maxlength="32" value="', htmlspecialchars($username), '"></td>
+				<td>', WT_I18N::translate('Approved by administrator'), help_link('useradmin_verification'), '</td>
 				<td><input type="checkbox" name="verified_by_admin" value="1" checked="checked"></td>
 			</tr>
 			<tr>
-				<td><?php echo WT_I18N::translate('Automatically approve changes made by this user'), help_link('useradmin_auto_accept'); ?></td>
-				<td><input type="checkbox" name="new_auto_accept" value="1"></td>
-				<td><?php echo WT_I18N::translate('Allow this user to edit his account information'), help_link('useradmin_editaccount'); ?></td>
-				<td><input type="checkbox" name="editaccount" value="1" checked="checked"></td>
+				<td>', WT_I18N::translate('Email address'), help_link('email'), '</td>
+				<td><input type="email" name="emailaddress" style="width:95%;" required maxlength="64" value="', htmlspecialchars($emailaddress), '"></td>
+				<td>', WT_I18N::translate('Email verified'), help_link('useradmin_verification'), '</td>
+				<td><input type="checkbox" name="verified" value="1" checked="checked"></td>
 			</tr>
 			<tr>
-				<td><?php echo WT_I18N::translate('Administrator'), help_link('role'); ?></td>
-				<td><input type="checkbox" name="canadmin" value="1"></td>
-				<td><?php echo WT_I18N::translate('Visible to other users when online'), help_link('useradmin_visibleonline'); ?></td>
+				<td>', WT_I18N::translate('Password'), help_link('password'), '</td>
+				<td><input type="password" name="pass1" style="width:95%;" value="', htmlspecialchars($pass1), '" required placeholder="', WT_I18N::translate('At least 6 characters'), '" pattern="', WT_REGEX_PASSWORD, '" onchange="form.user_password02.pattern = regex_quote(this.value);"></td>
+				<td>', WT_I18N::translate('Automatically approve changes made by this user'), help_link('useradmin_auto_accept'), '</td>
+				<td><input type="checkbox" name="new_auto_accept" value="1"></td>
+			</tr>
+				<td>', WT_I18N::translate('Confirm password'), help_link('password_confirm'), '</td>
+				<td><input type="password" name="pass2" style="width:95%;" value="', htmlspecialchars($pass2), '" required placeholder="', WT_I18N::translate('Same password as above'), '" pattern="', WT_REGEX_PASSWORD, '"></td>
+				<td>', WT_I18N::translate('Allow this user to edit his account information'), help_link('useradmin_editaccount'), '</td>
+				<td><input type="checkbox" name="editaccount" value="1" checked="checked"></td>
+			<tr>
+				<td>', WT_I18N::translate('Preferred contact method'), '</td>
+				<td>';
+					echo edit_field_contact('new_contact_method', $new_contact_method);
+				echo '</td>
+				<td>', WT_I18N::translate('Visible to other users when online'), help_link('useradmin_visibleonline'), '</td>
 				<td><input type="checkbox" name="visibleonline" value="1" checked="checked"></td>
 			</tr>
-			<?php if (WT_USER_IS_ADMIN) { ?>
 			<tr>
-				<td><?php echo WT_I18N::translate('Admin comments on user'); ?></td>
-				<td colspan="3"><textarea cols="80" rows="5" name="new_comment" value="<?php echo htmlspecialchars($new_comment); ?>"></textarea></td>
 			</tr>
-			<?php } ?>
 			<tr>
-				<td><?php echo WT_I18N::translate('Language'); ?></td>
-				<td colspan="3"><?php echo edit_field_language('user_language', $user_language); ?></td>
-			</tr>
-			<?php if (get_site_setting('ALLOW_USER_THEMES')) { ?>
-				<tr>
-					<td><?php echo WT_I18N::translate('Theme'), help_link('THEME'); ?></td>
-					<td colspan="3">
+				<td>', WT_I18N::translate('Language'), '</td>
+				<td>', edit_field_language('user_language', $user_language), '</td>';
+				if (WT_Site::preference('ALLOW_USER_THEMES')) {
+					echo '<td>', WT_I18N::translate('Theme'), help_link('THEME'), '</td>
+					<td>
 						<select name="new_user_theme">
-						<option value="" selected="selected"><?php echo htmlspecialchars(WT_I18N::translate('<default theme>')); ?></option>
-						<?php
+						<option value="" selected="selected">', htmlspecialchars(WT_I18N::translate('<default theme>')), '</option>';
 							foreach (get_theme_names() as $themename=>$themedir) {
 								echo '<option value="', $themedir, '">', $themename, '</option>';
 							}
-						?>
-						</select>
-					</td>
-				</tr>
-			<?php } ?>
-			<!-- access and relationship path details -->
-			<tr>
-				<th colspan="4"><?php print WT_I18N::translate('Family tree access and settings'); ?></th>
+						echo '</select>
+					</td>';
+				}
+			echo '</tr>';
+			if (WT_USER_IS_ADMIN) {
+			echo '<tr>
+				<td>', WT_I18N::translate('Admin comments on user'), '</td>
+				<td colspan="3"><textarea style="width:95%;" rows="5" name="new_comment" value="', htmlspecialchars($new_comment), '"></textarea></td>
+			</tr>';
+			}
+			echo '<tr>
+				<th colspan="4">', WT_I18N::translate('Family tree access and settings'), '</th>
 			</tr>
 			<tr>
 				<td colspan="4">
 					<table id="adduser2">
 						<tr>
-							<th><?php echo WT_I18N::translate('Family tree'); ?></th>
-							<th><?php echo WT_I18N::translate('Default individual'), help_link('default_individual'); ?></th>
-							<th><?php echo WT_I18N::translate('Individual record'), help_link('useradmin_gedcomid'); ?></th>
-							<th><?php echo WT_I18N::translate('Role'), help_link('role'); ?></th>
-							<th><?php echo WT_I18N::translate('Restrict to immediate family'), help_link('RELATIONSHIP_PATH_LENGTH'); ?></th>
-						</tr>
-						<?php
-							foreach ($all_gedcoms as $ged_id=>$ged_name) {
+							<th>', WT_I18N::translate('Family tree'), '</th>
+							<th>', WT_I18N::translate('Default individual'), help_link('default_individual'), '</th>
+							<th>', WT_I18N::translate('Individual record'), help_link('useradmin_gedcomid'), '</th>
+							<th>', WT_I18N::translate('Role'), help_link('role'), '</th>
+							<th>', WT_I18N::translate('Restrict to immediate family'), help_link('RELATIONSHIP_PATH_LENGTH'), '</th>
+						</tr>';
+							foreach (WT_Tree::getAll() as $tree) {
 								echo '<tr>',
-									'<td>', WT_I18N::translate('%s', get_gedcom_setting($ged_id, 'title')), '</td>',
+									'<td>', $tree->tree_title_html, '</td>',
 									//Pedigree root person
 									'<td>';
-										$varname='rootid'.$ged_id;
-										echo '<input type="text" size="12" name="', $varname, '" id="', $varname, '" value="', htmlspecialchars(safe_POST_xref('gedcomid'.$ged_id)), '"> ', print_findindi_link($varname),
+										$varname='rootid'.$tree->tree_id;
+										echo '<input type="text" size="12" name="', $varname, '" id="', $varname, '" value="', htmlspecialchars(safe_POST_xref('gedcomid'.$tree->tree_id)), '"> ', print_findindi_link($varname),
 									'</td>',						
 									// GEDCOM INDI Record ID
 									'<td>';
-										$varname='gedcomid'.$ged_id;
-										echo '<input type="text" size="12" name="',$varname, '" id="',$varname, '" value="', htmlspecialchars(safe_POST_xref('rootid'.$ged_id)), '"> ', print_findindi_link($varname),
+										$varname='gedcomid'.$tree->tree_id;
+										echo '<input type="text" size="12" name="',$varname, '" id="',$varname, '" value="', htmlspecialchars(safe_POST_xref('rootid'.$tree->tree_id)), '"> ', print_findindi_link($varname),
 									'</td>',
 									'<td>';
-										$varname='canedit'.$ged_id;
+										$varname='canedit'.$tree->tree_id;
 										echo '<select name="', $varname, '">';
 										foreach ($ALL_EDIT_OPTIONS as $EDIT_OPTION=>$desc) {
 											echo '<option value="', $EDIT_OPTION, '" ';
@@ -483,7 +467,7 @@ case 'createform':
 									'</td>',
 									//Relationship path
 									'<td>';
-										$varname = 'RELATIONSHIP_PATH_LENGTH'.$ged_id;
+										$varname = 'RELATIONSHIP_PATH_LENGTH'.$tree->tree_id;
 										echo '<select name="', $varname, '" id="', $varname, '" class="relpath">';
 											for ($n=0; $n<=10; ++$n) {
 												echo
@@ -495,17 +479,15 @@ case 'createform':
 									'</td>',
 								'</tr>';
 							}
-						?>
-					</table>
+					echo '</table>
 				</td>
 			</tr>
 				<td colspan="4">
-					<input type="submit" value="<?php echo WT_I18N::translate('Create User'); ?>">
+					<input type="submit" value="', WT_I18N::translate('Create User'), '">
 				</td>
 			</tr>	
 		</table>
-	</form>
-	<?php
+	</form>';
 	break;
 case 'cleanup':
 	?>
@@ -582,37 +564,6 @@ case 'cleanup2':
 			delete_user($user_id);
 			AddToLog("deleted user ->{$user_name}<-", 'auth');
 			echo WT_I18N::translate('Deleted user: '); echo $user_name, "<br>";
-		} else {
-			$tempArray = unserialize(get_user_setting($user_id, 'canedit'));
-			if (is_array($tempArray)) {
-				foreach ($tempArray as $gedid=>$data) {
-					$var = "delg_".str_replace(array(".", "-", " "), "_", $gedid);
-					if (safe_POST($var)=='1' && get_user_gedcom_setting($user_id, $gedid, 'canedit')) {
-						set_user_gedcom_setting($user_id, $gedid, 'canedit', null);
-						echo $gedid, ":&nbsp;&nbsp;", WT_I18N::translate('Unset GEDCOM rights for '), $user_name, "<br>";
-					}
-				}
-			}
-			$tempArray = unserialize(get_user_setting($user_id, 'rootid'));
-			if (is_array($tempArray)) {
-				foreach ($tempArray as $gedid=>$data) {
-					$var = "delg_".str_replace(array(".", "-", " "), "_", $gedid);
-					if (safe_POST($var)=='1' && get_user_gedcom_setting($user_id, $gedid, 'rootid')) {
-						set_user_gedcom_setting($user_id, $gedid, 'rootid', null);
-						echo $gedid, ":&nbsp;&nbsp;", WT_I18N::translate('Unset root ID for '), $user_name, "<br>";
-					}
-				}
-			}
-			$tempArray = unserialize(get_user_setting($user_id, 'gedcomid'));
-			if (is_array($tempArray)) {
-				foreach ($tempArray as $gedid=>$data) {
-					$var = "delg_".str_replace(array(".", "-", " "), "_", $gedid);
-					if (safe_POST($var)=='1' && get_user_gedcom_setting($user_id, $gedid, 'gedcomid')) {
-						set_user_gedcom_setting($user_id, $gedid, 'gedcomid', null);
-						echo $gedid, ":&nbsp;&nbsp;", WT_I18N::translate('Unset GEDCOM ID for '), $user_name, "<br>";
-					}
-				}
-			}
 		}
 	}
 	break;

@@ -36,7 +36,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: action.php 13825 2012-04-17 20:24:28Z greg $
+// $Id: action.php 14276 2012-09-14 15:39:40Z greg $
 
 define('WT_SCRIPT_NAME', 'action.php');
 require './includes/session.php';
@@ -135,7 +135,7 @@ case 'reject-changes':
 case 'theme':
 	// Change the current theme
 	$theme_dir=safe_POST('theme');
-	if (get_site_setting('ALLOW_USER_THEMES') && in_array($theme_dir, get_theme_names())) {
+	if (WT_Site::preference('ALLOW_USER_THEMES') && in_array($theme_dir, get_theme_names())) {
 		$WT_SESSION->theme_dir=$theme_dir;
 		if (WT_USER_ID) {
 			// Remember our selection

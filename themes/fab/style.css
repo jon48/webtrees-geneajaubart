@@ -21,7 +21,7 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 *
-* $Id: style.css 14159 2012-08-11 01:52:36Z nigel $
+* $Id: style.css 14402 2012-10-08 05:09:53Z nigel $
 */
 
 /* Add a permanent scrollbar, to prevent "flickering" when hover effects lengthen page */
@@ -86,12 +86,6 @@ a:hover, a:active {
 	color:White !important;
 	background-color:DarkSlateGray;
 }
-a.help, span.help {
-	font-weight:bold;
-	text-shadow:Black 1px 1px 1px;
-	color:Yellow !important;
-	cursor:help;
-}
 
 body {
 	color:DimGray;
@@ -103,6 +97,10 @@ body {
 img {
 	border:0;
 }
+
+input:required:valid, textarea:required:valid{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAONJREFUeNpi/P//PwMlgImBQjDwBrCgCzDOF2Zg+Adk/AOGDRvQfHZGoDWMxgyMDMb/Q1/NIt0F/xk8gIbNZPj7P41YL4AUGsM1//rfkuyeYMzw8z9xXgBqgNm0nuHnv0D/IH/juavmngV6oYY4F3z7y2DqY2oMpANB9MYl684yfP9Xw3Dzzw7sXgQmJGTM0MbjwdDKc0b2vt5/EM2QwunBoMyCVS1YPYYAMOwZ7FmiGLLYzjBYsSQD+QpALAjErNgMYERPyoyMjMxAih+IOYD4LxD/hOJfQLV/MaJ9NC8wAAQYAPbPfH2KJKx/AAAAAElFTkSuQmCC);background-position:right top; background-repeat:no-repeat;}
+input:required:invalid, textarea:required:invalid{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAMpJREFUeNpi/P//PwMlgImBQjAMDGBBF1jFyOgBpFqAuOYPA8MOoAI4P+z//x0YJoBiARkvYWA486+k5D+IBuJqZD66WnAMogvMA9o4F6j4R3Lyf2R6IQODMVEGTAW6CoirgfjMB2/v/yB6CgNDYQ8W14IwRiB+A7rgOwNDYLChofGcrVvPgugfDAzR/yFhwUAwDJqBNj6Ulf0PooEhV4jMx+YCRvSknAeMBWDotwgwMKRzMTCcfQW0GcQHxkbNJCyxwDiaFxgAAgwAYy67YIOQ//cAAAAASUVORK5CYII=);background-position:right top; background-repeat:no-repeat;}
+html[dir="rtl"] input:required:valid, html[dir="rtl"] textarea:required:valid, html[dir="rtl"] input:required:invalid, html[dir="rtl"] textarea:required:invalid {background-position:left top;}
 
 /* Various text styles */
 .warning, .error, .largeError {
@@ -231,7 +229,7 @@ html[dir='rtl'] .makeMenu li ul li {
 
 .makeMenu ul li a {
 	background-color:#EEE;
-	padding:0 5px 0 2px;
+	padding:0 5px 5px 2px;
 	display:block;
 }
 
@@ -239,6 +237,8 @@ html[dir='rtl'] .makeMenu li ul li {
 	background-color:DarkSlateGray;
 	color:#000;
 }
+
+.lang-active, .theme-active{font-weight:900;}
 
 #menu-language li {text-align:left;} /* The language menu is always LTR, even on RTL pages */
 #menu-theme    li {text-align:left;} /* The theme menu is always LTR, even on RTL pages */
@@ -1243,24 +1243,18 @@ html[dir='rtl'].field  .editlink, html[dir='rtl'].field  .deletelink  {float:lef
 #indi_header h3 a {display:inline;}
 #indi_header a {color:#333377;font-size:0.75em;font-weight:normal;}
 #indi_header a:hover {color:red;}
-
 #main_name {color:#000666;float:left;font-size:2em;margin:10px;font-weight:bold;}
-
 #indi_mainimage {float:right;}
 #indi_mainimage a img {float:right;padding:0;}
-
-#indi_name_details {margin:0;overflow:hidden !important;padding:5px;}
-#indi_name_details .warning {color:red;font-size:1em;}
-#indi_name_details dt:after {content:":";}
-#name1 {}
-
+.indi_name_details {margin:0;overflow:hidden !important;padding:5px;}
+#indi_header a.warning {color:red;font-size:1em;}
+#indi_header a:hover{background-color: DarkSlateGray!important;}
+.indi_name_details dt:after {content:":";}
 #indi_note {margin:0 0 5px 0;}
 #indi_note .fact_NOTE {float:left;margin:0 10px 0 0;}
 #indi_note .note_details {font-size:100%;}
 #indi_note .fact_SOUR a {font-size:100%;}
-
 #header_accordion1 {float:left;}
-
 .indi_table {clear:left;}
 #sex {float:right;}
 #dates {color:#000666;float:right;}
@@ -1302,7 +1296,7 @@ html[dir='rtl']  dd .editlink, html[dir='rtl']  dd .deletelink  {float:left;}
 .ui-tabs .ui-tabs-panel {padding:1em 0;}
 .ui-state-active, .ui-widget-content .ui-state-active {border:1px solid darkGray;background:#ccc;font-weight:normal;color:black;outline:none;}
 .ui-accordion .ui-accordion-header .ui-icon {position:absolute;left:0.5em;top:50%;margin-top:-8px;}
-.ui-accordion .ui-accordion-content {padding:1em .05em;border-top:0;margin-top:-2px;position:relative;top:1px;margin-bottom:2px;overflow:visible;display:none;}
+.ui-accordion .ui-accordion-content {padding:1em .05em;border-top:0;margin-top:1px;position:relative;top:1px;margin-bottom:2px;overflow:visible;display:none;}
 .ui-accordion .ui-accordion-content-active {display:block;}
 .ui-accordion .ui-accordion-header a {padding:.5em;}
 .ui-helper-reset {line-height:1.6;}
@@ -1522,7 +1516,7 @@ a.icon-darrow:hover{width:20px;height:20px;background-image:url(images/darrow2.p
 .icon-email{width:16px;height:16px;background-image:url(images/email.png);}
 .icon-fam-list{width:24px;height:24px;background-image:url(images/sfamily.png);}
 .icon-googlemaps{width:16px;height:16px;background-image:url(images/googlemaps.png);}
-.icon-help{width:15px;height:15px;background-image:url(images/help.png);}
+.icon-help{cursor:help;width:15px;height:15px;background-image:url(images/help.png);}
 .icon-indis{width:24px;height:24px;background-image:url(images/indis.png);}
 .icon-indi-list{width:50px;height:50px;background-image:url(images/indis.png);}
 .icon-larrow{width:20px;height:20px;background-image:url(images/larrow.png);}
@@ -1600,3 +1594,42 @@ a.icon-uarrow:hover{width:20px;height:20px;background-image:url(images/uarrow2.p
 /* Specific MIME types */
 .icon-mime-application-pdf{width:50px;height:32px;background-image:url(images/media/pdf.png);}
 .icon-mime-text-html{width:50px;height:32px;background-image:url(images/media/html.png);}
+
+/* Edit interface pop-ups*/
+#edit_interface-page h4{color:#555;margin:5px;}
+#edit_interface-page .optionbox span {margin:0 5px;}
+#edit_interface-page #LATI,#edit_interface-page #LONG,#edit_interface-page #SPFX,#edit_interface-page #NSFX,#edit_interface-page #NPFX {line-height:18px;margin:0 5px;width:88px;}
+#edit_interface-page #GIVN,#edit_interface-page #SURN,#edit_interface-page #_MARNM{line-height:18px;margin:0 5px;width:180px;}
+#edit_interface-page input[type="text"], #edit_interface-page #NAME_display{line-height:18px;margin:0 5px;vertical-align:top;width:240px;}
+#edit_interface-page input[type="text"][id*="PAGE"], #edit_interface-page input[type="text"][id*="_UID"]{width:350px;}
+#edit_interface-page input[type="text"][id*="SOUR"], #edit_interface-page input[type="text"][id*="REPO"],#edit_interface-page input[type="text"][id*="OBJE"],#edit_interface-page input[type="text"][id*="FAMC"],#edit_interface-page input[type="text"][id*="ASSO"],#edit_interface-page input[type="text"][id^="AGE"],#edit_interface-page input[type="text"][id*="SHARED_NOTE"]{width:70px;}
+#edit_interface-page input[type="text"][id$="DATE"] {width:160px;}
+#edit_interface-page input[type="text"][id^="TIME"] {width:100px;}
+#edit_interface-page input[id*="TEXT"]{height:140px;width:440px;} 
+#edit_interface-page textarea {margin:0 5px;width:440px;}
+#edit_interface-page textarea[id*="NOTE"]{height:240px;}
+#edit_interface-page textarea[id*="TEXT"], #edit_interface-page textarea[id*="PUBL"]{height:140px;}
+#edit_interface-page textarea[id^="newgedrec"]{line-height:18px;width:605px;}
+#edit_interface-page textarea#newgedrec1 {height:20px;}
+#edit_interface-page textarea#newgedrec2 {height:364px;}
+#edit_interface-page textarea[id*="ADDR"], #edit_interface-page input[id*="ADDR"]{height:80px;width:300px;}
+#edit_interface-page #changefam {padding:5px;}
+#edit_interface-page #changefam table{margin:10px auto;min-width:400px;max-width:650px;}
+#edit_interface-page #changefam span{margin:0;}
+#edit_interface-page #changefam td{padding:5px; white-space:normal;}
+#edit_interface-page #changefam td.child{text-align:center;}
+#edit_interface-page #changefam #save-cancel {margin:0 auto 50px auto;width:400px;}
+#edit_interface-page #changefam #save-cancel .save {float:left;}
+#edit_interface-page #changefam #save-cancel .cancel {float:right;}
+html[dir='rtl'] #edit_interface-page #changefam #save-cancel .save {float:right;}
+html[dir='rtl'] #edit_interface-page #changefam #save-cancel .cancel {float:left;}
+
+/* Addmedia pop-ups*/
+#addmedia-page input[type="text"]{line-height:18px;margin:0 5px;width:180px;}
+#addmedia-page .optionbox select {margin:0 5px;}
+#addmedia-page .optionbox p.sub{font-size:11px;margin:0 5px;}
+#addmedia-page input[type="text"][id*="PAGE"], #addmedia-page input[type="text"][id*="_UID"]{width:350px;}
+#addmedia-page input[type="text"][id*="SOUR"], #addmedia-page input[type="text"][id*="REPO"],#addmedia-page input[type="text"][id*="OBJE"],#addmedia-page input[type="text"][id*="FAMC"],#addmedia-page input[type="text"][id*="ASSO"],#addmedia-page input[type="text"][id^="AGE"],#addmedia-page input[type="text"][id*="SHARED_NOTE"]{width:70px;}
+#addmedia-page input[id*="TEXT"]{height:140px;width:440px;} 
+#addmedia-page textarea {margin:0 5px;width:440px;}
+#addmedia-page textarea[id*="NOTE"]{height:240px;}

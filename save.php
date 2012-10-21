@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: save.php 14108 2012-07-18 08:05:27Z greg $
+// $Id: save.php 14294 2012-09-15 11:36:34Z greg $
 
 define('WT_SCRIPT_NAME', 'save.php');
 require './includes/session.php';
@@ -120,7 +120,7 @@ case 'site_setting':
 		// The password will be displayed as "click to edit" on screen.
 		// Accept the update, but pretend to fail.  This will leave the "click to edit" on screen
 		if ($value) {
-			set_site_setting($id1, $value);
+			WT_Site::preference($id1, $value);
 		}
 		fail();
 	default:
@@ -129,7 +129,7 @@ case 'site_setting':
 	}
 
 	// Authorised and valid - make update
-	set_site_setting($id1, $value);
+	WT_Site::preference($id1, $value);
 	ok();
 
 case 'site_access_rule':
@@ -224,7 +224,7 @@ case 'user_gedcom_setting':
 	}
 
 	// Authorised and valid - make update
-	set_user_gedcom_setting($id1, $id2, $id3, $value);
+	WT_Tree::get($id2)->userPreference($id1, $id3, $value);
 	ok();
 
 case 'user_setting':

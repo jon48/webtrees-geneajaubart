@@ -23,7 +23,7 @@
  * along with this program;  if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * @version $Id: album_page.css 13890 2012-05-01 19:56:32Z nigel $
+ * @version $Id: album_page.css 14408 2012-10-09 22:36:21Z greg $
  */
  
 /* lightbox_plus.css version 3.00  29/06/2007  */
@@ -40,7 +40,7 @@
 li.li_norm{border:2px solid transparent; height:112px;}
 li.li_new{border:2px solid #00f;}
 li.li_old{border:2px solid red;}
-#thumblist_1 a img,#thumblist_2 a img,#thumblist_3 a img,#thumblist_4 a img,#thumblist_5 a img,#thumblist_1a a img,#thumblist_2a a img,#thumblist_3a a img,#thumblist_4a a img,#thumblist_5a a img{border:1px; border-style:none; padding:1px;}
+#thumblist_1 a img,#thumblist_2 a img,#thumblist_3 a img,#thumblist_4 a img,#thumblist_5 a img,#thumblist_1a a img,#thumblist_2a a img,#thumblist_3a a img,#thumblist_4a a img,#thumblist_5a a img{border:1px; border-style:none; padding:1px;max-height:78px;max-width:100px;height:auto;width:auto;}
 #thumblist_1 a:hover img,#thumblist_2 a:hover img,#thumblist_3 a:hover img,#thumblist_4 a:hover img,#thumblist_5 a:hover img,#thumblist_1a a:hover img,#thumblist_2a a:hover img,#thumblist_3a a:hover img,#thumblist_4a a:hover img,#thumblist_5a a:hover img{background-color:#BDB071; border:0; border-style:none; padding:1px;}
 .clearlist:after{clear:both; content:"."; display:block; height:0; visibility:hidden;}
 #lightbox_content span {padding:10px;}

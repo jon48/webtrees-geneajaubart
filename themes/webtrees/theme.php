@@ -23,7 +23,7 @@
 //
 // PNG Icons By:Alessandro Rei; License: GPL; http://www.kde-look.org/content/show.php/Dark-Glass+reviewed?content=67902
 //
-// $Id: theme.php 14034 2012-06-25 08:16:06Z nigel $
+// $Id: theme.php 14386 2012-10-03 17:35:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,7 +31,6 @@ if (!defined('WT_WEBTREES')) {
 }
 
 $theme_name = "webtrees"; // need double quotes, as file is scanned/parsed by script
-$stylesheet = WT_THEME_URL.'style.css';
 $headerfile = WT_THEME_DIR.'header.php';
 $footerfile = WT_THEME_DIR.'footer.php';
 

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lightbox_print_media.php 14096 2012-07-09 21:07:34Z greg $
+// $Id: lightbox_print_media.php 14409 2012-10-09 22:42:49Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -171,16 +171,6 @@ function lightbox_print_media($pid, $level=1, $related=false, $kind=1, $noedit=f
 			echo '<table class="facts_table" width="100%" cellpadding="0"><tr><td >';
 			echo '<div id="thumbcontainer', $kind, '">';
 			echo '<ul class="section" id="thumblist_', $kind, '">';
-		}
-		// Album Reorder include =============================
-		// Following used for Album media sort ------------------
-		$reorder=safe_GET_bool('reorder');
-		if ($reorder==1) {
-			if ($kind==1) $rownum1=$numm;
-			if ($kind==2) $rownum2=$numm;
-			if ($kind==3) $rownum3=$numm;
-			if ($kind==4) $rownum4=$numm;
-			if ($kind==5) require WT_ROOT.WT_MODULES_DIR.'lightbox/functions/lb_horiz_sort.php';
 		}
 		// ==================================================
 		// Start pulling media items into thumbcontainer div ==============================
@@ -338,10 +328,7 @@ Requests for commercial publication of these or other UK census images appearing
  */
 function lightbox_print_media_row($rtype, $rowm, $pid) {
 
-	global $TEXT_DIRECTION;
-	global $item, $sort_i, $notes;
-
-	$reorder=safe_GET_bool('reorder');
+	global $TEXT_DIRECTION, $sort_i, $notes;
 
 	$mainMedia = check_media_depth($rowm['m_file'], 'NOTRUNC');
 	// If media file is missing from "media" directory, but is referenced in Gedcom
@@ -379,13 +366,8 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 			return false;
 		} else {
 			// Media is NOT linked to private person
-			// If reorder media has been clicked
-			if (isset($reorder) && $reorder==1) {
-				echo '<li class="facts_value" style="border:0px;" id="li_', $rowm['m_media'], '" >';
-
-			// Else If reorder media has NOT been clicked
 			// Highlight Album Thumbnails - Changed=new (blue), Changed=old (red), Changed=no (none)
-			} else if ($rtype=='new') {
+			 if ($rtype=='new') {
 				echo '<li class="li_new">';
 			} else if ($rtype=='old') {
 				echo '<li class="li_old">';
@@ -438,48 +420,12 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 		$before   = substr($haystack, 0, strpos($haystack, $needle));
 		$after    = substr(strstr($haystack, $needle), strlen($needle));
 		$final    = $before.$needle.$after;
-		$notes    = htmlspecialchars(print_fact_notes($final, 1, true, true), ENT_QUOTES);
+		$notes    = htmlspecialchars(addslashes(print_fact_notes($final, 1, true, true)), ENT_QUOTES);
 
 		// Get info on how to handle this media file
 		$mediaInfo = mediaFileInfo($mainMedia, $thumbnail, $rowm['m_media'], $mediaTitle, $notes);
 
-		//text alignment for Tooltips
-		if ($TEXT_DIRECTION=='rtl') {
-			$alignm = 'right';
-			$left = 'true';
-		} else {
-			$alignm = 'left';
-			$left = 'false';
-		}
-
-		// Tooltip Options
-		$tt_opts = ", BALLOON," . true ; // true=balloon, false=normal
-		$tt_opts .= ", LEFT," . $left;
-		$tt_opts .= ", ABOVE, true";
-		$tt_opts .= ", TEXTALIGN, '" . $alignm . "'";
-		$tt_opts .= ", WIDTH, -480 ";
-		$tt_opts .= ", BORDERCOLOR, ''";
-		$tt_opts .= ", TITLEBGCOLOR, ''";
-		$tt_opts .= ", CLOSEBTNTEXT, 'X'";
-		$tt_opts .= ", CLOSEBTN, false";
-		$tt_opts .= ", CLOSEBTNCOLORS, ['#ff0000', '#ffffff', '#ffffff', '#ff0000']";
-		$tt_opts .= ", OFFSETX, -30";
-		$tt_opts .= ", OFFSETY, 110";
-		$tt_opts .= ", STICKY, true";
-		$tt_opts .= ", PADDING, 6";
-		$tt_opts .= ", CLICKCLOSE, true";
-		$tt_opts .= ", DURATION, 8000";
-		$tt_opts .= ", BGCOLOR, '#f3f3f3'";
-		$tt_opts .= ", JUMPHORZ, 'true' ";
-		$tt_opts .= ", JUMPVERT, 'false' ";
-		$tt_opts .= ", DELAY, 0";
-
 		// Prepare Below Thumbnail  menu ----------------------------------------------------
-		if ($TEXT_DIRECTION== 'rtl') {
-			$submenu_class = 'submenuitem_rtl';
-		} else {
-			$submenu_class = 'submenuitem';
-		}
 		$menu = new WT_Menu();
 		// Truncate media title to 13 chars (45 chars if Streetview) and add ellipsis
 		$mtitle = strip_tags($mediaTitle);
@@ -500,8 +446,6 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 		} else {
 			$menu->addLabel("<img src=\"{$thumbnail}\" style=\"display:none;\" alt=\"\" title=\"\">" . $mtitle, 'right');
 		}
-		// Next line removed to avoid gallery thumbnail duplication
-		// $menu['link'] = mediaInfo['url'];
 
 		if ($rtype=='old') {
 			// Do not print menu if item has changed and this is the old item
@@ -511,44 +455,34 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 
 			// View Notes
 			if (strpos($rowm['m_gedrec'], "\n1 NOTE")) {
-				$submenu = new WT_Menu('&nbsp;&nbsp;' . WT_I18N::translate('View Notes') . '&nbsp;&nbsp;', '#', 'right');
+				$submenu = new WT_Menu('&nbsp;&nbsp;' . WT_I18N::translate('View Notes') . '&nbsp;&nbsp;', '#');
 				// Notes Tooltip ----------------------------------------------------
-				$sonclick  = 'TipTog(';
-				// Contents of Notes
-				$sonclick .= "'";
-				$sonclick .= "<font color=#008800><b>" . WT_I18N::translate('Notes') . ":</b></font><br>";
-				$sonclick .= $notes;
-				$sonclick .= "'";
-				// Notes Tooltip Parameters
-				$sonclick .= $tt_opts;
-				$sonclick .= ");";
-				$sonclick .= "return false;";
-				$submenu->addOnclick($sonclick);
-				$submenu->addClass($submenu_class);
+				$submenu->addOnclick("modalNotes('". $notes ."','". WT_I18N::translate('View Notes') ."'); return false;");
+				$submenu->addClass("submenuitem");
 				$menu->addSubMenu($submenu);
 			}
 			//View Details
 			$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('View Details') . "&nbsp;&nbsp;", WT_SERVER_NAME.WT_SCRIPT_PATH . "mediaviewer.php?mid=".$rowm['m_media'].'&amp;ged='.WT_GEDURL, 'right');
-			$submenu->addClass($submenu_class);
+			$submenu->addClass("submenuitem");
 			$menu->addSubMenu($submenu);
 			//View Source
 			if ($sour && $sour->canDisplayDetails()) {
 				$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('View Source') . "&nbsp;&nbsp;", $sour->getHtmlUrl());
-				$submenu->addClass($submenu_class);
+				$submenu->addClass("submenuitem");
 				$menu->addSubMenu($submenu);
 			}
 			if (WT_USER_CAN_EDIT) {
 				// Edit Media
 				$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Edit media') . "&nbsp;&nbsp;");
 				$submenu->addOnclick("return window.open('addmedia.php?action=editmedia&amp;pid={$rowm['m_media']}&amp;linktoid={$rowm['mm_gid']}', '_blank', edit_window_specs);");
-				$submenu->addClass($submenu_class);
+				$submenu->addClass("submenuitem");
 				$menu->addSubMenu($submenu);
 				if (WT_USER_IS_ADMIN) {
 					// Manage Links
 					if (array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 						$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Manage links') . "&nbsp;&nbsp;");
 						$submenu->addOnclick("return window.open('inverselink.php?mediaid={$rowm['m_media']}&amp;linkto=manage', '_blank', find_window_specs);");
-						$submenu->addClass($submenu_class);
+						$submenu->addClass("submenuitem");
 						$menu->addSubMenu($submenu);
 					} else {
 						$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Set link') . "&nbsp;&nbsp;", '#', null, 'right', 'right');
@@ -574,7 +508,7 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 					// Unlink Media
 					$submenu = new WT_Menu("&nbsp;&nbsp;" . WT_I18N::translate('Unlink Media') . "&nbsp;&nbsp;");
 					$submenu->addOnclick("return delete_fact('$pid', 'OBJE', '".$rowm['m_media']."', '".WT_I18N::translate('Are you sure you want to delete this fact?')."');");
-					$submenu->addClass($submenu_class);
+					$submenu->addClass("submenuitem");
 					$menu->addSubMenu($submenu);
 				}
 			}
@@ -582,68 +516,31 @@ function lightbox_print_media_row($rtype, $rowm, $pid) {
 
 		// Check if allowed to View media
 		if ($isExternal || media_exists($thumbnail) && canDisplayFact($rowm['m_media'], $rowm['m_gedfile'], $rowm['m_gedrec'])) {
-			$mainFileExists = false;
-
 			// Get Media info
 			if ($isExternal || media_exists($rowm['m_file']) || media_exists($mainMedia)) {
-				$mainFileExists = true;
-				$imgsize = findImageSize($rowm['m_file']);
-				$imgwidth = $imgsize[0]+40;
-				$imgheight = $imgsize[1]+150;
-
 				// Start Thumbnail Enclosure table ---------------------------------------------
 				// Pull table up 90px if media object is a "streetview"
 				if (strpos($rowm['m_file'], 'http://maps.google.')===0) {
-					echo "<table width=\"10px\" style=\"margin-top:-90px;\" class=\"pic\" border=\"0\"><tr>";
+					echo '<table width="10px" style="margin-top:-90px;" class="pic" border="0"><tr>';
 				} else {
-					echo "<table width=\"10px\" class=\"pic\" border=\"0\"><tr>";
+					echo '<table width="10px" class="pic" border="0"><tr>';
 				}
-				echo "<td align=\"center\" rowspan=\"2\" >";
+				echo '<td align="center" rowspan="2">';
 				echo '<img src="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/images/transp80px.gif" height="100px" alt=""></img>';
-				echo "</td>";
-
-				// Check for Notes associated media item
-				if ($reorder) {
-					// If reorder media has been clicked
-					echo "<td width=\"90% align=\"center\"><b><font size=\"2\" style=\"cursor:move;margin-bottom:2px;\">" . $rowm['m_media'] . "</font></b></td>";
-					echo "</tr>";
-				}
-				$item++;
-
-				echo "<td colspan=\"3\" valign=\"middle\" align=\"center\" >";
-				// If not reordering, enable Lightbox or popup and show thumbnail tooltip ------
-				if (!$reorder) {
-					echo '<a href="', $mediaInfo['url'], '">';
-				}
+				echo '</td>';
+				echo '<td colspan="3" valign="middle" align="center">';
+				echo $media->displayMedia();
 			}
-
-			// Now finally print the thumbnail -----------------------------------------------------
-			$height = 78;
-			$size = findImageSize($mediaInfo['thumb']);
-			if ($size[1]<$height) $height = $size[1];
-			echo "<img src=\"{$mediaInfo['thumb']}\" height=\"{$height}\"" ;
-
-			// print browser tooltips associated with image ----------------------------------------
-			echo " alt=\"\" title=\"" . strip_tags($mediaTitle) . "\">";
-
-			// Close anchor --------------------------------------------------------------
-			if ($mainFileExists) {
-				echo "</a>";
-			}
-			echo "</td></tr>";
+			echo '</td></tr>';
 
 			//View Edit Menu ----------------------------------
-			if (!$reorder) {
-				// If not reordering media print View or View-Edit Menu
-				echo "<tr>";
-				echo "<td width=\"5px\"></td>";
-				echo "<td valign=\"bottom\" align=\"center\" class=\"nowrap\">";
-				echo $menu->getMenu();
-				echo "</td>";
-				echo "<td width=\"5px\"></td>";
-				echo "</tr>";
-			}
-			// echo "</table>";
+			echo '<tr>';
+			echo '<td width="5px"></td>';
+			echo '<td valign="bottom" align="center" class="nowrap">';
+			echo $menu->getMenu();
+			echo '</td>';
+			echo '<td width="5px"></td>';
+			echo '</tr>';
 		}
 	} // NOTE End If Show fact details
 

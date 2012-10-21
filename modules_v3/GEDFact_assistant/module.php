@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14079 2012-07-07 06:11:43Z greg $
+// $Id: module.php 14389 2012-10-04 14:54:01Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -44,7 +44,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 		switch($mod_action) {
 		case '_CENS/census_3_find':
 			// TODO: this file should be a method in this class
-			require WT_ROOT.WT_MODULES_DIR.$this->getName().'/'.$mod_action.'.php';
+			require WT_ROOT.WT_MODULES_DIR.$this->getName().'/_CENS/census_3_find.php';
 			break;
 		case 'media_3_find':
 			self::media_3_find();
@@ -781,7 +781,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 				echo '<br><br></td></tr></table>';
 			}
 		}
-		echo "</div>"; // Close div that centers table
+		echo '</div>'; // Close div that centers table
 		
 		// Set focus to the input field
 		echo '<script>document.filter', $type, '.filter.focus();</script>';
@@ -805,29 +805,29 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 				}
 			}
 			?>
-			'<script>'
+			<script>
 			function insertId() {
 				if (window.opener.document.getElementById('addlinkQueue')) {
 					// alert('Please move this alert window and examine the contents of the pop-up window, then click OK')
-					window.opener.insertRowToTable("<?php echo $record->getXref(); ?>", "<?php echo htmlSpecialChars($record->getFullName()); ?>", "<?php echo $headjs; ?>");
+					window.opener.insertRowToTable('<?php echo $record->getXref(); ?>', '<?php echo htmlSpecialChars($record->getFullName()); ?>', '<?php echo $headjs; ?>');
 					window.close();
 				}
 			}
-			'</script>'
+			</script>
 			<?php
 		
 		} else {
 			?>
-			'<sccript>'
+			<script>
 			function insertId() {
 				window.opener.alert('<?php echo strtoupper($iid2); ?> - <?php echo WT_I18N::translate('Not a valid Individual, Family or Source ID'); ?>');
 				window.close();
 			}
-			'</script>'
+			</script>
 			<?php
 		}
 		?>		
-		'<script>'window.onLoad = insertId();'</script>'
+		<script>window.onLoad = insertId();</script>
 		<?php
 	}
 }

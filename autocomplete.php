@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: autocomplete.php 14119 2012-07-24 21:11:28Z greg $
+// $Id: autocomplete.php 14388 2012-10-04 08:32:27Z greg $
 
 define('WT_SCRIPT_NAME', 'autocomplete.php');
 require './includes/session.php';

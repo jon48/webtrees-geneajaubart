@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: timeline.php 14208 2012-08-26 06:56:57Z greg $
+// $Id: timeline.php 14253 2012-09-07 05:22:02Z greg $
 
 define('WT_SCRIPT_NAME', 'timeline.php');
 require './includes/session.php';
@@ -35,7 +35,6 @@ $controller
 
 ?>
 <script>
-<!--
 var pastefield = null;
 function paste_id(value) {
 	pastefield.value=value;
@@ -217,6 +216,7 @@ function MM(e) {
 		}
 	}
 }
+</script><script>
 
 function MU() {
 	ob = null;

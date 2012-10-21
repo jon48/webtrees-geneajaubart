@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Place.php 14106 2012-07-14 07:30:01Z greg $
+// $Id: Place.php 14306 2012-09-16 06:48:51Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -65,7 +65,7 @@ class WT_Place {
 		}
 
 		$rows=
-			WT_DB::prepare("SELECT SQL_CACHE p_place FROM `##places` WHERE p_parent_id=? AND p_file=? ORDER BY p_place")
+			WT_DB::prepare("SELECT SQL_CACHE p_place FROM `##places` WHERE p_parent_id=? AND p_file=? ORDER BY p_place COLLATE '".WT_I18N::$collation."'")
 			->execute(array($this->getPlaceId(), $this->gedcom_id))
 			->fetchOneColumn();
 		foreach ($rows as $row) {
@@ -90,7 +90,7 @@ class WT_Place {
 
 	public function getPlaceName() {
 		$place=reset($this->gedcom_place);
-		return $place ? htmlspecialchars($place) : WT_I18N::translate('unknown');
+		return $place ? '<span dir="auto">'.htmlspecialchars($place).'</span>' : WT_I18N::translate('unknown');
 	}
 
 	public function getFullName() {
@@ -118,7 +118,7 @@ class WT_Place {
 				$short_name=implode(self::GEDCOM_SEPARATOR, array_slice($this->gedcom_place, 0, $SHOW_PEDIGREE_PLACES));
 			}
 			// Add a tool-tip showing the full name
-			return '<span title="'.htmlspecialchars($this->getGedcomName()).'">'.$short_name.'</span>';
+			return '<span title="'.htmlspecialchars($this->getGedcomName()).'" dir="auto">'.htmlspecialchars($short_name).'</span>';
 		}
 	}
 
@@ -146,7 +146,7 @@ class WT_Place {
 				" LEFT JOIN `##places` AS p8 ON (p7.p_parent_id=p8.p_id)".
 				" LEFT JOIN `##places` AS p9 ON (p8.p_parent_id=p9.p_id)".
 				" WHERE p1.p_file=?".
-				" ORDER BY CONCAT_WS(', ', p9.p_place, p8.p_place, p7.p_place, p6.p_place, p5.p_place, p4.p_place, p3.p_place, p2.p_place, p1.p_place)"
+				" ORDER BY CONCAT_WS(', ', p9.p_place, p8.p_place, p7.p_place, p6.p_place, p5.p_place, p4.p_place, p3.p_place, p2.p_place, p1.p_place) COLLATE '".WT_I18N::$collation."'"
 			)
 			->execute(array($gedcom_id))
 			->fetchOneColumn();
@@ -171,7 +171,7 @@ class WT_Place {
 				" LEFT JOIN `##places` AS p8 ON (p7.p_parent_id=p8.p_id)".
 				" LEFT JOIN `##places` AS p9 ON (p8.p_parent_id=p9.p_id)".
 				" WHERE p1.p_place LIKE CONCAT('%', ?, '%') AND p1.p_file=?".
-				" ORDER BY p1.p_place"
+				" ORDER BY p1.p_place COLLATE '".WT_I18N::$collation."'"
 			)
 			->execute(array($filter, $gedcom_id))
 			->fetchOneColumn();

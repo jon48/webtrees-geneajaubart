@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14123 2012-07-27 02:41:16Z nigel $
+// $Id: module.php 14273 2012-09-14 09:58:09Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -82,7 +82,7 @@ class gedcom_stats_WT_Module extends WT_Module implements WT_Module_Block {
 
 		$stats=new WT_Stats(WT_GEDCOM);
 
-		$content = '<b><a href="index.php?ctype=gedcom" dir="auto">'.htmlspecialchars(get_gedcom_setting(WT_GED_ID, 'title')).'</a></b><br>';
+		$content = '<b>'.WT_TREE_TITLE.'</b><br>';
 
 		if ($show_last_update) {
 			$content .= '<div>'./* I18N: %s is a date */ WT_I18N::translate('This family tree was last updated on %s.', strip_tags($stats->gedcomUpdated())).'</div>';

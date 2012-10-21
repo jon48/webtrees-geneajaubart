@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Source.php 12314 2011-10-15 20:57:25Z greg $
+// @version $Id: Source.php 14290 2012-09-15 09:01:22Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -63,7 +63,7 @@ class WT_Source extends WT_GedcomRecord {
 	}
 
 	public function getAuth() {
-		return get_gedcom_value('AUTH', 1, $this->getGedcomRecord(), '', false);
+		return get_gedcom_value('AUTH', 1, $this->getGedcomRecord());
 	}
 
 	// Generate a URL to this record, suitable for use in HTML

@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 13935 2012-05-16 04:51:31Z nigel $
+// $Id: header.php 14386 2012-10-03 17:35:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,7 +33,7 @@ echo
 	'<title>', htmlspecialchars($title), '</title>',
 	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
 	'<link rel="stylesheet" href="', WT_THEME_URL, 'jquery/jquery-ui_theme.css" type="text/css">',
-	'<link rel="stylesheet" href="', $stylesheet, '" type="text/css" media="all">',
+	'<link rel="stylesheet" href="', WT_THEME_URL, 'style.css', '" type="text/css" media="all">',
 	'<meta name="robots" content="noindex,nofollow">';
 	
 switch ($BROWSERTYPE) {
@@ -67,7 +67,7 @@ echo
 	'<div id="info">',
 	WT_WEBTREES, ' ', WT_VERSION_TEXT,
 	'<br>',
-	WT_I18N::translate('Current Server Time:'), ' ', format_timestamp(time()),
+	WT_I18N::translate('Current Server Time:'), ' ', format_timestamp(WT_TIMESTAMP),
 	'</div>',
 	'</div>',
 // Side menu 
@@ -94,13 +94,11 @@ if (WT_USER_IS_ADMIN) {
 }
 echo '<li><ul>';
 //-- gedcom list
-foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
-	if (userGedcomAdmin(WT_USER_ID, $ged_id)) {
+foreach (WT_Tree::getAll() as $tree) {
+	if (userGedcomAdmin(WT_USER_ID, $tree->tree_id)) {
+		// Add a title="" element, since long tree titles are cropped
 		echo
-			'<li><span><a ', (WT_SCRIPT_NAME=="admin_trees_config.php" && WT_GED_ID==$ged_id ? 'class="current" ' : ''), 'href="admin_trees_config.php?ged='.rawurlencode($gedcom).'" title="',
-			WT_I18N::translate('%s', htmlspecialchars(get_gedcom_setting($ged_id, 'title'))),
-			'">',
-			WT_I18N::translate('%s', htmlspecialchars(get_gedcom_setting($ged_id, 'title'))),
+			'<li><span><a ', (WT_SCRIPT_NAME=="admin_trees_config.php" && WT_GED_ID==$tree->tree_id ? 'class="current" ' : ''), 'href="admin_trees_config.php?ged='.$tree->tree_name_url.'" title="', htmlspecialchars($tree->tree_title), '" dir="auto">', $tree->tree_title_html,
 			'</a></span></li>';
 	}
 }

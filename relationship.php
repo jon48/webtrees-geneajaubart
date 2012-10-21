@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: relationship.php 14200 2012-08-25 16:21:33Z greg $
+// $Id: relationship.php 14424 2012-10-15 08:02:42Z greg $
 
 define('WT_SCRIPT_NAME', 'relationship.php');
 require './includes/session.php';
@@ -64,7 +64,14 @@ if ($person2) {
 	$pid2='';
 }
 
-if ($person1 && $person1->canDisplayDetails() && $person2 && $person2->canDisplayDetails()) {	
+$controller
+	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
+
+if ($person1 && $person1->canDisplayName() && $person2 && $person2->canDisplayName()) {	
+	$controller
+		->setPageTitle(WT_I18N::translate(/* I18N: %s are people's names */ 'Relationships between %1$s and %2$s', $person1->getFullName(), $person2->getFullName()))
+		->PageHeader();
 	$node=get_relationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);
 	// If no blood relationship exists, look for relationship via marriage
 	if ($path_to_find==0 && $node==false && $followspouse==false) {
@@ -72,17 +79,13 @@ if ($person1 && $person1->canDisplayDetails() && $person2 && $person2->canDispla
 		$node=get_relationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);
 	}
 	$disp=true;
-	$controller->setPageTitle(WT_I18N::translate(/* I18N: %s are people's names */ 'Relationships between %1$s and %2$s', $person1->getFullName(), $person2->getFullName()));
 } else {
+	$controller
+		->setPageTitle(WT_I18N::translate('Relationships'))
+		->PageHeader();
 	$node=false;
 	$disp=false;
-	$controller->setPageTitle(WT_I18N::translate('Relationships'));
 }
-
-$controller
-	->pageHeader()
-	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
-	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
 if (WT_USE_LIGHTBOX) {
 	$album = new lightbox_WT_Module();

@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index.php 14012 2012-06-17 10:15:43Z lukasz $
+// $Id: index.php 14273 2012-09-14 09:58:09Z greg $
 
 define('WT_SCRIPT_NAME', 'index.php');
 require './includes/session.php';
@@ -79,7 +79,7 @@ if ($ctype=='user') {
 	$controller->requireMemberLogin();
 }
 $controller
-	->setPageTitle($ctype=='user' ? WT_I18N::translate('My page') : get_gedcom_setting(WT_GED_ID, 'title'))
+	->setPageTitle($ctype=='user' ? WT_I18N::translate('My page') : WT_TREE_TITLE)
 	->setMetaRobots('index,follow')
 	->pageHeader()
 	// By default jQuery modifies AJAX URLs to disable caching, causing JS libraries to be loaded many times.

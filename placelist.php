@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: placelist.php 14088 2012-07-08 07:49:02Z greg $
+// $Id: placelist.php 14306 2012-09-16 06:48:51Z greg $
 
 define('WT_SCRIPT_NAME', 'placelist.php');
 require './includes/session.php';
@@ -45,7 +45,7 @@ $level=count($parent);
 
 if ($display=='hierarchy') {
 	if ($level) {
-		$controller->setPageTitle(WT_I18N::translate('Place hierarchy') . ' - ' . htmlspecialchars(end($parent)));
+		$controller->setPageTitle(WT_I18N::translate('Place hierarchy') . ' - <span dir="auto">' . htmlspecialchars(end($parent)) . '</span>');
 	} else {
 		$controller->setPageTitle(WT_I18N::translate('Place hierarchy'));
 	}

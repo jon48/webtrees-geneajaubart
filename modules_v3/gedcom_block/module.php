@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13642 2012-03-24 13:06:08Z greg $
+// $Id: module.php 14276 2012-09-14 15:39:40Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -46,11 +46,11 @@ class gedcom_block_WT_Module extends WT_Module implements WT_Module_Block {
 		$indi_xref=$controller->getSignificantIndividual()->getXref();
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
-		$title='<span dir="auto">'.get_gedcom_setting(WT_GED_ID, 'title').'</span>';
+		$title='<span dir="auto">'.WT_TREE_TITLE.'</span>';
 		$content = '<table><tr>';
 		$content .= '<td><a href="pedigree.php?rootid='.$indi_xref.'&amp;ged='.WT_GEDURL.'"><i class="icon-pedigree"></i><br>'.WT_I18N::translate('Default chart').'</a></td>';
 		$content .= '<td><a href="individual.php?pid='.$indi_xref.'&amp;ged='.WT_GEDURL.'"><i class="icon-indis"></i><br>'.WT_I18N::translate('Default individual').'</a></td>';
-		if (get_site_setting('USE_REGISTRATION_MODULE') && WT_USER_ID==false) {
+		if (WT_Site::preference('USE_REGISTRATION_MODULE') && WT_USER_ID==false) {
 			$content .= '<td><a href="'.WT_LOGIN_URL.'?action=register"><i class="icon-user_add"></i><br>'.WT_I18N::translate('Request new user account').'</a></td>';
 		}
 		$content .= "</tr>";

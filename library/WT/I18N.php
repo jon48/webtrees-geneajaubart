@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: I18N.php 14055 2012-06-30 10:39:20Z greg $
+// $Id: I18N.php 14351 2012-09-24 15:30:17Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -50,13 +50,13 @@ class WT_I18N {
 		if (ini_get('apc.enabled')) {
 			self::$cache=Zend_Cache::factory('Core', 'Apc', $cache_options, array());
 		} else {
-			if (!is_dir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache')) {
+			if (!is_dir(WT_DATA_DIR.'cache')) {
 				// We may not have permission - especially during setup, before we instruct
 				// the user to "chmod 777 /data"
-				@mkdir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache');
+				@mkdir(WT_DATA_DIR.'cache');
 			}
 			if (is_dir(WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache')) {
-				self::$cache=Zend_Cache::factory('Core', 'File', $cache_options, array('cache_dir'=>WT_DATA_DIR.DIRECTORY_SEPARATOR.'cache'));
+				self::$cache=Zend_Cache::factory('Core', 'File', $cache_options, array('cache_dir'=>WT_DATA_DIR.'cache'));
 			} else {
 				// No cache available :-(
 				self::$cache=Zend_Cache::factory('Core', 'Zend_Cache_Backend_BlackHole', $cache_options, array(), false, true);

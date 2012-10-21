@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_interface.php 14116 2012-07-23 19:40:08Z greg $
+// $Id: edit_interface.php 14418 2012-10-13 21:54:39Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_interface.php');
 require './includes/session.php';
@@ -129,6 +129,7 @@ if (!empty($pid)) {
 	$edit = true;
 }
 
+echo '<div id="edit_interface-page">';// page container
 if (!WT_USER_CAN_EDIT || !$edit || !$ALLOW_EDIT_GEDCOM) {
 	echo
 		'<p class="error">', WT_I18N::translate('Privacy settings prevent you from editing this record.'), '</p>',
@@ -142,45 +143,45 @@ if (!isset($type)) {
 $level0type = $type;
 if ($type=='INDI') {
 	$record=WT_Person::getInstance($pid);
-	echo '<b>', $record->getFullName(), '</b><br>';
+	echo '<h4>', $record->getFullName(), '</h4>';
 } elseif ($type=='FAM') {
 	if (!empty($pid)) {
 		$record=WT_Family::getInstance($pid);
 	} else {
 		$record=WT_Family::getInstance($famid);
 	}
-	echo '<b>', $record->getFullName(), '</b><br>';
+	echo '<h4>', $record->getFullName(), '</h4>';
 } elseif ($type=='SOUR') {
 	$record=WT_Source::getInstance($pid);
-	echo '<b>', $record->getFullName(),  '</b><br>';
+	echo '<h4>', $record->getFullName(),  '</h4>';
 }
 
 if (strstr($action, 'addchild')) {
 	if (empty($famid)) {
-		echo '<b>', WT_I18N::translate('Add an unlinked person'), '</b>', help_link('edit_add_unlinked_person');
+		echo '<h4>', WT_I18N::translate('Add an unlinked person'), '</h4>', help_link('edit_add_unlinked_person');
 	} elseif ($gender=='F') {
-		echo '<b>', WT_I18N::translate('Add daughter'), '</b>', help_link('edit_add_child');
+		echo '<h4>', WT_I18N::translate('Add daughter'), '</h4>', help_link('edit_add_child');
 	} elseif ($gender=='M') {
-		echo '<b>', WT_I18N::translate('Add son'), '</b>', help_link('edit_add_child');
+		echo '<h4>', WT_I18N::translate('Add son'), '</h4>', help_link('edit_add_child');
 	} else {
-		echo '<b>', WT_I18N::translate('Add child'), '</b>', help_link('edit_add_child');
+		echo '<h4>', WT_I18N::translate('Add child'), '</h4>', help_link('edit_add_child');
 	}
 } elseif (strstr($action, 'addspouse')) {
 	if ($famtag=='WIFE') {
-		echo '<b>', WT_I18N::translate('Add wife'), '</b>';
+		echo '<h4>', WT_I18N::translate('Add wife'), '</h4>';
 	} else {
-		echo '<b>', WT_I18N::translate('Add husband'), '</b>';
+		echo '<h4>', WT_I18N::translate('Add husband'), '</h4>';
 	}
 	echo help_link('edit_add_spouse');
 } elseif (strstr($action, 'addnewparent')) {
 	if ($famtag=='WIFE') {
-		echo '<b>', WT_I18N::translate('Add a new mother'), '</b>';
+		echo '<h4>', WT_I18N::translate('Add a new mother'), '</h4>';
 	} else {
-		echo '<b>', WT_I18N::translate('Add a new father'), '</b>';
+		echo '<h4>', WT_I18N::translate('Add a new father'), '</h4>';
 	}
 	echo help_link('edit_add_parent');
 } elseif (strstr($action, 'addopfchild')) {
-	echo '<b>', WT_I18N::translate('Add a child to create a one-parent family'), '</b>', help_link('add_opf_child');
+	echo '<h4>', WT_I18N::translate('Add a child to create a one-parent family'), '</h4>', help_link('add_opf_child');
 }
 //------------------------------------------------------------------------------
 switch ($action) {
@@ -214,7 +215,7 @@ case 'editraw':
 	$tmp=new WT_GedcomRecord($gedrec);
 	list($gedrec)=$tmp->privatizeGedcom(WT_USER_ACCESS_LEVEL);
 
-	echo '<br><b>', WT_I18N::translate('Edit raw GEDCOM record'), '</b>', help_link('edit_edit_raw');
+	echo '<h4>', WT_I18N::translate('Edit raw GEDCOM record'), '</h4>', help_link('edit_edit_raw');
 	echo '<form method="post" action="edit_interface.php">';
 	echo '<input type="hidden" name="action" value="updateraw">';
 	echo '<input type="hidden" name="pid" value="', $pid, '">';
@@ -224,8 +225,8 @@ case 'editraw':
 	// Notes are special - they may contain data on the first line
 	$gedrec=preg_replace('/^(0 @'.WT_REGEX_XREF.'@ NOTE) (.+)/', "$1\n1 CONC $2", $gedrec);
 	list($gedrec1, $gedrec2)=explode("\n", $gedrec, 2);
-	echo '<textarea name="newgedrec1" rows="1"  cols="80" dir="ltr" readonly="readonly">', $gedrec1, '</textarea><br>';
-	echo '<textarea name="newgedrec2" id="newgedrec2" rows="20" cols="80" dir="ltr">', htmlspecialchars($gedrec2), "</textarea><br>";
+	echo '<textarea name="newgedrec1" id="newgedrec1" dir="ltr" readonly="readonly">', $gedrec1, '</textarea><br>';
+	echo '<textarea name="newgedrec2" id="newgedrec2" dir="ltr">', htmlspecialchars($gedrec2), "</textarea><br>";
 	if (WT_USER_IS_ADMIN) {
 		echo '<table class="facts_table">';
 		echo '<tr><td class="descriptionbox  wrap width25">';
@@ -687,10 +688,8 @@ case 'addsourceaction':
 		if (!empty($CALN)) $newgedrec .= "\n2 CALN $CALN";
 	}
 	$xref = append_gedrec($newgedrec, WT_GED_ID);
-	$link = "source.php?sid=$xref";
 	if ($xref) {
-		echo '<br><br>', WT_I18N::translate('New source created successfully.'), '<br><br>';
-		echo "<a href=\"#\" onclick=\"openerpasteid('$xref'); return false;\">", WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record '), " <b>$xref</b></a>";
+		$controller->addInlineJavascript('openerpasteid("' . $xref . '");');
 	}
 	break;
 //------------------------------------------------------------------------------
@@ -748,13 +747,8 @@ case 'addnoteaction':
 	}
 
 	$xref = append_gedrec($newgedrec, WT_GED_ID);
-	$link = "note.php?nid=$xref";
-
-	if ($xref != "none") {
-		echo "<br><br>".WT_I18N::translate('New Shared Note created successfully.')." (".$xref.")<br><br>";
-		echo "<a href=\"#\" onclick=\"openerpasteid('$xref'); return false;\">".WT_I18N::translate('Paste the following ID into your editing fields to reference the newly created record ')." <b>$xref</b></a>";
-		echo "<br><br><br><br>";
-		echo "<br><br><br><br>";
+	if ($xref) {
+		$controller->addInlineJavascript('openerpasteid("' . $xref . '");');
 	}
 	break;
 //------------------------------------------------------------------------------
@@ -1023,10 +1017,8 @@ case 'addrepoaction':
 	if (!empty($WWW)) $newgedrec .= "\n1 WWW $WWW";
 
 	$xref = append_gedrec($newgedrec, WT_GED_ID);
-	$link = "repo.php?rid=$xref";
 	if ($xref) {
-		echo '<br><br>', WT_I18N::translate('New Repository created'), '<br><br>';
-		echo "<a href=\"#\" onclick=\"openerpasteid('$xref'); return false;\">", WT_I18N::translate('Paste the following Repository ID into your editing fields to reference this Repository '), " <b>$xref</b></a>";
+		$controller->addInlineJavascript('openerpasteid("' . $xref . '");');
 	}
 	break;
 //------------------------------------------------------------------------------
@@ -1424,7 +1416,7 @@ case 'linkspouseaction':
 		if ($gedrec) {
 			if ($famid=="new") {
 				$famrec = "0 @new@ FAM";
-				$SEX = get_gedcom_value("SEX", 1, $gedrec, '', false);
+				$SEX = get_gedcom_value("SEX", 1, $gedrec);
 				if ($SEX=="M") $famtag = "HUSB";
 				if ($SEX=="F") $famtag = "WIFE";
 				if ($famtag=="HUSB") {
@@ -1849,31 +1841,35 @@ case 'changefamily':
 				remElement.style.display = 'block';
 			}
 		}
-	<?php echo '</script>'; ?>
-	<br><br>
-	<?php echo WT_I18N::translate('Use this page to change or remove family members.<br /><br />For each member in the family, you can use the Change link to choose a different person to fill that role in the family.  You can also use the Remove link to remove that person from the family.<br /><br />When you have finished changing the family members, click the Save button to save the changes.'); ?>
+	<?php
+		echo '</script>
+			<div id="changefam">
+			<p>', WT_I18N::translate('Use this page to change or remove family members.<br /><br />For each member in the family, you can use the Change link to choose a different person to fill that role in the family.  You can also use the Remove link to remove that person from the family.<br /><br />When you have finished changing the family members, click the Save button to save the changes.'), '</p>';
+	?>
 	<form name="changefamform" method="post" action="edit_interface.php">
 		<input type="hidden" name="action" value="changefamily_update">
 		<input type="hidden" name="famid" value="<?php echo $famid; ?>">
-		<table class="width50">
-			<tr><td colspan="3" class="topbottombar"><?php echo WT_I18N::translate('Change Family Members'); ?></td></tr>
+		<table>
+			<tr><td colspan="4" class="topbottombar"><?php echo WT_I18N::translate('Change Family Members'); ?></td></tr>
 			<tr>
 			<?php
 			if (!is_null($father)) {
 			?>
 				<td class="descriptionbox"><b><?php echo $father->getLabel(); ?></b><input type="hidden" name="HUSB" value="<?php echo $father->getXref(); ?>"></td>
-				<td id="HUSBName" class="optionbox wrap"><?php echo $father->getFullName(); ?></td>
+				<td id="HUSBName" class="optionbox"><?php echo $father->getFullName(); ?></td>
 			<?php
 			} else {
 			?>
 				<td class="descriptionbox"><b><?php echo WT_I18N::translate('spouse'); ?></b><input type="hidden" name="HUSB" value=""></td>
-				<td id="HUSBName" class="optionbox wrap"></td>
+				<td id="HUSBName" class="optionbox"></td>
 			<?php
 			}
 			?>
-				<td class="optionbox wrap">
+				<td class="optionbox">
 					<a href="#" id="husbrem" style="display: <?php echo is_null($father) ? 'none':'block'; ?>;" onclick="document.changefamform.HUSB.value=''; document.getElementById('HUSBName').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
-					<a href="#" onclick="nameElement = document.getElementById('HUSBName'); remElement = document.getElementById('husbrem'); return findIndi(document.changefamform.HUSB);"><?php echo WT_I18N::translate('Change'); ?></a><br>
+				</td>
+				<td class="optionbox">
+					<a href="#" onclick="nameElement = document.getElementById('HUSBName'); remElement = document.getElementById('husbrem'); return findIndi(document.changefamform.HUSB);"><?php echo WT_I18N::translate('Change'); ?></a>
 				</td>
 			</tr>
 			<tr>
@@ -1881,18 +1877,20 @@ case 'changefamily':
 			if (!is_null($mother)) {
 			?>
 				<td class="descriptionbox"><b><?php echo $mother->getLabel(); ?></b><input type="hidden" name="WIFE" value="<?php echo $mother->getXref(); ?>"></td>
-				<td id="WIFEName" class="optionbox wrap"><?php echo $mother->getFullName(); ?></td>
+				<td id="WIFEName" class="optionbox"><?php echo $mother->getFullName(); ?></td>
 			<?php
 			} else {
 			?>
 				<td class="descriptionbox"><b><?php echo WT_I18N::translate('spouse'); ?></b><input type="hidden" name="WIFE" value=""></td>
-				<td id="WIFEName" class="optionbox wrap"></td>
+				<td id="WIFEName" class="optionbox"></td>
 			<?php
 			}
 			?>
-				<td class="optionbox wrap">
+				<td class="optionbox">
 					<a href="#" id="wiferem" style="display: <?php echo is_null($mother) ? 'none':'block'; ?>;" onclick="document.changefamform.WIFE.value=''; document.getElementById('WIFEName').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
-					<a href="#" onclick="nameElement = document.getElementById('WIFEName'); remElement = document.getElementById('wiferem'); return findIndi(document.changefamform.WIFE);"><?php echo WT_I18N::translate('Change'); ?></a><br>
+				</td>
+				<td class="optionbox">
+					<a href="#" onclick="nameElement = document.getElementById('WIFEName'); remElement = document.getElementById('wiferem'); return findIndi(document.changefamform.WIFE);"><?php echo WT_I18N::translate('Change'); ?></a>
 				</td>
 			</tr>
 			<?php
@@ -1902,10 +1900,12 @@ case 'changefamily':
 				?>
 			<tr>
 				<td class="descriptionbox"><b><?php echo $child->getLabel(); ?></b><input type="hidden" name="CHIL<?php echo $i; ?>" value="<?php echo $child->getXref(); ?>"></td>
-				<td id="CHILName<?php echo $i; ?>" class="optionbox wrap"><?php echo $child->getFullName(); ?></td>
-				<td class="optionbox wrap">
+				<td id="CHILName<?php echo $i; ?>" class="optionbox"><?php echo $child->getFullName(); ?></td>
+				<td class="optionbox">
 					<a href="#" id="childrem<?php echo $i; ?>" style="display: block;" onclick="document.changefamform.CHIL<?php echo $i; ?>.value=''; document.getElementById('CHILName<?php echo $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
-					<a href="#" onclick="nameElement = document.getElementById('CHILName<?php echo $i; ?>'); remElement = document.getElementById('childrem<?php echo $i; ?>'); return findIndi(document.changefamform.CHIL<?php echo $i; ?>);"><?php echo WT_I18N::translate('Change'); ?></a><br>
+				</td>
+				<td class="optionbox">
+					<a href="#" onclick="nameElement = document.getElementById('CHILName<?php echo $i; ?>'); remElement = document.getElementById('childrem<?php echo $i; ?>'); return findIndi(document.changefamform.CHIL<?php echo $i; ?>);"><?php echo WT_I18N::translate('Change'); ?></a>
 				</td>
 			</tr>
 				<?php
@@ -1915,18 +1915,21 @@ case 'changefamily':
 				?>
 			<tr>
 				<td class="descriptionbox"><b><?php echo WT_I18N::translate('child'); ?></b><input type="hidden" name="CHIL<?php echo $i; ?>" value=""></td>
-				<td id="CHILName<?php echo $i; ?>" class="optionbox wrap"></td>
-				<td class="optionbox wrap">
+				<td id="CHILName<?php echo $i; ?>" class="optionbox"></td>
+				<td colspan="2" class="optionbox child">
 					<a href="#" id="childrem<?php echo $i; ?>" style="display: none;" onclick="document.changefamform.CHIL<?php echo $i; ?>.value=''; document.getElementById('CHILName<?php echo $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
-					<a href="#" onclick="nameElement = document.getElementById('CHILName<?php echo $i; ?>'); remElement = document.getElementById('childrem<?php echo $i; ?>'); return findIndi(document.changefamform.CHIL<?php echo $i; ?>);"><?php echo WT_I18N::translate('Add'); ?></a><br>
+					<a href="#" onclick="nameElement = document.getElementById('CHILName<?php echo $i; ?>'); remElement = document.getElementById('childrem<?php echo $i; ?>'); return findIndi(document.changefamform.CHIL<?php echo $i; ?>);"><?php echo WT_I18N::translate('Add'); ?></a>
 				</td>
 			</tr>
 		</table>
-		<!-- <a href="#" onclick="addnewchild(''); return false;"><?php echo WT_I18N::translate('Add an unlinked person'); ?></a><br>-->
-		<br>
-		<input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>"><input type="button" value="<?php echo WT_I18N::translate('Cancel'); ?>" onclick="window.close();">
+		<!-- <p><a href="#" onclick="addnewchild(''); return false;"><?php echo WT_I18N::translate('Add an unlinked person'); ?></a></p> -->
+		<div id="save-cancel">
+			<div class="save"><input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>"></div>
+			<div class="cancel"><input type="button" value="<?php echo WT_I18N::translate('Cancel'); ?>" onclick="window.close();"></div>
+		</div>
 	</form>
 	<?php
+	echo '</div>';//close #changefam
 	break;
 //------------------------------------------------------------------------------
 case 'changefamily_update':
@@ -2177,3 +2180,4 @@ if ($success && !WT_DEBUG) {
 } else {
 	echo '<p class="center"><a href="#" onclick="closePopupAndReloadParent(\'', $link, '\');">', WT_I18N::translate('Close Window'), '</a></p>';
 }
+echo '</div>';//close #edit_interface-page

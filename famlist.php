@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: famlist.php 13598 2012-03-17 13:03:02Z greg $
+// $Id: famlist.php 14235 2012-09-01 18:05:23Z greg $
 
 define('WT_SCRIPT_NAME', 'famlist.php');
 require './includes/session.php';
@@ -216,7 +216,7 @@ if ($show=='indi' || $show=='surn') {
 			}
 		}
 		// Don't sublists short lists.
-		if ($count<get_gedcom_setting(WT_GED_ID, 'SUBLIST_TRIGGER_F')) {
+		if ($count<get_gedcom_setting(WT_GED_ID, 'SUBLIST_TRIGGER_I')) {
 			$falpha='';
 			$show_all_firstnames='no';
 		} else {

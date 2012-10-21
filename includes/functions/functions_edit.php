@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_edit.php 14163 2012-08-11 07:20:07Z greg $
+// $Id: functions_edit.php 14411 2012-10-11 13:24:22Z lukasz $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -35,7 +35,7 @@ require_once WT_ROOT.'includes/functions/functions_import.php';
 // Create an edit control for inline editing using jeditable
 function edit_field_inline($name, $value, $controller=null) {
 	$html='<span class="editable" id="' . $name . '">' . htmlspecialchars($value) . '</span>';
-	$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'save.php", {submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'"});';
+	$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'save.php", {submit:"&nbsp;&nbsp;' . /* I18N: button label */ WT_I18N::translate('save') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'"});';
 
 	if ($controller) {
 		$controller->addInlineJavascript($js);
@@ -49,7 +49,7 @@ function edit_field_inline($name, $value, $controller=null) {
 // Create a text area for inline editing using jeditable
 function edit_text_inline($name, $value, $controller=null) {
 	$html='<span class="editable" style="white-space:pre-wrap;" id="' . $name . '">' . htmlspecialchars($value) . '</span>';
-	$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'save.php", {submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'", type: "textarea", rows:4, cols:60 });';
+	$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'save.php", {submit:"&nbsp;&nbsp;' . WT_I18N::translate('save') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'", type: "textarea", rows:4, cols:60 });';
 
 	if ($controller) {
 		$controller->addInlineJavascript($js);
@@ -82,9 +82,9 @@ function select_edit_control($name, $values, $empty, $selected, $extra='') {
 	}
 	foreach ($values as $key=>$value) {
 		if ($key==$selected) {
-			$html.='<option value="'.htmlspecialchars($key).'" selected="selected">'.htmlspecialchars($value).'</option>';
+			$html.='<option value="'.htmlspecialchars($key).'" selected="selected" dir="auto">'.htmlspecialchars($value).'</option>';
 		} else {
-			$html.='<option value="'.htmlspecialchars($key).'">'.htmlspecialchars($value).'</option>';
+			$html.='<option value="'.htmlspecialchars($key).'" dir="auto">'.htmlspecialchars($value).'</option>';
 		}
 	}
 	return '<select id="'.$name.'" name="'.$name.'" '.$extra.'>'.$html.'</select>';
@@ -103,7 +103,7 @@ function select_edit_control_inline($name, $values, $empty, $selected, $controll
 	$values['selected']=htmlspecialchars($selected);
 
 	$html='<span class="editable" id="' . $name . '">' .  (array_key_exists($selected, $values) ? $values[$selected] : '') . '</span>';
-	$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'save.php", {type:"select", data:' . json_encode($values) . ', submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'", callback:function(value, settings) {jQuery(this).html(settings.data[value]);} });';
+	$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'save.php", {type:"select", data:' . json_encode($values) . ', submit:"&nbsp;&nbsp;' . WT_I18N::translate('save') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'", callback:function(value, settings) {jQuery(this).html(settings.data[value]);} });';
 
 	if ($controller) {
 		$controller->addInlineJavascript($js);
@@ -222,7 +222,7 @@ function edit_field_contact($name, $selected='', $extra='') {
 		'mailto'    =>WT_I18N::translate('Mailto link'),
 		'none'      =>WT_I18N::translate('No contact'),
 	);
-	if (!get_site_setting('STORE_MESSAGES')) {
+	if (!WT_Site::preference('STORE_MESSAGES')) {
 		unset($CONTACT_METHODS['messaging'], $CONTACT_METHODS['messaging2']);
 	}
 	return select_edit_control($name, $CONTACT_METHODS, null, $selected, $extra);
@@ -236,7 +236,7 @@ function edit_field_contact_inline($name, $selected='', $controller=null) {
 		'mailto'    =>WT_I18N::translate('Mailto link'),
 		'none'      =>WT_I18N::translate('No contact'),
 	);
-	if (!get_site_setting('STORE_MESSAGES')) {
+	if (!WT_Site::preference('STORE_MESSAGES')) {
 		unset($CONTACT_METHODS['messaging'], $CONTACT_METHODS['messaging2']);
 	}
 	return select_edit_control_inline($name, $CONTACT_METHODS, null, $selected, $controller);
@@ -382,7 +382,7 @@ function replace_gedrec($xref, $ged_id, $gedrec, $chan=true) {
 			));
 		}
 
-		if (WT_USER_AUTO_ACCEPT) {
+		if (get_user_setting(WT_USER_ID, 'auto_accept')) {
 			accept_all_changes($xref, $ged_id);
 		}
 		return true;
@@ -416,7 +416,7 @@ function append_gedrec($gedrec, $ged_id) {
 
 		AddToLog("Appending new $type record $xref", 'edit');
 
-		if (WT_USER_AUTO_ACCEPT) {
+		if (get_user_setting(WT_USER_ID, 'auto_accept')) {
 			accept_all_changes($xref, WT_GED_ID);
 		}
 		return $xref;
@@ -439,7 +439,7 @@ function delete_gedrec($xref, $ged_id) {
 
 	AddToLog("Deleting gedcom record $xref", 'edit');
 
-	if (WT_USER_AUTO_ACCEPT) {
+	if (get_user_setting(WT_USER_ID, 'auto_accept')) {
 		accept_all_changes($xref, WT_GED_ID);
 	}
 }
@@ -568,7 +568,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 	global $pid, $WORD_WRAPPED_NOTES;
 	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept;
 	global $bdm, $STANDARD_NAME_FACTS, $REVERSED_NAME_FACTS, $ADVANCED_NAME_FACTS, $ADVANCED_PLAC_FACTS;
-	global $QUICK_REQUIRED_FACTS, $QUICK_REQUIRED_FAMFACTS, $NO_UPDATE_CHAN;
+	global $QUICK_REQUIRED_FACTS, $QUICK_REQUIRED_FAMFACTS, $NO_UPDATE_CHAN, $controller;
 
 	$SURNAME_TRADITION=get_gedcom_setting(WT_GED_ID, 'SURNAME_TRADITION');
 
@@ -694,6 +694,38 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 					$name_fields['NAME']=$name_fields['GIVN'].' //';
 				}
 				break;
+			}
+			break;
+		case 'patrilineal':
+			// Father gives his surname to his children
+			if ($nextaction=='addchildaction' && WT_Family::getInstance($famid)->getHusband()) {
+				//$father_surname=WT_Family::getInstance($famid)->getHusband()->getAllNames()[0]['surn']; // PHP5.4 only
+				$tmp=WT_Family::getInstance($famid)->getHusband()->getAllNames();
+				$father_surname=$tmp[0]['surn'];
+				$name_fields['SURN']=$father_surname;
+				$name_fields['NAME']='/'.$father_surname.'/';
+			} elseif ($nextaction=='addnewparentaction' && $famtag=='HUSB' && WT_Person::getInstance($pid)) {
+				//$child_surname=WT_Person::getInstance($pid)->getAllNames()[0]['surn']; // PHP5.4 only
+				$tmp=WT_Person::getInstance($pid)->getAllNames();
+				$child_surname=$tmp[0]['surn'];
+				$name_fields['SURN']=$child_surname;
+				$name_fields['NAME']='/'.$child_surname.'/';
+			}
+			break;
+		case 'matrilineal':
+			// Mother gives her surname to her children
+			if ($nextaction=='addchildaction' && WT_Family::getInstance($famid)->getWife()) {
+				//$mother_surname=WT_Family::getInstance($famid)->getWife()->getAllNames()[0]['surn']; // PHP5.4 only
+				$tmp=WT_Family::getInstance($famid)->getWife()->getAllNames();
+				$mother_surname=$tmp[0]['surn'];
+				$name_fields['SURN']=$mother_surname;
+				$name_fields['NAME']='/'.$mother_surname.'/';
+			} elseif ($nextaction=='addnewparentaction' && $famtag=='WIFE' && WT_Person::getInstance($pid)) {
+				//$child_surname=WT_Person::getInstance($pid)->getAllNames()[0]['surn']; // PHP5.4 only
+				$tmp=WT_Person::getInstance($pid)->getAllNames();
+				$child_surname=$tmp[0]['surn'];
+				$name_fields['SURN']=$child_surname;
+				$name_fields['NAME']='/'.$child_surname.'/';
 			}
 			break;
 		case 'paternal':
@@ -921,11 +953,13 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 		echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save and go to new record'), "\" onclick=\"document.addchildform.goto.value='new';\">";
 	}
 	echo "</form>";
-	?>
-	<script>
+	$controller->addInlineJavascript('
+	SURNAME_TRADITION="'.$SURNAME_TRADITION.'";
+	sextag="'.$sextag.'";
+	famtag="'.$famtag.'";
 	function trim(str) {
 		str=str.replace(/\s\s+/g, " ");
-		return str.replace(/(^\s+)|(\s+$)/g, '');
+		return str.replace(/(^\s+)|(\s+$)/g, "");
 	}
 
 	function lang_class(str) {
@@ -944,20 +978,20 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 		var spfx=frm.SPFX.value;
 		var surn=frm.SURN.value;
 		var nsfx=frm.NSFX.value;
-		<?php if ($SURNAME_TRADITION=='polish' && ($sextag=='F' || $famtag=='WIFE')) { ?>
-			surn=surn.replace(/ski$/, 'ska');
-			surn=surn.replace(/cki$/, 'cka');
-			surn=surn.replace(/dzki$/, 'dzka');
-			surn=surn.replace(/żki$/, 'żka');
-		<?php } ?>
+		if (SURNAME_TRADITION=="polish" && (sextag=="F" || famtag=="WIFE")) {
+			surn=surn.replace(/ski$/, "ska");
+			surn=surn.replace(/cki$/, "cka");
+			surn=surn.replace(/dzki$/, "dzka");
+			surn=surn.replace(/żki$/, "żka");
+		}
 		// Commas are used in the GIVN and SURN field to separate lists of surnames.
 		// For example, to differentiate the two Spanish surnames from an English
 		// double-barred name.
 		// Commas *may* be used in other fields, and will form part of the NAME.
-		if (WT_LOCALE=='vi' || WT_LOCALE=='hu') {
+		if (WT_LOCALE=="vi" || WT_LOCALE=="hu") {
 			// Default format: /SURN/ GIVN
 			return trim(npfx+" /"+trim(spfx+" "+surn).replace(/ *, */, " ")+"/ "+givn.replace(/ *, */, " ")+" "+nsfx);
-		} else if (WT_LOCALE=='zh') {
+		} else if (WT_LOCALE=="zh") {
 			// Default format: /SURN/GIVN
 			return trim(npfx+" /"+trim(spfx+" "+surn).replace(/ *, */, " ")+"/"+givn.replace(/ *, */, " ")+" "+nsfx);
 		} else {
@@ -969,7 +1003,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 	// Update the NAME and _MARNM fields from the name components
 	// and also display the value in read-only "gedcom" format.
 	function updatewholename() {
-		// don't update the name if the user manually changed it
+		// don’t update the name if the user manually changed it
 		if (manualChange) return;
 		// Update NAME field from components and display it
 		var frm =document.forms[0];
@@ -978,16 +1012,16 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 		var spfx=frm.SPFX.value;
 		var surn=frm.SURN.value;
 		var nsfx=frm.NSFX.value;
-		document.getElementById('NAME').value=generate_name();
-		document.getElementById('NAME_display').innerHTML=frm.NAME.value;
+		document.getElementById("NAME").value=generate_name();
+		document.getElementById("NAME_display").innerHTML=frm.NAME.value;
 		// Married names inherit some NSFX values, but not these
-		nsfx=nsfx.replace(/^(I|II|III|IV|V|VI|Junior|Jr\.?|Senior|Sr\.?)$/i, '');
+		nsfx=nsfx.replace(/^(I|II|III|IV|V|VI|Junior|Jr\.?|Senior|Sr\.?)$/i, "");
 		// Update _MARNM field from _MARNM_SURN field and display it
 		// Be careful of mixing latin/hebrew/etc. character sets.
-		var ip=document.getElementsByTagName('input');
-		var marnm_id='';
-		var romn='';
-		var heb='';
+		var ip=document.getElementsByTagName("input");
+		var marnm_id="";
+		var romn="";
+		var heb="";
 		for (var i=0; i<ip.length; i++) {
 			var val=ip[i].value;
 			if (ip[i].id.indexOf("_HEB")==0)
@@ -996,15 +1030,15 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 				romn=val;
 			if (ip[i].id.indexOf("_MARNM")==0) {
 				if (ip[i].id.indexOf("_MARNM_SURN")==0) {
-					var msurn='';
-					if (val!='') {
+					var msurn="";
+					if (val!="") {
 						var lc=lang_class(document.getElementById(ip[i].id).value);
 						if (lang_class(frm.NAME.value)==lc)
 							msurn=trim(npfx+" "+givn+" /"+val+"/ "+nsfx);
 						else if (lc=="hebrew")
-							msurn=heb.replace(/\/.*\//, '/'+val+'/');
+							msurn=heb.replace(/\/.*\//, "/"+val+"/");
 						else if (lang_class(romn)==lc)
-							msurn=romn.replace(/\/.*\//, '/'+val+'/');
+							msurn=romn.replace(/\/.*\//, "/"+val+"/");
 					}
 					document.getElementById(marnm_id).value=msurn;
 					document.getElementById(marnm_id+"_display").innerHTML=msurn;
@@ -1024,9 +1058,9 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 		var element = document.getElementById(eid);
 		if (element) {
 			if (element.type=="hidden") {
-				// IE doesn't allow changing the "type" of an input field so we'll cludge it ( silly :P)
+				// IE doesn’t allow changing the "type" of an input field so we’ll cludge it ( silly :P)
 				if (IE) {
-					var newInput = document.createElement('input');
+					var newInput = document.createElement("input");
 					newInput.setAttribute("type", "text");
 					newInput.setAttribute("name", element.Name);
 					newInput.setAttribute("id", element.id);
@@ -1044,7 +1078,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 				manualChange = true;
 				var delement = document.getElementById(eid+"_display");
 				if (delement) {
-					delement.style.display='none';
+					delement.style.display="none";
 					// force FF ui to update the display
 					if (delement.innerHTML != oldName) {
 						oldName = delement.innerHTML;
@@ -1054,9 +1088,9 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 			}
 			else {
 				manualChange = false;
-				// IE doesn't allow changing the "type" of an input field so we'll cludge it ( silly :P)
+				// IE doesn’t allow changing the "type" of an input field so we’ll cludge it ( silly :P)
 				if (IE) {
-					var newInput = document.createElement('input');
+					var newInput = document.createElement("input");
 					newInput.setAttribute("type", "hidden");
 					newInput.setAttribute("name", element.Name);
 					newInput.setAttribute("id", element.id);
@@ -1071,7 +1105,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 				}
 				var delement = document.getElementById(eid+"_display");
 				if (delement) {
-					delement.style.display='inline';
+					delement.style.display="inline";
 				}
 			}
 		}
@@ -1081,7 +1115,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 	* if the user manually changed the NAME field, then update the textual
 	* HTML representation of it
 	* If the value changed set manualChange to true so that changing
-	* the other fields doesn't change the NAME line
+	* the other fields doesn’t change the NAME line
 	*/
 	function updateTextName(eid) {
 		var element = document.getElementById(eid);
@@ -1095,27 +1129,29 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 	}
 
 	function checkform() {
-		var ip=document.getElementsByTagName('input');
+		var ip=document.getElementsByTagName("input");
 		for (var i=0; i<ip.length; i++) {
 			// ADD slashes to _HEB and _AKA names
-			if (ip[i].id.indexOf('_AKA')==0 || ip[i].id.indexOf('_HEB')==0 || ip[i].id.indexOf('ROMN')==0)
-				if (ip[i].value.indexOf('/')<0 && ip[i].value!='')
+			if (ip[i].id.indexOf("_AKA")==0 || ip[i].id.indexOf("_HEB")==0 || ip[i].id.indexOf("ROMN")==0)
+				if (ip[i].value.indexOf("/")<0 && ip[i].value!="")
 					ip[i].value=ip[i].value.replace(/([^\s]+)\s*$/, "/$1/");
 			// Blank out temporary _MARNM_SURN
 			if (ip[i].id.indexOf("_MARNM_SURN")==0)
-					ip[i].value='';
+					ip[i].value="";
 			// Convert "xxx yyy" and "xxx y yyy" surnames to "xxx,yyy"
-			if ('<?php echo $SURNAME_TRADITION; ?>'=='spanish' || '<?php echo $SURNAME_TRADITION; ?>'=='portuguese')
-				if (ip[i].id.indexOf("SURN")==0) ip[i].value=document.forms[0].SURN.value.replace(/^\s*([^\s,]{2,})\s+([iIyY] +)?([^\s,]{2,})\s*$/, "$1,$3");
+			if ((SURNAME_TRADITION=="spanish" || "SURNAME_TRADITION"=="portuguese") && ip[i].id.indexOf("SURN")==0) {
+				ip[i].value=document.forms[0].SURN.value.replace(/^\s*([^\s,]{2,})\s+([iIyY] +)?([^\s,]{2,})\s*$/, "$1,$3");
+			}
 		}
 		return true;
 	}
 
-	// If the name isn't initially formed from the components in a standard way,
-	// then don't automatically update it.
-	if (document.getElementById("NAME").value!=generate_name() && document.getElementById("NAME").value!="//") convertHidden("NAME");
-	</script>
-	<?php
+	// If the name isn’t initially formed from the components in a standard way,
+	// then don’t automatically update it.
+	if (document.getElementById("NAME").value!=generate_name() && document.getElementById("NAME").value!="//") {
+		convertHidden("NAME");
+	}
+	');
 }
 
 // generates javascript code for calendar popup in user's language
@@ -1134,12 +1170,12 @@ function print_addnewrepository_link($element_id) {
 }
 
 function print_addnewnote_link($element_id) {
-	return '<a href="#" onclick="addnewnote(document.getElementById(\''.$element_id.'\')); return false;" class="icon-button_addnote" title="'.WT_I18N::translate('Create a new Shared Note').'">';
+	return '<a href="#" onclick="addnewnote(document.getElementById(\''.$element_id.'\')); return false;" class="icon-button_addnote" title="'.WT_I18N::translate('Create a new Shared Note').'"></a>';
 }
 
 /// Used in GEDFact CENS assistant
 function print_addnewnote_assisted_link($element_id, $pid) {
-	return '<a href="#" onclick="addnewnote_assisted(document.getElementById(\''.$element_id.'\'), \''.$pid.'\'); return false;" class="icon-button_addnote" title="'.WT_I18N::translate('Create a new Shared Note using Assistant').'"></a>';
+	return '<a href="#" onclick="addnewnote_assisted(document.getElementById(\''.$element_id.'\'), \''.$pid.'\'); return false;">'.WT_I18N::translate('Create a new Shared Note using Assistant').'</a>';
 }
 
 function print_editnote_link($note_id) {
@@ -1244,78 +1280,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 	if ($fact=='REPO' || $fact=='SOUR' || $fact=='OBJE' || $fact=='FAMC')
 		$islink = true;
 
-	// rows & cols
-	switch ($fact) {
-	case 'FORM':
-		if ($upperlevel=='OBJE') {
-			// FILE:FORM
-			$rows=1;
-			$cols=5;
-		} else {
-			// FACT:PLAC:FORM
-			$rows=1;
-			$cols=40;
-		}
-		break;
-	case 'LATI': case 'LONG': case 'NPFX': case 'SPFX': case 'NSFX':
-		$rows=1;
-		$cols=12;
-		break;
-	case 'DATE':
-		$rows=1;
-		$cols=30;
-		break;
-	case 'TIME': case 'TYPE':
-		$rows=1;
-		$cols=20;
-		break;
-	case 'GIVN': case 'SURN': case '_MARNM':
-		$rows=1;
-		$cols=25;
-		break;
-	case '_UID':
-		$rows=1;
-		$cols=50;
-		break;
-	case 'TEXT': case 'PUBL':
-		$rows=10;
-		$cols=70;
-		break;
-	case 'SHARED_NOTE_EDIT':
-		$islink=1;
-		$fact="NOTE";
-		$rows=15;
-		$cols=88;
-		break;
-	case 'SHARED_NOTE':
-		$islink=1;
-		$fact="NOTE";
-		$rows=1;
-		$cols=($islink ? 8 : 40);
-		break;
-	case 'NOTE':
-		if ($islink) {
-			$rows=1;
-			$cols=($islink ? 8 : 40);
-			break;
-		} else {
-			$rows=10;
-			$cols=70;
-			break;
-		}
-	case 'ADDR':
-		$rows=4;
-		$cols=40;
-		break;
-	case 'PAGE':
-		$rows=1;
-		$cols=50;
-		break;
-	default:
-		$rows=1;
-		$cols=($islink ? 8 : 40);
-		break;
-	}
+	if ($fact=='SHARED_NOTE_EDIT' || $fact=='SHARED_NOTE') {$islink=1;$fact="NOTE";}
 
 	// label
 	echo "<tr id=\"", $element_id, "_tr\" ";
@@ -1335,7 +1300,6 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		echo $element_name, "<br>";
 	}
 
-
 	// tag name
 	if (!empty($label)) {
 		if ($label=="Note" && $islink) {
@@ -1344,15 +1308,8 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 			echo $label;
 		}
 	} else {
-		if ($fact=="NOTE" && $islink) {
+		if ($fact=="SHARED_NOTE" && $islink) {
 			echo WT_Gedcom_Tag::getLabel('SHARED_NOTE');
-			/*
-			if ($pid && $label=='GEDFact Assistant' && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
-				// use $label (GEDFact Assistant);
-			} else {
-				echo WT_I18N::translate('Shared note');
-			}
-			*/
 		} else {
 			echo WT_Gedcom_Tag::getLabel($fact);
 		}
@@ -1372,11 +1329,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 			break;
 		case 'NOTE':
 			if ($islink) {
-				if ($pid && $label=='GEDFact Assistant' && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
-					echo help_link('edit_add_GEDFact_ASSISTED');
-				} else {
-					echo help_link('edit_add_SHARED_NOTE');
-				}
+				echo help_link('edit_add_SHARED_NOTE');
 			} else {
 				echo help_link($fact);
 			}
@@ -1442,15 +1395,6 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		echo "<input type=\"hidden\" name=\"glevels[]\" value=\"", $level, "\">";
 		echo "<input type=\"hidden\" name=\"islink[]\" value=\"", $islink, "\">";
 		echo "<input type=\"hidden\" name=\"tag[]\" value=\"", $fact, "\">";
-
-		// Shared Notes Debug ------------------------------------------------
-		// Please leave until GEDFact assistant/_CENS is released - B.Holland
-			// echo "<br>Label = ".$label;
-			// echo "<br>Level = ".$level;
-			// echo "<br>Link  = ".$islink;
-			// echo "<br>Fact  = ".$fact;
-			// echo "<br>Value = ".$value;
-		// End Debug ---------------------------------------------------------
 	}
 	echo "</td>";
 
@@ -1480,18 +1424,6 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 			echo " onclick=\"if (this.checked) ", $element_id, ".value='Y'; else ", $element_id, ".value=''; \">";
 			echo WT_I18N::translate('yes');
 		}
-/*
-		// If GEDFAct_assistant/_CENS/ module exists && we are on the INDI page && action is ADD a new CENS event
-		// Then show the add Shared note input field and the GEDFact assisted icon.
-		// If GEDFAct_assistant/_CENS/ module not installed  ... do not show
-		if ($pid && $fact=='CENS' && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
-			$type_pid=GedcomRecord::getInstance($pid);
-			if ($type_pid->getType()=="INDI" && $action=="add" ) {
-				add_simple_tag("2 SHARED_NOTE", "", "GEDFact Assistant");
-			}
-		}
-		// -----------------------------------------------------------------------------------------------------
-*/
 
 	} else if ($fact=="TEMP") {
 		echo select_edit_control($element_name, WT_Gedcom_Code_Temp::templeNames(), WT_I18N::translate('No Temple - Living Ordinance'), $value);
@@ -1550,7 +1482,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		echo '</select>';
 	} else if (($fact=='NAME' && $upperlevel!='REPO') || $fact=='_MARNM') {
 		// Populated in javascript from sub-tags
-		echo "<input type=\"hidden\" id=\"", $element_id, "\" name=\"", $element_name, "\" onchange=\"updateTextName('", $element_id, "');\" value=\"", htmlspecialchars($value), "\">";
+		echo "<input type=\"hidden\" id=\"", $element_id, "\" name=\"", $element_name, "\" onchange=\"updateTextName('", $element_id, "');\" value=\"", htmlspecialchars($value), "\" class=\"", $fact, "\">";
 		echo '<span id="', $element_id, '_display" dir="auto">', htmlspecialchars($value), '</span>';
 		echo ' <a href="#edit_name" onclick="convertHidden(\'', $element_id, '\'); return false;" class="icon-edit_indi" title="'.WT_I18N::translate('Edit name').'"></a>';
 	} else {
@@ -1561,35 +1493,50 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		}
 		else{
 		//END PERSO
-			// textarea
-			if ($rows>1) echo "<textarea id=\"", $element_id, "\" name=\"", $element_name, "\" rows=\"", $rows, "\" cols=\"", $cols, '" dir="auto">', htmlspecialchars($value), "</textarea><br>";
-			else {
+		// textarea
+		if ($fact=='TEXT' || $fact=='ADDR' || ($fact=='NOTE' && !$islink)) {
+			echo "<textarea id=\"", $element_id, "\" name=\"", $element_name, "\" dir=\"auto\">", htmlspecialchars($value), "</textarea><br>";
+		} else {
 				// text
 				// If using GEDFact-assistant window
 				if ($action=="addnewnote_assisted") {
 					echo "<input type=\"text\" id=\"", $element_id, "\" name=\"", $element_name, "\" value=\"", htmlspecialchars($value), "\" style=\"width:4.1em;\" dir=\"ltr\"";
 				} else {
-					echo "<input type=\"text\" id=\"", $element_id, "\" name=\"", $element_name, "\" value=\"", htmlspecialchars($value), "\" size=\"", $cols, "\" dir=\"ltr\"";
+				echo "<input type=\"text\" id=\"", $element_id, "\" name=\"", $element_name, "\" value=\"", htmlspecialchars($value), "\" dir=\"ltr\"";
 				}
 				echo " class=\"{$fact}\"";
-				if (in_array($fact, $subnamefacts)) echo " onblur=\"updatewholename();\" onkeyup=\"updatewholename();\"";
-				if ($fact=="DATE") echo " onblur=\"valid_date(this);\" onmouseout=\"valid_date(this);\"";
-				if ($fact=="LATI") echo " onblur=\"valid_lati_long(this, 'N', 'S');\" onmouseout=\"valid_lati_long(this, 'N', 'S');\"";
-				if ($fact=="LONG") echo " onblur=\"valid_lati_long(this, 'E', 'W');\" onmouseout=\"valid_lati_long(this, 'E', 'W');\"";
-				//if ($fact=="FILE") echo " onchange=\"if (updateFormat) updateFormat(this.value);\"";
+			if (in_array($fact, $subnamefacts)) {
+				echo " onblur=\"updatewholename();\" onkeyup=\"updatewholename();\"";
+			}
+			if ($fact=='GIVN') {
+				echo ' autofocus';
+			}
+			if ($fact=="DATE") {
+				echo " onblur=\"valid_date(this);\" onmouseout=\"valid_date(this);\"";
+			}
+			if ($fact=="LATI") {
+				echo " onblur=\"valid_lati_long(this, 'N', 'S');\" onmouseout=\"valid_lati_long(this, 'N', 'S');\"";
+			}
+			if ($fact=="LONG") {
+				echo " onblur=\"valid_lati_long(this, 'E', 'W');\" onmouseout=\"valid_lati_long(this, 'E', 'W');\"";
+			}
 				echo ' ', $readOnly, ">";
 			}
+		
+		$tmp_array[]='';
+			$tmp_array = array('TYPE','TIME','NOTE','ASSO','AGE');
+		
 			// split PLAC
 			if ($fact=="PLAC" && $readOnly=='') {
 				echo "<div id=\"", $element_id, "_pop\" style=\"display: inline;\">";
 				echo print_specialchar_link($element_id), ' ', print_findplace_link($element_id);
+			echo '<span  onclick="jQuery(\'#', $upperlevel, '_LATI_tr,#', $upperlevel, '_LONG_tr,#INDI_LATI_tr,#INDI_LONG_tr,tr[id^=LATI],tr[id^=LONG]\').toggle(\'fast\'); return false;" class="icon-target" title="', WT_Gedcom_Tag::getLabel('LATI'), ' / ', WT_Gedcom_Tag::getLabel('LONG'), '"></span>';
 				echo '</div>';
-				echo '<a href="#" onclick="jQuery(\'#LATI_tr,#LONG_tr,#INDI_LATI_tr,#INDI_LONG_tr,tr[id^=LATI],tr[id^=LONG]\').toggle(\'fast\'); return false;" class="icon-target" title="', WT_Gedcom_Tag::getLabel('LATI'), ' / ', WT_Gedcom_Tag::getLabel('LONG'), '" title="', WT_Gedcom_Tag::getLabel('LATI'), ' / ', WT_Gedcom_Tag::getLabel('LONG'), '"></a>';
 				if (array_key_exists('places_assistant', WT_Module::getActiveModules())) {
 					places_assistant_WT_Module::setup_place_subfields($element_id);
 					places_assistant_WT_Module::print_place_subfields($element_id);
-				}
-			} elseif (($cols>20 || $fact=="NPFX") && $readOnly=='') {
+			}
+		} elseif (!in_array($fact, $tmp_array) && $readOnly=='') {
 				echo print_specialchar_link($element_id);
 			}
 		} //END PERSO
@@ -1708,12 +1655,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 				if ($event_add=="census_add") {
 					$type_pid=WT_GedcomRecord::getInstance($pid);
 					if ($type_pid->getType()=="INDI" ) {
-						echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-						echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-						echo "<a href=\"#\" onclick=\"addnewnote_assisted(document.getElementById('", $element_id, "'), '", $pid, "' ); return false;\" title=\"".WT_I18N::translate('Create a new Shared Note using Assistant')."\" alt=\"".WT_I18N::translate('Create a new Shared Note using Assistant')."\">";
-						echo WT_I18N::translate('Shared Note using Assistant');
-						echo '</a> ';
-						echo print_addnewnote_assisted_link($element_id, $pid);
+						echo '<br>', print_addnewnote_assisted_link($element_id, $pid);
 					}
 				}
 			}
@@ -1746,9 +1688,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 	}
 	// pastable values
 	if ($readOnly=='') {
-		if ($fact=="SPFX") print_autopaste_link($element_id, $SPFX_accept, true);
-		if ($fact=="NSFX") print_autopaste_link($element_id, $NSFX_accept, true);
-		if ($fact=="FORM" && $upperlevel=='OBJE') print_autopaste_link($element_id, $FILE_FORM_accept, false);
+		if ($fact=="FORM" && $upperlevel=='OBJE') print_autopaste_link($element_id, $FILE_FORM_accept);
 	}
 
 	if ($noClose != "NOCLOSE") echo "</td></tr>";

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Fanchart.php 14198 2012-08-25 15:00:37Z greg $
+// $Id: Fanchart.php 14241 2012-09-03 08:50:48Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -371,10 +371,8 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 			return $html.$imagemap.'<p align="center"><img src="'.WT_SCRIPT_NAME.'?rootid='.$this->rootid.'&amp;fan_style='.$this->fan_style.'&amp;generations='.$this->generations.'&amp;fan_width='.$this->fan_width.'&amp;img=1" width="'.$fanw.'" height="'.$fanh.'" alt="'.$image_title.'" title="'.$image_title.'" usemap="#fanmap"></p>';
 		case 'png':
 			ImageStringUp($image, 1, $fanw-10, $fanh/3, WT_SERVER_NAME.WT_SCRIPT_PATH, $color);
-			ob_start();
 			ImagePng($image);
 			ImageDestroy($image);
-			return ob_get_flush();
 		}
 	}
 }

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_batch_update.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: admin_batch_update.php 14275 2012-09-14 10:26:33Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -61,14 +61,8 @@ class batch_update {
 			'<input type="hidden" name="data"   value="">'. // will be set by javascript for next update
 			'<table id="batch_update"><tr>'.
 			'<th>'.WT_I18N::translate('Family tree').'</th>'.
-			'<td><select name="ged" onchange="reset_reload();">';
-
-		$all_gedcoms=get_all_gedcoms();
-		asort($all_gedcoms);
-		foreach ($all_gedcoms as $ged_id=>$gedcom) {
-			$html.='<option value="'.$gedcom.'"'.($ged_id==WT_GED_ID ? ' selected="selected"' : '').'>'.get_gedcom_setting($ged_id, 'title').'</option>';
-		}
-		$html.='</select></td></tr><tr><th>'.WT_I18N::translate('Batch update').'</th><td><select name="plugin" onchange="reset_reload();">';
+			'<td>'.select_edit_control('ged', WT_Tree::getNameList(), '', WT_GEDCOM, 'onchange="reset_reload();"').
+			'</td></tr><tr><th>'.WT_I18N::translate('Batch update').'</th><td><select name="plugin" onchange="reset_reload();">';
 		if (!$this->plugin) {
 			$html.='<option value="" selected="selected"></option>';
 		}

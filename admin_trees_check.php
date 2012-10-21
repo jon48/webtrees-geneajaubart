@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-//$Id: admin_trees_check.php 13965 2012-06-02 20:41:44Z greg $
+//$Id: admin_trees_check.php 14275 2012-09-14 10:26:33Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_check.php');
 require './includes/session.php';
@@ -38,7 +38,7 @@ $controller
 
 echo '<form method="get" action="', WT_SCRIPT_NAME, '">';
 echo '<input type="hidden" name="go" value="1">';
-echo select_edit_control('ged', array_combine(get_all_gedcoms(), get_all_gedcoms()), null, WT_GEDCOM);
+echo select_edit_control('ged', WT_Tree::getNameList(), null, WT_GEDCOM);
 echo '<input type="submit" value="', $controller->getPageTitle(), '">';
 echo '</form>';
 

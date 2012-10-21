@@ -20,7 +20,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: webtrees.js 14226 2012-08-30 05:18:45Z nigel $
+// $Id: webtrees.js 14410 2012-10-10 17:33:33Z greg $
 
 // Specifications for various types of popup edit window.
 // Choose positions to center in the smallest (1000x800) target screen
@@ -58,6 +58,22 @@ function modalDialog(url, title) {
 		.dialog({
 			modal: true,
 			width: 700,
+			close: function(event, ui) { $(this).remove(); }
+		});
+	// Close the window when we click outside it.
+	jQuery(".ui-widget-overlay").live("click", function () {
+		jQuery("div:ui-dialog:visible").dialog("close");
+	});
+	return false;
+}
+
+// Create a modal dialog to display notes
+function modalNotes(content, title) {
+	dialog=jQuery('<div title="'+title+'"></div>')
+		.html(content)
+		.dialog({
+			modal: true,
+			width: 500,
 			close: function(event, ui) { $(this).remove(); }
 		});
 	// Close the window when we click outside it.
@@ -303,7 +319,7 @@ function getMouseXY(e) {
  */
 function edit_interface(params, windowspecs, pastefield) {
   var features = windowspecs || edit_window_specs;
-  var url = 'edit_interface.php?' + jQuery.param(params) + '&accesstime=' + accesstime;
+  var url = 'edit_interface.php?' + jQuery.param(params) + '&accesstime=' + accesstime + '&ged=' + WT_GEDCOM;
   window.open(url, '_blank', features);
 }
 
@@ -347,7 +363,7 @@ function add_record(pid, fact) {
 	if (factfield) {
 		var factvalue = factfield.options[factfield.selectedIndex].value;
 		if (factvalue == "OBJE") {
-			window.open('addmedia.php?action=showmediaform&linkid='+pid, '_blank', edit_window_specs);
+			window.open('addmedia.php?action=showmediaform&linkid='+pid+'&ged='+WT_GEDCOM, '_blank', edit_window_specs);
 		} else {
 			edit_interface({
 				"action": "add",
@@ -520,12 +536,12 @@ function reorder_families(pid) {
 }
 
 function reply(username, subject) {
-	window.open('message.php?to='+username+'&subject='+subject, '_blank', mesg_window_specs);
+	window.open('message.php?to='+username+'&subject='+subject+'&ged='+WT_GEDCOM, '_blank', mesg_window_specs);
 	return false;
 }
 
 function delete_message(id) {
-	window.open('message.php?action=delete&id='+id, '_blank', mesg_window_specs);
+	window.open('message.php?action=delete&id='+id, '_blank'+'&ged='+WT_GEDCOM, mesg_window_specs);
 	return false;
 }
 
@@ -1231,53 +1247,68 @@ var monthLabels = new Array();
   	cal_toggleDate(dateDivId, dateFieldId);
   	return false;
   }
+
 function findIndi(field, indiname, ged) {
-        pastefield = field;
-        nameElement = indiname;
-        window.open('find.php?type=indi&ged='+ged, '_blank', find_window_specs);
-        return false;
+	ged = (typeof ged === 'undefined') ? WT_GEDCOM : ged;
+	pastefield = field;
+	nameElement = indiname;
+	window.open('find.php?type=indi&ged='+ged, '_blank', find_window_specs);
+	return false;
 }
 
 function findPlace(field, ged) {
+	ged = (typeof ged === 'undefined') ? WT_GEDCOM : ged;
 	pastefield = field;
 	window.open('find.php?type=place&ged='+ged, '_blank', find_window_specs);
 	return false;
 }
 
 function findFamily(field, ged) {
+	ged = (typeof ged === 'undefined') ? WT_GEDCOM : ged;
 	pastefield = field;
 	window.open('find.php?type=fam&ged='+ged, '_blank', find_window_specs);
 	return false;
 }
+
 function findMedia(field, choose, ged) {
+	ged = (typeof ged === 'undefined') ? WT_GEDCOM : ged;
 	pastefield = field;
 	if (!choose) choose="0all";
 	window.open('find.php?type=media&choose='+choose+'&ged='+ged, '_blank', find_window_specs);
 	return false;
 }
+
 function findSource(field, sourcename, ged) {
+	ged = (typeof ged === 'undefined') ? WT_GEDCOM : ged;
 	pastefield = field;
 	nameElement = sourcename;
 	window.open('find.php?type=source&ged='+ged, '_blank', find_window_specs);
 	return false;
 }
+
 function findnote(field, notename, ged) {
+	ged = (typeof ged === 'undefined') ? WT_GEDCOM : ged;
 	pastefield = field;
 	nameElement = notename;
 	window.open('find.php?type=note&ged='+ged, '_blank', find_window_specs);
 	return false;
 }
+
 function findRepository(field, ged) {
+	ged = (typeof ged === 'undefined') ? WT_GEDCOM : ged;
 	pastefield = field;
 	window.open('find.php?type=repo&ged='+ged, '_blank', find_window_specs);
 	return false;
 }
+
 function findSpecialChar(field) {
 	pastefield = field;
 	window.open('find.php?type=specialchar', '_blank', find_window_specs);
 	return false;
 }
+
 function findFact(field, ged) {
+	ged = (typeof ged === 'undefined') ? WT_GEDCOM : ged;
 	pastefield = field;
 	tags = field.value;
 	window.open('find.php?type=facts&tags='+tags+'&ged='+ged, '_blank', find_window_specs);
@@ -1285,7 +1316,7 @@ function findFact(field, ged) {
 }
 
 function ilinkitem(mediaid, type) {
-	window.open('inverselink.php?mediaid='+mediaid+'&linkto='+type, '_blank', find_window_specs);
+	window.open('inverselink.php?mediaid='+mediaid+'&linkto='+type+'&ged='+WT_GEDCOM, '_blank', find_window_specs);
 	return false;
 }
 
@@ -1304,51 +1335,48 @@ function message(username, method, url, subject) {
  *
  */
 function include_css(css_file) {
-    var html_doc = document.getElementsByTagName('head')[0];
-    var css = document.createElement('link');
-    css.setAttribute('rel', 'stylesheet');
-    css.setAttribute('type', 'text/css');
-    css.setAttribute('href', css_file);
-    html_doc.appendChild(css);
+	var html_doc = document.getElementsByTagName('head')[0];
+	var css = document.createElement('link');
+	css.setAttribute('rel', 'stylesheet');
+	css.setAttribute('type', 'text/css');
+	css.setAttribute('href', css_file);
+	html_doc.appendChild(css);
 }
 
 function include_js(file) {
-    var html_doc = document.getElementsByTagName('head')[0];
-    var js = document.createElement('script');
-    js.setAttribute('type', 'text/javascript');
-    js.setAttribute('src', file);
-    html_doc.appendChild(js);
+	var html_doc = document.getElementsByTagName('head')[0];
+	var js = document.createElement('script');
+	js.setAttribute('type', 'text/javascript');
+	js.setAttribute('src', file);
+	html_doc.appendChild(js);
 }
 
-  function findPosX(obj)
-  {
-    var curleft = 0;
-    if(obj.offsetParent)
-        while(1)
-        {
-          curleft += obj.offsetLeft;
-          if(!obj.offsetParent)
-            break;
-          obj = obj.offsetParent;
-        }
-    else if(obj.x)
-        curleft += obj.x;
-    return curleft;
-  }
+function findPosX(obj) {
+	var curleft = 0;
+	if(obj.offsetParent)
+		while(1) {
+			curleft += obj.offsetLeft;
+			if(!obj.offsetParent)
+				break;
+			obj = obj.offsetParent;
+		}
+	else if(obj.x)
+		curleft += obj.x;
+	return curleft;
+}
 
-  function findPosY(obj)
-  {
-    var curtop = 0;
-    if(obj.offsetParent)
-        while(1)
-        {
-        	if (obj.style.position=="relative") break;
-          curtop += obj.offsetTop;
-          if(!obj.offsetParent)
-            break;
-          obj = obj.offsetParent;
-        }
-    else if(obj.y)
-        curtop += obj.y;
-    return curtop;
-  }
+function findPosY(obj) {
+	var curtop = 0;
+	if(obj.offsetParent)
+		while(1) {
+			if (obj.style.position=="relative")
+				break;
+			curtop += obj.offsetTop;
+			if(!obj.offsetParent)
+				break;
+			obj = obj.offsetParent;
+		}
+	else if(obj.y)
+		curtop += obj.y;
+	return curtop;
+}

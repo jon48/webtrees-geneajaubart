@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: find.php 14087 2012-07-07 21:34:26Z greg $
+// $Id: find.php 14242 2012-09-03 10:03:17Z greg $
 
 define('WT_SCRIPT_NAME', 'find.php');
 require './includes/session.php';
@@ -515,7 +515,7 @@ if ($type == "facts") {
 	<td><td></tbody></table>
 
 	<table id="tabAction"><tbody><tr>
-		<td><button id="btnOk" disabled="disabled" onclick="if (!this.disabled)DoOK();">', WT_I18N::translate('Accept'), '</button></td>
+		<td><button id="btnOk" disabled="disabled" onclick="if (!this.disabled)DoOK();">', WT_I18N::translate('Save'), '</button></td>
 		<td><button onclick="window.close();return false">', WT_I18N::translate('Cancel'), '</button></td>
 	<tr></tbody></table>
 	</td></tr></table>

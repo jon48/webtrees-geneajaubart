@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions.php 14230 2012-08-31 11:50:13Z greg $
+// $Id: functions.php 14396 2012-10-06 23:04:26Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -169,21 +169,21 @@ function fetch_remote_file($host, $path, $timeout=3) {
 // may be different for each.  The server logs are used to generate
 // installation statistics which can be found at http://svn.webtrees.net/statistics.html
 function fetch_latest_version() {
-	$last_update_timestamp=get_site_setting('LATEST_WT_VERSION_TIMESTAMP');
-	if ($last_update_timestamp < time()-24*60*60) {
+	$last_update_timestamp=WT_Site::preference('LATEST_WT_VERSION_TIMESTAMP');
+	if ($last_update_timestamp < WT_TIMESTAMP - 24*60*60) {
 		$row=WT_DB::prepare("SHOW VARIABLES LIKE 'version'")->fetchOneRow();
 		$params='?w='.WT_VERSION.WT_VERSION_RELEASE.'&p='.PHP_VERSION.'&m='.$row->value.'&o='.(DIRECTORY_SEPARATOR=='/'?'u':'w');
 		$latest_version_txt=fetch_remote_file('svn.webtrees.net', '/build/latest-version.txt'.$params);
 		if ($latest_version_txt) {
-			set_site_setting('LATEST_WT_VERSION', $latest_version_txt);
-			set_site_setting('LATEST_WT_VERSION_TIMESTAMP', time());
+			WT_Site::preference('LATEST_WT_VERSION', $latest_version_txt);
+			WT_Site::preference('LATEST_WT_VERSION_TIMESTAMP', WT_TIMESTAMP);
 			return $latest_version_txt;
 		} else {
 			// Cannot connect to server - use cached version (if we have one)
-			return get_site_setting('LATEST_WT_VERSION');
+			return WT_Site::preference('LATEST_WT_VERSION');
 		}
 	} else {
-		return get_site_setting('LATEST_WT_VERSION');
+		return WT_Site::preference('LATEST_WT_VERSION');
 	}
 }
 
@@ -237,7 +237,10 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $MEDIA_DIRECTORY;              $MEDIA_DIRECTORY              =get_gedcom_setting($ged_id, 'MEDIA_DIRECTORY');
 	global $MEDIA_DIRECTORY_LEVELS;       $MEDIA_DIRECTORY_LEVELS       =get_gedcom_setting($ged_id, 'MEDIA_DIRECTORY_LEVELS');
 	global $MEDIA_EXTERNAL;               $MEDIA_EXTERNAL               =get_gedcom_setting($ged_id, 'MEDIA_EXTERNAL');
-	global $MEDIA_FIREWALL_ROOTDIR;       $MEDIA_FIREWALL_ROOTDIR       =get_gedcom_setting($ged_id, 'MEDIA_FIREWALL_ROOTDIR', WT_DATA_DIR);
+	global $MEDIA_FIREWALL_ROOTDIR;       $MEDIA_FIREWALL_ROOTDIR       =get_gedcom_setting($ged_id, 'MEDIA_FIREWALL_ROOTDIR');
+	if (!$MEDIA_FIREWALL_ROOTDIR) {
+		$MEDIA_FIREWALL_ROOTDIR=WT_DATA_DIR;
+	}
 	global $MEDIA_FIREWALL_THUMBS;        $MEDIA_FIREWALL_THUMBS        =get_gedcom_setting($ged_id, 'MEDIA_FIREWALL_THUMBS');
 	global $MEDIA_ID_PREFIX;              $MEDIA_ID_PREFIX              =get_gedcom_setting($ged_id, 'MEDIA_ID_PREFIX');
 	global $NOTE_ID_PREFIX;               $NOTE_ID_PREFIX               =get_gedcom_setting($ged_id, 'NOTE_ID_PREFIX');
@@ -316,9 +319,6 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 function wt_error_handler($errno, $errstr, $errfile, $errline) {
 	if ((error_reporting() > 0)&&($errno<2048)) {
 		if (WT_ERROR_LEVEL==0) {
-			return;
-		}
-		if (stristr($errstr, "by reference")==true) {
 			return;
 		}
 		$fmt_msg="<br>ERROR {$errno}: {$errstr}<br>";
@@ -445,11 +445,10 @@ function get_sub_record($level, $tag, $gedrec, $num=1) {
  * @param int $level The gedcom line level of the first tag to find, setting level to 0 will cause it to use 1+ the level of the incoming record
  * @param string $gedrec The gedcom record to get the value from
  * @param int $truncate Should the value be truncated to a certain number of characters
- * @param boolean $convert Should data like dates be converted using the configuration settings
  * @return string
  */
-function get_gedcom_value($tag, $level, $gedrec, $truncate='', $convert=true) {
-	global $SHOW_PEDIGREE_PLACES, $GEDCOM;
+function get_gedcom_value($tag, $level, $gedrec, $truncate='') {
+	global $GEDCOM;
 	$ged_id=get_id_from_gedcom($GEDCOM);
 
 	if (empty($gedrec)) {
@@ -498,29 +497,9 @@ function get_gedcom_value($tag, $level, $gedrec, $truncate='', $convert=true) {
 	}
 	if ($ct > 0) {
 		$value = trim($match[1]);
-		$ct = preg_match("/@(.*)@/", $value, $match);
-		if (($ct > 0 ) && ($t!="DATE")) {
+		if ($t=='NOTE' && preg_match('/^@(.+)@$/', $value, $match)) {
 			$oldsub = $subrec;
-			switch ($t) {
-			case 'HUSB':
-			case 'WIFE':
-			case 'CHIL':
-				$subrec = find_person_record($match[1], $ged_id);
-				break;
-			case 'FAMC':
-			case 'FAMS':
-				$subrec = find_family_record($match[1], $ged_id);
-				break;
-			case 'SOUR':
-				$subrec = find_source_record($match[1], $ged_id);
-				break;
-			case 'REPO':
-				$subrec = find_other_record($match[1], $ged_id);
-				break;
-			default:
-				$subrec = find_gedcom_record($match[1], $ged_id);
-				break;
-			}
+			$subrec = find_other_record($match[1], $ged_id);
 			if ($subrec) {
 				$value=$match[1];
 				$ct = preg_match("/0 @$match[1]@ $t (.+)/", $subrec, $match);
@@ -529,88 +508,16 @@ function get_gedcom_value($tag, $level, $gedrec, $truncate='', $convert=true) {
 					$level = 0;
 				} else
 					$subrec = $oldsub;
-			} else
+			} else {
 				//-- set the value to the id without the @
 				$value = $match[1];
+			}
 		}
 		if ($level!=0 || $t!="NOTE") {
 			$value .= get_cont($level+1, $subrec);
 		}
 		$value = preg_replace("'\n'", "", $value);
 		$value = preg_replace("'<br>'", "\n", $value);
-		$value = trim($value);
-		//-- if it is a date value then convert the date
-		if ($convert && $t=="DATE") {
-			$g = new WT_Date($value);
-			$value = $g->Display();
-			if (!empty($truncate)) {
-				if (utf8_strlen($value)>$truncate) {
-					$value = preg_replace("/\(.+\)/", "", $value);
-					//if (utf8_strlen($value)>$truncate) {
-						//$value = preg_replace_callback("/([a-zśź]+)/ui", create_function('$matches', 'return utf8_substr($matches[1], 0, 3);'), $value);
-					//}
-				}
-			}
-		} else
-			//-- if it is a place value then apply the pedigree place limit
-			if ($convert && $t=="PLAC") {
-				if ($SHOW_PEDIGREE_PLACES>0) {
-					$plevels = explode(',', $value);
-					$value = "";
-					for ($plevel=0; $plevel<$SHOW_PEDIGREE_PLACES; $plevel++) {
-						if (!empty($plevels[$plevel])) {
-							if ($plevel>0) {
-								$value .= ", ";
-							}
-							$value .= trim($plevels[$plevel]);
-						}
-					}
-				}
-				if (!empty($truncate)) {
-					if (strlen($value)>$truncate) {
-						$plevels = explode(',', $value);
-						$value = "";
-						for ($plevel=0; $plevel<count($plevels); $plevel++) {
-							if (!empty($plevels[$plevel])) {
-								if (strlen($plevels[$plevel])+strlen($value)+3 < $truncate) {
-									if ($plevel>0) {
-										$value .= ", ";
-									}
-									$value .= trim($plevels[$plevel]);
-								} else
-									break;
-							}
-						}
-					}
-				}
-			} else
-				if ($convert && $t=="SEX") {
-					if ($value=="M") {
-						$value = utf8_substr(WT_I18N::translate('Male'), 0, 1);
-					} elseif ($value=="F") {
-						$value = utf8_substr(WT_I18N::translate('Female'), 0, 1);
-					} else {
-						$value = utf8_substr(WT_I18N::translate_c('unknown gender', 'Unknown'), 0, 1);
-					}
-				} else {
-					if (!empty($truncate)) {
-						if (strlen($value)>$truncate) {
-							$plevels = explode(' ', $value);
-							$value = "";
-							for ($plevel=0; $plevel<count($plevels); $plevel++) {
-								if (!empty($plevels[$plevel])) {
-									if (strlen($plevels[$plevel])+strlen($value)+3 < $truncate) {
-										if ($plevel>0) {
-											$value .= " ";
-										}
-										$value .= trim($plevels[$plevel]);
-									} else
-										break;
-								}
-							}
-						}
-					}
-				}
 		return $value;
 	}
 	return "";

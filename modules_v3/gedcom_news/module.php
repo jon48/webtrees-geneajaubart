@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14055 2012-06-30 10:39:20Z greg $
+// $Id: module.php 14279 2012-09-14 21:46:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -95,7 +95,6 @@ class gedcom_news_WT_Module extends WT_Module implements WT_Module_Block {
 			$content .= WT_I18N::translate('No News articles have been submitted.').'<br>';
 		}
 		$c = 0;
-		$td = time();
 		foreach ($usernews as $news) {
 			if ($limit=='count') {
 				if ($c >= $flag) {
@@ -104,7 +103,7 @@ class gedcom_news_WT_Module extends WT_Module implements WT_Module_Block {
 				$c++;
 			}
 			if ($limit=='date') {
-				if ((int)(($td - $news['date']) / 86400) > $flag) {
+				if ((int)((WT_TIMESTAMP - $news['date']) / 86400) > $flag) {
 					break;
 				}
 			}

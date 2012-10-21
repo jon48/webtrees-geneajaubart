@@ -21,53 +21,50 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_other.php 12696 2011-11-11 00:56:58Z greg $
+// $Id: admin_site_other.php 14300 2012-09-15 21:08:28Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_other.php');
 require './includes/session.php';
+require WT_ROOT.'includes/functions/functions_edit.php';
 
 $controller=new WT_Controller_Base();
 $controller->setPageTitle(WT_I18N::translate('Add unlinked records'));
 $controller->pageHeader();
 
-// The addnewXXX() functions work only for the default tree.
-// Choose one...
-$html='<p><form method="post" action="'.WT_SCRIPT_NAME.'" name="tree"><select name="ged" onChange="tree.submit();">';
-$n=0;
-foreach (get_gedcom_titles() as $gedcom) {
-	if (userGedcomAdmin(WT_USER_ID, $gedcom->gedcom_id)) {
-		$html.='<option value="'.htmlspecialchars($gedcom->gedcom_name).'"';
-		if ($gedcom->gedcom_id==WT_GED_ID) {
-			$html.=' selected="selected"';
-		}
-		$html.='>'.$gedcom->gedcom_title.'</option>';
-		++$n;
-	}
-}
-$html.='</select></form></p>';
-
-// Don't show gedcom list if there is only one...
-if ($n==1) {
-	$html='';
-}
-
-
-echo
-	'<div id="other">',
-	'<p>', WT_I18N::translate('Add unlinked records'), '</p>',
-	$html,
-	'<table id="other">',
-	'<tr><td>',
-	'<a href="#" onclick="addnewchild(\'\'); return false;">', WT_I18N::translate('Add an unlinked person'), '</a>',
-	help_link('edit_add_unlinked_person'),
-	'</td></tr>',
-	'<tr><td>',
-	'<a href="#" onclick="addnewnote(\'\'); return false;">', WT_I18N::translate('Add an unlinked note'), '</a>',
-	help_link('edit_add_unlinked_note'),
-	'</td></tr>',
-	'<tr><td>',
-	'<a href="#" onclick="addnewsource(\'\'); return false;">', WT_I18N::translate('Add an unlinked source'), '</a>',
-	help_link('edit_add_unlinked_source'),
-	'</td></tr>',
-	'</table>',
-	'</div>';
+?>
+<div id="other">
+	<p>
+		<?php echo WT_I18N::translate('Add unlinked records'); ?>
+	</p>
+	<p>
+		<form method="post" action="#" name="tree">
+			<?php echo select_edit_control('ged', WT_Tree::getNameList(), null, WT_GEDCOM, ' onchange="tree.submit();"'); ?>
+		</form>
+	</p>
+	<table id="other">
+		<tr>
+			<td>
+				<a href="#" onclick="addnewchild(''); return false;">
+					<?php echo WT_I18N::translate('Add an unlinked person'); ?>
+				</a>
+				<?php echo help_link('edit_add_unlinked_person'); ?>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<a href="#" onclick="addnewnote(''); return false;">
+					<?php echo WT_I18N::translate('Add an unlinked note'); ?>
+				</a>
+				<?php echo help_link('edit_add_unlinked_note'); ?>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<a href="#" onclick="addnewsource(''); return false;">
+					<?php echo WT_I18N::translate('Add an unlinked source'); ?>
+				</a>
+				<?php echo help_link('edit_add_unlinked_source'); ?>
+			</td>
+		</tr>
+	</table>
+</div>

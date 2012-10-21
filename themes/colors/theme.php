@@ -22,7 +22,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // PNG Icons By: Alessandro Rei; License:  GPL; www.deviantdark.com
 //
-// $Id: theme.php 14183 2012-08-18 22:30:17Z greg $
+// $Id: theme.php 14386 2012-10-03 17:35:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -30,15 +30,13 @@ if (!defined('WT_WEBTREES')) {
 }
 // Convert a menu into our theme-specific format
 function getMenuAsCustomList($menu) {
-		// Insert the label into the submenu, except for menus with only one item.
-		if (count($menu->submenus)>1) {
-			// Create a inert menu - to use as a label
-			$tmp=new WT_Menu(strip_tags($menu->label), '');
-			if ($menu->submenus) {
-				array_unshift($menu->submenus, $tmp);
-			} else {
-				$menu->addSubmenu($tmp);
-			}
+		// Create an inert menu - to use as a label
+		$tmp=new WT_Menu(strip_tags($menu->label), '');
+		// Insert the label into the submenu
+		if (is_array($menu->submenus)) {
+			array_unshift($menu->submenus, $tmp);
+		} else {
+			$menu->addSubmenu($tmp);
 		}
 		// Neutralise the top-level menu
 		$menu->label='';
@@ -49,12 +47,22 @@ function getMenuAsCustomList($menu) {
 
 //-- print color theme sub type change dropdown box
 function color_theme_dropdown() {
-	global $COLOR_THEME_LIST;
-	
+	global $COLOR_THEME_LIST, $WT_SESSION, $subColor;
 	$menu=new WT_Menu(/* I18N: A colour scheme */ WT_I18N::translate('Palette'), '#', 'menu-color');
 	uasort($COLOR_THEME_LIST, 'utf8_strcasecmp');
 	foreach ($COLOR_THEME_LIST as $colorChoice=>$colorName) {
 		$submenu=new WT_Menu($colorName, get_query_url(array('themecolor'=>$colorChoice), '&amp;'), 'menu-color-'.$colorChoice);
+		if (isset($WT_SESSION->subColor)) {
+			if ($WT_SESSION->subColor == $colorChoice) {  
+				$submenu->addClass('','','theme-active');
+			}
+		} elseif  (WT_Site::preference('DEFAULT_COLOR_PALETTE') == $colorChoice) { /* here when visitor changes palette from default */
+			$submenu->addClass('','','theme-active');
+		} elseif ($subColor=='ash') { /* here when site has different theme as default and user switches to colors */
+			if ($subColor == $colorChoice) {
+				$submenu->addClass('','','theme-active');
+			}
+		}
 		$menu->addSubMenu($submenu);
 	}
 	return $menu->getMenuAsList();
@@ -80,6 +88,7 @@ $COLOR_THEME_LIST=array(
 	'nocturnal'       => /* I18N: The name of a colour-scheme */ WT_I18N::translate('Nocturnal'),
 	'olivia'          => /* I18N: The name of a colour-scheme */ WT_I18N::translate('Olivia'),
 	'pinkplastic'     => /* I18N: The name of a colour-scheme */ WT_I18N::translate('Pink Plastic'),
+	'sage'            => /* I18N: The name of a colour-scheme */ WT_I18N::translate('Sage'),
 	'shinytomato'     => /* I18N: The name of a colour-scheme */ WT_I18N::translate('Shiny Tomato'),
 	'tealtop'         => /* I18N: The name of a colour-scheme */ WT_I18N::translate('Teal Top'),
 );
@@ -91,7 +100,7 @@ if (isset($_GET['themecolor']) && array_key_exists($_GET['themecolor'], $COLOR_T
 	if (WT_USER_ID) {
 		set_user_setting(WT_USER_ID, 'themecolor', $subColor);
 		if (WT_USER_IS_ADMIN) {
-			set_site_setting('DEFAULT_COLOR_PALETTE', $subColor);
+			WT_Site::preference('DEFAULT_COLOR_PALETTE', $subColor);
 		}
 	}
 	unset($_GET['themecolor']);
@@ -109,7 +118,7 @@ if (!$subColor) {
 }
 // We haven't selected one this session?  Use the site default
 if (!$subColor) {
-	$subColor=get_site_setting('DEFAULT_COLOR_PALETTE');
+	$subColor=WT_Site::preference('DEFAULT_COLOR_PALETTE');
 }
 // Make sure our selected palette actually exists
 if (!array_key_exists($subColor, $COLOR_THEME_LIST)) {
@@ -119,7 +128,6 @@ if (!array_key_exists($subColor, $COLOR_THEME_LIST)) {
 $theme_name = "colors"; // need double quotes, as file is scanned/parsed by script
 $footerfile = WT_THEME_DIR . 'footer.php';
 $headerfile = WT_THEME_DIR . 'header.php';
-$stylesheet = WT_THEME_URL . 'css/' . $subColor . '.css';
 
 $WT_IMAGES=array(
 	// used to draw charts

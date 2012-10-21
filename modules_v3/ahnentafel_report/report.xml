@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Includes 2010 work done by John Hawthornthwaite(hagershorn1) for an ancestry report in PhpGedView -->
 <Report>
-	<!-- $Id: report.xml 13842 2012-04-19 14:27:53Z lukasz $ -->
+	<!-- $Id: report.xml 14414 2012-10-12 09:19:09Z lukasz $ -->
 	<Title><var var="WT_I18N::translate('Ancestors')" /></Title>
 	<Description><var var="WT_I18N::translate('A report of an individual’s ancestors, in a narrative style.')" /></Description>
 	<Input name="pid" lookup="INDI" type="text"><var var="WT_I18N::translate('Enter Individual ID')" /></Input>
@@ -244,10 +244,12 @@
 						<SetVar name="cpid" value="@ID" />
 						<if condition="$cpid!=$spid">
 							<Gedcom id="@FAMS">
-								<if condition="$cpid==@HUSB">
+								<SetVar name="hpid" value="@HUSB"/>
+								<SetVar name="wpid" value="@WIFE"/>
+								<if condition="$cpid==$hpid">
 									<SetVar name="spid" value="@WIFE" />
 								</if>
-								<if condition="$cpid==@WIFE">
+								<if condition="$cpid==$wpid">
 									<SetVar name="spid" value="@HUSB" />
 								</if>
 								<Gedcom id="MARR">

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: PDF.php 14055 2012-06-30 10:39:20Z greg $
+// $Id: PDF.php 14427 2012-10-16 14:26:33Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -233,6 +233,21 @@ class WT_Report_PDF extends WT_Report_Base {
 	*/
 	function createImage($file, $x, $y, $w, $h, $align, $ln) {
 		return new ImagePDF($file, $x, $y, $w, $h, $align, $ln);
+	}
+
+	/**
+	* Create a new image object from WT_Media Object - WT_Report_PDF
+	* @param string $mediaobject WT_Media Object
+	* @param mixed $x
+	* @param mixed $y
+	* @param int $w Image width
+	* @param int $h Image height
+	* @param string $align L:left, C:center, R:right or empty to use x/y
+	* @param string $ln T:same line, N:next line
+	* @return ImagePDF
+	*/
+	function createImageFromObject($mediaobject, $x, $y, $w, $h, $align, $ln) {
+		return new ImagePDF($mediaobject->getServerFilename('thumb'), $x, $y, $w, $h, $align, $ln);
 	}
 
 	/**

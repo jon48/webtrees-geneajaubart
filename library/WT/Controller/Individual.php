@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: Individual.php 14202 2012-08-25 21:48:38Z nigel $
+// $Id: Individual.php 14310 2012-09-18 22:10:47Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -202,7 +202,7 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		
 		$this->name_count++;
 		if ($this->name_count >1) { echo '<h3 class="name_two">',$dummy->getFullName(), '</h3>'; } //Other names accordion element
-		echo '<div id="indi_name_details"';
+		echo '<div class="indi_name_details"';
 		if ($event->getIsOld()) {
 			echo " class=\"namered\"";
 		}
@@ -211,7 +211,7 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		}
 		echo ">";
 
-		echo '<div id="name1">';
+		echo '<div class="name1">';
 		echo '<dl><dt class="label">', WT_I18N::translate('Name'), '</dt>';
 		$dummy->setPrimaryName(0);
 		echo '<dd class="field">', $dummy->getFullName();
@@ -679,7 +679,7 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 				}
 				if ($include_pedi==true) {
 					$famcrec = get_sub_record(1, "1 FAMC @".$family->getXref()."@", $children[$i]->getGedcomRecord());
-					$pedi = get_gedcom_value("PEDI", 2, $famcrec, '', false);
+					$pedi = get_gedcom_value("PEDI", 2, $famcrec);
 					if ($pedi) {
 						$label.='<br>('.WT_Gedcom_Code_Pedi::getValue($pedi, $children[$i]).')';
 					}

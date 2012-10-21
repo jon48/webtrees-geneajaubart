@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: session.php 14231 2012-08-31 13:29:28Z greg $
+// $Id: session.php 14436 2012-10-20 19:31:58Z greg $
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
 if (!defined('WT_SCRIPT_NAME')) {
@@ -31,7 +31,7 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.3.1');
+define('WT_VERSION',         '1.3.2');
 define('WT_VERSION_RELEASE', ''); // 'svn', 'beta', 'rc1', '', etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
 
@@ -47,8 +47,8 @@ define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-
 // Optionally, load major JS libraries from Google's public CDN
 define ('WT_USE_GOOGLE_API', false);
 if (WT_USE_GOOGLE_API) {
-	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js');
-	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js');
+	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js');
+	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js');
 } else {
 	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery/jquery.min.js');
 	define('WT_JQUERYUI_URL',      WT_STATIC_URL.'js/jquery/jquery-ui.min.js');
@@ -67,7 +67,7 @@ define('WT_DEBUG_LANG', false);
 define('WT_ERROR_LEVEL', 2); // 0=none, 1=minimal, 2=full
 
 // Required version of database tables/columns/indexes/etc.
-define('WT_SCHEMA_VERSION', 19);
+define('WT_SCHEMA_VERSION', 20);
 
 // Regular expressions for validating user input, etc.
 define('WT_REGEX_XREF',     '[A-Za-z0-9:_-]+');
@@ -245,11 +245,11 @@ try {
 
 // The config.ini.php file must always be in a fixed location.
 // Other user files can be stored elsewhere...
-define('WT_DATA_DIR', realpath(get_site_setting('INDEX_DIRECTORY', 'data')).DIRECTORY_SEPARATOR);
+define('WT_DATA_DIR', realpath(WT_Site::preference('INDEX_DIRECTORY') ? WT_Site::preference('INDEX_DIRECTORY') : 'data').DIRECTORY_SEPARATOR);
 
 // If we have a preferred URL (e.g. https instead of http, or www.example.com instead of
 // www.isp.com/~example), then redirect to it.
-$SERVER_URL=get_site_setting('SERVER_URL');
+$SERVER_URL=WT_Site::preference('SERVER_URL');
 if ($SERVER_URL && $SERVER_URL != WT_SERVER_NAME.WT_SCRIPT_PATH) {
 	header('Location: '.$SERVER_URL.WT_SCRIPT_NAME.($QUERY_STRING ? '?'.$QUERY_STRING : ''), true, 301);
 	exit;
@@ -260,11 +260,11 @@ ignore_user_abort(false);
 
 // Request more resources - if we can/want to
 if (!ini_get('safe_mode')) {
-	$memory_limit=get_site_setting('MEMORY_LIMIT');
+	$memory_limit=WT_Site::preference('MEMORY_LIMIT');
 	if ($memory_limit) {
 		ini_set('memory_limit', $memory_limit);
 	}
-	$max_execution_time=get_site_setting('MAX_EXECUTION_TIME');
+	$max_execution_time=WT_Site::preference('MAX_EXECUTION_TIME');
 	if ($max_execution_time && strpos(ini_get('disable_functions'), 'set_time_limit')===false) {
 		set_time_limit($max_execution_time);
 	}
@@ -332,7 +332,7 @@ define('WT_SESSION_NAME', 'WT_SESSION');
 $cfg=array(
 	'name'            => WT_SESSION_NAME,
 	'cookie_lifetime' => 0,
-	'gc_maxlifetime'  => get_site_setting('SESSION_TIME'),
+	'gc_maxlifetime'  => WT_Site::preference('SESSION_TIME'),
 	'gc_probability'  => 1,
 	'gc_divisor'      => 100,
 	'cookie_path'     => WT_SCRIPT_PATH,
@@ -360,6 +360,11 @@ if (!$SEARCH_SPIDER && !$WT_SESSION->initiated) {
 	// An existing session
 }
 
+// Who are we?
+define('WT_USER_ID',       getUserId());
+define('WT_USER_NAME',     getUserName());
+define('WT_USER_IS_ADMIN', userIsAdmin(WT_USER_ID));
+
 // Set the active GEDCOM
 if (isset($_REQUEST['ged'])) {
 	// .... from the URL or form action
@@ -368,30 +373,64 @@ if (isset($_REQUEST['ged'])) {
 	// .... the most recently used one
 	$GEDCOM=$WT_SESSION->GEDCOM;
 } else {
-	// .... we'll need to query the DB to find one
-	$GEDCOM='';
+	// Try the site default
+	$GEDCOM=WT_Site::preference('DEFAULT_GEDCOM');
 }
 
-// Does the requested GEDCOM exist?
-$ged_id=get_id_from_gedcom($GEDCOM);
-if (!$ged_id) {
-	// Try the site default
-	$GEDCOM=get_site_setting('DEFAULT_GEDCOM');
-	$ged_id=get_id_from_gedcom($GEDCOM);
-	// Try any one
-	if (!$ged_id) {
-		foreach (get_all_gedcoms() as $ged_id=>$GEDCOM) {
-			if (get_gedcom_setting($ged_id, 'imported')) {
-				break;
-			}
-		}
+// Choose the selected tree (if it exists), or any valid tree otherwise
+$WT_TREE=null;
+foreach (WT_Tree::getAll() as $tree) {
+	$WT_TREE=$tree;
+	if ($WT_TREE->tree_name == $GEDCOM && ($WT_TREE->imported || WT_USER_IS_ADMIN)) {
+		break;
 	}
 }
-define('WT_GEDCOM', $GEDCOM);
-define('WT_GED_ID', $ged_id);
-define('WT_GEDURL', rawurlencode(WT_GEDCOM));
 
-load_gedcom_settings(WT_GED_ID);
+// These attributes of the currently-selected tree are used frequently
+if ($WT_TREE) {
+	define('WT_GEDCOM',            $WT_TREE->tree_name);
+	define('WT_GED_ID',            $WT_TREE->tree_id);
+	define('WT_GEDURL',            $WT_TREE->tree_name_url);
+	define('WT_TREE_TITLE',        $WT_TREE->tree_title_html);
+	define('WT_IMPORTED',          $WT_TREE->imported);
+	define('WT_USER_GEDCOM_ADMIN', WT_USER_IS_ADMIN     || userGedcomAdmin(WT_USER_ID, WT_GED_ID));
+	define('WT_USER_CAN_ACCEPT',   $WT_TREE->canAcceptChanges(WT_USER_ID));
+	define('WT_USER_CAN_EDIT',     WT_USER_CAN_ACCEPT   || userCanEdit    (WT_USER_ID, WT_GED_ID));
+	define('WT_USER_CAN_ACCESS',   WT_USER_CAN_EDIT     || userCanAccess  (WT_USER_ID, WT_GED_ID));
+	define('WT_USER_GEDCOM_ID',    $WT_TREE->userPreference(WT_USER_ID, 'gedcomid'));
+	define('WT_USER_ROOT_ID',      $WT_TREE->userPreference(WT_USER_ID, 'rootid') ? $WT_TREE->userPreference(WT_USER_ID, 'rootid') : WT_USER_GEDCOM_ID);
+	define('WT_USER_PATH_LENGTH',  $WT_TREE->userPreference(WT_USER_ID, 'RELATIONSHIP_PATH_LENGTH'));
+	if (WT_USER_GEDCOM_ADMIN) {
+		define('WT_USER_ACCESS_LEVEL', WT_PRIV_NONE);
+	} elseif (WT_USER_CAN_ACCESS) {
+		define('WT_USER_ACCESS_LEVEL', WT_PRIV_USER);
+	} else {
+		define('WT_USER_ACCESS_LEVEL', WT_PRIV_PUBLIC);
+	}
+	load_gedcom_settings(WT_GED_ID);
+} else {
+	define('WT_GEDCOM',            '');
+	define('WT_GED_ID',            null);
+	define('WT_GEDURL',            '');
+	define('WT_TREE_TITLE',        WT_WEBTREES);
+	define('WT_IMPORTED',          false);
+	define('WT_USER_GEDCOM_ADMIN', false);
+	define('WT_USER_CAN_ACCEPT',   false);
+	define('WT_USER_CAN_EDIT',     false);
+	define('WT_USER_CAN_ACCESS',   false);
+	define('WT_USER_GEDCOM_ID',    '');
+	define('WT_USER_ROOT_ID',      '');
+	define('WT_USER_PATH_LENGTH',  0);
+	define('WT_USER_ACCESS_LEVEL', WT_PRIV_PUBLIC);
+}
+$GEDCOM=WT_GEDCOM;
+
+// With no parameters, init() looks to the environment to choose a language
+define('WT_LOCALE', WT_I18N::init());
+$WT_SESSION->locale=WT_I18N::$locale;
+
+// Non-latin languages may need non-latin digits
+define('WT_NUMBERING_SYSTEM', Zend_Locale_Data::getContent(WT_LOCALE, 'defaultnumberingsystem'));
 
 // Set our gedcom selection as a default for the next page
 $WT_SESSION->GEDCOM=WT_GEDCOM;
@@ -402,37 +441,17 @@ if (empty($WEBTREES_EMAIL)) {
 
 // Use the server date to calculate privacy, etc.
 // Use the client date to show ages, etc.
-define('WT_SERVER_JD', 2440588+(int)(time()/86400));
-define('WT_CLIENT_JD', 2440588+(int)(client_time()/86400));
+define('WT_TIMESTAMP',        time());
+define('WT_CLIENT_TIMESTAMP', WT_TIMESTAMP - $WT_SESSION->timediff);
 
-// Who are we?
-define('WT_USER_ID', getUserId());
-
-// With no parameters, init() looks to the environment to choose a language
-define('WT_LOCALE', WT_I18N::init());
-$WT_SESSION->locale=WT_I18N::$locale;
-
-// Non-latin languages may need non-latin digits
-define('WT_NUMBERING_SYSTEM', Zend_Locale_Data::getContent(WT_LOCALE, 'defaultnumberingsystem'));
+define('WT_SERVER_JD', 2440588 + (int)(WT_TIMESTAMP       /86400));
+define('WT_CLIENT_JD', 2440588 + (int)(WT_CLIENT_TIMESTAMP/86400));
 
 // Application configuration data - things that aren't (yet?) user-editable
 require WT_ROOT.'includes/config_data.php';
 
 //-- load the privacy functions
 require WT_ROOT.'includes/functions/functions_privacy.php';
-
-// The current user's profile - from functions in authentication.php
-define('WT_USER_NAME',         getUserName());
-define('WT_USER_IS_ADMIN',     userIsAdmin   (WT_USER_ID));
-define('WT_USER_AUTO_ACCEPT',  userAutoAccept(WT_USER_ID));
-define('WT_USER_GEDCOM_ADMIN', WT_USER_IS_ADMIN     || userGedcomAdmin(WT_USER_ID, WT_GED_ID));
-define('WT_USER_CAN_ACCEPT',   WT_USER_GEDCOM_ADMIN || userCanAccept  (WT_USER_ID, WT_GED_ID));
-define('WT_USER_CAN_EDIT',     WT_USER_CAN_ACCEPT   || userCanEdit    (WT_USER_ID, WT_GED_ID));
-define('WT_USER_CAN_ACCESS',   WT_USER_CAN_EDIT     || userCanAccess  (WT_USER_ID, WT_GED_ID));
-define('WT_USER_ACCESS_LEVEL', getUserAccessLevel(WT_USER_ID, WT_GED_ID));
-define('WT_USER_GEDCOM_ID',    getUserGedcomId   (WT_USER_ID, WT_GED_ID));
-define('WT_USER_ROOT_ID',      getUserRootId     (WT_USER_ID, WT_GED_ID));
-define('WT_USER_PATH_LENGTH',  get_user_gedcom_setting(WT_USER_ID, WT_GED_ID, 'RELATIONSHIP_PATH_LENGTH'));
 
 // If we are logged in, and logout=1 has been added to the URL, log out
 // If we were logged in, but our account has been deleted, log out.
@@ -443,30 +462,35 @@ if (WT_USER_ID && (safe_GET_bool('logout') || !WT_USER_NAME)) {
 }
 
 // The login URL must be an absolute URL, and can be user-defined
-define('WT_LOGIN_URL', get_site_setting('LOGIN_URL', WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php'));
+if (WT_Site::preference('LOGIN_URL')) {
+	define('WT_LOGIN_URL', WT_Site::preference('LOGIN_URL'));
+} else {
+	define('WT_LOGIN_URL', WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php');
+}
 
-if (WT_SCRIPT_NAME!='help_text.php') {
-	if (!get_gedcom_setting(WT_GED_ID, 'imported') && substr(WT_SCRIPT_NAME, 0, 5)!=='admin' && !in_array(WT_SCRIPT_NAME, array('help_text.php', 'login.php', 'edit_changes.php', 'import.php', 'message.php', 'save.php'))) {
-		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_trees_manage.php');
-		exit;
-	}
+// If we are in the middle of importing (or have not imported) the current tree,
+// then stay on the manage-trees page.
+if (!WT_IMPORTED && WT_SCRIPT_NAME!='admin_trees_manage.php' && WT_SCRIPT_NAME!='import.php' && WT_SCRIPT_NAME!='login.php' && WT_SCRIPT_NAME!='help_text.php') {
+	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_trees_manage.php');
+	exit;
+}
 
-	if ($REQUIRE_AUTHENTICATION && !WT_USER_ID && !in_array(WT_SCRIPT_NAME, array('login.php', 'help_text.php', 'message.php'))) {
-		if (WT_SCRIPT_NAME=='index.php') {
-			$url='index.php?ged='.WT_GEDCOM;
-		} else {
-			$url=WT_SCRIPT_NAME.'?'.$QUERY_STRING;
-		}
-		header('Location: '.WT_LOGIN_URL.'?url='.rawurlencode($url));
-		exit;
+// If authentication is required for this tree, and we are not authenticated....
+if ((!$WT_TREE || $WT_TREE->preference('REQUIRE_AUTHENTICATION')) && !WT_USER_ID && WT_SCRIPT_NAME!='login.php' && WT_SCRIPT_NAME!='help_text.php' && WT_SCRIPT_NAME!='message.php') {
+	if (WT_SCRIPT_NAME=='index.php') {
+		$url='index.php?ged='.WT_GEDCOM;
+	} else {
+		$url=WT_SCRIPT_NAME.'?'.$QUERY_STRING;
 	}
+	header('Location: '.WT_LOGIN_URL.'?url='.rawurlencode($url));
+	exit;
 }
 
 if (WT_USER_ID) {
 	//-- update the login time every 5 minutes
-	if ($WT_SESSION->activity_time && time()-$WT_SESSION->activity_time > 300) {
-		userUpdateLogin(WT_USER_ID);
-		$WT_SESSION->activity_time = time();
+	if (WT_TIMESTAMP-$WT_SESSION->activity_time > 300) {
+		set_user_setting(WT_USER_ID, 'sessiontime', WT_TIMESTAMP);
+		$WT_SESSION->activity_time = WT_TIMESTAMP;
 	}
 }
 
@@ -475,7 +499,7 @@ if (substr(WT_SCRIPT_NAME, 0, 5)=='admin' || WT_SCRIPT_NAME=='module.php' && sub
 	// Administration scripts begin with 'admin' and use a special administration theme
 	define('WT_THEME_DIR', WT_THEMES_DIR.'_administration/');
 } else {
-	if (get_site_setting('ALLOW_USER_THEMES')) {
+	if (WT_Site::preference('ALLOW_USER_THEMES')) {
 		// Requested change of theme?
 		$THEME_DIR=safe_GET('theme', get_theme_names());
 		unset($_GET['theme']);
@@ -492,9 +516,11 @@ if (substr(WT_SCRIPT_NAME, 0, 5)=='admin' || WT_SCRIPT_NAME=='module.php' && sub
 		// 2) site setting
 		// 3) webtrees
 		// 4) first one found
-		$THEME_DIR=get_gedcom_setting(WT_GED_ID, 'THEME_DIR');
+		if (WT_GED_ID) {
+			$THEME_DIR=get_gedcom_setting(WT_GED_ID, 'THEME_DIR');
+		}
 		if (!in_array($THEME_DIR, get_theme_names())) {
-			$THEME_DIR=get_site_setting('THEME_DIR');
+			$THEME_DIR=WT_Site::preference('THEME_DIR');
 		}
 		if (!in_array($THEME_DIR, get_theme_names())) {
 			$THEME_DIR='webtrees';
@@ -515,7 +541,7 @@ define('WT_THEME_URL', WT_STATIC_URL.WT_THEME_DIR);
 require WT_ROOT.WT_THEME_DIR.'theme.php';
 
 // Page hit counter - load after theme, as we need theme formatting
-if ($SHOW_COUNTER && !$SEARCH_SPIDER) {
+if ($WT_TREE && $WT_TREE->preference('SHOW_COUNTER') && !$SEARCH_SPIDER) {
 	require WT_ROOT.'includes/hitcount.php';
 } else {
 	$hitCount='';

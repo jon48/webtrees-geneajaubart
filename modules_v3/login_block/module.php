@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14049 2012-06-29 08:43:57Z nigel $
+// $Id: module.php 14276 2012-09-14 15:39:40Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -87,7 +87,7 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 				<div>
 					<a href="#" id="passwd_click">'. WT_I18N::translate('Request new password').'</a>
 				</div>';
-			if (get_site_setting('USE_REGISTRATION_MODULE')) {
+			if (WT_Site::preference('USE_REGISTRATION_MODULE')) {
 				$content.= '<div><a href="'.WT_LOGIN_URL.'?action=register">'. WT_I18N::translate('Request new user account').'</a></div>';
 			}
 		$content.= '</form>'; // close "login-form"

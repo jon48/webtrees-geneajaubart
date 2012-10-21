@@ -23,7 +23,7 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 *
-* $Id: style.css 14158 2012-08-11 01:49:52Z nigel $
+* $Id: style.css 14422 2012-10-14 20:59:51Z nigel $
 */
 
 /* Add a permanent scrollbar, to prevent "flickering" when hover effects lengthen page */
@@ -41,13 +41,16 @@ img {border:none;}
 legend img {height:20px;vertical-align:middle;width:20px;}
 img.block, #calendar_img_indi, #calendar_img_fam, #biglink img, #mycart img {border:none;height:25px;vertical-align:middle;}
 input, button, textarea {border-top-color:#fff;border-left-color:#fff;border-right-color:#555;border-bottom-color:#555;border-width:1px;font-size:12px;}
-input, textarea {padding-left:3px;padding-right:3px;}
+input, textarea {padding:0 3px;}
 textarea {border-style:inset;}
 input.image {width:17px;height:17px;border:none;padding:0;vertical-align:top;}
 select {border:1px solid #555;font-size:12px;margin:0 7px;padding:1px;}
 form {font-size:12px;}
 h2 {color:#006;font-weight:bold;font-size:18px;}
 h4 {color:#006;font-weight:bold;font-size:12px;}
+input:required:valid, textarea:required:valid{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAONJREFUeNpi/P//PwMlgImBQjDwBrCgCzDOF2Zg+Adk/AOGDRvQfHZGoDWMxgyMDMb/Q1/NIt0F/xk8gIbNZPj7P41YL4AUGsM1//rfkuyeYMzw8z9xXgBqgNm0nuHnv0D/IH/juavmngV6oYY4F3z7y2DqY2oMpANB9MYl684yfP9Xw3Dzzw7sXgQmJGTM0MbjwdDKc0b2vt5/EM2QwunBoMyCVS1YPYYAMOwZ7FmiGLLYzjBYsSQD+QpALAjErNgMYERPyoyMjMxAih+IOYD4LxD/hOJfQLV/MaJ9NC8wAAQYAPbPfH2KJKx/AAAAAElFTkSuQmCC);background-position:right top; background-repeat:no-repeat;}
+input:required:invalid, textarea:required:invalid{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAMpJREFUeNpi/P//PwMlgImBQjAMDGBBF1jFyOgBpFqAuOYPA8MOoAI4P+z//x0YJoBiARkvYWA486+k5D+IBuJqZD66WnAMogvMA9o4F6j4R3Lyf2R6IQODMVEGTAW6CoirgfjMB2/v/yB6CgNDYQ8W14IwRiB+A7rgOwNDYLChofGcrVvPgugfDAzR/yFhwUAwDJqBNj6Ulf0PooEhV4jMx+YCRvSknAeMBWDotwgwMKRzMTCcfQW0GcQHxkbNJCyxwDiaFxgAAgwAYy67YIOQ//cAAAAASUVORK5CYII=);background-position:right top; background-repeat:no-repeat;}
+html[dir="rtl"] input:required:valid, html[dir="rtl"] textarea:required:valid, html[dir="rtl"] input:required:invalid, html[dir="rtl"] textarea:required:invalid {background-position:left top;}
 
 .line1, .line2, .line3 {vertical-align:bottom;} 
 .line4 {vertical-align:middle;}
@@ -101,17 +104,17 @@ table.center {margin-left:auto;margin-right:auto;}
 .tab_inactive_bottom {border-left:none;border-right:none;border-top:outset #81a9cb 2px;height:5px;}
 .tab_inactive_bottom_right {border-left:none;border-right:none;border-top:outset #81a9cb 2px;width:33%;height:5px;}
 
-.name1 {color:#333;font-weight:bold;font-size:12px;}
+.name1 {color:#555;font-weight:bold;font-size:12px;}
 a:hover .name1 {color:#f00;font-weight:bold;font-size:12px;}
 a:hover .name2 {color:#f00;font-weight:bold;font-size:12px;}
 a:hover .nameZoom {color:#f00;font-weight:bold;font-size:14px;}
-.name2 {color:#333;font-weight:bold;font-size:12px;}
+.name2 {color:#555;font-weight:bold;font-size:12px;}
 .details1 {font-size:11px;}
 .details2 {font-size:12px;}
-.nameZoom {color:#333;font-weight:bold;font-size:14px;}
+.nameZoom {color:#555;font-weight:bold;font-size:14px;}
 .detailsZoom {font-size:14px;text-decoration:none;}
 .details_label {font-weight:bold;}
-.name_head {color:#333;font-weight:bold;font-size:16px;letter-spacing:.2px;line-height:2;padding:0 5px;}
+.name_head {color:#555;font-weight:bold;font-size:16px;letter-spacing:.2px;line-height:2;padding:0 5px;}
 
 .date {color:#337;}
 .field {}
@@ -150,8 +153,6 @@ html[dir="rtl"] .pedigree_image {float:right;margin:0 0 0 4px;}
 .border1 {border:solid #000 1px;}
 .header_select {font-size:9pt;}
 .favorites_form {margin-top:0;}
-.help {cursor:help;font-weight:bold;line-height:16px;}
-.help img {vertical-align:bottom;}
 .menuitem {text-decoration:none;font-size:11px;padding:1px;}
 .menuitem_hover {text-decoration:none;font-size:11px;padding:1px;}
 .submenu {text-decoration:none;font-size:11px;background-color:#edf7fd;border:solid #81a9cb 1px;white-space:nowrap;visibility:hidden;position:absolute;padding:5px;}
@@ -391,12 +392,13 @@ td.descriptionbox a {color:#fff;}/* this keeps the tag color the same when it is
 #login-form label input, #new_passwd_form label input, #verify-form input {width:140px;margin:0 10px;}
 #new_passwd_form h4, #register-form h4 {font-weight:normal;text-align:center;}
 #register-form div, #verify-form div {text-align:right;}
-#register-form label input, #register-form label select, #register-form textarea {width:220px;margin:0 10px;}
+#register-form label input, #register-form label select, #register-form textarea {width:220px;margin:0 10px;padding:3px;}
 #register-form label select {margin:0 10px;width:228px;}
 #register-form textarea {vertical-align:top;}
 #register-form div#registration-submit {text-align:center;}
 .login_block_block #login-form, .login_block_block #new_passwd_form{border:0;background:none;}
 html[dir='rtl'] #login-form label, html[dir='rtl'] #new_passwd_form label, html[dir='rtl'] #register-form label, html[dir='rtl'] #verify-form label {text-align:left;}
+html[dir='rtl'] #register-form div, html[dir='rtl'] #verify-form div {text-align:left;}
 
 /* ============== reportengine.php ======================= */
 #reportengine-page table {margin:20px auto;}
@@ -505,7 +507,7 @@ html[dir='rtl'] #index_small_blocks {float:left;}
 table.faq {background-color:#e0e0e0;margin:5px 0 50px 5px;width:98%;}
 table.faq tr.odd td {background-color:#e7eef3;}
 div.faq_title {background-color:#e0e0e0;margin:1em 0;padding:.25em;font-weight:bold;width:98%;}
-div.faq_body {clear:both;margin:1em 0;padding:1em;}
+div.faq_body {clear:both;padding:0 1em;}
 .faq_italic {font-style:italic;font-weight:bold;font-size:90%;padding:0 10px;}
 .faq_top {float:right;}
 .faq_edit {float:right;}
@@ -652,6 +654,7 @@ html[dir='rtl'] #main-menu li li a {float:right;padding:1px 5px 1px 10px;}
 .makeMenu li ul li {padding:2px;display:block;text-align:left;}
 .makeMenu, .makeMenu li ul {list-style:none;margin:0;padding:1px;}
 .makeMenu li:hover > ul {display:block;}
+.lang-active, .theme-active{color:#006;font-weight:900;}
 
 html[dir='rtl'] #extra-menu {float:left;margin:20px 0 0 10px;}
 html[dir='rtl'] #extra-menu.makeMenu li ul {left:0;right:auto;}
@@ -681,25 +684,18 @@ html[dir='rtl'].field .editlink, html[dir='rtl'].field .deletelink {float:left;}
 #indi_header h3 a {display:inline;}
 #indi_header a {color:#337;font-size:0.75em;font-weight:normal;}
 #indi_header a:hover {color:#f00;}
-
 #main_name {float:left;font-size:2em;margin:10px;font-weight:bold;}
-
 #indi_mainimage {float:left;}
 #indi_mainimage a img {float:left;padding:0;}
-
-#indi_name_details {margin:0;overflow:hidden !important;padding:5px;}
-#indi_name_details .warning {color:#f00;font-size:1em;}
-#indi_name_details dt:after {content:":";}
-
-#name1 {}
+.indi_name_details {margin:0;overflow:hidden !important;padding:5px;}
+.indi_name_details dt:after {content:":";}
+.indi_name_details .name1 {font-weight:normal;padding-top:5px;font-size:inherit;}
+#indi_header a.warning {color:#f00;font-size:1em;}
 #indi_note {margin:0 0 5px 0;}
-
 #header_accordion1 {float:right;}
-
 .indi_table {clear:left;}
 #sex {float:right;}
 #dates {float:right;}
-
 dd .editlink, dd .deletelink {float:right;}
 #indi_note .fact_NOTE {float:left;margin:0 5px 0 0;}
 #indi_note .note_details {font-size:100%;}
@@ -741,12 +737,13 @@ html[dir='rtl'] dd .editlink, html[dir='rtl'] dd .deletelink {float:left;}
 /* ========= jquery-ui.custom.css changes ============ */
 .ui-tabs {padding:0;}
 .ui-tabs .ui-tabs-panel {padding:1em 0;}
-.ui-accordion .ui-accordion-content {overflow:visible;padding:0;}
+.ui-accordion .ui-accordion-content {margin-top: 1px;overflow:visible;padding:0 5px;}
 .ui-accordion .ui-accordion-header {text-align:center;margin-top:0;}
 .ui-accordion .ui-accordion-header a {padding:2px;}
 .ui-helper-reset {line-height:1.5;}
 .ui-state-highlight a {color:#f00;}
 .ui-widget-header {padding:3px;}
+.ui-widget-content{color:#555;}
 
 html[dir='rtl'] .ui-tabs {direction:rtl;}
 html[dir='rtl'] ui-tabs .ui-tabs-nav li.ui-tabs-selected, html[dir='rtl'] .ui-tabs .ui-tabs-nav li.ui-state-default {float:right;}
@@ -905,21 +902,21 @@ html[dir='rtl'] #edituser-table .value {margin:0 260px 0 0;}
 /* Icons */
 [class^="icon-"],[class*=" icon-"]{display:inline-block;vertical-align:text-bottom;background-repeat:no-repeat;}
 .icon-add{width:14px;height:15px;background-image:url(images/add.png);}
-.icon-admin{width:15px;height:15px;background-image:url(images/admin.png);}
+.icon-admin{width:15px;height:15px;background-image:url(images/admin.png);margin:0 5px;}
 .icon-bing{width:16px;height:16px;background-image:url(images/bing.png);}
-.icon-button_addmedia{width:18px;height:16px;background-image:url(images/buttons/addmedia.png);}
+.icon-button_addmedia{width:18px;height:16px;background-image:url(images/buttons/addmedia.png);vertical-align: middle;}
 .icon-button_addnote{width:17px;height:15px;background-image:url(images/buttons/addnote.png);}
 .icon-button_addrepository{width:15px;height:15px;background-image:url(images/buttons/addrepository.png);}
 .icon-button_addsource{width:18px;height:16px;background-image:url(images/buttons/addsource.png);}
-.icon-button_calendar{width:19px;height:15px;background-image:url(images/buttons/calendar.png);}
+.icon-button_calendar{width:19px;height:15px;background-image:url(images/buttons/calendar.png);vertical-align: middle;}
 .icon-button_family{width:14px;height:15px;background-image:url(images/buttons/family.png);}
 .icon-button_find_facts{width:20px;height:20px;background-image:url(images/buttons/find_facts.png);}
 .icon-button_head{width:12px;height:18px;background-image:url(images/buttons/head.png);}
 .icon-button_indi{width:11px;height:15px;background-image:url(images/buttons/indi.png);}
-.icon-button_keyboard{width:30px;height:15px;background-image:url(images/buttons/keyboard.png);}
-.icon-button_media{width:18px;height:16px;background-image:url(images/buttons/media.png);}
+.icon-button_keyboard{width:30px;height:15px;background-image:url(images/buttons/keyboard.png);vertical-align: middle;}
+.icon-button_media{width:18px;height:16px;background-image:url(images/buttons/media.png);vertical-align: middle;}
 .icon-button_note{width:17px;height:15px;background-image:url(images/buttons/note.png);}
-.icon-button_place{width:15px;height:15px;background-image:url(images/buttons/place.png);}
+.icon-button_place{width:15px;height:15px;background-image:url(images/buttons/place.png);vertical-align: middle;}
 .icon-button_repository{width:15px;height:15px;background-image:url(images/buttons/repository.png);}
 .icon-button_source{width:18px;height:16px;background-image:url(images/buttons/source.png);}
 .icon-cfamily{width:20px;height:20px;background-image:url(images/family.png);}
@@ -937,7 +934,7 @@ a.icon-ddarrow:hover{width:20px;height:20px;background-image:url(images/ddarrow2
 .icon-email{width:16px;height:16px;background-image:url(images/email.png);}
 .icon-fam-list{width:20px;height:20px;background-image:url(images/family.png);}
 .icon-googlemaps{width:16px;height:16px;background-image:url(images/googlemaps.png);}
-.icon-help{width:15px;height:15px;background-image:url(images/help2.png);}
+.icon-help{cursor:help;margin:0 5px;width:15px;height:15px;background-image:url(images/help2.png);}
 .icon-indi-list{width:20px;height:20px;background-image:url(images/indis.png);}
 .icon-indis{width:20px;height:20px;background-image:url(images/indis.png);}
 .icon-larrow{width:20px;height:20px;background-image:url(images/larrow.png);}
@@ -991,7 +988,7 @@ a.icon-rdarrow:hover{width:20px;height:20px;background-image:url(images/rdarrow2
 .icon-sfamily{width:20px;height:20px;background-image:url(images/family.png);}
 .icon-source{width:20px;height:20px;background-image:url(images/source.png);}
 .icon-source-list{width:20px;height:20px;background-image:url(images/source.png);}
-.icon-target{width:15px;height:15px;background-image:url(images/buttons/target.png);}
+.icon-target{width:15px;height:15px;background-image:url(images/buttons/target.png);vertical-align: middle;}
 .icon-terraserver{width:16px;height:16px;background-image:url(images/terraserver.png);}
 .icon-tree{width:20px;height:20px;background-image:url(images/tree.png);}
 .icon-uarrow{width:20px;height:20px;background-image:url(images/uarrow.png);}
@@ -1036,3 +1033,44 @@ a.icon-udarrow:hover{width:20px;height:20px;background-image:url(images/udarrow2
 .icon-mime-video-quicktime{width:48px;height:48px;background-position:-99px -147px;}
 .icon-mime-video-msvideo{width:48px;height:48px;background-position:-99px -0px;}
 .icon-mime-video-ms-wmv{width:48px;height:48px;background-position:-50px -196px;}
+
+/* Edit interface pop-ups*/
+#edit_interface-page h4{color:#555;margin:5px;}
+#edit_interface-page .optionbox span {margin:0 5px;}
+#edit_interface-page #LATI,#edit_interface-page #LONG,#edit_interface-page #SPFX,#edit_interface-page #NSFX,#edit_interface-page #NPFX {line-height:18px;margin:0 5px;width:88px;}
+#edit_interface-page #GIVN,#edit_interface-page #SURN,#edit_interface-page #_MARNM{line-height:18px;margin:0 5px;width:180px;}
+#edit_interface-page input[type="text"], #edit_interface-page #NAME_display{line-height:18px;margin:0 5px;vertical-align:top;width:240px;}
+#edit_interface-page input[type="text"][id*="PAGE"], #edit_interface-page input[type="text"][id*="_UID"]{width:350px;}
+#edit_interface-page input[type="text"][id*="SOUR"], #edit_interface-page input[type="text"][id*="REPO"],#edit_interface-page input[type="text"][id*="OBJE"],#edit_interface-page input[type="text"][id*="FAMC"],#edit_interface-page input[type="text"][id*="ASSO"],#edit_interface-page input[type="text"][id^="AGE"],#edit_interface-page input[type="text"][id*="SHARED_NOTE"]{width:70px;}
+#edit_interface-page input[type="text"][id$="DATE"] {width:160px;}
+#edit_interface-page input[type="text"][id^="TIME"] {width:100px;}
+#edit_interface-page input[id*="TEXT"]{height:140px;width:440px;} 
+#edit_interface-page textarea {margin:0 5px;width:440px;}
+#edit_interface-page textarea[id*="NOTE"]{height:240px;}
+#edit_interface-page textarea[id*="TEXT"], #edit_interface-page textarea[id*="PUBL"]{height:140px;}
+#edit_interface-page textarea[id^="newgedrec"]{line-height:18px;width:605px;}
+#edit_interface-page textarea#newgedrec1 {height:20px;}
+#edit_interface-page textarea#newgedrec2 {height:364px;}
+#edit_interface-page textarea[id*="ADDR"], #edit_interface-page input[id*="ADDR"]{height:80px;width:300px;}
+#edit_interface-page #changefam {padding:5px;}
+#edit_interface-page #changefam table{margin:10px auto;min-width:400px;max-width:650px;}
+#edit_interface-page #changefam span{margin:0;}
+#edit_interface-page #changefam td{padding:5px; white-space:normal;}
+#edit_interface-page #changefam td.child{text-align:center;}
+#edit_interface-page #changefam #save-cancel {margin:0 auto 50px auto;width:400px;}
+#edit_interface-page #changefam #save-cancel .save {float:left;}
+#edit_interface-page #changefam #save-cancel .cancel {float:right;}
+html[dir='rtl'] #edit_interface-page #changefam #save-cancel .save {float:right;}
+html[dir='rtl'] #edit_interface-page #changefam #save-cancel .cancel {float:left;}
+
+/* Addmedia pop-ups*/
+#addmedia-page input[type="text"]{line-height:18px;margin:0 5px;width:180px;}
+#addmedia-page .optionbox select {margin:0 5px;}
+#addmedia-page .optionbox p.sub{font-size:11px;margin:0 5px;}
+#addmedia-page input[type="text"][id*="PAGE"], #addmedia-page input[type="text"][id*="_UID"]{width:350px;}
+#addmedia-page input[type="text"][id*="SOUR"], #addmedia-page input[type="text"][id*="REPO"],#addmedia-page input[type="text"][id*="OBJE"],#addmedia-page input[type="text"][id*="FAMC"],#addmedia-page input[type="text"][id*="ASSO"],#addmedia-page input[type="text"][id^="AGE"],#addmedia-page input[type="text"][id*="SHARED_NOTE"]{width:70px;}
+#addmedia-page input[id*="TEXT"]{height:140px;width:440px;} 
+#addmedia-page textarea {margin:0 5px;width:440px;}
+#addmedia-page textarea[id*="NOTE"]{height:240px;}
+#addmedia-page textarea[id*="TEXT"], #addmedia-page textarea[id*="PUBL"]{height:140px;}
+

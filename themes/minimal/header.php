@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 14176 2012-08-16 10:48:52Z greg $
+// $Id: header.php 14386 2012-10-03 17:35:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -37,7 +37,7 @@ echo
 	header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
 	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
 	'<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css">',
-	'<link rel="stylesheet" type="text/css" href="', $stylesheet, '">';
+	'<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.css', '">';
 
 	//PERSO Add extra style sheet for personal additions
 	$extrastylesheet= str_replace('.css', '.extra.css', $stylesheet);
@@ -64,7 +64,7 @@ echo
 if ($view!='simple') {
 	echo '<div id="header">';
 	echo '<ul class="makeMenu">';
-	echo '<li class="title" dir="auto">',htmlspecialchars($GEDCOM_TITLE),'</li>';
+	echo '<li class="title" dir="auto">', WT_TREE_TITLE ,'</li>';
 	echo '<div>';
 	if (WT_USER_ID) {
 		echo '<li><a href="edituser.php">', getUserFullName(WT_USER_ID), '</a></li> <li>', logout_link(), '</li>';

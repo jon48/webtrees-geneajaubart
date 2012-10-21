@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14169 2012-08-12 17:50:01Z greg $
+// $Id: module.php 14276 2012-09-14 15:39:40Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -80,7 +80,7 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 				echo ' checked="checked"';
 			}
 			echo 'onclick="jQuery(\'tr.row_rela\').toggle();"><label for="checkbox_rela_facts">', WT_I18N::translate('Events of close relatives'), '</label>';
-			if (file_exists(get_site_setting('INDEX_DIRECTORY').'histo.'.WT_LOCALE.'.php')) {
+			if (file_exists(WT_Site::preference('INDEX_DIRECTORY').'histo.'.WT_LOCALE.'.php')) {
 				echo ' <input id="checkbox_histo" type="checkbox"';
 				if ($EXPAND_HISTO_EVENTS) {
 					echo ' checked="checked"';

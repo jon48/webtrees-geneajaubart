@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_change.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: admin_site_change.php 14275 2012-09-14 10:26:33Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_change.php');
 require './includes/session.php';
@@ -237,10 +237,6 @@ $url=
 	'&amp;user='.rawurlencode($user).
 	'&amp;gedc='.rawurlencode($gedc);
 
-$gedc_array=array();
-foreach (get_all_gedcoms() as $ged_id=>$ged_name) {
-	$gedc_array[$ged_name]=WT_I18N::translate('%s', get_gedcom_setting($ged_id, 'title'));
-}
 $users_array=array_combine(get_all_users(), get_all_users());
 uksort($users_array, 'strnatcasecmp');
 
@@ -270,7 +266,7 @@ echo
 					WT_I18N::translate('User'), '<br>', select_edit_control('user', $users_array, '', $user, ''),
 				'</td>',
 				'<td>',
-					WT_I18N::translate('Family tree'), '<br>',  select_edit_control('gedc', $gedc_array, '', $gedc, WT_USER_IS_ADMIN ? '' : 'disabled'),
+					WT_I18N::translate('Family tree'), '<br>',  select_edit_control('gedc', WT_Tree::getNameList(), '', $gedc, WT_USER_IS_ADMIN ? '' : 'disabled'),
 				'</td>',
 			'</tr><tr>',
 				'<td colspan="6">',

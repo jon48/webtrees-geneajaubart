@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 14176 2012-08-16 10:48:52Z greg $
+// $Id: header.php 14386 2012-10-03 17:35:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -48,7 +48,7 @@ echo
 	
 echo
 	'<link type="text/css" rel="stylesheet" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css">',
-	'<link type="text/css" rel="stylesheet" href="', $stylesheet, '">';
+	'<link type="text/css" rel="stylesheet" href="', WT_THEME_URL, 'style.css', '">';
 	//PERSO Add extra style sheet for personal additions
 	$extrastylesheet= str_replace('.css', '.extra.css', $stylesheet);
 	echo '<link rel="stylesheet" type="text/css" href="', $extrastylesheet, '">';
@@ -119,10 +119,7 @@ if ($view!='simple') { // Use "simple" headers for popup windows
 		$menu_items[]=$menu;
 	}
 
-	echo
-		'<div style="float:', WT_CSS_ALIGN, '; clear:', WT_CSS_ALIGN, '; font-size:175%;" dir="auto">',
-			htmlspecialchars($GEDCOM_TITLE),
-		'</div>';
+	echo '<div style="float:', WT_CSS_ALIGN, '; clear:', WT_CSS_ALIGN, '; font-size:175%;" dir="auto">', WT_TREE_TITLE, '</div>';
 
 	// Print the menu bar
 	echo '<div id="topMenu"><ul class="makeMenu">';

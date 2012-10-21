@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 14181 2012-08-18 21:23:39Z greg $
+// $Id: header.php 14386 2012-10-03 17:35:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ echo
 	header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
 	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
 	'<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css">',
-	'<link rel="stylesheet" type="text/css" href="', $stylesheet, '">';
+	'<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.css', '">';
 
 	//PERSO Add extra style sheet for personal additions
 	$extrastylesheet= str_replace('.css', '.extra.css', $stylesheet);
@@ -65,15 +65,13 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 	'<div id="clouds-container">',
 		'<div id="header">',
 			'<div class="header" >',
-				'<span class="title" dir="auto">',
-					htmlspecialchars($GEDCOM_TITLE),
-				'</span>',
+				'<span class="title" dir="auto">', WT_TREE_TITLE, '</span>',
 				'<div class="hsearch">',
 					'<form style="display:inline;" action="search.php" method="post">',
 						'<input type="hidden" name="action" value="general">',
 						'<input type="hidden" name="topsearch" value="yes">',
 						'<input type="search" name="query" size="15" placeholder="', WT_I18N::translate('Search'), '" dir="auto">',
-						'<input type="image" src="', $WT_IMAGES['search'], '" align="top" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '">',
+						'<input class="search-icon" type="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '">',
 					'</form>',
 				'</div>',
 			'</div>',

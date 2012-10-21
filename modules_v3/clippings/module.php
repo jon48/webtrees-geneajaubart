@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14164 2012-08-11 21:21:49Z greg $
+// $Id: module.php 14252 2012-09-06 22:45:44Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -48,9 +48,10 @@ class clippings_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module
 	public function modAction($mod_action) {
 		switch($mod_action) {
 		case 'ajax':
+			$html=$this->getSidebarAjaxContent();
 			Zend_Session::writeClose();
 			header('Content-Type: text/html; charset=UTF-8');
-			echo $this->getSidebarAjaxContent();
+			echo $html;
 			break;
 		case 'index':
 			global $MAX_PEDIGREE_GENERATIONS, $controller, $WT_SESSION;

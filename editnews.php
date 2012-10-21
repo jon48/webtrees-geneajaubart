@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: editnews.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: editnews.php 14279 2012-09-14 21:46:56Z greg $
 
 define('WT_SCRIPT_NAME', 'editnews.php');
 require './includes/session.php';
@@ -50,7 +50,7 @@ case 'compose':
 		$news = array();
 		$news['user_id'] = $user_id;
 		$news['gedcom_id'] = $gedcom_id;
-		$news['date'] = time();
+		$news['date'] = WT_TIMESTAMP;
 		$news['title'] = '';
 		$news['text'] = '';
 	}
@@ -85,9 +85,9 @@ case 'save':
 	}
 	$message['user_id'] = $user_id;
 	$message['gedcom_id'] = $gedcom_id;
-	$message['date']=time();
+	$message['date'] = WT_TIMESTAMP;
 	$message['title'] = $title;
-	$message['text'] = $text;
+	$message['text']  = $text;
 	addNews($message);
 	$controller->addInlineJavascript('window.opener.location.reload();window.close();');
 	break;

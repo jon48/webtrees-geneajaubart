@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13838 2012-04-19 07:41:26Z greg $
+// $Id: module.php 14374 2012-10-01 07:27:21Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -60,7 +60,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 	private function generate($file) {
 		if ($file=='sitemap.xml') {
 			$this->generate_index();
-		} elseif (preg_match('/^sitemap-(\d+)-([ifsrmn])-(\d+).xml$/', $file, $match)) {
+		} elseif (preg_match('/^sitemap-(\d+)-([isrmn])-(\d+).xml$/', $file, $match)) {
 			$this->generate_file($match[1], $match[2], $match[3]);
 		} else {
 			header('HTTP/1.0 404 Not Found');
@@ -71,43 +71,39 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 	private function generate_index() {
 		// Check the cache
 		$timestamp=get_module_setting($this->getName(), 'sitemap.timestamp');
-		if ($timestamp > time()-self::CACHE_LIFE) {
+		if ($timestamp > WT_TIMESTAMP - self::CACHE_LIFE) {
 			$data=get_module_setting($this->getName(), 'sitemap.xml');
 		} else {
 			$data='';
 			$lastmod='<lastmod>'.date('Y-m-d').'</lastmod>';
-			foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
-				if (get_gedcom_setting($ged_id, 'include_in_sitemap')) {
-					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=?")->execute(array($ged_id))->fetchOne();
+			foreach (WT_Tree::getAll() as $tree) {
+				if (get_gedcom_setting($tree->tree_id, 'include_in_sitemap')) {
+					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##individuals` WHERE i_file=?")->execute(array($tree->tree_id))->fetchOne();
 					for ($i=0; $i<=$n/self::RECORDS_PER_VOLUME; ++$i) {
-						$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$ged_id.'-i-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
+						$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$tree->tree_id.'-i-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
 					}
-					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##families` WHERE f_file=?")->execute(array($ged_id))->fetchOne();
-					for ($i=0; $i<=$n/self::RECORDS_PER_VOLUME; ++$i) {
-						$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$ged_id.'-f-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
-					}
-					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##sources` WHERE s_file=?")->execute(array($ged_id))->fetchOne();
+					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##sources` WHERE s_file=?")->execute(array($tree->tree_id))->fetchOne();
 					if ($n) {
 						for ($i=0; $i<=$n/self::RECORDS_PER_VOLUME; ++$i) {
-							$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$ged_id.'-s-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
+							$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$tree->tree_id.'-s-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
 						}
 					}
-					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##other` WHERE o_file=? AND o_type='REPO'")->execute(array($ged_id))->fetchOne();
+					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##other` WHERE o_file=? AND o_type='REPO'")->execute(array($tree->tree_id))->fetchOne();
 					if ($n) {
 						for ($i=0; $i<=$n/self::RECORDS_PER_VOLUME; ++$i) {
-							$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$ged_id.'-r-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
+							$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$tree->tree_id.'-r-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
 						}
 					}
-					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##other` WHERE o_file=? AND o_type='NOTE'")->execute(array($ged_id))->fetchOne();
+					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##other` WHERE o_file=? AND o_type='NOTE'")->execute(array($tree->tree_id))->fetchOne();
 					if ($n) {
 						for ($i=0; $i<=$n/self::RECORDS_PER_VOLUME; ++$i) {
-							$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$ged_id.'-n-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
+							$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$tree->tree_id.'-n-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
 						}
 					}
-					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##media` WHERE m_gedfile=?")->execute(array($ged_id))->fetchOne();
+					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##media` WHERE m_gedfile=?")->execute(array($tree->tree_id))->fetchOne();
 					if ($n) {
 						for ($i=0; $i<=$n/self::RECORDS_PER_VOLUME; ++$i) {
-							$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$ged_id.'-m-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
+							$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$tree->tree_id.'-m-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
 						}
 					}
 				}
@@ -115,7 +111,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 			$data='<'.'?xml version="1.0" encoding="UTF-8" ?'.'>'.PHP_EOL.'<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'.PHP_EOL.$data.'</sitemapindex>'.PHP_EOL;
 			// Cache this data
 			set_module_setting($this->getName(), 'sitemap.xml', $data);
-			set_module_setting($this->getName(), 'sitemap.timestamp', time());
+			set_module_setting($this->getName(), 'sitemap.timestamp', WT_TIMESTAMP);
 		}
 		header('Content-Type: application/xml');
 		header('Content-Length: '.strlen($data));
@@ -126,7 +122,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 	private function generate_file($ged_id, $rec_type, $volume) {
 		// Check the cache
 		$timestamp=get_module_setting($this->getName(), 'sitemap-'.$ged_id.'-'.$rec_type.'-'.$volume.'.timestamp');
-		if ($timestamp > time()-self::CACHE_LIFE) {
+		if ($timestamp > WT_TIMESTAMP - self::CACHE_LIFE) {
 			$data=get_module_setting($this->getName(), 'sitemap-'.$ged_id.'-'.$rec_type.'-'.$volume.'.xml');
 		} else {
 			$data='';
@@ -142,18 +138,6 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 				)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
 				foreach ($rows as $row) {
 					$records[]=WT_Person::getInstance($row);
-				}
-				break;
-			case 'f':
-				$rows=WT_DB::prepare(
-					"SELECT 'FAM' AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec".
-					" FROM `##families`".
-					" WHERE f_file=?".
-					" ORDER BY f_id".
-					" LIMIT ".self::RECORDS_PER_VOLUME." OFFSET ".($volume*self::RECORDS_PER_VOLUME)
-				)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
-				foreach ($rows as $row) {
-					$records[]=WT_Family::getInstance($row);
 				}
 				break;
 			case 's':
@@ -222,7 +206,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 			$data='<'.'?xml version="1.0" encoding="UTF-8" ?'.'>'.PHP_EOL.'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">'.PHP_EOL.$data.'</urlset>'.PHP_EOL;
 			// Cache this data
 			set_module_setting($this->getName(), 'sitemap-'.$ged_id.'-'.$rec_type.'-'.$volume.'.xml', $data);
-			set_module_setting($this->getName(), 'sitemap-'.$ged_id.'-'.$rec_type.'-'.$volume.'.timestamp', time());
+			set_module_setting($this->getName(), 'sitemap-'.$ged_id.'-'.$rec_type.'-'.$volume.'.timestamp', WT_TIMESTAMP);
 		}
 		header('Content-Type: application/xml');
 		header('Content-Length: '.strlen($data));
@@ -238,8 +222,8 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 
 		// Save the updated preferences
 		if (safe_POST('action', 'save')=='save') {
-			foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
-				set_gedcom_setting($ged_id, 'include_in_sitemap', safe_POST_bool('include'.$ged_id));
+			foreach (WT_Tree::getAll() as $tree) {
+				set_gedcom_setting($tree->tree_id, 'include_in_sitemap', safe_POST_bool('include'.$tree->tree_id));
 			}
 			// Clear cache and force files to be regenerated
 			WT_DB::prepare(
@@ -257,13 +241,13 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 			'<p>', WT_I18N::translate('Which family trees should be included in the sitemaps?'), '</p>',
 			'<form method="post" action="">',
 			'<input type="hidden" name="action" value="save">';
-		foreach (get_all_gedcoms() as $ged_id=>$gedcom) {
-			echo '<p><input type="checkbox" name="include', $ged_id, '"';
-			if (get_gedcom_setting($ged_id, 'include_in_sitemap')) {
+		foreach (WT_Tree::getAll() as $tree) {
+			echo '<p><input type="checkbox" name="include', $tree->tree_id, '"';
+			if (get_gedcom_setting($tree->tree_id, 'include_in_sitemap')) {
 				echo ' checked="checked"';
 				$include_any=true;
 			}
-			echo '> ', get_gedcom_setting($ged_id, 'title'), '</p>';
+			echo '>', $tree->tree_title_html, '</p>';
 		}
 		echo
 			'<input type="submit" value="', WT_I18N::translate('Save'), '">',

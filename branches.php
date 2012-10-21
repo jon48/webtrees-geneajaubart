@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: branches.php 14111 2012-07-18 12:25:09Z greg $
+// $Id: branches.php 14290 2012-09-15 09:01:22Z greg $
 
 define('WT_SCRIPT_NAME', 'branches.php');
 require './includes/session.php';
@@ -139,7 +139,7 @@ function print_fams($person, $famid=null) {
 	if ($famid && $person->getChildFamilyPedigree($famid)) {
 		$sex = $person->getSex();
 		$famcrec = get_sub_record(1, '1 FAMC @'.$famid.'@', $person->getGedcomRecord());
-		$pedi = get_gedcom_value('PEDI', 2, $famcrec, '', false);
+		$pedi = get_gedcom_value('PEDI', 2, $famcrec);
 		if ($pedi) {
 			$label = WT_Gedcom_Code_Pedi::getValue($pedi, $person);
 		}

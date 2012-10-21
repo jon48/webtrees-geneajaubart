@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_reorder.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: media_reorder.php 14234 2012-09-01 13:21:37Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -54,9 +54,9 @@ $controller->addInlineJavascript('
 		<input type="hidden" name="pid" value="<?php echo $pid; ?>">
 
 		<p><center>
-		<button type="submit" title="<?php echo WT_I18N::translate('Saves the sorted media to the database'); ?>"><?php echo WT_I18N::translate('Save'); ?></button>
-		<button type="submit" title="<?php echo WT_I18N::translate('Reset to the original order'); ?>" onclick="document.reorder_form.action.value='reset_media_update'; document.reorder_form.submit();"><?php echo WT_I18N::translate('Reset'); ?></button>
-		<button type="submit" title="<?php echo WT_I18N::translate('Quit and return'); ?>" onclick="window.close();"><?php echo WT_I18N::translate('Cancel'); ?></button>
+		<button type="submit"><?php echo WT_I18N::translate('Save'); ?></button>
+		<button type="submit" onclick="document.reorder_form.action.value='reset_media_update'; document.reorder_form.submit();"><?php echo WT_I18N::translate('Reset'); ?></button>
+		<button type="submit" onclick="window.close();"><?php echo WT_I18N::translate('Cancel'); ?></button>
 		</center>
 <ul id="reorder_media_list">
 	<?php
@@ -187,8 +187,8 @@ $controller->addInlineJavascript('
 		echo '</td></tr></table><br>';
 	}
 	?>
-	<button type="submit" title="<?php echo WT_I18N::translate('Saves the sorted media to the database'); ?>"><?php echo WT_I18N::translate('Save'); ?></button>
-	<button type="submit" title="<?php echo WT_I18N::translate('Reset to the original order'); ?>" onclick="document.reorder_form.action.value='reset_media_update'; document.reorder_form.submit();"><?php echo WT_I18N::translate('Reset'); ?></button>
-	<button type="submit" title="<?php echo WT_I18N::translate('Quit and return'); ?>" onclick="window.close();"><?php echo WT_I18N::translate('Cancel'); ?></button>
+	<button type="submit"><?php echo WT_I18N::translate('Save'); ?></button>
+	<button type="submit" onclick="document.reorder_form.action.value='reset_media_update'; document.reorder_form.submit();"><?php echo WT_I18N::translate('Reset'); ?></button>
+	<button type="submit" onclick="window.close();"><?php echo WT_I18N::translate('Cancel'); ?></button>
 	</center></p>
 	</form>

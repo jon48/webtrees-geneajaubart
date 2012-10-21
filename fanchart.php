@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: fanchart.php 14198 2012-08-25 15:00:37Z greg $
+// $Id: fanchart.php 14241 2012-09-03 08:50:48Z greg $
 
 define('WT_SCRIPT_NAME', 'fanchart.php');
 require './includes/session.php';
@@ -30,10 +30,8 @@ require WT_ROOT.'includes/functions/functions_edit.php';
 $controller=new WT_Controller_Fanchart();
 
 if (safe_GET_bool('img')) {
-	$img=$controller->generate_fan_chart('png');
 	header('Content-type: image/png');
-	header('Content-length: '.strlen($img));
-	echo $img;
+	$controller->generate_fan_chart('png');
 	exit;
 }
 
