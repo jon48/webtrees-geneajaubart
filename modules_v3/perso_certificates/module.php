@@ -51,7 +51,8 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 			'h_get_simpletag_editor#_ACT'	=> 50,
 			'h_add_simple_tag#SOUR'	=> 50,
 			'h_get_expected_tags' => 50,
-			'h_get_help_text_tag#_ACT'	=> 50
+			'h_get_help_text_tag#_ACT'	=> 50,
+			'h_has_help_text_tag#_ACT'	=> 50
 		);
 	}
 	
@@ -248,7 +249,17 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 		return array('SOUR' => '_ACT');
 	}
 	
-	// Implement WT_Perso_Module_HookSubscriber
+	//Implement WT_Perso_Module_CustomSimpleTagManager
+	public function h_has_help_text_tag($tag){
+		switch($tag){
+			case '_ACT':
+				return true;
+				break;
+		}
+		return false;
+	}
+	
+	// Implement WT_Perso_Module_CustomSimpleTagManager
 	public function h_get_help_text_tag($tag) {
 		switch($tag){
 			case '_ACT':

@@ -209,13 +209,16 @@ function getWatermarkText(){
 	// Get the watermark text from the source and repository details.
 	if($sid){
 		$source = WT_Source::getInstance($sid);
-		$wmtext = '&copy;';
-		$rid = get_gedcom_value('REPO', 0, $source->getGedcomRecord());
-		if($rid){
-			$repo = WT_Repository::getInstance($rid);
-			$wmtext .= ' '.$repo->getFullName().' - ';
+		if($source) {
+			$wmtext = '&copy;';
+			$match = null;
+			$rid = get_gedcom_value('REPO', 0, $source->getGedcomRecord());
+			if($rid && preg_match('/^@('.WT_REGEX_XREF.')@$/', $rid, $match)){
+				$repo = WT_Repository::getInstance($match[1]);
+				if($repo) $wmtext .= ' '.$repo->getFullName().' - ';
+			}
+			$wmtext .= $source->getFullName();
 		}
-		$wmtext .= $source->getFullName();;
 	}
 	
 	return $wmtext;

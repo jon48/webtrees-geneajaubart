@@ -38,10 +38,9 @@ echo
 	'<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css">',
 	'<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.css', '">';
 
-	//PERSO Add extra style sheet for personal additions
-	$extrastylesheet= str_replace('.css', '.extra.css', $stylesheet);
-	echo '<link rel="stylesheet" type="text/css" href="', $extrastylesheet, '">';
-	//END PERSO
+//PERSO Add extra style sheet for personal additions
+echo '<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.extra.css', '">';
+//END PERSO
 
 switch ($BROWSERTYPE) {
 //case 'chrome': uncomment when chrome.css file needs to be added, or add others as needed

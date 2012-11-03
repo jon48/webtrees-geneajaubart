@@ -49,8 +49,8 @@ function format_certificate_table($certificates, $city) {
 					"bAutoWidth":false,
 					"bProcessing": true,
 					"aoColumns": [
-		                    /* 0-Date */  			{ "sWidth": "15%" },
-		                    /* 1-Type */ 			{ "sWidth": "5%", "bSearchable": false },
+		                    /* 0-Date */  			{ "sWidth": "15%", "sClass": "center" },
+		                    /* 1-Type */ 			{ "sWidth": "5%", "bSearchable": false, "sClass": "center"},
 		                    /* 2-CertificateSort */ { "sType": "unicode", "bVisible" : false },
 		                    /* 3-Certificate */     { "iDataSort" : 2, "sClass": "left" }
 		                ],

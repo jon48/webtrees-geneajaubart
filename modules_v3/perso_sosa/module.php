@@ -134,15 +134,12 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 		$controller->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/computesosa.js');
 		
 		echo '<div id="'.$this->getName().'"><table class="gm_edit_config"><tr><td><dl>';
-		// Load all available gedcoms
-		$all_gedcoms = get_all_gedcoms();
-		foreach($all_gedcoms as $ged_id => $ged_name){
-			if(userGedcomAdmin(WT_USER_ID, $ged_id)){
-				$title=strip_tags(get_gedcom_setting($ged_id, 'title'));
-				echo '<dt>', WT_I18N::translate('Root individual for <em>%s</em>', $title), help_link('config_root_indi', $this->getName()), '</dt>',
-					'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('gedcom_setting-PERSO_PS_ROOT_INDI-'.$ged_id, get_gedcom_setting($ged_id, 'PERSO_PS_ROOT_INDI'), $controller),'</dd>',
-					'<dt>', WT_I18N::translate('Compute all Sosas for <em>%s</em>', $title), help_link('config_computesosa', $this->getName()), '</dt>',
-					'<dd><button id="bt_'.$ged_id.'" class="progressbutton" onClick="calculateSosa(\''.$ged_id.'\');"><div id="btsosa_'.$ged_id.'">'.WT_I18N::translate('Compute').'</div></button></dd>';
+		foreach(WT_Tree::getAll() as $tree){
+			if(userGedcomAdmin(WT_USER_ID, $tree->tree_id)){
+				echo '<dt>', WT_I18N::translate('Root individual for <em>%s</em>', $tree->tree_title), help_link('config_root_indi', $this->getName()), '</dt>',
+					'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('gedcom_setting-PERSO_PS_ROOT_INDI-'.$tree->tree_id, get_gedcom_setting($tree->tree_id, 'PERSO_PS_ROOT_INDI'), $controller),'</dd>',
+					'<dt>', WT_I18N::translate('Compute all Sosas for <em>%s</em>', $tree->tree_title), help_link('config_computesosa', $this->getName()), '</dt>',
+					'<dd><button id="bt_'.$tree->tree_id.'" class="progressbutton" onClick="calculateSosa(\''.$tree->tree_id.'\');"><div id="btsosa_'.$tree->tree_id.'">'.WT_I18N::translate('Compute').'</div></button></dd>';
 			}
 		}
 		echo '</dl></td></tr></table></div>';

@@ -1380,6 +1380,14 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		case '_PRIM':
 			echo help_link($fact);
 			break;
+		//PERSO
+		default:
+			$hook_has_help_text_tag = new WT_Perso_Hook('h_has_help_text_tag', $fact);
+			if($hook_has_help_text_tag->hasAnyActiveModule()){
+				if(in_array(true, $hook_has_help_text_tag->execute($fact))) echo help_link($fact);;
+			}
+			break;
+		//END PERSO
 		}
 	}
 	// tag level

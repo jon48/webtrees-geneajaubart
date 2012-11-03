@@ -229,14 +229,13 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			
 				');
 
-			$gedcoms = get_all_gedcoms();
 			echo '<div class="center">';
 			echo WT_I18N::translate('Choose tree: ');
 			echo '<select id="ddlGedcoms_'.$tab_id.'">';
-			foreach ($gedcoms as $gedid => $gedname) {
-				echo '<option value='.$gedid;
-				if($gedid == WT_GED_ID) echo ' selected=true';
-				echo '>'.$gedname.'</option>';
+			foreach (WT_Tree::getAll() as $tree) {
+				echo '<option value='.$tree->tree_id;
+				if($tree->tree_id == WT_GED_ID) echo ' selected=true';
+				echo '>'.$tree->tree_name.'</option>';
 			}
 			echo '</select>';
 			echo '</div>';
@@ -432,11 +431,11 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							jQuery(document).ready(function() {
 								tip = $("#geodispersion_tip").hide();
 														
-								var positionTab = jQuery("#geodispersion-tabs").position();
+								var positionTab = jQuery("#geodispersion-tabs").offset();
 							
 								jQuery("#geodispersion_map").mousemove(function(e){
 								    if (over){
-								      tip.css("left", e.pageX + 20 - positionTab.left).css("top", e.pageY + 20 - positionTab.top);
+									  tip.css("left", e.pageX + 20 - positionTab.left).css("top", e.pageY + 20 - positionTab.top);
 								      tip.html(tipText);
 								    }
 								});
@@ -466,7 +465,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							}
 						}
 						$html .= '});';
-						$html.= '</script>';						
+						$html.= '</script>';				
 						$html.= '<div id="geodispersion_map"></div>';
 						$html.= '<div id="geodispersion_tip"></div>';
 						

@@ -40,11 +40,10 @@ echo
 	header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
 	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
 	'<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css">',
-	'<link rel="stylesheet" type="text/css" href="', $stylesheet, '">';
+	'<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.css', '">';
 
 //PERSO Add extra style sheet for personal additions
-$extrastylesheet= str_replace('.css', '.extra.css', $stylesheet);
-echo '<link rel="stylesheet" type="text/css" href="', $extrastylesheet, '">';
+echo '<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.extra.css', '">';
 //END PERSO
 
 switch ($BROWSERTYPE) {
@@ -97,14 +96,14 @@ else {
 	}
 	echo '</li>';
 	echo '</ul>';
-	echo '<div class="gedtitle" dir="auto">',htmlspecialchars($GEDCOM_TITLE),'</div>';
+	echo '<div class="gedtitle" dir="auto">',WT_TREE_TITLE,'</div>';
 	echo '</div>';
 	echo  '<div id="hbottomright">';
 	//PERSO Extend header
 	$hook_print_header = new WT_Perso_Hook('h_print_header');
 	$hook_print_header->execute();
 	//END PERSO
-	echo '<ul class="makeMenu">';
+	echo '<ul id="extra-menu" class="makeMenu">';
 	$menu=WT_MenuBar::getFavoritesMenu();
 	if ($menu) {
 		echo $menu->getMenuAsList();

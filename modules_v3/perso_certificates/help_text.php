@@ -40,7 +40,7 @@ switch ($help) {
 		$title=WT_I18N::translate('Certificates firewall root directory');
 		$text=
 			'<p>'.
-			$text=WT_I18N::translate('Directory in which the protected certificates directory can be created.  When this field is empty, the <b>%s</b> directory will be used.', get_site_setting('INDEX_DIRECTORY')).
+			$text=WT_I18N::translate('Directory in which the protected certificates directory can be created.  When this field is empty, the <b>%s</b> directory will be used.', WT_Site::preference('INDEX_DIRECTORY')).
 			'</p>';
 		break;
 	case 'config_show_no_watermark':

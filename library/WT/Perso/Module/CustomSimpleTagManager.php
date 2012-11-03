@@ -55,6 +55,14 @@ interface WT_Perso_Module_CustomSimpleTagManager {
 	 * @param int $level Level to which add the tags
 	 */
 	public function h_add_simple_tag($context, $level);
+
+	/**
+	 * Returns whether the tag has any help text
+	 * 
+	 * @param string $tag Tag
+	 * @return bool True is help text, False otherwise 
+	 */
+	public function h_has_help_text_tag($tag);
 	
 	/**
 	 * Returns $title and $text to display help text for the specified tag.
