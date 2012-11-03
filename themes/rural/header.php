@@ -100,8 +100,10 @@ else {
 	echo '</div>';
 	echo  '<div id="hbottomright">';
 	//PERSO Extend header
+	echo '<div id="perso-header">';
 	$hook_print_header = new WT_Perso_Hook('h_print_header');
 	$hook_print_header->execute();
+	echo '</div>';
 	//END PERSO
 	echo '<ul id="extra-menu" class="makeMenu">';
 	$menu=WT_MenuBar::getFavoritesMenu();

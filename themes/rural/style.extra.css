@@ -61,6 +61,10 @@
 
 html[dir='rtl'] .certificate-list th:last-child, html[dir='rtl'] .sosa-list th:last-child, html[dir='rtl'] .smissing-list th:last-child {margin:0 1px 1px -2px;}
 
+/* Perso header */
+#perso-header {margin: 0 10px 0 0;}
+html[dir='rtl'] #perso-header {margin: 0 0 0 10px;}
+
 /* Individual header extender hooks */
 #indi_perso_header{float: right;width: 84%;color: #62584D;font-size: 1.1em;margin-top: 5px;}
 html[dir='rtl'] #indi_perso_header {float: left;}
