@@ -128,6 +128,32 @@ class WT_Perso_Functions {
 		return self::$_isIsSourcedModuleOperational;
 	}
 	
+	/**
+	 * Returns a randomy generated token of a given size
+	 *
+	 * @param int $length Length of the token, default to 32
+	 * @return string Random token
+	 */
+	public static function generateRandomToken($length=32) {
+		$chars = str_split('abcdefghijkmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+		$len_chars = count($chars);
+		$token = '';
+		
+		for ($i = 0; $i < $length; $i++)
+			$token .= $chars[ mt_rand(0, $len_chars - 1) ];
+		
+		# Number of 32 char chunks
+		$chunks = ceil( strlen($token) / 32 );
+		$md5token = '';
+		
+		# Run each chunk through md5
+		for ( $i=1; $i<=$chunks; $i++ )
+			$md5token .= md5( substr($token, $i * 32 - 32, 32) );
+		
+			# Trim the token
+		return substr($md5token, 0, $length);		
+	} 
+	
 }
 
 ?>

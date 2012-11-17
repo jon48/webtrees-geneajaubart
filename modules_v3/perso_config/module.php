@@ -96,7 +96,7 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 			$value = $config_class->validate_config_settings($id1, $value);
 		}
 			
-		if($value == 'ERROR_VALIDATION') $this->fail();
+		if($value === 'ERROR_VALIDATION') $this->fail();
 			
 		switch($table){
 		case 'module_setting':

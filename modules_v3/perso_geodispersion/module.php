@@ -825,7 +825,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 	}
 
 	/**
-	 * Delete a geodispersion analysis
+	 * Add a geodispersion analysis
 	 * 
 	 * Input parameters - POST :
 	 * 	- descr : Geodispersion analysis description

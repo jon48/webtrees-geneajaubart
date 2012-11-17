@@ -242,7 +242,7 @@ return array(
 	'Pedigree collapse at generation G.'
 									=>	'Implexe à la génération G.',										
 	'Pedigree collapse is a measure of the real number of ancestors of a person compared to its theorical number. The higher this number is, the more marriages between related persons have happened. Extreme examples of high pedigree collapse are royal families for which this number can be as high as nearly 90%% (Alfonso XII of Spain).'
-									=>	'L\'implexe est une mesure du nombre réel d\'ancêtres d\'une personne par rapport au nombre théorique. Plus ce pourcentage est grand, plus il y a eu de mariages entre personnes apparentées. Les familles royales constituent des exemples extrêmes d\'implexe, certains atteignant des niveaux de 90%, comme le roi Alphonse XII d\'Espagne.',							
+									=>	'L\'implexe est une mesure du nombre réel d\'ancêtres d\'une personne par rapport au nombre théorique. Plus ce pourcentage est grand, plus il y a eu de mariages entre personnes apparentées. Les familles royales constituent des exemples extrêmes d\'implexe, certains atteignant des niveaux de 90%%, comme le roi Alphonse XII d\'Espagne.',							
 	'Generation-equivalent: %.2f generations'
 									=>	'Équivalent-génération : %.2f générations',
 	'Missing Ancestors'				=>	'Ancêtres manquants',
@@ -360,7 +360,52 @@ return array(
 	'The Geodispersion analysis entry has been successfully deleted.'
 									=>	'L\'analyse de répartition géographique a été supprimée.',
 	
-									
+	//Perso Admin Tasks
+	'Administration Tasks (Perso)'	=>	'Tâches d\'administration (Perso)',
+	'Manage and run nearly-scheduled administration tasks.'
+									=>	'Gère et exécute des tâches d\'administration quasi-planifiées.',
+	'The Administration Tasks module must be installed and enabled to display this page.'
+									=>	'Le module Tâches d\'administration doit être installé et activé avant de pouvoir afficher cette page.',
+	'The administration tasks are meant to be run at a regular interval - or as regularly as possible.'
+									=>	'Les tâches d\'administration sont destinées à être exécutées à intervalles réguliers, ou aussi réguliers que possible.',
+	'It is sometimes necessary to force the execution of a task.'
+									=>	'Il est parfois nécessaire de forcer l\'exécution d\'une tâche.',
+	'In order to do so, use the following URL, with the optional parameter <em>%s</em> if you only want to force the execution of one task: '
+									=>	'Pour cela, utilisez l\'adresse suivante, avec le paramètre optionnel <em>%s</em>, si vous souhaitez forcer l\'exécution d\'une seule tâche',
+	'task_name'						=>	'nom_de_la_tâche',
+	'Regenerate token'				=>	'Regénérer le jeton',
+	'Task name'						=>	'Nom de la tâche',
+	'Last run'						=>	'Dernière exécution',
+	'Last result'					=>	'Dernier résultat',
+	'Frequency (in min.)'			=>	'Fréquence (min.)',
+	'Remaining occurrences'			=>	'Occurrences restantes',
+	'Is running?'					=>	'En cours ?',
+	'Run task'						=>	'Exécuter la tâche',
+	'Disabled'						=>	'Désactivé',
+	'Failure'						=>	'Échec',
+	'Unlimited'						=>	'Permanent',
+	'Running'						=>	'En cours...',
+	'Not running'					=>	'Arrêté',
+	'Run'							=>	'Exécuter',
+	'Done'							=>	'Terminé',
+	'%s Settings'					=>	'Configuration : %s',
+	'no_token_defined'				=>	'aucun_jeton_défini',
+	'Healthcheck Email'				=>	'État du système',
+	'Health Check Report'			=>	'État du système',
+	'Enable healthcheck emails for <em>%s</em>'
+									=>	'Activer les rapports d\'état du système pour </em>%s</em>',
+	'Health Check Report for the last %d days'
+									=>	'État du système - Rapport pour les %d derniers jours',
+	'Tree'							=>	'Arbre',
+	'Tree %s'						=>	'Arbre %s',
+	'A new version of *webtrees* is available: %s. Upgrade as soon as possible.'
+									=>	'Une nouvelle version de *webtrees* est disponible : %s. Veuillez mettre à jour dès que possible.',
+	'Download it here: %s.'			=>	'Pour la télécharger : %s',
+	'Tree statistics'				=>	'Statistiques de l\'arbre',
+	'Errors [%d]'					=>	'Erreurs [%d]',
+	'Last occurrence'				=>	'Dernière occurrence',		
+	
+		
 	//Titles
 	'Titles'						=>	'Titres',
 	'Title prefixes'				=>	'Particules nobiliaires',
