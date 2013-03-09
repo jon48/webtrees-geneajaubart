@@ -59,7 +59,7 @@
 #certificate-tabs {margin:auto; visibility:hidden; width:95%;}
 #certificate-edit {overflow-x:auto;}
 
-html[dir='rtl'] .certificate-list th:last-child, html[dir='rtl'] .sosa-list th:last-child, html[dir='rtl'] .smissing-list th:last-child {margin:0 1px 1px -2px;}
+html[dir='rtl'] .certificate-list th:last-child, html[dir='rtl'] .sosa-indi-list th:last-child, html[dir='rtl'] .sosa-fam-list th:last-child, html[dir='rtl'] .smissing-list th:last-child {margin:0 1px 1px -2px;}
 
 /* Perso header */
 #perso-header {margin: 0 10px 0 0;}

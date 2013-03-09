@@ -568,7 +568,7 @@ html[dir='rtl'] .main-menu-item  li li a {float:right;padding:1px 5px 1px 10px;}
 #menu-search    {background-position:center -240px;}
 #menu-sour      {background-position:center -400px;}
 #menu-tree      {background-position:center    0px;}
-#menu-story     {background-position:center -640px;}
+#menu-story     {background-position:center -600px;}
 
 /* Sub-menu icons */
 #menu-admin                 {background-position:left     0;}   html[dir=rtl] #menu-admin                 {background-position:right     0;}

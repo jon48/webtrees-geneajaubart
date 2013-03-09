@@ -150,6 +150,7 @@ class WT_Perso_Functions_PatronymicLineage {
 						if($children && count($children)>0){
 							$nbChildren=count($children);
 							$mother_surname=$indi_surname;
+							$father_surname = false;
 							if($spouse) {
 								$dspouse = new WT_Perso_Person($spouse);
 								$father_surname=$dspouse->getUnprotectedPrimarySurname();
@@ -175,6 +176,7 @@ class WT_Perso_Functions_PatronymicLineage {
 					//Else if the root individual is the father
 					else{
 						$father_surname=$indi_surname;
+						$mother_surname = false;
 						if($spouse) {
 							$dspouse = new WT_Perso_Person($spouse);
 							$mother_surname=$dspouse->getUnprotectedPrimarySurname();

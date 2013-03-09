@@ -538,7 +538,7 @@ function format_fam_table($datalist, $option='') {
 					/* 13 MARR:DATE */ {"bVisible": false},
 					/* 14 anniv     */ {"bSortable": false, "sClass": "center"},
 					/* 15 marr plac */ {"sType": "unicode", "sClass": "center"},
-					/* 16 birt sour */ { "iDataSort" : 17, "sClass": "center", "bVisible": '.(WT_Perso_Functions::isIsSourcedModuleOperational() ? 'true' : 'false').' },
+					/* 16 marr sour */ { "iDataSort" : 17, "sClass": "center", "bVisible": '.(WT_Perso_Functions::isIsSourcedModuleOperational() ? 'true' : 'false').' },
 					/* 17 sort sour */ { "bVisible": false},
 					/* 18 children  */ {"iDataSort": 19, "sClass": "center"},
 					/* 19 NCHI      */ {"sType": "numeric", "bVisible": false},

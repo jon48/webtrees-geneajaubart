@@ -261,8 +261,10 @@ return array(
 	'Potential %.2f %%'				=>	'Potentiel %.2f %%',
 	'No ancestors are missing for this generation. Generation complete at %.2f %%.'
 									=>	'Il ne manque aucun ancêtre pour cette génération. Génération complète à %.2f %%.',
-	'No individuals has been found for generation %d'
-									=>	'Aucun individu n\'a été trouvé pour la génération %d',
+	'No ancestor has been found for generation %d'
+									=>	'Aucun ancêtre n\'a été trouvé pour la génération %d',
+	'No family has been found for generation %d'
+									=>	'Aucune famille n\'a été trouvée pour la génération %d',
 	'The list could not be displayed. Reasons might be:'
 									=>	'La liste ne peut être affichée. La raison de ceci peut être :',
 	'No Sosa root individual has been defined.'
@@ -350,7 +352,7 @@ return array(
 	'<strong><em>Place</em> or <em>Flag</em> aa (bb %%)</strong>: The first number indicates the total number of ancestors born in this place, the percentage relates this count to the total number of found places. No percentage means it is less than 10%%.'
 									=>	'<strong><em>Lieu</em> or <em>Drapeau</em> aa (bb %%)</strong>: le premier nombre indique le nombre total d\'ancêtres nés en ce lieu, le pourcentage compare ce compte au nombre total de lieux trouvés. Pas de pourcentage signifie qu\'il est inférieur à 10%%.',
 	'If any, the darker area indicates the number of unknown places within the generation or places outside the analysed area, and its percentage compared to the number of ancestors. No percentage means it is less than 10%%.'
-									=>	'Si présente, la zone foncée indique le nombre de lieux inconnus dans la génération ou les lieux en dehors de la zone étudiée, et son pourcentage comparé au nombre d\ancêtres. Pas de pourcentage signifie qu\'il est inférieur à 10%%.',
+									=>	'Si présente, la zone foncée indique le nombre de lieux inconnus dans la génération ou les lieux en dehors de la zone étudiée, et son pourcentage comparé au nombre d\'ancêtres. Pas de pourcentage signifie qu\'il est inférieur à 10%%.',
 	'<strong><em>Place</em> [aa - bb %%]</strong>: The first number indicates the total number of ancestors born in this place, the percentage compares this count to the total number of found places.'
 									=>	'<strong><em>Lieu</em> [aa - bb %%]</strong> : le premier nombre indique le nombre total d\'ancêtres nés en ce lieu, le pourcentage compare ce compte au nombre total de lieux trouvés.',
 	'Only the %d more frequent places for each generation are displayed.'

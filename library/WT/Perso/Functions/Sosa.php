@@ -21,6 +21,7 @@ class WT_Perso_Functions_Sosa {
 	private static $_isModuleOperational = -1;
 	private static $_statistictab = null;
 	private static $_sosaListByGen = null;
+	private static $_sosaFamListByGen = null;
 	private static $_sosaListWithGen = null;
 	
 	/**
@@ -99,6 +100,32 @@ class WT_Perso_Functions_Sosa {
 				->fetchAssoc();
 			}
 			return self::$_sosaListByGen[$gen];
+		}
+		return null;
+	}
+	
+	/**
+	 * Get an associative array of Sosa families in generation G. Keys are Sosa numbers for the husband, values families.
+	 *
+	 * @param number $gen Generation
+	 * @return array|null Array of Sosa families
+	 */
+	public static function getFamilySosaListAtGeneration($gen){
+		if(!self::$_sosaFamListByGen) self::$_sosaFamListByGen= array();
+		if($gen){
+			if(!isset(self::$_sosaFamListByGen[$gen])){
+				self::$_sosaFamListByGen[$gen] = WT_DB::prepare(
+						'SELECT s1.ps_sosa AS sosa, f_id AS fam'.
+						' FROM ##families'.
+						' INNER JOIN ##psosa AS s1 ON (##families.f_husb = s1.ps_i_id AND ##families.f_file = s1.ps_file)'.
+						' INNER JOIN ##psosa AS s2 ON (##families.f_wife = s2.ps_i_id AND ##families.f_file = s2.ps_file)'.
+						' WHERE s1.ps_sosa + 1 = s2.ps_sosa'.
+						' AND s1.ps_file=? AND s1.ps_gen = ? ORDER BY s1.ps_sosa ASC'
+					)
+				->execute(array(WT_GED_ID, $gen))
+				->fetchAssoc();
+			}
+			return self::$_sosaFamListByGen[$gen];
 		}
 		return null;
 	}
