@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Base.php 14432 2012-10-18 21:47:11Z greg $
+// $Id: Base.php 14715 2013-01-23 21:09:52Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -2049,7 +2049,7 @@ function GedcomValueSHandler($attrs) {
 				break;
 			case 'PLAC':
 				$tmp=new WT_Place($value, WT_GED_ID);
-				$value=$tmp->getFullName();
+				$value=$tmp->getShortName();
 				break;
 			}
 			if ($useBreak == "1") {
@@ -2541,14 +2541,13 @@ function SetVarSHandler($attrs) {
 * @param array $attrs an array of key value pairs for the attributes
 */
 function ifSHandler($attrs) {
-	global $vars, $gedrec, $processIfs, $fact, $desc, $generation, $POSTAL_CODE;
+	global $vars, $gedrec, $processIfs, $fact, $desc, $generation;
 
 	if ($processIfs>0) {
 		$processIfs++;
 		return;
 	}
 
-	$vars['POSTAL_CODE']['id'] = $POSTAL_CODE;
 	$condition = $attrs['condition'];
 	$condition = preg_replace("/\\$(\w+)/", "\$vars[\"$1\"][\"id\"]", $condition);
 	$condition = str_replace(array(" LT ", " GT "), array("<", ">"), $condition);
@@ -2794,22 +2793,24 @@ function HighlightedImageSHandler($attrs) {
 	if (!empty($attrs['width'])) $width = (int)$attrs['width'];
 	if (!empty($attrs['height'])) $height = (int)$attrs['height'];
 
-	$media = find_highlighted_object($id, WT_GED_ID, $gedrec);
-	$mediaobject=WT_Media::getInstance($media['mid']);
-	$attributes=$mediaobject->getImageAttributes('thumb');
-	if (in_array($attributes['ext'], array('GIF','JPG','PNG','SWF','PSD','BMP','TIFF','TIFF','JPC','JP2','JPX','JB2','SWC','IFF','WBMP','XBM')) && $mediaobject->canDisplayDetails() && $mediaobject->fileExists('thumb')) {
-		if (($width>0) and ($height==0)) {
-			$perc = $width / $attributes['adjW'];
-			$height= round($attributes['adjH']*$perc);
-		} elseif (($height>0) and ($width==0)) {
-			$perc = $height / $attributes['adjH'];
-			$width= round($attributes['adjW']*$perc);
-		} else {
-			$width = $attributes['adjW'];
-			$height = $attributes['adjH'];
+	$person=WT_Person::getInstance($id);
+	$mediaobject = $person->findHighlightedMedia();
+	if ($mediaobject) {
+		$attributes=$mediaobject->getImageAttributes('thumb');
+		if (in_array($attributes['ext'], array('GIF','JPG','PNG','SWF','PSD','BMP','TIFF','TIFF','JPC','JP2','JPX','JB2','SWC','IFF','WBMP','XBM')) && $mediaobject->canDisplayDetails() && $mediaobject->fileExists('thumb')) {
+			if (($width>0) and ($height==0)) {
+				$perc = $width / $attributes['adjW'];
+				$height= round($attributes['adjH']*$perc);
+			} elseif (($height>0) and ($width==0)) {
+				$perc = $height / $attributes['adjH'];
+				$width= round($attributes['adjW']*$perc);
+			} else {
+				$width = $attributes['adjW'];
+				$height = $attributes['adjH'];
+			}
+			$image = $ReportRoot->createImageFromObject($mediaobject, $left, $top, $width, $height, $align, $ln);
+			$wt_report->addElement($image);
 		}
-		$image = $ReportRoot->createImageFromObject($mediaobject, $left, $top, $width, $height, $align, $ln);
-		$wt_report->addElement($image);
 	}
 }
 
@@ -2880,9 +2881,8 @@ function ImageSHandler($attrs) {
 			}
 		}
 	} else {
-		$filename = $file;
-		if (file_exists($filename) && preg_match("/(jpg|jpeg|png|gif)$/i", $filename)) {
-			$size = findImageSize($filename);
+		if (file_exists($file) && preg_match("/(jpg|jpeg|png|gif)$/i", $file)) {
+			$size = getimagesize($file);
 			if (($width>0) and ($height==0)) {
 				$perc = $width / $size[0];
 				$height= round($size[1]*$perc);
@@ -2893,7 +2893,7 @@ function ImageSHandler($attrs) {
 				$width = $size[0];
 				$height = $size[1];
 			}
-			$image = $ReportRoot->createImage($filename, $left, $top, $width, $height, $align, $ln);
+			$image = $ReportRoot->createImage($file, $left, $top, $width, $height, $align, $ln);
 			$wt_report->addElement($image);
 		}
 	}

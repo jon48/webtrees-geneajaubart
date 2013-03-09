@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: help_text.php 13722 2012-03-30 10:19:46Z greg $
+// $Id: help_text.php 14772 2013-02-04 17:15:23Z greg $
 
 if (!defined('WT_WEBTREES') || !defined('WT_SCRIPT_NAME') || WT_SCRIPT_NAME!='help_text.php') {
 	header('HTTP/1.0 403 Forbidden');
@@ -98,27 +98,7 @@ case 'GM_DISP_SHORT_PLACE':
 	$text=WT_I18N::translate('Here you can choose between two types of displaying places names in hierarchy. If set Yes the place has short name or actual level name, if No - full name.<br /><b>Examples:<br />Full name: </b>Chicago, Illinois, USA<br /><b>Short name: </b>Chicago<br /><b>Full name: </b>Illinois, USA<br /><b>Short name: </b>Illinois');
 	break;
 
-case 'GM_DISP_COUNT':
-	$title=WT_I18N::translate('Display indis and families counts');
-	$text=WT_I18N::translate('Here you can specify if the counts of indis and families connected to the place is displayed. Now if GEDCOM file contains many people is recomended to turn it off.');
-	break;
-
-case 'GOOGLEMAP_PH_WHEEL':
-	$title=WT_I18N::translate('Use mouse wheel for zoom');
-	$text=WT_I18N::translate('Here you can specify if the mouse wheel is enebled for zooming.');
-	break;
-
-case 'GOOGLEMAP_PH_CONTROLS':
-	$title=WT_I18N::translate('Hide map controls');
-	$text=WT_I18N::translate('This option allow to hide map controls (i.e. the map type choice) if mouse is outside the map.');
-	break;
-
 // Pedigree map
-
-case 'PEDIGREE_MAP_clustersize':
-	$title=WT_I18N::translate('Cluster size');
-	$text=WT_I18N::translate('The number of markers to be placed at one point before a trail of pins is started in a north east line behind the younger generations.  The \'trail\' is usually only visable at high zoom values.');
-	break;
 
 case 'PEDIGREE_MAP_hidelines':
 	$title=WT_I18N::translate('Hide lines');

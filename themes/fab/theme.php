@@ -20,7 +20,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: theme.php 14386 2012-10-03 17:35:05Z greg $
+// $Id: theme.php 14693 2013-01-22 08:56:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -51,21 +51,6 @@ $WT_IMAGES=array(
 	'default_image_F'=>WT_THEME_URL.'images/silhouette_female.png',
 	'default_image_M'=>WT_THEME_URL.'images/silhouette_male.png',
 	'default_image_U'=>WT_THEME_URL.'images/silhouette_unknown.png',
-
-	// need to replace with a system based on mime-types
-	'media'          =>WT_THEME_URL.'images/media.png',
-	'media_audio'    =>WT_THEME_URL.'images/media/audio.png',
-	'media_doc'      =>WT_THEME_URL.'images/media/doc.png',
-	'media_flash'    =>WT_THEME_URL.'images/media/flash.png',
-	'media_flashrem' =>WT_THEME_URL.'images/media/flashrem.png',
-	'media_ged'      =>WT_THEME_URL.'images/media/ged.png',
-	'media_globe'    =>WT_THEME_URL.'images/media/globe.png',
-	'media_html'     =>WT_THEME_URL.'images/media/html.png',
-	'media_pdf'      =>WT_THEME_URL.'images/media/pdf.png',
-	'media_picasa'   =>WT_THEME_URL.'images/media/picasa.png',
-	'media_tex'      =>WT_THEME_URL.'images/media/tex.png',
-	'media_wmv'      =>WT_THEME_URL.'images/media/wmv.png',
-	'media_wmvrem'   =>WT_THEME_URL.'images/media/wmvrem.png',
 );
 
 // Fan chart

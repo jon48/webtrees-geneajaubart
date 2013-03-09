@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: wt_v3_places_edit.js.php 14079 2012-07-07 06:11:43Z greg $
+// $Id: wt_v3_places_edit.js.php 14786 2013-02-06 22:28:50Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
  
@@ -34,7 +34,6 @@ if (!defined('WT_WEBTREES')) {
 <head>
 	<script src="<?php echo WT_GM_SCRIPT; ?>"></script>
 	<script src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/wt_v3_places_edit_overlays.js.php"></script>
-	<script src="<?php echo WT_STATIC_URL; ?>js/webtrees.js"></script>
 	<link type="text/css" href="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/css/wt_v3_googlemap.css" rel="stylesheet">
 
 	<script>
@@ -78,8 +77,6 @@ if (!defined('WT_WEBTREES')) {
 		var longitude;
 		var i;		
 
-		document.editplaces.save1.disabled = '';
-		document.editplaces.save2.disabled = '';
 		zoom = parseInt(document.editplaces.NEW_ZOOM_FACTOR.value);
 
 		prec = 20;

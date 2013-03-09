@@ -4,7 +4,7 @@
 // Various printing functions used by all scripts and included by the functions.php file.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print.php 14388 2012-10-04 08:32:27Z greg $
+// $Id: functions_print.php 14737 2013-01-30 20:11:30Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -58,8 +58,8 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 	// NOTE: Start div out-rand()
 	if (!$person) {
 		echo "<div id=\"out-", rand(), "\" class=\"person_boxNN\" style=\"width: ", $bwidth, "px; height: ", $bheight, "px; overflow: hidden;\">";
-		echo "<br>";
-		echo "</div>";
+		echo '<br>';
+		echo '</div>';
 		return false;
 	}
 	//PERSO Create the Decorator associated
@@ -73,21 +73,20 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 	$tmp=array('M'=>'', 'F'=>'F', 'U'=>'NN');
 	$isF=$tmp[$person->getSex()];
 
-	$personlinks = "";
-	$icons = "";
-	$classfacts = "";
-	$genderImage = "";
-	$BirthDeath = "";
-	$birthplace = "";
-	$outBoxAdd = "";
-	$thumbnail = "";
-	$showid = "";
-	$iconsStyleAdd = "float: right; ";
-	if ($TEXT_DIRECTION=="rtl") $iconsStyleAdd="float: left; ";
+	$personlinks = '';
+	$icons = '';
+	$classfacts = '';
+	$genderImage = '';
+	$BirthDeath = '';
+	$birthplace = '';
+	$outBoxAdd = '';
+	$showid = '';
+	$iconsStyleAdd = 'float:right;';
+	if ($TEXT_DIRECTION=='rtl') $iconsStyleAdd='float:left;';
 
 	$disp=$person->canDisplayDetails();
 	$uniqueID = (int)(microtime() * 1000000);
-	$boxID = $pid.".".$personcount.".".$count.".".$uniqueID;
+	$boxID = $pid.'.'.$personcount.'.'.$count.'.'.$uniqueID;
 	$mouseAction4 = " onclick=\"expandbox('".$boxID."', $style); return false;\"";
 	if ($person->canDisplayName()) {
 		if (empty($SEARCH_SPIDER)) {
@@ -162,18 +161,13 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 		}
 	}
 	//-- find the name
-		$name = $person->getFullName();
-		$shortname = $person->getShortName();
+	$name = $person->getFullName();
+	$shortname = $person->getShortName();
 	
 	if ($SHOW_HIGHLIGHT_IMAGES) {
-		$object=$person->findHighlightedMedia();
-		$img_id='box-'.$boxID.'.-thumb';
-		if (!empty($object)) {
-			$mediaobject=WT_Media::getInstance($object['mid']);
-			$thumbnail=$mediaobject->displayMedia(array('display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$name));
-		} else {
-			$thumbnail=display_silhouette(array('sex'=>$person->getSex(),'display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$name)); // may return ''
-		}
+		$thumbnail = $person->displayImage();
+	} else {
+		$thumbnail = '';
 	}
 	
 	//-- find additional name, e.g. Hebrew
@@ -485,7 +479,7 @@ function print_note_record($text, $nlevel, $nrec, $textOnly=false, $return=false
 			$data .= '<div class="fact_NOTE"><span class="label">';
 			if ($brpos !== false) {
 				if ($EXPAND_NOTES) $plusminus='minus'; else $plusminus='plus';
-				$data .= '<a href="#" onclick="expand_layer(\''.$elementID.'\'); return false;"><i id="'.$elementID.'_img" class="icon-plus"></i></a> ';
+				$data .= '<a href="#" onclick="expand_layer(\''.$elementID.'\'); return false;"><i id="'.$elementID.'_img" class="icon-'.$plusminus.'"></i></a> ';
 			}
 
 			// Check if Shared Note -----------------------------
@@ -671,7 +665,7 @@ function print_asso_rela_record(WT_Event $event, WT_GedcomRecord $record) {
 					$label=WT_Gedcom_Code_Rela::getValue($rela, $person);
 				} else {
 					// Generate an automatic RELA
-					$label=get_relationship_name(get_relationship($associate->getXref(), $person->getXref(), true, 4, true));
+					$label=get_relationship_name(get_relationship($associate->getXref(), $person->getXref(), true, 4));
 				}
 				if (!$label) {
 					$label=WT_I18N::translate('Relationships');
@@ -832,7 +826,7 @@ function format_fact_date(WT_Event $event, WT_GedcomRecord $record, $anchor=fals
 						} else {
 							$ageText = '('.$age.' '.WT_I18N::translate('after death').')';
 							// Family events which occur after death are probably errors
-							if ($event->getFamilyId()) {
+							if ($event->getParentObject() instanceof WT_Family) {
 								$ageText.='<i class="icon-warning"></i>';
 							}
 						}
@@ -1076,7 +1070,7 @@ function print_add_new_fact($id, $usedfacts, $type) {
 	}
 	uasort($translated_addfacts, 'factsort');
 	echo '<tr><td class="descriptionbox">';
-	echo WT_I18N::translate('Add new fact');
+	echo WT_I18N::translate('Fact or event');
 	echo help_link('add_facts'), '</td>';
 	echo '<td class="optionbox wrap">';
 	echo '<form method="get" name="newfactform" action="" onsubmit="return false;">';
@@ -1211,167 +1205,4 @@ function get_lds_glance($indirec) {
 	if ($ord) $text .= "P";
 	else $text .= "_";
 	return $text;
-}
-
-/**
-* This function produces a hexadecimal dump of the input string for debugging purposes
-*/
-
-function DumpString($input) {
-	if (empty($input)) return false;
-
-	$UTF8 = array();
-	$hex1L = '';
-	$hex1R = '';
-	$hex2L = '';
-	$hex2R = '';
-	$hex3L = '';
-	$hex3R = '';
-	$hex4L = '';
-	$hex4R = '';
-
-	$pos = 0;
-	while (true) {
-		// Separate the input string into UTF8 characters
-		$byte0 = ord(substr($input, $pos, 1));
-		$charLen = 1;
-		if (($byte0 & 0xE0) == 0xC0) $charLen = 2;  // 2-byte sequence
-		if (($byte0 & 0xF0) == 0xE0) $charLen = 3;  // 3-byte sequence
-		if (($byte0 & 0xF8) == 0xF0) $charLen = 4;  // 4-byte sequence
-		$thisChar = substr($input, $pos, $charLen);
-		$UTF8[] = $thisChar;
-
-		// Separate the current UTF8 character into hexadecimal digits
-		$byte = bin2hex(substr($thisChar, 0, 1));
-		$hex1L .= substr($byte, 0, 1);
-		$hex1R .= substr($byte, 1, 1);
-
-		if ($charLen > 1) {
-			$byte = bin2hex(substr($thisChar, 1, 1));
-			$hex2L .= substr($byte, 0, 1);
-			$hex2R .= substr($byte, 1, 1);
-		} else {
-			$hex2L .= ' ';
-			$hex2R .= ' ';
-		}
-
-		if ($charLen > 2) {
-			$byte = bin2hex(substr($thisChar, 2, 1));
-			$hex3L .= substr($byte, 0, 1);
-			$hex3R .= substr($byte, 1, 1);
-		} else {
-			$hex3L .= ' ';
-			$hex3R .= ' ';
-		}
-
-		if ($charLen > 3) {
-			$byte = bin2hex(substr($thisChar, 3, 1));
-			$hex4L .= substr($byte, 0, 1);
-			$hex4R .= substr($byte, 1, 1);
-		} else {
-			$hex4L .= ' ';
-			$hex4R .= ' ';
-		}
-
-		$pos += $charLen;
-		if ($pos>=strlen($input)) break;
-	}
-
-	$pos = 0;
-	$lastPos = count($UTF8);
-	$haveByte4 = (trim($hex4L)!='');
-	$haveByte3 = (trim($hex3L)!='');
-	$haveByte2 = (trim($hex2L)!='');
-
-	// We're ready: now output everything
-	echo '<br><code><span dir="ltr">';
-	while (true) {
-		$lineLength = $lastPos - $pos;
-		if ($lineLength>100) $lineLength = 100;
-
-		// Line 1: ruler
-		$thisLine = substr('      '.$pos, -6).' ';
-		$thisLine .= substr('........10........20........30........40........50........60........70........80........90.......100', 0, $lineLength);
-		echo str_replace(' ', '&nbsp;', $thisLine), '<br>';
-
-		// Line 2: UTF8 character string
-		$thisLine = '';
-		for ($i=$pos; $i<($pos+$lineLength); $i++) {
-			if (ord(substr($UTF8[$i], 0, 1)) < 0x20) {
-				$thisChar = "&nbsp;";
-			} else {
-				$thisChar = $UTF8[$i];
-				switch ($thisChar) {
-				case '&':
-					$thisChar = '&amp;';
-					break;
-				case '<':
-					$thisChar = '&lt;';
-					break;
-				case ' ':
-				case WT_UTF8_LRM:
-				case WT_UTF8_RLM:
-				case WT_UTF8_LRO:
-				case WT_UTF8_RLO:
-				case WT_UTF8_LRE:
-				case WT_UTF8_RLE:
-				case WT_UTF8_PDF:
-					$thisChar = '&nbsp;';
-					break;
-				}
-			}
-			//$thisLine .= WT_UTF8_LRM;
-			$thisLine .= $thisChar;
-		}
-		//echo '&nbsp;&nbsp;UTF8&nbsp;', $thisLine, '<br>';
-		echo '&nbsp;&nbsp;UTF8&nbsp;', WT_UTF8_LRO, $thisLine, WT_UTF8_PDF, '<br>';
-
-		// Line 3:  First hexadecimal byte
-		$thisLine = 'Byte 1 ';
-		$thisLine .= substr($hex1L, $pos, $lineLength);
-		$thisLine .= '<br>';
-		$thisLine .= '       ';
-		$thisLine .= substr($hex1R, $pos, $lineLength);
-		$thisLine .= '<br>';
-		echo str_replace(array(' ', '<br&nbsp;>'), array('&nbsp;', '<br>'), $thisLine);
-
-		// Line 4:  Second hexadecimal byte
-		if ($haveByte2) {
-			$thisLine = 'Byte 2 ';
-			$thisLine .= substr($hex2L, $pos, $lineLength);
-			$thisLine .= '<br>';
-			$thisLine .= '       ';
-			$thisLine .= substr($hex2R, $pos, $lineLength);
-			$thisLine .= '<br>';
-			echo str_replace(' ', '&nbsp;', $thisLine);
-		}
-
-		// Line 5:  Third hexadecimal byte
-		if ($haveByte3) {
-			$thisLine = 'Byte 3 ';
-			$thisLine .= substr($hex3L, $pos, $lineLength);
-			$thisLine .= '<br>';
-			$thisLine .= '       ';
-			$thisLine .= substr($hex3R, $pos, $lineLength);
-			$thisLine .= '<br>';
-			echo str_replace(' ', '&nbsp;', $thisLine);
-		}
-
-		// Line 6:  Fourth hexadecimal byte
-		if ($haveByte4) {
-			$thisLine = 'Byte 4 ';
-			$thisLine .= substr($hex4L, $pos, $lineLength);
-			$thisLine .= '<br>';
-			$thisLine .= '       ';
-			$thisLine .= substr($hex4R, $pos, $lineLength);
-			$thisLine .= '<br>';
-			echo str_replace(' ', '&nbsp;', $thisLine);
-		}
-		echo '<br>';
-		$pos += $lineLength;
-		if ($pos >= $lastPos) break;
-	}
-
-	echo '</span></code>';
-	return true;
 }

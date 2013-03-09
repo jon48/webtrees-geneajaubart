@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_edit.php 14411 2012-10-11 13:24:22Z lukasz $
+// $Id: functions_edit.php 14803 2013-02-14 20:29:48Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -81,7 +81,7 @@ function select_edit_control($name, $values, $empty, $selected, $extra='') {
 		$html='<option value=""></option>';
 	}
 	foreach ($values as $key=>$value) {
-		if ($key==$selected) {
+		if ((string)$key===$selected) { // Beware PHP array keys are cast to integers!  Cast them back
 			$html.='<option value="'.htmlspecialchars($key).'" selected="selected" dir="auto">'.htmlspecialchars($value).'</option>';
 		} else {
 			$html.='<option value="'.htmlspecialchars($key).'" dir="auto">'.htmlspecialchars($value).'</option>';
@@ -124,7 +124,7 @@ function radio_buttons($name, $values, $selected, $extra='') {
 	foreach ($values as $key=>$value) {
 		$uniqueID = $name.(int)(microtime() * 1000000);
 		$html.='<input type="radio" name="'.$name.'" id="'.$uniqueID.'" value="'.htmlspecialchars($key).'"';
-		if ($key==$selected) {
+		if ((string)$key===$selected) { // Beware PHP array keys are cast to integers!  Cast them back
 			$html.=' checked';
 		}
 		$html.='><label for="'.$uniqueID.'">'.htmlspecialchars($value).'</label>';
@@ -580,11 +580,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 	echo "<input type=\"hidden\" name=\"famid\" value=\"$famid\">";
 	echo "<input type=\"hidden\" name=\"pid\" value=\"$pid\">";
 	echo "<input type=\"hidden\" name=\"famtag\" value=\"$famtag\">";
-	echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\">";
 	echo "<input type=\"hidden\" name=\"goto\" value=\"\">";
-	if (preg_match('/^add(child|spouse|newparent|newrepository)/', $nextaction)) {
-		echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save and go to new record'), "\" onclick=\"document.addchildform.goto.value='new';\">";
-	}
 	echo "<table class=\"facts_table\">";
 
 	// When adding a new child, specify the pedigree
@@ -794,7 +790,9 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 		}
 		if (empty($name_fields['SPFX']) && empty($name_fields['SURN'])) {
 			$name_fields['SPFX']=trim($name_bits[7]);
-			$name_fields['SURN']=$name_bits[9];
+			// For names with two surnames, there will be four slashes.
+			// Turn them into a list
+			$name_fields['SURN']=preg_replace('~/[^/]*/~', ',', $name_bits[9]);
 		}
 		if (empty($name_fields['GIVN'])) {
 			$name_fields['GIVN']=$name_bits[4];
@@ -860,7 +858,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 		$tags=array();
 		$i = 0;
 		do {
-			if (!isset($name_fields[$type]) && !isset($adv_name_fields[$type])) {
+			if ($type!='TYPE' && !isset($name_fields[$type]) && !isset($adv_name_fields[$type])) {
 				$text = '';
 				for ($j=2; $j<count($fields); $j++) {
 					if ($j>2) $text .= ' ';
@@ -883,7 +881,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 				$level = $fields[0];
 				if (isset($fields[1])) $type = $fields[1];
 			}
-		} while (($level>$glevel)&&($i<count($gedlines))&&($type!='TYPE'));
+		} while (($level>$glevel)&&($i<count($gedlines)));
 	}
 
 	// If we are adding a new individual, add the basic details
@@ -948,11 +946,14 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 		print_add_layer('NOTE', 1);
 		print_add_layer('SHARED_NOTE', 1);
 	}
-	echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\">";
-	if (preg_match('/^add(child|spouse|newparent|source)/', $nextaction)) {
-		echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save and go to new record'), "\" onclick=\"document.addchildform.goto.value='new';\">";
+	echo '<p id="save-cancel">';
+	echo '<input type="submit" class="save" value="', /* I18N: button label */ WT_I18N::translate('save'), '">';
+	if (preg_match('/^add(child|spouse|newparent)/', $nextaction)) {
+		echo '<input type="submit" class="save" value="', /* I18N: button label */ WT_I18N::translate('go to new individual'), '" onclick="document.addchildform.goto.value=\'new\';">';
 	}
-	echo "</form>";
+	echo '<input type="button" class="cancel" value="', /* I18N: button label */ WT_I18N::translate('close'), '" onclick="window.close();">';
+	echo '</p>';
+	echo '</form>';
 	$controller->addInlineJavascript('
 	SURNAME_TRADITION="'.$SURNAME_TRADITION.'";
 	sextag="'.$sextag.'";
@@ -990,13 +991,13 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 		// Commas *may* be used in other fields, and will form part of the NAME.
 		if (WT_LOCALE=="vi" || WT_LOCALE=="hu") {
 			// Default format: /SURN/ GIVN
-			return trim(npfx+" /"+trim(spfx+" "+surn).replace(/ *, */, " ")+"/ "+givn.replace(/ *, */, " ")+" "+nsfx);
+			return trim(npfx+" /"+trim(spfx+" "+surn).replace(/ *, */g, " ")+"/ "+givn.replace(/ *, */g, " ")+" "+nsfx);
 		} else if (WT_LOCALE=="zh") {
 			// Default format: /SURN/GIVN
-			return trim(npfx+" /"+trim(spfx+" "+surn).replace(/ *, */, " ")+"/"+givn.replace(/ *, */, " ")+" "+nsfx);
+			return trim(npfx+" /"+trim(spfx+" "+surn).replace(/ *, */g, " ")+"/"+givn.replace(/ *, */g, " ")+" "+nsfx);
 		} else {
 			// Default format: GIVN /SURN/
-			return trim(npfx+" "+givn.replace(/ *, */, " ")+" /"+trim(spfx+" "+surn).replace(/ *, */, " ")+"/ "+nsfx);
+			return trim(npfx+" "+givn.replace(/ *, */g, " ")+" /"+trim(spfx+" "+surn).replace(/ *, */g, " ")+"/ "+nsfx);
 		}
 	}
 
@@ -1162,7 +1163,7 @@ function print_calendar_popup($id) {
 }
 
 function print_addnewmedia_link($element_id) {
-	return '<a href="#" onclick="pastefield=document.getElementById(\''.$element_id.'\'); window.open(\'addmedia.php?action=showmediaform&amp;linktoid={$linkToID}&amp;level={$level}\', \'_blank\', edit_window_specs); return false;" class="icon-button_addmedia" title="'.WT_I18N::translate('Add a new media object').'"></a>';
+	return '<a href="#" onclick="pastefield=document.getElementById(\''.$element_id.'\'); window.open(\'addmedia.php?action=showmediaform\', \'_blank\', edit_window_specs); return false;" class="icon-button_addmedia" title="'.WT_I18N::translate('Add a new media object').'"></a>';
 }
 
 function print_addnewrepository_link($element_id) {
@@ -1301,18 +1302,12 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 	}
 
 	// tag name
-	if (!empty($label)) {
-		if ($label=="Note" && $islink) {
-			echo WT_I18N::translate('Shared note');
-		} else {
-			echo $label;
-		}
+	if ($label) {
+		echo $label;
+	} elseif ($upperlevel) {
+		echo WT_Gedcom_Tag::getLabel($upperlevel.':'.$fact);
 	} else {
-		if ($fact=="SHARED_NOTE" && $islink) {
-			echo WT_Gedcom_Tag::getLabel('SHARED_NOTE');
-		} else {
-			echo WT_Gedcom_Tag::getLabel($fact);
-		}
+		echo WT_Gedcom_Tag::getLabel($fact);
 	}
 
 // help link
@@ -1335,7 +1330,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 			}
 			break;
 		case 'NAME':
-			if ($upperlevel=='INDI') {
+			if ($upperlevel!='REPO') {
 				echo help_link($fact);
 			}
 			break;
@@ -1351,22 +1346,16 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		case 'EMAL':
 		case '_EMAIL':
 		case 'FAX':
-		case 'GIVN':
-		case 'NICK':
-		case 'NPFX':
-		case 'NSPX':
 		case 'OBJE':
 		case 'PAGE':
 		case 'PEDI':
 		case 'PHON':
 		case 'PLAC':
-		case 'QUAY':
 		case 'RELA':
 		case 'RESN':
 		case 'ROMN':
 		case 'SEX':
 		case 'SOUR':
-		case 'SPFX':
 		case 'STAT':
 		case 'SURN':
 		case 'TEMP':
@@ -1376,7 +1365,6 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		case 'TYPE':
 		case 'URL':
 		case '_HEB':
-		case '_MARNM':
 		case '_PRIM':
 			echo help_link($fact);
 			break;
@@ -1451,6 +1439,8 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		echo select_edit_control($element_name, WT_Gedcom_Code_Stat::statusNames($upperlevel), '', $value);
 	} else if ($fact=='RELA') {
 		echo edit_field_rela($element_name, strtolower($value));
+	} else if ($fact=='QUAY') {
+		echo select_edit_control($element_name, WT_Gedcom_Code_Quay::getValues(), '', $value);
 	} else if ($fact=='_WT_USER') {
 		echo edit_field_username($element_name, $value);
 	} else if ($fact=='RESN') {
@@ -1709,7 +1699,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 *
 * @param string $tag Gedcom tag name
 */
-function print_add_layer($tag, $level=2, $printSaveButton=true) {
+function print_add_layer($tag, $level=2) {
 	global $MEDIA_DIRECTORY, $TEXT_DIRECTION, $gedrec, $FULL_SOURCES, $islink;
 
 	if ($tag=='OBJE' && get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') < WT_USER_ACCESS_LEVEL) {
@@ -1722,7 +1712,6 @@ function print_add_layer($tag, $level=2, $printSaveButton=true) {
 		echo help_link('edit_add_SOUR');
 		echo "<br>";
 		echo "<div id=\"newsource\" style=\"display: none;\">";
-		if ($printSaveButton) echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\">";
 		echo "<table class=\"facts_table\">";
 		// 2 SOUR
 		$source = "SOUR @";
@@ -1763,7 +1752,6 @@ function print_add_layer($tag, $level=2, $printSaveButton=true) {
 			echo "<br>";
 			echo "<div id=\"newasso2\" style=\"display: none;\">";
 		}
-		if ($printSaveButton) echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\">";
 		echo "<table class=\"facts_table\">";
 		// 2 ASSO
 		add_simple_tag(($level)." ASSO @");
@@ -1782,7 +1770,6 @@ function print_add_layer($tag, $level=2, $printSaveButton=true) {
 		echo help_link('edit_add_NOTE');
 		echo "<br>";
 		echo "<div id=\"newnote\" style=\"display: none;\">";
-		if ($printSaveButton) echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\">";
 		echo "<table class=\"facts_table\">";
 		// 2 NOTE
 		add_simple_tag(($level)." NOTE ".$text);
@@ -1795,7 +1782,6 @@ function print_add_layer($tag, $level=2, $printSaveButton=true) {
 		echo help_link('edit_add_SHARED_NOTE');
 		echo "<br>";
 		echo "<div id=\"newshared_note\" style=\"display: none;\">";
-		if ($printSaveButton) echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\">";
 		echo "<table class=\"facts_table\">";
 		// 2 SHARED NOTE
 		add_simple_tag(($level)." SHARED_NOTE ");
@@ -1808,7 +1794,6 @@ function print_add_layer($tag, $level=2, $printSaveButton=true) {
 		echo help_link('OBJE');
 		echo "<br>";
 		echo "<div id=\"newobje\" style=\"display: none;\">";
-		if ($printSaveButton) echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\">";
 		echo "<table class=\"facts_table\">";
 		add_simple_tag($level." OBJE");
 		echo "</table></div>";
@@ -1816,11 +1801,10 @@ function print_add_layer($tag, $level=2, $printSaveButton=true) {
 	if ($tag=="RESN") {
 		//-- Retrieve existing resn or add new resn to fact
 		$text = '';
-		echo "<a href=\"#\" onclick=\"return expand_layer('newresn');\"><i id=\"newresn_img\" class=\"icon-plus\"></i> ", WT_Gedcom_Tag::getLabel('RESN'), "</a>";
+		echo "<a href=\"#\" onclick=\"return expand_layer('newresn');\"><i id=\"newresn_img\" class=\"icon-plus\"></i> ", WT_I18N::translate('Add a new restriction'), "</a>";
 		echo help_link('RESN');
 		echo "<br>";
 		echo "<div id=\"newresn\" style=\"display: none;\">";
-		if ($printSaveButton) echo "<input type=\"submit\" value=\"", WT_I18N::translate('Save'), "\">";
 		echo "<table class=\"facts_table\">";
 		// 2 RESN
 		add_simple_tag(($level)." RESN ".$text);
@@ -2418,7 +2402,9 @@ function create_edit_form($gedrec, $linenum, $level0type) {
 		if ($level<=$glevel) break;
 	}
 
-	insert_missing_subtags($level1type, $add_date);
+	if ($level1type!='_PRIM') {
+		insert_missing_subtags($level1type, $add_date);
+	}
 	return $level1type;
 }
 
@@ -2432,9 +2418,9 @@ function insert_missing_subtags($level1tag, $add_date=false) {
 
 	// handle  MARRiage TYPE
 	$type_val = '';
-	if (substr($level1tag, 0, 5)=="MARR_") {
+	if (substr($level1tag, 0, 5)=='MARR_') {
 		$type_val = substr($level1tag, 5);
-		$level1tag = "MARR";
+		$level1tag = 'MARR';
 	}
 
 	foreach ($level2_tags as $key=>$value) {
@@ -2442,57 +2428,57 @@ function insert_missing_subtags($level1tag, $add_date=false) {
 			continue;
 		}
 		if (in_array($level1tag, $value) && !in_array($key, $tags)) {
-			if ($key=="TYPE") {
-				add_simple_tag("2 TYPE ".$type_val, $level1tag);
+			if ($key=='TYPE') {
+				add_simple_tag('2 TYPE '.$type_val, $level1tag);
 			} elseif ($level1tag=='_TODO' && $key=='DATE') {
-				add_simple_tag("2 ".$key.' '.strtoupper(date('d M Y')), $level1tag);
+				add_simple_tag('2 '.$key.' '.strtoupper(date('d M Y')), $level1tag);
 			} elseif ($level1tag=='_TODO' && $key=='_WT_USER') {
-				add_simple_tag("2 ".$key.' '.WT_USER_NAME, $level1tag);
+				add_simple_tag('2 '.$key.' '.WT_USER_NAME, $level1tag);
 			} else if ($level1tag=='TITL' && strstr($ADVANCED_NAME_FACTS, $key)!==false) {
-				add_simple_tag("2 ".$key, $level1tag);
+				add_simple_tag('2 '.$key, $level1tag);
 			} else if ($level1tag=='NAME' && strstr($ADVANCED_NAME_FACTS, $key)!==false) {
-				add_simple_tag("2 ".$key, $level1tag);
+				add_simple_tag('2 '.$key, $level1tag);
 			} else if ($level1tag!='TITL' && $level1tag!='NAME') {
-				add_simple_tag("2 ".$key, $level1tag);
+				add_simple_tag('2 '.$key, $level1tag);
 			}
 			switch ($key) { // Add level 3/4 tags as appropriate
-				case "PLAC":
+				case 'PLAC':
 					if (preg_match_all('/('.WT_REGEX_TAG.')/', $ADVANCED_PLAC_FACTS, $match)) {
 						foreach ($match[1] as $tag) {
 							add_simple_tag("3 $tag", '', WT_Gedcom_Tag::getLabel("{$level1tag}:PLAC:{$tag}"));
 						}
 					}
-					add_simple_tag("3 MAP");
-					add_simple_tag("4 LATI");
-					add_simple_tag("4 LONG");
+					add_simple_tag('3 MAP');
+					add_simple_tag('4 LATI');
+					add_simple_tag('4 LONG');
 					break;
-				case "FILE":
-					add_simple_tag("3 FORM");
+				case 'FILE':
+					add_simple_tag('3 FORM');
 					break;
-				case "EVEN":
-					add_simple_tag("3 DATE");
-					add_simple_tag("3 PLAC");
+				case 'EVEN':
+					add_simple_tag('3 DATE');
+					add_simple_tag('3 PLAC');
 					break;
-				case "STAT":
+				case 'STAT':
 					if (WT_Gedcom_Code_Temp::isTagLDS($level1tag)) {
-						add_simple_tag("3 DATE", '', WT_Gedcom_Tag::getLabel('STAT:DATE'));
+						add_simple_tag('3 DATE', '', WT_Gedcom_Tag::getLabel('STAT:DATE'));
 					}
 					break;
-				case "DATE":
+				case 'DATE':
 					if (in_array($level1tag, $date_and_time))
-						add_simple_tag("3 TIME"); // TIME is NOT a valid 5.5.1 tag
+						add_simple_tag('3 TIME'); // TIME is NOT a valid 5.5.1 tag
 					break;
-				case "HUSB":
-				case "WIFE":
-					add_simple_tag("3 AGE");
+				case 'HUSB':
+				case 'WIFE':
+					add_simple_tag('3 AGE');
 					break;
-				case "FAMC":
+				case 'FAMC':
 					if ($level1tag=='ADOP')
-						add_simple_tag("3 ADOP BOTH");
+						add_simple_tag('3 ADOP BOTH');
 					break;
 			}
-		} elseif ($key=="DATE" && $add_date) {
-			add_simple_tag("2 DATE", $level1tag, WT_Gedcom_Tag::getLabel("{$level1tag}:DATE"));
+		} elseif ($key=='DATE' && $add_date) {
+			add_simple_tag('2 DATE', $level1tag, WT_Gedcom_Tag::getLabel("{$level1tag}:DATE"));
 		}
 	}
 	// Do something (anything!) with unrecognised custom tags
@@ -2506,9 +2492,9 @@ function insert_missing_subtags($level1tag, $add_date=false) {
 							add_simple_tag("3 $tag", '', WT_Gedcom_Tag::getLabel("{$level1tag}:PLAC:{$tag}"));
 						}
 					}
-					add_simple_tag("3 MAP");
-					add_simple_tag("4 LATI");
-					add_simple_tag("4 LONG");
+					add_simple_tag('3 MAP');
+					add_simple_tag('4 LATI');
+					add_simple_tag('4 LONG');
 				}
 			}
 }

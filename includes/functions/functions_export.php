@@ -2,7 +2,7 @@
 // Functions for exporting data
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_export.php 13973 2012-06-05 06:48:50Z greg $
+// $Id: functions_export.php 14846 2013-03-01 22:32:02Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ function reformat_record_export($rec) {
 	foreach (preg_split('/[\r\n]+/', $rec, -1, PREG_SPLIT_NO_EMPTY) as $line) {
 		// Escape @ characters
 		// TODO:
-		// Need to replace '@' with '@@', unless it is either
+		// Need to replace “@” with “@@”, unless it is either
 		// a) an xref, such as @I123@
 		// b) an escape, such as @#D FRENCH R@
 		if (false) {
@@ -60,7 +60,7 @@ function reformat_record_export($rec) {
 						--$pos;
 					}
 					if ($pos==strpos($line, ' ', 3)+1) {
-						// No spaces in the data! Can't split it :-(
+						// No spaces in the data! Can’t split it :-(
 						break;
 					} else {
 						$newrec.=utf8_substr($line, 0, $pos-1).WT_EOL;
@@ -72,7 +72,7 @@ function reformat_record_export($rec) {
 						--$pos;
 					}
 					if ($pos==strpos($line, ' ', 3)) {
-						// No non-spaces in the data! Can't split it :-(
+						// No non-spaces in the data! Can’t split it :-(
 						break;
 					}
 					$newrec.=utf8_substr($line, 0, $pos).WT_EOL;
@@ -140,28 +140,21 @@ function gedcom_header($gedfile) {
 	return $HEAD.$SOUR.$DEST.$DATE.$GEDC.$CHAR.$FILE.$COPR.$LANG.$PLAC.$SUBN.$SUBM."\n";
 }
 
-// Convert media path by:
-// - removing current media directory
-// - adding a new prefix
-// - making directory name separators consistent
-function convert_media_path($rec, $path, $slashes) {
-	global $MEDIA_DIRECTORY;
-
-	if (preg_match('/\n1 FILE (.+)/', $rec, $match)) {
+// Prepend the GEDCOM_MEDIA_PATH to media filenames
+function convert_media_path($rec, $path) {
+	if ($path && preg_match('/\n1 FILE (.+)/', $rec, $match)) {
 		$old_file_name=$match[1];
-		if (!preg_match('~^(https?|ftp):~', $old_file_name)) { // Don't modify external links
-			if (strpos($old_file_name, $MEDIA_DIRECTORY)===0) {
-				$new_file_name=substr_replace($old_file_name, $path, 0, strlen($MEDIA_DIRECTORY));
-			} else {
-				$new_file_name=$old_file_name;
-			}
-			switch ($slashes) {
-			case 'backward':
+		if (!preg_match('~^(https?|ftp):~', $old_file_name)) { // Don’t modify external links
+			// Adding a windows path?  Convert the slashes.
+			if (strpos($path, '\\')!==false) {
 				$new_file_name=preg_replace('~/+~', '\\', $new_file_name);
-				break;
-			case 'forward':
-				$new_file_name=preg_replace('~\\\\+~', '/', $new_file_name);
-				break;
+			}
+			if (strpos($old_file_name, $path)===0) {
+				// Path already present
+				$new_file_name=$old_file_name;
+			} else {
+				// Add path
+				$new_file_name=$path . $old_file_name;
 			}
 			$rec=str_replace("\n1 FILE ".$old_file_name, "\n1 FILE ".$new_file_name, $rec);
 		}
@@ -278,12 +271,12 @@ function export_gedcom($gedcom, $gedout, $exportOptions) {
 	}
 
 	$rows=WT_DB::prepare(
-		"SELECT 'OBJE' AS type, m_media AS xref, m_gedfile AS ged_id, m_gedrec AS gedrec, m_titl, m_file".
-		" FROM `##media` WHERE m_gedfile=? ORDER BY m_media"
+		"SELECT 'OBJE' AS type, m_id AS xref, m_file AS ged_id, m_gedcom AS gedrec, m_titl, m_filename".
+		" FROM `##media` WHERE m_file=? ORDER BY m_id"
 	)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
 	foreach ($rows as $row) {
 		list($rec)=WT_Media::getInstance($row)->privatizeGedcom($access_level);
-		$rec = convert_media_path($rec, $exportOptions['path'], $exportOptions['slashes']);
+		$rec = convert_media_path($rec, $exportOptions['path']);
 		if ($exportOptions['toANSI']=="yes") {
 			$rec=utf8_decode($rec);
 		}

@@ -4,7 +4,7 @@
 // This is the page that does the work of linking items.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: inverselink.php 14226 2012-08-30 05:18:45Z nigel $
+// $Id: inverselink.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'inverselink.php');
 require './includes/session.php';
@@ -32,12 +32,9 @@ require WT_ROOT.'includes/functions/functions_edit.php';
 $controller=new WT_Controller_Simple();
 $controller
 	->requireEditorLogin()
-	->setPageTitle(WT_I18N::translate('Link media'))
-	->pageHeader()
-	->addExternalJavascript(WT_JQUERY_URL)
-	->addExternalJavascript(WT_JQUERYUI_URL)
-	->addExternalJavascript(WT_STATIC_URL.'js/webtrees.js')
-	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
+	->setPageTitle(WT_I18N::translate('Link to an existing media object'))
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
+	->pageHeader();
 
 //-- page parameters and checking
 $linktoid = safe_GET_xref('linktoid');
@@ -72,7 +69,6 @@ if ($linkto=='manage' && array_key_exists('GEDFact_assistant', WT_Module::getAct
 			pastefield.value += value;
 		}
 		</script>
-	<script src="<?php echo WT_STATIC_URL; ?>js/webtrees.js"></script>
 
 		<?php
 		echo '<form name="link" method="get" action="inverselink.php">';
@@ -87,13 +83,13 @@ if ($linkto=='manage' && array_key_exists('GEDFact_assistant', WT_Module::getAct
 		echo '<input type="hidden" name="ged" value="', $GEDCOM, '">';
 		echo '<table class="facts_table">';
 		echo '<tr><td class="topbottombar" colspan="2">';
-		echo WT_I18N::translate('Link media'), help_link('add_media_linkid');
+		echo WT_I18N::translate('Link to an existing media object'), help_link('add_media_linkid');
 		echo '</td></tr><tr><td class="descriptionbox width20 wrap">', WT_I18N::translate('Media'), '</td>';
 		echo '<td class="optionbox wrap">';
 		if (!empty($mediaid)) {
 			//-- Get the title of this existing Media item
 			$title=
-				WT_DB::prepare("SELECT m_titl FROM `##media` where m_media=? AND m_gedfile=?")
+				WT_DB::prepare("SELECT m_titl FROM `##media` where m_id=? AND m_file=?")
 				->execute(array($mediaid, WT_GED_ID))
 				->fetchOne();
 			if ($title) {
@@ -171,12 +167,8 @@ if ($linkto=='manage' && array_key_exists('GEDFact_assistant', WT_Module::getAct
 		echo '<tr><td class="topbottombar" colspan="2"><input type="submit" value="', WT_I18N::translate('Set link'), '"></td></tr>';
 		echo '</table>';
 		echo '</form>';
-		echo '<p class="center"><a href="#" onclick="closePopupAndReloadParent();">', WT_I18N::translate('Close Window'), '</a></p>';
 	} elseif ($action == "update" && $paramok) {
 		linkMedia($mediaid, $linktoid);
-		echo '<p class="center"><a href="#" onclick="closePopupAndReloadParent();">', WT_I18N::translate('Close Window'), '</a></p>';
-	} else {
-		echo '<center>nothing to do<center>';
-		echo '<p class="center"><a href="#" onclick="closePopupAndReloadParent();">', WT_I18N::translate('Close Window'), '</a></p>';
 	}
+	echo '<button onclick="closePopupAndReloadParent();">', WT_I18N::translate('close'), '</button>';
 }

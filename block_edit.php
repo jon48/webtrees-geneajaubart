@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: block_edit.php 14161 2012-08-11 06:18:18Z greg $
+// $Id: block_edit.php 14481 2012-10-30 10:41:55Z greg $
 
 define('WT_SCRIPT_NAME', 'block_edit.php');
 require './includes/session.php';
@@ -54,7 +54,7 @@ if (array_key_exists('ckeditor', WT_Module::getActiveModules())) {
 		<?php echo $block->configureBlock($block_id); ?>
 		<tr>
 			<td colspan="2" class="topbottombar">
-				<input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>">
+				<input type="submit" value="<?php echo WT_I18N::translate('save'); ?>">
 			</td>
 		</tr>
 	</table>

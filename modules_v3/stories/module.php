@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14366 2012-09-27 23:28:52Z nigel $
+// $Id: module.php 14786 2013-02-06 22:28:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Stories" module */ WT_I18N::translate('Add narrative stories to individuals in the family tree.');
+		return /* I18N: Description of the “Stories” module */ WT_I18N::translate('Add narrative stories to individuals in the family tree.');
 	}
 
 	// Extend WT_Module
@@ -166,11 +166,6 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 		return '';
 	}
 
-	// Implement class WT_Module_Tab
-	public function getJSCallback() {
-		return '';
-	}
-
 	// Action from the configuration page
 	private function edit() {
 		require_once WT_ROOT.'includes/functions/functions_edit.php';
@@ -206,7 +201,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			} else {
 				$block_id=safe_GET('block_id');
 
-				$controller=new WT_Controller_Base();
+				$controller=new WT_Controller_Page();
 				if ($block_id) {
 					$controller->setPageTitle(WT_I18N::translate('Edit story'));
 					$title=get_block_setting($block_id, 'title');
@@ -267,8 +262,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				echo '<td class="optionbox">';
 				echo edit_language_checkboxes('lang_', $languages);
 				echo '</td></tr></table>';
-				echo '<p><input type="submit" value="', WT_I18N::translate('Save'), '" tabindex="5">';
-				echo '&nbsp;<input type="button" value="', WT_I18N::translate('Cancel'), '" onclick="window.location=\''.$this->getConfigLink().'\';" tabindex="6">';
+				echo '<p><input type="submit" value="', WT_I18N::translate('save'), '" tabindex="5">';
 				echo '</p>';
 				echo '</form>';
 
@@ -302,13 +296,14 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 	}
 
 	private function config() {
+		require_once 'includes/functions/functions_edit.php';
 		if (WT_USER_GEDCOM_ADMIN) {
 
-			$controller=new WT_Controller_Base();
-			$controller->setPageTitle($this->getTitle());
-			$controller->pageHeader();
+			$controller=new WT_Controller_Page();
 			$controller
-				->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+				->setPageTitle($this->getTitle())
+				->pageHeader()
+				->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 				->addInlineJavascript('
 					jQuery("#story_table").dataTable({
 						"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
@@ -336,6 +331,15 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				" AND gedcom_id=?".
 				" ORDER BY xref"
 			)->execute(array($this->getName(), WT_GED_ID))->fetchAll();
+
+			echo
+				'<p><form method="get" action="', WT_SCRIPT_NAME ,'">',
+				WT_I18N::translate('Family tree'), ' ',
+				'<input type="hidden" name="mod", value="', $this->getName(), '">',
+				'<input type="hidden" name="mod_action", value="admin_config">',
+				select_edit_control('ged', WT_Tree::getNameList(), null, WT_GEDCOM),
+				'<input type="submit" value="', WT_I18N::translate('show'), '">',
+				'</form></p>';
 			
 			echo '<h3><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_edit">', WT_I18N::translate('Add story'), '</a>', help_link('add_story', $this->getName()), '</h3>';
 			if (count($stories)>0) {
@@ -371,11 +375,11 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 	private function show_list() {
 		global $controller;
 
-		$controller=new WT_Controller_Base();
-		$controller->setPageTitle($this->getTitle());
-		$controller->pageHeader();
+		$controller=new WT_Controller_Page();
 		$controller
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+			->setPageTitle($this->getTitle())
+			->pageHeader()
+			->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 			->addInlineJavascript('
 				jQuery("#story_table").dataTable({
 					"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',

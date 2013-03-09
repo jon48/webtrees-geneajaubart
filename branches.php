@@ -2,7 +2,7 @@
 // List branches by surname
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: branches.php 14290 2012-09-15 09:01:22Z greg $
+// $Id: branches.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'branches.php');
 require './includes/session.php';
@@ -40,7 +40,7 @@ if (WT_USER_GEDCOM_ID) {
 	load_ancestors_array(WT_Person::getInstance(WT_USER_GEDCOM_ID), 1);
 }
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 if ($surn) {
 	$controller->setPageTitle(/* I18N: %s is a surname */ WT_I18N::translate('Branches of the %s family', htmlspecialchars($surn)));
 } else {

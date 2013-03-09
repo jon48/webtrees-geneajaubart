@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: wt_v3_googlemap.js.php 14139 2012-08-01 05:23:14Z nigel $
+// $Id: wt_v3_googlemap.js.php 14701 2013-01-22 16:55:49Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
  
@@ -451,47 +451,37 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 				}
 				if (!empty($gmark['name'])) {
 					$person = WT_Person::getInstance($gmark['name']);
+				} else {
+					$person = null;
 				}
 
 				// The current indi ================================
 				if (!empty($this_person)) {
 					$class = 'pedigree_image';
 					if (in_array($gmark['fact'], array('CENS', 'BIRT', 'BAPM', 'CHR', '_MILI', 'OCCU', 'RESI', 'DEAT', 'CREM', 'BURI', 'RETI'))) {
-						$image = "<i class='icon_".$gmark['fact']."'></i>";
+						$image = addslashes('<i class="icon_'.$gmark['fact'].'"></i>');
 					} else {
-						$indirec = $this_person->getGedcomRecord();
-						$image = '';
 						if ($SHOW_HIGHLIGHT_IMAGES) {
-							if (!empty($pid)) {
-								$object = find_highlighted_object($pid, WT_GED_ID, $indirec);
-							}
-							if (!empty($object)) {
-								$mediaobject=WT_Media::getInstance($object['mid']);
-								$image=$mediaobject->displayMedia(array('display_type'=>'googlemap'));
-							} else {
-								$sex=$this_person->getSex();
-								$image=display_silhouette(array('sex'=>$sex,'display_type'=>'googlemap')); // may return ''
-							}
-						} // end of add image
+							$image = addslashes($this_person->displayImage());
+						} else {
+							$image = '';
+						}
 					}
-			}
+				}
 
 				// Other people
-				if (!empty($person)) {
-					$indirec2 = $person->getGedcomRecord();
-					$image2 = '';
+				if ($person) {
 					if ($SHOW_HIGHLIGHT_IMAGES) {
 						if (!empty($gmark['name'])) {
-							$object2 = find_highlighted_object($gmark['name'], WT_GED_ID, $indirec2);
-						}
-						if (!empty($object2)) {
-							$mediaobject=WT_Media::getInstance($object2['mid']);
-							$image2=$mediaobject->displayMedia(array('display_type'=>'googlemap'));
+							$image2 = addslashes($person->displayImage());
 						} else {
-							$sex=$person->getSex();
-							$image2=display_silhouette(array('sex'=>$sex,'display_type'=>'googlemap')); // may return ''
+							$image2 = '';
 						}
-					} // end of add image
+					} else {
+						$image2 = '';
+					}
+				} else {
+					$image2 = '';
 				}
 			?>
 				[
@@ -502,7 +492,7 @@ $STREETVIEW=get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 					"<?php if (!empty($gmark['date'])) { $date=new WT_Date($gmark['date']); echo addslashes($date->Display(true)); } else { echo WT_I18N::translate('Date not known'); } ?>",
 					"<?php if (!empty($gmark['info'])) { echo $gmark['info']; } else { echo NULL; } ?>",
 					"<?php if (!empty($gmark['name'])) { $person=WT_Person::getInstance($gmark['name']); if ($person) { echo '<a href=\"', $person->getHtmlUrl(), '\">', addslashes($person->getFullName()), '<\/a>'; } } ?>",
-					"<?php if (preg_match('/2 PLAC (.*)/', $gmark['placerec']) == 0) { print_address_structure_map($gmark['placerec'], 1); } else { echo preg_replace('/\"/', '\\\"', print_fact_place_map($gmark['placerec'])); } ?>",
+					"<?php echo addslashes(print_fact_place_map($gmark['placerec'])); ?>",
 					"<?php echo $gmark['index'].''; ?>",
 					"<?php echo $gmark['tabindex'].''; ?>",
 					"<?php echo $gmark['placed'].''; ?>",

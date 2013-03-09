@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: GedcomRecord.php 14397 2012-10-06 23:11:28Z greg $
+// $Id: GedcomRecord.php 14596 2012-12-07 15:02:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -273,19 +273,6 @@ class WT_GedcomRecord {
 		} else {
 			// If the record was created from a text string, assume the current gedcom
 			return $link.$this->getXref().$separator.'ged='.WT_GEDURL;
-		}
-	}
-
-	// Get an HTML link to this object, for use in sortable lists.
-	public function getXrefLink($target='') {
-		global $SEARCH_SPIDER;
-		if (empty($SEARCH_SPIDER)) {
-			if ($target) {
-				$target='target="'.$target.'"';
-			}
-			return '<a href="'.$this->getHtmlUrl().'#content" name="'.preg_replace('/\D/','',$this->getXref()).'" '.$target.'>'.$this->getXref().'</a>';
-		} else {
-			return $this->getXref();
 		}
 	}
 
@@ -764,40 +751,25 @@ class WT_GedcomRecord {
 		return $places;
 	}
 
-	/**
-	* Get the first WT_Event for the given Fact type
-	*
-	* @param string $fact
-	* @return WT_Event
-	*/
-	public function getFactByType($factType) {
-		$this->parseFacts();
-		if (empty($this->facts)) {
-			return null;
-		}
-		foreach ($this->facts as $f=>$fact) {
-			if ($fact->getTag()==$factType || $fact->getType()==$factType) {
+	// Get the first WT_Event for the given fact type
+	public function getFactByType($tag) {
+		foreach ($this->getFacts() as $fact) {
+			if ($fact->getTag()==$tag) {
 				return $fact;
 			}
 		}
 		return null;
 	}
 
-	/**
-	* Return an array of events that match the given types
-	*
-	* @param mixed $factTypes  may be a single string or an array of strings
-	* @return WT_Event
-	*/
-	public function getAllFactsByType($factTypes) {
-		$this->parseFacts();
-		if (is_string($factTypes)) {
-			$factTypes = array($factTypes);
+	// Return an array of events that match the given types
+	public function getAllFactsByType($tags) {
+		if (is_string($tags)) {
+			$tags = array($tags);
 		}
 		$facts = array();
-		foreach ($factTypes as $factType) {
-			foreach ($this->facts as $fact) {
-				if ($fact->getTag()==$factType) {
+		foreach ($tags as $tag) {
+			foreach ($this->getFacts() as $fact) {
+				if ($fact->getTag()==$tag) {
 					$facts[]=$fact;
 				}
 			}

@@ -2,7 +2,7 @@
 // Provide an interface to the wt_gedcom table
 //
 // webtrees: Web based Family History software
-// Copyright (c) 2012 webtrees development team
+// Copyright (c) 2013 webtrees development team
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Tree.php 14352 2012-09-24 15:38:40Z greg $
+// $Id: Tree.php 14693 2013-01-22 08:56:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -221,7 +221,6 @@ class WT_Tree {
 		set_gedcom_setting($tree_id, 'ADVANCED_PLAC_FACTS',          '');
 		set_gedcom_setting($tree_id, 'ALLOW_EDIT_GEDCOM',            true);
 		set_gedcom_setting($tree_id, 'ALLOW_THEME_DROPDOWN',         true);
-		set_gedcom_setting($tree_id, 'AUTO_GENERATE_THUMBS',         true);
 		set_gedcom_setting($tree_id, 'CALENDAR_FORMAT',              'gregorian');
 		set_gedcom_setting($tree_id, 'CHART_BOX_TAGS',               '');
 		set_gedcom_setting($tree_id, 'COMMON_NAMES_ADD',             '');
@@ -238,10 +237,11 @@ class WT_Tree {
 		set_gedcom_setting($tree_id, 'FAM_ID_PREFIX',                'F');
 		set_gedcom_setting($tree_id, 'FULL_SOURCES',                 false);
 		set_gedcom_setting($tree_id, 'GEDCOM_ID_PREFIX',             'I');
+		set_gedcom_setting($tree_id, 'GEDCOM_MEDIA_PATH',            '');
 		set_gedcom_setting($tree_id, 'GENERATE_UIDS',                false);
 		set_gedcom_setting($tree_id, 'HIDE_GEDCOM_ERRORS',           true);
 		set_gedcom_setting($tree_id, 'HIDE_LIVE_PEOPLE',             true);
-		set_gedcom_setting($tree_id, 'INDI_FACTS_ADD',               'ADDR,AFN,BIRT,DEAT,BURI,CREM,ADOP,BAPM,BARM,BASM,BLES,CHRA,CONF,EMAIL,FAX,FCOM,ORDN,NATU,EMIG,IMMI,CENS,PROB,WILL,GRAD,RETI,CAST,DSCR,EDUC,IDNO,NATI,NCHI,NMR,OCCU,PROP,RELI,RESI,SSN,TITL,BAPL,CONL,ENDL,SLGC,_MILI,ASSO,RESN');
+		set_gedcom_setting($tree_id, 'INDI_FACTS_ADD',               'AFN,BIRT,DEAT,BURI,CREM,ADOP,BAPM,BARM,BASM,BLES,CHRA,CONF,FCOM,ORDN,NATU,EMIG,IMMI,CENS,PROB,WILL,GRAD,RETI,DSCR,EDUC,IDNO,NATI,NCHI,NMR,OCCU,PROP,RELI,RESI,SSN,TITL,BAPL,CONL,ENDL,SLGC,_MILI,ASSO,RESN');
 		set_gedcom_setting($tree_id, 'INDI_FACTS_QUICK',             'BIRT,BURI,BAPM,CENS,DEAT,OCCU,RESI');
 		set_gedcom_setting($tree_id, 'INDI_FACTS_UNIQUE',            '');
 		set_gedcom_setting($tree_id, 'KEEP_ALIVE_YEARS_BIRTH',       '');
@@ -251,10 +251,6 @@ class WT_Tree {
 		set_gedcom_setting($tree_id, 'MAX_DESCENDANCY_GENERATIONS',  '15');
 		set_gedcom_setting($tree_id, 'MAX_PEDIGREE_GENERATIONS',     '10');
 		set_gedcom_setting($tree_id, 'MEDIA_DIRECTORY',              'media/');
-		set_gedcom_setting($tree_id, 'MEDIA_DIRECTORY_LEVELS',       '0');
-		set_gedcom_setting($tree_id, 'MEDIA_EXTERNAL',               true);
-		set_gedcom_setting($tree_id, 'MEDIA_FIREWALL_ROOTDIR',       WT_Site::preference('INDEX_DIRECTORY'));
-		set_gedcom_setting($tree_id, 'MEDIA_FIREWALL_THUMBS',        false);
 		set_gedcom_setting($tree_id, 'MEDIA_ID_PREFIX',              'M');
 		set_gedcom_setting($tree_id, 'MEDIA_UPLOAD',                 WT_PRIV_USER); 
 		set_gedcom_setting($tree_id, 'META_DESCRIPTION',             '');
@@ -268,7 +264,6 @@ class WT_Tree {
 		set_gedcom_setting($tree_id, 'PEDIGREE_LAYOUT',              true);
 		set_gedcom_setting($tree_id, 'PEDIGREE_ROOT_ID',             '');
 		set_gedcom_setting($tree_id, 'PEDIGREE_SHOW_GENDER',         false);
-		set_gedcom_setting($tree_id, 'POSTAL_CODE',                  true);
 		set_gedcom_setting($tree_id, 'PREFER_LEVEL2_SOURCES',        '1');
 		set_gedcom_setting($tree_id, 'QUICK_REQUIRED_FACTS',         'BIRT,DEAT');
 		set_gedcom_setting($tree_id, 'QUICK_REQUIRED_FAMFACTS',      'MARR');
@@ -316,8 +311,6 @@ class WT_Tree {
 		set_gedcom_setting($tree_id, 'THEME_DIR',                    'webtrees');
 		set_gedcom_setting($tree_id, 'THUMBNAIL_WIDTH',              '100');
 		set_gedcom_setting($tree_id, 'USE_GEONAMES',                 false);
-		set_gedcom_setting($tree_id, 'USE_MEDIA_FIREWALL',           false);
-		set_gedcom_setting($tree_id, 'USE_MEDIA_VIEWER',             true);
 		set_gedcom_setting($tree_id, 'USE_RIN',                      false);
 		set_gedcom_setting($tree_id, 'USE_SILHOUETTE',               true);
 		set_gedcom_setting($tree_id, 'WATERMARK_THUMB',              false);
@@ -327,7 +320,7 @@ class WT_Tree {
 		set_gedcom_setting($tree_id, 'WELCOME_TEXT_CUST_HEAD',       false);
 		set_gedcom_setting($tree_id, 'WORD_WRAPPED_NOTES',           false);
 		set_gedcom_setting($tree_id, 'imported',                     0);
-		set_gedcom_setting($tree_id, 'title',                        WT_I18N::translate('Genealogy from [%s]', $tree_name));
+		set_gedcom_setting($tree_id, 'title',                        /* I18N: Default title for new family trees */ WT_I18N::translate('My family tree'));
 
 		// Default restriction settings
 		$statement=WT_DB::prepare(
@@ -341,7 +334,7 @@ class WT_Tree {
 
 		// Genealogy data
 		// It is simpler to create a temporary/unimported GEDCOM than to populate all the tables...
-		$john_doe=/* I18N: This should be a common/default/placeholder name of a person.  Put slashes around the surname. */
+		$john_doe=/* I18N: This should be a common/default/placeholder name of an individual.  Put slashes around the surname. */
 			WT_I18N::translate('John /DOE/');
 		$note=WT_I18N::translate('Edit this individual and replace their details with your own');
 		WT_DB::prepare("INSERT INTO `##gedcom_chunk` (gedcom_id, chunk_data) VALUES (?, ?)")->execute(array(
@@ -353,6 +346,7 @@ class WT_Tree {
 		self::$trees=null;
 	}
 
+	// Delete everything relating to a tree
 	public static function delete($tree_id) {
 		// If this is the default tree, then unset 
 		if (WT_Site::preference('DEFAULT_GEDCOM')==self::getNameFromId($tree_id)) {
@@ -369,8 +363,7 @@ class WT_Tree {
 		WT_DB::prepare("DELETE FROM `##gedcom_setting`      WHERE gedcom_id =?")->execute(array($tree_id));
 		WT_DB::prepare("DELETE FROM `##individuals`         WHERE i_file    =?")->execute(array($tree_id));
 		WT_DB::prepare("DELETE FROM `##link`                WHERE l_file    =?")->execute(array($tree_id));
-		WT_DB::prepare("DELETE FROM `##media`               WHERE m_gedfile =?")->execute(array($tree_id));
-		WT_DB::prepare("DELETE FROM `##media_mapping`       WHERE mm_gedfile=?")->execute(array($tree_id));
+		WT_DB::prepare("DELETE FROM `##media`               WHERE m_file    =?")->execute(array($tree_id));
 		WT_DB::prepare("DELETE FROM `##module_privacy`      WHERE gedcom_id =?")->execute(array($tree_id));
 		WT_DB::prepare("DELETE FROM `##name`                WHERE n_file    =?")->execute(array($tree_id));
 		WT_DB::prepare("DELETE FROM `##next_id`             WHERE gedcom_id =?")->execute(array($tree_id));

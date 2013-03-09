@@ -4,7 +4,7 @@
 // Display all of the information about an individual
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2011  PGV Development Team.  All rights reserved.
@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: individual.php 14143 2012-08-07 20:14:39Z nigel $
+// $Id: individual.php 14806 2013-02-15 21:01:05Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -33,7 +33,7 @@ define('WT_SCRIPT_NAME', 'individual.php');
 require './includes/session.php';
 $controller=new WT_Controller_Individual();
 $controller
-	->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.cookie.js') // We use this to record the sidebar state
+	->addExternalJavascript(WT_JQUERY_COOKIE_URL) // We use this to record the sidebar state
 	->addInlineJavascript('var catch_and_ignore; function paste_id(value) {catch_and_ignore = value;}'); // For the "find" links
 	
 if ($controller->record && $controller->record->canDisplayDetails()) {
@@ -50,7 +50,7 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
-				/* I18N: %1$s is "accept", %2$s is "reject".  These are links. */ WT_I18N::translate(
+				/* I18N: %1$s is “accept”, %2$s is “reject”.  These are links. */ WT_I18N::translate(
 					'This individual has been deleted.  You should review the deletion and then %1$s or %2$s it.',
 					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'accept') . '</a>',
 					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'reject') . '</a>'
@@ -68,7 +68,7 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
-				/* I18N: %1$s is "accept", %2$s is "reject".  These are links. */ WT_I18N::translate(
+				/* I18N: %1$s is “accept”, %2$s is “reject”.  These are links. */ WT_I18N::translate(
 					'This individual has been edited.  You should review the changes and then %1$s or %2$s them.',
 					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'accept') . '</a>',
 					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'reject') . '</a>'
@@ -98,19 +98,13 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 
 $linkToID=$controller->record->getXref(); // -- Tell addmedia.php what to link to
 
-$callbacks='';
-foreach ($controller->tabs as $tab) {
-  $callbacks.=$tab->getJSCallback()."\n";
-}
 $controller->addInlineJavascript('
 	jQuery("#tabs").tabs({
 		spinner: \'<i class="icon-loading-small"></i>\',
-		cache: true
+		cache:    true,
+		active:   jQuery.cookie("indi-tab"),
+		activate: function(event, ui) { jQuery.cookie("indi-tab", jQuery("#tabs").tabs("option", "active")); }
 	});
-	jQuery("#tabs").tabs("select",jQuery.cookie("indi-tab"));
-	jQuery("#tabs").bind("tabsshow", function(event, ui) {
-		jQuery.cookie("indi-tab", ui.panel.id);'.$callbacks.
-	'});
 
 	// sidebar settings 
 	// Variables
@@ -171,7 +165,7 @@ $controller->addInlineJavascript('
 	jQuery("#header_accordion1").accordion({
 		active: 0,
 		icons: {"header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" },
-		autoHeight: false,
+		heightStyle: "content",
 		collapsible: true
 	});
 
@@ -183,12 +177,8 @@ echo
 	'<div id="indi_left">',
 	'<div id="indi_header">';
 if ($controller->record->canDisplayDetails()) {
-	echo '<div id="indi_mainimage" '; // Display highlight image
-	if ($USE_SILHOUETTE) {echo 'style="min-width:', $THUMBNAIL_WIDTH, 'px;">';} else {echo '>';}
-	if ($controller->canShowHighlightedObject()) {
-		echo $controller->getHighlightedObject();
-	}
-	echo '</div>'; // close #indi_mainimage
+	// Highlight image or silhouette
+	echo '<div id="indi_mainimage">', $controller->record->displayImage(), '</div>';
 	$globalfacts=$controller->getGlobalFacts();
 	echo '<div id="header_accordion1">'; // contain accordions for names
 	echo '<h3 class="name_one ', $controller->getPersonStyle($controller->record), '"><span>', $controller->record->getFullName(), '</span>'; // First name accordion header

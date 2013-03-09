@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14276 2012-09-14 15:39:40Z greg $
+// $Id: module.php 14771 2013-02-04 16:42:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Extend WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Facts and events" module */ WT_I18N::translate('A tab showing the facts and events of an individual.');
+		return /* I18N: Description of the “Facts and events” module */ WT_I18N::translate('A tab showing the facts and events of an individual.');
 	}
 
 	// Implement WT_Module_Tab
@@ -90,7 +90,7 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 			echo '</td></tr>';
 		}
 		foreach ($indifacts as $fact) {
-			if ($fact->getFamilyId()) {
+			if ($fact->getParentObject() instanceof WT_Family) {
 				// Print all family facts
 				print_fact($fact, $controller->record);
 			} else {
@@ -122,11 +122,6 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function getPreLoadContent() {
-		return '';
-	}
-
-	// Implement WT_Module_Tab
-	public function getJSCallback() {
 		return '';
 	}
 }

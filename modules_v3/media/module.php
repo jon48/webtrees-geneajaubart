@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13845 2012-04-20 12:13:34Z greg $
+// $Id: module.php 14771 2013-02-04 16:42:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Extend WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Media" module */ WT_I18N::translate('A tab showing the media objects linked to an individual.');
+		return /* I18N: Description of the “Media” module */ WT_I18N::translate('A tab showing the media objects linked to an individual.');
 	}
 
 	// Implement WT_Module_Tab
@@ -70,7 +70,6 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 			echo '</a></span>';
 			echo '</td></tr>';
 		}
-		$media_found = false;
 		$media_found = print_main_media($controller->record->getXref(), 0, true);
 		if (!$media_found) {
 			echo '<tr><td id="no_tab4" colspan="2" class="facts_value">', WT_I18N::translate('There are no media objects for this individual.'), '</td></tr>';
@@ -79,10 +78,12 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 		if (WT_USER_CAN_EDIT && $controller->record->canDisplayDetails() && get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') >= WT_USER_ACCESS_LEVEL) {
 		?>
 			<tr>
-				<td class="facts_label"><?php echo WT_I18N::translate('Add media'), help_link('OBJE'); ?></td>
+				<td class="facts_label"><?php echo WT_Gedcom_Tag::getLabel('OBJE'); ?></td>
 				<td class="facts_value">
-					<a href="#" onclick="window.open('addmedia.php?action=showmediaform&amp;linktoid=<?php echo $controller->record->getXref(); ?>', '_blank', edit_window_specs); return false;"> <?php echo WT_I18N::translate('Add a new media object'); ?></a><br>
-					<a href="#" onclick="window.open('inverselink.php?linktoid=<?php echo $controller->record->getXref(); ?>&amp;linkto=person', '_blank', find_window_specs); return false;"><?php echo WT_I18N::translate('Link to an existing media object'); ?></a>
+					<a href="#" onclick="window.open('addmedia.php?action=showmediaform&amp;linktoid=<?php echo $controller->record->getXref(); ?>&amp;ged=<?php echo WT_GEDURL; ?>', '_blank', edit_window_specs); return false;"> <?php echo WT_I18N::translate('Add a new media object'); ?></a>
+					<?php echo help_link('OBJE'); ?>
+					<br>
+					<a href="#" onclick="window.open('inverselink.php?linktoid=<?php echo $controller->record->getXref(); ?>&amp;ged=<?php echo WT_GEDURL; ?>&amp;linkto=person', '_blank', find_window_specs); return false;"><?php echo WT_I18N::translate('Link to an existing media object'); ?></a>
 				</td>
 			</tr>
 		<?php
@@ -120,10 +121,4 @@ class media_WT_Module extends WT_Module implements WT_Module_Tab {
 	public function getPreLoadContent() {
 		return '';
 	}
-
-	// Implement WT_Module_Tab
-	public function getJSCallback() {
-		return '';
-	}
-
 }

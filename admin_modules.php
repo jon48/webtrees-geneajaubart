@@ -2,7 +2,7 @@
 // Module Administration User Interface.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,18 +18,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_modules.php 14009 2012-06-17 06:19:58Z greg $
+// $Id: admin_modules.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_modules.php');
 require 'includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->requireAdminLogin()
 	->setPageTitle(WT_I18N::translate('Module administration'))
 	->pageHeader()
-	->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+	->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 	->addInlineJavascript('
 	  function reindexMods(id) {
 			jQuery("#"+id+" input").each(
@@ -46,6 +46,8 @@ $controller
 			"aaSorting": [[ 1, "asc" ]],
 			"iDisplayLength": 10,
 			"sPaginationType": "full_numbers",
+			"bStateSave": true,
+			"iCookieDuration": 180,
 			"aoColumns" : [
 				{ bSortable: false, sClass: "center" },
 				null,
@@ -112,7 +114,7 @@ case 'delete_module':
 				<thead>
 					<tr>
 					<th><?php echo WT_I18N::translate('Enabled'); ?></th>
-					<th width="100px"><?php echo WT_I18N::translate('Module Name'); ?></th>
+					<th width="100px"><?php echo WT_I18N::translate('Module'); ?></th>
 					<th><?php echo WT_I18N::translate('Description'); ?></th>
 					<th><?php echo WT_I18N::translate('Menu'); ?></th>
 					<th><?php echo WT_I18N::translate('Tab'); ?></th>
@@ -153,7 +155,7 @@ case 'delete_module':
 					?>
 				</tbody>
 			</table>
-			<input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>">
+			<input type="submit" value="<?php echo WT_I18N::translate('save'); ?>">
 		</form>
 	</div>
 </div>

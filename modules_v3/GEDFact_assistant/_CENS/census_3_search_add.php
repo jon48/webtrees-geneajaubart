@@ -4,7 +4,7 @@
 // Census Search and Add Area File
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2007 to 2010  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_3_search_add.php 14311 2012-09-18 22:20:48Z nigel $
+// $Id: census_3_search_add.php 14703 2013-01-22 21:22:08Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -179,7 +179,7 @@ if (!defined('WT_WEBTREES')) {
 									<?php
 									if (($people["husb"]->canDisplayDetails())) {
 									?>
-									<a href='javaScript:insertRowToTable("<?php
+									<a href='#' onclick='insertRowToTable("<?php
 											echo $people["husb"]->getXref() ; // pid = PID
 										?>", "<?php
 											echo addslashes($fulln); // nam = Full Name
@@ -311,7 +311,7 @@ if (!defined('WT_WEBTREES')) {
 									<?php
 									if (($people["wife"]->canDisplayDetails())) {
 										?>
-									<a href='javaScript:insertRowToTable2("<?php
+									<a href='#' onclick='insertRowToTable2("<?php
 											echo $people["wife"]->getXref() ;  // pid = PID
 										?>", "<?php
 											echo addslashes($fulln); // nam = Full Name
@@ -456,7 +456,7 @@ if (!defined('WT_WEBTREES')) {
 										<?php
 										if (($child->canDisplayDetails())) {
 											?>
-											<a href='javaScript:insertRowToTable("<?php
+											<a href='#' onclick='insertRowToTable("<?php
 													echo $child->getXref(); // pid = PID
 												?>", "<?php
 													echo addslashes($fulln); // nam = Full Name
@@ -619,7 +619,7 @@ if (!defined('WT_WEBTREES')) {
 									<?php
 									if (($people["husb"]->canDisplayDetails())) {
 									?>
-									<a href='javaScript:insertRowToTable("<?php
+									<a href='#' onclick='insertRowToTable("<?php
 											echo $people["husb"]->getXref(); // pid = PID
 										?>", "<?php
 											echo addslashes($fulln); // nam = Full Name
@@ -763,7 +763,7 @@ if (!defined('WT_WEBTREES')) {
 									<?php
 									if (($people["wife"]->canDisplayDetails())) {
 									?>
-									<a href='javaScript:insertRowToTable("<?php
+									<a href='#' onclick='insertRowToTable("<?php
 											echo $people["wife"]->getXref() ; // pid = PID
 										?>", "<?php
 											echo addslashes($fulln); // nam = Full Name
@@ -897,7 +897,7 @@ if (!defined('WT_WEBTREES')) {
 										<?php
 										if (($child->canDisplayDetails())) {
 										?>
-										<a href='javaScript:insertRowToTable("<?php
+										<a href='#' onclick='insertRowToTable("<?php
 												echo $child->getXref() ; // pid = PID
 											?>", "<?php
 												echo addslashes($fulln); // nam = Full Name
@@ -1055,7 +1055,7 @@ if (!defined('WT_WEBTREES')) {
 									<?php
 									if (($people["husb"]->canDisplayDetails())) {
 									?>
-									<a href='javaScript:insertRowToTable("<?php
+									<a href='#' onclick='insertRowToTable("<?php
 											echo $people["husb"]->getXref() ; // pid = PID
 										?>", "<?php
 											echo addslashes($fulln); // nam = Full Name
@@ -1200,7 +1200,7 @@ if (!defined('WT_WEBTREES')) {
 									<?php
 									if (($people["wife"]->canDisplayDetails())) {
 									?>
-										<a href='javaScript:insertRowToTable("<?php
+										<a href='#' onclick='insertRowToTable("<?php
 												echo $people["wife"]->getXref() ; // pid = PID
 										?>", "<?php
 											echo addslashes($fulln); // nam = Full Name
@@ -1338,7 +1338,7 @@ if (!defined('WT_WEBTREES')) {
 									<?php
 									if (($child->canDisplayDetails())) {
 									?>
-									<a href='javaScript:insertRowToTable("<?php
+									<a href='#' onclick='insertRowToTable("<?php
 											echo $child->getXref() ; // pid = PID
 										?>", "<?php
 											echo addslashes($fulln); // nam = Full Name
@@ -1433,7 +1433,7 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $SCRIPT_NAME;
 	global $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $PEDIGREE_FULL_DETAILS, $SHOW_PEDIGREE_PLACES;
 	global $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
-	global $ABBREVIATE_CHART_LABELS, $USE_MEDIA_VIEWER;
+	global $ABBREVIATE_CHART_LABELS;
 	global $chart_style, $box_width, $generations, $show_spouse, $show_full;
 	global $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE, $PEDIGREE_SHOW_GENDER;
 	global $SEARCH_SPIDER;

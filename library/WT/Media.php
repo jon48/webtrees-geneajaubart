@@ -2,12 +2,10 @@
 // Class that defines a media object
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
-//
-// Modifications Copyright (c) 2010 Greg Roach
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Media.php 14422 2012-10-14 20:59:51Z nigel $
+// $Id: Media.php 14833 2013-02-24 14:38:56Z rob $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,22 +31,13 @@ if (!defined('WT_WEBTREES')) {
 class WT_Media extends WT_GedcomRecord {
 	var $title         =null;
 	var $file          =null;
-	var $note          =null;
-	var $localfilename =null;
-	var $serverfilename=null;
-	var $fileexists    =false;
-	var $thumbfilename =null;
-	var $thumbserverfilename=null;
-	var $thumbfileexists=false;
-	var $mainimagesize  =null;
-	var $thumbimagesize =null;
 
 	// Create a Media object from either raw GEDCOM data or a database row
 	public function __construct($data) {
 		if (is_array($data)) {
 			// Construct from a row from the database
 			$this->title=$data['m_titl'];
-			$this->file =$data['m_file'];
+			$this->file =$data['m_filename'];
 		} else {
 			// Construct from raw GEDCOM data
 			$this->title = get_gedcom_value('TITL', 1, $data);
@@ -85,8 +74,8 @@ class WT_Media extends WT_GedcomRecord {
 
 		if ($statement===null) {
 			$statement=WT_DB::prepare(
-				"SELECT 'OBJE' AS type, m_media AS xref, m_gedfile AS ged_id, m_gedrec AS gedrec, m_titl, m_file ".
-				"FROM `##media` WHERE m_media=? AND m_gedfile=?"
+				"SELECT 'OBJE' AS type, m_id AS xref, m_file AS ged_id, m_gedcom AS gedrec, m_titl, m_filename".
+				" FROM `##media` WHERE m_id=? AND m_file=?"
 			);
 		}
 		return $statement->execute(array($xref, $ged_id))->fetchOneRow(PDO::FETCH_ASSOC);
@@ -97,18 +86,7 @@ class WT_Media extends WT_GedcomRecord {
 	 * @return string
 	 */
 	public function getNote() {
-		if (is_null($this->note)) {
-			$this->note=get_gedcom_value('NOTE', 1, $this->getGedcomRecord());
-		}
-		return $this->note;
-	}
-
-	/**
-	 * get the media icon filename
-	 * @return string
-	 */
-	public function getMediaIcon() {
-		return media_icon_file($this->file);
+		return get_gedcom_value('NOTE', 1, $this->getGedcomRecord());
 	}
 
 	/**
@@ -119,52 +97,78 @@ class WT_Media extends WT_GedcomRecord {
 		return $this->file;
 	}
 
-	/**
-	 * get the relative file path of the image on the server
-	 * @param which string - specify either 'main' or 'thumb'
-	 * @return string
-	 */
-	public function getLocalFilename($which='main') {
-		if ($which=='main') {
-			if (!$this->localfilename) $this->localfilename=check_media_depth($this->file);
-			return $this->localfilename;
-		} else {
-			// this is a convenience method
-			return $this->getThumbnail(false);
-		}
-	}
-
-	/**
-	 * get the filename on the server, either in the standard or protected directory
-	 * @param which string - specify either 'main' or 'thumb'
-	 * @return string
-	 */
+	// Get the filename on the server - for those (very few!) functions which actually
+	// need the filename, such as mediafirewall.php and the PDF reports.
 	public function getServerFilename($which='main') {
-		if ($which=='main') {
-			if ($this->serverfilename) return $this->serverfilename;
-			$localfilename = $this->getLocalFilename($which);
-			if (!empty($localfilename) && !$this->isExternal()) {
-				if (file_exists($localfilename)) {
-					// found image in unprotected directory
-					$this->fileexists = 2;
-					$this->serverfilename = $localfilename;
-					return $this->serverfilename;
-				}
-				$protectedfilename = get_media_firewall_path($localfilename);
-				if (file_exists($protectedfilename)) {
-					// found image in protected directory
-					$this->fileexists = 3;
-					$this->serverfilename = $protectedfilename;
-					return $this->serverfilename;
+		global $MEDIA_DIRECTORY, $THUMBNAIL_WIDTH;
+
+		if ($this->isExternal()) {
+			// External image
+			return $this->file;
+		} elseif ($which=='main') {
+			// Main image
+			return WT_DATA_DIR . $MEDIA_DIRECTORY . $this->file;
+		} else {
+			// Thumbnail
+			$file = WT_DATA_DIR . $MEDIA_DIRECTORY . 'thumbs/' . $this->file;
+			// Does the thumbnail exist?
+			if (file_exists($file)) {
+				return $file;
+			}
+			// Does a user-generated thumbnail exist?
+			$user_thumb = preg_replace('/\.[a-z0-9]{3,5}$/i', '.png', $file);
+			if (file_exists($user_thumb)) {
+				return $user_thumb;
+			}
+			// Does the folder exist for this thumbnail?
+			if (!is_dir(dirname($file)) && !@mkdir(dirname($file, WT_PERM_EXE, true))) {
+				AddToLog('The folder ' . dirname($file) . ' could not be created for ' . $this->getXref(), 'media');
+				return $file;
+			}
+			// Is there a corresponding main image?
+			$main_file = WT_DATA_DIR . $MEDIA_DIRECTORY . $this->file;
+			if (!file_exists($main_file)) {
+				AddToLog('The file ' . $main_file . ' does not exist for ' . $this->getXref(), 'media');
+				return $file;
+			}
+			// Try to create a thumbnail automatically
+			$imgsize = getimagesize($main_file);
+			if ($imgsize[0] && $imgsize[1]) {
+				// Image small enough to be its own thumbnail?
+				if ($imgsize[0] < $THUMBNAIL_WIDTH) {
+					AddToLog('Thumbnail created for ' . $main_file . ' (copy of main image)', 'media');
+					@copy($main_file, $file);
+				} else {
+					if (hasMemoryForImage($main_file)) {
+						switch ($imgsize['mime']) {
+						case 'image/png':  $main_image = @imagecreatefrompng ($main_file); break;
+						case 'image/gif':  $main_image = @imagecreatefromgif ($main_file); break;
+						case 'image/jpeg': $main_image = @imagecreatefromjpeg($main_file); break;
+						default:           return $file; // Nothing else we can do :-(
+						}
+						if ($main_image) {
+							// How big should the thumbnail be?
+							$width  = $THUMBNAIL_WIDTH;
+							$height = round($imgsize[1] * ($width/$imgsize[0]));
+							$thumb_image = @imagecreatetruecolor($width, $height);
+							@imagecopyresampled($thumb_image, $main_image, 0, 0, 0, 0, $width, $height, $imgsize[0], $imgsize[1]);
+							switch ($imgsize['mime']) {
+							case 'image/png':  @imagepng ($thumb_image, $file); break;
+							case 'image/gif':  @imagegif ($thumb_image, $file); break;
+							case 'image/jpeg': @imagejpeg($thumb_image, $file); break;
+							}
+							@imagedestroy($main_image);
+							@imagedestroy($thumb_image);
+							AddToLog('Thumbnail created for ' . $main_file, 'media');
+						} else {
+							AddToLog('Failed to create thumbnail for ' . $main_file, 'media');
+						}
+					} else {
+						AddToLog('Not enough memory to create thumbnail for ' . $main_file, 'media');
+					}
 				}
 			}
-			// file doesn't exist or is external, return the standard localfilename for backwards compatibility
-			$this->fileexists = false;
-			$this->serverfilename = $localfilename;
-			return $this->serverfilename;
-		} else {
-			if (!$this->thumbfilename) $this->getThumbnail(false);
-			return $this->thumbserverfilename;
+			return $file;
 		}
 	}
 
@@ -174,66 +178,13 @@ class WT_Media extends WT_GedcomRecord {
 	 * @return boolean
 	 */
 	public function fileExists($which='main') {
-		if ($which=='main') {
-			if (!$this->serverfilename) $this->getServerFilename();
-			return $this->fileexists;
-		} else {
-			if (!$this->thumbfilename) $this->getThumbnail(false);
-			return $this->thumbfileexists;
-		}
+		return @file_exists($this->getServerFilename($which));
 	}
 
-	/**
-	 * determine if the file is an external url
-	 * operates on the main url
-	 * @return boolean
-	 */
+	// determine if the file is an external url
 	public function isExternal() {
-		return isFileExternal($this->getLocalFilename('main'));
+		return strpos($this->file, '://') !== false;
 	}
-
-	/**
-	 * determine if the thumb file is a media icon
-	 * operates on the thumb file
-	 * @return boolean
-	 */
-	public function isMediaIcon() {
-		$thumb=$this->getThumbnail(false);
-		return (strpos($thumb, "themes/")!==false); 
-	}
-
-	/**
-	 * get the thumbnail filename
-	 * @return string
-	 */
-	public function getThumbnail($generateThumb = true) {
-		if ($this->thumbfilename) return $this->thumbfilename;
-
-		$localfilename = thumbnail_file($this->getLocalFilename(),$generateThumb);
-		// Note that localfilename could be in WT_IMAGES
-		$this->thumbfilename = $localfilename;
-		if (!empty($localfilename) && !$this->isExternal()) {
-			if (file_exists($localfilename)) {
-				// found image in unprotected directory
-				$this->thumbfileexists = 2;
-				$this->thumbserverfilename = $localfilename;
-				return $this->thumbfilename;
-			}
-			$protectedfilename = get_media_firewall_path($localfilename);
-			if (file_exists($protectedfilename)) {
-				// found image in protected directory
-				$this->thumbfileexists = 3;
-				$this->thumbserverfilename = $protectedfilename;
-				return $this->thumbfilename;
-			}
-		}
-
-		// this should never happen, since thumbnail_file will return something in WT_IMAGES if a thumbnail can't be found
-		$this->thumbfileexists = false;
-		$this->thumbserverfilename = $localfilename;
-		return $this->thumbfilename;
-	}
-
 
 	/**
 	 * get the media file size in KB
@@ -242,7 +193,7 @@ class WT_Media extends WT_GedcomRecord {
 	 */
 	public function getFilesize($which='main') {
 		$size = $this->getFilesizeraw($which);
-		if ($size) $size=(int)(($size+1023)/1024); // add some bytes to be sure we never return "0 KB"
+		if ($size) $size=(int)(($size+1023)/1024); // add some bytes to be sure we never return “0 KB”
 		return /* I18N: size of file in KB */ WT_I18N::translate('%s KB', WT_I18N::number($size));
 	}
 
@@ -272,7 +223,7 @@ class WT_Media extends WT_GedcomRecord {
 	 * @return number
 	 */
 	public function getEtag($which='main') {
-		// setup the etag.  use enough info so that if anything important changes, the etag won't match
+		// setup the etag.  use enough info so that if anything important changes, the etag won’t match
 		global $SHOW_NO_WATERMARK;
 		if ($this->isExternal()) {
 			// etag not really defined for external media
@@ -281,20 +232,6 @@ class WT_Media extends WT_GedcomRecord {
 		$etag_string = basename($this->getServerFilename($which)).$this->getFiletime($which).WT_GEDCOM.WT_USER_ACCESS_LEVEL.$SHOW_NO_WATERMARK;
 		$etag_string = dechex(crc32($etag_string));
 		return ($etag_string);
-	}
-
-
-	/**
-	 * get the media FORM from the gedcom.  if not defined, calculate from file extension 
-	 * @return string
-	 */
-	public function getMediaFormat() {
-		$mediaFormat = get_gedcom_value('FORM', 2, $this->getGedcomRecord());
-		if (!$mediaFormat) {
-			$imgsize=$this->getImageAttributes('main');
-			$mediaFormat=$imgsize['ext'];
-		}
-		return $mediaFormat;
 	}
 
 	/**
@@ -306,13 +243,13 @@ class WT_Media extends WT_GedcomRecord {
 		return $mediaType;
 	}
 
-	/**
-	 * get the media _PRIM from the gedcom
-	 * @return string
-	 */
+	// Is this object marked as a highlighted image?
 	public function isPrimary() {
-		$prim = get_gedcom_value("_PRIM", 1, $this->getGedcomRecord());
-		return $prim;
+		if (preg_match('/\n\d _PRIM ([YN])/', $this->getGedcomRecord(), $match)) {
+			return $match[1];
+		} else {
+			return '';
+		}
 	}
 
 	/**
@@ -338,17 +275,17 @@ class WT_Media extends WT_GedcomRecord {
 				$imageTypes=array('','GIF','JPG','PNG','SWF','PSD','BMP','TIFF','TIFF','JPC','JP2','JPX','JB2','SWC','IFF','WBMP','XBM');
 				$imgsize['ext']=$imageTypes[0+$imgsize[2]];
 				// this is for display purposes, always show non-adjusted info
-				$imgsize['WxH']=/* I18N: image dimensions, width x height */ WT_I18N::translate('%1$s × %2$s pixels', WT_I18N::number($imgsize['0']), WT_I18N::number($imgsize['1']));
+				$imgsize['WxH']=/* I18N: image dimensions, width × height */ WT_I18N::translate('%1$s × %2$s pixels', WT_I18N::number($imgsize['0']), WT_I18N::number($imgsize['1']));
 				$imgsize['imgWH']=' width="'.$imgsize['adjW'].'" height="'.$imgsize['adjH'].'" ';
 				if ( ($which=='thumb') && ($imgsize['0'] > $THUMBNAIL_WIDTH) ) {
-					// don't let large images break the dislay
+					// don’t let large images break the dislay
 					$imgsize['imgWH']=' width="'.$THUMBNAIL_WIDTH.'" ';
 				}
 			}
 		}
 
 		if (!is_array($imgsize) || empty($imgsize['0'])) {
-			// this is not an image, OR the file doesn't exist OR it is a url
+			// this is not an image, OR the file doesn’t exist OR it is a url
 			$imgsize[0]=0;
 			$imgsize[1]=0;
 			$imgsize['adjW']=0;
@@ -358,14 +295,14 @@ class WT_Media extends WT_GedcomRecord {
 			$imgsize['WxH']='';
 			$imgsize['imgWH']='';
 			if ($this->isExternal($which)) {
-				// don't let large external images break the dislay
+				// don’t let large external images break the dislay
 				$imgsize['imgWH']=' width="'.$THUMBNAIL_WIDTH.'" ';
 			}
 		}
 
 		if (empty($imgsize['mime'])) {
-			// this is not an image, OR the file doesn't exist OR it is a url
-			// set file type equal to the file extension - can't use parse_url because this may not be a full url
+			// this is not an image, OR the file doesn’t exist OR it is a url
+			// set file type equal to the file extension - can’t use parse_url because this may not be a full url
 			$exp = explode('?', $this->file);
 			$pathinfo = pathinfo($exp[0]);
 			$imgsize['ext']=@strtoupper($pathinfo['extension']);
@@ -374,7 +311,7 @@ class WT_Media extends WT_GedcomRecord {
 			'PPT'=>'application/vnd.ms-powerpoint', 'RTF'=>'text/rtf', 'SID'=>'image/x-mrsid', 'TXT'=>'text/plain', 'XLS'=>'application/vnd.ms-excel',
 			'WMV'=>'video/x-ms-wmv');
 			if (empty($mime[$imgsize['ext']])) {
-				// if we don't know what the mimetype is, use something ambiguous
+				// if we don’t know what the mimetype is, use something ambiguous
 				$imgsize['mime']='application/octet-stream';
 				if ($this->fileExists($which)) {
 					// alert the admin if we cannot determine the mime type of an existing file
@@ -398,368 +335,94 @@ class WT_Media extends WT_GedcomRecord {
 		return parent::_getLinkUrl('mediaviewer.php?mid=', '&');
 	}
 
-
-	/**
-	 * Generate a URL directly to the media file, suitable for use in HTML
-	 * @param which string - specify either 'main' or 'thumb'
-	 * @param separator string - specify either '&amp;' or '&'
-	 * @return string
-	 */
-	public function getHtmlUrlDirect($which='main', $download=false, $separator = '&amp;') {
-
-	 	if ($this->isExternal()) {
-			// this is an external file, do not try to access it through the media firewall
-			if ($separator == '&') {
-				return rawurlencode($this->getFilename());
-			} else {
-				return $this->getFilename();
-			}
-		} else if ($this->getXref()) {
-			// this file has gedcom record
-			if ($this->fileExists($which) == 3) {
-				// file is in protected media directory, access through media firewall
-				// 'cb' is 'cache buster', so clients will make new request if anything significant about the user or the file changes
-				$thumbstr = ($which=='thumb') ? $separator.'thumb=1' : '';
-				$downloadstr = ($download) ? $separator.'dl=1' : '';
-				return 'mediafirewall.php?mid='.$this->getXref().$thumbstr.$downloadstr.$separator.'ged='.rawurlencode(get_gedcom_from_id($this->ged_id)).$separator.'cb='.$this->getEtag($which);
-			} else {
-				// file is in standard media directory (or doesn't exist), no need to use media firewall script
-				if ($separator == '&') {
-					return rawurlencode($this->getLocalFilename($which));
-				} else {
-					return $this->getLocalFilename($which);
-				}
-			}
-		} else {
-			// this file is not in the gedcom
-			if ($this->fileExists($which) == 3) {
-				// file is in protected media directory, access through media firewall
-				$downloadstr = ($download) ? $separator.'dl=1' : '';
-				return 'mediafirewall.php?filename='.$this->getLocalFilename($which).$downloadstr.$separator.'cb='.$this->getEtag($which);
-			} else {
-				// file is in standard media directory (or doesn't exist), no need to use media firewall script
-				if ($separator == '&') {
-					return rawurlencode($this->getLocalFilename($which));
-				} else {
-					return $this->getLocalFilename($which);
-				}
-			}
-		}
-	}
-	// Generate a URL directly to the media file, suitable for use in javascript, HTTP headers, etc.
-	public function getRawUrlDirect($which='main', $download=false) {
-		return $this->getHtmlUrlDirect($which, $download, '&');
-	}
-
-	/**
-	 * if this is a Google Streetview url, return the HTML required to display it
-	* if not a Google Streetview url, return ''
-	* @return string
-	 */
-	public function getHtmlForStreetview() {
-		if (strpos($this->getHtmlUrlDirect('main'), 'http://maps.google.')===0) {
-			return '<iframe style="float:left; padding:5px;" width="264" height="176" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="'.$this->getHtmlUrlDirect('main').'&amp;output=svembed"></iframe>';
-		}
-		return '';
-	}
-
-	/**
-	 * builds html snippet with javascript, etc appropriate to view the media file
-	 * @param array with optional parameters: 
-	 *    'obeyViewerOption'=>true|false, default is 'true'
-	 *    'uselightbox'=>true|false,  default is true - if set to true, will use global settings for lightbox.  if false, will not use regardless of global settings
-	 *    'uselightbox_fallback'=>true|false,  default is true - if lb is not available, should we use  fallback javascript (true) or link directly to media viewer (false)
-	 *    'usejavascript'=>true|false,  default is true - set to false to ensure no javascript will be used in the link
-	 *    'clearbox'=>'general'|'general_1' etc
-	 *    'img_title'=>string (optional) - image title to override the default.  must run htmlspecialchars() priort to sending
-	 * @return string, suitable for use inside an a tag: '<a href="'.$this->getHtmlUrlSnippet().'">';
-	 */
-	public function getHtmlUrlSnippet(array $config = array()) {
-		global $USE_MEDIA_VIEWER;
-
-		$default_config=array(
-			'obeyViewerOption'=>true,
-			'uselightbox'=>true,
-			'uselightbox_fallback'=>true,
-			'usejavascript'=>true,
-			'clearbox'=>'general',
-			'img_title'=>''
-		 );
-		$config=array_merge($default_config, $config);
-
-		$urltype = get_url_type($this->getLocalFilename());
-		$notes=($this->getNote()) ? htmlspecialchars(print_fact_notes("1 NOTE ".$this->getNote(), 1, true, true)) : '';
-		if ($config['img_title']) {
-			$config['img_title']=strip_tags($config['img_title']);
-		} else {
-			$config['img_title']=strip_tags($this->getFullName());
-		}
-
-		// -- Determine the correct URL to open this media file
-		while (true) {
-			if (WT_USE_LIGHTBOX && $config['uselightbox'] && $config['usejavascript'] && (WT_THEME_DIR!=WT_THEMES_DIR.'_administration/')) {
-				// Lightbox is installed
-				switch ($urltype) {
-				case 'url_flv':
-					$url = 'js/jw_player/flvVideo.php?flvVideo='.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . htmlspecialchars($config['img_title']) . "::" . htmlspecialchars($notes);
-					break 2;
-				case 'local_flv':
-					$url = 'js/jw_player/flvVideo.php?flvVideo='.WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . htmlspecialchars($config['img_title']) . "::" . htmlspecialchars($notes);
-					break 2;
-				case 'url_audio':
-				case 'url_wmv':
-					$url = 'js/jw_player/wmvVideo.php?wmvVideo='.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . htmlspecialchars($config['img_title']) . "::" . htmlspecialchars($notes);
-					break 2;
-				case 'local_audio':
-				case 'local_wmv':
-					$url = 'js/jw_player/wmvVideo.php?wmvVideo='.WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main') . "\" rel='clearbox(500, 392, click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . htmlspecialchars($config['img_title']) . "::" . htmlspecialchars($notes);
-					break 2;
-				case 'url_image':
-				case 'local_image':
-					$url = $this->getHtmlUrlDirect('main') . "\" rel=\"clearbox[" . $config['clearbox'] . "]\" rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . htmlspecialchars($config['img_title']) . "::" . htmlspecialchars($notes);
-					break 2;
-				case 'url_picasa':
-				case 'url_page':
-				case 'url_pdf':
-				case 'url_other':
-				case 'url_document':
-				// case 'local_other':
-				case 'local_page':
-				case 'local_pdf':
-				case 'local_document':
-					$url = $this->getHtmlUrlDirect('main') . "\" rel='clearbox(" . get_module_setting('lightbox', 'LB_URL_WIDTH',  '1000') . ',' . get_module_setting('lightbox', 'LB_URL_HEIGHT', '600') . ", click)' rev=\"" . $this->getXref() . "::" . get_gedcom_from_id($this->ged_id) . "::" . htmlspecialchars($config['img_title']) . "::" . htmlspecialchars($notes);
-					break 2;
-				case 'url_streetview':
-					// need to call getHtmlForStreetview() instead of getHtmlUrlSnippet()
-					break 2;
-				}
-			}
-			if ($config['uselightbox_fallback'] && $config['usejavascript']) {
-				// Lightbox is not installed or Lightbox is not appropriate for this media type
-				switch ($urltype) {
-				case 'url_flv':
-					$url = "#\" onclick=\" var winflv = window.open('".'js/jw_player/flvVideo.php?flvVideo='.$this->getRawUrlDirect('main') . "', 'winflv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winflv.focus();}";
-					break 2;
-				case 'local_flv':
-					$url = "#\" onclick=\" var winflv = window.open('".'js/jw_player/flvVideo.php?flvVideo='.WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main') . "', 'winflv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winflv.focus();}";
-					break 2;
-				case 'url_audio':
-				case 'url_wmv':
-					$url = "#\" onclick=\" var winwmv = window.open('".'js/jw_player/wmvVideo.php?wmvVideo='.$this->getRawUrlDirect('main') . "', 'winwmv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winwmv.focus();}";
-					break 2;
-				case 'local_audio':
-				case 'local_wmv':
-					$url = "#\" onclick=\" var winwmv = window.open('".'js/jw_player/wmvVideo.php?wmvVideo='.WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main') . "', 'winwmv', 'width=500, height=392, left=600, top=200'); if (window.focus) {winwmv.focus();}";
-					break 2;
-				case 'url_image':
-				case 'local_image':
-					$imgsize = $this->getImageAttributes('main',40,150);
-					if ($imgsize['0']) {
-						$url = "#\" onclick=\"var winimg = window.open('".$this->getRawUrlDirect('main')."', 'winimg', 'width=".$imgsize['adjW'].", height=".$imgsize['adjH'].", left=200, top=200'); if (window.focus) {winimg.focus();}";
-					} else {
-						$url = $this->getHtmlUrl();
-					}
-					break 2;
-				case 'url_picasa':
-				case 'url_page':
-				case 'url_pdf':
-				case 'url_other':
-				case 'url_document':
-					$url = "#\" onclick=\"var winurl = window.open('".$this->getRawUrlDirect('main')."', 'winurl', 'width=900, height=600, left=200, top=200'); if (window.focus) {winurl.focus();}";
-					break 2;
-				case 'local_other';
-				case 'local_page':
-				case 'local_pdf':
-				case 'local_document':
-					$url = "#\" onclick=\"var winurl = window.open('".WT_SERVER_NAME.WT_SCRIPT_PATH.$this->getRawUrlDirect('main')."', 'winurl', 'width=900, height=600, left=200, top=200'); if (window.focus) {winurl.focus();}";
-					break 2;
-				case 'url_streetview':
-					// need to call getHtmlForStreetview() instead of getHtmlUrlSnippet()
-					break 2;
-				}
-			}
-
-			// final option if nothing else worked
-			if (($USE_MEDIA_VIEWER && $config['obeyViewerOption']) || !$config['usejavascript']) {
-				$url = $this->getHtmlUrl();
-			} else {
-				$imgsize = $this->getImageAttributes('main',40,150);
-				if ($imgsize['0']) {
-					$url = str_replace('mediaviewer.php?','imageview.php?', $this->getHtmlUrl());
-					$url = "#\" onclick=\"return openImage('".$url."', ".$imgsize['adjW'].", ".$imgsize['adjH'].");";
-				} else {
-					$url = $this->getHtmlUrl();
-				}
-			}
-			break;
-		}
-
-		return $url;
-	}
-
-	/**
-	 * returns the complete HTML needed to render a thumbnail image that is linked to the main image
-	 * @param array with optional parameters: 
-	 *    'download'=>true|false, default is false - whether or not to show a 'download file' link
-	 *    'display_type'=>'normal'|'pedigree_person'|'treeview'|'googlemap' the type of image this is
-	 *    'img_id'=>string (optional) - if this image needs an id, set it here
-	 *    'class'=>string (optional) - class to assign to image
-	 *    'img_title'=>string (optional) - image title to override the default.  must run htmlspecialchars() priort to sending
-	 *    'addslashes'=>true|false, default is false - if result will be stored in javascript array (such as googlemaps) set to true
-	 *    'oktolink'=>true|false, default is true - whether to include link to main image
-	 *    'alertnotfound'=>true|false, default is false - whether to display error when main image is missing
-	 *    'show_full'=>true|false, default is true - whether to show or hide the image 
-	 * @return string
-	 */
-	public function displayMedia(array $config = array()) {
-		global $TEXT_DIRECTION,$SHOW_MEDIA_DOWNLOAD;
-
-		$default_config=array(
-			'download'=>false,
-			'display_type'=>'normal',
-			'img_id'=>'',
-			'class'=>'thumbnail',
-			'img_title'=>'',
-			'addslashes'=>false,
-			'oktolink'=>true,
-			'alertnotfound'=>false,
-			'show_full'=>true
-		 );
-		$config=array_merge($default_config, $config);
-		if ($this->getHtmlForStreetview()) {
-			$output=$this->getHtmlForStreetview();
-		} else {
-
-			if ($config['display_type']=='pedigree_person') {
-				// 
-				$config['uselightbox_fallback']=false;
-				$config['clearbox']='general_2';        
-				$imgsizeped=$this->getImageAttributes('thumb');
-				$config['class']='pedigree_image';
-			}
-			if ($config['display_type']=='treeview') {
-				// 
-				$config['uselightbox_fallback']=false;
-				$imgsizeped=$this->getImageAttributes('thumb');
-				$config['class']='tv_link pedigree_image';
-			}
-			if ($config['display_type']=='googlemap') {
-				// used on google maps tab on indi page
-				$config['oktolink']=false;
-				$config['addslashes']=true;
-				$imgsizeped=$this->getImageAttributes('thumb');
-				$config['class']='pedigree_image';
-			}
-
-			$mainexists=$this->isExternal() || $this->fileExists('main');
-			$idstr=($config['img_id']) ? 'id="'.$config['img_id'].'"' : '';
-			$stylestr=($config['show_full']) ? '' : ' style="display: none;" ';
-			if ($config['img_title']) {
-				$config['img_title']=strip_tags($config['img_title']);
-			} else {
-				$config['img_title']=strip_tags($this->getFullName());
-			}
-			$sizestr='';
-			if ($config['class']=='thumbnail') {
-				// only set width/height when class==thumbnail, all other classes control the width/height
-				$imgsize=$this->getImageAttributes('thumb');
-				$sizestr=$imgsize['imgWH'];
-			}
-
-			$output='';
-			if ($config['oktolink'] && $mainexists) $output .= '<a class="media_container" href="'.$this->getHtmlUrlSnippet($config).'">';
-			$output .= '<img '.$idstr.' src="'.$this->getHtmlUrlDirect('thumb').'" '.$sizestr.' class="'.$config['class'].'"';
-			$output .= ' alt="'.$config['img_title'].'" title="'.$config['img_title'].'" '.$stylestr.'>';
-			if ($config['oktolink'] && $mainexists) {
-				$output .= '</a>';
-				if ($config['download'] && $SHOW_MEDIA_DOWNLOAD) {
-					$output .= '<div><a href="'.$this->getHtmlUrlDirect('main', true).'">'.WT_I18N::translate('Download File').'</a></div>';
-				}
-			} else if ($config['alertnotfound'] && !$mainexists) {
-				$output .= '<p class="ui-state-error">' . WT_I18N::translate('The file “%s” does not exist.', $this->getLocalFilename()) . '</p>';
-				
-			}
-		}
-		if ($config['addslashes']) {
-			// the image string will be used in javascript code, such as googlemaps
-			$output=addslashes($output);
-		}
-		return $output;
-	}
-
-	/**
-	 * output the list of linked records
-	 * @param size='small'|'normal'
-	 * @return string
-	 */
-	public function printLinkedRecords($size = "small") {
-		if ($size != "small") $size = "normal";
-		$linkList = array ();
-
-		foreach ($this->fetchLinkedIndividuals() as $indi) {
-			if ($indi->canDisplaydetails()) {
-				$linkItem=array ();
-				$linkItem['MEDIASORT']='A'.$indi->getSortName();
-				$linkItem['record']=$indi;
-				$linkList[]=$linkItem;
-			}
-		}
-		foreach ($this->fetchLinkedFamilies() as $fam) {
-			if ($fam->canDisplaydetails()) {
-				$linkItem=array ();
-				$linkItem['MEDIASORT']='B'.$fam->getSortName();
-				$linkItem['record']=$fam;
-				$linkList[]=$linkItem;
-			}
-		}
-		foreach ($this->fetchLinkedSources() as $sour) {
-			if ($sour->canDisplaydetails()) {
-				$linkItem=array ();
-				$linkItem['MEDIASORT']='C'.$sour->getSortName();
-				$linkItem['record']=$sour;
-				$linkList[]=$linkItem;
-			}
-		}
-
-		uasort($linkList, "mediasort");
-
-		$output="";
-		if ($size == "small") $output.="<sub>";
-		$prev_record=null;
-		foreach ($linkList as $linkItem) {
-			$record=$linkItem['record'];
-			if ($prev_record && $prev_record->getType()!=$record->getType()) {
-				$output.='<br>';
-			}
-			$output.='<br><a class="media_link" href="'.$record->getHtmlUrl().'">';
-			switch ($record->getType()) {
-			case 'INDI':
-				$output.=WT_I18N::translate('View Person');
-				break;
-			case 'FAM':
-				$output.=WT_I18N::translate('View Family');
-				break;
-			case 'SOUR':
-				$output.=WT_I18N::translate('View Source');
-				break;
-			}
-			$output.=' -- '.$record->getFullname().'</a>';
-			$prev_record=$record;
-		}
-		if ($size == "small") $output.="</sub>";
-		return ($output);
-	}
-
-	/**
-	 * check if the given Media object is in the objectlist
-	 * @param Media $obje
-	 * @return mixed  returns the ID for the for the matching media or null if not found
-	 */
-	static function in_obje_list($obje, $ged_id) {
+	// Generate a URL directly to the media file
+	public function getHtmlUrlDirect($which='main', $download=false) {
+		// “cb” is “cache buster”, so clients will make new request if anything significant about the user or the file changes
+		// The extension is there so that image viewers (e.g. colorbox) can do something sensible
+		$thumbstr = ($which=='thumb') ? '&thumb=1' : '';
+		$downloadstr = ($download) ? '&dl=1' : '';
 		return
-			WT_DB::prepare("SELECT m_media FROM `##media` WHERE m_file=? AND m_titl LIKE ? AND m_gedfile=?")
-			->execute(array($obje->file, $obje->title, $ged_id))
-			->fetchOne();
+			'mediafirewall.php?mid=' . $this->getXref() . $thumbstr . $downloadstr .
+			'&ged=' . rawurlencode(get_gedcom_from_id($this->ged_id)) .
+			'&cb=' . $this->getEtag($which);
+	}
+
+	// What file extension is used by this file?
+	public function extension() {
+		if (preg_match('/\.([a-zA-Z0-9]+)$/', $this->file, $match)) {
+			return strtolower($match[1]);
+		} else {
+			return '';
+		}
+	}
+
+	// What is the mime-type of this object?
+	// For simplicity and efficiency, use the extension, rather than the contents.
+	public function mimeType() {
+		// Themes contain icon definitions for some/all of these mime-types
+		switch ($this->extension()) {
+		case 'bmp':  return 'image/bmp';
+		case 'doc':  return 'application/msword';
+		case 'docx': return 'application/msword';
+		case 'ged':  return 'text/x-gedcom';
+		case 'gif':  return 'image/gif';
+		case 'htm':  return 'text/html';
+		case 'html': return 'text/html';
+		case 'jpeg': return 'image/jpeg';
+		case 'jpg':  return 'image/jpeg';
+		case 'mov':  return 'video/quicktime';
+		case 'mp3':  return 'audio/mpeg';
+		case 'ogv':  return 'video/ogg';
+		case 'pdf':  return 'application/pdf';
+		case 'png':  return 'image/png';
+		case 'rar':  return 'application/x-rar-compressed';
+		case 'swf':  return 'application/x-shockwave-flash';
+		case 'svg':  return 'image/svg';
+		case 'tif':  return 'image/tiff';
+		case 'tiff': return 'image/tiff';
+		case 'xls':  return 'application/vnd-ms-excel';
+		case 'xlsx': return 'application/vnd-ms-excel';
+		case 'wmv':  return 'video/x-ms-wmv';
+		case 'zip':  return 'application/zip';
+		default:     return 'application/octet-stream';
+		}
+	}
+
+	// Display an image-thumbnail or a media-icon, and add markup for image viewers such as colorbox.
+	// TODO - take a size parameter and generate different thumbnails for each size, rather than
+	// always send the same image and resize it in the browser.
+	public function displayImage() {
+		if ($this->isExternal() || !file_exists($this->getServerFilename('thumb'))) {
+			// Use an icon
+			$mime_type = str_replace('/', '-', $this->mimeType());
+			$image =
+				'<i' .
+				' dir="'   . 'auto'                           . '"' . // For the tool-tip
+				' class="' . 'icon-mime-' . $mime_type        . '"' .
+				' title="' . strip_tags($this->getFullName()) . '"' .
+				'></i>';
+		} else {
+			$imgsize = getimagesize($this->getServerFilename('thumb'));
+			// Use a thumbnail image
+			$image =
+				'<img' . 
+				' dir="'   . 'auto'                           . '"' . // For the tool-tip
+				' src="'   . $this->getHtmlUrlDirect('thumb') . '"' .
+				' alt="'   . strip_tags($this->getFullName()) . '"' .
+				' title="' . strip_tags($this->getFullName()) . '"' .
+				$imgsize[3] . // height="yyy" width="xxx"
+				'>';
+		}
+
+		return
+			'<a' .
+			' class="'          . 'gallery'                          . '"' .
+			' href="'           . $this->getHtmlUrlDirect('main')    . '"' .
+			' type="'           . $this->mimeType()                  . '"' .
+			' data-obje-url="'  . $this->getHtmlUrl()                . '"' .
+			' data-obje-note="' . htmlspecialchars($this->getNote()) . '"' .
+			' data-title="'     . strip_tags($this->getFullName())   . '"' .
+			'>' . $image . '</a>';
 	}
 
 	// If this object has no name, what do we call it?

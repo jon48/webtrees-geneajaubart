@@ -10,7 +10,7 @@
 // flag.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,15 +26,19 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: import.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: import.php 14789 2013-02-07 11:20:03Z greg $
 
 define('WT_SCRIPT_NAME', 'import.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_import.php';
 
+if (!WT_USER_GEDCOM_ADMIN) {
+	header('HTTP/1.1 403 Access Denied');
+	exit;
+}
+
 $controller=new WT_Controller_Ajax();
 $controller
-	->requireManagerLogin()
 	->pageHeader();
 
 // Don't use ged=XX as we want to be able to run without changing the current gedcom.

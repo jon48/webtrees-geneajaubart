@@ -1,12 +1,1 @@
-/* $Id: msie.css 13409 2012-02-07 23:39:46Z rob $ */
-
-
-.rela {filter: alpha(opacity=67);}
-.ltr {text-align: left;}
-
-#content {*margin-top: 50px;}
-#fav-menu {*left: 30px;}
-html[dir='rtl'] #fav-menu {*right: 30px;}
-
-.itr {height: 30px;}
-.itr:hover .popup {top: 28px;}
+.rela{filter:alpha(opacity=67)}.ltr{text-align:left}#content{*margin-top:50px}#fav-menu{*left:30px}html[dir='rtl'] #fav-menu{*right:30px}.itr{height:30px}.itr:hover .popup{top:28px}

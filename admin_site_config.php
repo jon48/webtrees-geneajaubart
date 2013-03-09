@@ -2,7 +2,7 @@
 // A form to edit site configuration.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,15 +18,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_config.php 14276 2012-09-14 15:39:40Z greg $
+// $Id: admin_site_config.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_config.php');
 require './includes/session.php';
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->requireAdminLogin()
-	->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.jeditable.min.js')
+	->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
 	->addInlineJavascript('jQuery("#tabs").tabs();')
 	->setPageTitle(WT_I18N::translate('Site configuration'))
 	->pageHeader();
@@ -42,7 +42,7 @@ echo
 				'<li><a href="#mail"><span>', WT_I18N::translate('Mail configuration'), '</span></a></li>',
 			'</ul>',
 			'<div id="site"><table><tr><td><dl>',
-			'<dt>', WT_I18N::translate('Data file directory'), help_link('INDEX_DIRECTORY'), '</dt>',
+			'<dt>', WT_I18N::translate('Data folder'), help_link('INDEX_DIRECTORY'), '</dt>',
 			'<dd>', edit_field_inline('site_setting-INDEX_DIRECTORY', WT_Site::preference('INDEX_DIRECTORY'), $controller), '</dd>',
 			'<dt>', WT_I18N::translate('Memory limit'), help_link('MEMORY_LIMIT'), '</dt>',
 			'<dd>', edit_field_inline('site_setting-MEMORY_LIMIT', WT_Site::preference('MEMORY_LIMIT'), $controller), '</dd>',

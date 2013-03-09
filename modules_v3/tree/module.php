@@ -19,7 +19,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: module.php 14771 2013-02-04 16:42:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -37,18 +37,13 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Extend WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Interactive tree" module */ WT_I18N::translate('An interactive tree, showing all the ancestors and descendants of a person.');
+		return /* I18N: Description of the “Interactive tree” module */ WT_I18N::translate('An interactive tree, showing all the ancestors and descendants of a person.');
 	}
 	
 	// Implement WT_Module_Tab
 	public function defaultTabOrder() {
 		return 68;
 	}
-
-	// Implement WT_Module_Tab
-	public function getJSCallback() {
-		return '';
-}
 
 	// Implement WT_Module_Tab
 	public function getTabContent() {
@@ -58,16 +53,9 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 		$tv = new TreeView('tvTab');
 		list($html, $js) = $tv->drawViewport($controller->record->getXref(), 3);
 		return
-			'<script src="'.$this->js().'"></script>'.
-			$html.
-			'<script>
-			if (document.createStyleSheet) {
-				document.createStyleSheet("'.$this->css().'"); // For Internet Explorer
-			} else {
-				jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="'.$this->css().'">\');
-			}'.
-			$js.
-			'</script>';
+			'<script src="' . $this->js() . '"></script>' .
+			'<script>' . $js . '</script>' .
+			$html;
 	}
 
 	// Implement WT_Module_Tab
@@ -87,6 +75,19 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function getPreLoadContent() {
+		// We cannot use jQuery("head").append(<link rel="stylesheet" ...as jQuery is not loaded at this time
+		return
+			'<script>
+			if (document.createStyleSheet) {
+				document.createStyleSheet("'.$this->css().'"); // For Internet Explorer
+			} else {
+				var newSheet=document.createElement("link");
+    		newSheet.setAttribute("rel","stylesheet");
+    		newSheet.setAttribute("type","text/css");
+   			newSheet.setAttribute("href","'.$this->css().'");
+		    document.getElementsByTagName("head")[0].appendChild(newSheet);
+			}
+			</script>';
 	}
 
 	// Extend WT_Module
@@ -124,33 +125,33 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 				$album->getPreLoadContent();
 			}
 			echo $html;
-		break;
+			break;
 
 		case 'getDetails':
+			//$controller = new WT_Controller_Ajax();
+			//$controller->pageHeader();
+			Zend_Session::writeClose();
 			header('Content-Type: text/html; charset=UTF-8');
 			$pid = safe_GET('pid');
-			$i = safe_GET('instance');
-			$tv = new TreeView($i);
+			$i   = safe_GET('instance');
+			$tv  = new TreeView($i);
 			echo $tv->getDetails($pid);
-		break;
+			break;
 
 		case 'getPersons':
-			$q = $_REQUEST["q"];
-			$i = safe_GET('instance');
+			//$controller = new WT_Controller_Ajax();
+			//$controller->pageHeader();
+			Zend_Session::writeClose();
+			header('Content-Type: text/html; charset=UTF-8');
+			$q  = $_REQUEST['q'];
+			$i  = safe_GET('instance');
 			$tv = new TreeView($i);
 			echo $tv->getPersons($q);
-		break;
-
-		// dynamically load full medias instead of thumbnails for opened boxes before printing
-		case 'getMedias':
-			$q = $_REQUEST["q"];
-			$i = safe_GET('instance');
-			$tv = new TreeView($i);
-			echo $tv->getMedias($q);
-		break;
+			break;
 
 		default:
 			header('HTTP/1.0 404 Not Found');
+			break;
 		}
 	}
 

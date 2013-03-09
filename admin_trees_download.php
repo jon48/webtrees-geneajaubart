@@ -2,7 +2,7 @@
 // Allow an admin user to download the entire gedcom file.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,13 +21,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_download.php 14276 2012-09-14 15:39:40Z greg $
+// $Id: admin_trees_download.php 14841 2013-02-28 20:18:35Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_download.php');
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_export.php';
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->setPageTitle(WT_I18N::translate('Download GEDCOM'))
 	->requireManagerLogin();
@@ -37,7 +37,6 @@ $action           = safe_GET('action',           'download');
 $convert          = safe_GET('convert',          'yes', 'no');
 $zip              = safe_GET('zip',              'yes', 'no');
 $conv_path        = safe_GET('conv_path',        WT_REGEX_NOSCRIPT);
-$conv_slashes     = safe_GET('conv_slashes',     array('forward', 'backward'), 'forward');
 $privatize_export = safe_GET('privatize_export', array('none', 'visitor', 'user', 'gedadmin'));
 
 if ($action == 'download') {
@@ -48,7 +47,6 @@ if ($action == 'download') {
 	$exportOptions['privatize'] = $privatize_export;
 	$exportOptions['toANSI'] = $convert;
 	$exportOptions['path'] = $conv_path;
-	$exportOptions['slashes'] = $conv_slashes;
 }
 
 $fileName = WT_GEDCOM;
@@ -61,24 +59,24 @@ if ($action == "download" && $zip == "yes") {
 	$gedname = $temppath . $fileName;
 
 	$removeTempDir = false;
-	if (!is_dir(filename_decode($temppath))) {
-		$res = mkdir(filename_decode($temppath));
+	if (!is_dir($temppath)) {
+		$res = mkdir($temppath);
 		if ($res !== true) {
 			echo "Error : Could not create temporary path!";
 			exit;
 		}
 		$removeTempDir = true;
 	}
-	$gedout = fopen(filename_decode($gedname), "w");
+	$gedout = fopen($gedname, "w");
 	export_gedcom($GEDCOM, $gedout, $exportOptions);
 	fclose($gedout);
 	$comment = "Created by ".WT_WEBTREES." ".WT_VERSION_TEXT." on " . date("r") . ".";
-	$archive = new PclZip(filename_decode($zipfile));
-	$v_list = $archive->create(filename_decode($gedname), PCLZIP_OPT_COMMENT, $comment, PCLZIP_OPT_REMOVE_PATH, filename_decode($temppath));
+	$archive = new PclZip($zipfile);
+	$v_list = $archive->create($gedname, PCLZIP_OPT_COMMENT, $comment, PCLZIP_OPT_REMOVE_PATH, $temppath);
 	if ($v_list == 0) echo "Error : " . $archive->errorInfo(true);
 	else {
-		unlink(filename_decode($gedname));
-		if ($removeTempDir) rmdir(filename_decode($temppath));
+		unlink($gedname);
+		if ($removeTempDir) rmdir($temppath);
 		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH."downloadbackup.php?fname=".$zipname);
 		exit;
 	}
@@ -86,6 +84,7 @@ if ($action == "download" && $zip == "yes") {
 }
 
 if ($action == "download") {
+	Zend_Session::writeClose();
 	header('Content-Type: text/plain; charset=UTF-8');
 	// We could open "php://compress.zlib" to create a .gz file or "php://compress.bzip2" to create a .bz2 file
 	$gedout = fopen('php://output', 'w');
@@ -101,7 +100,7 @@ if ($action == "download") {
 $controller->pageHeader();
 
 ?>
-<h2><?php echo WT_I18N::translate('Download GEDCOM'); ?> - <?php echo htmlspecialchars(WT_GEDCOM); ?></h2>
+<h2><?php echo $controller->getPageTitle(); ?> - <?php echo htmlspecialchars(WT_GEDCOM); ?></h2>
 <form name="convertform" method="get">
 	<input type="hidden" name="action" value="download">
 	<input type="hidden" name="ged" value="<?php echo WT_GEDCOM; ?>">
@@ -132,21 +131,14 @@ $controller->pageHeader();
 				<input type="checkbox" name="convert" value="yes">
 			</dd>
 			<dt>
-				<?php echo WT_I18N::translate('Convert media path to'), help_link('convertPath'); ?>
+				<?php echo WT_I18N::translate('GEDCOM media path'), help_link('GEDCOM_MEDIA_PATH'); ?>
 			</dt>
 			<dd>
-				<input type="text" name="conv_path" size="30" value="<?php echo $conv_path; ?>" dir="auto">
-			</dd>
-			<dt>
-				<?php echo WT_I18N::translate('Convert media folder separators to'), help_link('convertSlashes'); ?>
-			</dt>
-			<dd>
-				<input type="radio" name="conv_slashes" value="forward" <?php if ($conv_slashes=='forward') echo "checked=\"checked\" "; ?>>&nbsp;&nbsp;<?php echo WT_I18N::translate('Forward slashes : /'); ?>
-				<br>
-				<input type="radio" name="conv_slashes" value="backward" <?php if ($conv_slashes=='backward') echo "checked=\"checked\" "; ?>>&nbsp;&nbsp;<?php echo WT_I18N::translate('Backslashes : \\'); ?>
+				<input type="checkbox" name="conv_path" value="<?php echo htmlspecialchars($GEDCOM_MEDIA_PATH); ?>">
+				<span dir="auto"><?php echo htmlspecialchars($GEDCOM_MEDIA_PATH); ?></span>
 			</dd>
 		</dl>
 	</div>
 	<br>
-	<input type="submit" value="<?php echo WT_I18N::translate('Download Now'); ?>">
+	<input type="submit" value="<?php echo WT_I18N::translate('continue'); ?>">
 </form>

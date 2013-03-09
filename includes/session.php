@@ -2,7 +2,7 @@
 // Startup and session logic
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2011  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: session.php 14436 2012-10-20 19:31:58Z greg $
+// $Id: session.php 14857 2013-03-06 21:09:42Z greg $
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
 if (!defined('WT_SCRIPT_NAME')) {
@@ -31,8 +31,8 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.3.2');
-define('WT_VERSION_RELEASE', ''); // 'svn', 'beta', 'rc1', '', etc.
+define('WT_VERSION',         '1.4.0');
+define('WT_VERSION_RELEASE', ''); // “svn”, “beta”, “rc1”, “”, etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
 
 // External URLs
@@ -41,20 +41,27 @@ define('WT_WEBTREES_WIKI',   'http://wiki.webtrees.net/');
 define('WT_TRANSLATORS_URL', 'https://translations.launchpad.net/webtrees/');
 
 // Optionally, specify a CDN server for static content (e.g. CSS, JS, PNG)
-// For example, "http://my.cdn.com/webtrees-static-1.3.1/"
-define('WT_STATIC_URL', ''); // For example, "http://my.cdn.com/webtrees-static-1.3.1/"
+// For example, http://my.cdn.com/webtrees-static-1.3.1/
+define('WT_STATIC_URL', ''); // For example, http://my.cdn.com/webtrees-static-1.3.1/
 
-// Optionally, load major JS libraries from Google's public CDN
+// Optionally, load major JS libraries from Google’s public CDN
 define ('WT_USE_GOOGLE_API', false);
 if (WT_USE_GOOGLE_API) {
-	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js');
-	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js');
+	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js');
+	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js');
 } else {
-	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery/jquery.min.js');
-	define('WT_JQUERYUI_URL',      WT_STATIC_URL.'js/jquery/jquery-ui.min.js');
+	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery-1.9.1.js');
+	define('WT_JQUERYUI_URL',      WT_STATIC_URL.'js/jquery-ui-1.10.0.js');
 }
+define('WT_JQUERY_COLORBOX_URL',   WT_STATIC_URL.'js/jquery.colorbox-1.4.3.js');
+define('WT_JQUERY_COOKIE_URL',     WT_STATIC_URL.'js/jquery.cookie-1.3.1.js');
+define('WT_JQUERY_DATATABLES_URL', WT_STATIC_URL.'js/jquery.datatables-1.9.4.js');
+define('WT_JQUERY_JEDITABLE_URL',  WT_STATIC_URL.'js/jquery.jeditable-1.7.1.js');
+define('WT_JQUERY_WHEELZOOM_URL',  WT_STATIC_URL.'js/jquery.wheelzoom-1.1.2.js');
+define('WT_MODERNIZR_URL',         WT_STATIC_URL.'js/modernizr.custom-2.6.2.js');
+define('WT_WEBTREES_JS_URL',       WT_STATIC_URL.'js/webtrees-1.4.0.js');
 
-// Location of our modules and themes.  These are used as URLs and directory paths.
+// Location of our modules and themes.  These are used as URLs and folder paths.
 define('WT_MODULES_DIR', 'modules_v3/'); // Update setup.php and build/Makefile when this changes
 define('WT_THEMES_DIR',  'themes/' );
 
@@ -67,9 +74,11 @@ define('WT_DEBUG_LANG', false);
 define('WT_ERROR_LEVEL', 2); // 0=none, 1=minimal, 2=full
 
 // Required version of database tables/columns/indexes/etc.
-define('WT_SCHEMA_VERSION', 20);
+define('WT_SCHEMA_VERSION', 23);
 
 // Regular expressions for validating user input, etc.
+define('WT_MINIMUM_PASSWORD_LENGTH', 6);
+
 define('WT_REGEX_XREF',     '[A-Za-z0-9:_-]+');
 define('WT_REGEX_TAG',      '[_A-Z][_A-Z0-9]*');
 define('WT_REGEX_INTEGER',  '-?\d+');
@@ -77,7 +86,7 @@ define('WT_REGEX_ALPHA',    '[a-zA-Z]+');
 define('WT_REGEX_ALPHANUM', '[a-zA-Z0-9]+');
 define('WT_REGEX_BYTES',    '[0-9]+[bBkKmMgG]?');
 define('WT_REGEX_USERNAME', '[^<>"%{};]+');
-define('WT_REGEX_PASSWORD', '.{6,}');
+define('WT_REGEX_PASSWORD', '.{'.WT_MINIMUM_PASSWORD_LENGTH.',}');
 define('WT_REGEX_NOSCRIPT', '[^<>"&%{};]*');
 define('WT_REGEX_URL',      '[\/0-9A-Za-z_!~*\'().;?:@&=+$,%#-]+'); // Simple list of valid chars
 define('WT_REGEX_EMAIL',    '[^\s<>"&%{};@]+@[^\s<>"&%{};@]+');
@@ -138,7 +147,7 @@ if (version_compare(PHP_VERSION, '6.0', '<')) {
 		// Disabling them on PHP5.3 will cause a strict-warning, so ignore errors.
 		@set_magic_quotes_runtime(false);
 	}
-	// magic_quotes_gpc can't be disabled at run-time, so clean them up as necessary.
+	// magic_quotes_gpc can’t be disabled at run-time, so clean them up as necessary.
 	if (get_magic_quotes_gpc() || ini_get('magic_quotes_sybase') && strtolower(ini_get('magic_quotes_sybase'))!='off') {
 		$in = array(&$_GET, &$_POST, &$_REQUEST, &$_COOKIE);
 		while (list($k,$v) = each($in)) {
@@ -158,7 +167,7 @@ if (!ini_get('date.timezone')) {
 	date_default_timezone_set(@date_default_timezone_get());
 }
 
-// Split the request "protocol://host:port/path/to/script.php?var=value" into parts
+// Split the request protocol://host:port/path/to/script.php?var=value into parts
 // WT_SERVER_NAME  = protocol://host:port
 // WT_SCRIPT_PATH  = /path/to/   (begins and ends with /)
 // WT_SCRIPT_NAME  = script.php  (already defined in the calling script)
@@ -183,13 +192,18 @@ if (!empty($_SERVER['SCRIPT_NAME'])) {
 	define('WT_SCRIPT_PATH', '/');
 }
 
-// Microsoft IIS servers don't set REQUEST_URI, so generate it for them.
+// Microsoft IIS servers don’t set REQUEST_URI, so generate it for them.
 if (!isset($_SERVER['REQUEST_URI']))  {
 	$_SERVER['REQUEST_URI']=substr($_SERVER['PHP_SELF'], 1);
 	if (isset($_SERVER['QUERY_STRING'])) {
 		$_SERVER['REQUEST_URI'].='?'.$_SERVER['QUERY_STRING'];
 	}
 }
+
+// Enable this code when we release webtrees 1.5
+//if (version_compare(PHP_VERSION, '5.3.3', '<')) {
+//	header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'site-php-version.php');
+//}
 
 // Common functions
 require WT_ROOT.'includes/functions/functions.php';
@@ -222,6 +236,8 @@ if (file_exists(WT_ROOT.'data/config.ini.php')) {
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'setup.php');
 	exit;
 }
+
+$WT_REQUEST=new Zend_Controller_Request_Http();
 
 require WT_ROOT.'includes/authentication.php';
 
@@ -292,7 +308,7 @@ $rule=WT_DB::prepare(
 	" WHERE IFNULL(INET_ATON(?), 0) BETWEEN ip_address_start AND ip_address_end".
 	" AND ? LIKE user_agent_pattern".
 	" ORDER BY ip_address_end-ip_address_start"
-)->execute(array( $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT']))->fetchOne();
+)->execute(array($WT_REQUEST->getClientIp(), $_SERVER['HTTP_USER_AGENT']))->fetchOne();
 
 switch ($rule) {
 case 'allow':
@@ -303,25 +319,26 @@ case 'deny':
 	exit;
 case 'robot':
 case 'unknown':
-	// Search engines don't send cookies, and so create a new session with every visit.
+	// Search engines don’t send cookies, and so create a new session with every visit.
 	// Make sure they always use the same one
-	Zend_Session::setId('search-engine-'.str_replace('.', '-', $_SERVER['REMOTE_ADDR']));
+	Zend_Session::setId('search-engine-'.str_replace('.', '-', $WT_REQUEST->getClientIp()));
 	$SEARCH_SPIDER=true;
 	break;
 case '':
 	WT_DB::prepare(
 		"INSERT INTO `##site_access_rule` (ip_address_start, ip_address_end, user_agent_pattern, comment) VALUES (IFNULL(INET_ATON(?), 0), IFNULL(INET_ATON(?), 4294967295), ?, '')"
-	)->execute(array($_SERVER['REMOTE_ADDR'], $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT']));
+	)->execute(array($WT_REQUEST->getClientIp(), $WT_REQUEST->getClientIp(), $_SERVER['HTTP_USER_AGENT']));
 	$SEARCH_SPIDER=true;
 	break;
 }
 
 // Store our session data in the database.
+// Only update the session table once per minute, unless the session data has actually changed.
 session_set_save_handler(
 	create_function('', 'return true;'), // open
 	create_function('', 'return true;'), // close
 	create_function('$id', 'return WT_DB::prepare("SELECT session_data FROM `##session` WHERE session_id=?")->execute(array($id))->fetchOne();'), // read
-	create_function('$id,$data', 'WT_DB::prepare("REPLACE INTO `##session` (session_id, user_id, ip_address, session_data) VALUES (?,?,?,?)")->execute(array($id, WT_USER_ID, $_SERVER["REMOTE_ADDR"], $data));return true;'), // write
+	create_function('$id,$data', 'global $WT_REQUEST;WT_DB::prepare("INSERT INTO `##session` (session_id, user_id, ip_address, session_data, session_time) VALUES (?,?,?,?,CURRENT_TIMESTAMP-SECOND(CURRENT_TIMESTAMP)) ON DUPLICATE KEY UPDATE user_id=VALUES(user_id), ip_address=VALUES(ip_address), session_data=VALUES(session_data), session_time=CURRENT_TIMESTAMP-SECOND(CURRENT_TIMESTAMP)")->execute(array($id, WT_USER_ID, $WT_REQUEST->getClientIp(), $data));return true;'), // write
 	create_function('$id', 'WT_DB::prepare("DELETE FROM `##session` WHERE session_id=?")->execute(array($id));return true;'), // destroy
 	create_function('$maxlifetime', 'WT_DB::prepare("DELETE FROM `##session` WHERE session_time < DATE_SUB(NOW(), INTERVAL ? SECOND)")->execute(array($maxlifetime));return true;') // gc
 );
@@ -339,17 +356,17 @@ $cfg=array(
 	'cookie_httponly' => true,
 );
 
-// Search engines don't send cookies, and so create a new session with every visit.
+// Search engines don’t send cookies, and so create a new session with every visit.
 // Make sure they always use the same one
 if ($SEARCH_SPIDER) {
-	Zend_Session::setId('search-engine-'.str_replace('.', '-', $_SERVER['REMOTE_ADDR']));
+	Zend_Session::setId('search-engine-'.str_replace('.', '-', $WT_REQUEST->getClientIp()));
 }
 
 Zend_Session::start($cfg);
 
-// Register a session "namespace" to store session data.  This is better than
+// Register a session “namespace” to store session data.  This is better than
 // using $_SESSION, as we can avoid clashes with other modules or applications,
-// and problems with servers that have enabled "register_globals".
+// and problems with servers that have enabled “register_globals”.
 $WT_SESSION=new Zend_Session_Namespace('WEBTREES');
 
 if (!$SEARCH_SPIDER && !$WT_SESSION->initiated) {
@@ -441,13 +458,14 @@ if (empty($WEBTREES_EMAIL)) {
 
 // Use the server date to calculate privacy, etc.
 // Use the client date to show ages, etc.
-define('WT_TIMESTAMP',        time());
+// Note that the database/webservers may not be synchronised, so use DB time throughout.
+define('WT_TIMESTAMP', WT_DB::prepare("SELECT UNIX_TIMESTAMP()")->fetchOne());
 define('WT_CLIENT_TIMESTAMP', WT_TIMESTAMP - $WT_SESSION->timediff);
 
 define('WT_SERVER_JD', 2440588 + (int)(WT_TIMESTAMP       /86400));
 define('WT_CLIENT_JD', 2440588 + (int)(WT_CLIENT_TIMESTAMP/86400));
 
-// Application configuration data - things that aren't (yet?) user-editable
+// Application configuration data - things that aren’t (yet?) user-editable
 require WT_ROOT.'includes/config_data.php';
 
 //-- load the privacy functions
@@ -470,7 +488,7 @@ if (WT_Site::preference('LOGIN_URL')) {
 
 // If we are in the middle of importing (or have not imported) the current tree,
 // then stay on the manage-trees page.
-if (!WT_IMPORTED && WT_SCRIPT_NAME!='admin_trees_manage.php' && WT_SCRIPT_NAME!='import.php' && WT_SCRIPT_NAME!='login.php' && WT_SCRIPT_NAME!='help_text.php') {
+if (!WT_IMPORTED && WT_SCRIPT_NAME!='admin_trees_manage.php' && WT_SCRIPT_NAME!='import.php' && WT_SCRIPT_NAME!='login.php' && WT_SCRIPT_NAME!='help_text.php' && WT_SCRIPT_NAME!='admin_pgv_to_wt.php') {
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_trees_manage.php');
 	exit;
 }
@@ -496,7 +514,7 @@ if (WT_USER_ID) {
 
 // Set the theme
 if (substr(WT_SCRIPT_NAME, 0, 5)=='admin' || WT_SCRIPT_NAME=='module.php' && substr(safe_GET('mod_action'), 0, 5)=='admin') {
-	// Administration scripts begin with 'admin' and use a special administration theme
+	// Administration scripts begin with “admin” and use a special administration theme
 	define('WT_THEME_DIR', WT_THEMES_DIR.'_administration/');
 } else {
 	if (WT_Site::preference('ALLOW_USER_THEMES')) {
@@ -549,8 +567,8 @@ if ($WT_TREE && $WT_TREE->preference('SHOW_COUNTER') && !$SEARCH_SPIDER) {
 
 // define constants to be used when setting permissions after creating files/directories
 if (substr(PHP_SAPI, 0, 3) == 'cgi') {  // cgi-mode, should only be writable by owner
-	define('WT_PERM_EXE',  0755);  // to be used on directories, php files and htaccess files
-	define('WT_PERM_FILE', 0644);  // to be used on images, text files, etc
+	define('WT_PERM_EXE',  0755);  // to be used on directories, php files, etc.
+	define('WT_PERM_FILE', 0644);  // to be used on images, text files, etc.
 } else { // mod_php mode, should be writable by everyone
 	define('WT_PERM_EXE',  0777);
 	define('WT_PERM_FILE', 0666);
@@ -565,7 +583,7 @@ if ($SEARCH_SPIDER && !in_array(WT_SCRIPT_NAME , array(
 	'individual.php', 'family.php', 'mediaviewer.php', 'note.php', 'repo.php', 'source.php',
 ))) {
 	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
-	$controller=new WT_Controller_Base();
+	$controller=new WT_Controller_Page();
 	$controller->setPageTitle(WT_I18N::translate('Search engine'));
 	$controller->pageHeader();
 	echo '<p class="ui-state-error">', WT_I18N::translate('You do not have permission to view this page.'), '</p>';

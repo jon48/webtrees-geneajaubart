@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Fanchart.php 14241 2012-09-03 08:50:48Z greg $
+// $Id: Fanchart.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -48,7 +48,7 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 
 		if ($this->root && $this->root->canDisplayName()) {
 			$this->setPageTitle(
-				/* I18N: http://en.wikipedia.org/wiki/Family_tree#Fan_chart - %s is a person's name */
+				/* I18N: http://en.wikipedia.org/wiki/Family_tree#Fan_chart - %s is an individual’s name */
 				WT_I18N::translate('Fan chart of %s', $this->root->getFullName())
 			);
 		} else {

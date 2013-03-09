@@ -2,7 +2,7 @@
 // Restrict/allow site access based on IP address and user-agent string
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,17 +18,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_access.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: admin_site_access.php 14847 2013-03-01 22:46:25Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_access.php');
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->requireAdminLogin()
-	->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-	->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.jeditable.min.js')
+	->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
+	->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
 	->setPageTitle(WT_I18N::translate('Site access rules'));
 
 $action=safe_GET('action');
@@ -111,7 +111,7 @@ case 'load_rules':
 			'robot'=>/* I18N: http://en.wikipedia.org/wiki/Web_crawler */  WT_I18N::translate('robot'),
 		), null, $row[5]);
 		$row[6]=edit_field_inline('site_access_rule-comment-'.$site_access_rule_id, $row[6]);
-		$row[7]='<i class="icon-delete" onclick="if (confirm(\''.htmlspecialchars(WT_I18N::translate('Permanently delete "%s"?', strip_tags($user_agent))).'\')) { document.location=\''.WT_SCRIPT_NAME.'?action=delete&amp;site_access_rule_id='.$site_access_rule_id.'\'; }"></i>';
+		$row[7]='<i class="icon-delete" onclick="if (confirm(\''.htmlspecialchars(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($user_agent))).'\')) { document.location=\''.WT_SCRIPT_NAME.'?action=delete&amp;site_access_rule_id='.$site_access_rule_id.'\'; }"></i>';
 	}
 
 	// Total filtered rows
@@ -213,6 +213,8 @@ $controller
 			"bAutoWidth":false,
 			"bProcessing": true,
 			"sPaginationType": "full_numbers",
+			"bStateSave": true,
+			"iCookieDuration": 180,
 			"aoColumns": [
 				/* 0 ip_address_start        */ {"iDataSort": 1, "sClass": "ip_address"},
 				/* 1 ip_address_start (sort) */ {"sType": "numeric", "bVisible": false},
@@ -225,12 +227,10 @@ $controller
 			],
 			"fnDrawCallback": function() {
 				// Our JSON responses include Javascript as well as HTML.  This does not get
-				// executed, So extract it, and add it to its own DOM element
+				// executed, So extract it, and execute it
 				jQuery("#site_access_rules script").each(function() {
-					var script=document.createElement("script");
-					jQuery("#site_access_rules script").appendTo("body"); 
-					document.body.appendChild(script);
-				}).remove();
+					eval(this.text);
+				});
 			}
 		});
 		jQuery("#unknown_site_visitors").dataTable({
@@ -241,6 +241,8 @@ $controller
 			"bJQueryUI": true,
 			"bAutoWidth":false,
 			"bProcessing": true,
+			"bStateSave": true,
+			"iCookieDuration": 180,
 			"sPaginationType": "full_numbers",
 			"aoColumns": [
 				/* 0 ip_address         */ {"iDataSort": 1, "sClass": "ip_address"},

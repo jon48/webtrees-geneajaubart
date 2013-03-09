@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Ajax.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: Ajax.php 14811 2013-02-18 08:27:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -39,6 +39,18 @@ class WT_Controller_Ajax extends WT_Controller_Base {
 	public function pageFooter() {
 		// Ajax responses may have Javascript
 		echo $this->getJavascript();
+		return $this;
+	}
+	
+	// Restrict access
+	public function requireManagerLogin($ged_id=WT_GED_ID) {
+		if (
+			$ged_id==WT_GED_ID && !WT_USER_GEDCOM_ADMIN ||
+			$ged_id!=WT_GED_ID && userGedcomAdmin(WT_USER_ID, $gedcom_id)
+		) {
+			header('HTTP/1.0 403 Access Denied');
+			exit;
+		}
 		return $this;
 	}
 }

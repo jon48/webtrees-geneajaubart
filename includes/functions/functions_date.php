@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_date.php 14279 2012-09-14 21:46:56Z greg $
+// $Id: functions_date.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -98,25 +98,25 @@ function format_timestamp($time) {
 		case '%a':
 			$t=date('His', $time);
 			if ($t=='000000') {
-				$time_fmt=str_replace($match, /* I18N: time format "%a" - exactly 00:00:00 */ WT_I18N::translate('midnight'), $time_fmt);
+				$time_fmt=str_replace($match, /* I18N: time format “%a” - exactly 00:00:00 */ WT_I18N::translate('midnight'), $time_fmt);
 			} elseif ($t<'120000') {
-				$time_fmt=str_replace($match, /* I18N: time format "%a" - between 00:00:01 and 11:59:59 */ WT_I18N::translate('a.m.'), $time_fmt);
+				$time_fmt=str_replace($match, /* I18N: time format “%a” - between 00:00:01 and 11:59:59 */ WT_I18N::translate('a.m.'), $time_fmt);
 			} elseif ($t=='120000') {
-				$time_fmt=str_replace($match, /* I18N: time format "%a" - exactly 12:00:00 */ WT_I18N::translate('noon'), $time_fmt);
+				$time_fmt=str_replace($match, /* I18N: time format “%a” - exactly 12:00:00 */ WT_I18N::translate('noon'), $time_fmt);
 			} else {
-				$time_fmt=str_replace($match, /* I18N: time format "%a" - between 12:00:01 and 23:59:59 */ WT_I18N::translate('p.m.'), $time_fmt);
+				$time_fmt=str_replace($match, /* I18N: time format “%a” - between 12:00:01 and 23:59:59 */ WT_I18N::translate('p.m.'), $time_fmt);
 			}
 			break;
 		case '%A':
 			$t=date('His', $time);
 			if ($t=='000000') {
-				$time_fmt=str_replace($match, /* I18N: time format "%A" - exactly 00:00:00 */ WT_I18N::translate('Midnight'), $time_fmt);
+				$time_fmt=str_replace($match, /* I18N: time format “%A” - exactly 00:00:00 */ WT_I18N::translate('Midnight'), $time_fmt);
 			} elseif ($t<'120000') {
-				$time_fmt=str_replace($match, /* I18N: time format "%A" - between 00:00:01 and 11:59:59 */ WT_I18N::translate('A.M.'), $time_fmt);
+				$time_fmt=str_replace($match, /* I18N: time format “%A” - between 00:00:01 and 11:59:59 */ WT_I18N::translate('A.M.'), $time_fmt);
 			} elseif ($t=='120000') {
-				$time_fmt=str_replace($match, /* I18N: time format "%A" - exactly 12:00:00 */ WT_I18N::translate('Noon'), $time_fmt);
+				$time_fmt=str_replace($match, /* I18N: time format “%A” - exactly 12:00:00 */ WT_I18N::translate('Noon'), $time_fmt);
 			} else {
-				$time_fmt=str_replace($match, /* I18N: time format "%A" - between 12:00:01 and 23:59:59 */ WT_I18N::translate('P.M.'), $time_fmt);
+				$time_fmt=str_replace($match, /* I18N: time format “%A” - between 12:00:01 and 23:59:59 */ WT_I18N::translate('P.M.'), $time_fmt);
 			}
 				break;
 		default:

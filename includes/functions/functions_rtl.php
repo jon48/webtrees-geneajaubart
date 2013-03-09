@@ -2,7 +2,7 @@
 // RTL Functions
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_rtl.php 13527 2012-03-01 22:29:18Z greg $
+// $Id: functions_rtl.php 14737 2013-01-30 20:11:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -71,10 +71,7 @@ function spanLTRRTL($inputText, $direction='BOTH', $class='') {
 
 	if ($inputText == '') return ''; // Nothing to do
 
-	$debug = false; // false for normal operation (no calls of the DumpString function)
-
 	$spanNumber ++;
-	if ($debug) {echo '<br><b>Input ', $spanNumber, ':</b>'; DumpString($inputText);}
 
 	$workingText = str_replace("\n", '<br>', $inputText);
 	$workingText = str_replace(array('<span class="starredname"><br>', '<span<br>class="starredname">'), '<br><span class="starredname">',$workingText); // Reposition some incorrectly placed line breaks
@@ -373,7 +370,6 @@ function spanLTRRTL($inputText, $direction='BOTH', $class='') {
 	}
 
 	// Lastly, do some more cleanups
-	if ($debug) {echo '<b>Interim Output:</b>'; DumpString($result);}
 
 	// Move leading RTL numeric strings to following LTR text
 	// (this happens when the page direction is RTL and the original text begins with a number and is followed by LTR text)
@@ -489,7 +485,6 @@ function spanLTRRTL($inputText, $direction='BOTH', $class='') {
 		break;
 	}
 	$result = str_replace(array($startLTR, $endLTR, $startRTL, $endRTL), array($sLTR, $eLTR, $sRTL, $eRTL), $result);
-	if ($debug) {echo '<b>Final Output:</b>'; DumpString($result);}
 	return $result;
 }
 

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14111 2012-07-18 12:25:09Z greg $
+// $Id: module.php 14786 2013-02-06 22:28:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Charts" module */ WT_I18N::translate('An alternative way to display charts.');
+		return /* I18N: Description of the “Charts” module */ WT_I18N::translate('An alternative way to display charts.');
 	}
 
 	// Implement class WT_Module_Block
@@ -108,8 +108,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 					break;
 			}
 			$title .= help_link('index_charts', $this->getName());
-			$content = "<script src=\"".WT_STATIC_URL."js/webtrees.js\" type=\"text/javascript\"></script>";
-			$content .= '<table cellspacing="0" cellpadding="0" border="0"><tr>';
+			$content = '<table cellspacing="0" cellpadding="0" border="0"><tr>';
 			if ($type=='descendants' || $type=='hourglass') {
 				$content .= "<td valign=\"middle\">";
 				ob_start();

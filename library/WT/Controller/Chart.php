@@ -18,14 +18,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Chart.php 13258 2012-01-17 07:56:11Z greg $
+// $Id: Chart.php 14786 2013-02-06 22:28:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-class WT_Controller_Chart extends WT_Controller_Base {
+class WT_Controller_Chart extends WT_Controller_Page {
 	public $root;
 	public $rootid;
 	public $error_message=null;

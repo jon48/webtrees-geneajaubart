@@ -26,14 +26,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: db_schema_19_20.php 14417 2012-10-13 08:06:31Z greg $
+// $Id: db_schema_19_20.php 14672 2013-01-18 18:31:49Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-self::exec("UPDATE `##default_resn` SET xref=NULL WHERE xref=''");
+self::exec("UPDATE `##default_resn` SET xref    =NULL WHERE xref    =''");
+self::exec("UPDATE `##default_resn` SET tag_type=NULL WHERE tag_type=''");
 
 // Update the version to indicate success
 WT_Site::preference($schema_name, $next_version);

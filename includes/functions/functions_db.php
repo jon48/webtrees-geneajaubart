@@ -1,11 +1,8 @@
 <?php
-// Functions to query the database.
-//
-// This file implements the datastore functions necessary for webtrees
-// to use an SQL database as its datastore.
+// General functions to query the database.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -24,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_db.php 14294 2012-09-15 11:36:34Z greg $
+// $Id: functions_db.php 14779 2013-02-04 21:11:52Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -66,7 +63,7 @@ function count_linked_repo($xref, $link, $ged_id) {
 }
 function count_linked_obje($xref, $link, $ged_id) {
 	return
-		WT_DB::prepare("SELECT COUNT(*) FROM `##link`, `##media` WHERE m_gedfile=l_file AND m_media=l_from AND l_file=? AND l_type=? AND l_to=?")
+		WT_DB::prepare("SELECT COUNT(*) FROM `##link`, `##media` WHERE m_file=l_file AND m_id=l_from AND l_file=? AND l_type=? AND l_to=?")
 		->execute(array($ged_id, $link, $xref))
 		->fetchOne();
 }
@@ -127,9 +124,8 @@ function fetch_linked_sour($xref, $link, $ged_id) {
 			"SELECT 'SOUR' AS type, s_id AS xref, s_file AS ged_id, s_gedcom AS gedrec".
 			" FROM `##sources`".
 			" JOIN `##link` ON (s_file=l_file AND s_id=l_from)".
-			" LEFT JOIN `##name` ON (s_file=n_file AND s_id=n_id AND n_num=0)".
 			" WHERE s_file=? AND l_type=? AND l_to=?".
-			" ORDER BY n_sort COLLATE '".WT_I18N::$collation."'"
+			" ORDER BY s_name COLLATE '".WT_I18N::$collation."'"
 		)->execute(array($ged_id, $link, $xref))->fetchAll(PDO::FETCH_ASSOC);
 
 	$list=array();
@@ -156,12 +152,11 @@ function fetch_linked_repo($xref, $link, $ged_id) {
 }
 function fetch_linked_obje($xref, $link, $ged_id) {
 	$rows=WT_DB::prepare(
-		"SELECT 'OBJE' AS type, m_media AS xref, m_gedfile AS ged_id, m_gedrec AS gedrec, m_titl, m_file".
+		"SELECT 'OBJE' AS type, m_id AS xref, m_file AS ged_id, m_gedcom AS gedrec, m_titl, m_filename".
 		" FROM `##media`".
-		" JOIN `##link` ON (m_gedfile=l_file AND m_media=l_from)".
-		" LEFT JOIN `##name` ON (m_gedfile=n_file AND m_media=n_id AND n_num=0)".
-		" WHERE m_gedfile=? AND l_type=? AND l_to=?".
-		" ORDER BY n_sort COLLATE '".WT_I18N::$collation."'"
+		" JOIN `##link` ON (m_file=l_file AND m_id=l_from)".
+		" WHERE m_file=? AND l_type=? AND l_to=?".
+		" ORDER BY m_titl COLLATE '".WT_I18N::$collation."'"
 	)->execute(array($ged_id, $link, $xref))->fetchAll(PDO::FETCH_ASSOC);
 
 	$list=array();
@@ -243,7 +238,7 @@ function find_media_record($xref, $ged_id) {
 
 	if (is_null($statement)) {
 		$statement=WT_DB::prepare(
-			"SELECT m_gedrec FROM `##media` WHERE m_media=? AND m_gedfile=?"
+			"SELECT m_gedcom FROM `##media` WHERE m_id=? AND m_file=?"
 		);
 	}
 	return $statement->execute(array($xref, $ged_id))->fetchOne();
@@ -303,11 +298,11 @@ function gedcom_record_type($xref, $ged_id) {
 
 	if (is_null($statement)) {
 		$statement=WT_DB::prepare(
-			"SELECT 'INDI' FROM `##individuals` WHERE i_id   =? AND i_file   =? UNION ALL ".
-			"SELECT 'FAM'  FROM `##families`    WHERE f_id   =? AND f_file   =? UNION ALL ".
-			"SELECT 'SOUR' FROM `##sources`     WHERE s_id   =? AND s_file   =? UNION ALL ".
-			"SELECT 'OBJE' FROM `##media`       WHERE m_media=? AND m_gedfile=? UNION ALL ".
-			"SELECT o_type FROM `##other`       WHERE o_id   =? AND o_file   =?"
+			"SELECT 'INDI' FROM `##individuals` WHERE i_id=? AND i_file=? UNION ALL ".
+			"SELECT 'FAM'  FROM `##families`    WHERE f_id=? AND f_file=? UNION ALL ".
+			"SELECT 'SOUR' FROM `##sources`     WHERE s_id=? AND s_file=? UNION ALL ".
+			"SELECT 'OBJE' FROM `##media`       WHERE m_id=? AND m_file=? UNION ALL ".
+			"SELECT o_type FROM `##other`       WHERE o_id=? AND o_file=?"
 		);
 	}
 
@@ -965,39 +960,6 @@ function search_repos($query, $geds, $match) {
 	return $list;
 }
 
-// THIS FUNCTION IS OLD AND DEPRECATED.  Use WT_Place::findPlaces() instead.
-//
-// It is still called from the GEDFact_assistant module (although the calling
-// code seems to be unreachable??)
-function find_place_list($place) {
-	$rows=
-		WT_DB::prepare("SELECT p_id, p_place, p_parent_id  FROM `##places` WHERE p_file=? ORDER BY p_parent_id, p_id")
-		->execute(array(WT_GED_ID))
-		->fetchAll();
-
-	$placelist=array();
-	foreach ($rows as $row) {
-		if ($row->p_parent_id==0) {
-			$placelist[$row->p_id] = $row->p_place;
-		} else {
-			$placelist[$row->p_id] = $placelist[$row->p_parent_id].", ".$row->p_place;
-		}
-	}
-	if (!empty($place)) {
-		$found = array();
-		foreach ($placelist as $indexval => $pplace) {
-			if (stripos($pplace, $place)!==false) {
-				$upperplace = utf8_strtoupper($pplace);
-				if (!isset($found[$upperplace])) {
-					$found[$upperplace] = $pplace;
-				}
-			}
-		}
-		$placelist = array_values($found);
-	}
-	return $placelist;
-}
-
 //-- function to find the gedcom id for the given rin
 function find_rin_id($rin) {
 	$xref=
@@ -1365,7 +1327,7 @@ function get_events_list($jd1, $jd2, $events='') {
 ////////////////////////////////////////////////////////////////////////////////
 function is_media_used_in_other_gedcom($file_name, $ged_id) {
 	return
-		(bool)WT_DB::prepare("SELECT COUNT(*) FROM `##media` WHERE m_file LIKE ? AND m_gedfile<>?")
+		(bool)WT_DB::prepare("SELECT COUNT(*) FROM `##media` WHERE m_filename LIKE ? AND m_file<>?")
 		->execute(array("%{$file_name}", $ged_id))
 		->fetchOne();
 }

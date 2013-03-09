@@ -2,7 +2,7 @@
 // Compact pedigree tree
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: compact.php 14111 2012-07-18 12:25:09Z greg $
+// $Id: compact.php 14693 2013-01-22 08:56:56Z greg $
 
 define('WT_SCRIPT_NAME', 'compact.php');
 require './includes/session.php';
@@ -32,13 +32,7 @@ $controller
 	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
 	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }'); // For the "find indi" link
 
-if (WT_USE_LIGHTBOX) {
-	$album = new lightbox_WT_Module();
-	$album->getPreLoadContent();
-}
-
 ?>
-
 <table class="list_table">
 	<tr>
 		<td>
@@ -76,16 +70,6 @@ if (WT_USE_LIGHTBOX) {
 	</tr>
 </table>
 <br>
-
-<?php
-
-if ($controller->error_message) {
-	echo '<p class="ui-state-error">', $controller->error_message, '</p>';
-	exit;
-}
-
-?>
-
 <table width="100%" style="text-align:center;">
 	<tr>
 		<?php echo $controller->sosa_person(16); ?>

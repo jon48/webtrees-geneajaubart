@@ -1,11 +1,8 @@
 <?php
 // Class file for the tree navigator
 //
-// Note : NEVER use person or family id as ids because a same person could
-// appear more than once in the tree.
-//
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: class_treeview.php 13961 2012-06-02 07:49:11Z lukasz $
+// $Id: class_treeview.php 14694 2013-01-22 10:37:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -139,22 +136,6 @@ class TreeView {
 	}
 
 	/**
-	* Get full resolution medias
-	* @param string $medias the list of medias to return
-	*/
-	public function getMedias($medias) {
-		$medias = explode(';', $medias);
-		$nb = count($medias);
-		$r = array();
-		for ($i=0; $i<$nb; $i++) {
-			$mid = $medias[$i];
-			$m = WT_Media::getInstance($mid);
-			$r[] = $m->getServerFilename();
-		}
-		return json_encode($r);
-	}
-
-	/**
 	* Return the details for a person
 	* @param Person $person the person to return the details for
 	*/
@@ -181,44 +162,41 @@ class TreeView {
 	*/
 	private function drawChildren($familyList, $gen=1, $ajax=false) {
 		$r ='';
-		$flWithChildren = array();
+		$children2draw = array();
 		$f2load = array();
-		$tc = 0;
+
 		foreach($familyList as $f) {
 			if (empty($f)) {
 				continue;
 			}
-			$nbcf = $f->getNumberOfChildren();
-			if ($nbcf > 0) {
-				$flWithChildren[] = $f;
+			$children = $f->getChildren();
+			if (count($children) > 0) {
 				$f2load[] = $f->getXref();
-				$tc += $nbcf;
-			}
-		}
-		if ($tc) {
-			$f2load = implode(',', $f2load);
-			if (!$ajax) {
-				$r .= '<td align="right"'.($gen == 0 ? ' abbr="c'.$f2load.'"' : '').'>';
-			}
-			$nbc = 0;
-			foreach($flWithChildren as $f) {
-				foreach ($f->getChildren() as $child) {
-					$nbc++;
-					if ($tc == 1) {
-						$co = 'c'; // unique
-					} elseif ($nbc == 1) {
-						$co = 't'; // first
-					} elseif($nbc == $tc) {
-						$co = 'b'; //last
-					} else {
-						$co = 'h';
-					}
-					$fam = null;
-					$r .= $this->drawPerson($child, $gen-1, -1, $fam, $co);
+				foreach ($children as $ch) {
+				  // Eliminate duplicates - e.g. when adopted by a step-parent
+					$children2draw[$ch->getXref()] = $ch;
 				}
 			}
+		}
+		$tc = count($children2draw);		
+		if ($tc) {
+			$f2load = implode(',', $f2load);
+			$nbc = 0;
+			foreach ($children2draw as $child) {
+				$nbc++;
+				if ($tc == 1) {
+					$co = 'c'; // unique
+				} elseif ($nbc == 1) {
+					$co = 't'; // first
+				} elseif ($nbc == $tc) {
+					$co = 'b'; //last
+				} else {
+					$co = 'h';
+				}
+				$r .= $this->drawPerson($child, $gen-1, -1, null, $co);
+			}
 			if (!$ajax) {
-				$r .= '</td>'.$this->drawHorizontalLine();
+				$r = '<td align="right"' . ($gen == 0 ? ' abbr="c'.$f2load.'"' : '') . '>' . $r . '</td>'.$this->drawHorizontalLine();
 			}
 		}
 		return $r;
@@ -344,13 +322,13 @@ class TreeView {
 			if ($f) {
 				switch ($p->getSex()) {
 				case 'M':
-					$title=' title="'.strip_tags(/* I18N: e.g. "Son of [father name & mother name]" */ WT_I18N::translate('Son of %s', $f->getFullName())).'"';
+					$title=' title="'.strip_tags(/* I18N: e.g. “Son of [father name & mother name]” */ WT_I18N::translate('Son of %s', $f->getFullName())).'"';
 					break;
 				case 'F':
-					$title=' title="'.strip_tags(/* I18N: e.g. "Daughter of [father name & mother name]" */ WT_I18N::translate('Daughter of %s', $f->getFullName())).'"';
+					$title=' title="'.strip_tags(/* I18N: e.g. “Daughter of [father name & mother name]” */ WT_I18N::translate('Daughter of %s', $f->getFullName())).'"';
 					break;
 				case 'U':
-					$title=' title="'.strip_tags(/* I18N: e.g. "Child of [father name & mother name]" */ WT_I18N::translate('Child of %s', $f->getFullName())).'"';
+					$title=' title="'.strip_tags(/* I18N: e.g. “Child of [father name & mother name]” */ WT_I18N::translate('Child of %s', $f->getFullName())).'"';
 					break;
 				}
 			} else {
@@ -373,17 +351,11 @@ class TreeView {
 	private function getThumbnail($personGroup, $person) {
 		global $SHOW_HIGHLIGHT_IMAGES;
 
-		$thumbnail='';
 		if ($SHOW_HIGHLIGHT_IMAGES) {
-			$object=$person->findHighlightedMedia();
-			if (!empty($object)) {
-				$mediaobject=WT_Media::getInstance($object['mid']);
-				$thumbnail=$mediaobject->displayMedia(array('display_type'=>'treeview','img_title'=>$person->getFullName(),'clearbox'=>'tvlb'.$personGroup->getXref()));
-			} else {
-				$thumbnail=display_silhouette(array('sex'=>$person->getSex(),'display_type'=>'treeview','img_title'=>$person->getFullName())); // may return ''
-			}
+			return $person->displayImage();
+		} else {
+			return '';
 		}
-		return $thumbnail;
 	}
 
 	/**

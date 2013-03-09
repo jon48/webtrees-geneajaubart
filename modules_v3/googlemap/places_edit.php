@@ -2,7 +2,7 @@
 // Interface to edit place locations
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team. All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: places_edit.php 14221 2012-08-27 21:48:57Z greg $
+// $Id: places_edit.php 14786 2013-02-06 22:28:50Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -41,7 +41,6 @@ $controller=new WT_Controller_Simple();
 $controller
 		->requireAdminLogin()
 		->setPageTitle(WT_I18N::translate('Geographic data'))
-		->addExternalJavascript(WT_STATIC_URL.'js/webtrees.js')
 		->pageHeader();
 
 echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet">';
@@ -86,7 +85,7 @@ if ($action=='addrecord' && WT_USER_IS_ADMIN) {
 	if (!WT_DEBUG) {
 		$controller->addInlineJavaScript('closePopupAndReloadParent();');
 	}
-	echo "<div class=\"center\"><a href=\"#\" onclick=\"closePopupAndReloadParent();return false;\">", WT_I18N::translate('Close Window'), "</a></div><br>";
+	echo "<div class=\"center\"><button onclick=\"closePopupAndReloadParent();return false;\">", WT_I18N::translate('close'), "</button></div>";
 	exit;
 }
 
@@ -104,7 +103,7 @@ if ($action=='updaterecord' && WT_USER_IS_ADMIN) {
 	if (!WT_DEBUG) {
 		$controller->addInlineJavaScript('closePopupAndReloadParent();');
 	}
-	echo "<div class=\"center\"><a href=\"#\" onclick=\"closePopupAndReloadParent();return false;\">", WT_I18N::translate('Close Window'), "</a></div><br>";
+	echo "<div class=\"center\"><button onclick=\"closePopupAndReloadParent();return false;\">", WT_I18N::translate('close'), "</button></div>";
 	exit;
 }
 
@@ -124,7 +123,7 @@ if ($action=='update_sv_params' && WT_USER_IS_ADMIN) {
 	if (!WT_DEBUG) {
 		$controller->addInlineJavaScript('closePopupAndReloadParent();');
 	}
-	echo "<div class=\"center\"><a href=\"#\" onclick=\"closePopupAndReloadParent();return false;\">", WT_I18N::translate('Close Window'), "</a></div><br>";
+	echo "<div class=\"center\"><button onclick=\"closePopupAndReloadParent();return false;\">", WT_I18N::translate('close'), "</button></div>";
 	exit;
 }
 
@@ -178,7 +177,7 @@ if ($action=="update") {
 
 	$success = false;
 
-	echo '<b>', str_replace('Unknown', WT_I18N::translate('unknown'), implode(WT_I18N::$list_separator, array_reverse($where_am_i, true))), '</b><br>';
+	echo '<b>', htmlspecialchars(str_replace('Unknown', WT_I18N::translate('unknown'), implode(WT_I18N::$list_separator, array_reverse($where_am_i, true)))), '</b><br>';
 }
 
 if ($action=='add') {
@@ -227,7 +226,7 @@ if ($action=='add') {
 	if (!isset($place_name) || $place_name=="") echo '<b>', WT_I18N::translate('unknown');
 	else echo '<b>', $place_name;
 	if (count($where_am_i)>0)
-		echo ', ', str_replace('Unknown', WT_I18N::translate('unknown'), implode(WT_I18N::$list_separator, array_reverse($where_am_i, true))), '</b><br>';
+		echo ', ', htmlspecialchars(str_replace('Unknown', WT_I18N::translate('unknown'), implode(WT_I18N::$list_separator, array_reverse($where_am_i, true)))), '</b><br>';
 	echo '</b><br>';
 }
 
@@ -246,7 +245,6 @@ $api='v3';
 	<input type="hidden" name="place_lati" value="<?php echo $place_lati; ?>">
 	<input type="hidden" name="parent_long" value="<?php echo $parent_long; ?>">
 	<input type="hidden" name="parent_lati" value="<?php echo $parent_lati; ?>">
-	<input name="save1" type="submit" value="<?php echo WT_I18N::translate('Save'); ?>"><br>
 
 	<table class="facts_table">
 	<tr>
@@ -343,7 +341,8 @@ $api='v3';
 			</div></td>
 	</tr>
 	</table>
-	<input name="save2" type="submit" value="<?php echo WT_I18N::translate('Save'); ?>"><br>
+	<p id="save-cancel">
+		<input type="submit" class="save" value="<?php echo WT_I18N::translate('save'); ?>">
+		<input type="button" class="cancel" value="<?php echo WT_I18N::translate('close'); ?>" onclick="window.close();">
+	</p>
 </form>
-<?php
-echo '<p class="center"><a href="#" onclick="closePopupAndReloadParent();">', WT_I18N::translate('Close Window'), '</a></p>';

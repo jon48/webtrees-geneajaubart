@@ -5,7 +5,7 @@
 // Updates to one file almost certainly need to be made to the other one as well.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: indilist.php 13598 2012-03-17 13:03:02Z greg $
+// $Id: indilist.php 14786 2013-02-06 22:28:50Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$ 
 
@@ -32,7 +32,7 @@ define('WT_SCRIPT_NAME', 'indilist.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 
 // We show three different lists: initials, surnames and individuals
 // Note that the data may contain special chars, such as surname="<unknown>",

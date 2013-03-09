@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: MenuBar.php 14328 2012-09-21 02:43:56Z nigel $
+// $Id: MenuBar.php 14549 2012-11-16 13:58:16Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -293,7 +293,7 @@ class WT_MenuBar {
 			" EXISTS(SELECT 1 FROM `##sources` WHERE s_file=?                  ) AS sour,".
 			" EXISTS(SELECT 1 FROM `##other`   WHERE o_file=? AND o_type='REPO') AS repo,".
 			" EXISTS(SELECT 1 FROM `##other`   WHERE o_file=? AND o_type='NOTE') AS note,".
-			" EXISTS(SELECT 1 FROM `##media`   WHERE m_gedfile=?               ) AS obje"
+			" EXISTS(SELECT 1 FROM `##media`   WHERE m_file=?                  ) AS obje"
 		)->execute(array(WT_GED_ID, WT_GED_ID, WT_GED_ID, WT_GED_ID))->fetchOneRow();
 
 		// Build a list of submenu items and then sort it in localized name order
@@ -440,7 +440,7 @@ class WT_MenuBar {
 		$submenu = new WT_Menu(WT_I18N::translate('General search'), 'search.php?ged='.WT_GEDURL, 'menu-search-general');
 		$menu->addSubmenu($submenu);
 		//-- search_soundex sub menu
-		$submenu = new WT_Menu(/* I18N: search using "sounds like", rather than exact spelling */ WT_I18N::translate('Phonetic search'), 'search.php?ged='.WT_GEDURL.'&amp;action=soundex', 'menu-search-soundex');
+		$submenu = new WT_Menu(/* I18N: search using “sounds like”, rather than exact spelling */ WT_I18N::translate('Phonetic search'), 'search.php?ged='.WT_GEDURL.'&amp;action=soundex', 'menu-search-soundex');
 		$menu->addSubmenu($submenu);
 		//-- advanced search
 		$submenu = new WT_Menu(WT_I18N::translate('Advanced search'), 'search_advanced.php?ged='.WT_GEDURL, 'menu-search-advanced');

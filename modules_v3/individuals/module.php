@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14209 2012-08-26 07:11:08Z greg $
+// $Id: module.php 14805 2013-02-15 20:29:38Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return /* I18N: Description of "Individuals" module */ WT_I18N::translate('A sidebar showing an alphabetic list of all the individuals in the family tree.');
+		return /* I18N: Description of “Individuals” module */ WT_I18N::translate('A sidebar showing an alphabetic list of all the individuals in the family tree.');
 	}
 
 	// Implement WT_Module
@@ -92,7 +92,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			var loadedNames = new Array();
 
 			function isearchQ() {
-				var query = jQuery("#sb_indi_name").attr("value");
+				var query = jQuery("#sb_indi_name").val();
 				if (query.length>1) {
 					jQuery("#sb_indi_content").load("module.php?mod='.$this->getName().'&mod_action=ajax&sb_action=individuals&search="+query);
 				}
@@ -103,11 +103,11 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 				if (timerid) window.clearTimeout(timerid);
 				timerid = window.setTimeout("isearchQ()", 500);
 			});
-			jQuery(".sb_indi_letter").live("click", function() {
+			jQuery("#sb_content_individuals").on("click", ".sb_indi_letter", function() {
 				jQuery("#sb_indi_content").load(this.href);
 				return false;
 			});
-			jQuery(".sb_indi_surname").live("click", function() {
+			jQuery("#sb_content_individuals").on("click", ".sb_indi_surname", function() {
 				var surname = jQuery(this).attr("title");
 				var alpha = jQuery(this).attr("alt");
 

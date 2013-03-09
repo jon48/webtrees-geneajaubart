@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Source.php 13634 2012-03-23 16:00:17Z greg $
+// $Id: Source.php 14642 2013-01-12 23:39:52Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -45,6 +45,7 @@ class WT_Controller_Source extends WT_Controller_GedcomRecord {
 		if ($gedrec===null) {
 			if ($newrec===null) {
 				// Nothing to see here.
+				parent::__construct();
 				return;
 			} else {
 				// Create a dummy record from the first line of the new record.
@@ -102,7 +103,7 @@ class WT_Controller_Source extends WT_Controller_GedcomRecord {
 		// delete
 		if (WT_USER_CAN_EDIT) {
 			$submenu = new WT_Menu(WT_I18N::translate('Delete'), '#', 'menu-sour-del');
-			$submenu->addOnclick("if (confirm('".addslashes(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($this->record->getFullName())))."')) jQuery.post('action.php',{action:'delete-source',xref:'".$this->record->getXref()."'},function(){location.reload();})");
+			$submenu->addOnclick("if (confirm('".WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($this->record->getFullName()))."')) jQuery.post('action.php',{action:'delete-source',xref:'".$this->record->getXref()."'},function(){location.reload();})");
 			$menu->addSubmenu($submenu);
 		}
 

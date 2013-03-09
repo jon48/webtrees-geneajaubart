@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Place.php 14306 2012-09-16 06:48:51Z greg $
+// $Id: Place.php 14511 2012-11-03 16:41:01Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -170,10 +170,10 @@ class WT_Place {
 				" LEFT JOIN `##places` AS p7 ON (p6.p_parent_id=p7.p_id)".
 				" LEFT JOIN `##places` AS p8 ON (p7.p_parent_id=p8.p_id)".
 				" LEFT JOIN `##places` AS p9 ON (p8.p_parent_id=p9.p_id)".
-				" WHERE p1.p_place LIKE CONCAT('%', ?, '%') AND p1.p_file=?".
-				" ORDER BY p1.p_place COLLATE '".WT_I18N::$collation."'"
+				" WHERE CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place) LIKE CONCAT('%', ?, '%') AND CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place) NOT LIKE CONCAT('%,%', ?, '%') AND p1.p_file=?".
+				" ORDER BY  CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place) COLLATE '".WT_I18N::$collation."'"
 			)
-			->execute(array($filter, $gedcom_id))
+			->execute(array($filter, $filter, $gedcom_id))
 			->fetchOneColumn();
 		foreach ($rows as $row) {
 			$places[]=new WT_Place($row, $gedcom_id);

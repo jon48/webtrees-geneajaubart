@@ -32,7 +32,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: db_schema_1_2.php 14276 2012-09-14 15:39:40Z greg $
+// $Id: db_schema_1_2.php 14468 2012-10-27 19:33:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -40,7 +40,7 @@ if (!defined('WT_WEBTREES')) {
 }
 
 // Create all of the tables needed for this module
-//try {
+try {
 	WT_DB::exec(
 		"ALTER TABLE `##placelocation` ADD (".
 		" pl_media      VARCHAR(60)     NULL,".
@@ -51,9 +51,9 @@ if (!defined('WT_WEBTREES')) {
 		" sv_zoom       FLOAT           NOT NULL DEFAULT 1".
 		")"
 	);
-//} catch (PDOException $ex) {
+} catch (PDOException $ex) {
 	// Already done this?
-//}
+}
 
 // Update the version to indicate success
 WT_Site::preference($schema_name, $next_version);

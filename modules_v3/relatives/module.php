@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14293 2012-09-15 11:30:29Z greg $
+// $Id: module.php 14771 2013-02-04 16:42:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -32,11 +32,15 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 	// Extend WT_Module
 	public function getTitle() {
 		return /* I18N: Name of a module */ WT_I18N::translate('Families');
+
+		// Keep these deleted translations for a while - we may want them again... 
+		WT_I18N::translate('Add a new spouse');
+		WT_I18N::translate('Add a new parent');
 	}
 
 	// Extend WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Families" module */ WT_I18N::translate('A tab showing the close relatives of an individual.');
+		return /* I18N: Description of the “Families” module */ WT_I18N::translate('A tab showing the close relatives of an individual.');
 	}
 
 	// Implement WT_Module_Tab
@@ -95,7 +99,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 				?>
 				<tr>
 					<td class="facts_label"><?php echo WT_I18N::translate('Add a new father'); ?></td>
-					<td class="facts_value"><a href="#" onclick="return addnewparentfamily('<?php echo $controller->record->getXref(); ?>', 'HUSB', '<?php echo $family->getXref(); ?>');"><?php echo WT_I18N::translate('Add a new father'); ?></a><?php echo help_link('edit_add_parent'); ?></td>
+					<td class="facts_value"><a href="#" onclick="return addnewparentfamily('<?php echo $controller->record->getXref(); ?>', 'HUSB', '<?php echo $family->getXref(); ?>');"><?php echo WT_I18N::translate('Add a new father'); ?></a></td>
 				</tr>
 				<?php
 			}
@@ -141,7 +145,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 				?>
 				<tr>
 					<td class="facts_label"><?php echo WT_I18N::translate('Add a new mother'); ?></td>
-					<td class="facts_value"><a href="#" onclick="return addnewparentfamily('<?php echo $controller->record->getXref(); ?>', 'WIFE', '<?php echo $family->getXref(); ?>');"><?php echo WT_I18N::translate('Add a new mother'); ?></a><?php echo help_link('edit_add_parent'); ?></td>
+					<td class="facts_value"><a href="#" onclick="return addnewparentfamily('<?php echo $controller->record->getXref(); ?>', 'WIFE', '<?php echo $family->getXref(); ?>');"><?php echo WT_I18N::translate('Add a new mother'); ?></a></td>
 				</tr>
 				<?php
 			}
@@ -159,59 +163,47 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 		}
 		//-- marriage row
 		if ($family->getMarriageRecord()!="" || WT_USER_CAN_EDIT) {
-			$styleadd = "";
-			$date = $family->getMarriageDate();
-			$place = $family->getMarriagePlace();
-			$famid = $family->getXref();
 			?>
 			<tr>
 				<td class="facts_label">
 					&nbsp;
 				</td>
-				<td class="facts_value<?php echo $styleadd; ?>">
+				<td class="facts_value">
 					<?php $marr_type = strtoupper($family->getMarriageType());
 					if ($marr_type=='CIVIL' || $marr_type=='PARTNERS' || $marr_type=='RELIGIOUS' || $marr_type=='UNKNOWN') {
-						$marr_fact = WT_Gedcom_Tag::getLabel("MARR_".$marr_type);
-					} else if ($marr_type) {
-						$marr_fact = WT_Gedcom_Tag::getLabel("MARR").' '.$family->getMarriageType();
+						$marr_fact = 'MARR_' . $marr_type;
 					} else {
-						$marr_fact = WT_Gedcom_Tag::getLabel("MARR");
+						$marr_fact = 'MARR';
 					}
+					$famid = $family->getXref();
+					$place = $family->getMarriagePlace();
+					$date = $family->getMarriageDate();
 					if ($date && $date->isOK() || $place) {
-						echo '<span class="details_label">', $marr_fact, ': </span>';
 						if ($date) {
-							echo $date->Display(false);
-							if (!empty($place)) echo ' -- ';
+							$details=$date->Display(false);
 						}
-						if (!empty($place)) {
+						if ($place) {
+							if ($details) {
+								$details .= ' — ';
+							}
 							$tmp=new WT_Place($place, WT_GED_ID);
-							echo $tmp->getShortName();
+							$details .= $tmp->getShortName();
 						}
+						echo WT_Gedcom_Tag::getLabelValue('MARR', $details);
 					} else if (get_sub_record(1, "1 _NMR", find_family_record($famid, WT_GED_ID))) {
 						$husb = $family->getHusband();
 						$wife = $family->getWife();
-						if (empty($wife) && !empty($husb)) echo WT_Gedcom_Tag::getLabel('_NMR', $husb);
-						else if (empty($husb) && !empty($wife)) echo WT_Gedcom_Tag::getLabel('_NMR', $wife);
-						else echo WT_Gedcom_Tag::getLabel('_NMR');
-					} else if (get_sub_record(1, "1 _NMAR", find_family_record($famid, WT_GED_ID))) {
-						$husb = $family->getHusband();
-						$wife = $family->getWife();
-						if (empty($wife) && !empty($husb)) echo WT_Gedcom_Tag::getLabel('_NMAR', $husb);
-						else if (empty($husb) && !empty($wife)) echo WT_Gedcom_Tag::getLabel('_NMAR', $wife);
-						else echo WT_Gedcom_Tag::getLabel('_NMAR');
+						if (empty($wife) && !empty($husb)) {
+							echo WT_Gedcom_Tag::getLabel('_NMR', $husb);
+						} elseif (empty($husb) && !empty($wife)) {
+							echo WT_Gedcom_Tag::getLabel('_NMR', $wife);
+						} else {
+							echo WT_Gedcom_Tag::getLabel('_NMR');
+						}
 					} else if ($family->getMarriageRecord()=="" && $controller->record->canEdit()) {
 						echo "<a href=\"#\" onclick=\"return add_new_record('".$famid."', 'MARR');\">".WT_I18N::translate('Add marriage details')."</a>";
 					} else {
-						$factdetail = explode(' ', trim($family->getMarriageRecord()));
-						if (isset($factdetail) && count($factdetail) == 3) {
-							if (strtoupper($factdetail[2]) == "Y") {
-								echo '<span class="details_label">', $marr_fact, ': </span>', WT_I18N::translate('yes');
-							} else if (strtoupper($factdetail[2]) == "N") {
-								echo '<span class="details_label">', $marr_fact, ': </span>', WT_I18N::translate('no');
-							}
-						} else {
-							echo '<span class="details_label">', $marr_fact, '</span>';
-						}
+						echo WT_Gedcom_Tag::getLabelValue($marr_fact, WT_I18N::translate('yes'));
 					}
 					?>
 				</td>
@@ -323,7 +315,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 		?>
 		<table class="facts_table"><tr><td colspan="2" class="descriptionbox rela">
 		<input id="checkbox_elder" type="checkbox" onclick="jQuery('div.elderdate').toggle();" <?php if ($SHOW_AGE_DIFF) echo "checked=\"checked\""; ?>>
-		<label for="checkbox_elder"><?php echo WT_I18N::translate('Show date differences'), help_link('age_differences'); ?></label>
+		<label for="checkbox_elder"><?php echo WT_I18N::translate('Show date differences'); ?></label>
 		</td></tr></table>
 		<?php
 		$personcount=0;
@@ -333,10 +325,10 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 				?>
 				<table class="facts_table">
 					<tr>
-						<td class="facts_value"><a href="#" onclick="return addnewparent('<?php echo $controller->record->getXref(); ?>', 'HUSB');"><?php echo WT_I18N::translate('Add a new father'); ?></a><?php echo help_link('edit_add_parent'); ?></td>
+						<td class="facts_value"><a href="#" onclick="return addnewparent('<?php echo $controller->record->getXref(); ?>', 'HUSB');"><?php echo WT_I18N::translate('Add a new father'); ?></td>
 					</tr>
 					<tr>
-						<td class="facts_value"><a href="#" onclick="return addnewparent('<?php echo $controller->record->getXref(); ?>', 'WIFE');"><?php echo WT_I18N::translate('Add a new mother'); ?></a><?php echo help_link('edit_add_parent'); ?></td>
+						<td class="facts_value"><a href="#" onclick="return addnewparent('<?php echo $controller->record->getXref(); ?>', 'WIFE');"><?php echo WT_I18N::translate('Add a new mother'); ?></a></td>
 					</tr>
 				</table>
 				<?php
@@ -395,34 +387,29 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 			if (count($families)>1) { ?>
 			<tr>
 				<td class="facts_value">
-				<a href="#" onclick="return reorder_families('<?php echo $controller->record->getXref(); ?>');"><?php echo WT_I18N::translate('Reorder families'); ?></a>
-				<?php echo help_link('reorder_families'); ?>
+				<a href="#" onclick="return reorder_families('<?php echo $controller->record->getXref(); ?>');"><?php echo WT_I18N::translate('Re-order families'); ?></a>
 				</td>
 			</tr>
 		<?php } ?>
 			<tr>
 				<td class="facts_value">
 				<a href="#" onclick="return add_famc('<?php echo $controller->record->getXref(); ?>');"><?php echo WT_I18N::translate('Link this person to an existing family as a child'); ?></a>
-				<?php echo help_link('link_child'); ?>
 				</td>
 			</tr>
 			<?php if ($controller->record->getSex()!="F") { ?>
 			<tr>
 				<td class="facts_value">
 				<a href="#" onclick="return addspouse('<?php echo $controller->record->getXref(); ?>','WIFE');"><?php echo WT_I18N::translate('Add a new wife'); ?></a>
-				<?php echo help_link('add_wife'); ?>
 				</td>
 			</tr>
 			<tr>
 				<td class="facts_value">
 				<a href="#" onclick="return linkspouse('<?php echo $controller->record->getXref(); ?>','WIFE');"><?php echo WT_I18N::translate('Add a wife using an existing person'); ?></a>
-				<?php echo help_link('link_new_wife'); ?>
 				</td>
 			</tr>
 			<tr>
 				<td class="facts_value">
 				<a href="#" onclick="return add_fams('<?php echo $controller->record->getXref(); ?>','HUSB');"><?php echo WT_I18N::translate('Link this person to an existing family as a husband'); ?></a>
-				<?php echo help_link('link_new_husb'); ?>
 				</td>
 			</tr>
 			<?php }
@@ -430,26 +417,22 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 			<tr>
 				<td class="facts_value">
 				<a href="#" onclick="return addspouse('<?php echo $controller->record->getXref(); ?>','HUSB');"><?php echo WT_I18N::translate('Add a new husband'); ?></a>
-				<?php echo help_link('add_husband'); ?>
 				</td>
 			</tr>
 			<tr>
 				<td class="facts_value">
 				<a href="#" onclick="return linkspouse('<?php echo $controller->record->getXref(); ?>','HUSB');"><?php echo WT_I18N::translate('Add a husband using an existing person'); ?></a>
-				<?php echo help_link('link_husband'); ?>
 				</td>
 			</tr>
 			<tr>
 				<td class="facts_value">
 				<a href="#" onclick="return add_fams('<?php echo $controller->record->getXref(); ?>','WIFE');"><?php echo WT_I18N::translate('Link this person to an existing family as a wife'); ?></a>
-				<?php echo help_link('link_wife'); ?>
 				</td>
 			</tr>
 			<?php } ?>
 			<tr>
 				<td class="facts_value">
 				<a href="#" onclick="return addopfchild('<?php echo $controller->record->getXref(); ?>','U');"><?php echo WT_I18N::translate('Add a child to create a one-parent family'); ?></a>
-				<?php echo help_link('add_opf_child'); ?>
 				</td>
 			</tr>
 		</table>
@@ -481,11 +464,6 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function getPreLoadContent() {
-		return '';
-	}
-
-	// Implement WT_Module_Tab
-	public function getJSCallback() {
 		return '';
 	}
 }

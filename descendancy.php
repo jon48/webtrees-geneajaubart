@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: descendancy.php 14111 2012-07-18 12:25:09Z greg $
+// $Id: descendancy.php 14693 2013-01-22 08:56:56Z greg $
 
 define('WT_SCRIPT_NAME', 'descendancy.php');
 require './includes/session.php';
@@ -32,11 +32,6 @@ $controller
 	->pageHeader()
 	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
 	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }'); // For the "find indi" link
-
-if (WT_USE_LIGHTBOX) {
-	$album = new lightbox_WT_Module();
-	$album->getPreLoadContent();
-}
 
 echo '<table><tr><td valign="top"><h2>', $controller->getPageTitle(), '</h2>';
 echo '</td><td width="50px">&nbsp;</td><td><form method="get" name="people" action="?">';

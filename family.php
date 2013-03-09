@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: family.php 14079 2012-07-07 06:11:43Z greg $
+// $Id: family.php 14693 2013-01-22 08:56:56Z greg $
 
 define('WT_SCRIPT_NAME', 'family.php');
 require './includes/session.php';
@@ -36,7 +36,7 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
-				/* I18N: %1$s is "accept", %2$s is "reject".  These are links. */ WT_I18N::translate(
+				/* I18N: %1$s is “accept”, %2$s is “reject”.  These are links. */ WT_I18N::translate(
 					'This family has been deleted.  You should review the deletion and then %1$s or %2$s it.',
 					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'accept') . '</a>',
 					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'reject') . '</a>'
@@ -54,7 +54,7 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
-				/* I18N: %1$s is "accept", %2$s is "reject".  These are links. */ WT_I18N::translate(
+				/* I18N: %1$s is “accept”, %2$s is “reject”.  These are links. */ WT_I18N::translate(
 					'This family has been edited.  You should review the changes and then %1$s or %2$s them.',
 					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'accept') . '</a>',
 					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'reject') . '</a>'
@@ -78,11 +78,6 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 	$controller->pageHeader();
 	echo '<p class="ui-state-error">', WT_I18N::translate('This family does not exist or you do not have permission to view it.'), '</p>';
 	exit;
-}
-
-if (WT_USE_LIGHTBOX) {
-	$album = new lightbox_WT_Module();
-	$album->getPreLoadContent();
 }
 
 $PEDIGREE_FULL_DETAILS = '1'; // Override GEDCOM configuration
@@ -126,7 +121,7 @@ echo '</script>';
 								$husb=$controller->record->getHusband();
 							}
 							if (!$husb) {
-								echo '<a href="#" onclick="return addnewparentfamily(\'\', \'HUSB\', \'', $controller->record->getXref(), '\');">', WT_I18N::translate('Add a new father'), help_link('edit_add_parent'), '</a><br>';
+								echo '<a href="#" onclick="return addnewparentfamily(\'\', \'HUSB\', \'', $controller->record->getXref(), '\');">', WT_I18N::translate('Add a new father'), '</a><br>';
 							}
 							if ($controller->diff_record) {
 								$wife=$controller->diff_record->getWife();
@@ -134,7 +129,7 @@ echo '</script>';
 								$wife=$controller->record->getWife();
 							}
 							if (!$wife)  {
-								echo '<a href="#" onclick="return addnewparentfamily(\'\', \'WIFE\', \'', $controller->record->getXref(), '\');">', WT_I18N::translate('Add a new mother'), help_link('edit_add_parent'), '</a><br>';
+								echo '<a href="#" onclick="return addnewparentfamily(\'\', \'WIFE\', \'', $controller->record->getXref(), '\');">', WT_I18N::translate('Add a new mother'), '</a><br>';
 							}
 						}
 						?>
@@ -143,9 +138,12 @@ echo '</script>';
 				</tr>
 				<tr>
 					<td colspan="2">
+					<span class="subheaders"><?php echo WT_I18N::translate('Family Group Information'); ?></span>
 						<?php
 							if ($controller->record->canDisplayDetails()) {
-								print_family_facts($controller->record);
+								echo '<table class="facts_table">';
+								$controller->printFamilyFacts();
+								echo '</table>';
 							} else {
 								echo '<p class="ui-state-highlight">', WT_I18N::translate('The details of this family are private.'), '</p>';
 							}

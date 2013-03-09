@@ -21,14 +21,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 14386 2012-10-03 17:35:05Z greg $
+// $Id: header.php 14766 2013-02-03 16:51:34Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-global $DATE_FORMAT;
+// This theme uses the jQuery “colorbox” plugin to display images
+$this
+	->addExternalJavascript(WT_JQUERY_COLORBOX_URL)
+	->addExternalJavascript(WT_JQUERY_WHEELZOOM_URL)
+	->addInlineJavascript('activate_colorbox();');
 
 echo
 	'<!DOCTYPE html>',
@@ -38,7 +42,7 @@ echo
 	'<title>', htmlspecialchars($title), '</title>',
 	header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
 	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
-	'<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css">',
+	'<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'jquery-ui-1.10.0/jquery-ui-1.10.0.custom.css">',
 	'<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.css', '">';
 
 //PERSO Add extra style sheet for personal additions
@@ -150,13 +154,8 @@ if ($view!='simple') { // Use "simple" headers for popup windows
 				}
 				unset($menu_items, $menu);
 	echo
-			'</ul>',  // <ul id="main-menu">
-		'</div>'; // <div id="topMenu">
-	// Display feedback from asynchronous actions
-	echo '<div id="flash-messages">';
-	foreach (Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->getMessages() as $message) {
-		echo '<p class="ui-state-highlight">', $message, '</p>';
-	}
-	echo '</div>'; // <div id="flash-messages">
+		'</ul>',  // <ul id="main-menu">
+		'</div>', // <div id="topMenu">
+		WT_FlashMessages::getHtmlMessages(); // Feedback from asynchronous actions
 }
 echo $javascript, '<div id="content">';

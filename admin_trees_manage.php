@@ -2,7 +2,7 @@
 // UI for online updating of the GEDCOM configuration.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,26 +18,26 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_manage.php 14307 2012-09-16 19:00:55Z greg $
+// $Id: admin_trees_manage.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_manage.php');
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->requireAdminLogin()
 	->setPageTitle(WT_I18N::translate('Family trees'));
 
-// Don't allow the user to cancel the request.  We do not want to be left
+// Don’t allow the user to cancel the request.  We do not want to be left
 // with an incomplete transaction.
 ignore_user_abort(true);
 
 // $path is the full path to the (possibly temporary) file.
-// $filename is the actual filename (no directory).
+// $filename is the actual filename (no folder).
 function import_gedcom_file($gedcom_id, $path, $filename) {
 	// Read the file in blocks of roughly 64K.  Ensure that each block
-	// contains complete gedcom records.  This will ensure we don't split
+	// contains complete gedcom records.  This will ensure we don’t split
 	// multi-byte characters, as well as simplifying the code to import
 	// each block.
 
@@ -52,7 +52,7 @@ function import_gedcom_file($gedcom_id, $path, $filename) {
 		// There is no strrpos() function that searches for substrings :-(
 		for ($pos=strlen($file_data)-1; $pos>0; --$pos) {
 			if ($file_data[$pos]=='0' && ($file_data[$pos-1]=="\n" || $file_data[$pos-1]=="\r")) {
-				// We've found the last record boundary in this chunk of data
+				// We’ve found the last record boundary in this chunk of data
 				break;
 			}
 		}
@@ -166,7 +166,7 @@ case 'importform':
 	}
 	echo '<br><br><input type="checkbox" name="keep_media', $gedcom_id, '" value="1">';
 	echo WT_I18N::translate('If you have created media objects in webtrees, and have edited your gedcom off-line using a program that deletes media objects, then check this box to merge the current media objects with the new GEDCOM.');
-	echo '<br><br><input type="submit" value="', WT_I18N::translate('Continue'), '">';
+	echo '<br><br><input type="submit" value="', WT_I18N::translate('continue'), '">';
 	echo '</form>';
 	exit;
 }
@@ -226,7 +226,7 @@ foreach (WT_Tree::GetAll() as $tree) {
 			help_link('upload_gedcom'),
 			'</td>',
 			// delete
-			'<td><a href="', WT_SCRIPT_NAME, '?action=delete&amp;ged=', $tree->tree_name_url, '" onclick="return confirm(\''.WT_I18N::translate('Permanently delete the GEDCOM %s and all its settings?', $tree->tree_name_html),'\');">', WT_I18N::translate('Delete'), '</a>',
+			'<td><a href="', WT_SCRIPT_NAME, '?action=delete&amp;ged=', $tree->tree_name_url, '" onclick="return confirm(\''.WT_I18N::translate('Are you sure you want to delete “%s”?', $tree->tree_name_html),'\');">', WT_I18N::translate('Delete'), '</a>',
 			'</td></tr></table></td></tr></table><br>';
 	}
 }
@@ -250,7 +250,7 @@ if (WT_USER_IS_ADMIN) {
 		'<form name="createform" method="post" action="', WT_SCRIPT_NAME, '">',
 		'<input type="hidden" name="action" value="new_ged">',
 		'<input name="ged_name">',
-		' <input type="submit" value="', WT_I18N::translate('Save') , '">',
+		' <input type="submit" value="', WT_I18N::translate('save') , '">',
 		'</form>',
 		'</td>',
 		'</tr></table><br>';

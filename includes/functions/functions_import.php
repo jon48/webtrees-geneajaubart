@@ -2,7 +2,7 @@
 // Import-specific functions
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_import.php 14088 2012-07-08 07:49:02Z greg $
+// $Id: functions_import.php 14745 2013-02-01 09:51:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -34,7 +34,7 @@ require_once WT_ROOT.'includes/functions/functions_export.php';
 
 // Tidy up a gedcom record on import, so that we can access it consistently/efficiently.
 function reformat_record_import($rec) {
-	global $WORD_WRAPPED_NOTES;
+	global $WORD_WRAPPED_NOTES, $GEDCOM_MEDIA_PATH;
 
 	// Strip out UTF8 formatting characters
 	$rec=str_replace(array(WT_UTF8_BOM, WT_UTF8_LRM, WT_UTF8_RLM), '', $rec);
@@ -565,6 +565,10 @@ function reformat_record_import($rec) {
 		case 'DATA':
 		case 'CONT':
 		case 'FILE':
+			// Strip off the user-defined path prefix
+			if ($GEDCOM_MEDIA_PATH && strpos($data, $GEDCOM_MEDIA_PATH)===0) {
+				$data=substr($data, strlen($GEDCOM_MEDIA_PATH));
+			}
 			// convert backslashes in filenames to forward slashes
 			$data = preg_replace("/\\\/", "/", $data);
 			// Don't strip tabs, even though they are not valid in gedcom data.
@@ -639,7 +643,7 @@ function import_record($gedrec, $ged_id, $update) {
 	if ($newrec!=$gedrec) {
 		$gedrec=$newrec;
 		// make sure we have the correct media id
-		if (preg_match('/0 @('.WT_REGEX_XREF.')@ ('.WT_REGEX_TAG.')/', $gedrec, $match)) {
+		if (preg_match('/^0 @('.WT_REGEX_XREF.')@ ('.WT_REGEX_TAG.')/', $gedrec, $match)) {
 			list(,$xref, $type)=$match;
 		} else {
 			echo WT_I18N::translate('Invalid GEDCOM format'), '<br><pre>', $gedrec, '</pre>';
@@ -781,8 +785,6 @@ function update_places($gid, $ged_id, $gedrec) {
 
 		foreach ($secalp as $indexval => $place) {
 			$place = trim($place);
-			$place=preg_replace('/\\\"/', "", $place);
-			$place=preg_replace("/[\><]/", "", $place);
 			$key = strtolower($place."_".$parent_id);
 			//-- if this place has already been added then we don't need to add it again
 			if (isset($placecache[$key])) {
@@ -914,16 +916,12 @@ function update_names($xref, $ged_id, $record) {
 * @param int $count The count of OBJE records in the parent record
 */
 function insert_media($objrec, $objlevel, $update, $gid, $ged_id, $count) {
-	global $media_count, $found_ids;
+	global $found_ids;
 
 	static $sql_insert_media=null;
-	static $sql_insert_media_mapping=null;
 	if (!$sql_insert_media) {
 		$sql_insert_media=WT_DB::prepare(
-			"INSERT INTO `##media` (m_media, m_ext, m_titl, m_file, m_gedfile, m_gedrec) VALUES (?, ?, ?, ?, ?, ?)"
-		);
-		$sql_insert_media_mapping=WT_DB::prepare(
-			"INSERT INTO `##media_mapping` (mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec) VALUES (?, ?, ?, ?, ?)"
+			"INSERT INTO `##media` (m_id, m_ext, m_type, m_titl, m_filename, m_file, m_gedcom) VALUES (?, ?, ?, ?, ?, ?, ?)"
 		);
 	}
 
@@ -952,21 +950,11 @@ function insert_media($objrec, $objlevel, $update, $gid, $ged_id, $count) {
 
 		//-- check if another picture with the same file and title was previously imported
 		$media = new WT_Media($objrec);
-		$new_media = WT_Media::in_obje_list($media, $ged_id);
-		if (!$new_media) {
-			//-- add it to the media database table
-			$imgsize = $media->getImageAttributes();
-			$sql_insert_media->execute(array($m_media, $imgsize['ext'], $media->title, $media->file, $ged_id, $objrec));
-			$media_count++;
-		} else {
-			//-- already added so update the local id
-			$objref = str_replace("@$m_media@", "@$new_media@", $objref);
-			$m_media = $new_media;
-		}
+		//-- add it to the media database table
+		$imgsize = $media->getImageAttributes();
+		$sql_insert_media->execute(array($m_media, $media->extension(), $media->getMediaType(), $media->title, $media->file, $ged_id, $objrec));
 	}
 	if (isset($m_media)) {
-		//-- add the entry to the media_mapping table
-		$sql_insert_media_mapping->execute(array($m_media, $gid, $count, $ged_id, $objref));
 		return "{$objlevel} OBJE @{$m_media}@\n";
 	} else {
 		echo "Media reference error ".$objrec;
@@ -979,18 +967,15 @@ function insert_media($objrec, $objlevel, $update, $gid, $ged_id, $count) {
 * @return string an updated record
 */
 function update_media($gid, $ged_id, $gedrec, $update = false) {
-	global $media_count, $found_ids, $zero_level_media, $keepmedia;
+	global $found_ids, $zero_level_media, $keepmedia;
 
 	static $sql_insert_media=null;
 	if (!$sql_insert_media) {
 		$sql_insert_media=WT_DB::prepare(
-			"INSERT INTO `##media` (m_media, m_ext, m_titl, m_file, m_gedfile, m_gedrec) VALUES ( ?, ?, ?, ?, ?, ?)"
+			"INSERT INTO `##media` (m_id, m_ext, m_type, m_titl, m_filename, m_file, m_gedcom) VALUES (?, ?, ?, ?, ?, ?, ?)"
 		);
 	}
 
-	if (!isset ($media_count)) {
-		$media_count = 0;
-	}
 	if (!isset ($found_ids)) {
 		$found_ids = array ();
 	}
@@ -999,53 +984,21 @@ function update_media($gid, $ged_id, $gedrec, $update = false) {
 	}
 
 	//-- handle level 0 media OBJE seperately
-	$ct = preg_match("/0 @(.*)@ OBJE/", $gedrec, $match);
+	$ct = preg_match("/^0 @(.*)@ OBJE/", $gedrec, $match);
 	if ($ct > 0) {
 		$old_m_media = $match[1];
-		/**
-		* Hiding some code in order to fix a very annoying bug
-		* [ 1579889 ] Upgrading breaks Media links
-		*
-		* Don't understand the logic of renumbering media objects ??
-		*
-		if ($update) {
-			$new_m_media = $old_m_media;
-		} else {
-			if (isset ($found_ids[$old_m_media])) {
-				$new_m_media = $found_ids[$old_m_media]["new_id"];
-			} else {
-				$new_m_media = get_new_xref("OBJE");
-				$found_ids[$old_m_media]["old_id"] = $old_m_media;
-				$found_ids[$old_m_media]["new_id"] = $new_m_media;
-			}
-		}
-		**/
 		$new_m_media = $old_m_media;
-		//echo "RECORD: old $old_m_media new $new_m_media<br>";
 		$gedrec = str_replace("@" . $old_m_media . "@", "@" . $new_m_media . "@", $gedrec);
 		$media = new WT_Media($gedrec);
-		//--check if we already have a similar object
-		$new_media = WT_Media::in_obje_list($media, $ged_id);
-		if (!$new_media) {
-			$imgsize = $media->getImageAttributes();
-			$sql_insert_media->execute(array($new_m_media, $imgsize['ext'], $media->title, $media->file, $ged_id, $gedrec));
-			$media_count++;
-		} else {
-			$new_m_media = $new_media;
-			$found_ids[$old_m_media]["old_id"] = $old_m_media;
-			$found_ids[$old_m_media]["new_id"] = $new_media;
-			//$gedrec = preg_replace("/0 @(.*)@ OBJE/", "0 @$new_media@ OBJE", $gedrec);
-			//-- record was replaced by a duplicate record so leave it out.
-			return '';
-		}
+		$sql_insert_media->execute(array($new_m_media, $media->extension(), $media->getMediaType(), $media->title, $media->file, $ged_id, $gedrec));
 		return $gedrec;
 	}
 
 	if ($keepmedia) {
 		$old_linked_media=
-			WT_DB::prepare("SELECT mm_media, mm_gedrec FROM `##media_mapping` WHERE mm_gid=? AND mm_gedfile=?")
+			WT_DB::prepare("SELECT l_to FROM `##link` WHERE l_from=? AND l_file=? AND l_type='OBJE'")
 			->execute(array($gid, $ged_id))
-			->fetchAll(PDO::FETCH_NUM);
+			->fetchOneColumn();
 	}
 
 	//-- check to see if there are any media records
@@ -1111,9 +1064,8 @@ function update_media($gid, $ged_id, $gedrec, $update = false) {
 	}
 
 	if ($keepmedia) {
-		$newrec = trim($newrec)."\n";
-		foreach ($old_linked_media as $i=>$row) {
-			$newrec .= trim($row[1])."\n";
+		foreach ($old_linked_media as $media_id) {
+			$newrec .= '1 OBJE @' . $media_id . "@\n";
 		}
 	}
 
@@ -1139,11 +1091,10 @@ function empty_database($ged_id, $keepmedia) {
 	WT_DB::prepare("DELETE FROM `##change`      WHERE gedcom_id=?")->execute(array($ged_id));
 
 	if ($keepmedia) {
-		WT_DB::prepare("DELETE FROM `##link`          WHERE l_file    =? AND l_type<>'OBJE'")->execute(array($ged_id));
+		WT_DB::prepare("DELETE FROM `##link`          WHERE l_file =? AND l_type<>'OBJE'")->execute(array($ged_id));
 	} else {
-		WT_DB::prepare("DELETE FROM `##link`          WHERE l_file    =?")->execute(array($ged_id));
-		WT_DB::prepare("DELETE FROM `##media`         WHERE m_gedfile =?")->execute(array($ged_id));
-		WT_DB::prepare("DELETE FROM `##media_mapping` WHERE mm_gedfile=?")->execute(array($ged_id));
+		WT_DB::prepare("DELETE FROM `##link`          WHERE l_file =?")->execute(array($ged_id));
+		WT_DB::prepare("DELETE FROM `##media`         WHERE m_file =?")->execute(array($ged_id));
 	}
 }
 
@@ -1180,7 +1131,6 @@ function reject_all_changes($xref, $ged_id) {
 		" SET status='rejected'".
 		" WHERE status='pending' AND xref=? AND gedcom_id=?"
 	)->execute(array($xref, $ged_id));
-	//Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->addMessage(WT_I18N::translate('The changes have been rejected.'));
 }
 
 // Find a string in a file, preceded by a any form of line-ending.
@@ -1232,7 +1182,6 @@ function update_record($gedrec, $ged_id, $delete) {
 		}
 	}
 
-	WT_DB::prepare("DELETE FROM `##media_mapping` WHERE mm_gid=? AND mm_gedfile=?")->execute(array($gid, $ged_id));
 	WT_DB::prepare("DELETE FROM `##name` WHERE n_id=? AND n_file=?")->execute(array($gid, $ged_id));
 	WT_DB::prepare("DELETE FROM `##link` WHERE l_from=? AND l_file=?")->execute(array($gid, $ged_id));
 
@@ -1247,7 +1196,7 @@ function update_record($gedrec, $ged_id, $delete) {
 		WT_DB::prepare("DELETE FROM `##sources` WHERE s_id=? AND s_file=?")->execute(array($gid, $ged_id));
 		break;
 	case 'OBJE':
-		WT_DB::prepare("DELETE FROM `##media` WHERE m_media=? AND m_gedfile=?")->execute(array($gid, $ged_id));
+		WT_DB::prepare("DELETE FROM `##media` WHERE m_id=? AND m_file=?")->execute(array($gid, $ged_id));
 		break;
 	default:
 		WT_DB::prepare("DELETE FROM `##other` WHERE o_id=? AND o_file=?")->execute(array($gid, $ged_id));

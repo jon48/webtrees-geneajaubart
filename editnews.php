@@ -1,8 +1,10 @@
 <?php
 // Popup window for Editing news items
 //
+// TODO: this needs to be part of the news module
+//
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2005  PGV Development Team
@@ -21,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: editnews.php 14279 2012-09-14 21:46:56Z greg $
+// $Id: editnews.php 14853 2013-03-02 20:16:35Z greg $
 
 define('WT_SCRIPT_NAME', 'editnews.php');
 require './includes/session.php';
@@ -36,7 +38,7 @@ $action   =safe_GET('action', array('compose', 'save', 'delete'), 'compose');
 $news_id  =safe_GET('news_id');
 $user_id  =safe_REQUEST($_REQUEST, 'user_id');
 $gedcom_id=safe_REQUEST($_REQUEST, 'gedcom_id');
-$date     =safe_POST('date', WT_REGEX_UNSAFE);
+$date     =safe_POST('date', WT_REGEX_INTEGER, WT_TIMESTAMP);
 $title    =safe_POST('title', WT_REGEX_UNSAFE);
 $text     =safe_POST('text', WT_REGEX_UNSAFE);
 
@@ -74,7 +76,7 @@ case 'compose':
 		echo '<textarea name="text" cols="80" rows="10" dir="auto">'.htmlspecialchars($news['text']).'</textarea>';
 	}
 	echo '</td></tr>';
-	echo '<tr><td></td><td><input type="submit" value="'.WT_I18N::translate('Save').'"></td></tr>';
+	echo '<tr><td></td><td><input type="submit" value="'.WT_I18N::translate('save').'"></td></tr>';
 	echo '</table>';
 	echo '</form>';
 	break;
@@ -85,7 +87,7 @@ case 'save':
 	}
 	$message['user_id'] = $user_id;
 	$message['gedcom_id'] = $gedcom_id;
-	$message['date'] = WT_TIMESTAMP;
+	$message['date'] = $date;
 	$message['title'] = $title;
 	$message['text']  = $text;
 	addNews($message);

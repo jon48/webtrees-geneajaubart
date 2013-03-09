@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index.php 14273 2012-09-14 09:58:09Z greg $
+// $Id: index.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'index.php');
 require './includes/session.php';
@@ -74,7 +74,7 @@ if ($action=='ajax') {
 	exit;
 }
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 if ($ctype=='user') {
 	$controller->requireMemberLogin();
 }
@@ -84,11 +84,6 @@ $controller
 	->pageHeader()
 	// By default jQuery modifies AJAX URLs to disable caching, causing JS libraries to be loaded many times.
 	->addInlineJavascript('jQuery.ajaxSetup({cache:true});');
-
-if (WT_USE_LIGHTBOX) {
-	$album = new lightbox_WT_Module();
-	$album->getPreLoadContent();
-}
 
 if ($ctype=='user') {
 	echo '<div id="my-page">';

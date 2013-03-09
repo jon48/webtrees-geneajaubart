@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14279 2012-09-14 21:46:56Z greg $
+// $Id: module.php 14686 2013-01-20 14:55:59Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -44,7 +44,7 @@ class gedcom_news_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "GEDCOM News" module */ WT_I18N::translate('Family news and site announcements.');
+		return /* I18N: Description of the “GEDCOM News” module */ WT_I18N::translate('Family news and site announcements.');
 	}
 
 	// Implement class WT_Module_Block
@@ -112,6 +112,7 @@ class gedcom_news_WT_Module extends WT_Module implements WT_Module_Block {
 			$content .= "<div class=\"news_date\">".format_timestamp($news['date']).'</div>';
 			if ($news["text"]==strip_tags($news["text"])) {
 				// No HTML?
+				//$news["text"]=nl2br($news["text"], false);
 				$news["text"]=nl2br($news["text"]);
 			}
 			$content .= $news["text"];

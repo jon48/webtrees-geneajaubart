@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14169 2012-08-12 17:50:01Z greg $
+// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 	// Extend WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Family navigator" module */ WT_I18N::translate('A sidebar showing an individual’s close families and relatives.');
+		return /* I18N: Description of the “Family navigator” module */ WT_I18N::translate('A sidebar showing an individual’s close families and relatives.');
 	}
 
 	// Implement WT_Module_Sidebar
@@ -376,7 +376,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $SCRIPT_NAME, $GEDCOM;
 		global $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $PEDIGREE_FULL_DETAILS, $SHOW_PEDIGREE_PLACES;
 		global $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
-		global $ABBREVIATE_CHART_LABELS, $USE_MEDIA_VIEWER;
+		global $ABBREVIATE_CHART_LABELS;
 		global $chart_style, $box_width, $generations, $show_spouse, $show_full;
 		global $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE, $PEDIGREE_SHOW_GENDER;
 		global $SEARCH_SPIDER;

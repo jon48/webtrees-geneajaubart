@@ -4,7 +4,7 @@
 // This page will allow you to merge 2 gedcom records
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -23,12 +23,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_merge.php 14267 2012-09-13 19:54:18Z greg $
+// $Id: admin_site_merge.php 14797 2013-02-09 16:56:36Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_merge.php');
 require './includes/session.php';
 
-$controller=new WT_Controller_Base;
+$controller=new WT_Controller_Page;
 $controller
 	->requireManagerLogin()
 	->setPageTitle(WT_I18N::translate('Merge records'))
@@ -109,7 +109,7 @@ if ($action!='choose') {
 					$facts2[] = array('fact'=>$fact, 'subrec'=>trim($subrec));
 				}
 				if ($action=='select') {
-					echo '<div id="merge2"><h3>', WT_I18N::translate('Merge Step 2 of 3'), '</h3>';
+					echo '<div id="merge2"><h3>', WT_I18N::translate('Merge records'), '</h3>';
 					echo '<form method="post" action="admin_site_merge.php">';
 					echo WT_I18N::translate('The following facts were exactly the same in both records and will be merged automatically.'), '<br>';
 					echo '<input type="hidden" name="gid1" value="', $gid1, '">';
@@ -128,6 +128,7 @@ if ($action!='choose') {
 								$skip2[] = $j;
 								$equal_count++;
 								echo '<tr><td>', WT_I18N::translate($fact1['fact']);
+								// PHP5.3 echo '<input type="hidden" name="keep1[]" value="', $i, '"></td><td>', nl2br($fact1['subrec'], false), '</td></tr>';
 								echo '<input type="hidden" name="keep1[]" value="', $i, '"></td><td>', nl2br($fact1['subrec']), '</td></tr>';
 							}
 						}
@@ -144,6 +145,7 @@ if ($action!='choose') {
 					foreach ($facts1 as $i=>$fact1) {
 						if (($fact1['fact']!='CHAN')&&(!in_array($i, $skip1))) {
 							echo '<tr><td><input type="checkbox" name="keep1[]" value="', $i, '" checked="checked"></td>';
+							// PHP5.3 echo '<td>', nl2br($fact1['subrec'], false), '</td></tr>';
 							echo '<td>', nl2br($fact1['subrec']), '</td></tr>';
 						}
 					}
@@ -153,17 +155,18 @@ if ($action!='choose') {
 					foreach ($facts2 as $j=>$fact2) {
 						if (($fact2['fact']!='CHAN')&&(!in_array($j, $skip2))) {
 							echo '<tr><td><input type="checkbox" name="keep2[]" value="', $j, '" checked="checked"></td>';
+							// PHP5.3 echo '<td>', nl2br($fact2['subrec'], false), '</td></tr>';
 							echo '<td>', nl2br($fact2['subrec']), '</td></tr>';
 						}
 					}
 					echo '</table>';
 					echo '</td></tr>';
 					echo '</table>';
-					echo '<input type="submit" value="', WT_I18N::translate('Merge records'), '">';
+					echo '<input type="submit" value="', WT_I18N::translate('save'), '">';
 					echo '</form></div>';
 				} elseif ($action=='merge') {
 					$manual_save = true;
-					echo '<div id="merge3"><h3>', WT_I18N::translate('Merge Step 3 of 3'), '</h3>';
+					echo '<div id="merge3"><h3>', WT_I18N::translate('Merge records'), '</h3>';
 					if ($GEDCOM==$ged2) {
 						$success = delete_gedrec($gid2, WT_GED_ID);
 						if ($success) {
@@ -225,12 +228,17 @@ if ($action!='choose') {
 
 					replace_gedrec($gid1, WT_GED_ID, $newgedrec);
 					$rec=WT_GedcomRecord::getInstance($gid1);
-					echo '<br>', WT_I18N::translate('Record %s successfully updated.', $rec->getXrefLink()), '<br>';
+					echo
+						'<p>',
+							WT_I18N::translate(
+								'Record %s successfully updated.',
+								'<a href="'.$rec->getHtmlUrl().'">'.$rec->getXref().'</a>'
+							),
+						'</p';
 					$fav_count=update_favorites($gid2, $gid1);
 					if ($fav_count > 0) {
-						echo '<br>', $fav_count, ' ', WT_I18N::translate('favorites updated.'), '<br>';
+						echo '<p>', $fav_count, ' ', WT_I18N::translate('favorites updated.'), '<p>';
 					}
-					echo '<br><a href="admin_site_merge.php?action=choose">', WT_I18N::translate('Merge more records.'), '</a><br>';
 					echo '</div>';
 				}
 			}
@@ -238,31 +246,30 @@ if ($action!='choose') {
 	}
 }
 if ($action=='choose') {
-	?>
-	<script>
+	$controller->addInlineJavascript('
 	var pasteto;
 	function iopen_find(textbox, gedselect) {
 		pasteto = textbox;
 		ged = gedselect.options[gedselect.selectedIndex].value;
-		findwin = window.open('find.php?type=indi&ged='+ged, '_blank', find_window_specs);
+		findwin = window.open("find.php?type=indi&ged="+ged, "_blank", find_window_specs);
 	}
 	function fopen_find(textbox, gedselect) {
 		pasteto = textbox;
 		ged = gedselect.options[gedselect.selectedIndex].value;
-		findwin = window.open('find.php?type=fam&ged='+ged, '_blank', find_window_specs);
+		findwin = window.open("find.php?type=fam&ged="+ged, "_blank", find_window_specs);
 	}
 	function sopen_find(textbox, gedselect) {
 		pasteto = textbox;
 		ged = gedselect.options[gedselect.selectedIndex].value;
-		findwin = window.open('find.php?type=source&ged='+ged, '_blank', find_window_specs);
+		findwin = window.open("find.php?type=source&ged="+ged, "_blank", find_window_specs);
 	}
 	function paste_id(value) {
 		pasteto.value=value;
 	}
-	</script>
-	<?php
+	');
+
 	echo 
-		'<div id="merge"><h3>', WT_I18N::translate('Merge Step 1 of 3'), '</h3>
+		'<div id="merge"><h3>', WT_I18N::translate('Merge records'), '</h3>
 		<form method="post" name="merge" action="admin_site_merge.php">
 		<input type="hidden" name="action" value="select">
 		<p>', WT_I18N::translate('Select two GEDCOM records to merge.  The records must be of the same type.'), '</p>
@@ -310,6 +317,6 @@ if ($action=='choose') {
 		<a href="#" onclick="fopen_find(document.merge.gid2, document.merge.ged2);" tabindex="9" class="icon-button_family" title="'.WT_I18N::translate('Find a family').'"></a>
 		<a href="#" onclick="sopen_find(document.merge.gid2, document.merge.ged2);" tabindex="11" class="icon-button_source" title="'.WT_I18N::translate('Find a source').'"></a>
 		</td></tr></table>
-		<input type="submit" value="', WT_I18N::translate('Merge records'), '" tabindex="3">
+		<input type="submit" value="', WT_I18N::translate('next'), '" tabindex="3">
 		</form></div>';
 }

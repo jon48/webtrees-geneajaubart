@@ -1,6 +1,6 @@
 <?php
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -19,15 +19,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// version $Id: admin_site_clean.php 14294 2012-09-15 11:36:34Z greg $
+// version $Id: admin_site_clean.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_clean.php');
 require './includes/session.php';
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->requireAdminLogin()
-	->setPageTitle(WT_I18N::translate('Cleanup data directory'))
+	->setPageTitle(/* I18N: The “Data folder” is a configuration setting */ WT_I18N::translate('Clean up data folder'))
 	->pageHeader();
 
 require WT_ROOT.'includes/functions/functions_edit.php';
@@ -35,25 +35,25 @@ require WT_ROOT.'includes/functions/functions_edit.php';
 function full_rmdir($dir) {
 	if (!is_writable($dir)) {
 		if (!@chmod($dir, WT_PERM_EXE)) {
-			return FALSE;
+			return false;
 		}
 	}
 
 	$d = dir($dir);
-	while (FALSE !== ($entry = $d->read())) {
+	while (false !== ($entry = $d->read())) {
 		if ($entry == '.' || $entry == '..') {
 			continue;
 		}
 		$entry = $dir . '/' . $entry;
 		if (is_dir($entry)) {
 			if (!full_rmdir($entry)) {
-				return FALSE;
+				return false;
 			}
 			continue;
 		}
 		if (!@unlink($entry)) {
 			$d->close();
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -66,23 +66,21 @@ function full_rmdir($dir) {
 $ajaxdeleted = false;
 $locked_by_context = array('index.php', 'config.ini.php');
 
-// If we are storing the media in the data directory (this is the
-// default for the media firewall), then don't delete it.
+// If we are storing the media in the data folder (this is the
+// defaultl), then don’t delete it.
 // Need to consider the settings for all gedcoms
 foreach (WT_Tree::getAll() as $tree) {
-	$MEDIA_FIREWALL_ROOTDIR=$tree->preference('MEDIA_FIREWALL_ROOTDIR');
-	if (!$MEDIA_FIREWALL_ROOTDIR) {
-		$MEDIA_FIREWALL_ROOTDIR=WT_DATA_DIR;
-	}
 	$MEDIA_DIRECTORY=$tree->preference('MEDIA_DIRECTORY');
 
-	if (realpath($MEDIA_FIREWALL_ROOTDIR)==realpath(WT_DATA_DIR)) {
-		$locked_by_context[]=trim($MEDIA_DIRECTORY, '/');
+	if (substr($MEDIA_DIRECTORY, 0, 3) !='../') {
+		// Just need to add the first part of the path
+		$tmp = explode('/', $MEDIA_DIRECTORY);
+		$locked_by_context[] = $tmp[0];
 	}
 }
 
 echo
-	'<h3>', WT_I18N::translate('Cleanup data directory'), '</h3>',
+	'<h3>', $controller->getPageTitle(), '</h3>',
 	'<p>',
 	WT_I18N::translate('Files marked with %s are required for proper operation and cannot be removed.', '<i class="icon-resn-confidential"></i>'),
 	'</p>';

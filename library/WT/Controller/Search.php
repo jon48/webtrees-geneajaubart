@@ -2,7 +2,7 @@
 // Controller for the search page
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -21,14 +21,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Search.php 14306 2012-09-16 06:48:51Z greg $
+// $Id: Search.php 14802 2013-02-14 20:17:10Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-class WT_Controller_Search extends WT_Controller_Base {
+class WT_Controller_Search extends WT_Controller_Page {
 	public $action;
 	// TODO: decide if these variables are public/private/protected (or unused)
 	var $isPostBack = false;
@@ -615,7 +615,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 					}
 				}
 				echo '</div>';//#searchAccordion-indi
-				$this->addInlineJavascript('jQuery("#searchAccordion-indi").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
+				$this->addInlineJavascript('jQuery("#searchAccordion-indi").accordion({active:0, heightStyle: "content", collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 
 				// family results
 				echo '<div id="searchAccordion-fam">';
@@ -639,7 +639,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 					}
 				}
 				echo '</div>';//#searchAccordion-fam
-				$this->addInlineJavascript('jQuery("#searchAccordion-fam").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
+				$this->addInlineJavascript('jQuery("#searchAccordion-fam").accordion({active:0, heightStyle: "content", collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 
 				// source results
 				echo '<div id="searchAccordion-source">';
@@ -663,7 +663,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 					}
 				}
 				echo '</div>';//#searchAccordion-source
-				$this->addInlineJavascript('jQuery("#searchAccordion-source").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
+				$this->addInlineJavascript('jQuery("#searchAccordion-source").accordion({active:0, heightStyle: "content", collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 
 				// note results
 				echo '<div id="searchAccordion-note">';
@@ -687,7 +687,7 @@ class WT_Controller_Search extends WT_Controller_Base {
 					}
 				}
 				echo '</div>';//#searchAccordion-note
-				$this->addInlineJavascript('jQuery("#searchAccordion-note").accordion({active:0, autoHeight: false, collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
+				$this->addInlineJavascript('jQuery("#searchAccordion-note").accordion({active:0, heightStyle: "content", collapsible: true, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});');
 
 				$GEDCOM=WT_GEDCOM;
 				load_gedcom_settings(WT_GED_ID);

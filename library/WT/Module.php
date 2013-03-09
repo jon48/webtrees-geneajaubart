@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Module.php 13610 2012-03-18 23:06:15Z greg $
+// $Id: Module.php 14771 2013-02-04 16:42:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -63,7 +63,6 @@ interface WT_Module_Tab {
 	public function hasTabContent();
 	public function canLoadAjax();
 	public function getPreLoadContent();
-	public function getJSCallback();
 	public function isGrayedOut();
 
 }

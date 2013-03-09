@@ -2,7 +2,7 @@
 // Module Administration User Interface.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,13 +18,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_module_tabs.php 14267 2012-09-13 19:54:18Z greg $
+// $Id: admin_module_tabs.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_module_tabs.php');
 require 'includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->requireAdminLogin()
 	->setPageTitle(WT_I18N::translate('Module administration'))
@@ -110,6 +110,6 @@ if ($action=='update_mods') {
 				?>
 			</tbody>
 		</table>
-		<input type="submit" value="<?php echo WT_I18N::translate('Save'); ?>">
+		<input type="submit" value="<?php echo WT_I18N::translate('save'); ?>">
 	</form>
 </div>

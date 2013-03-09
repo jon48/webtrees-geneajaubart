@@ -4,7 +4,7 @@
 // Media Link information about an individual
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_0_inverselink.php 14226 2012-08-30 05:18:45Z nigel $
+// $Id: media_0_inverselink.php 14762 2013-02-03 08:44:20Z greg $
 
 // GEDFact Media assistant replacement code for inverselink.php: ===========================
 
@@ -71,11 +71,9 @@ if ($action == 'choose' && $paramok) {
 
 	var GEDFact_assist = 'installed';
 	</script>
-	<link href ="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>GEDFact_assistant/css/media_0_inverselink.css" rel="stylesheet" type="text/css" media="screen">
 
 	<?php
 	echo '<form class="medialink" name="link" method="get" action="inverselink.php">';
-	// echo '<input type="hidden" name="action" value="choose">';
 	echo '<input type="hidden" name="action" value="update">';
 	if (!empty($mediaid)) {
 		echo '<input type="hidden" name="mediaid" value="', $mediaid, '">';
@@ -87,13 +85,13 @@ if ($action == 'choose' && $paramok) {
 	echo '<input type="hidden" name="ged" value="', $GEDCOM, '">';
 	echo '<table class="facts_table center">';
 	echo '<tr><td class="topbottombar" colspan="2">';
-	echo WT_I18N::translate('Link media'), help_link('add_media_linkid');
+	echo WT_I18N::translate('Link to an existing media object'), help_link('add_media_linkid');
 	echo '</td></tr><tr><td class="descriptionbox width20 wrap">', WT_I18N::translate('Media'), '</td>';
 	echo '<td class="optionbox wrap">';
 	if (!empty($mediaid)) {
 		//-- Get the title of this existing Media item
 		$title=
-			WT_DB::prepare("SELECT m_titl FROM `##media` where m_media=? AND m_gedfile=?")
+			WT_DB::prepare("SELECT m_titl FROM `##media` where m_id=? AND m_file=?")
 			->execute(array($mediaid, WT_GED_ID))
 			->fetchOne();
 		if ($title) {
@@ -104,43 +102,46 @@ if ($action == 'choose' && $paramok) {
 		echo '<table><tr><td>';
 		//-- Get the filename of this existing Media item
 		$filename=
-			WT_DB::prepare("SELECT m_file FROM `##media` where m_media=? AND m_gedfile=?")
+			WT_DB::prepare("SELECT m_filename FROM `##media` where m_id=? AND m_file=?")
 			->execute(array($mediaid, WT_GED_ID))
 			->fetchOne();
-		$thumbnail = thumbnail_file($filename, false);
-		echo '<img src="', htmlspecialchars($thumbnail), '" class="thumbheight">';
+		$media=WT_Media::getInstance($mediaid);
+		echo $media->displayImage();
 		echo '</td></tr></table>';
 		echo '</td></tr>';
 		echo '<tr><td class="descriptionbox width20 wrap">', WT_I18N::translate('Links'), '</td>';
 		echo '<td class="optionbox wrap">';
-		$links = get_media_relations($mediaid);
 		echo "<table><tr><td>";
 		echo "<table id=\"existLinkTbl\" width=\"430\" cellspacing=\"1\" >";
 		echo "<tr>";
 		echo '<td class="topbottombar" width="15"  style="font-weight:100;" >#</td>';
-		echo '<td class="topbottombar" width="50"  style="font-weight:100;" >ID:</td>';
+		echo '<td class="topbottombar" width="50"  style="font-weight:100;" >', WT_I18N::translate('Record'), '</td>';
 		echo '<td class="topbottombar" width="340" style="font-weight:100;" >', WT_I18N::translate('Name'), '</td>';
 		echo '<td class="topbottombar" width="20"  style="font-weight:100;" >', WT_I18N::translate('Keep'), '</td>';
 		echo '<td class="topbottombar" width="20"  style="font-weight:100;" >', WT_I18N::translate('Remove'), '</td>';
 		echo '<td class="topbottombar" width="20"  style="font-weight:100;" >', WT_I18N::translate('Navigator'), '</td>';
 		echo "</tr>";
-	
+
+		$links = array_merge(
+			$media->fetchLinkedIndividuals(),
+			$media->fetchLinkedFamilies(),
+			$media->fetchLinkedSources()
+		);
 		$i=1;
-		foreach (array_keys($links) as $link) {
-			$record=WT_GedcomRecord::getInstance($link);
+		foreach ($links as $record) {
 			echo "<tr ><td>";
 			echo $i++;
 			echo "</td><td id=\"existId_", $i, "\" class=\"row2\">";
-			echo $link;
+			echo $record->getXref();
 			echo "</td><td>";
 			echo $record->getFullName();
 			echo "</td>";
-			echo "<td align='center'><input alt='", WT_I18N::translate('Keep Link in list'), "', title='", WT_I18N::translate('Keep Link in list'), "' type='radio' id='", $link, "_off' name='", $link, "' checked></td>";
-			echo "<td align='center'><input alt='", WT_I18N::translate('Remove Link from list'), "', title='", WT_I18N::translate('Remove Link from list'), "' type='radio' id='", $link, "_on'  name='", $link, "'></td>";
+			echo "<td align='center'><input alt='", WT_I18N::translate('Keep Link in list'), "', title='", WT_I18N::translate('Keep Link in list'), "' type='radio' id='", $record->getXref(), "_off' name='", $record->getXref(), "' checked></td>";
+			echo "<td align='center'><input alt='", WT_I18N::translate('Remove Link from list'), "', title='", WT_I18N::translate('Remove Link from list'), "' type='radio' id='", $record->getXref(), "_on'  name='", $record->getXref(), "'></td>";
 	
 			if ($record->getType()=='INDI') {
 				?>
-				<td align="center"><a href="#" class="icon-button_family" title="<?php echo WT_I18N::translate('Family navigator'); ?>" name="family_'<?php echo $link; ?>'" onclick="openFamNav('<?php echo $link; ?>'); return false;"></a></td>
+				<td align="center"><a href="#" class="icon-button_family" title="<?php echo WT_I18N::translate('Family navigator'); ?>" name="family_'<?php echo $record->getXref(); ?>'" onclick="openFamNav('<?php echo $record->getXref(); ?>'); return false;"></a></td>
 				<?php
 			} elseif ($record->getType()=='FAM') {
 				if ($record->getHusband()) {
@@ -151,7 +152,7 @@ if ($action == 'choose' && $paramok) {
 					$head='';
 				}
 				?>
-				<td align="center"><a href="#" class="icon-button_family" title="<?php echo WT_I18N::translate('Family navigator'); ?>" name="family_'<?php echo $link; ?>'" onclick="openFamNav('<?php echo $head; ?>');"></a></td>
+				<td align="center"><a href="#" class="icon-button_family" title="<?php echo WT_I18N::translate('Family navigator'); ?>" name="family_'<?php echo $record->getXref(); ?>'" onclick="openFamNav('<?php echo $head; ?>');"></a></td>
 				<?php
 			} else {
 				echo '<td></td>';
@@ -161,7 +162,6 @@ if ($action == 'choose' && $paramok) {
 	
 		echo "</table>";
 		echo "</td></tr></table>";
-		echo "<br>";
 		echo '</td></tr>';
 	}
 
@@ -191,8 +191,6 @@ if ($action == 'choose' && $paramok) {
 		echo ' ', print_findsource_link('gid');
 	echo '</td></tr></table>';
 	echo "<sub>" . WT_I18N::translate('Enter or search for the ID of the person, family, or source to which this media item should be linked.') . "</sub>";
-
-
 	echo '<br><br>';
 	echo '<input type="hidden" name="idName" id="idName" size="36" value="Name of ID">';
 ?>
@@ -219,24 +217,9 @@ if ($action == 'choose' && $paramok) {
 			// TODO --- alert('Opening Navigator with family id entered will come later');
 		}
 	}
-</script>
-<table border="0" cellpadding="1" cellspacing="2" >
-<tr>
-<td width="350" class="row2">
-	<style type="text/css">
-	<!--
-	.classy0 { font-family: Verdana, Arial, Helvetica, sans-serif; background-color: transparent; color: #000000; font-size: 10px; }
-	.classy1 { font-family: Verdana, Arial, Helvetica, sans-serif; background-color: transparent; color: #000000; font-size: 10px; }
-	-->
-	</style>
-	
-<?php
 
-// Various Javascript variables required --------------------------------- ?>
-<script>
-	var ifamily = "<?php echo WT_I18N::translate('Open Family Navigator'); ?>";
+	var ifamily = "<?php echo WT_I18N::translate('Family navigator'); ?>";
 	var remove = "<?php echo WT_I18N::translate('Remove'); ?>";
-	var linkExists = "<?php echo WT_I18N::translate('This link already exists'); ?>";
 	/* ===icons === */
 	var removeLinkIcon = "<?php echo $WT_IMAGES['remove']; ?>";
 	var familyNavIcon = "<?php echo $WT_IMAGES['button_family']; ?>";
@@ -316,11 +299,8 @@ function insertRowToTable(pid, nam, head)
 		// If Link does not exist then add it, or show alert ===============
 		if (rowToInsertAt!='EXIST') {
 			rowToInsertAt = i;
-			//addRowToTable(rowToInsertAt, pid, nam, label, gend, cond, yob, age, YMD, occu, birthpl);
 			addRowToTable(rowToInsertAt, pid, nam, head);
 			reorderRows(tbl, rowToInsertAt);
-		} else {
-			alert(nam+' ('+pid+') - '+linkExists);
 		}
 		
 	}
@@ -545,48 +525,6 @@ function openInNewWindow(frm)
 	frm.submit();
 }
 
-
-</script>
-
-	<table width="430" border="0" cellspacing="1" id="addlinkQueue">
-		<thead>
-		<tr>
-			<th class="topbottombar" width="10"  style="font-weight:100;" align="left">#</th>
-			<th class="topbottombar" width="55"  style="font-weight:100;" align="left">ID:</th>
-			<th class="topbottombar" width="370" style="font-weight:100;" align="left"><?php echo WT_I18N::translate('Name'); ?></th>
-			<th class="topbottombar" width="20"  style="font-weight:100;" align="left"><?php echo WT_I18N::translate('Remove'); ?></th>
-			<th class="topbottombar" width="20"  style="font-weight:100;" align="left"><?php echo WT_I18N::translate('Navigator'); ?></th>
-		</tr>
-		</thead>
-		<tbody></tbody>
-	</table>
-</td>
-</tr>
-</table>
-<?php
-	echo '</td></tr>';
-	// Admin Option CHAN log update override =======================
-	if (WT_USER_IS_ADMIN) {
-		echo "<tr><td class=\"descriptionbox wrap width25\">";
-		echo WT_Gedcom_Tag::getLabel('CHAN'), "</td><td class=\"optionbox wrap\">";
-		if ($NO_UPDATE_CHAN) {
-			echo "<input type=\"checkbox\" checked=\"checked\" name=\"preserve_last_changed\">";
-		} else {
-			echo "<input type=\"checkbox\" name=\"preserve_last_changed\">";
-		}
-		echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN'), '<br><br>';
-		echo "</td></tr>";
-	}
-	echo '</tr>';
-	echo '<input type="hidden" name="more_links" value="No_Values">';
-	echo '<input type="hidden" name="exist_links" value="No_Values">';
-	echo '<tr><td colspan="2">';
-	echo '</td></tr>';
-	echo '<tr><td class="topbottombar" colspan="2">';
-	echo '<center><input type="submit" value="', WT_I18N::translate('Save'), '" onclick="shiftlinks();">';
-	echo '</center></td></tr>';
-?>
-<script>
 function parseAddLinks() {
 	// start with the "newly added" ID.		
 	var str = document.getElementById('gid').value;
@@ -624,54 +562,59 @@ function shiftlinks() {
 }
 
 </script>
+
+				<table width="430" border="0" cellspacing="1" id="addlinkQueue">
+					<thead>
+						<tr>
+							<th class="topbottombar" width="10"  style="font-weight:100;" align="left">#</th>
+							<th class="topbottombar" width="55"  style="font-weight:100;" align="left"><?php echo WT_I18N::translate('Record'); ?></th>
+							<th class="topbottombar" width="370" style="font-weight:100;" align="left"><?php echo WT_I18N::translate('Name'); ?></th>
+							<th class="topbottombar" width="20"  style="font-weight:100;" align="left"><?php echo WT_I18N::translate('Remove'); ?></th>
+							<th class="topbottombar" width="20"  style="font-weight:100;" align="left"><?php echo WT_I18N::translate('Navigator'); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+		<?php
+		// Admin Option CHAN log update override =======================
+		if (WT_USER_IS_ADMIN) {
+			echo "<tr><td class=\"descriptionbox wrap width25\">";
+			echo WT_Gedcom_Tag::getLabel('CHAN'), "</td><td class=\"optionbox wrap\">";
+			if ($NO_UPDATE_CHAN) {
+				echo "<input type=\"checkbox\" checked=\"checked\" name=\"preserve_last_changed\">";
+			} else {
+				echo "<input type=\"checkbox\" name=\"preserve_last_changed\">";
+			}
+			echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
+			echo "</td></tr>";
+		}
+		?>
+	</table>
+	<input type="hidden" name="more_links" value="No_Values">
+	<input type="hidden" name="exist_links" value="No_Values">
+	<p id="save-cancel">
+		<input type="submit" class="save" value="<?php echo WT_I18N::translate('save'); ?>" onclick="shiftlinks();">
+		<input type="button" class="cancel" value="<?php echo WT_I18N::translate('close'); ?>" onclick="window.close();">
+	</p>
+</form>
 <?php
-	echo '</table>';
-	echo '</form>';
-	echo '<br><br><center><a href="#" onclick="closePopupAndReloadParent(); winNav.close(); ">', WT_I18N::translate('Close Window'), '</a><br></center>';
-
 } elseif ($action == "update" && $paramok) {
-
-	echo "<b>", $mediaid, "</b><br><br>";
-
 	// Unlink records indicated by radio button =========
 	if ($exist_links) {
 		foreach (explode(',', $exist_links) as $remLinkId) {
-			echo WT_I18N::translate('Link to %s deleted', $remLinkId);
-			echo '<br>';
-			if ($update_CHAN=='no_change') {
-				unlinkMedia($remLinkId, 'OBJE', $mediaid, 1, false);
-			} else {
-				unlinkMedia($remLinkId, 'OBJE', $mediaid, 1, true);
-			}
+			unlinkMedia($remLinkId, 'OBJE', $mediaid, 1, $update_CHAN!='no_change');
 		}
-		echo '<br>';
-	} else {
-		// echo nothing and do nothing
 	}
-
 	// Add new Links ====================================
 	if ($more_links) {
 		foreach (explode(',', $more_links) as $addLinkId) {
-			echo WT_I18N::translate('Link to %s added', $addLinkId);
-			if ($update_CHAN=='no_change') {
-				linkMedia($mediaid, $addLinkId, 1, false);
-			} else {
-				linkMedia($mediaid, $addLinkId, 1, true);
-			}
-			echo '<br>';
+			linkMedia($mediaid, $addLinkId, 1, $update_CHAN!='no_change');
 		}
-		echo '<br>';
 	}
-
-	if ($update_CHAN=='no_change') {
-		echo WT_I18N::translate('No CHAN (Last Change) records were updated');
-		echo '<br>';
-	}
-
-	echo '<br><br><center><a href="#" onclick="closePopupAndReloadParent(); winNav.close(); ">', WT_I18N::translate('Close Window'), '</a><br></center>';
-} else {
-	// echo '<center>You must be logged in as an Administrator<center>';
-	echo '<br><br><center><a href="#" onclick="closePopupAndReloadParent(); winNav.close();">', WT_I18N::translate('Close Window'), '</a><br></center>';
+	$controller->addInlineJavascript('closePopupAndReloadParent();');
 }
 
 /**

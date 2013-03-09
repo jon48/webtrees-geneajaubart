@@ -5,7 +5,7 @@
 // age -> periodes of 10 years (different for 0-1,1-5,5-10,10-20 etc)
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: statistics.php 14117 2012-07-24 06:21:08Z greg $
+// $Id: statistics.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'statistics.php');
 require './includes/session.php';
@@ -34,7 +34,7 @@ $tab = safe_GET('tab', WT_REGEX_NOSCRIPT, 0);
 $ajax = safe_GET('ajax', WT_REGEX_NOSCRIPT, 0);
 
 if (!$ajax) {
-	$controller=new WT_Controller_Base();
+	$controller=new WT_Controller_Page();
 	$controller->setPageTitle(WT_I18N::translate('Statistics'))
 		->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js')
 		->addInlineJavascript('jQuery("#stats-tabs").tabs({ spinner: "<i class=\"icon-loading-small\"></i>", cache: true });')
@@ -451,7 +451,7 @@ if (!$ajax) {
 						width: 964
 					});
 					// Close the window when we click outside it.
-					jQuery(".ui-widget-overlay").live("click", function () {
+					jQuery(".ui-widget-overlay").on("click", function () {
 						jQuery("div:ui-dialog:visible").dialog("close");
 					});
 				});

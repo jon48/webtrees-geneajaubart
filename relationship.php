@@ -2,7 +2,7 @@
 // Calculates the relationship between two individuals in the gedcom
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,13 +21,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: relationship.php 14424 2012-10-15 08:02:42Z greg $
+// $Id: relationship.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'relationship.php');
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 
 $pid1        =safe_GET_xref('pid1');
 $pid2        =safe_GET_xref('pid2');
@@ -53,30 +53,19 @@ $Dbaseyoffset	= 0;
 $person1=WT_Person::getInstance($pid1);
 $person2=WT_Person::getInstance($pid2);
 
-if ($person1) {
-	$pid1=$person1->getXref(); // i1 => I1
-} else {
-	$pid1='';
-}
-if ($person2) {
-	$pid2=$person2->getXref(); // i2 => I2
-} else {
-	$pid2='';
-}
-
 $controller
 	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
 	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
 if ($person1 && $person1->canDisplayName() && $person2 && $person2->canDisplayName()) {	
 	$controller
-		->setPageTitle(WT_I18N::translate(/* I18N: %s are people's names */ 'Relationships between %1$s and %2$s', $person1->getFullName(), $person2->getFullName()))
+		->setPageTitle(WT_I18N::translate(/* I18N: %s are individual’s names */ 'Relationships between %1$s and %2$s', $person1->getFullName(), $person2->getFullName()))
 		->PageHeader();
-	$node=get_relationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);
+	$node=get_relationship($person1->getXref(), $person2->getXref(), $followspouse, 0, $path_to_find);
 	// If no blood relationship exists, look for relationship via marriage
 	if ($path_to_find==0 && $node==false && $followspouse==false) {
 		$followspouse=true;
-		$node=get_relationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);
+		$node=get_relationship($person1->getXref(), $person2->getXref(), $followspouse, 0, $path_to_find);
 	}
 	$disp=true;
 } else {
@@ -87,13 +76,7 @@ if ($person1 && $person1->canDisplayName() && $person2 && $person2->canDisplayNa
 	$disp=false;
 }
 
-if (WT_USE_LIGHTBOX) {
-	$album = new lightbox_WT_Module();
-	$album->getPreLoadContent();
-}
-
 ?>
-
 <h2><?php echo $controller->getPageTitle(); ?></h2>
 <form name="people" method="get" action="relationship.php">
 	<input type="hidden" name="ged" value="<?php echo WT_GEDCOM; ?>">
@@ -198,7 +181,7 @@ if ($person1 && $person2) {
 			$colNum = 0;
 			$rowNum = 0;
 			$previous='';
-			$previous2='';
+			$change_count=''; // shift right on alternate change of direction
 			$xs = $Dbxspacing+70;
 			$ys = $Dbyspacing+50;
 			// step1 = tree depth calculation
@@ -242,7 +225,7 @@ if ($person1 && $person2) {
 			} else {
 				$right_arrow='icon-larrow';
 			}
-			// Up and down get reversed, for the "oldest at top" option
+			// Up and down get reversed, for the “oldest at top” option
 			if ($asc==1) {
 				$up_arrow   ='icon-uarrow';
 				$down_arrow ='icon-darrow';
@@ -281,7 +264,7 @@ if ($person1 && $person2) {
 						$liney = $yoffset+$Dbheight;
 					}
 					// need to draw a joining line ?
-					if ($previous=='child' && $previous2!='parent') {
+					if ($previous=='child' && ($change_count++ % 2) == 0) {
 						$joinh = 3;
 						$joinw = $xs/2+2;
 						$xoffset += $Dbwidth+$xs;
@@ -301,7 +284,6 @@ if ($person1 && $person2) {
 						$joiny = $joiny+$asc*$lh;
 						echo "<div id=\"joinb", $index, "\" style=\"position:absolute; ", $TEXT_DIRECTION=='ltr'?'left':'right', ':', $joinx + $Dbxspacing, 'px; top:', $joiny + $Dbyspacing, "px;\" align=\"center\"><img src=\"", $WT_IMAGES["hline"], "\" align=\"left\" width=\"", $joinw, "\" height=\"", $joinh, "\" alt=\"\"></div>";
 					}
-					$previous2=$previous;
 					$previous='parent';
 					break;
 				case 'brother':
@@ -322,7 +304,6 @@ if ($person1 && $person2) {
 					$lw = $xs;
 					$linex = $xoffset-$lw;
 					$liney = $yoffset+$Dbheight/4;
-					$previous2=$previous;
 					$previous='';
 					break;
 				case 'son':
@@ -345,7 +326,7 @@ if ($person1 && $person2) {
 						$liney = $yoffset+$Dbheight;
 					}
 					// need to draw a joining line ?
-					if ($previous=='parent' && $previous2!='child') {
+					if ($previous=='parent' && ($change_count++ % 2) == 0) {
 						$joinh = 3;
 						$joinw = $xs/2+2;
 						$xoffset += $Dbwidth+$xs;
@@ -365,7 +346,6 @@ if ($person1 && $person2) {
 						$joiny = $joiny-$asc*$lh;
 						echo '<div id="joinb', $index, '" style="position:absolute; ', $TEXT_DIRECTION=='ltr'?'left':'right', ':', $joinx+$Dbxspacing, 'px; top:', $joiny+$Dbyspacing, 'px;" align="center"><img src="', $WT_IMAGES['hline'], '" align="left" width="', $joinw, '" height="', $joinh, '" alt=""></div>';
 					}
-					$previous2=$previous;
 					$previous='child';
 					break;
 				}

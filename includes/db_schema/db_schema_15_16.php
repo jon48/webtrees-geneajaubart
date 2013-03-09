@@ -1,7 +1,6 @@
 <?php
 // Update the database schema from version 15 to 16
 // - delete old config settings
-// - add extra columns to wt_default_resn
 // - increase size of session_id column, to account for new session hash algorithms
 //
 // The script should assume that it can be interrupted at
@@ -28,7 +27,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: db_schema_15_16.php 14276 2012-09-14 15:39:40Z greg $
+// $Id: db_schema_15_16.php 14672 2013-01-18 18:31:49Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');

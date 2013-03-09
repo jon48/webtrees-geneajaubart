@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Admin.php 11281 2011-04-06 17:58:06Z greg $
+// @version $Id: Admin.php 14504 2012-10-31 23:10:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -195,7 +195,7 @@ class WT_Query_Admin {
 		return
 			WT_DB::prepare(
 				"SELECT count(change_id) FROM `##change`".
-				" JOIN `##media` ON (gedcom_id=m_gedfile AND m_media=xref)".
+				" JOIN `##media` ON (gedcom_id=m_file AND m_id=xref)".
 				" WHERE status='accepted' AND DATE(change_time)= DATE(NOW()) AND gedcom_id=?"
 			)
 			->execute(array($ged_id))
@@ -206,7 +206,7 @@ class WT_Query_Admin {
 		return
 			WT_DB::prepare(
 				"SELECT count(change_id) FROM `##change`".
-				" JOIN `##media` ON (gedcom_id=m_gedfile AND m_media=xref)".
+				" JOIN `##media` ON (gedcom_id=m_file AND m_id=xref)".
 				" WHERE status='accepted' AND WEEK(change_time,2)= WEEK(NOW(),2) AND gedcom_id=?"
 			)
 			->execute(array($ged_id))
@@ -217,7 +217,7 @@ class WT_Query_Admin {
 		return
 			WT_DB::prepare(
 				"SELECT count(change_id) FROM `##change`".
-				" JOIN `##media` ON (gedcom_id=m_gedfile AND m_media=xref)".
+				" JOIN `##media` ON (gedcom_id=m_file AND m_id=xref)".
 				" WHERE status='accepted' AND MONTH(change_time)= MONTH(NOW()) AND gedcom_id=?"
 			)
 			->execute(array($ged_id))

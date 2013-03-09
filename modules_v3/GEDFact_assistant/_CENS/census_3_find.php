@@ -2,7 +2,7 @@
 // Facility for Census assistant that will allow a user to search for a person
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_3_find.php 14245 2012-09-04 06:07:34Z greg $
+// $Id: census_3_find.php 14786 2013-02-06 22:28:50Z greg $
 
 $controller=new WT_Controller_Simple();
 
@@ -30,8 +30,9 @@ $action         =safe_GET('action');
 $callback       =safe_GET('callback', WT_REGEX_NOSCRIPT, 'paste_id');
 $multiple       =safe_GET_bool('multiple');
 
-$controller->setPageTitle(WT_I18N::translate('Find an individual'));
-$controller->pageHeader();
+$controller
+	->setPageTitle(WT_I18N::translate('Find an individual'))
+	->pageHeader();
 
 ?>
 <script>
@@ -188,8 +189,5 @@ if ($action=="filter") {
 	}
 	echo "</table>";
 }
-echo "<p><button onclick=\"window.close();\">", WT_I18N::translate('Close Window'), "</button></p>";
+echo '<button onclick="closePopupAndReloadParent();">', WT_I18N::translate('close'), '</button>';
 echo "</div>"; // Close div that centers table
-
-// Set focus to the input field
-echo '<script>document.filterindi.filter.focus();</script>';

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14275 2012-09-14 10:26:33Z greg $
+// $Id: module.php 14786 2013-02-06 22:28:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,12 +31,12 @@ if (!defined('WT_WEBTREES')) {
 class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block, WT_Module_Config {
 	// Extend class WT_Module
 	public function getTitle() {
-		return /* I18N: Name of a module.  Abbreviation for "Frequently Asked Questions" */ WT_I18N::translate('FAQ');
+		return /* I18N: Name of a module.  Abbreviation for “Frequently Asked Questions” */ WT_I18N::translate('FAQ');
 	}
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "FAQ" module */ WT_I18N::translate('A list of frequently asked questions and answers.');
+		return /* I18N: Description of the “FAQ” module */ WT_I18N::translate('A list of frequently asked questions and answers.');
 	}
 
 	// Extend WT_Module
@@ -132,7 +132,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 			$this->config();
 		} else {
 			$block_id=safe_GET('block_id');
-			$controller=new WT_Controller_Base();
+			$controller=new WT_Controller_Page();
 			if ($block_id) {
 				$controller->setPageTitle(WT_I18N::translate('Edit FAQ item'));
 				$header=get_block_setting($block_id, 'header');
@@ -187,8 +187,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 			echo '</td></tr>';
 			echo '</table>';
 
-			echo '<p><input type="submit" value="', WT_I18N::translate('Save'), '" tabindex="5">';
-			echo '&nbsp;<input type="button" value="', WT_I18N::translate('Cancel'), '" onclick="window.location=\''.$this->getConfigLink().'\';" tabindex="6"></p>';
+			echo '<p><input type="submit" value="', WT_I18N::translate('save'), '" tabindex="5">';
 			echo '</form>';
 			exit;
 		}
@@ -258,9 +257,10 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 
 	private function show() {
 		global $controller;
-		$controller=new WT_Controller_Base();
-		$controller->setPageTitle($this->getTitle());
-		$controller->pageHeader();
+		$controller=new WT_Controller_Page();
+		$controller
+			->setPageTitle($this->getTitle())
+			->pageHeader();
 
 		$faqs=WT_DB::prepare(
 			"SELECT block_id, bs1.setting_value AS header, bs2.setting_value AS body".
@@ -314,6 +314,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 				echo '<a href="#body">', WT_I18N::translate('back to top'), '</a>';
 				echo '</div>';
 				echo '</div>';
+				// PHP5.3 echo '<div class="faq_body">', substr($faqbody, 0, 1)=='<' ? $faqbody : nl2br($faqbody, false), '</div>';
 				echo '<div class="faq_body">', substr($faqbody, 0, 1)=='<' ? $faqbody : nl2br($faqbody), '</div>';
 				echo '<hr>';
 			}
@@ -323,9 +324,10 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 	private function config() {
 		require_once 'includes/functions/functions_edit.php';
 
-		$controller=new WT_Controller_Base();
-		$controller->setPageTitle($this->getTitle());
-		$controller->pageHeader();
+		$controller=new WT_Controller_Page();
+		$controller
+			->setPageTitle($this->getTitle())
+			->pageHeader();
 
 		$faqs=WT_DB::prepare(
 			"SELECT block_id, block_order, gedcom_id, bs1.setting_value AS header, bs2.setting_value AS faqbody".
@@ -401,7 +403,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 				echo '<div class="faq_edit_item">';
 				echo '<div class="faq_edit_title">', $faq->header, '</div>';
 				// NOTE: Print the body text of the current item
-				echo '<div class="faq_edit_content">', substr($faq->faqbody, 0, 1)=='<' ? $faq->faqbody : nl2br($faq->faqbody), '</div></div></td></tr>';
+				echo '<div class="faq_edit_content">', substr($faq->faqbody, 0, 1)=='<' ? $faq->faqbody : nl2br($faq->faqbody, false), '</div></div></td></tr>';
 			}
 			echo '</table>';
 		}

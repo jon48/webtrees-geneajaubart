@@ -2,7 +2,7 @@
 // Batch update module
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2008  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_batch_update.php 14275 2012-09-14 10:26:33Z greg $
+// $Id: admin_batch_update.php 14626 2013-01-09 09:44:38Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -248,7 +248,7 @@ class batch_update {
 				$vars[]=WT_GED_ID;
 				break;
 			case 'OBJE':
-				$sql[]="SELECT m_media, 'OBJE' FROM `##media` WHERE m_gedfile=?";
+				$sql[]="SELECT m_id, 'OBJE' FROM `##media` WHERE m_file=?";
 				$vars[]=WT_GED_ID;
 				break;
 			default:
@@ -265,7 +265,7 @@ class batch_update {
 			->fetchAssoc();
 	}
 
-	// Scan the plugin directory for a list of plugins
+	// Scan the plugin folder for a list of plugins
 	static function getPluginList() {
 		$array=array();
 		$dir=dirname(__FILE__).'/plugins/';

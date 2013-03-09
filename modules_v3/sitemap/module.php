@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14374 2012-10-01 07:27:21Z greg $
+// $Id: module.php 14786 2013-02-06 22:28:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -39,7 +39,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 
 	// Extend WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Sitemaps" module */ WT_I18N::translate('Generate sitemap files for search engines.');
+		return /* I18N: Description of the “Sitemaps” module */ WT_I18N::translate('Generate sitemap files for search engines.');
 	}
 
 	// Extend WT_Module
@@ -100,7 +100,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 							$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$tree->tree_id.'-n-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
 						}
 					}
-					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##media` WHERE m_gedfile=?")->execute(array($tree->tree_id))->fetchOne();
+					$n=WT_DB::prepare("SELECT COUNT(*) FROM `##media` WHERE m_file=?")->execute(array($tree->tree_id))->fetchOne();
 					if ($n) {
 						for ($i=0; $i<=$n/self::RECORDS_PER_VOLUME; ++$i) {
 							$data.='<sitemap><loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&amp;mod_action=generate&amp;file=sitemap-'.$tree->tree_id.'-m-'.$i.'.xml</loc>'.$lastmod.'</sitemap>'.PHP_EOL;
@@ -178,10 +178,10 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 				break;
 			case 'm':
 				$rows=WT_DB::prepare(
-					"SELECT 'OBJE' AS type, m_media AS xref, m_gedfile AS ged_id, m_gedrec AS gedrec, m_titl, m_file".
+					"SELECT 'OBJE' AS type, m_id AS xref, m_file AS ged_id, m_gedcom AS gedrec, m_titl, m_filename".
 					" FROM `##media`".
-					" WHERE m_gedfile=?".
-					" ORDER BY m_media".
+					" WHERE m_file=?".
+					" ORDER BY m_id".
 					" LIMIT ".self::RECORDS_PER_VOLUME." OFFSET ".($volume*self::RECORDS_PER_VOLUME)
 				)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
 				foreach ($rows as $row) {
@@ -214,7 +214,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 	}
 
 	private function admin() {
-		$controller=new WT_Controller_Base();
+		$controller=new WT_Controller_Page();
 		$controller
 			->requireAdminLogin()
 			->setPageTitle($this->getTitle())
@@ -250,7 +250,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 			echo '>', $tree->tree_title_html, '</p>';
 		}
 		echo
-			'<input type="submit" value="', WT_I18N::translate('Save'), '">',
+			'<input type="submit" value="', WT_I18N::translate('save'), '">',
 			'</form>',
 			'<hr>';
 
@@ -264,7 +264,6 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 				'<p>', WT_I18N::translate('To tell search engines that sitemaps are available, you can use the following links.'), '</p>',
 				'<ul>',
 				// This list comes from http://en.wikipedia.org/wiki/Sitemaps
-				'<li><a target="_new" href="http://submissions.ask.com/ping?sitemap='.$site_map_url2.'">Ask</a></li>',
 				'<li><a target="_new" href="http://www.bing.com/webmaster/ping.aspx?siteMap='.$site_map_url2.'">Bing</a></li>',
 				'<li><a target="_new" href="http://www.google.com/webmasters/tools/ping?sitemap='.$site_map_url2.'">Google</a></li>',
 				'</ul>';

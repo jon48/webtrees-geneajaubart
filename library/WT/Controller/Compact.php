@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Compact.php 14116 2012-07-23 19:40:08Z greg $
+// $Id: Compact.php 14694 2013-01-22 10:37:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -43,7 +43,7 @@ class WT_Controller_Compact extends WT_Controller_Chart {
 
 		if ($this->root && $this->root->canDisplayName()) {
 			$this->setPageTitle(
-				/* I18N: %s is a person's name */
+				/* I18N: %s is an individual’s name */
 			WT_I18N::translate('Compact tree of %s', $this->root->getFullName())
 		);
 			$this->treeid=ancestry_array($this->rootid, 5);
@@ -64,17 +64,11 @@ class WT_Controller_Compact extends WT_Controller_Chart {
 			$addname=$indi->getAddName();
 
 			if ($this->show_thumbs && $SHOW_HIGHLIGHT_IMAGES) {
-				$object=find_highlighted_object($pid, WT_GED_ID, $indi->getGedcomRecord());
 				$birth_date=$indi->getBirthDate();
 				$death_date=$indi->getDeathDate();
 				$img_title=$name.' - '.$birth_date->Display(false).' - '.$death_date->Display(false);
 				$img_id='box-'.$pid;
-				if (!empty($object)) {
-					$mediaobject=WT_Media::getInstance($object['mid']);
-					$text=$mediaobject->displayMedia(array('display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$img_title));
-				} else {
-					$text=display_silhouette(array('sex'=>$indi->getSex(),'display_type'=>'pedigree_person','img_id'=>$img_id,'img_title'=>$img_title)); // may return ''
-				}
+				$text=$indi->displayImage();
 			}
 
 			$text .= '<a class="name1" href="'.$indi->getHtmlUrl().'">';
@@ -102,9 +96,9 @@ class WT_Controller_Compact extends WT_Controller_Chart {
 		}
 		// -- box size
 		if ($n==1) {
-			$text='<td class="person_box'.$isF.'" style="text-align:center; vertical-align:top;">'.$text.'</td>';
+			$text='<td class="person_box'.$isF.' person_box_template" style="text-align:center; vertical-align:top;">'.$text.'</td>';
 		} else {
-			$text='<td class="person_box'.$isF.'" style="text-align:center; vertical-align:top;" width="15%">'.$text.'</td>';
+			$text='<td class="person_box'.$isF.' person_box_template" style="text-align:center; vertical-align:top;" width="15%">'.$text.'</td>';
 		}
 		return $text;
 	}

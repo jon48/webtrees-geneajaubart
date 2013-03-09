@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Media.php 13949 2012-05-28 21:03:05Z greg $
+// $Id: Media.php 14642 2013-01-12 23:39:52Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -34,62 +34,35 @@ require_once WT_ROOT.'includes/functions/functions_import.php';
 class WT_Controller_Media extends WT_Controller_GedcomRecord {
 
 	public function __construct() {
-		global $MEDIA_DIRECTORY;
-
-		$filename = safe_GET('filename');
 		$xref = safe_GET_xref('mid');
 
-		if (empty($filename) && empty($xref)) {
-			// this section used by mediafirewall.php to determine what media file was requested
+		$gedrec=find_media_record($xref, WT_GED_ID);
+		if (WT_USER_CAN_EDIT) {
+			$newrec=find_updated_record($xref, WT_GED_ID);
+		} else {
+			$newrec=null;
+		}
 
-			if (isset($_SERVER['REQUEST_URI'])) {
-				// NOTE: format of this server variable:
-				// Apache: /phpGedView/media/a.jpg
-				// IIS:    /phpGedView/mediafirewall.php?404;http://server/phpGedView/media/a.jpg
-				$requestedfile = $_SERVER['REQUEST_URI'];
-				// urldecode the request
-				$requestedfile = rawurldecode($requestedfile);
-				// make sure the requested file is in the media directory
-				if (strpos($requestedfile, $MEDIA_DIRECTORY) !== false) {
-					// strip off the wt directory and media directory from the requested url so just the image information is left
-					$filename = substr($requestedfile, strpos($requestedfile, $MEDIA_DIRECTORY) + strlen($MEDIA_DIRECTORY) - 1);
-					// strip the ged param if it was passed on the querystring
-					// would be better if this could remove any querystring, but '?' are valid in unix filenames
-					if (strpos($filename, '?ged=') !== false) {
-						$filename = substr($filename, 0, strpos($filename, '?ged='));
-					}
-					// if user requested a thumbnail, lookup permissions based on the original image
-					$filename = str_replace('/thumbs', '', $filename);
-				} else {
-					// the MEDIA_DIRECTORY of the current GEDCOM was not part of the requested file
-					// either the requested file is in a different GEDCOM (with a different MEDIA_DIRECTORY)
-					// or the Media Firewall is being called from outside the MEDIA_DIRECTORY
-					// this condition can be detected by the media firewall by calling controller->getServerFilename()
-				}
+		if ($gedrec===null) {
+			if ($newrec===null) {
+				// Nothing to see here.
+				parent::__construct();
+				return;
+			} else {
+				// Create a dummy record from the first line of the new record.
+				// We need it for diffMerge(), getXref(), etc.
+				list($gedrec)=explode("\n", $newrec);
 			}
 		}
 
-		//Checks to see if the filename ($filename) exists
-		if (!empty($filename)) {
-			//If the filename ($filename) is set, then it will call the method to get the Media ID ($xref) from the filename ($filename)
-			$xref = get_media_id_from_file($filename);
-			if (!$xref) {
-				//This will set the Media ID to be false if the File given doesn't match to anything in the database
-				$xref = false;
-				// create a very basic gedcom record for this file so that the functions of the media object will work
-				// this is used by the media firewall when requesting an object that exists in the media firewall directory but not in the gedcom
-				$this->record = new WT_Media("0 @"."0"."@ OBJE\n1 FILE ".$filename);
-			}
-		}
+		$this->record = new WT_Media($gedrec);
 
-		//checks to see if the Media ID ($xref) is set. If the Media ID isn't set then there isn't any information avaliable for that picture the picture doesn't exist.
-		if ($xref) {
-			//This creates a Media Object from the getInstance method of the Media Class. It takes the Media ID ($xref) and creates the object.
-			$this->record = WT_Media::getInstance($xref);
+		// If there are pending changes, merge them in.
+		if ($newrec!==null) {
+			$diff_record=new WT_Media($newrec);
+			$diff_record->setChanged(true);
+			$this->record->diffMerge($diff_record);
 		}
-
-		if (is_null($this->record)) return false;
-		$this->record->ged_id=WT_GED_ID; // This record is from a file
 
 		parent::__construct();
 	}
@@ -151,12 +124,8 @@ class WT_Controller_Media extends WT_Controller_GedcomRecord {
 
 		// delete
 		if (WT_USER_CAN_EDIT) {
-			$submenu = new WT_Menu(
-				WT_I18N::translate('Remove object'),
-				"admin_media.php?action=removeobject&amp;xref=".$this->record->getXref(),
-				'menu-obje-del'
-			);
-			$submenu->addOnclick("return confirm('".WT_I18N::translate('Are you sure you want to remove this object from the database?')."')");
+			$submenu = new WT_Menu(WT_I18N::translate('Delete'), '#', 'menu-obje-del');
+			$submenu->addOnclick("if (confirm('".WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($this->record->getFullName()))."')) jQuery.post('action.php',{action:'delete-media',xref:'".$this->record->getXref()."'},function(){location.reload();})");
 			$menu->addSubmenu($submenu);
 		}
 
@@ -185,48 +154,8 @@ class WT_Controller_Media extends WT_Controller_GedcomRecord {
 	*/
 	function getFacts($includeFileName=true) {
 		$facts = $this->record->getFacts(array());
-		sort_facts($facts);
-		//if ($includeFileName) $facts[] = new WT_Event("1 FILE ".$this->record->getFilename(), $this->record, 0);
-		$mediaType = $this->record->getMediatype();
-		$facts[] = new WT_Event("1 TYPE ".WT_Gedcom_Tag::getFileFormTypeValue($mediaType), $this->record, 0);
 
-		if (($newrec=find_updated_record($this->record->getXref(), WT_GED_ID))!==null) {
-			$newmedia = new WT_Media($newrec);
-			$newfacts = $newmedia->getFacts(array());
-			$newimgsize = $newmedia->getImageAttributes();
-			if ($includeFileName) $newfacts[] = new WT_Event("1 TYPE ".WT_Gedcom_Tag::getFileFormTypeValue($mediaType), $this->record, 0);
-			$newfacts[] = new WT_Event("1 FORM ".$newimgsize['ext'], $this->record, 0);
-			$mediaType = $newmedia->getMediatype();
-			$newfacts[] = new WT_Event("1 TYPE ".WT_Gedcom_Tag::getFileFormTypeValue($mediaType), $this->record, 0);
-			//-- loop through new facts and add them to the list if they are any changes
-			//-- compare new and old facts of the Personal Fact and Details tab 1
-			for ($i=0; $i<count($facts); $i++) {
-				$found=false;
-				foreach ($newfacts as $indexval => $newfact) {
-					if (trim($newfact->gedcomRecord)==trim($facts[$i]->gedcomRecord)) {
-						$found=true;
-						break;
-					}
-				}
-				if (!$found) {
-					$facts[$i]->setIsOld();
-				}
-			}
-			foreach ($newfacts as $indexval => $newfact) {
-				$found=false;
-				foreach ($facts as $indexval => $fact) {
-					if (trim($fact->gedcomRecord)==trim($newfact->gedcomRecord)) {
-						$found=true;
-						break;
-					}
-				}
-				if (!$found) {
-					$newfact->setIsNew();
-					$facts[]=$newfact;
-				}
-			}
-		}
-
+		// Add some dummy facts to show additional information
 		if ($this->record->fileExists()) {
 			// get height and width of image, when available
 			$imgsize = $this->record->getImageAttributes();
@@ -239,29 +168,5 @@ class WT_Controller_Media extends WT_Controller_GedcomRecord {
 
 		sort_facts($facts);
 		return $facts;
-	}
-
-	/**
-	* get the relative file path of the image on the server
-	* @return string
-	*/
-	function getLocalFilename() {
-		if ($this->record) {
-			return $this->record->getLocalFilename();
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	* get the filename on the server
-	* @return string
-	*/
-	function getServerFilename() {
-		if ($this->record) {
-			return $this->record->getServerFilename();
-		} else {
-			return false;
-		}
 	}
 }

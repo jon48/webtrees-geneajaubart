@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -38,7 +38,7 @@ class recent_changes_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Recent changes" module */ WT_I18N::translate('A list of records that have been updated recently.');
+		return /* I18N: Description of the “Recent changes” module */ WT_I18N::translate('A list of records that have been updated recently.');
 	}
 
 	// Implement class WT_Module_Block

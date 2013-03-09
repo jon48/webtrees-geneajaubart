@@ -2,7 +2,7 @@
 // User Account Edit Interface.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edituser.php 14294 2012-09-15 11:36:34Z greg $
+// $Id: edituser.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'edituser.php');
 require './includes/session.php';
@@ -34,9 +34,8 @@ if (!get_user_setting(WT_USER_ID, 'editaccount')) {
 	exit;
 }
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller->setPageTitle(WT_I18N::translate('User administration'));
-
 
 // Valid values for form variables
 $ALL_THEMES_DIRS=array();
@@ -180,6 +179,6 @@ echo '<div id="edituser-page">
 		<div class="label">', WT_I18N::translate('Visible to other users when online'), help_link('useradmin_visibleonline'), '</div>
 		<div class="value">', checkbox('form_visible_online', get_user_setting(WT_USER_ID, 'visibleonline')), '</div>
 	</div>'; // close edituser-table
-	echo '<div id="edituser_submit"><input type="submit" value="', WT_I18N::translate('Save'), '"></div>';
+	echo '<div id="edituser_submit"><input type="submit" value="', WT_I18N::translate('save'), '"></div>';
 	echo '</form>
 </div>'; // close edituser-page

@@ -5,7 +5,7 @@
 // adding I18N.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2006-2009 Greg Roach, all rights reserved
@@ -24,13 +24,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-//$Id: admin_trees_check.php 14275 2012-09-14 10:26:33Z greg $
+//$Id: admin_trees_check.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_check.php');
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->requireManagerLogin()
 	->setPageTitle(WT_I18N::translate('Check for errors'))
@@ -50,15 +50,15 @@ if (!safe_GET('go')) {
 // which may prevent the WT_GedcomRecord objects from working...
 
 $rows=WT_DB::prepare(
-	"SELECT i_id    AS xref, 'INDI' AS type, i_gedcom AS gedrec FROM `##individuals` WHERE i_file=?".
+	"SELECT i_id AS xref, 'INDI' AS type, i_gedcom AS gedrec FROM `##individuals` WHERE i_file=?".
 	" UNION ".
-	"SELECT f_id    AS xref, 'FAM'  AS type, f_gedcom AS gedrec FROM `##families`    WHERE f_file=?".
+	"SELECT f_id AS xref, 'FAM'  AS type, f_gedcom AS gedrec FROM `##families`    WHERE f_file=?".
 	" UNION ".
-	"SELECT s_id    AS xref, 'SOUR' AS type, s_gedcom AS gedrec FROM `##sources`     WHERE s_file=?".
+	"SELECT s_id AS xref, 'SOUR' AS type, s_gedcom AS gedrec FROM `##sources`     WHERE s_file=?".
 	" UNION ".
-	"SELECT m_media AS xref, 'OBJE' AS type, m_gedrec AS gedrec FROM `##media`       WHERE m_gedfile=?".
+	"SELECT m_id AS xref, 'OBJE' AS type, m_gedcom AS gedrec FROM `##media`       WHERE m_file=?".
 	" UNION ".
-	"SELECT o_id    AS xref, o_type AS type, o_gedcom AS gedrec FROM `##other`       WHERE o_file=? AND o_type NOT IN ('HEAD', 'TRLR')"
+	"SELECT o_id AS xref, o_type AS type, o_gedcom AS gedrec FROM `##other`       WHERE o_file=? AND o_type NOT IN ('HEAD', 'TRLR')"
 )->execute(array(WT_GED_ID, WT_GED_ID, WT_GED_ID, WT_GED_ID, WT_GED_ID))->fetchAll();
 
 $records=array();
@@ -140,7 +140,7 @@ $upper_links=array();
 foreach ($records as $record) {
 	$all_links[$record->xref]=array();
 	$upper_links[strtoupper($record->xref)]=$record->xref;
-	preg_match_all('/\n\d ([^ ]+) @([^#@][^@]*)@/', $record->gedrec, $matches, PREG_SET_ORDER);
+	preg_match_all('/\n\d ('.WT_REGEX_TAG.') @([^#@\n][^\n@]*)@/', $record->gedrec, $matches, PREG_SET_ORDER);
 	foreach ($matches as $match) {
 		$all_links[$record->xref][$match[2]]=$match[1];
 	}
@@ -176,7 +176,7 @@ foreach ($all_links as $xref1=>$links) {
 			// Target XREF does exist - but is invalid
 			echo error(
 				link_message($type1, $xref1, $type2, $xref2).' '.
-				/* I18N: %1$s is an internal ID numbers such as "R123".  %2$s and %3$s are record types, such as INDI or SOUR */ WT_I18N::translate('%1$s is a %2$s but a %3$s is expected.', format_link($xref2), format_type($type3), format_type($type2))
+				/* I18N: %1$s is an internal ID number such as R123.  %2$s and %3$s are record types, such as INDI or SOUR */ WT_I18N::translate('%1$s is a %2$s but a %3$s is expected.', format_link($xref2), format_type($type3), format_type($type2))
 			);
 		} elseif (
 			$type2=='FAMC' && (!array_key_exists($xref1, $all_links[$xref2]) || $all_links[$xref2][$xref1]!='CHIL') ||
@@ -187,7 +187,7 @@ foreach ($all_links as $xref1=>$links) {
 		) {
 			echo error(
 			link_message($type1, $xref1, $type2, $xref2).' '.
-				/* I18N: %1$s and %2$s are internal ID numbers such as "R123" */ WT_I18N::translate('%1$s does not have a link back to %2$s.', format_link($xref2), format_link($xref1))
+				/* I18N: %1$s and %2$s are internal ID numbers such as R123 */ WT_I18N::translate('%1$s does not have a link back to %2$s.', format_link($xref2), format_link($xref1))
 			);
 		}
 	}
@@ -195,7 +195,7 @@ foreach ($all_links as $xref1=>$links) {
 
 function link_message($type1, $xref1, $type2, $xref2) {
 	return
-		/* I18N: The placeholders are GEDCOM identifiers and tags.  e.g. "INDI I123 contains a FAMC link to F234 */ WT_I18N::translate(
+		/* I18N: The placeholders are GEDCOM identifiers and tags.  e.g. “INDI I123 contains a FAMC link to F234.” */ WT_I18N::translate(
 			'%1$s %2$s has a %3$s link to %4$s.',
 			format_type($type1),
 			format_link($xref1),

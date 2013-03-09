@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: config_data.php 14185 2012-08-18 22:49:00Z greg $
+// $Id: config_data.php 14682 2013-01-19 16:31:27Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -170,6 +170,7 @@ $emptyfacts=array(
 	'WILL',
 	'_HOL',
 	'_NMR',
+	'_NMAR',
 	'_SEPR',
 );
 
@@ -425,6 +426,14 @@ $level2_tags=array(
 	),
 	'_WT_USER'=>array(
 		'_TODO',
+	),
+	// See https://bugs.launchpad.net/webtrees/+bug/1082666
+	'RELI'=>array(
+		//'CHR',
+		//'CHRA',
+		//'BAPM',
+		//'MARR',
+		//'BURI',
 	),
 );
 

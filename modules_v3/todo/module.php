@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14292 2012-09-15 11:21:47Z greg $
+// $Id: module.php 14754 2013-02-02 21:14:34Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return /* I18N: Description of "Research tasks" module */ WT_I18N::translate('A list of tasks and activities that are linked to the family tree.');
+		return /* I18N: Description of “Research tasks” module */ WT_I18N::translate('A list of tasks and activities that are linked to the family tree.');
 	}
 
 	// Implement class WT_Module_Block
@@ -66,7 +66,7 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 
 		$table_id = 'ID'.(int)(microtime()*1000000); // create a unique ID
 		$controller
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+			->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 			->addInlineJavascript('
 				jQuery("#'.$table_id.'").dataTable( {
 				"sDom": \'t\',

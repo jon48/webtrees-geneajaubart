@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: AdvancedSearch.php 14395 2012-10-06 22:52:12Z greg $
+// $Id: AdvancedSearch.php 14557 2012-11-17 09:20:06Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -97,7 +97,7 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 			'EVEN',
 			'EVEN:DATE','EVEN:PLAC',
 			'FAMS:CENS:DATE','FAMS:CENS:PLAC',
-			'FAMS:DIV:DATE','FAMS:DIV:PLAC',
+			'FAMS:DIV:DATE',
 			'FAMS:NOTE',
 			'FAMS:SLGS:DATE','FAMS:SLGS:PLAC',
 			'FAX',
@@ -490,7 +490,7 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 			$person=WT_Person::getInstance($row);
 			// Check for XXXX:PLAC fields, which were only partially matched by SQL
 			foreach ($this->fields as $n=>$field) {
-				if (preg_match('/^('.WT_REGEX_TAG.'):PLAC$/', $field, $match)) {
+				if ($this->values[$n] && preg_match('/^('.WT_REGEX_TAG.'):PLAC$/', $field, $match)) {
 					if (!preg_match('/\n1 '.$match[1].'(\n[2-9].*)*\n2 PLAC .*'.preg_quote($this->values[$n], '/').'/i', $person->getGedcomRecord())) {
 						continue 2;
 				 }

@@ -4,7 +4,7 @@
 // used by the SAX parser to generate HTML reports from the XML report file.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: HTML.php 14427 2012-10-16 14:26:33Z lukasz $
+// $Id: HTML.php 14737 2013-01-30 20:11:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -549,12 +549,8 @@ class WT_Report_HTML extends WT_Report_Base {
 			}
 		}
 		
-//??if ($TEXT_DIRECTION!="ltr") $text=spanLTRRTL($text,"BOTH"); //@@	needed for IDs in the missing data report - ruins other reports
 		$htmlcode .= ">$text</span>";
-//@@	$htmlcode = str_replace(array("\n", "> ", " <", "+", ","), array("<br>", ">&nbsp;", "&nbsp;<", $this->entityRTL."+", $this->entityRTL.","), $htmlcode);
  		$htmlcode = str_replace(array("\n", "> ", " <"), array("<br>", ">&nbsp;", "&nbsp;<"), $htmlcode);
-//DumpString($htmlcode); //@@@ ??
-		//@@ do we need the +? + on rtl pages does not work for phone numbers
 		echo $htmlcode;
 	}
 

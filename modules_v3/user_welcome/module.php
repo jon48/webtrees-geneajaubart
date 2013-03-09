@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13642 2012-03-24 13:06:08Z greg $
+// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,14 +36,14 @@ class user_welcome_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "My page" module */ WT_I18N::translate('A greeting message and useful links for a user.');
+		return /* I18N: Description of the “My page” module */ WT_I18N::translate('A greeting message and useful links for a user.');
 	}
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
-		$title = '<span dir="auto">'./* I18N: A greeting; %s is the user's name */ WT_I18N::translate('Welcome %s', getUserFullName(WT_USER_ID)).'</span>';
+		$title = '<span dir="auto">'./* I18N: A greeting; %s is the user’s name */ WT_I18N::translate('Welcome %s', getUserFullName(WT_USER_ID)).'</span>';
 		$content = '<table><tr>';
 		if (get_user_setting(WT_USER_ID, 'editaccount')) {
 			$content .= '<td><a href="edituser.php"><i class="icon-mypage"></i><br>'.WT_I18N::translate('My account').'</a></td>';

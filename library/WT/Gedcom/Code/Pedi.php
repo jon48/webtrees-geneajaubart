@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Pedi.php 13596 2012-03-17 11:48:27Z greg $
+// $Id: Pedi.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -58,15 +58,15 @@ class WT_Gedcom_Code_Pedi {
 			}
 		case 'sealing':
 			switch ($sex) {
-			case 'U': return /* I18N: "sealing" is a Mormon ceremony. */ WT_I18N::translate_c('Pedigree',        'Sealing');
-			case 'M': return /* I18N: "sealing" is a Mormon ceremony. */ WT_I18N::translate_c('Male pedigree',   'Sealing');
-			case 'F': return /* I18N: "sealing" is a Mormon ceremony. */ WT_I18N::translate_c('Female pedigree', 'Sealing');
+			case 'U': return /* I18N: “sealing” is a ceremony in the Mormon church. */ WT_I18N::translate_c('Pedigree',        'Sealing');
+			case 'M': return /* I18N: “sealing” is a ceremony in the Mormon church. */ WT_I18N::translate_c('Male pedigree',   'Sealing');
+			case 'F': return /* I18N: “sealing” is a ceremony in the Mormon church. */ WT_I18N::translate_c('Female pedigree', 'Sealing');
 			}
 			case 'rada':
 				// Not standard GEDCOM - a webtrees extension
 				// This is an arabic word which does not exist in other languages.
 				// So, it will not have any inflected forms.
-				return /* I18N: This is an Arabic word, pronounced "ra DAH".  It is child-to-parent pedigree, established by wet-nursing. */ WT_I18N::translate('Rada');
+				return /* I18N: This is an Arabic word, pronounced “ra DAH”.  It is child-to-parent pedigree, established by wet-nursing. */ WT_I18N::translate('Rada');
 		default:
 			return $type;
 		}
@@ -89,8 +89,8 @@ class WT_Gedcom_Code_Pedi {
 		case 'birth':   return WT_I18N::translate('Family with parents');
 		case 'adopted': return WT_I18N::translate('Family with adoptive parents');
 		case 'foster':  return WT_I18N::translate('Family with foster parents');
-		case 'sealing': return /* I18N: "sealing" is a Mormon ceremony. */ WT_I18N::translate('Family with sealing parents');
-		case 'rada':    return /* I18N: "rada" is an Arabic word, pronounced "ra DAH".  It is child-to-parent pedigree, established by wet-nursing. */ WT_I18N::translate('Family with rada parents');
+		case 'sealing': return /* I18N: “sealing” is a Mormon ceremony. */ WT_I18N::translate('Family with sealing parents');
+		case 'rada':    return /* I18N: “rada” is an Arabic word, pronounced “ra DAH”.  It is child-to-parent pedigree, established by wet-nursing. */ WT_I18N::translate('Family with rada parents');
 		default:        return WT_I18N::translate('Family with parents').' - '.$pedi;
 		}
 	}

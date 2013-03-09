@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14276 2012-09-14 15:39:40Z greg $
+// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Login" module */ WT_I18N::translate('An alternative way to login and logout.');
+		return /* I18N: Description of the “Login” module */ WT_I18N::translate('An alternative way to login and logout.');
 	}
 
 	// Implement class WT_Module_Block
@@ -103,7 +103,7 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 					'<input type="text" id="new_passwd_username" name="new_passwd_username" value="">
 				</label>
 			</div>
-			<div><input type="submit" value="'. WT_I18N::translate('Continue'). '"></div>
+			<div><input type="submit" value="'. WT_I18N::translate('continue'). '"></div>
 			</form>
 		</div>'; //"new_passwd"
 		$content.= '</div>';//"login-box"

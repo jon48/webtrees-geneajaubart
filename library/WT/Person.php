@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Person.php 14412 2012-10-11 20:42:52Z greg $
+// $Id: Person.php 14782 2013-02-05 10:48:16Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -247,15 +247,71 @@ class WT_Person extends WT_GedcomRecord {
 		return false;
 	}
 
-	/**
-	* get highlighted media
-	* @return array
-	*/
+	// Find the highlighted media object for an individual
+	// 1. Ignore all media objects that are not displayable because of Privacy rules
+	// 2. Ignore all media objects with the Highlight option set to "N"
+	// 3. Pick the first media object that matches these criteria, in order of preference:
+	//    (a) Level 1 object with the Highlight option set to "Y"
+	//    (b) Level 1 object with the Highlight option missing or set to other than "Y" or "N"
+	//    (c) Level 2 or higher object with the Highlight option set to "Y"
 	function findHighlightedMedia() {
-		if (is_null($this->highlightedimage)) {
-			$this->highlightedimage = find_highlighted_object($this->xref, $this->ged_id, $this->getGedcomRecord());
+		$objectA = null;
+		$objectB = null;
+		$objectC = null;
+
+		// Iterate over all of the media items for the person
+		preg_match_all('/\n(\d) OBJE @(' . WT_REGEX_XREF . ')@/', $this->getGedcomRecord(), $matches, PREG_SET_ORDER);
+		foreach ($matches as $match) {
+			$media = WT_Media::getInstance($match[2]);
+			if (!$media || !$media->canDisplayDetails() || $media->isExternal()) {
+				continue;
+			}
+			$level = $match[1];
+			$prim=$media->isPrimary();
+			if ($prim=='N') {
+				continue;
+			}
+			if ($level == 1) {
+				if ($prim == 'Y') {
+					if (empty($objectA)) {
+						$objectA = $media;
+					}
+				} else {
+					if (empty($objectB)) {
+						$objectB = $media;
+					}
+				}
+			} else {
+				if ($prim == 'Y') {
+					if (empty($objectC)) {
+						$objectC = $media;
+					}
+				}
+			}
 		}
-		return $this->highlightedimage;
+
+		if ($objectA) return $objectA;
+		if ($objectB) return $objectB;
+		if ($objectC) return $objectC;
+
+		return null;
+	}
+
+	// Display the prefered image for this individual.
+	// Use an icon if no image is available.
+	public function displayImage() {
+		global $USE_SILHOUETTE;
+
+		$media = $this->findHighlightedMedia();
+		if ($media) {
+			// Thumbnail exists - use it.
+			return $media->displayImage();
+		} elseif ($USE_SILHOUETTE) {
+			// No thumbnail exists - use an icon
+			return '<i class="icon-silhouette-' . $this->getSex() . '"></i>';
+		} else {
+			return '';
+		}
 	}
 
 	/**
@@ -421,13 +477,13 @@ class WT_Person extends WT_GedcomRecord {
 		return $tmp;
 	}
 
-	// Get the range of years in which a person lived.  e.g. "1870–", "1870–1920", "–1920".
+	// Get the range of years in which a person lived.  e.g. “1870–”, “1870–1920”, “–1920”.
 	// Provide the full date using a tooltip.
-	// For consistent layout in charts, etc., show just a "–" when no dates are known.
+	// For consistent layout in charts, etc., show just a “–” when no dates are known.
 	// Note that this is a (non-breaking) en-dash, and not a hyphen.
 	public function getLifeSpan() {
 		return
-			/* I18N: A range of years, e.g. "1870–", "1870–1920", "–1920" */ WT_I18N::translate(
+			/* I18N: A range of years, e.g. “1870–”, “1870–1920”, “–1920” */ WT_I18N::translate(
 				'%1$s–%2$s',
 				'<span title="'.strip_tags($this->getBirthDate()->Display()).'">'.$this->getBirthDate()->MinDate()->Format('%Y').'</span>',
 				'<span title="'.strip_tags($this->getDeathDate()->Display()).'">'.$this->getDeathDate()->MinDate()->Format('%Y').'</span>'
@@ -901,37 +957,43 @@ class WT_Person extends WT_GedcomRecord {
 		}
 	}
 
-	/**
-	* get the correct label for a step family
-	* @param Family $family the family to get the label for
-	* @return string
-	*/
-	function getStepFamilyLabel($family) {
-		$label = 'Unknown Family';
-		if (is_null($family)) return $label;
-		$childfams = $this->getChildFamilies();
-		$mother = $family->getWife();
-		$father = $family->getHusband();
-		foreach ($childfams as $fam) {
+	// Create a label for a step family
+	function getStepFamilyLabel(WT_Family $family) {
+		foreach ($this->getChildFamilies() as $fam) {
 			if (!$fam->equals($family)) {
-				$wife = $fam->getWife();
-				$husb = $fam->getHusband();
-				if ((is_null($husb) || !$husb->equals($father)) && (is_null($wife)||$wife->equals($mother))) {
-					if ($mother->getSex()=='M') $label = WT_I18N::translate('Father\'s Family with ');
-					else $label = WT_I18N::translate('Mother\'s Family with ');
-					if (!is_null($father)) $label .= $father->getFullName();
-					else $label .= WT_I18N::translate('unknown person');
+				if ((is_null($fam->getHusband()) || !$fam->getHusband()->equals($family->getHusband())) && (is_null($fam->getWife()) || $fam->getWife()->equals($family->getWife()))) {
+					if ($family->getHusband()) {
+						if ($family->getWife()->getSex()=='F') {
+							return /* I18N: A step-family.  %s is an individual’s name */ WT_I18N::translate('Mother’s family with %s', $family->getHusband()->getFullName());
+						} else {
+							return /* I18N: A step-family.  %s is an individual’s name */ WT_I18N::translate('Father’s family with %s', $family->getHusband()->getFullName());
+						}
+					} else {
+						if ($family->getWife()->getSex()=='F') {
+							return /* I18N: A step-family. */ WT_I18N::translate('Mother’s family with an unknown individual');
+						} else {
+							return /* I18N: A step-family. */ WT_I18N::translate('Father’s family with an unknown individual');
+						}
+					}
+				} elseif ((is_null($fam->getWife()) || !$fam->getWife()->equals($family->getWife())) && (is_null($fam->getHusband()) || $fam->getHusband()->equals($family->getHusband()))) {
+					if ($family->getWife()) {
+						if ($family->getHusband()->getSex()=='F') {
+							return /* I18N: A step-family.  %s is an individual’s name */ WT_I18N::translate('Mother’s family with %s', $family->getWife()->getFullName());
+						} else {
+							return /* I18N: A step-family.  %s is an individual’s name */ WT_I18N::translate('Father’s family with %s', $family->getWife()->getFullName());
+						}
+					} else {
+						if ($family->getHusband()->getSex()=='F') {
+							return /* I18N: A step-family. */ WT_I18N::translate('Mother’s family with an unknown individual');
+						} else {
+							return /* I18N: A step-family. */ WT_I18N::translate('Father’s family with an unknown individual');
+						}
+					}
 				}
-				else if ((is_null($wife) || !$wife->equals($mother)) && (is_null($husb)||$husb->equals($father))) {
-					if ($father->getSex()=='F') $label = WT_I18N::translate('Mother\'s Family with ');
-					else $label = WT_I18N::translate('Father\'s Family with ');
-					if (!is_null($mother)) $label .= $mother->getFullName();
-					else $label .= WT_I18N::translate('unknown person');
-				}
-				if ($label!='Unknown Family') return $label;
 			}
 		}
-		return $label;
+		// It should not be possible to get here
+		throw new Exception('Invalid family in WT_Person::getStepFamilyLabel(' . $family . ')');
 	}
 	/**
 	* get the correct label for a family
@@ -1041,12 +1103,9 @@ class WT_Person extends WT_GedcomRecord {
 				$fact = $event->getTag();
 				if ($fact=='DIV') $hasdiv = true;
 				// -- handle special source fact case
-				if (($fact!='SOUR') && ($fact!='NOTE') && ($fact!='CHAN') && ($fact!='_UID') && ($fact!='RIN')) {
-					if ((!in_array($fact, $nonfacts))&&(!in_array($fact, $nonfamfacts))) {
-						$factrec = $event->getGedcomRecord();
-						if (!is_null($spouse)) $factrec.="\n2 _WTS @".$spouse->getXref().'@';
-						$factrec.="\n2 _WTFS @".$family->getXref()."@\n";
-						$event->gedcomRecord = $factrec;
+				if ($fact!='SOUR' && $fact!='NOTE' && $fact!='CHAN' && $fact!='_UID' && $fact!='RIN') {
+					if (!in_array($fact, $nonfacts) && !in_array($fact, $nonfamfacts)) {
+						$event->setSpouse($spouse);
 						if ($fact!='OBJE') {
 							$this->indifacts[]=$event;
 						} else {
@@ -1152,8 +1211,16 @@ class WT_Person extends WT_GedcomRecord {
 									$tmp_rec=preg_replace('/^1 ('.WT_EVENTS_MARR.')/', '1 _$1_PARE ', $sEvent->getGedcomRecord()); // Full
 									$tmp_rec="1 _".$sEvent->getTag()."_PARE\n2 DATE ".$sEvent->getValue('DATE')."\n2 PLAC ".$sEvent->getValue('PLAC'); // Abbreviated
 								}
+								// Add links to both spouses
+								foreach ($sfamily->getSpouses() as $spouse) {
+									$tmp_rec .= "\n2 ASSO @" . $spouse->getXref() . '@';
+								}
 								// Create a new event
-								$this->indifacts[]=new WT_Event($tmp_rec."\n2 ASSO @".$parent->getXref()."@\n2 ASSO @".$sEvent->getSpouseId().'@', $sfamily, 0);
+								$tmp = new WT_Event($tmp_rec, $sfamily, 0);
+								if (!$sfamily->equals($family)) {
+									$tmp->setSpouse($parent);
+								}
+								$this->indifacts[]=$tmp;
 							}
 						}
 					}
@@ -1207,11 +1274,11 @@ class WT_Person extends WT_GedcomRecord {
 					$sgdate=$sEvent->getDate();
 					// Always show _BIRT_CHIL, even if the dates are not known
 					if ($option=='_CHIL' || $sgdate->isOK() && WT_Date::Compare($this->getEstimatedBirthDate(), $sgdate)<=0 && WT_Date::Compare($sgdate, $this->getEstimatedDeathDate())<=0) {
-						if ($option=='_GCHI' && $relation=='son') {
+						if ($option=='_GCHI' && $relation=='dau') {
 							// Convert the event to a close relatives event.
 							$tmp_rec=preg_replace('/^1 ('.WT_EVENTS_BIRT.')/', '1 _$1_GCH1', $sEvent->getGedcomRecord()); // Full
 							$tmp_rec="1 _".$sEvent->getTag()."_GCH1\n2 DATE ".$sEvent->getValue('DATE')."\n2 PLAC ".$sEvent->getValue('PLAC'); // Abbreviated
-						} elseif ($option=='_GCHI' && $relation=='dau') {
+						} elseif ($option=='_GCHI' && $relation=='son') {
 							// Convert the event to a close relatives event.
 							$tmp_rec=preg_replace('/^1 ('.WT_EVENTS_BIRT.')/', '1 _$1_GCH2', $sEvent->getGedcomRecord()); // Full
 							$tmp_rec="1 _".$sEvent->getTag()."_GCH2\n2 DATE ".$sEvent->getValue('DATE')."\n2 PLAC ".$sEvent->getValue('PLAC'); // Abbreviated
@@ -1233,11 +1300,11 @@ class WT_Person extends WT_GedcomRecord {
 					$sgdate=$sEvent->getDate();
 					$srec = $sEvent->getGedcomRecord();
 					if ($sgdate->isOK() && WT_Date::Compare($this->getEstimatedBirthDate(), $sgdate)<=0 && WT_Date::Compare($sgdate, $this->getEstimatedDeathDate())<=0) {
-						if ($option=='_GCHI' && $relation=='son') {
+						if ($option=='_GCHI' && $relation=='dau') { 
 							// Convert the event to a close relatives event.
 							$tmp_rec=preg_replace('/^1 ('.WT_EVENTS_DEAT.')/', '1 _$1_GCH1', $sEvent->getGedcomRecord()); // Full
 							$tmp_rec="1 _".$sEvent->getTag()."_GCH1\n2 DATE ".$sEvent->getValue('DATE')."\n2 PLAC ".$sEvent->getValue('PLAC'); // Abbreviated
-						} elseif ($option=='_GCHI' && $relation=='dau') {
+						} elseif ($option=='_GCHI' && $relation=='son') {
 							// Convert the event to a close relatives event.
 							$tmp_rec=preg_replace('/^1 ('.WT_EVENTS_DEAT.')/', '1 _$1_GCH2', $sEvent->getGedcomRecord()); // Full
 							$tmp_rec="1 _".$sEvent->getTag()."_GCH2\n2 DATE ".$sEvent->getValue('DATE')."\n2 PLAC ".$sEvent->getValue('PLAC'); // Abbreviated
@@ -1259,23 +1326,27 @@ class WT_Person extends WT_GedcomRecord {
 					foreach ($sfamily->getAllFactsByType(explode('|', WT_EVENTS_MARR)) as $sEvent) {
 						$sgdate=$sEvent->getDate();
 						if ($sgdate->isOK() && WT_Date::Compare($this->getEstimatedBirthDate(), $sgdate)<=0 && WT_Date::Compare($sgdate, $this->getEstimatedDeathDate())<=0) {
-							if ($option=='_GCHI' && $relation=='son') {
+						if ($option=='_GCHI' && $relation=='dau') {
 								// Convert the event to a close relatives event.
-								$tmp_rec=preg_replace('/^1 ('.WT_EVENTS_MARR.')/', '1 _$1_GCH1', $sEvent->getGedcomRecord()); // Full
+								$tmp_rec=preg_replace('/^1 ('.WT_EVENTS_MARR.')/', '1 _$1_GCH1', $sEvent->getGedcomRecord());
 								$tmp_rec="1 _".$sEvent->getTag()."_GCH1\n2 DATE ".$sEvent->getValue('DATE')."\n2 PLAC ".$sEvent->getValue('PLAC'); // Abbreviated
-							} elseif ($option=='_GCHI' && $relation=='dau') {
+						} elseif ($option=='_GCHI' && $relation=='son') {
 								// Convert the event to a close relatives event.
-								$tmp_rec=preg_replace('/^1 ('.WT_EVENTS_MARR.')/', '1 _$1_GCH2', $sEvent->getGedcomRecord()); // Full
+								$tmp_rec=preg_replace('/^1 ('.WT_EVENTS_MARR.')/', '1 _$1_GCH2', $sEvent->getGedcomRecord());
 								$tmp_rec="1 _".$sEvent->getTag()."_GCH2\n2 DATE ".$sEvent->getValue('DATE')."\n2 PLAC ".$sEvent->getValue('PLAC'); // Abbreviated
 							} else {
 								// Convert the event to a close relatives event.
-								$tmp_rec=preg_replace('/^1 ('.WT_EVENTS_MARR.')/', '1 _$1'.$option, $sEvent->getGedcomRecord()); // Full
+								$tmp_rec=preg_replace('/^1 ('.WT_EVENTS_MARR.')/', '1 _$1'.$option, $sEvent->getGedcomRecord());
 								$tmp_rec="1 _".$sEvent->getTag().$option."\n2 DATE ".$sEvent->getValue('DATE')."\n2 PLAC ".$sEvent->getValue('PLAC'); // Abbreviated
 							}
-							$event=new WT_Event($tmp_rec."\n2 ASSO @".$child->getXref()."@\n2 ASSO @".$sEvent->getSpouseId()."@", $child, 0);
-							if (!in_array($event, $this->indifacts)) {
-								$this->indifacts[]=$event;
+							// Add links to both spouses
+							foreach ($sfamily->getSpouses() as $spouse) {
+								$tmp_rec .= "\n2 ASSO @" . $spouse->getXref() . '@';
 							}
+							// Create a new event
+							$tmp = new WT_Event($tmp_rec, $sfamily, 0);
+							$tmp->setSpouse($child);
+							$this->indifacts[]=$tmp;
 						}
 					}
 				}
@@ -1551,7 +1622,7 @@ class WT_Person extends WT_GedcomRecord {
 			// want the default name, not the one selected for display on the indilist.
 			$primary=$husb->getPrimaryName();
 			$husb->setPrimaryName(null);
-			$txt .= /* I18N: %s is the name of a person's father */ WT_I18N::translate('Father: %s', $husb->getFullName()).'<br>';
+			$txt .= /* I18N: %s is the name of an individual’s father */ WT_I18N::translate('Father: %s', $husb->getFullName()).'<br>';
 			$husb->setPrimaryName($primary);
 		}
 		$wife = $fam->getWife();
@@ -1560,7 +1631,7 @@ class WT_Person extends WT_GedcomRecord {
 			// want the default name, not the one selected for display on the indilist.
 			$primary=$wife->getPrimaryName();
 			$wife->setPrimaryName(null);
-			$txt .= /* I18N: %s is the name of a person's mother */ WT_I18N::translate('Mother: %s', $wife->getFullName());
+			$txt .= /* I18N: %s is the name of an individual’s mother */ WT_I18N::translate('Mother: %s', $wife->getFullName());
 			$wife->setPrimaryName($primary);
 		}
 		$txt .= '</div>';
@@ -1604,7 +1675,7 @@ class WT_Person extends WT_GedcomRecord {
 	// 2 GIVN Carlos
 	// 2 SURN Vasquez,Sante
 	protected function _addName($type, $full, $gedrec) {
-		global $UNKNOWN_NN, $UNKNOWN_PN, $TEXT_DIRECTION;
+		global $UNKNOWN_NN, $UNKNOWN_PN;
 
 		////////////////////////////////////////////////////////////////////////////
 		// Extract the structured name parts - use for "sortable" names and indexes

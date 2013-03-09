@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: message.php 14279 2012-09-14 21:46:56Z greg $
+// $Id: message.php 14667 2013-01-17 22:39:16Z greg $
 
 define('WT_SCRIPT_NAME', 'message.php');
 require './includes/session.php';
@@ -46,7 +46,7 @@ $to_user_id=get_user_id($to);
 // Only admins can send broadcast messages
 if ((!$to_user_id || $to=='all' || $to=='last_6mo' || $to=='never_logged') && !WT_USER_IS_ADMIN) {
 	// TODO, what if we have a user called "all" or "last_6mo" or "never_logged" ???
-	Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->addMessage(WT_I18N::translate('Message was not sent'));
+	WT_FlashMessages::addMessage(WT_I18N::translate('Message was not sent'));
 	$controller->pageHeader();
 	$controller->addInlineJavascript('window.opener.location.reload(); window.close();');
 	exit;
@@ -68,8 +68,8 @@ if (WT_USER_ID) {
 	if (preg_match('/(?!'.preg_quote(WT_SERVER_NAME, '/').')(((?:ftp|http|https):\/\/)[a-zA-Z0-9.-]+)/', $subject.$body, $match)) {
 		$errors.=
 			'<p class="ui-state-error">'.WT_I18N::translate('You are not allowed to send messages that contain external links.').'</p>'.
-			'<p class="ui-state-highlight">'./* I18N: e.g. "You should delete the “http://” from “http://www.example.com” and try again." */ WT_I18N::translate('You should delete the “%1$s” from “%2$s” and try again.', $match[2], $match[1]).'</p>'.
-		AddToLog('Possible spam message from "'.$from_name.'"/"'.$from_email.'", IP="'.$_SERVER['REMOTE_ADDR'].'", subject="'.$subject.'", body="'.$body.'"', 'auth');
+			'<p class="ui-state-highlight">'./* I18N: e.g. ‘You should delete the “http://” from “http://www.example.com” and try again.’ */ WT_I18N::translate('You should delete the “%1$s” from “%2$s” and try again.', $match[2], $match[1]).'</p>'.
+		AddToLog('Possible spam message from "'.$from_name.'"/"'.$from_email.'", IP="'.$WT_REQUEST->getClientIp().'", subject="'.$subject.'", body="'.$body.'"', 'auth');
 		$action='compose';
 	}
 	$from=$from_email;
@@ -144,7 +144,11 @@ case 'compose':
 	if ($method=='messaging2') {
 		echo WT_I18N::translate('When you send this message you will receive a copy sent via email to the address you provided.');
 	}
-	echo '<center><br><br><a href="#" onclick="window.opener.location.reload(); window.close();">', WT_I18N::translate('Close Window'), '</a></center>';
+	echo
+		'<br><br><br><br>',  // TODO use margin-bottom instead of this
+		'<p id="save-cancel">',
+		'<input type="button" class="cancel" value="', WT_I18N::translate('close'), '" onclick="window.close();">',
+		'</p>';
 	break;
 
 case 'send':
@@ -195,9 +199,9 @@ case 'send':
 		$message['url'] = $url;
 		if ($i>0) $message['no_from'] = true;
 		if (addMessage($message)) {
-			Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->addMessage(WT_I18N::translate('Message successfully sent to %s', htmlspecialchars($to)));
+			WT_FlashMessages::addMessage(WT_I18N::translate('Message successfully sent to %s', htmlspecialchars($to)));
 		} else {
-			Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->addMessage(WT_I18N::translate('Message was not sent'));
+			WT_FlashMessages::addMessage(WT_I18N::translate('Message was not sent'));
 			AddToLog('Unable to send message.  FROM:'.$from.' TO:'.$to.' (failed to send)', 'error');
 		}
 		$i++;

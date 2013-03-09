@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: mediaviewer.php 14079 2012-07-07 06:11:43Z greg $
+// $Id: mediaviewer.php 14693 2013-01-22 08:56:56Z greg $
 
 define('WT_SCRIPT_NAME', 'mediaviewer.php');
 require './includes/session.php';
@@ -37,7 +37,7 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
-				/* I18N: %1$s is "accept", %2$s is "reject".  These are links. */ WT_I18N::translate(
+				/* I18N: %1$s is “accept”, %2$s is “reject”.  These are links. */ WT_I18N::translate(
 					'This media object has been deleted.  You should review the deletion and then %1$s or %2$s it.',
 					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'accept') . '</a>',
 					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'reject') . '</a>'
@@ -55,7 +55,7 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
-				/* I18N: %1$s is "accept", %2$s is "reject".  These are links. */ WT_I18N::translate(
+				/* I18N: %1$s is “accept”, %2$s is “reject”.  These are links. */ WT_I18N::translate(
 					'This media object has been edited.  You should review the changes and then %1$s or %2$s them.',
 					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'accept') . '</a>',
 					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'reject') . '</a>'
@@ -77,34 +77,31 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 	exit;
 }
 
-if (WT_USE_LIGHTBOX) {
-	$album = new lightbox_WT_Module();
-	$album->getPreLoadContent();
-}
-
 $controller
 	->addInlineJavascript('function show_gedcom_record() {var recwin=window.open("gedrecord.php?pid=' . $controller->record->getXref() . '", "_blank", edit_window_specs);}')
 	->addInlineJavascript('jQuery("#media-tabs").tabs();')
 	->addInlineJavascript('jQuery("#media-tabs").css("visibility", "visible");');
 
-
-/* Note:
- *  if $controller->getLocalFilename() is not set, then an invalid MID was passed in
- *  if $controller->m_pid is not set, then a filename was passed in that is not in the gedcom
- */
-$filename = $controller->getLocalFilename();
-global $tmb;
 echo '<div id="media-details">';
 echo '<h2>', $controller->record->getFullName(), ' ', $controller->record->getAddName(), '</h2>';
 echo '<div id="media-tabs">';
-	// Media Object details ---------------------
 	echo '<div id="media-edit">';
 		echo '<table class="facts_table">
 			<tr>
 				<td align="center" width="150">';
-					// display image
-					if ($controller->record->canDisplayDetails()) {
-						echo $controller->record->displayMedia(array('download'=>true, 'alertnotfound'=>true));
+					// When we have a pending edit, $controller->record shows the *old* data.
+					// As a temporary kludge, fetch a "normal" version of the record - which includes pending changes
+					// TODO - check both, and use RED/BLUE boxes.
+					$tmp = WT_Media::getInstance($controller->record->getXref());
+					echo $tmp->displayImage();
+					if (!$tmp->isExternal()) {
+						if ($tmp->fileExists('main')) {
+							if ($SHOW_MEDIA_DOWNLOAD) {
+								echo '<p><a href="' . $tmp->getHtmlUrlDirect('main', true).'">' . WT_I18N::translate('Download File') . '</a></p>';
+							}
+						} else {
+							echo '<p class="ui-state-error">' . WT_I18N::translate('The file “%s” does not exist.', $tmp->getFilename()) . '</p>';
+						}
 					}
 				echo '</td>
 				<td valign="top">

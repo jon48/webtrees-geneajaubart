@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: module.php 14771 2013-02-04 16:42:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ class notes_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Extend WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Notes" module */ WT_I18N::translate('A tab showing the notes attached to an individual.');
+		return /* I18N: Description of the “Notes” module */ WT_I18N::translate('A tab showing the notes attached to an individual.');
 	}
 
 	// Implement WT_Module_Tab
@@ -89,17 +89,21 @@ class notes_WT_Module extends WT_Module implements WT_Module_Tab {
 		if ($controller->record->canEdit()) {
 			?>
 		<tr>
-			<td class="facts_label"><?php echo WT_I18N::translate('Add Note'), help_link('add_note'); ?></td>
-			<td class="facts_value"><a href="#"
-				onclick="add_new_record('<?php echo $controller->record->getXref(); ?>','NOTE'); return false;"><?php echo WT_I18N::translate('Add a new note'); ?></a>
-			<br>
+			<td class="facts_label"><?php echo WT_Gedcom_Tag::getLabel('NOTE'); ?></td>
+			<td class="facts_value">
+				<a href="#" onclick="add_new_record('<?php echo $controller->record->getXref(); ?>','NOTE'); return false;">
+					<?php echo WT_I18N::translate('Add a new note'); ?>
+				</a>
+				<?php echo help_link('add_note'); ?>
 			</td>
 		</tr>
 		<tr>
-			<td class="facts_label"><?php echo WT_I18N::translate('Add Shared Note'), help_link('add_shared_note'); ?></td>
-			<td class="facts_value"><a href="#"
-				onclick="add_new_record('<?php echo $controller->record->getXref(); ?>','SHARED_NOTE'); return false;"><?php echo WT_I18N::translate('Add a new shared note'); ?></a>
-			<br>
+			<td class="facts_label"><?php echo WT_Gedcom_Tag::getLabel('SHARED_NOTE'); ?></td>
+			<td class="facts_value">
+				<a href="#" onclick="add_new_record('<?php echo $controller->record->getXref(); ?>','SHARED_NOTE'); return false;">
+					<?php echo WT_I18N::translate('Add a new shared note'); ?>
+				</a>
+				<?php echo help_link('add_shared_note'); ?>
 			</td>
 		</tr>
 		<?php
@@ -143,11 +147,6 @@ class notes_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Implement WT_Module_Tab
 	public function getPreLoadContent() {
-		return '';
-	}
-
-	// Implement WT_Module_Tab
-	public function getJSCallback() {
 		return '';
 	}
 }

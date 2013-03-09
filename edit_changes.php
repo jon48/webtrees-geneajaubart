@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_changes.php 14309 2012-09-17 07:03:16Z greg $
+// $Id: edit_changes.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_changes.php');
 require './includes/session.php';
@@ -31,8 +31,6 @@ $controller=new WT_Controller_Simple();
 $controller
 	->requireAcceptLogin()
 	->setPageTitle(WT_I18N::translate('Pending changes'))
-	->addExternalJavascript(WT_JQUERY_URL)
-	->addExternalJavascript(WT_STATIC_URL.'js/webtrees.js')
 	->pageHeader();
 
 $action   =safe_GET('action');
@@ -227,7 +225,10 @@ if ($changed_gedcoms) {
 
 	echo
 		$output2, $output, $output2,
-		'<p class="center"><a href="#" onclick="closePopupAndReloadParent();">', WT_I18N::translate('Close Window'), '</a></p>';
+		'<br><br><br><br>',  // TODO use margin-bottom instead of this
+		'<p id="save-cancel">',
+		'<input type="button" class="cancel" value="', WT_I18N::translate('close'), '" onclick="window.close();">',
+		'</p>';
 } else {
 	// No pending changes - refresh the parent window and close this one
 	$controller->addInlineJavascript('closePopupAndReloadParent();');

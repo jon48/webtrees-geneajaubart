@@ -5,7 +5,7 @@
 // used on the indilist, famlist, find, and search pages.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print_lists.php 14391 2012-10-04 20:58:32Z nigel $
+// $Id: functions_print_lists.php 14754 2013-02-02 21:14:34Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -42,8 +42,7 @@ function format_indi_table($datalist, $option='') {
 	if ($option=='MARR_PLAC') return;
 	$html = '';
 	$controller
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/TableTools.min.js')
+		->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc"  ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc" ]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
@@ -217,7 +216,7 @@ function format_indi_table($datalist, $option='') {
 	$html .= '<th>'. WT_Gedcom_Tag::getLabel('SURN'). '</th>';
 	$html .= '<th>GIVN</th>';
 	$html .= '<th>SURN</th>';
-	$html .= '<th>'. /* I18N: Abbreviation for "Sosa-Stradonitz number".  This is a person's surname, so may need transliterating into non-latin alphabets. */ WT_I18N::translate('Sosa'). '</th>';
+	$html .= '<th>'. /* I18N: Abbreviation for “Sosa-Stradonitz number”.  This is a individual’s surname, so may need transliterating into non-latin alphabets. */ WT_I18N::translate('Sosa'). '</th>';
 	$html .= '<th>SOSA</th>';
 	$html .= '<th>'. WT_Gedcom_Tag::getLabel('BIRT'). '</th>';
 	$html .= '<th>SORT_BIRT</th>';
@@ -509,7 +508,7 @@ function format_fam_table($datalist, $option='') {
 	$html = '';
 
 	$controller
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
@@ -992,7 +991,7 @@ function format_sour_table($datalist) {
 	$html = '';
 	$table_id = "ID".(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
@@ -1132,7 +1131,7 @@ function format_note_table($datalist) {
 	$html = '';
 	$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
@@ -1233,7 +1232,7 @@ function format_repo_table($repos) {
 	$html = '';
 	$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
@@ -1325,7 +1324,7 @@ function format_media_table($datalist) {
 	$html = '';
 	$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 	$controller
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
@@ -1385,7 +1384,7 @@ function format_media_table($datalist) {
 			$name = $media->getFullName();
 			$html .= "<tr>";
 			//-- Object thumbnail
-			$html .= '<td><img src="'. $media->getThumbnail(). '" alt="'. htmlspecialchars(strip_tags($name)). '"></td>';
+			$html .= '<td>'. $media->displayImage(). '</td>';
 			//-- Object name(s)
 			$html .= '<td>';
 			$html .= '<a href="'. $media->getHtmlUrl(). '" class="list_item name2">';
@@ -1432,7 +1431,7 @@ function format_surname_table($surnames, $script, $extra = '') {
 	global $controller;
 	$html = '';
 	$controller
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["num-asc" ]=function(a,b) {a=parseFloat(a); b=parseFloat(b); return (a<b) ? -1 : (a>b ? 1 : 0);};
 			jQuery.fn.dataTableExt.oSort["num-desc"]=function(a,b) {a=parseFloat(a); b=parseFloat(b); return (a>b) ? -1 : (a<b ? 1 : 0);};
@@ -1698,7 +1697,7 @@ function print_changes_table($change_ids, $sort) {
 	}
 	$html = '';
 	$controller
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 		->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
@@ -1800,7 +1799,7 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 	$html = '';
 	$table_id = "ID".(int)(microtime()*1000000); // each table requires a unique ID
 	$controller
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 		->addInlineJavascript('
 			jQuery("#'.$table_id.'").dataTable({
 				"sDom": \'t\',
@@ -1957,14 +1956,14 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 				if ($endjd==$startjd) {
 					$summary = WT_I18N::translate('No events exist for tomorrow.');
 				} else {
-					// I18N: tanslation for %s==1 is unused; it is translated separately as "tomorrow"
+					// I18N: tanslation for %s==1 is unused; it is translated separately as “tomorrow”
 					$summary = WT_I18N::plural('No events exist for the next %s day.', 'No events exist for the next %s days.', $endjd-$startjd+1, WT_I18N::number($endjd-$startjd+1));
 				}
 			} else {
 				if ($endjd==$startjd) {
 					$summary = WT_I18N::translate('No events for living people exist for tomorrow.');
 				} else {
-					// I18N: tanslation for %s==1 is unused; it is translated separately as "tomorrow"
+					// I18N: tanslation for %s==1 is unused; it is translated separately as “tomorrow”
 					$summary = WT_I18N::plural('No events for living people exist for the next %s day.', 'No events for living people exist for the next %s days.', $endjd-$startjd+1, WT_I18N::number($endjd-$startjd+1));
 				}
 			}
@@ -2073,14 +2072,14 @@ function print_events_list($startjd, $endjd, $events='BIRT MARR DEAT', $only_liv
 				if ($endjd==$startjd) {
 					$summary = WT_I18N::translate('No events exist for tomorrow.');
 				} else {
-					// I18N: tanslation for %s==1 is unused; it is translated separately as "tomorrow"
+					// I18N: tanslation for %s==1 is unused; it is translated separately as “tomorrow”
 					$summary = WT_I18N::plural('No events exist for the next %s day.', 'No events exist for the next %s days.', $endjd-$startjd+1, WT_I18N::number($endjd-$startjd+1));
 				}
 			} else {
 				if ($endjd==$startjd) {
 					$summary = WT_I18N::translate('No events for living people exist for tomorrow.');
 				} else {
-					// I18N: tanslation for %s==1 is unused; it is translated separately as "tomorrow"
+					// I18N: tanslation for %s==1 is unused; it is translated separately as “tomorrow”
 					$summary = WT_I18N::plural('No events for living people exist for the next %s day.', 'No events for living people exist for the next %s days.', $endjd-$startjd+1, WT_I18N::number($endjd-$startjd+1));
 				}
 			}

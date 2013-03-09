@@ -2,7 +2,7 @@
 // Welcome page for the administration module
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,14 +18,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin.php 14430 2012-10-17 07:15:18Z greg $
+// $Id: admin.php 14856 2013-03-06 21:08:52Z greg $
 
 define('WT_SCRIPT_NAME', 'admin.php');
 
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->requireManagerLogin()
 	->setPageTitle(WT_I18N::translate('Administration'))
@@ -273,7 +273,7 @@ echo
 
 $controller
 	->addInlineJavascript('jQuery("#changes").accordion({active:' . $accordion_element . ', icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});')
-	->addInlineJavascript('jQuery("#x").accordion({active:0, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }, autoHeight:false});')
+	->addInlineJavascript('jQuery("#x").accordion({active:0, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }, heightStyle: "content"});')
 	->addInlineJavascript('jQuery("#content_container").css("visibility", "visible");');
 
 // This is a list of old files and directories, from earlier versions of webtrees, that can be deleted
@@ -438,7 +438,6 @@ function old_paths() {
 		WT_ROOT.'themes/webtrees/images/zoomin.gif',
 		WT_ROOT.'themes/webtrees/images/zoomout.gif',
 		// Removed in 1.1.2
-		WT_ROOT.'js/jquery/jquery.ajaxQueue.js',
 		WT_ROOT.'js/treenav.js',
 		WT_ROOT.'library/WT/TreeNav.php',
 		WT_ROOT.'themes/clouds/images/background.jpg',
@@ -610,22 +609,6 @@ function old_paths() {
 		WT_ROOT.'themes/xenea/images/zoomout.gif',
 		WT_ROOT.'treenav.php',
 		// Removed in 1.2.0
-		WT_ROOT.'js/jquery/css/images/ui-bg_flat_0_aaaaaa_40x100.png',
-		WT_ROOT.'js/jquery/css/images/ui-bg_gloss-wave_16_121212_500x100.png',
-		WT_ROOT.'js/jquery/css/images/ui-bg_highlight-hard_15_888888_1x100.png',
-		WT_ROOT.'js/jquery/css/images/ui-bg_highlight-hard_55_555555_1x100.png',
-		WT_ROOT.'js/jquery/css/images/ui-bg_highlight-soft_35_adadad_1x100.png',
-		WT_ROOT.'js/jquery/css/images/ui-bg_highlight-soft_60_dddddd_1x100.png',
-		WT_ROOT.'js/jquery/css/images/ui-bg_inset-soft_15_121212_1x100.png',
-		WT_ROOT.'js/jquery/css/images/ui-icons_666666_256x240.png',
-		WT_ROOT.'js/jquery/css/images/ui-icons_aaaaaa_256x240.png',
-		WT_ROOT.'js/jquery/css/images/ui-icons_bbbbbb_256x240.png',
-		WT_ROOT.'js/jquery/css/images/ui-icons_c98000_256x240.png',
-		WT_ROOT.'js/jquery/css/images/ui-icons_cccccc_256x240.png',
-		WT_ROOT.'js/jquery/css/images/ui-icons_f29a00_256x240.png',
-		WT_ROOT.'js/jquery/css/jquery_rtl.css',
-		WT_ROOT.'js/jquery/jquery.tablesorter.js',
-		WT_ROOT.'js/jquery/jquery.tablesorter.pager.js',
 		WT_ROOT.'themes/clouds/images/close.png',
 		// WT_ROOT.'themes/clouds/images/copy.png', // Added back in 1.2.4
 		WT_ROOT.'themes/clouds/images/jquery',
@@ -1269,7 +1252,6 @@ function old_paths() {
 		WT_ROOT.'includes/grampsxml.rng',
 		WT_ROOT.'includes/session_spider.php',
 		WT_ROOT.'js/autocomplete.js.htm',
-		WT_ROOT.'js/jquery/jquery.autocomplete.js',
 		WT_ROOT.'js/prototype',
 		WT_ROOT.'js/prototype.js.htm',
 		WT_ROOT.'modules_v3/googlemap/admin_editconfig.php',
@@ -1388,15 +1370,56 @@ function old_paths() {
 		WT_ROOT.'imageflush.php',
 		WT_ROOT.'includes/functions/functions_places.php',
 		WT_ROOT.'js/html5.js',
-		WT_ROOT.'js/jquery/jquery.scrollfollow.js',
 		WT_ROOT.'modules_v3/googlemap/wt_v3_pedigree_map.js.php',
 		WT_ROOT.'modules_v3/lightbox/js/tip_balloon_RTL.js',
 		// Removed in 1.3.2
 		WT_ROOT.'modules_v3/address_report',
+		// Removed in 1.4.0
+		WT_ROOT.'imageview.php',
+		WT_ROOT.'includes/functions/functions_media_reorder.php',
+		WT_ROOT.'js/jquery',
+		WT_ROOT.'js/jw_player',
+		WT_ROOT.'js/webtrees.js',
+		WT_ROOT.'media/MediaInfo.txt',
+		WT_ROOT.'media/thumbs/ThumbsInfo.txt',
+		WT_ROOT.'modules_v3/GEDFact_assistant/css/media_0_inverselink.css',
+		WT_ROOT.'modules_v3/lightbox/help_text.php',
+		WT_ROOT.'modules_v3/lightbox/images/blank.gif',
+		WT_ROOT.'modules_v3/lightbox/images/close_1.gif',
+		WT_ROOT.'modules_v3/lightbox/images/image_add.gif',
+		WT_ROOT.'modules_v3/lightbox/images/image_copy.gif',
+		WT_ROOT.'modules_v3/lightbox/images/image_delete.gif',
+		WT_ROOT.'modules_v3/lightbox/images/image_edit.gif',
+		WT_ROOT.'modules_v3/lightbox/images/image_link.gif',
+		WT_ROOT.'modules_v3/lightbox/images/images.gif',
+		WT_ROOT.'modules_v3/lightbox/images/image_view.gif',
+		WT_ROOT.'modules_v3/lightbox/images/loading.gif',
+		WT_ROOT.'modules_v3/lightbox/images/next.gif',
+		WT_ROOT.'modules_v3/lightbox/images/nextlabel.gif',
+		WT_ROOT.'modules_v3/lightbox/images/norm_2.gif',
+		WT_ROOT.'modules_v3/lightbox/images/overlay.png',
+		WT_ROOT.'modules_v3/lightbox/images/prev.gif',
+		WT_ROOT.'modules_v3/lightbox/images/prevlabel.gif',
+		WT_ROOT.'modules_v3/lightbox/images/private.gif',
+		WT_ROOT.'modules_v3/lightbox/images/slideshow.jpg',
+		WT_ROOT.'modules_v3/lightbox/images/transp80px.gif',
+		WT_ROOT.'modules_v3/lightbox/images/zoom_1.gif',
+		WT_ROOT.'modules_v3/lightbox/js',
+		WT_ROOT.'modules_v3/lightbox/music',
+		WT_ROOT.'modules_v3/lightbox/pic',
+		WT_ROOT.'themes/_administration/images/media',
+		WT_ROOT.'themes/_administration/jquery',
+		WT_ROOT.'themes/clouds/images/media',
+		WT_ROOT.'themes/colors/images/media',
+		WT_ROOT.'themes/fab/images/media',
+		WT_ROOT.'themes/minimal/images/media',
+		WT_ROOT.'themes/webtrees/chrome.css',
+		WT_ROOT.'themes/webtrees/images/media',
+		WT_ROOT.'themes/xenea/images/media',
 	);
 }
 
-// Delete a file or directory, ignoring errors
+// Delete a file or folder, ignoring errors
 function delete_recursively($path) {
 	@chmod($path, 0777);
 	if (is_dir($path)) {

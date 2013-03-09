@@ -2,7 +2,7 @@
 // Show help text in a popup window.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This file also serves as a database of fact and label descriptions,
 // allowing them to be discovered by xgettext, so we may use them dynamically
@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: help_text.php 14403 2012-10-09 08:23:56Z greg $
+// $Id: help_text.php 14730 2013-01-30 10:16:44Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -75,7 +75,7 @@ case 'CAUS':
 	break;
 
 case 'CEME':
-	$title=WT_Gedcom_Tag::getLabel('Cemetery');
+	$title=WT_Gedcom_Tag::getLabel('CEME');
 	$text=WT_I18N::translate('Enter the name of the cemetery or other resting place where individual is buried.');
 	break;
 
@@ -277,34 +277,38 @@ case 'FORM':
 	$text=WT_I18N::translate('This is an optional field that can be used to enter the file format of the multimedia object.  Some genealogy programs may look at this field to determine how to handle the item.  However, since media do not transfer across computer systems very well, this field is not very important.');
 	break;
 
-case 'GIVN':
-	$title=WT_Gedcom_Tag::getLabel('GIVN');
-	$text=WT_I18N::translate('In this field you should enter the given names for the person.  As an example, in the name "John Robert Finlay", the given names that should be entered here are "John Robert"');
-	break;
-
+// This help text is used for all NAME components
 case 'NAME':
 	$title=WT_Gedcom_Tag::getLabel('NAME');
-	$text=WT_I18N::translate('This is the most important field in a person\'s Name record.<br /><br />This field should be filled automatically as the other fields are filled in, but it is provided so that you can edit the information according to your personal preference.<br /><br />The name in this field should be entered according to the GEDCOM 5.5.1 standards with the surname surrounded by forward slashes "/".  As an example, the name "John Robert Finlay Jr." should be entered like this: "John Robert /Finlay/ Jr.".');
+	$text=
+		'<p>' .
+		WT_I18N::translate('The <b>name</b> field contains the individual’s full name, as they would have spelled it or as it was recorded.  This is how it will be displayed on screen.  It uses standard genealogical annotations to identify different parts of the name.') .
+		'</p>' .
+		'<ul><li>' .
+		WT_I18N::translate('The surname is enclosed by slashes: <%s>John Paul /Smith/<%s>', 'span style="color:#0000ff;"', '/span') .
+		'</li><li>' .
+		WT_I18N::translate('If the surname is unknown, use empty slashes: <%s>Mary //<%s>', 'span style="color:#0000ff;"', '/span') .
+		'</li><li>' .
+		WT_I18N::translate('If an individual has two separate surnames, both should be enclosed by slashes: <%s>José Antonio /Gómez/ /Iglesias/<%s>', 'span style="color:#0000ff;"', '/span') .
+		'</li><li>' .
+		WT_I18N::translate('If an individual does not have a surname, no slashes are needed: <%s>Jón Einarsson<%s>', 'span style="color:#0000ff;"', '/span') .
+		'</li><li>' .
+		WT_I18N::translate('If an individual was not known by their first given name, the preferred name should be indicated with an asterisk: <%s>John Paul* /Smith/<%s>', 'span style="color:#0000ff;"', '/span') .
+		'</li><li>' .
+		WT_I18N::translate('If an individual was known by a nickname which is not part of their formal name, it should be enclosed by quotation marks.  For example, <%s>John "Nobby" /Clark/<%s>.', 'span style="color:#0000ff;"', '/span') .
+		'</li></ul>';
 	break;
 
-case 'NICK':
-	$title=WT_Gedcom_Tag::getLabel('NICK');
-	$text=WT_I18N::translate('In this field you should enter any nicknames for the person.<br />This is an optional field.<br /><br />Ways to add a nickname:<ul><li>Select <b>modify name</b> then enter nickname and save</li><li>Select <b>add new name</b> then enter nickname AND name and save</li><li>Select <b>edit GEDCOM record</b> to add multiple [2&nbsp;NICK] records subordinate to the main [1&nbsp;NAME] record.</li></ul>');
+case 'SURN':
+	$title=WT_Gedcom_Tag::getLabel('SURN');
+	$text='<p>' .
+		WT_I18N::translate('The <b>surname</b> field contains a name that is used for sorting and grouping.  It can be different to the individual’s actual surname which is always taken from the <b>name</b> field.  This field can be used to sort surnames with or without a prefix (Gogh / van Gogh) and to group spelling variations or inflections (Kowalski / Kowalska).  If an individual needs to be listed under more than one surname, each name should be separated by a comma.') .
+		'</p>';
 	break;
 
 case 'NOTE':
 	$title=WT_Gedcom_Tag::getLabel('NOTE');
 	$text=WT_I18N::translate('Notes are free-form text and will appear in the Fact Details section of the page.');
-	break;
-
-case 'NPFX':
-	$title=WT_Gedcom_Tag::getLabel('NPFX');
-	$text=WT_I18N::translate('This optional field allows you to enter a name prefix such as "Dr." or "Adm."');
-	break;
-
-case 'NSFX':
-	$title=WT_Gedcom_Tag::getLabel('NSFX');
-	$text=WT_I18N::translate('In this optional field you should enter the name suffix for the person.  Examples of name suffixes are "Sr.", "Jr.", and "III".');
 	break;
 
 case 'OBJE':
@@ -333,11 +337,6 @@ case 'PHON':
 case 'PLAC':
 	$title=WT_Gedcom_Tag::getLabel('PLAC');
 	$text=WT_I18N::translate('Places should be entered according to the standards for genealogy.  In genealogy, places are recorded with the most specific information about the place first and then working up to the least specific place last, using commas to separate the different place levels.  The level at which you record the place information should represent the levels of government or church where vital records for that place are kept.<br /><br />For example, a place like Salt Lake City would be entered as "Salt Lake City, Salt Lake, Utah, USA".<br /><br />Let\'s examine each part of this place.  The first part, "Salt Lake City," is the city or township where the event occurred.  In some countries, there may be municipalities or districts inside a city which are important to note.  In that case, they should come before the city.  The next part, "Salt Lake," is the county.  "Utah" is the state, and "USA" is the country.  It is important to note each place because genealogical records are kept by the governments of each level.<br /><br />If a level of the place is unknown, you should leave a space between the commas.  Suppose, in the example above, you didn\'t know the county for Salt Lake City.  You should then record it like this: "Salt Lake City, , Utah, USA".  Suppose you only know that a person was born in Utah.  You would enter the information like this: ", , Utah, USA".  <br /><br />You can use the <b>Find Place</b> link to help you find places that already exist in the database.');
-	break;
-
-case 'QUAY':
-	$title=WT_Gedcom_Tag::getLabel('QUAY');
-	$text=WT_I18N::translate('You would use this field to record the quality or reliability of the data found in this source.  Many genealogy applications use a number in the field. <b>3</b> might mean that the data is a primary source, <b>2</b> might mean that it was a secondary source, <b>1</b> might mean the information is questionable, and <b>0</b> might mean that the source is unreliable.');
 	break;
 
 case 'RELA':
@@ -373,24 +372,9 @@ case 'SOUR':
 	$text=WT_I18N::translate('This field allows you to change the source record that this fact\'s source citation links to.  This field takes a Source ID.  Beside the field will be listed the title of the current source ID.  Use the <b>Find ID</b> link to look up the source\'s ID number.  To remove the entire citation, make this field blank.');
 	break;
 
-case 'SPFX':
-	$title=WT_Gedcom_Tag::getLabel('SPFX');
-	$text=WT_I18N::translate('Enter or select from the list words that precede the main part of the Surname.  Examples of such words are <b>von</b> Braun, <b>van der</b> Kloot, <b>de</b> Graaf, etc.');
-	break;
-
 case 'STAT':
 	$title=WT_Gedcom_Tag::getLabel('STAT');
 	$text=WT_I18N::translate('This is an optional status field and is used mostly for LDS ordinances as they are run through the TempleReady program.');
-	break;
-
-case 'SURN':
-	$john_doe=WT_I18N::translate('John /DOE/'); // Same text used in admin_trees_manage.php
-	$fullname=str_replace('/', '', $john_doe);
-	list(,$surname)=explode('/', $john_doe);
-	$title=WT_Gedcom_Tag::getLabel('SURN');
-	$text=WT_I18N::translate('In this field you should enter the surname for the person.  In the name %1$s, the surname is %2$s.', "<b>{$fullname}</b>", "<b>{$surname}</b>");
-	$text.='<br/><br/>';
-	$text.=WT_I18N::translate('Individuals with multiple surnames, common in Spain and Portugal, should separate the surnames with a comma.  This indicates that the person is to be listed under each of the names.  For example, <b>Cortes,Vega</b> will be listed under both <b>C</b> and <b>V</b>, whereas <b>Cortes Vega</b> will only be listed under <b>C</b>.');
 	break;
 
 case 'TEMP':
@@ -426,11 +410,6 @@ case 'URL':
 case '_HEB':
 	$title=WT_Gedcom_Tag::getLabel('_HEB');
 	$text=WT_I18N::translate('In many cultures it is customary to have a traditional name spelled in the traditional characters and also a romanized version of the name as it would be spelled or pronounced in languages based on the Latin alphabet, such as English.<br /><br />If you prefer to use the Latin alphabet to enter the name in the standard name fields, then you can use this field to enter the same name in the non-Latin alphabet such as Greek, Hebrew, Russian, Arabic, or Chinese.  Both versions of the name will appear in lists and charts.<br /><br />Although this field is labeled "Hebrew", it is not restricted to containing only Hebrew characters.');
-	break;
-
-case '_MARNM':
-	$title=WT_Gedcom_Tag::getLabel('_MARNM');
-	$text=WT_I18N::translate('Enter the married name for this person, using the same formatting rules that apply to the Name field.  This field is optional.<br /><br />For example, if Mary Jane Brown married John White, you might enter (without the quotation marks, of course)<ul><li>American usage:&nbsp;&nbsp;"Mary Jane Brown /White/"</li><li>European usage:&nbsp;&nbsp;"Mary Jane /White/"</li><li>Alternate European usage:&nbsp;&nbsp;"Mary Jane /White-Brown/" or "Mary Jane /Brown-White/"</li></ul>You should do this only if Mary Brown began calling herself by the new name after marrying John White.  In some places, Quebec (Canada) for example, it\'s illegal for names to be changed in this way.<br /><br />Men sometimes change their name after marriage, most often using the hyphenated form but occasionally taking the wife\'s surname.');
 	break;
 
 case '_PRIM':
@@ -475,11 +454,6 @@ case 'ALLOW_THEME_DROPDOWN':
 case 'ALLOW_USER_THEMES':
 	$title=WT_I18N::translate('Allow users to select their own theme');
 	$text=WT_I18N::translate('Gives users the option of selecting their own theme.');
-	break;
-
-case 'AUTO_GENERATE_THUMBS':
-	$title=WT_I18N::translate('Automatically generate thumbnails');
-	$text=WT_I18N::translate('Should the system automatically generate thumbnails for images that do not have them.  Your PHP installation might not support this functionality.');
 	break;
 
 case 'CALENDAR_FORMAT':
@@ -586,6 +560,20 @@ case 'GEDCOM_ID_PREFIX':
 	$text=WT_I18N::translate('When a new individual record is added online in <b>webtrees</b>, a new ID for that individual will be generated automatically. The individual ID will have this prefix.');
 	break;
 
+case 'GEDCOM_MEDIA_PATH':
+	$title=WT_I18N::translate('GEDCOM media path');
+	$text=
+		'<p>'.
+		// I18N: A “path” is something like “C:\Documents\My_User\Genealogy\Photos\Gravestones\John_Smith.jpeg”
+		WT_I18N::translate('Some genealogy applications create GEDCOM files that contain media filenames with full paths.  These paths will not exist on the web-server.  To allow webtrees to find the file, the first part of the path must be removed.').
+		'</p><p>'.
+		// I18N: %s are all folder names; “GEDCOM media path” is a configuration setting
+		WT_I18N::translate('For example, if the GEDCOM file contains %1$s and webtrees expects to find %2$s in the media folder, then the GEDCOM media path would be %3$s.', '<span class="filename">/home/fab/documents/family/photo.jpeg</span>', '<span class="filename">family/photo.jpeg</span>', '<span class="filename">/home/fab/documents/</span>').
+		'</p><p>'.
+		WT_I18N::translate('This setting is only used when you read or write GEDCOM files.').
+		'</p>';
+	break;
+
 case 'GENERATE_GUID':
 	$title=WT_I18N::translate('Automatically create globally unique IDs');
 	$text=WT_I18N::translate('<b>GUID</b> in this context is an acronym for «Globally Unique ID».<br /><br />GUIDs are intended to help identify each individual in a manner that is repeatable, so that central organizations such as the Family History Center of the LDS Church in Salt Lake City, or even compatible programs running on your own server, can determine whether they are dealing with the same person no matter where the GEDCOM originates.  The goal of the Family History Center is to have a central repository of genealogical data and expose it through web services. This will enable any program to access the data and update their data within it.<br /><br />If you do not intend to share this GEDCOM with anyone else, you do not need to let <b>webtrees</b> create these GUIDs; however, doing so will do no harm other than increasing the size of your GEDCOM.');
@@ -607,15 +595,17 @@ case 'HIDE_LIVE_PEOPLE':
         break;
 
 case 'INDEX_DIRECTORY':
-	$title=WT_I18N::translate('Data file directory');
+	$title=WT_I18N::translate('Data folder');
 	$text=
-		WT_I18N::translate('<b>webtrees</b> requires a directory with read/write permission, where it can create temporary files and export data.  By default, it uses the data/ directory.').
-	'<br/><br/>'.
-		WT_I18N::translate('Some site administrators prefer not to have writable files or directories in the public HTML directory.  By specifying an alternative location to write data, you can make the existing data/ directory read-only.  Note that the file data/config.ini.php cannot be moved, and must remain in this location.').
-	'<br/><br/>'.
-		WT_I18N::translate('If your server does not support ".htaccess" files (e.g. Microsoft IIS), and you cannot set access controls for this directory, then you should move this directory to another location.').
-	'<br/><br/>'.
-		WT_I18N::translate('The directory can be specified in full (e.g. /home/user_name/genealogy_data/) or relative to the installation directory (e.g. ../../genealogy_data/).');
+		'<p>'.
+		WT_I18N::translate('This folder will be used by webtrees to store media files, GEDCOM files, temporary files, etc.  These files may contain private data, and should not be made available over the internet.').
+		'</p><p>'.
+		/* I18N: “Apache” is a software program. */ WT_I18N::translate('To protect this private data, webtrees uses an Apache configuration file (.htaccess) which blocks all access to this folder.  If your web-server does not support .htaccess files, and you cannot restrict access to this folder, then you can select another folder, away from your web documents.').
+		'</p><p>'.
+		WT_I18N::translate('If you select a different folder, you must also move all files (except config.ini.php, index.php and .htaccess) from the existing folder to the new folder.').
+		'</p><p>'.
+		WT_I18N::translate('The folder can be specified in full (e.g. /home/user_name/webtrees_data/) or relative to the installation folder (e.g. ../../webtrees_data/).').
+		'</p>';
 	break;
 
 case 'INDI_FACTS_ADD':
@@ -680,40 +670,16 @@ case 'MAX_PEDIGREE_GENERATIONS':
 	$text=WT_I18N::translate('Set the maximum number of generations to display on Pedigree charts.');
 	break;
 
-case 'MEDIA_DIRECTORY_LEVELS':
-	$title=WT_I18N::translate('Multimedia directory levels to keep');
-	$text=WT_I18N::translate('A value of 0 will ignore all directories in the file path for the media object.  A value of 1 will retain the first directory containing this image.  Increasing the numbers increases number of parent directories to retain in the path.<br /><br />For example, if you link an image in your GEDCOM with a path like <b>C:\Documents&nbsp;and&nbsp;Settings\User\My&nbsp;Documents\My&nbsp;Pictures\Genealogy\Surname&nbsp;Line\grandpa.jpg</b>, a value of 0 will translate this path to <b>./media/grandpa.jpg</b>.  A value of 1 will translate this to <b>./media/Surname&nbsp;Line/grandpa.jpg</b>, etc.  Most people will only need to use a 0.  However, it is possible that some media objects kept in different directories have identical names and would overwrite each other when this option is set to 0.  Non-zero settings allow you to keep some organization in your media thereby preventing name collisions.');
-	break;
-
 case 'MEDIA_DIRECTORY':
-	$MEDIA_DIRECTORY=get_gedcom_setting(WT_GED_ID, 'MEDIA_DIRECTORY');
-	$title=WT_I18N::translate('Media directory');
+	$title=WT_I18N::translate('Media folder');
 	$text=
 		'<p>'.
-		/* I18N: %1$s is an example media directory, such as "media/", %2$s is an example URL, such as "http://localhost/webtrees/media/img123.jpg", and %3$s is an example file path, such as "/home/greg/public_html/webtrees/media/img123.jpg" */
-		WT_I18N::translate('The media directory is used to create URLs for your media items.  It is also the sub-directory in which the media items are stored.  For example, a media directory of %1$s will create URLs of the form %2$s and store these items as %3$s.', '<tt dir="ltr" lang="en" style="white-space:nowrap; color:#0000ff; font-weight:bold;">'.$MEDIA_DIRECTORY.'</tt>', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_SERVER_NAME.WT_SCRIPT_PATH.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span>img123.jpg</tt>', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span>img123.jpg</tt>').
+		WT_I18N::translate('This folder will be used to store the media files for this family tree.').
 		'</p><p>'.
-		/* I18N: %1$s and %2$s are both directory names */ WT_I18N::translate('If your server supports it, you can enable the media firewall.  This changes the location of the media directory from the public directory %1$s to a private directory such as %2$s.  This allows webtrees to apply privacy filtering to media items.', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span></tt>', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_DATA_DIR.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span></tt>').
+		WT_I18N::translate('If you select a different folder, you must also move any media files from the existing folder to the new one.').
 		'</p><p>'.
-		/* I18N: %s is a directory name */ WT_I18N::translate('The media directory %s must exist, and the webserver must have read and write access to it.', '<tt dir="ltr" lang="en" style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.'<span style="color:#0000ff;">'.$MEDIA_DIRECTORY.'</span></tt>').
-		'</p><p>'.
-		WT_I18N::translate('If two family trees share the same media directory, then they will be able to share media items.  If they use different media directories, then they will be able to use the same filename to access different media items.').
+		WT_I18N::translate('If two family trees use the same media folder, then they will be able to share media files.  If they use different media folders, then their media files will be kept separate.').
 		'</p>';
-	break;
-
-case 'MEDIA_EXTERNAL':
-	$title=WT_I18N::translate('Keep links');
-	$text=WT_I18N::translate('When a multimedia link is found starting with for example http://, ftp://, mms:// it will not be altered when set to <b>Yes</b>. For example, http://www.myfamily.com/photo/dad.jpg will stay http://www.myfamily.com/photo/dad.jpg.  When set to <b>No</b>, the link will be handled as a standard reference and the media depth will be used.  For example: http://www.myfamily.com/photo/dad.jpg will be changed to ./media/dad.jpg');
-	break;
-
-case 'MEDIA_FIREWALL_ROOTDIR':
-	$title=WT_I18N::translate('Media firewall root directory');
-	$text=WT_I18N::translate('Directory in which the protected Media directory can be created.  When this field is empty, the <b>%s</b> directory will be used.', WT_Site::preference('INDEX_DIRECTORY'));
-	break;
-
-case 'MEDIA_FIREWALL_THUMBS':
-	$title=WT_I18N::translate('Protect thumbnails of protected images');
-	$text=WT_I18N::translate('When an image is in the protected Media directory, should its thumbnail be protected as well?');
 	break;
 
 case 'MEDIA_ID_PREFIX':
@@ -840,11 +806,6 @@ case 'WEBTREES_EMAIL':
 	$text=WT_I18N::translate('E-mail address to be used in the &laquo;From:&raquo; field of e-mails that <b>webtrees</b> creates automatically.<br /><br /><b>webtrees</b> can automatically create e-mails to notify administrators of changes that need to be reviewed.  <b>webtrees</b> also sends notification e-mails to users who have requested an account.<br /><br />Usually, the &laquo;From:&raquo; field of these automatically created e-mails is something like <i>From: webtrees-noreply@yoursite</i> to show that no response to the e-mail is required.  To guard against spam or other e-mail abuse, some e-mail systems require each message\'s &laquo;From:&raquo; field to reflect a valid e-mail account and will not accept messages that are apparently from account <i>webtrees-noreply</i>.');
 	break;
 
-case 'POSTAL_CODE':
-	$title=WT_I18N::translate('Postal code position');
-	$text=WT_I18N::translate('Different countries use different ways to write the address. This option will enable you to place the postal code either before or after the city name.');
-	break;
-
 case 'PREFER_LEVEL2_SOURCES':
 	$title=WT_I18N::translate('Source type');
 	$text=WT_I18N::translate('When adding new close relatives, you can add source citations to the records (e.g. INDI, FAM) or the facts (BIRT, MARR, DEAT).  This option controls which checkboxes are ticked by default.');
@@ -928,11 +889,6 @@ case 'SHOW_FACT_ICONS':
 case 'SHOW_GEDCOM_RECORD':
 	$title=WT_I18N::translate('Allow users to see raw GEDCOM records');
 	$text=WT_I18N::translate('Setting this to <b>Yes</b> will place links on individuals, sources, and families to let users bring up another window containing the raw data taken right out of the GEDCOM file.');
-	break;
-
-case 'SHOW_LAST_CHANGE':
-	$title=WT_I18N::translate('Show GEDCOM record last change date on lists');
-	$text=WT_I18N::translate('This option controls whether or not to show GEDCOM record last change date on lists.');
 	break;
 
 case 'SHOW_LDS_AT_GLANCE':
@@ -1083,16 +1039,6 @@ case 'USE_GEONAMES':
 	$text=WT_I18N::translate('Should the GeoNames database be used to provide more suggestions for place names?<br /><br />When this option is set to <b>Yes</b>, the GeoNames database will be queried to supply suggestions for the place name being entered.  When set to <b>No</b>, only the current genealogical database will be searched.  As you enter more of the place name, the suggestion will become more precise.  This option can slow down data entry, particularly if your Internet connection is slow.<br /><br />The GeoNames geographical database is accessible free of charge. It currently contains over 8,000,000 geographical names.');
 	break;
 
-case 'USE_MEDIA_FIREWALL':
-	$title=WT_I18N::translate('Automatically protect new images');
-	$text=WT_I18N::translate('Should new images automatically go in the protected media directory when they are uploaded?'); 
-	break;
-
-case 'USE_MEDIA_VIEWER':
-	$title=WT_I18N::translate('Use media viewer');
-	$text=WT_I18N::translate('When this option is <b>Yes</b>, clicking on images will produce the Media Viewer page.  This page shows the details of the image.  If you have sufficient rights, you can also edit these details.<br /><br />When this option is <b>No</b>, clicking on images will produce a full-size image in a new window.');
-	break;
-
 case 'USE_REGISTRATION_MODULE':
 	$title=WT_I18N::translate('Allow visitors to request account registration');
 	$text=WT_I18N::translate('Gives visitors the option of registering themselves for an account on the site.<br /><br />The visitor will receive an email message with a code to verify his application for an account.  After verification, the Administrator will have to approve the registration before it becomes active.');
@@ -1157,11 +1103,6 @@ case 'add_facts':
 	$text.=WT_I18N::translate('<b>webtrees</b> allows you to copy up to 10 facts, with all their details, to a clipboard.  This clipboard is different from the Clippings Cart that you can use to export portions of your database.<br /><br />You can select any of the facts from the clipboard and copy the selected fact to the Individual, Family, Media, Source, or Repository record currently being edited.  However, you cannot copy facts of dissimilar record types.  For example, you cannot copy a Marriage fact to a Source or an Individual record since the Marriage fact is associated only with Family records.<br /><br />This is very helpful when entering similar facts, such as census facts, for many individuals or families.');
 	break;
 
-case 'add_husband':
-	$title=WT_I18N::translate('Add a new husband');
-	$text=WT_I18N::translate('By clicking this link, you can add a <u>new</u> male person and link this person to the principal individual as a new husband.<br /><br />Just click the link, and you will get a pop up window to add the new person.  Fill out as many boxes as you can and click the <b>Save</b> button.<br /><br />That\'s all.');
-	break;
-
 case 'add_media_linkid':
 	$title=WT_I18N::translate('Link ID');
 	$text=WT_I18N::translate('Each media item should be associated with one or more person, family, or source records in your database.<br /><br />To establish such a link, you can enter or search for the ID of the person, family, or source at the same time as you create the media item.  You can also establish the link later through editing options on the Manage MultiMedia page, or by adding media items through the Add Media link available on the Individual, Family, or Source Details pages.');
@@ -1181,11 +1122,6 @@ case 'add_note':
 	$text=WT_I18N::translate('If you have a note to add to this record, this is the place to do so.<br /><br />Just click the link, a window will open, and you can type your note.  When you are finished typing, just click the button below the box, close the window, and that\'s all.');
 	break;
 
-case 'add_opf_child':
-	$title=WT_I18N::translate('Add a child to create a one-parent family');
-	$text=WT_I18N::translate('By clicking this link, you can add a <u>new</u> child to this person, creating a one-parent family.<br /><br />Just click the link, and you will get a pop up window to add the new person.  Fill out as many boxes as you can and click the <b>Save</b> button.<br /><br />That\'s all.');
-	break;
-
 case 'add_shared_note':
 	// This is a general help text for multiple pages
 	$title=WT_I18N::translate('Add a new shared note');
@@ -1196,11 +1132,6 @@ case 'add_source':
 	// This is a general help text for multiple pages
 	$title=WT_I18N::translate('Add a new source citation');
 	$text=WT_I18N::translate('Here you can add a source <b>Citation</b> to this record.<br /><br />Just click the link, a window will open, and you can choose the source from the list (Find ID) or create a new source and then add the Citation.<br /><br />Adding sources is an important part of genealogy because it allows other researchers to verify where you obtained your information.');
-	break;
-
-case 'add_wife':
-	$title=WT_I18N::translate('Add a new wife');
-	$text=WT_I18N::translate('By clicking this link, you can add a <u>new</u> female person and link this person to the principal individual as a new wife.<br /><br />Just click the link, and you will get a pop up window to add the new person.  Fill out as many boxes as you can and click the <b>Save</b> button.<br /><br />That\'s all.');
 	break;
 
 case 'annivers_year_select':
@@ -1221,16 +1152,6 @@ case 'block_move_right':
 case 'block_move_up':
 	$title=WT_I18N::translate('Move list entries');
 	$text=WT_I18N::translate('Use these buttons to re-arrange the order of the entries within the list.  The blocks will be printed in the order in which they are listed.<br /><br />Highlight the entry to be moved, and then click a button to move that entry up or down.');
-	break;
-
-case 'convertPath':
-	$title=WT_I18N::translate('Convert media path to');
-	$text=WT_I18N::translate('This option defines a constant path to be prefixed to all media paths in the output file.<br /><br />For example, if the media directory has been configured to be "/media" and if the media file being exported has a path "/media/pictures/xyz.jpg" and you have entered "c:\my pictures\my family" into this field, the resultant media path will be "c:\my pictures\my family/pictures/xyz.jpg".<br /><br />You will notice in this example:<ul><li>the current media directory name is stripped from the path</li><li>and the resultant path will not have correct folder name separators.</li></ul><br />If you wish to retain the media directory in media file paths of the output file, you will need to include that name in the <b>Convert media path to</b> field.<br /><br />You should also use the <b>Convert media folder separators to</b> option to ensure that the folder name separators are consistent and agree with the requirements of the receiving operating system.<br /><br />Media paths that are actually URLs will not be changed.');
-	break;
-
-case 'convertSlashes':
-	$title=WT_I18N::translate('Convert media folder separators to');
-	$text=WT_I18N::translate('This option determines whether folder names in the FILE specification of media objects should be separated by forward slashes or by backslashes.  Your choice depends on the requirements of the receiving operating system.<br /><br />The choice <b>Forward slashes : /</b> is appropriate for most operating systems other than Microsoft Windows.  The choice <b>Backslashes : \</b> should be used when the destination program is running on a Microsoft Windows system.<br /><br />Media paths that are actually URLs will not be changed.');
 	break;
 
 case 'default_gedcom':
@@ -1279,36 +1200,6 @@ case 'edit_add_SHARED_NOTE':
 case 'edit_add_SOUR':
 	$title=WT_I18N::translate('Add a new source citation');
 	$text=WT_I18N::translate('This section allows you to add a new source citation to the fact that you are currently editing.<br /><br />In the Source field you enter the ID for the source.  Click the <b>Create a new source</b> link if you need to enter a new source.  In the Citation Details field you would enter the page number or other information that might help someone find the information in the source.  In the Text field you would enter the text transcription from the source.');
-	break;
-
-case 'edit_add_child':
-	$title=WT_I18N::translate('Add a new child');
-	$text=WT_I18N::translate('With this page you can add a new child to the selected family.  Fill out the name of the child and the birth and death information if it is known.  If you don\'t know some information leave it blank.<br /><br />To add other facts besides birth and death, first add the new child to the database by saving the changes.  Then click on the child\'s name in the updated Family page or Close Relatives tab to view the child\'s Individual Information page.  From the Individual Information page you can add more detailed information.');
-	break;
-
-case 'edit_add_parent':
-	$title=WT_I18N::translate('Add a new parent');
-	$text=WT_I18N::translate('With this page you can add a new mother or father to the selected person.  Fill out the new person\'s name and the birth and death information if it is known.  If you don\'t know some information, leave it blank.<br /><br />To add other facts besides birth and death, first add the new person to the database by saving the changes.  Then click on the person\'s name in the updated Family page or Close Relatives tab to view the person\'s Individual Information page.  From the Individual Information page you can add more detailed information.');
-	break;
-
-case 'edit_add_spouse':
-	$title=WT_I18N::translate('Add a new spouse');
-	$text=WT_I18N::translate('With this page you can add a new husband or wife to the selected person.  Fill out the new person\'s name and the birth and death information if it is known.  If you don\'t know some information leave it blank.<br /><br />To add other facts besides birth and death, first add the new person to the database by saving the changes.  Then click on the person\'s name in the updated Family page or Close Relatives tab to view the person\'s Individual Information page.  From the Individual Information page you can add more detailed information.');
-	break;
-
-case 'edit_add_unlinked_note':
-	$title=WT_I18N::translate('Add an unlinked shared note');
-	$text=WT_I18N::translate('Use this link to add a new shared note to your database without linking the note to any record.<br /><br />The new note will appear in the Shared Note list, but will not appear on any charts or anywhere else in the program until it is linked to an individual, family or event.');
-	break;
-
-case 'edit_add_unlinked_person':
-	$title=WT_I18N::translate('Add an unlinked person');
-	$text=WT_I18N::translate('Use this form to add an unlinked person.<br /><br />When you add an unlinked person to your family tree, the person will not be linked to any other people until you link them.  Later, you can link people together from the Close Relatives tab on the Individual Information page.');
-	break;
-
-case 'edit_add_unlinked_source':
-	$title=WT_I18N::translate('Add an unlinked source');
-	$text=WT_I18N::translate('Use this link to add a new source to your database without linking the source to a source citation in another record.  The new source will appear in the source list, but will not appear on any charts or anywhere else in the program until it is linked up to a source citation.');
 	break;
 
 case 'edit_edit_raw':
@@ -1364,9 +1255,12 @@ case 'email':
 case 'export_gedcom':
 	$title=WT_I18N::translate('Export family tree');
 	$text=
-		WT_I18N::translate('This option will save the family tree to a GEDCOM file on the server.').
-		'<br/><br/>'.
-		/* I18N: %s is a directory name */ WT_I18N::translate('Files are stored in the %s directory.', '<b>'.WT_DATA_DIR.'</b>');
+		'<p>' .
+		WT_I18N::translate('This option will save the family tree to a GEDCOM file on the server.') .
+		'</p><p>' .
+		/* I18N: %s is a folder name */
+		WT_I18N::translate('GEDCOM files are stored in the %s folder.', '<b style="dir:auto;">' . WT_DATA_DIR . '</b>') .
+		'</p>';
 	break;
 
 case 'fambook_descent':
@@ -1399,11 +1293,6 @@ case 'gen_missing_thumbs':
 	$text=WT_I18N::translate('This option will generate thumbnails for all files in the current directory which don\'t already have a thumbnail.  This is much more convenient than clicking the <b>Create thumbnail</b> link for each such file.<br /><br />If you wish to retain control over which files should have corresponding thumbnails, you should not use this option.  Instead, click the appropriate <b>Create thumbnail</b> links.');
 	break;
 
-case 'generate_thumb':
-	$title=WT_I18N::translate('Automatic thumbnail');
-	$text=WT_I18N::translate('Your system can generate thumbnails for certain types of images automatically.  There may be support for BMP, GIF, JPG, and PNG files.  The types that your system supports are listed beside the checkbox.<br /><br />By clicking this checkbox, you signal the system that you are uploading images of this type and that you want it to try to generate thumbnails for them.  Leave the box unchecked if you want to provide your own thumbnails.');
-	break;
-
 case 'google_chart_surname':
 	$title=WT_I18N::translate('Surname');
 	$text=WT_I18N::translate('The number of occurrences of the specified name will be shown on the map. If you leave this field empty, the most common surname will be used.');
@@ -1417,9 +1306,12 @@ case 'header_favorites':
 case 'import_gedcom':
 	$title=WT_I18N::translate('Import family tree');
 	$text=
-		WT_I18N::translate('This option deletes all the genealogy data in your family tree and replaces it with data from a GEDCOM file on the server.').
-		'<br/><br/>'.
-		/* I18N: %s is a directory name */ WT_I18N::translate('Files are stored in the %s directory.', '<b>'.WT_DATA_DIR.'</b>');
+		'<p>' .
+		WT_I18N::translate('This option deletes all the genealogy data in your family tree and replaces it with data from a GEDCOM file on the server.') .
+		'</p><p>' .
+		/* I18N: %s is a folder name */
+		WT_I18N::translate('GEDCOM files are stored in the %s folder.', '<b style="dir:auto;">' . WT_DATA_DIR . '</b>') .
+		'</p>';
 	break;
 
 case 'include_media':
@@ -1430,46 +1322,6 @@ case 'include_media':
 case 'lifespan_chart':
 	$title=WT_I18N::translate('Lifespans');
 	$text=WT_I18N::translate('On this chart you can display one or more persons along a horizontal timeline.  This chart allows you to see how the lives of different people overlapped.<br /><br />You can add people to the chart individually or by family groups by their IDs.  The previous list will be remembered as you add more people to the chart.  You can clear the chart at any time with the <b>Clear Chart</b> button.<br /><br />You can also add people to the chart by searching for them by date range or locality.');
-	break;
-
-case 'link_child':
-	$title=WT_I18N::translate('Link to an existing family as a child');
-	$text=WT_I18N::translate('You can link this person as a child to an existing family when you click this link.<br /><br />Suppose that at one time the parents of the person were unknown, and you discovered later that the parents have a record in this database.<br /><br />Just click the link, enter the ID of the family, and you have competed the task.  If you don\'t know the family\'s ID, you can search for it.');
-	break;
-
-case 'link_husband':
-	$title=WT_I18N::translate('Link to an existing family as a husband');
-	$text=WT_I18N::translate('This item will allow you to link the current individual as a husband to a family that is already in the database. By clicking this link you can add this person to an existing family, of which the husband was unknown until now. This person will take the place of the previously unknown husband. All events, marriage information, and children will keep their existing links to the family.<br /><br />Just click the link, enter the ID of the family, and you have competed the task. This is an advanced editing option that should only be used if the family you want to link to already exists.  If you want to add a <u>new</u> family to this individual, use the <b>Add a new wife</b> link.');
-	break;
-
-case 'link_new_husb':
-	$title=WT_I18N::translate('Add a husband using an existing person');
-	$text=WT_I18N::translate('This will allow you to link another individual, who already exists, as a new husband to this person.  This will create a new family with the husband you select.  You will also have the option of specifying a marriage for this new family.');
-	break;
-
-case 'link_new_wife':
-	$title=WT_I18N::translate('Add a wife using an existing person');
-	$text=WT_I18N::translate('This will allow you to link another individual, who already exists, as a new wife to this person.  This will create a new family with the wife you select.  You will also have the option of specifying a marriage for this new family.');
-	break;
-
-case 'link_wife':
-	$title=WT_I18N::translate('Link to an existing family as a wife');
-	$text=WT_I18N::translate('This item will allow you to link the current individual as a wife to a family that is already in the database.<br /><br />This is an advanced editing option that should only be used if the family you want to link to already exists.  If you want to add a <u>new</u> family to this individual, use the <b>Add a new husband</b> link.');
-	break;
-
-case 'manage_media':
-	$title=WT_I18N::translate('Media');
-	$text=WT_I18N::translate('On this page you can easily manage your Media files and directories.<br /><br />When you create new Media subdirectories, <b>webtrees</b> will ensure that the identical directory structure is maintained within the <b>%sthumbs</b> directory.  When you upload new Media files, <b>webtrees</b> can automatically create the thumbnails for you.<br /><br />Beside each image in the Media list you\'ll find the following options.  The options actually shown depend on the current status of the Media file.<ul><li><b>Edit</b>&nbsp;&nbsp;When you click on this option, you\'ll see a page where you can change the title of the Media object.  If the Media object is not yet linked to a person, family, or source in the currently active database, you can establish this link here.  You can rename the file or even change its location within the <b>%s</b> directory structure.  When necessary, <b>webtrees</b> will automatically create the required subdirectories or any missing thumbnails.</li><li><b>Edit raw GEDCOM record</b>&nbsp;&nbsp;This option is only available when the administrator has enabled it.  You can view or edit the raw GEDCOM data associated with this Media object.  You should be very careful when you use this option.</li><li><b>Delete file</b>&nbsp;&nbsp;This option lets you erase all knowledge of the Media file from the current database.  Other databases will not be affected.  If this Media file is not mentioned in any other database, it, and its associated thumbnail, will be deleted.</li><li><b>Remove object</b>&nbsp;&nbsp;This option lets you erase all knowledge of the Media file from the current database.  Other databases will not be affected.  The Media file, and its associated thumbnail, will not be deleted.</li><li><b>Remove links</b>&nbsp;&nbsp;This option lets you remove all links to the media object from the current database.  The file will not be deleted, and the Media object by which this file is known to the current database will be retained.  Other databases will not be affected.</li><li><b>Set link</b>&nbsp;&nbsp;This option lets you establish links between the media file and persons, families, or sources of the current database.  When necessary, <b>webtrees</b> will also create the Media object by which the Media file is known to the database.</li><li><b>Create thumbnail</b>&nbsp;&nbsp;When you select this option, <b>webtrees</b> will create the missing thumbnail.</li></ul>', $MEDIA_DIRECTORY, $MEDIA_DIRECTORY);
-	break;
-
-case 'medialist_recursive':
-	$title=WT_I18N::translate('List files in subdirectories');
-	$text=WT_I18N::translate('When this option is selected, the MultiMedia Objects will search not only the directory selected from the Filter list but all its subdirectories as well. When this option is not selected, only the selected directory is searched.<br /><br />The titles of all media objects found are then examined to determine whether they contain the text entered in the Filter.  The result of these two actions determines the multimedia objects to be listed.');
-	break;
-
-case 'move_mediadirs':
-	$title=WT_I18N::translate('Move media directories');
-	$text=WT_I18N::translate('When the Media Firewall is enabled, Multi-Media files can be stored in a server directory that is not accessible from the Internet.<br /><br />These buttons allow you to easily move an entire Media directory structure between the protected (not web-addressable) <b>%s%s</b> and the normal <b>%s</b> directories.', $MEDIA_FIREWALL_ROOTDIR, $MEDIA_DIRECTORY, $MEDIA_DIRECTORY);
 	break;
 
 case 'next_path':
@@ -1566,16 +1418,6 @@ case 'remove_person':
 	$text=WT_I18N::translate('Click this link to remove the person from the timeline.');
 	break;
 
-case 'reorder_children':
-	$title=WT_I18N::translate('Reorder children');
-	$text=WT_I18N::translate('Children are displayed in the order in which they appear in the family record.  Children are not automatically sorted by birth date because often the birth dates of some of the children are uncertain but the order of their birth <u>is</u> known.<br /><br />This option will allow you to change the order of the children within the family\'s record.  Since you might want to sort the children by their birth dates, there is a button you can press that will do this for you.<br /><br />You can also drag-and-drop any information box to change the order of the children.  As you move the mouse cursor over an information box, its shape will change to a pair of double-headed crossed arrows. If you push and hold the left mouse button before moving the mouse cursor, the information box will follow the mouse cursor up or down in the list.  As the information box is moved, the other boxes will make room.  When you release the left mouse button, the information box will take its new place in the list.');
-	break;
-
-case 'reorder_families':
-	$title=WT_I18N::translate('Reorder families');
-	$text=WT_I18N::translate('Families on the Close Relatives tab are displayed in the order in which they appear in the individual\'s GEDCOM record.  Families are not sorted by the marriage date because often the marriage dates are unknown but the order of the marriages <u>is</u> known.<br /><br />This option will allow you to change the order of the families in which they are listed on the Close Relatives tab.  If you want to sort the families by their marriage dates, there is a button you can press that will automatically do this for you.');
-	break;
-
 case 'role':
 	$title=WT_I18N::translate('Role');
 	$text=
@@ -1610,11 +1452,6 @@ case 'role':
 case 'search_include_ASSO':
 	$title=WT_I18N::translate('Associates');
 	$text=WT_I18N::translate('This option causes <b>webtrees</b> to show all individuals who are recorded as having an association relationship to the person or family that was found as a direct result of the search.  The inverse, where all persons or families are shown when a person found as a direct result of the search has an association relationship to these other persons or families, is not possible.<br /><br />Example:  Suppose person <b>A</b> is godparent to person <b>B</b>.  This relationship is recorded in the GEDCOM record of person <b>B</b> by means of an ASSO tag.  No corresponding tag exists in the GEDCOM record of person <b>A</b>.<br /><br />When this option is set to <b>Yes</b> and the Search results list includes <b>B</b>, <b>A</b> will be included automatically because of the ASSO tag in the GEDCOM record of <b>B</b>.  However, if the Search results list includes <b>A</b>, <b>B</b> will not be included automatically since there is no matching ASSO tag in the GEDCOM record of person <b>A</b>.');
-	break;
-
-case 'setperms':
-	$title=WT_I18N::translate('Set media permissions');
-	$text=WT_I18N::translate('Recursively set the permissions on the protected (not web-addressable) <b>%s%s</b> and the normal <b>%s</b> directories to either world-writable or read-only.', $MEDIA_FIREWALL_ROOTDIR, $MEDIA_DIRECTORY, $MEDIA_DIRECTORY);
 	break;
 
 case 'show_fact_sources':
@@ -1657,7 +1494,10 @@ case 'upload_server_file':
 
 case 'upload_server_folder':
 	$title=WT_I18N::translate('Folder name on server');
-	$text=WT_I18N::translate('The administrator has enabled up to %s folder levels below the default <b>%s</b>.  This helps to organize the media files and reduces the possibility of name collisions.<br /><br />In this field, you specify the destination folder where the uploaded media file should be stored.  The matching thumbnail file, either uploaded separately or generated automatically, will be stored in a similar folder structure starting at <b>%sthumbs/</b> instead of <b>%s</b>.  You do not need to enter the <b>%s</b> part of the destination folder name.<br /><br />If you are not sure about what to enter here, you should contact your site administrator for advice.', $MEDIA_DIRECTORY_LEVELS, $MEDIA_DIRECTORY, $MEDIA_DIRECTORY, $MEDIA_DIRECTORY, $MEDIA_DIRECTORY);
+	$text=
+		'<p>' .
+		WT_I18N::translate('If you have a large number of media files, you can organize them into folders and subfolders.') .
+		'</p>';
 	break;
 
 case 'upload_thumbnail_file':
@@ -1710,14 +1550,6 @@ case 'username':
 case 'utf8_ansi':
 	$title=WT_I18N::translate('Convert from UTF-8 to ANSI');
 	$text=WT_I18N::translate('For optimal display on the Internet, <b>webtrees</b> uses the UTF-8 character set.  Some programs, Family Tree Maker for example, do not support importing GEDCOM files encoded in UTF-8.  Checking this box will convert the file from <b>UTF-8</b> to <b>ANSI (ISO-8859-1)</b>.<br /><br />The format you need depends on the program you use to work with your downloaded GEDCOM file.  If you aren\'t sure, consult the documentation of that program.<br /><br />Note that for special characters to remain unchanged, you will need to keep the file in UTF-8 and convert it to your program\'s method for handling these special characters by some other means.  Consult your program\'s manufacturer or author.<br /><br />This <a href=\'http://en.wikipedia.org/wiki/UTF-8\' target=\'_blank\' title=\'Wikipedia article\'><b>Wikipedia article</b></a> contains comprehensive information and links about UTF-8.');
-	break;
-
-case 'view_server_folder':
-	$title=WT_I18N::translate('View server folder');
-	$text=WT_I18N::translate('The administrator has enabled up to %s folder levels below the default <b>%s</b>.  This helps to organize the media files and reduces the possibility of name collisions.<br /><br />In this field, you select the media folder whose contents you wish to view.  When you select <b>ALL</b>, all media files will be shown without regard to the folder in which they are stored.  This can produce a very long list of media items.',
-		get_gedcom_setting(WT_GED_ID, 'MEDIA_DIRECTORY_LEVELS'),
-		get_gedcom_setting(WT_GED_ID, 'MEDIA_DIRECTORY')
-	);
 	break;
 
 case 'zip':

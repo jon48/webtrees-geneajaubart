@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13634 2012-03-23 16:00:17Z greg $
+// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -38,7 +38,7 @@ class relative_ext_report_WT_Module extends WT_Module implements WT_Module_Repor
 	// Extend class WT_Module
 	public function getDescription() {
 		// This text also appears in the .XML file - update both together
-		return /* I18N: Description of the "Related individuals" module */ WT_I18N::translate('A report of the individuals that are closely related to an individual.');
+		return /* I18N: Description of the “Related individuals” module */ WT_I18N::translate('A report of the individuals that are closely related to an individual.');
 	}
 
 	// Extend class WT_Module

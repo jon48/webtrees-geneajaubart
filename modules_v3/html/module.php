@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14368 2012-09-28 07:46:44Z greg $
+// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +36,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "HTML" module */ WT_I18N::translate('Add your own text and graphics.');
+		return /* I18N: Description of the “HTML” module */ WT_I18N::translate('Add your own text and graphics.');
 	}
 
 	// Implement class WT_Module_Block

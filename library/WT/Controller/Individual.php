@@ -2,7 +2,7 @@
 // Controller for the individual page
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team. All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: Individual.php 14310 2012-09-18 22:10:47Z nigel $
+// $Id: Individual.php 14794 2013-02-09 08:57:53Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -62,7 +62,8 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 				$this->record = new WT_Person($gedrec);
 				$this->record->ged_id=WT_GED_ID; // This record is from a file
 		} else if (!$this->record) {
-			return false;
+			parent::__construct();
+			return;
 		}
 
 		//-- if the user can edit and there are changes then get the new changes
@@ -134,52 +135,9 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 
 		echo $mod->getTabContent();
 		
-		// Allow the other tabs to modify this one - e.g. lightbox does this.
-		echo '<script>';
-		foreach ($this->tabs as $module) {
-			echo $module->getJSCallback();
-		}
-		echo '</script>';
-
 		if (WT_DEBUG_SQL) {
 			echo WT_DB::getQueryLog();
 		}
-	}
-
-	/**
-	* check if we can show the highlighted media object
-	* @return boolean
-	*/
-	function canShowHighlightedObject() {
-		global $SHOW_HIGHLIGHT_IMAGES, $USE_SILHOUETTE;
-
-		if (($this->record->canDisplayDetails()) && $SHOW_HIGHLIGHT_IMAGES) {
-			$firstmediarec = $this->record->findHighlightedMedia();
-			if ($firstmediarec) return true;
-		}
-		if ($USE_SILHOUETTE) { return true; }
-		return false;
-	}
-
-	/**
-	* get the highlighted object HTML
-	* @return string HTML string for the <img> tag
-	*/
-	function getHighlightedObject() {
-		global $sex;
-
-		if ($this->canShowHighlightedObject()) {
-			$firstmediarec=$this->record->findHighlightedMedia();
-			if (!empty($firstmediarec)) {
-				$mediaobject=WT_Media::getInstance($firstmediarec['mid']);
-				$result=$mediaobject->displayMedia(array('uselightbox_fallback'=>false,'clearbox'=>'general_1'));
-				return $result;
-			}
-		}
-
-		$sex=$this->record->getSex();
-		return display_silhouette(array('sex'=>$sex)); // may return ''
-
 	}
 
 	/**
@@ -199,6 +157,8 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 
 		// Create a dummy record, so we can extract the formatted NAME value from the event.
 		$dummy=new WT_Person('0 @'.$event->getParentObject()->getXref()."@ INDI\n1 DEAT Y\n".$factrec);
+		$all_names=$dummy->getAllNames();
+		$primary_name=$all_names[0];
 		
 		$this->name_count++;
 		if ($this->name_count >1) { echo '<h3 class="name_two">',$dummy->getFullName(), '</h3>'; } //Other names accordion element
@@ -235,17 +195,29 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		for ($i=0; $i<$ct; $i++) {
 			echo '<div>';
 				$fact = $nmatch[$i][1];
-				if (($fact!="SOUR") && ($fact!="NOTE") && ($fact!="SPFX")) {
+				if ($fact!='SOUR' && $fact!='NOTE' && $fact!='SPFX') {
 					echo '<dl><dt class="label">', WT_Gedcom_Tag::getLabel($fact, $this->record), '</dt>';
 					echo '<dd class="field">'; // Before using dir="auto" on this field, note that Gecko treats this as an inline element but WebKit treats it as a block element
 					if (isset($nmatch[$i][2])) {
 							$name = htmlspecialchars($nmatch[$i][2]);
 							$name = str_replace('/', '', $name);
 							$name=preg_replace('/(\S*)\*/', '<span class="starredname">\\1</span>', $name);
-							if ($fact=='TYPE') {
+							switch ($fact) {
+							case 'TYPE':
 								echo WT_Gedcom_Code_Name::getValue($name, $this->record);
-							} else {
+								break;
+							case 'SURN':
+								// The SURN field is not necessarily the surname.
+								// Where it is not a substring of the real surname, show it after the real surname.
+								if (strpos($primary_name['surname'], str_replace(',', ' ', $name))!==false) {
+									echo $primary_name['surname'];
+								} else {
+									echo WT_I18N::translate('%1$s (%2$s)', $primary_name['surname'], $name);
+								}
+								break;
+							default:
 								echo $name;
+								break;
 							}
 						}
 					echo '</dd>';
@@ -358,7 +330,7 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 			}
 
 			if (count($this->record->getSpouseFamilies())>1) {
-				$submenu = new WT_Menu(WT_I18N::translate('Reorder families'), '#', 'menu-indi-orderfam');
+				$submenu = new WT_Menu(WT_I18N::translate('Re-order families'), '#', 'menu-indi-orderfam');
 				$submenu->addOnclick("return reorder_families('".$this->record->getXref()."');");
 				$menu->addSubmenu($submenu);
 			}
@@ -468,7 +440,7 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 
 	/**
 	* build an array of Person that will be used to build a list
-	* of family members on the close relatives tab
+	* of family members on the families tab
 	* @param Family $family the family we are building for
 	* @return array an array of Person that will be used to iterate through on the indivudal.php page
 	*/
@@ -759,18 +731,25 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 		global $controller;
 
 		$html='';
+		$active=0;
+		$n=0;
 		foreach (WT_Module::getActiveSidebars() as $mod) {
 			if ($mod->hasSidebarContent()) {
 				$html.='<h3 id="'.$mod->getName().'"><a href="#">'.$mod->getTitle().'</a></h3>';
 				$html.='<div id="sb_content_'.$mod->getName().'">'.$mod->getSidebarContent().'</div>';
+				// The family navigator should be opened by default
+				if ($mod->getName()=='family_nav') {
+					$active=$n;
+				}
+				++$n;
 			}
 		}
 
 		$controller
 			->addInlineJavascript('
 				jQuery("#sidebarAccordion").accordion({
-					active:"#family_nav",
-					autoHeight: false,
+					active:' . $active . ',
+					heightStyle: "content",
 					collapsible: true,
 					icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }
 				});

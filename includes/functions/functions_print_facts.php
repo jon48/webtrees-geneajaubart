@@ -4,7 +4,7 @@
 // Various printing functions used to print fact records
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print_facts.php 14407 2012-10-09 22:27:37Z greg $
+// $Id: functions_print_facts.php 14801 2013-02-11 08:03:18Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -47,9 +47,7 @@ function print_fact(WT_Event $fact, WT_GedcomRecord $record) {
 		return;
 	}
 
-	if (!is_null($fact->getFamilyId())) {
-		$pid = $fact->getFamilyId();
-	} elseif ($fact->getParentObject()) {
+	if ($fact->getParentObject()) {
 		$pid = $fact->getParentObject()->getXref();
 	} else {
 		$pid = '';
@@ -88,9 +86,9 @@ function print_fact(WT_Event $fact, WT_GedcomRecord $record) {
 	}
 
 	// Who is this fact about?  Need it to translate fact label correctly
-	if (preg_match('/2 ASSO @('.WT_REGEX_XREF.')@/', $fact->getGedcomRecord(), $match)) {
+	if ($fact->getSpouse()) {
 		// Event of close relative
-		$label_person=WT_Person::getInstance($match[1]);
+		$label_person = $fact->getSpouse();
 	} else if (preg_match('/2 _WTS @('.WT_REGEX_XREF.')@/', $fact->getGedcomRecord(), $match)) {
 		// Event of close relative
 		$label_person=WT_Person::getInstance($match[1]);
@@ -195,23 +193,13 @@ function print_fact(WT_Event $fact, WT_GedcomRecord $record) {
 	//END PERSO
 
 	// Print the spouse and family of this fact/event
-	if (preg_match('/_WTS @(.*)@/', $fact->getGedcomRecord(), $match)) {
-		$spouse=WT_Person::getInstance($match[1]);
-		if ($spouse) {
-			echo ' <a href="', $spouse->getHtmlUrl(), '">';
-			if ($spouse->canDisplayName()) {
-				echo $spouse->getFullName();
-			} else {
-				echo WT_I18N::translate('Private');
-			}
-			echo '</a>';
-		}
-		$family = WT_Family::getInstance($pid);
-		if ($family) {
-			if ($spouse) echo ' - ';
-			echo '<a href="', $family->getHtmlUrl(), '">', WT_I18N::translate('View Family'), '</a>';
-			echo '<br>';
-		}
+	if ($fact->getSpouse()) {
+		// The significant spouse is set on family events of close relatives
+		echo '<a href="', $fact->getSpouse()->getHtmlUrl(), '">', $fact->getSpouse()->getFullName(), '</a> - ';
+	}
+	if ($fact->getParentObject() instanceof WT_Family && $record instanceof WT_Person) {
+		// Family events on an individual page
+		echo '<a href="', $fact->getParentObject()->getHtmlUrl(), '">', WT_I18N::translate('View Family'), '</a><br>';
 	}
 
 	// Print the value of this fact/event
@@ -273,6 +261,7 @@ function print_fact(WT_Event $fact, WT_GedcomRecord $record) {
 		echo '<div class="field"><a href="', htmlspecialchars($fact->getDetail()), '">', htmlspecialchars($fact->getDetail()), '</a></div>';
 		break;
 	case 'TEXT': // 0 SOUR / 1 TEXT
+		// PHP5.3 echo '<div class="field">', nl2br(htmlspecialchars($fact->getDetail()), false), '</div>';
 		echo '<div class="field">', nl2br(htmlspecialchars($fact->getDetail())), '</div>';
 		break;
 	default:
@@ -315,6 +304,8 @@ function print_fact(WT_Event $fact, WT_GedcomRecord $record) {
 	
 	// Print the place of this fact/event
 	echo '<div class="place">', format_fact_place($fact, true, true, true), '</div>';
+	// A blank line between the primary attributes (value, date, place) and the secondary ones
+	echo '<br>';
 	print_address_structure($fact->getGedcomRecord(), 2);
 
 	// Print the associates of this fact/event
@@ -332,16 +323,10 @@ function print_fact(WT_Event $fact, WT_GedcomRecord $record) {
 		case 'ALIA':
 		case 'ASSO':
 		case 'DESC':
-		case 'EMAIL':
-		case 'FAX':
-		case 'PHON':
 		case 'RELA':
 		case 'STAT':
 		case 'TEMP':
 		case 'TYPE':
-		case 'WWW':
-		case '_EMAIL':
-		case 'URL':
 		case 'FAMS':
 		case '_WTS':
 		case '_WTFS':
@@ -411,9 +396,27 @@ function print_fact(WT_Event $fact, WT_GedcomRecord $record) {
 		case 'CALN':
 			echo WT_Gedcom_Tag::getLabelValue('CALN', expand_urls($match[2]));
 			break;
+		case 'FORM': // 0 OBJE / 1 FILE / 2 FORM / 3 TYPE
+			echo WT_Gedcom_Tag::getLabelValue('FORM', $match[2]);
+			if (preg_match('/\n3 TYPE (.+)/', $fact->getGedcomRecord(), $type_match)) {
+				echo WT_Gedcom_Tag::getLabelValue('TYPE', WT_Gedcom_Tag::getFileFormTypeValue($type_match[1]));
+			}
+			break;
 		default:
 			if (!$HIDE_GEDCOM_ERRORS || WT_Gedcom_Tag::isTag($match[1])) {
-				echo WT_Gedcom_Tag::getLabelValue($fact->getTag().':'.$match[1], htmlspecialchars($match[2]));
+				if (preg_match('/^@(' . WT_REGEX_XREF . ')@$/', $match[2], $xmatch)) {
+					// Links
+					$linked_record = WT_GedcomRecord::getInstance($xmatch[1]);
+					if ($linked_record) {
+						$link = '<a href="' .$linked_record->getHtmlUrl()  . '">' . $linked_record->getFullName() . '</a>';
+						echo WT_Gedcom_Tag::getLabelValue($fact->getTag().':'.$match[1], $link);
+					} else {
+						echo WT_Gedcom_Tag::getLabelValue($fact->getTag().':'.$match[1], htmlspecialchars($match[2]));
+					}
+				} else {
+					// Non links
+					echo WT_Gedcom_Tag::getLabelValue($fact->getTag().':'.$match[1], htmlspecialchars($match[2]));
+				}
 			}
 			break;
 		}
@@ -522,9 +525,14 @@ function print_fact_sources($factrec, $level, $return=false) {
 				$data .= print_fact_notes($srec, $nlevel, false, true);
 				$data .= '</div>';
 				$data .= '</div>';
+			} else {
+				// Show that we do actually have sources for this data.
+				// Commented out for now, based on user feedback.
+				// http://webtrees.net/index.php/en/forum/3-help-for-beta-and-svn-versions/27002-source-media-privacy-issue
+				//$data .= WT_Gedcom_Tag::getLabelValue('SOUR', WT_I18N::translate('yes'));
 			}
 		} else {
-			$data='<div class="fact_SOUR"><span class="label">'.WT_I18N::translate('Source').'</span>: <span class="field error">'.$sid.'</span></div>';
+			$data .= WT_Gedcom_Tag::getLabelValue('SOUR', '<span class="error">'.$sid.'</span>');
 		}
 	}
 
@@ -539,7 +547,7 @@ function print_fact_sources($factrec, $level, $return=false) {
 function print_media_links($factrec, $level, $pid='') {
 	global $TEXT_DIRECTION;
 	global $SEARCH_SPIDER;
-	global $THUMBNAIL_WIDTH, $USE_MEDIA_VIEWER;
+	global $THUMBNAIL_WIDTH;
 	global $GEDCOM, $HIDE_GEDCOM_ERRORS;
 
 	$ged_id=get_id_from_gedcom($GEDCOM);
@@ -553,47 +561,9 @@ function print_media_links($factrec, $level, $pid='') {
 		$media=WT_Media::getInstance($media_id);
 		if ($media) {
 			if ($media->canDisplayDetails()) {
-				$mainMedia = check_media_depth($media->getFileName(), 'NOTRUNC');
-				$thumbnail = thumbnail_file($mainMedia, true, false, $pid);
-				$isExternal = isFileExternal($media->getFileName());
-
-				// Determine the size of the mediafile
-				$imgsize = findImageSize($mainMedia);
-				$imgwidth = $imgsize[0]+40;
-				$imgheight = $imgsize[1]+150;
 				if ($objectNum > 0) echo '<br class="media-separator" style="clear:both;">';
 				echo '<div id="media-display"><div id="media-display-image">';
-				if ($isExternal || media_exists($thumbnail)) {
-	
-					//LBox --------  change for Lightbox Album --------------------------------------------
-					if (WT_USE_LIGHTBOX && preg_match("/\.(jpe?g|gif|png)$/i", $mainMedia)) {
-						echo '<a href="', $mainMedia, '" rel="clearbox[general_1]" rev="', $media->getXref(), '::', $GEDCOM, '::', strip_tags($media->getFullName()), '">';
-					} else if (WT_USE_LIGHTBOX && preg_match("/\.(pdf|avi|txt)$/i", $mainMedia)) {
-						echo '<a href="', $mainMedia, "\" rel='clearbox(", get_module_setting('lightbox', 'LB_URL_WIDTH',  '1000'), ", ", get_module_setting('lightbox', 'LB_URL_HEIGHT', '600'), ", click)' rev=\"", $media->getXref(), '::', $GEDCOM, '::', strip_tags($media->getFullName()), '">';
-					// extra for Streetview ----------------------------------------
-					} else if (WT_USE_LIGHTBOX && strpos($media->getFileName(), 'http://maps.google.')===0) {
-						echo '<iframe style="float:left; padding:5px;" width="264" height="176" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="', $media->getFileName(), '&amp;output=svembed"></iframe>';
-					// --------------------------------------------------------------------------------------
-					} else if ($USE_MEDIA_VIEWER) {
-						echo '<a href="mediaviewer.php?mid=', $media->getXref(), '&amp;ged=', WT_GEDURL, '">';
-					} else if (preg_match("/\.(jpe?g|gif|png)$/i", $mainMedia)) {
-						echo "<a href=\"#\" onclick=\"return openImage('", rawurlencode($mainMedia), "', $imgwidth, $imgheight);\">";
-					// extra for Streetview ----------------------------------------
-					} else if (strpos($media->getFileName(), 'http://maps.google.')===0) {
-						echo '<iframe width="300" height="200" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="', $media->getFileName(), '&amp;output=svembed"></iframe>';
-					} else {
-						echo '<a href="mediaviewer.php?mid=', $media->getXref(), '&amp;ged=', WT_GEDURL, '">';
-					}
-
-					echo '<img src="', $thumbnail, '" align="' , $TEXT_DIRECTION== 'rtl'?'right':'left', '" class="thumbnail"';
-					if (strpos($mainMedia, 'http://maps.google.')===0) {
-						// Do not print Streetview title here (PF&D tab)
-					} else {
-						if ($isExternal) echo ' width="', $THUMBNAIL_WIDTH, '"';
-						echo ' alt="', strip_tags($media->getFullName()), '"';
-					}
-					echo ' title="', strip_tags($media->getFullName()), '"></a>';
-				}
+				echo $media->displayImage();
 				echo '</div>'; // close div "media-display-image"
 				echo '<div id="media-display-title">';
 				if ($SEARCH_SPIDER) {
@@ -655,111 +625,15 @@ function print_media_links($factrec, $level, $pid='') {
  * @param int $level The gedcom line level of the main ADDR record
  */
 function print_address_structure($factrec, $level) {
-	global $POSTAL_CODE;
-
-	//   $POSTAL_CODE = 'false' - before city, 'true' - after city and/or state
-	//-- define per gedcom till can do per address countries in address languages
-	//-- then this will be the default when country not recognized or does not exist
-	//-- both Finland and Suomi are valid for Finland etc.
-	//-- see http://www.bitboost.com/ref/international-address-formats.html
-
-	$nlevel = $level+1;
-	$ct = preg_match_all("/$level ADDR(.*)/", $factrec, $omatch, PREG_SET_ORDER);
-	for ($i=0; $i<$ct; $i++) {
-		$arec = get_sub_record($level, "$level ADDR", $factrec, $i+1);
-		$resultText = "";
-		if ($level>1) $resultText .= "<span class=\"label\">".WT_Gedcom_Tag::getLabel('ADDR').': </span><br><div class="indent">';
-		$resultText .= $omatch[$i][1];
-		$cont = get_cont($nlevel, $arec);
-		if ($cont) {
-			$resultText .= $cont;
-		} else {
-			if (strlen(trim($omatch[$i][1])) > 0) echo '<br>';
-			$cs = preg_match("/$nlevel ADR1 (.*)/", $arec, $cmatch);
-			if ($cs>0) {
-				$resultText .= $cmatch[1];
-			}
-			$cs = preg_match("/$nlevel ADR2 (.*)/", $arec, $cmatch);
-			if ($cs>0) {
-				$resultText .= $cmatch[1];
-			}
-
-			if (!$POSTAL_CODE) {
-				$cs = preg_match("/$nlevel POST (.*)/", $arec, $cmatch);
-				if ($cs>0) {
-					$resultText .= "<br>".$cmatch[1];
-				}
-				$cs = preg_match("/$nlevel CITY (.*)/", $arec, $cmatch);
-				if ($cs>0) {
-					$resultText .= " ".$cmatch[1];
-				}
-				$cs = preg_match("/$nlevel STAE (.*)/", $arec, $cmatch);
-				if ($cs>0) {
-					$resultText .= ", ".$cmatch[1];
-				}
-			} else {
-				$cs = preg_match("/$nlevel CITY (.*)/", $arec, $cmatch);
-				if ($cs>0) {
-					$resultText .= "<br>".$cmatch[1];
-				}
-				$cs = preg_match("/$nlevel STAE (.*)/", $arec, $cmatch);
-				if ($cs>0) {
-					$resultText .= ", ".$cmatch[1];
-				}
-				$cs = preg_match("/$nlevel POST (.*)/", $arec, $cmatch);
-				if ($cs>0) {
-					$resultText .= " ".$cmatch[1];
-				}
-			}
-
-			$cs = preg_match("/$nlevel CTRY (.*)/", $arec, $cmatch);
-			if ($cs>0) {
-				$resultText .= "<br>".$cmatch[1];
-			}
+	if (preg_match("/$level ADDR (.*)/", $factrec, $omatch)) {
+		$arec = get_sub_record($level, "$level ADDR", $factrec, 1);
+		$cont = get_cont($level+1, $arec);
+		$resultText = $omatch[1] . get_cont($level+1, $arec);
+		if ($level>1) {
+			$resultText = '<span class="label">'.WT_Gedcom_Tag::getLabel('ADDR').': </span><br><div class="indent">' . $resultText . '</div>';
 		}
-		if ($level>1) $resultText .= "</div>";
-		// Here we can examine the resultant text and remove empty tags
 		echo $resultText;
 	}
-	$resultText = '<table>';
-	$ct = preg_match_all("/$level PHON (.*)/", $factrec, $omatch, PREG_SET_ORDER);
-	if ($ct>0) {
-		for ($i=0; $i<$ct; $i++) {
-			$resultText .= '<tr>';
-			$resultText .= '<td><span class="label"><b>'.WT_Gedcom_Tag::getLabel('PHON').': </b></span></td><td><span class="field" dir="auto">';
-			$resultText .= $omatch[$i][1];
-			$resultText .= '</span></td></tr>';
-		}
-	}
-	$ct = preg_match_all("/$level FAX (.*)/", $factrec, $omatch, PREG_SET_ORDER);
-	if ($ct>0) {
-		for ($i=0; $i<$ct; $i++) {
-			$resultText .= '<tr>';
-			$resultText .= '<td><span class="label"><b>'.WT_Gedcom_Tag::getLabel('FAX').': </b></span></td><td><span class="field" dir="auto">';
-			$resultText .= $omatch[$i][1];
-			$resultText .= '</span></td></tr>';
-		}
-	}
-	$ct = preg_match_all("/$level EMAIL (.*)/", $factrec, $omatch, PREG_SET_ORDER);
-	if ($ct>0) {
-		for ($i=0; $i<$ct; $i++) {
-			$resultText .= '<tr>';
-			$resultText .= '<td><span class="label"><b>'.WT_Gedcom_Tag::getLabel('EMAIL').': </b></span></td><td><span class="field">';
-			$resultText .= '<a href="mailto:'.$omatch[$i][1].'" dir="auto">'.$omatch[$i][1].'</a>';
-			$resultText .= '</span></td></tr>';
-		}
-	}
-	$ct = preg_match_all("/$level (WWW|URL) (.*)/", $factrec, $omatch, PREG_SET_ORDER);
-	if ($ct>0) {
-		for ($i=0; $i<$ct; $i++) {
-			$resultText .= '<tr>';
-			$resultText .= '<td><span class="label"><b>'.WT_Gedcom_Tag::getLabel($omatch[$i][1]).': </b></span></td><td><span class="field" dir="auto">';
-			$resultText .= '<a href="'.$omatch[$i][2].'" target="_blank" dir="auto">'.$omatch[$i][2].'</a>';
-			$resultText .= '</span></td></tr>';
-		}
-	}
-	$resultText .= '</table>';
-	if ($resultText!='<table></table>') echo $resultText;
 }
 
 function print_main_sources(WT_Event $fact, $level, $pid, $noedit=false) {
@@ -918,7 +792,7 @@ function printSourceStructure($textSOUR) {
 	}
 
 	if ($textSOUR['QUAY']!='') {
-		$html.='<div class="indent"><span class="label">'.WT_Gedcom_Tag::getLabel('QUAY').':</span> <span class="field" dir="auto">'.$textSOUR['QUAY'].'</span></div>';
+		$html.='<div class="indent"><span class="label">'.WT_Gedcom_Tag::getLabel('QUAY').':</span> <span class="field" dir="auto">'.WT_Gedcom_Code_Quay::getValue($textSOUR['QUAY']).'</span></div>';
 	}
 
 	return $html;
@@ -1141,126 +1015,128 @@ function print_main_notes(WT_Event $fact, $level, $pid, $noedit=false) {
  * @param boolean $related Whether or not to grab media from related records
  */
 function print_main_media($pid, $level=1, $related=false) {
-	global $GEDCOM, $MEDIATYPE;
+	global $GEDCOM;
 	$ged_id=get_id_from_gedcom($GEDCOM);
-
-	$gedrec = find_gedcom_record($pid, $ged_id, true);
-	$ids = array($pid);
+	$person = WT_GedcomRecord::getInstance($pid);
 
 	//-- find all of the related ids
+	$ids = array($person->getXref());
 	if ($related) {
-		$ct = preg_match_all("/1 FAMS @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
-		for ($i=0; $i<$ct; $i++) {
-			$ids[] = trim($match[$i][1]);
+		foreach ($person->getSpouseFamilies() as $family) {
+			$ids[] = $family->getXref();
 		}
 	}
 
-	//LBox -- if  exists, get a list of the sorted current objects in the indi gedcom record  -  (1 _WT_OBJE_SORT @xxx@ .... etc) ----------
+	//-- If they exist, get a list of the sorted current objects in the indi gedcom record  -  (1 _WT_OBJE_SORT @xxx@ .... etc) ----------
 	$sort_current_objes = array();
-	if ($level>0) $sort_regexp = "/".$level." _WT_OBJE_SORT @(.*)@/";
-	else $sort_regexp = "/_WT_OBJE_SORT @(.*)@/";
-	$sort_ct = preg_match_all($sort_regexp, $gedrec, $sort_match, PREG_SET_ORDER);
+	$sort_ct = preg_match_all('/\n1 _WT_OBJE_SORT @(.*)@/', $person->getGedcomRecord(), $sort_match, PREG_SET_ORDER);
 	for ($i=0; $i<$sort_ct; $i++) {
-		if (!isset($sort_current_objes[$sort_match[$i][1]])) $sort_current_objes[$sort_match[$i][1]] = 1;
-		else $sort_current_objes[$sort_match[$i][1]]++;
+		if (!isset($sort_current_objes[$sort_match[$i][1]])) {
+			$sort_current_objes[$sort_match[$i][1]] = 1;
+		} else {
+			$sort_current_objes[$sort_match[$i][1]]++;
+		}
 		$sort_obje_links[$sort_match[$i][1]][] = $sort_match[$i][0];
 	}
-	// -----------------------------------------------------------------------------------------------
 
 	// create ORDER BY list from Gedcom sorted records list  ---------------------------
 	$orderbylist = 'ORDER BY '; // initialize
 	foreach ($sort_match as $id) {
-		$orderbylist .= "m_media='$id[1]' DESC, ";
+		$orderbylist .= "m_id='$id[1]' DESC, ";
 	}
 	$orderbylist = rtrim($orderbylist, ', ');
-	// -----------------------------------------------------------------------------------------------
 
 	//-- get a list of the current objects in the record
 	$current_objes = array();
-	if ($level>0) $regexp = "/".$level." OBJE @(.*)@/";
-	else $regexp = "/OBJE @(.*)@/";
-	$ct = preg_match_all($regexp, $gedrec, $match, PREG_SET_ORDER);
+	if ($level>0) {
+		$regexp = '/\n' . $level . ' OBJE @(.*)@/';
+	} else {
+		$regexp = '/\n\d OBJE @(.*)@/';
+	}
+	$ct = preg_match_all($regexp, $person->getGedcomRecord(), $match, PREG_SET_ORDER);
 	for ($i=0; $i<$ct; $i++) {
-		$match[$i][1]=strtoupper($match[$i][1]); // Force PHP to copy MySQL's case-insensitivity
-		if (!isset($current_objes[$match[$i][1]])) $current_objes[$match[$i][1]] = 1;
-		else $current_objes[$match[$i][1]]++;
+		if (!isset($current_objes[$match[$i][1]])) {
+			$current_objes[$match[$i][1]] = 1;
+		} else {
+			$current_objes[$match[$i][1]]++;
+		}
 		$obje_links[$match[$i][1]][] = $match[$i][0];
 	}
 
 	$media_found = false;
-	$sqlmm = "SELECT ";
-	$sqlmm .= "m_media, m_ext, m_file, m_titl, m_gedfile, m_gedrec, mm_gid, mm_gedrec FROM `##media`, `##media_mapping` where ";
-	$sqlmm .= "mm_gid IN (";
-	$vars=array();
+
+	// Get the related media items
+	$sqlmm =
+		"SELECT DISTINCT m_id, m_ext, m_filename, m_titl, m_file, m_gedcom, l_from AS pid" .
+		" FROM `##media`" .
+		" JOIN `##link` ON (m_id=l_to AND m_file=l_file AND l_type='OBJE')" .
+		" WHERE m_file=? AND l_from IN (";
 	$i=0;
-	foreach ($ids as $key=>$id) {
+	$vars=array(WT_GED_ID);
+	foreach ($ids as $media_id) {
 		if ($i>0) $sqlmm .= ", ";
 		$sqlmm .= "?";
-		$vars[]=$id;
+		$vars[]=$media_id;
 		$i++;
 	}
-	$sqlmm .= ") AND mm_gedfile=? AND mm_media=m_media AND mm_gedfile=m_gedfile ";
-	$vars[]=WT_GED_ID;
-	//-- for family and source page only show level 1 obje references
-	if ($level>0) {
-		$sqlmm .= "AND mm_gedrec LIKE ?";
-		$vars[]="{$level} OBJE%";
-	}
+	$sqlmm .= ')';
 
-	// LBox --- media sort -------------------------------------
 	if ($sort_ct>0) {
 		$sqlmm .= $orderbylist;
-	} else {
-		$sqlmm .= " ORDER BY mm_gid DESC ";
 	}
-	// ---------------------------------------------------------------
 
 	$rows=WT_DB::prepare($sqlmm)->execute($vars)->fetchAll(PDO::FETCH_ASSOC);
 
 	$foundObjs = array();
 	foreach ($rows as $rowm) {
-		$rowm['m_media']=strtoupper($rowm['m_media']); // Force PHP to copy MySQL's case-insensitivity
-		if (isset($foundObjs[$rowm['m_media']])) {
-			if (isset($current_objes[$rowm['m_media']])) $current_objes[$rowm['m_media']]--;
+		//-- for family, repository, note and source page only show level 1 obje references
+		$tmp=WT_GedcomRecord::getInstance($rowm['pid']);
+		if ($level && !preg_match('/\n'.$level.' OBJE @'.$rowm['m_id'].'@/', $tmp->getGedcomRecord())) {
+			continue;
+		}
+		if (isset($foundObjs[$rowm['m_id']])) {
+			if (isset($current_objes[$rowm['m_id']])) {
+				$current_objes[$rowm['m_id']]--;
+			}
 			continue;
 		}
 		$rows=array();
 
 		//-- if there is a change to this media item then get the
 		//-- updated media item and show it
-		if ($newrec=find_updated_record($rowm["m_media"], $ged_id)) {
+		if ($newrec=find_updated_record($rowm["m_id"], $ged_id)) {
 			$row = array();
-			$row['m_media'] = $rowm["m_media"];
-			$row['m_gedfile']=$rowm["m_gedfile"];
-			$row['m_file'] = get_gedcom_value("FILE", 1, $newrec);
+			$row['m_id'] = $rowm["m_id"];
+			$row['m_file']=$rowm["m_file"];
+			$row['m_filename'] = get_gedcom_value("FILE", 1, $newrec);
 			$row['m_titl'] = get_gedcom_value("TITL", 1, $newrec);
 			if (empty($row['m_titl'])) $row['m_titl'] = get_gedcom_value("FILE:TITL", 1, $newrec);
-			$row['m_gedrec'] = $newrec;
+			$row['m_gedcom'] = $newrec;
 			$et = preg_match("/(\.\w+)$/", $row['m_file'], $ematch);
 			$ext = "";
 			if ($et>0) $ext = substr(trim($ematch[1]), 1);
 			$row['m_ext'] = $ext;
-			$row['mm_gid'] = $pid;
-			$row['mm_gedrec'] = $rowm["mm_gedrec"];
+			$row['pid'] = $pid;
 			$rows['new'] = $row;
 			$rows['old'] = $rowm;
-			$current_objes[$rowm['m_media']]--;
+			if (isset($current_objes[$rowm['m_id']])) {
+				$current_objes[$rowm['m_id']]--;
+			}
 		} else {
-			if (!isset($current_objes[$rowm['m_media']]) && ($rowm['mm_gid']==$pid)) {
+			if (!isset($current_objes[$rowm['m_id']]) && ($rowm['pid']==$pid)) {
 				$rows['old'] = $rowm;
 			} else {
 				$rows['normal'] = $rowm;
-				if (isset($current_objes[$rowm['m_media']])) {
-					$current_objes[$rowm['m_media']]--;
+				if (isset($current_objes[$rowm['m_id']])) {
+					$current_objes[$rowm['m_id']]--;
 				}
 			}
 		}
 		foreach ($rows as $rtype => $rowm) {
 			$res = print_main_media_row($rtype, $rowm, $pid);
 			$media_found = $media_found || $res;
-			$foundObjs[$rowm['m_media']]=true;
+			$foundObjs[$rowm['m_id']]=true;
 		}
-		$media_found = true;
 	}
 
 	//-- objects are removed from the $current_objes list as they are printed
@@ -1271,25 +1147,23 @@ function print_main_media($pid, $level=1, $related=false) {
 			$objSubrec = array_pop($obje_links[$media_id]);
 			$row = array();
 			$newrec = find_gedcom_record($media_id, $ged_id, true);
-			$row['m_media'] = $media_id;
-			$row['m_gedfile']=$ged_id;
-			$row['m_file'] = get_gedcom_value("FILE", 1, $newrec);
+			$row['m_id'] = $media_id;
+			$row['m_file']=$ged_id;
+			$row['m_filename'] = get_gedcom_value("FILE", 1, $newrec);
 			$row['m_titl'] = get_gedcom_value("TITL", 1, $newrec);
 			if (empty($row['m_titl'])) $row['m_titl'] = get_gedcom_value("FILE:TITL", 1, $newrec);
-			$row['m_gedrec'] = $newrec;
+			$row['m_gedcom'] = $newrec;
 			$et = preg_match("/(\.\w+)$/", $row['m_file'], $ematch);
 			$ext = "";
 			if ($et>0) $ext = substr(trim($ematch[1]), 1);
 			$row['m_ext'] = $ext;
-			$row['mm_gid'] = $pid;
-			$row['mm_gedrec'] = get_sub_record($objSubrec{0}, $objSubrec, $gedrec);
+			$row['pid'] = $pid;
 			$res = print_main_media_row('new', $row, $pid);
 			$media_found = $media_found || $res;
 			$value--;
 		}
 	}
-	if ($media_found) return true;
-	else return false;
+	return $media_found;
 }
 
 /**
@@ -1301,25 +1175,25 @@ function print_main_media($pid, $level=1, $related=false) {
 function print_main_media_row($rtype, $rowm, $pid) {
 	global $SHOW_FACT_ICONS, $SEARCH_SPIDER;
 
-	$mediaobject = new WT_Media($rowm['m_gedrec']);
+	$mediaobject = new WT_Media($rowm['m_gedcom']);
 	if (!$mediaobject || !$mediaobject->canDisplayDetails()) {
 		return false;
 	}
 
 	$styleadd='';
-	if ($rtype=='new') $styleadd = 'change_new';
-	if ($rtype=='old') $styleadd = 'change_old';
+	if ($rtype=='new') $styleadd = ' change_new';
+	if ($rtype=='old') $styleadd = ' change_old';
 
 	$linenum = 0;
 	echo '<tr><td class="descriptionbox', $styleadd,' width20">';
-	if ($rowm['mm_gid']==$pid && WT_USER_CAN_EDIT && (!FactEditRestricted($mediaobject->getXref(), $mediaobject->getGedcomRecord())) && ($styleadd!='change_old') && $rowm['m_gedrec']!='') {
-		echo "<a onclick=\"return window.open('addmedia.php?action=editmedia&amp;pid=", $mediaobject->getXref(), "&amp;linktoid={$rowm['mm_gid']}', '_blank', edit_window_specs);\" href=\"#\" title=\"", WT_I18N::translate('Edit'), "\">";
+	if ($rowm['pid']==$pid && WT_USER_CAN_EDIT && (!FactEditRestricted($mediaobject->getXref(), $mediaobject->getGedcomRecord())) && ($styleadd!=' change_old') && $rowm['m_gedcom']!='') {
+		echo "<a onclick=\"return window.open('addmedia.php?action=editmedia&amp;pid=", $mediaobject->getXref(), "&amp;linktoid={$rowm['pid']}', '_blank', edit_window_specs);\" href=\"#\" title=\"", WT_I18N::translate('Edit'), "\">";
 		if ($SHOW_FACT_ICONS) {
 			echo '<i class="icon-media"></i> ';
 		}
 		echo WT_Gedcom_Tag::getLabel('OBJE'), '</a>';
 		echo '<div class="editfacts">';
-		echo "<div class=\"editlink\"><a class=\"editicon\" onclick=\"return window.open('addmedia.php?action=editmedia&amp;pid=".$mediaobject->getXref()."&amp;linktoid={$rowm['mm_gid']}', '_blank', edit_window_specs);\" href=\"#\" title=\"".WT_I18N::translate('Edit')."\"><span class=\"link_text\">".WT_I18N::translate('Edit')."</span></a></div>";
+		echo "<div class=\"editlink\"><a class=\"editicon\" onclick=\"return window.open('addmedia.php?action=editmedia&amp;pid=".$mediaobject->getXref()."&amp;linktoid={$rowm['pid']}', '_blank', edit_window_specs);\" href=\"#\" title=\"".WT_I18N::translate('Edit')."\"><span class=\"link_text\">".WT_I18N::translate('Edit')."</span></a></div>";
 		echo '<div class="copylink"><a class="copyicon" href="#" onclick="jQuery.post(\'action.php\',{action:\'copy-fact\', type:\'\', factgedcom:\'1 OBJE @'.$mediaobject->getXref().'@\'},function(){location.reload();})" title="'.WT_I18N::translate('Copy').'"><span class="link_text">'.WT_I18N::translate('Copy').'</span></a></div>';
 		echo "<div class=\"deletelink\"><a class=\"deleteicon\" onclick=\"return delete_fact('$pid', 'OBJE', '".$mediaobject->getXref()."', '".WT_I18N::translate('Are you sure you want to delete this fact?')."');\" href=\"#\" title=\"".WT_I18N::translate('Delete')."\"><span class=\"link_text\">".WT_I18N::translate('Delete')."</span></a></div>";
 		echo '</div>';
@@ -1328,7 +1202,7 @@ function print_main_media_row($rtype, $rowm, $pid) {
 
 	// NOTE Print the title of the media
 	echo '<td class="optionbox wrap', $styleadd, '"><span class="field">';
-	echo $mediaobject->displayMedia(array('alertnotfound'=>true));
+	echo $mediaobject->displayImage();
 	if (empty($SEARCH_SPIDER)) {
 		echo '<a href="'.$mediaobject->getHtmlUrl().'">';
 	}
@@ -1342,10 +1216,7 @@ function print_main_media_row($rtype, $rowm, $pid) {
 		echo '</a>';
 	}
 
-	$mediaformat=$mediaobject->getMediaFormat();
-	if ($mediaformat) {
-		echo WT_Gedcom_Tag::getLabelValue('FORM', $mediaformat);
-	}
+	echo WT_Gedcom_Tag::getLabelValue('FORM', $mediaobject->mimeType());
 	$imgsize = $mediaobject->getImageAttributes('main');
 	if (!empty($imgsize['WxH'])) {
 		echo WT_Gedcom_Tag::getLabelValue('__IMAGE_SIZE__', $imgsize['WxH']);
@@ -1359,9 +1230,9 @@ function print_main_media_row($rtype, $rowm, $pid) {
 	}
 	echo '</span>';
 	//-- print spouse name for marriage events
-	if ($rowm['mm_gid']!=$pid) {
+	if ($rowm['pid']!=$pid) {
 		$person=WT_Person::getInstance($pid);
-		$family=WT_Family::getInstance($rowm['mm_gid']);
+		$family=WT_Family::getInstance($rowm['pid']);
 		if ($family) {
 			$spouse=$family->getSpouse($person);
 			if ($spouse) {
@@ -1370,29 +1241,19 @@ function print_main_media_row($rtype, $rowm, $pid) {
 			echo '<a href="', $family->getHtmlUrl(), '">', WT_I18N::translate('View Family'), '</a><br>';
 		}
 	}
-	//-- don't show _PRIM option to regular users
-	if (WT_USER_GEDCOM_ADMIN) {
-		$prim=$mediaobject->isPrimary();
-		if ($prim) {
-			echo WT_Gedcom_Tag::getLabelValue('_PRIM', $prim=='Y' ? WT_I18N::translate('yes') : WT_I18N::translate('no'));
-		}
+	
+	switch ($mediaobject->isPrimary()) {
+	case 'Y':
+		echo WT_Gedcom_Tag::getLabelValue('_PRIM', WT_I18N::translate('yes'));
+		break;
+	case 'N':
+		echo WT_Gedcom_Tag::getLabelValue('_PRIM', WT_I18N::translate('no'));
+		break;
 	}
 	print_fact_notes($mediaobject->getGedcomRecord(), 1);
 	print_fact_sources($mediaobject->getGedcomRecord(), 1);
 
 	echo '</td></tr>';
 
-	// echo '<pre>'; print_r($rowm); print_r($mediaobject); echo '</pre>';
-
 	return true;
 }
-
-// -----------------------------------------------------------------------------
-//  Extra print_facts_functions for reorder media
-// -----------------------------------------------------------------------------
-
-require_once WT_ROOT.'includes/functions/functions_media_reorder.php';
-
-// -----------------------------------------------------------------------------
-//  End extra print_facts_functions for reorder media
-// -----------------------------------------------------------------------------

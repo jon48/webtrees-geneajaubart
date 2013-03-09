@@ -2,7 +2,7 @@
 // Administrative User Interface.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,12 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_users.php 14358 2012-09-25 23:41:45Z nigel $
+// $Id: admin_users.php 14847 2013-03-01 22:46:25Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_users.php');
 require './includes/session.php';
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->requireAdminLogin()
 	->setPageTitle(WT_I18N::translate('User administration'));
@@ -169,7 +169,7 @@ case 'loadrows':
 		$aData[12]=edit_field_yes_no_inline('user_setting-'.$user_id.'-verified_by_admin-', $aData[12]);
 		// Add extra column for "delete" action
 		if ($user_id != WT_USER_ID) {
-			$aData[13]='<div class="icon-delete" onclick="if (confirm(\''.htmlspecialchars(WT_I18N::translate('Permanently delete "%s"?', $user_name)).'\')) { document.location=\''.WT_SCRIPT_NAME.'?action=deleteuser&username='.htmlspecialchars($user_name).'\'; }"></div>';
+			$aData[13]='<div class="icon-delete" onclick="if (confirm(\''.htmlspecialchars(WT_I18N::translate('Are you sure you want to delete “%s”?', $user_name)).'\')) { document.location=\''.WT_SCRIPT_NAME.'?action=deleteuser&username='.htmlspecialchars($user_name).'\'; }"></div>';
 		} else {
 			// Do not delete ourself!
 			$aData[13]='';
@@ -388,12 +388,12 @@ case 'createform':
 			</tr>
 			<tr>
 				<td>', WT_I18N::translate('Password'), help_link('password'), '</td>
-				<td><input type="password" name="pass1" style="width:95%;" value="', htmlspecialchars($pass1), '" required placeholder="', WT_I18N::translate('At least 6 characters'), '" pattern="', WT_REGEX_PASSWORD, '" onchange="form.user_password02.pattern = regex_quote(this.value);"></td>
+				<td><input type="password" name="pass1" style="width:95%;" value="', htmlspecialchars($pass1), '" required placeholder="',  WT_I18N::plural('Use at least %s character.', 'Use at least %s characters.', WT_MINIMUM_PASSWORD_LENGTH, WT_I18N::number(WT_MINIMUM_PASSWORD_LENGTH)), '" pattern="', WT_REGEX_PASSWORD, '" onchange="form.user_password02.pattern = regex_quote(this.value);"></td>
 				<td>', WT_I18N::translate('Automatically approve changes made by this user'), help_link('useradmin_auto_accept'), '</td>
 				<td><input type="checkbox" name="new_auto_accept" value="1"></td>
 			</tr>
 				<td>', WT_I18N::translate('Confirm password'), help_link('password_confirm'), '</td>
-				<td><input type="password" name="pass2" style="width:95%;" value="', htmlspecialchars($pass2), '" required placeholder="', WT_I18N::translate('Same password as above'), '" pattern="', WT_REGEX_PASSWORD, '"></td>
+				<td><input type="password" name="pass2" style="width:95%;" value="', htmlspecialchars($pass2), '" required placeholder="', WT_I18N::translate('Type the password again.'), '" pattern="', WT_REGEX_PASSWORD, '"></td>
 				<td>', WT_I18N::translate('Allow this user to edit his account information'), help_link('useradmin_editaccount'), '</td>
 				<td><input type="checkbox" name="editaccount" value="1" checked="checked"></td>
 			<tr>
@@ -551,9 +551,8 @@ case 'cleanup':
 	<p>
 	<?php
 	if ($ucnt >0) {
-		?><input type="submit" value="<?php echo WT_I18N::translate('Continue'); ?>">&nbsp;&nbsp;<?php
+		?><input type="submit" value="<?php echo WT_I18N::translate('continue'); ?>">&nbsp;&nbsp;<?php
 	} ?>
-	<input type="button" value="<?php echo WT_I18N::translate('Back'); ?>" onclick="window.location='admin_users.php';">
 	</p>
 	</form><?php
 	break;
@@ -594,8 +593,8 @@ default:
 		'</table>';
 	
 	$controller
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.jeditable.min.js')
+		->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
+		->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
 		->addInlineJavascript('
 			var oTable = jQuery("#list").dataTable({
 				"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
@@ -625,25 +624,21 @@ default:
 					/* delete            */ { bSortable:false }
 				],
 				"fnDrawCallback": function() {
-					// Our JSON responses include Javascript as well as HTML.  This does not get
-					// executed (except for some versions of Firefox?).  So, extract it, and add
-					// it to its own DOM element
+					// Our JSON responses include Javascript as well as HTML.  This does not get executed automatically…
 					jQuery("#list script").each(function() {
-						var script=document.createElement("script");
-						jQuery("#list script").appendTo("body"); 
-						document.body.appendChild(script);
-					}).remove();
+						eval(this.text);
+					});
 				}				
 			});
 			
 			/* When clicking on the +/- icon, we expand/collapse the details block */
-			jQuery("#list tbody td.icon-close").live("click", function () {
+			jQuery("#list tbody").on("click", "td.icon-close", function () {
 				var nTr=this.parentNode;
 				jQuery(this).removeClass("icon-close");
 				oTable.fnClose(nTr);
 				jQuery(this).addClass("icon-open");
 			});
-			jQuery("#list tbody td.icon-open").live("click", function () {
+			jQuery("#list tbody").on("click", "td.icon-open", function () {
 				var nTr=this.parentNode;
 				jQuery(this).removeClass("icon-open");
 				var aData=oTable.fnGetData(nTr);

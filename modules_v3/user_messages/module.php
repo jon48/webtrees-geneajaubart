@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 13999 2012-06-16 21:57:04Z greg $
+// $Id: module.php 14782 2013-02-05 10:48:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,12 +36,12 @@ class user_messages_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Extend class WT_Module
 	public function getDescription() {
-		return /* I18N: Description of the "Messages" module */ WT_I18N::translate('Communicate directly with other users, using private messages.');
+		return /* I18N: Description of the “Messages” module */ WT_I18N::translate('Communicate directly with other users, using private messages.');
 	}
 
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $ctype, $TEXT_DIRECTION;
+		global $ctype;
 
 		require_once WT_ROOT.'includes/functions/functions_print_facts.php';
 
@@ -109,8 +109,9 @@ class user_messages_WT_Module extends WT_Module implements WT_Module_Block {
 				$content.='</td>';
 				$content.='</tr>';
 				$content.='<tr><td class="list_value_wrap" colspan="5"><div id="message'.$message->message_id.'" style="display:none;">';
+				// PHP5.3 $content.=expand_urls(nl2br(htmlspecialchars($message->body), false)).'<br><br>';
 				$content.=expand_urls(nl2br(htmlspecialchars($message->body))).'<br><br>';
-				if (strpos($message->subject, /* I18N: When replying to an email, the subject becomes "RE: <subject>" */ WT_I18N::translate('RE: '))!==0) {
+				if (strpos($message->subject, /* I18N: When replying to an email, the subject becomes “RE: <subject>” */ WT_I18N::translate('RE: '))!==0) {
 					$message->subject= WT_I18N::translate('RE: ').$message->subject;
 				}
 				if ($user_id) {

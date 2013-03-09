@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: index_edit.php 14299 2012-09-15 19:38:41Z greg $
+// $Id: index_edit.php 14481 2012-10-30 10:41:55Z greg $
 
 define('WT_SCRIPT_NAME', 'index_edit.php');
 require './includes/session.php';
@@ -334,6 +334,6 @@ echo '<tr><td class="descriptionbox wrap" colspan="7"><div id="instructions">';
 echo WT_I18N::translate('Highlight a  block name and then click on one of the arrow icons to move that highlighted block in the indicated direction.');
 echo '</div></td></tr>';
 echo '<tr><td class="topbottombar" colspan="7">';
-echo '<input type="submit" value="', WT_I18N::translate('Save'), '">';
+echo '<input type="submit" value="', WT_I18N::translate('save'), '">';
 echo '</td></tr></table>';
 echo '</form>';

@@ -5,7 +5,7 @@
 // about the family tree.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Stats.php 14361 2012-09-26 08:58:08Z greg $
+// $Id: Stats.php 14754 2013-02-02 21:14:34Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -251,51 +251,6 @@ class WT_Stats {
 		} else {
 			return self::gedcomDate();
 		}
-	}
-
-	function gedcomHighlight() {
-		$highlight=false;
-		if (file_exists("images/gedcoms/{$this->_gedcom}.jpg")) {
-			$highlight="images/gedcoms/{$this->_gedcom}.jpg";
-		}
-		elseif (file_exists("images/gedcoms/{$this->_gedcom}.png")) {
-			$highlight="images/gedcoms/{$this->_gedcom}.png";
-		}
-		if (!$highlight) {return '';}
-		$imgsize=findImageSize($highlight);
-		return "<a href=\"index.php?ctype=gedcom&amp;ged={$this->_gedcom_url}\" style=\"border-style:none;\"><img src=\"{$highlight}\" {$imgsize[3]} style=\"border:none; padding:2px 6px 2px 2px;\" class=\"gedcom_highlight\" alt=\"\" /></a>";
-	}
-
-	function gedcomHighlightLeft() {
-		$highlight=false;
-		if (file_exists("images/gedcoms/{$this->_gedcom}.jpg")) {
-			$highlight="images/gedcoms/{$this->_gedcom}.jpg";
-		} else {
-			if (file_exists("images/gedcoms/{$this->_gedcom}.png")) {
-				$highlight="images/gedcoms/{$this->_gedcom}.png";
-			}
-		}
-		if (!$highlight) {
-			return '';
-		}
-		$imgsize=findImageSize($highlight);
-		return "<a href=\"index.php?ctype=gedcom&amp;ged={$this->_gedcom_url}\" style=\"border-style:none;\"><img src=\"{$highlight}\" {$imgsize[3]} style=\"border:none; padding:2px 6px 2px 2px;\" align=\"left\" class=\"gedcom_highlight\" alt=\"\" /></a>";
-	}
-
-	function gedcomHighlightRight() {
-		$highlight=false;
-		if (file_exists("images/gedcoms/{$this->_gedcom}.jpg")) {
-			$highlight="images/gedcoms/{$this->_gedcom}.jpg";
-		} else {
-			if (file_exists("images/gedcoms/{$this->_gedcom}.png")) {
-				$highlight="images/gedcoms/{$this->_gedcom}.png";
-			}
-		}
-		if (!$highlight) {
-			return '';
-		}
-		$imgsize=findImageSize($highlight);
-		return "<a href=\"index.php?ctype=gedcom&amp;ged={$this->_gedcom_url}\" style=\"border-style:none;\"><img src=\"{$highlight}\" {$imgsize[3]} style=\"border:none; padding:2px 6px 2px 2px;\" align=\"right\" class=\"gedcom_highlight\" alt=\"\" /></a>";
 	}
 
 	function gedcomRootID() {
@@ -657,7 +612,7 @@ class WT_Stats {
 				WT_I18N::translate_c('unknown people', 'Unknown').' - '.$per_u;
 			return "<img src=\"https://chart.googleapis.com/chart?cht=p3&amp;chd=e:{$chd}&amp;chs={$size}&amp;chco={$color_unknown},{$color_female},{$color_male}&amp;chf=bg,s,ffffff00&amp;chl={$chl}\" width=\"{$sizes[0]}\" height=\"{$sizes[1]}\" alt=\"".$chart_title."\" title=\"".$chart_title."\" />";
 		} else {
-			$chd = self::_array_to_extended_encoding(array($tot_f, $tot_m));
+			$chd = self::_array_to_extended_encoding(array(4095*$tot_f/$tot, 4095*$tot_m/$tot));
 			$chl =
 				WT_I18N::translate('Females').' - '.$per_f.'|'.
 				WT_I18N::translate('Males').' - '.$per_m;
@@ -670,7 +625,7 @@ class WT_Stats {
 	// The totalLiving/totalDeceased queries assume that every dead person will
 	// have a DEAT record.  It will not include individuals who were born more
 	// than MAX_ALIVE_AGE years ago, and who have no DEAT record.
-	// A good reason to run the "Add missing DEAT records" batch-update!
+	// A good reason to run the “Add missing DEAT records” batch-update!
 	// However, SQL cannot provide the same logic used by Person::isDead().
 	function _totalLiving() {
 		return
@@ -750,19 +705,19 @@ class WT_Stats {
 		if (!in_array($type, self::$_media_types) && $type != 'all' && $type != 'unknown') {
 			return 0;
 		}
-		$sql="SELECT SQL_CACHE COUNT(*) AS tot FROM `##media` WHERE m_gedfile=?";
+		$sql="SELECT SQL_CACHE COUNT(*) AS tot FROM `##media` WHERE m_file=?";
 		$vars=array($this->_ged_id);
 
 		if ($type != 'all') {
 			if ($type=='unknown') {
 				// There has to be a better way then this :(
 				foreach (self::$_media_types as $t) {
-					$sql.=" AND (m_gedrec NOT LIKE ? AND m_gedrec NOT LIKE ?)";
+					$sql.=" AND (m_gedcom NOT LIKE ? AND m_gedcom NOT LIKE ?)";
 					$vars[]="%3 TYPE {$t}%";
 					$vars[]="%1 _TYPE {$t}%";
 				}
 			} else {
-				$sql.=" AND (m_gedrec LIKE ? OR m_gedrec LIKE ?)";
+				$sql.=" AND (m_gedcom LIKE ? OR m_gedcom LIKE ?)";
 				$vars[]="%3 TYPE {$type}%";
 				$vars[]="%1 _TYPE {$type}%";
 			}
@@ -1169,7 +1124,7 @@ class WT_Stats {
 				}
 			}
 		}
-		// get all the user's countries names
+		// get all the user’s countries names
 		$all_countries = self::get_all_countries();
 		foreach ($all_db_countries as $country_code=>$country) {
 			$top10[]='<li>';
@@ -2718,6 +2673,8 @@ class WT_Stats {
 					$return .= $child1->format_list('span', false, $child1->getFullName());
 					$return .= "<br><a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View Family')."]</a>";
 					return $return;
+				} else {
+					return WT_I18N::translate('This information is private and cannot be shown.');
 				}
 			}
 		}
@@ -3301,9 +3258,10 @@ class WT_Stats {
 			->fetchAll();
 		$nameList=array();
 		foreach ($rows as $row) {
-			// Split "John Thomas" into "John" and "Thomas" and count against both totals
+			// Split “John Thomas” into “John” and “Thomas” and count against both totals
 			foreach (explode(' ', $row->n_givn) as $given) {
-				if (utf8_strlen($given)>1) {
+				// Exclude initials and particles.
+				if (!preg_match('/^([A-Z]|[a-z]{1,3})$/', $given)) {
 					if (array_key_exists($given, $nameList)) {
 						$nameList[$given]+=$row->num;
 					} else {
@@ -3344,7 +3302,7 @@ class WT_Stats {
 			global $controller;
 				$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
 				$controller
-				->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+				->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 				->addInlineJavascript('
 					jQuery("#'.$table_id.'").dataTable({
 						"sDom": \'t\',

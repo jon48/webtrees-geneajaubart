@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: hourglass.php 14111 2012-07-18 12:25:09Z greg $
+// $Id: hourglass.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'hourglass.php');
 require './includes/session.php';
@@ -37,13 +37,6 @@ $controller
 
 echo '<table><tr><td valign="top">';
 echo '<h2>', WT_I18N::translate('Hourglass chart of %s', $controller->name), '</h2>';
-
-// LBox =====================================================================================
-if (WT_USE_LIGHTBOX) {
-	$album = new lightbox_WT_Module();
-	$album->getPreLoadContent();
-}
-// ==========================================================================================
 
 $gencount=0;
 ?>
@@ -119,7 +112,7 @@ $gencount=0;
 
 	<!-- // NOTE: Close table header -->
 	</td></tr></table>
-<div id="hourglass_chart" <?php echo "style=\"width:98%; direction:".$TEXT_DIRECTION."; z-index:1;\""; ?> >
+<div id="hourglass_chart" <?php echo "style=\"width:98%; z-index:1;\""; ?> >
 <table cellspacing="0" cellpadding="0" border="0"><tr>
 <!-- // descendancy -->
 <td valign="middle">
