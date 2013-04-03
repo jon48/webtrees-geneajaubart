@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: statistics.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: statistics.php 14919 2013-03-26 09:39:58Z greg $
 
 define('WT_SCRIPT_NAME', 'statistics.php');
 require './includes/session.php';
@@ -448,7 +448,8 @@ if (!$ajax) {
 				jQuery.post(form.attr('action'), form.serialize(), function(response) {
 					jQuery(response).dialog({
 						modal: true,
-						width: 964
+						width: 964,
+						closeText: ""
 					});
 					// Close the window when we click outside it.
 					jQuery(".ui-widget-overlay").on("click", function () {

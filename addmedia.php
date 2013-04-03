@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: addmedia.php 14854 2013-03-02 21:43:41Z greg $
+// $Id: addmedia.php 14905 2013-03-24 20:51:33Z greg $
 
 define('WT_SCRIPT_NAME', 'addmedia.php');
 require './includes/session.php';
@@ -153,8 +153,11 @@ case 'create': // Save the information from the “showcreateform” action
 	}
 
 	// User-specified filename?
-	$filename = $text[0];
+	if ($tag[0]=='FILE' && $text[0]) {
+		$filename = $text[0];
+	}
 	// Use the name of the uploaded file?
+	// If no filename specified, use the name of the uploaded file?
 	if (!$filename && !empty($_FILES['mediafile']['name'])) {
 		$filename = $_FILES['mediafile']['name'];
 	}
@@ -204,7 +207,7 @@ case 'create': // Save the information from the “showcreateform” action
 		}
 
 		// Now copy the (optional thumbnail)
-		if (!empty($_FILES['thumbnail']['name']) && preg_match('/^image\/(png|gif|jpeg)', $_FILES['thumbnail']['type'], $match)) {
+		if (!empty($_FILES['thumbnail']['name']) && preg_match('/^image\/(png|gif|jpeg)/', $_FILES['thumbnail']['type'], $match)) {
 			$extension = $match[1];
 			$thumbFile = preg_replace('/\.[a-z0-9]{3,5}$/', '.' . $extension, $fileName);
 			$serverFileName = WT_DATA_DIR . $MEDIA_DIRECTORY . 'thumbs/' . $folderName .  $thumbFile;
@@ -220,8 +223,13 @@ case 'create': // Save the information from the “showcreateform” action
 	$media_id = get_new_xref('OBJE');
 	if ($media_id) {
 		$newged = '0 @' . $media_id . "@ OBJE\n";
-		// Put the filename where handle_updates() will find it
-		$text[0] = $folderName . $fileName;
+		if ($tag[0]=='FILE') {
+			// The admin has an edit field to change the file name
+			$text[0] = $folderName . $fileName;
+		} else {
+			// Users keep the original filename
+			$newged .= '1 FILE ' . $folderName . $fileName;
+		}
 
 		$newged  = handle_updates($newged);
 

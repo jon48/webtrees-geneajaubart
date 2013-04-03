@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: help_text.php 14730 2013-01-30 10:16:44Z greg $
+// $Id: help_text.php 14902 2013-03-24 08:18:11Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -66,7 +66,12 @@ case 'AGNC':
 
 case 'ASSO':
 	$title=WT_Gedcom_Tag::getLabel('ASSO');
-	$text=WT_I18N::translate('Enter associate GEDCOM ID.');
+	$text=WT_I18N::translate('An associate is another indivdual who was involved with this individual, such as a friend or an employer.');
+	break;
+
+case '_ASSO':
+	$title=WT_Gedcom_Tag::getLabel('ASSO');
+	$text=WT_I18N::translate('An associate is another indivdual who was involved with this fact or event, such as a witness or a priest.');
 	break;
 
 case 'CAUS':

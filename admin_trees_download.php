@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_download.php 14841 2013-02-28 20:18:35Z greg $
+// $Id: admin_trees_download.php 14915 2013-03-25 11:49:51Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_download.php');
 require './includes/session.php';
@@ -40,9 +40,6 @@ $conv_path        = safe_GET('conv_path',        WT_REGEX_NOSCRIPT);
 $privatize_export = safe_GET('privatize_export', array('none', 'visitor', 'user', 'gedadmin'));
 
 if ($action == 'download') {
-	$conv_path = rtrim(str_replace('\\', '/', trim($conv_path)), '/').'/'; // make sure we have a trailing slash here
-	if ($conv_path=='/') $conv_path = '';
-
 	$exportOptions = array();
 	$exportOptions['privatize'] = $privatize_export;
 	$exportOptions['toANSI'] = $convert;

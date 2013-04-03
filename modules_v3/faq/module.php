@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: module.php 14884 2013-03-17 21:22:52Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -183,7 +183,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 			echo '</td><td>';
 			echo '<input type="text" name="block_order" size="3" tabindex="3" value="', $block_order, '"></td>';
 			echo '</td><td>';
-			echo select_edit_control('gedcom_id', WT_Tree::getIdList(), '', $gedcom_id, 'tabindex="4"');
+			echo select_edit_control('gedcom_id', WT_Tree::getIdList(), WT_I18N::translate('All'), $gedcom_id, 'tabindex="4"');
 			echo '</td></tr>';
 			echo '</table>';
 
@@ -403,7 +403,8 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 				echo '<div class="faq_edit_item">';
 				echo '<div class="faq_edit_title">', $faq->header, '</div>';
 				// NOTE: Print the body text of the current item
-				echo '<div class="faq_edit_content">', substr($faq->faqbody, 0, 1)=='<' ? $faq->faqbody : nl2br($faq->faqbody, false), '</div></div></td></tr>';
+				// PHP5.3 echo '<div class="faq_edit_content">', substr($faq->faqbody, 0, 1)=='<' ? $faq->faqbody : nl2br($faq->faqbody, false), '</div></div></td></tr>';
+				echo '<div class="faq_edit_content">', substr($faq->faqbody, 0, 1)=='<' ? $faq->faqbody : nl2br($faq->faqbody), '</div></div></td></tr>';
 			}
 			echo '</table>';
 		}

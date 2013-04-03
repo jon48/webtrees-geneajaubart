@@ -9,7 +9,7 @@
 // We wrap the Zend_Translate gettext library, to allow us to add extra
 // functionality, such as mixed RTL and LTR text.
 //
-// Copyright (C) 2012 Greg Roach
+// Copyright (C) 2013 Greg Roach
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: I18N.php 14839 2013-02-28 09:24:27Z greg $
+// $Id: I18N.php 14861 2013-03-08 22:43:53Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -102,7 +102,11 @@ class WT_I18N {
 						array ('_', 'strtoupper("$0")'),
 						$l
 					); // en-gb => en_GB
-					$prefs2[$l]=(float)$q;
+					if (array_key_exists($l, $prefs2)) {
+						$prefs2[$l]=max((float)$q, $prefs2[$l]);
+					} else {
+						$prefs2[$l]=(float)$q;
+					}
 				}
 				// Ensure there is a fallback.
 				if (!array_key_exists('en_US', $prefs2)) {

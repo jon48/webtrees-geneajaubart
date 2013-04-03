@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14809 2013-02-16 18:24:58Z greg $
+// $Id: module.php 14885 2013-03-17 22:59:31Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -131,28 +131,5 @@ class lightbox_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	private function getJS() {
 		return '';
-	}
-
-	static public function getMediaListMenu($mediaobject) {
-		$html='<div id="lightbox-menu"><ul class="makeMenu lb-menu">';
-		$menu = new WT_Menu(WT_I18N::translate('Edit Details'), '#', 'lb-image_edit');
-		$menu->addOnclick("return window.open('addmedia.php?action=editmedia&amp;pid=".$mediaobject->getXref()."', '_blank', edit_window_specs);");
-		$html.=$menu->getMenuAsList().'</ul><ul class="makeMenu lb-menu">';
-		$menu = new WT_Menu(WT_I18N::translate('Set link'), '#', 'lb-image_link');
-		$menu->addOnclick("return ilinkitem('".$mediaobject->getXref()."','person')");
-		$submenu = new WT_Menu(WT_I18N::translate('To Person'), '#');
-		$submenu->addOnclick("return ilinkitem('".$mediaobject->getXref()."','person')");
-		$menu->addSubMenu($submenu);
-		$submenu = new WT_Menu(WT_I18N::translate('To Family'), '#');
-		$submenu->addOnclick("return ilinkitem('".$mediaobject->getXref()."','family')");
-		$menu->addSubMenu($submenu);
-		$submenu = new WT_Menu(WT_I18N::translate('To Source'), '#');
-		$submenu->addOnclick("return ilinkitem('".$mediaobject->getXref()."','source')");
-		$menu->addSubMenu($submenu);
-		$html.=$menu->getMenuAsList().'</ul><ul class="makeMenu lb-menu">';
-		$menu = new WT_Menu(WT_I18N::translate('View Details'), $mediaobject->getHtmlUrl(), 'lb-image_view');
-		$html.=$menu->getMenuAsList();
-		$html.='</ul></div>';
-		return $html;
 	}
 }

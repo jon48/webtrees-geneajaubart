@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14844 2013-03-01 15:13:06Z lukasz $
+// $Id: module.php 14879 2013-03-14 16:58:17Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -1192,7 +1192,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			// save the info we need to use later for the side_bar
 			'gmarkers[i] = marker;'.
 			// add a line to the side_bar html
-			'side_bar_html += "<br><div id=\'"+linkid+"\'><a href=\'#\' onclick=\'myclick(" + i + ")\'>" + html +"</a><br></div>";
+			'side_bar_html += "<br><div id=\'"+linkid+"\' onclick=\'myclick(" + i + ")\'>" + html +"<br></div>";
 			i++;
 			return marker;
 		};'.
@@ -1321,7 +1321,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 						// Construct the polygon lines
 						if (!$hidelines) {
 							$to_child = (intval(($i-1)/2)); // Draw a line from parent to child
-							if (array_key_exists($to_child, $lat)) {
+							if (array_key_exists($to_child, $lat) && $lat[$to_child]!=0 && $lon[$to_child]!=0) {
 								$js.='
 								var linecolor;
 								var plines;
@@ -1331,11 +1331,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 								plines = new google.maps.Polygon({
 									paths: lines,
 									strokeColor: linecolor,
-									// strokeColor: '.$colored_line[$curgen].',
 									strokeOpacity: 0.8,
 									strokeWeight: 3,
 									fillColor: "#FF0000",
-									//fillOpacity: 0.35
 									fillOpacity: 0.1
 								});
 								plines.setMap(pm_map);';

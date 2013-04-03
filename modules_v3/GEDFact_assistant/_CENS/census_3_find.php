@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_3_find.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: census_3_find.php 14922 2013-03-27 00:40:08Z nigel $
 
 $controller=new WT_Controller_Simple();
 
@@ -189,5 +189,5 @@ if ($action=="filter") {
 	}
 	echo "</table>";
 }
-echo '<button onclick="closePopupAndReloadParent();">', WT_I18N::translate('close'), '</button>';
+echo '<button onclick="window.close();">', WT_I18N::translate('close'), '</button>';
 echo "</div>"; // Close div that centers table

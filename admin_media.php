@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_media.php 14855 2013-03-02 22:10:11Z greg $
+// $Id: admin_media.php 14909 2013-03-24 21:36:49Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_media.php');
 require './includes/session.php';
@@ -69,7 +69,7 @@ if ($delete_file) {
 		} else {
 			WT_FlashMessages::addMessage(WT_I18N::translate('The file %s could not be deleted.', $tmp));
 		}
-		$tmp = WT_DATA_DIR . $media_folder . 'thumb/' . $delete_file;
+		$tmp = WT_DATA_DIR . $media_folder . 'thumbs/' . $delete_file;
 		if (file_exists($tmp)) {
 			if (@unlink($tmp)) {
 				WT_FlashMessages::addMessage(WT_I18N::translate('The file %s was deleted.', $tmp));
@@ -231,6 +231,14 @@ case 'load_json':
 		break;
 
 	case 'unused':
+		// Which trees use this media folder?
+		$media_trees = WT_DB::prepare(
+			"SELECT gedcom_name, gedcom_name" .
+			" FROM `##gedcom`" .
+			" JOIN `##gedcom_setting` USING (gedcom_id)" .
+			" WHERE setting_name='MEDIA_DIRECTORY' AND setting_value=?"
+		)->execute(array($media_folder))->fetchAssoc();
+
 		$disk_files = all_disk_files ($media_folder, $media_path, $subfolders, $sSearch);
 		$db_files   = all_media_files($media_folder, $media_path, $subfolders, $sSearch);
 
@@ -241,8 +249,8 @@ case 'load_json':
 		// Filter unused files
 		if ($sSearch) {
 			// Lambda functions can't be used until PHP5.3
-			//$unused_files = array_filter($unused_files, function($x) use ($sSearch) {return strpos($x, $sSearch)!==0;});
-			function substr_search($x) {global $sSearch; return strpos($x, $sSearch)!==0;}
+			//$unused_files = array_filter($unused_files, function($x) use ($sSearch) {return strpos($x, $sSearch)!==false;});
+			function substr_search($x) {global $sSearch; return strpos($x, $sSearch)!==false;}
 			$unused_files = array_filter($unused_files, 'substr_search');
 		}
 		$iTotalDisplayRecords = count($unused_files);
@@ -273,14 +281,28 @@ case 'load_json':
 				$img = '-';
 			}
 
+			// Is there a pending record for this file?
+			$exists_pending = WT_DB::prepare(
+				"SELECT 1 FROM `##change` WHERE status='pending' AND new_gedcom LIKE CONCAT('%\n1 FILE ', ?, '\n%')"
+			)->execute(array($unused_file))->fetchOne();
+
+			// Form to create new media object in each tree
+			$create_form='';
+			if (!$exists_pending) {
+				foreach ($media_trees as $media_tree) {
+					$create_form .=
+						'<p><a onclick="window.open(\'addmedia.php?action=showmediaform&amp;ged=' . rawurlencode(reset($media_trees)) . '&amp;filename=' . rawurlencode(basename($unused_file)) . '&amp;folder=' . rawurlencode(dirname($unused_file)) . '\', \'_blank\', edit_window_specs); return false;">' .  WT_I18N::translate('Create') . '</a> — ' . htmlspecialchars($media_tree) . '<p>';
+				}
+			}
+
 			$conf        = WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($unused_file));
 			$delete_link =
-				'<p><a onclick="if (confirm(\'' . $conf . '\')) jQuery.post(\'admin_media.php\',{delete:\'' . $unused_file . '\',media_folder:\'' . $media_folder . '\',},function(){location.reload();})" href="#">' . WT_I18N::Translate('Delete') . '</a></p>';
+				'<p><a onclick="if (confirm(\'' . $conf . '\')) jQuery.post(\'admin_media.php\',{delete:\'' .addslashes($media_path . $unused_file) . '\',media_folder:\'' . addslashes($media_folder) . '\'},function(){location.reload();})" href="#">' . WT_I18N::Translate('Delete') . '</a></p>';
 
 			$aaData[] = array(
 				media_file_info($media_folder, $media_path, $unused_file) . $delete_link,
 				$img,
-				'',
+				$create_form,
 			);
 		}
 		break;
@@ -345,7 +367,6 @@ function scan_dirs($dir, $recursive, $filter) {
 					}
 				}
 			} elseif (!$filter || stripos($path, $filter)!==false) {
-				if ($path=='Duckphoto.JPG') {var_dump($dir);exit;}
 				$files[] = $path;
 			}
 		}

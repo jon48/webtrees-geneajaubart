@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_media_upload.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: admin_media_upload.php 14893 2013-03-20 09:49:12Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_media_upload.php');
 require './includes/session.php';
@@ -96,7 +96,7 @@ if ($action == "upload") {
 			}
 
 			// Thumbnails must be images.
-			if (!empty($_FILES['thumbnail' . $i]['name']) && !preg_match('/^image\/(png|gif|jpeg)', $_FILES['thumbnail' . $i]['type'])) {
+			if (!empty($_FILES['thumbnail' . $i]['name']) && !preg_match('/^image\/(png|gif|jpeg)/', $_FILES['thumbnail' . $i]['type'])) {
 				WT_FlashMessages::addMessage(WT_I18N::translate('Thumbnails must be images.'));
 				break;
 			}
@@ -149,7 +149,7 @@ if ($action == "upload") {
 				}
 
 				// Now copy the (optional thumbnail)
-				if (!empty($_FILES['thumbnail' . $i]['name']) && preg_match('/^image\/(png|gif|jpeg)', $_FILES['thumbnail' . $i]['type'], $match)) {
+				if (!empty($_FILES['thumbnail' . $i]['name']) && preg_match('/^image\/(png|gif|jpeg)/', $_FILES['thumbnail' . $i]['type'], $match)) {
 					$extension = $match[1];
 					$thumbFile = preg_replace('/\.[a-z0-9]{3,5}$/', '.' . $extension, $fileName);
 					$serverFileName = WT_DATA_DIR . $MEDIA_DIRECTORY . 'thumbs/' . $folderName .  $thumbFile;

@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin.php 14856 2013-03-06 21:08:52Z greg $
+// $Id: admin.php 14924 2013-03-27 08:34:40Z greg $
 
 define('WT_SCRIPT_NAME', 'admin.php');
 
@@ -1416,6 +1416,10 @@ function old_paths() {
 		WT_ROOT.'themes/webtrees/chrome.css',
 		WT_ROOT.'themes/webtrees/images/media',
 		WT_ROOT.'themes/xenea/images/media',
+		// Removed in 1.4.1
+		WT_ROOT.'js/webtrees-1.4.0.js',
+		WT_ROOT.'modules_v3/lightbox/images/image_edit.png',
+		WT_ROOT.'modules_v3/lightbox/images/image_view.png',
 	);
 }
 

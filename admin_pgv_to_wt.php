@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_pgv_to_wt.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: admin_pgv_to_wt.php 14876 2013-03-13 08:19:13Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_pgv_to_wt.php');
 require './includes/session.php';
@@ -88,9 +88,8 @@ if ($PGV_PATH) {
 }
 
 if ($PGV_PATH && !$error) {
-	// We have everything we need to run the wizard.
-	// Log out, as the account we are using is about to be deleted.
-	userLogout(WT_USER_ID);
+	// The account we are using is about to be deleted.
+	$WT_SESSION->wt_user = null;
 }
 
 $controller->pageHeader();

@@ -2,7 +2,7 @@
 // Various functions used by the Edit interface
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_edit.php 14803 2013-02-14 20:29:48Z nigel $
+// $Id: functions_edit.php 14912 2013-03-24 22:44:01Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -81,7 +81,7 @@ function select_edit_control($name, $values, $empty, $selected, $extra='') {
 		$html='<option value=""></option>';
 	}
 	foreach ($values as $key=>$value) {
-		if ((string)$key===$selected) { // Beware PHP array keys are cast to integers!  Cast them back
+		if ((string)$key===(string)$selected) { // Because "0" != ""
 			$html.='<option value="'.htmlspecialchars($key).'" selected="selected" dir="auto">'.htmlspecialchars($value).'</option>';
 		} else {
 			$html.='<option value="'.htmlspecialchars($key).'" dir="auto">'.htmlspecialchars($value).'</option>';
@@ -356,9 +356,13 @@ function checkChangeTime($pid, $gedrec, $last_time) {
 		$changeUser = '';
 	}
 	if (isset($_REQUEST['linenum']) && $changeTime!=0 && $last_time && $changeTime > $last_time) {
-		echo "<span class=\"error\">", WT_I18N::translate('The record with id %s was changed by another user since you last accessed it.', $pid), "<br><br>";
-		if (!empty($changeUser)) echo /* I18N: %s placeholders are a user-ID and a timestamp */ WT_I18N::translate('This record was last changed by <i>%s</i> at %s', $changeUser, date("d M Y H:i:s", $changeTime)), "<br><br>";
-		echo WT_I18N::translate('Please reload the previous page to make sure you are working with the most recent record.'), "</span>";
+		global $controller;
+		$controller->pageHeader();
+		echo '<p class="error">', WT_I18N::translate('The record with id %s was changed by another user since you last accessed it.', $pid), '</p>';
+		if (!empty($changeUser)) {
+			echo '<p>', /* I18N: %s placeholders are a user-ID and a timestamp */ WT_I18N::translate('This record was last changed by <i>%s</i> at %s', $changeUser, date("d M Y H:i:s", $changeTime)), '</p>';
+		}
+		echo '<p>', WT_I18N::translate('Please reload the previous page to make sure you are working with the most recent record.'), "</p>";
 		exit;
 	}
 }
@@ -694,34 +698,40 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 			break;
 		case 'patrilineal':
 			// Father gives his surname to his children
-			if ($nextaction=='addchildaction' && WT_Family::getInstance($famid)->getHusband()) {
-				//$father_surname=WT_Family::getInstance($famid)->getHusband()->getAllNames()[0]['surn']; // PHP5.4 only
-				$tmp=WT_Family::getInstance($famid)->getHusband()->getAllNames();
-				$father_surname=$tmp[0]['surn'];
-				$name_fields['SURN']=$father_surname;
-				$name_fields['NAME']='/'.$father_surname.'/';
-			} elseif ($nextaction=='addnewparentaction' && $famtag=='HUSB' && WT_Person::getInstance($pid)) {
-				//$child_surname=WT_Person::getInstance($pid)->getAllNames()[0]['surn']; // PHP5.4 only
-				$tmp=WT_Person::getInstance($pid)->getAllNames();
-				$child_surname=$tmp[0]['surn'];
-				$name_fields['SURN']=$child_surname;
-				$name_fields['NAME']='/'.$child_surname.'/';
+			switch ($nextaction) {
+			case 'addchildaction':
+				if (preg_match('/\/((?:[a-z]{2,3} )*)(.*)\//i', $father_name, $match)) {
+					$name_fields['SURN']=$match[2];
+					$name_fields['SPFX']=trim($match[1]);
+					$name_fields['NAME']="/{$match[1]}{$match[2]}/";
+				}
+				break;
+			case 'addnewparentaction':
+				if ($famtag=='HUSB' && preg_match('/\/((?:[a-z]{2,3} )*)(.*)\//i', $indi_name, $match)) {
+					$name_fields['SURN']=$match[2];
+					$name_fields['SPFX']=trim($match[1]);
+					$name_fields['NAME']="/{$match[1]}{$match[2]}/";
+				}
+				break;
 			}
 			break;
 		case 'matrilineal':
 			// Mother gives her surname to her children
-			if ($nextaction=='addchildaction' && WT_Family::getInstance($famid)->getWife()) {
-				//$mother_surname=WT_Family::getInstance($famid)->getWife()->getAllNames()[0]['surn']; // PHP5.4 only
-				$tmp=WT_Family::getInstance($famid)->getWife()->getAllNames();
-				$mother_surname=$tmp[0]['surn'];
-				$name_fields['SURN']=$mother_surname;
-				$name_fields['NAME']='/'.$mother_surname.'/';
-			} elseif ($nextaction=='addnewparentaction' && $famtag=='WIFE' && WT_Person::getInstance($pid)) {
-				//$child_surname=WT_Person::getInstance($pid)->getAllNames()[0]['surn']; // PHP5.4 only
-				$tmp=WT_Person::getInstance($pid)->getAllNames();
-				$child_surname=$tmp[0]['surn'];
-				$name_fields['SURN']=$child_surname;
-				$name_fields['NAME']='/'.$child_surname.'/';
+			switch ($nextaction) {
+			case 'addchildaction':
+				if (preg_match('/\/((?:[a-z]{2,3} )*)(.*)\//i', $mother, $match)) {
+					$name_fields['SURN']=$match[2];
+					$name_fields['SPFX']=trim($match[1]);
+					$name_fields['NAME']="/{$match[1]}{$match[2]}/";
+				}
+				break;
+			case 'addnewparentaction':
+				if ($famtag=='WIFE' && preg_match('/\/((?:[a-z]{2,3} )*)(.*)\//i', $indi_name, $match)) {
+					$name_fields['SURN']=$match[2];
+					$name_fields['SPFX']=trim($match[1]);
+					$name_fields['NAME']="/{$match[1]}{$match[2]}/";
+				}
+				break;
 			}
 			break;
 		case 'paternal':
@@ -740,7 +750,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 				}
 				break;
 			case 'addchildaction':
-				if (preg_match('/\/((?:[a-z]{2,3}\s+)*)(.*)\//i', $father_name, $match)) {
+				if (preg_match('/\/((?:[a-z]{2,3} )*)(.*)\//i', $father_name, $match)) {
 					$name_fields['SURN']=$match[2];
 					if ($SURNAME_TRADITION=='polish' && $sextag=='F') {
 						$match[2]=preg_replace(array('/ski$/', '/cki$/', '/dzki$/', '/żki$/'), array('ska', 'cka', 'dzka', 'żka'), $match[2]);
@@ -752,7 +762,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 				}
 				break;
 			case 'addnewparentaction':
-				if ($famtag=='HUSB' && preg_match('/\/((?:[a-z]{2,3}\s+)*)(.*)\//i', $indi_name, $match)) {
+				if ($famtag=='HUSB' && preg_match('/\/((?:[a-z]{2,3} )*)(.*)\//i', $indi_name, $match)) {
 					if ($SURNAME_TRADITION=='polish' && $sextag=='M') {
 						$match[2]=preg_replace(array('/ska$/', '/cka$/', '/dzka$/', '/żka$/'), array('ski', 'cki', 'dzki', 'żki'), $match[2]);
 					} else if ($SURNAME_TRADITION=='lithuanian') {
@@ -763,7 +773,7 @@ function print_indi_form($nextaction, $famid, $linenum='', $namerec='', $famtag=
 					$name_fields['SURN']=$match[2];
 					$name_fields['NAME']="/{$match[1]}{$match[2]}/";
 				}
-				if ($famtag=='WIFE' && preg_match('/\/((?:[a-z]{2,3}\s+)*)(.*)\//i', $indi_name, $match)) {
+				if ($famtag=='WIFE' && preg_match('/\/((?:[a-z]{2,3} )*)(.*)\//i', $indi_name, $match)) {
 					if ($SURNAME_TRADITION=='lithuanian') {
 						$match[2]=preg_replace(array('/as$/', '/is$/', '/ys$/', '/us$/'), array('ienė', 'ienė', 'ienė', 'ienė'), $match[2]);
 						$match[2]=preg_replace(array('/aitė$/', '/ytė$/', '/iūtė$/', '/utė$/'), array('ienė', 'ienė', 'ienė', 'ienė'), $match[2]);
@@ -1364,6 +1374,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 		case 'TITL':
 		case 'TYPE':
 		case 'URL':
+		case '_ASSO':
 		case '_HEB':
 		case '_PRIM':
 			echo help_link($fact);
@@ -1521,8 +1532,7 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 				echo ' ', $readOnly, ">";
 			}
 		
-		$tmp_array[]='';
-			$tmp_array = array('TYPE','TIME','NOTE','ASSO','AGE');
+		$tmp_array = array('TYPE','TIME','NOTE','SOUR','REPO','OBJE','ASSO','_ASSO','AGE');
 		
 			// split PLAC
 			if ($fact=="PLAC" && $readOnly=='') {
@@ -1570,22 +1580,30 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 	}
 
 	// popup links
-	if ($readOnly=='') {
-		if ($fact=='DATE') {
+	if (!$readOnly) {
+		switch ($fact) {
+		case 'DATE':
 			echo print_calendar_popup($element_id);
 			// If GEDFact_assistant/_CENS/ module is installed -------------------------------------------------
 			if ($action=='add' && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
-				if (isset($CensDate) && $CensDate=="yes") {
-					require_once WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_CENS/census_asst_date.php';
+				if (isset($CensDate) && $CensDate=='yes') {
+					require_once WT_ROOT.WT_MODULES_DIR . 'GEDFact_assistant/_CENS/census_asst_date.php';
 				}
 			}
 			// -------------------------------------------------------------------------------------------------
-		}
-		if ($fact=="FAMC") echo print_findfamily_link($element_id);
-		if ($fact=="FAMS") echo print_findfamily_link($element_id);
-		if ($fact=="ASSO") echo print_findindi_link($element_id);
-		if ($fact=="FILE") print_findmedia_link($element_id, "0file");
-		if ($fact=="SOUR") {
+			break;
+		case 'FAMC':
+		case 'FAMS':
+			echo print_findfamily_link($element_id);
+			break;
+		case 'ASSO':
+		case '_ASSO':
+			echo print_findindi_link($element_id);
+			break;
+		case 'FILE':
+			print_findmedia_link($element_id, "0file");
+			break;
+		case 'SOUR':
 			echo print_findsource_link($element_id), ' ', print_addnewsource_link($element_id);
 			//-- checkboxes to apply '1 SOUR' to BIRT/MARR/DEAT as '2 SOUR'
 			if ($level==1) {
@@ -1634,62 +1652,62 @@ function add_simple_tag($tag, $upperlevel='', $label='', $readOnly='', $noClose=
 					}
 				}
 			}
-		}
-		if ($fact=="REPO") {
+			break;
+		case 'REPO':
 			echo print_findrepository_link($element_id), ' ', print_addnewrepository_link($element_id);
-		}
-
-		// Shared Notes Icons ========================================
-		if ($fact=="NOTE" && $islink) {
-			// Print regular Shared Note icons ---------------------------
-			echo ' ', print_findnote_link($element_id), ' ', print_addnewnote_link($element_id);
-			if ($value) {
-				echo ' ', print_editnote_link($value);
-			}
-			// If GEDFact_assistant/_CENS/ module exists && we are on the INDI page and the action is a GEDFact CENS assistant addition.
-			// Then show the add Shared note assisted icon, if not  ... show regular Shared note icons.
-			if (($action=='add' || $action=='edit') && $pid && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
-				// Check if a CENS event ---------------------------
-				if ($event_add=="census_add") {
-					$type_pid=WT_GedcomRecord::getInstance($pid);
-					if ($type_pid->getType()=="INDI" ) {
-						echo '<br>', print_addnewnote_assisted_link($element_id, $pid);
+			break;
+		case 'NOTE':
+			// Shared Notes Icons ========================================
+			if ($islink) {
+				// Print regular Shared Note icons ---------------------------
+				echo ' ', print_findnote_link($element_id), ' ', print_addnewnote_link($element_id);
+				if ($value) {
+					echo ' ', print_editnote_link($value);
+				}
+				// If GEDFact_assistant/_CENS/ module exists && we are on the INDI page and the action is a GEDFact CENS assistant addition.
+				// Then show the add Shared note assisted icon, if not  ... show regular Shared note icons.
+				if (($action=='add' || $action=='edit') && $pid && array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
+					// Check if a CENS event ---------------------------
+					if ($event_add=='census_add') {
+						$type_pid=WT_GedcomRecord::getInstance($pid);
+						if ($type_pid->getType()=='INDI' ) {
+							echo '<br>', print_addnewnote_assisted_link($element_id, $pid);
+						}
 					}
 				}
 			}
-		}
-
-		if ($fact=="OBJE") {
+			break;
+		case 'OBJE':
 			echo print_findmedia_link($element_id, '1media');
-		}
-		if ($fact=="OBJE" && !$value) {
-			echo ' ', print_addnewmedia_link($element_id);
-			$value = "new";
+			if (!$value) {
+				echo ' ', print_addnewmedia_link($element_id);
+				$value = 'new';
+			}
+			break;
 		}
 
-		echo "<br>";
+		echo '<br>';
 	}
 
 	// current value
-	if ($fact=="DATE") {
+	if ($fact=='DATE') {
 		$date=new WT_Date($value);
 		echo $date->Display(false);
 	}
-	if (($fact=="ASSO" || $fact=="SOUR" || $fact=="OBJE" || ($fact=="NOTE" && $islink)) && $value) {
+	if (($fact=='ASSO' || $fact=='_ASSO' || $fact=='SOUR' || $fact=='OBJE' || ($fact=='NOTE' && $islink)) && $value) {
 		$record=WT_GedcomRecord::getInstance($value);
 		if ($record) {
 			echo ' ', $record->getFullName();
-		}
-		else if ($value!="new") {
+		} elseif ($value!='new') {
 			echo ' ', $value;
 		}
 	}
 	// pastable values
 	if ($readOnly=='') {
-		if ($fact=="FORM" && $upperlevel=='OBJE') print_autopaste_link($element_id, $FILE_FORM_accept);
+		if ($fact=='FORM' && $upperlevel=='OBJE') print_autopaste_link($element_id, $FILE_FORM_accept);
 	}
 
-	if ($noClose != "NOCLOSE") echo "</td></tr>";
+	if ($noClose != 'NOCLOSE') echo '</td></tr>';
 
 	return $element_id;
 }

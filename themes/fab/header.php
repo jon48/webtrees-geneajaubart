@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 14778 2013-02-04 19:07:39Z greg $
+// $Id: header.php 14896 2013-03-22 12:57:01Z rob $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -32,8 +32,15 @@ if (!defined('WT_WEBTREES')) {
 $this
 	->addExternalJavascript(WT_JQUERY_COLORBOX_URL)
 	->addExternalJavascript(WT_JQUERY_WHEELZOOM_URL)
-	->addInlineJavascript('activate_colorbox();');
-
+	->addInlineJavascript('activate_colorbox();')
+	->addInlineJavascript('
+		jQuery.extend(jQuery.colorbox.settings, {
+			title:	function(){
+					var img_title = jQuery(this).data("title");
+					return img_title;
+			}
+		});
+	');
 echo
 	'<!DOCTYPE html>',
 	'<html ', WT_I18N::html_markup(), '>',

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_export.php 14846 2013-03-01 22:32:02Z greg $
+// $Id: functions_export.php 14915 2013-03-25 11:49:51Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -147,14 +147,13 @@ function convert_media_path($rec, $path) {
 		if (!preg_match('~^(https?|ftp):~', $old_file_name)) { // Don’t modify external links
 			// Adding a windows path?  Convert the slashes.
 			if (strpos($path, '\\')!==false) {
-				$new_file_name=preg_replace('~/+~', '\\', $new_file_name);
-			}
-			if (strpos($old_file_name, $path)===0) {
-				// Path already present
-				$new_file_name=$old_file_name;
+				$new_file_name=preg_replace('~/+~', '\\', $old_file_name);
 			} else {
-				// Add path
-				$new_file_name=$path . $old_file_name;
+				$new_file_name=$old_file_name;
+			}
+			// Path not present - add it.
+			if (strpos($new_file_name, $path)===false) {
+				$new_file_name=$path . $new_file_name;
 			}
 			$rec=str_replace("\n1 FILE ".$old_file_name, "\n1 FILE ".$new_file_name, $rec);
 		}

@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: lightbox_print_media.php 14808 2013-02-16 17:44:02Z greg $
+// $Id: lightbox_print_media.php 14881 2013-03-16 09:27:54Z lukasz $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -44,15 +44,20 @@ function lightbox_print_media($pid, $level=1, $related=false, $kind=1, $noedit=f
 
 	$ged_id=get_id_from_gedcom($GEDCOM);
 	$person = WT_Person::getInstance($pid);
-
+	$ctf=0;
+	if ($level>0) {
+		$regexp = '/\n' . $level . ' OBJE @(.*)@/';
+	} else {
+		$regexp = '/\n\d OBJE @(.*)@/';
+	}
 	//-- find all of the related ids
 	$ids = array($person->getXref());
 	if ($related) {
 		foreach ($person->getSpouseFamilies() as $family) {
 			$ids[] = $family->getXref();
+			$ctf += preg_match_all($regexp, $family->getGedcomRecord(), $match, PREG_SET_ORDER);
 		}
 	}
-
 	//-- If they exist, get a list of the sorted current objects in the indi gedcom record  -  (1 _WT_OBJE_SORT @xxx@ .... etc) ----------
 	$sort_current_objes = array();
 	$sort_ct = preg_match_all('/\n1 _WT_OBJE_SORT @(.*)@/', $person->getGedcomRecord(), $sort_match, PREG_SET_ORDER);
@@ -74,11 +79,6 @@ function lightbox_print_media($pid, $level=1, $related=false, $kind=1, $noedit=f
 
 	//-- get a list of the current objects in the record
 	$current_objes = array();
-	if ($level>0) {
-		$regexp = '/\n' . $level . ' OBJE @(.*)@/';
-	} else {
-		$regexp = '/\n\d OBJE @(.*)@/';
-	}
 	$ct = preg_match_all($regexp, $person->getGedcomRecord(), $match, PREG_SET_ORDER);
 	for ($i=0; $i<$ct; $i++) {
 		if (!isset($current_objes[$match[$i][1]])) {
@@ -229,7 +229,7 @@ function lightbox_print_media($pid, $level=1, $related=false, $kind=1, $noedit=f
 		//-- We will print them too, and put any “Extra Items not in DB” into a new Row.
 
 		// Compare Items count in Database versus Item count in GEDCOM
-		if ($kind==5 && $ct!=$numm) {
+		if ($kind==5 && $ct+$ctf!=$numm) {
 			// If any items are left in $current_objes list for this individual, put them into $kind 5 (“Not in DB”) row
 			echo '<table cellpadding="0" border="0" width="100%" class="facts_table"><tr>';
 			echo '<td width="100" align="center" class="descriptionbox" style="vertical-align:middle;">';
@@ -262,9 +262,9 @@ function lightbox_print_media($pid, $level=1, $related=false, $kind=1, $noedit=f
 			}
 		}
 		// No “Extra” Media Items ============================
-		if ($kind==5 && $ct==$numm) {
+		if ($kind==5 && $ct+$ctf==$numm) {
 		// “Extra” Media Item in GEDCOM but NOT in DB ========
-		} else if ($kind==5 && $ct!=$numm) {
+		} else if ($kind==5 && $ct+$ctf!=$numm) {
 			echo '</ul>';
 			echo '</div>';
 			echo '<div class="clearlist">';

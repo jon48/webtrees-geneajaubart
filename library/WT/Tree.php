@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Tree.php 14693 2013-01-22 08:56:56Z greg $
+// $Id: Tree.php 14916 2013-03-25 17:44:09Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -341,6 +341,14 @@ class WT_Tree {
 			$tree_id,
 			"0 HEAD\n0 @I1@ INDI\n1 NAME {$john_doe}\n1 SEX M\n1 BIRT\n2 DATE 01 JAN 1850\n2 NOTE {$note}\n0 TRLR\n"
 		));
+
+		// Set the initial blocks
+		WT_DB::prepare(
+			"INSERT INTO `##block` (gedcom_id, location, block_order, module_name)".
+			" SELECT ?, location, block_order, module_name".
+			" FROM `##block`".
+			" WHERE gedcom_id=-1"
+		)->execute(array($tree_id));
 
 		// Update the list of trees - to include the new configuration settings
 		self::$trees=null;

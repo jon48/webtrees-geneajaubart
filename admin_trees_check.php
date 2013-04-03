@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-//$Id: admin_trees_check.php 14786 2013-02-06 22:28:50Z greg $
+//$Id: admin_trees_check.php 14902 2013-03-24 08:18:11Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_check.php');
 require './includes/session.php';
@@ -97,27 +97,28 @@ foreach (array_keys($records) as $key) {
 
 // LOOK FOR BROKEN LINKS
 $XREF_LINKS=array(
-	'NOTE'=>'NOTE',
-	'SOUR'=>'SOUR',
-	'REPO'=>'REPO',
-	'OBJE'=>'OBJE',
-	'FAMC'=>'FAM',
-	'FAMS'=>'FAM',
+	'NOTE'          => 'NOTE',
+	'SOUR'          => 'SOUR',
+	'REPO'          => 'REPO',
+	'OBJE'          => 'OBJE',
+	'FAMC'          => 'FAM',
+	'FAMS'          => 'FAM',
 	//'ADOP'=>'FAM', // Need to handle this case specially.  We may have both ADOP and FAMC links to the same FAM, but only store one.
-	'HUSB'=>'INDI',
-	'WIFE'=>'INDI',
-	'CHIL'=>'INDI',
-	'ASSO'=>'INDI',
-	'ALIA'=>'INDI',
-	'AUTH'=>'INDI', // A webtrees extension
-	'ANCI'=>'SUBM',
-	'DESI'=>'SUBM',
-	'_WT_OBJE_SORT'=>'OBJE'
+	'HUSB'          => 'INDI',
+	'WIFE'          => 'INDI',
+	'CHIL'          => 'INDI',
+	'ASSO'          => 'INDI',
+	'_ASSO'         => 'INDI', // A webtrees extension
+	'ALIA'          => 'INDI',
+	'AUTH'          => 'INDI', // A webtrees extension
+	'ANCI'          => 'SUBM',
+	'DESI'          => 'SUBM',
+	'_WT_OBJE_SORT' => 'OBJE'
 );
 
 $RECORD_LINKS=array(
-	'INDI'=>array('NOTE', 'OBJE', 'SOUR', 'ASSO', 'FAMC', 'FAMS', 'ALIA', '_WT_OBJE_SORT'),
-	'FAM' =>array('NOTE', 'OBJE', 'SOUR', 'ASSO', 'HUSB', 'WIFE', 'CHIL'),
+	'INDI'=>array('NOTE', 'OBJE', 'SOUR', 'ASSO', '_ASSO', 'FAMC', 'FAMS', 'ALIA', '_WT_OBJE_SORT'),
+	'FAM' =>array('NOTE', 'OBJE', 'SOUR', 'ASSO', '_ASSO', 'HUSB', 'WIFE', 'CHIL'),
 	'SOUR'=>array('NOTE', 'OBJE', 'REPO', 'AUTH'),
 	'REPO'=>array('NOTE'),
 	'OBJE'=>array('NOTE'), // The spec also allows SOUR, but we treat this as a warning

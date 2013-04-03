@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_places.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: admin_places.php 14897 2013-03-22 16:53:26Z lukasz $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -145,6 +145,7 @@ $controller=new WT_Controller_Page();
 $controller->requireAdminLogin();
 	
 if ($action=='ExportFile' && WT_USER_IS_ADMIN) {
+	Zend_Session::writeClose();
 	$tmp = place_id_to_hierarchy($parent);
 	$maxLevel = getHighestLevel();
 	if ($maxLevel>8) $maxLevel=8;
