@@ -16,6 +16,8 @@ if (!defined('WT_WEBTREES')) {
 
 class WT_Perso_Functions {
 
+	const ENCRYPTION_IV_SIZE = 16;
+	
 	private static $_isIsSourcedModuleOperational = -1;
 	private static $_isUrlAlive = array();
 	
@@ -153,6 +155,47 @@ class WT_Perso_Functions {
 			# Trim the token
 		return substr($md5token, 0, $length);		
 	} 
+	
+	/**	  
+	 * Encrypt a text, and encode it to base64 compatible with URL use
+	 * 	(no +, no /, no =)
+	 *
+	 * @param string $data Text to encrypt
+	 * @return string Encrypted and encoded text
+	 */
+	public static function encryptToSafeBase64($data){
+		$key = 'STANDARDKEYIFNOSERVER';
+		if($_SERVER['SERVER_NAME'] && $_SERVER['SERVER_SOFTWARE'])
+			$key = md5($_SERVER['SERVER_NAME'].$_SERVER['SERVER_SOFTWARE']);
+		$iv = mcrypt_create_iv(self::ENCRYPTION_IV_SIZE, MCRYPT_RAND);
+		$id = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $data, MCRYPT_MODE_CBC,$iv);
+		$encrypted = base64_encode($iv.$id);
+		// +, / and = are not URL-compatible
+		$encrypted = str_replace('+', '-', $encrypted);
+		$encrypted = str_replace('/', '_', $encrypted);
+		$encrypted = str_replace('=', '*', $encrypted);
+		return $encrypted;
+	}
+	
+	/**
+	 * Decode and encrypt a text from base64 compatible with URL use
+	 *
+	 * @param string $encrypted Text to decrypt
+	 * @return string Decrypted text
+	 */
+	public static function decryptFromSafeBase64($encrypted){
+		$key = 'STANDARDKEYIFNOSERVER';
+		if($_SERVER['SERVER_NAME'] && $_SERVER['SERVER_SOFTWARE'])
+			$key = md5($_SERVER['SERVER_NAME'].$_SERVER['SERVER_SOFTWARE']);
+		$encrypted = str_replace('-', '+', $encrypted);
+		$encrypted = str_replace('_', '/', $encrypted);
+		$encrypted = str_replace('*', '=', $encrypted);
+		$encrypted = base64_decode($encrypted);
+		$iv_dec = substr($encrypted, 0, self::ENCRYPTION_IV_SIZE);
+		$encrypted = substr($encrypted, self::ENCRYPTION_IV_SIZE);
+		$decrypted = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $encrypted, MCRYPT_MODE_CBC, $iv_dec);
+		return  preg_replace('~(?:\\000+)$~','',$decrypted);
+	}
 	
 }
 

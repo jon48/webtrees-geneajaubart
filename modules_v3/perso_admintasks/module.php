@@ -110,12 +110,12 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 	private function config(){
 		global $controller;
 		
-		$controller=new WT_Controller_Base();
+		$controller=new WT_Controller_Page();
 		$controller
 			->requireAdminLogin()
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.fnReloadAjax.js')
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.jeditable.min.js')
+			->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
+			->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery.dataTables.fnReloadAjax.js')
 			->addInlineJavascript('jQuery("#tabs").tabs();')
 			->setPageTitle($this->getTitle())
 			->pageHeader();
@@ -176,13 +176,10 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 					/* 7 ForceExecution */		{"sClass": "center"},
 				],
 				"fnDrawCallback": function() {
-					// Our JSON responses include Javascript as well as HTML.  This does not get
-					// executed, So extract it, and add it to its own DOM element
+					// Our JSON responses include Javascript as well as HTML.  This does not get executed automatically…
 					jQuery("#admintasks_list script").each(function() {
-						var script=document.createElement("script");
-						jQuery("#admintasks_list script").appendTo("body");
-						document.body.appendChild(script);
-					}).remove();
+						eval(this.text);
+					});
 				}
 			});
 		');
@@ -268,6 +265,8 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 	 *
 	 */
 	private function trigger(){
+		$controller = new WT_Controller_Ajax();
+		$controller->pageHeader();
 		if(WT_Perso_Admin_Task::isModuleOperational()){
 			$taskname = safe_GET('task', WT_REGEX_ALPHANUM);
 			$token_submitted = safe_GET('force', WT_REGEX_ALPHANUM);
@@ -340,57 +339,57 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 				}
 			}
 				
-			if($value === 'ERROR_VALIDATION') $this->fail();
+			if($value === 'ERROR_VALIDATION') WT_Perso_Functions_Edit::fail();
 				
 			switch($table){
 				case 'task':
 					// Verify if the user has enough rights to modify the setting
-					if(!WT_USER_IS_ADMIN) $this->fail();
+					if(!WT_USER_IS_ADMIN) WT_Perso_Functions_Edit::fail();
 					
 					// Verify if a task has been specified;
-					if(is_null($id1)) $this->fail();
+					if(is_null($id1)) WT_Perso_Functions_Edit::fail();
 					// Verify if a setting name has been specified;
-					if(is_null($id2)) $this->fail();
+					if(is_null($id2)) WT_Perso_Functions_Edit::fail();
 					
 					WT_DB::prepare('UPDATE `##padmintasks` SET '.$id2.' = ? WHERE pat_name = ?')
 						->execute(array($value, $id1));
 					
 					$value = $this->formatConfigSettings($id2, $value);					
-					$this->ok($value);
+					WT_Perso_Functions_Edit::ok($value);
 					break;
 				case 'module_setting':
 					// Verify if the user has enough rights to modify the setting
-					if(!WT_USER_IS_ADMIN) $this->fail();
+					if(!WT_USER_IS_ADMIN) WT_Perso_Functions_Edit::fail();
 						
 					// Verify if a task has been specified;
-					if(is_null($id1)) $this->fail();
+					if(is_null($id1)) WT_Perso_Functions_Edit::fail();
 					// Verify if a setting name has been specified;
-					if(is_null($id2)) $this->fail();
+					if(is_null($id2)) WT_Perso_Functions_Edit::fail();
 						
 					// Authorised and valid - make update
 					set_module_setting($this->getName(), 'PAT_'.$id1.'_'.$id2, $value);
-					$this->ok($value);
+					WT_Perso_Functions_Edit::ok($value);
 					break;
 				case 'gedcom_setting':
 					// Verify if the user has enough rights to modify the setting
-					if(!WT_USER_GEDCOM_ADMIN) $this->fail();
+					if(!WT_USER_GEDCOM_ADMIN) WT_Perso_Functions_Edit::fail();
 						
 					// Verify if a task has been specified;
-					if(is_null($id1)) $this->fail();
+					if(is_null($id1)) WT_Perso_Functions_Edit::fail();
 					// Verify if a setting name has been specified;
-					if(is_null($id2)) $this->fail();
+					if(is_null($id2)) WT_Perso_Functions_Edit::fail();
 					// Verify if a gedcom ID has been specified;
-					if(is_null($id3)) $this->fail();
+					if(is_null($id3)) WT_Perso_Functions_Edit::fail();
 						
 					// Authorised and valid - make update
 					set_gedcom_setting($id3, 'PAT_'.$id1.'_'.$id2, $value);
-					$this->ok($value);
+					WT_Perso_Functions_Edit::ok($value);
 					break;
 				default:
-					$this->fail();
+					WT_Perso_Functions_Edit::fail();
 			}
 		}
-		$this->fail();
+		WT_Perso_Functions_Edit::fail();
 	}
 	
 	/**
@@ -438,29 +437,7 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 		}
 		return $value;
 	}
-	
-	
-	// The script must always end by calling one of these two functions.
-	/**
-	 * Is called when saving is successful, and return the value for insertion in the field.
-	 *
-	 * @param string $value New setting value
-	 */
-	private function ok($value) {
-		header('Content-type: text/html; charset=UTF-8');
-		echo htmlspecialchars($value);
-		exit;
-	}
-	
-	/**
-	 * Is called when saving fails, and return an HTML error.
-	 */
-	private function fail() {
-		// Any 4xx code should work.  jeditable recommends 406
-		header('HTTP/1.0 406 Not Acceptable');
-		exit;
-	}
-	
+
 	/**
 	 * Ajax call to get the list of tasks (active or not) in the system.
 	 * In case a task does not exist anymore, it is deleted.

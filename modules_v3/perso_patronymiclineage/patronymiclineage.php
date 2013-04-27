@@ -18,7 +18,7 @@ require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 global $SEARCH_SPIDER, $SURNAME_LIST_STYLE, $UNKNOWN_NN, $controller;
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 
 // We show three different lists: initials, surnames and individuals
 // Note that the data may contain special chars, such as surname="<unknown>",
@@ -71,7 +71,7 @@ $controller
 	->setPageTitle(WT_I18N::translate('Patronymic Lineages').' : '.$legend)
 	->pageHeader();
 
-echo '<h2 class="center">', WT_I18N::translate('Patronymic Lineages'), '</h2>';
+echo '<h2 class="center">', $controller->getPageTitle(), '</h2>';
 
 // Print a selection list of initial letters
 $list=array();

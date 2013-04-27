@@ -142,7 +142,7 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 	 */
 	private function config() {
 		
-		$controller=new WT_Controller_Base();
+		$controller=new WT_Controller_Page();
 		$controller
 			->requireAdminLogin()
 			->setPageTitle($this->getTitle())
@@ -187,7 +187,7 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 		'</div>';
 		
 		$controller
-		->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+		->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 		->addInlineJavascript('
 				  	jQuery(document).ready(function() {
 		

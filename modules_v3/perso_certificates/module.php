@@ -68,11 +68,9 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 		echo '<div id="'.$this->getName().'"><table class="gm_edit_config"><tr><td><dl>';
 		if(WT_USER_IS_ADMIN){
 			echo '<dt>', WT_I18N::translate('Certificates directory'), help_link('config_cert_rootdir', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_CERT_ROOTDIR-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_CERT_ROOTDIR', 'certificates/'), $controller), '</dd>',
+				'<dd>', WT_DATA_DIR , WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_CERT_ROOTDIR-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_CERT_ROOTDIR', 'certificates/'), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Show certificates'), help_link('config_show_cert', $this->getName()), '</dt>',
 				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PC_SHOW_CERT-'.$this->getName(), get_module_setting($this->getName(), 'PC_SHOW_CERT', WT_PRIV_HIDE), $controller), '</dd>',
-				'<dt>', WT_I18N::translate('Certificates firewall root directory'), help_link('config_cert_fw_rootdir', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PC_CERT_FW_ROOTDIR-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PC_CERT_FW_ROOTDIR', 'data/'), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Show non-watermarked certificates'), help_link('config_show_no_watermark', $this->getName()), '</dt>',
 				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PC_SHOW_NO_WATERMARK-'.$this->getName(), get_module_setting($this->getName(), 'PC_SHOW_NO_WATERMARK', WT_PRIV_HIDE), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Default watermark'), help_link('config_wm_default', $this->getName()), '</dt>',
@@ -99,31 +97,7 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 				if (substr ($value, -1) != '/') $value = $value . '/'; // silently add trailing slash
 				if (substr($value, 0, 1)=='/') { $errors_cert_rootdir = true; } // don't allow absolute path
 				if (preg_match("/.*[a-zA-Z]{1}:.*/", $value)>0) { $errors_cert_rootdir = true; } // don't allow drive letters
-				if (preg_match('/([\.]?[\.][\/])+/', $value)>0) { $errors_cert_rootdir = true; } // don't allow ./ or ../ 
-				$errors_cert_rootdir = $errors_cert_rootdir || $this->fix_certif_htaccess($value);
 				if ($errors_cert_rootdir) $value = 'ERROR_VALIDATION';
-				break;
-			case 'PC_CERT_FW_ROOTDIR':
-				$errors_cert_fw_rootdir = false;
-				$cert_rootdir = get_module_setting($this->getName(), 'PC_CERT_ROOTDIR', 'certificates/');
-				$value = trim(str_replace('\\','/',$value)); // silently convert backslashes to forward slashes
-				if (substr ($value, -1) != "/") $value = $value . "/"; // silently add trailing slash
-				if (!is_dir($value)) $errors_cert_fw_rootdir = true;
-				if (!$errors_cert_fw_rootdir) {
-					// Since the certificates firewall is always enabled, need to verify that the protected certificates dir exists
-					if (!is_dir($value.$cert_rootdir)) {
-						@mkdir($value.$cert_rootdir, WT_PERM_EXE);
-						if (!is_dir($value.$cert_rootdir)) $errors_cert_fw_rootdir = true;
-					}
-				}	
-				if (!$errors_cert_fw_rootdir) {
-					// copy the .htaccess file from INDEX_DIRECTORY to the certificates firewall root directory in case it is still in a web-accessible area
-					if ((file_exists(WT_DATA_DIR.".htaccess")) && (is_dir($value.$cert_rootdir)) && (!file_exists($value.$cert_rootdir.".htaccess")) ) {
-						@copy(WT_DATA_DIR.".htaccess", $value.$cert_rootdir.".htaccess");
-						if (!file_exists($value.$cert_rootdir.".htaccess"))	$errors_cert_fw_rootdir = true;
-					}
-				}
-				if ($errors_cert_fw_rootdir) $value = 'ERROR_VALIDATION';
 				break;
 			case 'PC_WM_FONT_COLOR':
 				$error_font_color = false;
@@ -157,7 +131,7 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 		if(get_module_setting($this->getName(), 'PC_SHOW_CERT', WT_PRIV_HIDE) >= WT_USER_ACCESS_LEVEL){	
 			if (strlen($srec)==0) return $html;
 			
-			$certifFile='';
+			$certificate = null;
 			$subrecords = explode("\n", $srec);
 			$levelSOUR = substr($subrecords[0], 0, 1);
 			if (preg_match('~^'.$levelSOUR.' SOUR @('.WT_REGEX_XREF.')@$~', $subrecords[0], $match)) {
@@ -168,13 +142,13 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 				$level = substr($subrecords[$i], 0, 1);
 				$tag = substr($subrecords[$i], 2, 4);
 				$text = substr($subrecords[$i], 7);
-				if($tag == '_ACT') $certifFile=$text;
+				if($tag == '_ACT') $certificate= new WT_Perso_Certificate($text);
 			}
 			
-			if($certifFile != '') $html = $this->getDisplay_ACT($certifFile, $sid);
+			if($certificate && $certificate->canDisplayDetails()) 
+				$html = $this->getDisplay_ACT($certificate, $sid);
 			
-		}
-		
+		}		
 		return $html;
 	}
 	
@@ -211,24 +185,21 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 					->addExternalJavascript('js/autocomplete.js')
 					->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/autocomplete.js')
 					->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.$this->getName().'/js/updatecertificatevalues.js');
-				$city='';
-				$certif='';
+				$certificate = null;
 				if($value){
-					$tabExplode = explode('/', $value, 2);
-					if(count($tabExplode)==2){
-						$city=$tabExplode[0];
-						$certif=$tabExplode[1];
-					}
+					$certificate = new WT_Perso_Certificate($value);
 				}
 				$tabCities = WT_Perso_Functions_Certificates::getCitiesList();
 				$html .= '<select id="certifCity'.$element_id.'" class="_CITY">';
 				foreach ($tabCities as $cities){
 					$selectedCity='';
-					if($cities==$city) $selectedCity='selected="true"';
+					if($certificate && $cities== $certificate->getCity()) $selectedCity='selected="true"';
 					$html .= '<option value="'.$cities.'" '.$selectedCity.' />'.$cities.'</option>';
 				}
 				$html .= '</select>';
-				$html .= '<input id="certifFile'.$element_id.'" autocomplete="off" class="_ACT" value="'.$certif.'" size="35" />';		
+				$html .= '<input id="certifFile'.$element_id.'" autocomplete="off" class="_ACT" value="'.
+					($certificate ? basename($certificate->file) : '').
+					'" size="35" />';
 				$html .= '<input type="hidden" id="'.$element_id.'" name = "'.$element_name.'" value="'.$value.'" size="35"/>';
 		}
 		
@@ -277,65 +248,16 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 	 * @param string $certificatePath Path of the Certificate (as per the GEDCOM)
 	 * @param string $sid ID of the linked source, if it exists
 	 */
-	private function getDisplay_ACT($certificatePath, $sid = null){		
-		$certdetails = explode('/',$certificatePath,2);
+	private function getDisplay_ACT(WT_Perso_Certificate $certificate, $sid = null){
+		global $controller;
+				
 		$html = '';
-		if(count($certdetails)==2){
-			$pathCertif= WT_MODULES_DIR.$this->getName().'/'.get_module_setting($this->getName(), 'PC_CERT_ROOTDIR', 'certificates/').$certificatePath;
-			if($sid) $pathCertif .= '?sid='.$sid;
-			$requestedCity = $certdetails[0];
-			$requestedCertif = $certdetails[1];
-			$html= '<a href="'.$pathCertif.'" title="'.$requestedCertif.'"'.
-					' rel="clearbox[certificate]"'.
-					' rev="PC::'.$requestedCity.'::'.$requestedCertif.'::">'.
-					'<i class="icon-perso-certificate margin-h-2"></i></a>';
+		if($certificate){
+			$certificate->setSource($sid);
+			$html = $certificate->displayImage('icon');
 		}
 		return $html;
 	}	
-	
-	/**
-	 * Creates a .htaccess file within the Certificates directory in order to redirect public URL requests to the certificates firewall
-	 * 
-	 * @param string $cert_rootdir Certificates public directory
-	 */
-	private function fix_certif_htaccess($cert_rootdir) {
-		$whichFile = WT_MODULES_DIR.$this->getName().'/'.$cert_rootdir.".htaccess";
-		$httext = "";
-		if (file_exists($whichFile)) {
-			$httext = implode('', file($whichFile));
-			if ($httext && strpos('RewriteRule .* '.WT_SCRIPT_PATH.'module.php?mod='.$this->getName().'&mod_action=certificatefirewall [L]', $httext) !== false) {
-				return; // don't mess with the file if it already refers to the certificatesfirewall
-			} else {
-				// remove all WT certificates firewall sections from the .htaccess
-				$httext = preg_replace('/\n?^[#]*\s*BEGIN WT CERTIFICATES FIREWALL SECTION(.*\n){10}[#]*\s*END WT MEDIA FIREWALL SECTION\s*[#]*\n?/m', "", $httext);
-				// comment out any existing lines that set ErrorDocument 404
-				$httext = preg_replace('/^(ErrorDocument\s*404(.*))\n?/', "#$1\n", $httext);
-				$httext = preg_replace('/[^#](ErrorDocument\s*404(.*))\n?/', "\n#$1\n", $httext);
-			}
-		}
-		// add new WT certificates firewall section to the end of the file
-		$httext .= "\n##### BEGIN WT CERTIFICATES FIREWALL SECTION #######";
-		$httext .= "\n################## DO NOT MODIFY ###################";
-		$httext .= "\n## THERE MUST BE EXACTLY 11 LINES IN THIS SECTION ##";
-		$httext .= "\n<IfModule mod_rewrite.c>";
-		$httext .= "\n\tRewriteEngine On";
-		$httext .= "\n\tRewriteCond %{REQUEST_FILENAME} !-f";
-		$httext .= "\n\tRewriteCond %{REQUEST_FILENAME} !-d";
-		$httext .= "\n\tRewriteRule .* ".WT_SCRIPT_PATH."module.php?mod=".$this->getName()."&mod_action=certificatefirewall"." [L]";
-		$httext .= "\n</IfModule>";
-		$httext .= "\nErrorDocument\t404\t".WT_SCRIPT_PATH."module.php?mod=".$this->getName()."&mod_action=certificatefirewall";
-		$httext .= "\n####### END WT CERTIFICATES FIREWALL SECTION #######";
-	
-		$fp = @fopen($whichFile, "wb");
-		if (!$fp) {
-			return true;
-		} else {
-			fwrite($fp, $httext);
-			fclose($fp);
-			@chmod($whichFile, WT_PERM_FILE); // Make sure apache can read this file
-		}
-		return false;
-	}
 	
 }
 

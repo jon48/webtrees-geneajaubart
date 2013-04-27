@@ -86,7 +86,16 @@ class WT_Perso_Functions_Edit {
 		$html='<span class="editable" id="' . $name . '">' .
 			(array_key_exists($selected, $values) ? $values[$selected] : '').
 			'</span>';
-		$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'module.php?mod='.$savingmodule.'&mod_action=admin_update_setting", {type:"select", data:' . json_encode($values) . ', submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'", callback:function(value, settings) {jQuery(this).html(settings.data[value]);} });';
+		$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'module.php?mod='.$savingmodule.'&mod_action=admin_update_setting",
+				{
+					type:"select", data:' . json_encode($values) . ', 
+					submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", 
+					style:"inherit",
+					placeholder: "'.WT_I18N::translate('click to edit').'",
+					callback: function(value, settings) {
+							jQuery(this).html(settings.data[value]);
+					}
+				});';
 		
 		if ($controller) {
 			$controller->addInlineJavascript($js);
@@ -133,6 +142,28 @@ class WT_Perso_Functions_Edit {
 		return self::select_edit_control_inline($name, $ACCESS_LEVEL, null, $selected, $controller, $savingmodule, $extra);
 	}
 	
+	/**
+	 * Is called when saving is successful, and return the value for insertion in the field.
+	 *
+	 * @param string $value New setting value
+	 */
+	static public function ok($value) {
+		$controller = new WT_Perso_Controller_PlainAjax();		
+		$controller->pageHeader();
+		echo htmlspecialchars($value);
+		exit;
+	}
+	
+	/**
+	 * Is called when saving fails, and return an HTML error.
+	 */
+	static public function fail() {
+		$controller = new WT_Controller_Ajax();
+		// Any 4xx code should work.  jeditable recommends 406
+		$controller->pageHeader();
+		header('HTTP/1.0 406 Not Acceptable');
+		exit;
+	}
 
 }
 

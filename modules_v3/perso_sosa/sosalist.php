@@ -18,7 +18,7 @@ global $controller;
 
 $selectedgen = safe_REQUEST($_REQUEST, 'gen', WT_REGEX_INTEGER, null);
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->setPageTitle(WT_I18N::translate('Sosa Ancestors'))
 	->pageHeader()
@@ -66,7 +66,7 @@ $controller
 	');
 ;
 
-echo '<div class="center"><h2>', WT_I18N::translate('Sosa Ancestors'), '</h2>';
+echo '<div class="center"><h2>', $controller->getPageTitle(), '</h2>';
 
 $maxGen = WT_Perso_Functions_Sosa::getLastGeneration();
 

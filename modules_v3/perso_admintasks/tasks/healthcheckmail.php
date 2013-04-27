@@ -117,7 +117,7 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 						' SELECT "indi" AS ged_type, i_id AS ged_id, i_file AS ged_file FROM wt_individuals'.
 						' UNION SELECT "fam" AS ged_type, f_id AS ged_id, f_file AS ged_file FROM wt_families'.
 						' UNION SELECT "sour" AS ged_type, s_id AS ged_id, s_file AS ged_file FROM wt_sources'.
-						' UNION SELECT "media" AS ged_type, m_id AS ged_id, m_gedfile AS ged_file FROM wt_media'.
+						' UNION SELECT "media" AS ged_type, m_id AS ged_id, m_file AS ged_file FROM wt_media'.
 						' UNION SELECT LOWER(o_type) AS ged_type, o_id AS ged_id, o_file AS ged_file FROM wt_other'.
 					') AS gedrecords ON (xref = ged_id AND gedcom_id = ged_file)'.
 					' WHERE change_time >= DATE_ADD( NOW(), INTERVAL -'.$nbdays.' DAY)'.

@@ -14,15 +14,14 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-header('Content-Type: application/json; charset=UTF-8');
-header('Cache-Control: no-cache, must-revalidate'); 
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); 
-
-// We have finished writing session data, so release the lock
-Zend_Session::writeClose();
+$controller = new WT_Perso_Controller_Json();
 
 $city = safe_GET('city');
 $contains = safe_GET('term');
+
+$controller->pageHeader();
+header('Cache-Control: no-cache, must-revalidate');
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 
 if($city && $contains){
 	WT_Perso_Functions_Certificates::printCertificateListBeginWith($city, $contains);

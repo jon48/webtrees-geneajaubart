@@ -52,10 +52,10 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 	private function config(){
 		global $controller;
 		
-		$controller=new WT_Controller_Base();
+		$controller=new WT_Controller_Page();
 		$controller
 			->requireAdminLogin()
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.jeditable.min.js')
+			->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
 			->addInlineJavascript('jQuery("#tabs").tabs();')
 			->setPageTitle($this->getTitle())
 			->pageHeader();
@@ -96,57 +96,37 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 			$value = $config_class->validate_config_settings($id1, $value);
 		}
 			
-		if($value === 'ERROR_VALIDATION') $this->fail();
+		if($value === 'ERROR_VALIDATION') WT_Perso_Functions_Edit::fail();
 			
 		switch($table){
 		case 'module_setting':
 			// Verify if the user has enough rights to modify the setting
-			if(!WT_USER_IS_ADMIN) $this->fail();
+			if(!WT_USER_IS_ADMIN) WT_Perso_Functions_Edit::fail();
 			
 			// Verify if a module has been specified;
-			if(is_null($id2)) $this->fail();
+			if(is_null($id2)) WT_Perso_Functions_Edit::fail();
 					
 			// Authorised and valid - make update
 			set_module_setting($id2, $id1, $value);
-			$this->ok($value);
+			WT_Perso_Functions_Edit::ok($value);
 		break;
 		case 'gedcom_setting':
 			// Verify if the user has enough rights to modify the setting
-			if(!WT_USER_GEDCOM_ADMIN) $this->fail();
+			if(!WT_USER_GEDCOM_ADMIN) WT_Perso_Functions_Edit::fail();
 			
 			// Verify if a gedcom ID has been specified;
-			if(is_null($id2)) $this->fail();
+			if(is_null($id2)) WT_Perso_Functions_Edit::fail();
 			
 			// Authorised and valid - make update
 			set_gedcom_setting($id2, $id1, $value);
-			$this->ok($value);
+			WT_Perso_Functions_Edit::ok($value);
 			break;
 		default:
-			$this->fail();				
+			WT_Perso_Functions_Edit::fail();				
 		}
-		$this->fail();	
+		WT_Perso_Functions_Edit::fail();	
 	}
 	
-	// The script must always end by calling one of these two functions.
-	/**
-	 * Is called when saving is successful, and return the value for insertion in the field.
-	 * 
-	 * @param string $value New setting value
-	 */
-	private function ok($value) {
-		header('Content-type: text/html; charset=UTF-8');
-		echo htmlspecialchars($value);
-		exit;
-	}
-	
-	/**
-	 * Is called when saving fails, and return an HTML error.
-	 */
-	private function fail() {
-		// Any 4xx code should work.  jeditable recommends 406
-		header('HTTP/1.0 406 Not Acceptable');
-		exit;
-	}
 
 }
 

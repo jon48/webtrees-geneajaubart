@@ -31,7 +31,8 @@ return array(
 	'Priority (1 is high)'			=>	'Priorité (élevée : 1)',
 	'<p>Hooks are predefined functions that can be called and executed from the core code, on a subscription base.</p><p>This page allows you to manage the different identified hooks within the module directory. You can enable (resp. disable) each of them by ticking (resp. unticking) the checkbox in front of each of them. A custom priority can also be defined, in order to execute the different hooks in a specific order (1 being the highest priority).</p><p>By default, the hooks are enabled when first created. If a module is removed, linked hooks will be removed. If a module is disabled, linked hooks will also be. However, if the module is enabled again, hook need to be enabled manually (if required).</p>'
 									=>	'<p>Les '.WT_I18N::translate('Hooks').' sont des fonctions prédéfinies qui peuvent être appelées depuis le code principal, sur le principe de l\'abonnement</p><p>Cette page vous permet de gérer les différents '.WT_I18N::translate('Hooks').' identifiés dans le répertoire des modules. Vous pouvez les activer (respectivement désactiver) en cochant (respectivement décochant) la case appropriée. Une priorité personnalisée peut être définie afin d\'exécuter les '.WT_I18N::translate('Hooks').' dans une ordre déterminé (1 pour une priorité élevée).</p><p>Par défaut, les '.WT_I18N::translate('Hooks').' sont activés. Si un module est supprimé, les '.WT_I18N::translate('Hooks').' associés le seront également. Si un module est désactivé, ils le seront aussi. Par contre, activer à nouveau un module n\'activera pas les '.WT_I18N::translate('Hooks').' associés, qui devront l\'être manuellement (si nécessaire).</p>',
-
+	'Module Name'					=>	'Nom du module',
+		
 	//Central config management
 	'Central Perso configuration'	=>	'Configuration des modules Perso',
 	'Allows central configuration for Perso modules configuration.'
@@ -45,8 +46,8 @@ return array(
 	// Extra header
 	'Include additional HTML in header'	
 									=>	'Étendre l\'HTML dans l\'en-tête',
-	'<p>Enable this option to include raw additional HTML in the header of the page. This HTML will only be displayed to non-admin users.</p>'
-									=>	'<p>Activer cette option pour inclure du code HTML additional dans l\'en-tête. Ce code sera visible seulement par les utilisateurs non-administrateurs.</p>',
+	'<p>Enable this option to include raw additional HTML in the header of the page.</p>'
+									=>	'<p>Activer cette option pour inclure du code HTML additional dans l\'en-tête.</p>',
 	'Hide additional header'		=>	'Masquer l\'en-tête additionnel',
 	'<p>Select the access level until which the additional header should be displayed. The <em>Hide from everyone</em> should be used to show the header to everybody.</p>'
 									=>	'<p>Sélectionner le niveau d\'accès jusqu\'auquel l\'en-tête additionnel doit être affiché. L\'option <em>Masquer à tout le monde</em> devrait être utilisée pour cacher l\'en-tête à tout le monde.</p>',
@@ -72,7 +73,7 @@ return array(
 									=>	'<p>Activer cette option pour inclure du code HTML additional dans le pied de page.</p>',
 	'Hide additional footer'		=>	'Masquer le pied de page additionnel',
 	'<p>Select the access level until which the additional footer should be displayed. The <em>Hide from everyone</em> should be used to show the footer to everybody.</p>'
-									=>	'<p>Sélectionner le niveau d\'accès jusqu\'auquel pied de page additionnel doit être affiché. L\'option <em>Masquer à tout le monde</em> devrait être utilisée pour cacher pied de page à tout le monde.</p>',
+									=>	'<p>Sélectionner le niveau d\'accès jusqu\'auquel le pied de page additionnel doit être affiché. L\'option <em>Masquer à tout le monde</em> devrait être utilisée pour cacher pied de page à tout le monde.</p>',
 	'Additional HTML in footer'		=>	'Code HTML additionnel pour le pied de page',
 	'<p>If the option has been enabled, the saved HTML will be inserted in the footer, before the logo.</p><p>In edit mode, the HTML characters might have been transformed to their HTML equivalents (for instance &amp;gt; for &gt;), it is however possible to insert HTML characters, they will be automatically converted to their equivalent values.</p>'
 									=>	'<p>Si l\'option est activée, le code HTML sauvegardée sera inséré dans le pied de page, au-dessus du logo.</p><p>En mode édition, les caractères HTML peuvent avoir été modifiés par leurs équivalents HTML (par exemple &amp;gt; pour &gt;), il est cependant possible d\'insérer directement des caractères HTML dans la zone de texte, ils seront convertis en leur equivalents.</p>',					
@@ -83,28 +84,18 @@ return array(
 									=>	'Affichage et édition des actes liés aux sources d\'événements',
 	'Certificate'					=>	'Acte',
 	'Certificates'					=>	'Actes',
-	'View details about this certificate'
-									=>	'Voir les détails de cet acte',
 	'Certificates directory'		=>	'Répertoire des actes',
-	'The certificates directory is used to create URLs for your certificates. You will access the certificates by using URL of the form %2$s, if the certificate directory is %1$s.'
-									=>	'Le Répertoire des actes est utilisé pour créer les adresses URL de vos actes. Vous accédez ainsi aux actes avec une URL du type %2$s, si le Répertoire des actes est %1$s',
-	'The certificates firewall changes the location of the certificates directory from the public directory %1$s to a private directory such as %2$s.  This allows webtrees to apply privacy filtering to certificates.'
-									=>	'Le pare-feu des actes transforme le Répertoire des actes public %1$s en un répertoire privé tel que %2$s. Cela permet d\'appliquer des filtres d\'accès privés aux actes.',
-	'The certificates directory %s must exist, and the webserver must have read and write access to it.'
-									=>	'Le Répertoire des actes %s doit exister, et le serveur web doit y avoir les droits de lecture et d\'écriture.',
-	'The certificates directory is shared by all family trees.'
-									=>	'Le Répertoire des actes est partagé par tous les arbres.',
+	'This folder will be used to store the certificate files.'
+									=>	'Ce répertoire est utilisé pour stocker les images d\'actes.',
+	'If you select a different folder, you must also move any certificate files from the existing folder to the new one.'
+									=>	'Si vous désirez utiliser un autre répertoire, vous devez également déplacer les images d\'actes du répertoire existant vers le nouveau.',
 	'Show certificates'				=>	'Montrer les actes',
 	'Define access level required to display certificates in facts sources. By default, nobody can see the certificates.'
 									=>	'Définit le niveau d\'accès requis pour afficher les actes dans les sources des événements. Par défaut, personne ne peut voir les actes.',
-	'Certificates firewall root directory'
-									=>	'Répertoire racine du pare-feu des actes',
-	'Directory in which the protected certificates directory can be created.  When this field is empty, the <b>%s</b> directory will be used.'
-									=>	'Répertoire dans lequel le répertoire des actes peut être créé de manière protégée. Par défaut, le répertoire <b>%s</b> est utilisé.',
 	'Show non-watermarked certificates'
 									=>	'Montrer les actes non-filigranés',
 	'Define access level required to see certificate images without any watermark. By default, everybody will see the watermark.'
-									=>	'Définit le niveau d\'accès requis pour ne pas afficher de filigrane sur ls images d\'actes. Par défaut, tout le monde peut voir le filigrane.',
+									=>	'Définit le niveau d\'accès requis pour ne pas afficher de filigrane sur les images d\'actes. Par défaut, tout le monde peut voir le filigrane.',
 	'When displayed, the watermark is generated from the name of the repository and of the sources, if they exist. Otherwise, a default text is displayed.'
 									=>	'Quand affiché, le filigrane se compose des noms du dépôt d\'archive et de la source, s\'ils existent. Sinon, un texte par défaut est affiché.',
 	'Default watermark'				=>	'Texte du filigrane par défaut',
@@ -119,12 +110,10 @@ return array(
 	'Watermark maximum font size'	=>	'Taille de police maximale du filigrane',
 	'This image is protected under copyright law.'
 									=>	'Cette image est protégée par les lois sur le copyright.',
-	'The certificate reference was not found.'
-									=>	'La référence de l\'acte n\'a pas été trouvée.',
+	'The certificate file was not found in this family tree'
+									=>	'L\'acte n\'a pu être trouvé dans cet arbre.',
 	'The certificate file does not exist.'
-									=>	'Le fichier de l\'acte n\'existe pas.',	
-	'You are not allowed to access this certificate.'
-									=>	'Vous n\'êtes pas autorisé à afficher cet acte.',
+									=>	'Le fichier de l\'acte n\'existe pas',
 	'This certificate file is broken and cannot be watermarked.'
 									=>	'Cet acte semble être corrompu et le filigrane n\'a pas pu être ajouté',							
 	'Individuals linked to this certificate'
@@ -186,7 +175,6 @@ return array(
 	'Recompute'						=>	'Recalculer',
 	'Compute all Sosas for <em>%s</em>'
 									=>	'Calculer les Sosas pour <em>%s</em>',
-	'Compute Sosas'					=>	'Calculer les ancêtres Sosas',
 	'Sosas computation'				=>	'Calcul des ancêtres Sosas',
 	'Compute all Sosas'				=>	'Calculer tous les ancêtres Sosas',
 	'Compute all Sosa ancestors for the specified GEDCOM, from the set Sosa root individual.'
@@ -246,13 +234,10 @@ return array(
 	'Generation-equivalent: %.2f generations'
 									=>	'Équivalent-génération : %.2f générations',
 	'Missing Ancestors'				=>	'Ancêtres manquants',
-	'%s\'s missing ancestors'		=>	'Ancêtres manquants de %s',
 	'Choose generation'				=>	'Choisir une génération',
 	'Generation %d'					=>	'Génération %d',
 	'Previous generation'			=>	'Génération précédente',
-	'Next generation'				=>	'Génération suivante',								
-	'Birth place (known or supposed)'
-									=>	'Lieu de naissance (connu ou supposé)',
+	'Next generation'				=>	'Génération suivante',
 	'Number of different missing ancestors: %d'
 									=>	'Nombre d\'ancêtres manquants différents: %d',
 	'%d hidden'						=>	'%d cachés',
@@ -263,6 +248,8 @@ return array(
 									=>	'Il ne manque aucun ancêtre pour cette génération. Génération complète à %.2f %%.',
 	'No ancestor has been found for generation %d'
 									=>	'Aucun ancêtre n\'a été trouvé pour la génération %d',
+	'No individual has been found for generation %d'
+									=>	'Aucun individu n\'a été trouvé pour la génération %d',
 	'No family has been found for generation %d'
 									=>	'Aucune famille n\'a été trouvée pour la génération %d',
 	'The list could not be displayed. Reasons might be:'
@@ -274,7 +261,9 @@ return array(
 	'No generation were found.'		=>	'Le nombre de générations est insuffisant',	
 	'Sosa Ancestors'				=>	'Ancêtres Sosa',	
 	'Number of Sosa ancestors: %1$d known / %2$d theoretical (%3$0.2f %%)'
-									=>	'Nombre d\'ancêtres Sosa : %1$d connus / %2$d théoriques (%3$0.2f %%)',																
+									=>	'Nombre d\'ancêtres Sosa : %1$d connus / %2$d théoriques (%3$0.2f %%)',	
+	'An error occurred while retrieving data...'
+									=>	'Une erreur s\'est produite en récupérant les données...',															
 
 	//Perso IsSourced
 	'Sourced events'				=>	'Événements documentés',
@@ -315,18 +304,6 @@ return array(
 									=>	'Voici un exemple de lieu issu de vos données :',
 	'Your GEDCOM header does not contain any indication of place structure.'
 									=>	'L\'en-tête de votre fichier GEDCOM ne contient aucune indication sur la structure de vos lieux.',
-	'Click to enable or disable this analysis'
-									=>	'Cliquer pour activer ou désactiver cette analyse',
-	'Click to edit the description'	=>	'Cliquer pour éditer la description',
-	'Click to change the level of subdivision'
-									=>	'Cliquer pour modifier le niveau de subdvision',
-	'Click to change the map'		=>	'Cliquer pour modifier la carte',
-	'Click to change the top level of the map'
-									=>	'Cliquer pour modifier le niveau de la subdvision supérieure',
-	'Click to enable or disable the use of flags'
-									=>	'Cliquer pour activer ou désactiver l\'utilisation des drapeaux',
-	'Click to change the number of places to display in the generation analysis'
-									=>	'Cliquer pour modifier le nombre maximum de lieux à afficher dans l\'analyse générationnelle',
 	'Add...'						=>	'Ajouter...',
 	'Add a new entry'				=>	'Ajouter une entrée',
 	'Level of analysis'				=>	'Subdivision d\'analyse',
@@ -361,6 +338,8 @@ return array(
 									=>	'L\'analyse de répartition géographique n\'a pas pu être supprimée.',
 	'The Geodispersion analysis entry has been successfully deleted.'
 									=>	'L\'analyse de répartition géographique a été supprimée.',
+	'An error occured while adding new element.'
+									=>	'Une erreur s\'est produite lors de l\'ajout d\'un élément',
 	
 	//Perso Admin Tasks
 	'Administration Tasks (Perso)'	=>	'Tâches d\'administration (Perso)',
@@ -406,6 +385,7 @@ return array(
 	'Tree statistics'				=>	'Statistiques de l\'arbre',
 	'Errors [%d]'					=>	'Erreurs [%d]',
 	'Last occurrence'				=>	'Dernière occurrence',		
+	'No errors'						=>	'Aucune erreur',
 	
 		
 	//Titles
@@ -413,7 +393,14 @@ return array(
 	'Title prefixes'				=>	'Particules nobiliaires',
 	'<p>Set possible aristocratic particles to separate titles from the land they refer to (e.g. Earl <strong>of</strong> Essex). Variants must be separated by the character |.</p><p>An example for this setting is : <strong>de |d\'|du |of |von |vom |am |zur |van |del |della |t\'|da |ten |ter |das |dos |af </strong> (covering some of French, English, German, Dutch, Italian, Spanish, Portuguese, Swedish common particles).</p>'
 									=>	'Définit les particule nobiliaires à utiliser pour séparer le titre de la terre associée (par exemple Comte <strong>de</strong> Toulouse). Les variantes doivent être séparées par le caractère |.</p><p>Une valeur possible pour ce paramètre est : <strong>de |d\'|du |of |von |vom |am |zur |van |del |della |t\'|da |ten |ter |das |dos |af </strong> (couvrant les principales particules françaises, anglaises, allemandes, hollandaises, italiennes, espagnoles, portugaises et suédoises).</p>',
-									
+
+	//Perso Translation tool
+	'Perso Translation Tool'		=>	'Outil de traduction Perso',
+	'Manage webtrees translation.'	=>	'Gère les traductions de webtrees',
+	'Translations status'			=>	'Statut des traductions',
+	'Missing translations'			=>	'Traductions manquantes',
+	'Message Id'					=>	'Id du message',
+	'Removed personal translations'	=>	'Traductions personnelles supprimées'
 									
 );
 

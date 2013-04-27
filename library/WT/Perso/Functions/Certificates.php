@@ -17,30 +17,15 @@ if (!defined('WT_WEBTREES')) {
 class WT_Perso_Functions_Certificates {
 	
 	private static $_citiesList = null;	
-	
+		
 	/**
 	 * Returns the certificates directory path as it is really (within the firewall directory).
 	 * 
 	 * @return string Real certificates directory path
 	 */
 	public static function getRealCertificatesDirectory(){
-				
-		$cert_fw_rootdir = get_module_setting('perso_certificates', 'PC_CERT_FW_ROOTDIR', 'data/'); 
 		$cert_rootdir = get_module_setting('perso_certificates', 'PC_CERT_ROOTDIR', 'certificates/');
-	
-		return $cert_fw_rootdir.$cert_rootdir;
-	}
-	
-	/**
-	 * Returns the certificates directory path as it appears publicly in the URLs.
-	 * 
-	 * @return string Public certificates directory path
-	 */
-	public static function getPublicCertificatesDirectory(){
-		
-		$cert_rootdir = get_module_setting('perso_certificates', 'PC_CERT_ROOTDIR', 'certificates/');
-	
-		return WT_MODULES_DIR.'perso_certificates/'.$cert_rootdir;
+		return WT_DATA_DIR.$cert_rootdir;
 	}
 	
 	/**
@@ -86,40 +71,15 @@ class WT_Perso_Functions_Certificates {
 			$dir=opendir($certdir.$selCity);
 			while($entry = readdir($dir)){
 				if($entry!='.' && $entry!='..' && !is_dir($certdir.$entry.'/')){
-					$fileParts= explode('.', $entry);
-					$nb=count($fileParts);
-					$ext = $fileParts[$nb-1];
-					if(isImageTypeSupported($ext)){
-						$date='';
-						$type='';
-						$desc=$fileParts[$nb-2];
-						$i=0;
-						while($i<$nb-2){
-							$date.=trim($fileParts[$i]).'.';
-							$i++;
-						}
-						$ct=preg_match("/([0-9]*) ([A-Z]{1,2}) (.*)/", $fileParts[$nb-2], $match);
-						if($ct>0){
-							$date.=trim($match[1]);
-							$type=trim($match[2]);
-							$desc=trim($match[3]);
-						}
-						else{
-							$ct2=preg_match("/([0-9]*) (.*)/", $fileParts[$nb-2], $match);
-							if($ct2>0){
-								$date.=trim($match[1]);
-								$desc=trim($match[2]);
-							}
-						}
-						$tabCertif[]= array(utf8_encode($entry), utf8_encode($date), utf8_encode($type), utf8_encode($desc));
-	
+					$path = utf8_encode($selCity.'/'.$entry);
+					$certificate = new WT_Perso_Certificate($path);
+					if(self::isImageTypeSupported($certificate->extension())){
+						//if($certificate->canDisplayDetails())
+						$tabCertif[] = 	$certificate;
 					}
 				}
-			}
-	
+			}	
 		}
-	
-		sort($tabCertif);
 		return $tabCertif;
 	}
 	
@@ -161,32 +121,24 @@ class WT_Perso_Functions_Certificates {
 		
 		echo Zend_Json::encode($listCertif);
 	}
-	
+		
 	/**
-	 * Returns the list of individuals linked to a certificate
+	 * Returns whether the image type is supported by the system, and if so, return the standardised type
 	 *
-	 * @param string $certif Path of the certificate file (as entered in the GEDCOM)
-	 * @return array List of individuals
+	 * @param string $reqtype Extension to test
+	 * @return boolean|string Is supported?
 	 */
-	public static function getLinkedIndividuals($certif){
-		return WT_DB::prepare("SELECT i_id FROM `##individuals` WHERE i_file=? AND i_gedcom LIKE \"%_ACT ".$certif."%\"")
-				->execute(array(WT_GED_ID))
-				->fetchOneColumn();
+	public static function isImageTypeSupported($reqtype) {
+		$supportByGD = array('jpg'=>'jpeg', 'jpeg'=>'jpeg', 'gif'=>'gif', 'png'=>'png');
+		$reqtype = strtolower($reqtype);
+	
+		if (empty($supportByGD[$reqtype])) return false;
+		$type = $supportByGD[$reqtype];
+	
+		if (function_exists('imagecreatefrom'.$type) && function_exists('image'.$type)) return $type;
+		// Here we could check for image types that are supported by other than the GD library
+		return false;
 	}
-	
-	/**
-	 * Returns the list of families linked to a certificate
-	 *
-	 * @param string $certif Path of the certificate file (as entered in the GEDCOM)
-	 * @return array List of families
-	 */
-	public static function getLinkedFamilies($certif){	
-		return WT_DB::prepare("SELECT f_id FROM `##families` WHERE f_file=? AND f_gedcom LIKE \"%_ACT ".$certif."%\"")
-				->execute(array(WT_GED_ID))
-				->fetchOneColumn();
-	}
-	
-	
 }
 
 ?>

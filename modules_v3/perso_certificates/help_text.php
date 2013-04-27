@@ -17,16 +17,11 @@ if (!defined('WT_WEBTREES')) {
 switch ($help) {
 	case 'config_cert_rootdir':
 		$title=WT_I18N::translate('Certificates directory');
-		$certif_directory = get_module_setting('perso_certificates', 'PC_CERT_ROOTDIR', 'certificates/');
 		$text=
 			'<p>'.
-			WT_I18N::translate('The certificates directory is used to create URLs for your certificates. You will access the certificates by using URL of the form %2$s, if the certificate directory is %1$s.', '<tt style="white-space:nowrap; color:#0000ff; font-weight:bold;">'.$certif_directory.'</tt>', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_MODULES_DIR.'perso_certificates/<span style="color:#0000ff;">'.$certif_directory.'</span>certif123.jpg</tt>').
+			WT_I18N::translate('This folder will be used to store the certificate files.').
 			'</p><p>'.
-			WT_I18N::translate('The certificates firewall changes the location of the certificates directory from the public directory %1$s to a private directory such as %2$s.  This allows webtrees to apply privacy filtering to certificates.', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_ROOT.WT_MODULES_DIR.'perso_certificates/<span style="color:#0000ff;">'.$certif_directory.'</span></tt>', '<tt style="white-space:nowrap; font-weight:bold;">'.get_module_setting('perso_certificates', 'PC_CERT_FW_ROOTDIR', 'data/').'<span style="color:#0000ff;">'.$certif_directory.'</span></tt>').
-			'</p><p>'.
-			WT_I18N::translate('The certificates directory %s must exist, and the webserver must have read and write access to it.', '<tt style="white-space:nowrap; font-weight:bold;">'.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_MODULES_DIR.'perso_certificates/<span style="color:#0000ff;">'.$certif_directory.'</span></tt>').
-			'</p><p>'.
-			WT_I18N::translate('The certificates directory is shared by all family trees.').
+			WT_I18N::translate('If you select a different folder, you must also move any certificate files from the existing folder to the new one.').
 			'</p>';
 		break;
 	case 'config_show_cert':
@@ -34,13 +29,6 @@ switch ($help) {
 		$text=
 			'<p>'.
 			WT_I18N::translate('Define access level required to display certificates in facts sources. By default, nobody can see the certificates.').
-			'</p>';
-		break;
-	case 'config_cert_fw_rootdir':
-		$title=WT_I18N::translate('Certificates firewall root directory');
-		$text=
-			'<p>'.
-			$text=WT_I18N::translate('Directory in which the protected certificates directory can be created.  When this field is empty, the <b>%s</b> directory will be used.', WT_Site::preference('INDEX_DIRECTORY')).
 			'</p>';
 		break;
 	case 'config_show_no_watermark':

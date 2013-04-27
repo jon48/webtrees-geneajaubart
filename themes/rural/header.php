@@ -31,6 +31,43 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
+// This theme uses the jQuery “colorbox” plugin to display images
+$this
+	->addExternalJavascript(WT_JQUERY_COLORBOX_URL)
+	->addExternalJavascript(WT_JQUERY_WHEELZOOM_URL)
+	->addInlineJavascript('
+		activate_colorbox();	
+		
+		jQuery("body").on("click", "a.gallery", function(event) {		
+			// Add colorbox to pdf-files
+			jQuery("a[type^=application].gallery").colorbox({
+				innerWidth: "75%",
+				innerHeight:"75%",
+				rel:        "gallery",
+				iframe:     true,
+				photo:      false,
+				slideshow:     true,
+				slideshowAuto: false,
+				title:		function(){
+					var url = jQuery(this).attr("href");
+					var img_title = jQuery(this).data("title");
+					return "<a href=\"" + url + "\" target=\"_blank\">" + img_title + "</a>";
+				}
+			});
+		});
+		jQuery.extend(jQuery.colorbox.settings, {
+			initialWidth: "20%", initialHeight: "20%", 
+			slideshowStart: "<div id=\"cboxSlideshowStart\">&nbsp;</div>",
+			slideshowStop: "<div id=\"cboxSlideshowStop\">&nbsp;</div>",
+			transition: "none",
+			current: "{current} '.WT_I18N::translate('of').' {total}",
+			title: function(){
+				var img_title = jQuery(this).data("title");
+				return img_title;
+			}
+		});
+	');
+
 echo
 	'<!DOCTYPE html>',
 	'<html ', WT_I18N::html_markup(), '>',
@@ -39,15 +76,16 @@ echo
 	'<title>', htmlspecialchars($title), '</title>',
 	header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
 	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
-	'<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css">',
+	'<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'jquery-ui-1.10.0/jquery-ui-1.10.0.custom.css">',
 	'<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.css', '">';
 
 //PERSO Add extra style sheet for personal additions
 echo '<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.extra.css', '">';
+// and Java script for Certificate Module
+$this->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.'perso_certificates/js/activatecolorbox.js');
 //END PERSO
 
 switch ($BROWSERTYPE) {
-//case 'chrome': uncomment when chrome.css file needs to be added, or add others as needed
 case 'msie':
 	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_URL, $BROWSERTYPE, '.css">';
 	break;
@@ -64,17 +102,16 @@ echo
 
 // begin header section
 if ($view=='simple') {
-
+	
 	echo '<div id="header_simple" > </div>';
 	echo '<div id="main_content">';
 	echo '<div class="top_center_box">';
 	echo '<div class="top_center_box_left" ></div><div class="top_center_box_right" ></div><div class="top_center_box_center"></div>';
 	echo '</div>';
-	echo '<div class="content_box">';
-	echo  $javascript, '<div id="content">';
-
+	echo '<div class="content_box simpleview">';
 }
 else {
+	global $WT_IMAGES;
 	echo '<div id="main_content">';
 	echo '<div id="header">';
 	echo  '<div id="htopright">';
@@ -106,29 +143,21 @@ else {
 	echo '</div>';
 	//END PERSO
 	echo '<ul id="extra-menu" class="makeMenu">';
-	$menu=WT_MenuBar::getFavoritesMenu();
-	if ($menu) {
-		echo $menu->getMenuAsList();
-	}
-	$menu=WT_MenuBar::getThemeMenu();
-	if ($menu) {
-		echo $menu->getMenuAsList();
-	}
-	$menu=WT_MenuBar::getLanguageMenu();
-	if ($menu) {
-		echo $menu->getMenuAsList();
-	}
-	echo '</ul>';
-	echo '</div>';
+	echo
+		WT_MenuBar::getFavoritesMenu(),
+		WT_MenuBar::getThemeMenu(),
+		WT_MenuBar::getLanguageMenu(),
+		'</ul>',
+		'</div>';
 	//Prepare menu bar
 	$menu_items=array(
-	WT_MenuBar::getGedcomMenu(),
-	WT_MenuBar::getMyPageMenu(),
-	WT_MenuBar::getChartsMenu(),
-	WT_MenuBar::getListsMenu(),
-	WT_MenuBar::getCalendarMenu(),
-	WT_MenuBar::getReportsMenu(),
-	WT_MenuBar::getSearchMenu(),
+		WT_MenuBar::getGedcomMenu(),
+		WT_MenuBar::getMyPageMenu(),
+		WT_MenuBar::getChartsMenu(),
+		WT_MenuBar::getListsMenu(),
+		WT_MenuBar::getCalendarMenu(),
+		WT_MenuBar::getReportsMenu(),
+		WT_MenuBar::getSearchMenu(),
 	);
 	foreach (WT_MenuBar::getModuleMenus() as $menu) {
 		$menu_items[]=$menu;
@@ -163,13 +192,10 @@ else {
 		'</table>',
 		'</div>', // close topMenu_center
 	'</div>'; // close topmenu
-	// Display feedback from asynchronous actions
-	echo '<div id="flash-messages">';
-	foreach (Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->getMessages() as $message) {
-		echo '<p class="ui-state-highlight">', $message, '</p>';
-	}
-	echo '</div>'; // <div id="flash-messages">
 	// begin content section -->
-	echo  $javascript, '<div id="content">';
 }
+echo
+	$javascript,
+	WT_FlashMessages::getHtmlMessages(), // Feedback from asynchronous actions
+	'<div id="content">';
 ?>

@@ -16,13 +16,13 @@ if (!defined('WT_WEBTREES')) {
 
 global $controller;
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->setPageTitle(WT_I18N::translate('Sosa Geographical dispersion'))
 	->pageHeader();
 
 echo '<div class="pgeodispersion-geodispersion-page center">',
-	'<h2>', WT_I18N::translate('Sosa Geographical dispersion'), '</h2>';
+	'<h2>', $controller->getPageTitle(), '</h2>';
 
 
 if(WT_Perso_Functions_Sosa::isModuleOperational()){
@@ -33,7 +33,7 @@ if(WT_Perso_Functions_Sosa::isModuleOperational()){
 		
 		if($title){
 			$controller
-			->addExternalJavascript(WT_STATIC_URL.'js/raphaeljs/raphael.min.js')
+			->addExternalJavascript(WT_STATIC_URL.'js/raphael-2.0.1.js')
 			->addInlineJavascript('
 					jQuery("#geodispersion-tabs").tabs();
 					jQuery("#geodispersion-tabs").css("visibility", "visible");

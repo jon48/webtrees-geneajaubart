@@ -55,7 +55,7 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 		//-- Indi Sosa
 		$html .= '<td class="transparent">'.$sosa.'</td>';
 		//-- Indi ID
-		$html .=  '<td class="transparent">'.$person->getXrefLink().'</td>';
+		$html .=  '<td class="transparent">'.$dperson->getXrefLink().'</td>';
 		//-- Indi name(s)
 		//-- Indi name(s)
 		$html .= '<td colspan="2">';
@@ -163,7 +163,7 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 	$percSosa = WT_Perso_Functions::getPercentage(count($sosalistG1), pow(2, $gen-1));
 	if($areMissing){
 		$controller
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
+			->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 			->addInlineJavascript('
 				/* Initialise datatables */
 				jQuery.fn.dataTableExt.oSort["unicode-asc"  ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
@@ -303,13 +303,13 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 
 }
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->setPageTitle(WT_I18N::translate('Missing Ancestors'))
 	->pageHeader();
 
 echo '<div class="psosa-missing-page center">',
-	'<h2>', WT_I18N::translate('Missing Ancestors'), '</h2>';
+	'<h2>', $controller->getPageTitle(), '</h2>';
 
 $maxGen = WT_Perso_Functions_Sosa::getLastGeneration();
 
@@ -352,7 +352,7 @@ if($maxGen>0){
 				echo format_missing_table($listGenG, $listGenG1, $gen);
 			}
 			else{
-				echo '<p class="warning">'.WT_I18N::translate('No individuals has been found for generation %d', $gen - 1).'</p>';
+				echo '<p class="warning">'.WT_I18N::translate('No individual has been found for generation %d', $gen - 1).'</p>';
 			}
 			
 		}

@@ -16,12 +16,12 @@ if (!defined('WT_WEBTREES')) {
 
 global $controller;
 
-$controller=new WT_Controller_Base();
+$controller=new WT_Controller_Page();
 $controller
 	->setPageTitle(WT_I18N::translate('Sosa Statistics'))
 	->pageHeader();
 
-echo '<div class="center"><h2>', WT_I18N::translate('Sosa Statistics'), '</h2>';
+echo '<div class="center"><h2>', $controller->getPageTitle(), '</h2>';
 
 $indi_root = WT_Person::getInstance(get_gedcom_setting(WT_GED_ID, 'PERSO_PS_ROOT_INDI'));
 if($indi_root){

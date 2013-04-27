@@ -41,11 +41,12 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			case 'geodispersion':
 				require WT_ROOT.WT_MODULES_DIR.$this->getName().'/'.$mod_action.'.php';
 				break;
+			case 'admin_update_setting':
+				$this->editsetting();
+				break;
 			case 'ajaxgeodispersiondata':
 			case 'ajaxplacehierarchy':
-			case 'ajaxadmingethierarchy':
 			case 'ajaxadminconfigdata':
-			case 'ajaxadminupdate':
 			case 'ajaxadminadd':
 			case 'ajaxadmindelete':
 				$this->$mod_action();
@@ -78,10 +79,10 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			$tab_id = 'ID'.floor(microtime()*1000000);
 				
 			$controller
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.min.js')
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.jeditable.min.js')
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.validate.min.js')
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery/jquery.dataTables.editable.js')
+			->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
+			->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery.dataTables.fnReloadAjax.js')
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery.form-3.32.0.js')
 			->addInlineJavascript('
 					function updatePlaceHierarchy(){
 					// Create the display array for place hierarchy
@@ -98,12 +99,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							     		for(i=1;i<=hierarchyArray.length;i++){
 							     			dropdownHierarchyArray.push("(" + i + ") " + hierarchyArray[i-1]);
 							     			newDropDown = newDropDown + "<option value=\'" + i + "\'>";
-							     			if(data.isdefined){
-							     				newDropDown = newDropDown + hierarchyArray[i-1];
-							     			}
-							     			else{
-							     				newDropDown = newDropDown + i;
-							     			}
+						     				newDropDown = newDropDown + hierarchyArray[i-1];
 							     			newDropDown = newDropDown +"</option>";
 							    		 }
 							    		 if(data.isdefined){
@@ -128,13 +124,30 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 						);
 					}
 					
+					function fnDeleteGeoDispRow(id) {
+			            $.ajax({ "url": "'.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'",
+			                "type": "POST",
+			                "data": { "mod" : "'.$this->getName().'", "mod_action": "ajaxadmindelete", "geodispid": id },
+			                "success": function(response){
+								if(response.result == "ok"){
+									geoConfigDatatable.fnReloadAjax();
+								}
+								alert(response.text);					
+							},
+			                "dataType": "json",
+			                "error": function (response) {
+								alert("'.strip_tags(WT_I18N::translate('The Geodispersion analysis entry could not be deleted.')).'");		
+			                }
+			            });
+	        		}
+					
 					jQuery(document).ready(function() {		
 						ged = "'.WT_GEDCOM.'";
 						hierarchyArray = null;
 						dropdownHierarchyArray = null;
-						geoConfigDatatable = null;
+						geoConfigDatatable = null;									
 						
-						updatePlaceHierarchy();						
+						updatePlaceHierarchy();							
 						
 						//Change behaviour on Gedcom dropdown list
 						jQuery("#ddlGedcoms_'.$tab_id.'").change(function() {
@@ -148,7 +161,47 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							// - Refresh data
 							geoConfigDatatable.fnDraw();
 							
-						});	
+						});						
+					
+						//Prepare the dialog form											
+						var oAddNewGeoDispForm = $("#formAddNewRow_'.$tab_id.'");
+						oAddNewGeoDispForm.dialog(
+						{
+							"height": "auto",
+        					"width" : "auto",
+							"modal": true,
+							"autoOpen" : false,
+					        "position": "center",
+					        "buttons" : [
+								{ 
+									"text" : "'.WT_I18N::translate('Add').'",
+									"click" : function() {
+						                $(this).ajaxSubmit({
+											"resetForm": true,
+											"dataType": "json",
+											"error": function(){
+						                        alert("'.htmlspecialchars(WT_I18N::translate('An error occured while adding new element.')).'");
+						                    },
+											"success": function(e){
+												if(e.result == "ok") {					
+													geoConfigDatatable.fnReloadAjax();
+													oAddNewGeoDispForm.dialog("close");
+												}
+												else{
+													alert(e.text);
+												}
+											}
+						                });
+					                }
+								},
+								{
+									"text" : "'.WT_I18N::translate('Cancel').'",
+									"click" : function() {
+					                        $(this).dialog("close");
+					                }
+								}
+					        ]
+						});					
 
 						//Datatable initialisation
 						jQuery.fn.dataTableExt.oSort["unicode-asc"  ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
@@ -168,7 +221,8 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 								/* 4 Map 			*/ {"bSortable": false, "sClass": "center"},
 								/* 5 MapTopLevel 	*/ {"bSortable": false, "sClass": "center"},
 								/* 6 Use flags	 	*/ {"bSortable": false, "sClass": "center"},
-								/* 7 Gen Details 	*/ {"bSortable": false, "sClass": "center"},
+								/* 7 Gen Details 	*/ {"bSortable": false, "sClass": "center"},					
+								/* 8 <delete> 		*/ {"bSortable": false, "sClass": "center"}
 							],
 							"aaSorting": [[2, "asc"], [3, "asc"]],
 							"iDisplayLength": 10,
@@ -187,44 +241,22 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 									"data": aoData,
 									"success": fnCallback
 								});
+							},
+							"fnDrawCallback": function() {
+								// Our JSON responses include Javascript as well as HTML.  This does not get executed automatically…
+								jQuery("#tGeoConfigTable_'.$tab_id.' script").each(function() {
+									eval(this.text);
+								});
 							}
-						});
-						geoConfigDatatable.makeEditable({
-							"sUpdateURL" : "module.php?mod='.$this->getName().'&mod_action=ajaxadminupdate",
-							"sAddURL" : "module.php?mod='.$this->getName().'&mod_action=ajaxadminadd",
-							"sDeleteURL" : "module.php?mod='.$this->getName().'&mod_action=ajaxadmindelete",
-							"aoColumns": [
-								/* 0 Activated 		*/ {"tooltip": "'.WT_I18N::translate('Click to enable or disable this analysis').'", "type": "select", "onblur": "cancel", "submit" : "'.WT_I18N::translate('OK').'",  "data": "{ \'enabled\':\''.WT_I18N::translate('Enabled').'\', \'disabled\':\''.WT_I18N::translate('Disabled').'\' }" },
-								/* 1 Description	*/ {"tooltip": "'.WT_I18N::translate('Click to edit the description').'", "onblur": "cancel", "submit" : "'.WT_I18N::translate('OK').'", "type": "textarea"},
-								/* 2 Subdivision	*/ {"tooltip": "'.WT_I18N::translate('Click to change the level of subdivision').'", "type": "select", "onblur": "cancel", "submit" : "'.WT_I18N::translate('OK').'", loadurl : "module.php", loaddata : { "mod" : "'.$this->getName().'", "mod_action" : "ajaxadmingethierarchy", "ged" : function(){return ged}}},
-								/* 3 Map 			*/ {"tooltip": "'.WT_I18N::translate('Click to change the map').'", "type": "select", "onblur": "cancel", "submit" : "'.WT_I18N::translate('OK').'", "data": '.Zend_Json::encode(WT_Perso_Functions_Map::getAvailableGeoDispersionMaps()).'},
-								/* 4 MapTopLevel 	*/ {"tooltip": "'.WT_I18N::translate('Click to change the top level of the map').'", "type": "select", "onblur": "cancel", "submit" : "'.WT_I18N::translate('OK').'", loadurl : "module.php", loaddata : { "mod" : "'.$this->getName().'", "mod_action" : "ajaxadmingethierarchy", "ged" : function(){return ged}, "nomap":1}},
-								/* 5 Use flags		*/ {"tooltip": "'.WT_I18N::translate('Click to enable or disable the use of flags').'", "type": "select", "onblur": "cancel", "submit" : "'.WT_I18N::translate('OK').'",  "data": "{ \'yes\':\''.WT_I18N::translate('yes').'\', \'no\':\''.WT_I18N::translate('no').'\' }" },
-								/* 6 Gen Details	*/ {"tooltip": "'.WT_I18N::translate('Click to change the number of places to display in the generation analysis').'", "type": "select", "onblur": "cancel", "submit" : "'.WT_I18N::translate('OK').'",  "data": "{ \'0\':\''.WT_I18N::translate('All').'\', \'1\':\'1\', \'2\':\'2\', \'3\':\'3\', \'4\':\'4\', \'5\':\'5\', \'6\':\'6\', \'7\':\'7\', \'8\':\'8\', \'9\':\'9\', \'10\':\'10\' }" },
-							],
-							"sAddNewRowButtonId" : "buttonAddRow_'.$tab_id.'",
-							"oAddNewRowButtonOptions" : {	
+					
+						});	
+					
+						$("#tGeoConfigTable_'.$tab_id.'_length").append("<button id=\"btaddrow_'.$tab_id.'\" class=\"add_row\"></button>");
+                   		var oAddNewGeoDispButton = $("#btaddrow_'.$tab_id.'").button({
 								label: "'.WT_I18N::translate('Add...').'",
 								icons: { primary: "ui-icon-plus" } 
-							},
-							"sDeleteRowButtonId" : "buttonDeleteRow_'.$tab_id.'",
-							"oDeleteRowButtonOptions" : {
-								label: "'.WT_I18N::translate('Remove').'", 
-								icons: { primary:"ui-icon-trash"}
-							},
-							"fnOnDeleted": function() {
-                             	geoConfigDatatable.fnDraw();
-                             }, 
-							"sAddNewRowFormId" : "formAddNewRow_'.$tab_id.'",
-							"sAddNewRowOkButtonId" : "buttonNewRowOK_'.$tab_id.'",
-							"sAddNewRowCancelButtonId" : "buttonNewRowCancel_'.$tab_id.'",
-							"oAddNewRowFormOptions" : { 	
-								title: "'.WT_I18N::translate('Add a new entry').'",
-								show: "blind",
-								modal: true
-							},
-							"sAddDeleteToolbarSelector" : ".dataTables_length"
-						});			
+						});
+                    	oAddNewGeoDispButton.click(function () { oAddNewGeoDispForm.dialog("open"); });
 					});
 			
 				');
@@ -241,7 +273,11 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			echo '</div>';
 			echo '<div id="dPlaceHierarchy_'.$tab_id.'" class="center"></div>';
 			echo '<div id="dGeoConfigTable_'.$tab_id.'" class="center">';
-			echo '<form id="formAddNewRow_'.$tab_id.'" action="#" title="'.WT_I18N::translate('Add a new entry').'">',
+			
+			
+			echo '<form id="formAddNewRow_'.$tab_id.'" method="POST" action="'.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'" title="'.WT_I18N::translate('Add a new entry').'">',
+					'<input id="mod" type="hidden" name="mod" value="'.$this->getName().'">',
+					'<input id="mod_action" type="hidden" name="mod_action" value="ajaxadminadd">',
 					'<input type="hidden" name="id" id="newid" value="DATAROWID" rel="0" />',
 					'<input type="hidden" name="status" id="newstatus" value="enabled" rel="1" />',
 					'<input id="ged" type="hidden" name="ged" value="'.WT_GEDCOM.'">',
@@ -249,10 +285,11 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 					'<br />',
 					'<label for="name">'.WT_I18N::translate('Level of analysis').'</label><br /><select name="subdiv" id="newsubdiv" class="required" rel="3"></select>',
 					'<br />',
-					'<label for="name">'.WT_I18N::translate('Map').'</label><br /><select name="map" rel="4">';
-			foreach(WT_Perso_Functions_Map::getAvailableGeoDispersionMaps() as $mapkey => $mapname){
-				echo '<option value="'.$mapkey.'">'.$mapname.'</option>';
-			}
+					'<label for="name">'.WT_I18N::translate('Map').'</label><br /><select name="map" rel="4">',
+					'<option value="nomap">'.WT_I18N::translate('No map').'</option>';
+					foreach(WT_Perso_Functions_Map::getAvailableGeoDispersionMaps() as $mapkey => $mapname){
+						echo '<option value="'.$mapkey.'">'.$mapname.'</option>';
+					}
 			echo '</select>',
 					'<br />',
 					'<label for="name">'.WT_I18N::translate('Map Top level').'</label><br /><select name="toplevel" id="newtoplevel" rel="5"></select>',
@@ -275,7 +312,8 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 					'<option value="9">9</option>',
 					'<option value="10">10</option>',
 					'</select>',
-				'</form>';			
+				'</form>';	
+			
 			echo '<table id="tGeoConfigTable_'.$tab_id.'" class="dtGeoConfigTable">',
 					'<thead>',
 						'<tr>',
@@ -287,6 +325,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							'<th>',WT_I18N::translate('Map Top level'),'</th>',
 							'<th>',WT_I18N::translate('Use Flags'),'</th>',
 							'<th>',WT_I18N::translate('Place Details'),'</th>',
+							'<th>',WT_I18N::translate('Delete'),'</th>',
 						'</tr>',
 					'</thead>',
 				'</table>';
@@ -300,8 +339,96 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 
 	// Implement WT_Perso_Module_Configurable
 	public function validate_config_settings($setting, $value){
+		if(is_null($setting)) return 'ERROR_VALIDATION';
+		$value = trim($value);
+		switch($setting){
+			case 'pg_map':
+				$value = empty($value) ? null : $value;
+			case 'pg_descr':
+				$value = (strlen($value) > 70) ? substr($value, 0, 70) :  $value;
+				break;
+			case 'pg_toplevel':
+				if(empty($value)){
+					$value = null;
+					break;
+				}
+			case 'pg_sublevel':			
+			case 'pg_detailsgen':
+				if (!is_numeric($value) || (is_numeric($value) && $value <0 && $value >= 128))
+					$value = 'ERROR_VALIDATION';
+				break;
+			case 'pg_status':
+				if(!in_array($value, array('enabled', 'disabled'))) $value = 'ERROR_VALIDATION';
+				break;
+			case 'pg_useflagsgen':
+				$value = $value ? 'yes' : 'no';
+				break;
+			default:
+				$value = 'ERROR_VALIDATION';
+				break;
+		}
 		return $value;
 	}
+	
+	/**
+	 *  Save Geodispersion analysis settings.
+	 * The id to be sent is under the format <strong><em>type_setting</em>-<em>geoanalysis_id</em>-<em>setting</em>-validate<strong>, with :
+	 * 	- type_setting: <strong>geo</strong>
+	 *  - geoanalysis_id : related geodispersion analysis
+	 *  - setting: setting to be change
+	 */
+	private function editsetting(){
+		if(WT_Perso_Functions_Map::isGeoDispersionModuleOperational()){
+			$id=safe_POST('id', '[a-zA-Z0-9_-]+');
+			list($table, $id1, $id2)=explode('-', $id.'--');
+				
+			// The replacement value.
+			$value=safe_POST('value', WT_REGEX_UNSAFE);
+		
+			// Validate the replacement value
+			$value = $this->validate_config_settings($id2, $value);				
+			if($value === 'ERROR_VALIDATION') WT_Perso_Functions_Edit::fail();
+				
+			switch($table){
+				case 'geo':
+					// Verify if the user has enough rights to modify the setting
+					if(!WT_USER_IS_ADMIN) WT_Perso_Functions_Edit::fail();
+					
+					// Verify if a geodispersion analysis has been specified;
+					if(is_null($id1)) WT_Perso_Functions_Edit::fail();
+					// Verify if a setting name has been specified;
+					if(is_null($id2)) WT_Perso_Functions_Edit::fail();
+										
+					WT_DB::prepare('UPDATE `##pgeodispersion` SET '.$id2.' = ? WHERE pg_id = ?')
+						->execute(array($value, $id1));
+						
+					$value = $this->formatConfigSettings($id2, $value);									
+					WT_Perso_Functions_Edit::ok($value);
+					break;
+				default:
+					WT_Perso_Functions_Edit::fail();
+			}
+		}
+		WT_Perso_Functions_Edit::fail();
+	}
+	
+	/**
+	 * Format config settings to be suitable for display
+	 *
+	 * @param string $setting The setting to validate
+	 * @param mixed $value The value of the setting, to format
+	 * @return mixed The value of the settings, after formatting
+	 */
+	private function formatConfigSettings($setting, $value){
+		switch($setting){
+			case 'pg_useflagsgen':
+				$value = ($value == 'yes');
+				break;
+			default:
+				break;
+		}
+		return $value;
+	}	
 
 	/*
 	 * AJAX Calls
@@ -324,7 +451,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 		
 		$geoid = safe_GET('geoid', WT_REGEX_INTEGER, null);
 		
-		header('Content-Type: text/plain; charset=UTF-8');
+		$controller = new WT_Perso_Controller_Json();
 		
 		$jsonArray = array(
 			'generaltab' => '',
@@ -568,6 +695,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			$jsonArray['generationstab'] = '<p class="warning">'.WT_I18N::translate('The Perso Sosa module must be installed and enabled to display this page.').'<p>';
 		}		
 		
+		$controller->pageHeader();
 		echo Zend_Json::encode($jsonArray);
 	}
 	
@@ -589,60 +717,12 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 	 * @return string JSON for place hierarchy
 	 */
 	private function ajaxplacehierarchy(){
-		header('Content-Type: text/plain; charset=UTF-8');
-
-		$jsonArray = array();
-		$jsonArray['ged_id'] = WT_GED_ID;		// This is already taken care of in the session.php
-		$jsonArray['isdefined'] = false;
-		$jsonArray['nblevels'] = 0;
-		$jsonArray['hierarchy'] = null;
-		if($placestructure = WT_Perso_Functions_Map::getPlaceHierarchyHeader(WT_GED_ID)){
-			$jsonArray['isdefined'] = true;
-			$jsonArray['nblevels'] = count($placestructure);
-			$jsonArray['hierarchy'] = $placestructure;
-		}
-		else{
-			list($jsonArray['nblevels'], $jsonArray['hierarchy']) = WT_Perso_Functions_Map::getRandomPlaceExample(WT_GED_ID);
-		}
-		echo Zend_Json::encode($jsonArray);
-	}
-
-	/**
-	 * Return the place hierarchy in JSON format, suitable for the jEditable datatable dropdown lists.
-	 * 
-	 * Input parameters - GET :
-	 * 	- ged is managed in the session.php
-	 *  - nomap : Should the option No map be displayed in the dropdown lists.
-	 * 
-	 * JSON format
-	 * {
-	 * 		-1 : "No map" (optional),
-	 * 		$i : Level $i of the hierarchy
-	 * }
-	 * 
-	 * @return string JSON for place hierarchy dropdown lists
-	 */
-	private function ajaxadmingethierarchy(){
-		$nomap = safe_GET_integer('nomap', 0, 1, 0);
-
-		header('Content-Type: text/plain; charset=UTF-8');
-
-		$jsonArray = array();
-		if($nomap == 1) $jsonArray[-1] = WT_I18N::translate('No map');
-		if($placestructure = WT_Perso_Functions_Map::getPlaceHierarchyHeader(WT_GED_ID)){
-			for($i = 1; $i<count($placestructure); $i++){
-				$jsonArray[$i] = $placestructure[$i-1];
-			}
-		}
-		else{
-			list($nblevels, $placesample) = WT_Perso_Functions_Map::getRandomPlaceExample(WT_GED_ID);
-			for($i = 1; $i<$nblevels; $i++){
-				$jsonArray[$i] = $i;
-			}
-		}
-		echo Zend_Json::encode($jsonArray);
-	}
-
+		$controller = new WT_Perso_Controller_Json();
+		
+		$controller->pageHeader();
+		echo Zend_Json::encode(WT_Perso_Functions_Map::getPlaceHierarchy(WT_GED_ID));
+	}	
+	
 	/**
 	 * Return the data for the geodispersion admin table, in JSON format
 	 * 
@@ -661,14 +741,15 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 	 * 		aaData : array
 	 * 		{
 	 * 			DT_RowID : string - ID for the current row tr,
-	 * 			0 : int - GeoDispersion record ID,
-	 * 			1 : string - Is record enabled,
-	 * 			2 : string - Description,
-	 * 			3 : int - Level of subdivision to analyse,
-	 * 			4 : string or null - Map to display, if any,
-	 * 			5 : int - Level of the top level of the map,
-	 * 			6 : string - Use flags for display in generational analysis,
-	 * 			7 : string or int - Number of levels to display in generational analysis (0=All)
+	 * 			0 : string - GeoDispersion record ID,
+	 * 			1 : string - Is record enabled (editable),
+	 * 			2 : string - Description (editable),
+	 * 			3 : string - Level of subdivision to analyse (editable),
+	 * 			4 : string - Map to display, if any (editable),
+	 * 			5 : string - Level of the top level of the map (editable),
+	 * 			6 : string - Use flags for display in generational analysis (editable),
+	 * 			7 : string - Number of levels to display in generational analysis (0=All) (editable),
+	 * 			8 : string - Delete button
 	 * 		}
 	 * }
 	 * 
@@ -680,7 +761,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 		$iDisplayLength = safe_GET('iDisplayLength', WT_REGEX_INTEGER, null);
 		$sSearch = safe_GET('sSearch');
 
-		header('Content-Type: text/plain; charset=UTF-8');
+		$controller = new WT_Perso_Controller_Json();
 			
 		$jsonArray = array();
 		$jsonArray['iTotalRecords'] = 0;
@@ -708,120 +789,104 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 				$sql .= ' LIMIT '.$iDisplayStart.', '.$iDisplayLength;
 			}
 			$aResults = WT_DB::prepare($sql)->execute(array(WT_GED_ID))->fetchAll();
-			$placestructure = WT_Perso_Functions_Map::getPlaceHierarchyHeader(WT_GED_ID);
+			$placestructure = WT_Perso_Functions_Map::getPlaceHierarchy(WT_GED_ID);
 			foreach($aResults as $aResult ){
 				$row = array();
 				$row['DT_RowId'] = 'row_'.$aResult->pg_id;
 				$row[0] = $aResult->pg_id;
-				$row[1] = ($aResult->pg_status=="enabled") ? WT_I18N::translate('Enabled') : WT_I18N::translate('Disabled');
-				$row[2] = $aResult->pg_descr;
-				$row[3] = $placestructure ? $placestructure[$aResult->pg_sublevel-1] : $aResult->pg_sublevel;
-				if($aResult->pg_map){
-					$row[4] = $aResult->pg_map;
-					$row[5] = $placestructure ? $placestructure[$aResult->pg_toplevel-1] : $aResult->pg_toplevel;
-				}
-				else{
-					$row[4] = WT_I18N::translate('No map');
-					$row[5] = WT_I18N::translate('No map');
-				}
-				$row[6] = ($aResult->pg_useflagsgen=="yes") ? WT_I18N::translate('yes') : WT_I18N::translate('no');
-				$row[7] = ($aResult->pg_detailsgen==0) ? WT_I18N::translate('All') : $aResult->pg_detailsgen;
+				$row[1] = WT_Perso_Functions_Edit::select_edit_control_inline(
+						'geo-'.$aResult->pg_id.'-pg_status', 
+						array('enabled' => WT_I18N::translate('Enabled'), 'disabled' => WT_I18N::translate('Disabled')),
+						null,
+						$aResult->pg_status,
+						null, 
+						$this->getName()); 
+				$row[2] = WT_Perso_Functions_Edit::edit_module_field_inline(
+						'geo-'.$aResult->pg_id.'-pg_descr', 
+						$aResult->pg_descr,
+						null,
+						$this->getName()); 
+				$row[3] = WT_Perso_Functions_Edit::select_edit_control_inline(
+						'geo-'.$aResult->pg_id.'-pg_sublevel',
+						$placestructure['hierarchy'],
+						null,
+						$aResult->pg_sublevel,  // CHeck if it is sublebel or sublebel-1
+						null,
+						$this->getName());
+				$row[4] = WT_Perso_Functions_Edit::select_edit_control_inline(
+						'geo-'.$aResult->pg_id.'-pg_map',
+						WT_Perso_Functions_Map::getAvailableGeoDispersionMaps(),
+						WT_I18N::translate('No map'),
+						$aResult->pg_map,
+						null,
+						$this->getName());
+				$row[5] = WT_Perso_Functions_Edit::select_edit_control_inline(
+						'geo-'.$aResult->pg_id.'-pg_toplevel',
+						$placestructure['hierarchy'],
+						WT_I18N::translate('No map'),
+						$aResult->pg_toplevel,  // CHeck if it is sublebel or sublebel-1
+						null,
+						$this->getName());
+				$row[6] = WT_Perso_Functions_Edit::edit_field_yes_no_inline(
+						'geo-'.$aResult->pg_id.'-pg_useflagsgen',
+						($aResult->pg_useflagsgen == 'yes'),
+						null,
+						$this->getName());
+				$row[7] = WT_Perso_Functions_Edit::select_edit_control_inline(
+						'geo-'.$aResult->pg_id.'-pg_detailsgen',
+						array(0 => WT_I18N::translate('All'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5,
+								6 => 6, 7 => 7, 8 => 8,  9 => 9, 10 => 10),
+						null,
+						$aResult->pg_detailsgen,
+						null,
+						$this->getName());
+				$row[8] = '<i class="icon-delete" onclick="if (confirm(\''.
+					htmlspecialchars(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($aResult->pg_descr))).
+					'\')) { fnDeleteGeoDispRow(\''.$aResult->pg_id.'\'); }"></i>';				
 				$jsonArray['aaData'][] = $row;
 			}
 		}
 
+		$controller->pageHeader();
 		echo Zend_Json::encode($jsonArray);
 	}
 
 	/**
-	 * Update a geodispersion analysis entry
+	 * Delete a geodispersion analysis, and return the result
 	 * 
 	 * Input parameters - POST :
-	 * 	- id : ID of the Geodispersion analysis
-	 *  - value : New value
-	 *  - columnId : Column ID of the parameter
+	 * 	- geodispid : ID of the Geodispersion analysis to delete
 	 *  
-	 *  Display value updated
-	 *
-	 */
-	private function ajaxadminupdate(){
-		$id = safe_POST('id', WT_REGEX_INTEGER, null);
-		$value = safe_POST('value');
-		$columnId = safe_POST('columnId', WT_REGEX_INTEGER, null) ;
-
-		header('Content-Type: text/plain; charset=UTF-8');
-		
-		$sentvalue = $value;
-		if(WT_USER_IS_ADMIN && $id && !is_null($value)  && $columnId){
-			$sql = 'UPDATE ##pgeodispersion';
-			$canUpdate = false;
-			switch($columnId){
-				case 1:
-					$sql .= ' SET pg_status = ?'; $canUpdate = true; break;
-				case 2:
-					$sql .= ' SET pg_descr = ?'; $canUpdate = true; break;
-				case 3:
-					$sql .= ' SET pg_sublevel = ?'; $canUpdate = true; break;
-				case 4:
-					$sql .= ' SET pg_map = ?'; 
-					if($value == 'nomap') {
-						$value = null;
-						$sql .= ', pg_toplevel = ?';
-					}
-					$canUpdate = true; 
-					break;
-				case 5:
-					$sql .= ' SET pg_toplevel = ?'; 
-					if($value == -1) {
-						$value = null;
-						$sql .= ', pg_map = ?';
-					}
-					$canUpdate = true; 
-					break;
-				case 6:
-					$sql .= ' SET pg_useflagsgen = ?'; $canUpdate = true; break;
-				case 7:
-					$sql .= ' SET pg_detailsgen = ?'; $canUpdate = true; break;
-				default:
-					break;
-			}
-			$sql .= ' WHERE pg_id = ?';
-			$params = array($value);
-			if(($columnId == 4 && $value == null) || ($columnId == 5 && $value == null)) $params[] = null;
-			$params[] = $id;
-				
-			if($canUpdate) WT_DB::prepare($sql)->execute($params);
-			AddToLog('Module '.$this->getName().' : Geo Analysis ID "'.$id.'" - Parameter "'.$columnId.'" set to "'.$value.'"', 'config');
-		}
-			
-		echo $sentvalue;
-	}
-
-	/**
-	 * Delete a geodispersion analysis
-	 * 
-	 * Input parameters - POST :
-	 * 	- id : ID of the Geodispersion analysis to delete
+	 *  JSON format
+	 * 	{
+	 * 		result 	: string - Result of the deletion ('failure' or 'ok'),
+	 * 		text 	: string - Text to display
+	 * 	}
 	 *  
 	 *  Display a text result
 	 *
 	 */
 	private function ajaxadmindelete(){
-		$id = safe_POST('id', WT_REGEX_INTEGER, null);
+		$id = safe_POST('geodispid', WT_REGEX_INTEGER, null);
 
-		header('Content-Type: text/plain; charset=UTF-8');
+		$controller = new WT_Perso_Controller_Json();
 
-		$txtresult = WT_I18N::translate('The Geodispersion analysis entry could not be deleted.');
+		$result = array(
+			'result' => 'failure',
+			'text'	=>	WT_I18N::translate('The Geodispersion analysis entry could not be deleted.')
+		);
 		
 		if(WT_USER_IS_ADMIN && $id){
 			$sql = 'DELETE FROM ##pgeodispersion WHERE pg_id = ?';
 			WT_DB::prepare($sql)->execute(array($id));
 			
-			$txtresult = WT_I18N::translate('The Geodispersion analysis entry has been successfully deleted.');
+			$result['result'] = 'ok';
+			$result['text'] = WT_I18N::translate('The Geodispersion analysis entry has been successfully deleted.');
 			AddToLog('Module '.$this->getName().' : Geo Analysis ID "'.$id.'" has been deleted.', 'config');
 		}
 			
-		echo $txtresult;
+		$controller->pageHeader();
+		echo Zend_Json::encode($result);
 	}
 
 	/**
@@ -834,7 +899,13 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 	 *  - toplevel : Map top level subdivision
 	 *  - useflagsgen : Use flags
 	 *  - detailsgen : Number of place to display
-	 *  
+	 *    
+	 *  JSON format
+	 * 	{
+	 * 		result 	: string - Result of the insertion ('failure' or 'ok'),
+	 * 		text 	: string - Text to display for failure, new ID if success
+	 * 	}
+	 * 
 	 *  Display the ID of the new Geodispersion analysis entry
 	 *
 	 */
@@ -846,9 +917,13 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 		$useflagsgen = safe_POST('useflagsgen');
 		$detailsgen = safe_POST('detailsgen', WT_REGEX_INTEGER, null);
 
-		header('Content-Type: text/plain; charset=UTF-8');
+		$controller = new WT_Perso_Controller_PlainAjax();
 
-		$id = -1;
+		$id = -1;		
+		$result = array(
+			'result' => 'failure',
+			'text'	=>	WT_I18N::translate('An error occured while adding new element.')
+		);
 
 		if(WT_USER_IS_ADMIN && $descr && $subdiv && $useflagsgen && $detailsgen >= 0){
 			$sql = 'INSERT INTO ##pgeodispersion'.
@@ -863,6 +938,8 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 				WT_DB::prepare($sql)->execute(array(WT_GED_ID, $descr, $subdiv, $map, $toplevel, $useflagsgen, $detailsgen));
 				$id = WT_DB::getInstance()->lastInsertId();
 				WT_DB::getInstance()->commit();
+				$result['result'] = 'ok';
+				$result['text']=$id;
 				AddToLog('Module '.$this->getName().' : Geo Analysis ID "'.$id.'" added with parameters ['.$descr.', '.$subdiv.','.$map.','.$toplevel.','.$useflagsgen.', '.$detailsgen.'].', 'config');
 			}
 			catch(Exception $e){
@@ -872,7 +949,8 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			}
 		}
 
-		echo $id;
+		$controller->pageHeader();
+		echo Zend_Json::encode($result);
 	}
 
 	/*

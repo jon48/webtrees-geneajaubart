@@ -43,6 +43,20 @@ class WT_Perso_GedcomRecord {
 	}
 	
 	/**
+	 * Get an HTML link to this object, for use in sortable lists.
+	 * 
+	 * @return string HTML link
+	 */
+	public function getXrefLink() {
+		global $SEARCH_SPIDER;
+		if (empty($SEARCH_SPIDER)) {
+			return '<a href="'.$this->gedcomrecord->getHtmlUrl().'#content" name="'.preg_replace('/\D/','',$this->gedcomrecord->getXref()).'">'.$this->gedcomrecord->getXref().'</a>';
+		} else {
+			return $this->gedcomrecord->getXref();
+		}
+	}
+	
+	/**
 	 * Add additional options to the core format_first_major_facts function.
 	 * If no option is suitable, it will try returning the core function.
 	 *

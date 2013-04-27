@@ -17,11 +17,11 @@ function compute_sosa(sosa_pid){
 		closeOnEscape: false,
 		width: 300,
 		open: function(event, ui) {
-			$("div[aria-labelledby^='ui-dialog-title-computesosadlg'] .ui-dialog-titlebar-close").hide();
+			$("button[title='close']").hide();
 			$('#sosaloadingarea').empty().html('<i class="icon-loading-small"></i>');
 			$('#sosaloadingarea').load('module.php?mod=perso_sosa&mod_action=computesosaindi&pid=' + sosa_pid, 
 					function(){
-						$("div[aria-labelledby^='ui-dialog-title-computesosadlg'] .ui-dialog-titlebar-close").show();
+						$("button[title='close']").show();
 						setTimeout(function(){
 							$('#computesosadlg').dialog('close');
 						}, 2000);

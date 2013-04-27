@@ -20,6 +20,7 @@ class WT_Perso_Functions_Map {
 	
 	private static $_maps = null;
 	private static $_enabledmaps = null;
+	private static $_isGeoDispersionOperational = -1;
 	
 	/**
 	 * Return HTML code for the flag icon of the requested place
@@ -39,6 +40,38 @@ class WT_Perso_Functions_Map {
 		else{
 			return '';
 		}
+	}
+	
+	/**
+	 * Returns the infered place hierarchy, determined from the Gedcom data
+	 *
+	 * @param int $gedid ID of the gedcom file
+	 * @return array Places hierarchy
+	 */
+	public static function getPlaceHierarchy($gedid = WT_GED_ID){
+		$plHierarchy = array();
+	
+		$cacheId = 'placeHierarchyArray'.$gedid;
+		if(WT_Perso_Cache::isCached($cacheId)) {
+			$plHierarchy = WT_Perso_Cache::get($cacheId);
+		}
+		else{
+			$plHierarchy['ged_id'] = WT_GED_ID;		// This is already taken care of in the session.php
+			$plHierarchy['isdefined'] = false;
+			$plHierarchy['nblevels'] = 0;
+			$plHierarchy['hierarchy'] = null;
+			if($placestructure = WT_Perso_Functions_Map::getPlaceHierarchyHeader(WT_GED_ID)){
+				$plHierarchy['isdefined'] = true;
+				$plHierarchy['nblevels'] = count($placestructure);
+				$plHierarchy['hierarchy'] = $placestructure;
+			}
+			else{
+				list($plHierarchy['nblevels'], $plHierarchy['hierarchy']) = WT_Perso_Functions_Map::getRandomPlaceExample(WT_GED_ID);
+			}
+			WT_Perso_Cache::save($cacheId, $plHierarchy);
+		}
+	
+		return $plHierarchy;
 	}
 	
 	/**
@@ -128,6 +161,21 @@ class WT_Perso_Functions_Map {
 	}
 	
 	/**
+	 * Return whether the GeoDispersion module is active and the table has been created.
+	 *
+	 * @return bool True if module active and table created, false otherwise
+	 */
+	public static function isGeoDispersionModuleOperational(){
+		if(self::$_isGeoDispersionOperational == -1){
+			self::$_isGeoDispersionOperational = array_key_exists('perso_geodispersion', WT_Module::getActiveModules());
+			if(self::$_isGeoDispersionOperational){
+				self::$_isGeoDispersionOperational = WT_Perso_Functions::doesTableExist('##pgeodispersion');
+			}
+		}
+		return self::$_isGeoDispersionOperational;
+	}
+		
+	/**
 	 * Return the list of geodispersion maps available within the maps folder.
 	 *
 	 * @return array List of available maps
@@ -143,7 +191,7 @@ class WT_Perso_Functions_Map {
 					}
 				}
 				if(self::$_maps) uasort(self::$_maps, create_function('$x,$y', 'return utf8_strcasecmp((string)$x, (string)$y);'));
-				self::$_maps = array_merge(array('nomap' => WT_I18N::translate('No map')), self::$_maps);
+				//self::$_maps = array_merge(array('nomap' => WT_I18N::translate('No map')), self::$_maps);
 			}
 		}
 		return self::$_maps;
