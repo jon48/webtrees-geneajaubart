@@ -49,6 +49,8 @@ if (stristr($_SERVER['HTTP_USER_AGENT'], 'iPad')) {
 
 	//PERSO Add extra style sheet for personal additions
 	echo '<link rel="stylesheet" type="text/css" href="', WT_THEME_URL ,'css/colors.extra.css', '">';
+	// and Java script for Certificate Module
+	$this->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.'perso_certificates/js/activatecolorbox.js');
 	//END PERSO
 
 switch ($BROWSERTYPE) {

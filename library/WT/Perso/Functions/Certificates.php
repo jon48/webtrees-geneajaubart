@@ -42,7 +42,7 @@ class WT_Perso_Functions_Certificates {
 			$dir=opendir($certdir);
 			
 			while($entry = readdir($dir)){
-				if($entry!='.' && $entry!='..' && is_dir($certdir.$entry.'/')){
+				if($entry!='.' && $entry!='..' && is_dir($certdir.$entry)){
 					$_citiesList[]=utf8_encode($entry);
 				}
 			}

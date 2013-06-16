@@ -14,8 +14,6 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-require_once WT_ROOT.WT_MODULES_DIR.'googlemap/googlemap.php';
-
 class WT_Perso_Functions_Map {
 	
 	private static $_maps = null;
@@ -30,6 +28,8 @@ class WT_Perso_Functions_Map {
 	 * @return string HTML code of the flag icon
 	 */
 	public static function getPlaceIcon($place, $height){
+		require_once WT_ROOT.WT_MODULES_DIR.'googlemap/googlemap.php'; // Cannot be outside of the function, causing issues with placehierarchy.php
+		
 		$latlongval = get_lati_long_placelocation($place);
 		if ((count($latlongval) == 0) && (!empty($GM_DEFAULT_TOP_VALUE))) {
 			$latlongval = get_lati_long_placelocation($place.", ".$GM_DEFAULT_TOP_VALUE);

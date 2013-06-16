@@ -76,7 +76,7 @@ html[dir='rtl'] .fact_flag {float: left;}
 /* Certificates */
 .icon-perso-certificate{width:15px;height:15px;background-image:url(images/perso/certificate_15x15.png);}
 .margin-h-2 {margin: 0px 2px 0px 2px;}
-.certif_image {max-width: 85%;padding: 5px;border: solid black 1px;margin: 10px;}
+.certif_image {max-width: 85%;height: auto;padding: 5px;border: solid black 1px;margin: 10px;}
 ._CITY {margin:0px;}
 
 /* Patronymic lineage */
