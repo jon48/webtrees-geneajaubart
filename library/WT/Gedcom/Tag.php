@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Tag.php 14902 2013-03-24 08:18:11Z greg $
+// $Id: Tag.php 15035 2013-06-02 15:10:32Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -233,7 +233,7 @@ class WT_Gedcom_Tag {
 		case 'FILE': return /* I18N: gedcom tag FILE */ WT_I18N::translate('Filename');
 		case 'FONE': return /* I18N: gedcom tag FONE */ WT_I18N::translate('Phonetic');
 		case 'FORM': return /* I18N: gedcom tag FORM */ WT_I18N::translate('Format');
-		case 'GEDC': return /* I18N: gedcom tag GEDC */ WT_I18N::translate('Gedcom');
+		case 'GEDC': return /* I18N: gedcom tag GEDC */ WT_I18N::translate('GEDCOM file');
 		case 'GIVN': return /* I18N: gedcom tag GIVN */ WT_I18N::translate('Given names');
 		case 'GRAD': return /* I18N: gedcom tag GRAD */ WT_I18N::translate('Graduation');
 		case 'HEAD': return /* I18N: gedcom tag HEAD */ WT_I18N::translate('Header');

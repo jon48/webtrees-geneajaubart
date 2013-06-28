@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_pgv_to_wt.php 14876 2013-03-13 08:19:13Z greg $
+// $Id: admin_pgv_to_wt.php 15038 2013-06-12 07:17:35Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_pgv_to_wt.php');
 require './includes/session.php';
@@ -137,13 +137,13 @@ if ($error || !$PGV_PATH) {
 		'<dt>',WT_I18N::translate('Installation directory'), '</dt>';
 	switch (count($pgv_dirs)) {
 	case '0':
-		echo '<dd><input type="text" name="PGV_PATH" size="40" value=""></dd>';
+		echo '<dd><input type="text" name="PGV_PATH" size="40" value="" autofocus></dd>';
 		break;
 	case '1':
-		echo '<dd><input type="text" name="PGV_PATH" size="40" value="'.htmlspecialchars($pgv_dirs[0]).'"></dd>';
+		echo '<dd><input type="text" name="PGV_PATH" size="40" value="'.htmlspecialchars($pgv_dirs[0]).'" autofocus></dd>';
 		break;
 	default:
-		echo '<dd><input type="text" name="PGV_PATH" size="40" value=""></dd>';
+		echo '<dd><input type="text" name="PGV_PATH" size="40" value="" autofocus></dd>';
 		echo '<dt>', /* find better english before translating */ 'PhpGedView might be found in these locations', '</dt>';
 		echo '<dd>';
 		foreach ($pgv_dirs as $pgvpath) {
@@ -181,7 +181,6 @@ if (ini_get('output_buffering')) {
 	ob_flush();
 }
 // TODO May need to set 'DATA_DIRECTORY' to $INDEX_DIRECTORY when dealing with media??
-@WT_Site::preference('STORE_MESSAGES',                  $PGV_STORE_MESSAGES);
 @WT_Site::preference('USE_REGISTRATION_MODULE',         $USE_REGISTRATION_MODULE);
 @WT_Site::preference('REQUIRE_ADMIN_AUTH_REGISTRATION', $REQUIRE_ADMIN_AUTH_REGISTRATION);
 @WT_Site::preference('ALLOW_USER_THEMES',               $ALLOW_USER_THEMES);
@@ -542,50 +541,49 @@ if ($PGV_SCHEMA_VERSION>=12) {
 	if (ini_get('output_buffering')) {
 		ob_flush();
 	}
-	try {
-		$user_gedcom_settings=
-			WT_DB::prepare(
-				"SELECT user_id, u_gedcomid, u_rootid, u_canedit".
-				" FROM `{$DBNAME}`.`{$TBLPREFIX}users`".
-				" JOIN `##user` ON (user_name=CONVERT(u_username USING utf8) COLLATE utf8_unicode_ci)"
-			)->fetchAll();
-		foreach ($user_gedcom_settings as $setting) {
-			@$array=unserialize($setting->u_gedcomid);
-			if (is_array($array)) {
-				foreach ($array as $gedcom=>$value) {
-					$id=get_id_from_gedcom($gedcom);
-					if ($id) {
-						// Allow for old/invalid gedcom values in array
-						WT_Tree::get($id)->userPreference($setting->user_id, 'gedcomid', $value);
-					}
-				}
-			}
-			@$array=unserialize($setting->u_rootid);
-			if (is_array($array)) {
-				foreach ($array as $gedcom=>$value) {
-					$id=get_id_from_gedcom($gedcom);
-					if ($id) {
-						// Allow for old/invalid gedcom values in array
-						WT_Tree::get($id)->userPreference($setting->user_id, 'rootid', $value);
-					}
-				}
-			}
-			@$array=unserialize($setting->u_canedit);
-			if (is_array($array)) {
-				foreach ($array as $gedcom=>$value) {
-					$id=get_id_from_gedcom($gedcom);
-					if ($id) {
-						// Allow for old/invalid gedcom values in array
-						WT_Tree::get($id)->userPreference($setting->user_id, 'canedit', $value);
-					}
+	$user_gedcom_settings=
+		WT_DB::prepare(
+			"SELECT user_id, u_gedcomid, u_rootid, u_canedit".
+			" FROM `{$DBNAME}`.`{$TBLPREFIX}users`".
+			" JOIN `##user` ON (user_name=CONVERT(u_username USING utf8) COLLATE utf8_unicode_ci)"
+		)->fetchAll();
+	foreach ($user_gedcom_settings as $setting) {
+		@$array=unserialize($setting->u_gedcomid);
+		if (is_array($array)) {
+			foreach ($array as $gedcom=>$value) {
+				try {
+					WT_DB::prepare(
+						"INSERT IGNORE INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value) VALUES (?, ?, ?, ?)"
+					)->execute(array($setting->user_id, get_id_from_gedcom($gedcom), 'gedcomid', $value));
+				} catch (PDOException $ex) {
+					// Invalid data?  Reference to non-existing tree?
 				}
 			}
 		}
-
-	} catch (PDOException $ex) {
-		// This could only fail if;
-		// a) we've already done it (upgrade)
-		// b) it doesn't exist (new install)
+		@$array=unserialize($setting->u_rootid);
+		if (is_array($array)) {
+			foreach ($array as $gedcom=>$value) {
+				try {
+					WT_DB::prepare(
+						"INSERT IGNORE INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value) VALUES (?, ?, ?, ?)"
+					)->execute(array($setting->user_id, get_id_from_gedcom($gedcom), 'rootid', $value));
+				} catch (PDOException $ex) {
+					// Invalid data?  Reference to non-existing tree?
+				}
+			}
+		}
+		@$array=unserialize($setting->u_canedit);
+		if (is_array($array)) {
+			foreach ($array as $gedcom=>$value) {
+				try {
+					WT_DB::prepare(
+						"INSERT IGNORE INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value) VALUES (?, ?, ?, ?)"
+					)->execute(array($setting->user_id, get_id_from_gedcom($gedcom), 'canedit', $value));
+				} catch (PDOException $ex) {
+					// Invalid data?  Reference to non-existing tree?
+				}
+			}
+		}
 	}
 }
 
@@ -653,7 +651,6 @@ foreach ($GEDCOMS as $GEDCOM=>$GED_DATA) {
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'ABBREVIATE_CHART_LABELS',      $ABBREVIATE_CHART_LABELS));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'ADVANCED_NAME_FACTS',          $ADVANCED_NAME_FACTS));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'ADVANCED_PLAC_FACTS',          $ADVANCED_PLAC_FACTS));
-	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'ALLOW_EDIT_GEDCOM',            $ALLOW_EDIT_GEDCOM));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'ALLOW_THEME_DROPDOWN',         $ALLOW_THEME_DROPDOWN));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'CALENDAR_FORMAT',              $CALENDAR_FORMAT));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'CHART_BOX_TAGS',               $CHART_BOX_TAGS));
@@ -743,7 +740,6 @@ foreach ($GEDCOMS as $GEDCOM=>$GED_DATA) {
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'SHOW_PARENTS_AGE',             $SHOW_PARENTS_AGE));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'SHOW_PEDIGREE_PLACES',         $SHOW_PEDIGREE_PLACES));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'SHOW_PRIVATE_RELATIONSHIPS',   $SHOW_PRIVATE_RELATIONSHIPS));
-	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'SHOW_REGISTER_CAUTION',        $SHOW_REGISTER_CAUTION));
 
 	// Update these - see db_schema_5_6.php
 	$SHOW_RELATIVES_EVENTS=preg_replace('/_(BIRT|MARR|DEAT)_(COUS|MSIB|FSIB|GGCH|NEPH|GGPA)/', '', $SHOW_RELATIVES_EVENTS);
@@ -789,9 +785,6 @@ foreach ($GEDCOMS as $GEDCOM=>$GED_DATA) {
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'USE_RIN',                      $USE_RIN));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'WATERMARK_THUMB',              $WATERMARK_THUMB));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'WEBMASTER_USER_ID',            get_user_id($WEBMASTER_EMAIL)));
-	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'WELCOME_TEXT_AUTH_MODE',       $WELCOME_TEXT_AUTH_MODE));
-	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'WELCOME_TEXT_AUTH_MODE_'.WT_LOCALE, $WELCOME_TEXT_AUTH_MODE_4));
-	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'WELCOME_TEXT_CUST_HEAD',       $WELCOME_TEXT_CUST_HEAD));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'WORD_WRAPPED_NOTES',           $WORD_WRAPPED_NOTES));
 }
 WT_DB::prepare("DELETE FROM `##gedcom_setting` WHERE setting_name in ('config', 'privacy', 'path', 'pgv_ver', 'imported')")->execute();
@@ -819,7 +812,33 @@ WT_DB::exec(
 );
 
 ////////////////////////////////////////////////////////////////////////////////
+// The PGV blocks don't migrate easily.
+// Just give everybody and every tree default blocks
+////////////////////////////////////////////////////////////////////////////////
 
+WT_DB::prepare(
+	"INSERT INTO `##block` (user_id, location, block_order, module_name)" .
+	" SELECT `##user`.user_id, location, block_order, module_name" .
+	" FROM `##block`" .
+	" JOIN `##user`" .
+	" WHERE `##block`.user_id = -1" .
+	" AND   `##user`.user_id  >  0"
+)->execute();
+
+WT_DB::prepare(
+	"INSERT INTO `##block` (gedcom_id, location, block_order, module_name)" .
+	" SELECT `##gedcom`.gedcom_id, location, block_order, module_name" .
+	" FROM `##block`" .
+	" JOIN `##gedcom`" .
+	" WHERE `##block`.gedcom_id = -1" .
+	" AND   `##gedcom`.gedcom_id  >  0"
+)->execute();
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Hit counter
+////////////////////////////////////////////////////////////////////////////////
+//
 if ($PGV_SCHEMA_VERSION>=13) {
 	echo '<p>pgv_hit_counter => wt_hit_counter ...</p>';
 	flush();
@@ -990,27 +1009,32 @@ echo '<p>Genealogy records ...</p>'; ob_flush(); flush(); usleep(50000);
 WT_DB::prepare(
 	"INSERT INTO `##gedcom_chunk` (gedcom_id, chunk_data, imported)" .
 	" SELECT o_file, o_gedcom, 0 FROM `{$DBNAME}`.`{$TBLPREFIX}other`" .
+	" JOIN `##gedcom` ON (o_file = gedcom_id)" .
 	" ORDER BY o_type!='HEAD'" // Must load HEAD record first
 )->execute();
 
 WT_DB::prepare(
 	"INSERT INTO `##gedcom_chunk` (gedcom_id, chunk_data, imported)" .
-	" SELECT i_file, i_gedcom, 0 FROM `{$DBNAME}`.`{$TBLPREFIX}individuals`"
+	" SELECT i_file, i_gedcom, 0 FROM `{$DBNAME}`.`{$TBLPREFIX}individuals`" .
+	" JOIN `##gedcom` ON (i_file = gedcom_id)"
 )->execute();
 
 WT_DB::prepare(
 	"INSERT INTO `##gedcom_chunk` (gedcom_id, chunk_data, imported)" .
-	" SELECT f_file, f_gedcom, 0 FROM `{$DBNAME}`.`{$TBLPREFIX}families`"
+	" SELECT f_file, f_gedcom, 0 FROM `{$DBNAME}`.`{$TBLPREFIX}families`" .
+	" JOIN `##gedcom` ON (f_file = gedcom_id)"
 )->execute();
 
 WT_DB::prepare(
 	"INSERT INTO `##gedcom_chunk` (gedcom_id, chunk_data, imported)" .
-	" SELECT s_file, s_gedcom, 0 FROM `{$DBNAME}`.`{$TBLPREFIX}sources`"
+	" SELECT s_file, s_gedcom, 0 FROM `{$DBNAME}`.`{$TBLPREFIX}sources`" .
+	" JOIN `##gedcom` ON (s_file = gedcom_id)"
 )->execute();
 
 WT_DB::prepare(
 	"INSERT INTO `##gedcom_chunk` (gedcom_id, chunk_data, imported)" .
-	" SELECT m_gedfile, m_gedrec, 0 FROM `{$DBNAME}`.`{$TBLPREFIX}media`"
+	" SELECT m_gedfile, m_gedrec, 0 FROM `{$DBNAME}`.`{$TBLPREFIX}media`" .
+	" JOIN `##gedcom` ON (m_gedfile = gedcom_id)"
 )->execute();
 
 WT_DB::prepare(

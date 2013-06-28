@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: module.php 14963 2013-04-11 20:36:43Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -307,6 +307,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 				->addInlineJavascript('
 					jQuery("#story_table").dataTable({
 						"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
+						'.WT_I18N::datatablesI18N().',
 						"bAutoWidth":false,
 						"bPaginate": true,
 						"sPaginationType": "full_numbers",
@@ -383,6 +384,7 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			->addInlineJavascript('
 				jQuery("#story_table").dataTable({
 					"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
+					'.WT_I18N::datatablesI18N().',
 					"bAutoWidth":false,
 					"bPaginate": true,
 					"sPaginationType": "full_numbers",
@@ -417,12 +419,15 @@ class stories_WT_Module extends WT_Module implements WT_Module_Block, WT_Module_
 			foreach ($stories as $story) {
 				$indi=WT_Person::getInstance($story->xref);
 				$story_title = get_block_setting($story->block_id, 'title');
-				if ($indi) {
-					if ($indi->canDisplayDetails()) {
-						echo '<tr><td><a href="'.$indi->getHtmlUrl().'#stories">'.$story_title.'</a></td><td><a href="'.$indi->getHtmlUrl().'#stories">'.$indi->getFullName().'</a></td></tr>';
+				$languages=get_block_setting($story->block_id, 'languages');
+				if (!$languages || in_array(WT_LOCALE, explode(',', $languages))) {
+					if ($indi) {
+						if ($indi->canDisplayDetails()) {
+							echo '<tr><td><a href="'.$indi->getHtmlUrl().'#stories">'.$story_title.'</a></td><td><a href="'.$indi->getHtmlUrl().'#stories">'.$indi->getFullName().'</a></td></tr>';
+						}
+					} else {
+						echo '<tr><td>', $story_title, '</td><td class="error">', $story->xref, '</td></tr>';
 					}
-				} else {
-					echo '<tr><td>', $story_title, '</td><td class="error">', $story->xref, '</td></tr>';
 				}
 			}
 			echo '</tbody></table>';

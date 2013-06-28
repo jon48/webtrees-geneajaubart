@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
+// $Id: module.php 15026 2013-06-01 20:38:43Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -160,10 +160,10 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 			WT_I18N::translate('Narrative description')=>
 			/* I18N: do not translate the #keywords# */ WT_I18N::translate('This GEDCOM (family tree) was last updated on #gedcomUpdated#. There are #totalSurnames# surnames in this family tree. The earliest recorded event is the #firstEventType# of #firstEventName# in #firstEventYear#. The most recent event is the #lastEventType# of #lastEventName# in #lastEventYear#.<br /><br />If you have any comments or feedback please contact #contactWebmaster#.'),
 
-			WT_I18N::translate('GEDCOM statistics')=>
+			WT_I18N::translate('Statistics')=>
 			'<div class="gedcom_stats">
 				<span style="font-weight: bold"><a href="index.php?command=gedcom">#gedcomTitle#</a></span><br>
-				'.WT_I18N::translate('This GEDCOM was created using <b>%1$s</b> on <b>%2$s</b>.', '#gedcomCreatedSoftware#', '#gedcomDate#').'
+				' . WT_I18N::translate('This family tree was last updated on %s.', '#gedcomUpdated#') . '
 				<table id="keywords">
 					<tr>
 						<td valign="top" class="width20">

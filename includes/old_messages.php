@@ -27,10 +27,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: old_messages.php 14917 2013-03-26 07:57:01Z greg $
+// $Id: old_messages.php 15075 2013-06-23 09:15:17Z greg $
 
 exit;
 
-/* I18N: This message is deleted in webtrees-1.4.1  */ WT_I18N::translate('Enter associate GEDCOM ID.');
-/* I18N: This message is deleted in webtrees-1.4.1  */ WT_I18N::translate('External objects');
-/* I18N: This message is deleted in webtrees-1.4.1  */ WT_I18N::translate('You can determine whether this FAQ will be visible regardless of GEDCOM, or whether it will be visible only to the current GEDCOM.<br /><ul><li><b>ALL</b>&nbsp;&nbsp;&nbsp;The FAQ will appear in all FAQ lists, regardless of GEDCOM.</li><li><b>%s</b>&nbsp;&nbsp;&nbsp;The FAQ will appear only in the currently active GEDCOM\'s FAQ list.</li></ul>');
+// /* I18N: This message is deleted in webtrees-1.x.x  */ WT_I18N::translate('');

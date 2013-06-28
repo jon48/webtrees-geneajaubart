@@ -21,7 +21,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14879 2013-03-14 16:58:17Z lukasz $
+// $Id: module.php 15069 2013-06-20 22:59:03Z nigel $
+// @version: p_$Revision$ $Date$
+// $HeadURL$
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -268,7 +270,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 						</tr>
 						<tr>
 							<th><?php echo WT_I18N::translate('Google Street View™'); ?></th>
-							<td><?php echo radio_buttons('NEW_GM_USE_STREETVIEW', array(false=>WT_I18N::translate('hide'),true=>WT_I18N::translate('show')), get_module_setting('googlemap', 'GM_USE_STREETVIEW')); ?></td>
+							<td><?php echo radio_buttons('NEW_GM_USE_STREETVIEW', array(false=>WT_I18N::translate('hide'),true=>WT_I18N::translate('show')), get_module_setting('googlemap', 'GM_USE_STREETVIEW', '0')); ?></td>
 						</tr>
 						<tr>
 							<th><?php echo WT_I18N::translate('Size of map (in pixels)'); ?></th>
@@ -392,7 +394,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					<table class="gm_edit_config">
 						<tr>
 							<th><?php echo WT_I18N::translate('Use Google Maps™ for the place hierarchy'); ?></th>
-							<td><?php echo edit_field_yes_no('NEW_GM_PLACE_HIERARCHY', get_module_setting('googlemap', 'GM_PLACE_HIERARCHY')); ?></td>
+							<td><?php echo edit_field_yes_no('NEW_GM_PLACE_HIERARCHY', get_module_setting('googlemap', 'GM_PLACE_HIERARCHY', '0')); ?></td>
 						</tr>
 						<tr>
 							<th><?php echo WT_I18N::translate('Size of map (in pixels)'); ?></th>
@@ -665,78 +667,73 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			->addInLineJavascript('var pastefield; function paste_id(value) {pastefield.value=value;}');
 
 		echo '<link type="text/css" href ="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/css/wt_v3_googlemap.css" rel="stylesheet">';
-		echo '<div><table><tr><td valign="middle">';
-		echo '<h2>', $controller->getPageTitle(), '</h2>';
+		echo '<div id="pedigreemap-page">
+				<h2>', $controller->getPageTitle(), '</h2>';
 
 		// -- print the form to change the number of displayed generations
 		?>
-		</td>
-		<td width="50px">&nbsp;</td>
-		<td>
-			<form name="people" method="get" action="module.php?ged=<?php echo WT_GEDURL; ?>&amp;mod=googlemap&amp;mod_action=pedigree_map">
-				<input type="hidden" name="mod" value="googlemap">
-				<input type="hidden" name="mod_action" value="pedigree_map">
-				<table class="pedigree_table" width="555">
-					<tr>
-						<td class="descriptionbox wrap">
-							<?php echo WT_I18N::translate('Individual'); ?>
-						</td>
-						<td class="descriptionbox wrap">
-							<?php echo WT_I18N::translate('Generations'); ?>
-						</td>
-						<td class="descriptionbox wrap">
-							<?php echo WT_I18N::translate('Hide flags'), help_link('PEDIGREE_MAP_hideflags','googlemap'); ?>
-						</td>
-						<td class="descriptionbox wrap">
-							<?php echo WT_I18N::translate('Hide lines'), help_link('PEDIGREE_MAP_hidelines','googlemap'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td class="optionbox">
-							<input class="pedigree_form" type="text" id="rootid" name="rootid" size="3" value="<?php echo $controller->root->getXref(); ?>">
-							<?php echo print_findindi_link('rootid'); ?>
-						</td>
-						<td class="optionbox">
-							<select name="PEDIGREE_GENERATIONS">
-							<?php
-								for ($p=3; $p<=$MAX_PEDIGREE_GENERATIONS; $p++) {
-									echo '<option value="', $p, '" ';
-									if ($p == $controller->PEDIGREE_GENERATIONS) {
-										echo 'selected="selected"';
-									}
-									echo '>', $p, '</option>';
+		<form name="people" method="get" action="module.php?ged=<?php echo WT_GEDURL; ?>&amp;mod=googlemap&amp;mod_action=pedigree_map">
+			<input type="hidden" name="mod" value="googlemap">
+			<input type="hidden" name="mod_action" value="pedigree_map">
+			<table class="list_table" width="555">
+				<tr>
+					<td class="descriptionbox wrap">
+						<?php echo WT_I18N::translate('Individual'); ?>
+					</td>
+					<td class="descriptionbox wrap">
+						<?php echo WT_I18N::translate('Generations'); ?>
+					</td>
+					<td class="descriptionbox wrap">
+						<?php echo WT_I18N::translate('Hide flags'), help_link('PEDIGREE_MAP_hideflags','googlemap'); ?>
+					</td>
+					<td class="descriptionbox wrap">
+						<?php echo WT_I18N::translate('Hide lines'), help_link('PEDIGREE_MAP_hidelines','googlemap'); ?>
+					</td>
+				</tr>
+				<tr>
+					<td class="optionbox">
+						<input class="pedigree_form" type="text" id="rootid" name="rootid" size="3" value="<?php echo $controller->root->getXref(); ?>">
+						<?php echo print_findindi_link('rootid'); ?>
+					</td>
+					<td class="optionbox">
+						<select name="PEDIGREE_GENERATIONS">
+						<?php
+							for ($p=3; $p<=$MAX_PEDIGREE_GENERATIONS; $p++) {
+								echo '<option value="', $p, '" ';
+								if ($p == $controller->PEDIGREE_GENERATIONS) {
+									echo 'selected="selected"';
 								}
-							?>
-							</select>
-						</td>
-						<td class="optionbox">
-							<?php
-							echo '<input name="hideflags" type="checkbox"';
-							if ($hideflags) {
-								echo ' checked="checked"';
+								echo '>', $p, '</option>';
 							}
-							echo '>';
-							?>
-						</td>
-						<td class="optionbox">
-							<?php
-							echo '<input name="hidelines" type="checkbox"';
-							if ($hidelines) {
-								echo ' checked="checked"';
-							}
-							echo '>';
-							?>
-						</td>
-					</tr>
-					<tr>
-						<td class="topbottombar" colspan="5">
-							<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>">
-						</td>
-					</tr>
-				</table>
-			</form>
-		</td></tr>
-		</table>
+						?>
+						</select>
+					</td>
+					<td class="optionbox">
+						<?php
+						echo '<input name="hideflags" type="checkbox"';
+						if ($hideflags) {
+							echo ' checked="checked"';
+						}
+						echo '>';
+						?>
+					</td>
+					<td class="optionbox">
+						<?php
+						echo '<input name="hidelines" type="checkbox"';
+						if ($hidelines) {
+							echo ' checked="checked"';
+						}
+						echo '>';
+						?>
+					</td>
+				</tr>
+				<tr>
+					<td class="topbottombar" colspan="5">
+						<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>">
+					</td>
+				</tr>
+			</table>
+		</form>
 		<!-- end of form -->
 
 		<!-- count records by type -->
@@ -752,7 +749,6 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			if ($i+1 >= pow(2, $curgen)) {$curgen++;}
 			$person = WT_Person::getInstance($controller->treeid[$i]);
 			if (!empty($person)) {
-				$pid = $controller->treeid[$i];
 				$name = $person->getFullName();
 				if ($name == WT_I18N::translate('Private')) $priv++;
 				$place = $person->getBirthPlace();
@@ -770,18 +766,20 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					if (($lat[$i] != NULL) && ($lon[$i] != NULL)) {
 						$count++;
 					} else { // The place is in the table but has empty values
-						if (!empty($name)) {
-							if (!empty($missing)) $missing .= ', ';
-							$addlist = '<a href="'.$person->getHtmlUrl().'">'. $name . '</a>';
-							$missing .= $addlist;
+						if ($name) {
+							if ($missing) {
+								$missing .= ', ';
+							}
+							$missing .= '<a href="' . $person->getHtmlUrl() . '">' . $name . '</a>';
 							$miscount++;
 						}
 					}
 				} else { // There was no place, or not listed in the map table
-					if (!empty($name)) {
-						if (!empty($missing)) $missing .= ', ';
-						$addlist = '<a href="'.$person->getHtmlUrl().'">'. $name . '</a>';
-						$missing .= $addlist;
+					if ($name) {
+						if ($missing) {
+							$missing .= ', ';
+						}
+						$missing .= '<a href="' . $person->getHtmlUrl() . '">' . $name . '</a>';
 						$miscount++;
 					}
 				}
@@ -789,6 +787,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		}
 		//<!-- end of count records by type -->
 		//<!-- start of map display -->
+		echo '<div id="pedigreemap_chart">';
 		echo '<table class="tabs_table" cellspacing="0" cellpadding="0" border="0" width="100%">';
 		echo '<tr>';
 		echo '<td valign="top">';
@@ -849,7 +848,8 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		echo '</td>';
 		echo '</tr>';
 		echo '</table>';
-		echo '</div>';
+		echo '</div>';// close #pedigreemap_chart
+		echo '</div>';// close #pedigreemap-page
 		?>
 		<!-- end of map display -->
 		<!-- Start of map scripts -->
@@ -1247,19 +1247,14 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		for ($i=0; $i<($controller->treesize); $i++) {
 			// moved up to grab the sex of the individuals
 			$person = WT_Person::getInstance($controller->treeid[$i]);
-			if (!empty($person)) {
-				$pid = $controller->treeid[$i];
-				$indirec = $person->getGedcomRecord();
-				$sex = $person->getSex();
-				$bplace = trim($person->getBirthPlace());
-				$bdate = $person->getBirthDate();
+			if ($person) {
 				$name = $person->getFullName();
 
 				// -- check to see if we have moved to the next generation
 				if ($i+1 >= pow(2, $curgen)) {
 					$curgen++;
 				}
-				$relationship=get_relationship_name(get_relationship($controller->root->getXref(), $pid, false, 0));
+				$relationship=get_relationship_name(get_relationship($controller->root, $person, false, 0));
 				if (empty($relationship)) $relationship=WT_I18N::translate('self');
 				$event = '<img src=\"'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/images/sq'.$curgen.'.png\" width=\"10\" height=\"10\">'.
 					'<strong>&nbsp;'.$relationship.':&nbsp;</strong>';
@@ -1276,7 +1271,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				$datamid .= '('.WT_I18N::translate('View Person').')';
 				$datamid  .= '</a></span>';
 				$dataright = '<br><strong>'. WT_I18N::translate('Birth:') . '&nbsp;</strong>' .
-						addslashes($bdate->Display(false)).'<br>'.$bplace;
+						addslashes($person->getBirthDate()->Display(false)).'<br>'.$person->getBirthPlace();
 
 				$latlongval[$i] = get_lati_long_placelocation($person->getBirthPlace());
 				if ($latlongval[$i] != NULL) {
@@ -1320,7 +1315,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 						$js.= 'var point = new google.maps.LatLng('.$lat[$i].','.$lon[$i].');';
 						$js.= "var marker = createMarker(point, \"".addslashes($name)."\",\n\t\"<div>".$dataleft.$datamid.$dataright."</div>\", \"";
 						$js.= "<div class='iwstyle'>";
-						$js.= "<a href='module.php?ged=".WT_GEDURL."&amp;mod=googlemap&amp;mod_action=pedigree_map&amp;rootid={$pid}&amp;PEDIGREE_GENERATIONS={$PEDIGREE_GENERATIONS}";
+						$js.= "<a href='module.php?ged=".WT_GEDURL."&amp;mod=googlemap&amp;mod_action=pedigree_map&amp;rootid=" . $person->getXref() . "&amp;PEDIGREE_GENERATIONS={$PEDIGREE_GENERATIONS}";
 						if ($hideflags) $js.= '&amp;hideflags=1';
 						if ($hidelines) $js.= '&amp;hidelines=1';
 						$js.= "' title='".WT_I18N::translate('Pedigree map')."'>".$dataleft."</a>".$datamid.$dataright."</div>\", \"".$marker_number."\");";

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: module.php 14969 2013-04-29 17:23:24Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -138,7 +138,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 				$tv=new TreeView;
 				$content .= '<td>';
 
-				$content .= '<script>$("head").append(\'<link rel="stylesheet" href="'.$mod->css().'" type="text/css" />\');</script>';
+				$content .= '<script>jQuery("head").append(\'<link rel="stylesheet" href="'.$mod->css().'" type="text/css" />\');</script>';
 				$content .= '<script src="'.$mod->js().'"></script>';
 		    list($html, $js) = $tv->drawViewport($person->getXref(), 2);
 				$content .= $html.'<script>'.$js.'</script>';

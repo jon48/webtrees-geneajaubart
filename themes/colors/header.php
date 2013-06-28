@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 14425 2012-10-15 17:00:24Z rob $
+// $Id: header.php 14976 2013-05-11 07:53:39Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -30,6 +30,22 @@ if (!defined('WT_WEBTREES')) {
 
 global $subColor;
 
+
+// This theme uses the jQuery “colorbox” plugin to display images
+$this
+	->addExternalJavascript(WT_JQUERY_COLORBOX_URL)
+	->addExternalJavascript(WT_JQUERY_WHEELZOOM_URL)
+	->addInlineJavascript('activate_colorbox();')
+	->addInlineJavascript('jQuery.extend(jQuery.colorbox.settings, {width:"70%", height:"70%", transition:"none", slideshowStart:"'. WT_I18N::translate('Play').'", slideshowStop:"'. WT_I18N::translate('Stop').'"})') 
+
+	->addInlineJavascript('
+		jQuery.extend(jQuery.colorbox.settings, {
+			title:	function(){
+					var img_title = jQuery(this).data("title");
+					return img_title;
+			}
+		});
+	');
 echo
 	'<!DOCTYPE html>',
 	'<html ', WT_I18N::html_markup(), '>',
@@ -38,7 +54,7 @@ echo
 	'<title>', htmlspecialchars($title), '</title>',
 	header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
 	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
-	'<link rel="stylesheet" href="', WT_STATIC_URL, 'js/jquery/css/jquery-ui.custom.css" type="text/css">',
+	'<link rel="stylesheet" href="', WT_THEME_URL, 'jquery-ui-1.10.3/jquery-ui-1.10.3.custom.css" type="text/css">',
 	'<link rel="stylesheet" href="', WT_THEME_URL, 'css/colors.css" type="text/css">',
 	'<link rel="stylesheet" href="', WT_THEME_URL,  'css/',  $subColor,  '.css" type="text/css" media="all">';
 
@@ -75,12 +91,10 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 	echo
 	// Top row left
 	'<div id="header">',
-	'<div id="spacer""></div>',
 	'<span class="title" dir="auto">', WT_TREE_TITLE, '</span>';
 
 	// Top row right 
 	echo 
-	'<div class="optionsMenu" >',
 	'<ul class="makeMenu">';
 
 	if (WT_USER_ID) {
@@ -126,7 +140,7 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 			'</form>',
 		'</li>',
 	'</ul>',
-	'</div>';
+'</div>';
 
 	// Second Row menu and palette selection
 	// Menu
@@ -145,7 +159,7 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 
 	// Print the menu bar
 	echo
-		'<div id="topMenu">',
+
 		'<ul id="main-menu">'; 
 		foreach ($menu_items as $menu) {
 			if ($menu) {
@@ -154,21 +168,15 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 		}
 	unset($menu_items, $menu);
 	echo
-		'</ul>',
-		'</div>'; // <div id="topMenu">
-	echo '</div>'; // <div id="header">
-
-	// NOTE: in other themes, the flash-messages are inside #header.
-	// However, in this theme, it causes them to overlap with #content.
-	// Display feedback from asynchronous actions
-	echo '<div id="flash-messages">';
-	foreach (Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->getMessages() as $message) {
-		echo '<p class="ui-state-highlight">', $message, '</p>';
-	}
-	echo '</div>'; // <div id="flash-messages">
+		'</ul>'; 
 }
 // Remove list from home when only 1 gedcom 
 $this->addInlineJavaScript(
 	'if (jQuery("#menu-tree ul li").length == 2) jQuery("#menu-tree ul li:last-child").remove();'
 );
-echo $javascript, '<div id="content">';
+
+echo
+	$javascript,
+	WT_FlashMessages::getHtmlMessages(), // Feedback from asynchronous actions
+	'<div id="content">';
+

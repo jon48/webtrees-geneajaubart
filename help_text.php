@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: help_text.php 14902 2013-03-24 08:18:11Z greg $
+// $Id: help_text.php 15042 2013-06-14 20:47:19Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -49,11 +49,6 @@ switch ($help) {
 	// Generally, these tags need to be lists explicitly in add_simple_tag()
 	//////////////////////////////////////////////////////////////////////////////
 
-case 'ABBR':
-	$title=WT_Gedcom_Tag::getLabel('ABBR');
-	$text=WT_I18N::translate('Use this field for storing an abbreviated version of a title.  This field is used in conjunction with the title field on sources.  By default <b>webtrees</b> will first use the title and then the abbreviated title.<br /><br />According to the GEDCOM 5.5 specification, "this entry is to provide a short title used for sorting, filing, and retrieving source records (pg 62)."<br /><br />In <b>webtrees</b> the abbreviated title is optional, but in other genealogical programs it is required.');
-	break;
-
 case 'ADDR':
 	$title=WT_Gedcom_Tag::getLabel('ADDR');
 	$text=WT_I18N::translate('Enter the address into the field just as you would write it on an envelope.<br /><br />Leave this field blank if you do not want to include an address.');
@@ -64,24 +59,19 @@ case 'AGNC':
 	$text=WT_I18N::translate('The organization, institution, corporation, person, or other entity that has authority.<br /><br />For example, an employer of a person, or a church that administered rites or events, or an organization responsible for creating and/or archiving records.');
 	break;
 
-case 'ASSO':
+case 'ASSO_1':
 	$title=WT_Gedcom_Tag::getLabel('ASSO');
-	$text=WT_I18N::translate('An associate is another indivdual who was involved with this individual, such as a friend or an employer.');
+	$text=WT_I18N::translate('An associate is another individual who was involved with this individual, such as a friend or an employer.');
 	break;
 
-case '_ASSO':
+case 'ASSO_2':
 	$title=WT_Gedcom_Tag::getLabel('ASSO');
-	$text=WT_I18N::translate('An associate is another indivdual who was involved with this fact or event, such as a witness or a priest.');
+	$text=WT_I18N::translate('An associate is another individual who was involved with this fact or event, such as a witness or a priest.');
 	break;
 
 case 'CAUS':
 	$title=WT_Gedcom_Tag::getLabel('CAUS');
 	$text=WT_I18N::translate('A description of the cause of the associated event or fact, such as the cause of death.');
-	break;
-
-case 'CEME':
-	$title=WT_Gedcom_Tag::getLabel('CEME');
-	$text=WT_I18N::translate('Enter the name of the cemetery or other resting place where individual is buried.');
 	break;
 
 case 'DATE':
@@ -397,16 +387,6 @@ case 'TIME':
 	$text=WT_I18N::translate('Enter the time for this event in 24-hour format with leading zeroes. Midnight is 00:00. Examples: 04:50 13:00 20:30.');
 	break;
 
-case 'TITL':
-	$title=WT_Gedcom_Tag::getLabel('TITL');
-	$text=WT_I18N::translate('Enter a title for the item you are editing.  If this is a title for a multimedia item, enter a descriptive title that will identify that item to the user.');
-	break;
-
-case 'TYPE':
-	$title=WT_Gedcom_Tag::getLabel('TYPE');
-	$text=WT_I18N::translate('The Type field is used to enter additional information about the item.  In most cases, the field is completely free-form, and you can enter anything you want.');
-	break;
-
 case 'URL':
 	$title=WT_Gedcom_Tag::getLabel('URL');
 	$text=WT_I18N::translate('Enter the URL address including the http://.<br /><br />An example URL looks like this: <b>http://www.webtrees.net/</b> Leave this field blank if you do not want to include a URL.');
@@ -442,13 +422,8 @@ case 'ADVANCED_PLAC_FACTS':
 	break;
 
 case 'ALLOW_CHANGE_GEDCOM':
-	$title=WT_I18N::translate('Allow GEDCOM switching');
-	$text=WT_I18N::translate('If you have an environment with multiple GEDCOMs, setting this value to <b>Yes</b> allows your site visitors <u>and</u> users to have the option of changing GEDCOMs.  Setting it to <b>No</b> disables GEDCOM switching for both visitors <u>and</u> logged in users.');
-	break;
-
-case 'ALLOW_EDIT_GEDCOM':
-	$title=WT_I18N::translate('Online editing');
-	$text=WT_I18N::translate('This option enables online editing features for this database so that users with Edit privileges may update data online.');
+	$title=WT_I18N::translate('Show list of family trees');
+	$text=/* I18N: Help text for the “Show list of family trees” site configuration setting */ WT_I18N::translate('For sites with more than one family tree, this option will show the list of family trees in the main menu, the search pages, etc.');
 	break;
 
 case 'ALLOW_THEME_DROPDOWN':
@@ -603,7 +578,7 @@ case 'INDEX_DIRECTORY':
 	$title=WT_I18N::translate('Data folder');
 	$text=
 		'<p>'.
-		WT_I18N::translate('This folder will be used by webtrees to store media files, GEDCOM files, temporary files, etc.  These files may contain private data, and should not be made available over the internet.').
+		/* I18N: Help text for the "Data folder" site configuration setting */ WT_I18N::translate('This folder will be used by webtrees to store media files, GEDCOM files, temporary files, etc.  These files may contain private data, and should not be made available over the internet.').
 		'</p><p>'.
 		/* I18N: “Apache” is a software program. */ WT_I18N::translate('To protect this private data, webtrees uses an Apache configuration file (.htaccess) which blocks all access to this folder.  If your web-server does not support .htaccess files, and you cannot restrict access to this folder, then you can select another folder, away from your web documents.').
 		'</p><p>'.
@@ -639,8 +614,8 @@ case 'LANGUAGE':
 	break;
 
 case 'LOGIN_URL':
-	$title=WT_I18N::translate('Login URL');
-	$text=WT_I18N::translate('You only need to enter a Login URL if you want to redirect to a different site or location when your users login.  This is very useful if you need to switch from http to https when your users login.  Include the full URL to <i>login.php</i>.  For example, https://www.yourserver.com/webtrees/login.php .');
+	$title=/* I18N: A site configuration setting */ WT_I18N::translate('Login URL');
+	$text=/* I18N: Help text for the “Login URL” site configuration setting */ WT_I18N::translate('You only need to enter a Login URL if you want to redirect to a different site or location when your users login.  This is very useful if you need to switch from http to https when your users login.  Include the full URL to <i>login.php</i>.  For example, https://www.yourserver.com/webtrees/login.php .');
 	break;
 
 case 'MAX_ALIVE_AGE':
@@ -725,13 +700,13 @@ case 'NOTE_ID_PREFIX':
 	break;
 
 case 'PEDIGREE_FULL_DETAILS':
-	$title=WT_I18N::translate('Birth and death details on charts');
-	$text=WT_I18N::translate('This option controls whether or not to show the Birth and Death details of an individual on charts.');
+	$title=/* I18N: A site configuration setting */ WT_I18N::translate('Show chart details by default');
+	$text=/* I18N: Help text for the “Show chart details by default” tree configuration setting */ WT_I18N::translate('This is the initial setting for the “show details” option on the charts.');
 	break;
 
 case 'PEDIGREE_LAYOUT':
-	$title=WT_I18N::translate('Default pedigree chart layout');
-	$text=WT_I18N::translate('This option indicates whether the Pedigree chart should be generated in landscape or portrait mode.');
+	$title=/* I18N: A site configuration setting */ WT_I18N::translate('Default pedigree chart layout');
+	$text=/* I18N: Help text for the “Default pedigree chart layout” tree configuration setting */ WT_I18N::translate('This option indicates whether the Pedigree chart should be generated in landscape or portrait mode.');
 	break;
 
 case 'PEDIGREE_SHOW_GENDER':
@@ -750,13 +725,13 @@ case 'RELATIONSHIP_PATH_LENGTH':
 	break;
 
 case 'SESSION_TIME':
-	$title=WT_I18N::translate('Session timeout');
-	$text=WT_I18N::translate('The time in seconds that a <b>webtrees</b> session remains active before requiring a login.  The default is 7200, which is 2 hours.');
+	$title/* I18N: A site configuration setting */ =WT_I18N::translate('Session timeout');
+	$text=/* I18N: Help text for the “Session timeout” site configuration setting */ WT_I18N::translate('The time in seconds that a <b>webtrees</b> session remains active before requiring a login.  The default is 7200, which is 2 hours.');
 	break;
 
 case 'SMTP_ACTIVE':
-	$title=WT_I18N::translate('Use SMTP to send external mails');
-	$text=WT_I18N::translate('Use SMTP to send e-mails from <b>webtrees</b>.<br /><br />This option requires access to an SMTP mail server.  When set to <b>No</b> <b>webtrees</b> will use the e-mail system built into PHP on this server.');
+	$title=/* I18N: A site configuration setting */ WT_I18N::translate('Messages');
+	$text=/* I18N: Help text for the “Messages” site configuration setting */ WT_I18N::translate('<b>webtrees</b> needs to send emails, such as password reminders and site notifications.  To do this, it can use this server\'s built in PHP mail facility (which is not always available) or an external SMTP (mail-relay) service, for which you will need to provide the connection details.');
 	break;
 
 case 'SMTP_AUTH_PASS':
@@ -771,39 +746,32 @@ case 'SMTP_AUTH_USER':
 
 case 'SMTP_AUTH':
 	$title=WT_I18N::translate('Use password');
-	$text=WT_I18N::translate('Use name and password authentication to connect to the SMTP server.<br /><br />Some SMTP servers require all connections to be authenticated before they will accept outbound e-mails.');
+	$text=/* I18N: Help text for the “Use password” site configuration setting */ WT_I18N::translate('Most SMTP servers require a password.');
 	break;
 
 case 'SMTP_FROM_NAME':
-	$title=WT_I18N::translate('From email address');
-	// This text also exists in setup.php
-	$text=WT_I18N::translate('This is used in the "From:" header when sending mails.');
+	$title=/* I18N: A site configuration setting */ WT_I18N::translate('Sender name');
+	$text=/* I18N: Help text for the “Sender name” site configuration setting */ WT_I18N::translate('This name is used in the “From” field, when sending automatic emails from this server.');
 	break;
 
 case 'SMTP_HELO':
-	$title=WT_I18N::translate('Sender email address');
-	// This text also exists in setup.php
-	$text=WT_I18N::translate('This is used in the "Sender:" header when sending mails.  It is often the same as the "From:" header.');
+	$title=/* I18N: A site configuration setting */ WT_I18N::translate('Sending server name');
+	$text=/* I18N: Help text for the “Sending server name” site configuration setting */ WT_I18N::translate('Many mail servers require that the sending server identifies itself correctly, using a valid domain name.');
 	break;
 
 case 'SMTP_HOST':
-	$title=WT_I18N::translate('Outgoing server (SMTP) name');
-	$text=WT_I18N::translate('This is the name of the SMTP mail server.  Example: <b>smtp.foo.bar.com</b>.<br /><br />Configuration values for some e-mail providers:<br /><br /><b>Gmail<br /></b><br /><b>Outgoing server (SMTP) name:</b> smtp.gmail.com<br /><b>SMTP Port:</b> 465 or 587<br /><b>Secure connection:</b> SSL<br /><br /><b>Hotmail<br /></b><br /><b>Outgoing server (SMTP) name:</b> smtp.live.com<br /><b>SMTP Port:</b> 25 or 587<br /><b>Secure connection:</b> TLS<br /><br /><b>Yahoo Mail Plus (currently a paid service)<br /></b><br /><b>Outgoing server (SMTP) name:</b> smtp.mail.yahoo.com<br /><b>SMTP Port:</b> 25');
+	$title=/* I18N: A site configuration setting */ WT_I18N::translate('Server name');
+	$text=/* I18N: Help text for the “Server name” site configuration setting */ WT_I18N::translate('This is the name of the SMTP server. \'localhost\' means that the mail service is running on the same computer as your web server.');
 	break;
 
 case 'SMTP_PORT':
-	$title=WT_I18N::translate('SMTP port');
-	$text=WT_I18N::translate('The port number to be used for connections to the SMTP server.  Generally, this is port <b>25</b>.');
+	$title=/* I18N: A site configuration setting */ WT_I18N::translate('Port number');
+	$text=/* I18N: Help text for the "Port number" site configuration setting */ WT_I18N::translate('By default, SMTP works on port 25.');
 	break;
 
 case 'SMTP_SSL':
-	$title=WT_I18N::translate('Secure connection');
-	$text=WT_I18N::translate('Transport Layer Security (TLS) and Secure Sockets Layer (SSL) are Internet data encryption protocols.<br /><br />TLS 1.0, 1.1 and 1.2 are standardized developments of SSL 3.0. TLS 1.0 and SSL 3.1 are equivalent. Further work on SSL is now done under the new name, TLS.<br /><br />If your SMTP Server requires the SSL protocol during login, you should select the <b>SSL</b> option. If your SMTP Server requires the TLS protocol during login, you should select the <b>TLS</b> option.');
-	break;
-
-case 'STORE_MESSAGES':
-	$title=WT_I18N::translate('Allow messages to be stored online');
-	$text=WT_I18N::translate('Specifies whether messages sent through <b>webtrees</b> can be stored in the database.  If set to <b>Yes</b> users will be able to retrieve their messages when they login to <b>webtrees</b>.  If set to <b>No</b> messages will only be emailed.');
+	$title=/* I18N: A site configuration setting */ WT_I18N::translate('Secure connection');
+	$text=/* I18N: Help text for the "Secure connection" site configuration setting */ WT_I18N::translate('Most servers do not use secure connections.');
 	break;
 
 case 'WEBTREES_EMAIL':
@@ -856,19 +824,9 @@ case 'REQUIRE_AUTHENTICATION':
 	$text=WT_I18N::translate('Enabling this option will force all visitors to login before they can view any data on the site.');
 	break;
 
-case 'SAVE_WATERMARK_IMAGE':
-	$title=WT_I18N::translate('Store watermarked full size images on server?');
-	$text=WT_I18N::translate('If the Media Firewall is enabled, should copies of watermarked full size images be stored on the server in addition to the same images without watermarks?<br /><br />When set to <b>Yes</b>, full-sized watermarked images will be produced more quickly at the expense of higher server disk space requirements.');
-	break;
-
-case 'SAVE_WATERMARK_THUMB':
-	$title=WT_I18N::translate('Store watermarked thumbnails on server?');
-	$text=WT_I18N::translate('If the Media Firewall is enabled, should copies of watermarked thumbnails be stored on the server in addition to the same thumbnails without watermarks?<br /><br />When set to <b>Yes</b>, media lists containing watermarked thumbnails will be produced more quickly at the expense of higher server disk space requirements.');
-	break;
-
 case 'SERVER_URL':
 	$title=WT_I18N::translate('Website URL');
-	$text=WT_I18N::translate('If your site can be reached using more than one URL, such as <b>http://www.example.com/webtrees/</b> and <b>http://webtrees.example.com/</b>, you can specify the preferred URL.  Requests for the other URLs will be redirected to the preferred one.');
+	$text=/* I18N: Help text for the "Website URL" site configuration setting */ WT_I18N::translate('If your site can be reached using more than one URL, such as <b>http://www.example.com/webtrees/</b> and <b>http://webtrees.example.com/</b>, you can specify the preferred URL.  Requests for the other URLs will be redirected to the preferred one.');
 	break;
 
 case 'SHOW_COUNTER':
@@ -915,11 +873,6 @@ case 'SHOW_LIVING_NAMES':
 case 'SHOW_MEDIA_DOWNLOAD':
 	$title=WT_I18N::translate('Show download link in media viewer');
 	$text=WT_I18N::translate('The Media Viewer can show a link which, when clicked, will download the Media file to the local PC.<br /><br />You may want to hide the download link for security reasons.');
-	break;
-
-case 'SHOW_NO_WATERMARK':
-	$title=WT_I18N::translate('Who can view non-watermarked images?');
-	$text=WT_I18N::translate('If the Media Firewall is enabled, users will see watermarks if they do not have the privilege level specified here.');
 	break;
 
 case 'SHOW_PARENTS_AGE':
@@ -1029,7 +982,7 @@ case 'SURNAME_TRADITION':
 case 'THEME':
 	$title=WT_I18N::translate('Theme');
 	$text=
-		WT_I18N::translate('You can change the appearance of <b>webtrees</b> using "themes".  Each theme has a different style, layout, color scheme, etc.').
+		/* I18N: Help text for the "Default Theme" site configuration setting */ WT_I18N::translate('You can change the appearance of <b>webtrees</b> using "themes".  Each theme has a different style, layout, color scheme, etc.').
 		'<br/><br/>'.
 		WT_I18N::translate('Themes can be selected at three levels: user, GEDCOM, and site.  User settings take priority over GEDCOM settings, which in turn take priority over the site setting.  Selecting "default theme" at user level will give the setting for the current GEDCOM.  Selecting "default theme" at GEDCOM level will give the site setting.');
 	break;
@@ -1065,9 +1018,16 @@ case 'USE_SILHOUETTE':
 	." </td><td><img src=\"".$WT_IMAGES["default_image_U"]."\" width=\"40\" alt=\"\" title=\"\" /></td></tr></table>";
 	break;
 
-case 'WATERMARK_THUMB':
-	$title=WT_I18N::translate('Add watermarks to thumbnails?');
-	$text=WT_I18N::translate('If the Media Firewall is enabled, should thumbnails be watermarked? Your media lists will load faster if you don\'t watermark the thumbnails.');
+case 'Watermarks':
+	$title = WT_I18N::translate('Watermarks');
+	$text  =
+		'<p>' .
+		WT_I18N::translate('A watermark is text that is added to an image, to discourage others from copying it without permission.') .
+		'</p><p>' .
+		WT_I18N::translate('Watermarks are optional and normally shown just to visitors.') .
+		'</p><p>' .
+		WT_I18N::translate('Watermarks can be slow to generate for large images.  Busy sites may prefer to generate them once and store the watermarked image on the server.') .
+		'</p>';
 	break;
 
 case 'WEBMASTER_USER_ID':
@@ -1075,7 +1035,7 @@ case 'WEBMASTER_USER_ID':
 	$text=WT_I18N::translate('The person to be contacted about technical questions or errors encountered on your site.');
 	break;
 
-case 'WELCOME_TEXT_AUTH_MODE_CUST_HEAD':
+case 'WELCOME_TEXT_CUST_HEAD':
 	$title=WT_I18N::translate('Standard header for custom welcome text');
 	$text=WT_I18N::translate('Choose to display a standard header for your custom Welcome text.  When your users change language, this header will appear in the new language.<br /><br />If set to <b>Yes</b>, the header will look like this:<div class="list_value_wrap"><center><b>Welcome to this Genealogy website</b></center><br />Access is permitted to users who have an account and a password for this website.<br /></div>');
 	break;
@@ -1106,11 +1066,6 @@ case 'add_facts':
 	$text.='<b>'.WT_I18N::translate('Add from clipboard').'</b>';
 	$text.='<br/><br/>';
 	$text.=WT_I18N::translate('<b>webtrees</b> allows you to copy up to 10 facts, with all their details, to a clipboard.  This clipboard is different from the Clippings Cart that you can use to export portions of your database.<br /><br />You can select any of the facts from the clipboard and copy the selected fact to the Individual, Family, Media, Source, or Repository record currently being edited.  However, you cannot copy facts of dissimilar record types.  For example, you cannot copy a Marriage fact to a Source or an Individual record since the Marriage fact is associated only with Family records.<br /><br />This is very helpful when entering similar facts, such as census facts, for many individuals or families.');
-	break;
-
-case 'add_media_linkid':
-	$title=WT_I18N::translate('Link ID');
-	$text=WT_I18N::translate('Each media item should be associated with one or more person, family, or source records in your database.<br /><br />To establish such a link, you can enter or search for the ID of the person, family, or source at the same time as you create the media item.  You can also establish the link later through editing options on the Manage MultiMedia page, or by adding media items through the Add Media link available on the Individual, Family, or Source Details pages.');
 	break;
 
 case 'add_new_gedcom':
@@ -1429,7 +1384,7 @@ case 'role':
 		WT_I18N::translate('A role is a set of access rights, which give permission to view data, change configuration settings, etc.  Access rights are assigned to roles, and roles are granted to users.  Each family tree can assign different access to each role, and users can have a different role in each family tree.').
 		'<br/><br>'.
 		'<dl>'.
-		'<dt>'.WT_I18N::translate('Visitors').'</dt><dd>'.
+		'<dt>'.WT_I18N::translate('Visitor').'</dt><dd>'.
 		WT_I18N::translate('Everybody has this role, including visitors to the site and search engines.').
 		'</dd>'.
 		'<dl>'.
@@ -1454,9 +1409,9 @@ case 'role':
 		'</dd>';
 	break;
 
-case 'search_include_ASSO':
-	$title=WT_I18N::translate('Associates');
-	$text=WT_I18N::translate('This option causes <b>webtrees</b> to show all individuals who are recorded as having an association relationship to the person or family that was found as a direct result of the search.  The inverse, where all persons or families are shown when a person found as a direct result of the search has an association relationship to these other persons or families, is not possible.<br /><br />Example:  Suppose person <b>A</b> is godparent to person <b>B</b>.  This relationship is recorded in the GEDCOM record of person <b>B</b> by means of an ASSO tag.  No corresponding tag exists in the GEDCOM record of person <b>A</b>.<br /><br />When this option is set to <b>Yes</b> and the Search results list includes <b>B</b>, <b>A</b> will be included automatically because of the ASSO tag in the GEDCOM record of <b>B</b>.  However, if the Search results list includes <b>A</b>, <b>B</b> will not be included automatically since there is no matching ASSO tag in the GEDCOM record of person <b>A</b>.');
+case 'SHOW_AGE_DIFF':
+	$title=WT_I18N::translate('Date differences');
+	$text=WT_I18N::translate('When this option is selected, webtrees will calculate the age differences between siblings, children, spouses, etc.');
 	break;
 
 case 'show_fact_sources':

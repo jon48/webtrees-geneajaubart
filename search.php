@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search.php 14306 2012-09-16 06:48:51Z greg $
+// $Id: search.php 15010 2013-05-27 16:45:37Z greg $
 
 define('WT_SCRIPT_NAME', 'search.php');
 require './includes/session.php';
@@ -128,7 +128,7 @@ echo '<div id="search-page">
 				echo ' value="yes" id="srnote" name="srnote">
 					<label for="srnote">' ,  WT_I18N::translate('Shared notes'), '</label>
 			</p></div>
-			<div class="label">' , WT_I18N::translate('Associates'), help_link('search_include_ASSO'), '</div>
+			<div class="label">' , WT_I18N::translate('Associates'), '</div>
 			<div class="value"><input type="checkbox" id="showasso" name="showasso" value="on"';
 				if ($controller->showasso == 'on') echo ' checked="checked"'; 
 			echo '><label for="showasso">' , WT_I18N::translate('Show related persons/families'), '</label></div>';

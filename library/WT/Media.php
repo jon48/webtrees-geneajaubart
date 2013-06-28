@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Media.php 14833 2013-02-24 14:38:56Z rob $
+// $Id: Media.php 14956 2013-04-08 23:34:26Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,26 +29,30 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Media extends WT_GedcomRecord {
-	var $title         =null;
-	var $file          =null;
+	public $title = null; // TODO: these should be private, with getTitle() and getFilename() functions
+	public $file  = null;
 
 	// Create a Media object from either raw GEDCOM data or a database row
 	public function __construct($data) {
+		parent::__construct($data);
+
 		if (is_array($data)) {
 			// Construct from a row from the database
-			$this->title=$data['m_titl'];
 			$this->file =$data['m_filename'];
+			$this->title=$data['m_titl'];
 		} else {
 			// Construct from raw GEDCOM data
-			$this->title = get_gedcom_value('TITL', 1, $data);
-			if (empty($this->title)) {
-				$this->title = get_gedcom_value('TITL', 2, $data);
+			if (preg_match('/\n1 FILE (.+)/', $data, $match)) {
+				$this->file = $match[1];
+			} else {
+				$this->file = '';
 			}
-			$this->file = get_gedcom_value('FILE', 1, $data);
+			if (preg_match('/\n\d TITL (.+)/', $data, $match)) {
+				$this->title = $match[1];
+			} else {
+				$this->title = $this->file;
+			}
 		}
-		if (empty($this->title)) $this->title = $this->file;
-
-		parent::__construct($data);
 	}
 
 	// Implement media-specific privacy logic ...
@@ -102,8 +106,8 @@ class WT_Media extends WT_GedcomRecord {
 	public function getServerFilename($which='main') {
 		global $MEDIA_DIRECTORY, $THUMBNAIL_WIDTH;
 
-		if ($this->isExternal()) {
-			// External image
+		if ($this->isExternal() || !$this->file) {
+			// External image, or (in the case of corrupt GEDCOM data) no image at all
 			return $this->file;
 		} elseif ($which=='main') {
 			// Main image
@@ -339,12 +343,12 @@ class WT_Media extends WT_GedcomRecord {
 	public function getHtmlUrlDirect($which='main', $download=false) {
 		// “cb” is “cache buster”, so clients will make new request if anything significant about the user or the file changes
 		// The extension is there so that image viewers (e.g. colorbox) can do something sensible
-		$thumbstr = ($which=='thumb') ? '&thumb=1' : '';
+		$thumbstr = ($which=='thumb') ? '&amp;thumb=1' : '';
 		$downloadstr = ($download) ? '&dl=1' : '';
 		return
 			'mediafirewall.php?mid=' . $this->getXref() . $thumbstr . $downloadstr .
-			'&ged=' . rawurlencode(get_gedcom_from_id($this->ged_id)) .
-			'&cb=' . $this->getEtag($which);
+			'&amp;ged=' . rawurlencode(get_gedcom_from_id($this->ged_id)) .
+			'&amp;cb=' . $this->getEtag($which);
 	}
 
 	// What file extension is used by this file?
@@ -410,7 +414,7 @@ class WT_Media extends WT_GedcomRecord {
 				' src="'   . $this->getHtmlUrlDirect('thumb') . '"' .
 				' alt="'   . strip_tags($this->getFullName()) . '"' .
 				' title="' . strip_tags($this->getFullName()) . '"' .
-				$imgsize[3] . // height="yyy" width="xxx"
+				' '. $imgsize[3] . // height="yyy" width="xxx"
 				'>';
 		}
 

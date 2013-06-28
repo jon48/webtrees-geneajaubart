@@ -25,7 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: individual.php 14806 2013-02-15 21:01:05Z greg $
+// $Id: individual.php 14966 2013-04-20 03:49:26Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -236,9 +236,9 @@ foreach ($controller->tabs as $tab) {
 		// id, which means that we cannot use the tab's title/description.  (The
 		// documentation suggests simply replacing spaces with underscores, but
 		// this will only work for English.)  We can wrap the tab's title in its
-		// own <div title="">, but jQueryUI gives the <a> element padding, which
+		// own <span title="">, but jQueryUI gives the <a> element padding, which
 		// shows the correct title on the text but the wrong title on the padding.
-		// So,... move the padding from the <a> to the internal <div>
+		// So,... move the padding from the <a> to the internal <span>.
 		echo '<li class="'.$greyed_out.'"><a title="', $tab->getName(), '" href="';
 		if ($tab->canLoadAjax()) {
 			// AJAX tabs load only when selected
@@ -247,7 +247,7 @@ foreach ($controller->tabs as $tab) {
 			// Non-AJAX tabs load immediately
 			echo '#', $tab->getName();
 		}
-		echo '"><div title="', $tab->getDescription(), '"><span>', $tab->getTitle(), '</span></div></a></li>';
+		echo '"><span title="', $tab->getDescription(), '">', $tab->getTitle(), '</span></a></li>';
 	}
 }
 echo '</ul>';

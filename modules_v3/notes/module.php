@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14771 2013-02-04 16:42:55Z greg $
+// $Id: module.php 15053 2013-06-16 10:34:46Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -62,24 +62,24 @@ class notes_WT_Module extends WT_Module implements WT_Module_Tab {
 			</tr>
 		<?php
 		$globalfacts = $controller->getGlobalFacts();
-		foreach ($globalfacts as $key => $event) {
+		foreach ($globalfacts as $event) {
 			$fact = $event->getTag();
 			if ($fact=='NAME') {
-				print_main_notes($event, 2, $controller->record->getXref(), true);
+				print_main_notes($event, 2);
 			}
 		}
 		$otherfacts = $controller->getOtherFacts();
-		foreach ($otherfacts as $key => $event) {
+		foreach ($otherfacts as $event) {
 			$fact = $event->getTag();
 			if ($fact=='NOTE') {
-				print_main_notes($event, 1, $controller->record->getXref());
+				print_main_notes($event, 1);
 			}
 		}
 		// 2nd to 5th level notes/sources
 		$controller->record->add_family_facts(false);
-		foreach ($controller->getIndiFacts() as $key => $factrec) {
+		foreach ($controller->getIndiFacts() as $factrec) {
 			for ($i=2; $i<6; $i++) {
-				print_main_notes($factrec, $i, $controller->record->getXref(), true);
+				print_main_notes($factrec, $i);
 			}
 		}
 		if ($this->get_note_count()==0) {

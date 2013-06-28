@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: inverselink.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: inverselink.php 15040 2013-06-14 20:33:24Z greg $
 
 define('WT_SCRIPT_NAME', 'inverselink.php');
 require './includes/session.php';
@@ -83,7 +83,7 @@ if ($linkto=='manage' && array_key_exists('GEDFact_assistant', WT_Module::getAct
 		echo '<input type="hidden" name="ged" value="', $GEDCOM, '">';
 		echo '<table class="facts_table">';
 		echo '<tr><td class="topbottombar" colspan="2">';
-		echo WT_I18N::translate('Link to an existing media object'), help_link('add_media_linkid');
+		echo WT_I18N::translate('Link to an existing media object');
 		echo '</td></tr><tr><td class="descriptionbox width20 wrap">', WT_I18N::translate('Media'), '</td>';
 		echo '<td class="optionbox wrap">';
 		if (!empty($mediaid)) {

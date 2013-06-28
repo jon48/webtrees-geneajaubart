@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_0_inverselink.php 14762 2013-02-03 08:44:20Z greg $
+// $Id: media_0_inverselink.php 15040 2013-06-14 20:33:24Z greg $
 
 // GEDFact Media assistant replacement code for inverselink.php: ===========================
 
@@ -85,7 +85,7 @@ if ($action == 'choose' && $paramok) {
 	echo '<input type="hidden" name="ged" value="', $GEDCOM, '">';
 	echo '<table class="facts_table center">';
 	echo '<tr><td class="topbottombar" colspan="2">';
-	echo WT_I18N::translate('Link to an existing media object'), help_link('add_media_linkid');
+	echo WT_I18N::translate('Link to an existing media object');
 	echo '</td></tr><tr><td class="descriptionbox width20 wrap">', WT_I18N::translate('Media'), '</td>';
 	echo '<td class="optionbox wrap">';
 	if (!empty($mediaid)) {
@@ -637,7 +637,7 @@ function unlinkMedia($linktoid, $linenum, $mediaid, $level=1, $chan=true) {
 	//-- when deleting/unlinking a media link
 	//-- $linenum comes as an OBJE and the $mediaid to delete should be set
 	if (!is_numeric($linenum)) {
-		$newged = remove_subrecord($gedrec, $linenum, $mediaid);
+		$newged = remove_media_subrecord($gedrec, $mediaid);
 	} else {
 		$newged = remove_subline($gedrec, $linenum);
 	}

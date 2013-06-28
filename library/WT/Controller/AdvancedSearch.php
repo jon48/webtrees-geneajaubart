@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: AdvancedSearch.php 14557 2012-11-17 09:20:06Z greg $
+// $Id: AdvancedSearch.php 15045 2013-06-14 21:25:04Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -117,7 +117,8 @@ class WT_Controller_AdvancedSearch extends WT_Controller_Search {
 			'_MILI',
 		);
 		// Allow (some of) the user-specified fields to be selected
-		foreach (explode(',', get_gedcom_setting(WT_GED_ID, 'INDI_FACTS_ADD')) as $fact) {
+		preg_match_all('/(' . WT_REGEX_TAG . ')/', get_gedcom_setting(WT_GED_ID, 'INDI_FACTS_ADD'), $facts);
+		foreach ($facts[1] as $fact) {
 			if (
 				$fact!='BIRT' &&
 				$fact!='DEAT' &&

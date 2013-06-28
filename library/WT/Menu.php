@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// $Id: Menu.php 14807 2013-02-16 14:11:22Z greg $
+// $Id: Menu.php 14960 2013-04-09 19:40:29Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -136,22 +136,6 @@ class WT_Menu {
 			return '<li id="'.$this->id.'">'.$html.'</li>';
 		} else {
 			return '<li>'.$html.'</li>';
-		}
-	}
-
-	// Get the menu as a dropdown form element
-	function getMenuAsDropdown() {
-		if (!$this->link && !$this->submenus) {
-			return '';
-		}
-		if ($this->submenus) {
-			$options='<option value="'.$this->link.'">'.$this->label.'</option>';
-			foreach ($this->submenus as $submenu) {
-				$options.=$submenu->getMenuAsDropdown();
-			}
-			return '<select onchange="document.location=this.value;">'.$options.'</select>';
-		} else {
-			return '<option value="'.$this->link.'">'.$this->label.'</option>';
 		}
 	}
 

@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Stats.php 14754 2013-02-02 21:14:34Z greg $
+// $Id: Stats.php 15019 2013-06-01 17:03:34Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -4042,7 +4042,7 @@ class WT_Stats {
 	// century name, English => 21st, Polish => XXI, etc.
 	private static function _centuryName($century) {
 		if ($century<0) {
-			return str_replace(-$century, WT_I18N::_centuryName(-$century), WT_I18N::translate('%s&nbsp;BCE', WT_I18N::number(-$century)));
+			return str_replace(-$century, WT_Stats::_centuryName(-$century), /* I18N: BCE=Before the Common Era, for Julian years < 0.  See http://en.wikipedia.org/wiki/Common_Era */ WT_I18N::translate('%s BCE', WT_I18N::number(-$century)));
 		}
 		switch ($century) {
 		case 21: return WT_I18N::translate_c('CENTURY', '21st');

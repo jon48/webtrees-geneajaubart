@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Tree.php 14916 2013-03-25 17:44:09Z greg $
+// $Id: Tree.php 15038 2013-06-12 07:17:35Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -120,11 +120,10 @@ class WT_Tree {
 	
 	// Can a user accept changes for this tree?
 	public function canAcceptChanges($user_id) {
-		// An admin/manager can always accept changes, even if editing is disabled
 		return
 			userIsAdmin($user_id) ||
 			$this->userPreference($user_id, 'canedit')=='admin' ||
-			$this->preference('ALLOW_EDIT_GEDCOM') && $this->userPreference($user_id, 'canedit')=='accept';
+			$this->userPreference($user_id, 'canedit')=='accept';
 	}
 
 	// Fetch all the trees that we have permission to access.
@@ -219,7 +218,6 @@ class WT_Tree {
 		set_gedcom_setting($tree_id, 'ABBREVIATE_CHART_LABELS',      false);
 		set_gedcom_setting($tree_id, 'ADVANCED_NAME_FACTS',          'NICK,_AKA');
 		set_gedcom_setting($tree_id, 'ADVANCED_PLAC_FACTS',          '');
-		set_gedcom_setting($tree_id, 'ALLOW_EDIT_GEDCOM',            true);
 		set_gedcom_setting($tree_id, 'ALLOW_THEME_DROPDOWN',         true);
 		set_gedcom_setting($tree_id, 'CALENDAR_FORMAT',              'gregorian');
 		set_gedcom_setting($tree_id, 'CHART_BOX_TAGS',               '');
@@ -290,7 +288,6 @@ class WT_Tree {
 		set_gedcom_setting($tree_id, 'SHOW_PEDIGREE_PLACES',         '9');
 		set_gedcom_setting($tree_id, 'SHOW_PEDIGREE_PLACES_SUFFIX',  false);
 		set_gedcom_setting($tree_id, 'SHOW_PRIVATE_RELATIONSHIPS',   true);
-		set_gedcom_setting($tree_id, 'SHOW_REGISTER_CAUTION',        true);
 		set_gedcom_setting($tree_id, 'SHOW_RELATIVES_EVENTS',        '_BIRT_CHIL,_BIRT_SIBL,_MARR_CHIL,_MARR_PARE,_DEAT_CHIL,_DEAT_PARE,_DEAT_GPAR,_DEAT_SIBL,_DEAT_SPOU');
 		set_gedcom_setting($tree_id, 'SHOW_STATS',                   false);
 		set_gedcom_setting($tree_id, 'SOURCE_ID_PREFIX',             'S');
@@ -316,8 +313,6 @@ class WT_Tree {
 		set_gedcom_setting($tree_id, 'WATERMARK_THUMB',              false);
 		set_gedcom_setting($tree_id, 'WEBMASTER_USER_ID',            WT_USER_ID);
 		set_gedcom_setting($tree_id, 'WEBTREES_EMAIL',               '');
-		set_gedcom_setting($tree_id, 'WELCOME_TEXT_AUTH_MODE',       '1');
-		set_gedcom_setting($tree_id, 'WELCOME_TEXT_CUST_HEAD',       false);
 		set_gedcom_setting($tree_id, 'WORD_WRAPPED_NOTES',           false);
 		set_gedcom_setting($tree_id, 'imported',                     0);
 		set_gedcom_setting($tree_id, 'title',                        /* I18N: Default title for new family trees */ WT_I18N::translate('My family tree'));

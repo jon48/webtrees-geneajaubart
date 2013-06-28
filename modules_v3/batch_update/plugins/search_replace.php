@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: search_replace.php 13590 2012-03-16 15:11:35Z greg $
+// $Id: search_replace.php 15030 2013-06-01 21:09:01Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -38,7 +38,7 @@ class search_replace_bu_plugin extends base_plugin {
 	}
 
 	static function getDescription() {
-		return WT_I18N::translate('Search and/or replace data in your GEDCOM using simple searches or advanced pattern matching.');
+		return /* I18N: Description of the “Search and replace” option of the batch update module */ WT_I18N::translate('Search and replace text, using simple searches or advanced pattern matching.');
 	}
 
 	// Default is to operate on INDI records

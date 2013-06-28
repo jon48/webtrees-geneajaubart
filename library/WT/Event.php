@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Event.php 14556 2012-11-17 08:17:19Z greg $
+// $Id: Event.php 15037 2013-06-07 22:30:54Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -291,10 +291,10 @@ class WT_Event {
 		$tag=$this->getTag();
 		$file=$tag.'.png';
 		if (file_exists($dir.$file)) {
-			return '<img src="'.WT_STATIC_URL.$dir.$file.'" title="'.WT_Gedcom_Tag::getLabel($tag).'" align="middle">';
+			return '<img src="'.WT_STATIC_URL.$dir.$file.'" title="'.WT_Gedcom_Tag::getLabel($tag).'">';
 		} elseif (file_exists($dir.'NULL.png')) {
 			// Spacer image - for alignment - until we move to a sprite.
-			return '<img src="'.WT_STATIC_URL.$dir.'NULL.png" align="middle">';
+			return '<img src="'.WT_STATIC_URL.$dir.'NULL.png">';
 		} else {
 			return '';
 		}
@@ -375,8 +375,8 @@ class WT_Event {
 				"WILL",
 				"_HOL",
 				"_????_",
-				"DEAT", "CAUS",
-				"_FNRL", "BURI", "CREM", "_INTE", "CEME",
+				"DEAT",
+				"_FNRL", "BURI", "CREM", "_INTE",
 				"_YART",
 				"_NLIV",
 				"PROB",

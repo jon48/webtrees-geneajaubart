@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Fanchart.php 14549 2012-11-16 13:58:16Z greg $
+// $Id: Fanchart.php 15044 2013-06-14 21:14:27Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -232,14 +232,7 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 					$text = reverseText($name) . "\n";
 					if (!empty($addname)) $text .= reverseText($addname). "\n";
 
-					if ($person->canDisplayDetails()) {
-						$birthrec = get_sub_record(1, "1 BIRT", $person->getGedcomRecord());
-						$ct = preg_match("/2 DATE.*(\d\d\d\d)/", $birthrec, $match);
-						if ($ct>0) $text.= trim($match[1]);
-						$deathrec = get_sub_record(1, "1 DEAT", $person->getGedcomRecord());
-						$ct = preg_match("/2 DATE.*(\d\d\d\d)/", $deathrec, $match);
-						if ($ct>0) $text.= "-".trim($match[1]);
-					}
+					$text .= $person->getLifeSpan();
 
 					$text = unhtmlentities($text);
 					$text = strip_tags($text);

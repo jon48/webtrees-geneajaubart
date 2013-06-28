@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print.php 14902 2013-03-24 08:18:11Z greg $
+// $Id: functions_print.php 15047 2013-06-15 21:36:02Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -603,7 +603,7 @@ function help_link($help_topic, $module='') {
 
 // Print an external help link to the wiki site, in a new window
 function wiki_help_link($topic) {
-	return '<a class="help icon-wiki" href="'.WT_WEBTREES_WIKI.$topic.'" alt="'.WT_I18N::translate('webtrees wiki').'">&nbsp;</a>';
+	return '<a class="help icon-wiki" href="'.WT_WEBTREES_WIKI.$topic.'" alt="'.WT_I18N::translate('webtrees wiki').'" target="_blank">&nbsp;</a>';
 }
 
 // When a user has searched for text, highlight any matches in
@@ -662,31 +662,35 @@ function print_asso_rela_record(WT_Event $event, WT_GedcomRecord $record) {
 		foreach ($associates as $associate) {
 			if ($associate) {
 				if ($rela) {
-					$label=WT_Gedcom_Code_Rela::getValue($rela, $person);
+					$label='<span class="rela_type">'.WT_Gedcom_Code_Rela::getValue($rela, $person).':&nbsp;</span>';
+					$label_2='<span class="rela_name">'.get_relationship_name(get_relationship($associate, $person, true, 4)).'</span>';
 				} else {
 					// Generate an automatic RELA
-					$label=get_relationship_name(get_relationship($associate->getXref(), $person->getXref(), true, 4));
+					$label='';
+					$label_2='<span class="rela_name">'.get_relationship_name(get_relationship($associate, $person, true, 4)).'</span>';
 				}
-				if (!$label) {
+				if (!$label && !$label_2) {
 					$label=WT_I18N::translate('Relationships');
+					$label_2='';
 				}
 				// For family records (e.g. MARR), identify the spouse with a sex icon
 				if ($record instanceof WT_Family) {
-					$label=$associate->getSexImage().$label;
+					$label_2=$associate->getSexImage().$label_2;
 				}
+
 				if ($SEARCH_SPIDER) {
-					$html[]=$label; // Search engines cannot use the relationship chart.
+					$html[]=$label_2; // Search engines cannot use the relationship chart.
 				} else {
-					$html[]='<a href="relationship.php?pid1='.$associate->getXref().'&amp;pid2='.$person->getXref().'&amp;ged='.WT_GEDURL.'">'.$label.'</a>';
+					$html[]='<a href="relationship.php?pid1='.$associate->getXref().'&amp;pid2='.$person->getXref().'&amp;ged='.WT_GEDURL.'">'.$label_2.'</a>';
 				}
 			}
 		}
 		$html=array_unique($html);
 		echo
-			'<div class="fact_ASSO">',
-			'<a href="', $person->getHtmlUrl().'">', $person->getFullName(), '</a>',
+			'<div class="fact_ASSO">',$label,
+			implode(WT_I18N::$list_separator, $html),
 			' - ',
-			implode(WT_I18N::$list_separator, $html);
+			'<a href="', $person->getHtmlUrl().'">', $person->getFullName(), '</a>';
 			echo '</div>';
 	}
 }

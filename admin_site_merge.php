@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_site_merge.php 14797 2013-02-09 16:56:36Z greg $
+// $Id: admin_site_merge.php 15024 2013-06-01 20:29:16Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_merge.php');
 require './includes/session.php';
@@ -169,9 +169,7 @@ if ($action!='choose') {
 					echo '<div id="merge3"><h3>', WT_I18N::translate('Merge records'), '</h3>';
 					if ($GEDCOM==$ged2) {
 						$success = delete_gedrec($gid2, WT_GED_ID);
-						if ($success) {
-							echo '<br>', WT_I18N::translate('GEDCOM record successfully deleted.'), '<br>';
-						}
+						echo WT_I18N::translate('GEDCOM record successfully deleted.'), '<br>';
 						//-- replace all the records that linked to gid2
 						$ids=fetch_all_links($gid2, WT_GED_ID);
 						foreach ($ids as $id) {

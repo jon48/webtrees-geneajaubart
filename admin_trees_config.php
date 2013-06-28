@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin_trees_config.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: admin_trees_config.php 15038 2013-06-12 07:17:35Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_config.php');
 
@@ -72,7 +72,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'ABBREVIATE_CHART_LABELS',      safe_POST_bool('NEW_ABBREVIATE_CHART_LABELS'));
 	set_gedcom_setting(WT_GED_ID, 'ADVANCED_NAME_FACTS',          safe_POST('NEW_ADVANCED_NAME_FACTS'));
 	set_gedcom_setting(WT_GED_ID, 'ADVANCED_PLAC_FACTS',          safe_POST('NEW_ADVANCED_PLAC_FACTS'));
-	set_gedcom_setting(WT_GED_ID, 'ALLOW_EDIT_GEDCOM',            safe_POST_bool('NEW_ALLOW_EDIT_GEDCOM'));
 	set_gedcom_setting(WT_GED_ID, 'ALLOW_THEME_DROPDOWN',         safe_POST_bool('NEW_ALLOW_THEME_DROPDOWN'));
 	// For backwards compatibility with webtrees 1.x we store the two calendar formats in one variable
 	// e.g. "gregorian_and_jewish"
@@ -97,7 +96,7 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'GEDCOM_ID_PREFIX',             safe_POST('NEW_GEDCOM_ID_PREFIX'));
 	set_gedcom_setting(WT_GED_ID, 'GEDCOM_MEDIA_PATH',            safe_POST('NEW_GEDCOM_MEDIA_PATH'));
 	set_gedcom_setting(WT_GED_ID, 'GENERATE_UIDS',                safe_POST_bool('NEW_GENERATE_UIDS'));
-	set_gedcom_setting(WT_GED_ID, 'HIDE_GEDCOM_ERRORS',          !safe_POST_bool('NEW_HIDE_GEDCOM_ERRORS'));
+	set_gedcom_setting(WT_GED_ID, 'HIDE_GEDCOM_ERRORS',           safe_POST_bool('NEW_HIDE_GEDCOM_ERRORS'));
 	set_gedcom_setting(WT_GED_ID, 'HIDE_LIVE_PEOPLE',             safe_POST_bool('NEW_HIDE_LIVE_PEOPLE'));
 	set_gedcom_setting(WT_GED_ID, 'GEDCOM_MEDIA_PATH',            safe_POST('GEDCOM_MEDIA_PATH'));
 	set_gedcom_setting(WT_GED_ID, 'INDI_FACTS_ADD',               str_replace(' ', '', safe_POST('NEW_INDI_FACTS_ADD')));
@@ -146,7 +145,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'SHOW_PEDIGREE_PLACES',         safe_POST('NEW_SHOW_PEDIGREE_PLACES'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_PEDIGREE_PLACES_SUFFIX',  safe_POST_bool('NEW_SHOW_PEDIGREE_PLACES_SUFFIX'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_PRIVATE_RELATIONSHIPS',   safe_POST('SHOW_PRIVATE_RELATIONSHIPS'));
-	set_gedcom_setting(WT_GED_ID, 'SHOW_REGISTER_CAUTION',        safe_POST_bool('NEW_SHOW_REGISTER_CAUTION'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_RELATIVES_EVENTS',        safe_POST('NEW_SHOW_RELATIVES_EVENTS'));
 	set_gedcom_setting(WT_GED_ID, 'SHOW_STATS',                   safe_POST_bool('NEW_SHOW_STATS'));
 	set_gedcom_setting(WT_GED_ID, 'SOURCE_ID_PREFIX',             safe_POST('NEW_SOURCE_ID_PREFIX'));
@@ -164,9 +162,6 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'WATERMARK_THUMB',              safe_POST_bool('NEW_WATERMARK_THUMB'));
 	set_gedcom_setting(WT_GED_ID, 'WEBMASTER_USER_ID',            safe_POST('NEW_WEBMASTER_USER_ID'));
 	set_gedcom_setting(WT_GED_ID, 'WEBTREES_EMAIL',               safe_POST('NEW_WEBTREES_EMAIL'));
-	set_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_AUTH_MODE',       safe_POST('NEW_WELCOME_TEXT_AUTH_MODE'));
-	set_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_AUTH_MODE_'.WT_LOCALE, safe_POST('NEW_WELCOME_TEXT_AUTH_MODE_4', WT_REGEX_UNSAFE));
-	set_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_CUST_HEAD',       safe_POST_bool('NEW_WELCOME_TEXT_CUST_HEAD'));
 	set_gedcom_setting(WT_GED_ID, 'WORD_WRAPPED_NOTES',           safe_POST_bool('NEW_WORD_WRAPPED_NOTES'));
 	if (safe_POST('gedcom_title', WT_REGEX_UNSAFE)) {
 		set_gedcom_setting(WT_GED_ID, 'title',                        safe_POST('gedcom_title', WT_REGEX_UNSAFE));
@@ -190,6 +185,7 @@ case 'update':
 	}
 
 	// Reload the page, so that the settings take effect immediately.	
+	Zend_Session::writeClose();
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME);
 	exit;
 }
@@ -211,7 +207,6 @@ if (count(WT_Tree::getAll())==1) { //Removed because it doesn't work here for mu
 	<div id="tabs">
 		<ul>
 			<li><a href="#file-options"><span><?php echo WT_I18N::translate('General'); ?></span></a></li>
-			<li><a href="#access-options"><span><?php echo WT_I18N::translate('Access'); ?></span></a></li>
 			<li><a href="#privacy"><span><?php echo WT_I18N::translate('Privacy'); ?></span></a></li>
 			<li><a href="#config-media"><span><?php echo WT_I18N::translate('Media'); ?></span></a></li>
 			<li><a href="#layout-options"><span><?php echo WT_I18N::translate('Layout'); ?></span></a></li>
@@ -434,11 +429,52 @@ if (count(WT_Tree::getAll())==1) { //Removed because it doesn't work here for mu
 						<?php echo WT_I18N::translate('Leave this field empty to use the title of the currently active database.'); ?>
 					</td>
 				</tr>
+				<tr>
+					<th colspan="2">
+						<?php echo WT_I18N::translate('User options'); ?>
+					</th>
+				</tr>
+				<tr>
+					<td>
+						<?php echo WT_I18N::translate('Theme dropdown selector for theme changes'), help_link('ALLOW_THEME_DROPDOWN'); ?>
+					</td>
+					<td>
+						<?php echo radio_buttons('NEW_ALLOW_THEME_DROPDOWN', array(false=>WT_I18N::translate('hide'),true=>WT_I18N::translate('show')), get_gedcom_setting(WT_GED_ID, 'ALLOW_THEME_DROPDOWN')); ?>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<?php echo WT_I18N::translate('Default Theme'), help_link('THEME'); ?>
+					</td>
+					<td>
+						<select name="NEW_THEME_DIR">
+							<?php
+								echo '<option value="">', htmlspecialchars(WT_I18N::translate('<default theme>')), '</option>';
+								$current_themedir=get_gedcom_setting(WT_GED_ID, 'THEME_DIR');
+								foreach (get_theme_names() as $themename=>$themedir) {
+									echo '<option value="', $themedir, '"';
+									if ($themedir==$current_themedir) {
+										echo ' selected="selected"';
+									}
+									echo '>', $themename, '</option>';
+								}
+							?>
+						</select>
+					</td>
+				</tr>
 			</table>
 		</div>
 		<!-- PRIVACY OPTIONS -->
 		<div id="privacy">
 			<table>
+				<tr>
+					<td>
+						<?php echo WT_I18N::translate('Require visitor authentication'), help_link('REQUIRE_AUTHENTICATION'); ?>
+					</td>
+					<td>
+						<?php echo edit_field_yes_no('NEW_REQUIRE_AUTHENTICATION', get_gedcom_setting(WT_GED_ID, 'REQUIRE_AUTHENTICATION')); ?>
+					</td>
+				</tr>
 				<tr>
 					<td>
 						<?php echo WT_I18N::translate('Privacy options'), help_link('HIDE_LIVE_PEOPLE'); ?>
@@ -643,12 +679,12 @@ if (count(WT_Tree::getAll())==1) { //Removed because it doesn't work here for mu
 				</tr>
 				<tr>
 					<th colspan="2">
-						<?php echo /* I18N: Copyright messages, added to images */ WT_I18N::translate('Watermarks'); ?>
+						<?php echo /* I18N: Copyright messages, added to images */ WT_I18N::translate('Watermarks'), help_link('Watermarks'); ?>
 					</th>
 				</tr>
 				<tr>
 					<td>
-						<?php echo WT_I18N::translate('Add watermarks to thumbnails?'), help_link('WATERMARK_THUMB'); ?>
+						<?php echo WT_I18N::translate('Add watermarks to thumbnails?'); ?>
 					</td>
 					<td>
 						<?php echo edit_field_yes_no('NEW_WATERMARK_THUMB', get_gedcom_setting(WT_GED_ID, 'WATERMARK_THUMB')); ?>
@@ -656,7 +692,7 @@ if (count(WT_Tree::getAll())==1) { //Removed because it doesn't work here for mu
 				</tr>
 				<tr>
 					<td>
-						<?php echo WT_I18N::translate('Store watermarked full size images on server?'), help_link('SAVE_WATERMARK_IMAGE'); ?>
+						<?php echo WT_I18N::translate('Store watermarked full size images on server?'); ?>
 					</td>
 					<td>
 						<?php echo edit_field_yes_no('NEW_SAVE_WATERMARK_IMAGE', get_gedcom_setting(WT_GED_ID, 'SAVE_WATERMARK_IMAGE')); ?>
@@ -664,7 +700,7 @@ if (count(WT_Tree::getAll())==1) { //Removed because it doesn't work here for mu
 				</tr>
 				<tr>
 					<td>
-						<?php echo WT_I18N::translate('Store watermarked thumbnails on server?'), help_link('SAVE_WATERMARK_THUMB'); ?>
+						<?php echo WT_I18N::translate('Store watermarked thumbnails on server?'); ?>
 					</td>
 					<td>
 						<?php echo edit_field_yes_no('NEW_SAVE_WATERMARK_THUMB', get_gedcom_setting(WT_GED_ID, 'SAVE_WATERMARK_THUMB')); ?>
@@ -672,98 +708,10 @@ if (count(WT_Tree::getAll())==1) { //Removed because it doesn't work here for mu
 				</tr>
 				<tr>
 					<td>
-						<?php echo WT_I18N::translate('Who can view non-watermarked images?'), help_link('SHOW_NO_WATERMARK'); ?>
+						<?php echo WT_I18N::translate('Images without watermarks'); ?>
 					</td>
 					<td>
 						<?php echo edit_field_access_level("NEW_SHOW_NO_WATERMARK", $SHOW_NO_WATERMARK); ?>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<!-- ACCESS -->
-		<div id="access-options">
-			<table>
-				<tr>
-					<th colspan="2">
-						<?php echo WT_I18N::translate('Visitor options'); ?>
-					</th>
-				</tr>
-				<tr>
-					<td>
-						<?php echo WT_I18N::translate('Require visitor authentication'), help_link('REQUIRE_AUTHENTICATION'); ?>
-					</td>
-					<td>
-						<?php echo edit_field_yes_no('NEW_REQUIRE_AUTHENTICATION', get_gedcom_setting(WT_GED_ID, 'REQUIRE_AUTHENTICATION')); ?>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<?php echo WT_I18N::translate('Welcome text on login page'), help_link('WELCOME_TEXT_AUTH_MODE'); ?>
-					</td>
-					<td><select name="NEW_WELCOME_TEXT_AUTH_MODE">
-							<option value="0" <?php if ($WELCOME_TEXT_AUTH_MODE=='0') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('No predefined text'); ?></option>
-							<option value="1" <?php if ($WELCOME_TEXT_AUTH_MODE=='1') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('Predefined text that states all users can request a user account'); ?></option>
-							<option value="2" <?php if ($WELCOME_TEXT_AUTH_MODE=='2') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('Predefined text that states admin will decide on each request for a user account'); ?></option>
-							<option value="3" <?php if ($WELCOME_TEXT_AUTH_MODE=='3') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('Predefined text that states only family members can request a user account'); ?></option>
-							<option value="4" <?php if ($WELCOME_TEXT_AUTH_MODE=='4') echo "selected=\"selected\""; ?>><?php echo WT_I18N::translate('Choose user defined welcome text typed below'); ?></option>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<?php echo WT_I18N::translate('Standard header for custom welcome text'), help_link('WELCOME_TEXT_AUTH_MODE_CUST_HEAD'); ?>
-					</td>
-					<td>
-						<?php echo edit_field_yes_no('NEW_WELCOME_TEXT_CUST_HEAD', get_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_CUST_HEAD')); ?>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<?php echo WT_I18N::translate('Custom welcome text'), help_link('WELCOME_TEXT_AUTH_MODE_CUST'); ?>
-					</td>
-					<td>
-						<textarea name="NEW_WELCOME_TEXT_AUTH_MODE_4" maxlength="255"><?php echo htmlspecialchars(get_gedcom_setting(WT_GED_ID, 'WELCOME_TEXT_AUTH_MODE_'.WT_LOCALE)); ?></textarea>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<?php echo WT_I18N::translate('Show acceptable use agreement on «Request new user account» page'), help_link('SHOW_REGISTER_CAUTION'); ?>
-					</td>
-					<td>
-						<?php echo edit_field_yes_no('NEW_SHOW_REGISTER_CAUTION', get_gedcom_setting(WT_GED_ID, 'SHOW_REGISTER_CAUTION')); ?>
-					</td>
-				</tr>
-				<tr>
-					<th colspan="2">
-						<?php echo WT_I18N::translate('User options'); ?>
-					</th>
-				</tr>
-				<tr>
-					<td>
-						<?php echo WT_I18N::translate('Theme dropdown selector for theme changes'), help_link('ALLOW_THEME_DROPDOWN'); ?>
-					</td>
-					<td>
-						<?php echo radio_buttons('NEW_ALLOW_THEME_DROPDOWN', array(false=>WT_I18N::translate('hide'),true=>WT_I18N::translate('show')), get_gedcom_setting(WT_GED_ID, 'ALLOW_THEME_DROPDOWN')); ?>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<?php echo WT_I18N::translate('Default Theme'), help_link('THEME'); ?>
-					</td>
-					<td>
-						<select name="NEW_THEME_DIR">
-							<?php
-								echo '<option value="">', htmlspecialchars(WT_I18N::translate('<default theme>')), '</option>';
-								$current_themedir=get_gedcom_setting(WT_GED_ID, 'THEME_DIR');
-								foreach (get_theme_names() as $themename=>$themedir) {
-									echo '<option value="', $themedir, '"';
-									if ($themedir==$current_themedir) {
-										echo ' selected="selected"';
-									}
-									echo '>', $themename, '</option>';
-								}
-							?>
-						</select>
 					</td>
 				</tr>
 			</table>
@@ -994,10 +942,10 @@ if (count(WT_Tree::getAll())==1) { //Removed because it doesn't work here for mu
 				</tr>
 				<tr>
 					<td>
-						<?php echo WT_I18N::translate('Birth and death details on charts'), help_link('PEDIGREE_FULL_DETAILS'); ?>
+						<?php echo WT_I18N::translate('Show chart details by default'), help_link('PEDIGREE_FULL_DETAILS'); ?>
 					</td>
 					<td>
-						<?php echo radio_buttons('NEW_PEDIGREE_FULL_DETAILS', array(false=>WT_I18N::translate('hide'),true=>WT_I18N::translate('show')), $PEDIGREE_FULL_DETAILS); ?>
+						<?php echo edit_field_yes_no('NEW_PEDIGREE_FULL_DETAILS', get_gedcom_setting(WT_GED_ID, 'PEDIGREE_FULL_DETAILS')); ?>
 					</td>
 				</tr>
 				<tr>
@@ -1095,7 +1043,7 @@ if (count(WT_Tree::getAll())==1) { //Removed because it doesn't work here for mu
 						<?php echo WT_I18N::translate('GEDCOM errors'), help_link('HIDE_GEDCOM_ERRORS'); ?>
 					</td>
 					<td>
-						<?php echo radio_buttons('NEW_HIDE_GEDCOM_ERRORS', array(false=>WT_I18N::translate('hide'),true=>WT_I18N::translate('show')), !$HIDE_GEDCOM_ERRORS); /* Note: name of object is reverse of description */ ?>
+						<?php echo radio_buttons('NEW_HIDE_GEDCOM_ERRORS', array(false=>WT_I18N::translate('show'),true=>WT_I18N::translate('hide')), $HIDE_GEDCOM_ERRORS); /* Note: name of object is reverse of description */ ?>
 					</td>
 				</tr>
 				<tr>
@@ -1119,13 +1067,6 @@ if (count(WT_Tree::getAll())==1) { //Removed because it doesn't work here for mu
 		<!-- EDIT -->
 		<div id="edit-options">
 			<table>
-			<tr>
-				<td>
-					<?php echo WT_I18N::translate('Online editing'), help_link('ALLOW_EDIT_GEDCOM'); ?>
-				</td>
-				<td><?php echo radio_buttons('NEW_ALLOW_EDIT_GEDCOM', array(false=>WT_I18N::translate('disable'),true=>WT_I18N::translate('enable')), $ALLOW_EDIT_GEDCOM); ?>
-				</td>
-			</tr>
 			<tr>
 				<th colspan="2">
 					<?php echo WT_I18N::translate('Facts for Individual records'); ?>

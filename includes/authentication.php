@@ -9,7 +9,7 @@
 // Other possible options are to use LDAP for authentication.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
@@ -28,7 +28,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: authentication.php 14853 2013-03-02 20:16:35Z greg $
+// $Id: authentication.php 15038 2013-06-12 07:17:35Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -45,11 +45,6 @@ function authenticateUser($user_name, $password) {
 	// If no cookies are available, then we cannot log in.
 	if (!isset($_COOKIE[WT_SESSION_NAME])) {
 		return -5;
-	}
-
-	// If we were already logged in, log out first
-	if (getUserId()) {
-		userLogout(getUserId());
 	}
 
 	if ($user_id=get_user_id($user_name)) {
@@ -158,9 +153,8 @@ function userCanAccess($user_id=WT_USER_ID, $ged_id=WT_GED_ID) {
  * check if the given user has write privileges for the given gedcom
  */
 function userCanEdit($user_id=WT_USER_ID, $ged_id=WT_GED_ID) {
-	global $ALLOW_EDIT_GEDCOM;
 
-	if ($user_id && WT_Tree::get($ged_id)->preference('ALLOW_EDIT_GEDCOM')) {
+	if ($user_id) {
 		if (userIsAdmin($user_id)) {
 			return true;
 		} else {
@@ -304,7 +298,7 @@ function addMessage($message) {
 	}
 	if (empty($message['created']))
 		$message['created'] = gmdate ("D, d M Y H:i:s T");
-	if (WT_Site::preference('STORE_MESSAGES') && ($message['method']!='messaging3' && $message['method']!='mailto' && $message['method']!='none')) {
+	if ($message['method']!='messaging3' && $message['method']!='mailto' && $message['method']!='none') {
 		WT_DB::prepare("INSERT INTO `##message` (sender, ip_address, user_id, subject, body) VALUES (? ,? ,? ,? ,?)")
 			->execute(array($message['from'], $WT_REQUEST->getClientIp(), get_user_id($message['to']), $message['subject'], $message['body']));
 	}

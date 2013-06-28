@@ -2,7 +2,7 @@
 // Class file for a person
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Person.php 14902 2013-03-24 08:18:11Z greg $
+// $Id: Person.php 15074 2013-06-23 08:30:23Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -97,7 +97,10 @@ class WT_Person extends WT_GedcomRecord {
 		}
 		// Consider relationship privacy (unless an admin is applying download restrictions)
 		if (WT_USER_GEDCOM_ID && WT_USER_PATH_LENGTH && $this->getGedId()==WT_GED_ID && $access_level=WT_USER_ACCESS_LEVEL) {
-			return get_relationship(WT_USER_GEDCOM_ID, $this->getXref(), true, WT_USER_PATH_LENGTH)!==false;
+			$self = WT_Person::getInstance(WT_USER_GEDCOM_ID);
+			if ($self) {
+				return get_relationship($this, $self, true, WT_USER_PATH_LENGTH)!==false;
+			}
 		}
 		// No restriction found - show living people to members only:
 		return WT_PRIV_USER>=$access_level;
@@ -159,11 +162,6 @@ class WT_Person extends WT_GedcomRecord {
 
 	// Calculate whether this person is living or dead.
 	// If not known to be dead, then assume living.
-	// NOTE: this function checks both parents and children.  Therefore we cannot
-	// use any function - e.g. getChildFamilies() - that calls canDisplayDetails(),
-	// as this will cause an infinite loop.  Also, we need to bypass privacy checks,
-	// as we are allowed to check the dates of the children.
-	// Therefore we must access the raw gedcom data directly.
 	public function isDead() {
 		global $MAX_ALIVE_AGE;
 
@@ -173,15 +171,21 @@ class WT_Person extends WT_GedcomRecord {
 		}
 
 		// If any event occured more than $MAX_ALIVE_AGE years ago, then assume the person is dead
-		preg_match_all('/\n2 DATE (.+)/', $this->_gedrec, $date_matches);
-		foreach ($date_matches[1] as $date_match) {
-			$date=new WT_Date($date_match);
-			if ($date->isOK() && $date->MaxJD() <= WT_SERVER_JD - 365*$MAX_ALIVE_AGE) {
-				return true;
+		if (preg_match_all('/\n2 DATE (.+)/', $this->_gedrec, $date_matches)) {
+			foreach ($date_matches[1] as $date_match) {
+				$date=new WT_Date($date_match);
+				if ($date->isOK() && $date->MaxJD() <= WT_SERVER_JD - 365*$MAX_ALIVE_AGE) {
+					return true;
+				}
+			}
+			// The individual has one or more dated events.  All are less than $MAX_ALIVE_AGE years ago.
+			// If one of these is a birth, the person must be alive.
+			if (preg_match('/\n1 BIRT(?:\n[2-9].+)*\n2 DATE /', $this->_gedrec)) {
+				return false;
 			}
 		}
 
-		// If we found no dates then check the dates of close relatives.
+		// If we found no conclusive dates then check the dates of close relatives.
 
 		// Check parents (birth and adopted)
 		foreach ($this->getChildFamilies(WT_PRIV_HIDE) as $family) {
@@ -989,6 +993,9 @@ class WT_Person extends WT_GedcomRecord {
 							return /* I18N: A step-family. */ WT_I18N::translate('Father’s family with an unknown individual');
 						}
 					}
+				} elseif ($family->getWife()==$fam->getWife() && $family->getHusband()==$fam->getHusband() || $family->getWife()==$fam->getHusband() && $family->getHusband()==$fam->getWife()) {
+					// Same parents - but a different family record.
+					return WT_I18N::translate('Family with parents');
 				}
 			}
 		}
@@ -1457,7 +1464,7 @@ class WT_Person extends WT_GedcomRecord {
 						} else {
 							$factrec.="\n2 $asso_tag @".$associate->getXref().'@';
 							// CHR/BAPM events are commonly used.  Generate the reverse relationship
-							if ($event->getTag()=='CHR' || $event->getTag()=='BAPM') {
+							if (preg_match('/^(?:BAPM|CHR)$/', $event->getTag()) && preg_match('/3 RELA god(?:parent|mother|father)/', $event->getGedcomRecord())) {
 								switch ($associate->getSex()) {
 								case 'M':
 									$factrec.="\n3 RELA godson";
@@ -1817,7 +1824,7 @@ class WT_Person extends WT_GedcomRecord {
 		if (strpos($full, '@P.N.')!==false) {
 			$full=str_replace('@P.N.', $UNKNOWN_PN, $full);
 		}
-		$full='<span class="NAME" dir="auto">'.preg_replace('/\/([^\/]*)\//', '<span class="SURN">$1</span>', htmlspecialchars($full)).'</span>';
+		$full='<span class="NAME" dir="auto" translate="no">'.preg_replace('/\/([^\/]*)\//', '<span class="SURN">$1</span>', htmlspecialchars($full)).'</span>';
 
 		// The standards say you should use a suffix of '*' for preferred name
 		$full=preg_replace('/([^ >]*)\*/', '<span class="starredname">\\1</span>', $full);

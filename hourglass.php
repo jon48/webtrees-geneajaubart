@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: hourglass.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: hourglass.php 15068 2013-06-20 22:44:33Z nigel $
 
 define('WT_SCRIPT_NAME', 'hourglass.php');
 require './includes/session.php';
@@ -35,15 +35,15 @@ $controller
 	->setupJavascript()
 	->addInlineJavascript('sizeLines();');
 
-echo '<table><tr><td valign="top">';
+echo '<div id="hourglass-page">';
 echo '<h2>', WT_I18N::translate('Hourglass chart of %s', $controller->name), '</h2>';
 
 $gencount=0;
 ?>
 <!-- // NOTE: Start form and table -->
-	</td><td width="50px">&nbsp;</td><td><form method="get" name="people" action="?">
+	<form method="get" name="people" action="?">
 	<input type="hidden" name="show_full" value="<?php echo $controller->show_full; ?>">
-	<table><tr>
+	<table class="list_table"><tr>
 
 		<!-- // NOTE: Root ID -->
 	<td class="descriptionbox">
@@ -112,17 +112,18 @@ $gencount=0;
 
 	<!-- // NOTE: Close table header -->
 	</td></tr></table>
-<div id="hourglass_chart" <?php echo "style=\"width:98%; z-index:1;\""; ?> >
-<table cellspacing="0" cellpadding="0" border="0"><tr>
-<!-- // descendancy -->
-<td valign="middle">
-<?php
-$controller->print_descendency(WT_Person::getInstance($controller->pid), 1); ?>
-</td>
-<!-- // pedigree -->
-<td valign="middle">
-<?php
-$controller->print_person_pedigree(WT_Person::getInstance($controller->pid), 1); ?>
-</td>
-</tr></table>
-</div>
+	<div id="hourglass_chart" <?php echo "style=\"width:98%; z-index:1;\""; ?> >
+		<table cellspacing="0" cellpadding="0" border="0"><tr>
+		<!-- // descendancy -->
+		<td valign="middle">
+		<?php
+		$controller->print_descendency(WT_Person::getInstance($controller->pid), 1); ?>
+		</td>
+		<!-- // pedigree -->
+		<td valign="middle">
+		<?php
+		$controller->print_person_pedigree(WT_Person::getInstance($controller->pid), 1); ?>
+		</td>
+		</tr></table>
+	</div><!-- close #hourglass_chart -->
+</div> <!-- close #hourglass-page -->

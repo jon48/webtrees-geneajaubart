@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: calendar.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: calendar.php 14999 2013-05-13 18:39:17Z greg $
 
 define('WT_SCRIPT_NAME', 'calendar.php');
 require './includes/session.php';
@@ -36,7 +36,7 @@ $controller->pageHeader();
 $cal     =safe_GET('cal',      '@#D[A-Z ]+@');
 $day     =safe_GET('day',      '[0-9]+');
 $month   =safe_GET('month',    '[A-Z]{3,5}');
-$year    =safe_GET('year',     '[0-9]+');
+$year    =safe_GET('year',     '[0-9]+(-[0-9]+|[?]+)?');
 $action  =safe_GET('action',   array('year', 'today', 'calendar'), 'today');
 $filterev=safe_GET('filterev', array('all', 'bdm', WT_REGEX_TAG), 'bdm');
 $filterof=safe_GET('filterof', array('all', 'living', 'recent'), 'all');

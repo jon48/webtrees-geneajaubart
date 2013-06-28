@@ -26,7 +26,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: import.php 14789 2013-02-07 11:20:03Z greg $
+// $Id: import.php 14984 2013-05-12 07:58:25Z greg $
 
 define('WT_SCRIPT_NAME', 'import.php');
 require './includes/session.php';
@@ -133,7 +133,8 @@ for ($end_time=microtime(true)+1.0; microtime(true)<$end_time; ) {
 				" WHERE gedcom_id=?"
 			)->execute(array($gedcom_id));
 			break;
-		case 'IBMPC':   // IBMPC and MS_DOS could be anything.  Mostly it means CP850.
+		case 'IBMPC':   // IBMPC, IBM WINDOWS and MS-DOS could be anything.  Mostly it means CP850.
+		case 'IBM WINDOWS':
 		case 'MS-DOS':
 		case 'CP437':
 		case 'CP850':
@@ -221,7 +222,7 @@ for ($end_time=microtime(true)+1.0; microtime(true)<$end_time; ) {
 			// "SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction"
 			// The documentation says that if you get this error, wait and try again.....
 			sleep(1);
-			$controller->addInlineJavascript('jQuery("#import'.$gedcom_id.'").load("import.php?gedcom_id='.$gedcom_id.'");');
+			$controller->addInlineJavascript('jQuery("#import'.$gedcom_id.'").load("import.php?gedcom_id='.$gedcom_id.'&u='.uniqid().'");');
 		} else {
 			// A fatal error.  Nothing we can do?
 			echo '<span class="error">', $ex->getMessage(), '</span>';
@@ -234,4 +235,5 @@ for ($end_time=microtime(true)+1.0; microtime(true)<$end_time; ) {
 WT_DB::exec("COMMIT");
 
 // Reload.....
-$controller->addInlineJavascript('jQuery("#import'.$gedcom_id.'").load("import.php?gedcom_id='.$gedcom_id.'");');
+// Use uniqid() to prevent jQuery caching the previous response.
+$controller->addInlineJavascript('jQuery("#import'.$gedcom_id.'").load("import.php?gedcom_id='.$gedcom_id.'&u='.uniqid().'");');

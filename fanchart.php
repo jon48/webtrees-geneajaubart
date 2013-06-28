@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: fanchart.php 14241 2012-09-03 08:50:48Z greg $
+// $Id: fanchart.php 15064 2013-06-20 05:18:10Z nigel $
 
 define('WT_SCRIPT_NAME', 'fanchart.php');
 require './includes/session.php';
@@ -41,52 +41,44 @@ $controller
 	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }'); // For the 'find indi' link
 
 ?>
-<table class="list_table">
-	<tr>
-		<td>
-			<h2><?php echo $controller->getPageTitle(); ?></h2>
-		</td>
-		<td width="50px">&nbsp;</td>
-		<td>
-			<form name="people" method="get" action="#">
-				<table class="list_table">
-					<tr>
-						<td class="descriptionbox">
-							<?php echo WT_I18N::translate('Individual'); ?>
-						</td>
-						<td class="optionbox">
-							<input class="pedigree_form" type="text" name="rootid" id="rootid" size="3" value="<?php echo $controller->rootid; ?>">
-							<?php echo print_findindi_link('rootid'); ?>
-						</td>
-						<td class="descriptionbox">
-							<?php echo WT_I18N::translate('Layout'); ?>
-						</td>
-						<td class="optionbox">
-							<?php echo select_edit_control('fan_style', $controller->getFanStyles(), null, $controller->fan_style); ?>
-						</td>
-						<td rowspan="2" class="topbottombar vmiddle">
-							<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>">
-						</td>
-					</tr>
-					<tr>
-						<td class="descriptionbox">
-							<?php echo WT_I18N::translate('Generations'); ?>
-						</td>
-						<td class="optionbox">
-							<?php echo edit_field_integers('generations', $controller->generations, 2, 9); ?>
-						</td>
-						<td class="descriptionbox">
-							<?php echo WT_I18N::translate('Width'), help_link('fan_width'); ?>
-						</td>
-						<td class="optionbox">
-							<input type="text" size="3" name="fan_width" value="<?php echo $controller->fan_width; ?>"> %
-						</td>
-					</tr>
-				</table>
-			</form>
-		</tr>
-</table>
-
+<div id="page-fan">
+	<h2><?php echo $controller->getPageTitle(); ?></h2>
+	<form name="people" method="get" action="#">
+		<table class="list_table">
+			<tr>
+				<td class="descriptionbox">
+					<?php echo WT_I18N::translate('Individual'); ?>
+				</td>
+				<td class="optionbox">
+					<input class="pedigree_form" type="text" name="rootid" id="rootid" size="3" value="<?php echo $controller->rootid; ?>">
+					<?php echo print_findindi_link('rootid'); ?>
+				</td>
+				<td class="descriptionbox">
+					<?php echo WT_I18N::translate('Layout'); ?>
+				</td>
+				<td class="optionbox">
+					<?php echo select_edit_control('fan_style', $controller->getFanStyles(), null, $controller->fan_style); ?>
+				</td>
+				<td rowspan="2" class="topbottombar vmiddle">
+					<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>">
+				</td>
+			</tr>
+			<tr>
+				<td class="descriptionbox">
+					<?php echo WT_I18N::translate('Generations'); ?>
+				</td>
+				<td class="optionbox">
+					<?php echo edit_field_integers('generations', $controller->generations, 2, 9); ?>
+				</td>
+				<td class="descriptionbox">
+					<?php echo WT_I18N::translate('Width'), help_link('fan_width'); ?>
+				</td>
+				<td class="optionbox">
+					<input type="text" size="3" name="fan_width" value="<?php echo $controller->fan_width; ?>"> %
+				</td>
+			</tr>
+		</table>
+	</form>
 <?php
 
 if ($controller->error_message) {
@@ -95,5 +87,6 @@ if ($controller->error_message) {
 }
 
 if ($controller->root) {
-	echo $controller->generate_fan_chart('html');
+	echo '<div id="fan_chart">', $controller->generate_fan_chart('html'), '</div>';
 }
+echo '</div>'; // close #page-chart

@@ -24,7 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_print_lists.php 14754 2013-02-02 21:14:34Z greg $
+// $Id: functions_print_lists.php 15001 2013-05-13 22:17:50Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -1089,16 +1089,16 @@ function format_sour_table($datalist) {
 		//-- Author
 		$html .= '<td>'. highlight_search_hits(htmlspecialchars($source->getAuth())). '</td>';
 		//-- Linked INDIs
-		$num=$source->countLinkedIndividuals();
+		$num=count($source->fetchLinkedIndividuals());
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Linked FAMs
-		$num=$source->countLinkedfamilies();
+		$num=count($source->fetchLinkedfamilies());
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Linked OBJEcts
-		$num=$source->countLinkedMedia();
+		$num=count($source->fetchLinkedMedia());
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Linked NOTEs
-		$num=$source->countLinkedNotes();
+		$num=count($source->fetchLinkedNotes());
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Last change
 		if ($SHOW_LAST_CHANGE) {
@@ -1190,16 +1190,16 @@ function format_note_table($datalist) {
 		//-- Shared Note name
 		$html .= '<td><a class="name2" href="'. $note->getHtmlUrl(). '">'. highlight_search_hits($note->getFullName()). '</a></td>';
 		//-- Linked INDIs
-		$num=$note->countLinkedIndividuals();
+		$num=count($note->fetchLinkedIndividuals());
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Linked FAMs
-		$num=$note->countLinkedfamilies();
+		$num=count($note->fetchLinkedfamilies());
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Linked OBJEcts
-		$num=$note->countLinkedMedia();
+		$num=count($note->fetchLinkedMedia());
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Linked SOURs
-		$num=$note->countLinkedSources();
+		$num=count($note->fetchLinkedSources());
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Last change
 		if ($SHOW_LAST_CHANGE) {
@@ -1291,7 +1291,7 @@ function format_repo_table($repos) {
 		}	
 		$html .= '</td>';
 		//-- Linked SOURces
-		$num=$repo->countLinkedSources();
+		$num=count($repo->fetchLinkedSources());
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Last change
 		if ($SHOW_LAST_CHANGE) {
@@ -1394,13 +1394,13 @@ function format_media_table($datalist) {
 			$html .= '</td>';
 
 			//-- Linked INDIs
-			$num=$media->countLinkedIndividuals();
+			$num=count($media->fetchLinkedIndividuals());
 			$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 			//-- Linked FAMs
-			$num=$media->countLinkedfamilies();
+			$num=count($media->fetchLinkedfamilies());
 			$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 			//-- Linked SOURces
-			$num=$media->countLinkedSources();
+			$num=count($media->fetchLinkedSources());
 			$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 			//-- Last change
 			if ($SHOW_LAST_CHANGE) {

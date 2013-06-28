@@ -3,7 +3,7 @@
 // reference this repository.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: repo.php 14693 2013-01-22 08:56:56Z greg $
+// $Id: repo.php 15001 2013-05-13 22:17:50Z greg $
 
 define('WT_SCRIPT_NAME', 'repo.php');
 require './includes/session.php';
@@ -83,12 +83,14 @@ $controller
 	->addInlineJavascript('jQuery("#repo-tabs").tabs();')
 	->addInlineJavascript('jQuery("#repo-tabs").css("visibility", "visible");');
 
+$linked_sour = $controller->record->fetchLinkedSources();
+
 echo '<div id="repo-details">';
 echo '<h2>', $controller->record->getFullName(), '</h2>';
 echo '<div id="repo-tabs">
 	<ul>
 		<li><a href="#repo-edit"><span>', WT_I18N::translate('Details'), '</span></a></li>';
-		if ($controller->record->countLinkedSources()) {
+		if ($linked_sour) {
 			echo '<li><a href="#source-repo"><span id="reposource">', WT_I18N::translate('Sources'), '</span></a></li>';
 		}
 		echo '</ul>';
@@ -123,9 +125,9 @@ echo '<div id="repo-tabs">
 
 
 	// Sources linked to this repository
-	if ($controller->record->countLinkedSources()) {
+	if ($linked_sour) {
 		echo '<div id="source-repo">';
-		echo format_sour_table($controller->record->fetchLinkedSources(), $controller->record->getFullName());
+		echo format_sour_table($linked_sour, $controller->record->getFullName());
 		echo '</div>'; //close "source-repo"
 	}
 

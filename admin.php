@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: admin.php 14924 2013-03-27 08:34:40Z greg $
+// $Id: admin.php 15075 2013-06-23 09:15:17Z greg $
 
 define('WT_SCRIPT_NAME', 'admin.php');
 
@@ -1420,6 +1420,19 @@ function old_paths() {
 		WT_ROOT.'js/webtrees-1.4.0.js',
 		WT_ROOT.'modules_v3/lightbox/images/image_edit.png',
 		WT_ROOT.'modules_v3/lightbox/images/image_view.png',
+		// Removed in 1.4.2
+		WT_ROOT.'modules_v3/lightbox/images/image_view.png',
+		WT_ROOT.'js/jquery.colorbox-1.4.3.js',
+		WT_ROOT.'js/jquery-ui-1.10.0.js',
+		WT_ROOT.'js/webtrees-1.4.1.js',
+		WT_ROOT.'modules_v3/top10_pageviews/help_text.php',
+		WT_ROOT.'themes/_administration/jquery-ui-1.10.0',
+		WT_ROOT.'themes/clouds/jquery-ui-1.10.0',
+		WT_ROOT.'themes/colors/jquery-ui-1.10.0',
+		WT_ROOT.'themes/fab/jquery-ui-1.10.0',
+		WT_ROOT.'themes/minimal/jquery-ui-1.10.0',
+		WT_ROOT.'themes/webtrees/jquery-ui-1.10.0',
+		WT_ROOT.'themes/xenea/jquery-ui-1.10.0',
 	);
 }
 

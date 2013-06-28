@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14885 2013-03-17 22:59:31Z nigel $
+// $Id: module.php 15017 2013-06-01 15:47:26Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -121,10 +121,23 @@ class lightbox_WT_Module extends WT_Module implements WT_Module_Tab {
 		global $controller;
 
 		if ($this->mediaCount===null) {
-			$ct = preg_match_all("/\d OBJE/", $controller->record->getGedcomRecord(), $match);
-			foreach ($controller->record->getSpouseFamilies() as $sfam)
-				$ct += preg_match_all("/\d OBJE/", $sfam->getGedcomRecord(), $match);
-			$this->mediaCount = $ct;
+			$this->mediaCount = 0;
+			preg_match_all('/\d OBJE @(' . WT_REGEX_XREF . ')@/', $controller->record->getGedcomRecord(), $matches);
+			foreach ($matches[1] as $match) {
+				$obje = WT_Media::getInstance($match);
+				if ($obje && $obje->canDisplayDetails()) {
+					$this->mediaCount++;
+				}
+			}
+			foreach ($controller->record->getSpouseFamilies() as $sfam) {
+				preg_match_all('/\d OBJE @(' . WT_REGEX_XREF . ')@/', $sfam->getGedcomRecord(), $matches);
+				foreach ($matches[1] as $match) {
+					$obje = WT_Media::getInstance($match);
+					if ($obje && $obje->canDisplayDetails()) {
+						$this->mediaCount++;
+					}
+				}
+			}
 		}
 		return $this->mediaCount;
 	}

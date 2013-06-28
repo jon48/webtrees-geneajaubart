@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// @version $Id: Note.php 12313 2011-10-15 20:38:06Z greg $
+// @version $Id: Note.php 15073 2013-06-22 07:40:07Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -48,7 +48,7 @@ class WT_Note extends WT_GedcomRecord {
 
 	// Generate a private version of this record
 	protected function createPrivateGedcomRecord($access_level) {
-		return '0 @'.$this->xref.'@  NOTE '.WT_I18N::translate('Private');
+		return '0 @'.$this->xref.'@ NOTE '.WT_I18N::translate('Private');
 	}
 
 	// Fetch the record from the database

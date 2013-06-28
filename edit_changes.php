@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_changes.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: edit_changes.php 15031 2013-06-01 21:11:41Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_changes.php');
 require './includes/session.php';
@@ -218,7 +218,7 @@ if ($changed_gedcoms) {
 		if ($count!=0) {
 			$output2.='<br>';
 		}
-		$output2 .= '<a href="edit_changes.php?action=undoall&amp;ged='.rawurlencode($gedcom_name)."\" onclick=\"return confirm('".WT_I18N::translate('Are you sure you want to undo all of the changes for this GEDCOM?')."');\">$gedcom_name - ".WT_I18N::translate('Undo all changes').'</a>';
+		$output2 .= '<a href="edit_changes.php?action=undoall&amp;ged='.rawurlencode($gedcom_name)."\" onclick=\"return confirm('".WT_I18N::translate('Are you sure you want to undo all the changes to this family tree?')."');\">$gedcom_name - ".WT_I18N::translate('Undo all changes').'</a>';
 		$count++;
 	}
 	$output2 .= '</td></tr></table>';

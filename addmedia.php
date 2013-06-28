@@ -22,7 +22,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: addmedia.php 14905 2013-03-24 20:51:33Z greg $
+// $Id: addmedia.php 15040 2013-06-14 20:33:24Z greg $
 
 define('WT_SCRIPT_NAME', 'addmedia.php');
 require './includes/session.php';
@@ -77,7 +77,7 @@ if ($action=='update' || $action=='create') {
 	}
 }
 
-if (!WT_USER_CAN_EDIT || !$disp || !$ALLOW_EDIT_GEDCOM) {
+if (!WT_USER_CAN_EDIT || !$disp) {
 	$controller
 		->pageHeader()
 		->addInlineJavascript('closePopupAndReloadParent();');
@@ -206,10 +206,16 @@ case 'create': // Save the information from the “showcreateform” action
 			break;
 		}
 
-		// Now copy the (optional thumbnail)
+		// Now copy the (optional) thumbnail
 		if (!empty($_FILES['thumbnail']['name']) && preg_match('/^image\/(png|gif|jpeg)/', $_FILES['thumbnail']['type'], $match)) {
-			$extension = $match[1];
-			$thumbFile = preg_replace('/\.[a-z0-9]{3,5}$/', '.' . $extension, $fileName);
+			// Thumbnails have either
+			// (a) the same filename as the main image
+			// (b) the same filename as the main image - but with a .png extension
+			if ($match[1]=='png' && !preg_match('/\.(png)$/i', $fileName)) {
+				$thumbFile = preg_replace('/\.[a-z0-9]{3,5}$/', '.png', $fileName);
+			} else {
+				$thumbFile = $fileName;
+			}
 			$serverFileName = WT_DATA_DIR . $MEDIA_DIRECTORY . 'thumbs/' . $folderName .  $thumbFile;
 			if (move_uploaded_file($_FILES['thumbnail']['tmp_name'], $serverFileName)) {
 				chmod($serverFileName, WT_PERM_FILE);
@@ -338,6 +344,7 @@ case 'update': // Save the information from the “editmedia” action
 		break;
 	}
 
+	$messages = false;
 	// Move files on disk (if we can) to reflect the change to the GEDCOM data
 	if (!$media->isExternal()) {
 		$oldServerFile  = $media->getServerFilename('main');
@@ -355,10 +362,11 @@ case 'update': // Save the information from the “editmedia” action
 				} else {
 					WT_FlashMessages::addMessage(WT_I18N::translate('Media file %1$s could not be renamed to %2$s.', '<span class="filename">'.$oldFilename.'</span>', '<span class="filename">'.$newFilename.'</span>'));
 				}
+				$messages = true;
 			}
 			if (!file_exists($newServerFile)) {
-					WT_FlashMessages::addMessage(WT_I18N::translate('Media file %s does not exist.',
-					'<span class="filename">'.$newFilename.'</span>'));
+				WT_FlashMessages::addMessage(WT_I18N::translate('Media file %s does not exist.', '<span class="filename">'.$newFilename.'</span>'));
+				$messages = true;
 			}
 		}
 		if ($oldServerThumb != $newServerThumb) {
@@ -368,10 +376,11 @@ case 'update': // Save the information from the “editmedia” action
 				} else {
 					WT_FlashMessages::addMessage(WT_I18N::translate('Thumbnail file %1$s could not be renamed to %2$s.', '<span class="filename">'.$oldFilename.'</span>', '<span class="filename">'.$newFilename.'</span>'));
 				}
+				$messages = true;
 			}
 			if (!file_exists($newServerThumb)) {
-					WT_FlashMessages::addMessage(WT_I18N::translate('Thumbnail file %s does not exist.',
-					'<span class="filename">'.$newFilename.'</span>'));
+				WT_FlashMessages::addMessage(WT_I18N::translate('Thumbnail file %s does not exist.', '<span class="filename">'.$newFilename.'</span>'));
+				$messages = true;
 			}
 		}
 	}
@@ -402,7 +411,11 @@ case 'update': // Save the information from the “editmedia” action
 		}
 	}
 	$controller->pageHeader();
-	echo '<button onclick="closePopupAndReloadParent();">', WT_I18N::translate('close'), '</button>';
+	if ($messages) {
+		echo '<button onclick="closePopupAndReloadParent();">', WT_I18N::translate('close'), '</button>';
+	} else {
+		$controller->addInlineJavascript('closePopupAndReloadParent();');
+	}
 	exit;
 case 'showmediaform':
 	$controller->setPageTitle(WT_I18N::translate('Create a new media object'));
@@ -432,7 +445,7 @@ echo $controller->getPageTitle(), help_link('OBJE');
 echo '</td></tr>';
 if ($linktoid == 'new' || ($linktoid == '' && $action != 'update')) {
 	echo '<tr><td class="descriptionbox wrap width25">';
-	echo WT_I18N::translate('Enter a Person, Family, or Source ID'), help_link('add_media_linkid');
+	echo WT_I18N::translate('Enter a Person, Family, or Source ID');
 	echo '</td><td class="optionbox wrap"><input type="text" name="gid" id="gid" size="6" value="">';
 	echo ' ', print_findindi_link('gid');
 	echo ' ', print_findfamily_link('gid');

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14771 2013-02-04 16:42:55Z greg $
+// $Id: module.php 14956 2013-04-08 23:34:26Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -79,13 +79,13 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 			if ($EXPAND_RELATIVES_EVENTS) {
 				echo ' checked="checked"';
 			}
-			echo 'onclick="jQuery(\'tr.row_rela\').toggle();"><label for="checkbox_rela_facts">', WT_I18N::translate('Events of close relatives'), '</label>';
+			echo ' onclick="jQuery(\'tr.row_rela\').toggle();"><label for="checkbox_rela_facts">', WT_I18N::translate('Events of close relatives'), '</label>';
 			if (file_exists(WT_Site::preference('INDEX_DIRECTORY').'histo.'.WT_LOCALE.'.php')) {
 				echo ' <input id="checkbox_histo" type="checkbox"';
 				if ($EXPAND_HISTO_EVENTS) {
 					echo ' checked="checked"';
 				}
-				echo 'onclick="jQuery(\'tr.row_histo\').toggle();"><label for="checkbox_histo">', WT_I18N::translate('Historical facts'), '</label>';
+				echo ' onclick="jQuery(\'tr.row_histo\').toggle();"><label for="checkbox_histo">', WT_I18N::translate('Historical facts'), '</label>';
 			}
 			echo '</td></tr>';
 		}

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: edit_interface.php 14786 2013-02-06 22:28:50Z greg $
+// $Id: edit_interface.php 15059 2013-06-17 15:44:35Z greg $
 
 define('WT_SCRIPT_NAME', 'edit_interface.php');
 require './includes/session.php';
@@ -79,7 +79,23 @@ $controller->addInlineJavascript('
 
 $controller->addInlineJavascript('
 	function paste_char(value) {
-		pastefield.value += value;
+		if (document.selection) {
+			// IE
+			pastefield.focus();
+			sel = document.selection.createRange();
+			sel.text = value;
+		} else if (pastefield.selectionStart || pastefield.selectionStart == 0) {
+			// Mozilla/Chrome/Safari
+			pastefield.value =
+				pastefield.value.substring(0, pastefield.selectionStart) +
+				value +
+				pastefield.value.substring(pastefield.selectionEnd, pastefield.value.length);
+			pastefield.selectionStart = pastefield.selectionEnd = pastefield.selectionStart + value.length;
+		} else {
+			// Fallback? - just append
+			pastefield.value += value;
+		}
+
 		if (pastefield.id=="NPFX" || pastefield.id=="GIVN" || pastefield.id=="SPFX" || pastefield.id=="SURN" || pastefield.id=="NSFX") {
 			updatewholename();
 		}
@@ -119,8 +135,10 @@ if (!empty($pid)) {
 	$edit = true;
 }
 
-if (!WT_USER_CAN_EDIT || !$edit || !$ALLOW_EDIT_GEDCOM) {
-	$controller->addInlineJavascript('closePopupAndReloadParent();');
+if (!WT_USER_CAN_EDIT || !$edit) {
+	$controller
+		->pageHeader()
+		->addInlineJavascript('closePopupAndReloadParent();');
 	exit;
 }
 
@@ -139,7 +157,7 @@ case 'delete':
 			
 	// When deleting a media link, $linenum comes is an OBJE and the $mediaid to delete should be set
 	if ($linenum=='OBJE') {
-		$newged = remove_subrecord($gedrec, $linenum, $_REQUEST['mediaid']);
+		$newged = remove_media_subrecord($gedrec, $_REQUEST['mediaid']);
 	} else {
 		$newged = remove_subline($gedrec, $linenum);
 	}
@@ -670,10 +688,10 @@ case 'addnewsource':
 		<input type="hidden" name="action" value="addsourceaction">
 		<input type="hidden" name="pid" value="newsour">
 		<table class="facts_table">
-			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ABBR'), help_link('ABBR'); ?></td>
-			<td class="optionbox wrap"><input type="text" name="ABBR" id="ABBR" value="" size="40" maxlength="255"> <?php echo print_specialchar_link('ABBR'); ?></td></tr>
-			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('TITL'), help_link('TITL'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('TITL'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="TITL" id="TITL" value="" size="60"> <?php echo print_specialchar_link('TITL'); ?></td></tr>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ABBR'); ?></td>
+			<td class="optionbox wrap"><input type="text" name="ABBR" id="ABBR" value="" size="40" maxlength="255"> <?php echo print_specialchar_link('ABBR'); ?></td></tr>
 			<?php if (strstr($ADVANCED_NAME_FACTS, "_HEB")!==false) { ?>
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('_HEB'), help_link('_HEB'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="_HEB" id="_HEB" value="" size="60"> <?php echo print_specialchar_link('_HEB'); ?></td></tr>
@@ -682,13 +700,13 @@ case 'addnewsource':
 			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('ROMN'), help_link('ROMN'); ?></td>
 			<td class="optionbox wrap"><input  type="text" name="ROMN" id="ROMN" value="" size="60"> <?php echo print_specialchar_link('ROMN'); ?></td></tr>
 			<?php } ?>
-			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('AUTH'), help_link('AUTH'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('AUTH'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="AUTH" id="AUTH" value="" size="40" maxlength="255"> <?php echo print_specialchar_link('AUTH'); ?></td></tr>
-			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('PUBL'), help_link('PUBL'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('PUBL'); ?></td>
 			<td class="optionbox wrap"><textarea name="PUBL" id="PUBL" rows="5" cols="60"></textarea><br><?php echo print_specialchar_link('PUBL'); ?></td></tr>
-			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('REPO'), help_link('REPO'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('REPO'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="REPO" id="REPO" value="" size="10"> <?php echo print_findrepository_link('REPO'), ' ', print_addnewrepository_link('REPO'); ?></td></tr>
-			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('CALN'), help_link('CALN'); ?></td>
+			<tr><td class="descriptionbox wrap width25"><?php echo WT_Gedcom_Tag::getLabel('CALN'); ?></td>
 			<td class="optionbox wrap"><input type="text" name="CALN" id="CALN" value=""></td></tr>
 		<?php
 			if (WT_USER_IS_ADMIN) {
@@ -869,24 +887,25 @@ case 'addnewnote_assisted':
 		->pageHeader();
 
 	echo '<div id="edit_interface-page">';
-	echo '<h4>', $controller->getPageTitle(), '</h4>';
-
+	echo '<h3>', $controller->getPageTitle(), '&nbsp;&nbsp;';
+		// When more languages are added to the wiki, we can expand or redesign this
+		switch (WT_LOCALE) {
+		case 'fr':
+			echo wiki_help_link('/fr/Module_Assistant_Recensement');
+			break;
+		case 'en':
+		default:
+			echo wiki_help_link('/en/Census_Assistant_module');
+			break;
+		}
+	echo '</h3>';
+	
 	if (isset($_REQUEST['pid'])) $pid = $_REQUEST['pid'];
 	global $pid;
 
 	?>
-	<div class="center font11" style="width:100%;">
+	<div class="center" style="width:100%;">
 		<?php
-			// When more languages are added to the wiki, we can expand or redesign this
-			switch (WT_LOCALE) {
-			case 'fr':
-				echo wiki_help_link('fr:Module_Assistant_Recensement');
-				break;
-			case 'en':
-			default:
-				echo wiki_help_link('Census_Assistant_module');
-				break;
-			}
 		?>
 		<form method="post" action="edit_interface.php" onsubmit="return check_form(this);">
 			<input type="hidden" name="action" value="addnoteaction_assisted">
@@ -2091,10 +2110,8 @@ case 'changefamily':
 			}
 		}
 	}
-	echo '<script>';
 	?>
-		var nameElement = null;
-		var remElement = null;
+	<script>
 		function pastename(name) {
 			if (nameElement) {
 				nameElement.innerHTML = name;
@@ -2103,62 +2120,46 @@ case 'changefamily':
 				remElement.style.display = 'block';
 			}
 		}
-	<?php
-		echo '</script>
-			<div id="changefam">
-			<p>', WT_I18N::translate('Use this page to change or remove family members.<br /><br />For each member in the family, you can use the Change link to choose a different person to fill that role in the family.  You can also use the Remove link to remove that person from the family.<br /><br />When you have finished changing the family members, click the Save button to save the changes.'), '</p>';
-	?>
+	</script>
+	<div id="changefam">
+	<p>
+		<?php echo WT_I18N::translate('Use this page to change or remove family members.<br /><br />For each member in the family, you can use the Change link to choose a different person to fill that role in the family.  You can also use the Remove link to remove that person from the family.<br /><br />When you have finished changing the family members, click the Save button to save the changes.'); ?>
+	</p>
 	<form name="changefamform" method="post" action="edit_interface.php">
 		<input type="hidden" name="action" value="changefamily_update">
 		<input type="hidden" name="famid" value="<?php echo $famid; ?>">
 		<table>
 			<tr>
-			<?php
-			if (!is_null($father)) {
-			?>
+			<?php if ($father) { ?>
 				<td class="descriptionbox"><b><?php echo $father->getLabel(); ?></b><input type="hidden" name="HUSB" value="<?php echo $father->getXref(); ?>"></td>
 				<td id="HUSBName" class="optionbox"><?php echo $father->getFullName(); ?></td>
-			<?php
-			} else {
-			?>
+			<?php } else { ?>
 				<td class="descriptionbox"><b><?php echo WT_I18N::translate('spouse'); ?></b><input type="hidden" name="HUSB" value=""></td>
 				<td id="HUSBName" class="optionbox"></td>
-			<?php
-			}
-			?>
+			<?php } ?>
 				<td class="optionbox">
 					<a href="#" id="husbrem" style="display: <?php echo is_null($father) ? 'none':'block'; ?>;" onclick="document.changefamform.HUSB.value=''; document.getElementById('HUSBName').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
 				</td>
 				<td class="optionbox">
-					<a href="#" onclick="nameElement = document.getElementById('HUSBName'); remElement = document.getElementById('husbrem'); return findIndi(document.changefamform.HUSB);"><?php echo WT_I18N::translate('Change'); ?></a>
+					<a href="#" onclick="return findIndi(document.changefamform.HUSB, document.getElementById('HUSBName'));"><?php echo WT_I18N::translate('Change'); ?></a>
 				</td>
 			</tr>
 			<tr>
-			<?php
-			if (!is_null($mother)) {
-			?>
+			<?php if ($mother) { ?>
 				<td class="descriptionbox"><b><?php echo $mother->getLabel(); ?></b><input type="hidden" name="WIFE" value="<?php echo $mother->getXref(); ?>"></td>
 				<td id="WIFEName" class="optionbox"><?php echo $mother->getFullName(); ?></td>
-			<?php
-			} else {
-			?>
+			<?php } else { ?>
 				<td class="descriptionbox"><b><?php echo WT_I18N::translate('spouse'); ?></b><input type="hidden" name="WIFE" value=""></td>
 				<td id="WIFEName" class="optionbox"></td>
-			<?php
-			}
-			?>
+			<?php } ?>
 				<td class="optionbox">
 					<a href="#" id="wiferem" style="display: <?php echo is_null($mother) ? 'none':'block'; ?>;" onclick="document.changefamform.WIFE.value=''; document.getElementById('WIFEName').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
 				</td>
 				<td class="optionbox">
-					<a href="#" onclick="nameElement = document.getElementById('WIFEName'); remElement = document.getElementById('wiferem'); return findIndi(document.changefamform.WIFE);"><?php echo WT_I18N::translate('Change'); ?></a>
+					<a href="#" onclick="return findIndi(document.changefamform.WIFEdocument.getElementById('WIFEName'));"><?php echo WT_I18N::translate('Change'); ?></a>
 				</td>
 			</tr>
-			<?php
-			$i=0;
-			foreach ($children as $key=>$child) {
-				if (!is_null($child)) {
-				?>
+			<?php $i=0; foreach ($children as $child) { ?>
 			<tr>
 				<td class="descriptionbox"><b><?php echo $child->getLabel(); ?></b><input type="hidden" name="CHIL<?php echo $i; ?>" value="<?php echo $child->getXref(); ?>"></td>
 				<td id="CHILName<?php echo $i; ?>" class="optionbox"><?php echo $child->getFullName(); ?></td>
@@ -2166,20 +2167,16 @@ case 'changefamily':
 					<a href="#" id="childrem<?php echo $i; ?>" style="display: block;" onclick="document.changefamform.CHIL<?php echo $i; ?>.value=''; document.getElementById('CHILName<?php echo $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
 				</td>
 				<td class="optionbox">
-					<a href="#" onclick="nameElement = document.getElementById('CHILName<?php echo $i; ?>'); remElement = document.getElementById('childrem<?php echo $i; ?>'); return findIndi(document.changefamform.CHIL<?php echo $i; ?>);"><?php echo WT_I18N::translate('Change'); ?></a>
+					<a href="#" onclick="return findIndi(document.changefamform.CHIL<?php echo $i; ?>, document.getElementById('CHILName<?php echo $i; ?>'));"><?php echo WT_I18N::translate('Change'); ?></a>
 				</td>
 			</tr>
-				<?php
-					$i++;
-				}
-			}
-				?>
+			<?php $i++; } ?>
 			<tr>
 				<td class="descriptionbox"><b><?php echo WT_I18N::translate('child'); ?></b><input type="hidden" name="CHIL<?php echo $i; ?>" value=""></td>
 				<td id="CHILName<?php echo $i; ?>" class="optionbox"></td>
 				<td colspan="2" class="optionbox child">
 					<a href="#" id="childrem<?php echo $i; ?>" style="display: none;" onclick="document.changefamform.CHIL<?php echo $i; ?>.value=''; document.getElementById('CHILName<?php echo $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php echo WT_I18N::translate('Remove'); ?></a>
-					<a href="#" onclick="nameElement = document.getElementById('CHILName<?php echo $i; ?>'); remElement = document.getElementById('childrem<?php echo $i; ?>'); return findIndi(document.changefamform.CHIL<?php echo $i; ?>);"><?php echo WT_I18N::translate('Add'); ?></a>
+					<a href="#" onclick="remElement = document.getElementById('childrem<?php echo $i; ?>'); return findIndi(document.changefamform.CHIL<?php echo $i; ?>, document.getElementById('CHILName<?php echo $i; ?>'));"><?php echo WT_I18N::translate('Add'); ?></a>
 				</td>
 			</tr>
 		</table>
@@ -2189,8 +2186,8 @@ case 'changefamily':
 		</p>
 	</form>
 	</div><!-- id="edit_interface-page" -->
+	</div><!-- id="changefam" -->
 	<?php
-	echo '</div>'; //close #changefam
 	break;
 
 ////////////////////////////////////////////////////////////////////////////////

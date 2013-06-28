@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: header.php 14896 2013-03-22 12:57:01Z rob $
+// $Id: header.php 14976 2013-05-11 07:53:39Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -30,6 +30,7 @@ $this
 	->addExternalJavascript(WT_JQUERY_COLORBOX_URL)
 	->addExternalJavascript(WT_JQUERY_WHEELZOOM_URL)
 	->addInlineJavascript('activate_colorbox();')
+	->addInlineJavascript('jQuery.extend(jQuery.colorbox.settings, {width:"50%", height:"50%", transition:"none", slideshowStart:"'. WT_I18N::translate('Play').'", slideshowStop:"'. WT_I18N::translate('Stop').'"})') 
 	->addInlineJavascript('
 		jQuery.extend(jQuery.colorbox.settings, {
 			title:	function(){
@@ -45,7 +46,7 @@ echo
 	'<meta charset="UTF-8">',
 	'<title>', htmlspecialchars($title), '</title>',
 	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
-	'<link rel="stylesheet" href="', WT_THEME_URL, 'jquery-ui-1.10.0/jquery-ui-1.10.0.custom.css" type="text/css">',
+	'<link rel="stylesheet" href="', WT_THEME_URL, 'jquery-ui-1.10.3/jquery-ui-1.10.3.custom.css" type="text/css">',
 	'<link rel="stylesheet" href="', WT_THEME_URL, 'style.css', '" type="text/css" media="all">',
 	'<meta name="robots" content="noindex,nofollow">';
 	

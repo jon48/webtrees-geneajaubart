@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions.php 14714 2013-01-23 20:53:40Z greg $
+// $Id: functions.php 15058 2013-06-16 16:42:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -220,7 +220,6 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $ABBREVIATE_CHART_LABELS;      $ABBREVIATE_CHART_LABELS      =get_gedcom_setting($ged_id, 'ABBREVIATE_CHART_LABELS');
 	global $ADVANCED_NAME_FACTS;          $ADVANCED_NAME_FACTS          =get_gedcom_setting($ged_id, 'ADVANCED_NAME_FACTS');
 	global $ADVANCED_PLAC_FACTS;          $ADVANCED_PLAC_FACTS          =get_gedcom_setting($ged_id, 'ADVANCED_PLAC_FACTS');
-	global $ALLOW_EDIT_GEDCOM;            $ALLOW_EDIT_GEDCOM            =get_gedcom_setting($ged_id, 'ALLOW_EDIT_GEDCOM');
 	global $CALENDAR_FORMAT;              $CALENDAR_FORMAT              =get_gedcom_setting($ged_id, 'CALENDAR_FORMAT');
 	global $CHART_BOX_TAGS;               $CHART_BOX_TAGS               =get_gedcom_setting($ged_id, 'CHART_BOX_TAGS');
 	global $CONTACT_USER_ID;              $CONTACT_USER_ID              =get_gedcom_setting($ged_id, 'CONTACT_USER_ID');
@@ -271,7 +270,6 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $SHOW_PEDIGREE_PLACES;         $SHOW_PEDIGREE_PLACES         =get_gedcom_setting($ged_id, 'SHOW_PEDIGREE_PLACES');
 	global $SHOW_PEDIGREE_PLACES_SUFFIX;  $SHOW_PEDIGREE_PLACES_SUFFIX  =get_gedcom_setting($ged_id, 'SHOW_PEDIGREE_PLACES_SUFFIX');
 	global $SHOW_PRIVATE_RELATIONSHIPS;   $SHOW_PRIVATE_RELATIONSHIPS   =get_gedcom_setting($ged_id, 'SHOW_PRIVATE_RELATIONSHIPS');
-	global $SHOW_REGISTER_CAUTION;        $SHOW_REGISTER_CAUTION        =get_gedcom_setting($ged_id, 'SHOW_REGISTER_CAUTION');
 	global $SHOW_RELATIVES_EVENTS;        $SHOW_RELATIVES_EVENTS        =get_gedcom_setting($ged_id, 'SHOW_RELATIVES_EVENTS');
 	global $SOURCE_ID_PREFIX;             $SOURCE_ID_PREFIX             =get_gedcom_setting($ged_id, 'SOURCE_ID_PREFIX');
 	global $SURNAME_LIST_STYLE;           $SURNAME_LIST_STYLE           =get_gedcom_setting($ged_id, 'SURNAME_LIST_STYLE');
@@ -281,8 +279,6 @@ function load_gedcom_settings($ged_id=WT_GED_ID) {
 	global $WATERMARK_THUMB;              $WATERMARK_THUMB              =get_gedcom_setting($ged_id, 'WATERMARK_THUMB');
 	global $WEBMASTER_USER_ID;            $WEBMASTER_USER_ID            =get_gedcom_setting($ged_id, 'WEBMASTER_USER_ID');
 	global $WEBTREES_EMAIL;               $WEBTREES_EMAIL               =get_gedcom_setting($ged_id, 'WEBTREES_EMAIL');
-	global $WELCOME_TEXT_AUTH_MODE;       $WELCOME_TEXT_AUTH_MODE       =get_gedcom_setting($ged_id, 'WELCOME_TEXT_AUTH_MODE');
-	global $WELCOME_TEXT_CUST_HEAD;       $WELCOME_TEXT_CUST_HEAD       =get_gedcom_setting($ged_id, 'WELCOME_TEXT_CUST_HEAD');
 	global $WORD_WRAPPED_NOTES;           $WORD_WRAPPED_NOTES           =get_gedcom_setting($ged_id, 'WORD_WRAPPED_NOTES');
 
 	global $person_privacy; $person_privacy=array();
@@ -811,8 +807,8 @@ function sort_facts(&$arr) {
  * @param int $maxlength - the maximum length of path
  * @param int $path_to_find - which path in the relationship to find, 0 is the shortest path, 1 is the next shortest path, etc
  */
-function get_relationship($pid1, $pid2, $followspouse=true, $maxlength=0, $path_to_find=0) {
-	if ($pid1==$pid2) {
+function get_relationship(WT_Person $person1, WT_Person $person2, $followspouse=true, $maxlength=0, $path_to_find=0) {
+	if (!$person1 || !$person2 || $person1->equals($person2)) {
 		return false;
 	}
 
@@ -823,14 +819,14 @@ function get_relationship($pid1, $pid2, $followspouse=true, $maxlength=0, $path_
 
 	//-- set up first node for person1
 	$node1 = array(
-		'path'      => array($pid1),
+		'path'      => array($person1),
 		'length'    => 0,
-		'pid'       => $pid1,
+		'indi'      => $person1,
 		'relations' => array('self'),
 	);
 	$p1nodes[] = $node1;
 
-	$visited[$pid1] = true;
+	$visited[$person1->getXref()] = true;
 
 	$found = false;
 	while (!$found) {
@@ -850,19 +846,19 @@ function get_relationship($pid1, $pid2, $followspouse=true, $maxlength=0, $path_
 			return false;
 		$node = $p1nodes[$shortest];
 		if ($maxlength==0 || count($node['path'])<=$maxlength) {
-			$indi = WT_Person::getInstance($node['pid']);
+			$indi = $node['indi'];
 			//-- check all parents and siblings of this node
 			foreach ($indi->getChildFamilies(WT_PRIV_HIDE) as $family) {
 				$visited[$family->getXref()] = true;
 				foreach ($family->getSpouses(WT_PRIV_HIDE) as $spouse) {
 					if (!isset($visited[$spouse->getXref()])) {
 						$node1 = $node;
-						$node1['length']+=10;
-						$node1['path'][] = $spouse->getXref();
-						$node1['pid'] = $spouse->getXref();
+						$node1['length']++;
+						$node1['path'][] = $spouse;
+						$node1['indi'] = $spouse;
 						$node1['relations'][] = 'parent';
 						$p1nodes[] = $node1;
-						if ($node1['pid']==$pid2) {
+						if ($spouse->equals($person2)) {
 							if ($path_to_find>0) {
 								$path_to_find--;
 							} else {
@@ -877,12 +873,12 @@ function get_relationship($pid1, $pid2, $followspouse=true, $maxlength=0, $path_
 				foreach ($family->getChildren(WT_PRIV_HIDE) as $child) {
 					if (!isset($visited[$child->getXref()])) {
 						$node1 = $node;
-						$node1['length']+=50;
-						$node1['path'][] = $child->getXref();
-						$node1['pid'] = $child->getXref();
+						$node1['length']++;
+						$node1['path'][] = $child;
+						$node1['indi'] = $child;
 						$node1['relations'][] = 'sibling';
 						$p1nodes[] = $node1;
-						if ($node1['pid']==$pid2) {
+						if ($child->equals($person2)) {
 							if ($path_to_find>0) {
 								$path_to_find--;
 							} else {
@@ -902,12 +898,12 @@ function get_relationship($pid1, $pid2, $followspouse=true, $maxlength=0, $path_
 					foreach ($family->getSpouses(WT_PRIV_HIDE) as $spouse) {
 						if (!in_array($spouse->getXref(), $node1) || !isset($visited[$spouse->getXref()])) {
 							$node1 = $node;
-							$node1['length']+=100;
-							$node1['path'][] = $spouse->getXref();
-							$node1['pid'] = $spouse->getXref();
+							$node1['length']++;
+							$node1['path'][] = $spouse;
+							$node1['indi'] = $spouse;
 							$node1['relations'][] = 'spouse';
 							$p1nodes[] = $node1;
-							if ($node1['pid']==$pid2) {
+							if ($spouse->equals($person2)) {
 								if ($path_to_find>0) {
 									$path_to_find--;
 								} else {
@@ -923,12 +919,12 @@ function get_relationship($pid1, $pid2, $followspouse=true, $maxlength=0, $path_
 				foreach ($family->getChildren(WT_PRIV_HIDE) as $child) {
 					if (!isset($visited[$child->getXref()])) {
 						$node1 = $node;
-						$node1['length']+=5;
-						$node1['path'][] = $child->getXref();
-						$node1['pid'] = $child->getXref();
+						$node1['length']++;
+						$node1['path'][] = $child;
+						$node1['indi'] = $child;
 						$node1['relations'][] = 'child';
 						$p1nodes[] = $node1;
-						if ($node1['pid']==$pid2) {
+						if ($child->equals($person2)) {
 							if ($path_to_find>0) {
 								$path_to_find--;
 							} else {
@@ -946,28 +942,28 @@ function get_relationship($pid1, $pid2, $followspouse=true, $maxlength=0, $path_
 	}
 
 	// Convert generic relationships into sex-specific ones.
-	foreach ($resnode['path'] as $n=>$pid) {
+	foreach ($resnode['path'] as $n=>$indi) {
 		switch ($resnode['relations'][$n]) {
 		case 'parent':
-			switch (WT_Person::getInstance($pid)->getSex()) {
+			switch ($indi->getSex()) {
 			case 'M': $resnode['relations'][$n]='father'; break;
 			case 'F': $resnode['relations'][$n]='mother'; break;
 			}
 			break;
 		case 'child':
-			switch (WT_Person::getInstance($pid)->getSex()) {
+			switch ($indi->getSex()) {
 			case 'M': $resnode['relations'][$n]='son'; break;
 			case 'F': $resnode['relations'][$n]='daughter'; break;
 			}
 			break;
 		case 'spouse':
-			switch (WT_Person::getInstance($pid)->getSex()) {
+			switch ($indi->getSex()) {
 			case 'M': $resnode['relations'][$n]='husband'; break;
 			case 'F': $resnode['relations'][$n]='wife'; break;
 			}
 			break;
 		case 'sibling':
-			switch (WT_Person::getInstance($pid)->getSex()) {
+			switch ($indi->getSex()) {
 			case 'M': $resnode['relations'][$n]='brother'; break;
 			case 'F': $resnode['relations'][$n]='sister'; break;
 			}
@@ -982,8 +978,8 @@ function get_relationship_name($nodes) {
 	if (!is_array($nodes)) {
 		return '';
 	}
-	$pid1=$nodes['path'][0];
-	$pid2=$nodes['path'][count($nodes['path'])-1];
+	$person1=$nodes['path'][0];
+	$person2=$nodes['path'][count($nodes['path'])-1];
 	$path=array_slice($nodes['relations'], 1);
 	// Look for paths with *specific* names first.
 	// Note that every combination must be listed separately, as the same English
@@ -1000,8 +996,6 @@ function get_relationship_name($nodes) {
 	//
 	// This is very repetitive in English, but necessary in order to handle the
 	// complexities of other languages.
-	//
-	// TODO: handle unmarried partners, so need male-partner, female-partner, unknown-partner
 
 	// Make each relationship parts the same length, for simpler matching.
 	$combined_path='';
@@ -1009,7 +1003,7 @@ function get_relationship_name($nodes) {
 		$combined_path.=substr($rel, 0, 3);
 	}
 
-	return get_relationship_name_from_path($combined_path, $pid1, $pid2);
+	return get_relationship_name_from_path($combined_path, $person1, $person2);
 }
 
 function cousin_name($n, $sex) {
@@ -1116,17 +1110,15 @@ function cousin_name2($n, $sex, $relation) {
 }
 
 
-function get_relationship_name_from_path($path, $pid1, $pid2) {
+function get_relationship_name_from_path($path, WT_Person $person1=null, WT_Person $person2=null) {
 	if (!preg_match('/^(mot|fat|par|hus|wif|spo|son|dau|chi|bro|sis|sib)*$/', $path)) {
 		// TODO: Update all the “3 RELA ” values in class_person
 		return '<span class="error">'.$path.'</span>';
 	}
-	$person1=$pid1 ? WT_Person::GetInstance($pid1) : null;
-	$person2=$pid2 ? WT_Person::GetInstance($pid2) : null;
 	// The path does not include the starting person.  In some languages, the
 	// translation for a man’s (relative) is different to a woman’s (relative),
 	// due to inflection.
-	$sex1=$person1 ? $person1->getSex() : 'U';
+	$sex1 = $person1 ? $person1->getSex() : 'U';
 
 	// The sex of the last person in the relationship determines the name in
 	// many cases.  e.g. great-aunt / great-uncle
@@ -1145,9 +1137,45 @@ function get_relationship_name_from_path($path, $pid1, $pid2) {
 	case 'mot': return WT_I18N::translate('mother');
 	case 'fat': return WT_I18N::translate('father');
 	case 'par': return WT_I18N::translate('parent');
-	case 'hus': return WT_I18N::translate('husband');
-	case 'wif': return WT_I18N::translate('wife');
-	case 'spo': return WT_I18N::translate('spouse');
+	case 'hus':
+		if ($person1 && $person2) {
+			foreach ($person1->getSpouseFamilies() as $family) {
+				if ($person2->equals($family->getSpouse($person1))) {
+					if ($family->isNotMarried()) {
+						return WT_I18N::translate_c('MALE', 'partner');
+					} elseif($family->isDivorced()) {
+						return WT_I18N::translate('ex-husband');
+					}
+				}
+			}
+		}
+		return WT_I18N::translate('husband');
+	case 'wif':
+		if ($person1 && $person1) {
+			foreach ($person1->getSpouseFamilies() as $family) {
+				if ($person2->equals($family->getSpouse($person1))) {
+					if ($family->isNotMarried()) {
+						return WT_I18N::translate_c('FEMALE', 'partner');
+					} elseif($family->isDivorced()) {
+						return WT_I18N::translate('ex-wife');
+					}
+				}
+			}
+		}
+		return WT_I18N::translate('wife');
+	case 'spo':
+		if ($person1 && $person2) {
+			foreach ($person1->getSpouseFamilies() as $family) {
+				if ($person2->equals($family->getSpouse($person1))) {
+					if ($family->isNotMarried()) {
+						return WT_I18N::translate_c('MALE/FEMALE', 'partner');
+					} elseif($family->isDivorced()) {
+						return WT_I18N::translate('ex-spouse');
+					}
+				}
+			}
+		}
+		return WT_I18N::translate('spouse');
 	case 'son': return WT_I18N::translate('son');
 	case 'dau': return WT_I18N::translate('daughter');
 	case 'chi': return WT_I18N::translate('child');
@@ -1156,11 +1184,11 @@ function get_relationship_name_from_path($path, $pid1, $pid2) {
 			$dob1=$person1->getBirthDate();
 			$dob2=$person2->getBirthDate();
 			if ($dob1->isOK() && $dob2->isOK()) {
-				if (abs($dob1->JD()-$dob2->JD())<2) {
+				if (abs($dob1->JD()-$dob2->JD())<2 && !$dob1->qual1 && !$dob2->qual1) { // Exclude BEF, AFT, etc.
 					return WT_I18N::translate('twin brother');
-				} else if ($dob1->JD()<$dob2->JD()) {
+				} elseif ($dob1->MaxJD()<$dob2->MinJD()) {
 					return WT_I18N::translate('younger brother');
-				} else {
+				} elseif ($dob1->MinJD()>$dob2->MaxJD()) {
 					return WT_I18N::translate('elder brother');
 				}
 			}
@@ -1171,11 +1199,11 @@ function get_relationship_name_from_path($path, $pid1, $pid2) {
 			$dob1=$person1->getBirthDate();
 			$dob2=$person2->getBirthDate();
 			if ($dob1->isOK() && $dob2->isOK()) {
-				if (abs($dob1->JD()-$dob2->JD())<2) {
+				if (abs($dob1->JD()-$dob2->JD())<2 && !$dob1->qual1 && !$dob2->qual1) { // Exclude BEF, AFT, etc.
 					return WT_I18N::translate('twin sister');
-				} else if ($dob1->JD()<$dob2->JD()) {
+				} elseif ($dob1->MaxJD()<$dob2->MinJD()) {
 					return WT_I18N::translate('younger sister');
-				} else {
+				} elseif ($dob1->MinJD()>$dob2->MaxJD()) {
 					return WT_I18N::translate('elder sister');
 				}
 			}
@@ -1186,11 +1214,11 @@ function get_relationship_name_from_path($path, $pid1, $pid2) {
 			$dob1=$person1->getBirthDate();
 			$dob2=$person2->getBirthDate();
 			if ($dob1->isOK() && $dob2->isOK()) {
-				if (abs($dob1->JD()-$dob2->JD())<2) {
+				if (abs($dob1->JD()-$dob2->JD())<2 && !$dob1->qual1 && !$dob2->qual1) { // Exclude BEF, AFT, etc.
 					return WT_I18N::translate('twin sibling');
-				} else if ($dob1->JD()<$dob2->JD()) {
+				} elseif ($dob1->MaxJD()<$dob2->MinJD()) {
 					return WT_I18N::translate('younger sibling');
-				} else {
+				} elseif ($dob1->MinJD()>$dob2->MaxJD()) {
 					return WT_I18N::translate('elder sibling');
 				}
 			}
@@ -1669,7 +1697,9 @@ function get_relationship_name_from_path($path, $pid1, $pid2) {
 				case 'U': return WT_I18N::translate('great x%d aunt/uncle', $up-2);
 				}
 			case 'it': // Source: Michele Locati
-			case 'en':
+			case 'en_AU':
+			case 'en_GB':
+			case 'en_US':
 			default:
 				switch ($sex2) {
 				case 'M': // I18N: if you need a different number for %d, contact the developers, as a code-change is required
@@ -1832,7 +1862,9 @@ function get_relationship_name_from_path($path, $pid1, $pid2) {
 				case 'U': return WT_I18N::translate('great x%d nephew/niece', $down-1);
 				}
 			case 'it': // Source: Michele Locati.
-			case 'en':
+			case 'en_AU':
+			case 'en_GB':
+			case 'en_US':
 			default:
 				switch ($sex2) {
 				case 'M': // I18N: if you need a different number for %d, contact the developers, as a code-change is required
@@ -1909,12 +1941,23 @@ function get_relationship_name_from_path($path, $pid1, $pid2) {
 				case 'U': return WT_I18N::translate('great x%d grandparent', $up);
 				}
 			case 'fr': // Source: Jacqueline Tetreault
+			case 'fr_CA':
 				switch ($sex2) {
 				case 'M': return WT_I18N::translate('great x%d grandfather', $up-1);
 				case 'F': return WT_I18N::translate('great x%d grandmother', $up-1);
 				case 'U': return WT_I18N::translate('great x%d grandparent', $up-1);
 				}
-			case 'en':
+			case 'nn': // Source: Hogne Røed Nilsen (https://bugs.launchpad.net/webtrees/+bug/1168553)
+			case 'nb':
+				switch ($sex2) {
+				case 'M': // I18N: if you need a different number for %d, contact the developers, as a code-change is required
+				          return WT_I18N::translate('great x%d grandfather', $up-3);
+				case 'F': return WT_I18N::translate('great x%d grandmother', $up-3);
+				case 'U': return WT_I18N::translate('great x%d grandparent', $up-3);
+				}
+			case 'en_AU':
+			case 'en_GB':
+			case 'en_US':
 			default:
 				switch ($sex2) {
 				case 'M': // I18N: if you need a different number for %d, contact the developers, as a code-change is required
@@ -1977,20 +2020,24 @@ function get_relationship_name_from_path($path, $pid1, $pid2) {
 			//
 			// Need to find out which languages use which rules.
 			switch (WT_LOCALE) {
+			case 'nn': // Source: Hogne Røed Nilsen
+			case 'nb':				
 			case 'da': // Source: Patrick Sorensen
 				switch ($sex2) {
 				case 'M': return WT_I18N::translate('great x%d grandson',      $up-3);
 				case 'F': return WT_I18N::translate('great x%d granddaughter', $up-3);
 				case 'U': return WT_I18N::translate('great x%d grandchild',    $up-3);
 				}
-			case 'en':
 			case 'it': // Source: Michele Locati
 			case 'es': // Source: Wes Groleau (adding doesn’t change behavior, but needs to be better researched)
+			case 'en_AU':
+			case 'en_GB':
+			case 'en_US':
 			default:
 				switch ($sex2) {
 
 				case 'M': // I18N: if you need a different number for %d, contact the developers, as a code-change is required
-				            return WT_I18N::translate('great x%d grandson',      $up-2);
+				          return WT_I18N::translate('great x%d grandson',      $up-2);
 				case 'F': return WT_I18N::translate('great x%d granddaughter', $up-2);
 				case 'U': return WT_I18N::translate('great x%d grandchild',    $up-2);
 				}
@@ -2030,7 +2077,9 @@ function get_relationship_name_from_path($path, $pid1, $pid2) {
 				case 'U': return cousin_name2($cousin+1, $sex2, get_relationship_name_from_path('sib' . $descent, null, null));
 				}
 			}
-		case 'en': // See: http://en.wikipedia.org/wiki/File:CousinTree.svg
+		case 'en_AU': // See: http://en.wikipedia.org/wiki/File:CousinTree.svg
+		case 'en_GB':
+		case 'en_US':
 		default:
 			switch ($removed) {
 			case 0:

@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: functions_charts.php 14546 2012-11-16 11:19:33Z greg $
+// $Id: functions_charts.php 15058 2013-06-16 16:42:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -530,19 +530,17 @@ function print_url_arrow($id, $url, $label, $dir=2) {
  * @param string $sosa sosa number
  */
 function get_sosa_name($sosa) {
-	$relations=array();
+	$path='';
 	while ($sosa>1) {
 		if ($sosa%2==1) {
 			$sosa-=1;
-			array_unshift($relations, 'mother');
+			$path = 'mot' . $path;
 		} else {
-			array_unshift($relations, 'father');
+			$path = 'fat' . $path;
 		}
 		$sosa/=2;
 	}
-	array_unshift($relations, 'self');
-	$path=array('relations'=>$relations, 'path'=>$relations); // path is just a dummy
-	return get_relationship_name($path);
+	return get_relationship_name_from_path($path, null, null);
 }
 
 /**

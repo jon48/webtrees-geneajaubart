@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
+// $Id: module.php 15028 2013-06-01 20:57:49Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -152,14 +152,11 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 							$content .= $favorite['note'];
 							$content .= '</div>';
 						} else {
-							$record=WT_GedcomRecord::getInstance($favorite['gid']);
 							$content .= '<div id="box'.$favorite['gid'].'.0" class="person_box">';
-							if ($ctype=='user' || WT_USER_GEDCOM_ADMIN) $content .= $removeFavourite;
-							if ($record) {
-								$content.=$record->format_list('span');
-							} else {
-								$content.=WT_I18N::translate('No such ID exists in this GEDCOM file.');
+							if ($ctype=='user' || WT_USER_GEDCOM_ADMIN) {
+								$content .= $removeFavourite;
 							}
+							$content .= $record->format_list('span');
 							$content .= '<br>'.$favorite['note'];
 							$content .= '</div>';
 						}

@@ -22,7 +22,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-# $Id: robots-example.txt 14626 2013-01-09 09:44:38Z greg $
+# $Id: robots-example.txt 14930 2013-03-27 17:07:21Z greg $
 
 # Well-behaved robots understand "Allow" directives.
 User-Agent: bingbot       # Bing
@@ -38,7 +38,6 @@ Allow: /family.php
 Allow: /index.php
 Allow: /indilist.php
 Allow: /individual.php
-Allow: /media.php
 Allow: /mediafirewall.php
 Allow: /mediaviewer.php
 Allow: /module.php?mod=sitemap
@@ -52,3 +51,6 @@ Disallow: /
 # Disallow all other robots
 User-Agent: *
 Disallow: /
+
+# Put your sitemap here:
+#Sitemap: http://www.example.com/module.php?mod=sitemap&mod_action=generate&file=sitemap.xml

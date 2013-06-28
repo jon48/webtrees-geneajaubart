@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: census_3_search_add.php 14703 2013-01-22 21:22:08Z greg $
+// $Id: census_3_search_add.php 15018 2013-06-01 16:06:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -311,7 +311,7 @@ if (!defined('WT_WEBTREES')) {
 									<?php
 									if (($people["wife"]->canDisplayDetails())) {
 										?>
-									<a href='#' onclick='insertRowToTable2("<?php
+									<a href='#' onclick='insertRowToTable("<?php
 											echo $people["wife"]->getXref() ;  // pid = PID
 										?>", "<?php
 											echo addslashes($fulln); // nam = Full Name
@@ -970,11 +970,6 @@ if (!defined('WT_WEBTREES')) {
 					//$personcount = 0;
 					foreach ($families as $family) {
 						$people = $this->buildFamilyList($family, "spouse", false);
-						if ($this->record->equals($people["husb"])) {
-							$spousetag = 'WIFE';
-						} else {
-							$spousetag = 'HUSB';
-						}
 						$marrdate = $family->getMarriageDate();
 
 						//-- Get Children's Name, DOB, DOD --------------------------
@@ -1437,11 +1432,8 @@ function print_pedigree_person_nav2($pid, $style=1, $count=0, $personcount="1", 
 	global $chart_style, $box_width, $generations, $show_spouse, $show_full;
 	global $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE, $PEDIGREE_SHOW_GENDER;
 	global $SEARCH_SPIDER;
-
-	global $spouselinks, $parentlinks, $step_parentlinks, $persons, $person_step, $person_parent, $tabno, $spousetag;
+	global $spouselinks, $parentlinks, $step_parentlinks, $persons, $person_step, $person_parent, $tabno;
 	global $natdad, $natmom, $censyear, $censdate;
-	// global $pHusbFBP, $pHusbMBP, $pWifeFBP, $pWifeMBP;
-	// global $phusb, $pwife, $pwhusb, $pwwife;
 
 	if ($style != 2) $style=1;
 	if (empty($show_full)) $show_full = 0;

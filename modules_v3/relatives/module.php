@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: module.php 14771 2013-02-04 16:42:55Z greg $
+// $Id: module.php 14956 2013-04-08 23:34:26Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -313,7 +313,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 
 		ob_start();
 		?>
-		<table class="facts_table"><tr><td colspan="2" class="descriptionbox rela">
+		<table class="facts_table"><tr><td class="descriptionbox rela">
 		<input id="checkbox_elder" type="checkbox" onclick="jQuery('div.elderdate').toggle();" <?php if ($SHOW_AGE_DIFF) echo "checked=\"checked\""; ?>>
 		<label for="checkbox_elder"><?php echo WT_I18N::translate('Show date differences'); ?></label>
 		</td></tr></table>

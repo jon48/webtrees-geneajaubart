@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: media_reorder.php 14920 2013-03-26 15:42:47Z lukasz $
+// $Id: media_reorder.php 15061 2013-06-18 20:36:11Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -168,10 +168,8 @@ echo '&nbsp --- &nbsp;' . WT_I18N::translate('Click a row, then drag-and-drop to
 			}
 			echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN'), '<br>';
 			$event = $person->getChangeEvent();
-			if (!is_null($event)) {
-				echo format_fact_date($event, new WT_Person(''), false, true);
-			} else {
-				echo format_fact_date(new WT_Event('1 CHAN', $person, 0), new WT_Person(''), false, true);
+			if ($event) {
+				echo format_fact_date($event, $person, false, true);
 			}
 			echo '</td></tr></table>';
 		}

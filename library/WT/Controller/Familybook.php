@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// $Id: Familybook.php 14549 2012-11-16 13:58:16Z greg $
+// $Id: Familybook.php 15067 2013-06-20 22:36:56Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -367,9 +367,10 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 		if (count($families)>0 || empty($firstrun)) {
 			$firstrun=true;
 			echo
-				'<h2>',
-				/* I18N: A title/heading. %s is an individual’s name */ WT_I18N::translate('Family of %s', $person->getFullName()),
-				'</h2><table class="t0"><tr><td class="tdmid">';
+				'<h3>',
+					/* I18N: A title/heading. %s is an individual’s name */ WT_I18N::translate('Family of %s', $person->getFullName()),
+				'</h3>
+				<table class="t0"><tr><td class="tdmid">';
 			$this->dgenerations = $this->generations;
 			$this->print_descendency($person, 1);
 			echo '</td><td class="tdmid">';
