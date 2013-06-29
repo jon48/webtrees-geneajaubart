@@ -39,7 +39,7 @@ html { overflow-y:scroll; }
 #headerdiv, #bodydiv, #footerdiv {color: #555555;font: 12px tahoma,arial,helvetica,sans-serif;}
 #header_simple{height:1em;}
 fieldset {margin: 8px 8px 4px 8px;text-align:left;}
-html[dir='rtl'] fieldset {text-align:right;}
+html[dir=rtl] fieldset {text-align:right;}
 legend {color: #62584D;font-size: 11px;font-weight: bold;text-align: left;}
 a {color: #416271;text-decoration: none;}
 a:hover {color: #1c3b4a;text-decoration: none;}
@@ -63,16 +63,16 @@ img.block, #calendar_img_indi, #calendar_img_fam, #biglink img, #mycart img  {bo
  * Header
  */
 #header {background: url(images/header.png) no-repeat bottom left;position: relative;width: 100%;height: 150px;margin: auto;color: white;}
-html[dir='rtl'] #header { background-position: right;}
+html[dir=rtl] #header { background-position: right;}
 #header a{color:white;}
 #header a:hover{color:#e9e2db;}
 #header td{text-align: right;}
 #htopright{text-align: right;position: absolute;top: 5px;right:0px;}
-html[dir='rtl'] #htopright { text-align: left; left:0px;}
+html[dir=rtl] #htopright { text-align: left; left:0px;}
 #hbottomright{text-align: right;position: absolute;bottom: 5px;right:0px;}
-html[dir='rtl'] #hbottomright { text-align: left; left:0px;}
+html[dir=rtl] #hbottomright { text-align: left; left:0px;}
 #hcenterright{text-align: right;position: absolute;top:75px;right:0px;} 
-html[dir='rtl'] #hcenterright { text-align: left; left:0px;}
+html[dir=rtl] #hcenterright { text-align: left; left:0px;}
 
 /**
  * White box, with top rounded
@@ -195,12 +195,10 @@ table.center {margin-left: auto;margin-right: auto;}
 .current_day {font-weight: bold;font-size: 16px;}
 .cal_day {float: left;font-weight: bold;}
 .rtl_cal_day {direction: rtl;float: right;color: blue;font-weight: bold;}
+
+.helpheader {}
 .helpcontent {margin-left: 10px;margin-right: 10px;}
 .helpcontent dt {clear:both;}
-.helpfooter {margin: 0px 10px 0px 10px;}
-.helpheader {}
-.helpstart {margin: 10px;font: bold 14px tahoma, arial, helvetica, sans-serif;color: blue;text-decoration: none;}
-.helptext {font: 12px tahoma, arial, helvetica, sans-serif;color: black;}
 #content {width: 98%;margin: auto;}
 
 /**
@@ -215,37 +213,41 @@ table.center {margin-left: auto;margin-right: auto;}
 #familybook_chart table {border-collapse: collapse; empty-cells: show;}
 #familybook_chart td {margin:0; padding:0;}
 #familybook_chart h2 {text-align:center;}
-#familybook_chart .line3, #familybook_chart .pvline, #familybook_chart .spacer{width: 3px}
-#familybook_chart .line4 {width: 7px}
+#familybook_chart .line3, #familybook_chart .pvline, #familybook_chart .spacer{width: 3px;}
+#familybook_chart .line4 {width: 7px;}
 [ID^="vline"] {width:3px;}
+#familybook_chart h3 {font-size: 16px;text-align:center;}
+#relationship-page h3 {margin:20px 0 0 20px;}
+#relationship_chart {margin:0 20px 0;}
 
 .tdtop {vertical-align:top;}
 .tdmid {vertical-align:middle;}
 .tdbot, .tvertline {vertical-align:bottom;}
 
-html[dir='rtl'] #familybook_chart{margin-right:10px;}
+html[dir=rtl] #familybook_chart{margin-right:10px;}
 
 /*-- pedigree chart specific stylesheets --*/
 #pedigree-page table.list_table {margin:0 auto;width:500px;}
 .pedigree_chart_table {border:0;border-collapse:collapse;padding:0;width:100%;}
 #pedigree_chart {position:relative;top:-200px;left:0;}
-html[dir='rtl'] #pedigree_chart {left:auto;right:10px;}
+html[dir=rtl] #pedigree_chart {left:auto;right:10px;}
 #pedigree_canvas {color:#D3C6B8;position:absolute;top:200px;z-index:-1000;}
 #pedigree_chart #childarrow, #pedigree_chart #uparrow, #pedigree_chart .shadow {position:absolute;}
 #pedigree_chart #childbox {border:1px solid;background-color:white;padding:5px;position:absolute;visibility:hidden;}
 
 /*-- descendancy chart specific stylesheets --*/
+#descendancy_chart{margin:20px;}
 #descendancy_chart ul {background-image: url(images/vline.png);background-repeat: repeat-y;background-position: left top;list-style: none;margin: 0px 0px 5px 15px;padding-top: 0px;padding-right: 0px;padding-bottom: 0px;}
 #descendancy_chart li {list-style: none;margin: 0px 0px 0px -15px;padding-top: 0px;padding-right: 0px;padding-bottom: 0px;}
-html[dir='rtl'] #descendancy_chart ul {background-position: right top;margin: 0px 15px 0px 0px;left: auto;}
+html[dir=rtl] #descendancy_chart ul {background-position: right top;margin: 0px 15px 0px 0px;left: auto;}
 
 /*-- ancestry chart specific stylesheets --*/
 #ancestry_chart table div p {font-size:90%; margin:0;}
 #ancestry_chart ul {background-image: url(images/vline.png);background-repeat: repeat-y;background-position: left top;list-style: none;display: block;margin: 0px 0px 0px 15px;padding-top: 0px;padding-right: 0px;padding-bottom: 0px;}
 #ancestry_chart li {list-style: none;margin: 0px 0px 2px -13px;padding-top: 0px;padding-right: 0px;padding-bottom: 0px;}
 #ancestry_chart li table {margin: 5px 0;}
-html[dir='rtl'] #ancestry_chart ul {background-position: right top;margin: 0px 15px 0px 0px;left: auto;}
-html[dir='rtl'] #ancestry_chart li {margin: 0px 0px 0px 0px;padding: 0px 2px 0px 0px;left: auto;}
+html[dir=rtl] #ancestry_chart ul {background-position: right top;margin: 0px 15px 0px 0px;left: auto;}
+html[dir=rtl] #ancestry_chart li {margin: 0px 0px 0px 0px;padding: 0px 2px 0px 0px;left: auto;}
 
 /*-- timeline chart specific styles --*/
 #timeline_chart {position: relative;top: 0px;left: 0px;}
@@ -257,6 +259,8 @@ html[dir='rtl'] #ancestry_chart li {margin: 0px 0px 0px 0px;padding: 0px 2px 0px
 .person3 {background-color: #bad196;border: outset #1b491a 1px;vertical-align: top;}
 .person4 {background-color: #f4f0ed;border: outset #62584D 1px;vertical-align: top;}
 .person5 {background-color: #cfe4b4;border: outset #1b491a 1px;vertical-align: top;}
+
+#compact_chart, #fan_chart, #ancestry_chart, #familybook_chart, #hourglass_chart {margin:20px;}
 
 .compact_view {cursor:url(images/zoomin.png),n-resize;}
 .compact_view p {font-size:90%; margin:0;}
@@ -279,10 +283,10 @@ h1, h2, .helpheader {color: #7B983C;font: 18px tahoma, arial, helvetica, sans-se
 .search_hit {background-color:#ff0;}
 .search_item{font-weight:600;}
 .title {clear: both;font-size: 20px;font-family: tahoma, arial, helvetica, sans-serif;float: left;padding-left: 10px;}
-html[dir='rtl'] .title {float: right;padding-right: 10px;}
-html[dir='rtl'] .header_img {float: right;}
+html[dir=rtl] .title {float: right;padding-right: 10px;}
+html[dir=rtl] .header_img {float: right;}
 .header_search {float: right;}
-html[dir='rtl'] .header_search {float:left;}
+html[dir=rtl] .header_search {float:left;}
 
 #flash-messages { clear:both; width: 98%; margin: auto;}
 
@@ -302,7 +306,7 @@ html[dir='rtl'] .header_search {float:left;}
 /* Style for the subbar in  */
 /* facts_value */
 .subbar {background-color: #ded4c9;border: solid #d3c6b8 1px;vertical-align: top;white-space: nowrap;padding: 3px;}
-.vmiddle {vertical-align: middle}
+.vmiddle {vertical-align: middle;}
 
 /* Colors */
 .red {color: red;}
@@ -329,9 +333,6 @@ html[dir='rtl'] .header_search {float:left;}
 /* Font sizes */
 .font11 {font-size: 11px;}
 .font9 {font-size: 9px;}
-
-/* Chart styles */
-.pedigree_table {margin: 0;}
 
 /* Message box */
 .messagebox {background-color: #c2ceef;border: solid #81a9cb 1px;}
@@ -383,7 +384,7 @@ a.showit:hover > span {display: block;position: absolute;top: 22px;left: 0px;wid
 .nowrap {white-space: nowrap;}
 .wrap {white-space: normal;}
 ul.clist {list-style-image: none;text-decoration: none;color: #000000;margin: 0px;}
-.statistics_chart {text-align: center;}
+.statistics-page {text-align: center;}
 .center2 {text-align: center;}
 .gchart {border: solid #DDDDDD 1px;}
 .execution_stats {padding-top: 12px;text-align: center;}
@@ -425,10 +426,10 @@ html[dir="rtl"] dt {float: right;margin-right: auto;margin-left: 10px;}
 .source-list th:last-child, .note-list th:last-child, .repo-list th:last-child {margin:0 -2px 1px 1px; padding:3px 0 4px; width:24px;}
 .givn-list th{cursor:pointer;white-space: nowrap;padding:2px;text-align:center;}
 .givn-list th{cursor:pointer;white-space: nowrap;padding:2px;text-align:center;}
-#source-details h2, #sourcelist-page h2, #note-details h2, #notelist-page h2, #repo-details h2, #repolist-page h2, #media-details h2, #medialist-page h2, #stats-details h2 {margin-bottom:20px; text-align:center;}
+#source-details h2, #sourcelist-page h2, #note-details h2, #notelist-page h2, #repo-details h2, #repolist-page h2, #media-details h2, #medialist-page h2, #statistics-page h2 {margin-bottom:20px; text-align:center;}
 #source-tabs, #note-tabs, #repo-tabs, #media-tabs {margin:auto; visibility:hidden; width:95%;}
 #source-edit, #note-edit, #repo-edit, #media-edit {overflow-x:auto;}
-#stats-tabs {margin:auto; visibility:hidden; width:90%;}
+#statistics_chart {margin:auto; visibility:hidden; width:90%;}
 .media-list td img {display:block; height:40px;width:auto;margin:3px auto;}
 .loading-image{background:transparent url(images/loading.gif) 50% 50% no-repeat; height:50px; margin:50px;}
 .list-charts{text-align:center;}
@@ -437,16 +438,16 @@ html[dir="rtl"] dt {float: right;margin-right: auto;margin-left: 10px;}
 #searchAccordion-indi, #searchAccordion-fam, #searchAccordion-source, #searchAccordion-note {margin:auto; width:99%;}
 #place-hierarchy h2, #place-hierarchy h4 {text-align:center;}
 
-html[dir='rtl'] .source-list th:last-child, html[dir='rtl'] .note-list th:last-child, html[dir='rtl'] .repo-list th:last-child {margin:0 1px 1px -2px;}
+html[dir=rtl] .source-list th:last-child, html[dir=rtl] .note-list th:last-child, html[dir=rtl] .repo-list th:last-child {margin:0 1px 1px -2px;}
 
 /* ======= Block styles ========== */
 #index_main_blocks {clear:none; width:66%; float:left;}
 #index_small_blocks {clear:none; width:33%; float:right;}
-html[dir='rtl'] #index_main_blocks { float: right;}
-html[dir='rtl'] #index_small_blocks { float: left;}
+html[dir=rtl] #index_main_blocks { float: right;}
+html[dir=rtl] #index_small_blocks { float: left;}
 #index_full_blocks {clear:none; width:100%;}
-html[dir='rtl'] #index_main_blocks {float:right;}
-html[dir='rtl'] #index_small_blocks {float:left;}
+html[dir=rtl] #index_main_blocks {float:right;}
+html[dir=rtl] #index_small_blocks {float:left;}
 .small_inner_block {max-height: 200px;overflow: auto;font: normal 10px tahoma, arial, helvetica, sans-serif;}
 .normal_inner_block {overflow:auto;}
 .block a{color:#62584D;}
@@ -485,6 +486,12 @@ html[dir='rtl'] #index_small_blocks {float:left;}
 .gedcom_stats_block table td td {vertical-align:middle;}
 .gedcom_stats_block td .stats_value {text-align:center;}
 
+/* ============= Theme select block ============ */
+.theme_form ul {margin:-10px auto;-webkit-padding-start:0;width:90%;overflow:hidden;}
+.theme_form li {list-style:none;visibility:hidden;}
+.theme_form li ul li {float:left;padding:10px;visibility:visible;}
+html[dir=rtl] .theme_form li ul li {float:right;}
+
 /* ======= FAQ table styles ========== */
 table.faq {	background-color: #F3EFEF; 	margin: 5px 0 50px 5px; width: 98%;}
 table.faq  tr.odd td{ background-color: #E9E2DB;}
@@ -501,8 +508,8 @@ div.faq_title a:hover, div.faq_body a:hover, .faq_italic a:hover { color: #9F8C7
 
 .faq_top {float:right;}
 .faq_edit {float:right;}
-html[dir='rtl'] .faq_top {float:left;}
-html[dir='rtl'] .faq_edit {float:left;}
+html[dir=rtl] .faq_top {float:left;}
+html[dir=rtl] .faq_edit {float:left;}
 	
 /* ======= Main menu items ========== */
 	
@@ -537,13 +544,13 @@ html[dir='rtl'] .faq_edit {float:left;}
 .main-menu-item .separator_top { border-top: 2px solid #D3C6B8; }
 
 /* Reverse left and right on RTL pages */
-html[dir='rtl'] #main-menu td { background-position: left;}
-html[dir='rtl'] .main-menu-item {}
-html[dir='rtl'] .main-menu-item li {}
-html[dir='rtl'] .main-menu-item   li:hover > ul {right:100%; left:auto;}
-html[dir='rtl'] .main-menu-item > li:hover > ul {left:auto; right:10px;}
-html[dir='rtl'] .main-menu-item   li  li {text-align:right;}
-html[dir='rtl'] .main-menu-item  li li a {float:right;padding:1px 5px 1px 10px;}
+html[dir=rtl] #main-menu td { background-position: left;}
+html[dir=rtl] .main-menu-item {}
+html[dir=rtl] .main-menu-item li {}
+html[dir=rtl] .main-menu-item   li:hover > ul {right:100%; left:auto;}
+html[dir=rtl] .main-menu-item > li:hover > ul {left:auto; right:10px;}
+html[dir=rtl] .main-menu-item   li  li {text-align:right;}
+html[dir=rtl] .main-menu-item  li li a {float:right;padding:1px 5px 1px 10px;}
 
 
 /* Main menu icons */
@@ -657,10 +664,10 @@ html[dir='rtl'] .main-menu-item  li li a {float:right;padding:1px 5px 1px 10px;}
 #header .makeMenu li ul li:hover{background-color: #f4f0ed;white-space: nowrap;}
 .lang-active, .theme-active{font-weight:900;}
 
-html[dir='rtl'] .makeMenu li ul {left:0px; right:auto;}
-html[dir='rtl'] .makeMenu li ul li {text-align:right;}
-html[dir='rtl'] .makeMenu li {border-left:none; border-right: 2px solid;}
-html[dir='rtl'] .makeMenu li:first-child, html[dir='rtl'] .makeMenu li ul li  {border:none;}
+html[dir=rtl] .makeMenu li ul {left:0px; right:auto;}
+html[dir=rtl] .makeMenu li ul li {text-align:right;}
+html[dir=rtl] .makeMenu li {border-left:none; border-right: 2px solid;}
+html[dir=rtl] .makeMenu li:first-child, html[dir=rtl] .makeMenu li ul li  {border:none;}
 
 
 /* ========= Positioning edit, copy, delete links ============= */
@@ -668,11 +675,11 @@ html[dir='rtl'] .makeMenu li:first-child, html[dir='rtl'] .makeMenu li ul li  {b
 .editfacts {clear:left;	padding-top:5px;margin: 0 auto; width:72px;} /* a container for the following three links */
 #sidebar .editfacts {padding-top: 15px;}
 .editlink, .copylink, .deletelink {float:left;}
-html[dir='rtl'] .editlink, html[dir='rtl'] .copylink, html[dir='rtl'] .deletelink {float:right;}
+html[dir=rtl] .editlink, html[dir=rtl] .copylink, html[dir=rtl] .deletelink {float:right;}
 span.link_text  {display:none;}
 /* Indi header */
 .field  .editlink, .field  .deletelink, .field .copylink {float:right;}
-html[dir='rtl'].field  .editlink, html[dir='rtl'].field  .deletelink  {float:left;}
+html[dir=rtl].field  .editlink, html[dir=rtl].field  .deletelink  {float:left;}
 /* =========== end edit, copy, delete links ==================== */
 
 /* =========== Indi header ================== */ 
@@ -684,7 +691,7 @@ html[dir='rtl'].field  .editlink, html[dir='rtl'].field  .deletelink  {float:lef
 #indi_header h3.person_box, #indi_header h3.person_boxF , #indi_header h3.person_boxNN  {border:1px solid #A28765;background: #D3C6B8;}
 #indi_header h3.ui-state-active, #indi_header h3.ui-state-active, #indi_header h3.ui-state-active {border-bottom: none;}
 #indi_header h3 .header_age {padding:5px 0 5px 5px; float:right; font-weight:normal; font-size:65%;}
-#indi_header h3 .ui-icon { background-image: url("jquery-ui-1.10.0/images/ui-icons_ffffff_256x240.png") }
+#indi_header h3 .ui-icon { background-image: url("jquery-ui-1.10.3/images/ui-icons_ffffff_256x240.png") }
 #indi_header h3 .ui-state-active .ui-icon-triangle-1-s  {background-position: 0 -16px;}
 #indi_header h3 a {display:inline;}
 #indi_header a {color:#62584D; font-weight:normal;}
@@ -710,18 +717,18 @@ dd .editlink, dd .deletelink  {float:right;}
 #indi_note .fact_NOTE,
 #indi_note .fact_SOUR {clear: both;}
 
-html[dir='rtl'] #indi_header {float:right;}
-html[dir='rtl'] #indi_header h3 {padding: 0 30px 0 10px; text-align:right;}
-html[dir='rtl']  #indi_header h3 .header_age {padding:5px 5px 5px 0; float:left;}
-html[dir='rtl'] #main_name {float:right;}
-html[dir='rtl'] #indi_mainimage {float:right;}
-html[dir='rtl'] #indi_mainimage a img {float:right;}
-html[dir='rtl'] #indi_note .fact_NOTE {float:right; margin:0 0 0 10px;}
-html[dir='rtl'] #header_accordion1 {float:left;}
-html[dir='rtl'] .indi_table {clear:right;}
-html[dir='rtl']  #sex {float:left;}	
-html[dir='rtl']  #dates {	float:left;}
-html[dir='rtl']  dd .editlink, html[dir='rtl']  dd .deletelink  {float:left;}
+html[dir=rtl] #indi_header {float:right;}
+html[dir=rtl] #indi_header h3 {padding: 0 30px 0 10px; text-align:right;}
+html[dir=rtl]  #indi_header h3 .header_age {padding:5px 5px 5px 0; float:left;}
+html[dir=rtl] #main_name {float:right;}
+html[dir=rtl] #indi_mainimage {float:right;}
+html[dir=rtl] #indi_mainimage a img {float:right;}
+html[dir=rtl] #indi_note .fact_NOTE {float:right; margin:0 0 0 10px;}
+html[dir=rtl] #header_accordion1 {float:left;}
+html[dir=rtl] .indi_table {clear:right;}
+html[dir=rtl]  #sex {float:left;}	
+html[dir=rtl]  #dates {	float:left;}
+html[dir=rtl]  dd .editlink, html[dir=rtl]  dd .deletelink  {float:left;}
 
 
 /* General sprite */
@@ -735,7 +742,7 @@ html[dir='rtl']  dd .editlink, html[dir='rtl']  dd .deletelink  {float:left;}
 .deleteicon {background-position: -100px -32px; width: 24px; height:16px;}
 
 .icon_arrow {display:block; background:url(images/small_menu_sprite.png) no-repeat left 0;}
-.icon_arrow {background-position:90% -1166px;} html[dir='rtl'] .icon_arrow {background-position:10% -1184px;}
+.icon_arrow {background-position:90% -1166px;} html[dir=rtl] .icon_arrow {background-position:10% -1184px;}
 
 /* =========== Indi tabs ================== */
 /* Facts & Events tab */
@@ -744,15 +751,15 @@ html[dir='rtl']  dd .editlink, html[dir='rtl']  dd .deletelink  {float:left;}
 #media-display-title {float:left; font-style:italic; margin:10px;}
 
 
-html[dir='rtl'] li up li {text-align: left;}
+html[dir=rtl] li up li {text-align: left;}
 .makeMenu,.makeMenu li ul {list-style: none;margin: 0;padding: 1px;}
 .makeMenu li:hover>ul {display: block;}
 
 /* The language/theme/favorites menu in the header is right-justified, so submenus must also be right justified */
 #extra-menu {float: right;white-space: nowrap;margin: 0 10px 0 0;}
-html[dir='rtl'] #extra-menu {float: left;margin: 0 0 0 10px;}
+html[dir=rtl] #extra-menu {float: left;margin: 0 0 0 10px;}
 #extra-menu.makeMenu li ul {left: auto;right: 0px;}
-html[dir='rtl'] #extra-menu.makeMenu li ul {left: 0px;right: auto;}
+html[dir=rtl] #extra-menu.makeMenu li ul {left: 0px;right: auto;}
 
 .place {padding-top: 5px;}
 .logo {	text-align: center;}
@@ -796,8 +803,8 @@ html[dir="rtl"] .person_box_template i[class^="icon-silhouette"]{float:right;}
 .lb-menu a {display:block;}
 .lb-menu li a {padding-top:24px;}
 .lb-menu li li a {padding:1px 10px 1px 5px;}
-html[dir='rtl'] .lb-menu {float:right;}
-html[dir='rtl'] .lb-menu li {float:right;}
+html[dir=rtl] .lb-menu {float:right;}
+html[dir=rtl] .lb-menu li {float:right;}
 
 li#lb-image_edit {background:url(images/image_edit.png) no-repeat 50% 20%;}
 li#lb-image_link {background:url(images/image_link.png) no-repeat 50% 20%;}
@@ -826,8 +833,8 @@ li#lb-image_view {background:url(images/image_view.png) no-repeat 50% 20%;}
 #register-form textarea {vertical-align: top;}
 #register-form div#registration-submit {text-align:center;}
 .login_block_block #login-form, .login_block_block #new_passwd_form{border:0; background:none;}
-html[dir='rtl'] #login-form label, html[dir='rtl'] #new_passwd_form label, html[dir='rtl'] #register-form label, html[dir='rtl'] #verify-form  label {text-align:left;}
-html[dir='rtl'] #register-form div, html[dir='rtl'] #verify-form div {text-align:left;}
+html[dir=rtl] #login-form label, html[dir=rtl] #new_passwd_form label, html[dir=rtl] #register-form label, html[dir=rtl] #verify-form  label {text-align:left;}
+html[dir=rtl] #register-form div, html[dir=rtl] #verify-form div {text-align:left;}
 
 /* ============== reportengine.php ======================= */
 #reportengine-page table {margin:20px auto;}
@@ -844,22 +851,22 @@ html[dir='rtl'] #register-form div, html[dir='rtl'] #verify-form div {text-align
 .popup  li span {padding:0 5px;}
 .popup  li ul, .popup  li ul li, .popup  li span span {padding:0;}
 .itr:hover .popup {display:block; position:absolute; width:12em;right:0; z-index: 9999;}
-html[dir='rtl'] .itr:hover .popup {left:0; right:auto;}
+html[dir=rtl] .itr:hover .popup {left:0; right:auto;}
 
 /* ========= jquery-ui.custom.css changes ============ */
-.ui-tabs {padding:0;}
 .ui-tabs .ui-tabs-panel {padding:1em 0;}
 .ui-accordion .ui-accordion-content {overflow:visible;padding: 0 5px;position:relative;}
 .ui-accordion .ui-accordion-header {text-align:center; margin-top:0;}
 .ui-accordion .ui-accordion-header a {padding: 2px;}
+.ui-widget-overlay {background:#62584D; opacity: 0.9;}
 
 .ui-helper-reset {line-height: 1.5;}
 
-html[dir='rtl'] .ui-tabs {direction:rtl;}
-html[dir='rtl'] ui-tabs .ui-tabs-nav li.ui-tabs-selected, html[dir='rtl'] .ui-tabs .ui-tabs-nav li.ui-state-default {float:right;}
-html[dir='rtl'] .ui-accordion .ui-accordion-header .ui-icon {right: 0.5em;}
-html[dir='rtl'] .ui-dialog-title{float:right;}
-html[dir='rtl'] .ui-dialog-titlebar-close{left:.3em; right:auto;}
+html[dir=rtl] .ui-tabs {direction:rtl;}
+html[dir=rtl] .ui-tabs .ui-tabs-nav li.ui-tabs-selected, html[dir=rtl] .ui-tabs .ui-tabs-nav li.ui-state-default {float:right;}
+html[dir=rtl] .ui-accordion .ui-accordion-header .ui-icon {right: 0.5em;}
+html[dir=rtl] .ui-dialog-title{float:right;}
+html[dir=rtl] .ui-dialog-titlebar-close{left:.3em; right:auto;}
 
 .ui-widget {font-family: Verdana, Arial, Helvetica, sans-serif;}
 .ui-widget-header { background: #e9e2db; border-color: #ddd;padding:3px;}
@@ -872,6 +879,7 @@ html[dir='rtl'] .ui-dialog-titlebar-close{left:.3em; right:auto;}
 .ui-tabs-nav li.ui-tabs-active 			 { background: #f4f0ed;}
 .ui-tabs-nav li.ui-tabs-active a	 	 { font-weight:600; color: #62584D; }
 .ui-tabs-nav li.ui-tabs-active a:hover	 { font-weight:600; color: #62584D; }
+.ui-widget-header button	{ font-size: 1em; font-family: arial,helvetica,sans-serif;}
 
 .ui-state-highlight { padding: 3px; text-align: center;}
 
@@ -905,18 +913,18 @@ html[dir='rtl'] .ui-dialog-titlebar-close{left:.3em; right:auto;}
 /*.dataTables_wrapper .ui-state-default {background: none #D3C6B8}*/
 .ui-accordeon-header .ui-state-default, .ui-accordeon-header .ui-state-active  { border:1px solid #A28765;background: #D3C6B8; } 
 
-html[dir='rtl'] .css_right {float:right;}
-html[dir='rtl'] .dataTables_paginate {float:right;}
-html[dir='rtl'] .dataTables_processing {float:right;}
-html[dir='rtl'] .dataTables_filter {float:left;}
-html[dir='rtl'] .dataTables_info {float:right}
-html[dir='rtl'] .dataTables_length {float:left;}
-html[dir='rtl'] .DataTables_sort_wrapper {margin-right:20px;}
-html[dir='rtl'] .DataTables_sort_wrapper span {left:auto; right:0; margin-right:-20px;}
+html[dir=rtl] .css_right {float:right;}
+html[dir=rtl] .dataTables_paginate {float:right;}
+html[dir=rtl] .dataTables_processing {float:right;}
+html[dir=rtl] .dataTables_filter {float:left;}
+html[dir=rtl] .dataTables_info {float:right}
+html[dir=rtl] .dataTables_length {float:left;}
+html[dir=rtl] .DataTables_sort_wrapper {margin-right:20px;}
+html[dir=rtl] .DataTables_sort_wrapper span {left:auto; right:0; margin-right:-20px;}
 
 /* =======Search results======== */
 #search-result-tabs h3 { border:1px solid #A28765;background: #D3C6B8; }
-#search-result-tabs h3 .ui-icon { background-image: url("jquery-ui-1.10.0/images/ui-icons_ffffff_256x240.png") }
+#search-result-tabs h3 .ui-icon { background-image: url("jquery-ui-1.10.3/images/ui-icons_ffffff_256x240.png") }
 
 /* ========= Tabs ============== */
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
@@ -926,12 +934,12 @@ html[dir='rtl'] .DataTables_sort_wrapper span {left:auto; right:0; margin-right:
 #indi_left {float:left; width:98%;}
 #tabs {background-color:#f4f0ed; border-color:#DDD; float:left; width:100%; overflow:auto;font-family: Verdana, Arial, Helvetica, sans-serif; font-size:10px}
 
-html[dir='rtl'] #indi_left {float:right;}
-html[dir='rtl'] #tabs {float:right;}
+html[dir=rtl] #indi_left {float:right;}
+html[dir=rtl] #tabs {float:right;}
 
 /* ========= Sidebar ============== */
 #sidebar {border-color:#DDD; display:none; margin:5px 2px 0 0; height:auto;}
-#sidebar .ui-icon { background-image: url("jquery-ui-1.10.0/images/ui-icons_ffffff_256x240.png")
+#sidebar .ui-icon { background-image: url("jquery-ui-1.10.3/images/ui-icons_ffffff_256x240.png")
 }#sidebar h3.ui-state-active {border-bottom: none;}
 #sidebar .ui-state-active a, #sidebar .ui-state-default a { font-family: Lucida Grande,Lucida Sans,Arial,sans-serif; color: #62584D;  font-weight: bold; }
 #sidebar .ui-state-active .ui-icon-triangle-1-s  {background-position: 0 -16px;}
@@ -944,10 +952,10 @@ html[dir='rtl'] #tabs {float:right;}
 .use-sidebar #separator {background:#D3C6B8 url(images/general_sprite.png) no-repeat -1px 2px;}
 #sidebar .ui-accordion-header { border:1px solid #A28765;background: #D3C6B8; } 
 
-html[dir='rtl'] #sidebar  {margin:5px 0 0 2px;}
-html[dir='rtl'] .use-sidebar.sidebar-at-right #sidebar, html[dir='rtl'] .sidebar-at-right #separator  {float:left;}
-html[dir='rtl'] #separator {float:left; background:#D3C6B8 url(images/general_sprite.png) no-repeat -1px 2px;}
-html[dir='rtl'] .use-sidebar #separator {background:#D3C6B8 url(images/general_sprite.png) no-repeat -26px 2px;}
+html[dir=rtl] #sidebar  {margin:5px 0 0 2px;}
+html[dir=rtl] .use-sidebar.sidebar-at-right #sidebar, html[dir=rtl] .sidebar-at-right #separator  {float:left;}
+html[dir=rtl] #separator {float:left; background:#D3C6B8 url(images/general_sprite.png) no-repeat -1px 2px;}
+html[dir=rtl] .use-sidebar #separator {background:#D3C6B8 url(images/general_sprite.png) no-repeat -26px 2px;}
 
 /* ============== Sidebar content items ============== */
 /* Family navigator */
@@ -960,9 +968,9 @@ html[dir='rtl'] .use-sidebar #separator {background:#D3C6B8 url(images/general_s
 .flyout3, .flyout3 a {background:none; border:none; text-decoration:none; text-align:left; margin-top:0px; left:0px; padding:0px;}
 .flyout, .flyout2{  background-color: #E9E2DB; border: 1px solid #D3C6B8; }
 
-html[dir='rtl'] .flyout {text-align:right; left:210px;}
-html[dir='rtl'] .flyout2 {text-align:right; right:40px;}
-html[dir='rtl'] .flyout3 {text-align:right;}
+html[dir=rtl] .flyout {text-align:right; left:210px;}
+html[dir=rtl] .flyout2 {text-align:right; right:40px;}
+html[dir=rtl] .flyout3 {text-align:right;}
 
 /* Descendancy */
 #sb_content_descendancy {}
@@ -972,8 +980,8 @@ html[dir='rtl'] .flyout3 {text-align:right;}
 .desc_tree_div {	display:none;}
 .desc_tree_div ul {padding:0px;	margin-left:10px;margin-top:0px;margin-right:0px;}
 
-html[dir='rtl'] #sb_desc_content {margin-right:3px;}
-html[dir='rtl'] .desc_tree_div ul {margin-right:10px;margin-left:0px;}
+html[dir=rtl] #sb_desc_content {margin-right:3px;}
+html[dir=rtl] .desc_tree_div ul {margin-right:10px;margin-left:0px;}
 
 /* Individuals, Families */
 #sb_content_individuals, #sb_content_families {}
@@ -995,7 +1003,7 @@ html[dir='rtl'] .desc_tree_div ul {margin-right:10px;margin-left:0px;}
 #sb_content_extra_info span a {display:inline;} /* --- Table does not fit otherwise */
 #sb_content_extra_info #hitcounter {border-top: 1px solid #A28765; font-weight: bold; padding-top: 5px;}
 
-html[dir='rtl'] #sb_content_extra_info .editfacts {float:left;}
+html[dir=rtl] #sb_content_extra_info .editfacts {float:left;}
 
 /* ============== find.php ======================= */
 #find-page h3, #find-page h4{margin: 0 10px 10px 10px; text-align:center;}
@@ -1024,8 +1032,8 @@ html[dir='rtl'] #sb_content_extra_info .editfacts {float:left;}
 #search-page-table .value a {color:#62584D;}
 #search-page-table .value a:hover {color:#9f8c77;}
 #search-page-table p {margin:0;}
-html[dir='rtl'] #search-page-table .label{float:right;}
-html[dir='rtl'] #search-page-table .value {margin:0 170px 0 0;}
+html[dir=rtl] #search-page-table .label{float:right;}
+html[dir=rtl] #search-page-table .value {margin:0 170px 0 0;}
 
 /* ============== edituser.php ======================= */
 #edituser-page h2, #edituser_submit {margin:20px;text-align:center;}
@@ -1036,8 +1044,8 @@ html[dir='rtl'] #search-page-table .value {margin:0 170px 0 0;}
 #edituser-table .value a:hover {color:#9f8c77;}
 #edituser-table .label span{margin:0 10px;}
 #edituser-table select{margin:0;}
-html[dir='rtl'] #edituser-table .label{float:right;}
-html[dir='rtl'] #edituser-table .value {margin:0 260px 0 0;}
+html[dir=rtl] #edituser-table .label{float:right;}
+html[dir=rtl] #edituser-table .value {margin:0 260px 0 0;}
 
 
 @media print {
@@ -1202,7 +1210,7 @@ a.icon-udarrow:hover{width:20px;height:20px;background-image:url(images/udarrow2
 #edit_interface-page #GIVN,#edit_interface-page #SURN,#edit_interface-page #_MARNM{line-height:14px;margin:0 5px;width:170px;}
 #edit_interface-page input[type="text"], #edit_interface-page #NAME_display{line-height:14px;margin:0 5px;vertical-align:top;width:210px;}
 #edit_interface-page input[type="text"][id*="PAGE"], #edit_interface-page input[type="text"][id*="_UID"]{width:270px;}
-#edit_interface-page input[type="text"][id*="SOUR"], #edit_interface-page input[type="text"][id*="REPO"],#edit_interface-page input[type="text"][id*="OBJE"],#edit_interface-page input[type="text"][id*="FAMC"],#edit_interface-page input[type="text"][id*="ASSO"],#edit_interface-page input[type="text"][id^="AGE"],#edit_interface-page input[type="text"][id*="SHARED_NOTE"]{width:70px;}
+#edit_interface-page input[type="text"][id*="SOUR"], #edit_interface-page input[type="text"][id*="REPO"],#edit_interface-page input[type="text"][id*="OBJE"],#edit_interface-page input[type="text"][id*="FAMC"],#edit_interface-page input[type="text"][id*="ASSO"],#edit_interface-page input[type="text"][id^="AGE"],#edit_interface-page input[type="text"][id*="SHARED_NOTE"]{width:250px;}
 #edit_interface-page input[type="text"][id$="DATE"] {width:130px;}
 #edit_interface-page input[type="text"][id^="TIME"] {width:100px;}
 #edit_interface-page input[type="text"][id*="OBJE_FILE"] {width:200px;}
@@ -1224,8 +1232,8 @@ a.icon-udarrow:hover{width:20px;height:20px;background-image:url(images/udarrow2
 #save-cancel input{padding:2px 8px;}
 #save-cancel .save {float:left;margin:5px;}
 #save-cancel .cancel {float:right;margin:5px;}
-html[dir='rtl'] #save-cancel .save {float:right;}
-html[dir='rtl'] #save-cancel .cancel {float:left;}
+html[dir=rtl] #save-cancel .save {float:right;}
+html[dir=rtl] #save-cancel .cancel {float:left;}
 #save-cancel .save:hover, #save-cancel .cancel:hover {background:buttonhighlight;}
 #edit_interface-page {margin-bottom:50px;}
 
@@ -1266,8 +1274,8 @@ html[dir='rtl'] #save-cancel .cancel {float:left;}
 #cboxSlideshowStop {background:url(images/controls.png) no-repeat -100px 0; width:25px; height:25px;}
 #cboxSlideshowStop:hover{background-position:-100px -25px;}
 
-html[dir='rtl'] #cboxClose {position:absolute;right:auto;left:0px}
-html[dir='rtl'] #cboxPrevious {position:absolute;right:56px;left:auto}
-html[dir='rtl'] #cboxNext {position:absolute;right:0px;left:auto}
-html[dir='rtl'] #cboxSlideshow {position:absolute;right:28px;left:auto}
-html[dir='rtl'] #cboxCurrent {position:absolute;right:94px;left:auto}
+html[dir=rtl] #cboxClose {position:absolute;right:auto;left:0px}
+html[dir=rtl] #cboxPrevious {position:absolute;right:56px;left:auto}
+html[dir=rtl] #cboxNext {position:absolute;right:0px;left:auto}
+html[dir=rtl] #cboxSlideshow {position:absolute;right:28px;left:auto}
+html[dir=rtl] #cboxCurrent {position:absolute;right:94px;left:auto}

@@ -159,6 +159,7 @@ return array(
 									=>	'Les statistiques Piwik ne peuvent être récupérées.',
 	'<span class="hit-counter">%1$s</span> visits since the beginning of %2$s<br/>(<span class="hit-counter">%3$s</span> today)'
 									=>	'<span class="hit-counter">%1$s</span> visiteurs depuis le début de l\'année %2$s<br/>dont <span class="hit-counter">%3$s</span> aujourd\'hui',
+	'Continue'						=>	'Continuer',
 	
 	// Perso Sosa
 	'Perso Sosa'					=>	'Perso Sosa',
@@ -291,6 +292,7 @@ return array(
 	'Sosa Geographical dispersion'	=>	'Répartition géographique des ancêtres Sosa',
 	'General data'					=>	'Données générales',
 	'Data by Generations'			=>	'Données par générations',
+	'Generation %s'					=>	'Génération %s',
 	'The required dispersion analysis does not exist.'
 									=>	'L\'analyse de répartition géographique demandée n\'existe pas.',
 	'The Perso Sosa module must be installed and enabled to display this page.'

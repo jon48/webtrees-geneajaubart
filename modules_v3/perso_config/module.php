@@ -60,7 +60,7 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 			->setPageTitle($this->getTitle())
 			->pageHeader();
 		
-		echo '<div class="site_config">',
+		echo '<div id="site-config">',
 				'<div id="tabs">',
 					'<ul>';
 		$h_config_tab_name = new WT_Perso_Hook('h_config_tab_name');

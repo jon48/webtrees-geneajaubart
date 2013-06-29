@@ -163,7 +163,7 @@ html[dir=rtl] #tree_stats td, html[dir=rtl] #recent td {padding:0 0 0 10px; text
 #site table, #mail table, #login table {background:#fdf5e6; border:1px inset #d9d6c4; border-collapse:separate; border-spacing:0; font-size:90%; padding:5px; width:100%;}
 #site-config h2 {font-size:125%; font-weight:bold; margin:10px 0 5px;}
 /* PERSO No max-width defined */
-.site_config dl {float:left;margin:0 0 0 20px;line-height:25px;}
+#site-config dl {float:left;margin:0 0 0 20px;line-height:25px;}
 /* END PERSO */
 #site-config dt {clear:left; float:left; min-width:170px; margin:0; padding:5px 5px 5px 0; border-bottom:1px solid #999999; font-weight:bold;}
 #site-config dd {border-bottom:1px solid #999999; margin-left:370px; min-width:370px; padding:5px;}
