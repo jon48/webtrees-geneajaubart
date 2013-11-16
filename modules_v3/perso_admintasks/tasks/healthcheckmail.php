@@ -46,10 +46,18 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 	
 	//Extend class WT_Perso_Admin_Task
 	protected function executeSteps(){		
-		$res = false;
-
-		$nbdays = ceil($this->_frequency / (24 * 60));
+		$res = false;		
 		
+		// Get the number of days to take into account, either last 7 days or since last check
+		$interval_sincelast = 0;
+		if($this->_lastupdated){
+			$tmpInt = $this->_lastupdated->diff(new DateTime("now"), true);
+			$interval_sincelast = ( $tmpInt->days * 24  + $tmpInt->h ) * 60 + $tmpInt->i;
+		}
+		
+		$interval = max($this->_frequency, $interval_sincelast);
+		$nbdays = ceil($interval / (24 * 60));
+
 		// Check for updates
 		$latest_version_txt=fetch_latest_version();
 		if (preg_match('/^[0-9.]+\|[0-9.]+\|/', $latest_version_txt)) {

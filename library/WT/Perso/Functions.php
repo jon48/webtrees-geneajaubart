@@ -197,6 +197,32 @@ class WT_Perso_Functions {
 		return  preg_replace('~(?:\\000+)$~','',$decrypted);
 	}
 	
+	/**
+	 * Encode a string from the file system encoding to UTF-8 (if necessary)
+	 *
+	 * @param string $string Filesystem encoded string to encode
+	 * @return string UTF-8 encoded string
+	 */
+	public static function encodeFileSystemToUtf8($string){
+		if (strtoupper(substr(php_uname('s'), 0, 7)) === 'WINDOWS') {
+		    return iconv('cp1252', 'utf-8',$string);
+		}
+		return $string;
+	}
+	
+	/**
+	 * Encode a string from UTF-8 to the file system encoding (if necessary)
+	 *
+	 * @param string $string UTF-8 encoded string to encode
+	 * @return string Filesystem encoded string
+	 */
+	public static function encodeUtf8ToFileSystem($string){
+		if (strtoupper(substr(php_uname('s'), 0, 7)) === 'WINDOWS') {
+		    return iconv('utf-8', 'cp1252' ,$string);
+		}
+		return $string;
+	}
+	
 }
 
 ?>

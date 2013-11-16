@@ -239,18 +239,20 @@ function imagettftextErrorHandler($errno, $errstr, $errfile, $errline) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // this needs to be a global variable so imagettftextErrorHandler can set it
+global $useTTF;
 $useTTF = function_exists('imagettftext');
 
 // certificate object missing/private?
 if (!$certificate || !$certificate->canDisplayDetails()) {
+	AddToLog("Certificate Firewall error: >".WT_I18N::translate('Missing or private certificate object.').'< with CID >'.$cid.'<', 'media');
 	send404AndExit();
 }
 
 $serverFilename = $certificate->getServerFilename();
 
 if (!file_exists($serverFilename)) {
+	AddToLog("Certificate Firewall error: >".WT_I18N::translate('The certificate file does not exist.').'< for path >'.$serverFilename.'<', 'media');
 	send404AndExit();
-	AddToLog("Certificate Firewall error: >".WT_I18N::translate('The certificate file does not exist.').'< in file >'.$serverFilename.'<', 'media');
 }
 
 $mimetype = $certificate->mimeType();

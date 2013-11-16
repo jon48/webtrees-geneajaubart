@@ -127,10 +127,7 @@ class WT_Perso_Certificate extends WT_Media {
 	// Extend class WT_Media
 	public function getServerFilename($which='main') {
 		$filename = WT_Perso_Functions_Certificates::getRealCertificatesDirectory(). $this->file;
-		if (strtoupper(substr(php_uname('s'), 0, 7)) === 'WINDOWS') {
-		    return iconv('utf-8', 'cp1252', $filename);
-		}
-		return $filename;
+		return WT_Perso_Functions::encodeUtf8ToFileSystem($filename);
 	}
 	
 	// Extend class WT_Media

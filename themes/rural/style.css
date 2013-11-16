@@ -654,6 +654,15 @@ html[dir=rtl] .main-menu-item  li li a {float:right;padding:1px 5px 1px 10px;}
 #menu-language li {text-align:left;} /* The language menu is always LTR, even on RTL pages */
 #menu-theme    li {text-align:left;} /* The theme menu is always LTR, even on RTL pages */
 
+/* Old Submenus (used in Album) */
+
+.menuitem {text-decoration:none;padding:1px;}
+.menuitem_hover {text-decoration:none;padding:1px;}
+.submenu {text-decoration:none;background-color:#e9e2db;border:solid #d3c6b8 1px;white-space:nowrap;visibility:hidden;position:absolute;padding:4px;}
+.submenuitem {vertical-align:middle;height:18px;text-decoration:none;background-color:#e9e2db;white-space:nowrap;padding:1px;}
+.submenuitem a, .submenuitem_hover a {display:inline-block;vertical-align:middle;}
+
+
 /* ========= Login|Favorites|Theme|Language menu items ========== */
 .makeMenu {font-weight: bold;}
 .makeMenu li {display: inline;position: relative;white-space: nowrap; border-left: 1px solid; padding:0 5px;}
@@ -932,7 +941,7 @@ html[dir=rtl] .DataTables_sort_wrapper span {left:auto; right:0; margin-right:-2
 }
 #main {min-width:600px; width:100%}
 #indi_left {float:left; width:98%;}
-#tabs {background-color:#f4f0ed; border-color:#DDD; float:left; width:100%; overflow:auto;font-family: Verdana, Arial, Helvetica, sans-serif; font-size:10px}
+#tabs {background-color:#f4f0ed; border-color:#DDD; float:left; width:100%; overflow:visible;font-family: Verdana, Arial, Helvetica, sans-serif; font-size:10px}
 
 html[dir=rtl] #indi_left {float:right;}
 html[dir=rtl] #tabs {float:right;}

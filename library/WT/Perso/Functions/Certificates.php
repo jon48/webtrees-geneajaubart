@@ -43,7 +43,7 @@ class WT_Perso_Functions_Certificates {
 			
 			while($entry = readdir($dir)){
 				if($entry!='.' && $entry!='..' && is_dir($certdir.$entry)){
-					$_citiesList[]=utf8_encode($entry);
+					$_citiesList[]=WT_Perso_Functions::encodeFileSystemToUtf8($entry);
 				}
 			}
 			sort($_citiesList);
@@ -62,7 +62,7 @@ class WT_Perso_Functions_Certificates {
 	 */
 	public static function getCertificatesList($selCity){
 	
-		$selCity = utf8_decode($selCity);
+		$selCity = WT_Perso_Functions::encodeUtf8ToFileSystem($selCity);
 		
 		$certdir = self::getRealCertificatesDirectory();
 		$tabCertif= array();
@@ -71,7 +71,7 @@ class WT_Perso_Functions_Certificates {
 			$dir=opendir($certdir.$selCity);
 			while($entry = readdir($dir)){
 				if($entry!='.' && $entry!='..' && !is_dir($certdir.$entry.'/')){
-					$path = utf8_encode($selCity.'/'.$entry);
+					$path = WT_Perso_Functions::encodeFileSystemToUtf8($selCity.'/'.$entry);
 					$certificate = new WT_Perso_Certificate($path);
 					if(self::isImageTypeSupported($certificate->extension())){
 						//if($certificate->canDisplayDetails())
@@ -93,7 +93,7 @@ class WT_Perso_Functions_Certificates {
 	 */
 	public static function getCertificateListBeginWith($city, $contains, $limit= 9999){
 		$tabFiles= array();	
-		$dirPath=$certdir = self::getRealCertificatesDirectory().utf8_decode($city).'/';
+		$dirPath=$certdir = self::getRealCertificatesDirectory().WT_Perso_Functions::encodeUtf8ToFileSystem($city).'/';
 		$contains = utf8_decode($contains);
 		$nbCert = 0;
 		
@@ -101,7 +101,7 @@ class WT_Perso_Functions_Certificates {
 			$dir=opendir($dirPath);
 			while(($entry = readdir($dir)) && $nbCert < $limit){
 				if($entry!='.' && $entry!='..' && $entry!='Thumbs.db' &&!is_dir($dirPath.$entry.'/') && stripos($entry, $contains)!== false){
-					$tabFiles[]=utf8_encode($entry);
+					$tabFiles[]=WT_Perso_Functions::encodeUtf8ToFileSystem($entry);
 					$nbCert++;
 				}
 			}

@@ -112,6 +112,8 @@ return array(
 									=>	'Cette image est protégée par les lois sur le copyright.',
 	'The certificate file was not found in this family tree'
 									=>	'L\'acte n\'a pu être trouvé dans cet arbre.',
+	'Missing or private certificate object.'
+									=>	'L\'objet acte n\'existe pas ou est privé.',
 	'The certificate file does not exist.'
 									=>	'Le fichier de l\'acte n\'existe pas',
 	'This certificate file is broken and cannot be watermarked.'
@@ -358,7 +360,7 @@ return array(
 	'task_name'						=>	'nom_de_la_tâche',
 	'Regenerate token'				=>	'Regénérer le jeton',
 	'Task name'						=>	'Nom de la tâche',
-	'Last run'						=>	'Dernière exécution',
+	'Last success'					=>	'Dernier succès',
 	'Last result'					=>	'Dernier résultat',
 	'Frequency (in min.)'			=>	'Fréquence (min.)',
 	'Remaining occurrences'			=>	'Occurrences restantes',

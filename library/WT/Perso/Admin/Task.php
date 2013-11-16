@@ -114,16 +114,18 @@ abstract class WT_Perso_Admin_Task{
 		
 		if(!$this->_isrunning){  //TODO put in place a time_out for running...
 			//TODO Log the executions in the logs
-			$this->_lastupdated = new DateTime();
 			$this->_lastresult = false;
 			$this->_isrunning = true;
 			$this->updateTask();
 
 			AddToLog('Start execution of Perso Admin task: '.$this->getPrettyName(), 'debug');
 			$this->_lastresult = $this->executeSteps();
-			if($this->_lastresult && $this->_nboccur > 0){
-				$this->_nboccur--;
-				if($this->_nboccur == 0) $this->_status = 'disabled';
+			if($this->_lastresult){
+				$this->_lastupdated = new DateTime();
+				if($this->_nboccur > 0){
+					$this->_nboccur--;
+					if($this->_nboccur == 0) $this->_status = 'disabled';
+				}
 			}
 			$this->_isrunning = false;
 			$this->updateTask();
