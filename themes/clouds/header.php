@@ -2,10 +2,10 @@
 // Header for clouds theme
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: header.php 14976 2013-05-11 07:53:39Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,7 +31,7 @@ $this
 	->addExternalJavascript(WT_JQUERY_COLORBOX_URL)
 	->addExternalJavascript(WT_JQUERY_WHEELZOOM_URL)
 	->addInlineJavascript('activate_colorbox();')
-	->addInlineJavascript('jQuery.extend(jQuery.colorbox.settings, {width:"70%", height:"70%", transition:"none", slideshowStart:"'. WT_I18N::translate('Play').'", slideshowStop:"'. WT_I18N::translate('Stop').'"})') 
+	->addInlineJavascript('jQuery.extend(jQuery.colorbox.settings, {width:"70%", height:"70%", transition:"none", slideshowStart:"'. WT_I18N::translate('Play').'", slideshowStop:"'. WT_I18N::translate('Stop').'"})')
 	->addInlineJavascript('
 		jQuery.extend(jQuery.colorbox.settings, {
 			title:	function(){
@@ -47,11 +45,11 @@ echo
 	'<html ', WT_I18N::html_markup(), '>',
 	'<head>',
 	'<meta charset="UTF-8">',
-	'<title>', htmlspecialchars($title), '</title>',
+	'<title>', WT_Filter::escapeHtml($title), '</title>',
 	header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
-	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
+	'<link rel="icon" href="', WT_CSS_URL, 'favicon.png" type="image/png">',
 	'<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'jquery-ui-1.10.3/jquery-ui-1.10.3.custom.css">',
-	'<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.css', '">';
+	'<link rel="stylesheet" type="text/css" href="', WT_CSS_URL, 'style.css', '">';
 
 //PERSO Add extra style sheet for personal additions
 echo '<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.extra.css', '">';
@@ -60,9 +58,8 @@ $this->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.'perso_certificates/js
 //END PERSO
 
 switch ($BROWSERTYPE) {
-//case 'chrome': uncomment when chrome.css file needs to be added, or add others as needed
 case 'msie':
-	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_URL, $BROWSERTYPE, '.css">';
+	echo '<link type="text/css" rel="stylesheet" href="', WT_CSS_URL, $BROWSERTYPE, '.css">';
 	break;
 }
 
@@ -77,7 +74,7 @@ echo
 
 if  ($view!='simple') { // Use "simple" headers for popup windows
 	global $WT_IMAGES;
-	echo 
+	echo
 	'<div id="clouds-container">',
 		'<div id="header">',
 			'<div class="header" >',
@@ -85,6 +82,7 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 				'<div class="hsearch">',
 					'<form style="display:inline;" action="search.php" method="post">',
 						'<input type="hidden" name="action" value="general">',
+						'<input type="hidden" name="ged" value="', WT_GEDCOM, '">',
 						'<input type="hidden" name="topsearch" value="yes">',
 						'<input type="search" name="query" size="15" placeholder="', WT_I18N::translate('Search'), '" dir="auto">',
 						'<input class="search-icon" type="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '">',
@@ -108,19 +106,19 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 	foreach (WT_MenuBar::getModuleMenus() as $menu) {
 		$menu_items[]=$menu;
 	}
- 
+
 	// Print the menu bar
 	echo
 	'<div id="topMenu">',
-		'<ul id="main-menu">'; 
+		'<ul id="main-menu">';
 		foreach ($menu_items as $menu) {
 			if ($menu) {
 				echo getMenuAsCustomList($menu);
 			}
 		}
-	echo 
+	echo
 	'</ul>';
-	echo 
+	echo
 	'<div id="menu-right">',
 	'<ul class="makeMenu">';
 	if (WT_USER_ID) {

@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team. All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: places_edit.php 14786 2013-02-06 22:28:50Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -33,9 +31,9 @@ if (!defined('WT_WEBTREES')) {
 require WT_ROOT.WT_MODULES_DIR.'googlemap/defaultconfig.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$action=safe_REQUEST($_REQUEST, 'action');
-if (isset($_REQUEST['placeid'])) $placeid = $_REQUEST['placeid'];
-if (isset($_REQUEST['place_name'])) $place_name = $_REQUEST['place_name'];
+$action     = WT_Filter::post('action',  null, WT_Filter::get('action'));
+$placeid    = WT_Filter::post('placeid', null, WT_Filter::get('placeid'));
+$place_name = WT_Filter::post('place_name');
 
 $controller=new WT_Controller_Simple();
 $controller
@@ -108,7 +106,7 @@ if ($action=='updaterecord' && WT_USER_IS_ADMIN) {
 }
 
 // Update placelocation STREETVIEW fields ----------------------------------------------------------
-if ($action=='update_sv_params' && WT_USER_IS_ADMIN) {	
+if ($action=='update_sv_params' && WT_USER_IS_ADMIN) {
 	echo "Google Street View™ parameters updated";
 	echo "<br><br>";
 	echo "LATI = ".$_REQUEST['svlati']."<br>";
@@ -116,9 +114,9 @@ if ($action=='update_sv_params' && WT_USER_IS_ADMIN) {
 	echo "BEAR = ".$_REQUEST['svbear']."<br>";
 	echo "ELEV = ".$_REQUEST['svelev']."<br>";
 	echo "ZOOM = ".$_REQUEST['svzoom']."<br>";
-	echo "<br><br>";	
+	echo "<br><br>";
 	$statement=
-		WT_DB::prepare("UPDATE `##placelocation` SET sv_lati=?, sv_long=?, sv_bearing=?, sv_elevation=?, sv_zoom=? WHERE pl_id=?");		
+		WT_DB::prepare("UPDATE `##placelocation` SET sv_lati=?, sv_long=?, sv_bearing=?, sv_elevation=?, sv_zoom=? WHERE pl_id=?");
 	$statement->execute(array($_REQUEST['svlati'], $_REQUEST['svlong'], $_REQUEST['svbear'], $_REQUEST['svelev'], $_REQUEST['svzoom'], $placeid));
 	if (!WT_DEBUG) {
 		$controller->addInlineJavaScript('closePopupAndReloadParent();');
@@ -172,12 +170,12 @@ if ($action=="update") {
 			}
 		}
 		$parent_id = $row->pl_parent_id;
-	} 
+	}
 	while ($row->pl_parent_id!=0 && $row->pl_lati===null && $row->pl_long===null);
 
 	$success = false;
 
-	echo '<b>', htmlspecialchars(str_replace('Unknown', WT_I18N::translate('unknown'), implode(WT_I18N::$list_separator, array_reverse($where_am_i, true)))), '</b><br>';
+	echo '<b>', WT_Filter::escapeHtml(str_replace('Unknown', WT_I18N::translate('unknown'), implode(WT_I18N::$list_separator, array_reverse($where_am_i, true)))), '</b><br>';
 }
 
 if ($action=='add') {
@@ -226,7 +224,7 @@ if ($action=='add') {
 	if (!isset($place_name) || $place_name=="") echo '<b>', WT_I18N::translate('unknown');
 	else echo '<b>', $place_name;
 	if (count($where_am_i)>0)
-		echo ', ', htmlspecialchars(str_replace('Unknown', WT_I18N::translate('unknown'), implode(WT_I18N::$list_separator, array_reverse($where_am_i, true)))), '</b><br>';
+		echo ', ', WT_Filter::escapeHtml(str_replace('Unknown', WT_I18N::translate('unknown'), implode(WT_I18N::$list_separator, array_reverse($where_am_i, true)))), '</b><br>';
 	echo '</b><br>';
 }
 
@@ -254,7 +252,7 @@ $api='v3';
 	</tr>
 	<tr>
 		<td class="descriptionbox"><?php echo WT_Gedcom_Tag::getLabel('PLAC'); ?></td>
-		 <td class="optionbox"><input type="text" id="new_pl_name" name="NEW_PLACE_NAME" value="<?php echo htmlspecialchars($place_name); ?>" size="25" class="address_input">
+		 <td class="optionbox"><input type="text" id="new_pl_name" name="NEW_PLACE_NAME" value="<?php echo WT_Filter::escapeHtml($place_name); ?>" size="25" class="address_input">
 			<div id="INDI_PLAC_pop" style="display: inline;">
 			<?php echo print_specialchar_link('NEW_PLACE_NAME'); ?></div></td><td class="optionbox">
 			<label for="new_pl_name"><a href="#" onclick="showLocation_all(document.getElementById('new_pl_name').value); return false">&nbsp;<?php echo WT_I18N::translate('Search globally'); ?></a></label>

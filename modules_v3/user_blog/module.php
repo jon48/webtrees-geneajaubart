@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14686 2013-01-20 14:55:59Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -51,9 +49,9 @@ class user_blog_WT_Module extends WT_Module implements WT_Module_Block {
 	public function getBlock($block_id, $template=true, $cfg=null) {
 		global $ctype;
 
-		switch (safe_GET('action')) {
+		switch (WT_Filter::get('action')) {
 		case 'deletenews':
-			$news_id=safe_GET('news_id');
+			$news_id=WT_Filter::getInteger('news_id');
 			if ($news_id) {
 				deleteNews($news_id);
 			}
@@ -86,8 +84,7 @@ class user_blog_WT_Module extends WT_Module implements WT_Module_Block {
 			$content .= "<div class=\"news_date\">".format_timestamp($news['date']).'</div>';
 			if ($news["text"]==strip_tags($news["text"])) {
 				// No HTML?
-				// PHP5.3 $news["text"]=nl2br($news["text"], false);
-				$news["text"]=nl2br($news["text"]);
+				$news["text"]=nl2br($news["text"], false);
 			}
 			$content .= $news["text"]."<br><br>";
 			$content .= "<a href=\"#\" onclick=\"window.open('editnews.php?news_id='+".$key.", '_blank', indx_window_specs); return false;\">".WT_I18N::translate('Edit')."</a> | ";

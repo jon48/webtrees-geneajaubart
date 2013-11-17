@@ -8,7 +8,7 @@
 // midday.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Jalali.php 15033 2013-06-01 22:53:08Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -32,21 +30,14 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Date_Jalali extends WT_Date_Calendar {
-	static function CALENDAR_ESCAPE() {
-		return '@#DJALALI@';
-	}
+	const CALENDAR_ESCAPE = '@#DJALALI@';
+	const CAL_START_JD    = 1948321;
+	static $MONTH_ABBREV  = array(
+		''=>0, 'FARVA'=>1, 'ORDIB'=>2, 'KHORD'=>3, 'TIR'=>4, 'MORDA'=>5, 'SHAHR'=>6, 'MEHR'=>7, 'ABAN'=>8, 'AZAR'=>9, 'DEY'=>10, 'BAHMA'=>11, 'ESFAN'=>12
+	);
 
 	static function calendarName() {
 		return /* I18N: The Persian/Jalali calendar */ WT_I18N::translate('Jalali');
-	}
-
-	static function MONTH_TO_NUM($m) {
-		static $months=array(''=>0, 'FARVA'=>1, 'ORDIB'=>2, 'KHORD'=>3, 'TIR'=>4, 'MORDA'=>5, 'SHAHR'=>6, 'MEHR'=>7, 'ABAN'=>8, 'AZAR'=>9, 'DEY'=>10, 'BAHMA'=>11, 'ESFAN'=>12);
-		if (isset($months[$m])) {
-			return $months[$m];
-		} else {
-			return null;
-		}
 	}
 
 	static function NUM_TO_MONTH_NOMINATIVE($n, $leap_year) {
@@ -139,36 +130,17 @@ class WT_Date_Jalali extends WT_Date_Calendar {
 		}
 	}
 
-	static function NUM_TO_GEDCOM_MONTH($n, $leap_year) {
-		switch ($n) {
-		case 1:  return 'FARVA';
-		case 2:  return 'ORDIB';
-		case 3:  return 'KHORD';
-		case 4:  return 'TIR';
-		case 5:  return 'MORDA';
-		case 6:  return 'SHAHR';
-		case 7:  return 'MEHR';
-		case 8:  return 'ABAN';
-		case 9:  return 'AZAR';
-		case 10: return 'DEY';
-		case 11: return 'BAHMA';
-		case 12: return 'ESFAN';
-		default: return '';
-		}
-	}
-	
-	static function CAL_START_JD() {
-		return 1948321;
-	}
-
 	function IsLeapYear() {
-		return (((((($this->y - (($this->y > 0) ? 474 : 473)) % 2820) + 474) + 38) * 682) % 2816) < 682;
+		return in_array(
+			(($this->y + 2346) % 2820) % 128,
+			array(0, 5, 9, 13, 17, 21, 25, 29, 34, 38, 42, 46, 50, 54, 58, 62, 67, 71, 75, 79, 83, 87, 91, 95, 100, 104, 108, 112, 116, 120, 124)
+		);
 	}
 
 	static function YMDtoJD($year, $month, $day) {
 		$epbase = $year - (($year >= 0) ? 474 : 473);
 		$epyear = 474 + $epbase % 2820;
-	
+
 		return $day +
 				(($month <= 7) ?
 					(($month - 1) * 31) :
@@ -177,12 +149,12 @@ class WT_Date_Jalali extends WT_Date_Calendar {
 				(int)((($epyear * 682) - 110) / 2816) +
 				($epyear - 1) * 365 +
 				(int)($epbase / 2820) * 1029983 +
-				(self::CAL_START_JD() - 1);
+				(self::CAL_START_JD - 1);
 	}
 
 	static function JDtoYMD($jd) {
 		$jd = (int)($jd) + 0.5;
-	
+
 		$depoch = $jd - self::YMDtoJD(475, 1, 1);
 		$cycle = (int)($depoch / 1029983);
 		$cyear = $depoch % 1029983;

@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Tree.php 15038 2013-06-12 07:17:35Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -52,9 +50,9 @@ class WT_Tree {
 		$this->tree_id        =$tree_id;
 		$this->tree_name      =$tree_name;
 		$this->tree_name_url  =rawurlencode($tree_name);
-		$this->tree_name_html =htmlspecialchars($tree_name);
+		$this->tree_name_html =WT_Filter::escapeHtml($tree_name);
 		$this->tree_title     =$tree_title;
-		$this->tree_title_html='<span dir="auto">'.htmlspecialchars($tree_title).'</span>';
+		$this->tree_title_html='<span dir="auto">' . WT_Filter::escapeHtml($tree_title) . '</span>';
 		$this->imported       =$imported;
 	}
 
@@ -87,7 +85,7 @@ class WT_Tree {
 			return $this;
 		}
 	}
-	
+
 	// Get and Set the tree's configuration settings
 	public function userPreference($user_id, $setting_name, $setting_value=null) {
 		// There are lots of settings, and we need to fetch lots of them on every page
@@ -117,7 +115,7 @@ class WT_Tree {
 			return $this;
 		}
 	}
-	
+
 	// Can a user accept changes for this tree?
 	public function canAcceptChanges($user_id) {
 		return
@@ -215,7 +213,6 @@ class WT_Tree {
 		WT_Module::setDefaultAccess($tree_id);
 
 		// Gedcom and privacy settings
-		set_gedcom_setting($tree_id, 'ABBREVIATE_CHART_LABELS',      false);
 		set_gedcom_setting($tree_id, 'ADVANCED_NAME_FACTS',          'NICK,_AKA');
 		set_gedcom_setting($tree_id, 'ADVANCED_PLAC_FACTS',          '');
 		set_gedcom_setting($tree_id, 'ALLOW_THEME_DROPDOWN',         true);
@@ -250,7 +247,7 @@ class WT_Tree {
 		set_gedcom_setting($tree_id, 'MAX_PEDIGREE_GENERATIONS',     '10');
 		set_gedcom_setting($tree_id, 'MEDIA_DIRECTORY',              'media/');
 		set_gedcom_setting($tree_id, 'MEDIA_ID_PREFIX',              'M');
-		set_gedcom_setting($tree_id, 'MEDIA_UPLOAD',                 WT_PRIV_USER); 
+		set_gedcom_setting($tree_id, 'MEDIA_UPLOAD',                 WT_PRIV_USER);
 		set_gedcom_setting($tree_id, 'META_DESCRIPTION',             '');
 		set_gedcom_setting($tree_id, 'META_TITLE',                   WT_WEBTREES);
 		set_gedcom_setting($tree_id, 'NOTE_FACTS_ADD',               'SOUR,RESN');
@@ -351,7 +348,7 @@ class WT_Tree {
 
 	// Delete everything relating to a tree
 	public static function delete($tree_id) {
-		// If this is the default tree, then unset 
+		// If this is the default tree, then unset
 		if (WT_Site::preference('DEFAULT_GEDCOM')==self::getNameFromId($tree_id)) {
 			WT_Site::preference('DEFAULT_GEDCOM', '');
 		}

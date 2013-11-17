@@ -2,10 +2,10 @@
 // Counts how many hits.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: hitcount.php 13428 2012-02-11 17:14:29Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,32 +29,35 @@ if (!defined('WT_WEBTREES')) {
 // Only record hits for certain pages
 switch (WT_SCRIPT_NAME) {
 case 'index.php':
-	switch (safe_REQUEST($_REQUEST, 'ctype', array('gedcom', 'user'), WT_USER_ID ? 'user' : 'gedcom')) {
+	switch (WT_Filter::get('ctype', 'gedcom|user', WT_USER_ID ? 'user' : 'gedcom')) {
 	case 'user':
 		$page_parameter='user:'.WT_USER_ID;
 		break;
-	default:
+	case 'gedcom':
 		$page_parameter='gedcom:'.WT_GED_ID;
+		break;
+	default:
+		$page_parameter='';
 		break;
 	}
 	break;
 case 'individual.php':
-	$page_parameter=safe_GET('pid', WT_REGEX_XREF);
+	$page_parameter=WT_Filter::get('pid', WT_REGEX_XREF);
 	break;
 case 'family.php':
-	$page_parameter=safe_GET('famid', WT_REGEX_XREF);
+	$page_parameter=WT_Filter::get('famid', WT_REGEX_XREF);
 	break;
 case 'source.php':
-	$page_parameter=safe_GET('sid', WT_REGEX_XREF);
+	$page_parameter=WT_Filter::get('sid', WT_REGEX_XREF);
 	break;
 case 'repo.php':
-	$page_parameter=safe_GET('rid', WT_REGEX_XREF);
+	$page_parameter=WT_Filter::get('rid', WT_REGEX_XREF);
 	break;
 case 'note.php':
-	$page_parameter=safe_GET('nid', WT_REGEX_XREF);
+	$page_parameter=WT_Filter::get('nid', WT_REGEX_XREF);
 	break;
 case 'mediaviewer.php':
-	$page_parameter=safe_GET('mid', WT_REGEX_XREF);
+	$page_parameter=WT_Filter::get('mid', WT_REGEX_XREF);
 	break;
 default:
 	$page_parameter='';

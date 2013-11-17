@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: admin_site_change.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_change.php');
 require './includes/session.php';
@@ -41,20 +39,20 @@ $earliest=WT_DB::prepare("SELECT DATE(MIN(change_time)) FROM `##change`")->execu
 $latest  =WT_DB::prepare("SELECT DATE(MAX(change_time)) FROM `##change`")->execute(array())->fetchOne();
 
 // Filtering
-$action=safe_GET('action');
-$from  =safe_GET('from', '\d\d\d\d-\d\d-\d\d', $earliest);
-$to    =safe_GET('to',   '\d\d\d\d-\d\d-\d\d', $latest);
-$type  =safe_GET('type', array_keys($statuses));
-$oldged=safe_GET('oldged');
-$newged=safe_GET('newged');
-$xref  =safe_GET('xref');
-$user  =safe_GET('user');
+$action = WT_Filter::get('action');
+$from   = WT_Filter::get('from', '\d\d\d\d-\d\d-\d\d', $earliest);
+$to     = WT_Filter::get('to',   '\d\d\d\d-\d\d-\d\d', $latest);
+$type   = WT_Filter::get('type', 'accepted|rejected|pending');
+$oldged = WT_Filter::get('oldged');
+$newged = WT_Filter::get('newged');
+$xref   = WT_Filter::get('xref', WT_REGEX_XREF);
+$user   = WT_Filter::get('user');
 if (WT_USER_IS_ADMIN) {
 	// Administrators can see all logs
-	$gedc=safe_GET('gedc');
+	$gedc = WT_Filter::get('gedc');
 } else {
 	// Managers can only see logs relating to this gedcom
-	$gedc=WT_GEDCOM;
+	$gedc = WT_GEDCOM;
 }
 
 $query=array();
@@ -80,7 +78,7 @@ if ($newged) {
 	$args []=$newged;
 }
 if ($xref) {
-	$query[]="xref LIKE CONCAT('%', ?, '%')";
+	$query[]="xref = ?";
 	$args []=$xref;
 }
 if ($user) {
@@ -139,33 +137,33 @@ case 'export':
 	exit;
 case 'load_json':
 	Zend_Session::writeClose();
-	$iDisplayStart =(int)safe_GET('iDisplayStart');
-	$iDisplayLength=(int)safe_GET('iDisplayLength');
+	$iDisplayStart  = WT_Filter::getInteger('iDisplayStart');
+	$iDisplayLength = WT_Filter::getInteger('iDisplayLength');
 	set_user_setting(WT_USER_ID, 'admin_site_change_page_size', $iDisplayLength);
 	if ($iDisplayLength>0) {
-		$LIMIT=" LIMIT " . $iDisplayStart . ',' . $iDisplayLength;
+		$LIMIT = " LIMIT " . $iDisplayStart . ',' . $iDisplayLength;
 	} else {
-		$LIMIT="";
+		$LIMIT = "";
 	}
-	$iSortingCols=safe_GET('iSortingCols');
+	$iSortingCols = WT_Filter::getInteger('iSortingCols');
 	if ($iSortingCols) {
 		$ORDER_BY=' ORDER BY ';
 		for ($i=0; $i<$iSortingCols; ++$i) {
 			// Datatables numbers columns 0, 1, 2, ...
 			// MySQL numbers columns 1, 2, 3, ...
-			switch (safe_GET('sSortDir_'.$i)) {
+			switch (WT_Filter::get('sSortDir_'.$i)) {
 			case 'asc':
-				if ((int)safe_GET('iSortCol_'.$i)==0) {
+				if (WT_Filter::getInteger('iSortCol_'.$i)==0) {
 					$ORDER_BY.='change_id ASC '; // column 0 is "timestamp", using change_id gives the correct order for events in the same second
 				} else {
-					$ORDER_BY.=(1+(int)safe_GET('iSortCol_'.$i)).' ASC ';
+					$ORDER_BY.=(1 + WT_Filter::getInteger('iSortCol_'.$i)).' ASC ';
 				}
 				break;
 			case 'desc':
-				if ((int)safe_GET('iSortCol_'.$i)==0) {
+				if (WT_Filter::getInteger('iSortCol_'.$i)==0) {
 					$ORDER_BY.='change_id DESC ';
 				} else {
-					$ORDER_BY.=(1+(int)safe_GET('iSortCol_'.$i)).' DESC ';
+					$ORDER_BY.=(1 + WT_Filter::getInteger('iSortCol_'.$i)).' DESC ';
 				}
 				break;
 			}
@@ -182,20 +180,20 @@ case 'load_json':
 	foreach ($aaData as &$row) {
 		$row[1]=WT_I18N::translate($row[1]);
 		$row[2]='<a href="gedrecord.php?pid='.$row[2].'&ged='.$row[6].'" target="_blank">'.$row[2].'</a>';
-		$row[3]='<pre>'.htmlspecialchars($row[3]).'</pre>';
-		$row[4]='<pre>'.htmlspecialchars($row[4]).'</pre>';
+		$row[3]='<pre>'.WT_Filter::escapeHtml($row[3]).'</pre>';
+		$row[4]='<pre>'.WT_Filter::escapeHtml($row[4]).'</pre>';
 	}
-	
+
 	// Total filtered/unfiltered rows
 	$iTotalDisplayRecords=WT_DB::prepare("SELECT FOUND_ROWS()")->fetchColumn();
 	$iTotalRecords=WT_DB::prepare($SELECT2.$WHERE)->execute($args)->fetchColumn();
 
 	header('Content-type: application/json');
 	echo json_encode(array( // See http://www.datatables.net/usage/server-side
-		'sEcho'               =>(int)safe_GET('sEcho'),
-		'iTotalRecords'       =>$iTotalRecords,
-		'iTotalDisplayRecords'=>$iTotalDisplayRecords,
-		'aaData'              =>$aaData
+		'sEcho'                => WT_Filter::getInteger('sEcho'), // Always an integer
+		'iTotalRecords'        => $iTotalRecords,
+		'iTotalDisplayRecords' => $iTotalDisplayRecords,
+		'aaData'               => $aaData
 	));
 	exit;
 }
@@ -247,20 +245,20 @@ echo
 			'<tr>',
 				'<td colspan="6">',
 					// I18N: %s are both user-input date fields
-					WT_I18N::translate('From %s to %s', '<input class="log-date" name="from" value="'.htmlspecialchars($from).'">', '<input class="log-date" name="to" value="'.htmlspecialchars($to).'">'),
+					WT_I18N::translate('From %s to %s', '<input class="log-date" name="from" value="'.WT_Filter::escapeHtml($from).'">', '<input class="log-date" name="to" value="'.WT_Filter::escapeHtml($to).'">'),
 				'</td>',
 			'</tr><tr>',
 				'<td>',
 					WT_I18N::translate('Status'), '<br>', select_edit_control('type', $statuses, null, $type, ''),
 				'</td>',
 				'<td>',
-					WT_I18N::translate('Record'), '<br><input class="log-filter" name="xref" value="', htmlspecialchars($xref), '"> ',
+					WT_I18N::translate('Record'), '<br><input class="log-filter" name="xref" value="', WT_Filter::escapeHtml($xref), '"> ',
 				'</td>',
 				'<td>',
-					WT_I18N::translate('Old data'), '<br><input class="log-filter" name="oldged" value="', htmlspecialchars($oldged), '"> ',
+					WT_I18N::translate('Old data'), '<br><input class="log-filter" name="oldged" value="', WT_Filter::escapeHtml($oldged), '"> ',
 				'</td>',
 				'<td>',
-					WT_I18N::translate('New data'), '<br><input class="log-filter" name="newged" value="', htmlspecialchars($newged), '"> ',
+					WT_I18N::translate('New data'), '<br><input class="log-filter" name="newged" value="', WT_Filter::escapeHtml($newged), '"> ',
 				'</td>',
 				'<td>',
 					WT_I18N::translate('User'), '<br>', select_edit_control('user', $users_array, '', $user, ''),
@@ -272,7 +270,7 @@ echo
 				'<td colspan="6">',
 					'<input type="submit" value="', WT_I18N::translate('Filter'), '">',
 					'<input type="submit" value="', WT_I18N::translate('Export'), '" onclick="document.changes.action.value=\'export\';return true;" ', ($action=='show' ? '' : 'disabled="disabled"'),'>',
-					'<input type="submit" value="', WT_I18N::translate('Delete'), '" onclick="if (confirm(\'', htmlspecialchars(WT_I18N::translate('Permanently delete these records?')) , '\')) {document.changes.action.value=\'delete\';return true;} else {return false;}" ', ($action=='show' ? '' : 'disabled="disabled"'),'>',
+					'<input type="submit" value="', WT_I18N::translate('Delete'), '" onclick="if (confirm(\'', WT_Filter::escapeHtml(WT_I18N::translate('Permanently delete these records?')) , '\')) {document.changes.action.value=\'delete\';return true;} else {return false;}" ', ($action=='show' ? '' : 'disabled="disabled"'),'>',
 				'</td>',
 			'</tr>',
 		'</table>',

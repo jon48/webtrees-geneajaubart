@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Simple.php 14786 2013-02-06 22:28:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -40,7 +38,7 @@ class WT_Controller_Simple extends WT_Controller_Page {
 		parent::pageHeader();
 		return $this;
 	}
-	
+
 	// Restrict access
 	public function requireAdminLogin() {
 		if (!WT_USER_IS_ADMIN) {
@@ -49,7 +47,7 @@ class WT_Controller_Simple extends WT_Controller_Page {
 		}
 		return $this;
 	}
-	
+
 	// Restrict access
 	public function requireManagerLogin($ged_id=WT_GED_ID) {
 		if (
@@ -61,7 +59,7 @@ class WT_Controller_Simple extends WT_Controller_Page {
 		}
 		return $this;
 	}
-	
+
 	// Restrict access
 	public function requireMemberLogin() {
 		if (!WT_USER_ID) {

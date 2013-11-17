@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: admin_module_menus.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_module_menus.php');
 require 'includes/session.php';
@@ -44,17 +42,17 @@ $controller
 
 $modules=WT_Module::getActiveMenus(WT_GED_ID, WT_PRIV_HIDE);
 
-$action = safe_POST('action');
+$action = WT_Filter::post('action');
 
-if ($action=='update_mods') {
+if ($action=='update_mods' && WT_Filter::checkCsrf()) {
 	foreach ($modules as $module_name=>$module) {
 		foreach (WT_Tree::getAll() as $tree) {
-			$access_level = safe_POST("menuaccess-{$module_name}-{$tree->tree_id}", WT_REGEX_INTEGER, $module->defaultAccessLevel());
+			$access_level = WT_Filter::post("menuaccess-{$module_name}-{$tree->tree_id}", WT_REGEX_INTEGER, $module->defaultAccessLevel());
 			WT_DB::prepare(
 				"REPLACE INTO `##module_privacy` (module_name, gedcom_id, component, access_level) VALUES (?, ?, 'menu', ?)"
 			)->execute(array($module_name, $tree->tree_id, $access_level));
 		}
-		$order = safe_POST('menuorder-'.$module_name);
+		$order = WT_Filter::post('menuorder-'.$module_name);
 		WT_DB::prepare(
 			"UPDATE `##module` SET menu_order=? WHERE module_name=?"
 		)->execute(array($order, $module_name));
@@ -67,6 +65,7 @@ if ($action=='update_mods') {
 <div id="menus" align="center">
 	<form method="post" action="<?php echo WT_SCRIPT_NAME; ?>">
 		<input type="hidden" name="action" value="update_mods">
+		<?php echo WT_Filter::getCsrf(); ?>
 		<table id="menus_table" class="modules_table">
 			<thead>
 				<tr>

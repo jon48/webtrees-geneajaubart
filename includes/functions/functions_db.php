@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: functions_db.php 15043 2013-06-14 21:01:34Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,248 +27,19 @@ if (!defined('WT_WEBTREES')) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Fetch records linked to a given record
-////////////////////////////////////////////////////////////////////////////////
-function fetch_linked_indi($xref, $link, $ged_id) {
-	$rows=WT_DB::prepare(
-		"SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec".
-		" FROM `##individuals`".
-		" JOIN `##link` ON (i_file=l_file AND i_id=l_from)".
-		" LEFT JOIN `##name` ON (i_file=n_file AND i_id=n_id AND n_num=0)".
-		" WHERE i_file=? AND l_type=? AND l_to=?".
-		" ORDER BY n_sort COLLATE '".WT_I18N::$collation."'"
-	)->execute(array($ged_id, $link, $xref))->fetchAll(PDO::FETCH_ASSOC);
-
-	$list=array();
-	foreach ($rows as $row) {
-		$list[]=WT_Person::getInstance($row);
-	}
-	return $list;
-}
-function fetch_linked_fam($xref, $link, $ged_id) {
-	$rows=WT_DB::prepare(
-		"SELECT 'FAM' AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec".
-		" FROM `##families`".
-		" JOIN `##link` ON (f_file=l_file AND f_id=l_from)".
-		" LEFT JOIN `##name` ON (f_file=n_file AND f_id=n_id AND n_num=0)".
-		" WHERE f_file=? AND l_type=? AND l_to=?".
-		" ORDER BY n_sort" // n_sort is not used for families.  Sorting here has no effect???
-	)->execute(array($ged_id, $link, $xref))->fetchAll(PDO::FETCH_ASSOC);
-
-	$list=array();
-	foreach ($rows as $row) {
-		$list[]=WT_Family::getInstance($row);
-	}
-	return $list;
-}
-function fetch_linked_note($xref, $link, $ged_id) {
-	$rows=WT_DB::prepare(
-		"SELECT 'NOTE' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec".
-		" FROM `##other`".
-		" JOIN `##link` ON (o_file=l_file AND o_id=l_from)".
-		" LEFT JOIN `##name` ON (o_file=n_file AND o_id=n_id AND n_num=0)".
-		" WHERE o_file=? AND o_type='NOTE' AND l_type=? AND l_to=?".
-		" ORDER BY n_sort COLLATE '".WT_I18N::$collation."'"
-	)->execute(array($ged_id, $link, $xref))->fetchAll(PDO::FETCH_ASSOC);
-
-	$list=array();
-	foreach ($rows as $row) {
-		$list[]=WT_Note::getInstance($row);
-	}
-	return $list;
-}
-function fetch_linked_sour($xref, $link, $ged_id) {
-	$rows=WT_DB::prepare(
-			"SELECT 'SOUR' AS type, s_id AS xref, s_file AS ged_id, s_gedcom AS gedrec".
-			" FROM `##sources`".
-			" JOIN `##link` ON (s_file=l_file AND s_id=l_from)".
-			" WHERE s_file=? AND l_type=? AND l_to=?".
-			" ORDER BY s_name COLLATE '".WT_I18N::$collation."'"
-		)->execute(array($ged_id, $link, $xref))->fetchAll(PDO::FETCH_ASSOC);
-
-	$list=array();
-	foreach ($rows as $row) {
-		$list[]=WT_Source::getInstance($row);
-	}
-	return $list;
-}
-function fetch_linked_repo($xref, $link, $ged_id) {
-	$rows=WT_DB::prepare(
-		"SELECT 'REPO' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec".
-		" FROM `##other`".
-		" JOIN `##link` ON (o_file=l_file AND o_id=l_from)".
-		" LEFT JOIN `##name` ON (o_file=n_file AND o_id=n_id AND n_num=0)".
-		" WHERE o_file=? AND o_type='REPO' AND l_type=? AND l_to=?".
-		" ORDER BY n_sort COLLATE '".WT_I18N::$collation."'"
-	)->execute(array($ged_id, $link, $xref))->fetchAll(PDO::FETCH_ASSOC);
-
-	$list=array();
-	foreach ($rows as $row) {
-		$list[]=WT_Note::getInstance($row);
-	}
-	return $list;
-}
-function fetch_linked_obje($xref, $link, $ged_id) {
-	$rows=WT_DB::prepare(
-		"SELECT 'OBJE' AS type, m_id AS xref, m_file AS ged_id, m_gedcom AS gedrec, m_titl, m_filename".
-		" FROM `##media`".
-		" JOIN `##link` ON (m_file=l_file AND m_id=l_from)".
-		" WHERE m_file=? AND l_type=? AND l_to=?".
-		" ORDER BY m_titl COLLATE '".WT_I18N::$collation."'"
-	)->execute(array($ged_id, $link, $xref))->fetchAll(PDO::FETCH_ASSOC);
-
-	$list=array();
-	foreach ($rows as $row) {
-		$list[]=WT_Media::getInstance($row);
-	}
-	return $list;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Fetch all records linked to a record - when deleting an object, we must
 // also delete all links to it.
 ////////////////////////////////////////////////////////////////////////////////
-function fetch_all_links($xref, $ged_id) {
+function fetch_all_links($xref, $gedcom_id) {
 	return
-		WT_DB::prepare("SELECT l_from FROM `##link` WHERE l_file=? AND l_to=?")
-		->execute(array($ged_id, $xref))
+		WT_DB::prepare(
+			"SELECT l_from FROM `##link` WHERE l_file=? AND l_to=?" .
+			" UNION " .
+			"SELECT xref FROM `##change` WHERE status='pending' AND gedcom_id=? AND new_gedcom LIKE" .
+			" CONCAT('%@', ?, '@%')"
+		)
+		->execute(array($gedcom_id, $xref, $gedcom_id, $xref))
 		->fetchOneColumn();
-}
-
-// find the gedcom record for a family
-function find_family_record($xref, $ged_id) {
-	static $statement=null;
-
-	if (is_null($statement)) {
-		$statement=WT_DB::prepare(
-			"SELECT f_gedcom FROM `##families` WHERE f_id=? AND f_file=?"
-		);
-	}
-	return $statement->execute(array($xref, $ged_id))->fetchOne();
-}
-
-// find the gedcom record for an individual
-function find_person_record($xref, $ged_id) {
-	static $statement=null;
-
-	if (is_null($statement)) {
-		$statement=WT_DB::prepare(
-			"SELECT i_gedcom FROM `##individuals` WHERE i_id=? AND i_file=?"
-		);
-	}
-	return $statement->execute(array($xref, $ged_id))->fetchOne();
-}
-
-// find the gedcom record for a source
-function find_source_record($xref, $ged_id) {
-	static $statement=null;
-
-	if (is_null($statement)) {
-		$statement=WT_DB::prepare(
-			"SELECT s_gedcom FROM `##sources` WHERE s_id=? AND s_file=?"
-		);
-	}
-	return $statement->execute(array($xref, $ged_id))->fetchOne();
-}
-
-/**
-* Find a repository record by its ID
-* @param string $rid the record id
-* @param string $gedfile the gedcom file id
-*/
-function find_other_record($xref, $ged_id) {
-	static $statement=null;
-
-	if (is_null($statement)) {
-		$statement=WT_DB::prepare(
-			"SELECT o_gedcom FROM `##other` WHERE o_id=? AND o_file=?"
-		);
-	}
-	return $statement->execute(array($xref, $ged_id))->fetchOne();
-}
-
-/**
-* Find a media record by its ID
-* @param string $rid the record id
-*/
-function find_media_record($xref, $ged_id) {
-	static $statement=null;
-
-	if (is_null($statement)) {
-		$statement=WT_DB::prepare(
-			"SELECT m_gedcom FROM `##media` WHERE m_id=? AND m_file=?"
-		);
-	}
-	return $statement->execute(array($xref, $ged_id))->fetchOne();
-}
-
-// Find the gedcom data for a record. Optionally include pending changes.
-function find_gedcom_record($xref, $ged_id, $pending=false) {
-	if ($pending) {
-		// This will return NULL if no record exists, or an empty string if the record has been deleted.
-		$gedcom=find_updated_record($xref, $ged_id);
-	} else {
-		$gedcom=null;
-	}
-
-	if (is_null($gedcom)) {
-		$gedcom=find_person_record($xref, $ged_id);
-	}
-	if (is_null($gedcom)) {
-		$gedcom=find_family_record($xref, $ged_id);
-	}
-	if (is_null($gedcom)) {
-		$gedcom=find_source_record($xref, $ged_id);
-	}
-	if (is_null($gedcom)) {
-		$gedcom=find_media_record($xref, $ged_id);
-	}
-	if (is_null($gedcom)) {
-		$gedcom=find_other_record($xref, $ged_id);
-	}
-	return $gedcom;
-}
-
-/**
- * find and return an updated gedcom record
- * @param string $gid the id of the record to find
- * @param string $gedfile the gedcom file to get the record from.. defaults to currently active gedcom
- */
-function find_updated_record($xref, $ged_id) {
-	static $statement=null;
-
-	if (is_null($statement)) {
-		$statement=WT_DB::prepare(
-			"SELECT new_gedcom FROM `##change` WHERE gedcom_id=? AND xref=? AND status='pending' ".
-			"ORDER BY change_id DESC LIMIT 1"
-		);
-	}
-
-	// This will return NULL if no record exists, or an empty string if the record has been deleted.
-	return $gedcom=$statement->execute(array($ged_id, $xref))->fetchOne();
-}
-
-// Find the type of a gedcom record. Check the cache before querying the database.
-// Returns 'INDI', 'FAM', etc., or null if the record does not exist.
-function gedcom_record_type($xref, $ged_id) {
-	global $gedcom_record_cache;
-	static $statement=null;
-
-	if (is_null($statement)) {
-		$statement=WT_DB::prepare(
-			"SELECT 'INDI' FROM `##individuals` WHERE i_id=? AND i_file=? UNION ALL ".
-			"SELECT 'FAM'  FROM `##families`    WHERE f_id=? AND f_file=? UNION ALL ".
-			"SELECT 'SOUR' FROM `##sources`     WHERE s_id=? AND s_file=? UNION ALL ".
-			"SELECT 'OBJE' FROM `##media`       WHERE m_id=? AND m_file=? UNION ALL ".
-			"SELECT o_type FROM `##other`       WHERE o_id=? AND o_file=?"
-		);
-	}
-
-	if (isset($gedcom_record_cache[$xref][$ged_id])) {
-		return $gedcom_record_cache[$xref][$ged_id]->getType();
-	} else {
-		return $statement->execute(array($xref, $ged_id, $xref, $ged_id, $xref, $ged_id, $xref, $ged_id, $xref, $ged_id))->fetchOne();
-	}
 }
 
 // Find out if there are any pending changes that a given user may accept
@@ -287,13 +56,13 @@ function exists_pending_change($user_id=WT_USER_ID, $ged_id=WT_GED_ID) {
 // get a list of all the sources
 function get_source_list($ged_id) {
 	$rows=
-		WT_DB::prepare("SELECT 'SOUR' AS type, s_id AS xref, s_file AS ged_id, s_gedcom AS gedrec FROM `##sources` s WHERE s_file=?")
+		WT_DB::prepare("SELECT s_id AS xref, s_file AS gedcom_id, s_gedcom AS gedcom FROM `##sources` WHERE s_file=?")
 		->execute(array($ged_id))
-		->fetchAll(PDO::FETCH_ASSOC);
+		->fetchAll();
 
 	$list=array();
 	foreach ($rows as $row) {
-		$list[]=WT_Source::getInstance($row);
+		$list[]=WT_Source::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 	}
 	usort($list, array('WT_GedcomRecord', 'Compare'));
 	return $list;
@@ -303,13 +72,13 @@ function get_source_list($ged_id) {
 // $ged_id - the gedcom to search
 function get_repo_list($ged_id) {
 	$rows=
-		WT_DB::prepare("SELECT 'REPO' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec FROM `##other` WHERE o_type='REPO' AND o_file=?")
+		WT_DB::prepare("SELECT o_id AS xref, o_file AS gedcom_id, o_gedcom AS gedcom FROM `##other` WHERE o_type='REPO' AND o_file=?")
 		->execute(array($ged_id))
-		->fetchAll(PDO::FETCH_ASSOC);
+		->fetchAll();
 
 	$list=array();
 	foreach ($rows as $row) {
-		$list[]=WT_Repository::getInstance($row);
+		$list[]=WT_Repository::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 	}
 	usort($list, array('WT_GedcomRecord', 'Compare'));
 	return $list;
@@ -318,13 +87,13 @@ function get_repo_list($ged_id) {
 //-- get the shared note list from the datastore
 function get_note_list($ged_id) {
 	$rows=
-		WT_DB::prepare("SELECT 'NOTE' AS type, o_id AS xref, {$ged_id} AS ged_id, o_gedcom AS gedrec FROM `##other` WHERE o_type=? AND o_file=?")
-		->execute(array('NOTE', $ged_id))
-		->fetchAll(PDO::FETCH_ASSOC);
+		WT_DB::prepare("SELECT o_id AS xref, o_file AS gedcom_id, o_gedcom AS gedcom FROM `##other` WHERE o_type='NOTE' AND o_file=?")
+		->execute(array($ged_id))
+		->fetchAll();
 
 	$list=array();
 	foreach ($rows as $row) {
-		$list[]=WT_Note::getInstance($row);
+		$list[]=WT_Note::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 	}
 	usort($list, array('WT_GedcomRecord', 'Compare'));
 	return $list;
@@ -333,22 +102,22 @@ function get_note_list($ged_id) {
 
 // Search for INDIs using custom SQL generated by the report engine
 function search_indis_custom($join, $where, $order) {
-	$sql="SELECT DISTINCT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec FROM `##individuals` ".implode(' ', $join).' WHERE '.implode(' AND ', $where);
+	$sql="SELECT DISTINCT i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom FROM `##individuals` ".implode(' ', $join).' WHERE '.implode(' AND ', $where);
 	if ($order) {
 		$sql.=' ORDER BY '.implode(' ', $order);
 	}
 
 	$list=array();
-	$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+	$rows=WT_DB::prepare($sql)->fetchAll();
 	$GED_ID=WT_GED_ID;
 	foreach ($rows as $row) {
 		// Switch privacy file if necessary
-		if ($row['ged_id']!=$GED_ID) {
-			$GEDCOM=get_gedcom_from_id($row['ged_id']);
-			load_gedcom_settings($row['ged_id']);
-			$GED_ID=$row['ged_id'];
+		if ($row->gedcom_id!=$GED_ID) {
+			$GEDCOM=get_gedcom_from_id($row->gedcom_id);
+			load_gedcom_settings($row->gedcom_id);
+			$GED_ID=$row->gedcom_id;
 		}
-		$list[]=WT_Person::getInstance($row);
+		$list[]=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 	}
 	// Switch privacy file if necessary
 	if ($GED_ID!=WT_GED_ID) {
@@ -360,22 +129,22 @@ function search_indis_custom($join, $where, $order) {
 
 // Search for FAMs using custom SQL generated by the report engine
 function search_fams_custom($join, $where, $order) {
-	$sql="SELECT DISTINCT 'FAM' AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec FROM `##families` ".implode(' ', $join).' WHERE '.implode(' AND ', $where);
+	$sql="SELECT DISTINCT f_id AS xref, f_file AS gedcom_id, f_gedcom AS gedcom FROM `##families` ".implode(' ', $join).' WHERE '.implode(' AND ', $where);
 	if ($order) {
 		$sql.=' ORDER BY '.implode(' ', $order);
 	}
 
 	$list=array();
-	$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+	$rows=WT_DB::prepare($sql)->fetchAll();
 	$GED_ID=WT_GED_ID;
 	foreach ($rows as $row) {
 		// Switch privacy file if necessary
-		if ($row['ged_id']!=$GED_ID) {
-			$GEDCOM=get_gedcom_from_id($row['ged_id']);
-			load_gedcom_settings($row['ged_id']);
-			$GED_ID=$row['ged_id'];
+		if ($row->gedcom_id!=$GED_ID) {
+			$GEDCOM=get_gedcom_from_id($row->gedcom_id);
+			load_gedcom_settings($row->gedcom_id);
+			$GED_ID=$row->gedcom_id;
 		}
-		$list[]=WT_Family::getInstance($row);
+		$list[]=WT_Family::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 	}
 	// Switch privacy file if necessary
 	if ($GED_ID!=WT_GED_ID) {
@@ -407,25 +176,25 @@ function search_indis($query, $geds, $match) {
 		$querysql[]="i_gedcom LIKE ".WT_DB::quote("%{$q}%")." COLLATE '".WT_I18N::$collation."'";
 	}
 
-	$sql="SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec FROM `##individuals` WHERE (".implode(" {$match} ", $querysql).') AND i_file IN ('.implode(',', $geds).')';
+	$sql="SELECT i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom FROM `##individuals` WHERE (".implode(" {$match} ", $querysql).') AND i_file IN ('.implode(',', $geds).')';
 
 	// Group results by gedcom, to minimise switching between privacy files
-	$sql.=' ORDER BY ged_id';
+	$sql.=' ORDER BY gedcom_id';
 
 	$list=array();
-	$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+	$rows=WT_DB::prepare($sql)->fetchAll();
 	$GED_ID=WT_GED_ID;
 	foreach ($rows as $row) {
 		// Switch privacy file if necessary
-		if ($row['ged_id']!=$GED_ID) {
-			$GEDCOM=get_gedcom_from_id($row['ged_id']);
-			load_gedcom_settings($row['ged_id']);
-			$GED_ID=$row['ged_id'];
+		if ($row->gedcom_id!=$GED_ID) {
+			$GEDCOM=get_gedcom_from_id($row->gedcom_id);
+			load_gedcom_settings($row->gedcom_id);
+			$GED_ID=$row->gedcom_id;
 		}
 		// SQL may have matched on private data or gedcom tags, so check again against privatized data.
-		$record=WT_Person::getInstance($row);
+		$record=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 		// Ignore non-genealogical data
-		$gedrec=preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcomRecord());
+		$gedrec=preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcom());
 		// Ignore links and tags
 		$gedrec=preg_replace('/\n\d '.WT_REGEX_TAG.'( @'.WT_REGEX_XREF.'@)?/', '', $gedrec);
 		// Re-apply the filtering
@@ -462,24 +231,24 @@ function search_indis_names($query, $geds, $match) {
 	foreach ($query as $q) {
 		$querysql[]="n_full LIKE ".WT_DB::quote("%{$q}%")." COLLATE '".WT_I18N::$collation."'";
 	}
-	$sql="SELECT DISTINCT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, n_num FROM `##individuals` JOIN `##name` ON i_id=n_id AND i_file=n_file WHERE (".implode(" {$match} ", $querysql).') AND i_file IN ('.implode(',', $geds).')';
+	$sql="SELECT DISTINCT i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom, n_num FROM `##individuals` JOIN `##name` ON i_id=n_id AND i_file=n_file WHERE (".implode(" {$match} ", $querysql).') AND i_file IN ('.implode(',', $geds).')';
 
 	// Group results by gedcom, to minimise switching between privacy files
-	$sql.=' ORDER BY ged_id';
+	$sql.=' ORDER BY gedcom_id';
 
 	$list=array();
-	$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+	$rows=WT_DB::prepare($sql)->fetchAll();
 	$GED_ID=WT_GED_ID;
 	foreach ($rows as $row) {
 		// Switch privacy file if necessary
-		if ($row['ged_id']!=$GED_ID) {
-			$GEDCOM=get_gedcom_from_id($row['ged_id']);
-			load_gedcom_settings($row['ged_id']);
-			$GED_ID=$row['ged_id'];
+		if ($row->gedcom_id!=$GED_ID) {
+			$GEDCOM=get_gedcom_from_id($row->gedcom_id);
+			load_gedcom_settings($row->gedcom_id);
+			$GED_ID=$row->gedcom_id;
 		}
-		$indi=WT_Person::getInstance($row);
-		if ($indi->canDisplayName()) {
-			$indi->setPrimaryName($row['n_num']);
+		$indi=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
+		if ($indi->canShowName()) {
+			$indi->setPrimaryName($row->n_num);
 			// We need to clone $indi, as we may have multiple references to the
 			// same person in this list, and the "primary name" would otherwise
 			// be shared amongst all of them.  This has some performance/memory
@@ -501,7 +270,7 @@ function search_indis_names($query, $geds, $match) {
 // $lastname, $firstname, $place - search terms
 // $geds - array of gedcoms to search
 function search_indis_soundex($soundex, $lastname, $firstname, $place, $geds) {
-	$sql="SELECT DISTINCT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec FROM `##individuals`";
+	$sql="SELECT DISTINCT i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom FROM `##individuals`";
 	if ($place) {
 		$sql.=" JOIN `##placelinks` ON (pl_file=i_file AND pl_gid=i_id)";
 		$sql.=" JOIN `##places` ON (p_file=pl_file AND pl_p_id=p_id)";
@@ -545,20 +314,20 @@ function search_indis_soundex($soundex, $lastname, $firstname, $place, $geds) {
 	}
 
 	// Group results by gedcom, to minimise switching between privacy files
-	$sql.=' ORDER BY ged_id';
+	$sql.=' ORDER BY gedcom_id';
 
 	$list=array();
-	$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+	$rows=WT_DB::prepare($sql)->fetchAll();
 	$GED_ID=WT_GED_ID;
 	foreach ($rows as $row) {
 		// Switch privacy file if necessary
-		if ($row['ged_id']!=$GED_ID) {
-			$GEDCOM=get_gedcom_from_id($row['ged_id']);
-			load_gedcom_settings($row['ged_id']);
-			$GED_ID=$row['ged_id'];
+		if ($row->gedcom_id!=$GED_ID) {
+			$GEDCOM=get_gedcom_from_id($row->gedcom_id);
+			load_gedcom_settings($row->gedcom_id);
+			$GED_ID=$row->gedcom_id;
 		}
-		$indi=WT_Person::getInstance($row);
-		if ($indi->canDisplayName()) {
+		$indi=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
+		if ($indi->canShowName()) {
 			$list[]=$indi;
 		}
 	}
@@ -589,7 +358,7 @@ function get_recent_changes($jd=0, $allgeds=false) {
 
 // Seach for individuals with events on a given day
 function search_indis_dates($day, $month, $year, $facts) {
-	$sql="SELECT DISTINCT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec FROM `##individuals` JOIN `##dates` ON i_id=d_gid AND i_file=d_file WHERE i_file=?";
+	$sql="SELECT DISTINCT i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom FROM `##individuals` JOIN `##dates` ON i_id=d_gid AND i_file=d_file WHERE i_file=?";
 	$vars=array(WT_GED_ID);
 	if ($day) {
 		$sql.=" AND d_day=?";
@@ -618,9 +387,9 @@ function search_indis_dates($day, $month, $year, $facts) {
 	}
 
 	$list=array();
-	$rows=WT_DB::prepare($sql)->execute($vars)->fetchAll(PDO::FETCH_ASSOC);
+	$rows=WT_DB::prepare($sql)->execute($vars)->fetchAll();
 	foreach ($rows as $row) {
-		$list[]=WT_Person::getInstance($row);
+		$list[]=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 	}
 	return $list;
 }
@@ -647,25 +416,25 @@ function search_fams($query, $geds, $match) {
 		$querysql[]="f_gedcom LIKE ".WT_DB::quote("%{$q}%")." COLLATE '".WT_I18N::$collation."'";
 	}
 
-	$sql="SELECT 'FAM' AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec FROM `##families` WHERE (".implode(" {$match} ", $querysql).') AND f_file IN ('.implode(',', $geds).')';
+	$sql="SELECT f_id AS xref, f_file AS gedcom_id, f_gedcom AS gedcom FROM `##families` WHERE (".implode(" {$match} ", $querysql).') AND f_file IN ('.implode(',', $geds).')';
 
 	// Group results by gedcom, to minimise switching between privacy files
-	$sql.=' ORDER BY ged_id';
+	$sql.=' ORDER BY gedcom_id';
 
 	$list=array();
-	$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+	$rows=WT_DB::prepare($sql)->fetchAll();
 	$GED_ID=WT_GED_ID;
 	foreach ($rows as $row) {
 		// Switch privacy file if necessary
-		if ($row['ged_id']!=$GED_ID) {
-			$GEDCOM=get_gedcom_from_id($row['ged_id']);
-			load_gedcom_settings($row['ged_id']);
-			$GED_ID=$row['ged_id'];
+		if ($row->gedcom_id!=$GED_ID) {
+			$GEDCOM=get_gedcom_from_id($row->gedcom_id);
+			load_gedcom_settings($row->gedcom_id);
+			$GED_ID=$row->gedcom_id;
 		}
 		// SQL may have matched on private data or gedcom tags, so check again against privatized data.
-		$record=WT_Person::getInstance($row);
+		$record=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 		// Ignore non-genealogical data
-		$gedrec=preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcomRecord());
+		$gedrec=preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcom());
 		// Ignore links and tags
 		$gedrec=preg_replace('/\n\d '.WT_REGEX_TAG.'( @'.WT_REGEX_XREF.'@)?/', '', $gedrec);
 		// Ignore tags
@@ -705,23 +474,23 @@ function search_fams_names($query, $geds, $match) {
 		$querysql[]="(husb.n_full LIKE ".WT_DB::quote("%{$q}%")." COLLATE '".WT_I18N::$collation."' OR wife.n_full LIKE ".WT_DB::quote("%{$q}%")." COLLATE '".WT_I18N::$collation."')";
 	}
 
-	$sql="SELECT DISTINCT 'FAM' AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec FROM `##families` LEFT OUTER JOIN `##name` husb ON f_husb=husb.n_id AND f_file=husb.n_file LEFT OUTER JOIN `##name` wife ON f_wife=wife.n_id AND f_file=wife.n_file WHERE (".implode(" {$match} ", $querysql).') AND f_file IN ('.implode(',', $geds).')';
+	$sql="SELECT DISTINCT f_id AS xref, f_file AS gedcom_id, f_gedcom AS gedcom FROM `##families` LEFT OUTER JOIN `##name` husb ON f_husb=husb.n_id AND f_file=husb.n_file LEFT OUTER JOIN `##name` wife ON f_wife=wife.n_id AND f_file=wife.n_file WHERE (".implode(" {$match} ", $querysql).') AND f_file IN ('.implode(',', $geds).')';
 
 	// Group results by gedcom, to minimise switching between privacy files
-	$sql.=' ORDER BY ged_id';
+	$sql.=' ORDER BY gedcom_id';
 
 	$list=array();
-	$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+	$rows=WT_DB::prepare($sql)->fetchAll();
 	$GED_ID=WT_GED_ID;
 	foreach ($rows as $row) {
 		// Switch privacy file if necessary
-		if ($row['ged_id']!=$GED_ID) {
-			$GEDCOM=get_gedcom_from_id($row['ged_id']);
-			load_gedcom_settings($row['ged_id']);
-			$GED_ID=$row['ged_id'];
+		if ($row->gedcom_id!=$GED_ID) {
+			$GEDCOM=get_gedcom_from_id($row->gedcom_id);
+			load_gedcom_settings($row->gedcom_id);
+			$GED_ID=$row->gedcom_id;
 		}
-		$indi=WT_Family::getInstance($row);
-		if ($indi->canDisplayName()) {
+		$indi=WT_Family::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
+		if ($indi->canShowName()) {
 			$list[]=$indi;
 		}
 	}
@@ -755,25 +524,25 @@ function search_sources($query, $geds, $match) {
 		$querysql[]="s_gedcom LIKE ".WT_DB::quote("%{$q}%")." COLLATE '".WT_I18N::$collation."'";
 	}
 
-	$sql="SELECT 'SOUR' AS type, s_id AS xref, s_file AS ged_id, s_gedcom AS gedrec FROM `##sources` WHERE (".implode(" {$match} ", $querysql).') AND s_file IN ('.implode(',', $geds).')';
+	$sql="SELECT s_id AS xref, s_file AS gedcom_id, s_gedcom AS gedcom FROM `##sources` WHERE (".implode(" {$match} ", $querysql).') AND s_file IN ('.implode(',', $geds).')';
 
 	// Group results by gedcom, to minimise switching between privacy files
-	$sql.=' ORDER BY ged_id';
+	$sql.=' ORDER BY gedcom_id';
 
 	$list=array();
-	$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+	$rows=WT_DB::prepare($sql)->fetchAll();
 	$GED_ID=WT_GED_ID;
 	foreach ($rows as $row) {
 		// Switch privacy file if necessary
-		if ($row['ged_id']!=$GED_ID) {
-			$GEDCOM=get_gedcom_from_id($row['ged_id']);
-			load_gedcom_settings($row['ged_id']);
-			$GED_ID=$row['ged_id'];
+		if ($row->gedcom_id!=$GED_ID) {
+			$GEDCOM=get_gedcom_from_id($row->gedcom_id);
+			load_gedcom_settings($row->gedcom_id);
+			$GED_ID=$row->gedcom_id;
 		}
 		// SQL may have matched on private data or gedcom tags, so check again against privatized data.
-		$record=WT_Person::getInstance($row);
+		$record=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 		// Ignore non-genealogical data
-		$gedrec=preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcomRecord());
+		$gedrec=preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcom());
 		// Ignore links and tags
 		$gedrec=preg_replace('/\n\d '.WT_REGEX_TAG.'( @'.WT_REGEX_XREF.'@)?/', '', $gedrec);
 		// Ignore tags
@@ -817,25 +586,25 @@ function search_notes($query, $geds, $match) {
 		$querysql[]="o_gedcom LIKE ".WT_DB::quote("%{$q}%")." COLLATE '".WT_I18N::$collation."'";
 	}
 
-	$sql="SELECT 'NOTE' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec FROM `##other` WHERE (".implode(" {$match} ", $querysql).") AND o_type='NOTE' AND o_file IN (".implode(',', $geds).')';
+	$sql="SELECT o_id AS xref, o_file AS gedcom_id, o_gedcom AS gedcom FROM `##other` WHERE (".implode(" {$match} ", $querysql).") AND o_type='NOTE' AND o_file IN (".implode(',', $geds).')';
 
 	// Group results by gedcom, to minimise switching between privacy files
-	$sql.=' ORDER BY ged_id';
+	$sql.=' ORDER BY gedcom_id';
 
 	$list=array();
-	$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+	$rows=WT_DB::prepare($sql)->fetchAll();
 	$GED_ID=WT_GED_ID;
 	foreach ($rows as $row) {
 		// Switch privacy file if necessary
-		if ($row['ged_id']!=$GED_ID) {
-			$GEDCOM=get_gedcom_from_id($row['ged_id']);
-			load_gedcom_settings($row['ged_id']);
-			$GED_ID=$row['ged_id'];
+		if ($row->gedcom_id!=$GED_ID) {
+			$GEDCOM=get_gedcom_from_id($row->gedcom_id);
+			load_gedcom_settings($row->gedcom_id);
+			$GED_ID=$row->gedcom_id;
 		}
 		// SQL may have matched on private data or gedcom tags, so check again against privatized data.
-		$record=WT_Person::getInstance($row);
+		$record=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 		// Ignore non-genealogical data
-		$gedrec=preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcomRecord());
+		$gedrec=preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcom());
 		// Ignore links and tags
 		$gedrec=preg_replace('/\n\d '.WT_REGEX_TAG.'( @'.WT_REGEX_XREF.'@)?/', '', $gedrec);
 		// Ignore tags
@@ -880,25 +649,25 @@ function search_repos($query, $geds, $match) {
 		$querysql[]="o_gedcom LIKE ".WT_DB::quote("%{$q}%")." COLLATE '".WT_I18N::$collation."'";
 	}
 
-	$sql="SELECT 'REPO' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec FROM `##other` WHERE (".implode(" {$match} ", $querysql).") AND o_type='REPO' AND o_file IN (".implode(',', $geds).')';
+	$sql="SELECT o_id AS xref, o_file AS gedcom_id, o_gedcom AS gedcom FROM `##other` WHERE (".implode(" {$match} ", $querysql).") AND o_type='REPO' AND o_file IN (".implode(',', $geds).')';
 
 	// Group results by gedcom, to minimise switching between privacy files
-	$sql.=' ORDER BY ged_id';
+	$sql.=' ORDER BY gedcom_id';
 
 	$list=array();
-	$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+	$rows=WT_DB::prepare($sql)->fetchAll();
 	$GED_ID=WT_GED_ID;
 	foreach ($rows as $row) {
 		// Switch privacy file if necessary
-		if ($row['ged_id']!=$GED_ID) {
-			$GEDCOM=get_gedcom_from_id($row['ged_id']);
-			load_gedcom_settings($row['ged_id']);
-			$GED_ID=$row['ged_id'];
+		if ($row->gedcom_id!=$GED_ID) {
+			$GEDCOM=get_gedcom_from_id($row->gedcom_id);
+			load_gedcom_settings($row->gedcom_id);
+			$GED_ID=$row->gedcom_id;
 		}
 		// SQL may have matched on private data or gedcom tags, so check again against privatized data.
-		$record=WT_Person::getInstance($row);
+		$record=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 		// Ignore non-genealogical data
-		$gedrec=preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcomRecord());
+		$gedrec=preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcom());
 		// Ignore links and tags
 		$gedrec=preg_replace('/\n\d '.WT_REGEX_TAG.'( @'.WT_REGEX_XREF.'@)?/', '', $gedrec);
 		// Ignore tags
@@ -1123,57 +892,27 @@ function get_anniversary_events($jd, $facts='', $ged_id=WT_GED_ID) {
 		$where.=" AND d_file=".$ged_id;
 
 		// Now fetch these anniversaries
-		$ind_sql="SELECT DISTINCT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, d_type, d_day, d_month, d_year, d_fact FROM `##dates`, `##individuals` {$where} AND d_gid=i_id AND d_file=i_file ORDER BY d_day ASC, d_year DESC";
-		$fam_sql="SELECT DISTINCT 'FAM' AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec, d_type, d_day, d_month, d_year, d_fact FROM `##dates`, `##families` {$where} AND d_gid=f_id AND d_file=f_file ORDER BY d_day ASC, d_year DESC";
+		$ind_sql="SELECT DISTINCT 'INDI' AS type, i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom, d_type, d_day, d_month, d_year, d_fact FROM `##dates`, `##individuals` {$where} AND d_gid=i_id AND d_file=i_file ORDER BY d_day ASC, d_year DESC";
+		$fam_sql="SELECT DISTINCT 'FAM'  AS type, f_id AS xref, f_file AS gedcom_id, f_gedcom AS gedcom, d_type, d_day, d_month, d_year, d_fact FROM `##dates`, `##families` {$where} AND d_gid=f_id AND d_file=f_file ORDER BY d_day ASC, d_year DESC";
 		foreach (array($ind_sql, $fam_sql) as $sql) {
-			$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+			$rows=WT_DB::prepare($sql)->fetchAll();
 			foreach ($rows as $row) {
-				if ($row['type']=='INDI') {
-					$record=WT_Person::getInstance($row);
+				if ($row->type=='INDI') {
+					$record=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 				} else {
-					$record=WT_Family::getInstance($row);
+					$record=WT_Family::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 				}
-				if ($record->canDisplayDetails()) {
-					// Generate a regex to match the retrieved date - so we can find it in the original gedcom record.
-					// TODO having to go back to the original gedcom is lame.  This is why it is so slow.
-					// We should store the level1 fact here (or in a "facts" table)
-					if ($row['d_type']=='@#DJULIAN@') {
-						if ($row['d_year']<0) {
-							$year_regex=$row['d_year'].' ?[Bb]\.? ?[Cc]\.\ ?';
-						} else {
-							$year_regex="({$row['d_year']}|".($row['d_year']-1)."\/".($row['d_year']%100).")";
-						}
-					} else
-						$year_regex="0*".$row['d_year'];
-					$ged_date_regex="/2 DATE.*(".($row['d_day']>0 ? "0?{$row['d_day']}\s*" : "").$row['d_month']."\s*".($row['d_year']!=0 ? $year_regex : "").")/i";
-					preg_match_all('/\n(1 ('.WT_REGEX_TAG.').*(\n[2-9] .*)*)/', $row['gedrec'], $matches);
-					foreach ($matches[1] as $factrec) {
-						if (preg_match('/^1 '.$row['d_fact'].'[ \n]/', $factrec) && preg_match($ged_date_regex, $factrec, $match)) {
-							$date=new WT_Date($match[1]);
-							if (preg_match('/2 PLAC (.+)/', $factrec, $match)) {
-								$plac=$match[1];
-							} else {
-								$plac='';
-							}
-							if (canDisplayFact($row['xref'], $ged_id, $factrec)) {
-								$found_facts[]=array(
-									'record'=>$record,
-									'id'=>$row['xref'],
-									'objtype'=>$row['type'],
-									'fact'=>$row['d_fact'],
-									'factrec'=>$factrec,
-									'jd'=>$jd,
-									'anniv'=>($row['d_year']==0?0:$anniv->y-$row['d_year']),
-									'date'=>$date,
-									'plac'=>$plac
-								);
-							}
-						}
+				$anniv_date = new WT_Date($row->d_type . ' ' . $row->d_day . ' ' . $row->d_month . ' ' . $row->d_year);
+				foreach ($record->getFacts(str_replace(' ', '|', $facts)) as $fact) {
+					if ($fact->getDate() == $anniv_date && $fact->getTag()==$row->d_fact) {
+						$fact->anniv = $row->d_year == 0 ? 0 : $anniv->y - $row->d_year;
+						$found_facts[] = $fact;
 					}
 				}
 			}
 		}
 	}
+
 	return $found_facts;
 }
 
@@ -1212,45 +951,21 @@ function get_calendar_events($jd1, $jd2, $facts='', $ged_id=WT_GED_ID) {
 	$where.=" AND d_file=".$ged_id;
 
 	// Now fetch these events
-	$ind_sql="SELECT d_gid, i_gedcom, 'INDI', d_type, d_day, d_month, d_year, d_fact, d_type FROM `##dates`, `##individuals` {$where} AND d_gid=i_id AND d_file=i_file GROUP BY d_julianday1 ORDER BY d_julianday1";
-	$fam_sql="SELECT d_gid, f_gedcom, 'FAM',  d_type, d_day, d_month, d_year, d_fact, d_type FROM `##dates`, `##families`    {$where} AND d_gid=f_id AND d_file=f_file GROUP BY d_julianday1 ORDER BY d_julianday1";
+	$ind_sql="SELECT d_gid AS xref, i_file AS gedcom_id, i_gedcom AS gedcom, 'INDI' AS type, d_type, d_day, d_month, d_year, d_fact, d_type FROM `##dates`, `##individuals` {$where} AND d_gid=i_id AND d_file=i_file GROUP BY d_julianday1, d_gid ORDER BY d_julianday1";
+	$fam_sql="SELECT d_gid AS xref, f_file AS gedcom_id, f_gedcom AS gedcom, 'FAM'  AS type, d_type, d_day, d_month, d_year, d_fact, d_type FROM `##dates`, `##families`    {$where} AND d_gid=f_id AND d_file=f_file GROUP BY d_julianday1, d_gid ORDER BY d_julianday1";
 	foreach (array($ind_sql, $fam_sql) as $sql) {
-		$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_NUM);
+		$rows=WT_DB::prepare($sql)->fetchAll();
 		foreach ($rows as $row) {
-			// Generate a regex to match the retrieved date - so we can find it in the original gedcom record.
-			// TODO having to go back to the original gedcom is inneficient and slow.
-			// We should store the level1 fact here (or somewhere)
-			if ($row[8]=='@#DJULIAN@') {
-				if ($row[6]<0) {
-					$year_regex=$row[6].' ?[Bb]\.? ?[Cc]\.\ ?';
-				} else {
-					$year_regex="({$row[6]}|".($row[6]-1)."\/".($row[6]%100).")";
-				}
+			if ($row->type=='INDI') {
+				$record=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 			} else {
-				$year_regex="0*".$row[6];
+				$record=WT_Family::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 			}
-			$ged_date_regex="/2 DATE.*(".($row[4]>0 ? "0?{$row[4]}\s*" : "").$row[5]."\s*".($row[6]!=0 ? $year_regex : "").")/i";
-			preg_match_all('/\n(1 ('.WT_REGEX_TAG.').*(\n[2-9] .*)*)/', $row[1], $matches);
-			foreach ($matches[1] as $factrec) {
-				if (preg_match('/^1 '.$row[7].'[ \n]/', $factrec) && preg_match($ged_date_regex, $factrec, $match)) {
-					$date=new WT_Date($match[1]);
-					if (preg_match('/2 PLAC (.+)/', $factrec, $match)) {
-						$plac=$match[1];
-					} else {
-						$plac='';
-					}
-					if (canDisplayFact($row[0], $ged_id, $factrec)) {
-						$found_facts[]=array(
-							'id'=>$row[0],
-							'objtype'=>$row[2],
-							'fact'=>$row[7],
-							'factrec'=>$factrec,
-							'jd'=>$jd1,
-							'anniv'=>0,
-							'date'=>$date,
-							'plac'=>$plac
-						);
-					}
+			$anniv_date = new WT_Date($row->d_type . ' ' . $row->d_day . ' ' . $row->d_month . ' ' . $row->d_year);
+			foreach ($record->getFacts(str_replace(' ', '|', $facts)) as $fact) {
+				if ($fact->getDate() == $anniv_date) {
+					$fact->anniv = 0;
+					$found_facts[] = $fact;
 				}
 			}
 		}
@@ -1258,22 +973,9 @@ function get_calendar_events($jd1, $jd2, $facts='', $ged_id=WT_GED_ID) {
 	return $found_facts;
 }
 
-
-/**
-* Get the list of current and upcoming events, sorted by anniversary date
-*
-* This function is used by the Todays and Upcoming blocks on the Index and Portal
-* pages.
-*
-* Special note on unknown day-of-month:
-* When the anniversary date is imprecise, the sort will pretend that the day-of-month
-* is either tomorrow or the first day of next month.  These imprecise anniversaries
-* will sort to the head of the chosen day.
-*
-* Special note on Privacy:
-* This routine does not check the Privacy of the events in the list.  That check has
-* to be done by the routine that makes use of the event list.
-*/
+////////////////////////////////////////////////////////////////////////////////
+// Get the list of current and upcoming events, sorted by anniversary date
+////////////////////////////////////////////////////////////////////////////////
 function get_events_list($jd1, $jd2, $events='') {
 	$found_facts=array();
 	for ($jd=$jd1; $jd<=$jd2; ++$jd) {
@@ -1466,20 +1168,12 @@ function get_newest_registered_user() {
 }
 
 function set_user_password($user_id, $password) {
-	if (version_compare(PHP_VERSION, '5.3')>0) {
-		// Some PHP5.2 implementations of crypt() appear to be broken - #802316
-		// PHP5.3 will always support BLOWFISH - see php.net/crypt
-		// This salt will select the BLOWFISH algorithm with 2^12 rounds
-		$salt='$2a$12$';
-		$salt_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./';
-		for ($i=0;$i<22;++$i) {
-			$salt.=substr($salt_chars, mt_rand(0,63), 1);
-		}
-		$password_hash=crypt($password, $salt);
-	} else {
-		// Our prefered hash algorithm is not available.  Use the default.
-		$password_hash=crypt($password);
+	$salt='$2a$12$';
+	$salt_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./';
+	for ($i=0;$i<22;++$i) {
+		$salt.=substr($salt_chars, mt_rand(0,63), 1);
 	}
+	$password_hash=crypt($password, $salt);
 	WT_DB::prepare("UPDATE `##user` SET password=? WHERE user_id=?")
 		->execute(array($password_hash, $user_id));
 	AddToLog('User ID: '.$user_id. ' ('.get_user_name($user_id).') changed password', 'auth');
@@ -1493,7 +1187,7 @@ function check_user_password($user_id, $password) {
 		->fetchOne();
 	if (crypt($password, $password_hash)==$password_hash) {
 		// Update older passwords to use BLOWFISH with 2^12 rounds
-		if (version_compare(PHP_VERSION, '5.3')>0 && substr($password_hash, 0, 7)!='$2a$12$') {
+		if (substr($password_hash, 0, 7)!='$2a$12$') {
 			set_user_password($user_id, $password);
 		}
 		return true;

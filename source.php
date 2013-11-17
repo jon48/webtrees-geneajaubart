@@ -21,8 +21,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: source.php 15001 2013-05-13 22:17:50Z greg $
 
 define('WT_SCRIPT_NAME', 'source.php');
 require './includes/session.php';
@@ -30,16 +28,16 @@ require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 $controller=new WT_Controller_Source();
 
-if ($controller->record && $controller->record->canDisplayDetails()) {
+if ($controller->record && $controller->record->canShow()) {
 	$controller->pageHeader();
-	if ($controller->record->isMarkedDeleted()) {
+	if ($controller->record->isOld()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
 				/* I18N: %1$s is “accept”, %2$s is “reject”.  These are links. */ WT_I18N::translate(
 					'This source has been deleted.  You should review the deletion and then %1$s or %2$s it.',
-					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'accept') . '</a>',
-					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'reject') . '</a>'
+					'<a href="#" onclick="accept_changes(\''.$controller->record->getXref().'\');">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'accept') . '</a>',
+					'<a href="#" onclick="reject_changes(\''.$controller->record->getXref().'\');">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'reject') . '</a>'
 				),
 				' ', help_link('pending_changes'),
 				'</p>';
@@ -50,14 +48,14 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 				' ', help_link('pending_changes'),
 				'</p>';
 		}
-	} elseif (find_updated_record($controller->record->getXref(), WT_GED_ID)!==null) {
+	} elseif ($controller->record->isNew()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
 				/* I18N: %1$s is “accept”, %2$s is “reject”.  These are links. */ WT_I18N::translate(
 					'This source has been edited.  You should review the changes and then %1$s or %2$s them.',
-					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'accept') . '</a>',
-					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'reject') . '</a>'
+					'<a href="#" onclick="accept_changes(\''.$controller->record->getXref().'\');">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'accept') . '</a>',
+					'<a href="#" onclick="reject_changes(\''.$controller->record->getXref().'\');">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'reject') . '</a>'
 				),
 				' ', help_link('pending_changes'),
 				'</p>';
@@ -79,14 +77,14 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 $linkToID=$controller->record->getXref(); // Tell addmedia.php what to link to
 
 $controller
-	->addInlineJavascript('function show_gedcom_record() {var recwin=window.open("gedrecord.php?pid=' . $controller->record->getXref() . '", "_blank", edit_window_specs);}')
+	->addInlineJavascript('function show_gedcom_record() {window.open("gedrecord.php?pid=' . $controller->record->getXref() . '", "_blank", edit_window_specs);}')
 	->addInlineJavascript('jQuery("#source-tabs").tabs();')
 	->addInlineJavascript('jQuery("#source-tabs").css("visibility", "visible");');
 
-$linked_indi = $controller->record->fetchLinkedIndividuals();
-$linked_fam  = $controller->record->fetchLinkedFamilies();
-$linked_obje = $controller->record->fetchLinkedMedia();
-$linked_note = $controller->record->fetchLinkedNotes();
+$linked_indi = $controller->record->linkedIndividuals('SOUR');
+$linked_fam  = $controller->record->linkedFamilies('SOUR');
+$linked_obje = $controller->record->linkedMedia('SOUR');
+$linked_note = $controller->record->linkedNotes('SOUR');
 
 echo '<div id="source-details">';
 echo '<h2>', $controller->record->getFullName(), '</h2>';
@@ -106,27 +104,52 @@ echo '<div id="source-tabs">
 			echo '<li><a href="#note-sources"><span id="notesource">', WT_I18N::translate('Notes'), '</span></a></li>';
 		}
 		echo '</ul>';
-	// Edit this source
+
 	echo '<div id="source-edit">';
 		echo '<table class="facts_table">';
 
-		$sourcefacts=$controller->record->getFacts();
-		foreach ($sourcefacts as $fact) {
+		// Fetch the facts
+		$facts=$controller->record->getFacts();
+
+		// Sort the facts
+		usort(
+			$facts,
+			function(WT_Fact $x, WT_Fact $y) {
+				static $order = array(
+					'TITL' => 0,
+					'ABBR' => 1,
+					'AUTH' => 2,
+					'DATA' => 3,
+					'PUBL' => 4,
+					'TEXT' => 5,
+					'NOTE' => 6,
+					'OBJE' => 7,
+					'REFN' => 8,
+					'RIN'  => 9,
+					'_UID' => 10,
+					'CHAN' => 11,
+				);
+				return
+					(array_key_exists($x->getTag(), $order) ? $order[$x->getTag()] : PHP_INT_MAX)
+					-
+					(array_key_exists($y->getTag(), $order) ? $order[$y->getTag()] : PHP_INT_MAX);
+			}
+		);
+
+		// Print the facts
+		foreach ($facts as $fact) {
 			print_fact($fact, $controller->record);
 		}
 
-		// Print media
-		print_main_media($controller->record->getXref());
-
 		// new fact link
 		if ($controller->record->canEdit()) {
-			print_add_new_fact($controller->record->getXref(), $sourcefacts, 'SOUR');
+			print_add_new_fact($controller->record->getXref(), $facts, 'SOUR');
 			// new media
 			if (get_gedcom_setting(WT_GED_ID, 'MEDIA_UPLOAD') >= WT_USER_ACCESS_LEVEL) {
 				echo '<tr><td class="descriptionbox">';
 				echo WT_Gedcom_Tag::getLabel('OBJE');
 				echo '</td><td class="optionbox">';
-				echo '<a href="#" onclick="window.open(\'addmedia.php?action=showmediaform&amp;linktoid=', $controller->record->getXref(), '\', \'_blank\', edit_window_specs); return false;">', WT_I18N::translate('Add a new media object'), '</a>';		
+				echo '<a href="#" onclick="window.open(\'addmedia.php?action=showmediaform&amp;linktoid=', $controller->record->getXref(), '\', \'_blank\', edit_window_specs); return false;">', WT_I18N::translate('Add a new media object'), '</a>';
 				echo help_link('OBJE');
 				echo '<br>';
 				echo '<a href="#" onclick="window.open(\'inverselink.php?linktoid=', $controller->record->getXref(), '&amp;linkto=source\', \'_blank\', find_window_specs); return false;">', WT_I18N::translate('Link to an existing media object'), '</a>';
@@ -134,7 +157,8 @@ echo '<div id="source-tabs">
 			}
 		}
 		echo '</table>
-	</div>'; // close "details"
+	</div>';
+
 	// Individuals linked to this source
 	if ($linked_indi) {
 		echo '<div id="indi-sources">';

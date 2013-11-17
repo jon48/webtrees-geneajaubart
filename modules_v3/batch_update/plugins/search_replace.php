@@ -2,7 +2,7 @@
 // Batch Update plugin for phpGedView - search/replace
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: search_replace.php 15030 2013-06-01 21:09:01Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -58,10 +56,10 @@ class search_replace_bu_plugin extends base_plugin {
 
 	function getOptions() {
 		parent::getOptions();
-		$this->search =safe_GET('search', WT_REGEX_UNSAFE);
-		$this->replace=safe_GET('replace', WT_REGEX_UNSAFE);
-		$this->method =safe_GET('method', array('exact', 'words', 'wildcards', 'regex'), 'exact');
-		$this->case   =safe_GET('case', 'i');
+		$this->search  = WT_Filter::get('search');
+		$this->replace = WT_Filter::get('replace');
+		$this->method  = WT_Filter::get('method', 'exact|words|wildcards|regex', 'exact');
+		$this->case    = WT_Filter::get('case', 'i');
 
 		$this->error='';
 		switch ($this->method) {
@@ -81,7 +79,7 @@ class search_replace_bu_plugin extends base_plugin {
 			$ct=-1;
 			$ct=@preg_match('/'.$this->search.'/', '');
 			if ($ct==-1) {
-				$this->error='<br><span class="error">'.WT_I18N::translate('The regex appears to contain an error.  It can\'t be used.').'</span>';
+				$this->error='<br><span class="error">'.WT_I18N::translate('The regex appears to contain an error.  It can’t be used.').'</span>';
 			}
 			break;
 		}
@@ -92,18 +90,18 @@ class search_replace_bu_plugin extends base_plugin {
 			'exact'=>WT_I18N::translate('Match the exact text, even if it occurs in the middle of a word.'),
 			'words'=>WT_I18N::translate('Match the exact text, unless it occurs in the middle of a word.'),
 			'wildcards'=>WT_I18N::translate('Use a &laquo;?&raquo; to match a single character, use &laquo;*&raquo; to match zero or more characters.'),
-			'regex'=>WT_I18N::translate('Regular expressions are an advanced pattern matching technique.  See <a href="http://php.net/manual/en/regexp.reference.php" target="_new">php.net/manual/en/regexp.reference.php</a> for futher details.'),
+			'regex'=>WT_I18N::translate('Regular expressions are an advanced pattern matching technique.  See <a href="http://php.net/manual/en/regexp.reference.php" target="_blank">php.net/manual/en/regexp.reference.php</a> for futher details.'),
 		);
 
 		return
 			'<tr><th>'.WT_I18N::translate('Search text/pattern').'</th>'.
 			'<td>'.
-			'<input name="search" size="40" value="'.htmlspecialchars($this->search).
+			'<input name="search" size="40" value="'.WT_Filter::escapeHtml($this->search).
 			'" onchange="this.form.submit();"></td></tr>'.
 
 			'<tr><th>'.WT_I18N::translate('Replacement text').'</th>'.
 			'<td>'.
-			'<input name="replace" size="40" value="'.htmlspecialchars($this->replace).
+			'<input name="replace" size="40" value="'.WT_Filter::escapeHtml($this->replace).
 			'" onchange="this.form.submit();"></td></tr>'.
 
 			'<tr><th>'.WT_I18N::translate('Search method').'</th>'.

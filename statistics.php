@@ -8,7 +8,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,15 +23,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: statistics.php 15070 2013-06-20 23:30:30Z nigel $
 
 define('WT_SCRIPT_NAME', 'statistics.php');
 require './includes/session.php';
 
 // check for on demand content loading
-$tab = safe_GET('tab', WT_REGEX_NOSCRIPT, 0);
-$ajax = safe_GET('ajax', WT_REGEX_NOSCRIPT, 0);
+$tab  = WT_Filter::getInteger('tab', 0, 3);
+$ajax = WT_Filter::getBool('ajax');
 
 if (!$ajax) {
 	$controller=new WT_Controller_Page();
@@ -40,11 +38,22 @@ if (!$ajax) {
 		->addInlineJavascript('
 			jQuery("#statistics_chart").css("visibility", "visible");
 			jQuery("#statistics_chart").tabs({
-				beforeLoad: function() {jQuery("#loading-indicator").addClass("loading-image");},
-				load: function() {jQuery("#loading-indicator").removeClass("loading-image");},
-				cache: true
+				load: function() {
+					jQuery("#loading-indicator").removeClass("loading-image");
+				},
+				beforeLoad: function(event, ui) {
+					jQuery("#loading-indicator").addClass("loading-image");
+					// Only load each tab once
+					if (ui.tab.data("loaded")) {
+						event.preventDefault();
+						return;
+					}
+					ui.jqXHR.success(function() {
+						ui.tab.data("loaded", true);
+					});
+				}
 			});
-		')		
+		')
 		->pageHeader();
 
 	echo '<div id="statistics-page"><h2>', WT_I18N::translate('Statistics'), '</h2>',
@@ -158,7 +167,7 @@ if (!$ajax) {
 		</table>
 		<br>';
 		if (WT_USER_ID) {
-			echo '<b>', WT_I18N::translate('Oldest living people'), '</b>
+			echo '<b>', WT_I18N::translate('Oldest living individuals'), '</b>
 			<table class="facts_table">
 				<tr>
 					<td class="facts_label">', WT_I18N::translate('Males'), '</td>
@@ -564,7 +573,7 @@ if (!$ajax) {
 			echo '<br><select id="xas-grenzen-leeftijden" name="xas-grenzen-leeftijden">
 				<option value="1,5,10,20,30,40,50,60,70,80,90,100" selected="selected">',
 				WT_I18N::plural('interval %s year', 'interval %s years', 10, WT_I18N::number(10)), '</option>
-				<option value="5,20,40,60,75,80,85,90">', 
+				<option value="5,20,40,60,75,80,85,90">',
 				WT_I18N::plural('interval %s year', 'interval %s years', 20, WT_I18N::number(20)), '</option>
 				<option value="10,25,50,75,100">',
 				WT_I18N::plural('interval %s year', 'interval %s years', 25, WT_I18N::number(25)), '</option>

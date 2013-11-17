@@ -8,10 +8,10 @@
 // $content - the content of the block
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: block_main_temp.php 12813 2011-11-19 14:18:05Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +34,7 @@ if (!defined('WT_WEBTREES')) {
 
 ?>
 <div id="<?php echo $id; ?>" class="block" >
-	<table class="blockheader" cellpadding="0" cellspacing="0" style="padding:0;margin:0;">
+	<table class="blockheader">
 		<tr>
 			<td class="blockh1" ></td>
 			<td class="blockh2" >

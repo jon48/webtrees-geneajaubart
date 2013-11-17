@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,122 +20,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: functions.php 15058 2013-06-16 16:42:20Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Extract, sanitise and validate FORM (POST), URL (GET) and COOKIE variables.
-//
-// Request variables should ALWAYS be accessed through these functions, to
-// protect against XSS (cross-site-scripting) attacks.
-//
-// $var     - The variable to check
-// $regex   - Regular expression to validate the variable (or an array of
-//            regular expressions).  A number of common regexes are defined in
-//            session.php as constants WT_REGEX_*.  If no value is specified,
-//            the default blocks all characters that could introduce scripts.
-// $default - A value to use if $var is undefined or invalid.
-//
-// You should always know whether your variables are coming from GET or POST,
-// and always use the correct function.
-//
-// NOTE: when using checkboxes, $var is either set (checked) or unset (not
-// checked).  This lets us use the syntax safe_GET('my_checkbox', 'yes', 'no')
-//
-// NOTE: when using listboxes, $regex can be an array of valid values.  For
-// example, you can use safe_POST('lang', array_keys($pgv_language), WT_LOCALE)
-// to validate against a list of valid languages and supply a sensible default.
-//
-// If the values are plain text, pass them through preg_quote_array() to
-// escape any regex special characters:
-// $export = safe_GET('export', preg_quote_array($gedcoms));
-////////////////////////////////////////////////////////////////////////////////
-
-function safe_POST($var, $regex=WT_REGEX_NOSCRIPT, $default=null) {
-	return safe_REQUEST($_POST, $var, $regex, $default);
-}
-function safe_GET($var, $regex=WT_REGEX_NOSCRIPT, $default=null) {
-	return safe_REQUEST($_GET, $var, $regex, $default);
-}
-function safe_COOKIE($var, $regex=WT_REGEX_NOSCRIPT, $default=null) {
-	return safe_REQUEST($_COOKIE, $var, $regex, $default);
-}
-
-function safe_GET_integer($var, $min, $max, $default) {
-	$num=safe_GET($var, WT_REGEX_INTEGER, $default);
-	$num=max($num, $min);
-	$num=min($num, $max);
-	return (int)$num;
-}
-function safe_POST_integer($var, $min, $max, $default) {
-	$num=safe_POST($var, WT_REGEX_INTEGER, $default);
-	$num=max($num, $min);
-	$num=min($num, $max);
-	return (int)$num;
-}
-
-function safe_GET_bool($var, $true='(y|Y|1|yes|YES|Yes|true|TRUE|True|on)') {
-	return !is_null(safe_GET($var, $true));
-}
-function safe_POST_bool($var, $true='(y|Y|1|yes|YES|Yes|true|TRUE|True|on)') {
-	return !is_null(safe_POST($var, $true));
-}
-
-function safe_GET_xref($var, $default=null) {
-	return safe_GET($var, WT_REGEX_XREF, $default);
-}
-function safe_POST_xref($var, $default=null) {
-	return safe_POST($var, WT_REGEX_XREF, $default);
-}
-
-function safe_REQUEST($arr, $var, $regex=WT_REGEX_NOSCRIPT, $default=null) {
-	if (is_array($regex)) {
-		$regex='(?:'.join('|', $regex).')';
-	}
-	if (array_key_exists($var, $arr) && preg_match_recursive('~^'.addcslashes($regex, '~').'$~', $arr[$var])) {
-		return $arr[$var];
-	} else {
-		return $default;
-	}
-}
-
-function preg_quote_array($var) {
-	if (is_scalar($var)) {
-		return preg_quote($var);
-	} else {
-		if (is_array($var)) {
-			foreach ($var as &$v) {
-				$v = preg_quote($v);
-			}
-			return $var;
-		} else {
-			// Neither scalar nor array.  Object?
-			return false;
-		}
-	}
-}
-
-function preg_match_recursive($regex, $var) {
-	if (is_scalar($var)) {
-		return preg_match($regex, $var);
-	} else {
-		if (is_array($var)) {
-			foreach ($var as $k=>$v) {
-				if (!preg_match_recursive($regex, $v)) {
-					return false;
-				}
-			}
-			return true;
-		} else {
-			// Neither scalar nor array.  Object?
-			return false;
-		}
-	}
 }
 
 // Fetch a remote file.  Stream wrappers are disabled on
@@ -217,7 +105,6 @@ function file_upload_error_text($error_code) {
 function load_gedcom_settings($ged_id=WT_GED_ID) {
 	// Load the configuration settings into global scope
 	// TODO: some of these are used infrequently - just load them when we need them
-	global $ABBREVIATE_CHART_LABELS;      $ABBREVIATE_CHART_LABELS      =get_gedcom_setting($ged_id, 'ABBREVIATE_CHART_LABELS');
 	global $ADVANCED_NAME_FACTS;          $ADVANCED_NAME_FACTS          =get_gedcom_setting($ged_id, 'ADVANCED_NAME_FACTS');
 	global $ADVANCED_PLAC_FACTS;          $ADVANCED_PLAC_FACTS          =get_gedcom_setting($ged_id, 'ADVANCED_PLAC_FACTS');
 	global $CALENDAR_FORMAT;              $CALENDAR_FORMAT              =get_gedcom_setting($ged_id, 'CALENDAR_FORMAT');
@@ -357,22 +244,6 @@ function wt_error_handler($errno, $errstr, $errfile, $errline) {
 // ************************************************* START OF GEDCOM FUNCTIONS ********************************* //
 
 /**
- * Get first tag in GEDCOM sub-record
- *
- * This routine uses function get_sub_record to retrieve the specified sub-record
- * and then returns the first tag.
- *
- */
-function get_first_tag($level, $tag, $gedrec, $num=1) {
-	$temp = get_sub_record($level, $level." ".$tag, $gedrec, $num)."\n";
-	$length = strpos($temp, "\n");
-	if ($length===false) {
-		$length = strlen($temp);
-	}
-	return substr($temp, 2, $length-2);
-}
-
-/**
  * get a gedcom subrecord
  *
  * searches a gedcom record and returns a subrecord of it.  A subrecord is defined starting at a
@@ -431,124 +302,6 @@ function get_sub_record($level, $tag, $gedrec, $num=1) {
 }
 
 /**
- * get gedcom tag value
- *
- * returns the value of a gedcom tag from the given gedcom record
- * @param string $tag The tag to find, use : to delineate subtags
- * @param int $level The gedcom line level of the first tag to find, setting level to 0 will cause it to use 1+ the level of the incoming record
- * @param string $gedrec The gedcom record to get the value from
- * @param int $truncate Should the value be truncated to a certain number of characters
- * @return string
- */
-function get_gedcom_value($tag, $level, $gedrec, $truncate='') {
-	global $GEDCOM;
-	$ged_id=get_id_from_gedcom($GEDCOM);
-
-	if (empty($gedrec)) {
-		return "";
-	}
-	$tags = explode(':', $tag);
-	$origlevel = $level;
-	if ($level==0) {
-		$level = $gedrec{0} + 1;
-	}
-
-	$subrec = $gedrec;
-	foreach ($tags as $indexval => $t) {
-		$lastsubrec = $subrec;
-		$subrec = get_sub_record($level, "$level $t", $subrec);
-		if (empty($subrec) && $origlevel==0) {
-			$level--;
-			$subrec = get_sub_record($level, "$level $t", $lastsubrec);
-		}
-		if (empty($subrec)) {
-			if ($t=="TITL") {
-				$subrec = get_sub_record($level, "$level ABBR", $lastsubrec);
-				if (!empty($subrec)) {
-					$t = "ABBR";
-				}
-			}
-			if (empty($subrec)) {
-				if ($level>0) {
-					$level--;
-				}
-				$subrec = get_sub_record($level, "@ $t", $gedrec);
-				if (empty($subrec)) {
-					return;
-				}
-			}
-		}
-		$level++;
-	}
-	$level--;
-	$ct = preg_match("/$level $t(.*)/", $subrec, $match);
-	if ($ct==0) {
-		$ct = preg_match("/$level @.+@ (.+)/", $subrec, $match);
-	}
-	if ($ct==0) {
-		$ct = preg_match("/@ $t (.+)/", $subrec, $match);
-	}
-	if ($ct > 0) {
-		$value = trim($match[1]);
-		if ($t=='NOTE' && preg_match('/^@(.+)@$/', $value, $match)) {
-			$oldsub = $subrec;
-			$subrec = find_other_record($match[1], $ged_id);
-			if ($subrec) {
-				$value=$match[1];
-				$ct = preg_match("/0 @$match[1]@ $t (.+)/", $subrec, $match);
-				if ($ct>0) {
-					$value = $match[1];
-					$level = 0;
-				} else
-					$subrec = $oldsub;
-			} else {
-				//-- set the value to the id without the @
-				$value = $match[1];
-			}
-		}
-		if ($level!=0 || $t!="NOTE") {
-			$value .= get_cont($level+1, $subrec);
-		}
-		$value = preg_replace("'\n'", "", $value);
-		$value = preg_replace("'<br>'", "\n", $value);
-		return $value;
-	}
-	return "";
-}
-
-/**
- * create CONT lines
- *
- * Break input GEDCOM subrecord into pieces not more than 255 chars long,
- * with CONC and CONT lines as needed.  Routine also pays attention to the
- * word wrapped Notes option.  Routine also avoids splitting UTF-8 encoded
- * characters between lines.
- *
- * @param string $newline Input GEDCOM subrecord to be worked on
- * @return string $newged Output string with all necessary CONC and CONT lines
- */
-function breakConts($newline) {
-	global $WORD_WRAPPED_NOTES;
-
-	// Determine level number of CONC and CONT lines
-	$level = substr($newline, 0, 1);
-	$tag = substr($newline, 1, 6);
-	if ($tag!=" CONC " && $tag!=" CONT ") {
-		$level ++;
-	}
-
-	$newged = "";
-	$newlines = preg_split("/\n/", rtrim($newline));
-	for ($k=0; $k<count($newlines); $k++) {
-		if ($k>0) {
-			$newlines[$k] = "{$level} CONT ".$newlines[$k];
-		}
-		$newged .= trim($newlines[$k])."\n";
-	}
-	return $newged;
-}
-
-/**
  * get CONT lines
  *
  * get the N+1 CONT or CONC lines of a gedcom subrecord
@@ -556,14 +309,9 @@ function breakConts($newline) {
  * @param string $nrec the gedcom subrecord to search in
  * @return string a string with all CONT or CONC lines merged
  */
-function get_cont($nlevel, $nrec, $tobr=true) {
+function get_cont($nlevel, $nrec) {
 	global $WORD_WRAPPED_NOTES;
 	$text = "";
-	if ($tobr) {
-		$newline = "<br>";
-	} else {
-		$newline = "\n";
-	}
 
 	$subrecords = explode("\n", $nrec);
 	foreach ($subrecords as $thisSubrecord) {
@@ -572,7 +320,7 @@ function get_cont($nlevel, $nrec, $tobr=true) {
 		}
 		$subrecordType = substr($thisSubrecord, 2, 4);
 		if ($subrecordType=="CONT") {
-			$text .= $newline;
+			$text .= "\n";
 		}
 		if ($subrecordType=="CONC" && $WORD_WRAPPED_NOTES) {
 			$text .= " ";
@@ -583,50 +331,6 @@ function get_cont($nlevel, $nrec, $tobr=true) {
 	}
 
 	return rtrim($text, " ");
-}
-
-/**
- * find the parents in a family
- *
- * find and return a two element array containing the parents of the given family record
- * @author John Finlay (yalnifj)
- * @param string $famid the gedcom xref id for the family
- * @return array returns a two element array with indexes HUSB and WIFE for the parent ids
- */
-function find_parents($famid) {
-	$famrec = find_gedcom_record($famid, WT_GED_ID, WT_USER_CAN_EDIT);
-	if (empty($famrec)) {
-		return false;
-	}
-	return find_parents_in_record($famrec);
-}
-
-/**
- * find the parents in a family record
- *
- * find and return a two element array containing the parents of the given family record
- * @author John Finlay (yalnifj)
- * @param string $famrec the gedcom record of the family to search in
- * @return array returns a two element array with indexes HUSB and WIFE for the parent ids
- */
-function find_parents_in_record($famrec) {
-	if (empty($famrec)) {
-		return false;
-	}
-	$parents = array();
-	$ct = preg_match('/1 HUSB @('.WT_REGEX_XREF.')@/', $famrec, $match);
-	if ($ct>0) {
-		$parents["HUSB"]=$match[1];
-	} else {
-		$parents["HUSB"]="";
-	}
-	$ct = preg_match('/1 WIFE @('.WT_REGEX_XREF.')@/', $famrec, $match);
-	if ($ct>0) {
-		$parents["WIFE"]=$match[1];
-	} else {
-		$parents["WIFE"]="";
-	}
-	return $parents;
 }
 
 // ************************************************* START OF SORTING FUNCTIONS ********************************* //
@@ -659,91 +363,6 @@ function event_sort_name($a, $b) {
 	}
 }
 
-// Helper function to sort facts.
-function compare_facts_date($arec, $brec) {
-	if (is_array($arec))
-		$arec = $arec[1];
-	if (is_array($brec))
-		$brec = $brec[1];
-
-	// If either fact is undated, the facts sort equally.
-	if (!preg_match("/2 _?DATE (.*)/", $arec, $amatch) || !preg_match("/2 _?DATE (.*)/", $brec, $bmatch)) {
-		if (preg_match('/2 _SORT (\d+)/', $arec, $match1) && preg_match('/2 _SORT (\d+)/', $brec, $match2)) {
-			return $match1[1]-$match2[1];
-		}
-		return 0;
-	}
-
-	$adate = new WT_Date($amatch[1]);
-	$bdate = new WT_Date($bmatch[1]);
-	// If either date can’t be parsed, don’t sort.
-	if (!$adate->isOK() || !$bdate->isOK()) {
-		if (preg_match('/2 _SORT (\d+)/', $arec, $match1) && preg_match('/2 _SORT (\d+)/', $brec, $match2)) {
-			return $match1[1]-$match2[1];
-		}
-		return 0;
-	}
-
-	// Remember that dates can be ranges and overlapping ranges sort equally.
-	$amin=$adate->MinJD();
-	$bmin=$bdate->MinJD();
-	$amax=$adate->MaxJD();
-	$bmax=$bdate->MaxJD();
-
-	// BEF/AFT XXX sort as the day before/after XXX
-	if ($adate->qual1=='BEF') {
-		$amin=$amin-1;
-		$amax=$amin;
-	} elseif ($adate->qual1=='AFT') {
-		$amax=$amax+1;
-		$amin=$amax;
-	}
-	if ($bdate->qual1=='BEF') {
-		$bmin=$bmin-1;
-		$bmax=$bmin;
-	} elseif ($bdate->qual1=='AFT') {
-		$bmax=$bmax+1;
-		$bmin=$bmax;
-	}
-
-	if ($amax<$bmin) {
-		return -1;
-	} else {
-		if ($amin>$bmax) {
-			return 1;
-		} else {
-			//-- ranged date... take the type of fact sorting into account
-			$factWeight = 0;
-			if (preg_match('/2 _SORT (\d+)/', $arec, $match1) && preg_match('/2 _SORT (\d+)/', $brec, $match2)) {
-				$factWeight = $match1[1]-$match2[1];
-			}
-			//-- fact is prefered to come before, so compare using the minimum ranges
-			if ($factWeight < 0 && $amin!=$bmin) {
-				return ($amin-$bmin);
-			} else {
-				if ($factWeight > 0 && $bmax!=$amax) {
-					//-- fact is prefered to come after, so compare using the max of the ranges
-					return ($bmax-$amax);
-				} else {
-					//-- facts are the same or the ranges don’t give enough info, so use the average of the range
-					$aavg = ($amin+$amax)/2;
-					$bavg = ($bmin+$bmax)/2;
-					if ($aavg<$bavg) {
-						return -1;
-					} else {
-						if ($aavg>$bavg) {
-							return 1;
-						} else {
-							return $factWeight;
-						}
-					}
-				}
-			}
-			return 0;
-		}
-	}
-}
-
 /**
  * A multi-key sort
  * 1. First divide the facts into two arrays one set with dates and one set without dates
@@ -761,13 +380,16 @@ function sort_facts(&$arr) {
 	foreach ($arr as $event) {
 		$event->sortOrder = $order;
 		$order++;
-		if ($event->getValue("DATE")==NULL || !$event->getDate()->isOk()) $nondated[] = $event;
-		else $dated[] = $event;
+		if ($event->getDate()->isOk()) {
+			$dated[] = $event;
+		} else {
+			$nondated[] = $event;
+		}
 	}
 
 	//-- sort each type of array
-	usort($dated, array("WT_Event", "CompareDate"));
-	usort($nondated, array("WT_Event", "CompareType"));
+	usort($dated, array("WT_Fact", "CompareDate"));
+	usort($nondated, array("WT_Fact", "CompareType"));
 
 	//-- merge the arrays back together comparing by Facts
 	$dc = count($dated);
@@ -778,7 +400,7 @@ function sort_facts(&$arr) {
 	// while there is anything in the dated array continue merging
 	while ($i<$dc) {
 		// compare each fact by type to merge them in order
-		if ($j<$nc && WT_Event::CompareType($dated[$i], $nondated[$j])>0) {
+		if ($j<$nc && WT_Fact::CompareType($dated[$i], $nondated[$j])>0) {
 			$arr[$k] = $nondated[$j];
 			$j++;
 		}
@@ -798,6 +420,31 @@ function sort_facts(&$arr) {
 
 }
 
+// For close family relationships, such as the families tab and the family navigator
+// Display a tick if both individuals are the same.
+// Stop after 3 steps, because pending edits may mean that there is no longer a
+// relationship to find.
+function get_close_relationship_name(WT_Individual $person1, WT_Individual $person2) {
+	if ($person1 === $person2) {
+		$label = '<i class="icon-selected" title="' . WT_I18N::translate('self') . '"></i>';
+	} else {
+		$label = get_relationship_name(get_relationship($person1, $person2, true, 3));
+	}
+	return $label;
+}
+
+// For facts on the individual/family pages.
+// Stop after 4 steps, as distant relationships may take a long time to find.
+// TODO review the limit of 4 when the performance of the function is improved
+function get_associate_relationship_name(WT_Individual $person1, WT_Individual $person2) {
+	if ($person1 === $person2) {
+		$label = WT_I18N::translate('self');
+	} else {
+		$label = get_relationship_name(get_relationship($person1, $person2, true, 4));
+	}
+	return $label;
+}
+
 /**
  * Get relationship between two individuals in the gedcom
  *
@@ -807,8 +454,8 @@ function sort_facts(&$arr) {
  * @param int $maxlength - the maximum length of path
  * @param int $path_to_find - which path in the relationship to find, 0 is the shortest path, 1 is the next shortest path, etc
  */
-function get_relationship(WT_Person $person1, WT_Person $person2, $followspouse=true, $maxlength=0, $path_to_find=0) {
-	if (!$person1 || !$person2 || $person1->equals($person2)) {
+function get_relationship(WT_Individual $person1, WT_Individual $person2, $followspouse=true, $maxlength=0, $path_to_find=0) {
+	if ($person1 === $person2) {
 		return false;
 	}
 
@@ -858,7 +505,7 @@ function get_relationship(WT_Person $person1, WT_Person $person2, $followspouse=
 						$node1['indi'] = $spouse;
 						$node1['relations'][] = 'parent';
 						$p1nodes[] = $node1;
-						if ($spouse->equals($person2)) {
+						if ($spouse === $person2) {
 							if ($path_to_find>0) {
 								$path_to_find--;
 							} else {
@@ -878,7 +525,7 @@ function get_relationship(WT_Person $person1, WT_Person $person2, $followspouse=
 						$node1['indi'] = $child;
 						$node1['relations'][] = 'sibling';
 						$p1nodes[] = $node1;
-						if ($child->equals($person2)) {
+						if ($child === $person2) {
 							if ($path_to_find>0) {
 								$path_to_find--;
 							} else {
@@ -903,7 +550,7 @@ function get_relationship(WT_Person $person1, WT_Person $person2, $followspouse=
 							$node1['indi'] = $spouse;
 							$node1['relations'][] = 'spouse';
 							$p1nodes[] = $node1;
-							if ($spouse->equals($person2)) {
+							if ($spouse === $person2) {
 								if ($path_to_find>0) {
 									$path_to_find--;
 								} else {
@@ -924,7 +571,7 @@ function get_relationship(WT_Person $person1, WT_Person $person2, $followspouse=
 						$node1['indi'] = $child;
 						$node1['relations'][] = 'child';
 						$p1nodes[] = $node1;
-						if ($child->equals($person2)) {
+						if ($child === $person2) {
 							if ($path_to_find>0) {
 								$path_to_find--;
 							} else {
@@ -1109,8 +756,7 @@ function cousin_name2($n, $sex, $relation) {
 	}
 }
 
-
-function get_relationship_name_from_path($path, WT_Person $person1=null, WT_Person $person2=null) {
+function get_relationship_name_from_path($path, WT_Individual $person1=null, WT_Individual $person2=null) {
 	if (!preg_match('/^(mot|fat|par|hus|wif|spo|son|dau|chi|bro|sis|sib)*$/', $path)) {
 		// TODO: Update all the “3 RELA ” values in class_person
 		return '<span class="error">'.$path.'</span>';
@@ -1140,10 +786,10 @@ function get_relationship_name_from_path($path, WT_Person $person1=null, WT_Pers
 	case 'hus':
 		if ($person1 && $person2) {
 			foreach ($person1->getSpouseFamilies() as $family) {
-				if ($person2->equals($family->getSpouse($person1))) {
-					if ($family->isNotMarried()) {
+				if ($person2 === $family->getSpouse($person1)) {
+					if ($family->getFacts('_NMR')) {
 						return WT_I18N::translate_c('MALE', 'partner');
-					} elseif($family->isDivorced()) {
+					} elseif($family->getFacts(WT_EVENTS_DIV)) {
 						return WT_I18N::translate('ex-husband');
 					}
 				}
@@ -1153,10 +799,10 @@ function get_relationship_name_from_path($path, WT_Person $person1=null, WT_Pers
 	case 'wif':
 		if ($person1 && $person1) {
 			foreach ($person1->getSpouseFamilies() as $family) {
-				if ($person2->equals($family->getSpouse($person1))) {
-					if ($family->isNotMarried()) {
+				if ($person2 === $family->getSpouse($person1)) {
+					if ($family->getFacts('_NMR')) {
 						return WT_I18N::translate_c('FEMALE', 'partner');
-					} elseif($family->isDivorced()) {
+					} elseif($family->getFacts(WT_EVENTS_DIV)) {
 						return WT_I18N::translate('ex-wife');
 					}
 				}
@@ -1166,10 +812,10 @@ function get_relationship_name_from_path($path, WT_Person $person1=null, WT_Pers
 	case 'spo':
 		if ($person1 && $person2) {
 			foreach ($person1->getSpouseFamilies() as $family) {
-				if ($person2->equals($family->getSpouse($person1))) {
-					if ($family->isNotMarried()) {
+				if ($person2 === $family->getSpouse($person1)) {
+					if ($family->getFacts('_NMR')) {
 						return WT_I18N::translate_c('MALE/FEMALE', 'partner');
-					} elseif($family->isDivorced()) {
+					} elseif($family->getFacts(WT_EVENTS_DIV)) {
 						return WT_I18N::translate('ex-spouse');
 					}
 				}
@@ -1339,26 +985,26 @@ function get_relationship_name_from_path($path, WT_Person $person1=null, WT_Pers
 	case 'chichison': return WT_I18N::translate_c('child\'s child\'s son',            'great-grandson');
 	case 'chidauchi': return WT_I18N::translate_c('child\'s daughter\'s child',       'great-grandchild');
 	case 'chidaudau': return WT_I18N::translate_c('child\'s daughter\'s daughter',    'great-granddaughter');
-	case 'chidauhus': return WT_I18N::translate_c('child\'s daughter\'s husband',     'granddaughter\'s husband');
+	case 'chidauhus': return WT_I18N::translate_c('child\'s daughter\'s husband',     'granddaughter’s husband');
 	case 'chidauson': return WT_I18N::translate_c('child\'s daughter\'s son',         'great-grandson');
 	case 'chisonchi': return WT_I18N::translate_c('child\'s son\'s child',            'great-grandchild');
 	case 'chisondau': return WT_I18N::translate_c('child\'s son\'s daughter',         'great-granddaughter');
 	case 'chisonson': return WT_I18N::translate_c('child\'s son\'s son',              'great-grandson');
-	case 'chisonwif': return WT_I18N::translate_c('child\'s son\'s wife',             'grandson\'s wife');
+	case 'chisonwif': return WT_I18N::translate_c('child\'s son\'s wife',             'grandson’s wife');
 	case 'dauchichi': return WT_I18N::translate_c('daughter\'s child\'s child',       'great-grandchild');
 	case 'dauchidau': return WT_I18N::translate_c('daughter\'s child\'s daughter',    'great-granddaughter');
 	case 'dauchison': return WT_I18N::translate_c('daughter\'s child\'s son',         'great-grandson');
 	case 'daudauchi': return WT_I18N::translate_c('daughter\'s daughter\'s child',    'great-grandchild');
 	case 'daudaudau': return WT_I18N::translate_c('daughter\'s daughter\'s daughter', 'great-granddaughter');
-	case 'daudauhus': return WT_I18N::translate_c('daughter\'s daughter\'s husband',  'granddaughter\'s husband');
+	case 'daudauhus': return WT_I18N::translate_c('daughter\'s daughter\'s husband',  'granddaughter’s husband');
 	case 'daudauson': return WT_I18N::translate_c('daughter\'s daughter\'s son',      'great-grandson');
-	case 'dauhusfat': return WT_I18N::translate_c('daughter\'s husband\'s father',    'son-in-law\'s father');
-	case 'dauhusmot': return WT_I18N::translate_c('daughter\'s husband\'s mother',    'son-in-law\'s mother');
-	case 'dauhuspar': return WT_I18N::translate_c('daughter\'s husband\'s parent',    'son-in-law\'s parent');
+	case 'dauhusfat': return WT_I18N::translate_c('daughter\'s husband\'s father',    'son-in-law’s father');
+	case 'dauhusmot': return WT_I18N::translate_c('daughter\'s husband\'s mother',    'son-in-law’s mother');
+	case 'dauhuspar': return WT_I18N::translate_c('daughter\'s husband\'s parent',    'son-in-law’s parent');
 	case 'dausonchi': return WT_I18N::translate_c('daughter\'s son\'s child',         'great-grandchild');
 	case 'dausondau': return WT_I18N::translate_c('daughter\'s son\'s daughter',      'great-granddaughter');
 	case 'dausonson': return WT_I18N::translate_c('daughter\'s son\'s son',           'great-grandson');
-	case 'dausonwif': return WT_I18N::translate_c('daughter\'s son\'s wife',          'grandson\'s wife');
+	case 'dausonwif': return WT_I18N::translate_c('daughter\'s son\'s wife',          'grandson’s wife');
 	case 'fatbrochi': return WT_I18N::translate_c('father\'s brother\'s child',       'first cousin');
 	case 'fatbrodau': return WT_I18N::translate_c('father\'s brother\'s daughter',    'first cousin');
 	case 'fatbroson': return WT_I18N::translate_c('father\'s brother\'s son',         'first cousin');
@@ -1481,15 +1127,15 @@ function get_relationship_name_from_path($path, WT_Person $person1=null, WT_Pers
 	case 'sonchison': return WT_I18N::translate_c('son\'s child\'s son',              'great-grandson');
 	case 'sondauchi': return WT_I18N::translate_c('son\'s daughter\'s child',         'great-grandchild');
 	case 'sondaudau': return WT_I18N::translate_c('son\'s daughter\'s daughter',      'great-granddaughter');
-	case 'sondauhus': return WT_I18N::translate_c('son\'s daughter\'s husband',       'granddaughter\'s husband');
+	case 'sondauhus': return WT_I18N::translate_c('son\'s daughter\'s husband',       'granddaughter’s husband');
 	case 'sondauson': return WT_I18N::translate_c('son\'s daughter\'s son',           'great-grandson');
 	case 'sonsonchi': return WT_I18N::translate_c('son\'s son\'s child',              'great-grandchild');
 	case 'sonsondau': return WT_I18N::translate_c('son\'s son\'s daughter',           'great-granddaughter');
 	case 'sonsonson': return WT_I18N::translate_c('son\'s son\'s son',                'great-grandson');
-	case 'sonsonwif': return WT_I18N::translate_c('son\'s son\'s wife',               'grandson\'s wife');
-	case 'sonwiffat': return WT_I18N::translate_c('son\'s wife\'s father',            'daughter-in-law\'s father');
-	case 'sonwifmot': return WT_I18N::translate_c('son\'s wife\'s mother',            'daughter-in-law\'s mother');
-	case 'sonwifpar': return WT_I18N::translate_c('son\'s wife\'s parent',            'daughter-in-law\'s parent');
+	case 'sonsonwif': return WT_I18N::translate_c('son\'s son\'s wife',               'grandson’s wife');
+	case 'sonwiffat': return WT_I18N::translate_c('son\'s wife\'s father',            'daughter-in-law’s father');
+	case 'sonwifmot': return WT_I18N::translate_c('son\'s wife\'s mother',            'daughter-in-law’s mother');
+	case 'sonwifpar': return WT_I18N::translate_c('son\'s wife\'s parent',            'daughter-in-law’s parent');
 	case 'wifbrowif': return WT_I18N::translate_c('wife\'s brother\'s wife',          'sister-in-law');
 	case 'wifsishus': return WT_I18N::translate_c('wife\'s sister\'s husband',        'brother-in-law');
 
@@ -2021,7 +1667,7 @@ function get_relationship_name_from_path($path, WT_Person $person1=null, WT_Pers
 			// Need to find out which languages use which rules.
 			switch (WT_LOCALE) {
 			case 'nn': // Source: Hogne Røed Nilsen
-			case 'nb':				
+			case 'nb':
 			case 'da': // Source: Patrick Sorensen
 				switch ($sex2) {
 				case 'M': return WT_I18N::translate('great x%d grandson',      $up-3);
@@ -2103,10 +1749,10 @@ function get_relationship_name_from_path($path, WT_Person $person1=null, WT_Pers
 			case 3:
 				if ($up>$down) {
 					/* I18N: %s=“fifth cousin”, etc. */
-					return WT_I18N::translate('%s thrice removed ascending', cousin_name($cousin, $sex2));
+					return WT_I18N::translate('%s three times removed ascending', cousin_name($cousin, $sex2));
 				} else {
 					/* I18N: %s=“fifth cousin”, etc. */
-					return WT_I18N::translate('%s thrice removed descending', cousin_name($cousin, $sex2));
+					return WT_I18N::translate('%s three times removed descending', cousin_name($cousin, $sex2));
 				}
 			default:
 				if ($up>$down) {
@@ -2129,7 +1775,7 @@ function get_relationship_name_from_path($path, WT_Person $person1=null, WT_Pers
 	while ($path2) {
 		$tmp=WT_I18N::translate(
 			// I18N: A complex relationship, such as “third-cousin’s great-uncle”
-			'%1$s\'s %2$s',
+			'%1$s’s %2$s',
 			get_relationship_name_from_path($path1, null, null), // TODO: need the actual people
 			get_relationship_name_from_path($path2, null, null)
 		);
@@ -2201,144 +1847,7 @@ function get_query_url($overwrite=null, $separator='&') {
 	}
 }
 
-//This function works with a specified generation limit.  It will completely fill
-//the PDF without regard to whether a known person exists in each generation.
-//TODO: If a known individual is found in a generation, add prior empty positions
-//and add remaining empty spots automatically.
-function add_ancestors(&$list, $pid, $children=false, $generations=-1, $show_empty=false) {
-	$total_num_skipped = 0;
-	$skipped_gen = 0;
-	$num_skipped = 0;
-	$genlist = array($pid);
-	$list[$pid]->generation = 1;
-	while (count($genlist)>0) {
-		$id = array_shift($genlist);
-		if (strpos($id, "empty")===0) continue; // id can be something like “empty7”
-		$person = WT_Person::getInstance($id);
-		$famids = $person->getChildFamilies();
-		if (count($famids)>0) {
-			if ($show_empty) {
-				for ($i=0;$i<$num_skipped;$i++) {
-					$list["empty" . $total_num_skipped] = new WT_Person('');
-					$list["empty" . $total_num_skipped]->generation = $list[$id]->generation+1;
-					array_push($genlist, "empty" . $total_num_skipped);
-					$total_num_skipped++;
-				}
-			}
-			$num_skipped = 0;
-			foreach ($famids as $famid => $family) {
-				$husband = $family->getHusband();
-				$wife = $family->getWife();
-				if ($husband) {
-					$list[$husband->getXref()] = $husband;
-					$list[$husband->getXref()]->generation = $list[$id]->generation+1;
-				} elseif ($show_empty) {
-					$list["empty" . $total_num_skipped] = new WT_Person('');
-					$list["empty" . $total_num_skipped]->generation = $list[$id]->generation+1;
-				}
-				if ($wife) {
-					$list[$wife->getXref()] = $wife;
-					$list[$wife->getXref()]->generation = $list[$id]->generation+1;
-				} elseif ($show_empty) {
-					$list["empty" . $total_num_skipped] = new WT_Person('');
-					$list["empty" . $total_num_skipped]->generation = $list[$id]->generation+1;
-				}
-				if ($generations == -1 || $list[$id]->generation+1 < $generations) {
-					$skipped_gen = $list[$id]->generation+1;
-					if ($husband) {
-						array_push($genlist, $husband->getXref());
-					} elseif ($show_empty) {
-						array_push($genlist, "empty" . $total_num_skipped);
-					}
-					if ($wife) {
-						array_push($genlist, $wife->getXref());
-					} elseif ($show_empty) {
-						array_push($genlist, "empty" . $total_num_skipped);
-					}
-				}
-				$total_num_skipped++;
-				if ($children) {
-					$childs = $family->getChildren();
-					foreach ($childs as $child) {
-						$list[$child->getXref()] = $child;
-						if (isset($list[$id]->generation))
-							$list[$child->getXref()]->generation = $list[$id]->generation;
-						else
-							$list[$child->getXref()]->generation = 1;
-					}
-				}
-			}
-		} else
-			if ($show_empty) {
-				if ($skipped_gen > $list[$id]->generation) {
-					$list["empty" . $total_num_skipped] = new WT_Person('');
-					$list["empty" . $total_num_skipped]->generation = $list[$id]->generation+1;
-					$total_num_skipped++;
-					$list["empty" . $total_num_skipped] = new WT_Person('');
-					$list["empty" . $total_num_skipped]->generation = $list[$id]->generation+1;
-					array_push($genlist, "empty" . ($total_num_skipped - 1));
-					array_push($genlist, "empty" . $total_num_skipped);
-					$total_num_skipped++;
-				} else
-					$num_skipped += 2;
-		}
-
-	}
-}
-
-//--- copied from class_reportpdf.php
-function add_descendancy(&$list, $pid, $parents=false, $generations=-1) {
-	$person = WT_Person::getInstance($pid);
-	if ($person==null) return;
-	if (!isset($list[$pid])) {
-		$list[$pid] = $person;
-	}
-	if (!isset($list[$pid]->generation)) {
-		$list[$pid]->generation = 0;
-	}
-	foreach ($person->getSpouseFamilies() as $family) {
-		if ($parents) {
-			$husband = $family->getHusband();
-			$wife = $family->getWife();
-			if ($husband) {
-				$list[$husband->getXref()] = $husband;
-				if (isset($list[$pid]->generation))
-					$list[$husband->getXref()]->generation = $list[$pid]->generation-1;
-				else
-					$list[$husband->getXref()]->generation = 1;
-			}
-			if ($wife) {
-				$list[$wife->getXref()] = $wife;
-				if (isset($list[$pid]->generation))
-					$list[$wife->getXref()]->generation = $list[$pid]->generation-1;
-				else
-					$list[$wife->getXref()]->generation = 1;
-			}
-		}
-		$children = $family->getChildren();
-		foreach ($children as $child) {
-			if ($child) {
-				$list[$child->getXref()] = $child;
-				if (isset($list[$pid]->generation))
-					$list[$child->getXref()]->generation = $list[$pid]->generation+1;
-				else
-					$list[$child->getXref()]->generation = 2;
-			}
-		}
-		if ($generations == -1 || $list[$pid]->generation+1 < $generations) {
-			foreach ($children as $child) {
-				add_descendancy($list, $child->getXref(), $parents, $generations); // recurse on the childs family
-			}
-		}
-	}
-}
-
-/**
- * get the next available xref
- * calculates the next available XREF id for the given type of record
- * @param string $type the type of record, defaults to 'INDI'
- * @return string
- */
+// Generate a new XREF, unique across all family trees
 function get_new_xref($type='INDI', $ged_id=WT_GED_ID) {
 	global $SOURCE_ID_PREFIX, $REPO_ID_PREFIX, $MEDIA_ID_PREFIX, $FAM_ID_PREFIX, $GEDCOM_ID_PREFIX;
 
@@ -2363,8 +1872,7 @@ function get_new_xref($type='INDI', $ged_id=WT_GED_ID) {
 		break;
 	}
 
-	$num=
-		WT_DB::prepare("SELECT next_id FROM `##next_id` WHERE record_type=? AND gedcom_id=?")
+	$num = WT_DB::prepare("SELECT next_id FROM `##next_id` WHERE record_type=? AND gedcom_id=?")
 		->execute(array($type, $ged_id))
 		->fetchOne();
 
@@ -2378,34 +1886,30 @@ function get_new_xref($type='INDI', $ged_id=WT_GED_ID) {
 			->execute(array($ged_id, $type));
 	}
 
-	while (find_gedcom_record($prefix.$num, $ged_id, true)) {
+	$statement = WT_DB::prepare(
+		"SELECT i_id FROM `##individuals` WHERE i_id = ?" .
+		" UNION ALL " .
+		"SELECT f_id FROM `##families` WHERE f_id = ?" .
+		" UNION ALL " .
+		"SELECT s_id FROM `##sources` WHERE s_id = ?" .
+		" UNION ALL " .
+		"SELECT m_id FROM `##media` WHERE m_id = ?" .
+		" UNION ALL " .
+		"SELECT o_id FROM `##other` WHERE o_id = ?" .
+		" UNION ALL " .
+		"SELECT xref FROM `##change` WHERE xref = ?"
+	);
+
+	while ($statement->execute(array_fill(0, 6, $prefix.$num))->fetchOne()) {
 		// Applications such as ancestry.com generate XREFs with numbers larger than
 		// PHP’s signed integer.  MySQL can handle large integers.
-		$num=WT_DB::prepare("SELECT 1+?")->execute(array($num))->fetchOne();
+		$num = WT_DB::prepare("SELECT 1+?")->execute(array($num))->fetchOne();
 	}
-
-	//-- the key is the prefix and the number
-	$key = $prefix.$num;
 
 	//-- update the next id number in the DB table
 	WT_DB::prepare("UPDATE `##next_id` SET next_id=? WHERE record_type=? AND gedcom_id=?")
 		->execute(array($num+1, $type, $ged_id));
-	return $key;
-}
-
-/**
- * check if the given string has UTF-8 characters
- *
- */
-function has_utf8($string) {
-	$len = strlen($string);
-	for ($i=0; $i<$len; $i++) {
-		$letter = substr($string, $i, 1);
-		$ord = ord($letter);
-		if ($ord==95 || $ord>=195)
-			return true;
-	}
-	return false;
+	return $prefix.$num;
 }
 
 /**
@@ -2413,25 +1917,6 @@ function has_utf8($string) {
  */
 function isFileExternal($file) {
 	return strpos($file, '://') !== false;
-}
-
-// Turn URLs in text into HTML links.  Insert breaks into long URLs
-// so that the browser can word-wrap.
-function expand_urls($text) {
-	// Some versions of RFC3987 have an appendix B which gives the following regex
-	// (([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?
-	// This matches far too much while a “precise” regex is several pages long.
-	// This is a compromise.
-	$URL_REGEX='((https?|ftp]):)(//([^\s/?#<>]*))?([^\s?#<>]*)(\?([^\s#<>]*))?(#[^\s?#<>]+)?';
-
-	return preg_replace_callback(
-		'/'.addcslashes("(?!>)$URL_REGEX(?!</a>)", '/').'/i',
-		create_function( // Insert soft hyphens into the replaced string
-			'$m',
-			'return "<a href=\"".$m[0]."\" target=\"blank\">".preg_replace("/\b/", "&shy;", $m[0])."</a>";'
-		),
-		preg_replace("/<(?!br)/i", "&lt;", $text) // no html except br
-	);
 }
 
 // Returns the part of the haystack before the first occurrence of the needle.

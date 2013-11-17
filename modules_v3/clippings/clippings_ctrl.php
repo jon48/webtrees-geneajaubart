@@ -7,7 +7,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: clippings_ctrl.php 14670 2013-01-18 17:52:10Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -54,7 +52,7 @@ class WT_Controller_Clippings {
 
 	public function __construct() {
 		global $SCRIPT_NAME, $MEDIA_DIRECTORY, $WT_SESSION;
-		
+
 		// Our cart is an array of items in the session
 		if (!is_array($WT_SESSION->cart)) {
 			$WT_SESSION->cart=array();
@@ -63,25 +61,18 @@ class WT_Controller_Clippings {
 			$WT_SESSION->cart[WT_GED_ID]=array();
 		}
 
-		if (!$WT_SESSION->exportConvPath) {
-			$WT_SESSION->exportConvPath = $MEDIA_DIRECTORY;
-		}
-		if (!$WT_SESSION->exportConvSlashes) {
-			$WT_SESSION->exportConvSlashes = 'forward';
-		}
-
-		$this->action = safe_GET("action");
-		$this->id = safe_GET('id');
-		$convert = safe_GET('convert',"yes","no");
-		$this->Zip = safe_GET('Zip');
-		$this->IncludeMedia = safe_GET('IncludeMedia');
-		$this->conv_path = safe_GET('conv_path', WT_REGEX_NOSCRIPT, $WT_SESSION->exportConvPath);
-		$this->privatize_export = safe_GET('privatize_export', array('none', 'visitor', 'user', 'gedadmin'), 'visitor');
-		$this->level1 = safe_GET('level1', WT_REGEX_INTEGER, PHP_INT_MAX);
-		$this->level2 = safe_GET('level2', WT_REGEX_INTEGER, PHP_INT_MAX);
-		$this->level3 = safe_GET('level3', WT_REGEX_INTEGER, PHP_INT_MAX);
-		$others = safe_GET('others');
-		$this->type = safe_GET('type');
+		$this->action           = WT_Filter::get('action');
+		$this->id               = WT_Filter::get('id');
+		$convert                = WT_Filter::get('convert', 'yes|no', 'no');
+		$this->Zip              = WT_Filter::get('Zip');
+		$this->IncludeMedia     = WT_Filter::get('IncludeMedia');
+		$this->conv_path        = WT_Filter::get('conv_path');
+		$this->privatize_export = WT_Filter::get('privatize_export', 'none|visitor|user|gedadmin', 'visitor');
+		$this->level1           = WT_Filter::getInteger('level1');
+		$this->level2           = WT_Filter::getInteger('level2');
+		$this->level3           = WT_Filter::getInteger('level3');
+		$others                 = WT_Filter::get('others');
+		$this->type             = WT_Filter::get('type');
 
 		if (($this->privatize_export=='none' || $this->privatize_export=='none') && !WT_USER_GEDCOM_ADMIN) {
 			$this->privatize_export='visitor';
@@ -89,8 +80,6 @@ class WT_Controller_Clippings {
 		if ($this->privatize_export=='user' && !WT_USER_CAN_ACCESS) {
 			$this->privatize_export='visitor';
 		}
-
-		$WT_SESSION->exportConvPath = $this->conv_path; // remember this for the next Download
 
 		if ($this->action == 'add') {
 			if (empty($this->type) && !empty($this->id)) {
@@ -100,7 +89,7 @@ class WT_Controller_Clippings {
 					$this->id="";
 					$this->action="";
 				}
-				else $this->type = strtolower($obj->getType());
+				else $this->type = strtolower($obj::RECORD_TYPE);
 			}
 			else if (empty($this->id)) $this->action="";
 			if (!empty($this->id) && $this->type != 'fam' && $this->type != 'indi' && $this->type != 'sour')
@@ -108,13 +97,14 @@ class WT_Controller_Clippings {
 		}
 
 		if ($this->action == 'add1') {
-			$this->add_clipping(WT_GedcomRecord::getInstance($this->id));
+			$obj = WT_GedcomRecord::getInstance($this->id);
+			$this->add_clipping($obj);
 			if ($this->type == 'sour') {
 				if ($others == 'linked') {
-					foreach (fetch_linked_indi($this->id, 'SOUR', WT_GED_ID) as $indi) {
+					foreach ($obj->linkedIndividuals('SOUR') as $indi) {
 						$this->add_clipping($indi);
 					}
-					foreach (fetch_linked_fam($this->id, 'SOUR', WT_GED_ID) as $fam) {
+					foreach ($obj->linkedFamilies('SOUR') as $fam) {
 						$this->add_clipping($fam);
 					}
 				}
@@ -130,19 +120,19 @@ class WT_Controller_Clippings {
 				}
 			} elseif ($this->type == 'indi') {
 				if ($others == 'parents') {
-					foreach (WT_Person::getInstance($this->id)->getChildFamilies() as $family) {
+					foreach (WT_Individual::getInstance($this->id)->getChildFamilies() as $family) {
 						$this->add_family_members($family);
 					}
 				} elseif ($others == 'ancestors') {
-					$this->add_ancestors_to_cart(WT_Person::getInstance($this->id), $this->level1);
+					$this->add_ancestors_to_cart(WT_Individual::getInstance($this->id), $this->level1);
 				} elseif ($others == 'ancestorsfamilies') {
-					$this->add_ancestors_to_cart_families(WT_Person::getInstance($this->id), $this->level2);
+					$this->add_ancestors_to_cart_families(WT_Individual::getInstance($this->id), $this->level2);
 				} elseif ($others == 'members') {
-					foreach (WT_Person::getInstance($this->id)->getSpouseFamilies() as $family) {
+					foreach (WT_Individual::getInstance($this->id)->getSpouseFamilies() as $family) {
 						$this->add_family_members($family);
 					}
 				} elseif ($others == 'descendants') {
-					foreach (WT_Person::getInstance($this->id)->getSpouseFamilies() as $family) {
+					foreach (WT_Individual::getInstance($this->id)->getSpouseFamilies() as $family) {
 						$this->add_clipping($family);
 						$this->add_family_descendancy($family, $this->level3);
 					}
@@ -195,7 +185,7 @@ class WT_Controller_Clippings {
 			foreach (array_keys($WT_SESSION->cart[WT_GED_ID]) as $xref) {
 				$object=WT_GedcomRecord::getInstance($xref);
 				if ($object) { // The object may have been deleted since we added it to the cart....
-					list($record)=$object->privatizeGedcom($access_level);
+					$record = $object->privatizeGedcom($access_level);
 					// Remove links to objects that aren't in the cart
 					preg_match_all('/\n1 '.WT_REGEX_TAG.' @('.WT_REGEX_XREF.')@(\n[2-9].*)*/', $record, $matches, PREG_SET_ORDER);
 					foreach ($matches as $match) {
@@ -220,7 +210,7 @@ class WT_Controller_Clippings {
 					if ($convert=='yes') {
 						$record=utf8_decode($record);
 					}
-					switch ($object->getType()) {
+					switch ($object::RECORD_TYPE) {
 					case 'INDI':
 						$filetext .= $record."\n";
 						$filetext .= "1 SOUR @WEBTREES@\n";
@@ -241,8 +231,8 @@ class WT_Controller_Clippings {
 							// Skip external files and non-existant files
 							if (file_exists(WT_DATA_DIR . $MEDIA_DIRECTORY . $match[$k][1])) {
 								$media[$mediacount] = array (
-									PCLZIP_ATT_FILE_NAME          =>                                  $match[$k][1],
-									PCLZIP_ATT_FILE_NEW_FULL_NAME => WT_DATA_DIR . $MEDIA_DIRECTORY . $match[$k][1],
+									PCLZIP_ATT_FILE_NAME          => WT_DATA_DIR . $MEDIA_DIRECTORY . $match[$k][1],
+									PCLZIP_ATT_FILE_NEW_FULL_NAME =>                                  $match[$k][1],
 								);
 								$mediacount++;
 							}
@@ -301,6 +291,8 @@ class WT_Controller_Clippings {
 	// Brings up the download dialog box and allows the user to download the file
 	// based on the options he or she selected
 	function download_clipping() {
+		Zend_Session::writeClose();
+
 		if ($this->IncludeMedia == "yes" || $this->Zip == "yes") {
 			header('Content-Type: application/zip');
 			header('Content-Disposition: attachment; filename="clipping.zip"');
@@ -319,10 +311,10 @@ class WT_Controller_Clippings {
 	function add_clipping($record) {
 		global $WT_SESSION;
 
-		if ($record->canDisplayName()) {
+		if ($record->canShowName()) {
 			$WT_SESSION->cart[WT_GED_ID][$record->getXref()]=true;
 			// Add directly linked records
-			preg_match_all('/\n\d (?:OBJE|NOTE|SOUR|REPO) @('.WT_REGEX_XREF.')@/', $record->getGedcomRecord(), $matches);
+			preg_match_all('/\n\d (?:OBJE|NOTE|SOUR|REPO) @('.WT_REGEX_XREF.')@/', $record->getGedcom(), $matches);
 			foreach ($matches[1] as $match) {
 				$WT_SESSION->cart[WT_GED_ID][$match]=true;
 			}
@@ -396,7 +388,7 @@ class WT_Controller_Clippings {
 		$a=WT_GedcomRecord::getInstance($a);
 		$b=WT_GedcomRecord::getInstance($b);
 		if ($a && $b) {
-			switch ($a->getType()) {
+			switch ($a::RECORD_TYPE) {
 			case 'INDI': $t1=1; break;
 			case 'FAM':  $t1=2; break;
 			case 'SOUR': $t1=3; break;
@@ -405,7 +397,7 @@ class WT_Controller_Clippings {
 			case 'NOTE': $t1=6; break;
 			default:     $t1=7; break;
 			}
-			switch ($b->getType()) {
+			switch ($b::RECORD_TYPE) {
 			case 'INDI': $t2=1; break;
 			case 'FAM':  $t2=2; break;
 			case 'SOUR': $t2=3; break;

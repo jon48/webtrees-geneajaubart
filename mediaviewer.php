@@ -7,7 +7,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: mediaviewer.php 15001 2013-05-13 22:17:50Z greg $
 
 define('WT_SCRIPT_NAME', 'mediaviewer.php');
 require './includes/session.php';
@@ -31,16 +29,16 @@ require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
 $controller=new WT_Controller_Media();
 
-if ($controller->record && $controller->record->canDisplayDetails()) {
+if ($controller->record && $controller->record->canShow()) {
 	$controller->pageHeader();
-	if ($controller->record->isMarkedDeleted()) {
+	if ($controller->record->isOld()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
 				/* I18N: %1$s is “accept”, %2$s is “reject”.  These are links. */ WT_I18N::translate(
 					'This media object has been deleted.  You should review the deletion and then %1$s or %2$s it.',
-					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'accept') . '</a>',
-					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'reject') . '</a>'
+					'<a href="#" onclick="accept_changes(\''.$controller->record->getXref().'\');">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'accept') . '</a>',
+					'<a href="#" onclick="reject_changes(\''.$controller->record->getXref().'\');">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'reject') . '</a>'
 				),
 				' ', help_link('pending_changes'),
 				'</p>';
@@ -51,14 +49,14 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 				' ', help_link('pending_changes'),
 				'</p>';
 		}
-	} elseif (find_updated_record($controller->record->getXref(), WT_GED_ID)!==null) {
+	} elseif ($controller->record->isNew()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
 				/* I18N: %1$s is “accept”, %2$s is “reject”.  These are links. */ WT_I18N::translate(
 					'This media object has been edited.  You should review the changes and then %1$s or %2$s them.',
-					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'accept') . '</a>',
-					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'reject') . '</a>'
+					'<a href="#" onclick="accept_changes(\''.$controller->record->getXref().'\');">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'accept') . '</a>',
+					'<a href="#" onclick="reject_changes(\''.$controller->record->getXref().'\');">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'reject') . '</a>'
 				),
 				' ', help_link('pending_changes'),
 				'</p>';
@@ -82,11 +80,11 @@ $controller
 	->addInlineJavascript('jQuery("#media-tabs").tabs();')
 	->addInlineJavascript('jQuery("#media-tabs").css("visibility", "visible");');
 
-$linked_indi = $controller->record->fetchLinkedIndividuals();
-$linked_fam  = $controller->record->fetchLinkedFamilies();
-$linked_sour = $controller->record->fetchLinkedSources();
-$linked_repo = $controller->record->fetchLinkedRepositories();
-$linked_note = $controller->record->fetchLinkedNotes();
+$linked_indi = $controller->record->linkedIndividuals('OBJE');
+$linked_fam  = $controller->record->linkedFamilies('OBJE');
+$linked_sour = $controller->record->linkedSources('OBJE');
+$linked_repo = $controller->record->linkedRepositories('OBJE'); // Invalid GEDCOM - you cannot link a REPO to an OBJE
+$linked_note = $controller->record->linkedNotes('OBJE');        // Invalid GEDCOM - you cannot link a NOTE to an OBJE
 
 echo '<div id="media-details">';
 echo '<h2>', $controller->record->getFullName(), ' ', $controller->record->getAddName(), '</h2>';
@@ -126,7 +124,7 @@ echo '<div id="media-tabs">';
 				</td>
 			</tr>
 		</table>
-	</div>'; // close "media-edit"
+	</div>';
 	echo '<ul>';
 		if ($linked_indi) {
 			echo '<li><a href="#indi-media"><span id="indimedia">', WT_I18N::translate('Individuals'), '</span></a></li>';
@@ -148,36 +146,36 @@ echo '<div id="media-tabs">';
 	// Individuals linked to this media object
 	if ($linked_indi) {
 		echo '<div id="indi-media">';
-		echo format_indi_table($controller->record->fetchLinkedIndividuals(), $controller->record->getFullName());
-		echo '</div>'; //close "indi-media"
+		echo format_indi_table($linked_indi, $controller->record->getFullName());
+		echo '</div>';
 	}
 
 	// Families linked to this media object
 	if ($linked_fam) {
 		echo '<div id="fam-media">';
-		echo format_fam_table($controller->record->fetchLinkedFamilies(), $controller->record->getFullName());
-		echo '</div>'; //close "fam-media"
+		echo format_fam_table($linked_fam, $controller->record->getFullName());
+		echo '</div>';
 	}
 
 	// Sources linked to this media object
 	if ($linked_sour) {
 		echo '<div id="sources-media">';
-		echo format_sour_table($controller->record->fetchLinkedSources(), $controller->record->getFullName());
-		echo '</div>'; //close "source-media"
+		echo format_sour_table($linked_sour, $controller->record->getFullName());
+		echo '</div>';
 	}
 
 	// Repositories linked to this media object
 	if ($linked_repo) {
 		echo '<div id="repo-media">';
-		echo format_repo_table($controller->record->fetchLinkedRepositories(), $controller->record->getFullName());
-		echo '</div>'; //close "repo-media"
+		echo format_repo_table($linked_repo, $controller->record->getFullName());
+		echo '</div>';
 	}
 
 	// medias linked to this media object
 	if ($linked_note) {
 		echo '<div id="notes-media">';
-		echo format_note_table($controller->record->fetchLinkedNotes(), $controller->record->getFullName());
-		echo '</div>'; //close "notes-media"
+		echo format_note_table($linked_note, $controller->record->getFullName());
+		echo '</div>';
 	}
-echo '</div>'; //close div "media-tabs"
-echo '</div>'; //close div "media-details"
+echo '</div>';
+echo '</div>';

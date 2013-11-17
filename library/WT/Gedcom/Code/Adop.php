@@ -2,7 +2,7 @@
 // Functions and logic for GEDCOM "PEDI" codes
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Adop.php 11090 2011-03-08 20:51:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -26,12 +24,12 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Gedcom_Code_Adop {
-	
+
 	private static $TYPES=array('BOTH', 'HUSB', 'WIFE');
 
 	// Translate a code, for an (optional) record
 	public static function getValue($type, $record=null) {
-		if ($record instanceof WT_Person) {
+		if ($record instanceof WT_Individual) {
 			$sex=$record->getSex();
 		} else {
 			$sex='U';

@@ -8,7 +8,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: statisticsplot.php 14829 2013-02-23 14:37:04Z greg $
 
 define('WT_SCRIPT_NAME', 'statisticsplot.php');
 require './includes/session.php';
@@ -658,7 +656,7 @@ function myplot($mytitle, $n, $xdata, $xtitle, $ydata, $ytitle, $legend) {
 	// in PHP 5.3.0 we can use
 	//$title = strstr($mytitle, '|', true);
 	$title = substr($mytitle, 0, strpos($mytitle, '|'));
-	echo '<img src="', $imgurl, '" width="950" height="300" alt="', htmlspecialchars($title), '" title="', htmlspecialchars($title), '">';
+	echo '<img src="', $imgurl, '" width="950" height="300" alt="', WT_Filter::escapeHtml($title), '" title="', WT_Filter::escapeHtml($title), '">';
 }
 
 function calc_axis($xas_grenzen) {
@@ -715,18 +713,21 @@ function calc_legend($grenzen_zas) {
 	$hulpar = explode(',', $grenzen_zas);
 	$i=1;
 	// I18N: %d is a year
-	$legend[0] = WT_I18N::translate('before %d', $hulpar[0]);
+	$date = new WT_Date('BEF ' . $hulpar[0]);
+	$legend[0] = strip_tags($date->display());
 	$zgrenzen[0] = $hulpar[0]-1;
 	while (isset($hulpar[$i])) {
 		$i1 = $i-1;
-		$legend[$i] = WT_I18N::number($hulpar[$i1]).'-'.($hulpar[$i]-1);
+		$date = new WT_Date('BET ' . $hulpar[$i1] .' AND ' . ($hulpar[$i]-1));
+		$legend[$i] = strip_tags($date->display());
 		$zgrenzen[$i] = $hulpar[$i]-1;
 		$i++;
 	}
 	$zmax = $i;
 	$zmax1 = $zmax-1;
 	// I18N: %d is a year
-	$legend[$zmax] = WT_I18N::translate('from %d', $hulpar[$zmax1]);
+	$date = new WT_Date('AFT ' . $hulpar[$zmax1]);
+	$legend[$zmax] = strip_tags($date->display());
 	$zgrenzen[$zmax] = 10000;
 	$zmax = $zmax+1;
 	if ($zmax > 8) {
@@ -776,11 +777,11 @@ function set_params($current, $indfam, $xg, $zg, $titstr, $xt, $yt, $gx, $gz, $m
 		if ($y_as == 201) {
 			$percentage = false;
 			if ($current == 13 || $current == 15 || $current == 16 || $current == 21) {
-				$ytitle = WT_I18N::translate('Total families');
+				$ytitle = WT_I18N::translate('Families');
 			} else if ($current == 14) {
-				$ytitle = WT_I18N::translate('Number of children');
+				$ytitle = WT_I18N::translate('Children');
 			} else {
-				$ytitle = WT_I18N::translate('Total individuals');
+				$ytitle = WT_I18N::translate('Individuals');
 			}
 		} else if ($y_as == 202) {
 			$percentage = true;
@@ -810,18 +811,18 @@ function set_params($current, $indfam, $xg, $zg, $titstr, $xt, $yt, $gx, $gz, $m
 		}
 		$myfunc();
 		if ($indfam == 'IND') {
-			$hstr = $title.'|' .WT_I18N::translate('Counts ').' '.WT_I18N::number($n1).' '.WT_I18N::translate('of').' '.WT_I18N::number($stats->_totalIndividuals());
+			$hstr = $title.'|' .WT_I18N::translate('Counts ').' '.WT_I18N::number($n1).' '.WT_I18N::translate('of').' '.$stats->totalIndividuals();
 		} else if ($x_as==21) {
-			$hstr = $title.'|' .WT_I18N::translate('Counts ').' '.WT_I18N::number($n1).' '.WT_I18N::translate('of').' '.WT_I18N::number($stats->totalChildren());
+			$hstr = $title.'|' .WT_I18N::translate('Counts ').' '.WT_I18N::number($n1).' '.WT_I18N::translate('of').' '.$stats->totalChildren();
 		} else {
-			$hstr = $title.'|' .WT_I18N::translate('Counts ').' '.WT_I18N::number($n1).' '.WT_I18N::translate('of').' '.WT_I18N::number($stats->_totalFamilies());
+			$hstr = $title.'|' .WT_I18N::translate('Counts ').' '.WT_I18N::number($n1).' '.WT_I18N::translate('of').' '.$stats->totalFamilies();
 		}
 		myplot($hstr, $zmax, $xdata, $xtitle, $ydata, $ytitle, $legend);
 	}
 }
 
 //-- ========= start of main program =========
-$action = safe_REQUEST($_REQUEST, 'action', WT_REGEX_XREF);
+$action = WT_Filter::post('action');
 
 if ($action=='update') {
 	$x_as = $_POST['x-as'];

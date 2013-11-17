@@ -2,10 +2,10 @@
 //	Controller for the pedigree chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Pedigree.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -55,17 +53,17 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 		global $BROWSER_TYPE, $show_full, $talloffset;
 
 		parent::__construct();
-		
+
 		$this->linewidth = $linewidth;
 		$this->shadowcolor = $shadowcolor;
 		$this->shadowblur = $shadowblur;
 		$this->shadowoffsetX = $shadowoffsetX;
 		$this->shadowoffsetY = $shadowoffsetY;
-		
-		$this->show_full =safe_GET('show_full', array('0', '1'), $PEDIGREE_FULL_DETAILS);
-		$this->talloffset=safe_GET('talloffset', array('0', '1', '2', '3'), $PEDIGREE_LAYOUT);
-		$this->box_width  =safe_GET_integer('box_width',   50, 300, 100);
-		$this->PEDIGREE_GENERATIONS=safe_GET_integer('PEDIGREE_GENERATIONS', 2, $MAX_PEDIGREE_GENERATIONS, $DEFAULT_PEDIGREE_GENERATIONS);
+
+		$this->show_full            = WT_Filter::getInteger('show_full', 0, 1, $PEDIGREE_FULL_DETAILS);
+		$this->talloffset           = WT_Filter::getInteger('talloffset', 0, 3, $PEDIGREE_LAYOUT);
+		$this->box_width            = WT_Filter::getInteger('box_width', 50, 300, 100);
+		$this->PEDIGREE_GENERATIONS = WT_Filter::getInteger('PEDIGREE_GENERATIONS', 2, $MAX_PEDIGREE_GENERATIONS, $DEFAULT_PEDIGREE_GENERATIONS);
 
 		if ($this->talloffset==1) $this->talloffset=1; // Make SURE this is an integer
 		if ($this->talloffset>1 && $this->PEDIGREE_GENERATIONS>8) $this->PEDIGREE_GENERATIONS=8;
@@ -74,7 +72,7 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 		// Passing a function parameter would be much better.
 		global $PEDIGREE_GENERATIONS;
 		$PEDIGREE_GENERATIONS=$this->PEDIGREE_GENERATIONS;
-		
+
 		// This is passed as a global.  A parameter would be better...
 		$this->show_full = ($this->show_full) ? 1 : 0; // Make SURE this is an integer
 		if ($this->talloffset>3) {
@@ -85,7 +83,7 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 		$show_full = $this->show_full;
 		$talloffset = $this->talloffset;
 
-		if ($this->root && $this->root->canDisplayName()) {
+		if ($this->root && $this->root->canShowName()) {
 			$this->setPageTitle(
 				/* I18N: %s is an individual’s name */
 				WT_I18N::translate('Pedigree tree of %s', $this->root->getFullName())
@@ -208,8 +206,8 @@ class WT_Controller_Pedigree extends WT_Controller_Chart {
 				$this->yoffset-=(($boxspacing/2)*pow(2,($this->PEDIGREE_GENERATIONS-2))-($boxspacing/2));
 			}
 			else if ($this->talloffset==1) {
-				$this->xoffset = 10 + $basexoffset + (($this->PEDIGREE_GENERATIONS - $this->curgen) * ($this->pbwidth+$bxspacing));
-				if ($this->curgen == $this->PEDIGREE_GENERATIONS) $this->xoffset += 10;
+				$this->xoffset = 22 + $basexoffset + (($this->PEDIGREE_GENERATIONS - $this->curgen) * ($this->pbwidth+$bxspacing));
+				if ($this->curgen == $this->PEDIGREE_GENERATIONS) $this->xoffset;
 				if ($this->PEDIGREE_GENERATIONS<4) $this->xoffset += 60;
 			}
 			else if ($this->talloffset==2) {

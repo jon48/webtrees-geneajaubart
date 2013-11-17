@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: admin_site_readme.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_readme.php');
 require './includes/session.php';
@@ -47,7 +45,7 @@ function get_tag($txt,$tag){
 	}while($pos);
 	return $arr;
 }
-	
+
 echo '<div id="readme" dir="ltr" lang="en">'; // This information is always LTR/English
 
 $url = 'readme.html';
@@ -57,5 +55,5 @@ $arr = get_tag($txt, "body");
 foreach ($arr as $value) {
 	echo $value;
 }
-	
+
 echo '</div>';

@@ -4,10 +4,10 @@
 // GEDFact Census information about an individual
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,25 +22,63 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: CENS_ctrl.php 14588 2012-12-04 22:44:30Z greg $
 
-$controller=new WT_Controller_Individual();
+$xref = WT_Filter::get('xref', WT_REGEX_XREF);
+
+$person = WT_Individual::getInstance($xref);
+check_record_access($person);
+
+$controller
+	->setPageTitle(WT_I18N::translate('Create a new shared note using assistant'))
+	->addInlineJavascript(
+		'jQuery("head").append(\'<link rel="stylesheet" href="' . WT_STATIC_URL . WT_MODULES_DIR . 'GEDFact_assistant/css/cens_style.css" type="text/css">\');'
+	)
+	->pageHeader();
+
+echo '<div id="edit_interface-page">';
+echo '<h3>', $controller->getPageTitle(), '&nbsp;&nbsp;';
+	// When more languages are added to the wiki, we can expand or redesign this
+	switch (WT_LOCALE) {
+	case 'fr':
+		echo wiki_help_link('/fr/Module_Assistant_Recensement');
+		break;
+	case 'en':
+	default:
+		echo wiki_help_link('/en/Census_Assistant_module');
+		break;
+	}
+echo '</h3>';
+
+?>
+<div class="center" style="width:100%;">
+	<?php
+	?>
+	<form method="post" action="edit_interface.php" onsubmit="return check_form(this);">
+		<input type="hidden" name="action" value="addnoteaction_assisted">
+		<input type="hidden" name="noteid" value="newnote">
+		<input id="pid_array" type="hidden" name="pid_array" value="none">
+		<input id="xref" type="hidden" name="xref" value=<?php echo $xref; ?>>
+		<?php
 
 global $tabno, $linkToID, $SEARCH_SPIDER;
-global $SHOW_AGE_DIFF, $GEDCOM, $ABBREVIATE_CHART_LABELS;
+global $SHOW_AGE_DIFF, $GEDCOM;
 global $show_full, $famid;
-echo '<link type="text/css" href="', WT_STATIC_URL, WT_MODULES_DIR, 'GEDFact_assistant/css/cens_style.css" rel="stylesheet">';
 
-$summary=$controller->record->format_first_major_fact(WT_EVENTS_BIRT, 2);
-if (!($controller->record->isDead())) {
+$summary=$person->format_first_major_fact(WT_EVENTS_BIRT, 2);
+if (!($person->isDead())) {
 	// If alive display age
-	$bdate=$controller->record->getBirthDate();
+	$bdate=$person->getBirthDate();
 	$age = WT_Date::GetAgeGedcom($bdate);
 	if ($age!="") {
 		$summary.= "<span class=\"label\">".WT_I18N::translate('Age').":</span><span class=\"field\"> ".get_age_at_event($age, true)."</span>";
 	}
 }
-$summary.=$controller->record->format_first_major_fact(WT_EVENTS_DEAT, 2);
+$summary.=$person->format_first_major_fact(WT_EVENTS_DEAT, 2);
 
-$controller->census_assistant();
+require WT_ROOT.WT_MODULES_DIR.'GEDFact_assistant/_CENS/census_1_ctrl.php';
+
+?>
+		</form>
+	</div>
+	<div style="clear:both;"></div>
+</div><!-- id="edit_interface-page" -->

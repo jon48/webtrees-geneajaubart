@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Chart.php 14962 2013-04-10 21:11:02Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,16 +31,16 @@ class WT_Controller_Chart extends WT_Controller_Page {
 	public function __construct() {
 		parent::__construct();
 
-		$this->rootid = safe_GET_xref('rootid');
+		$this->rootid = WT_Filter::get('rootid', WT_REGEX_XREF);
 		if ($this->rootid) {
-			$this->root = WT_Person::getInstance($this->rootid);
+			$this->root = WT_Individual::getInstance($this->rootid);
 		} else {
 			// Missing rootid parameter?  Do something.
 			$this->root   = $this->getSignificantIndividual();
 			$this->rootid = $this->root->getXref();
 		}
-		
-		if (!$this->root || !$this->root->canDisplayName()) {
+
+		if (!$this->root || !$this->root->canShowName()) {
 			header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
 			$this->error_message=WT_I18N::translate('This individual does not exist or you do not have permission to view it.');
 			$this->rootid=null;

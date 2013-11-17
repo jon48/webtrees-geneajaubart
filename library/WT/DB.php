@@ -4,7 +4,7 @@
 // PDOStatement classes to provide database access with logging, etc.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (c) 2009-2010 Greg Roach
@@ -22,8 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: DB.php 14276 2012-09-14 15:39:40Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -118,7 +116,7 @@ class WT_DB {
 					unset($trace[$n]);
 				}
 			}
-			$stack='<abbr title="'.htmlspecialchars(implode(" / ", $trace)).'">'.(count(self::$log)+1).'</abbr>';
+			$stack='<abbr title="'.WT_Filter::escapeHtml(implode(" / ", $trace)).'">'.(count(self::$log)+1).'</abbr>';
 			// Bind variables
 			$query2='';
 			foreach ($bind_variables as $key=>$value) {
@@ -126,9 +124,9 @@ class WT_DB {
 					$bind_variables[$key]='[NULL]';
 				}
 			}
-			foreach (str_split(htmlspecialchars($query)) as $char) {
+			foreach (str_split(WT_Filter::escapeHtml($query)) as $char) {
 				if ($char=='?') {
-					$query2.='<abbr title="'.htmlspecialchars(array_shift($bind_variables)).'">'.$char.'</abbr>';
+					$query2.='<abbr title="'.WT_Filter::escapeHtml(array_shift($bind_variables)).'">'.$char.'</abbr>';
 				} else {
 					$query2.=$char;
 				}
@@ -232,7 +230,7 @@ class WT_DB {
 		$need_to_delete_old_files=false;
 		$need_to_update_config_data=false;
 		$need_to_update_stored_procedures=false;
-		
+
 		// During installation, the current version is set to a special value of
 		// -1 (v1.2.5 to v1.2.7) or -2 (v1.3.0 onwards).  This indicates that the tables have
 		// been created, but that we still need to install/update configuration data

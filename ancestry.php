@@ -7,7 +7,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: ancestry.php 15064 2013-06-20 05:18:10Z nigel $
 
 define('WT_SCRIPT_NAME', 'ancestry.php');
 require './includes/session.php';
@@ -39,7 +37,7 @@ $controller
 <div id="ancestry-page">
 	<h2><?php echo $controller->getPageTitle(); ?></h2>
 	<form name="people" id="people" method="get" action="?">
-		<input type="hidden" name="ged" value="<?php echo WT_GEDCOM; ?>">
+		<input type="hidden" name="ged" value="<?php echo WT_Filter::escapeHtml(WT_GEDCOM); ?>">
 		<input type="hidden" name="show_full" value="<?php echo $controller->show_full; ?>">
 		<input type="hidden" name="show_cousins" value="<?php echo $controller->show_cousins; ?>">
 		<table class="list_table">
@@ -55,7 +53,7 @@ $controller
 					<?php echo WT_I18N::translate('Box width'); ?>
 				</td>
 				<td class="optionbox">
-					<input type="text" size="3" name="box_width" value="<?php echo htmlspecialchars($box_width); ?>"> <b>%</b>
+					<input type="text" size="3" name="box_width" value="<?php echo WT_Filter::escapeHtml($box_width); ?>"> <b>%</b>
 				</td>
 				<td rowspan="2" class="descriptionbox">
 					<?php echo WT_I18N::translate('Layout'); ?>
@@ -125,7 +123,7 @@ $controller
 					</select>
 				</td>
 				<td class="descriptionbox">
-					<?php echo WT_I18N::translate('Show Details'); ?>
+					<?php echo WT_I18N::translate('Show details'); ?>
 				</td>
 				<td class="optionbox">
 					<input type="checkbox" value="<?php if ($controller->show_full) { echo '1" checked="checked" onclick="document.people.show_full.value=\'0\';'; } else { echo '0" onclick="document.people.show_full.value=\'1\';'; } ?>">
@@ -160,7 +158,7 @@ case 1:
 	$treeid=ancestry_array($controller->root->getXref(), $PEDIGREE_GENERATIONS-1);
 	foreach ($treeid as $i=>$pid) {
 		if ($pid) {
-			$person=WT_Person::getInstance($pid);
+			$person=WT_Individual::getInstance($pid);
 			if ($person) {
 				foreach ($person->getChildFamilies() as $family) {
 					print_sosa_family($family->getXref(), $pid, $i);
@@ -182,7 +180,7 @@ case 3:
 	$treeid=ancestry_array($controller->root->getXref(), $PEDIGREE_GENERATIONS-1);
 	$famlist=array();
 	foreach ($treeid as $pid) {
-		$person=WT_Person::getInstance($pid);
+		$person=WT_Individual::getInstance($pid);
 		if (is_null($person)) {
 			continue;
 		}

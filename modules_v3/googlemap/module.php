@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 15069 2013-06-20 22:59:03Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -121,8 +119,6 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			echo '<table border="0" width="100%"><tr><td>';
 			echo '<table width="100%" border="0" class="facts_table">';
 			echo '<tr><td valign="top">';
-			echo '<div id="googlemap_left">';
-			echo '<img src="', $WT_IMAGES['hline'], '" width="', $GOOGLEMAP_XSIZE, '" height="3" alt="">';
 			echo '<div id="map_pane" style="border: 1px solid gray; color: black; width: 100%; height: ', $GOOGLEMAP_YSIZE, 'px"></div>';
 			if (WT_USER_IS_ADMIN) {
 				echo '<table width="100%"><tr>';
@@ -137,7 +133,6 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				echo '</td>';
 				echo '</tr></table>';
 			}
-			echo '</div>';
 			echo '</td>';
 			echo '<td valign="top" width="30%">';
 			echo '<div id="map_content">';
@@ -146,8 +141,18 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			foreach ($families as $family) {
 				$famids[] = $family->getXref();
 			}
-			$controller->record->add_family_facts(false);
-			build_indiv_map($controller->record->getIndiFacts(), $famids);
+			$indifacts = array();
+			foreach ($controller->record->getFacts() as $fact) {
+				$indifacts[] = $fact;
+			}
+			foreach ($controller->record->getSpouseFamilies() as $family) {
+				foreach ($family->getFacts() as $fact) {
+					$indifacts[] = $fact;
+				}
+			}
+			sort_facts($indifacts);
+
+			build_indiv_map($controller->record, $indifacts, $famids);
 			echo '</div>';
 			echo '</td>';
 			echo '</tr></table>';
@@ -186,7 +191,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		require WT_ROOT.WT_MODULES_DIR.'googlemap/defaultconfig.php';
 		require WT_ROOT.'includes/functions/functions_edit.php';
 
-		$action=safe_REQUEST($_REQUEST, 'action');
+		$action = WT_Filter::post('action');
 
 		$controller=new WT_Controller_Page();
 		$controller
@@ -197,25 +202,24 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 
 
 		if ($action=='update') {
-			set_module_setting('googlemap', 'GM_MAP_TYPE',          $_POST['NEW_GM_MAP_TYPE']);
-			set_module_setting('googlemap', 'GM_USE_STREETVIEW',    $_POST['NEW_GM_USE_STREETVIEW']);
-			set_module_setting('googlemap', 'GM_MIN_ZOOM',          $_POST['NEW_GM_MIN_ZOOM']);
-			set_module_setting('googlemap', 'GM_MAX_ZOOM',          $_POST['NEW_GM_MAX_ZOOM']);
-			set_module_setting('googlemap', 'GM_XSIZE',             $_POST['NEW_GM_XSIZE']);
-			set_module_setting('googlemap', 'GM_YSIZE',             $_POST['NEW_GM_YSIZE']);
-			set_module_setting('googlemap', 'GM_PRECISION_0',       $_POST['NEW_GM_PRECISION_0']);
-			set_module_setting('googlemap', 'GM_PRECISION_1',       $_POST['NEW_GM_PRECISION_1']);
-			set_module_setting('googlemap', 'GM_PRECISION_2',       $_POST['NEW_GM_PRECISION_2']);
-			set_module_setting('googlemap', 'GM_PRECISION_3',       $_POST['NEW_GM_PRECISION_3']);
-			set_module_setting('googlemap', 'GM_PRECISION_4',       $_POST['NEW_GM_PRECISION_4']);
-			set_module_setting('googlemap', 'GM_PRECISION_5',       $_POST['NEW_GM_PRECISION_5']);
-			set_module_setting('googlemap', 'GM_DEFAULT_TOP_VALUE', $_POST['NEW_GM_DEFAULT_TOP_LEVEL']);
-			set_module_setting('googlemap', 'GM_COORD',             $_POST['NEW_GM_COORD']);
-			set_module_setting('googlemap', 'GM_PLACE_HIERARCHY',   $_POST['NEW_GM_PLACE_HIERARCHY']);
-			set_module_setting('googlemap', 'GM_PH_XSIZE',          $_POST['NEW_GM_PH_XSIZE']);
-			set_module_setting('googlemap', 'GM_PH_YSIZE',          $_POST['NEW_GM_PH_YSIZE']);
-			set_module_setting('googlemap', 'GM_PH_MARKER',         $_POST['NEW_GM_PH_MARKER']);
-			set_module_setting('googlemap', 'GM_DISP_SHORT_PLACE',  $_POST['NEW_GM_DISP_SHORT_PLACE']);
+			set_module_setting('googlemap', 'GM_MAP_TYPE',          WT_Filter::post('NEW_GM_MAP_TYPE'));
+			set_module_setting('googlemap', 'GM_USE_STREETVIEW',    WT_Filter::post('NEW_GM_USE_STREETVIEW'));
+			set_module_setting('googlemap', 'GM_MIN_ZOOM',          WT_Filter::post('NEW_GM_MIN_ZOOM'));
+			set_module_setting('googlemap', 'GM_MAX_ZOOM',          WT_Filter::post('NEW_GM_MAX_ZOOM'));
+			set_module_setting('googlemap', 'GM_XSIZE',             WT_Filter::post('NEW_GM_XSIZE'));
+			set_module_setting('googlemap', 'GM_YSIZE',             WT_Filter::post('NEW_GM_YSIZE'));
+			set_module_setting('googlemap', 'GM_PRECISION_0',       WT_Filter::post('NEW_GM_PRECISION_0'));
+			set_module_setting('googlemap', 'GM_PRECISION_1',       WT_Filter::post('NEW_GM_PRECISION_1'));
+			set_module_setting('googlemap', 'GM_PRECISION_2',       WT_Filter::post('NEW_GM_PRECISION_2'));
+			set_module_setting('googlemap', 'GM_PRECISION_3',       WT_Filter::post('NEW_GM_PRECISION_3'));
+			set_module_setting('googlemap', 'GM_PRECISION_4',       WT_Filter::post('NEW_GM_PRECISION_4'));
+			set_module_setting('googlemap', 'GM_PRECISION_5',       WT_Filter::post('NEW_GM_PRECISION_5'));
+			set_module_setting('googlemap', 'GM_COORD',             WT_Filter::post('NEW_GM_COORD'));
+			set_module_setting('googlemap', 'GM_PLACE_HIERARCHY',   WT_Filter::post('NEW_GM_PLACE_HIERARCHY'));
+			set_module_setting('googlemap', 'GM_PH_XSIZE',          WT_Filter::post('NEW_GM_PH_XSIZE'));
+			set_module_setting('googlemap', 'GM_PH_YSIZE',          WT_Filter::post('NEW_GM_PH_YSIZE'));
+			set_module_setting('googlemap', 'GM_PH_MARKER',         WT_Filter::post('NEW_GM_PH_MARKER'));
+			set_module_setting('googlemap', 'GM_DISP_SHORT_PLACE',  WT_Filter::post('NEW_GM_DISP_SHORT_PLACE'));
 
 			for ($i=1; $i<=9; $i++) {
 				set_module_setting('googlemap', 'GM_PREFIX_'.$i,  $_POST['NEW_GM_PREFIX_'.$i]);
@@ -360,12 +364,6 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 							</td>
 							<td>&nbsp;</td>
 						</tr>
-						<tr>
-							<th colspan="2"><?php echo WT_I18N::translate('Default value for top-level'), help_link('GM_DEFAULT_LEVEL_0','googlemap'); ?></th>
-							<td><input type="text" name="NEW_GM_DEFAULT_TOP_LEVEL" value="<?php echo $GM_DEFAULT_TOP_VALUE; ?>" size="20"></td>
-							<td>&nbsp;</td>
-						</tr>
-						<tr>
 							<th class="gm_prefix" colspan="3"><?php echo WT_I18N::translate('Optional prefixes and suffixes'), help_link('GM_NAME_PREFIX_SUFFIX','googlemap');?></th>
 						</tr>
 						<tr id="gm_level_titles">
@@ -441,13 +439,11 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			->setPageTitle(WT_I18N::translate('Select flag'))
 			->pageHeader();
 
-		$countries=WT_Stats::get_all_countries();
-		$action=safe_REQUEST($_REQUEST, 'action');
+		$countries = WT_Stats::get_all_countries();
+		$action    = WT_Filter::post('action');
 
-		if (isset($_REQUEST['countrySelected'])) $countrySelected = $_REQUEST['countrySelected'];
-		if (!isset($countrySelected)) $countrySelected='Countries';
-		if (isset($_REQUEST['stateSelected'])) $stateSelected = $_REQUEST['stateSelected'];
-		if (!isset($stateSelected)) $stateSelected='States';
+		$countrySelected = WT_Filter::get('countrySelected', null, 'Countries');
+		$stateSelected   = WT_Filter::get('stateSelected',   null, 'States');
 
 		$country = array();
 		$rep = opendir(WT_ROOT.WT_MODULES_DIR.'googlemap/places/flags/');
@@ -649,8 +645,8 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		require_once WT_ROOT.WT_MODULES_DIR.'googlemap/googlemap.php';
 
 		// Default is show for both of these.
-		$hideflags = safe_GET('hideflags');
-		$hidelines = safe_GET('hidelines');
+		$hideflags = WT_Filter::get('hideflags');
+		$hidelines = WT_Filter::get('hidelines');
 
 		$controller=new WT_Controller_Pedigree();
 
@@ -672,7 +668,8 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 
 		// -- print the form to change the number of displayed generations
 		?>
-		<form name="people" method="get" action="module.php?ged=<?php echo WT_GEDURL; ?>&amp;mod=googlemap&amp;mod_action=pedigree_map">
+		<form name="people" method="get" action="?">
+			<input type="hidden" name="ged" value="<?php echo WT_Filter::escapeHtml(WT_GEDCOM); ?>">
 			<input type="hidden" name="mod" value="googlemap">
 			<input type="hidden" name="mod_action" value="pedigree_map">
 			<table class="list_table" width="555">
@@ -747,23 +744,20 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		for ($i=0; $i<($controller->treesize); $i++) {
 			// -- check to see if we have moved to the next generation
 			if ($i+1 >= pow(2, $curgen)) {$curgen++;}
-			$person = WT_Person::getInstance($controller->treeid[$i]);
+			$person = WT_Individual::getInstance($controller->treeid[$i]);
 			if (!empty($person)) {
 				$name = $person->getFullName();
 				if ($name == WT_I18N::translate('Private')) $priv++;
 				$place = $person->getBirthPlace();
 				if (empty($place)) {
-					$latlongval[$i] = NULL;
+					$latlongval[$i] = null;
 				} else {
 					$latlongval[$i] = get_lati_long_placelocation($person->getBirthPlace());
-					if ($latlongval[$i] != NULL && $latlongval[$i]['lati']=='0' && $latlongval[$i]['long']=='0') {
-						$latlongval[$i] = NULL;
-					}
 				}
-				if ($latlongval[$i] != NULL) {
-					$lat[$i] = str_replace(array('N', 'S', ','), array('', '-', '.'), $latlongval[$i]['lati']);
-					$lon[$i] = str_replace(array('E', 'W', ','), array('', '-', '.'), $latlongval[$i]['long']);
-					if (($lat[$i] != NULL) && ($lon[$i] != NULL)) {
+				if ($latlongval[$i]) {
+					$lat[$i] = str_replace(array('N', 'S', ','), array('', '-', '.'), $latlongval[$i]->pl_lati);
+					$lon[$i] = str_replace(array('E', 'W', ','), array('', '-', '.'), $latlongval[$i]->pl_long);
+					if (($lat[$i] != null) && ($lon[$i] != null)) {
 						$count++;
 					} else { // The place is in the table but has empty values
 						if ($name) {
@@ -1246,7 +1240,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 
 		for ($i=0; $i<($controller->treesize); $i++) {
 			// moved up to grab the sex of the individuals
-			$person = WT_Person::getInstance($controller->treeid[$i]);
+			$person = WT_Individual::getInstance($controller->treeid[$i]);
 			if ($person) {
 				$name = $person->getFullName();
 
@@ -1254,10 +1248,11 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				if ($i+1 >= pow(2, $curgen)) {
 					$curgen++;
 				}
-				$relationship=get_relationship_name(get_relationship($controller->root, $person, false, 0));
-				if (empty($relationship)) $relationship=WT_I18N::translate('self');
-				$event = '<img src=\"'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/images/sq'.$curgen.'.png\" width=\"10\" height=\"10\">'.
-					'<strong>&nbsp;'.$relationship.':&nbsp;</strong>';
+
+				$relationship = get_close_relationship_name($controller->root, $person);
+
+				$event = '<img src="'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/images/sq'.$curgen.'.png" width="10" height="10"> '.
+					'<strong>'.$relationship.'</strong>';
 				// add thumbnail image
 				if ($SHOW_HIGHLIGHT_IMAGES) {
 					$image = $person->displayImage();
@@ -1266,21 +1261,18 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				}
 				// end of add image
 
-				$dataleft  = addslashes($image) . $event . addslashes($name);
-				$datamid   = " <span><a href='".$person->getHtmlUrl()."' id='alturl' title='" . WT_I18N::translate('Individual information') . "'>";
-				$datamid .= '('.WT_I18N::translate('View Person').')';
-				$datamid  .= '</a></span>';
-				$dataright = '<br><strong>'. WT_I18N::translate('Birth:') . '&nbsp;</strong>' .
-						addslashes($person->getBirthDate()->Display(false)).'<br>'.$person->getBirthPlace();
+				$dataleft  = WT_Filter::escapeJs($image . $event . ' — ' . $name);
+				$datamid   = WT_Filter::escapeJs(' <span><a href="' . $person->getHtmlUrl() . '"></a></span>');
+				$dataright = WT_Filter::escapeJs('<br><strong>'. WT_I18N::translate('Birth:') . '&nbsp;</strong>' .  $person->getBirthDate()->Display(false) . ' — ' . $person->getBirthPlace());
 
 				$latlongval[$i] = get_lati_long_placelocation($person->getBirthPlace());
-				if ($latlongval[$i] != NULL) {
-					$lat[$i] = (double)str_replace(array('N', 'S', ','), array('', '-', '.'), $latlongval[$i]['lati']);
-					$lon[$i] = (double)str_replace(array('E', 'W', ','), array('', '-', '.'), $latlongval[$i]['long']);
+				if ($latlongval[$i]) {
+					$lat[$i] = (double)str_replace(array('N', 'S', ','), array('', '-', '.'), $latlongval[$i]->pl_lati);
+					$lon[$i] = (double)str_replace(array('E', 'W', ','), array('', '-', '.'), $latlongval[$i]->pl_long);
 					if ($lat[$i] || $lon[$i]) {
-						if ((!$hideflags) && ($latlongval[$i]['icon'] != NULL)) {
-							$flags[$i] = $latlongval[$i]['icon'];
-							$ffile = strrchr($latlongval[$i]['icon'], '/');
+						if (!$hideflags && $latlongval[$i]->pl_icon) {
+							$flags[$i] = $latlongval[$i]->pl_icon;
+							$ffile = strrchr($latlongval[$i]->pl_icon, '/');
 							$ffile = substr($ffile,1, strpos($ffile, '.')-1);
 							if (empty($flags[$ffile])) {
 								$flags[$ffile] = $i; // Only generate the flag once
@@ -1313,7 +1305,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 							}
 						}
 						$js.= 'var point = new google.maps.LatLng('.$lat[$i].','.$lon[$i].');';
-						$js.= "var marker = createMarker(point, \"".addslashes($name)."\",\n\t\"<div>".$dataleft.$datamid.$dataright."</div>\", \"";
+						$js.= "var marker = createMarker(point, \"".WT_Filter::escapeJs($name)."\",\"<div>".$dataleft.$datamid.$dataright."</div>\", \"";
 						$js.= "<div class='iwstyle'>";
 						$js.= "<a href='module.php?ged=".WT_GEDURL."&amp;mod=googlemap&amp;mod_action=pedigree_map&amp;rootid=" . $person->getXref() . "&amp;PEDIGREE_GENERATIONS={$PEDIGREE_GENERATIONS}";
 						if ($hideflags) $js.= '&amp;hideflags=1';
@@ -1347,7 +1339,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					}
 				}
 			} else {
-				$latlongval[$i] = NULL;
+				$latlongval[$i] = null;
 			}
 		}
 		$js.='pm_map.setCenter(bounds.getCenter());'.
@@ -1428,11 +1420,11 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		require_once WT_ROOT.WT_MODULES_DIR.'googlemap/googlemap.php';
 		require_once WT_ROOT.'includes/functions/functions_edit.php';
 
-		$action    = safe_GET('action', '','go');
-		$gedcom_id = safe_GET('gedcom_id', array_keys(WT_Tree::getAll()), WT_GED_ID);
-		$country   = safe_GET('country', WT_REGEX_UNSAFE, 'XYZ');
-		$state     = safe_GET('state', WT_REGEX_UNSAFE, 'XYZ');
-		$matching  = safe_GET_bool('matching');
+		$action    = WT_Filter::get('action', '','go');
+		$gedcom_id = WT_Filter::get('gedcom_id', null, WT_GED_ID);
+		$country   = WT_Filter::get('country', '.+', 'XYZ');
+		$state     = WT_Filter::get('state', '.+', 'XYZ');
+		$matching  = WT_Filter::getBool('matching');
 
 		if (!empty($WT_SESSION['placecheck_gedcom_id'])) {
 			$gedcom_id = $WT_SESSION['placecheck_gedcom_id'];
@@ -1490,12 +1482,12 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 							$rows=WT_DB::prepare("SELECT pl_id, pl_place FROM `##placelocation` WHERE pl_level=0 ORDER BY pl_place")
 								->fetchAssoc();
 							foreach ($rows as $id=>$place) {
-								echo '<option value="', htmlspecialchars($place), '"';
+								echo '<option value="', WT_Filter::escapeHtml($place), '"';
 								if ($place==$country) {
 									echo ' selected="selected"';
 									$par_id=$id;
 								}
-								echo '>', htmlspecialchars($place), '</option>';
+								echo '>', WT_Filter::escapeHtml($place), '</option>';
 							}
 					echo '</select>';
 					if ($country!='XYZ') {
@@ -1507,7 +1499,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 									->execute(array($par_id))
 									->fetchOneColumn();
 								foreach ($places as $place) {
-									echo '<option value="', htmlspecialchars($place), '"', $place==$state?' selected="selected"':'', '>', htmlspecialchars($place), '</option>';
+									echo '<option value="', WT_Filter::escapeHtml($place), '"', $place==$state?' selected="selected"':'', '>', WT_Filter::escapeHtml($place), '</option>';
 								}
 								echo '</select>';
 							}
@@ -1688,8 +1680,8 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 						$long[$z]="<td class='error center'><strong>X</strong></td>";$matched[$x]++;
 					}
 					$level++;
-					$mapstr3=$mapstr3."&amp;parent[".$z."]=".addslashes($row['pl_placerequested']);
-					$mapstr4=$mapstr4."&amp;parent[".$z."]=".addslashes(rtrim(ltrim($levels[$z])));
+					$mapstr3=$mapstr3."&amp;parent[".$z."]=".WT_Filter::escapeJs($row['pl_placerequested']);
+					$mapstr4=$mapstr4."&amp;parent[".$z."]=".WT_Filter::escapeJs($levels[$z]);
 					$z++;
 				}
 				if ($matching) {

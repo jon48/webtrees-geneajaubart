@@ -2,10 +2,10 @@
 // View for the fan chart.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: fanchart.php 15064 2013-06-20 05:18:10Z nigel $
 
 define('WT_SCRIPT_NAME', 'fanchart.php');
 require './includes/session.php';
@@ -29,8 +27,8 @@ require WT_ROOT.'includes/functions/functions_edit.php';
 
 $controller=new WT_Controller_Fanchart();
 
-if (safe_GET_bool('img')) {
-	header('Content-type: image/png');
+if (WT_Filter::getBool('img')) {
+	Zend_Session::writeClose();
 	$controller->generate_fan_chart('png');
 	exit;
 }
@@ -43,7 +41,8 @@ $controller
 ?>
 <div id="page-fan">
 	<h2><?php echo $controller->getPageTitle(); ?></h2>
-	<form name="people" method="get" action="#">
+	<form name="people" method="get" action="?">
+		<input type="hidden" name="ged" value="<?php echo WT_Filter::escapeHtml(WT_GEDCOM); ?>">
 		<table class="list_table">
 			<tr>
 				<td class="descriptionbox">
@@ -89,4 +88,4 @@ if ($controller->error_message) {
 if ($controller->root) {
 	echo '<div id="fan_chart">', $controller->generate_fan_chart('html'), '</div>';
 }
-echo '</div>'; // close #page-chart
+echo '</div>';

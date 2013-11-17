@@ -9,7 +9,7 @@
 // midday.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Julian.php 14065 2012-07-03 19:27:10Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,11 +31,9 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Date_Julian extends WT_Date_Calendar {
-	var $new_old_style=false;
+	const CALENDAR_ESCAPE = '@#DJULIAN@';
 
-	static function CALENDAR_ESCAPE() {
-		return '@#DJULIAN@';
-	}
+	var $new_old_style=false;
 
 	static function calendarName() {
 		return /* I18N: The julian calendar */ WT_I18N::translate('Julian');
@@ -75,24 +71,26 @@ class WT_Date_Julian extends WT_Date_Calendar {
 		$day=$e-(int)((153*$m+2)/5)+1;
 		$month=$m+3-12*(int)($m/10);
 		$year=$d-4800+(int)($m/10);
-		if ($year<1) // 0=1BC, -1=2BC, etc.
-		--$year;
+		if ($year<1) {
+			// 0=1BC, -1=2BC, etc.
+			--$year;
+		}
 		return array($year, $month, $day);
 	}
 
 	// Process new-style/old-style years and years BC
-	function ExtractYear($year) {
-		if (preg_match('/^(\d\d\d\d) \/ \d{1,4}$/', $year, $match)) { // Assume the first year is correct
+	public function ExtractYear($year) {
+		if (preg_match('/^(\d\d\d\d)\/\d{1,4}$/', $year, $match)) { // Assume the first year is correct
 			$this->new_old_style=true;
 			return $match[1]+1;
 		} else
-			if (preg_match('/^(\d+) b ?c$/', $year, $match))
+			if (preg_match('/^(\d+) B\.C\.$/', $year, $match))
 				return -$match[1];
 			else
 				return (int)$year;
 	}
 
-	function FormatLongYear() {
+	protected function FormatLongYear() {
 		if ($this->y<0) {
 			return /*  I18N: BCE=Before the Common Era, for Julian years < 0.  See http://en.wikipedia.org/wiki/Common_Era */ WT_I18N::translate('%s&nbsp;BCE', WT_I18N::digits(-$this->y));
 		} else {
@@ -103,9 +101,9 @@ class WT_Date_Julian extends WT_Date_Calendar {
 		}
 	}
 
-	function FormatGedcomYear() {
+	protected function FormatGedcomYear() {
 		if ($this->y<0) {
-			return sprintf('%04dB.C.', -$this->y);
+			return sprintf('%04d B.C.', -$this->y);
 		} else {
 			if ($this->new_old_style) {
 				return sprintf('%04d/%02d', $this->y-1, $this->y % 100);

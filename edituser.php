@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: edituser.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'edituser.php');
 require './includes/session.php';
@@ -34,9 +32,6 @@ if (!get_user_setting(WT_USER_ID, 'editaccount')) {
 	exit;
 }
 
-$controller=new WT_Controller_Page();
-$controller->setPageTitle(WT_I18N::translate('User administration'));
-
 // Valid values for form variables
 $ALL_THEMES_DIRS=array();
 foreach (get_theme_names() as $themename=>$themedir) {
@@ -44,58 +39,56 @@ foreach (get_theme_names() as $themename=>$themedir) {
 }
 
 // Extract form variables
-$form_action        =safe_POST('form_action'   );
-$form_username      =safe_POST('form_username',       WT_REGEX_USERNAME);
-$form_realname      =safe_POST('form_realname' );
-$form_pass1         =safe_POST('form_pass1',          WT_REGEX_PASSWORD);
-$form_pass2         =safe_POST('form_pass2',          WT_REGEX_PASSWORD);
-$form_email         =safe_POST('form_email',          WT_REGEX_EMAIL,                         'email@example.com');
-$form_rootid        =safe_POST('form_rootid',         WT_REGEX_XREF,                           WT_USER_ROOT_ID   );
-$form_theme         =safe_POST('form_theme',          $ALL_THEME_DIRS);
-$form_language      =safe_POST('form_language',       array_keys(WT_I18N::installed_languages()), WT_LOCALE          );
-$form_contact_method=safe_POST('form_contact_method');
-$form_visible_online=safe_POST_bool('form_visible_online');
+$form_action         = WT_Filter::post('form_action');
+$form_username       = WT_Filter::post('form_username');
+$form_realname       = WT_Filter::post('form_realname' );
+$form_pass1          = WT_Filter::post('form_pass1', WT_REGEX_PASSWORD);
+$form_pass2          = WT_Filter::post('form_pass2', WT_REGEX_PASSWORD);
+$form_email          = WT_Filter::postEmail('form_email');
+$form_rootid         = WT_Filter::post('form_rootid', WT_REGEX_XREF);
+$form_theme          = WT_Filter::post('form_theme', implode('|', $ALL_THEME_DIRS));
+$form_language       = WT_Filter::post('form_language', implode('|', array_keys(WT_I18N::installed_languages())), WT_LOCALE);
+$form_contact_method = WT_Filter::post('form_contact_method');
+$form_visible_online = WT_Filter::postBool('form_visible_online');
 
 // Respond to form action
-if ($form_action=='update') {
+if ($form_action=='update' && WT_Filter::checkCsrf()) {
 	if ($form_username!=WT_USER_NAME && get_user_id($form_username)) {
-		$controller->pageHeader();
-		echo '<span class="error">', WT_I18N::translate('Duplicate user name.  A user with that user name already exists.  Please choose another user name.'), '</span><br>';
+		WT_FlashMessages::addMessage(WT_I18N::translate('Duplicate user name.  A user with that user name already exists.  Please choose another user name.'));
 	} elseif ($form_email!=getUserEmail(WT_USER_ID) && get_user_by_email($form_email)) {
-		$controller->pageHeader();
-		echo '<span class="error">', WT_I18N::translate('Duplicate email address.  A user with that email already exists.'), '</span><br>';
+		WT_FlashMessages::addMessage(WT_I18N::translate('Duplicate email address.  A user with that email already exists.'));
 	} else {
-		// Change password
-		if (!empty($form_pass1)) {
-			set_user_password(WT_USER_ID, $form_pass1);
-		}
-		$old_realname =getUserFullName(WT_USER_ID);
-		$old_email    =getUserEmail(WT_USER_ID);
-		// Change other settings
-		setUserFullName(WT_USER_ID, $form_realname);
-		setUserEmail   (WT_USER_ID, $form_email);
-		set_user_setting(WT_USER_ID, 'theme',         $form_theme);
-		$WT_SESSION->theme_dir=$form_theme; // switch to the new theme right away
-		set_user_setting(WT_USER_ID, 'language',      $form_language);
-		$WT_SESSION->locale=$form_language; // switch to the new language right away
-		set_user_setting(WT_USER_ID, 'contactmethod', $form_contact_method);
-		set_user_setting(WT_USER_ID, 'visibleonline', $form_visible_online);
-		$WT_TREE->userPreference(WT_USER_ID, 'rootid', $form_rootid);
-
 		// Change username
 		if ($form_username!=WT_USER_NAME) {
 			AddToLog('User renamed to ->'.$form_username.'<-', 'auth');
 			rename_user(WT_USER_ID, $form_username);
 		}
+
+		// Change password
+		if ($form_pass1 && $form_pass1 == $form_pass2) {
+			set_user_password(WT_USER_ID, $form_pass1);
+		}
+
+		// Change other settings
+		setUserFullName(WT_USER_ID, $form_realname);
+		setUserEmail   (WT_USER_ID, $form_email);
+		set_user_setting(WT_USER_ID, 'theme',         $form_theme);
+		set_user_setting(WT_USER_ID, 'language',      $form_language);
+		set_user_setting(WT_USER_ID, 'contactmethod', $form_contact_method);
+		set_user_setting(WT_USER_ID, 'visibleonline', $form_visible_online);
+		$WT_TREE->userPreference(WT_USER_ID, 'rootid', $form_rootid);
+
 		// Reload page to pick up changes such as theme and user_id
 		header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME);
 		exit;
 	}
-} else {
-	$controller
-		->pageHeader()
-		->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 }
+
+$controller=new WT_Controller_Page();
+$controller
+	->setPageTitle(WT_I18N::translate('User administration'))
+	->pageHeader()
+	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
 // Form validation
 ?>
@@ -133,25 +126,26 @@ function paste_id(value) {
 // show the form to edit a user account details
 echo '<div id="edituser-page">
 	<h2>', WT_I18N::translate('My account'), '</h2>
-	<form name="editform" method="post" action="" onsubmit="return checkform(this);">
+	<form name="editform" method="post" action="?" onsubmit="return checkform(this);">
 	<input type="hidden" name="form_action" value="update">
+	', WT_Filter::getCsrf(), '
 	<div id="edituser-table">
 		<div class="label">', WT_I18N::translate('Username'), help_link('username'), '</div>
 		<div class="value"><input type="text" name="form_username" value="', WT_USER_NAME, '" autofocus></div>
 		<div class="label">', WT_I18N::translate('Real name'), help_link('real_name'), '</div>
 		<div class="value"><input type="text" name="form_realname" value="', getUserFullName(WT_USER_ID), '"></div>';
-		$person=WT_Person::getInstance(WT_USER_GEDCOM_ID);
+		$person=WT_Individual::getInstance(WT_USER_GEDCOM_ID);
 		if ($person) {
 			echo '<div class="label">', WT_I18N::translate('Individual record'), help_link('edituser_gedcomid'), '</div>
 				<div class="value">', $person->format_list('span'), '</div>';
 		}
-		$person=WT_Person::getInstance(WT_USER_ROOT_ID);
+		$person=WT_Individual::getInstance(WT_USER_ROOT_ID);
 		echo '<div class="label">', WT_I18N::translate('Default individual'), help_link('default_individual'), '</div>
 			<div class="value"><input type="text" name="form_rootid" id="rootid" value="', WT_USER_ROOT_ID, '">';
 				echo print_findindi_link('rootid'), '<br>';
 				if ($person) {
 					echo $person->format_list('span');
-				}		
+				}
 			echo '</div>
 		<div class="label">', WT_I18N::translate('Password'), help_link('password'), '</div>
 		<div class="value"><input type="password" name="form_pass1"> ', WT_I18N::translate('Leave password blank if you want to keep the current password.'), '</div>
@@ -164,7 +158,7 @@ echo '<div id="edituser-page">
 		<div class="label">', WT_I18N::translate('Theme'), help_link('THEME'), '</div>
 		<div class="value">
 			<select name="form_theme">
-			<option value="">', htmlspecialchars(/* I18N: default option in list of themes */ WT_I18N::translate('<default theme>')), '</option>';
+			<option value="">', WT_Filter::escapeHtml(/* I18N: default option in list of themes */ WT_I18N::translate('<default theme>')), '</option>';
 			foreach (get_theme_names() as $themename=>$themedir) {
 				echo '<option value="', $themedir, '"';
 				if ($themedir==get_user_setting(WT_USER_ID, 'theme')) {

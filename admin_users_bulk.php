@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // Modifications Copyright (c) 2010 Greg Roach
 //
@@ -22,8 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: admin_users_bulk.php 10239 2011-01-01 22:32:55Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_users_bulk.php');
 require './includes/session.php';
@@ -37,17 +35,17 @@ $controller
 ?>
 <div id="users_bulk">
 	<p>
-		<a href="#" onclick="message('all', 'messaging2', '', ''); return false;">
+		<a href="#" onclick="message('all', 'messaging2', ''); return false;">
 			<?php echo WT_I18N::translate('Send message to all users'); ?>
 		</a>
 	</p>
 	<p>
-		<a href="#" onclick="message('never_logged', 'messaging2', '', ''); return false;">
+		<a href="#" onclick="message('never_logged', 'messaging2', ''); return false;">
 			<?php echo WT_I18N::translate('Send message to users who have never logged in'); ?>
 		</a>
 	</p>
 	<p>
-		<a href="#" onclick="message('last_6mo', 'messaging2', '', ''); return false;">
+		<a href="#" onclick="message('last_6mo', 'messaging2', ''); return false;">
 			<?php echo WT_I18N::translate('Send message to users who have not logged in for 6 months'); ?>
 		</a>
 	</p>

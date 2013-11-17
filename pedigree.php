@@ -2,10 +2,10 @@
 // View for the pedigree tree.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: pedigree.php 14693 2013-01-22 08:56:56Z greg $
 
 define('WT_SCRIPT_NAME', 'pedigree.php');
 require './includes/session.php';
@@ -33,41 +31,48 @@ $controller
 	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
 	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
-echo '
+?>
 <div id="pedigree-page">
-	<h2>'. $controller->getPageTitle(). '</h2>
+	<h2><?php echo $controller->getPageTitle(); ?></h2>
 	<form name="people" id="people" method="get" action="?">
-		<input type="hidden" name="show_full" value="'. $controller->show_full. '">
+		<input type="hidden" name="ged" value="<?php echo WT_Filter::escapeHtml(WT_GEDCOM); ?>">
+		<input type="hidden" name="show_full" value="<?php echo $controller->show_full; ?>">
 		<table class="list_table">
 			<tr>
-				<th class="descriptionbox wrap">'. WT_I18N::translate('Individual'). '</th>
-				<th class="descriptionbox wrap">'. WT_I18N::translate('Generations'). '</th>
-				<th class="descriptionbox wrap">'. WT_I18N::translate('Layout'). '</th>
-				<th class="descriptionbox wrap">'. WT_I18N::translate('Show Details'). '</th>
-				<th rowspan="2" class="facts_label03"><input type="submit" value="'. WT_I18N::translate('View'). '"></th>
+				<th class="descriptionbox wrap">
+					<?php echo WT_I18N::translate('Individual'); ?>
+				</th>
+				<th class="descriptionbox wrap">
+					<?php echo WT_I18N::translate('Generations'); ?>
+				</th>
+				<th class="descriptionbox wrap">
+					<?php echo WT_I18N::translate('Layout'); ?>
+				</th>
+				<th class="descriptionbox wrap">
+					<?php echo WT_I18N::translate('Show details'); ?>
+				</th>
+				<th rowspan="2" class="facts_label03">
+					<input type="submit" value="<?php echo WT_I18N::translate('View'); ?>">
+				</th>
 			</tr>
 			<tr>
 				<td class="optionbox">
-					<input class="pedigree_form" type="text" id="rootid" name="rootid" size="3" value="'. $controller->rootid. '">'. print_findindi_link('rootid'). '</td>
-				<td class="optionbox center">
-					<select name="PEDIGREE_GENERATIONS">';
-						for ($i=3; $i<=$MAX_PEDIGREE_GENERATIONS; $i++) {
-							echo '<option value="', $i, '"';
-							if ($i == $controller->PEDIGREE_GENERATIONS) echo ' selected="selected"';
-							echo '>', $i, '</option>';
-						}
-					echo '</select>
+					<input class="pedigree_form" type="text" id="rootid" name="rootid" size="3" value="<?php echo $controller->rootid; ?>">
+					<?php echo print_findindi_link('rootid'); ?>
 				</td>
-				<td class="optionbox center">'. select_edit_control('talloffset', array(0=>WT_I18N::translate('Portrait'), 1=>WT_I18N::translate('Landscape'), 2=>WT_I18N::translate('Oldest at top'), 3=>WT_I18N::translate('Oldest at bottom')), null, $talloffset). '</td>
 				<td class="optionbox center">
-					<input type="checkbox" value="';
-					if ($controller->show_full) echo '1" checked="checked" onclick="document.people.show_full.value=\'0\';';
-					else echo '0" onclick="document.people.show_full.value=\'1\';';
-					echo '">
+					<?php echo edit_field_integers('PEDIGREE_GENERATIONS', $controller->PEDIGREE_GENERATIONS, 3, $MAX_PEDIGREE_GENERATIONS); ?>
+				</td>
+				<td class="optionbox center">
+					<?php echo select_edit_control('talloffset', array(0=>WT_I18N::translate('Portrait'), 1=>WT_I18N::translate('Landscape'), 2=>WT_I18N::translate('Oldest at top'), 3=>WT_I18N::translate('Oldest at bottom')), null, $talloffset); ?>
+				</td>
+				<td class="optionbox center">
+				    <input type="checkbox" value="<?php	if ($controller->show_full) echo "1\" checked=\"checked\" onclick=\"document.people.show_full.value='0';"; else echo "0\" onclick=\"document.people.show_full.value='1';"; ?>">
 				</td>
 			</tr>
 		</table>
-	</form>';
+	</form>
+<?php
 if ($controller->error_message) {
 	echo '<p class="ui-state-error">', $controller->error_message, '</p>';
 	exit;
@@ -75,7 +80,7 @@ if ($controller->error_message) {
 echo '<div id="pedigree_chart">';
 //-- echo the boxes
 $curgen = 1;
-$xoffset = 0;	
+$xoffset = 0;
 $yoffset = 0;     // -- used to offset the position of each box as it is generated
 $prevxoffset = 0; // -- used to track the horizontal x position of the previous box
 $prevyoffset = 0; // -- used to track the vertical y position of the previous box
@@ -93,7 +98,7 @@ for ($i=($controller->treesize-1); $i>=0; $i--) {
 	}
 	$prevxoffset = $xoffset;
 	$prevyoffset = $yoffset;
-	if ($talloffset < 2) { // Portrate 0 Landscape 1 top 2 bottom 3 
+	if ($talloffset < 2) { // Portrate 0 Landscape 1 top 2 bottom 3
 		$xoffset = $controller->offsetarray[$i]["x"];
 		$yoffset = $controller->offsetarray[$i]["y"];
 	} else {
@@ -110,7 +115,7 @@ for ($i=($controller->treesize-1); $i>=0; $i--) {
 		$iref = $i;
 	}
 	// Can we go back to an earlier generation?
-	$can_go_back=$curgen==1 && WT_Person::getInstance($controller->treeid[$i]) && WT_Person::getInstance($controller->treeid[$i])->getChildFamilies();
+	$can_go_back=$curgen==1 && WT_Individual::getInstance($controller->treeid[$i]) && WT_Individual::getInstance($controller->treeid[$i])->getChildFamilies();
 
 	if ($talloffset == 2) { // oldest at top
 		echo '<div id="uparrow" dir="';
@@ -136,12 +141,12 @@ for ($i=($controller->treesize-1); $i>=0; $i--) {
 	echo '.1'.$iref;
 	if ($TEXT_DIRECTION=="rtl") {echo '" style="right:';} else {echo '" style="left:';}
 	//Correct box spacing for different layouts
-	if ($talloffset == 2) {$zindex = $PEDIGREE_GENERATIONS-$curgen;} else {$zindex = 0;}	
+	if ($talloffset == 2) {$zindex = $PEDIGREE_GENERATIONS-$curgen;} else {$zindex = 0;}
 	if (($talloffset == 3) && ($curgen ==1)) {$yoffset +=25;}
 	if (($talloffset == 3) && ($curgen ==2)) {$yoffset +=10;}
-	echo $xoffset, "px; top:", $yoffset, "px; width:", ($controller->pbwidth), "px; height:", $controller->pbheight, "px; z-index:", $zindex, ";\">";		
-	if (!isset($controller->treeid[$i])) {$controller->treeid[$i] = false;}	
-	print_pedigree_person(WT_Person::getInstance($controller->treeid[$i]), 1, $iref, 1);		
+	echo $xoffset, "px; top:", $yoffset, "px; width:", ($controller->pbwidth), "px; height:", $controller->pbheight, "px; z-index:", $zindex, ";\">";
+	if (!isset($controller->treeid[$i])) {$controller->treeid[$i] = false;}
+	print_pedigree_person(WT_Individual::getInstance($controller->treeid[$i]), 1, $iref, 1);
 	if ($can_go_back) {
 		$did = 1;
 		if ($i > (int)($controller->treesize/2) + (int)($controller->treesize/4)) {
@@ -201,18 +206,14 @@ if (count($famids)>0) {
 	foreach ($famids as $family) {
 		$spouse=$family->getSpouse($controller->root);
 		if ($spouse) {
-			echo "<a href=\"pedigree.php?PEDIGREE_GENERATIONS={$controller->PEDIGREE_GENERATIONS}&amp;rootid=".$spouse->getXref()."&amp;show_full={$controller->show_full}&amp;talloffset={$talloffset}\"><span ";
-			$name = $spouse->getFullName();
-			echo 'class="name1">';
-			echo $name;
+			echo '<a href="pedigree.php?PEDIGREE_GENERATIONS=', $controller->PEDIGREE_GENERATIONS, '&amp;rootid=', $spouse->getXref(), '&amp;show_full=', $controller->show_full, '&amp;talloffset=', $talloffset, '"><span class="name1">';
+			echo $spouse->getFullName();
 			echo '<br></span></a>';
 		}
 		$children = $family->getChildren();
 		foreach ($children as $child) {
-			echo "&nbsp;&nbsp;<a href=\"pedigree.php?PEDIGREE_GENERATIONS={$controller->PEDIGREE_GENERATIONS}&amp;rootid=".$child->getXref()."&amp;show_full={$controller->show_full}&amp;talloffset={$talloffset}\"><span ";
-			$name = $child->getFullName();
-			echo "class=\"name1\">&lt; ";
-			echo $name;
+			echo '&nbsp;&nbsp;<a href="pedigree.php?PEDIGREE_GENERATIONS=', $controller->PEDIGREE_GENERATIONS, '&amp;rootid=', $child->getXref(), '&amp;show_full=', $controller->show_full, '&amp;talloffset=', $talloffset, '"><span class="name1">';
+			echo $child->getFullName();
 			echo '<br></span></a>';
 		}
 	}
@@ -227,7 +228,7 @@ if (count($famids)>0) {
 				echo '<span class="name1"><br>', WT_I18N::translate('Sibling'), '<br></span>';
 			}
 			foreach ($children as $child) {
-				if (!$controller->root->equals($child) && !is_null($child)) {
+				if ($controller->root !== $child) {
 					echo "&nbsp;&nbsp;<a href=\"pedigree.php?PEDIGREE_GENERATIONS={$controller->PEDIGREE_GENERATIONS}&amp;rootid=".$child->getXref()."&amp;show_full={$controller->show_full}&amp;talloffset={$talloffset}\"><span ";
 					$name = $child->getFullName();
 					echo 'class="name1"> ';
@@ -270,7 +271,7 @@ $controller->addInlineJavascript('
 			strValue = oElm.currentStyle[strCssRule];
 		}
 		return strValue;
-	}	
+	}
 	// Set variables
 		var c=document.getElementById("pedigree_canvas");
 		var ctx=c.getContext("2d");
@@ -285,7 +286,7 @@ $controller->addInlineJavascript('
 		var offset_y2 = '.$controller->pbheight.'*2;
 		var lineDrawx2 = new Array("'. join($lineDrawx,'","'). '");
 		var lineDrawy2 = new Array("'. join($lineDrawy,'","'). '");
-		var maxjoins = Math.pow(2,'.$PEDIGREE_GENERATIONS.');		
+		var maxjoins = Math.pow(2,'.$PEDIGREE_GENERATIONS.');
 	//Draw the lines
 		if (talloffset < 2) { // landscape and portrait styles
 			for (var i = 0; i <= maxjoins-3; i++) {
@@ -303,7 +304,7 @@ $controller->addInlineJavascript('
 					}
 				}
 			}
-		}	
+		}
 		if (talloffset == 2) { // oldest at top
 			for (var i = 0; i <= maxjoins; i++) {
 				if(i%2!=0){

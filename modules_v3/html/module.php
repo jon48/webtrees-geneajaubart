@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 15026 2013-06-01 20:38:43Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -135,15 +133,15 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function configureBlock($block_id) {
-		if (safe_POST_bool('save')) {
-			set_block_setting($block_id, 'gedcom',         safe_POST('gedcom'));
-			set_block_setting($block_id, 'title',          $_POST['title']);
-			set_block_setting($block_id, 'html',           $_POST['html']);
-			set_block_setting($block_id, 'show_timestamp', safe_POST_bool('show_timestamp'));
-			set_block_setting($block_id, 'timestamp',      safe_POST('timestamp'));
+		if (WT_Filter::postBool('save') && WT_Filter::checkCsrf()) {
+			set_block_setting($block_id, 'gedcom',         WT_Filter::post('gedcom'));
+			set_block_setting($block_id, 'title',          WT_Filter::post('title'));
+			set_block_setting($block_id, 'html',           WT_Filter::post('html'));
+			set_block_setting($block_id, 'show_timestamp', WT_Filter::postBool('show_timestamp'));
+			set_block_setting($block_id, 'timestamp',      WT_Filter::post('timestamp'));
 			$languages=array();
 			foreach (WT_I18N::installed_languages() as $code=>$name) {
-				if (safe_POST_bool('lang_'.$code)) {
+				if (WT_Filter::postBool('lang_'.$code)) {
 					$languages[]=$code;
 				}
 			}
@@ -158,7 +156,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 			'#getAllTagsTable#',
 
 			WT_I18N::translate('Narrative description')=>
-			/* I18N: do not translate the #keywords# */ WT_I18N::translate('This GEDCOM (family tree) was last updated on #gedcomUpdated#. There are #totalSurnames# surnames in this family tree. The earliest recorded event is the #firstEventType# of #firstEventName# in #firstEventYear#. The most recent event is the #lastEventType# of #lastEventName# in #lastEventYear#.<br /><br />If you have any comments or feedback please contact #contactWebmaster#.'),
+			/* I18N: do not translate the #keywords# */ WT_I18N::translate('This GEDCOM (family tree) was last updated on #gedcomUpdated#. There are #totalSurnames# surnames in this family tree. The earliest recorded event is the #firstEventType# of #firstEventName# in #firstEventYear#. The most recent event is the #lastEventType# of #lastEventName# in #lastEventYear#.<br><br>If you have any comments or feedback please contact #contactWebmaster#.'),
 
 			WT_I18N::translate('Statistics')=>
 			'<div class="gedcom_stats">
@@ -234,7 +232,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 									<td class="facts_value">#lastDeath#</td>
 								</tr>
 								<tr>
-									<td class="facts_label">'.WT_I18N::translate('Person who lived the longest').'</td>
+									<td class="facts_label">'.WT_I18N::translate('Individual who lived the longest').'</td>
 									<td class="facts_value" align="right">#longestLifeAge#</td>
 									<td class="facts_value">#longestLife#</td>
 								</tr>
@@ -267,7 +265,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 		// title
 		echo '<tr><td class="descriptionbox wrap">',
 			WT_Gedcom_Tag::getLabel('TITL'),
-			'</td><td class="optionbox"><input type="text" name="title" size="30" value="', htmlspecialchars($title), '"></td></tr>';
+			'</td><td class="optionbox"><input type="text" name="title" size="30" value="', WT_Filter::escapeHtml($title), '"></td></tr>';
 
 		// templates
 		echo '<tr><td class="descriptionbox wrap">',
@@ -281,9 +279,9 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 			$ckeditor_onchange='';
 		}
 		echo '<select name="template" onchange="document.block.html.value=document.block.template.options[document.block.template.selectedIndex].value;', $ckeditor_onchange, '">';
-		echo '<option value="', htmlspecialchars($html), '">', WT_I18N::translate('Custom'), '</option>';
+		echo '<option value="', WT_Filter::escapeHtml($html), '">', WT_I18N::translate('Custom'), '</option>';
 		foreach ($templates as $title=>$template) {
-			echo '<option value="', htmlspecialchars($template), '">', $title, '</option>';
+			echo '<option value="', WT_Filter::escapeHtml($template), '">', $title, '</option>';
 		}
 		echo '</select></td></tr>';
 
@@ -311,7 +309,7 @@ class html_WT_Module extends WT_Module implements WT_Module_Block {
 			help_link('block_html_content', $this->getName()),
 			'</td></tr><tr>',
 			'<td colspan="2" class="optionbox">';
-		echo '<textarea name="html" class="html-edit" rows="10" style="width:98%;">', htmlspecialchars($html), '</textarea>';
+		echo '<textarea name="html" class="html-edit" rows="10" style="width:98%;">', WT_Filter::escapeHtml($html), '</textarea>';
 		echo '</td></tr>';
 
 		$show_timestamp=get_block_setting($block_id, 'show_timestamp', false);

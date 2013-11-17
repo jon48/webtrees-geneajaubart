@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14754 2013-02-02 21:14:34Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -84,7 +82,7 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 					/* 2-Username */	{},
 					/* 3-Text */		{}
 				]
-				});		
+				});
 			jQuery("#'.$table_id.'").css("visibility", "visible");
 			jQuery(".loading-image").css("display", "none");
 			');
@@ -103,26 +101,24 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 
 		$found=false;
 		$end_jd=$show_future ? 99999999 : WT_CLIENT_JD;
-		foreach (get_calendar_events(0, $end_jd, '_TODO', WT_GED_ID) as $todo) {
-			$record=WT_GedcomRecord::getInstance($todo['id']);
-			if ($record && $record->canDisplayDetails()) {
-				$user_name = preg_match('/\n2 _WT_USER (.+)/', $todo['factrec'], $match) ? $match[1] : '';
-				if ($user_name==WT_USER_NAME || !$user_name && $show_unassigned || $user_name && $show_other) {
-					$content.='<tr>';
-					//-- Event date (sortable)
-					$content .= '<td>'; //hidden by datables code
-					$content .= $todo['date']->JD();
-					$content .= '</td>';
-					$content.='<td class="wrap">'. $todo['date']->Display(empty($SEARCH_SPIDER)).'</td>';
-					$content.='<td class="wrap"><a href="'.$record->getHtmlUrl().'">'.$record->getFullName().'</a></td>';
-					if ($show_unassigned || $show_other) {
-						$content.='<td class="wrap">'.$user_name.'</td>';
-					}
-					$text = preg_match('/^1 _TODO (.+)/', $todo['factrec'], $match) ? $match[1] : '';
-					$content.='<td class="wrap">'.$text.'</td>';
-					$content.='</tr>';
-					$found=true;
+		foreach (get_calendar_events(0, $end_jd, '_TODO', WT_GED_ID) as $fact) {
+			$record = $fact->getParent();
+			$user_name = $fact->getAttribute('_WT_USER');
+			if ($user_name==WT_USER_NAME || !$user_name && $show_unassigned || $user_name && $show_other) {
+				$content.='<tr>';
+				//-- Event date (sortable)
+				$content .= '<td>'; //hidden by datables code
+				$content .= $fact->getDate()->JD();
+				$content .= '</td>';
+				$content.='<td class="wrap">'. $fact->getDate()->Display(empty($SEARCH_SPIDER)).'</td>';
+				$content.='<td class="wrap"><a href="'.$record->getHtmlUrl().'">'.$record->getFullName().'</a></td>';
+				if ($show_unassigned || $show_other) {
+					$content.='<td class="wrap">'.$user_name.'</td>';
 				}
+				$text = $fact->getValue();
+				$content.='<td class="wrap">'.$text.'</td>';
+				$content.='</tr>';
+				$found=true;
 			}
 		}
 
@@ -159,11 +155,11 @@ class todo_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function configureBlock($block_id) {
-		if (safe_POST_bool('save')) {
-			set_block_setting($block_id, 'show_other',      safe_POST_bool('show_other'));
-			set_block_setting($block_id, 'show_unassigned', safe_POST_bool('show_unassigned'));
-			set_block_setting($block_id, 'show_future',     safe_POST_bool('show_future'));
-			set_block_setting($block_id, 'block',  safe_POST_bool('block'));
+		if (WT_Filter::postBool('save') && WT_Filter::checkCsrf()) {
+			set_block_setting($block_id, 'show_other',      WT_Filter::postBool('show_other'));
+			set_block_setting($block_id, 'show_unassigned', WT_Filter::postBool('show_unassigned'));
+			set_block_setting($block_id, 'show_future',     WT_Filter::postBool('show_future'));
+			set_block_setting($block_id, 'block',           WT_Filter::postBool('block'));
 			exit;
 		}
 

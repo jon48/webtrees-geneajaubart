@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: class_treeview.php 14694 2013-01-22 10:37:56Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -37,7 +35,7 @@ class TreeView {
 		$this->name = $name;
 
 		// Read if all partners must be shown or not
-		$allPartners = safe_GET('allPartners');
+		$allPartners = WT_Filter::get('allPartners');
 		// if allPartners not specified in url, we try to read the cookie
 		if ($allPartners == '') {
 			if (isset($_COOKIE['allPartners']))
@@ -55,13 +53,9 @@ class TreeView {
 	* @param string $rootPersonId the id of the root person
 	* @param int $generations number of generations to draw
 	*/
-	public function drawViewport($rootPersonId, $generations) {
+	public function drawViewport(WT_Individual $rootPerson, $generations) {
 		global $GEDCOM, $controller;
 
-		$rootPerson = WT_Person::getInstance($rootPersonId);
-		if (is_null($rootPerson)) {
-			$rootPerson = new WT_Person('');
-		}
 		if (WT_SCRIPT_NAME == 'individual.php') {
 			$path = 'individual.php?pid='.$rootPerson->getXref().'&amp;ged='.$GEDCOM.'&allPartners='.($this->allPartners ? "false" : "true").'#tree';
 		} else {
@@ -122,14 +116,12 @@ class TreeView {
 	*/
 	public function getDetails($pid) {
 
-		$person = WT_Person::getInstance($pid);
+		$person = WT_Individual::getInstance($pid);
 		$r = $this->getPersonDetails($person, $person, null);
 		foreach ($person->getSpouseFamilies() as $family) {
-			if (!empty($family)) {
-				$partner = $family->getSpouse($person);
-				if (!empty($partner)) {
-					$r .= $this->getPersonDetails($person, $partner, $family);
-				}
+			$spouse = $family->getSpouse($person);
+			if ($spouse) {
+				$r .= $this->getPersonDetails($person, $spouse, $family);
 			}
 		}
 		return $r;
@@ -137,21 +129,22 @@ class TreeView {
 
 	/**
 	* Return the details for a person
-	* @param Person $person the person to return the details for
 	*/
-	private function getPersonDetails($personGroup, $person, $family) {
-		$r = '<div class="tv'.$person->getSex().' tv_person_expanded">';
-		$r .= $this->getThumbnail($personGroup, $person);
-		$r .= '<a class="tv_link" href="'.$person->getHtmlUrl().'">'.$person->getFullName().'</a> <a href="module.php?mod=tree&amp;mod_action=treeview&allPartners='.($this->allPartners ? 'true' : 'false').'&amp;rootid='.$person->getXref().'" title="'.WT_I18N::translate('Interactive tree of %s', strip_tags($person->getFullName())).'" class="icon-button_indi tv_link tv_treelink"></a>';
-		$r .= '<br><b>'.WT_Gedcom_Tag::getAbbreviation('BIRT').'</b> '.$person->getBirthDate()->Display().' '.$person->getBirthPlace();
+	private function getPersonDetails($personGroup, $individual, $family) {
+		$r = $this->getThumbnail($personGroup, $individual);
+		$r .= '<a class="tv_link" href="'.$individual->getHtmlUrl().'">'.$individual->getFullName().'</a> <a href="module.php?mod=tree&amp;mod_action=treeview&allPartners='.($this->allPartners ? 'true' : 'false').'&amp;rootid='.$individual->getXref().'" title="'.WT_I18N::translate('Interactive tree of %s', strip_tags($individual->getFullName())).'" class="icon-button_indi tv_link tv_treelink"></a>';
+		foreach ($individual->getFacts(WT_EVENTS_BIRT, true) as $fact) {
+			$r .= $fact->summary();
+		}
 		if ($family) {
-			$r .= '<br><b>'.WT_Gedcom_Tag::getAbbreviation('MARR').'</b> '.$family->getMarriageDate()->Display().' <a href="'.$family->getHtmlUrl().'" class="icon-button_family tv_link tv_treelink" title="'.strip_tags($family->getFullName()).'"></a>'.$family->getMarriagePlace();
+			foreach ($family->getFacts(WT_EVENTS_MARR, true) as $fact) {
+				$r .= $fact->summary();
+			}
 		}
-		if ($person->isDead()) {
-			$r .= '<br><b>'.WT_Gedcom_Tag::getAbbreviation('DEAT').'</b> '.$person->getDeathDate()->Display().' '.$person->getDeathPlace();
+		foreach ($individual->getFacts(WT_EVENTS_DEAT, true) as $fact) {
+			$r .= $fact->summary();
 		}
-		$r.= '</div>';
-		return $r;
+		return '<div class="tv'.$individual->getSex().' tv_person_expanded">' . $r . '</div>';
 	}
 
 	/**
@@ -178,7 +171,7 @@ class TreeView {
 				}
 			}
 		}
-		$tc = count($children2draw);		
+		$tc = count($children2draw);
 		if ($tc) {
 			$f2load = implode(',', $f2load);
 			$nbc = 0;
@@ -253,8 +246,8 @@ class TreeView {
 			$dashed = '';
 			foreach ($sfams as $famid=>$family) {
 				$p = $family->getSpouse($person);
-				if (!empty($p)) {
-					if (($p->equals($partner)) || $this->allPartners) {
+				if ($p) {
+					if (($p === $partner) || $this->allPartners) {
 						$pf = $p->getPrimaryChildFamily();
 						if (!empty($pf)) {
 							$fop[] = Array($pf->getHusband(), $pf);
@@ -313,7 +306,7 @@ class TreeView {
 
 	/**
 	* Draw a person name preceded by sex icon, with parents as tooltip
-	* @param WT_Person $p a person
+	* @param WT_Individual $p a person
 	* @param $dashed if = 'dashed' print dashed top border to separate multiple spuses
 	*/
 	private function drawPersonName($p, $dashed='') {

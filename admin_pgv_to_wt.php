@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: admin_pgv_to_wt.php 15038 2013-06-12 07:17:35Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_pgv_to_wt.php');
 require './includes/session.php';
@@ -35,9 +33,9 @@ $controller
 	->requireAdminLogin()
 	->setPageTitle(WT_I18N::translate('PhpGedView to webtrees transfer wizard'));
 
-$error='';
-$warning='';
-$PGV_PATH=safe_POST('PGV_PATH');
+$error    = '';
+$warning  = '';
+$PGV_PATH = WT_Filter::post('PGV_PATH');
 
 if ($PGV_PATH) {
 	if (!is_dir($PGV_PATH) || !is_readable($PGV_PATH.'/config.php')) {
@@ -140,7 +138,7 @@ if ($error || !$PGV_PATH) {
 		echo '<dd><input type="text" name="PGV_PATH" size="40" value="" autofocus></dd>';
 		break;
 	case '1':
-		echo '<dd><input type="text" name="PGV_PATH" size="40" value="'.htmlspecialchars($pgv_dirs[0]).'" autofocus></dd>';
+		echo '<dd><input type="text" name="PGV_PATH" size="40" value="'.WT_Filter::escapeHtml($pgv_dirs[0]).'" autofocus></dd>';
 		break;
 	default:
 		echo '<dd><input type="text" name="PGV_PATH" size="40" value="" autofocus></dd>';
@@ -648,7 +646,6 @@ foreach ($GEDCOMS as $GEDCOM=>$GED_DATA) {
 
 	$stmt_gedcom_setting=WT_DB::prepare("INSERT INTO `##gedcom_setting` (gedcom_id, setting_name, setting_value) VALUES (?,?,?)");
 
-	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'ABBREVIATE_CHART_LABELS',      $ABBREVIATE_CHART_LABELS));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'ADVANCED_NAME_FACTS',          $ADVANCED_NAME_FACTS));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'ADVANCED_PLAC_FACTS',          $ADVANCED_PLAC_FACTS));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'ALLOW_THEME_DROPDOWN',         $ALLOW_THEME_DROPDOWN));
@@ -1001,6 +998,18 @@ WT_DB::prepare(
 	" FROM `{$DBNAME}`.`{$TBLPREFIX}messages`".
 	" JOIN `##user` ON (CONVERT(m_to USING utf8) COLLATE utf8_unicode_ci=user_name)"
 )->execute();
+
+////////////////////////////////////////////////////////////////////////////////
+
+try {
+	echo '<p>pgv_placelocation => wt_placelocation ...</p>'; ob_flush(); flush(); usleep(50000);
+	WT_DB::prepare(
+		"REPLACE INTO `##placelocation` (pl_id, pl_parent_id, pl_level, pl_place, pl_long, pl_lati, pl_zoom, pl_icon)".
+		" SELECT pl_id, pl_parent_id, pl_level, pl_place, pl_long, pl_lati, pl_zoom, pl_icon FROM `{$DBNAME}`.`{$TBLPREFIX}placelocation`"
+	)->execute();
+} catch (PDOexception $ex) {
+	// This table will only exist if the gm module is installed in PGV/WT
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

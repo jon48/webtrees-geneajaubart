@@ -2,10 +2,10 @@
 //	Controller for the fan chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Fanchart.php 15044 2013-06-14 21:14:27Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -38,15 +36,15 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 
 	public function __construct() {
 		parent::__construct();
-		
+
 		$default_generations=get_gedcom_setting(WT_GED_ID, 'DEFAULT_PEDIGREE_GENERATIONS');
 
 		// Extract the request parameters
-		$this->fan_style  =safe_GET_integer('fan_style',   2,  4,  3);
-		$this->fan_width  =safe_GET_integer('fan_width',   50, 300, 100);
-		$this->generations=safe_GET_integer('generations', 2, 9, $default_generations);
+		$this->fan_style   = WT_Filter::getInteger('fan_style',   2,  4,  3);
+		$this->fan_width   = WT_Filter::getInteger('fan_width',   50, 300, 100);
+		$this->generations = WT_Filter::getInteger('generations', 2, 9, $default_generations);
 
-		if ($this->root && $this->root->canDisplayName()) {
+		if ($this->root && $this->root->canShowName()) {
 			$this->setPageTitle(
 				/* I18N: http://en.wikipedia.org/wiki/Family_tree#Fan_chart - %s is an individual’s name */
 				WT_I18N::translate('Fan chart of %s', $this->root->getFullName())
@@ -209,11 +207,18 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 
 			// draw each cell
 			while ($sosa >= $p2) {
-				$pid=$treeid[$sosa];
-				if ($pid) {
-					$person =WT_Person::getInstance($pid);
-					$name   =$person->getFullName();
-					$addname=$person->getAddName();
+				$pid = $treeid[$sosa];
+				$person = WT_Individual::getInstance($pid);
+				if ($person) {
+					$name    = WT_Filter::unescapeHtml($person->getFullName());
+					$addname = WT_Filter::unescapeHtml($person->getAddName());
+
+					$text = reverseText($name);
+					if ($addname) {
+						$text .= "\n" . reverseText($addname);
+					}
+
+					$text .= "\n" . WT_Filter::unescapeHtml($person->getLifeSpan());
 
 					switch($person->getSex()) {
 					case 'M':
@@ -229,14 +234,6 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 
 					ImageFilledArc($image, $cx, $cy, $rx, $rx, $deg1, $deg2, $bg, IMG_ARC_PIE);
 
-					$text = reverseText($name) . "\n";
-					if (!empty($addname)) $text .= reverseText($addname). "\n";
-
-					$text .= $person->getLifeSpan();
-
-					$text = unhtmlentities($text);
-					$text = strip_tags($text);
-	
 					// split and center text by lines
 					$wmax = (int)($angle*7/$fanChart['size']*$scale);
 					$wmax = min($wmax, 35*$scale);
@@ -323,9 +320,9 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 						$spouse=$family->getSpouse($person);
 						if ($spouse) {
 							$html.= '<br><a href="'.$spouse->getHtmlUrl().'" class="name1">'.$spouse->getFullName().'</a>';
-						}
-						foreach ($family->getChildren() as $child) {
-							$html.= '<br>&nbsp;&nbsp;<a href="'.$child->getHtmlUrl().'" class="name1">&lt; '.$child->getFullName().'</a>';
+							foreach ($family->getChildren() as $child) {
+								$html.= '<br>&nbsp;&nbsp;<a href="'.$child->getHtmlUrl().'" class="name1">&lt; '.$child->getFullName().'</a>';
+							}
 						}
 					}
 					// siblings
@@ -337,7 +334,7 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 							$html.= '<br><span class="name1">'.WT_I18N::translate('Sibling').'</span>';
 						}
 						foreach ($children as $sibling) {
-							if (!$sibling->equals($person)) {
+							if ($sibling === $person) {
 								$html.= '<br>&nbsp;&nbsp;<a href="'.$sibling->getHtmlUrl().'" class="name1"> '.$sibling->getFullName().'</a>';
 							}
 						}
@@ -346,7 +343,7 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 					$html.= '</div>';
 					$imagemap .= " onclick=\"show_family_box('".$pid.".".$count."', 'relatives'); return false;\"";
 					$imagemap .= " onmouseout=\"family_box_timeout('".$pid.".".$count."'); return false;\"";
-					$imagemap .= " alt=\"".htmlspecialchars(strip_tags($name))."\" title=\"".htmlspecialchars(strip_tags($name))."\">";
+					$imagemap .= " alt=\"".WT_Filter::escapeHtml(strip_tags($name))."\" title=\"".WT_Filter::escapeHtml(strip_tags($name))."\">";
 				}
 				$deg1-=$angle;
 				$deg2-=$angle;

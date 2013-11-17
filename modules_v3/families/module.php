@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14805 2013-02-15 20:29:38Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -61,15 +59,17 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 	// Implement WT_Module_Sidebar
 	public function hasSidebarContent() {
-		return true;
+		global $SEARCH_SPIDER;
+
+		return !$SEARCH_SPIDER;
 	}
 
 	// Implement WT_Module_Sidebar
 	public function getSidebarAjaxContent() {
-		$alpha   =safe_GET('alpha'); // All surnames beginning with this letter where "@"=unknown and ","=none
-		$surname =safe_GET('surname', '[^<>&%{};]*'); // All indis with this surname.  NB - allow ' and "
-		$search   =safe_GET('search');
-		
+		$alpha   = WT_Filter::get('alpha'); // All surnames beginning with this letter where "@"=unknown and ","=none
+		$surname = WT_Filter::get('surname'); // All indis with this surname.
+		$search  = WT_Filter::get('search');
+
 		if ($search) {
 			return $this->search($search);
 		} elseif ($alpha=='@' || $alpha==',' || $surname) {
@@ -187,9 +187,9 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		$families=WT_Query_Name::families($surname, $alpha, '', true, WT_GED_ID);
 		$out = '<ul>';
 		foreach ($families as $family) {
-			if ($family->canDisplayName()) {
+			if ($family->canShowName()) {
 				$out .= '<li><a href="'.$family->getHtmlUrl().'">'.$family->getFullName().' ';
-				if ($family->canDisplayDetails()) {
+				if ($family->canShow()) {
 					$marriage_year=$family->getMarriageYear();
 					if ($marriage_year) {
 						$out.=' ('.$marriage_year.')';
@@ -209,17 +209,17 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 		//-- search for INDI names
 		$rows=WT_DB::prepare(
-			"SELECT ? AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec".
+			"SELECT i_id AS xref".
 			" FROM `##individuals`, `##name`".
 			" WHERE (i_id LIKE ? OR n_sort LIKE ?)".
 			" AND i_id=n_id AND i_file=n_file AND i_file=?".
 			" ORDER BY n_sort"
 		)
-		->execute(array('INDI', "%{$query}%", "%{$query}%", WT_GED_ID))
-		->fetchAll(PDO::FETCH_ASSOC);
+		->execute(array("%{$query}%", "%{$query}%", WT_GED_ID))
+		->fetchAll();
 		$ids = array();
 		foreach ($rows as $row) {
-			$ids[] = $row['xref'];
+			$ids[] = $row->xref;
 		}
 
 		$vars=array('FAM');
@@ -235,16 +235,16 @@ class families_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		}
 
 		$vars[]=WT_GED_ID;
-		$rows=WT_DB::prepare("SELECT ? AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec FROM `##families` WHERE {$where} AND f_file=?")
+		$rows=WT_DB::prepare("SELECT f_id AS xref, f_file AS gedcom_id, f_gedcom AS gedcom FROM `##families` WHERE {$where} AND f_file=?")
 		->execute($vars)
-		->fetchAll(PDO::FETCH_ASSOC);
+		->fetchAll();
 
 		$out = '<ul>';
 		foreach ($rows as $row) {
-			$family=WT_Family::getInstance($row);
-			if ($family->canDisplayName()) {
+			$family=WT_Family::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
+			if ($family->canShowName()) {
 				$out .= '<li><a href="'.$family->getHtmlUrl().'">'.$family->getFullName().' ';
-				if ($family->canDisplayDetails()) {
+				if ($family->canShow()) {
 					$marriage_year=$family->getMarriageYear();
 					if ($marriage_year) {
 						$out.=' ('.$marriage_year.')';

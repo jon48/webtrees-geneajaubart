@@ -5,7 +5,7 @@
 // It simply needs to set $title and $text for the help topic $help_topic
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: help_text.php 10972 2011-02-25 19:25:19Z greg $
 
 if (!defined('WT_WEBTREES') || !defined('WT_SCRIPT_NAME') || WT_SCRIPT_NAME!='help_text.php') {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,6 +34,6 @@ case 'block_html_content':
 
 case 'block_html_template':
 	$title=WT_I18N::translate('Templates');
-	$text=WT_I18N::translate('To assist you in getting started with this block, we have created several standard templates.  When you select one of these templates, the text area will contain a copy that you can then alter to suit your site\'s requirements.');
+	$text=WT_I18N::translate('To assist you in getting started with this block, we have created several standard templates.  When you select one of these templates, the text area will contain a copy that you can then alter to suit your site’s requirements.');
 	break;
 }

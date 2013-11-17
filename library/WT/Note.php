@@ -2,10 +2,10 @@
 // Class file for a Shared Note (NOTE) object
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// @version $Id: Note.php 15073 2013-06-22 07:40:07Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,48 +27,50 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Note extends WT_GedcomRecord {
+	const RECORD_TYPE = 'NOTE';
+	const SQL_FETCH   = "SELECT o_gedcom FROM `##other` WHERE o_id=? AND o_file=?";
+	const URL_PREFIX  = 'note.php?nid=';
+
+	// Get the text contents of the note
+	public function getNote() {
+		if (preg_match('/^0 @' . WT_REGEX_TAG . '@ NOTE ?(.*(?:\n1 CONT ?.*)*)/', $this->gedcom.$this->pending, $match)) {
+			return preg_replace("/\n1 CONT ?/", "\n", $match[1]);
+		} else {
+			return null;
+		}
+	}
+
 	// Implement note-specific privacy logic
-	protected function _canDisplayDetailsByType($access_level) {
+	protected function _canShowByType($access_level) {
 		// Hide notes if they are attached to private records
 		$linked_ids=WT_DB::prepare(
 			"SELECT l_from FROM `##link` WHERE l_to=? AND l_file=?"
-		)->execute(array($this->xref, $this->ged_id))->fetchOneColumn();
+		)->execute(array($this->xref, $this->gedcom_id))->fetchOneColumn();
 		foreach ($linked_ids as $linked_id) {
 			$linked_record=WT_GedcomRecord::getInstance($linked_id);
-			if ($linked_record && !$linked_record->canDisplayDetails($access_level)) {
+			if ($linked_record && !$linked_record->canShow($access_level)) {
 				return false;
 			}
 		}
-			
+
 		// Apply default behaviour
-		return parent::_canDisplayDetailsByType($access_level);
+		return parent::_canShowByType($access_level);
 	}
 
 	// Generate a private version of this record
 	protected function createPrivateGedcomRecord($access_level) {
-		return '0 @'.$this->xref.'@ NOTE '.WT_I18N::translate('Private');
+		return '0 @' . $this->xref . '@ NOTE ' . WT_I18N::translate('Private');
 	}
 
 	// Fetch the record from the database
-	protected static function fetchGedcomRecord($xref, $ged_id) {
+	protected static function fetchGedcomRecord($xref, $gedcom_id) {
 		static $statement=null;
 
 		if ($statement===null) {
-			$statement=WT_DB::prepare(
-				"SELECT o_type AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec ".
-				"FROM `##other` WHERE o_id=? AND o_file=? AND o_type='NOTE'"
-			);
+			$statement=WT_DB::prepare("SELECT o_gedcom FROM `##other` WHERE o_id=? AND o_file=? AND o_type='NOTE'");
 		}
-		return $statement->execute(array($xref, $ged_id))->fetchOneRow(PDO::FETCH_ASSOC);
-	}
-	
-	// Generate a URL to this record, suitable for use in HTML
-	public function getHtmlUrl() {
-		return parent::_getLinkUrl('note.php?nid=', '&amp;');
-	}
-	// Generate a URL to this record, suitable for use in javascript, HTTP headers, etc.
-	public function getRawUrl() {
-		return parent::_getLinkUrl('note.php?nid=', '&');
+
+		return $statement->execute(array($xref, $gedcom_id))->fetchOne();
 	}
 
 	// The 'name' of a note record is the first line.  This can be

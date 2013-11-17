@@ -2,7 +2,7 @@
 // Controller for the descendancy chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Descendancy.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -59,11 +57,10 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 		parent::__construct();
 
 		// Extract parameters from form
-		$this->show_full  =safe_GET('show_full', array('0', '1'), $PEDIGREE_FULL_DETAILS);
-		$this->chart_style=safe_GET_integer('chart_style', 0, 3, 0);
-		$this->generations=safe_GET_integer('generations', 2, $MAX_DESCENDANCY_GENERATIONS, $DEFAULT_PEDIGREE_GENERATIONS);
-		$this->box_width  =safe_GET_integer('box_width',   50, 300, 100);
-		$box_width           =safe_GET_integer('box_width',            50, 300, 100);
+		$this->show_full   = WT_Filter::getInteger('show_full',   0, 1, $PEDIGREE_FULL_DETAILS);
+		$this->chart_style = WT_Filter::getInteger('chart_style', 0, 3, 0);
+		$this->generations = WT_Filter::getInteger('generations', 2, $MAX_DESCENDANCY_GENERATIONS, $DEFAULT_PEDIGREE_GENERATIONS);
+		$this->box_width   = WT_Filter::getInteger('box_width',   50, 300, 100);
 
 		// This is passed as a global.  A parameter would be better...
 		$show_full=$this->show_full;
@@ -71,18 +68,18 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 		if (!isset($this->personcount)) $this->personcount = 1;
 
 		// -- size of the detailed boxes based upon optional width parameter
-		$Dbwidth=($box_width*$bwidth)/100;
-		$Dbheight=($box_width*$bheight)/100;
-		$bwidth=$Dbwidth;
-		$bheight=$Dbheight;
-		
+		$Dbwidth  = ($this->box_width*$bwidth)/100;
+		$Dbheight = ($this->box_width*$bheight)/100;
+		$bwidth   = $Dbwidth;
+		$bheight  = $Dbheight;
+
 		// -- adjust size of the compact box
 		if (!$this->show_full) {
-			$bwidth = $cbwidth;
+			$bwidth  = $cbwidth;
 			$bheight = $cbheight;
 		}
-		
-		$pbwidth = $bwidth+12;
+
+		$pbwidth  = $bwidth+12;
 		$pbheight = $bheight+14;
 
 		// Validate form variables
@@ -92,7 +89,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 			$this->cellwidth=(strlen($this->name)*14);
 		}
 
-		if ($this->root && $this->root->canDisplayName()) {
+		if ($this->root && $this->root->canShowName()) {
 			$this->setPageTitle(
 				/* I18N: %s is an individual’s name */
 				WT_I18N::translate('Descendants of %s', $this->root->getFullName())
@@ -131,7 +128,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 	 */
 	function print_child_descendancy($person, $depth) {
 		global $WT_IMAGES, $Dindent, $personcount;
-	
+
 		if (is_null($person)) return;
 		//print_r($person);
 		echo "<li>";
@@ -143,7 +140,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 		}
 		print_pedigree_person($person, 1, 0, $personcount);
 		echo '</td>';
-	
+
 		// check if child has parents and add an arrow
 		echo '<td>&nbsp;</td>';
 		echo '<td>';
@@ -155,7 +152,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 				break;
 			}
 		}
-	
+
 		// d'Aboville child number
 		$level =$this->generations-$depth;
 		if ($this->show_full) echo '<br><br>&nbsp;';
@@ -175,14 +172,14 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 		echo "</td></tr>";
 		echo "</table>";
 		echo "</li>";
-	
+
 		// loop for each spouse
 		foreach ($person->getSpouseFamilies() as $family) {
 			$personcount++;
 			$this->print_family_descendancy($person, $family, $depth);
 		}
 	}
-	
+
 	/**
 	 * print a family descendancy
 	 *
@@ -192,50 +189,46 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 	 */
 	function print_family_descendancy($person, $family, $depth) {
 		global $GEDCOM, $WT_IMAGES, $Dindent, $personcount;
-	
+
 		if (is_null($family)) return;
 		if (is_null($person)) return;
-	
-		$spouse=$family->getSpouse($person);
-		if (!$spouse) {
-			// One parent families have no spouse
-			$spouse=new WT_Person('');
-		}
-	
+
 		// print marriage info
 		echo '<li>';
 		echo '<img src="', $WT_IMAGES['spacer'], '" height="2" width="', ($Dindent+4), '" alt="">';
 		echo '<span class="details1" style="white-space:nowrap;">';
-		echo "<a href=\"#\" onclick=\"expand_layer('".$family->getXref().$personcount."'); return false;\" class=\"top\"><i id=\"".$family->getXref().$personcount."_img\" class=\"icon-minus\" title=\"".WT_I18N::translate('View Family')."\"></i></a>";
-		$marriage = $family->getMarriage();
-		if ($marriage->canShow()) {
-			echo ' <a href="', $family->getHtmlUrl(), '" class="details1">';
-			$marriage->print_simple_fact();
-			echo '</a>';
+		echo "<a href=\"#\" onclick=\"expand_layer('".$family->getXref().$personcount."'); return false;\" class=\"top\"><i id=\"".$family->getXref().$personcount."_img\" class=\"icon-minus\" title=\"".WT_I18N::translate('View family')."\"></i></a>";
+		if ($family->canShow()) {
+			foreach ($family->getFacts(WT_EVENTS_MARR) as $fact) {
+				echo ' <a href="', $family->getHtmlUrl(), '" class="details1">', $fact->summary(), '</a>';
+			}
 		}
 		echo '</span>';
-	
+
 		// print spouse
+		$spouse=$family->getSpouse($person);
 		echo '<ul style="list-style:none; display:block;" id="'.$family->getXref().$personcount.'">';
 		echo '<li>';
 		echo '<table border="0" cellpadding="0" cellspacing="0"><tr><td>';
 		print_pedigree_person($spouse, 1, 0, $personcount);
 		echo '</td>';
-	
+
 		// check if spouse has parents and add an arrow
 		echo '<td>&nbsp;</td>';
 		echo '<td>';
-		foreach ($spouse->getChildFamilies() as $cfamily) {
-			foreach ($cfamily->getSpouses() as $parent) {
-				print_url_arrow($parent->getXref().$personcount.$person->getXref(), '?rootid='.$parent->getXref().'&amp;generations='.$this->generations.'&amp;chart_style='.$this->chart_style.'&amp;show_full='.$this->show_full.'&amp;box_width='.$this->box_width.'&amp;ged='.WT_GEDURL, WT_I18N::translate('Start at parents'), 2);
-				$personcount++;
-				// only show the arrow for one of the parents
-				break;
+		if ($spouse) {
+			foreach ($spouse->getChildFamilies() as $cfamily) {
+				foreach ($cfamily->getSpouses() as $parent) {
+					print_url_arrow($parent->getXref().$personcount.$person->getXref(), '?rootid='.$parent->getXref().'&amp;generations='.$this->generations.'&amp;chart_style='.$this->chart_style.'&amp;show_full='.$this->show_full.'&amp;box_width='.$this->box_width.'&amp;ged='.WT_GEDURL, WT_I18N::translate('Start at parents'), 2);
+					$personcount++;
+					// only show the arrow for one of the parents
+					break;
+				}
 			}
 		}
 		if ($this->show_full) echo '<br><br>&nbsp;';
 		echo '</td></tr>';
-	
+
 		// children
 		$children = $family->getChildren();
 		echo '<tr><td colspan="3" class="details1" >&nbsp;&nbsp;';
@@ -244,7 +237,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 		} else {
 			// Distinguish between no children (NCHI 0) and no recorded
 			// children (no CHIL records)
-			if (strpos($family->getGedcomRecord(), '\n1 NCHI 0')) {
+			if (strpos($family->getGedcom(), '\n1 NCHI 0')) {
 				echo WT_Gedcom_Tag::getLabel('NCHI').': '.count($children);
 			} else {
 				echo WT_I18N::translate('No children');
@@ -258,5 +251,35 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 		}
 		echo '</ul>';
 		echo '</li>';
+	}
+
+	public function indi_desc($person, $n, $array) {
+		if ($n < 1) {
+			return $array;
+		}
+		$array[$person->getXref()]=$person;
+		foreach ($person->getSpouseFamilies() as $family) {
+			$spouse = $family->getSpouse($person);
+			if ($spouse) {
+				$array[$spouse->getXref()] = $spouse;
+			}
+			foreach ($family->getChildren() as $child) {
+				$array = $this->indi_desc($child, $n-1, $array);
+			}
+		}
+		return $array;
+	}
+
+	public function fam_desc($person, $n, $array) {
+		if ($n < 1) {
+			return $array;
+		}
+		foreach ($person->getSpouseFamilies() as $family) {
+			$array[$family->getXref()]=$family;
+			foreach ($family->getChildren() as $child) {
+				$array = $this->fam_desc($child, $n-1, $array);
+			}
+		}
+		return $array;
 	}
 }

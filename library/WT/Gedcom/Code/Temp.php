@@ -2,7 +2,7 @@
 // Functions and logic for GEDCOM "TEMP" codes
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Temp.php 11093 2011-03-09 07:57:41Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -140,7 +138,7 @@ class WT_Gedcom_Code_Temp {
 		case 'NAUV2': return WT_I18N::translate('Nauvoo, Illinois (new)');
 		case 'NAUVO': return WT_I18N::translate('Nauvoo, Illinois (original)');
 		case 'NBEAC': return WT_I18N::translate('Newport Beach, California');
-		case 'NUKUA': return WT_I18N::translate('Nuku\'Alofa, Tonga');
+		case 'NUKUA': return WT_I18N::translate('Nuku’Alofa, Tonga');
 		case 'NYORK': return WT_I18N::translate('New York, New York');
 		case 'NZEAL': return WT_I18N::translate('Hamilton, New Zealand');
 		case 'OAKLA': return WT_I18N::translate('Oakland, California');
@@ -152,7 +150,7 @@ class WT_Gedcom_Code_Temp {
 		case 'PALMY': return WT_I18N::translate('Palmyra, New York');
 		case 'PAPEE': return WT_I18N::translate('Papeete, Tahiti');
 		case 'PERTH': return WT_I18N::translate('Perth, Australia');
-		case 'POFFI': return  /* I18N: http://en.wikipedia.org/wiki/President_of_the_Church */ WT_I18N::translate('President\'s Office');
+		case 'POFFI': return  /* I18N: http://en.wikipedia.org/wiki/President_of_the_Church */ WT_I18N::translate('President’s Office');
 		case 'PORTL': return WT_I18N::translate('Portland, Oregon');
 		case 'PREST': return WT_I18N::translate('Preston, England');
 		case 'PROVO': return WT_I18N::translate('Provo, Utah');

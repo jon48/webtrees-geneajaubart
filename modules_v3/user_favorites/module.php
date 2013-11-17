@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14630 2013-01-09 21:36:34Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -66,16 +64,16 @@ class user_favorites_WT_Module extends gedcom_favorites_WT_Module {
 		switch($modAction) {
 		case 'menu-add-favorite':
 			// Process the "add to user favorites" menu item on indi/fam/etc. pages
-			$record=WT_GedcomRecord::getInstance(safe_POST_xref('xref'));
-			if (WT_USER_ID && $record->canDisplayName()) {
+			$record = WT_GedcomRecord::getInstance(WT_Filter::post('xref', WT_REGEX_XREF));
+			if (WT_USER_ID && $record->canShowName()) {
 				self::addFavorite(array(
-					'user_id'  =>WT_USER_ID,
-					'gedcom_id'=>$record->getGedId(),
-					'gid'      =>$record->getXref(),
-					'type'     =>$record->getType(),
-					'url'      =>null,
-					'note'     =>null,
-					'title'    =>null,
+					'user_id'   => WT_USER_ID,
+					'gedcom_id' => $record->getGedcomId(),
+					'gid'       => $record->getXref(),
+					'type'      => $record::RECORD_TYPE,
+					'url'       => null,
+					'note'      => null,
+					'title'     => null,
 				));
 				WT_FlashMessages::addMessage(/* I18N: %s is the name of an individual, source or other record */ WT_I18N::translate('“%s” has been added to your favorites.', $record->getFullName()));
 			}

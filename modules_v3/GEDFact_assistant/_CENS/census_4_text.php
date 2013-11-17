@@ -4,10 +4,10 @@
 // Census Proposed Text Area File
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2007 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2007 to 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,15 +22,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: census_4_text.php 14503 2012-10-31 20:05:24Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 ?>
-<!--   ---- The proposed Census Text -------- -->
+<!-- The proposed Census Text -->
 <div class="optionbox cens_text wrap">
 <!--[if IE]><style>.cens_text{margin-top:-1.3em;}</style><![EndIf]-->
 	<div class="cens_text_header">

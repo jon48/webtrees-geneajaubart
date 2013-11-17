@@ -2,7 +2,7 @@
 // Displays a streetview map
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: wt_v3_street_view.php 13988 2012-06-10 08:31:17Z greg $
 
 // This PHP script *really* ought to include session.php, so it picks up
 // language, access, etc...
@@ -27,7 +25,7 @@ define('WT_GM_SCRIPT', 'https://maps.google.com/maps/api/js?v=3.2&amp;sensor=fal
 header('Content-type: text/html; charset=UTF-8');
 
 ?>
- 
+
 <html>
 <head>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
@@ -35,7 +33,7 @@ header('Content-type: text/html; charset=UTF-8');
 
 <script>
 
-	// Following function creates an array of the google map parameters passed ---------------------    
+	// Following function creates an array of the google map parameters passed ---------------------
 	var qsParm = new Array();
 	function qs() {
 		var query = window.location.search.substring(1);
@@ -48,13 +46,13 @@ header('Content-type: text/html; charset=UTF-8');
 				qsParm[key] = val;
 			}
 		}
-	} 	
+	}
 	qsParm['x'] = null;
 	qsParm['y'] = null;
 	qs();
 	// ---------------------------------------------------------------------------------------------
 
-	
+
 	// ---------------------------------------------------------------------------------------------
 
 var geocoder = new google.maps.Geocoder();
@@ -108,9 +106,9 @@ function initialize() {
     var b = parseFloat(qsParm['b']);
     var p = parseFloat(qsParm['p']);
     var m = parseFloat(qsParm['m']);
-    	
+
   	var latLng = new google.maps.LatLng(y, x);
-  	  
+
   	// Create the map and mapOptions
 	var mapOptions = {
 		zoom: 16,
@@ -125,9 +123,9 @@ function initialize() {
    			style: google.maps.NavigationControlStyle.SMALL			// ANDROID, DEFAULT, SMALL, ZOOM_PAN
       	},
       	streetViewControl: false,									// Show Pegman or not
-      	scrollwheel: true     		
+      	scrollwheel: true
 	};
-	
+
     var map = new google.maps.Map(document.getElementById('mapCanvas'), mapOptions);
 
     var bearing = b;
@@ -136,9 +134,9 @@ function initialize() {
     }
     var pitch = p;
     var svzoom = m;
-    
-	var imageNum = Math.round(bearing/22.5) % 16;  
-      
+
+	var imageNum = Math.round(bearing/22.5) % 16;
+
   	var image = new google.maps.MarkerImage('images/panda-icons/panda-' + imageNum + '.png',
       	// This marker is 50 pixels wide by 50 pixels tall.
       	new google.maps.Size(50, 50),
@@ -152,19 +150,19 @@ function initialize() {
       	coord: [1, 1, 1, 20, 18, 20, 18 , 1],
      	type: 'poly'
   	};
- 	
+
   	var marker = new google.maps.Marker({
         icon: image,
-        // shape: shape, 
+        // shape: shape,
     	position: latLng,
     	title: 'Drag me to a Blue Street',
     	map: map,
     	draggable: true
   	});
-  	
-	
+
+
     // ===Next, get the map's default panorama and set up some defaults. ===========================
-    
+
     // --- First check if Browser supports html5 ---
     var browserName=navigator.appName;
     if (browserName=='Microsoft Internet Explorer') {
@@ -175,13 +173,13 @@ function initialize() {
 
 	// --- Create the panorama ---
     var panoramaOptions = {
-      	navigationControl: false,
+      	navigationControl: true,
       	navigationControlOptions: {
       		position: google.maps.ControlPosition.TOP_RIGHT,	// BOTTOM, BOTTOM_LEFT, LEFT, TOP, etc
       		style: google.maps.NavigationControlStyle.SMALL  	// ANDROID, DEFAULT, SMALL, ZOOM_PAN
       	},
-      	linksControl: false,
-      	addressControl: false,
+      	linksControl: true,
+      	addressControl: true,
       	addressControlOptions: {
       		style: {
       			// display: 'none',									// USE CSS notation here
@@ -189,7 +187,7 @@ function initialize() {
       		}
       	},
         position: latLng,
-        mode: render_type, 
+        mode: render_type,
        	pov: {
           	heading: bearing,
           	pitch: pitch,
@@ -229,11 +227,6 @@ function initialize() {
   				}
  			}
  			return true;
-			if (parseInt(navigator.appVersion)>3) {
- 				document.onmousedown = mouseDown;
- 			if (navigator.appName=='Netscape') 
-  				document.captureEvents(Event.MOUSEDOWN);
-			}
 		};
 		panorama.controls[google.maps.ControlPosition.TOP_RIGHT].push(aLink);
 		// -----------------------------------------------------------------------------------------
@@ -242,38 +235,38 @@ function initialize() {
   	// Update current position info.
   	updateMarkerPosition(latLng);
   	geocodePosition(latLng);
-  
+
   	// Add dragging event listeners.
   	google.maps.event.addListener(marker, 'dragstart', function() {
     	updateMarkerAddress('Dragging...');
   	});
-  
+
   	google.maps.event.addListener(marker, 'drag', function() {
     	updateMarkerStatus('Dragging...');
     	updateMarkerPosition(marker.getPosition());
     	panorama.setPosition(marker.getPosition());
   	});
-  
+
   	google.maps.event.addListener(marker, 'dragend', function() {
     	updateMarkerStatus('Drag ended');
     	geocodePosition(marker.getPosition());
   	});
-  	
+
 	google.maps.event.addListener(panorama, 'pov_changed', function() {
 		povLevel = panorama.getPov();
         parent.document.getElementById('sv_bearText').value = roundNumber(povLevel.heading, 2)+"\u00B0";
         parent.document.getElementById('sv_elevText').value = roundNumber(povLevel.pitch, 2)+"\u00B0";
         parent.document.getElementById('sv_zoomText').value = roundNumber(povLevel.zoom, 2);
-	});	
-  	
-	google.maps.event.addListener(panorama, 'position_changed', function() {		
+	});
+
+	google.maps.event.addListener(panorama, 'position_changed', function() {
 		pos = panorama.getPosition();
 		marker.setPosition(pos);
         parent.document.getElementById('sv_latiText').value = pos.lat()+"\u00B0";
         parent.document.getElementById('sv_longText').value = pos.lng()+"\u00B0";
 	});
-	
-	
+
+
 	//==============================================================================================
 	//  CREATE THE MAP PANE STREETVIEW BLUE STREETS
 	//======================================================================================
@@ -311,42 +304,25 @@ function initialize() {
 	//--------------------------------------------------------------------------------------
 	map.overlayMapTypes.setAt(1, street);
 	//==============================================================================================
-	
+
 
 }  // end init
 
 var mapbutt = "<?php echo $_GET['map']; ?>";
-var svbutt = "<?php echo $_GET['streetview']; ?>";  	
-function toggleStreetView() { 
+var svbutt = "<?php echo $_GET['streetview']; ?>";
+function toggleStreetView() {
     var toggle = panorama.getVisible();
     if (toggle == false) {
       	panorama.setVisible(true);
-	  	document.myForm.butt1.value=mapbutt;	  	
+	  	document.myForm.butt1.value=mapbutt;
     } else {
       	panorama.setVisible(false);
       	document.myForm.butt1.value=svbutt;
     }
 }
 
-function toggleStreetViewControls() { 
-	if (panorama.get('addressControl') == false) {
-		panorama.set('navigationControl', true);
-		panorama.set('addressControl', true);
-		panorama.set('linksControl', true);
-		document.myForm.butt0.value='SV controls OFF';
-	} else {
-		panorama.set('navigationControl', false);
-		panorama.set('addressControl', false);
-		panorama.set('linksControl', false);
-		document.myForm.butt0.value='SV controls ON ';
-	}
-}
-
-
-
 function resetview() {
 	initialize();
-	document.myForm.butt0.value='SV controls ON ';
 }
 
 // Onload handler to fire off the app.
@@ -364,7 +340,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
   	}
   	#butt1{
   		width:120px;
-  	}  	  	
+  	}
 		#butt2 {
   		width:90px;
   	}
@@ -393,36 +369,31 @@ google.maps.event.addDomListener(window, 'load', initialize);
   		text-align: center;
   	}
   	</style>
-  	
+
   	<div id="toggle">
   		<form name="myForm" title="myForm">
-<!--
-			<input type="button" value="street" name="sv_btn" onclick="addStreetViewOverlay()"></input>
--->
-
   			<?php
   			$map = $_GET['map'];
   			$reset = $_GET['reset'];
-  			echo '<input id="butt0" name ="butt0" type="button" value="SV controls ON " onclick="toggleStreetViewControls();"></input>';
   			echo '<input id="butt1" name ="butt1" type="button" value="', $map, '" onclick="toggleStreetView();"></input>';
   			echo '<input id="butt2" name ="butt2" type="button" value="', $reset, '" onclick="resetview();"></input>';
   			?>
-  			
+
   		</form>
   	</div>
-  		
+
   	<div id="mapCanvas">
-  	
+
   	</div>
 
   	<div id="infoPanel">
     	<!-- <b>Marker status:</b> -->
     	<div id="markerStatus"><em>Click and drag the marker.</em></div>
 <!--    	<b>Current position:</b> -->
-    	<div id="info" ></div> 
+    	<div id="info" ></div>
 <!--    	<b>Closest matching address:</b> -->
     	<div id="address"></div>
-  	</div> 
+  	</div>
 
 </body>
 </html>

@@ -2,10 +2,10 @@
 //	Controller for the familybook chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Familybook.php 15067 2013-06-20 22:36:56Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -30,7 +28,7 @@ if (!defined('WT_WEBTREES')) {
 
 class WT_Controller_Familybook extends WT_Controller_Chart {
 	// Data for the view
-	public $pid	       =" ";
+	public $pid	       =null;
 	public $show_full  =null;
 	public $show_spouse=null;
 	public $descent    =null;
@@ -47,35 +45,26 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 		$MAX_DESCENDANCY_GENERATIONS=get_gedcom_setting(WT_GED_ID, 'MAX_DESCENDANCY_GENERATIONS');
 
 		// Extract the request parameters
-		$this->pid        =safe_GET_xref('rootid');
-		$this->show_full  =safe_GET('show_full',     array('0', '1'), $PEDIGREE_FULL_DETAILS);
-		$this->show_spouse=safe_GET('show_spouse',   '1', '0');
-		$this->descent    =safe_GET_integer('descent',       0, 9, 5);
-		$this->generations=safe_GET_integer('generations',   2, $MAX_DESCENDANCY_GENERATIONS, 2);
-		$this->box_width  =safe_GET_integer('box_width',     50, 300, 100);
+		$this->show_full   = WT_Filter::getInteger('show_full',   0, 1, $PEDIGREE_FULL_DETAILS);
+		$this->show_spouse = WT_Filter::getInteger('show_spouse', 0, 1);
+		$this->descent     = WT_Filter::getInteger('descent',     0, 9, 5);
+		$this->generations = WT_Filter::getInteger('generations', 2, $MAX_DESCENDANCY_GENERATIONS, 2);
+		$this->box_width   = WT_Filter::getInteger('box_width',   50, 300, 100);
 
 		// Box sizes are set globally in the theme.  Modify them here.
-		global $bwidth, $bheight, $cbwidth, $cbheight, $Dbwidth, $bhalfheight, $Dbheight; 
+		global $bwidth, $bheight, $cbwidth, $cbheight, $Dbwidth, $bhalfheight, $Dbheight;
 		$Dbwidth =$this->box_width * $bwidth  / 100;
 		$Dbheight=$this->box_width * $bheight / 100;
 		$bwidth  =$Dbwidth;
 		$bheight =$Dbheight;
-		
-		// Validate parameters
-		if (!empty($rootid)) $this->pid = $rootid;
-		$rootid=$this->rootid;
-		$this->hourPerson = WT_Person::getInstance($this->pid);
-		if (!$this->hourPerson) {
-			$this->hourPerson=$this->getSignificantIndividual();
-			$this->pid=$this->hourPerson->getXref();
-		}
+
 		// -- adjust size of the compact box
 		if (!$this->show_full) {
 			$bwidth = $this->box_width * $cbwidth  / 100;
 			$bheight = $cbheight;
 		}
 		$bhalfheight = $bheight / 2;
-		if ($this->root && $this->root->canDisplayName()) {
+		if ($this->root && $this->root->canShowName()) {
 			$this->setPageTitle(
 				/* I18N: %s is an individual’s name */
 				WT_I18N::translate('Family book of %s', $this->root->getFullName())
@@ -87,7 +76,7 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 		$this->dgenerations = $this->max_descendency_generations($this->pid, 0);
 		if ($this->dgenerations<1) $this->dgenerations=1;
 	}
-	
+
 	/**
 	* Prints descendency of passed in person
 	*/
@@ -107,7 +96,7 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 		$famNum = 0;
 		$lh = 0;
 		// if real person load child array
-		if ($person) { 
+		if ($person) {
 			$sfamilies=$person->getSpouseFamilies();
 			$children = array();
 			//count is position from center to left, dgenerations is number of generations
@@ -146,7 +135,7 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 							$h= round(((($bheight)*$kids)/2)+10);
 							//-- adjust for other vertical columns
 							if ($kids>1) $h = ((($kids-1)*4)+$h);
-							
+
 							//echo '<td class="tdtop">',
 							//	 '<img class="bvertline"  src="',$WT_IMAGES["vline"],'" width="3" height="',$h,'" alt=""></td>';
 					} else {
@@ -184,7 +173,7 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 							$h= round(((($bheight)*$kids)/2)+10);
 							//-- adjust for other vertical columns
 							if ($kids>1) $h = ((($kids-1)*4)+$h);
-							
+
 							echo '<td class="tdtop">',
 								 '<img class="bvertline" id="vline_',$chil,'" src="',$WT_IMAGES["vline"],'" height="',$h,'" alt=""></td>';
 						} else {
@@ -199,12 +188,12 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 			echo '</td>';
 			echo '<td width="',$bwidth,'">';
 		}
-		
+
 		if ($numkids==0) {
 			$numkids = 1;
 		}
 		echo '<table><tr><td>';
-		if ($person) { 
+		if ($person) {
 			print_pedigree_person($person);
 					echo '</td><td>',
 			 '<img class="line2" src="',$WT_IMAGES["hline"],'" width="7" height="3" alt="">';
@@ -213,25 +202,21 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 				 '</td><td width="7">';
 		}
 		//----- Print the spouse
-		if ($count==1 ) { 
+		if ($count==1 ) {
 			if ($this->show_spouse) {
 				foreach ($sfamilies as $family) {
-					if (!is_null($family)) {
-						$spouse = $family->getSpouse($person);
-						if ($spouse!=null) {
-							echo '</td></tr><tr><td>';
-							//-- shrink the box for the spouses
-							$tempw = $bwidth;
-							$temph = $bheight;
-							$bwidth -= 10;
-							$bheight -= 10;
-							print_pedigree_person($spouse);
-							$bwidth = $tempw;
-							$bheight = $temph;
-							$numkids += 0.95;
-							echo '</td><td></td>';
-						}
-					}
+					$spouse = $family->getSpouse($person);
+					echo '</td></tr><tr><td>';
+					//-- shrink the box for the spouses
+					$tempw = $bwidth;
+					$temph = $bheight;
+					$bwidth -= 10;
+					$bheight -= 10;
+					print_pedigree_person($spouse);
+					$bwidth = $tempw;
+					$bheight = $temph;
+					$numkids += 0.95;
+					echo '</td><td></td>';
 				}
 			}
 		}
@@ -240,7 +225,7 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 		echo '</table>';
 		return $numkids;
 	}
-	
+
 	/**
 	* Prints pedigree of the person passed in
 	*/
@@ -255,7 +240,7 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 		//Prints empty table columns for children w/o parents up to the max generation
 		//This allows vertical line spacing to be consistent
 		//
-		if (count($person->getChildFamilies())==0) { 
+		if (count($person->getChildFamilies())==0) {
 			echo '<table>';
 			$this->printEmptyBox($bwidth, $bheight);
 
@@ -272,7 +257,7 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 				 '<td>',
 				 '</tr></table>';
 		}
-		
+
 		//Empty box section done, now for regular pedigree
 		foreach ($person->getChildFamilies() as $family) {
 			echo '<table>',
@@ -292,7 +277,7 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 				echo '</td>';
 			} else {
 				echo '<td>';
-				for ($i=$count; $i<$genoffset-1; $i++) { 
+				for ($i=$count; $i<$genoffset-1; $i++) {
 					echo '<table>';
 					$this->printEmptyBox($bwidth, $bheight);
 					echo '</tr>';
@@ -314,7 +299,7 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 				echo '</td>';
 			} else {
 				echo '<td>';
-				for ($i=$count; $i<$genoffset-1; $i++) { 
+				for ($i=$count; $i<$genoffset-1; $i++) {
 					echo '<table>';
 						 '<tr>';
 					$this->printEmptyBox($bwidth, $bheight);
@@ -328,13 +313,13 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 			break;
 		}
 	}
-	
+
 	/**
 	 * Calculates number of generations a person has
 	 */
 	function max_descendency_generations($pid, $depth) {
 		if ($depth > $this->generations) return $depth;
-		$person = WT_Person::getInstance($pid);
+		$person = WT_Individual::getInstance($pid);
 		if (is_null($person)) return $depth;
 		$maxdc = $depth;
 		foreach ($person->getSpouseFamilies() as $family) {
@@ -360,7 +345,7 @@ class WT_Controller_Familybook extends WT_Controller_Chart {
 	}
 	function print_family_book($person, $descent) {
 		global $firstrun;
-		if ($descent==0 || !$person->canDisplayName()) {
+		if ($descent==0 || !$person->canShowName()) {
 			return;
 		}
 		$families=$person->getSpouseFamilies();

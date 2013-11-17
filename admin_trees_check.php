@@ -23,8 +23,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-//$Id: admin_trees_check.php 14902 2013-03-24 08:18:11Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_trees_check.php');
 require './includes/session.php';
@@ -42,7 +40,7 @@ echo select_edit_control('ged', WT_Tree::getNameList(), null, WT_GEDCOM);
 echo '<input type="submit" value="', $controller->getPageTitle(), '">';
 echo '</form>';
 
-if (!safe_GET('go')) {
+if (!WT_Filter::get('go')) {
 	exit;
 }
 
@@ -168,6 +166,10 @@ foreach ($all_links as $xref1=>$links) {
 			//echo warning(WT_I18N::translate('The note %1$s has a source %2$s. Notes are intended to add explanations and comments to other records.  They should not have their own sources.'), format_link($xref1), format_link($xref2));
 		} elseif ($type2=='SOUR' && $type1=='OBJE') {
 			//echo warning(WT_I18N::translate('The media object %1$s has a source %2$s. Media objects are intended to illustrate other records, facts, and source/citations.  They should not have their own sources.', format_link($xref1), format_link($xref2)));
+		} elseif ($type2=='OBJE' && $type1=='REPO') {
+			echo warning(
+				link_message($type1, $xref1, $type2, $xref2) . ' ' .  WT_I18N::translate('This type of link is not allowed here.')
+			);
 		} elseif (!array_key_exists($type1, $RECORD_LINKS) || !in_array($type2, $RECORD_LINKS[$type1]) || !array_key_exists($type2, $XREF_LINKS)) {
 			echo error(
 				link_message($type1, $xref1, $type2, $xref2).' '.

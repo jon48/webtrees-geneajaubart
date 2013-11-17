@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -61,36 +59,27 @@ class review_changes_WT_Module extends WT_Module implements WT_Module_Block {
 			}
 		}
 
-		if ($changes) {
-			//-- if the time difference from the last email is greater than 24 hours then send out another email
-			$LAST_CHANGE_EMAIL=WT_Site::preference('LAST_CHANGE_EMAIL');
-			if (WT_TIMESTAMP - $LAST_CHANGE_EMAIL > (60*60*24*$days)) {
-				$LAST_CHANGE_EMAIL = WT_TIMESTAMP;
-				WT_Site::preference('LAST_CHANGE_EMAIL', $LAST_CHANGE_EMAIL);
-				if ($sendmail=="yes") {
-					// Which users have pending changes?
-					$users_with_changes=array();
-					foreach (get_all_users() as $user_id=>$user_name) {
+		if ($changes && $sendmail=='yes') {
+			// There are pending changes - tell moderators/managers/administrators about them.
+			if (WT_TIMESTAMP - WT_Site::preference('LAST_CHANGE_EMAIL') > (60*60*24*$days)) {
+				// Which users have pending changes?
+				foreach (get_all_users() as $user_id=>$user_name) {
+					if (get_user_setting($user_id, 'contactmethod') != 'none') {
 						foreach (WT_Tree::getAll() as $tree) {
 							if (exists_pending_change($user_id, $tree->tree_id)) {
-								$users_with_changes[$user_id]=$user_name;
-								break;
+								WT_Mail::system_message(
+									$tree,
+									$user_id,
+									WT_I18N::translate('Pending changes'),
+									WT_I18N::translate('There are pending changes for you to moderate.') .
+									WT_Mail::EOL . WT_MAIL::EOL .
+									'<a href="' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'index.php?ged=' . WT_GEDURL . '">' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'index.php?ged=' . WT_GEDURL . '</a>'
+								);
 							}
 						}
 					}
-					foreach ($users_with_changes as $user_id=>$user_name) {
-						//-- send message
-						$message = array();
-						$message["to"]=$user_name;
-						$message["from"] = $WEBTREES_EMAIL;
-						$message["subject"] = WT_I18N::translate('webtrees - Review changes');
-						$message["body"] = WT_I18N::translate('Online changes have been made to a genealogical database.  These changes need to be reviewed and accepted before they will appear to all users.  Please use the URL below to enter that webtrees site and login to review the changes.');
-						$message["method"] = get_user_setting($user_id, 'contactmethod');
-						$message["url"] = WT_SERVER_NAME.WT_SCRIPT_PATH;
-						$message["no_from"] = true;
-						addMessage($message);
-					}
 				}
+				WT_Site::preference('LAST_CHANGE_EMAIL', WT_TIMESTAMP);
 			}
 			if (WT_USER_CAN_EDIT) {
 				$id=$this->getName().$block_id;
@@ -107,8 +96,8 @@ class review_changes_WT_Module extends WT_Module implements WT_Module_Block {
 					$content .= "<a href=\"#\" onclick=\"window.open('edit_changes.php','_blank', chan_window_specs); return false;\">".WT_I18N::translate('There are pending changes for you to moderate.')."</a><br>";
 				}
 				if ($sendmail=="yes") {
-					$content .= WT_I18N::translate('Last email reminder was sent ').format_timestamp($LAST_CHANGE_EMAIL)."<br>";
-					$content .= WT_I18N::translate('Next email reminder will be sent after ').format_timestamp($LAST_CHANGE_EMAIL+(60*60*24*$days))."<br><br>";
+					$content .= WT_I18N::translate('Last email reminder was sent ').format_timestamp(WT_Site::preference('LAST_CHANGE_EMAIL'))."<br>";
+					$content .= WT_I18N::translate('Next email reminder will be sent after ').format_timestamp(WT_Site::preference('LAST_CHANGE_EMAIL')+(60*60*24*$days))."<br><br>";
 				}
 				$changes=WT_DB::prepare(
 					"SELECT xref".
@@ -119,17 +108,10 @@ class review_changes_WT_Module extends WT_Module implements WT_Module_Block {
 				)->execute(array(WT_GED_ID))->fetchAll();
 				foreach ($changes as $change) {
 					$record=WT_GedcomRecord::getInstance($change->xref);
-					if ($record->canDisplayDetails()) {
+					if ($record->canShow()) {
 						$content.='<b>'.$record->getFullName().'</b>';
-						switch ($record->getType()) {
-						case 'INDI':
-						case 'FAM':
-						case 'SOUR':
-						case 'OBJE':
-							$content.=$block ? '<br>' : ' ';
-							$content.='<a href="'.$record->getHtmlUrl().'">'.WT_I18N::translate('View the changes').'</a>';
-							break;
-						}
+						$content.=$block ? '<br>' : ' ';
+						$content.='<a href="'.$record->getHtmlUrl().'">'.WT_I18N::translate('View the changes').'</a>';
 						$content.='<br>';
 					}
 				}
@@ -164,10 +146,10 @@ class review_changes_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function configureBlock($block_id) {
-		if (safe_POST_bool('save')) {
-			set_block_setting($block_id, 'days',     safe_POST_integer('num', 1, 180, 7));
-			set_block_setting($block_id, 'sendmail', safe_POST_bool('sendmail'));
-			set_block_setting($block_id, 'block',    safe_POST_bool('block'));
+		if (WT_Filter::postBool('save') && WT_Filter::checkCsrf()) {
+			set_block_setting($block_id, 'days',     WT_Filter::postInteger('num', 1, 180, 7));
+			set_block_setting($block_id, 'sendmail', WT_Filter::postBool('sendmail'));
+			set_block_setting($block_id, 'block',    WT_Filter::postBool('block'));
 			exit;
 		}
 

@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2011  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2011 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: session.php 15094 2013-06-25 11:53:20Z greg $
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
 if (!defined('WT_SCRIPT_NAME')) {
@@ -31,8 +29,8 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.4.3');
-define('WT_VERSION_RELEASE', ''); // “svn”, “beta”, “rc1”, “”, etc.
+define('WT_VERSION',         '1.5.0');
+define('WT_VERSION_RELEASE', ''); // “dev”, “beta”, “rc1”, “”, etc.
 define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
 
 // External URLs
@@ -47,19 +45,19 @@ define('WT_STATIC_URL', ''); // For example, http://my.cdn.com/webtrees-static-1
 // Optionally, load major JS libraries from Google’s public CDN
 define ('WT_USE_GOOGLE_API', false);
 if (WT_USE_GOOGLE_API) {
-	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js');
+	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
 	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js');
 } else {
-	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery-1.9.1.js');
+	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery-1.10.2.js');
 	define('WT_JQUERYUI_URL',      WT_STATIC_URL.'js/jquery-ui-1.10.3.js');
 }
 define('WT_JQUERY_COLORBOX_URL',   WT_STATIC_URL.'js/jquery.colorbox-1.4.15.js');
-define('WT_JQUERY_COOKIE_URL',     WT_STATIC_URL.'js/jquery.cookie-1.3.1.js');
+define('WT_JQUERY_COOKIE_URL',     WT_STATIC_URL.'js/jquery.cookie-1.4.0.js');
 define('WT_JQUERY_DATATABLES_URL', WT_STATIC_URL.'js/jquery.datatables-1.9.4.js');
 define('WT_JQUERY_JEDITABLE_URL',  WT_STATIC_URL.'js/jquery.jeditable-1.7.1.js');
 define('WT_JQUERY_WHEELZOOM_URL',  WT_STATIC_URL.'js/jquery.wheelzoom-1.1.2.js');
 define('WT_MODERNIZR_URL',         WT_STATIC_URL.'js/modernizr.custom-2.6.2.js');
-define('WT_WEBTREES_JS_URL',       WT_STATIC_URL.'js/webtrees-1.4.2.js');
+define('WT_WEBTREES_JS_URL',       WT_STATIC_URL.'js/webtrees-1.5.0.js');
 
 // Location of our modules and themes.  These are used as URLs and folder paths.
 define('WT_MODULES_DIR', 'modules_v3/'); // Update setup.php and build/Makefile when this changes
@@ -87,10 +85,6 @@ define('WT_REGEX_ALPHANUM', '[a-zA-Z0-9]+');
 define('WT_REGEX_BYTES',    '[0-9]+[bBkKmMgG]?');
 define('WT_REGEX_USERNAME', '[^<>"%{};]+');
 define('WT_REGEX_PASSWORD', '.{'.WT_MINIMUM_PASSWORD_LENGTH.',}');
-define('WT_REGEX_NOSCRIPT', '[^<>"&%{};]*');
-define('WT_REGEX_URL',      '[\/0-9A-Za-z_!~*\'().;?:@&=+$,%#-]+'); // Simple list of valid chars
-define('WT_REGEX_EMAIL',    '[^\s<>"&%{};@]+@[^\s<>"&%{};@]+');
-define('WT_REGEX_UNSAFE',   '[\x00-\xFF]*'); // Use with care and apply additional validation!
 
 // UTF8 representation of various characters
 define('WT_UTF8_BOM',    "\xEF\xBB\xBF"); // U+FEFF
@@ -107,7 +101,7 @@ define('WT_UTF8_PDF',    "\xE2\x80\xAC"); // U+202C  (Pop directional formatting
 // Alternatives to BMD events for lists, charts, etc.
 define('WT_EVENTS_BIRT', 'BIRT|CHR|BAPM|_BRTM|ADOP');
 define('WT_EVENTS_DEAT', 'DEAT|BURI|CREM');
-define('WT_EVENTS_MARR', 'MARR');
+define('WT_EVENTS_MARR', 'MARR|_NMR');
 define('WT_EVENTS_DIV',  'DIV|ANUL|_SEPR');
 
 // Use these line endings when writing files on the server
@@ -130,7 +124,6 @@ define ('WT_ROOT', realpath(dirname(dirname(__FILE__))).DIRECTORY_SEPARATOR);
 
 // Keep track of time statistics, for the summary in the footer
 $start_time=microtime(true);
-$PRIVACY_CHECKS=0;
 
 // We want to know about all PHP errors
 error_reporting(E_ALL | E_STRICT);
@@ -140,28 +133,6 @@ set_include_path(WT_ROOT.'library'.PATH_SEPARATOR.get_include_path());
 require_once 'Zend/Loader/Autoloader.php';
 Zend_Loader_Autoloader::getInstance()->registerNamespace('WT_');
 
-// Check configuration issues that affect various versions of PHP
-if (version_compare(PHP_VERSION, '6.0', '<')) {
-	if (get_magic_quotes_runtime()) {
-		// Magic quotes were deprecated in PHP5.3 and removed in PHP6.0
-		// Disabling them on PHP5.3 will cause a strict-warning, so ignore errors.
-		@set_magic_quotes_runtime(false);
-	}
-	// magic_quotes_gpc can’t be disabled at run-time, so clean them up as necessary.
-	if (get_magic_quotes_gpc() || ini_get('magic_quotes_sybase') && strtolower(ini_get('magic_quotes_sybase'))!='off') {
-		$in = array(&$_GET, &$_POST, &$_REQUEST, &$_COOKIE);
-		while (list($k,$v) = each($in)) {
-			foreach ($v as $key => $val) {
-				if (!is_array($val)) {
-					$in[$k][$key] = stripslashes($val);
-					continue;
-				}
-				$in[] =& $in[$k][$key];
-			}
-		}
-		unset($in);
-	}
-}
 // PHP requires a time zone to be set in php.ini
 if (!ini_get('date.timezone')) {
 	date_default_timezone_set(@date_default_timezone_get());
@@ -199,11 +170,6 @@ if (!isset($_SERVER['REQUEST_URI']))  {
 		$_SERVER['REQUEST_URI'].='?'.$_SERVER['QUERY_STRING'];
 	}
 }
-
-// Enable this code when we release webtrees 1.5
-//if (version_compare(PHP_VERSION, '5.3.3', '<')) {
-//	header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'site-php-version.php');
-//}
 
 // Common functions
 require WT_ROOT.'includes/functions/functions.php';
@@ -452,24 +418,25 @@ if (empty($WEBTREES_EMAIL)) {
 	$WEBTREES_EMAIL='webtrees-noreply@'.preg_replace('/^www\./i', '', $_SERVER['SERVER_NAME']);
 }
 
-// Use the server date to calculate privacy, etc.
-// Use the client date to show ages, etc.
 // Note that the database/webservers may not be synchronised, so use DB time throughout.
-define('WT_TIMESTAMP', WT_DB::prepare("SELECT UNIX_TIMESTAMP()")->fetchOne());
-define('WT_CLIENT_TIMESTAMP', WT_TIMESTAMP - $WT_SESSION->timediff);
+define('WT_TIMESTAMP', (int)WT_DB::prepare("SELECT UNIX_TIMESTAMP()")->fetchOne());
 
-define('WT_SERVER_JD', 2440588 + (int)(WT_TIMESTAMP       /86400));
+// Server timezone is defined in php.ini
+define('WT_SERVER_TIMESTAMP', WT_TIMESTAMP + (int)date('Z'));
+
+if (WT_USER_ID) {
+	define('WT_CLIENT_TIMESTAMP', WT_TIMESTAMP - $WT_SESSION->timediff);
+} else {
+	define('WT_CLIENT_TIMESTAMP', WT_SERVER_TIMESTAMP);
+}
 define('WT_CLIENT_JD', 2440588 + (int)(WT_CLIENT_TIMESTAMP/86400));
 
 // Application configuration data - things that aren’t (yet?) user-editable
 require WT_ROOT.'includes/config_data.php';
 
-//-- load the privacy functions
-require WT_ROOT.'includes/functions/functions_privacy.php';
-
 // If we are logged in, and logout=1 has been added to the URL, log out
 // If we were logged in, but our account has been deleted, log out.
-if (WT_USER_ID && (safe_GET_bool('logout') || !WT_USER_NAME)) {
+if (WT_USER_ID && (WT_Filter::getBool('logout') || !WT_USER_NAME)) {
 	userLogout(WT_USER_ID);
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH);
 	exit;
@@ -503,13 +470,13 @@ if (WT_USER_ID) {
 }
 
 // Set the theme
-if (substr(WT_SCRIPT_NAME, 0, 5)=='admin' || WT_SCRIPT_NAME=='module.php' && substr(safe_GET('mod_action'), 0, 5)=='admin') {
+if (substr(WT_SCRIPT_NAME, 0, 5)=='admin' || WT_SCRIPT_NAME=='module.php' && substr(WT_Filter::get('mod_action'), 0, 5)=='admin') {
 	// Administration scripts begin with “admin” and use a special administration theme
 	define('WT_THEME_DIR', WT_THEMES_DIR.'_administration/');
 } else {
 	if (WT_Site::preference('ALLOW_USER_THEMES')) {
 		// Requested change of theme?
-		$THEME_DIR=safe_GET('theme', get_theme_names());
+		$THEME_DIR = WT_Filter::get('theme');
 		unset($_GET['theme']);
 		// Last theme used?
 		if (!$THEME_DIR && in_array($WT_SESSION->theme_dir, get_theme_names())) {

@@ -2,10 +2,10 @@
 // Controller for the hourglass chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Hourglass.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -54,12 +52,11 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 		parent::__construct();
 
 		// Extract parameters from from
-		$this->pid        =safe_GET_xref('rootid');
-		$this->show_full  =safe_GET('show_full',   array('0', '1'), $PEDIGREE_FULL_DETAILS);
-		$this->show_spouse=safe_GET('show_spouse', array('0', '1'), '0');
-		$this->generations=safe_GET_integer('generations', 2, $MAX_DESCENDANCY_GENERATIONS, 3);
-		$this->box_width  =safe_GET_integer('box_width',   50, 300, 100);
-		$box_width           =safe_GET_integer('box_width',            50, 300, 100);
+		$this->pid         = WT_Filter::get('rootid', WT_REGEX_XREF);
+		$this->show_full   = WT_Filter::getInteger('show_full',   0, 1, $PEDIGREE_FULL_DETAILS);
+		$this->show_spouse = WT_Filter::getInteger('show_spouse', 0, 1, 0);
+		$this->generations = WT_Filter::getInteger('generations', 2, $MAX_DESCENDANCY_GENERATIONS, 3);
+		$this->box_width   = WT_Filter::getInteger('box_width',   50, 300, 100);
 
 		// This is passed as a global.  A parameter would be better...
 		$show_full=$this->show_full;
@@ -74,13 +71,13 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 			$this->left_arrow='icon-larrow';
 			$this->right_arrow='icon-larrow';
 		}
-		
+
 		// -- size of the detailed boxes based upon optional width parameter
-		$Dbwidth=($box_width*$bwidth)/100;
-		$Dbheight=($box_width*$bheight)/100;
+		$Dbwidth=($this->box_width*$bwidth)/100;
+		$Dbheight=($this->box_width*$bheight)/100;
 		$bwidth=$Dbwidth;
 		$bheight=$Dbheight;
-		
+
 		// -- adjust size of the compact box
 		if (!$this->show_full) {
 			$bwidth = $this->box_width * $cbwidth  / 100;
@@ -88,14 +85,14 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 		}
 
 		$bhalfheight = (int)($bheight / 2);
-		
+
 		// Validate parameters
-		$this->hourPerson = WT_Person::getInstance($this->pid);
+		$this->hourPerson = WT_Individual::getInstance($this->pid);
 		if (!$this->hourPerson) {
 			$this->hourPerson=$this->getSignificantIndividual();
 			$this->pid=$this->hourPerson->getXref();
 		}
-		
+
 		$this->name=$this->hourPerson->getFullName();
 
 		//Checks how many generations of descendency is for the person for formatting purposes
@@ -125,14 +122,14 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 		//Prints empty table columns for children w/o parents up to the max generation
 		//This allows vertical line spacing to be consistent
 		//
-		if (count($person->getChildFamilies())==0) { 
+		if (count($person->getChildFamilies())==0) {
 			echo '<table>',
 				 '<tr>',
 				 '<td>',
 				 '<div style="width:',$bwidth,'px; height:',$bheight,'px;"></div>';
 			echo '</td>';
 			echo '<td>';
-				
+
 				//-- recursively get the father's family
 				$this->print_person_pedigree($person, $count+1);
 				echo '</td>';
@@ -185,7 +182,7 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 				if ($count==$this->generations-1 && $family->getWife()->getChildFamilies()) {
 					echo "<a href=\"#\" onclick=\"ChangeDiv('td_".$ARID."','".$ARID."','".$this->show_full."','".$this->show_spouse."','".$this->box_width."'); return false;\" class=\"".$this->right_arrow."\"></a> ";
 				}
-	
+
 				//-- recursively print the mother's family
 				$this->print_person_pedigree($family->getWife(), $count+1);
 				echo "</td>";
@@ -301,13 +298,7 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 				//-- move the arrow up to line up with the correct box
 				if ($this->show_spouse) {
 					foreach ($families as $family) {
-						/* @var $family Family */
-						if (!is_null($family)) {
-							$spouse = $family->getSpouse($person);
-							if ($spouse!=null) {
-								echo "<br><br><br>";
-							}
-						}
+						echo '<br><br><br>';
 					}
 				}
 				echo "</td><td width=\"$bwidth\">";
@@ -321,23 +312,17 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 		//----- Print the spouse
 		if ($this->show_spouse) {
 			foreach ($families as $family) {
-				/* @var $family Family */
-				if (!is_null($family)) {
-					$spouse = $family->getSpouse($person);
-					if ($spouse!=null) {
-						echo "</td></tr><tr><td align=\"$otablealign\">";
-						//-- shrink the box for the spouses
-						$tempw = $bwidth;
-						$temph = $bheight;
-						$bwidth -= 10;
-						$bheight -= 10;
-						print_pedigree_person($spouse);
-						$bwidth = $tempw;
-						$bheight = $temph;
-						$numkids += 0.95;
-						echo "</td><td></td>";
-					}
-				}
+				echo "</td></tr><tr><td align=\"$otablealign\">";
+				//-- shrink the box for the spouses
+				$tempw = $bwidth;
+				$temph = $bheight;
+				$bwidth -= 10;
+				$bheight -= 10;
+				print_pedigree_person($family->getSpouse($person));
+				$bwidth = $tempw;
+				$bheight = $temph;
+				$numkids += 0.95;
+				echo "</td><td></td>";
 			}
 			//-- add offset divs to make things line up better
 			if ($count==$this->dgenerations) echo "<tr><td colspan\"2\"><div style=\"height: ".($bhalfheight/2)."px; width: ".$bwidth."px;\"><br></div>";
@@ -347,7 +332,7 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 		// For the root person, print a down arrow that allows changing the root of tree
 		if ($showNav && $count==1) {
 			// NOTE: If statement OK
-			if ($person->canDisplayName()) {
+			if ($person->canShowName()) {
 				// -- print left arrow for decendants so that we can move down the tree
 				$famids = $person->getSpouseFamilies();
 				//-- make sure there is more than 1 child in the family with parents
@@ -370,11 +355,9 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 							echo "<a href=\"hourglass.php?rootid={$spid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\" class=\"name1\">";
 							echo $spouse->getFullName();
 							echo '</a><br>';
-
 						}
 
-						$children = $family->getChildren();
-						foreach ($children as $id=>$child) {
+						foreach ($family->getChildren() as $child) {
 							$cid = $child->getXref();
 							echo "&nbsp;&nbsp;<a href=\"hourglass.php?rootid={$cid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\" class=\"name1\">";
 							echo $child->getFullName();
@@ -401,11 +384,10 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 								echo '</a><br>';
 							}
 						}
-						$children = $family->getChildren();
 						$num = $family->getNumberOfChildren();
 						if ($num>2) echo "<span class=\"name1\"><br>".WT_I18N::translate('Siblings')."<br></span>";
 						if ($num==2) echo "<span class=\"name1\"><br>".WT_I18N::translate('Sibling')."<br></span>";
-						foreach ($children as $id=>$child) {
+						foreach ($family->getChildren() as $child) {
 							$cid = $child->getXref();
 							if ($cid!=$pid) {
 								echo "&nbsp;&nbsp;<a href=\"hourglass.php?rootid={$cid}&amp;show_spouse={$this->show_spouse}&amp;show_full={$this->show_full}&amp;generations={$this->generations}&amp;box_width={$this->box_width}\" class=\"name1\">";
@@ -435,7 +417,7 @@ class WT_Controller_Hourglass extends WT_Controller_Chart {
 	 */
 	function max_descendency_generations($pid, $depth) {
 		if ($depth > $this->generations) return $depth;
-		$person = WT_Person::getInstance($pid);
+		$person = WT_Individual::getInstance($pid);
 		if (is_null($person)) return $depth;
 		$maxdc = $depth;
 		foreach ($person->getSpouseFamilies() as $family) {

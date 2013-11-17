@@ -2,10 +2,10 @@
 // Configuration file required by GoogleMap module
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team. All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: defaultconfig.php 14589 2012-12-05 08:44:21Z greg $
 
 if (!defined('WT_WEBTREES')) {
  header('HTTP/1.0 403 Forbidden');
@@ -64,8 +62,6 @@ $GOOGLEMAP_PRECISION_5 = get_module_setting('googlemap', 'GM_PRECISION_5', '9');
 
 global $GM_MAX_NOF_LEVELS;
 $GM_MAX_NOF_LEVELS     = get_module_setting('googlemap', 'GM_MAX_NOF_LEVELS',    '4'); // Max nr of levels to use in Googlemap
-global $GM_DEFAULT_TOP_VALUE;
-$GM_DEFAULT_TOP_VALUE  = get_module_setting('googlemap', 'GM_DEFAULT_TOP_VALUE', '' ); // Default value, inserted when no location can be found
 
 global $GOOGLEMAP_COORD;
 $GOOGLEMAP_COORD       = get_module_setting('googlemap', 'GM_COORD',             '0'); // Enable or disable Display Map Co-ordinates

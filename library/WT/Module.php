@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Module.php 14771 2013-02-04 16:42:55Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -84,7 +82,7 @@ abstract class WT_Module {
 		}
 		return $this->_title;
 	}
-	
+
 	// Each module must provide the following functions
 	abstract public function getTitle();       // To label tabs, etc.
 	abstract public function getDescription(); // A sentence describing what this module does
@@ -109,7 +107,7 @@ abstract class WT_Module {
 		// Sorting is slow, so only do it when requested.
 		static $modules=null;
 		static $sorted =false;
-		
+
 		if ($modules===null) {
 			$module_names=WT_DB::prepare(
 				"SELECT SQL_CACHE module_name FROM `##module` WHERE status='enabled'"

@@ -2,10 +2,10 @@
 // Class file for a Source (SOUR) object
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// @version $Id: Source.php 14290 2012-09-15 09:01:22Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,50 +27,39 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Source extends WT_GedcomRecord {
+	const RECORD_TYPE = 'SOUR';
+	const SQL_FETCH   = "SELECT s_gedcom FROM `##sources` WHERE s_id=? AND s_file=?";
+	const URL_PREFIX  = 'source.php?sid=';
+
 	// Implement source-specific privacy logic
-	protected function _canDisplayDetailsByType($access_level) {
+	protected function _canShowByType($access_level) {
 		// Hide sources if they are attached to private repositories ...
-		preg_match_all('/\n1 REPO @(.+)@/', $this->_gedrec, $matches);
+		preg_match_all('/\n1 REPO @(.+)@/', $this->gedcom, $matches);
 		foreach ($matches[1] as $match) {
 			$repo=WT_Repository::getInstance($match);
-			if ($repo && !$repo->canDisplayDetails($access_level)) {
+			if ($repo && !$repo->canShow($access_level)) {
 				return false;
 			}
 		}
 
 		// ... otherwise apply default behaviour
-		return parent::_canDisplayDetailsByType($access_level);
+		return parent::_canShowByType($access_level);
 	}
 
 	// Generate a private version of this record
 	protected function createPrivateGedcomRecord($access_level) {
-		return "0 @".$this->xref."@ ".$this->type."\n1 TITL ".WT_I18N::translate('Private');
+		return '0 @' . $this->xref . "@ SOUR\n1 TITL " . WT_I18N::translate('Private');
 	}
 
 	// Fetch the record from the database
-	protected static function fetchGedcomRecord($xref, $ged_id) {
+	protected static function fetchGedcomRecord($xref, $gedcom_id) {
 		static $statement=null;
 
 		if ($statement===null) {
-			$statement=WT_DB::prepare(
-				"SELECT 'SOUR' AS type, s_id AS xref, s_file AS ged_id, s_gedcom AS gedrec ".
-				"FROM `##sources` WHERE s_id=? AND s_file=?"
-			);
+			$statement=WT_DB::prepare("SELECT s_gedcom FROM `##sources` WHERE s_id=? AND s_file=?");
 		}
-		return $statement->execute(array($xref, $ged_id))->fetchOneRow(PDO::FETCH_ASSOC);
-	}
 
-	public function getAuth() {
-		return get_gedcom_value('AUTH', 1, $this->getGedcomRecord());
-	}
-
-	// Generate a URL to this record, suitable for use in HTML
-	public function getHtmlUrl() {
-		return parent::_getLinkUrl('source.php?sid=', '&amp;');
-	}
-	// Generate a URL to this record, suitable for use in javascript, HTTP headers, etc.
-	public function getRawUrl() {
-		return parent::_getLinkUrl('source.php?sid=', '&');
+		return $statement->execute(array($xref, $gedcom_id))->fetchOne();
 	}
 
 	// Get an array of structures containing all the names in the record

@@ -7,7 +7,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: calendar.php 14999 2013-05-13 18:39:17Z greg $
 
 define('WT_SCRIPT_NAME', 'calendar.php');
 require './includes/session.php';
@@ -33,14 +31,14 @@ $controller=new WT_Controller_Page();
 $controller->setPageTitle(WT_I18N::translate('Anniversary calendar'));
 $controller->pageHeader();
 
-$cal     =safe_GET('cal',      '@#D[A-Z ]+@');
-$day     =safe_GET('day',      '[0-9]+');
-$month   =safe_GET('month',    '[A-Z]{3,5}');
-$year    =safe_GET('year',     '[0-9]+(-[0-9]+|[?]+)?');
-$action  =safe_GET('action',   array('year', 'today', 'calendar'), 'today');
-$filterev=safe_GET('filterev', array('all', 'bdm', WT_REGEX_TAG), 'bdm');
-$filterof=safe_GET('filterof', array('all', 'living', 'recent'), 'all');
-$filtersx=safe_GET('filtersx', array('M', 'F'), '');
+$cal      = WT_Filter::get('cal',      '@#D[A-Z ]+@');
+$day      = WT_Filter::get('day',      '\d\d?');
+$month    = WT_Filter::get('month',    '[A-Z]{3,5}');
+$year     = WT_Filter::get('year',     '\d{1,4}(?: B\.C\.)?|\d\d\d\d\/\d\d|\d+(-\d+|[?]+)?');
+$action   = WT_Filter::get('action',   'year|today|calendar', 'today');
+$filterev = WT_Filter::get('filterev', 'all|bdm|' . WT_REGEX_TAG, 'bdm');
+$filterof = WT_Filter::get('filterof', 'all|living|recent', 'all');
+$filtersx = WT_Filter::get('filtersx', '[MF]');
 
 if ($cal.$day.$month.$year=='') {
 	// No date specified?  Use the most likely calendar
@@ -54,13 +52,19 @@ if ($cal.$day.$month.$year=='') {
 
 // Create a WT_Date_Calendar from the parameters
 
+// We cannot display new-style/old-style years, so convert to new style
+if (preg_match('/^(\d\d)\d\d\/(\d\d)$/', $year, $match)) {
+	$year=$match[1].$match[2];
+}
+
 // advance-year "year range"
 if (preg_match('/^(\d+)-(\d+)$/', $year, $match)) {
-	if (strlen($match[1]) > strlen($match[2]))
+	if (strlen($match[1]) > strlen($match[2])) {
 		$match[2]=substr($match[1], 0, strlen($match[1])-strlen($match[2])).$match[2];
+	}
 	$ged_date=new WT_Date("FROM {$cal} {$match[1]} TO {$cal} {$match[2]}");
 	$action='year';
-} else
+} else {
 	// advanced-year "decade/century wildcard"
 	if (preg_match('/^(\d+)(\?+)$/', $year, $match)) {
 		$y1=$match[1].str_replace('?', '0', $match[2]);
@@ -69,10 +73,11 @@ if (preg_match('/^(\d+)-(\d+)$/', $year, $match)) {
 		$action='year';
 	} else {
 		if ($year<0)
-			$year=(-$year)."B.C."; // need BC to parse date
+			$year=(-$year)." B.C."; // need BC to parse date
 		$ged_date=new WT_Date("{$cal} {$day} {$month} {$year}");
 		$year=$ged_date->date1->y; // need negative year for year entry field.
 	}
+}
 $cal_date=&$ged_date->date1;
 
 // Invalid month?  Pick a sensible one.
@@ -117,13 +122,13 @@ $cal=rawurlencode($cal);
 
 switch ($action) {
 case 'today':
-	echo WT_I18N::translate('On This Day ...').'<br>'.$ged_date->Display(false);
+	echo WT_I18N::translate('On this day…').'<br>'.$ged_date->Display(false);
 	break;
 case 'calendar':
-	echo WT_I18N::translate('In This Month ...').'<br>'.$ged_date->Display(false, '%F %Y');
+	echo WT_I18N::translate('In this month…').'<br>'.$ged_date->Display(false, '%F %Y');
 	break;
 case 'year':
-	echo WT_I18N::translate('In This Year ...').'<br>'.$ged_date->Display(false, '%Y');
+	echo WT_I18N::translate('In this year…').'<br>'.$ged_date->Display(false, '%Y');
 	break;
 }
 echo '</h2></td></tr>';
@@ -148,9 +153,9 @@ echo '</td></tr>';
 echo '<tr><td class="descriptionbox vmiddle">';
 echo WT_I18N::translate('Month'), '</td>';
 echo '<td class="optionbox" colspan="3">';
-for ($n=1; $n<=$cal_date->NUM_MONTHS(); ++$n) {
+for ($n=1; $n<=$cal_date->MonthsInYear(); ++$n) {
 	$month_name=$cal_date->NUM_TO_MONTH_NOMINATIVE($n, $cal_date->IsLeapYear());
-	$m=$cal_date->NUM_TO_GEDCOM_MONTH($n, $cal_date->IsLeapYear());
+	$m = array_search($n, $cal_date::$MONTH_ABBREV);
 	if ($m=='ADS' && $cal_date instanceof WT_Date_Jewish && !$cal_date->IsLeapYear()) {
 		// No month 7 in Jewish leap years.
 		continue;
@@ -181,26 +186,26 @@ echo '<td class="optionbox vmiddle">';
 echo '<select class="list_value" name="filterof" onchange="document.dateform.submit();">';
 echo '<option value="all"';
 if ($filterof == "all") echo ' selected="selected"';
-echo '>', WT_I18N::translate('All People'), '</option>';
+echo '>', WT_I18N::translate('All individuals'), '</option>';
 if (!$HIDE_LIVE_PEOPLE || WT_USER_ID) {
 	echo '<option value="living"';
 if ($filterof == "living") echo ' selected="selected"';
-	echo '>', WT_I18N::translate('Living People'), '</option>';
+	echo '>', WT_I18N::translate('Living individuals'), '</option>';
 }
 echo '<option value="recent"';
 if ($filterof == "recent") echo ' selected="selected"';
-echo '>', WT_I18N::translate('Recent Years (&lt; 100 yrs)'), '</option>';
+echo '>', WT_I18N::translate('Recent years (&lt; 100 yrs)'), '</option>';
 echo '</select>';
-	
+
 echo '&nbsp;&nbsp;&nbsp;';
-	
+
 if ($filtersx=="") {
-	echo '<i class="icon-sex_m_15x15" title="', WT_I18N::translate('All People'), '"></i>';
-	echo '<i class="icon-sex_f_15x15" title="', WT_I18N::translate('All People'), '"></i> | ';
+	echo '<i class="icon-sex_m_15x15" title="', WT_I18N::translate('All individuals'), '"></i>';
+	echo '<i class="icon-sex_f_15x15" title="', WT_I18N::translate('All individuals'), '"></i> | ';
 } else {
 	echo '<a href="calendar.php?cal=', $cal, '&amp;day=', $cal_date->d, '&amp;month=', $cal_month, '&amp;year=', $cal_date->y, '&amp;filterev=', $filterev, '&amp;filterof=', $filterof, '&amp;action=', $action, '">';
-	echo '<i class="icon-sex_m_9x9" title="', WT_I18N::translate('All People'), '"></i>';
-	echo '<i class="icon-sex_f_9x9" title="', WT_I18N::translate('All People'), '"></i></a> | ';
+	echo '<i class="icon-sex_m_9x9" title="', WT_I18N::translate('All individuals'), '"></i>';
+	echo '<i class="icon-sex_f_9x9" title="', WT_I18N::translate('All individuals'), '"></i></a> | ';
 }
 if ($filtersx=="M") {
 	echo '<i class="icon-sex_m_15x15" title="', WT_I18N::translate('Males'), '"></i> | ';
@@ -219,7 +224,7 @@ echo "<input type=\"hidden\" name=\"filterev\" value=\"$filterev\">";
 echo '<select class="list_value" name="filterev" onchange="document.dateform.submit();">';
 echo '<option value="bdm"';
 if ($filterev == "bdm") echo ' selected="selected"';
-echo '>', WT_I18N::translate('Births, Deaths, Marriages'), '</option>';
+echo '>', WT_I18N::translate('Vital records'), '</option>';
 echo '<option value="all"';
 if ($filterev == "all") echo ' selected="selected"';
 echo '>', WT_I18N::translate('All'), '</option>';
@@ -261,7 +266,7 @@ if ($filterev == "EMIG") echo ' selected="selected"';
 echo '>', WT_Gedcom_Tag::getLabel('EMIG'), '</option>';
 echo '<option value="EVEN"';
 if ($filterev == "EVEN") echo ' selected="selected"';
-echo '>', WT_I18N::translate('Custom Event'), '</option>';
+echo '>', WT_I18N::translate('Custom event'), '</option>';
 echo '</select>';
 
 
@@ -272,19 +277,19 @@ echo "<table class=\"width100\">";
 // Day/Month/Year and calendar selector
 echo '<tr><td class="topbottombar width50">';
 if ($action=='today') {
-	echo '<span class="error">', WT_I18N::translate('View Day'), '</span>';
+	echo '<span class="error">', WT_I18N::translate('View day'), '</span>';
 } else {
-	echo "<a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year={$cal_date->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action=today\">", WT_I18N::translate('View Day'), "</a>";
+	echo "<a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year={$cal_date->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action=today\">", WT_I18N::translate('View day'), "</a>";
 }
 if ($action=='calendar') {
-	echo ' | <span class="error">', WT_I18N::translate('View Month'), '</span>';
+	echo ' | <span class="error">', WT_I18N::translate('View month'), '</span>';
 } else {
-	echo " | <a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year={$cal_date->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action=calendar\">", WT_I18N::translate('View Month'), "</a>";
+	echo " | <a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year={$cal_date->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action=calendar\">", WT_I18N::translate('View month'), "</a>";
 }
 if ($action=='year') {
-	echo ' | <span class="error">', WT_I18N::translate('View Year'), '</span>';
+	echo ' | <span class="error">', WT_I18N::translate('View year'), '</span>';
 } else {
-	echo " | <a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year={$cal_date->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action=year\">", WT_I18N::translate('View Year'), "</a>";
+	echo " | <a href=\"calendar.php?cal={$cal}&amp;day={$cal_date->d}&amp;month={$cal_month}&amp;year={$cal_date->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action=year\">", WT_I18N::translate('View year'), "</a>";
 }
 echo '</td><td class="topbottombar width50">';
 $n=0;
@@ -305,7 +310,7 @@ foreach (array(
 			echo "<span class=\"error\">{$cal_name}</span>";
 		} else {
 			$newcalesc=urlencode($tmp->Format('%@'));
-			$tmpmonth=$tmp->FormatGedcomMonth();
+			$tmpmonth=$tmp->Format('%O');
 			echo "<a href=\"calendar.php?cal={$newcalesc}&amp;day={$tmp->d}&amp;month={$tmpmonth}&amp;year={$tmp->y}&amp;filterev={$filterev}&amp;filterof={$filterof}&amp;filtersx={$filtersx}&amp;action={$action}\">{$cal_name}</a>";
 		}
 	}
@@ -338,25 +343,22 @@ case 'calendar':
 		$found_facts[$d]=array();
 	// Fetch events for each day
 	for ($jd=$cal_date->minJD; $jd<=$cal_date->maxJD; ++$jd)
-		foreach (apply_filter(get_anniversary_events($jd, $events), $filterof, $filtersx) as $event) {
-			$tmp=$event['date']->MinDate();
-			if ($tmp->d>=1 && $tmp->d<=$tmp->DaysInMonth())
+		foreach (apply_filter(get_anniversary_events($jd, $events), $filterof, $filtersx) as $fact) {
+			$tmp=$fact->getDate()->MinDate();
+			if ($tmp->d>=1 && $tmp->d<=$tmp->DaysInMonth()) {
 				$d=$jd-$cal_date->minJD+1;
-			else
+			} else {
 				$d=0;
-			$found_facts[$d][]=$event;
+			}
+			$found_facts[$d][]=$fact;
 		}
 	break;
 case 'year':
 	$cal_date->m=0;
 	$cal_date->SetJDfromYMD();
 	$found_facts=apply_filter(get_calendar_events($ged_date->MinJD(), $ged_date->MaxJD(), $events), $filterof, $filtersx);
-	// Eliminate duplictes (e.g. BET JUL 1900 AND SEP 1900 will appear twice in 1900)
-	foreach ($found_facts as $key=>$value)
-		$found_facts[$key]=serialize($found_facts[$key]);
-	$found_facts=array_unique($found_facts);
-	foreach ($found_facts as $key=>$value)
-		$found_facts[$key]=unserialize($found_facts[$key]);
+	// Eliminate duplicates (e.g. BET JUL 1900 AND SEP 1900 will appear twice in 1900)
+	$found_facts = array_unique($found_facts);
 	break;
 }
 
@@ -367,20 +369,20 @@ case 'today':
 	$indis=array();
 	$fams=array();
 	foreach ($found_facts as $fact) {
-		$fact_text=calendar_fact_text($fact, true);
-		switch ($fact['objtype']) {
-		case 'INDI':
-			if (empty($indis[$fact['id']]))
-				$indis[$fact['id']]=$fact_text;
-			else
-				$indis[$fact['id']].='<br>'.$fact_text;
-			break;
-		case 'FAM':
-			if (empty($fams[$fact['id']]))
-				$fams[$fact['id']]=$fact_text;
-			else
-				$fams[$fact['id']].='<br>'.$fact_text;
-			break;
+		$record = $fact->getParent();
+		$xref   = $record->getXref();
+		if ($record instanceof WT_Individual) {
+			if (empty($indis[$xref])) {
+				$indis[$xref] = calendar_fact_text($fact, true);
+			} else {
+				$indis[$xref] .= '<br>' . calendar_fact_text($fact, true);
+			}
+		} elseif ($record instanceof WT_Family) {
+			if (empty($indis[$xref])) {
+				$fams[$xref] = calendar_fact_text($fact, true);
+			} else {
+				$fams[$xref] .= '<br>' . calendar_fact_text($fact, true);
+			}
 		}
 	}
 	break;
@@ -389,11 +391,11 @@ case 'calendar':
 	foreach ($found_facts as $d=>$facts) {
 		$cal_facts[$d]=array();
 		foreach ($facts as $fact) {
-			$id=$fact['id'];
-			if (empty($cal_facts[$d][$id]))
-				$cal_facts[$d][$id]=calendar_fact_text($fact, false);
+			$xref=$fact->getParent()->getXref();
+			if (empty($cal_facts[$d][$xref]))
+				$cal_facts[$d][$xref]=calendar_fact_text($fact, false);
 			else
-				$cal_facts[$d][$id].='<br>'.calendar_fact_text($fact, false);
+				$cal_facts[$d][$xref].='<br>'.calendar_fact_text($fact, false);
 		}
 	}
 	break;
@@ -440,7 +442,7 @@ case 'today':
 	echo '<i class="icon-sex_m_15x15" title="', WT_I18N::translate('Males'), '"></i> ', $males, '&nbsp;&nbsp;&nbsp;&nbsp;';
 	echo '<i class="icon-sex_f_15x15" title="', WT_I18N::translate('Males'), '"></i> ', $females, '&nbsp;&nbsp;&nbsp;&nbsp;';
 	if (count($indis)!=$males+$females) {
-		echo '<i class="icon-sex_u_15x15" title="', WT_I18N::translate('All People'), '"></i> ', count($indis)-$males-$females;
+		echo '<i class="icon-sex_u_15x15" title="', WT_I18N::translate('All individuals'), '"></i> ', count($indis)-$males-$females;
 	}
 	echo '</td>';
 	echo '<td class="descriptionbox">', WT_I18N::translate('Total families: %s', count($fams)), '</td>';
@@ -514,52 +516,56 @@ case 'calendar':
 echo '</div>'; //close "calendar-page"
 
 /////////////////////////////////////////////////////////////////////////////////
-// Filter a list of facts
+// Filter a list of anniversaries
 /////////////////////////////////////////////////////////////////////////////////
 function apply_filter($facts, $filterof, $filtersx) {
-	$filtered=array();
-	$hundred_years=WT_SERVER_JD-36525;
+	$filtered = array();
+	$hundred_years = WT_CLIENT_JD - 36525;
 	foreach ($facts as $fact) {
-		$tmp=WT_GedcomRecord::GetInstance($fact['id']);
-		// Filter on sex
-		if ($fact['objtype']=='INDI' && $filtersx!='' && $filtersx!=$tmp->getSex())
-			continue;
-		// Can't display families if the sex filter is on.
-		// TODO: but we could show same-sex partnerships....
-		if ($fact['objtype']=='FAM' && $filtersx!='')
-			continue;
-		// Filter on age of event
-		if ($filterof=='living') {
-			if ($fact['objtype']=='INDI' && $tmp->isDead())
-			continue;
-			if ($fact['objtype']=='FAM') {
-				$husb=$tmp->getHusband();
-				$wife=$tmp->getWife();
-				if (!empty($husb) && $husb->isDead())
-					continue;
-				if (!empty($wife) && $wife->isDead())
-					continue;
+		$record = $fact->getParent();
+		if ($filtersx) {
+			// Filter on sex
+			if ($record instanceof WT_Individual && $filtersx != $record->getSex()) {
+				continue;
+			}
+			// Can't display families if the sex filter is on.
+			if ($record instanceof WT_Family) {
+				continue;
 			}
 		}
-		if ($filterof=='recent' && $fact['date']->MaxJD()<$hundred_years)
+		// Filter living individuals
+		if ($filterof == 'living') {
+			if ($record instanceof WT_Individual && $record->isDead()) {
+				continue;
+			}
+			if ($record instanceof WT_Family) {
+				$husb = $record->getHusband();
+				$wife = $record->getWife();
+				if ($husb && $husb->isDead() || $wife && $wife->isDead()) {
+					continue;
+				}
+			}
+		}
+		// Filter on recent events
+		if ($filterof == 'recent' && $fact->getDate()->MaxJD()<$hundred_years) {
 			continue;
-		// Finally, check for privacy rules before adding fact.
-		if ($tmp->canDisplayDetails())
-			$filtered[]=$fact;
+		}
+		$filtered[] = $fact;
 	}
 	return $filtered;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Format a fact for display.  Include the date, the event type, and optionally
-// the place.
+// Format an anniversary display.
 ////////////////////////////////////////////////////////////////////////////////
-function calendar_fact_text($fact, $show_places) {
-	$text=WT_Gedcom_Tag::getLabel($fact['fact']).' - '.$fact['date']->Display(true, "", array());
-	if ($fact['anniv']>0)
-		$text.=' ('.WT_I18N::translate('%s year anniversary', $fact['anniv']).')';
-	if ($show_places && !empty($fact['plac']))
-		$text.=' - '.$fact['plac'];
+function calendar_fact_text(WT_Fact $fact, $show_places) {
+	$text = $fact->getLabel().' — '.$fact->getDate()->Display(true, "", array());
+	if ($fact->anniv) {
+		$text .= ' (' . WT_I18N::translate('%s year anniversary', $fact->anniv) . ')';
+	}
+	if ($show_places && $fact->getAttribute('PLAC')) {
+		$text .= ' — ' . $fact->getAttribute('PLAC');
+	}
 	return $text;
 }
 
@@ -572,7 +578,7 @@ function calendar_list_text($list, $tag1, $tag2, $show_sex_symbols) {
 	foreach ($list as $id=>$facts) {
 		$tmp=WT_GedcomRecord::GetInstance($id);
 		echo $tag1, '<a href="', $tmp->getHtmlUrl(), '">', $tmp->getFullName(), '</a> ';
-		if ($show_sex_symbols && $tmp->getType()=='INDI')
+		if ($show_sex_symbols && $tmp instanceof WT_Individual)
 			switch ($tmp->getSex()) {
 			case 'M':
 				echo '<i class="icon-sex_m_9x9" title="', WT_I18N::translate('Male'), '"></i>';

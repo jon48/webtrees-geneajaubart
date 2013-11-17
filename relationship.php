@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,21 +20,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: relationship.php 15070 2013-06-20 23:30:30Z nigel $
 
 define('WT_SCRIPT_NAME', 'relationship.php');
 require './includes/session.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$controller=new WT_Controller_Page();
+$controller = new WT_Controller_Page();
 
-$pid1        =safe_GET_xref('pid1');
-$pid2        =safe_GET_xref('pid2');
-$show_full   =safe_GET('show_full', array('0', '1'), $PEDIGREE_FULL_DETAILS);
-$path_to_find=safe_GET('path_to_find', '[0-9]+', 0);
-$followspouse=safe_GET_bool('followspouse');
-$asc         =safe_GET_bool('asc');
+$pid1         = WT_Filter::get('pid1', WT_REGEX_XREF);
+$pid2         = WT_Filter::get('pid2', WT_REGEX_XREF);
+$show_full    = WT_Filter::getInteger('show_full', 0, 1, $PEDIGREE_FULL_DETAILS);
+$path_to_find = WT_Filter::getInteger('path_to_find');
+$followspouse = WT_Filter::getBool('followspouse');
+$asc          = WT_Filter::getBool('asc');
 
 $asc = $asc ? -1 : 1;
 
@@ -50,14 +48,14 @@ $Dbyspacing		= 0;
 $Dbasexoffset	= 0;
 $Dbaseyoffset	= 0;
 
-$person1=WT_Person::getInstance($pid1);
-$person2=WT_Person::getInstance($pid2);
+$person1=WT_Individual::getInstance($pid1);
+$person2=WT_Individual::getInstance($pid2);
 
 $controller
 	->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
 	->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
-if ($person1 && $person1->canDisplayName() && $person2 && $person2->canDisplayName()) {	
+if ($person1 && $person1->canShowName() && $person2 && $person2->canShowName()) {
 	$controller
 		->setPageTitle(WT_I18N::translate(/* I18N: %s are individual’s names */ 'Relationships between %1$s and %2$s', $person1->getFullName(), $person2->getFullName()))
 		->PageHeader();
@@ -79,8 +77,8 @@ if ($person1 && $person1->canDisplayName() && $person2 && $person2->canDisplayNa
 ?>
 <div id="relationship-page">
 	<h2><?php echo $controller->getPageTitle(); ?></h2>
-	<form name="people" method="get" action="relationship.php">
-		<input type="hidden" name="ged" value="<?php echo WT_GEDCOM; ?>">
+	<form name="people" method="get" action="?">
+		<input type="hidden" name="ged" value="<?php echo WT_Filter::escapeHtml(WT_GEDCOM); ?>">
 		<input type="hidden" name="path_to_find" value="0">
 		<table class="list_table">
 			<tr>
@@ -93,14 +91,14 @@ if ($person1 && $person1->canDisplayName() && $person2 && $person2->canDisplayNa
 			</tr>
 			<tr>
 				<td class="descriptionbox">
-					<?php echo WT_I18N::translate('Person 1'); ?>
+					<?php echo WT_I18N::translate('Individual 1'); ?>
 				</td>
 				<td class="optionbox vmiddle">
 					<input tabindex="1" class="pedigree_form" type="text" name="pid1" id="pid1" size="3" value="<?php echo $pid1; ?>">
 					<?php echo print_findindi_link('pid1'); ?>
 				</td>
 				<td class="descriptionbox">
-					<?php echo WT_I18N::translate('Show Details'); ?>
+					<?php echo WT_I18N::translate('Show details'); ?>
 				</td>
 				<td class="optionbox vmiddle">
 					<?php echo two_state_checkbox('show_full', $show_full); ?>
@@ -108,7 +106,7 @@ if ($person1 && $person1->canDisplayName() && $person2 && $person2->canDisplayNa
 			</tr>
 			<tr>
 				<td class="descriptionbox">
-					<?php echo WT_I18N::translate('Person 2'); ?>
+					<?php echo WT_I18N::translate('Individual 2'); ?>
 				</td>
 				<td class="optionbox vmiddle">
 					<input tabindex="2" class="pedigree_form" type="text" name="pid2" id="pid2" size="3" value="<?php echo $pid2; ?>">
@@ -159,7 +157,7 @@ if ($person1 && $person1->canDisplayName() && $person2 && $person2->canDisplayNa
 	</form>
 
 <?php
-			
+
 $maxyoffset = $Dbaseyoffset;
 if ($person1 && $person2) {
 	if (!$disp) {

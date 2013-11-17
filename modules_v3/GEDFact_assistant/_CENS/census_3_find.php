@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,15 +20,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: census_3_find.php 14922 2013-03-27 00:40:08Z nigel $
 
 $controller=new WT_Controller_Simple();
 
-$filter         =safe_GET('filter');
-$action         =safe_GET('action');
-$callback       =safe_GET('callback', WT_REGEX_NOSCRIPT, 'paste_id');
-$multiple       =safe_GET_bool('multiple');
+$filter   = WT_Filter::get('filter');
+$action   = WT_Filter::get('action');
+$callback = WT_Filter::get('callback');
+$multiple = WT_Filter::getBool('multiple');
 
 $controller
 	->setPageTitle(WT_I18N::translate('Find an individual'))
@@ -169,7 +167,7 @@ if ($action=="filter") {
 			echo "'".(1901-$indi->getbirthyear())."' ,"; // ~age~     - Census Date minus YOB (Preliminary)
 			echo "'".(($indi->getDeathDate()->minJD() + $indi->getDeathDate()->maxJD())/2)."' ,"; // dod       - Date of Death
 			echo "'', "; // occu      - Occupation
-			echo "'".htmlspecialchars($indi->getbirthplace(), ENT_QUOTES)."', "; // birthpl   - Birthplace
+			echo "'".WT_Filter::escapeHtml($indi->getbirthplace())."', "; // birthpl   - Birthplace
 			echo "'".$FBP."', "; // fbirthpl  - Father's Birthplace
 			echo "'".$MBP."', "; // mbirthpl  - Mother's Birthplace
 			echo "'".$chBLDarray."'"; // chilBLD   - Array of Children (name, birthdate, deathdate)

@@ -2,10 +2,10 @@
 // View for the family book chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: familybook.php 15067 2013-06-20 22:36:56Z nigel $
 
 define('WT_SCRIPT_NAME', 'familybook.php');
 require './includes/session.php';
@@ -37,6 +35,7 @@ $controller
 <div id="familybook-page">
 	<h2><?php echo $controller->getPageTitle(); ?></h2>
 	<form method="get" name="people" action="?">
+		<input type="hidden" name="ged" value="<?php echo WT_Filter::escapeHtml(WT_GEDCOM); ?>">
 		<table class="list_table">
 			<tr>
 				<td class="descriptionbox">
@@ -47,7 +46,7 @@ $controller
 					<?php echo print_findindi_link('rootid'); ?>
 				</td>
 				<td class="descriptionbox">
-					<?php echo WT_I18N::translate('Show Details'); ?>
+					<?php echo WT_I18N::translate('Show details'); ?>
 				</td>
 				<td class="optionbox">
 					<input type="hidden" name="show_full" value="<?php echo $controller->show_full; ?>">
@@ -81,7 +80,7 @@ $controller
 			</tr>
 			<tr>
 				<td class="descriptionbox">
-					<?php echo WT_I18N::translate('Descent Steps'), help_link('fambook_descent'); ?>
+					<?php echo WT_I18N::translate('Descent steps'), help_link('fambook_descent'); ?>
 				</td>
 				<td class="optionbox">
 					<input type="text" size="3" name="descent" value="<?php echo $controller->descent; ?>">
@@ -96,6 +95,10 @@ $controller
 		</table>
 	</form>
 <div id="familybook_chart" style="z-index:1;">
-<?php $controller->print_family_book($controller->root, $controller->descent); ?>
+<?php
+if ($controller->root) {
+	$controller->print_family_book($controller->root, $controller->descent);
+}
+?>
 </div>
 </div> <!-- close #familybook-page -->

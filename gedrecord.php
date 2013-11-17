@@ -18,27 +18,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: gedrecord.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'gedrecord.php');
 require './includes/session.php';
 
 $controller=new WT_Controller_Page();
 
-$obj=WT_GedcomRecord::getInstance(safe_GET_xref('pid'));
+$obj = WT_GedcomRecord::getInstance(WT_Filter::get('pid', WT_REGEX_XREF));
 
 if (
-	$obj instanceof WT_Person ||
-	$obj instanceof WT_Family ||
-	$obj instanceof WT_Source ||
+	$obj instanceof WT_Individual ||
+	$obj instanceof WT_Family     ||
+	$obj instanceof WT_Source     ||
 	$obj instanceof WT_Repository ||
-	$obj instanceof WT_Note ||
+	$obj instanceof WT_Note       ||
 	$obj instanceof WT_Media
 ) {
+	Zend_Session::writeClose();
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$obj->getRawUrl());
 	exit;
-} elseif (!$obj || !$obj->canDisplayDetails()) {
+} elseif (!$obj || !$obj->canShow()) {
 	$controller->pageHeader();
 	print_privacy_error();
 } else {
@@ -47,7 +46,7 @@ if (
 		'<pre style="white-space:pre-wrap; word-wrap:break-word;">',
 		preg_replace(
 			'/@('.WT_REGEX_XREF.')@/', '@<a href="gedrecord.php?pid=$1">$1</a>@',
-			htmlspecialchars($obj->getGedcomRecord())
+			WT_Filter::escapeHtml($obj->getGedcom())
 		),
 		'</pre>';
 }

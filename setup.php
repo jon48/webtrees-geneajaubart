@@ -17,50 +17,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: setup.php 15011 2013-05-28 05:40:08Z nigel $
 
 define('WT_SCRIPT_NAME', 'setup.php');
 define('WT_CONFIG_FILE', 'config.ini.php');
-
-// magic quotes were deprecated in PHP5.3.0
-if (version_compare(PHP_VERSION, '5.3.0', '<')) {
-	set_magic_quotes_runtime(0);
-	// magic_quotes_gpc can’t be disabled at run-time, so clean them up as necessary.
-	if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() ||
-		ini_get('magic_quotes_sybase') && strtolower(ini_get('magic_quotes_sybase'))!='off') {
-		$in = array(&$_POST);
-		while (list($k,$v) = each($in)) {
-			foreach ($v as $key => $val) {
-				if (!is_array($val)) {
-					$in[$k][$key] = stripslashes($val);
-					continue;
-				}
-				$in[] =& $in[$k][$key];
-			}
-		}
-		unset($in);
-	}
-}
-
-
-if (version_compare(PHP_VERSION, '5.2')<0) {
-	// Our translation system requires PHP 5.2, so we cannot translate this message :-(
-	header('Content-Type: text/html; charset=UTF-8');
-	echo
-		'<!DOCTYPE html>',
-		'<html lang="en" dir="ltr">',
-		'<head>',
-		'<meta charset="UTF-8">',
-		'<title>webtrees setup wizard</title>',
-		'<h1>Sorry, the setup wizard cannot start.</h1>',
-		'<p>This server is running PHP version ', PHP_VERSION, '</p>',
-		'<p><b>webtrees</b> requires PHP 5.2 or later.  PHP 5.3 is recommended.</p>';
-	if (version_compare(PHP_VERSION, '5.0')<0) {
-		echo '<p>Many servers offer both PHP4 and PHP5.  You may be able to change your default to PHP5 using a control panel or a configuration setting.</p>';
-	}
-	exit;
-}
 
 // This script (uniquely) does not load session.php.
 // session.php won’t run until a configuration file exists…
@@ -71,7 +30,8 @@ require 'includes/functions/functions_db.php'; // for get/setSiteSetting()
 define('WT_DATA_DIR',    'data/');
 define('WT_DEBUG_LANG',  false);
 define('WT_DEBUG_SQL',   false);
-define('WT_REQUIRED_MYSQL_VERSION', '5.0.13'); // For: prepared statements within stored procedures
+define('WT_REQUIRED_MYSQL_VERSION', '5.0.13');
+define('WT_REQUIRED_PHP_VERSION',   '5.3.2');
 define('WT_MODULES_DIR', 'modules_v3/');
 define('WT_ROOT', '');
 define('WT_GED_ID', null);
@@ -81,8 +41,17 @@ define('WT_PRIV_USER',   1);
 define('WT_PRIV_NONE',   0);
 define('WT_PRIV_HIDE',  -1);
 
-if (file_exists(WT_DATA_DIR.WT_CONFIG_FILE)) {
+if (file_exists(WT_DATA_DIR . WT_CONFIG_FILE)) {
 	header('Location: index.php');
+	exit;
+}
+
+if (version_compare(PHP_VERSION, WT_REQUIRED_PHP_VERSION)<0) {
+	// We cannot translate these messages without a modern PHP
+	echo
+		'<h1>Sorry, the setup wizard cannot start.</h1>',
+		'<p>This server is running PHP version ', PHP_VERSION, '</p>',
+		'<p>PHP ', WT_REQUIRED_PHP_VERSION , ' (or any later version) is required</p>';
 	exit;
 }
 
@@ -95,15 +64,19 @@ require 'includes/functions/functions_utf-8.php';
 require 'includes/functions/functions_edit.php';
 $WT_REQUEST=new Zend_Controller_Request_Http();
 $WT_SESSION=new stdClass; $WT_SESSION->locale=null; // Can't use Zend_Session until we've checked ini_set
-define('WT_LOCALE', WT_I18N::init(safe_POST('lang', '[@a-zA-Z_]+')));
+define('WT_LOCALE', WT_I18N::init(WT_Filter::post('lang', '[@a-zA-Z_]+')));
 
 header('Content-Type: text/html; charset=UTF-8');
-echo
-	'<!DOCTYPE html>',
-	'<html ', WT_I18N::html_markup(), '>',
-	'<head>',
-	'<title>webtrees setup wizard</title>',
-	'<style type="text/css">
+
+?>
+<!DOCTYPE html>
+<html <?php echo WT_I18N::html_markup(); ?>>
+<head>
+	<meta charset="UTF-8">
+	<title>
+		webtrees setup wizard
+	</title>
+	<style type="text/css">
 		body {color: black; background-color: white; font: 14px tahoma, arial, helvetica, sans-serif; padding:10px; }
 		a {color: black; font-weight: normal; text-decoration: none;}
 		a:hover {color: #81A9CB;}
@@ -112,9 +85,13 @@ echo
 		.good {color: green;}
 		.bad {color: red; font-weight: bold;}
 		.info {color: blue;}
-	</style>',
-	'</head><body>',
-	'<h1>', WT_I18N::translate('Setup wizard for <b>webtrees</b>'), '</h1>';
+	</style>
+	</head>
+	<body>
+		<h1>
+			<?php echo WT_I18N::translate('Setup wizard for <b>webtrees</b>'); ?>
+		</h1>
+<?php
 
 echo '<form name="config" action="', WT_SCRIPT_NAME, '" method="post" onsubmit="this.btncontinue.disabled=\'disabled\';">';
 echo '<input type="hidden" name="lang" value="', WT_LOCALE, '">';
@@ -123,7 +100,7 @@ echo '<input type="hidden" name="lang" value="', WT_LOCALE, '">';
 // Step one - choose language and confirm server configuration
 ////////////////////////////////////////////////////////////////////////////////
 
-if (empty($_POST['lang'])) {
+if (!isset($_POST['lang'])) {
 	echo
 		'<p>', WT_I18N::translate('Change language'), ' ',
 		edit_field_language('change_lang', WT_LOCALE, 'onchange="window.location=\'' .  WT_SCRIPT_NAME . '?lang=\'+this.value;">'),
@@ -143,7 +120,7 @@ if (empty($_POST['lang'])) {
 	// Mandatory extensions
 	foreach (array('pcre', 'pdo', 'pdo_mysql', 'session', 'iconv') as $extension) {
 		if (!extension_loaded($extension)) {
-			echo '<p class="bad">', WT_I18N::translate('PHP extension "%s" is disabled.  You cannot install webtrees until this is enabled.  Please ask your server\'s administrator to enable it.', $extension), '</p>';
+			echo '<p class="bad">', WT_I18N::translate('PHP extension “%s” is disabled.  You cannot install webtrees until this is enabled.  Please ask your server’s administrator to enable it.', $extension), '</p>';
 			$errors=true;
 		}
 	}
@@ -155,7 +132,7 @@ if (empty($_POST['lang'])) {
 		'simplexml' => /* I18N: a program feature */ WT_I18N::translate('reporting'),
 	) as $extension=>$features) {
 		if (!extension_loaded($extension)) {
-			echo '<p class="bad">', WT_I18N::translate('PHP extension "%1$s" is disabled.  Without it, the following features will not work: %2$s.  Please ask your server\'s administrator to enable it.', $extension, $features), '</p>';
+			echo '<p class="bad">', WT_I18N::translate('PHP extension “%1$s” is disabled.  Without it, the following features will not work: %2$s.  Please ask your server’s administrator to enable it.', $extension, $features), '</p>';
 			$warnings=true;
 		}
 	}
@@ -164,7 +141,7 @@ if (empty($_POST['lang'])) {
 		'file_uploads'=>/* I18N: a program feature */ WT_I18N::translate('file upload capability'),
 	) as $setting=>$features) {
 		if (!ini_get($setting)) {
-			echo '<p class="bad">', WT_I18N::translate('PHP setting "%1$s" is disabled. Without it, the following features will not work: %2$s.  Please ask your server\'s administrator to enable it.', $setting, $features), '</p>';
+			echo '<p class="bad">', WT_I18N::translate('PHP setting “%1$s” is disabled. Without it, the following features will not work: %2$s.  Please ask your server’s administrator to enable it.', $setting, $features), '</p>';
 			$warnings=true;
 		}
 	}
@@ -191,11 +168,11 @@ if (empty($_POST['lang'])) {
 		WT_I18N::translate('Large systems (50000 individuals): 64-128MB, 40-80 seconds'),
 		'</p>',
 		($maxmem<32 || $maxcpu<20) ? '<p class="bad">' : '<p class="good">',
-		WT_I18N::translate('This server\'s memory limit is %dMB and its CPU time limit is %d seconds.', $maxmem, $maxcpu),
+		WT_I18N::translate('This server’s memory limit is %dMB and its CPU time limit is %d seconds.', $maxmem, $maxcpu),
 		'</p><p>',
 		WT_I18N::translate('If you try to exceed these limits, you may experience server time-outs and blank pages.'),
 		'</p><p>',
-		WT_I18N::translate('If your server\'s security policy permits it, you will be able to request increased memory or CPU time using the <b>webtrees</b> administration page.  Otherwise, you will need to contact your server\'s administrator.'),
+		WT_I18N::translate('If your server’s security policy permits it, you will be able to request increased memory or CPU time using the <b>webtrees</b> administration page.  Otherwise, you will need to contact your server’s administrator.'),
 		'</p>';
 	if (!$errors) {
 		echo '<input type="hidden" name="maxcpu" value="', $maxcpu, '">';
@@ -233,12 +210,12 @@ if ($FAB != 'FAB!') {
 // Step three - Database connection.
 ////////////////////////////////////////////////////////////////////////////////
 
-if (empty($_POST['dbhost'])) $_POST['dbhost']='localhost';
-if (empty($_POST['dbport'])) $_POST['dbport']='3306';
-if (empty($_POST['dbuser'])) $_POST['dbuser']='';
-if (empty($_POST['dbpass'])) $_POST['dbpass']='';
-if (empty($_POST['dbname'])) $_POST['dbname']='';
-if (empty($_POST['tblpfx'])) $_POST['tblpfx']='wt_';
+if (!isset($_POST['dbhost'])) $_POST['dbhost']='localhost';
+if (!isset($_POST['dbport'])) $_POST['dbport']='3306';
+if (!isset($_POST['dbuser'])) $_POST['dbuser']='';
+if (!isset($_POST['dbpass'])) $_POST['dbpass']='';
+if (!isset($_POST['dbname'])) $_POST['dbname']='';
+if (!isset($_POST['tblpfx'])) $_POST['tblpfx']='wt_';
 
 define('WT_TBLPREFIX', $_POST['tblpfx']);
 try {
@@ -272,23 +249,23 @@ if (empty($_POST['dbuser']) || !WT_DB::isConnected() || !$db_version_ok) {
 	echo
 		'<h2>', WT_I18N::translate('Connection to database server'), '</h2>',
 		'<p>', WT_I18N::translate('<b>webtrees</b> needs a MySQL database, version %s or later.', WT_REQUIRED_MYSQL_VERSION), '</p>',
-		'<p>', WT_I18N::translate('Your server\'s administrator will provide you with the connection details.'), '</p>',
+		'<p>', WT_I18N::translate('Your server’s administrator will provide you with the connection details.'), '</p>',
 		'<fieldset><legend>', WT_I18N::translate('Database connection'), '</legend>',
 		'<table border="0"><tr><td>',
 		WT_I18N::translate('Server name'), '</td><td>',
-		'<input type="text" name="dbhost" value="', htmlspecialchars($_POST['dbhost']), '" dir="ltr"></td><td>',
+		'<input type="text" name="dbhost" value="', WT_Filter::escapeHtml($_POST['dbhost']), '" dir="ltr"></td><td>',
 		WT_I18N::translate('Most sites are configured to use localhost.  This means that your database runs on the same computer as your web server.'),
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Port number'), '</td><td>',
-		'<input type="text" name="dbport" value="', htmlspecialchars($_POST['dbport']), '"></td><td>',
+		'<input type="text" name="dbport" value="', WT_Filter::escapeHtml($_POST['dbport']), '"></td><td>',
 		WT_I18N::translate('Most sites are configured to use the default value of 3306.'),
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Database user account'), '</td><td>',
-		'<input type="text" name="dbuser" value="', htmlspecialchars($_POST['dbuser']), '" autofocus></td><td>',
+		'<input type="text" name="dbuser" value="', WT_Filter::escapeHtml($_POST['dbuser']), '" autofocus></td><td>',
 		WT_I18N::translate('This is case sensitive.'),
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Database password'), '</td><td>',
-		'<input type="password" name="dbpass" value="', htmlspecialchars($_POST['dbpass']), '"></td><td>',
+		'<input type="password" name="dbpass" value="', WT_Filter::escapeHtml($_POST['dbpass']), '"></td><td>',
 		WT_I18N::translate('This is case sensitive.'),
 		'</td></tr><tr><td>',
 		'</td></tr></table>',
@@ -299,10 +276,10 @@ if (empty($_POST['dbuser']) || !WT_DB::isConnected() || !$db_version_ok) {
 		exit;
 } else {
 	// Copy these values through to the next step
-	echo '<input type="hidden" name="dbhost" value="', htmlspecialchars($_POST['dbhost']), '">';
-	echo '<input type="hidden" name="dbport" value="', htmlspecialchars($_POST['dbport']), '">';
-	echo '<input type="hidden" name="dbuser" value="', htmlspecialchars($_POST['dbuser']), '">';
-	echo '<input type="hidden" name="dbpass" value="', htmlspecialchars($_POST['dbpass']), '">';
+	echo '<input type="hidden" name="dbhost" value="', WT_Filter::escapeHtml($_POST['dbhost']), '">';
+	echo '<input type="hidden" name="dbport" value="', WT_Filter::escapeHtml($_POST['dbport']), '">';
+	echo '<input type="hidden" name="dbuser" value="', WT_Filter::escapeHtml($_POST['dbuser']), '">';
+	echo '<input type="hidden" name="dbpass" value="', WT_Filter::escapeHtml($_POST['dbpass']), '">';
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -366,16 +343,16 @@ if ($dbname_ok) {
 if (!$dbname_ok) {
 	echo
 		'<h2>', WT_I18N::translate('Database and table names'), '</h2>',
-		'<p>', WT_I18N::translate('A database server can store many separate databases.  You need to select an existing database (created by your server\'s administrator) or create a new one (if your database user account has sufficient privileges).'), '</p>',
+		'<p>', WT_I18N::translate('A database server can store many separate databases.  You need to select an existing database (created by your server’s administrator) or create a new one (if your database user account has sufficient privileges).'), '</p>',
 		'<fieldset><legend>', WT_I18N::translate('Database name'), '</legend>',
 		'<table border="0"><tr><td>',
 		WT_I18N::translate('Database name'), '</td><td>',
-		'<input type="text" name="dbname" value="', htmlspecialchars($_POST['dbname']), '" autofocus></td><td>',
+		'<input type="text" name="dbname" value="', WT_Filter::escapeHtml($_POST['dbname']), '" autofocus></td><td>',
 		WT_I18N::translate('This is case sensitive. If a database with this name does not already exist webtrees will attempt to create one for you. Success will depend on permissions set for your web server, but you will be notified if this fails.'),
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Table prefix'), '</td><td>',
-		'<input type="text" name="tblpfx" value="', htmlspecialchars($_POST['tblpfx']), '"></td><td>',
-		WT_I18N::translate('The prefix is optional, but recommended.  By giving the table names a unique prefix you can let several different applications share the same database. "wt_" is suggested, but can be anything you want.'),
+		'<input type="text" name="tblpfx" value="', WT_Filter::escapeHtml($_POST['tblpfx']), '"></td><td>',
+		WT_I18N::translate('The prefix is optional, but recommended.  By giving the table names a unique prefix you can let several different applications share the same database. “wt_” is suggested, but can be anything you want.'),
 		'</td></tr></table>',
 		'</fieldset>',
 		'<br><hr><input type="submit" id="btncontinue" value="', WT_I18N::translate('continue'), '">',
@@ -384,19 +361,19 @@ if (!$dbname_ok) {
 		exit;
 } else {
 	// Copy these values through to the next step
-	echo '<input type="hidden" name="dbname" value="', htmlspecialchars($_POST['dbname']), '">';
-	echo '<input type="hidden" name="tblpfx" value="', htmlspecialchars($_POST['tblpfx']), '">';
+	echo '<input type="hidden" name="dbname" value="', WT_Filter::escapeHtml($_POST['dbname']), '">';
+	echo '<input type="hidden" name="tblpfx" value="', WT_Filter::escapeHtml($_POST['tblpfx']), '">';
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Step five - site setup data
 ////////////////////////////////////////////////////////////////////////////////
 
-if (empty($_POST['wtname'    ])) $_POST['wtname'    ]='';
-if (empty($_POST['wtuser'    ])) $_POST['wtuser'    ]='';
-if (empty($_POST['wtpass'    ])) $_POST['wtpass'    ]='';
-if (empty($_POST['wtpass2'   ])) $_POST['wtpass2'   ]='';
-if (empty($_POST['wtemail'   ])) $_POST['wtemail'   ]='';
+if (!isset($_POST['wtname'    ])) $_POST['wtname'    ]='';
+if (!isset($_POST['wtuser'    ])) $_POST['wtuser'    ]='';
+if (!isset($_POST['wtpass'    ])) $_POST['wtpass'    ]='';
+if (!isset($_POST['wtpass2'   ])) $_POST['wtpass2'   ]='';
+if (!isset($_POST['wtemail'   ])) $_POST['wtemail'   ]='';
 
 if (empty($_POST['wtname']) || empty($_POST['wtuser']) || strlen($_POST['wtpass'])<6 || strlen($_POST['wtpass2'])<6 || empty($_POST['wtemail']) || $_POST['wtpass']<>$_POST['wtpass2']) {
 	if (strlen($_POST['wtpass'])>0 && strlen($_POST['wtpass'])<6) {
@@ -413,23 +390,23 @@ if (empty($_POST['wtname']) || empty($_POST['wtuser']) || strlen($_POST['wtpass'
 		'<fieldset><legend>', WT_I18N::translate('Administrator account'), '</legend>',
 		'<table border="0"><tr><td>',
 		WT_I18N::translate('Your name'), '</td><td>',
-		'<input type="text" name="wtname" value="', htmlspecialchars($_POST['wtname']), '" autofocus></td><td>',
+		'<input type="text" name="wtname" value="', WT_Filter::escapeHtml($_POST['wtname']), '" autofocus></td><td>',
 		WT_I18N::translate('This is your real name, as you would like it displayed on screen.'),
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Login ID'), '</td><td>',
-		'<input type="text" name="wtuser" value="', htmlspecialchars($_POST['wtuser']), '"></td><td>',
+		'<input type="text" name="wtuser" value="', WT_Filter::escapeHtml($_POST['wtuser']), '"></td><td>',
 		WT_I18N::translate('You will use this to login to webtrees.'),
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Password'), '</td><td>',
-		'<input type="password" name="wtpass" value="', htmlspecialchars($_POST['wtpass']), '"></td><td>',
+		'<input type="password" name="wtpass" value="', WT_Filter::escapeHtml($_POST['wtpass']), '"></td><td>',
 		WT_I18N::translate('This must to be at least six characters.  It is case-sensitive.'),
 		'</td></tr><tr><td>',
 		'&nbsp;', '</td><td>',
-		'<input type="password" name="wtpass2" value="', htmlspecialchars($_POST['wtpass2']), '"></td><td>',
+		'<input type="password" name="wtpass2" value="', WT_Filter::escapeHtml($_POST['wtpass2']), '"></td><td>',
 		WT_I18N::translate('Type your password again, to make sure you have typed it correctly.'),
 		'</td></tr><tr><td>',
 		WT_I18N::translate('Email address'), '</td><td>',
-		'<input type="email" name="wtemail" value="', htmlspecialchars($_POST['wtemail']), '"></td><td>',
+		'<input type="email" name="wtemail" value="', WT_Filter::escapeHtml($_POST['wtemail']), '"></td><td>',
 		WT_I18N::translate('This email address will be used to send you password reminders, site notifications, and messages from other family members who are registered on the site.'),
 		'</td></tr><tr><td>',
 		'</td></tr></table>',
@@ -440,11 +417,11 @@ if (empty($_POST['wtname']) || empty($_POST['wtuser']) || strlen($_POST['wtpass'
 		exit;
 } else {
 	// Copy these values through to the next step
-	echo '<input type="hidden" name="wtname"     value="'.htmlspecialchars($_POST['wtname']).'">';
-	echo '<input type="hidden" name="wtuser"     value="'.htmlspecialchars($_POST['wtuser']).'">';
-	echo '<input type="hidden" name="wtpass"     value="'.htmlspecialchars($_POST['wtpass']).'">';
-	echo '<input type="hidden" name="wtpass2"    value="'.htmlspecialchars($_POST['wtpass2']).'">';
-	echo '<input type="hidden" name="wtemail"    value="'.htmlspecialchars($_POST['wtemail']).'">';
+	echo '<input type="hidden" name="wtname"     value="', WT_Filter::escapeHtml($_POST['wtname']), '">';
+	echo '<input type="hidden" name="wtuser"     value="', WT_Filter::escapeHtml($_POST['wtuser']), '">';
+	echo '<input type="hidden" name="wtpass"     value="', WT_Filter::escapeHtml($_POST['wtpass']), '">';
+	echo '<input type="hidden" name="wtpass2"    value="', WT_Filter::escapeHtml($_POST['wtpass2']), '">';
+	echo '<input type="hidden" name="wtemail"    value="', WT_Filter::escapeHtml($_POST['wtemail']), '">';
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -920,7 +897,7 @@ try {
 		" FROM `##block`" .
 		" WHERE user_id=-1"
 	)->execute();
-	
+
 
 	// Write the config file.  We already checked that this would work.
 	$config_ini_php=

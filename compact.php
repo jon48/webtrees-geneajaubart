@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: compact.php 15062 2013-06-20 00:12:49Z nigel $
 
 define('WT_SCRIPT_NAME', 'compact.php');
 require './includes/session.php';
@@ -35,7 +33,8 @@ $controller
 ?>
 <div id="compact-page">
 	<h2><?php echo $controller->getPageTitle(); ?></h2>
-	<form name="people" id="people" method="get" action="#">
+	<form name="people" id="people" method="get" action="?">
+		<input type="hidden" name="ged" value="<?php echo WT_Filter::escapeHtml(WT_GEDCOM); ?>">
 		<table class="list_table">
 			<tr>
 				<td class="descriptionbox">
@@ -52,7 +51,7 @@ $controller
 				<?php if ($SHOW_HIGHLIGHT_IMAGES) { ?>
 				<tr>
 					<td class="descriptionbox">
-						<?php echo WT_I18N::translate('Show highlight images in people boxes'); ?>
+						<?php echo WT_I18N::translate('Show highlight images in individual boxes'); ?>
 					</td>
 					<td class="optionbox">
 						<input name="show_thumbs" type="checkbox" value="1" <?php echo $controller->show_thumbs ? 'checked="checked"' : ''; ?>>

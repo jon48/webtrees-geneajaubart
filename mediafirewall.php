@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,16 +20,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: mediafirewall.php 14813 2013-02-20 10:25:14Z greg $
 
 define('WT_SCRIPT_NAME', 'mediafirewall.php');
 require './includes/session.php';
 
 Zend_Session::writeClose();
 
-$mid   = safe_GET_xref('mid');
-$thumb = safe_GET_bool('thumb');
+$mid   = WT_Filter::get('mid', WT_REGEX_XREF);
+$thumb = WT_Filter::getBool('thumb');
 $media = WT_Media::getInstance($mid);
 
 // Send a “Not found” error as an image
@@ -230,10 +228,10 @@ function isImageTypeSupported($reqtype) {
 $useTTF = function_exists('imagettftext');
 
 // Media object missing/private?
-if (!$media || !$media->canDisplayDetails()) {
+if (!$media || !$media->canShow()) {
 	send404AndExit();
 }
-// Media file somewhere else?
+// media file somewhere else?
 if ($media->isExternal()) {
 	header('Location: ' . $media->getFilename());
 	exit;
@@ -254,7 +252,7 @@ $protocol = $_SERVER["SERVER_PROTOCOL"];  // determine if we are using HTTP/1.0 
 $filetime = $media->getFiletime($which);
 $filetimeHeader = gmdate("D, d M Y H:i:s", $filetime).' GMT';
 $expireOffset = 3600 * 24;  // tell browser to cache this image for 24 hours
-if (safe_GET('cb')) $expireOffset = $expireOffset * 7; // if cb parameter was sent, cache for 7 days 
+if (WT_Filter::get('cb')) $expireOffset = $expireOffset * 7; // if cb parameter was sent, cache for 7 days
 $expireHeader = gmdate("D, d M Y H:i:s", WT_TIMESTAMP + $expireOffset) . " GMT";
 
 $type = isImageTypeSupported($imgsize['ext']);

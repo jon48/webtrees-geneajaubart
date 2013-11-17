@@ -22,17 +22,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: hourglass_ajax.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'hourglass_ajax.php');
 require './includes/session.php';
-
-/*
- * The purpose of this page is to build the left half of the Hourglass chart via Ajax.
- * This page only produces a husband and wife with the connecting lines to unite and
- * label the pair as a pair.
- */
 
 $controller=new WT_Controller_Hourglass();
 
@@ -41,7 +33,8 @@ header('Content-type: text/html; charset=UTF-8');
 Zend_Session::writeClose();
 
 // -- print html header information
-if (isset($_REQUEST['type']) && $_REQUEST['type']=='desc')
-	$controller->print_descendency(WT_Person::getInstance($controller->pid), 1, false);
-else
-	$controller->print_person_pedigree(WT_Person::getInstance($controller->pid), 0);
+if (WT_Filter::get('type')=='desc') {
+	$controller->print_descendency(WT_Individual::getInstance($controller->pid), 1, false);
+} else {
+	$controller->print_person_pedigree(WT_Individual::getInstance($controller->pid), 0);
+}

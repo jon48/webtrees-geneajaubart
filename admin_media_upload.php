@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: admin_media_upload.php 14893 2013-03-20 09:49:12Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_media_upload.php');
 require './includes/session.php';
@@ -32,13 +30,13 @@ $controller
 	->requireManagerLogin()
 	->requireEditorLogin() /* Editing may be disabled, even for admins */
 	->setPageTitle(WT_I18N::translate('Upload media files'));
-	
-$action = safe_POST('action');
+
+$action = WT_Filter::post('action');
 
 if ($action == "upload") {
 	for ($i=1; $i<6; $i++) {
 		if (!empty($_FILES['mediafile'.$i]["name"]) || !empty($_FILES['thumbnail'.$i]["name"])) {
-			$folder = safe_POST('folder' . $i, WT_REGEX_UNSAFE);
+			$folder = WT_Filter::post('folder' . $i);
 
 			// Validate the media folder
 			$folderName = str_replace('\\', '/', $folder);
@@ -102,7 +100,7 @@ if ($action == "upload") {
 			}
 
 			// User-specified filename?
-			$filename = safe_POST('filename' . $i, WT_REGEX_UNSAFE);
+			$filename = WT_Filter::post('filename' . $i);
 			// Use the name of the uploaded file?
 			if (!$filename && !empty($_FILES['mediafile' . $i]['name'])) {
 				$filename = $_FILES['mediafile' . $i]['name'];
@@ -114,7 +112,7 @@ if ($action == "upload") {
 				WT_FlashMessages::addMessage(WT_I18N::translate('Filenames are not allowed to contain the character “%s”.', $match[1]));
 				$filename = '';
 				break;
-			} elseif (preg_match('/(\.(php|pl|cgi|bash|sh|bat|exe|com))$/', $filename)) {
+			} elseif (preg_match('/(\.(php|pl|cgi|bash|sh|bat|exe|com|htm|html|shtml))$/i', $filename, $match)) {
 				// Do not allow obvious script files.
 				WT_FlashMessages::addMessage(WT_I18N::translate('Filenames are not allowed to have the extension “%s”.', $match[1]));
 				$filename = '';
@@ -183,7 +181,7 @@ for ($i=1; $i<6; $i++) {
 	echo '<table class="upload_media">';
 	echo '<tr><th>', WT_I18N::translate('Media file'), ':&nbsp;&nbsp;', $i, '</th></tr>';
 	echo '<tr><td>';
-	echo WT_I18N::translate('Media file to upload'), help_link('upload_media_file');
+	echo WT_I18N::translate('Media file to upload');
 	echo '</td>';
 	echo '<td>';
 	echo '<input name="mediafile', $i, '" type="file" size="40">';
@@ -216,9 +214,9 @@ for ($i=1; $i<6; $i++) {
 		echo '<span dir="ltr"><select name="folder_list', $i, '" onchange="document.uploadmedia.folder', $i, '.value=this.options[this.selectedIndex].value;">';
 		echo '<option';
 		echo ' value="/"> ', WT_I18N::translate('Choose: '), ' </option>';
-		if (WT_USER_IS_ADMIN) echo '<option value="other" disabled>', WT_I18N::translate('Other folder... please type in'), "</option>";
+		if (WT_USER_IS_ADMIN) echo '<option value="other" disabled>', WT_I18N::translate('Other folder… please type in'), "</option>";
 		foreach ($mediaFolders as $f) {
-			echo '<option value="', htmlspecialchars($f), '">', htmlspecialchars($f), "</option>";
+			echo '<option value="', WT_Filter::escapeHtml($f), '">', WT_Filter::escapeHtml($f), "</option>";
 		}
 		echo "</select></span>";
 		if (WT_USER_IS_ADMIN) {

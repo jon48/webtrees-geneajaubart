@@ -15,19 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: admin_media.php 14985 2013-05-12 08:11:31Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_media.php');
 require './includes/session.php';
 require WT_ROOT . 'includes/functions/functions_edit.php';
 
 // type of file/object to include
-$files = safe_GET('files', array('local', 'external', 'unused'), 'local');
+$files = WT_Filter::get('files', 'local|external|unused', 'local');
 
 // family tree setting MEDIA_DIRECTORY
 $media_folders = all_media_folders();
-$media_folder  = safe_GET('media_folder', WT_REGEX_UNSAFE);
+$media_folder  = WT_Filter::get('media_folder', null, ''); // MySQL needs an empty string, not NULL
 // User folders may contain special characters.  Restrict to actual folders.
 if (!array_key_exists($media_folder, $media_folders)) {
 	$media_folder = reset($media_folders);
@@ -35,24 +33,24 @@ if (!array_key_exists($media_folder, $media_folders)) {
 
 // prefix to filename
 $media_paths = media_paths($media_folder);
-$media_path  = safe_GET('media_path', WT_REGEX_UNSAFE);
+$media_path  = WT_Filter::get('media_path', null, ''); // MySQL needs an empty string, not NULL
 // User paths may contain special characters.  Restrict to actual paths.
 if (!array_key_exists($media_path, $media_paths)) {
 	$media_path = reset($media_paths);
 }
 
 // subfolders within $media_path
-$subfolders = safe_GET('subfolders', array('include', 'exclude'), 'include');
-$action     = safe_GET('action');
+$subfolders = WT_Filter::get('subfolders', 'include|exclude', 'include');
+$action     = WT_Filter::get('action');
 
 ////////////////////////////////////////////////////////////////////////////////
 // POST callback for file deletion
 ////////////////////////////////////////////////////////////////////////////////
-$delete_file = safe_POST('delete', WT_REGEX_UNSAFE);
+$delete_file = WT_Filter::post('delete');
 if ($delete_file) {
 	$controller = new WT_Controller_Ajax;
 	// Only delete valid (i.e. unused) media files
-	$media_folder = safe_POST('media_folder', WT_REGEX_UNSAFE);
+	$media_folder = WT_Filter::post('media_folder', null, ''); // MySQL needs an empty string, not NULL
 	$disk_files = all_disk_files ($media_folder, '', 'include', '');
 	if (in_array($delete_file, $disk_files)) {
 		$tmp = WT_DATA_DIR . $media_folder . $delete_file;
@@ -73,7 +71,7 @@ if ($delete_file) {
 		// File no longer exists?  Maybe it was already deleted or renamed.
 	}
 	$controller->pageHeader();
-	exit;	
+	exit;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,15 +81,15 @@ if ($delete_file) {
 switch($action) {
 case 'load_json':
 	Zend_Session::writeClose();
-	$sSearch        = safe_GET('sSearch');
-	$iDisplayStart  = (int)safe_GET('iDisplayStart');
-	$iDisplayLength = (int)safe_GET('iDisplayLength');
+	$sSearch        = WT_Filter::get('sSearch', null, ''); // MySQL needs an empty string, not NULL
+	$iDisplayStart  = WT_Filter::getInteger('iDisplayStart');
+	$iDisplayLength = WT_Filter::getInteger('iDisplayLength');
 
 	switch ($files) {
 	case 'local':
 		// Filtered rows
 		$SELECT1 =
-				"SELECT SQL_CACHE SQL_CALC_FOUND_ROWS TRIM(LEADING ? FROM m_filename) AS media_path, 'OBJE' AS type, m_titl, m_id AS xref, m_file AS ged_id, m_gedcom AS gedrec, m_filename" .
+				"SELECT SQL_CACHE SQL_CALC_FOUND_ROWS TRIM(LEADING ? FROM m_filename) AS media_path, m_id AS xref, m_file AS gedcom_id, m_gedcom AS gedcom" .
 				" FROM  `##media`" .
 				" JOIN  `##gedcom_setting` ON (m_file = gedcom_id AND setting_name = 'MEDIA_DIRECTORY')" .
 				" JOIN  `##gedcom`         USING (gedcom_id)" .
@@ -125,18 +123,18 @@ case 'load_json':
 		} else {
 			$LIMIT = "";
 		}
-		$iSortingCols=safe_GET('iSortingCols');
+		$iSortingCols=WT_Filter::getInteger('iSortingCols');
 		if ($iSortingCols) {
 			$ORDER_BY = " ORDER BY ";
 			for ($i=0; $i<$iSortingCols; ++$i) {
 				// Datatables numbers columns 0, 1, 2, ...
 				// MySQL numbers columns 1, 2, 3, ...
-				switch (safe_GET('sSortDir_'.$i)) {
+				switch (WT_Filter::get('sSortDir_'.$i)) {
 				case 'asc':
-					$ORDER_BY .= (1+(int)safe_GET('iSortCol_'.$i)).' ASC ';
+					$ORDER_BY .= (1 + WT_Filter::getInteger('iSortCol_'.$i)).' ASC ';
 					break;
 				case 'desc':
-					$ORDER_BY .= (1+(int)safe_GET('iSortCol_'.$i)).' DESC ';
+					$ORDER_BY .= (1 + WT_Filter::getInteger('iSortCol_'.$i)).' DESC ';
 					break;
 				}
 				if ($i<$iSortingCols-1) {
@@ -147,16 +145,16 @@ case 'load_json':
 			$ORDER_BY="1 ASC";
 		}
 
-		$rows = WT_DB::prepare($SELECT1.$ORDER_BY.$LIMIT)->execute($ARGS1)->fetchAll(PDO::FETCH_ASSOC);
+		$rows = WT_DB::prepare($SELECT1.$ORDER_BY.$LIMIT)->execute($ARGS1)->fetchAll();
 		// Total filtered/unfiltered rows
 		$iTotalDisplayRecords = WT_DB::prepare("SELECT FOUND_ROWS()")->fetchColumn();
 		$iTotalRecords        = WT_DB::prepare($SELECT2)->execute($ARGS2)->fetchColumn();
 
 		$aaData = array();
 		foreach ($rows as $row) {
-			$media = WT_Media::getInstance($row);
+			$media = WT_Media::getInstance($row->xref, $row->gedcom_id);
 			$aaData[] = array(
-				media_file_info($media_folder, $media_path, $row['media_path']),
+				media_file_info($media_folder, $media_path, $row->media_path),
 				$media->displayImage(),
 				media_object_info($media),
 			);
@@ -166,7 +164,7 @@ case 'load_json':
 	case 'external':
 		// Filtered rows
 		$SELECT1 =
-				"SELECT SQL_CACHE SQL_CALC_FOUND_ROWS m_filename AS media_path, 'OBJE' AS type, m_id AS xref, m_file AS ged_id, m_gedcom AS gedrec, m_titl, m_filename" .
+				"SELECT SQL_CACHE SQL_CALC_FOUND_ROWS m_id AS xref, m_file AS gedcom_id, m_gedcom AS gedcom, m_filename" .
 				" FROM  `##media`" .
 				" WHERE (m_filename LIKE 'http://%' OR m_filename LIKE 'https://%')" .
 				" AND   (m_filename LIKE CONCAT('%', ?, '%') OR m_titl LIKE CONCAT('%', ?, '%'))";
@@ -183,18 +181,18 @@ case 'load_json':
 		} else {
 			$LIMIT = "";
 		}
-		$iSortingCols = safe_GET('iSortingCols');
+		$iSortingCols = WT_Filter::getInteger('iSortingCols');
 		if ($iSortingCols) {
 			$ORDER_BY = " ORDER BY ";
 			for ($i=0; $i<$iSortingCols; ++$i) {
 				// Datatables numbers columns 0, 1, 2, ...
 				// MySQL numbers columns 1, 2, 3, ...
-				switch (safe_GET('sSortDir_'.$i)) {
+				switch (WT_Filter::get('sSortDir_'.$i)) {
 				case 'asc':
-					$ORDER_BY.=(1+(int)safe_GET('iSortCol_'.$i)).' ASC ';
+					$ORDER_BY.=(1 + WT_Filter::getInteger('iSortCol_'.$i)).' ASC ';
 					break;
 				case 'desc':
-					$ORDER_BY.=(1+(int)safe_GET('iSortCol_'.$i)).' DESC ';
+					$ORDER_BY.=(1 + WT_Filter::getInteger('iSortCol_'.$i)).' DESC ';
 					break;
 				}
 				if ($i<$iSortingCols-1) {
@@ -205,7 +203,7 @@ case 'load_json':
 			$ORDER_BY="1 ASC";
 		}
 
-		$rows = WT_DB::prepare($SELECT1.$ORDER_BY.$LIMIT)->execute($ARGS1)->fetchAll(PDO::FETCH_ASSOC);
+		$rows = WT_DB::prepare($SELECT1.$ORDER_BY.$LIMIT)->execute($ARGS1)->fetchAll();
 
 		// Total filtered/unfiltered rows
 		$iTotalDisplayRecords = WT_DB::prepare("SELECT FOUND_ROWS()")->fetchColumn();
@@ -213,9 +211,9 @@ case 'load_json':
 
 		$aaData = array();
 		foreach ($rows as $row) {
-			$media = WT_Media::getInstance($row);
+			$media = WT_Media::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 			$aaData[] = array(
-			 	WT_Gedcom_Tag::getLabelValue('URL', $row['m_filename']),
+			 	WT_Gedcom_Tag::getLabelValue('URL', $row->m_filename),
 				$media->displayImage(),
 				media_object_info($media),
 			);
@@ -249,7 +247,7 @@ case 'load_json':
 
 		// Sort files - only option is column 0
 		sort($unused_files);
-		if (safe_GET('sSortDir_0')=='desc') {
+		if (WT_Filter::get('sSortDir_0')=='desc') {
 			$unused_files = array_reverse($unused_files);
 		}
 
@@ -283,13 +281,13 @@ case 'load_json':
 			if (!$exists_pending) {
 				foreach ($media_trees as $media_tree) {
 					$create_form .=
-						'<p><a onclick="window.open(\'addmedia.php?action=showmediaform&amp;ged=' . rawurlencode($media_tree) . '&amp;filename=' . rawurlencode(basename($unused_file)) . '&amp;folder=' . rawurlencode(dirname($unused_file)) . '\', \'_blank\', edit_window_specs); return false;">' .  WT_I18N::translate('Create') . '</a> — ' . htmlspecialchars($media_tree) . '<p>';
+						'<p><a onclick="window.open(\'addmedia.php?action=showmediaform&amp;ged=' . rawurlencode($media_tree) . '&amp;filename=' . rawurlencode(basename($unused_file)) . '&amp;folder=' . rawurlencode(dirname($unused_file)) . '\', \'_blank\', edit_window_specs); return false;">' .  WT_I18N::translate('Create') . '</a> — ' . WT_Filter::escapeHtml($media_tree) . '<p>';
 				}
 			}
 
-			$conf        = WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($unused_file));
+			$conf        = WT_I18N::translate('Are you sure you want to delete “%s”?', $unused_file);
 			$delete_link =
-				'<p><a onclick="if (confirm(\'' . $conf . '\')) jQuery.post(\'admin_media.php\',{delete:\'' .addslashes($media_path . $unused_file) . '\',media_folder:\'' . addslashes($media_folder) . '\'},function(){location.reload();})" href="#">' . WT_I18N::Translate('Delete') . '</a></p>';
+				'<p><a onclick="if (confirm(\'' . WT_Filter::escapeJs($conf) . '\')) jQuery.post(\'admin_media.php\',{delete:\'' .WT_Filter::escapeJs($media_path . $unused_file) . '\',media_folder:\'' . WT_Filter::escapeJs($media_folder) . '\'},function(){location.reload();})" href="#">' . WT_I18N::Translate('Delete') . '</a></p>';
 
 			$aaData[] = array(
 				media_file_info($media_folder, $media_path, $unused_file) . $delete_link,
@@ -302,7 +300,7 @@ case 'load_json':
 
 	header('Content-type: application/json');
 	echo json_encode(array( // See http://www.datatables.net/usage/server-side
-		'sEcho'                => (int)safe_GET('sEcho'),
+		'sEcho'                => WT_Filter::getInteger('sEcho'), // String, but always an integer
 		'iTotalRecords'        => $iTotalRecords,
 		'iTotalDisplayRecords' => $iTotalDisplayRecords,
 		'aaData'               => $aaData
@@ -318,7 +316,7 @@ case 'load_json':
 function all_media_folders() {
 	return WT_DB::prepare(
 		"SELECT SQL_CACHE setting_value, setting_value" .
-		" FROM `##gedcom_setting`" . 
+		" FROM `##gedcom_setting`" .
 		" WHERE setting_name='MEDIA_DIRECTORY'" .
 		" GROUP BY 1" .
 		" ORDER BY 1"
@@ -394,7 +392,7 @@ function all_media_files($media_folder, $media_path, $subfolders, $filter) {
 }
 
 function media_file_info($media_folder, $media_path, $file) {
-	$html = '<b>' . htmlspecialchars($file). '</b>';
+	$html = '<b>' . WT_Filter::escapeHtml($file). '</b>';
 
 	$full_path = WT_DATA_DIR . $media_folder . $media_path . $file;
 	if ($file && file_exists($full_path)) {
@@ -420,21 +418,20 @@ function media_file_info($media_folder, $media_path, $file) {
 
 function media_object_info(WT_Media $media) {
 	$xref   = $media->getXref();
-	$gedcom = WT_Tree::getNameFromId($media->getGedId());
+	$gedcom = WT_Tree::getNameFromId($media->getGedcomId());
 	$name   = $media->getFullName();
-	$conf   = WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($name));
 
 	$html   =
 		'<b>' . $name . '</b>' .
-		'<div><i>' . htmlspecialchars($media->getNote()) . '</i></div>' .
+		'<div><i>' . WT_Filter::escapeHtml($media->getNote()) . '</i></div>' .
 		'<br>' .
 		'<a href="' . $media->getHtmlUrl() . '">' . WT_I18N::translate('View') . '</a>';
 
 		$html .=
 			' - ' .
-			'<a onclick="window.open(\'addmedia.php?action=editmedia&pid=' . $xref . '&ged=' . $gedcom . '\', \'_blank\', edit_window_specs)" href="#">' . WT_I18N::Translate('Edit') . '</a>' .
+			'<a onclick="window.open(\'addmedia.php?action=editmedia&amp;pid=' . $xref . '&ged=' . WT_Filter::escapeJs($gedcom) . '\', \'_blank\', edit_window_specs)" href="#">' . WT_I18N::Translate('Edit') . '</a>' .
 			' - ' .
-			'<a onclick="if (confirm(\'' . $conf . '\')) jQuery.post(\'action.php\',{action:\'delete-media\',xref:\'' . $xref . '\',ged:\'' . $gedcom . '\'},function(){location.reload();})" href="#">' . WT_I18N::Translate('Delete') . '</a>' .
+			'<a onclick="return delete_media(\'' . WT_Filter::escapeJs(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($media->getFullName()))) . '\', \'' . $media->getXref() . '\', \'' . WT_Filter::escapeJs($gedcom) . '\');" href="#">' . WT_I18N::Translate('Delete') . '</a>' .
 			' - ';
 
 	if (array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
@@ -446,17 +443,17 @@ function media_object_info(WT_Media $media) {
 		$menu = new WT_Menu();
 		$menu->addLabel(WT_I18N::translate('Set link'));
 		$menu->addClass('', 'submenu');
-		$submenu = new WT_Menu(WT_I18N::translate('To Person'));
+		$submenu = new WT_Menu(WT_I18N::translate('To individual'));
 		$submenu->addClass("submenuitem".$classSuffix);
 		$submenu->addOnClick("return ilinkitem('$xref', 'person', '$gedcom')");
 		$menu->addSubMenu($submenu);
 
-		$submenu = new WT_Menu(WT_I18N::translate('To Family'));
+		$submenu = new WT_Menu(WT_I18N::translate('To family'));
 		$submenu->addClass("submenuitem".$classSuffix);
 		$submenu->addOnClick("return ilinkitem('$xref', 'family', '$gedcom')");
 		$menu->addSubMenu($submenu);
 
-		$submenu = new WT_Menu(WT_I18N::translate('To Source'));
+		$submenu = new WT_Menu(WT_I18N::translate('To source'));
 		$submenu->addClass("submenuitem".$classSuffix);
 		$submenu->addOnClick("return ilinkitem('$xref', 'source', '$gedcom')");
 		$menu->addSubMenu($submenu);
@@ -465,22 +462,19 @@ function media_object_info(WT_Media $media) {
 	$html .= '<br><br>';
 
 	$linked = array();
-	foreach ($media->fetchLinkedIndividuals() as $link) {
+	foreach ($media->linkedIndividuals('OBJE') as $link) {
 		$linked[] = '<a href="' . $link->getHtmlUrl() . '">' . $link->getFullName() . '</a>';
 	}
-	foreach ($media->fetchLinkedFamilies() as $link) {
+	foreach ($media->linkedFamilies('OBJE') as $link) {
 		$linked[] = '<a href="' . $link->getHtmlUrl() . '">' . $link->getFullName() . '</a>';
 	}
-	foreach ($media->fetchLinkedNotes() as $link) {
+	foreach ($media->linkedSources('OBJE') as $link) {
 		$linked[] = '<a href="' . $link->getHtmlUrl() . '">' . $link->getFullName() . '</a>';
 	}
-	foreach ($media->fetchLinkedSources() as $link) {
+	foreach ($media->linkedNotes('OBJE') as $link) { // Invalid GEDCOM - you cannot link a NOTE to an OBJE
 		$linked[] = '<a href="' . $link->getHtmlUrl() . '">' . $link->getFullName() . '</a>';
 	}
-	foreach ($media->fetchLinkedRepositories() as $link) {
-		$linked[] = '<a href="' . $link->getHtmlUrl() . '">' . $link->getFullName() . '</a>';
-	}
-	foreach ($media->fetchLinkedMedia() as $link) {
+	foreach ($media->linkedRepositories('OBJE') as $link) { // Invalid GEDCOM - you cannot link a REPO to an OBJE
 		$linked[] = '<a href="' . $link->getHtmlUrl() . '">' . $link->getFullName() . '</a>';
 	}
 	if ($linked) {
@@ -563,13 +557,13 @@ $controller
 						if (count($media_folders)>1) {
 							echo '&nbsp;', select_edit_control('media_folder', $media_folders, null, $media_folder, $extra);
 						} else {
-							echo $media_folder, '<input type="hidden" name="media_folder" value="', htmlspecialchars($media_folder), '">';
+							echo $media_folder, '<input type="hidden" name="media_folder" value="', WT_Filter::escapeHtml($media_folder), '">';
 						}
 						// Don’t show a list of subfolders if it just contains one subfolder
 						if (count($media_paths)>1) {
 							echo '&nbsp;', select_edit_control('media_path', $media_paths, null, $media_path, $extra);
 						} else {
-							echo $media_path, '<input type="hidden" name="media_path" value="', htmlspecialchars($media_path), '">';
+							echo $media_path, '<input type="hidden" name="media_path" value="', WT_Filter::escapeHtml($media_path), '">';
 						}
 						echo
 							'</span>',
@@ -583,8 +577,8 @@ $controller
 						break;
 					case 'external':
 						echo WT_I18N::translate('External media files have a URL instead of a filename.');
-						echo '<input type="hidden" name="media_folder" value="', htmlspecialchars($media_folder), '">';
-						echo '<input type="hidden" name="media_path" value="',   htmlspecialchars($media_path),   '">';
+						echo '<input type="hidden" name="media_folder" value="', WT_Filter::escapeHtml($media_folder), '">';
+						echo '<input type="hidden" name="media_path" value="',   WT_Filter::escapeHtml($media_path),   '">';
 						break;
 					}
 				?>

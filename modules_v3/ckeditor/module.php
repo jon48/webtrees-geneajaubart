@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -29,6 +27,8 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class ckeditor_WT_Module extends WT_Module {
+	const VERSION = 'ckeditor-4.2.2-custom';
+
 	// Extend WT_Module
 	public function getTitle() {
 		return /* I18N: Name of a module.  CKEditor is a trademark.  Do not translate it?  http://ckeditor.com */ WT_I18N::translate('CKEditor™');
@@ -42,29 +42,16 @@ class ckeditor_WT_Module extends WT_Module {
 	// Convert <textarea class="html-edit"> fields to CKEditor fields
 	public static function enableEditor($controller) {
 		$controller
-			->addExternalJavascript(WT_MODULES_DIR.'ckeditor/ckeditor.js')
-			->addExternalJavascript(WT_MODULES_DIR.'ckeditor/adapters/jquery.js')
+			->addExternalJavascript(WT_MODULES_DIR . 'ckeditor/' . self::VERSION . '/ckeditor.js')
+			->addExternalJavascript(WT_MODULES_DIR . 'ckeditor/' . self::VERSION . '/adapters/jquery.js')
 			// Need to specify the path before we load the libary
-			->addInlineJavascript('var CKEDITOR_BASEPATH="'.WT_MODULES_DIR.'ckeditor/";', WT_Controller_Base::JS_PRIORITY_HIGH)
+			->addInlineJavascript(
+				'var CKEDITOR_BASEPATH="' . WT_MODULES_DIR . 'ckeditor/' . self::VERSION . '/";',
+				WT_Controller_Base::JS_PRIORITY_HIGH
+			)
 			// Activate the editor
 			->addInlineJavascript('jQuery(".html-edit").ckeditor(function(){}, {
-				toolbar:[
-					["Source"],
-					["Cut","Copy","Paste","PasteText","PasteFromWord"],
-					["Undo","Redo","-","Find","Replace","-","SelectAll"],
-					["Styles"],
-					["Link","Unlink","Anchor"],
-					"/",
-					["Bold","Italic","Underline","-","Subscript","Superscript","RemoveFormat"],
-					["NumberedList","BulletedList","-","Outdent","Indent","Blockquote","CreateDiv"],
-					["JustifyLeft","JustifyCenter","JustifyRight","JustifyBlock"],				
-					["Image","Table","HorizontalRule","SpecialChar"],
-					"/",
-					["Format","Font","FontSize"],
-					["TextColor","BGColor"],
-					["Maximize", "ShowBlocks"]
-				],
-				skin : "v2"
+				language: "' . str_replace('_','-',strtolower(WT_LOCALE)) . '"
 			});');
 	}
 }

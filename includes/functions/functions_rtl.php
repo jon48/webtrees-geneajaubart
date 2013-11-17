@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: functions_rtl.php 14737 2013-01-30 20:11:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -1039,21 +1037,6 @@ function finishCurrentSpan(&$result, $theEnd=false) {
 	$result .= $trailingBreaks; // Get rid of any waiting <br>
 
 	return;
-}
-
-/**
- * convert HTML entities to to their original characters
- *
- * original found at http://www.php.net/manual/en/function.get-html-translation-table.php
- * @see http://www.php.net/manual/en/function.get-html-translation-table.php
- * @param string $string the string to remove the entities from
- * @return string the string with entities converted
- */
-function unhtmlentities($string)  {
-	$trans_tbl=array_flip(get_html_translation_table (HTML_ENTITIES));
-	$trans_tbl['&lrm;']=WT_UTF8_LRM;
-	$trans_tbl['&rlm;']=WT_UTF8_RLM;
-	return preg_replace('/&#(\d+);/e', "chr(\\1)", strtr($string, $trans_tbl));
 }
 
 /*

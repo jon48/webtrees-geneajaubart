@@ -2,10 +2,10 @@
 // Include for GEDFact Assistant - Census.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: addnoteaction_assisted.php 14418 2012-10-13 21:54:39Z greg $
 
 // This file is required by the addnoteaction_assisted function in edit_interface.php
 
@@ -90,22 +88,15 @@ if (!empty($NOTE)) {
 }
 
 if ($pid_array != '') {
-	$xref = append_gedrec($newgedrec, WT_GED_ID);
+	$record = WT_GedcomRecord::createRecord($newgedrec, WT_GED_ID);
 } else {
-	$xref='';
+	$record='';
 	echo '<div class="indent">No individuals entered, close and try again </div>';
 }
 
-if ($xref) {
+if ($record) {
 	$controller->addInlineJavascript('
-	if (parent.opener.document.getElementById("pids_array_edit") == null || parent.opener.document.getElementById("pids_array_edit") == "undefined") {
-	} else {
-		parent.opener.document.editform.pids_array_edit.value="' . $pid_array .'";
-	}
-	if (parent.opener.document.getElementById("pids_array_add") == null || parent.opener.document.getElementById("pids_array_add") == "undefined") {
-	} else {
-		parent.opener.document.addform.pids_array_add.value="' . $pid_array . '";
-	}
-	openerpasteid("' . $xref . '")
+	window.opener.set_pid_array("' . $pid_array . '");
+	openerpasteid("' . $record->getXref() . '");
 	');
 }

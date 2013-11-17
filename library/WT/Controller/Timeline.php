@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Timeline.php 14786 2013-02-06 22:28:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -49,29 +47,26 @@ class WT_Controller_Timeline extends WT_Controller_Page {
 		parent::__construct();
 
 		$this->setPageTitle(WT_I18N::translate('Timeline'));
-	
+
 		$this->baseyear = date("Y");
 		//-- new pid
-		$newpid=safe_GET_xref('newpid');
+		$newpid = WT_Filter::get('newpid', WT_REGEX_XREF);
 
 		//-- pids array
-		$this->pids=safe_GET_xref('pids');
-		if (!is_array($this->pids)) {
-			$this->pids = array();
-		}
+		$this->pids = WT_Filter::getArray('pids', WT_REGEX_XREF);
 		//-- make sure that arrays are indexed by numbers
 		$this->pids = array_values($this->pids);
 		if (!empty($newpid) && !in_array($newpid, $this->pids)) {
 			$this->pids[] = $newpid;
 		}
 		if (count($this->pids)==0) $this->pids[] = $this->getSignificantIndividual()->getXref();
-		$remove = safe_GET_xref('remove');
+		$remove = WT_Filter::get('remove', WT_REGEX_XREF);
 		//-- cleanup user input
 		$newpids = array();
 		foreach ($this->pids as $value) {
 			if ($value!=$remove) {
 				$newpids[] = $value;
-				$person = WT_Person::getInstance($value);
+				$person = WT_Individual::getInstance($value);
 				if ($person) {
 					$this->people[] = $person;
 				}
@@ -81,7 +76,7 @@ class WT_Controller_Timeline extends WT_Controller_Page {
 		$this->pidlinks = "";
 		/* @var $indi Person */
 		foreach ($this->people as $p=>$indi) {
-			if (!is_null($indi) && $indi->canDisplayDetails()) {
+			if (!is_null($indi) && $indi->canShow()) {
 				//-- setup string of valid pids for links
 				$this->pidlinks .= "pids%5B%5D=".$indi->getXref()."&amp;";
 				$bdate = $indi->getBirthDate();
@@ -95,8 +90,14 @@ class WT_Controller_Timeline extends WT_Controller_Page {
 					}
 				}
 				// find all the fact information
-				$indi->add_family_facts(false);
-				foreach ($indi->getIndiFacts() as $event) {
+				$facts = $indi->getFacts();
+				foreach ($indi->getSpouseFamilies() as $family) {
+					foreach ($family->getFacts() as $fact) {
+						$fact->spouse = $family->getSpouse($indi);
+						$facts[] = $fact;
+					}
+				}
+				foreach ($facts as $event) {
 					//-- get the fact type
 					$fact = $event->getTag();
 					if (!in_array($fact, $this->nonfacts)) {
@@ -119,7 +120,7 @@ class WT_Controller_Timeline extends WT_Controller_Page {
 				}
 			}
 		}
-		$scale=safe_GET_integer('scale', 0, 200, 0);
+		$scale = WT_Filter::getInteger('scale', 0, 200);
 		if ($scale==0) {
 			$this->scale = round(($this->topyear-$this->baseyear)/20 * count($this->indifacts)/4);
 			if ($this->scale<6) $this->scale = 6;
@@ -137,8 +138,8 @@ class WT_Controller_Timeline extends WT_Controller_Page {
 		$printed = false;
 		for ($i=0; $i<count($this->people); $i++) {
 			if (!is_null($this->people[$i])) {
-				if (!$this->people[$i]->canDisplayDetails()) {
-					if ($this->people[$i]->canDisplayName()) {
+				if (!$this->people[$i]->canShow()) {
+					if ($this->people[$i]->canShowName()) {
 						echo "&nbsp;<a href=\"".$this->people[$i]->getHtmlUrl()."\">".$this->people[$i]->getFullName()."</a>";
 						print_privacy_error();
 						echo "<br>";
@@ -153,15 +154,15 @@ class WT_Controller_Timeline extends WT_Controller_Page {
 		}
 	}
 
-	function print_time_fact(WT_Event $event) {
+	function print_time_fact(WT_Fact $event) {
 		global $basexoffset, $baseyoffset, $factcount, $TEXT_DIRECTION, $WT_IMAGES, $SHOW_PEDIGREE_PLACES, $placements;
 
 		/* @var $event Event */
-		$factrec = $event->getGedComRecord();
+		$factrec = $event->getGedcom();
 		$fact = $event->getTag();
-		$desc = $event->getDetail();
+		$desc = $event->getValue();
 		if ($fact=="EVEN" || $fact=="FACT") {
-			$fact = $event->getType();
+			$fact = $event->getAttribute('TYPE');
 			}
 		//-- check if this is a family fact
 		$gdate=$event->getDate();
@@ -201,11 +202,11 @@ class WT_Controller_Timeline extends WT_Controller_Page {
 		echo ": 3px;\">";
 		$col = $event->temp % 6;
 		echo "</td><td valign=\"top\" class=\"person".$col."\">";
-		if (count($this->pids) > 6) echo $event->getParentObject()->getFullName()." - ";
-		$record=$event->getParentObject();
+		if (count($this->pids) > 6) echo $event->getParent()->getFullName()." - ";
+		$record=$event->getParent();
 		echo $event->getLabel();
 		echo " -- ";
-		if ($record instanceof WT_Person) {
+		if ($record instanceof WT_Individual) {
 			echo format_fact_date($event, $record, false, false);
 		} elseif ($record instanceof WT_Family) {
 			echo $gdate->Display(false);
@@ -220,29 +221,23 @@ class WT_Controller_Timeline extends WT_Controller_Page {
 				$agew=null;
 			}
 			if ($ageh && $agew) {
-				echo '<span class="age"> ', WT_I18N::translate('Husband\'s age'), ' ', $ageh, ' ', WT_I18N::translate('Wife\'s age'), ' ', $agew, '</span>';
+				echo '<span class="age"> ', WT_I18N::translate('Husband’s age'), ' ', $ageh, ' ', WT_I18N::translate('Wife’s age'), ' ', $agew, '</span>';
 			} elseif ($ageh) {
 				echo '<span class="age"> ', WT_I18N::translate('Age'), ' ', $ageh, '</span>';
 			} elseif ($agew) {
 				echo '<span class="age"> ', WT_I18N::translate('Age'), ' ', $ageh, '</span>';
 			}
 		}
-		echo " ".htmlspecialchars($desc);
-		if ($SHOW_PEDIGREE_PLACES>0) {
-			$place = $event->getPlace();
-			if ($place!=null) {
-				if ($desc!=null) echo " - ";
-				$plevels = explode(',', $place);
-				for ($plevel=0; $plevel<$SHOW_PEDIGREE_PLACES; $plevel++) {
-					if (!empty($plevels[$plevel])) {
-						if ($plevel>0) echo ", ";
-						echo htmlspecialchars($plevels[$plevel]);
-					}
-				}
-			}
+		echo ' ' . WT_Filter::escapeHtml($desc);
+		if (!$event->getPlace()->isEmpty()) {
+			echo ' — ' . $event->getPlace()->getShortName();
 		}
 		//-- print spouse name for marriage events
-		$spouse = $event->getSpouse();
+		if (isset($event->spouse)) {
+			$spouse = $event->spouse;
+		} else {
+			$spouse = null;
+		}
 		if ($spouse) {
 			for ($p=0; $p<count($this->pids); $p++) {
 				if ($this->pids[$p]==$spouse->getXref()) break;
@@ -252,7 +247,7 @@ class WT_Controller_Timeline extends WT_Controller_Page {
 			if ($spouse->getXref()!=$this->pids[$p]) {
 				echo ' <a href="', $spouse->getHtmlUrl(), '">', $spouse->getFullName(), '</a>';
 			} else {
-				echo ' <a href="', $event->getParentObject()->getHtmlUrl(), '">', $event->getParentObject()->getFullName(), '</a>';
+				echo ' <a href="', $event->getParent()->getHtmlUrl(), '">', $event->getParent()->getFullName(), '</a>';
 			}
 		}
 		echo "</td></tr></table>";
@@ -284,7 +279,7 @@ class WT_Controller_Timeline extends WT_Controller_Page {
 
 	public function getSignificantIndividual() {
 		if ($this->pids) {
-			return WT_Person::getInstance($this->pids[0]);
+			return WT_Individual::getInstance($this->pids[0]);
 		} else {
 			return parent::getSignificantIndividual();
 		}

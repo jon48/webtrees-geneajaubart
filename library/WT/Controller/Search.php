@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Search.php 15001 2013-05-13 22:17:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -81,10 +79,13 @@ class WT_Controller_Search extends WT_Controller_Page {
 	function __construct() {
 		parent::__construct();
 
-		// action comes from $_GET (menus) or $_POST (form submission)
-		$this->action=safe_REQUEST($_REQUEST, 'action', array('advanced', 'general', 'soundex', 'replace'), 'general');
+		// $action comes from $_GET (menus) or $_POST (form submission)
+		$this->action = WT_Filter::post('action', 'advanced|general|soundex|replace');
+		if (!$this->action) {
+			$this->action = WT_Filter::get('action', 'advanced|general|soundex|replace', 'general');
+		}
 
-		$topsearch=safe_POST_bool('topsearch');
+		$topsearch = WT_Filter::postBool('topsearch');
 
 		if ($topsearch) {
 			$this->isPostBack = true;
@@ -94,25 +95,15 @@ class WT_Controller_Search extends WT_Controller_Page {
 			$this->srnote = 'yes';
 		}
 
-		// Get the query and remove slashes
-		if (isset ($_REQUEST["query"])) {
-			// Reset the "Search" text from the page header
-			if (strlen($_REQUEST["query"])<2) {
-				$this->query="";
-				$this->myquery="";
-			} else {
-				$this->query = $_REQUEST["query"];
-				$this->myquery = htmlspecialchars($this->query);
-			}
-		}
-		if (isset ($_REQUEST["replace"])) {
-			$this->replace = $_REQUEST["replace"];
+		// Get the query
+		$this->query   = WT_Filter::post('query', '.{2,}');
+		$this->myquery = WT_Filter::escapeHtml($this->query);
 
-			if (isset($_REQUEST["replaceNames"])) $this->replaceNames = true;
-			if (isset($_REQUEST["replacePlaces"])) $this->replacePlaces = true;
-			if (isset($_REQUEST["replacePlacesWord"])) $this->replacePlacesWord = true;
-			if (isset($_REQUEST["replaceAll"])) $this->replaceAll = true;
-		}
+		$this->replace           = WT_Filter::post('replace');
+		$this->replaceNames      = WT_Filter::postBool('replaceNames');
+		$this->replacePlaces     = WT_Filter::postBool('replacePlaces');
+		$this->replacePlacesWord = WT_Filter::postBool('replacePlacesWord');
+		$this->replaceAll        = WT_Filter::postBool('replaceAll');
 
 		// TODO: fetch each variable independently, using appropriate validation
 		// Aquire all the variables values from the $_REQUEST
@@ -139,29 +130,14 @@ class WT_Controller_Search extends WT_Controller_Page {
 		}
 
 		// vars use for soundex search
-		if (!empty ($_REQUEST["firstname"])) {
-			$this->firstname = $_REQUEST["firstname"];
-		} else {
-			$this->firstname="";
-		}
-		if (!empty ($_REQUEST["lastname"])) {
-			$this->lastname = $_REQUEST["lastname"];
-		} else {
-			$this->lastname="";
-		}
-		if (!empty ($_REQUEST["place2"])) {
-			$this->place = $_REQUEST["place2"];
-		} else {
-			$this->place="";
-		}
-		if (!empty ($_REQUEST["year"])) {
-			$this->year = $_REQUEST["year"];
-		} else {
-			$this->year="";
-		}
+		$this->firstname = WT_Filter::post('firstname');
+		$this->lastname  = WT_Filter::post('lastname');
+		$this->place2    = WT_Filter::post('place2');
+		$this->year      = WT_Filter::post('year');
+
 		// Set the search result titles for soundex searches
 		if ($this->firstname || $this->lastname || $this->place) {
-			$this->myquery=htmlspecialchars(implode(' ', array($this->firstname, $this->lastname, $this->place)));
+			$this->myquery = WT_Filter::escapeHtml(implode(' ', array($this->firstname, $this->lastname, $this->place)));
 		};
 
 		if (!empty ($_REQUEST["name"])) {
@@ -285,7 +261,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 		// Then see if an ID is typed in. If so, we might want to jump there.
 		if (isset ($this->query)) {
 			$record=WT_GedcomRecord::getInstance($this->query);
-			if ($record && $record->canDisplayDetails()) {
+			if ($record && $record->canShow()) {
 				header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$record->getRawUrl());
 				exit;
 			}
@@ -357,7 +333,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 			// If ID cannot be displayed, continue to the search page.
 			if (count($this->myindilist)==1 && !$this->myfamlist && !$this->mysourcelist && !$this->mynotelist) {
 				$indi=$this->myindilist[0];
-				if ($indi->canDisplayName()) {
+				if ($indi->canShowName()) {
 					Zend_Session::writeClose();
 					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$indi->getRawUrl());
 					exit;
@@ -365,7 +341,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 			}
 			if (!$this->myindilist && count($this->myfamlist)==1 && !$this->mysourcelist && !$this->mynotelist) {
 				$fam=$this->myfamlist[0];
-				if ($fam->canDisplayName()) {
+				if ($fam->canShowName()) {
 					Zend_Session::writeClose();
 					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$fam->getRawUrl());
 					exit;
@@ -373,7 +349,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 			}
 			if (!$this->myindilist && !$this->myfamlist && count($this->mysourcelist)==1 && !$this->mynotelist) {
 				$sour=$this->mysourcelist[0];
-				if ($sour->canDisplayName()) {
+				if ($sour->canShowName()) {
 					Zend_Session::writeClose();
 					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$sour->getRawUrl());
 					exit;
@@ -381,7 +357,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 			}
 			if (!$this->myindilist && !$this->myfamlist && !$this->mysourcelist && count($this->mynotelist)==1) {
 				$note=$this->mynotelist[0];
-				if ($note->canDisplayName()) {
+				if ($note->canShowName()) {
 					Zend_Session::writeClose();
 					header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.$note->getRawUrl());
 					exit;
@@ -424,10 +400,9 @@ class WT_Controller_Search extends WT_Controller_Page {
 		$adv_name_tags = preg_split("/[\s,;: ]+/", $ADVANCED_NAME_FACTS);
 		$name_tags = array_unique(array_merge($STANDARD_NAME_FACTS, $adv_name_tags));
 		$name_tags[] = "_MARNM";
-		foreach ($this->myindilist as $id=>$individual) {
-			$indirec=find_gedcom_record($individual->getXref(), WT_GED_ID, true);
-			$oldRecord = $indirec;
-			$newRecord = $indirec;
+		foreach ($this->myindilist as $id=>$record) {
+			$oldRecord = $record->getGedcom();
+			$newRecord = $oldRecord;
 			if ($this->replaceAll) {
 				$newRecord = preg_replace("~".$oldquery."~i", $this->replace, $newRecord);
 			} else {
@@ -443,16 +418,15 @@ class WT_Controller_Search extends WT_Controller_Page {
 			}
 			//-- if the record changed replace the record otherwise remove it from the search results
 			if ($newRecord != $oldRecord) {
-				replace_gedrec($individual->getXref(), WT_GED_ID, $newRecord);
+				$record->updateRecord($newRecord, true);
 			} else {
 				unset($this->myindilist[$id]);
 			}
 		}
 
-		foreach ($this->myfamlist as $id=>$family) {
-			$indirec=find_gedcom_record($family->getXref(), WT_GED_ID, true);
-			$oldRecord = $indirec;
-			$newRecord = $indirec;
+		foreach ($this->myfamlist as $id=>$record) {
+			$oldRecord = $record->getGedcom();
+			$newRecord = $oldRecord;
 
 			if ($this->replaceAll) {
 				$newRecord = preg_replace("~".$oldquery."~i", $this->replace, $newRecord);
@@ -465,16 +439,15 @@ class WT_Controller_Search extends WT_Controller_Page {
 			}
 			//-- if the record changed replace the record otherwise remove it from the search results
 			if ($newRecord != $oldRecord) {
-				replace_gedrec($family->getXref(), WT_GED_ID, $newRecord);
+				$record->updateRecord($newRecord, true);
 			} else {
 				unset($this->myfamlist[$id]);
 			}
 		}
 
-		foreach ($this->mysourcelist as $id=>$source) {
-			$indirec=find_gedcom_record($source->getXref(), WT_GED_ID, true);
-			$oldRecord = $indirec;
-			$newRecord = $indirec;
+		foreach ($this->mysourcelist as $id=>$record) {
+			$oldRecord = $record->getGedcom();
+			$newRecord = $oldRecord;
 
 			if ($this->replaceAll) {
 				$newRecord = preg_replace("~".$oldquery."~i", $this->replace, $newRecord);
@@ -490,23 +463,22 @@ class WT_Controller_Search extends WT_Controller_Page {
 			}
 			//-- if the record changed replace the record otherwise remove it from the search results
 			if ($newRecord != $oldRecord) {
-				replace_gedrec($source->getXref(), WT_GED_ID, $newRecord);
+				$record->updateRecord($newRecord, true);
 			} else {
 				unset($this->mysourcelist[$id]);
 			}
 		}
 
-		foreach ($this->mynotelist as $id=>$note) {
-			$indirec=find_gedcom_record($note->getXref(), WT_GED_ID, true);
-			$oldRecord = $indirec;
-			$newRecord = $indirec;
+		foreach ($this->mynotelist as $id=>$record) {
+			$oldRecord = $record->getGedcom();
+			$newRecord = $oldRecord;
 
 			if ($this->replaceAll) {
 				$newRecord = preg_replace("~".$oldquery."~i", $this->replace, $newRecord);
 			}
 			//-- if the record changed replace the record otherwise remove it from the search results
 			if ($newRecord != $oldRecord) {
-				replace_gedrec($note->getXref(), WT_GED_ID, $newRecord);
+				$record->updateRecord($newRecord, true);
 			} else {
 				unset($this->mynotelist[$id]);
 			}
@@ -555,12 +527,18 @@ class WT_Controller_Search extends WT_Controller_Page {
 		// Now we have the final list of indi's to be printed.
 		// We may add the assos at this point.
 
-		if ($this->showasso == "on") {
+		if ($this->showasso == 'on') {
 			foreach ($this->myindilist as $indi) {
-				foreach (fetch_linked_indi($indi->getXref(), 'ASSO', $indi->getGedId()) as $asso) {
+				foreach ($indi->linkedIndividuals('ASSO') as $asso) {
 					$this->myindilist[]=$asso;
 				}
-				foreach (fetch_linked_fam($indi->getXref(), 'ASSO', $indi->getGedId()) as $asso) {
+				foreach ($indi->linkedIndividuals('_ASSO') as $asso) {
+					$this->myindilist[]=$asso;
+				}
+				foreach ($indi->linkedFamilies('ASSO') as $asso) {
+					$this->myfamlist[]=$asso;
+				}
+				foreach ($indi->linkedFamilies('_ASSO') as $asso) {
 					$this->myfamlist[]=$asso;
 				}
 			}
@@ -603,7 +581,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 				foreach ($this->sgeds as $ged_id=>$gedcom) {
 					$datalist = array();
 					foreach ($this->myindilist as $individual) {
-						if ($individual->getGedId()==$ged_id) {
+						if ($individual->getGedcomId()==$ged_id) {
 							$datalist[]=$individual;
 						}
 					}
@@ -627,7 +605,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 				foreach ($this->sgeds as $ged_id=>$gedcom) {
 					$datalist = array();
 					foreach ($this->myfamlist as $family) {
-						if ($family->getGedId()==$ged_id) {
+						if ($family->getGedcomId()==$ged_id) {
 							$datalist[]=$family;
 						}
 					}
@@ -651,7 +629,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 				foreach ($this->sgeds as $ged_id=>$gedcom) {
 					$datalist = array();
 					foreach ($this->mysourcelist as $source) {
-						if ($source->getGedId()==$ged_id) {
+						if ($source->getGedcomId()==$ged_id) {
 							$datalist[]=$source;
 						}
 					}
@@ -675,7 +653,7 @@ class WT_Controller_Search extends WT_Controller_Page {
 				foreach ($this->sgeds as $ged_id=>$gedcom) {
 					$datalist = array();
 					foreach ($this->mynotelist as $note) {
-						if ($note->getGedId()==$ged_id) {
+						if ($note->getGedcomId()==$ged_id) {
 							$datalist[]=$note;
 						}
 					}

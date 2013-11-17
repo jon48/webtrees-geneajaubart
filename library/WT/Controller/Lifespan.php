@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Lifespan.php 14786 2013-02-06 22:28:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -85,19 +83,19 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 		$this->endDate = $this->currentYear;
 
 		// Request parameters
-		$newpid=safe_GET_xref('newpid');
-		$remove=safe_GET_xref('remove');
-		$pids  =safe_GET_xref('pids');
-		$clear =safe_GET_bool('clear');
-		$addfam=safe_GET_bool('addFamily');
-		$place =safe_GET('place');
-		$beginYear=safe_GET_integer('beginYear', 0, date('Y')+100, 0);
-		$endYear  =safe_GET_integer('endYear',   0, date('Y')+100, 0);
+		$newpid    = WT_Filter::get('newpid', WT_REGEX_XREF);
+		$remove    = WT_Filter::get('remove', WT_REGEX_XREF);
+		$pids      = WT_Filter::getArray('pids', WT_REGEX_XREF);
+		$clear     = WT_Filter::getBool('clear');
+		$addfam    = WT_Filter::getBool('addFamily');
+		$place     = WT_Filter::get('place');
+		$beginYear = WT_Filter::getInteger('beginYear', 0, date('Y')+100, 0);
+		$endYear   = WT_Filter::getInteger('endYear',   0, date('Y')+100, 0);
 
 		if ($clear) {
 			// Empty list
 			$this->pids=array();
-		} elseif (is_array($pids)) {
+		} elseif ($pids) {
 			// List of specified records
 			$this->pids=$pids;
 		} elseif ($place) {
@@ -122,7 +120,7 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 					}
 				}
 			} elseif ($newpid) {
-				$person=WT_Person::getInstance($newpid);
+				$person=WT_Individual::getInstance($newpid);
 				$this->addFamily($person, $addfam);
 			} elseif (!$this->pids) {
 				$this->addFamily($this->getSignificantIndividual(), false);
@@ -138,13 +136,13 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 			foreach ($this->pids as $key => $value) {
 				if ($value != $remove) {
 					$this->pids[$key] = $value;
-					$person = WT_Person::getInstance($value);
+					$person = WT_Individual::getInstance($value);
 					// list of linked records includes families as well as individuals.
-					if ($person && $person->getType()=='INDI') {
+					if ($person) {
 						$bdate = $person->getEstimatedBirthDate();
 						$ddate = $person->getEstimatedDeathDate();
 						//--Checks to see if the details of that person can be viewed
-						if ($bdate->isOK() && $person->canDisplayDetails()) {
+						if ($bdate->isOK() && $person->canShow()) {
 							$this->people[] = $person;
 						}
 					}
@@ -169,7 +167,7 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 					$bdate = $person->getEstimatedBirthDate();
 					$ddate = $person->getEstimatedDeathDate();
 					//--Checks to see if the details of that person can be viewed
-					if ($bdate->isOK() && $person->canDisplayDetails()) {
+					if ($bdate->isOK() && $person->canShow()) {
 						$this->people[] = $person;
 					}
 				}
@@ -177,7 +175,7 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 			$WT_SESSION->timeline_pids=null;
 		}
 
-		//--Sort the arrar in order of being year
+		// Sort the array in order of birth year
 		uasort($this->people, "compare_people");
 		//If there is people in the array posted back this if occurs
 		if (isset ($this->people[0])) {
@@ -211,12 +209,12 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 			$this->pids[]=$person->getXref();
 			if ($add_family) {
 				foreach ($person->getSpouseFamilies() as $family) {
-					$spouse=$family->getSpouse($person);
+					$spouse = $family->getSpouse($person);
 					if ($spouse) {
 						$this->pids[]=$spouse->getXref();
-					}
-					foreach ($family->getChildren() as $child) {
-						$this->pids[]=$child->getXref();
+						foreach ($family->getChildren() as $child) {
+							$this->pids[]=$child->getXref();
+						}
 					}
 				}
 				foreach ($person->getChildFamilies() as $family) {
@@ -224,7 +222,7 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 						$this->pids[]=$parent->getXref();
 					}
 					foreach ($family->getChildren() as $sibling) {
-						if (!$person->equals($sibling)) {
+						if ($person !== $sibling) {
 							$this->pids[]=$sibling->getXref();
 						}
 					}
@@ -398,11 +396,15 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 				// event1 distance will be event - birthyear   that will be the distance. then each distance will chain off that
 
 				//$event[][]  = {"Cell 1 will hold events"}{"cell2 will hold time between that and the next value"};
-				//$value->add_historical_facts();
-				$value->add_family_facts(false);
+				$facts = $value->getFacts();
+				foreach ($value->getSpouseFamilies() as $family) {
+					foreach ($family->getFacts() as $fact) {
+						$facts[] = $fact;
+					}
+				}
 				$unparsedEvents = array();
 
-				foreach ($value->getIndiFacts() as $fact) {
+				foreach ($facts as $fact) {
 					if (!in_array($fact->getTag(), $this->nonfacts)) {
 						$unparsedEvents[]=$fact;
 					}
@@ -424,14 +426,13 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 						$evntwdth = $eventwidth."%";
 						//-- if the fact is a generic EVENt then get the qualifying TYPE
 						if ($fact=="EVEN") {
-							$fact = $val->getType();
+							$fact = $val->getAttribute('TYPE');
 						}
-						$place = $val->getPlace();
 						$trans = WT_Gedcom_Tag::getLabel($fact);
 						if (isset($eventinformation[$evntwdth])) {
-							$eventinformation[$evntwdth] .= "<br>".$trans."<br>".strip_tags($date->Display(false, '', NULL, false))." ".$place;
+							$eventinformation[$evntwdth] .= '<br>' . $trans . '<br>' . strip_tags($date->Display(false, '', NULL, false)) . ' ' . $val->getPlace()->getFullName();
 						} else {
-							$eventinformation[$evntwdth]= $fact."-fact, ".$trans."<br>".strip_tags($date->Display(false, '', NULL, false))." ".$place;
+							$eventinformation[$evntwdth] = $fact . '-fact, ' . $trans . '<br>' . strip_tags($date->Display(false, '', NULL, false)) . ' ' . $val->getPlace()->getFullName();
 						}
 					}
 				}
@@ -445,18 +446,18 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 						$text = explode("-fact, ", $val);
 						$fact = $text[0];
 						$val = $text[1];
-						echo '</b><span>', WT_Gedcom_Tag::getAbbreviation($fact), '</span></a></div>';
+						echo '</b><span>', self::getAbbreviation($fact), '</span></a></div>';
 					}
 					$indiName = $value->getFullName();
 					echo '<table><tr><td width="15"><a class="showit" href="#"><b>';
-					echo WT_Gedcom_Tag::getAbbreviation('BIRT');
+					echo self::getAbbreviation('BIRT');
 					echo '</b><span>', $value->getSexImage(), $indiName, '<br>', WT_Gedcom_Tag::getLabel('BIRT'), ' ', strip_tags($bdate->Display(false)), ' ', $value->getBirthPlace(), '</span></a>',
 						'<td align="left" width="100%"><a href="', $value->getHtmlUrl(), '">', $value->getSexImage(), $indiName, '  ', $lifespan, ' </a></td>' ,
 						'<td width="15">';
 					if ($value->isDead()) {
 						if ($deathReal || $value->isDead()) {
 							echo '<a class="showit" href="#"><b>';
-							echo WT_Gedcom_Tag::getAbbreviation('DEAT');
+							echo self::getAbbreviation('DEAT');
 							if (!$deathReal) echo '*';
 							echo '</b><span>'.$value->getSexImage().$indiName.'<br>'.WT_Gedcom_Tag::getLabel('DEAT').' '.strip_tags($ddate->Display(false)).' '.$value->getDeathPlace().'</span></a>';
 						}
@@ -472,11 +473,11 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 							$text = explode("-fact,", $val);
 							$fact = $text[0];
 							$val = $text[1];
-							echo '</b><span>'.WT_Gedcom_Tag::getAbbreviation($fact).'</span></a></div>';
+							echo '</b><span>'.self::getAbbreviation($fact).'</span></a></div>';
 						}
 						$indiName = $value->getFullName();
 						echo '<table dir="ltr"><tr><td width="15"><a class="showit" href="#"><b>';
-						echo WT_Gedcom_Tag::getAbbreviation('BIRT');
+						echo self::getAbbreviation('BIRT');
 						if (!$birthReal) echo '*';
 						echo '</b><span>'.$value->getSexImage().$indiName.'<br>'.WT_Gedcom_Tag::getLabel('BIRT').' '.strip_tags($bdate->Display(false)).' '.$value->getBirthPlace().'</span></a></td>'.
 						'<td align="left" width="100%"><a href="'.$value->getHtmlUrl().'">'.$value->getSexImage().$indiName.'</a></td>'.
@@ -484,7 +485,7 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 						if ($value->isDead()) {
 							if ($deathReal || $value->isDead()) {
 								echo '<a class="showit" href="#"><b>';
-								echo WT_Gedcom_Tag::getAbbreviation('DEAT');
+								echo self::getAbbreviation('DEAT');
 								if (!$deathReal) echo "*";
 								echo '</b><span>'.$value->getSexImage().$indiName.'<br>'.WT_Gedcom_Tag::getLabel('DEAT').' '.strip_tags($ddate->Display(false)).' '.$value->getDeathPlace().'</span></a>';
 							}
@@ -495,7 +496,7 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 						echo '<div style="text-align: left; position: absolute;top:', $Y, 'px; left:', $startPos, 'px;width:', $width, 'px; height:', $height, 'px; background-color:', $this->color, '; border: solid blue 1px; z-index:', $Z, '">';
 						$indiName = $value->getFullName();
 						echo '<a class="showit" href="'.$value->getHtmlUrl().'"><b>';
-						echo WT_Gedcom_Tag::getAbbreviation('BIRT');
+						echo self::getAbbreviation('BIRT');
 						echo '</b><span>'.$value->getSexImage().$indiName.'<br>'.WT_Gedcom_Tag::getLabel('BIRT').' '.strip_tags($bdate->Display(false)).' '.$value->getBirthPlace().'<br>';
 						foreach ($eventinformation as $evtwidth=>$val) {
 							$text = explode('-fact,', $val);
@@ -532,19 +533,28 @@ class WT_Controller_Lifespan extends WT_Controller_Page {
 		$endjd  =WT_Date_Gregorian::YMDtoJD($endyear+1, 1, 1)-1;
 
 		$sql=
-			"SELECT DISTINCT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec".
+			"SELECT DISTINCT i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom".
 			" FROM `##individuals`".
 			" JOIN `##dates` ON i_id=d_gid AND i_file=d_file".
 			" WHERE i_file=? AND d_julianday1 BETWEEN ? AND ?";
 
 		$rows=WT_DB::prepare($sql)
 			->execute(array(WT_GED_ID, $startjd, $endjd))
-			->fetchAll(PDO::FETCH_ASSOC);
+			->fetchAll();
 
 		$list=array();
 		foreach ($rows as $row) {
-			$list[]=WT_Person::getInstance($row);
+			$list[]=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 		}
 		return $list;
+	}
+
+	private static function getAbbreviation($tag) {
+		switch ($tag) {
+		case 'BIRT':  return WT_I18N::translate_c('Abbreviation for birth',            'b.');
+		case 'MARR':  return WT_I18N::translate_c('Abbreviation for marriage',         'm.');
+		case 'DEAT':  return WT_I18N::translate_c('Abbreviation for death',            'd.');
+		default:      return utf8_substr(WT_Gedcom_Tag::getLabel($tag), 0, 1); // Just use the first letter of the full fact
+		}
 	}
 }

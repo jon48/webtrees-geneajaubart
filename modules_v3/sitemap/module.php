@@ -4,9 +4,6 @@
 // webtrees: Web based Family History software
 // Copyright (C) 2013 webtrees development team.
 //
-// Derived from PhpGedView
-// Copyright (C) 2010 John Finlay
-//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
@@ -20,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14786 2013-02-06 22:28:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -31,7 +26,7 @@ if (!defined('WT_WEBTREES')) {
 class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 	const RECORDS_PER_VOLUME=500;    // Keep sitemap files small, for memory, CPU and max_allowed_packet limits.
 	const CACHE_LIFE        =1209600; // Two weeks
-	
+
 	// Extend WT_Module
 	public function getTitle() {
 		return /* I18N: Name of a module - see http://en.wikipedia.org/wiki/Sitemaps */ WT_I18N::translate('Sitemaps');
@@ -50,7 +45,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 			break;
 		case 'generate':
 			Zend_Session::writeClose();
-			$this->generate(safe_GET('file'));
+			$this->generate(WT_Filter::get('file'));
 			break;
 		default:
 			header('HTTP/1.0 404 Not Found');
@@ -130,70 +125,70 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 			switch ($rec_type) {
 			case 'i':
 				$rows=WT_DB::prepare(
-					"SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec".
+					"SELECT i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom".
 					" FROM `##individuals`".
 					" WHERE i_file=?".
 					" ORDER BY i_id".
 					" LIMIT ".self::RECORDS_PER_VOLUME." OFFSET ".($volume*self::RECORDS_PER_VOLUME)
-				)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
+				)->execute(array($ged_id))->fetchAll();
 				foreach ($rows as $row) {
-					$records[]=WT_Person::getInstance($row);
+					$records[]=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 				}
 				break;
 			case 's':
 				$rows=WT_DB::prepare(
-					"SELECT 'SOUR' AS type, s_id AS xref, s_file AS ged_id, s_gedcom AS gedrec".
+					"SELECT s_id AS xref, s_file AS gedcom_id, s_gedcom AS gedcom".
 					" FROM `##sources`".
 					" WHERE s_file=?".
 					" ORDER BY s_id".
 					" LIMIT ".self::RECORDS_PER_VOLUME." OFFSET ".($volume*self::RECORDS_PER_VOLUME)
-				)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
+				)->execute(array($ged_id))->fetchAll();
 				foreach ($rows as $row) {
-					$records[]=WT_Source::getInstance($row);
+					$records[]=WT_Source::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 				}
 				break;
 			case 'r':
 				$rows=WT_DB::prepare(
-					"SELECT 'REPO' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec".
+					"SELECT o_id AS xref, o_file AS gedcom_id, o_gedcom AS gedcom".
 					" FROM `##other`".
 					" WHERE o_file=? AND o_type='REPO'".
 					" ORDER BY o_id".
 					" LIMIT ".self::RECORDS_PER_VOLUME." OFFSET ".($volume*self::RECORDS_PER_VOLUME)
-				)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
+				)->execute(array($ged_id))->fetchAll();
 				foreach ($rows as $row) {
-					$records[]=WT_Repository::getInstance($row);
+					$records[]=WT_Repository::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 				}
 				break;
 			case 'n':
 				$rows=WT_DB::prepare(
-					"SELECT 'NOTE' AS type, o_id AS xref, o_file AS ged_id, o_gedcom AS gedrec".
+					"SELECT o_id AS xref, o_file AS gedcom_id, o_gedcom AS gedcom".
 					" FROM `##other`".
 					" WHERE o_file=? AND o_type='NOTE'".
 					" ORDER BY o_id".
 					" LIMIT ".self::RECORDS_PER_VOLUME." OFFSET ".($volume*self::RECORDS_PER_VOLUME)
-				)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
+				)->execute(array($ged_id))->fetchAll();
 				foreach ($rows as $row) {
-					$records[]=WT_Note::getInstance($row);
+					$records[]=WT_Note::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 				}
 				break;
 			case 'm':
 				$rows=WT_DB::prepare(
-					"SELECT 'OBJE' AS type, m_id AS xref, m_file AS ged_id, m_gedcom AS gedrec, m_titl, m_filename".
+					"SELECT m_id AS xref, m_file AS gedcom_id, m_gedcom AS gedcom".
 					" FROM `##media`".
 					" WHERE m_file=?".
 					" ORDER BY m_id".
 					" LIMIT ".self::RECORDS_PER_VOLUME." OFFSET ".($volume*self::RECORDS_PER_VOLUME)
-				)->execute(array($ged_id))->fetchAll(PDO::FETCH_ASSOC);
+				)->execute(array($ged_id))->fetchAll();
 				foreach ($rows as $row) {
-					$records[]=WT_Media::getInstance($row);
+					$records[]=WT_Media::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 				}
 				break;
 			}
 			foreach ($records as $record) {
-				if ($record->canDisplayName()) {
+				if ($record->canShowName()) {
 					$data.='<url>';
 					$data.='<loc>'.WT_SERVER_NAME.WT_SCRIPT_PATH.$record->getHtmlUrl().'</loc>';
-					$chan=$record->getChangeEvent();
+					$chan=$record->getFirstFact('CHAN');
 					if ($chan) {
 						$date=$chan->getDate();
 						if ($date->isOK()) {
@@ -221,9 +216,9 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 			->pageHeader();
 
 		// Save the updated preferences
-		if (safe_POST('action', 'save')=='save') {
+		if (WT_Filter::post('action')=='save') {
 			foreach (WT_Tree::getAll() as $tree) {
-				set_gedcom_setting($tree->tree_id, 'include_in_sitemap', safe_POST_bool('include'.$tree->tree_id));
+				set_gedcom_setting($tree->tree_id, 'include_in_sitemap', WT_Filter::postBool('include'.$tree->tree_id));
 			}
 			// Clear cache and force files to be regenerated
 			WT_DB::prepare(
@@ -239,7 +234,7 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 			WT_I18N::translate('Sitemaps are a way for webmasters to tell search engines about the pages on a website that are available for crawling.  All major search engines support sitemaps.  For more information, see <a href="http://www.sitemaps.org/">www.sitemaps.org</a>.').
 			'</p>',
 			'<p>', WT_I18N::translate('Which family trees should be included in the sitemaps?'), '</p>',
-			'<form method="post" action="">',
+			'<form method="post" action="?">',
 			'<input type="hidden" name="action" value="save">';
 		foreach (WT_Tree::getAll() as $tree) {
 			echo '<p><input type="checkbox" name="include', $tree->tree_id, '"';
@@ -264,8 +259,8 @@ class sitemap_WT_Module extends WT_Module implements WT_Module_Config {
 				'<p>', WT_I18N::translate('To tell search engines that sitemaps are available, you can use the following links.'), '</p>',
 				'<ul>',
 				// This list comes from http://en.wikipedia.org/wiki/Sitemaps
-				'<li><a target="_new" href="http://www.bing.com/webmaster/ping.aspx?siteMap='.$site_map_url2.'">Bing</a></li>',
-				'<li><a target="_new" href="http://www.google.com/webmasters/tools/ping?sitemap='.$site_map_url2.'">Google</a></li>',
+				'<li><a target="_blank" href="http://www.bing.com/webmaster/ping.aspx?siteMap='.$site_map_url2.'">Bing</a></li>',
+				'<li><a target="_blank" href="http://www.google.com/webmasters/tools/ping?sitemap='.$site_map_url2.'">Google</a></li>',
 				'</ul>';
 
 		}

@@ -2,7 +2,7 @@
 // Provide an interface to the wt_site_setting table
 //
 // webtrees: Web based Family History software
-// Copyright (c) 2012 webtrees development team
+// Copyright (c) 2013 webtrees development team
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Site.php 14313 2012-09-19 08:01:43Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -27,7 +25,7 @@ if (!defined('WT_WEBTREES')) {
 
 class WT_Site {
 	static $setting=null;
-	
+
 	// Get and Set the site's configuration settings
 	public static function preference($setting_name, $setting_value=null) {
 		// There are lots of settings, and we need to fetch lots of them on every page

@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: save.php 15038 2013-06-12 07:17:35Z greg $
 
 define('WT_SCRIPT_NAME', 'save.php');
 require './includes/session.php';
@@ -38,15 +36,20 @@ function fail() {
 	exit;
 }
 
+// Do we have a valid CSRF token?
+if (!WT_Filter::checkCsrf()) {
+	fail();
+}
+
 // The data item to updated must identified with a single "id" element.
 // The id must be a valid CSS identifier, so it can be used in HTML.
 // We use "[A-Za-z0-9_]+" separated by "-".
 
-$id=safe_POST('id', '[a-zA-Z0-9_-]+');
+$id=WT_Filter::post('id', '[a-zA-Z0-9_-]+');
 list($table, $id1, $id2, $id3)=explode('-', $id.'---');
 
 // The replacement value.
-$value=safe_POST('value', WT_REGEX_UNSAFE);
+$value=WT_Filter::post('value');
 
 // Every switch must have a default case, and every case must end in ok() or fail()
 
@@ -97,7 +100,6 @@ case 'site_setting':
 	case 'ALLOW_USER_THEMES':
 	case 'ALLOW_CHANGE_GEDCOM':
 	case 'SMTP_AUTH':
-	case 'WELCOME_TEXT_CUST_HEAD':
 	case 'SHOW_REGISTER_CAUTION':
 		$value=(int)$value;
 		break;
@@ -106,9 +108,7 @@ case 'site_setting':
 		$id1 = 'WELCOME_TEXT_AUTH_MODE_' . WT_LOCALE;
 		break;
 	case 'LOGIN_URL':
-		if ($value=='') {
-			$value=null; // Empty string is invalid - delete the row
-		} elseif (!preg_match('/^https?:\/\//', $value)) {
+		if ($value && !preg_match('/^https?:\/\//', $value)) {
 			fail();
 		}
 		break;
@@ -255,11 +255,10 @@ case 'user_setting':
 	case 'verified_by_admin':
 		// Approving for the first time?  Send a confirmation email
 		if ($value && get_user_setting($id1, $id2)!=$value && get_user_setting($id1, 'sessiontime')==0) {
-			require_once WT_ROOT.'includes/functions/functions_mail.php';
 			WT_I18N::init(get_user_setting($id1, 'language'));
-			webtreesMail(
-				getUserEmail($id1),
-				$WEBTREES_EMAIL,
+			WT_Mail::system_message(
+				$WT_TREE,
+				$id1,
 				WT_I18N::translate('Approval of account at %s', WT_SERVER_NAME.WT_SCRIPT_PATH),
 				WT_I18N::translate('The administrator at the webtrees site %s has approved your application for an account.  You may now login by accessing the following link: %s', WT_SERVER_NAME.WT_SCRIPT_PATH, WT_SERVER_NAME.WT_SCRIPT_PATH)
 			);

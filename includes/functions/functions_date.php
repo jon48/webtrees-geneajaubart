@@ -2,7 +2,7 @@
 // Date Functions that can be used by any page in webtrees
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -20,46 +20,48 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: functions_date.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
 }
 
-// translate gedcom age string
-//
-// Examples:
-// 4y 8m 10d.
-// Chi
-// INFANT
-function get_age_at_event($agestring, $show_years) {
-	switch (WT_LOCALE) {
-		case 'pl':
-			$show_years = true;
+function get_age_at_event($age_string, $show_years) {
+	switch (strtoupper($age_string)) {
+	case 'CHILD':
+		return WT_I18N::translate('Child');
+	case 'INFANT':
+		return WT_I18N::translate('Infant');
+	case 'STILLBORN':
+		return WT_I18N::translate('Stillborn');
+	default:
+		return preg_replace_callback(
+			array(
+				'/(\d+)([ymwd])/',
+			),
+			function ($match) use ($age_string, $show_years) {
+				switch (WT_LOCALE) {
+				case 'pl':
+					$show_years = true;
+				}
+				switch ($match[2]) {
+				case 'y':
+					if ($show_years || preg_match('/[dm]/', $age_string)) {
+						return WT_I18N::plural('%s year', '%s years', $match[1], WT_I18N::digits($match[1]));
+					} else {
+						return WT_I18N::digits($match[1]);
+					}
+				case 'm':
+					return WT_I18N::plural('%s month', '%s months', $match[1], WT_I18N::digits($match[1]));
+				case 'w':
+					return WT_I18N::plural('%s week', '%s weeks', $match[1], WT_I18N::digits($match[1]));
+				case 'd':
+					return WT_I18N::plural('%s day', '%s days', $match[1], WT_I18N::digits($match[1]));
+				}
+			},
+			$age_string
+		);
 	}
-	return preg_replace(
-		array(
-			'/\bchi(ld)?\b/i',
-			'/\binf(ant)?\b/i',
-			'/\bsti(llborn)?\b/i',
-			'/(\d+)y/ie',
-			'/(\d+)m/ie',
-			'/(\d+)d/ie',
-			'/(\d+)w/ie'
-		),
-		array(
-			WT_I18N::translate('Child'),
-			WT_I18N::translate('Infant'),
-			WT_I18N::translate('Stillborn'),
-			($show_years || preg_match('/[dm]/', $agestring)) ? "WT_I18N::plural('%s year', '%s years', $1 , WT_I18N::digits($1))" : "WT_I18N::digits($1)",
-			"WT_I18N::plural('%s month', '%s months', $1 , WT_I18N::digits($1))",
-			"WT_I18N::plural('%s day', '%s days', $1 , WT_I18N::digits($1))",
-			"WT_I18N::plural('%s week', '%s weeks', $1 , WT_I18N::digits($1))"
-		),
-		$agestring
-	);
 }
 
 /**
@@ -120,7 +122,7 @@ function format_timestamp($time) {
 			}
 				break;
 		default:
-			$time_fmt=str_replace($match, WT_I18N::digits(date(substr($match, -1), $time)), $time_fmt);
+			$time_fmt=str_replace($match, WT_I18N::digits(gmdate(substr($match, -1), $time)), $time_fmt);
 		}
 	}
 
@@ -131,5 +133,5 @@ function format_timestamp($time) {
 // Convert a unix-style timestamp into a WT_Date object
 ////////////////////////////////////////////////////////////////////////////////
 function timestamp_to_gedcom_date($time) {
-	return new WT_Date(strtoupper(date('j M Y', $time)));
+	return new WT_Date(strtoupper(gmdate('j M Y', $time)));
 }

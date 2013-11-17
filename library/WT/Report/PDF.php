@@ -7,7 +7,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: PDF.php 14737 2013-01-30 20:11:30Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -56,7 +54,7 @@ class WT_Report_PDF extends WT_Report_Base {
 	const unicode = true;
 	/**
 	* FALSE means that the full font is embedded, TRUE means only the used chars
-	* in TCPDF v5.9 font subsetting is a very slow process, this leads to larger files  
+	* in TCPDF v5.9 font subsetting is a very slow process, this leads to larger files
 	* @var boolean const
 	*/
 	const subsetting = false;
@@ -491,7 +489,7 @@ class PDF extends TCPDF {
 		$this->currentStyle = $s;
 		$style = $this->wt_report->getStyle($s);
 		$this->SetFont($style['font'], $style['style'], $style['size']);
-		} 
+		}
 
 	/**
 	* Get the style -PDF
@@ -1070,7 +1068,7 @@ class TextBoxPDF extends TextBox {
 		// Draw the border
 		if (!empty($cS)) {
 			if (!$pdf->getRTL()) {
-				$cXM = $cX;	
+				$cXM = $cX;
 			} else {
 				$cXM=($pdf->getPageWidth())-$cX-$cW;
 			}
@@ -1084,7 +1082,7 @@ class TextBoxPDF extends TextBox {
 					$pdf->SetY($cY + $cM['padding_top']);
 				}
 				else {
-					$pdf->SetY($cY + $cM['cell']);					
+					$pdf->SetY($cY + $cM['cell']);
 				}
 			}
 		}
@@ -1095,7 +1093,7 @@ class TextBoxPDF extends TextBox {
 					$pdf->SetLeftMargin($cX + $cM['padding_left']);
 				}
 				else {
-					$pdf->SetLeftMargin($cX + $cM['cell']);					
+					$pdf->SetLeftMargin($cX + $cM['cell']);
 				}
 				$pdf->SetRightMargin($pdf->getRemainingWidthPDF() - $cW + $cM['right']);
 			}
@@ -1186,7 +1184,7 @@ class TextPDF extends Text {
 		$temptext = str_replace("#PAGENUM#", $pdf->PageNo(), $this->text);
 		// underline «title» part of Source item
 		$temptext = str_replace(array('«', '»'), array('<u>', '</u>'), $temptext);
-		
+
 		// Paint the text color or they might use inherited colors by the previous function
 		$match = array();
 		if (preg_match("/#?(..)(..)(..)/", $this->color, $match)) {

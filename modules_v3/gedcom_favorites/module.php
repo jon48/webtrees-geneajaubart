@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 15028 2013-06-01 20:57:49Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -47,43 +45,43 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 
 		self::updateSchema(); // make sure the favorites table has been created
 
-		$action=safe_GET('action');
+		$action = WT_Filter::get('action');
 		switch ($action) {
 		case 'deletefav':
-			$favorite_id=safe_GET('favorite_id');
+			$favorite_id = WT_Filter::getInteger('favorite_id');
 			if ($favorite_id) {
 				self::deleteFavorite($favorite_id);
 			}
 			unset($_GET['action']);
 			break;
 		case 'addfav':
-			$gid     =safe_GET('gid');
-			$favnote =safe_GET('favnote');
-			$url     =safe_GET('url', WT_REGEX_URL);
-			$favtitle=safe_GET('favtitle');
+			$gid      = WT_Filter::get('gid', WT_REGEX_XREF);
+			$favnote  = WT_Filter::get('favnote');
+			$url      = WT_Filter::getUrl('url');
+			$favtitle = WT_Filter::get('favtitle');
 
 			if ($gid) {
-				$record=WT_GedcomRecord::getInstance($gid);
-				if ($record && $record->canDisplayDetails()) {
+				$record = WT_GedcomRecord::getInstance($gid);
+				if ($record && $record->canShow()) {
 					self::addFavorite(array(
-						'user_id'  =>$ctype=='user' ? WT_USER_ID : null,
-						'gedcom_id'=>WT_GED_ID,
-						'gid'      =>$record->getXref(),
-						'type'     =>$record->getType(),
-						'url'      =>null,
-						'note'     =>$favnote,
-						'title'    =>$favtitle,
+						'user_id'   => $ctype=='user' ? WT_USER_ID : null,
+						'gedcom_id' => WT_GED_ID,
+						'gid'       => $record->getXref(),
+						'type'      => $record::RECORD_TYPE,
+						'url'       => null,
+						'note'      => $favnote,
+						'title'     => $favtitle,
 					));
 				}
 			} elseif ($url) {
 				self::addFavorite(array(
-					'user_id'  =>$ctype=='user' ? WT_USER_ID : null,
-					'gedcom_id'=>WT_GED_ID,
-					'gid'      =>null,
-					'type'     =>'URL',
-					'url'      =>$url,
-					'note'     =>$favnote,
-					'title'    =>$favtitle ? $favtitle : $url,
+					'user_id'   => $ctype=='user' ? WT_USER_ID : null,
+					'gedcom_id' => WT_GED_ID,
+					'gid'       => null,
+					'type'      => 'URL',
+					'url'       => $url,
+					'note'      => $favnote,
+					'title'     => $favtitle ? $favtitle : $url,
 				));
 			}
 			unset($_GET['action']);
@@ -131,8 +129,8 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 					$content .= '</div>';
 				} else {
 					$record=WT_GedcomRecord::getInstance($favorite['gid']);
-					if ($record && $record->canDisplayDetails()) {
-						if ($record->getType()=='INDI') {
+					if ($record && $record->canShow()) {
+						if ($record instanceof WT_Individual) {
 							$content .= '<div id="box'.$favorite["gid"].'.0" class="person_box action_header';
 							switch($record->getsex()) {
 								case 'M':
@@ -177,7 +175,7 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 			$content .= '<input type="hidden" name="ged" value="'.WT_GEDCOM.'">';
 			$content .= '<div class="add_fav_ref">';
 			$content .= '<input type="radio" name="fav_category" value="record" checked="checked" onclick="jQuery(\'#gid'.$uniqueID.'\').removeAttr(\'disabled\'); jQuery(\'#url, #favtitle\').attr(\'disabled\',\'disabled\').val(\'\');">';
-			$content .= '<label for="gid">'.WT_I18N::translate('Enter a Person, Family, or Source ID').'</label>';
+			$content .= '<label for="gid'.$uniqueID.'">'.WT_I18N::translate('Enter an individual, family, or source ID').'</label>';
 			$content .= '<input class="pedigree_form" type="text" name="gid" id="gid'.$uniqueID.'" size="5" value="">';
 			$content .= ' '.print_findindi_link('gid'.$uniqueID);
 			$content .= ' '.print_findfamily_link('gid'.$uniqueID);
@@ -229,8 +227,8 @@ class gedcom_favorites_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function configureBlock($block_id) {
-		if (safe_POST_bool('save')) {
-			set_block_setting($block_id, 'block',  safe_POST_bool('block'));
+		if (WT_Filter::postBool('save') && WT_Filter::checkCsrf()) {
+			set_block_setting($block_id, 'block',  WT_Filter::postBool('block'));
 			exit;
 		}
 

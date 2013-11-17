@@ -2,7 +2,7 @@
 // A sidebar to show extra/non-genealogical information about an individual
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 11459 2011-05-04 23:37:08Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -49,30 +47,52 @@ class extra_info_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	// Implement WT_Module_Sidebar
 	public function getSidebarContent() {
 		global $SHOW_COUNTER, $controller;
-		
+
+		$indifacts = array();
+		// The individual's own facts
+		foreach ($controller->record->getFacts() as $fact) {
+			if (self::showFact($fact)) {
+				$indifacts[] = $fact;
+			}
+		}
+
 		ob_start();
-		$indifacts = $controller->getIndiFacts();
-		if (count($indifacts)==0) {
+		if (!$indifacts) {
 			echo WT_I18N::translate('There are no Facts for this individual.');
 		} else {
 			foreach ($indifacts as $fact) {
-				if (in_array($fact->getTag(), WT_Gedcom_Tag::getReferenceFacts())) {
-					print_fact($fact, $controller->record);
-				}
+				print_fact($fact, $controller->record);
 			}
 		}
 		echo '<div id="hitcounter">';
 		if ($SHOW_COUNTER && (empty($SEARCH_SPIDER))) {
 			//print indi counter only if displaying a non-private person
 			require WT_ROOT.'includes/hitcount.php';
-			echo WT_I18N::translate('Hit Count:'). ' '. $hitCount;
+			echo WT_I18N::translate('Hit count:'). ' '. $hitCount;
 		}
 		echo '</div>';// close #hitcounter
 		return strip_tags(ob_get_clean(), '<a><div><span>');
 	}
-	
+
 	// Implement WT_Module_Sidebar
 	public function getSidebarAjaxContent() {
 		return '';
+	}
+
+	// Does this module display a particular fact
+	public static function showFact(WT_Fact $fact) {
+		switch ($fact->getTag()) {
+		case 'AFN':
+		case 'CHAN':
+		case 'IDNO':
+		case 'REFN':
+		case 'RFN':
+		case 'RIN':
+		case 'SSN':
+		case '_UID':
+			return true;
+		default:
+			return false;
+		}
 	}
 }

@@ -2,7 +2,7 @@
 // Gedcom Place functionality.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Place.php 14511 2012-11-03 16:41:01Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -90,13 +88,20 @@ class WT_Place {
 
 	public function getPlaceName() {
 		$place=reset($this->gedcom_place);
-		return $place ? '<span dir="auto">'.htmlspecialchars($place).'</span>' : WT_I18N::translate('unknown');
+		return $place ? '<span dir="auto">'.WT_Filter::escapeHtml($place).'</span>' : WT_I18N::translate('unknown');
+	}
+
+	public function isEmpty() {
+		return empty($this->gedcom_place);
 	}
 
 	public function getFullName() {
+		// If a place hierarchy is a single entity
+		return '<span dir="auto">' . WT_Filter::escapeHtml(implode(WT_I18N::$list_separator, $this->gedcom_place)) . '</span>';
+		// If a place hierarchy is a list of distinct items
 		$tmp=array();
 		foreach ($this->gedcom_place as $place) {
-			$tmp[]='<span dir="auto">' . htmlspecialchars($place) . '</span>';
+			$tmp[]='<span dir="auto">' . WT_Filter::escapeHtml($place) . '</span>';
 		}
 		return implode(WT_I18N::$list_separator, $tmp);
 	}
@@ -118,7 +123,7 @@ class WT_Place {
 				$short_name=implode(self::GEDCOM_SEPARATOR, array_slice($this->gedcom_place, 0, $SHOW_PEDIGREE_PLACES));
 			}
 			// Add a tool-tip showing the full name
-			return '<span title="'.htmlspecialchars($this->getGedcomName()).'" dir="auto">'.htmlspecialchars($short_name).'</span>';
+			return '<span title="'.WT_Filter::escapeHtml($this->getGedcomName()).'" dir="auto">'.WT_Filter::escapeHtml($short_name).'</span>';
 		}
 	}
 
@@ -126,7 +131,7 @@ class WT_Place {
 	public function getReverseName() {
 		$tmp=array();
 		foreach (array_reverse($this->gedcom_place) as $place) {
-			$tmp[]='<span dir="auto">' . htmlspecialchars($place) . '</span>';
+			$tmp[]='<span dir="auto">' . WT_Filter::escapeHtml($place) . '</span>';
 		}
 		return implode(WT_I18N::$list_separator, $tmp);
 	}
@@ -170,10 +175,10 @@ class WT_Place {
 				" LEFT JOIN `##places` AS p7 ON (p6.p_parent_id=p7.p_id)".
 				" LEFT JOIN `##places` AS p8 ON (p7.p_parent_id=p8.p_id)".
 				" LEFT JOIN `##places` AS p9 ON (p8.p_parent_id=p9.p_id)".
-				" WHERE CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place) LIKE CONCAT('%', ?, '%') AND CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place) NOT LIKE CONCAT('%,%', ?, '%') AND p1.p_file=?".
+				" WHERE CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place) LIKE CONCAT('%', ?, '%') AND CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place) REGEXP CONCAT('^[^,]*', ?) AND p1.p_file=?".
 				" ORDER BY  CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place) COLLATE '".WT_I18N::$collation."'"
 			)
-			->execute(array($filter, $filter, $gedcom_id))
+			->execute(array($filter, preg_quote($filter), $gedcom_id))
 			->fetchOneColumn();
 		foreach ($rows as $row) {
 			$places[]=new WT_Place($row, $gedcom_id);

@@ -2,7 +2,7 @@
 // Functions and logic for GEDCOM "NAME" codes
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Name.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -27,11 +25,11 @@ if (!defined('WT_WEBTREES')) {
 
 class WT_Gedcom_Code_Name {
 
-	private static $TYPES=array('adopted', 'aka', 'birth', 'change', 'immigrant', 'maiden', 'married', 'religious');
+	private static $TYPES=array('adopted', 'aka', 'birth', 'change', 'estate', 'immigrant', 'maiden', 'married', 'religious');
 
 	// Translate a code, for an (optional) record
 	public static function getValue($type, $record=null) {
-		if ($record instanceof WT_Person) {
+		if ($record instanceof WT_Individual) {
 			$sex=$record->getSex();
 		} else {
 			$sex='U';
@@ -85,6 +83,18 @@ class WT_Gedcom_Code_Name {
 			default:
 				/* I18N: A name chosen by an individual, to replace their existing name (whether legal or otherwise) */
 				return WT_I18N::translate('change of name');
+			}
+		case 'estate':
+			switch ($sex) {
+			case 'M':
+				/* I18N: A name given to an individual, from the farm or estate on which they lived or worked */
+				return WT_I18N::translate_c('MALE', 'estate name');
+			case 'F':
+				/* I18N: A name given to an individual, from the farm or estate on which they lived or worked */
+				return WT_I18N::translate_c('FEMALE', 'estate name');
+			default:
+				/* I18N: A name given to an individual, from the farm or estate on which they lived or worked */
+				return WT_I18N::translate('estate name');
 			}
 		case 'immigrant':
 			switch ($sex) {

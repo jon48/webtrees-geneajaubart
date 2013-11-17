@@ -2,7 +2,7 @@
 // Controller for the shared note page
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2009 PGV Development Team.  All rights reserved.
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Note.php 14642 2013-01-12 23:39:52Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -33,35 +31,8 @@ require_once WT_ROOT.'includes/functions/functions_import.php';
 
 class WT_Controller_Note extends WT_Controller_GedcomRecord {
 	public function __construct() {
-		$xref=safe_GET_xref('nid');
-
-		$gedrec=find_other_record($xref, WT_GED_ID);
-		if (WT_USER_CAN_EDIT) {
-			$newrec=find_updated_record($xref, WT_GED_ID);
-		} else {
-			$newrec=null;
-		}
-
-		if ($gedrec===null) {
-			if ($newrec===null) {
-				// Nothing to see here.
-				parent::__construct();
-				return;
-			} else {
-				// Create a dummy record from the first line of the new record.
-				// We need it for diffMerge(), getXref(), etc.
-				list($gedrec)=explode("\n", $newrec);
-			}
-		}
-
-		$this->record = new WT_Note($gedrec);
-
-		// If there are pending changes, merge them in.
-		if ($newrec!==null) {
-			$diff_record=new WT_Note($newrec);
-			$diff_record->setChanged(true);
-			$this->record->diffMerge($diff_record);
-		}
+		$xref         = WT_Filter::get('nid', WT_REGEX_XREF);
+		$this->record = WT_Note::getInstance($xref);
 
 		parent::__construct();
 	}
@@ -72,7 +43,7 @@ class WT_Controller_Note extends WT_Controller_GedcomRecord {
 	function getEditMenu() {
 		$SHOW_GEDCOM_RECORD=get_gedcom_setting(WT_GED_ID, 'SHOW_GEDCOM_RECORD');
 
-		if (!$this->record || $this->record->isMarkedDeleted()) {
+		if (!$this->record || $this->record->isOld()) {
 			return null;
 		}
 
@@ -85,25 +56,19 @@ class WT_Controller_Note extends WT_Controller_GedcomRecord {
 			$menu->addSubmenu($submenu);
 		}
 
-		// edit/view raw gedcom
-		if (WT_USER_IS_ADMIN || $SHOW_GEDCOM_RECORD) {
-			$submenu = new WT_Menu(WT_I18N::translate('Edit raw GEDCOM record'), '#', 'menu-note-editraw');
-			$submenu->addOnclick("return edit_raw('".$this->record->getXref()."');");
-			$menu->addSubmenu($submenu);
-		} elseif ($SHOW_GEDCOM_RECORD) {
-			$submenu = new WT_Menu(WT_I18N::translate('View GEDCOM Record'), '#', 'menu-note-viewraw');
-			if (WT_USER_CAN_EDIT) {
-				$submenu->addOnclick("return show_gedcom_record('new');");
-			} else {
-				$submenu->addOnclick("return show_gedcom_record();");
-			}
+		// edit raw
+		/* Does not currently work - NOTE records do not contain nice level 1 facts
+		if (WT_USER_IS_ADMIN || WT_USER_CAN_EDIT && $SHOW_GEDCOM_RECORD) {
+			$submenu = new WT_Menu(WT_I18N::translate('Edit raw GEDCOM'), '#', 'menu-note-editraw');
+			$submenu->addOnclick("return edit_raw('" . $this->record->getXref() . "');");
 			$menu->addSubmenu($submenu);
 		}
+		 */
 
 		// delete
 		if (WT_USER_CAN_EDIT) {
 			$submenu = new WT_Menu(WT_I18N::translate('Delete'), '#', 'menu-note-del');
-			$submenu->addOnclick("if (confirm('".WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($this->record->getFullName()))."')) jQuery.post('action.php',{action:'delete-note',xref:'".$this->record->getXref()."'},function(){location.reload();})");
+			$submenu->addOnclick("return delete_note('" . WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($this->record->getFullName())) . "', '" . $this->record->getXref() . "');");
 			$menu->addSubmenu($submenu);
 		}
 

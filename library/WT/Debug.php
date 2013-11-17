@@ -1,7 +1,7 @@
 <?php
 // Debug functions.
 //
-// Copyright (C) 2011 webtrees development team
+// Copyright (C) 2013 webtrees development team
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,8 +16,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Debug.php 11834 2011-06-16 18:23:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -40,7 +38,7 @@ class WT_Debug {
 		'['=>'⟨', ']'=>'⟩', '('=>'⟨', ')'=>'⟩', '{'=>'⟨', '}'=>'⟩',
 		'.'=>'·', ':'=>'˸'
 	);
-	
+
 	// Pseudo-tranlsate a string.  Give it the attributes of a foreign language,
 	// while leaving it understandable by an English speaking developer.
 	public static function pseudoTranslate($text) {

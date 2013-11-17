@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// @version $Id: Name.php 13543 2012-03-05 07:33:08Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -347,7 +345,7 @@ class WT_Query_Name {
 			" JOIN (SELECT n_surn, n_file FROM `##name`".
 			" WHERE n_file={$ged_id}".
 			($marnm ? "" : " AND n_type!='_MARNM'");
-			
+
 		if ($surn) {
 			$sql.=" AND n_surn COLLATE '".WT_I18N::$collation."' =".WT_DB::quote($surn);
 		} elseif ($salpha==',') {
@@ -364,7 +362,7 @@ class WT_Query_Name {
 		if (!$marnm) {
 			$sql.=" AND n_type!='_MARNM'";
 		}
-	
+
 		$list=array();
 		foreach (WT_DB::prepare($sql)->fetchAll() as $row) {
 			$list[utf8_strtoupper($row->n_surn)][$row->n_surname][$row->n_id]=true;
@@ -387,13 +385,13 @@ class WT_Query_Name {
 	// To search for names with no surnames, use $salpha=","
 	public static function individuals($surn, $salpha, $galpha, $marnm, $fams, $ged_id) {
 		$sql=
-			"SELECT 'INDI' AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec, n_full ".
+			"SELECT i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom, n_full ".
 			"FROM `##individuals` ".
 			"JOIN `##name` ON (n_id=i_id AND n_file=i_file) ".
 			($fams ? "JOIN `##link` ON (n_id=l_from AND n_file=l_file AND l_type='FAMS') " : "").
 			"WHERE n_file={$ged_id} ".
 			($marnm ? "" : "AND n_type!='_MARNM'");
-	
+
 		if ($surn) {
 			$sql.=" AND n_surn COLLATE '".WT_I18N::$collation."'=".WT_DB::quote($surn);
 		} elseif ($salpha==',') {
@@ -409,16 +407,16 @@ class WT_Query_Name {
 		if ($galpha) {
 			$sql.=" AND ".self::_getInitialSql('n_givn', $galpha);
 		}
-	
+
 		$sql.=" ORDER BY CASE n_surn WHEN '@N.N.' THEN 1 ELSE 0 END, n_surn COLLATE '".WT_I18N::$collation."', CASE n_givn WHEN '@P.N.' THEN 1 ELSE 0 END, n_givn COLLATE '".WT_I18N::$collation."'";
-	
+
 		$list=array();
-		$rows=WT_DB::prepare($sql)->fetchAll(PDO::FETCH_ASSOC);
+		$rows=WT_DB::prepare($sql)->fetchAll();
 		foreach ($rows as $row) {
-			$person=WT_Person::getInstance($row);
+			$person=WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 			// The name from the database may be private - check the filtered list...
 			foreach ($person->getAllNames() as $n=>$name) {
-				if ($name['fullNN']==$row['n_full']) {
+				if ($name['fullNN']==$row->n_full) {
 					$person->setPrimaryName($n);
 					// We need to clone $person, as we may have multiple references to the
 					// same person in this list, and the "primary name" would otherwise

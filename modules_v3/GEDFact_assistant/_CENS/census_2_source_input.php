@@ -4,10 +4,10 @@
 // Census and Souce Input Area File File
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2007 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2007 to 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: census_2_source_input.php 14223 2012-08-27 22:54:29Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -80,7 +78,7 @@ if (!defined('WT_WEBTREES')) {
 		} else if (cenyear == 1941) { var cendate = new Date(1941,  31, 12);   // 01 JAN 1920
 		} else if (cenyear == 1946) { var cendate = new Date(1946,  31, 12);   // 01 APR 1930
 		} else if (cenyear == 1951) { var cendate = new Date(1951,  31, 12);   // 01 APR 1940
-		
+
 		// Default Date
 		} else {
 			var cendate = new Date(1901, 2, 31);
@@ -134,7 +132,7 @@ if (!defined('WT_WEBTREES')) {
 		} else if (prevcenyear == 1941) { var prevcendate = new Date(1941,  31, 12);   // 01 JAN 1920
 		} else if (prevcenyear == 1946) { var prevcendate = new Date(1946,  31, 12);   // 01 APR 1930
 		} else if (prevcenyear == 1951) { var prevcendate = new Date(1951,  31, 12);   // 01 APR 1940
-		
+
 		// Default Date
 		} else {
 			var prevcendate = new Date(1901, 2, 31);
@@ -948,7 +946,7 @@ if (!defined('WT_WEBTREES')) {
 				flip_11 = "";
 				flip_16 = ""; //YoM
 				flip_21 = ""; //BithPlace
-				flip_23 = "";		
+				flip_23 = "";
 				//flip_27 = "";
 				//flip_28 = "";
 				//flip_29 = "";
@@ -956,7 +954,7 @@ if (!defined('WT_WEBTREES')) {
 				//flip_43 = "";
 				flip_46 = "";
 				flip_49 = "";
-			} 
+			}
 		}
 
 		// Hide or show ===============
@@ -1036,9 +1034,9 @@ if (!defined('WT_WEBTREES')) {
 	<div class="cens_sour_country">
 		<span><?php echo WT_I18N::translate('Country'); ?><br></span>
 		<select id="censCtry" name="censCtry" >
-			<option id="UKOPT" name="UKOPT" value="UK">UK</option>
-			<option id="USOPT" name="USOPT" value="USA">USA</option>
-			<option id="FROPT" name="FROPT" value="FR">FR</option>
+			<option id="UKOPT" value="UK">UK</option>
+			<option id="USOPT" value="USA">USA</option>
+			<option id="FROPT" value="FR">FR</option>
 		</select>
 
 		<script>
@@ -1093,26 +1091,13 @@ if (!defined('WT_WEBTREES')) {
 		}
 		</script>
 
-		<div>
-			<table><tr><td class="nowrap">
-			<br>
-			<?php
-				// echo "&nbsp;".WT_I18N::translate('Date').":&nbsp;&nbsp;";
-				echo "<font size=2>";
-			// Input renamed as type=hidden to hide the date field ----- //
-			// Note Input field is still required ---------------------- //
-			?>
-				<input type="hidden" style="width:6em; background:#bbddff;" id="censDate" name="censDate" type="text" value="<?php echo ""; ?>" readonly="readonly">
-			</font>
-			</td></tr></table>
-		</div>
-
+		<input type="hidden" id="censDate" name="censDate" value="">
 
 	</div>
 
 	<div class="cens_sour_year">
 		<span><?php echo WT_I18N::translate('Year'); ?><br></span>
-		<select style = "background:#ffaaaa;";
+		<select style = "background:#ffaaaa;"
 				onchange = "if (this.options[this.selectedIndex].value!='') {
 								changeYear(this.options[this.selectedIndex].value);
 							}"

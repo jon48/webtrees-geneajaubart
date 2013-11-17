@@ -23,8 +23,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: French.php 15033 2013-06-01 22:53:08Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -32,22 +30,19 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Date_French extends WT_Date_Calendar {
-	static function CALENDAR_ESCAPE() {
-		return '@#DFRENCH R@';
-	}
+	const CALENDAR_ESCAPE = '@#DFRENCH R@';
+	const MONTHS_IN_YEAR  = 13;
+	const CAL_START_JD    = 2375840; // 22 SEP 1792 = 01 VEND 0001
+	const CAL_END_JD      = 2380687; // 31 DEC 1805 = 10 NIVO 0014
+	const DAYS_IN_WEEK    = 10; // A metric week of 10 unimaginatively named days.
+	static $MONTH_ABBREV  = array(
+		''=>0, 'VEND'=>1, 'BRUM'=>2, 'FRIM'=>3, 'NIVO'=>4, 'PLUV'=>5, 'VENT'=>6, 'GERM'=>7, 'FLOR'=>8, 'PRAI'=>9, 'MESS'=>10, 'THER'=>11, 'FRUC'=>12, 'COMP'=>13
+	);
 
 	static function calendarName() {
 		return /* I18N: The French calendar */ WT_I18N::translate('French');
 	}
 
-	static function MONTH_TO_NUM($m) {
-		static $months=array(''=>0, 'VEND'=>1, 'BRUM'=>2, 'FRIM'=>3, 'NIVO'=>4, 'PLUV'=>5, 'VENT'=>6, 'GERM'=>7, 'FLOR'=>8, 'PRAI'=>9, 'MESS'=>10, 'THER'=>11, 'FRUC'=>12, 'COMP'=>13);
-		if (isset($months[$m])) {
-			return $months[$m];
-		} else {
-			return null;
-		}
-	}
 	static function NUM_TO_MONTH_NOMINATIVE($n, $leap_year) {
 		switch ($n) {
 		case 1:  return WT_I18N::translate_c('NOMINATIVE', 'Vendémiaire');
@@ -120,26 +115,7 @@ class WT_Date_French extends WT_Date_Calendar {
 		// TODO: Do these have short names?
 		return self::NUM_TO_MONTH_NOMINATIVE($n, $leap_year);
 	}
-	static function NUM_TO_GEDCOM_MONTH($n, $leap_year) {
-		switch ($n) {
-		case 1:  return 'VEND';
-		case 2:  return 'BRUM';
-		case 3:  return 'FRIM';
-		case 4:  return 'NIVO';
-		case 5:  return 'PLUV';
-		case 6:  return 'VENT';
-		case 7:  return 'GERM';
-		case 8:  return 'FLOR';
-		case 9:  return 'PRAI';
-		case 10: return 'MESS';
-		case 11: return 'THER';
-		case 12: return 'FRUC';
-		case 13: return 'COMP';
-		}
-	}
-	static function NUM_MONTHS() {
-		return 13;
-	}
+
 	static function LONG_DAYS_OF_WEEK($n) {
 		switch ($n) {
 		case 0: return WT_I18N::translate('Primidi');
@@ -157,15 +133,6 @@ class WT_Date_French extends WT_Date_Calendar {
 	static function SHORT_DAYS_OF_WEEK($n) {
 		// TODO: Do these have short names?
 		return self::LONG_DAYS_OF_WEEK($n);
-	}
-	static function NUM_DAYS_OF_WEEK() {
-		return 10; // A "metric" week of 10 unimaginatively named days.
-	}
-	static function CAL_START_JD() {
-		return 2375840; // 22 SEP 1792 = 01 VEND 0001
-	}
-	static function CAL_END_JD() {
-		return 2380687; // 31 DEC 1805 = 10 NIVO 0014
 	}
 
 	// Leap years were based on astronomical observations.  Only years 3, 7 and 11
@@ -187,7 +154,7 @@ class WT_Date_French extends WT_Date_Calendar {
 	}
 
 	// Years were written using roman numerals
-	function FormatLongYear() {
+	protected function FormatLongYear() {
 		return $this->NumToRoman($this->y);
 	}
 }

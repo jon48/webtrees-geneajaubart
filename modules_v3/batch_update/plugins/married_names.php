@@ -5,7 +5,7 @@
 // It simply needs to set $title and $text for the help topic $help_topic
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: married_names.php 13137 2011-12-27 05:19:50Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +34,7 @@ class married_names_bu_plugin extends base_plugin {
 	}
 
 	static function getDescription() {
-		return WT_I18N::translate('You can make it easier to search for married women by recording their married name.<br />However not all women take their husband\'s surname, so beware of introducing incorrect information into your database.');
+		return WT_I18N::translate('You can make it easier to search for married women by recording their married name.<br>However not all women take their husband’s surname, so beware of introducing incorrect information into your database.');
 	}
 
 	function doesRecordNeedUpdate($xref, $gedrec) {
@@ -72,7 +70,7 @@ class married_names_bu_plugin extends base_plugin {
 		preg_match_all('/^1 FAMS @(.+)@/m', $gedrec, $fmatch);
 		foreach ($fmatch[1] as $famid) {
 			$famrec=batch_update::getLatestRecord($famid, 'FAM');
-			if (preg_match('/^1 '.WT_EVENTS_MARR.'/m', $famrec) && preg_match('/^1 HUSB @(.+)@/m', $famrec, $hmatch)) {
+			if (preg_match('/^1 MARR/m', $famrec) && preg_match('/^1 HUSB @(.+)@/m', $famrec, $hmatch)) {
 				$husbrec=batch_update::getLatestRecord($hmatch[1], 'INDI');
 				$husb_surnames=array_unique(array_merge($husb_surnames, self::_surnames($hmatch[1], $husbrec)));
 			}
@@ -96,17 +94,17 @@ class married_names_bu_plugin extends base_plugin {
 	// Add an option for different surname styles
 	function getOptions() {
 		parent::getOptions();
-		$this->surname=safe_GET('surname', array('add', 'replace'), 'replace');
+		$this->surname = WT_Filter::get('surname', 'add|replace', 'replace');
 	}
 
 	function getOptionsForm() {
 		return
 			parent::getOptionsForm().
-			'<tr valign="top"><th>'.WT_I18N::translate('Surname Option').'</th>'.
+			'<tr valign="top"><th>'.WT_I18N::translate('Surname option').'</th>'.
 			'<td class="optionbox"><select name="surname" onchange="reset_reload();"><option value="replace"'.
 			($this->surname=='replace' ? ' selected="selected"' : '').
-			'">'.WT_I18N::translate('Wife\'s surname replaced by husband\'s surname').'</option><option value="add"'.
+			'">'.WT_I18N::translate('Wife’s surname replaced by husband’s surname').'</option><option value="add"'.
 			($this->surname=='add' ? ' selected="selected"' : '').
-			'">'.WT_I18N::translate('Wife\'s maiden surname becomes new given name').'</option></select></td></tr>';
+			'">'.WT_I18N::translate('Wife’s maiden surname becomes new given name').'</option></select></td></tr>';
 	}
 }

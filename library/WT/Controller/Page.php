@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Page.php 14786 2013-02-06 22:28:50Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -151,21 +149,22 @@ class WT_Controller_Page extends WT_Controller_Base {
 		// This javascript needs to be loaded in the header, *before* the CSS.
 		// All other javascript should be defered until the end of the page
 		$javascript= '<script src="' . WT_MODERNIZR_URL . '"></script>';
+
 		// Give Javascript access to some PHP constants
 		$this->addInlineJavascript('
-			var WT_STATIC_URL  = "'.WT_STATIC_URL.'";
-			var WT_THEME_DIR   = "'.WT_THEME_DIR.'";
-			var WT_MODULES_DIR = "'.WT_MODULES_DIR.'";
-			var WT_GEDCOM      = "'.WT_GEDCOM.'";
-			var WT_GED_ID      = "'.WT_GED_ID.'";
-			var WT_USER_ID     = "'.WT_USER_ID.'";
-			var textDirection  = "'.$TEXT_DIRECTION.'";
-			var browserType    = "'.$BROWSERTYPE.'";
-			var WT_SCRIPT_NAME = "'.WT_SCRIPT_NAME.'";
-			var WT_LOCALE      = "'.WT_LOCALE.'";
-			var accesstime     = '.WT_TIMESTAMP.';
+			var WT_STATIC_URL  = "' . WT_Filter::escapeJs(WT_STATIC_URL)             . '";
+			var WT_THEME_DIR   = "' . WT_Filter::escapeJs(WT_THEME_DIR)              . '";
+			var WT_MODULES_DIR = "' . WT_Filter::escapeJs(WT_MODULES_DIR)            . '";
+			var WT_GEDCOM      = "' . WT_Filter::escapeJs(WT_GEDCOM)                 . '";
+			var WT_GED_ID      = "' . WT_Filter::escapeJs(WT_GED_ID)                 . '";
+			var WT_USER_ID     = "' . WT_Filter::escapeJs(WT_USER_ID)                . '";
+			var textDirection  = "' . WT_Filter::escapeJs($TEXT_DIRECTION)           . '";
+			var browserType    = "' . WT_Filter::escapeJs($BROWSERTYPE)              . '";
+			var WT_SCRIPT_NAME = "' . WT_Filter::escapeJs(WT_SCRIPT_NAME)            . '";
+			var WT_LOCALE      = "' . WT_Filter::escapeJs(WT_LOCALE)                 . '";
+			var WT_CSRF_TOKEN  = "' . WT_Filter::escapeJs(WT_Filter::getCsrfToken()) . '";
 		', self::JS_PRIORITY_HIGH);
-	
+
 		// Temporary fix for access to main menu hover elements on android/blackberry touch devices
 		$this->addInlineJavascript('
 			if(navigator.userAgent.match(/Android|PlayBook/i)) {
@@ -173,12 +172,12 @@ class WT_Controller_Page extends WT_Controller_Base {
 				jQuery("a.icon_arrow").attr("href", "#");
 			}
 		');
-		
+
 		// Tell IE to use standards mode instead of compatability mode.
 		if ($BROWSERTYPE=='msie') {
 			header("X-UA-Compatible: IE=Edge");
 		}
-		
+
 		header('Content-Type: text/html; charset=UTF-8');
 		require WT_ROOT.$headerfile;
 
@@ -220,16 +219,16 @@ class WT_Controller_Page extends WT_Controller_Base {
 		static $individual; // Only query the DB once.
 
 		if (!$individual && WT_USER_ROOT_ID) {
-			$individual=WT_Person::getInstance(WT_USER_ROOT_ID);
+			$individual=WT_Individual::getInstance(WT_USER_ROOT_ID);
 		}
 		if (!$individual && WT_USER_GEDCOM_ID) {
-			$individual=WT_Person::getInstance(WT_USER_GEDCOM_ID);
+			$individual=WT_Individual::getInstance(WT_USER_GEDCOM_ID);
 		}
 		if (!$individual) {
-			$individual=WT_Person::getInstance(get_gedcom_setting(WT_GED_ID, 'PEDIGREE_ROOT_ID'));
+			$individual=WT_Individual::getInstance(get_gedcom_setting(WT_GED_ID, 'PEDIGREE_ROOT_ID'));
 		}
 		if (!$individual) {
-			$individual=WT_Person::getInstance(
+			$individual=WT_Individual::getInstance(
 				WT_DB::prepare(
 					"SELECT MIN(i_id) FROM `##individuals` WHERE i_file=?"
 				)->execute(array(WT_GED_ID))->fetchOne()
@@ -237,7 +236,7 @@ class WT_Controller_Page extends WT_Controller_Base {
 		}
 		if (!$individual) {
 			// always return a record
-			$individual=new WT_Person('0 @I@ INDI');
+			$individual=new WT_Individual('I', '0 @I@ INDI', null, WT_GED_ID);
 		}
 		return $individual;
 	}
@@ -252,7 +251,7 @@ class WT_Controller_Page extends WT_Controller_Base {
 			}
 		}
 		// always return a record
-		return new WT_Family('0 @F@ FAM');
+		return new WT_Family('F', '0 @F@ FAM', null, WT_GED_ID);
 	}
 	public function getSignificantSurname() {
 		return '';

@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team. All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: admin_places.php 15039 2013-06-14 20:13:02Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -33,11 +31,11 @@ if (!defined('WT_WEBTREES')) {
 require WT_ROOT.WT_MODULES_DIR.'googlemap/defaultconfig.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$action=safe_REQUEST($_REQUEST, 'action');
-if (isset($_REQUEST['parent'])) $parent=safe_REQUEST($_REQUEST, 'parent');
-if (isset($_REQUEST['inactive'])) $inactive=safe_GET_bool('inactive');
-if (isset($_REQUEST['mode'])) $mode=safe_REQUEST($_REQUEST, 'mode');
-if (isset($_REQUEST['deleteRecord'])) $deleteRecord=safe_REQUEST($_REQUEST, 'deleteRecord');
+$action       = WT_Filter::get('action');
+$parent       = WT_Filter::get('parent');
+$inactive     = WT_Filter::getBool('inactive');
+$mode         = WT_Filter::get('mode');
+$deleteRecord = WT_Filter::get('deleteRecord');
 
 if (!isset($parent)) $parent=0;
 if (!isset($inactive)) $inactive=false;
@@ -143,7 +141,7 @@ function findFiles($path) {
 
 $controller=new WT_Controller_Page();
 $controller->requireAdminLogin();
-	
+
 if ($action=='ExportFile' && WT_USER_IS_ADMIN) {
 	Zend_Session::writeClose();
 	$tmp = place_id_to_hierarchy($parent);
@@ -286,7 +284,7 @@ if ($action=='ImportGedcom') {
 					$highestIndex++;
 					WT_DB::prepare("INSERT INTO `##placelocation` (pl_id, pl_parent_id, pl_level, pl_place, pl_zoom) VALUES (?, ?, ?, ?, ?)")
 						->execute(array($highestIndex, $parent_id, $i, $escparent, $default_zoom_level[$i]));
-					echo htmlspecialchars($escparent), '<br>';
+					echo WT_Filter::escapeHtml($escparent), '<br>';
 					$parent_id=$highestIndex;
 				} else {
 					$parent_id=$row->pl_id;
@@ -297,12 +295,12 @@ if ($action=='ImportGedcom') {
 					$highestIndex++;
 					WT_DB::prepare("INSERT INTO `##placelocation` (pl_id, pl_parent_id, pl_level, pl_place, pl_long, pl_lati, pl_zoom) VALUES (?, ?, ?, ?, ?, ?, ?)")
 						->execute(array($highestIndex, $parent_id, $i, $escparent, $place['long'], $place['lati'], $default_zoom_level[$i]));
-					echo htmlspecialchars($escparent), '<br>';
+					echo WT_Filter::escapeHtml($escparent), '<br>';
 				} else {
 					if (empty($row->pl_long) && empty($row->pl_lati) && $place['lati']!='0' && $place['long']!='0') {
 						WT_DB::prepare("UPDATE `##placelocation` SET pl_lati=?, pl_long=? WHERE pl_id=?")
 							->execute(array($place['lati'], $place['long'], $row->pl_id));
-						echo htmlspecialchars($escparent), '<br>';
+						echo WT_Filter::escapeHtml($escparent), '<br>';
 					}
 				}
 			}
@@ -316,8 +314,7 @@ if ($action=='ImportFile') {
 	findFiles(WT_MODULES_DIR.'googlemap/extra');
 	sort($placefiles);
 ?>
-<form method="post" enctype="multipart/form-data" id="importfile" name="importfile" action="module.php?mod=googlemap&mod_action=admin_places">
-	<input type="hidden" name="action" value="ImportFile2">
+<form method="post" enctype="multipart/form-data" id="importfile" name="importfile" action="module.php?mod=googlemap&amp;mod_action=admin_places&amp;action=ImportFile2">
 	<table class="gm_plac_edit">
 		<tr>
 			<th><?php echo WT_I18N::translate('File containing places (CSV)'); ?></th>
@@ -330,7 +327,7 @@ if ($action=='ImportFile') {
 				<select name="localfile">
 					<option></option>
 					<?php foreach ($placefiles as $p=>$placefile) { ?>
-					<option value="<?php echo htmlspecialchars($placefile); ?>"><?php
+					<option value="<?php echo WT_Filter::escapeHtml($placefile); ?>"><?php
 						if (substr($placefile, 0, 1)=="/") echo substr($placefile, 1);
 						else echo $placefile; ?></option>
 					<?php } ?>
@@ -556,14 +553,14 @@ $where_am_i=place_id_to_hierarchy($parent);
 foreach (array_reverse($where_am_i, true) as $id=>$place) {
 	if ($id==$parent) {
 		if ($place != 'Unknown') {
-			echo htmlspecialchars($place);
+			echo WT_Filter::escapeHtml($place);
 		} else {
 			echo WT_I18N::translate('unknown');
 		}
 	} else {
 		echo '<a href="module.php?mod=googlemap&mod_action=admin_places&parent=', $id, '&inactive=', $inactive, '">';
 		if ($place != 'Unknown') {
-			echo htmlspecialchars($place), '</a>';
+			echo WT_Filter::escapeHtml($place), '</a>';
 		} else {
 			echo WT_I18N::translate('unknown'), '</a>';
 		}
@@ -593,7 +590,7 @@ if (count($placelist) == 0)
 foreach ($placelist as $place) {
 	echo '<tr><td><a href="module.php?mod=googlemap&mod_action=admin_places&parent=', $place['place_id'], '&inactive=', $inactive, '">';
 	if ($place['place'] != 'Unknown')
-			echo htmlspecialchars($place['place']), '</a></td>';
+			echo WT_Filter::escapeHtml($place['place']), '</a></td>';
 		else
 			echo WT_I18N::translate('unknown'), '</a></td>';
 	echo '<td>', $place['lati'], '</td>';
@@ -636,7 +633,7 @@ foreach ($placelist as $place) {
 			<?php echo WT_I18N::translate('Add  a new geographic location'); ?>
 		</td>
 		<td>
-			<form action="#" onsubmit="add_place_location(this.parent_id.options[this.parent_id.selectedIndex].value); return false;">
+			<form action="?" onsubmit="add_place_location(this.parent_id.options[this.parent_id.selectedIndex].value); return false;">
 				<?php echo select_edit_control('parent_id', $where_am_i, WT_I18N::translate('Top Level'), $parent); ?>
 				<input type="submit" value="<?php echo WT_I18N::translate('Add'); ?>">
 			</form>

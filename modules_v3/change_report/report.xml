@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report>
-	<!-- $Id: report.xml 12246 2011-10-05 15:56:15Z greg $ -->
 	<Title><var var="WT_I18N::translate('Changes')" /></Title>
 	<Description><var var="WT_I18N::translate('A report of recent and pending changes.')" /></Description>
 	<Input name="changeRangeStart" lookup="DATE" type="text" default="NOW-30"><var var="WT_I18N::translate('Starting range of change dates')" /></Input>
@@ -113,7 +112,7 @@
 				</TextBox>
 
 				<TextBox height="12" width="$datewidth">
-					<Text style="text"><varLetter var="BIRT" />: <GedcomValue tag="BIRT:DATE" /><br /><varLetter var="DEAT" />: <GedcomValue tag="DEAT:DATE" /></Text>
+					<Text style="text"><var var="WT_I18N::translate('Birth')" />: <GedcomValue tag="BIRT:DATE" /><br /><var var="WT_I18N::translate('Death')" />: <GedcomValue tag="DEAT:DATE" /></Text>
 				</TextBox>
 
 				<TextBox height="12" newline="1">

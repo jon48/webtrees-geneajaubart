@@ -4,10 +4,10 @@
 // used by the SAX parser to generate reports from the XML report file.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // Modifications Copyright (c) 2010 Greg Roach
 //
@@ -24,8 +24,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Base.php 14715 2013-01-23 21:09:52Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -405,14 +403,6 @@ class WT_Report_Base {
 		}
 		return $this->Styles[$s];
 	}
-
-	// static callback functions to sort data
-	static function CompareBirthDate($x, $y) {
-		return WT_Date::Compare($x->getBirthDate(), $y->getBirthDate());
-	}
-	static function CompareDeathDate($x, $y) {
-		return WT_Date::Compare($x->getDeathDate(), $y->getDeathDate());
-	}
 }
 
 /**
@@ -458,7 +448,7 @@ class Element {
 		$t = str_replace(array("<br>", "&nbsp;"), array("\n", " "), $t);
 		if (!WT_RNEW) {
 			$t = strip_tags($t);
-			$t = unhtmlentities($t);
+			$t = htmlspecialchars_decode($t);
 		}
 		$this->text .= $t;
 
@@ -975,7 +965,7 @@ class Footnote extends Element {
 		$t = str_replace(array("<br>", "&nbsp;"), array("\n", " "), $t);
 		if (!WT_RNEW) {
 			$t = strip_tags($t);
-			$t = unhtmlentities($t);
+			$t = htmlspecialchars_decode($t);
 		}
 		$this->text .= $t;
 		return 0;
@@ -1669,7 +1659,7 @@ function GedcomSHandler($attrs) {
 	$newgedrec = "";
 	if (count($tags)<2) {
 		$tmp=WT_GedcomRecord::getInstance($attrs['id']);
-		$newgedrec=$tmp ? $tmp->getGedcomRecord() : '';
+		$newgedrec=$tmp ? $tmp->getGedcom() : '';
 	}
 	if (empty($newgedrec)) {
 		$tgedrec = $gedrec;
@@ -1680,14 +1670,14 @@ function GedcomSHandler($attrs) {
 					$newgedrec = $vars[$match[1]]['gedcom'];
 				} else {
 					$tmp=WT_GedcomRecord::getInstance($match[1]);
-					$newgedrec=$tmp ? $tmp->getGedcomRecord() : '';
+					$newgedrec=$tmp ? $tmp->getGedcom() : '';
 				}
 			} else {
 				if (preg_match("/@(.+)/", $tag, $match)) {
 					$gmatch = array();
 					if (preg_match("/\d $match[1] @([^@]+)@/", $tgedrec, $gmatch)) {
 						$tmp=WT_GedcomRecord::getInstance($gmatch[1]);
-						$newgedrec=$tmp ? $tmp->getGedcomRecord() : '';
+						$newgedrec=$tmp ? $tmp->getGedcom() : '';
 						$tgedrec = $newgedrec;
 					} else {
 						$newgedrec = "";
@@ -1942,7 +1932,7 @@ function GetPersonNameSHandler($attrs) {
 		if (is_null($record)) {
 			return;
 		}
-		if (!$record->canDisplayName()) {
+		if (!$record->canShowName()) {
 			$currentElement->addText(WT_I18N::translate('Private'));
 		} else {
 			$name = $record->getFullName();
@@ -1982,7 +1972,7 @@ echo "<br>".$addname."<br>";
 for ($ii=0; $ii<=strlen($addname); $ii++)
 echo substr($addname, $ii, 1)." ";
 */
-				$addname = preg_replace(array('/<span class="starredname">/','/<\/span><\/span>/','/<\/span>/'), array('«','','»'), $addname);						
+				$addname = preg_replace(array('/<span class="starredname">/','/<\/span><\/span>/','/<\/span>/'), array('«','','»'), $addname);
 				if (!WT_RNEW) {
 					$addname = strip_tags($addname); //@@ unknown printed in other alignment with ... on wrong side
 				}
@@ -2189,12 +2179,7 @@ function RepeatTagEHandler() {
 		// Save original values
 		array_push($parserStack, $parser);
 		$oldgedrec = $gedrec;
-		// PHP 5.2.3 has a bug with foreach (), so don't use that here, while 5.2.3 is on the market
-		// while () has the fastest execution speed
-		$count = count($repeats);
-		$i = 0;
-		while ($i < $count) {
-			$gedrec = $repeats[$i];
+		foreach ($repeats as $gedrec) {
 			//-- start the sax parser
 			$repeat_parser = xml_parser_create();
 			$parser = $repeat_parser;
@@ -2211,7 +2196,6 @@ function RepeatTagEHandler() {
 				exit;
 			}
 			xml_parser_free($repeat_parser);
-			$i++;
 		}
 		// Restore original values
 		$gedrec = $oldgedrec;
@@ -2263,7 +2247,7 @@ function varSHandler($attrs) {
 			$tfact = $type;
 		}
 		$var = str_replace(array("@fact", "@desc"), array(WT_Gedcom_Tag::getLabel($tfact), $desc), $var);
-		if (substr($var, 0, 18) == 'WT_I18N::translate' || substr($var, 0, 15) == 'WT_I18N::number' || substr($var, 0, 23)=='WT_Gedcom_Tag::getLabel') {
+		if (substr($var, 0, 18) == 'WT_I18N::translate' || substr($var, 0, 15) == 'WT_I18N::number') {
 			eval("\$var=$var;");
 		}
 	}
@@ -2275,27 +2259,6 @@ function varSHandler($attrs) {
 		}
 	}
 	$currentElement->addText($var);
-}
-
-/**
-* Variable lookup, retrieve the first letter only
-*
-* @param array $attrs an array of key value pairs for the attributes
-*/
-function varLetterSHandler($attrs) {
-	global $currentElement, $fact, $desc;
-
-	if (empty($attrs['var'])) {
-		die("<strong>REPORT ERROR varLetter: </strong> The attribute \"var=\" is missing or not set in the XML file.");
-	}
-
-	$var=$attrs['var'];
-	if ($var) {
-		if ($var=='@fact') {
-			$var=$fact;
-		}
-		$currentElement->addText(WT_Gedcom_Tag::getAbbreviation($var));
-	}
 }
 
 /**
@@ -2334,45 +2297,21 @@ function FactsSHandler($attrs) {
 		$tag = $vars[$match[1]]['id'];
 	}
 
+	$record = WT_GedcomRecord::getInstance($id);
 	if (empty($attrs['diff']) && !empty($id)) {
-		$record = WT_GedcomRecord::getInstance($id);
 		$facts = $record->getFacts();
-		if (!is_array($facts)) {
-			$facts = array($facts);
-		}
 		sort_facts($facts);
 		$repeats = array();
 		$nonfacts=explode(',', $tag);
 		foreach ($facts as $event) {
 			if (!in_array($event->getTag(), $nonfacts)) {
-				$repeats[]=$event->getGedComRecord();
+				$repeats[]=$event->getGedcom();
 			}
 		}
 	} else {
-		$record = new WT_GedcomRecord($gedrec);
-		switch ($record->getType()) {
-			case "INDI":
-				$record=new WT_Person($gedrec);
-				break;
-			case "FAM":
-				$record=new WT_Family($gedrec);
-				break;
-			case "SOUR":
-				$record=new WT_Source($gedrec);
-				break;
-			case "REPO":
-				$record=new WT_Repository($gedrec);
-				break;
-			case "NOTE":
-				$record=new WT_Note($gedrec);
-				break;
-		}
-		$oldrecord = WT_GedcomRecord::getInstance($record->getXref());
-		$oldrecord->diffMerge($record);
-		$facts = $oldrecord->getFacts();
-		foreach ($facts as $fact) {
-			if ($fact->getIsNew() && $fact->getTag()<>'CHAN') {
-				$repeats[]=$fact->getGedcomRecord();
+		foreach ($record->getFacts() as $fact) {
+			if ($fact->isNew() && $fact->getTag()<>'CHAN') {
+				$repeats[]=$fact->getGedcom();
 			}
 		}
 	}
@@ -2505,7 +2444,7 @@ function SetVarSHandler($attrs) {
 		$value = preg_replace("/\\$".$match[$i][1]."/", $t, $value, 1);
 		$i++;
 	}
-	if (substr($value, 0, 18) == 'WT_I18N::translate' || substr($value, 0, 15) == 'WT_I18N::number' || substr($value, 0, 23)=='WT_Gedcom_Tag::getLabel') {
+	if (substr($value, 0, 18) == 'WT_I18N::translate' || substr($value, 0, 15) == 'WT_I18N::number') {
 		eval("\$value = $value;");
 	}
 	// Arithmetic functions
@@ -2621,7 +2560,7 @@ function FootnoteSHandler($attrs) {
 		$id = $match[2];
 	}
 	$record=WT_GedcomRecord::GetInstance($id);
-	if ($record && $record->canDisplayDetails()) {
+	if ($record && $record->canShow()) {
 		array_push($printDataStack, $printData);
 		$printData = true;
 		$style = "";
@@ -2677,25 +2616,36 @@ function FootnoteTextsSHandler() {
 * @final
 */
 function AgeAtDeathSHandler() {
+	// TODO: This duplicates functionality in format_fact_date()
 	global $currentElement, $gedrec, $fact, $desc;
 
 	$id = "";
 	$match = array();
 	if (preg_match("/0 @(.+)@/", $gedrec, $match)) {
-		$person=WT_Person::getInstance($match[1]);
+		$person=WT_Individual::getInstance($match[1]);
 		// Recorded age
-		$fact_age=get_gedcom_value('AGE', 2, $gedrec);
-		if ($fact_age=='') {
-			$fact_age=get_gedcom_value('DATE:AGE', 2, $gedrec);
+		if (preg_match('/\n2 AGE (.+)/', $factrec, $match)) {
+			$fact_age = $match[1];
+		} else {
+			$fact_age = '';
 		}
-		$husb_age=get_gedcom_value('HUSB:AGE', 2, $gedrec);
-		$wife_age=get_gedcom_value('WIFE:AGE', 2, $gedrec);
+		if (preg_match('/\n2 HUSB\n3 AGE (.+)/', $factrec, $match)) {
+			$husb_age = $match[1];
+		} else {
+			$husb_age = '';
+		}
+		if (preg_match('/\n2 WIFE\n3 AGE (.+)/', $factrec, $match)) {
+			$wife_age = $match[1];
+		} else {
+			$wife_age = '';
+		}
+
 		// Calculated age
 		$birth_date=$person->getBirthDate();
 		// Can't use getDeathDate(), as this also gives BURI/CREM events, which
 		// wouldn't give the correct "days after death" result for people with
 		// no DEAT.
-		$death_event=$person->getFactByType('DEAT');
+		$death_event=$person->getFirstFact('DEAT');
 		if ($death_event) {
 			$death_date=$death_event->getDate();
 		} else {
@@ -2793,11 +2743,11 @@ function HighlightedImageSHandler($attrs) {
 	if (!empty($attrs['width'])) $width = (int)$attrs['width'];
 	if (!empty($attrs['height'])) $height = (int)$attrs['height'];
 
-	$person=WT_Person::getInstance($id);
+	$person=WT_Individual::getInstance($id);
 	$mediaobject = $person->findHighlightedMedia();
 	if ($mediaobject) {
 		$attributes=$mediaobject->getImageAttributes('thumb');
-		if (in_array($attributes['ext'], array('GIF','JPG','PNG','SWF','PSD','BMP','TIFF','TIFF','JPC','JP2','JPX','JB2','SWC','IFF','WBMP','XBM')) && $mediaobject->canDisplayDetails() && $mediaobject->fileExists('thumb')) {
+		if (in_array($attributes['ext'], array('GIF','JPG','PNG','SWF','PSD','BMP','TIFF','TIFF','JPC','JP2','JPX','JB2','SWC','IFF','WBMP','XBM')) && $mediaobject->canShow() && $mediaobject->fileExists('thumb')) {
 			if (($width>0) and ($height==0)) {
 				$perc = $width / $attributes['adjW'];
 				$height= round($attributes['adjH']*$perc);
@@ -2865,7 +2815,7 @@ function ImageSHandler($attrs) {
 		if (preg_match("/\d OBJE @(.+)@/", $gedrec, $match)) {
 			$mediaobject=WT_Media::getInstance($match[1], WT_GED_ID);
 			$attributes=$mediaobject->getImageAttributes('thumb');
-			if (in_array($attributes['ext'], array('GIF','JPG','PNG','SWF','PSD','BMP','TIFF','TIFF','JPC','JP2','JPX','JB2','SWC','IFF','WBMP','XBM')) && $mediaobject->canDisplayDetails() && $mediaobject->fileExists('thumb')) {
+			if (in_array($attributes['ext'], array('GIF','JPG','PNG','SWF','PSD','BMP','TIFF','TIFF','JPC','JP2','JPX','JB2','SWC','IFF','WBMP','XBM')) && $mediaobject->canShow() && $mediaobject->fileExists('thumb')) {
 				if (($width>0) and ($height==0)) {
 					$perc = $width / $attributes['adjW'];
 					$height= round($attributes['adjH']*$perc);
@@ -2989,7 +2939,7 @@ function ListSHandler($attrs) {
 	switch ($listname) {
 		case "pending":
 			$rows=WT_DB::prepare(
-				"SELECT CASE new_gedcom WHEN '' THEN old_gedcom ELSE new_gedcom END AS gedcom".
+				"SELECT xref, gedcom_id, CASE new_gedcom WHEN '' THEN old_gedcom ELSE new_gedcom END AS gedcom".
 				" FROM `##change`".
 				" WHERE (xref, change_id) IN (".
 				"  SELECT xref, MAX(change_id)".
@@ -3000,7 +2950,7 @@ function ListSHandler($attrs) {
 			)->execute(array(WT_GED_ID))->fetchAll();
 			$list=array();
 			foreach ($rows as $row) {
-				$list[]=new WT_GedcomRecord($row->gedcom);
+				$list[] = WT_GedcomRecord::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 			}
 			break;
 		case "individual":
@@ -3012,7 +2962,7 @@ function ListSHandler($attrs) {
 			foreach ($attrs as $attr=>$value) {
 				if ((strpos($attr, "filter")===0) && $value) {
 					// Substitute global vars
-					$value=preg_replace('/\$(\w+)/e', '$vars["\\1"]["id"]', $value);
+					$value=preg_replace_callback('/\$(\w+)/', function($matches) use ($vars) { return $vars[$matches[1]]['id']; }, $value);
 					// Convert the various filters into SQL
 					if (preg_match('/^(\w+):DATE (LTE|GTE) (.+)$/', $value, $match)) {
 						$sql_join[]="JOIN `##dates` AS {$attr} ON ({$attr}.d_file={$sql_col_prefix}file AND {$attr}.d_gid={$sql_col_prefix}id)";
@@ -3188,7 +3138,7 @@ function ListSHandler($attrs) {
 	if ($filters) {
 		foreach ($list as $key=>$record) {
 			foreach ($filters as $filter) {
-				if (!preg_match("/".$filter."/i", $record->getGedcomRecord())) {
+				if (!preg_match("/".$filter."/i", $record->getGedcom())) {
 					unset($list[$key]);
 					break;
 				}
@@ -3199,7 +3149,7 @@ function ListSHandler($attrs) {
 		$mylist = array();
 		foreach ($list as $indi) {
 			$key=$indi->getXref();
-			$grec=$indi->getGedcomRecord();
+			$grec=$indi->getGedcom();
 			$keep = true;
 			foreach ($filters2 as $filter) {
 				if ($keep) {
@@ -3261,13 +3211,31 @@ function ListSHandler($attrs) {
 			uasort($list, array("WT_GedcomRecord", "Compare"));
 			break;
 		case "CHAN":
-			uasort($list, array("WT_GedcomRecord", "CompareChanDate"));
+			uasort($list, function($x, $y) {
+				$f1 = $x->getFirstFact('CHAN');
+				$f2 = $y->getFirstFact('CHAN');
+				if ($f1 && $f2) {
+					$d1 = $f1->getDate();
+					$d2 = $f2->getDate();
+					$cmp = WT_Date::compare($d1, $d2);
+					if ($cmp) {
+						return $cmp;
+					} else {
+						// Same date.  Compare times
+						preg_match('/\n3 TIME (.+)/', $f1->getGedcom(), $m1);
+						preg_match('/\n3 TIME (.+)/', $f2->getGedcom(), $m2);
+						return strcmp($m1[1], $m2[1]);
+					}
+				} else {
+					return 0;
+				}
+			});
 			break;
 		case "BIRT:DATE":
-			uasort($list, array("WT_Person", "CompareBirtDate"));
+			uasort($list, array("WT_Individual", "CompareBirtDate"));
 			break;
 		case "DEAT:DATE":
-			uasort($list, array("WT_Person", "CompareDeatDate"));
+			uasort($list, array("WT_Individual", "CompareDeatDate"));
 			break;
 		case "MARR:DATE":
 			uasort($list, array("WT_Family", "CompareMarrDate"));
@@ -3332,8 +3300,8 @@ function ListEHandler() {
 		$list_total = count($list);
 		$list_private = 0;
 		foreach ($list as $record) {
-			if ($record->canDisplayDetails()) {
-				$gedrec = $record->getGedcomRecord();
+			if ($record->canShow()) {
+				$gedrec = $record->getGedcom();
 				//-- start the sax parser
 				$repeat_parser = xml_parser_create();
 				$parser = $repeat_parser;
@@ -3420,15 +3388,8 @@ function RelativesSHandler($attrs) {
 		$id = trim($id);
 	}
 
-	$showempty = false;
-	if (isset($attrs['showempty'])) $showempty = $attrs['showempty'];
-	if (preg_match("/\\$(\w+)/", $showempty, $match)) {
-		$showempty = $vars[$match[1]]['id'];
-		$showempty = trim($showempty);
-	}
-
 	$list = array();
-	$person = WT_Person::getInstance($id);
+	$person = WT_Individual::getInstance($id);
 	if (!empty($person)) {
 		$list[$id] = $person;
 		switch ($group) {
@@ -3465,17 +3426,17 @@ function RelativesSHandler($attrs) {
 				}
 				break;
 			case "direct-ancestors":
-				add_ancestors($list, $id, false, $maxgen, $showempty);
+				add_ancestors($list, $id, false, $maxgen);
 				break;
 			case "ancestors":
-				add_ancestors($list, $id, true, $maxgen, $showempty);
+				add_ancestors($list, $id, true, $maxgen);
 				break;
 			case "descendants":
 				$list[$id]->generation = 1;
 				add_descendancy($list, $id, false, $maxgen);
 				break;
 			case "all":
-				add_ancestors($list, $id, true, $maxgen, $showempty);
+				add_ancestors($list, $id, true, $maxgen);
 				add_descendancy($list, $id, true, $maxgen);
 				break;
 		}
@@ -3486,10 +3447,10 @@ function RelativesSHandler($attrs) {
 			uasort($list, array("WT_GedcomRecord", "Compare"));
 			break;
 		case "BIRT:DATE":
-			uasort($list, array("WT_Report_Base", "CompareBirthDate"));
+			uasort($list, array("WT_Individual", "CompareBirtDate"));
 			break;
 		case "DEAT:DATE":
-			uasort($list, array("WT_Report_Base", "CompareDeathDate"));
+			uasort($list, array("WT_Individual", "CompareDeatDate"));
 			break;
 		case "generation":
 			$newarray = array();
@@ -3571,11 +3532,8 @@ function RelativesEHandler() {
 			if (isset($value->generation)) {
 				$generation = $value->generation;
 			}
-			if (strpos($key, "empty")===0) {
-				continue; // key can be something like "empty7"
-			}
 			$tmp=WT_GedcomRecord::getInstance($key);
-			$gedrec = $tmp->getGedcomRecord();
+			$gedrec = $tmp->getGedcom();
 			//-- start the sax parser
 			$repeat_parser = xml_parser_create();
 			$parser = $repeat_parser;
@@ -3713,4 +3671,176 @@ function DescriptionSHandler() {
 function DescriptionEHandler() {
 	global $reportDescription;
 	$reportDescription = false;
+}
+
+/**
+ * get gedcom tag value
+ *
+ * returns the value of a gedcom tag from the given gedcom record
+ * @param string $tag The tag to find, use : to delineate subtags
+ * @param int $level The gedcom line level of the first tag to find, setting level to 0 will cause it to use 1+ the level of the incoming record
+ * @param string $gedrec The gedcom record to get the value from
+ * @param int $truncate Should the value be truncated to a certain number of characters
+ * @return string
+ */
+function get_gedcom_value($tag, $level, $gedrec, $truncate='') {
+	global $GEDCOM;
+	$ged_id=get_id_from_gedcom($GEDCOM);
+
+	if (empty($gedrec)) {
+		return "";
+	}
+	$tags = explode(':', $tag);
+	$origlevel = $level;
+	if ($level==0) {
+		$level = $gedrec{0} + 1;
+	}
+
+	$subrec = $gedrec;
+	foreach ($tags as $indexval => $t) {
+		$lastsubrec = $subrec;
+		$subrec = get_sub_record($level, "$level $t", $subrec);
+		if (empty($subrec) && $origlevel==0) {
+			$level--;
+			$subrec = get_sub_record($level, "$level $t", $lastsubrec);
+		}
+		if (empty($subrec)) {
+			if ($t=="TITL") {
+				$subrec = get_sub_record($level, "$level ABBR", $lastsubrec);
+				if (!empty($subrec)) {
+					$t = "ABBR";
+				}
+			}
+			if (empty($subrec)) {
+				if ($level>0) {
+					$level--;
+				}
+				$subrec = get_sub_record($level, "@ $t", $gedrec);
+				if (empty($subrec)) {
+					return;
+				}
+			}
+		}
+		$level++;
+	}
+	$level--;
+	$ct = preg_match("/$level $t(.*)/", $subrec, $match);
+	if ($ct==0) {
+		$ct = preg_match("/$level @.+@ (.+)/", $subrec, $match);
+	}
+	if ($ct==0) {
+		$ct = preg_match("/@ $t (.+)/", $subrec, $match);
+	}
+	if ($ct > 0) {
+		$value = trim($match[1]);
+		if ($t=='NOTE' && preg_match('/^@(.+)@$/', $value, $match)) {
+			$note = WT_Note::getInstance($match[1]);
+			if ($note) {
+				$value = $note->getNote();
+			} else {
+				//-- set the value to the id without the @
+				$value = $match[1];
+			}
+		}
+		if ($level!=0 || $t!="NOTE") {
+			$value .= get_cont($level+1, $subrec);
+		}
+		return $value;
+	}
+	return "";
+}
+
+function add_ancestors(&$list, $pid, $children=false, $generations=-1, $show_empty=false) {
+	$total_num_skipped = 0;
+	$skipped_gen = 0;
+	$num_skipped = 0;
+	$genlist = array($pid);
+	$list[$pid]->generation = 1;
+	while (count($genlist)>0) {
+		$id = array_shift($genlist);
+		if (strpos($id, "empty")===0) continue; // id can be something like “empty7”
+		$person = WT_Individual::getInstance($id);
+		$famids = $person->getChildFamilies();
+		if (count($famids)>0) {
+			$num_skipped = 0;
+			foreach ($famids as $famid => $family) {
+				$husband = $family->getHusband();
+				$wife = $family->getWife();
+				if ($husband) {
+					$list[$husband->getXref()] = $husband;
+					$list[$husband->getXref()]->generation = $list[$id]->generation+1;
+				}
+				if ($wife) {
+					$list[$wife->getXref()] = $wife;
+					$list[$wife->getXref()]->generation = $list[$id]->generation+1;
+				}
+				if ($generations == -1 || $list[$id]->generation+1 < $generations) {
+					$skipped_gen = $list[$id]->generation+1;
+					if ($husband) {
+						array_push($genlist, $husband->getXref());
+					}
+					if ($wife) {
+						array_push($genlist, $wife->getXref());
+					}
+				}
+				$total_num_skipped++;
+				if ($children) {
+					$childs = $family->getChildren();
+					foreach ($childs as $child) {
+						$list[$child->getXref()] = $child;
+						if (isset($list[$id]->generation))
+							$list[$child->getXref()]->generation = $list[$id]->generation;
+						else
+							$list[$child->getXref()]->generation = 1;
+					}
+				}
+			}
+		}
+	}
+}
+
+function add_descendancy(&$list, $pid, $parents=false, $generations=-1) {
+	$person = WT_Individual::getInstance($pid);
+	if ($person==null) return;
+	if (!isset($list[$pid])) {
+		$list[$pid] = $person;
+	}
+	if (!isset($list[$pid]->generation)) {
+		$list[$pid]->generation = 0;
+	}
+	foreach ($person->getSpouseFamilies() as $family) {
+		if ($parents) {
+			$husband = $family->getHusband();
+			$wife = $family->getWife();
+			if ($husband) {
+				$list[$husband->getXref()] = $husband;
+				if (isset($list[$pid]->generation))
+					$list[$husband->getXref()]->generation = $list[$pid]->generation-1;
+				else
+					$list[$husband->getXref()]->generation = 1;
+			}
+			if ($wife) {
+				$list[$wife->getXref()] = $wife;
+				if (isset($list[$pid]->generation))
+					$list[$wife->getXref()]->generation = $list[$pid]->generation-1;
+				else
+					$list[$wife->getXref()]->generation = 1;
+			}
+		}
+		$children = $family->getChildren();
+		foreach ($children as $child) {
+			if ($child) {
+				$list[$child->getXref()] = $child;
+				if (isset($list[$pid]->generation))
+					$list[$child->getXref()]->generation = $list[$pid]->generation+1;
+				else
+					$list[$child->getXref()]->generation = 2;
+			}
+		}
+		if ($generations == -1 || $list[$pid]->generation+1 < $generations) {
+			foreach ($children as $child) {
+				add_descendancy($list, $child->getXref(), $parents, $generations); // recurse on the childs family
+			}
+		}
+	}
 }

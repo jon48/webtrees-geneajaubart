@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: admin_site_access.php 14847 2013-03-01 22:46:25Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_access.php');
 require './includes/session.php';
@@ -31,16 +29,16 @@ $controller
 	->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
 	->setPageTitle(WT_I18N::translate('Site access rules'));
 
-$action=safe_GET('action');
+$action = WT_Filter::get('action');
 switch ($action) {
 case 'delete':
-	$user_access_rule_id=safe_GET('site_access_rule_id');
+	$user_access_rule_id = WT_Filter::getInteger('site_access_rule_id');
 	WT_DB::prepare("DELETE FROM `##site_access_rule` WHERE site_access_rule_id=?")->execute(array($user_access_rule_id));
 	break;
 case 'allow':
 case 'deny':
 case 'robot':
-	$user_access_rule_id=safe_GET('site_access_rule_id');
+	$user_access_rule_id = WT_Filter::getInteger('site_access_rule_id');
 	WT_DB::prepare("UPDATE `##site_access_rule` SET rule=? WHERE site_access_rule_id=?")->execute(array($action, $user_access_rule_id));
 	break;
 case 'load_rules':
@@ -53,7 +51,7 @@ case 'load_rules':
 		" WHERE rule<>'unknown'";
 	$args=array();
 
-	$sSearch=safe_GET('sSearch');
+	$sSearch = WT_Filter::get('sSearch');
 	if ($sSearch) {
 		$sql.=
 			" AND (INET_ATON(?) BETWEEN ip_address_start AND ip_address_end".
@@ -68,18 +66,18 @@ case 'load_rules':
 		$args[]=$sSearch;
 	}
 
-	$iSortingCols=safe_GET('iSortingCols');
+	$iSortingCols = WT_Filter::getInteger('iSortingCols');
 	if ($iSortingCols) {
 		$sql.=" ORDER BY ";
 		for ($i=0; $i<$iSortingCols; ++$i) {
 			// Datatables numbers columns 0, 1, 2, ...
 			// MySQL numbers columns 1, 2, 3, ...
-			switch (safe_GET('sSortDir_'.$i)) {
+			switch (WT_Filter::get('sSortDir_'.$i)) {
 			case 'asc':
-				$sql.=(1+(int)safe_GET('iSortCol_'.$i)).' ASC ';
+				$sql.=(1 + WT_Filter::getInteger('iSortCol_'.$i)).' ASC ';
 				break;
 			case 'desc':
-				$sql.=(1+(int)safe_GET('iSortCol_'.$i)).' DESC ';
+				$sql.=(1 + WT_Filter::getInteger('iSortCol_'.$i)).' DESC ';
 				break;
 			}
 			if ($i<$iSortingCols-1) {
@@ -90,8 +88,8 @@ case 'load_rules':
 		$sql.=" ORDER BY updated DESC";
 	}
 
-	$iDisplayStart =(int)safe_GET('iDisplayStart');
-	$iDisplayLength=(int)safe_GET('iDisplayLength');
+	$iDisplayStart  = WT_Filter::getInteger('iDisplayStart');
+	$iDisplayLength = WT_Filter::getInteger('iDisplayLength');
 	if ($iDisplayLength>0) {
 		$sql.=" LIMIT " . $iDisplayStart . ',' . $iDisplayLength;
 	}
@@ -111,7 +109,7 @@ case 'load_rules':
 			'robot'=>/* I18N: http://en.wikipedia.org/wiki/Web_crawler */  WT_I18N::translate('robot'),
 		), null, $row[5]);
 		$row[6]=edit_field_inline('site_access_rule-comment-'.$site_access_rule_id, $row[6]);
-		$row[7]='<i class="icon-delete" onclick="if (confirm(\''.htmlspecialchars(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($user_agent))).'\')) { document.location=\''.WT_SCRIPT_NAME.'?action=delete&amp;site_access_rule_id='.$site_access_rule_id.'\'; }"></i>';
+		$row[7]='<i class="icon-delete" onclick="if (confirm(\''.WT_Filter::escapeHtml(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($user_agent))).'\')) { document.location=\''.WT_SCRIPT_NAME.'?action=delete&amp;site_access_rule_id='.$site_access_rule_id.'\'; }"></i>';
 	}
 
 	// Total filtered rows
@@ -121,10 +119,10 @@ case 'load_rules':
 
 	header('Content-type: application/json');
 	echo json_encode(array( // See http://www.datatables.net/usage/server-side
-		'sEcho'               =>(int)safe_GET('sEcho'),
-		'iTotalRecords'       =>$iTotalRecords,
-		'iTotalDisplayRecords'=>$iTotalDisplayRecords,
-		'aaData'              =>$aaData
+		'sEcho'                => WT_Filter::getInteger('sEcho'), // Always an integer
+		'iTotalRecords'        => $iTotalRecords,
+		'iTotalDisplayRecords' => $iTotalDisplayRecords,
+		'aaData'               => $aaData
 	));
 	exit;
 case 'load_unknown':
@@ -137,7 +135,7 @@ case 'load_unknown':
 		" WHERE rule='unknown'";
 	$args=array();
 
-	$sSearch=safe_GET('sSearch');
+	$sSearch = WT_Filter::get('sSearch');
 	if ($sSearch) {
 		$sql.=
 			" AND (INET_ATON(ip_address_start) LIKE CONCAT('%', ?, '%')".
@@ -146,18 +144,18 @@ case 'load_unknown':
 		$args[]=$sSearch;
 	}
 
-	$iSortingCols=safe_GET('iSortingCols');
+	$iSortingCols = WT_Filter::getInteger('iSortingCols');
 	if ($iSortingCols) {
 		$sql.=" ORDER BY ";
 		for ($i=0; $i<$iSortingCols; ++$i) {
 			// Datatables numbers columns 0, 1, 2, ...
 			// MySQL numbers columns 1, 2, 3, ...
-			switch (safe_GET('sSortDir_'.$i)) {
+			switch (WT_Filter::get('sSortDir_'.$i)) {
 			case 'asc':
-				$sql.=(1+(int)safe_GET('iSortCol_'.$i)).' ASC ';
+				$sql.=(1 + WT_Filter::getInteger('iSortCol_'.$i)).' ASC ';
 				break;
 			case 'desc':
-				$sql.=(1+(int)safe_GET('iSortCol_'.$i)).' DESC ';
+				$sql.=(1 + WT_Filter::getInteger('iSortCol_'.$i)).' DESC ';
 				break;
 			}
 			if ($i<$iSortingCols-1) {
@@ -168,8 +166,8 @@ case 'load_unknown':
 		$sql.=" ORDER BY updated DESC";
 	}
 
-	$iDisplayStart =(int)safe_GET('iDisplayStart');
-	$iDisplayLength=(int)safe_GET('iDisplayLength');
+	$iDisplayStart  = WT_Filter::getInteger('iDisplayStart');
+	$iDisplayLength = WT_Filter::getInteger('iDisplayLength');
 	if ($iDisplayLength>0) {
 		$sql.=" LIMIT " . $iDisplayStart . ',' . $iDisplayLength;
 	}
@@ -191,10 +189,10 @@ case 'load_unknown':
 
 	header('Content-type: application/json');
 	echo json_encode(array( // See http://www.datatables.net/usage/server-side
-		'sEcho'               =>(int)safe_GET('sEcho'),
-		'iTotalRecords'       =>$iTotalRecords,
-		'iTotalDisplayRecords'=>$iTotalDisplayRecords,
-		'aaData'              =>$aaData
+		'sEcho'                => WT_Filter::getInteger('sEcho'), // Always an integer
+		'iTotalRecords'        => $iTotalRecords,
+		'iTotalDisplayRecords' => $iTotalDisplayRecords,
+		'aaData'               => $aaData
 	));
 	exit;
 }

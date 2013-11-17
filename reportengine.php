@@ -7,7 +7,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,22 +22,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: reportengine.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'reportengine.php');
 require './includes/session.php';
 
 $controller=new WT_Controller_Page();
 
-$famid   =safe_GET('famid');
-$pid     =safe_GET('pid');
-$action  =safe_GET('action', array('choose', 'setup', 'run'), 'choose');
-$report  =safe_GET('report');
-$output  =safe_GET('output', array('HTML', 'PDF'), 'PDF');
-$vars    =safe_GET('vars');
-$varnames=safe_GET('varnames');
-$type    =safe_GET('type');
+$famid   =WT_Filter::get('famid');
+$pid     =WT_Filter::get('pid');
+$action  =WT_Filter::get('action', 'choose|setup|run', 'choose');
+$report  =WT_Filter::get('report');
+$output  =WT_Filter::get('output', 'HTML|PDF', 'PDF');
+$vars    =WT_Filter::get('vars');
+$varnames=WT_Filter::get('varnames');
+$type    =WT_Filter::get('type');
 if (!is_array($vars)) {
 	$vars=array();
 }
@@ -67,21 +65,20 @@ $newvars = array();
 foreach ($vars as $name=>$var) {
 	$newvars[$name]['id'] = $var;
 	if (!empty($type[$name]) && (($type[$name]=='INDI') || ($type[$name]=='FAM') || ($type[$name]=='SOUR'))) {
-		$gedcom = find_gedcom_record($var, WT_GED_ID);
-		if (empty($gedcom)) {
+		$record = WT_GedcomRecord::getInstance($var);
+		if (!$record) {
 			$action='setup';
 		}
+		$gedcom = $record->getGedcom();
 		// If we wanted a FAM, and were given an INDI, look for a spouse
-		if ($type[$name]=='FAM') {
-			if (preg_match('/0 @.+@ INDI/', $gedcom)>0) {
-				if (preg_match('/\n1 FAMS @(.+)@/', $gedcom, $match)) {
-					$gedcom = find_family_record($match[1], WT_GED_ID);
-					if (!empty($gedcom)) {
-						$vars[$name] = $match[1];
-					} else {
-						$action='setup';
-					}
-				}
+		if ($type[$name]=='FAM' && $record instanceof WT_Individual) {
+			$tmp = false;
+			foreach ($record->getSpouseFamilies() as $family) {
+				$gedcom = $family->getGedcom();
+				$tmp = true;
+			}
+			if (!$tmp) {
+				$action='setup';
 			}
 		}
 		$newvars[$name]['gedcom'] = $gedcom;
@@ -212,7 +209,7 @@ elseif ($action=='setup') {
 			}
 		}
 		if ($input['type']=='text') {
-			echo '<input type="text" name="vars[', $input['name'], ']" id="', $input['name'], '" 
+			echo '<input type="text" name="vars[', $input['name'], ']" id="', $input['name'], '"
 					value="', $input['default'], '" style="direction: ltr;">';
 		}
 		if ($input['type']=='checkbox') {
@@ -231,7 +228,7 @@ elseif ($action=='setup') {
 				if (substr($display, 0, 18)=='WT_I18N::translate' || substr($display, 0, 15) == 'WT_I18N::number' || substr($display, 0, 23)=='WT_Gedcom_Tag::getLabel') {
 					eval("\$display=$display;");
 				}
-				echo '<option value="', htmlspecialchars($value), '"';
+				echo '<option value="', WT_Filter::escapeHtml($value), '"';
 				if ($opt[0]==$input['default']) {
 					echo ' selected="selected"';
 				}
@@ -368,7 +365,6 @@ elseif ($action=='run') {
 	$elementHandler['Title']['start']            = 'TitleSHandler';
 	$elementHandler['TotalPages']['start']       = 'TotalPagesSHandler';
 	$elementHandler['var']['start']              = 'varSHandler';
-	$elementHandler['varLetter']['start']        = 'varLetterSHandler';
 	$elementHandler['sp']['start']               = 'spSHandler';
 
 	/**

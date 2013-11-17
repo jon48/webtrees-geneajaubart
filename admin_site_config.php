@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: admin_site_config.php 15038 2013-06-12 07:17:35Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_config.php');
 require './includes/session.php';
@@ -87,7 +85,7 @@ $WELCOME_TEXT_AUTH_MODE_OPTIONS = array(
 							<dt><?php echo WT_I18N::translate('Allow users to select their own theme'), help_link('ALLOW_USER_THEMES'); ?></dt>
 							<dd><?php echo edit_field_yes_no_inline('site_setting-ALLOW_USER_THEMES', WT_Site::preference('ALLOW_USER_THEMES'), $controller); ?></dd>
 
-							<dt><?php echo WT_I18N::translate('Default Theme'), help_link('THEME'); ?></dt>
+							<dt><?php echo WT_I18N::translate('Default theme'), help_link('THEME'); ?></dt>
 							<dd><?php echo select_edit_control_inline('site_setting-THEME_DIR', array_flip(get_theme_names()), null, WT_Site::preference('THEME_DIR'), $controller); ?></dd>
 
 							<dt><?php echo WT_I18N::translate('Show list of family trees'), help_link('ALLOW_CHANGE_GEDCOM'); ?></dt>
@@ -159,16 +157,13 @@ $WELCOME_TEXT_AUTH_MODE_OPTIONS = array(
 							<dt><?php echo WT_I18N::translate('Login URL'), help_link('LOGIN_URL'); ?></dt>
 							<dd><?php echo edit_field_inline('site_setting-LOGIN_URL', WT_Site::preference('LOGIN_URL'), $controller); ?></dd>
 
-							<dt><?php echo WT_I18N::translate('Standard header for custom welcome text'), help_link('WELCOME_TEXT_CUST_HEAD'); ?></dt>
-							<dd><?php echo edit_field_yes_no_inline('site_setting-WELCOME_TEXT_CUST_HEAD', WT_Site::preference('WELCOME_TEXT_CUST_HEAD'), $controller); ?></dd>
-
 							<dt><?php echo WT_I18N::translate('Welcome text on login page'), help_link('WELCOME_TEXT_AUTH_MODE'); ?></dt>
 							<dd><?php echo select_edit_control_inline('site_setting-WELCOME_TEXT_AUTH_MODE', $WELCOME_TEXT_AUTH_MODE_OPTIONS, null, WT_Site::preference('WELCOME_TEXT_AUTH_MODE'), $controller); ?></dd>
 
-							<dt><?php echo WT_I18N::translate('Custom welcome text'), help_link('WELCOME_TEXT_AUTH_MODE_CUST'); ?></dt>
+							<dt><?php echo WT_I18N::translate('Custom welcome text'), ' — ', WT_LOCALE, help_link('WELCOME_TEXT_AUTH_MODE_CUST'); ?></dt>
 							<dd><?php echo edit_text_inline('site_setting-WELCOME_TEXT_AUTH_MODE_4', WT_Site::preference('WELCOME_TEXT_AUTH_MODE_'.WT_LOCALE), $controller); ?></dd>
 
-							<dt><?php echo WT_I18N::translate('Show acceptable use agreement on «Request new user account» page'), help_link('SHOW_REGISTER_CAUTION'); ?></dt>
+							<dt><?php echo WT_I18N::translate('Show acceptable use agreement on “Request new user account” page'), help_link('SHOW_REGISTER_CAUTION'); ?></dt>
 							<dd><?php echo edit_field_yes_no_inline('site_setting-SHOW_REGISTER_CAUTION', WT_Site::preference('SHOW_REGISTER_CAUTION'), $controller); ?></dd>
 						</dl>
 					</td>

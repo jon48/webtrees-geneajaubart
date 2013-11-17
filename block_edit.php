@@ -2,7 +2,7 @@
 // Change the preferences for a block on the index pages.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,14 +17,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: block_edit.php 14481 2012-10-30 10:41:55Z greg $
 
 define('WT_SCRIPT_NAME', 'block_edit.php');
 require './includes/session.php';
 
-$block_id=safe_GET('block_id');
-$block=WT_DB::prepare(
+$block_id = WT_Filter::getInteger('block_id');
+$block = WT_DB::prepare(
 	"SELECT SQL_CACHE * FROM `##block` WHERE block_id=?"
 )->execute(array($block_id))->fetchOneRow();
 
@@ -47,6 +45,7 @@ if (array_key_exists('ckeditor', WT_Module::getActiveModules())) {
 ?>
 <form name="block" method="post" action="block_edit.php?block_id=<?php echo $block_id; ?>" onsubmit="return modalDialogSubmitAjax(this);" >
 	<input type="hidden" name="save" value="1">
+	<?php echo WT_Filter::getCsrf(); ?>
 	<p>
 		<?php echo $block->getDescription(); ?>
 	</p>

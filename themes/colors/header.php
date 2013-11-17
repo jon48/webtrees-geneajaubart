@@ -2,10 +2,10 @@
 // Header for colors theme
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: header.php 14976 2013-05-11 07:53:39Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -36,7 +34,7 @@ $this
 	->addExternalJavascript(WT_JQUERY_COLORBOX_URL)
 	->addExternalJavascript(WT_JQUERY_WHEELZOOM_URL)
 	->addInlineJavascript('activate_colorbox();')
-	->addInlineJavascript('jQuery.extend(jQuery.colorbox.settings, {width:"70%", height:"70%", transition:"none", slideshowStart:"'. WT_I18N::translate('Play').'", slideshowStop:"'. WT_I18N::translate('Stop').'"})') 
+	->addInlineJavascript('jQuery.extend(jQuery.colorbox.settings, {width:"70%", height:"70%", transition:"none", slideshowStart:"'. WT_I18N::translate('Play').'", slideshowStop:"'. WT_I18N::translate('Stop').'"})')
 
 	->addInlineJavascript('
 		jQuery.extend(jQuery.colorbox.settings, {
@@ -51,12 +49,12 @@ echo
 	'<html ', WT_I18N::html_markup(), '>',
 	'<head>',
 	'<meta charset="UTF-8">',
-	'<title>', htmlspecialchars($title), '</title>',
+	'<title>', WT_Filter::escapeHtml($title), '</title>',
 	header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
-	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
+	'<link rel="icon" href="', WT_CSS_URL, 'favicon.png" type="image/png">',
 	'<link rel="stylesheet" href="', WT_THEME_URL, 'jquery-ui-1.10.3/jquery-ui-1.10.3.custom.css" type="text/css">',
-	'<link rel="stylesheet" href="', WT_THEME_URL, 'css/colors.css" type="text/css">',
-	'<link rel="stylesheet" href="', WT_THEME_URL,  'css/',  $subColor,  '.css" type="text/css" media="all">';
+	'<link rel="stylesheet" href="', WT_CSS_URL, 'css/colors.css" type="text/css">',
+	'<link rel="stylesheet" href="', WT_CSS_URL,  'css/',  $subColor,  '.css" type="text/css" media="all">';
 
 if (stristr($_SERVER['HTTP_USER_AGENT'], 'iPad')) {
 	echo '<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.8, maximum-scale=2.0" />';
@@ -71,10 +69,10 @@ if (stristr($_SERVER['HTTP_USER_AGENT'], 'iPad')) {
 
 switch ($BROWSERTYPE) {
 case 'msie':
-	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_URL, $BROWSERTYPE, '.css">';
+	echo '<link type="text/css" rel="stylesheet" href="', WT_CSS_URL, $BROWSERTYPE, '.css">';
 	break;
 case 'ipad':
-	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_URL, $BROWSERTYPE, '.css">';
+	echo '<link type="text/css" rel="stylesheet" href="', WT_CSS_URL, $BROWSERTYPE, '.css">';
 	break;
 }
 
@@ -93,8 +91,8 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 	'<div id="header">',
 	'<span class="title" dir="auto">', WT_TREE_TITLE, '</span>';
 
-	// Top row right 
-	echo 
+	// Top row right
+	echo
 	'<ul class="makeMenu">';
 
 	if (WT_USER_ID) {
@@ -134,6 +132,7 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 		'<li>',
 			'<form style="display:inline;" action="search.php" method="post">',
 			'<input type="hidden" name="action" value="general">',
+			'<input type="hidden" name="ged" value="', WT_GEDCOM, '">',
 			'<input type="hidden" name="topsearch" value="yes">',
 			'<input type="search" name="query" size="15" placeholder="', WT_I18N::translate('Search'), '" dir="auto">',
 			'<input class="search-icon" type="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '">',
@@ -145,7 +144,7 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 	// Second Row menu and palette selection
 	// Menu
 	$menu_items=array(
-		WT_MenuBar::getGedcomMenu(), 
+		WT_MenuBar::getGedcomMenu(),
 		WT_MenuBar::getMyPageMenu(),
 		WT_MenuBar::getChartsMenu(),
 		WT_MenuBar::getListsMenu(),
@@ -160,7 +159,7 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 	// Print the menu bar
 	echo
 
-		'<ul id="main-menu">'; 
+		'<ul id="main-menu">';
 		foreach ($menu_items as $menu) {
 			if ($menu) {
 			echo getMenuAsCustomList($menu);
@@ -168,9 +167,9 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 		}
 	unset($menu_items, $menu);
 	echo
-		'</ul>'; 
+		'</ul>';
 }
-// Remove list from home when only 1 gedcom 
+// Remove list from home when only 1 gedcom
 $this->addInlineJavaScript(
 	'if (jQuery("#menu-tree ul li").length == 2) jQuery("#menu-tree ul li:last-child").remove();'
 );

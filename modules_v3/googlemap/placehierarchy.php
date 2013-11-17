@@ -2,10 +2,10 @@
 // Displays a place hierachy
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team. All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: placehierarchy.php 14589 2012-12-05 08:44:21Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -128,12 +126,12 @@ function set_levelm($level, $parent) {
 function create_map($placelevels) {
 	global $level;
 	global $GOOGLEMAP_PH_XSIZE, $GOOGLEMAP_PH_YSIZE, $GOOGLEMAP_MAP_TYPE, $levelm, $plzoom, $controller;
-	
+
 	// *** ENABLE STREETVIEW *** (boolean) =========================================================
 	$STREETVIEW = get_module_setting('googlemap', 'GM_USE_STREETVIEW');
 	// =============================================================================================
-	$parent = safe_GET('parent', WT_REGEX_UNSAFE);
-	
+	$parent = WT_Filter::get('parent');
+
 	// create the map
 	echo '<table style="margin:20px auto 0 auto;"><tr valign="top"><td>';
 	//<!-- start of map display -->
@@ -141,19 +139,19 @@ function create_map($placelevels) {
 	echo '<td class="center" width="200px">';
 
 	$levelm = set_levelm($level, $parent);
-	$latlng = 
+	$latlng =
 		WT_DB::prepare("SELECT pl_place, pl_id, pl_lati, pl_long, pl_zoom, sv_long, sv_lati, sv_bearing, sv_elevation, sv_zoom FROM `##placelocation` WHERE pl_id=?")
 		->execute(array($levelm))
 		->fetch(PDO::FETCH_ASSOC);
 	if ($STREETVIEW && $level!=0 ) {
 		echo '<div id="place_map" style="margin-top:20px; border:1px solid gray; width: ', $GOOGLEMAP_PH_XSIZE, 'px; height: ', $GOOGLEMAP_PH_YSIZE, 'px; ';
 	} else {
-		echo '<div id="place_map" style="border:1px solid gray; width:', $GOOGLEMAP_PH_XSIZE, 'px; height:', $GOOGLEMAP_PH_YSIZE, 'px; ';	
+		echo '<div id="place_map" style="border:1px solid gray; width:', $GOOGLEMAP_PH_XSIZE, 'px; height:', $GOOGLEMAP_PH_YSIZE, 'px; ';
 	}
 	echo "\"><i class=\"icon-loading-large\"></i></div>";
 	echo '<script src="', WT_GM_SCRIPT, '"></script>';
 	echo '</td>';
-	
+
 	$plzoom	= $latlng['pl_zoom'];		// Map zoom level
 
 	if (WT_USER_IS_ADMIN) {
@@ -175,7 +173,7 @@ function create_map($placelevels) {
 		echo '&nbsp;|&nbsp;';
 		echo '<a href="'.$placecheck_url.'">', WT_I18N::translate('Place Check'), '</a>';
 		if (array_key_exists('batch_update', WT_Module::getActiveModules())) {
-			$placelevels=preg_replace('/, '.WT_I18N::translate('unknown').'/', ', ', $placelevels); // replace ", unknown" with ", " 
+			$placelevels=preg_replace('/, '.WT_I18N::translate('unknown').'/', ', ', $placelevels); // replace ", unknown" with ", "
 			$placelevels=substr($placelevels, 2); // remove the leading ", "
 			if ($placelevels) {
 				$batchupdate_url='module.php?mod=batch_update&amp;mod_action=admin_batch_update&amp;plugin=search_replace_bu_plugin&amp;method=exact&amp;ged='.WT_GEDCOM.'&amp;search='.urlencode($placelevels); // exact match
@@ -196,25 +194,25 @@ function create_map($placelevels) {
 				var svbear = document.getElementById("sv_bearText").value.slice(0, -1);
 				var svelev = document.getElementById("sv_elevText").value.slice(0, -1);
 				var svzoom = document.getElementById("sv_zoomText").value;
-				win03 = window.open("module.php?mod=googlemap&mod_action=places_edit&action=update_sv_params&placeid="+placeid+"&svlati="+svlati+"&svlong="+svlong+"&svbear="+svbear+"&svelev="+svelev+"&svzoom="+svzoom, "win03", indx_window_specs);	
+				win03 = window.open("module.php?mod=googlemap&mod_action=places_edit&action=update_sv_params&placeid="+placeid+"&svlati="+svlati+"&svlong="+svlong+"&svbear="+svbear+"&svelev="+svelev+"&svzoom="+svzoom, "win03", indx_window_specs);
 				if (window.focus) {win03.focus();}
 			}
 		');
-	
-		$parent = safe_GET('parent');
+
+		$parent = WT_Filter::get('parent');
 		global $TBLPREFIX, $pl_lati, $pl_long;
 		if ($level>=1) {
 			$pl_lati = str_replace(array('N', 'S', ','), array('', '-', '.'), $latlng['pl_lati']);	// WT_placelocation lati
 			$pl_long = str_replace(array('E', 'W', ','), array('', '-', '.'), $latlng['pl_long']);	// WT_placelocation long
-			
-			// Check if Streetview location parameters are stored in database		
+
+			// Check if Streetview location parameters are stored in database
 			$placeid	= $latlng['pl_id'];			// Placelocation place id
 			$sv_lat		= $latlng['sv_lati'];		// StreetView Point of View Latitude
-			$sv_lng		= $latlng['sv_long'];		// StreetView Point of View Longitude	
+			$sv_lng		= $latlng['sv_long'];		// StreetView Point of View Longitude
 			$sv_dir		= $latlng['sv_bearing'];	// StreetView Point of View Direction (degrees from North)
 			$sv_pitch	= $latlng['sv_elevation'];	// StreetView Point of View Elevation (+90 to -90 degrees (+=down, -=up)
 			$sv_zoom	= $latlng['sv_zoom'];		// StreetView Point of View Zoom (0, 1, 2 or 3)
-			
+
 			// Check if Street View Lati/Long are the default of 0 or null, if so use regular Place Lati/Long to set an initial location for the panda ------------
 			if (($latlng['sv_lati']==null && $latlng['sv_long']==null) || ($latlng['sv_lati']==0 && $latlng['sv_long']==0)) {
 					$sv_lat = $pl_lati;
@@ -226,11 +224,11 @@ function create_map($placelevels) {
 			}
 			if ($sv_pitch==null) {
 				$sv_pitch=0;
-			}				
+			}
 			if ($sv_zoom==null) {
 				$sv_zoom=1;
 			}
-			
+
 			$_map = WT_I18N::translate('Google Maps™');
 			$_reset = WT_I18N::translate('Reset');
 				$_streetview = /* I18N: http://en.wikipedia.org/wiki/Google_street_view */ WT_I18N::translate('Google Street View™');
@@ -238,8 +236,8 @@ function create_map($placelevels) {
 			<div>
 			<iframe style="background:transparent; margin-top:-3px; margin-left:2px; width:530px;height:405px;padding:0;border:solid 0px black" src="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>googlemap/wt_v3_street_view.php?x=<?php echo $sv_lng; ?>&amp;y=<?php echo $sv_lat; ?>&amp;z=18&amp;t=2&amp;c=1&amp;s=1&amp;b=<?php echo $sv_dir; ?>&amp;p=<?php echo $sv_pitch; ?>&amp;m=<?php echo $sv_zoom; ?>&amp;j=1&amp;k=1&amp;v=1&amp;map=<?php echo $_map; ?>&amp;reset=<?php echo $_reset; ?>&amp;streetview=<?php echo $_streetview; ?>" marginwidth="0" marginheight="0" frameborder="0" scrolling="no"></iframe>
 			</div>
-			
-			<?php			
+
+			<?php
 			$list_latlon = (
 				WT_Gedcom_Tag::getLabel('LATI')."<input name='sv_latiText' id='sv_latiText' type='text' style='width:42px; background:none; border:none;' value='".$sv_lat."'>".
 				WT_Gedcom_Tag::getLabel('LONG')."<input name='sv_longText' id='sv_longText' type='text' style='width:42px; background:none; border:none;' value='".$sv_lng."'>".
@@ -309,7 +307,7 @@ function print_how_many_people($level, $parent) {
 
 function print_gm_markers($place2, $level, $parent, $levelm, $linklevels, $placelevels, $lastlevel=false) {
 	global $GOOGLEMAP_COORD, $GOOGLEMAP_PH_MARKER, $GM_DISP_SHORT_PLACE;
-	
+
 	if (($place2['lati'] == NULL) || ($place2['long'] == NULL) || (($place2['lati'] == '0') && ($place2['long'] == '0'))) {
 		//PERSO
 		$icon_image = WT_STATIC_URL.WT_MODULES_DIR. 'googlemap/images/marker_yellow.png';
@@ -383,7 +381,7 @@ function print_gm_markers($place2, $level, $parent, $levelm, $linklevels, $place
 		} elseif ($long < 0) {
 			$long = '-'.abs($long);
 		}
-		
+
 		// flags by kiwi3685 ---
 		//PERSO Resize flags
 		$icon_image="";
@@ -469,7 +467,7 @@ function map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $pla
 		var numMarkers = "'.$numfound.'";
 		var mapLevel   = "'.$level.   '";
 		var placezoom  = "'.$plzoom.  '";
-		var infowindow = new google.maps.InfoWindow({ 
+		var infowindow = new google.maps.InfoWindow({
 			// size: new google.maps.Size(150,50),
 			// maxWidth: 600
 		});
@@ -480,7 +478,7 @@ function map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $pla
 		var markers = [];
 		var gmarkers = [];
 		var i = 0;
-	
+
 		// Create the map and mapOptions
 		var mapOptions = {
 			zoom: 8,
@@ -498,19 +496,19 @@ function map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $pla
 			scrollwheel: false
 		};
 		map = new google.maps.Map(document.getElementById("place_map"), mapOptions);
-	
+
 		// Close any infowindow when map is clicked
 		google.maps.event.addListener(map, "click", function() {
 			infowindow.close();
 		});
-	
+
 		// If only one marker, set zoom level to that of place in database
 		if (mapLevel != 0) {
 			var pointZoom = placezoom;
 		} else {
 			var pointZoom = 1;
 		}
-	
+
 		// Creates a marker whose info window displays the given name
 		//PERSO Add width and height
 		function createMarker(point, html, icon, name, width, height) {	
@@ -575,9 +573,9 @@ function map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $pla
 			marker.mypoint = point;
 			marker.mytitle = name;
 			marker.myposn = posn;
-			gmarkers.push(marker); 
+			gmarkers.push(marker);
 			bounds.extend(marker.position);
-		
+
 			// If only one marker use database place zoom level rather than fitBounds of markers
 			if (numMarkers > 1) {
 				map.fitBounds(bounds);
@@ -588,7 +586,7 @@ function map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $pla
 			return marker;
 		}
 	');
-	
+
 	global $GOOGLEMAP_MAX_ZOOM;
 	$levelm = set_levelm($level, $parent);
 	if (isset($levelo[0])) $levelo[0]=0;
@@ -609,7 +607,7 @@ function map_scripts($numfound, $level, $parent, $linklevels, $placelevels, $pla
 		// echo "map.maxZoom=".$GOOGLEMAP_MAX_ZOOM.";";
 		// echo "zoomlevel = map.getBoundsZoomLevel(bounds);\n";
 		// echo " map.setCenter(new google.maps.LatLng(0, 0), zoomlevel+18);\n";
-	} 
+	}
 	//create markers
 
 	ob_start(); // TODO: rewrite print_gm_markers, and the functions called therein, to either return text or add JS directly.

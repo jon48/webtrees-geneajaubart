@@ -3,7 +3,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -21,8 +21,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -120,12 +118,12 @@ class recent_changes_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function configureBlock($block_id) {
-		if (safe_POST_bool('save')) {
-			set_block_setting($block_id, 'days', safe_POST_integer('days', 1, 30, 7));
-			set_block_setting($block_id, 'infoStyle', safe_POST('infoStyle', array('list', 'table'), 'table'));
-			set_block_setting($block_id, 'sortStyle', safe_POST('sortStyle', array('name', 'date_asc', 'date_desc'), 'date_desc'));
-			set_block_setting($block_id, 'hide_empty', safe_POST_bool('hide_empty'));
-			set_block_setting($block_id, 'block', safe_POST_bool('block'));
+		if (WT_Filter::postBool('save') && WT_Filter::checkCsrf()) {
+			set_block_setting($block_id, 'days',       WT_Filter::postInteger('days', 1, 30, 7));
+			set_block_setting($block_id, 'infoStyle',  WT_Filter::post('infoStyle', 'list|table', 'table'));
+			set_block_setting($block_id, 'sortStyle',  WT_Filter::post('sortStyle', 'name|date_asc|date_desc', 'date_desc'));
+			set_block_setting($block_id, 'hide_empty', WT_Filter::postBool('hide_empty'));
+			set_block_setting($block_id, 'block',      WT_Filter::postBool('block'));
 			exit;
 		}
 

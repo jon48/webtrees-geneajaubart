@@ -6,7 +6,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,25 +21,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: addmedia.php 15040 2013-06-14 20:33:24Z greg $
 
 define('WT_SCRIPT_NAME', 'addmedia.php');
 require './includes/session.php';
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 require WT_ROOT.'includes/functions/functions_edit.php';
 
-$pid         = safe_REQUEST($_REQUEST, 'pid',         WT_REGEX_XREF); // edit this media object
-$linktoid    = safe_REQUEST($_REQUEST, 'linktoid',    WT_REGEX_XREF); // create a new media object, linked to this record
-$action      = safe_REQUEST($_REQUEST, 'action');
-$filename    = safe_REQUEST($_REQUEST, 'filename',    WT_REGEX_UNSAFE);
-$text        = safe_REQUEST($_REQUEST, 'text',        WT_REGEX_UNSAFE);
-$tag         = safe_REQUEST($_REQUEST, 'tag',         WT_REGEX_UNSAFE);
-$islink      = safe_REQUEST($_REQUEST, 'islink',      WT_REGEX_UNSAFE);
-$glevels     = safe_REQUEST($_REQUEST, 'glevels',     WT_REGEX_UNSAFE);
+$pid         = WT_Filter::get('pid',      WT_REGEX_XREF, WT_Filter::post('pid', WT_REGEX_XREF));      // edit this media object
+$linktoid    = WT_Filter::get('linktoid', WT_REGEX_XREF, WT_Filter::post('linktoid', WT_REGEX_XREF)); // create a new media object, linked to this record
+$action      = WT_Filter::get('action',   null, WT_Filter::post('action'));
+$filename    = WT_Filter::get('filename', null, WT_Filter::post('filename'));
+$text        = WT_Filter::postArray('text');
+$tag         = WT_Filter::postArray('tag', WT_REGEX_TAG);
+$islink      = WT_Filter::postArray('islink');
+$glevels     = WT_Filter::postArray('glevels', '[0-9]');
 
-$folder      = safe_POST('folder',      WT_REGEX_UNSAFE);
-$update_CHAN = !safe_POST_bool('preserve_last_changed');
+$folder      = WT_Filter::post('folder');
+$update_CHAN = !WT_Filter::postBool('preserve_last_changed');
 
 $controller = new WT_Controller_Simple();
 $controller
@@ -64,16 +62,16 @@ $controller
 		pastefield.value += value;
 	}
 	');
-	
+
 $disp = true;
 $media = WT_Media::getInstance($pid);
 if ($media) {
-	$disp = $media->canDisplayDetails();
+	$disp = $media->canShow();
 }
 if ($action=='update' || $action=='create') {
 	if (!isset($linktoid) || $linktoid=='new') $linktoid='';
 	if (!empty($linktoid)) {
-		$disp = WT_GedcomRecord::getInstance($linktoid)->canDisplayDetails();
+		$disp = WT_GedcomRecord::getInstance($linktoid)->canShow();
 	}
 }
 
@@ -173,7 +171,7 @@ case 'create': // Save the information from the “showcreateform” action
 		WT_FlashMessages::addMessage(WT_I18N::translate('Filenames are not allowed to contain the character “%s”.', $match[1]));
 		$filename = '';
 		break;
-	} elseif (preg_match('/(\.(php|pl|cgi|bash|sh|bat|exe|com))$/', $filename)) {
+	} elseif (preg_match('/(\.(php|pl|cgi|bash|sh|bat|exe|com|htm|html|shtml))$/i', $filename, $match)) {
 		// Do not allow obvious script files.
 		WT_FlashMessages::addMessage(WT_I18N::translate('Filenames are not allowed to have the extension “%s”.', $match[1]));
 		$filename = '';
@@ -226,36 +224,33 @@ case 'create': // Save the information from the “showcreateform” action
 
 	$controller->pageHeader();
 	// Build the gedcom record
-	$media_id = get_new_xref('OBJE');
-	if ($media_id) {
-		$newged = '0 @' . $media_id . "@ OBJE\n";
-		if ($tag[0]=='FILE') {
-			// The admin has an edit field to change the file name
-			$text[0] = $folderName . $fileName;
-		} else {
-			// Users keep the original filename
-			$newged .= '1 FILE ' . $folderName . $fileName;
-		}
+	$newged = "0 @new@ OBJE";
+	if ($tag[0]=='FILE') {
+		// The admin has an edit field to change the file name
+		$text[0] = $folderName . $fileName;
+	} else {
+		// Users keep the original filename
+		$newged .= "\n1 FILE " . $folderName . $fileName;
+	}
 
-		$newged  = handle_updates($newged);
+	$newged  = handle_updates($newged);
 
-		if (append_gedrec($newged, WT_GED_ID)) {
-			if ($linktoid) {
-				linkMedia($media_id, $linktoid, 1);
-				AddToLog('Media ID '.$media_id." successfully added to $linktoid.", 'edit');
-				$controller->addInlineJavascript('closePopupAndReloadParent();');
-			} else {
-				AddToLog('Media ID '.$media_id.' successfully added.', 'edit');
-				$controller->addInlineJavascript('openerpasteid("' . $media_id . '");');
-			}
-		}
+	$media = WT_GedcomRecord::createRecord($newged, WT_GED_ID);
+	if ($linktoid) {
+		$record = WT_GedcomRecord::getInstance($linktoid);
+		$record->createFact('1 OBJE @' . $media->getXref() . '@', true);
+		AddToLog('Media ID '.$media->getXref()." successfully added to $linktoid.", 'edit');
+		$controller->addInlineJavascript('closePopupAndReloadParent();');
+	} else {
+		AddToLog('Media ID '.$media->getXref().' successfully added.', 'edit');
+		$controller->addInlineJavascript('openerpasteid("' . $media->getXref() . '");');
 	}
 	echo '<button onclick="closePopupAndReloadParent();">', WT_I18N::translate('close'), '</button>';
 	exit;
-	
+
 case 'update': // Save the information from the “editmedia” action
 	$controller->setPageTitle(WT_I18N::translate('Edit media object'));
-	
+
 	// Validate the media folder
 	$folderName = str_replace('\\', '/', $folder);
 	$folderName = trim($folderName, '/');
@@ -315,7 +310,7 @@ case 'update': // Save the information from the “editmedia” action
 		WT_FlashMessages::addMessage(WT_I18N::translate('Filenames are not allowed to contain the character “%s”.', $match[1]));
 		$filename = '';
 		break;
-	} elseif (preg_match('/(\.(php|pl|cgi|bash|sh|bat|exe|com))$/', $filename)) {
+	} elseif (preg_match('/(\.(php|pl|cgi|bash|sh|bat|exe|com|htm|html|shtml))$/i', $filename, $match)) {
 		// Do not allow obvious script files.
 		WT_FlashMessages::addMessage(WT_I18N::translate('Filenames are not allowed to have the extension “%s”.', $match[1]));
 		$filename = '';
@@ -350,7 +345,7 @@ case 'update': // Save the information from the “editmedia” action
 		$oldServerFile  = $media->getServerFilename('main');
 		$oldServerThumb = $media->getServerFilename('thumb');
 
-		$newmedia = new WT_Media("0 @xxx@ OBJE\n1 FILE " . $newFilename);
+		$newmedia = new WT_Media("xxx", "0 @xxx@ OBJE\n1 FILE " . $newFilename, null, WT_GED_ID);
 		$newServerFile  = $newmedia->getServerFilename('main');
 		$newServerThumb = $newmedia->getServerFilename('thumb');
 
@@ -391,24 +386,15 @@ case 'update': // Save the information from the “editmedia” action
 	$islink = array_merge(array(0), $islink);
 	$text = array_merge(array($newFilename), $text);
 
-	if (!empty($pid)) {
-		$gedrec=find_gedcom_record($pid, WT_GED_ID, true);
-	}
+	$record = WT_GedcomRecord::getInstance($pid);
 	$newrec = "0 @$pid@ OBJE\n";
 	$newrec = handle_updates($newrec);
-	if (!$update_CHAN) {
-		$newrec .= get_sub_record(1, '1 CHAN', $gedrec);
-	}
-	//-- look for the old record media in the file
-	//-- if the old media record does not exist that means it was
-	//-- generated at import and we need to append it
-	replace_gedrec($pid, WT_GED_ID, $newrec, $update_CHAN);
+	$record->updateRecord($newrec, $update_CHAN);
 
-	if ($pid && $linktoid!='') {
-		$link = linkMedia($pid, $linktoid, 1);
-		if ($link) {
-			AddToLog('Media ID '.$pid." successfully added to $linktoid.", 'edit');
-		}
+	if ($pid && $linktoid) {
+		$record = WT_GedcomRecord::getInstance($linktoid);
+		$record->createFact('1 OBJE @' . $pid . '@', true);
+		AddToLog('Media ID '.$pid." successfully added to $linktoid.", 'edit');
 	}
 	$controller->pageHeader();
 	if ($messages) {
@@ -445,14 +431,20 @@ echo $controller->getPageTitle(), help_link('OBJE');
 echo '</td></tr>';
 if ($linktoid == 'new' || ($linktoid == '' && $action != 'update')) {
 	echo '<tr><td class="descriptionbox wrap width25">';
-	echo WT_I18N::translate('Enter a Person, Family, or Source ID');
+	echo WT_I18N::translate('Enter an individual, family, or source ID');
 	echo '</td><td class="optionbox wrap"><input type="text" name="gid" id="gid" size="6" value="">';
 	echo ' ', print_findindi_link('gid');
 	echo ' ', print_findfamily_link('gid');
 	echo ' ', print_findsource_link('gid');
-	echo '<p class="sub">', WT_I18N::translate('Enter or search for the ID of the person, family, or source to which this media item should be linked.'), '</p></td></tr>';
+	echo '<p class="sub">', WT_I18N::translate('Enter or search for the ID of the individual, family, or source to which this media item should be linked.'), '</p></td></tr>';
 }
-$gedrec=find_gedcom_record($pid, WT_GED_ID, true);
+
+$tmp = WT_Media::getInstance($pid);
+if ($tmp) {
+	$gedrec = $tmp->getGedcom();
+} else {
+	$gedrec = '';
+}
 
 // 0 OBJE
 // 1 FILE
@@ -467,18 +459,15 @@ if ($gedrec == '') {
 }
 if ($gedfile != 'FILE') {
 	$gedfile = 'FILE ' . substr($gedfile, 5);
-	$readOnly = 'READONLY';
-} else {
-	$readOnly = '';
 }
 if ($gedfile == 'FILE') {
 	// Box for user to choose to upload file from local computer
 	echo '<tr><td class="descriptionbox wrap width25">';
-	echo WT_I18N::translate('Media file to upload').help_link('upload_media_file').'</td><td class="optionbox wrap"><input type="file" name="mediafile" onchange="updateFormat(this.value);" size="40"></td></tr>';
+	echo WT_I18N::translate('Media file to upload') . '</td><td class="optionbox wrap"><input type="file" name="mediafile" onchange="updateFormat(this.value);" size="40"></td></tr>';
 	// Check for thumbnail generation support
 	if (WT_USER_GEDCOM_ADMIN) {
 		echo '<tr><td class="descriptionbox wrap width25">';
-		echo WT_I18N::translate('Thumbnail to upload').help_link('upload_thumbnail_file').'</td><td class="optionbox wrap"><input type="file" name="thumbnail" size="40"></td></tr>';
+		echo WT_I18N::translate('Thumbnail to upload') . help_link('upload_thumbnail_file').'</td><td class="optionbox wrap"><input type="file" name="thumbnail" size="40"></td></tr>';
 	}
 }
 
@@ -486,9 +475,12 @@ if ($gedfile == 'FILE') {
 $isExternal = isFileExternal($gedfile);
 if ($gedfile == 'FILE') {
 	if (WT_USER_GEDCOM_ADMIN) {
-		add_simple_tag("1 $gedfile", '', WT_I18N::translate('File name on server'), '', 'NOCLOSE');
-		echo '<p class="sub">' . WT_I18N::translate('Do not change to keep original file name.');
-		echo WT_I18N::translate('You may enter a URL, beginning with &laquo;http://&raquo;.') . '</p></td></tr>';
+		add_simple_tag(
+			"1 $gedfile",
+			'',
+			WT_I18N::translate('File name on server'),
+			WT_I18N::translate('Do not change to keep original file name.') . '<br>' .WT_I18N::translate('You may enter a URL, beginning with &laquo;http://&raquo;.')
+		);
 	}
 	$fileName = '';
 	$folder = '';
@@ -511,14 +503,14 @@ if ($gedfile == 'FILE') {
 	echo '</td>';
 	echo '<td class="optionbox wrap wrap">';
 	if (WT_USER_GEDCOM_ADMIN) {
-		echo '<input name="filename" type="text" value="' . htmlspecialchars($fileName) . '" size="40"';
+		echo '<input name="filename" type="text" value="' . WT_Filter::escapeHtml($fileName) . '" size="40"';
 		if ($isExternal)
 			echo '>';
 		else
 			echo '><p class="sub">' . WT_I18N::translate('Do not change to keep original file name.') . '</p>';
 	} else {
 		echo $fileName;
-		echo '<input name="filename" type="hidden" value="' . htmlspecialchars($fileName) . '" size="40">';
+		echo '<input name="filename" type="hidden" value="' . WT_Filter::escapeHtml($fileName) . '" size="40">';
 	}
 	echo '</td>';
 	echo '</tr>';
@@ -536,7 +528,7 @@ if (!$isExternal) {
 		if ($folder == '') echo ' selected="selected"';
 		echo ' value=""> ', WT_I18N::translate('Choose: '), ' </option>';
 		if (WT_USER_IS_ADMIN) {
-			echo '<option value="other" disabled>', WT_I18N::translate('Other folder... please type in'), "</option>";
+			echo '<option value="other" disabled>', WT_I18N::translate('Other folder… please type in'), "</option>";
 		}
 		foreach ($mediaFolders as $f) {
 			echo '<option value="', $f, '"';
@@ -554,7 +546,7 @@ if (!$isExternal) {
 			echo '<p class="sub">', WT_I18N::translate('This entry is ignored if you have entered a URL into the file name field.'), '</p>';
 		}
 	} else {
-		echo '<input name="folder" type="hidden" value="', addslashes($folder), '">';
+		echo '<input name="folder" type="hidden" value="', WT_Filter::escapeHtml($folder), '">';
 	}
 	echo '</td></tr>';
 } else {
@@ -663,7 +655,7 @@ if (!empty($gedrec)) {
 			$fact = trim($match[2]);
 			$event = trim($match[3]);
 			if ($fact=='NOTE' || $fact=='TEXT') {
-				$event .= get_cont(($subLevel +1), $subrec, false);
+				$event .= get_cont(($subLevel +1), $subrec);
 			}
 			if ($sourceSOUR!='' && $subLevel<=$sourceLevel) {
 				// Get rid of all saved Source data
@@ -731,8 +723,6 @@ if (WT_USER_IS_ADMIN) {
 		echo "<input type=\"checkbox\" name=\"preserve_last_changed\">";
 	}
 	echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN'), '<br>';
-	$event = new WT_Event(get_sub_record(1, '1 CHAN', $gedrec), null, 0);
-	echo format_fact_date($event, new WT_Person(''), false, true);
 	echo '</td></tr>';
 }
 echo '</table>';
@@ -747,3 +737,16 @@ echo '</table>';
 		</p>
 	</form>
 </div>
+
+<?php
+
+
+// Legacy/deprecated functions.  TODO: refactor these away....
+function get_first_tag($level, $tag, $gedrec, $num=1) {
+	$temp = get_sub_record($level, $level." ".$tag, $gedrec, $num)."\n";
+	$length = strpos($temp, "\n");
+	if ($length===false) {
+		$length = strlen($temp);
+	}
+	return substr($temp, 2, $length-2);
+}

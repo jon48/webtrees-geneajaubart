@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14805 2013-02-15 20:29:38Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -61,14 +59,16 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 	// Implement WT_Module_Sidebar
 	public function hasSidebarContent() {
-		return true;
+		global $SEARCH_SPIDER;
+
+		return !$SEARCH_SPIDER;
 	}
 
 	// Implement WT_Module_Sidebar
 	public function getSidebarAjaxContent() {
-		$alpha   =safe_GET('alpha'); // All surnames beginning with this letter where "@"=unknown and ","=none
-		$surname =safe_GET('surname', '[^<>&%{};]*'); // All indis with this surname.  NB - allow ' and "
-		$search   =safe_GET('search');
+		$alpha   = WT_Filter::get('alpha'); // All surnames beginning with this letter where "@"=unknown and ","=none
+		$surname = WT_Filter::get('surname'); // All indis with this surname.
+		$search  = WT_Filter::get('search');
 
 		if ($search) {
 			return $this->search($search);
@@ -137,7 +137,7 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			});
 		');
 
-		
+
 		$out='<form method="post" action="module.php?mod='.$this->getName().'&amp;mod_action=ajax" onsubmit="return false;"><input type="search" name="sb_indi_name" id="sb_indi_name" placeholder="'.WT_I18N::translate('Search').'"><p>';
 		foreach ($initials as $letter=>$count) {
 			switch ($letter) {
@@ -186,9 +186,9 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		$indis=WT_Query_Name::individuals($surname, $alpha, '', true, false, WT_GED_ID);
 		$out = '<ul>';
 		foreach ($indis as $person) {
-			if ($person->canDisplayName()) {
+			if ($person->canShowName()) {
 				$out .= '<li><a href="'.$person->getHtmlUrl().'">'.$person->getSexImage().' '.$person->getFullName().' ';
-				if ($person->canDisplayDetails()) {
+				if ($person->canShow()) {
 					$bd = $person->getLifeSpan();
 					if (!empty($bd)) {
 						$out .= ' ('.$bd.')';
@@ -207,22 +207,22 @@ class individuals_WT_Module extends WT_Module implements WT_Module_Sidebar {
 		}
 		$rows=
 			WT_DB::prepare(
-				"SELECT ? AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec".
+				"SELECT i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom".
 				" FROM `##individuals`, `##name`".
 				" WHERE (i_id LIKE ? OR n_sort LIKE ?)".
 				" AND i_id=n_id AND i_file=n_file AND i_file=?".
 				" ORDER BY n_sort COLLATE '".WT_I18N::$collation."'".
 				" LIMIT 50"
 			)
-			->execute(array('INDI', "%{$query}%", "%{$query}%", WT_GED_ID))
-			->fetchAll(PDO::FETCH_ASSOC);
+			->execute(array("%{$query}%", "%{$query}%", WT_GED_ID))
+			->fetchAll();
 
 		$out = '<ul>';
 		foreach ($rows as $row) {
-			$person=WT_Person::getInstance($row);
-			if ($person->canDisplayName()) {
+			$person = WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
+			if ($person->canShowName()) {
 				$out .= '<li><a href="'.$person->getHtmlUrl().'">'.$person->getSexImage().' '.$person->getFullName().' ';
-				if ($person->canDisplayDetails()) {
+				if ($person->canShow()) {
 					$bd = $person->getLifeSpan();
 					if (!empty($bd)) $out .= ' ('.$bd.')';
 				}

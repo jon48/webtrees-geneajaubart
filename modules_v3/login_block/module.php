@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -50,6 +48,7 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 					jQuery("#new_passwd").slideToggle(100, function() {
 						jQuery("#new_passwd_username").focus();
 					});
+					return false;
 				});
 			');
 		if (WT_USER_ID) {
@@ -65,12 +64,9 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 			$title = WT_I18N::translate('Login');
 			$content='';
 			$content='<div id="login-box">
-				<form id="login-form" name="login-form" method="post" action="'. WT_LOGIN_URL. '" onsubmit="t = new Date(); this.usertime.value=t.getFullYear()+\'-\'+(t.getMonth()+1)+\'-\'+t.getDate()+\' \'+t.getHours()+\':\'+t.getMinutes()+\':\'+t.getSeconds();return true;">
+				<form id="login-form" name="login-form" method="post" action="'. WT_LOGIN_URL. '" onsubmit="d=new Date(); this.timediff.value=d.getTimezoneOffset()*60;">
 				<input type="hidden" name="action" value="login">
-				<input type="hidden" name="url" value="index.php">
-				<input type="hidden" name="ged" value="'; if (isset($ged)) $content.= htmlspecialchars($ged); else $content.= htmlentities(WT_GEDCOM); $content.= '">
-				<input type="hidden" name="pid" value="'; if (isset($pid)) $content.= htmlspecialchars($pid); $content.= '">
-				<input type="hidden" name="usertime" value="">';
+				<input type="hidden" name="timediff" value="">';
 			$content.= '<div>
 				<label for="username">'. WT_I18N::translate('Username').
 					'<input type="text" id="username" name="username" class="formField">
@@ -91,7 +87,7 @@ class login_block_WT_Module extends WT_Module implements WT_Module_Block {
 				$content.= '<div><a href="'.WT_LOGIN_URL.'?action=register">'. WT_I18N::translate('Request new user account').'</a></div>';
 			}
 		$content.= '</form>'; // close "login-form"
-		
+
 		// hidden New Password block
 		$content.= '<div id="new_passwd">
 			<form id="new_passwd_form" name="new_passwd_form" action="'.WT_LOGIN_URL.'" method="post">

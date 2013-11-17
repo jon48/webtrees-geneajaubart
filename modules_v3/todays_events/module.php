@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14549 2012-11-16 13:58:16Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -111,12 +109,12 @@ class todays_events_WT_Module extends WT_Module implements WT_Module_Block {
 
 	// Implement class WT_Module_Block
 	public function configureBlock($block_id) {
-		if (safe_POST_bool('save')) {
-			set_block_setting($block_id, 'filter',        safe_POST_bool('filter'));
-			set_block_setting($block_id, 'onlyBDM',       safe_POST_bool('onlyBDM'));
-			set_block_setting($block_id, 'infoStyle',     safe_POST('infoStyle', array('list', 'table'), 'table'));
-			set_block_setting($block_id, 'sortStyle',     safe_POST('sortStyle', array('alpha', 'anniv'), 'alpha'));
-			set_block_setting($block_id, 'block',  safe_POST_bool('block'));
+		if (WT_Filter::postBool('save') && WT_Filter::checkCsrf()) {
+			set_block_setting($block_id, 'filter',    WT_Filter::postBool('filter'));
+			set_block_setting($block_id, 'onlyBDM',   WT_Filter::postBool('onlyBDM'));
+			set_block_setting($block_id, 'infoStyle', WT_Filter::post('infoStyle', 'list|table', 'table'));
+			set_block_setting($block_id, 'sortStyle', WT_Filter::post('sortStyle', 'alpha|anniv', 'alpha'));
+			set_block_setting($block_id, 'block',     WT_Filter::postBool('block'));
 			exit;
 		}
 
@@ -124,7 +122,7 @@ class todays_events_WT_Module extends WT_Module implements WT_Module_Block {
 
 		$filter=get_block_setting($block_id, 'filter', true);
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo WT_I18N::translate('Show only events of living people?');
+		echo WT_I18N::translate('Show only events of living individuals?');
 		echo '</td><td class="optionbox">';
 		echo edit_field_yes_no('filter', $filter);
 		echo '</td></tr>';

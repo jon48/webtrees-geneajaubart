@@ -7,7 +7,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2011  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2011 PGV Development Team.  All rights reserved.
 //
 // Sidebar controls courtesy of http://devheart.org/articles/jquery-collapsible-sidebar-layout/
 //
@@ -24,8 +24,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: individual.php 14966 2013-04-20 03:49:26Z nigel $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -35,9 +33,9 @@ $controller=new WT_Controller_Individual();
 $controller
 	->addExternalJavascript(WT_JQUERY_COOKIE_URL) // We use this to record the sidebar state
 	->addInlineJavascript('var catch_and_ignore; function paste_id(value) {catch_and_ignore = value;}'); // For the "find" links
-	
-if ($controller->record && $controller->record->canDisplayDetails()) {
-	if (safe_GET('action')=='ajax') {
+
+if ($controller->record && $controller->record->canShow()) {
+	if (WT_Filter::get('action')=='ajax') {
 		$controller->ajaxRequest();
 		exit;
 	}
@@ -46,14 +44,14 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 	$sidebar_html=$controller->getSideBarContent();
 
 	$controller->pageHeader();
-	if ($controller->record->isMarkedDeleted()) {
+	if ($controller->record->isOld()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
 				/* I18N: %1$s is “accept”, %2$s is “reject”.  These are links. */ WT_I18N::translate(
 					'This individual has been deleted.  You should review the deletion and then %1$s or %2$s it.',
-					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'accept') . '</a>',
-					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'reject') . '</a>'
+					'<a href="#" onclick="accept_changes(\''.$controller->record->getXref().'\');">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'accept') . '</a>',
+					'<a href="#" onclick="reject_changes(\''.$controller->record->getXref().'\');">' . WT_I18N::translate_c('You should review the deletion and then accept or reject it.', 'reject') . '</a>'
 				),
 				' ', help_link('pending_changes'),
 				'</p>';
@@ -64,14 +62,14 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 				' ', help_link('pending_changes'),
 				'</p>';
 		}
-	} elseif (find_updated_record($controller->record->getXref(), WT_GED_ID)!==null) {
+	} elseif ($controller->record->isNew()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
 				/* I18N: %1$s is “accept”, %2$s is “reject”.  These are links. */ WT_I18N::translate(
 					'This individual has been edited.  You should review the changes and then %1$s or %2$s them.',
-					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'accept-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'accept') . '</a>',
-					'<a href="#" onclick="jQuery.post(\'action.php\',{action:\'reject-changes\',xref:\''.$controller->record->getXref().'\'},function(){location.reload();})">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'reject') . '</a>'
+					'<a href="#" onclick="accept_changes(\''.$controller->record->getXref().'\');">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'accept') . '</a>',
+					'<a href="#" onclick="reject_changes(\''.$controller->record->getXref().'\');">' . WT_I18N::translate_c('You should review the changes and then accept or reject them.', 'reject') . '</a>'
 				),
 				' ', help_link('pending_changes'),
 				'</p>';
@@ -83,7 +81,7 @@ if ($controller->record && $controller->record->canDisplayDetails()) {
 				'</p>';
 		}
 	}
-} elseif ($controller->record && $controller->record->canDisplayName()) {
+} elseif ($controller->record && $controller->record->canShowName()) {
 	// Just show the name.
 	$controller->pageHeader();
 	echo '<h2>', $controller->record->getFullName(), '</h2>';
@@ -101,12 +99,23 @@ $linkToID=$controller->record->getXref(); // -- Tell addmedia.php what to link t
 $controller->addInlineJavascript('
 	jQuery("#tabs").tabs({
 		spinner: \'<i class="icon-loading-small"></i>\',
-		cache:    true,
 		active:   jQuery.cookie("indi-tab"),
-		activate: function(event, ui) { jQuery.cookie("indi-tab", jQuery("#tabs").tabs("option", "active")); }
+		activate: function(event, ui) {
+			jQuery.cookie("indi-tab", jQuery("#tabs").tabs("option", "active"));
+		},
+		// Only load each tab once
+		beforeLoad: function(event, ui) {
+			if (ui.tab.data("loaded")) {
+				event.preventDefault();
+				return;
+			}
+			ui.jqXHR.success(function() {
+				ui.tab.data("loaded", true);
+			});
+		}
 	});
 
-	// sidebar settings 
+	// sidebar settings
 	// Variables
 	var objMain			= jQuery("#main");
 	var objTabs			= jQuery("#indi_left");
@@ -157,10 +166,10 @@ $controller->addInlineJavascript('
 	}
 	adjHeader();
 	jQuery("#main").css("visibility", "visible");
-	
+
 	function show_gedcom_record() {
 		var recwin=window.open("gedrecord.php?pid='. $controller->record->getXref(). '", "_blank", edit_window_specs);
-	}	
+	}
 
 	jQuery("#header_accordion1").accordion({
 		active: 0,
@@ -176,10 +185,9 @@ echo
 	'<div id="main" class="use-sidebar sidebar-at-right" style="visibility:hidden;">', //overall page container
 	'<div id="indi_left">',
 	'<div id="indi_header">';
-if ($controller->record->canDisplayDetails()) {
+if ($controller->record->canShow()) {
 	// Highlight image or silhouette
 	echo '<div id="indi_mainimage">', $controller->record->displayImage(), '</div>';
-	$globalfacts=$controller->getGlobalFacts();
 	echo '<div id="header_accordion1">'; // contain accordions for names
 	echo '<h3 class="name_one ', $controller->getPersonStyle($controller->record), '"><span>', $controller->record->getFullName(), '</span>'; // First name accordion header
 	$bdate=$controller->record->getBirthDate();
@@ -195,21 +203,26 @@ if ($controller->record->canDisplayDetails()) {
 	echo '</span>';
 	// Display summary birth/death info.
 	echo '<span id="dates">', $controller->record->getLifeSpan(), '</span>';
-	//Display gender icon
-	foreach ($globalfacts as $key=>$value) {
-		$fact = $value->getTag();
-		if ($fact=="SEX") $controller->print_sex_record($value);
+
+	// Display gender icon
+	foreach ($controller->record->getFacts() as $fact) {
+		if ($fact->getTag() == 'SEX') {
+			$controller->print_sex_record($fact);
+		}
 	}
 	//PERSO
 	$dcontroller = new WT_Perso_Controller_Individual($controller);
 	$dcontroller->print_extra_icons_header();
 	//END PERSO
-	echo '</h3>'; // close first name accordion header	
-	//Display name details
-	foreach ($globalfacts as $key=>$value) {
-		$fact = $value->getTag();
-		if ($fact=="NAME") $controller->print_name_record($value);
+	echo '</h3>'; // close first name accordion header
+
+	// Display name details
+	foreach ($controller->record->getFacts() as $fact) {
+		if ($fact->getTag() == 'NAME') {
+			$controller->print_name_record($fact);
+		}
 	}
+
 	echo '</div>'; // close header_accordion1
 	//PERSO
 	$dcontroller->print_extensions_header();

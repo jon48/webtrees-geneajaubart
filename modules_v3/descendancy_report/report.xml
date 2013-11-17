@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report>
-	<!-- $Id: report.xml 13842 2012-04-19 14:27:53Z lukasz $ -->
 	<Title><var var="WT_I18N::translate('Descendants')" /></Title>
 	<Description><var var="WT_I18N::translate('A report of an individual’s descendants, in a narrative style.')" /></Description>
 	<Input name="pid" lookup="INDI" type="text" default=""><var var="WT_I18N::translate('Enter Individual ID')" /></Input>
@@ -556,7 +555,7 @@
 												<Text style="label1"> </Text> <!-- @@ -->
 											</if>
 											<Gedcom id="BIRT">
-												<Text style="label1"> <varLetter var="BIRT" />: <GedcomValue tag="DATE" level="2"/>  <GedcomValue tag="PLAC" level="2"/></Text>
+												<Text style="label1"> <var var="WT_I18N::translate('Birth')" />: <GedcomValue tag="DATE" level="2"/>  <GedcomValue tag="PLAC" level="2"/></Text>
 											</Gedcom>
 											<SetVar name="showMarraige" value="T" />
 											<RepeatTag tag="FAMS">
@@ -573,7 +572,7 @@
 												</if>
 												<RepeatTag tag="FAMS">
 													<Gedcom id="@FAMS">
-														<Text style="label1"> <varLetter var="MARR" />: </Text>
+														<Text style="label1"> <var var="WT_I18N::translate('Marriage')" />: </Text>
 														<if condition="$gender=='male'">
 															<Text style="name"><GetPersonName id="@WIFE" /></Text>
 														</if>
@@ -592,7 +591,7 @@
 												</RepeatTag>
 											</if>
 											<Gedcom id="DEAT">
-												<Text style="label1"> <varLetter var="DEAT" />: <GedcomValue tag="DATE" level="2"/> <GedcomValue tag="PLAC" level="2"/></Text>
+												<Text style="label1"> <var var="WT_I18N::translate('Death')" />: <GedcomValue tag="DATE" level="2"/> <GedcomValue tag="PLAC" level="2"/></Text>
 											</Gedcom>
 										</TextBox>
 									</Gedcom>

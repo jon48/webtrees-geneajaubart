@@ -5,7 +5,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Partly Derived from PhpGedView
-// Copyright (C) 2002 to 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: admin_site_other.php 14786 2013-02-06 22:28:50Z greg $
 
 define('WT_SCRIPT_NAME', 'admin_site_other.php');
 require './includes/session.php';
@@ -39,14 +37,14 @@ $controller
 		<?php echo WT_I18N::translate('Add unlinked records'); ?>
 	</p>
 	<p>
-		<form method="post" action="#" name="tree">
+		<form method="post" action="?" name="tree">
 			<?php echo select_edit_control('ged', WT_Tree::getNameList(), null, WT_GEDCOM, ' onchange="tree.submit();"'); ?>
 		</form>
 	</p>
 	<table id="other">
 		<tr>
 			<td>
-				<a href="#" onclick="addnewchild(''); return false;">
+				<a href="#" onclick="add_unlinked_indi(); return false;">
 					<?php echo /* I18N: An individual that is not linked to any other record */ WT_I18N::translate('Create a new individual'); ?>
 				</a>
 			</td>

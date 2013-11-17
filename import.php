@@ -25,8 +25,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: import.php 14984 2013-05-12 07:58:25Z greg $
 
 define('WT_SCRIPT_NAME', 'import.php');
 require './includes/session.php';
@@ -43,7 +41,7 @@ $controller
 
 // Don't use ged=XX as we want to be able to run without changing the current gedcom.
 // This will let us load several gedcoms together, or to edit one while loading another.
-$gedcom_id=safe_GET('gedcom_id');
+$gedcom_id = WT_Filter::getInteger('gedcom_id');
 
 // Don't allow the user to cancel the request.  We do not want to be left
 // with an incomplete transaction.
@@ -95,7 +93,7 @@ for ($end_time=microtime(true)+1.0; microtime(true)<$end_time; ) {
 	)->execute(array($gedcom_id))->fetchOneRow();
 	// If we are at the start position, do some tidying up
 	if ($first_time) {
-		$keep_media=safe_GET_bool('keep_media'.$gedcom_id);
+		$keep_media=WT_Filter::getBool('keep_media'.$gedcom_id);
 		// Delete any existing genealogical data
 		empty_database($gedcom_id, $keep_media);
 		set_gedcom_setting($gedcom_id, 'imported', false);
@@ -195,7 +193,7 @@ for ($end_time=microtime(true)+1.0; microtime(true)<$end_time; ) {
 			exit;
 		}
 		$first_time=false;
-		
+
 		// Re-fetch the data, now that we have performed character set conversion.
 		$data=WT_DB::prepare(
 			"SELECT gedcom_chunk_id, REPLACE(chunk_data, '\r', '\n') AS chunk_data".

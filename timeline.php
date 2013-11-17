@@ -4,10 +4,10 @@
 // Use the $pids array to set which individuals to show on the chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: timeline.php 14253 2012-09-07 05:22:02Z greg $
 
 define('WT_SCRIPT_NAME', 'timeline.php');
 require './includes/session.php';
@@ -58,8 +56,7 @@ function ageMD(divbox, num) {
 	if (N) {
 		X=ob.offsetLeft;
 		Y=ob.offsetTop;
-	}
-	else {
+	} else {
 		X=ob.offsetLeft;
 		Y=ob.offsetTop;
 		oldx = event.clientX + document.documentElement.scrollLeft;
@@ -137,8 +134,7 @@ function MM(e) {
 			line.style.width=(line.width+temp)+"px";
 			oldx=newx;
 			return false;
-		}
-		else {
+		} else {
 			newy = 0;
 			newx = 0;
 			if (N) {
@@ -146,8 +142,7 @@ function MM(e) {
 				newx = e.pageX - tldiv.offsetLeft;
 				if (oldx==0) oldx=newx;
 				linewidth = e.pageX;
-			}
-			else {
+			} else {
 				newy = event.clientY + document.documentElement.scrollTop - tldiv.offsetTop;
 				newx = event.clientX + document.documentElement.scrollLeft - tldiv.offsetLeft;
 				linewidth = event.clientX + document.documentElement.scrollLeft;
@@ -170,21 +165,18 @@ function MM(e) {
 				if (textDirection=='ltr') {
 					dbox.style.backgroundImage = "url('<?php echo $WT_IMAGES["dline"]; ?>')";
 					dbox.style.backgroundPosition = "0% 100%";
-				}
-				else {
+				} else {
 					dbox.style.backgroundImage = "url('<?php echo $WT_IMAGES["dline2"]; ?>')";
 					dbox.style.backgroundPosition = "0% 0%";
 				}
 				dy = (-1)*dy;
 				state=1;
 				dbox.style.top = (newy+bheight/3)+"px";
-			}
-			else {
+			} else {
 				if (textDirection=='ltr') {
 					dbox.style.backgroundImage = "url('<?php echo $WT_IMAGES["dline2"]; ?>')";
 					dbox.style.backgroundPosition = "0% 0%";
-				}
-				else {
+				} else {
 					dbox.style.backgroundImage = "url('<?php echo $WT_IMAGES["dline"]; ?>')";
 					dbox.style.backgroundPosition = "0% 100%";
 				}
@@ -216,7 +208,6 @@ function MM(e) {
 		}
 	}
 }
-</script><script>
 
 function MU() {
 	ob = null;
@@ -231,7 +222,8 @@ document.onmousemove = MM;
 document.onmouseup = MU;
 </script>
 <h2><?php echo WT_I18N::translate('Timeline'); ?></h2>
-<form name="people" action="timeline.php">
+<form name="people" action="?">
+	<input type="hidden" name="ged" value="<?php echo WT_Filter::escapeHtml(WT_GEDCOM); ?>">
 <?php
 $controller->checkPrivacy();
 ?>
@@ -255,7 +247,7 @@ $controller->checkPrivacy();
 		?>
 		<td class="person<?php echo $col; ?>" style="padding: 5px;">
 		<?php
-		if ($indi && $indi->canDisplayDetails()) {
+		if ($indi && $indi->canShow()) {
 			if ($indi->getSex()=="M") {
 				echo $indi->getSexImage('large', '', WT_I18N::translate('Male'));
 			} elseif ($indi->getSex()=="F") {
@@ -267,7 +259,7 @@ $controller->checkPrivacy();
 			<a href="<?php echo $indi->getHtmlUrl(); ?>">&nbsp;<?php echo $indi->getFullName(); ?><br>
 			<?php echo $indi->getAddName(); ?><br>
 			</a>
-			<input type="hidden" name="pids[<?php echo $p; ?>]" value="<?php echo htmlspecialchars($pid); ?>">
+			<input type="hidden" name="pids[<?php echo $p; ?>]" value="<?php echo WT_Filter::escapeHtml($pid); ?>">
 				<a href="timeline.php?<?php echo $controller->pidlinks; ?>&amp;scale=<?php echo $controller->scale; ?>&amp;remove=<?php echo $pid; ?>&amp;ged=<?php echo WT_GEDURL; ?>" >
 				<span class="details1"><?php echo WT_I18N::translate('Remove person'); ?></span></a>
 			<?php if (!empty($controller->birthyears[$pid])) { ?>
@@ -282,7 +274,7 @@ $controller->checkPrivacy();
 		} else {
 			print_privacy_error();
 			?>
-			<input type="hidden" name="pids[<?php echo $p; ?>]" value="<?php echo htmlspecialchars($pid); ?>">
+			<input type="hidden" name="pids[<?php echo $p; ?>]" value="<?php echo WT_Filter::escapeHtml($pid); ?>">
 				<br>
 				<a href="timeline.php?<?php echo $controller->pidlinks; ?>&amp;scale=<?php echo $controller->scale; ?>&amp;remove=<?php echo $pid; ?>&amp;ged=<?php echo WT_GEDURL; ?>" >
 				<span class="details1"><?php echo WT_I18N::translate('Remove person'); ?></span></a>
@@ -293,7 +285,7 @@ $controller->checkPrivacy();
 		if (!isset($col)) $col = 0;
 		?>
 		<td class="person<?php echo $col; ?>" style="padding: 5px" valign="top">
-			<?php echo WT_I18N::translate('Add another person to the chart'), '<br>'; ?>
+			<?php echo WT_I18N::translate('Add another individual to the chart'), '<br>'; ?>
 			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid">
 			<?php echo print_findindi_link('newpid'); ?>
 			<br>
@@ -307,7 +299,7 @@ $controller->checkPrivacy();
 		<td class="list_value" style="padding: 5px">
 			<a href="<?php echo WT_SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale+$scalemod); ?>&amp;ged=<?php echo WT_GEDURL; ?>" class="icon-zoomin" title="<?php echo WT_I18N::translate('Zoom in'); ?>"></a><br>
 			<a href="<?php echo WT_SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale-$scalemod); ?>&amp;ged=<?php echo WT_GEDURL; ?>" class="icon-zoomout" title="<?php echo WT_I18N::translate('Zoom out'); ?>"></a><br>
-			<input type="button" value="<?php echo WT_I18N::translate('Clear Chart'); ?>" onclick="window.location = 'timeline.php?ged=<?php echo WT_GEDURL; ?>';">
+			<input type="button" value="<?php echo WT_I18N::translate('Clear chart'); ?>" onclick="window.location = 'timeline.php?ged=<?php echo WT_GEDURL; ?>';">
 		</td>
 	<?php } ?>
 	</tr>

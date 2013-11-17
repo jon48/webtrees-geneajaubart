@@ -7,7 +7,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2005  PGV Development Team
+// Copyright (C) 2002 to 2005 PGV Development Team
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: editnews.php 15060 2013-06-17 21:17:07Z nigel $
 
 define('WT_SCRIPT_NAME', 'editnews.php');
 require './includes/session.php';
@@ -34,13 +32,13 @@ $controller
 	->requireMemberLogin()
 	->pageHeader();
 
-$action   =safe_GET('action', array('compose', 'save', 'delete'), 'compose');
-$news_id  =safe_GET('news_id');
-$user_id  =safe_REQUEST($_REQUEST, 'user_id');
-$gedcom_id=safe_REQUEST($_REQUEST, 'gedcom_id');
-$date     =safe_POST('date', WT_REGEX_INTEGER, WT_TIMESTAMP);
-$title    =safe_POST('title', WT_REGEX_UNSAFE);
-$text     =safe_POST('text', WT_REGEX_UNSAFE);
+$action    = WT_Filter::get('action', 'compose|save|delete', 'compose');
+$news_id   = WT_Filter::getInteger('news_id');
+$user_id   = WT_Filter::get('user_id', WT_REGEX_INTEGER, WT_Filter::post('user_id', WT_REGEX_INTEGER));
+$gedcom_id = WT_Filter::get('gedcom_id', WT_REGEX_INTEGER, WT_Filter::post('gedcom_id', WT_REGEX_INTEGER));
+$date      = WT_Filter::postInteger('date', 0, PHP_INT_MAX, WT_TIMESTAMP);
+$title     = WT_Filter::post('title');
+$text      = WT_Filter::post('text');
 
 switch ($action) {
 case 'compose':
@@ -62,7 +60,7 @@ case 'compose':
 	echo '<table>';
 	echo '<tr><th style="text-align:left;font-weight:900;" dir="auto;">'.WT_I18N::translate('Title:').'</th><tr>';
 	echo '<tr><td><input type="text" name="title" size="50" dir="auto" autofocus value="'.$news['title'].'"></td></tr>';
-	echo '<tr><th valign="top" style="text-align:left;font-weight:900;" dir="auto;">'.WT_I18N::translate('Entry Text:').'</th></tr>';
+	echo '<tr><th valign="top" style="text-align:left;font-weight:900;" dir="auto;">'.WT_I18N::translate('Entry text:').'</th></tr>';
 	echo '<tr><td>';
 	if (array_key_exists('ckeditor', WT_Module::getActiveModules())) {
 		require_once WT_ROOT.WT_MODULES_DIR.'ckeditor/ckeditor.php';
@@ -74,7 +72,7 @@ case 'compose':
 		$oCKeditor->config['DefaultLanguage'] = 'en';
 		$oCKeditor->editor('text', $news['text']);
 	} else { //use standard textarea
-		echo '<textarea name="text" cols="80" rows="10" dir="auto">'.htmlspecialchars($news['text']).'</textarea>';
+		echo '<textarea name="text" cols="80" rows="10" dir="auto">'.WT_Filter::escapeHtml($news['text']).'</textarea>';
 	}
 	echo '</td></tr>';
 	echo '<tr><td><input type="submit" value="'.WT_I18N::translate('save').'"></td></tr>';

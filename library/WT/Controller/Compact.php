@@ -2,10 +2,10 @@
 //	Controller for the compact chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Compact.php 14929 2013-03-27 13:47:23Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -39,9 +37,9 @@ class WT_Controller_Compact extends WT_Controller_Chart {
 		parent::__construct();
 
 		// Extract the request parameters
-		$this->show_thumbs=safe_GET_bool('show_thumbs');
+		$this->show_thumbs = WT_Filter::getBool('show_thumbs');
 
-		if ($this->root && $this->root->canDisplayName()) {
+		if ($this->root && $this->root->canShowName()) {
 			$this->setPageTitle(
 				/* I18N: %s is an individual’s name */
 			WT_I18N::translate('Compact tree of %s', $this->root->getFullName())
@@ -51,13 +49,13 @@ class WT_Controller_Compact extends WT_Controller_Chart {
 		}
 		$this->treeid=ancestry_array($this->rootid, 5);
 	}
-	
+
 	function sosa_person($n) {
 		global $SHOW_HIGHLIGHT_IMAGES;
 
-		$indi=WT_Person::getInstance($this->treeid[$n]);
+		$indi=WT_Individual::getInstance($this->treeid[$n]);
 
-		if ($indi && $indi->canDisplayName()) {
+		if ($indi && $indi->canShowName()) {
 			$name=$indi->getFullName();
 			$addname=$indi->getAddName();
 
@@ -72,7 +70,7 @@ class WT_Controller_Compact extends WT_Controller_Chart {
 			if ($addname) $html .= '<br>' . $addname;
 			$html .= '</a>';
 			$html .= '<br>';
-			if ($indi->canDisplayDetails()) {
+			if ($indi->canShow()) {
 				$html.='<div class="details1">'.$indi->getLifeSpan().'</div>';
 			}
 		} else {
@@ -114,8 +112,8 @@ class WT_Controller_Compact extends WT_Controller_Chart {
 			}
 		}
 
-		if ($pid) {
-			$indi=WT_Person::getInstance($pid);
+		$indi=WT_Individual::getInstance($pid);
+		if ($indi) {
 			$title=WT_I18N::translate('Compact tree of %s', $indi->getFullName());
 			$text = '<a class="icon-'.$arrow_dir.'arrow" title="'.strip_tags($title).'" href="?rootid='.$pid;
 			if ($this->show_thumbs) $text .= "&amp;show_thumbs=".$this->show_thumbs;

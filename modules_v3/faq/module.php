@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14884 2013-03-17 21:22:52Z nigel $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -100,39 +98,39 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 	private function edit() {
 		require_once WT_ROOT.'includes/functions/functions_edit.php';
 
-		if (safe_POST_bool('save')) {
-			$block_id=safe_POST('block_id');
+		if (WT_Filter::postBool('save') && WT_Filter::checkCsrf()) {
+			$block_id = WT_Filter::postInteger('block_id');
 			if ($block_id) {
 				WT_DB::prepare(
-					"UPDATE `##block` SET gedcom_id=NULLIF(?, ''), block_order=? WHERE block_id=?"
+					"UPDATE `##block` SET gedcom_id=NULLIF(?, '0'), block_order=? WHERE block_id=?"
 				)->execute(array(
-					safe_POST('gedcom_id'),
-					(int)safe_POST('block_order'),
+					WT_Filter::postInteger('gedcom_id'),
+					WT_Filter::postInteger('block_order'),
 					$block_id
 				));
 			} else {
 				WT_DB::prepare(
-					"INSERT INTO `##block` (gedcom_id, module_name, block_order) VALUES (NULLIF(?, ''), ?, ?)"
+					"INSERT INTO `##block` (gedcom_id, module_name, block_order) VALUES (NULLIF(?, '0'), ?, ?)"
 				)->execute(array(
-					safe_POST('gedcom_id'),
+					WT_Filter::postInteger('gedcom_id'),
 					$this->getName(),
-					(int)safe_POST('block_order')
+					WT_Filter::postInteger('block_order')
 				));
 				$block_id=WT_DB::getInstance()->lastInsertId();
 			}
-			set_block_setting($block_id, 'header',  safe_POST('header',  WT_REGEX_UNSAFE));
-			set_block_setting($block_id, 'faqbody', safe_POST('faqbody', WT_REGEX_UNSAFE)); // allow html
-			$languages=array();
+			set_block_setting($block_id, 'header',  WT_Filter::post('header'));
+			set_block_setting($block_id, 'faqbody', WT_Filter::post('faqbody'));
+			$languages = array();
 			foreach (WT_I18N::installed_languages() as $code=>$name) {
-				if (safe_POST_bool('lang_'.$code)) {
-					$languages[]=$code;
+				if (WT_Filter::postBool('lang_'.$code)) {
+					$languages[] = $code;
 				}
 			}
 			set_block_setting($block_id, 'languages', implode(',', $languages));
 			$this->config();
 		} else {
-			$block_id=safe_GET('block_id');
-			$controller=new WT_Controller_Page();
+			$block_id = WT_Filter::getInteger('block_id');
+			$controller = new WT_Controller_Page();
 			if ($block_id) {
 				$controller->setPageTitle(WT_I18N::translate('Edit FAQ item'));
 				$header=get_block_setting($block_id, 'header');
@@ -159,17 +157,17 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 
 			// "Help for this page" link
 			echo '<div id="page_help">', help_link('add_faq_item', $this->getName()), '</div>';
-			echo '<form name="faq" method="post" action="#">';
+			echo '<form name="faq" method="post" action="module.php?mod=', $this->getName(), '&amp;mod_action=admin_edit">';
 			echo '<input type="hidden" name="save" value="1">';
 			echo '<input type="hidden" name="block_id" value="', $block_id, '">';
 			echo '<table id="faq_module">';
 			echo '<tr><th>';
 			echo WT_I18N::translate('Question');
-			echo '</th></tr><tr><td><input type="text" name="header" size="90" tabindex="1" value="'.htmlspecialchars($header).'"></td></tr>';
+			echo '</th></tr><tr><td><input type="text" name="header" size="90" tabindex="1" value="'.WT_Filter::escapeHtml($header).'"></td></tr>';
 			echo '<tr><th>';
 			echo WT_I18N::translate('Answer');
 			echo '</th></tr><tr><td>';
-			echo '<textarea name="faqbody" class="html-edit" rows="10" cols="90" tabindex="2">', htmlspecialchars($faqbody), '</textarea>';
+			echo '<textarea name="faqbody" class="html-edit" rows="10" cols="90" tabindex="2">', WT_Filter::escapeHtml($faqbody), '</textarea>';
 			echo '</td></tr>';
 			echo '</table><table id="faq_module2">';
 			echo '<tr>';
@@ -194,7 +192,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 	}
 
 	private function delete() {
-		$block_id=safe_GET('block_id');
+		$block_id = WT_Filter::getInteger('block_id');
 
 		WT_DB::prepare(
 			"DELETE FROM `##block_setting` WHERE block_id=?"
@@ -206,7 +204,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 	}
 
 	private function moveup() {
-		$block_id=safe_GET('block_id');
+		$block_id = WT_Filter::getInteger('block_id');
 
 		$block_order=WT_DB::prepare(
 			"SELECT block_order FROM `##block` WHERE block_id=?"
@@ -231,7 +229,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 	}
 
 	private function movedown() {
-		$block_id=safe_GET('block_id');
+		$block_id=WT_Filter::get('block_id');
 
 		$block_order=WT_DB::prepare(
 			"SELECT block_order FROM `##block` WHERE block_id=?"
@@ -280,7 +278,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 		echo '<div class="faq_italic">', WT_I18N::translate('Click on a title to go straight to it, or scroll down to read them all');
 			if (WT_USER_GEDCOM_ADMIN) {
 				echo '<div class="faq_edit">',
-						'<a href="module.php?mod=faq&amp;mod_action=admin_config">', WT_I18N::translate('Click here to Add, Edit, or Delete'), '</a>',
+						'<a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_config">', WT_I18N::translate('Click here to Add, Edit, or Delete'), '</a>',
 				'</div>';
 			}
 		echo '</div>';
@@ -314,8 +312,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 				echo '<a href="#body">', WT_I18N::translate('back to top'), '</a>';
 				echo '</div>';
 				echo '</div>';
-				// PHP5.3 echo '<div class="faq_body">', substr($faqbody, 0, 1)=='<' ? $faqbody : nl2br($faqbody, false), '</div>';
-				echo '<div class="faq_body">', substr($faqbody, 0, 1)=='<' ? $faqbody : nl2br($faqbody), '</div>';
+				echo '<div class="faq_body">', substr($faqbody, 0, 1)=='<' ? $faqbody : nl2br($faqbody, false), '</div>';
 				echo '<hr>';
 			}
 		}
@@ -403,8 +400,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 				echo '<div class="faq_edit_item">';
 				echo '<div class="faq_edit_title">', $faq->header, '</div>';
 				// NOTE: Print the body text of the current item
-				// PHP5.3 echo '<div class="faq_edit_content">', substr($faq->faqbody, 0, 1)=='<' ? $faq->faqbody : nl2br($faq->faqbody, false), '</div></div></td></tr>';
-				echo '<div class="faq_edit_content">', substr($faq->faqbody, 0, 1)=='<' ? $faq->faqbody : nl2br($faq->faqbody), '</div></div></td></tr>';
+				echo '<div class="faq_edit_content">', substr($faq->faqbody, 0, 1)=='<' ? $faq->faqbody : nl2br($faq->faqbody, false), '</div></div></td></tr>';
 			}
 			echo '</table>';
 		}
@@ -426,7 +422,7 @@ class faq_WT_Module extends WT_Module implements WT_Module_Menu, WT_Module_Block
 		$faqs=WT_DB::prepare(
 			"SELECT block_id FROM `##block` b WHERE module_name=? AND IFNULL(gedcom_id, ?)=?"
 		)->execute(array($this->getName(), WT_GED_ID, WT_GED_ID))->fetchAll();
-		
+
 		if (!$faqs) {
 			return null;
 		}

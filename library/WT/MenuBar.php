@@ -2,7 +2,7 @@
 // System for generating menus.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team. All rights reserved.
@@ -22,8 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-//
-// $Id: MenuBar.php 14549 2012-11-16 13:58:16Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -86,7 +84,7 @@ class WT_MenuBar {
 			//-- admin submenu
 			$submenu = new WT_Menu(WT_I18N::translate('Administration'), 'admin.php', 'menu-admin');
 			$menu->addSubmenu($submenu);
-		}		
+		}
 		return $menu;
 	}
 
@@ -237,8 +235,8 @@ class WT_MenuBar {
 						// Add a submenu showing relationship from this person to each of our favorites
 						foreach (user_favorites_WT_Module::getFavorites(WT_USER_ID) as $favorite) {
 							if ($favorite['type']=='INDI' && $favorite['gedcom_id']==WT_GED_ID) {
-								$person=WT_Person::getInstance($favorite['gid']);
-								if ($person instanceof WT_Person) {
+								$person=WT_Individual::getInstance($favorite['gid']);
+								if ($person instanceof WT_Individual) {
 									$subsubmenu = new WT_Menu(
 										$person->getFullName(),
 										'relationship.php?pid1='.$person->getXref().'&amp;pid2='.$pid2.'&amp;ged='.WT_GEDURL,
@@ -286,7 +284,7 @@ class WT_MenuBar {
 
 		// The top level menu shows the individual list
 		$menu=new WT_Menu(WT_I18N::translate('Lists'), 'indilist.php?ged='.WT_GEDURL, 'menu-list');
- 
+
 		// Do not show empty lists
 		$row=WT_DB::prepare(
 			"SELECT SQL_CACHE".
@@ -539,7 +537,7 @@ class WT_MenuBar {
 			case 'OBJE':
 			case 'NOTE':
 				$obj=WT_GedcomRecord::getInstance($favorite['gid']);
-				if ($obj && $obj->canDisplayName()) {
+				if ($obj && $obj->canShowName()) {
 					$submenu=new WT_Menu($obj->getFullName(), $obj->getHtmlUrl());
 					$menu->addSubMenu($submenu);
 				}
@@ -552,7 +550,7 @@ class WT_MenuBar {
 				$submenu=new WT_Menu(WT_I18N::translate('Add to favorites'), '#');
 				$submenu->addOnclick("jQuery.post('module.php?mod=user_favorites&amp;mod_action=menu-add-favorite',{xref:'".$controller->record->getXref()."'},function(){location.reload();})");
 				$menu->addSubMenu($submenu);
-			} 
+			}
 		}
 		return $menu;
 	}

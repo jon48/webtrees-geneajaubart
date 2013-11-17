@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -20,8 +20,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: module.php 14969 2013-04-29 17:23:24Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -72,11 +70,11 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 		}
 		$PEDIGREE_FULL_DETAILS = $show_full;
 
-		$person = WT_Person::getInstance($pid);
+		$person = WT_Individual::getInstance($pid);
 		if (!$person) {
 			$pid = $PEDIGREE_ROOT_ID;
 			set_block_setting($block_id, 'pid', $pid);
-			$person = WT_Person::getInstance($pid);
+			$person = WT_Individual::getInstance($pid);
 		}
 
 		if ($type!='treenav' && $person) {
@@ -140,7 +138,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 
 				$content .= '<script>jQuery("head").append(\'<link rel="stylesheet" href="'.$mod->css().'" type="text/css" />\');</script>';
 				$content .= '<script src="'.$mod->js().'"></script>';
-		    list($html, $js) = $tv->drawViewport($person->getXref(), 2);
+				list($html, $js) = $tv->drawViewport($person, 2);
 				$content .= $html.'<script>'.$js.'</script>';
 				$content .= '</td>';
 			}
@@ -186,10 +184,10 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 
 		$PEDIGREE_ROOT_ID=get_gedcom_setting(WT_GED_ID, 'PEDIGREE_ROOT_ID');
 
-		if (safe_POST_bool('save')) {
-			set_block_setting($block_id, 'details', safe_POST_bool('details'));
-			set_block_setting($block_id, 'type',    safe_POST('type', array('pedigree', 'descendants', 'hourglass', 'treenav'), 'pedigree'));
-			set_block_setting($block_id, 'pid',     safe_POST('pid', WT_REGEX_XREF));
+		if (WT_Filter::postBool('save') && WT_Filter::checkCsrf()) {
+			set_block_setting($block_id, 'details', WT_Filter::postBool('details'));
+			set_block_setting($block_id, 'type',    WT_Filter::post('type', 'pedigree|descendants|hourglass|treenav', 'pedigree'));
+			set_block_setting($block_id, 'pid',     WT_Filter::post('pid', WT_REGEX_XREF));
 			exit;
 		}
 
@@ -209,7 +207,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 			</select>
 		</td></tr>
 		<tr>
-			<td class="descriptionbox wrap width33"><?php echo WT_I18N::translate('Show Details'); ?></td>
+			<td class="descriptionbox wrap width33"><?php echo WT_I18N::translate('Show details'); ?></td>
 		<td class="optionbox">
 			<select name="details">
 					<option value="no" <?php if (!$details) echo " selected=\"selected\""; ?>><?php echo WT_I18N::translate('no'); ?></option>
@@ -223,7 +221,7 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 				<input type="text" name="pid" id="pid" value="<?php echo $pid; ?>" size="5">
 				<?php
 				echo print_findindi_link('pid');
-				$root=WT_Person::getInstance($pid);
+				$root=WT_Individual::getInstance($pid);
 				if ($root) {
 					echo ' <span class="list_item">', $root->getFullName(), $root->format_first_major_fact(WT_EVENTS_BIRT, 1), '</span>';
 				}

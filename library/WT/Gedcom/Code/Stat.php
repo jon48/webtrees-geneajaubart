@@ -2,7 +2,7 @@
 // Functions and logic for GEDCOM "STAT" codes
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2011 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Stat.php 11093 2011-03-09 07:57:41Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -69,10 +67,10 @@ class WT_Gedcom_Code_Stat {
 				WT_I18N::translate('Completed; date unknown');
 		case 'DNS':
 			return /* I18N: LDS sealing status; see http://en.wikipedia.org/wiki/Sealing_(Latter_Day_Saints) */
-				WT_I18N::translate('Do Not Seal: unauthorized');
+				WT_I18N::translate('Do not seal: unauthorized');
 		case 'DNS/CAN':
 			return /* I18N: LDS sealing status; see http://en.wikipedia.org/wiki/Sealing_(Latter_Day_Saints) */
-				WT_I18N::translate('Do Not Seal, previous sealing cancelled');
+				WT_I18N::translate('Do not seal, previous sealing cancelled');
 		case 'EXCLUDED':
 			return /* I18N: LDS sealing status; see http://en.wikipedia.org/wiki/Sealing_(Latter_Day_Saints) */
 				WT_I18N::translate('Excluded from this submission');

@@ -8,7 +8,7 @@
 // Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: functions_print_lists.php 15001 2013-05-13 22:17:50Z greg $
 // @version: p_$Revision$ $Date$
 // $HeadURL$
 
@@ -91,27 +89,27 @@ function format_indi_table($datalist, $option='') {
 				"iDisplayLength": 20,
 				"sPaginationType": "full_numbers"
 			});
-	
-			jQuery("div.filtersH_'.$table_id.'").html("'.addslashes(
-				'<button type="button" id="SEX_M_'.    $table_id.'" class="ui-state-default SEX_M" title="'.    WT_I18N::translate('Show only males.').'">&nbsp;'.WT_Person::sexImage('M', 'small').'&nbsp;</button>'.
-				'<button type="button" id="SEX_F_'.    $table_id.'" class="ui-state-default SEX_F" title="'.    WT_I18N::translate('Show only females.').'">&nbsp;'.WT_Person::sexImage('F', 'small').'&nbsp;</button>'.
-				'<button type="button" id="SEX_U_'.    $table_id.'" class="ui-state-default SEX_U" title="'.    WT_I18N::translate('Show only persons of whom the gender is not known.').'">&nbsp;'.WT_Person::sexImage('U', 'small').'&nbsp;</button>'.
-				'<button type="button" id="DEAT_N_'.   $table_id.'" class="ui-state-default DEAT_N" title="'.   WT_I18N::translate('Show people who are alive or couples where both partners are alive.').'">'.WT_I18N::translate('Alive').'</button>'.
-				'<button type="button" id="DEAT_Y_'.   $table_id.'" class="ui-state-default DEAT_Y" title="'.   WT_I18N::translate('Show people who are dead or couples where both partners are deceased.').'">'.WT_I18N::translate('Dead').'</button>'.
-				'<button type="button" id="DEAT_YES_'. $table_id.'" class="ui-state-default DEAT_YES" title="'. WT_I18N::translate('Show people who died more than 100 years ago.').'">'.WT_Gedcom_Tag::getLabel('DEAT').'&gt;100</button>'.
-				'<button type="button" id="DEAT_Y100_'.$table_id.'" class="ui-state-default DEAT_Y100" title="'.WT_I18N::translate('Show people who died within the last 100 years.').'">'.WT_Gedcom_Tag::getLabel('DEAT').'&lt;=100</button>'.
-				'<button type="button" id="BIRT_YES_'. $table_id.'" class="ui-state-default BIRT_YES" title="'. WT_I18N::translate('Show persons born more than 100 years ago.').'">'.WT_Gedcom_Tag::getLabel('BIRT').'&gt;100</button>'.
-				'<button type="button" id="BIRT_Y100_'.$table_id.'" class="ui-state-default BIRT_Y100" title="'.WT_I18N::translate('Show persons born within the last 100 years.').'">'.WT_Gedcom_Tag::getLabel('BIRT').'&lt;=100</button>'.
-				'<button type="button" id="TREE_R_'   .$table_id.'" class="ui-state-default TREE_R" title="'.   WT_I18N::translate('Show «roots» couples or individuals.  These people may also be called «patriarchs».  They are individuals who have no parents recorded in the database.').'">'.WT_I18N::translate('Roots').'</button>'.
-				'<button type="button" id="TREE_L_'.   $table_id.'" class="ui-state-default TREE_L" title="'.   WT_I18N::translate('Show «leaves» couples or individuals.  These are individuals who are alive but have no children recorded in the database.').'">'.WT_I18N::translate('Leaves').'</button>'.
+
+			jQuery("div.filtersH_'.$table_id.'").html("'.WT_Filter::escapeJs(
+				'<button type="button" id="SEX_M_'.    $table_id.'" class="ui-state-default SEX_M" title="'.    WT_I18N::translate('Show only males.').'">&nbsp;'.WT_Individual::sexImage('M', 'small').'&nbsp;</button>'.
+				'<button type="button" id="SEX_F_'.    $table_id.'" class="ui-state-default SEX_F" title="'.    WT_I18N::translate('Show only females.').'">&nbsp;'.WT_Individual::sexImage('F', 'small').'&nbsp;</button>'.
+				'<button type="button" id="SEX_U_'.    $table_id.'" class="ui-state-default SEX_U" title="'.    WT_I18N::translate('Show only individuals of whom the gender is not known.').'">&nbsp;'.WT_Individual::sexImage('U', 'small').'&nbsp;</button>'.
+				'<button type="button" id="DEAT_N_'.   $table_id.'" class="ui-state-default DEAT_N" title="'.   WT_I18N::translate('Show individuals who are alive or couples where both partners are alive.').'">'.WT_I18N::translate('Alive').'</button>'.
+				'<button type="button" id="DEAT_Y_'.   $table_id.'" class="ui-state-default DEAT_Y" title="'.   WT_I18N::translate('Show individuals who are dead or couples where both partners are deceased.').'">'.WT_I18N::translate('Dead').'</button>'.
+				'<button type="button" id="DEAT_YES_'. $table_id.'" class="ui-state-default DEAT_YES" title="'. WT_I18N::translate('Show individuals who died more than 100 years ago.').'">'.WT_Gedcom_Tag::getLabel('DEAT').'&gt;100</button>'.
+				'<button type="button" id="DEAT_Y100_'.$table_id.'" class="ui-state-default DEAT_Y100" title="'.WT_I18N::translate('Show individuals who died within the last 100 years.').'">'.WT_Gedcom_Tag::getLabel('DEAT').'&lt;=100</button>'.
+				'<button type="button" id="BIRT_YES_'. $table_id.'" class="ui-state-default BIRT_YES" title="'. WT_I18N::translate('Show individuals born more than 100 years ago.').'">'.WT_Gedcom_Tag::getLabel('BIRT').'&gt;100</button>'.
+				'<button type="button" id="BIRT_Y100_'.$table_id.'" class="ui-state-default BIRT_Y100" title="'.WT_I18N::translate('Show individuals born within the last 100 years.').'">'.WT_Gedcom_Tag::getLabel('BIRT').'&lt;=100</button>'.
+				'<button type="button" id="TREE_R_'   .$table_id.'" class="ui-state-default TREE_R" title="'.   WT_I18N::translate('Show “roots” couples or individuals.  These individuals may also be called “patriarchs”.  They are individuals who have no parents recorded in the database.').'">'.WT_I18N::translate('Roots').'</button>'.
+				'<button type="button" id="TREE_L_'.   $table_id.'" class="ui-state-default TREE_L" title="'.   WT_I18N::translate('Show “leaves” couples or individuals.  These are individuals who are alive but have no children recorded in the database.').'">'.WT_I18N::translate('Leaves').'</button>'.
 				'<button type="button" id="RESET_'.    $table_id.'" class="ui-state-default RESET" title="'.    WT_I18N::translate('Reset to the list defaults.').'">'.WT_I18N::translate('Reset').'</button>'
 			).'");
-	
-			jQuery("div.filtersF_'.$table_id.'").html("'.addslashes(
+
+			jQuery("div.filtersF_'.$table_id.'").html("'.WT_Filter::escapeJs(
 				'<button type="button" class="ui-state-default" id="cb_parents_indi_list_table" onclick="jQuery(\'div.parents_indi_list_table_'.$table_id.'\').toggle(); jQuery(this).toggleClass(\'ui-state-active\');">'.WT_I18N::translate('Show parents').'</button>'.
 				'<button type="button" class="ui-state-default" id="charts_indi_list_table" onclick="jQuery(\'div.indi_list_table-charts_'.$table_id.'\').toggle(); jQuery(this).toggleClass(\'ui-state-active\');">'.WT_I18N::translate('Show statistics charts').'</button>'
 			).'");
-	
+
 			/* Add event listeners for filtering inputs */
 			/* PERSO Modify table to include IsSourced module */
 			jQuery("#SEX_M_'.    $table_id.'").click( function() {
@@ -179,7 +177,7 @@ function format_indi_table($datalist, $option='') {
 				oTable'.$table_id.'.fnFilter("L", 27 );
 				jQuery("#TREE_R_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#TREE_L_'.$table_id.'").addClass("ui-state-active");
-			});	
+			});
 			jQuery("#RESET_'.    $table_id.'").click( function() {
 				for (i=24; i<=27; i++){
 					oTable'.$table_id.'.fnFilter("", i );
@@ -193,7 +191,7 @@ function format_indi_table($datalist, $option='') {
 			jQuery("th div:eq(3)").css("margin", "auto").css("text-align", "center");
 			jQuery("th span:eq(8)").css("display", "none");
 			jQuery("th div:eq(8)").css("margin", "auto").css("text-align", "center");
-			
+
 			jQuery(".indi-list").css("visibility", "visible");
 			jQuery(".loading-image").css("display", "none");
 		');
@@ -262,16 +260,15 @@ function format_indi_table($datalist, $option='') {
 		if (is_object($value)) { // Array of objects
 			$person=$value;
 		} elseif (!is_array($value)) { // Array of IDs
-			$person = WT_Person::getInstance($value);
+			$person = WT_Individual::getInstance($value);
 		} else { // Array of search results
 			$gid = $key;
 			if (isset($value['gid'])) $gid = $value['gid']; // from indilist
 			if (isset($value[4])) $gid = $value[4]; // from indilist ALL
-			$person = WT_Person::getInstance($gid);
+			$person = WT_Individual::getInstance($gid);
 		}
 		if (is_null($person)) continue;
-		if ($person->getType() !== 'INDI') continue;
-		if (!$person->canDisplayName()) {
+		if (!$person->canShowName()) {
 			continue;
 		}
 		//PERSO Create decorator for Individual
@@ -280,7 +277,14 @@ function format_indi_table($datalist, $option='') {
 		//-- place filtering
 		if ($option=='BIRT_PLAC' && strstr($person->getBirthPlace(), $filter)===false) continue;
 		if ($option=='DEAT_PLAC' && strstr($person->getDeathPlace(), $filter)===false) continue;
-		$html .= '<tr>';
+		if ($person->isNew()) {
+			$class = ' class="new"';
+		} elseif ($person->isOld()) {
+			$class = ' class="old"';
+		} else {
+			$class = '';
+		}
+		$html .= '<tr' . $class . '>';
 		//-- Indi name(s)
 		$html .= '<td colspan="2">';
 		foreach ($person->getAllNames() as $num=>$name) {
@@ -310,8 +314,8 @@ function format_indi_table($datalist, $option='') {
 		// Use "AAAA" as a separator (instead of ",") as Javascript.localeCompare() ignores
 		// punctuation and "ANN,ROACH" would sort after "ANNE,ROACH", instead of before it.
 		// Similarly, @N.N. would sort as NN.
-		$html .= '<td>'. htmlspecialchars(str_replace('@P.N.', 'AAAA', $givn)). 'AAAA'. htmlspecialchars(str_replace('@N.N.', 'AAAA', $surn)). '</td>';
-		$html .= '<td>'. htmlspecialchars(str_replace('@N.N.', 'AAAA', $surn)). 'AAAA'. htmlspecialchars(str_replace('@P.N.', 'AAAA', $givn)). '</td>';
+		$html .= '<td>'. WT_Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)). 'AAAA'. WT_Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)). '</td>';
+		$html .= '<td>'. WT_Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)). 'AAAA'. WT_Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)). '</td>';
 		//-- SOSA
 		if ($option=='sosa') {
 			$html .= '<td><a href="relationship.php?pid1='. $datalist[1]. '&amp;pid2='. $person->getXref(). '" title="'. WT_I18N::translate('Relationships'). '">'. WT_I18N::number($key). '</a></td><td>'. $key. '</td>';
@@ -458,7 +462,7 @@ function format_indi_table($datalist, $option='') {
 		$html .= '</td>';
 		//-- Filtering by birth date
 		$html .= '<td>';
-		if (!$person->canDisplayDetails() || WT_Date::Compare($birth_date, $d100y)>0) {
+		if (!$person->canShow() || WT_Date::Compare($birth_date, $d100y)>0) {
 			$html .= 'Y100';
 		} else {
 			$html .= 'YES';
@@ -496,7 +500,7 @@ function format_indi_table($datalist, $option='') {
 		'</td></tr></table>
 		</div>
 		</div>'; // Close "indi-list"
-		
+
 	return $html;
 }
 
@@ -553,13 +557,13 @@ function format_fam_table($datalist, $option='') {
 				"sPaginationType": "full_numbers"
 		   });
 
-			jQuery("div.filtersH_'.$table_id.'").html("'.addslashes(
-				'<button type="button" id="DEAT_N_'.    $table_id.'" class="ui-state-default DEAT_N" title="'.    WT_I18N::translate('Show people who are alive or couples where both partners are alive.').'">'.WT_I18N::translate('Both alive').'</button>'.
+			jQuery("div.filtersH_'.$table_id.'").html("'.WT_Filter::escapeJs(
+				'<button type="button" id="DEAT_N_'.    $table_id.'" class="ui-state-default DEAT_N" title="'.    WT_I18N::translate('Show individuals who are alive or couples where both partners are alive.').'">'.WT_I18N::translate('Both alive').'</button>'.
 				'<button type="button" id="DEAT_W_'.    $table_id.'" class="ui-state-default DEAT_W" title="'.    WT_I18N::translate('Show couples where only the female partner is deceased.').'">'.WT_I18N::translate('Widower').'</button>'.
 				'<button type="button" id="DEAT_H_'.    $table_id.'" class="ui-state-default DEAT_H" title="'.    WT_I18N::translate('Show couples where only the male partner is deceased.').'">'.WT_I18N::translate('Widow').'</button>'.
-				'<button type="button" id="DEAT_Y_'.    $table_id.'" class="ui-state-default DEAT_Y" title="'.    WT_I18N::translate('Show people who are dead or couples where both partners are deceased.').'">'.WT_I18N::translate('Both dead').'</button>'.
-				'<button type="button" id="TREE_R_'.    $table_id.'" class="ui-state-default TREE_R" title="'.    WT_I18N::translate('Show «roots» couples or individuals.  These people may also be called «patriarchs».  They are individuals who have no parents recorded in the database.').'">'.WT_I18N::translate('Roots').'</button>'.
-				'<button type="button" id="TREE_L_'.    $table_id.'" class="ui-state-default TREE_L" title="'.    WT_I18N::translate('Show «leaves» couples or individuals.  These are individuals who are alive but have no children recorded in the database.').'">'.WT_I18N::translate('Leaves').'</button>'.
+				'<button type="button" id="DEAT_Y_'.    $table_id.'" class="ui-state-default DEAT_Y" title="'.    WT_I18N::translate('Show individuals who are dead or couples where both partners are deceased.').'">'.WT_I18N::translate('Both dead').'</button>'.
+				'<button type="button" id="TREE_R_'.    $table_id.'" class="ui-state-default TREE_R" title="'.    WT_I18N::translate('Show “roots” couples or individuals.  These individuals may also be called “patriarchs”.  They are individuals who have no parents recorded in the database.').'">'.WT_I18N::translate('Roots').'</button>'.
+				'<button type="button" id="TREE_L_'.    $table_id.'" class="ui-state-default TREE_L" title="'.    WT_I18N::translate('Show “leaves” couples or individuals.  These are individuals who are alive but have no children recorded in the database.').'">'.WT_I18N::translate('Leaves').'</button>'.
 				'<button type="button" id="MARR_U_'.    $table_id.'" class="ui-state-default MARR_U" title="'.    WT_I18N::translate('Show couples with an unknown marriage date.').'">'.WT_Gedcom_Tag::getLabel('MARR').'</button>'.
 				'<button type="button" id="MARR_YES_'.  $table_id.'" class="ui-state-default MARR_YES" title="'.  WT_I18N::translate('Show couples who married more than 100 years ago.').'">'.WT_Gedcom_Tag::getLabel('MARR').'&gt;100</button>'.
 				'<button type="button" id="MARR_Y100_'. $table_id.'" class="ui-state-default MARR_Y100" title="'. WT_I18N::translate('Show couples who married within the last 100 years.').'">'.WT_Gedcom_Tag::getLabel('MARR').'&lt;=100</button>'.
@@ -568,11 +572,11 @@ function format_fam_table($datalist, $option='') {
 				'<button type="button" id="RESET_'.$table_id.'" class="ui-state-default RESET" title="'.WT_I18N::translate('Reset to the list defaults.').'">'.WT_I18N::translate('Reset').'</button>'
 			).'");
 
-			jQuery("div.filtersF_'.$table_id.'").html("'.addslashes(
+			jQuery("div.filtersF_'.$table_id.'").html("'.WT_Filter::escapeJs(
 				'<button type="button" class="ui-state-default" id="cb_parents_'.$table_id.'" onclick="jQuery(\'div.parents_'.$table_id.'\').toggle(); jQuery(this).toggleClass(\'ui-state-active\');">'.WT_I18N::translate('Show parents').'</button>'.
 				'<button type="button" class="ui-state-default" id="charts_fam_list_table" onclick="jQuery(\'div.fam_list_table-charts_'.$table_id.'\').toggle(); jQuery(this).toggleClass(\'ui-state-active\');">'. WT_I18N::translate('Show statistics charts').'</button>'
 			).'");
-			
+
 			/* Add event listeners for filtering inputs */
 			/* PERSO Modify table to include IsSourced module */		
 			jQuery("#MARR_U_'.    $table_id.'").click( function() {
@@ -652,7 +656,7 @@ function format_fam_table($datalist, $option='') {
 				oTable'.$table_id.'.fnFilter("L", 24);
 				jQuery("#TREE_R_'.$table_id.'").removeClass("ui-state-active");
 				jQuery("#TREE_L_'.$table_id.'").addClass("ui-state-active");
-			});	
+			});
 			jQuery("#RESET_'.     $table_id.'").click( function() {
 				for (i=22; i<=24; i++) {
 					oTable'.$table_id.'.fnFilter("", i );
@@ -663,7 +667,7 @@ function format_fam_table($datalist, $option='') {
 			/* This code is a temporary fix for Datatables bug http://www.datatables.net/forums/discussion/4730/datatables_sort_wrapper-being-added-to-columns-with-bsortable-false/p1*/
 			jQuery("th span:eq(9)").css("display", "none");
 			jQuery("th div:eq(9)").css("margin", "auto").css("text-align", "center");
-			
+
 			jQuery(".fam-list").css("visibility", "visible");
 			jQuery(".loading-image").css("display", "none");
 	');
@@ -716,33 +720,28 @@ function format_fam_table($datalist, $option='') {
 	$html .= '<tbody>';
 	$num = 0;
 	$d100y=new WT_Date(date('Y')-100);  // 100 years ago
-	foreach ($datalist as $key => $value) {
-		if (is_object($value)) { // Array of objects
-			$family=$value;
-		} elseif (!is_array($value)) { // Array of IDs
-			$family=WT_Family::getInstance($value);
-		} else { // Array of search results
-			$gid = "";
-			if (isset($value['gid'])) $gid = $value['gid'];
-			if (isset($value['gedcom'])) $family = new WT_Family($value['gedcom']);
-			else $family = WT_Family::getInstance($gid);
-		}
-		if (is_null($family)) continue;
-		if ($family->getType() !== 'FAM') continue;
+	foreach ($datalist as $family) {
 		//PERSO Create decorator for Family
 		$dfamily = new WT_Perso_Family($family);
 		//END PERSO
 		//-- Retrieve husband and wife
 		$husb = $family->getHusband();
-		if (is_null($husb)) $husb = new WT_Person('');
+		if (is_null($husb)) $husb = new WT_Individual('H', '0 @H@ INDI', null, WT_GED_ID);
 		$wife = $family->getWife();
-		if (is_null($wife)) $wife = new WT_Person('');
-		if (!$family->canDisplayDetails()) {
+		if (is_null($wife)) $wife = new WT_Individual('W', '0 @W@ INDI', null, WT_GED_ID);
+		if (!$family->canShow()) {
 			continue;
 		}
 		//-- place filtering
 		if ($option=='MARR_PLAC' && strstr($family->getMarriagePlace(), $filter)===false) continue;
-		$html .= '<tr>';
+		if ($family->isNew()) {
+			$class = ' class="new"';
+		} elseif ($family->isOld()) {
+			$class = ' class="old"';
+		} else {
+			$class = '';
+		}
+		$html .= '<tr' . $class . '>';
 		//-- Husband name(s)
 		$html .= '<td colspan="2">';
 		foreach ($husb->getAllNames() as $num=>$name) {
@@ -776,8 +775,8 @@ function format_fam_table($datalist, $option='') {
 		// Use "AAAA" as a separator (instead of ",") as Javascript.localeCompare() ignores
 		// punctuation and "ANN,ROACH" would sort after "ANNE,ROACH", instead of before it.
 		// Similarly, @N.N. would sort as NN.
-		$html .= '<td>'. htmlspecialchars(str_replace('@P.N.', 'AAAA', $givn)). 'AAAA'. htmlspecialchars(str_replace('@N.N.', 'AAAA', $surn)). '</td>';
-		$html .= '<td>'. htmlspecialchars(str_replace('@N.N.', 'AAAA', $surn)). 'AAAA'. htmlspecialchars(str_replace('@P.N.', 'AAAA', $givn)). '</td>';
+		$html .= '<td>'. WT_Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)). 'AAAA'. WT_Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)). '</td>';
+		$html .= '<td>'. WT_Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)). 'AAAA'. WT_Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)). '</td>';
 		$mdate=$family->getMarriageDate();
 		//-- Husband age
 		$hdate=$husb->getBirthDate();
@@ -825,8 +824,8 @@ function format_fam_table($datalist, $option='') {
 		// Use "AAAA" as a separator (instead of ",") as Javascript.localeCompare() ignores
 		// punctuation and "ANN,ROACH" would sort after "ANNE,ROACH", instead of before it.
 		// Similarly, @N.N. would sort as NN.
-		$html .= '<td>'. htmlspecialchars(str_replace('@P.N.', 'AAAA', $givn)). 'AAAA'. htmlspecialchars(str_replace('@N.N.', 'AAAA', $surn)). '</td>';
-		$html .= '<td>'. htmlspecialchars(str_replace('@N.N.', 'AAAA', $surn)). 'AAAA'. htmlspecialchars(str_replace('@P.N.', 'AAAA', $givn)). '</td>';
+		$html .= '<td>'. WT_Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)). 'AAAA'. WT_Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)). '</td>';
+		$html .= '<td>'. WT_Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)). 'AAAA'. WT_Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)). '</td>';
 		$mdate=$family->getMarriageDate();
 		//-- Wife age
 		$wdate=$wife->getBirthDate();
@@ -852,31 +851,12 @@ function format_fam_table($datalist, $option='') {
 			if ($marriage_dates[0]->gregorianYear()>=1550 && $marriage_dates[0]->gregorianYear()<2030) {
 				$marr_by_decade[(int)($marriage_dates[0]->gregorianYear()/10)*10] .= $husb->getSex().$wife->getSex();
 			}
-		} else if (get_sub_record(1, '1 _NMR', $family->getGedcomRecord())) {
-			$hus = $family->getHusband();
-			$wif = $family->getWife();
-			if (empty($wif) && !empty($hus)) $html .= WT_Gedcom_Tag::getLabel('_NMR', $hus);
-			else if (empty($hus) && !empty($wif)) $html .= WT_Gedcom_Tag::getLabel('_NMR', $wif);
-			else $html .= WT_Gedcom_Tag::getLabel('_NMR');
-		} else if (get_sub_record(1, '1 _NMAR', $family->getGedcomRecord())) {
-			$hus = $family->getHusband();
-			$wif = $family->getWife();
-			if (empty($wif) && !empty($hus)) $html .= WT_Gedcom_Tag::getLabel('_NMAR', $hus);
-			else if (empty($hus) && !empty($wif)) $html .= WT_Gedcom_Tag::getLabel('_NMAR', $wif);
-			else $html .= WT_Gedcom_Tag::getLabel('_NMAR');
+		} elseif ($family->getFacts('_NMR')) {
+			$html .= WT_I18N::translate('no');
+		} elseif ($family->getFacts('MARR')) {
+			$html .= WT_I18N::translate('yes');
 		} else {
-			$factdetail = explode(' ', trim($family->getMarriageRecord()));
-			if (isset($factdetail)) {
-				if (count($factdetail) >= 3) {
-					if (strtoupper($factdetail[2]) != "N") {
-						$html .= WT_I18N::translate('yes');
-					} else {
-						$html .= WT_I18N::translate('no');
-					}
-				} else {
-					$html .= '&nbsp;';
-				}
-			}
+			$html .= '&nbsp;';
 		}
 		$html .= '</td>';
 		//-- Event date (sortable)hidden by datatables code
@@ -931,7 +911,7 @@ function format_fam_table($datalist, $option='') {
 		}
 		//-- Sorting by marriage date
 		$html .= '<td>';
-		if (!$family->canDisplayDetails() || !$mdate->isOK()) {
+		if (!$family->canShow() || !$mdate->isOK()) {
 			$html .= 'U';
 		} else {
 			if (WT_Date::Compare($mdate, $d100y)>0) {
@@ -940,7 +920,7 @@ function format_fam_table($datalist, $option='') {
 				$html .= 'YES';
 			}
 		}
-		if ($family->isDivorced()) {
+		if ($family->getFacts(WT_EVENTS_DIV)) {
 			$html .= 'D';
 		}
 		if (count($husb->getSpouseFamilies())>1 || count($wife->getSpouseFamilies())>1) {
@@ -981,7 +961,7 @@ function format_fam_table($datalist, $option='') {
 		'</td></tr></table>
 		</div>
 		</div>'; // Close "fam-list"
-	
+
 	return $html;
 }
 
@@ -1047,30 +1027,18 @@ function format_sour_table($datalist) {
 	//-- table body
 	$html .= '<tbody>';
 	$n=0;
-	foreach ($datalist as $key=>$value) {
-		if (is_object($value)) { // Array of objects
-			$source=$value;
-		} elseif (!is_array($value)) { // Array of IDs
-			$source=WT_Source::getInstance($key); // from placelist
-			if (is_null($source)) {
-				$source=WT_Source::getInstance($value);
-			}
-			unset($value);
-		} else { // Array of search results
-			$gid='';
-			if (isset($value['gid'])) {
-				$gid=$value['gid'];
-			}
-			if (isset($value['gedcom'])) {
-				$source=new WT_Source($value['gedcom']);
-			} else {
-				$source=WT_Source::getInstance($gid);
-			}
-		}
-		if (!$source || !$source->canDisplayDetails()) {
+	foreach ($datalist as $source) {
+		if (!$source->canShow()) {
 			continue;
 		}
-		$html .= '<tr>';
+		if ($source->isNew()) {
+			$class = ' class="new"';
+		} elseif ($source->isOld()) {
+			$class = ' class="old"';
+		} else {
+			$class = '';
+		}
+		$html .= '<tr' . $class . '>';
 		//-- Source name(s)
 		$html .= '<td>';
 		foreach ($source->getAllNames() as $n=>$name) {
@@ -1082,23 +1050,29 @@ function format_sour_table($datalist) {
 			} else {
 				$html .= '<a href="'. $source->getHtmlUrl(). '">'. highlight_search_hits($name['full']). '</a>';
 			}
-		}	
+		}
 		$html .= '</td>';
 		// Sortable name
 		$html .= '<td>'. strip_tags($source->getFullName()). '</td>';
 		//-- Author
-		$html .= '<td>'. highlight_search_hits(htmlspecialchars($source->getAuth())). '</td>';
+		$auth = $source->getFirstFact('AUTH');
+		if ($auth) {
+			$author = $auth->getValue();
+		} else {
+			$author = '';
+		}
+		$html .= '<td>'. highlight_search_hits($author). '</td>';
 		//-- Linked INDIs
-		$num=count($source->fetchLinkedIndividuals());
+		$num = count($source->linkedIndividuals('SOUR'));
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Linked FAMs
-		$num=count($source->fetchLinkedfamilies());
+		$num = count($source->linkedfamilies('SOUR'));
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Linked OBJEcts
-		$num=count($source->fetchLinkedMedia());
+		$num = count($source->linkedMedia('SOUR'));
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Linked NOTEs
-		$num=count($source->fetchLinkedNotes());
+		$num = count($source->linkedNotes('SOUR'));
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Last change
 		if ($SHOW_LAST_CHANGE) {
@@ -1112,16 +1086,16 @@ function format_sour_table($datalist) {
 		} else {
 			$html .= '<td>&nbsp;</td>';
 		}
-		//-- Delete 
+		//-- Delete
 		if (WT_USER_GEDCOM_ADMIN) {
-			$html .= '<td><div title="'. WT_I18N::translate('Delete'). '" class="deleteicon" onclick="if (confirm(\''. addslashes(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($source->getFullName()))). '\')) jQuery.post(\'action.php\',{action:\'delete-source\',xref:\''. $source->getXref(). '\'},function(){location.reload();})"><span class="link_text">'. WT_I18N::translate('Delete'). '</span></div></td>';
+			$html .= '<td><div title="'. WT_I18N::translate('Delete'). '" class="deleteicon" onclick="return delete_source(\'' . WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($source->getFullName())) . "', '" . $source->getXref() . '\');"><span class="link_text">'. WT_I18N::translate('Delete'). '</span></div></td>';
 		} else {
 			$html .= '<td>&nbsp;</td>';
 		}
 		$html .= '</tr>';
 	}
 	$html .= '</tbody></table></div>';
-		
+
 	return $html;
 }
 
@@ -1161,7 +1135,7 @@ function format_note_table($datalist) {
 			jQuery(".note-list").css("visibility", "visible");
 			jQuery(".loading-image").css("display", "none");
 		');
-		
+
 	//--table wrapper
 	$html .= '<div class="loading-image">&nbsp;</div>';
 	$html .= '<div class="note-list">';
@@ -1183,23 +1157,30 @@ function format_note_table($datalist) {
 	//-- table body
 	$html .= '<tbody>';
 	foreach ($datalist as $note) {
-		if (!$note->canDisplayDetails()) {
+		if (!$note->canShow()) {
 			continue;
 		}
-		$html .= '<tr>';
+		if ($note->isNew()) {
+			$class = ' class="new"';
+		} elseif ($note->isOld()) {
+			$class = ' class="old"';
+		} else {
+			$class = '';
+		}
+		$html .= '<tr' . $class . '>';
 		//-- Shared Note name
 		$html .= '<td><a class="name2" href="'. $note->getHtmlUrl(). '">'. highlight_search_hits($note->getFullName()). '</a></td>';
 		//-- Linked INDIs
-		$num=count($note->fetchLinkedIndividuals());
+		$num = count($note->linkedIndividuals('NOTE'));
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Linked FAMs
-		$num=count($note->fetchLinkedfamilies());
+		$num = count($note->linkedfamilies('NOTE'));
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Linked OBJEcts
-		$num=count($note->fetchLinkedMedia());
+		$num = count($note->linkedMedia('NOTE'));
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Linked SOURs
-		$num=count($note->fetchLinkedSources());
+		$num = count($note->linkedSources('NOTE'));
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Last change
 		if ($SHOW_LAST_CHANGE) {
@@ -1213,16 +1194,16 @@ function format_note_table($datalist) {
 		} else {
 			$html .= '<td>&nbsp;</td>';
 		}
-		//-- Delete 
+		//-- Delete
 		if (WT_USER_GEDCOM_ADMIN) {
-			$html .= '<td><div title="'. WT_I18N::translate('Delete'). '" class="deleteicon" onclick="if (confirm(\''. addslashes(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($note->getFullName()))). '\')) jQuery.post(\'action.php\',{action:\'delete-note\',xref:\''. $note->getXref(). '\'},function(){location.reload();})"><span class="link_text">'. WT_I18N::translate('Delete'). '</span></div></td>';
+			$html .= '<td><div title="'. WT_I18N::translate('Delete'). '" class="deleteicon" onclick="return delete_note(\'' . WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($note->getFullName())) . "', '" . $note->getXref() . '\');"><span class="link_text">'. WT_I18N::translate('Delete'). '</span></div></td>';
 		} else {
 			$html .= '<td></td>';
 		}
 		$html .= '</tr>';
 	}
 	$html .= '</tbody></table></div>';
-		
+
 	return $html;
 }
 
@@ -1256,7 +1237,7 @@ function format_repo_table($repos) {
 		jQuery(".repo-list").css("visibility", "visible");
 		jQuery(".loading-image").css("display", "none");
 		');
-		
+
 	//--table wrapper
 	$html .= '<div class="loading-image">&nbsp;</div>';
 	$html .= '<div class="repo-list">';
@@ -1273,10 +1254,17 @@ function format_repo_table($repos) {
 	$html .= '<tbody>';
 	$n=0;
 	foreach ($repos as $repo) {
-		if (!$repo->canDisplayDetails()) {
+		if (!$repo->canShow()) {
 			continue;
 		}
-		$html .= '<tr>';
+		if ($repo->isNew()) {
+			$class = ' class="new"';
+		} elseif ($repo->isOld()) {
+			$class = ' class="old"';
+		} else {
+			$class = '';
+		}
+		$html .= '<tr' . $class . '>';
 		//-- Repository name(s)
 		$html .= '<td>';
 		foreach ($repo->getAllNames() as $n=>$name) {
@@ -1288,10 +1276,10 @@ function format_repo_table($repos) {
 			} else {
 				$html .= '<a href="'. $repo->getHtmlUrl(). '">'. highlight_search_hits($name['full']). '</a>';
 			}
-		}	
+		}
 		$html .= '</td>';
 		//-- Linked SOURces
-		$num=count($repo->fetchLinkedSources());
+		$num = count($repo->linkedSources('REPO'));
 		$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 		//-- Last change
 		if ($SHOW_LAST_CHANGE) {
@@ -1305,16 +1293,16 @@ function format_repo_table($repos) {
 		} else {
 			$html .= '<td>&nbsp;</td>';
 		}
-		//-- Delete 
+		//-- Delete
 		if (WT_USER_GEDCOM_ADMIN) {
-			$html .= '<td><div title="'. WT_I18N::translate('Delete'). '" class="deleteicon" onclick="if (confirm(\''. addslashes(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($repo->getFullName()))). '\')) jQuery.post(\'action.php\',{action:\'delete-repository\',xref:\''. $repo->getXref(). '\'},function(){location.reload();})"><span class="link_text">'. WT_I18N::translate('Delete'). '</span></div></td>';
+			$html .= '<td><div title="'. WT_I18N::translate('Delete'). '" class="deleteicon" onclick="return delete_repository(\'' . WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($repo->getFullName())) . "', '" . $repo->getXref() . '\');"><span class="link_text">'. WT_I18N::translate('Delete'). '</span></div></td>';
 		} else {
 			$html .= '<td>&nbsp;</td>';
 		}
 		$html .= '</tr>';
 	}
 	$html .= '</tbody></table></div>';
-	
+
 	return $html;
 }
 
@@ -1352,7 +1340,7 @@ function format_media_table($datalist) {
 		jQuery(".media-list").css("visibility", "visible");
 		jQuery(".loading-image").css("display", "none");
 		');
-		
+
 	//--table wrapper
 	$html .= '<div class="loading-image">&nbsp;</div>';
 	$html .= '<div class="media-list">';
@@ -1372,17 +1360,17 @@ function format_media_table($datalist) {
 	//-- table body
 	$html .= '<tbody>';
 	$n = 0;
-	foreach ($datalist as $key => $value) {
-		if (is_object($value)) { // Array of objects
-			$media=$value;
-		} else {
-			$media = new WT_Media($value["GEDCOM"]);
-			if (is_null($media)) $media = WT_Media::getInstance($key);
-			if (is_null($media)) continue;
-		}
-		if ($media->canDisplayDetails()) {
+	foreach ($datalist as $media) {
+		if ($media->canShow()) {
 			$name = $media->getFullName();
-			$html .= "<tr>";
+			if ($media->isNew()) {
+				$class = ' class="new"';
+			} elseif ($media->isOld()) {
+				$class = ' class="old"';
+			} else {
+				$class = '';
+			}
+			$html .= '<tr' . $class . '>';
 			//-- Object thumbnail
 			$html .= '<td>'. $media->displayImage(). '</td>';
 			//-- Object name(s)
@@ -1394,13 +1382,13 @@ function format_media_table($datalist) {
 			$html .= '</td>';
 
 			//-- Linked INDIs
-			$num=count($media->fetchLinkedIndividuals());
+			$num = count($media->linkedIndividuals('OBJE'));
 			$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 			//-- Linked FAMs
-			$num=count($media->fetchLinkedfamilies());
+			$num = count($media->linkedfamilies('OBJE'));
 			$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 			//-- Linked SOURces
-			$num=count($media->fetchLinkedSources());
+			$num = count($media->linkedSources('OBJE'));
 			$html .= '<td>'. WT_I18N::number($num). '</td><td>'. $num. '</td>';
 			//-- Last change
 			if ($SHOW_LAST_CHANGE) {
@@ -1418,7 +1406,7 @@ function format_media_table($datalist) {
 		}
 	}
 	$html .= '</tbody></table></div>';
-	
+
 	return $html;
 }
 
@@ -1481,10 +1469,10 @@ function format_surname_table($surnames, $script, $extra = '') {
 		// Multiple surname variants, e.g. von Groot, van Groot, van der Groot, etc.
 		foreach ($surns as $spfxsurn=>$indis) {
 			if ($spfxsurn) {
-				$html.='<a href="'.$url.'" dir="auto">'.htmlspecialchars($spfxsurn).'</a><br>';
+				$html.='<a href="'.$url.'" dir="auto">'.WT_Filter::escapeHtml($spfxsurn).'</a><br>';
 			} else {
 				// No surname, but a value from "2 SURN"?  A common workaround for toponyms, etc.
-				$html.='<a href="'.$url.'" dir="auto">'.htmlspecialchars($surn).'</a><br>';
+				$html.='<a href="'.$url.'" dir="auto">'.WT_Filter::escapeHtml($surn).'</a><br>';
 			}
 		}
 		$html.='</td>';
@@ -1506,7 +1494,7 @@ function format_surname_table($surnames, $script, $extra = '') {
 		$html.='<td>'. $subtotal. '</td></tr>';
 	}
 	$html .= '</tbody></table>';
-	
+
 	return $html;
 }
 
@@ -1591,7 +1579,7 @@ function format_surname_list($surnames, $style, $totals, $script, $extra = '') {
 				$first_spfxsurn=$spfxsurn;
 			}
 		}
-		$subhtml='<a href="'.$url.'" dir="auto">'.htmlspecialchars(implode(WT_I18N::$list_separator, array_keys($surns))).'</a>';
+		$subhtml='<a href="'.$url.'" dir="auto">'.WT_Filter::escapeHtml(implode(WT_I18N::$list_separator, array_keys($surns))).'</a>';
 
 		if ($totals) {
 			$subtotal=0;
@@ -1641,7 +1629,7 @@ function print_changes_list($change_ids, $sort) {
 	$arr=array();
 	foreach ($change_ids as $change_id) {
 		$record = WT_GedcomRecord::getInstance($change_id);
-		if (!$record || !$record->canDisplayDetails()) {
+		if (!$record || !$record->canShow()) {
 			continue;
 		}
 		// setup sorting parameters
@@ -1666,7 +1654,7 @@ function print_changes_list($change_ids, $sort) {
 	foreach ($arr as $value) {
 		$html .= '<a href="' . $value['record']->getHtmlUrl() . '" class="list_item name2">' . $value['record']->getFullName() . '</a>';
 		$html .= '<div class="indent" style="margin-bottom:5px">';
-		if ($value['record']->getType() == 'INDI') {
+		if ($value['record'] instanceof WT_Individual) {
 			if ($value['record']->getAddName()) {
 				$html .= '<a href="' . $value['record']->getHtmlUrl() . '" class="list_item">' . $value['record']->getAddName() . '</a>';
 			}
@@ -1735,29 +1723,27 @@ function print_changes_table($change_ids, $sort) {
 		//-- table body
 		foreach ($change_ids as $change_id) {
 		$record = WT_GedcomRecord::getInstance($change_id);
-		if (!$record || !$record->canDisplayDetails()) {
+		if (!$record || !$record->canShow()) {
 			continue;
 		}
 		$html .= '<tr><td>';
-		$indi = false;
-		switch ($record->getType()) {
-			case "INDI":
+		switch ($record::RECORD_TYPE) {
+			case 'INDI':
 				$icon = $record->getSexImage('small', '', '', false);
-				$indi = true;
 				break;
-			case "FAM":
+			case 'FAM':
 				$icon = '<i class="icon-button_family"></i>';
 				break;
-			case "OBJE":
+			case 'OBJE':
 				$icon = '<i class="icon-button_media"></i>';
 				break;
-			case "NOTE":
+			case 'NOTE':
 				$icon = '<i class="icon-button_note"></i>';
 				break;
-			case "SOUR":
+			case 'SOUR':
 				$icon = '<i class="icon-button_source"></i>';
 				break;
-			case "REPO":
+			case 'REPO':
 				$icon = '<i class="icon-button_repository"></i>';
 				break;
 			default:
@@ -1771,7 +1757,7 @@ function print_changes_table($change_ids, $sort) {
 		$name = $record->getFullName();
 		$html .= '<td class="wrap">';
 		$html .= '<a href="'. $record->getHtmlUrl() .'">'. $name . '</a>';
-		if ($indi) {
+		if ($record instanceof WT_Individual) {
 			$addname = $record->getAddName();
 			if ($addname) {
 				$html .= '<div class="indent"><a href="'. $record->getHtmlUrl() .'">'. $addname . '</a></div>';
@@ -1820,7 +1806,7 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 					/* 5-ANNIV  */ { "sType": "numeric", "bVisible": false},
 					/* 6-Event */  { "sClass": "center" }
 				]
-			});		
+			});
 		');
 
 	// Did we have any output?  Did we skip anything?
@@ -1828,15 +1814,15 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 	$filter = 0;
 	$filtered_events = array();
 
-	foreach (get_events_list($startjd, $endjd, $events) as $value) {
-		$record=$value['record'];
+	foreach (get_events_list($startjd, $endjd, $events) as $fact) {
+		$record=$fact->getParent();
 		//-- only living people ?
 		if ($only_living) {
-			if ($record->getType()=="INDI" && $record->isDead()) {
+			if ($record instanceof WT_Individual && $record->isDead()) {
 				$filter ++;
 				continue;
 			}
-			if ($record->getType()=="FAM") {
+			if ($record instanceof WT_Family) {
 				$husb = $record->getHusband();
 				if (is_null($husb) || $husb->isDead()) {
 					$filter ++;
@@ -1850,12 +1836,8 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 			}
 		}
 
-		// Privacy
-		if (!$record->canDisplayDetails() || !canDisplayFact($record->getXref(), $record->getGedId(), $value['factrec'])) {
-			continue;
-		}
 		//-- Counter
-		$output ++;
+		$output++;
 
 		if ($output==1) {
 			//-- table body
@@ -1868,85 +1850,64 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 			$html .= '<th><i class="icon-reminder" title="'.WT_I18N::translate('Anniversary').'"></i></th>';
 			$html .= '<th>ANNIV</th>';
 			$html .= '<th>'.WT_Gedcom_Tag::getLabel('EVEN').'</th>';
-			$html .= '</tr></thead><tbody>'."\n";
+			$html .= '</tr></thead><tbody>';
 		}
 
-		$value['name'] = $record->getFullName();
-		$value['url'] = $record->getHtmlUrl();
-		if ($record->getType()=="INDI") {
-			$value['sex'] = $record->getSexImage();
-		} else {
-			$value['sex'] = '';
-		}
-		$filtered_events[] = $value;
+		$filtered_events[] = $fact;
 	}
-
-	foreach ($filtered_events as $n=>$value) {
-		$html .= "<tr>";
-		//-- Record name(s)
-		$name = $value['name'];
-		$html .= '<td class="wrap">';
+	
+	foreach ($filtered_events as $n=>$fact) {
+		$record = $fact->getParent();
+		$html .= '<tr>';
+		$html .= '<td>';
 		//PERSO Add Sosa Icon to Families
-		if ($value['record']->getType()=="FAM") {
+		$name = $record->getFullName();
+		if($record instanceof WT_Family) {
 			$exp = explode(' + ', $name);
-			$husb = $value['record']->getHusband();
+			$husb = $record->getHusband();
 			if($husb){
 				$dhusb = new WT_Perso_Person($husb);
 				$exp[0] .= ' '.WT_Perso_Functions_Print::formatSosaNumbers($dhusb->getSosaNumbers(), 1, 'smaller');
 			}
-			$wife = $value['record']->getWife();
+			$wife = $record->getWife();
 			if($wife){
 				$dwife = new WT_Perso_Person($wife);
 				$exp[1] .= ' '.WT_Perso_Functions_Print::formatSosaNumbers($dwife->getSosaNumbers(), 1, 'smaller');
 			}
 			$name = implode(' + ', $exp);
 		}
+		$html .= '<a href="' . $record->getHtmlUrl() . '">' . $name . '</a>';
 		//END PERSO
-		$html .= '<a href="'.$value['url'].'">'.$name.'</a>';
-		if ($value['record']->getType()=="INDI") {
-			$html .= $value['sex'];
+		if ($record instanceof WT_Individual) {
+			$html .= $record->getSexImage();
 			//PERSO Add Sosa Icon
-			$dindi = new WT_Perso_Person($value['record']);
+			$dindi = new WT_Perso_Person($record);
 			$html .= WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1, 'smaller');
 			//END PERSO
 		}
 		$html .= '</td>';
-		//-- NAME
-		$html .= '<td>'; //hidden by datatables code
-		$html .= $value['record']->getSortName();
-		$html .= '</td>';
-		//-- Event date
-		$html .= '<td class="wrap">';
-		$html .= $value['date']->Display(empty($SEARCH_SPIDER));
-		$html .= '</td>';
-		//-- Event date (sortable)
-		$html .= '<td>'; //hidden by datatables code
-		$html .= $n;
-		$html .= '</td>';
-		//-- Anniversary
-		$anniv = $value['anniv'];
-		$html .= '<td>'.($anniv ? WT_I18N::number($anniv) : '&nbsp;').'</td><td>'.$anniv.'</td>';
-		//-- Event name
-		$html .= '<td class="wrap">';
-		$html .= '<a href="'.$value['url'].'">'.WT_Gedcom_Tag::getLabel($value['fact']).'</a>';
-		$html .= '&nbsp;</td>';
-
-		$html .= '</tr>'."\n";
+		$html .= '<td>' . $record->getSortName() . '</td>';
+		$html .= '<td>' . $fact->getDate()->Display(empty($SEARCH_SPIDER)) . '</td>';
+		$html .= '<td>' . $n . '</td>';
+		$html .= '<td>' . WT_I18N::number($fact->anniv) . '</td>';
+		$html .= '<td>' . $fact->anniv . '</td>';
+		$html .= '<td>' . $fact->getLabel() . '</td>';
+		$html .= '</tr>';
 	}
-
+	
 	if ($output!=0) {
 		$html .= '</tbody></table>';
 	}
 
 	// Print a final summary message about restricted/filtered facts
-	$summary = "";
+	$summary = '';
 	if ($endjd==WT_CLIENT_JD) {
 		// We're dealing with the Today's Events block
 		if ($output==0) {
 			if ($filter==0) {
 				$summary = WT_I18N::translate('No events exist for today.');
 			} else {
-				$summary = WT_I18N::translate('No events for living people exist for today.');
+				$summary = WT_I18N::translate('No events for living individuals exist for today.');
 			}
 		}
 	} else {
@@ -1961,7 +1922,7 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 				}
 			} else {
 				if ($endjd==$startjd) {
-					$summary = WT_I18N::translate('No events for living people exist for tomorrow.');
+					$summary = WT_I18N::translate('No events for living individuals exist for tomorrow.');
 				} else {
 					// I18N: tanslation for %s==1 is unused; it is translated separately as “tomorrow”
 					$summary = WT_I18N::plural('No events for living people exist for the next %s day.', 'No events for living people exist for the next %s days.', $endjd-$startjd+1, WT_I18N::number($endjd-$startjd+1));
@@ -1987,15 +1948,15 @@ function print_events_list($startjd, $endjd, $events='BIRT MARR DEAT', $only_liv
 	$filter = 0;
 	$filtered_events = array();
 	$html = '';
-	foreach (get_events_list($startjd, $endjd, $events) as $value) {
-		$record = WT_GedcomRecord::getInstance($value['id']);
+	foreach (get_events_list($startjd, $endjd, $events) as $fact) {
+		$record = $fact->getParent();
 		//-- only living people ?
 		if ($only_living) {
-			if ($record->getType()=="INDI" && $record->isDead()) {
+			if ($record instanceof WT_Individual && $record->isDead()) {
 				$filter ++;
 				continue;
 			}
-			if ($record->getType()=="FAM") {
+			if ($record instanceof WT_Family) {
 				$husb = $record->getHusband();
 				if (is_null($husb) || $husb->isDead()) {
 					$filter ++;
@@ -2009,60 +1970,54 @@ function print_events_list($startjd, $endjd, $events='BIRT MARR DEAT', $only_liv
 			}
 		}
 
-		// Privacy
-		if (!$record->canDisplayDetails() || !canDisplayFact($record->getXref(), $record->getGedId(), $value['factrec'])) {
-			continue;
-		}
 		$output ++;
-
-		$value['name'] = $record->getFullName();
-		$value['url'] = $record->getHtmlUrl();
-		//PERSO Add Sosa Icon
-		if ($record->getType()=="INDI") {
-			$dindi = new WT_Perso_Person($record);
-			$value['sex'] = $record->getSexImage();
-			$value['sosa'] = WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1, 'smaller');
-		} else {
-			$value['sex'] = '';
-			$value['sosa'] = '';
-		}
-		//END PERSO 
-		$filtered_events[] = $value;
+		$filtered_events[] = $fact;
 	}
 
 	// Now we've filtered the list, we can sort by event, if required
 	switch ($sort_by) {
 	case 'anniv':
-		uasort($filtered_events, 'event_sort');
+		uasort($filtered_events, function($x, $y) {
+			return WT_Date::compare($y->getDate(), $x->getDate()); // most recent first
+		});
 		break;
 	case 'alpha':
-		uasort($filtered_events, 'event_sort_name');
+		uasort($filtered_events, function($x, $y) {
+			return WT_GedcomRecord::compare($x->getParent(), $y->getParent());
+		});
 		break;
 	}
 
-	foreach ($filtered_events as $value) {
-		//PERSO Add Sosa Icon
-		$html .= "<a href=\"".$value['url']."\" class=\"list_item name2\">".$value['name']."</a>".$value['sex'].$value['sosa'];
-		//END PERSO
-		$html .= "<br><div class=\"indent\">";
-		$html .= WT_Gedcom_Tag::getLabel($value['fact']).' - '.$value['date']->Display(true);
-		if ($value['anniv']!=0) $html .= " (" . WT_I18N::translate('%s year anniversary', $value['anniv']).")";
-		if (!empty($value['plac'])) {
-			$tmp=new WT_Place($value['plac'], WT_GED_ID);
-			$html .= " - <a href=\"".$tmp->getURL()."\">".$tmp->getFullName()."</a>";
+	foreach ($filtered_events as $fact) {
+		$record = $fact->getParent();
+		$html .= '<a href="' . $record->getHtmlUrl() .'" class="list_item name2">' . $record->getFullName() . '</a>';
+		if ($record instanceof WT_Individual) {
+			$html .= $record->getSexImage();
+			//PERSO Add Sosa Icon
+			$dindi = new WT_Perso_Person($record);
+			$html .= WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1, 'smaller');
+			//END PERSO
 		}
-		$html .= "</div>";
+		$html .= '<br><div class="indent">';
+		$html .= $fact->getLabel().' — '.$fact->getDate()->Display(true);
+		if ($fact->anniv) {
+			$html .= ' (' . WT_I18N::translate('%s year anniversary', $fact->anniv) . ')';
+		}
+		if (!$fact->getPlace()->isEmpty()) {
+			$html .= ' — <a href="' . $fact->getPlace()->getURL() . '">' . $fact->getPlace()->getFullName() . '</a>';
+		}
+		$html .= '</div>';
 	}
 
 	// Print a final summary message about restricted/filtered facts
-	$summary = "";
+	$summary = '';
 	if ($endjd==WT_CLIENT_JD) {
 		// We're dealing with the Today's Events block
 		if ($output==0) {
 			if ($filter==0) {
 				$summary = WT_I18N::translate('No events exist for today.');
 			} else {
-				$summary = WT_I18N::translate('No events for living people exist for today.');
+				$summary = WT_I18N::translate('No events for living individuals exist for today.');
 			}
 		}
 	} else {
@@ -2077,7 +2032,7 @@ function print_events_list($startjd, $endjd, $events='BIRT MARR DEAT', $only_liv
 				}
 			} else {
 				if ($endjd==$startjd) {
-					$summary = WT_I18N::translate('No events for living people exist for tomorrow.');
+					$summary = WT_I18N::translate('No events for living individuals exist for tomorrow.');
 				} else {
 					// I18N: tanslation for %s==1 is unused; it is translated separately as “tomorrow”
 					$summary = WT_I18N::plural('No events for living people exist for the next %s day.', 'No events for living people exist for the next %s days.', $endjd-$startjd+1, WT_I18N::number($endjd-$startjd+1));

@@ -23,8 +23,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: Stats.php 15019 2013-06-01 17:03:34Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -174,39 +172,15 @@ class WT_Stats {
 		$title = "";
 		$version = '';
 		$source = '';
-		static $cache=null;
-		if (is_array($cache)) {
-			return $cache;
+
+		$head = WT_GedcomRecord::getInstance('HEAD');
+		$sour = $head->getFirstFact('SOUR');
+		if ($sour) {
+			$source  = $sour->getValue();
+			$title   = $sour->getAttribute('NAME');
+			$version = $sour->getAttribute('VERS');
 		}
-		$head=find_other_record('HEAD', $this->_ged_id);
-		$ct=preg_match("/1 SOUR (.*)/", $head, $match);
-		if ($ct > 0) {
-			$softrec=get_sub_record(1, '1 SOUR', $head);
-			$tt=preg_match("/2 NAME (.*)/", $softrec, $tmatch);
-			if ($tt > 0) {
-				$title=trim($tmatch[1]);
-			} else {
-				$title=trim($match[1]);
-			}
-			if (!empty($title)) {
-				$tt=preg_match("/2 VERS (.*)/", $softrec, $tmatch);
-				if ($tt > 0) {
-					$version=trim($tmatch[1]);
-				} else {
-					$version='';
-				}
-			} else {
-				$version='';
-			}
-			$tt=preg_match("/1 SOUR (.*)/", $softrec, $tmatch);
-			if ($tt > 0) {
-				$source=trim($tmatch[1]);
-			} else {
-				$source=trim($match[1]);
-			}
-		}
-		$cache=array($title, $version, $source);
-		return $cache;
+		return array($title, $version, $source);
 	}
 
 	function gedcomCreatedSoftware() {
@@ -232,9 +206,10 @@ class WT_Stats {
 	function gedcomDate() {
 		global $DATE_FORMAT;
 
-		$head=find_other_record('HEAD', $this->_ged_id);
-		if (preg_match("/1 DATE (.+)/", $head, $match)) {
-			$date=new WT_Date($match[1]);
+		$head = WT_GedcomRecord::getInstance('HEAD');
+		$fact = $head->getFirstFact('DATE');
+		if ($fact) {
+			$date=new WT_Date($fact->getValue());
 			return $date->Display(false, $DATE_FORMAT); // Override $PUBLIC_DATE_FORMAT
 		}
 		return '';
@@ -254,7 +229,7 @@ class WT_Stats {
 	}
 
 	function gedcomRootID() {
-		$root = WT_Person::getInstance(get_gedcom_setting(WT_GED_ID, 'PEDIGREE_ROOT_ID'));
+		$root = WT_Individual::getInstance(get_gedcom_setting(WT_GED_ID, 'PEDIGREE_ROOT_ID'));
 		$root = substr($root, 0, stripos($root, "@") );
 		return $root;
 	}
@@ -842,7 +817,7 @@ class WT_Stats {
 		switch($type) {
 			default:
 			case 'full':
-				if ($record->canDisplayDetails()) {
+				if ($record->canShow()) {
 					$result=$record->format_list('span', false, $record->getFullName());
 				} else {
 					$result=WT_I18N::translate('This information is private and cannot be shown.');
@@ -856,7 +831,7 @@ class WT_Stats {
 				$result="<a href=\"".$record->getHtmlUrl()."\">".$record->getFullName()."</a>";
 				break;
 			case 'place':
-				$fact=WT_GedcomRecord::getInstance($row['d_gid'])->getFactByType($row['d_fact']);
+				$fact=WT_GedcomRecord::getInstance($row['d_gid'])->getFirstFact($row['d_fact']);
 				if ($fact) {
 					$result=format_fact_place($fact, true, true, true);
 				} else {
@@ -883,19 +858,16 @@ class WT_Stats {
 			}
 			$placelist = array();
 			foreach ($rows as $row) {
-				$factrec = trim(get_sub_record(1, "1 {$fact}", $row->ged, 1));
-				if (!empty($factrec) && preg_match("/2 PLAC (.+)/", $factrec, $match)) {
+				if (preg_match('/\n1 ' . $fact . '(?:\n[2-9].*)*\n2 PLAC (.+)/', $row->ged, $match)) {
 					if ($country) {
 						$tmp=explode(WT_Place::GEDCOM_SEPARATOR, $match[1]);
 						$place = end($tmp);
-					}
-					else {
+					} else {
 						$place = $match[1];
 					}
 					if (!isset($placelist[$place])) {
 						$placelist[$place] = 1;
-					}
-					else {
+					} else {
 						$placelist[$place] ++;
 					}
 				}
@@ -996,10 +968,9 @@ class WT_Stats {
 			$surn_countries=array();
 			$indis = WT_Query_Name::individuals(utf8_strtoupper($surname), '', '', false, false, WT_GED_ID);
 			foreach ($indis as $person) {
-				if (preg_match_all('/^2 PLAC (?:.*, *)*(.*)/m', $person->getGedcomRecord(), $matches)) {
+				if (preg_match_all('/^2 PLAC (?:.*, *)*(.*)/m', $person->getGedcom(), $matches)) {
 					// webtrees uses 3 letter country codes and localised country names, but google uses 2 letter codes.
 					foreach ($matches[1] as $country) {
-						$country=trim($country);
 						if (array_key_exists($country, $country_to_iso3166)) {
 							if (array_key_exists($country_to_iso3166[$country], $surn_countries)) {
 								$surn_countries[$country_to_iso3166[$country]]++;
@@ -1017,7 +988,7 @@ class WT_Stats {
 			$surn_countries=array();
 			$b_countries=$this->_statsPlaces('INDI', 'BIRT', 0, true);
 			foreach ($b_countries as $place=>$count) {
-				$country=$place;
+				$country = $place;
 				if (array_key_exists($country, $country_to_iso3166)) {
 					if (!isset($surn_countries[$country_to_iso3166[$country]])) {
 						$surn_countries[$country_to_iso3166[$country]]=$count;
@@ -1034,7 +1005,7 @@ class WT_Stats {
 			$surn_countries=array();
 			$d_countries=$this->_statsPlaces('INDI', 'DEAT', 0, true);
 			foreach ($d_countries as $place=>$count) {
-				$country=$place;
+				$country = $place;
 				if (array_key_exists($country, $country_to_iso3166)) {
 					if (!isset($surn_countries[$country_to_iso3166[$country]])) {
 						$surn_countries[$country_to_iso3166[$country]]=$count;
@@ -1052,11 +1023,13 @@ class WT_Stats {
 			$m_countries=$this->_statsPlaces('FAM');
 			// webtrees uses 3 letter country codes and localised country names, but google uses 2 letter codes.
 			foreach ($m_countries as $place) {
-				$country=trim($place['country']);
-				if (!isset($surn_countries[$country_to_iso3166[$country]])) {
-					$surn_countries[$country_to_iso3166[$country]]=$place['tot'];
-				} else {
-					$surn_countries[$country_to_iso3166[$country]]+=$place['tot'];
+				$country = $place['country'];
+				if (array_key_exists($country, $country_to_iso3166)) {
+					if (!isset($surn_countries[$country_to_iso3166[$country]])) {
+						$surn_countries[$country_to_iso3166[$country]]=$place['tot'];
+					} else {
+						$surn_countries[$country_to_iso3166[$country]]+=$place['tot'];
+					}
 				}
 			}
 			break;
@@ -1068,7 +1041,7 @@ class WT_Stats {
 			$a_countries=$this->_statsPlaces('INDI');
 			// webtrees uses 3 letter country codes and localised country names, but google uses 2 letter codes.
 			foreach ($a_countries as $place) {
-				$country=trim($place['country']);
+				$country = $place['country'];
 				if (array_key_exists($country, $country_to_iso3166)) {
 					if (!isset($surn_countries[$country_to_iso3166[$country]])) {
 						$surn_countries[$country_to_iso3166[$country]]=$place['tot'];
@@ -1377,11 +1350,11 @@ class WT_Stats {
 		);
 		if (!isset($rows[0])) {return '';}
 		$row = $rows[0];
-		$person=WT_Person::getInstance($row['id']);
+		$person=WT_Individual::getInstance($row['id']);
 		switch($type) {
 			default:
 			case 'full':
-				if ($person->canDisplayName()) {
+				if ($person->canShowName()) {
 					$result=$person->format_list('span', false, $person->getFullName());
 				} else {
 					$result= WT_I18N::translate('This information is private and cannot be shown.');
@@ -1435,7 +1408,7 @@ class WT_Stats {
 		if (!isset($rows[0])) {return '';}
 		$top10 = array();
 		foreach ($rows as $row) {
-			$person = WT_Person::getInstance($row['deathdate']);
+			$person = WT_Individual::getInstance($row['deathdate']);
 			$age = $row['age'];
 			if ((int)($age/365.25)>0) {
 				$age = (int)($age/365.25).'y';
@@ -1445,7 +1418,7 @@ class WT_Stats {
 				$age = $age.'d';
 			}
 			$age = get_age_at_event($age, true);
-			if ($person->canDisplayDetails()) {
+			if ($person->canShow()) {
 				if ($type == 'list') {
 					$top10[]="<li><a href=\"".$person->getHtmlUrl()."\">".$person->getFullName()."</a> (".$age.")"."</li>";
 				} else {
@@ -1502,7 +1475,7 @@ class WT_Stats {
 		if (!isset($rows)) {return 0;}
 		$top10 = array();
 		foreach ($rows as $row) {
-			$person=WT_Person::getInstance($row['id']);
+			$person=WT_Individual::getInstance($row['id']);
 			$age = (WT_CLIENT_JD-$row['age']);
 			if ((int)($age/365.25)>0) {
 				$age = (int)($age/365.25).'y';
@@ -1684,6 +1657,8 @@ class WT_Stats {
 				" birth.d_fact='BIRT' AND".
 				" death.d_fact='DEAT' AND".
 				" birth.d_julianday1<>0 AND".
+				" birth.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND".
+				" death.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@') AND".
 				" death.d_julianday1>birth.d_julianday2".
 				$years.
 				$sex_search.
@@ -1776,7 +1751,7 @@ class WT_Stats {
 		switch($type) {
 			default:
 			case 'full':
-				if ($record->canDisplayDetails()) {
+				if ($record->canShow()) {
 					$result=$record->format_list('span', false, $record->getFullName());
 				} else {
 					$result=WT_I18N::translate('This information is private and cannot be shown.');
@@ -1797,7 +1772,7 @@ class WT_Stats {
 				$result="<a href=\"".$record->getHtmlUrl()."\">".$record->getFullName()."</a>";
 				break;
 			case 'place':
-				$fact=$record->getFactByType($row['fact']);
+				$fact=$record->getFirstFact($row['fact']);
 				if ($fact) {
 					$result=format_fact_place($fact, true, true, true);
 				} else {
@@ -1871,11 +1846,11 @@ class WT_Stats {
 		if (!isset($rows[0])) {return '';}
 		$row=$rows[0];
 		if (isset($row['famid'])) $family=WT_Family::getInstance($row['famid']);
-		if (isset($row['i_id'])) $person=WT_Person::getInstance($row['i_id']);
+		if (isset($row['i_id'])) $person=WT_Individual::getInstance($row['i_id']);
 		switch($type) {
 			default:
 			case 'full':
-				if ($family->canDisplayDetails()) {
+				if ($family->canShow()) {
 					$result=$family->format_list('span', false, $person->getFullName());
 				} else {
 					$result=WT_I18N::translate('This information is private and cannot be shown.');
@@ -1990,7 +1965,7 @@ class WT_Stats {
 			$husb = $family->getHusband();
 			$wife = $family->getWife();
 			if (($husb->getAllDeathDates() && $wife->getAllDeathDates()) || !$husb->isDead() || !$wife->isDead()) {
-				if ($family->canDisplayDetails()) {
+				if ($family->canShow()) {
 					if ($type == 'list') {
 						$top10[] = "<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> (".$age.")"."</li>";
 					} else {
@@ -2054,7 +2029,7 @@ class WT_Stats {
 				$age = $age.'d';
 			}
 			$age = get_age_at_event($age, true);
-			if ($family->canDisplayDetails()) {
+			if ($family->canShow()) {
 				if ($type == 'list') {
 					$top10[] = "<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a> (".$age.")"."</li>";
 				} else {
@@ -2102,11 +2077,11 @@ class WT_Stats {
 		);
 		if (!isset($rows[0])) {return '';}
 		$row=$rows[0];
-		if (isset($row['id'])) $person=WT_Person::getInstance($row['id']);
+		if (isset($row['id'])) $person=WT_Individual::getInstance($row['id']);
 		switch($type) {
 			default:
 			case 'full':
-				if ($person->canDisplayDetails()) {
+				if ($person->canShow()) {
 					$result=$person->format_list('span', false, $person->getFullName());
 				} else {
 					$result=WT_I18N::translate('This information is private and cannot be shown.');
@@ -2291,7 +2266,7 @@ class WT_Stats {
 	function lastDivorceYear()  { return $this->_mortalityQuery('year',  'DESC', 'DIV'); }
 	function lastDivorceName()  { return $this->_mortalityQuery('name',  'DESC', 'DIV'); }
 	function lastDivorcePlace() { return $this->_mortalityQuery('place', 'DESC', 'DIV'); }
-	
+
 	function statsDiv($params=null) {return $this->_statsDiv(true, false, -1, -1, $params);}
 
 	function _statsMarrAge($simple=true, $sex='M', $year1=-1, $year2=-1, $params=null) {
@@ -2448,7 +2423,7 @@ class WT_Stats {
 	function oldestMarriageMale()                     { return $this->_marriageQuery('full', 'DESC', 'M'); }
 	function oldestMarriageMaleName()                 { return $this->_marriageQuery('name', 'DESC', 'M'); }
 	function oldestMarriageMaleAge($show_years=false) { return $this->_marriageQuery('age',  'DESC', 'M', $show_years); }
-	
+
 	function statsMarrAge($params=null) { return $this->_statsMarrAge(true, 'BOTH', -1, -1, $params); }
 
 	function ageBetweenSpousesMF    ($params=null) { return $this->_ageBetweenSpousesQuery($type='nolist', $age_dir='DESC', $params=null); }
@@ -2523,7 +2498,7 @@ class WT_Stats {
 		switch($type) {
 			default:
 			case 'full':
-				if ($family->canDisplayDetails()) {
+				if ($family->canShow()) {
 					$result=$family->format_list('span', false, $family->getFullName());
 				} else {
 					$result = WT_I18N::translate('This information is private and cannot be shown.');
@@ -2556,7 +2531,7 @@ class WT_Stats {
 		$top10 = array();
 		for ($c = 0; $c < $total; $c++) {
 			$family=WT_Family::getInstance($rows[$c]['id']);
-			if ($family->canDisplayDetails()) {
+			if ($family->canShow()) {
 				if ($type == 'list') {
 					$top10[]=
 						'<li><a href="'.$family->getHtmlUrl().'">'.$family->getFullName().'</a> - '.
@@ -2618,14 +2593,14 @@ class WT_Stats {
 		if ($one) $dist = array();
 		foreach ($rows as $fam) {
 			$family = WT_Family::getInstance($fam['family']);
-			$child1 = WT_Person::getInstance($fam['ch1']);
-			$child2 = WT_Person::getInstance($fam['ch2']);
+			$child1 = WT_Individual::getInstance($fam['ch1']);
+			$child2 = WT_Individual::getInstance($fam['ch2']);
 			if ($type == 'name') {
-				if ($child1->canDisplayDetails() && $child2->canDisplayDetails()) {
+				if ($child1->canShow() && $child2->canShow()) {
 					$return = '<a href="'.$child2->getHtmlUrl().'">'.$child2->getFullName().'</a> ';
 					$return .= WT_I18N::translate('and').' ';
 					$return .= '<a href="'.$child1->getHtmlUrl().'">'.$child1->getFullName().'</a>';
-					$return .= ' <a href="'.$family->getHtmlUrl().'">['.WT_I18N::translate('View Family').']</a>';
+					$return .= ' <a href="'.$family->getHtmlUrl().'">['.WT_I18N::translate('View family').']</a>';
 				} else {
 					$return = WT_I18N::translate('This information is private and cannot be shown.');
 				}
@@ -2645,33 +2620,33 @@ class WT_Stats {
 			}
 			if ($type == 'list') {
 				if ($one && !in_array($fam['family'], $dist)) {
-					if ($child1->canDisplayDetails() && $child2->canDisplayDetails()) {
+					if ($child1->canShow() && $child2->canShow()) {
 						$return = "<li>";
 						$return .= "<a href=\"".$child2->getHtmlUrl()."\">".$child2->getFullName()."</a> ";
 						$return .= WT_I18N::translate('and')." ";
 						$return .= "<a href=\"".$child1->getHtmlUrl()."\">".$child1->getFullName()."</a>";
 						$return .= " (".$age.")";
-						$return .= " <a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View Family')."]</a>";
+						$return .= " <a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View family')."]</a>";
 						$return .= '</li>';
 						$top10[] = $return;
 						$dist[] = $fam['family'];
 					}
-				} else if (!$one && $child1->canDisplayDetails() && $child2->canDisplayDetails()) {
+				} else if (!$one && $child1->canShow() && $child2->canShow()) {
 					$return = "<li>";
 					$return .= "<a href=\"".$child2->getHtmlUrl()."\">".$child2->getFullName()."</a> ";
 					$return .= WT_I18N::translate('and')." ";
 					$return .= "<a href=\"".$child1->getHtmlUrl()."\">".$child1->getFullName()."</a>";
 					$return .= " (".$age.")";
-					$return .= " <a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View Family')."]</a>";
+					$return .= " <a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View family')."]</a>";
 					$return .= '</li>';
 					$top10[] = $return;
 				}
 			} else {
-				if ($child1->canDisplayDetails() && $child2->canDisplayDetails()) {
+				if ($child1->canShow() && $child2->canShow()) {
 					$return = $child2->format_list('span', false, $child2->getFullName());
 					$return .= "<br>".WT_I18N::translate('and')."<br>";
 					$return .= $child1->format_list('span', false, $child1->getFullName());
-					$return .= "<br><a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View Family')."]</a>";
+					$return .= "<br><a href=\"".$family->getHtmlUrl()."\">[".WT_I18N::translate('View family')."]</a>";
 					return $return;
 				} else {
 					return WT_I18N::translate('This information is private and cannot be shown.');
@@ -2689,7 +2664,7 @@ class WT_Stats {
 		}
 		return $top10;
 	}
-	
+
 	function _monthFirstChildQuery($simple=true, $sex=false, $year1=-1, $year2=-1, $params=null) {
 		global $WT_STATS_S_CHART_X, $WT_STATS_S_CHART_Y, $WT_STATS_CHART_COLOR1, $WT_STATS_CHART_COLOR2;
 		if ($params === null) {$params = array();}
@@ -2830,14 +2805,14 @@ class WT_Stats {
 		$chl = array();
 		foreach ($rows as $row) {
 			$family=WT_Family::getInstance($row['id']);
-			if ($family->canDisplayDetails()) {
+			if ($family->canShow()) {
 				if ($tot==0) {
 					$per = 0;
 				} else {
 					$per = round(100 * $row['tot'] / $tot, 0);
 				}
 				$chd .= self::_array_to_extended_encoding(array($per));
-				$chl[] = strip_tags(unhtmlentities($family->getFullName())).' - '.WT_I18N::number($row['tot']);
+				$chl[] = htmlspecialchars_decode(strip_tags($family->getFullName())).' - '.WT_I18N::number($row['tot']);
 			}
 		}
 		$chl = rawurlencode(join('|', $chl));
@@ -2863,14 +2838,13 @@ class WT_Stats {
 			$sizes = explode('x', $size);
 			$max = 0;
 			$rows=self::_runSQL(
-				" SELECT SQL_CACHE ROUND(AVG(f_numchil),2) AS num, FLOOR(married.d_year/100+1) AS century".
-				" FROM `##families` AS fam".
-				" LEFT JOIN `##dates` AS married ON married.d_file = {$this->_ged_id}".
-				" WHERE".
-				" married.d_gid = fam.f_id AND".
-				" fam.f_file = {$this->_ged_id} AND".
-				" married.d_fact = 'MARR' AND".
-				" married.d_type IN ('@#DGREGORIAN@', '@#DJULIAN@')".
+				" SELECT SQL_CACHE ROUND(AVG(f_numchil),2) AS num, FLOOR(d_year/100+1) AS century".
+				" FROM  `##families`".
+				" JOIN  `##dates` ON (d_file = f_file AND d_gid=f_id)".
+				" WHERE f_file = {$this->_ged_id}".
+				" AND   d_julianday1<>0".
+				" AND   d_fact = 'MARR'".
+				" AND   d_type IN ('@#DGREGORIAN@', '@#DJULIAN@')".
 				" GROUP BY century".
 				" ORDER BY century");
 			if (empty($rows)) return '';
@@ -2943,19 +2917,18 @@ class WT_Stats {
 	function topAgeBetweenSiblingsFullName($params=null) { return $this->_ageBetweenSiblingsQuery($type='nolist', $params=null); }
 	function topAgeBetweenSiblingsList    ($params=null) { return $this->_ageBetweenSiblingsQuery($type='list',   $params=null); }
 
-	function noChildrenFamilies() {
+	function _noChildrenFamilies() {
 		$rows=self::_runSQL(
-			" SELECT SQL_CACHE".
-			" COUNT(*) AS tot".
-			" FROM".
-			" `##families` AS fam".
-			" WHERE".
-			" f_numchil = 0 AND".
-			" fam.f_file = {$this->_ged_id}");
+			" SELECT SQL_CACHE COUNT(*) AS tot".
+			" FROM  `##families`".
+			" WHERE f_numchil = 0 AND f_file = {$this->_ged_id}");
 		$row=$rows[0];
-		return WT_I18N::number($row['tot']);
+		return $row['tot'];
 	}
 
+	function noChildrenFamilies() {
+		return WT_I18N::number($this->_noChildrenFamilies());
+	}
 
 	function noChildrenFamiliesList($params = null) {
 		global $TEXT_DIRECTION;
@@ -2968,7 +2941,7 @@ class WT_Stats {
 		$top10 = array();
 		foreach ($rows as $row) {
 			$family=WT_Family::getInstance($row['family']);
-			if ($family->canDisplayDetails()) {
+			if ($family->canShow()) {
 				if ($type == 'list') {
 					$top10[] = "<li><a href=\"".$family->getHtmlUrl()."\">".$family->getFullName()."</a></li>";
 				} else {
@@ -3023,7 +2996,7 @@ class WT_Stats {
 			if ($max<$values['count']) $max = $values['count'];
 			$tot += $values['count'];
 		}
-		$unknown = $this->noChildrenFamilies()-$tot;
+		$unknown = $this->_noChildrenFamilies()-$tot;
 		if ($unknown>$max) $max=$unknown;
 		$chm = "";
 		$chxl = "0:|";
@@ -3085,7 +3058,7 @@ class WT_Stats {
 		$top10 = array();
 		foreach ($rows as $row) {
 			$family=WT_Family::getInstance($row['id']);
-			if ($family->canDisplayDetails()) {
+			if ($family->canShow()) {
 				if ($type == 'list') {
 					$top10[]=
 						'<li><a href="'.$family->getHtmlUrl().'">'.$family->getFullName().'</a> - '.
@@ -3436,15 +3409,15 @@ class WT_Stats {
 		if (WT_USER_ID) {
 			foreach ($loggedusers as $user_id=>$user_name) {
 				if ($type == 'list') {
-					$content .= "<li>".htmlspecialchars(getUserFullName($user_id))." - {$user_name}";
+					$content .= "<li>".WT_Filter::escapeHtml(getUserFullName($user_id))." - {$user_name}";
 				} else {
-					$content .= htmlspecialchars(getUserFullName($user_id))." - {$user_name}";
+					$content .= WT_Filter::escapeHtml(getUserFullName($user_id))." - {$user_name}";
 				}
 				if (WT_USER_ID != $user_id && get_user_setting($user_id, 'contactmethod') != 'none') {
 					if ($type == 'list') {
-						$content .= '<br><a class="icon-email" href="#" onclick="return message(\''.$user_id.'\', \'\', \''.addslashes(urlencode(get_query_url())).'\', \'\');" title="'.WT_I18N::translate('Send Message').'"></a>';
+						$content .= '<br><a class="icon-email" href="#" onclick="return message(\'' . WT_Filter::escapeJs($user_id) . '\', \'\', \'' . WT_Filter::escapeJs(get_query_url()) . '\');" title="' . WT_I18N::translate('Send message') . '"></a>';
 					} else {
-						$content .= ' <a class="icon-email" href="#" onclick="return message(\''.$user_id.'\', \'\', \''.addslashes(urlencode(get_query_url())).'\', \'\');" title="'.WT_I18N::translate('Send Message').'"></a>';
+						$content .= ' <a class="icon-email" href="#" onclick="return message(\'' . WT_Filter::escapeJs($user_id) . '\', \'\', \'' . WT_Filter::escapeJs(get_query_url()) . '\');" title="' . WT_I18N::translate('Send message') . '"></a>';
 					}
 				}
 				if ($type == 'list') {
@@ -3483,8 +3456,8 @@ class WT_Stats {
 			return getUserName();
 		} else {
 			if (is_array($params) && isset($params[0]) && $params[0] != '') {
-				# if #username:visitor# was specified, then "visitor" will be returned when the user is not logged in 
-				return $params[0]; 
+				# if #username:visitor# was specified, then "visitor" will be returned when the user is not logged in
+				return $params[0];
 			}
 			else return null;
 		}
@@ -3579,7 +3552,7 @@ class WT_Stats {
 		} else {
 			// indi/fam/sour/etc.
 		}
-		
+
 		$count=WT_DB::prepare(
 			"SELECT SQL_NO_CACHE page_count FROM `##hit_counter`".
 			" WHERE gedcom_id=? AND page_name=? AND page_parameter=?"
@@ -3702,9 +3675,9 @@ class WT_Stats {
 			$v = array_shift($bits);
 			$cfg[$v] = join('=', $bits);
 		}
-		$block = new $class_name;
-		$block_id=safe_GET('block_id');
-		$content = $block->getBlock($block_id, false, $cfg);
+		$block    = new $class_name;
+		$block_id = WT_Filter::getInteger('block_id');
+		$content  = $block->getBlock($block_id, false, $cfg);
 		return $content;
 	}
 
@@ -3819,7 +3792,7 @@ class WT_Stats {
 			'CHI'=>WT_I18N::translate('Channel Islands'),
 			'CHL'=>WT_I18N::translate('Chile'),
 			'CHN'=>WT_I18N::translate('China'),
-			'CIV'=>WT_I18N::translate('Cote d\'Ivoire'),
+			'CIV'=>WT_I18N::translate('Cote d’Ivoire'),
 			'CMR'=>WT_I18N::translate('Cameroon'),
 			'COD'=>WT_I18N::translate('Congo (Kinshasa)'),
 			'COG'=>WT_I18N::translate('Congo (Brazzaville)'),

@@ -6,10 +6,10 @@
 // $addname, $showid, $float
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2010  PGV Development Team.  All rights reserved.
+// Copyright (C) 2010 PGV Development Team.  All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// $Id: compactbox_template.php 13641 2012-03-24 11:33:33Z greg $
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -51,7 +49,7 @@ echo '<div id="out-', $boxID ,'" ', $outBoxAdd, '>
 			$BirthDeath,
 		'</div>
 		<div id="inout-',$boxID,'" style="display:none;">
-			<div id="LOADING-inout-',$boxID,'">',WT_I18N::translate('Loading...'),'</div>
+			<div id="LOADING-inout-',$boxID,'">',WT_I18N::translate('Loading…'),'</div>
 		</div>';
 	// end of zoom view
 echo '</div>';
