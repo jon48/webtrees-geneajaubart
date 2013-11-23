@@ -89,7 +89,7 @@ class perso_general_WT_Module extends WT_Module implements WT_Perso_Module_HookS
 		global $WT_SESSION;
 		
 		if(get_module_setting($this->getName(), 'PG_ADD_HTML_HEADER', false)){
-			if(WT_USER_ACCESS_LEVEL >= get_module_setting($this->getName(), 'PG_SHOW_HTML_HEADER', WT_PRIV_HIDE)  && !safe_GET_bool('noheader')){		
+			if(WT_USER_ACCESS_LEVEL >= get_module_setting($this->getName(), 'PG_SHOW_HTML_HEADER', WT_PRIV_HIDE)  && !WT_Filter::getBool('noheader')){		
 				echo htmlspecialchars_decode(get_module_setting($this->getName(), 'PG_HTML_HEADER', ''));
 			}
 		}
@@ -110,7 +110,7 @@ class perso_general_WT_Module extends WT_Module implements WT_Perso_Module_HookS
 				'</div>';
 		}
 		if(get_module_setting($this->getName(), 'PG_ADD_HTML_FOOTER', false)){
-			if(WT_USER_ACCESS_LEVEL >= get_module_setting($this->getName(), 'PG_SHOW_HTML_FOOTER', WT_PRIV_HIDE) && !safe_GET_bool('nofooter')){		
+			if(WT_USER_ACCESS_LEVEL >= get_module_setting($this->getName(), 'PG_SHOW_HTML_FOOTER', WT_PRIV_HIDE) && !WT_Filter::getBool('nofooter')){		
 				echo htmlspecialchars_decode(get_module_setting($this->getName(), 'PG_HTML_FOOTER', ''));
 			}
 		}
@@ -124,7 +124,7 @@ class perso_general_WT_Module extends WT_Module implements WT_Perso_Module_HookS
 	public function h_extend_indi_header_left(WT_Controller_Individual $ctrlIndi) {
 		$res = '';
 		if($ctrlIndi){
-			$dindi = new WT_Perso_Person($ctrlIndi->getSignificantIndividual());
+			$dindi = new WT_Perso_Individual($ctrlIndi->getSignificantIndividual());
 			$tab=$dindi->getTitles();
 			$countTitles = count($tab);
 			if($countTitles>0){

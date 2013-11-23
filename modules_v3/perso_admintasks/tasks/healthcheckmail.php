@@ -181,12 +181,13 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 				
 				//Send mail
 				$mail = array();
-				$mail["to"]= get_user_name($webmaster_user_id) ;
-				$mail["from"] = $webtrees_email_from;
-				$mail["subject"] = $subject;
-				$mail["body"] = $message;
-				$mail["method"] = get_user_setting($webmaster_user_id, 'contactmethod');
-				$mail["no_from"] = true;				
+				$mail['to']= get_user_name($webmaster_user_id) ;
+				$mail['from'] = $webtrees_email_from;
+				$mail['from_name'] = WT_I18N::translate('webtrees Site Administrator');
+				$mail['subject'] = $subject;
+				$mail['body'] = $message;
+				$mail['method'] = get_user_setting($webmaster_user_id, 'contactmethod');
+				$mail['no_from'] = true;				
 				$tmpres = addMessage($mail);
 				$res = $tmpres && (!$one_tree_done || $one_tree_done && $res);
 				$one_tree_done = true;

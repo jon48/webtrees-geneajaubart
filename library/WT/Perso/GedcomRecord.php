@@ -18,7 +18,6 @@ if (!defined('WT_WEBTREES')) {
 class WT_Perso_GedcomRecord {
 
 	protected $gedcomrecord;
-	protected $gedrec;
 
 	// Cached results from various functions.
 	protected $_issourced=null;
@@ -30,7 +29,6 @@ class WT_Perso_GedcomRecord {
 	 */
 	public function __construct(WT_GedcomRecord $gedcomrecord_in){
 		$this->gedcomrecord = $gedcomrecord_in;
-		$this->gedrec = $gedcomrecord_in->getGedcomRecord();
 	}
 
 	/**
@@ -67,12 +65,12 @@ class WT_Perso_GedcomRecord {
 	 * @return string Formatted fact description
 	 */
 	public function format_first_major_fact($facts, $style) {
-		foreach ($this->gedcomrecord->getAllFactsByType(explode('|', $facts)) as $event) {
+		foreach ($this->gedcomrecord->getFacts($facts) as $fact) {
 			// Only display if it has a date or place (or both)
-			if (($event->getDate() || $event->getPlace()) && $event->canShow()) {
+			if (($fact->getDate() || $fact->getPlace()) && $fact->canShow()) {
 				switch ($style) {
 					case 10:
-						return '<i>'.$event->getLabel(true).' '.WT_Perso_Functions_Print::formatFactDateShort($event).'&nbsp;'.WT_Perso_Functions_Print::formatFactPlaceShort($event, '%1').'</i>';
+						return '<i>'.$fact->getLabel().' '.WT_Perso_Functions_Print::formatFactDateShort($fact).'&nbsp;'.WT_Perso_Functions_Print::formatFactPlaceShort($fact, '%1').'</i>';
 						break;
 					default:
 						return $this->gedcomrecord->format_first_major_fact($facts, $style);
@@ -91,7 +89,7 @@ class WT_Perso_GedcomRecord {
 	public function canDisplayIsSourced($access_level=WT_USER_ACCESS_LEVEL){
 		global $global_facts;
 
-		if(!$this->gedcomrecord->canDisplayDetails($access_level)) return false;
+		if(!$this->gedcomrecord->canShow($access_level)) return false;
 
 		if (isset($global_facts['SOUR'])) {
 			return $global_facts['SOUR']>=$access_level;
@@ -112,11 +110,10 @@ class WT_Perso_GedcomRecord {
 	public function isSourced(){
 		if($this->_issourced != null) return $this->_issourced;
 		$this->_issourced=-1;
-		$nbSources = preg_match("/1 SOUR (.*)/", $this->gedrec);
-		for($i=1;$i<=$nbSources;$i++){
+		$sourcesfacts = $this->gedcomrecord->getFacts('SOUR');
+		foreach($sourcesfacts as $sourcefact){
 			$this->_issourced=max($this->_issourced, 1);
-			$source = get_sub_record(1, '1 SOUR',  $this->gedrec, $i);
-			if(preg_match('/2 _ACT (.*)/', $source) ){
+			if($sourcefact->getAttribute('_ACT')){
 				$this->_issourced=max($this->_issourced, 2);
 			}
 		}
@@ -129,22 +126,19 @@ class WT_Perso_GedcomRecord {
 	 * @param string $eventslist
 	 * @return int Level of sources
 	 */
-	public function isEventSourced($eventslist){
+	public function isFactSourced($eventslist){
 		$isSourced=0;
-		foreach (explode('|', $eventslist) as $event) {
-			if($isSourced<WT_Perso_Event::MAX_IS_SOURCED_LEVEL){
-				foreach($this->gedcomrecord->getAllFactsByType($event) as $fact){
-					if($isSourced<WT_Perso_Event::MAX_IS_SOURCED_LEVEL){
-						$fact = new WT_Perso_Event($fact);
-						$tmpIsSourced = $fact->isSourced();
-						if($tmpIsSourced != 0) {
-							if($isSourced==0) {
-								$isSourced =  $tmpIsSourced;
-							}
-							else{
-								$isSourced = max($isSourced, $tmpIsSourced);
-							}
-						}
+		$facts = $this->gedcomrecord->getFacts($eventslist);
+		foreach($facts as $fact){
+			if($isSourced<WT_Perso_Fact::MAX_IS_SOURCED_LEVEL){
+				$dfact = new WT_Perso_Fact($fact);
+				$tmpIsSourced = $dfact->isSourced();
+				if($tmpIsSourced != 0) {
+					if($isSourced==0) {
+						$isSourced =  $tmpIsSourced;
+					}
+					else{
+						$isSourced = max($isSourced, $tmpIsSourced);
 					}
 				}
 			}

@@ -26,9 +26,9 @@ echo '<div class="pgeodispersion-geodispersion-page center">',
 
 
 if(WT_Perso_Functions_Sosa::isModuleOperational()){
-	$geoid = safe_GET('geoid', WT_REGEX_INTEGER, null);
+	$geoid = WT_Filter::getInteger('geoid');
 	
-	if($geoid){
+	if($geoid > 0){
 		$title = getGeoDispersionTitle($geoid);
 		
 		if($title){

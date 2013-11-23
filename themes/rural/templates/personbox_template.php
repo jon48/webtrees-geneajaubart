@@ -53,7 +53,7 @@ echo 	'</a>
 	</div>
 	</div>
 	<div id="inout-',$boxID,'" style="display:none;">
-		<div id="LOADING-inout-',$boxID,'">',WT_I18N::translate('Loading...'),'</div>
+		<div id="LOADING-inout-',$boxID,'">',WT_I18N::translate('Loading…'),'</div>
 	</div>
 </div>';
 ?>

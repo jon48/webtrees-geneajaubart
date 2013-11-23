@@ -2,7 +2,7 @@
 // Footer for webtrees theme
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2012 webtrees development team.
+// Copyright (C) 2013 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
@@ -30,38 +30,43 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-echo '</div>'; // <div id="content">
-if ($view!='simple') {
-	
-	echo '<div id="footer">';
-	echo '<div class="footer_left">';
-	echo '<div class="footer_right">';
-	echo '<div class="footer_center">';
-	
-	echo contact_links();
-	
-	//PERSO Add Extra footer
-	$f_hook = new WT_Perso_Hook('h_print_footer');
-	$f_hook->execute();
-	//END PERSO
-	
-	echo '<p class="logo">';
-	echo '<a href="', WT_WEBTREES_URL, '" target="_blank" class="icon-webtrees" title="', WT_WEBTREES, ' ', WT_VERSION_TEXT, '"></a>';
-	echo '</p>';
-	if (WT_DEBUG || get_gedcom_setting(WT_GED_ID, 'SHOW_STATS')) {
-		echo execution_stats();
-	}
-	if (exists_pending_change()) {
-		echo '<a href="#" onclick="window.open(\'edit_changes.php\', \'_blank\', chan_window_specs); return false;">';
-		echo '<p class="error center">', WT_I18N::translate('There are pending changes for you to moderate.'), '</p>';
-		echo '</a>';
-	}
-	echo '</div>'; //  close div id=\"footer_center\"
-	echo '</div>'; //  close div id=\"footer_right\"
-	echo '</div>'; //  close div id=\"footer_left\"
-	echo '</div>'; // close div id=\"footer\"
-}
-
-echo '</div>'; // close div class=\"content_box\"
-echo '</div>'; // close div id=\"main_content\"
 ?>
+
+</div>
+
+<?php if ($view!='simple') { ?>
+
+	<div id="footer">
+		<div class="footer_left">
+			<div class="footer_right">
+				<div class="footer_center">
+				<?php 
+					echo contact_links(); 
+		
+					//PERSO Add Extra footer
+					$f_hook = new WT_Perso_Hook('h_print_footer');
+					$f_hook->execute();
+					//END PERSO
+				?>
+				
+				<p class="logo">
+					<a href="<?php echo WT_WEBTREES_URL; ?>" target="_blank" class="icon-webtrees" title="<?php echo WT_WEBTREES.' '.WT_VERSION_TEXT; ?>"></a>
+				</p>
+				
+				<?php 
+				if (WT_DEBUG || get_gedcom_setting(WT_GED_ID, 'SHOW_STATS')) {
+					echo execution_stats();
+				}
+				if (exists_pending_change()) { ?>
+					<a href="#" onclick="window.open('edit_changes.php', '_blank', chan_window_specs); return false;">
+						<p class="error center"><?php echo WT_I18N::translate('There are pending changes for you to moderate.'); ?></p>
+					</a>
+				<?php } ?>
+				</div>
+			</div>
+		</div>
+	</div>
+<?php } ?>
+
+</div>
+</div>

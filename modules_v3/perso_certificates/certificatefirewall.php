@@ -18,7 +18,7 @@ global $controller, $useTTF;
 
 Zend_Session::writeClose();
 
-$cid   = safe_GET('cid');
+$cid   = WT_Filter::get('cid');
 $certificate = WT_Perso_Certificate::getInstance($cid);
 
 /**
@@ -243,7 +243,7 @@ global $useTTF;
 $useTTF = function_exists('imagettftext');
 
 // certificate object missing/private?
-if (!$certificate || !$certificate->canDisplayDetails()) {
+if (!$certificate || !$certificate->canShow()) {
 	AddToLog("Certificate Firewall error: >".WT_I18N::translate('Missing or private certificate object.').'< with CID >'.$cid.'<', 'media');
 	send404AndExit();
 }
@@ -262,7 +262,7 @@ $protocol = $_SERVER["SERVER_PROTOCOL"];  // determine if we are using HTTP/1.0 
 $filetime = $certificate->getFiletime();
 $filetimeHeader = gmdate("D, d M Y H:i:s", $filetime).' GMT';
 $expireOffset = 3600 * 24;  // tell browser to cache this image for 24 hours
-if (safe_GET('cb')) $expireOffset = $expireOffset * 7; // if cb parameter was sent, cache for 7 days 
+if (WT_Filter::get('cb')) $expireOffset = $expireOffset * 7; // if cb parameter was sent, cache for 7 days 
 $expireHeader = gmdate("D, d M Y H:i:s", WT_TIMESTAMP + $expireOffset) . " GMT";
 
 $type = WT_Perso_Functions_Certificates::isImageTypeSupported($imgsize['ext']);

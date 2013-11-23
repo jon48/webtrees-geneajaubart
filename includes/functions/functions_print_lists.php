@@ -272,7 +272,7 @@ function format_indi_table($datalist, $option='') {
 			continue;
 		}
 		//PERSO Create decorator for Individual
-		$dperson = new WT_Perso_Person($person);
+		$dperson = new WT_Perso_Individual($person);
 		//END PERSO
 		//-- place filtering
 		if ($option=='BIRT_PLAC' && strstr($person->getBirthPlace(), $filter)===false) continue;
@@ -761,7 +761,7 @@ function format_fam_table($datalist, $option='') {
 			// Only show married names if they are the name we are filtering by.
 			if ($name['type']!='_MARNM' || $num==$husb->getPrimaryName()) {
 				//PERSO Add Sosa Icon
-				$dhusb = new WT_Perso_Person($husb);
+				$dhusb = new WT_Perso_Individual($husb);
 				$html .= '<a '. $title. ' href="'. $family->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image.WT_Perso_Functions_Print::formatSosaNumbers($dhusb->getSosaNumbers(), 1, 'smaller'). '<br>';
 				//END PERSO
 			}
@@ -809,7 +809,7 @@ function format_fam_table($datalist, $option='') {
 			// Only show married names if they are the name we are filtering by.
 			if ($name['type']!='_MARNM' || $num==$wife->getPrimaryName()) {
 				//PERSO Add Sosa Icon
-				$dwife = new WT_Perso_Person($wife);
+				$dwife = new WT_Perso_Individual($wife);
 				$html .= '<a '. $title. ' href="'. $family->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image.WT_Perso_Functions_Print::formatSosaNumbers($dwife->getSosaNumbers(), 1, 'smaller'). '<br>';
 				//END PERSO
 			}
@@ -1866,12 +1866,12 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 			$exp = explode(' + ', $name);
 			$husb = $record->getHusband();
 			if($husb){
-				$dhusb = new WT_Perso_Person($husb);
+				$dhusb = new WT_Perso_Individual($husb);
 				$exp[0] .= ' '.WT_Perso_Functions_Print::formatSosaNumbers($dhusb->getSosaNumbers(), 1, 'smaller');
 			}
 			$wife = $record->getWife();
 			if($wife){
-				$dwife = new WT_Perso_Person($wife);
+				$dwife = new WT_Perso_Individual($wife);
 				$exp[1] .= ' '.WT_Perso_Functions_Print::formatSosaNumbers($dwife->getSosaNumbers(), 1, 'smaller');
 			}
 			$name = implode(' + ', $exp);
@@ -1881,7 +1881,7 @@ function print_events_table($startjd, $endjd, $events='BIRT MARR DEAT', $only_li
 		if ($record instanceof WT_Individual) {
 			$html .= $record->getSexImage();
 			//PERSO Add Sosa Icon
-			$dindi = new WT_Perso_Person($record);
+			$dindi = new WT_Perso_Individual($record);
 			$html .= WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1, 'smaller');
 			//END PERSO
 		}
@@ -1994,7 +1994,7 @@ function print_events_list($startjd, $endjd, $events='BIRT MARR DEAT', $only_liv
 		if ($record instanceof WT_Individual) {
 			$html .= $record->getSexImage();
 			//PERSO Add Sosa Icon
-			$dindi = new WT_Perso_Person($record);
+			$dindi = new WT_Perso_Individual($record);
 			$html .= WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1, 'smaller');
 			//END PERSO
 		}

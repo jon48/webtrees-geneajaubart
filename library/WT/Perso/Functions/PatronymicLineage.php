@@ -58,7 +58,7 @@ class WT_Perso_Functions_PatronymicLineage {
 				$indiFirst=self::getLineageRootIndividual($indi);
 				if($indiFirst){
 					$_usedIndis[$indiFirst->getXref()] = true;
-					if($indiFirst->canDisplayDetails()){
+					if($indiFirst->canShow()){
 						if($nbLineages>0) echo '<hr/>';
 						//Reinitialise the place table for the new lineage
 						$_tabPlaces=array();
@@ -105,13 +105,13 @@ class WT_Perso_Functions_PatronymicLineage {
 	 * 	- If the root individual is a mother, display children only if they hold the same surname and they do not hold the same surname as their father (when known).
 	 *  - If the root individual is a mother, indicate other children by ... 
 	 * 
-	 * @param WT_Person $indi_root Root individual to start the lineage from
+	 * @param WT_Individual $indi_root Root individual to start the lineage from
 	 */
-	private static function printIndiLineage(WT_Person $indi_root){
+	private static function printIndiLineage(WT_Individual $indi_root){
 		global $_usedIndis, $_tabPlaces;
 
 		if($indi_root){
-			$dindi = new WT_Perso_Person($indi_root);
+			$dindi = new WT_Perso_Individual($indi_root);
 			$indi_surname=$dindi->getUnprotectedPrimarySurname();
 		
 			echo '<ul>';
@@ -152,12 +152,12 @@ class WT_Perso_Functions_PatronymicLineage {
 							$mother_surname=$indi_surname;
 							$father_surname = false;
 							if($spouse) {
-								$dspouse = new WT_Perso_Person($spouse);
+								$dspouse = new WT_Perso_Individual($spouse);
 								$father_surname=$dspouse->getUnprotectedPrimarySurname();
 							}
 							$nbNatural=0;
 							foreach($children as $child){
-								$dchild = new WT_Perso_Person($child);
+								$dchild = new WT_Perso_Individual($child);
 								$child_surname=$dchild->getUnprotectedPrimarySurname();
 								//Print only lineages of children with the same surname as their mother (supposing they are natural children)
 								if(!$spouse || ($father_surname && $child_surname!=$father_surname)){
@@ -178,11 +178,11 @@ class WT_Perso_Functions_PatronymicLineage {
 						$father_surname=$indi_surname;
 						$mother_surname = false;
 						if($spouse) {
-							$dspouse = new WT_Perso_Person($spouse);
+							$dspouse = new WT_Perso_Individual($spouse);
 							$mother_surname=$dspouse->getUnprotectedPrimarySurname();
 						}
 						foreach($children as $child){
-							$dchild = new WT_Perso_Person($child);
+							$dchild = new WT_Perso_Individual($child);
 							$child_surname=$dchild->getUnprotectedPrimarySurname();
 							//Print the natural children of the mother, with a reference to the relevant lineage
 							if($child_surname && $child_surname!=$father_surname && $mother_surname && $child_surname==$mother_surname){
@@ -236,13 +236,13 @@ class WT_Perso_Functions_PatronymicLineage {
 	 *  - Else, we have reached the root of the lineage
 	 *  - Also, if the root has already been used, do not return it (to avoid duplication of lineages in case of Private context).
 	 * 
-	 * @param WT_Person $individual Root Individual, or null, if already used.
+	 * @param WT_Individual $individual Root Individual, or null, if already used.
 	 */
-	private static function getLineageRootIndividual(WT_Person $individual) {
+	private static function getLineageRootIndividual(WT_Individual $individual) {
 		global $_usedIndis;
 		
 		$is_first=false;
-		$dindi = new WT_Perso_Person($individual);
+		$dindi = new WT_Perso_Individual($individual);
 		$indi_surname=$dindi->getUnprotectedPrimarySurname();
 		while(!$is_first){
 			//Get the individual parents family
@@ -256,7 +256,7 @@ class WT_Perso_Functions_PatronymicLineage {
 				}
 				//If only a mother exists
 				else if($wife){
-					$dwife = new WT_Perso_Person($wife);
+					$dwife = new WT_Perso_Individual($wife);
 					$wife_surname=$dwife->getUnprotectedPrimarySurname();
 					//Check if the child is a natural child of the mother (based on the surname - Warning : surname must be identical)
 					if($wife_surname==$indi_surname){

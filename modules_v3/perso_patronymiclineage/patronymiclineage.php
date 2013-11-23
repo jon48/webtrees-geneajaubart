@@ -22,9 +22,9 @@ $controller=new WT_Controller_Page();
 
 // We show three different lists: initials, surnames and individuals
 // Note that the data may contain special chars, such as surname="<unknown>",
-$alpha   =safe_GET('alpha', WT_REGEX_UNSAFE); // All surnames beginning with this letter where "@"=unknown and ","=none
-$surname =safe_GET('surname', WT_REGEX_UNSAFE); // All indis with this surname.  NB - allow ' and "
-$show_all=safe_GET('show_all', array('no','yes'), 'no'); // All indis
+$alpha   =WT_Filter::get('alpha'); // All surnames beginning with this letter where "@"=unknown and ","=none
+$surname =WT_Filter::get('surname'); // All indis with this surname.  NB - allow ' and "
+$show_all=WT_Filter::get('show_all', 'no|yes', 'no'); // All indis
 
 // Make sure selections are consistent.
 // i.e. can't specify show_all and surname at the same time.
@@ -33,14 +33,14 @@ if ($show_all=='yes') {
 	$surname='';
 	$legend=WT_I18N::translate('All');
 	$url='module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&show_all=yes'.'&amp;ged='.WT_GEDURL;
-	$show=safe_GET('show', array('surn', 'lineage'), 'surn');
+	$show=WT_Filter::get('show', 'surn|lineage', 'surn');
 } elseif ($surname) {
 	$alpha=WT_Query_Name::initialLetter($surname);
 	$show_all='no';
 	if ($surname=='@N.N.') {
 		$legend=$UNKNOWN_NN;
 	} else {
-		$legend=htmlspecialchars($surname);
+		$legend=WT_Filter::escapeHtml($surname);
 	}
 	$url='module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&surname='.rawurlencode($surname).'&amp;ged='.WT_GEDURL;
 	$show='lineage'; // SURN list makes no sense here
@@ -57,9 +57,9 @@ if ($show_all=='yes') {
 	$show='none'; // Don't show lists until something is chosen
 } elseif ($alpha) {
 	$show_all='no';
-	$legend=htmlspecialchars($alpha).'…';
+	$legend=WT_Filter::escapeHtml($alpha).'…';
 	$url='module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&alpha='.rawurlencode($alpha).'&amp;ged='.WT_GEDURL;
-	$show=safe_GET('show', array('surn', 'lineage'), 'surn');
+	$show=WT_Filter::get('show', 'surn|lineage', 'surn');
 } else {
 	$show_all='no';
 	$legend='…';
@@ -83,7 +83,7 @@ foreach (WT_Query_Name::surnameAlpha(false, false, WT_GED_ID) as $letter=>$count
 	case ',':
 		break;
 	default:
-		$html=htmlspecialchars($letter);
+		$html=WT_Filter::escapeHtml($letter);
 		break;
 	}
 	if ($letter!='' && $count) {

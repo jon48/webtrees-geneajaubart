@@ -60,7 +60,7 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 		return false;
 	}
 	//PERSO Create the Decorator associated
-	$dperson = new WT_Perso_Person($person);
+	$dperson = new WT_Perso_Individual($person);
 	//END PERSO
 	$pid=$person->getXref();
 	if ($count==0) $count = rand();

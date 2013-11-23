@@ -44,14 +44,20 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 		$areMissing = true;
 		if(isset($unique_indis[$pid])) continue;
 		$sumMissingDifferent += $miss['father'] + $miss['mother'];
-		/* @var $person Person */
-		$person = WT_Person::getInstance($pid);
+		/* @var $person WT_Individual */
+		$person = WT_Individual::getInstance($pid);
 		if (is_null($person)) continue;
-		if ($person->getType() !== 'INDI') continue;
-		if (!$person->canDisplayName()) continue;
-		$dperson = new WT_Perso_Person($person);
+		if (!$person->canShowName()) continue;
+		$dperson = new WT_Perso_Individual($person);
 		$sumMissingDifferentWithoutHidden += $miss['father'] + $miss['mother'];
-		$html .= '<tr>';
+		if ($person->isNew()) {
+			$class = ' class="new"';
+		} elseif ($person->isOld()) {
+			$class = ' class="old"';
+		} else {
+			$class = '';
+		}
+		$html .= '<tr' . $class . '>';
 		//-- Indi Sosa
 		$html .= '<td class="transparent">'.$sosa.'</td>';
 		//-- Indi ID
@@ -85,8 +91,8 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 		// Use "AAAA" as a separator (instead of ",") as JavaScript.localeCompare() ignores
 		// punctuation and "ANN,ROACH" would sort after "ANNE,ROACH", instead of before it.
 		// Similarly, @N.N. would sort as NN.
-		$html .= '<td>'. htmlspecialchars(str_replace('@P.N.', 'AAAA', $givn)). 'AAAA'. htmlspecialchars(str_replace('@N.N.', 'AAAA', $surn)). '</td>';
-		$html .= '<td>'. htmlspecialchars(str_replace('@N.N.', 'AAAA', $surn)). 'AAAA'. htmlspecialchars(str_replace('@P.N.', 'AAAA', $givn)). '</td>';
+		$html .= '<td>'. WT_Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)). 'AAAA'. WT_Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)). '</td>';
+		$html .= '<td>'. WT_Filter::escapeHtml(str_replace('@N.N.', 'AAAA', $surn)). 'AAAA'. WT_Filter::escapeHtml(str_replace('@P.N.', 'AAAA', $givn)). '</td>';
 		//PERSO Modify table to include IsSourced module
 		if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
 			$isSourced = $dperson->isSourced();
@@ -202,10 +208,10 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 					"sPaginationType": "full_numbers"
 			   });
 			   
-				jQuery("div.filtersH_'.$table_id.'").html("'.addslashes(
-					'<button type="button" id="SEX_M_'.    $table_id.'" class="ui-state-default SEX_M" title="'.    WT_I18N::translate('Show only males.').'">&nbsp;'.WT_Person::sexImage('M', 'small').'&nbsp;</button>'.
-					'<button type="button" id="SEX_F_'.    $table_id.'" class="ui-state-default SEX_F" title="'.    WT_I18N::translate('Show only females.').'">&nbsp;'.WT_Person::sexImage('F', 'small').'&nbsp;</button>'.
-					'<button type="button" id="SEX_U_'.    $table_id.'" class="ui-state-default SEX_U" title="'.    WT_I18N::translate('Show only persons of whom the gender is not known.').'">&nbsp;'.WT_Person::sexImage('U', 'small').'&nbsp;</button>'.
+				jQuery("div.filtersH_'.$table_id.'").html("'.WT_Filter::escapeJs(
+					'<button type="button" id="SEX_M_'.    $table_id.'" class="ui-state-default SEX_M" title="'.    WT_I18N::translate('Show only males.').'">&nbsp;'.WT_Individual::sexImage('M', 'small').'&nbsp;</button>'.
+					'<button type="button" id="SEX_F_'.    $table_id.'" class="ui-state-default SEX_F" title="'.    WT_I18N::translate('Show only females.').'">&nbsp;'.WT_Individual::sexImage('F', 'small').'&nbsp;</button>'.
+					'<button type="button" id="SEX_U_'.    $table_id.'" class="ui-state-default SEX_U" title="'.    WT_I18N::translate('Show only individuals of whom the gender is not known.').'">&nbsp;'.WT_Individual::sexImage('U', 'small').'&nbsp;</button>'.
 					'<button type="button" id="RESET_'.    $table_id.'" class="ui-state-default RESET" title="'.    WT_I18N::translate('Reset to the list defaults.').'">'.WT_I18N::translate('Reset').'</button>'
 				).'");
 		
@@ -314,7 +320,7 @@ echo '<div class="psosa-missing-page center">',
 $maxGen = WT_Perso_Functions_Sosa::getLastGeneration();
 
 if($maxGen>0){
-	$selectedgen = safe_REQUEST($_REQUEST, 'gen', WT_REGEX_INTEGER, null);
+	$selectedgen = WT_Filter::post('gen', WT_REGEX_INTEGER, WT_Filter::getInteger('gen'));
 	
 	echo '<form method="get" name="setgen" action="module.php">',
 		'<input type="hidden" name="mod" value="perso_sosa">',
@@ -333,7 +339,7 @@ if($maxGen>0){
 		'<input type="submit" value="', WT_I18N::translate('Show'), '" /><br />',
 		'</form>';
 	
-	if($selectedgen){
+	if($selectedgen > 0){
 		$mingen = $selectedgen;
 		$maxgen = $selectedgen;
 		if($selectedgen == 1){

@@ -82,11 +82,16 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 	 */
 	private function editsetting(){
 		
-		$id=safe_POST('id', '[a-zA-Z0-9_-]+');
+		// Do we have a valid CSRF token?
+		if (!WT_Filter::checkCsrf()) {
+			WT_Perso_Functions_Edit::fail();
+		}
+		
+		$id=WT_Filter::post('id', '[a-zA-Z0-9_-]+');
 		list($table, $id1, $id2, $id3)=explode('-', $id.'---');
 			
 		// The replacement value.
-		$value=safe_POST('value', WT_REGEX_UNSAFE);
+		$value=WT_Filter::post('value');
 
 		// Validate the replacement value
 		if($id3 == 'validate' && !is_null($id2)){

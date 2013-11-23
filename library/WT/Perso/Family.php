@@ -20,10 +20,10 @@ class WT_Perso_Family extends WT_Perso_GedcomRecord {
 	protected $_ismarriagesourced = null;
 	
 	/**
-	 * Extend WT_Family getInstance, in order to retrieve directly a WT_Perso_Person object 
+	 * Extend WT_Family getInstance, in order to retrieve directly a WT_Perso_Family object 
 	 *
 	 * @param unknown_type $data Data to identify the individual
-	 * @return WT_Perso_Family|null WT_Perso_Person instance
+	 * @return WT_Perso_Family|null WT_Perso_Family instance
 	 */
 	public static function getIntance($data){
 		$dfam = null;
@@ -41,7 +41,7 @@ class WT_Perso_Family extends WT_Perso_GedcomRecord {
 	* */
 	function isMarriageSourced(){
 		if($this->_ismarriagesourced != null) return $this->_ismarriagesourced;
-		$this->_ismarriagesourced = $this->isEventSourced(WT_EVENTS_MARR.'|MARC');
+		$this->_ismarriagesourced = $this->isFactSourced(WT_EVENTS_MARR.'|MARC');
 		return $this->_ismarriagesourced;
 	}
 		

@@ -37,12 +37,14 @@ echo '<div id="out-',$boxID,'" ',$outBoxAdd,'>
 	'<a onclick="event.cancelBubble=true;" href="individual.php?pid=', $pid, '&amp;ged=', rawurlencode($GEDCOM), '">
 		<span id="namedef-',$boxID, '" class="name',$style,' ',$classfacts,'">', $name.$addname,  '</span>
 		<span class="name',$style,'"> ',$genderImage,'</span>';
+
 //PERSO Append record name text
 echo 	'<span class="rn_append">';
 $hook_rn_append = new WT_Perso_Hook('h_rn_append');
 echo 	implode('&nbsp;', $hook_rn_append->execute($person)) ;		
 echo	'</span>';
 //END PERSO
+
 echo 	'
 	</a>
 	<div id="fontdef-',$boxID,'" class="details',$style,'">

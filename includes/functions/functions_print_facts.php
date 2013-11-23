@@ -203,7 +203,7 @@ function print_fact(WT_Fact $fact, WT_GedcomRecord $record) {
 	echo '</td><td class="optionbox ', $styleadd, ' wrap">';
 
 	//PERSO
-	echo WT_Perso_Functions_Print::getFactPlaceIcon($fact->getGedcomRecord());
+	echo WT_Perso_Functions_Print::getFactPlaceIcon($fact);
 	//END PERSO
 
 	// Event from another record?

@@ -1,6 +1,6 @@
 <?php
 /**
- * Decorator class to extend native Event class.
+ * Decorator class to extend native Fact class.
  *
  * @package webtrees
  * @subpackage PersoLibrary
@@ -14,48 +14,46 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-class WT_Perso_Event {
+class WT_Perso_Fact {
 		
 	const MAX_IS_SOURCED_LEVEL = 3;
 	
-	protected $event; 
+	protected $fact; 
 	
 	/**
 	* Contructor for the decorator
 	*
-	* @param WT_Event $event_in The Event to extend
+	* @param WT_Fact $fact_in The Fact to extend
 	*/
-	public function __construct(WT_Event $event_in){
-		$this->event = $event_in;
+	public function __construct(WT_Fact $fact_in){
+		$this->fact = $fact_in;
 	}
 	
 	/**
-	* Check if an event has a date and is sourced
+	* Check if a fact has a date and is sourced
 	* Values:
-	* 		- 0, if no date is found for the event
+	* 		- 0, if no date is found for the fact
 	* 		- -1, if the date is not precise
 	* 		- -2, if the date is precise, but no source is found
 	* 		- 1, if the date is precise, and a source is found
 	* 		- 2, if the date is precise, a source exists, and is supported by a certificate (requires _ACT usage)
-	* 		- 3, if the date is precise, a source exists, and the certificate supporting the event is within an acceptable range of date
+	* 		- 3, if the date is precise, a source exists, and the certificate supporting the fact is within an acceptable range of date
 	*
 	* @return int Level of sources
 	*/
 	public function isSourced(){
 		$isSourced=0;
-		$date = $this->event->getDate(false);
+		$date = $this->fact->getDate(false);
 		if($date->JD()>0) {
 			$isSourced=-1;
 			if($date->qual1=='' && $date->MinJD() == $date->MaxJD()){
 				$isSourced=-2;
-				$srec=$this->event->gedcomRecord;
- 				$nbSources = substr_count($srec, '2 SOUR');
-				for($i=1;$i<=$nbSources;$i++){
+				$citations = $this->fact->getCitations();
+				foreach($citations as $citation){
 					$isSourced=max($isSourced, 1);
-					$source = get_sub_record(2, '2 SOUR',  $srec, $i);
-					if(preg_match('/3 _ACT (.*)/', $source) ){
+					if(preg_match('/3 _ACT (.*)/', $citation) ){
  						$isSourced=max($isSourced, 2);
- 						preg_match_all("/4 DATE (.*)/", $source, $datessource, PREG_SET_ORDER);
+ 						preg_match_all("/4 DATE (.*)/", $citation, $datessource, PREG_SET_ORDER);
  						foreach($datessource as $daterec){
  							$datesource = new WT_Date($daterec[1]);
  							if(abs($datesource->JD() - $date->JD()) < 180){

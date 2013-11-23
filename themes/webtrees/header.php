@@ -44,14 +44,15 @@ $this
 	<link rel="stylesheet" type="text/css" href="<?php echo WT_THEME_URL; ?>jquery-ui-1.10.3/jquery-ui-1.10.3.custom.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo WT_CSS_URL; ?>style.css">
 	<!--[if IE]>
-//PERSO Add extra style sheet for personal additions
-echo '<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.extra.css', '">';
-// and Java script for Certificate Module
-$this->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.'perso_certificates/js/activatecolorbox.js');
-//END PERSO
-
 	<link rel="stylesheet" type="text/css" href="<?php echo WT_CSS_URL; ?>msie.css">
 	<![endif]-->
+	<?php //PERSO Add extra style sheet for personal additions  ?>
+	<link rel="stylesheet" type="text/css" href="<?php echo WT_CSS_URL; ?>style.extra.css">
+	<?php 
+	// and Java script for Certificate Module
+	if(WT_Perso_Certificate::isModuleOperational())	$this->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.'perso_certificates/js/activatecolorbox.js');
+	//END PERSO
+	?>
 	<?php if (WT_USE_LIGHTBOX) { ?>
 	<link rel="stylesheet" type="text/css" href="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/css/album_page.css">
 	<?php } ?>

@@ -31,6 +31,7 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
+global $WT_IMAGES;
 // This theme uses the jQuery “colorbox” plugin to display images
 $this
 	->addExternalJavascript(WT_JQUERY_COLORBOX_URL)
@@ -68,134 +69,136 @@ $this
 		});
 	');
 
-echo
-	'<!DOCTYPE html>',
-	'<html ', WT_I18N::html_markup(), '>',
-	'<head>',
-	'<meta charset="UTF-8">',
-	'<title>', htmlspecialchars($title), '</title>',
-	header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL),
-	'<link rel="icon" href="', WT_THEME_URL, 'favicon.png" type="image/png">',
-	'<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'jquery-ui-1.10.3/jquery-ui-1.10.3.custom.css">',
-	'<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.css', '">';
-
-//PERSO Add extra style sheet for personal additions
-echo '<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.extra.css', '">';
-// and Java script for Certificate Module
-$this->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.'perso_certificates/js/activatecolorbox.js');
-//END PERSO
-
-switch ($BROWSERTYPE) {
-case 'msie':
-	echo '<link type="text/css" rel="stylesheet" href="', WT_THEME_URL, $BROWSERTYPE, '.css">';
-	break;
-}
-
-// Additional css files required (Only if Lightbox installed)
-if (WT_USE_LIGHTBOX) {
-		echo '<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/css/album_page.css" media="screen">';
-}
-
-echo
-	'</head>',
-	'<body id="body">';
-
-// begin header section
-if ($view=='simple') {
-	
-	echo '<div id="header_simple" > </div>';
-	echo '<div id="main_content">';
-	echo '<div class="top_center_box">';
-	echo '<div class="top_center_box_left" ></div><div class="top_center_box_right" ></div><div class="top_center_box_center"></div>';
-	echo '</div>';
-	echo '<div class="content_box simpleview">';
-}
-else {
-	global $WT_IMAGES;
-	echo '<div id="main_content">';
-	echo '<div id="header">';
-	echo  '<div id="htopright">';
-	global $WT_IMAGES;
-	//echo '<div class="header_search">',
-	echo 	'<form action="search.php" method="post">',
-			'<input type="hidden" name="action" value="general">',
-			'<input type="hidden" name="topsearch" value="yes">',
-			'<input type="search" name="query" size="25" placeholder="', WT_I18N::translate('Search'), '" dir="auto">',
-			'<input type="image" class="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '">',
-			'</form>';
-	echo '</div>';
-	echo  '<div id="hcenterright">';
-	echo '<ul class="makeMenu">';
-	if (WT_USER_ID) {
-		echo '<li><a href="edituser.php">', WT_I18N::translate('Logged in as '), ' ', getUserFullName(WT_USER_ID), '</a></li> <li>', logout_link(), '</li>';
-	} else {
-		echo '<li>', login_link(), '</li> ';
-	}
-	echo '</li>';
-	echo '</ul>';
-	echo '<div class="gedtitle" dir="auto">',WT_TREE_TITLE,'</div>';
-	echo '</div>';
-	echo  '<div id="hbottomright">';
-	//PERSO Extend header
-	echo '<div id="perso-header">';
-	$hook_print_header = new WT_Perso_Hook('h_print_header');
-	$hook_print_header->execute();
-	echo '</div>';
-	//END PERSO
-	echo '<ul id="extra-menu" class="makeMenu">';
-	echo
-		WT_MenuBar::getFavoritesMenu(),
-		WT_MenuBar::getThemeMenu(),
-		WT_MenuBar::getLanguageMenu(),
-		'</ul>',
-		'</div>';
-	//Prepare menu bar
-	$menu_items=array(
-		WT_MenuBar::getGedcomMenu(),
-		WT_MenuBar::getMyPageMenu(),
-		WT_MenuBar::getChartsMenu(),
-		WT_MenuBar::getListsMenu(),
-		WT_MenuBar::getCalendarMenu(),
-		WT_MenuBar::getReportsMenu(),
-		WT_MenuBar::getSearchMenu(),
-	);
-	foreach (WT_MenuBar::getModuleMenus() as $menu) {
-		$menu_items[]=$menu;
-	}
-	echo '</div>'; // close header
-	//end header section
-	echo '<div class="top_center_box"/>';
-	echo '<div class="top_center_box_left" ></div>';
-	echo '<div class="top_center_box_right" ></div>';
-	echo '<div class="top_center_box_center"></div>';
-	echo '</div>';
-	echo '<div class="content_box">';
-	echo '<div id="topMenu">',
-		'<div class="topMenu_left"></div>',
-		'<div class="topMenu_right"></div>',
-		'<div class="topMenu_center">',
-		'<table align="center" id="main-menu">',
-			'<tr>';
-	$nbMenus = count($menu_items);
-	for ($i = 0; $i < $nbMenus -1 ; $i++) {
-		$menu = $menu_items[$i];
-		if ($menu) {
-			echo '<td valign="top"><ul class="main-menu-item">', $menu->getMenuAsList(), '</ul></td>';
-		}
-	}
-	$menu = $menu_items[$nbMenus - 1];
-	if ($menu) {
-		echo '<td class="topmenu_last" valign="top"><ul class="main-menu-item">', $menu->getMenuAsList(), '</ul></td>';
-	}
-	unset($menu_items, $menu);
-	echo '</tr>',
-		'</table>',
-		'</div>', // close topMenu_center
-	'</div>'; // close topmenu
-	// begin content section -->
-}
-echo
-	$javascript,
-	WT_FlashMessages::getHtmlMessages(), // Feedback from asynchronous actions
-	'<div id="content">';
 ?>
+<!DOCTYPE html>
+<html <?php echo WT_I18N::html_markup(); ?>>
+<head>
+	<meta charset="UTF-8">
+	<title><?php echo WT_Filter::escapeHtml($title); ?></title>
+	<?php echo header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL); ?>
+	<link rel="icon" href="<?php echo WT_CSS_URL; ?>favicon.png" type="image/png">
+	<link rel="stylesheet" type="text/css" href="<?php echo WT_THEME_URL; ?>jquery-ui-1.10.3/jquery-ui-1.10.3.custom.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo WT_CSS_URL; ?>style.css">
+	<!--[if IE]>
+	<link rel="stylesheet" type="text/css" href="<?php echo WT_CSS_URL; ?>msie.css">
+	<![endif]-->
+	
+	<?php //PERSO Add extra style sheet for personal additions  ?>
+	<link rel="stylesheet" type="text/css" href="<?php echo WT_CSS_URL; ?>style.extra.css">
+	<?php 
+	// and Java script for Certificate Module
+	if(WT_Perso_Certificate::isModuleOperational())	$this->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.'perso_certificates/js/activatecolorbox.js');
+	//END PERSO
+	?>
+
+	<?php if (WT_USE_LIGHTBOX) { ?>
+	<link rel="stylesheet" type="text/css" href="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/css/album_page.css">
+	<?php } ?>
+
+</head>
+<body id="body">
+<?php if ($view=='simple') { ?>
+	<div id="header_simple" > </div>
+	<div id="main_content">
+		<div class="top_center_box">
+			<div class="top_center_box_left" ></div>
+			<div class="top_center_box_right" ></div>
+			<div class="top_center_box_center"></div>
+		</div>
+		<div class="content_box simpleview">
+<?php } else { ?>
+	<div id="main_content">
+		<div id="header">
+			<div id="htopright">
+				<div class="header_search">
+					<form action="search.php" method="post">
+						<input type="hidden" name="action" value="general">
+						<input type="hidden" name="ged" value="<?php echo WT_GEDCOM; ?>">
+						<input type="hidden" name="topsearch" value="yes">
+						<input type="search" name="query" size="25" placeholder="<?php echo WT_I18N::translate('Search'); ?>" dir="auto">
+						<input type="image" class="image" src="<?php echo $WT_IMAGES['search']; ?>" alt="<?php echo WT_I18N::translate('Search'); ?>" title="<?php echo WT_I18N::translate('Search'); ?>">
+					</form>
+				</div>
+			</div>
+			<div id="hcenterright">
+				<ul class="makeMenu">
+					<li>
+					<?php 
+					if (WT_USER_ID) {
+						echo '<a href="edituser.php">', WT_I18N::translate('Logged in as '), ' ', getUserFullName(WT_USER_ID), '</a></li> <li>', logout_link();
+					} else {
+						echo login_link();
+					}
+					?>
+					</li>
+				</ul>
+				<div class="gedtitle">
+					<?php echo  WT_TREE_TITLE; ?>
+				</div>
+			</div>
+			<div id="hbottomright">
+			<?php //PERSO Extend header ?>
+				<div id="perso-header">
+					<?php  
+					$hook_print_header = new WT_Perso_Hook('h_print_header');
+					$hook_print_header->execute();
+					?>
+				</div>
+			<?php //END PERSO ?>
+				<ul id="extra-menu" class="makeMenu">
+					<?php echo WT_MenuBar::getFavoritesMenu(); ?>
+					<?php echo WT_MenuBar::getThemeMenu(); ?>
+					<?php echo WT_MenuBar::getLanguageMenu(); ?>
+				</ul>
+			</div>
+			<?php 
+			//Prepare menu bar
+			$menu_items=array(
+				WT_MenuBar::getGedcomMenu(),
+				WT_MenuBar::getMyPageMenu(),
+				WT_MenuBar::getChartsMenu(),
+				WT_MenuBar::getListsMenu(),
+				WT_MenuBar::getCalendarMenu(),
+				WT_MenuBar::getReportsMenu(),
+				WT_MenuBar::getSearchMenu(),
+			);
+			foreach (WT_MenuBar::getModuleMenus() as $menu) {
+				$menu_items[]=$menu;
+			}
+			?>
+		</div>
+		<div class="top_center_box">
+			<div class="top_center_box_left" ></div>
+			<div class="top_center_box_right" ></div>
+			<div class="top_center_box_center"></div>
+		</div>
+		<div class="content_box">
+			<div id="topMenu">
+				<div class="topMenu_left"></div>
+				<div class="topMenu_right"></div>
+				<div class="topMenu_center">
+					<table align="center" id="main-menu">
+						<tr>
+						<?php  
+							$nbMenus = count($menu_items);
+							for ($i = 0; $i < $nbMenus -1 ; $i++) {
+								$menu = $menu_items[$i];
+								if ($menu) {?>
+									<td valign="top"><ul class="main-menu-item"><?php echo $menu->getMenuAsList(); ?></ul></td>
+								<?php }
+							}
+							$menu = $menu_items[$nbMenus - 1];
+							if ($menu) { ?>
+								<td class="topmenu_last" valign="top"><ul class="main-menu-item"><?php echo $menu->getMenuAsList(); ?></ul></td>
+							<?php }
+							unset($menu_items, $menu);
+						?>
+						</tr>
+					</table>
+				</div>
+			</div>
+			
+	<?php } ?>
+	<?php echo $javascript; ?>
+	<?php echo WT_FlashMessages::getHtmlMessages(); ?>
+	<div id="content">

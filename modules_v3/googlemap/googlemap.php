@@ -20,6 +20,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// @version: p_$Revision$ $Date$
+// $HeadURL$
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -350,15 +352,19 @@ function build_indiv_map(WT_Individual $indi, $indifacts, $famids) {
 		var placer   = null;
 
 		// A function to create the marker and set up the event window
-		function createMarker(latlng, html, tooltip, sv_lati, sv_long, sv_bearing, sv_elevation, sv_zoom, sv_point, marker_icon) {
+		function createMarker(latlng, html, tooltip, sv_lati, sv_long, sv_bearing, sv_elevation, sv_zoom, sv_point, marker_icon, width, height) {
 			var contentString = '<div id="iwcontent">'+html+'</div>';
 
 			// Use flag icon (if defined) instead of regular marker icon
-			if (marker_icon) {
+			//PERSO Resize flag
+			if (marker_icon && width!= undefined && width > 0 && height != undefined && height >0) {
 				var icon_image = new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+'googlemap/'+marker_icon,
-					new google.maps.Size(25, 15),
+					null,
 					new google.maps.Point(0,0),
-					new google.maps.Point(0, 44));
+					new google.maps.Point(0, 44),
+					new google.maps.Size(width, height)
+			//END PERSO
+					);
 				var icon_shadow = new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+'googlemap/images/flag_shadow.png',
 					new google.maps.Size(35, 45), // Shadow size
 					new google.maps.Point(0,0),   // Shadow origin
@@ -565,6 +571,19 @@ function build_indiv_map(WT_Individual $indi, $indifacts, $famids) {
 					"sv_bearing":   "<?php echo WT_Filter::escapeJs($gmark['sv_bearing']  ); ?>",
 					"sv_elevation": "<?php echo WT_Filter::escapeJs($gmark['sv_elevation']); ?>",
 					"sv_zoom":      "<?php echo WT_Filter::escapeJs($gmark['sv_zoom']     ); ?>"
+					<?php 
+					//PERSO Resize flag
+					if (!empty($gmark['pl_icon'])) { 
+						$icon_image = WT_STATIC_URL.WT_MODULES_DIR . 'googlemap/' . $gmark['pl_icon'];	
+						list($flag_width, $flag_height) = WT_Perso_Functions::getResizedImageSize($icon_image, 25);
+						
+					}
+					?>,
+					"width":	"<?php echo WT_Filter::escapeJs($flag_width && $flag_width > 0 ? $flag_width : 0); ?>",
+					"height":	"<?php echo WT_Filter::escapeJs($flag_height && $flag_height > 0 ? $flag_height : 0); ?>"
+					<?php
+					//END PERSO Resize flags
+					?>
 				}
 				<?php } ?>
 			];
@@ -632,7 +651,7 @@ function build_indiv_map(WT_Individual $indi, $indifacts, $famids) {
 				var sv_point     = new google.maps.LatLng(location.sv_lati, location.sv_long); // StreetView Latitude and Longitide
 
 				var zoomLevel = <?php echo $GOOGLEMAP_MAX_ZOOM; ?>;
-				var marker    = createMarker(point, html, location.tooltip, location.sv_lati, location.sv_long, location.sv_bearing, location.sv_elevation, location.sv_zoom, sv_point, location.pl_icon);
+				var marker    = createMarker(point, html, location.tooltip, location.sv_lati, location.sv_long, location.sv_bearing, location.sv_elevation, location.sv_zoom, sv_point, location.pl_icon, location.width, location.height);
 
 				// if streetview coordinates are available, use them for marker,
 				// else use the place coordinates

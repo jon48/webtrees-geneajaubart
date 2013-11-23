@@ -81,7 +81,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			$controller
 			->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 			->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery.dataTables.fnReloadAjax.js')
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery.datatables.fnReloadAjax.js')
 			->addExternalJavascript(WT_STATIC_URL.'js/jquery.form-3.32.0.js')
 			->addInlineJavascript('
 					function updatePlaceHierarchy(){
@@ -126,7 +126,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 					
 					function fnDeleteGeoDispRow(id) {
 			            $.ajax({ "url": "'.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'",
-			                "type": "POST",
+			                "type": "GET",
 			                "data": { "mod" : "'.$this->getName().'", "mod_action": "ajaxadmindelete", "geodispid": id },
 			                "success": function(response){
 								if(response.result == "ok"){
@@ -180,7 +180,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 											"resetForm": true,
 											"dataType": "json",
 											"error": function(){
-						                        alert("'.htmlspecialchars(WT_I18N::translate('An error occured while adding new element.')).'");
+						                        alert("'.WT_Filter::escapeHtml(WT_I18N::translate('An error occured while adding new element.')).'");
 						                    },
 											"success": function(e){
 												if(e.result == "ok") {					
@@ -275,7 +275,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			echo '<div id="dGeoConfigTable_'.$tab_id.'" class="center">';
 			
 			
-			echo '<form id="formAddNewRow_'.$tab_id.'" method="POST" action="'.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'" title="'.WT_I18N::translate('Add a new entry').'">',
+			echo '<form id="formAddNewRow_'.$tab_id.'" method="GET" action="'.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'" title="'.WT_I18N::translate('Add a new entry').'">',
 					'<input id="mod" type="hidden" name="mod" value="'.$this->getName().'">',
 					'<input id="mod_action" type="hidden" name="mod_action" value="ajaxadminadd">',
 					'<input type="hidden" name="id" id="newid" value="DATAROWID" rel="0" />',
@@ -378,12 +378,12 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 	 *  - setting: setting to be change
 	 */
 	private function editsetting(){
-		if(WT_Perso_Functions_Map::isGeoDispersionModuleOperational()){
-			$id=safe_POST('id', '[a-zA-Z0-9_-]+');
+		if(WT_Filter::checkCsrf() && WT_Perso_Functions_Map::isGeoDispersionModuleOperational()){
+			$id=WT_Filter::post('id', '[a-zA-Z0-9_-]+');
 			list($table, $id1, $id2)=explode('-', $id.'--');
 				
 			// The replacement value.
-			$value=safe_POST('value', WT_REGEX_UNSAFE);
+			$value=WT_Filter::post('value');
 		
 			// Validate the replacement value
 			$value = $this->validate_config_settings($id2, $value);				
@@ -449,7 +449,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 	 */
 	private function ajaxgeodispersiondata(){
 		
-		$geoid = safe_GET('geoid', WT_REGEX_INTEGER, null);
+		$geoid = WT_Filter::getInteger('geoid');
 		
 		$controller = new WT_Perso_Controller_Json();
 		
@@ -580,7 +580,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 								$textToolTip = '<strong>'.$name.'</strong><br/>';
 								if($parameters->useflags == 'yes' && $location['flag'] != '') $textToolTip .= '<span class="geodispersion_flag">'.$location['flag'].'</span><br/>';
 								$textToolTip .= WT_I18N::translate('%d individuals', $location['count']).'<br/>'.WT_I18N::translate('%.1f %%', WT_Perso_Functions::getPercentage($location['count'], $nbFound - $nbOther));
-								$html.= 'addTip(map.area'.$location['id'].'.node, "'.addslashes($textToolTip).'");';
+								$html.= 'addTip(map.area'.$location['id'].'.node, "'.WT_Filter::escapeJs($textToolTip).'");';
 								$html.= 'map.area'.$location['id'].'.attr({"fill" : "'.$maxcolor.'", "fill-opacity" : '.$location['transparency'].' });';
 								$html.= 'map.area'.$location['id'].'.mouseover(function () {'.
 											'map.area'.$location['id'].'.stop().animate({"fill" : "'.$mapSettings['canvas']['hovercolor'].'", "fill-opacity" : 1}, 100, "linear");'.
@@ -756,10 +756,10 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 	 * @return string JSON for table data
 	 */
 	private function ajaxadminconfigdata(){
-		$sEcho = intval(safe_GET('sEcho', WT_REGEX_INTEGER, null));
-		$iDisplayStart = safe_GET('iDisplayStart', WT_REGEX_INTEGER, null);
-		$iDisplayLength = safe_GET('iDisplayLength', WT_REGEX_INTEGER, null);
-		$sSearch = safe_GET('sSearch');
+		$sEcho = WT_Filter::getInteger('sEcho');
+		$iDisplayStart = WT_Filter::getInteger('iDisplayStart');
+		$iDisplayLength = WT_Filter::getInteger('iDisplayLength');
+		$sSearch = WT_Filter::get('sSearch');
 
 		$controller = new WT_Perso_Controller_Json();
 			
@@ -785,7 +785,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			//Ordering
 			$sql .= ' ORDER BY pg_descr ASC, pg_sublevel ASC';
 			//Paging
-			if(!is_null($iDisplayStart) && !is_null($iDisplayLength)){
+			if($iDisplayLength > 0){
 				$sql .= ' LIMIT '.$iDisplayStart.', '.$iDisplayLength;
 			}
 			$aResults = WT_DB::prepare($sql)->execute(array(WT_GED_ID))->fetchAll();
@@ -841,7 +841,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 						null,
 						$this->getName());
 				$row[8] = '<i class="icon-delete" onclick="if (confirm(\''.
-					htmlspecialchars(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($aResult->pg_descr))).
+					WT_Filter::escapeHtml(WT_I18N::translate('Are you sure you want to delete “%s”?', strip_tags($aResult->pg_descr))).
 					'\')) { fnDeleteGeoDispRow(\''.$aResult->pg_id.'\'); }"></i>';				
 				$jsonArray['aaData'][] = $row;
 			}
@@ -854,7 +854,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 	/**
 	 * Delete a geodispersion analysis, and return the result
 	 * 
-	 * Input parameters - POST :
+	 * Input parameters - GET :
 	 * 	- geodispid : ID of the Geodispersion analysis to delete
 	 *  
 	 *  JSON format
@@ -867,7 +867,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 	 *
 	 */
 	private function ajaxadmindelete(){
-		$id = safe_POST('geodispid', WT_REGEX_INTEGER, null);
+		$id = WT_Filter::getInteger('geodispid');
 
 		$controller = new WT_Perso_Controller_Json();
 
@@ -876,7 +876,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			'text'	=>	WT_I18N::translate('The Geodispersion analysis entry could not be deleted.')
 		);
 		
-		if(WT_USER_IS_ADMIN && $id){
+		if(WT_USER_IS_ADMIN && $id > 0){
 			$sql = 'DELETE FROM ##pgeodispersion WHERE pg_id = ?';
 			WT_DB::prepare($sql)->execute(array($id));
 			
@@ -892,7 +892,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 	/**
 	 * Add a geodispersion analysis
 	 * 
-	 * Input parameters - POST :
+	 * Input parameters - GET :
 	 * 	- descr : Geodispersion analysis description
 	 *  - subdiv : Subdivision of analysis
 	 *  - map : Map to use
@@ -910,12 +910,12 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 	 *
 	 */
 	private function ajaxadminadd(){
-		$descr = safe_POST('descr');
-		$subdiv = safe_POST('subdiv', WT_REGEX_INTEGER, null);
-		$map = safe_POST('map');
-		$toplevel = safe_POST('toplevel', WT_REGEX_INTEGER, null);
-		$useflagsgen = safe_POST('useflagsgen');
-		$detailsgen = safe_POST('detailsgen', WT_REGEX_INTEGER, null);
+		$descr = WT_Filter::get('descr');
+		$subdiv = WT_Filter::getInteger('subdiv', -1, PHP_INT_MAX, -1);
+		$map = WT_Filter::get('map');
+		$toplevel = WT_Filter::getInteger('toplevel', -100, PHP_INT_MAX, -100);
+		$useflagsgen = WT_Filter::get('useflagsgen');
+		$detailsgen = WT_Filter::getInteger('detailsgen', -1, PHP_INT_MAX, -1);
 
 		$controller = new WT_Perso_Controller_PlainAjax();
 
@@ -925,7 +925,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			'text'	=>	WT_I18N::translate('An error occured while adding new element.')
 		);
 
-		if(WT_USER_IS_ADMIN && $descr && $subdiv && $useflagsgen && $detailsgen >= 0){
+		if(WT_USER_IS_ADMIN && $descr && $subdiv >= 0 && $useflagsgen && $detailsgen >= -1){
 			$sql = 'INSERT INTO ##pgeodispersion'.
 				' (pg_file, pg_descr, pg_sublevel, pg_map, pg_toplevel, pg_status, pg_useflagsgen, pg_detailsgen)'.
 				' VALUES (?, ?, ?, ?, ?, "enabled", ?, ?)';
@@ -933,7 +933,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 				WT_DB::getInstance()->beginTransaction();
 				if($map == 'nomap' || $toplevel == -1){
 					$map = null;
-					$toplevel = null;
+					$toplevel = -100;
 				}
 				WT_DB::prepare($sql)->execute(array(WT_GED_ID, $descr, $subdiv, $map, $toplevel, $useflagsgen, $detailsgen));
 				$id = WT_DB::getInstance()->lastInsertId();
@@ -985,11 +985,11 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			$placesDispGeneral['unknown'] = 0;
 			$placesDispGeneral['max'] = 0;
 			foreach($sosalist as $sosaid => $gens) {
-				$sosa = WT_Perso_Person::getIntance($sosaid);
+				$sosa = WT_Perso_Individual::getIntance($sosaid);
 				$place =$sosa->getEstimatedBirthPlace();
 				$genstab = explode(',', $gens); 
 				$isUnknown=true;
-				if($sosa->getDerivedRecord()->canDisplayDetails() && !is_null($place)){
+				if($sosa->getDerivedRecord()->canShow() && !is_null($place)){
 					$levels = array_reverse(array_map('trim',explode(',', $place)));
 					if(count($levels)>= $subdivlevel){
 						$toplevelvalues = array_map('trim',explode(',', strtolower($toplevelvalue)));

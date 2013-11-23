@@ -28,7 +28,7 @@ class WT_Perso_Functions {
 	 */
 	static public function promptAlert($text){
 		echo '<script>';
-		echo 'alert("',htmlspecialchars($text),'")';
+		echo 'alert("',WT_Filter::escapeHtml($text),'")';
 		echo '</script>';
 	}
 	
@@ -221,6 +221,11 @@ class WT_Perso_Functions {
 		    return iconv('utf-8', 'cp1252' ,$string);
 		}
 		return $string;
+	}
+	
+	public static function isValidPath($filename, $acceptfolder = FALSE) {		
+		if(strpbrk($filename, $acceptfolder ? '?%*:|"<>' : '\\/?%*:|"<>') === FALSE) return true;
+		return false;
 	}
 	
 }

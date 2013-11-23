@@ -145,7 +145,7 @@ class perso_certificates_WT_Module extends WT_Module implements WT_Perso_Module_
 				if($tag == '_ACT') $certificate= new WT_Perso_Certificate($text);
 			}
 			
-			if($certificate && $certificate->canDisplayDetails()) 
+			if($certificate && $certificate->canShow()) 
 				$html = $this->getDisplay_ACT($certificate, $sid);
 			
 		}		

@@ -97,8 +97,8 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 							<form id="perso-login-form" name="perso-login-form" method="post" action="'.WT_LOGIN_URL.'" onsubmit="t = new Date(); this.usertime.value=t.getFullYear()+\'-\'+(t.getMonth()+1)+\'-\'+t.getDate()+\' \'+t.getHours()+\':\'+t.getMinutes()+\':\'+t.getSeconds(); return true;">
 							<input type="hidden" name="action" value="login">
 							<input type="hidden" name="url" value="index.php">
-							<input type="hidden" name="ged" value="'; if (isset($ged)) $content.= htmlspecialchars($ged); else $content.= htmlentities(WT_GEDCOM); $content.= '">
-							<input type="hidden" name="pid" value="'; if (isset($pid)) $content.= htmlspecialchars($pid); $content.= '">
+							<input type="hidden" name="ged" value="'; if (isset($ged)) $content.= WT_Filter::escapeHtml($ged); else $content.= htmlentities(WT_GEDCOM); $content.= '">
+							<input type="hidden" name="pid" value="'; if (isset($pid)) $content.= WT_Filter::escapeHtml($pid); $content.= '">
 							<input type="hidden" name="usertime" value="">';
 			$content.= '<div>
 							<label for="perso-username">'. WT_I18N::translate('Username').
@@ -162,11 +162,11 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 
 	// Implement class WT_Module_Block
 	public function configureBlock($block_id) {
-		if (safe_POST_bool('save')) {
-			set_block_setting($block_id, 'piwik_enabled',  safe_POST_bool('piwik_enabled'));
-			set_block_setting($block_id, 'piwik_url',  safe_POST('piwik_url'));
-			set_block_setting($block_id, 'piwik_siteid',  safe_POST('piwik_siteid'));
-			set_block_setting($block_id, 'piwik_token',  safe_POST('piwik_token'));
+		if (WT_Filter::postBool('save')) {
+			set_block_setting($block_id, 'piwik_enabled',  WT_Filter::postBool('piwik_enabled'));
+			set_block_setting($block_id, 'piwik_url',  WT_Filter::post('piwik_url'));
+			set_block_setting($block_id, 'piwik_siteid',  WT_Filter::post('piwik_siteid'));
+			set_block_setting($block_id, 'piwik_token',  WT_Filter::post('piwik_token'));
 			exit;
 		}
 		
@@ -237,7 +237,7 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		$controller=new WT_Controller_Ajax();
 		
 		$html = WT_I18N::translate('No statistics could be retrieved from Piwik.');
-		$block_id = safe_GET('block_id');
+		$block_id = WT_Filter::get('block_id');
 		$piwik_url=get_block_setting($block_id, 'piwik_url', '');
 		if($block_id && WT_Perso_Functions::isUrlAlive($piwik_url)){
 			if(WT_Perso_Cache::isCached('piwikCountYear', $this)) {

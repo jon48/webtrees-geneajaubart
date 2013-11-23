@@ -38,17 +38,14 @@ class WT_Perso_Functions_Print {
 	/**
 	 * Return HTML code to include a flag icon in facts description
 	 *
-	 * @param string $factrec GEDCOM fact record
+	 * @param WT_Fact $factrec Fact record
 	 * @return string HTML code of the inserted flag
 	 */
-	public static function getFactPlaceIcon($factrec) {
+	public static function getFactPlaceIcon(WT_Fact $fact) {
 		$html='';
-		$ctpl = preg_match("/2 PLAC (.*)/", $factrec, $match);
-		if($ctpl>0){
-			$iconPlace=WT_Perso_Functions_Map::getPlaceIcon($match[1], 50);
-			if(count($iconPlace) != 0){
-				$html.='<div class="fact_flag">'.$iconPlace.'</div>';
-			}
+		$iconPlace=WT_Perso_Functions_Map::getPlaceIcon($fact->getPlace(), 50);
+		if(strlen($iconPlace) > 0){
+			$html.='<div class="fact_flag">'.$iconPlace.'</div>';
 		}
 		return $html;
 	}
@@ -102,16 +99,16 @@ class WT_Perso_Functions_Print {
 	/**
 	 * Return HTML Code to display individual in non structured list (e.g. Patronymic Lineages)
 	 *
-	 * @param WT_Person $individual Individual to print
+	 * @param WT_Individual $individual Individual to print
 	 * @param bool $isStrong Bolden the name ?
 	 * @return string HTML Code for individual item
 	 */
-	public static function getIndividualForList(WT_Person $individual, $isStrong = true){
+	public static function getIndividualForList(WT_Individual $individual, $isStrong = true){
 		$html = '';
 		$tag = 'em';
 		if($isStrong) $tag = 'strong';
-		if($individual && $individual->canDisplayDetails()){
-			$dindi = new WT_Perso_Person($individual);
+		if($individual && $individual->canShow()){
+			$dindi = new WT_Perso_Individual($individual);
 			$html = $individual->getSexImage();
 			$html .= '<a class="list_item" href="'.
 			$individual->getHtmlUrl().
@@ -133,27 +130,25 @@ class WT_Perso_Functions_Print {
 	/**
 	 * Format date to display short (just years)
 	 *
-	 * @param Event $eventObj Event to display date
+	 * @param WT_Fact $eventObj Fact to display date
 	 * @param boolean $anchor option to print a link to calendar
 	 * @return string HTML code for short date
 	 */
-	public static function formatFactDateShort(&$eventObj, $anchor=false) {
+	public static function formatFactDateShort(WT_Fact $fact, $anchor=false) {
 		global $SEARCH_SPIDER;
 
 		$html='';
-		if (!is_object($eventObj)) trigger_error("Must use Event object", E_USER_WARNING);
-		$factrec = $eventObj->getGedcomRecord();
-		if (preg_match('/2 DATE (.+)/', $factrec, $match)) {
-			$date = new WT_Date($match[1]);
+		$date = $fact->getDate();
+		if($date->isOK()){
 			$html.=' '.$date->Display($anchor && !$SEARCH_SPIDER, '%Y');
-		} else {
+		}
+		else{
 			// 1 DEAT Y with no DATE => print YES
+			// 1 BIRT 2 SOUR @S1@ => print YES
 			// 1 DEAT N is not allowed
 			// It is not proper GEDCOM form to use a N(o) value with an event tag to infer that it did not happen.
-			$factrec = str_replace("\nWT_OLD\n", '', $factrec);
-			$factrec = str_replace("\nWT_NEW\n", '', $factrec);
-			$factdetail = explode(' ', trim($factrec));
-			if (isset($factdetail)) if (count($factdetail) == 3) if (strtoupper($factdetail[2]) == 'Y') {
+			$factdetail = explode(' ', trim($fact->getGedcom()));
+			if (isset($factdetail) && (count($factdetail) == 3 && strtoupper($factdetail[2]) == 'Y') || (count($factdetail) == 4 && $factdetail[2] == 'SOUR')) {
 				$html.=WT_I18N::translate('yes');
 			}
 		}
@@ -163,19 +158,18 @@ class WT_Perso_Functions_Print {
 	/**
 	 * Format fact place to display short
 	 *
-	 * @param WT_Event $eventObj Event to display date
+	 * @param WT_Fact $eventObj Fact to display date
 	 * @param string $format Format of the place
 	 * @param boolean $anchor option to print a link to placelist
 	 * @return string HTML code for short place
 	 */
-	public static function formatFactPlaceShort(WT_Event $event, $format, $anchor=false){
+	public static function formatFactPlaceShort(WT_Fact $fact, $format, $anchor=false){
 		$html='';
 		
-		if ($event==null) return $html;
-
-		$place = $event->getPlace();
+		if ($fact==null) return $html;
+		$place = $fact->getPlace();
 		if($place){
-			$dplace = WT_Perso_Place::getIntance($place, WT_GED_ID);
+			$dplace = new WT_Perso_Place($place);
 			$html .= $dplace->getFormattedName($format, $anchor);
 		}
 		return $html;

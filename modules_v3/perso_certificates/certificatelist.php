@@ -86,15 +86,15 @@ function format_certificate_table($certificates, $city) {
 		}
 		//-- Certificate type
 		$type = $certificate->getCertificateType() ?: '';
-		$html .= '<td>'.htmlspecialchars($type).'</td>';
+		$html .= '<td>'.WT_Filter::escapeHtml($type).'</td>';
 		//-- Certificate name
 		$name = $certificate->getCertificateDetails() ?: '';
 		$sortname = "";
 		$ct_names=preg_match("/([A-Z]{2,})/", $name, $match);
 		if($ct_names>0) $sortname = $match[1].'_';
 		$sortname .= $name;
-		$html .= '<td>'.htmlspecialchars($sortname).'</td>';
-		$html .= '<td><a href="'.$certificate->getHtmlUrl().'">'.htmlspecialchars($name).'</a></td>';
+		$html .= '<td>'.WT_Filter::escapeHtml($sortname).'</td>';
+		$html .= '<td><a href="'.$certificate->getHtmlUrl().'">'.WT_Filter::escapeHtml($name).'</a></td>';
 		$html .= '</tr>';
 	}
 	$html .= '</tbody>';
@@ -104,8 +104,8 @@ function format_certificate_table($certificates, $city) {
 	return $html;
 }
 
-$cid = safe_GET('cid');
-$city = safe_GET('city');
+$cid = WT_Filter::get('cid');
+$city = WT_Filter::get('city');
 
 // check if the page can be displayed
 if(get_module_setting($this->getName(), 'PC_SHOW_CERT', WT_PRIV_HIDE) < WT_USER_ACCESS_LEVEL){
@@ -125,7 +125,7 @@ if($city && strlen($city) > 22){
 $certificate = null;
 if($cid && strlen($cid) > 22){
 	$certificate = WT_Perso_Certificate::getInstance($cid);
-	$city = $certificate->getCity() ?: $city;
+	if($certificate) $city = $certificate->getCity() ?: $city;
 }
 
 echo '<div class="pcertif-list-page center"><h2>', $controller->getPageTitle(),'</h2>';
@@ -152,8 +152,8 @@ if ($certificate){
 			jQuery("#certificate-tabs").css("visibility", "visible");
 		');	
 	
-	$tabIndi = $certificate->fetchLinkedIndividuals();
-	$tabFam = $certificate->fetchLinkedFamilies();
+	$tabIndi = $certificate->linkedIndividuals();
+	$tabFam = $certificate->linkedFamilies();
 	
 	echo '<div id="certificate-details">';
 	echo '<h4>',$certificate->getFullName(),'</h4>';

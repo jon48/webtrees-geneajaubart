@@ -29,6 +29,10 @@ if (!defined('WT_WEBTREES')) {
 echo '</div>'; // <div id="content">
 if ($view!='simple') {
 	echo '<div id="footer"><div class="block">', contact_links();
+	//PERSO Add Extra footer
+	$f_hook = new WT_Perso_Hook('h_print_footer');
+	$f_hook->execute();
+	//END PERSO
 	if (WT_DEBUG || get_gedcom_setting(WT_GED_ID, 'SHOW_STATS')) {
 		echo execution_stats();
 	}

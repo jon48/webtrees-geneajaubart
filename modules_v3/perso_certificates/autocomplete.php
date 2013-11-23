@@ -16,8 +16,8 @@ if (!defined('WT_WEBTREES')) {
 
 $controller = new WT_Perso_Controller_Json();
 
-$city = safe_GET('city');
-$contains = safe_GET('term');
+$city = WT_Filter::get('city');
+$contains = WT_Filter::get('term');
 
 $controller->pageHeader();
 header('Cache-Control: no-cache, must-revalidate');

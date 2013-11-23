@@ -26,7 +26,7 @@ class WT_Perso_Controller_Individual {
 	 */
 	public function __construct(WT_Controller_Individual  $ctrlIndividual_in){
 		$this->ctrlIndividual = $ctrlIndividual_in;
-		$this->dindi = new WT_Perso_Person($this->ctrlIndividual->getSignificantIndividual());
+		$this->dindi = new WT_Perso_Individual($this->ctrlIndividual->getSignificantIndividual());
 	}
 	
 	/**

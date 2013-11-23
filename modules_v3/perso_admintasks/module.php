@@ -115,7 +115,7 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 			->requireAdminLogin()
 			->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 			->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery.dataTables.fnReloadAjax.js')
+			->addExternalJavascript(WT_STATIC_URL.'js/jquery.datatables.fnReloadAjax.js')
 			->addInlineJavascript('jQuery("#tabs").tabs();')
 			->setPageTitle($this->getTitle())
 			->pageHeader();
@@ -268,8 +268,8 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 		$controller = new WT_Controller_Ajax();
 		$controller->pageHeader();
 		if(WT_Perso_Admin_Task::isModuleOperational()){
-			$taskname = safe_GET('task', WT_REGEX_ALPHANUM);
-			$token_submitted = safe_GET('force', WT_REGEX_ALPHANUM);
+			$taskname = WT_Filter::get('task', WT_REGEX_ALPHANUM);
+			$token_submitted = WT_Filter::get('force', WT_REGEX_ALPHANUM);
 			$token = get_module_setting($this->getName(), 'PAT_FORCE_EXEC_TOKEN');	
 					
 			$sql = 
@@ -319,11 +319,11 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 	private function editsetting(){
 	
 		if(WT_Perso_Admin_Task::isModuleOperational()){
-			$id=safe_POST('id', '[a-zA-Z0-9_-]+');
+			$id=WT_Filter::post('id', '[a-zA-Z0-9_-]+');
 			list($table, $id1, $id2, $id3, $id4)=explode('-', $id.'----');
 				
 			// The replacement value.
-			$value=safe_POST('value', WT_REGEX_UNSAFE);
+			$value=WT_Filter::post('value');
 		
 			// Validate the replacement value
 			if($id4 == 'validate' && !is_null($id1)){
@@ -477,25 +477,25 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 			' FROM `##padmintasks`';
 			$args=array();
 			
-			$sSearch=safe_GET('sSearch');
+			$sSearch=WT_Filter::get('sSearch');
 			if ($sSearch) {
 				$sql.=
 				' WHERE pat_name LIKE CONCAT("%", ?, "%")';
 				$args[]=$sSearch;
 			}
 			
-			$iSortingCols=safe_GET('iSortingCols');
+			$iSortingCols=WT_Filter::get('iSortingCols');
 			if ($iSortingCols) {
 				$sql.=" ORDER BY ";
 				for ($i=0; $i<$iSortingCols; ++$i) {
 					// Datatables numbers columns 0, 1, 2, ...
 					// MySQL numbers columns 1, 2, 3, ...
-					switch (safe_GET('sSortDir_'.$i)) {
+					switch (WT_Filter::get('sSortDir_'.$i)) {
 						case 'asc':
-							$sql.=(1+(int)safe_GET('iSortCol_'.$i)).' ASC ';
+							$sql.=(1+(int)WT_Filter::getInteger('iSortCol_'.$i)).' ASC ';
 							break;
 						case 'desc':
-							$sql.=(1+(int)safe_GET('iSortCol_'.$i)).' DESC ';
+							$sql.=(1+(int)WT_Filter::getInteger('iSortCol_'.$i)).' DESC ';
 							break;
 					}
 					if ($i<$iSortingCols-1) {
@@ -506,8 +506,8 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 				$sql.=' ORDER BY pat_name ASC';
 			}
 			
-			$iDisplayStart =(int)safe_GET('iDisplayStart');
-			$iDisplayLength=(int)safe_GET('iDisplayLength');
+			$iDisplayStart =(int)WT_Filter::getInteger('iDisplayStart');
+			$iDisplayLength=(int)WT_Filter::getInteger('iDisplayLength');
 			if ($iDisplayLength>0) {
 				$sql.=" LIMIT " . $iDisplayStart . ',' . $iDisplayLength;
 			}
@@ -562,7 +562,7 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 		
 		$controller->pageHeader();
 		echo json_encode(array( // See http://www.datatables.net/usage/server-side
-				'sEcho'               =>(int)safe_GET('sEcho'),
+				'sEcho'               =>(int)WT_Filter::getInteger('sEcho'),
 				'iTotalRecords'       =>$iTotalRecords,
 				'iTotalDisplayRecords'=>$iTotalDisplayRecords,
 				'aaData'              =>$aaData

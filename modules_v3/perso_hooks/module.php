@@ -99,14 +99,16 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 			
 			$module_names=WT_DB::prepare("SELECT module_name FROM `##module` WHERE status='disabled'")->fetchOneColumn();		
 			
+			$isposted = WT_Filter::postBool('ispost') && WT_Filter::checkCsrf();
+			
 			if($ihooks!=null){
 				foreach ($ihooks as $ihook => $params) {
 					$array_hook = explode('#', $ihook);
 					//Update status
-					$new_status=safe_POST("status-{$params['id']}");
+					$new_status=WT_Filter::post("status-{$params['id']}");
 					if(in_array($array_hook[0], $module_names)) $new_status=0;
 					$previous_status=$params['status'];	
-					if ($new_status!==null) {
+					if ($isposted && $new_status!==null) {
 						$new_status= $new_status ? 'enabled' : 'disabled';
 						if($new_status != $previous_status){
 							$chook = new WT_Perso_Hook($array_hook[1], $array_hook[2]);
@@ -123,9 +125,9 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 						}
 					}
 					//Update priority
-					$new_priority=safe_POST("moduleorder-{$params['id']}");
+					$new_priority=WT_Filter::post("moduleorder-{$params['id']}");
 					$previous_priority=$params['priority'];	
-					if ($new_priority!==null) {
+					if ($isposted && $new_priority!==null) {
 						if($new_priority != $previous_priority){
 							$chook = new WT_Perso_Hook($array_hook[1], $array_hook[2]);
 							$chook->setPriority($array_hook[0], $new_priority);
@@ -156,6 +158,8 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 			'<div id="tabs">';
 		echo WT_I18N::translate('Help').help_link('admin_config', $this->getName());
 		echo '<form method="post" action="#">',
+					WT_Filter::getCsrf(),
+					'<input type="hidden" name="ispost" value="true">',
 					'<table id="installed_table" class="tablesorter" border="0" cellpadding="0" cellspacing="1">',
 						'<thead>',
 							'<tr>',

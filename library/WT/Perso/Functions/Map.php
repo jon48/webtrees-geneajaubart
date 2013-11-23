@@ -23,23 +23,21 @@ class WT_Perso_Functions_Map {
 	/**
 	 * Return HTML code for the flag icon of the requested place
 	 *
-	 * @param string $place The place to find
+	 * @param WT_Place $place The place to find
 	 * @param int $height Height of the returned icon
 	 * @return string HTML code of the flag icon
 	 */
-	public static function getPlaceIcon($place, $height){
+	public static function getPlaceIcon(WT_Place $place, $height){
 		require_once WT_ROOT.WT_MODULES_DIR.'googlemap/googlemap.php'; // Cannot be outside of the function, causing issues with placehierarchy.php
 		
-		$latlongval = get_lati_long_placelocation($place);
-		if ((count($latlongval) == 0) && (!empty($GM_DEFAULT_TOP_VALUE))) {
-			$latlongval = get_lati_long_placelocation($place.", ".$GM_DEFAULT_TOP_VALUE);
+		if(!$place->isEmpty()){
+			$place_gedcom = $place->getGedcomName();
+			$latlongval = get_lati_long_placelocation($place_gedcom);
+			if($latlongval){
+				return '<img class="flag_gm_h'.$height.'" src="'.WT_MODULES_DIR.'googlemap/'.$latlongval->pl_icon.'" title="'.$place_gedcom.'" alt="'.$place_gedcom.'" />';
+			}
 		}
-		if(count($latlongval) != 0){
-			return '<img class="flag_gm_h'.$height.'" src="'.WT_MODULES_DIR.'googlemap/'.$latlongval['icon'].'" title="'.$place.'" alt="'.$place.'" />';
-		}
-		else{
-			return '';
-		}
+		return '';
 	}
 	
 	/**
@@ -82,18 +80,12 @@ class WT_Perso_Functions_Map {
 	 * @return NULL|array Place hierarchy array
 	 */
 	public static function getPlaceHierarchyHeader($ged_id = WT_GED_ID){
-		$hierarchyarray = null;
-		$head=find_other_record('HEAD', $ged_id);
-		$ct=preg_match('/1 PLAC/', $head, $match);
-		if ($ct > 0) {
-			$softrec=get_sub_record(1, '1 PLAC', $head);
-			$tt=preg_match('/2 FORM (.*)/', $softrec, $tmatch);
-			if ($tt > 0) {
-				$places=trim($tmatch[1]);
-				$hierarchyarray = array_reverse(array_map('trim',explode(',', $places)));
-			}
+		$head= WT_GedcomRecord::getInstance('HEAD');
+		$headplac = $head->getFirstFact('PLAC');
+		if($headplac && $headplacvalue = $headplac->getAttribute('FORM')){
+			return array_reverse(array_map('trim',explode(',', $headplacvalue)));
 		}
-		return $hierarchyarray;
+		return null;
 	}
 	
 	/**

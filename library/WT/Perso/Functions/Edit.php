@@ -26,8 +26,8 @@ class WT_Perso_Functions_Edit {
 	 * @return string HTML code for inline editable textbox
 	 */
 	static public function edit_module_field_inline($name, $value, $controller = null, $savingmodule = 'perso_config'){
-		$html='<span class="editable" id="' . $name . '">' . htmlspecialchars($value) . '</span>';
-		$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'module.php?mod='.$savingmodule.'&mod_action=admin_update_setting", {submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'"});';
+		$html='<span class="editable" id="' . $name . '">' . WT_Filter::escapeHtml($value) . '</span>';
+		$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'module.php?mod='.$savingmodule.'&mod_action=admin_update_setting", {submitdata: {csrf: WT_CSRF_TOKEN}, submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", style:"inherit", placeholder: "'.WT_I18N::translate('click to edit').'"});';
 
 		if ($controller) {
 			$controller->addInlineJavascript($js);
@@ -48,8 +48,8 @@ class WT_Perso_Functions_Edit {
 	 * @return string HTML code for inline editable text area
 	 */
 	static public function edit_module_longfield_inline($name, $value, $controller = null, $savingmodule = 'perso_config'){
-		$html='<span class="editable" id="' . $name . '">' . htmlspecialchars($value) . '</span>';
-		$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'module.php?mod='.$savingmodule.'&mod_action=admin_update_setting", {type:"textarea", submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", style:"inherit", rows: 5, placeholder: "'.WT_I18N::translate('click to edit').'"});';
+		$html='<span class="editable" id="' . $name . '">' . WT_Filter::escapeHtml($value) . '</span>';
+		$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'module.php?mod='.$savingmodule.'&mod_action=admin_update_setting", {type:"textarea", submitdata: {csrf: WT_CSRF_TOKEN}, submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", style:"inherit", rows: 5, placeholder: "'.WT_I18N::translate('click to edit').'"});';
 		
 		if ($controller) {
 			$controller->addInlineJavascript($js);
@@ -75,13 +75,13 @@ class WT_Perso_Functions_Edit {
 	static public function select_edit_control_inline($name, $values, $empty, $selected, $controller=null, $savingmodule = 'perso_config', $extra='') {
 		if (!is_null($empty)) {
 			// Push ''=>$empty onto the front of the array, maintaining keys
-			$tmp=array(''=>htmlspecialchars($empty));
+			$tmp=array(''=>WT_Filter::escapeHtml($empty));
 			foreach ($values as $key=>$value) {
-				$tmp[$key]=htmlspecialchars($value);
+				$tmp[$key]=WT_Filter::escapeHtml($value);
 			}
 			$values=$tmp;
 		}
-		$values['selected']=htmlspecialchars($selected);
+		$values['selected']=WT_Filter::escapeHtml($selected);
 		
 		$html='<span class="editable" id="' . $name . '">' .
 			(array_key_exists($selected, $values) ? $values[$selected] : '').
@@ -89,6 +89,7 @@ class WT_Perso_Functions_Edit {
 		$js='jQuery("#' . $name . '").editable("' . WT_SERVER_NAME . WT_SCRIPT_PATH . 'module.php?mod='.$savingmodule.'&mod_action=admin_update_setting",
 				{
 					type:"select", data:' . json_encode($values) . ', 
+					submitdata: {csrf: WT_CSRF_TOKEN},
 					submit:"&nbsp;&nbsp;' . WT_I18N::translate('OK') . '&nbsp;&nbsp;", 
 					style:"inherit",
 					placeholder: "'.WT_I18N::translate('click to edit').'",
@@ -150,7 +151,7 @@ class WT_Perso_Functions_Edit {
 	static public function ok($value) {
 		$controller = new WT_Perso_Controller_PlainAjax();		
 		$controller->pageHeader();
-		echo htmlspecialchars($value);
+		echo WT_Filter::escapeHtml($value);
 		exit;
 	}
 	

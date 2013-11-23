@@ -1,6 +1,6 @@
 <?php
 /**
- * Decorator class to extend native Person class.
+ * Decorator class to extend native Individual class.
  *
  * @package webtrees
  * @subpackage PersoLibrary
@@ -14,7 +14,7 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-class WT_Perso_Person extends WT_Perso_GedcomRecord {
+class WT_Perso_Individual extends WT_Perso_GedcomRecord {
 
 	// Cached results from various functions.
 	protected $_titles=null;
@@ -24,16 +24,16 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 	protected $_isdeathsourced = null;
 	
 	/**
-	 * Extend WT_Person getInstance, in order to retrieve directly a WT_Perso_Person object 
+	 * Extend WT_Individual getInstance, in order to retrieve directly a WT_Perso_Individual object 
 	 *
 	 * @param unknown_type $data Data to identify the individual
-	 * @return WT_Perso_Person|null WT_Perso_Person instance
+	 * @return WT_Perso_Individual|null WT_Perso_Individual instance
 	 */
 	public static function getIntance($data){
 		$dindi = null;
-		$indi = WT_Person::getInstance($data);
+		$indi = WT_Individual::getInstance($data);
 		if($indi){
-			$dindi = new WT_Perso_Person($indi);
+			$dindi = new WT_Perso_Individual($indi);
 		}
 		return $dindi;
 	}
@@ -46,17 +46,14 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 	public function getTitles(){
 		if(is_null($this->_titles)){
 			$this->_titles=array();
-			$ct = preg_match_all('/1 TITL (.*)/', $this->gedrec, $match);
-			if($ct>0){
-				$titles=$match[1];
-				foreach($titles as $title){
-					$ct2 = preg_match_all('/(.*) (('.get_module_setting('perso_general', 'PG_TITLE_PREFIX', '').')(.*))/', $title, $match2);
-					if($ct2>0){
-						$this->_titles[$match2[1][0]][]= trim($match2[2][0]);
-					}
-					else{
-						$this->_titles[$title][]="";
-					}
+			$titlefacts = $this->gedcomrecord->getFacts('TITL');
+			foreach($titlefacts as $titlefact){
+				$ct2 = preg_match_all('/(.*) (('.get_module_setting('perso_general', 'PG_TITLE_PREFIX', '').')(.*))/', $titlefact->getValue(), $match2);
+				if($ct2>0){
+					$this->_titles[$match2[1][0]][]= trim($match2[2][0]);
+				}
+				else{
+					$this->_titles[$titlefact->getValue()][]="";
 				}
 			}
 		}
@@ -140,7 +137,7 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 		$death_year = $this->gedcomrecord->getEstimatedDeathDate()->gregorianYear();
 		
 		if($this->_sosa && $this->_sosa[$sosa]){
-			$tmp_sosatable[] = array($this->gedcomrecord->getXref(), $this->gedcomrecord->getGedId(), $sosa, $this->_sosa[$sosa], $birth_year, $death_year); 
+			$tmp_sosatable[] = array($this->gedcomrecord->getXref(), $this->gedcomrecord->getGedcomId(), $sosa, $this->_sosa[$sosa], $birth_year, $death_year); 
 			
 			WT_Perso_Functions_Sosa::flushTmpSosaTable();
 				
@@ -149,11 +146,11 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 				$husb=$fam->getHusband();
 				$wife=$fam->getWife();
 				if($husb){
-					$dhusb = new WT_Perso_Person($husb);
+					$dhusb = new WT_Perso_Individual($husb);
 					$dhusb->addAndComputeSosa(2* $sosa);
 				}
 				if($wife){
-					$dwife = new WT_Perso_Person($wife);
+					$dwife = new WT_Perso_Individual($wife);
 					$dwife->addAndComputeSosa(2* $sosa + 1);
 				}
 			}
@@ -181,11 +178,11 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 				$husb=$fam->getHusband();
 				$wife=$fam->getWife();
 				if($husb){
-					$dhusb = new WT_Perso_Person($husb);
+					$dhusb = new WT_Perso_Individual($husb);
 					$dhusb->removeSosas();
 				}
 				if($wife){
-					$dwife = new WT_Perso_Person($wife);
+					$dwife = new WT_Perso_Individual($wife);
 					$dwife->removeSosas();
 				}
 			}
@@ -223,7 +220,7 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 		}
 		if(WT_Perso_Functions_Sosa::isModuleOperational()){
 			$this->_sosa = WT_DB::prepare('SELECT ps_sosa, ps_gen FROM ##psosa WHERE ps_i_id=? AND ps_file=?')
-				->execute(array($this->gedcomrecord->getXref(), $this->gedcomrecord->getGedId()))
+				->execute(array($this->gedcomrecord->getXref(), $this->gedcomrecord->getGedcomId()))
 				->fetchAssoc();
 			return $this->_sosa;
 		}
@@ -237,7 +234,7 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 	 * */
 	function isBirthSourced(){
 		if($this->_isbirthsourced != null) return $this->_isbirthsourced;
-		$this->_isbirthsourced = $this->isEventSourced(WT_EVENTS_BIRT);
+		$this->_isbirthsourced = $this->isFactSourced(WT_EVENTS_BIRT);
 		return $this->_isbirthsourced;
 	}
 	
@@ -248,7 +245,7 @@ class WT_Perso_Person extends WT_Perso_GedcomRecord {
 	* */
 	function isDeathSourced(){
 		if($this->_isdeathsourced != null) return $this->_isdeathsourced;
-		$this->_isdeathsourced = $this->isEventSourced(WT_EVENTS_DEAT);
+		$this->_isdeathsourced = $this->isFactSourced(WT_EVENTS_DEAT);
 		return $this->_isdeathsourced;
 	}
 	

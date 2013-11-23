@@ -46,7 +46,7 @@ class perso_issourced_WT_Module extends WT_Module implements WT_Module_Sidebar, 
 	//Implement WT_Perso_IndividualHeaderExtender
 	public function h_extend_indi_header_icons(WT_Controller_Individual $ctrlIndi) {
 		if($ctrlIndi){
-			$dindi = new WT_Perso_Person($ctrlIndi->getSignificantIndividual());
+			$dindi = new WT_Perso_Individual($ctrlIndi->getSignificantIndividual());
 			if ($dindi->canDisplayIsSourced()) return WT_Perso_Functions_Print::formatIsSourcedIcon('R', $dindi->isSourced(), 'INDI', 1, 'large');
 		}
 		return '';
@@ -66,8 +66,8 @@ class perso_issourced_WT_Module extends WT_Module implements WT_Module_Sidebar, 
 	//Implement WT_Perso_Module_RecordNameTextExtender
 	public function h_rn_append(WT_GedcomRecord $grec){
 		$html = '';
-		if($grec instanceof WT_Person){
-			$dindi = new WT_Perso_Person($grec);
+		if($grec instanceof WT_Individual){
+			$dindi = new WT_Perso_Individual($grec);
 			$html .= WT_Perso_Functions_Print::formatIsSourcedIcon('R', $dindi->isSourced(), 'INDI', 1, 'small');
 			$html .= WT_Perso_Functions_Print::formatIsSourcedIcon('E', $dindi->isBirthSourced(), 'BIRT', 1, 'small');
 			if($grec->isDead()) $html .= WT_Perso_Functions_Print::formatIsSourcedIcon('E', $dindi->isDeathSourced(), 'DEAT', 1, 'small');			
@@ -92,7 +92,7 @@ class perso_issourced_WT_Module extends WT_Module implements WT_Module_Sidebar, 
 		ob_start();
 		$root = $controller->getSignificantIndividual();
 		if ($root) {		
-			$dindi = new WT_Perso_Person($root);
+			$dindi = new WT_Perso_Individual($root);
 			
 			if (!$dindi->canDisplayIsSourced()) {
 				print_privacy_error();

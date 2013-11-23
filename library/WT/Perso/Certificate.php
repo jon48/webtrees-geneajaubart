@@ -15,36 +15,45 @@ if (!defined('WT_WEBTREES')) {
 }
 
 class WT_Perso_Certificate extends WT_Media {
+
+	const URL_PREFIX  = 'module.php?mod=perso_certificates&mod_action=certificatelist&cid=';
+	
+	private static $_isModuleOperational = -1;
 	
 	protected $certType = null;
 	protected $certDate = null;
 	protected $certDetails = null;
 	protected $source = null;
 	
+	/**
+	 * Return whether the Certificate module is active.
+	 *
+	 * @return bool True if module active, false otherwise
+	 */
+	public static function isModuleOperational(){
+		if(self::$_isModuleOperational == -1){
+			self::$_isModuleOperational = array_key_exists('perso_certificates', WT_Module::getActiveModules());
+		}
+		return self::$_isModuleOperational;
+	}
+	
 	// Extend WT_Media constructor
 	public function __construct($data) {
 		// Data is only the file name
-		$data = str_replace("\\", '/', $data);			
-		parent::__construct(
-			array(
-				'ged_id' => WT_GED_ID,
-				'xref' => WT_Perso_Functions::encryptToSafeBase64($data),
-				'type' => 'OBJE',
-				'm_titl' => null,
-				'm_filename' =>	$data,
-				'gedrec' => null
-			)
+		$data = str_replace("\\", '/', $data);
+		$xref = WT_Perso_Functions::encryptToSafeBase64($data);
+		$gedcom = sprintf(
+			'0 @%1$s@ OBJE'.PHP_EOL.
+			'1 FILE %2$s',
+			$xref, $data
 		);
+		parent::__construct($xref, $gedcom, '', WT_GED_ID);
 		
 		$this->title = basename($this->file, '.'.$this->extension());
-		$this->_gedrec .= 
-			'0 @'.$this->xref.'@ OBJE'."\n".
-			'1 FILE '.$this->file."\n".
-			'1 TITL '.$this->title;		
 		
 		$ct = preg_match("/(?<year>\d{1,4})(\.(?<month>\d{1,2}))?(\.(?<day>\d{1,2}))?( (?<type>[A-Z]{1,2}) )?(?<details>.*)/", $this->title, $match);
 		if($ct > 0){
-			$this->certDate = new WT_Date($match['day'].' '.WT_Date_Calendar::NUM_TO_GEDCOM_MONTH($match['month'], null).' '.$match['year']);
+			$this->certDate = new WT_Date($match['day'].' '.WT_Date_Calendar::NUM_TO_SHORT_MONTH($match['month'], null).' '.$match['year']);
 			$this->certType = $match['type'];
 			$this->certDetails = $match['details'];			
 		} else {
@@ -53,21 +62,27 @@ class WT_Perso_Certificate extends WT_Media {
 	}
 	
 	// Extend class WT_Media
-	static public function getInstance($data) {
-		return new WT_Perso_Certificate(WT_Perso_Functions::decryptFromSafeBase64($data));
+	static public function getInstance($data, $gedcom_id=WT_GED_ID, $gedcom=null) {
+		$certfile = WT_Perso_Functions::decryptFromSafeBase64($data);
+		
+		//NEED TO CHECK THAT !!!
+		if(WT_Perso_Functions::isValidPath($certfile, true)) {
+			return new WT_Perso_Certificate($certfile);
+		}
+		return null;
 	}
 		
 	// Extend class WT_Media
 	protected function _canDisplayDetailsByType($access_level) {
 		$linked_indis = $this->fetchLinkedIndividuals();
 		foreach ($linked_indis as $linked_indi) {
-			if ($linked_indi && !$linked_indi->canDisplayDetails($access_level)) {
+			if ($linked_indi && !$linked_indi->canShow($access_level)) {
 				return false;
 			}
 		}
 		$linked_fams = $this->fetchLinkedFamilies();
 		foreach ($linked_fams as $linked_fam) {
-			if ($linked_fam && !$linked_fam->canDisplayDetails($access_level)) {
+			if ($linked_fam && !$linked_fam->canShow($access_level)) {
 				return false;
 			}
 		}
@@ -131,16 +146,6 @@ class WT_Perso_Certificate extends WT_Media {
 	}
 	
 	// Extend class WT_Media
-	public function getHtmlUrl() {
-		return parent::_getLinkUrl('module.php?mod=perso_certificates&mod_action=certificatelist&cid=', '&amp;');
-	}
-	
-	// Extend class WT_Media
-	public function getRawUrl() {
-		return parent::_getLinkUrl('module.php?mod=perso_certificates&mod_action=certificatelist&cid=', '&');
-	}
-	
-	// Extend class WT_Media
 	public function getHtmlUrlDirect($which = 'main', $download = false) {
 		$sidstr = ($this->source) ? '&sid='.$this->source->getXref() : '';
 		return
@@ -158,7 +163,7 @@ class WT_Perso_Certificate extends WT_Media {
 	 */
 	 public function getWatermarkText(){	
 		$wmtext = get_module_setting('perso_certificates', 'PC_WM_DEFAULT', WT_I18N::translate('This image is protected under copyright law.'));
-		$sid= safe_GET_xref('sid');	
+		$sid= WT_Filter::get('sid', WT_REGEX_XREF);	
 	
 		if($sid){
 			$this->source = WT_Source::getInstance($sid);
@@ -169,12 +174,12 @@ class WT_Perso_Certificate extends WT_Media {
 		
 		if($this->source) {
 			$wmtext = '&copy;';
-			$rid = get_gedcom_value('REPO', 0, $this->source->getGedcomRecord());
-			if($rid && preg_match('/^@('.WT_REGEX_XREF.')@$/', $rid, $match)){
-				$repo = WT_Repository::getInstance($match[1]);
-				if($repo) $wmtext .= ' '.$repo->getFullName().' - ';
+			$repofact = $this->source->getFirstFact('REPO');
+			if($repofact) {
+				$repo = $repofact->getTarget();
+				if($repo && $repo instanceof WT_Repository)  $wmtext .= ' '.$repo->getFullName().' - ';
 			}
-			$wmtext .= $this->source->getFullName();
+			$wmtext .= $this->source->getFullName();			
 		}	
 		return $wmtext;
 	}
@@ -224,41 +229,38 @@ class WT_Perso_Certificate extends WT_Media {
 		'>' . $image . '</a>'.$script;
 	}
 	
-	/**
-	 * Returns the list of individuals linked to a certificate
-	 *
-	 * @return array List of individuals
-	 */
-	public function fetchLinkedIndividuals(){
+	//Extend class WT_GedcomRecord
+	public function linkedIndividuals($link = '_ACT'){
 		$rows = WT_DB::prepare(
-				'SELECT "INDI" AS type, i_id AS xref, i_file AS ged_id, i_gedcom AS gedrec'.
+				'SELECT i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom'.
 				' FROM `##individuals`'.
 				' WHERE i_file=? AND i_gedcom LIKE ?')
-		->execute(array(WT_GED_ID, '%_ACT '.$this->file.'%'))->fetchAll(PDO::FETCH_ASSOC);
+		->execute(array(WT_GED_ID, '%_ACT '.$this->file.'%'))->fetchAll();
 		
-		$list=array();
+		$list = array();
 		foreach ($rows as $row) {
-			$list[]=WT_Person::getInstance($row);
+			$record = WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
+			if ($record->canShowName()) {
+				$list[] = $record;
+			}
 		}
 		return $list;
 	}
 
-	/**
-	 * Returns the list of families linked to a certificate
-	 *
-	 * @param string $certif Path of the certificate file (as entered in the GEDCOM)
-	 * @return array List of families
-	 */
-	public function fetchLinkedFamilies(){
+	//Extend class WT_GedcomRecord
+	public function linkedFamilies($link = '_ACT'){
 		$rows = WT_DB::prepare(
-				'SELECT "FAM" AS type, f_id AS xref, f_file AS ged_id, f_gedcom AS gedrec'.
+				'SELECT f_id AS xref, f_file AS gedcom_id, f_gedcom AS gedcom'.
 				' FROM `##families`'.
 				' WHERE f_file=? AND f_gedcom LIKE ?')
-		->execute(array(WT_GED_ID, '%_ACT '.$this->file.'%'))->fetchAll(PDO::FETCH_ASSOC);
+		->execute(array(WT_GED_ID, '%_ACT '.$this->file.'%'))->fetchAll();
 		
-		$list=array();
+		$list = array();
 		foreach ($rows as $row) {
-			$list[]=WT_Family::getInstance($row);
+			$record = WT_Family::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
+			if ($record->canShowName()) {
+				$list[] = $record;
+			}
 		}
 		return $list;
 	}
@@ -276,17 +278,17 @@ class WT_Perso_Certificate extends WT_Media {
 		WT_DB::prepare(
 				'SELECT i_gedcom AS gedrec FROM `##individuals`'.
 				' WHERE i_file=? AND i_gedcom LIKE ?')
-				->execute(array($this->ged_id, '%_ACT '.$this->file.'%'))->fetchOne();
+				->execute(array($this->gedcom_id, '%_ACT '.$this->file.'%'))->fetchOne();
 		if(!$ged){
 			$ged = WT_DB::prepare(
 					'SELECT f_gedcom AS gedrec FROM `##families`'.
 					' WHERE f_file=? AND f_gedcom LIKE ?')
-					->execute(array($this->ged_id, '%_ACT '.$this->file.'%'))->fetchOne();
+					->execute(array($this->gedcom_id, '%_ACT '.$this->file.'%'))->fetchOne();
 			if(!$ged){
 				$ged = WT_DB::prepare(
 						'SELECT o_gedcom AS gedrec FROM `##other`'.
 						' WHERE o_file=? AND o_gedcom LIKE ?')
-						->execute(array($this->ged_id, '%_ACT '.$this->file.'%'))->fetchOne();
+						->execute(array($this->gedcom_id, '%_ACT '.$this->file.'%'))->fetchOne();
 			}
 		}
 		//If a record has been found, parse it to find the source reference.

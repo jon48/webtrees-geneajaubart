@@ -52,9 +52,9 @@ echo
 	'<link rel="stylesheet" type="text/css" href="', WT_CSS_URL, 'style.css', '">';
 
 //PERSO Add extra style sheet for personal additions
-echo '<link rel="stylesheet" type="text/css" href="', WT_THEME_URL, 'style.extra.css', '">';
+echo '<link rel="stylesheet" type="text/css" href="', WT_CSS_URL, 'style.extra.css', '">';
 // and Java script for Certificate Module
-$this->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.'perso_certificates/js/activatecolorbox.js');
+if(WT_Perso_Certificate::isModuleOperational())	$this->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.'perso_certificates/js/activatecolorbox.js');
 //END PERSO
 
 switch ($BROWSERTYPE) {

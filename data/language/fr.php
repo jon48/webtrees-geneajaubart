@@ -375,6 +375,7 @@ return array(
 	'Done'							=>	'Terminé',
 	'%s Settings'					=>	'Configuration : %s',
 	'no_token_defined'				=>	'aucun_jeton_défini',
+	'webtrees Site Administrator'	=>	'Administrateur webtrees',
 	'Healthcheck Email'				=>	'État du système',
 	'Health Check Report'			=>	'État du système',
 	'Enable healthcheck emails for <em>%s</em>'
@@ -404,7 +405,9 @@ return array(
 	'Translations status'			=>	'Statut des traductions',
 	'Missing translations'			=>	'Traductions manquantes',
 	'Message Id'					=>	'Id du message',
-	'Removed personal translations'	=>	'Traductions personnelles supprimées'
+	'Removed personal translations'	=>	'Traductions personnelles supprimées',
+	'Please make sure to <a href="%s">generate the PO template</a> beforehand.'
+									=>	'Assurez-vous d\'avoir <a href="%s">généré le fichier POT</a> auparavant'
 									
 );
 

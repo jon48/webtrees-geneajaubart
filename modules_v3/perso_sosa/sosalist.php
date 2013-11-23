@@ -16,7 +16,7 @@ if (!defined('WT_WEBTREES')) {
 
 global $controller;
 
-$selectedgen = safe_REQUEST($_REQUEST, 'gen', WT_REGEX_INTEGER, null);
+$selectedgen = WT_Filter::post('gen', WT_REGEX_INTEGER, WT_Filter::getInteger('gen'));
 
 $controller=new WT_Controller_Page();
 $controller
@@ -40,7 +40,7 @@ $controller
 			}
 		).error(
 			function(){
-				jQuery("#sosalist-indi-data").html("'.addslashes('<p class="warning">'.WT_I18N::translate('An error occurred while retrieving data...').'</p>').'");
+				jQuery("#sosalist-indi-data").html("'.WT_Filter::escapeJs('<p class="warning">'.WT_I18N::translate('An error occurred while retrieving data...').'</p>').'");
 			    jQuery("#loading-indi").hide();
 			}
 		);
@@ -58,7 +58,7 @@ $controller
 			}
 		).error(
 			function(){
-				jQuery("#sosalist-fam-data").html("'.addslashes('<p class="warning">'.WT_I18N::translate('An error occurred while retrieving data...').'</p>').'");
+				jQuery("#sosalist-fam-data").html("'.WT_Filter::escapeJs('<p class="warning">'.WT_I18N::translate('An error occurred while retrieving data...').'</p>').'");
 			    jQuery("#loading-fam").hide();
 			}
 		);
@@ -87,7 +87,7 @@ if($maxGen>0){
 		'<input type="submit" value="', WT_I18N::translate('Show'), '" /><br />',
 		'</form>';
 
-	if($selectedgen){
+	if($selectedgen > 0){
 		echo '<h4>',
 			'<a href="module.php?mod=perso_sosa&mod_action=sosalist&gen=',$selectedgen-1,'"><i class="icon-ldarrow" title="',WT_I18N::translate('Previous generation'),'" ></i>&nbsp;&nbsp;</a>',
 			WT_I18N::translate('Generation %d', $selectedgen),
