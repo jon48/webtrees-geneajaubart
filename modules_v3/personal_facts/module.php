@@ -53,7 +53,7 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 		$EXPAND_HISTO_EVENTS = false;
 
 		$indifacts = array();
-		// The individual's own facts
+		// The individual’s own facts
 		foreach ($controller->record->getFacts() as $fact) {
 			switch ($fact->getTag()) {
 			case 'SEX':
@@ -243,7 +243,7 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 				// We are not our own sibling!
 				continue;
 			}
-			// add child's birth
+			// add child’s birth
 			if (strpos($SHOW_RELATIVES_EVENTS, '_BIRT'.str_replace('_HSIB', '_SIBL', $option))!==false) {
 				foreach ($child->getFacts(WT_EVENTS_BIRT) as $fact) {
 					$sgdate=$fact->getDate();
@@ -268,7 +268,7 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 					}
 				}
 			}
-			// add child's death
+			// add child’s death
 			if (strpos($SHOW_RELATIVES_EVENTS, '_DEAT'.str_replace('_HSIB', '_SIBL', $option))!==false) {
 				foreach ($child->getFacts(WT_EVENTS_DEAT) as $fact) {
 					$sgdate=$fact->getDate();
@@ -293,7 +293,7 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 					}
 				}
 			}
-			// add child's marriage
+			// add child’s marriage
 			if (strstr($SHOW_RELATIVES_EVENTS, '_MARR'.str_replace('_HSIB', '_SIBL', $option))) {
 				foreach ($child->getSpouseFamilies() as $sfamily) {
 					foreach ($sfamily->getFacts(WT_EVENTS_MARR) as $fact) {
@@ -428,6 +428,10 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 			if (file_exists(WT_Site::preference('INDEX_DIRECTORY') . 'histo.' . WT_LOCALE . '.php')) {
 				require WT_Site::preference('INDEX_DIRECTORY') . 'histo.' . WT_LOCALE . '.php';
 				foreach ($histo as $hist) {
+					// Earlier versions of the WIKI encouraged people to use HTML entities,
+					// rather than UTF8 encoding.
+					$hist = html_entity_decode($hist, ENT_QUOTES, 'UTF-8');
+					
 					$fact = new WT_Fact($hist, $person, 'histo');
 					$sdate = $fact->getDate();
 					if ($sdate->isOK() && WT_Date::Compare($birt_date, $sdate)<=0 && WT_Date::Compare($sdate, $deat_date)<=0) {

@@ -48,7 +48,7 @@ class WT_Controller_Page extends WT_Controller_Base {
 		}
 	}
 
-	// What should this page show in the browser's title bar?
+	// What should this page show in the browser’s title bar?
 	public function setPageTitle($page_title) {
 		$this->page_title=$page_title;
 		return $this;
@@ -125,15 +125,14 @@ class WT_Controller_Page extends WT_Controller_Base {
 
 	// Print the page header, using the theme
 	public function pageHeader() {
-		// Import global variables into the local scope, for the theme's header.php
-		global $BROWSERTYPE, $SEARCH_SPIDER, $TEXT_DIRECTION, $REQUIRE_AUTHENTICATION;
-		global $headerfile, $view;
+		// Import global variables into the local scope, for the theme’s header.php
+		global $SEARCH_SPIDER, $TEXT_DIRECTION, $REQUIRE_AUTHENTICATION, $headerfile, $view;
 
 		// The title often includes the names of records, which may have markup
 		// that cannot be used in the page title.
 		$title=html_entity_decode(strip_tags($this->page_title), ENT_QUOTES, 'UTF-8');
 
-		// Initialise variables for the theme's header.php
+		// Initialise variables for the theme’s header.php
 		$LINK_CANONICAL  =$this->canonical_url;
 		$META_ROBOTS     =$this->meta_robots;
 		$META_DESCRIPTION=WT_GED_ID ? get_gedcom_setting(WT_GED_ID, 'META_DESCRIPTION') : '';
@@ -159,7 +158,6 @@ class WT_Controller_Page extends WT_Controller_Base {
 			var WT_GED_ID      = "' . WT_Filter::escapeJs(WT_GED_ID)                 . '";
 			var WT_USER_ID     = "' . WT_Filter::escapeJs(WT_USER_ID)                . '";
 			var textDirection  = "' . WT_Filter::escapeJs($TEXT_DIRECTION)           . '";
-			var browserType    = "' . WT_Filter::escapeJs($BROWSERTYPE)              . '";
 			var WT_SCRIPT_NAME = "' . WT_Filter::escapeJs(WT_SCRIPT_NAME)            . '";
 			var WT_LOCALE      = "' . WT_Filter::escapeJs(WT_LOCALE)                 . '";
 			var WT_CSRF_TOKEN  = "' . WT_Filter::escapeJs(WT_Filter::getCsrfToken()) . '";
@@ -172,11 +170,6 @@ class WT_Controller_Page extends WT_Controller_Base {
 				jQuery("a.icon_arrow").attr("href", "#");
 			}
 		');
-
-		// Tell IE to use standards mode instead of compatability mode.
-		if ($BROWSERTYPE=='msie') {
-			header("X-UA-Compatible: IE=Edge");
-		}
 
 		header('Content-Type: text/html; charset=UTF-8');
 		require WT_ROOT.$headerfile;

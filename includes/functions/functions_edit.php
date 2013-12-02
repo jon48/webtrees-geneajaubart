@@ -307,7 +307,7 @@ function remove_links($gedrec, $xref) {
 	return $gedrec;
 }
 
-// generates javascript code for calendar popup in user's language
+// generates javascript code for calendar popup in user’s language
 function print_calendar_popup($id) {
 	return
 		' <a href="#" onclick="cal_toggleDate(\'caldiv'.$id.'\', \''.$id.'\'); return false;" class="icon-button_calendar" title="'.WT_I18N::translate('Select a date').'"></a>'.
@@ -1530,7 +1530,7 @@ function insert_missing_subtags($level1tag, $add_date=false) {
 			add_simple_tag('2 DATE', $level1tag, WT_Gedcom_Tag::getLabel("{$level1tag}:DATE"));
 		}
 	}
-	// Do something (anything!) with unrecognised custom tags
+	// Do something (anything!) with unrecognized custom tags
 	if (substr($level1tag, 0, 1)=='_' && $level1tag!='_UID' && $level1tag!='_TODO')
 		foreach (array('DATE', 'PLAC', 'ADDR', 'AGNC', 'TYPE', 'AGE') as $tag)
 			if (!in_array($tag, $tags)) {

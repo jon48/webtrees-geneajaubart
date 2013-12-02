@@ -238,7 +238,7 @@ case 'load_json':
 
 		// Filter unused files
 		if ($sSearch) {
-			// Lambda functions can't be used until PHP5.3
+			// Lambda functions can’t be used until PHP5.3
 			//$unused_files = array_filter($unused_files, function($x) use ($sSearch) {return strpos($x, $sSearch)!==false;});
 			function substr_search($x) {global $sSearch; return strpos($x, $sSearch)!==false;}
 			$unused_files = array_filter($unused_files, 'substr_search');
@@ -351,7 +351,7 @@ function scan_dirs($dir, $recursive, $filter) {
 		foreach (scandir($dir) as $path) {
 			if (is_dir($dir . $path)) {
 				// TODO - but what if there are user-defined subfolders “thumbs” or “watermarks”…
-				if ($path!='.' && $path!='..' && $path!='thumbs' && $path!='watermarks' && $recursive) {
+				if ($path!='.' && $path!='..' && $path!='thumbs' && $path!='watermark' && $recursive) {
 					foreach (scan_dirs($dir . $path . '/', $recursive, $filter) as $subpath) {
 						$files[] = $path . '/' . $subpath;
 					}

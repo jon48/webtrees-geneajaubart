@@ -56,39 +56,14 @@ echo '<div id="x">';// div x - manages the accordion effect
 echo '<h2>', WT_WEBTREES, ' ', WT_VERSION, '</h2>',
 	'<div id="about">',
 	'<p>', WT_I18N::translate('These pages provide access to all the configuration settings and management tools for this <b>webtrees</b> site.'), '</p>',
-	'<p>',  /* I18N: %s is a URL/link to the project website */ WT_I18N::translate('Support and documentation can be found at %s.', ' <a class="current" href="http://webtrees.net/">webtrees.net</a>'), '</p>',
-	'</div>';
+	'<p>',  /* I18N: %s is a URL/link to the project website */ WT_I18N::translate('Support and documentation can be found at %s.', ' <a class="current" href="http://webtrees.net/">webtrees.net</a>'), '</p>';
 
 // Accordion block for UPGRADE - only shown when upgrades are available
 if (WT_USER_IS_ADMIN && $latest_version && version_compare(WT_VERSION, $latest_version)<0) {
-	echo
-		'<h2><span class="warning">',
-		/* I18N: %s is a version number */ WT_I18N::translate('Upgrade to webtrees %s', $latest_version),
-		'</span></h2>',
-		'<div>',
-		'<h3>', WT_I18N::translate('Upgrade instructions'), '</h3>',
-		'<ul>',
-		'<li>', /* I18N: %s is a URL/link to a .ZIP file */ WT_I18N::translate('Download %s and extract the files.', '<a class="current" href="'.$download_url.'">'.basename($download_url).'</a>'), '</li>';
-	if (version_compare(WT_VERSION, $earliest_version)<0) {
-		echo '<li>', WT_I18N::translate('Accept or reject any pending changes.'), '</li>';
-		echo '<li>', WT_I18N::translate('Save all your family trees to disk, by using the “export” function for each one.'), '</li>';
-	}
-
-	echo '<li>', WT_I18N::translate('Copy the new files to the web server, replacing any that have the same name.'), '</li>';
-
-	if (version_compare(WT_VERSION, $earliest_version)<0) {
-		echo '<li>', WT_I18N::translate('Load all your family trees from disk, by using the “import” function for each one.'), '</li>';
-	}
-
-	echo
-		'</ul>',
-		'<h3>', WT_I18N::translate('Recommendations'), '</h3>',
-		'<ul>',
-		'<li>', WT_I18N::translate('Make a backup of your database before you start.'), '</li>',
-		'<li>', /* I18N: %s is a filename */ WT_I18N::translate('Take your site offline while copying the new files.  Do this by temporarily creating a file %s on the web server.', '<tt style="white-space:nowrap">'.WT_ROOT.'data/offline.txt'.'</tt>'), '</li>',
-		'</ul>',
-		'</div>';
+	echo '<p>', WT_I18N::translate('A new version of webtrees is available.'), ' <a href="admin_site_upgrade.php"><span class="error">',  WT_I18N::translate('Upgrade to webtrees %s', WT_Filter::escapeHtml($latest_version)), '</span></a></p>';
 }
+
+echo '</div>';
 
 // Accordion block for DELETE OLD FILES - only shown when old files are found
 $old_files_found=false;
@@ -350,7 +325,6 @@ function old_paths() {
 		WT_ROOT.'themes/clouds/print.css',
 		WT_ROOT.'themes/clouds/style_rtl.css',
 		WT_ROOT.'themes/colors/chrome.css',
-		WT_ROOT.'themes/colors/css/common.css',
 		WT_ROOT.'themes/colors/opera.css',
 		WT_ROOT.'themes/colors/print.css',
 		WT_ROOT.'themes/colors/style_rtl.css',
@@ -460,12 +434,16 @@ function old_paths() {
 		WT_ROOT.'modules_v3/googlemap/wt_v3_pedigree_map.js.php',
 		WT_ROOT.'modules_v3/lightbox/js/tip_balloon_RTL.js',
 		// Removed in 1.3.2
+		WT_ROOT.'includes/set_gedcom_defaults.php',
 		WT_ROOT.'modules_v3/address_report',
+		WT_ROOT.'modules_v3/lightbox/functions/lb_horiz_sort.php',
+		WT_ROOT.'modules_v3/random_media/help_text.php',
 		// Removed in 1.4.0
 		WT_ROOT.'imageview.php',
 		WT_ROOT.'includes/functions/functions_media_reorder.php',
 		WT_ROOT.'js/jquery',
 		WT_ROOT.'js/jw_player',
+		WT_ROOT.'js/modernizr.custom-2.6.1.js',
 		WT_ROOT.'js/webtrees.js',
 		WT_ROOT.'media/MediaInfo.txt',
 		WT_ROOT.'media/thumbs/ThumbsInfo.txt',
@@ -518,6 +496,8 @@ function old_paths() {
 		WT_ROOT.'includes/functions/functions_privacy.php',
 		WT_ROOT.'includes/media_reorder.php',
 		WT_ROOT.'includes/old_messages.php',
+		WT_ROOT.'js/jquery-1.9.1.js',
+		WT_ROOT.'js/jquery.cookie-1.3.1.js',
 		WT_ROOT.'js/webtrees-1.4.2.js',
 		WT_ROOT.'library/WT/Event.php',
 		WT_ROOT.'library/WT/Person.php',
@@ -537,23 +517,7 @@ function old_paths() {
 		WT_ROOT.'themes/clouds/images',
 		WT_ROOT.'themes/clouds/msie.css',
 		WT_ROOT.'themes/clouds/style.css',
-		WT_ROOT.'themes/colors/css/aquamarine.css',
-		WT_ROOT.'themes/colors/css/ash.css',
-		WT_ROOT.'themes/colors/css/belgianchocolate.css',
-		WT_ROOT.'themes/colors/css/bluelagoon.css',
-		WT_ROOT.'themes/colors/css/bluemarine.css',
-		WT_ROOT.'themes/colors/css/coffeeandcream.css',
-		WT_ROOT.'themes/colors/css/coldday.css',
-		WT_ROOT.'themes/colors/css/colors.css',
-		WT_ROOT.'themes/colors/css/greenbeam.css',
-		WT_ROOT.'themes/colors/css/mediterranio.css',
-		WT_ROOT.'themes/colors/css/mercury.css',
-		WT_ROOT.'themes/colors/css/nocturnal.css',
-		WT_ROOT.'themes/colors/css/olivia.css',
-		WT_ROOT.'themes/colors/css/pinkplastic.css',
-		WT_ROOT.'themes/colors/css/sage.css',
-		WT_ROOT.'themes/colors/css/shinytomato.css',
-		WT_ROOT.'themes/colors/css/tealtop.css',
+		WT_ROOT.'themes/colors/css',
 		WT_ROOT.'themes/colors/favicon.png',
 		WT_ROOT.'themes/colors/images',
 		WT_ROOT.'themes/colors/ipad.css',
@@ -574,6 +538,15 @@ function old_paths() {
 		WT_ROOT.'themes/xenea/images',
 		WT_ROOT.'themes/xenea/msie.css',
 		WT_ROOT.'themes/xenea/style.css',
+		// Removed in 1.5.1
+		WT_ROOT.'js/webtrees-1.5.0.js',
+		WT_ROOT.'themes/_administration/css-1.5.0',
+		WT_ROOT.'themes/clouds/css-1.5.0',
+		WT_ROOT.'themes/colors/css-1.5.0',
+		WT_ROOT.'themes/fab/css-1.5.0',
+		WT_ROOT.'themes/minimal/css-1.5.0',
+		WT_ROOT.'themes/webtrees/css-1.5.0',
+		WT_ROOT.'themes/xenea/css-1.5.0',
 	);
 }
 

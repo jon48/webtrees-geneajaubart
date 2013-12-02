@@ -88,7 +88,7 @@ class WT_I18N {
 					$prefs=array();
 				}
 				if (WT_GED_ID) {
-					// Add the gedcom's default language as a low-priority
+					// Add the tree’s default language as a low-priority
 					$locale=get_gedcom_setting(WT_GED_ID, 'LANGUAGE');
 					$prefs[]=$locale.';q=0.2';
 				}
@@ -148,7 +148,7 @@ class WT_I18N {
 		// Extract language settings from the translation file
 		global $DATE_FORMAT; // I18N: This is the format string for full dates.  See http://php.net/date for codes
 		$DATE_FORMAT=self::noop('%j %F %Y');
-		global $TIME_FORMAT; // I18N: This a the format string for the time-of-day.  See http://php.net/date for codes
+		global $TIME_FORMAT; // I18N: This is the format string for the time-of-day.  See http://php.net/date for codes
 		$TIME_FORMAT=self::noop('%H:%i:%s');
 		global $ALPHABET_upper; // Alphabetic sorting sequence (upper-case letters), used by webtrees to sort strings
 		$ALPHABET_upper=self::noop('ALPHABET_upper=ABCDEFGHIJKLMNOPQRSTUVWXYZ');

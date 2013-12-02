@@ -449,6 +449,7 @@ html[dir=rtl] #story_module th {text-align:right;}
 html[dir=rtl] #story_module2 th, html[dir=rtl] #story_module2 td {text-align:right;}
 table#story_table {width:100%}
 #story_table_wrapper  {margin-top: 20px;}
+#admin_content form {padding:10px 0;}
 
 /* Autocomplete styles */
 .ui-autocomplete-input {background-color:#eee8aa;}
@@ -477,6 +478,7 @@ a.icon-darrow:hover {background-position:-40px -124px; width:20px; height:20px;}
 .icon-delete-grey {background-position:-40px -98px; width:16px; height:16px;}
 .icon-edit {background-position:-109px -34px; width:18px; height:18px;}
 .icon-email {background-position:-10px -6px; width:25px; height:25px;}
+.icon-failure {background-position:-40px -154px; width:16px; height:16px;}
 .icon-find-facts {background-position:-38px -180px; width:16px; height:16px;}
 .icon-help {background-position:-10px -181px; width:15px; height:15px;vertical-align:top; margin:0 5px;cursor:help;}
 .icon-larrow {background-position:-79px -64px; width:20px; height:20px;}
