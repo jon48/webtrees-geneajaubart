@@ -93,29 +93,29 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 				
 				$subject = WT_I18N::translate('Health Check Report').' - '.WT_I18N::translate('Tree %s', $tree->tree_title);
 				$message = 
-					WT_I18N::translate('Health Check Report for the last %d days', $nbdays)."\r\n\r\n".
-					WT_I18N::translate('Tree %s', $tree->tree_title)."\r\n".
-					'=========================================='."\r\n\r\n";
+					WT_I18N::translate('Health Check Report for the last %d days', $nbdays).WT_Mail::EOL.WT_Mail::EOL.
+					WT_I18N::translate('Tree %s', $tree->tree_title).WT_Mail::EOL.
+					'=========================================='.WT_Mail::EOL.WT_Mail::EOL;
 				
 				// News
 				$message_version = '';
 				if($latest_version && version_compare(WT_VERSION, $latest_version)<0){
-					$message_version = WT_I18N::translate('News')."\r\n".
-							'-------------'."\r\n".
-							WT_I18N::translate('A new version of *webtrees* is available: %s. Upgrade as soon as possible.', $latest_version)."\r\n".
-							WT_I18N::translate('Download it here: %s.', $download_url)."\r\n\r\n";
+					$message_version = WT_I18N::translate('News').WT_Mail::EOL.
+							'-------------'.WT_Mail::EOL.
+							WT_I18N::translate('A new version of *webtrees* is available: %s. Upgrade as soon as possible.', $latest_version).WT_Mail::EOL.
+							WT_I18N::translate('Download it here: %s.', $download_url).WT_Mail::EOL.WT_Mail::EOL;
 				}
 				$message .= $message_version;
 				
 				// Statistics users
-				$message_users = WT_I18N::translate('Users')."\r\n".
-						'-------------'."\r\n".
-						WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_users.php'."\r\n".
-						WT_I18N::translate('Total number of users')."\t\t".$totusers."\r\n".
-						WT_I18N::translate('Users with warnings')."\t\t".$warnusers."\r\n".
-						WT_I18N::translate('Unverified by User')."\t\t".$applusers."\r\n".
-						WT_I18N::translate('Unverified by Administrator')."\t".$nverusers."\r\n".
-						"\r\n";
+				$message_users = WT_I18N::translate('Users').WT_Mail::EOL.
+						'-------------'.WT_Mail::EOL.
+						WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_users.php'.WT_Mail::EOL.
+						WT_I18N::translate('Total number of users')."\t\t".$totusers.WT_Mail::EOL.
+						WT_I18N::translate('Users with warnings')."\t\t".$warnusers.WT_Mail::EOL.
+						WT_I18N::translate('Unverified by User')."\t\t".$applusers.WT_Mail::EOL.
+						WT_I18N::translate('Unverified by Administrator')."\t".$nverusers.WT_Mail::EOL.
+						WT_Mail::EOL;
 				$message  .= $message_users;
 								
 				// Statistics tree:				
@@ -133,16 +133,16 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 					' GROUP BY ged_type';
 				$changes = WT_DB::prepare($sql)->execute(array('accepted', $tree->tree_id))->fetchAssoc();
 								
-				$message_gedcom = WT_I18N::translate('Tree statistics')."\r\n".
-					'-------------'."\r\n".
-					sprintf('%-25s', WT_I18N::translate('Records'))."\t".sprintf('%15s', WT_I18N::translate('Count'))."\t".sprintf('%15s', WT_I18N::translate('Changes'))."\r\n".
-					sprintf('%-25s', WT_I18N::translate('Individuals'))."\t".sprintf('%15s', $stats->totalIndividuals())."\t".sprintf('%15s', (isset($changes['indi']) ? $changes['indi'] : 0))."\r\n".
-					sprintf('%-25s', WT_I18N::translate('Families'))."\t".sprintf('%15s', $stats->totalFamilies())."\t".sprintf('%15s', (isset($changes['fam']) ? $changes['fam'] : 0))."\r\n".
-					sprintf('%-25s', WT_I18N::translate('Sources'))."\t".sprintf('%15s', $stats->totalSources())."\t".sprintf('%15s', (isset($changes['sour']) ? $changes['sour'] : 0))."\r\n".
-					sprintf('%-25s', WT_I18N::translate('Repositories'))."\t".sprintf('%15s', $stats->totalRepositories())."\t".sprintf('%15s', (isset($changes['repo']) ? $changes['repo'] : 0))."\r\n".
-					sprintf('%-25s', WT_I18N::translate('Media objects'))."\t".sprintf('%15s', $stats->totalMedia())."\t".sprintf('%15s', (isset($changes['media']) ? $changes['media'] : 0))."\r\n".
-					sprintf('%-25s', WT_I18N::translate('Notes'))."\t".sprintf('%15s', $stats->totalNotes())."\t".sprintf('%15s', (isset($changes['note']) ? $changes['note'] : 0))."\r\n".
-					"\r\n";				
+				$message_gedcom = WT_I18N::translate('Tree statistics').WT_Mail::EOL.
+					'-------------'.WT_Mail::EOL.
+					sprintf('%-25s', WT_I18N::translate('Records'))."\t".sprintf('%15s', WT_I18N::translate('Count'))."\t".sprintf('%15s', WT_I18N::translate('Changes')).WT_Mail::EOL.
+					sprintf('%-25s', WT_I18N::translate('Individuals'))."\t".sprintf('%15s', $stats->totalIndividuals())."\t".sprintf('%15s', (isset($changes['indi']) ? $changes['indi'] : 0)).WT_Mail::EOL.
+					sprintf('%-25s', WT_I18N::translate('Families'))."\t".sprintf('%15s', $stats->totalFamilies())."\t".sprintf('%15s', (isset($changes['fam']) ? $changes['fam'] : 0)).WT_Mail::EOL.
+					sprintf('%-25s', WT_I18N::translate('Sources'))."\t".sprintf('%15s', $stats->totalSources())."\t".sprintf('%15s', (isset($changes['sour']) ? $changes['sour'] : 0)).WT_Mail::EOL.
+					sprintf('%-25s', WT_I18N::translate('Repositories'))."\t".sprintf('%15s', $stats->totalRepositories())."\t".sprintf('%15s', (isset($changes['repo']) ? $changes['repo'] : 0)).WT_Mail::EOL.
+					sprintf('%-25s', WT_I18N::translate('Media objects'))."\t".sprintf('%15s', $stats->totalMedia())."\t".sprintf('%15s', (isset($changes['media']) ? $changes['media'] : 0)).WT_Mail::EOL.
+					sprintf('%-25s', WT_I18N::translate('Notes'))."\t".sprintf('%15s', $stats->totalNotes())."\t".sprintf('%15s', (isset($changes['note']) ? $changes['note'] : 0)).WT_Mail::EOL.
+					WT_Mail::EOL;				
 				$message .= $message_gedcom;
 								
 				//Errors
@@ -161,22 +161,22 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 					$tmp_message .= sprintf('%'.$nb_char_count_title.'d', $error->nblogs)."\t";
 					$tmp_message .= sprintf('%'.$nb_char_type.'s', is_null($error->gedcom_id) ? WT_I18N::translate('Site') : WT_I18N::translate('Tree'));
 					$tmp_message .= "\t".sprintf('%20s', $error->lastoccurred)."\t";
-					$tmp_message .= str_replace("\n", "\n\t\t\t\t\t\t", $error->log_message)."\r\n";
+					$tmp_message .= str_replace("\n", "\n\t\t\t\t\t\t", $error->log_message).WT_Mail::EOL;
 					$nb_errors += $error->nblogs;
 				}
 				if($nb_errors > 0){
-					$message .= WT_I18N::translate('Errors [%d]', $nb_errors)."\r\n".
-						'-------------'."\r\n".
-						WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_site_logs.php'."\r\n".
+					$message .= WT_I18N::translate('Errors [%d]', $nb_errors).WT_Mail::EOL.
+						'-------------'.WT_Mail::EOL.
+						WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_site_logs.php'.WT_Mail::EOL.
 						WT_I18N::translate('Count')."\t".
 						sprintf('%-'.$nb_char_type.'s', WT_I18N::translate('Type'))."\t".
 						sprintf('%-20s', WT_I18N::translate('Last occurrence'))."\t".
-						WT_I18N::translate('Error')."\r\n".
-						str_repeat('-', $nb_char_count_title)."\t".str_repeat('-', $nb_char_type)."\t".str_repeat('-', 20)."\t".str_repeat('-', strlen(WT_I18N::translate('Error')))."\r\n".
-						$tmp_message."\r\n";
+						WT_I18N::translate('Error').WT_Mail::EOL.
+						str_repeat('-', $nb_char_count_title)."\t".str_repeat('-', $nb_char_type)."\t".str_repeat('-', 20)."\t".str_repeat('-', strlen(WT_I18N::translate('Error'))).WT_Mail::EOL.
+						$tmp_message.WT_Mail::EOL;
 				}
 				else{
-					$message .= WT_I18N::translate('No errors', $nb_errors)."\r\n\r\n";
+					$message .= WT_I18N::translate('No errors', $nb_errors).WT_Mail::EOL.WT_Mail::EOL;
 				}
 				
 				//Send mail
@@ -184,6 +184,7 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 				$mail['to']= get_user_name($webmaster_user_id) ;
 				$mail['from'] = $webtrees_email_from;
 				$mail['from_name'] = WT_I18N::translate('webtrees Site Administrator');
+				$mail['from_email'] = $mail['from'];
 				$mail['subject'] = $subject;
 				$mail['body'] = $message;
 				$mail['method'] = get_user_setting($webmaster_user_id, 'contactmethod');

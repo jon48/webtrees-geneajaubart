@@ -996,9 +996,9 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			//END PERSO
 			//-- Retrieve husband and wife
 			$husb = $sfamily->getHusband();
-			if (is_null($husb)) $husb = new WT_Individual('');
+			if (is_null($husb)) $husb = new WT_Individual('H', '0 @H@ INDI', null, WT_GED_ID);
 			$wife = $sfamily->getWife();
-			if (is_null($wife)) $wife = new WT_Individual('');
+			if (is_null($wife)) $wife = new WT_Individual('W', '0 @W@ INDI', null, WT_GED_ID);
 			if (!$sfamily->canShow()) {
 				continue;
 			}
@@ -1123,9 +1123,9 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 				if ($marriage_dates[0]->gregorianYear()>=1550 && $marriage_dates[0]->gregorianYear()<2030) {
 					$marr_by_decade[(int)($marriage_dates[0]->gregorianYear()/10)*10] .= $husb->getSex().$wife->getSex();
 				}
-			} elseif ($family->getFacts('_NMR')) {
+			} elseif ($sfamily->getFacts('_NMR')) {
 				$html .= WT_I18N::translate('no');
-			} elseif ($family->getFacts('MARR')) {
+			} elseif ($sfamily->getFacts('MARR')) {
 				$html .= WT_I18N::translate('yes');
 			} else {
 				$html .= '&nbsp;';
