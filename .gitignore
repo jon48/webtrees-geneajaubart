@@ -1,0 +1,29 @@
+
+*.swp
+
+# /
+/.buildpath
+/.project
+/.settings
+/svn*
+/test*.php
+
+# /data/
+/data/*.GED
+/data/*.ged
+/data/*.zip
+/data/cache
+/data/config*
+/data/histo.fr.php
+
+# /data/certificates/
+/data/certificates/*
+
+# /modules_v3/
+/modules_v3/perso_translationtool
+
+# /modules_v3/googlemap/places/
+/modules_v3/googlemap/places/*
+
+# /themes/rural/css-1.5.1/images/
+/themes/rural/css-1.5.1/images/old
