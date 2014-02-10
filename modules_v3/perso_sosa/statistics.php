@@ -94,7 +94,7 @@ if($indi_root){
 			'<td class="optionbox vmiddle">', $genTheoretical,'</td>',
 			'<td class="optionbox vmiddle">', $tab['sosaCount'], '</td>',
 			'<td class="optionbox vmiddle right">&nbsp;', WT_I18N::translate('%.2f %%',$percSosaCountTheor) ,'&nbsp;</td>',
-			'<td class="optionbox vmiddle">', $missing, '</td>',
+			'<td class="optionbox vmiddle">', $missing > 0 ? '<a href="module.php?mod=perso_sosa&mod_action=missingancestors&gen='.$gen.'">'.$missing.'</a>' : $missing, '</td>',
 			'<td class="optionbox vmiddle right">&nbsp;', WT_I18N::translate('%.2f %%',$percSosaCountPrevKnown) ,'&nbsp;</td>',
 			'<td class="optionbox vmiddle">', $tab['sosaTotalCount'], '</td>',
 			'<td class="optionbox vmiddle right">&nbsp;', WT_I18N::translate('%.2f %%',$percSosaTotCountTotTheor) ,'&nbsp;</td>',
