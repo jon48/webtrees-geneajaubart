@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -108,8 +108,15 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	private function drawFamily(WT_Individual $root, WT_Family $family) {
 		global $controller;
 		global $spouselinks, $parentlinks;
+		global $SHOW_PRIVATE_RELATIONSHIPS;
 
-		foreach ($family->getFacts('HUSB') as $fact) {
+		if ($SHOW_PRIVATE_RELATIONSHIPS) {
+			$access_level = WT_PRIV_HIDE;
+		} else {
+			$access_level = WT_USER_ACCESS_LEVEL;
+		}
+
+		foreach ($family->getFacts('HUSB', false, $access_level) as $fact) {
 			$spouse = $fact->getTarget();
 			if ($spouse instanceof WT_Individual) {
 				$menu = new WT_Menu(get_close_relationship_name($root, $spouse));
@@ -125,7 +132,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			}
 		}
 
-		foreach ($family->getFacts('WIFE') as $fact) {
+		foreach ($family->getFacts('WIFE', false, $access_level) as $fact) {
 			$spouse = $fact->getTarget();
 			if ($spouse instanceof WT_Individual) {
 				$menu = new WT_Menu(get_close_relationship_name($root, $spouse));
@@ -141,7 +148,7 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 			}
 		}
 
-		foreach ($family->getFacts('CHIL') as $fact) {
+		foreach ($family->getFacts('CHIL', false, $access_level) as $fact) {
 			$child = $fact->getTarget();
 			if ($child instanceof WT_Individual) {
 				$menu = new WT_Menu(get_close_relationship_name($root, $child));

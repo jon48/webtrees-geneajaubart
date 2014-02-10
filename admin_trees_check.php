@@ -1,14 +1,8 @@
 <?php
 // Check a family tree for structural errors.
 //
-// Note that the tests and error messages are not yet finalised.  Wait until the code has stabilised before
-// adding I18N.
-//
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
-//
-// Derived from PhpGedView
-// Copyright (C) 2006-2009 Greg Roach, all rights reserved
+// Copyright (C) 2014 Greg Roach
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,7 +16,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 define('WT_SCRIPT_NAME', 'admin_trees_check.php');
 require './includes/session.php';
@@ -99,6 +93,7 @@ $XREF_LINKS=array(
 	'SOUR'          => 'SOUR',
 	'REPO'          => 'REPO',
 	'OBJE'          => 'OBJE',
+	'SUBM'          => 'SUBM',
 	'FAMC'          => 'FAM',
 	'FAMS'          => 'FAM',
 	//'ADOP'=>'FAM', // Need to handle this case specially.  We may have both ADOP and FAMC links to the same FAM, but only store one.
@@ -111,18 +106,20 @@ $XREF_LINKS=array(
 	'AUTH'          => 'INDI', // A webtrees extension
 	'ANCI'          => 'SUBM',
 	'DESI'          => 'SUBM',
-	'_WT_OBJE_SORT' => 'OBJE'
+	'_WT_OBJE_SORT' => 'OBJE',
+	'_LOC'          => '_LOC',
 );
 
 $RECORD_LINKS=array(
-	'INDI'=>array('NOTE', 'OBJE', 'SOUR', 'ASSO', '_ASSO', 'FAMC', 'FAMS', 'ALIA', '_WT_OBJE_SORT'),
-	'FAM' =>array('NOTE', 'OBJE', 'SOUR', 'ASSO', '_ASSO', 'HUSB', 'WIFE', 'CHIL'),
+	'INDI'=>array('NOTE', 'OBJE', 'SOUR', 'SUBM', 'ASSO', '_ASSO', 'FAMC', 'FAMS', 'ALIA', '_WT_OBJE_SORT', '_LOC'),
+	'FAM' =>array('NOTE', 'OBJE', 'SOUR', 'SUBM', 'ASSO', '_ASSO', 'HUSB', 'WIFE', 'CHIL', '_LOC'),
 	'SOUR'=>array('NOTE', 'OBJE', 'REPO', 'AUTH'),
 	'REPO'=>array('NOTE'),
 	'OBJE'=>array('NOTE'), // The spec also allows SOUR, but we treat this as a warning
 	'NOTE'=>array(), // The spec also allows SOUR, but we treat this as a warning
-	'SUBM'=>array(),
-	'SUBN'=>array(),
+	'SUBM'=>array('NOTE', 'OBJE'),
+	'SUBN'=>array('SUBM'),
+	'_LOC'=>array('SOUR', 'OBJE', '_LOC'),
 );
 
 $errors=false;

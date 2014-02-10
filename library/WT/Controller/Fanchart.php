@@ -2,7 +2,7 @@
 //	Controller for the fan chart
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -70,7 +70,7 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 	 * @return string $text output string
 	 */
 	public function split_align_text($data, $maxlen) {
-		global $RTLOrd;
+		$RTLOrd = array(215,216,217,218,219);
 
 		$lines = explode("\n", $data);
 		// more than 1 line : recursive calls
@@ -334,7 +334,7 @@ class WT_Controller_Fanchart extends WT_Controller_Chart {
 							$html.= '<br><span class="name1">'.WT_I18N::translate('Sibling').'</span>';
 						}
 						foreach ($children as $sibling) {
-							if ($sibling === $person) {
+							if ($sibling !== $person) {
 								$html.= '<br>&nbsp;&nbsp;<a href="'.$sibling->getHtmlUrl().'" class="name1"> '.$sibling->getFullName().'</a>';
 							}
 						}

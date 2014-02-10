@@ -2,7 +2,7 @@
 // Various functions used by the Edit interface
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -897,25 +897,31 @@ function print_add_layer($tag, $level=2) {
 
 // Add some empty tags to create a new fact
 function addSimpleTags($fact) {
-	global $ADVANCED_PLAC_FACTS;
+	global $ADVANCED_PLAC_FACTS, $nonplacfacts, $nondatefacts;
 
 	// For new individuals, these facts default to "Y"
-	if ($fact=='MARR' /*|| $fact=='BIRT'*/) {
+	if ($fact=='MARR') {
 		add_simple_tag("0 {$fact} Y");
 	} else {
 		add_simple_tag("0 {$fact}");
 	}
-	add_simple_tag("0 DATE", $fact, WT_Gedcom_Tag::getLabel("{$fact}:DATE"));
-	add_simple_tag("0 PLAC", $fact, WT_Gedcom_Tag::getLabel("{$fact}:PLAC"));
 
-	if (preg_match_all('/('.WT_REGEX_TAG.')/', $ADVANCED_PLAC_FACTS, $match)) {
-		foreach ($match[1] as $tag) {
-			add_simple_tag("0 {$tag}", $fact, WT_Gedcom_Tag::getLabel("{$fact}:PLAC:{$tag}"));
-		}
+	if (!in_array($fact, $nondatefacts)) {
+		add_simple_tag("0 DATE", $fact, WT_Gedcom_Tag::getLabel("{$fact}:DATE"));
 	}
-	add_simple_tag("0 MAP", $fact);
-	add_simple_tag("0 LATI", $fact);
-	add_simple_tag("0 LONG", $fact);
+
+	if (!in_array($fact, $nonplacfacts)) {
+		add_simple_tag("0 PLAC", $fact, WT_Gedcom_Tag::getLabel("{$fact}:PLAC"));
+
+		if (preg_match_all('/('.WT_REGEX_TAG.')/', $ADVANCED_PLAC_FACTS, $match)) {
+			foreach ($match[1] as $tag) {
+				add_simple_tag("0 {$tag}", $fact, WT_Gedcom_Tag::getLabel("{$fact}:PLAC:{$tag}"));
+			}
+		}
+		add_simple_tag("0 MAP", $fact);
+		add_simple_tag("0 LATI", $fact);
+		add_simple_tag("0 LONG", $fact);
+	}
 }
 
 // Assemble the pieces of a newly created record into gedcom
@@ -957,9 +963,9 @@ function addNewSex() {
 function addNewFact($fact) {
 	global $tagSOUR, $ADVANCED_PLAC_FACTS;
 
-	$FACT=WT_Filter::post($fact, WT_REGEX_TAG);
-	$DATE=WT_Filter::post("{$fact}_DATE");
-	$PLAC=WT_Filter::post("{$fact}_PLAC");
+	$FACT = WT_Filter::post($fact);
+	$DATE = WT_Filter::post("{$fact}_DATE");
+	$PLAC = WT_Filter::post("{$fact}_PLAC");
 	if ($DATE || $PLAC || $FACT && $FACT!='Y') {
 		if ($FACT && $FACT!='Y') {
 			$gedrec="\n1 {$fact} {$FACT}";

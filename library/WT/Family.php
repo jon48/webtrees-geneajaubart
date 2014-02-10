@@ -2,7 +2,7 @@
 // Class file for a Family
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -139,19 +139,15 @@ class WT_Family extends WT_GedcomRecord {
 		return $spouses;
 	}
 
-	/**
-	 * get the children
-	 * @return array array of children Persons
-	 */
+	// Get a list of this family’s children
 	function getChildren($access_level=WT_USER_ACCESS_LEVEL) {
 		global $SHOW_PRIVATE_RELATIONSHIPS;
 
-		$children=array();
-		preg_match_all('/\n1 CHIL @('.WT_REGEX_XREF.')@/', $this->gedcom, $match);
-		foreach ($match[1] as $pid) {
-			$child=WT_Individual::getInstance($pid);
+		$children = array();
+		foreach ($this->getFacts('CHIL', false, $access_level, $SHOW_PRIVATE_RELATIONSHIPS) as $fact) {
+			$child = $fact->getTarget();
 			if ($child && ($SHOW_PRIVATE_RELATIONSHIPS || $child->canShowName($access_level))) {
-				$children[]=$child;
+				$children[] = $child;
 			}
 		}
 		return $children;
@@ -256,7 +252,7 @@ class WT_Family extends WT_GedcomRecord {
 				);
 			}
 			foreach ($husb_names as $n=>$husb_name) {
-				$husb_names[$n]['script']=utf8_script($husb_name['full']);
+				$husb_names[$n]['script']=WT_I18N::textScript($husb_name['full']);
 			}
 			if ($this->wife) {
 				$wife_names=$this->wife->getAllNames();
@@ -270,7 +266,7 @@ class WT_Family extends WT_GedcomRecord {
 				);
 			}
 			foreach ($wife_names as $n=>$wife_name) {
-				$wife_names[$n]['script']=utf8_script($wife_name['full']);
+				$wife_names[$n]['script']=WT_I18N::textScript($wife_name['full']);
 			}
 			// Add the matched names first
 			foreach ($husb_names as $husb_name) {

@@ -2,7 +2,7 @@
 // Filter/escape/validate input and output
 //
 // webtrees: Web based Family History software
-// Copyright (c) 2013 webtrees development team
+// Copyright (c) 2014 webtrees development team
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,12 +16,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
+use Michelf\MarkdownExtra;
 
 class WT_Filter {
 	// REGEX to match a URL
@@ -76,19 +73,58 @@ class WT_Filter {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
-	// Escape a string for use in HTML, and additionally:
-	// Convert URLs to links, inserting soft-hyphens at word boundaries so that
-	// the browser can word-wrap.
+	// Format block-level text such as notes or transcripts, etc.
+	//////////////////////////////////////////////////////////////////////////////
+	public static function formatText($text, WT_Tree $WT_TREE) {
+		switch ($WT_TREE->preference('FORMAT_TEXT')) {
+		case 'markdown':
+			return '<div class="markdown" dir="auto">' . WT_Filter::markdown($text) . '</div>';
+			break;
+		case '':
+		default:
+			return '<div style="white-space: pre-wrap;" dir="auto">' . WT_Filter::expandUrls($text) . '</div>';
+			break;
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
+	// Escape a string for use in HTML, and additionally convert URLs to links.
 	//////////////////////////////////////////////////////////////////////////////
 	public static function expandUrls($text) {
 		return preg_replace_callback(
-			'/' . addcslashes('(?!>)' . self::URL_REGEX . '(?!</a>)', '/') . '/i',
-			create_function( // Insert soft hyphens into the replaced string
-				'$m',
-				'return "<a href=\"" . $m[0] . "\" target=\"blank\">" . preg_replace("/\b/", "&shy;", $m[0]) . "</a>";'
-			),
+			'/' . addcslashes('(?!>)' . WT_Filter::URL_REGEX . '(?!</a>)', '/') . '/i',
+			function ($m) {
+				return '<a href="' . $m[0] . '" target="_blank">' . $m[0] . '</a>';
+			},
 			WT_Filter::escapeHtml($text)
 		);
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
+	// Format a block of text, using "Markdown".
+	//////////////////////////////////////////////////////////////////////////////
+	public static function markdown($text) {
+		$parser = new MarkdownExtra;
+		$parser->empty_element_suffix = '>';
+		$parser->no_markup            = true;
+		$text = $parser->transform($text);
+
+		// HTMLPurifier needs its own autoloader
+		require_once WT_ROOT . 'library/htmlpurifier-4.6.0/library/HTMLPurifier.auto.php';
+
+		// HTMLPurifier needs somewhere to write temporary files
+		$HTML_PURIFIER_CACHE_DIR = WT_DATA_DIR . 'html_purifier_cache';
+
+		if (!is_dir($HTML_PURIFIER_CACHE_DIR)) {
+			mkdir($HTML_PURIFIER_CACHE_DIR);
+		}
+
+		$config = HTMLPurifier_Config::createDefault();
+		$config->set('Cache.SerializerPath', $HTML_PURIFIER_CACHE_DIR);
+		$purifier = new HTMLPurifier($config);
+		$text = $purifier->purify($text);
+
+		return $text;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////

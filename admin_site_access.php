@@ -2,7 +2,7 @@
 // Restrict/allow site access based on IP address and user-agent string
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 define('WT_SCRIPT_NAME', 'admin_site_access.php');
 require './includes/session.php';
@@ -130,7 +130,7 @@ case 'load_unknown':
 	// AJAX callback for datatables
 	$sql=
 		"SELECT SQL_CALC_FOUND_ROWS".
-		" INET_NTOA(ip_address_start), ip_address_start, user_agent_pattern, site_access_rule_id".
+		" INET_NTOA(ip_address_start), ip_address_start, user_agent_pattern, DATE(updated) AS updated, site_access_rule_id".
 		" FROM `##site_access_rule`".
 		" WHERE rule='unknown'";
 	$args=array();
@@ -176,10 +176,10 @@ case 'load_unknown':
 	$aaData=WT_DB::prepare($sql)->execute($args)->fetchAll(PDO::FETCH_NUM);
 	// Reformat the data for display
 	foreach ($aaData as &$row) {
-		$site_access_rule_id=$row[3];
-		$row[3]='<i class="icon-yes" onclick="document.location=\''.WT_SCRIPT_NAME.'?action=allow&amp;site_access_rule_id='.$site_access_rule_id.'\';"></i>';
-		$row[4]='<i class="icon-yes" onclick="document.location=\''.WT_SCRIPT_NAME.'?action=deny&amp;site_access_rule_id='.$site_access_rule_id.'\';"></i>';
-		$row[5]='<i class="icon-yes" onclick="document.location=\''.WT_SCRIPT_NAME.'?action=robot&amp;site_access_rule_id='.$site_access_rule_id.'\';"></i>';
+		$site_access_rule_id=$row[4];
+		$row[4]='<i class="icon-yes" onclick="document.location=\''.WT_SCRIPT_NAME.'?action=allow&amp;site_access_rule_id='.$site_access_rule_id.'\';"></i>';
+		$row[5]='<i class="icon-yes" onclick="document.location=\''.WT_SCRIPT_NAME.'?action=deny&amp;site_access_rule_id='.$site_access_rule_id.'\';"></i>';
+		$row[6]='<i class="icon-yes" onclick="document.location=\''.WT_SCRIPT_NAME.'?action=robot&amp;site_access_rule_id='.$site_access_rule_id.'\';"></i>';
 	}
 
 	// Total filtered rows
@@ -246,9 +246,10 @@ $controller
 				/* 0 ip_address         */ {"iDataSort": 1, "sClass": "ip_address"},
 				/* 0 ip_address (sort)  */ {"sType": "numeric", "bVisible": false},
 				/* 1 user_agent_pattern */ {"sClass": "ua_string"},
-				/* 2 <allowed>          */ {"bSortable": false, "sClass": "center"},
-				/* 3 <banned>           */ {"bSortable": false, "sClass": "center"},
-				/* 4 <search-engine>    */ {"bSortable": false, "sClass": "center"}
+				/* 2 updated            */ {"sClass": "ua_string"},
+				/* 3 <allowed>          */ {"bSortable": false, "sClass": "center"},
+				/* 4 <banned>           */ {"bSortable": false, "sClass": "center"},
+				/* 5 <search-engine>    */ {"bSortable": false, "sClass": "center"}
 			]
 		});
 	');
@@ -292,6 +293,7 @@ WT_DB::exec(
 			<th rowspan="2"><?php /* I18N: http://en.wikipedia.org/wiki/IP_address */ echo WT_I18N::translate('IP address'); ?></th>
 			<th rowspan="2">-</th>
 			<th rowspan="2"><?php echo WT_I18N::translate('User-agent string'); ?></th>
+			<th rowspan="2"><?php echo WT_I18N::translate('Date'); ?></th>
 			<th colspan="3"><?php echo WT_I18N::translate('Create a new rule'); ?></th>
 		</tr>
 		<tr>

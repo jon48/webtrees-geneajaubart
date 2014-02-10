@@ -2,7 +2,7 @@
 // Class file for a Shared Note (NOTE) object
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2009 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -73,20 +73,17 @@ class WT_Note extends WT_GedcomRecord {
 		return $statement->execute(array($xref, $gedcom_id))->fetchOne();
 	}
 
-	// The 'name' of a note record is the first line.  This can be
-	// somewhat unwieldy if lots of CONC records are used.  Limit to 100 chars
-	protected function _addName($type, $value, $gedrec) {
-		if (utf8_strlen($value)<100) {
-			parent::_addName($type, $value, $gedrec);
-		} else {
-			parent::_addName($type, utf8_substr($value, 0, 100).WT_I18N::translate('…'), $gedrec);
-		}
-	}
-
 	// Get an array of structures containing all the names in the record
-	public function getAllNames() {
+	public function extractNames() {
 		// Uniquely, the NOTE objects have data in their level 0 record.
-		// Hence the REGEX passed in the second parameter
-		return parent::_getAllNames('NOTE', '0 @'.WT_REGEX_XREF.'@');
+		if (preg_match('/^0 @' . WT_REGEX_XREF . '@ NOTE (.+)/', $this->getGedcom(), $match)) {
+			// The 'name' of a note record is the first line.  This can be
+			// somewhat unwieldy if lots of CONC records are used.  Limit to 100 chars
+			if (utf8_strlen($match[1])<100) {
+				$this->_addName('NOTE', $match[1], $this->getGedcom());
+			} else {
+				$this->_addName('NOTE', utf8_substr($match[1], 0, 100).WT_I18N::translate('…'), $this->getGedcom());
+			}
+		}
 	}
 }

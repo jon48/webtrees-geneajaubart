@@ -2,7 +2,7 @@
 // Footer for FAB theme
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Modifications Copyright (c) 2010 Greg Roach
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -32,5 +32,5 @@ if ($view!='simple') {
 	if (WT_DEBUG || get_gedcom_setting(WT_GED_ID, 'SHOW_STATS')) {
 		echo execution_stats();
 	}
-	echo '</div><a style="font-size:150%; color:#888;" href="', WT_WEBTREES_URL, '" title="', WT_WEBTREES , ' - ', WT_VERSION_TEXT, '">', WT_WEBTREES, '</a></div>';
+	echo '</div><a style="font-size:150%; color:#888;" href="', WT_WEBTREES_URL, '" title="', WT_WEBTREES , ' - ', WT_VERSION, '">', WT_WEBTREES, '</a></div>';
 }

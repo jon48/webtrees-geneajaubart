@@ -2,7 +2,7 @@
 // Provide an interface to the wt_gedcom table
 //
 // webtrees: Web based Family History software
-// Copyright (c) 2013 webtrees development team
+// Copyright (C) 2014 webtrees development team
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -224,13 +224,13 @@ class WT_Tree {
 		set_gedcom_setting($tree_id, 'COMMON_NAMES_THRESHOLD',       '40');
 		set_gedcom_setting($tree_id, 'CONTACT_USER_ID',              WT_USER_ID);
 		set_gedcom_setting($tree_id, 'DEFAULT_PEDIGREE_GENERATIONS', '4');
-		set_gedcom_setting($tree_id, 'EXPAND_NOTES',                 false);
 		set_gedcom_setting($tree_id, 'EXPAND_RELATIVES_EVENTS',      false);
 		set_gedcom_setting($tree_id, 'EXPAND_SOURCES',               false);
 		set_gedcom_setting($tree_id, 'FAM_FACTS_ADD',                'CENS,MARR,RESI,SLGS,MARR_CIVIL,MARR_RELIGIOUS,MARR_PARTNERS,RESN');
 		set_gedcom_setting($tree_id, 'FAM_FACTS_QUICK',              'MARR,DIV,_NMR');
 		set_gedcom_setting($tree_id, 'FAM_FACTS_UNIQUE',             'NCHI,MARL,DIV,ANUL,DIVF,ENGA,MARB,MARC,MARS');
 		set_gedcom_setting($tree_id, 'FAM_ID_PREFIX',                'F');
+		set_gedcom_setting($tree_id, 'FORMAT_TEXT',                  'markdown');
 		set_gedcom_setting($tree_id, 'FULL_SOURCES',                 false);
 		set_gedcom_setting($tree_id, 'GEDCOM_ID_PREFIX',             'I');
 		set_gedcom_setting($tree_id, 'GEDCOM_MEDIA_PATH',            '');

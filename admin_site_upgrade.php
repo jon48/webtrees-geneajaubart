@@ -2,7 +2,7 @@
 // Welcome page for the administration module
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 define('WT_SCRIPT_NAME', 'admin_site_upgrade.php');
 
@@ -68,7 +68,7 @@ if ($latest_version == '') {
 	exit;
 }
 
-if (version_compare(WT_VERSION, $latest_version) > 0) {
+if (version_compare(WT_VERSION, $latest_version) >= 0) {
 	echo '<p>', WT_I18N::translate('This is the latest version of webtrees.  No upgrade is available.'), '</p>';
 	exit;
 }
@@ -377,7 +377,7 @@ echo '</li>'; flush();
 echo '<li>', WT_I18N::translate('Check file permissions…');
 
 $iterator = new RecursiveDirectoryIterator($zip_dir);
-$iterator->setFlags(RecursiveDirectoryIterator::SKIP_DOTS);
+//$iterator->setFlags(RecursiveDirectoryIterator::SKIP_DOTS);
 foreach (new RecursiveIteratorIterator($iterator) as $file) {
 	$file = WT_ROOT . substr($file, strlen($zip_dir) + 1);
 	if (file_exists($file) && (!is_readable($file) || !is_writable($file))) {

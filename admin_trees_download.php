@@ -2,7 +2,7 @@
 // Allow an admin user to download the entire gedcom file.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 define('WT_SCRIPT_NAME', 'admin_trees_download.php');
 require './includes/session.php';
@@ -65,7 +65,7 @@ if ($action == "download" && $zip == "yes") {
 	$gedout = fopen($gedname, "w");
 	export_gedcom($GEDCOM, $gedout, $exportOptions);
 	fclose($gedout);
-	$comment = "Created by ".WT_WEBTREES." ".WT_VERSION_TEXT." on " . date("r") . ".";
+	$comment = "Created by ".WT_WEBTREES." ".WT_VERSION." on " . date("r") . ".";
 	$archive = new PclZip($zipfile);
 	$v_list = $archive->create($gedname, PCLZIP_OPT_COMMENT, $comment, PCLZIP_OPT_REMOVE_PATH, $temppath);
 	if ($v_list == 0) echo "Error : " . $archive->errorInfo(true);

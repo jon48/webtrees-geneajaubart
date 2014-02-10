@@ -1,14 +1,14 @@
 BUILD_DIR=build
 BUILD_NUMBER=$(shell git log --oneline | wc -l)
 BUILD_VERSION=$(if $(WT_RELEASE),$(BUILD_NUMBER),$(WT_VERSION)$(WT_RELEASE))
-GIT_BRANCH=$(shell git symbolic-ref --short -q HEAD)
+GIT_BRANCH=$(shell git symbolic-ref -q HEAD || git describe --tags --exact-match)
 LANGUAGE_DIR=language
 LANGUAGE_SRC=$(shell git grep -I --name-only --fixed-strings -e WT_I18N:: -- "*.php" "*.xml")
 MO_FILES=$(patsubst %.po,%.mo,$(PO_FILES))
 PO_FILES=$(wildcard $(LANGUAGE_DIR)/*.po $(LANGUAGE_DIR)/extra/*.po)
 SHELL=bash
-WT_VERSION=$(shell grep "'WT_VERSION'" includes/session.php | cut -d "'" -f 4)
-WT_RELEASE=$(shell grep "'WT_VERSION_RELEASE'" includes/session.php | cut -d "'" -f 4)
+WT_VERSION=$(shell grep "'WT_VERSION'" includes/session.php | cut -d "'" -f 4 | awk -F - '{print $$1}')
+WT_RELEASE=$(shell grep "'WT_VERSION'" includes/session.php | cut -d "'" -f 4 | awk -F - '{print $$2}')
 
 # Location of minification tools
 CLOSURE_JS=$(BUILD_DIR)/compiler-20121212.jar
@@ -45,25 +45,22 @@ check:
 # Create a release from this GIT branch
 ################################################################################
 build/webtrees: clean update
-	# Extract from the repository either a tag or the current revision
-	if [ -z "$(WT_RELEASE)" ]; then git archive --prefix=$@/ $(WT_VERSION); else git archive --prefix=$@/ $(GIT_BRANCH); fi | tar -x
+	# Extract from the repository, to filter files using .gitattributes
+	git archive --prefix=$@/ $(GIT_BRANCH) | tar -x
 	# Embed the build number in the code (for DEV builds only)
-	sed -i "s/define('WT_RELEASE', 'dev')/define('WT_RELEASE', 'dev-$(BUILD_NUMBER)')/" $@/includes/session.php
+	sed -i "s/define('WT_RELEASE', '$(WT_VERSION)-dev')/define('WT_RELEASE', '$(WT_VERSION)-dev+$(BUILD_NUMBER)')/" $@/includes/session.php
 	# Add language files
 	cp -R $(LANGUAGE_DIR)/*.mo       $@/$(LANGUAGE_DIR)/
 	cp -R $(LANGUAGE_DIR)/extra/*.mo $@/$(LANGUAGE_DIR)/extra/
 	# Minification
-	if [ -z "$(WT_RELEASE)" ]; then find $@ -name "*.js" -exec java -jar $(CLOSURE_JS) --js "{}" --js_output_file "{}.tmp" \; -exec mv "{}.tmp" "{}" \; ; fi
-	if [ -z "$(WT_RELEASE)" ]; then find $@ -name "*.css" -exec java -jar $(CLOSURE_CSS) --output-file "{}.tmp" "{}" \; -exec mv "{}.tmp" "{}" \; ; fi
-	if [ -z "$(WT_RELEASE)" ]; then find $@ -name "*.js"  -exec java -jar $(YUI_COMPRESSOR) -o "{}" "{}" \; ; fi
-	if [ -z "$(WT_RELEASE)" ]; then find $@ -name "*.css" -exec java -jar $(YUI_COMPRESSOR) -o "{}" "{}" \; ; fi
+	find $@ -name "*.js" -exec java -jar $(CLOSURE_JS) --js "{}" --js_output_file "{}.tmp" \; -exec mv "{}.tmp" "{}" \;
+	find $@ -name "*.css" -exec java -jar $(CLOSURE_CSS) --output-file "{}.tmp" "{}" \; -exec mv "{}.tmp" "{}" \;
+	find $@ -name "*.js"  -exec java -jar $(YUI_COMPRESSOR) -o "{}" "{}" \;
+	find $@ -name "*.css" -exec java -jar $(YUI_COMPRESSOR) -o "{}" "{}" \;
 	# Zip up the release files
 	cd $(@D) && zip -qr $(@F)-$(BUILD_VERSION).zip $(@F)
 	# If we have a GNU private key, sign the file with it
 	if test -d ~/.gnupg; then gpg --armor --sign --detach-sig $@-$(BUILD_VERSION).zip; fi
-	# If we have a public html area, publish the files
-	if test -d ~/public_html/build; then cp $@-$(BUILD_VERSION).zip ~/public_html/build/; fi
-	if test -d ~/public_html/build; then echo ${BUILD_VERSION} > ~/public_html/build/latest-dev.txt; fi
 	rm -Rf $@
 	# Done!
 	ls -l $@-$(BUILD_VERSION).zip*

@@ -2,7 +2,7 @@
 // Functions used for charts
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -131,6 +131,11 @@ function print_family_parents(WT_Family $family, $sosa=0, $label='', $parid='', 
 			echo "<td valign=\"top\">";
 			print_pedigree_person(WT_Individual::getInstance($hfam->getHusband()->getXref()), 1, 4, $personcount);
 			echo "</td></tr></table>";
+		} elseif ($hfam && !$hfam->getHusband()) { // here for empty box for grandfather
+			echo "<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
+			echo '<td valign="top">';
+			print_pedigree_person($hfam->getHusband());
+			echo '</td></tr></table>';
 		}
 		echo "</td>";
 	}
@@ -148,6 +153,11 @@ function print_family_parents(WT_Family $family, $sosa=0, $label='', $parid='', 
 			if (!empty($gparid) && $hfam->getWife()->getXref()==$gparid) print_sosa_number(trim(substr($label,0,-3),".").".");
 			echo '<td valign="top">';
 			print_pedigree_person(WT_Individual::getInstance($hfam->getWife()->getXref()), 1, 5, $personcount);
+			echo '</td></tr></table>';
+		} elseif ($hfam && !$hfam->getWife()) {  // here for empty box for grandmother
+			echo "<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
+			echo '<td valign="top">';
+			print_pedigree_person($hfam->getWife());
 			echo '</td></tr></table>';
 		}
 		echo '</td>';
@@ -236,8 +246,8 @@ function print_family_parents(WT_Family $family, $sosa=0, $label='', $parid='', 
 function print_family_children(WT_Family $family, $childid = "", $sosa = 0, $label="", $personcount="1") {
 	global $bwidth, $bheight, $pbwidth, $pbheight, $cbheight, $cbwidth, $show_cousins, $WT_IMAGES, $TEXT_DIRECTION;
 
-	$children = $family->getFacts('CHIL');
-	$numchil=$family->getNumberOfChildren();
+	$children = $family->getChildren();
+	$numchil = count($children);
 
 	echo "<table border=\"0\" cellpadding=\"0\" cellspacing=\"2\"><tr>";
 	if ($sosa>0) echo "<td></td>";
@@ -264,8 +274,7 @@ function print_family_children(WT_Family $family, $childid = "", $sosa = 0, $lab
 
 	$nchi=1;
 	if ($children) {
-		foreach ($children as $chil) {
-			$child = $chil->getTarget();
+		foreach ($children as $child) {
 			echo '<tr>';
 			if ($sosa != 0) {
 				if ($child->getXref() == $childid) {
@@ -276,9 +285,9 @@ function print_family_children(WT_Family $family, $childid = "", $sosa = 0, $lab
 					print_sosa_number($label.($nchi++).".");
 				}
 			}
-			if ($chil->isNew()) {
+			if ($child->isNew()) {
 				echo '<td valign="middle" class="new">';
-			} elseif ($chil->isOld()) {
+			} elseif ($child->isOld()) {
 				echo '<td valign="middle" class="old">';
 			} else {
 				echo '<td valign="middle">';

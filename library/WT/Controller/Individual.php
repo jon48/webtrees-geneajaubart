@@ -2,7 +2,7 @@
 // Controller for the individual page
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team. All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -179,10 +179,11 @@ class WT_Controller_Individual extends WT_Controller_GedcomRecord {
 							case 'SURN':
 								// The SURN field is not necessarily the surname.
 								// Where it is not a substring of the real surname, show it after the real surname.
-								if (strpos($primary_name['surname'], str_replace(',', ' ', $name))!==false) {
-									echo $primary_name['surname'];
+								$surname = WT_Filter::escapeHtml($primary_name['surname']);
+								if (strpos($primary_name['surname'], str_replace(',', ' ', $nmatch[$i][2]))!==false) {
+									echo $surname;
 								} else {
-									echo WT_I18N::translate('%1$s (%2$s)', $primary_name['surname'], $name);
+									echo WT_I18N::translate('%1$s (%2$s)', $surname, $name);
 								}
 								break;
 							default:

@@ -2,7 +2,7 @@
 // Base class for all gedcom records
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -175,15 +175,9 @@ class WT_GedcomRecord {
 		case 'NOTE':
 			$record = new WT_Note($xref, $gedcom, $pending, $gedcom_id);
 			break;
-		case 'HEAD':
-		case 'TRLR':
-		case 'SUBM':
-		case 'SUBN':
-		case 'UNKNOWN':
+		default:
 			$record = new WT_GedcomRecord($xref, $gedcom, $pending, $gedcom_id);
 			break;
-		default:
-			throw new Exception('No support for GEDCOM record type: ' . $type);
 		}
 
 		// Store it in the cache
@@ -423,29 +417,42 @@ class WT_GedcomRecord {
 	// ['type'] = the gedcom fact, e.g. NAME, TITL, FONE, _HEB, etc.
 	// ['full'] = the name as specified in the record, e.g. 'Vincent van Gogh' or 'John Unknown'
 	// ['sort'] = a sortable version of the name (not for display), e.g. 'Gogh, Vincent' or '@N.N., John'
-	protected function _getAllNames($fact='!', $level=1) {
-		global $WORD_WRAPPED_NOTES;
-
-		if (is_null($this->_getAllNames)) {
-			$this->_getAllNames=array();
-			if ($this->canShowName()) {
-				$sublevel=$level+1;
-				$subsublevel=$sublevel+1;
-				if (preg_match_all("/^{$level} ({$fact}) (.+)((\n[{$sublevel}-9].+)*)/m", $this->getGedcom(), $matches, PREG_SET_ORDER)) {
-					foreach ($matches as $match) {
-						// Treat 1 NAME / 2 TYPE married the same as _MARNM
-						if ($match[1]=='NAME' && strpos($match[3], "\n2 TYPE married")!==false) {
-							$this->_addName('_MARNM', $match[2] ? $match[2] : $this->getFallBackName(), $match[0]);
-						} else {
-							$this->_addName($match[1], $match[2] ? $match[2] : $this->getFallBackName(), $match[0]);
-						}
-						if ($match[3] && preg_match_all("/^{$sublevel} (ROMN|FONE|_\w+) (.+)((\n[{$subsublevel}-9].+)*)/m", $match[3], $submatches, PREG_SET_ORDER)) {
-							foreach ($submatches as $submatch) {
-								$this->_addName($submatch[1], $submatch[2] ? $submatch[2] : $this->getFallBackName(), $submatch[0]);
-							}
+	protected function _extractNames($level, $fact_type, $facts) {
+		$sublevel    = $level + 1;
+		$subsublevel = $sublevel + 1;
+		foreach ($facts as $fact) {
+			if (preg_match_all("/^{$level} ({$fact_type}) (.+)((\n[{$sublevel}-9].+)*)/m", $fact->getGedcom(), $matches, PREG_SET_ORDER)) {
+				foreach ($matches as $match) {
+					// Treat 1 NAME / 2 TYPE married the same as _MARNM
+					if ($match[1]=='NAME' && strpos($match[3], "\n2 TYPE married")!==false) {
+						$this->_addName('_MARNM', $match[2], $fact->getGedcom());
+					} else {
+						$this->_addName($match[1], $match[2], $fact->getGedcom());
+					}
+					if ($match[3] && preg_match_all("/^{$sublevel} (ROMN|FONE|_\w+) (.+)((\n[{$subsublevel}-9].+)*)/m", $match[3], $submatches, PREG_SET_ORDER)) {
+						foreach ($submatches as $submatch) {
+							$this->_addName($submatch[1], $submatch[2], $match[3]);
 						}
 					}
-				} else {
+				}
+			}
+		}
+	}
+
+	// Default for "other" object types
+	public function extractNames() {
+		$this->_addName(static::RECORD_TYPE, $this->getFallBackName(), null);
+	}
+
+	// Derived classes should redefine this function, otherwise the object will have no name
+	public function getAllNames() {
+		if ($this->_getAllNames === null) {
+			$this->_getAllNames = array();
+			if ($this->canShowName()) {
+				// Ask the record to extract its names
+				$this->extractNames();
+				// No name found?  Use a fallback.
+				if (!$this->_getAllNames) {
 					$this->_addName(static::RECORD_TYPE, $this->getFallBackName(), null);
 				}
 			} else {
@@ -453,11 +460,6 @@ class WT_GedcomRecord {
 			}
 		}
 		return $this->_getAllNames;
-	}
-
-	// Derived classes should redefine this function, otherwise the object will have no name
-	public function getAllNames() {
-		return $this->_getAllNames('!', 1);
 	}
 
 	// If this object has no name, what do we call it?
@@ -475,7 +477,7 @@ class WT_GedcomRecord {
 				switch (WT_LOCALE) {
 				case 'el':
 					foreach ($this->getAllNames() as $n=>$name) {
-						if ($name['type']!='_MARNM' && utf8_script($name['sort'])=='Grek') {
+						if ($name['type']!='_MARNM' && WT_I18N::textScript($name['sort'])=='Grek') {
 							$this->_getPrimaryName=$n;
 							break;
 						}
@@ -483,7 +485,7 @@ class WT_GedcomRecord {
 					break;
 				case 'ru':
 					foreach ($this->getAllNames() as $n=>$name) {
-						if ($name['type']!='_MARNM' && utf8_script($name['sort'])=='Cyrl') {
+						if ($name['type']!='_MARNM' && WT_I18N::textScript($name['sort'])=='Cyrl') {
 							$this->_getPrimaryName=$n;
 							break;
 						}
@@ -491,7 +493,7 @@ class WT_GedcomRecord {
 					break;
 				case 'he':
 					foreach ($this->getAllNames() as $n=>$name) {
-						if ($name['type']!='_MARNM' && utf8_script($name['sort'])=='Hebr') {
+						if ($name['type']!='_MARNM' && WT_I18N::textScript($name['sort'])=='Hebr') {
 							$this->_getPrimaryName=$n;
 							break;
 						}
@@ -499,7 +501,7 @@ class WT_GedcomRecord {
 					break;
 				case 'ar':
 					foreach ($this->getAllNames() as $n=>$name) {
-						if ($name['type']!='_MARNM' && utf8_script($name['sort'])=='Arab') {
+						if ($name['type']!='_MARNM' && WT_I18N::textScript($name['sort'])=='Arab') {
 							$this->_getPrimaryName=$n;
 							break;
 						}
@@ -507,7 +509,7 @@ class WT_GedcomRecord {
 					break;
 				default:
 					foreach ($this->getAllNames() as $n=>$name) {
-						if ($name['type']!='_MARNM' && utf8_script($name['sort'])=='Latn') {
+						if ($name['type']!='_MARNM' && WT_I18N::textScript($name['sort'])=='Latn') {
 							$this->_getPrimaryName=$n;
 							break;
 						}
@@ -527,9 +529,9 @@ class WT_GedcomRecord {
 			// ....except when there are names with different character sets
 			$all_names=$this->getAllNames();
 			if (count($all_names)>1) {
-				$primary_script=utf8_script($all_names[$this->getPrimaryName()]['sort']);
+				$primary_script=WT_I18N::textScript($all_names[$this->getPrimaryName()]['sort']);
 				foreach ($all_names as $n=>$name) {
-					if ($n!=$this->getPrimaryName() && $name['type']!='_MARNM' && utf8_script($name['sort'])!=$primary_script) {
+					if ($n!=$this->getPrimaryName() && $name['type']!='_MARNM' && WT_I18N::textScript($name['sort'])!=$primary_script) {
 						$this->_getSecondaryName=$n;
 						break;
 					}
@@ -785,9 +787,11 @@ class WT_GedcomRecord {
 	}
 
 	// The facts and events for this record
-	public function getFacts($filter=null, $sort=false, $access_level=WT_USER_ACCESS_LEVEL) {
+	// $override allows us to implement $SHOW_PRIVATE_RELATIONSHIPS and $SHOW_LIVING_NAMES, by giving
+	// access to otherwise private records.
+	public function getFacts($filter=null, $sort=false, $access_level=WT_USER_ACCESS_LEVEL, $override=false) {
 		$facts=array();
-		if ($this->canShow($access_level)) {
+		if ($this->canShow($access_level) || $override) {
 			foreach ($this->facts as $fact) {
 				if (($filter==null || preg_match('/^' . $filter . '$/', $fact->getTag())) && $fact->canShow($access_level)) {
 					$facts[] = $fact;
@@ -888,10 +892,11 @@ class WT_GedcomRecord {
 		// Replacing (or deleting) an existing fact
 		foreach ($this->getFacts(null, false, WT_PRIV_HIDE) as $fact) {
 			if (!$fact->isOld()) {
-				if ($fact->getFactId() == $fact_id) {
+				if ($fact->getFactId() === $fact_id) {
 					if ($gedcom) {
 						$new_gedcom .= "\n" . $gedcom;
 					}
+					$fact_id = true; // Only replace/delete one copy of a duplicate fact
 				} elseif ($fact->getTag()!='CHAN' || !$update_chan) {
 					$new_gedcom .= "\n" . $fact->getGedcom();
 				}

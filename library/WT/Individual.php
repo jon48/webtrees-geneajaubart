@@ -2,7 +2,7 @@
 // Class file for an individual
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -596,7 +596,7 @@ class WT_Individual extends WT_GedcomRecord {
 		global $SHOW_PRIVATE_RELATIONSHIPS;
 
 		$families = array();
-		foreach ($this->getFacts('FAMS', false, $access_level) as $fact) {
+		foreach ($this->getFacts('FAMS', false, $access_level, $SHOW_PRIVATE_RELATIONSHIPS) as $fact) {
 			$family = $fact->getTarget();
 			if ($family && ($SHOW_PRIVATE_RELATIONSHIPS || $family->canShow($access_level))) {
 				$families[] = $family;
@@ -638,7 +638,7 @@ class WT_Individual extends WT_GedcomRecord {
 		global $SHOW_PRIVATE_RELATIONSHIPS;
 
 		$families = array();
-		foreach ($this->getFacts('FAMC', false, $access_level) as $fact) {
+		foreach ($this->getFacts('FAMC', false, $access_level, $SHOW_PRIVATE_RELATIONSHIPS) as $fact) {
 			$family = $fact->getTarget();
 			if ($family && ($SHOW_PRIVATE_RELATIONSHIPS || $family->canShow($access_level))) {
 				$families[] = $family;
@@ -1016,9 +1016,10 @@ class WT_Individual extends WT_GedcomRecord {
 	}
 
 	// Get an array of structures containing all the names in the record
-	public function getAllNames() {
-		return $this->_getAllNames('NAME', 1);
+	public function extractNames() {
+		$this->_extractNames(1, 'NAME', $this->getFacts('NAME', false, WT_USER_ACCESS_LEVEL, $this->canShowName()));
 	}
+
 
 	// Extra info to display when displaying this record in a list of
 	// selection items or favorites.

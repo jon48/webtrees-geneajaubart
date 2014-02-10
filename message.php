@@ -2,7 +2,7 @@
 // Send a message to a user in the system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2007  John Finlay and Others
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 define('WT_SCRIPT_NAME', 'message.php');
 require './includes/session.php';
@@ -122,7 +122,7 @@ case 'compose':
 	echo '<table>';
 	if ($to != 'all' && $to != 'last_6mo' && $to != 'never_logged') {
 		echo '<tr><td></td><td>', WT_I18N::translate('This message will be sent to %s', '<b>'.getUserFullName($to_user_id).'</b>'), '<br>';
-		echo /* I18N: %s is the name of a language */ WT_I18N::translate('This user prefers to receive messages in %s', Zend_Locale::getTranslation(get_user_setting($to_user_id, 'language'), 'language', WT_LOCALE)), '</td></tr>';
+		echo /* I18N: %s is the name of a language */ WT_I18N::translate('This user prefers to receive messages in %s', WT_I18N::languageName(get_user_setting($to_user_id, 'language'))), '</td></tr>';
 	}
 	if (!WT_USER_ID) {
 		echo '<tr><td valign="top" width="15%" align="right">', WT_I18N::translate('Your Name:'), '</td>';

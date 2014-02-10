@@ -2,7 +2,7 @@
 // Core Functions
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -60,7 +60,7 @@ function fetch_latest_version() {
 	$last_update_timestamp=WT_Site::preference('LATEST_WT_VERSION_TIMESTAMP');
 	if ($last_update_timestamp < WT_TIMESTAMP - 24*60*60) {
 		$row=WT_DB::prepare("SHOW VARIABLES LIKE 'version'")->fetchOneRow();
-		$params='?w='.WT_VERSION.WT_VERSION_RELEASE.'&p='.PHP_VERSION.'&m='.$row->value.'&o='.(DIRECTORY_SEPARATOR=='/'?'u':'w');
+		$params='?w='.WT_VERSION.'&p='.PHP_VERSION.'&m='.$row->value.'&o='.(DIRECTORY_SEPARATOR=='/'?'u':'w');
 		$latest_version_txt=fetch_remote_file('svn.webtrees.net', '/build/latest-version.txt'.$params);
 		if ($latest_version_txt) {
 			WT_Site::preference('LATEST_WT_VERSION', $latest_version_txt);

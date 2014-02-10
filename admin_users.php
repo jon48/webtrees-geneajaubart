@@ -2,7 +2,7 @@
 // Administrative User Interface.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 define('WT_SCRIPT_NAME', 'admin_users.php');
 require './includes/session.php';
@@ -356,6 +356,10 @@ case 'createform':
 				jQuery(this).val("");
 			}
 		});
+
+		function regex_quote(str) {
+			return str.replace(/[\\\\.?+*()[\](){}|]/g, "\\\\$&");
+		}
 	');
 
 	echo '
@@ -382,7 +386,7 @@ case 'createform':
 			</tr>
 			<tr>
 				<td>', WT_I18N::translate('Password'), help_link('password'), '</td>
-				<td><input type="password" name="pass1" style="width:95%;" value="', WT_Filter::escapeHtml($pass1), '" required placeholder="',  WT_I18N::plural('Use at least %s character.', 'Use at least %s characters.', WT_MINIMUM_PASSWORD_LENGTH, WT_I18N::number(WT_MINIMUM_PASSWORD_LENGTH)), '" pattern="', WT_REGEX_PASSWORD, '" onchange="form.user_password02.pattern = regex_quote(this.value);"></td>
+				<td><input type="password" name="pass1" style="width:95%;" value="', WT_Filter::escapeHtml($pass1), '" required placeholder="',  WT_I18N::plural('Use at least %s character.', 'Use at least %s characters.', WT_MINIMUM_PASSWORD_LENGTH, WT_I18N::number(WT_MINIMUM_PASSWORD_LENGTH)), '" pattern="', WT_REGEX_PASSWORD, '" onchange="form.pass2.pattern = regex_quote(this.value);"></td>
 				<td>', WT_I18N::translate('Automatically approve changes made by this user'), help_link('useradmin_auto_accept'), '</td>
 				<td><input type="checkbox" name="new_auto_accept" value="1"></td>
 			</tr>

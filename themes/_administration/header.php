@@ -2,7 +2,7 @@
 // Header for webtrees administration theme
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -75,7 +75,7 @@ echo
 	}
 	echo '</div>',
 	'<div id="info">',
-	WT_WEBTREES, ' ', WT_VERSION_TEXT,
+	WT_WEBTREES, ' ', WT_VERSION,
 	'<br>',
 	/* I18N: The local time on the server */
 	WT_I18N::translate('Server time'), ' —  ', format_timestamp(WT_SERVER_TIMESTAMP),
@@ -116,11 +116,12 @@ foreach (WT_Tree::getAll() as $tree) {
 	}
 }
 echo
-	'<li><a ', (WT_SCRIPT_NAME=='admin_site_merge.php' ? 'class="current" ' : ''), 'href="admin_site_merge.php">',   WT_I18N::translate('Merge records'), '</a></li>',
-	'<li><a ', (WT_SCRIPT_NAME=='admin_site_other.php' ? 'class="current" ' : ''), 'href="admin_site_other.php">',   WT_I18N::translate('Add unlinked records'), '</a></li>',
-	'<li><a ', (WT_SCRIPT_NAME=='admin_trees_check.php' ? 'class="current" ' : ''), 'href="admin_trees_check.php">', WT_I18N::translate('Check for errors'), '</a></li>',
-	'<li><a ', (WT_SCRIPT_NAME=='admin_site_change.php' ? 'class="current" ' : ''), 'href="admin_site_change.php">', WT_I18N::translate('Changes log'),'</a></li>',
-	'<li><a href="index_edit.php?gedcom_id=-1" onclick="return modalDialog(\'index_edit.php?gedcom_id=-1'.'\', \'',  WT_I18N::translate('Set the default blocks for new family trees'), '\');">', WT_I18N::translate('Set the default blocks'), '</a></li>',
+	'<li><a ', (WT_SCRIPT_NAME=='admin_site_merge.php'   ? 'class="current" ' : ''), 'href="admin_site_merge.php">',   WT_I18N::translate('Merge records'), '</a></li>',
+	'<li><a ', (WT_SCRIPT_NAME=='admin_site_other.php'   ? 'class="current" ' : ''), 'href="admin_site_other.php">',   WT_I18N::translate('Add unlinked records'), '</a></li>',
+	'<li><a ', (WT_SCRIPT_NAME=='admin_trees_places.php' ? 'class="current" ' : ''), 'href="admin_trees_places.php">', WT_I18N::translate('Update place names'), '</a></li>',
+	'<li><a ', (WT_SCRIPT_NAME=='admin_trees_check.php'  ? 'class="current" ' : ''), 'href="admin_trees_check.php">',  WT_I18N::translate('Check for errors'), '</a></li>',
+	'<li><a ', (WT_SCRIPT_NAME=='admin_site_change.php'  ? 'class="current" ' : ''), 'href="admin_site_change.php">',  WT_I18N::translate('Changes log'),'</a></li>',
+	'<li><a href="index_edit.php?gedcom_id=-1" onclick="return modalDialog(\'index_edit.php?gedcom_id=-1'.'\', \'',    WT_I18N::translate('Set the default blocks for new family trees'), '\');">', WT_I18N::translate('Set the default blocks'), '</a></li>',
 	'</ul></li>';
 
 if (WT_USER_IS_ADMIN) {

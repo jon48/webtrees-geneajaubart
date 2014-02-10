@@ -2,7 +2,7 @@
 // Colors theme
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 // PNG Icons By: Alessandro Rei; License:  GPL; www.deviantdark.com
 
 if (!defined('WT_WEBTREES')) {
@@ -127,7 +127,7 @@ if (!array_key_exists($subColor, $COLOR_THEME_LIST)) {
 $theme_name = "colors";
 
 // A version number in the path prevents browser-cache problems during upgrade
-define('WT_CSS_URL', WT_THEME_URL . 'css-1.5.1/');
+define('WT_CSS_URL', WT_THEME_URL . 'css-1.5.2/');
 
 $footerfile = WT_THEME_DIR . 'footer.php';
 $headerfile = WT_THEME_DIR . 'header.php';

@@ -2,7 +2,7 @@
 // Controller for full-page, themed HTML responses
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -133,21 +133,21 @@ class WT_Controller_Page extends WT_Controller_Base {
 		$title=html_entity_decode(strip_tags($this->page_title), ENT_QUOTES, 'UTF-8');
 
 		// Initialise variables for the theme’s header.php
-		$LINK_CANONICAL  =$this->canonical_url;
-		$META_ROBOTS     =$this->meta_robots;
-		$META_DESCRIPTION=WT_GED_ID ? get_gedcom_setting(WT_GED_ID, 'META_DESCRIPTION') : '';
+		$LINK_CANONICAL   = $this->canonical_url;
+		$META_ROBOTS      = $this->meta_robots;
+		$META_DESCRIPTION = WT_GED_ID ? get_gedcom_setting(WT_GED_ID, 'META_DESCRIPTION') : '';
 		if (!$META_DESCRIPTION) {
-			$META_DESCRIPTION=WT_TREE_TITLE;
+			$META_DESCRIPTION = strip_tags(WT_TREE_TITLE);
 		}
-		$META_GENERATOR  =WT_WEBTREES.'-'.WT_VERSION_TEXT.' - '.WT_WEBTREES_URL;
-		$META_TITLE      =WT_GED_ID ? get_gedcom_setting(WT_GED_ID, 'META_TITLE') : '';
+		$META_GENERATOR = WT_WEBTREES . ' ' . WT_VERSION . ' - ' . WT_WEBTREES_URL;
+		$META_TITLE     = WT_GED_ID ? get_gedcom_setting(WT_GED_ID, 'META_TITLE') : '';
 		if ($META_TITLE) {
-			$title.=' - '.$META_TITLE;
+			$title .= ' - ' . $META_TITLE;
 		}
 
 		// This javascript needs to be loaded in the header, *before* the CSS.
 		// All other javascript should be defered until the end of the page
-		$javascript= '<script src="' . WT_MODERNIZR_URL . '"></script>';
+		$javascript = '<script src="' . WT_MODERNIZR_URL . '"></script>';
 
 		// Give Javascript access to some PHP constants
 		$this->addInlineJavascript('

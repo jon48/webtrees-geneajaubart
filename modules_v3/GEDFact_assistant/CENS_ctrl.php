@@ -4,7 +4,7 @@
 // GEDFact Census information about an individual
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 $xref = WT_Filter::get('xref', WT_REGEX_XREF);
 
@@ -59,6 +59,7 @@ echo '</h3>';
 		<input id="pid_array" type="hidden" name="pid_array" value="none">
 		<input id="xref" type="hidden" name="xref" value=<?php echo $xref; ?>>
 		<?php
+		echo WT_Filter::getCsrf();
 
 global $tabno, $linkToID, $SEARCH_SPIDER;
 global $SHOW_AGE_DIFF, $GEDCOM;

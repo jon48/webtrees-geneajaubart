@@ -2,7 +2,7 @@
 // Register as a new User or request new password if it is lost
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 define('WT_SCRIPT_NAME', 'login.php');
 require './includes/session.php';
@@ -171,11 +171,17 @@ default:
 		<div>
 			<input type="submit" value="', WT_I18N::translate('Login'), '">
 		</div>
-		<div>
-			<a href="#" id="passwd_click">', WT_I18N::translate('Request new password'), '</a>
-		</div>';
-		if (WT_Site::preference('USE_REGISTRATION_MODULE')) {
-			echo '<div><a href="'.WT_LOGIN_URL.'?action=register">', WT_I18N::translate('Request new user account'), '</a></div>';
+		';
+		// Emails are sent from a TREE, not from a SITE.  Therefore if there is no
+		// tree available (initial setup or all trees private), then we can't send email.
+		if ($WT_TREE) {
+			echo '
+			<div>
+				<a href="#" id="passwd_click">', WT_I18N::translate('Request new password'), '</a>
+			</div>';
+			if (WT_Site::preference('USE_REGISTRATION_MODULE')) {
+				echo '<div><a href="'.WT_LOGIN_URL.'?action=register">', WT_I18N::translate('Request new user account'), '</a></div>';
+			}
 		}
 	echo '</form>';
 
@@ -323,9 +329,7 @@ case 'register':
 				WT_I18N::translate('Username') . " " . $user_name . WT_Mail::EOL .
 				WT_I18N::translate('Verification code:') . " " . get_user_setting($user_id, 'reg_hashcode') . WT_Mail::EOL .
 				WT_I18N::translate('Comments').": " . $user_comments . WT_Mail::EOL .
-				WT_I18N::translate('If you didn’t request an account, you can just delete this message.') .
-				'  '.
-				WT_I18N::translate('You won’t get any more email from this site, because the account request will be deleted automatically after seven days.') . WT_Mail::EOL;
+				WT_I18N::translate('If you didn’t request an account, you can just delete this message.') . WT_Mail::EOL;
 			$mail2_subject=/* I18N: %s is a server name/URL */ WT_I18N::translate('Your registration at %s', WT_SERVER_NAME.WT_SCRIPT_PATH);
 			$mail2_to     =$user_email;
 			$mail2_from   =$WEBTREES_EMAIL;

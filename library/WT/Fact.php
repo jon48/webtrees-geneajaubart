@@ -2,7 +2,7 @@
 // Class that defines an event details object
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2008 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -272,7 +272,7 @@ class WT_Fact {
 				$attributes[] = '<span dir="auto">' . WT_Filter::escapeHtml($value) . '</span>';
 			}
 			$date = $this->getDate();
-			if ($this->getTag() == 'BIRT' && $SHOW_PARENTS_AGE) {
+			if ($this->getTag() == 'BIRT' && $SHOW_PARENTS_AGE && $this->getParent() instanceof WT_Individual) {
 				$attributes[] = $date->display() . format_parents_age($this->getParent(), $date);
 			} else {
 				$attributes[] = $date->display();
@@ -333,7 +333,6 @@ class WT_Fact {
 
 		if (empty($factsort))
 			$factsort=array_flip(array(
-				'OBJE', 'NOTE', 'SOUR', // On the individual tabs, show 1 OBJE before 1 XXXX/2 OBJE
 				'BIRT',
 				'_HNM',
 				'ALIA', '_AKA', '_AKAN',
@@ -386,7 +385,9 @@ class WT_Fact {
 				'TEMP',
 				'SLGC', 'BAPL', 'CONL', 'ENDL', 'SLGS',
 				'ADDR', 'PHON', 'EMAIL', '_EMAIL', 'EMAL', 'FAX', 'WWW', 'URL', '_URL',
+				'FILE', // For media objects
 				'AFN', 'REFN', '_PRMN', 'REF', 'RIN', '_UID',
+				'OBJE', 'NOTE', 'SOUR',
 				'CHAN', '_TODO',
 			));
 
