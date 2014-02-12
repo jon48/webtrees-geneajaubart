@@ -15,6 +15,7 @@
 /data/cache
 /data/config*
 /data/histo.fr.php
+/data/html_purifier_cache
 
 # /data/certificates/
 /data/certificates/*
@@ -22,8 +23,67 @@
 # /modules_v3/
 /modules_v3/perso_translationtool
 
-# /modules_v3/googlemap/places/
-/modules_v3/googlemap/places/*
-
 # /themes/rural/css-1.5.1/images/
 /themes/rural/css-1.5.1/images/old
+
+# Build files
+/build
+/.gitattributes
+/Makefile
+
+# Unused Zend libraries
+/library/Zend/Acl
+/library/Zend/Amf
+/library/Zend/Application
+/library/Zend/Auth
+/library/Zend/Barcode
+/library/Zend/Captcha
+/library/Zend/CodeGenerator
+/library/Zend/Console
+/library/Zend/Config
+/library/Zend/Crypt
+/library/Zend/Currency
+/library/Zend/Date          
+/library/Zend/Db
+/library/Zend/Dojo
+/library/Zend/Dom
+/library/Zend/Feed
+/library/Zend/File
+/library/Zend/Form
+/library/Zend/Gdata
+/library/Zend/Http
+/library/Zend/Infocard
+/library/Zend/Json
+/library/Zend/Layout
+/library/Zend/Ldap
+/library/Zend/Log
+/library/Zend/Markup
+/library/Zend/Measure
+/library/Zend/Memory
+/library/Zend/Navigation
+/library/Zend/Oauth
+/library/Zend/OpenId
+/library/Zend/Paginator
+/library/Zend/Pdf
+/library/Zend/ProgressBar
+/library/Zend/Queue
+/library/Zend/Reflection
+/library/Zend/Rest
+/library/Zend/Search
+/library/Zend/Serializer
+/library/Zend/Service
+/library/Zend/Soap
+/library/Zend/Test
+/library/Zend/Text
+/library/Zend/TimeSync
+/library/Zend/Tool
+/library/Zend/View
+/library/Zend/Wildfire
+/library/Zend/XmlRpc
+
+# Language folder
+/language/*.po
+/language/extra
+/language/.gitattributes
+/language/.gitignore
+/language/updateLanguages.bat

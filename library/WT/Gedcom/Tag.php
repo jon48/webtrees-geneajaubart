@@ -2,7 +2,7 @@
 // Static GEDCOM data for Tags
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 Greg Roach
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-// @version: p_$Revision$ $Date$
-// $HeadURL$
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+// @author Jonathan Jaubart <dev@jaubart.com>
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -71,7 +70,7 @@ class WT_Gedcom_Tag {
 		'_DEAT_HSIB', '_DEAT_PARE', '_DEAT_SIBL', '_DEAT_SPOU', '_DEG', '_DETS',
 		'_EMAIL', '_EYEC', '_FA1', '_FA2', '_FA3', '_FA4', '_FA5', '_FA6', '_FA7', '_FA8',
 		'_FA9', '_FA10', '_FA11', '_FA12', '_FA13', '_FNRL', '_FREL', '_GEDF', '_GODP', '_HAIR',
-		'_HEB', '_HEIG', '_HNM', '_HOL', '_INTE', '_MARB_CHIL', '_MARB_FAMC', '_MARB_GCHI',
+		'_HEB', '_HEIG', '_HNM', '_HOL', '_INTE', '_LOC', '_MARB_CHIL', '_MARB_FAMC', '_MARB_GCHI',
 		'_MARB_GCH1', '_MARB_GCH2', '_MARB_HSIB', '_MARB_PARE', '_MARB_SIBL', '_MARI',
 		'_MARNM', '_PRIM', '_MARNM_SURN', '_MARR_CHIL', '_MARR_FAMC', '_MARR_GCHI',
 		'_MARR_GCH1', '_MARR_GCH2', '_MARR_HSIB', '_MARR_PARE', '_MARR_SIBL', '_MBON',
@@ -732,6 +731,7 @@ class WT_Gedcom_Tag {
 			case 'F': return /* I18N: gedcom tag _INTE */ WT_I18N::translate_c('FEMALE', 'Interred');
 			default:  return /* I18N: gedcom tag _INTE */ WT_I18N::translate('Interred');
 			}
+		case '_LOC': return /* I18N: gedcom tag _LOC */ WT_I18N::translate('Location');
 		case '_MARI': return /* I18N: gedcom tag _MARI */ WT_I18N::translate('Marriage intention');
 		case '_MARNM': return /* I18N: gedcom tag _MARNM */ WT_I18N::translate('Married name');
 		case '_PRIM': return /* I18N: gedcom tag _PRIM */ WT_I18N::translate('Highlighted image');
@@ -813,9 +813,10 @@ class WT_Gedcom_Tag {
 		case '_TODO':  return /* I18N: gedcom tag _TODO  */ WT_I18N::translate('Research task');
 		case '_TYPE':  return /* I18N: gedcom tag _TYPE  */ WT_I18N::translate('Media type');
 		case '_UID':   return /* I18N: gedcom tag _UID   */ WT_I18N::translate('Globally unique identifier');
-		case '_URL':   return /* I18N: gedcom tag _URL   */ WT_I18N::translate('Web URL');
+		case '_URL':   return /* I18N: gedcom tag _URL   */ WT_I18N::translate('URL');
 		case '_WEIG':  return /* I18N: gedcom tag _WEIG  */ WT_I18N::translate('Weight');
 		case '_WITN':  return /* I18N: gedcom tag _WITN  */ WT_I18N::translate('Witness');
+		case '_WT_OBJE_SORT':  return /* I18N: gedcom tag _WT_OBJE_SORT  */ WT_I18N::translate('Re-order media');
 		case '_YART':  return /* I18N: gedcom tag _YART  */ WT_I18N::translate('Yahrzeit');
 		// Brit milah applies only to males, no need for male/female translations
 		case '__BRTM_CHIL': return WT_I18N::translate  ('Brit milah of a son');

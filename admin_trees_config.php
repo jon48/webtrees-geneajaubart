@@ -2,7 +2,7 @@
 // UI for online updating of the GEDCOM config file.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 define('WT_SCRIPT_NAME', 'admin_trees_config.php');
 
@@ -99,6 +99,7 @@ case 'update':
 	set_gedcom_setting(WT_GED_ID, 'FAM_FACTS_UNIQUE',             str_replace(' ', '', WT_Filter::post('NEW_FAM_FACTS_UNIQUE')));
 	set_gedcom_setting(WT_GED_ID, 'FAM_ID_PREFIX',                WT_Filter::post('NEW_FAM_ID_PREFIX'));
 	set_gedcom_setting(WT_GED_ID, 'FULL_SOURCES',                 WT_Filter::postBool('NEW_FULL_SOURCES'));
+	set_gedcom_setting(WT_GED_ID, 'FORMAT_TEXT',                  WT_Filter::post('NEW_FORMAT_TEXT'));
 	set_gedcom_setting(WT_GED_ID, 'GEDCOM_ID_PREFIX',             WT_Filter::post('NEW_GEDCOM_ID_PREFIX'));
 	set_gedcom_setting(WT_GED_ID, 'GEDCOM_MEDIA_PATH',            WT_Filter::post('NEW_GEDCOM_MEDIA_PATH'));
 	set_gedcom_setting(WT_GED_ID, 'GENERATE_UIDS',                WT_Filter::postBool('NEW_GENERATE_UIDS'));
@@ -926,6 +927,28 @@ if (count(WT_Tree::getAll())==1) { //Removed because it doesn't work here for mu
 								get_gedcom_setting(WT_GED_ID, 'SHOW_PEDIGREE_PLACES')
 							)
 						);
+						?>
+					</td>
+				</tr>
+				<tr>
+					<th colspan="2">
+						<?php echo WT_I18N::translate('Format'); ?>
+					</th>
+				</tr>
+				<tr>
+					<td>
+						<?php echo WT_I18N::translate('Format text and notes'), help_link('FORMAT_TEXT'); ?>
+					</td>
+					<td>
+						<?php
+						echo select_edit_control('NEW_FORMAT_TEXT',
+								array(
+									''         => WT_I18N::translate('none'),
+									'markdown' => /* I18N: https://en.wikipedia.org/wiki/Markdown */ WT_I18N::translate('markdown')
+								),
+								null,
+								get_gedcom_setting(WT_GED_ID, 'FORMAT_TEXT')
+							);
 						?>
 					</td>
 				</tr>

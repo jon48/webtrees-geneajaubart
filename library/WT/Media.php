@@ -2,7 +2,7 @@
 // Class that defines a media object
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -155,6 +155,10 @@ class WT_Media extends WT_GedcomRecord {
 							$width  = $THUMBNAIL_WIDTH;
 							$height = round($imgsize[1] * ($width/$imgsize[0]));
 							$thumb_image = @imagecreatetruecolor($width, $height);
+							// Create a transparent background, instead of the default black one
+							@imagesavealpha($thumb_image, true);
+							@imagefill($thumb_image, 0, 0, imagecolorallocatealpha($thumb_image, 0, 0, 0, 127));
+							// Shrink the image
 							@imagecopyresampled($thumb_image, $main_image, 0, 0, 0, 0, $width, $height, $imgsize[0], $imgsize[1]);
 							switch ($imgsize['mime']) {
 							case 'image/png':  @imagepng ($thumb_image, $file); break;
@@ -430,14 +434,11 @@ class WT_Media extends WT_GedcomRecord {
 	}
 
 	// Get an array of structures containing all the names in the record
-	public function getAllNames() {
-		if (strpos($this->getGedcom(), "\n1 TITL ")) {
-			// Earlier gedcom versions had level 1 titles
-			return parent::_getAllNames('TITL', 1);
-		} else {
-			// Later gedcom versions had level 2 titles
-			return parent::_getAllNames('TITL', 2);
-		}
+	public function extractNames() {
+		// Earlier gedcom versions had level 1 titles
+		// Later gedcom versions had level 2 titles
+		$this->_extractNames(2, 'TITL', $this->getFacts('FILE'));
+		$this->_extractNames(1, 'TITL', $this->getFacts('TITL'));
 	}
 
 	// Extra info to display when displaying this record in a list of

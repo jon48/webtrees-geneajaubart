@@ -1,1 +1,0 @@
-CKEDITOR.plugins.setLang("wordcount","pl",{WordCount:"S\u0142\u00f3w:",CharCount:"Znak\u00f3w:",CharCountWithHTML:"Znak\u00f3w (including HTML):",limit:"Limit:",title:"Statystyka"});

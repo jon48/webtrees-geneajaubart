@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <supplementalData>
-    <version number="$Revision$"/>
-    <generation date="$Date$"/>
+    <version number="$Revision: 1.3 $"/>
+    <generation date="$Date: 2009/05/05 23:15:57 $"/>
 	<telephoneCodeData>
 		<codesByTerritory territory="001">
 			<telephoneCountryCode code="388"/>

@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -214,7 +214,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 
 	// Convert custom markup into HTML
 	public static function formatCensusNote(WT_Note $note) {
-		global $controller;
+		global $controller, $WT_TREE;
 
 		$headers = array(
 			'AgM'        => 'Age at first marriage',
@@ -303,7 +303,7 @@ class GEDFact_assistant_WT_Module extends WT_Module {
 				'<p>' . $postamble . '</p>';
 		} else {
 			// Not a census-assistant shared note - apply default formatting
-			return WT_Filter::expandUrls($note->getNote());
+			return WT_Filter::formatText($note->getNote(), $WT_TREE);
 		}
 	}
 

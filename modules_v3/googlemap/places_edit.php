@@ -2,7 +2,7 @@
 // Interface to edit place locations
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team. All rights reserved.
@@ -19,9 +19,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-// @version: p_$Revision$ $Date$
-// $HeadURL$
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+// @author Jonathan Jaubart <dev@jaubart.com>
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -105,23 +104,20 @@ if ($action=='updaterecord' && WT_USER_IS_ADMIN) {
 	exit;
 }
 
-// Update placelocation STREETVIEW fields ----------------------------------------------------------
-if ($action=='update_sv_params' && WT_USER_IS_ADMIN) {
-	echo "Google Street View™ parameters updated";
-	echo "<br><br>";
-	echo "LATI = ".$_REQUEST['svlati']."<br>";
-	echo "LONG = ".$_REQUEST['svlong']."<br>";
-	echo "BEAR = ".$_REQUEST['svbear']."<br>";
-	echo "ELEV = ".$_REQUEST['svelev']."<br>";
-	echo "ZOOM = ".$_REQUEST['svzoom']."<br>";
-	echo "<br><br>";
-	$statement=
-		WT_DB::prepare("UPDATE `##placelocation` SET sv_lati=?, sv_long=?, sv_bearing=?, sv_elevation=?, sv_zoom=? WHERE pl_id=?");
-	$statement->execute(array($_REQUEST['svlati'], $_REQUEST['svlong'], $_REQUEST['svbear'], $_REQUEST['svelev'], $_REQUEST['svzoom'], $placeid));
-	if (!WT_DEBUG) {
-		$controller->addInlineJavaScript('closePopupAndReloadParent();');
-	}
-	echo "<div class=\"center\"><button onclick=\"closePopupAndReloadParent();return false;\">", WT_I18N::translate('close'), "</button></div>";
+// Update placelocation STREETVIEW fields
+// TODO: This ought to be a POST request, rather than a GET request
+if ($action == 'update_sv_params' && WT_USER_IS_ADMIN) {
+	WT_DB::prepare(
+		"UPDATE `##placelocation` SET sv_lati=?, sv_long=?, sv_bearing=?, sv_elevation=?, sv_zoom=? WHERE pl_id=?"
+	)->execute(array(
+		WT_Filter::get('svlati'),
+		WT_Filter::get('svlong'),
+		WT_Filter::get('svbear'),
+		WT_Filter::get('svelev'),
+		WT_Filter::get('svzoom'),
+		$placeid
+	));
+	$controller->addInlineJavaScript('window.close();');
 	exit;
 }
 

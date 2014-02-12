@@ -2,7 +2,7 @@
 // Show help text in a popup window.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // This file also serves as a database of fact and label descriptions,
 // allowing them to be discovered by xgettext, so we may use them dynamically
@@ -24,9 +24,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-// @version: p_$Revision$ $Date$
-// $HeadURL$
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+// @author Jonathan Jaubart <dev@jaubart.com>
 
 define('WT_SCRIPT_NAME', 'help_text.php');
 require './includes/session.php';
@@ -523,6 +522,15 @@ case 'FAM_ID_PREFIX':
 	$text=WT_I18N::translate('When a new family record is added online in <b>webtrees</b>, a new ID for that family will be generated automatically. The family ID will have this prefix.');
 	break;
 
+case 'FORMAT_TEXT':
+	$title=WT_I18N::translate('Format text and notes');
+	$text =
+		'<p>' .
+		WT_I18N::translate('To ensure compatibility with other genealogy applications, notes, text, and transcripts should be recorded in simple, unformatted text.  However, formatting is often desirable to aid presentation, comprehension, etc.') .
+		'</p><p>' .
+		WT_I18N::translate('Markdown is a simple system of formatting, used on websites such as Wikipedia.  It uses unobtrusive punctuation characters to create headings and sub-headings, bold and italic text, lists, tables, etc.') .
+		'</p>';
+	break;
 case 'FULL_SOURCES':
 	$title=WT_I18N::translate('Use full source citations');
 	$text=WT_I18N::translate('Source citations can include fields to record the quality of the data (primary, secondary, etc.) and the date the event was recorded in the source.  If you don’t use these fields, you can disable them when creating new source citations.');
@@ -1508,7 +1516,7 @@ default:
 		$title=WT_I18N::translate('Help');
 		$text=WT_I18N::translate('The help text has not been written for this item.');
 		// If we've been called from a module, allow the module to provide the help text
-	$mod = WT_Filter::get('mod', '[A-Za-z0-9_]+');
+		$mod = WT_Filter::get('mod', '[A-Za-z0-9_]+');
 		if (file_exists(WT_ROOT.WT_MODULES_DIR.$mod.'/help_text.php')) {
 			require WT_ROOT.WT_MODULES_DIR.$mod.'/help_text.php';
 		}

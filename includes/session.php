@@ -2,7 +2,7 @@
 // Startup and session logic
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2011 PGV Development Team.  All rights reserved.
@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 // WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
 if (!defined('WT_SCRIPT_NAME')) {
@@ -28,14 +28,13 @@ if (!defined('WT_SCRIPT_NAME')) {
 }
 
 // Identify ourself
-define('WT_WEBTREES',        'webtrees');
-define('WT_VERSION',         '1.5.1');
-define('WT_VERSION_RELEASE', ''); // “dev”, “beta”, “rc1”, “”, etc.
-define('WT_VERSION_TEXT',    trim(WT_VERSION.' '.WT_VERSION_RELEASE));
+define('WT_WEBTREES',     'webtrees');
+define('WT_VERSION',      '1.5.2');
+define('WT_VERSION_TEXT', WT_VERSION); // Deprecated
 
 // External URLs
-define('WT_WEBTREES_URL',    'http://www.webtrees.net/');
-define('WT_WEBTREES_WIKI',   'http://wiki.webtrees.net/');
+define('WT_WEBTREES_URL',  'http://www.webtrees.net/');
+define('WT_WEBTREES_WIKI', 'http://wiki.webtrees.net/');
 
 // Optionally, specify a CDN server for static content (e.g. CSS, JS, PNG)
 // For example, http://my.cdn.com/webtrees-static-1.3.1/
@@ -56,7 +55,7 @@ define('WT_JQUERY_DATATABLES_URL', WT_STATIC_URL.'js/jquery.datatables-1.9.4.js'
 define('WT_JQUERY_JEDITABLE_URL',  WT_STATIC_URL.'js/jquery.jeditable-1.7.1.js');
 define('WT_JQUERY_WHEELZOOM_URL',  WT_STATIC_URL.'js/jquery.wheelzoom-1.1.2.js');
 define('WT_MODERNIZR_URL',         WT_STATIC_URL.'js/modernizr.custom-2.6.2.js');
-define('WT_WEBTREES_JS_URL',       WT_STATIC_URL.'js/webtrees-1.5.1.js');
+define('WT_WEBTREES_JS_URL',       WT_STATIC_URL.'js/webtrees-1.5.2.js');
 
 // Location of our modules and themes.  These are used as URLs and folder paths.
 define('WT_MODULES_DIR', 'modules_v3/'); // Update setup.php and build/Makefile when this changes
@@ -146,9 +145,12 @@ if (version_compare(PHP_VERSION, '5.4', '<') && get_magic_quotes_gpc()) {
 }
 
 // Invoke the Zend Framework Autoloader, so we can use Zend_XXXXX and WT_XXXXX classes
-set_include_path(WT_ROOT.'library'.PATH_SEPARATOR.get_include_path());
+set_include_path(WT_ROOT . 'library' . PATH_SEPARATOR . get_include_path());
 require_once 'Zend/Loader/Autoloader.php';
-Zend_Loader_Autoloader::getInstance()->registerNamespace('WT_');
+Zend_Loader_Autoloader::getInstance()
+	->registerNamespace('WT_')
+	->registerNamespace('HTMLPurifier_')
+	->registerNamespace('Michelf\\');
 
 // PHP requires a time zone to be set in php.ini
 if (!ini_get('date.timezone')) {
@@ -163,15 +165,19 @@ if (!ini_get('date.timezone')) {
 // TODO: we ought to generate this dynamically, but lots of code currently relies on this global
 $QUERY_STRING=isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
 
+$https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off';
 define('WT_SERVER_NAME',
-	(empty($_SERVER['HTTPS']) || !in_array($_SERVER['HTTPS'], array('1', 'on', 'On', 'ON')) ?  'http://' : 'https://').
+	($https ?  'https://' : 'http://').
 	(empty($_SERVER['SERVER_NAME']) ? '' : $_SERVER['SERVER_NAME']).
-	(empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT']==80 ? '' : ':'.$_SERVER['SERVER_PORT'])
+	(empty($_SERVER['SERVER_PORT']) || (!$https && $_SERVER['SERVER_PORT']==80) || ($https && $_SERVER['SERVER_PORT']==443) ? '' : ':'.$_SERVER['SERVER_PORT'])
 );
 
+// REDIRECT_URL should be set in the case of Apache following a RedirectRule
 // SCRIPT_NAME should always be correct, but is not always present.
 // PHP_SELF should always be present, but may have trailing path: /path/to/script.php/FOO/BAR
-if (!empty($_SERVER['SCRIPT_NAME'])) {
+if (!empty($_SERVER['REDIRECT_URL'])) {
+	define('WT_SCRIPT_PATH', substr($_SERVER['REDIRECT_URL'], 0, stripos($_SERVER['REDIRECT_URL'], WT_SCRIPT_NAME)));
+} elseif (!empty($_SERVER['SCRIPT_NAME'])) {
 	define('WT_SCRIPT_PATH', substr($_SERVER['SCRIPT_NAME'], 0, stripos($_SERVER['SCRIPT_NAME'], WT_SCRIPT_NAME)));
 } elseif (!empty($_SERVER['PHP_SELF'])) {
 	define('WT_SCRIPT_PATH', substr($_SERVER['PHP_SELF'], 0, stripos($_SERVER['PHP_SELF'], WT_SCRIPT_NAME)));
@@ -198,7 +204,6 @@ require WT_ROOT.'includes/functions/functions.php';
 require WT_ROOT.'includes/functions/functions_db.php';
 // TODO: Not all pages require all of these.  Only load them in scripts that need them?
 require WT_ROOT.'includes/functions/functions_print.php';
-require WT_ROOT.'includes/functions/functions_rtl.php';
 require WT_ROOT.'includes/functions/functions_mediadb.php';
 require WT_ROOT.'includes/functions/functions_date.php';
 require WT_ROOT.'includes/functions/functions_charts.php';
@@ -300,14 +305,43 @@ case '':
 }
 
 // Store our session data in the database.
-// Only update the session table once per minute, unless the session data has actually changed.
 session_set_save_handler(
-	create_function('', 'return true;'), // open
-	create_function('', 'return true;'), // close
-	create_function('$id', 'return WT_DB::prepare("SELECT session_data FROM `##session` WHERE session_id=?")->execute(array($id))->fetchOne();'), // read
-	create_function('$id,$data', 'global $WT_REQUEST;WT_DB::prepare("INSERT INTO `##session` (session_id, user_id, ip_address, session_data, session_time) VALUES (?,?,?,?,CURRENT_TIMESTAMP-SECOND(CURRENT_TIMESTAMP)) ON DUPLICATE KEY UPDATE user_id=VALUES(user_id), ip_address=VALUES(ip_address), session_data=VALUES(session_data), session_time=CURRENT_TIMESTAMP-SECOND(CURRENT_TIMESTAMP)")->execute(array($id, WT_USER_ID, $WT_REQUEST->getClientIp(), $data));return true;'), // write
-	create_function('$id', 'WT_DB::prepare("DELETE FROM `##session` WHERE session_id=?")->execute(array($id));return true;'), // destroy
-	create_function('$maxlifetime', 'WT_DB::prepare("DELETE FROM `##session` WHERE session_time < DATE_SUB(NOW(), INTERVAL ? SECOND)")->execute(array($maxlifetime));return true;') // gc
+	// open
+	function () {
+		return true;
+	},
+	// close
+	function () {
+		return true;
+	},
+	// read
+	function ($id) {
+		return WT_DB::prepare("SELECT session_data FROM `##session` WHERE session_id=?")->execute(array($id))->fetchOne();
+	},
+	// write
+	function ($id, $data) use ($WT_REQUEST) {
+		// Only update the session table once per minute, unless the session data has actually changed.
+		WT_DB::prepare(
+			"INSERT INTO `##session` (session_id, user_id, ip_address, session_data, session_time)" .
+			" VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP - SECOND(CURRENT_TIMESTAMP))" .
+			" ON DUPLICATE KEY UPDATE" .
+			" user_id      = VALUES(user_id)," .
+			" ip_address   = VALUES(ip_address)," .
+			" session_data = VALUES(session_data)," .
+			" session_time = CURRENT_TIMESTAMP - SECOND(CURRENT_TIMESTAMP)"
+		)->execute(array($id, WT_USER_ID, $WT_REQUEST->getClientIp(), $data));
+		return true;
+	},
+	// destroy
+	function ($id) {
+		WT_DB::prepare("DELETE FROM `##session` WHERE session_id=?")->execute(array($id));
+		return true;
+	},
+	// gc
+	function ($maxlifetime) {
+		WT_DB::prepare("DELETE FROM `##session` WHERE session_time < DATE_SUB(NOW(), INTERVAL ? SECOND)")->execute(array($maxlifetime));
+		return true;
+	}
 );
 
 // Use the Zend_Session object to start the session.
@@ -413,9 +447,6 @@ $GEDCOM=WT_GEDCOM;
 define('WT_LOCALE', WT_I18N::init());
 $WT_SESSION->locale=WT_I18N::$locale;
 
-// Non-latin languages may need non-latin digits
-define('WT_NUMBERING_SYSTEM', Zend_Locale_Data::getContent(WT_LOCALE, 'defaultnumberingsystem'));
-
 // Set our gedcom selection as a default for the next page
 $WT_SESSION->GEDCOM=WT_GEDCOM;
 
@@ -483,6 +514,9 @@ if (substr(WT_SCRIPT_NAME, 0, 5)=='admin' || WT_SCRIPT_NAME=='module.php' && sub
 		// Requested change of theme?
 		$THEME_DIR = WT_Filter::get('theme');
 		unset($_GET['theme']);
+		if (!in_array($THEME_DIR, get_theme_names())) {
+			$THEME_DIR = '';
+		}
 		// Last theme used?
 		if (!$THEME_DIR && in_array($WT_SESSION->theme_dir, get_theme_names())) {
 			$THEME_DIR=$WT_SESSION->theme_dir;

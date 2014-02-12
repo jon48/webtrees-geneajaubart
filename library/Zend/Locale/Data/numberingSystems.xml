@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <supplementalData>
-    <version number="$Revision$"/>
-    <generation date="$Date$"/>
+    <version number="$Revision: 1.9 $"/>
+    <generation date="$Date: 2009/05/05 23:15:57 $"/>
     <numberingSystems>
         <numberingSystem id="arab" type="numeric" digits="٠١٢٣٤٥٦٧٨٩"/>
         <numberingSystem id="arabext" type="numeric" digits="۰۱۲۳۴۵۶۷۸۹"/>

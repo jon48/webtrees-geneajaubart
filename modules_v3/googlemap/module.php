@@ -2,7 +2,7 @@
 // Classes and libraries for module system
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2010 John Finlay
@@ -19,9 +19,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-// @version: p_$Revision$ $Date$
-// $HeadURL$
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+// @author Jonathan Jaubart <dev@jaubart.com>
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -72,10 +71,11 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			break;
 		case 'admin_places':
 		case 'places_edit':
+		case 'wt_v3_street_view':
 			// TODO: these files should be methods in this class
-			require_once WT_ROOT.WT_MODULES_DIR.'googlemap/googlemap.php';
-			require_once WT_ROOT.WT_MODULES_DIR.'googlemap/defaultconfig.php';
-			require WT_ROOT.WT_MODULES_DIR.$this->getName().'/'.$mod_action.'.php';
+			require WT_ROOT . WT_MODULES_DIR . 'googlemap/googlemap.php';
+			require WT_ROOT . WT_MODULES_DIR . 'googlemap/defaultconfig.php';
+			require WT_ROOT . WT_MODULES_DIR . $this->getName() . '/' . $mod_action . '.php';
 			break;
 		default:
 			header('HTTP/1.0 404 Not Found');
@@ -273,7 +273,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 							</td>
 						</tr>
 						<tr>
-							<th><?php echo WT_I18N::translate('Google Street View™'); ?></th>
+							<th><?php echo /* I18N: http://en.wikipedia.org/wiki/Google_street_view */ WT_I18N::translate('Google Street View™'); ?></th>
 							<td><?php echo radio_buttons('NEW_GM_USE_STREETVIEW', array(false=>WT_I18N::translate('hide'),true=>WT_I18N::translate('show')), get_module_setting('googlemap', 'GM_USE_STREETVIEW', '0')); ?></td>
 						</tr>
 						<tr>
@@ -1262,7 +1262,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				// end of add image
 
 				$dataleft  = WT_Filter::escapeJs($image . $event . ' — ' . $name);
-				$datamid   = WT_Filter::escapeJs(' <span><a href="' . $person->getHtmlUrl() . '"></a></span>');
+				$datamid   = WT_Filter::escapeJs(' <span><a href="' . $person->getHtmlUrl() . '">('.WT_I18N::translate('View person').')</a></span>');
 				$dataright = WT_Filter::escapeJs('<br><strong>'. WT_I18N::translate('Birth:') . '&nbsp;</strong>' .  $person->getBirthDate()->Display(false) . ' — ' . $person->getBirthPlace());
 
 				$latlongval[$i] = get_lati_long_placelocation($person->getBirthPlace());

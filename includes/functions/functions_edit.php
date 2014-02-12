@@ -2,7 +2,7 @@
 // Various functions used by the Edit interface
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -19,9 +19,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-// @version: p_$Revision$ $Date$
-// $HeadURL$
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+// @author Jonathan Jaubart <dev@jaubart.com>
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -588,9 +587,9 @@ function add_simple_tag($tag, $upperlevel='', $label='', $extra=null) {
 		else{
 		//END PERSO
 		// textarea
-		if ($fact=='TEXT' || $fact=='ADDR' || ($fact=='NOTE' && !$islink)) {
-			echo "<textarea id=\"", $element_id, "\" name=\"", $element_name, "\" dir=\"auto\">", WT_Filter::escapeHtml($value), "</textarea><br>";
-		} else {
+			if ($fact=='TEXT' || $fact=='ADDR' || ($fact=='NOTE' && !$islink)) {
+				echo "<textarea id=\"", $element_id, "\" name=\"", $element_name, "\" dir=\"auto\">", WT_Filter::escapeHtml($value), "</textarea><br>";
+			} else {
 				// text
 				// If using GEDFact-assistant window
 				if ($action=="addnewnote_assisted") {
@@ -599,37 +598,37 @@ function add_simple_tag($tag, $upperlevel='', $label='', $extra=null) {
 				echo "<input type=\"text\" id=\"", $element_id, "\" name=\"", $element_name, "\" value=\"", WT_Filter::escapeHtml($value), "\" dir=\"ltr\"";
 				}
 				echo " class=\"{$fact}\"";
-			if (in_array($fact, $subnamefacts)) {
-				echo " onblur=\"updatewholename();\" onkeyup=\"updatewholename();\"";
-			}
-			if ($fact=='GIVN') {
-				echo ' autofocus';
-			}
-			if ($fact=="DATE") {
-				echo " onblur=\"valid_date(this);\" onmouseout=\"valid_date(this);\"";
-			}
-			if ($fact=="LATI") {
-				echo " onblur=\"valid_lati_long(this, 'N', 'S');\" onmouseout=\"valid_lati_long(this, 'N', 'S');\"";
-			}
-			if ($fact=="LONG") {
-				echo " onblur=\"valid_lati_long(this, 'E', 'W');\" onmouseout=\"valid_lati_long(this, 'E', 'W');\"";
-			}
-			echo '>';
+				if (in_array($fact, $subnamefacts)) {
+					echo " onblur=\"updatewholename();\" onkeyup=\"updatewholename();\"";
+				}
+				if ($fact=='GIVN') {
+					echo ' autofocus';
+				}
+				if ($fact=="DATE") {
+					echo " onblur=\"valid_date(this);\" onmouseout=\"valid_date(this);\"";
+				}
+				if ($fact=="LATI") {
+					echo " onblur=\"valid_lati_long(this, 'N', 'S');\" onmouseout=\"valid_lati_long(this, 'N', 'S');\"";
+				}
+				if ($fact=="LONG") {
+					echo " onblur=\"valid_lati_long(this, 'E', 'W');\" onmouseout=\"valid_lati_long(this, 'E', 'W');\"";
+				}
+				echo '>';
 			}
 
-		$tmp_array = array('TYPE','TIME','NOTE','SOUR','REPO','OBJE','ASSO','_ASSO','AGE');
+			$tmp_array = array('TYPE','TIME','NOTE','SOUR','REPO','OBJE','ASSO','_ASSO','AGE');
 
 			// split PLAC
-		if ($fact=='PLAC') {
-				echo "<div id=\"", $element_id, "_pop\" style=\"display: inline;\">";
-				echo print_specialchar_link($element_id), ' ', print_findplace_link($element_id);
-			echo '<span  onclick="jQuery(\'#', $upperlevel, '_LATI_tr,#', $upperlevel, '_LONG_tr,#INDI_LATI_tr,#INDI_LONG_tr,tr[id^=LATI],tr[id^=LONG]\').toggle(\'fast\'); return false;" class="icon-target" title="', WT_Gedcom_Tag::getLabel('LATI'), ' / ', WT_Gedcom_Tag::getLabel('LONG'), '"></span>';
-				echo '</div>';
-				if (array_key_exists('places_assistant', WT_Module::getActiveModules())) {
-					places_assistant_WT_Module::setup_place_subfields($element_id);
-					places_assistant_WT_Module::print_place_subfields($element_id);
-			}
-		} elseif (!in_array($fact, $tmp_array)) {
+			if ($fact=='PLAC') {
+					echo "<div id=\"", $element_id, "_pop\" style=\"display: inline;\">";
+					echo print_specialchar_link($element_id), ' ', print_findplace_link($element_id);
+				echo '<span  onclick="jQuery(\'#', $upperlevel, '_LATI_tr,#', $upperlevel, '_LONG_tr,#INDI_LATI_tr,#INDI_LONG_tr,tr[id^=LATI],tr[id^=LONG]\').toggle(\'fast\'); return false;" class="icon-target" title="', WT_Gedcom_Tag::getLabel('LATI'), ' / ', WT_Gedcom_Tag::getLabel('LONG'), '"></span>';
+					echo '</div>';
+					if (array_key_exists('places_assistant', WT_Module::getActiveModules())) {
+						places_assistant_WT_Module::setup_place_subfields($element_id);
+						places_assistant_WT_Module::print_place_subfields($element_id);
+				}
+			} elseif (!in_array($fact, $tmp_array)) {
 				echo print_specialchar_link($element_id);
 			}
 		} //END PERSO
@@ -919,25 +918,31 @@ function print_add_layer($tag, $level=2) {
 
 // Add some empty tags to create a new fact
 function addSimpleTags($fact) {
-	global $ADVANCED_PLAC_FACTS;
+	global $ADVANCED_PLAC_FACTS, $nonplacfacts, $nondatefacts;
 
 	// For new individuals, these facts default to "Y"
-	if ($fact=='MARR' /*|| $fact=='BIRT'*/) {
+	if ($fact=='MARR') {
 		add_simple_tag("0 {$fact} Y");
 	} else {
 		add_simple_tag("0 {$fact}");
 	}
-	add_simple_tag("0 DATE", $fact, WT_Gedcom_Tag::getLabel("{$fact}:DATE"));
-	add_simple_tag("0 PLAC", $fact, WT_Gedcom_Tag::getLabel("{$fact}:PLAC"));
 
-	if (preg_match_all('/('.WT_REGEX_TAG.')/', $ADVANCED_PLAC_FACTS, $match)) {
-		foreach ($match[1] as $tag) {
-			add_simple_tag("0 {$tag}", $fact, WT_Gedcom_Tag::getLabel("{$fact}:PLAC:{$tag}"));
-		}
+	if (!in_array($fact, $nondatefacts)) {
+		add_simple_tag("0 DATE", $fact, WT_Gedcom_Tag::getLabel("{$fact}:DATE"));
 	}
-	add_simple_tag("0 MAP", $fact);
-	add_simple_tag("0 LATI", $fact);
-	add_simple_tag("0 LONG", $fact);
+
+	if (!in_array($fact, $nonplacfacts)) {
+		add_simple_tag("0 PLAC", $fact, WT_Gedcom_Tag::getLabel("{$fact}:PLAC"));
+
+		if (preg_match_all('/('.WT_REGEX_TAG.')/', $ADVANCED_PLAC_FACTS, $match)) {
+			foreach ($match[1] as $tag) {
+				add_simple_tag("0 {$tag}", $fact, WT_Gedcom_Tag::getLabel("{$fact}:PLAC:{$tag}"));
+			}
+		}
+		add_simple_tag("0 MAP", $fact);
+		add_simple_tag("0 LATI", $fact);
+		add_simple_tag("0 LONG", $fact);
+	}
 }
 
 // Assemble the pieces of a newly created record into gedcom
@@ -979,9 +984,9 @@ function addNewSex() {
 function addNewFact($fact) {
 	global $tagSOUR, $ADVANCED_PLAC_FACTS;
 
-	$FACT=WT_Filter::post($fact, WT_REGEX_TAG);
-	$DATE=WT_Filter::post("{$fact}_DATE");
-	$PLAC=WT_Filter::post("{$fact}_PLAC");
+	$FACT = WT_Filter::post($fact);
+	$DATE = WT_Filter::post("{$fact}_DATE");
+	$PLAC = WT_Filter::post("{$fact}_PLAC");
 	if ($DATE || $PLAC || $FACT && $FACT!='Y') {
 		if ($FACT && $FACT!='Y') {
 			$gedrec="\n1 {$fact} {$FACT}";

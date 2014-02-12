@@ -4,7 +4,7 @@
 // Media Link information about an individual
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 // GEDFact Media assistant replacement code for inverselink.php: ===========================
 
@@ -605,7 +605,7 @@ function shiftlinks() {
 	// Unlink records indicated by radio button =========
 	if ($exist_links) {
 		foreach (explode(',', $exist_links) as $remLinkId) {
-			$indi = WT_Individual::getInstance($remLinkId);
+			$indi = WT_GedcomRecord::getInstance($remLinkId);
 			$indi->removeLinks($mediaid, $update_CHAN!='no_change');
 		}
 	}
@@ -614,7 +614,7 @@ function shiftlinks() {
 		// array_unique() because parseAddLinks() may includes the gid field, even
 		// when it is also in the list.
 		foreach (array_unique(explode(',', $more_links)) as $addLinkId) {
-			$indi = WT_Individual::getInstance($addLinkId);
+			$indi = WT_GedcomRecord::getInstance($addLinkId);
 			$indi->createFact('1 OBJE @' . $mediaid . '@', $update_CHAN!='no_change');
 		}
 	}

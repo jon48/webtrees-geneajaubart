@@ -2,7 +2,7 @@
 // Controller for the branches list
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -188,10 +188,10 @@ class WT_Controller_Branches extends WT_Controller_Page {
 
 				$spouse = $family->getSpouse($individual);
 				if ($spouse) {
-					$sosa = array_search($spouse->getXref(), $this->ancestors);
+					$sosa = array_search($spouse, $this->ancestors);
 					if ($sosa) {
 						$sosa_class = 'search_hit';
-						$sosa_html  = ' <a class="details1 ' . $spouse->getBoxStyle() . '" title="' . WT_I18N::translate('Sosa') . '" href="relationship.php?pid2=' . WT_USER_ROOT_ID . '&amp;pid1=' . $spouse->getXref() . '"> '.$sosa.' </a>' . self::sosaGeneration($sosa2);
+						$sosa_html  = ' <a class="details1 ' . $spouse->getBoxStyle() . '" title="' . WT_I18N::translate('Sosa') . '" href="relationship.php?pid2=' . WT_USER_ROOT_ID . '&amp;pid1=' . $spouse->getXref() . '"> '.$sosa.' </a>' . self::sosaGeneration($sosa);
 					} else {
 						$sosa_class = '';
 						$sosa_html  = '';

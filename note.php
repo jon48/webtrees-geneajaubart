@@ -3,7 +3,7 @@
 // reference this shared note.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2009 PGV Development Team.  All rights reserved.
@@ -20,7 +20,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 define('WT_SCRIPT_NAME', 'note.php');
 require './includes/session.php';
@@ -92,11 +92,11 @@ foreach ($controller->record->getFacts() as $fact) {
 	}
 }
 
-// Check if using census assistant
+// Legacy formatting, created by the census assistant
 if (array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 	$text = GEDFact_assistant_WT_Module::formatCensusNote($controller->record);
 } else {
-	$text = WT_Filter::expandUrls($controller->record->getNote());
+	$text = WT_Filter::formatText($controller->record->getNote(), $WT_TREE);
 }
 
 ?>
@@ -157,7 +157,7 @@ if (array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 						<?php echo WT_I18N::translate('Shared note'); ?>
 					<?php } ?>
 				</td>
-				<td class="optionbox wrap width80" style="white-space: pre-wrap;"><?php echo $text; ?></td>
+				<td class="optionbox wrap width80"><?php echo $text; ?></td>
 			</tr>
 			<?php
 				foreach ($facts as $fact) {

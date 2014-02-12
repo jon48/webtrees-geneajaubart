@@ -4,7 +4,7 @@
 // Various printing functions used by all scripts and included by the functions.php file.
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
@@ -21,9 +21,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-// @version: p_$Revision$ $Date$
-// $HeadURL$
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+// @author Jonathan Jaubart <dev@jaubart.com>
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -39,7 +38,7 @@ if (!defined('WT_WEBTREES')) {
 * @param int $count on some charts it is important to keep a count of how many boxes were printed
 */
 function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
-	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $GEDCOM;
+	global $GEDCOM;
 	global $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $PEDIGREE_FULL_DETAILS, $SHOW_PEDIGREE_PLACES;
 	global $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT;
 	global $chart_style, $box_width, $generations, $show_spouse, $show_full;
@@ -232,16 +231,16 @@ function print_pedigree_person($person, $style=1, $count=0, $personcount="1") {
 // now added as a function here.
 
 function header_links($META_DESCRIPTION, $META_ROBOTS, $META_GENERATOR, $LINK_CANONICAL) {
-	$header_links='';
-	if (!empty($LINK_CANONICAL)) {
-		$header_links.= '<link rel="canonical" href="'. $LINK_CANONICAL. '">';
+	$header_links = '';
+	if ($LINK_CANONICAL) {
+		$header_links .= '<link rel="canonical" href="' . $LINK_CANONICAL . '">';
 	}
-	if (!empty($META_DESCRIPTION)) {
-		$header_links.= '<meta name="description" content="'. WT_Filter::escapeHtml($META_DESCRIPTION). '">';
+	if ($META_DESCRIPTION) {
+		$header_links .= '<meta name="description" content="' . $META_DESCRIPTION . '">';
 	}
-	$header_links.= '<meta name="robots" content="'. $META_ROBOTS. '">';
-	if (!empty($META_GENERATOR)) {
-		$header_links.= '<meta name="generator" content="'. $META_GENERATOR. '">';
+	$header_links .= '<meta name="robots" content="' . $META_ROBOTS . '">';
+	if ($META_GENERATOR) {
+		$header_links .= '<meta name="generator" content="' . $META_GENERATOR . '">';
 	}
 	return $header_links;
 }
@@ -396,69 +395,46 @@ function contact_links($ged_id=WT_GED_ID) {
 * @return boolean
 */
 function print_note_record($text, $nlevel, $nrec, $textOnly=false) {
-	global $EXPAND_SOURCES, $EXPAND_NOTES;
-	$elementID = 'N-'.(int)(microtime()*1000000);
-
+	global $WT_TREE;
+	
 	$text .= get_cont($nlevel, $nrec);
 
 	// Check if shared note (we have already checked that it exists)
 	if (preg_match('/^0 @('.WT_REGEX_XREF.')@ NOTE/', $nrec, $match)) {
-		$note = WT_Note::getInstance($match[1]);
+		$note  = WT_Note::getInstance($match[1]);
+		$label = 'SHARED_NOTE';
 		// If Census assistant installed, allow it to format the note
 		if (array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
-			$text = GEDFact_assistant_WT_Module::formatCensusNote($note);
+			$html = GEDFact_assistant_WT_Module::formatCensusNote($note);
 		} else {
-			$text = WT_Filter::expandUrls($note->getNote());
+			$html = WT_Filter::formatText($note->getNote(), $WT_TREE);
 		}
 	} else {
-		$note = null;
-		$text = WT_Filter::expandUrls($text);
+		$note  = null;
+		$label = 'NOTE';
+		$html  = WT_Filter::formatText($text, $WT_TREE);
 	}
 
 	if ($textOnly) {
 		return strip_tags($text);
 	}
 
-	if (strpos($text, "\n") !== false) {
-		list($first_line, $cont_lines) = explode("\n", $text, 2);
+	if (strpos($text, "\n") === false) {
+		// A one-line note? strip the block-level tags, so it displays inline
+		return WT_Gedcom_Tag::getLabelValue($label, strip_tags($html, '<a><strong><em>'));
+	} elseif ($WT_TREE->preference('EXPAND_NOTES')) {
+		// A multi-line note, and we're expanding notes by default
+		return WT_Gedcom_Tag::getLabelValue($label, $html);
 	} else {
-		$first_line = $text;
-		$cont_lines = '';
+		// A multi-line note, with an expand/collapse option
+		$element_id = uniqid('n-');
+		// NOTE: class "note-details" is (currently) used only by some third-party themes
+		return
+			'<div class="fact_NOTE"><span class="label">' .
+			'<a href="#" onclick="expand_layer(\'' . $element_id . '\'); return false;"><i id="' . $element_id . '_img" class="icon-plus"></i></a> ' . WT_Gedcom_Tag::getLabel($label) . ': ' .
+			'</div>' .
+			'<div class="note-details" id="' . $element_id . '" style="display:none">' . $html . '</div>';
 	}
-
-	$data = '<div class="fact_NOTE"><span class="label">';
-	if ($cont_lines) {
-		if ($EXPAND_NOTES) {
-			$plusminus='minus';
-		} else {
-			$plusminus='plus';
-		}
-		$data .= '<a href="#" onclick="expand_layer(\'' . $elementID . '\'); return false;"><i id="' . $elementID . '_img" class="icon-' . $plusminus . '"></i></a> ';
-	}
-
-	if ($note) {
-		$data .= WT_I18N::translate('Shared note').': </span> ';
-	} else {
-		$data .= WT_I18N::translate('Note').': </span>';
-	}
-
-	if ($cont_lines) {
-		if ($note) {
-			$first_line = '<a href="' . $note->getHtmlUrl() . '">' . $first_line . '</a>';
-		}
-		$data .= '<span class="field" dir="auto">' . $first_line . '</span>';
-		$data .= '<div id="' . $elementID . '" dir="auto" style="white-space:pre-wrap; display:';
-		$data .= $EXPAND_NOTES ? 'block' : 'none';
-		$data .= '">' . $cont_lines. '</div>';
-	} else {
-		if ($note) {
-			$first_line = '<a href="' . $note->getHtmlUrl() . '">' . $first_line . '</a>';
-		}
-		$data .= '<span class="field" dir="auto">' . $first_line . '</span>';
-	}
-	$data .= '</div>';
-
-	return $data;
 }
 
 /**
@@ -925,17 +901,16 @@ function print_add_new_fact($id, $usedfacts, $type) {
 	// -- Add from clipboard
 	if ($WT_SESSION->clipboard) {
 		$newRow = true;
-		foreach (array_reverse($WT_SESSION->clipboard, true) as $key=>$fact) {
+		foreach (array_reverse($WT_SESSION->clipboard, true) as $fact_id=>$fact) {
 			if ($fact["type"]==$type || $fact["type"]=='all') {
 				if ($newRow) {
 					$newRow = false;
 					echo '<tr><td class="descriptionbox">';
 					echo WT_I18N::translate('Add from clipboard'), '</td>';
 					echo '<td class="optionbox wrap"><form method="get" name="newFromClipboard" action="?" onsubmit="return false;">';
-					echo '<select id="newClipboardFact" name="newClipboardFact">';
+					echo '<select id="newClipboardFact">';
 				}
-				$fact_type=WT_Gedcom_Tag::getLabel($fact['fact']);
-				echo '<option value="clipboard_', $key, '">', $fact_type;
+				echo '<option value="', WT_Filter::escapeHtml($fact_id), '">', WT_Gedcom_Tag::getLabel($fact['fact']);
 				// TODO use the event class to store/parse the clipboard events
 				if (preg_match('/^2 DATE (.+)/m', $fact['factrec'], $match)) {
 					$tmp=new WT_Date($match[1]);
@@ -949,7 +924,7 @@ function print_add_new_fact($id, $usedfacts, $type) {
 		}
 		if (!$newRow) {
 			echo '</select>';
-			echo '&nbsp;&nbsp;<input type="button" value="', WT_I18N::translate('Add'), "\" onclick=\"addClipboardRecord('$id', 'newClipboardFact');\"> ";
+			echo '&nbsp;&nbsp;<input type="button" value="', WT_I18N::translate('Add'), "\" onclick=\"return paste_fact('$id', '#newClipboardFact');\"> ";
 			echo '</form></td></tr>', "\n";
 		}
 	}

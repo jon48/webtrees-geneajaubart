@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <supplementalData>
-    <version number="$Revision$"/>
-    <generation date="$Date$"/>
+    <version number="$Revision: 1.220 $"/>
+    <generation date="$Date: 2009/06/25 20:24:56 $"/>
     <cldrVersion version="1.7.1"/>
     <currencyData>
         <fractions>

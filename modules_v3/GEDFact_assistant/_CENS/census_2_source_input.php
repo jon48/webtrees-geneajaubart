@@ -4,7 +4,7 @@
 // Census and Souce Input Area File File
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2007 to 2010 PGV Development Team.  All rights reserved.
@@ -21,7 +21,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -562,7 +562,7 @@ if (!defined('WT_WEBTREES')) {
 		}
 		var cens_ctry_a = document.getElementById('censCtry');
 		var cens_ctry = cens_ctry_a.value;
-		document.getElementById('Titl').value = '<?php echo WT_I18N::translate('Census transcript'),' - ',$wholename, ' - ', WT_I18N::translate('Household'); ?>';
+		document.getElementById('Titl').value = '<?php echo WT_I18N::translate('Census transcript'),' - ', WT_Filter::escapeJs($wholename), ' - ', WT_I18N::translate('Household'); ?>';
 		var prev = document.getElementById('prevYear');
 		prev.value = cenyear;
 	}
@@ -1110,7 +1110,7 @@ if (!defined('WT_WEBTREES')) {
 		<div class="cens_sour_1">
 			<div class="cens_sour_2"><?php echo WT_I18N::translate('Title'); ?></div>
 			<script>
-				document.writeln('<input id="Titl" name="Titl" type="text" value="<?php echo WT_I18N::translate('Census transcript'),' - ',$wholename, ' - ', WT_I18N::translate('Household'); ?>">');
+				document.writeln('<input id="Titl" name="Titl" type="text" value="<?php echo WT_I18N::translate('Census transcript'),' - ', WT_Filter::escapeJs($wholename), ' - ', WT_I18N::translate('Household'); ?>">');
 			</script>
 		</div>
 		<div class="cens_sour_1">

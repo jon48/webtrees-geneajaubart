@@ -4,7 +4,7 @@
 // Various printing functions used to print fact records
 //
 // webtrees: Web based Family History software
-// Copyright (C) 2013 webtrees development team.
+// Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team.  All rights reserved.
@@ -21,9 +21,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-// @version: p_$Revision$ $Date$
-// $HeadURL$
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+// @author Jonathan Jaubart <dev@jaubart.com>
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -275,6 +274,7 @@ function print_fact(WT_Fact $fact, WT_GedcomRecord $record) {
 		}
 		break;
 	case 'URL':
+	case '_URL':
 	case 'WWW':
 		echo '<div class="field"><a href="', WT_Filter::escapeHtml($fact->getValue()), '">', WT_Filter::escapeHtml($fact->getValue()), '</a></div>';
 		break;
@@ -312,8 +312,16 @@ function print_fact(WT_Fact $fact, WT_GedcomRecord $record) {
 
 	// Print the type of this fact/event
 	if ($type) {
-		// We don't have a translation for $type - but a custom translation might exist.
-		echo WT_Gedcom_Tag::getLabelValue('TYPE', WT_I18N::translate(WT_Filter::escapeHtml($type)));
+		$utype = strtoupper($type);
+		// Events of close relatives, e.g. _MARR_CHIL
+		if (substr($fact->getTag(), 0, 6) == '_MARR_' && ($utype == 'CIVIL' || $utype == 'PARTNERS' || $utype == 'RELIGIOUS')) {
+			// Translate MARR/TYPE using the code that supports MARR_CIVIL, etc. tags
+			$type = WT_Gedcom_Tag::getLabel('MARR_'.$utype);
+		} else {
+			// Allow (custom) translations for other types
+			$type = WT_I18N::translate($type);
+		}
+		echo WT_Gedcom_Tag::getLabelValue('TYPE', WT_Filter::escapeHtml($type));
 	}
 
 	// Print the date of this fact/event
@@ -421,6 +429,12 @@ function print_fact(WT_Fact $fact, WT_GedcomRecord $record) {
 			if (preg_match('/\n3 TYPE (.+)/', $fact->getGedcom(), $type_match)) {
 				echo WT_Gedcom_Tag::getLabelValue('TYPE', WT_Gedcom_Tag::getFileFormTypeValue($type_match[1]));
 			}
+			break;
+		case 'URL':
+		case '_URL':
+		case 'WWW':
+			$link = '<a href="' . WT_Filter::escapeHtml($match[2]) . '">' . WT_Filter::escapeHtml($match[2]) . '</a>';
+			echo WT_Gedcom_Tag::getLabelValue($fact->getTag().':'.$match[1], $link);
 			break;
 		default:
 			if (!$HIDE_GEDCOM_ERRORS || WT_Gedcom_Tag::isTag($match[1])) {
@@ -762,6 +776,7 @@ function print_main_sources(WT_Fact $fact, $level) {
  *  getSourceStructure() function.
  */
 function printSourceStructure($textSOUR) {
+	global $WT_TREE;
 	$html = '';
 
 	if ($textSOUR['PAGE']) {
@@ -781,7 +796,7 @@ function printSourceStructure($textSOUR) {
 			$html .= WT_Gedcom_Tag::getLabelValue('DATA:DATE', $date->Display(false));
 		}
 		foreach ($textSOUR['TEXT'] as $text) {
-			$html .= WT_Gedcom_Tag::getLabelValue('TEXT', '<span style="white-space: pre-wrap;">' . WT_Filter::expandUrls($text) . '</span>');
+			$html .= WT_Gedcom_Tag::getLabelValue('TEXT', WT_Filter::formatText($text, $WT_TREE));
 		}
 	}
 
@@ -845,7 +860,7 @@ function getSourceStructure($srec) {
 
 // Print a row for the notes tab on the individual page
 function print_main_notes(WT_Fact $fact, $level) {
-	global $GEDCOM, $SHOW_FACT_ICONS, $TEXT_DIRECTION;
+	global $GEDCOM, $WT_TREE, $SHOW_FACT_ICONS, $TEXT_DIRECTION;
 
 	$factrec = $fact->getGedcom();
 	$fact_id = $fact->getFactId();
@@ -927,7 +942,7 @@ function print_main_notes(WT_Fact $fact, $level) {
 				if (array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 					$text = GEDFact_assistant_WT_Module::formatCensusNote($note);
 				} else {
-					$text = WT_Filter::expandUrls($note->getNote());
+					$text = WT_Filter::formatText($note->getNote(), $WT_TREE);
 				}
 			} else {
 				$text = '<span class="error">' . WT_Filter::escapeHtml($nid) . '</span>';
@@ -936,11 +951,11 @@ function print_main_notes(WT_Fact $fact, $level) {
 			// Inline notes
 			$nrec = get_sub_record($level, "$level NOTE", $factrec, $j+1);
 			$text = $match[$j][1] . get_cont($level+1, $nrec);
-			$text = WT_Filter::expandUrls($text);
+			$text = WT_Filter::formatText($text, $WT_TREE);
 		}
 
 		echo '<td class="optionbox', $styleadd, ' wrap">';
-		echo '<div style="white-space:pre-wrap;">', $text, '</div>';
+		echo $text;
 
 		if (!empty($noterec)) {
 			echo print_fact_sources($noterec, 1);
