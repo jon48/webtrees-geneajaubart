@@ -522,7 +522,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							if(isset($mapSettings['subdivisions'][$levelvalues[0]])){								
 								$mapSettings['subdivisions'][$levelvalues[0]]['count'] = $count;
 								$mapSettings['subdivisions'][$levelvalues[0]]['transparency'] = WT_Perso_Functions::getPercentage($count, $max)/100;
-								if($parameters->useflags == 'yes') $mapSettings['subdivisions'][$levelvalues[0]]['flag'] = WT_Perso_Functions_Map::getPlaceIcon(implode(', ', $levelvalues), 50);
+								if($parameters->useflags == 'yes') $mapSettings['subdivisions'][$levelvalues[0]]['flag'] = WT_Perso_Functions_Map::getPlaceIcon(new WT_Place(implode(', ', $levelvalues), WT_GED_ID), 50);
 							}
 						}
 						
@@ -1126,7 +1126,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 				if($placename!='sum' && $placename!='unknown' && $placename!='other'){
 					$levels = array_map('trim',explode(',', $placename));
 					$content = '';
-					if($useflag == 'yes' && ($flag = WT_Perso_Functions_Map::getPlaceIcon(implode(', ', array_reverse($levels)), 25)) != ''){
+					if($useflag == 'yes' && ($flag = WT_Perso_Functions_Map::getPlaceIcon(new WT_Place(implode(', ', array_reverse($levels)), WT_GED_ID), 25)) != ''){
 						$content .= '<td class="geodispersion_flag">'.$flag.'</td><td>';
 					}
 					else{

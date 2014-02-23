@@ -112,7 +112,6 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 						'-------------'.WT_Mail::EOL.
 						WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_users.php'.WT_Mail::EOL.
 						WT_I18N::translate('Total number of users')."\t\t".$totusers.WT_Mail::EOL.
-						WT_I18N::translate('Users with warnings')."\t\t".$warnusers.WT_Mail::EOL.
 						WT_I18N::translate('Unverified by User')."\t\t".$applusers.WT_Mail::EOL.
 						WT_I18N::translate('Unverified by Administrator')."\t".$nverusers.WT_Mail::EOL.
 						WT_Mail::EOL;

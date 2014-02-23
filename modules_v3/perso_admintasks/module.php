@@ -189,7 +189,7 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 		
 		$tasks = WT_Perso_Admin_Task::getActiveTasks();
 		
-		echo '<div class="site_config">',
+		echo '<div id="site-config">',
 			'<div id="tabs">',
 				'<ul>',
 					'<li><a href="#'.$this->getName().'"><span>', WT_I18N::translate('General'), '</span></a></li>';
