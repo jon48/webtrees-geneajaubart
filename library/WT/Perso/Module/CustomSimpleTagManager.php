@@ -6,9 +6,7 @@
  *
  * @package webtrees
  * @subpackage PersoLibrary
- * @author: Jonathan Jaubart ($Author$)
- * @version: p_$Revision$ $Date$
- * $HeadURL$
+ * @author Jonathan Jaubart <dev@jaubart.com>
  */
 
 if (!defined('WT_WEBTREES')) {

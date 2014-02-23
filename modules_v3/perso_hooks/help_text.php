@@ -4,9 +4,7 @@
  *
  * @package webtrees
  * @subpackage Perso
- * @author: Jonathan Jaubart ($Author$)
- * @version: p_$Revision$ $Date$
- * $HeadURL$
+ * @author Jonathan Jaubart <dev@jaubart.com>
  */
 
 if (!defined('WT_WEBTREES') || !defined('WT_SCRIPT_NAME') || WT_SCRIPT_NAME!='help_text.php') {

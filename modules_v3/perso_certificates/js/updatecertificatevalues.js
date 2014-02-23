@@ -3,9 +3,7 @@
  *
  * @package webtrees
  * @subpackage Perso
- * @author: Jonathan Jaubart ($Author$)
- * @version: p_$Revision$ $Date$
- * $HeadURL$
+ * @author Jonathan Jaubart <dev@jaubart.com>
  */
 
 jQuery(document).ready(function($){

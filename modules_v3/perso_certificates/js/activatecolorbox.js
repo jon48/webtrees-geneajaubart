@@ -3,9 +3,7 @@
  * 
  * @package webtrees
  * @subpackage Perso
- * @author: Jonathan Jaubart ($Author$)
- * @version: p_$Revision$ $Date: 2011-08-20 21:38:01 +0100 (sam., 20 août 2011) 
- * $ $HeadURL$
+ * @author Jonathan Jaubart <dev@jaubart.com>
  */
 
 var isCertifColorboxActive = 0;
