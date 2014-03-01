@@ -462,9 +462,11 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							->execute(array($geoid, 'enabled'))
 							->fetchOneRow();
 		
-		if($geoid && $parameters){
-			$toplevelvalue = null;
-			if($parameters->map && $parameters->toplevel){				
+		if($geoid && $parameters){		
+			$toplevel = null;
+			$toplevelvalue = null;	
+			if($parameters->map && $parameters->toplevel && $parameters->toplevel > -100){
+				$toplevel = $parameters->toplevel;		
 				$mapSettings = $this->getMapSettings($parameters->map);
 				if($mapSettings){
 					$toplevelvalue = $mapSettings['toplevel'] ; // get it from the map
@@ -475,7 +477,12 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			}
 			
 			// Compute tables for birth places
-			list($placesDispGeneral, $placesDispGenerations) = $this->computeDispersionTables(WT_Perso_Functions_Sosa::getAllSosaWithGenerations($parameters->gedid), $parameters->sublevel, $parameters->toplevel, $toplevelvalue);
+			list($placesDispGeneral, $placesDispGenerations) = $this->computeDispersionTables(
+					WT_Perso_Functions_Sosa::getAllSosaWithGenerations($parameters->gedid),
+					$parameters->sublevel,
+					$toplevel,
+					$toplevelvalue
+			);
 						
 			// Generate the General tab
 			$html = '';
@@ -808,7 +815,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 						'geo-'.$aResult->pg_id.'-pg_sublevel',
 						$placestructure['hierarchy'],
 						null,
-						$aResult->pg_sublevel,  // CHeck if it is sublebel or sublebel-1
+						$aResult->pg_sublevel - 1,
 						null,
 						$this->getName());
 				$row[4] = WT_Perso_Functions_Edit::select_edit_control_inline(
@@ -822,7 +829,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 						'geo-'.$aResult->pg_id.'-pg_toplevel',
 						$placestructure['hierarchy'],
 						WT_I18N::translate('No map'),
-						$aResult->pg_toplevel,  // CHeck if it is sublebel or sublebel-1
+						$aResult->pg_toplevel - 1,
 						null,
 						$this->getName());
 				$row[6] = WT_Perso_Functions_Edit::edit_field_yes_no_inline(
@@ -990,8 +997,9 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 				if($sosa->getDerivedRecord()->canShow() && !is_null($place)){
 					$levels = array_reverse(array_map('trim',explode(',', $place)));
 					if(count($levels)>= $subdivlevel){
-						$toplevelvalues = array_map('trim',explode(',', strtolower($toplevelvalue)));
-						if(is_null($toplevel) || $toplevelvalue == '*' || ($toplevel <= $subdivlevel && in_array(strtolower($levels[$toplevel-1]), $toplevelvalues))) {
+						$toplevelvalues = array();
+						if($toplevelvalue) $toplevelvalues = array_map('trim',explode(',', strtolower($toplevelvalue)));
+						if(is_null($toplevel) || $toplevelvalue == '*' || ($toplevel <= $subdivlevel && $toplevel > 0 && count($levels) >= $toplevel && in_array(strtolower($levels[$toplevel-1]), $toplevelvalues))) {
 							$placest = implode(WT_I18N::$list_separator, array_slice($levels, 0, $subdivlevel));
 							if(isset($placesDispGeneral[$placest])) {
 								$placesDispGeneral[$placest] += 1;
