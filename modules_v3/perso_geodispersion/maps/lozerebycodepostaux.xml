@@ -3,9 +3,7 @@
 	Perso GeoDispersion module
 	Map Lozère par Codes Postaux
 	
- 	@author: Jonathan Jaubart ($Author$)
-	@version: p_$Revision$ $Date$
-	$HeadURL$
+ 	@author: Jonathan Jaubart <dev@jaubart.com>
 -->
 <map>
 	<displayName>Lozère par Codes Postaux</displayName>
