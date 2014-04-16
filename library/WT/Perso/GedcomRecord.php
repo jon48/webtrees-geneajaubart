@@ -39,6 +39,21 @@ class WT_Perso_GedcomRecord {
 	}
 	
 	/**
+	 * Return the GEDCOM type of the record
+	 * 
+	 * @return string Type of the record
+	 */
+	public function getType() {
+		if ($this->gedcomrecord instanceof WT_Individual) return 'INDI';
+		if ($this->gedcomrecord instanceof WT_Family) return 'FAM';
+		if ($this->gedcomrecord instanceof WT_Source) return 'SOUR';
+		if ($this->gedcomrecord instanceof WT_Repository) return 'REPO';
+		if ($this->gedcomrecord instanceof WT_Media) return 'OBJE';
+		if ($this->gedcomrecord instanceof WT_Note) return 'NOTE';
+		return WT_GedcomRecord::RECORD_TYPE;
+	}
+	
+	/**
 	 * Get an HTML link to this object, for use in sortable lists.
 	 * 
 	 * @return string HTML link
