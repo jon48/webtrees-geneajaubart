@@ -21,14 +21,28 @@ interface WT_Perso_Inference_EngineInterface {
 	 * @return WT_Perso_Inference_Engine Inference engine singleton
 	 */
 	public static function getInstance ($gedid);
-		
+	
+	/**
+	 * Get the name of the inference engine
+	 * 
+	 * @return string Name of the inference engine
+	 */
+	public function getName();
+	
 	/**
 	 * Gets the title of the engine for display purpose
 	 * 
 	 * @return string Engine title
 	 */
 	public function getTitle ();
-		
+	
+	/**
+	 * Displays the output linked to the action specified.
+	 * 
+	 * @param string $action Action page to display
+	 */
+	public function engineAction($action);
+	
 	/**
 	 * Gets Infered value, based on the input parameters
 	 * If an inference is found, an array is returned, with:
@@ -46,7 +60,14 @@ interface WT_Perso_Inference_EngineInterface {
 	 * Compute data required for inference.
 	 */
 	public function compute();
-		
+	
+	/**
+	 * Return the HTML code for the specific engine configuration.
+	 * 
+	 * @return string HTML code for configuration
+	 */
+	public function getConfigDisplay();
+	
 }
 
 

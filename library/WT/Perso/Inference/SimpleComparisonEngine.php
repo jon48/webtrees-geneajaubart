@@ -158,12 +158,29 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 		}
 		return self::$ENGINES[$gedid];
 	}
-		
+	
+	// Implement WT_Perso_Inference_EngineInterface
+	public function getName() {
+		return 'SimpleComparisonEngine';
+	}
+	
 	// Implement WT_Perso_Inference_EngineInterface
 	public function getTitle() {
 		return WT_I18N::translate('Simple value comparison');
 	}
-		
+	
+	// Implement WT_Perso_Inference_EngineInterface
+	public function engineAction($action) {
+		switch($action) {
+			case 'ajaxinferencelist':
+			case 'ajaxadmindelete';
+				$this->$action();
+				break;
+			default:
+				header('HTTP/1.0 404 Not Found');
+		}
+	}
+	
 	// Implement WT_Perso_Inference_EngineInterface
 	public function getInferedValue(WT_GedcomRecord $record, $attribute, $useminvalues = true) {
 		if($record) $drecord = new WT_Perso_GedcomRecord($record);
@@ -241,7 +258,237 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 		$this->_inferences = array();
 		$this->getAllInferences();
 	}
+	
+	// Implement WT_Perso_Inference_EngineInterface
+	public function getConfigDisplay() {
+		$html = '';
 		
+		$inf_id = 'ID-PI-SI-'.floor(microtime()*1000000);
+		
+		$html .= '<div>'.
+					'<dt>'. WT_I18N::translate('Minimum percentage').'</dt>'.  // TODO How to manage helptext??
+					'<dd>'.WT_Perso_Functions_Edit::edit_module_field_inline(
+							'gedcom_setting-PERSO_PI_SC_MIN_PERCENT-'.$this->_gedid, 
+							get_gedcom_setting($this->_gedid, 'PERSO_PI_SC_MIN_PERCENT') ?: self::DEFAULT_MINIMUM_PERCENTAGE, 
+							null, 
+							'perso_inferences'
+					).'</dd>'.
+					'<dt>'. WT_I18N::translate('Minimum population count').'</dt>'.  // TODO How to manage helptext??
+					'<dd>'.WT_Perso_Functions_Edit::edit_module_field_inline(
+							'gedcom_setting-PERSO_PI_SC_MIN_COUNT-'.$this->_gedid,
+							get_gedcom_setting($this->_gedid, 'PERSO_PI_SC_MIN_COUNT') ?: self::DEFAULT_MINIMUM_COUNT,
+							null,
+							'perso_inferences'
+					).'</dd>'.
+				'</div>';
+		
+		$js = ' function fnDeleteInferenceRow (inferenceid) {
+		            $.ajax({ "url": "module.php",
+		                "type": "GET",
+		                "data": {
+							"mod" : "perso_inferences",
+							"mod_action": "engineaction",
+							"gedid" : gedid,
+							"engine" : "'.WT_Filter::escapeJs($this->getName()).'",
+							"engineaction" : "ajaxadmindelete",
+							"inferenceid": inferenceid },
+		                "success": function(response){
+							if(response.result == "ok"){
+								infSCConfigDatatable.fnReloadAjax();
+							}
+							alert(response.text);				
+						},
+		                "dataType": "json",
+		                "error": function (response) {
+							alert("'.strip_tags(WT_I18N::translate('The inference entry could not be deleted.')).'");		
+		                }
+		            });
+				}
+				
+				gedid = '.$this->_gedid.';
+				
+				//Datatable initialisation
+				jQuery.fn.dataTableExt.oSort["unicode-asc"  ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
+				jQuery.fn.dataTableExt.oSort["unicode-desc" ]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
+				jQuery.fn.dataTableExt.oSort["num-html-asc" ]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a<b) ? -1 : (a>b ? 1 : 0);};
+				jQuery.fn.dataTableExt.oSort["num-html-desc"]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a>b) ? -1 : (a<b ? 1 : 0);};
+	
+				infSCConfigDatatable = jQuery("#tInfSCConfigTable_'.$inf_id.'").dataTable({
+					"sDom": \'<"H"<"dt-clear">ir>t\',
+					'.WT_I18N::datatablesI18N().',
+					"bJQueryUI": true,
+					"aoColumns": [
+						/* 0 ID		 			*/ {"bVisible": false},
+						/* 1 Source type		*/ {"bSortable": false, "sClass": "center"},
+						/* 2 Source attr.		*/ {"bSortable": false, "sClass": "center", "sType": "unicode"},
+						/* 3 Comparison attr.	*/ {"bSortable": false, "sClass": "center"},
+						/* 4 Matches 			*/ {"bSortable": false, "sClass": "center", "sType": "numeric"},
+						/* 5 Count			 	*/ {"bSortable": false, "sClass": "center", "sType": "numeric"},
+						/* 6 Percentage		 	*/ {"bSortable": false, "sClass": "center", "iDataSort": 7 },
+						/* 7 PERCENTAGE		 	*/ {"bVisible": false, "sType": "numeric"},
+						/* 8 <delete> 		 	*/ {"bSortable": false, "sClass": "center"}
+					],
+					"bAutoWidth": false,
+					"iDisplayLength": 1000, 
+					// Server side processing
+					"bProcessing " : true,
+					"bServerSide" : true,
+					"sAjaxSource": "module.php",
+					"fnServerData": function ( sSource, aoData, fnCallback ) {
+						aoData.push({ "name" : "mod", "value": "perso_inferences"});
+						aoData.push({ "name" : "mod_action", "value": "engineaction"});
+						aoData.push({ "name" : "gedid", "value": gedid});
+						aoData.push({ "name" : "engine", "value": "'.WT_Filter::escapeJs($this->getName()).'"});
+						aoData.push({ "name" : "engineaction", "value": "ajaxinferencelist"});	
+						$.ajax({
+							"dataType": "json",
+							"url": sSource,
+							"data": aoData,
+							"success": fnCallback
+						});
+					}			
+				});
+		';
+		
+		$html .= '</div>&nbsp</div>'.
+			'<div>'.
+				'<table id="tInfSCConfigTable_'.$inf_id.'" class="dtInferenceDatatable">'.
+					'<thead>'.
+						'<tr>'.
+							'<th>ID</th>'.
+							'<th>'.WT_I18N::translate('Source record').'</th>'.
+							'<th>'.WT_I18N::translate('Source attribute').'</th>'.
+							'<th>'.WT_I18N::translate('Comparison attribute').'</th>'.
+							'<th>'.WT_I18N::translate('Matches count').'</th>'.
+							'<th>'.WT_I18N::translate('Total count').'</th>'.
+							'<th>'.WT_I18N::translate('Percentage').'</th>'.
+							'<th>PERCENT</th>'.
+							'<th>'.WT_I18N::translate('Delete').'</th>'.
+						'</tr>'.
+					'</thead>'.
+				'</table>'.
+			'</div>';
+		
+		$html .= '<script>' . $js . '</script>';
+		
+		
+		return $html;
+	}
+	
+	/**
+	 * Returns the list of inferences for the SimpleComparison engine
+	 * 
+	 * Input parameters - GET :
+	 * 	- gedid : gedcom ID to return the inferences for
+	 *  - sEcho : datatable server-side processing parameter, must be returned as it
+	 * 
+	 * JSON format
+	 * {
+	 * 		iTotalRecords : int - Total number of records,
+	 * 		iTotalDisplayRecords : int - Total display number of records,
+	 * 		sEcho : string - Parameter received from the request, to be returned,
+	 * 		aaData : array
+	 * 		{
+	 * 			DT_RowID : string - ID for the current row tr,
+	 * 			0 : int - Inference record ID,
+	 * 			1 : string - Source gedcom record type,
+	 * 			2 : string - Source attribute,
+	 * 			3 : string - Target attribute,
+	 * 			4 : int - Number of matches,
+	 * 			5 : int - Count of total population ,
+	 * 			6 : string - Probability - for display,
+	 * 			7 : float - Probability,
+	 * 			8 : string - Delete button
+	 * 		}
+	 * }
+	 * 
+	 */
+	private function ajaxinferencelist() {
+		$sEcho = WT_Filter::getInteger('sEcho');
+		$gedid = WT_Filter::getInteger('gedid');
+		
+		$controller = new WT_Perso_Controller_Json();
+			
+		$jsonArray = array();
+		$jsonArray['iTotalRecords'] = 0;
+		$jsonArray['iTotalDisplayRecords'] = 0;
+		$jsonArray['sEcho'] = $sEcho;
+		$jsonArray['aaData'] = array();
+				
+		if(WT_Perso_Inference_Helper::isModuleOperational()
+		&& $gedid && array_key_exists($gedid, WT_Tree::getIdList())) {
+			$controller->requireManagerLogin($gedid);
+			
+			$inferences = $this->getAllInferences();
+						
+			$jsonArray['iTotalRecords'] =  count($inferences);
+			$jsonArray['iTotalDisplayRecords'] =  count($inferences);
+
+			foreach($inferences as $inference ){
+				$row = array();
+				$row['DT_RowId'] = $inference['pisc_id'];
+				$row[0] = $inference['pisc_id'];
+				$row[1] = WT_Gedcom_Tag::getLabel($inference['pisc_record_type']);
+				$row[2] = $inference['pisc_record_value'];
+				$row[3] = $inference['pisc_rela_value'];
+				$row[4] = $inference['pisc_matches'];
+				$row[5] = $inference['pisc_count'];
+				$row[6] = sprintf('%.2f %%', 100 * $inference['percent']);
+				$row[7] = $inference['percent'];
+				$row[8] = '<i class="icon-delete" onclick=" if (confirm(\''.
+						WT_Filter::escapeHtml(WT_I18N::translate('Are you sure you want to delete this inference?')).
+						'\')) { fnDeleteInferenceRow(\''.$inference['pisc_id'].'\'); }"></i>';
+				$jsonArray['aaData'][] = $row;
+			}
+		}
+		
+		$controller->pageHeader();
+		echo Zend_Json::encode($jsonArray);
+	}
+	
+	/**
+	 * Delete an inference record, and return the result
+	 * 
+	 * Input parameters - GET :
+	 * 	- gedid : gedcom ID of the inference
+	 *  - inferenceid : ID of the inference to delete
+	 *  
+	 *  JSON format
+	 * 	{
+	 * 		result 	: string - Result of the deletion ('failure' or 'ok'),
+	 * 		text 	: string - Text to display
+	 * 	}
+	 *  
+	 *  Display a text result
+	 *
+	 */
+	private function ajaxadmindelete(){
+		$gedid = WT_Filter::getInteger('gedid');
+		$id = WT_Filter::getInteger('inferenceid');
+	
+		$controller = new WT_Perso_Controller_Json();
+	
+		$result = array(
+				'result' => 'failure',
+				'text'	=>	WT_I18N::translate('The inference entry could not be deleted.')
+		);
+	
+		if(WT_Perso_Inference_Helper::isModuleOperational()
+		&& $gedid && array_key_exists($gedid, WT_Tree::getIdList())) {
+			$controller->requireManagerLogin($gedid);
+			
+			$sql = 'DELETE FROM ##pinferences_simplecomp WHERE pisc_id = ?';
+			WT_DB::prepare($sql)->execute(array($id));
+				
+			$result['result'] = 'ok';
+			$result['text'] = WT_I18N::translate('The inference entry has been successfully deleted.');
+			AddToLog('Module Inferences '.$this->getName().' : Inference ID "'.$id.'" has been deleted.', 'config');
+		}
+			
+		$controller->pageHeader();
+		echo Zend_Json::encode($result);
+	}
+	
 }
 
 ?>

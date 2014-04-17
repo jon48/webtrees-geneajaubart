@@ -30,4 +30,25 @@ class WT_Perso_Controller_Json extends WT_Controller_Base {
 		return $this;
 	}
 	
+	// Restrict access
+	public function requireAdminLogin() {
+		if (!WT_USER_IS_ADMIN) {			
+			header('HTTP/1.0 403 Access Denied');
+			exit;
+		}
+		return $this;
+	}
+	
+	// Restrict access
+	public function requireManagerLogin($ged_id=WT_GED_ID) {		
+		if (
+		$ged_id==WT_GED_ID && !WT_USER_GEDCOM_ADMIN ||
+		$ged_id!=WT_GED_ID && !userGedcomAdmin(WT_USER_ID, $ged_id)
+		) {
+			header('HTTP/1.0 403 Access Denied');
+			exit;
+		}
+		return $this;
+	}
+	
 }

@@ -566,6 +566,12 @@ html[dir=rtl] #cboxSlideshow {right:57px;left:0; }
 .icon-perso-success{width:16px;height:16px;background-image:url(images/perso/success.png);}
 .icon-perso-error{width:16px;height:16px;background-image:url(images/perso/error.png);}
 
-#perso_geodispersion td {padding: 10px 50px 10px 50px;}
+#perso_geodispersion td { padding: 0px;  }
+#perso_geodispersion dl>div {padding: 5px 30px 5px 30px;}
 #perso_geodispersion .dataTables_wrapper td { padding: 0px;  }
+#perso_geodispersion .dataTables_wrapper th { text-align: center;  }
+
+#perso_inferences .dataTables_wrapper {padding: 5px 50px 5px 0px;}
+#perso_inferences .dataTables_wrapper td { padding: 0px 15px;  }
+#perso_inferences .dataTables_wrapper th { text-align: center;  }
 /* END PERSO */

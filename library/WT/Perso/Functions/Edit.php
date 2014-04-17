@@ -68,9 +68,10 @@ class WT_Perso_Functions_Edit {
 	 * @param WT_Controller_Base $controller Page controller
 	 * @param string $savingmodule Module to use for saving the setting, default to the Perso Config module
 	 * @param string $extra
+	 * @param string $callback Javascript callback script
 	 * @return string HTML code for inline editable combobox
 	 */
-	static public function select_edit_control_inline($name, $values, $empty, $selected, $controller=null, $savingmodule = 'perso_config', $extra='') {
+	static public function select_edit_control_inline($name, $values, $empty, $selected, $controller=null, $savingmodule = 'perso_config', $extra='', $callback = null) {
 		if (!is_null($empty)) {
 			// Push ''=>$empty onto the front of the array, maintaining keys
 			$tmp=array(''=>WT_Filter::escapeHtml($empty));
@@ -93,6 +94,7 @@ class WT_Perso_Functions_Edit {
 					placeholder: "'.WT_I18N::translate('click to edit').'",
 					callback: function(value, settings) {
 							jQuery(this).html(settings.data[value]);
+							'. ($callback ?: '') .'
 					}
 				});';
 		
