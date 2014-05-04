@@ -342,7 +342,7 @@ function user_contact_link($user_id) {
 		$email=getUserEmail($user_id);
 		return '<a href="mailto:' . WT_Filter::escapeHtml($email).'">'.WT_Filter::escapeHtml($fullname).'</a>';
 	default:
-		return "<a href='#' onclick='message(\"" . WT_Filter::escapeJs(get_user_name($user_id)) . "\", \"" . $method . "\", \"" . WT_Filter::escapeJs(get_query_url()) . "\", \"\");return false;'>" . WT_Filter::escapeHtml($fullname) . '</a>';
+		return "<a href='#' onclick='message(\"" . WT_Filter::escapeJs(get_user_name($user_id)) . "\", \"" . $method . "\", \"" . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_Filter::escapeJs(get_query_url()) . "\", \"\");return false;'>" . WT_Filter::escapeHtml($fullname) . '</a>';
 	}
 }
 
@@ -445,7 +445,6 @@ function print_fact_notes($factrec, $level, $textOnly=false) {
 	$nlevel = $level+1;
 	$ct = preg_match_all("/$level NOTE (.*)/", $factrec, $match, PREG_SET_ORDER);
 	for ($j=0; $j<$ct; $j++) {
-		$nid = str_replace("@","",$match[$j][1]);
 		$spos1 = strpos($factrec, $match[$j][0], $previous_spos);
 		$spos2 = strpos($factrec."\n$level", "\n$level", $spos1+1);
 		if (!$spos2) $spos2 = strlen($factrec);
@@ -469,7 +468,7 @@ function print_fact_notes($factrec, $level, $textOnly=false) {
 					}
 				}
 			} else {
-				$data='<div class="fact_NOTE"><span class="label">'.WT_I18N::translate('Note').'</span>: <span class="field error">'.$nid.'</span></div>';
+				$data='<div class="fact_NOTE"><span class="label">'.WT_I18N::translate('Note').'</span>: <span class="field error">'.$nmatch[1].'</span></div>';
 			}
 		}
 		if (!$textOnly) {
@@ -536,70 +535,65 @@ function highlight_search_hits($string) {
 }
 
 // Print the associations from the associated individuals in $event to the individuals in $record
-function print_asso_rela_record(WT_Fact $event, WT_GedcomRecord $record) {
+function format_asso_rela_record(WT_Fact $event) {
 	global $SEARCH_SPIDER;
 
+	$parent = $event->getParent();
 	// To whom is this record an assocate?
-	if ($record instanceof WT_Individual) {
+	if ($parent instanceof WT_Individual) {
 		// On an individual page, we just show links to the person
-		$associates=array($record);
-	} elseif ($record instanceof WT_Family) {
+		$associates = array($parent);
+	} elseif ($parent instanceof WT_Family) {
 		// On a family page, we show links to both spouses
-		$associates=$record->getSpouses();
+		$associates = $parent->getSpouses();
 	} else {
 		// On other pages, it does not make sense to show associates
-		return;
+		return '';
 	}
 
 	preg_match_all('/^1 ASSO @('.WT_REGEX_XREF.')@((\n[2-9].*)*)/', $event->getGedcom(), $amatches1, PREG_SET_ORDER);
 	preg_match_all('/\n2 _?ASSO @('.WT_REGEX_XREF.')@((\n[3-9].*)*)/', $event->getGedcom(), $amatches2, PREG_SET_ORDER);
+
+	$html = '';
 	// For each ASSO record
 	foreach (array_merge($amatches1, $amatches2) as $amatch) {
-		$person=WT_Individual::getInstance($amatch[1]);
+		$person = WT_Individual::getInstance($amatch[1]);
 		if ($person) {
+			// Is there a "RELA" tag
 			if (preg_match('/\n[23] RELA (.+)/', $amatch[2], $rmatch)) {
-				$rela=$rmatch[1];
+				// Use the supplied relationship as a label
+				$label = WT_Gedcom_Code_Rela::getValue($rmatch[1], $person);
 			} else {
-				$rela='';
+				// Use a default label
+				$label = WT_Gedcom_Tag::getLabel('ASSO', $person);
 			}
-			$html=array();
-			foreach ($associates as $associate) {
-				if ($associate) {
-					if ($rela) {
-						$label='<span class="rela_type">'.WT_Gedcom_Code_Rela::getValue($rela, $person).':&nbsp;</span>';
-						$label_2='<span class="rela_name">'.get_associate_relationship_name($associate, $person).'</span>';
-					} else {
-						// Generate an automatic RELA
-						$label='';
-						$label_2='<span class="rela_name">'.get_associate_relationship_name($associate, $person).'</span>';
-					}
-					if (!$label && !$label_2) {
-						$label=WT_I18N::translate('Relationships');
-						$label_2='';
-					}
-					// For family records (e.g. MARR), identify the spouse with a sex icon
-					if ($record instanceof WT_Family) {
-						$label_2=$associate->getSexImage().$label_2;
+
+			$values = array('<a href="' . $person->getHtmlUrl() . '">' . $person->getFullName() . '</a>');
+			if (!$SEARCH_SPIDER) {
+				foreach ($associates as $associate) {
+					$relationship_name = get_associate_relationship_name($associate, $person);
+					if (!$relationship_name) {
+						$relationship_name = WT_Gedcom_Tag::getLabel('RELA');
 					}
 
-					if ($SEARCH_SPIDER) {
-						$html[]=$label_2; // Search engines cannot use the relationship chart.
-					} else {
-						$html[]='<a href="relationship.php?pid1='.$associate->getXref().'&amp;pid2='.$person->getXref().'&amp;ged='.WT_GEDURL.'">'.$label_2.'</a>';
+					if ($parent instanceof WT_Family) {
+						// For family ASSO records (e.g. MARR), identify the spouse with a sex icon
+						$relationship_name .= $associate->getSexImage();
 					}
+
+					$values[] = '<a href="relationship.php?pid1=' . $associate->getXref() . '&amp;pid2=' . $person->getXref() . '&amp;ged=' . WT_GEDURL . '">' . $relationship_name . '</a>';
 				}
 			}
-			$html=array_unique($html);
-			echo
-				'<div class="fact_ASSO">',$label,
-				implode(WT_I18N::$list_separator, $html),
-				' - ',
-				'<a href="', $person->getHtmlUrl().'">', $person->getFullName(), '</a>';
-				echo '</div>';
+			$value = implode(' — ', $values);
+
+			// Use same markup as WT_Gedcom_Tag::getLabelValue()
+			$asso = WT_I18N::translate('<span class="label">%1$s:</span> <span class="field" dir="auto">%2$s</span>', $label, $value);
 		} else {
-			echo WT_Gedcom_Tag::getLabelValue('ASSO', '<span class="error">' . $amatch[1] . '</span>');
+			$asso = WT_Gedcom_Tag::getLabelValue('ASSO', '<span class="error">' . $amatch[1] . '</span>');
 		}
+		$html .= '<div class="fact_ASSO">' . $asso . '</div>';
 	}
+	return $html;
 }
 
 /**
@@ -820,21 +814,20 @@ function format_fact_place(WT_Fact $event, $anchor=false, $sub_records=false, $l
 			$cts = preg_match('/\d LATI (.*)/', $placerec, $match);
 			if ($cts>0) {
 				$map_lati=$match[1];
-				$html.='<br><span class="label">'.WT_Gedcom_Tag::getLabel('LATI').': </span>'.$map_lati;
+				$html .= '<br><span class="label">' . WT_Gedcom_Tag::getLabel('LATI') . ': </span>' . $map_lati;
 			}
-			$map_long="";
+			$map_long = '';
 			$cts = preg_match('/\d LONG (.*)/', $placerec, $match);
-			if ($cts>0) {
-				$map_long=$match[1];
-				$html.=' <span class="label">'.WT_Gedcom_Tag::getLabel('LONG').': </span>'.$map_long;
+			if ($cts > 0) {
+				$map_long = $match[1];
+				$html .= ' <span class="label">' . WT_Gedcom_Tag::getLabel('LONG') . ': </span>' . $map_long;
 			}
-			if ($map_lati && $map_long && empty($SEARCH_SPIDER)) {
-				$map_lati=trim(strtr($map_lati, "NSEW,�", " - -. ")); // S5,6789 ==> -5.6789
-				$map_long=trim(strtr($map_long, "NSEW,�", " - -. ")); // E3.456� ==> 3.456
-				$html.=' <a target="_BLANK" href="'."//www.mapquest.com/maps/map.adp?searchtype=address&amp;formtype=latlong&amp;latlongtype=decimal&amp;latitude={$map_lati}&amp;longitude={$map_long}".'" class="icon-mapquest" title="MapQuest™"></a>';
-				$html.=' <a target="_BLANK" href="'."//maps.google.com/maps?q={$map_lati},{$map_long}(".rawurlencode($event->getPlace()->getGedcomName()).")".'" class="icon-googlemaps" title="'.WT_I18N::translate('Google Maps™').'"></a>';
-				$html.=' <a target="_BLANK" href="'."//www.multimap.com/map/browse.cgi?lat={$map_lati}&amp;lon={$map_long}&amp;scale=&amp;icon=x".'" class="icon-bing" title="Bing Maps™"></a>';
-				$html.=' <a target="_BLANK" href="'."//www.terraserver.com/imagery/image_gx.asp?cpx={$map_long}&amp;cpy={$map_lati}&amp;res=30&amp;provider_id=340".'" class="icon-terraserver" title="TerraServer™"></a>';
+			if ($map_lati && $map_long) {
+				$map_lati = trim(strtr($map_lati, "NSEW,�", " - -. ")); // S5,6789 ==> -5.6789
+				$map_long = trim(strtr($map_long, "NSEW,�", " - -. ")); // E3.456� ==> 3.456
+				$html .= ' <a rel="nollow" href="https://maps.google.com/maps?q=' . $map_lati . ',' . $map_long . '" class="icon-googlemaps" title="' . WT_I18N::translate('Google Maps™') . '"></a>';
+				$html .= ' <a rel="nollow" href="https://www.bing.com/maps/?lvl=15&cp=' . $map_lati . '~' . $map_long . '" class="icon-bing" title="' . WT_I18N::translate('Bing Maps™') . '"></a>';
+				$html .= ' <a rel="nollow" href="https://www.openstreetmap.org/#map=15/' . $map_lati . '/' . $map_long . '" class="icon-osm" title="' . WT_I18N::translate('OpenStreetMap™') . '"></a>';
 			}
 			if (preg_match('/\d NOTE (.*)/', $placerec, $match)) {
 				$html .= '<br>' . print_fact_notes($placerec, 3);
@@ -961,7 +954,9 @@ function print_add_new_fact($id, $usedfacts, $type) {
 	foreach ($addfacts as $addfact) {
 		$translated_addfacts[$addfact] = WT_Gedcom_Tag::getLabel($addfact);
 	}
-	uasort($translated_addfacts, 'factsort');
+	uasort($translated_addfacts, function ($x, $y) {
+		return utf8_strcasecmp(WT_I18N::translate($x), WT_I18N::translate($y));
+	});
 	echo '<tr><td class="descriptionbox">';
 	echo WT_I18N::translate('Fact or event');
 	echo help_link('add_facts'), '</td>';
@@ -1032,7 +1027,7 @@ function print_findfamily_link($element_id) {
 }
 
 function print_specialchar_link($element_id) {
-	return '<span onclick="findSpecialChar(document.getElementById(\''.$element_id.'\')); updatewholename(); return false;" class="icon-button_keyboard" title="'.WT_I18N::translate('Find a special character').'"></span>';
+	return '<span onclick="findSpecialChar(document.getElementById(\''.$element_id.'\')); if (window.updatewholename) { updatewholename(); } return false;" class="icon-button_keyboard" title="'.WT_I18N::translate('Find a special character').'"></span>';
 }
 
 function print_autopaste_link($element_id, $choices) {
