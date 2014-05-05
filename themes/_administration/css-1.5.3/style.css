@@ -615,12 +615,13 @@ select {
 	margin: 10px 0 5px;
 }
 
+/* PERSO No max-width defined */
 #site-config dl {
 	float: left;
 	margin: 0 0 0 20px;
 	line-height: 25px;
-	max-width: 600px;
 }
+/* END PERSO */
 
 #site-config dt {
 	clear: left;

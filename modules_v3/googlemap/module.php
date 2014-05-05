@@ -663,7 +663,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				$j = 1;
 				for ($i = 0; $i < count($flags_s); $i++) {
 					if ($stateSelected != 'States') {
+						//PERSO Resize flags
 						echo '<td><input type="radio" dir="ltr" name="FLAGS" value="', $i, '"><img class="flag_gm_w25" src="', WT_STATIC_URL.WT_MODULES_DIR, 'googlemap/places/', $countrySelected, '/flags/', $stateSelected, '/', $flags_s[$i], '.png">&nbsp;&nbsp;', $flags_s[$i], '</input></td>';
+						//END PERSO
 					}
 					if ($j == 4) {
 						echo '</tr><tr>';
@@ -2060,15 +2062,19 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			var placer   = null;
 
 			// A function to create the marker and set up the event window
-			function createMarker(latlng, html, tooltip, sv_lati, sv_long, sv_bearing, sv_elevation, sv_zoom, sv_point, marker_icon) {
+			//PERSO Resize flag
+			function createMarker(latlng, html, tooltip, sv_lati, sv_long, sv_bearing, sv_elevation, sv_zoom, sv_point, marker_icon, width, height) {
 				var contentString = '<div id="iwcontent">'+html+'</div>';
 
 				// Use flag icon (if defined) instead of regular marker icon
-				if (marker_icon) {
+				if (marker_icon && width!= undefined && width > 0 && height != undefined && height >0) {
 					var icon_image = new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+'googlemap/'+marker_icon,
-						new google.maps.Size(25, 15),
+						null,
 						new google.maps.Point(0,0),
-						new google.maps.Point(0, 44));
+						new google.maps.Point(0, 44)
+						, new google.maps.Size(width, height)
+					);
+			//END PERSO
 					var icon_shadow = new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+'googlemap/images/flag_shadow.png',
 						new google.maps.Size(35, 45), // Shadow size
 						new google.maps.Point(0,0),   // Shadow origin
@@ -2094,6 +2100,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					map:      map,
 					title:    tooltip,
 					zIndex:   Math.round(latlng.lat()*-100000)<<5
+					//PERSO Resize flags - Some flags are cut by GM tiles
+					, optimized: false
+					//END PERSO
 				});
 
 				// Store the tab and event info as marker properties
@@ -2275,6 +2284,18 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 						"sv_bearing":   "<?php echo WT_Filter::escapeJs($gmark['sv_bearing']  ); ?>",
 						"sv_elevation": "<?php echo WT_Filter::escapeJs($gmark['sv_elevation']); ?>",
 						"sv_zoom":      "<?php echo WT_Filter::escapeJs($gmark['sv_zoom']     ); ?>"
+						<?php 
+						//PERSO Resize flag
+						if (!empty($gmark['pl_icon'])) { 
+							$icon_image = WT_STATIC_URL.WT_MODULES_DIR . 'googlemap/' . $gmark['pl_icon'];	
+							list($flag_width, $flag_height) = WT_Perso_Functions::getResizedImageSize($icon_image, 25);
+						}
+						?>,
+						"width":	"<?php echo WT_Filter::escapeJs($flag_width && $flag_width > 0 ? $flag_width : 0); ?>",
+						"height":	"<?php echo WT_Filter::escapeJs($flag_height && $flag_height > 0 ? $flag_height : 0); ?>"
+						<?php
+						//END PERSO Resize flags
+						?>
 					}
 					<?php } ?>
 				];
@@ -2342,8 +2363,10 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					var sv_point     = new google.maps.LatLng(location.sv_lati, location.sv_long); // StreetView Latitude and Longitide
 
 					var zoomLevel = <?php echo $GM_MAX_ZOOM; ?>;
-					var marker    = createMarker(point, html, location.tooltip, location.sv_lati, location.sv_long, location.sv_bearing, location.sv_elevation, location.sv_zoom, sv_point, location.pl_icon);
-
+					//PERSO Resize flag
+					var marker    = createMarker(point, html, location.tooltip, location.sv_lati, location.sv_long, location.sv_bearing, location.sv_elevation, location.sv_zoom, sv_point, location.pl_icon, location.width, location.height);
+					//END PERSO
+					
 					// if streetview coordinates are available, use them for marker,
 					// else use the place coordinates
 					if (sv_point && sv_point != "(0, 0)") {
@@ -2651,11 +2674,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 
 	private function print_gm_markers($place2, $level, $parent, $levelm, $linklevels, $placelevels, $lastlevel=false) {
 		if (($place2['lati'] == NULL) || ($place2['long'] == NULL) || (($place2['lati'] == '0') && ($place2['long'] == '0'))) {
-			echo 'var icon_type = new google.maps.MarkerImage();';
-			echo 'icon_type.image = "', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/images/marker_yellow.png";';
-			echo 'icon_type.shadow = "', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/images/shadow50.png";';
-			echo 'icon_type.iconSize = google.maps.Size(20, 34);';
-			echo 'icon_type.shadowSize = google.maps.Size(37, 34);';
+			//PERSO
+			$icon_image = WT_STATIC_URL.WT_MODULES_DIR. 'googlemap/images/marker_yellow.png';
+			//END PERSO
 			echo 'var point = new google.maps.LatLng(0, 0);';
 			if ($lastlevel)
 				echo "var marker = createMarker(point, \"<div class='iwstyle' style='width: 250px;'><a href='?action=find", $linklevels, "'><br>";
@@ -2707,8 +2728,11 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			}
 			echo '<br>', WT_I18N::translate('This place has no coordinates');
 			if (WT_USER_IS_ADMIN)
+				
 				echo "<br><a href='module.php?mod=googlemap&amp;mod_action=admin_places&amp;parent=", $levelm, "&amp;display=inactive'>", WT_I18N::translate('Geographic data'), "</a>";
-			echo "</div>\", icon_type, \"", str_replace(array('&lrm;', '&rlm;'), array(WT_UTF8_LRM, WT_UTF8_RLM), addslashes($place2['place'])), "\");\n";
+			//PERSO Resize flags
+			echo "</div>\", \"", $icon_image, "\", \"", str_replace(array('&lrm;', '&rlm;'), array(WT_UTF8_LRM, WT_UTF8_RLM), addslashes($place2['place'])), "\");\n";
+			//END PERSO
 		} else {
 			$lati = str_replace(array('N', 'S', ','), array('', '-', '.'), $place2['lati']);
 			$long = str_replace(array('E', 'W', ','), array('', '-', '.'), $place2['long']);
@@ -2725,15 +2749,14 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			}
 
 			// flags by kiwi3685 ---
-			if (($place2['icon'] == NULL) || ($place2['icon'] == '') || ($this->getSetting('GM_PH_MARKER') != 'G_FLAG')) {
-				echo 'var icon_type = new google.maps.MarkerImage();';
-			} else {
-				echo 'var icon_type = new google.maps.MarkerImage();';
-				echo ' icon_type.image = "', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/', $place2['icon'], '";';
-				echo ' icon_type.shadow = "', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/images/flag_shadow.png";';
-				echo ' icon_type.iconSize = new google.maps.Size(25, 15);';
-				echo ' icon_type.shadowSize = new google.maps.Size(35, 45);';
+			//PERSO Resize flags
+			$icon_image="";
+			$flag_width = 0; $flag_height = 0;
+			if (($place2['icon'] != NULL) && ($place2['icon'] != '') && ($this->getSetting('GM_PH_MARKER') == 'G_FLAG')) {
+				$icon_image = WT_STATIC_URL.WT_MODULES_DIR . 'googlemap/' . $place2['icon'];
+				list($flag_width, $flag_height) = WT_Perso_Functions::getResizedImageSize($icon_image, 25);
 			}
+			//END PERSO
 			echo "var point = new google.maps.LatLng({$lati}, {$long});";
 			if ($lastlevel) {
 				echo "var marker = createMarker(point, \"<div class='iwstyle' style='width: 250px;'><a href='?action=find", $linklevels, "'><br>";
@@ -2746,7 +2769,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				}
 			}
 			if (($place2['icon'] != NULL) && ($place2['icon'] != "")) {
-				echo '<img src=\"', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/', $place2['icon'], '\">&nbsp;&nbsp;';
+				//PERSO Resize flags
+				echo '<img class=\"flag_gm_50\" src=\"', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/', $place2['icon'], '\">&nbsp;&nbsp;';
+				//END PERSO
 			}
 			if ($lastlevel) {
 				$placename = substr($placelevels, 2);
@@ -2789,9 +2814,13 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			$temp=addslashes($place2['place']);
 			$temp=str_replace(array('&lrm;', '&rlm;'), array(WT_UTF8_LRM, WT_UTF8_RLM), $temp);
 			if (!$this->getSetting('GM_COORD')) {
-				echo "<br><br></div>\", icon_type, \"", $temp, "\");";
+				//PERSO Resize flags
+				echo "<br><br></div>\", \"".$icon_image."\", \"", $temp, "\", \"".$flag_width."\", \"".$flag_height."\");";
+				//END PERSO
 			} else {
-				echo "<br><br>", $place2['lati'], ", ", $place2['long'], "</div>\", icon_type, \"", $temp, "\");";
+				//PERSO Resize flags
+				echo "<br><br>", $place2['lati'], ", ", $place2['long'], "</div>\", \"".$icon_image."\", \"", $temp, "\", \"".$flag_width."\", \"".$flag_height."\");";
+				//END PERSO
 			}
 		}
 	}
@@ -2848,20 +2877,23 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			}
 
 			// Creates a marker whose info window displays the given name
-			function createMarker(point, html, icon, name) {
+			//PERSO Resize flags - Add width and height
+			function createMarker(point, html, icon, name, width, height) {
 				// Choose icon and shadow ============
-				if (icon.image && '.$level.'<=3) {
-					if (icon.image!="'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/images/marker_yellow.png") {
-						var iconImage = new google.maps.MarkerImage(icon.image,
-						new google.maps.Size(25, 15),
+				if (icon) {
+					if (icon!="'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/images/marker_yellow.png") {
+						var iconImage = new google.maps.MarkerImage(icon,
+						null,
 						new google.maps.Point(0,0),
-						new google.maps.Point(1, 45));
+						new google.maps.Point(1, 45),
+						new google.maps.Size(width, height));
 						var iconShadow = new google.maps.MarkerImage("'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/images/flag_shadow.png",
 						new google.maps.Size(35, 45),
 						new google.maps.Point(0,0),
 						new google.maps.Point(1, 45));
 					 } else {
-						var iconImage = new google.maps.MarkerImage(icon.image,
+						var iconImage = new google.maps.MarkerImage(icon,
+			//END PERSO
 						new google.maps.Size(20, 34),
 						new google.maps.Point(0,0),
 						new google.maps.Point(9, 34));
@@ -2896,7 +2928,10 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					icon: iconImage,
 					shadow: iconShadow,
 					map: map,
-					title: name
+					title: name,
+				//PERSO Resize flags - Some flags are cut by GM tiles
+					optimized: false
+				//END PERSO
 				});
 				// Show this markers name in the info window when it is clicked
 				google.maps.event.addListener(marker, "click", function() {
@@ -3600,11 +3635,15 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 
 				// Create the Main Location Marker
 				<?php
-				if ($level < 3 && $place_icon != '') {
+				//PERSO Resize flags
+				if ($place_icon != '') {
+					list($flag_width, $flag_height) = WT_Perso_Functions::getResizedImageSize(WT_STATIC_URL.WT_MODULES_DIR.'googlemap/'.$place_icon, 25);
 					echo 'var image = new google.maps.MarkerImage("', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/',$place_icon,'",';
-						echo 'new google.maps.Size(25, 15),';	// Image size
+						echo 'null,';	// Image size
 						echo 'new google.maps.Point(0, 0),';	// Image origin
 						echo 'new google.maps.Point(0, 44)';	// Image anchor
+						echo ', new google.maps.Size(',$flag_width,',',$flag_height,')';
+				//END PERSO
 					echo ');';
 					echo 'var iconShadow = new google.maps.MarkerImage("', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/images/flag_shadow.png",';
 						echo 'new google.maps.Size(35, 45),';	// Shadow size
@@ -3619,6 +3658,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 						echo 'title: pl_name,';
 						echo 'draggable: true,';
 						echo 'zIndex:1';
+						//PERSO Resize flags - Some flags are cut by GM tiles
+						echo ', optimized: false';
+						//END PERSO
 					echo '});';
 				} else {
 					echo 'marker = new google.maps.Marker({';
@@ -3650,6 +3692,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 						echo 'title: pl_name,';
 						echo 'draggable: true,';
 						echo 'zIndex: 1';
+						//PERSO Resize flags - Some flags are cut by GM tiles
+						echo ', optimized: false';
+						//END PERSO
 					echo '});';
 					?>
 					pos3 = marker.getPosition();
@@ -3910,7 +3955,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 						<a href="#" onclick="change_icon();return false;"><?php echo WT_I18N::translate('Change flag'); ?></a>
 		<?php   }
 				else { ?>
-						<img alt="<?php echo /* I18N: The emblem of a country or region */ WT_I18N::translate('Flag'); ?>" src="<?php echo WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/', $place_icon; ?>">&nbsp;&nbsp;
+						<!-- PERSO Resize flags -->
+						<img class="flag_gm_30" alt="<?php echo /* I18N: The emblem of a country or region */ WT_I18N::translate('Flag'); ?>" src="<?php echo WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/', $place_icon; ?>">&nbsp;&nbsp;
+						<!-- END PERSO -->
 						<a href="#" onclick="change_icon();return false;"><?php echo WT_I18N::translate('Change flag'); ?></a>&nbsp;&nbsp;
 						<a href="#" onclick="remove_icon();return false;"><?php echo WT_I18N::translate('Remove flag'); ?></a>
 		<?php   } ?>
@@ -4403,7 +4450,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					echo '<img src="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/images/mm_20_red.png">';
 				}
 			} else {
-				echo '<img src="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/', $place['icon'], '" width="25" height="15">';
+				//PERSO Resize flags
+				echo '<img class="flag_gm_25" src="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/', $place['icon'], '" >';
+				//END PERSO
 			}
 			echo '</td>';
 			echo '<td class="narrow"><a href="#" onclick="edit_place_location(', $place['place_id'], ');return false;" class="icon-edit" title="', WT_I18N::translate('Edit'), '"></a></td>';
