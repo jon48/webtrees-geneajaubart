@@ -228,7 +228,7 @@ function print_fact(WT_Fact $fact, WT_GedcomRecord $record) {
 		echo '<div class="field"><a href="https://familysearch.org/search/tree/results#count=20&query=afn:', rawurlencode($fact->getValue()), '" target="new">', WT_Filter::escapeHtml($fact->getValue()), '</a></div>';
 		break;
 	case 'ASSO':
-		// we handle this later, in print_asso_rela_record()
+		// we handle this later, in format_asso_rela_record()
 		break;
 	case 'EMAIL':
 	case 'EMAI':
@@ -338,7 +338,7 @@ function print_fact(WT_Fact $fact, WT_GedcomRecord $record) {
 	}
 
 	// Print the associates of this fact/event
-	print_asso_rela_record($fact, $record);
+	echo format_asso_rela_record($fact);
 
 	// Print any other "2 XXXX" attributes, in the order in which they appear.
 	preg_match_all('/\n2 ('.WT_REGEX_TAG.') (.+)/', $fact->getGedcom(), $matches, PREG_SET_ORDER);
@@ -878,8 +878,20 @@ function print_main_notes(WT_Fact $fact, $level) {
 		$can_edit = $level==1 && $fact->canEdit();
 	}
 
-	$ct = preg_match_all("/$level NOTE(.*)/", $factrec, $match, PREG_SET_ORDER);
+	$ct = preg_match_all("/$level NOTE (.*)/", $factrec, $match, PREG_SET_ORDER);
 	for ($j=0; $j<$ct; $j++) {
+		// Note object, or inline note?
+		if (preg_match("/$level NOTE @(.*)@/", $match[$j][0], $nmatch)) {
+			$nid = $nmatch[1];
+			$note = WT_Note::getInstance($nid);
+			if ($note && !$note->canShow()) {
+				continue;
+			}
+		} else {
+			$nid = null;
+			$note = null;
+		}
+
 		if ($level>=2) echo '<tr class="row_note2">';
 		else echo '<tr>';
 		echo '<td class="descriptionbox';
@@ -933,19 +945,13 @@ function print_main_notes(WT_Fact $fact, $level) {
 			}
 		}
 		echo '</td>';
-		if (preg_match("/$level NOTE @(.*)@/", $match[$j][0], $nmatch)) {
+		if ($note) {
 			// Note objects
-			$nid = $nmatch[1];
-			$note = WT_Note::getInstance($nid);
-			if ($note) {
+			if (array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
 				// If Census assistant installed, allow it to format the note
-				if (array_key_exists('GEDFact_assistant', WT_Module::getActiveModules())) {
-					$text = GEDFact_assistant_WT_Module::formatCensusNote($note);
-				} else {
-					$text = WT_Filter::formatText($note->getNote(), $WT_TREE);
-				}
+				$text = GEDFact_assistant_WT_Module::formatCensusNote($note);
 			} else {
-				$text = '<span class="error">' . WT_Filter::escapeHtml($nid) . '</span>';
+				$text = WT_Filter::formatText($note->getNote(), $WT_TREE);
 			}
 		} else {
 			// Inline notes

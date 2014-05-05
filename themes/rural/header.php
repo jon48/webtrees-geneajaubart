@@ -89,10 +89,6 @@ $this
 	//END PERSO
 	?>
 
-	<?php if (WT_USE_LIGHTBOX) { ?>
-	<link rel="stylesheet" type="text/css" href="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/css/album_page.css">
-	<?php } ?>
-
 </head>
 <body id="body">
 <?php if ($view=='simple') { ?>

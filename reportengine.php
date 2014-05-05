@@ -29,8 +29,8 @@ require WT_ROOT.'includes/functions/functions_rtl.php';
 
 $controller=new WT_Controller_Page();
 
-$famid   =WT_Filter::get('famid');
-$pid     =WT_Filter::get('pid');
+$famid   =WT_Filter::get('famid', WT_REGEX_XREF);
+$pid     =WT_Filter::get('pid', WT_REGEX_XREF);
 $action  =WT_Filter::get('action', 'choose|setup|run', 'choose');
 $report  =WT_Filter::get('report');
 $output  =WT_Filter::get('output', 'HTML|PDF', 'PDF');
@@ -169,7 +169,6 @@ elseif ($action=='setup') {
 	$controller
 		->setPageTitle($report_array['title'])
 		->pageHeader()
-		->addInlineJavascript('var pastefield; function paste_id(value) { pastefield.value=value; }') // For the 'find indi' link
 		->addExternalJavascript(WT_STATIC_URL.'js/autocomplete.js');
 
 	init_calendar_popup();
@@ -259,7 +258,7 @@ elseif ($action=='setup') {
 				echo print_findsource_link($input['name']);
 			} elseif ($input['lookup']=='DATE') {
 				echo ' <a href="#" onclick="cal_toggleDate(\'div_', WT_Filter::EscapeJs($input['name']), '\', \'', WT_Filter::EscapeJs($input['name']), '\'); return false;" class="icon-button_calendar" title="', WT_I18N::translate('Select a date'), '"></a>';
-				echo '<div id="div_', WT_Filter::EscapeHtml($input['name']), '" style="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></div>';
+				echo '<div id="div_', WT_Filter::EscapeHtml($input['name']), '" style="position:absolute;visibility:hidden;background-color:white;"></div>';
 			}
 		}
 		echo '</td></tr>';

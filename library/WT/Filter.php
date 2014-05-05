@@ -66,6 +66,20 @@ class WT_Filter {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
+	// Escape a string for use in a SQL "LIKE" clause
+	//////////////////////////////////////////////////////////////////////////////
+	public static function escapeLike($string) {
+		return strtr(
+			$string,
+			array(
+				'\\' => '\\\\',
+				'%'  => '\%',
+				'_'  => '\_',
+			)
+		);
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
 	// Unescape an HTML string, giving just the literal text
 	//////////////////////////////////////////////////////////////////////////////
 	public static function unescapeHtml($string) {
@@ -108,9 +122,6 @@ class WT_Filter {
 		$parser->empty_element_suffix = '>';
 		$parser->no_markup            = true;
 		$text = $parser->transform($text);
-
-		// HTMLPurifier needs its own autoloader
-		require_once WT_ROOT . 'library/htmlpurifier-4.6.0/library/HTMLPurifier.auto.php';
 
 		// HTMLPurifier needs somewhere to write temporary files
 		$HTML_PURIFIER_CACHE_DIR = WT_DATA_DIR . 'html_purifier_cache';
@@ -245,6 +256,13 @@ class WT_Filter {
 
 	public static function postUrl($variable, $default=null) {
 		return filter_input(INPUT_POST, $variable, FILTER_VALIDATE_URL) ?: $default;
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
+	// Validate COOKIE requests
+	//////////////////////////////////////////////////////////////////////////////
+	public static function cookie($variable, $regexp=null, $default=null) {
+		return self::_input(INPUT_COOKIE, $variable, $regexp, $default);
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
