@@ -98,12 +98,12 @@ echo
 		#container dl {margin:0 0 40px 25px;}
 		#container dt {display:inline; width: 320px; font-weight:normal; margin: 0 0 15px 0;}
 		#container dd {color: #81A9CB; margin-bottom:20px;font-weight:bold;}
-		#container p {color: #81A9CB; font-size: 14px; font-style: italic; font-weight:bold; padding: 0 5px 5px; align: top;}
+		#container p {color: #81A9CB; font-size: 14px; font-style: italic; font-weight:bold; padding: 0 5px 5px;}
 		h2 {color: #81A9CB;}
 		.good {color: green;}
 		.bad {color: red !important;}
 		.indifferent {color: blue;}
-		#container p.pgv  {color: black; font-size: 12px; font-style: normal; font-weight:normal; padding:0; margin:10px 0 0 320px}
+		#container p.pgv  {color: black; font-size: 12px; font-style: normal; font-weight:normal; padding:0; margin:10px 0 0 320px;}
 	</style>';
 
 if ($error || !$PGV_PATH) {
@@ -777,7 +777,6 @@ foreach ($GEDCOMS as $GEDCOM=>$GED_DATA) {
 		break;
 	}
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'THUMBNAIL_WIDTH',              $THUMBNAIL_WIDTH));
-	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'USE_GEONAMES',                 $USE_GEONAMES));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'USE_RELATIONSHIP_PRIVACY',     $USE_RELATIONSHIP_PRIVACY));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'USE_RIN',                      $USE_RIN));
 	$stmt_gedcom_setting->execute(array($GED_DATA['id'], 'WATERMARK_THUMB',              $WATERMARK_THUMB));

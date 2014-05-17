@@ -19,20 +19,50 @@ class WT_Perso_Functions_Map {
 	private static $_isGeoDispersionOperational = -1;
 	
 	/**
+	 * Returns the GoogleMap ID associated with the Gedcom place.
+	 * The functions tries to reproduce a subpart of the function get_lati_long_placelocation
+	 * in the googlemap module, which is now private.
+	 * 
+	 * The function does not however take into account the possible place names (based on prefixes
+	 *  and suffixes), which is as well an private method.
+	 * 
+	 * @param WT_Place $place
+	 * @return int|NULL GoogleMap place ID
+	 */
+	public static function getGoogleMapId(WT_Place $place) {
+		if(!$place->isEmpty()) {
+			$parent = array_reverse( explode (',', $place->getGedcomName()));
+			$place_id = 0;
+			for ($i=0; $i<count($parent); $i++) {
+				$parent[$i] = trim($parent[$i]);
+				if (empty($parent[$i])) $parent[$i]='unknown';// GoogleMap module uses "unknown" while GEDCOM uses , ,
+				$pl_id=
+					WT_DB::prepare('SELECT pl_id FROM `##placelocation` WHERE pl_level=? AND pl_parent_id=? AND pl_place LIKE ? ORDER BY pl_place')
+					->execute(array($i, $place_id, $parent[$i]))
+					->fetchOne();
+				if (empty($pl_id)) break;
+				$place_id = $pl_id;
+			}
+			return $place_id;
+		}
+		return null;
+	}
+	
+	
+	/**
 	 * Return HTML code for the flag icon of the requested place
 	 *
 	 * @param WT_Place $place The place to find
 	 * @param int $height Height of the returned icon
 	 * @return string HTML code of the flag icon
 	 */
-	public static function getPlaceIcon(WT_Place $place, $height){
-		require_once WT_ROOT.WT_MODULES_DIR.'googlemap/googlemap.php'; // Cannot be outside of the function, causing issues with placehierarchy.php
-		
+	public static function getPlaceIcon(WT_Place $place, $height){		
 		if(!$place->isEmpty()){
-			$place_gedcom = $place->getGedcomName();
-			$latlongval = get_lati_long_placelocation($place_gedcom);
-			if($latlongval){
-				return '<img class="flag_gm_h'.$height.'" src="'.WT_MODULES_DIR.'googlemap/'.$latlongval->pl_icon.'" title="'.$place_gedcom.'" alt="'.$place_gedcom.'" />';
+			$place_details = WT_DB::prepare("SELECT SQL_CACHE pl_icon FROM `##placelocation` WHERE pl_id=? ORDER BY pl_place")
+				->execute(array(self::getGoogleMapId($place)))
+				->fetchOneRow();
+			if($place){
+				return '<img class="flag_gm_h'.$height.'" src="'.WT_MODULES_DIR.'googlemap/'.$place_details->pl_icon.'" title="'.$place->getGedcomName().'" alt="'.$place->getGedcomName().'" />';
 			}
 		}
 		return '';

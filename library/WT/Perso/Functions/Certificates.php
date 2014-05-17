@@ -99,7 +99,7 @@ class WT_Perso_Functions_Certificates {
 			$dir=opendir($dirPath);
 			while(($entry = readdir($dir)) && $nbCert < $limit){
 				if($entry!='.' && $entry!='..' && $entry!='Thumbs.db' &&!is_dir($dirPath.$entry.'/') && stripos($entry, $contains)!== false){
-					$tabFiles[]=WT_Perso_Functions::encodeUtf8ToFileSystem($entry);
+					$tabFiles[]=WT_Perso_Functions::encodeFileSystemToUtf8($entry);
 					$nbCert++;
 				}
 			}

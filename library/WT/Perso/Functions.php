@@ -60,46 +60,6 @@ class WT_Perso_Functions {
 		return array($width, $height);
 	}
 
-	/**
-	 * Checks if an URL is available.
-	 * Useful when disconnected from Internet, or website down.
-	 *
-	 * @param string $url URL of the website to check
-	 * @return boolean Is the URL active ?
-	 */
-	static public function isUrlAlive($url){
-		if(isset($_isUrlAlive[$url])) return true;
-		
-		$url_ini = $url;		
-		$url = @parse_url($url);
-		
-		if (!$url) {
-			return false;
-		}
-		
-		$url = array_map('trim', $url);
-		$url['port'] = (!isset($url['port'])) ? 80 : (int)$url['port'];
-		$path = (isset($url['path'])) ? $url['path'] : '';
-
-		if ($path == '')
-		{
-			$path = '/';
-		}
-
-		$path .= ( isset ( $url['query'] ) ) ? "?$url[query]" : '';
-
-		if ( isset ( $url['host'] ) AND $url['host'] != gethostbyname ( $url['host'] ) )
-		{
-			$headers = get_headers("$url[scheme]://$url[host]:$url[port]$path");
-			$headers = ( is_array ( $headers ) ) ? implode ( "\n", $headers ) : $headers;
-			if(preg_match ( '#^HTTP/.*\s+[(200|301|302)]+\s#i', $headers )){
-				$_isUrlAlive[$url_ini] = true;
-				return true;
-			}
-		}
-		return false;
-		
-	}
 	
 	/**
 	 * Checks if a table exist in the DB schema
@@ -216,7 +176,7 @@ class WT_Perso_Functions {
 	 */
 	public static function encodeUtf8ToFileSystem($string){
 		if (strtoupper(substr(php_uname('s'), 0, 7)) === 'WINDOWS') {
-		    return iconv('utf-8', 'cp1252' ,$string);
+			return iconv('utf-8', 'cp1252' ,$string);
 		}
 		return $string;
 	}

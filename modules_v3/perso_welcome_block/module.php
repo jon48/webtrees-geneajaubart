@@ -219,13 +219,9 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		$url .= '&format=PHP';
 		$url .= '&token_auth='.$piwik_token;
 		
-		$fetched = file_get_contents($url);
-		$content = unserialize($fetched);
-		
-		// case error
-		if($content && is_numeric($content))
-		{
-			return $content;
+		if($fetched = WT_File::fetchUrl($url)) {
+			$content = unserialize($fetched);
+			if(is_numeric($content)) return $content;
 		}
 		
 		return null;	
@@ -237,7 +233,7 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		$html = WT_I18N::translate('No statistics could be retrieved from Piwik.');
 		$block_id = WT_Filter::get('block_id');
 		$piwik_url=get_block_setting($block_id, 'piwik_url', '');
-		if($block_id && WT_Perso_Functions::isUrlAlive($piwik_url)){
+		if($block_id){
 			if(WT_Perso_Cache::isCached('piwikCountYear', $this)) {
 				$visitCountYear = WT_Perso_Cache::get('piwikCountYear', $this);
 			}

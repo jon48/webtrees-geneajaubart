@@ -29,7 +29,7 @@ if (!defined('WT_SCRIPT_NAME')) {
 
 // Identify ourself
 define('WT_WEBTREES',     'webtrees');
-define('WT_VERSION',      '1.5.2');
+define('WT_VERSION',      '1.5.3');
 define('WT_VERSION_TEXT', WT_VERSION); // Deprecated
 
 // External URLs
@@ -43,11 +43,11 @@ define('WT_STATIC_URL', ''); // For example, http://my.cdn.com/webtrees-static-1
 // Optionally, load major JS libraries from Google’s public CDN
 define ('WT_USE_GOOGLE_API', false);
 if (WT_USE_GOOGLE_API) {
-	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
-	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js');
+	define('WT_JQUERY_URL',        'https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js');
+	define('WT_JQUERYUI_URL',      'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js');
 } else {
-	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery-1.10.2.js');
-	define('WT_JQUERYUI_URL',      WT_STATIC_URL.'js/jquery-ui-1.10.3.js');
+	define('WT_JQUERY_URL',        WT_STATIC_URL.'js/jquery-1.11.0.js');
+	define('WT_JQUERYUI_URL',      WT_STATIC_URL.'js/jquery-ui-1.10.4.js');
 }
 define('WT_JQUERY_COLORBOX_URL',   WT_STATIC_URL.'js/jquery.colorbox-1.4.15.js');
 define('WT_JQUERY_COOKIE_URL',     WT_STATIC_URL.'js/jquery.cookie-1.4.0.js');
@@ -55,7 +55,7 @@ define('WT_JQUERY_DATATABLES_URL', WT_STATIC_URL.'js/jquery.datatables-1.9.4.js'
 define('WT_JQUERY_JEDITABLE_URL',  WT_STATIC_URL.'js/jquery.jeditable-1.7.1.js');
 define('WT_JQUERY_WHEELZOOM_URL',  WT_STATIC_URL.'js/jquery.wheelzoom-1.1.2.js');
 define('WT_MODERNIZR_URL',         WT_STATIC_URL.'js/modernizr.custom-2.6.2.js');
-define('WT_WEBTREES_JS_URL',       WT_STATIC_URL.'js/webtrees-1.5.2.js');
+define('WT_WEBTREES_JS_URL',       WT_STATIC_URL.'js/webtrees-1.5.3.js');
 
 // Location of our modules and themes.  These are used as URLs and folder paths.
 define('WT_MODULES_DIR', 'modules_v3/'); // Update setup.php and build/Makefile when this changes
@@ -144,13 +144,7 @@ if (version_compare(PHP_VERSION, '5.4', '<') && get_magic_quotes_gpc()) {
 	unset($process);
 }
 
-// Invoke the Zend Framework Autoloader, so we can use Zend_XXXXX and WT_XXXXX classes
-set_include_path(WT_ROOT . 'library' . PATH_SEPARATOR . get_include_path());
-require_once 'Zend/Loader/Autoloader.php';
-Zend_Loader_Autoloader::getInstance()
-	->registerNamespace('WT_')
-	->registerNamespace('HTMLPurifier_')
-	->registerNamespace('Michelf\\');
+require 'library/autoload.php';
 
 // PHP requires a time zone to be set in php.ini
 if (!ini_get('date.timezone')) {
@@ -209,7 +203,51 @@ require WT_ROOT.'includes/functions/functions_date.php';
 require WT_ROOT.'includes/functions/functions_charts.php';
 require WT_ROOT.'includes/functions/functions_utf-8.php';
 
-set_error_handler('wt_error_handler');
+// Set a custom error handler
+set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+	if ((error_reporting() > 0)&&($errno<2048)) {
+		if (WT_ERROR_LEVEL==0) {
+			return;
+		}
+		$fmt_msg="<br>ERROR {$errno}: {$errstr}<br>";
+		$log_msg="ERROR {$errno}: {$errstr};";
+		// Although debug_backtrace should always exist in PHP5, without this check, PHP sometimes crashes.
+		// Possibly calling it generates an error, which causes infinite recursion??
+		if ($errno < 16 && function_exists("debug_backtrace") && strstr($errstr, "headers already sent by") === false) {
+			$backtrace = debug_backtrace();
+			$num = count($backtrace);
+			if (WT_ERROR_LEVEL == 1) {
+				$num = 1;
+			}
+			for ($i = 0; $i < $num; $i++) {
+				if ($i === 0) {
+					$fmt_msg .= "0 Error occurred on ";
+					$log_msg .= "\n0 Error occurred on ";
+				} else {
+					$fmt_msg .= "{$i} called from ";
+					$log_msg .= "\n{$i} called from ";
+				}
+				if (isset($backtrace[$i]["line"]) && isset($backtrace[$i]["file"])) {
+					$fmt_msg .= "line <b>{$backtrace[$i]['line']}</b> of file <b>".basename($backtrace[$i]['file'])."</b>";
+					$log_msg .= "line {$backtrace[$i]['line']} of file ".basename($backtrace[$i]['file']);
+				}
+				if ($i<$num-1) {
+					$fmt_msg .= " in function <b>".$backtrace[$i+1]['function']."</b>";
+					$log_msg .= " in function ".$backtrace[$i+1]['function'];
+				}
+				$fmt_msg .= "<br>";
+			}
+		}
+		echo $fmt_msg;
+		if (function_exists('AddToLog')) {
+			AddToLog($log_msg, 'error');
+		}
+		if ($errno == 1) {
+			die();
+		}
+	}
+	return false;
+});
 
 // Load our configuration file, so we can connect to the database
 if (file_exists(WT_ROOT.'data/config.ini.php')) {

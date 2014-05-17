@@ -89,10 +89,6 @@ $this
 	//END PERSO
 	?>
 
-	<?php if (WT_USE_LIGHTBOX) { ?>
-	<link rel="stylesheet" type="text/css" href="<?php echo WT_STATIC_URL, WT_MODULES_DIR; ?>lightbox/css/album_page.css">
-	<?php } ?>
-
 </head>
 <body id="body">
 <?php if ($view=='simple') { ?>
@@ -113,7 +109,7 @@ $this
 						<input type="hidden" name="action" value="general">
 						<input type="hidden" name="ged" value="<?php echo WT_GEDCOM; ?>">
 						<input type="hidden" name="topsearch" value="yes">
-						<input type="search" name="query" size="25" placeholder="<?php echo WT_I18N::translate('Search'); ?>" dir="auto">
+						<input type="search" name="query" size="25" placeholder="<?php echo WT_I18N::translate('Search'); ?>">
 						<input type="image" class="image" src="<?php echo $WT_IMAGES['search']; ?>" alt="<?php echo WT_I18N::translate('Search'); ?>" title="<?php echo WT_I18N::translate('Search'); ?>">
 					</form>
 				</div>

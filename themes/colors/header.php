@@ -71,11 +71,6 @@ echo '<link rel="stylesheet" type="text/css" href="', WT_CSS_URL ,'css/colors.ex
 if(WT_Perso_Certificate::isModuleOperational())	$this->addExternalJavascript(WT_STATIC_URL.WT_MODULES_DIR.'perso_certificates/js/activatecolorbox.js');
 //END PERSO
 
-// Additional css files required (Only if Lightbox installed)
-if (WT_USE_LIGHTBOX) {
-	echo '<link rel="stylesheet" type="text/css" href="', WT_STATIC_URL, WT_MODULES_DIR, 'lightbox/css/album_page.css" media="screen">';
-}
-
 echo
 	'</head>',
 	'<body id="body">';
@@ -129,7 +124,7 @@ if  ($view!='simple') { // Use "simple" headers for popup windows
 			'<input type="hidden" name="action" value="general">',
 			'<input type="hidden" name="ged" value="', WT_GEDCOM, '">',
 			'<input type="hidden" name="topsearch" value="yes">',
-			'<input type="search" name="query" size="15" placeholder="', WT_I18N::translate('Search'), '" dir="auto">',
+			'<input type="search" name="query" size="15" placeholder="', WT_I18N::translate('Search'), '">',
 			'<input class="search-icon" type="image" src="', $WT_IMAGES['search'], '" alt="', WT_I18N::translate('Search'), '" title="', WT_I18N::translate('Search'), '">',
 			'</form>',
 		'</li>',

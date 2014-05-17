@@ -26,9 +26,9 @@ require WT_ROOT.'includes/functions/functions_edit.php';
 $controller=new WT_Controller_Page();
 $controller
 	->requireManagerLogin()
-	->addInlineJavascript('jQuery("#x").accordion({active:0, icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }, heightStyle: "content"});')
-	->addInlineJavascript('jQuery("#tree_stats").accordion({icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});')
-	->addInlineJavascript('jQuery("#changes").accordion({icons:{ "header": "ui-icon-triangle-1-s", "headerSelected": "ui-icon-triangle-1-n" }});')
+	->addInlineJavascript('jQuery("#x").accordion({heightStyle: "content"});')
+	->addInlineJavascript('jQuery("#tree_stats").accordion();')
+	->addInlineJavascript('jQuery("#changes").accordion();')
 	->addInlineJavascript('jQuery("#content_container").css("visibility", "visible");')
 	->setPageTitle(WT_I18N::translate('Administration'))
 	->pageHeader();
@@ -96,7 +96,7 @@ $user_languages = WT_DB::prepare(
 $stats = new WT_Stats(WT_GEDCOM);
 
 ?>
-<div id="content_container" style="visibility:hidden">
+<div id="content_container" style="visibility: hidden;">
 	<div id="x">
 		<h2><?php echo WT_WEBTREES, ' ', WT_VERSION; ?></h2>
 		<div id="about">
@@ -117,14 +117,14 @@ $stats = new WT_Stats(WT_GEDCOM);
 		</div>
 
 		<?php if (WT_USER_IS_ADMIN && $old_files) { ?>
-		<h2><span class="warning">', WT_I18N::translate('Old files found'), '</span></h2>
+		<h2><span class="warning"><?php echo WT_I18N::translate('Old files found'); ?></span></h2>
 		<div>
 			<p>
 				<?php echo WT_I18N::translate('Files have been found from a previous version of webtrees.  Old files can sometimes be a security risk.  You should delete them.'); ?>
 			</p>
 			<ul>
-				<?php foreach ($old_files as $file) { ?>
-				<li dir="ltr"><?php echo $path; ?></li>';
+				<?php foreach ($old_files as $old_file) { ?>
+				<li dir="ltr"><?php echo $old_file; ?></li>
 				<?php } ?>	
 			</ul>
 		</div>
@@ -592,6 +592,32 @@ function old_paths() {
 		WT_ROOT.'themes/minimal/css-1.5.1',
 		WT_ROOT.'themes/webtrees/css-1.5.1',
 		WT_ROOT.'themes/xenea/css-1.5.1',
+		// Removed in 1.5.3
+		WT_ROOT.'js/jquery-1.10.2.js',
+		WT_ROOT.'js/jquery-ui-1.10.3.js',
+		WT_ROOT.'js/webtrees-1.5.2.js',
+		WT_ROOT.'library/htmlpurifier-4.6.0',
+		//WT_ROOT.'library/Michelf', On windows, this would delete library/michelf
+		WT_ROOT.'library/tcpdf',
+		WT_ROOT.'library/Zend',
+		WT_ROOT.'modules_v3/GEDFact_assistant/_CENS/census_asst_help.php',
+		WT_ROOT.'modules_v3/googlemap/admin_places.php',
+		WT_ROOT.'modules_v3/googlemap/defaultconfig.php',
+		WT_ROOT.'modules_v3/googlemap/googlemap.php',
+		WT_ROOT.'modules_v3/googlemap/placehierarchy.php',
+		WT_ROOT.'modules_v3/googlemap/places_edit.php',
+		WT_ROOT.'modules_v3/googlemap/util.js',
+		WT_ROOT.'modules_v3/googlemap/wt_v3_places_edit.js.php',
+		WT_ROOT.'modules_v3/googlemap/wt_v3_places_edit_overlays.js.php',
+		WT_ROOT.'modules_v3/googlemap/wt_v3_street_view.php',
+		WT_ROOT.'readme.html',
+		WT_ROOT.'themes/_administration/css-1.5.2',
+		WT_ROOT.'themes/clouds/css-1.5.2',
+		WT_ROOT.'themes/colors/css-1.5.2',
+		WT_ROOT.'themes/fab/css-1.5.2',
+		WT_ROOT.'themes/minimal/css-1.5.2',
+		WT_ROOT.'themes/webtrees/css-1.5.2',
+		WT_ROOT.'themes/xenea/css-1.5.2',
 	);
 }
 
