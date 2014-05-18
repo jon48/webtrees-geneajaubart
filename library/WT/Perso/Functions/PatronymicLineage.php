@@ -53,7 +53,7 @@ class WT_Perso_Functions_PatronymicLineage {
 			//Look if the individual has been already used in a previous lineage
 			if(!isset($_usedIndis[$pid])){
 				//Find the root of the lineage
-				$indiFirst=self::getLineageRootIndividual($indi);
+				$indiFirst=self::getLineageRootIndividual(WT_Individual::getInstance($pid, $gedcomid));
 				if($indiFirst){
 					$_usedIndis[$indiFirst->getXref()] = true;
 					if($indiFirst->canShow()){
@@ -242,15 +242,16 @@ class WT_Perso_Functions_PatronymicLineage {
 		$is_first=false;
 		$dindi = new WT_Perso_Individual($individual);
 		$indi_surname=$dindi->getUnprotectedPrimarySurname();
+		$resIndi = $individual;
 		while(!$is_first){
 			//Get the individual parents family
-			$fam=$individual->getPrimaryChildFamily();
+			$fam=$resIndi->getPrimaryChildFamily();
 			if($fam){
 				$husb=$fam->getHusband();
 				$wife=$fam->getWife();
 				//If the father exists, take him
 				if($husb){
-					$individual=$husb;
+					$resIndi=$husb;
 				}
 				//If only a mother exists
 				else if($wife){
@@ -258,7 +259,7 @@ class WT_Perso_Functions_PatronymicLineage {
 					$wife_surname=$dwife->getUnprotectedPrimarySurname();
 					//Check if the child is a natural child of the mother (based on the surname - Warning : surname must be identical)
 					if($wife_surname==$indi_surname){
-						$individual=$wife;
+						$resIndi=$wife;
 					}
 					else{
 						$is_first=true;
@@ -272,11 +273,11 @@ class WT_Perso_Functions_PatronymicLineage {
 				$is_first=true;
 			}
 		}
-		if($_usedIndis && isset($_usedIndis[$individual->getXref()])){
+		if($_usedIndis && isset($_usedIndis[$resIndi->getXref()])){
 			return null;
 		}
 		else{
-			return $individual;
+			return $resIndi;
 		}
 	}
 
