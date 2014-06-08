@@ -141,7 +141,7 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 						$removerow = true;
 				}				
 				if($useminvalues &&
-					( $row['percent'] < ( get_gedcom_setting($this->_gedid, 'PERSO_PI_SC_MIN_PERCENT') ?: self::DEFAULT_MINIMUM_PERCENTAGE) 
+					( $row['percent'] < ( get_gedcom_setting($this->_gedid, 'PERSO_PI_SC_MIN_PERCENT') ? get_gedcom_setting($this->_gedid, 'PERSO_PI_SC_MIN_PERCENT') / 100 : self::DEFAULT_MINIMUM_PERCENTAGE) 
 					||$row['pisc_count'] < ( get_gedcom_setting($this->_gedid, 'PERSO_PI_SC_MIN_COUNT') ?: self::DEFAULT_MINIMUM_COUNT))
 				) $removerow = true;
 				if($removerow) unset($res[$rowid]);
@@ -173,7 +173,9 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 	public function engineAction($action) {
 		switch($action) {
 			case 'ajaxinferencelist':
+			case 'ajaxadminadd';
 			case 'ajaxadmindelete';
+			case 'ajaxcompute';
 				$this->$action();
 				break;
 			default:
@@ -268,21 +270,34 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 		$html .= '<div>'.
 					'<dt>'. WT_I18N::translate('Minimum percentage').'</dt>'.  // TODO How to manage helptext??
 					'<dd>'.WT_Perso_Functions_Edit::edit_module_field_inline(
-							'gedcom_setting-PERSO_PI_SC_MIN_PERCENT-'.$this->_gedid, 
-							get_gedcom_setting($this->_gedid, 'PERSO_PI_SC_MIN_PERCENT') ?: self::DEFAULT_MINIMUM_PERCENTAGE, 
+							'gedcom_setting-'.$this->getName().'-PERSO_PI_SC_MIN_PERCENT-'.$this->_gedid.'-validate', 
+							get_gedcom_setting($this->_gedid, 'PERSO_PI_SC_MIN_PERCENT') ?: self::DEFAULT_MINIMUM_PERCENTAGE * 100, 
 							null, 
 							'perso_inferences'
-					).'</dd>'.
+					).' %</dd>'.
 					'<dt>'. WT_I18N::translate('Minimum population count').'</dt>'.  // TODO How to manage helptext??
 					'<dd>'.WT_Perso_Functions_Edit::edit_module_field_inline(
-							'gedcom_setting-PERSO_PI_SC_MIN_COUNT-'.$this->_gedid,
+							'gedcom_setting-'.$this->getName().'-PERSO_PI_SC_MIN_COUNT-'.$this->_gedid.'-validate',
 							get_gedcom_setting($this->_gedid, 'PERSO_PI_SC_MIN_COUNT') ?: self::DEFAULT_MINIMUM_COUNT,
 							null,
 							'perso_inferences'
 					).'</dd>'.
 				'</div>';
-		
-		$js = ' function fnDeleteInferenceRow (inferenceid) {
+
+		$js = ' 
+				function calculateSCStats(){
+					jQuery("#bInfSCCompute_'.$inf_id.'").attr("disabled", "disabled");
+					jQuery("#bInfSCCompute_text_'.$inf_id.'").empty().html("<i class=\"icon-loading-small\"></i>");
+					jQuery("#bInfSCCompute_text_'.$inf_id.'").load(
+						"module.php?mod=perso_inferences&mod_action=engineaction&gedid='.$this->_gedid.'&engine='.WT_Filter::escapeJs($this->getName()).'&engineaction=ajaxcompute",
+						function() {
+							jQuery("#bInfSCCompute_'.$inf_id.'").removeAttr("disabled");
+							infSCConfigDatatable.fnReloadAjax();
+						}
+					);
+				}
+				
+				function fnDeleteInferenceRow (inferenceid) {
 		            $.ajax({ "url": "module.php",
 		                "type": "GET",
 		                "data": {
@@ -306,6 +321,48 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 				}
 				
 				gedid = '.$this->_gedid.';
+						
+				//Prepare the dialog form											
+				var oAddNewSCInferenceForm = $("#formAddNewSCInfRow_'.$inf_id.'");
+				oAddNewSCInferenceForm.dialog(
+					{
+						"height": "auto",
+        				"width" : "auto",
+						"modal": true,
+						"autoOpen" : false,
+						"position": "center",
+						"buttons" : [
+							{ 
+								"text" : "'.WT_I18N::translate('Add').'",
+								"click" : function() {
+						    		$(this).ajaxSubmit({
+										"resetForm": true,
+										"dataType": "json",
+										"error": function(){
+						                	alert("'.WT_Filter::escapeHtml(WT_I18N::translate('An error occured while adding new element.')).'");
+						                },
+										"success": function(e){
+											if(e.result == "ok") {					
+												infSCConfigDatatable.fnReloadAjax();
+												oAddNewSCInferenceForm.dialog("close");
+											}
+											else{
+												alert(e.text);
+											}
+										}
+						            });
+					            }
+							},
+							{
+								"text" : "'.WT_I18N::translate('Cancel').'",
+								"click" : function() {
+					        	     $(this).dialog("close");
+					            }
+							}
+					    ]
+					}
+				);			
+				
 				
 				//Datatable initialisation
 				jQuery.fn.dataTableExt.oSort["unicode-asc"  ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
@@ -314,7 +371,7 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 				jQuery.fn.dataTableExt.oSort["num-html-desc"]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a>b) ? -1 : (a<b ? 1 : 0);};
 	
 				infSCConfigDatatable = jQuery("#tInfSCConfigTable_'.$inf_id.'").dataTable({
-					"sDom": \'<"H"<"dt-clear">ir>t\',
+					"sDom": \'<"H"<"dt-clear">ir<"css_right"<"#bAddSCInfRowDiv'.$inf_id.'">>>t\',
 					'.WT_I18N::datatablesI18N().',
 					"bJQueryUI": true,
 					"aoColumns": [
@@ -348,10 +405,42 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 						});
 					}			
 				});
+								
+				$("#bAddSCInfRowDiv'.$inf_id.'").html("<button id=\"btaddSCInfrow_'.$inf_id.'\" class=\"add_row\"></button>");
+                var oAddNewSCInferenceButton = $("#btaddSCInfrow_'.$inf_id.'").button({
+					label: "'.WT_I18N::translate('Add...').'",
+					icons: { primary: "ui-icon-plus" }
+				});
+				oAddNewSCInferenceButton.click(function () { oAddNewSCInferenceForm.dialog("open"); });
 		';
 		
 		$html .= '</div>&nbsp</div>'.
 			'<div>'.
+				
+				'<form id="formAddNewSCInfRow_'.$inf_id.'" method="GET" action="'.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'" title="'.WT_I18N::translate('Add a new entry').'">'.
+					'<input id="mod" type="hidden" name="mod" value="perso_inferences">'.
+					'<input id="mod_action" type="hidden" name="mod_action" value="engineaction">'.
+					'<input id="engine" type="hidden" name="engine" value="'.$this->getName().'">'.
+					'<input id="gedid" type="hidden" name="gedid" value="'.$this->_gedid.'">'.
+					'<input id="engineaction" type="hidden" name="engineaction" value="ajaxadminadd">'.
+					'<input type="hidden" name="id" id="newid" value="DATAROWID" rel="0" />'.
+					'<input type="hidden" name="status" id="newstatus" value="enabled" rel="1" />'.
+					'<label for="name">'.WT_I18N::translate('Source record').'</label><br />'.
+					'<select name="sourcerecord" rel="2">'.					
+						'<option value="INDI">'.WT_Gedcom_Tag::getLabel('INDI').'</option>'.
+						'<option value="FAM">'.WT_Gedcom_Tag::getLabel('FAM').'</option>'.
+						'<option value="SOUR">'.WT_Gedcom_Tag::getLabel('SOUR').'</option>'.
+						'<option value="OBJE">'.WT_Gedcom_Tag::getLabel('OBJE').'</option>'.
+						'<option value="NOTE">'.WT_Gedcom_Tag::getLabel('NOTE').'</option>'.
+						'<option value="REPO">'.WT_Gedcom_Tag::getLabel('REPO').'</option>'.
+					'</select>'.
+					'<br />'.
+					'<label for="name">'.WT_I18N::translate('Source attribute').'</label><br /><input type="text" name="sourceattr" class="required" rel="3" />'.
+					'<br />'.
+					'<label for="name">'.WT_I18N::translate('Comparison attribute').'</label><br /><input type="text" name="targetattr" class="required" rel="4" />'.
+					'<br />'.
+				'</form>'.
+				
 				'<table id="tInfSCConfigTable_'.$inf_id.'" class="dtInferenceDatatable">'.
 					'<thead>'.
 						'<tr>'.
@@ -367,12 +456,63 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 						'</tr>'.
 					'</thead>'.
 				'</table>'.
+			'</div>'.
+			'<div class="center">'.
+				'<button id="bInfSCCompute_'.$inf_id.'" class="progressbutton" onClick="calculateSCStats();">'.
+					'<div id="bInfSCCompute_text_'.$inf_id.'">'.WT_I18N::translate('Recompute').'</div>'.
+				'</button>'.
 			'</div>';
 		
 		$html .= '<script>' . $js . '</script>';
 		
 		
 		return $html;
+	}
+	
+	// Implement WT_Perso_Inference_EngineInterface
+	public function validateConfigSettings($setting, $value) {
+		switch($setting) {
+			case 'PERSO_PI_SC_MIN_PERCENT':
+				if(!(is_numeric($value) && $value >= 0 && $value <= 100)) {
+					$value = 'ERROR_VALIDATION';
+				}
+				break;
+			case 'PERSO_PI_SC_MIN_COUNT':
+				if(!(is_numeric($value) && $value >= 0)) {
+					$value = 'ERROR_VALIDATION';
+				}
+				break;
+			default:
+				return 'ERROR_VALIDATION';
+		}
+		return $value;
+	}
+	
+	/**
+	 * Compute asynchronously the Simple Comparison engine statistics, and return the result.
+	 *
+	 * @return string HTML code result to display
+	 */
+	private function ajaxcompute() {
+		$controller=new WT_Controller_Ajax();
+		
+		$html = '<i class="icon-perso-error" title="'.WT_I18N::translate('Error').'"></i>';
+		
+		$ged_id = WT_Filter::getInteger('gedid', 0, PHP_INT_MAX, WT_GED_ID);
+		$engine = WT_Filter::get('engine');
+		
+		if(WT_Perso_Inference_Helper::isModuleOperational()
+			&& $ged_id && array_key_exists($ged_id, WT_Tree::getIdList())
+			&& WT_User::isManager(WT_Tree::get($ged_id))
+		) {
+			$this->compute();
+			$html = '<i class="icon-perso-success" title="'.WT_I18N::translate('Success').'"></i>';
+		}
+		
+		$html .= '&nbsp;'.WT_I18N::translate('Recompute');
+		
+		$controller->pageHeader();
+		echo $html;	
 	}
 	
 	/**
@@ -444,6 +584,63 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 		
 		$controller->pageHeader();
 		echo Zend_Json::encode($jsonArray);
+	}
+	
+	/**
+	 * Add a Simple Comparison inference dimension.
+	 *
+	 * Input parameters - GET :
+	 * 	- sourcerecord : Type of the source gedcom record (must be a valid type of Gedcom record)
+	 *  - sourceattr : Source attribute
+	 *  - tagetattr : Target attribute for comparison
+	 *
+	 *  JSON format
+	 * 	{
+	 * 		result 	: string - Result of the insertion ('failure' or 'ok'),
+	 * 		text 	: string - Text to display for failure, new ID if success
+	 * 	}
+	 *
+	 *  Display the ID of the new Simple Comparison inference dimension entry
+	 *
+	 */
+	private function ajaxadminadd(){
+
+		$sourcerecord = WT_Filter::get('sourcerecord', 'INDI|FAM|SOUR|OBJE|REPO|NOTE');
+		$sourceattr = WT_Filter::get('sourceattr', '[a-zA-Z\[\]=]+(:[a-zA-Z\[\]=]+)*');
+		$targetattr = WT_Filter::get('targetattr', '[a-zA-Z\[\]=]+(:[a-zA-Z\[\]=]+)*');
+		
+		$controller = new WT_Perso_Controller_PlainAjax();
+		
+		$id = -1;
+		$result = array(
+				'result' => 'failure',
+				'text'	=>	WT_I18N::translate('An error occured while adding new element.')
+		);
+		
+		if(WT_User::isManager(WT_Tree::get($this->_gedid)) && 
+			$sourcerecord && $sourceattr && $targetattr){
+			$sql = 'INSERT INTO ##pinferences_simplecomp'.
+					' (pisc_file, pisc_record_type, pisc_record_value, pisc_rela_value)'.
+					' VALUES (?, ?, ?, ?)';
+			try{
+				WT_DB::getInstance()->beginTransaction();
+				WT_DB::prepare($sql)->execute(array($this->_gedid, $sourcerecord, $sourceattr, $targetattr));
+				$id = WT_DB::getInstance()->lastInsertId();
+				WT_DB::getInstance()->commit();
+				$result['result'] = 'ok';
+				$result['text']=$id;
+				AddToLog('Module Inferences '.$this->getName().' : Inference ID "'.$id.'" added with parameters ['.$sourcerecord.', '.$sourceattr.','.$targetattr.'].', 'config');
+			}
+			catch(Exception $e){
+				WT_DB::getInstance()->rollback();
+				AddToLog('Module Inferences '.$this->getName().' : A new Inference could not be added. See error log.', 'config');
+				AddToLog('Module Inferences '.$this->getName().' : A new Inference failed to be added. Parameters ['.$sourcerecord.', '.$sourceattr.','.$targetattr.']. Exception '.$e->getMessage(), 'error');
+			}
+		}
+		
+		$controller->pageHeader();
+		echo Zend_Json::encode($result);
+		
 	}
 	
 	/**

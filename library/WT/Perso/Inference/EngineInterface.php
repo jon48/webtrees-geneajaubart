@@ -68,6 +68,18 @@ interface WT_Perso_Inference_EngineInterface {
 	 */
 	public function getConfigDisplay();
 	
+	/**
+	 * Validate the value sent for the setting against specific inference engine rules.
+	 * 
+	 * Can return either the initial or a modified value,
+	 * or the error message 'ERROR_VALIDATION' is the validation fails.
+	 * 
+	 * @param string $setting Setting name
+	 * @param string $value Replacement setting value to be validated.
+	 * @return string Result of the validation (value or error message) 
+	 */
+	public function validateConfigSettings($setting, $value);
+	
 }
 
 

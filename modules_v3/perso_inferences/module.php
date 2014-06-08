@@ -28,6 +28,9 @@ class perso_inferences_WT_Module extends WT_Module implements WT_Perso_Module_Ho
 	// Extend WT_Module
 	public function modAction($mod_action) {
 		switch($mod_action) {
+			case 'admin_update_setting': //standard method for inline edit
+				$this->editsetting();
+				break;
 			case 'engineaction':
 			case 'ajaxadmingedsettings':
 			case 'ajaxadminenginesettings':
@@ -253,6 +256,61 @@ class perso_inferences_WT_Module extends WT_Module implements WT_Perso_Module_Ho
 		$controller->pageHeader();
 		echo $html;
 	}
+
+	/**
+	 *  Save Geodispersion analysis settings.
+	 *  
+	 *  The id to be sent is under the format <strong><em>type_setting</em>-<em>inference_engine</em>-<em>setting</em>-<em>gedcom_id</em>-validate<strong>, with :
+	 * 	- type_setting: <strong>gedcom_setting</strong>
+	 *  - inference_engine : inference engine to be used
+	 *  - setting: setting to be changed
+	 *  - gedcom_id: Id of the related gedcom
+	 *  - validate: use validation rule
+	 */
+	private function editsetting() {
+		if(WT_Filter::checkCsrf() && WT_Perso_Inference_Helper::isModuleOperational()){
+			$id=WT_Filter::post('id', '[a-zA-Z0-9_-]+');
+			// $table 	- type of setting
+			// $id1		- inference engine
+			// $id2		- setting name
+			// $id3		- gedcom ID
+			// $id4		- validate settings
+			list($table, $id1, $id2, $id3, $id4)=explode('-', $id.'----');
+		
+			// The replacement value.
+			$value=WT_Filter::post('value');
+			
+			if($id1 && $id3 && $engine = WT_Perso_Inference_Helper::getInferenceEngineInstance($id1, $id3)) {
+				// Validate the replacement value
+				if($id4 == 'validate' && !is_null($id2)){
+					$value = $engine->validateConfigSettings($id2, $value);					
+				}
+				
+				if($value === 'ERROR_VALIDATION') WT_Perso_Functions_Edit::fail();
+												
+				switch($table){
+					case 'gedcom_setting':
+						// Verify if the user has enough rights to modify the setting
+						if(!WT_USER_GEDCOM_ADMIN) WT_Perso_Functions_Edit::fail();
+					
+						// Verify if a setting name has been specified;
+						if(is_null($id2)) WT_Perso_Functions_Edit::fail();
+					
+						// Authorised and valid - make update
+						set_gedcom_setting($id3, $id2, $value);
+						WT_Perso_Functions_Edit::ok($value);
+						break;
+					default:
+						WT_Perso_Functions_Edit::fail();
+				}
+			}
+			else{
+				WT_Perso_Functions_Edit::fail();
+			}
+		}
+		WT_Perso_Functions_Edit::fail();
+	}
+
 }
 
 ?>
