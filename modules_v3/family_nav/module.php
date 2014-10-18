@@ -21,11 +21,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
-
 class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 	CONST TTL = "<div class='flyout2'>%s</div>";
@@ -63,16 +58,16 @@ class family_nav_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	public function getSidebarContent() {
 		global $controller;
 
-		$controller->addInlineJavascript("
-			jQuery('#sb_family_nav_content')
-				.on('click', '.flyout a', function() {
+		$controller->addInlineJavascript('
+			jQuery("#sb_family_nav_content")
+				.on("click", ".flyout a", function() {
 					return false;
 				})
-				.on('click', '.flyout3', function() {
-					window.location.href = jQuery(this).data('href');
+				.on("click", ".flyout3", function() {
+					window.location.href = jQuery(this).data("href");
 					return false;
 				});
-		");
+		');
 
 		ob_start();
 

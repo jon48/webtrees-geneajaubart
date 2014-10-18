@@ -19,11 +19,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
-
 class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 	var $headers; // CSS and script to include in the top of <head> section, before theme’s CSS
 	var $js; // the TreeViewHandler javascript
@@ -92,6 +87,11 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 
 	// Extend WT_Module
 	// We define here actions to proceed when called, either by Ajax or not
+	/**
+	 * @param string $mod_action
+	 *
+	 * @throws Exception
+	 */
 	public function modAction($mod_action) {
 		require_once WT_MODULES_DIR . $this->getName() . '/class_treeview.php';
 		switch ($mod_action) {
@@ -117,11 +117,6 @@ class tree_WT_Module extends WT_Module implements WT_Module_Tab {
 						jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="' . $this->css() . '">\');
 					}
 				');
-
-			if (WT_USE_LIGHTBOX) {
-				$album = new lightbox_WT_Module();
-				$album->getPreLoadContent();
-			}
 			echo $html;
 			break;
 
