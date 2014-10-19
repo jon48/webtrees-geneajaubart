@@ -18,11 +18,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
-
 class extra_info_WT_Module extends WT_Module implements WT_Module_Sidebar {
 	// Extend WT_Module
 	public function getTitle() {
@@ -58,7 +53,7 @@ class extra_info_WT_Module extends WT_Module implements WT_Module_Sidebar {
 
 		ob_start();
 		if (!$indifacts) {
-			echo WT_I18N::translate('There are no Facts for this individual.');
+			echo WT_I18N::translate('There are no facts for this individual.');
 		} else {
 			foreach ($indifacts as $fact) {
 				print_fact($fact, $controller->record);

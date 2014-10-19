@@ -33,7 +33,7 @@ if ($view!='simple') {
 	$f_hook = new WT_Perso_Hook('h_print_footer');
 	$f_hook->execute();
 	//END PERSO
-	if (WT_DEBUG || get_gedcom_setting(WT_GED_ID, 'SHOW_STATS')) {
+	if ($WT_TREE && $WT_TREE->getPreference('SHOW_STATS')) {
 		echo execution_stats();
 	}
 	echo '</div><a style="font-size:150%; color:#888;" href="', WT_WEBTREES_URL, '" title="', WT_WEBTREES , ' - ', WT_VERSION, '">', WT_WEBTREES, '</a></div>';

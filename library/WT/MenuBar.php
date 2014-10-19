@@ -7,8 +7,6 @@
 // Derived from PhpGedView
 // Copyright (C) 2002 to 2010 PGV Development Team. All rights reserved.
 //
-// Modifications Copyright (c) 2010 Greg Roach
-//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
@@ -24,15 +22,12 @@
 // // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 // @author Jonathan Jaubart <dev@jaubart.com>
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
+use WT\Auth;
 
 class WT_MenuBar {
 	public static function getGedcomMenu() {
 		$menu = new WT_Menu(WT_I18N::translate('Home page'), 'index.php?ctype=gedcom&amp;ged='.WT_GEDURL, 'menu-tree');
-		$ALLOW_CHANGE_GEDCOM=WT_Site::preference('ALLOW_CHANGE_GEDCOM') && count(WT_Tree::getAll())>1;
+		$ALLOW_CHANGE_GEDCOM=WT_Site::getPreference('ALLOW_CHANGE_GEDCOM') && count(WT_Tree::getAll())>1;
 		foreach (WT_Tree::getAll() as $tree) {
 			if ($tree->tree_id==WT_GED_ID || $ALLOW_CHANGE_GEDCOM) {
 				$submenu = new WT_Menu(
@@ -52,7 +47,7 @@ class WT_MenuBar {
 		$showFull = ($PEDIGREE_FULL_DETAILS) ? 1 : 0;
 		$showLayout = ($PEDIGREE_LAYOUT) ? 1 : 0;
 
-		if (!WT_USER_ID) {
+		if (!Auth::id()) {
 			return null;
 		}
 
@@ -63,7 +58,7 @@ class WT_MenuBar {
 		$submenu = new WT_Menu(WT_I18N::translate('My page'), 'index.php?ctype=user&amp;ged='.WT_GEDURL, 'menu-mypage');
 		$menu->addSubmenu($submenu);
 		//-- editaccount submenu
-		if (get_user_setting(WT_USER_ID, 'editaccount')) {
+		if (Auth::user()->getPreference('editaccount')) {
 			$submenu = new WT_Menu(WT_I18N::translate('My account'), 'edituser.php', 'menu-myaccount');
 			$menu->addSubmenu($submenu);
 		}
@@ -162,8 +157,6 @@ class WT_MenuBar {
 				break;
 
 			case 'timeline':
-				//-- timeline
-				$link = 'timeline.php?ged='.WT_GEDURL;
 				$submenu = new WT_Menu($menuName, 'timeline.php?pids%5B%5D='.$indi_xref.'&amp;ged='.WT_GEDURL, 'menu-chart-timeline');
 				if ($controller instanceof WT_Controller_Family && $controller->record) {
 					// Build a sortable list of submenu items and then sort it in localized name order
@@ -174,12 +167,12 @@ class WT_MenuBar {
 					asort($menuList);
 
 					// Produce the submenus in localized name order
-					foreach ($menuList as $menuType => $menuName) {
-						switch ($menuType) {
+					foreach ($menuList as $submenuType => $submenuName) {
+						switch ($submenuType) {
 						case 'parentTimeLine':
 							// charts / parents_timeline
 							$subsubmenu = new WT_Menu(
-								WT_I18N::translate('Show couple on timeline chart'),
+								$submenuName,
 								'timeline.php?'.$controller->getTimelineIndis(array('HUSB','WIFE')).'&amp;ged='.WT_GEDURL,
 								'menu-chart-timeline-parents'
 							);
@@ -189,7 +182,7 @@ class WT_MenuBar {
 						case 'childTimeLine':
 							// charts / children_timeline
 							$subsubmenu = new WT_Menu(
-								WT_I18N::translate('Show children on timeline chart'),
+								$submenuName,
 								'timeline.php?'.$controller->getTimelineIndis(array('CHIL')).'&amp;ged='.WT_GEDURL,
 								'menu-chart-timeline-children'
 							);
@@ -199,7 +192,7 @@ class WT_MenuBar {
 						case 'familyTimeLine':
 							// charts / family_timeline
 							$subsubmenu = new WT_Menu(
-								WT_I18N::translate('Show family on timeline chart'),
+								$submenuName,
 								'timeline.php?'.$controller->getTimelineIndis(array('HUSB','WIFE','CHIL')).'&amp;ged='.WT_GEDURL,
 								'menu-chart-timeline-family'
 							);
@@ -404,10 +397,11 @@ class WT_MenuBar {
 	}
 
 	/**
-	* get the reports menu
-	* @return WT_Menu the menu item
-	*/
-	public static function getReportsMenu($pid='', $famid='') {
+	 * get the reports menu
+	 *
+	 * @return WT_Menu the menu item
+	 */
+	public static function getReportsMenu() {
 		global $SEARCH_SPIDER;
 
 		$active_reports=WT_Module::getActiveReports();
@@ -422,6 +416,7 @@ class WT_MenuBar {
 				$menu->addSubmenu($submenu);
 			}
 		}
+
 		return $menu;
 	}
 
@@ -462,9 +457,9 @@ class WT_MenuBar {
 	}
 
 	public static function getThemeMenu() {
-		global $SEARCH_SPIDER;
+		global $SEARCH_SPIDER, $WT_TREE;
 
-		if (WT_GED_ID && !$SEARCH_SPIDER && WT_Site::preference('ALLOW_USER_THEMES') && get_gedcom_setting(WT_GED_ID, 'ALLOW_THEME_DROPDOWN')) {
+		if ($WT_TREE && !$SEARCH_SPIDER && WT_Site::getPreference('ALLOW_USER_THEMES') && $WT_TREE->getPreference('ALLOW_THEME_DROPDOWN')) {
 			$menu=new WT_Menu(WT_I18N::translate('Theme'), '#', 'menu-theme');
 			foreach (get_theme_names() as $themename=>$themedir) {
 				$submenu=new WT_Menu($themename, get_query_url(array('theme'=>$themedir), '&amp;'), 'menu-theme-'.$themedir);

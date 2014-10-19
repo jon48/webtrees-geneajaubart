@@ -2,7 +2,7 @@
 // Template for drawing person boxes
 // This template expects that the following variables will be set
 //  $pid, $boxID, $icons, $GEDCOM, $style,
-// $name, $classfacts, $genderImage, $BirthDeath, $isF, $outBoxAdd,
+// $name, $genderImage, $BirthDeath, $outBoxAdd,
 // $addname
 //
 // webtrees: Web based Family History software
@@ -32,26 +32,29 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-echo '<div id="out-',$boxID,'" ',$outBoxAdd,'>
-	<div class="noprint" id="icons-',$boxID,'" style="',$iconsStyleAdd,'">', $icons, '</div>',
+echo 
+'<div data-pid="'. $pid . '" ',$outBoxAdd,'>
+	<div class="noprint icons">', $icons, '</div>',
 	'<div class="chart_textbox" style="max-height:', $bheight,'px;">',
 	$thumbnail,
-	'<a onclick="event.cancelBubble=true;" href="individual.php?pid=', $pid, '&amp;ged=', rawurlencode($GEDCOM), '">
-		<span id="namedef-',$boxID, '" class="name',$style,' ',$classfacts,'">', $name.$addname,  '</span>
-		<span class="name',$style,'"> ',$genderImage,'</span>';
-//PERSO Append record name text
-echo 	'<span class="rn_append">';
-$hook_rn_append = new WT_Perso_Hook('h_rn_append');
-echo 	implode('&nbsp;', $hook_rn_append->execute($person)) ;		
-echo	'</span>';
-//END PERSO
-echo 	'</a>
-	<div id="fontdef-',$boxID,'" class="details',$style,'">
-		<div id="inout2-',$boxID,'" style="max-height:', ($bheight*.9),'px;">',$BirthDeath,'</div>
+	'<a href="individual.php?pid=', $pid, '&amp;ged=', rawurlencode($GEDCOM), '">
+		<span class="namedef name',$style,'"> ',
+			$name,
+			$genderImage;
+			//PERSO Append record name text
+			echo 	'<span class="rn_append">';
+			$hook_rn_append = new WT_Perso_Hook('h_rn_append');
+			echo 	implode('&nbsp;', $hook_rn_append->execute($person)) ;		
+			echo	'</span>';
+			//END PERSO
+			echo '<span class="details',$style,'">' . $LDSord . '</span>
+		</span>
+		</a>
+		<div class="namedef name',$style,'">',$addname,'</div>
+			<div class="inout2 details',$style,'">',
+			$BirthDeath,
+		'</div>
 	</div>
-	</div>
-	<div id="inout-',$boxID,'" style="display:none;">
-		<div id="LOADING-inout-',$boxID,'">',WT_I18N::translate('Loading…'),'</div>
-	</div>
+	<div class="inout"></div>
 </div>';
 
