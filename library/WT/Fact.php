@@ -20,6 +20,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+// @author Jonathan Jaubart <dev@jaubart.com>
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -134,6 +135,9 @@ class WT_Fact {
 		// Managers can edit anything
 		// Members cannot edit RESN, CHAN and locked records
 		return
+			//PERSO Add a can edit function
+			$this->editable && 
+			//END PERSO
 			$this->parent->canEdit() && !$this->isOld() && (
 				WT_USER_GEDCOM_ADMIN ||
 				WT_USER_CAN_EDIT && strpos($this->gedcom, "\n2 RESN locked")===false && $this->getTag()!='RESN' && $this->getTag()!='CHAN'
@@ -486,4 +490,17 @@ class WT_Fact {
 		return $this->fact_id . '@' . $this->parent->getXref();
 	}
 
+	//PERSO Add extra functions
+	private $editable      = true;  // Can edit this fact
+
+	/**
+	 * Set the fact as editable
+	 * 
+	 * @param boolean $canedit true if the fact can be edited, false otherwise
+	 */
+	public function setEditable($canedit) {
+		$this->editable = $canedit;
+	}	
+	//END PERSO
+	
 }

@@ -44,17 +44,17 @@ interface WT_Perso_Inference_EngineInterface {
 	public function engineAction($action);
 	
 	/**
-	 * Gets Infered value, based on the input parameters
+	 * Gets Inferred value, based on the input parameters
 	 * If an inference is found, an array is returned, with:
-	 * 		- at index 0: value of the infered value
+	 * 		- at index 0: value of the inferred value
 	 * 		- at index 1: confidence of the inference
 	 * 
 	 * @param WT_GedcomRecord $record Source gedcom record
 	 * @param string $attribute Target value to infer
 	 * @param boolean $userestrictions Use restrictions in the inference
-	 * @return (array|null) Infered value, if exists
+	 * @return (array|null) Inferred value, if exists
 	 */
-	public function getInferedValue(WT_GedcomRecord $record, $attribute, $userestrictions = true);
+	public function getInferredValue(WT_GedcomRecord $record, $attribute, $userestrictions = true);
 	
 	/**
 	 * Compute data required for inference.

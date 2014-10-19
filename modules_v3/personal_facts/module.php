@@ -20,6 +20,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+// @author Jonathan Jaubart <dev@jaubart.com>
 
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
@@ -111,7 +112,25 @@ class personal_facts_WT_Module extends WT_Module implements WT_Module_Tab {
 		foreach (self::associate_facts($controller->record) as $fact) {
 			$indifacts[] = $fact;
 		}
-
+		
+		//PERSO Add additional facts
+		/* ADD ADDITIONNAL FACTS */
+		
+		//TODO Think about tye best way to integrate $hookfacts into the $indifacts:
+		// cannot pass by reference (introduce a specific executeByReference??)
+		// so will return a list of facts...
+		// do we want to add them (with potential duplicates...	) ??
+		
+		$hook = new WT_Perso_Hook('h_add_facts');
+		$hookresults = $hook->execute($controller->record, $indifacts);
+		
+		foreach($hookresults as $hookfacts) {
+			foreach($hookfacts as $fact) {
+				$indifacts[] = $fact;
+			}
+		}
+		//END PERSO
+			
 		sort_facts($indifacts);
 
 		ob_start();

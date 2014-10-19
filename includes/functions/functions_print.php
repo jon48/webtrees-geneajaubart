@@ -800,9 +800,21 @@ function format_fact_place(WT_Fact $event, $anchor=false, $sub_records=false, $l
 		} else {
 			$html = '<a href="' . $event->getPlace()->getURL() . '">' . $event->getPlace()->getFullName() . '</a>';
 		}
+		//PERSO Add inferred place
+		if($event->getPlace()->isEmpty()) {
+			$html = WT_Perso_Inference_Helper::printInferredPlace($event, $anchor);
+		}
+		//END PERSO
 	} else {
 		// Abbreviate the place name, for chart boxes
-		return ' - ' . $event->getPlace()->getShortName();
+		//PERSO Add inferred place
+		if($event->getPlace()->isEmpty()) {
+			return ' - ' . WT_Perso_Inference_Helper::printInferredPlace($event, $anchor);
+		}
+		else {
+			return ' - ' . $event->getPlace()->getShortName();
+		}
+		//END PERSO
 	}
 
 	if ($sub_records) {

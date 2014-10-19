@@ -79,14 +79,21 @@ class WT_Perso_Individual extends WT_Perso_GedcomRecord {
 	 * @return string|array Estimated birth place if found, null otherwise
 	 */
 	public function getEstimatedBirthPlace($perc=false){
+		$reliab = 0;
+		$bplace = null;			
 		if($bplace = $this->gedcomrecord->getBirthPlace()){
-			if($perc){
-				return array ($bplace, 1);
-			}
-			else{
-				return $bplace;
+			$reliab =1;
+		} else {
+			$engine = WT_Perso_Inference_Helper::getCurrentInferenceEngineInstance($this->getDerivedRecord()->getGedcomId());
+			if($engine && $estbplace = $engine->getInferredValue($this->getDerivedRecord(), 'BIRT:PLAC', true)) {
+				if ($estbplace[0] instanceof WT_Place)
+				{
+					$bplace = $estbplace[0]->getGedcomName();
+					$reliab = $estbplace[1];
+				}
 			}
 		}
+		if($bplace) return $perc ? array($place, $reliab) : $bplace;
 		return null;
 	}
 	

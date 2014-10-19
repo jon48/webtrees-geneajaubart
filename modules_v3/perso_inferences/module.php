@@ -13,7 +13,10 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-class perso_inferences_WT_Module extends WT_Module implements WT_Perso_Module_HookSubscriber, WT_Perso_Module_Configurable {
+class perso_inferences_WT_Module 
+	extends WT_Module 
+	implements WT_Perso_Module_HookSubscriber, WT_Perso_Module_Configurable, WT_Perso_Module_FactsExtender
+{
 	
 	// Extend class WT_Module
 	public function getTitle() {
@@ -45,7 +48,8 @@ class perso_inferences_WT_Module extends WT_Module implements WT_Perso_Module_Ho
 	public function getSubscribedHooks() {
 		return array(
 				'h_config_tab_name' => 35,
-				'h_config_tab_content' => 35
+				'h_config_tab_content' => 35,
+				'h_add_facts'	=> 20
 		);
 	}
 
@@ -170,6 +174,26 @@ class perso_inferences_WT_Module extends WT_Module implements WT_Perso_Module_Ho
 		return $value;
 	}
 	
+	// Implement WT_Perso_Module_FactsExtender	
+	public function h_add_facts(WT_GedcomRecord $record, $factsarray) {
+		$result = array();
+		
+		if($record instanceof WT_Individual) {
+			if($record->canShow() && count($record->getFacts(WT_EVENTS_BIRT)) == 0) {
+				$fact = new WT_Fact('1 BIRT Y', $record, md5($this->getName().'_birth'));
+				$fact->setEditable(false);
+				$result[] = $fact;
+			}
+			if($record->canShow() && $record->isDead() && count($record->getFacts(WT_EVENTS_DEAT)) == 0) {
+				$fact = new WT_Fact('1 DEAT Y', $record, md5($this->getName().'_death'));
+				$fact->setEditable(false);
+				$result[] = $fact;
+			}	
+		}
+		
+		return $result;
+	}	
+	
 	/**
 	 * Manages pages actions on the required inference engine.
 	 */
@@ -206,7 +230,7 @@ class perso_inferences_WT_Module extends WT_Module implements WT_Perso_Module_Ho
 		$gedid = WT_Filter::getInteger('gedid');
 
 		$jsonArray = array(
-				'inferenceengine' => null,
+				'inferenceengine' => '',
 				'inferenceenginehtml' => '&nbsp'
 		);
 		

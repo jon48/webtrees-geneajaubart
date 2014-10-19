@@ -184,7 +184,7 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 	}
 	
 	// Implement WT_Perso_Inference_EngineInterface
-	public function getInferedValue(WT_GedcomRecord $record, $attribute, $useminvalues = true) {
+	public function getInferredValue(WT_GedcomRecord $record, $attribute, $useminvalues = true) {
 		if($record) $drecord = new WT_Perso_GedcomRecord($record);
 		foreach($this->getFilteredInferences( $drecord->getType(), $attribute, $useminvalues) as $inference) {
 			if(strlen($inference['pisc_record_value']) != strlen($attribute)) { // No initial gedcom record
@@ -202,6 +202,10 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 		$inferenceByType = array();
 		
 		foreach($this->getAllInferences() as $inference){
+			//Reset the counters
+			$inference['pisc_matches'] = 0;
+			$inference['pisc_count'] = 0;
+			// Identify types of record sources
 			if(isset($inferenceByType[$inference['pisc_record_type']])){
 				$inferenceByType[$inference['pisc_record_type']][] = $inference;
 			}
@@ -221,8 +225,9 @@ class WT_Perso_Inference_SimpleComparisonEngine implements WT_Perso_Inference_En
 
 					$sources = $this->_crawler->crawl($record, $inferSource);
 					$targets = $this->_crawler->crawl($record, $inferTarget);
-					
+										
 					foreach($sources as $source) {
+						// The comparison is successful as long as one target matches.
 						if(count($targets) > 0) $inferences[$infid]['pisc_count']++;
 						foreach($targets as $target) {
 							if ($source instanceof WT_Place && $target instanceof WT_Place) {

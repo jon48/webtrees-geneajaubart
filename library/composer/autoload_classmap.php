@@ -349,6 +349,7 @@ return array(
     'WT_Perso_Module_Configurable' => $vendorDir . '/WT/Perso/Module/Configurable.php',
     'WT_Perso_Module_CustomSimpleTagManager' => $vendorDir . '/WT/Perso/Module/CustomSimpleTagManager.php',
     'WT_Perso_Module_FactSourceTextExtender' => $vendorDir . '/WT/Perso/Module/FactSourceTextExtender.php',
+    'WT_Perso_Module_FactsExtender' => $vendorDir . '/WT/Perso/Module/FactsExtender.php',
     'WT_Perso_Module_FooterExtender' => $vendorDir . '/WT/Perso/Module/FooterExtender.php',
     'WT_Perso_Module_HeaderExtender' => $vendorDir . '/WT/Perso/Module/HeaderExtender.php',
     'WT_Perso_Module_HookSubscriber' => $vendorDir . '/WT/Perso/Module/HookSubscriber.php',
