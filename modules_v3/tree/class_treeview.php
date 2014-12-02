@@ -37,9 +37,9 @@ class TreeView {
 	 * Size is set by the container, as the viewport can scale itself automatically
 	 *
 	 * @param WT_Individual $root_person  the id of the root person
-	 * @param int           $generations number of generations to draw
+	 * @param integer       $generations number of generations to draw
 	 *
-	 * @return array        HTML and Javascript
+	 * @return string[]     HTML and Javascript
 	 */
 	public function drawViewport(WT_Individual $root_person, $generations) {
 		$html = '
@@ -97,6 +97,8 @@ class TreeView {
 				$f = WT_Family::getInstance($fid);
 				if ($f->getHusband()) {
 					$r[] = $this->drawPerson($f->getHusband(), 0, 1, $f, $order);
+				} elseif ($f->getWife()) {
+					$r[] = $this->drawPerson($f->getWife(), 0, 1, $f, $order);
 				}
 				break;
 			}
@@ -125,6 +127,11 @@ class TreeView {
 
 	/**
 	 * Return the details for a person
+	 *
+	 * @param WT_Individual $individual
+	 * @param WT_Family     $family
+	 *
+	 * @return string
 	 */
 	private function getPersonDetails(WT_Individual $individual, WT_Family $family = null) {
 		$hmtl = $this->getThumbnail($individual);
@@ -147,7 +154,7 @@ class TreeView {
 	 * Draw the children for some families
 	 *
 	 * @param array   $familyList array of families to draw the children for
-	 * @param int     $gen        number of generations to draw
+	 * @param integer $gen        number of generations to draw
 	 * @param boolean $ajax       setted to true for an ajax call
 	 *
 	 * @return string
@@ -198,8 +205,8 @@ class TreeView {
 	 * Draw a person in the tree
 	 *
 	 * @param WT_Individual $person The Person object to draw the box for
-	 * @param int           $gen    The number of generations up or down to print
-	 * @param int           $state  Whether we are going up or down the tree, -1 for descendents +1 for ancestors
+	 * @param integer       $gen    The number of generations up or down to print
+	 * @param integer       $state  Whether we are going up or down the tree, -1 for descendents +1 for ancestors
 	 * @param WT_Family     $pfamily
 	 * @param string        $order  first (1), last(2), unique(0), or empty. Required for drawing lines between boxes
 	 * @param boolean       $isRoot
@@ -251,6 +258,8 @@ class TreeView {
 						$spouse_parents = $spouse->getPrimaryChildFamily();
 						if ($spouse_parents && $spouse_parents->getHusband()) {
 							$fop[] = array($spouse_parents->getHusband(), $spouse_parents);
+						} elseif ($spouse_parents && $spouse_parents->getWife()) {
+							$fop[] = array($spouse_parents->getHWife(), $spouse_parents);
 						}
 						$html .= $this->drawPersonName($spouse, $dashed);
 						if ($this->all_partners !== 'true') {
@@ -329,7 +338,7 @@ class TreeView {
 						WT_I18N::translate('Daughter of %s', $family->getFullName())
 					) . '"';
 					break;
-				case 'U':
+				default:
 					$title = ' title="' . strip_tags(
 						/* I18N: e.g. “Child of [father name & mother name]” */
 						WT_I18N::translate('Child of %s', $family->getFullName())

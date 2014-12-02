@@ -92,12 +92,12 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 		///// HUSB /////
 		$found = false;
 		foreach ($family->getFacts('HUSB', false, $access_level) as $fact) {
-			$found |= !$fact->isOld();
+			$found |= !$fact->isPendingDeletion();
 			$person = $fact->getTarget();
 			if ($person instanceof WT_Individual) {
-				if ($fact->isNew()) {
+				if ($fact->isPendingAddition()) {
 					$class = 'facts_label new';
-				} elseif ($fact->isOld()) {
+				} elseif ($fact->isPendingDeletion()) {
 					$class = 'facts_label old';
 				} else {
 					$class = 'facts_label';
@@ -128,10 +128,10 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 		foreach ($family->getFacts('WIFE', false, $access_level) as $fact) {
 			$person = $fact->getTarget();
 			if ($person instanceof WT_Individual) {
-				$found |= !$fact->isOld();
-				if ($fact->isNew()) {
+				$found |= !$fact->isPendingDeletion();
+				if ($fact->isPendingAddition()) {
 					$class = 'facts_label new';
-				} elseif ($fact->isOld()) {
+				} elseif ($fact->isPendingDeletion()) {
 					$class = 'facts_label old';
 				} else {
 					$class = 'facts_label';
@@ -161,10 +161,10 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 		$found = false;
 		$prev = new WT_Date('');
 		foreach ($family->getFacts(WT_EVENTS_MARR) as $fact) {
-			$found |= !$fact->isOld();
-			if ($fact->isNew()) {
+			$found |= !$fact->isPendingDeletion();
+			if ($fact->isPendingAddition()) {
 				$class = ' new';
-			} elseif ($fact->isOld()) {
+			} elseif ($fact->isPendingDeletion()) {
 				$class = ' old';
 			} else {
 				$class = '';
@@ -175,7 +175,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 					&nbsp;
 				</td>
 				<td class="facts_value<?php echo $class; ?>">
-					<?php echo WT_Gedcom_Tag::getLabelValue($fact->getTag(), $fact->getDate()->Display(false) . ' — ' . $fact->getPlace()->getFullName()); ?>
+					<?php echo WT_Gedcom_Tag::getLabelValue($fact->getTag(), $fact->getDate()->display() . ' — ' . $fact->getPlace()->getFullName()); ?>
 				</td>
 			</tr>
 			<?php
@@ -204,10 +204,10 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 		foreach ($family->getFacts('CHIL', false, $access_level) as $fact) {
 			$person = $fact->getTarget();
 			if ($person instanceof WT_Individual) {
-				if ($fact->isNew()) {
+				if ($fact->isPendingAddition()) {
 					$child_number++;
 					$class = 'facts_label new';
-				} elseif ($fact->isOld()) {
+				} elseif ($fact->isPendingDeletion()) {
 					$class = 'facts_label old';
 				} else {
 					$child_number++;

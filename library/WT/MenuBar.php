@@ -1,6 +1,4 @@
 <?php
-// System for generating menus.
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -23,7 +21,13 @@
 
 use WT\Auth;
 
+/**
+ * Class WT_MenuBar - System for generating menus.
+ */
 class WT_MenuBar {
+	/**
+	 * @return WT_Menu
+	 */
 	public static function getGedcomMenu() {
 		$menu = new WT_Menu(WT_I18N::translate('Home page'), 'index.php?ctype=gedcom&amp;ged='.WT_GEDURL, 'menu-tree');
 		$ALLOW_CHANGE_GEDCOM=WT_Site::getPreference('ALLOW_CHANGE_GEDCOM') && count(WT_Tree::getAll())>1;
@@ -40,6 +44,9 @@ class WT_MenuBar {
 		return $menu;
 	}
 
+	/**
+	 * @return WT_Menu
+	 */
 	public static function getMyPageMenu() {
 		global $PEDIGREE_FULL_DETAILS, $PEDIGREE_LAYOUT;
 
@@ -81,6 +88,9 @@ class WT_MenuBar {
 		return $menu;
 	}
 
+	/**
+	 * @return WT_Menu
+	 */
 	public static function getChartsMenu() {
 		global $SEARCH_SPIDER, $controller;
 
@@ -224,7 +234,7 @@ class WT_MenuBar {
 					);
 					if (array_key_exists('user_favorites', WT_Module::getActiveModules())) {
 						// Add a submenu showing relationship from this person to each of our favorites
-						foreach (user_favorites_WT_Module::getFavorites(WT_USER_ID) as $favorite) {
+						foreach (user_favorites_WT_Module::getFavorites(Auth::id()) as $favorite) {
 							if ($favorite['type']=='INDI' && $favorite['gedcom_id']==WT_GED_ID) {
 								$person=WT_Individual::getInstance($favorite['gid']);
 								if ($person instanceof WT_Individual) {
@@ -270,91 +280,59 @@ class WT_MenuBar {
 		return $menu;
 	}
 
+	/**
+	 * @return WT_Menu
+	 * @throws Exception
+	 */
 	public static function getListsMenu() {
 		global $SEARCH_SPIDER, $controller;
 
 		// The top level menu shows the individual list
-		$menu=new WT_Menu(WT_I18N::translate('Lists'), 'indilist.php?ged='.WT_GEDURL, 'menu-list');
+		$menu = new WT_Menu(WT_I18N::translate('Lists'), 'indilist.php?ged=' . WT_GEDURL, 'menu-list');
 
 		// Do not show empty lists
-		$row=WT_DB::prepare(
-			"SELECT SQL_CACHE".
-			" EXISTS(SELECT 1 FROM `##sources` WHERE s_file=?                  ) AS sour,".
-			" EXISTS(SELECT 1 FROM `##other`   WHERE o_file=? AND o_type='REPO') AS repo,".
-			" EXISTS(SELECT 1 FROM `##other`   WHERE o_file=? AND o_type='NOTE') AS note,".
+		$row = WT_DB::prepare(
+			"SELECT SQL_CACHE" .
+			" EXISTS(SELECT 1 FROM `##sources` WHERE s_file=?                  ) AS sour," .
+			" EXISTS(SELECT 1 FROM `##other`   WHERE o_file=? AND o_type='REPO') AS repo," .
+			" EXISTS(SELECT 1 FROM `##other`   WHERE o_file=? AND o_type='NOTE') AS note," .
 			" EXISTS(SELECT 1 FROM `##media`   WHERE m_file=?                  ) AS obje"
 		)->execute(array(WT_GED_ID, WT_GED_ID, WT_GED_ID, WT_GED_ID))->fetchOneRow();
 
 		// Build a list of submenu items and then sort it in localized name order
-		$menulist=array('indilist.php'  =>WT_I18N::translate('Individuals'));
+		$surname_url = '&surname=' . rawurlencode($controller->getSignificantSurname()) . '&amp;ged=' . WT_GEDURL;
+
+		$menulist = array(
+			new WT_Menu(WT_I18N::translate('Individuals'), 'indilist.php?ged=' . WT_GEDURL . $surname_url, 'menu-list-indi'),
+		);
+
 		if (!$SEARCH_SPIDER) {
-			$menulist['famlist.php'  ]=WT_I18N::translate('Families');
-			$menulist['branches.php' ]=WT_I18N::translate('Branches');
-			$menulist['placelist.php']=WT_I18N::translate('Place hierarchy');
-			// Build a list of submenu items and then sort it in localized name order
+			$menulist[] = new WT_Menu(WT_I18N::translate('Families'), 'famlist.php?ged=' . WT_GEDURL . $surname_url, 'menu-list-fam');
+			$menulist[] = new WT_Menu(WT_I18N::translate('Branches'), 'branches.php?ged=' . WT_GEDURL . $surname_url, 'menu-branches');
+			$menulist[] = new WT_Menu(WT_I18N::translate('Place hierarchy'), 'placelist.php?ged=' . WT_GEDURL, 'menu-list-plac');
 			if ($row->obje) {
-				$menulist['medialist.php']=WT_I18N::translate('Media objects');
+				$menulist[] = new WT_Menu(WT_I18N::translate('Media objects'), 'medialist.php?ged=' . WT_GEDURL, 'menu-list-obje');
 			}
 			if ($row->repo) {
-				$menulist['repolist.php']=WT_I18N::translate('Repositories');
+				$menulist[] = new WT_Menu(WT_I18N::translate('Repositories'), 'repolist.php?ged=' . WT_GEDURL, 'menu-list-repo');
 			}
 			if ($row->sour) {
-				$menulist['sourcelist.php']=WT_I18N::translate('Sources');
+				$menulist[] = new WT_Menu(WT_I18N::translate('Sources'), 'sourcelist.php?ged=' . WT_GEDURL, 'menu-list-sour');
 			}
 			if ($row->note) {
-				$menulist['notelist.php']=WT_I18N::translate('Shared notes');
+				$menulist[] = new WT_Menu(WT_I18N::translate('Shared notes'), 'notelist.php?ged=' . WT_GEDURL, 'menu-list-note');
 			}
 		}
-		asort($menulist);
+		uasort($menulist, function(WT_Menu $x, WT_Menu $y) { return WT_I18N::strcasecmp($x->label, $y->label); });
 
-		$surname_url='?surname='.rawurlencode($controller->getSignificantSurname()).'&amp;ged='.WT_GEDURL;
-		foreach ($menulist as $page=>$name) {
-			switch ($page) {
-			case 'indilist.php':
-				$submenu = new WT_Menu($name, $page.$surname_url, 'menu-list-indi');
-				$menu->addSubmenu($submenu);
-				break;
-
-			case 'famlist.php':
-				$submenu = new WT_Menu($name, $page.$surname_url, 'menu-list-fam');
-				$menu->addSubmenu($submenu);
-				break;
-
-			case 'branches.php':
-				$submenu = new WT_Menu($name, $page.$surname_url, 'menu-branches');
-				$menu->addSubmenu($submenu);
-				break;
-
-			case 'sourcelist.php':
-				$submenu = new WT_Menu($name, $page.'?ged='.WT_GEDURL, 'menu-list-sour');
-				$menu->addSubmenu($submenu);
-				break;
-
-			case 'notelist.php':
-				$submenu = new WT_Menu($name, $page.'?ged='.WT_GEDURL, 'menu-list-note');
-				$menu->addSubmenu($submenu);
-				break;
-
-			case 'repolist.php':
-				$submenu = new WT_Menu($name, $page.'?ged='.WT_GEDURL, 'menu-list-repo');
-				$menu->addSubmenu($submenu);
-				break;
-
-			case 'placelist.php':
-				$submenu = new WT_Menu($name, $page.'?ged='.WT_GEDURL, 'menu-list-plac');
-				$menu->addSubmenu($submenu);
-				break;
-
-			case 'medialist.php':
-				$submenu = new WT_Menu($name, $page.'?ged='.WT_GEDURL, 'menu-list-obje');
-				$menu->addSubmenu($submenu);
-				break;
-			}
-		}
+		$menu->submenus = $menulist;
 
 		return $menu;
 	}
 
+	/**
+	 * @return WT_Menu
+	 */
 	public static function getCalendarMenu() {
 		global $SEARCH_SPIDER;
 
@@ -399,6 +377,9 @@ class WT_MenuBar {
 		return $menu;
 	}
 
+	/**
+	 * @return WT_Menu
+	 */
 	public static function getSearchMenu() {
 		global $SEARCH_SPIDER;
 
@@ -424,6 +405,9 @@ class WT_MenuBar {
 		return $menu;
 	}
 
+	/**
+	 * @return WT_Menu[]
+	 */
 	public static function getModuleMenus() {
 		$menus=array();
 		foreach (WT_Module::getActiveMenus() as $module) {
@@ -435,6 +419,10 @@ class WT_MenuBar {
 		return $menus;
 	}
 
+	/**
+	 * @return null|WT_Menu
+	 * @throws Exception
+	 */
 	public static function getThemeMenu() {
 		global $SEARCH_SPIDER, $WT_TREE;
 
@@ -451,6 +439,9 @@ class WT_MenuBar {
 		}
 	}
 
+	/**
+	 * @return null|WT_Menu
+	 */
 	public static function getLanguageMenu() {
 		global $SEARCH_SPIDER;
 
@@ -472,20 +463,24 @@ class WT_MenuBar {
 		}
 	}
 
+	/**
+	 * @return WT_Menu
+	 * @throws Exception
+	 */
 	public static function getFavoritesMenu() {
 		global $REQUIRE_AUTHENTICATION, $controller, $SEARCH_SPIDER;
 
-		$show_user_favs=WT_USER_ID               && array_key_exists('user_favorites',   WT_Module::getActiveModules());
-		$show_gedc_favs=!$REQUIRE_AUTHENTICATION && array_key_exists('gedcom_favorites', WT_Module::getActiveModules());
+		$show_user_favs = Auth::check() && array_key_exists('user_favorites',   WT_Module::getActiveModules());
+		$show_gedc_favs = !$REQUIRE_AUTHENTICATION && array_key_exists('gedcom_favorites', WT_Module::getActiveModules());
 
 		if ($show_user_favs && !$SEARCH_SPIDER) {
 			if ($show_gedc_favs && !$SEARCH_SPIDER) {
 				$favorites=array_merge(
 					gedcom_favorites_WT_Module::getFavorites(WT_GED_ID),
-					user_favorites_WT_Module::getFavorites(WT_USER_ID)
+					user_favorites_WT_Module::getFavorites(Auth::id())
 				);
 			} else {
-				$favorites=user_favorites_WT_Module::getFavorites(WT_USER_ID);
+				$favorites=user_favorites_WT_Module::getFavorites(Auth::id());
 			}
 		} else {
 			if ($show_gedc_favs && !$SEARCH_SPIDER) {

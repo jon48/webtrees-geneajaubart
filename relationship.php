@@ -5,7 +5,7 @@
 // Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -235,11 +235,16 @@ if ($person1 && $person2) {
 			foreach ($node['path'] as $index=>$person) {
 				$linex = $xoffset;
 				$liney = $yoffset;
-				$mfstyle = 'NN';
 				switch ($person->getSex()) {
-				case 'M': $mfstyle='';   break;
-				case 'F': $mfstyle='F';  break;
-				case 'U': $mfstyle='NN'; break;
+				case 'M':
+					$mfstyle='';
+					break;
+				case 'F':
+					$mfstyle='F';
+					break;
+				default:
+					$mfstyle='NN';
+					break;
 				}
 				switch ($node['relations'][$index]) {
 				case 'father':

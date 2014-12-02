@@ -12665,15 +12665,8 @@ msgstr "إظهار %1$s إلى %2$s من %3$s"
 
 #: library/WT/Controller/Fanchart.php:349
 #: library/WT/Controller/Hourglass.php:398 pedigree.php:228
-#, fuzzy
 msgid "Sibling"
-msgid_plural "Siblings"
-msgstr[0] "أخ أو أخت"
-msgstr[1] "أخ أو أخت"
-msgstr[2] "أخ أو أخت"
-msgstr[3] "أخ أو أخت"
-msgstr[4] "أخ أو أخت"
-msgstr[5] "أخ أو أخت"
+msgstr "أخ أو أخت"
 
 #: library/WT/Controller/Hourglass.php:397 pedigree.php:225
 msgid "Siblings"
@@ -15760,7 +15753,7 @@ msgid "You can re-enable these themes after the upgrade."
 msgstr ""
 
 #: admin_trees_renumber.php:261
-msgid "You can renumber the records in a family tree, so that these internal identification numbers are not duplicated in any other family tree."
+msgid "You can renumber the records in a family tree, so that these internal reference numbers are not duplicated in any other family tree."
 msgstr ""
 
 #: admin_trees_renumber.php:274

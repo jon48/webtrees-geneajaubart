@@ -26,7 +26,7 @@ abstract class WT_Module {
 	/** @var string A user-friendly, localized name for this module */
 	private $_title = null;
 
-	/** @var  string[] A cached copy of the module settings */
+	/** @var string[] A cached copy of the module settings */
 	private $settings;
 
 	/**
@@ -68,7 +68,7 @@ abstract class WT_Module {
 	 *
 	 * Some modules are aimed at admins or managers, and are not generally shown to users.
 	 *
-	 * @return int
+	 * @return integer
 	 */
 	public function defaultAccessLevel() {
 		// Returns one of: WT_PRIV_HIDE, WT_PRIV_PUBLIC, WT_PRIV_USER, WT_PRIV_ADMIN
@@ -162,7 +162,7 @@ abstract class WT_Module {
 	/**
 	 * Get a list of all active (enabled) modules.
 	 *
-	 * @param bool $sort Sort the module by the (localised) name
+	 * @param boolean $sort Sort the module by the (localised) name
 	 *
 	 * @return WT_Module[]
 	 */
@@ -181,7 +181,7 @@ abstract class WT_Module {
 			foreach ($module_names as $module_name) {
 				if (file_exists(WT_ROOT . WT_MODULES_DIR . $module_name . '/module.php')) {
 					require_once WT_ROOT . WT_MODULES_DIR . $module_name . '/module.php';
-					$class = $module_name.'_WT_Module';
+					$class                 = $module_name . '_WT_Module';
 					$modules[$module_name] = new $class;
 				} else {
 					// Module has been deleted from disk?  Disable it.
@@ -225,8 +225,13 @@ abstract class WT_Module {
 		foreach ($module_names as $module_name) {
 			if (file_exists(WT_ROOT . WT_MODULES_DIR . $module_name . '/module.php')) {
 				require_once WT_ROOT . WT_MODULES_DIR . $module_name . '/module.php';
-				$class = $module_name . '_WT_Module';
-				$array[$module_name] = new $class;
+				$class     = $module_name . '_WT_Module';
+				$interface = 'WT_Module_' . ucfirst($component);
+				$module    = new $class;
+				// Check that this module is still implementing the desired interface.
+				if ($module instanceof $interface) {
+					$array[$module_name] = new $module;
+				}
 			} else {
 				// Module has been deleted from disk?  Disable it.
 				Log::addConfigurationLog("Module {$module_name} has been deleted from disk - disabling it");
@@ -252,7 +257,7 @@ abstract class WT_Module {
 	 * @param integer $tree_id
 	 * @param integer $access_level
 	 *
-	 * @return WT_Module[]
+	 * @return WT_Module_Block[]
 	 */
 	public static function getActiveBlocks($tree_id = WT_GED_ID, $access_level = WT_USER_ACCESS_LEVEL) {
 		static $blocks = null;
@@ -270,7 +275,7 @@ abstract class WT_Module {
 	 * @param integer $tree_id
 	 * @param integer $access_level
 	 *
-	 * @return WT_Module[]
+	 * @return WT_Module_Chart[]
 	 */
 	public static function getActiveCharts($tree_id = WT_GED_ID, $access_level = WT_USER_ACCESS_LEVEL) {
 		static $charts = null;
@@ -288,7 +293,7 @@ abstract class WT_Module {
 	 * @param integer $tree_id
 	 * @param integer $access_level
 	 *
-	 * @return WT_Module[]
+	 * @return WT_Module_Menu[]
 	 */
 	public static function getActiveMenus($tree_id = WT_GED_ID, $access_level = WT_USER_ACCESS_LEVEL) {
 		static $menus = null;
@@ -306,7 +311,7 @@ abstract class WT_Module {
 	 * @param integer $tree_id
 	 * @param integer $access_level
 	 *
-	 * @return WT_Module[]
+	 * @return WT_Module_Report[]
 	 */
 	public static function getActiveReports($tree_id = WT_GED_ID, $access_level = WT_USER_ACCESS_LEVEL) {
 		static $reports = null;
@@ -324,7 +329,7 @@ abstract class WT_Module {
 	 * @param integer $tree_id
 	 * @param integer $access_level
 	 *
-	 * @return WT_Module[]
+	 * @return WT_Module_Sidebar[]
 	 */
 	public static function getActiveSidebars($tree_id = WT_GED_ID, $access_level = WT_USER_ACCESS_LEVEL) {
 		static $sidebars = null;
@@ -342,7 +347,7 @@ abstract class WT_Module {
 	 * @param integer $tree_id
 	 * @param integer $access_level
 	 *
-	 * @return WT_Module[]
+	 * @return WT_Module_Tab[]
 	 */
 	public static function getActiveTabs($tree_id = WT_GED_ID, $access_level = WT_USER_ACCESS_LEVEL) {
 		static $tabs = null;
@@ -360,7 +365,7 @@ abstract class WT_Module {
 	 * @param integer $tree_id
 	 * @param integer $access_level
 	 *
-	 * @return WT_Module[]
+	 * @return WT_Module_Theme[]
 	 */
 	public static function getActiveThemes($tree_id = WT_GED_ID, $access_level = WT_USER_ACCESS_LEVEL) {
 		static $themes = null;
@@ -389,8 +394,8 @@ abstract class WT_Module {
 		while (($module_name = readdir($dir)) !== false) {
 			if (preg_match('/^[a-zA-Z0-9_]+$/', $module_name) && file_exists(WT_ROOT . WT_MODULES_DIR . $module_name . '/module.php')) {
 				require_once WT_ROOT . WT_MODULES_DIR . $module_name . '/module.php';
-				$class = $module_name . '_WT_Module';
-				$module = new $class;
+				$class                       = $module_name . '_WT_Module';
+				$module                      = new $class;
 				$modules[$module->getName()] = $module;
 				WT_DB::prepare("INSERT IGNORE INTO `##module` (module_name, status, menu_order, sidebar_order, tab_order) VALUES (?, ?, ?, ?, ?)")
 					->execute(array(
@@ -462,7 +467,7 @@ abstract class WT_Module {
 	 * After creating a new family tree, we need to assign the default access
 	 * rights for each module.
 	 *
-	 * @param $tree_id
+	 * @param integer $tree_id
 	 *
 	 * @return void
 	 */

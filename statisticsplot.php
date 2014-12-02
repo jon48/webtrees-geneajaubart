@@ -8,7 +8,7 @@
 // Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -651,9 +651,7 @@ function myplot($mytitle, $xdata, $xtitle, $ydata, $ytitle, $legend) {
 			}
 		}
 	}
-	// in PHP 5.3.0 we can use
-	//$title = strstr($mytitle, '|', true);
-	$title = substr($mytitle, 0, strpos($mytitle, '|'));
+	$title = strstr($mytitle, '|', true);
 	echo '<img src="', $imgurl, '" width="950" height="300" alt="', WT_Filter::escapeHtml($title), '" title="', WT_Filter::escapeHtml($title), '">';
 }
 

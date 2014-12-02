@@ -21,6 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+use WT\Auth;
 use WT\User;
 
 class user_messages_WT_Module extends WT_Module implements WT_Module_Block {
@@ -42,10 +43,10 @@ class user_messages_WT_Module extends WT_Module implements WT_Module_Block {
 
 		// Block actions
 		$action     = WT_Filter::post('action');
-		$message_id = WT_Filter::postArray('message_id');
+		$message_ids = WT_Filter::postArray('message_id');
 		if ($action=='deletemessage') {
-			foreach ($message_id as $msg_id) {
-				deleteMessage($msg_id);
+			foreach ($message_ids as $message_id) {
+				WT_DB::prepare("DELETE FROM `##message` WHERE message_id=?")->execute(array($message_id));
 			}
 		}
 		$block=get_block_setting($block_id, 'block', true);
@@ -56,7 +57,9 @@ class user_messages_WT_Module extends WT_Module implements WT_Module_Block {
 				}
 			}
 		}
-		$messages = getUserMessages(WT_USER_ID);
+		$messages = WT_DB::prepare("SELECT message_id, sender, subject, body, UNIX_TIMESTAMP(created) AS created FROM `##message` WHERE user_id=? ORDER BY message_id DESC")
+			->execute(array(Auth::id()))
+			->fetchAll();
 
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
@@ -66,7 +69,7 @@ class user_messages_WT_Module extends WT_Module implements WT_Module_Block {
 			$content.='<br>'.WT_I18N::translate('Send a message')." <select name=\"touser\">";
 			$content.='<option value="">' . WT_I18N::translate('&lt;select&gt;') . '</option>';
 			foreach (User::all() as $user) {
-				if ($user->getUserId() != WT_USER_ID && $user->getPreference('verified_by_admin') && $user->getPreference('contactmethod') != 'none') {
+				if ($user->getUserId() !== Auth::id() && $user->getPreference('verified_by_admin') && $user->getPreference('contactmethod') !== 'none') {
 					$content.='<option value="' . WT_Filter::escapeHtml($user->getUserName()) . '">';
 					$content.='<span dir="auto">'.WT_Filter::escapeHtml($user->getRealName()).'</span> - <span dir="auto">' . WT_Filter::escapeHtml($user->getUserName()) . '</span>';
 					$content.='</option>';

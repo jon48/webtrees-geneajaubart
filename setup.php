@@ -18,6 +18,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+// To embed webtrees code in other applications, we must explicitly declare any global variables that we create.
+global $WT_REQUEST, $WT_SESSION;
+
 define('WT_SCRIPT_NAME', 'setup.php');
 define('WT_CONFIG_FILE', 'config.ini.php');
 
@@ -29,7 +32,6 @@ require 'library/autoload.php';
 define('WT_WEBTREES',    'webtrees');
 define('WT_SERVER_NAME', '');
 define('WT_SCRIPT_PATH', '');
-require 'includes/authentication.php';
 require 'includes/functions/functions_db.php'; // for get/setSiteSetting()
 define('WT_DATA_DIR',    'data/');
 define('WT_DEBUG_SQL',   false);
@@ -38,7 +40,6 @@ define('WT_REQUIRED_PHP_VERSION',   '5.3.2');
 define('WT_MODULES_DIR', 'modules_v3/');
 define('WT_ROOT', '');
 define('WT_GED_ID', null);
-define('WT_USER_ID', 0);
 define('WT_PRIV_PUBLIC', 2);
 define('WT_PRIV_USER',   1);
 define('WT_PRIV_NONE',   0);

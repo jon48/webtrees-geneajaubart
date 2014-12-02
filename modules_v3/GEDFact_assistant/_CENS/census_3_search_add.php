@@ -7,7 +7,7 @@
 // Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2007 to 2010 PGV Development Team.  All rights reserved.
+// Copyright (C) 2007 to 2010 PGV Development Team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -990,7 +990,6 @@ if (!defined('WT_WEBTREES')) {
 							$married = WT_Date::Compare($censdate, $marrdate);
 							$nam     = $gparent->getAllNames();
 							$fulln   = rtrim($nam[0]['givn'],'*') . ' ' . $nam[0]['surname'];
-							//$fulln   = str_replace('"', '\"', $fulln);
 							$fulln   = str_replace("@N.N.", "(".WT_I18N::translate('unknown').")", $fulln);
 							$fulln   = str_replace("@P.N.", "(".WT_I18N::translate('unknown').")", $fulln);
 							$givn    = rtrim($nam[0]['givn'],'*');
