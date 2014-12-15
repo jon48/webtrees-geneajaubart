@@ -461,7 +461,11 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		<?php
 	}
 
-	// Google Maps API script
+	/**
+	 * Google Maps API script
+	 *
+	 * @return string
+	 */
 	private function googleMapsScript() {
 		return 'https://maps.google.com/maps/api/js?v=3.2&amp;sensor=false&amp;language=' . WT_LOCALE;
 	}
@@ -681,11 +685,11 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 	}
 
 	private function pedigreeMap() {
-		global $controller, $PEDIGREE_GENERATIONS, $MAX_PEDIGREE_GENERATIONS;
+		global $controller, $MAX_PEDIGREE_GENERATIONS;
 
 		// Default is show for both of these.
-		$hideflags = WT_Filter::get('hideflags');
-		$hidelines = WT_Filter::get('hidelines');
+		$hideflags = WT_Filter::getBool('hideflags');
+		$hidelines = WT_Filter::getBool('hidelines');
 
 		$controller = new WT_Controller_Pedigree();
 
@@ -746,7 +750,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					</td>
 					<td class="optionbox">
 						<?php
-						echo '<input name="hideflags" type="checkbox"';
+						echo '<input name="hideflags" type="checkbox" value="1"';
 						if ($hideflags) {
 							echo ' checked="checked"';
 						}
@@ -755,7 +759,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					</td>
 					<td class="optionbox">
 						<?php
-						echo '<input name="hidelines" type="checkbox"';
+						echo '<input name="hidelines" type="checkbox" value="1"';
 						if ($hidelines) {
 							echo ' checked="checked"';
 						}
@@ -786,7 +790,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		for ($i=0; $i<($controller->treesize); $i++) {
 			// -- check to see if we have moved to the next generation
 			if ($i+1 >= pow(2, $curgen)) {$curgen++;}
-			$person = WT_Individual::getInstance($controller->treeid[$i]);
+			$person = $controller->ancestors[$i];
 			if (!empty($person)) {
 				$name = $person->getFullName();
 				if ($name == WT_I18N::translate('Private')) $priv++;
@@ -893,8 +897,15 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		$controller->addInlineJavascript($this->pedigreeMapJavascript($hideflags, $hidelines));
 	}
 
+	/**
+	 * @param boolean $hideflags
+	 * @param boolean $hidelines
+	 *
+	 * @return string
+	 */
 	private function pedigreeMapJavascript($hideflags, $hidelines) {
 		global $controller, $SHOW_HIGHLIGHT_IMAGES, $PEDIGREE_GENERATIONS;
+
 		// The HomeControl returns the map to the original position and style
 		$js='function HomeControl(controlDiv, pm_map) {'.
 			// Set CSS styles for the DIV containing the control
@@ -1266,19 +1277,25 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		// create the map bounds
 		'var bounds = new google.maps.LatLngBounds();';
 		// add the points
-		$curgen=1;
-		$count=0;
-		$colored_line = array('1'=>'#FF0000','2'=>'#0000FF','3'=>'#00FF00',
-						'4'=>'#FFFF00','5'=>'#00FFFF','6'=>'#FF00FF',
-						'7'=>'#C0C0FF','8'=>'#808000');
-
-		$lat = array();
-		$lon = array();
+		$curgen       = 1;
+		$count        = 0;
+		$colored_line = array(
+			'1' => '#FF0000',
+			'2' => '#0000FF',
+			'3' => '#00FF00',
+			'4' => '#FFFF00',
+			'5' => '#00FFFF',
+			'6' => '#FF00FF',
+			'7' => '#C0C0FF',
+			'8' => '#808000',
+		);
+		$lat        = array();
+		$lon        = array();
 		$latlongval = array();
-		$flags = array();
+		$flags      = array();
 		for ($i = 0; $i < $controller->treesize; $i++) {
 			// moved up to grab the sex of the individuals
-			$person = WT_Individual::getInstance($controller->treeid[$i]);
+			$person = $controller->ancestors[$i];
 			if ($person) {
 				$name = $person->getFullName();
 
@@ -1301,7 +1318,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 
 				$dataleft  = WT_Filter::escapeJs($image . $event . ' — ' . $name);
 				$datamid   = WT_Filter::escapeJs(' <span><a href="' . $person->getHtmlUrl() . '">('.WT_I18N::translate('View person').')</a></span>');
-				$dataright = WT_Filter::escapeJs('<br><strong>'. WT_I18N::translate('Birth:') . '&nbsp;</strong>' .  $person->getBirthDate()->Display(false) . ' — ' . $person->getBirthPlace());
+				$dataright = WT_Filter::escapeJs('<br><strong>'. WT_I18N::translate('Birth:') . '&nbsp;</strong>' .  $person->getBirthDate()->display() . ' — ' . $person->getBirthPlace());
 
 				$latlongval[$i] = $this->getLatitudeAndLongitudeFromPlaceLocation($person->getBirthPlace());
 				if ($latlongval[$i]) {
@@ -1314,41 +1331,54 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 							$ffile = substr($ffile,1, strpos($ffile, '.')-1);
 							if (empty($flags[$ffile])) {
 								$flags[$ffile] = $i; // Only generate the flag once
-								$js.= 'var point = new google.maps.LatLng(' . $lat[$i] . ',' . $lon[$i]. ');';
-								$js.= 'var Marker1_0_flag = new google.maps.MarkerImage();';
-								$js.= 'Marker1_0_flag.image = "'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/'.$flags[$i].'";';
-								$js.= 'Marker1_0_flag.shadow = "'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/images/flag_shadow.png";';
-								$js.= 'Marker1_0_flag.iconSize = new google.maps.Size(25, 15);';
-								$js.= 'Marker1_0_flag.shadowSize = new google.maps.Size(35, 45);';
-								$js.= 'Marker1_0_flag.iconAnchor = new google.maps.Point(1, 45);';
-								$js.= 'var Marker1_0 = new google.maps.LatLng(point, {icon:Marker1_0_flag});';
+								$js .= 'var point = new google.maps.LatLng(' . $lat[$i] . ',' . $lon[$i] . ');';
+								$js .= 'var Marker1_0_flag = new google.maps.MarkerImage();';
+								$js .= 'Marker1_0_flag.image = "' . WT_STATIC_URL . WT_MODULES_DIR . 'googlemap/' . $flags[$i] . '";';
+								$js .= 'Marker1_0_flag.shadow = "' . WT_STATIC_URL . WT_MODULES_DIR . 'googlemap/images/flag_shadow.png";';
+								$js .= 'Marker1_0_flag.iconSize = new google.maps.Size(25, 15);';
+								$js .= 'Marker1_0_flag.shadowSize = new google.maps.Size(35, 45);';
+								$js .= 'Marker1_0_flag.iconAnchor = new google.maps.Point(1, 45);';
+								$js .= 'var Marker1_0 = new google.maps.LatLng(point, {icon:Marker1_0_flag});';
 							}
 						}
 						$marker_number = $curgen;
-						$dups=0;
-						for ($k=0; $k<$i; $k++) {
+						$dups          = 0;
+						for ($k = 0; $k < $i; $k++) {
 							if ($latlongval[$i] == $latlongval[$k]) {
 								$dups++;
-								switch($dups) {
-									case 1: $marker_number = $curgen . 'L'; break;
-									case 2: $marker_number = $curgen . 'R'; break;
-									case 3: $marker_number = $curgen . 'Ls'; break;
-									case 4: $marker_number = $curgen . 'Rs'; break;
-									case 5: //adjust position where markers have same coodinates
-									default: $marker_number = $curgen;
-										$lon[$i] = $lon[$i]+0.0025;
-										$lat[$i] = $lat[$i]+0.0025;
-										break;
+								switch ($dups) {
+								case 1:
+									$marker_number = $curgen . 'L';
+									break;
+								case 2:
+									$marker_number = $curgen . 'R';
+									break;
+								case 3:
+									$marker_number = $curgen . 'Ls';
+									break;
+								case 4:
+									$marker_number = $curgen . 'Rs';
+									break;
+								case 5: //adjust position where markers have same coodinates
+								default:
+									$marker_number = $curgen;
+									$lon[$i]       = $lon[$i] + 0.0025;
+									$lat[$i]       = $lat[$i] + 0.0025;
+									break;
 								}
 							}
 						}
-						$js.= 'var point = new google.maps.LatLng('.$lat[$i].','.$lon[$i].');';
-						$js.= "var marker = createMarker(point, \"".WT_Filter::escapeJs($name)."\",\"<div>".$dataleft.$datamid.$dataright."</div>\", \"";
-						$js.= "<div class='iwstyle'>";
-						$js.= "<a href='module.php?ged=".WT_GEDURL."&amp;mod=googlemap&amp;mod_action=pedigree_map&amp;rootid=" . $person->getXref() . "&amp;PEDIGREE_GENERATIONS={$PEDIGREE_GENERATIONS}";
-						if ($hideflags) $js.= '&amp;hideflags=1';
-						if ($hidelines) $js.= '&amp;hidelines=1';
-						$js.= "' title='".WT_I18N::translate('Pedigree map')."'>".$dataleft."</a>".$datamid.$dataright."</div>\", \"".$marker_number."\");";
+						$js .= 'var point = new google.maps.LatLng(' . $lat[$i] . ',' . $lon[$i] . ');';
+						$js .= "var marker = createMarker(point, \"" . WT_Filter::escapeJs($name) . "\",\"<div>" . $dataleft . $datamid . $dataright . "</div>\", \"";
+						$js .= "<div class='iwstyle'>";
+						$js .= "<a href='module.php?ged=" . WT_GEDURL . "&amp;mod=googlemap&amp;mod_action=pedigree_map&amp;rootid=" . $person->getXref() . "&amp;PEDIGREE_GENERATIONS={$PEDIGREE_GENERATIONS}";
+						if ($hideflags) {
+							$js .= '&amp;hideflags=1';
+						}
+						if ($hidelines) {
+							$js .= '&amp;hidelines=1';
+						}
+						$js .= "' title='" . WT_I18N::translate('Pedigree map') . "'>" . $dataleft . "</a>" . $datamid . $dataright . "</div>\", \"" . $marker_number . "\");";
 						// Construct the polygon lines
 						if (!$hidelines) {
 							$to_child = (intval(($i-1)/2)); // Draw a line from parent to child
@@ -1450,6 +1480,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		'google.maps.event.addListener(pm_map, "click", function() {
 			contextmenu.style.visibility="hidden";
 		});';
+
 		return $js;
 	}
 
@@ -1738,92 +1769,143 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		}
 	}
 
+	/**
+	 * @return string
+	 */
 	private function checkMapData() {
 		global $controller;
-		$xrefs="'".$controller->record->getXref()."'";
+		$xrefs    = "'" . $controller->record->getXref() . "'";
 		$families = $controller->record->getSpouseFamilies();
 		foreach ($families as $family) {
-			$xrefs.=", '".$family->getXref()."'";
+			$xrefs .= ", '" . $family->getXref() . "'";
 		}
-		return WT_DB::prepare("SELECT COUNT(*) AS tot FROM `##placelinks` WHERE pl_gid IN (".$xrefs.") AND pl_file=?")
-			->execute(array(WT_GED_ID))
-			->fetchOne();
+
+		return WT_DB::prepare(
+			"SELECT COUNT(*) AS tot FROM `##placelinks` WHERE pl_gid IN (" . $xrefs . ") AND pl_file=?"
+		)->execute(array(WT_GED_ID))->fetchOne();
 	}
+
+	/**
+	 * @param string   $prefix_list
+	 * @param string   $place
+	 * @param string[] $placelist
+	 *
+	 * @return string[]
+	 */
 	private function removePrefixFromPlaceName($prefix_list, $place, $placelist) {
 		if ($prefix_list) {
 			foreach (explode(';', $prefix_list) as $prefix) {
-				if ($prefix && substr($place, 0, strlen($prefix)+1)==$prefix.' ') {
-					$placelist[] = substr($place, strlen($prefix)+1);
+				if ($prefix && substr($place, 0, strlen($prefix) + 1) == $prefix . ' ') {
+					$placelist[] = substr($place, strlen($prefix) + 1);
 				}
 			}
 		}
+
 		return $placelist;
 	}
 
+	/**
+	 * @param string   $suffix_list
+	 * @param string   $place
+	 * @param string[] $placelist
+	 *
+	 * @return string[]
+	 */
 	private function removeSuffixFromPlaceName($suffix_list, $place, $placelist) {
 		if ($suffix_list) {
-			foreach (explode (';', $suffix_list) as $postfix) {
-				if ($postfix && substr($place, -strlen($postfix)-1)==' '.$postfix) {
-					$placelist[] = substr($place, 0, strlen($place)-strlen($postfix)-1);
+			foreach (explode(';', $suffix_list) as $postfix) {
+				if ($postfix && substr($place, -strlen($postfix) - 1) == ' ' . $postfix) {
+					$placelist[] = substr($place, 0, strlen($place) - strlen($postfix) - 1);
 				}
 			}
 		}
+
 		return $placelist;
 	}
 
+	/**
+	 * @param string   $prefix_list
+	 * @param string   $suffix_list
+	 * @param string   $place
+	 * @param string[] $placelist
+	 *
+	 * @return string[]
+	 */
 	private function removePrefixAndSuffixFromPlaceName($prefix_list, $suffix_list, $place, $placelist) {
 		if ($prefix_list && $suffix_list) {
-			foreach (explode (";", $prefix_list) as $prefix) {
-				foreach (explode (";", $suffix_list) as $postfix) {
-					if ($prefix && $postfix && substr($place, 0, strlen($prefix)+1)==$prefix.' ' && substr($place, -strlen($postfix)-1)==' '.$postfix) {
-						$placelist[] = substr($place, strlen($prefix)+1, strlen($place)-strlen($prefix)-strlen($postfix)-2);
+			foreach (explode(';', $prefix_list) as $prefix) {
+				foreach (explode(';', $suffix_list) as $postfix) {
+					if ($prefix && $postfix && substr($place, 0, strlen($prefix) + 1) == $prefix . ' ' && substr($place, -strlen($postfix) - 1) == ' ' . $postfix) {
+						$placelist[] = substr($place, strlen($prefix) + 1, strlen($place) - strlen($prefix) - strlen($postfix) - 2);
 					}
 				}
 			}
 		}
+
 		return $placelist;
 	}
 
+	/**
+	 * @param string  $placename
+	 * @param integer $level
+	 *
+	 * @return string[]
+	 */
 	private function createPossiblePlaceNames($placename, $level) {
 		$retlist = array();
-		if ($level<=9) {
+		if ($level <= 9) {
 			$retlist = $this->removePrefixAndSuffixFromPlaceName($this->getSetting('GM_PREFIX_' . $level), $this->getSetting('GM_POSTFIX_' . $level), $placename, $retlist); // Remove both
 			$retlist = $this->removePrefixFromPlaceName($this->getSetting('GM_PREFIX_' . $level), $placename, $retlist); // Remove prefix
 			$retlist = $this->removeSuffixFromPlaceName($this->getSetting('GM_POSTFIX_' . $level), $placename, $retlist); // Remove suffix
 		}
-		$retlist[]=$placename; // Exact
+		$retlist[] = $placename; // Exact
 
 		return $retlist;
 	}
 
+	/**
+	 * @param string $place
+	 *
+	 * @return null|stdClass
+	 */
 	private function getLatitudeAndLongitudeFromPlaceLocation($place) {
-		$parent = explode (',', $place);
-		$parent = array_reverse($parent);
+		$parent   = explode(',', $place);
+		$parent   = array_reverse($parent);
 		$place_id = 0;
-		for ($i=0; $i<count($parent); $i++) {
+		for ($i = 0; $i < count($parent); $i++) {
 			$parent[$i] = trim($parent[$i]);
-			if (empty($parent[$i])) $parent[$i]='unknown';// GoogleMap module uses "unknown" while GEDCOM uses , ,
-			$placelist = $this->createPossiblePlaceNames($parent[$i], $i+1);
-			foreach ($placelist as $placename) {
-				$pl_id=
-					WT_DB::prepare("SELECT pl_id FROM `##placelocation` WHERE pl_level=? AND pl_parent_id=? AND pl_place LIKE ? ORDER BY pl_place")
-					->execute(array($i, $place_id, $placename))
-					->fetchOne();
-				if (!empty($pl_id)) break;
+			if (empty($parent[$i])) {
+				$parent[$i] = 'unknown'; // GoogleMap module uses "unknown" while GEDCOM uses , ,
 			}
-			if (empty($pl_id)) break;
+			$placelist = $this->createPossiblePlaceNames($parent[$i], $i + 1);
+			foreach ($placelist as $placename) {
+				$pl_id = WT_DB::prepare(
+					"SELECT pl_id FROM `##placelocation` WHERE pl_level=? AND pl_parent_id=? AND pl_place LIKE ? ORDER BY pl_place"
+				)->execute(array($i, $place_id, $placename))->fetchOne();
+				if (!empty($pl_id)) {
+					break;
+				}
+			}
+			if (empty($pl_id)) {
+				break;
+			}
 			$place_id = $pl_id;
 		}
 
-		return
-			WT_DB::prepare("SELECT sv_lati, sv_long, sv_bearing, sv_elevation, sv_zoom, pl_lati, pl_long, pl_zoom, pl_icon, pl_level FROM `##placelocation` WHERE pl_id=? ORDER BY pl_place")
-			->execute(array($place_id))
-			->fetchOneRow();
+		return WT_DB::prepare(
+			"SELECT sv_lati, sv_long, sv_bearing, sv_elevation, sv_zoom, pl_lati, pl_long, pl_zoom, pl_icon, pl_level" .
+			" FROM `##placelocation`" .
+			" WHERE pl_id = ?" .
+			" ORDER BY pl_place"
+		)->execute(array($place_id))->fetchOneRow();
 	}
 
+	/**
+	 * @param WT_Individual $indi
+	 * @param WT_Fact[]     $indifacts
+	 * @param string[]      $famids
+	 */
 	private function buildIndividualMap(WT_Individual $indi, $indifacts, $famids) {
-		global $controller;
-
 		$GM_MAX_ZOOM = $this->getSetting('GM_MAX_ZOOM');
 
 		// Create the markers list array
@@ -1844,9 +1926,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					$i++;
 					$gmarks[$i]=array(
 						'class'        => 'optionbox',
-						'date'         => $fact->getDate()->Display(true),
+						'date'         => $fact->getDate()->display(true),
 						'fact_label'   => $fact->getLabel(),
-						'image'        => $spouse ? $spouse->displayImage() : $fact->Icon(),
+						'image'        => $spouse ? $spouse->displayImage() : $fact->icon(),
 						'info'         => $fact->getValue(),
 						'lat'          => str_replace(array('N', 'S', ','), array('', '-', '.') , $match1[1]),
 						'lng'          => str_replace(array('E', 'W', ','), array('', '-', '.') , $match2[1]),
@@ -1866,9 +1948,9 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 						$i++;
 						$gmarks[$i] = array(
 							'class'        => 'optionbox',
-							'date'         => $fact->getDate()->Display(true),
+							'date'         => $fact->getDate()->display(true),
 							'fact_label'   => $fact->getLabel(),
-							'image'        => $spouse ? $spouse->displayImage() : $fact->Icon(),
+							'image'        => $spouse ? $spouse->displayImage() : $fact->icon(),
 							'info'         => $fact->getValue(),
 							'lat'          => str_replace(array('N', 'S', ','), array('', '-', '.'), $latlongval->pl_lati),
 							'lng'          => str_replace(array('E', 'W', ','), array('', '-', '.'), $latlongval->pl_long),
@@ -1903,7 +1985,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 						if ($ctla && $ctlo) {
 							$i++;
 							$gmarks[$i]=array(
-								'date'         => $birth->getDate()->Display(true),
+								'date'         => $birth->getDate()->display(true),
 								'image'        => $child->displayImage(),
 								'info'         => '',
 								'lat'          => str_replace(array('N', 'S', ','), array('', '-', '.'), $match1[1]),
@@ -1937,7 +2019,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 							if ($latlongval && $latlongval->pl_lati && $latlongval->pl_long) {
 								$i++;
 								$gmarks[$i] = array(
-									'date'         => $birth->getDate()->Display(true),
+									'date'         => $birth->getDate()->display(true),
 									'image'        => $child->displayImage(),
 									'info'         => '',
 									'lat'          => str_replace(array('N', 'S', ','), array('', '-', '.'), $latlongval->pl_lati),
@@ -2407,84 +2489,121 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		echo '</table></div><br>';
 	}
 
+	/**
+	 * @param string $place
+	 *
+	 * @return integer
+	 */
 	private function getPlaceLocationId($place) {
-		$par = explode (",", strip_tags($place));
-		$par = array_reverse($par);
+		$par      = explode(',', strip_tags($place));
+		$par      = array_reverse($par);
 		$place_id = 0;
-		for ($i=0; $i<count($par); $i++) {
+		for ($i = 0; $i < count($par); $i++) {
 			$par[$i] = trim($par[$i]);
-			if (empty($par[$i])) $par[$i]="unknown";
-			$placelist = $this->createPossiblePlaceNames($par[$i], $i+1);
-			foreach ($placelist as $key => $placename) {
-				$pl_id=
-					WT_DB::prepare("SELECT pl_id FROM `##placelocation` WHERE pl_level=? AND pl_parent_id=? AND pl_place LIKE ? ORDER BY pl_place")
-					->execute(array($i, $place_id, $placename))
-					->fetchOne();
-				if (!empty($pl_id)) break;
+			if (empty($par[$i])) {
+				$par[$i] = 'unknown';
 			}
-			if (empty($pl_id)) break;
+			$placelist = $this->createPossiblePlaceNames($par[$i], $i + 1);
+			foreach ($placelist as $key => $placename) {
+				$pl_id = WT_DB::prepare(
+					"SELECT pl_id FROM `##placelocation` WHERE pl_level=? AND pl_parent_id=? AND pl_place LIKE ? ORDER BY pl_place"
+				)->execute(array($i, $place_id, $placename))->fetchOne();
+				if (!empty($pl_id)) {
+					break;
+				}
+			}
+			if (empty($pl_id)) {
+				break;
+			}
 			$place_id = $pl_id;
 		}
+
 		return $place_id;
 	}
 
+	/**
+	 * @param string $place
+	 *
+	 * @return integer
+	 */
 	private function getPlaceId($place) {
-		$par = explode (",", $place);
-		$par = array_reverse($par);
+		$par      = explode(',', $place);
+		$par      = array_reverse($par);
 		$place_id = 0;
-		for ($i=0; $i<count($par); $i++) {
-			$par[$i] = trim($par[$i]);
-			$placelist = $this->createPossiblePlaceNames($par[$i], $i+1);
+		for ($i = 0; $i < count($par); $i++) {
+			$par[$i]   = trim($par[$i]);
+			$placelist = $this->createPossiblePlaceNames($par[$i], $i + 1);
 			foreach ($placelist as $key => $placename) {
-				$pl_id=
-					WT_DB::prepare("SELECT p_id FROM `##places` WHERE p_parent_id=? AND p_file=? AND p_place LIKE ? ORDER BY p_place")
-					->execute(array($place_id, WT_GED_ID, $placename))
-					->fetchOne();
-				if (!empty($pl_id)) break;
+				$pl_id = WT_DB::prepare(
+					"SELECT p_id FROM `##places` WHERE p_parent_id=? AND p_file=? AND p_place LIKE ? ORDER BY p_place"
+				)->execute(array($place_id, WT_GED_ID, $placename))->fetchOne();
+				if (!empty($pl_id)) {
+					break;
+				}
 			}
-			if (empty($pl_id)) break;
+			if (empty($pl_id)) {
+				break;
+			}
 			$place_id = $pl_id;
 		}
+
 		return $place_id;
 	}
 
-	private function set_placeid_map($level, $parent) {
-		$fullplace = "";
+	/**
+	 * @param integer  $level
+	 * @param string[] $parent
+	 *
+	 * @return integer
+	 */
+	private function setPlaceIdMap($level, $parent) {
+		$fullplace = '';
 		if ($level == 0) {
 			return 0;
 		} else {
-			for ($i=1; $i<=$level; $i++) {
-				$fullplace .= $parent[$level-$i].", ";
+			for ($i = 1; $i <= $level; $i++) {
+				$fullplace .= $parent[$level - $i] . ', ';
 			}
 			$fullplace = substr($fullplace, 0, -2);
+
 			return $this->getPlaceId($fullplace);
 		}
 	}
 
-	private function set_levelm($level, $parent) {
-		$fullplace = "";
+	/**
+	 * @param integer  $level
+	 * @param string[] $parent
+	 *
+	 * @return integer
+	 */
+	private function setLevelMap($level, $parent) {
+		$fullplace = '';
 		if ($level == 0) {
 			return 0;
 		} else {
-			for ($i=1; $i<=$level; $i++) {
-				if ($parent[$level-$i]!="")
-					$fullplace .= $parent[$level-$i].", ";
-				else
-					$fullplace .= "Unknown, ";
+			for ($i = 1; $i <= $level; $i++) {
+				if ($parent[$level - $i] != '') {
+					$fullplace .= $parent[$level - $i] . ', ';
+				} else {
+					$fullplace .= 'Unknown, ';
+				}
 			}
 			$fullplace = substr($fullplace, 0, -2);
+
 			return $this->getPlaceLocationId($fullplace);
 		}
 	}
 
-	// Called by placelist.php
+	/**
+	 * Called by placelist.php
+	 *
+	 * @param string $placelevels
+	 */
 	public function createMap($placelevels) {
 		global $level, $levelm, $plzoom, $controller;
 
-		// *** ENABLE STREETVIEW *** (boolean) =========================================================
 		$STREETVIEW = $this->getSetting('GM_USE_STREETVIEW');
-		// =============================================================================================
-		$parent = WT_Filter::get('parent');
+		$parent = WT_Filter::getArray('parent');
 
 		// create the map
 		echo '<table style="margin:20px auto 0 auto;"><tr valign="top"><td>';
@@ -2492,7 +2611,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		echo '<table><tr valign="top">';
 		echo '<td class="center" width="200px">';
 
-		$levelm = $this->set_levelm($level, $parent);
+		$levelm = $this->setLevelMap($level, $parent);
 		$latlng =
 			WT_DB::prepare("SELECT pl_place, pl_id, pl_lati, pl_long, pl_zoom, sv_long, sv_lati, sv_bearing, sv_elevation, sv_zoom FROM `##placelocation` WHERE pl_id=?")
 			->execute(array($levelm))
@@ -2613,37 +2732,46 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		}	// End Streetview window ===================================================================
 	}
 
+	/**
+	 * @param integer $numls
+	 * @param integer $levelm
+	 *
+	 * @return integer[]
+	 */
 	private function checkWhereAmI($numls, $levelm) {
 		$where_am_i = $this->placeIdToHierarchy($levelm);
-		$i = $numls+1;
-		$levelo = array(0 => 0);
+		$i          = $numls + 1;
+		$levelo     = array(0 => 0);
 		foreach (array_reverse($where_am_i, true) as $id => $place2) {
 			$levelo[$i] = $id;
 			$i--;
 		}
+
 		return $levelo;
 	}
 
+	/**
+	 * @param integer  $level
+	 * @param string[] $parent
+	 */
 	private function printHowManyPeople($level, $parent) {
 		$stats = new WT_Stats(WT_GEDCOM);
 
 		$place_count_indi = 0;
-		$place_count_fam = 0;
-		if (!isset($parent[$level-1])) $parent[$level-1]="";
-		$p_id = $this->set_placeid_map($level, $parent);
+		$place_count_fam  = 0;
+		if (!isset($parent[$level - 1])) {
+			$parent[$level - 1] = '';
+		}
+		$p_id = $this->setPlaceIdMap($level, $parent);
 		$indi = $stats->statsPlaces('INDI', false, $p_id);
-		$fam = $stats->statsPlaces('FAM', false, $p_id);
-		if (!empty($indi)) {
-			foreach ($indi as $place) {
-				$place_count_indi=$place['tot'];
-			}
+		$fam  = $stats->statsPlaces('FAM', false, $p_id);
+		foreach ($indi as $place) {
+			$place_count_indi = $place['tot'];
 		}
-		if (!empty($fam)) {
-			foreach ($fam as $place) {
-				$place_count_fam=$place['tot'];
-			}
+		foreach ($fam as $place) {
+			$place_count_fam = $place['tot'];
 		}
-		echo "<br><br>", WT_I18N::translate('Individuals'), ": ", $place_count_indi, ", ", WT_I18N::translate('Families'), ": ", $place_count_fam;
+		echo '<br><br>', WT_I18N::translate('Individuals'), ': ', $place_count_indi, ', ', WT_I18N::translate('Families'), ': ', $place_count_fam;
 	}
 
 	private function printGoogleMapMarkers($place2, $level, $parent, $levelm, $linklevels, $placelevels, $lastlevel=false) {
@@ -2795,15 +2923,24 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		}
 	}
 
-	// Called by placelist.php
+	/**
+	 * Called by placelist.php
+	 *
+	 * @param integer  $numfound
+	 * @param integer  $level
+	 * @param string[] $parent
+	 * @param string   $linklevels
+	 * @param string   $placelevels
+	 * @param string[] $place_names
+	 */
 	public function mapScripts($numfound, $level, $parent, $linklevels, $placelevels, $place_names) {
 		global $plzoom, $controller;
 
 		$controller->addInlineJavascript('
-			jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="'.WT_STATIC_URL.WT_MODULES_DIR.'googlemap/css/wt_v3_googlemap.css" />\');
-			var numMarkers = "'.$numfound.'";
-			var mapLevel   = "'.$level.   '";
-			var placezoom  = "'.$plzoom.  '";
+			jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="' . WT_STATIC_URL . WT_MODULES_DIR . 'googlemap/css/wt_v3_googlemap.css" />\');
+			var numMarkers = "' . $numfound . '";
+			var mapLevel   = "' . $level . '";
+			var placezoom  = "' . $plzoom . '";
 			var infowindow = new google.maps.InfoWindow({
 				// size: new google.maps.Size(150,50),
 				// maxWidth: 600
@@ -2927,25 +3064,15 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 			}
 		');
 
-		$levelm = $this->set_levelm($level, $parent);
+		$levelm = $this->setLevelMap($level, $parent);
 		if (isset($levelo[0])) $levelo[0]=0;
 		$numls = count($parent)-1;
 		$levelo = $this->checkWhereAmI($numls, $levelm);
-		if ($numfound<2 && ($level==1 || !(isset($levelo[($level-1)])))) {
+		if ($numfound<2 && ($level==1 || !isset($levelo[$level-1]))) {
 			$controller->addInlineJavascript('map.maxZoom=6;');
-			// echo "zoomlevel = map.getBoundsZoomLevel(bounds);\n";
-			// echo " map.setCenter(new google.maps.LatLng(0, 0), zoomlevel+5);\n";
-		} elseif ($numfound<2 && !isset($levelo[($level-2)])) {
-			// echo "zoomlevel = map.getBoundsZoomLevel(bounds);\n";
-			// echo " map.setCenter(new google.maps.LatLng(0, 0), zoomlevel+6);\n";
+		} elseif ($numfound<2 && !isset($levelo[$level-2])) {
 		} elseif ($level==2) {
 			$controller->addInlineJavascript('map.maxZoom=10;');
-			// echo "zoomlevel = map.getBoundsZoomLevel(bounds);\n";
-			// echo " map.setCenter(new google.maps.LatLng(0, 0), zoomlevel+8);\n";
-		} elseif ($numfound<2 && $level>1) {
-			// echo "map.maxZoom=".$GM_MAX_ZOOM.";";
-			// echo "zoomlevel = map.getBoundsZoomLevel(bounds);\n";
-			// echo " map.setCenter(new google.maps.LatLng(0, 0), zoomlevel+18);\n";
 		}
 		//create markers
 
@@ -2982,7 +3109,7 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		foreach ($place_names as $placename) {
 			$thisloc = $parent;
 			$thisloc[] = $placename;
-			$this_levelm = $this->set_levelm($level+1, $thisloc);
+			$this_levelm = $this->setLevelMap($level+1, $thisloc);
 			if ($this_levelm) $placeidlist[] = $this_levelm;
 		}
 
@@ -3008,33 +3135,50 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		$controller->addInlineJavascript(ob_get_clean());
 	}
 
-	// Take a place id and find its place in the hierarchy
-	// Input: place ID
-	// Output: ordered array of id=>name values, starting with the Top level
-	// e.g. 0=>"Top level", 16=>"England", 19=>"London", 217=>"Westminster"
-	// NB This function exists in both places.php and places_edit.php
+	/**
+	 * Take a place id and find its place in the hierarchy
+	 * Input: place ID
+	 * Output: ordered array of id=>name values, starting with the Top level
+	 * e.g. 0=>"Top level", 16=>"England", 19=>"London", 217=>"Westminster"
+	 * NB This function exists in both places.php and places_edit.php
+	 *
+	 * @param integer $id
+	 *
+	 * @return string[]
+	 */
 	private function placeIdToHierarchy($id) {
-		$statement=
-			WT_DB::prepare("SELECT pl_parent_id, pl_place FROM `##placelocation` WHERE pl_id=?");
-		$arr=array();
-		while ($id!=0) {
-			$row=$statement->execute(array($id))->fetchOneRow();
-			$arr=array($id=>$row->pl_place)+$arr;
-			$id=$row->pl_parent_id;
+		$statement = WT_DB::prepare("SELECT pl_parent_id, pl_place FROM `##placelocation` WHERE pl_id=?");
+		$arr       = array();
+		while ($id != 0) {
+			$row = $statement->execute(array($id))->fetchOneRow();
+			$arr = array($id => $row->pl_place) + $arr;
+			$id  = $row->pl_parent_id;
 		}
+
 		return $arr;
 	}
 
+	/**
+	 * @return int
+	 */
 	private function getHighestIndex() {
 		return (int)WT_DB::prepare("SELECT MAX(pl_id) FROM `##placelocation`")->fetchOne();
 	}
 
+	/**
+	 * @return int
+	 */
 	private function getHighestLevel() {
 		return (int)WT_DB::prepare("SELECT MAX(pl_level) FROM `##placelocation`")->fetchOne();
 	}
 
 	/**
 	 * Find all of the places in the hierarchy
+	 *
+	 * @param integer $parent_id
+	 * @param boolean $inactive
+	 *
+	 * @return array[]
 	 */
 	private function getPlaceListLocation($parent_id, $inactive=false) {
 		if ($inactive) {
@@ -3043,41 +3187,51 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 				->execute(array($parent_id))
 				->fetchAll();
 		} else {
-			$rows=
-				WT_DB::prepare(
-					"SELECT DISTINCT pl_id, pl_place, pl_lati, pl_long, pl_zoom, pl_icon".
-					" FROM `##placelocation`".
-					" INNER JOIN `##places` ON `##placelocation`.pl_place=`##places`.p_place".
-					" WHERE pl_parent_id=? ORDER BY pl_place COLLATE ".WT_I18N::$collation
-				)
-				->execute(array($parent_id))
-				->fetchAll();
+			$rows = WT_DB::prepare(
+				"SELECT DISTINCT pl_id, pl_place, pl_lati, pl_long, pl_zoom, pl_icon".
+				" FROM `##placelocation`".
+				" INNER JOIN `##places` ON `##placelocation`.pl_place=`##places`.p_place".
+				" WHERE pl_parent_id=? ORDER BY pl_place COLLATE " . WT_I18N::$collation
+			)->execute(array($parent_id))->fetchAll();
 		}
 
-		$placelist=array();
+		$placelist = array();
 		foreach ($rows as $row) {
-			$placelist[]=array('place_id'=>$row->pl_id, 'place'=>$row->pl_place, 'lati'=>$row->pl_lati, 'long'=>$row->pl_long, 'zoom'=>$row->pl_zoom, 'icon'=>$row->pl_icon);
+			$placelist[] = array(
+				'place_id' => $row->pl_id,
+				'place' => $row->pl_place,
+				'lati' => $row->pl_lati,
+				'long' => $row->pl_long,
+				'zoom' => $row->pl_zoom,
+				'icon' => $row->pl_icon,
+			);
 		}
+
 		return $placelist;
 	}
 
+	/**
+	 * @param integer $parent_id
+	 */
 	private function outputLevel($parent_id) {
-		$tmp = $this->placeIdToHierarchy($parent_id);
+		$tmp      = $this->placeIdToHierarchy($parent_id);
 		$maxLevel = $this->getHighestLevel();
-		if ($maxLevel>8) $maxLevel = 8;
+		if ($maxLevel > 8) {
+			$maxLevel = 8;
+		}
 		$prefix = implode(';', $tmp);
-		if ($prefix!='')
-			$prefix.=';';
-		$suffix=str_repeat(';', $maxLevel-count($tmp));
-		$level=count($tmp);
+		if ($prefix != '') {
+			$prefix .= ';';
+		}
+		$suffix = str_repeat(';', $maxLevel - count($tmp));
+		$level  = count($tmp);
 
-		$rows=
-			WT_DB::prepare("SELECT pl_id, pl_place, pl_long, pl_lati, pl_zoom, pl_icon FROM `##placelocation` WHERE pl_parent_id=? ORDER BY pl_place")
-			->execute(array($parent_id))
-			->fetchAll();
+		$rows = WT_DB::prepare(
+			"SELECT pl_id, pl_place, pl_long, pl_lati, pl_zoom, pl_icon FROM `##placelocation` WHERE pl_parent_id=? ORDER BY pl_place"
+		)->execute(array($parent_id))->fetchAll();
 
 		foreach ($rows as $row) {
-			echo $level,';',$prefix,$row->pl_place,$suffix,';',$row->pl_long,';',$row->pl_lati,';',$row->pl_zoom,';',$row->pl_icon,"\r\n";
+			echo $level, ';', $prefix, $row->pl_place, $suffix, ';', $row->pl_long, ';', $row->pl_lati, ';', $row->pl_zoom, ';', $row->pl_icon, "\r\n";
 			if ($level < $maxLevel) {
 				$this->outputLevel($row->pl_id);
 			}
@@ -3094,11 +3248,11 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 		if (file_exists($path)) {
 			$dir = dir($path);
 			while (false !== ($entry = $dir->read())) {
-				if ($entry!='.' && $entry!='..' && $entry!='.svn') {
-					if (is_dir($path.'/'.$entry)) {
-						$this->findFiles($path.'/'.$entry);
-					} elseif (strstr($entry, '.csv')!==false) {
-						$placefiles[] = preg_replace('~'.WT_MODULES_DIR.'googlemap/extra~', '', $path).'/'.$entry;
+				if ($entry != '.' && $entry != '..' && $entry != '.svn') {
+					if (is_dir($path . '/' . $entry)) {
+						$this->findFiles($path . '/' . $entry);
+					} elseif (strstr($entry, '.csv') !== false) {
+						$placefiles[] = preg_replace('~' . WT_MODULES_DIR . 'googlemap/extra~', '', $path) . '/' . $entry;
 					}
 				}
 			}
@@ -4750,14 +4904,12 @@ class googlemap_WT_Module extends WT_Module implements WT_Module_Config, WT_Modu
 					#mapCanvas {
 						width: 520px;
 						height: 350px;
-						margin: 0 auto;
-						margin-top: -10px;
+						margin: -10px auto 0;
 						border:1px solid black;
 					}
 					#infoPanel {
 						display: none;
-						margin: 0 auto;
-						margin-top: 5px;
+						margin: 5px auto 0;
 					}
 					#infoPanel div {
 						display: none;

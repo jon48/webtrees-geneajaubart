@@ -7,7 +7,7 @@
 // Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -97,10 +97,10 @@ $gencount = 0;
 		<table>
 			<tr>
 				<td style="vertical-align:middle">
-					<?php $controller->print_descendency(WT_Individual::getInstance($controller->pid), 1); ?>
+					<?php $controller->printDescendency(WT_Individual::getInstance($controller->pid), 1); ?>
 				</td>
 				<td style="vertical-align:middle">
-					<?php $controller->print_person_pedigree(WT_Individual::getInstance($controller->pid), 1); ?>
+					<?php $controller->printPersonPedigree(WT_Individual::getInstance($controller->pid), 1); ?>
 				</td>
 			</tr>
 		</table>

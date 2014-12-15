@@ -7,7 +7,7 @@
 // Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2011 PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2011 PGV Development Team.
 //
 // Sidebar controls courtesy of http://devheart.org/articles/jquery-collapsible-sidebar-layout/
 //
@@ -42,7 +42,7 @@ if ($controller->record && $controller->record->canShow()) {
 	$sidebar_html=$controller->getSideBarContent();
 
 	$controller->pageHeader();
-	if ($controller->record->isOld()) {
+	if ($controller->record->isPendingDeletion()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
@@ -60,7 +60,7 @@ if ($controller->record && $controller->record->canShow()) {
 				' ', help_link('pending_changes'),
 				'</p>';
 		}
-	} elseif ($controller->record->isNew()) {
+	} elseif ($controller->record->isPendingAddtion()) {
 		if (WT_USER_CAN_ACCEPT) {
 			echo
 				'<p class="ui-state-highlight">',
@@ -177,10 +177,10 @@ if ($controller->record->canShow()) {
 	echo '<span class="header_age">';
 	if ($bdate->isOK() && !$controller->record->isDead()) {
 		// If living display age
-		echo WT_Gedcom_Tag::getLabelValue('AGE', get_age_at_event(WT_Date::GetAgeGedcom($bdate), true), '', 'span');
+		echo WT_Gedcom_Tag::getLabelValue('AGE', get_age_at_event(WT_Date::GetAgeGedcom($bdate), true), $controller->record, 'span');
 	} elseif ($bdate->isOK() && $ddate->isOK()) {
 		// If dead, show age at death
-		echo WT_Gedcom_Tag::getLabelValue('AGE', get_age_at_event(WT_Date::GetAgeGedcom($bdate, $ddate), false), '', 'span');
+		echo WT_Gedcom_Tag::getLabelValue('AGE', get_age_at_event(WT_Date::GetAgeGedcom($bdate, $ddate), false), $controller->record, 'span');
 	}
 	echo '</span>';
 	// Display summary birth/death info.
@@ -189,7 +189,7 @@ if ($controller->record->canShow()) {
 	// Display gender icon
 	foreach ($controller->record->getFacts() as $fact) {
 		if ($fact->getTag() == 'SEX') {
-			$controller->print_sex_record($fact);
+			$controller->printSexRecord($fact);
 		}
 	}
 	//PERSO
@@ -201,7 +201,7 @@ if ($controller->record->canShow()) {
 	// Display name details
 	foreach ($controller->record->getFacts() as $fact) {
 		if ($fact->getTag() == 'NAME') {
-			$controller->print_name_record($fact);
+			$controller->printNameRecord($fact);
 		}
 	}
 

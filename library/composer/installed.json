@@ -1,5 +1,58 @@
 [
     {
+        "name": "bombayworks/zendframework1",
+        "version": "v1.12.9",
+        "version_normalized": "1.12.9.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/bombayworks/zendframework1.git",
+            "reference": "4bce65c9427866dc62e9ea9ab511f0edffa49f85"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/bombayworks/zendframework1/zipball/4bce65c9427866dc62e9ea9ab511f0edffa49f85",
+            "reference": "4bce65c9427866dc62e9ea9ab511f0edffa49f85",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2.11"
+        },
+        "require-dev": {
+            "phpunit/dbunit": "1.3.*",
+            "phpunit/phpunit": "3.7.*"
+        },
+        "time": "2014-09-17 15:01:24",
+        "bin": [
+            "bin/zf.sh",
+            "bin/zf.php"
+        ],
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.12.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Zend_": "library/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "include-path": [
+            "library/"
+        ],
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "description": "Zend Framework 1",
+        "homepage": "http://framework.zend.com/",
+        "keywords": [
+            "ZF1",
+            "framework"
+        ]
+    },
+    {
         "name": "ezyang/htmlpurifier",
         "version": "v4.6.0",
         "version_normalized": "4.6.0.0",
@@ -76,7 +129,7 @@
         "authors": [
             {
                 "name": "Anthony Ferrara",
-                "email": "ircmaxell@php.net",
+                "email": "ircmaxell@ircmaxell.com",
                 "homepage": "http://blog.ircmaxell.com"
             }
         ],
@@ -141,74 +194,6 @@
         ]
     },
     {
-        "name": "rhumsaa/uuid",
-        "version": "2.7.3",
-        "version_normalized": "2.7.3.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/ramsey/uuid.git",
-            "reference": "b976326ca5977d7333f34e3c828ae7c22a49a65a"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/ramsey/uuid/zipball/b976326ca5977d7333f34e3c828ae7c22a49a65a",
-            "reference": "b976326ca5977d7333f34e3c828ae7c22a49a65a",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "require-dev": {
-            "doctrine/dbal": ">=2.3",
-            "moontoast/math": "~1.1",
-            "phpunit/phpunit": "~4.1",
-            "satooshi/php-coveralls": "~0.6",
-            "symfony/console": "~2.3"
-        },
-        "suggest": {
-            "doctrine/dbal": "Allow the use of a UUID as doctrine field type.",
-            "moontoast/math": "Support for converting UUID to 128-bit integer (in string form).",
-            "symfony/console": "Support for use of the bin/uuid command line tool."
-        },
-        "time": "2014-08-27 22:39:41",
-        "bin": [
-            "bin/uuid"
-        ],
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.7.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Rhumsaa\\Uuid\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Marijn Huizendveld",
-                "email": "marijn.huizendveld@gmail.com"
-            },
-            {
-                "name": "Ben Ramsey",
-                "homepage": "http://benramsey.com"
-            }
-        ],
-        "description": "A PHP 5.3+ library for generating RFC 4122 version 1, 3, 4, and 5 universally unique identifiers (UUID).",
-        "homepage": "https://github.com/ramsey/uuid",
-        "keywords": [
-            "guid",
-            "identifier",
-            "uuid"
-        ]
-    },
-    {
         "name": "patchwork/utf8",
         "version": "v1.1.25",
         "version_normalized": "1.1.25.0",
@@ -268,23 +253,23 @@
     },
     {
         "name": "tecnick.com/tcpdf",
-        "version": "6.0.093",
-        "version_normalized": "6.0.093.0",
+        "version": "6.0.097",
+        "version_normalized": "6.0.097.0",
         "source": {
             "type": "git",
             "url": "https://github.com/tecnickcom/TCPDF.git",
-            "reference": "8ec040b3ccedc2a0150a7b6b46c18c59d932ad59"
+            "reference": "73b436e180d91cb0e9897242ccfb4b49fc498901"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/8ec040b3ccedc2a0150a7b6b46c18c59d932ad59",
-            "reference": "8ec040b3ccedc2a0150a7b6b46c18c59d932ad59",
+            "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/73b436e180d91cb0e9897242ccfb4b49fc498901",
+            "reference": "73b436e180d91cb0e9897242ccfb4b49fc498901",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2014-09-02 19:31:33",
+        "time": "2014-10-20 20:02:38",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -332,71 +317,18 @@
         ]
     },
     {
-        "name": "bombayworks/zendframework1",
-        "version": "v1.12.9",
-        "version_normalized": "1.12.9.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/bombayworks/zendframework1.git",
-            "reference": "4bce65c9427866dc62e9ea9ab511f0edffa49f85"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/bombayworks/zendframework1/zipball/4bce65c9427866dc62e9ea9ab511f0edffa49f85",
-            "reference": "4bce65c9427866dc62e9ea9ab511f0edffa49f85",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.2.11"
-        },
-        "require-dev": {
-            "phpunit/dbunit": "1.3.*",
-            "phpunit/phpunit": "3.7.*"
-        },
-        "time": "2014-09-17 15:01:24",
-        "bin": [
-            "bin/zf.sh",
-            "bin/zf.php"
-        ],
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.12.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Zend_": "library/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "include-path": [
-            "library/"
-        ],
-        "license": [
-            "BSD-3-Clause"
-        ],
-        "description": "Zend Framework 1",
-        "homepage": "http://framework.zend.com/",
-        "keywords": [
-            "ZF1",
-            "framework"
-        ]
-    },
-    {
         "name": "fisharebest/ext-calendar",
-        "version": "1.2.0",
-        "version_normalized": "1.2.0.0",
+        "version": "1.3.0",
+        "version_normalized": "1.3.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/fisharebest/ext-calendar.git",
-            "reference": "e73e382d347440c9ea6ac8abc658cc4405c9250d"
+            "reference": "1498941b9b83222312bb957b5a425df075421443"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/fisharebest/ext-calendar/zipball/e73e382d347440c9ea6ac8abc658cc4405c9250d",
-            "reference": "e73e382d347440c9ea6ac8abc658cc4405c9250d",
+            "url": "https://api.github.com/repos/fisharebest/ext-calendar/zipball/1498941b9b83222312bb957b5a425df075421443",
+            "reference": "1498941b9b83222312bb957b5a425df075421443",
             "shasum": ""
         },
         "require": {
@@ -404,9 +336,9 @@
         },
         "require-dev": {
             "phpunit/phpunit": "*",
-            "satooshi/php-coveralls": "dev-master"
+            "satooshi/php-coveralls": "*"
         },
-        "time": "2014-09-27 08:43:30",
+        "time": "2014-10-31 19:49:13",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -425,7 +357,7 @@
                 "role": "Developer"
             }
         ],
-        "description": "Implementation of the Arabic (Hijri), French, Gregorian, Jewish, Julian and Persian (Jalali) calendars.  PHP shims for the ext/calendar extension.",
+        "description": "Implementation of the Arabic (Hijri), French, Gregorian, Jewish, Julian and Persian (Jalali) calendars.  Optional PHP shims for servers without the ext/calendar extension.",
         "homepage": "https://github.com/fisharebest/ext-calendar",
         "keywords": [
             "Jalali",
@@ -442,6 +374,74 @@
             "julian day number",
             "persian",
             "shamsi"
+        ]
+    },
+    {
+        "name": "rhumsaa/uuid",
+        "version": "2.7.4",
+        "version_normalized": "2.7.4.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/ramsey/uuid.git",
+            "reference": "eb1d371067aa8c2b83d6691837ee4896a6f76a44"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/ramsey/uuid/zipball/eb1d371067aa8c2b83d6691837ee4896a6f76a44",
+            "reference": "eb1d371067aa8c2b83d6691837ee4896a6f76a44",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "doctrine/dbal": ">=2.3",
+            "moontoast/math": "~1.1",
+            "phpunit/phpunit": "~4.1",
+            "satooshi/php-coveralls": "~0.6",
+            "symfony/console": "~2.3"
+        },
+        "suggest": {
+            "doctrine/dbal": "Allow the use of a UUID as doctrine field type.",
+            "moontoast/math": "Support for converting UUID to 128-bit integer (in string form).",
+            "symfony/console": "Support for use of the bin/uuid command line tool."
+        },
+        "time": "2014-10-30 03:36:49",
+        "bin": [
+            "bin/uuid"
+        ],
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.7.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Rhumsaa\\Uuid\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Marijn Huizendveld",
+                "email": "marijn.huizendveld@gmail.com"
+            },
+            {
+                "name": "Ben Ramsey",
+                "homepage": "http://benramsey.com"
+            }
+        ],
+        "description": "A PHP 5.3+ library for generating RFC 4122 version 1, 3, 4, and 5 universally unique identifiers (UUID).",
+        "homepage": "https://github.com/ramsey/uuid",
+        "keywords": [
+            "guid",
+            "identifier",
+            "uuid"
         ]
     }
 ]

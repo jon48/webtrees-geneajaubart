@@ -7,7 +7,7 @@
 // Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -85,7 +85,6 @@ $controller
 			oldMy = msY;
 		}
 		i = document.getElementById("topInner");
-		//alert(i.style.top);
 		movei1 = i;
 		i = document.getElementById("inner");
 		movei2 = i;
@@ -202,10 +201,10 @@ $people = count($controller->people);
 	</table>
 	<div dir="ltr" id="lifespan_chart" class="lifespan_outer">
 		<div dir="ltr" id="topInner"  class="lifespan_timeline" onmousedown="pandiv(); return false;">';
-			<?php $controller->PrintTimeline($controller->timelineMinYear,$controller->timelineMaxYear); ?>
+			<?php $controller->printTimeline($controller->timelineMinYear,$controller->timelineMaxYear); ?>
 		</div>
 		<div id="inner" class="lifespan_people" onmousedown="pandiv(); return false;">
-			<?php $maxY = $controller->fillTL($controller->people, $controller->YrowLoc); ?>
+			<?php $maxY = $controller->fillTimeline($controller->people, $controller->YrowLoc); ?>
 		</div>
 		<!--  Floating div controls START -->
 		<div dir="ltr" style="position:relative; z-index: 100; filter: alpha(opacity=67); -moz-opacity: 0.67;  opacity: 0.67; width:180px; top: 80px;">

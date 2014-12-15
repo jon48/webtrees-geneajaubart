@@ -1,6 +1,4 @@
 <?php
-// Controller for the branches list
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -18,13 +16,28 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+/**
+ * Class WT_Controller_Branches - Controller for the branches list
+ */
 class WT_Controller_Branches extends WT_Controller_Page {
+	/** @var string Generate the branches for this surname */
 	private $surname;
-	private $soundex_std;
-	private $soundex_dm;
-	private $individuals = array(); // Everyone with the selected surname
-	private $ancestors   = array(); // Ancestors of the root person - for SOSA numbers
 
+	/** @var bool Whether to use Standard phonetic matching */
+	private $soundex_std;
+
+	/** @var bool Whether to use Daitch-Mokotov phonetic matching */
+	private $soundex_dm;
+
+	/** @var WT_Individual[] Everyone with the selected surname */
+	private $individuals = array();
+
+	/** @var WT_Individual[] Ancestors of the root person - for SOSA numbers */
+	private $ancestors = array();
+
+	/**
+	 * Create a branches list controller
+	 */
 	public function __construct() {
 		parent::__construct();
 
@@ -33,42 +46,59 @@ class WT_Controller_Branches extends WT_Controller_Page {
 		$this->soundex_dm  = WT_Filter::getBool('soundex_dm');
 
 		if ($this->surname) {
-			$this->setPageTitle(/* I18N: %s is a surname */ WT_I18N::translate('Branches of the %s family', WT_Filter::escapeHtml($this->surname)));
+			$this->setPageTitle(/* I18N: %s is a surname */
+				WT_I18N::translate('Branches of the %s family', WT_Filter::escapeHtml($this->surname)));
 			$this->loadIndividuals();
 			$self = WT_Individual::getInstance(WT_USER_GEDCOM_ID);
 			if ($self) {
-				$this->loadAncestors(WT_Individual::getInstance(WT_USER_GEDCOM_ID), 1);
+				$this->loadAncestors($self, 1);
 			}
 		} else {
 			$this->setPageTitle(/* I18N: Branches of a family tree */ WT_I18N::translate('Branches'));
 		}
 	}
 
-	// Page parameters
+	/**
+	 * The surname to be used on this page.
+	 *
+	 * @return null|string
+	 */
 	public function getSurname() {
 		return $this->surname;
 	}
 
+	/**
+	 * Should we use Standard phonetic matching
+	 *
+	 * @return boolean
+	 */
 	public function getSoundexStd() {
 		return $this->soundex_std;
 	}
 
+	/**
+	 * Should we use Daitch-Mokotov phonetic matching
+	 *
+	 * @return boolean
+	 */
 	public function getSoundexDm() {
 		return $this->soundex_dm;
 	}
 
-	// Fetch all individuals with a matching surname
+	/**
+	 * Fetch all individuals with a matching surname
+	 */
 	private function loadIndividuals() {
-		$sql=
-			"SELECT DISTINCT i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom".
-			" FROM `##individuals`".
-			" JOIN `##name` ON (i_id=n_id AND i_file=n_file)".
-			" WHERE n_file=?".
-			" AND n_type!=?".
-			" AND (n_surn=? OR n_surname=?";
-		$args=array(WT_GED_ID, '_MARNM', $this->surname, $this->surname);
+		$sql =
+			"SELECT DISTINCT i_id AS xref, i_file AS gedcom_id, i_gedcom AS gedcom" .
+			" FROM `##individuals`" .
+			" JOIN `##name` ON (i_id=n_id AND i_file=n_file)" .
+			" WHERE n_file = ?" .
+			" AND n_type != ?" .
+			" AND (n_surn = ? OR n_surname = ?";
+		$args = array(WT_GED_ID, '_MARNM', $this->surname, $this->surname);
 		if ($this->soundex_std) {
-			$sdx = WT_Soundex::soundex_std($this->surname);
+			$sdx = WT_Soundex::russell($this->surname);
 			if ($sdx) {
 				foreach (explode(':', $sdx) as $value) {
 					$sql .= " OR n_soundex_surn_std LIKE CONCAT('%', ?, '%')";
@@ -77,7 +107,7 @@ class WT_Controller_Branches extends WT_Controller_Page {
 			}
 		}
 		if ($this->soundex_dm) {
-			$sdx = WT_Soundex::soundex_dm($this->surname);
+			$sdx = WT_Soundex::daitchMokotoff($this->surname);
 			if ($sdx) {
 				foreach (explode(':', $sdx) as $value) {
 					$sql .= " OR n_soundex_surn_dm LIKE CONCAT('%', ?, '%')";
@@ -86,27 +116,37 @@ class WT_Controller_Branches extends WT_Controller_Page {
 			}
 		}
 		$sql .= ')';
-		$rows = WT_DB::prepare($sql)->execute($args)->fetchAll();
+		$rows              = WT_DB::prepare($sql)->execute($args)->fetchAll();
 		$this->individuals = array();
 		foreach ($rows as $row) {
 			$this->individuals[] = WT_Individual::getInstance($row->xref, $row->gedcom_id, $row->gedcom);
 		}
 		// Sort by birth date, oldest first
-		usort($this->individuals, array('WT_Individual', 'CompareBirtDate'));
+		usort($this->individuals, array('WT_Individual', 'compareBirthDate'));
 	}
 
+	/**
+	 * Load the ancestors of an individual, so we can highlight them in the list
+	 *
+	 * @param WT_Individual $ancestor
+	 * @param integer       $sosa
+	 */
 	private function loadAncestors(WT_Individual $ancestor, $sosa) {
 		if ($ancestor) {
 			$this->ancestors[$sosa] = $ancestor;
 			foreach ($ancestor->getChildFamilies() as $family) {
 				foreach ($family->getSpouses() as $parent) {
-					$this->loadAncestors($parent, $sosa * 2 + ($parent->getSex() == 'F'));
+					$this->loadAncestors($parent, $sosa * 2 + ($parent->getSex() == 'F' ? 1 : 0));
 				}
 			}
 		}
 	}
 
-	// List individuals without an ancestor (with the same surname)
+	/**
+	 * For each individual with no ancestors, list their descendants.
+	 *
+	 * @return string
+	 */
 	public function getPatriarchsHtml() {
 		$html = '';
 		foreach ($this->individuals as $individual) {
@@ -119,30 +159,37 @@ class WT_Controller_Branches extends WT_Controller_Page {
 			}
 			$html .= $this->getDescendantsHtml($individual);
 		}
+
 		return $html;
 	}
 
-	// Generate a recursive list of descendants of an individual.
-	// If parents are specified, we can also show the pedigree (adopted, etc.).
-	private function getDescendantsHtml(WT_Individual $individual, WT_Family $parents=null) {
+	/**
+	 * Generate a recursive list of descendants of an individual.
+	 * If parents are specified, we can also show the pedigree (adopted, etc.).
+	 *
+	 * @param WT_Individual  $individual
+	 * @param WT_Family|null $parents
+	 *
+	 * @return string
+	 */
+	private function getDescendantsHtml(WT_Individual $individual, WT_Family $parents = null) {
 		// A person has many names.  Select the one that matches the searched surname
 		$person_name = '';
 		foreach ($individual->getAllNames() as $name) {
 			list($surn1) = explode(",", $name['sort']);
-			if (
-				// one name is a substring of the other
+			if (// one name is a substring of the other
 				stripos($surn1, $this->surname) !== false ||
 				stripos($this->surname, $surn1) !== false ||
 				// one name sounds like the other
-				$this->soundex_std && WT_Soundex::compare(WT_Soundex::soundex_std($surn1), WT_Soundex::soundex_std($this->surname)) ||
-				$this->soundex_dm  && WT_Soundex::compare(WT_Soundex::soundex_dm ($surn1), WT_Soundex::soundex_dm ($this->surname))
+				$this->soundex_std && WT_Soundex::compare(WT_Soundex::russell($surn1), WT_Soundex::russell($this->surname)) ||
+				$this->soundex_dm && WT_Soundex::compare(WT_Soundex::daitchMokotoff($surn1), WT_Soundex::daitchMokotoff($this->surname))
 			) {
 				$person_name = $name['full'];
 				break;
 			}
 		}
 
-		// No matching name?  Typically children with a different surname.  The tree stops here.
+		// No matching name?  Typically children with a different surname.  The branch stops here.
 		if (!$person_name) {
 			return '<li title="' . strip_tags($individual->getFullName()) . '">' . $individual->getSexImage() . '…</li>';
 		}
@@ -158,7 +205,7 @@ class WT_Controller_Branches extends WT_Controller_Page {
 		}
 
 		// Generate HTML for this individual, and all their descendants
-		$indi_html = $individual->getSexImage() . '<a class="' . $sosa_class . '" href="' . $individual->getHtmlUrl() . '">' . $person_name . '</a> ' .  $individual->getLifeSpan() . $sosa_html;
+		$indi_html = $individual->getSexImage() . '<a class="' . $sosa_class . '" href="' . $individual->getHtmlUrl() . '">' . $person_name . '</a> ' . $individual->getLifeSpan() . $sosa_html;
 
 		// If this is not a birth pedigree (e.g. an adoption), highlight it
 		if ($parents) {
@@ -170,7 +217,7 @@ class WT_Controller_Branches extends WT_Controller_Page {
 				}
 			}
 			if ($pedi && $pedi != 'birth') {
-				$indi_html = '<span class="red">'.WT_Gedcom_Code_Pedi::getValue($pedi, $individual).'</span> ' . $indi_html;
+				$indi_html = '<span class="red">' . WT_Gedcom_Code_Pedi::getValue($pedi, $individual) . '</span> ' . $indi_html;
 			}
 		}
 
@@ -187,14 +234,14 @@ class WT_Controller_Branches extends WT_Controller_Page {
 					$sosa = array_search($spouse, $this->ancestors, true);
 					if ($sosa) {
 						$sosa_class = 'search_hit';
-						$sosa_html  = ' <a class="details1 ' . $spouse->getBoxStyle() . '" title="' . WT_I18N::translate('Sosa') . '" href="relationship.php?pid2=' . WT_USER_ROOT_ID . '&amp;pid1=' . $spouse->getXref() . '"> '.$sosa.' </a>' . self::sosaGeneration($sosa);
+						$sosa_html  = ' <a class="details1 ' . $spouse->getBoxStyle() . '" title="' . WT_I18N::translate('Sosa') . '" href="relationship.php?pid2=' . WT_USER_ROOT_ID . '&amp;pid1=' . $spouse->getXref() . '"> ' . $sosa . ' </a>' . self::sosaGeneration($sosa);
 					} else {
 						$sosa_class = '';
 						$sosa_html  = '';
 					}
 					$marriage_year = $family->getMarriageYear();
 					if ($marriage_year) {
-						$fam_html .= ' <a href="' . $family->getHtmlUrl() . '" title="' . strip_tags($family->getMarriageDate()->Display()) . '"><i class="icon-rings"></i>' . $marriage_year . '</a>';
+						$fam_html .= ' <a href="' . $family->getHtmlUrl() . '" title="' . strip_tags($family->getMarriageDate()->display()) . '"><i class="icon-rings"></i>' . $marriage_year . '</a>';
 					} elseif ($family->getFirstFact('MARR')) {
 						$fam_html .= ' <a href="' . $family->getHtmlUrl() . '" title="' . WT_Gedcom_Tag::getLabel('MARR') . '"><i class="icon-rings"></i></a>';
 					} elseif ($family->getFirstFact('_NMR')) {
@@ -209,6 +256,7 @@ class WT_Controller_Branches extends WT_Controller_Page {
 				}
 				$fam_html .= '</ol>';
 			}
+
 			return '<li>' . $fam_html . '</li>';
 		} else {
 			// No spouses - just show the individual
@@ -216,8 +264,16 @@ class WT_Controller_Branches extends WT_Controller_Page {
 		}
 	}
 
+	/**
+	 * Convert a SOSA number into a generation number.  e.g. 8 = great-grandfather = 3 generations
+	 *
+	 * @param integer $sosa
+	 *
+	 * @return string
+	 */
 	private static function sosaGeneration($sosa) {
 		$generation = (int)log($sosa, 2) + 1;
+
 		return '<sup title="' . WT_I18N::translate('Generation') . '">' . $generation . '</sup>';
 	}
 }

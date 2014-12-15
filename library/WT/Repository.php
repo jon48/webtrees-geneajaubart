@@ -1,6 +1,4 @@
 <?php
-// Class file for a Repository (REPO) object
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -21,27 +19,57 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+/**
+ * Class WT_Repository - Class file for a Repository (REPO) object
+ */
 class WT_Repository extends WT_GedcomRecord {
 	const RECORD_TYPE = 'REPO';
-	const URL_PREFIX  = 'repo.php?rid=';
+	const URL_PREFIX = 'repo.php?rid=';
 
-	// Fetch the record from the database
+	/**
+	 * Get an instance of a repository object.  For single records,
+	 * we just receive the XREF.  For bulk records (such as lists
+	 * and search results) we can receive the GEDCOM data as well.
+	 *
+	 * @param string       $xref
+	 * @param integer|null $gedcom_id
+	 * @param string|null  $gedcom
+	 *
+	 * @return WT_Repository|null
+	 */
+	public static function getInstance($xref, $gedcom_id = WT_GED_ID, $gedcom = null) {
+		$record = parent::getInstance($xref, $gedcom_id, $gedcom);
+
+		if ($record instanceof WT_Repository) {
+			return $record;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	protected static function fetchGedcomRecord($xref, $gedcom_id) {
-		static $statement=null;
+		static $statement = null;
 
-		if ($statement===null) {
-			$statement=WT_DB::prepare("SELECT o_gedcom FROM `##other` WHERE o_id=? AND o_file=?");
+		if ($statement === null) {
+			$statement = WT_DB::prepare("SELECT o_gedcom FROM `##other` WHERE o_id=? AND o_file=?");
 		}
 
 		return $statement->execute(array($xref, $gedcom_id))->fetchOne();
 	}
 
-	// Generate a private version of this record
+	/**
+	 * {@inheritdoc}
+	 */
 	protected function createPrivateGedcomRecord($access_level) {
 		return '0 @' . $this->xref . "@ REPO\n1 NAME " . WT_I18N::translate('Private');
 	}
 
-	// Get an array of structures containing all the names in the record
+	/**
+	 * {@inheritdoc}
+	 */
 	public function extractNames() {
 		parent::_extractNames(1, 'NAME', $this->getFacts('NAME'));
 	}

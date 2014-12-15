@@ -429,9 +429,9 @@ case 'ALLOW_USER_THEMES':
 	break;
 
 case 'CALENDAR_FORMAT':
-	$d1=new WT_Date('22 SEP 1792'); $d1=$d1->Display(false, null, array());
-	$d2=new WT_Date('31 DEC 1805'); $d2=$d2->Display(false, null, array());
-	$d3=new WT_Date('15 OCT 1582'); $d3=$d3->Display(false, null, array());
+	$d1=new WT_Date('22 SEP 1792'); $d1=$d1->display();
+	$d2=new WT_Date('31 DEC 1805'); $d2=$d2->display();
+	$d3=new WT_Date('15 OCT 1582'); $d3=$d3->display();
 	$title=WT_I18N::translate('Calendar conversion');
 	$text=
 		'<p>'.
@@ -1215,7 +1215,7 @@ case 'export_gedcom':
 		WT_I18N::translate('This option will save the family tree to a GEDCOM file on the server.') .
 		'</p><p>' .
 		/* I18N: %s is a folder name */
-		WT_I18N::translate('GEDCOM files are stored in the %s folder.', '<b style="dir:auto;">' . WT_DATA_DIR . '</b>') .
+		WT_I18N::translate('GEDCOM files are stored in the %s folder.', '<b dir="auto">' . WT_DATA_DIR . '</b>') .
 		'</p>';
 	break;
 
@@ -1261,7 +1261,7 @@ case 'import_gedcom':
 		WT_I18N::translate('This option deletes all the genealogy data in your family tree and replaces it with data from a GEDCOM file on the server.') .
 		'</p><p>' .
 		/* I18N: %s is a folder name */
-		WT_I18N::translate('GEDCOM files are stored in the %s folder.', '<b style="dir:auto;">' . WT_DATA_DIR . '</b>') .
+		WT_I18N::translate('GEDCOM files are stored in the %s folder.', '<b dir="auto">' . WT_DATA_DIR . '</b>') .
 		'</p>';
 	break;
 

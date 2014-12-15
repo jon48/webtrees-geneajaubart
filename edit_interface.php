@@ -5,7 +5,7 @@
 // Copyright (C) 2014 webtrees development team.
 //
 // Derived from PhpGedView
-// Copyright (C) 2002 to 2009 PGV Development Team.  All rights reserved.
+// Copyright (C) 2002 to 2009 PGV Development Team.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ case 'editraw':
 			<?php echo WT_Filter::getCsrf(); ?>
 			<ul id="raw-gedcom-list">
 				<?php foreach ($record->getFacts() as $fact) { ?>
-					<?php if (!$fact->isOld()) { ?>
+					<?php if (!$fact->isPendingDeletion()) { ?>
 					<li>
 						<div style="cursor:move;">
 							<?php echo $fact->summary(); ?>
@@ -1687,7 +1687,7 @@ case 'reorder_media':
 	foreach ($record_list as $record) {
 		if ($record->canShow()) {
 			foreach ($record->getFacts() as $fact) {
-				if (!$fact->isOld()) {
+				if (!$fact->isPendingDeletion()) {
 					preg_match_all('/(?:^1|\n\d) OBJE @(' . WT_REGEX_XREF . ')@/', $fact->getGedcom(), $matches);
 					foreach ($matches[1] as $match) {
 						$media = WT_Media::getInstance($match);
@@ -2051,8 +2051,6 @@ case 'changefamily_update':
 		exit;
 	}
 
-	//TODO use CHIL[] instead of CHIL<n>
-	//$CHIL      = WT_Filter::postArray('CHIL', WT_REGEX_XREF);
 	$CHIL = array();
 	for ($i=0; ;++$i) {
 		if (isset($_POST['CHIL'.$i])) {
@@ -2262,7 +2260,7 @@ function keep_chan(WT_GedcomRecord $record=null) {
 		if ($record) {
 			$details =
 				WT_Gedcom_Tag::getLabelValue('DATE', $record->lastChangeTimestamp()) .
-				WT_Gedcom_Tag::getLabelValue('_WT_USER', $record->lastChangeUser());
+				WT_Gedcom_Tag::getLabelValue('_WT_USER', WT_Filter::escapeHtml($record->lastChangeUser()));
 		} else {
 			$details = '';
 		}
@@ -2489,7 +2487,7 @@ function print_indi_form($nextaction, WT_Individual $person=null, WT_Family $fam
 			// Mother gives her surname to her children
 			switch ($nextaction) {
 			case 'add_child_to_family_action':
-				if (preg_match('/\/((?:[a-z]{2,3} )*)(.*)\//i', $mother, $match)) {
+				if (preg_match('/\/((?:[a-z]{2,3} )*)(.*)\//i', $mother_name, $match)) {
 					$name_fields['SURN']=$match[2];
 					$name_fields['SPFX']=trim($match[1]);
 					$name_fields['NAME']="/{$match[1]}{$match[2]}/";

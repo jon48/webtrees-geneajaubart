@@ -92,12 +92,90 @@ class WT_I18N {
 		'’' => '‘',
 	);
 
+	/** @var string[] The names of all currently supported languages */
+	private static $language_data = array(
+		'af' => array('Latn', 'Afrikaans'),
+		'ar' => array('Arab', 'العربية'),
+		'bg' => array('Cyrl', 'български'),
+		'bs' => array('Latn', 'bosanski'),
+		'ca' => array('Latn', 'català'),
+		'cs' => array('Latn', 'čeština'),
+		'da' => array('Latn', 'dansk'),
+		'de' => array('Latn', 'Deutsch'),
+		'dv' => array('Thaa', 'ދިވެހިބަސް'),
+		'el' => array('Grek', 'Ελληνικά'),
+		'en' => array('Latn', 'English'),
+		'en-AU' => array('Latn', 'Australian English'),
+		'en-GB' => array('Latn', 'British English'),
+		'en-US' => array('Latn', 'U.S. English'),
+		'es' => array('Latn', 'español'),
+		'et' => array('Latn', 'eesti'),
+		'fa' => array('Arab', 'فارسی'),
+		'fi' => array('Latn', 'suomi'),
+		'fo' => array('Latn', 'føroyskt'),
+		'fr' => array('Latn', 'français'),
+		'fr-CA' => array('Latn', 'français canadien'),
+		'gl' => array('Latn', 'galego'),
+		'haw' => array('Latn', 'ʻŌlelo Hawaiʻi'),
+		'he' => array('Hebr', 'עברית'),
+		'hr' => array('Latn', 'hrvatski'),
+		'hu' => array('Latn', 'magyar'),
+		'id' => array('Latn', 'Bahasa Indonesia'),
+		'is' => array('Latn', 'íslenska'),
+		'it' => array('Latn', 'italiano'),
+		'ja' => array('Kana', '日本語'),
+		'ka' => array('Geor', 'ქართული'),
+		'ko' => array('Kore', '한국어'),
+		'lt' => array('Latn', 'lietuvių'),
+		'lv' => array('Latn', 'latviešu'),
+		'mi' => array('Latn', 'Māori'),
+		'mr' => array('Mymr', 'मराठी'),
+		'ms' => array('Latn', 'Bahasa Melayu'),
+		'nb' => array('Latn', 'norsk bokmål'),
+		'ne' => array('Deva', 'नेपाली'),
+		'nl' => array('Latn', 'Nederlands'),
+		'nn' => array('Latn', 'nynorsk'),
+		'oc' => array('Latn', 'occitan'),
+		'pl' => array('Latn', 'polski'),
+		'pt' => array('Latn', 'português'),
+		'pt-BR' => array('Latn', 'português do Brasil'),
+		'ro' => array('Latn', 'română'),
+		'ru' => array('Cyrl', 'русский'),
+		'sk' => array('Latn', 'slovenčina'),
+		'sl' => array('Latn', 'slovenščina'),
+		'sr' => array('Cyrl', 'Српски'),
+		'sr-Latn' => array('Latn', 'srpski'),
+		'sv' => array('Latn', 'svenska'),
+		'ta' => array('Taml', 'தமிழ்'),
+		'tr' => array('Latn', 'Türkçe'),
+		'tt' => array('Cyrl', 'Татар'),
+		'uk' => array('Cyrl', 'українська'),
+		'vi' => array('Latn', 'Tiếng Việt'),
+		'yi' => array('Hebr', 'ייִדיש'),
+		'zh' => array('Hans', '中文'),
+		'zh-CN' => array('Hans', '简体中文'),
+		'zh-TW' => array('Hant', '繁體中文'),
+	);
+
+	/** @var string the name of the current locale, such as fr or en_GB */
 	public  static $locale;
+
+	/** @var string The MySQL collation sequence used by this language, typically utf8_unicode_ci */
 	public  static $collation;
+
+	/** @var string Puncutation used to separate list items, typically a comma */
 	public  static $list_separator;
+
+	/** @var string Text direction; ltr or rtl */
 	private static $dir;
+
+	/** @var Zend_Cache_Core */
 	private static $cache;
+
+	/** @var string The numbering system used by this language; typically latin digits */
 	private static $numbering_system;
+
+	/** @var Zend_Translate */
 	private static $translation_adapter;
 
 	/**
@@ -184,20 +262,20 @@ class WT_I18N {
 		Zend_Registry::set('Zend_Translate', self::$translation_adapter);
 
 		// Load any local user translations
-		if (is_dir(WT_DATA_DIR.'language')) {
-			if (file_exists(WT_DATA_DIR.'language/'.$locale.'.mo')) {
+		if (is_dir(WT_DATA_DIR . 'language')) {
+			if (file_exists(WT_DATA_DIR . 'language/' . $locale . '.mo')) {
 				self::addTranslation(
-					new Zend_Translate('gettext', WT_DATA_DIR.'language/'.$locale.'.mo', $locale)
+					new Zend_Translate('gettext', WT_DATA_DIR.'language/' . $locale . '.mo', $locale)
 				);
 			}
-			if (file_exists(WT_DATA_DIR.'language/'.$locale.'.php')) {
+			if (file_exists(WT_DATA_DIR.'language/' . $locale . '.php')) {
 				self::addTranslation(
-					new Zend_Translate('array', WT_DATA_DIR.'language/'.$locale.'.php', $locale)
+					new Zend_Translate('array', WT_DATA_DIR . 'language/' . $locale . '.php', $locale)
 				);
 			}
-			if (file_exists(WT_DATA_DIR.'language/'.$locale.'.csv')) {
+			if (file_exists(WT_DATA_DIR . 'language/' . $locale . '.csv')) {
 				self::addTranslation(
-					new Zend_Translate('csv', WT_DATA_DIR.'language/'.$locale.'.csv', $locale)
+					new Zend_Translate('csv', WT_DATA_DIR . 'language/' . $locale . '.csv', $locale)
 				);
 			}
 		}
@@ -246,7 +324,7 @@ class WT_I18N {
 	 * @param Zend_Translate $translation
 	 */
 	public static function addTranslation(Zend_Translate $translation) {
-		self::$translation_adapter->addTranslation($translation);
+		self::$translation_adapter->getAdapter()->addTranslation(array('content' => $translation));
 	}
 
 	/**
@@ -313,8 +391,8 @@ class WT_I18N {
 	 * fr: 12 345,67
 	 * de: 12.345,67
 	 *
-	 * @param float $n
-	 * @param int   $precision
+	 * @param float   $n
+	 * @param integer $precision
 	 *
 	 * @return string
 	 */
@@ -330,7 +408,7 @@ class WT_I18N {
 	 *
 	 * Used for years, etc., where we do not want thousands-separators, decimals, etc.
 	 *
-	 * @param int $n
+	 * @param integer $n
 	 *
 	 * @return string
 	 */
@@ -350,10 +428,10 @@ class WT_I18N {
 	 * fr: 12,3 %
 	 * de: 12,3%
 	 *
-	 * @param     $n
-	 * @param int $precision
+	 * @param float   $n
+	 * @param integer $precision
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public static function percentage($n, $precision=0) {
 		return
@@ -371,7 +449,7 @@ class WT_I18N {
 	 */
 	public static function translate(/* var_args */) {
 		$args = func_get_args();
-		$args[0] = self::$translation_adapter->_($args[0]);
+		$args[0] = self::$translation_adapter->getAdapter()->_($args[0]);
 
 		return call_user_func_array('sprintf', $args);
 	}
@@ -387,7 +465,7 @@ class WT_I18N {
 	public static function translate_c(/* var_args */) {
 		$args = func_get_args();
 		$msgid = $args[0] . "\x04" . $args[1];
-		$msgtxt = self::$translation_adapter->_($msgid);
+		$msgtxt = self::$translation_adapter->getAdapter()->_($msgid);
 		if ($msgtxt == $msgid) {
 			$msgtxt = $args[1];
 		}
@@ -408,7 +486,7 @@ class WT_I18N {
 	 * @return string
 	 */
 	public static function noop($string) {
-		return self::$translation_adapter->_($string);
+		return self::$translation_adapter->getAdapter()->_($string);
 	}
 
 	/**
@@ -422,7 +500,7 @@ class WT_I18N {
 	 */
 	public static function plural(/* var_args */) {
 		$args = func_get_args();
-		$string = self::$translation_adapter->plural($args[0], $args[1], $args[2]);
+		$string = self::$translation_adapter->getAdapter()->plural($args[0], $args[1], $args[2]);
 		array_splice($args, 0, 3, array($string));
 
 		return call_user_func_array('sprintf', $args);
@@ -495,23 +573,19 @@ class WT_I18N {
 	/**
 	 * Convert a number of seconds into a relative time.  For example, 630 => "10 hours, 30 minutes ago"
 	 *
-	 * @param int $seconds
+	 * @param integer $seconds
 	 *
 	 * @return string
 	 *
 	 * @todo Does Nesbot\Carbon do this for us?
 	 */
-	public static function time_ago($seconds) {
-		$year   = 365*24*60*60;
-		$month  = 30*24*60*60;
-		$day    = 24*60*60;
-		$hour   = 60*60;
+	public static function timeAgo($seconds) {
 		$minute = 60;
+		$hour   = 60 * $minute;
+		$day    = 24 * $hour;
+		$month  = 30 * $day;
+		$year   = 365 * $day;
 
-		// TODO: Display two units (years+months), (months+days), etc.
-		// This requires "contexts".  i.e. "%s months" has a different translation
-		// in different contexts.
-		// We must AVOID combining phrases to make sentences.
 		if ($seconds>$year) {
 			$years=(int)($seconds/$year);
 			return self::plural('%s year ago', '%s years ago', $years, self::number($years));
@@ -534,154 +608,36 @@ class WT_I18N {
 
 	/**
 	 * Return the endonym for a given language - as per http://cldr.unicode.org/
-	 *
-	 * @param $language
+	 * 
+	 * @param string $locale
 	 *
 	 * @return string
 	 */
-	public static function languageName($language) {
-		switch (str_replace(array('_', '@'), '-', $language)) {
-		case 'af':      return 'Afrikaans';
-		case 'ar':      return 'العربية';
-		case 'bg':      return 'български';
-		case 'bs':      return 'bosanski';
-		case 'ca':      return 'català';
-		case 'cs':      return 'čeština';
-		case 'da':      return 'dansk';
-		case 'de':      return 'Deutsch';
-		case 'dv':      return 'ދިވެހިބަސް';
-		case 'el':      return 'Ελληνικά';
-		case 'en':      return 'English';
-		case 'en-AU':   return 'Australian English';
-		case 'en-GB':   return 'British English';
-		case 'en-US':   return 'U.S. English';
-		case 'es':      return 'español';
-		case 'et':      return 'eesti';
-		case 'fa':      return 'فارسی';
-		case 'fi':      return 'suomi';
-		case 'fo':      return 'føroyskt';
-		case 'fr':      return 'français';
-		case 'fr-CA':   return 'français canadien';
-		case 'gl':      return 'galego';
-		case 'haw':     return 'ʻŌlelo Hawaiʻi';
-		case 'he':      return 'עברית';
-		case 'hr':      return 'hrvatski';
-		case 'hu':      return 'magyar';
-		case 'id':      return 'Bahasa Indonesia';
-		case 'is':      return 'íslenska';
-		case 'it':      return 'italiano';
-		case 'ja':      return '日本語';
-		case 'ka':      return 'ქართული';
-		case 'ko':      return '한국어';
-		case 'lt':      return 'lietuvių';
-		case 'lv':      return 'latviešu';
-		case 'mi':      return 'Māori';
-		case 'mr':      return 'मराठी';
-		case 'ms':      return 'Bahasa Melayu';
-		case 'nb':      return 'norsk bokmål';
-		case 'ne':      return 'नेपाली';
-		case 'nl':      return 'Nederlands';
-		case 'nn':      return 'nynorsk';
-		case 'oc':      return 'occitan';
-		case 'pl':      return 'polski';
-		case 'pt':      return 'português';
-		case 'pt-BR':   return 'português do Brasil';
-		case 'ro':      return 'română';
-		case 'ru':      return 'русский';
-		case 'sk':      return 'slovenčina';
-		case 'sl':      return 'slovenščina';
-		case 'sr':      return 'Српски';
-		case 'sr-Latn': return 'srpski';
-		case 'sv':      return 'svenska';
-		case 'ta':      return 'தமிழ்';
-		case 'tr':      return 'Türkçe';
-		case 'tt':      return 'Татар';
-		case 'uk':      return 'українська';
-		case 'vi':      return 'Tiếng Việt';
-		case 'yi':      return 'ייִדיש';
-		case 'zh':      return '中文';
-		case 'zh-CN':   return '简体中文'; // Simplified Chinese
-		case 'zh-TW':   return '繁體中文'; // Traditional Chinese
-		default:
-			// Use the PHP/intl library, if it exists
-			if (class_exists('\\Locale')) {
-				return Locale::getDisplayName($language, $language);
-			}
-			return $language;
+	public static function languageName($locale) {
+		$language_tag = str_replace(array('_', '@'), '-', $locale);
+
+		if (array_key_exists($language_tag, self::$language_data)) {
+			return self::$language_data[$language_tag][1];
+		} elseif (class_exists('\Locale')) {
+			return Locale::getDisplayName($locale, $locale);
+		} else {
+			return $locale;
 		}
 	}
 
 	/**
 	 * Return the script used by a given language
 	 *
-	 * @param string $language
+	 * @param string $locale
 	 *
 	 * @return string
 	 */
-	public static function languageScript($language) {
-		switch (str_replace(array('_', '@'), '-', $language)) {
-		case 'af':      return 'Latn';
-		case 'ar':      return 'Arab';
-		case 'bg':      return 'Cyrl';
-		case 'bs':      return 'Latn';
-		case 'ca':      return 'Latn';
-		case 'cs':      return 'Latn';
-		case 'da':      return 'Latn';
-		case 'de':      return 'Latn';
-		case 'dv':      return 'Thaa';
-		case 'el':      return 'Grek';
-		case 'en':      return 'Latn';
-		case 'en-AU':   return 'Latn';
-		case 'en-GB':   return 'Latn';
-		case 'en-US':   return 'Latn';
-		case 'es':      return 'Latn';
-		case 'et':      return 'Latn';
-		case 'fa':      return 'Arab';
-		case 'fi':      return 'Latn';
-		case 'fo':      return 'Latn';
-		case 'fr':      return 'Latn';
-		case 'fr-CA':   return 'Latn';
-		case 'gl':      return 'Latn';
-		case 'haw':     return 'Latn';
-		case 'he':      return 'Hebr';
-		case 'hr':      return 'Latn';
-		case 'hu':      return 'Latn';
-		case 'id':      return 'Latn';
-		case 'is':      return 'Latn';
-		case 'it':      return 'Latn';
-		case 'ja':      return 'Kana';
-		case 'ka':      return 'Geor';
-		case 'ko':      return 'Kore';
-		case 'lt':      return 'Latn';
-		case 'lv':      return 'Latn';
-		case 'mi':      return 'Latn';
-		case 'mr':      return 'Mymr';
-		case 'ms':      return 'Latn';
-		case 'nb':      return 'Latn';
-		case 'ne':      return 'Deva';
-		case 'nl':      return 'Latn';
-		case 'nn':      return 'Latn';
-		case 'oc':      return 'Latn';
-		case 'pl':      return 'Latn';
-		case 'pt':      return 'Latn';
-		case 'pt-BR':   return 'Latn';
-		case 'ro':      return 'Latn';
-		case 'ru':      return 'Cyrl';
-		case 'sk':      return 'Latn';
-		case 'sl':      return 'Latn';
-		case 'sr':      return 'Cyrl';
-		case 'sr-Latn': return 'Latn';
-		case 'sv':      return 'Latn';
-		case 'ta':      return 'Taml';
-		case 'tr':      return 'Latn';
-		case 'tt':      return 'Cyrl';
-		case 'uk':      return 'Cyrl';
-		case 'vi':      return 'Latn';
-		case 'yi':      return 'Hebr';
-		case 'zh':      return 'Hans';
-		case 'zh-CN':   return 'Hans';
-		case 'zh-TW':   return 'Hant';
-		default:
+	public static function languageScript($locale) {
+		$language_tag = str_replace(array('_', '@'), '-', $locale);
+
+		if (array_key_exists($language_tag, self::$language_data)) {
+			return self::$language_data[$language_tag][0];
+		} else {
 			return 'Latn';
 		}
 	}
@@ -798,7 +754,7 @@ class WT_I18N {
 	 * @param string $string1
 	 * @param string $string2
 	 *
-	 * @return int
+	 * @return integer
 	 */
 	public static function strcasecmp($string1, $string2) {
 		$strpos1 = 0;

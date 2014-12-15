@@ -78,7 +78,7 @@ switch (WT_Filter::post('action')) {
 case 'delete':
 	$gedcom_id = WT_Filter::postInteger('gedcom_id');
 	if (WT_Filter::checkCsrf() && $gedcom_id) {
-		WT_Tree::delete($gedcom_id);
+		WT_Tree::get($gedcom_id)->delete();
 	}
 	header('Location: ' . WT_SERVER_NAME . WT_SCRIPT_PATH . WT_SCRIPT_NAME);
 	break;
@@ -189,12 +189,12 @@ foreach (WT_Tree::GetAll() as $tree) {
 			'</th><td>';
 
 		// The third row shows an optional progress bar and a list of maintenance options
-		$importing=WT_DB::prepare(
-			"SELECT 1 FROM `##gedcom_chunk` WHERE gedcom_id=? AND imported=0 LIMIT 1"
+		$importing = WT_DB::prepare(
+			"SELECT 1 FROM `##gedcom_chunk` WHERE gedcom_id = ? AND imported = '0' LIMIT 1"
 		)->execute(array($tree->tree_id))->fetchOne();
 		if ($importing) {
-			$in_progress=WT_DB::prepare(
-				"SELECT 1 FROM `##gedcom_chunk` WHERE gedcom_id=? AND imported=1 LIMIT 1"
+			$in_progress = WT_DB::prepare(
+				"SELECT 1 FROM `##gedcom_chunk` WHERE gedcom_id = ? AND imported = '1' LIMIT 1"
 			)->execute(array($tree->tree_id))->fetchOne();
 			if (!$in_progress) {
 				echo '<div id="import', $tree->tree_id, '"><div id="progressbar', $tree->tree_id, '"><div style="position:absolute;">', WT_I18N::translate('Deleting old genealogy data…'), '</div></div></div>';

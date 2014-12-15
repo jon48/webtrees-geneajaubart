@@ -1,12 +1,4 @@
 <?php
-// Classes for Gedcom Date/Calendar functionality.
-//
-// Definitions for the Gregorian calendar
-//
-// NOTE: Since different calendars start their days at different times, (civil
-// midnight, solar midnight, sunset, sunrise, etc.), we convert on the basis of
-// midday.
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 Greg Roach
 //
@@ -26,21 +18,26 @@
 
 use Fisharebest\ExtCalendar\GregorianCalendar;
 
+/**
+ * Class WT_Date_Gregorian - Definitions for the Gregorian calendar
+ */
 class WT_Date_Gregorian extends WT_Date_Calendar {
 	const CALENDAR_ESCAPE = '@#DGREGORIAN@';
-	const CAL_START_JD    = 2299161; // 15 OCT 1582
+	const CAL_START_JD = 2299161; // 15 OCT 1582
 
 	/**
-	 * Create a new calendar date
-	 *
-	 * @param mixed $date
+	 * {@inheritdoc}
 	 */
 	public function __construct($date) {
 		$this->calendar = new GregorianCalendar;
 		parent::__construct($date);
 	}
 
-	static function calendarName() {
-		return /* I18N: The gregorian calendar */ WT_I18N::translate('Gregorian');
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function calendarName() {
+		return /* I18N: The gregorian calendar */
+			WT_I18N::translate('Gregorian');
 	}
 }

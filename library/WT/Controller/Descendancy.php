@@ -1,6 +1,4 @@
 <?php
-// Controller for the descendancy chart
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -22,6 +20,10 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 use Rhumsaa\Uuid\Uuid;
+
+/**
+ * Class WT_Controller_Descendancy - Controller for the descendancy chart
+ */
 class WT_Controller_Descendancy extends WT_Controller_Chart {
 	var $descPerson = null;
 
@@ -46,6 +48,9 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 	var $cellwidth;
 	var $show_cousins;
 
+	/**
+	 * Create the descendancy controller
+	 */
 	function __construct() {
 		global $bwidth, $bheight, $cbwidth, $cbheight, $pbwidth, $pbheight, $PEDIGREE_FULL_DETAILS, $MAX_DESCENDANCY_GENERATIONS, $DEFAULT_PEDIGREE_GENERATIONS, $show_full;
 
@@ -98,20 +103,20 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 	 * Print a child family
 	 *
 	 * @param WT_Individual $person
-	 * @param int           $depth the descendancy depth to show
+	 * @param integer       $depth the descendancy depth to show
 	 * @param string        $label
 	 * @param string        $gpid
 	 *
 	 * @return void
 	 */
-	function print_child_family(WT_Individual $person, $depth, $label='1.', $gpid='') {
+	public function printChildFamily(WT_Individual $person, $depth, $label='1.', $gpid='') {
 
 		if ($depth<2) return;
 		foreach ($person->getSpouseFamilies() as $family) {
 			print_sosa_family($family->getXref(), '', -1, $label, $person->getXref(), $gpid);
 			$i=1;
 			foreach ($family->getChildren() as $child) {
-				$this->print_child_family($child, $depth-1, $label.($i++).'.', $person->getXref());
+				$this->printChildFamily($child, $depth-1, $label.($i++).'.', $person->getXref());
 			}
 		}
 	}
@@ -120,11 +125,11 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 	 * print a child descendancy
 	 *
 	 * @param WT_Individual $person
-	 * @param int           $depth the descendancy depth to show
+	 * @param integer       $depth the descendancy depth to show
 	 *
 	 * @return void
 	 */
-	function print_child_descendancy(WT_Individual $person, $depth) {
+	public function printChildDescendancy(WT_Individual $person, $depth) {
 		global $WT_IMAGES, $Dindent;
 
 		echo "<li>";
@@ -170,7 +175,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 
 		// loop for each spouse
 		foreach ($person->getSpouseFamilies() as $family) {
-			$this->print_family_descendancy($person, $family, $depth);
+			$this->printFamilyDescendancy($person, $family, $depth);
 		}
 	}
 
@@ -179,11 +184,11 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 	 *
 	 * @param WT_Individual $person
 	 * @param WT_Family     $family
-	 * @param int           $depth the descendancy depth to show
+	 * @param integer       $depth the descendancy depth to show
 	 *
 	 * @return void
 	 */
-	function print_family_descendancy(WT_Individual $person, WT_Family $family, $depth) {
+	private function printFamilyDescendancy(WT_Individual $person, WT_Family $family, $depth) {
 		global $WT_IMAGES, $Dindent;
 
 		$uid = Uuid::uuid4(); // create a unique ID
@@ -239,7 +244,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 		echo '</td></tr></table>';
 		echo '</li>';
 		if ($depth>1) foreach ($children as $child) {
-			$this->print_child_descendancy($child, $depth-1);
+			$this->printChildDescendancy($child, $depth-1);
 		}
 		echo '</ul>';
 		echo '</li>';
@@ -249,12 +254,12 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 	 * Find all the individuals that are descended from an individual.
 	 *
 	 * @param WT_Individual   $person
-	 * @param int             $n
+	 * @param integer         $n
 	 * @param WT_Individual[] $array
 	 *
 	 * @return WT_Individual[]
 	 */
-	public function indi_desc(WT_Individual $person, $n, $array) {
+	public function individualDescendancy(WT_Individual $person, $n, $array) {
 		if ($n < 1) {
 			return $array;
 		}
@@ -265,7 +270,7 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 				$array[$spouse->getXref()] = $spouse;
 			}
 			foreach ($family->getChildren() as $child) {
-				$array = $this->indi_desc($child, $n-1, $array);
+				$array = $this->individualDescendancy($child, $n-1, $array);
 			}
 		}
 		return $array;
@@ -275,19 +280,19 @@ class WT_Controller_Descendancy extends WT_Controller_Chart {
 	 * Find all the families that are descended from an individual.
 	 *
 	 * @param WT_Individual $person
-	 * @param int           $n
+	 * @param integer       $n
 	 * @param WT_Family[]   $array
 	 *
 	 * @return WT_Family[]
 	 */
-	public function fam_desc($person, $n, $array) {
+	public function familyDescendancy($person, $n, $array) {
 		if ($n < 1) {
 			return $array;
 		}
 		foreach ($person->getSpouseFamilies() as $family) {
 			$array[$family->getXref()]=$family;
 			foreach ($family->getChildren() as $child) {
-				$array = $this->fam_desc($child, $n-1, $array);
+				$array = $this->familyDescendancy($child, $n-1, $array);
 			}
 		}
 		return $array;
