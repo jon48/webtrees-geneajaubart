@@ -371,7 +371,6 @@ return array(
 	'Done'							=>	'Terminé',
 	'%s Settings'					=>	'Configuration : %s',
 	'no_token_defined'				=>	'aucun_jeton_défini',
-	'webtrees Site Administrator'	=>	'Administrateur webtrees',
 	'Healthcheck Email'				=>	'État du système',
 	'Health Check Report'			=>	'État du système',
 	'Enable healthcheck emails for <em>%s</em>'

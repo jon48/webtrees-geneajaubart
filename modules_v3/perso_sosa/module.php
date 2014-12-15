@@ -586,9 +586,9 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 				continue;
 			}
 			$dperson = new WT_Perso_Individual($person);
-			if ($person->isNew()) {
+			if ($person->isPendingAddtion()) {
 				$class = ' class="new"';
-			} elseif ($person->isOld()) {
+			} elseif ($person->isPendingDeletion()) {
 				$class = ' class="old"';
 			} else {
 				$class = '';
@@ -1107,9 +1107,9 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			if (!$sfamily->canShow()) {
 				continue;
 			}
-			if ($sfamily->isNew()) {
+			if ($sfamily->isPendingAddtion()) {
 				$class = ' class="new"';
-			} elseif ($sfamily->isOld()) {
+			} elseif ($sfamily->isPendingDeletion()) {
 				$class = ' class="old"';
 			} else {
 				$class = '';

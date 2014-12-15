@@ -14,19 +14,19 @@ if (!defined('WT_WEBTREES')) {
 
 require_once WT_ROOT.'includes/functions/functions_print_lists.php';
 
-global $SEARCH_SPIDER, $SURNAME_LIST_STYLE, $UNKNOWN_NN, $controller;
+global $SEARCH_SPIDER, $UNKNOWN_NN, $WT_TREE, $controller;
 
 $controller=new WT_Controller_Page();
 
 // We show three different lists: initials, surnames and individuals
 // Note that the data may contain special chars, such as surname="<unknown>",
 $alpha   =WT_Filter::get('alpha'); // All surnames beginning with this letter where "@"=unknown and ","=none
-$surname =WT_Filter::get('surname'); // All indis with this surname.  NB - allow ' and "
+$surname =WT_Filter::get('surname'); // All indis with this surname
 $show_all=WT_Filter::get('show_all', 'no|yes', 'no'); // All indis
 
 // Make sure selections are consistent.
 // i.e. can't specify show_all and surname at the same time.
-if ($show_all=='yes') {
+if ($show_all==='yes') {
 	$alpha='';
 	$surname='';
 	$legend=WT_I18N::translate('All');
@@ -35,20 +35,20 @@ if ($show_all=='yes') {
 } elseif ($surname) {
 	$alpha=WT_Query_Name::initialLetter($surname);
 	$show_all='no';
-	if ($surname=='@N.N.') {
+	if ($surname==='@N.N.') {
 		$legend=$UNKNOWN_NN;
 	} else {
 		$legend=WT_Filter::escapeHtml($surname);
 	}
 	$url='module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&surname='.rawurlencode($surname).'&amp;ged='.WT_GEDURL;
 	$show='lineage'; // SURN list makes no sense here
-}  elseif ($alpha=='@') {
+}  elseif ($alpha==='@') {
 	$show_all='no';
 	$legend=$UNKNOWN_NN;
 	$url='module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&alpha='.rawurlencode($alpha).'&amp;ged='.WT_GEDURL;
 	$show='lineage'; // SURN list makes no sense here
 	$surname='@N.N.';
-} elseif ($alpha==',') {
+} elseif ($alpha===',') {
 	$show_all='no';
 	$legend=WT_I18N::translate('None');
 	$url='module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&alpha='.rawurlencode($alpha).'&amp;ged='.WT_GEDURL;
@@ -97,7 +97,7 @@ foreach (WT_Query_Name::surnameAlpha(false, false, WT_GED_ID) as $letter=>$count
 
 // Search spiders don't get the "show all" option as the other links give them everything.
 if (!$SEARCH_SPIDER) {
-	if ($show_all=='yes') {
+	if ($show_all==='yes') {
 		$list[]='<span class="warning">'.WT_I18N::translate('All').'</span>';
 	} else {
 		$list[]='<a href="module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&show_all=yes'.'&amp;ged='.WT_GEDURL.'">'.WT_I18N::translate('All').'</a>';
@@ -106,11 +106,11 @@ if (!$SEARCH_SPIDER) {
 
 echo '<p class="center alpha_index">', join(' | ', $list), '</p>';
 
-if ($show=='lineage' || $show=='surn') {
+if ($show==='lineage' || $show==='surn') {
 	$surns=WT_Query_Name::surnames($surname, $alpha, false, false, WT_GED_ID);
-	if ($show=='surn') {
+	if ($show==='surn') {
 		// Show the surname list
-		switch ($SURNAME_LIST_STYLE) {
+		switch ($WT_TREE->getPreference('SURNAME_LIST_STYLE')) {
 		case 'style1';
 			echo format_surname_list($surns, 3, true, 'module.php', '&mod=perso_patronymiclineage&mod_action=patronymiclineage');
 			break;
@@ -126,7 +126,7 @@ if ($show=='lineage' || $show=='surn') {
 		//Link to indilist
 		echo '<p class="center"><strong><a href="indilist.php?ged='.WT_GEDCOM.'&surname='.urlencode($surname).'">'.WT_I18N::translate('Go to the list of individuals with surname %s', $legend).'</a></strong></p>';
 		
-		if ($legend && $show_all=='no') {
+		if ($legend && $show_all==='no') {
 			$legend=WT_I18N::translate('Individuals in %s lineages', $legend);
 		}
 		

@@ -66,12 +66,11 @@ html[dir='rtl'] .certificate-list th:last-child, html[dir='rtl'] .sosa-indi-list
 html[dir='rtl'] #perso-header {margin: 0 0 0 10px;}
 
 /* Individual header extender hooks */
-#indi_perso_header{float: right;width: 84%;color: #62584D;font-size: 1.1em;margin-top: 5px;}
-html[dir='rtl'] #indi_perso_header {float: left;}
-#indi_perso_header_left{float: left;padding-left: 5px;text-align: left;}
-html[dir='rtl'] #indi_perso_header_left {float: right;}
-#indi_perso_header_right{float: right;padding-right: 5px;text-align: right;}
-html[dir='rtl'] #indi_perso_header_right { float: left;}
+#indi_perso_header{color: #62584D;font-size: 1.1em;margin-top: 5px;}
+#indi_perso_header_left{float: left;text-align: left;}
+html[dir='rtl'] #indi_perso_header_left {float: right;text-align: right;}
+#indi_perso_header_right{float: right;padding-left: 0; padding-right: 10px;text-align: right;}
+html[dir='rtl'] #indi_perso_header_right { float: left; padding-left: 10px; padding-right: 0;text-align: left;}
 .indi_perso_header_left_div, .indi_perso_header_right_div {display: block;}
 #indi_perso_icons{float: right;}
 html[dir='rtl'] #indi_perso_icons { float: left;}

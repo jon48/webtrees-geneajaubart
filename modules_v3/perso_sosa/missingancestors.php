@@ -51,9 +51,9 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 		}
 		$dperson = new WT_Perso_Individual($person);
 		$sumMissingDifferentWithoutHidden += $miss['father'] + $miss['mother'];
-		if ($person->isNew()) {
+		if ($person->isPendingAddtion()) {
 			$class = ' class="new"';
-		} elseif ($person->isOld()) {
+		} elseif ($person->isPendingDeletion()) {
 			$class = ' class="old"';
 		} else {
 			$class = '';

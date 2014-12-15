@@ -81,7 +81,6 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 		foreach(WT_Tree::getAll() as $tree){
 			$isTreeEnabled = $tree->getPreference('PAT_'.$this->getName().'_ENABLED');
 			if((is_null($isTreeEnabled) || $isTreeEnabled) && $webmaster = User::find($tree->getPreference('WEBMASTER_USER_ID'))){
-				$webtrees_email_from =$tree->getPreference('WEBTREES_EMAIL');
 				WT_I18N::init($webmaster->getPreference('language'));
 				
 				$subject = WT_I18N::translate('Health Check Report').' - '.WT_I18N::translate('Tree %s', $tree->tree_title);
@@ -171,17 +170,11 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 					$message .= WT_I18N::translate('No errors', $nb_errors).WT_Mail::EOL.WT_Mail::EOL;
 				}
 				
-				//Send mail
-				$mail = array();
-				$mail['to']= $webmaster->getUserName() ;
-				$mail['from'] = $webtrees_email_from;
-				$mail['from_name'] = WT_I18N::translate('webtrees Site Administrator');
-				$mail['from_email'] = $mail['from'];
-				$mail['subject'] = $subject;
-				$mail['body'] = $message;
-				$mail['method'] = $webmaster->getPreference('contactmethod');
-				$mail['no_from'] = true;				
-				$tmpres = addMessage($mail);
+				$tmpres = true;
+				if($webmaster->getPreference('contactmethod') !== 'messaging' 
+						&& $webmaster->getPreference('contactmethod') !== 'none') {
+					$tmpres = WT_Mail::systemMessage($tree, $webmaster, $subject, $message);
+				}		
 				$res = $tmpres && (!$one_tree_done || $one_tree_done && $res);
 				$one_tree_done = true;
 			}
