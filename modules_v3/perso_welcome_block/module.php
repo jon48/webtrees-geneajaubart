@@ -7,10 +7,7 @@
  * @author Jonathan Jaubart <dev@jaubart.com>
 */
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
+use WT\Auth;
 
 class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block {
 	// Extend class WT_Module
@@ -36,7 +33,7 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 	
 	// Implement class WT_Module_Block
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $ctype, $controller;
+		global $controller;
 		
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
@@ -46,8 +43,9 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 				  jQuery("#perso-passwd_click").click(function()
 				  {
 					jQuery("#perso-new_passwd").slideToggle(100, function() {
-						jQuery("#perso-username").focus();
+						jQuery("#perso-new_passwd_username").focus();
 					});
+					return false;
 				  });
 			');
 		
@@ -55,7 +53,7 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		$indi_xref=$controller->getSignificantIndividual()->getXref();
 		$id=$this->getName().$block_id;
 		$class=$this->getName().'_block';
-		if (WT_USER_IS_ADMIN) {
+		if (Auth::isAdmin()) {
 			$title='<i class="icon-admin" title="'.WT_I18N::translate('Configure').'" onclick="modalDialog(\'block_edit.php?block_id='.$block_id.'\', \''.$this->getTitle().'\');"></i>';
 		} else {
 			$title='';
@@ -67,7 +65,7 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		$content = '<table><tr>';
 		$content .= '<td><a href="pedigree.php?rootid='.$indi_xref.'&amp;ged='.WT_GEDURL.'"><i class="icon-pedigree"></i><br>'.WT_I18N::translate('Default chart').'</a></td>';
 		$content .= '<td><a href="individual.php?pid='.$indi_xref.'&amp;ged='.WT_GEDURL.'"><i class="icon-indis"></i><br>'.WT_I18N::translate('Default individual').'</a></td>';
-		if (WT_Site::preference('USE_REGISTRATION_MODULE') && WT_USER_ID==false) {
+		if (WT_Site::getPreference('USE_REGISTRATION_MODULE') && !Auth::check()) {
 			$content .= '<td><a href="'.WT_LOGIN_URL.'?action=register"><i class="icon-user_add"></i><br>'.WT_I18N::translate('Request new user account').'</a></td>';
 		}
 		$content .= '</tr>';
@@ -83,21 +81,17 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		$content .= '<hr />';
 		
 		// Login section - based on login_block
-		if (WT_USER_ID) {
-			$content .= '<div class="center"><form method="post" action="index.php?logout=1" name="logoutform" onsubmit="return true;">';
-			$content .= '<br><a href="edituser.php" class="name2">'.WT_I18N::translate('Logged in as ').' ('.WT_USER_NAME.')</a><br><br>';
-
+		if (Auth::check()) {
+			$content .= '<div class="center"><form method="post" action="logout.php" name="logoutform" onsubmit="return true;">';
+			$content .= '<br><a href="edituser.php" class="name2">'.WT_I18N::translate('Logged in as ').' '.WT_Filter::escapeHtml(Auth::user()->getRealName()).'</a><br><br>';
 			$content .= '<input type="submit" value="'.WT_I18N::translate('Logout').'">';
 
 			$content .= '<br><br></form></div>';
 		} else {
 			$content .= '<div id="perso-login-box">
-							<form id="perso-login-form" name="perso-login-form" method="post" action="'.WT_LOGIN_URL.'" onsubmit="t = new Date(); this.usertime.value=t.getFullYear()+\'-\'+(t.getMonth()+1)+\'-\'+t.getDate()+\' \'+t.getHours()+\':\'+t.getMinutes()+\':\'+t.getSeconds(); return true;">
+							<form id="perso-login-form" name="perso-login-form" method="post" action="'.WT_LOGIN_URL.'" onsubmit="d=new Date(); this.timediff.value=d.getTimezoneOffset()*60;">
 							<input type="hidden" name="action" value="login">
-							<input type="hidden" name="url" value="index.php">
-							<input type="hidden" name="ged" value="'; if (isset($ged)) $content.= WT_Filter::escapeHtml($ged); else $content.= htmlentities(WT_GEDCOM); $content.= '">
-							<input type="hidden" name="pid" value="'; if (isset($pid)) $content.= WT_Filter::escapeHtml($pid); $content.= '">
-							<input type="hidden" name="usertime" value="">';
+							<input type="hidden" name="timediff" value="">';
 			$content.= '<div>
 							<label for="perso-username">'. WT_I18N::translate('Username').
 								'<input type="text" id="perso-username" name="username" class="formField">
@@ -114,20 +108,20 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 							<div>
 								<a href="#" id="perso-passwd_click">'. WT_I18N::translate('Request new password').'</a>
 							</div>';
-			if (WT_Site::preference('USE_REGISTRATION_MODULE')) {
+			if (WT_Site::getPreference('USE_REGISTRATION_MODULE')) {
 				$content.= '<div><a href="'.WT_LOGIN_URL.'?action=register">'. WT_I18N::translate('Request new user account').'</a></div>';
 			}
 			$content.= '</form>'; // close "login-form"
 			
 			// hidden New Password block
 			$content.= '<div id="perso-new_passwd">
-				<form id="perso-new_passwd_form" name="new_passwd_form" action="'.WT_LOGIN_URL.'" method="post" onsubmit="t = new Date(); document.new_passwd_form.time.value=t.toUTCString(); return checkform(this);">
+				<form id="perso-new_passwd_form" name="new_passwd_form" action="'.WT_LOGIN_URL.'" method="post">
 				<input type="hidden" name="time" value="">
 				<input type="hidden" name="action" value="requestpw">
 				<h4>'. WT_I18N::translate('Lost password request').'</h4>
 				<div>
-					<label for="perso-username">'. WT_I18N::translate('Username or email address').
-						'<input type="text" id="perso-username" name="username" value="">
+					<label for="perso-new_passwd_username">'. WT_I18N::translate('Username or email address').
+						'<input type="text" id="perso-new_passwd_username" name="new_passwd_username" value="">
 					</label>
 				</div>
 				<div><input type="submit" value="'. WT_I18N::translate('Continue'). '"></div>

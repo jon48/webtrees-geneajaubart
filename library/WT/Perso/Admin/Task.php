@@ -7,6 +7,8 @@
  * @author Jonathan Jaubart <dev@jaubart.com>
 */
 
+use WT\Log;
+
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
@@ -116,7 +118,7 @@ abstract class WT_Perso_Admin_Task{
 			$this->_isrunning = true;
 			$this->updateTask();
 
-			AddToLog('Start execution of Perso Admin task: '.$this->getPrettyName(), 'debug');
+			Log::addDebugLog('Start execution of Perso Admin task: '.$this->getPrettyName());
 			$this->_lastresult = $this->executeSteps();
 			if($this->_lastresult){
 				$this->_lastupdated = new DateTime();
@@ -127,9 +129,7 @@ abstract class WT_Perso_Admin_Task{
 			}
 			$this->_isrunning = false;
 			$this->updateTask();
-			AddToLog(
-				'Execution completed for Perso Admin task: '.$this->getPrettyName().' - '.($this->_lastresult ? 'Success' : 'Failure'),
-				'debug');
+			Log::addDebugLog('Execution completed for Perso Admin task: '.$this->getPrettyName().' - '.($this->_lastresult ? 'Success' : 'Failure'));
 		}
 	}
 	
@@ -235,7 +235,7 @@ abstract class WT_Perso_Admin_Task{
 			}
 		}
 		if ($sort) {
-			uasort($tasks, create_function('$x,$y', 'return utf8_strcasecmp((string)$x, (string)$y);'));
+			uasort($tasks, create_function('$x,$y', 'return WT_I18N::strcasecmp((string)$x, (string)$y);'));
 		}
 		return $tasks;
 	}
@@ -246,7 +246,7 @@ abstract class WT_Perso_Admin_Task{
 	 * @param string $task_name Task to delete
 	 */
 	public static function deleteTask($task_name){
-		AddToLog('Perso Admin Task '.$task_name.' has been deleted from disk - deleting it from DB', 'config');
+		Log::addConfigurationLog('Perso Admin Task '.$task_name.' has been deleted from disk - deleting it from DB');
 		WT_DB::prepare('DELETE FROM  `##padmintasks` WHERE pat_name=?')
 		->execute(array($task_name));
 		WT_DB::prepare("DELETE FROM  `##gedcom_setting` WHERE setting_name LIKE 'PAT_?%'")

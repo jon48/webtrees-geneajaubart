@@ -8,10 +8,8 @@
  * @author Jonathan Jaubart <dev@jaubart.com>
 */
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
+use WT\Auth;
+use WT\Log;
 
 // Create tables, if not already present
 try {
@@ -110,19 +108,18 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 		
 		$controller=new WT_Controller_Page();
 		$controller
-			->requireAdminLogin()
+			->restrictAccess(Auth::isAdmin())
 			->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 			->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery.datatables.fnReloadAjax.js')
 			->addInlineJavascript('jQuery("#tabs").tabs();')
 			->setPageTitle($this->getTitle())
 			->pageHeader();
 
 		if(WT_Perso_Admin_Task::isModuleOperational()){
-		$token = get_module_setting($this->getName(), 'PAT_FORCE_EXEC_TOKEN');
+		$token = $this->getSetting('PAT_FORCE_EXEC_TOKEN');
 		if(is_null($token)) {
 			$token = WT_Perso_Functions::generateRandomToken();
-			set_module_setting($this->getName(), 'PAT_FORCE_EXEC_TOKEN', $token);
+			$this->setSetting('PAT_FORCE_EXEC_TOKEN', $token);
 		}
 		
 		$controller->addInlineJavascript('
@@ -145,7 +142,7 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 					"module.php?mod='.$this->getName().'&mod_action=trigger&force='.$token.'&task=" + taskname,
 					function() {
 						jQuery("#bt_runtasktext_" + taskname).empty().html("'.WT_I18N::translate('Done').'");
-						oTable.fnReloadAjax();
+						oTable.ajax.reload();
 					}
 				);
 			}
@@ -154,26 +151,32 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 		$controller->addInlineJavascript('
 			jQuery.fn.dataTableExt.oSort["unicode-asc" ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
 			jQuery.fn.dataTableExt.oSort["unicode-desc"]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
-			var oTable = jQuery("#admintasks_list").dataTable({
-				"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
-				"sAjaxSource": "'.WT_SERVER_NAME.WT_SCRIPT_PATH.WT_SCRIPT_NAME.'?mod='.$this->getName().'&mod_action=ajaxtaskslist",
-				"bServerSide":true,
+			var oTable = jQuery("#admintasks_list").DataTable({
+				dom: \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
 				'.WT_I18N::datatablesI18N().',
-				"bJQueryUI": true,
-				"bAutoWidth":false,
-				"bProcessing": true,
-				"sPaginationType": "full_numbers",
-				"aoColumns": [
-					/* 0 Enabled        */ 		{"sClass": "center"},
-					/* 1 Task name */			{"sClass": "center"},
-					/* 2 Last run */			{"sClass": "center"},
-					/* 3 Last result */			{"sClass": "center"},
-					/* 4 Frequency */			{"sType": "numeric", "sClass": "center"},
-					/* 5 Number occurrence */	{"sClass": "center"},
-					/* 6 IsRunning */			{"sClass": "center"},
-					/* 7 ForceExecution */		{"sClass": "center"},
+				jQueryUI: true,
+				autoWidth:false,
+				pagingType: "full_numbers",
+				columns: [
+					/* 0 Enabled        */ 		{class: "center"},
+					/* 1 Task name */			{class: "center"},
+					/* 2 Last run */			{class: "center"},
+					/* 3 Last result */			{class: "center"},
+					/* 4 Frequency */			{type: "num", class: "center"},
+					/* 5 Number occurrence */	{class: "center"},
+					/* 6 IsRunning */			{class: "center"},
+					/* 7 ForceExecution */		{class: "center"},
 				],
-				"fnDrawCallback": function() {
+				processing: true,
+				serverSide: true,
+				ajax: {
+					url: "module.php",
+					data: {
+						mod: "'.$this->getName().'",
+						mod_action: "ajaxtaskslist"
+					}
+				},
+				drawCallback: function() {
 					// Our JSON responses include Javascript as well as HTML.  This does not get executed automatically…
 					jQuery("#admintasks_list script").each(function() {
 						eval(this.text);
@@ -243,14 +246,14 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 		$controller = new WT_Controller_Ajax();
 		$html = WT_I18N::translate('no_token_defined');
 		
-		if(WT_Perso_Admin_Task::isModuleOperational() &&  WT_USER_IS_ADMIN){
+		if(WT_Perso_Admin_Task::isModuleOperational() &&  Auth::isAdmin()){
 			$token = WT_Perso_Functions::generateRandomToken();
-			set_module_setting($this->getName(), 'PAT_FORCE_EXEC_TOKEN', $token);
-			AddToLog($this->getTitle().' : New token generated.', 'config');
+			$this->setSetting('PAT_FORCE_EXEC_TOKEN', $token);
+			Log::addConfigurationLog($this->getTitle().' : New token generated.');
 			$html = $token;
 		}
 		else{
-			AddToLog($this->getTitle().' : Unauthorised attempt to change the token.', 'error');
+			Log::addErrorLog($this->getTitle().' : Unauthorised attempt to change the token.');
 		}
 		
 		$controller->pageHeader();
@@ -268,7 +271,7 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 		if(WT_Perso_Admin_Task::isModuleOperational()){
 			$taskname = WT_Filter::get('task', WT_REGEX_ALPHANUM);
 			$token_submitted = WT_Filter::get('force', WT_REGEX_ALPHANUM);
-			$token = get_module_setting($this->getName(), 'PAT_FORCE_EXEC_TOKEN');	
+			$token = $this->getSetting('PAT_FORCE_EXEC_TOKEN');	
 					
 			$sql = 
 				'SELECT pat_name, pat_status, pat_last_run, pat_last_result, pat_frequency, pat_nb_occur, pat_running
@@ -342,7 +345,7 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 			switch($table){
 				case 'task':
 					// Verify if the user has enough rights to modify the setting
-					if(!WT_USER_IS_ADMIN) WT_Perso_Functions_Edit::fail();
+					if(!Auth::isAdmin()) WT_Perso_Functions_Edit::fail();
 					
 					// Verify if a task has been specified;
 					if(is_null($id1)) WT_Perso_Functions_Edit::fail();
@@ -357,7 +360,7 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 					break;
 				case 'module_setting':
 					// Verify if the user has enough rights to modify the setting
-					if(!WT_USER_IS_ADMIN) WT_Perso_Functions_Edit::fail();
+					if(!Auth::isAdmin()) WT_Perso_Functions_Edit::fail();
 						
 					// Verify if a task has been specified;
 					if(is_null($id1)) WT_Perso_Functions_Edit::fail();
@@ -365,7 +368,7 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 					if(is_null($id2)) WT_Perso_Functions_Edit::fail();
 						
 					// Authorised and valid - make update
-					set_module_setting($this->getName(), 'PAT_'.$id1.'_'.$id2, $value);
+					$this->setSetting('PAT_'.$id1.'_'.$id2, $value);
 					WT_Perso_Functions_Edit::ok($value);
 					break;
 				case 'gedcom_setting':
@@ -376,11 +379,12 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 					if(is_null($id1)) WT_Perso_Functions_Edit::fail();
 					// Verify if a setting name has been specified;
 					if(is_null($id2)) WT_Perso_Functions_Edit::fail();
-					// Verify if a gedcom ID has been specified;
-					if(is_null($id3)) WT_Perso_Functions_Edit::fail();
+					// Verify if a gedcom ID has been specified, and the Gedcom exists;
+					if(is_null($id3) && array_key_exists($id3, WT_Tree::getAll())) 
+						WT_Perso_Functions_Edit::fail();
 						
 					// Authorised and valid - make update
-					set_gedcom_setting($id3, 'PAT_'.$id1.'_'.$id2, $value);
+					WT_Tree::get($id3)->setPreference('PAT_'.$id1.'_'.$id2, $value);
 					WT_Perso_Functions_Edit::ok($value);
 					break;
 				default:
@@ -467,7 +471,7 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 	private function ajaxtaskslist(){
 		$controller = new WT_Perso_Controller_Json();
 		
-		if(WT_USER_IS_ADMIN && WT_Perso_Admin_Task::isModuleOperational()){		
+		if(Auth::isAdmin() && WT_Perso_Admin_Task::isModuleOperational()){		
 			// AJAX callback for datatables
 			$sql=
 			'SELECT SQL_CALC_FOUND_ROWS'.
@@ -550,7 +554,7 @@ class perso_admintasks_WT_Module extends WT_Module implements WT_Module_Config, 
 			// Total filtered rows
 			$iTotalDisplayRecords= count($aaData);
 			// Total unfiltered rows
-			$iTotalRecords=WT_DB::prepare('SELECT COUNT(*) FROM `##padmintasks`')->fetchColumn();
+			$iTotalRecords=WT_DB::prepare('SELECT COUNT(*) FROM `##padmintasks`')->fetchOne();
 		}
 		else{
 			$iTotalDisplayRecords = 0;

@@ -154,7 +154,7 @@ class WT_Perso_Functions_Map {
 		
 		//sort the array, limit to unique values, and count them
 		$place_parts=array();
-		usort($place_list, "utf8_strcasecmp");
+		usort($place_list, array('WT_I18N', 'strcasecmp'));
 		$i=count($place_list);
 		
 		//calculate maximum no. of levels to display
@@ -210,7 +210,7 @@ class WT_Perso_Functions_Map {
 						self::$_maps[$file]=$file;
 					}
 				}
-				if(self::$_maps) uasort(self::$_maps, create_function('$x,$y', 'return utf8_strcasecmp((string)$x, (string)$y);'));
+				if(self::$_maps) uasort(self::$_maps, create_function('$x,$y', 'return WT_I18N::strcasecmp((string)$x, (string)$y);'));
 				//self::$_maps = array_merge(array('nomap' => WT_I18N::translate('No map')), self::$_maps);
 			}
 		}

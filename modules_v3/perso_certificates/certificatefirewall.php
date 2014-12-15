@@ -7,6 +7,9 @@
  * @subpackage Perso
  * @author Jonathan Jaubart <dev@jaubart.com>
  */
+
+use WT\Log;
+
 if (!defined('WT_WEBTREES')) {
 	header('HTTP/1.0 403 Forbidden');
 	exit;
@@ -17,7 +20,8 @@ global $controller, $useTTF;
 Zend_Session::writeClose();
 
 $cid   = WT_Filter::get('cid');
-$certificate = WT_Perso_Certificate::getInstance($cid);
+$certificate = null;
+if($cid) $certificate = WT_Perso_Certificate::getInstance($cid);
 
 /**
  * Displays a 404 error message
@@ -27,7 +31,7 @@ $certificate = WT_Perso_Certificate::getInstance($cid);
 function send404AndExit() {
 	$error = WT_I18N::translate('The certificate file was not found in this family tree');
 
-	$width = (utf8_strlen($error)) * 6.5 + 50;
+	$width = (mb_strlen($error)) * 6.5 + 50;
 	$height = 60;
 	$im  = imagecreatetruecolor($width, $height);  /* Create a black image */
 	$bgc = imagecolorallocate($im, 255, 255, 255); /* set background color */
@@ -53,15 +57,17 @@ function send404AndExit() {
  */
 function applyWatermark($im, WT_Perso_Certificate $certificate) {
 	global $useTTF;
+
+	$module = new perso_certificates_WT_Module();
 	
 	// text to watermark with
 	$word1_text   = $certificate->getWatermarkText();
 	// minimum font size for "word1" ;
-	$word1_minsize = get_module_setting('perso_certificates', 'PC_WM_FONT_MINSIZE', 8);
+	$word1_minsize = $module->getSetting('PC_WM_FONT_MINSIZE', 8);
 	// maximum font size for "word1" ; will be automaticaly reduced to fit in the image
-	$word1_maxsize = get_module_setting('perso_certificates', 'PC_WM_FONT_MAXSIZE', 18);
+	$word1_maxsize = $module->getSetting('PC_WM_FONT_MAXSIZE', 18);
 	// rgb color codes for text
-	$word1_color  = get_module_setting('perso_certificates', 'PC_WM_FONT_COLOR', '77,109,243');
+	$word1_color  = $module->getSetting('PC_WM_FONT_COLOR', '77,109,243');
 	// ttf font file to use. must exist in the includes/fonts/ folder
 	$word1_font   = "";
 	// vertical position for the text to past; possible values are: top, middle or bottom, across
@@ -118,7 +124,7 @@ function embedText($im, $text, $maxsize, $minsize, $color, $font, $vpos, $hpos) 
 		if ($hpos=="top2bottom") $hpos = "bottom2top";
 	}
 
-	$text = reverseText($text);
+	$text = WT_I18N::reverseText($text);
 	$height = imagesy($im);
 	$width  = imagesx($im);
 	$calc_angle=rad2deg(atan($height/$width));
@@ -207,7 +213,7 @@ function embedText($im, $text, $maxsize, $minsize, $color, $font, $vpos, $hpos) 
  */
 function textlength($max, $min, $mxl, $text) {
 	$taille_c = $max;
-	$len = utf8_strlen($text);
+	$len = mb_strlen($text);
 	while (($taille_c-2)*($len) > $mxl) {
 		$taille_c--;
 		if ($taille_c == 2) break;
@@ -224,10 +230,10 @@ function textlength($max, $min, $mxl, $text) {
  * @param string $errfile Error file
  * @param int $errline Error line
  */
-function imagettftextErrorHandler($errno, $errstr, $errfile, $errline) {
+function imagettftextErrorHandler($errno, $errstr) {
 	global $useTTF, $serverFilename;
 	// log the error
-	AddToLog("Certificate Firewall error: >".$errstr."< in file >".$certfilename."< (".getImageInfoForLog($certfilename).")", 'error');
+	Log::addErrorLog('Certificate Firewall error: >'.$errstr.'< in file >'.$serverFilename.'< ('.getImageInfoForLog($serverFilename).')');
 	
 	// change value of useTTF to false so the fallback watermarking can be used.
 	$useTTF = false;
@@ -242,14 +248,14 @@ $useTTF = function_exists('imagettftext');
 
 // certificate object missing/private?
 if (!$certificate || !$certificate->canShow()) {
-	AddToLog("Certificate Firewall error: >".WT_I18N::translate('Missing or private certificate object.').'< with CID >'.$cid.'<', 'media');
+	Log::addMediaLog('Certificate Firewall error: >'.WT_I18N::translate('Missing or private certificate object.').'< with CID >'.$cid.'<');
 	send404AndExit();
 }
 
 $serverFilename = $certificate->getServerFilename();
 
 if (!file_exists($serverFilename)) {
-	AddToLog("Certificate Firewall error: >".WT_I18N::translate('The certificate file does not exist.').'< for path >'.$serverFilename.'<', 'media');
+	Log::addMediaLog('Certificate Firewall error: >'.WT_I18N::translate('The certificate file does not exist.').'< for path >'.$serverFilename.'<');
 	send404AndExit();
 }
 
@@ -265,7 +271,7 @@ $expireHeader = gmdate("D, d M Y H:i:s", WT_TIMESTAMP + $expireOffset) . " GMT";
 
 $type = WT_Perso_Functions_Certificates::isImageTypeSupported($imgsize['ext']);
 $usewatermark = false;
-$pc_show_no_watermark = get_module_setting($this->getName(), 'PC_SHOW_NO_WATERMARK', WT_PRIV_HIDE);
+$pc_show_no_watermark = $this->getSetting('PC_SHOW_NO_WATERMARK', WT_PRIV_HIDE);
 // if this image supports watermarks and the watermark module is intalled...
 if ($type) {
 	if (WT_USER_ACCESS_LEVEL > $pc_show_no_watermark ) {
@@ -333,7 +339,7 @@ if ($usewatermark) {
 
 	} else {
 		// this image is defective.  log it
-		AddToLog("Certificate Firewall error: >".WT_I18N::translate('This certificate file is broken and cannot be watermarked.')."< in file >".$serverFilename."< memory used: ".memory_get_usage(), 'error');
+		Log::addErrorLog('Certificate Firewall error: >'.WT_I18N::translate('This certificate file is broken and cannot be watermarked.').'< in file >'.$serverFilename.'< memory used: '.memory_get_usage());
 	}
 }
 

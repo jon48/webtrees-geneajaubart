@@ -12,6 +12,8 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
+use Rhumsaa\Uuid\Uuid;
+
 global $controller;
 
 /**
@@ -23,15 +25,15 @@ global $controller;
 * @return string HTML code for the missing ancestors table
 */
 function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
-	global $GEDCOM, $SHOW_LAST_CHANGE, $SEARCH_SPIDER, $controller;
-	$table_id = 'ID'.(int)(microtime()*1000000); // lists requires a unique ID in case there are multiple lists per page
-	$SHOW_EST_LIST_DATES=get_gedcom_setting(WT_GED_ID, 'SHOW_EST_LIST_DATES');
+	global $WT_TREE, $GEDCOM, $SHOW_LAST_CHANGE, $SEARCH_SPIDER, $controller;
+	$table_id = 'table-sosa-missing-' . Uuid::uuid4(); // lists requires a unique ID in case there are multiple lists per page
+	$SHOW_EST_LIST_DATES=$WT_TREE->getPreference('SHOW_EST_LIST_DATES');
 	if (count($sosalistG)<1) return;
 	
 	$sumMissingDifferent = 0;
 	$sumMissingDifferentWithoutHidden = 0;
 	$areMissing = false;
-	$n = 0;
+	$nbDisplayed = 0;
 	$unique_indis=array(); // Don't double-count indis with multiple names.
 	$html = '';
 	foreach($sosalistG as $sosa=>$pid){
@@ -44,8 +46,9 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 		$sumMissingDifferent += $miss['father'] + $miss['mother'];
 		/* @var $person WT_Individual */
 		$person = WT_Individual::getInstance($pid);
-		if (is_null($person)) continue;
-		if (!$person->canShowName()) continue;
+		if (!$person || !$person->canShowName()) {
+			continue;
+		}
 		$dperson = new WT_Perso_Individual($person);
 		$sumMissingDifferentWithoutHidden += $miss['father'] + $miss['mother'];
 		if ($person->isNew()) {
@@ -81,7 +84,7 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 			$html .= '<a '. $title. ' href="'. $person->getHtmlUrl(). '"'. $class. '>'. highlight_search_hits($name['full']). '</a>'. $sex_image.WT_Perso_Functions_Print::formatSosaNumbers($dperson->getSosaNumbers(), 1, 'smaller'). '<br/>';
 			//END PERSO
 		}// Indi parents
-		$html .= $person->getPrimaryParentsNames('parents_indi_list_table_'.$table_id.' details1', 'none');
+		$html .= $person->getPrimaryParentsNames('parents details1', 'none');
 		$html .= '</td>';
 		// Dummy column to match colspan in header
 		$html .= '<td style="display:none;"></td>';
@@ -120,7 +123,6 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 			}
 		} else {
 			$birth_date=$person->getEstimatedBirthDate();
-			$birth_jd=$birth_date->JD();
 			if ($SHOW_EST_LIST_DATES) {
 				$html .= $birth_date->Display(!$SEARCH_SPIDER);
 			} else {
@@ -159,12 +161,10 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 		$html .= '<td>';
 		$html .= $person->getSex();
 		$html .= '</td>';
-		++$n;
+		++$nbDisplayed;
 	}
 	
-	$html2 = '';
-	
-	$percSosa = WT_Perso_Functions::getPercentage(count($sosalistG1), pow(2, $gen-1));
+	$percSosa = WT_Perso_Functions::safeDivision(count($sosalistG1), pow(2, $gen-1));
 	if($areMissing){
 		$controller
 			->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
@@ -174,133 +174,152 @@ function format_missing_table($sosalistG, $sosalistG1, $gen, $legend='') {
 				jQuery.fn.dataTableExt.oSort["unicode-desc" ]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
 				jQuery.fn.dataTableExt.oSort["num-html-asc" ]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a<b) ? -1 : (a>b ? 1 : 0);};
 				jQuery.fn.dataTableExt.oSort["num-html-desc"]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a>b) ? -1 : (a<b ? 1 : 0);};
-				oTable'.$table_id.' = jQuery("#'.$table_id.'").dataTable( {
-					"sDom": \'<"H"<"filtersH_'.$table_id.'"><"dt-clear">pf<"dt-clear">irl>t<"F"pl>\',
+				
+				jQuery("#'.$table_id.'").dataTable( {
+					dom: \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
 					'.WT_I18N::datatablesI18N().',
-					"bJQueryUI": true,
-					"bAutoWidth":false,
-					"bProcessing": true,
-					"bRetrieve": true,
-					"aoColumns": [
-						/* 0-Sosa */  		{ "sType": "numeric", "sClass": "center" },
-		                /* 1-ID */ 			{ "sClass": "center" },
-		                /* 2-givn */ 		{"iDataSort": 4,  "sClass": "left"},
-						/* 3-surn */ 		{"iDataSort": 5},
-						/* 4-GIVN,SURN */ 	{"sType": "unicode", "bVisible": false},
-						/* 5-SURN,GIVN */ 	{"sType": "unicode", "bVisible": false},
+					jQueryUI: true,
+					autoWidth:false,
+					processing: true,
+					retrieve: true,
+					columns: [
+						/* 0-Sosa */  		{ type: "num", class: "center" },
+		                /* 1-ID */ 			{ class: "center" },
+		                /* 2-givn */ 		{ dataSort: 4,  class: "left"},
+						/* 3-surn */ 		{ dataSort: 5},
+						/* 4-GIVN,SURN */ 	{ type: "unicode", visible: false},
+						/* 5-SURN,GIVN */ 	{ type: "unicode", visible: false},
 		                /* PERSO Modify table to include IsSourced module */
-		                /* 6-INDI_SOUR */	{ "iDataSort" : 7, "sClass": "center", "bVisible": '.(WT_Perso_Functions::isIsSourcedModuleOperational() ? 'true' : 'false').' },
-	                	/* 7-SORT_INDISC */	{ "bVisible" : false},
-		                /* 8-Father */		{ "sClass": "center"},
-		                /* 9-Mother */		{ "sClass": "center"},
-		                /* 10-Birth */		{ "iDataSort" : 11 , "sClass": "center"},
-		                /* 11-SORT_BIRT */	{ "bVisible" : false},
-		                /* 12-BIRT_PLAC */	{ "sType": "unicode", "sClass": "center"},
-		                /* 13-BIRT_SOUR */	{ "iDataSort" : 14, "sClass": "center", "bVisible": '.(WT_Perso_Functions::isIsSourcedModuleOperational() ? 'true' : 'false').' },
-	                	/* 14-SORT_BIRTSC */{ "bVisible" : false},
-		                /* 15-SEX */		{ "bVisible" : false}
+		                /* 6-INDI_SOUR */	{ dataSort : 7, class: "center", visible: '.(WT_Perso_Functions::isIsSourcedModuleOperational() ? 'true' : 'false').' },
+	                	/* 7-SORT_INDISC */	{ visible : false},
+		                /* 8-Father */		{ class: "center"},
+		                /* 9-Mother */		{ class: "center"},
+		                /* 10-Birth */		{ dataSort : 11 , class: "center"},
+		                /* 11-SORT_BIRT */	{ visible : false},
+		                /* 12-BIRT_PLAC */	{ type: "unicode", class: "center"},
+		                /* 13-BIRT_SOUR */	{ dataSort : 14, class: "center", visible: '.(WT_Perso_Functions::isIsSourcedModuleOperational() ? 'true' : 'false').' },
+	                	/* 14-SORT_BIRTSC */{ visible : false},
+		                /* 15-SEX */		{ visible : false}
 		                /* END PERSO */
 					],			
-		            "aaSorting": [[0,"asc"]],
-					"iDisplayLength": 20,
-					"sPaginationType": "full_numbers"
+		            sorting: [[0,"asc"]],
+					displayLength: 20,
+					pagingType: "full_numbers"
 			   });
-			   
-				jQuery("div.filtersH_'.$table_id.'").html("'.WT_Filter::escapeJs(
-					'<button type="button" id="SEX_M_'.    $table_id.'" class="ui-state-default SEX_M" title="'.    WT_I18N::translate('Show only males.').'">&nbsp;'.WT_Individual::sexImage('M', 'small').'&nbsp;</button>'.
-					'<button type="button" id="SEX_F_'.    $table_id.'" class="ui-state-default SEX_F" title="'.    WT_I18N::translate('Show only females.').'">&nbsp;'.WT_Individual::sexImage('F', 'small').'&nbsp;</button>'.
-					'<button type="button" id="SEX_U_'.    $table_id.'" class="ui-state-default SEX_U" title="'.    WT_I18N::translate('Show only individuals of whom the gender is not known.').'">&nbsp;'.WT_Individual::sexImage('U', 'small').'&nbsp;</button>'.
-					'<button type="button" id="RESET_'.    $table_id.'" class="ui-state-default RESET" title="'.    WT_I18N::translate('Reset to the list defaults.').'">'.WT_I18N::translate('Reset').'</button>'
-				).'");
-		
-			   /* Add event listeners for filtering inputs */
-			   /* PERSO Modify table to include IsSourced module */
-				jQuery("#SEX_M_'.$table_id.'").click( function() {
-					oTable'.$table_id.'.fnFilter("M", 15 );
-					jQuery("#SEX_M_'.$table_id.'").addClass("ui-state-active");
-					jQuery("#SEX_F_'.$table_id.'").removeClass("ui-state-active");
-					jQuery("#SEX_U_'.$table_id.'").removeClass("ui-state-active");
+					
+				jQuery("#' . $table_id . '")
+				/* Filter buttons in table header */
+				.on("click", "button[data-filter-column]", function() {
+					var btn = jQuery(this);
+					// De-activate the other buttons in this button group
+					btn.siblings().removeClass("ui-state-active");
+					// Apply (or clear) this filter
+					var col = jQuery("#' . $table_id . '").DataTable().column(btn.data("filter-column"));
+					if (btn.hasClass("ui-state-active")) {
+						btn.removeClass("ui-state-active");
+						col.search("").draw();
+					} else {
+						btn.addClass("ui-state-active");
+						col.search(btn.data("filter-value")).draw();
+					}
 				});
-				jQuery("#SEX_F_'.    $table_id.'").click( function() {
-					oTable'.$table_id.'.fnFilter("F", 15 );
-					jQuery("#SEX_M_'.$table_id.'").removeClass("ui-state-active");
-					jQuery("#SEX_F_'.$table_id.'").addClass("ui-state-active");
-					jQuery("#SEX_U_'.$table_id.'").removeClass("ui-state-active");
-				});
-				jQuery("#SEX_U_'.    $table_id.'").click( function() {
-					oTable'.$table_id.'.fnFilter("U", 15 );
-					jQuery("#SEX_M_'.$table_id.'").removeClass("ui-state-active");
-					jQuery("#SEX_F_'.$table_id.'").removeClass("ui-state-active");
-					jQuery("#SEX_U_'.$table_id.'").addClass("ui-state-active");
-				});			
-				jQuery("#RESET_'.    $table_id.'").click( function() {
-					oTable'.$table_id.'.fnFilter("", 15 );
-					jQuery("div.filtersH_'.$table_id.' button").removeClass("ui-state-active");
-				});
-				/* END PERSO */									
-				
-				/* This code is a temporary fix for Datatables bug http://www.datatables.net/forums/discussion/4730/datatables_sort_wrapper-being-added-to-columns-with-bsortable-false/p1*/
-				jQuery("th div span:eq(5)").css("display", "none");
-				jQuery("th div:eq(5)").css("margin", "auto").css("text-align", "center");
-				
+			   		
 				jQuery(".smissing-list").css("visibility", "visible");
 				jQuery(".loading-image").css("display", "none");
 			');
-		
-		//--table wrapper
-		$html2 .= '<div class="loading-image">&nbsp;</div>';
-		$html2 .= '<div class="smissing-list">';
-		//-- table header
-		$html2 .= '<table id="'.$table_id.'"><thead><tr>';
-		$html2 .= '<th>'.WT_I18N::translate('Sosa').'</th>';
-		$html2 .= '<th>'.WT_Gedcom_Tag::getLabel('INDI').'</th>';	
-		$html2 .= '<th>'. WT_Gedcom_Tag::getLabel('GIVN'). '</th>';
-		$html2 .= '<th>'. WT_Gedcom_Tag::getLabel('SURN'). '</th>';
-		$html2 .= '<th>GIVN</th>';
-		$html2 .= '<th>SURN</th>';
+				
+		$html2 = '
+			<div class="loading-image">&nbsp;</div>
+			<div class="smissing-list">
+				<table id="'.$table_id.'">
+					<thead>
+						<tr>
+							<th colspan="16">
+								<div class="btn-toolbar">
+									<div class="btn-group">
+										<button
+											class="ui-state-default"
+											data-filter-column="15"
+											data-filter-value="M"
+											title="' . WT_I18N::translate('Show only males.') . '"
+											type="button"
+										>
+										 	' . WT_Individual::sexImage('M', 'large') . '
+										</button>
+										<button
+											class="ui-state-default"
+											data-filter-column="15"
+											data-filter-value="F"
+											title="' . WT_I18N::translate('Show only females.') . '"
+											type="button"
+										>
+											' . WT_Individual::sexImage('F', 'large') . '
+										</button>
+										<button
+											class="ui-state-default"
+											data-filter-column="15"
+											data-filter-value="U"
+											title="' . WT_I18N::translate('Show only individuals for whom the gender is not known.') . '"
+											type="button"
+										>
+											' . WT_Individual::sexImage('U', 'large') . '
+										</button>
+									</div>
+								</div>
+							</th>
+						</tr>
+						<tr>
+							<th>'.WT_I18N::translate('Sosa').'</th>
+							<th>'.WT_Gedcom_Tag::getLabel('INDI').'</th>
+							<th>'. WT_Gedcom_Tag::getLabel('GIVN'). '</th>
+							<th>'. WT_Gedcom_Tag::getLabel('SURN'). '</th>
+							<th>GIVN</th>
+							<th>SURN</th>';
 		//PERSO Modify table to include IsSourced module
 		if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
-			$html2 .= '<th><i class="icon-source" title="'.WT_I18N::translate('Sourced individual').'"></i></th>'.
-				'<th>SORT_INDISC</th>';
+			$html2 .= 		'<th><i class="icon-source" title="'.WT_I18N::translate('Sourced individual').'"></i></th>
+							<th>SORT_INDISC</th>';
 		} else {
-			$html2 .= '<th></th><th></th>';
+			$html2 .= 		'<th></th><th></th>';
 		}
 		//END PERSO
-		$html2 .= '<th>'.WT_I18N::translate('Father').'</th>';
-		$html2 .= '<th>'.WT_I18N::translate('Mother').'</th>';
-		$html2 .= '<th>'.WT_Gedcom_Tag::getLabel('BIRT').'</th>';
-		$html2 .= '<th>SORT_BIRT</th>';
-		$html2 .= '<th>'.WT_Gedcom_Tag::getLabel('PLAC').'</th>';
+		$html2 .= 			'<th>'.WT_I18N::translate('Father').'</th>
+							<th>'.WT_I18N::translate('Mother').'</th>
+							<th>'.WT_Gedcom_Tag::getLabel('BIRT').'</th>
+							<th>SORT_BIRT</th>
+							<th>'.WT_Gedcom_Tag::getLabel('PLAC').'</th>';
 		//PERSO Modify table to include IsSourced module
 		if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
-			$html2 .= '<th><i class="icon-source" title="'.WT_I18N::translate('Sourced birth').'"></i></th>'.
-				'<th>SORT_BIRTSC</th>';
+			$html2 .= 		'<th><i class="icon-source" title="'.WT_I18N::translate('Sourced birth').'"></i></th>
+							<th>SORT_BIRTSC</th>';
 		} else {
-			$html2 .= '<th></th><th></th>';
+			$html2 .= 		'<th></th><th></th>';
 		}
 		//END PERSO
-		$html2 .= '<th>SEX</th>';
-		$html2 .= '</tr></thead>';
-		//-- table body
-		$html2 .= '<tbody>';
-		$html2 .= $html;
-		$html2 .= '</tbody>';
-		
-		//Prepare footer
-		//PERSO Modify table to include IsSourced module
-		$html2 .= '<tfoot>'.
-				'<tr><td class="ui-state-default" colspan="16">'.WT_I18N::translate('Number of different missing ancestors: %d',$sumMissingDifferent);
+		$html2 .= 			'<th>SEX</th>
+						</tr>
+					</thead>
+					<tbody>
+						'.$html.'
+					</tbody>
+					<tfoot>
+						<tr>
+							<td class="ui-state-default" colspan="16">
+								<div class="center">
+									'.WT_I18N::translate('Number of different missing ancestors: %s',WT_I18N::number($sumMissingDifferent));
 		//END PERSO
-		if($sumMissingDifferent != $sumMissingDifferentWithoutHidden) $html2 .= ' ['.WT_I18N::translate('%d hidden', $sumMissingDifferent - $sumMissingDifferentWithoutHidden).']';
-		$percPotentialSosa = WT_Perso_Functions::getPercentage(count($sosalistG), pow(2, $gen-2));
-		$html2 .= ' - '.WT_I18N::translate('Generation complete at %.2f %%', $percSosa);
-		$html2 .= ' ['.WT_I18N::translate('Potential %.2f %%', $percPotentialSosa).']';
-		$html2 .= '</td></tr></tfoot>';
-		$html2 .= '</table>';
-		$html2 .= '</div>'; // Close "smissing-list"
+		if($sumMissingDifferent != $sumMissingDifferentWithoutHidden) $html2 .= ' ['.WT_I18N::translate('%s hidden', WT_I18N::number($sumMissingDifferent - $sumMissingDifferentWithoutHidden)).']';
+		$percPotentialSosa = WT_Perso_Functions::safeDivision(count($sosalistG), pow(2, $gen-2));
+		$html2 .= ' - '.WT_I18N::translate('Generation complete at %s', WT_I18N::percentage($percSosa, 2));
+		$html2 .= ' ['.WT_I18N::translate('Potential %s', WT_I18N::percentage($percPotentialSosa,2)).']
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>';
 	}
 	else{
-		$html2 .=  WT_I18N::translate('No ancestors are missing for this generation. Generation complete at %.2f %%.', $percSosa);
+		$html2 =  WT_I18N::translate('No ancestors are missing for this generation. Generation complete at %s.', WT_I18N::percentage($percSosa, 2));
 	}		
 	
 	return $html2;

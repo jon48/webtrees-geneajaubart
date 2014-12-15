@@ -198,7 +198,6 @@ return array(
 	'Number of different ancestors'	=>	'Nombre d\'ancêtres différents',
 	'%% of ancestors in the base'	=>	'Proportion de Sosas dans la base',
 	'Mean generation time'			=>	'Durée moyenne d\'une génération',
-	'%.1f years'					=>	'%.1f ans',
 	'Statistics by generations'		=>	'Statistiques par générations',						
 	'Theoretical'					=>	'Théoriques',
 	'Known'							=>	'Connus',
@@ -232,21 +231,20 @@ return array(
 									=>	'Implexe à la génération G.',										
 	'Pedigree collapse is a measure of the real number of ancestors of a person compared to its theorical number. The higher this number is, the more marriages between related persons have happened. Extreme examples of high pedigree collapse are royal families for which this number can be as high as nearly 90%% (Alfonso XII of Spain).'
 									=>	'L\'implexe est une mesure du nombre réel d\'ancêtres d\'une personne par rapport au nombre théorique. Plus ce pourcentage est grand, plus il y a eu de mariages entre personnes apparentées. Les familles royales constituent des exemples extrêmes d\'implexe, certains atteignant des niveaux de 90%%, comme le roi Alphonse XII d\'Espagne.',							
-	'Generation-equivalent: %.2f generations'
-									=>	'Équivalent-génération : %.2f générations',
+	'Generation-equivalent: %s generations'
+									=>	'Équivalent-génération : %s générations',
 	'Missing Ancestors'				=>	'Ancêtres manquants',
 	'Choose generation'				=>	'Choisir une génération',
 	'Generation %d'					=>	'Génération %d',
 	'Previous generation'			=>	'Génération précédente',
 	'Next generation'				=>	'Génération suivante',
-	'Number of different missing ancestors: %d'
-									=>	'Nombre d\'ancêtres manquants différents: %d',
-	'%d hidden'						=>	'%d cachés',
-	'Generation complete at %.2f %%'
-									=>	'Génération complète à %.2f %%',
-	'Potential %.2f %%'				=>	'Potentiel %.2f %%',
-	'No ancestors are missing for this generation. Generation complete at %.2f %%.'
-									=>	'Il ne manque aucun ancêtre pour cette génération. Génération complète à %.2f %%.',
+	'Number of different missing ancestors: %s'
+									=>	'Nombre d\'ancêtres manquants différents: %s',
+	'%s hidden'						=>	'%s cachés',
+	'Generation complete at %s'		=>	'Génération complète à %s',
+	'Potential %s'					=>	'Potentiel %s',
+	'No ancestors are missing for this generation. Generation complete at %s.'
+									=>	'Il ne manque aucun ancêtre pour cette génération. Génération complète à %s.',
 	'No ancestor has been found for generation %d'
 									=>	'Aucun ancêtre n\'a été trouvé pour la génération %d',
 	'No individual has been found for generation %d'
@@ -261,8 +259,8 @@ return array(
 									=>	'La liste des ancêtres Sosa n\'a pas été encore calculée.',
 	'No generation were found.'		=>	'Le nombre de générations est insuffisant',	
 	'Sosa Ancestors'				=>	'Ancêtres Sosa',	
-	'Number of Sosa ancestors: %1$d known / %2$d theoretical (%3$0.2f %%)'
-									=>	'Nombre d\'ancêtres Sosa : %1$d connus / %2$d théoriques (%3$0.2f %%)',	
+	'Number of Sosa ancestors: %1$s known / %2$s theoretical (%3$s)'
+									=>	'Nombre d\'ancêtres Sosa : %1$s connus / %2$s théoriques (%3$s)',	
 	'An error occurred while retrieving data...'
 									=>	'Une erreur s\'est produite en récupérant les données...',															
 

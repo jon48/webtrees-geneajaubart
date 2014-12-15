@@ -41,21 +41,21 @@ function format_certificate_table($certificates, $city) {
 				jQuery.fn.dataTableExt.oSort["num-html-asc" ]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a<b) ? -1 : (a>b ? 1 : 0);};
 				jQuery.fn.dataTableExt.oSort["num-html-desc"]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a>b) ? -1 : (a<b ? 1 : 0);};
 				oTable'.$table_id.' = jQuery("#'.$table_id.'").dataTable( {
-					"sDom": \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
+					dom: \'<"H"pf<"dt-clear">irl>t<"F"pl>\',
 					'.WT_I18N::datatablesI18N().',
-					"bJQueryUI": true,
-					"bAutoWidth":false,
-					"bProcessing": true,
-					"aoColumns": [
-		                    /* 0-Date */  			{ "iDataSort" : 1, "sWidth": "15%", "sClass": "center" },
-							/* 1-DateSort */		{ "sType": "unicode", "bVisible" : false },
-		                    /* 2-Type */ 			{ "sWidth": "5%", "bSearchable": false, "sClass": "center"},
-		                    /* 3-CertificateSort */ { "sType": "unicode", "bVisible" : false },
-		                    /* 4-Certificate */     { "iDataSort" : 3, "sClass": "left" }
+					jQueryUI: true,
+					autoWidth: false,
+					processing: true,
+					columns: [
+		                    /* 0-Date */  			{ dataSort: 1, width: "15%", class: "center" },
+							/* 1-DateSort */		{ type: "unicode", visible : false },
+		                    /* 2-Type */ 			{ width: "5%", searchable: false, class: "center"},
+		                    /* 3-CertificateSort */ { type: "unicode", visible : false },
+		                    /* 4-Certificate */     { dataSort: 3, class: "left" }
 		                ],
-		            "aaSorting": [[0,"asc"], [2,"asc"]],
-					"iDisplayLength": 20,
-					"sPaginationType": "full_numbers"
+		            sorting: [[0,"asc"], [2,"asc"]],
+					displayLength: 20,
+					pagingType: "full_numbers"
 			   });
 				jQuery(".certificate-list").css("visibility", "visible");
 				jQuery(".loading-image").css("display", "none");
@@ -106,7 +106,7 @@ $cid = WT_Filter::get('cid');
 $city = WT_Filter::get('city');
 
 // check if the page can be displayed
-if(get_module_setting($this->getName(), 'PC_SHOW_CERT', WT_PRIV_HIDE) < WT_USER_ACCESS_LEVEL){
+if($this->getSetting('PC_SHOW_CERT', WT_PRIV_HIDE) < WT_USER_ACCESS_LEVEL){
 	header('Location: '.WT_SERVER_NAME.WT_SCRIPT_PATH.'login.php');
 	exit;
 }

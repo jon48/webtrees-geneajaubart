@@ -1,4 +1,6 @@
 <?php
+
+use WT\Log;
 /**
  * Class for managing certificates, extending a WT_Media object.
  *
@@ -51,7 +53,10 @@ class WT_Perso_Certificate extends WT_Media {
 		
 		$ct = preg_match("/(?<year>\d{1,4})(\.(?<month>\d{1,2}))?(\.(?<day>\d{1,2}))?( (?<type>[A-Z]{1,2}) )?(?<details>.*)/", $this->title, $match);
 		if($ct > 0){
-			$this->certDate = new WT_Date($match['day'].' '.WT_Date_Calendar::NUM_TO_SHORT_MONTH($match['month'], null).' '.$match['year']);
+			$monthId = (int) $match['month'];
+			$monthShortName = array_key_exists($monthId, WT_Perso_Functions::getCalendarShortMonths()) ? 
+				WT_Perso_Functions::getCalendarShortMonths()[$monthId] : $monthId;
+			$this->certDate = new WT_Date($match['day'].' '.strtoupper($monthShortName).' '.$match['year']);
 			$this->certType = $match['type'];
 			$this->certDetails = $match['details'];			
 		} else {
@@ -61,12 +66,18 @@ class WT_Perso_Certificate extends WT_Media {
 	
 	// Extend class WT_Media
 	static public function getInstance($data, $gedcom_id=WT_GED_ID, $gedcom=null) {
-		$certfile = WT_Perso_Functions::decryptFromSafeBase64($data);
-		
-		//NEED TO CHECK THAT !!!
-		if(WT_Perso_Functions::isValidPath($certfile, true)) {
-			return new WT_Perso_Certificate($certfile);
+		try{
+			$certfile = WT_Perso_Functions::decryptFromSafeBase64($data);
+			
+			//NEED TO CHECK THAT !!!
+			if(WT_Perso_Functions::isValidPath($certfile, true)) {
+				return new WT_Perso_Certificate($certfile);
+			}
 		}
+		catch (Exception $ex) { 
+			Log::addErrorLog('Certificate module error : > '.$ex->getMessage().' < with data > '.$data.' <');
+		}	
+
 		return null;
 	}
 		
@@ -160,7 +171,7 @@ class WT_Perso_Certificate extends WT_Media {
 	 * @return string Watermark text
 	 */
 	 public function getWatermarkText(){	
-		$wmtext = get_module_setting('perso_certificates', 'PC_WM_DEFAULT', WT_I18N::translate('This image is protected under copyright law.'));
+		$wmtext = (new perso_certificates_WT_Module())->getSetting('PC_WM_DEFAULT', WT_I18N::translate('This image is protected under copyright law.'));
 		$sid= WT_Filter::get('sid', WT_REGEX_XREF);	
 	
 		if($sid){

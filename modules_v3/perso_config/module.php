@@ -7,10 +7,7 @@
  * @author Jonathan Jaubart <dev@jaubart.com>
  */
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
+use WT\Auth;
 
 class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 
@@ -52,7 +49,7 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 		
 		$controller=new WT_Controller_Page();
 		$controller
-			->requireAdminLogin()
+			->restrictAccess(Auth::isAdmin())
 			->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
 			->addInlineJavascript('jQuery("#tabs").tabs();')
 			->setPageTitle($this->getTitle())
@@ -104,13 +101,15 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 		switch($table){
 		case 'module_setting':
 			// Verify if the user has enough rights to modify the setting
-			if(!WT_USER_IS_ADMIN) WT_Perso_Functions_Edit::fail();
+			if(!Auth::isAdmin()) WT_Perso_Functions_Edit::fail();
 			
 			// Verify if a module has been specified;
-			if(is_null($id2)) WT_Perso_Functions_Edit::fail();
+			if(is_null($id2) || !array_key_exists($id2, WT_Module::getActiveModules())) 
+				WT_Perso_Functions_Edit::fail();
 					
-			// Authorised and valid - make update
-			set_module_setting($id2, $id1, $value);
+			// Authorised and valid - make update	
+			$class = $id2.'_WT_Module';
+			(new $class())->setSetting($id1, $value);
 			WT_Perso_Functions_Edit::ok($value);
 		break;
 		case 'gedcom_setting':
@@ -118,10 +117,10 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 			if(!WT_USER_GEDCOM_ADMIN) WT_Perso_Functions_Edit::fail();
 			
 			// Verify if a gedcom ID has been specified;
-			if(is_null($id2)) WT_Perso_Functions_Edit::fail();
+			if(is_null($id2) || !array_key_exists($id2, WT_Tree::getAll())) WT_Perso_Functions_Edit::fail();
 			
 			// Authorised and valid - make update
-			set_gedcom_setting($id2, $id1, $value);
+			WT_Tree::get($id2)->setPreference($id1, $value);
 			WT_Perso_Functions_Edit::ok($value);
 			break;
 		default:

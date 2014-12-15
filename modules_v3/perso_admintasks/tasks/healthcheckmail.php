@@ -7,10 +7,8 @@
  * @author Jonathan Jaubart <dev@jaubart.com>
 */
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
+use WT\Auth;
+use WT\User;
 
 class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTask {
 	
@@ -30,8 +28,8 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 		
 		$html = '<table class="gm_edit_config"><tr><td><dl>';
 		foreach(WT_Tree::getAll() as $tree){
-			if(userGedcomAdmin(WT_USER_ID, $tree->tree_id)){
-				$isTreeEnabled = get_gedcom_setting($tree->tree_id, 'PAT_'.$this->getName().'_ENABLED');
+			if(Auth::isManager($tree)){
+				$isTreeEnabled = $tree->getPreference('PAT_'.$this->getName().'_ENABLED');
 				if(is_null($isTreeEnabled)) $isTreeEnabled = true;
 				$html .= '<dt>'.WT_I18N::translate('Enable healthcheck emails for <em>%s</em>', $tree->tree_title).'</dt>'.
 					'<dd>'.WT_Perso_Functions_Edit::edit_field_yes_no_inline('gedcom_setting-'.$this->getName().'-ENABLED-'.$tree->tree_id, $isTreeEnabled, $controller, 'perso_admintasks').'</dd>';
@@ -63,19 +61,17 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 		}
 				
 		// Users statistics
-		$totusers = 0;
 		$warnusers = 0;
 		$nverusers = 0;
 		$applusers = 0;
-		foreach(get_all_users() as $user_id=>$user_name) {
-			$totusers = $totusers + 1;
-			if (((date("U") - (int)get_user_setting($user_id, 'reg_timestamp')) > 604800) && !get_user_setting($user_id, 'verified')) {
+		foreach(User::all() as $user) {
+			if (((date("U") - (int)$user->getPreference('reg_timestamp')) > 604800) && !$user->getPreference('verified')) {
 				$warnusers++;
 			}
-			if (!get_user_setting($user_id, 'verified_by_admin') && get_user_setting($user_id, 'verified')) {
+			if (!$user->getPreference('verified_by_admin') && $user->getPreference('verified')) {
 				$nverusers++;
 			}
-			if (!get_user_setting($user_id, 'verified')) {
+			if (!$user->getPreference('verified')) {
 				$applusers++;
 			}
 		}
@@ -83,11 +79,10 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 		// Tree specifics checks
 		$one_tree_done = false;
 		foreach(WT_Tree::getAll() as $tree){
-			$isTreeEnabled = get_gedcom_setting($tree->tree_id, 'PAT_'.$this->getName().'_ENABLED');
-			if(is_null($isTreeEnabled) || $isTreeEnabled){
-				$webmaster_user_id=get_gedcom_setting($tree->tree_id, 'WEBMASTER_USER_ID');
-				$webtrees_email_from =get_gedcom_setting($tree->tree_id, 'WEBTREES_EMAIL');
-				WT_I18N::init(get_user_setting($webmaster_user_id, 'language'));
+			$isTreeEnabled = $tree->getPreference('PAT_'.$this->getName().'_ENABLED');
+			if((is_null($isTreeEnabled) || $isTreeEnabled) && $webmaster = User::find($tree->getPreference('WEBMASTER_USER_ID'))){
+				$webtrees_email_from =$tree->getPreference('WEBTREES_EMAIL');
+				WT_I18N::init($webmaster->getPreference('language'));
 				
 				$subject = WT_I18N::translate('Health Check Report').' - '.WT_I18N::translate('Tree %s', $tree->tree_title);
 				$message = 
@@ -109,9 +104,9 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 				$message_users = WT_I18N::translate('Users').WT_Mail::EOL.
 						'-------------'.WT_Mail::EOL.
 						WT_SERVER_NAME.WT_SCRIPT_PATH.'admin_users.php'.WT_Mail::EOL.
-						WT_I18N::translate('Total number of users')."\t\t".$totusers.WT_Mail::EOL.
-						WT_I18N::translate('Unverified by User')."\t\t".$applusers.WT_Mail::EOL.
-						WT_I18N::translate('Unverified by Administrator')."\t".$nverusers.WT_Mail::EOL.
+						WT_I18N::translate('Total number of users')."\t\t".User::count().WT_Mail::EOL.
+						WT_I18N::translate('Not verified by the user')."\t\t".$applusers.WT_Mail::EOL.
+						WT_I18N::translate('Not approved by an administrator')."\t".$nverusers.WT_Mail::EOL.
 						WT_Mail::EOL;
 				$message  .= $message_users;
 								
@@ -178,13 +173,13 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 				
 				//Send mail
 				$mail = array();
-				$mail['to']= get_user_name($webmaster_user_id) ;
+				$mail['to']= $webmaster->getUserName() ;
 				$mail['from'] = $webtrees_email_from;
 				$mail['from_name'] = WT_I18N::translate('webtrees Site Administrator');
 				$mail['from_email'] = $mail['from'];
 				$mail['subject'] = $subject;
 				$mail['body'] = $message;
-				$mail['method'] = get_user_setting($webmaster_user_id, 'contactmethod');
+				$mail['method'] = $webmaster->getPreference('contactmethod');
 				$mail['no_from'] = true;				
 				$tmpres = addMessage($mail);
 				$res = $tmpres && (!$one_tree_done || $one_tree_done && $res);

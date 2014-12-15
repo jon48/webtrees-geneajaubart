@@ -1,4 +1,5 @@
 <?php
+
 /**
  * General additional functions
  *
@@ -18,6 +19,7 @@ class WT_Perso_Functions {
 	
 	private static $_isIsSourcedModuleOperational = -1;
 	private static $_isUrlAlive = array();
+	private static $_calendarShortMonths = array();
 	
 	/**
 	 * Debug tool: prompt a Javascript pop-up with a text
@@ -31,17 +33,30 @@ class WT_Perso_Functions {
 	}
 	
 	/**
+	 * Return the result of a division, and a default value if denomintaor is 0
+	 * 
+	 * @param integer $num Numerator
+	 * @param integer $denom Denominator
+	 * @param float $default Default value if denominator null or 0
+	 * @return float Result of the safe division
+	 */
+	public static function safeDivision($num, $denom, $default = 0) {
+		if($denom && $denom!=0){
+			return $num / $denom;
+		}
+		return $default;
+	}
+	
+	/**
 	 * Returns the percentage of two numbers
 	 *
 	 * @param int $num Numerator
 	 * @param int $denom Denominator
+	 * @param float $default Default value if denominator null or 0
 	 * @return float Percentage
 	 */
-	public static function getPercentage($num, $denom){
-		if($denom!=0){
-			return 100 * $num / $denom;
-		}
-		return 0;
+	public static function getPercentage($num, $denom, $default = 0){
+		return 100 * self::safeDivision($num, $denom, $default);
 	}
 	
 	/**
@@ -149,6 +164,10 @@ class WT_Perso_Functions {
 		$encrypted = str_replace('_', '/', $encrypted);
 		$encrypted = str_replace('*', '=', $encrypted);
 		$encrypted = base64_decode($encrypted);
+		if(!$encrypted)
+			throw new InvalidArgumentException('The encrypted value is not in correct base64 format.');
+		if(strlen($encrypted) < self::ENCRYPTION_IV_SIZE) 
+			throw new InvalidArgumentException('The encrypted value does not contain enough characters for the key.');
 		$iv_dec = substr($encrypted, 0, self::ENCRYPTION_IV_SIZE);
 		$encrypted = substr($encrypted, self::ENCRYPTION_IV_SIZE);
 		$decrypted = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $encrypted, MCRYPT_MODE_CBC, $iv_dec);
@@ -181,9 +200,30 @@ class WT_Perso_Functions {
 		return $string;
 	}
 	
+	/**
+	 * Check whether a path is under a valid form.
+	 * 
+	 * @param string $filename Filename path to check
+	 * @param boolean $acceptfolder Should folders be accepted?
+	 * @return boolean True if path valid
+	 */
 	public static function isValidPath($filename, $acceptfolder = FALSE) {		
 		if(strpbrk($filename, $acceptfolder ? '?%*:|"<>' : '\\/?%*:|"<>') === FALSE) return true;
 		return false;
+	}
+	
+	/**
+	 * Return short names for the months of the specific calendar.
+	 * 
+	 * @see cal_info
+	 * @param integer $calendarId Calendar ID (according to PHP cal_info)
+	 * @return array Array of month short names
+	 */
+	public static function getCalendarShortMonths($calendarId = 0) {
+		if(!isset(self::$_calendarShortMonths[$calendarId])) {
+			self::$_calendarShortMonths[$calendarId] = cal_info($calendarId)['abbrevmonths'];
+		}		
+		return self::$_calendarShortMonths[$calendarId];
 	}
 	
 }

@@ -2492,11 +2492,14 @@ a.icon-uarrow:hover {
 /* PERSO Personal styles */
 .flag_gm_25 {max-width: 25px;max-height: 25px;}
 
-.progressbutton{width: 130px;height: 30px;}
+.progressbutton{min-width: 130px;height: 30px;}
 .icon-loading-small{width:16px;height:16px;background-image:url(images/indicator.gif);}
 .icon-perso-success{width:16px;height:16px;background-image:url(images/perso/success.png);}
 .icon-perso-error{width:16px;height:16px;background-image:url(images/perso/error.png);}
 
 #perso_geodispersion td {padding: 10px 50px 10px 50px;}
 #perso_geodispersion .dataTables_wrapper td { padding: 0px;  }
+
+.fullwidth_table {width: 100%;}
+.fullwidth_table th {min-width: 60px;}
 /* END PERSO */

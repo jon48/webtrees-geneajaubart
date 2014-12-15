@@ -8,10 +8,9 @@
  * @author Jonathan Jaubart <dev@jaubart.com>
  */
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
+use Rhumsaa\Uuid\Uuid;
+use WT\Auth;
+use WT\Log;
 
 // Create tables, if not already present
 try {
@@ -74,12 +73,11 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 		echo '<div id="'.$this->getName().'"><table class="gm_edit_config"><tr><td><dl>';
 
 		if(WT_Perso_Functions_Sosa::isModuleOperational()){
-			$tab_id = 'ID'.floor(microtime()*1000000);
+			$tab_id = Uuid::uuid4();
 				
 			$controller
 			->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 			->addExternalJavascript(WT_JQUERY_JEDITABLE_URL)
-			->addExternalJavascript(WT_STATIC_URL.'js/jquery.datatables.fnReloadAjax.js')
 			->addExternalJavascript(WT_STATIC_URL.'js/jquery.form-3.32.0.js')
 			->addInlineJavascript('
 					function updatePlaceHierarchy(){
@@ -128,7 +126,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			                "data": { "mod" : "'.$this->getName().'", "mod_action": "ajaxadmindelete", "geodispid": id },
 			                "success": function(response){
 								if(response.result == "ok"){
-									geoConfigDatatable.fnReloadAjax();
+									geoConfigDatatable.ajax.reload();
 								}
 								alert(response.text);					
 							},
@@ -182,7 +180,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 						                    },
 											"success": function(e){
 												if(e.result == "ok") {					
-													geoConfigDatatable.fnReloadAjax();
+													geoConfigDatatable.ajax.reload();
 													oAddNewGeoDispForm.dialog("close");
 												}
 												else{
@@ -207,40 +205,36 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 						jQuery.fn.dataTableExt.oSort["num-html-asc" ]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a<b) ? -1 : (a>b ? 1 : 0);};
 						jQuery.fn.dataTableExt.oSort["num-html-desc"]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a>b) ? -1 : (a<b ? 1 : 0);};
 			
-						geoConfigDatatable = jQuery("#tGeoConfigTable_'.$tab_id.'").dataTable({
-							"sDom": \'<"H"pf<"dt-clear">irl>t<"F"p>\',
+						geoConfigDatatable = jQuery("#tGeoConfigTable_'.$tab_id.'").DataTable({
+							dom: \'<"H"pf<"dt-clear">irl>t<"F"p>\',
 							'.WT_I18N::datatablesI18N().',
-							"bJQueryUI": true,
-							"aoColumns": [
-								/* 0 ID		 		*/ {"bVisible": false},
-								/* 1 Activated 		*/ {"bSortable": false, "sClass": "center"},
-								/* 2 Description	*/ {"bSortable": false, "sClass": "center", "sType": "unicode"},
-								/* 3 Subdivision	*/ {"bSortable": false, "sClass": "center"},
-								/* 4 Map 			*/ {"bSortable": false, "sClass": "center"},
-								/* 5 MapTopLevel 	*/ {"bSortable": false, "sClass": "center"},
-								/* 6 Use flags	 	*/ {"bSortable": false, "sClass": "center"},
-								/* 7 Gen Details 	*/ {"bSortable": false, "sClass": "center"},					
-								/* 8 <delete> 		*/ {"bSortable": false, "sClass": "center"}
+							jQueryUI: true,
+							columns: [
+								/* 0 ID		 		*/ {visible: false},
+								/* 1 Activated 		*/ {sortable: false, class: "center"},
+								/* 2 Description	*/ {sortable: false, class: "center", type: "unicode"},
+								/* 3 Subdivision	*/ {sortable: false, class: "center"},
+								/* 4 Map 			*/ {sortable: false, class: "center"},
+								/* 5 MapTopLevel 	*/ {sortable: false, class: "center"},
+								/* 6 Use flags	 	*/ {sortable: false, class: "center"},
+								/* 7 Gen Details 	*/ {sortable: false, class: "center"},					
+								/* 8 <delete> 		*/ {sortable: false, class: "center"}
 							],
-							"aaSorting": [[2, "asc"], [3, "asc"]],
-							"iDisplayLength": 10,
-							"sPaginationType": "full_numbers",
+							sorting: [[2, "asc"], [3, "asc"]],
+							displayLength: 10,
+							pagingType: "full_numbers",
 							// Server side processing
-							"bProcessing " : true,
-							"bServerSide" : true,
-							"sAjaxSource": "module.php",
-							"fnServerData": function ( sSource, aoData, fnCallback ) {
-								aoData.push({ "name" : "mod", "value": "'.$this->getName().'"});
-								aoData.push({ "name" : "mod_action", "value": "ajaxadminconfigdata"});
-								aoData.push({ "name" : "ged", "value": ged});
-								$.ajax({
-									"dataType": "json",
-									"url": sSource,
-									"data": aoData,
-									"success": fnCallback
-								});
+							processing : true,
+							serverSide : true,
+							ajax : {
+								url : "module.php",
+								data : {
+									mod : "'.$this->getName().'",
+									mod_action : "ajaxadminconfigdata",
+									ged : ged
+								}
 							},
-							"fnDrawCallback": function() {
+							drawCallback: function() {
 								// Our JSON responses include Javascript as well as HTML.  This does not get executed automatically…
 								jQuery("#tGeoConfigTable_'.$tab_id.' script").each(function() {
 									eval(this.text);
@@ -390,7 +384,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			switch($table){
 				case 'geo':
 					// Verify if the user has enough rights to modify the setting
-					if(!WT_USER_IS_ADMIN) WT_Perso_Functions_Edit::fail();
+					if(!Auth::isAdmin()) WT_Perso_Functions_Edit::fail();
 					
 					// Verify if a geodispersion analysis has been specified;
 					if(is_null($id1)) WT_Perso_Functions_Edit::fail();
@@ -491,23 +485,23 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 				$nbOther = 0;				
 				if(isset($placesDispGeneral['other'])) $nbOther =$placesDispGeneral['other'];
 				$nbUnknown = $placesDispGeneral['unknown'];
-				$percKnown = WT_Perso_Functions::getPercentage($nbFound - $nbOther, $nbFound + $nbUnknown);
+				$percKnown = WT_Perso_Functions::safeDivision($nbFound - $nbOther, $nbFound + $nbUnknown);
 				$html.='<div id="geodispersion_summary">'.
 				       '<table class="center">'.
 							'<tr>'.
 								'<td class="descriptionbox">'.WT_I18N::translate('Places found').'</td>'.
-								'<td class="optionbox">'.WT_I18N::translate('%1$d (%2$.0f %%)',$nbFound - $nbOther, $percKnown).'</td>'.
+								'<td class="optionbox">'.WT_I18N::translate('%1$d (%2$s)',$nbFound - $nbOther, WT_I18N::percentage($percKnown)).'</td>'.
 							'</tr>';				
 				if($nbOther > 0){
-					$percOther = WT_Perso_Functions::getPercentage($nbOther, $nbFound + $nbUnknown);
+					$percOther = WT_Perso_Functions::safeDivision($nbOther, $nbFound + $nbUnknown);
 					$html.=	'<tr>'.
 								'<td class="descriptionbox">'.WT_I18N::translate('Other places').'</td>'.
-								'<td class="optionbox">'.WT_I18N::translate('%1$d (%2$.0f %%)',$nbOther, $percOther).'</td>'.
+								'<td class="optionbox">'.WT_I18N::translate('%1$d (%2$s)',$nbOther, WT_I18N::percentage($percOther)).'</td>'.
 							'</tr>';
 				}				
 				$html.=		'<tr>'.
 								'<td class="descriptionbox">'.WT_I18N::translate('Places not found').'</td>'.
-								'<td class="optionbox">'.WT_I18N::translate('%1$d (%2$.0f %%)',$nbUnknown, 100 - $percKnown).'</td>'.
+								'<td class="optionbox">'.WT_I18N::translate('%1$d (%2$s)',$nbUnknown, WT_I18N::percentage(1 - $percKnown)).'</td>'.
 							'</tr>'.
 						'</table>'.
 					'</div>';
@@ -526,7 +520,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							$levelvalues = array_reverse(array_map('trim',explode(',', $location)));
 							if(isset($mapSettings['subdivisions'][$levelvalues[0]])){								
 								$mapSettings['subdivisions'][$levelvalues[0]]['count'] = $count;
-								$mapSettings['subdivisions'][$levelvalues[0]]['transparency'] = WT_Perso_Functions::getPercentage($count, $max)/100;
+								$mapSettings['subdivisions'][$levelvalues[0]]['transparency'] = WT_Perso_Functions::safeDivision($count, $max);
 								if($parameters->useflags == 'yes') $mapSettings['subdivisions'][$levelvalues[0]]['flag'] = WT_Perso_Functions_Map::getPlaceIcon(new WT_Place(implode(', ', $levelvalues), WT_GED_ID), 50);
 							}
 						}
@@ -584,7 +578,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							if(isset($location['transparency'])) {
 								$textToolTip = '<strong>'.$name.'</strong><br/>';
 								if($parameters->useflags == 'yes' && $location['flag'] != '') $textToolTip .= '<span class="geodispersion_flag">'.$location['flag'].'</span><br/>';
-								$textToolTip .= WT_I18N::translate('%d individuals', $location['count']).'<br/>'.WT_I18N::translate('%.1f %%', WT_Perso_Functions::getPercentage($location['count'], $nbFound - $nbOther));
+								$textToolTip .= WT_I18N::translate('%d individuals', $location['count']).'<br/>'.WT_I18N::percentage(WT_Perso_Functions::safeDivision($location['count'], $nbFound - $nbOther), 1);
 								$html.= 'addTip(map.area'.$location['id'].'.node, "'.WT_Filter::escapeJs($textToolTip).'");';
 								$html.= 'map.area'.$location['id'].'.attr({"fill" : "'.$maxcolor.'", "fill-opacity" : '.$location['transparency'].' });';
 								$html.= 'map.area'.$location['id'].'.mouseover(function () {'.
@@ -615,7 +609,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 					arsort($placesDispGeneral);
 					foreach($placesDispGeneral as $place => $nb){
 						if($place != 'knownsum' && $place != 'other' && $place != 'unknown' && $place != 'max') {
-							$perc = WT_Perso_Functions::getPercentage($nb, $nbFound - $nbOther);
+							$perc = WT_Perso_Functions::safeDivision($nb, $nbFound - $nbOther);
 							if($nb!=$previousNb){
 								$j=$i;
 							}
@@ -630,7 +624,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 										'<td class="descriptionbox"><strong>'.$j.'</strong></td>'.
 										'<td class="descriptionbox">'.$placename.'</td>'.
 										'<td class="optionbox">'.WT_I18N::translate('%d',$nb).'</td>'.
-										'<td class="optionbox">'.WT_I18N::translate('%.1f %%', $perc).'</td>'.
+										'<td class="optionbox">'.WT_I18N::percentage($perc,1).'</td>'.
 									'</tr>';
 							$i++;
 							$previousNb=$nb;
@@ -669,7 +663,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 					else{
 						$html .= ' ';
 					}
-					$html .= 		WT_I18N::translate('(%.1f %%)', WT_Perso_Functions::getPercentage($countGen, $countGen + $unknownGen)).'</td>'.
+					$html .= 		WT_I18N::translate('(%s)', WT_I18N::percentage(WT_Perso_Functions::safeDivision($countGen, $countGen + $unknownGen),1)).'</td>'.
 								'<td class="optionbox left">'.$this->getGenerationPlacesRow($genData, $parameters->sublevel, $parameters->useflags, $parameters->detailsgen).'</td>'.
 							'</tr>'
 					;
@@ -774,7 +768,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 		$jsonArray['sEcho'] = $sEcho;
 		$jsonArray['aaData'] = array();
 
-		if(WT_USER_IS_ADMIN){
+		if(Auth::isAdmin()){
 			$sql = 'SELECT COUNT(pg_id) FROM ##pgeodispersion WHERE pg_file=?';
 			$nbResults = WT_DB::prepare($sql)->execute(array(WT_GED_ID))->fetchOne(0);
 			$jsonArray['iTotalRecords'] =  $nbResults;
@@ -881,13 +875,13 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			'text'	=>	WT_I18N::translate('The Geodispersion analysis entry could not be deleted.')
 		);
 		
-		if(WT_USER_IS_ADMIN && $id > 0){
+		if(Auth::isAdmin() && $id > 0){
 			$sql = 'DELETE FROM ##pgeodispersion WHERE pg_id = ?';
 			WT_DB::prepare($sql)->execute(array($id));
 			
 			$result['result'] = 'ok';
 			$result['text'] = WT_I18N::translate('The Geodispersion analysis entry has been successfully deleted.');
-			AddToLog('Module '.$this->getName().' : Geo Analysis ID "'.$id.'" has been deleted.', 'config');
+			Log::addConfigurationLog('Module '.$this->getName().' : Geo Analysis ID "'.$id.'" has been deleted.');
 		}
 			
 		$controller->pageHeader();
@@ -930,27 +924,33 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 			'text'	=>	WT_I18N::translate('An error occured while adding new element.')
 		);
 
-		if(WT_USER_IS_ADMIN && $descr && $subdiv >= 0 && $useflagsgen && $detailsgen >= -1){
+		if(Auth::isAdmin() && $descr && $subdiv >= 0 && $useflagsgen && $detailsgen >= -1){
 			$sql = 'INSERT INTO ##pgeodispersion'.
 				' (pg_file, pg_descr, pg_sublevel, pg_map, pg_toplevel, pg_status, pg_useflagsgen, pg_detailsgen)'.
 				' VALUES (?, ?, ?, ?, ?, "enabled", ?, ?)';
 			try{
-				WT_DB::getInstance()->beginTransaction();
+				//Commit da64ae4e3714bfc6adf747fe25e881304a69a771 removed the capability to expose the PDO object
+				// No access to the transactional method is then possible. Use of 
+				// To be added back > v1.6.1
+				WT_DB::exec('START TRANSACTION');
+				// WT_DB::getInstance()->beginTransaction(); -> will become WT_DB::beginTransaction()
 				if($map == 'nomap' || $toplevel == -1){
 					$map = null;
 					$toplevel = -100;
 				}
 				WT_DB::prepare($sql)->execute(array(WT_GED_ID, $descr, $subdiv, $map, $toplevel, $useflagsgen, $detailsgen));
 				$id = WT_DB::getInstance()->lastInsertId();
-				WT_DB::getInstance()->commit();
+				WT_DB::exec('COMMIT');
+				// WT_DB::getInstance()->commit();  -> will become WT_DB::commit()
 				$result['result'] = 'ok';
 				$result['text']=$id;
-				AddToLog('Module '.$this->getName().' : Geo Analysis ID "'.$id.'" added with parameters ['.$descr.', '.$subdiv.','.$map.','.$toplevel.','.$useflagsgen.', '.$detailsgen.'].', 'config');
+				Log::addConfigurationLog('Module '.$this->getName().' : Geo Analysis ID "'.$id.'" added with parameters ['.$descr.', '.$subdiv.','.$map.','.$toplevel.','.$useflagsgen.', '.$detailsgen.'].');
 			}
 			catch(Exception $e){
-				WT_DB::getInstance()->rollback();
-				AddToLog('Module '.$this->getName().' : A new Geo Analysis could not be added. See error log.', 'config');
-				AddToLog('Module '.$this->getName().' : A new Geo Analysis failed to be added. Parameters ['.$descr.', '.$subdiv.','.$map.','.$toplevel.','.$useflagsgen.', '.$detailsgen.']. Exception '.$e->getMessage(), 'error');
+				WT_DB::exec('ROLLBACK');
+				// WT_DB::getInstance()->rollback();  -> will become WT_DB::rollback()
+				Log::addConfigurationLog('Module '.$this->getName().' : A new Geo Analysis could not be added. See error log.');
+				Log::addErrorLog('Module '.$this->getName().' : A new Geo Analysis failed to be added. Parameters ['.$descr.', '.$subdiv.','.$map.','.$toplevel.','.$useflagsgen.', '.$detailsgen.']. Exception '.$e->getMessage());
 			}
 		}
 
@@ -1139,12 +1139,12 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 						$content .= '<td><span title="'.implode(WT_I18N::$list_separator, array_reverse($levels)).'">'.$levels[$sublevel-1].'</span><br/>';
 					}
 					$content .= $count;
-					$perc=WT_Perso_Functions::getPercentage($count, $sum + $unknownother);
-					$perc2=WT_Perso_Functions::getPercentage($count, $sum);					
-					if($perc2>=10) $content.= '<br/><span class="small">('.WT_I18N::translate('%.0f %%', $perc2).')</span>';
+					$perc=WT_Perso_Functions::safeDivision($count, $sum + $unknownother);
+					$perc2=WT_Perso_Functions::safeDivision($count, $sum);					
+					if($perc2>=0.1) $content.= '<br/><span class="small">('.WT_I18N::percentage($perc2, 1).')</span>';
 					$content .= '</td>';
 					
-					$html .= '<td class="geodispersion_rowitem" width="'.max(round($perc, 0),1).'%">'.
+					$html .= '<td class="geodispersion_rowitem" width="'.max(round(100*$perc, 0),1).'%">'.
 								'<table><tr>'.
 									'<td><table><tr>'.$content.'</tr></table></td>'.
 								'</tr></table>'.
@@ -1153,10 +1153,10 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 				}
 			}
 			if($unknownother>0){
-				$perc=WT_Perso_Functions::getPercentage($unknownother, $sum + $unknownother);
+				$perc=WT_Perso_Functions::safeDivision($unknownother, $sum + $unknownother);
 				$html .='<td class="geodispersion_unknownitem left" >'.
 				            $unknownother;
-				if($perc>=10) $html.= '<br/><span class="small">('.WT_I18N::translate('%.1f %%', $perc).')</span>';
+				if($perc>=0.1) $html.= '<br/><span class="small">('.WT_I18N::percentage($perc, 1).')</span>';
 				$html .='</td>';
 			}
 			$html .= '</tr></table>';
@@ -1176,7 +1176,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 						$placename = WT_I18N::translate('Other places');
 					}
 					$count = current($data);
-					$placesArray[] = WT_I18N::translate('<strong>%s</strong> [%d - %0.1f %%]', $placename, $count, WT_Perso_Functions::getPercentage($count, $sum + $other));
+					$placesArray[] = WT_I18N::translate('<strong>%s</strong> [%d - %s]', $placename, $count, WT_I18N::percentage(WT_Perso_Functions::safeDivision($count, $sum + $other), 1));
 					$nbPlaces++;
 				}
 				next($data);

@@ -7,10 +7,8 @@
  * @author Jonathan Jaubart <dev@jaubart.com>
  */
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
+use WT\Auth;
+use Rhumsaa\Uuid\Uuid;
 
 // Create tables, if not already present
 try {
@@ -55,7 +53,7 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 	 */
 	private function updateHooks(){
 		
-		if(WT_USER_IS_ADMIN){
+		if(Auth::isAdmin()){
 			$ihooks = WT_Perso_Hook::getInstalledHooks();
 			$phooks = WT_Perso_Hook::getPossibleHooks();
 			
@@ -92,7 +90,7 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 	 */
 	private function updateParams(){
 		
-		if(WT_USER_IS_ADMIN){
+		if(Auth::isAdmin()){
 			$ihooks = WT_Perso_Hook::getInstalledHooks();
 			
 			$module_names=WT_DB::prepare("SELECT module_name FROM `##module` WHERE status='disabled'")->fetchOneColumn();		
@@ -141,24 +139,26 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 	 * Display an editable list of installed hooks in order for the admin to configure statuses and priorities.
 	 */
 	private function config() {
-		
+				
 		$controller=new WT_Controller_Page();
 		$controller
-			->requireAdminLogin()
+			->restrictAccess(Auth::isAdmin())
 			->setPageTitle($this->getTitle())
 			->pageHeader();
-		
+				
 		require WT_ROOT.'includes/functions/functions_edit.php';
 	
-		$hooks= WT_Perso_Hook::getRawInstalledHooks();
+		$table_id = 'table-installedhooks-' . Uuid::uuid4();
 		
+		$hooks= WT_Perso_Hook::getRawInstalledHooks();
+				
 		echo '<div align="center">',
 			'<div id="tabs">';
 		echo WT_I18N::translate('Help').help_link('admin_config', $this->getName());
 		echo '<form method="post" action="#">',
 					WT_Filter::getCsrf(),
 					'<input type="hidden" name="ispost" value="true">',
-					'<table id="installed_table" class="tablesorter" border="0" cellpadding="0" cellspacing="1">',
+					'<table id="'.$table_id.'" class="fullwidth_table" border="0">',
 						'<thead>',
 							'<tr>',
 							'<th>',WT_I18N::translate('Enabled'),'</th>',
@@ -183,7 +183,7 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 							}
 		echo 			'</tbody>',
 					'</table>',
-					'<input type="submit" value="',WT_I18N::translate('Save'),'" />',
+					'<input class="progressbutton" type="submit" value="',WT_I18N::translate('Save'),'" />',
 				'</form>',
 			'</div>',
 		'</div>';
@@ -192,23 +192,28 @@ class perso_hooks_WT_Module extends WT_Module implements WT_Module_Config {
 		->addExternalJavascript(WT_JQUERY_DATATABLES_URL)
 		->addInlineJavascript('
 				  	jQuery(document).ready(function() {
-		
-					  var oTable = jQuery("#installed_table").dataTable( {
-							"sDom": \'<"H"prf>t<"F"li>\',
+						/* Initialise datatables */
+						jQuery.fn.dataTableExt.oSort["unicode-asc"  ]=function(a,b) {return a.replace(/<[^<]*>/, "").localeCompare(b.replace(/<[^<]*>/, ""))};
+						jQuery.fn.dataTableExt.oSort["unicode-desc" ]=function(a,b) {return b.replace(/<[^<]*>/, "").localeCompare(a.replace(/<[^<]*>/, ""))};
+						jQuery.fn.dataTableExt.oSort["num-html-asc" ]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a<b) ? -1 : (a>b ? 1 : 0);};
+						jQuery.fn.dataTableExt.oSort["num-html-desc"]=function(a,b) {a=parseFloat(a.replace(/<[^<]*>/, "")); b=parseFloat(b.replace(/<[^<]*>/, "")); return (a>b) ? -1 : (a<b ? 1 : 0);};
+						
+						jQuery("#'.$table_id.'").dataTable( {
+							dom: \'<"H"prf>t<"F"li>\',
 							'.WT_I18N::datatablesI18N().',
-							"bJQueryUI": true,
-							"bAutoWidth":false,
-							"aaSorting": [[ 2, "asc" ], [ 3, "asc" ]],
-							"iDisplayLength": 10,
-							"sPaginationType": "full_numbers",
-							"aoColumns": [
-								/* 0 Enabled 		*/	{ "iDataSort": 1, "sClass": "center" },
-								/* 1 Enabled sort	*/	{ "bVisible": false},
+							jQueryUI: true,
+							
+							sorting: [[ 2, "asc" ], [ 3, "asc" ]],
+							displayLength: 10,
+							pagingType: "full_numbers",
+							columns: [
+								/* 0 Enabled 		*/	{ dataSort: 1, class: "center" },
+								/* 1 Enabled sort	*/	{ visible: false},
 								/* 2 Hook function	*/	null,
 								/* 3 Hook context	*/	null,
 								/* 4 Module name	*/	null,						
-								/* 5 Priority		*/	{ "iDataSort": 6, "sClass": "center" },
-								/* 6 Priority sort	*/	{ "sType": "numeric", "bVisible": false},
+								/* 5 Priority		*/	{ dataSort: 6, class: "center" },
+								/* 6 Priority sort	*/	{ type: "num", visible: false}
 							]
 					  });
 					});

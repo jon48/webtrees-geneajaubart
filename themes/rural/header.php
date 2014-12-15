@@ -120,7 +120,7 @@ $this
 				<ul class="makeMenu">
 					<li>
 					<?php 
-					if (WT_USER_ID) {
+					if (Auth::check()) {
 						echo '<a href="edituser.php">', WT_I18N::translate('Logged in as '), ' ', WT_Filter::escapeHtml(Auth::user()->getRealName()), '</a></li> <li>', logout_link();
 					} else {
 						echo login_link();

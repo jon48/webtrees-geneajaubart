@@ -46,7 +46,7 @@ class WT_Perso_Individual extends WT_Perso_GedcomRecord {
 			$this->_titles=array();
 			$titlefacts = $this->gedcomrecord->getFacts('TITL');
 			foreach($titlefacts as $titlefact){
-				$ct2 = preg_match_all('/(.*) (('.get_module_setting('perso_general', 'PG_TITLE_PREFIX', '').')(.*))/', $titlefact->getValue(), $match2);
+				$ct2 = preg_match_all('/(.*) (('.(new perso_general_WT_Module())->getSetting('PG_TITLE_PREFIX', '').')(.*))/', $titlefact->getValue(), $match2);
 				if($ct2>0){
 					$this->_titles[$match2[1][0]][]= trim($match2[2][0]);
 				}

@@ -372,6 +372,7 @@ return array(
     'WT_Perso_Module_IndividualHeaderExtender' => $vendorDir . '/WT/Perso/Module/IndividualHeaderExtender.php',
     'WT_Perso_Module_RecordNameTextExtender' => $vendorDir . '/WT/Perso/Module/RecordNameTextExtender.php',
     'WT_Perso_Place' => $vendorDir . '/WT/Perso/Place.php',
+    'WT_Perso_Query_Stats' => $vendorDir . '/WT/Perso/Query/Stats.php',
     'WT_Place' => $vendorDir . '/WT/Place.php',
     'WT_Query_Admin' => $vendorDir . '/WT/Query/Admin.php',
     'WT_Query_Media' => $vendorDir . '/WT/Query/Media.php',

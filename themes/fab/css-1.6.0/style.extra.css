@@ -32,6 +32,25 @@
  * $HeadURL$
  */
 
+#perso-header-menu {position:absolute; left:30%; top:5px;}
+#perso-header-menu a {color: white;}
+#perso-header-menu a:hover {color: red;}
+ 
+ /* Large menu icons */
+#main-menu > li[id^='menu-perso-'] {background-image:url(images/perso/large_menu_sprite.png);}
+#menu-perso-sosa       				{background-position:center  0px;}
+
+ /* Small menu icon */
+#main-menu li li[id^='menu-perso-'] {background-image:url(images/perso/small_menu_sprite.png);}
+#menu-perso-list-certificate   		{background-position:left    	0px;} html[dir=rtl] #menu-perso-list-certificate		{background-position:right    	 0px;} 
+#menu-perso-list-lineage   			{background-position:left     -23px;} html[dir=rtl] #menu-perso-list-lineage 			{background-position:right     -23px;}
+#menu-perso-sosa-list			   	{background-position:left     -46px;} html[dir=rtl] #menu-perso-sosa-list			 	{background-position:right     -46px;}
+#menu-perso-sosa-missing		   	{background-position:left     -69px;} html[dir=rtl] #menu-perso-sosa-missing		 	{background-position:right     -69px;}
+#menu-perso-sosa-stats		   		{background-position:left     -92px;} html[dir=rtl] #menu-perso-sosa-stats		 		{background-position:right     -92px;}
+#menu-perso-sosa-recompute	   		{background-position:left    -115px;} html[dir=rtl] #menu-perso-sosa-recompute	 		{background-position:right    -115px;}
+#menu-perso-sosa-geodispersion	   	{background-position:left    -138px;} html[dir=rtl] #menu-perso-sosa-geodispersion 		{background-position:right    -138px;}
+#menu-perso-sosa-geodispersion li	{background-position:left    -138px;} html[dir=rtl] #menu-perso-sosa-geodispersion li	{background-position:right    -138px;}
+
 /* Lists */
 .certificate-list, .sosa-list, .smissing-list  {margin:5px auto; width:98%; visibility:hidden;}
 .certificate-list table, .sosa-list table, .smissing-list table  {width:100%;}

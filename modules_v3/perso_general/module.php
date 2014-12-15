@@ -8,10 +8,7 @@
  * @author Jonathan Jaubart <dev@jaubart.com>
  */
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
+use WT\Auth;
 
 class perso_general_WT_Module extends WT_Module implements WT_Perso_Module_HookSubscriber, WT_Perso_Module_Configurable, WT_Perso_Module_HeaderExtender, WT_Perso_Module_FooterExtender, WT_Perso_Module_IndividualHeaderExtender{
 
@@ -46,25 +43,25 @@ class perso_general_WT_Module extends WT_Module implements WT_Perso_Module_HookS
 		global $controller;
 		
 		echo '<div id="'.$this->getName().'"><table class="gm_edit_config"><tr><td><dl>';
-		if(WT_USER_IS_ADMIN){
+		if(Auth::isAdmin()){
 			echo '<dt>', WT_I18N::translate('Title prefixes'), help_link('config_title_prefix', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PG_TITLE_PREFIX-'.$this->getName(), get_module_setting($this->getName(), 'PG_TITLE_PREFIX', ''), $controller), '</dd>';
+				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PG_TITLE_PREFIX-'.$this->getName(), $this->getSetting('PG_TITLE_PREFIX', ''), $controller), '</dd>';
 			echo '<dt>', WT_I18N::translate('Include additional HTML in header'), help_link('config_add_html_header', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_field_yes_no_inline('module_setting-PG_ADD_HTML_HEADER-'.$this->getName(), get_module_setting($this->getName(), 'PG_ADD_HTML_HEADER', false), $controller), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_field_yes_no_inline('module_setting-PG_ADD_HTML_HEADER-'.$this->getName(), $this->getSetting('PG_ADD_HTML_HEADER', false), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Hide additional header'), help_link('config_show_html_header', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PG_SHOW_HTML_HEADER-'.$this->getName(), get_module_setting($this->getName(), 'PG_SHOW_HTML_HEADER', WT_PRIV_HIDE), $controller), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PG_SHOW_HTML_HEADER-'.$this->getName(), $this->getSetting('PG_SHOW_HTML_HEADER', WT_PRIV_HIDE), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Additional HTML in header'), help_link('config_html_header', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_longfield_inline('module_setting-PG_HTML_HEADER-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PG_HTML_HEADER', ''), $controller), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_module_longfield_inline('module_setting-PG_HTML_HEADER-'.$this->getName().'-validate', $this->getSetting('PG_HTML_HEADER', ''), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Display French <em>CNIL</em> disclaimer'), help_link('config_display_CNIL', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_field_yes_no_inline('module_setting-PG_DISPLAY_CNIL-'.$this->getName(), get_module_setting($this->getName(), 'PG_DISPLAY_CNIL', false), $controller), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_field_yes_no_inline('module_setting-PG_DISPLAY_CNIL-'.$this->getName(), $this->getSetting('PG_DISPLAY_CNIL', false), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('<em>CNIL</em> reference'), help_link('config_cnil_ref', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PG_CNIL_REFERENCE-'.$this->getName(), get_module_setting($this->getName(), 'PG_CNIL_REFERENCE', ''), $controller), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_module_field_inline('module_setting-PG_CNIL_REFERENCE-'.$this->getName(), $this->getSetting('PG_CNIL_REFERENCE', ''), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Include additional HTML in footer'), help_link('config_add_html_footer', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_field_yes_no_inline('module_setting-PG_ADD_HTML_FOOTER-'.$this->getName(), get_module_setting($this->getName(), 'PG_ADD_HTML_FOOTER', false), $controller), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_field_yes_no_inline('module_setting-PG_ADD_HTML_FOOTER-'.$this->getName(), $this->getSetting('PG_ADD_HTML_FOOTER', false), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Hide additional footer'), help_link('config_show_html_footer', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PG_SHOW_HTML_FOOTER-'.$this->getName(), get_module_setting($this->getName(), 'PG_SHOW_HTML_FOOTER', WT_PRIV_HIDE), $controller), '</dd>',
+				'<dd>', WT_Perso_Functions_Edit::edit_field_access_level_inline('module_setting-PG_SHOW_HTML_FOOTER-'.$this->getName(), $this->getSetting('PG_SHOW_HTML_FOOTER', WT_PRIV_HIDE), $controller), '</dd>',
 				'<dt>', WT_I18N::translate('Additional HTML in footer'), help_link('config_html_footer', $this->getName()), '</dt>',
-				'<dd>', WT_Perso_Functions_Edit::edit_module_longfield_inline('module_setting-PG_HTML_FOOTER-'.$this->getName().'-validate', get_module_setting($this->getName(), 'PG_HTML_FOOTER', ''), $controller), '</dd>';
+				'<dd>', WT_Perso_Functions_Edit::edit_module_longfield_inline('module_setting-PG_HTML_FOOTER-'.$this->getName().'-validate', $this->getSetting('PG_HTML_FOOTER', ''), $controller), '</dd>';
 		}
 		echo '</dl></td></tr></table></div>';
 	}
@@ -86,30 +83,30 @@ class perso_general_WT_Module extends WT_Module implements WT_Perso_Module_HookS
 	public function h_print_header(){
 		global $WT_SESSION;
 		
-		if(get_module_setting($this->getName(), 'PG_ADD_HTML_HEADER', false)){
-			if(WT_USER_ACCESS_LEVEL >= get_module_setting($this->getName(), 'PG_SHOW_HTML_HEADER', WT_PRIV_HIDE)  && !WT_Filter::getBool('noheader')){		
-				echo htmlspecialchars_decode(get_module_setting($this->getName(), 'PG_HTML_HEADER', ''));
+		if($this->getSetting('PG_ADD_HTML_HEADER', false)){
+			if(WT_USER_ACCESS_LEVEL >= $this->getSetting('PG_SHOW_HTML_HEADER', WT_PRIV_HIDE)  && !WT_Filter::getBool('noheader')){		
+				echo htmlspecialchars_decode($this->getSetting('PG_HTML_HEADER', ''));
 			}
 		}
 	}
 	
 	// Implement WT_Perso_Module_FooterExtender
 	public function h_print_footer(){
-		global $WT_SESSION;
+		global $WT_SESSION, $WT_TREE;
 		
-		if(get_module_setting($this->getName(), 'PG_DISPLAY_CNIL', false)){
+		if($this->getSetting('PG_DISPLAY_CNIL', false)){
 			echo '<br/>';
 			echo '<div class="center">';
-			$cnil_ref = get_module_setting($this->getName(), 'PG_CNIL_REFERENCE', '');
+			$cnil_ref = $this->getSetting('PG_CNIL_REFERENCE', '');
 			if($cnil_ref != ''){
 				echo WT_I18N::translate('This site has been notified to the French National Commission for Data protection (CNIL) and registered under number %s. ', $cnil_ref);
 			}
-			echo WT_I18N::translate('In accordance with the French Data protection Act (<em>Loi Informatique et Libertés</em>) of January 6th, 1978, you have the right to access, modify, rectify and delete personal information that pertains to you. To exercice this right, please contact %s, and provide your name, address and a proof of your identity.', user_contact_link(get_gedcom_setting(WT_GED_ID, 'WEBMASTER_USER_ID'))),
+			echo WT_I18N::translate('In accordance with the French Data protection Act (<em>Loi Informatique et Libertés</em>) of January 6th, 1978, you have the right to access, modify, rectify and delete personal information that pertains to you. To exercice this right, please contact %s, and provide your name, address and a proof of your identity.', user_contact_link($WT_TREE->getPreference('WEBMASTER_USER_ID'))),
 				'</div>';
 		}
-		if(get_module_setting($this->getName(), 'PG_ADD_HTML_FOOTER', false)){
-			if(WT_USER_ACCESS_LEVEL >= get_module_setting($this->getName(), 'PG_SHOW_HTML_FOOTER', WT_PRIV_HIDE) && !WT_Filter::getBool('nofooter')){		
-				echo htmlspecialchars_decode(get_module_setting($this->getName(), 'PG_HTML_FOOTER', ''));
+		if($this->getSetting('PG_ADD_HTML_FOOTER', false)){
+			if(WT_USER_ACCESS_LEVEL >= $this->getSetting('PG_SHOW_HTML_FOOTER', WT_PRIV_HIDE) && !WT_Filter::getBool('nofooter')){		
+				echo htmlspecialchars_decode($this->getSetting('PG_HTML_FOOTER', ''));
 			}
 		}
 	}
