@@ -232,22 +232,6 @@ class WT_MenuBar {
 						'relationship.php?pid1='.$pid1.'&amp;pid2='.$pid2.'&amp;ged='.WT_GEDURL,
 						'menu-chart-relationship'
 					);
-					if (array_key_exists('user_favorites', WT_Module::getActiveModules())) {
-						// Add a submenu showing relationship from this person to each of our favorites
-						foreach (user_favorites_WT_Module::getFavorites(Auth::id()) as $favorite) {
-							if ($favorite['type']=='INDI' && $favorite['gedcom_id']==WT_GED_ID) {
-								$person=WT_Individual::getInstance($favorite['gid']);
-								if ($person instanceof WT_Individual) {
-									$subsubmenu = new WT_Menu(
-										$person->getFullName(),
-										'relationship.php?pid1='.$person->getXref().'&amp;pid2='.$pid2.'&amp;ged='.WT_GEDURL,
-										'menu-chart-relationship-'.$person->getXref().'-'.$pid2 // We don't use these, but a custom theme might
-									);
-									$submenu->addSubmenu($subsubmenu);
-								}
-							}
-						}
-					}
 				} else {
 					// Regular pages - from me, to somebody
 					$pid1=WT_USER_GEDCOM_ID ? WT_USER_GEDCOM_ID : WT_USER_ROOT_ID;
@@ -300,7 +284,7 @@ class WT_MenuBar {
 		)->execute(array(WT_GED_ID, WT_GED_ID, WT_GED_ID, WT_GED_ID))->fetchOneRow();
 
 		// Build a list of submenu items and then sort it in localized name order
-		$surname_url = '&surname=' . rawurlencode($controller->getSignificantSurname()) . '&amp;ged=' . WT_GEDURL;
+		$surname_url = '&amp;surname=' . rawurlencode($controller->getSignificantSurname()) . '&amp;ged=' . WT_GEDURL;
 
 		$menulist = array(
 			new WT_Menu(WT_I18N::translate('Individuals'), 'indilist.php?ged=' . WT_GEDURL . $surname_url, 'menu-list-indi'),
@@ -323,9 +307,9 @@ class WT_MenuBar {
 				$menulist[] = new WT_Menu(WT_I18N::translate('Shared notes'), 'notelist.php?ged=' . WT_GEDURL, 'menu-list-note');
 			}
 		}
-		uasort($menulist, function(WT_Menu $x, WT_Menu $y) { return WT_I18N::strcasecmp($x->label, $y->label); });
+		uasort($menulist, function(WT_Menu $x, WT_Menu $y) { return WT_I18N::strcasecmp($x->getLabel(), $y->getLabel()); });
 
-		$menu->submenus = $menulist;
+		$menu->setSubmenus($menulist);
 
 		return $menu;
 	}
@@ -431,7 +415,7 @@ class WT_MenuBar {
 			foreach (get_theme_names() as $themename=>$themedir) {
 				$submenu=new WT_Menu($themename, get_query_url(array('theme'=>$themedir), '&amp;'), 'menu-theme-'.$themedir);
 				if (WT_THEME_DIR == 'themes/'.$themedir.'/') {$submenu->addClass('','','theme-active');}
-				$menu->addSubMenu($submenu);
+				$menu->addSubmenu($submenu);
 			}
 			return $menu;
 		} else {
@@ -453,9 +437,9 @@ class WT_MenuBar {
 			foreach (WT_I18N::installed_languages() as $lang=>$name) {
 				$submenu=new WT_Menu($name, get_query_url(array('lang'=>$lang), '&amp;'), 'menu-language-'.$lang);
 				if (WT_LOCALE == $lang) {$submenu->addClass('','','lang-active');}
-				$menu->addSubMenu($submenu);
+				$menu->addSubmenu($submenu);
 			}
-			if (count($menu->submenus)>1) {
+			if (count($menu->getSubmenus())>1) {
 				return $menu;
 			} else {
 				return null;
@@ -497,7 +481,7 @@ class WT_MenuBar {
 			switch($favorite['type']) {
 			case 'URL':
 				$submenu=new WT_Menu($favorite['title'], $favorite['url']);
-				$menu->addSubMenu($submenu);
+				$menu->addSubmenu($submenu);
 				break;
 			case 'INDI':
 			case 'FAM':
@@ -507,7 +491,7 @@ class WT_MenuBar {
 				$obj=WT_GedcomRecord::getInstance($favorite['gid']);
 				if ($obj && $obj->canShowName()) {
 					$submenu=new WT_Menu($obj->getFullName(), $obj->getHtmlUrl());
-					$menu->addSubMenu($submenu);
+					$menu->addSubmenu($submenu);
 				}
 				break;
 			}
@@ -516,8 +500,8 @@ class WT_MenuBar {
 		if ($show_user_favs) {
 			if (isset($controller->record) && $controller->record instanceof WT_GedcomRecord) {
 				$submenu=new WT_Menu(WT_I18N::translate('Add to favorites'), '#');
-				$submenu->addOnclick("jQuery.post('module.php?mod=user_favorites&amp;mod_action=menu-add-favorite',{xref:'".$controller->record->getXref()."'},function(){location.reload();})");
-				$menu->addSubMenu($submenu);
+				$submenu->setOnclick("jQuery.post('module.php?mod=user_favorites&amp;mod_action=menu-add-favorite',{xref:'".$controller->record->getXref()."'},function(){location.reload();})");
+				$menu->addSubmenu($submenu);
 			}
 		}
 		return $menu;

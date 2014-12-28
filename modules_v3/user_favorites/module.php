@@ -1,6 +1,4 @@
 <?php
-// Classes and libraries for module system
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -23,31 +21,35 @@
 
 use WT\Auth;
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
-
 // The "user favorites" module is almost identical to the "gedcom favorites" module
-require_once WT_ROOT.WT_MODULES_DIR.'gedcom_favorites/module.php';
+require_once WT_ROOT . WT_MODULES_DIR . 'gedcom_favorites/module.php';
 
+/**
+ * Class user_favorites_WT_Module
+ */
 class user_favorites_WT_Module extends gedcom_favorites_WT_Module {
-	// Extend class WT_Module
+	/** {@inheritdoc} */
 	public function getDescription() {
 		return /* I18N: Description of the “Favorites” module */ WT_I18N::translate('Display and manage a user’s favorite pages.');
 	}
 
-	// Implement class WT_Module_Block
+	/** {@inheritdoc} */
 	public function isUserBlock() {
 		return true;
 	}
 
-	// Implement class WT_Module_Block
+	/** {@inheritdoc} */
 	public function isGedcomBlock() {
 		return false;
 	}
 
-	// Get the favorites for a user (for the current family tree)
+	/**
+	 * Get the favorites for a user (for the current family tree)
+	 *
+	 * @param integer $user_id
+	 *
+	 * @return string[][]
+	 */
 	public static function getFavorites($user_id) {
 		self::updateSchema(); // make sure the favorites table has been created
 
@@ -59,10 +61,8 @@ class user_favorites_WT_Module extends gedcom_favorites_WT_Module {
 			->fetchAll(PDO::FETCH_ASSOC);
 	}
 
-	// Add a favorite to the user-favorites
+	/** {@inheritdoc} */
 	public function modAction($modAction) {
-		global $controller;
-
 		switch($modAction) {
 		case 'menu-add-favorite':
 			// Process the "add to user favorites" menu item on indi/fam/etc. pages

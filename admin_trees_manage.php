@@ -34,8 +34,13 @@ $controller
 // with an incomplete transaction.
 ignore_user_abort(true);
 
-// $path is the full path to the (possibly temporary) file.
-// $filename is the actual filename (no folder).
+/**
+ * @param integer $gedcom_id
+ * @param string  $path      the full path to the (possibly temporary) file.
+ * @param string  $filename  the actual filename (no folder).
+ *
+ * @throws Exception
+ */
 function import_gedcom_file($gedcom_id, $path, $filename) {
 	// Read the file in blocks of roughly 64K.  Ensure that each block
 	// contains complete gedcom records.  This will ensure we don’t split
@@ -45,7 +50,7 @@ function import_gedcom_file($gedcom_id, $path, $filename) {
 	$file_data='';
 	$fp=fopen($path, 'rb');
 
-	WT_DB::exec("START TRANSACTION");
+	WT_DB::beginTransaction();
 	WT_DB::prepare("DELETE FROM `##gedcom_chunk` WHERE gedcom_id=?")->execute(array($gedcom_id));
 
 	while (!feof($fp)) {
@@ -69,7 +74,7 @@ function import_gedcom_file($gedcom_id, $path, $filename) {
 	)->execute(array($gedcom_id, $file_data));
 
 	WT_Tree::get($gedcom_id)->setPreference('gedcom_filename', $filename);
-	WT_DB::exec("COMMIT");
+	WT_DB::commit();
 	fclose($fp);
 }
 

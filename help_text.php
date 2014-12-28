@@ -383,8 +383,8 @@ case 'TIME':
 	$text=WT_I18N::translate('Enter the time for this event in 24-hour format with leading zeroes.  Midnight is 00:00.  Examples: 04:50 13:00 20:30.');
 	break;
 
-case 'URL':
-	$title=WT_Gedcom_Tag::getLabel('URL');
+case 'WWW':
+	$title=WT_Gedcom_Tag::getLabel('WWW');
 	$text=WT_I18N::translate('Enter the URL address including the http://.<br><br>An example URL looks like this: <b>http://www.webtrees.net/</b>.  Leave this field blank if you do not want to include a URL.');
 	break;
 
@@ -1500,16 +1500,16 @@ case 'zip':
 	break;
 
 default:
-	$title=WT_I18N::translate('Help');
-	$text=WT_I18N::translate('The help text has not been written for this item.');
+	$title = WT_I18N::translate('Help');
+	$text  = WT_I18N::translate('The help text has not been written for this item.');
 	// If we've been called from a module, allow the module to provide the help text
 	$mod = WT_Filter::get('mod', '[A-Za-z0-9_]+');
-	if (file_exists(WT_ROOT.WT_MODULES_DIR.$mod.'/help_text.php')) {
-		require WT_ROOT.WT_MODULES_DIR.$mod.'/help_text.php';
+	if (array_key_exists($mod, WT_Module::getActiveModules()) && file_exists(WT_ROOT.WT_MODULES_DIR.$mod.'/help_text.php')) {
+		require WT_ROOT . WT_MODULES_DIR . $mod . '/help_text.php';
 	}
 	break;
 }
 // This file is called by a getJSON call so return the data
 // in correct format
 header('Content-Type: application/json');
-echo json_encode(array('title'=>$title,'content'=>$text));
+echo json_encode(array('title' => $title, 'content' => $text));

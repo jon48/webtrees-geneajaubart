@@ -1,6 +1,4 @@
 <?php
-// Classes and libraries for module system
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -21,22 +19,32 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+/**
+ * Class relatives_WT_Module
+ */
 class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
-	// Extend WT_Module
+	/** {@inheritdoc} */
 	public function getTitle() {
 		return /* I18N: Name of a module */ WT_I18N::translate('Families');
 	}
 
-	// Extend WT_Module
+	/** {@inheritdoc} */
 	public function getDescription() {
 		return /* I18N: Description of the “Families” module */ WT_I18N::translate('A tab showing the close relatives of an individual.');
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function defaultTabOrder() {
 		return 20;
 	}
 
+	/**
+	 * @param WT_Date $prev
+	 * @param WT_Date $next
+	 * @param integer $child_number
+	 *
+	 * @return string
+	 */
 	static function ageDifference(WT_Date $prev, WT_Date $next, $child_number=0) {
 		if ($prev->isOK() && $next->isOK()) {
 			$days = $next->MaxJD() - $prev->MinJD();
@@ -64,6 +72,11 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 	}
 
 	// print parents informations
+	/**
+	 * @param WT_Family $family
+	 * @param string    $type
+	 * @param string    $label
+	 */
 	function printFamily(WT_Family $family, $type, $label) {
 		global $controller;
 		global $SHOW_PRIVATE_RELATIONSHIPS;
@@ -264,7 +277,7 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 		return;
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function getTabContent() {
 		global $SHOW_AGE_DIFF, $show_full, $controller;
 
@@ -373,22 +386,22 @@ class relatives_WT_Module extends WT_Module implements WT_Module_Tab {
 		return '<div id="'.$this->getName().'_content">'.ob_get_clean().'</div>';
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function hasTabContent() {
 		return true;
 	}
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function isGrayedOut() {
 		return false;
 	}
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function canLoadAjax() {
 		global $SEARCH_SPIDER;
 
 		return !$SEARCH_SPIDER; // Search engines cannot use AJAX
 	}
 
-	// Implement WT_Module_Tab
+	/** {@inheritdoc} */
 	public function getPreLoadContent() {
 		return '';
 	}

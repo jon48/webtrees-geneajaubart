@@ -96,7 +96,7 @@ case 'login':
 
 		$WT_SESSION->timediff      = $timediff;
 		$WT_SESSION->locale        = Auth::user()->getPreference('language');
-		$WT_SESSION->theme_dir     = Auth::user()->getPreference('theme');
+		$WT_SESSION->theme_id      = Auth::user()->getPreference('theme');
 		$WT_SESSION->activity_time = WT_TIMESTAMP;
 
 		Auth::user()->setPreference('sessiontime', WT_TIMESTAMP);
@@ -501,8 +501,7 @@ case 'verify_hash':
 	$user = User::findByIdentifier($user_name);
 	$mail1_body =
 		WT_I18N::translate('Hello administrator…') . WT_Mail::EOL . WT_Mail::EOL .
-		/* I18N: %1$s is a real-name, %2$s is a username, %3$s is an email address */
-		WT_I18N::translate(
+		/* I18N: %1$s is a real-name, %2$s is a username, %3$s is an email address */ WT_I18N::translate(
 			'A new user (%1$s) has requested an account (%2$s) and verified an email address (%3$s).',
 			$user->getRealName(),
 			$user->getUserName(),
@@ -559,7 +558,7 @@ case 'verify_hash':
 				->deletePreference('reg_hashcode');
 
 			if (!$REQUIRE_ADMIN_AUTH_REGISTRATION) {
-				set_user_setting($user_id, 'verified_by_admin', 1);
+				$user->setPreference('verified_by_admin', '1');
 			}
 			Log::addAuthenticationLog('User ' . $user_name . ' verified their email address');
 

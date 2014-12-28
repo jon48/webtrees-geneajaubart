@@ -24,7 +24,7 @@ use WT\Log;
  */
 abstract class WT_Module {
 	/** @var string A user-friendly, localized name for this module */
-	private $_title = null;
+	private $_title;
 
 	/** @var string[] A cached copy of the module settings */
 	private $settings;
@@ -168,7 +168,7 @@ abstract class WT_Module {
 	 */
 	public static function getActiveModules($sort = false) {
 		/** @var WT_Module[] - We call this function several times, so cache the results. */
-		static $modules = null;
+		static $modules;
 
 		/** @var boolean - Sorting is slow, so only do it when requested. */
 		static $sorted = false;
@@ -193,8 +193,9 @@ abstract class WT_Module {
 			}
 		}
 		if ($sort && !$sorted) {
-			uasort($modules, create_function('$x,$y', 'return WT_I18N::strcasecmp((string)$x, (string)$y);'));
-			$sorted = true;
+			$sorted = uasort($modules, function (WT_Module $x, WT_MOdule $y) {
+				return WT_I18N::strcasecmp((string)$x, (string)$y);
+			});
 		}
 
 		return $modules;
@@ -458,7 +459,6 @@ abstract class WT_Module {
 				}
 			}
 		}
-		uasort($modules, create_function('$x,$y', 'return WT_I18N::strcasecmp((string)$x, (string)$y);'));
 
 		return $modules;
 	}
