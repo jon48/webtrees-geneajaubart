@@ -93,7 +93,7 @@ class perso_issourced_WT_Module extends WT_Module implements WT_Module_Sidebar, 
 			$dindi = new WT_Perso_Individual($root);
 			
 			if (!$dindi->canDisplayIsSourced()) {
-				print_privacy_error();
+				echo '<div class="error">', WT_I18N::translate('This information is private and cannot be shown.'), '</div>';
 			} else {
 				echo '<table class="issourcedtable">';
 				echo '<tr><td class="slabel">'.WT_Gedcom_Tag::getLabel('INDI').'</td><td class="svalue">'.WT_Perso_Functions_Print::formatIsSourcedIcon('R', $dindi->isSourced(), 'INDI', 1).'</td></tr>';
