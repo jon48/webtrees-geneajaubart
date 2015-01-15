@@ -1,6 +1,4 @@
 <?php
-// Classes and libraries for module system
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -23,11 +21,6 @@
 
 use \WT\Auth;
 
-if (!defined('WT_WEBTREES')) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
-
 // Create tables, if not already present
 try {
 	WT_DB::updateSchema(WT_MODULES_DIR . 'user_blog/db_schema/', 'NB_SCHEMA_VERSION', 3);
@@ -36,18 +29,21 @@ try {
 	die($ex);
 }
 
+/**
+ * Class user_blog_WT_Module
+ */
 class user_blog_WT_Module extends WT_Module implements WT_Module_Block {
-	// Extend class WT_Module
+	/** {@inheritdoc} */
 	public function getTitle() {
 		return /* I18N: Name of a module */ WT_I18N::translate('Journal');
 	}
 
-	// Extend class WT_Module
+	/** {@inheritdoc} */
 	public function getDescription() {
 		return /* I18N: Description of the “Journal” module */ WT_I18N::translate('A private area to record notes or keep a journal.');
 	}
 
-	// Implement class WT_Module_Block
+	/** {@inheritdoc} */
 	public function getBlock($block_id, $template = true, $cfg = null) {
 		global $ctype;
 
@@ -76,13 +72,10 @@ class user_blog_WT_Module extends WT_Module implements WT_Module_Block {
 		$title = '';
 		$title .= $this->getTitle();
 		$content = '';
-		if (count($usernews) == 0) {
+		if (!$usernews) {
 			$content .= WT_I18N::translate('You have not created any journal items.');
 		}
 		foreach ($usernews as $news) {
-			$day  = date('j', $news->updated);
-			$mon  = date('M', $news->updated);
-			$year = date('Y', $news->updated);
 			$content .= '<div class="journal_box">';
 			$content .= '<div class="news_title">' . $news->subject . '</div>';
 			$content .= '<div class="news_date">' . format_timestamp($news->updated) . '</div>';
@@ -108,22 +101,22 @@ class user_blog_WT_Module extends WT_Module implements WT_Module_Block {
 		}
 	}
 
-	// Implement class WT_Module_Block
+	/** {@inheritdoc} */
 	public function loadAjax() {
 		return false;
 	}
 
-	// Implement class WT_Module_Block
+	/** {@inheritdoc} */
 	public function isUserBlock() {
 		return true;
 	}
 
-	// Implement class WT_Module_Block
+	/** {@inheritdoc} */
 	public function isGedcomBlock() {
 		return false;
 	}
 
-	// Implement class WT_Module_Block
+	/** {@inheritdoc} */
 	public function configureBlock($block_id) {
 	}
 }

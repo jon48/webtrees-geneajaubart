@@ -1,6 +1,4 @@
 <?php
-// Classes and libraries for module system
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -23,20 +21,23 @@
 
 use WT\Auth;
 
+/**
+ * Class charts_WT_Module
+ */
 class charts_WT_Module extends WT_Module implements WT_Module_Block {
-	// Extend class WT_Module
+	/** {@inheritdoc} */
 	public function getTitle() {
 		return /* I18N: Name of a module/block */ WT_I18N::translate('Charts');
 	}
 
-	// Extend class WT_Module
+	/** {@inheritdoc} */
 	public function getDescription() {
 		return /* I18N: Description of the “Charts” module */ WT_I18N::translate('An alternative way to display charts.');
 	}
 
-	// Implement class WT_Module_Block
+	/** {@inheritdoc} */
 	public function getBlock($block_id, $template=true, $cfg=null) {
-		global $WT_TREE, $ctype, $PEDIGREE_FULL_DETAILS, $show_full, $bwidth, $bheight, $controller;
+		global $WT_TREE, $ctype, $PEDIGREE_FULL_DETAILS, $show_full, $controller;
 
 		$PEDIGREE_ROOT_ID = $WT_TREE->getPreference('PEDIGREE_ROOT_ID');
 
@@ -52,7 +53,9 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 		}
 
 		// Override GEDCOM configuration temporarily
-		if (isset($show_full)) $saveShowFull = $show_full;
+		if (isset($show_full)) {
+			$saveShowFull = $show_full;
+		}
 		$savePedigreeFullDetails = $PEDIGREE_FULL_DETAILS;
 		if (!$details) {
 			$show_full = 0;
@@ -140,36 +143,38 @@ class charts_WT_Module extends WT_Module implements WT_Module_Block {
 			$content=WT_I18N::translate('You must select an individual and chart type in the block configuration settings.');
 		}
 
+		// Restore GEDCOM configuration
+		unset($show_full);
+		if (isset($saveShowFull)) {
+			$show_full = $saveShowFull;
+		}
+		$PEDIGREE_FULL_DETAILS = $savePedigreeFullDetails;
+
 		if ($template) {
 			require WT_THEME_DIR.'templates/block_main_temp.php';
 		} else {
 			return $content;
 		}
-
-		// Restore GEDCOM configuration
-		unset($show_full);
-		if (isset($saveShowFull)) $show_full = $saveShowFull;
-		$PEDIGREE_FULL_DETAILS = $savePedigreeFullDetails;
 	}
 
-	// Implement class WT_Module_Block
+	/** {@inheritdoc} */
 	public function loadAjax() {
 		return true;
 	}
 
-	// Implement class WT_Module_Block
+	/** {@inheritdoc} */
 	public function isUserBlock() {
 		return true;
 	}
 
-	// Implement class WT_Module_Block
+	/** {@inheritdoc} */
 	public function isGedcomBlock() {
 		return true;
 	}
 
-	// Implement class WT_Module_Block
+	/** {@inheritdoc} */
 	public function configureBlock($block_id) {
-		global $WT_TREE, $ctype, $controller;
+		global $WT_TREE, $controller;
 		require_once WT_ROOT.'includes/functions/functions_edit.php';
 
 		$PEDIGREE_ROOT_ID = $WT_TREE->getPreference('PEDIGREE_ROOT_ID');

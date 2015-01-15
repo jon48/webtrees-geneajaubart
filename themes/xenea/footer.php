@@ -26,9 +26,9 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-echo '</div>'; // <div id="content">
+echo '</main>';
 if ($view!='simple') {
-	echo '<div id="footer" class="', $TEXT_DIRECTION, ' width99 center">';
+	echo '<footer>';
 	echo contact_links();
 	//PERSO Add Extra footer
 	$f_hook = new WT_Perso_Hook('h_print_footer');
@@ -45,5 +45,5 @@ if ($view!='simple') {
 		echo '<p class="error center">', WT_I18N::translate('There are pending changes for you to moderate.'), '</p>';
 		echo '</a>';
 	}
-	echo '</div>'; // <div id="footer">
+	echo '</footer>';
 }

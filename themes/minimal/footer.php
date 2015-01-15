@@ -26,9 +26,9 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-echo '</div>'; // <div id="content">
+echo '</main>';
 if ($view!='simple') {
-	echo '<div id="footer" class="', $TEXT_DIRECTION, ' width99 center">';
+	echo '<footer>';
 	echo contact_links();
 	//PERSO Add Extra footer
 	$f_hook = new WT_Perso_Hook('h_print_footer');
@@ -40,5 +40,5 @@ if ($view!='simple') {
 	if ($WT_TREE && $WT_TREE->getPreference('SHOW_STATS')) {
 		echo execution_stats();
 	}
-	echo '</div>'; // <div id="footer">
+	echo '</footer>';
 }

@@ -26,9 +26,9 @@ if (!defined('WT_WEBTREES')) {
 	exit;
 }
 
-echo '</div>'; // <div id="content">
+echo '</main>';
 if ($view!='simple') {
-	echo '<div id="footer"><div class="block">', contact_links();
+	echo '<footer><div class="block">', contact_links();
 	//PERSO Add Extra footer
 	$f_hook = new WT_Perso_Hook('h_print_footer');
 	$f_hook->execute();
@@ -36,5 +36,5 @@ if ($view!='simple') {
 	if ($WT_TREE && $WT_TREE->getPreference('SHOW_STATS')) {
 		echo execution_stats();
 	}
-	echo '</div><a style="font-size:150%; color:#888;" href="', WT_WEBTREES_URL, '" title="', WT_WEBTREES , ' - ', WT_VERSION, '">', WT_WEBTREES, '</a></div>';
+	echo '</div><a style="font-size:150%; color:#888;" href="', WT_WEBTREES_URL, '" title="', WT_WEBTREES , ' - ', WT_VERSION, '">', WT_WEBTREES, '</a></footer>';
 }

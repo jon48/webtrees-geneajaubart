@@ -1,6 +1,4 @@
 <?php
-// Classes and libraries for module system
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -23,24 +21,21 @@
 
 use WT\Auth;
 
+/**
+ * Class top10_surnames_WT_Module
+ */
 class top10_surnames_WT_Module extends WT_Module implements WT_Module_Block {
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	public function getTitle() {
 		return /* I18N: Name of a module.  Top=Most common */ WT_I18N::translate('Top surnames');
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	public function getDescription() {
 		return /* I18N: Description of the “Top surnames” module */ WT_I18N::translate('A list of the most popular surnames.');
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	public function getBlock($block_id, $template = true, $cfg = null) {
 		global $WT_TREE, $ctype;
 
@@ -130,30 +125,22 @@ class top10_surnames_WT_Module extends WT_Module implements WT_Module_Block {
 		}
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	public function loadAjax() {
 		return true;
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	public function isUserBlock() {
 		return true;
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	public function isGedcomBlock() {
 		return true;
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	public function configureBlock($block_id) {
 		if (WT_Filter::postBool('save') && WT_Filter::checkCsrf()) {
 			set_block_setting($block_id, 'num', WT_Filter::postInteger('num', 1, 10000, 10));
