@@ -1,6 +1,4 @@
 <?php
-// Class file for the tree navigator
-//
 // webtrees: Web based Family History software
 // Copyright (C) 2014 webtrees development team.
 //
@@ -18,6 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+/**
+ * Class TreeView
+ */
 class TreeView {
 	private $name;
 	private $all_partners;
@@ -259,7 +260,7 @@ class TreeView {
 						if ($spouse_parents && $spouse_parents->getHusband()) {
 							$fop[] = array($spouse_parents->getHusband(), $spouse_parents);
 						} elseif ($spouse_parents && $spouse_parents->getWife()) {
-							$fop[] = array($spouse_parents->getHWife(), $spouse_parents);
+							$fop[] = array($spouse_parents->getWife(), $spouse_parents);
 						}
 						$html .= $this->drawPersonName($spouse, $dashed);
 						if ($this->all_partners !== 'true') {

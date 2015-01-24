@@ -214,7 +214,7 @@ class perso_welcome_block_WT_Module extends WT_Module implements WT_Module_Block
 		$url .= '&token_auth='.$piwik_token;
 		
 		if($fetched = WT_File::fetchUrl($url)) {
-			$content = unserialize($fetched);
+			$content = @unserialize($fetched);
 			if(is_numeric($content)) return $content;
 		}
 		

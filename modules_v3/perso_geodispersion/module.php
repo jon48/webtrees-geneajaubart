@@ -155,7 +155,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							updatePlaceHierarchy();
 														
 							// - Refresh data
-							geoConfigDatatable.fnDraw();
+							geoConfigDatatable.ajax.reload();
 							
 						});						
 					
@@ -167,7 +167,6 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
         					"width" : "auto",
 							"modal": true,
 							"autoOpen" : false,
-					        "position": "center",
 					        "buttons" : [
 								{ 
 									"text" : "'.WT_I18N::translate('Add').'",
@@ -228,10 +227,10 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 							serverSide : true,
 							ajax : {
 								url : "module.php",
-								data : {
-									mod : "'.$this->getName().'",
-									mod_action : "ajaxadminconfigdata",
-									ged : ged
+								data : function ( d ) {
+									d.mod = "'.$this->getName().'",
+									d.mod_action = "ajaxadminconfigdata",
+									d.ged = ged
 								}
 							},
 							drawCallback: function() {
@@ -241,7 +240,7 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 								});
 							}
 					
-						});	
+						});
 					
 						$("#tGeoConfigTable_'.$tab_id.'_length").append("<button id=\"btaddrow_'.$tab_id.'\" class=\"add_row\"></button>");
                    		var oAddNewGeoDispButton = $("#btaddrow_'.$tab_id.'").button({
@@ -343,8 +342,9 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 				if(empty($value)){
 					$value = null;
 					break;
-				}
-			case 'pg_sublevel':			
+				}				
+			case 'pg_sublevel':	
+				if(is_numeric($value)) $value = $value + 1;
 			case 'pg_detailsgen':
 				if (!is_numeric($value) || (is_numeric($value) && $value <0 && $value >= 128))
 					$value = 'ERROR_VALIDATION';
@@ -413,6 +413,10 @@ class perso_geodispersion_WT_Module extends WT_Module implements WT_Perso_Module
 	 */
 	private function formatConfigSettings($setting, $value){
 		switch($setting){
+			case 'pg_toplevel':
+			case 'pg_sublevel':
+				if(is_numeric($value)) $value = $value - 1;
+				break;
 			case 'pg_useflagsgen':
 				$value = ($value == 'yes');
 				break;
