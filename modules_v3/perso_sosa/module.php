@@ -73,7 +73,7 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 		$menu = null;
 		if(WT_Perso_Functions_Sosa::isModuleOperational()){
 			//-- main menu
-			$menu = new WT_Menu(WT_I18N::translate('Sosa Statistics'), 'module.php?mod=perso_sosa&mod_action=statistics', 'menu-perso-sosa', 'down');
+			$menu = new WT_Menu(WT_I18N::translate('Sosa Statistics'), 'module.php?mod=perso_sosa&mod_action=statistics', 'menu-perso-sosa');
 	
 			//-- Sosa ancestors list
 			$submenu = new WT_Menu(WT_I18N::translate('Sosa Ancestors'), 'module.php?mod=perso_sosa&mod_action=sosalist', 'menu-perso-sosa-list');
@@ -97,6 +97,7 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 					);
 					$submenu->addSubmenu($subsubmenu);
 				}
+				$submenu->addClass('icon_arrow', '', 'icon_arrow');
 				$menu->addSubMenu($submenu);
 			}
 			
@@ -108,7 +109,7 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 				;
 					
 				$submenu = new WT_Menu(WT_I18N::translate('Complete Sosas'), '#', 'menu-sosa-recompute');
-				$submenu->addOnclick('return compute_sosa(\''.$controller->getSignificantIndividual()->getXref().'\');');
+				$submenu->setOnclick('return compute_sosa(\''.$controller->getSignificantIndividual()->getXref().'\');');
 				$menu->addSubMenu($submenu);
 			}
 		}
@@ -759,9 +760,9 @@ class perso_sosa_WT_Module extends WT_Module implements WT_Module_Menu, WT_Perso
 			//-- Filtering by death date
 			$html .= '<td>';
 			// Died in last 100 years?  Died?  Not dead?
-			if (WT_Date::Compare($death_date, $d100y)>0) {
+			if (WT_Date::Compare($death_dates[0], $d100y)>0) {
 				$html .= 'Y100';
-			} elseif ($death_date->minJD() || $person->isDead()) {
+			} elseif ($death_dates[0]->minJD() || $person->isDead()) {
 				$html .= 'YES';
 			} else {
 				$html .= 'N';
