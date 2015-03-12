@@ -54,8 +54,8 @@ class WT_Perso_Certificate extends WT_Media {
 		$ct = preg_match("/(?<year>\d{1,4})(\.(?<month>\d{1,2}))?(\.(?<day>\d{1,2}))?( (?<type>[A-Z]{1,2}) )?(?<details>.*)/", $this->title, $match);
 		if($ct > 0){
 			$monthId = (int) $match['month'];
-			$monthShortName = array_key_exists($monthId, WT_Perso_Functions::getCalendarShortMonths()) ? 
-				WT_Perso_Functions::getCalendarShortMonths()[$monthId] : $monthId;
+			$calendarShortMonths = WT_Perso_Functions::getCalendarShortMonths();
+			$monthShortName = array_key_exists($monthId, $calendarShortMonths) ? $calendarShortMonths[$monthId] : $monthId;
 			$this->certDate = new WT_Date($match['day'].' '.strtoupper($monthShortName).' '.$match['year']);
 			$this->certType = $match['type'];
 			$this->certDetails = $match['details'];			
@@ -171,7 +171,8 @@ class WT_Perso_Certificate extends WT_Media {
 	 * @return string Watermark text
 	 */
 	 public function getWatermarkText(){	
-		$wmtext = (new perso_certificates_WT_Module())->getSetting('PC_WM_DEFAULT', WT_I18N::translate('This image is protected under copyright law.'));
+	 	$module = new perso_certificates_WT_Module();
+		$wmtext = $module->getSetting('PC_WM_DEFAULT', WT_I18N::translate('This image is protected under copyright law.'));
 		$sid= WT_Filter::get('sid', WT_REGEX_XREF);	
 	
 		if($sid){

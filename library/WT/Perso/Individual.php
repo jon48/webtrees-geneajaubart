@@ -43,10 +43,12 @@ class WT_Perso_Individual extends WT_Perso_GedcomRecord {
 	 */
 	public function getTitles(){
 		if(is_null($this->_titles)){
+			$module = new perso_general_WT_Module();
+			$pattern = '/(.*) (('.$module->getSetting('PG_TITLE_PREFIX', '').')(.*))/';
 			$this->_titles=array();
 			$titlefacts = $this->gedcomrecord->getFacts('TITL');
 			foreach($titlefacts as $titlefact){
-				$ct2 = preg_match_all('/(.*) (('.(new perso_general_WT_Module())->getSetting('PG_TITLE_PREFIX', '').')(.*))/', $titlefact->getValue(), $match2);
+				$ct2 = preg_match_all($pattern, $titlefact->getValue(), $match2);
 				if($ct2>0){
 					$this->_titles[$match2[1][0]][]= trim($match2[2][0]);
 				}

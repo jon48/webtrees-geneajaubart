@@ -22,7 +22,8 @@ class WT_Perso_Functions_Certificates {
 	 * @return string Real certificates directory path
 	 */
 	public static function getRealCertificatesDirectory(){
-		$cert_rootdir = (new perso_certificates_WT_Module())->getSetting('PC_CERT_ROOTDIR', 'certificates/');
+		$module = new perso_certificates_WT_Module();
+		$cert_rootdir = $module->getSetting('PC_CERT_ROOTDIR', 'certificates/');
 		return WT_DATA_DIR.$cert_rootdir;
 	}
 	

@@ -109,7 +109,8 @@ class perso_config_WT_Module extends WT_Module implements WT_Module_Config {
 					
 			// Authorised and valid - make update	
 			$class = $id2.'_WT_Module';
-			(new $class())->setSetting($id1, $value);
+			$class_object = new $class();
+			$class_object->setSetting($id1, $value);
 			WT_Perso_Functions_Edit::ok($value);
 		break;
 		case 'gedcom_setting':

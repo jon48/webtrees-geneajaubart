@@ -221,7 +221,8 @@ class WT_Perso_Functions {
 	 */
 	public static function getCalendarShortMonths($calendarId = 0) {
 		if(!isset(self::$_calendarShortMonths[$calendarId])) {
-			self::$_calendarShortMonths[$calendarId] = cal_info($calendarId)['abbrevmonths'];
+			$calendar_info = cal_info($calendarId);
+			self::$_calendarShortMonths[$calendarId] = $calendar_info['abbrevmonths'];
 		}		
 		return self::$_calendarShortMonths[$calendarId];
 	}

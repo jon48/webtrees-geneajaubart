@@ -59,6 +59,10 @@ class healthcheckmail_WT_Perso_Admin_Task extends WT_Perso_Admin_ConfigurableTas
 		if (preg_match('/^[0-9.]+\|[0-9.]+\|/', $latest_version_txt)) {
 			list($latest_version, $earliest_version, $download_url)=explode('|', $latest_version_txt);
 		}
+		else {
+			// Cannot determine the latest version
+			$latest_version = null;
+		}
 				
 		// Users statistics
 		$warnusers = 0;
