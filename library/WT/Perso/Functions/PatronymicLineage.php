@@ -182,16 +182,18 @@ class WT_Perso_Functions_PatronymicLineage {
 						}
 						foreach($children as $child){
 							$dchild = new WT_Perso_Individual($child);
-							$child_surname=$dchild->getUnprotectedPrimarySurname();
-							//Print the natural children of the mother, with a reference to the relevant lineage
-							if($child_surname && $child_surname!=$father_surname && $mother_surname && $child_surname==$mother_surname){
-								echo '<ul><li>';
-								echo WT_Perso_Functions_Print::getIndividualForList($child);
-								echo '&nbsp;<a href="module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&surname='.$child_surname.'&ged='.WT_GED_ID.'">('.WT_I18N::translate('Go to %s lineages', $child_surname).')</a></li></ul>';
-							}
-							//Print the children's lineage
-							else{
-								self::printIndiLineage($child);
+							if(!$dchild->isNewAddition()) {
+								$child_surname=$dchild->getUnprotectedPrimarySurname();
+								//Print the natural children of the mother, with a reference to the relevant lineage
+								if($child_surname && $child_surname!=$father_surname && $mother_surname && $child_surname==$mother_surname){
+									echo '<ul><li>';
+									echo WT_Perso_Functions_Print::getIndividualForList($child);
+									echo '&nbsp;<a href="module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&surname='.$child_surname.'&ged='.WT_GED_ID.'">('.WT_I18N::translate('Go to %s lineages', $child_surname).')</a></li></ul>';
+								}
+								//Print the children's lineage
+								else{
+									self::printIndiLineage($child);
+								}
 							}
 						}
 					}
@@ -252,14 +254,15 @@ class WT_Perso_Functions_PatronymicLineage {
 				$wife=$fam->getWife();
 				//If the father exists, take him
 				if($husb){
-					$resIndi=$husb;
+					$dhusb = new WT_Perso_Individual($husb);
+					$dhusb->isNewAddition() ? $is_first = true : $resIndi=$husb;
 				}
 				//If only a mother exists
 				else if($wife){
 					$dwife = new WT_Perso_Individual($wife);
 					$wife_surname=$dwife->getUnprotectedPrimarySurname();
 					//Check if the child is a natural child of the mother (based on the surname - Warning : surname must be identical)
-					if($wife_surname==$indi_surname){
+					if(!$dwife->isNewAddition() &&  $wife_surname==$indi_surname){
 						$resIndi=$wife;
 					}
 					else{

@@ -39,6 +39,16 @@ class WT_Perso_GedcomRecord {
 	}
 	
 	/**
+	 * Return whether the record is a new addition (and not just a modification)
+	 * 
+	 * @return boolean True id new addition
+	 */
+	public function isNewAddition() {
+		return $this->gedcomrecord->isPendingAddtion()
+			&& $this->gedcomrecord->privatizeGedcom(WT_PRIV_HIDE) === null;
+	}
+	
+	/**
 	 * Get an HTML link to this object, for use in sortable lists.
 	 * 
 	 * @return string HTML link
