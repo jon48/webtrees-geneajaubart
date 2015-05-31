@@ -31,7 +31,8 @@ class WT_Perso_Functions_PatronymicLineage {
 
 		if(count($indilist)==0) {
 			echo '<p class="center"><span class="warning">',
-			WT_I18N::translate('No individuals with surname %s has been found. Please try another name.', check_NN($surname)),
+			WT_I18N::translate('No individuals with surname %s has been found. Please try another name.',
+					'<span dir="auto">' . WT_Filter::escapeHtml($surname) . '</span>'),
 				'</span></p>';
 			return;
 		}
