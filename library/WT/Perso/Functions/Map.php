@@ -57,11 +57,11 @@ class WT_Perso_Functions_Map {
 	 * @return string HTML code of the flag icon
 	 */
 	public static function getPlaceIcon(WT_Place $place, $height){		
-		if(!$place->isEmpty()){
+		if($place && !$place->isEmpty()){
 			$place_details = WT_DB::prepare("SELECT SQL_CACHE pl_icon FROM `##placelocation` WHERE pl_id=? ORDER BY pl_place")
 				->execute(array(self::getGoogleMapId($place)))
 				->fetchOneRow();
-			if($place){
+			if($place_details){
 				return '<img class="flag_gm_h'.$height.'" src="'.WT_MODULES_DIR.'googlemap/'.$place_details->pl_icon.'" title="'.$place->getGedcomName().'" alt="'.$place->getGedcomName().'" />';
 			}
 		}
