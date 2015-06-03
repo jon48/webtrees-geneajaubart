@@ -58,7 +58,8 @@ class WT_Perso_Functions_Map {
 	 */
 	public static function getPlaceIcon(WT_Place $place, $height){		
 		if($place && !$place->isEmpty()){
-			$place_details = WT_DB::prepare("SELECT SQL_CACHE pl_icon FROM `##placelocation` WHERE pl_id=? ORDER BY pl_place")
+			$place_details = 
+				WT_DB::prepare("SELECT SQL_CACHE pl_icon FROM `##placelocation` WHERE pl_id=? ORDER BY pl_place")
 				->execute(array(self::getGoogleMapId($place)))
 				->fetchOneRow();
 			if($place_details){
