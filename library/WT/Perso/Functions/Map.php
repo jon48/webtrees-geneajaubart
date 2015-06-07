@@ -36,8 +36,7 @@ class WT_Perso_Functions_Map {
 			for ($i=0; $i<count($parent); $i++) {
 				$parent[$i] = trim($parent[$i]);
 				if (empty($parent[$i])) $parent[$i]='unknown';// GoogleMap module uses "unknown" while GEDCOM uses , ,
-				$pl_id=
-					WT_DB::prepare('SELECT pl_id FROM `##placelocation` WHERE pl_level=? AND pl_parent_id=? AND pl_place LIKE ? ORDER BY pl_place')
+				$pl_id= WT_DB::prepare('SELECT pl_id FROM `##placelocation` WHERE pl_level=? AND pl_parent_id=? AND pl_place LIKE ? ORDER BY pl_place')
 					->execute(array($i, $place_id, $parent[$i]))
 					->fetchOne();
 				if (empty($pl_id)) break;
@@ -58,7 +57,8 @@ class WT_Perso_Functions_Map {
 	 */
 	public static function getPlaceIcon(WT_Place $place, $height){		
 		if($place && !$place->isEmpty()){
-			$place_details = WT_DB::prepare("SELECT SQL_CACHE pl_icon FROM `##placelocation` WHERE pl_id=? ORDER BY pl_place")
+			$place_details = 
+				WT_DB::prepare("SELECT SQL_CACHE pl_icon FROM `##placelocation` WHERE pl_id=? ORDER BY pl_place")
 				->execute(array(self::getGoogleMapId($place)))
 				->fetchOneRow();
 			if($place_details){
