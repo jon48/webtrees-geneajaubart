@@ -1,5 +1,5 @@
 {
-	"name": "fisharebest/webtrees",
+	"name": "jon48/webtrees-addons",
 	"description": "webtrees online genealogy",
 	"keywords": ["webtrees", "genealogy"],
 	"license": "GPL-3.0",
@@ -19,7 +19,8 @@
 		"patchwork/utf8": "1.*",
 		"pclzip/pclzip": "2.*",
 		"ramsey/uuid": "2.*",
-		"tecnick.com/tcpdf": "6.*"
+		"tecnick.com/tcpdf": "6.*",
+        "twbs/bootstrap": "3.3.*"
 	},
 	"extra": {
 		"branch-alias": {

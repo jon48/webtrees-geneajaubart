@@ -49,7 +49,7 @@
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/bombayworks/zendframework1/zipball/9d7220bba71e86518ce93abbe47d978f275f03dc",
+            "url": "https://api.github.com/repos/bombayworks/zendframework1/zipball/e3e1c30b057b0aafdd4ca2c24e4eeb9ef7347f59",
             "reference": "9d7220bba71e86518ce93abbe47d978f275f03dc",
             "shasum": ""
         },
@@ -588,6 +588,59 @@
             "pdf",
             "pdf417",
             "qrcode"
+        ]
+    },
+    {
+        "name": "twbs/bootstrap",
+        "version": "v3.3.5",
+        "version_normalized": "3.3.5.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/twbs/bootstrap.git",
+            "reference": "16b48259a62f576e52c903c476bd42b90ab22482"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/twbs/bootstrap/zipball/16b48259a62f576e52c903c476bd42b90ab22482",
+            "reference": "16b48259a62f576e52c903c476bd42b90ab22482",
+            "shasum": ""
+        },
+        "replace": {
+            "twitter/bootstrap": "self.version"
+        },
+        "time": "2015-06-16 16:13:22",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "3.3.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Jacob Thornton",
+                "email": "jacobthornton@gmail.com"
+            },
+            {
+                "name": "Mark Otto",
+                "email": "markdotto@gmail.com"
+            }
+        ],
+        "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
+        "homepage": "http://getbootstrap.com",
+        "keywords": [
+            "JS",
+            "css",
+            "framework",
+            "front-end",
+            "less",
+            "mobile-first",
+            "responsive",
+            "web"
         ]
     }
 ]
