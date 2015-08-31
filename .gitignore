@@ -1,7 +1,8 @@
 
 *.swp
 .idea/
-vendor/.git
+apidocs/
+vendor/twbs/
 
 # /
 /.buildpath

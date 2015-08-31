@@ -1,82 +1,80 @@
 <?php
-// Used by AJAX to load the expanded view inside person boxes
-//
-// webtrees: Web based Family History software
-// Copyright (C) 2014 webtrees development team.
-//
-// Derived from PhpGedView
-// Copyright (C) 2002 to 2008 PGV Development Team. All rights reserved.
-//
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+/**
+ * webtrees: online genealogy
+ * Copyright (C) 2015 webtrees development team
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+namespace Fisharebest\Webtrees;
+
+/**
+ * Defined in session.php
+ *
+ * @global Tree $WT_TREE
+ */
+global $WT_TREE;
+
+use Fisharebest\Webtrees\Functions\Functions;
 
 define('WT_SCRIPT_NAME', 'expand_view.php');
 require './includes/session.php';
 
-Zend_Session::writeClose();
-
 header('Content-Type: text/html; charset=UTF-8');
-$person = WT_Individual::getInstance(WT_Filter::get('pid', WT_REGEX_XREF));
-if (!$person || !$person->canShow()) {
-	return WT_I18N::translate('Private');
+$individual = Individual::getInstance(Filter::get('pid', WT_REGEX_XREF), $WT_TREE);
+if (!$individual || !$individual->canShow()) {
+	return I18N::translate('Private');
 }
 
-$facts = $person->getFacts();
-foreach ($person->getSpouseFamilies() as $family) {
+$facts = $individual->getFacts();
+foreach ($individual->getSpouseFamilies() as $family) {
 	foreach ($family->getFacts() as $fact) {
 		$facts[] = $fact;
 	}
 }
-sort_facts($facts);
+Functions::sortFacts($facts);
 
-foreach ($facts as $event) {
-	switch ($event->getTag()) {
-	case 'SEX':
-	case 'FAMS':
-	case 'FAMC':
-	case 'NAME':
-	case 'TITL':
-	case 'NOTE':
-	case 'SOUR':
-	case 'SSN':
-	case 'OBJE':
-	case 'HUSB':
-	case 'WIFE':
-	case 'CHIL':
-	case 'ALIA':
+foreach ($facts as $fact) {
+	switch ($fact->getTag()) {
 	case 'ADDR':
-	case 'PHON':
-	case 'SUBM':
-	case '_EMAIL':
+	case 'ALIA':
+	case 'ASSO':
 	case 'CHAN':
-	case 'URL':
+	case 'CHIL':
 	case 'EMAIL':
-	case 'WWW':
+	case 'FAMC':
+	case 'FAMS':
+	case 'HUSB':
+	case 'NAME':
+	case 'NOTE':
+	case 'OBJE':
+	case 'PHON':
 	case 'RESI':
 	case 'RESN':
-	case '_UID':
+	case 'SEX':
+	case 'SOUR':
+	case 'SSN':
+	case 'SUBM':
+	case 'TITL':
+	case 'URL':
+	case 'WIFE':
+	case 'WWW':
+	case '_EMAIL':
 	case '_TODO':
+	case '_UID':
 	case '_WT_OBJE_SORT':
 		// Do not show these
 		break;
-	case 'ASSO':
-		// Associates
-		echo format_asso_rela_record($event);
-		break;
 	default:
-		// Simple version of print_fact()
-		echo $event->summary();
+		// Simple version of FunctionsPrintFacts::print_fact()
+		echo $fact->summary();
 		break;
 	}
 }

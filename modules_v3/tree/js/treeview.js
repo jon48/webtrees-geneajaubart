@@ -1,21 +1,16 @@
 /**
- * TreeViewHandler
- *
- * Copyright (C) 2014 webtrees development team
- *
- * This program is free software; you can redistribute it and/or modify
+ * webtrees: online genealogy
+ * Copyright (C) 2015 webtrees development team
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 function TreeViewHandler(treeview_instance) {
@@ -29,8 +24,7 @@ function TreeViewHandler(treeview_instance) {
 	this.boxWidth = 180; // default family box width
 	this.boxExpandedWidth = 250; // default expanded family box width
 	this.cookieDays = 3; // lifetime of preferences memory, in days
-	this.ajaxUrl = "module.php?mod=tree&instance=" + treeview_instance +
-		"&mod_action=";
+	this.ajaxUrl = "module.php?mod=tree&ged=" + WT_GEDCOM + "&instance=" + treeview_instance + "&mod_action=";
 
 	this.container = this.treeview.parent(); // Store the container element ("#" + treeview_instance + "_out")
 	this.auto_box_width = false;

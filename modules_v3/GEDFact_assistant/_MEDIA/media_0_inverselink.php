@@ -1,51 +1,49 @@
 <?php
-// Media Link Assistant Control module for webtrees
-//
-// Media Link information about an individual
-//
-// webtrees: Web based Family History software
-// Copyright (C) 2014 webtrees development team.
-//
-// Derived from PhpGedView
-// Copyright (C) 2002 to 2009 PGV Development Team.
-//
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+/**
+ * webtrees: online genealogy
+ * Copyright (C) 2015 webtrees development team
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+namespace Fisharebest\Webtrees;
 
-// GEDFact Media assistant replacement code for inverselink.php: ===========================
+/**
+ * Defined in session.php
+ *
+ * @global Tree $WT_TREE
+ */
+global $WT_TREE;
 
-//-- extra page parameters and checking
-use WT\Auth;
+use Fisharebest\Webtrees\Functions\FunctionsPrint;
 
-$more_links  = WT_Filter::get('more_links');
-$exist_links = WT_Filter::get('exist_links');
-$gid         = WT_Filter::get('gid', WT_REGEX_XREF);
-$update_CHAN = WT_Filter::get('preserve_last_changed');
+$more_links  = Filter::get('more_links');
+$exist_links = Filter::get('exist_links');
+$gid         = Filter::get('gid', WT_REGEX_XREF);
+$update_CHAN = Filter::get('preserve_last_changed');
 
 $controller
-	->addExternalJavascript(WT_STATIC_URL . 'js/autocomplete.js')
+	->addExternalJavascript(WT_AUTOCOMPLETE_JS_URL)
 	->addInlineJavascript('autocomplete();');
 
-$paramok =  true;
-if (!empty($linktoid)) $paramok = WT_GedcomRecord::getInstance($linktoid)->canShow();
+$paramok = true;
+if (!empty($linktoid)) {
+	$paramok = GedcomRecord::getInstance($linktoid, $WT_TREE)->canShow();
+}
 
 if ($action == 'choose' && $paramok) {
 
 	?>
 	<script>
 	// Javascript variables
-	var id_empty = "<?php echo WT_I18N::translate('When adding a link, the ID field cannot be empty.'); ?>";
+	var id_empty = "<?php echo I18N::translate('When adding a link, the ID field cannot be empty.'); ?>";
 
 	function blankwin() {
 		if (document.getElementById('gid').value == "" || document.getElementById('gid').value.length<=1) {
@@ -69,17 +67,17 @@ if ($action == 'choose' && $paramok) {
 		echo '<input type="hidden" name="linktoid" value="', $linktoid, '">';
 	}
 	echo '<input type="hidden" name="linkto" value="', $linkto, '">';
-	echo '<input type="hidden" name="ged" value="', $GEDCOM, '">';
+	echo '<input type="hidden" name="ged" value="', $WT_TREE->getNameHtml(), '">';
 	echo '<table class="facts_table center">';
 	echo '<tr><td class="topbottombar" colspan="2">';
-	echo WT_I18N::translate('Link to an existing media object');
-	echo '</td></tr><tr><td class="descriptionbox width20 wrap">', WT_I18N::translate('Media'), '</td>';
+	echo I18N::translate('Link to an existing media object');
+	echo '</td></tr><tr><td class="descriptionbox width20 wrap">', I18N::translate('Media'), '</td>';
 	echo '<td class="optionbox wrap">';
 	if (!empty($mediaid)) {
 		//-- Get the title of this existing Media item
-		$title=
-			WT_DB::prepare("SELECT m_titl FROM `##media` where m_id=? AND m_file=?")
-			->execute(array($mediaid, WT_GED_ID))
+		$title =
+			Database::prepare("SELECT m_titl FROM `##media` where m_id=? AND m_file=?")
+			->execute(array($mediaid, $WT_TREE->getTreeId()))
 			->fetchOne();
 		if ($title) {
 			echo '<b>', $title, '</b>';
@@ -88,35 +86,35 @@ if ($action == 'choose' && $paramok) {
 		}
 		echo '<table><tr><td>';
 		//-- Get the filename of this existing Media item
-		$filename=
-			WT_DB::prepare("SELECT m_filename FROM `##media` where m_id=? AND m_file=?")
-			->execute(array($mediaid, WT_GED_ID))
+		$filename =
+			Database::prepare("SELECT m_filename FROM `##media` where m_id=? AND m_file=?")
+			->execute(array($mediaid, $WT_TREE->getTreeId()))
 			->fetchOne();
-		$media=WT_Media::getInstance($mediaid);
+		$media = Media::getInstance($mediaid, $WT_TREE);
 		echo $media->displayImage();
 		echo '</td></tr></table>';
 		echo '</td></tr>';
-		echo '<tr><td class="descriptionbox width20 wrap">', WT_I18N::translate('Links'), '</td>';
+		echo '<tr><td class="descriptionbox width20 wrap">', I18N::translate('Links'), '</td>';
 		echo '<td class="optionbox wrap">';
 		echo "<table><tr><td>";
 		echo "<table id=\"existLinkTbl\" width=\"430\" cellspacing=\"1\" >";
 		echo "<tr>";
 		echo '<td class="topbottombar" width="15"  style="font-weight:100;" >#</td>';
-		echo '<td class="topbottombar" width="50"  style="font-weight:100;" >', WT_I18N::translate('Record'), '</td>';
-		echo '<td class="topbottombar" width="340" style="font-weight:100;" >', WT_I18N::translate('Name'), '</td>';
-		echo '<td class="topbottombar" width="20"  style="font-weight:100;" >', WT_I18N::translate('Keep'), '</td>';
-		echo '<td class="topbottombar" width="20"  style="font-weight:100;" >', WT_I18N::translate('Remove'), '</td>';
-		echo '<td class="topbottombar" width="20"  style="font-weight:100;" >', WT_I18N::translate('Navigator'), '</td>';
+		echo '<td class="topbottombar" width="50"  style="font-weight:100;" >', I18N::translate('Record'), '</td>';
+		echo '<td class="topbottombar" width="340" style="font-weight:100;" >', I18N::translate('Name'), '</td>';
+		echo '<td class="topbottombar" width="20"  style="font-weight:100;" >', I18N::translate('Keep'), '</td>';
+		echo '<td class="topbottombar" width="20"  style="font-weight:100;" >', I18N::translate('Remove'), '</td>';
+		echo '<td class="topbottombar" width="20"  style="font-weight:100;" >', I18N::translate('Family navigator'), '</td>';
 		echo "</tr>";
 
 		$links = array_merge(
 			$media->linkedIndividuals('OBJE'),
 			$media->linkedFamilies('OBJE'),
 			$media->linkedSources('OBJE'),
-			$media->linkedNotes('OBJE'),       // Invalid GEDCOM - you cannot link a NOTE to an OBJE
+			$media->linkedNotes('OBJE'), // Invalid GEDCOM - you cannot link a NOTE to an OBJE
 			$media->linkedRepositories('OBJE') // Invalid GEDCOM - you cannot link a REPO to an OBJE
 		);
-		$i=1;
+		$i = 1;
 		foreach ($links as $record) {
 			echo "<tr ><td>";
 			echo $i++;
@@ -125,23 +123,23 @@ if ($action == 'choose' && $paramok) {
 			echo "</td><td>";
 			echo $record->getFullName();
 			echo "</td>";
-			echo "<td align='center'><input alt='", WT_I18N::translate('Keep link in list'), "', title='", WT_I18N::translate('Keep link in list'), "' type='radio' id='", $record->getXref(), "_off' name='", $record->getXref(), "' checked></td>";
-			echo "<td align='center'><input alt='", WT_I18N::translate('Remove link from list'), "', title='", WT_I18N::translate('Remove link from list'), "' type='radio' id='", $record->getXref(), "_on'  name='", $record->getXref(), "'></td>";
+			echo "<td align='center'><input alt='", I18N::translate('Keep link in list'), "', title='", I18N::translate('Keep link in list'), "' type='radio' id='", $record->getXref(), "_off' name='", $record->getXref(), "' checked></td>";
+			echo "<td align='center'><input alt='", I18N::translate('Remove link from list'), "', title='", I18N::translate('Remove link from list'), "' type='radio' id='", $record->getXref(), "_on'  name='", $record->getXref(), "'></td>";
 
-			if ($record instanceof WT_Individual) {
+			if ($record instanceof Individual) {
 				?>
-				<td align="center"><a href="#" class="icon-button_family" title="<?php echo WT_I18N::translate('Family navigator'); ?>" name="family_'<?php echo $record->getXref(); ?>'" onclick="openFamNav('<?php echo $record->getXref(); ?>'); return false;"></a></td>
+				<td align="center"><a href="#" class="icon-button_family" name="family_'<?php echo $record->getXref(); ?>'" onclick="openFamNav('<?php echo $record->getXref(); ?>'); return false;"></a></td>
 				<?php
-			} elseif ($record instanceof WT_Family) {
+			} elseif ($record instanceof Family) {
 				if ($record->getHusband()) {
-					$head=$record->getHusband()->getXref();
+					$head = $record->getHusband()->getXref();
 				} elseif ($record->getWife()) {
-					$head=$record->getWife()->getXref();
+					$head = $record->getWife()->getXref();
 				} else {
-					$head='';
+					$head = '';
 				}
 				?>
-				<td align="center"><a href="#" class="icon-button_family" title="<?php echo WT_I18N::translate('Family navigator'); ?>" name="family_'<?php echo $record->getXref(); ?>'" onclick="openFamNav('<?php echo $head; ?>');"></a></td>
+				<td align="center"><a href="#" class="icon-button_family" name="family_'<?php echo $record->getXref(); ?>'" onclick="openFamNav('<?php echo $head; ?>');"></a></td>
 				<?php
 			} else {
 				echo '<td></td>';
@@ -157,30 +155,27 @@ if ($action == 'choose' && $paramok) {
 	if (!isset($linktoid)) { $linktoid = ""; }
 
 	echo '<tr><td class="descriptionbox wrap">';
-	echo WT_I18N::translate('Add links');
+	echo I18N::translate('Add links');
 	echo '<td class="optionbox wrap ">';
-	if ($linktoid=="") {
+	if ($linktoid == "") {
 		// ----
 	} else {
-		$record=WT_Individual::getInstance($linktoid);
+		$record = Individual::getInstance($linktoid, $WT_TREE);
 		echo '<b>', $record->getFullName(), '</b>';
 	}
 	echo '<table><tr><td>';
 	echo '<input type="text" data-autocomplete-type="IFS" name="gid" id="gid" size="6" value="">';
 	echo '</td><td style="padding-bottom: 2px; vertical-align: middle;">';
 	echo '&nbsp;';
-	if (isset($WT_IMAGES["add"])) {
-		echo '<img style="border-style:none;" src="', $WT_IMAGES["add"], '" alt="', WT_I18N::translate('Add'), ' " title="', WT_I18N::translate('Add'), '" align="middle" name="addLink" value="" onclick="blankwin(); return false;">';
-	} else {
-		echo '<button name="addLink" value="" type="button" onclick="blankwin(); return false;">', WT_I18N::translate('Add'), '</button>';
-	}
-	echo ' ', print_findindi_link('gid');
-	echo ' ', print_findfamily_link('gid');
-	echo ' ', print_findsource_link('gid');
+	echo '<a href="#" class="icon-add" title="', I18N::translate('Add'), '" onclick="blankwin(); return false;"></a>';
+	echo ' ', FunctionsPrint::printFindIndividualLink('gid');
+	echo ' ', FunctionsPrint::printFindFamilyLink('gid');
+	echo ' ', FunctionsPrint::printFindSourceLink('gid');
 	echo '</td></tr></table>';
-	echo "<sub>" . WT_I18N::translate('Enter or search for the ID of the individual, family, or source to which this media item should be linked.') . "</sub>";
+	echo "<sub>" . I18N::translate('Enter or search for the ID of the individual, family, or source to which this media object should be linked.') . "</sub>";
 	echo '<br><br>';
 	echo '<input type="hidden" name="idName" id="idName" size="36" value="Name of ID">';
+
 ?>
 <script>
 
@@ -195,23 +190,11 @@ if ($action == 'choose' && $paramok) {
 	}
 
 	function openFamNav(id) {
-		//id=document.getElementById('gid').value;
-		if (id.match("I")=="I" || id.match("i")=="i") {
-			id = id.toUpperCase();
-			winNav = window.open('edit_interface.php?action=addmedia_links&noteid=newnote&pid='+id, 'winNav', fam_nav_specs);
-			if (window.focus) {winNav.focus();}
-		} else if (id.match("F")=="F") {
-			id = id.toUpperCase();
-			// TODO --- alert('Opening Navigator with family id entered will come later');
+		winNav = window.open('edit_interface.php?action=addmedia_links&noteid=newnote&pid='+id, 'winNav', fam_nav_specs);
+		if (window.focus) {
+			winNav.focus();
 		}
 	}
-
-	var ifamily = "<?php echo WT_I18N::translate('Family navigator'); ?>";
-	var remove = "<?php echo WT_I18N::translate('Remove'); ?>";
-	/* ===icons === */
-	var removeLinkIcon = "<?php echo $WT_IMAGES['remove']; ?>";
-	var familyNavIcon = "<?php echo $WT_IMAGES['button_family']; ?>";
-
 
 var INPUT_NAME_PREFIX = 'InputCell_'; // this is being set via script
 var RADIO_NAME = "totallyrad"; // this is being set via script
@@ -378,34 +361,19 @@ function addRowToTable(num, pid, nam, head)
 
 			// cell btn - remove img button
 			var cellbtn = row.insertCell(3);
-				cellbtn.setAttribute('align', 'center');
-			var btnEl = document.createElement('img');
-				btnEl.setAttribute('type', 'img');
-				btnEl.setAttribute('src', removeLinkIcon);
-				btnEl.setAttribute('alt', remove);
-				btnEl.setAttribute('title', remove);
-				btnEl.setAttribute('height', '14px');
-				btnEl.onclick = function () {deleteCurrentRow(this)};
-			cellbtn.appendChild(btnEl);
+			var btnEl = jQuery('<a href="#" class="icon-remove"></a>');
+			btnEl.on('click', function () {deleteCurrentRow(this)});
+			jQuery(cellbtn).append(btnEl);
 
 			// cell btn - family img button
 			var cellbtn2 = row.insertCell(4);
-				cellbtn2.setAttribute('align', 'center');
 			if (pid.match("I")=="I" || pid.match("i")=="i") {
-				var btn2El = document.createElement('img');
-					btn2El.setAttribute('type', 'img');
-					btn2El.setAttribute('src', familyNavIcon);
-					btn2El.setAttribute('alt', ifamily);
-					btn2El.setAttribute('title', ifamily);
-					btn2El.onclick = function () {openFamNav(pid)};
-				cellbtn2.appendChild(btn2El);
+				var btn2El = jQuery('<a href="#" class="icon-button_family"></a>');
+				btn2El.on('click', function() {openFamNav(pid)});
+				jQuery(cellbtn2).append(btn2El);
 			} else if (pid.match("F")=="F" || pid.match("f")=="f") {
-				var btn2El = document.createElement('img');
-					btn2El.setAttribute('type', 'img');
-					btn2El.setAttribute('src', familyNavIcon);
-					btn2El.setAttribute('alt', ifamily);
-					btn2El.setAttribute('title', ifamily);
-					btn2El.onclick = function () {openFamNav(head)};
+				var btn2El = jQuery('<a href="#" class="icon-button_family"></a>');
+				btn2El.on('click', function () {openFamNav(head)});
 				cellbtn2.appendChild(btn2El);
 			} else {
 				// Show No Icon
@@ -519,7 +487,8 @@ function parseAddLinks() {
 	var str = document.getElementById('gid').value;
 	// Add in the "keep" IDs.
 	var tbl = document.getElementById('addlinkQueue');
-	for (var i=1; i<tbl.rows.length; i++) { // start at i=1 because we need to avoid header
+	// start at i=1 because we need to avoid header
+	for (var i=1; i<tbl.rows.length; i++) {
 		var tr = tbl.rows[i];
 		if (typeof tr.cells[1].childNodes[0].textContent !== "undefined") {
 			str += (str==''?'':',') + tr.cells[1].childNodes[0].textContent;
@@ -533,7 +502,8 @@ function parseAddLinks() {
 function parseRemLinks() {
 	var remstr = "";
 	var tbl = document.getElementById('existLinkTbl');
-	for (var i=1; i<tbl.rows.length; i++) { // start at i=1 because we need to avoid header
+	// start at i=1 because we need to avoid header
+	for (var i=1; i<tbl.rows.length; i++) {
 		var remtr = tbl.rows[i];
 		if (remtr.cells[4].childNodes[0].checked)  {
 			remstr += (remstr==''?'':',') + remtr.cells[4].childNodes[0].name;
@@ -556,10 +526,10 @@ function shiftlinks() {
 					<thead>
 						<tr>
 							<th class="topbottombar" width="10"  style="font-weight:100;" align="left">#</th>
-							<th class="topbottombar" width="55"  style="font-weight:100;" align="left"><?php echo WT_I18N::translate('Record'); ?></th>
-							<th class="topbottombar" width="370" style="font-weight:100;" align="left"><?php echo WT_I18N::translate('Name'); ?></th>
-							<th class="topbottombar" width="20"  style="font-weight:100;" align="left"><?php echo WT_I18N::translate('Remove'); ?></th>
-							<th class="topbottombar" width="20"  style="font-weight:100;" align="left"><?php echo WT_I18N::translate('Navigator'); ?></th>
+							<th class="topbottombar" width="55"  style="font-weight:100;" align="left"><?php echo I18N::translate('Record'); ?></th>
+							<th class="topbottombar" width="370" style="font-weight:100;" align="left"><?php echo I18N::translate('Name'); ?></th>
+							<th class="topbottombar" width="20"  style="font-weight:100;" align="left"><?php echo I18N::translate('Remove'); ?></th>
+							<th class="topbottombar" width="20"  style="font-weight:100;" align="left"><?php echo I18N::translate('Family navigator'); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -571,13 +541,13 @@ function shiftlinks() {
 		// Admin Option CHAN log update override =======================
 		if (Auth::isAdmin()) {
 			echo "<tr><td class=\"descriptionbox wrap width25\">";
-			echo WT_Gedcom_Tag::getLabel('CHAN'), "</td><td class=\"optionbox wrap\">";
-			if ($NO_UPDATE_CHAN) {
-				echo "<input type=\"checkbox\" checked=\"checked\" name=\"preserve_last_changed\">";
+			echo GedcomTag::getLabel('CHAN'), "</td><td class=\"optionbox wrap\">";
+			if ($WT_TREE->getPreference('NO_UPDATE_CHAN')) {
+				echo "<input type=\"checkbox\" checked name=\"preserve_last_changed\">";
 			} else {
 				echo "<input type=\"checkbox\" name=\"preserve_last_changed\">";
 			}
-			echo WT_I18N::translate('Do not update the “last change” record'), help_link('no_update_CHAN');
+			echo I18N::translate('Keep the existing “last change” information');
 			echo "</td></tr>";
 		}
 		?>
@@ -585,8 +555,8 @@ function shiftlinks() {
 	<input type="hidden" name="more_links" value="No_Values">
 	<input type="hidden" name="exist_links" value="No_Values">
 	<p id="save-cancel">
-		<input type="submit" class="save" value="<?php echo WT_I18N::translate('save'); ?>" onclick="shiftlinks();">
-		<input type="button" class="cancel" value="<?php echo WT_I18N::translate('close'); ?>" onclick="window.close();">
+		<input type="submit" class="save" value="<?php echo I18N::translate('save'); ?>" onclick="shiftlinks();">
+		<input type="button" class="cancel" value="<?php echo I18N::translate('close'); ?>" onclick="window.close();">
 	</p>
 </form>
 <?php
@@ -594,8 +564,8 @@ function shiftlinks() {
 	// Unlink records indicated by radio button =========
 	if ($exist_links) {
 		foreach (explode(',', $exist_links) as $remLinkId) {
-			$indi = WT_GedcomRecord::getInstance($remLinkId);
-			$indi->removeLinks($mediaid, $update_CHAN!='no_change');
+			$indi = GedcomRecord::getInstance($remLinkId, $WT_TREE);
+			$indi->removeLinks($mediaid, $update_CHAN != 'no_change');
 		}
 	}
 	// Add new Links ====================================
@@ -603,8 +573,8 @@ function shiftlinks() {
 		// array_unique() because parseAddLinks() may includes the gid field, even
 		// when it is also in the list.
 		foreach (array_unique(explode(',', $more_links)) as $addLinkId) {
-			$indi = WT_GedcomRecord::getInstance($addLinkId);
-			$indi->createFact('1 OBJE @' . $mediaid . '@', $update_CHAN!='no_change');
+			$indi = GedcomRecord::getInstance($addLinkId, $WT_TREE);
+			$indi->createFact('1 OBJE @' . $mediaid . '@', $update_CHAN != 'no_change');
 		}
 	}
 	$controller->addInlineJavascript('closePopupAndReloadParent();');
