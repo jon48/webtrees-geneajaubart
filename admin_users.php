@@ -197,8 +197,8 @@ case 'load_json':
 	$data = Database::prepare($sql_select)->execute($args)->fetchAll(PDO::FETCH_NUM);
 
 	$installed_languages = array();
-	foreach (I18N::installedLocales() as $locale) {
-		$installed_languages[$locale->languageTag()] = $locale->endonym();
+	foreach (I18N::installedLocales() as $installed_locale) {
+		$installed_languages[$installed_locale->languageTag()] = $installed_locale->endonym();
 	}
 
 	// Reformat various columns for display
@@ -216,14 +216,14 @@ case 'load_json':
 
 		$datum[0] = '<div class="btn-group"><button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-pencil"></i> <span class="caret"></span></button><ul class="dropdown-menu" role="menu"><li><a href="?action=edit&amp;user_id=' . $user_id . '"><i class="fa fa-fw fa-pencil"></i> ' . I18N::translate('Edit') . '</a></li><li class="divider"><li><a href="index_edit.php?user_id=' . $user_id . '"><i class="fa fa-fw fa-th-large"></i> ' . I18N::translate('Change the blocks on this user’s “My page”') . '</a></li>' . $admin_options . '</ul></div>';
 		// $datum[1] is the user ID
-		// $datum[2] is the user name
-		$datum[2] = '<span dir="auto">' . Filter::escapeHtml($datum[2]) . '</span>';
 		// $datum[3] is the real name
 		$datum[3] = '<span dir="auto">' . Filter::escapeHtml($datum[3]) . '</span>';
 		// $datum[4] is the email address
 		if ($user_id != Auth::id()) {
 			$datum[4] = '<a href="#" onclick="return message(\'' . Filter::escapeHtml($datum[2]) . '\', \'\', \'\');">' . Filter::escapeHtml($datum[4]) . '</i></a>';
 		}
+		// $datum[2] is the user name
+		$datum[2] = '<span dir="auto">' . Filter::escapeHtml($datum[2]) . '</span>';
 		// $datum[5] is the langauge
 		if (array_key_exists($datum[5], $installed_languages)) {
 			$datum[5] = $installed_languages[$datum[5]];
@@ -408,9 +408,9 @@ case 'edit':
 			</label>
 			<div class="col-sm-9">
 				<select id="language" name="language" class="form-control">
-					<?php foreach (I18N::installedLocales() as $locale): ?>
-						<option value="<?php echo $locale->languageTag(); ?>" <?php echo $user->getPreference('language', WT_LOCALE) === $locale->languageTag() ? 'selected' : ''; ?>>
-							<?php echo $locale->endonym(); ?>
+					<?php foreach (I18N::installedLocales() as $installed_locale): ?>
+						<option value="<?php echo $installed_locale->languageTag(); ?>" <?php echo $user->getPreference('language', WT_LOCALE) === $installed_locale->languageTag() ? 'selected' : ''; ?>>
+							<?php echo $installed_locale->endonym(); ?>
 						</option>
 					<?php endforeach; ?>
 				</select>
@@ -818,6 +818,8 @@ default:
 		->addInlineJavascript('
 			jQuery(".table-user-list").dataTable({
 				' . I18N::datatablesI18N() . ',
+				stateSave: true,
+				stateDuration: 300,
 				processing: true,
 				serverSide: true,
 				ajax: {

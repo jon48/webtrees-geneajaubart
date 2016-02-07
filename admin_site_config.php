@@ -125,8 +125,8 @@ $WELCOME_TEXT_AUTH_MODE_OPTIONS = array(
 );
 
 $language_tags = array();
-foreach (I18N::activeLocales() as $locale) {
-	$language_tags[] = $locale->languageTag();
+foreach (I18N::activeLocales() as $active_locale) {
+	$language_tags[] = $active_locale->languageTag();
 }
 
 switch (Filter::get('action')) {
@@ -471,7 +471,7 @@ $controller->pageHeader();
 			<?php echo /* I18N: A site configuration setting */ I18N::translate('Custom welcome text'); ?>
 		</label>
 		<div class="col-sm-9">
-			<input type="text" class="form-control" id="WELCOME_TEXT_AUTH_MODE_4" name="WELCOME_TEXT_AUTH_MODE_4" value="<?php echo Filter::escapeHtml(Site::getPreference('WELCOME_TEXT_AUTH_MODE_' . WT_LOCALE)); ?>" maxlength="255">
+			<textarea class="form-control" maxlength="2000" id="WELCOME_TEXT_AUTH_MODE_4" name="WELCOME_TEXT_AUTH_MODE_4" rows="4"><?php echo Filter::escapeHtml(Site::getPreference('WELCOME_TEXT_AUTH_MODE_' . WT_LOCALE)); ?></textarea>
 			<p class="small text-muted">
 				<?php echo /* I18N: Help text for the "Custom welcome text" site configuration setting */ I18N::translate('To set this text for other languages, you must switch to that language, and visit this page again.'); ?>
 			</p>
@@ -588,7 +588,7 @@ $controller->pageHeader();
 				<?php echo /* I18N: A site configuration setting */ I18N::translate('URL'); ?>
 			</label>
 			<div class="col-sm-9">
-				<input type="text" class="form-control" id="PIWIK_URL" name="PIWIK_URL" value="<?php echo Filter::escapeHtml(Site::getPreference('PIWIK_URL')); ?>" placeholder="http://example.com/piwik/" maxlength="255">
+				<input type="text" class="form-control" id="PIWIK_URL" name="PIWIK_URL" value="<?php echo Filter::escapeHtml(Site::getPreference('PIWIK_URL')); ?>" placeholder="example.com/piwik" maxlength="255">
 				<p class="small text-muted">
 					<?php echo I18N::translate('Tracking and analytics are not added to the control panel.'); ?>
 				</p>
@@ -632,11 +632,11 @@ $controller->pageHeader();
 				<?php echo /* I18N: A site configuration setting */ I18N::translate('Language'); ?>
 			</legend>
 			<div class="col-sm-9" style="columns: 4 150px;-moz-columns: 4 150px;">
-				<?php foreach (I18N::installedLocales() as $locale): ?>
+				<?php foreach (I18N::installedLocales() as $installed_locale): ?>
 					<div class="checkbox">
-						<label title="<?php echo $locale->languageTag(); ?>">
-							<input type="checkbox" name="LANGUAGES[]" value="<?php echo $locale->languageTag(); ?>" <?php echo in_array($locale->languageTag(), $language_tags) ? 'checked' : ''; ?>>
-							<?php echo $locale->endonym(); ?>
+						<label title="<?php echo $installed_locale->languageTag(); ?>">
+							<input type="checkbox" name="LANGUAGES[]" value="<?php echo $installed_locale->languageTag(); ?>" <?php echo in_array($installed_locale->languageTag(), $language_tags) ? 'checked' : ''; ?>>
+							<?php echo $installed_locale->endonym(); ?>
 						</label>
 					</div>
 				<?php endforeach; ?>

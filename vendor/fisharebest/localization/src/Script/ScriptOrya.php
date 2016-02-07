@@ -8,33 +8,18 @@
  * @license   GPLv3+
  */
 class ScriptOrya extends AbstractScript implements ScriptInterface {
-	/** {@inheritdoc} */
 	public function code() {
 		return 'Orya';
 	}
 
-	/** {@inheritdoc} */
 	public function numerals() {
-		return array(
-			'0' => '୦',
-			'1' => '୧',
-			'2' => '୨',
-			'3' => '୩',
-			'4' => '୪',
-			'5' => '୫',
-			'6' => '୬',
-			'7' => '୭',
-			'8' => '୮',
-			'9' => '୯',
-		);
+		return array('୦', '୧', '୨', '୩', '୪', '୫', '୬', '୭', '୮', '୯');
 	}
 
-	/** {@inheritdoc} */
 	public function number() {
 		return '327';
 	}
 
-	/** {@inheritdoc} */
 	public function unicodeName() {
 		return 'Oriya';
 	}

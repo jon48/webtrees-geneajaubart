@@ -18,19 +18,24 @@ namespace Fisharebest\Webtrees;
 /**
  * Defined in session.php
  *
- * @global Tree   $WT_TREE
+ * @global Tree $WT_TREE
  */
 global $WT_TREE;
 
 use Fisharebest\Webtrees\Controller\IndividualController;
 use Fisharebest\Webtrees\Functions\FunctionsDate;
+use Fisharebest\Webtrees\Functions\FunctionsDb;
 use Fisharebest\Webtrees\Functions\FunctionsPrint;
 
 define('WT_SCRIPT_NAME', 'individual.php');
 require './includes/session.php';
-$controller = new IndividualController;
-$controller
-	->addExternalJavascript(WT_JQUERY_COOKIE_JS_URL); // We use this to record the sidebar state
+
+$pid = Filter::get('pid', WT_REGEX_XREF);
+$record = Individual::getInstance($pid, $WT_TREE);
+if (!$record && $WT_TREE->getPreference('USE_RIN')) {
+	$record = Individual::getInstance(FunctionsDb::findRin($pid), $WT_TREE);
+}
+$controller = new IndividualController($record);
 
 if ($controller->record && $controller->record->canShow()) {
 	if (Filter::get('action') == 'ajax') {
@@ -110,11 +115,10 @@ var WT_INDIVIDUAL = (function () {
 		});
 
 		jQuery ("#tabs").tabs ({
-			// If url has a hash (e.g #stories) then don\'t set an active tab - it overrides the hash
-			// otherwise use cookie
-			active: location.hash ? null : jQuery.cookie ("indi-tab"),
+			// Remember the currently selected tab between pages.
+			active: sessionStorage.getItem("indi-tab"),
 			activate: function (event, ui) {
-				jQuery.cookie ("indi-tab", jQuery ("#tabs").tabs ("option", "active"));
+				sessionStorage.setItem("indi-tab", jQuery(this).tabs("option", "active"));
 			},
 			// Only load each tab once
 			beforeLoad: function (event, ui) {
@@ -136,14 +140,14 @@ var WT_INDIVIDUAL = (function () {
 				jQsidebar.animate ({width: "toggle"}, {
 					duration: 300,
 					done: function () {
-						jQuery.cookie ("hide-sb", jQsidebar.is (":hidden"));
+						sessionStorage.setItem("hide-sb", jQsidebar.is(":hidden"));
 						jQseparator.toggleClass("separator-hidden separator-visible");
 					}
 				});
 			});
 
 			// Set initial sidebar state
-			if (jQuery.cookie ("hide-sb") === "true") {
+			if (sessionStorage.getItem("hide-sb") === "true") {
 				jQsidebar.hide ();
 				jQseparator.addClass("separator-hidden");
 			} else {
@@ -220,15 +224,16 @@ foreach ($controller->tabs as $tab) {
 		$greyed_out = '';
 	}
 	if ($tab->hasTabContent()) {
-		echo '<li class="' . $greyed_out . '"><a href="';
+		echo '<li class="' . $greyed_out . '"><a';
 		if ($tab->canLoadAjax()) {
 			// AJAX tabs load only when selected
-			echo $controller->record->getHtmlUrl(), '&amp;action=ajax&amp;module=', $tab->getName();
+			echo ' href="' . $controller->record->getHtmlUrl(), '&amp;action=ajax&amp;module=', $tab->getName() . '"';
+			echo ' rel="nofollow"';
 		} else {
 			// Non-AJAX tabs load immediately
-			echo '#', $tab->getName();
+			echo ' href="#', $tab->getName() . '"';
 		}
-		echo '" title="', $tab->getDescription(), '">', $tab->getTitle(), '</a></li>';
+		echo ' title="', $tab->getDescription(), '">', $tab->getTitle(), '</a></li>';
 	}
 }
 echo '</ul>';

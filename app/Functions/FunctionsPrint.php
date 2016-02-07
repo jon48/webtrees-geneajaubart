@@ -198,14 +198,16 @@ class FunctionsPrint {
 	}
 
 	/**
-	 * Print an external help link to the wiki site, in a new window
+	 * Print an external help link to the wiki site.
+	 *
+	 * @deprecated - nothing should be so complicated that it needs lengthy instructions!
 	 *
 	 * @param string $topic
 	 *
 	 * @return string
 	 */
 	public static function wikiHelpLink($topic) {
-		return '<a class="help icon-wiki" href="' . WT_WEBTREES_WIKI . $topic . '" title="' . I18N::translate('webtrees wiki') . '" target="_blank">&nbsp;</a>';
+		return '<a class="help icon-wiki" href="' . WT_WEBTREES_WIKI . $topic . '" title="' . I18N::translate('webtrees wiki') . '"></a>';
 	}
 
 	/**

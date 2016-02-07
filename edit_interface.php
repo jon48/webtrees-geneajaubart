@@ -37,7 +37,7 @@ $controller
 	->restrictAccess(Auth::isEditor($WT_TREE))
 	->addExternalJavascript(WT_AUTOCOMPLETE_JS_URL)
 	->addInlineJavascript('autocomplete();')
-	->addInlineJavascript('var locale_date_format="' . preg_replace('/[^DMY]/', '', str_replace(array('J', 'F'), array('D', 'M'), I18N::dateFormat())) . '";');
+	->addInlineJavascript('var locale_date_format="' . preg_replace('/[^DMY]/', '', str_replace(array('j', 'F'), array('D', 'M'), I18N::dateFormat())) . '";');
 
 switch ($action) {
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ case 'updateraw':
 
 	// Retain any private facts
 	foreach ($record->getFacts(null, false, Auth::PRIV_HIDE) as $fact) {
-		if (!in_array($fact->getFactId(), $fact_ids)) {
+		if (!in_array($fact->getFactId(), $fact_ids) && !$fact->isPendingDeletion()) {
 			$gedcom .= "\n" . $fact->getGedcom();
 		}
 	}
@@ -489,7 +489,7 @@ case 'update':
 	// For the GEDFact_assistant module
 	$pid_array = Filter::post('pid_array');
 	if ($pid_array) {
-		foreach (explode(', ', $pid_array) as $pid) {
+		foreach (explode(',', $pid_array) as $pid) {
 			if ($pid !== $xref) {
 				$indi = Individual::getInstance($pid, $WT_TREE);
 				if ($indi && $indi->canEdit()) {
@@ -1795,7 +1795,7 @@ case 'reorder_children':
 	$option = Filter::post('option');
 
 	$family = Family::getInstance($xref, $WT_TREE);
-	check_record_access($family, $WT_TREE);
+	check_record_access($family);
 
 	$controller
 		->addInlineJavascript('jQuery("#reorder_list").sortable({forceHelperSize: true, forcePlaceholderSize: true, opacity: 0.7, cursor: "move", axis: "y"});')
@@ -2505,7 +2505,7 @@ function print_indi_form($nextaction, Individual $person = null, Family $family 
 		$fields   = explode(' ', $gedlines[0]);
 		$glevel   = $fields[0];
 		$level    = $glevel;
-		$type     = trim($fields[1]);
+		$type     = $fields[1];
 		$tags     = array();
 		$i        = 0;
 		do {
@@ -2518,7 +2518,7 @@ function print_indi_form($nextaction, Individual $person = null, Family $family 
 					$text .= $fields[$j];
 				}
 				while (($i + 1 < count($gedlines)) && (preg_match('/' . ($level + 1) . ' CONT ?(.*)/', $gedlines[$i + 1], $cmatch) > 0)) {
-					$text .= "\n" . $cmatch[2];
+					$text .= "\n" . $cmatch[1];
 					$i++;
 				}
 				FunctionsEdit::addSimpleTag($level . ' ' . $type . ' ' . $text);
@@ -2637,12 +2637,12 @@ function print_indi_form($nextaction, Individual $person = null, Family $family 
 		// For example, to differentiate the two Spanish surnames from an English
 		// double-barred name.
 		// Commas *may* be used in other fields, and will form part of the NAME.
-		if (WT_LOCALE=="vi" || WT_LOCALE=="hu") {
+		if (WT_LOCALE === "vi" || WT_LOCALE === "hu") {
 			// Default format: /SURN/ GIVN
 			return trim(npfx+" /"+trim(spfx+" "+surn).replace(/ *, */g, " ")+"/ "+givn.replace(/ *, */g, " ")+" "+nsfx);
-		} else if (WT_LOCALE=="zh") {
+		} else if (WT_LOCALE === "zh-Hans" || WT_LOCALE === "zh-Hant") {
 			// Default format: /SURN/GIVN
-			return trim(npfx+" /"+trim(spfx+" "+surn).replace(/ *, */g, " ")+"/"+givn.replace(/ *, */g, " ")+" "+nsfx);
+			return npfx+"/"+spfx+surn+"/"+givn+nsfx;
 		} else {
 			// Default format: GIVN /SURN/
 			return trim(npfx+" "+givn.replace(/ *, */g, " ")+" /"+trim(spfx+" "+surn).replace(/ *, */g, " ")+"/ "+nsfx);

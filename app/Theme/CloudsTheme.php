@@ -33,15 +33,6 @@ class CloudsTheme extends AbstractTheme implements ThemeInterface {
 	}
 
 	/**
-	 * HTML link to a "favorites icon".
-	 *
-	 * @return string
-	 */
-	protected function favicon() {
-		return '<link rel="icon" href="' . $this->assetUrl() . 'favicon.png" type="image/png">';
-	}
-
-	/**
 	 * Add markup to a flash message.
 	 *
 	 * @param \stdClass $message
@@ -141,7 +132,7 @@ class CloudsTheme extends AbstractTheme implements ThemeInterface {
 
 		foreach ($menus as $menu) {
 			// Create an inert menu - to use as a label
-			$tmp = new Menu(strip_tags($menu->getLabel()), '');
+			$tmp = new Menu($menu->getLabel(), '');
 
 			// Insert the label into the submenu
 			$submenus = $menu->getSubmenus();

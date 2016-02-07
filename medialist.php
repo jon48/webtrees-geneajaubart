@@ -286,6 +286,10 @@ if ($action === 'submit') {
 				if ($mediaobject->fileExists()) {
 					if (Auth::isEditor($WT_TREE)) {
 						echo GedcomTag::getLabelValue('FILE', $mediaobject->getFilename());
+						$mediatype = $mediaobject->getMediaType();
+						if ($mediatype) {
+						echo GedcomTag::getLabelValue('TYPE', GedcomTag::getFileFormTypeValue($mediatype));
+						}
 					}
 					echo GedcomTag::getLabelValue('FORM', $mediaobject->mimeType());
 					echo GedcomTag::getLabelValue('__FILE_SIZE__', $mediaobject->getFilesize());

@@ -40,7 +40,7 @@ global $WT_TREE, $SEARCH_SPIDER;
 
 // Identify ourself
 define('WT_WEBTREES', 'webtrees');
-define('WT_VERSION', '1.7.2');
+define('WT_VERSION', '1.7.3');
 
 // External URLs
 define('WT_WEBTREES_URL', 'http://www.webtrees.net/');
@@ -62,7 +62,6 @@ if (getenv('USE_CDN')) {
 	define('WT_FONT_AWESOME_CSS_URL', '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css');
 	define('WT_JQUERYUI_JS_URL', '//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js');
 	define('WT_JQUERYUI_TOUCH_PUNCH_URL', '//cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js');
-	define('WT_JQUERY_COOKIE_JS_URL', '//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js');
 	define('WT_JQUERY_DATATABLES_JS_URL', '//cdnjs.cloudflare.com/ajax/libs/datatables/1.10.7/js/jquery.dataTables.min.js');
 	define('WT_JQUERY_JS_URL', '//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js');
 	define('WT_JQUERY2_JS_URL', '//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js');
@@ -80,7 +79,6 @@ if (getenv('USE_CDN')) {
 	define('WT_FONT_AWESOME_CSS_URL', WT_STATIC_URL . 'packages/font-awesome-4.4.0/css/font-awesome.min.css');
 	define('WT_JQUERYUI_JS_URL', WT_STATIC_URL . 'packages/jquery-ui-1.11.4/js/jquery-ui.min.js');
 	define('WT_JQUERYUI_TOUCH_PUNCH_URL', WT_STATIC_URL . 'packages/jqueryui-touch-punch-0.2.3/jquery.ui.touch-punch.min.js');
-	define('WT_JQUERY_COOKIE_JS_URL', WT_STATIC_URL . 'packages/jquery-cookie-1.4.1/jquery.cookie.js');
 	define('WT_JQUERY_DATATABLES_JS_URL', WT_STATIC_URL . 'packages/datatables-1.10.7/js/jquery.dataTables.min.js');
 	define('WT_JQUERY_JS_URL', WT_STATIC_URL . 'packages/jquery-1.11.3/jquery.min.js');
 	define('WT_JQUERY2_JS_URL', WT_STATIC_URL . 'packages/jquery-2.1.4/jquery.min.js');
@@ -111,7 +109,7 @@ define('WT_DEBUG', strpos(WT_VERSION, 'dev') !== false);
 define('WT_DEBUG_SQL', false);
 
 // Required version of database tables/columns/indexes/etc.
-define('WT_SCHEMA_VERSION', 32);
+define('WT_SCHEMA_VERSION', 34);
 
 // Regular expressions for validating user input, etc.
 define('WT_MINIMUM_PASSWORD_LENGTH', 6);
@@ -160,31 +158,12 @@ if (WT_DEBUG) {
 	error_reporting(E_ALL);
 }
 
-// We use some PHP5.5 features, but need to run on older servers
-if (version_compare(PHP_VERSION, '5.4', '<')) {
-	require WT_ROOT . 'includes/php_53_compatibility.php';
-}
-
 require WT_ROOT . 'vendor/autoload.php';
 
 // PHP requires a time zone to be set.  We'll set a better one later on.
 date_default_timezone_set('UTC');
 
-// Use the patchwork/utf8 library to:
-// 1) set all PHP defaults to UTF-8
-// 2) create shims for missing mb_string functions such as mb_strlen()
-// 3) check that requests are valid UTF-8
-\Patchwork\Utf8\Bootup::initAll(); // Enables the portablity layer and configures PHP for UTF-8
-\Patchwork\Utf8\Bootup::filterRequestUri(); // Redirects to an UTF-8 encoded URL if it's not already the case
-\Patchwork\Utf8\Bootup::filterRequestInputs(); // Normalizes HTTP inputs to UTF-8 NFC
-
-// Use the fisharebest/ext-calendar library to
-// 1) provide shims for the PHP ext/calendar extension, such as JewishToJD()
-// 2) provide calendar conversions for the Arabic and Persian calendars
-\Fisharebest\ExtCalendar\Shim::create();
-
 // Calculate the base URL, so we can generate absolute URLs.
-
 $protocol = Filter::server('HTTP_X_FORWARDED_PROTO', 'https?', Filter::server('HTTPS', null, 'off') === 'off' ? 'http' : 'https');
 
 // For CLI scripts, use localhost.
@@ -340,7 +319,7 @@ $rule = Database::prepare(
 	" WHERE IFNULL(INET_ATON(?), 0) BETWEEN ip_address_start AND ip_address_end" .
 	" AND ? LIKE user_agent_pattern" .
 	" ORDER BY ip_address_end LIMIT 1"
-)->execute(array(WT_CLIENT_IP, Filter::server('HTTP_USER_AGENT')))->fetchOne();
+)->execute(array(WT_CLIENT_IP, Filter::server('HTTP_USER_AGENT', null, '')))->fetchOne();
 
 switch ($rule) {
 case 'allow':
@@ -376,7 +355,7 @@ session_set_save_handler(
 	},
 	// read
 	function ($id) {
-		return Database::prepare("SELECT session_data FROM `##session` WHERE session_id=?")->execute(array($id))->fetchOne();
+		return (string) Database::prepare("SELECT session_data FROM `##session` WHERE session_id=?")->execute(array($id))->fetchOne();
 	},
 	// write
 	function ($id, $data) {
@@ -465,6 +444,13 @@ if (WT_SCRIPT_NAME != 'admin_trees_manage.php' && WT_SCRIPT_NAME != 'admin_pgv_t
 		if (Auth::isAdmin()) {
 			header('Location: ' . WT_BASE_URL . 'admin_trees_manage.php');
 		} else {
+			// We're not an administrator, so we can only log in if there is a tree.
+			if (Auth::id()) {
+				Auth::logout();
+				FlashMessages::addMessage(
+					I18N::translate('This user account does not have access to any tree.')
+				);
+			}
 			header('Location: ' . WT_LOGIN_URL . '?url=' . rawurlencode(WT_SCRIPT_NAME . (isset($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '')), true, 301);
 
 		}
@@ -472,8 +458,8 @@ if (WT_SCRIPT_NAME != 'admin_trees_manage.php' && WT_SCRIPT_NAME != 'admin_pgv_t
 	}
 }
 
-// Update the login time every 5 minutes
-if (WT_TIMESTAMP - Session::get('activity_time') > 300) {
+// Update the last-login time no more than once a minute
+if (WT_TIMESTAMP - Session::get('activity_time') >= 60) {
 	Auth::user()->setPreference('sessiontime', WT_TIMESTAMP);
 	Session::put('activity_time', WT_TIMESTAMP);
 }

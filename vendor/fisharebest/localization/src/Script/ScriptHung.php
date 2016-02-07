@@ -8,13 +8,15 @@
  * @license   GPLv3+
  */
 class ScriptHung extends AbstractScript implements ScriptInterface {
-	/** {@inheritdoc} */
 	public function code() {
 		return 'Hung';
 	}
 
-	/** {@inheritdoc} */
 	public function number() {
 		return '176';
+	}
+
+	public function unicodeName() {
+		return 'Old_Hungarian';
 	}
 }
