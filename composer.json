@@ -18,7 +18,8 @@
 		"michelf/php-markdown": "1.*",
 		"pclzip/pclzip": "2.*",
 		"rhumsaa/uuid": "2.*",
-		"tecnickcom/tcpdf": "6.*"
+		"tecnickcom/tcpdf": "6.*",
+		"twbs/bootstrap": "3.3.*"
 	},
 	"require-dev": {
 		"fabpot/php-cs-fixer": "*",
