@@ -126,20 +126,7 @@ return array(
 									=>	'Familles liés à cet acte',
 	'Path to a certificate linked to a source reference.'		
 									=>	'Chemin vers un acte lié à la source.',						
-	
-	//Patronymic Lineages
-	'Perso Patronymic Lineages'		=>	'Perso Lignées Patronymiques',
-	'Display lineages of people holding the same surname.'
-									=>	'Affiche les lignées des individus portant le même nom de famille.',
-	'Patronymic Lineages'			=>	'Lignées Patronymiques',
-	'Individuals in %s lineages'	=>	'Indididus des lignées %s',
-	'Go to the list of individuals with surname %s'	
-									=>	'Voir la liste des individus portant le nom %s',
-	'No individuals with surname %s has been found. Please try another name.'
-									=>	'Aucun individu portant le nom %s n\'a été trouvé. Veuillez essayer un autre patronyme.',						
-	'%s lineages found'				=>	'%s lignées trouvées',
-	'Go to %s lineages'				=>	'Voir les lignées %s',
-	'Informations for individual %s'=>	'Informations sur l\'individu %s',
+
 
 	// Perso Welcome Block
 	'Perso Welcome Block'			=>	'Bloc «Perso Accueil»',

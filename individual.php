@@ -198,8 +198,8 @@ if ($controller->record->canShow()) {
 		}
 	}
 	//PERSO
-	$dcontroller = new WT_Perso_Controller_Individual($controller);
-	$dcontroller->print_extra_icons_header();
+	$dcontroller = new \MyArtJaub\Webtrees\Controller\IndividualController($controller);
+	$dcontroller->printHeaderExtraIcons();
 	//END PERSO
 	echo '</h3>'; // close first name accordion header
 
@@ -212,7 +212,7 @@ if ($controller->record->canShow()) {
 
 	echo '</div>'; // close header_accordion1
 	//PERSO
-	$dcontroller->print_extensions_header();
+	$dcontroller->printHeaderExtensions();
 	//END PERSO
 }
 echo '</div>'; // close #indi_header

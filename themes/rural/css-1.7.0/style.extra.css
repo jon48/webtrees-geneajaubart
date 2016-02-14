@@ -97,6 +97,8 @@ html[dir='rtl'] .fact_flag {float: left;}
 ._CITY {margin:0px;}
 
 /* Patronymic lineage */
+#patronymiclineages .list_label { padding:5px 0; }
+#patronymiclineages .list_value_wrap { padding:10px 0; }
 .patrolin_tree li {list-style-type: circle;}
 .patrolin_tree li li {list-style-type: square;}
 .patrolin_places {width: 60%;margin-left: auto;margin-right: auto;text-align: center;border: solid #d3c6b8 1px;background-color: #f4f0ed;}

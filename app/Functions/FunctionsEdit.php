@@ -43,6 +43,10 @@ use Fisharebest\Webtrees\Repository;
 use Fisharebest\Webtrees\Source;
 use Rhumsaa\Uuid\Uuid;
 
+//PERSO
+use \MyArtJaub\Webtrees\Hook\Hook;
+//END PERSO
+
 /**
  * Class FunctionsEdit - common functions
  */
@@ -567,7 +571,7 @@ class FunctionsEdit {
 					break;
 				//PERSO
 				default:
-					$hook_has_help_text_tag = new WT_Perso_Hook('h_has_help_text_tag', $fact);
+					$hook_has_help_text_tag = new Hook('h_has_help_text_tag', $fact);
 					if($hook_has_help_text_tag->hasAnyActiveModule()){
 						if(in_array(true, $hook_has_help_text_tag->execute($fact))) echo help_link($fact);;
 					}
@@ -697,7 +701,7 @@ class FunctionsEdit {
 			echo ' <a href="#edit_name" onclick="convertHidden(\'', $element_id, '\'); return false;" class="icon-edit_indi" title="' . I18N::translate('Edit name') . '"></a>';
 		} else {
 			//PERSO Implement custom tags management
-			$hook_get_simpletag_editor = new WT_Perso_Hook('h_get_simpletag_editor', $fact);
+			$hook_get_simpletag_editor = new Hook('h_get_simpletag_editor', $fact);
 			if($hook_get_simpletag_editor->hasAnyActiveModule()){
 				echo implode('', $hook_get_simpletag_editor->execute($fact, $value, $element_id, $element_name));
 			}
@@ -1005,7 +1009,7 @@ class FunctionsEdit {
 					self::addSimpleTag(($level + 1) . ' QUAY');
 				}
 				//PERSO Implement custom tags management
-				$hook_add_simple_tag = new WT_Perso_Hook('h_add_simple_tag', $tag);
+				$hook_add_simple_tag = new Hook('h_add_simple_tag', $tag);
 				$hook_add_simple_tag->execute($tag, ($level+1));
 				//END PERSO
 				// 3 OBJE
@@ -1507,7 +1511,7 @@ class FunctionsEdit {
 				}
 			}
 			//PERSO Implement custom tags management
-			$hook_add_simple_tag = new WT_Perso_Hook('h_add_simple_tag', $fact);
+			$hook_add_simple_tag = new Hook('h_add_simple_tag', $fact);
 			$hook_add_simple_tag->execute($fact, 2);
 			//END PERSO
 		}
@@ -1561,7 +1565,7 @@ class FunctionsEdit {
 			$expected_subtags['PLAC'] = array_merge($match[1], $expected_subtags['PLAC']);
 		}
 		//PERSO Add expected custom tags
-		$hook_get_expected_tags = new WT_Perso_Hook('h_get_expected_tags');
+		$hook_get_expected_tags = new Hook('h_get_expected_tags');
 		$hook_expected_tags_all = $hook_get_expected_tags->execute();
 		foreach($hook_expected_tags_all as $hook_expected_tags){
 			foreach($hook_expected_tags as $hook_context => $hook_expected_tag){

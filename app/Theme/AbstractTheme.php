@@ -36,6 +36,10 @@ use Fisharebest\Webtrees\Theme;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\User;
 
+//PERSO MyArtJaub namespace
+use \MyArtJaub\Webtrees as mw;
+//END PERSO
+
 /**
  * Common functions for all themes.
  */
@@ -1386,6 +1390,12 @@ abstract class AbstractTheme {
 		if ($row->note) {
 			$menulist[] = $this->menuListsNotes();
 		}
+		
+		//PERSO Add MyArtJaub menus
+		if(mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_PATROLIN_NAME)) {
+		    $menulist[] = Module::getModuleByName(mw\Constants::MODULE_MAJ_PATROLIN_NAME)->getMenu($this->tree, $surname);
+		}
+		//END PERSO
 
 		uasort($menulist, function (Menu $x, Menu $y) {
 			return I18N::strcasecmp($x->getLabel(), $y->getLabel());
@@ -1958,6 +1968,7 @@ abstract class AbstractTheme {
 			WT_BOOTSTRAP_CSS_URL,
 			WT_FONT_AWESOME_CSS_URL,
 			WT_FONT_AWESOME_RTL_CSS_URL,
+			$this->assetUrl() . 'style.extra.css'
 		);
 
 		if (I18N::direction() === 'rtl') {

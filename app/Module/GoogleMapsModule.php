@@ -38,6 +38,10 @@ use Fisharebest\Webtrees\Theme;
 use Fisharebest\Webtrees\Tree;
 use PDO;
 
+//PERSO
+use \MyArtJaub\Webtrees as mw;
+//END PERSO
+
 /**
  * Class GoogleMapsModule
  *
@@ -2374,7 +2378,7 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 						//PERSO Resize flag
 						if (!empty($gmark['pl_icon'])) { 
 							$icon_image = WT_STATIC_URL.WT_MODULES_DIR . 'googlemap/' . $gmark['pl_icon'];	
-							list($flag_width, $flag_height) = WT_Perso_Functions::getResizedImageSize($icon_image, 25);
+							list($flag_width, $flag_height) = mw\Functions\Functions::getResizedImageSize($icon_image, 25);
 						}
 						?>,
 						"width":	"<?php echo Filter::escapeJs($flag_width && $flag_width > 0 ? $flag_width : 0); ?>",
@@ -2898,7 +2902,7 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 			$flag_width = 0; $flag_height = 0;
 			if ($place2['icon'] !== null && $place2['icon'] !== '' && $this->getSetting('GM_PH_MARKER') === 'G_FLAG') {
 				$icon_image = WT_STATIC_URL.WT_MODULES_DIR . 'googlemap/' . $place2['icon'];
-				list($flag_width, $flag_height) = WT_Perso_Functions::getResizedImageSize($icon_image, 25);
+				list($flag_width, $flag_height) = mw\Functions\Functions::getResizedImageSize($icon_image, 25);
 			}
 			//END PERSO
 			echo 'var point = new google.maps.LatLng(', $lati, ', ', $long, ');';
@@ -3801,7 +3805,7 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 				<?php
 				//PERSO Resize flags
 				if ($place_icon != '') {
-					list($flag_width, $flag_height) = WT_Perso_Functions::getResizedImageSize(WT_STATIC_URL.WT_MODULES_DIR.'googlemap/'.$place_icon, 25);
+					list($flag_width, $flag_height) = mw\Functions\Functions::getResizedImageSize(WT_STATIC_URL.WT_MODULES_DIR.'googlemap/'.$place_icon, 25);
 					echo 'var image = new google.maps.MarkerImage("', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/', $place_icon, '",';
 						echo 'null,';	// Image size
 						echo 'new google.maps.Point(0, 0),'; // Image origin

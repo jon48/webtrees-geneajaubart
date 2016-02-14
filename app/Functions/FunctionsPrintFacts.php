@@ -39,6 +39,10 @@ use Fisharebest\Webtrees\Theme;
 use Fisharebest\Webtrees\User;
 use Rhumsaa\Uuid\Uuid;
 
+//PERSO
+use \MyArtJaub\Webtrees\Hook\Hook;
+//END PERSO
+
 /**
  * Class FunctionsPrintFacts - common functions
  */
@@ -224,7 +228,7 @@ class FunctionsPrintFacts {
 		echo '</td><td class="optionbox ', $styleadd, ' wrap">';
 		
 		//PERSO
-		echo WT_Perso_Functions_Print::getFactPlaceIcon($fact);
+		echo \MyArtJaub\Webtrees\Functions\FunctionsPrint::htmlFactPlaceIcon($fact, new \MyArtJaub\Webtrees\Map\GoogleMapsProvider);
 		//END PERSO
 
 		// Event from another record?
@@ -624,7 +628,7 @@ class FunctionsPrintFacts {
 						$data .= '<a href="#" onclick="return expand_layer(\'' . $elementID . '\');"><i id="' . $elementID . '_img" class="' . $plusminus . '"></i></a> ';
 					}
 					//PERSO Prepend fact source text
-					$hook_fs_prepend = new WT_Perso_Hook('h_fs_prepend');
+					$hook_fs_prepend = new Hook('h_fs_prepend');
 					$data .= implode('', $hook_fs_prepend->execute($srec)) ;
 					//END PERSO
 					$data .= I18N::translate('Source') . ':</span> <span class="field">';
@@ -817,7 +821,7 @@ class FunctionsPrintFacts {
 				echo '<td class="optionbox ', $styleadd, ' wrap">';
 				if ($source) {
 					//PERSO Prepend fact source text
-					$hook_fs_prepend = new WT_Perso_Hook('h_fs_prepend');
+					$hook_fs_prepend = new Hook('h_fs_prepend');
 					echo implode('', $hook_fs_prepend->execute($factrec)) ;
 					//END PERSO
 					echo '<a href="', $source->getHtmlUrl(), '">', $source->getFullName(), '</a>';

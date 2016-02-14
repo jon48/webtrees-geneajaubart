@@ -36,6 +36,12 @@ use Fisharebest\Webtrees\Stats;
 use Fisharebest\Webtrees\Tree;
 use Rhumsaa\Uuid\Uuid;
 
+//PERSO
+use \MyArtJaub\Webtrees as mw;
+use mw\Hook\Hook;
+//END PERSO
+
+
 /**
  * Class FunctionsPrintLists - common functions
  */
@@ -79,7 +85,7 @@ class FunctionsPrintLists {
 						/*  7 BIRT:DATE */ { visible: false },
 						/*  8 anniv     */ { dataSort: 7, class: "center" },
 						/*  9 birt plac */ { type: "unicode", class: "center"},
-						/* 10 birt sour */ { dataSort : 11, class: "center", visible: '.(WT_Perso_Functions::isIsSourcedModuleOperational() ? 'true' : 'false').' },
+						/* 10 birt sour */ { dataSort : 11, class: "center", visible: '.(mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME) ? 'true' : 'false').' },
 						/* 11 sort sour */ { visible: false},
 						/* 12 children  */ { dataSort: 13, class: "center" },
 						/* 13 children  */ { type: "num", visible: false },
@@ -89,7 +95,7 @@ class FunctionsPrintLists {
 						/* 17 age       */ { dataSort: 18, class: "center" },
 						/* 18 AGE       */ { type: "num", visible: false },
 						/* 19 deat plac */ { type: "unicode", class: "center"},
-						/* 20 deat sour */ { dataSort : 21, class: "center", visible: '.(WT_Perso_Functions::isIsSourcedModuleOperational() ? 'true' : 'false').' },
+						/* 20 deat sour */ { dataSort : 21, class: "center", visible: '.(mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME) ? 'true' : 'false').' },
 						/* 21 sort sour */ { visible: false},
 						/* 22 CHAN      */ { dataSort: 23, visible: ' . ($WT_TREE->getPreference('SHOW_LAST_CHANGE') ? 'true' : 'false') . ' },
 						/* 23 CHAN_sort */ { visible: false },
@@ -283,8 +289,8 @@ class FunctionsPrintLists {
 							<th><i class="icon-reminder" title="' . I18N::translate('Anniversary') . '"></i></th>
 							<th>' . GedcomTag::getLabel('PLAC') . '</th>';
 							//PERSO Modify table to include IsSourced module
-							if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
-								$html .= '<th><i class="icon-source" title="'.WT_I18N::translate('Sourced birth').'" border="0"></i></th>'.
+							if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
+								$html .= '<th><i class="icon-source" title="'.I18N::translate('Sourced birth').'" border="0"></i></th>'.
 									'<th>SORT_BIRTSC</th>';
 							} else {
 								$html .=  '<th></th><th></th>';
@@ -299,8 +305,8 @@ $html .=		 			'<th><i class="icon-children" title="' . I18N::translate('Children
 							<th>AGE</th>
 							<th>' . GedcomTag::getLabel('PLAC') . '</th>';
 							//PERSO Modify table to include IsSourced module
-							if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
-								$html .=  '<th><i class="icon-source" title="'.WT_I18N::translate('Sourced death').'" border="0"></i></th>'.
+							if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
+								$html .=  '<th><i class="icon-source" title="'.I18N::translate('Sourced death').'" border="0"></i></th>'.
 									'<th>SORT_DEATSC</th>';
 							} else {
 								$html .=  '<th></th><th></th>';
@@ -339,7 +345,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 				continue;
 			}
 			//PERSO Create decorator for Individual
-			$dperson = new WT_Perso_Individual($person);
+			$dperson = new mw\Individual($person);
 			//END PERSO
 			if ($person->isPendingAddtion()) {
 				$class = ' class="new"';
@@ -366,8 +372,8 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 					$sex_image = '';
 				}
 				//PERSO Add Sosa Image
-				$html .= '<a ' . $title . ' href="' . $person->getHtmlUrl() . '"' . $class . '>' . FunctionsPrint::highlightSearchHits($name['full']) . '</a>' . $sex_image . WT_Perso_Functions_Print::formatSosaNumbers($dperson->getSosaNumbers(), 1, 'smaller') . '<br>';
-				//END PERSO
+				$html .= '<a ' . $title . ' href="' . $person->getHtmlUrl() . '"' . $class . '>' . FunctionsPrint::highlightSearchHits($name['full']) . '</a>' . $sex_image . mw\Functions\FunctionsPrint::formatSosaNumbers($dperson->getSosaNumbers(), 1, 'smaller') . '<br>';
+				//END PERSO not found in G:\Dev
 			}
 			// Indi parents
 			$html .= $person->getPrimaryParentsNames('parents details1', 'none');
@@ -424,9 +430,9 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 			}
 			$html .= '</td>';
 			//PERSO Modify table to include IsSourced module
-			if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+			if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
 				$isBSourced = $dperson->isBirthSourced();
-				$html .= '<td>'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $isBSourced, 'BIRT', 1, 'medium').'</td>'.
+				$html .= '<td>'.mw\Functions\FunctionsPrint::formatIsSourcedIcon('E', $isBSourced, 'BIRT', 1, 'medium').'</td>'.
 					'<td>'.$isBSourced.'</td>';
 			} else {
 				$html .= '<td>&nbsp;</td>'.
@@ -485,10 +491,10 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 			}
 			$html .= '</td>';
 			//PERSO Modify table to include IsSourced module
-			if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+			if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
 				if($person->isDead()){
 					$isDSourced = $dperson->isDeathSourced();
-					$html .= '<td>'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $isDSourced, 'DEAT', 1, 'medium').'</td>'.
+					$html .= '<td>'.wm\Functions\FunctionsPrint::formatIsSourcedIcon('E', $isDSourced, 'DEAT', 1, 'medium').'</td>'.
 						'<td>'.$isDSourced.'</td>';
 				}
 				else{
@@ -605,7 +611,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 						/* 13 MARR:DATE */ {visible: false},
 						/* 14 anniv     */ {dataSort: 13, class: "center"},
 						/* 15 marr plac */ {type: "unicode", class: "center"},
-						/* 16 marr sour */ {dataSort : 17, class: "center", visible: '.(WT_Perso_Functions::isIsSourcedModuleOperational() ? 'true' : 'false').' },
+						/* 16 marr sour */ {dataSort : 17, class: "center", visible: '.(mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME) ? 'true' : 'false').' },
 						/* 17 sort sour */ {visible: false},
 						/* 18 children  */ {dataSort: 18, class: "center"},
 						/* 19 NCHI      */ {type: "num", visible: false},
@@ -801,8 +807,8 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 							<th><i class="icon-reminder" title="' . I18N::translate('Anniversary') . '"></i></th>
 							<th>' . GedcomTag::getLabel('PLAC') . '</th>';
 							//PERSO Modify table to include IsSourced module
-							if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
-								$html .= '<th><i class="icon-source" title="'.WT_I18N::translate('Sourced marriage').'" border="0"></i></th>'.
+							if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
+								$html .= '<th><i class="icon-source" title="'.I18N::translate('Sourced marriage').'" border="0"></i></th>'.
 									'<th>SORT_MARRSC</th>';
 							} else {
 								$html .= '<th>&nbsp;</th><th></th>';
@@ -838,7 +844,7 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 		$d100y = new Date(date('Y') - 100); // 100 years ago
 		foreach ($datalist as $family) {
 			//PERSO Create decorator for Family
-			$dfamily = new WT_Perso_Family($family);
+			$dfamily = new mw\Family($family);
 			//END PERSO
 			//-- Retrieve husband and wife
 			$husb = $family->getHusband();
@@ -879,8 +885,8 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 				// Only show married names if they are the name we are filtering by.
 				if ($name['type'] != '_MARNM' || $num == $husb->getPrimaryName()) {
 					//PERSO Add Sosa Icon
-					$dhusb = new WT_Perso_Individual($husb);
-					$html .= '<a ' . $title . ' href="' . $family->getHtmlUrl() . '"' . $class . '>' . FunctionsPrint::highlightSearchHits($name['full']) . '</a>' . $sex_image . WT_Perso_Functions_Print::formatSosaNumbers($dhusb->getSosaNumbers(), 1, 'smaller') . '<br>';
+					$dhusb = new mw\Individual($husb);
+					$html .= '<a ' . $title . ' href="' . $family->getHtmlUrl() . '"' . $class . '>' . FunctionsPrint::highlightSearchHits($name['full']) . '</a>' . $sex_image . mw\Functions\FunctionsPrint::formatSosaNumbers($dhusb->getSosaNumbers(), 1, 'smaller') . '<br>';
 					//END PERSO
 				}
 			}
@@ -927,8 +933,8 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 				// Only show married names if they are the name we are filtering by.
 				if ($name['type'] != '_MARNM' || $num == $wife->getPrimaryName()) {
 					//PERSO Add Sosa Icon
-					$dwife = new WT_Perso_Individual($wife);
-					$html .= '<a ' . $title . ' href="' . $family->getHtmlUrl() . '"' . $class . '>' . FunctionsPrint::highlightSearchHits($name['full']) . '</a>' . $sex_image . WT_Perso_Functions_Print::formatSosaNumbers($dwife->getSosaNumbers(), 1, 'smaller') . '<br>';
+					$dwife = new mw\Individual($wife);
+					$html .= '<a ' . $title . ' href="' . $family->getHtmlUrl() . '"' . $class . '>' . FunctionsPrint::highlightSearchHits($name['full']) . '</a>' . $sex_image . mw\Functions\FunctionsPrint::formatSosaNumbers($dwife->getSosaNumbers(), 1, 'smaller') . '<br>';
 					//END PERSO
 				}
 			}
@@ -999,9 +1005,9 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 			}
 			$html .= '</td>';
 			//PERSO Modify table to include IsSourced module
-			if (WT_Perso_Functions::isIsSourcedModuleOperational()) {
+			if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
 				$isMSourced = $dfamily->isMarriageSourced();
-				$html .= '<td>'.WT_Perso_Functions_Print::formatIsSourcedIcon('E', $isMSourced, 'MARR', 1, 'medium').'</td>'.
+				$html .= '<td>'.mw\Functions\FunctionsPrint::formatIsSourcedIcon('E', $isMSourced, 'MARR', 1, 'medium').'</td>'.
 					'<td>'.$isMSourced.'</td>';
 			} else {
 				$html .= '<td>&nbsp;</td>'.
@@ -1599,10 +1605,11 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 	 * @param string[][] $surnames array (of SURN, of array of SPFX_SURN, of array of PID)
 	 * @param string $script "indilist.php" (counts of individuals) or "famlist.php" (counts of spouses)
 	 * @param Tree $tree generate links for this tree
+	 * @param array $extra_url_params Extra parameters to add to the URL //PERSO
 	 *
 	 * @return string
 	 */
-	public static function surnameTable($surnames, $script, Tree $tree) {
+	public static function surnameTable($surnames, $script, Tree $tree, $extra_url_params = array()) {   //PERSO Add extra parameters for URL
 		global $controller;
 
 		$html = '';
@@ -1648,6 +1655,11 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 			} else {
 				$url = $script . '?alpha=,&amp;ged=' . $tree->getNameUrl();
 			}
+			//PERSO Add extra parameters to URL
+			foreach($extra_url_params as $param => $value) {
+			    $url .= '&' . Filter::escapeUrl($param) . '=' . Filter::escapeUrl($value); 
+			}
+			//END PERSO
 			// Row counter
 			$html .= '<tr>';
 			// Surname
@@ -1691,10 +1703,11 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 	 * @param string $script indilist or famlist
 	 * @param bool $totals show totals after each name
 	 * @param Tree $tree generate links to this tree
+	 * @param array $extra_url_params Extra parameters to add to the URL //PERSO
 	 *
 	 * @return string
 	 */
-	public static function surnameTagCloud($surnames, $script, $totals, Tree $tree) {
+	public static function surnameTagCloud($surnames, $script, $totals, Tree $tree, $extra_url_params = array()) {   //PERSO Add extra parameters for URL
 		$minimum = PHP_INT_MAX;
 		$maximum = 1;
 		foreach ($surnames as $surn => $surns) {
@@ -1713,7 +1726,13 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 				} else {
 					$size = 75.0 + 125.0 * (count($indis) - $minimum) / ($maximum - $minimum);
 				}
-				$html .= '<a style="font-size:' . $size . '%" href="' . $script . '?surname=' . Filter::escapeUrl($surn) . '&amp;ged=' . $tree->getNameUrl() . '">';
+				//PERSO Add extra parameters to URL
+				$url = $script . '?surname=' . Filter::escapeUrl($surn) . '&amp;ged=' . $tree->getNameUrl();
+				foreach($extra_url_params as $param => $value) {
+				    $url .= '&' . Filter::escapeUrl($param) . '=' . Filter::escapeUrl($value);
+				}
+				$html .= '<a style="font-size:' . $size . '%" href="' . $url . '">';
+				//END PERSO
 				if ($totals) {
 					$html .= I18N::translate('%1$s (%2$s)', '<span dir="auto">' . $spfxsurn . '</span>', I18N::number(count($indis)));
 				} else {
@@ -1734,10 +1753,11 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 	 * @param bool $totals show totals after each name
 	 * @param string $script indilist or famlist
 	 * @param Tree $tree Link back to the individual list in this tree
+	 * @param array $extra_url_params Extra parameters to add to the URL //PERSO
 	 *
 	 * @return string
 	 */
-	public static function surnameList($surnames, $style, $totals, $script, Tree $tree) {
+	public static function surnameList($surnames, $style, $totals, $script, Tree $tree, $extra_url_params = array()) {   //PERSO Add extra parameters for URL
 		$html = array();
 		foreach ($surnames as $surn => $surns) {
 			// Each surname links back to the indilist
@@ -1746,6 +1766,11 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 			} else {
 				$url = $script . '?alpha=,&amp;ged=' . $tree->getNameUrl();
 			}
+			//PERSO Add extra parameters to URL
+			foreach($extra_url_params as $param => $value) {
+			    $url .= '&' . Filter::escapeUrl($param) . '=' . Filter::escapeUrl($value); 
+			}
+			//END PERSO
 			// If all the surnames are just case variants, then merge them into one
 			// Comment out this block if you want SMITH listed separately from Smith
 			$first_spfxsurn = null;

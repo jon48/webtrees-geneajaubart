@@ -1789,7 +1789,7 @@ class GedcomTag {
 		case '__IMAGE_SIZE__':
 			return I18N::translate('Image dimensions');
 		//PERSO Add Perso Tag
-		case '_ACT' : return WT_I18N::translate('Certificate');
+		case '_ACT' : return I18N::translate('Certificate');
 		//END PERSO
 		default:
 			// If no specialisation exists (e.g. DEAT:CAUS), then look for the general (CAUS)

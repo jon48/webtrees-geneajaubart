@@ -1271,9 +1271,9 @@ class Individual extends GedcomRecord {
 	 */
 	public function formatListDetails() {
 		//PERSO Add Sosa icon
-		$dindi = new WT_Perso_Individual($this);
+		$dindi = new \MyArtJaub\Webtrees\Individual($this);
 		return
-			'&nbsp;'.WT_Perso_Functions_Print::formatSosaNumbers($dindi->getSosaNumbers(), 1).
+			'&nbsp;'.\MyArtJaub\Webtrees\Functions\FunctionsPrint::formatSosaNumbers($dindi->getSosaNumbers(), 1).
 		//END PERSO
 			$this->formatFirstMajorFact(WT_EVENTS_BIRT, 1) .
 			$this->formatFirstMajorFact(WT_EVENTS_DEAT, 1);

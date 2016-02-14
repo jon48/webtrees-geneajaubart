@@ -257,7 +257,7 @@ if ($show === 'indi' || $show === 'surn') {
 		}
 		if ($show === 'indi') {
 			// PERSO Add link to Patronymic Lineage
-			echo '<p class="center"><strong><a href="module.php?mod=perso_patronymiclineage&mod_action=patronymiclineage&ged='.WT_GEDCOM.'&surname='.urlencode($surname).'">'.WT_I18N::translate('Go to %s lineages', $legend).'</a></strong></p>';
+			echo '<p class="center"><strong><a href="module.php?mod='.\MyArtJaub\Webtrees\Constants::MODULE_MAJ_PATROLIN_NAME.'&mod_action=Lineage&ged='.$WT_TREE->getNameHtml().'&surname='.urlencode($surname).'">'.I18N::translate('Go to %s lineages', $legend).'</a></strong></p>';
 			//END PERSO
 			
 			echo FunctionsPrintLists::individualTable(QueryName::individuals($WT_TREE, $surname, $alpha, $falpha, $show_marnm === 'yes', false));

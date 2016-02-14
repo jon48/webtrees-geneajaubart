@@ -1,8 +1,14 @@
 {
-	"name": "jon48/webtrees-addons",
+	"name": "jon48/webtrees-geneajaubart",
 	"description": "webtrees online genealogy",
 	"keywords": ["webtrees", "genealogy"],
 	"license": "GPL-3.0",
+	"author": [{
+        "name": "Jonathan Jaubart",
+        "email": "dev@jaubart.com",
+        "homepage": "http://www.jaubart.com",
+        "role": "Developer"
+    }],
 	"autoload": {
 		"psr-4": {
 			"Fisharebest\\Webtrees\\": "app/"
