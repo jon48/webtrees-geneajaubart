@@ -126,31 +126,6 @@ return array(
 									=>	'Familles liés à cet acte',
 	'Path to a certificate linked to a source reference.'		
 									=>	'Chemin vers un acte lié à la source.',						
-
-
-	// Perso Welcome Block
-	'Perso Welcome Block'			=>	'Bloc «Perso Accueil»',
-	'The Perso Welcome block welcomes the visitor to the site, allows a quick login to the site, and displays statistics on visits.'
-									=>	'Le bloc Perso Accueil acueille le visiteur sur le site, permet une connexion rapide et affiche des statistiques de visites.',
-	'Enable Piwik Statistics'		=>	'Activer les statistiques Piwik',
-	'Enable Piwik statistics, in order to display the number of visits on the related site.'
-									=>	'Activer les statistiques afin d\'afficher le nombre de visites sur le site associé',
-	'Piwik URL'						=>	'Adresse URL de Piwik',
-	'URL of the Piwik API to request. This is usually the <b>index.php</b> at the root of the Piwik installation'
-									=>	'Adresse URL de l\'API Piwik à requêter. Il s\'agit normalement du <b>index.php</b> à la racine de l\'installation Piwik.',
-	'Piwik Token'					=>	'Token Piwik',
-	'Token provided by the Piwik installation, under the API tab.'
-									=>	'Token fourni par l\'installation Piwik, sous la section API.',
-	'Piwik Site ID'					=>	'ID Piwik du site',		
-	'Piwik Site ID of the website to follow.'	
-									=>	'ID Piwik du site à suivre.',	
-	'Retrieving Piwik statistics...'
-									=>	'Récupération des statistiques Piwik...',
-	'No statistics could be retrieved from Piwik.'
-									=>	'Les statistiques Piwik ne peuvent être récupérées.',
-	'<span class="hit-counter">%1$s</span> visits since the beginning of %2$s<br/>(<span class="hit-counter">%3$s</span> today)'
-									=>	'<span class="hit-counter">%1$s</span> visiteurs depuis le début de l\'année %2$s<br/>dont <span class="hit-counter">%3$s</span> aujourd\'hui',
-	'Continue'						=>	'Continuer',
 	
 	// Perso Sosa
 	'Perso Sosa'					=>	'Perso Sosa',
