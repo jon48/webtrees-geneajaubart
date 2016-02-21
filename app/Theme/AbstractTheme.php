@@ -713,6 +713,11 @@ abstract class AbstractTheme {
 			$thumbnail .
 			'<a href="' . $individual->getHtmlUrl() . '">' .
 			'<span class="namedef name1">' . $individual->getFullName() . '</span>' .
+			//PERSO Append record name text
+			'<span class="rn_append">' .
+			implode('&nbsp;', \MyArtJaub\Webtrees\Hook\HookProvider::get('hRecordNameAppend')->execute($individual)) .
+			'</span>' .
+			//END PERSO
 			'</a>' .
 			'<div class="namedef name1">' . $individual->getAddName() . '</div>' .
 			'<div class="inout2 details1">' . $this->individualBoxFacts($individual) . '</div>' .
@@ -758,6 +763,11 @@ abstract class AbstractTheme {
 			$thumbnail .
 			'<a href="' . $individual->getHtmlUrl() . '">' .
 			'<span class="namedef name2">' . $individual->getFullName() . '</span>' .
+			//PERSO Append record name text
+			'<span class="rn_append">' .
+			implode('&nbsp;', \MyArtJaub\Webtrees\Hook\HookProvider::get('hRecordNameAppend')->execute($individual)) .
+			'</span>' .
+			//END PERSO
 			'</a>' .
 			'<div class="namedef name2">' . $individual->getAddName() . '</div>' .
 			'<div class="inout2 details2">' . $this->individualBoxFacts($individual) . '</div>' .
