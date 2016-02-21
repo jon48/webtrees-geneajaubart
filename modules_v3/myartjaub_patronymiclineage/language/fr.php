@@ -9,12 +9,6 @@
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3
  */
 
-// WT_SCRIPT_NAME is defined in each script that the user is permitted to load.
-if (!defined('WT_SCRIPT_NAME')) {
-	http_response_code(403);
-	return;
-}
-
 return array (
 
 		'Patronymic Lineages'			=>	'Lignées Patronymiques',

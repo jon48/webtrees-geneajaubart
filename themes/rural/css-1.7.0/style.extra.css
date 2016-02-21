@@ -1,35 +1,24 @@
 /**
- * Extra Style for Rural theme
+ * Extra Style for Rural Theme
  *
- * Use this stylesheet to customize the display of your site.
- * To learn more about CSS visit http: //www.w3.org/TR/REC-CSS2/
- *
- * webtrees: Web based Family History software
- * Copyright (C) 2011 webtrees development team.
- *
- * Derived from PhpGedView
- * Copyright (C) 2002 to 2009  PGV Development Team.  All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
+ * webtrees-MyArtJaub
+ * Copyright (C) 2015 Jonathan Jaubart
+ * 
+ * Based on webtrees: online genealogy
+ * Copyright (C) 2015 webtrees development team
+ *  
+ * This file is part of webtrees-MyArtJaub
+ *  
+ * webtrees-MyArtJaub is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
+ * webtrees-MyArtJaub is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * @package webtrees
- * @subpackage Themes
- * @version $Id: style.css 11049 2011-03-05 12:51:27Z greg $
- * @author Jonathan Jaubart ($Author$)
- * @version p_$Revision$ $Date$
- * $HeadURL$
+ * along with webtrees-MyArtJaub. If not, see <http://www.gnu.org/licenses/>.
  */
  
  /* Large menu icons */

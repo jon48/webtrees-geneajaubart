@@ -11,7 +11,6 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- * @author Jonathan Jaubart <dev@jaubart.com>
  */
 
 /* Some menus (e.g. languages) can be longer than a page */
@@ -60,6 +59,10 @@ body {
 /* Do not let the focused accessibility links change the layout */
 .accessibility-links {
 	position: fixed;
+}
+
+.table-site-logs td:nth-child(3) {
+	white-space: pre-wrap;
 }
 
 /* Make <fieldset class="form-group"> look like <div class="form-group"> so we can use semantic/accessible markup */
@@ -712,18 +715,3 @@ a.icon-uarrow:hover {
 	position: absolute;
 	width: 1px;
 }
-
-/* PERSO Personal styles */
-.flag_gm_25 {max-width: 25px;max-height: 25px;}
-
-.progressbutton{min-width: 130px;height: 30px;}
-.icon-loading-small{width:16px;height:16px;background-image:url(images/indicator.gif);}
-.icon-perso-success{width:16px;height:16px;background-image:url(images/perso/success.png);}
-.icon-perso-error{width:16px;height:16px;background-image:url(images/perso/error.png);}
-
-#perso_geodispersion td {padding: 10px 50px 10px 50px;}
-#perso_geodispersion .dataTables_wrapper td { padding: 0px;  }
-
-.fullwidth_table {width: 100%;}
-.fullwidth_table th {min-width: 60px;}
-/* END PERSO */
