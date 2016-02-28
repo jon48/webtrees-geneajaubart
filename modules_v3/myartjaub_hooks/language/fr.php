@@ -11,7 +11,7 @@
 
 return array (
 
-	'Hooks'							=>	'<em>Hooks</em>',
+	'Hooks'							=>	'Hooks',
 	'Implements hooks management.'	=>	'Implémente la gestion des Hooks',
 	'Hook Function'					=>	'Fonction Hook',
 	'Hook Context'					=>	'Contexte Hook',

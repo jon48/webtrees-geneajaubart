@@ -494,7 +494,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 			if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
 				if($person->isDead()){
 					$isDSourced = $dperson->isDeathSourced();
-					$html .= '<td>'.wm\Functions\FunctionsPrint::formatIsSourcedIcon('E', $isDSourced, 'DEAT', 1, 'medium').'</td>'.
+					$html .= '<td>'.mw\Functions\FunctionsPrint::formatIsSourcedIcon('E', $isDSourced, 'DEAT', 1, 'medium').'</td>'.
 						'<td>'.$isDSourced.'</td>';
 				}
 				else{
