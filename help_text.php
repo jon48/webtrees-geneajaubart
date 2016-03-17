@@ -325,7 +325,7 @@ case 'pending_changes':
 
 default:
 	//PERSO Implement custom tags management
-	$hook_get_help_text_tag = new \MyArtJaub\Webtrees\Hook\Hook('h_get_help_text_tag', $help);
+	$hook_get_help_text_tag = new \MyArtJaub\Webtrees\Hook\Hook('hGetHelpTextTag', $help);
 	if($hook_get_help_text_tag->hasAnyActiveModule()){
 		$result = $hook_get_help_text_tag->execute($help);
 		$title = ''; $text = '';

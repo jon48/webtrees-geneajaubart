@@ -16,8 +16,9 @@ jQuery(document).ready(function($){
 					url: 'module.php',
 					datatype: 'json',
 					data : {
-						mod: 'perso_certificates',
-						mod_action: 'autocomplete',
+						mod: 'myartjaub_certificates',
+						mod_action: 'Certificate@autocomplete',
+						ged: WT_GEDCOM,
 						term : request.term,
 						city : $('#certifCity' + el.attr('id').substring(10)).val()
 					},

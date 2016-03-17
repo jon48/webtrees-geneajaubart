@@ -40,7 +40,7 @@ use Fisharebest\Webtrees\User;
 use Rhumsaa\Uuid\Uuid;
 
 //PERSO
-use \MyArtJaub\Webtrees\Hook\Hook;
+use MyArtJaub\Webtrees\Hook\HookProvider;
 //END PERSO
 
 /**
@@ -628,8 +628,7 @@ class FunctionsPrintFacts {
 						$data .= '<a href="#" onclick="return expand_layer(\'' . $elementID . '\');"><i id="' . $elementID . '_img" class="' . $plusminus . '"></i></a> ';
 					}
 					//PERSO Prepend fact source text
-					$hook_fs_prepend = new Hook('h_fs_prepend');
-					$data .= implode('', $hook_fs_prepend->execute($srec)) ;
+					$data .= implode('', HookProvider::get('hFactSourcePrepend')->execute($srec)) ;
 					//END PERSO
 					$data .= I18N::translate('Source') . ':</span> <span class="field">';
 					$data .= '<a href="' . $source->getHtmlUrl() . '">' . $source->getFullName() . '</a>';
@@ -821,8 +820,7 @@ class FunctionsPrintFacts {
 				echo '<td class="optionbox ', $styleadd, ' wrap">';
 				if ($source) {
 					//PERSO Prepend fact source text
-					$hook_fs_prepend = new Hook('h_fs_prepend');
-					echo implode('', $hook_fs_prepend->execute($factrec)) ;
+					echo implode('', HookProvider::get('hFactSourcePrepend')->execute($factrec));
 					//END PERSO
 					echo '<a href="', $source->getHtmlUrl(), '">', $source->getFullName(), '</a>';
 					// PUBL

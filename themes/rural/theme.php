@@ -25,7 +25,8 @@ namespace MyArtJaub\Webtrees\Theme;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\Menu;
-
+use MyArtJaub;
+use Fisharebest\Webtrees\Module;
 /**
  * Class RuralTheme - Main class for Rural Theme.
  */
@@ -104,7 +105,14 @@ class RuralTheme extends \Fisharebest\Webtrees\Theme\AbstractTheme implements
 				return img_title;
 			}
 		});
-		</script>';
+		</script>'.
+		//PERSO Add Java script for Certificate Module
+		(Module::getModuleByName(MyArtJaub\Webtrees\Constants::MODULE_MAJ_CERTIF_NAME) ?
+		    '<script src="' . WT_STATIC_URL . WT_MODULES_DIR . MyArtJaub\Webtrees\Constants::MODULE_MAJ_CERTIF_NAME . '/js/activatecolorbox.js"></script>' :
+		    ''
+		)
+		// END PERSO
+		;
 	}
 	
 	/** {@inheritdoc} */

@@ -1405,6 +1405,10 @@ abstract class AbstractTheme {
 		if(mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_PATROLIN_NAME)) {
 		    $menulist[] = Module::getModuleByName(mw\Constants::MODULE_MAJ_PATROLIN_NAME)->getMenu($this->tree, $surname);
 		}
+		
+		if(mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_CERTIF_NAME)) {
+		    $menulist[] = Module::getModuleByName(mw\Constants::MODULE_MAJ_CERTIF_NAME)->getMenu($this->tree);
+		}
 		//END PERSO
 
 		uasort($menulist, function (Menu $x, Menu $y) {
