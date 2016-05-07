@@ -40,11 +40,15 @@
 #primary-menu-nav .primary-menu .menu-maj-sosa-geodispersion li		{background-position:left    -180px;} html[dir=rtl] #menu-maj-sosa-geodispersion li	{background-position:right    -180px;}
 
 
+/* Icons */
+[class^="icon-maj-"],[class*=" icon-maj-"]{background-image:url(images/myartjaub/icon-general-sprite.png);;}
+.icon-maj-map	{background-position:left    	0px;width:24px;height:24px;}
+.icon-maj-table	{background-position:left    	-24px;width:24px;height:24px;}
 
 .maj-table {display:table; background-color:#D3C6B8; border:1px outset #D3C6B8; border-top:0; margin:20px auto 0;}
 .maj-row {display: table-row;}
-.maj-row .label {display: table-cell; border-top:1px solid #D3C6B8;color:#62584D;padding:5px 5px 0;}
-.maj-row .value {display: table-cell; background-color:#E9E2DB; color:#000; border-top:1px solid #D3C6B8; white-space:nowrap;margin:0; padding:5px;}
+.maj-row .label {display: table-cell; border-top:1px solid #D3C6B8;color:#62584D;padding:5px 5px 0;vertical-align: middle}
+.maj-row .value {display: table-cell; background-color:#E9E2DB; color:#000; border-top:1px solid #D3C6B8; white-space:nowrap;margin:0; padding:5px; vertical-align: middle}
 .maj-row .value a {color:#62584D;}
 .maj-row .value a:hover {color:#9f8c77;}
 .maj-table p {margin:0;}

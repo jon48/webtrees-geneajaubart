@@ -1511,7 +1511,7 @@ class FunctionsEdit {
 				}
 			}
 			//PERSO Implement custom tags management
-			HookProvider::get('hAddSimpleTag', $tag)->execute($fact, 2);
+			HookProvider::get('hAddSimpleTag', $fact)->execute($fact, 2);
 			//END PERSO
 		}
 	}
