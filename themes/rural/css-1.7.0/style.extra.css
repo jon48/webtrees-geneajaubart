@@ -73,6 +73,8 @@ html[dir='rtl'] .certificate-list th:last-child, html[dir='rtl'] .sosa-indi-list
 #perso-header {margin: 0 10px 0 0;}
 html[dir='rtl'] #perso-header {margin: 0 0 0 10px;}
 
+#maj-header-extender {margin-top: -40px;}
+
 /* Individual header extender hooks */
 #indi_perso_header{color: #62584D;font-size: 1.1em;margin-top: 5px;}
 #indi_perso_header_left{float: left;text-align: left;}
@@ -86,7 +88,7 @@ html[dir='rtl'] #indi_perso_icons { float: left;}
 /* Individual TITL */
 #indi-header-titles {}
 #indi-header-titles dt:after {content:":";}
-#indi-header-titles dd {display: block; /* to force new line */ margin-left: 5em; /* whatever the width of dt */}
+#indi-header-titles dd {display: block; /* to force new line */ margin-left: 6em; /* whatever the width of dt */}
 
 /* Flags size */
 .flag_gm_30 {max-width: 30px;max-height: 30px;}

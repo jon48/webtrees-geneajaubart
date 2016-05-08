@@ -27,6 +27,7 @@ use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\Menu;
 use MyArtJaub;
 use Fisharebest\Webtrees\Module;
+use MyArtJaub\Webtrees\Hook\HookProvider;
 /**
  * Class RuralTheme - Main class for Rural Theme.
  */
@@ -203,9 +204,11 @@ class RuralTheme extends \Fisharebest\Webtrees\Theme\AbstractTheme implements
 					'<ul>' . implode(' | ', array_map(function (Menu $menu) { return $menu->getMenuAsList(); }, $login_menu)) . '</ul>'.
 					//$this->secondaryMenuContainer($login_menu).
 					$this->formatTreeTitle() .
+					//'<br>' . implode('', HookProvider::get('hPrintHeader')->execute()).
 				'</div></div>'.
 				'<div class="header-row"><div id="header-bottom">'.
 					$this->formQuickSearch().
+					'<div id="maj-header-extender">' . implode('', HookProvider::get('hPrintHeader')->execute()) . '</div>' .
 				'</div></div>'.
 			'</div>'.     // --  #header-content-lrg
             '<div id="header-content-xs">'.

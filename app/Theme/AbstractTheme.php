@@ -388,6 +388,9 @@ abstract class AbstractTheme {
 	protected function footerContent() {
 		return
 			$this->formatContactLinks() .
+			//PERSO
+			implode('', \MyArtJaub\Webtrees\Hook\HookProvider::get('hPrintFooter')->execute()) .
+			//PERSO
 			$this->logoPoweredBy() .
 			$this->formatPageViews($this->page_views);
 	}
