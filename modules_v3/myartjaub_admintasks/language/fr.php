@@ -1,0 +1,72 @@
+<?php
+/**
+ * webtrees-lib: MyArtJaub library for webtrees
+ *
+ * @package MyArtJaub\Webtrees
+ * @subpackage Module
+ * @author Jonathan Jaubart <dev@jaubart.com>
+ * @copyright Copyright (c) 2009-2015, Jonathan Jaubart
+ * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3
+ */
+
+return array (
+
+    'Administration Tasks'	         =>	'Tâches d\'administration',
+    'Manage and run nearly-scheduled administration tasks.'
+                                    =>	'Gère et exécute des tâches d\'administration quasi-planifiées.',
+    'The Administration Tasks module must be installed and enabled to display this page.'
+                                    =>	'Le module Tâches d\'administration doit être installé et activé avant de pouvoir afficher cette page.',
+    'The administration tasks are meant to be run at a regular interval - or as regularly as possible.'
+                                    =>	'Les tâches d\'administration sont destinées à être exécutées à intervalles réguliers, ou aussi réguliers que possible.',
+    'It is sometimes necessary to force the execution of a task.'
+                                    =>	'Il est parfois nécessaire de forcer l\'exécution d\'une tâche.',
+    'In order to do so, use the following URL, with the optional parameter <em>%s</em> if you only want to force the execution of one task: '
+                                    =>	'Pour cela, utilisez l\'adresse suivante, avec le paramètre optionnel <em>%s</em>, si vous souhaitez forcer l\'exécution d\'une seule tâche',
+    'task_name'						=>	'nom_de_la_tâche',
+    'Regenerate token'				=>	'Regénérer le jeton',
+    'Task name'						=>	'Nom de la tâche',
+    'Enable'						=>	'Activer',
+    'Disable'						=>	'Désactiver',
+    'Last success'					=>	'Dernier succès',
+    'Last result'					=>	'Dernier résultat',
+    'Frequency'			            =>	'Fréquence',
+    'Remaining occurrences'			=>	'Occurrences restantes',
+    'Is running?'					=>	'En cours ?',
+    'Run task'						=>	'Exécuter la tâche',
+    'Disabled'						=>	'Désactivé',
+    'Failure'						=>	'Échec',
+    'Unlimited'						=>	'Permanent',
+    'Running'						=>	'En cours...',
+    'Not running'					=>	'Arrêté',
+    'Run'							=>	'Exécuter',
+    'Done'							=>	'Terminé',
+    '%s Settings'					=>	'Configuration : %s',
+    'no_token_defined'				=>	'aucun_jeton_défini',
+    'Healthcheck Email'				=>	'État du système',
+    'Health Check Report'			=>	'État du système',
+    'Edit the administrative task'  =>  'Éditer la tâche administrative',
+    'Enable healthcheck emails for'
+                                    =>	'Activer les rapports d\'état du système pour',
+    'Enable the health check emails for each of the selected trees.'
+                                    =>  'Active les rapports d\'état du système pour les arbres sélectionnés.',
+    'Health Check Report for the last %d days'
+                                    =>	'État du système - Rapport pour les %d derniers jours',
+    'Tree'							=>	'Arbre',
+    'Tree %s'						=>	'Arbre %s',
+    'A new version of *webtrees* is available: %s. Upgrade as soon as possible.'
+                                    =>	'Une nouvelle version de *webtrees* est disponible : %s. Veuillez mettre à jour dès que possible.',
+    'Download it here: %s.'			=>	'Pour la télécharger : %s',
+    'Tree statistics'				=>	'Statistiques de l\'arbre',
+    'Errors [%d]'					=>	'Erreurs [%d]',
+    'Last occurrence'				=>	'Dernière occurrence',
+    'No errors'						=>	'Aucune erreur',
+    '%a d %h h %i m'                =>  '%a j %h h %i m',
+    'Frequency at which the task should be run (in minutes).'
+                                    =>  'Fréquence à laquelle la tâche doit s\'exécuter (en minutes).',
+    'The actual run of the task may not be fired exactly at the frequency defined, but should be run as close as possible to it.'
+                                    =>  'L\'exécution de la tâche peut ne pas être déclenchée exactement à la fréquence définie, mais devrait s\'en rapprocher le plus possible.',
+    'Run a limited number of times' =>  'Exécuter un nombre déterminé de fois',
+    'Defines whether the task should be run only a limited number of times.'
+                                    =>  'Détermine si la tâche doit s\'exécuter un nombre déterminé de fois.',
+    
+);
