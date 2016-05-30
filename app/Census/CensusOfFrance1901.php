@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,7 +25,7 @@ class CensusOfFrance1901 extends CensusOfFrance implements CensusInterface {
 	 * @return string
 	 */
 	public function censusDate() {
-		return '1901';
+		return '17 JAN 1901';
 	}
 
 	/**
@@ -35,7 +35,14 @@ class CensusOfFrance1901 extends CensusOfFrance implements CensusInterface {
 	 */
 	public function columns() {
 		return array(
-			new CensusColumnNull($this, 'XXXX', 'XXXX'),
+			new CensusColumnSurname($this, 'Noms', 'Noms de famille'),
+			new CensusColumnGivenNames($this, 'Prénoms', ''),
+			new CensusColumnAge($this, 'Âge', ''),
+			new CensusColumnNationality($this, 'Nationalité', ''),
+			new CensusColumnRelationToHead($this, 'Situation', 'Situation par rapport au chef de ménage'),
+			new CensusColumnOccupation($this, 'Profession', ''),
+			new CensusColumnBirthPlace($this, 'Lieu', 'Lieu de naissance'),
+			new CensusColumnNull($this, 'Empl', ''),
 		);
 	}
 }

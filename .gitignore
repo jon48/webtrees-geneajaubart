@@ -1,4 +1,3 @@
-*.swp
-.idea/
-apidocs/
+/.vagrant
+/apidocs/
 vendor/twbs/
