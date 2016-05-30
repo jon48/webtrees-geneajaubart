@@ -30,15 +30,9 @@
 	},
 	"require-dev": {
 		"fabpot/php-cs-fixer": "*",
+		"jon48/webtrees-tools": "dev-master",
 		"mockery/mockery": "*",
 		"phpunit/phpunit": "*",
 		"satooshi/php-coveralls": "~1.0"
-	},
-	"require-dev": {
-		"fabpot/php-cs-fixer": "*",
-		"jon48/webtrees-tools": "dev-master"
-		"mockery/mockery": "*",
-		"phpunit/phpunit": "*",
-		"satooshi/php-coveralls": "~1.0"
-	}
+	}	
 }

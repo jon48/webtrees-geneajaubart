@@ -18,6 +18,7 @@ return array(
     'Symfony\\Polyfill\\Iconv\\' => array($vendorDir . '/symfony/polyfill-iconv'),
     'Symfony\\Component\\Intl\\' => array($vendorDir . '/symfony/intl'),
     'Rhumsaa\\Uuid\\' => array($vendorDir . '/rhumsaa/uuid/src'),
+    'MyArtJaub\\Tests\\' => array($vendorDir . '/jon48/webtrees-lib/tests'),
     'MyArtJaub\\' => array($vendorDir . '/jon48/webtrees-lib/src'),
     'Fisharebest\\Webtrees\\' => array($baseDir . '/app'),
     'Fisharebest\\PhpPolyfill\\' => array($vendorDir . '/fisharebest/php-polyfill/src'),

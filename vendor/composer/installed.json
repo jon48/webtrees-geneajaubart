@@ -1533,5 +1533,44 @@
             "responsive",
             "web"
         ]
+    },
+    {
+        "name": "jon48/webtrees-lib",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/jon48/webtrees-lib.git",
+            "reference": "1a2e092915905c3b9f9974d3823f6adb81a30472"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/1a2e092915905c3b9f9974d3823f6adb81a30472",
+            "reference": "1a2e092915905c3b9f9974d3823f6adb81a30472",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.4.0"
+        },
+        "require-dev": {
+            "fisharebest/webtrees": "*",
+            "mockery/mockery": "@stable",
+            "phpunit/phpunit": "4.8.*"
+        },
+        "time": "2016-05-30 19:19:47",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "MyArtJaub\\": "src/",
+                "MyArtJaub\\Tests\\": "tests/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-3.0+"
+        ],
+        "description": "Library to extend webtrees core capabilities",
+        "homepage": "https://github.com/jon48/webtrees-lib"
     }
 ]

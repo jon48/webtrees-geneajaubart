@@ -22,7 +22,7 @@ implemented for the [GeneaJaubart website](http://genea.jaubart.com/wt/).
 ### License
 
 * **webtrees-geneajaubart: webtrees for the GeneaJaubart website**
-* Copyright (C) 2011 to 2014 Jonathan Jaubart.
+* Copyright (C) 2009 to 2016 Jonathan Jaubart.
 * Derived from **webtrees** - Copyright (C) 2010 to 2014  webtrees development team.
 * Derived from PhpGedView - Copyright (C) 2002 to 2010  PGV Development Team.
 
@@ -48,11 +48,16 @@ When the main PGV developers moved to create **webtrees**, I slowly migrated my 
 to the new platform, taking advantage of the evolved architecture to refactor some of
 the modules.
 
+Following the further code evolutions in the version 1.7.0 of **webtrees**, I decided
+to split the library part of my code from the main **webtrees-geneajaubart** package, 
+as well as renaming the modules from the too generic Perso prefix, to a more *branded*
+name: MyArtJaub (a rather bad pun on my surname...). 
+
 My personal and professional constraints have not allowed me to provide the same level
 of support as I used to, nevertheless I have always wished to share my changes 
 with the general **webtrees** audience. I was maintaining an SVN repository on Assembla,
 but since the migration of **webtrees** to Github, I have as well created the current
-Git repository, which should simplify the upgrade process.
+Git repositories.
 
 Please read carefully the instructions below, as some modules need changes in the core
 code, hence cannot be just added to a standard **webtrees** installation.
@@ -67,28 +72,26 @@ Themes:
 
 Mandatory modules:
 
-* **Perso Config** (`perso_config`)
-  * Central configuration module for all Perso Modules.
-* **Perso Hooks** (`perso_hooks`)
-  * Allows hooking Perso modules in core code more easily.
+* **MyArtJaub Hooks** (`myartjaub_hooks`)
+  * Allows hooking MyArtJaub modules in core code more easily.
 
 Available modules:
 
-* **Perso Administrative Tasks** (`perso_admintasks`)
+* **MyArtJaub Administrative Tasks** (`myartjaub_admintasks`)
   * Runs administrative tasks on a scheduled manner.
-* **Perso Certificates** (`perso_certificates`)
+* **MyArtJaub Certificates** (`myartjaub_certificates`)
   * Alternative management of certificates supporting sources.
-* **Perso General** (`perso_general`)
-  * Placeholder module for miscellaneous integrations.
-* **Perso Geographical Dispersion** (`perso_geodispersion`)
-  * Provide geographical dispersion analysis on Sosa ancestors.
-* **Perso Patronymic Lineage** (`perso_patronymiclineage`)
+* **MyArtJaub Geographical Dispersion** (`myartjaub_geodispersion`)
+  * Provide geographical dispersion analysis on Sosa ancestors.  
+* **MyArtJaub Miscellaneous Extensions** (`myartjaub_misc`)
+  * Placeholder module for miscellaneous extensions.
+* **MyArtJaub Patronymic Lineage** (`myartjaub_patronymiclineage`)
   * Alternative to Branches page (created before the latter).
-* **Perso Sources** (`perso_issourced`)
+* **MyArtJaub Sources** (`myartjaub_issourced`)
   * Provides information about the level and quality of sourced for records.
-* **Perso Sosa** (`perso_sosa`)
+* **MyArtJaub Sosa** (`myartjaub_sosa`)
   * Module to manage Sosa ancestors, and provide statistics.
-* **Perso Welcome Block** (`perso_welcome_block`)
+* **MyArtJaub Welcome Block** (`myartjaub_welcome_block`)
   * Merge of standard welcome and login blocks, with display of Piwik statistics
   
 ### General notes
@@ -97,8 +100,13 @@ Please note that the modules are translated in English and French only. Other
 languages will display English texts where no translation is available in the
 standard **webtrees**.
 
-You can use the `/data/language/fr.php` file as a template to translate missing
-expressions in other languages.
+Translations files are located under each module folder. You can then use the 
+`/modules_v3/*module_name*/language/fr.php` file as a template to translate 
+missing expressions in other languages.
+
+**webtrees-geneajaubart** relies heavily on the **webtrees-lib** library for 
+most of its code. The latter then needs to be included, which can be done through
+the standard composer commands.
 
 **webtrees-geneajaubart** is not guaranteed to work nicely with other custom
 modules or themes.
@@ -109,8 +117,8 @@ the Rural theme might present weird displays or alignments. Please contact
 
 ### System requirements
 
-No additional server configuration or requirements are necessary compared to a
-standard **webtrees** installation.
+It is required to run PHP 5.4 to be able to run the **webtrees-lib** library.
+Except the above, **webtrees-lib** shares the same requirements and system configuration as a standard **webtrees** installation.
 
 
 ### Installation
@@ -121,35 +129,39 @@ You need however to select the modules you wish to use. They are two ways to do 
 
 * Either install the whole code, then enable only the ones required in the module 
 administration page;
-* Or not copy the corresponding `perso_` folders under the `/modules_v3/` folder.
+* Or not copy the corresponding `myartjaub_` folders under the `/modules_v3/` folder.
 
-**Please remember that the `perso_config` and `perso_hooks` are required for most 
-of the modules.**
+**Please remember that the `myartjaub_hooks` is required for most of the modules.**
 
 Steps:
 
 1. Download latest stable version from the [webtrees-geneajaubart Github repository](https://github.com/jon48/webtrees-geneajaubart/archive/master.zip).
 2. Unzip the files.
-3. If you do not want some modules, delete them from the `/modules_v3/` folder 
-(except `perso_config` and `perso_hooks`).
-4. Upload the files to an empty directory on your web server.
-5. Open your web browser and type the URL for your **webtrees** site (for example,
+3. Download latest stable version from the [webtrees-lib Github repository](https://github.com/jon48/webtrees-lib/archive/master.zip).
+4. Unzip the latter files under the `/vendor/jon48/webtrees-lib` folder. You should
+then have a `/vendor/jon48/webtrees-lib/src/Webtrees` folder.
+5. If you do not want some modules, delete them from the `/modules_v3/` folder 
+(except `myartjaub_hooks`).
+6. Upload the files to an empty directory on your web server.
+7. Open your web browser and type the URL for your **webtrees** site (for example,
    [http://www.yourserver.com/webtrees](http://www.yourserver.com/webtrees)) into
    the address bar.
-6. The **webtrees** setup wizard will start automatically. Simply follow the steps,
+8. The **webtrees** setup wizard will start automatically. Simply follow the steps,
    answering each question as you proceed.
-7. Upload or create a GEDCOM file.
+9. Upload or create a GEDCOM file.
 
 You should now have a pretty much standard installation of **webtrees**.
 
 Some additional steps are required to complete the specific **webtrees-geneajaubart**
 steps:
 
-1. Log in, and go to the administrative page.
-2. In the right panel, click on the *Hooks (Perso)* link. That will register and enable
-the modules hooks.
-3. In the right panel, click on the *Central Perso configuration* link. Depending on
-the enabled modules, configurations items will be displayed, organised by modules.
+1. Log in, and go to the control panel.
+2. Under the *Module* tab, open the *Module Administration* page.
+3. Find the *Hooks* module, and click on the link to access this module's configuration.
+4. Once the page is opened, the modules hooks will be registered and activated. If you wish,
+you can then enable/disable some hooks, or change their priorities.
+5. Equally, from the *Module Administration* page, you can access the configuration pages 
+for the modules which offer configuration settings.
 
 The basis for **webtrees-geneajaubart** is now complete. Further configuration might be
 required for specific modules.
@@ -162,15 +174,15 @@ hence cannot be used with **webtrees-geneajaubart** (even though the logic has n
 removed). Hence, **DO NOT USE the automatic upgrade mechanism**.
 
 1. Take a backup of your installation (follow standard backup procedure).
-2. Download the latest version of **webtrees-geneajaubart** available from
-   [webtrees-geneajaubart Github repository](https://github.com/jon48/webtrees-geneajaubart/archive/master.zip)
+2. Download the latest version of **webtrees-geneajaubart** and of the **webtrees-lib** 
+library available respectively from [webtrees-geneajaubart Github repository](https://github.com/jon48/webtrees-geneajaubart/archive/master.zip) and [webtrees-lib Github repository](https://github.com/jon48/webtrees-lib/archive/master.zip)
 3. While you are in the middle of uploading the new files,
    a visitor to your site would encounter a mixture of new and old files.  This
    could cause unpredictable behaviour or errors.  To prevent this, create the
    file **data/offline.txt**.  While this file exists, visitors will see a
    “site unavailable - come back later” message.
 4. If you do not want some modules, delete them from the `/modules_v3/` folder 
-(except `perso_config` and `perso_hooks`).
+(except `myartjaub_hooks`).
 4. Upload the files to your web server, overwriting the existing files.
 5. Delete the file **data/offline.txt**.
 

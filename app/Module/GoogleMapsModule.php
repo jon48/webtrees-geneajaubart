@@ -2179,8 +2179,8 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 					var icon_image = new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+'googlemap/'+marker_icon,
 						null,
 						new google.maps.Point(0,0),
-						new google.maps.Point(12, 15));
-						, new google.maps.Size(width, height)
+						new google.maps.Point(12, 15),
+						new google.maps.Size(width, height)
 					);
 			//END PERSO
 					var icon_shadow = new google.maps.MarkerImage(WT_STATIC_URL+WT_MODULES_DIR+'googlemap/images/flag_shadow.png',
@@ -2988,7 +2988,7 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 						var iconImage = new google.maps.MarkerImage(icon,
 						null,
 						new google.maps.Point(0,0),
-						new google.maps.Point(12, 15));
+						new google.maps.Point(12, 15),
 						new google.maps.Size(width, height));
 						var iconShadow = new google.maps.MarkerImage("' . WT_STATIC_URL . WT_MODULES_DIR . 'googlemap/images/flag_shadow.png",
 						new google.maps.Size(35, 45),
@@ -4628,7 +4628,7 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 			echo '<td>';
 			if ($place['icon']) {
 				//PERSO Resize flags
-				echo '<img class="flag_gm_25" src="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/', $place['icon'], '" width="25" height="15">';
+				echo '<img class="flag_gm_25" src="', WT_STATIC_URL, WT_MODULES_DIR, 'googlemap/', $place['icon'], '" >';
 				//END PERSO
 			} else {
 				if ($place['lati'] || $place['long']) {

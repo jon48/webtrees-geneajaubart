@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "70a9ddb976b6640ac627cf491a04ffff",
-    "content-hash": "4eca3885754d7cb5c1d4910136824f0a",
+    "hash": "1118105d4a0f73f4a63567641d29ac3f",
+    "content-hash": "eab548ad9de49ca8ce5e796ad66baf8e",
     "packages": [
         {
             "name": "bombayworks/zendframework1",
@@ -409,6 +409,43 @@
             ],
             "description": "Provides functionality for http_build_url() to environments without pecl_http.",
             "time": "2014-11-17 16:24:50"
+        },
+        {
+            "name": "jon48/webtrees-lib",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jon48/webtrees-lib.git",
+                "reference": "1a2e092915905c3b9f9974d3823f6adb81a30472"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/1a2e092915905c3b9f9974d3823f6adb81a30472",
+                "reference": "1a2e092915905c3b9f9974d3823f6adb81a30472",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "fisharebest/webtrees": "*",
+                "mockery/mockery": "@stable",
+                "phpunit/phpunit": "4.8.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MyArtJaub\\": "src/",
+                    "MyArtJaub\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0+"
+            ],
+            "description": "Library to extend webtrees core capabilities",
+            "homepage": "https://github.com/jon48/webtrees-lib",
+            "time": "2016-05-30 19:19:47"
         },
         {
             "name": "michelf/php-markdown",
@@ -1600,6 +1637,174 @@
             "time": "2016-05-26 23:49:24"
         },
         {
+            "name": "fisharebest/webtrees",
+            "version": "1.7.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fisharebest/webtrees.git",
+                "reference": "d27eddb0406060c140f29758cf15926e9153b2ff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fisharebest/webtrees/zipball/d27eddb0406060c140f29758cf15926e9153b2ff",
+                "reference": "d27eddb0406060c140f29758cf15926e9153b2ff",
+                "shasum": ""
+            },
+            "require": {
+                "bombayworks/zendframework1": "1.*",
+                "ezyang/htmlpurifier": "4.*",
+                "fisharebest/algorithm": "1.*",
+                "fisharebest/ext-calendar": "2.*",
+                "fisharebest/localization": "1.*",
+                "fisharebest/php-polyfill": "1.*",
+                "michelf/php-markdown": "1.*",
+                "pclzip/pclzip": "2.*",
+                "rhumsaa/uuid": "2.*",
+                "tecnickcom/tcpdf": "6.*"
+            },
+            "require-dev": {
+                "fabpot/php-cs-fixer": "*",
+                "mockery/mockery": "*",
+                "phpunit/phpunit": "*",
+                "satooshi/php-coveralls": "~1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.8-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Fisharebest\\Webtrees\\": "app/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "description": "webtrees online genealogy",
+            "keywords": [
+                "genealogy",
+                "webtrees"
+            ],
+            "time": "2016-03-02 19:51:49"
+        },
+        {
+            "name": "gettext/gettext",
+            "version": "v3.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/oscarotero/Gettext.git",
+                "reference": "0db171e15df0da3aa6122d6335921dfb67c9b099"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/oscarotero/Gettext/zipball/0db171e15df0da3aa6122d6335921dfb67c9b099",
+                "reference": "0db171e15df0da3aa6122d6335921dfb67c9b099",
+                "shasum": ""
+            },
+            "require": {
+                "gettext/languages": "2.*",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "illuminate/view": "*",
+                "symfony/yaml": "~2",
+                "twig/extensions": "*",
+                "twig/twig": "*"
+            },
+            "suggest": {
+                "illuminate/view": "Is necessary if you want to use the Blade extractor",
+                "symfony/yaml": "Is necessary if you want to use the Yaml extractor/generator",
+                "twig/extensions": "Is necessary if you want to use the Twig extractor",
+                "twig/twig": "Is necessary if you want to use the Twig extractor"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Gettext\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Oscar Otero",
+                    "email": "oom@oscarotero.com",
+                    "homepage": "http://oscarotero.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP gettext manager",
+            "homepage": "https://github.com/oscarotero/Gettext",
+            "keywords": [
+                "JS",
+                "gettext",
+                "i18n",
+                "mo",
+                "po",
+                "translation"
+            ],
+            "time": "2016-04-27 19:15:17"
+        },
+        {
+            "name": "gettext/languages",
+            "version": "2.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mlocati/cldr-to-gettext-plural-rules.git",
+                "reference": "c43ade7e3fb68bcf2379036513dce8d20553d9c8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mlocati/cldr-to-gettext-plural-rules/zipball/c43ade7e3fb68bcf2379036513dce8d20553d9c8",
+                "reference": "c43ade7e3fb68bcf2379036513dce8d20553d9c8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Gettext\\Languages\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michele Locati",
+                    "email": "mlocati@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "gettext languages with plural rules",
+            "homepage": "https://github.com/mlocati/cldr-to-gettext-plural-rules",
+            "keywords": [
+                "cldr",
+                "i18n",
+                "internationalization",
+                "l10n",
+                "language",
+                "languages",
+                "localization",
+                "php",
+                "plural",
+                "plural rules",
+                "plurals",
+                "translate",
+                "translations",
+                "unicode"
+            ],
+            "time": "2015-03-27 11:32:41"
+        },
+        {
             "name": "guzzle/guzzle",
             "version": "v3.8.1",
             "source": {
@@ -1735,6 +1940,41 @@
                 "test"
             ],
             "time": "2015-05-11 14:41:42"
+        },
+        {
+            "name": "jon48/webtrees-tools",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jon48/webtrees-tools.git",
+                "reference": "de2abe33779d1e282cf58f6eedc045eb2b5b9ce4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jon48/webtrees-tools/zipball/de2abe33779d1e282cf58f6eedc045eb2b5b9ce4",
+                "reference": "de2abe33779d1e282cf58f6eedc045eb2b5b9ce4",
+                "shasum": ""
+            },
+            "require": {
+                "fisharebest/localization": "*",
+                "fisharebest/webtrees": "*",
+                "gettext/gettext": "*",
+                "jon48/webtrees-lib": "*",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MyArtJaub\\Webtrees\\Tools\\": "src/app/Webtrees/Tools"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0+"
+            ],
+            "description": "Technical tools for webtrees",
+            "homepage": "https://github.com/jon48/webtrees-tools",
+            "time": "2016-05-30 02:36:32"
         },
         {
             "name": "mockery/mockery",
@@ -3358,7 +3598,10 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "jon48/webtrees-lib": 20,
+        "jon48/webtrees-tools": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
