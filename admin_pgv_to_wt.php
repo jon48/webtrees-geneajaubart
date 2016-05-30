@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -140,7 +140,8 @@ if (!$PGV_PATH) {
 	$pgv_dirs = array();
 	$dir      = opendir(realpath('..'));
 	while (($subdir = readdir($dir)) !== false) {
-		if (is_dir('../' . $subdir) && file_exists('../' . $subdir . '/config.php')) {
+		// Exclude '..' as ascending too many levels can trigger open_basedir_restriction errors.
+		if ($subdir !== '..' && is_dir('../' . $subdir) && file_exists('../' . $subdir . '/config.php')) {
 			$pgv_dirs[] = '../' . $subdir;
 		}
 	}
@@ -195,12 +196,12 @@ Database::beginTransaction();
 // Delete the existing user accounts, and any information associated with it
 Database::exec("UPDATE `##log` SET user_id=NULL");
 Database::exec("DELETE FROM `##change`");
-Database::exec("DELETE `##block_setting` FROM `##block_setting` JOIN  `##block` USING (block_id) WHERE user_id>0 OR gedcom_id>0");
-Database::exec("DELETE FROM `##block`               WHERE user_id>0 OR gedcom_id>0");
+Database::exec("DELETE `##block_setting` FROM `##block_setting` JOIN `##block` USING (block_id) WHERE user_id>0 OR gedcom_id>0");
+Database::exec("DELETE FROM `##block` WHERE user_id>0 OR gedcom_id>0");
 Database::exec("DELETE FROM `##message`");
 Database::exec("DELETE FROM `##user_gedcom_setting` WHERE user_id>0");
-Database::exec("DELETE FROM `##user_setting`        WHERE user_id>0");
-Database::exec("DELETE FROM `##user`                WHERE user_id>0");
+Database::exec("DELETE FROM `##user_setting` WHERE user_id>0");
+Database::exec("DELETE FROM `##user` WHERE user_id>0");
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -301,7 +302,7 @@ if ($PGV_SCHEMA_VERSION >= 12) {
 	echo '<p>pgv_user => wt_user…</p>';
 
 	try {
-		// "INSERT IGNORE" is needed to allow for PhpGedView users with duplicate emails.  Only the first will be imported.
+		// "INSERT IGNORE" is needed to allow for PhpGedView users with duplicate emails. Only the first will be imported.
 		Database::prepare(
 			"INSERT IGNORE INTO `##user` (user_id, user_name, real_name, email, password)" .
 			" SELECT user_id, user_name, CONCAT_WS(' ', us1.setting_value, us2.setting_value), us3.setting_value, password FROM `{$DBNAME}`.`{$TBLPREFIX}user`" .
@@ -418,7 +419,7 @@ if ($PGV_SCHEMA_VERSION >= 12) {
 	echo '<p>pgv_users => wt_user…</p>';
 
 	try {
-		// "INSERT IGNORE" is needed to allow for PhpGedView users with duplicate emails.  Only the first will be imported.
+		// "INSERT IGNORE" is needed to allow for PhpGedView users with duplicate emails. Only the first will be imported.
 		Database::prepare(
 			"INSERT IGNORE INTO `##user` (user_name, real_name, email, password)" .
 			" SELECT u_username, CONCAT_WS(' ', u_firstname, u_lastname), u_email, u_password FROM `{$DBNAME}`.`{$TBLPREFIX}users`"
@@ -554,13 +555,11 @@ if ($PGV_SCHEMA_VERSION >= 12) {
 		try {
 			$array = unserialize($setting->u_gedcomid);
 			foreach ($array as $gedcom => $value) {
-				try {
-					$tree_id = Tree::findByName($gedcom)->getTreeId();
+				$tree = Tree::findByName($gedcom);
+				if ($tree !== null) {
 					Database::prepare(
 						"INSERT IGNORE INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value) VALUES (?, ?, ?, ?)"
-					)->execute(array($setting->user_id, $tree_id, 'gedcomid', $value));
-				} catch (PDOException $ex) {
-					// Invalid data?  Reference to non-existing tree?
+					)->execute(array($setting->user_id, $tree->getTreeId(), 'gedcomid', $value));
 				}
 			}
 		} catch (\ErrorException $ex) {
@@ -570,13 +569,11 @@ if ($PGV_SCHEMA_VERSION >= 12) {
 		try {
 			$array = unserialize($setting->u_rootid);
 			foreach ($array as $gedcom => $value) {
-				try {
-					$tree_id = Tree::findByName($gedcom)->getTreeId();
+				$tree = Tree::findByName($gedcom);
+				if ($tree !== null) {
 					Database::prepare(
 						"INSERT IGNORE INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value) VALUES (?, ?, ?, ?)"
-					)->execute(array($setting->user_id, $tree_id, 'rootid', $value));
-				} catch (PDOException $ex) {
-					// Invalid data?  Reference to non-existing tree?
+					)->execute(array($setting->user_id, $tree->getTreeId(), 'rootid', $value));
 				}
 			}
 		} catch (\ErrorException $ex) {
@@ -586,13 +583,11 @@ if ($PGV_SCHEMA_VERSION >= 12) {
 		try {
 			$array = unserialize($setting->u_canedit);
 			foreach ($array as $gedcom => $value) {
-				try {
-					$tree_id = Tree::findByName($gedcom)->getTreeId();
+				$tree = Tree::findByName($gedcom);
+				if ($tree !== null) {
 					Database::prepare(
 						"INSERT IGNORE INTO `##user_gedcom_setting` (user_id, gedcom_id, setting_name, setting_value) VALUES (?, ?, ?, ?)"
-					)->execute(array($setting->user_id, $tree_id, 'canedit', $value));
-				} catch (PDOException $ex) {
-					// Invalid data?  Reference to non-existing tree?
+					)->execute(array($setting->user_id, $tree->getTreeId(), 'canedit', $value));
 				}
 			}
 		} catch (\ErrorException $ex) {
@@ -637,7 +632,7 @@ foreach ($GEDCOMS as $GEDCOM => $GED_DATA) {
 	$COMMON_NAMES_ADD             = '';
 	$COMMON_NAMES_REMOVE          = '';
 	$COMMON_NAMES_THRESHOLD       = '';
-	$CONTACT_USER_ID              = '';
+	$CONTACT_EMAIL                = '';
 	$DEFAULT_PEDIGREE_GENERATIONS = '';
 	$EXPAND_NOTES                 = '';
 	$EXPAND_RELATIVES_EVENTS      = '';
@@ -659,15 +654,13 @@ foreach ($GEDCOMS as $GEDCOM => $GED_DATA) {
 	$MAX_DESCENDANCY_GENERATIONS  = '';
 	$MAX_PEDIGREE_GENERATIONS     = '';
 	$MAX_RELATION_PATH_LENGTH     = '';
-	$MEDIA_DIRECTORY              = '';
 	$MEDIA_ID_PREFIX              = '';
 	$META_DESCRIPTION             = '';
 	$META_TITLE                   = '';
-	$MEDIA_UPLOAD                 = '';
+	$MULTI_MEDIA                  = '';
 	$NOTE_FACTS_ADD               = '';
 	$NOTE_FACTS_QUICK             = '';
 	$NOTE_FACTS_UNIQUE            = '';
-	$NOTE_ID_PREFIX               = '';
 	$NO_UPDATE_CHAN               = '';
 	$PEDIGREE_FULL_DETAILS        = '';
 	$PEDIGREE_LAYOUT              = '';
@@ -711,7 +704,7 @@ foreach ($GEDCOMS as $GEDCOM => $GED_DATA) {
 	$USE_RELATIONSHIP_PRIVACY     = '';
 	$USE_RIN                      = '';
 	$WATERMARK_THUMB              = '';
-	$WEBMASTER_USER_ID            = '';
+	$WEBMASTER_EMAIL              = '';
 	$WORD_WRAPPED_NOTES           = '';
 
 	$config = str_replace(array('$INDEX_DIRECTORY', '${INDEX_DIRECTORY}'), $INDEX_DIRECTORY, $GED_DATA['config']);
@@ -1022,7 +1015,7 @@ if ($PGV_SCHEMA_VERSION >= 13) {
 					try {
 						$statement->execute(array($GED_DATA['id'], $page_name, $page_parameter, $match[3]));
 					} catch (PDOException $ex) {
-						// Primary key violation?  Ignore?
+						// Primary key violation? Ignore?
 					}
 				}
 			}
@@ -1113,7 +1106,7 @@ try {
 		"REPLACE INTO `##placelocation` (pl_id, pl_parent_id, pl_level, pl_place, pl_long, pl_lati, pl_zoom, pl_icon)" .
 		" SELECT pl_id, pl_parent_id, pl_level, pl_place, pl_long, pl_lati, pl_zoom, pl_icon FROM `{$DBNAME}`.`{$TBLPREFIX}placelocation`"
 	)->execute();
-} catch (PDOexception $ex) {
+} catch (PDOException $ex) {
 	// This table will only exist if the gm module is installed in PhpGedView/WT
 }
 

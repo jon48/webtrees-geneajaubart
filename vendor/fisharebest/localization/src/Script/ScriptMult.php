@@ -8,13 +8,15 @@
  * @license   GPLv3+
  */
 class ScriptMult extends AbstractScript implements ScriptInterface {
-	/** {@inheritdoc} */
 	public function code() {
 		return 'Mult';
 	}
 
-	/** {@inheritdoc} */
 	public function number() {
 		return '323';
+	}
+
+	public function unicodeName() {
+		return 'Multani';
 	}
 }

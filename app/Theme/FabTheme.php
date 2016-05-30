@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,16 +28,7 @@ class FabTheme extends AbstractTheme implements ThemeInterface {
 	 * @return string A relative path, such as "themes/foo/"
 	 */
 	public function assetUrl() {
-		return 'themes/fab/css-1.7.0/';
-	}
-
-	/**
-	 * HTML link to a "favorites icon".
-	 *
-	 * @return string
-	 */
-	protected function favicon() {
-		return '<link rel="icon" href="' . $this->assetUrl() . 'favicon.png" type="image/png">';
+		return 'themes/fab/css-1.7.4/';
 	}
 
 	/**

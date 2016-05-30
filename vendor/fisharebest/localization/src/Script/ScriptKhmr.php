@@ -8,33 +8,18 @@
  * @license   GPLv3+
  */
 class ScriptKhmr extends AbstractScript implements ScriptInterface {
-	/** {@inheritdoc} */
 	public function code() {
 		return 'Khmr';
 	}
 
-	/** {@inheritdoc} */
 	public function numerals() {
-		return array(
-			'0' => '០',
-			'1' => '១',
-			'2' => '២',
-			'3' => '៣',
-			'4' => '៤',
-			'5' => '៥',
-			'6' => '៦',
-			'7' => '៧',
-			'8' => '៨',
-			'9' => '៩',
-		);
+		return array('០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩');
 	}
 
-	/** {@inheritdoc} */
 	public function number() {
 		return '355';
 	}
 
-	/** {@inheritdoc} */
 	public function unicodeName() {
 		return 'Khmer';
 	}

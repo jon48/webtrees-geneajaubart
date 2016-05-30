@@ -1,6 +1,15 @@
 CHANGE LOG
 ==========
 
+## 2.2.1 (2015-12-11)
+ - HHVM tests failing
+
+## 2.2.0 (2015-12-01)
+ - Autoload shim functions
+
+## 2.1.1 (2015-09-21)
+ - Test against PHP 7.0
+
 ## 2.1.0 (2015-04-02)
  - Add JewishCalendar::numberToHebrewNumerals() to format Jewish dates
 

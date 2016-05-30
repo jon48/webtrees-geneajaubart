@@ -1,4 +1,5 @@
 language: php
+
 php:
   - 7.0
   - 5.6
@@ -6,4 +7,21 @@ php:
   - 5.4
   - 5.3
   - hhvm
+
+## Travis is faster if we do not need sudo
 sudo: false
+
+## Cache composer bits
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+install:
+  - travis_retry composer config github-oauth.github.com "${GITHUB_OAUTH_TOKEN}"
+  - travis_retry composer update --prefer-dist --no-interaction
+
+script:
+  - phpunit --coverage-clover tests/clover.xml
+
+after_script:
+  - php vendor/bin/coveralls -v

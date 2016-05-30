@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -162,7 +162,7 @@ class Individual extends GedcomRecord {
 				}
 			}
 		} else {
-			// No individual linked to this account?  Cannot use relationship privacy.
+			// No individual linked to this account? Cannot use relationship privacy.
 			return true;
 		}
 
@@ -307,7 +307,7 @@ class Individual extends GedcomRecord {
 					return true;
 				}
 			}
-			// The individual has one or more dated events.  All are less than $MAX_ALIVE_AGE years ago.
+			// The individual has one or more dated events. All are less than $MAX_ALIVE_AGE years ago.
 			// If one of these is a birth, the individual must be alive.
 			if (preg_match('/\n1 BIRT(?:\n[2-9].+)*\n2 DATE /', $this->gedcom)) {
 				return false;
@@ -539,7 +539,7 @@ class Individual extends GedcomRecord {
 	}
 
 	/**
-	 * Get the range of years in which a individual lived.  e.g. “1870–”, “1870–1920”, “–1920”.
+	 * Get the range of years in which a individual lived. e.g. “1870–”, “1870–1920”, “–1920”.
 	 * Provide the full date using a tooltip.
 	 * For consistent layout in charts, etc., show just a “–” when no dates are known.
 	 * Note that this is a (non-breaking) en-dash, and not a hyphen.
@@ -731,7 +731,7 @@ class Individual extends GedcomRecord {
 
 	/**
 	 * Get the sex - M F or U
-	 * Use the un-privatised gedcom record.  We call this function during
+	 * Use the un-privatised gedcom record. We call this function during
 	 * the privatize-gedcom function, and we are allowed to know this.
 	 *
 	 * @return string
@@ -999,7 +999,7 @@ class Individual extends GedcomRecord {
 								// Father’s family with someone else
 								if ($step_family->getSpouse($step_parent)) {
 									return
-										/* I18N: A step-family.  %s is an individual’s name */
+										/* I18N: A step-family. %s is an individual’s name */
 										I18N::translate('Father’s family with %s', $step_family->getSpouse($step_parent)->getFullName());
 								} else {
 									return
@@ -1010,7 +1010,7 @@ class Individual extends GedcomRecord {
 								// Mother’s family with someone else
 								if ($step_family->getSpouse($step_parent)) {
 									return
-										/* I18N: A step-family.  %s is an individual’s name */
+										/* I18N: A step-family. %s is an individual’s name */
 										I18N::translate('Mother’s family with %s', $step_family->getSpouse($step_parent)->getFullName());
 								} else {
 									return
@@ -1043,10 +1043,10 @@ class Individual extends GedcomRecord {
 		}
 		$txt = '<div';
 		if ($classname) {
-			$txt .= " class=\"$classname\"";
+			$txt .= ' class="' . $classname . '"';
 		}
 		if ($display) {
-			$txt .= " style=\"display:$display\"";
+			$txt .= ' style="display:' . $display . '"';
 		}
 		$txt .= '>';
 		$husb = $fam->getHusband();
@@ -1085,7 +1085,7 @@ class Individual extends GedcomRecord {
 	 * Convert a name record into ‘full’ and ‘sort’ versions.
 	 * Use the NAME field to generate the ‘full’ version, as the
 	 * gedcom spec says that this is the individual’s name, as they would write it.
-	 * Use the SURN field to generate the sortable names.  Note that this field
+	 * Use the SURN field to generate the sortable names. Note that this field
 	 * may also be used for the ‘true’ surname, perhaps spelt differently to that
 	 * recorded in the NAME field. e.g.
 	 *
@@ -1135,7 +1135,7 @@ class Individual extends GedcomRecord {
 		// Extract the components from NAME - use for the "full" names
 		////////////////////////////////////////////////////////////////////////////
 
-		// Fix bad slashes.  e.g. 'John/Smith' => 'John/Smith/'
+		// Fix bad slashes. e.g. 'John/Smith' => 'John/Smith/'
 		if (substr_count($full, '/') % 2 == 1) {
 			$full = $full . '/';
 		}
@@ -1192,16 +1192,6 @@ class Individual extends GedcomRecord {
 			$full = substr($full, 0, $pos) . '@P.N. ' . substr($full, $pos);
 		}
 
-		// The NPFX field might be present, but not appear in the NAME
-		if ($NPFX && strpos($full, "$NPFX ") !== 0) {
-			$full = "$NPFX $full";
-		}
-
-		// The NSFX field might be present, but not appear in the NAME
-		if ($NSFX && strrpos($full, " $NSFX") !== strlen($full) - strlen(" $NSFX")) {
-			$full = "$full $NSFX";
-		}
-
 		// GEDCOM nicknames should be specificied in a NICK field, or in the
 		// NAME filed, surrounded by ASCII quotes (or both).
 		if ($NICK && strpos($full, '"' . $NICK . '"') === false) {
@@ -1224,10 +1214,10 @@ class Individual extends GedcomRecord {
 		// Insert placeholders for any missing/unknown names
 		$full = str_replace('@N.N.', I18N::translateContext('Unknown surname', '…'), $full);
 		$full = str_replace('@P.N.', I18N::translateContext('Unknown given name', '…'), $full);
-		// Localise quotation marks around the nickname
-		$full = preg_replace_callback('/"([^"]*)"/', function ($matches) { return I18N::translate('“%s”', $matches[1]); }, $full);
 		// Format for display
 		$full = '<span class="NAME" dir="auto" translate="no">' . preg_replace('/\/([^\/]*)\//', '<span class="SURN">$1</span>', Filter::escapeHtml($full)) . '</span>';
+		// Localise quotation marks around the nickname
+		$full = preg_replace_callback('/&quot;([^&]*)&quot;/', function ($matches) { return I18N::translate('“%s”', $matches[1]); }, $full);
 
 		// A suffix of “*” indicates a preferred name
 		$full = preg_replace('/([^ >]*)\*/', '<span class="starredname">\\1</span>', $full);

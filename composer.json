@@ -20,16 +20,25 @@
 		"fisharebest/algorithm": "1.*",
 		"fisharebest/ext-calendar": "2.*",
 		"fisharebest/localization": "1.*",
-		"ircmaxell/password-compat": "1.*",
+		"fisharebest/php-polyfill": "1.*",
 		"jon48/webtrees-lib": "dev-master",
 		"michelf/php-markdown": "1.*",
-		"patchwork/utf8": "1.*",
 		"pclzip/pclzip": "2.*",
-		"ramsey/uuid": "2.*",
-		"tecnick.com/tcpdf": "6.*",
-        "twbs/bootstrap": "3.3.*"
+		"rhumsaa/uuid": "2.*",
+		"tecnickcom/tcpdf": "6.*",
+		"twbs/bootstrap": "3.3.*"
 	},
 	"require-dev": {
+		"fabpot/php-cs-fixer": "*",
+		"mockery/mockery": "*",
+		"phpunit/phpunit": "*",
+		"satooshi/php-coveralls": "~1.0"
+	},
+	"require-dev": {
+		"fabpot/php-cs-fixer": "*",
 		"jon48/webtrees-tools": "dev-master"
+		"mockery/mockery": "*",
+		"phpunit/phpunit": "*",
+		"satooshi/php-coveralls": "~1.0"
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,18 +28,6 @@ use Fisharebest\Webtrees\Module;
  * Controller for the media page
  */
 class MediaController extends GedcomRecordController {
-	/**
-	 * Startup activity
-	 */
-	public function __construct() {
-		global $WT_TREE;
-
-		$xref         = Filter::get('mid', WT_REGEX_XREF);
-		$this->record = Media::getInstance($xref, $WT_TREE);
-
-		parent::__construct();
-	}
-
 	/**
 	 * get edit menu
 	 */
@@ -79,7 +67,7 @@ class MediaController extends GedcomRecordController {
 		// delete
 		if (Auth::isEditor($this->record->getTree())) {
 			$menu->addSubmenu(new Menu(I18N::translate('Delete'), '#', 'menu-obje-del', array(
-				'onclick' => 'return delete_media("' . I18N::translate('Are you sure you want to delete “%s”?', Filter::escapeJS(Filter::unescapeHtml($this->record->getFullName()))) . '", "' . $this->record->getXref() . '");',
+				'onclick' => 'return delete_record("' . I18N::translate('Are you sure you want to delete “%s”?', Filter::escapeJs(Filter::unescapeHtml($this->record->getFullName()))) . '", "' . $this->record->getXref() . '");',
 			)));
 		}
 
@@ -93,7 +81,7 @@ class MediaController extends GedcomRecordController {
 		// add to favorites
 		if (Module::getModuleByName('user_favorites')) {
 			$menu->addSubmenu(new Menu(
-			/* I18N: Menu option.  Add [the current page] to the list of favorites */
+			/* I18N: Menu option. Add [the current page] to the list of favorites */
 				I18N::translate('Add to favorites'),
 				'#',
 				'menu-obje-addfav',

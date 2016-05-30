@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -55,7 +55,7 @@ $controller
 					</td>
 					<td class="optionbox">
 						<?php echo FunctionsEdit::twoStateCheckbox('show_full', $controller->showFull()); ?>
-		  			</td>
+					</td>
 					<td rowspan="3" class="topbottombar vmiddle">
 						<input type="submit" value="<?php echo /* I18N: Submit button, on a form */ I18N::translate('View'); ?>">
 					</td>
@@ -85,10 +85,10 @@ $controller
 					</td>
 				</tr>
 				<tr>
-					<th>
+					<td class="descriptionbox">
 						<?php echo I18N::translate('Descendant generations'); ?>
-					</th>
-					<td>
+					</td>
+					<td class="optionbox">
 						<select name="descent">
 							<?php
 							for ($i = 0; $i <= 9; $i++) {

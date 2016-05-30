@@ -1,7 +1,6 @@
 
-*.swp
-.idea/
-apidocs/
+/.vagrant
+/apidocs/
 vendor/twbs/
 vendor/jon48/
 

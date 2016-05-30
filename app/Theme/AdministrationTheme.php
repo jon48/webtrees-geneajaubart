@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -44,9 +44,17 @@ class AdministrationTheme extends AbstractTheme implements ThemeInterface {
 	 * @return string A relative path, such as "themes/foo/"
 	 */
 	public function assetUrl() {
-		return 'themes/_administration/css-1.7.0/';
+		return 'themes/_administration/css-1.7.4/';
 	}
 
+	/**
+	 * HTML link to a "favorites icon".
+	 *
+	 * @return string
+	 */
+	protected function favicon() {
+		return '<link rel="icon" href="favicon.ico" type="image/x-icon">';
+	}
 	/**
 	 * Create the contents of the <footer> tag.
 	 *

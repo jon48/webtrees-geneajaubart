@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -51,9 +51,9 @@ class FunctionsPrintFacts {
 	 * Print a fact record, for the individual/family/source/repository/etc. pages.
 	 *
 	 * Although a Fact has a parent object, we also need to know
-	 * the GedcomRecord for which we are printing it.  For example,
+	 * the GedcomRecord for which we are printing it. For example,
 	 * we can show the death of X on the page of Y, or the marriage
-	 * of X+Y on the page of Z.  We need to know both records to
+	 * of X+Y on the page of Z. We need to know both records to
 	 * calculate ages, relationships, etc.
 	 *
 	 * @param Fact $fact
@@ -96,7 +96,7 @@ class FunctionsPrintFacts {
 				break;
 		}
 
-		// Who is this fact about?  Need it to translate fact label correctly
+		// Who is this fact about? Need it to translate fact label correctly
 		if ($parent instanceof Family && $record instanceof Individual) {
 			// Family event
 			$label_person = $fact->getParent()->getSpouse($record);
@@ -140,7 +140,7 @@ class FunctionsPrintFacts {
 			case 'EVEN':
 			case 'FACT':
 				if (GedcomTag::isTag($type)) {
-					// Some users (just Meliza?) use "1 EVEN/2 TYPE BIRT".  Translate the TYPE.
+					// Some users (just Meliza?) use "1 EVEN/2 TYPE BIRT". Translate the TYPE.
 					$label = GedcomTag::getLabel($type, $label_person);
 					$type  = ''; // Do not print this again
 				} elseif ($type) {
@@ -153,7 +153,7 @@ class FunctionsPrintFacts {
 				}
 				break;
 			case 'MARR':
-				// This is a hack for a proprietory extension.  Is it still used/needed?
+				// This is a hack for a proprietory extension. Is it still used/needed?
 				$utype = strtoupper($type);
 				if ($utype == 'CIVIL' || $utype == 'PARTNERS' || $utype == 'RELIGIOUS') {
 					$label = GedcomTag::getLabel('MARR_' . $utype, $label_person);
@@ -251,7 +251,7 @@ class FunctionsPrintFacts {
 				echo $fact->getValue();
 				break;
 			case 'AFN':
-				echo '<div class="field"><a href="https://familysearch.org/search/tree/results#count=20&query=afn:', rawurlencode($fact->getValue()), '" target="new">', Filter::escapeHtml($fact->getValue()), '</a></div>';
+				echo '<div class="field"><a href="https://familysearch.org/search/tree/results#count=20&query=afn:', Filter::escapeUrl($fact->getValue()), '">', Filter::escapeHtml($fact->getValue()), '</a></div>';
 				break;
 			case 'ASSO':
 				// we handle this later, in format_asso_rela_record()
@@ -617,7 +617,6 @@ class FunctionsPrintFacts {
 					$srec = substr($factrec, $spos1, $spos2 - $spos1);
 					$lt   = preg_match_all("/$nlevel \w+/", $srec, $matches);
 					$data .= '<div class="fact_SOUR">';
-					$data .= '<span class="label">';
 					$elementID = Uuid::uuid4();
 					if ($WT_TREE->getPreference('EXPAND_SOURCES')) {
 						$plusminus = 'icon-minus';
@@ -630,9 +629,8 @@ class FunctionsPrintFacts {
 					//PERSO Prepend fact source text
 					$data .= implode('', HookProvider::get('hFactSourcePrepend')->execute($srec)) ;
 					//END PERSO
-					$data .= I18N::translate('Source') . ':</span> <span class="field">';
-					$data .= '<a href="' . $source->getHtmlUrl() . '">' . $source->getFullName() . '</a>';
-					$data .= '</span></div>';
+					$data .= GedcomTag::getLabelValue('SOUR', '<a href="' . $source->getHtmlUrl() . '">' . $source->getFullName() . '</a>', null, 'span');
+					$data .= '</div>';
 
 					$data .= "<div id=\"$elementID\"";
 					if ($WT_TREE->getPreference('EXPAND_SOURCES')) {
@@ -654,7 +652,7 @@ class FunctionsPrintFacts {
 					$data .= '</div>';
 				} else {
 					// Here we could show that we do actually have sources for this data,
-					// but not the details.  For example “Sources: ”.
+					// but not the details. For example “Sources: ”.
 					// But not by default, based on user feedback.
 					// http://webtrees.net/index.php/en/forum/3-help-for-beta-and-svn-versions/27002-source-media-privacy-issue
 				}
@@ -805,7 +803,7 @@ class FunctionsPrintFacts {
 					echo GedcomTag::getLabel($factname, $parent), '</a>';
 					echo '<div class="editfacts">';
 					if (preg_match('/^@.+@$/', $match[$j][2])) {
-						// Inline sources can't be edited.  Attempting to save one will convert it
+						// Inline sources can't be edited. Attempting to save one will convert it
 						// into a link, and delete it.
 						// e.g. "1 SOUR my source" becomes "1 SOUR @my source@" which does not exist.
 						echo "<div class=\"editlink\"><a class=\"editicon\" onclick=\"return edit_record('$pid', '$fact_id');\" href=\"#\" title=\"" . I18N::translate('Edit') . "\"><span class=\"link_text\">" . I18N::translate('Edit') . "</span></a></div>";
@@ -828,7 +826,7 @@ class FunctionsPrintFacts {
 					if ($publ) {
 						echo GedcomTag::getLabelValue('PUBL', $publ->getValue());
 					}
-					// 2 RESN tags.  Note, there can be more than one, such as "privacy" and "locked"
+					// 2 RESN tags. Note, there can be more than one, such as "privacy" and "locked"
 					if (preg_match_all("/\n2 RESN (.+)/", $factrec, $rmatches)) {
 						foreach ($rmatches[1] as $rmatch) {
 							echo '<br><span class="label">', GedcomTag::getLabel('RESN'), ':</span> <span class="field">';
@@ -1094,7 +1092,7 @@ class FunctionsPrintFacts {
 				echo self::printFactSources($noterec, 1);
 			}
 
-			// 2 RESN tags.  Note, there can be more than one, such as "privacy" and "locked"
+			// 2 RESN tags. Note, there can be more than one, such as "privacy" and "locked"
 			if (preg_match_all("/\n2 RESN (.+)/", $factrec, $matches)) {
 				foreach ($matches[1] as $match) {
 					echo '<br><span class="label">', GedcomTag::getLabel('RESN'), ':</span> <span class="field">';

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -29,16 +29,7 @@ class CloudsTheme extends AbstractTheme implements ThemeInterface {
 	 * @return string A relative path, such as "themes/foo/"
 	 */
 	public function assetUrl() {
-		return 'themes/clouds/css-1.7.0/';
-	}
-
-	/**
-	 * HTML link to a "favorites icon".
-	 *
-	 * @return string
-	 */
-	protected function favicon() {
-		return '<link rel="icon" href="' . $this->assetUrl() . 'favicon.png" type="image/png">';
+		return 'themes/clouds/css-1.7.4/';
 	}
 
 	/**
@@ -147,7 +138,7 @@ class CloudsTheme extends AbstractTheme implements ThemeInterface {
 
 		foreach ($menus as $menu) {
 			// Create an inert menu - to use as a label
-			$tmp = new Menu(strip_tags($menu->getLabel()), '');
+			$tmp = new Menu($menu->getLabel(), '');
 
 			// Insert the label into the submenu
 			$submenus = $menu->getSubmenus();

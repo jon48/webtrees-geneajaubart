@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -145,7 +145,7 @@ case 'setup':
 	FunctionsPrint::initializeCalendarPopup();
 
 	echo '<div id="reportengine-page">
-		<form name="setupreport" method="get" action="reportengine.php" onsubmit="if (this.output[1].checked) {this.target=\'_blank\';}">
+		<form name="setupreport" method="get" action="reportengine.php">
 		<input type="hidden" name="action" value="run">
 		<input type="hidden" name="report" value="', Filter::escapeHtml($report), '">
 		<table class="facts_table width50">
@@ -241,8 +241,8 @@ case 'setup':
 			} elseif ($input['lookup'] == 'SOUR') {
 				echo FunctionsPrint::printFindSourceLink($input['name']);
 			} elseif ($input['lookup'] == 'DATE') {
-				echo ' <a href="#" onclick="cal_toggleDate(\'div_', Filter::EscapeJs($input['name']), '\', \'', Filter::EscapeJs($input['name']), '\'); return false;" class="icon-button_calendar" title="', I18N::translate('Select a date'), '"></a>';
-				echo '<div id="div_', Filter::EscapeHtml($input['name']), '" style="position:absolute;visibility:hidden;background-color:white;"></div>';
+				echo ' <a href="#" onclick="cal_toggleDate(\'div_', Filter::escapeJs($input['name']), '\', \'', Filter::escapeJs($input['name']), '\'); return false;" class="icon-button_calendar" title="', I18N::translate('Select a date'), '"></a>';
+				echo '<div id="div_', Filter::escapeHtml($input['name']), '" style="position:absolute;visibility:hidden;background-color:white;"></div>';
 			}
 		}
 		echo '</td></tr>';

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2015 webtrees development team
+ * Copyright (C) 2016 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -37,7 +37,7 @@ $controller
 	->restrictAccess(Auth::isEditor($WT_TREE))
 	->addExternalJavascript(WT_AUTOCOMPLETE_JS_URL)
 	->addInlineJavascript('autocomplete();')
-	->addInlineJavascript('var locale_date_format="' . preg_replace('/[^DMY]/', '', str_replace(array('J', 'F'), array('D', 'M'), I18N::dateFormat())) . '";');
+	->addInlineJavascript('var locale_date_format="' . preg_replace('/[^DMY]/', '', str_replace(array('j', 'F'), array('D', 'M'), I18N::dateFormat())) . '";');
 
 switch ($action) {
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ case 'updateraw':
 
 	// Retain any private facts
 	foreach ($record->getFacts(null, false, Auth::PRIV_HIDE) as $fact) {
-		if (!in_array($fact->getFactId(), $fact_ids)) {
+		if (!in_array($fact->getFactId(), $fact_ids) && !$fact->isPendingDeletion()) {
 			$gedcom .= "\n" . $fact->getGedcom();
 		}
 	}
@@ -287,7 +287,7 @@ case 'edit':
 		break;
 	case 'FAM':
 	case 'INDI':
-		// FAM and INDI records have real facts.  They can take NOTE/SOUR/OBJE/etc.
+		// FAM and INDI records have real facts. They can take NOTE/SOUR/OBJE/etc.
 		if ($level1type !== 'SEX' && $level1type !== 'NOTE' && $level1type !== 'ALIA') {
 			if ($level1type !== 'SOUR') {
 				FunctionsEdit::printAddLayer('SOUR');
@@ -489,7 +489,7 @@ case 'update':
 	// For the GEDFact_assistant module
 	$pid_array = Filter::post('pid_array');
 	if ($pid_array) {
-		foreach (explode(', ', $pid_array) as $pid) {
+		foreach (explode(',', $pid_array) as $pid) {
 			if ($pid !== $xref) {
 				$indi = Individual::getInstance($pid, $WT_TREE);
 				if ($indi && $indi->canEdit()) {
@@ -1008,7 +1008,7 @@ case 'addfamlink':
 					<td class="facts_value">
 						<?php echo FunctionsEdit::editFieldPedigree('PEDI', '', '', $person); ?>
 						<p class="small text-muted">
-							<?php echo I18N::translate('A child may have more than one set of parents.  The relationship between the child and the parents can be biological, legal, or based on local culture and tradition.  If no pedigree is specified, then a biological relationship will be assumed.'); ?>
+							<?php echo I18N::translate('A child may have more than one set of parents. The relationship between the child and the parents can be biological, legal, or based on local culture and tradition. If no pedigree is specified, then a biological relationship will be assumed.'); ?>
 						</p>
 					</td>
 				</tr>
@@ -1726,7 +1726,7 @@ case 'reorder_media':
 				<li class="facts_value" style="list-style:none;cursor:move;margin-bottom:2px;" id="li_<?php echo $obje->getXref(); ?>">
 					<table class="pic">
 						<tr>
-							<td width="80" valign="top" align="center">
+							<td>
 								<?php echo $obje->displayImage(); ?>
 							</td>
 							<td>
@@ -1795,7 +1795,7 @@ case 'reorder_children':
 	$option = Filter::post('option');
 
 	$family = Family::getInstance($xref, $WT_TREE);
-	check_record_access($family, $WT_TREE);
+	check_record_access($family);
 
 	$controller
 		->addInlineJavascript('jQuery("#reorder_list").sortable({forceHelperSize: true, forcePlaceholderSize: true, opacity: 0.7, cursor: "move", axis: "y"});')
@@ -2505,7 +2505,7 @@ function print_indi_form($nextaction, Individual $person = null, Family $family 
 		$fields   = explode(' ', $gedlines[0]);
 		$glevel   = $fields[0];
 		$level    = $glevel;
-		$type     = trim($fields[1]);
+		$type     = $fields[1];
 		$tags     = array();
 		$i        = 0;
 		do {
@@ -2518,7 +2518,7 @@ function print_indi_form($nextaction, Individual $person = null, Family $family 
 					$text .= $fields[$j];
 				}
 				while (($i + 1 < count($gedlines)) && (preg_match('/' . ($level + 1) . ' CONT ?(.*)/', $gedlines[$i + 1], $cmatch) > 0)) {
-					$text .= "\n" . $cmatch[2];
+					$text .= "\n" . $cmatch[1];
 					$i++;
 				}
 				FunctionsEdit::addSimpleTag($level . ' ' . $type . ' ' . $text);
@@ -2637,12 +2637,12 @@ function print_indi_form($nextaction, Individual $person = null, Family $family 
 		// For example, to differentiate the two Spanish surnames from an English
 		// double-barred name.
 		// Commas *may* be used in other fields, and will form part of the NAME.
-		if (WT_LOCALE=="vi" || WT_LOCALE=="hu") {
+		if (WT_LOCALE === "vi" || WT_LOCALE === "hu") {
 			// Default format: /SURN/ GIVN
 			return trim(npfx+" /"+trim(spfx+" "+surn).replace(/ *, */g, " ")+"/ "+givn.replace(/ *, */g, " ")+" "+nsfx);
-		} else if (WT_LOCALE=="zh") {
+		} else if (WT_LOCALE === "zh-Hans" || WT_LOCALE === "zh-Hant") {
 			// Default format: /SURN/GIVN
-			return trim(npfx+" /"+trim(spfx+" "+surn).replace(/ *, */g, " ")+"/"+givn.replace(/ *, */g, " ")+" "+nsfx);
+			return npfx+"/"+spfx+surn+"/"+givn+nsfx;
 		} else {
 			// Default format: GIVN /SURN/
 			return trim(npfx+" "+givn.replace(/ *, */g, " ")+" /"+trim(spfx+" "+surn).replace(/ *, */g, " ")+"/ "+nsfx);
@@ -2705,7 +2705,7 @@ function print_indi_form($nextaction, Individual $person = null, Family $family 
 	var oldName = "";
 
 	// Calls to generate_name() trigger an update - hence need to
-	// set the manual change to true first.  We are probably
+	// set the manual change to true first. We are probably
 	// listening to the wrong events on the input fields...
 	var manualChange = true;
 	manualChange = generate_name() !== jQuery("#NAME").val();

@@ -8,33 +8,18 @@
  * @license   GPLv3+
  */
 class ScriptOsma extends AbstractScript implements ScriptInterface {
-	/** {@inheritdoc} */
 	public function code() {
 		return 'Osma';
 	}
 
-	/** {@inheritdoc} */
 	public function numerals() {
-		return array(
-			'0' => '𐒠',
-			'1' => '𐒡',
-			'2' => '𐒢',
-			'3' => '𐒣',
-			'4' => '𐒤',
-			'5' => '𐒥',
-			'6' => '𐒦',
-			'7' => '𐒧',
-			'8' => '𐒨',
-			'9' => '𐒩',
-		);
+		return array('𐒠', '𐒡', '𐒢', '𐒣', '𐒤', '𐒥', '𐒦', '𐒧', '𐒨', '𐒩');
 	}
 
-	/** {@inheritdoc} */
 	public function number() {
 		return '260';
 	}
 
-	/** {@inheritdoc} */
 	public function unicodeName() {
 		return 'Osmanya';
 	}

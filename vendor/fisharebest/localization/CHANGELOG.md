@@ -1,7 +1,17 @@
 CHANGE LOG
 ==========
 
-## 1.5.0
+## 1.7.0 (2015-11-27)
+ - Updated version of CLDR
+
+## 1.6.0 (2015-09-14)
+ - Updated versions of ISO-15924, iana-subtag-registry and CLDR
+
+## 1.5.1 (2015-09-14)
+ - Norwegian collation rules
+ - Add PHP 7.0 and HHVM to Travis tests
+
+## 1.5.0 (2015-06-29)
  - Updated versions of ISO-15924, iana-subtag-registry and CLDR
 
 ## 1.4.1 (2015-04-06)
