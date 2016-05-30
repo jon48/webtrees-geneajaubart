@@ -103,7 +103,13 @@ class CloudsTheme extends AbstractTheme implements ThemeInterface {
 			' slideshowStop: "' . I18N::translate('Stop') . '",' .
 			' title: function() { return jQuery(this).data("title"); }' .
 			'});' .
-			'</script>';
+			'</script>' .
+    		//PERSO Add Java script for Certificate Module
+    		(\Fisharebest\Webtrees\Module::getModuleByName(\MyArtJaub\Webtrees\Constants::MODULE_MAJ_CERTIF_NAME) ?
+    		    '<script src="' . WT_STATIC_URL . WT_MODULES_DIR . \MyArtJaub\Webtrees\Constants::MODULE_MAJ_CERTIF_NAME . '/js/activatecolorbox.js"></script>' :
+    		    ''
+    		);
+    		// END PERSO
 	}
 
 	/**
@@ -163,6 +169,8 @@ class CloudsTheme extends AbstractTheme implements ThemeInterface {
 		return array(
 			'themes/clouds/jquery-ui-1.11.2/jquery-ui.css',
 			$this->assetUrl() . 'style.css',
+		    //PERSO Extra style
+		    $this->assetUrl() . 'style.extra.css',
 		);
 	}
 

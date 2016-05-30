@@ -14,27 +14,18 @@ return array (
     'Geographical Dispersion' 		=>	'Répartition Géographique',
     'Display the geographical dispersion of the root person’s Sosa ancestors.'
                                     =>	'Affiche la répartition géographique des ancêtres Sosa de l’individu de-cujus',
-    'GeoDispersion'					=>	'GéoRépartition',
-    'No map'						=>	'Pas de carte',
     'Sosa Geographical dispersion'	=>	'Répartition géographique des ancêtres Sosa',
     'General data'					=>	'Données générales',
     'Data by Generations'			=>	'Données par générations',
     'Generation %s'					=>	'Génération %s',
     'The required dispersion analysis does not exist.'
                                     =>	'L\'analyse de répartition géographique demandée n\'existe pas.',
-    'The Perso Sosa module must be installed and enabled to display this page.'
-                                    =>	'Le module Perso Sosa doit être installé et activé avant de pouvoir afficher cette page.',
-    'Choose tree: '					=>	'Choisir un arbre généalogique : ',
-    'No place or indication of place structure could be found in your data.'
-                                    =>	'Aucun lieu ou indication de la structure des lieux n\'a pu être trouvé dans vos données.',
     'According to the GEDCOM header, the places within your file follows the structure: '
                                     =>	'D\'après votre en-tête GEDCOM, la structure des lieux dans votre fichier est la suivante : ',
     'Here is an example of your place data: '
                                     =>	'Voici un exemple de lieu issu de vos données : ',
     'Your GEDCOM header does not contain any indication of place structure.'
                                     =>	'L\'en-tête de votre fichier GEDCOM ne contient aucune indication sur la structure de vos lieux.',
-    'Add...'						=>	'Ajouter...',
-    'Add a new entry'				=>	'Ajouter une entrée',
     'Level of analysis'				=>	'Subdivision d\'analyse',
     'Map parent level'				=>	'Subdivision supérieure',
     'Use flags'						=>	'Drapeaux ?',
@@ -42,12 +33,9 @@ return array (
 	'Top places number'				=>	'Nombre de lieux principaux',
     'Choose a geographical dispersion analysis:'
                                     =>	'Choisir une analyse de répartition géographique :',
-    'The Perso Sosa module is required for this module to run. Please activate it.'
-                                    =>	'Le module Perso Sosa est requis pour ce module. Veuillez l\'activer.',
     'Other places'					=>	'Autres lieux',
     'Places not found'				=>	'Lieux non trouvés',
     '%d individuals'				=>	'%d individus',
-    'The map could not be loaded.'	=>	'La carte n\'a pu être chargée.',
     'Unknown (%s)'					=>	'Inconnu (%s)',
     'No data is available for the general analysis.'
                                     =>	'Aucune donnée n\'est disponible pour l\'analyse générale.',
@@ -64,12 +52,47 @@ return array (
                                     =>	'<strong><em>Lieu</em> [aa - bb %%]</strong> : le premier nombre indique le nombre total d\'ancêtres nés en ce lieu, le pourcentage compare ce compte au nombre total de lieux trouvés.',
     'Only the %d more frequent places for each generation are displayed.'
                                     =>	'Seuls les %d lieux les plus fréquents de chaque génération sont affichés.',
-    'The Geodispersion analysis entry could not be deleted.'
-                                    =>	'L\'analyse de répartition géographique n\'a pas pu être supprimée.',
-    'The Geodispersion analysis entry has been successfully deleted.'
-                                    =>	'L\'analyse de répartition géographique a été supprimée.',
-    'An error occured while adding new element.'
-                                    =>	'Une erreur s\'est produite lors de l\'ajout d\'un élément',
+    'Displays the results on a map.'=>  'Affiche les résultats sur une carte',
+    'Edit the geographical dispersion analysis'
+                                    =>  'Modifier l\'analyse de répartition géographique',
+    'Add a geographical dispersion analysis'
+                                    =>  'Ajouter une analyse de répartition géographique',
+    'For instance, if the map is intended to represent a country by county analysis, then the map parent level would be “Country”, and the analysis level would be “County”.'
+                                    =>  'Par exemple, si la carte représente une analyse d\'un pays par départements, le niveau de carte parent serait “Pays”, et le niveau d\'analyse serait “Département”.',
+    'Map outline to be used for the result display.'
+                                    =>  'Fond de carte à utiliser pour l\'affichage des résultats',
+    'An error occured while adding the geographical dispersion analysis “%s”'
+                                    =>  'Une erreur s\'est produite lors de la création de l\'analyse de répartition géographique “%s”',
+    'An error occured while editing this analysis:'
+                                    =>  'Une erreur s\'est produite lors de la mise à jour de l\'analyse :',
+    'An error occured while deleting this analysis:'
+                                    =>  'Une erreur s\'est produite lors de la suppression de l\'analyse :',
+    'An error occured while updating the geographical dispersion analysis “%s”'
+                                    => 'Une erreur s\'est produite lors de la mise à jour de l\'analyse de répartition géographique “%s” :',
+    'The geographical dispersion analysis “%s” has been successfully updated'
+                                    =>  'L\'analyse de répartition géographique “%s” a été mise à jour avec succès',
+    'The geographical dispersion analysis “%s” has been successfully added.'
+                                    =>  'L\'analyse de répartition géographique “%s” a été ajoutée avec succès',
+    'Change tree'                   =>  'Changer d\'arbre généalogique',
+    'Subdivision level of the parent subdivision(s) represented by the map.'
+                                    =>  'Niveau de la (des) subdivision(s) parente(s) représentées par la carte',
+    'Display the place\'s flag, instead of or in addition to the place name.'
+                                    =>  'Affiche le drapeau du lieu, au lieu ou en plus de son nom',
+    'Set the number of top places to display in the generation breakdown view.'
+                                    =>  'Définit le nombre de lieux principaux à afficher dans l\'analyse par générations.',
+    'Description to be given to the geographical dispersion analysis. It will be used as the page title for it.'
+                                    =>  'Description à donner à l\'analyse de répartition géographique. Elle sera utilisée comme titre de la page de résultats.',
+    'Analysis level'                =>  'Subdivision d\'analyse',
+    'Subdivision level used for the analysis.'
+                                    =>  'Niveau de la subdivision d\'analyse à utiliser',
+    'Display options'               =>  'Options d\'affichage',
+    'Use map'                       =>  'Utiliser une carte',
+    'Table'                         =>  'Tableau',
+    'There is no geographical dispersion analysis to display.'
+                                    =>  'Il n\'y a aucune analyse de répartition géographique à afficher.'
+    
+    
+    
 
 
 );

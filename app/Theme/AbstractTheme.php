@@ -1954,7 +1954,11 @@ abstract class AbstractTheme {
 	 * @return string
 	 */
 	protected function secondaryMenuContainer(array $menus) {
-		return '<ul class="nav nav-pills secondary-menu">' . $this->secondaryMenuContent($menus) . '</ul>';
+		return '<ul class="nav nav-pills secondary-menu">' . 
+		  //PERSO Add extra header
+		  implode('', array_map(function($item) { return !empty($item) ? '<li> ' . $item . ' </li>' : ''; }, \MyArtJaub\Webtrees\Hook\HookProvider::get('hPrintHeader')->execute())) .
+		  //END PERSO
+		  $this->secondaryMenuContent($menus) . '</ul>';
 	}
 
 	/**

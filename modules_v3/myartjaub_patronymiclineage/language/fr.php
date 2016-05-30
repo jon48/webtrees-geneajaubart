@@ -15,6 +15,7 @@ return array (
 		'Display lineages of people holding the same surname.'
 										=>	'Affiche les lignées des individus portant le même nom de famille.',
 		'Individuals in %s lineages'	=>	'Individus des lignées %s',
+        'All lineages'                  =>  'Toutes les lignées',
 		'Go to the list of individuals with surname %s'
 										=>	'Voir la liste des individus portant le nom %s',
 		'No individuals with surname %s has been found. Please try another name.'
@@ -22,5 +23,6 @@ return array (
 		'%s lineages found'				=>	'%s lignées trouvées',
 		'Go to %s lineages'				=>	'Voir les lignées %s',
 		'Informations for individual %s'=>	'Informations sur l\'individu %s',
+        'Unknown surname'               =>  'Patronyme inconnu'
 		
 );

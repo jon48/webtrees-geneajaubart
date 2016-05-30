@@ -39,26 +39,16 @@ return array (
     'Color'                         =>  'Couleur',
     'Font color for the watermark. By default, <span style="color:#4d6df3;">the color #4D6DF3</span> is used.'
                                     =>	'Couleur de la police du filigrane. Par défault, <span style="color:#4d6df3;">la couleur #4D6DF3</span> est utilisée.',
-    'This parameter must be entered with the format <strong>RR,GG,BB</strong> with <strong>RR</strong>, <strong>GG</strong> and <strong>BB</strong> the respective <span style="color:#ff0000;">red</span>, <span style="color:#00ff00;">green</span> and <span style="color:#0000ff;">blue</span> components as decimal integers (between 0 and 255).'
-                                    =>	'Ce paramètre est de la forme <strong>RR,VV,BB</strong> avec <strong>RR</strong>, <strong>VV</strong> et <strong>BB</strong> les composantes respectivement <span style="color:#ff0000;">rouge</span>, <span style="color:#00ff00;">verte</span> et <span style="color:#0000ff;">bleu</span> sous leur forme décimale (comprises entre 0 et 255).',
-    'Watermark font size'	      =>	'Taille de police du filigrane',
+    'Watermark font size'	        =>	'Taille de police du filigrane',
+    'Maximum font size'	            =>	'Taille de police maximale',
     'This image is protected under copyright law.'
                                     =>	'Cette image est protégée par les lois sur le copyright.',
-    'The certificate file was not found in this family tree'
-                                    =>	'L\'acte n\'a pu être trouvé dans cet arbre.',
-    'Missing or private certificate object.'
-                                    =>	'L\'objet acte n\'existe pas ou est privé.',
-    'The certificate file does not exist.'
-                                    =>	'Le fichier de l\'acte n\'existe pas',
-    'This certificate file is broken and cannot be watermarked.'
-                                    =>	'Cet acte semble être corrompu et le filigrane n\'a pas pu être ajouté',
-    'Individuals linked to this certificate'
-                                    =>	'Individus liés à cet acte',
-    'Families linked to this certificate'
-                                    =>	'Familles liés à cet acte',
     'Path to a certificate linked to a source reference.'
                                     =>	'Chemin vers un acte lié à la source.',
-    'The color "%s" is not valid.'    =>  'La couleur "%s" n\'est pas valide.'
+    'Missing or private media object.'
+                                    =>  'Objet multimédia absent ou privé.',
+    'The media object does not exist.'
+                                    =>  'L\'object multimédia n\'existe pas.'
 
 
 );

@@ -167,6 +167,7 @@ class ColorsTheme extends CloudsTheme implements ThemeInterface {
 			'themes/colors/jquery-ui-1.11.2/jquery-ui.css',
 			$this->assetUrl() . 'style.css',
 			$this->assetUrl() . 'palette/' . $this->palette . '.css',
+		    $this->assetUrl() . 'style.extra.css',
 		);
 	}
 

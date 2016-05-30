@@ -3,6 +3,7 @@
 .idea/
 apidocs/
 vendor/twbs/
+vendor/jon48/
 
 # /
 /.buildpath
@@ -24,10 +25,7 @@ vendor/twbs/
 /data/certificates/*
 
 # /modules_v3/
-/modules_v3/perso_translationtool
-
-# /themes/rural/css-1.5.1/images/
-/themes/rural/css-1.5.1/images/old
+/modules_v3/myartjaub_translationtool
 
 # Build files
 /build
@@ -39,3 +37,8 @@ vendor/twbs/
 /language/.gitattributes
 /language/.gitignore
 /language/updateLanguages.bat
+
+# Utilities configuration files
+/phpunit.xml
+/phpdoc.xml
+/pdepend.xml

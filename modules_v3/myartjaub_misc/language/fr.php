@@ -23,7 +23,7 @@ return array (
                                     =>	'Activer cette option pour inclure du code HTML additional dans l\'en-tête.',
     'Hide additional header'		=>	'Masquer l\'en-tête additionnel',
     'Select the access level until which the additional header should be displayed. The <em>Hide from everyone</em> should be used to show the header to everybody.'
-                                    =>	'Sélectionner le niveau d\'accès jusqu\'auquel l\'en-tête additionnel doit être affiché. L\'option <em>Masquer à tout le monde</em> devrait être utilisée pour cacher l\'en-tête à tout le monde.',
+                                    =>	'Sélectionner le niveau d\'accès jusqu\'auquel l\'en-tête additionnel doit être affiché. L\'option <em>Masquer à tout le monde</em> devrait être utilisée pour montrer l\'en-tête à tout le monde.',
     'Additional HTML in header'		=>	'Code HTML additionnel pour l\'en-tête',
     'If the option has been enabled, the saved HTML will be inserted in the header.'
                                     =>	'Si l\'option est activée, le code HTML sauvegardée sera inséré dans l\'en-tête.',
@@ -31,6 +31,7 @@ return array (
                                     =>	'En mode édition, les caractères HTML peuvent avoir été modifiés par leurs équivalents HTML (par exemple &amp;gt; pour &gt;), il est cependant possible d\'insérer directement des caractères HTML dans la zone de texte, ils seront convertis en leur equivalents.',
     
     // Extra footer
+    'Footer'                        =>  'Pied de page',
     'Display French <em>CNIL</em> disclaimer'
                                     =>	'Afficher le message d\'information CNIL',
     '<em>CNIL</em> reference'		=>	'Numéro d\'autorisation CNIL',
@@ -48,7 +49,7 @@ return array (
                                     =>	'Activer cette option pour inclure du code HTML additional dans le pied de page.',
     'Hide additional footer'		=>	'Masquer le pied de page additionnel',
     'Select the access level until which the additional footer should be displayed. The <em>Hide from everyone</em> should be used to show the footer to everybody.'
-                                    =>	'Sélectionner le niveau d\'accès jusqu\'auquel le pied de page additionnel doit être affiché. L\'option <em>Masquer à tout le monde</em> devrait être utilisée pour cacher pied de page à tout le monde.',
+                                    =>	'Sélectionner le niveau d\'accès jusqu\'auquel le pied de page additionnel doit être affiché. L\'option <em>Masquer à tout le monde</em> devrait être utilisée pour montrer le pied de page à tout le monde.',
     'Additional HTML in footer'		=>	'Code HTML additionnel pour le pied de page',
     'If the option has been enabled, the saved HTML will be inserted in the footer, before the logo.'
                                     => 'Si l\'option est activée, le code HTML sauvegardée sera inséré dans le pied de page, au-dessus du logo.',

@@ -108,7 +108,7 @@ class RuralTheme extends \Fisharebest\Webtrees\Theme\AbstractTheme implements
 		});
 		</script>'.
 		//PERSO Add Java script for Certificate Module
-		(Module::getModuleByName(MyArtJaub\Webtrees\Constants::MODULE_MAJ_CERTIF_NAME) ?
+		(\Fisharebest\Webtrees\Module::getModuleByName(MyArtJaub\Webtrees\Constants::MODULE_MAJ_CERTIF_NAME) ?
 		    '<script src="' . WT_STATIC_URL . WT_MODULES_DIR . MyArtJaub\Webtrees\Constants::MODULE_MAJ_CERTIF_NAME . '/js/activatecolorbox.js"></script>' :
 		    ''
 		)
@@ -202,9 +202,7 @@ class RuralTheme extends \Fisharebest\Webtrees\Theme\AbstractTheme implements
 				'</div></div>'.
 				'<div class="header-row"><div id="header-middle">'.
 					'<ul>' . implode(' | ', array_map(function (Menu $menu) { return $menu->getMenuAsList(); }, $login_menu)) . '</ul>'.
-					//$this->secondaryMenuContainer($login_menu).
 					$this->formatTreeTitle() .
-					//'<br>' . implode('', HookProvider::get('hPrintHeader')->execute()).
 				'</div></div>'.
 				'<div class="header-row"><div id="header-bottom">'.
 					$this->formQuickSearch().

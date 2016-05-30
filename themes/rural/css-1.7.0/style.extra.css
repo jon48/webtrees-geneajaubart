@@ -2,7 +2,7 @@
  * Extra Style for Rural Theme
  *
  * webtrees-MyArtJaub
- * Copyright (C) 2015 Jonathan Jaubart
+ * Copyright (C) 2009-2016 Jonathan Jaubart
  * 
  * Based on webtrees: online genealogy
  * Copyright (C) 2015 webtrees development team
@@ -73,7 +73,7 @@ html[dir='rtl'] .certificate-list th:last-child, html[dir='rtl'] .sosa-indi-list
 #perso-header {margin: 0 10px 0 0;}
 html[dir='rtl'] #perso-header {margin: 0 0 0 10px;}
 
-#maj-header-extender {margin-top: -40px;}
+#maj-header-extender {margin-top: -40px;color: #fff;}
 
 /* Individual header extender hooks */
 #indi_perso_header{color: #62584D;font-size: 1.1em;margin-top: 5px;}

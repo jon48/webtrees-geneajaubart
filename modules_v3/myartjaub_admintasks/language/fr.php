@@ -14,8 +14,6 @@ return array (
     'Administration Tasks'	         =>	'Tâches d\'administration',
     'Manage and run nearly-scheduled administration tasks.'
                                     =>	'Gère et exécute des tâches d\'administration quasi-planifiées.',
-    'The Administration Tasks module must be installed and enabled to display this page.'
-                                    =>	'Le module Tâches d\'administration doit être installé et activé avant de pouvoir afficher cette page.',
     'The administration tasks are meant to be run at a regular interval - or as regularly as possible.'
                                     =>	'Les tâches d\'administration sont destinées à être exécutées à intervalles réguliers, ou aussi réguliers que possible.',
     'It is sometimes necessary to force the execution of a task.'
@@ -34,14 +32,11 @@ return array (
     'Is running?'					=>	'En cours ?',
     'Run task'						=>	'Exécuter la tâche',
     'Disabled'						=>	'Désactivé',
-    'Failure'						=>	'Échec',
     'Unlimited'						=>	'Permanent',
     'Running'						=>	'En cours...',
     'Not running'					=>	'Arrêté',
     'Run'							=>	'Exécuter',
     'Done'							=>	'Terminé',
-    '%s Settings'					=>	'Configuration : %s',
-    'no_token_defined'				=>	'aucun_jeton_défini',
     'Healthcheck Email'				=>	'État du système',
     'Health Check Report'			=>	'État du système',
     'Edit the administrative task'  =>  'Éditer la tâche administrative',
@@ -61,6 +56,12 @@ return array (
     'Last occurrence'				=>	'Dernière occurrence',
     'No errors'						=>	'Aucune erreur',
     '%a d %h h %i m'                =>  '%a j %h h %i m',
+    'minutes'                       =>  'minutes',
+    'Number of occurrences'         =>  'Nombre d\'exécutions',
+    'Options for “%s”'              =>  'Options pour “%s”',
+    'Site'                          =>  'Site',
+    'time(s)'                       =>  'fois',
+    'Yes'                           =>  'Oui',
     'Frequency at which the task should be run (in minutes).'
                                     =>  'Fréquence à laquelle la tâche doit s\'exécuter (en minutes).',
     'The actual run of the task may not be fired exactly at the frequency defined, but should be run as close as possible to it.'
@@ -68,5 +69,15 @@ return array (
     'Run a limited number of times' =>  'Exécuter un nombre déterminé de fois',
     'Defines whether the task should be run only a limited number of times.'
                                     =>  'Détermine si la tâche doit s\'exécuter un nombre déterminé de fois.',
+    'Defines the number of times the task will run.'
+                                    =>  'Détermine le nombre de fois la tâche doit s\'exécuter.',
+    'The administrative task “%s” has been successfully updated'
+                                    =>  'La  tâche d\'administration “%s” a été mise à jour avec succès',
+    'An error occured while editing this task:'
+                                    =>  'Une erreur s\'est produite lors de l\'édition de la tâche',
+    'An error occured while updating the administrative task “%s”'
+                                    =>  'Une erreur s\'est produite lors de la mise à jour de la tâche “%s”',
+    'An error occured while updating the specific settings of administrative task “%s”'
+                                    =>  'Une erreur s\'est produite lors de la mise à jour des paramètres de la tâche “%s”',
     
 );
