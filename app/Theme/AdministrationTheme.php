@@ -44,7 +44,7 @@ class AdministrationTheme extends AbstractTheme implements ThemeInterface {
 	 * @return string A relative path, such as "themes/foo/"
 	 */
 	public function assetUrl() {
-		return 'themes/_administration/css-1.7.4/';
+		return 'themes/_administration/css-1.7.5/';
 	}
 
 	/**
@@ -94,7 +94,7 @@ class AdministrationTheme extends AbstractTheme implements ThemeInterface {
 		return new Menu(/* I18N: Menu entry*/ I18N::translate('Website'), '#', '', array(), array(
 			new Menu(/* I18N: Menu entry */ I18N::translate('Website preferences'), 'admin_site_config.php?action=site'),
 			new Menu(/* I18N: Menu entry */ I18N::translate('Sending email'), 'admin_site_config.php?action=email'),
-			new Menu(/* I18N: Menu entry */ I18N::translate('Login and registration'), 'admin_site_config.php?action=login'),
+			new Menu(/* I18N: Menu entry */ I18N::translate('Sign-in and registration'), 'admin_site_config.php?action=login'),
 			new Menu(/* I18N: Menu entry */ I18N::translate('Languages'), 'admin_site_config.php?action=languages'),
 			new Menu(/* I18N: Menu entry */ I18N::translate('Tracking and analytics'), 'admin_site_config.php?action=tracking'),
 			new Menu(/* I18N: Menu entry */ I18N::translate('Website logs'), 'admin_site_logs.php'),
@@ -161,7 +161,7 @@ class AdministrationTheme extends AbstractTheme implements ThemeInterface {
 	protected function menuAdminUsers() {
 		return new Menu(/* I18N: Menu entry */ I18N::translate('Users'), '#', '', array(), array(
 			new Menu(/* I18N: Menu entry */ I18N::translate('User administration'), 'admin_users.php'),
-			new Menu(/* I18N: Menu entry */ I18N::translate('Add a new user'), 'admin_users.php?action=edit'),
+			new Menu(/* I18N: Menu entry */ I18N::translate('Add a user'), 'admin_users.php?action=edit'),
 			new Menu(/* I18N: Menu entry */ I18N::translate('Send broadcast messages'), 'admin_users_bulk.php'),
 			new Menu(/* I18N: Menu entry */ I18N::translate('Delete inactive users'), 'admin_users.php?action=cleanup'),
 			new Menu(/* I18N: Menu entry */ I18N::translate('Set the default blocks for new users'), 'index_edit.php?user_id=-1'),
@@ -192,6 +192,7 @@ class AdministrationTheme extends AbstractTheme implements ThemeInterface {
 			new Menu(/* I18N: Menu entry */ I18N::translate('Tabs'), 'admin_module_tabs.php'),
 			new Menu(/* I18N: Menu entry */ I18N::translate('Blocks'), 'admin_module_blocks.php'),
 			new Menu(/* I18N: Menu entry */ I18N::translate('Sidebars'), 'admin_module_sidebar.php'),
+			new Menu(/* I18N: Menu entry */ I18N::translate('Charts'), 'admin_module_charts.php'),
 			new Menu(/* I18N: Menu entry */ I18N::translate('Reports'), 'admin_module_reports.php'),
 		));
 	}

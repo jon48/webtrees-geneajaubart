@@ -23,6 +23,7 @@ namespace Fisharebest\Webtrees;
 global $WT_TREE;
 
 use Fisharebest\Webtrees\Controller\PageController;
+use Fisharebest\Webtrees\Functions\Functions;
 
 define('WT_SCRIPT_NAME', 'admin_trees_manage.php');
 require './includes/session.php';
@@ -96,6 +97,8 @@ case 'replace_upload':
 		if (isset($_FILES['tree_name'])) {
 			if ($_FILES['tree_name']['error'] == 0 && is_readable($_FILES['tree_name']['tmp_name'])) {
 				$tree->importGedcomFile($_FILES['tree_name']['tmp_name'], $_FILES['tree_name']['name']);
+			} else {
+				FlashMessages::addMessage(Functions::fileUploadErrorText($_FILES['tree_name']['error']), 'danger');
 			}
 		} else {
 			FlashMessages::addMessage(I18N::translate('No GEDCOM file was received.'), 'danger');
@@ -264,7 +267,7 @@ case 'importform':
 
 		<fieldset class="form-group">
 			<legend class="control-label col-sm-3">
-				<?php echo I18N::translate('Import options'); ?>
+				<?php echo I18N::translate('Import preferences'); ?>
 			</legend>
 			<div class="col-sm-9">
 				<label>
@@ -303,7 +306,7 @@ case 'importform':
 		<div class="form-group">
 			<div class="col-sm-offset-3 col-sm-9">
 				<button type="submit" class="btn btn-primary">
-					<?php echo /* I18N: A button label */ I18N::translate('continue'); ?>
+					<?php echo /* I18N: A button label. */ I18N::translate('continue'); ?>
 				</button>
 			</div>
 		</div>
@@ -617,12 +620,12 @@ if (count($all_trees) >= $multiple_tree_threshold) {
 		<div class="panel-heading">
 			<h2 class="panel-title">
 				<i class="fa fa-fw fa-plus"></i>
-				<a data-toggle="collapse" data-parent="#accordion" href="#create-a-new-family-tree">
-					<?php echo I18N::translate('Create a new family tree'); ?>
+				<a data-toggle="collapse" data-parent="#accordion" href="#create-a-family-tree">
+					<?php echo I18N::translate('Create a family tree'); ?>
 				</a>
 			</h2>
 		</div>
-		<div id="create-a-new-family-tree" class="panel-collapse collapse<?php echo Tree::getAll() ? '' : ' in'; ?>">
+		<div id="create-a-family-tree" class="panel-collapse collapse<?php echo Tree::getAll() ? '' : ' in'; ?>">
 			<div class="panel-body">
 				<form role="form" class="form-horizontal" method="post">
 					<?php echo Filter::getCsrf(); ?>
@@ -657,7 +660,7 @@ if (count($all_trees) >= $multiple_tree_threshold) {
 									id="tree_name"
 									maxlength="31"
 									name="tree_name"
-									pattern="[^&lt;&gt;&amp;&quot;#^$.*?{}()\[\]/\\]*"
+									pattern="[^&lt;&gt;&amp;&quot;#^$*?{}()\[\]/\\]*"
 									required
 									type="text"
 									value="<?php echo $default_tree_name; ?>"
@@ -672,7 +675,7 @@ if (count($all_trees) >= $multiple_tree_threshold) {
 						<div class="col-sm-offset-2 col-sm-10">
 							<button type="submit" class="btn btn-primary">
 								<i class="fa fa-check"></i>
-								<?php echo /* I18N: Button label */ I18N::translate('create'); ?>
+								<?php echo /* I18N: A button label. */ I18N::translate('create'); ?>
 							</button>
 							<p class="small text-muted">
 								<?php echo I18N::translate('After creating the family tree, you will be able to import data from a GEDCOM file.'); ?>
@@ -719,7 +722,7 @@ if (count($all_trees) >= $multiple_tree_threshold) {
 				</p>
 				<p>
 					<a href="admin_pgv_to_wt.php">
-						<?php echo I18N::translate('Click here for PhpGedView to webtrees transfer wizard'); ?>
+						<?php echo I18N::translate('PhpGedView to webtrees transfer wizard'); ?>
 					</a>
 				</p>
 			</div>
@@ -748,7 +751,7 @@ if (count($all_trees) >= $multiple_tree_threshold) {
 					<input type="hidden" name="action" value="synchronize">
 					<button type="submit" class="btn btn-danger">
 						<i class="fa fa-refresh"></i>
-						<?php echo /* I18N: Button label */ I18N::translate('continue'); ?>
+						<?php echo /* I18N: A button label. */ I18N::translate('continue'); ?>
 					</button>
 					<p class="small text-muted">
 						<?php echo I18N::translate('Caution! This may take a long time. Be patient.'); ?>

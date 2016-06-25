@@ -190,10 +190,10 @@ $medialist = QueryMedia::mediaList(
 				<td class="descriptionbox wrap"></td>
 				<td class="optionbox wrap">
 					<button type="submit" name="action" value="submit">
-						<?php echo I18N::translate('Search'); ?>
+						<?php echo /* I18N: A button label. */ I18N::translate('search'); ?>
 					</button>
 					<button type="submit" name="action" value="reset">
-						<?php echo I18N::translate('reset'); ?>
+						<?php echo /* I18N: A button label. */ I18N::translate('reset'); ?>
 					</button>
 				</td>
 			</tr>
@@ -239,13 +239,13 @@ if ($action === 'submit') {
 			echo '<', $tsection, '><tr><td colspan="2">';
 			echo '<table class="list_table_controls"><tr><td>';
 			if ($page > 1) {
-				echo '<a href="', $url, '&amp;page=1" class="icon-', $icons['first'] ,'"></a>';
-				echo '<a href="', $url, '&amp;page=', $page - 1 ,'" class="icon-', $icons['previous'] , '"></a>';
+				echo '<a href="', $url, '&amp;page=1" class="icon-', $icons['first'], '"></a>';
+				echo '<a href="', $url, '&amp;page=', $page - 1, '" class="icon-', $icons['previous'], '"></a>';
 			}
 			echo '</td><td>', I18N::translate('Page %s of %s', $page, $pages), '</td><td>';
 			if ($page < $pages) {
-				echo '<a href="', $url, '&amp;page=', $page + 1 ,'" class="icon-', $icons['next'] , '"></a>';
-				echo '<a href="', $url, '&amp;page=', $pages ,'" class="icon-', $icons['last'] ,'"></a>';
+				echo '<a href="', $url, '&amp;page=', $page + 1, '" class="icon-', $icons['next'], '"></a>';
+				echo '<a href="', $url, '&amp;page=', $pages, '" class="icon-', $icons['last'], '"></a>';
 			}
 			echo '</td></tr></table>';
 			echo '</td></tr></', $tsection, '>';
@@ -307,13 +307,13 @@ if ($action === 'submit') {
 			echo FunctionsPrint::printFactNotes($mediaobject->getGedcom(), 1);
 			echo '</div>';
 			foreach ($mediaobject->linkedIndividuals('OBJE') as $individual) {
-				echo '<a href="' . $individual->getHtmlUrl() . '">' . I18N::translate('View individual') . ' — ' . $individual->getFullName() . '</a><br>';
+				echo '<a href="' . $individual->getHtmlUrl() . '">' . I18N::translate('View this individual') . ' — ' . $individual->getFullName() . '</a><br>';
 			}
 			foreach ($mediaobject->linkedFamilies('OBJE') as $family) {
-				echo '<a href="' . $family->getHtmlUrl() . '">' . I18N::translate('View family') . ' — ' . $family->getFullName() . '</a><br>';
+				echo '<a href="' . $family->getHtmlUrl() . '">' . I18N::translate('View this family') . ' — ' . $family->getFullName() . '</a><br>';
 			}
 			foreach ($mediaobject->linkedSources('OBJE') as $source) {
-				echo '<a href="' . $source->getHtmlUrl() . '">' . I18N::translate('View source') . ' — ' . $source->getFullName() . '</a><br>';
+				echo '<a href="' . $source->getHtmlUrl() . '">' . I18N::translate('View this source') . ' — ' . $source->getFullName() . '</a><br>';
 			}
 			echo '</td></tr></table>';
 			echo '</td>';

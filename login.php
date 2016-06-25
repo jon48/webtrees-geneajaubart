@@ -52,10 +52,18 @@ $username        = Filter::post('username');
 $password        = Filter::post('password');
 
 // These parameters may come from the URL which is emailed to users.
-if (!$action)        $action        = Filter::get('action');
-if (!$user_name)     $user_name     = Filter::get('user_name');
-if (!$user_hashcode) $user_hashcode = Filter::get('user_hashcode');
-if (!$url)           $url           = Filter::get('url');
+if (!$action) {
+	$action = Filter::get('action');
+}
+if (!$user_name) {
+	$user_name = Filter::get('user_name');
+}
+if (!$user_hashcode) {
+	$user_hashcode = Filter::get('user_hashcode');
+}
+if (!$url) {
+	$url = Filter::get('url');
+}
 
 $message = '';
 
@@ -64,7 +72,7 @@ case 'login':
 	try {
 		if (!$_COOKIE) {
 			Log::addAuthenticationLog('Login failed (no session cookies): ' . $username);
-			throw new \Exception(I18N::translate('You cannot login because your browser does not accept cookies.'));
+			throw new \Exception(I18N::translate('You cannot sign in because your browser does not accept cookies.'));
 		}
 
 		$user = User::findByIdentifier($username);
@@ -119,9 +127,11 @@ case 'login':
 			// Switch to a tree where we have a genealogy record (or keep to the current/default).
 			$tree = Database::prepare(
 				"SELECT gedcom_name FROM `##gedcom` JOIN `##user_gedcom_setting` USING (gedcom_id)" .
-				" WHERE setting_name = 'gedcomid' AND user_id = :user_id"
+				" WHERE setting_name = 'gedcomid' AND user_id = :user_id" .
+				" ORDER BY gedcom_id = :tree_id DESC"
 			)->execute(array(
 				'user_id' => Auth::user()->getUserId(),
+				'tree_id' => $WT_TREE->getTreeId(),
 			))->fetchOne();
 			$url .= '&ged=' . Filter::escapeUrl($tree);
 		}
@@ -137,7 +147,7 @@ case 'login':
 
 default:
 	$controller
-		->setPageTitle(I18N::translate('Login'))
+		->setPageTitle(I18N::translate('Sign in'))
 		->pageHeader()
 		->addInlineJavascript('
 			jQuery("#new_passwd_form").hide();
@@ -152,15 +162,17 @@ default:
 	echo '<div id="login-page">';
 	echo '<div id="login-text">';
 
+	echo '<p class="center"><strong>' . I18N::translate('Welcome to this genealogy website') . '</strong></p>';
+
 	switch (Site::getPreference('WELCOME_TEXT_AUTH_MODE')) {
 	case 1:
-		echo I18N::translate('<center><b>Welcome to this genealogy website</b></center><br>Access to this website is permitted to every visitor who has a user account.<br><br>If you have a user account, you can login on this page. If you don’t have a user account, you can apply for one by clicking on the appropriate link below.<br><br>After verifying your application, the website administrator will activate your account. You will receive an email when your application has been approved.');
+		echo '<p>' . I18N::translate('Anyone with a user account can access this website.') . ' ' . I18N::translate('You can apply for an account using the link below.') . '</p>';
 		break;
 	case 2:
-		echo I18N::translate('<center><b>Welcome to this genealogy website</b></center><br>Access to this website is permitted to <u>authorized</u> users only.<br><br>If you have a user account you can login on this page. If you don’t have a user account, you can apply for one by clicking on the appropriate link below.<br><br>After verifying your information, the administrator will either approve or decline your account application. You will receive an email message when your application has been approved.');
+		echo '<p>' . I18N::translate('You need to be an authorized user to access this website.') . ' ' . I18N::translate('You can apply for an account using the link below.') . '</p>';
 		break;
 	case 3:
-		echo I18N::translate('<center><b>Welcome to this genealogy website</b></center><br>Access to this website is permitted to <u>family members only</u>.<br><br>If you have a user account you can login on this page. If you don’t have a user account, you can apply for one by clicking on the appropriate link below.<br><br>After verifying the information you provide, the administrator will either approve or decline your request for an account. You will receive an email when your request is approved.');
+		echo '<p>' . I18N::translate('You need to be a family member to access this website.') . ' ' . I18N::translate('You can apply for an account using the link below.') . '</p>';
 		break;
 	case 4:
 		echo '<p style="white-space: pre-wrap;">', Site::getPreference('WELCOME_TEXT_AUTH_MODE_' . WT_LOCALE), '</p>';
@@ -186,7 +198,7 @@ default:
 			</label>
 		</div>
 		<div>
-			<input type="submit" value="', I18N::translate('Login'), '">
+			<input type="submit" value="', /* I18N: A button label. */ I18N::translate('sign in'), '">
 		</div>
 		';
 		// Emails are sent from a TREE, not from a SITE. Therefore if there is no
@@ -194,10 +206,10 @@ default:
 		if ($WT_TREE) {
 			echo '
 			<div>
-				<a href="#" id="passwd_click">', I18N::translate('Request new password'), '</a>
+				<a href="#" id="passwd_click">', I18N::translate('Forgot password?'), '</a>
 			</div>';
 			if (Site::getPreference('USE_REGISTRATION_MODULE')) {
-				echo '<div><a href="' . WT_LOGIN_URL . '?action=register">', I18N::translate('Request new user account'), '</a></div>';
+				echo '<div><a href="' . WT_LOGIN_URL . '?action=register">', I18N::translate('Request a new user account'), '</a></div>';
 			}
 		}
 	echo '</form>';
@@ -206,13 +218,13 @@ default:
 	echo '<div id="new_passwd">
 		<form id="new_passwd_form" name="new_passwd_form" action="' . WT_LOGIN_URL . '" method="post">
 		<input type="hidden" name="action" value="requestpw">
-		<h4>', I18N::translate('Lost password request'), '</h4>
+		<h4>', I18N::translate('Request a new password'), '</h4>
 		<div>
 			<label for="new_passwd_username">', I18N::translate('Username or email address'),
 				'<input type="text" id="new_passwd_username" name="new_passwd_username" value="">
 			</label>
 		</div>
-		<div><input type="submit" value="', /* I18N: button label */ I18N::translate('continue'), '"></div>
+		<div><input type="submit" value="', /* I18N: A button label. */ I18N::translate('continue'), '"></div>
 		</form>
 	</div>';
 	echo '</div>';
@@ -241,14 +253,14 @@ case 'requestpw':
 			$user,
 			I18N::translate('Lost password request'),
 			I18N::translate('Hello %s…', $user->getRealNameHtml()) . Mail::EOL . Mail::EOL .
-			I18N::translate('A new password has been requested for your user name.') . Mail::EOL . Mail::EOL .
+			I18N::translate('A new password has been requested for your username.') . Mail::EOL . Mail::EOL .
 			I18N::translate('Username') . ": " . Filter::escapeHtml($user->getUserName()) . Mail::EOL .
 			I18N::translate('Password') . ": " . $user_new_pw . Mail::EOL . Mail::EOL .
-			I18N::translate('After you have logged in, select the “My account” link under the “My page” menu and fill in the password fields to change your password.') . Mail::EOL . Mail::EOL .
+			I18N::translate('After you have signed in, select the “My account” link under the “My page” menu and fill in the password fields to change your password.') . Mail::EOL . Mail::EOL .
 			'<a href="' . WT_BASE_URL . 'login.php?ged=' . $WT_TREE->getNameUrl() . '">' . WT_BASE_URL . 'login.php?ged=' . $WT_TREE->getNameUrl() . '</a>'
 		);
 
-		FlashMessages::addMessage(I18N::translate('A new password has been created and emailed to %s. You can change this password after you login.', Filter::escapeHtml($user_name)), 'success');
+		FlashMessages::addMessage(I18N::translate('A new password has been created and emailed to %s. You can change this password after you sign in.', Filter::escapeHtml($user_name)), 'success');
 	} else {
 		FlashMessages::addMessage(I18N::translate('There is no account with the username or email “%s”.', Filter::escapeHtml($user_name)), 'danger');
 	}
@@ -264,14 +276,14 @@ case 'register':
 		return;
 	}
 
-	$controller->setPageTitle(I18N::translate('Request new user account'));
+	$controller->setPageTitle(I18N::translate('Request a new user account'));
 
 	// The form parameters are mandatory, and the validation errors are shown in the client.
 	if (Session::get('good_to_send') && $user_name && $user_password01 && $user_password01 == $user_password02 && $user_realname && $user_email && $user_comments) {
 
 		// These validation errors cannot be shown in the client.
 		if (User::findByUserName($user_name)) {
-			FlashMessages::addMessage(I18N::translate('Duplicate user name. A user with that user name already exists. Please choose another user name.'));
+			FlashMessages::addMessage(I18N::translate('Duplicate username. A user with that username already exists. Please choose another username.'));
 		} elseif (User::findByEmail($user_email)) {
 			FlashMessages::addMessage(I18N::translate('Duplicate email address. A user with that email already exists.'));
 		} elseif (preg_match('/(?!' . preg_quote(WT_BASE_URL, '/') . ')(((?:ftp|http|https):\/\/)[a-zA-Z0-9.-]+)/', $user_comments, $match)) {
@@ -311,8 +323,8 @@ case 'register':
 				I18N::translate('Real name') . ' ' . $user->getRealNameHtml() . Mail::EOL .
 				I18N::translate('Email address') . ' ' . Filter::escapeHtml($user->getEmail()) . Mail::EOL .
 				I18N::translate('Comments') . ' ' . Filter::escapeHtml($user_comments) . Mail::EOL . Mail::EOL .
-				I18N::translate('The user has been sent an e-mail with the information necessary to confirm the access request.') . Mail::EOL . Mail::EOL .
-				I18N::translate('You will be informed by e-mail when this prospective user has confirmed the request. You can then complete the process by activating the user name. The new user will not be able to login until you activate the account.');
+				I18N::translate('The user has been sent an email with the information necessary to confirm the access request.') . Mail::EOL . Mail::EOL .
+				I18N::translate('You will be informed by email when this prospective user has confirmed the request. You can then complete the process by activating the username. The new user will not be able to sign in until you activate the account.');
 
 			$mail1_subject = /* I18N: %s is a server name/URL */ I18N::translate('New registration at %s', WT_BASE_URL . ' ' . $WT_TREE->getTitle());
 			I18N::init(WT_LOCALE);
@@ -321,16 +333,17 @@ case 'register':
 
 			// Generate an email in the user’s language
 			$mail2_body =
-				I18N::translate('Hello %s…', $user->getRealNameHtml()) . Mail::EOL . Mail::EOL .
+				I18N::translate('Hello %s…', $user->getRealNameHtml()) .
+				Mail::EOL . Mail::EOL .
 				/* I18N: %1$s is the site URL and %2$s is an email address */
-				I18N::translate('You (or someone claiming to be you) has requested an account at %1$s using the email address %2$s.', WT_BASE_URL . ' ' . $WT_TREE->getTitleHtml(), $user->getEmail()) . ' ' .
-				I18N::translate('Information about the request is shown under the link below.') . Mail::EOL .
-				I18N::translate('Please click on the following link and fill in the requested data to confirm your request and email address.') . Mail::EOL . Mail::EOL .
+				I18N::translate('You (or someone claiming to be you) has requested an account at %1$s using the email address %2$s.', WT_BASE_URL . ' ' . $WT_TREE->getTitleHtml(), $user->getEmail()) .
+				Mail::EOL . Mail::EOL .
+				I18N::translate('Follow this link to verify your email address.') .
+				Mail::EOL . Mail::EOL .
 				'<a href="' . WT_LOGIN_URL . '?user_name=' . Filter::escapeUrl($user->getUserName()) . '&amp;user_hashcode=' . $user->getPreference('reg_hashcode') . '&amp;action=userverify&amp;ged=' . $WT_TREE->getNameUrl() . '">' .
 				WT_LOGIN_URL . "?user_name=" . Filter::escapeHtml($user->getUserName()) . "&amp;user_hashcode=" . urlencode($user->getPreference('reg_hashcode')) . '&amp;action=userverify&amp;ged=' . $WT_TREE->getNameHtml() .
 				'</a>' . Mail::EOL . Mail::EOL .
 				I18N::translate('Username') . " - " . Filter::escapeHtml($user->getUserName()) . Mail::EOL .
-				I18N::translate('Verification code') . " - " . $user->getPreference('reg_hashcode') . Mail::EOL .
 				I18N::translate('Comments') . " - " . $user->getPreference('comment') . Mail::EOL .
 				I18N::translate('If you didn’t request an account, you can just delete this message.') . Mail::EOL;
 			$mail2_subject = /* I18N: %s is a server name/URL */ I18N::translate('Your registration at %s', WT_BASE_URL);
@@ -373,7 +386,7 @@ case 'register':
 			}
 
 			echo '<div class="confirm"><p>', I18N::translate('Hello %s…<br>Thank you for your registration.', $user->getRealNameHtml()), '</p>';
-			echo '<p>', I18N::translate('We will now send a confirmation email to the address <b>%s</b>. You must verify your account request by following instructions in the confirmation email. If you do not confirm your account request within seven days, your application will be rejected automatically. You will have to apply again.<br><br>After you have followed the instructions in the confirmation email, the administrator still has to approve your request before your account can be used.<br><br>To login to this website, you will need to know your user name and password.', $user->getEmail()), '</p>';
+			echo '<p>', I18N::translate('We will now send a confirmation email to the address <b>%s</b>. You must verify your account request by following instructions in the confirmation email. If you do not confirm your account request within seven days, your application will be rejected automatically. You will have to apply again.<br><br>After you have followed the instructions in the confirmation email, the administrator still has to approve your request before your account can be used.<br><br>To sign in to this website, you will need to know your username and password.', $user->getEmail()), '</p>';
 			echo '</div>';
 			echo '</div>';
 
@@ -423,7 +436,7 @@ case 'register':
 
 				<div>
 					<label for="username">
-						<?php echo I18N::translate('Desired user name'); ?>
+						<?php echo I18N::translate('Username'); ?>
 						<input type="text" id="username" name="user_name" required maxlength="32" value="<?php Filter::escapeHtml($user_name); ?>">
 					</label>
 					<p class="small text-muted">
@@ -433,7 +446,7 @@ case 'register':
 
 				<div>
 					<label for="user_password01">
-						<?php echo I18N::translate('Desired password'); ?>
+						<?php echo I18N::translate('Password'); ?>
 						<input required
 							type="password"
 							id="user_password01" name="user_password01"
@@ -599,7 +612,7 @@ case 'verify_hash':
 		Log::addAuthenticationLog('User ' . $user_name . ' verified their email address');
 
 		echo '<p>', I18N::translate('You have confirmed your request to become a registered user.'), '</p>';
-		echo '<p>', I18N::translate('The administrator has been informed. As soon as they give you permission to login, you can login with your user name and password.'), '</p>';
+		echo '<p>', I18N::translate('The administrator has been informed. As soon as they give you permission to sign in, you can sign in with your username and password.'), '</p>';
 	} else {
 		echo '<p class="warning">';
 		echo I18N::translate('Could not verify the information you entered. Please try again or contact the site administrator for more information.');

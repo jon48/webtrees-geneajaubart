@@ -23,14 +23,17 @@ use Fisharebest\Webtrees\Tree;
  * Class AbstractModule - common functions for blocks
  */
 abstract class AbstractModule {
-	/** @var string A user-friendly, localized name for this module */
-	private $title;
-
 	/** @var string The directory where the module is installed */
 	private $directory;
 
 	/** @var string[] A cached copy of the module settings */
 	private $settings;
+
+	/** @var string For custom modules - optional (recommended) version number */
+	const CUSTOM_VERSION = '';
+
+	/** @var string For custom modules - link for support, upgrades, etc. */
+	const CUSTOM_WEBSITE = '';
 
 	/**
 	 * Create a new module.
@@ -39,7 +42,6 @@ abstract class AbstractModule {
 	 */
 	public function __construct($directory) {
 		$this->directory = $directory;
-		$this->title     = $this->getTitle();
 	}
 
 	/**

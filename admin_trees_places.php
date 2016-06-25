@@ -27,7 +27,7 @@ use Fisharebest\Webtrees\Controller\PageController;
 define('WT_SCRIPT_NAME', 'admin_trees_places.php');
 require './includes/session.php';
 
-$search  = Filter::post('search');
+$search  = Filter::post('search', null, Filter::get('search'));
 $replace = Filter::post('replace');
 $confirm = Filter::post('confirm');
 
@@ -40,7 +40,7 @@ if ($search && $replace) {
 		" LEFT JOIN `##change` ON (i_id = xref AND i_file=gedcom_id AND status='pending')" .
 		" WHERE i_file = ?" .
 		" AND COALESCE(new_gedcom, i_gedcom) REGEXP CONCAT('\n2 PLAC ([^\n]*, )*', ?, '(\n|$)')"
-	)->execute(array($WT_TREE->getTreeId(), $search))->fetchAll();
+	)->execute(array($WT_TREE->getTreeId(), preg_quote($search)))->fetchAll();
 	foreach ($rows as $row) {
 		$record = Individual::getInstance($row->xref, $WT_TREE, $row->gedcom);
 		foreach ($record->getFacts() as $fact) {
@@ -61,7 +61,7 @@ if ($search && $replace) {
 		" LEFT JOIN `##change` ON (f_id = xref AND f_file=gedcom_id AND status='pending')" .
 		" WHERE f_file = ?" .
 		" AND COALESCE(new_gedcom, f_gedcom) REGEXP CONCAT('\n2 PLAC ([^\n]*, )*', ?, '(\n|$)')"
-	)->execute(array($WT_TREE->getTreeId(), $search))->fetchAll();
+	)->execute(array($WT_TREE->getTreeId(), preg_quote($search)))->fetchAll();
 	foreach ($rows as $row) {
 		$record = Family::getInstance($row->xref, $WT_TREE, $row->gedcom);
 		foreach ($record->getFacts() as $fact) {
@@ -104,8 +104,8 @@ $controller
 		<dt><label for="replace"><?php echo I18N::translate('Replace with'); ?></label></dt>
 		<dd><input name="replace" id="replace" type="text" size="30" value="<?php echo Filter::escapeHtml($replace); ?>" required></dd>
 	</dl>
-	<button type="submit" value="preview"><?php echo /* I18N: button label */ I18N::translate('preview'); ?></button>
-	<button type="submit" value="update" name="confirm"><?php echo /* I18N: button label */ I18N::translate('update'); ?></button>
+	<button type="submit" value="preview"><?php echo /* I18N: A button label. */ I18N::translate('preview'); ?></button>
+	<button type="submit" value="update" name="confirm"><?php echo /* I18N: A button label. */ I18N::translate('update'); ?></button>
 </form>
 
 <?php if ($search && $replace) { ?>

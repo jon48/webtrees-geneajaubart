@@ -56,7 +56,7 @@ class FunctionsImport {
 		$newrec = '';
 		foreach ($matches as $n => $match) {
 			list(, $level, $xref, $tag, $data) = $match;
-			$tag = strtoupper($tag); // Tags should always be upper case
+			$tag                               = strtoupper($tag); // Tags should always be upper case
 			switch ($tag) {
 				// Convert PhpGedView tags to WT
 			case '_PGVU':
@@ -188,7 +188,7 @@ class FunctionsImport {
 				// Preserve text from INT dates
 				if (strpos($data, '(') !== false) {
 					list($date, $text) = explode('(', $data, 2);
-					$text = ' (' . $text;
+					$text              = ' (' . $text;
 				} else {
 					$date = $data;
 					$text = '';
@@ -640,7 +640,7 @@ class FunctionsImport {
 			$gedrec = self::convertInlineMedia($tree, $gedrec);
 
 			$record = new Individual($xref, $gedrec, null, $tree);
-			if ($tree->getPreference('USE_RIN') && preg_match('/\n1 RIN (.+)/', $gedrec, $match)) {
+			if (preg_match('/\n1 RIN (.+)/', $gedrec, $match)) {
 				$rin = $match[1];
 			} else {
 				$rin = $xref;
@@ -1025,6 +1025,8 @@ class FunctionsImport {
 			$gedrec = str_replace("\n0 OBJE\n", '0 @' . $xref . "@ OBJE\n", $gedrec);
 			// Fix Legacy GEDCOMS
 			$gedrec = preg_replace('/\n1 FORM (.+)\n1 FILE (.+)\n1 TITL (.+)/', "\n1 FILE $2\n2 FORM $1\n2 TITL $3", $gedrec);
+			// Fix FTB GEDCOMS
+			$gedrec = preg_replace('/\n1 FORM (.+)\n1 TITL (.+)\n1 FILE (.+)/', "\n1 FILE $3\n2 FORM $1\n2 TITL $2", $gedrec);
 			// Create new record
 			$record = new Media($xref, $gedrec, null, $tree);
 			Database::prepare(

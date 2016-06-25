@@ -172,7 +172,7 @@ class FunctionsDb {
 			// SQL may have matched on private data or gedcom tags, so check again against privatized data.
 			$record = Individual::getInstance($row->xref, Tree::findById($row->gedcom_id), $row->gedcom);
 			// Ignore non-genealogy data
-			$gedrec = preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcom());
+			$gedrec = preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|RESN) .*/', '', $record->getGedcom());
 			// Ignore links and tags
 			$gedrec = preg_replace('/\n\d ' . WT_REGEX_TAG . '( @' . WT_REGEX_XREF . '@)?/', '', $gedrec);
 			// Re-apply the filtering
@@ -249,18 +249,18 @@ class FunctionsDb {
 	 */
 	public static function searchIndividualsPhonetic($soundex, $lastname, $firstname, $place, array $trees) {
 		switch ($soundex) {
-			case 'Russell':
-				$givn_sdx = Soundex::russell($firstname);
-				$surn_sdx = Soundex::russell($lastname);
-				$plac_sdx = Soundex::russell($place);
-				break;
-			case 'DaitchM':
-				$givn_sdx = Soundex::daitchMokotoff($firstname);
-				$surn_sdx = Soundex::daitchMokotoff($lastname);
-				$plac_sdx = Soundex::daitchMokotoff($place);
-				break;
-			default:
-				throw new \DomainException('soundex: ' . $soundex);
+		case 'Russell':
+			$givn_sdx = Soundex::russell($firstname);
+			$surn_sdx = Soundex::russell($lastname);
+			$plac_sdx = Soundex::russell($place);
+			break;
+		case 'DaitchM':
+			$givn_sdx = Soundex::daitchMokotoff($firstname);
+			$surn_sdx = Soundex::daitchMokotoff($lastname);
+			$plac_sdx = Soundex::daitchMokotoff($place);
+			break;
+		default:
+			throw new \DomainException('soundex: ' . $soundex);
 		}
 
 		// Nothing to search for? Return nothing.
@@ -292,12 +292,12 @@ class FunctionsDb {
 			foreach ($givn_sdx as $n => $sdx) {
 				$sql .= $n ? " OR " : "";
 				switch ($soundex) {
-					case 'Russell':
-						$sql .= "n_soundex_givn_std LIKE CONCAT('%', :given_name_" . $n . ", '%')";
-						break;
-					case 'DaitchM':
-						$sql .= "n_soundex_givn_dm LIKE CONCAT('%', :given_name_" . $n . ", '%')";
-						break;
+				case 'Russell':
+					$sql .= "n_soundex_givn_std LIKE CONCAT('%', :given_name_" . $n . ", '%')";
+					break;
+				case 'DaitchM':
+					$sql .= "n_soundex_givn_dm LIKE CONCAT('%', :given_name_" . $n . ", '%')";
+					break;
 				}
 				$args['given_name_' . $n] = $sdx;
 			}
@@ -310,12 +310,12 @@ class FunctionsDb {
 			foreach ($surn_sdx as $n => $sdx) {
 				$sql .= $n ? " OR " : "";
 				switch ($soundex) {
-					case 'Russell':
-						$sql .= "n_soundex_surn_std LIKE CONCAT('%', :surname_" . $n . ", '%')";
-						break;
-					case 'DaitchM':
-						$sql .= "n_soundex_surn_dm LIKE CONCAT('%', :surname_" . $n . ", '%')";
-						break;
+				case 'Russell':
+					$sql .= "n_soundex_surn_std LIKE CONCAT('%', :surname_" . $n . ", '%')";
+					break;
+				case 'DaitchM':
+					$sql .= "n_soundex_surn_dm LIKE CONCAT('%', :surname_" . $n . ", '%')";
+					break;
 				}
 				$args['surname_' . $n] = $sdx;
 			}
@@ -328,12 +328,12 @@ class FunctionsDb {
 			foreach ($plac_sdx as $n => $sdx) {
 				$sql .= $n ? " OR " : "";
 				switch ($soundex) {
-					case 'Russell':
-						$sql .= "p_std_soundex LIKE CONCAT('%', :place_" . $n . ", '%')";
-						break;
-					case 'DaitchM':
-						$sql .= "p_dm_soundex LIKE CONCAT('%', :place_" . $n . ", '%')";
-						break;
+				case 'Russell':
+					$sql .= "p_std_soundex LIKE CONCAT('%', :place_" . $n . ", '%')";
+					break;
+				case 'DaitchM':
+					$sql .= "p_dm_soundex LIKE CONCAT('%', :place_" . $n . ", '%')";
+					break;
 				}
 				$args['place_' . $n] = $sdx;
 			}
@@ -348,28 +348,6 @@ class FunctionsDb {
 		$list = array_filter($list, function (Individual $x) { return $x->canShowName(); });
 
 		return $list;
-	}
-
-	/**
-	 * get recent changes since the given julian day inclusive
-	 *
-	 * @param int $jd leave empty to include all
-	 * @param bool $allgeds
-	 *
-	 * @return string[] List of XREFs of records with changes
-	 */
-	public static function getRecentChanges($jd = 0, $allgeds = false) {
-		global $WT_TREE;
-
-		$sql  = "SELECT d_gid FROM `##dates` WHERE d_fact='CHAN' AND d_julianday1>=?";
-		$vars = array($jd);
-		if (!$allgeds) {
-			$sql .= " AND d_file=?";
-			$vars[] = $WT_TREE->getTreeId();
-		}
-		$sql .= " ORDER BY d_julianday1 DESC";
-
-		return Database::prepare($sql)->execute($vars)->fetchOneColumn();
 	}
 
 	/**
@@ -408,7 +386,7 @@ class FunctionsDb {
 			// SQL may have matched on private data or gedcom tags, so check again against privatized data.
 			$record = Family::getInstance($row->xref, Tree::findById($row->gedcom_id), $row->gedcom);
 			// Ignore non-genealogy data
-			$gedrec = preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcom());
+			$gedrec = preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|RESN) .*/', '', $record->getGedcom());
 			// Ignore links and tags
 			$gedrec = preg_replace('/\n\d ' . WT_REGEX_TAG . '( @' . WT_REGEX_XREF . '@)?/', '', $gedrec);
 			// Ignore tags
@@ -511,7 +489,7 @@ class FunctionsDb {
 			// SQL may have matched on private data or gedcom tags, so check again against privatized data.
 			$record = Source::getInstance($row->xref, Tree::findById($row->gedcom_id), $row->gedcom);
 			// Ignore non-genealogy data
-			$gedrec = preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcom());
+			$gedrec = preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|RESN) .*/', '', $record->getGedcom());
 			// Ignore links and tags
 			$gedrec = preg_replace('/\n\d ' . WT_REGEX_TAG . '( @' . WT_REGEX_XREF . '@)?/', '', $gedrec);
 			// Ignore tags
@@ -566,7 +544,7 @@ class FunctionsDb {
 			// SQL may have matched on private data or gedcom tags, so check again against privatized data.
 			$record = Note::getInstance($row->xref, Tree::findById($row->gedcom_id), $row->gedcom);
 			// Ignore non-genealogy data
-			$gedrec = preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcom());
+			$gedrec = preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|RESN) .*/', '', $record->getGedcom());
 			// Ignore links and tags
 			$gedrec = preg_replace('/\n\d ' . WT_REGEX_TAG . '( @' . WT_REGEX_XREF . '@)?/', '', $gedrec);
 			// Ignore tags
@@ -621,7 +599,7 @@ class FunctionsDb {
 			// SQL may have matched on private data or gedcom tags, so check again against privatized data.
 			$record = Repository::getInstance($row->xref, Tree::findById($row->gedcom_id), $row->gedcom);
 			// Ignore non-genealogy data
-			$gedrec = preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|REFN|RESN) .*/', '', $record->getGedcom());
+			$gedrec = preg_replace('/\n\d (_UID|_WT_USER|FILE|FORM|TYPE|CHAN|RESN) .*/', '', $record->getGedcom());
 			// Ignore links and tags
 			$gedrec = preg_replace('/\n\d ' . WT_REGEX_TAG . '( @' . WT_REGEX_XREF . '@)?/', '', $gedrec);
 			// Ignore tags
@@ -664,36 +642,15 @@ class FunctionsDb {
 	 * This function returns a simple array of the most common surnames
 	 * found in the individuals list.
 	 *
+	 * @deprecated
+	 *
 	 * @param int $min The number of times a surname must occur before it is added to the array
 	 * @param Tree $tree
 	 *
-	 * @return mixed[][]
+	 * @return int[]
 	 */
 	public static function getCommonSurnames($min, Tree $tree) {
-		$COMMON_NAMES_ADD    = $tree->getPreference('COMMON_NAMES_ADD');
-		$COMMON_NAMES_REMOVE = $tree->getPreference('COMMON_NAMES_REMOVE');
-
-		$topsurns = self::getTopSurnames($tree->getTreeId(), $min, 0);
-		foreach (explode(',', $COMMON_NAMES_ADD) as $surname) {
-			if ($surname && !array_key_exists($surname, $topsurns)) {
-				$topsurns[$surname] = $min;
-			}
-		}
-		foreach (explode(',', $COMMON_NAMES_REMOVE) as $surname) {
-			unset($topsurns[I18N::strtoupper($surname)]);
-		}
-
-		//-- check if we found some, else recurse
-		if (empty($topsurns) && $min > 2) {
-			return self::getCommonSurnames($min / 2, $tree);
-		} else {
-			uksort($topsurns, '\Fisharebest\Webtrees\I18N::strcasecmp');
-			foreach ($topsurns as $key => $value) {
-				$topsurns[$key] = array('name' => $key, 'match' => $value);
-			}
-
-			return $topsurns;
-		}
+		return self::getTopSurnames($tree->getTreeId(), $min, 0);
 	}
 
 	/**
@@ -703,7 +660,7 @@ class FunctionsDb {
 	 * @param int $min only fetch surnames occuring this many times
 	 * @param int $max only fetch this number of surnames (0=all)
 	 *
-	 * @return string[]
+	 * @return int[]
 	 */
 	public static function getTopSurnames($ged_id, $min, $max) {
 		// Use n_surn, rather than n_surname, as it is used to generate URLs for
@@ -713,7 +670,7 @@ class FunctionsDb {
 			return
 				Database::prepare(
 					"SELECT SQL_CACHE n_surn, COUNT(n_surn) FROM `##name`" .
-					" WHERE n_file = :tree_id AND n_type != '_MARNM' AND n_surn NOT IN ('@N.N.', '', '?', 'UNKNOWN')" .
+					" WHERE n_file = :tree_id AND n_type != '_MARNM' AND n_surn NOT IN ('@N.N.', '')" .
 					" GROUP BY n_surn HAVING COUNT(n_surn) >= :min" .
 					" ORDER BY 2 DESC"
 				)->execute(array(
@@ -724,7 +681,7 @@ class FunctionsDb {
 			return
 				Database::prepare(
 					"SELECT SQL_CACHE n_surn, COUNT(n_surn) FROM `##name`" .
-					" WHERE n_file = :tree_id AND n_type != '_MARNM' AND n_surn NOT IN ('@N.N.', '', '?', 'UNKNOWN')" .
+					" WHERE n_file = :tree_id AND n_type != '_MARNM' AND n_surn NOT IN ('@N.N.', '')" .
 					" GROUP BY n_surn HAVING COUNT(n_surn) >= :min" .
 					" ORDER BY 2 DESC" .
 					" LIMIT :limit"
@@ -749,13 +706,13 @@ class FunctionsDb {
 	public static function getAnniversaryEvents($jd, $facts, Tree $tree) {
 		$found_facts = array();
 		foreach (array(
-			         new GregorianDate($jd),
-			         new JulianDate($jd),
-			         new FrenchDate($jd),
-			         new JewishDate($jd),
-			         new HijriDate($jd),
-			         new JalaliDate($jd),
-		         ) as $anniv) {
+			new GregorianDate($jd),
+			new JulianDate($jd),
+			new FrenchDate($jd),
+			new JewishDate($jd),
+			new HijriDate($jd),
+			new JalaliDate($jd),
+		 ) as $anniv) {
 			// Build a SQL where clause to match anniversaries in the appropriate calendar.
 			$ind_sql =
 				"SELECT DISTINCT i_id AS xref, i_gedcom AS gedcom, d_type, d_day, d_month, d_year, d_fact" .
@@ -791,82 +748,82 @@ class FunctionsDb {
 			} else {
 				// SPECIAL CASES:
 				switch ($anniv->m) {
-					case 2:
-						// 29 CSH does not include 30 CSH (but would include an invalid 31 CSH if there were no 30 CSH)
-						if ($anniv->d === 1) {
-							$where .= " AND d_day <= 1 AND d_mon = 2";
-						} elseif ($anniv->d === 30) {
-							$where .= " AND d_day >= 30 AND d_mon = 2";
-						} elseif ($anniv->d === 29 && $anniv->daysInMonth() === 29) {
-							$where .= " AND (d_day = 29 OR d_day > 30) AND d_mon = 2";
+				case 2:
+					// 29 CSH does not include 30 CSH (but would include an invalid 31 CSH if there were no 30 CSH)
+					if ($anniv->d === 1) {
+						$where .= " AND d_day <= 1 AND d_mon = 2";
+					} elseif ($anniv->d === 30) {
+						$where .= " AND d_day >= 30 AND d_mon = 2";
+					} elseif ($anniv->d === 29 && $anniv->daysInMonth() === 29) {
+						$where .= " AND (d_day = 29 OR d_day > 30) AND d_mon = 2";
+					} else {
+						$where .= " AND d_day = :day AND d_mon = 2";
+						$args['day'] = $anniv->d;
+					}
+					break;
+				case 3:
+					// 1 KSL includes 30 CSH (if this year didn’t have 30 CSH)
+					// 29 KSL does not include 30 KSL (but would include an invalid 31 KSL if there were no 30 KSL)
+					if ($anniv->d === 1) {
+						$tmp = new JewishDate(array($anniv->y, 'CSH', 1));
+						if ($tmp->daysInMonth() === 29) {
+							$where .= " AND (d_day <= 1 AND d_mon = 3 OR d_day = 30 AND d_mon = 2)";
 						} else {
-							$where .= " AND d_day = :day AND d_mon = 2";
-							$args['day'] = $anniv->d;
+							$where .= " AND d_day <= 1 AND d_mon = 3";
 						}
-						break;
-					case 3:
-						// 1 KSL includes 30 CSH (if this year didn’t have 30 CSH)
-						// 29 KSL does not include 30 KSL (but would include an invalid 31 KSL if there were no 30 KSL)
-						if ($anniv->d === 1) {
-							$tmp = new JewishDate(array($anniv->y, 'CSH', 1));
-							if ($tmp->daysInMonth() === 29) {
-								$where .= " AND (d_day <= 1 AND d_mon = 3 OR d_day = 30 AND d_mon = 2)";
-							} else {
-								$where .= " AND d_day <= 1 AND d_mon = 3";
-							}
-						} elseif ($anniv->d === 30) {
-							$where .= " AND d_day >= 30 AND d_mon = 3";
-						} elseif ($anniv->d == 29 && $anniv->daysInMonth() === 29) {
-							$where .= " AND (d_day = 29 OR d_day > 30) AND d_mon = 3";
+					} elseif ($anniv->d === 30) {
+						$where .= " AND d_day >= 30 AND d_mon = 3";
+					} elseif ($anniv->d == 29 && $anniv->daysInMonth() === 29) {
+						$where .= " AND (d_day = 29 OR d_day > 30) AND d_mon = 3";
+					} else {
+						$where .= " AND d_day = :day AND d_mon = 3";
+						$args['day'] = $anniv->d;
+					}
+					break;
+				case 4:
+					// 1 TVT includes 30 KSL (if this year didn’t have 30 KSL)
+					if ($anniv->d === 1) {
+						$tmp = new JewishDate(array($anniv->y, 'KSL', 1));
+						if ($tmp->daysInMonth() === 29) {
+							$where .= " AND (d_day <=1 AND d_mon = 4 OR d_day = 30 AND d_mon = 3)";
 						} else {
-							$where .= " AND d_day = :day AND d_mon = 3";
-							$args['day'] = $anniv->d;
+							$where .= " AND d_day <= 1 AND d_mon = 4";
 						}
-						break;
-					case 4:
-						// 1 TVT includes 30 KSL (if this year didn’t have 30 KSL)
-						if ($anniv->d === 1) {
-							$tmp = new JewishDate(array($anniv->y, 'KSL', 1));
-							if ($tmp->daysInMonth() === 29) {
-								$where .= " AND (d_day <=1 AND d_mon = 4 OR d_day = 30 AND d_mon = 3)";
-							} else {
-								$where .= " AND d_day <= 1 AND d_mon = 4";
-							}
-						} elseif ($anniv->d === $anniv->daysInMonth()) {
-							$where .= " AND d_day >= :day AND d_mon=4";
-							$args['day'] = $anniv->d;
+					} elseif ($anniv->d === $anniv->daysInMonth()) {
+						$where .= " AND d_day >= :day AND d_mon=4";
+						$args['day'] = $anniv->d;
+					} else {
+						$where .= " AND d_day = :day AND d_mon=4";
+						$args['day'] = $anniv->d;
+					}
+					break;
+				case 7: // ADS includes ADR (non-leap)
+					if ($anniv->d === 1) {
+						$where .= " AND d_day <= 1";
+					} elseif ($anniv->d === $anniv->daysInMonth()) {
+						$where .= " AND d_day >= :day";
+						$args['day'] = $anniv->d;
+					} else {
+						$where .= " AND d_day = :day";
+						$args['day'] = $anniv->d;
+					}
+					$where .= " AND (d_mon = 6 AND MOD(7 * d_year + 1, 19) >= 7 OR d_mon = 7)";
+					break;
+				case 8: // 1 NSN includes 30 ADR, if this year is non-leap
+					if ($anniv->d === 1) {
+						if ($anniv->isLeapYear()) {
+							$where .= " AND d_day <= 1 AND d_mon = 8";
 						} else {
-							$where .= " AND d_day = :day AND d_mon=4";
-							$args['day'] = $anniv->d;
+							$where .= " AND (d_day <= 1 AND d_mon = 8 OR d_day = 30 AND d_mon = 6)";
 						}
-						break;
-					case 7: // ADS includes ADR (non-leap)
-						if ($anniv->d === 1) {
-							$where .= " AND d_day <= 1";
-						} elseif ($anniv->d === $anniv->daysInMonth()) {
-							$where .= " AND d_day >= :day";
-							$args['day'] = $anniv->d;
-						} else {
-							$where .= " AND d_day = :day";
-							$args['day'] = $anniv->d;
-						}
-						$where .= " AND (d_mon = 6 AND MOD(7 * d_year + 1, 19) >= 7 OR d_mon = 7)";
-						break;
-					case 8: // 1 NSN includes 30 ADR, if this year is non-leap
-						if ($anniv->d === 1) {
-							if ($anniv->isLeapYear()) {
-								$where .= " AND d_day <= 1 AND d_mon = 8";
-							} else {
-								$where .= " AND (d_day <= 1 AND d_mon = 8 OR d_day = 30 AND d_mon = 6)";
-							}
-						} elseif ($anniv->d === $anniv->daysInMonth()) {
-							$where .= " AND d_day >= :day AND d_mon = 8";
-							$args['day'] = $anniv->d;
-						} else {
-							$where .= " AND d_day = :day AND d_mon = 8";
-							$args['day'] = $anniv->d;
-						}
-						break;
+					} elseif ($anniv->d === $anniv->daysInMonth()) {
+						$where .= " AND d_day >= :day AND d_mon = 8";
+						$args['day'] = $anniv->d;
+					} else {
+						$where .= " AND d_day = :day AND d_mon = 8";
+						$args['day'] = $anniv->d;
+					}
+					break;
 				}
 			}
 			// Only events in the past (includes dates without a year)
@@ -926,9 +883,6 @@ class FunctionsDb {
 	public static function getCalendarEvents($jd1, $jd2, $facts, Tree $tree) {
 		// If no facts specified, get all except these
 		$skipfacts = "CHAN,BAPL,SLGC,SLGS,ENDL,CENS,RESI,NOTE,ADDR,OBJE,SOUR,PAGE,DATA,TEXT";
-		if ($facts != '_TODO') {
-			$skipfacts .= ',_TODO';
-		}
 
 		$found_facts = array();
 

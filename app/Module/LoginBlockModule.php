@@ -26,12 +26,12 @@ use Fisharebest\Webtrees\Theme;
 class LoginBlockModule extends AbstractModule implements ModuleBlockInterface {
 	/** {@inheritdoc} */
 	public function getTitle() {
-		return /* I18N: Name of a module */ I18N::translate('Login');
+		return /* I18N: Name of a module */ I18N::translate('Sign in');
 	}
 
 	/** {@inheritdoc} */
 	public function getDescription() {
-		return /* I18N: Description of the “Login” module */ I18N::translate('An alternative way to login and logout.');
+		return /* I18N: Description of the “Sign in” module */ I18N::translate('An alternative way to sign in and sign out.');
 	}
 
 	/**
@@ -50,22 +50,23 @@ class LoginBlockModule extends AbstractModule implements ModuleBlockInterface {
 		$controller->addInlineJavascript('
 			jQuery("#new_passwd").hide();
 			jQuery("#passwd_click").click(function() {
-				jQuery("#new_passwd").slideToggle(100, function() {
-					jQuery("#new_passwd_username").focus();
-				});
+				jQuery("#new_passwd").slideToggle(200);
+				jQuery("#register-link").slideToggle(200);
+				jQuery("#new_passwd_username").focus();
+
 				return false;
 			});
 		');
 
 		if (Auth::check()) {
-			$title   = I18N::translate('Logout');
+			$title   = I18N::translate('Sign out');
 			$content = '<div class="center"><form method="post" action="logout.php" name="logoutform" onsubmit="return true;">';
-			$content .= '<br><a href="edituser.php" class="name2">' . I18N::translate('Logged in as ') . ' ' . Auth::user()->getRealNameHtml() . '</a><br><br>';
-			$content .= '<input type="submit" value="' . I18N::translate('Logout') . '">';
+			$content .= '<br>' . I18N::translate('You are signed in as %s.', '<a href="edituser.php" class="name2">' . Auth::user()->getRealNameHtml() . '</a>') . '<br><br>';
+			$content .= '<input type="submit" value="' . /* I18N: A button label. */ I18N::translate('sign out') . '">';
 
 			$content .= '<br><br></form></div>';
 		} else {
-			$title   = I18N::translate('Login');
+			$title   = I18N::translate('Sign in');
 			$content = '<div id="login-box">
 				<form id="login-form" name="login-form" method="post" action="' . WT_LOGIN_URL . '">
 				<input type="hidden" name="action" value="login">';
@@ -80,13 +81,13 @@ class LoginBlockModule extends AbstractModule implements ModuleBlockInterface {
 					</label>
 				</div>
 				<div>
-					<input type="submit" value="' . I18N::translate('Login') . '">
+					<input type="submit" value="' . /* I18N: A button label. */ I18N::translate('sign in') . '">
 				</div>
 				<div>
-					<a href="#" id="passwd_click">' . I18N::translate('Request new password') . '</a>
+					<a href="#" id="passwd_click">' . I18N::translate('Forgot password?') . '</a>
 				</div>';
 			if (Site::getPreference('USE_REGISTRATION_MODULE')) {
-				$content .= '<div><a href="' . WT_LOGIN_URL . '?action=register">' . I18N::translate('Request new user account') . '</a></div>';
+				$content .= '<div id="register-link"><a href="' . WT_LOGIN_URL . '?action=register">' . I18N::translate('Request a new user account') . '</a></div>';
 			}
 		$content .= '</form>'; // close "login-form"
 
@@ -95,7 +96,7 @@ class LoginBlockModule extends AbstractModule implements ModuleBlockInterface {
 			<form id="new_passwd_form" name="new_passwd_form" action="' . WT_LOGIN_URL . '" method="post">
 			<input type="hidden" name="time" value="">
 			<input type="hidden" name="action" value="requestpw">
-			<h4>' . I18N::translate('Lost password request') . '</h4>
+			<h4>' . I18N::translate('Request a new password') . '</h4>
 			<div>
 				<label for="new_passwd_username">' . I18N::translate('Username or email address') .
 					'<input type="text" id="new_passwd_username" name="new_passwd_username" value="">

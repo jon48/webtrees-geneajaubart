@@ -37,15 +37,15 @@ class RepositoryController extends GedcomRecordController {
 		$menu = new Menu(I18N::translate('Edit'), '#', 'menu-repo');
 
 		if (Auth::isEditor($this->record->getTree())) {
-			$fact    = $this->record->getFirstFact('NAME');
+			$fact = $this->record->getFirstFact('NAME');
 			if ($fact) {
 				// Edit existing name
-				$menu->addSubmenu(new Menu(I18N::translate('Edit repository'), '#', 'menu-repo-edit', array(
+				$menu->addSubmenu(new Menu(I18N::translate('Edit the repository'), '#', 'menu-repo-edit', array(
 					'onclick' => 'return edit_record("' . $this->record->getXref() . '", "' . $fact->getFactId() . '");',
 				)));
 			} else {
 				// Add new name
-				$menu->addSubmenu(new Menu(I18N::translate('Edit repository'), '#', 'menu-repo-edit', array(
+				$menu->addSubmenu(new Menu(I18N::translate('Edit the repository'), '#', 'menu-repo-edit', array(
 					'onclick' => 'return add_fact("' . $this->record->getXref() . '", "NAME");',
 				)));
 			}
@@ -60,7 +60,7 @@ class RepositoryController extends GedcomRecordController {
 
 		// edit raw
 		if (Auth::isAdmin() || Auth::isEditor($this->record->getTree()) && $this->record->getTree()->getPreference('SHOW_GEDCOM_RECORD')) {
-			$menu->addSubmenu(new Menu(I18N::translate('Edit raw GEDCOM'), '#', 'menu-repo-editraw', array(
+			$menu->addSubmenu(new Menu(I18N::translate('Edit the raw GEDCOM'), '#', 'menu-repo-editraw', array(
 				'onclick' => 'return edit_raw("' . $this->record->getXref() . '");',
 			)));
 		}
@@ -75,13 +75,6 @@ class RepositoryController extends GedcomRecordController {
 					'onclick' => 'jQuery.post("module.php?mod=user_favorites&mod_action=menu-add-favorite" ,{xref:"' . $this->record->getXref() . '"},function(){location.reload();})',
 				)
 			));
-		}
-
-		// Get the link for the first submenu and set it as the link for the main menu
-		if ($menu->getSubmenus()) {
-			$submenus = $menu->getSubmenus();
-			$menu->setLink($submenus[0]->getLink());
-			$menu->setAttrs($submenus[0]->getAttrs());
 		}
 
 		return $menu;

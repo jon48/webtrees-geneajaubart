@@ -62,8 +62,6 @@ if (version_compare(PHP_VERSION, WT_REQUIRED_PHP_VERSION) < 0) {
 	return;
 }
 
-Session::start();
-
 define('WT_LOCALE', I18N::init(Filter::post('lang', '[a-zA-Z-]+', Filter::get('lang', '[a-zA-Z-]+'))));
 
 header('Content-Type: text/html; charset=UTF-8');
@@ -107,7 +105,7 @@ if (!isset($_POST['lang'])) {
 	}
 
 	echo
-		'<p>', I18N::translate('Change language'), ' ',
+		'<p>', I18N::translate('Language'), ' ',
 		FunctionsEdit::selectEditControl('change_lang', $installed_languages, null, WT_LOCALE, 'onchange="window.location=\'' . WT_SCRIPT_NAME . '?lang=\'+this.value;">'),
 		'</p>',
 		'<h2>', I18N::translate('Checking server configuration'), '</h2>';
@@ -186,7 +184,7 @@ if (!isset($_POST['lang'])) {
 		I18N::translate('If your server’s security policy permits it, you will be able to request increased memory or CPU time using the webtrees administration page. Otherwise, you will need to contact your server’s administrator.'),
 		'</p>';
 	if (!$errors) {
-		echo '<br><hr><input type="submit" id="btncontinue" value="', /* I18N: button label */ I18N::translate('continue'), '">';
+		echo '<br><hr><input type="submit" id="btncontinue" value="', /* I18N: A button label. */ I18N::translate('continue'), '">';
 
 	}
 	echo '</form></body></html>';
@@ -263,7 +261,7 @@ try {
 	if ($_POST['dbuser']) {
 		// If we’ve supplied a login, then show the error
 		echo
-			'<p class="bad">', I18N::translate('Unable to connect using these settings. Your server gave the following error.'), '</p>',
+			'<p class="bad">', I18N::translate('Unable to connect using this username and password. Your server gave the following error.'), '</p>',
 			'<pre>', $ex->getMessage(), '</pre>',
 			'<p class="bad">', I18N::translate('Check the settings and try again.'), '</p>';
 	}
@@ -335,7 +333,7 @@ if ($DBNAME && $DBNAME == $_POST['dbname'] && $TBLPREFIX == $_POST['tblpfx']) {
 		$dbname_ok = true;
 	} catch (PDOException $ex) {
 		echo
-			'<p class="bad">', I18N::translate('Unable to connect using these settings. Your server gave the following error.'), '</p>',
+			'<p class="bad">', I18N::translate('Unable to connect using this username and password. Your server gave the following error.'), '</p>',
 			'<pre>', $ex->getMessage(), '</pre>',
 			'<p class="bad">', I18N::translate('Check the settings and try again.'), '</p>';
 	}
@@ -420,8 +418,7 @@ if (empty($_POST['wtname']) || empty($_POST['wtuser']) || strlen($_POST['wtpass'
 		echo '<p class="bad">', I18N::translate('You must enter all the administrator account fields.'), '</p>';
 	}
 	echo
-		'<h2>', I18N::translate('System settings'), '</h2>',
-		'<h3>', I18N::translate('Administrator account'), '</h3>',
+		'<h2>', I18N::translate('Administrator account'), '</h2>',
 		'<p>', I18N::translate('You need to set up an administrator account. This account can control all aspects of this webtrees installation. Please choose a strong password.'), '</p>',
 		'<fieldset><legend>', I18N::translate('Administrator account'), '</legend>',
 		'<table border="0"><tr><td>',
@@ -429,9 +426,9 @@ if (empty($_POST['wtname']) || empty($_POST['wtuser']) || strlen($_POST['wtpass'
 		'<input type="text" name="wtname" value="', Filter::escapeHtml($_POST['wtname']), '" autofocus></td><td>',
 		I18N::translate('This is your real name, as you would like it displayed on screen.'),
 		'</td></tr><tr><td>',
-		I18N::translate('Login ID'), '</td><td>',
+		I18N::translate('Username'), '</td><td>',
 		'<input type="text" name="wtuser" value="', Filter::escapeHtml($_POST['wtuser']), '"></td><td>',
-		I18N::translate('You will use this to login to webtrees.'),
+		I18N::translate('You will use this to sign in to webtrees.'),
 		'</td></tr><tr><td>',
 		I18N::translate('Password'), '</td><td>',
 		'<input type="password" name="wtpass" value="', Filter::escapeHtml($_POST['wtpass']), '"></td><td>',
@@ -468,14 +465,24 @@ try {
 	// Create/update the database tables.
 	Database::updateSchema('\Fisharebest\Webtrees\Schema', 'WT_SCHEMA_VERSION', 30);
 
-	// Create the admin user
-	$admin = User::create($_POST['wtuser'], $_POST['wtname'], $_POST['wtemail'], $_POST['wtpass']);
-	$admin->setPreference('canadmin', '1');
-	$admin->setPreference('language', WT_LOCALE);
-	$admin->setPreference('verified', '1');
-	$admin->setPreference('verified_by_admin', '1');
-	$admin->setPreference('auto_accept', '0');
-	$admin->setPreference('visibleonline', '1');
+	// If we are re-installing, then this user may already exist.
+	$admin = User::findByIdentifier($_POST['wtemail']);
+	if ($admin === null) {
+		$admin = User::findByIdentifier($_POST['wtuser']);
+	}
+	// Create the user
+	if ($admin === null) {
+		$admin = User::create($_POST['wtuser'], $_POST['wtname'], $_POST['wtemail'], $_POST['wtpass'])
+			->setPreference('language', WT_LOCALE)
+			->setPreference('visibleonline', '1');
+	} else {
+		$admin->setPassword($_POST['wtpass']);
+	}
+	// Make the user an administrator
+	$admin
+		->setPreference('canadmin', '1')
+		->setPreference('verified', '1')
+		->setPreference('verified_by_admin', '1');
 
 	// Write the config file. We already checked that this would work.
 	$config_ini_php =

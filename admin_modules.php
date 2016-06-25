@@ -17,6 +17,7 @@ namespace Fisharebest\Webtrees;
 
 use Fisharebest\Webtrees\Controller\PageController;
 use Fisharebest\Webtrees\Functions\FunctionsEdit;
+use Fisharebest\Webtrees\Module\AbstractModule;
 use Fisharebest\Webtrees\Module\ModuleBlockInterface;
 use Fisharebest\Webtrees\Module\ModuleChartInterface;
 use Fisharebest\Webtrees\Module\ModuleConfigInterface;
@@ -36,6 +37,10 @@ $controller
 
 $modules       = Module::getInstalledModules('disabled');
 $module_status = Database::prepare("SELECT module_name, status FROM `##module`")->fetchAssoc();
+
+uasort($modules, function (AbstractModule $x, AbstractModule $y) {
+	return I18N::strcasecmp($x->getTitle(), $y->getTitle());
+});
 
 if (Filter::post('action') === 'update_mods' && Filter::checkCsrf()) {
 	foreach ($modules as $module) {
@@ -124,7 +129,7 @@ $controller
 				{ class: "center" },
 				{ class: "center" },
 				{ class: "center" },
-				{ class: "center", visible: false }, // The Module system does not yet include charts
+				{ class: "center" },
 				{ class: "center" },
 				{ class: "center", visible: false } // The Module system does not yet include themes
 			]
@@ -155,38 +160,101 @@ $controller
 			<th class="hidden-xs"><a href="admin_module_tabs.php"><?php echo I18N::translate('Tabs'); ?></a></th>
 			<th class="hidden-xs"><a href="admin_module_sidebar.php"><?php echo I18N::translate('Sidebars'); ?></a></th>
 			<th class="hidden-xs"><a href="admin_module_blocks.php"><?php echo I18N::translate('Blocks'); ?></a></th>
-			<th class="hidden"><?php echo I18N::translate('Charts'); ?></th>
+			<th class="hidden-xs"><a href="admin_module_charts.php"><?php echo I18N::translate('Charts'); ?></a></th>
 			<th class="hidden-xs"><a href="admin_module_reports.php"><?php echo I18N::translate('Reports'); ?></a></th>
 			<th class="hidden"><?php echo I18N::translate('Themes'); ?></th>
 		</tr>
 		</thead>
 		<tbody>
-		<?php
-		foreach ($modules as $module_name => $module) {
-			$status = $module_status[$module_name];
-			echo
-			'<tr><td class="text-center">', FunctionsEdit::twoStateCheckbox('status-' . $module->getName(), $status === 'enabled'), '</td>',
-			'<td>';
-			if ($module instanceof ModuleConfigInterface) {
-				echo '<a href="', $module->getConfigLink(), '">';
-			}
-			echo $module->getTitle();
-			if ($module instanceof ModuleConfigInterface) {
-				echo ' <i class="fa fa-cogs"></i></a>';
-			}
-			echo
-			'</td>',
-			'<td>', $module->getDescription(), '</td>',
-			'<td class="text-center text-muted hidden-xs">', $module instanceof ModuleMenuInterface ? '<i class="fa fa-list-ul" title="' . I18N::translate('Menu') . '"></i>' : '-', '</td>',
-			'<td class="text-center text-muted hidden-xs">', $module instanceof ModuleTabInterface ? '<i class="fa fa-folder" title="' . I18N::translate('Tab') . '"></i>' : '-', '</td>',
-			'<td class="text-center text-muted hidden-xs">', $module instanceof ModuleSidebarInterface ? '<i class="fa fa-th-large" title="' . I18N::translate('Sidebar') . '"></i>' : '-', '</td>',
-			'<td class="text-center text-muted hidden-xs">', $module instanceof ModuleBlockInterface ? (($module->isUserBlock() ? '<i class="fa fa-user" title="' . I18N::translate('My page') . '"></i>' : '') . ($module->isGedcomBlock() ? '<i class="fa fa-tree" title="' . I18N::translate('Home page') . '"></i>' : '')) : '-', '</td>',
-			'<td class="text-center text-muted hidden">', $module instanceof ModuleChartInterface ? '<i class="fa fa-check" title="' . I18N::translate('Chart') . '"></i>' : '-', '</td>',
-			'<td class="text-center text-muted hidden-xs">', $module instanceof ModuleReportInterface ? '<i class="fa fa-file" title="' . I18N::translate('Report') . '"></i>' : '-', '</td>',
-			'<td class="text-center text-muted hidden">', $module instanceof ModuleThemeInterface ? '<i class="fa fa-check" title="' . I18N::translate('Theme') . '"></i>' : '-', '</td>',
-			'</tr>';
-		}
-		?>
+			<?php foreach ($modules as $module_name => $module): ?>
+				<tr>
+					<td class="text-center">
+						<?php echo FunctionsEdit::twoStateCheckbox('status-' . $module->getName(), $module_status[$module_name] === 'enabled') ?>
+					</td>
+					<td>
+						<?php if ($module instanceof ModuleConfigInterface): ?>
+							<a href="<?php echo $module->getConfigLink() ?>">
+								<?php echo $module->getTitle() ?> <i class="fa fa-cogs"></i>
+							</a>
+						<?php else: ?>
+							<?php echo $module->getTitle() ?>
+						<?php endif; ?>
+						<?php if (!in_array($module->getName(), Module::getCoreModuleNames())): ?>
+							<br>
+						<?php endif; ?>
+					</td>
+					<td>
+						<?php echo '', $module->getDescription() ?>
+						<?php if (!in_array($module->getName(), Module::getCoreModuleNames())): ?>
+							<br>
+							<i class="fa fa-asterisk"></i>
+							<?php echo I18N::translate('Custom module') ?>
+							<?php if ($module::CUSTOM_VERSION): ?>
+								- <?php echo I18N::translate('Version') ?> <?php echo $module::CUSTOM_VERSION ?>
+							<?php endif; ?>
+							<?php if ($module::CUSTOM_WEBSITE): ?>
+								- <a href="<?php echo $module::CUSTOM_WEBSITE ?>">
+									<?php echo $module::CUSTOM_WEBSITE ?>
+								</a>
+							<?php endif; ?>
+						<?php endif; ?>
+					</td>
+					<td class="text-center text-muted hidden-xs">
+						<?php if ($module instanceof ModuleMenuInterface): ?>
+							<i class="fa fa-list-ul" title="<?php echo I18N::translate('Menu') ?>"></i>
+						<?php else: ?>
+							-
+						<?php endif; ?>
+					</td>
+					<td class="text-center text-muted hidden-xs">
+						<?php if ($module instanceof ModuleTabInterface): ?>
+							<i class="fa fa-folder" title="<?php echo I18N::translate('Tab') ?>"></i>
+						<?php else: ?>
+							-
+						<?php endif; ?>
+					</td>
+					<td class="text-center text-muted hidden-xs">
+						<?php if ($module instanceof ModuleSidebarInterface): ?>
+							<i class="fa fa-th-large" title="<?php echo I18N::translate('Sidebar') ?>"></i>
+						<?php else: ?>
+							-
+						<?php endif; ?>
+					</td>
+					<td class="text-center text-muted hidden-xs">
+						<?php if ($module instanceof ModuleBlockInterface): ?>
+							<?php if ($module->isUserBlock()): ?>
+								<i class="fa fa-user" title="<?php echo I18N::translate('My page') ?>"></i>
+							<?php endif; ?>
+							<?php if ($module->isUserBlock()): ?>
+								<i class="fa fa-tree" title="<?php echo I18N::translate('Home page') ?>"></i>
+							<?php endif; ?>
+						<?php else: ?>
+							-
+						<?php endif; ?>
+					</td>
+					<td class="text-center text-muted hidden-xs">
+						<?php if ($module instanceof ModuleChartInterface): ?>
+							<i class="fa fa-share-alt" title="<?php echo I18N::translate('Chart') ?>"></i>
+						<?php else: ?>
+							-
+						<?php endif; ?>
+					</td>
+					<td class="text-center text-muted hidden-xs">
+						<?php if ($module instanceof ModuleReportInterface): ?>
+							<i class="fa fa-file" title="<?php echo I18N::translate('Report') ?>"></i>
+						<?php else: ?>
+							-
+						<?php endif; ?>
+					</td>
+					<td class="text-center text-muted hidden">
+						<?php if ($module instanceof ModuleThemeInterface): ?>
+							<i class="fa fa-check" title="<?php echo I18N::translate('Theme') ?>"></i>
+						<?php else: ?>
+							-
+						<?php endif; ?>
+					</td>
+				</tr>
+			<?php endforeach; ?>
 		</tbody>
 	</table>
 	<button class="btn btn-primary" type="submit">
