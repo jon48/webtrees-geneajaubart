@@ -436,6 +436,14 @@ $old_files = array(
 	WT_ROOT . 'packages/jquery-1.11.3',
 	WT_ROOT . 'packages/jquery-2.1.4',
 	WT_ROOT . 'packages/moment-2.10.6',
+	// Removed in 1.7.5
+	WT_ROOT . 'themes/_administration/css-1.7.4',
+	WT_ROOT . 'themes/clouds/css-1.7.4',
+	WT_ROOT . 'themes/colors/css-1.7.4',
+	WT_ROOT . 'themes/fab/css-1.7.4',
+	WT_ROOT . 'themes/minimal/css-1.7.4',
+	WT_ROOT . 'themes/webtrees/css-1.7.4',
+	WT_ROOT . 'themes/xenea/css-1.7.4',
 );
 
 // Delete old files (if we can).
@@ -547,13 +555,13 @@ if (
 	$server_warnings[] =
 		I18N::translate('Your web server is using PHP version %s, which is no longer maintained. You should upgrade to a later version.', PHP_VERSION) .
 		 '<br><a href="https://php.net/supported-versions.php">https://php.net/supported-versions.php</a>';
-} else
+}
 
 ?>
 <h1><?php echo $controller->getPageTitle(); ?></h1>
 
 <p>
-	<?php echo I18N::translate('These pages provide access to all the configuration settings and management tools for this webtrees site.'); ?>
+	<?php echo I18N::translate('These pages provide access to all the preferences and management tools for this webtrees site.'); ?>
 </p>
 
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -592,7 +600,7 @@ if (
 		<div id="webtrees-version-panel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="webtrees-version-heading">
 			<div class="panel-body">
 				<p>
-					<?php echo /* I18N: %s is a URL/link to the project website */ I18N::translate('Support and documentation can be found at %s.', '<a href="http://webtrees.net/">webtrees.net</a>'); ?>
+					<?php echo /* I18N: %s is a URL/link to the project website */ I18N::translate('Support and documentation can be found at %s.', '<a href="https://webtrees.net/">webtrees.net</a>'); ?>
 				</p>
 				<?php if (Auth::isAdmin()): ?>
 				<p>
@@ -706,7 +714,7 @@ if (
 						</tr>
 						<tr>
 							<th>
-								<?php echo I18N::translate('Users logged in'); ?>
+								<?php echo I18N::translate('Users who are signed in'); ?>
 							</th>
 							<td>
 								<?php foreach ($logged_in as $n => $user): ?>

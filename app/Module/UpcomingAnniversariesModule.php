@@ -75,7 +75,7 @@ class UpcomingAnniversariesModule extends AbstractModule implements ModuleBlockI
 		$id    = $this->getName() . $block_id;
 		$class = $this->getName() . '_block';
 		if ($ctype === 'gedcom' && Auth::isManager($WT_TREE) || $ctype === 'user' && Auth::check()) {
-			$title = '<a class="icon-admin" title="' . I18N::translate('Configure') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
+			$title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
 		} else {
 			$title = '';
 		}
@@ -151,13 +151,13 @@ class UpcomingAnniversariesModule extends AbstractModule implements ModuleBlockI
 		echo '</td></tr>';
 
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo I18N::translate('Show only events of living individuals?');
+		echo I18N::translate('Show only events of living individuals');
 		echo '</td><td class="optionbox">';
 		echo FunctionsEdit::editFieldYesNo('filter', $filter);
 		echo '</td></tr>';
 
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo I18N::translate('Show only births, deaths, and marriages?');
+		echo I18N::translate('Show only births, deaths, and marriages');
 		echo '</td><td class="optionbox">';
 		echo FunctionsEdit::editFieldYesNo('onlyBDM', $onlyBDM);
 		echo '</td></tr>';

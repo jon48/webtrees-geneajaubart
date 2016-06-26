@@ -58,29 +58,17 @@ class TopSurnamesModule extends AbstractModule implements ModuleBlockInterface {
 	public function getBlock($block_id, $template = true, $cfg = array()) {
 		global $WT_TREE, $ctype;
 
-		$COMMON_NAMES_REMOVE    = $WT_TREE->getPreference('COMMON_NAMES_REMOVE');
-		$COMMON_NAMES_THRESHOLD = $WT_TREE->getPreference('COMMON_NAMES_THRESHOLD');
-
 		$num       = $this->getBlockSetting($block_id, 'num', '10');
 		$infoStyle = $this->getBlockSetting($block_id, 'infoStyle', 'table');
-		$block     = $this->getBlockSetting($block_id, 'block', '0');
 
-		foreach (array('num', 'infoStyle', 'block') as $name) {
+		foreach (array('num', 'infoStyle') as $name) {
 			if (array_key_exists($name, $cfg)) {
 				$$name = $cfg[$name];
 			}
 		}
 
 		// This next function is a bit out of date, and doesn't cope well with surname variants
-		$top_surnames = FunctionsDb::getTopSurnames($WT_TREE->getTreeId(), $COMMON_NAMES_THRESHOLD, $num);
-
-		// Remove names found in the "Remove Names" list
-		if ($COMMON_NAMES_REMOVE) {
-			foreach (preg_split("/[,; ]+/", $COMMON_NAMES_REMOVE) as $delname) {
-				unset($top_surnames[$delname]);
-				unset($top_surnames[I18N::strtoupper($delname)]);
-			}
-		}
+		$top_surnames = FunctionsDb::getTopSurnames($WT_TREE->getTreeId(), 0, $num);
 
 		$all_surnames = array();
 		$i            = 0;
@@ -96,7 +84,7 @@ class TopSurnamesModule extends AbstractModule implements ModuleBlockInterface {
 		$id    = $this->getName() . $block_id;
 		$class = $this->getName() . '_block';
 		if ($ctype === 'gedcom' && Auth::isManager($WT_TREE) || $ctype === 'user' && Auth::check()) {
-			$title = '<a class="icon-admin" title="' . I18N::translate('Configure') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
+			$title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
 		} else {
 			$title = '';
 		}
@@ -116,11 +104,11 @@ class TopSurnamesModule extends AbstractModule implements ModuleBlockInterface {
 			break;
 		case 'list':
 			uasort($all_surnames, '\Fisharebest\Webtrees\Module\TopSurnamesModule::surnameCountSort');
-			$content = FunctionsPrintLists::surnameList($all_surnames, '1', true, 'indilist.php', $WT_TREE);
+			$content = FunctionsPrintLists::surnameList($all_surnames, 1, true, 'indilist.php', $WT_TREE);
 			break;
 		case 'array':
 			uasort($all_surnames, '\Fisharebest\Webtrees\Module\TopSurnamesModule::surnameCountSort');
-			$content = FunctionsPrintLists::surnameList($all_surnames, '2', true, 'indilist.php', $WT_TREE);
+			$content = FunctionsPrintLists::surnameList($all_surnames, 2, true, 'indilist.php', $WT_TREE);
 			break;
 		case 'table':
 		default:
@@ -130,13 +118,8 @@ class TopSurnamesModule extends AbstractModule implements ModuleBlockInterface {
 		}
 
 		if ($template) {
-			if ($block) {
-				$class .= ' small_inner_block';
-			}
-
 			return Theme::theme()->formatBlock($id, $title, $class, $content);
 		} else {
-
 			return $content;
 		}
 	}
@@ -165,15 +148,13 @@ class TopSurnamesModule extends AbstractModule implements ModuleBlockInterface {
 		if (Filter::postBool('save') && Filter::checkCsrf()) {
 			$this->setBlockSetting($block_id, 'num', Filter::postInteger('num', 1, 10000, 10));
 			$this->setBlockSetting($block_id, 'infoStyle', Filter::post('infoStyle', 'list|array|table|tagcloud', 'table'));
-			$this->setBlockSetting($block_id, 'block', Filter::postBool('block'));
 		}
 
 		$num       = $this->getBlockSetting($block_id, 'num', '10');
 		$infoStyle = $this->getBlockSetting($block_id, 'infoStyle', 'table');
-		$block     = $this->getBlockSetting($block_id, 'block', '0');
 
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo I18N::translate('Number of items to show');
+		echo /* I18N: ... to show in a list */ I18N::translate('Number of surnames');
 		echo '</td><td class="optionbox">';
 		echo '<input type="text" name="num" size="2" value="', $num, '">';
 		echo '</td></tr>';
@@ -182,12 +163,6 @@ class TopSurnamesModule extends AbstractModule implements ModuleBlockInterface {
 		echo I18N::translate('Presentation style');
 		echo '</td><td class="optionbox">';
 		echo FunctionsEdit::selectEditControl('infoStyle', array('list' => I18N::translate('bullet list'), 'array' => I18N::translate('compact list'), 'table' => I18N::translate('table'), 'tagcloud' => I18N::translate('tag cloud')), null, $infoStyle, '');
-		echo '</td></tr>';
-
-		echo '<tr><td class="descriptionbox wrap width33">';
-		echo /* I18N: label for a yes/no option */ I18N::translate('Add a scrollbar when block contents grow');
-		echo '</td><td class="optionbox">';
-		echo FunctionsEdit::editFieldYesNo('block', $block);
 		echo '</td></tr>';
 	}
 

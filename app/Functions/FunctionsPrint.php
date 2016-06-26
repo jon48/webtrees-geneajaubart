@@ -50,20 +50,20 @@ class FunctionsPrint {
 	public static function printPedigreePerson(Individual $person = null, $show_full = 1) {
 
 		switch ($show_full) {
-			case 0:
-				if ($person) {
-					echo Theme::theme()->individualBoxSmall($person);
-				} else {
-					echo Theme::theme()->individualBoxSmallEmpty();
-				}
-				break;
-			case 1:
-				if ($person) {
-					echo Theme::theme()->individualBox($person);
-				} else {
-					echo Theme::theme()->individualBoxEmpty();
-				}
-				break;
+		case 0:
+			if ($person) {
+				echo Theme::theme()->individualBoxSmall($person);
+			} else {
+				echo Theme::theme()->individualBoxSmallEmpty();
+			}
+			break;
+		case 1:
+			if ($person) {
+				echo Theme::theme()->individualBox($person);
+			} else {
+				echo Theme::theme()->individualBoxEmpty();
+			}
+			break;
 		}
 	}
 
@@ -259,25 +259,25 @@ class FunctionsPrint {
 					$age      = Date::getAge($parent->getBirthDate(), $birth_date, 2);
 					$deatdate = $parent->getDeathDate();
 					switch ($parent->getSex()) {
-						case 'F':
-							// Highlight mothers who die in childbirth or shortly afterwards
-							if ($deatdate->isOK() && $deatdate->maximumJulianDay() < $birth_date->minimumJulianDay() + 90) {
-								$html .= ' <span title="' . GedcomTag::getLabel('_DEAT_PARE', $parent) . '" class="parentdeath">' . $sex . $age . '</span>';
-							} else {
-								$html .= ' <span title="' . I18N::translate('Mother’s age') . '">' . $sex . $age . '</span>';
-							}
-							break;
-						case 'M':
-							// Highlight fathers who die before the birth
-							if ($deatdate->isOK() && $deatdate->maximumJulianDay() < $birth_date->minimumJulianDay()) {
-								$html .= ' <span title="' . GedcomTag::getLabel('_DEAT_PARE', $parent) . '" class="parentdeath">' . $sex . $age . '</span>';
-							} else {
-								$html .= ' <span title="' . I18N::translate('Father’s age') . '">' . $sex . $age . '</span>';
-							}
-							break;
-						default:
-							$html .= ' <span title="' . I18N::translate('Parent’s age') . '">' . $sex . $age . '</span>';
-							break;
+					case 'F':
+						// Highlight mothers who die in childbirth or shortly afterwards
+						if ($deatdate->isOK() && $deatdate->maximumJulianDay() < $birth_date->minimumJulianDay() + 90) {
+							$html .= ' <span title="' . GedcomTag::getLabel('_DEAT_PARE', $parent) . '" class="parentdeath">' . $sex . $age . '</span>';
+						} else {
+							$html .= ' <span title="' . I18N::translate('Mother’s age') . '">' . $sex . $age . '</span>';
+						}
+						break;
+					case 'M':
+						// Highlight fathers who die before the birth
+						if ($deatdate->isOK() && $deatdate->maximumJulianDay() < $birth_date->minimumJulianDay()) {
+							$html .= ' <span title="' . GedcomTag::getLabel('_DEAT_PARE', $parent) . '" class="parentdeath">' . $sex . $age . '</span>';
+						} else {
+							$html .= ' <span title="' . I18N::translate('Father’s age') . '">' . $sex . $age . '</span>';
+						}
+						break;
+					default:
+						$html .= ' <span title="' . I18N::translate('Parent’s age') . '">' . $sex . $age . '</span>';
+						break;
 					}
 				}
 			}
@@ -444,7 +444,7 @@ class FunctionsPrint {
 			$html = '<a href="' . $event->getPlace()->getURL() . '">' . $event->getPlace()->getFullName() . '</a>';
 		} else {
 			// Abbreviate the place name, for chart boxes
-			return ' - ' . $event->getPlace()->getShortName();
+			return $event->getPlace()->getShortName();
 		}
 
 		if ($sub_records) {
@@ -552,7 +552,7 @@ class FunctionsPrint {
 				if ($fact["type"] == $type || $fact["type"] == 'all') {
 					if ($newRow) {
 						$newRow = false;
-						echo '<tr><td class="descriptionbox">';
+						echo '<tr class="noprint"><td class="descriptionbox">';
 						echo I18N::translate('Add from clipboard'), '</td>';
 						echo '<td class="optionbox wrap"><form method="get" name="newFromClipboard" action="?" onsubmit="return false;">';
 						echo '<select id="newClipboardFact">';
@@ -571,40 +571,40 @@ class FunctionsPrint {
 			}
 			if (!$newRow) {
 				echo '</select>';
-				echo '&nbsp;&nbsp;<input type="button" value="', I18N::translate('Add'), "\" onclick=\"return paste_fact('$id', '#newClipboardFact');\"> ";
+				echo '&nbsp;&nbsp;<input type="button" value="', /* I18N: A button label. */ I18N::translate('add'), "\" onclick=\"return paste_fact('$id', '#newClipboardFact');\"> ";
 				echo '</form></td></tr>', "\n";
 			}
 		}
 
 		// -- Add from pick list
 		switch ($type) {
-			case "INDI":
-				$addfacts    = preg_split("/[, ;:]+/", $WT_TREE->getPreference('INDI_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
-				$uniquefacts = preg_split("/[, ;:]+/", $WT_TREE->getPreference('INDI_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
-				$quickfacts  = preg_split("/[, ;:]+/", $WT_TREE->getPreference('INDI_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
-				break;
-			case "FAM":
-				$addfacts    = preg_split("/[, ;:]+/", $WT_TREE->getPreference('FAM_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
-				$uniquefacts = preg_split("/[, ;:]+/", $WT_TREE->getPreference('FAM_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
-				$quickfacts  = preg_split("/[, ;:]+/", $WT_TREE->getPreference('FAM_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
-				break;
-			case "SOUR":
-				$addfacts    = preg_split("/[, ;:]+/", $WT_TREE->getPreference('SOUR_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
-				$uniquefacts = preg_split("/[, ;:]+/", $WT_TREE->getPreference('SOUR_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
-				$quickfacts  = preg_split("/[, ;:]+/", $WT_TREE->getPreference('SOUR_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
-				break;
-			case "NOTE":
-				$addfacts    = preg_split("/[, ;:]+/", $WT_TREE->getPreference('NOTE_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
-				$uniquefacts = preg_split("/[, ;:]+/", $WT_TREE->getPreference('NOTE_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
-				$quickfacts  = preg_split("/[, ;:]+/", $WT_TREE->getPreference('NOTE_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
-				break;
-			case "REPO":
-				$addfacts    = preg_split("/[, ;:]+/", $WT_TREE->getPreference('REPO_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
-				$uniquefacts = preg_split("/[, ;:]+/", $WT_TREE->getPreference('REPO_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
-				$quickfacts  = preg_split("/[, ;:]+/", $WT_TREE->getPreference('REPO_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
-				break;
-			default:
-				return;
+		case "INDI":
+			$addfacts    = preg_split("/[, ;:]+/", $WT_TREE->getPreference('INDI_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
+			$uniquefacts = preg_split("/[, ;:]+/", $WT_TREE->getPreference('INDI_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
+			$quickfacts  = preg_split("/[, ;:]+/", $WT_TREE->getPreference('INDI_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
+			break;
+		case "FAM":
+			$addfacts    = preg_split("/[, ;:]+/", $WT_TREE->getPreference('FAM_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
+			$uniquefacts = preg_split("/[, ;:]+/", $WT_TREE->getPreference('FAM_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
+			$quickfacts  = preg_split("/[, ;:]+/", $WT_TREE->getPreference('FAM_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
+			break;
+		case "SOUR":
+			$addfacts    = preg_split("/[, ;:]+/", $WT_TREE->getPreference('SOUR_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
+			$uniquefacts = preg_split("/[, ;:]+/", $WT_TREE->getPreference('SOUR_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
+			$quickfacts  = preg_split("/[, ;:]+/", $WT_TREE->getPreference('SOUR_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
+			break;
+		case "NOTE":
+			$addfacts    = preg_split("/[, ;:]+/", $WT_TREE->getPreference('NOTE_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
+			$uniquefacts = preg_split("/[, ;:]+/", $WT_TREE->getPreference('NOTE_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
+			$quickfacts  = preg_split("/[, ;:]+/", $WT_TREE->getPreference('NOTE_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
+			break;
+		case "REPO":
+			$addfacts    = preg_split("/[, ;:]+/", $WT_TREE->getPreference('REPO_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
+			$uniquefacts = preg_split("/[, ;:]+/", $WT_TREE->getPreference('REPO_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
+			$quickfacts  = preg_split("/[, ;:]+/", $WT_TREE->getPreference('REPO_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
+			break;
+		default:
+			return;
 		}
 		$addfacts            = array_merge(self::checkFactUnique($uniquefacts, $usedfacts, $type), $addfacts);
 		$quickfacts          = array_intersect($quickfacts, $addfacts);
@@ -615,7 +615,7 @@ class FunctionsPrint {
 		uasort($translated_addfacts, function ($x, $y) {
 			return I18N::strcasecmp(I18N::translate($x), I18N::translate($y));
 		});
-		echo '<tr><td class="descriptionbox">';
+		echo '<tr class="noprint"><td class="descriptionbox">';
 		echo I18N::translate('Fact or event');
 		echo '</td>';
 		echo '<td class="optionbox wrap">';
@@ -630,7 +630,7 @@ class FunctionsPrint {
 			echo '<option value="EVEN">', I18N::translate('Custom event'), '</option>';
 		}
 		echo '</select>';
-		echo '<input type="button" value="', I18N::translate('Add'), '" onclick="add_record(\'' . $id . '\', \'newfact\');">';
+		echo '<input type="button" value="', /* I18N: A button label. */ I18N::translate('add'), '" onclick="add_record(\'' . $id . '\', \'newfact\');">';
 		echo '<span class="quickfacts">';
 		foreach ($quickfacts as $fact) {
 			echo '<a href="#" onclick="add_new_record(\'' . $id . '\', \'' . $fact . '\');return false;">', GedcomTag::getLabel($fact), '</a>';

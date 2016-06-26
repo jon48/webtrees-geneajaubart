@@ -32,6 +32,7 @@
 		"fabpot/php-cs-fixer": "*",
 		"jon48/webtrees-tools": "dev-master",
 		"mockery/mockery": "*",
+		"phpdocumentor/phpdocumentor": "*",
 		"phpunit/phpunit": "*",
 		"satooshi/php-coveralls": "~1.0"
 	}	

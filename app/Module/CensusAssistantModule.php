@@ -417,10 +417,10 @@ class CensusAssistantModule extends AbstractModule {
 	 * @return string
 	 */
 	public static function censusNavigatorFamily(CensusInterface $census, Family $family, Individual $head) {
-		$headImg2  = '<i class="icon-button_head" title="' . I18N::translate('Click to choose individual as head of family.') . '"></i>';
+		$headImg2 = '<i class="icon-button_head" title="' . I18N::translate('Head of household') . '"></i>';
 
 		foreach ($family->getSpouses() as $spouse) {
-			$menu  = new Menu(Functions::getCloseRelationshipName($head, $spouse));
+			$menu = new Menu(Functions::getCloseRelationshipName($head, $spouse));
 			foreach ($spouse->getChildFamilies() as $grandparents) {
 				foreach ($grandparents->getSpouses() as $grandparent) {
 					$submenu = new Menu(
@@ -446,16 +446,18 @@ class CensusAssistantModule extends AbstractModule {
 					</a>
 				</td>
 				<td class="facts_value">
-					<a href="edit_interface.php?action=addnewnote_assisted&amp;noteid=newnote&amp;xref=<?php echo $spouse->getXref(); ?>&amp;gedcom=<?php echo $spouse->getTree()->getNameUrl(); ?>&amp;census=<?php echo get_class($census); ?>">
-						<?php echo $headImg2; ?>
-					</a>
+					<?php if ($head !== $spouse): ?>
+						<a href="edit_interface.php?action=addnewnote_assisted&amp;noteid=newnote&amp;xref=<?php echo $spouse->getXref(); ?>&amp;gedcom=<?php echo $spouse->getTree()->getNameUrl(); ?>&amp;census=<?php echo get_class($census); ?>">
+							<?php echo $headImg2; ?>
+						</a>
+					<?php endif; ?>
 				</td>
 			</tr>
 			<?php
 		}
 
 		foreach ($family->getChildren() as $child) {
-			$menu  = new Menu(Functions::getCloseRelationshipName($head, $child));
+			$menu = new Menu(Functions::getCloseRelationshipName($head, $child));
 			foreach ($child->getSpouseFamilies() as $spouse_family) {
 				foreach ($spouse_family->getSpouses() as $spouse_family_spouse) {
 					if ($spouse_family_spouse != $child) {
@@ -494,9 +496,11 @@ class CensusAssistantModule extends AbstractModule {
 					</a>
 				</td>
 				<td class="facts_value">
-					<a href="edit_interface.php?action=addnewnote_assisted&amp;noteid=newnote&amp;xref=<?php echo $child->getXref(); ?>&amp;gedcom=<?php echo $child->getTree()->getNameUrl(); ?>&amp;census=<?php echo get_class($census); ?>">
-						<?php echo $headImg2; ?>
-					</a>
+					<?php if ($head !== $child): ?>
+						<a href="edit_interface.php?action=addnewnote_assisted&amp;noteid=newnote&amp;xref=<?php echo $child->getXref(); ?>&amp;gedcom=<?php echo $child->getTree()->getNameUrl(); ?>&amp;census=<?php echo get_class($census); ?>">
+							<?php echo $headImg2; ?>
+						</a>
+					<?php endif; ?>
 				</td>
 			</tr>
 			<?php

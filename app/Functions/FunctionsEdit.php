@@ -27,7 +27,6 @@ use Fisharebest\Webtrees\Census\CensusOfScotland;
 use Fisharebest\Webtrees\Census\CensusOfUnitedStates;
 use Fisharebest\Webtrees\Census\CensusOfWales;
 use Fisharebest\Webtrees\Config;
-use Fisharebest\Webtrees\Database;
 use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Family;
@@ -48,6 +47,7 @@ use Fisharebest\Webtrees\Module;
 use Fisharebest\Webtrees\Note;
 use Fisharebest\Webtrees\Repository;
 use Fisharebest\Webtrees\Source;
+use Fisharebest\Webtrees\User;
 use Rhumsaa\Uuid\Uuid;
 
 //PERSO
@@ -308,15 +308,16 @@ class FunctionsEdit {
 	 * @return string
 	 */
 	public static function editFieldUsername($name, $selected = '', $extra = '') {
-		$all_users = Database::prepare(
-			"SELECT user_name, CONCAT_WS(' ', real_name, '-', user_name) FROM `##user` ORDER BY real_name"
-		)->fetchAssoc();
+		$users = array();
+		foreach (User::all() as $user) {
+			$users[$user->getUserName()] = $user->getRealName() . ' - ' . $user->getUserName();
+		}
 		// The currently selected user may not exist
-		if ($selected && !array_key_exists($selected, $all_users)) {
-			$all_users[$selected] = $selected;
+		if ($selected && !array_key_exists($selected, $users)) {
+			$users[$selected] = $selected;
 		}
 
-		return self::selectEditControl($name, $all_users, '-', $selected, $extra);
+		return self::selectEditControl($name, $users, '-', $selected, $extra);
 	}
 
 	/**
@@ -419,7 +420,7 @@ class FunctionsEdit {
 	 * @return string
 	 */
 	public static function printAddNewMediaLink($element_id) {
-		return '<a href="#" onclick="pastefield=document.getElementById(\'' . $element_id . '\'); window.open(\'addmedia.php?action=showmediaform\', \'_blank\', edit_window_specs); return false;" class="icon-button_addmedia" title="' . I18N::translate('Create a new media object') . '"></a>';
+		return '<a href="#" onclick="pastefield=document.getElementById(\'' . $element_id . '\'); window.open(\'addmedia.php?action=showmediaform\', \'_blank\', edit_window_specs); return false;" class="icon-button_addmedia" title="' . I18N::translate('Create a media object') . '"></a>';
 	}
 
 	/**
@@ -430,7 +431,7 @@ class FunctionsEdit {
 	 * @return string
 	 */
 	public static function printAddNewRepositoryLink($element_id) {
-		return '<a href="#" onclick="addnewrepository(document.getElementById(\'' . $element_id . '\')); return false;" class="icon-button_addrepository" title="' . I18N::translate('Create a new repository') . '"></a>';
+		return '<a href="#" onclick="addnewrepository(document.getElementById(\'' . $element_id . '\')); return false;" class="icon-button_addrepository" title="' . I18N::translate('Create a repository') . '"></a>';
 	}
 
 	/**
@@ -441,7 +442,7 @@ class FunctionsEdit {
 	 * @return string
 	 */
 	public static function printAddNewNoteLink($element_id) {
-		return '<a href="#" onclick="addnewnote(document.getElementById(\'' . $element_id . '\')); return false;" class="icon-button_addnote" title="' . I18N::translate('Create a new shared note') . '"></a>';
+		return '<a href="#" onclick="addnewnote(document.getElementById(\'' . $element_id . '\')); return false;" class="icon-button_addnote" title="' . I18N::translate('Create a shared note') . '"></a>';
 	}
 
 	/**
@@ -452,7 +453,7 @@ class FunctionsEdit {
 	 * @return string
 	 */
 	public static function printEditNoteLink($note_id) {
-		return '<a href="#" onclick="edit_note(\'' . $note_id . '\'); return false;" class="icon-button_note" title="' . I18N::translate('Edit shared note') . '"></a>';
+		return '<a href="#" onclick="edit_note(\'' . $note_id . '\'); return false;" class="icon-button_note" title="' . I18N::translate('Edit the shared note') . '"></a>';
 	}
 
 	/**
@@ -463,7 +464,7 @@ class FunctionsEdit {
 	 * @return string
 	 */
 	public static function printAddNewSourceLink($element_id) {
-		return '<a href="#" onclick="addnewsource(document.getElementById(\'' . $element_id . '\')); return false;" class="icon-button_addsource" title="' . I18N::translate('Create a new source') . '"></a>';
+		return '<a href="#" onclick="addnewsource(document.getElementById(\'' . $element_id . '\')); return false;" class="icon-button_addsource" title="' . I18N::translate('Create a source') . '"></a>';
 	}
 
 	/**
@@ -538,7 +539,7 @@ class FunctionsEdit {
 
 		// label
 		echo '<tr id="', $element_id, '_tr"';
-		if ($fact === 'MAP' || ($fact === 'LATI' || $fact === 'LONG') && $value === '') {
+		if ($fact === 'DATA' || $fact === 'MAP' || ($fact === 'LATI' || $fact === 'LONG') && $value === '') {
 			echo ' style="display:none;"';
 		}
 		echo '>';
@@ -589,13 +590,6 @@ class FunctionsEdit {
 		}
 		// tag level
 		if ($level > 0) {
-			if ($fact === 'TEXT' && $level > 1) {
-				echo '<input type="hidden" name="glevels[]" value="', $level - 1, '">';
-				echo '<input type="hidden" name="islink[]" value="0">';
-				echo '<input type="hidden" name="tag[]" value="DATA">';
-				// leave data text[] value empty because the following TEXT line will cause the DATA to be added
-				echo '<input type="hidden" name="text[]" value="">';
-			}
 			echo '<input type="hidden" name="glevels[]" value="', $level, '">';
 			echo '<input type="hidden" name="islink[]" value="', $islink, '">';
 			echo '<input type="hidden" name="tag[]" value="', $fact, '">';
@@ -645,7 +639,7 @@ class FunctionsEdit {
 				if (Module::getModuleByName('GEDFact_assistant') && GedcomRecord::getInstance($xref, $WT_TREE) instanceof Individual) {
 					echo
 						'<div></div><a href="#" style="display: none;" id="assistant-link" onclick="return activateCensusAssistant();">' .
-						I18N::translate('Create a new shared note using assistant') .
+						I18N::translate('Create a shared note using the census assistant') .
 						'</a></div>';
 				}
 			}
@@ -716,7 +710,7 @@ class FunctionsEdit {
 			// Populated in javascript from sub-tags
 			echo '<input type="hidden" id="', $element_id, '" name="', $element_name, '" onchange="updateTextName(\'', $element_id, '\');" value="', Filter::escapeHtml($value), '" class="', $fact, '">';
 			echo '<span id="', $element_id, '_display" dir="auto">', Filter::escapeHtml($value), '</span>';
-			echo ' <a href="#edit_name" onclick="convertHidden(\'', $element_id, '\'); return false;" class="icon-edit_indi" title="' . I18N::translate('Edit name') . '"></a>';
+			echo ' <a href="#edit_name" onclick="convertHidden(\'', $element_id, '\'); return false;" class="icon-edit_indi" title="' . I18N::translate('Edit the name') . '"></a>';
 		} else {
 			//PERSO Implement custom tags management
 			$hook_get_simpletag_editor = HookProvider::get('hHtmlSimpleTagEditor', $fact);
@@ -1081,7 +1075,7 @@ class FunctionsEdit {
 
 		switch ($tag) {
 		case 'SOUR':
-			echo '<a href="#" onclick="return expand_layer(\'newsource\');"><i id="newsource_img" class="icon-plus"></i> ', I18N::translate('Add a new source citation'), '</a>';
+			echo '<a href="#" onclick="return expand_layer(\'newsource\');"><i id="newsource_img" class="icon-plus"></i> ', I18N::translate('Add a source citation'), '</a>';
 			echo '<br>';
 			echo '<div id="newsource" style="display: none;">';
 			echo '<table class="facts_table">';
@@ -1090,6 +1084,7 @@ class FunctionsEdit {
 			// 3 PAGE
 			self::addSimpleTag(($level + 1) . ' PAGE');
 			// 3 DATA
+			self::addSimpleTag(($level + 1) . ' DATA');
 			// 4 TEXT
 			self::addSimpleTag(($level + 2) . ' TEXT');
 			if ($WT_TREE->getPreference('FULL_SOURCES')) {
@@ -1112,11 +1107,11 @@ class FunctionsEdit {
 		case 'ASSO2':
 			//-- Add a new ASSOciate
 			if ($tag === 'ASSO') {
-				echo "<a href=\"#\" onclick=\"return expand_layer('newasso');\"><i id=\"newasso_img\" class=\"icon-plus\"></i> ", I18N::translate('Add a new associate'), '</a>';
+				echo "<a href=\"#\" onclick=\"return expand_layer('newasso');\"><i id=\"newasso_img\" class=\"icon-plus\"></i> ", I18N::translate('Add an associate'), '</a>';
 				echo '<br>';
 				echo '<div id="newasso" style="display: none;">';
 			} else {
-				echo "<a href=\"#\" onclick=\"return expand_layer('newasso2');\"><i id=\"newasso2_img\" class=\"icon-plus\"></i> ", I18N::translate('Add a new associate'), '</a>';
+				echo "<a href=\"#\" onclick=\"return expand_layer('newasso2');\"><i id=\"newasso2_img\" class=\"icon-plus\"></i> ", I18N::translate('Add an associate'), '</a>';
 				echo '<br>';
 				echo '<div id="newasso2" style="display: none;">';
 			}
@@ -1134,7 +1129,7 @@ class FunctionsEdit {
 
 		case 'NOTE':
 			//-- Retrieve existing note or add new note to fact
-			echo "<a href=\"#\" onclick=\"return expand_layer('newnote');\"><i id=\"newnote_img\" class=\"icon-plus\"></i> ", I18N::translate('Add a new note'), '</a>';
+			echo "<a href=\"#\" onclick=\"return expand_layer('newnote');\"><i id=\"newnote_img\" class=\"icon-plus\"></i> ", I18N::translate('Add a note'), '</a>';
 			echo '<br>';
 			echo '<div id="newnote" style="display: none;">';
 			echo '<table class="facts_table">';
@@ -1144,7 +1139,7 @@ class FunctionsEdit {
 			break;
 
 		case 'SHARED_NOTE':
-			echo "<a href=\"#\" onclick=\"return expand_layer('newshared_note');\"><i id=\"newshared_note_img\" class=\"icon-plus\"></i> ", I18N::translate('Add a new shared note'), '</a>';
+			echo "<a href=\"#\" onclick=\"return expand_layer('newshared_note');\"><i id=\"newshared_note_img\" class=\"icon-plus\"></i> ", I18N::translate('Add a shared note'), '</a>';
 			echo '<br>';
 			echo '<div id="newshared_note" style="display: none;">';
 			echo '<table class="facts_table">';
@@ -1155,7 +1150,7 @@ class FunctionsEdit {
 
 		case 'OBJE':
 			if ($WT_TREE->getPreference('MEDIA_UPLOAD') >= Auth::accessLevel($WT_TREE)) {
-				echo "<a href=\"#\" onclick=\"return expand_layer('newobje');\"><i id=\"newobje_img\" class=\"icon-plus\"></i> ", I18N::translate('Add a new media object'), '</a>';
+				echo "<a href=\"#\" onclick=\"return expand_layer('newobje');\"><i id=\"newobje_img\" class=\"icon-plus\"></i> ", I18N::translate('Add a media object'), '</a>';
 				echo '<br>';
 				echo '<div id="newobje" style="display: none;">';
 				echo '<table class="facts_table">';
@@ -1165,7 +1160,7 @@ class FunctionsEdit {
 			break;
 
 		case 'RESN':
-			echo "<a href=\"#\" onclick=\"return expand_layer('newresn');\"><i id=\"newresn_img\" class=\"icon-plus\"></i> ", I18N::translate('Add a new restriction'), '</a>';
+			echo "<a href=\"#\" onclick=\"return expand_layer('newresn');\"><i id=\"newresn_img\" class=\"icon-plus\"></i> ", I18N::translate('Add a restriction'), '</a>';
 			echo '<br>';
 			echo '<div id="newresn" style="display: none;">';
 			echo '<table class="facts_table">';
@@ -1539,13 +1534,9 @@ class FunctionsEdit {
 
 			//-- if the value is not empty or it has sub lines
 			//--- then write the line to the gedcom record
-			//if ((($text[trim($j)]!='')||($pass==true)) && (strlen($text[$j]) > 0)) {
 			//-- we have to let some emtpy text lines pass through... (DEAT, BIRT, etc)
 			if ($pass) {
 				$newline = $glevels[$j] + $levelAdjust . ' ' . $tag[$j];
-				//-- check and translate the incoming dates
-				if ($tag[$j] === 'DATE' && $text[$j] !== '') {
-				}
 				if ($text[$j] !== '') {
 					if ($islink[$j]) {
 						$newline .= ' @' . $text[$j] . '@';
@@ -1608,15 +1599,14 @@ class FunctionsEdit {
 	/**
 	 * Create a form to edit a Fact object.
 	 *
-	 * @param GedcomRecord $record
 	 * @param Fact $fact
 	 *
 	 * @return string
 	 */
-	public static function createEditForm(GedcomRecord $record, Fact $fact) {
-		global $tags, $WT_TREE;
+	public static function createEditForm(Fact $fact) {
+		global $tags;
 
-		$pid = $record->getXref();
+		$record = $fact->getParent();
 
 		$tags     = array();
 		$gedlines = explode("\n", $fact->getGedcom());
@@ -1627,14 +1617,14 @@ class FunctionsEdit {
 		$level   = $glevel;
 
 		$type       = $fact->getTag();
-		$parent     = $fact->getParent();
-		$level0type = $parent::RECORD_TYPE;
+		$level0type = $record::RECORD_TYPE;
 		$level1type = $type;
 
 		$i           = $linenum;
 		$inSource    = false;
 		$levelSource = 0;
 		$add_date    = true;
+
 		// List of tags we would expect at the next level
 		// NB add_missing_subtags() already takes care of the simple cases
 		// where a level 1 tag is missing a level 2 tag. Here we only need to
@@ -1649,6 +1639,12 @@ class FunctionsEdit {
 			$expected_subtags['SOUR'][] = 'QUAY';
 			$expected_subtags['DATA'][] = 'DATE';
 		}
+		if (GedcomCodeTemp::isTagLDS($level1type)) {
+			$expected_subtags['STAT'] = array('DATE');
+		}
+		if (in_array($level1type, Config::dateAndTime())) {
+			$expected_subtags['DATE'] = array('TIME'); // TIME is NOT a valid 5.5.1 tag
+		}
 		if (preg_match_all('/(' . WT_REGEX_TAG . ')/', $record->getTree()->getPreference('ADVANCED_PLAC_FACTS'), $match)) {
 			$expected_subtags['PLAC'] = array_merge($match[1], $expected_subtags['PLAC']);
 		}
@@ -1661,13 +1657,13 @@ class FunctionsEdit {
 		}
 		//END PERSO
 
-		$stack = array(0 => $level0type);
+		$stack = array();
 		// Loop on existing tags :
 		while (true) {
 			// Keep track of our hierarchy, e.g. 1=>BIRT, 2=>PLAC, 3=>FONE
-			$stack[(int) $level] = $type;
+			$stack[$level] = $type;
 			// Merge them together, e.g. BIRT:PLAC:FONE
-			$label = implode(':', array_slice($stack, 1, $level));
+			$label = implode(':', array_slice($stack, 0, $level));
 
 			$text = '';
 			for ($j = 2; $j < count($fields); $j++) {
@@ -1689,31 +1685,27 @@ class FunctionsEdit {
 				$inSource = false;
 			}
 
-			if ($type !== 'DATA' && $type !== 'CONT') {
+			if ($type !== 'CONT') {
 				$tags[]    = $type;
-				$person    = Individual::getInstance($pid, $WT_TREE);
 				$subrecord = $level . ' ' . $type . ' ' . $text;
 				if ($inSource && $type === 'DATE') {
-					self::addSimpleTag($subrecord, '', GedcomTag::getLabel($label, $person));
+					self::addSimpleTag($subrecord, '', GedcomTag::getLabel($label, $record));
 				} elseif (!$inSource && $type === 'DATE') {
-					self::addSimpleTag($subrecord, $level1type, GedcomTag::getLabel($label, $person));
+					self::addSimpleTag($subrecord, $level1type, GedcomTag::getLabel($label, $record));
 					if ($level === '2') {
 						// We already have a date - no need to add one.
 						$add_date = false;
 					}
 				} elseif ($type === 'STAT') {
-					self::addSimpleTag($subrecord, $level1type, GedcomTag::getLabel($label, $person));
-				} elseif ($level0type === 'REPO') {
-					$repo = Repository::getInstance($pid, $WT_TREE);
-					self::addSimpleTag($subrecord, $level0type, GedcomTag::getLabel($label, $repo));
+					self::addSimpleTag($subrecord, $level1type, GedcomTag::getLabel($label, $record));
 				} else {
-					self::addSimpleTag($subrecord, $level0type, GedcomTag::getLabel($label, $person));
+					self::addSimpleTag($subrecord, $level0type, GedcomTag::getLabel($label, $record));
 				}
 			}
 
 			// Get a list of tags present at the next level
 			$subtags = array();
-			for ($ii = $i + 1; isset($gedlines[$ii]) && preg_match('/^\s*(\d+)\s+(\S+)/', $gedlines[$ii], $mm) && $mm[1] > $level; ++$ii) {
+			for ($ii = $i + 1; isset($gedlines[$ii]) && preg_match('/^(\d+) (\S+)/', $gedlines[$ii], $mm) && $mm[1] > $level; ++$ii) {
 				if ($mm[1] == $level + 1) {
 					$subtags[] = $mm[2];
 				}
@@ -1723,9 +1715,7 @@ class FunctionsEdit {
 			if (!empty($expected_subtags[$type])) {
 				foreach ($expected_subtags[$type] as $subtag) {
 					if (!in_array($subtag, $subtags)) {
-						if (!$inSource || $subtag !== 'DATA') {
-							self::addSimpleTag(($level + 1) . ' ' . $subtag, '', GedcomTag::getLabel($label . ':' . $subtag));
-						}
+						self::addSimpleTag(($level + 1) . ' ' . $subtag, '', GedcomTag::getLabel($label . ':' . $subtag));
 						if (!empty($expected_subtags[$subtag])) {
 							foreach ($expected_subtags[$subtag] as $subsubtag) {
 								self::addSimpleTag(($level + 2) . ' ' . $subsubtag, '', GedcomTag::getLabel($label . ':' . $subtag . ':' . $subsubtag));
@@ -1733,14 +1723,6 @@ class FunctionsEdit {
 						}
 					}
 				}
-			}
-
-			// Awkward special cases
-			if ($level == 2 && $type === 'DATE' && in_array($level1type, Config::dateAndTime()) && !in_array('TIME', $subtags)) {
-				self::addSimpleTag('3 TIME'); // TIME is NOT a valid 5.5.1 tag
-			}
-			if ($level == 2 && $type === 'STAT' && GedcomCodeTemp::isTagLDS($level1type) && !in_array('DATE', $subtags)) {
-				self::addSimpleTag('3 DATE', '', GedcomTag::getLabel('STAT:DATE'));
 			}
 
 			$i++;

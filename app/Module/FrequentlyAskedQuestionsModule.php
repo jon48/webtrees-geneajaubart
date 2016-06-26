@@ -125,7 +125,7 @@ class FrequentlyAskedQuestionsModule extends AbstractModule implements ModuleMen
 	/**
 	 * Action from the configuration page
 	 */
-		private function edit() {
+	private function edit() {
 		global $WT_TREE;
 
 		$controller = new PageController;
@@ -133,7 +133,7 @@ class FrequentlyAskedQuestionsModule extends AbstractModule implements ModuleMen
 
 			$block_id = Filter::getInteger('block_id');
 		if ($block_id) {
-			$controller->setPageTitle(I18N::translate('Edit FAQ item'));
+			$controller->setPageTitle(I18N::translate('Edit the FAQ item'));
 			$header      = $this->getBlockSetting($block_id, 'header');
 			$faqbody     = $this->getBlockSetting($block_id, 'faqbody');
 			$block_order = Database::prepare(
@@ -194,7 +194,7 @@ class FrequentlyAskedQuestionsModule extends AbstractModule implements ModuleMen
 
 		<div class="form-group">
 			<label for="xref" class="col-sm-3 control-label">
-				<?php echo I18N::translate('Show this block for which languages?'); ?>
+				<?php echo /* I18N: Label for a configuration option */ I18N::translate('Show this block for which languages'); ?>
 			</label>
 
 			<div class="col-sm-9">
@@ -360,14 +360,11 @@ class FrequentlyAskedQuestionsModule extends AbstractModule implements ModuleMen
 			'tree_id_2'   => $WT_TREE->getTreeId(),
 		))->fetchAll();
 
-		// Define your colors for the alternating rows
-		echo '<h2 class="center">', I18N::translate('Frequently asked questions'), '</h2>';
-		// Instructions
-		echo '<div class="faq_italic">', I18N::translate('Click on a title to go straight to it, or scroll down to read them all.');
+		echo '<h2 class="center">', I18N::translate('Frequently asked questions');
 		if (Auth::isManager($WT_TREE)) {
-			echo '<div class="faq_edit"><a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_config">', I18N::translate('Click here to add, edit, or delete'), '</a></div>';
+			echo ' — <a href="module.php?mod=', $this->getName(), '&amp;mod_action=admin_config">', I18N::translate('edit'), '</a>';
 		}
-		echo '</div>';
+		echo '</h2>';
 		$row_count = 0;
 		echo '<table class="faq">';
 		// List of titles
@@ -526,11 +523,15 @@ class FrequentlyAskedQuestionsModule extends AbstractModule implements ModuleMen
 		global $WT_TREE;
 
 		$faqs = Database::prepare(
-			"SELECT block_id FROM `##block` WHERE module_name = :module_name AND IFNULL(gedcom_id, :tree_id_1) = :tree_id_2"
+			"SELECT block_id FROM `##block`" .
+			" JOIN `##block_setting` USING (block_id)" .
+			" WHERE module_name = :module_name AND IFNULL(gedcom_id, :tree_id_1) = :tree_id_2" .
+			" AND setting_name='languages' AND (setting_value LIKE CONCAT('%', :locale, '%') OR setting_value='')"
 		)->execute(array(
 			'module_name' => $this->getName(),
 			'tree_id_1'   => $WT_TREE->getTreeId(),
 			'tree_id_2'   => $WT_TREE->getTreeId(),
+			'locale'      => WT_LOCALE,
 		))->fetchAll();
 
 		if ($faqs) {

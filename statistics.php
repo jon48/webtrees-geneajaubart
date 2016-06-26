@@ -35,7 +35,9 @@ $ajax = Filter::getBool('ajax');
 
 if (!$ajax) {
 	$controller = new PageController;
-	$controller->setPageTitle(I18N::translate('Statistics'))
+	$controller
+		->restrictAccess(Module::isActiveChart($WT_TREE, 'statistics_chart'))
+		->setPageTitle(I18N::translate('Statistics'))
 		->addExternalJavascript(WT_AUTOCOMPLETE_JS_URL)
 		->addInlineJavascript('
 			jQuery("#statistics_chart").css("visibility", "visible");
@@ -590,7 +592,7 @@ if (!$ajax) {
 		echo GedcomTag::getLabel('SURN'), FunctionsPrint::helpLink('google_chart_surname'), '<br><input data-autocomplete-type="SURN" type="text" name="SURN" size="20">';
 		echo '<br>
 			</div>';
-		echo I18N::translate('Geographical area');
+		echo I18N::translate('Geographic area');
 		echo '<br><select id="chart_shows" name="chart_shows">
 				<option value="world" selected>', I18N::translate('World'), '</option>
 				<option value="europe">', I18N::translate('Europe'), '</option>
@@ -640,8 +642,7 @@ if (!$ajax) {
 			<table width="100%">
 			<tr style="text-align:center;"><td>
 				<br>
-				<input type="submit" value="', I18N::translate('show the plot'), ' ">
-				<input type="reset"  value=" ', I18N::translate('reset'), ' " onclick="{statusEnable(\'z_sex\'); statusHide(\'x_years\'); statusHide(\'x_months\'); statusHide(\'x_numbers\'); statusHide(\'map_opt\');}"><br>
+				<input type="submit" value="', I18N::translate('show the chart'), ' ">
 			</td>
 			</tr>
 		</table>

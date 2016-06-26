@@ -218,10 +218,10 @@ class I18N {
 		return
 			'"language": {' .
 			' "paginate": {' .
-			'  "first":    "' . /* I18N: button label, first page */ self::translate('first') . '",' .
-			'  "last":     "' . /* I18N: button label, last page */ self::translate('last') . '",' .
-			'  "next":     "' . /* I18N: button label, next page */ self::translate('next') . '",' .
-			'  "previous": "' . /* I18N: button label, previous page */ self::translate('previous') . '"' .
+			'  "first":    "' . /* I18N: A button label, first page */ self::translate('first') . '",' .
+			'  "last":     "' . /* I18N: A button label, last page */ self::translate('last') . '",' .
+			'  "next":     "' . /* I18N: A button label, next page */ self::translate('next') . '",' .
+			'  "previous": "' . /* I18N: A button label, previous page */ self::translate('previous') . '"' .
 			' },' .
 			' "emptyTable":     "' . self::translate('No records to display') . '",' .
 			' "info":           "' . /* I18N: %s are placeholders for numbers */ self::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_') . '",' .
@@ -282,15 +282,15 @@ class I18N {
 	 */
 	public static function gedcomAge($string) {
 		switch ($string) {
-			case 'STILLBORN':
-				// I18N: Description of an individual’s age at an event. For example, Died 14 Jan 1900 (stillborn)
-				return self::translate('(stillborn)');
-			case 'INFANT':
-				// I18N: Description of an individual’s age at an event. For example, Died 14 Jan 1900 (in infancy)
-				return self::translate('(in infancy)');
-			case 'CHILD':
-				// I18N: Description of an individual’s age at an event. For example, Died 14 Jan 1900 (in childhood)
-				return self::translate('(in childhood)');
+		case 'STILLBORN':
+			// I18N: Description of an individual’s age at an event. For example, Died 14 Jan 1900 (stillborn)
+			return self::translate('(stillborn)');
+		case 'INFANT':
+			// I18N: Description of an individual’s age at an event. For example, Died 14 Jan 1900 (in infancy)
+			return self::translate('(in infancy)');
+		case 'CHILD':
+			// I18N: Description of an individual’s age at an event. For example, Died 14 Jan 1900 (in childhood)
+			return self::translate('(in childhood)');
 		}
 		$age = array();
 		if (preg_match('/(\d+)y/', $string, $match)) {
@@ -377,7 +377,7 @@ class I18N {
 		}
 
 		$cache_dir_exists = File::mkdir(WT_DATA_DIR . 'cache');
-		$cache_file = WT_DATA_DIR . 'cache/language-' . self::$locale->languageTag() . '-cache.php';
+		$cache_file       = WT_DATA_DIR . 'cache/language-' . self::$locale->languageTag() . '-cache.php';
 		if (file_exists($cache_file)) {
 			$filemtime = filemtime($cache_file);
 		} else {
@@ -421,7 +421,8 @@ class I18N {
 				$translation  = new Translation($translation_file);
 				$translations = array_merge($translations, $translation->asArray());
 			}
-			if ($cache_dir_exists && is_writeable($cache_file)) { // During setup, we may not have been able to create it.
+			if ($cache_dir_exists && is_writeable($cache_file)) {
+				// During setup, we may not have been able to create it.
 				file_put_contents($cache_file, '<' . '?php return ' . var_export($translations, true) . ';');
 			}
 		} else {
@@ -874,15 +875,15 @@ class I18N {
 	 */
 	public static function defaultCalendar() {
 		switch (self::$locale->languageTag()) {
-			case 'ar':
-				return new ArabicCalendar;
-			case 'fa':
-				return new PersianCalendar;
-			case 'he':
-			case 'yi':
-				return new JewishCalendar;
-			default:
-				return new GregorianCalendar;
+		case 'ar':
+			return new ArabicCalendar;
+		case 'fa':
+			return new PersianCalendar;
+		case 'he':
+		case 'yi':
+			return new JewishCalendar;
+		default:
+			return new GregorianCalendar;
 		}
 	}
 }

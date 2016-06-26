@@ -100,7 +100,7 @@ class ReviewChangesModule extends AbstractModule implements ModuleBlockInterface
 			$id    = $this->getName() . $block_id;
 			$class = $this->getName() . '_block';
 			if ($ctype === 'user' || Auth::isManager($WT_TREE)) {
-				$title = '<a class="icon-admin" title="' . I18N::translate('Configure') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
+				$title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
 			} else {
 				$title = '';
 			}
@@ -182,7 +182,7 @@ class ReviewChangesModule extends AbstractModule implements ModuleBlockInterface
 
 	<?php
 		echo '<tr><td class="descriptionbox wrap width33">';
-		echo I18N::translate('Send out reminder emails?');
+		echo /* I18N: Label for a configuration option */ I18N::translate('Send out reminder emails');
 		echo '</td><td class="optionbox">';
 		echo FunctionsEdit::editFieldYesNo('sendmail', $sendmail);
 		echo '<br>';

@@ -103,7 +103,7 @@ class HtmlBlockModule extends AbstractModule implements ModuleBlockInterface {
 		$id    = $this->getName() . $block_id;
 		$class = $this->getName() . '_block';
 		if ($ctype === 'gedcom' && Auth::isManager($WT_TREE) || $ctype === 'user' && Auth::check()) {
-			$title = '<a class="icon-admin" title="' . I18N::translate('Configure') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>' . $title;
+			$title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>' . $title;
 		}
 
 		$content = $html;
@@ -329,7 +329,7 @@ class HtmlBlockModule extends AbstractModule implements ModuleBlockInterface {
 		echo '</td></tr>';
 
 		echo '<tr><td class="descriptionbox wrap">';
-		echo I18N::translate('Show this block for which languages?');
+		echo I18N::translate('Show this block for which languages');
 		echo '</td><td class="optionbox">';
 		echo FunctionsEdit::editLanguageCheckboxes('lang', $languages);
 		echo '</td></tr>';

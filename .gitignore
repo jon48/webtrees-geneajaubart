@@ -1,6 +1,7 @@
 
 /.vagrant
 /apidocs/
+robots.txt
 
 # /
 /.buildpath
@@ -8,18 +9,6 @@
 /.settings
 /svn*
 /test*.php
-
-# /data/
-/data/*.GED
-/data/*.ged
-/data/*.zip
-/data/cache
-/data/config*
-/data/histo.fr.php
-/data/html_purifier_cache
-
-# /data/certificates/
-/data/certificates/*
 
 # /modules_v3/
 /modules_v3/myartjaub_translationtool
@@ -34,33 +23,6 @@
 /language/.gitattributes
 /language/.gitignore
 /language/updateLanguages.bat
-
-#Vendor
-vendor/bin/
-vendor/jon48/
-vendor/doctrine/
-vendor/fabpot/
-vendor/fisharebest/webtrees/
-vendor/gettext/
-vendor/guzzle/
-vendor/hamcrest/
-vendor/mockery/
-vendor/myclabs/
-vendor/phpdocumentor/
-vendor/phpspec/
-vendor/phpunit/
-vendor/psr/
-vendor/satooshi/
-vendor/sebastian/
-vendor/symfony/config/
-vendor/symfony/console/
-vendor/symfony/event-dispatcher/
-vendor/symfony/filesystem/
-vendor/symfony/finder/
-vendor/symfony/process/
-vendor/symfony/stopwatch/
-vendor/symfony/yaml/
-vendor/twbs/
 
 # Utilities configuration files
 /phpunit.xml
