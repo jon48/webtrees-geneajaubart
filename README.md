@@ -87,10 +87,10 @@ Available modules:
   * Placeholder module for miscellaneous extensions.
 * **MyArtJaub Patronymic Lineage** (`myartjaub_patronymiclineage`)
   * Alternative to Branches page (created before the latter).
-* **MyArtJaub Sources** (`myartjaub_issourced`)
-  * Provides information about the level and quality of sourced for records.
 * **MyArtJaub Sosa** (`myartjaub_sosa`)
   * Module to manage Sosa ancestors, and provide statistics.
+* **MyArtJaub Sources** (`myartjaub_issourced`)
+  * Provides information about the level and quality of sourced for records.
 * **MyArtJaub Welcome Block** (`myartjaub_welcome_block`)
   * Merge of standard welcome and login blocks, with display of Piwik statistics
   

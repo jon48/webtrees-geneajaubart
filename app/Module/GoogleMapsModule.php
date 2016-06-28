@@ -560,7 +560,7 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 
 		$flags_s = array();
 		if ($stateSelected != 'States' && is_dir(WT_ROOT . WT_MODULES_DIR . 'googlemap/places/' . $countrySelected . '/flags/' . $stateSelected)) {
-			$files = glob(WT_ROOT . WT_MODULES_DIR . 'googlemap/places/' . $countrySelected . '/flags/' . $stateSelected . '*.png');
+			$files = glob(WT_ROOT . WT_MODULES_DIR . 'googlemap/places/' . $countrySelected . '/flags/' . $stateSelected . '/*.png');
 			foreach ($files as $file) {
 				$flags_s[] = basename($file, '.png');
 			}
@@ -675,7 +675,7 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 						echo '<td>';
 						echo '<input type="radio" dir="ltr" name="FLAGS" value="' . $i++ . '">';
 						//PERSO Resize flags
-						echo '<img "flag_gm_w25" style="margin-right:15px" src="' . $path . $flag . '.png" alt="' . $flag . '" title="' . $title . '">';
+						echo '<img class="flag_gm_w25" style="margin-right:15px" src="' . $path . $flag . '.png" alt="' . $flag . '" title="' . $title . '">';
 						//END PERSO
 						echo $flag . '</td>';
 
@@ -685,7 +685,7 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 					echo "</tr>";
 				}
 
-				echo'<tr style="visibility:' . $countrySelected == 'Countries' || count($stateList) == 0 ? 'hidden' : 'visible' . '">';
+				echo'<tr style="visibility:' . (($countrySelected == 'Countries' || count($stateList) == 0) ? 'hidden' : 'visible') . '">';
 				?>
 
 				<td class="optionbox" colspan="4">
@@ -703,12 +703,14 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 			</tr>
 
 			<?php
-
+			
+            $i = 0;
 			if (!empty($flags_s)) {
 				foreach (array_chunk($flags_s, 4) as $row) {
+					echo "<tr>";
 					foreach ($row as $flag) {
 						//PERSO Resize flags
-						echo '<td><input type="radio" dir="ltr" name="FLAGS" value="', $i++, '"><img class="flag_gm_w25" src="', WT_STATIC_URL . WT_MODULES_DIR, 'googlemap/places/', $countrySelected, '/flags/', $stateSelected, '/', $flag, '.png">&nbsp;&nbsp;', $flag, '></td>';
+						echo '<td><input type="radio" dir="ltr" name="FLAGS" value="', $i++, '"><img class="flag_gm_w25" src="', WT_STATIC_URL . WT_MODULES_DIR, 'googlemap/places/', $countrySelected, '/flags/', $stateSelected, '/', $flag, '.png">&nbsp;&nbsp;', $flag, '</td>';
 						//END PERSO
 					}
 					echo str_repeat('<td></td>', 4 - count($row));
