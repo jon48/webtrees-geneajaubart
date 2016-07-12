@@ -437,7 +437,7 @@ abstract class AbstractTheme {
 		return
 			$this->formatContactLinks() .
 			//PERSO
-			implode('', \MyArtJaub\Webtrees\Hook\HookProvider::get('hPrintFooter')->execute()) .
+			implode('', \MyArtJaub\Webtrees\Hook\HookProvider::getInstance()->get('hPrintFooter')->execute()) .
 			//PERSO
 			$this->logoPoweredBy() .
 			$this->formatPageViews($this->page_views) .
@@ -776,7 +776,7 @@ abstract class AbstractTheme {
 			$content .
 			//PERSO Append record name text
 			'<span class="rn_append">' .
-			implode('&nbsp;', \MyArtJaub\Webtrees\Hook\HookProvider::get('hRecordNameAppend')->execute($individual)) .
+			implode('&nbsp;', \MyArtJaub\Webtrees\Hook\HookProvider::getInstance()->get('hRecordNameAppend')->execute($individual)) .
 			'</span>' .
 			//END PERSO
 			'<div class="inout2 details1">' . $this->individualBoxFacts($individual) . '</div>' .
@@ -833,7 +833,7 @@ abstract class AbstractTheme {
 			$content .
 			//PERSO Append record name text
 			'<span class="rn_append">' .
-			implode('&nbsp;', \MyArtJaub\Webtrees\Hook\HookProvider::get('hRecordNameAppend')->execute($individual)) .
+			implode('&nbsp;', \MyArtJaub\Webtrees\Hook\HookProvider::getInstance()->get('hRecordNameAppend')->execute($individual)) .
 			'</span>' .
 			//END PERSO
 			'<div class="inout2 details2">' . $this->individualBoxFacts($individual) . '</div>' .
@@ -2064,7 +2064,7 @@ abstract class AbstractTheme {
 	protected function secondaryMenuContainer(array $menus) {
 		return '<ul class="nav nav-pills secondary-menu">' . 
 		  //PERSO Add extra header
-		  implode('', array_map(function($item) { return !empty($item) ? '<li> ' . $item . ' </li>' : ''; }, \MyArtJaub\Webtrees\Hook\HookProvider::get('hPrintHeader')->execute())) .
+		  implode('', array_map(function($item) { return !empty($item) ? '<li> ' . $item . ' </li>' : ''; }, \MyArtJaub\Webtrees\Hook\HookProvider::getInstance()->get('hPrintHeader')->execute())) .
 		  //END PERSO
 		  $this->secondaryMenuContent($menus) . '</ul>';
 	}

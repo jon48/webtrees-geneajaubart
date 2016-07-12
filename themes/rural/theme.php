@@ -206,7 +206,7 @@ class RuralTheme extends \Fisharebest\Webtrees\Theme\AbstractTheme implements
 				'</div></div>'.
 				'<div class="header-row"><div id="header-bottom">'.
 					$this->formQuickSearch().
-					'<div id="maj-header-extender">' . implode('', HookProvider::get('hPrintHeader')->execute()) . '</div>' .
+					'<div id="maj-header-extender">' . implode('', HookProvider::getInstance()->get('hPrintHeader')->execute()) . '</div>' .
 				'</div></div>'.
 			'</div>'.     // --  #header-content-lrg
             '<div id="header-content-xs">'.

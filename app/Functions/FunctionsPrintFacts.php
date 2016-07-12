@@ -636,7 +636,7 @@ class FunctionsPrintFacts {
 						$data .= '<a href="#" onclick="return expand_layer(\'' . $elementID . '\');"><i id="' . $elementID . '_img" class="' . $plusminus . '"></i></a> ';
 					}
 					//PERSO Prepend fact source text
-					$data .= implode('', HookProvider::get('hFactSourcePrepend')->execute($srec)) ;
+					$data .= implode('', HookProvider::getInstance()->get('hFactSourcePrepend')->execute($srec)) ;
 					//END PERSO
 					$data .= GedcomTag::getLabelValue('SOUR', '<a href="' . $source->getHtmlUrl() . '">' . $source->getFullName() . '</a>', null, 'span');
 					$data .= '</div>';
@@ -827,7 +827,7 @@ class FunctionsPrintFacts {
 				echo '<td class="optionbox ', $styleadd, ' wrap">';
 				if ($source) {
 					//PERSO Prepend fact source text
-					echo implode('', HookProvider::get('hFactSourcePrepend')->execute($factrec));
+					echo implode('', HookProvider::getInstance()->get('hFactSourcePrepend')->execute($factrec));
 					//END PERSO
 					echo '<a href="', $source->getHtmlUrl(), '">', $source->getFullName(), '</a>';
 					// PUBL

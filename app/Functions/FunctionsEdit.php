@@ -713,7 +713,7 @@ class FunctionsEdit {
 			echo ' <a href="#edit_name" onclick="convertHidden(\'', $element_id, '\'); return false;" class="icon-edit_indi" title="' . I18N::translate('Edit the name') . '"></a>';
 		} else {
 			//PERSO Implement custom tags management
-			$hook_get_simpletag_editor = HookProvider::get('hHtmlSimpleTagEditor', $fact);
+			$hook_get_simpletag_editor = HookProvider::getInstance()->get('hHtmlSimpleTagEditor', $fact);
 			if($hook_get_simpletag_editor->hasAnyActiveModule()){
 				echo implode('', $hook_get_simpletag_editor->execute($fact, $value, $element_id, $element_name));
 			}
@@ -1094,7 +1094,7 @@ class FunctionsEdit {
 				self::addSimpleTag(($level + 1) . ' QUAY');
 			}
 				//PERSO Implement custom tags management
-				HookProvider::get('hAddSimpleTag', $tag)->execute($tag, ($level+1));
+				HookProvider::getInstance()->get('hAddSimpleTag', $tag)->execute($tag, ($level+1));
 				//END PERSO
 			// 3 OBJE
 			self::addSimpleTag(($level + 1) . ' OBJE');
@@ -1591,7 +1591,7 @@ class FunctionsEdit {
 				}
 			}
 			//PERSO Implement custom tags management
-			HookProvider::get('hAddSimpleTag', $fact)->execute($fact, 2);
+			HookProvider::getInstance()->get('hAddSimpleTag', $fact)->execute($fact, 2);
 			//END PERSO
 		}
 	}
@@ -1649,7 +1649,7 @@ class FunctionsEdit {
 			$expected_subtags['PLAC'] = array_merge($match[1], $expected_subtags['PLAC']);
 		}
 		//PERSO Add expected custom tags
-		$hook_expected_tags_all = HookProvider::get('hGetExpectedTags')->execute();
+		$hook_expected_tags_all = HookProvider::getInstance()->get('hGetExpectedTags')->execute();
 		foreach($hook_expected_tags_all as $hook_expected_tags){
 			foreach($hook_expected_tags as $hook_context => $hook_expected_tag){
 				$expected_subtags[$hook_context][]=$hook_expected_tag;
