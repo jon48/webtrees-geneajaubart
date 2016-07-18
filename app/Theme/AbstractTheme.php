@@ -282,7 +282,7 @@ abstract class AbstractTheme {
 	 * @return string
 	 */
 	protected function contactLinkEverything(User $user) {
-		return I18N::translate('For technical support or genealogy questions, please contact') . ' ' . $this->contactLink($user);
+		return I18N::translate('For technical support or genealogy questions contact %s.', $this->contactLink($user));
 	}
 
 	/**
@@ -293,7 +293,7 @@ abstract class AbstractTheme {
 	 * @return string
 	 */
 	protected function contactLinkGenealogy(User $user) {
-		return I18N::translate('For help with genealogy questions contact') . ' ' . $this->contactLink($user);
+		return I18N::translate('For help with genealogy questions contact %s.', $this->contactLink($user));
 	}
 
 	/**
@@ -304,7 +304,7 @@ abstract class AbstractTheme {
 	 * @return string
 	 */
 	protected function contactLinkTechnical(User $user) {
-		return I18N::translate('For technical support and information contact') . ' ' . $this->contactLink($user);
+		return I18N::translate('For technical support and information contact %s.', $this->contactLink($user));
 	}
 
 	/**
@@ -747,7 +747,7 @@ abstract class AbstractTheme {
 
 		$content = '<span class="namedef name1">' . $individual->getFullName() . '</span>';
 		$icons   = '';
-		if ($individual->canShowName()) {
+		if ($individual->canShow()) {
 			$content =
 				'<a href="' . $individual->getHtmlUrl() . '">' . $content . '</a>' .
 				'<div class="namedef name1">' . $individual->getAddName() . '</div>';
@@ -799,7 +799,7 @@ abstract class AbstractTheme {
 
 		$content = '<span class="namedef name1">' . $individual->getFullName() . '</span>';
 		$icons   = '';
-		if ($individual->canShowName()) {
+		if ($individual->canShow()) {
 			$content =
 				'<a href="' . $individual->getHtmlUrl() . '">' . $content . '</a>' .
 				'<div class="namedef name2">' . $individual->getAddName() . '</div>';
