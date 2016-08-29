@@ -22,6 +22,7 @@ return array(
 	' and '							=>	' et ',
 	'My page'						=>	'Ma page',	
 	'%j %F %Y'						=> 	'%D %j %F %Y', 
+    '%s: %s'                        =>  '%s : %s',
 			
 	//Perso Translation tool
 	'Perso Translation Tool'		=>	'Outil de traduction Perso',
