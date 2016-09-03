@@ -120,6 +120,8 @@ the Rural theme might present weird displays or alignments. Please contact
 It is required to run PHP 5.4 to be able to run the **webtrees-lib** library.
 Except the above, **webtrees-lib** shares the same requirements and system configuration as a standard **webtrees** installation.
 
+For a correct installation, you need to have [**composer**](https://getcomposer.org/) installed on your computer.
+
 
 ### Installation
 
@@ -137,9 +139,12 @@ Steps:
 
 1. Download latest stable version from the [webtrees-geneajaubart Github repository](https://github.com/jon48/webtrees-geneajaubart/archive/master.zip).
 2. Unzip the files.
-3. Download latest stable version from the [webtrees-lib Github repository](https://github.com/jon48/webtrees-lib/archive/master.zip).
-4. Unzip the latter files under the `/vendor/jon48/webtrees-lib` folder. You should
-then have a `/vendor/jon48/webtrees-lib/src/Webtrees` folder.
+3. Open a command line terminal, and navigate to the root of the newly created folder. 
+4. Run the following command:
+   ```
+   composer install --no-dev
+   ```
+   You should then have folders in the `/vendor/` folder.
 5. If you do not want some modules, delete them from the `/modules_v3/` folder 
 (except `myartjaub_hooks`).
 6. Upload the files to an empty directory on your web server.
@@ -174,17 +179,22 @@ hence cannot be used with **webtrees-geneajaubart** (even though the logic has n
 removed). Hence, **DO NOT USE the automatic upgrade mechanism**.
 
 1. Take a backup of your installation (follow standard backup procedure).
-2. Download the latest version of **webtrees-geneajaubart** and of the **webtrees-lib** 
-library available respectively from [webtrees-geneajaubart Github repository](https://github.com/jon48/webtrees-geneajaubart/archive/master.zip) and [webtrees-lib Github repository](https://github.com/jon48/webtrees-lib/archive/master.zip)
+2. Download the latest version of **webtrees-geneajaubart** available from 
+   [webtrees-geneajaubart Github repository](https://github.com/jon48/webtrees-geneajaubart/archive/master.zip)
 3. While you are in the middle of uploading the new files,
    a visitor to your site would encounter a mixture of new and old files.  This
    could cause unpredictable behaviour or errors.  To prevent this, create the
    file **data/offline.txt**.  While this file exists, visitors will see a
    “site unavailable - come back later” message.
-4. If you do not want some modules, delete them from the `/modules_v3/` folder 
+3. Open a command line terminal, and navigate to the root of the installation folder. 
+4. Run the following command:
+   ```
+   composer install --no-dev
+   ```
+5. If you do not want some modules, delete them from the `/modules_v3/` folder 
 (except `myartjaub_hooks`).
-4. Upload the files to your web server, overwriting the existing files.
-5. Delete the file **data/offline.txt**.
+6. Upload the files to your web server, overwriting the existing files.
+7. Delete the file **data/offline.txt**.
 
 
 ### Contacts

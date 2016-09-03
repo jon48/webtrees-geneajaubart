@@ -163,13 +163,13 @@ class FunctionsPrintLists {
 			<div class="indi-list">
 				<table id="' . $table_id . '">
 					<thead>
-						<tr>
-							<th colspan="24">
+						<tr>' . //PERSO Modify table to include IsSourced module
+							'<th colspan="28">
 								<div class="btn-toolbar">
 									<div class="btn-group">
 										<button
 											class="ui-state-default"
-											data-filter-column="20"
+											data-filter-column="24"
 											data-filter-value="M"
 											title="' . I18N::translate('Show only males.') . '"
 											type="button"
@@ -178,7 +178,7 @@ class FunctionsPrintLists {
 										</button>
 										<button
 											class="ui-state-default"
-											data-filter-column="20"
+											data-filter-column="24"
 											data-filter-value="F"
 											title="' . I18N::translate('Show only females.') . '"
 											type="button"
@@ -187,7 +187,7 @@ class FunctionsPrintLists {
 										</button>
 										<button
 											class="ui-state-default"
-											data-filter-column="20"
+											data-filter-column="24"
 											data-filter-value="U"
 											title="' . I18N::translate('Show only individuals for whom the gender is not known.') . '"
 											type="button"
@@ -198,7 +198,7 @@ class FunctionsPrintLists {
 									<div class="btn-group">
 										<button
 											class="ui-state-default"
-											data-filter-column="22"
+											data-filter-column="26"
 											data-filter-value="N"
 											title="' . I18N::translate('Show individuals who are alive or couples where both partners are alive.') . '"
 											type="button"
@@ -207,7 +207,7 @@ class FunctionsPrintLists {
 										</button>
 										<button
 											class="ui-state-default"
-											data-filter-column="22"
+											data-filter-column="26"
 											data-filter-value="Y"
 											title="' . I18N::translate('Show individuals who are dead or couples where both partners are dead.') . '"
 											type="button"
@@ -216,7 +216,7 @@ class FunctionsPrintLists {
 										</button>
 										<button
 											class="ui-state-default"
-											data-filter-column="22"
+											data-filter-column="26"
 											data-filter-value="YES"
 											title="' . I18N::translate('Show individuals who died more than 100 years ago.') . '"
 											type="button"
@@ -225,7 +225,7 @@ class FunctionsPrintLists {
 										</button>
 										<button
 											class="ui-state-default"
-											data-filter-column="22"
+											data-filter-column="26"
 											data-filter-value="Y100"
 											title="' . I18N::translate('Show individuals who died within the last 100 years.') . '"
 											type="button"
@@ -236,7 +236,7 @@ class FunctionsPrintLists {
 									<div class="btn-group">
 										<button
 											class="ui-state-default"
-											data-filter-column="21"
+											data-filter-column="25"
 											data-filter-value="YES"
 											title="' . I18N::translate('Show individuals born more than 100 years ago.') . '"
 											type="button"
@@ -245,7 +245,7 @@ class FunctionsPrintLists {
 										</button>
 										<button
 											class="ui-state-default"
-											data-filter-column="21"
+											data-filter-column="25"
 											data-filter-value="Y100"
 											title="' . I18N::translate('Show individuals born within the last 100 years.') . '"
 											type="button"
@@ -256,7 +256,7 @@ class FunctionsPrintLists {
 									<div class="btn-group">
 										<button
 											class="ui-state-default"
-											data-filter-column="23"
+											data-filter-column="27"
 											data-filter-value="R"
 											title="' . I18N::translate('Show “roots” couples or individuals. These individuals may also be called “patriarchs”. They are individuals who have no parents recorded in the database.') . '"
 											type="button"
@@ -265,7 +265,7 @@ class FunctionsPrintLists {
 										</button>
 										<button
 											class="ui-state-default"
-											data-filter-column="23"
+											data-filter-column="27"
 											data-filter-value="L"
 											title="' . I18N::translate('Show “leaves” couples or individuals. These are individuals who are alive but have no children recorded in the database.') . '"
 											type="button"
@@ -274,8 +274,8 @@ class FunctionsPrintLists {
 										</button>
 									</div>
 								</div>
-							</th>
-						</tr>
+							</th>'. //END PERSO   
+						'</tr>
 						<tr>
 							<th>' . GedcomTag::getLabel('GIVN') . '</th>
 							<th>' . GedcomTag::getLabel('SURN') . '</th>
@@ -322,8 +322,8 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 					</thead>
 					<tfoot>
 						<tr>
-							<th colspan="24">
-								<div class="btn-toolbar">
+							<th colspan="28">'. //PERSO Modify table to include IsSourced module
+								'<div class="btn-toolbar">
 									<div class="btn-group">
 										<button type="button" class="ui-state-default btn-toggle-parents">
 											' . I18N::translate('Show parents') . '
@@ -678,13 +678,13 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 			<div class="fam-list">
 				<table id="' . $table_id . '">
 					<thead>
-						<tr>
-							<th colspan="23">
+						<tr>'. //PERSO Modify table to include IsSourced module
+							'<th colspan="25">
 								<div class="btn-toolbar">
 									<div class="btn-group">
 										<button
 											type="button"
-											data-filter-column="21"
+											data-filter-column="23"
 											data-filter-value="N"
 											class="ui-state-default"
 											title="' . I18N::translate('Show individuals who are alive or couples where both partners are alive.') . '"
@@ -693,7 +693,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 										</button>
 										<button
 											type="button"
-											data-filter-column="21"
+											data-filter-column="23"
 											data-filter-value="W"
 											class="ui-state-default"
 											title="' . I18N::translate('Show couples where only the female partner is dead.') . '"
@@ -702,7 +702,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 										</button>
 										<button
 											type="button"
-											data-filter-column="21"
+											data-filter-column="23"
 											data-filter-value="H"
 											class="ui-state-default"
 											title="' . I18N::translate('Show couples where only the male partner is dead.') . '"
@@ -711,7 +711,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 										</button>
 										<button
 											type="button"
-											data-filter-column="21"
+											data-filter-column="23"
 											data-filter-value="Y"
 											class="ui-state-default"
 											title="' . I18N::translate('Show individuals who are dead or couples where both partners are dead.') . '"
@@ -722,7 +722,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 									<div class="btn-group">
 										<button
 											type="button"
-											data-filter-column="22"
+											data-filter-column="24"
 											data-filter-value="R"
 											class="ui-state-default"
 											title="' . I18N::translate('Show “roots” couples or individuals. These individuals may also be called “patriarchs”. They are individuals who have no parents recorded in the database.') . '"
@@ -731,7 +731,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 										</button>
 										<button
 											type="button"
-											data-filter-column="22"
+											data-filter-column="24"
 											data-filter-value="L"
 											class="ui-state-default"
 											title="' . I18N::translate('Show “leaves” couples or individuals. These are individuals who are alive but have no children recorded in the database.') . '"
@@ -742,7 +742,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 									<div class="btn-group">
 										<button
 											type="button"
-											data-filter-column="20"
+											data-filter-column="22"
 											data-filter-value="U"
 											class="ui-state-default"
 											title="' . I18N::translate('Show couples with an unknown marriage date.') . '"
@@ -751,7 +751,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 										</button>
 										<button
 											type="button"
-											data-filter-column="20"
+											data-filter-column="22"
 											data-filter-value="YES"
 											class="ui-state-default"
 											title="' . I18N::translate('Show couples who married more than 100 years ago.') . '"
@@ -760,7 +760,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 										</button>
 										<button
 											type="button"
-											data-filter-column="20"
+											data-filter-column="22"
 											data-filter-value="Y100"
 											class="ui-state-default"
 											title="' . I18N::translate('Show couples who married within the last 100 years.') . '"
@@ -769,7 +769,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 										</button>
 										<button
 											type="button"
-											data-filter-column="20"
+											data-filter-column="22"
 											data-filter-value="D"
 											class="ui-state-default"
 											title="' . I18N::translate('Show divorced couples.') . '"
@@ -778,7 +778,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 										</button>
 										<button
 											type="button"
-											data-filter-column="20"
+											data-filter-column="22"
 											data-filter-value="M"
 											class="ui-state-default"
 											title="' . I18N::translate('Show couples where either partner married more than once.') . '"
@@ -787,8 +787,8 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 										</button>
 									</div>
 								</div>
-							</th>
-						</tr>
+							</th>'. //END PERSO
+						'</tr>
 						<tr>
 							<th>' . GedcomTag::getLabel('GIVN') . '</th>
 							<th>' . GedcomTag::getLabel('SURN') . '</th>
@@ -825,8 +825,8 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 				</thead>
 				<tfoot>
 					<tr>
-						<th colspan="23">
-							<div class="btn-toolbar">
+						<th colspan="25">'. //PERSO Modify table to include IsSourced module
+							'<div class="btn-toolbar">
 								<div class="btn-group">
 									<button type="button" class="ui-state-default btn-toggle-parents">
 										' . I18N::translate('Show parents') . '
