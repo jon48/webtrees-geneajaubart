@@ -16,22 +16,18 @@
 namespace Fisharebest\Webtrees\Schema;
 
 use Fisharebest\Webtrees\Database;
-use Fisharebest\Webtrees\Module;
 
 /**
- * Upgrade the database schema from version 34 to version 35.
+ * Upgrade the database schema from version 36 to version 37.
  */
-class Migration34 implements MigrationInterface {
+class Migration36 implements MigrationInterface {
 	/**
 	 * Upgrade to to the next version
 	 */
 	public function upgrade() {
-		// New modules (charts) have been added.
-		Module::getInstalledModules('enabled');
-
-		// Delete old/unused settings
-		Database::exec(
-			"DELETE FROM `##gedcom_setting` WHERE setting_name IN ('COMMON_NAMES_ADD', 'COMMON_NAMES_REMOVE', 'COMMON_NAMES_THRESHOLD')"
-		);
+		// IPv6 addresses can be up to 45 characters.
+		Database::exec("ALTER TABLE `##log`     CHANGE ip_address ip_address VARCHAR(45) NOT NULL");
+		Database::exec("ALTER TABLE `##message` CHANGE ip_address ip_address VARCHAR(45) NOT NULL");
+		Database::exec("ALTER TABLE `##session` CHANGE ip_address ip_address VARCHAR(45) NOT NULL");
 	}
 }

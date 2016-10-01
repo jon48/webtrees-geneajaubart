@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2016-09-18 14:15+0100\n"
-"PO-Revision-Date: 2016-05-13 13:13+0000\n"
+"PO-Revision-Date: 2016-06-29 13:40+0000\n"
 "Last-Translator: Greg Roach <fisharebest@gmail.com>\n"
-"Language-Team: Faroese <https://translate.webtrees.net/projects/webtrees/webtrees/fo/>\n"
-"Language: fo\n"
+"Language-Team: Thai <https://translate.webtrees.net/projects/webtrees/webtrees/th/>\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Plural-Forms: nplurals=1; plural=-;\n"
 "X-Generator: Weblate 2.5\n"
 
 #: modules_v3/ahnentafel_report/report.xml:160
@@ -115,14 +115,12 @@ msgstr ""
 msgid "%1$s file was extracted in %2$s seconds."
 msgid_plural "%1$s files were extracted in %2$s seconds."
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Module/GoogleMapsModule.php:839
 #, php-format
 msgid "%1$s individual displayed, out of the normal total of %2$s, from %3$s generations."
 msgid_plural "%1$s individuals displayed, out of the normal total of %2$s, from %3$s generations."
 msgstr[0] ""
-msgstr[1] ""
 
 #. I18N: %1$s is a count of individuals, %2$s is a list of their names
 #: app/Module/GoogleMapsModule.php:853
@@ -130,7 +128,6 @@ msgstr[1] ""
 msgid "%1$s individual is missing birthplace map coordinates: %2$s."
 msgid_plural "%1$s individuals are missing birthplace map coordinates: %2$s."
 msgstr[0] ""
-msgstr[1] ""
 
 #. I18N: %1$s is an internal ID number such as R123. %2$s and %3$s are record types, such as INDI or SOUR
 #: admin_trees_check.php:192
@@ -234,14 +231,12 @@ msgstr ""
 msgid "%s anonymous signed-in user"
 msgid_plural "%s anonymous signed-in users"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Functions/FunctionsCharts.php:304 app/Stats.php:4457 app/Stats.php:4461
 #, php-format
 msgid "%s child"
 msgid_plural "%s children"
 msgstr[0] ""
-msgstr[1] ""
 
 #. I18N: Part of an age string. e.g. 5 years, 4 months and 3 days
 #: app/Functions/FunctionsDate.php:59 app/I18N.php:313
@@ -249,84 +244,72 @@ msgstr[1] ""
 msgid "%s day"
 msgid_plural "%s days"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/I18N.php:799
 #, php-format
 msgid "%s day ago"
 msgid_plural "%s days ago"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Controller/SearchController.php:378
 #, php-format
 msgid "%s family has been updated."
 msgid_plural "%s families have been updated."
 msgstr[0] ""
-msgstr[1] ""
 
 #: admin.php:859
 #, php-format
 msgid "%s family tree"
 msgid_plural "%s family trees"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Stats.php:5258 app/Stats.php:5262
 #, php-format
 msgid "%s grandchild"
 msgid_plural "%s grandchildren"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/I18N.php:803
 #, php-format
 msgid "%s hour ago"
 msgid_plural "%s hours ago"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Controller/LifespanController.php:260
 #, php-format
 msgid "%s individual"
 msgid_plural "%s individuals"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Controller/SearchController.php:349
 #, php-format
 msgid "%s individual has been updated."
 msgid_plural "%s individuals have been updated."
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Module/GoogleMapsModule.php:846
 #, php-format
 msgid "%s individual is private."
 msgid_plural "%s individuals are private."
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Controller/LifespanController.php:253
 #, php-format
 msgid "%s individual with events between %s and %s"
 msgid_plural "%s individuals with events between %s and %s"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Controller/LifespanController.php:246
 #, php-format
 msgid "%s individual with events in %s"
 msgid_plural "%s individuals with events in %s"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Controller/LifespanController.php:239
 #, php-format
 msgid "%s individual with events in %s between %s and %s"
 msgid_plural "%s individuals with events in %s between %s and %s"
 msgstr[0] ""
-msgstr[1] ""
 
 #. I18N: %s is a PHP function/module/setting
 #: setup.php:119
@@ -339,14 +322,12 @@ msgstr ""
 msgid "%s message"
 msgid_plural "%s messages"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/I18N.php:807
 #, php-format
 msgid "%s minute ago"
 msgid_plural "%s minutes ago"
 msgstr[0] ""
-msgstr[1] ""
 
 #. I18N: Part of an age string. e.g. 5 years, 4 months and 3 days
 #: app/Functions/FunctionsDate.php:55 app/I18N.php:305
@@ -355,21 +336,18 @@ msgstr[1] ""
 msgid "%s month"
 msgid_plural "%s months"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/I18N.php:795
 #, php-format
 msgid "%s month ago"
 msgid_plural "%s months ago"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Controller/SearchController.php:432
 #, php-format
 msgid "%s note has been updated."
 msgid_plural "%s notes have been updated."
 msgstr[0] ""
-msgstr[1] ""
 
 #. I18N: %s=“fifth cousin”, etc. http://www.ancestry.com/learn/library/article.aspx?article=2856
 #: app/Functions/Functions.php:2108
@@ -388,7 +366,6 @@ msgstr ""
 msgid "%s second ago"
 msgid_plural "%s seconds ago"
 msgstr[0] ""
-msgstr[1] ""
 
 #. I18N: %s is a person's name
 #: message.php:300 message.php:303 message.php:305
@@ -401,14 +378,12 @@ msgstr ""
 msgid "%s signed-in user"
 msgid_plural "%s signed-in users"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Controller/SearchController.php:411
 #, php-format
 msgid "%s source has been updated."
 msgid_plural "%s sources have been updated."
 msgstr[0] ""
-msgstr[1] ""
 
 #. I18N: %s=“fifth cousin”, etc.
 #: app/Functions/Functions.php:2124
@@ -440,7 +415,6 @@ msgstr ""
 msgid "%s week"
 msgid_plural "%s weeks"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Functions/FunctionsDate.php:50 app/I18N.php:299
 #: app/Module/RelativesTabModule.php:83
@@ -448,14 +422,12 @@ msgstr[1] ""
 msgid "%s year"
 msgid_plural "%s years"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/I18N.php:791
 #, php-format
 msgid "%s year ago"
 msgid_plural "%s years ago"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Functions/FunctionsPrintLists.php:1942 app/Module/YahrzeitModule.php:129
 #: calendar.php:601
@@ -1689,7 +1661,7 @@ msgstr ""
 
 #: statistics.php:697
 msgid "Africa"
-msgstr "Afrika"
+msgstr ""
 
 #: admin_trees_manage.php:681
 msgid "After creating the family tree, you will be able to import data from a GEDCOM file."
@@ -1710,7 +1682,7 @@ msgstr ""
 
 #: statistics.php:283
 msgid "Age at birth of child"
-msgstr "Aldur at barnaføðsli"
+msgstr ""
 
 #: admin_trees_config.php:403
 msgid "Age at which to assume an individual is dead"
@@ -1718,19 +1690,19 @@ msgstr ""
 
 #: statistics.php:338
 msgid "Age between husband and wife"
-msgstr "Aldursmunir ímillum hjún"
+msgstr ""
 
 #: statistics.php:330
 msgid "Age between siblings"
-msgstr "Aldursmunir ímillum syskin"
+msgstr ""
 
 #: statistics.php:339
 msgid "Age between wife and husband"
-msgstr "Aldursmunir ímillum hjún"
+msgstr ""
 
 #: statistics.php:327
 msgid "Age difference"
-msgstr "Aldursmunir"
+msgstr ""
 
 #: statistics.php:550 statisticsplot.php:1282
 msgid "Age in year of first marriage"
@@ -1813,7 +1785,7 @@ msgstr ""
 #: modules_v3/missing_facts_report/report.xml:7
 #: modules_v3/relative_ext_report/report.xml:6
 msgid "All"
-msgstr "Alt"
+msgstr ""
 
 #: admin_trees_manage.php:714
 msgid "All changes in PhpGedView must be accepted"
@@ -2366,7 +2338,7 @@ msgstr ""
 #: app/Module/FamilyTreeStatisticsModule.php:390
 #: app/Module/HtmlBlockModule.php:241 app/Stats.php:2602 statistics.php:149
 msgid "Average age at death"
-msgstr "Meðal livialdur við deyðsfall"
+msgstr ""
 
 #: app/Stats.php:3933 app/Stats.php:3934 app/Stats.php:3938 app/Stats.php:3942
 #: app/Stats.php:3945
@@ -2381,7 +2353,7 @@ msgstr ""
 #: app/Module/FamilyTreeStatisticsModule.php:418
 #: app/Module/HtmlBlockModule.php:251 app/Stats.php:4951 statistics.php:306
 msgid "Average number of children per family"
-msgstr "Meðal tal á børnum fyri hvørja familju"
+msgstr ""
 
 #. I18N: help text for family tree / GEDCOM file names
 #: admin_trees_config.php:627 admin_trees_manage.php:670
@@ -2788,7 +2760,7 @@ msgstr ""
 
 #: app/Stats.php:1661 statistics.php:565
 msgid "Birth by country"
-msgstr "Føðslar eftir landi"
+msgstr ""
 
 #: modules_v3/bdm_report/report.xml:8 modules_v3/birth_report/report.xml:8
 msgid "Birth date range end"
@@ -2868,7 +2840,7 @@ msgstr ""
 
 #: statistics.php:411
 msgid "Birth places"
-msgstr "Føðistøð"
+msgstr ""
 
 #: modules_v3/birth_report/report.xml:6
 msgid "Birthplace contains"
@@ -2882,7 +2854,7 @@ msgstr ""
 
 #: app/Stats.php:1956 statistics.php:121
 msgid "Births by century"
-msgstr "Føðslar eftir øld"
+msgstr ""
 
 #. I18N: Location of an LDS church temple
 #: app/GedcomCode/GedcomCodeTemp.php:107
@@ -3273,7 +3245,6 @@ msgstr ""
 msgid "By default, your server allows scripts to run for %s second."
 msgid_plural "By default, your server allows scripts to run for %s seconds."
 msgstr[0] ""
-msgstr[1] ""
 
 #. I18N: %s is an amount of memory, such as 32MB
 #: admin_site_config.php:201
@@ -3362,7 +3333,7 @@ msgstr ""
 
 #: statistics.php:703
 msgid "Categories"
-msgstr "Bólkar"
+msgstr ""
 
 #. I18N: gedcom tag CAUS
 #: app/GedcomTag.php:242
@@ -3497,7 +3468,6 @@ msgstr ""
 msgid "Changes in the last %s day"
 msgid_plural "Changes in the last %s days"
 msgstr[0] ""
-msgstr[1] ""
 
 #: admin_trees_manage.php:519
 msgid "Changes log"
@@ -3598,7 +3568,7 @@ msgstr ""
 
 #: statistics.php:303
 msgid "Children in family"
-msgstr "Børn í familjuni"
+msgstr ""
 
 #: modules_v3/ahnentafel_report/report.xml:391
 #: modules_v3/descendancy_report/report.xml:484
@@ -3980,7 +3950,7 @@ msgstr ""
 #: admin_trees_download.php:150 app/Module/ClippingsCartModule.php:413
 #: app/Module/ClippingsCartModule.php:781
 msgid "Convert from UTF-8 to ISO-8859-1"
-msgstr "Formbroyt úr UTF-8 til ISO-8859-1"
+msgstr ""
 
 #. I18N: Name of a country or state
 #: app/Stats.php:6724
@@ -4701,7 +4671,7 @@ msgstr ""
 
 #: app/Stats.php:1677 statistics.php:575
 msgid "Death by country"
-msgstr "Deyðsfall eftir landi"
+msgstr ""
 
 #: modules_v3/bdm_report/report.xml:10 modules_v3/death_report/report.xml:8
 msgid "Death date range end"
@@ -4842,7 +4812,7 @@ msgstr ""
 
 #: statistics.php:412
 msgid "Death places"
-msgstr "Deyðsstøð"
+msgstr ""
 
 #. I18N: Name of a module/report
 #: app/Module/DeathReportModule.php:29 modules_v3/death_report/report.xml:3
@@ -4852,7 +4822,7 @@ msgstr ""
 
 #: app/Stats.php:2049 statistics.php:122
 msgid "Deaths by century"
-msgstr "Deyðsfall eftir øld"
+msgstr ""
 
 #: app/Date/CalendarDate.php:322
 msgctxt "Abbreviation for December"
@@ -5715,7 +5685,7 @@ msgstr ""
 
 #: statistics.php:682
 msgid "Europe"
-msgstr "Evropa"
+msgstr ""
 
 #. I18N: gedcom tag EVEN
 #: app/GedcomTag.php:428 modules_v3/fact_sources/report.xml:70
@@ -5726,11 +5696,11 @@ msgstr ""
 
 #: app/Module/GoogleMapsModule.php:2082 statistics.php:110 statistics.php:212
 msgid "Events"
-msgstr "Hendingar"
+msgstr ""
 
 #: statistics.php:420
 msgid "Events in countries"
-msgstr "Hendingar í londum"
+msgstr ""
 
 #: app/Module/IndividualFactsTabModule.php:134
 msgid "Events of close relatives"
@@ -5947,11 +5917,11 @@ msgstr ""
 #: repo.php:127 search.php:93 source.php:131 statistics.php:71
 #: statisticsplot.php:990 statisticsplot.php:1094 statisticsplot.php:1344
 msgid "Families"
-msgstr "Familjur"
+msgstr ""
 
 #: app/Stats.php:520 statistics.php:395
 msgid "Families with sources"
-msgstr "Familjur við keldum"
+msgstr ""
 
 #. I18N: gedcom tag FAM
 #. I18N: Name of a module/report
@@ -6224,7 +6194,7 @@ msgstr ""
 #: app/Stats.php:2602 app/Stats.php:3945 calendar.php:248 calendar.php:436
 #: statistics.php:151 statistics.php:167 statistics.php:180
 msgid "Females"
-msgstr "Kvinnur"
+msgstr ""
 
 #. I18N: Name of a country or state
 #: app/Stats.php:6750
@@ -6340,7 +6310,7 @@ msgstr ""
 
 #: statistics.php:370
 msgid "First event"
-msgstr "Fyrsta hending"
+msgstr ""
 
 #. I18N: Record is an indvidual, source, etc.
 #: admin_site_merge.php:357
@@ -6706,7 +6676,7 @@ msgstr ""
 #: modules_v3/individual_ext_report/report.xml:7
 #: modules_v3/missing_facts_report/report.xml:7 pedigree.php:160
 msgid "Generations"
-msgstr "Ættarlið"
+msgstr ""
 
 #. I18N: gedcom tag ANCE
 #: app/GedcomTag.php:154
@@ -6859,7 +6829,7 @@ msgstr ""
 
 #: statistics.php:331
 msgid "Greatest age between siblings"
-msgstr "Stórsti aldursmunir ímilum syskin"
+msgstr ""
 
 #. I18N: Name of a country or state
 #: app/Stats.php:6767
@@ -7160,7 +7130,7 @@ msgstr ""
 #. I18N: Name of a module
 #: admin_modules.php:229 app/Module/WelcomeBlockModule.php:30
 msgid "Home page"
-msgstr "Heimasíða"
+msgstr ""
 
 #. I18N: Name of a country or state
 #: app/Stats.php:6776
@@ -7539,16 +7509,16 @@ msgstr ""
 #: statisticsplot.php:886 statisticsplot.php:936 statisticsplot.php:1144
 #: statisticsplot.php:1194 statisticsplot.php:1244 statisticsplot.php:1294
 msgid "Individuals"
-msgstr "Einstaklingar"
+msgstr ""
 
 #: app/Stats.php:422 statistics.php:394
 msgid "Individuals with sources"
-msgstr "Einstaklingar við keldum"
+msgstr ""
 
 #: famlist.php:255 indilist.php:255
 #, php-format
 msgid "Individuals with surname %s"
-msgstr "Einstaklingar við eftirnavninum %s"
+msgstr ""
 
 #. I18N: Name of a country or state
 #: app/Stats.php:6780
@@ -8050,7 +8020,7 @@ msgstr ""
 
 #: app/Stats.php:4859 statistics.php:318
 msgid "Largest families"
-msgstr "Stórstu familjurnar"
+msgstr ""
 
 #: statistics.php:319
 msgid "Largest number of grandchildren"
@@ -8073,7 +8043,7 @@ msgstr ""
 
 #: statistics.php:371
 msgid "Last event"
-msgstr "Síðsta hending"
+msgstr ""
 
 #: admin_users.php:852
 msgid "Last signed in"
@@ -8120,7 +8090,7 @@ msgstr ""
 
 #: ancestry.php:59 descendancy.php:55 fanchart.php:88 pedigree.php:163
 msgid "Layout"
-msgstr "Snið"
+msgstr ""
 
 #: edituser.php:220
 msgid "Leave the password blank if you want to keep the current password."
@@ -8213,7 +8183,7 @@ msgstr ""
 
 #: statistics.php:146
 msgid "Lifespan"
-msgstr "Livitíð"
+msgstr ""
 
 #. I18N: Name of a module/chart
 #: app/Controller/LifespanController.php:120
@@ -8274,7 +8244,7 @@ msgstr ""
 
 #: ancestry.php:65 descendancy.php:59
 msgid "List"
-msgstr "Listi"
+msgstr ""
 
 #: admin_trees_config.php:1146 app/Theme/AbstractTheme.php:1471
 msgid "Lists"
@@ -8300,7 +8270,7 @@ msgstr ""
 
 #: app/I18N.php:232 app/I18N.php:233
 msgid "Loading…"
-msgstr "Løði…"
+msgstr ""
 
 #. I18N: “Local files” are stored on this computer
 #: admin_media.php:632
@@ -8454,7 +8424,7 @@ msgstr ""
 #: app/Stats.php:2602 app/Stats.php:3945 calendar.php:244 calendar.php:435
 #: statistics.php:150 statistics.php:166 statistics.php:179
 msgid "Males"
-msgstr "Menn"
+msgstr ""
 
 #. I18N: Name of a country or state
 #: app/Stats.php:6823
@@ -8639,7 +8609,7 @@ msgstr ""
 
 #: app/Stats.php:1693 statistics.php:570
 msgid "Marriage by country"
-msgstr "Vígslur eftir landi"
+msgstr ""
 
 #. I18N: gedcom tag MARC
 #: app/GedcomTag.php:568
@@ -8788,7 +8758,7 @@ msgstr ""
 
 #: app/Stats.php:3543 statistics.php:223
 msgid "Marriages by century"
-msgstr "Vígslur eftir øld"
+msgstr ""
 
 #. I18N: gedcom tag _MARNM
 #: app/GedcomTag.php:1560 modules_v3/cemetery_report/report.xml:7
@@ -8903,7 +8873,7 @@ msgstr ""
 #: inverselink.php:70
 #: modules_v3/GEDFact_assistant/_MEDIA/media_0_inverselink.php:74
 msgid "Media"
-msgstr "Miðil"
+msgstr ""
 
 #. I18N: Label for search field
 #: find.php:184
@@ -9140,7 +9110,7 @@ msgstr ""
 
 #: statistics.php:694
 msgid "Middle East"
-msgstr "Miðeystur"
+msgstr ""
 
 #. I18N: time format “%A” - exactly 00:00:00
 #: app/Functions/FunctionsDate.php:102
@@ -9250,7 +9220,7 @@ msgstr ""
 
 #: statistics.php:510 statisticsplot.php:874
 msgid "Month of birth"
-msgstr "Føðingarmánaði"
+msgstr ""
 
 #: app/Stats.php:4739 statistics.php:530 statisticsplot.php:1028
 msgid "Month of birth of first child in a relation"
@@ -9533,7 +9503,7 @@ msgstr ""
 #: modules_v3/cemetery_report/report.xml:7
 #: modules_v3/death_report/report.xml:10 search.php:198 statistics.php:189
 msgid "Names"
-msgstr "Nøvn"
+msgstr ""
 
 #. I18N: gedcom tag _NAMS
 #: app/GedcomTag.php:1679
@@ -9793,7 +9763,6 @@ msgstr ""
 msgid "No events exist for the next %s day."
 msgid_plural "No events exist for the next %s days."
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Functions/FunctionsPrintLists.php:1842
 #: app/Functions/FunctionsPrintLists.php:1956
@@ -9822,7 +9791,6 @@ msgstr ""
 msgid "No events for living people exist for the next %s day."
 msgid_plural "No events for living people exist for the next %s days."
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Controller/FamilyController.php:140
 msgid "No facts exist for this family."
@@ -9909,7 +9877,7 @@ msgstr ""
 #: modules_v3/individual_ext_report/report.xml:11
 #: modules_v3/individual_report/report.xml:8
 msgid "None"
-msgstr "Einki"
+msgstr ""
 
 #. I18N: The ninth day in the French republican calendar
 #: app/Date/FrenchDate.php:205
@@ -10011,7 +9979,7 @@ msgstr ""
 #: modules_v3/individual_report/report.xml:226 note.php:137 repo.php:145
 #: source.php:149 statistics.php:355
 msgid "Notes"
-msgstr "Viðmerkingar"
+msgstr ""
 
 #: admin_users.php:774
 msgid "Nothing found to cleanup"
@@ -10055,7 +10023,7 @@ msgstr ""
 #: app/GedcomTag.php:626 app/Stats.php:4944 app/Stats.php:4946
 #: app/Stats.php:4948 statistics.php:555 statisticsplot.php:1332
 msgid "Number of children"
-msgstr "Tal á børnum"
+msgstr ""
 
 #: app/Module/RecentChangesModule.php:146
 #: app/Module/UpcomingAnniversariesModule.php:147
@@ -10065,7 +10033,7 @@ msgstr ""
 
 #: app/Stats.php:5213 statistics.php:307
 msgid "Number of families without children"
-msgstr "Tal á barnleysum familjum"
+msgstr ""
 
 #: app/Module/ClippingsCartModule.php:211
 #: app/Module/ClippingsCartModule.php:230
@@ -10190,31 +10158,31 @@ msgstr ""
 
 #: pedigree.php:182
 msgid "Oldest at bottom"
-msgstr "Ellst niðast"
+msgstr ""
 
 #: pedigree.php:182
 msgid "Oldest at top"
-msgstr "Ellst ovast"
+msgstr ""
 
 #: statistics.php:294
 msgid "Oldest father"
-msgstr "Elsti pápin"
+msgstr ""
 
 #: statistics.php:272
 msgid "Oldest female"
-msgstr "Elsta kvinnan"
+msgstr ""
 
 #: statistics.php:176
 msgid "Oldest living individuals"
-msgstr "Elsti núlivandi persónur"
+msgstr ""
 
 #: statistics.php:271
 msgid "Oldest male"
-msgstr "Elsti maðurin"
+msgstr ""
 
 #: statistics.php:295
 msgid "Oldest mother"
-msgstr "Elsta mamman"
+msgstr ""
 
 #. I18N: The name of a colour-scheme
 #: app/Theme/ColorsTheme.php:87
@@ -10337,7 +10305,7 @@ msgstr ""
 
 #: statistics.php:73
 msgid "Others"
-msgstr "Onnur"
+msgstr ""
 
 #: app/Module/GoogleMapsModule.php:3698
 msgid "Overwrite existing coordinates."
@@ -10834,7 +10802,7 @@ msgstr ""
 
 #: admin_trees_config.php:1500 search.php:204 statistics.php:408
 msgid "Places"
-msgstr "Støð"
+msgstr ""
 
 #: find.php:665
 msgid "Places found"
@@ -10865,7 +10833,7 @@ msgstr ""
 
 #: message.php:50
 msgid "Please enter a valid email address."
-msgstr "Vinarliga skriva inn eina gilduga t-post adressu."
+msgstr ""
 
 #: app/Module/CensusAssistantModule.php:169 find.php:127 search.php:36
 #: search.php:48
@@ -10874,7 +10842,7 @@ msgstr ""
 
 #: message.php:96
 msgid "Please enter some message text before sending."
-msgstr "Vinarliga skriva eini boð, áðrenn tú sendur."
+msgstr ""
 
 #: message.php:117
 msgid "Please provide your email address so that we may contact you in response to this message. If you do not provide your email address we will not be able to respond to your inquiry. Your email address will not be used in any other way besides responding to this inquiry."
@@ -11063,7 +11031,7 @@ msgstr ""
 #: app/Report/ReportParserGenerate.php:847 app/Repository.php:50
 #: app/Source.php:54 app/Stats.php:1470 app/Stats.php:2975 expand_view.php:33
 msgid "Private"
-msgstr "Privat"
+msgstr ""
 
 #. I18N: gedcom tag PROB
 #: app/GedcomTag.php:700
@@ -11880,7 +11848,7 @@ msgstr ""
 #: app/Theme/WebtreesTheme.php:58 app/Theme/WebtreesTheme.php:59
 #: app/Theme/XeneaTheme.php:57 modules_v3/GEDFact_assistant/MEDIA_ctrl.php:89
 msgid "Search"
-msgstr "Leita"
+msgstr ""
 
 #: app/Controller/SearchController.php:202
 #: app/Module/BatchUpdate/BatchUpdateSearchReplacePlugin.php:50
@@ -11966,7 +11934,7 @@ msgstr ""
 
 #: app/Functions/FunctionsEdit.php:404 reportengine.php:244
 msgid "Select a date"
-msgstr "Vel eitt dato"
+msgstr ""
 
 #: edit_interface.php:1245
 msgid "Select events"
@@ -12022,12 +11990,12 @@ msgstr ""
 
 #: app/Module/UserMessagesModule.php:107 login.php:537 message.php:128
 msgid "Send"
-msgstr "Send"
+msgstr ""
 
 #: app/Module/LoggedInUsersModule.php:90 app/Module/UserMessagesModule.php:100
 #: app/Stats.php:5934 app/Stats.php:5936 edit_changes.php:201 message.php:103
 msgid "Send a message"
-msgstr "Send boð"
+msgstr ""
 
 #: admin_users_bulk.php:41
 msgid "Send a message to all users"
@@ -12386,7 +12354,7 @@ msgstr ""
 
 #: calendar.php:221
 msgid "Show"
-msgstr "Vís"
+msgstr ""
 
 #. I18N: A configuration setting
 #: admin_trees_config.php:1031
@@ -12463,7 +12431,7 @@ msgstr ""
 
 #: ancestry.php:75
 msgid "Show cousins"
-msgstr "Sýn systkinabørn"
+msgstr ""
 
 #. I18N: label for yes/no option
 #: app/Module/FamilyTreeStatisticsModule.php:296
@@ -12478,7 +12446,7 @@ msgstr ""
 #: ancestry.php:115 app/Module/ChartsBlockModule.php:206 descendancy.php:84
 #: familybook.php:55 hourglass.php:56 pedigree.php:166 relationship.php:81
 msgid "Show details"
-msgstr "Sýn smálutir"
+msgstr ""
 
 #: app/Functions/FunctionsPrintLists.php:711
 msgid "Show divorced couples."
@@ -12636,7 +12604,7 @@ msgstr ""
 
 #: familybook.php:82 hourglass.php:73
 msgid "Show spouses"
-msgstr "Sýn hjún"
+msgstr ""
 
 #: app/Functions/FunctionsPrintLists.php:302
 #: app/Functions/FunctionsPrintLists.php:763
@@ -12740,14 +12708,13 @@ msgstr ""
 
 #: app/Controller/HourglassController.php:358
 #: app/Controller/PedigreeController.php:285
-#, fuzzy
 msgid "Sibling"
-msgstr "Systkin"
+msgstr ""
 
 #: app/Controller/HourglassController.php:358
 #: app/Controller/PedigreeController.php:285
 msgid "Siblings"
-msgstr "Systkin"
+msgstr ""
 
 #: admin_module_sidebar.php:87 admin_modules.php:218
 msgid "Sidebar"
@@ -12767,14 +12734,12 @@ msgstr ""
 #. I18N: Name of a module
 #: app/Module/LoginBlockModule.php:29 app/Module/LoginBlockModule.php:69
 #: app/Theme/AbstractTheme.php:1561 login.php:150
-#, fuzzy
 msgid "Sign in"
-msgstr "Innrita"
+msgstr ""
 
 #: app/Module/LoginBlockModule.php:62 app/Theme/AbstractTheme.php:1572
-#, fuzzy
 msgid "Sign out"
-msgstr "Útrita"
+msgstr ""
 
 #. I18N: A configuration setting
 #: admin_site_config.php:446
@@ -13035,7 +13000,7 @@ msgstr ""
 #: search.php:98 source.php:144 sourcelist.php:33 sourcelist.php:37
 #: statistics.php:354 statistics.php:391
 msgid "Sources"
-msgstr "Keldur"
+msgstr ""
 
 #: modules_v3/missing_facts_report/report.xml:14
 msgid "Sources to the events"
@@ -13048,7 +13013,7 @@ msgstr ""
 
 #: statistics.php:688
 msgid "South America"
-msgstr "Suður Amerika"
+msgstr ""
 
 #. I18N: Name of a country or state
 #: app/Stats.php:6877
@@ -13161,7 +13126,7 @@ msgstr ""
 #: app/Module/HtmlBlockModule.php:162 app/Module/StatisticsChartModule.php:33
 #: statistics.php:40 statistics.php:65
 msgid "Statistics"
-msgstr "Hagfrøði"
+msgstr ""
 
 #: statisticsplot.php:852
 msgid "Statistics chart"
@@ -13228,7 +13193,7 @@ msgstr ""
 
 #: app/Module/UserMessagesModule.php:112 message.php:119
 msgid "Subject"
-msgstr "Evni"
+msgstr ""
 
 #. I18N: gedcom tag SUBN
 #: app/GedcomTag.php:814
@@ -13757,7 +13722,7 @@ msgstr ""
 #: message.php:191
 #, php-format
 msgid "The message was successfully sent to %s."
-msgstr "Boð sent til %s."
+msgstr ""
 
 #: admin_modules.php:54
 #, php-format
@@ -13920,7 +13885,6 @@ msgstr ""
 msgid "The two family trees have %1$s record which uses the same “XREF”."
 msgid_plural "The two family trees have %1$s records which use the same “XREF”."
 msgstr[0] ""
-msgstr[1] ""
 
 #: admin_site_upgrade.php:447
 msgid "The upgrade is complete."
@@ -14052,7 +14016,6 @@ msgstr ""
 msgid "There have been no changes within the last %s day."
 msgid_plural "There have been no changes within the last %s days."
 msgstr[0] ""
-msgstr[1] ""
 
 #: login.php:265
 #, php-format
@@ -14159,7 +14122,6 @@ msgstr ""
 msgid "This family tree has %s record which uses the same “XREF” as another family tree."
 msgid_plural "This family tree has %s records which use the same “XREF” as another family tree."
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Module/SlideShowModule.php:192
 msgid "This family tree has no images to display."
@@ -14482,7 +14444,6 @@ msgstr ""
 msgid "This page has been viewed %s time."
 msgid_plural "This page has been viewed %s times."
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Module/GoogleMapsModule.php:2419
 msgid "This place has no coordinates"
@@ -14840,7 +14801,6 @@ msgstr ""
 msgid "Top %s given name"
 msgid_plural "Top %s given names"
 msgstr[0] ""
-msgstr[1] ""
 
 #. I18N: Title for a list of the most common surnames, %s is a number. Note that a separate translation exists when %s is 1
 #: app/Module/TopSurnamesModule.php:97
@@ -14848,7 +14808,6 @@ msgstr[1] ""
 msgid "Top %s surname"
 msgid_plural "Top %s surnames"
 msgstr[0] ""
-msgstr[1] ""
 
 #. I18N: i.e. most popular given name.
 #: app/Module/TopGivenNamesModule.php:71
@@ -14858,7 +14817,7 @@ msgstr ""
 #. I18N: Name of a module. Top=Most common
 #: app/Module/TopGivenNamesModule.php:31 statistics.php:201
 msgid "Top given names"
-msgstr "Mest nýttu fornøvn"
+msgstr ""
 
 #: app/Module/GoogleMapsModule.php:3945 app/Module/GoogleMapsModule.php:4021
 #: placelist.php:107
@@ -14873,7 +14832,7 @@ msgstr ""
 #. I18N: Name of a module. Top=Most common
 #: app/Module/TopSurnamesModule.php:37 statistics.php:200
 msgid "Top surnames"
-msgstr "Mest nýttu eftirnøvn"
+msgstr ""
 
 #. I18N: Location of an LDS church temple
 #: app/GedcomCode/GedcomCodeTemp.php:373
@@ -14890,15 +14849,15 @@ msgstr ""
 
 #: statistics.php:113
 msgid "Total births"
-msgstr "Tal á føðslum"
+msgstr ""
 
 #: statistics.php:96
 msgid "Total dead"
-msgstr "Tal á deyðum"
+msgstr ""
 
 #: statistics.php:114
 msgid "Total deaths"
-msgstr "Tal á deyðsfall"
+msgstr ""
 
 #: statistics.php:216
 msgid "Total divorces"
@@ -14917,7 +14876,7 @@ msgstr ""
 #: modules_v3/fact_sources/report.xml:354
 #: modules_v3/marriage_report/report.xml:111
 msgid "Total families"
-msgstr "Tal á familjum"
+msgstr ""
 
 #: calendar.php:441 find.php:582 statistics.php:211
 #, php-format
@@ -14926,11 +14885,11 @@ msgstr ""
 
 #: statistics.php:94
 msgid "Total females"
-msgstr "Tal á kvinnum"
+msgstr ""
 
 #: statistics.php:193
 msgid "Total given names"
-msgstr "Tal á fornøvnum"
+msgstr ""
 
 #: modules_v3/bdm_report/report.xml:210 modules_v3/birth_report/report.xml:66
 #: modules_v3/cemetery_report/report.xml:88
@@ -14942,7 +14901,7 @@ msgstr "Tal á fornøvnum"
 #: modules_v3/occupation_report/report.xml:94
 #: modules_v3/relative_ext_report/report.xml:140
 msgid "Total individuals"
-msgstr "Tal á einstaklingum"
+msgstr ""
 
 #: app/Module/CensusAssistantModule.php:214 calendar.php:433 find.php:558
 #: statistics.php:90
@@ -14952,15 +14911,15 @@ msgstr ""
 
 #: statistics.php:95
 msgid "Total living"
-msgstr "Tal á livandi"
+msgstr ""
 
 #: statistics.php:93
 msgid "Total males"
-msgstr "Tal á monnum"
+msgstr ""
 
 #: statistics.php:215
 msgid "Total marriages"
-msgstr "Tal á vígslum"
+msgstr ""
 
 #: admin.php:662
 msgid "Total number of users"
@@ -14985,7 +14944,7 @@ msgstr ""
 #: app/Module/FamilyTreeStatisticsModule.php:328
 #: app/Module/HtmlBlockModule.php:183 statistics.php:192
 msgid "Total surnames"
-msgstr "Tal á eftirnøvnum"
+msgstr ""
 
 #: app/Module/FamilyTreeStatisticsModule.php:130
 #: app/Module/FamilyTreeStatisticsModule.php:412
@@ -15312,7 +15271,6 @@ msgstr ""
 msgid "Use at least %s character."
 msgid_plural "Use at least %s characters."
 msgstr[0] ""
-msgstr[1] ""
 
 #: modules_v3/family_group_report/report.xml:12
 #: modules_v3/individual_ext_report/report.xml:13
@@ -15539,7 +15497,7 @@ msgstr ""
 #: app/Functions/FunctionsPrintFacts.php:1028
 #: app/Functions/FunctionsPrintFacts.php:1060
 msgid "View"
-msgstr "Vís"
+msgstr ""
 
 #: placelist.php:157
 msgid "View all records found in this place"
@@ -15605,7 +15563,7 @@ msgstr ""
 #: app/Module/ClippingsCartModule.php:769
 #: app/Module/ClippingsCartModule.php:776
 msgid "Visitor"
-msgstr "Gestur"
+msgstr ""
 
 #. I18N: Name of a module/report. “Vital records” are life events - birth/marriage/death
 #: app/Module/BirthDeathMarriageReportModule.php:33 calendar.php:254
@@ -15859,7 +15817,7 @@ msgstr ""
 
 #: statistics.php:679
 msgid "World"
-msgstr "Heimurin"
+msgstr ""
 
 #. I18N: A configuration setting. The first letter(s) in a GEDCOM identifier.
 #: admin_trees_config.php:733
@@ -16121,19 +16079,19 @@ msgstr ""
 
 #: statistics.php:286
 msgid "Youngest father"
-msgstr "Yngsti pápi"
+msgstr ""
 
 #: statistics.php:264
 msgid "Youngest female"
-msgstr "Yngsta kvinnan"
+msgstr ""
 
 #: statistics.php:263
 msgid "Youngest male"
-msgstr "Yngsti maðurin"
+msgstr ""
 
 #: statistics.php:287
 msgid "Youngest mother"
-msgstr "Yngsta mamman"
+msgstr ""
 
 #: app/Module/ClippingsCartModule.php:344
 #: app/Module/ClippingsCartModule.php:678
@@ -16181,7 +16139,7 @@ msgstr ""
 #: app/Module/ClippingsCartModule.php:368
 #: app/Module/ClippingsCartModule.php:755
 msgid "Zip file(s)"
-msgstr "Stappa fílu(r)"
+msgstr ""
 
 #: app/Module/GoogleMapsModule.php:1498 app/Module/GoogleMapsModule.php:2346
 #: fanchart.php:109
@@ -16511,9 +16469,8 @@ msgstr ""
 
 #. I18N: A button label.
 #: app/Module/ClippingsCartModule.php:796
-#, fuzzy
 msgid "cancel"
-msgstr "Ógilda"
+msgstr ""
 
 #: app/Stats.php:2918
 msgid "census added"
@@ -17145,7 +17102,6 @@ msgstr ""
 msgid "from %1$s interval %2$s year"
 msgid_plural "from %1$s interval %2$s years"
 msgstr[0] ""
-msgstr[1] ""
 
 #. I18N: Gedcom FROM dates
 #: app/Date.php:316
@@ -17166,7 +17122,7 @@ msgstr ""
 
 #: statistics.php:713
 msgid "gender"
-msgstr "kyn"
+msgstr ""
 
 #. I18N: A button label.
 #: edit_interface.php:2586
@@ -18686,7 +18642,7 @@ msgstr ""
 
 #: statistics.php:628
 msgid "half-year after marriage"
-msgstr "hálvár eftir vígslu"
+msgstr ""
 
 #. I18N: reflexive pronoun
 #: app/Functions/Functions.php:279
@@ -18746,7 +18702,6 @@ msgstr ""
 msgid "interval %s year"
 msgid_plural "interval %s years"
 msgstr[0] ""
-msgstr[1] ""
 
 #: statistics.php:640
 msgid "interval one child"
@@ -18884,7 +18839,6 @@ msgstr ""
 msgid "maximum %s day"
 msgid_plural "maximum %s days"
 msgstr[0] ""
-msgstr[1] ""
 
 #: admin_trees_config.php:364 admin_trees_config.php:388
 #: admin_trees_config.php:428 admin_trees_config.php:468
@@ -19110,7 +19064,7 @@ msgstr ""
 
 #: statistics.php:708
 msgid "overall"
-msgstr "samanumtikið"
+msgstr ""
 
 #. I18N: time format “%a” - between 12:00:01 and 23:59:59
 #: app/Functions/FunctionsDate.php:95
@@ -19170,7 +19124,7 @@ msgstr ""
 #: statisticsplot.php:1147 statisticsplot.php:1197 statisticsplot.php:1247
 #: statisticsplot.php:1297 statisticsplot.php:1347
 msgid "percentage"
-msgstr "prosent"
+msgstr ""
 
 #: admin_trees_config.php:1086
 msgid "pixels"
@@ -19252,7 +19206,7 @@ msgstr ""
 #: app/Module/GoogleMapsModule.php:4344 lifespan.php:109 medialist.php:196
 #: timeline.php:315
 msgid "reset"
-msgstr "tómstilla"
+msgstr ""
 
 #. I18N: http://en.wikipedia.org/wiki/Web_crawler
 #: admin_site_access.php:29 admin_site_access.php:36
@@ -19287,7 +19241,7 @@ msgstr ""
 #: medialist.php:193 modules_v3/GEDFact_assistant/census/census-edit.php:110
 #: search.php:143 search.php:185 search.php:300 search_advanced.php:288
 msgid "search"
-msgstr "leita"
+msgstr ""
 
 #. I18N: A Spanish relationship name, such as second great-nephew
 #: app/Functions/Functions.php:637
@@ -19507,13 +19461,12 @@ msgstr ""
 #. I18N: A button label.
 #: app/Module/LoginBlockModule.php:84 login.php:201
 msgid "sign in"
-msgstr "innrita"
+msgstr ""
 
 #. I18N: A button label.
 #: app/Module/LoginBlockModule.php:65
-#, fuzzy
 msgid "sign out"
-msgstr "útrita"
+msgstr ""
 
 #: app/Functions/Functions.php:785
 msgid "sister"
@@ -20000,9 +19953,8 @@ msgstr ""
 #: ancestry.php:92 app/Module/GoogleMapsModule.php:739 branches.php:49
 #: compact.php:54 descendancy.php:71 familybook.php:61 fanchart.php:95
 #: hourglass.php:62 lifespan.php:110 pedigree.php:169 relationship.php:85
-#, fuzzy
 msgid "view"
-msgstr "vís"
+msgstr ""
 
 #: admin_trees_config.php:363 admin_trees_config.php:387
 #: admin_trees_config.php:427 admin_trees_config.php:467
@@ -20034,7 +19986,7 @@ msgstr ""
 
 #: message.php:40 message.php:260 message.php:320
 msgid "webtrees message"
-msgstr "webtrees boð"
+msgstr ""
 
 #: setup.php:273
 #, php-format
@@ -20126,7 +20078,6 @@ msgstr ""
 msgid "±%s year"
 msgid_plural "±%s years"
 msgstr[0] ""
-msgstr[1] ""
 
 #: app/Individual.php:1218
 #, php-format

@@ -7,14 +7,14 @@
 .travis.yml    export-ignore
 Makefile       export-ignore
 Vagrantfile    export-ignore
-phpdoc.xml     export-ignore
-phpunit.xml*    export-ignore
 *.psd			export-ignore
 
 build/         export-ignore
 js/*.patch     export-ignore
+phpdoc.xml     export-ignore
+phpunit.xml*    export-ignore
 tests/         export-ignore
 
 themes/rural/less/          export-ignore
-
+themes/rural/css-*/images/*.psd    export-ignore
 language/*.po	export-ignore

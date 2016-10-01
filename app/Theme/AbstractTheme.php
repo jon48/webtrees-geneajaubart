@@ -1665,8 +1665,8 @@ abstract class AbstractTheme {
 				$this->menuMyIndividualRecord(),
 				$this->menuMyPedigree(),
 				$this->menuMyAccount(),
-				$this->menuChangeBlocks(),
 				$this->menuControlPanel(),
+				$this->menuChangeBlocks(),
 			)));
 		} else {
 			return null;
