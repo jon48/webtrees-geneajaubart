@@ -2597,6 +2597,9 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 					icon: iconImage,
 					map: map,
 					title: name
+		    	//PERSO Resize flags - Some flags are cut by GM tiles
+					, optimized: false
+				//END PERSO
 				});
 				// Show this markers name in the info window when it is clicked
 				google.maps.event.addListener(marker, "click", function() {
@@ -3201,6 +3204,9 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 					echo 'title: pl_name,';
 					echo 'draggable: true,';
 					echo 'zIndex:1';
+					//PERSO Resize flags - Some flags are cut by GM tiles
+					echo ', optimized: false';
+					//END PERSO
 					echo '});';
 				} else {
 					echo 'marker = new google.maps.Marker({';
