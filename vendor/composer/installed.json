@@ -14,7 +14,7 @@
             "reference": "19dd1de9d3f5fc4d7d70175b4c344dee329f45fd",
             "shasum": ""
         },
-        "time": "2014-06-05 11:42:24",
+        "time": "2014-06-05T11:42:24+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -39,56 +39,6 @@
         ]
     },
     {
-        "name": "fisharebest/algorithm",
-        "version": "1.1.0",
-        "version_normalized": "1.1.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/fisharebest/algorithm.git",
-            "reference": "01ed4471cb5ec2e6f5bf6756221f658d67c1c8d8"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/fisharebest/algorithm/zipball/01ed4471cb5ec2e6f5bf6756221f658d67c1c8d8",
-            "reference": "01ed4471cb5ec2e6f5bf6756221f658d67c1c8d8",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "*",
-            "satooshi/php-coveralls": "*"
-        },
-        "time": "2015-10-20 12:39:25",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Fisharebest\\Algorithm\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "GPL-3.0+"
-        ],
-        "authors": [
-            {
-                "name": "Greg Roach",
-                "email": "greg@subaqua.co.uk",
-                "role": "Developer"
-            }
-        ],
-        "description": "Implementation of standard algorithms in PHP.",
-        "homepage": "https://github.com/fisharebest/algorithm",
-        "keywords": [
-            "Algorithm",
-            "diff",
-            "dijkstra",
-            "myers"
-        ]
-    },
-    {
         "name": "fisharebest/ext-calendar",
         "version": "2.2.1",
         "version_normalized": "2.2.1.0",
@@ -110,7 +60,7 @@
             "phpunit/phpunit": "*",
             "satooshi/php-coveralls": "*"
         },
-        "time": "2015-12-11 22:50:01",
+        "time": "2015-12-11T22:50:01+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -169,7 +119,7 @@
         "require-dev": {
             "phpunit/phpunit": "4.*"
         },
-        "time": "2014-11-20 16:49:30",
+        "time": "2014-11-20T16:49:30+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -230,7 +180,7 @@
             "moontoast/math": "Support for converting UUID to 128-bit integer (in string form).",
             "symfony/console": "Support for use of the bin/uuid command line tool."
         },
-        "time": "2015-07-23 19:00:41",
+        "time": "2015-07-23T19:00:41+00:00",
         "bin": [
             "bin/uuid"
         ],
@@ -282,7 +232,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2015-09-12 10:08:34",
+        "time": "2015-09-12T10:08:34+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -347,7 +297,7 @@
         "require-dev": {
             "phpunit/phpunit": "~3.7"
         },
-        "time": "2014-11-17 16:24:50",
+        "time": "2014-11-17T16:24:50+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -366,59 +316,6 @@
             }
         ],
         "description": "Provides functionality for http_build_url() to environments without pecl_http."
-    },
-    {
-        "name": "michelf/php-markdown",
-        "version": "1.6.0",
-        "version_normalized": "1.6.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/michelf/php-markdown.git",
-            "reference": "156e56ee036505ec637d761ee62dc425d807183c"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/michelf/php-markdown/zipball/156e56ee036505ec637d761ee62dc425d807183c",
-            "reference": "156e56ee036505ec637d761ee62dc425d807183c",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "time": "2015-12-24 01:37:31",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-lib": "1.4.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Michelf": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-3-Clause"
-        ],
-        "authors": [
-            {
-                "name": "Michel Fortin",
-                "email": "michel.fortin@michelf.ca",
-                "homepage": "https://michelf.ca/",
-                "role": "Developer"
-            },
-            {
-                "name": "John Gruber",
-                "homepage": "https://daringfireball.net/"
-            }
-        ],
-        "description": "PHP Markdown",
-        "homepage": "https://michelf.ca/projects/php-markdown/",
-        "keywords": [
-            "markdown"
-        ]
     },
     {
         "name": "fisharebest/php-polyfill",
@@ -455,7 +352,7 @@
             "phpunit/phpunit": "*",
             "satooshi/php-coveralls": "~1.0"
         },
-        "time": "2016-02-05 22:51:18",
+        "time": "2016-02-05T22:51:18+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -504,7 +401,7 @@
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2016-03-03 16:49:40",
+        "time": "2016-03-03T16:49:40+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -562,7 +459,7 @@
         "suggest": {
             "ext-iconv": "For best performance"
         },
-        "time": "2016-02-26 11:31:02",
+        "time": "2016-02-26T11:31:02+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -623,7 +520,7 @@
         "suggest": {
             "ext-intl": "For best performance"
         },
-        "time": "2016-02-15 04:08:08",
+        "time": "2016-02-15T04:08:08+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -685,7 +582,7 @@
         "suggest": {
             "ext-intl": "For best performance"
         },
-        "time": "2016-02-15 04:08:08",
+        "time": "2016-02-15T04:08:08+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -750,7 +647,7 @@
         "suggest": {
             "ext-mbstring": "For best performance"
         },
-        "time": "2016-01-20 09:13:37",
+        "time": "2016-01-20T09:13:37+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -808,7 +705,7 @@
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2016-01-25 19:13:00",
+        "time": "2016-01-25T19:13:00+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -869,7 +766,7 @@
             "ircmaxell/password-compat": "~1.0",
             "php": ">=5.3.3"
         },
-        "time": "2016-01-20 09:13:37",
+        "time": "2016-01-20T09:13:37+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -926,7 +823,7 @@
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2016-01-20 09:13:37",
+        "time": "2016-01-20T09:13:37+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -984,7 +881,7 @@
         "suggest": {
             "ext-intl": "For best performance"
         },
-        "time": "2016-02-26 16:18:12",
+        "time": "2016-02-26T16:18:12+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1046,7 +943,7 @@
         "suggest": {
             "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
         },
-        "time": "2016-03-18 20:34:03",
+        "time": "2016-03-18T20:34:03+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1091,7 +988,7 @@
             "php": ">=5.3.3",
             "symfony/polyfill-util": "~1.0"
         },
-        "time": "2016-01-20 09:13:37",
+        "time": "2016-01-20T09:13:37+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1149,7 +1046,7 @@
             "paragonie/random_compat": "~1.0",
             "php": ">=5.3.3"
         },
-        "time": "2016-01-28 22:42:02",
+        "time": "2016-01-28T22:42:02+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1212,7 +1109,7 @@
         "suggest": {
             "ext-xml": "For best performance"
         },
-        "time": "2016-01-20 09:13:37",
+        "time": "2016-01-20T09:13:37+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1273,7 +1170,7 @@
             "phpunit/phpunit": "*",
             "satooshi/php-coveralls": "*"
         },
-        "time": "2016-06-02 13:56:47",
+        "time": "2016-06-02T13:56:47+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1308,18 +1205,167 @@
         ]
     },
     {
-        "name": "swiftmailer/swiftmailer",
-        "version": "v5.4.3",
-        "version_normalized": "5.4.3.0",
+        "name": "ezyang/htmlpurifier",
+        "version": "v4.8.0",
+        "version_normalized": "4.8.0.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/swiftmailer/swiftmailer.git",
-            "reference": "4cc92842069c2bbc1f28daaaf1d2576ec4dfe153"
+            "url": "https://github.com/ezyang/htmlpurifier.git",
+            "reference": "d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/4cc92842069c2bbc1f28daaaf1d2576ec4dfe153",
-            "reference": "4cc92842069c2bbc1f28daaaf1d2576ec4dfe153",
+            "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2",
+            "reference": "d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2"
+        },
+        "time": "2016-07-16T12:58:58+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "HTMLPurifier": "library/"
+            },
+            "files": [
+                "library/HTMLPurifier.composer.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL"
+        ],
+        "authors": [
+            {
+                "name": "Edward Z. Yang",
+                "email": "admin@htmlpurifier.org",
+                "homepage": "http://ezyang.com"
+            }
+        ],
+        "description": "Standards compliant HTML filter written in PHP",
+        "homepage": "http://htmlpurifier.org/",
+        "keywords": [
+            "html"
+        ]
+    },
+    {
+        "name": "michelf/php-markdown",
+        "version": "1.7.0",
+        "version_normalized": "1.7.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/michelf/php-markdown.git",
+            "reference": "1f51cc520948f66cd2af8cbc45a5ee175e774220"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/michelf/php-markdown/zipball/1f51cc520948f66cd2af8cbc45a5ee175e774220",
+            "reference": "1f51cc520948f66cd2af8cbc45a5ee175e774220",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2016-10-29T18:58:20+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-lib": "1.4.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Michelf": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Michel Fortin",
+                "email": "michel.fortin@michelf.ca",
+                "homepage": "https://michelf.ca/",
+                "role": "Developer"
+            },
+            {
+                "name": "John Gruber",
+                "homepage": "https://daringfireball.net/"
+            }
+        ],
+        "description": "PHP Markdown",
+        "homepage": "https://michelf.ca/projects/php-markdown/",
+        "keywords": [
+            "markdown"
+        ]
+    },
+    {
+        "name": "fisharebest/algorithm",
+        "version": "1.3.0",
+        "version_normalized": "1.3.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/fisharebest/algorithm.git",
+            "reference": "c353cc3a200fa068dc0935b5456b915b14dff638"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/fisharebest/algorithm/zipball/c353cc3a200fa068dc0935b5456b915b14dff638",
+            "reference": "c353cc3a200fa068dc0935b5456b915b14dff638",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "*",
+            "satooshi/php-coveralls": "*"
+        },
+        "time": "2016-12-05T20:20:29+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Fisharebest\\Algorithm\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-3.0+"
+        ],
+        "authors": [
+            {
+                "name": "Greg Roach",
+                "email": "greg@subaqua.co.uk",
+                "role": "Developer"
+            }
+        ],
+        "description": "Implementation of standard algorithms in PHP.",
+        "homepage": "https://github.com/fisharebest/algorithm",
+        "keywords": [
+            "Algorithm",
+            "diff",
+            "dijkstra",
+            "myers"
+        ]
+    },
+    {
+        "name": "swiftmailer/swiftmailer",
+        "version": "v5.4.4",
+        "version_normalized": "5.4.4.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/swiftmailer/swiftmailer.git",
+            "reference": "545ce9136690cea74f98f86fbb9c92dd9ab1a756"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/545ce9136690cea74f98f86fbb9c92dd9ab1a756",
+            "reference": "545ce9136690cea74f98f86fbb9c92dd9ab1a756",
             "shasum": ""
         },
         "require": {
@@ -1328,7 +1374,7 @@
         "require-dev": {
             "mockery/mockery": "~0.9.1"
         },
-        "time": "2016-07-08 11:51:25",
+        "time": "2016-11-24T01:01:23+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1363,64 +1409,18 @@
         ]
     },
     {
-        "name": "ezyang/htmlpurifier",
-        "version": "v4.8.0",
-        "version_normalized": "4.8.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/ezyang/htmlpurifier.git",
-            "reference": "d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2",
-            "reference": "d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.2"
-        },
-        "time": "2016-07-16 12:58:58",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "HTMLPurifier": "library/"
-            },
-            "files": [
-                "library/HTMLPurifier.composer.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "LGPL"
-        ],
-        "authors": [
-            {
-                "name": "Edward Z. Yang",
-                "email": "admin@htmlpurifier.org",
-                "homepage": "http://ezyang.com"
-            }
-        ],
-        "description": "Standards compliant HTML filter written in PHP",
-        "homepage": "http://htmlpurifier.org/",
-        "keywords": [
-            "html"
-        ]
-    },
-    {
         "name": "symfony/intl",
-        "version": "v2.8.11",
-        "version_normalized": "2.8.11.0",
+        "version": "v2.8.15",
+        "version_normalized": "2.8.15.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/intl.git",
-            "reference": "2ec401b37460b22077643d48773e5f6a9f0b21e8"
+            "reference": "36a13a8fc1a56cbfdc709135a1723323b53f3460"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/intl/zipball/2ec401b37460b22077643d48773e5f6a9f0b21e8",
-            "reference": "2ec401b37460b22077643d48773e5f6a9f0b21e8",
+            "url": "https://api.github.com/repos/symfony/intl/zipball/36a13a8fc1a56cbfdc709135a1723323b53f3460",
+            "reference": "36a13a8fc1a56cbfdc709135a1723323b53f3460",
             "shasum": ""
         },
         "require": {
@@ -1434,7 +1434,7 @@
         "suggest": {
             "ext-intl": "to use the component with locales other than \"en\""
         },
-        "time": "2016-09-06 10:55:00",
+        "time": "2016-11-18T21:10:01+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1504,7 +1504,7 @@
         "replace": {
             "twitter/bootstrap": "self.version"
         },
-        "time": "2016-07-25 15:51:55",
+        "time": "2016-07-25T15:51:55+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2016-09-18 14:15+0100\n"
-"PO-Revision-Date: 2016-06-29 13:55+0000\n"
+"PO-Revision-Date: 2016-12-16 11:35+0000\n"
 "Last-Translator: Łukasz Wileński <lukas.the.best@poczta.fm>\n"
 "Language-Team: Polish <https://translate.webtrees.net/projects/webtrees/webtrees/pl/>\n"
 "Language: pl\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 2.5\n"
+"X-Generator: Weblate 2.8\n"
 "X-Poedit-Language: Polish\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-SearchPath-0: .\n"
@@ -1298,11 +1298,11 @@ msgstr "Dodaj pustą linię"
 
 #: app/Module/RelativesTabModule.php:273
 msgid "Add a brother or sister"
-msgstr "Dodaj nowego brata lub siostrę"
+msgstr "Dodaj brata lub siostrę"
 
 #: edit_interface.php:516
 msgid "Add a child"
-msgstr "Dodaj nowe dziecko"
+msgstr "Dodaj dziecko"
 
 #: app/Module/RelativesTabModule.php:398 edit_interface.php:595
 msgid "Add a child to create a one-parent family"
@@ -1318,7 +1318,7 @@ msgstr "Dodaj fakt"
 
 #: app/Module/RelativesTabModule.php:326 edit_interface.php:675 family.php:92
 msgid "Add a father"
-msgstr "Dodaj nowego ojca"
+msgstr "Dodaj ojca"
 
 #: app/Module/FamilyTreeFavoritesModule.php:203
 msgid "Add a favorite"
@@ -1326,12 +1326,12 @@ msgstr "Dodaj do ulubionych"
 
 #: app/Module/GoogleMapsModule.php:4017
 msgid "Add a geographic location"
-msgstr "Dodaj nową lokalizację geograficzną"
+msgstr "Dodaj lokalizację geograficzną"
 
 #: app/Module/RelativesTabModule.php:387 edit_interface.php:810
 #: edit_interface.php:900
 msgid "Add a husband"
-msgstr "Dodaj nowego męża"
+msgstr "Dodaj męża"
 
 #: app/Module/RelativesTabModule.php:154
 msgid "Add a husband to this family"
@@ -1344,17 +1344,17 @@ msgstr "Dodaj męża spośród istniejących osób"
 
 #: app/Module/UserJournalModule.php:110
 msgid "Add a journal entry"
-msgstr "Dodaj nowy wpis do dziennika"
+msgstr "Dodaj wpis do dziennika"
 
 #: app/Controller/FamilyController.php:162 app/Functions/FunctionsEdit.php:1125
 #: app/Module/AlbumModule.php:98 app/Module/AlbumModule.php:99
 #: app/Module/MediaTabModule.php:87 source.php:168
 msgid "Add a media object"
-msgstr "Dodaj nowy obiekt multimedialny"
+msgstr "Dodaj obiekt multimedialny"
 
 #: app/Module/RelativesTabModule.php:329 edit_interface.php:672 family.php:96
 msgid "Add a mother"
-msgstr "Dodaj nową matkę"
+msgstr "Dodaj matkę"
 
 #: app/Controller/IndividualController.php:276 edit_interface.php:1655
 msgid "Add a name"
@@ -1367,11 +1367,11 @@ msgstr "Dodaj artykuł"
 #: app/Controller/FamilyController.php:149 app/Functions/FunctionsEdit.php:1104
 #: app/Module/NotesTabModule.php:102
 msgid "Add a note"
-msgstr "Dodaj nową notatkę"
+msgstr "Dodaj notatkę"
 
 #: app/Functions/FunctionsEdit.php:1135
 msgid "Add a restriction"
-msgstr "Dodaj nowe ograniczenie"
+msgstr "Dodaj ograniczenie"
 
 #. I18N: label for a yes/no option
 #: app/Module/FamilyTreeFavoritesModule.php:286
@@ -1385,20 +1385,20 @@ msgstr "Dodaj pasek przewijania, gdy zawartość bloku jest długa"
 #: app/Controller/FamilyController.php:155 app/Functions/FunctionsEdit.php:1114
 #: app/Module/NotesTabModule.php:112
 msgid "Add a shared note"
-msgstr "Dodaj nową wspólną notatkę"
+msgstr "Dodaj wspólną notatkę"
 
 #: app/Module/RelativesTabModule.php:271
 msgid "Add a son or daughter"
-msgstr "Dodaj nowego syna lub córkę"
+msgstr "Dodaj syna lub córkę"
 
 #: app/Controller/FamilyController.php:172 app/Functions/FunctionsEdit.php:1053
 #: app/Module/SourcesTabModule.php:95
 msgid "Add a source citation"
-msgstr "Dodaj nowe źródło"
+msgstr "Dodaj źródło"
 
 #: edit_interface.php:837
 msgid "Add a spouse"
-msgstr "Dodaj nowego współmałżonka"
+msgstr "Dodaj współmałżonka"
 
 #: app/Module/StoriesModule.php:113 app/Module/StoriesModule.php:195
 #: app/Module/StoriesModule.php:367
@@ -1408,12 +1408,12 @@ msgstr "Dodaj historię"
 #. I18N: Menu entry
 #: admin_users.php:264 app/Theme/AdministrationTheme.php:164
 msgid "Add a user"
-msgstr "Dodaj nowego użytkownika"
+msgstr "Dodaj użytkownika"
 
 #: app/Module/RelativesTabModule.php:375 edit_interface.php:807
 #: edit_interface.php:897
 msgid "Add a wife"
-msgstr "Dodaj nową żonę"
+msgstr "Dodaj żonę"
 
 #: app/Module/RelativesTabModule.php:188
 msgid "Add a wife to this family"
@@ -1432,7 +1432,7 @@ msgstr "Dodaj element FAQ"
 
 #: app/Functions/FunctionsEdit.php:1082 app/Functions/FunctionsEdit.php:1086
 msgid "Add an associate"
-msgstr "Dodaj nowe powiązanie"
+msgstr "Dodaj powiązanie"
 
 #: timeline.php:299
 msgid "Add another individual to the chart"
@@ -4326,7 +4326,7 @@ msgstr "Własny fakt"
 
 #: admin_modules.php:191 admin_site_upgrade.php:126 admin_site_upgrade.php:129
 msgid "Custom module"
-msgstr "Własny moduł"
+msgstr "Moduł niestandardowy"
 
 #: find.php:533
 msgid "Custom tags"
@@ -13551,7 +13551,7 @@ msgstr "Administrator strony %s zatwierdził twoje zgłoszenie. Można się tera
 
 #: login.php:615
 msgid "The administrator has been informed. As soon as they give you permission to sign in, you can sign in with your username and password."
-msgstr "Administrator został o tym poinformowany.<br>Gdy tylko udzieli zezwolenia będzie możliwe zalogowanie się na stronie korzystając ze swojego loginu i hasła."
+msgstr "Administrator został o tym poinformowany. Gdy tylko udzieli zezwolenia będzie możliwe zalogowanie się na stronie korzystając ze swojego loginu i hasła."
 
 #. I18N: %s is the name of a genealogy record
 #: action.php:50
@@ -14320,22 +14320,22 @@ msgstr "Używasz aktualnej wersji webtrees. Brak dostępnej aktualizacji."
 #. I18N: Help text for the “All family facts” configuration setting
 #: admin_trees_config.php:1757
 msgid "This is the list of GEDCOM facts that your users can add to families. You can modify this list by removing or adding fact names, even custom ones, as necessary. Fact names that appear in this list must not also appear in the “Unique family facts” list."
-msgstr "To jest lista faktów, które użytkownicy mogą dodawać do rodzin. Można zmieniać tę listę, dowolnie usuwając lub dodając nazwy faktów (nawet własne). Nazwy faktów, które występują na tej liście, nie mogą jednocześnie występować na liście <i>Unikalne fakty rodzinne</i>."
+msgstr "To jest lista faktów, które użytkownicy mogą dodawać do rodzin. Można zmieniać tę listę, dowolnie usuwając lub dodając nazwy faktów (nawet niestandardowe). Nazwy faktów, które występują na tej liście, nie mogą jednocześnie występować na liście „Unikalne fakty rodzinne”."
 
 #. I18N: Help text for the “All individual facts” configuration setting
 #: admin_trees_config.php:1639
 msgid "This is the list of GEDCOM facts that your users can add to individuals. You can modify this list by removing or adding fact names, even custom ones, as necessary. Fact names that appear in this list must not also appear in the “Unique individual facts” list."
-msgstr "To jest lista faktów, które użytkownicy mogą dodawać do osób. Można zmieniać tę listę, dowolnie usuwając lub dodając nazwy faktów (nawet własne). Nazwy faktów, które występują na tej liście, nie mogą występować jednocześnie na liście <i>Unikalne fakty osobowe</i>."
+msgstr "To jest lista faktów, które użytkownicy mogą dodawać do osób. Można zmieniać tę listę, dowolnie usuwając lub dodając nazwy faktów (nawet niestandardowe). Nazwy faktów, które występują na tej liście, nie mogą występować jednocześnie na liście „Unikalne fakty osobowe”."
 
 #. I18N: Help text for the “All repository facts” configuration setting
 #: admin_trees_config.php:1964
 msgid "This is the list of GEDCOM facts that your users can add to repositories. You can modify this list by removing or adding fact names, even custom ones, as necessary. Fact names that appear in this list must not also appear in the “Unique repository facts” list."
-msgstr "To jest lista faktów, które użytkownicy mogą dodawać do repozytoriów. Można zmieniać tę listę, dowolnie usuwając lub dodając nazwy faktów (nawet własne). Nazwy faktów, które występują na tej liście, nie mogą jednocześnie występować na liście <i>Unikalne fakty repozytorium</i>."
+msgstr "To jest lista faktów, które użytkownicy mogą dodawać do repozytoriów. Można zmieniać tę listę, dowolnie usuwając lub dodając nazwy faktów (nawet niestandardowe). Nazwy faktów, które występują na tej liście, nie mogą jednocześnie występować na liście „Unikalne fakty repozytorium”."
 
 #. I18N: Help text for the “All source facts” configuration setting
 #: admin_trees_config.php:1875
 msgid "This is the list of GEDCOM facts that your users can add to sources. You can modify this list by removing or adding fact names, even custom ones, as necessary. Fact names that appear in this list must not also appear in the “Unique source facts” list."
-msgstr "To jest lista faktów, które użytkownicy mogą dodawać do źródeł. Możesz zmieniać tą listę, dowolnie usuwając lub dodając nazwy faktów (nawet własne). Nazwy faktów, które występują na tej liście, nie mogą jednocześnie występować na liście <i>Unikalne fakty źródłowe</i>."
+msgstr "To jest lista faktów, które użytkownicy mogą dodawać do źródeł. Możesz zmieniać tą listę, dowolnie usuwając lub dodając nazwy faktów (nawet niestandardowe). Nazwy faktów, które występują na tej liście, nie mogą jednocześnie występować na liście „Unikalne fakty źródłowe”."
 
 #. I18N: Help text for the “Unique family facts” configuration setting
 #: admin_trees_config.php:1786
@@ -16285,7 +16285,7 @@ msgstr "zaakceptowana"
 #: app/Module/FamilyTreeFavoritesModule.php:228
 #: app/Module/GoogleMapsModule.php:4025 timeline.php:306
 msgid "add"
-msgstr "dodaj"
+msgstr "Dodaj"
 
 #. I18N: The name given to a child by its adoptive parents
 #: app/GedcomCode/GedcomCodeName.php:55
@@ -18913,7 +18913,7 @@ msgstr "rodzic matki"
 #. I18N: A system where children take their mother’s surname
 #: app/SurnameTradition.php:78
 msgid "matrilineal"
-msgstr "matrylinearny"
+msgstr "matrylinearna"
 
 #: app/Module/GoogleMapsModule.php:362
 msgid "maximum"
@@ -19201,7 +19201,7 @@ msgstr "rodzic ojca"
 #. I18N: A system where children take their father’s surname
 #: app/SurnameTradition.php:75
 msgid "patrilineal"
-msgstr "patrylinearny"
+msgstr "patrylinearna"
 
 #. I18N: the status of an edit accepted/rejected/pending
 #: admin_site_change.php:56
@@ -19550,7 +19550,7 @@ msgstr "rodzeństwo"
 #. I18N: A button label.
 #: app/Module/LoginBlockModule.php:84 login.php:201
 msgid "sign in"
-msgstr "logowanie"
+msgstr "Zaloguj"
 
 #. I18N: A button label.
 #: app/Module/LoginBlockModule.php:65
@@ -19660,7 +19660,7 @@ msgstr "współmałżonek dziecka"
 #: app/Module/UpcomingAnniversariesModule.php:176
 #: modules_v3/change_report/report.xml:7
 msgid "sort by date"
-msgstr "sortuj według daty"
+msgstr "Sortuj według daty"
 
 #: edit_interface.php:1847 modules_v3/bdm_report/report.xml:11
 #: modules_v3/birth_report/report.xml:9 modules_v3/change_report/report.xml:7
@@ -19669,32 +19669,32 @@ msgstr "sortuj według daty"
 #: modules_v3/occupation_report/report.xml:6
 #: modules_v3/relative_ext_report/report.xml:7
 msgid "sort by date of birth"
-msgstr "sortuj według daty urodzenia"
+msgstr "Sortuj według daty urodzenia"
 
 #: modules_v3/bdm_report/report.xml:11 modules_v3/cemetery_report/report.xml:6
 #: modules_v3/death_report/report.xml:9
 #: modules_v3/relative_ext_report/report.xml:7
 msgid "sort by date of death"
-msgstr "sortuj według daty śmierci"
+msgstr "Sortuj według daty śmierci"
 
 #: edit_interface.php:2202 modules_v3/marriage_report/report.xml:9
 msgid "sort by date of marriage"
-msgstr "sortuj według daty ślubu"
+msgstr "Sortuj według daty ślubu"
 
 #. I18N: An option in a list-box
 #: app/Module/RecentChangesModule.php:164
 msgid "sort by date, newest first"
-msgstr "sortuj według daty, najnowsze na początku"
+msgstr "Sortuj według daty, najnowsze na początku"
 
 #. I18N: An option in a list-box
 #: app/Module/RecentChangesModule.php:163
 msgid "sort by date, oldest first"
-msgstr "sortuj według daty, najstarsze na początku"
+msgstr "Sortuj według daty, najstarsze na początku"
 
 #. I18N: An option in a list-box
 #: medialist.php:109
 msgid "sort by filename"
-msgstr "sortuj według nazwy pliku"
+msgstr "Sortuj według nazwy pliku"
 
 #. I18N: An option in a list-box
 #: app/Module/OnThisDayModule.php:156 app/Module/RecentChangesModule.php:162
@@ -19708,12 +19708,12 @@ msgstr "sortuj według nazwy pliku"
 #: modules_v3/occupation_report/report.xml:6
 #: modules_v3/relative_ext_report/report.xml:7
 msgid "sort by name"
-msgstr "sortuj według nazwiska"
+msgstr "Sortuj według nazwiska"
 
 #. I18N: An option in a list-box
 #: medialist.php:106
 msgid "sort by title"
-msgstr "sortuj według tytułu"
+msgstr "Sortuj według tytułu"
 
 #: app/Module/GoogleMapsModule.php:3363
 msgid "south"

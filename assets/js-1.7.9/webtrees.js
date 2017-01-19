@@ -975,7 +975,7 @@ function message(username, method, url) {
  * @param checkbox_id
  * @param data_selector
  */
-function persistant_toggle(checkbox_id, data_selector) {
+function persistent_toggle(checkbox_id, data_selector) {
 	var checkbox = document.getElementById(checkbox_id);
 	var elements = document.querySelectorAll(data_selector);
 	var display  = localStorage.getItem(checkbox_id);
@@ -1250,3 +1250,11 @@ jQuery(".menu-theme").on("click", "li a", function () {
 		location.reload();
 	});
 });
+
+// Locale-aware functions for sorting user-data.
+function textCompareAsc(x, y) {
+	return x.localeCompare(y, WT_LOCALE, {'sensitivity': 'base'});
+}
+function textCompareDesc(x, y) {
+	return y.localeCompare(x, WT_LOCALE, {'sensitivity': 'base'});
+}

@@ -359,14 +359,14 @@ class FunctionsPrint {
 								$wife_age != '' && $record->getSex() == 'F' && $wife_age != $age
 							) {
 								if ($age != "0d") {
-									$ageText = '(' . I18N::translate('Age') . ' ' . FunctionsDate::getAgeAtEvent($age, false) . ')';
+									$ageText = '(' . I18N::translate('Age') . ' ' . FunctionsDate::getAgeAtEvent($age) . ')';
 								}
 							}
 						}
 					}
 					if ($fact != 'DEAT' && Date::compare($date, $death_date) >= 0) {
 						// After death, print time since death
-						$age = FunctionsDate::getAgeAtEvent(Date::getAgeGedcom($death_date, $date), true);
+						$age = FunctionsDate::getAgeAtEvent(Date::getAgeGedcom($death_date, $date));
 						if ($age != '') {
 							if (Date::getAgeGedcom($death_date, $date) == "0d") {
 								$ageText = '(' . I18N::translate('on the date of death') . ')';
@@ -399,7 +399,7 @@ class FunctionsPrint {
 								$husb_age != '' && $indi->getSex() == 'M' && $husb_age != $age ||
 								$wife_age != '' && $indi->getSex() == 'F' && $wife_age != $age
 							) {
-								$ageText = '(' . I18N::translate('Age') . ' ' . FunctionsDate::getAgeAtEvent($age, false) . ')';
+								$ageText = '(' . I18N::translate('Age') . ' ' . FunctionsDate::getAgeAtEvent($age) . ')';
 							}
 						}
 					}
@@ -408,20 +408,14 @@ class FunctionsPrint {
 					}
 				}
 			}
-		} else {
-			// 1 DEAT Y with no DATE => print YES
-			// 1 BIRT 2 SOUR @S1@ => print YES
-			// 1 DEAT N is not allowed
-			// It is not proper GEDCOM form to use a N(o) value with an event tag to infer that it did not happen.
-			$factdetail = explode(' ', trim($factrec));
-			if (isset($factdetail) && (count($factdetail) == 3 && strtoupper($factdetail[2]) == 'Y') || (count($factdetail) == 4 && $factdetail[2] == 'SOUR')) {
-				$html .= I18N::translate('yes');
-			}
+		} elseif (strpos($factrec, "\n2 PLAC ") === false) {
+			// There is no DATE.  If there is also no PLAC, then print "yes"
+			$html .= I18N::translate('yes');
 		}
 		// print gedcom ages
 		foreach (array(GedcomTag::getLabel('AGE') => $fact_age, GedcomTag::getLabel('HUSB') => $husb_age, GedcomTag::getLabel('WIFE') => $wife_age) as $label => $age) {
 			if ($age != '') {
-				$html .= ' <span class="label">' . $label . ':</span> <span class="age">' . FunctionsDate::getAgeAtEvent($age, false) . '</span>';
+				$html .= ' <span class="label">' . $label . ':</span> <span class="age">' . FunctionsDate::getAgeAtEvent($age) . '</span>';
 			}
 		}
 
