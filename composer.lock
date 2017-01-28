@@ -361,12 +361,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "6465eeec644b84ffaec227f49c3dc5d368d04a4b"
+                "reference": "6276bdc8d175daf07ec32c4e6763f36a28d9a372"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/6465eeec644b84ffaec227f49c3dc5d368d04a4b",
-                "reference": "6465eeec644b84ffaec227f49c3dc5d368d04a4b",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/6276bdc8d175daf07ec32c4e6763f36a28d9a372",
+                "reference": "6276bdc8d175daf07ec32c4e6763f36a28d9a372",
                 "shasum": ""
             },
             "require": {
@@ -404,7 +404,7 @@
                 "genealogy",
                 "webtrees"
             ],
-            "time": "2017-01-21 16:59:40"
+            "time": "2017-01-28 13:58:29"
         },
         {
             "name": "michelf/php-markdown",
