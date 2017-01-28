@@ -205,7 +205,8 @@ class RuralTheme extends \Fisharebest\Webtrees\Theme\AbstractTheme implements
 					$this->formatTreeTitle() .
 				'</div></div>'.
 				'<div class="header-row"><div id="header-bottom">'.
-					$this->formQuickSearch() .
+					$this->formQuickSearch().
+					'<div id="maj-header-extender">' . implode('', HookProvider::getInstance()->get('hPrintHeader')->execute()) . '</div>' .
 				'</div></div>'.
 			'</div>'.     // --  #header-content-lrg
             '<div id="header-content-xs">'.
@@ -263,6 +264,13 @@ class RuralTheme extends \Fisharebest\Webtrees\Theme\AbstractTheme implements
 		return implode('', array_map(function (Menu $menu) { return $menu->bootstrap(); }, $menus));
 	}
 	
+	//PERSO Remove Perso custom from this container
+	/** {@inheritDoc} */
+	protected function secondaryMenuContainer(array $menus) {
+	    return '<ul class="nav nav-pills secondary-menu">' .  $this->secondaryMenuContent($menus) . '</ul>';
+	}
+	//END PERSO
+		
     /** {@inheritdoc} */
 	protected function secondaryMenuContent(array $menus) {
 		return implode('', array_map(function (Menu $menu) { return $menu->bootstrap(); }, $menus));

@@ -2064,7 +2064,7 @@ abstract class AbstractTheme {
 	protected function secondaryMenuContainer(array $menus) {
 		return '<ul class="nav nav-pills secondary-menu">' . 
 		  //PERSO Add extra header
-		  implode('', array_map(function($item) { return !empty($item) ? '<li class="dropdown"><a>' . $item . '</a></li>' : ''; }, \MyArtJaub\Webtrees\Hook\HookProvider::getInstance()->get('hPrintHeader')->execute())) .
+		  implode('', array_map(function($item) { return !empty($item) ? '<li> ' . $item . ' </li>' : ''; }, \MyArtJaub\Webtrees\Hook\HookProvider::getInstance()->get('hPrintHeader')->execute())) .
 		  //END PERSO
 		  $this->secondaryMenuContent($menus) . '</ul>';
 	}
