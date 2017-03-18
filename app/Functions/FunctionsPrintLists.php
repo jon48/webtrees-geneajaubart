@@ -37,8 +37,8 @@ use Fisharebest\Webtrees\Tree;
 use Rhumsaa\Uuid\Uuid;
 
 //PERSO
-use \MyArtJaub\Webtrees as mw;
-use mw\Hook\Hook;
+use MyArtJaub\Webtrees\Constants;
+use MyArtJaub\Webtrees\Module\ModuleManager;
 //END PERSO
 
 
@@ -106,18 +106,19 @@ class FunctionsPrintLists {
 						/* Birth date   */ { type: "num", class: "center" },
 						/* Anniversary  */ { type: "num" },
 						/* Birthplace   */ { type: "text", class: "center" },
-						/* Birth source */ { class: "center", visible: '.(mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME) ? 'true' : 'false').' },
+						/* Birth source */ { class: "center", visible: '.(ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_ISSOURCED_NAME) ? 'true' : 'false').' },
 						/* Children     */ { type: "num" },
 						/* Deate date   */ { type: "num", class: "center" },
 						/* Anniversary  */ { type: "num" },
 						/* Age          */ { type: "num" },
 						/* Death place  */ { type: "text", class: "center" },
-						/* Death source */ { class: "center", visible: '.(mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME) ? 'true' : 'false').' },
+						/* Death source */ { class: "center", visible: '.(ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_ISSOURCED_NAME) ? 'true' : 'false').' },
 						/* Last change  */ { visible: ' . ($WT_TREE->getPreference('SHOW_LAST_CHANGE') ? 'true' : 'false') . ' },
 						/* Filter sex   */ { sortable: false },
 						/* Filter birth */ { sortable: false },
 						/* Filter death */ { sortable: false },
-						/* Filter tree  */ { sortable: false }
+						/* Filter tree  */ { sortable: false },
+			            /* Filter sosa */  { sortable: false }
 						/* END PERSO */
 					],
 					sorting: [[' . ($option === 'sosa' ? '4, "asc"' : '1, "asc"') . ']],
@@ -179,7 +180,7 @@ class FunctionsPrintLists {
 				<table id="' . $table_id . '">
 					<thead>
 						<tr>' . //PERSO Modify table to include IsSourced module
-							'<th colspan="18">
+							'<th colspan="19">
 								<div class="btn-toolbar">
 									<div class="btn-group">
 										<button
@@ -287,8 +288,21 @@ class FunctionsPrintLists {
 										>
 											' . I18N::translate('Leaves') . '
 										</button>
-									</div>
-								</div>
+									</div>';
+if(ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_SOSA_NAME)) {
+    $html .=					    '<div class="btn-group">
+										<button
+											class="ui-state-default"
+											data-filter-column="18"
+											data-filter-value="Y"
+											title="' . I18N::translate('Show Sosa ancestors.') . '"
+											type="button"
+										>
+											' . I18N::translate('Sosa') . '
+										</button>
+									</div>';
+}
+$html .=                        '</div>
 							</th>'. //END PERSO   
 						'</tr>
 						<tr>
@@ -299,7 +313,7 @@ class FunctionsPrintLists {
 							<th><i class="icon-reminder" title="' . I18N::translate('Anniversary') . '"></i></th>
 							<th>' . GedcomTag::getLabel('PLAC') . '</th>';
 							//PERSO Modify table to include IsSourced module
-							if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
+							if (ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_ISSOURCED_NAME)) {
 								$html .= '<th><i class="icon-source" title="'.I18N::translate('Sourced birth').'" border="0"></i></th>';
 							} else {
 								$html .=  '<th></th>';
@@ -311,22 +325,25 @@ $html .=		 				'<th><i class="icon-children" title="' . I18N::translate('Childre
 							<th>' . GedcomTag::getLabel('AGE') . '</th>
 							<th>' . GedcomTag::getLabel('PLAC') . '</th>';
 							//PERSO Modify table to include IsSourced module
-							if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
+							if (ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_ISSOURCED_NAME)) {
 								$html .=  '<th><i class="icon-source" title="'.I18N::translate('Sourced death').'" border="0"></i></th>';
 							} else {
 								$html .=  '<th></th>';
 							}
 							//END PERSO
-$html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
+$html .= 					'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 							<th hidden></th>
 							<th hidden></th>
 							<th hidden></th>
-							<th hidden></th>
-						</tr>
+							<th hidden></th>';
+//PERSO Sosa Filter
+$html .= 					'<th hidden></th>'; 
+//END PERSO
+$html .=				'</tr>
 					</thead>
 					<tfoot>
 						<tr>
-							<th colspan="18">
+							<th colspan="19">
 								<div class="btn-toolbar">
 									<div class="btn-group">
 										<button type="button" class="ui-state-default btn-toggle-parents">
@@ -350,7 +367,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 				continue;
 			}
 			//PERSO Create decorator for Individual
-			$dindividual = new mw\Individual($individual);
+			$dindividual = new \MyArtJaub\Webtrees\Individual($individual);
 			//END PERSO
 			if ($individual->isPendingAddtion()) {
 				$class = ' class="new"';
@@ -378,7 +395,12 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 					$sex_image = '';
 				}
 				//PERSO Add Sosa Image
-				$html .= '<a ' . $title . ' href="' . $individual->getHtmlUrl() . '"' . $class . '>' . FunctionsPrint::highlightSearchHits($name['full']) . '</a>' . $sex_image . mw\Functions\FunctionsPrint::formatSosaNumbers($dindividual->getSosaNumbers(), 1, 'smaller') . '<br>';
+				$html .= '<a ' . $title . ' href="' . $individual->getHtmlUrl() . '"' . $class . '>' . FunctionsPrint::highlightSearchHits($name['full']) . '</a>' . $sex_image;
+				$html .= implode('&nbsp;', 
+				    \MyArtJaub\Webtrees\Hook\HookProvider::getInstance()
+				        ->get('hRecordNameAppend')
+				        ->executeOnlyFor(array(Constants::MODULE_MAJ_SOSA_NAME),  $individual, 'smaller'));
+				$html .= '<br>';
 				//END PERSO
 			}
 			$html .= $individual->getPrimaryParentsNames('parents details1', 'none');
@@ -426,9 +448,9 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 			}
 			$html .= '</td>';
 			//PERSO Modify table to include IsSourced module
-			if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
+			if (ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_ISSOURCED_NAME)) {
 				$isBSourced = $dindividual->isBirthSourced();
-				$html .= '<td data-sort="' . $isBSourced . '">' . mw\Functions\FunctionsPrint::formatIsSourcedIcon('E', $isBSourced, 'BIRT', 1, 'medium') . '</td>';
+				$html .= '<td data-sort="' . $isBSourced . '">' . \MyArtJaub\Webtrees\Functions\FunctionsPrint::formatIsSourcedIcon('E', $isBSourced, 'BIRT', 1, 'medium') . '</td>';
 			} else {
 				$html .= '<td>&nbsp;</td>';
 			}
@@ -482,10 +504,10 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 			}
 			$html .= '</td>';
 			//PERSO Modify table to include IsSourced module
-			if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
+			if (ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_ISSOURCED_NAME)) {
 				if($individual->isDead()){
 					$isDSourced = $dindividual->isDeathSourced();
-					$html .= '<td data-sort="' . $isDSourced . '">' . mw\Functions\FunctionsPrint::formatIsSourcedIcon('E', $isDSourced, 'DEAT', 1, 'medium') . '</td>';
+					$html .= '<td data-sort="' . $isDSourced . '">' . \MyArtJaub\Webtrees\Functions\FunctionsPrint::formatIsSourcedIcon('E', $isDSourced, 'DEAT', 1, 'medium') . '</td>';
 				}
 				else{
 					$html .='<td data-sort="-99">&nbsp;</td>';
@@ -530,6 +552,19 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 				$html .= '&nbsp;';
 			}
 			$html .= '</td>';
+			
+			// PERSO -- Filter by Sosa
+			$html .= '<td hidden>';
+			if (ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_SOSA_NAME) 
+			    && $dindividual->isSosa()) {
+			    $html .= 'Y';
+			}
+			else {
+			    $html .= 'N';
+			}
+			$html .= '</td>';
+			//END PERSO
+			
 			$html .= '</tr>';
 
 			$unique_indis[$individual->getXref()] = true;
@@ -593,12 +628,13 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 						/* Marriage date       */ { type: "num", class: "center" },
 						/* Anniversary         */ { type: "num" },
 						/* Marriage place      */ { type: "text" },
-						/* Marriage source     */ { class: "center", visible: '.(mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME) ? 'true' : 'false').' },
+						/* Marriage source     */ { class: "center", visible: '.(ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_ISSOURCED_NAME) ? 'true' : 'false').' },
 						/* Children            */ { type: "num" },
 						/* Last change         */ { visible: ' . ($WT_TREE->getPreference('SHOW_LAST_CHANGE') ? 'true' : 'false') . ' },
 						/* Filter marriage     */ { sortable: false },
 						/* Filter alive/dead   */ { sortable: false },
-						/* Filter tree         */ { sortable: false }
+						/* Filter tree         */ { sortable: false },			    
+			            /* Filter sosa         */  { sortable: false }
 						/* END PERSO */
 					],
 					sorting: [[1, "asc"]],
@@ -658,7 +694,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 				<table id="' . $table_id . '">
 					<thead>
 						<tr>'. //PERSO Modify table to include IsSourced module
-							'<th colspan="15">
+							'<th colspan="16">
 								<div class="btn-toolbar">
 									<div class="btn-group">
 										<button
@@ -764,8 +800,21 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 										>
 											' . I18N::translate('Multiple marriages') . '
 										</button>
-									</div>
-								</div>
+									</div>';
+if(ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_SOSA_NAME)) {
+    $html .=					    '<div class="btn-group">
+										<button
+											class="ui-state-default"
+											data-filter-column="15"
+											data-filter-value="Y"
+											title="' . I18N::translate('Show Sosa ancestors.') . '"
+											type="button"
+										>
+											' . I18N::translate('Sosa') . '
+										</button>
+									</div>';
+}
+$html .=                        '</div>
 							</th>'. //END PERSO
 						'</tr>
 						<tr>
@@ -779,7 +828,7 @@ $html .= 						'<th>' . GedcomTag::getLabel('CHAN') . '</th>
 							<th><i class="icon-reminder" title="' . I18N::translate('Anniversary') . '"></i></th>
 							<th>' . GedcomTag::getLabel('PLAC') . '</th>';
 							//PERSO Modify table to include IsSourced module
-							if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
+							if (ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_ISSOURCED_NAME)) {
 								$html .= '<th><i class="icon-source" title="' . I18N::translate('Sourced marriage') . '" border="0"></i></th>';;
 							} else {
 								$html .= '<th>&nbsp;</th>';
@@ -789,12 +838,15 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 							<th>' . GedcomTag::getLabel('CHAN') . '</th>
 							<th hidden></th>
 							<th hidden></th>
-							<th hidden></th>
-						</tr>
+							<th hidden></th>';
+//PERSO Sosa Filter
+$html .= 					'<th hidden></th>'; 
+//END PERSO
+$html .=				'</tr>
 					</thead>
 					<tfoot>
 						<tr>
-						<th colspan="15">
+						<th colspan="16">
 								<div class="btn-toolbar">
 									<div class="btn-group">
 										<button type="button" class="ui-state-default btn-toggle-parents">
@@ -814,7 +866,7 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 
 		foreach ($families as $family) {
 			//PERSO Create decorator for Family
-			$dfamily = new mw\Family($family);
+			$dfamily = new \MyArtJaub\Webtrees\Family($family);
 			//END PERSO
 			// Retrieve husband and wife
 			$husb = $family->getHusband();
@@ -857,8 +909,12 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 				// Only show married names if they are the name we are filtering by.
 				if ($name['type'] != '_MARNM' || $num == $husb->getPrimaryName()) {
 					//PERSO Add Sosa Icon
-					$dhusb = new mw\Individual($husb);
-					$html .= '<a ' . $title . ' href="' . $family->getHtmlUrl() . '"' . $class . '>' . FunctionsPrint::highlightSearchHits($name['full']) . '</a>' . $sex_image . mw\Functions\FunctionsPrint::formatSosaNumbers($dhusb->getSosaNumbers(), 1, 'smaller') . '<br>';
+					$html .= '<a ' . $title . ' href="' . $family->getHtmlUrl() . '"' . $class . '>' . FunctionsPrint::highlightSearchHits($name['full']) . '</a>' . $sex_image;
+					$html .= implode('&nbsp;',
+					    \MyArtJaub\Webtrees\Hook\HookProvider::getInstance()
+					    ->get('hRecordNameAppend')
+					    ->executeOnlyFor(array(Constants::MODULE_MAJ_SOSA_NAME),  $husb, 'smaller'));
+					$html .= '<br>';
 					//END PERSO
 				}
 			}
@@ -903,8 +959,12 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 				// Only show married names if they are the name we are filtering by.
 				if ($name['type'] != '_MARNM' || $num == $wife->getPrimaryName()) {
 					//PERSO Add Sosa Icon
-					$dwife = new mw\Individual($wife);
-					$html .= '<a ' . $title . ' href="' . $family->getHtmlUrl() . '"' . $class . '>' . FunctionsPrint::highlightSearchHits($name['full']) . '</a>' . $sex_image . mw\Functions\FunctionsPrint::formatSosaNumbers($dwife->getSosaNumbers(), 1, 'smaller') . '<br>';
+					$html .= '<a ' . $title . ' href="' . $family->getHtmlUrl() . '"' . $class . '>' . FunctionsPrint::highlightSearchHits($name['full']) . '</a>' . $sex_image;
+					$html .= implode('&nbsp;',
+					    \MyArtJaub\Webtrees\Hook\HookProvider::getInstance()
+					    ->get('hRecordNameAppend')
+					    ->executeOnlyFor(array(Constants::MODULE_MAJ_SOSA_NAME),  $wife, 'smaller'));
+					$html .= '<br>';
 					//END PERSO
 				}
 			}
@@ -965,9 +1025,9 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 			}
 			$html .= '</td>';
 			//PERSO Modify table to include IsSourced module
-			if (mw\Module\ModuleManager::getInstance()->isOperational(mw\Constants::MODULE_MAJ_ISSOURCED_NAME)) {
+			if (ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_ISSOURCED_NAME)) {
 				$isMSourced = $dfamily->isMarriageSourced();
-				$html .= '<td data-sort="' . $isMSourced . '">' . mw\Functions\FunctionsPrint::formatIsSourcedIcon('E', $isMSourced, 'MARR', 1, 'medium') . '</td>';
+				$html .= '<td data-sort="' . $isMSourced . '">' . \MyArtJaub\Webtrees\Functions\FunctionsPrint::formatIsSourcedIcon('E', $isMSourced, 'MARR', 1, 'medium') . '</td>';
 			} else {
 				$html .= '<td>&nbsp;</td>';
 			}
@@ -1030,8 +1090,25 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 			} elseif (!$husb->isDead() && !$wife->isDead() && $family->getNumberOfChildren() === 0) {
 				$html .= 'L';
 			}
-			$html .= '</td>
-			</tr>';
+
+			$html .= '</td>';
+				
+			// PERSO -- Filter by Sosa
+			$html .= '<td hidden>';
+		    $dhusb = $husb ? new \MyArtJaub\Webtrees\Individual($husb) : null;
+		    $dwife = $wife ? new \MyArtJaub\Webtrees\Individual($wife) : null;
+			if (ModuleManager::getInstance()->isOperational(Constants::MODULE_MAJ_SOSA_NAME) && 
+			    (($dhusb && $dhusb->isSosa()) || ($dwife && $dwife->isSosa()))
+			    ) {
+			    $html .= 'Y';
+		    }
+		    else {
+		        $html .= 'N';		        
+		    }
+		    $html .= '</td>';
+		    //END PERSO
+		    	
+		    $html .= '</tr>';
 		}
 
 		$html .= '
@@ -1777,7 +1854,7 @@ $html .=						'<th><i class="icon-children" title="' . I18N::translate('Children
 			$html .= '<th>' . GedcomTag::getLabel('EVEN') . '</th>';
 			$html .= '</tr></thead><tbody>';
 
-			foreach ($filtered_events as $n => $fact) {
+			foreach ($filtered_events as $fact) {
 				$record = $fact->getParent();
 				$html .= '<tr>';
 				$html .= '<td data-sort="' . Filter::escapeHtml($record->getSortName()) . '">';
