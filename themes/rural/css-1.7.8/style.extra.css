@@ -48,7 +48,7 @@
 .maj-table {display:table; background-color:#D3C6B8; border:1px outset #D3C6B8; border-top:0; margin:20px auto 0;}
 .maj-row {display: table-row;}
 .maj-row .label {display: table-cell; border-top:1px solid #D3C6B8;color:#62584D;padding:5px 5px 0;vertical-align: middle}
-.maj-row .value {display: table-cell; background-color:#E9E2DB; color:#000; border-top:1px solid #D3C6B8; white-space:nowrap;margin:0; padding:5px; vertical-align: middle}
+.maj-row .value {display: table-cell; background-color:#E9E2DB; color:#000; border-top:1px solid #D3C6B8; margin:0; padding:5px; vertical-align: middle}
 .maj-row .value a {color:#62584D;}
 .maj-row .value a:hover {color:#9f8c77;}
 .maj-table p {margin:0;}
@@ -60,8 +60,8 @@
 .sosa-list td, .smissing-list td {}
 .sosa-list .stats {margin:0 auto; width:auto;}
 .smissing-list .btn-toolbar .btn-group { float:none;}
-.certificate-list th, .sosa-list th, .smissing-list th {cursor:pointer; font-weight: 600; padding: 2px 4px; white-space: nowrap;}
-.sosa-list tfoot td, .smissing-list tfoot td {font-weight: 600; padding: 2px 4px; white-space: nowrap;}
+.certificate-list th, .sosa-list th, .smissing-list th {cursor:pointer; font-weight: 600; padding: 2px 4px;}
+.sosa-list tfoot td, .smissing-list tfoot td {font-weight: 600; padding: 2px 4px;}
 .certificate-list th:last-child, .sosa-list th:last-child, .smissing-list th:last-child {margin:0 -2px 1px 1px; padding:3px 0 4px; width:24px;}
 #certificate-tabs {margin:auto; visibility:hidden; width:95%;}
 #certificate-edit {overflow-x:auto;}
@@ -122,7 +122,7 @@ html[dir='rtl'] .fact_flag {float: left;}
 #maj-sosa-stats-page h3 {margin:20px; text-align:center;}
 #maj-sosa-config-page-table {background-color:#D3C6B8; border:1px outset #D3C6B8; border-top:0; margin:20px auto 0; width:580px;}
 #maj-sosa-config-page-table .label {border-top:1px solid #D3C6B8;color:#62584D; float:left;padding:5px 10px 0; width:150px;}
-#maj-sosa-config-page-table .value {background-color:#E9E2DB; color:#000; border-top:1px solid #D3C6B8; margin:0 0 0 170px; padding:5px; white-space:nowrap;}
+#maj-sosa-config-page-table .value {background-color:#E9E2DB; color:#000; border-top:1px solid #D3C6B8; margin:0 0 0 170px; padding:5px;}
 #maj-sosa-config-page-table .value a {color:#62584D;}
 #maj-sosa-config-page-table .value a:hover {color:#9f8c77;}
 #maj-sosa-config-page-table p {margin:0;}

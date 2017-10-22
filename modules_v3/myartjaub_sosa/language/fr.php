@@ -77,6 +77,9 @@ return array (
                                     =>	'Implexe à la génération G. L\'implexe est une mesure du nombre réel d\'ancêtres d\'une personne par rapport au nombre théorique. Plus ce pourcentage est grand, plus il y a eu de mariages entre personnes apparentées. Les familles royales constituent des exemples extrêmes d\'implexe, certains atteignant des niveaux de 90%%, comme le roi Alphonse XII d\'Espagne.',
     'Generation-equivalent: %s generations'
                                     =>	'Équivalent-génération : %s générations',
+    'Most duplicated root Sosa ancestors'
+                                    =>  'Ancêtres Sosas racines les plus fréquents',
+    '%s times'                      =>  '%s fois',
     'Missing Ancestors'				=>	'Ancêtres manquants',
     'Choose generation'				=>	'Choisir une génération',
     'Generation %d'					=>	'Génération %d',
@@ -107,5 +110,6 @@ return array (
                                     =>	'Une erreur s\'est produite en récupérant les données...',
     'An error occurred while saving data...'
                                     =>	'Une erreur s\'est produite en sauvant les données...',
+    'Show Sosa ancestors.'          =>  'Montrer les ancêtres Sosa.'
 
 );

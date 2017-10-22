@@ -361,12 +361,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "94717f631da314ec50d0f26e7fccb24e51e161b5"
+                "reference": "b0ff97f9d6bfbc2ce5e70fd7b7736aec8ffa2b70"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/94717f631da314ec50d0f26e7fccb24e51e161b5",
-                "reference": "94717f631da314ec50d0f26e7fccb24e51e161b5",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/b0ff97f9d6bfbc2ce5e70fd7b7736aec8ffa2b70",
+                "reference": "b0ff97f9d6bfbc2ce5e70fd7b7736aec8ffa2b70",
                 "shasum": ""
             },
             "require": {
@@ -404,7 +404,7 @@
                 "genealogy",
                 "webtrees"
             ],
-            "time": "2017-03-18 14:50:02"
+            "time": "2017-10-22T19:19:20+00:00"
         },
         {
             "name": "michelf/php-markdown",
@@ -2787,12 +2787,12 @@
             "version": "0.9.6",
             "source": {
                 "type": "git",
-                "url": "https://github.com/padraic/mockery.git",
+                "url": "https://github.com/mockery/mockery.git",
                 "reference": "65d4ca18e15cb02eeb1e5336f884e46b9b905be0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padraic/mockery/zipball/65d4ca18e15cb02eeb1e5336f884e46b9b905be0",
+                "url": "https://api.github.com/repos/mockery/mockery/zipball/65d4ca18e15cb02eeb1e5336f884e46b9b905be0",
                 "reference": "65d4ca18e15cb02eeb1e5336f884e46b9b905be0",
                 "shasum": ""
             },
