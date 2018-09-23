@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -87,7 +87,7 @@ class FamilyTreeNewsModule extends AbstractModule implements ModuleBlockInterfac
 		$limit     = 5 * (1 + $more_news);
 
 		$articles = Database::prepare(
-			"SELECT SQL_CACHE news_id, user_id, gedcom_id, UNIX_TIMESTAMP(updated) + :offset AS updated, subject, body FROM `##news` WHERE gedcom_id = :tree_id ORDER BY updated DESC LIMIT :limit"
+			"SELECT news_id, user_id, gedcom_id, UNIX_TIMESTAMP(updated) + :offset AS updated, subject, body FROM `##news` WHERE gedcom_id = :tree_id ORDER BY updated DESC LIMIT :limit"
 		)->execute(array(
 			'offset'  => WT_TIMESTAMP_OFFSET,
 			'tree_id' => $WT_TREE->getTreeId(),
@@ -95,7 +95,7 @@ class FamilyTreeNewsModule extends AbstractModule implements ModuleBlockInterfac
 		))->fetchAll();
 
 		$count = Database::prepare(
-			"SELECT SQL_CACHE COUNT(*) FROM `##news` WHERE gedcom_id = :tree_id"
+			"SELECT COUNT(*) FROM `##news` WHERE gedcom_id = :tree_id"
 		)->execute(array(
 			'tree_id' => $WT_TREE->getTreeId(),
 		))->fetchOne();

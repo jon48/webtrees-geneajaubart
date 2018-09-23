@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -738,9 +738,7 @@ foreach ($GEDCOMS as $GEDCOM => $GED_DATA) {
 		}
 
 		foreach ($person_privacy as $key => $value) {
-			if (isset($value['details'])) {
-				$stmt_default_resn->execute(array($GED_DATA['id'], $key, null, $value['details']));
-			}
+			$stmt_default_resn->execute(array($GED_DATA['id'], $key, null, $value));
 		}
 
 		foreach ($person_facts as $key1 => $array) {

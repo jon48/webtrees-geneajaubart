@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -37,6 +37,9 @@ define('WT_REQUIRED_PHP_VERSION', '5.3.2');
 define('WT_MODULES_DIR', 'modules_v3/');
 define('WT_ROOT', '');
 define('WT_CLIENT_IP', $_SERVER['REMOTE_ADDR']);
+
+// PHP requires a time zone to be set. We'll set a better one later on.
+date_default_timezone_set('UTC');
 
 // Convert PHP errors into exceptions
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {

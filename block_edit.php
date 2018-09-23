@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@ require './includes/session.php';
 
 $block_id = Filter::getInteger('block_id');
 $block    = Database::prepare(
-	"SELECT SQL_CACHE * FROM `##block` WHERE block_id=?"
+	"SELECT * FROM `##block` WHERE block_id=?"
 )->execute(array($block_id))->fetchOneRow();
 
 // Check access. (1) the block must exist and be enabled, (2) gedcom blocks require

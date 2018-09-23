@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -84,7 +84,7 @@ class Config {
 		return array(
 			'ABBR', 'ADDR', 'AFN', 'ALIA', 'AUTH', 'CHIL', 'EMAIL', 'FAX', 'FILE',
 			'HUSB', 'NAME', 'NCHI', 'NOTE', 'OBJE', 'PHON', 'PUBL', 'REFN', 'REPO',
-			'RESN', 'SEX', 'SOUR', 'SSN', 'TEXT', 'TITL', 'WIFE', 'WWW', '_EMAIL',
+			'RESN', 'SEX', 'SOUR', 'SSN', 'TEXT', 'WIFE', 'WWW', '_EMAIL',
 		);
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,6 +18,7 @@ namespace Fisharebest\Webtrees;
 use Fisharebest\Webtrees\Controller\PageController;
 use Fisharebest\Webtrees\Theme\AdministrationTheme;
 use PDOException;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * This is the bootstrap script, that is run on every request.
@@ -40,7 +41,7 @@ global $WT_TREE, $SEARCH_SPIDER;
 
 // Identify ourself
 define('WT_WEBTREES', 'webtrees');
-define('WT_VERSION', '1.7.9');
+define('WT_VERSION', '1.7.11');
 
 // External URLs
 define('WT_WEBTREES_URL', 'https://www.webtrees.net/');
@@ -153,9 +154,9 @@ define('WT_START_TIME', microtime(true));
 
 // We want to know about all PHP errors during development, and fewer in production.
 if (WT_DEBUG) {
-	error_reporting(E_ALL | E_STRICT | E_NOTICE | E_DEPRECATED);
+    error_reporting(E_ALL | E_STRICT | E_NOTICE | E_DEPRECATED);
 } else {
-	error_reporting(E_ALL);
+    error_reporting(E_ALL);
 }
 
 require WT_ROOT . 'vendor/autoload.php';
@@ -164,33 +165,19 @@ require WT_ROOT . 'vendor/autoload.php';
 date_default_timezone_set('UTC');
 
 // Calculate the base URL, so we can generate absolute URLs.
-$https    = strtolower(Filter::server('HTTPS'));
-$protocol = ($https === '' || $https === 'off') ? 'http' : 'https';
-$protocol = Filter::server('HTTP_X_FORWARDED_PROTO', 'https?', $protocol);
+$request     = Request::createFromGlobals();
+$request_uri = $request->getSchemeAndHttpHost() . $request->getRequestUri();
 
-$host = Filter::server('SERVER_ADDR', null, '127.0.0.1');
-$host = Filter::server('SERVER_NAME', null, $host);
+// Remove any PHP script name and parameters.
+$base_uri = preg_replace('/[^\/]+\.php(\?.*)?$/', '', $request_uri);
+define('WT_BASE_URL', $base_uri);
 
-$port = Filter::server('SERVER_PORT', null, '80');
-$port = Filter::server('HTTP_X_FORWARDED_PORT', '80|443', $port);
-
-// Ignore the default port.
-if ($protocol === 'http' && $port === '80' || $protocol === 'https' && $port === '443') {
-	$port = '';
-} else {
-	$port = ':' . $port;
-}
-
-// REDIRECT_URL should be set when Apache is following a RedirectRule
-// PHP_SELF may have trailing path: /path/to/script.php/FOO/BAR
-$path = Filter::server('REDIRECT_URL', null, Filter::server('PHP_SELF'));
-$path = substr($path, 0, stripos($path, WT_SCRIPT_NAME));
-
-define('WT_BASE_URL', $protocol . '://' . $host . $port . $path);
-
-// Convert PHP errors into exceptions
+// Convert PHP warnings/notices into exceptions
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-	throw new \ErrorException($errfile . ':' . $errline . ' ' . $errstr, $errno);
+    // Ignore errors that are silenced with '@'
+    if (error_reporting() & $errno) {
+        throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+    }
 });
 
 set_exception_handler(function ($ex) {
@@ -234,7 +221,7 @@ set_exception_handler(function ($ex) {
 		}
 	}
 
-	if (true || error_reporting() & $ex->getCode()) {
+	if (error_reporting() & $ex->getCode()) {
 		echo $message;
 	}
 
@@ -285,7 +272,7 @@ try {
 	}
 } catch (PDOException $ex) {
 	header('Location: ' . WT_BASE_URL . 'site-unavailable.php?message=' . rawurlencode($ex->getMessage()));
-	throw $ex;
+	exit;
 }
 
 // The config.ini.php file must always be in a fixed location.
@@ -312,7 +299,7 @@ if (!ini_get('safe_mode')) {
 }
 
 $rule = Database::prepare(
-	"SELECT SQL_CACHE rule FROM `##site_access_rule`" .
+	"SELECT rule FROM `##site_access_rule`" .
 	" WHERE IFNULL(INET_ATON(?), 0) BETWEEN ip_address_start AND ip_address_end" .
 	" AND ? LIKE user_agent_pattern" .
 	" ORDER BY ip_address_end LIMIT 1"
@@ -385,7 +372,7 @@ session_set_save_handler(
 
 Session::start(array(
 	'gc_maxlifetime' => Site::getPreference('SESSION_TIME'),
-	'cookie_path'    => parse_url(WT_BASE_URL, PHP_URL_PATH),
+	'cookie_path'    => implode('/', array_map('rawurlencode', explode('/', parse_url(WT_BASE_URL, PHP_URL_PATH)))),
 ));
 
 if (!Auth::isSearchEngine() && !Session::get('initiated')) {

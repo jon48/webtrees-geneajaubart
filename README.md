@@ -1,4 +1,4 @@
-# webtrees-geneaujaubart
+# webtrees-geneajaubart
 
 Please note that this file is an extension of the one contained in the standard 
 **[webtrees](http://webtrees.net)** project, so please read the latter carefully
@@ -22,8 +22,8 @@ implemented for the [GeneaJaubart website](http://genea.jaubart.com/wt/).
 ### License
 
 * **webtrees-geneajaubart: webtrees for the GeneaJaubart website**
-* Copyright (C) 2009 to 2016 Jonathan Jaubart.
-* Derived from **webtrees** - Copyright (C) 2010 to 2014  webtrees development team.
+* Copyright (C) 2009 to 2018 Jonathan Jaubart.
+* Derived from **webtrees** - Copyright (C) 2010 to 2018  webtrees development team.
 * Derived from PhpGedView - Copyright (C) 2002 to 2010  PGV Development Team.
 
 This program is free software; you can redistribute it and/or modify it under the

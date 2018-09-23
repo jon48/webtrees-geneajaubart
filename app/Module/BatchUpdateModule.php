@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -131,7 +131,7 @@ class BatchUpdateModule extends AbstractModule implements ModuleConfigInterface 
 					$newrecord = $this->PLUGIN->updateRecord($this->xref, $record);
 					if ($newrecord != $record) {
 						if ($newrecord) {
-							GedcomRecord::getInstance($this->xref, $WT_TREE)->updateRecord($newrecord, $this->PLUGIN->chan);
+							GedcomRecord::getInstance($this->xref, $WT_TREE)->updateRecord($newrecord, !$this->PLUGIN->chan);
 						} else {
 							GedcomRecord::getInstance($this->xref, $WT_TREE)->deleteRecord();
 						}
@@ -146,7 +146,7 @@ class BatchUpdateModule extends AbstractModule implements ModuleConfigInterface 
 						$newrecord = $this->PLUGIN->updateRecord($xref, $record);
 						if ($newrecord != $record) {
 							if ($newrecord) {
-								GedcomRecord::getInstance($xref, $WT_TREE)->updateRecord($newrecord, $this->PLUGIN->chan);
+								GedcomRecord::getInstance($xref, $WT_TREE)->updateRecord($newrecord, !$this->PLUGIN->chan);
 							} else {
 								GedcomRecord::getInstance($xref, $WT_TREE)->deleteRecord();
 							}

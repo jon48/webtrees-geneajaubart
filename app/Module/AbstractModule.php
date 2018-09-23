@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -55,7 +55,7 @@ abstract class AbstractModule {
 	 */
 	public function getBlockSetting($block_id, $setting_name, $default_value = null) {
 		$setting_value = Database::prepare(
-			"SELECT SQL_CACHE setting_value FROM `##block_setting` WHERE block_id = :block_id AND setting_name = :setting_name"
+			"SELECT setting_value FROM `##block_setting` WHERE block_id = :block_id AND setting_name = :setting_name"
 		)->execute(array(
 			'block_id'     => $block_id,
 			'setting_name' => $setting_name,
@@ -138,7 +138,7 @@ abstract class AbstractModule {
 	private function loadAllSettings() {
 		if ($this->settings === null) {
 			$this->settings = Database::prepare(
-				"SELECT SQL_CACHE setting_name, setting_value FROM `##module_setting` WHERE module_name = ?"
+				"SELECT setting_name, setting_value FROM `##module_setting` WHERE module_name = ?"
 			)->execute(array($this->getName()))->fetchAssoc();
 		}
 	}

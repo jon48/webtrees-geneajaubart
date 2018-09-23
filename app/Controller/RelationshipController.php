@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -74,7 +74,7 @@ class RelationshipController extends PageController {
 			// Insert the paths into the queue, with an exclusion list.
 			$queue[] = array('path' => $path, 'exclude' => array());
 			// While there are un-extended paths
-			while (list(, $next) = each($queue)) {
+            for ($next = current($queue); $next !== false; $next = next($queue)) {
 				// For each family on the path
 				for ($n = count($next['path']) - 2; $n >= 1; $n -= 2) {
 					$exclude = $next['exclude'];
@@ -178,7 +178,7 @@ class RelationshipController extends PageController {
 				$parameters
 			)->fetchOneColumn();
 
-			$queue = [];
+			$queue = array();
 			foreach ($parents as $parent) {
 				if (!in_array($parent, $ancestors)) {
 					$ancestors[] = $parent;

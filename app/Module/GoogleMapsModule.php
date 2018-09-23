@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -1807,15 +1807,14 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 			$facts = array_merge($facts, $family->getFacts());
 			// Add birth of children from this family to the facts array
 			foreach ($family->getChildren() as $child) {
-				$facts[] = $child->getFirstFact('BIRT');
+				$birth_fact = $child->getFirstFact('BIRT');
+				// Exclude children without birthplaces
+				// facts without places
+				if ($birth_fact !== null && $birth_fact->getPlace() !== null) {
+					$facts[] = $birth_fact;
+				}
 			}
 		}
-
-		$facts = array_values(array_filter($facts, function ($item) {
-			// remove null facts (child without birth event) and
-			// facts without places
-			return !is_null($item) && !$item->getPlace()->isEmpty();
-		}));
 
 		Functions::sortFacts($facts);
 
@@ -2531,6 +2530,7 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
 
 			// Create the map and mapOptions
 			var mapOptions = {
+				minZoom: ' . $this->getSetting('GM_MIN_ZOOM') . ',
 				zoom: 8,
 				center: map_center,
 				mapTypeId: google.maps.MapTypeId.' . $this->getSetting('GM_MAP_TYPE') . ',

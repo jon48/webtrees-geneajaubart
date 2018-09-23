@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -38,7 +38,7 @@ class Site {
 		// so it is quicker to fetch them all in one go.
 		if (self::$settings === null) {
 			self::$settings = Database::prepare(
-				"SELECT SQL_CACHE setting_name, setting_value FROM `##site_setting`"
+				"SELECT setting_name, setting_value FROM `##site_setting`"
 			)->fetchAssoc();
 		}
 

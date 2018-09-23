@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -64,7 +64,7 @@ class UserFavoritesModule extends FamilyTreeFavoritesModule {
 
 		return
 			Database::prepare(
-				"SELECT SQL_CACHE favorite_id AS id, user_id, gedcom_id, xref AS gid, favorite_type AS type, title AS title, note AS note, url AS url" .
+				"SELECT favorite_id AS id, user_id, gedcom_id, xref AS gid, favorite_type AS type, title AS title, note AS note, url AS url" .
 				" FROM `##favorite` WHERE user_id=? AND gedcom_id=?")
 			->execute(array($user_id, $WT_TREE->getTreeId()))
 			->fetchAll(PDO::FETCH_ASSOC);

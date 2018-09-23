@@ -1,6 +1,6 @@
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -4852,11 +4852,11 @@ footer {
 }
 
 .menu-indi-addname {
-	background-position: left -780px;
+	background-position: left -680px;
 }
 
 [dir=rtl] .menu-indi-addname {
-	background-position: right -780px;
+	background-position: right -680px;
 }
 
 .menu-indi-del,
@@ -4878,11 +4878,11 @@ footer {
 }
 
 .menu-indi-editsex {
-	background-position: left -780px;
+	background-position: left -680px;
 }
 
 [dir=rtl] .menu-indi-editsex {
-	background-position: right -780px;
+	background-position: right -680px;
 }
 
 .menu-list-fam {

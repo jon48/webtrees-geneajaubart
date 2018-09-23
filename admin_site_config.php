@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -112,10 +112,17 @@ $SMTP_SSL_OPTIONS = array(
 	/* I18N: Secure Sockets Layer - a secure communications protocol*/ 'ssl'      => I18N::translate('ssl'),
 	/* I18N: Transport Layer Security - a secure communications protocol */ 'tls' => I18N::translate('tls'),
 );
+
 $SMTP_ACTIVE_OPTIONS = array(
 	'internal' => I18N::translate('Use PHP mail to send messages'),
+	'sendmail' => /* I18N: "sendmail" is the name of some mail software */ I18N::translate('Use sendmail to send messages'),
 	'external' => I18N::translate('Use SMTP to send messages'),
 );
+
+if (!function_exists('proc_open')) {
+	unset($SMTP_ACTIVE_OPTIONS['sendmail']);
+}
+
 $WELCOME_TEXT_AUTH_MODE_OPTIONS = array(
 	0 => I18N::translate('No predefined text'),
 	1 => I18N::translate('Predefined text that states all users can request a user account'),
@@ -512,7 +519,7 @@ $controller->pageHeader();
 			<?php echo I18N::translate('If you use one of the following tracking and analytics services, webtrees can add the tracking codes automatically.') ?>
 		</p>
 
-		<h2><a href="https://http://www.bing.com/toolbox/webmaster/">Bing Webmaster Tools</a></h2>
+		<h2><a href="https://www.bing.com/toolbox/webmaster/">Bing Webmaster Tools</a></h2>
 
 		<!-- BING_WEBMASTER_ID -->
 		<div class="form-group">
@@ -554,7 +561,7 @@ $controller->pageHeader();
 			</div>
 		</div>
 
-		<h2><a href="http://www.google.com/analytics/">Google Analytics</a></h2>
+		<h2><a href="https://www.google.com/analytics/">Google Analytics</a></h2>
 
 		<!-- GOOGLE_ANALYTICS_ID -->
 		<div class="form-group">
