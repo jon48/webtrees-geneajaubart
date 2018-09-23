@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -33,9 +33,9 @@ class CensusColumnSurnameGivenNameInitial extends CensusColumnFullName {
 		$name  = $this->nameAtCensusDate($individual, $this->date());
 		$given = $name['givn'];
 		if (strpos($given, ' ') === false) {
-			return $name['surn'] . ', ' . $given;
+			return $name['surname'] . ', ' . $given;
 		} else {
-			return $name['surn'] . ', ' . substr($given, 0, strpos($given, ' ') + 2);
+			return $name['surname'] . ', ' . substr($given, 0, strpos($given, ' ') + 2);
 		}
 	}
 }

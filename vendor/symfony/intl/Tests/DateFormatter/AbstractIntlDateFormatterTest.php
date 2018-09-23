@@ -11,15 +11,18 @@
 
 namespace Symfony\Component\Intl\Tests\DateFormatter;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
 use Symfony\Component\Intl\Globals\IntlGlobals;
+use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Util\IcuVersion;
 
 /**
  * Test case for IntlDateFormatter implementations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractIntlDateFormatterTest extends TestCase
 {
     protected function setUp()
     {
@@ -36,7 +39,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
 
         // In PHP 5.5 default timezone depends on `date_default_timezone_get()` method
-        if (PHP_VERSION_ID >= 50500 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+        if (\PHP_VERSION_ID >= 50500 || (\extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
             $this->assertEquals(date_default_timezone_get(), $formatter->getTimeZoneId());
         } else {
             $this->assertNull($formatter->getTimeZoneId());
@@ -228,17 +231,6 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('s', 3601, '1'),
             array('s', 3630, '30'),
             array('s', 43200, '0'), // 12 hours
-
-            // general
-            array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 GMT'),
-            array('K:mm a, z', 0, '0:00 AM, GMT'),
-
-            // timezone
-            array('z', 0, 'GMT'),
-            array('zz', 0, 'GMT'),
-            array('zzz', 0, 'GMT'),
-            array('zzzz', 0, 'GMT'),
-            array('zzzzz', 0, 'GMT'),
         );
 
         $dateTime = new \DateTime('@0');
@@ -249,10 +241,28 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $formatData[] = array('h:mm a', $dateTime, '12:00 AM');
         $formatData[] = array('yyyyy.MMMM.dd hh:mm aaa', $dateTime, '01970.January.01 12:00 AM');
 
-        $formatData[] = array("yyyy.MM.dd 'at' HH:mm:ss zzz", $dateTime, '1970.01.01 at 00:00:00 GMT');
-        $formatData[] = array('K:mm a, z', $dateTime, '0:00 AM, GMT');
+        if (IcuVersion::compare(Intl::getIcuVersion(), '59.1', '>=', 1)) {
+            // Before ICU 59.1 GMT was used instead of UTC
+            $formatData[] = array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 UTC');
+            $formatData[] = array('K:mm a, z', 0, '0:00 AM, UTC');
+            $formatData[] = array("yyyy.MM.dd 'at' HH:mm:ss zzz", $dateTime, '1970.01.01 at 00:00:00 UTC');
+            $formatData[] = array('K:mm a, z', $dateTime, '0:00 AM, UTC');
+        }
 
         return $formatData;
+    }
+
+    /**
+     * @requires PHP 5.5.10
+     */
+    public function testFormatUtcAndGmtAreSplit()
+    {
+        $pattern = "yyyy.MM.dd 'at' HH:mm:ss zzz";
+        $gmtFormatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'GMT', IntlDateFormatter::GREGORIAN, $pattern);
+        $utcFormatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN, $pattern);
+
+        $this->assertSame('1970.01.01 at 00:00:00 GMT', $gmtFormatter->format(new \DateTime('@0')));
+        $this->assertSame('1970.01.01 at 00:00:00 UTC', $utcFormatter->format(new \DateTime('@0')));
     }
 
     /**
@@ -270,7 +280,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     public function formatErrorProvider()
     {
         // With PHP 5.5 IntlDateFormatter accepts empty values ('0')
-        if (PHP_VERSION_ID >= 50500 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+        if (\PHP_VERSION_ID >= 50500 || (\extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
             return array(
                 array('y-M-d', 'foobar', 'datefmt_format: string \'foobar\' is not numeric, which would be required for it to be a valid date: U_ILLEGAL_ARGUMENT_ERROR'),
             );
@@ -323,7 +333,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         );
 
         // As of PHP 5.5, intl ext no longer fallbacks invalid time zones to UTC
-        if (PHP_VERSION_ID < 50500 && !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+        if (\PHP_VERSION_ID < 50500 && !(\extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
             // When time zone not exists, uses UTC by default
             $data[] = array(0, 'Foo/Bar', '1970-01-01 00:00:00');
             $data[] = array(0, 'UTC+04:30', '1970-01-01 00:00:00');
@@ -333,11 +343,80 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         return $data;
     }
 
+    /**
+     * @dataProvider formatTimezoneProvider
+     * @requires PHP 5.5.10
+     */
+    public function testFormatTimezone($pattern, $timezone, $expected)
+    {
+        $formatter = $this->getDefaultDateFormatter($pattern);
+        $formatter->setTimeZone(new \DateTimeZone($timezone));
+
+        $this->assertEquals($expected, $formatter->format(0));
+    }
+
+    public function formatTimezoneProvider()
+    {
+        $cases = array(
+            array('z', 'GMT', 'GMT'),
+            array('zz', 'GMT', 'GMT'),
+            array('zzz', 'GMT', 'GMT'),
+            array('zzzz', 'GMT', 'Greenwich Mean Time'),
+            array('zzzzz', 'GMT', 'Greenwich Mean Time'),
+
+            array('z', 'Etc/GMT', 'GMT'),
+            array('zz', 'Etc/GMT', 'GMT'),
+            array('zzz', 'Etc/GMT', 'GMT'),
+            array('zzzz', 'Etc/GMT', 'Greenwich Mean Time'),
+            array('zzzzz', 'Etc/GMT', 'Greenwich Mean Time'),
+
+            array('z', 'Etc/GMT+3', 'GMT-3'),
+            array('zz', 'Etc/GMT+3', 'GMT-3'),
+            array('zzz', 'Etc/GMT+3', 'GMT-3'),
+            array('zzzz', 'Etc/GMT+3', 'GMT-03:00'),
+            array('zzzzz', 'Etc/GMT+3', 'GMT-03:00'),
+
+            array('z', 'UTC', 'UTC'),
+            array('zz', 'UTC', 'UTC'),
+            array('zzz', 'UTC', 'UTC'),
+            array('zzzz', 'UTC', 'Coordinated Universal Time'),
+            array('zzzzz', 'UTC', 'Coordinated Universal Time'),
+
+            array('z', 'Etc/UTC', 'UTC'),
+            array('zz', 'Etc/UTC', 'UTC'),
+            array('zzz', 'Etc/UTC', 'UTC'),
+            array('zzzz', 'Etc/UTC', 'Coordinated Universal Time'),
+            array('zzzzz', 'Etc/UTC', 'Coordinated Universal Time'),
+
+            array('z', 'Etc/Universal', 'UTC'),
+            array('z', 'Etc/Zulu', 'UTC'),
+            array('z', 'Etc/UCT', 'UTC'),
+            array('z', 'Etc/Greenwich', 'GMT'),
+            array('zzzzz', 'Etc/Universal', 'Coordinated Universal Time'),
+            array('zzzzz', 'Etc/Zulu', 'Coordinated Universal Time'),
+            array('zzzzz', 'Etc/UCT', 'Coordinated Universal Time'),
+            array('zzzzz', 'Etc/Greenwich', 'Greenwich Mean Time'),
+        );
+
+        if (!\defined('HHVM_VERSION')) {
+            // these timezones are not considered valid in HHVM
+            $cases = array_merge($cases, array(
+                array('z', 'GMT+03:00', 'GMT+3'),
+                array('zz', 'GMT+03:00', 'GMT+3'),
+                array('zzz', 'GMT+03:00', 'GMT+3'),
+                array('zzzz', 'GMT+03:00', 'GMT+03:00'),
+                array('zzzzz', 'GMT+03:00', 'GMT+03:00'),
+            ));
+        }
+
+        return $cases;
+    }
+
     public function testFormatWithGmtTimezone()
     {
         $formatter = $this->getDefaultDateFormatter('zzzz');
 
-        if (PHP_VERSION_ID >= 50500 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+        if (\PHP_VERSION_ID >= 50500 || (\extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
             $formatter->setTimeZone('GMT+03:00');
         } else {
             $formatter->setTimeZoneId('GMT+03:00');
@@ -350,7 +429,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $formatter = $this->getDefaultDateFormatter('zzzz');
 
-        if (PHP_VERSION_ID >= 50500 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+        if (\PHP_VERSION_ID >= 50500 || (\extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
             $formatter->setTimeZone('GMT+00:30');
         } else {
             $formatter->setTimeZoneId('GMT+00:30');
@@ -363,7 +442,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $formatter = $this->getDefaultDateFormatter('zzzz');
 
-        if (PHP_VERSION_ID >= 50500 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+        if (\PHP_VERSION_ID >= 50500 || (\extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
             $formatter->setTimeZone('Pacific/Fiji');
         } else {
             $formatter->setTimeZoneId('Pacific/Fiji');
@@ -383,20 +462,19 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @requires PHP 5.5.10
+     */
     public function testFormatWithDateTimeZoneGmt()
     {
-        if (PHP_VERSION_ID < 50500 && !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
-            $this->markTestSkipped('Only in PHP 5.5+ IntlDateFormatter allows to use DateTimeZone objects.');
-        }
-
-        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT'), IntlDateFormatter::GREGORIAN, 'zzzz');
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT'), IntlDateFormatter::GREGORIAN, 'zzz');
 
         $this->assertEquals('GMT', $formatter->format(0));
     }
 
     public function testFormatWithDateTimeZoneGmtOffset()
     {
-        if (defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) {
+        if (\defined('HHVM_VERSION_ID') || \PHP_VERSION_ID <= 50509) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
@@ -407,10 +485,10 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function testFormatWithIntlTimeZone()
     {
-        if (!extension_loaded('intl')) {
+        if (!\extension_loaded('intl')) {
             $this->markTestSkipped('Extension intl is required.');
         }
-        if (PHP_VERSION_ID < 50500 && !method_exists('IntlDateFormatter', 'setTimeZone')) {
+        if (\PHP_VERSION_ID < 50500 && !method_exists('IntlDateFormatter', 'setTimeZone')) {
             $this->markTestSkipped('Only in PHP 5.5+ IntlDateFormatter allows to use DateTimeZone objects.');
         }
 
@@ -421,7 +499,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function testFormatWithTimezoneFromEnvironmentVariable()
     {
-        if (PHP_VERSION_ID >= 50500 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+        if (\PHP_VERSION_ID >= 50500 || (\extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
             $this->markTestSkipped('IntlDateFormatter in PHP 5.5 no longer depends on TZ environment.');
         }
 
@@ -444,7 +522,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function testFormatWithTimezoneFromPhp()
     {
-        if (PHP_VERSION_ID < 50500 && !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+        if (\PHP_VERSION_ID < 50500 && !(\extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
             $this->markTestSkipped('Only in PHP 5.5 IntlDateFormatter depends on default timezone (`date_default_timezone_get()`).');
         }
 
@@ -481,8 +559,8 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array(0, IntlDateFormatter::LONG, IntlDateFormatter::NONE, 'January 1, 1970'),
             array(0, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'Jan 1, 1970'),
             array(0, IntlDateFormatter::SHORT, IntlDateFormatter::NONE, '1/1/70'),
-            array(0, IntlDateFormatter::NONE, IntlDateFormatter::FULL, '12:00:00 AM GMT'),
-            array(0, IntlDateFormatter::NONE, IntlDateFormatter::LONG, '12:00:00 AM GMT'),
+            array(0, IntlDateFormatter::NONE, IntlDateFormatter::FULL, '12:00:00 AM Coordinated Universal Time'),
+            array(0, IntlDateFormatter::NONE, IntlDateFormatter::LONG, '12:00:00 AM UTC'),
             array(0, IntlDateFormatter::NONE, IntlDateFormatter::MEDIUM, '12:00:00 AM'),
             array(0, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, '12:00 AM'),
         );
@@ -857,7 +935,9 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $position = null;
         $formatter = $this->getDefaultDateFormatter('y');
         $this->assertSame(0, $formatter->parse('1970', $position));
-        $this->assertNull($position);
+        // Since $position is not supported by the Symfony implementation, the following won't work.
+        // The intl implementation works this way since 60.2.
+        // $this->assertSame(4, $position);
     }
 
     public function testSetPattern()
@@ -874,7 +954,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $formatter = $this->getDefaultDateFormatter();
 
-        if (PHP_VERSION_ID >= 50500 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+        if (\PHP_VERSION_ID >= 50500 || (\extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
             $formatter->setTimeZone($timeZoneId);
         } else {
             $formatter->setTimeZoneId($timeZoneId);
@@ -885,7 +965,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function setTimeZoneIdProvider()
     {
-        $isPhp55 = PHP_VERSION_ID >= 50500 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'));
+        $isPhp55 = \PHP_VERSION_ID >= 50500 || (\extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'));
 
         return array(
             array('UTC', 'UTC'),

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -95,18 +95,28 @@ class CalendarDate {
 			return;
 		}
 
+        $this->minJD = $date->minJD;
+        $this->maxJD = $date->maxJD;
+
 		// Construct from an equivalent xxxxDate object
 		if (get_class($this) == get_class($date)) {
 			$this->y     = $date->y;
 			$this->m     = $date->m;
 			$this->d     = $date->d;
-			$this->minJD = $date->minJD;
-			$this->maxJD = $date->maxJD;
 
 			return;
 		}
 
-		// ...else construct an inequivalent xxxxDate object
+        // Not all dates can be converted
+        if (!$this->inValidRange()) {
+            $this->y = 0;
+            $this->m = 0;
+            $this->d = 0;
+
+            return;
+        }
+
+        // ...else construct an inequivalent xxxxDate object
 		if ($date->y == 0) {
 			// Incomplete date - convert on basis of anniversary in current year
 			$today = $date->calendar->jdToYmd(unixtojd());
@@ -409,7 +419,7 @@ class CalendarDate {
 	public static function compare(CalendarDate $d1, CalendarDate $d2) {
 		if ($d1->maxJD < $d2->minJD) {
 			return -1;
-		} elseif ($d2->minJD > $d1->maxJD) {
+		} elseif ($d2->maxJD < $d1->minJD) {
 			return 1;
 		} else {
 			return 0;

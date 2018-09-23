@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -331,8 +331,8 @@ class SiteMapModule extends AbstractModule implements ModuleConfigInterface {
 				'<p>', I18N::translate('To tell search engines that sitemaps are available, you can use the following links.'), '</p>',
 				'<ul>',
 				// This list comes from http://en.wikipedia.org/wiki/Sitemaps
-				'<li><a href="http://www.bing.com/webmaster/ping.aspx?siteMap=' . $site_map_url2 . '">Bing</a></li>',
-				'<li><a href="http://www.google.com/webmasters/tools/ping?sitemap=' . $site_map_url2 . '">Google</a></li>',
+				'<li><a href="https://www.bing.com/webmaster/ping.aspx?siteMap=' . $site_map_url2 . '">Bing</a></li>',
+				'<li><a href="https://www.google.com/webmasters/tools/ping?sitemap=' . $site_map_url2 . '">Google</a></li>',
 				'</ul>';
 
 		}

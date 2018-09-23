@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -217,9 +217,13 @@
             "BYB",
             "nou ruble bielorús (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "ruble bielorús"
+        ],
         "BYR": [
             "BYR",
-            "ruble bielorús"
+            "ruble bielorús (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -256,6 +260,10 @@
         "CLP": [
             "CLP",
             "peso xilè"
+        ],
+        "CNH": [
+            "CNH",
+            "iuan xinès extracontinental"
         ],
         "CNY": [
             "¥",
@@ -672,6 +680,10 @@
         ],
         "MRO": [
             "MRO",
+            "ouguiya maurità (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "ouguiya maurità"
         ],
         "MTL": [
@@ -768,11 +780,11 @@
         ],
         "PEN": [
             "PEN",
-            "nou sol peruà"
+            "sol peruà"
         ],
         "PES": [
             "PES",
-            "sol peruà"
+            "sol peruà (1863–1965)"
         ],
         "PGK": [
             "PGK",
@@ -900,6 +912,10 @@
         ],
         "STD": [
             "STD",
+            "dobra de São Tomé i Príncipe (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "dobra de São Tomé i Príncipe"
         ],
         "SUR": [

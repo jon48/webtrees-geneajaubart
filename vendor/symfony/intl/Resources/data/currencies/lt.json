@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -217,9 +217,13 @@
             "BYB",
             "Baltarusijos naujasis rublis (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "Baltarusijos rublis"
+        ],
         "BYR": [
             "BYR",
-            "Baltarusijos rublis"
+            "Baltarusijos rublis (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -256,6 +260,10 @@
         "CLP": [
             "CLP",
             "Čilės pesas"
+        ],
+        "CNH": [
+            "CNH",
+            "Kinijos Užsienio juanis"
         ],
         "CNX": [
             "CNX",
@@ -675,6 +683,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritanijos ugija (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritanijos ugija"
         ],
         "MTL": [
@@ -775,7 +787,7 @@
         ],
         "PEN": [
             "PEN",
-            "Peru naujasis solis"
+            "Peru solis"
         ],
         "PES": [
             "PES",
@@ -907,6 +919,10 @@
         ],
         "STD": [
             "STD",
+            "San Tomės ir Principės dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "San Tomės ir Principės dobra"
         ],
         "SUR": [

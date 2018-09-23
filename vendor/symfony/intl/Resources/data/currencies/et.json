@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -201,9 +201,13 @@
             "BYB",
             "Valgevene uus rubla (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "Valgevene rubla"
+        ],
         "BYR": [
             "BYR",
-            "Valgevene rubla"
+            "Valgevene rubla (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -228,6 +232,10 @@
         "CLP": [
             "CLP",
             "Tšiili peeso"
+        ],
+        "CNH": [
+            "CNH",
+            "Hiina jüaan (välismaine turg)"
         ],
         "CNY": [
             "CN¥",
@@ -600,6 +608,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauritaania ugia (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauritaania ugia"
         ],
         "MTL": [
@@ -696,7 +708,7 @@
         ],
         "PEN": [
             "PEN",
-            "Peruu uus soll"
+            "Peruu soll"
         ],
         "PES": [
             "PES",
@@ -828,6 +840,10 @@
         ],
         "STD": [
             "STD",
+            "São Tomé ja Príncipe dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São Tomé ja Príncipe dobra"
         ],
         "SUR": [
@@ -892,7 +908,7 @@
         ],
         "TWD": [
             "NT$",
-            "Taiwani dollar"
+            "uus Taiwani dollar"
         ],
         "TZS": [
             "TZS",

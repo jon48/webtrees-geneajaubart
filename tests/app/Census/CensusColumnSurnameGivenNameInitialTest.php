@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -35,7 +35,7 @@ class CensusColumnSurnameGivenNameInitialTest extends \PHPUnit_Framework_TestCas
 	 */
 	public function testOneGivenName() {
 		$individual = Mockery::mock('Fisharebest\Webtrees\Individual');
-		$individual->shouldReceive('getAllNames')->andReturn(array(array('givn' => 'Joe', 'surn' => 'Sixpack')));
+		$individual->shouldReceive('getAllNames')->andReturn(array(array('givn' => 'Joe', 'surname' => 'Sixpack')));
 		$individual->shouldReceive('getSpouseFamilies')->andReturn(array());
 
 		$census = Mockery::mock('Fisharebest\Webtrees\Census\CensusInterface');
@@ -52,7 +52,7 @@ class CensusColumnSurnameGivenNameInitialTest extends \PHPUnit_Framework_TestCas
 	 */
 	public function testMultipleGivenNames() {
 		$individual = Mockery::mock('Fisharebest\Webtrees\Individual');
-		$individual->shouldReceive('getAllNames')->andReturn(array(array('givn' => 'Joe Fred', 'surn' => 'Sixpack')));
+		$individual->shouldReceive('getAllNames')->andReturn(array(array('givn' => 'Joe Fred', 'surname' => 'Sixpack')));
 		$individual->shouldReceive('getSpouseFamilies')->andReturn(array());
 
 		$census = Mockery::mock('Fisharebest\Webtrees\Census\CensusInterface');

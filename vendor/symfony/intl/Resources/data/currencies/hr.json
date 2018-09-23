@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.7",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -217,9 +217,13 @@
             "BYB",
             "bjeloruska nova rublja (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "bjeloruska rublja"
+        ],
         "BYR": [
             "BYR",
-            "bjeloruska rublja"
+            "bjeloruska rublja (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -256,6 +260,10 @@
         "CLP": [
             "CLP",
             "čileanski pezo"
+        ],
+        "CNH": [
+            "CNH",
+            "kineski juan (offshore)"
         ],
         "CNX": [
             "CNX",
@@ -675,6 +683,10 @@
         ],
         "MRO": [
             "MRO",
+            "mauritanijska ouguja (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "mauritanijska ouguja"
         ],
         "MTL": [
@@ -775,11 +787,11 @@
         ],
         "PEN": [
             "PEN",
-            "peruanski novi sol"
+            "peruanski sol"
         ],
         "PES": [
             "PES",
-            "peruanski sol"
+            "peruanski sol (1863–1965)"
         ],
         "PGK": [
             "PGK",
@@ -907,6 +919,10 @@
         ],
         "STD": [
             "STD",
+            "dobra Svetog Tome i Principa (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "dobra Svetog Tome i Principa"
         ],
         "SUR": [
@@ -1039,7 +1055,7 @@
         ],
         "VUV": [
             "VUV",
-            "vanuatuški vatu"
+            "vanuatski vatu"
         ],
         "WST": [
             "WST",

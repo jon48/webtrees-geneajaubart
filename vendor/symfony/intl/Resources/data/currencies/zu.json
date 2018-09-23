@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.41.97",
     "Names": {
         "AED": [
             "AED",
@@ -93,9 +93,13 @@
             "BWP",
             "i-Botswana Pula"
         ],
+        "BYN": [
+            "BYN",
+            "i-Belarusian Ruble"
+        ],
         "BYR": [
             "BYR",
-            "i-Belarusian Ruble"
+            "i-Belarusian Ruble (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -116,6 +120,10 @@
         "CLP": [
             "CLP",
             "i-Chilean Peso"
+        ],
+        "CNH": [
+            "CNH",
+            "CNH"
         ],
         "CNY": [
             "CN¥",
@@ -371,6 +379,10 @@
         ],
         "MRO": [
             "MRO",
+            "i-Mauritanian Ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "i-Mauritanian Ouguiya"
         ],
         "MUR": [
@@ -519,6 +531,10 @@
         ],
         "STD": [
             "STD",
+            "i-São Tomé kanye ne-Príncipe Dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "i-São Tomé kanye ne-Príncipe Dobra"
         ],
         "SYP": [
@@ -603,7 +619,7 @@
         ],
         "XAF": [
             "FCFA",
-            "i-CFA Franc BCEA"
+            "i-Central African CFA Franc"
         ],
         "XCD": [
             "EC$",
@@ -611,7 +627,7 @@
         ],
         "XOF": [
             "CFA",
-            "i-CFA Franc BCEAO"
+            "i-West African CFA Franc"
         ],
         "XPF": [
             "CFPF",

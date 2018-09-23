@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.7",
+    "Version": "2.1.41.97",
     "Names": {
         "ADP": [
             "ADP",
@@ -189,9 +189,13 @@
             "BYB",
             "Wäissrussesche Rubel (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "Wäissrussesche Rubel"
+        ],
         "BYR": [
             "BYR",
-            "Wäissrussesche Rubel"
+            "Wäissrussesche Rubel (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -607,6 +611,10 @@
         ],
         "MRO": [
             "MRO",
+            "Mauretaneschen Ouguiya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
             "Mauretaneschen Ouguiya"
         ],
         "MTL": [
@@ -703,11 +711,11 @@
         ],
         "PEN": [
             "PEN",
-            "Peruaneschen Neie Sol"
+            "Peruaneschen Sol"
         ],
         "PES": [
             "PES",
-            "Peruanesche Sol (1863–1965)"
+            "Peruaneschen Sol (1863–1965)"
         ],
         "PGK": [
             "PGK",
@@ -835,6 +843,10 @@
         ],
         "STD": [
             "STD",
+            "São-toméeschen Dobra (1977–2017)"
+        ],
+        "STN": [
+            "STN",
             "São-toméeschen Dobra"
         ],
         "SUR": [

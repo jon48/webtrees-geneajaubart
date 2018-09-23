@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +19,7 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Census\Census;
 use Fisharebest\Webtrees\Census\CensusOfCzechRepublic;
 use Fisharebest\Webtrees\Census\CensusOfDenmark;
+use Fisharebest\Webtrees\Census\CensusOfDeutschland;
 use Fisharebest\Webtrees\Census\CensusOfEngland;
 use Fisharebest\Webtrees\Census\CensusOfFrance;
 use Fisharebest\Webtrees\Census\CensusOfScotland;
@@ -517,7 +518,7 @@ class FunctionsEdit {
 		// field value
 		$islink = (substr($value, 0, 1) === '@' && substr($value, 0, 2) !== '@#');
 		if ($islink) {
-			$value = trim(substr($tag, strlen($fact) + 3), ' @\r');
+			$value = trim(substr($tag, strlen($fact) + 3), '@');
 		} else {
 			$value = (string) substr($tag, strlen($fact) + 3);
 		}
@@ -984,6 +985,9 @@ class FunctionsEdit {
 			break;
 		case 'da':
 			$census_places = array(new CensusOfDenmark);
+			break;
+		case 'de':
+			$census_places = array(new CensusOfDeutschland);
 			break;
 		default:
 			$census_places = array();

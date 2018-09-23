@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,6 +24,7 @@ use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Menu;
+use Fisharebest\Webtrees\Module;
 use Fisharebest\Webtrees\Module\ClippingsCart\ClippingsCartController;
 use Fisharebest\Webtrees\Session;
 
@@ -61,6 +62,18 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface,
 	 * @param string $mod_action
 	 */
 	public function modAction($mod_action) {
+		global $WT_TREE;
+
+		// Only allow access if either the menu or sidebar is enabled.
+		if (
+			!array_key_exists($this->getName(), Module::getActiveSidebars($WT_TREE)) &&
+			!array_key_exists($this->getName(), Module::getActiveMenus($WT_TREE))
+		) {
+			http_response_code(404);
+
+			return;
+		}
+
 		switch ($mod_action) {
 		case 'ajax':
 			$html = $this->getSidebarAjaxContent();

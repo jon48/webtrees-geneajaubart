@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -52,7 +52,7 @@ case 'compose':
 	echo '<h3>' . I18N::translate('Add/edit a journal/news entry') . '</h3>';
 	echo '<form style="overflow: hidden;" name="messageform" method="post" action="editnews.php?action=save&news_id=' . $news_id . '">';
 	if ($news_id) {
-		$news = Database::prepare("SELECT SQL_CACHE news_id AS id, user_id, gedcom_id, UNIX_TIMESTAMP(updated) AS date, subject, body FROM `##news` WHERE news_id=?")->execute(array($news_id))->fetchOneRow(PDO::FETCH_ASSOC);
+		$news = Database::prepare("SELECT news_id AS id, user_id, gedcom_id, UNIX_TIMESTAMP(updated) AS date, subject, body FROM `##news` WHERE news_id=?")->execute(array($news_id))->fetchOneRow(PDO::FETCH_ASSOC);
 	} else {
 		$news              = array();
 		$news['user_id']   = $user_id;

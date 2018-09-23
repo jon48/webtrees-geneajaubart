@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -1433,7 +1433,7 @@ abstract class AbstractTheme {
 	protected function menuLists($surname) {
 		// Do not show empty lists
 		$row = Database::prepare(
-			"SELECT SQL_CACHE" .
+			"SELECT" .
 			" EXISTS(SELECT 1 FROM `##sources` WHERE s_file = ?) AS sour," .
 			" EXISTS(SELECT 1 FROM `##other` WHERE o_file = ? AND o_type='REPO') AS repo," .
 			" EXISTS(SELECT 1 FROM `##other` WHERE o_file = ? AND o_type='NOTE') AS note," .

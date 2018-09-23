@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Reader;
 
-use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
+use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
+class BundleEntryReaderTest extends TestCase
 {
     const RES_DIR = '/res/dir';
 
@@ -62,7 +63,7 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->readerImpl = $this->getMock('Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface');
+        $this->readerImpl = $this->getMockBuilder('Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface')->getMock();
         $this->reader = new BundleEntryReader($this->readerImpl);
     }
 
@@ -188,7 +189,7 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testMergeDataWithFallbackData($childData, $parentData, $result)
     {
-        if (null === $childData || is_array($childData)) {
+        if (null === $childData || \is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'en')
@@ -226,7 +227,7 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testMergeExistingEntryWithExistingFallbackEntry($childData, $parentData, $result)
     {
-        if (null === $childData || is_array($childData)) {
+        if (null === $childData || \is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'en')
@@ -269,7 +270,7 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testMergeExistingEntryWithNonExistingFallbackEntry($childData, $parentData, $result)
     {
-        if (null === $childData || is_array($childData)) {
+        if (null === $childData || \is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'en_GB')
@@ -312,8 +313,8 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testMergeTraversables($childData, $parentData, $result)
     {
-        $parentData = is_array($parentData) ? new \ArrayObject($parentData) : $parentData;
-        $childData = is_array($childData) ? new \ArrayObject($childData) : $childData;
+        $parentData = \is_array($parentData) ? new \ArrayObject($parentData) : $parentData;
+        $childData = \is_array($childData) ? new \ArrayObject($childData) : $childData;
 
         if (null === $childData || $childData instanceof \ArrayObject) {
             $this->readerImpl->expects($this->at(0))
@@ -342,7 +343,7 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->reader->setLocaleAliases(array('mo' => 'ro_MD'));
 
-        if (null === $childData || is_array($childData)) {
+        if (null === $childData || \is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'ro_MD')

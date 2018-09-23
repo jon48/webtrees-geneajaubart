@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -327,7 +327,7 @@ class GedcomRecord {
 	 * @return string
 	 */
 	public function getHtmlUrl() {
-		return $this->getLinkUrl(static::URL_PREFIX, '&amp;');
+		return $this->getLinkUrl('&amp;');
 	}
 
 	/**
@@ -336,7 +336,7 @@ class GedcomRecord {
 	 * @return string
 	 */
 	public function getRawUrl() {
-		return $this->getLinkUrl(static::URL_PREFIX, '&');
+		return $this->getLinkUrl('&');
 	}
 
 	/**
@@ -351,13 +351,12 @@ class GedcomRecord {
 	/**
 	 * Generate a URL to this record.
 	 *
-	 * @param string $link
 	 * @param string $separator
 	 *
 	 * @return string
 	 */
-	private function getLinkUrl($link, $separator) {
-		return $link . $this->getXref() . $separator . 'ged=' . $this->tree->getNameUrl();
+	private function getLinkUrl($separator) {
+		return static::URL_PREFIX . Filter::escapeUrl($this->getXref()) . $separator . 'ged=' . Filter::escapeUrl($this->tree->getName());
 	}
 
 	/**
@@ -620,7 +619,7 @@ class GedcomRecord {
 	 * @return string
 	 */
 	public function getFallBackName() {
-		return $this->getXref();
+		return Filter::escapeHtml($this->getXref());
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,7 +32,7 @@ class QueryMedia {
 		global $WT_TREE;
 
 		$folders = Database::prepare(
-			"SELECT SQL_CACHE LEFT(m_filename, CHAR_LENGTH(m_filename) - CHAR_LENGTH(SUBSTRING_INDEX(m_filename, '/', -1))) AS media_path" .
+			"SELECT LEFT(m_filename, CHAR_LENGTH(m_filename) - CHAR_LENGTH(SUBSTRING_INDEX(m_filename, '/', -1))) AS media_path" .
 			" FROM  `##media`" .
 			" WHERE m_file = ?" .
 			" AND   m_filename NOT LIKE 'http://%'" .
@@ -55,7 +55,7 @@ class QueryMedia {
 	 */
 	public static function folderListAll() {
 		$folders = Database::prepare(
-			"SELECT SQL_CACHE LEFT(m_filename, CHAR_LENGTH(m_filename) - CHAR_LENGTH(SUBSTRING_INDEX(m_filename, '/', -1))) AS media_path" .
+			"SELECT LEFT(m_filename, CHAR_LENGTH(m_filename) - CHAR_LENGTH(SUBSTRING_INDEX(m_filename, '/', -1))) AS media_path" .
 			" FROM  `##media`" .
 			" WHERE m_filename NOT LIKE 'http://%'" .
 			" AND   m_filename NOT LIKE 'https://%'" .

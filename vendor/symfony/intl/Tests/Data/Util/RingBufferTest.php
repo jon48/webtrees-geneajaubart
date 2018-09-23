@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Util;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Data\Util\RingBuffer;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class RingBufferTest extends \PHPUnit_Framework_TestCase
+class RingBufferTest extends TestCase
 {
     /**
      * @var RingBuffer
@@ -33,8 +34,8 @@ class RingBufferTest extends \PHPUnit_Framework_TestCase
         $this->buffer[0] = 'foo';
         $this->buffer['bar'] = 'baz';
 
-        $this->assertTrue(isset($this->buffer[0]));
-        $this->assertTrue(isset($this->buffer['bar']));
+        $this->assertArrayHasKey(0, $this->buffer);
+        $this->assertArrayHasKey('bar', $this->buffer);
         $this->assertSame('foo', $this->buffer[0]);
         $this->assertSame('baz', $this->buffer['bar']);
     }
@@ -45,8 +46,8 @@ class RingBufferTest extends \PHPUnit_Framework_TestCase
         $this->buffer['bar'] = 'baz';
         $this->buffer[2] = 'bam';
 
-        $this->assertTrue(isset($this->buffer['bar']));
-        $this->assertTrue(isset($this->buffer[2]));
+        $this->assertArrayHasKey('bar', $this->buffer);
+        $this->assertArrayHasKey(2, $this->buffer);
         $this->assertSame('baz', $this->buffer['bar']);
         $this->assertSame('bam', $this->buffer[2]);
     }
@@ -61,14 +62,14 @@ class RingBufferTest extends \PHPUnit_Framework_TestCase
 
     public function testQueryNonExisting()
     {
-        $this->assertFalse(isset($this->buffer['foo']));
+        $this->assertArrayNotHasKey('foo', $this->buffer);
     }
 
     public function testUnsetNonExistingSucceeds()
     {
         unset($this->buffer['foo']);
 
-        $this->assertFalse(isset($this->buffer['foo']));
+        $this->assertArrayNotHasKey('foo', $this->buffer);
     }
 
     /**
@@ -85,7 +86,7 @@ class RingBufferTest extends \PHPUnit_Framework_TestCase
 
     public function testQueryOverwritten()
     {
-        $this->assertFalse(isset($this->buffer[0]));
+        $this->assertArrayNotHasKey(0, $this->buffer);
     }
 
     public function testUnsetOverwrittenSucceeds()
@@ -96,6 +97,6 @@ class RingBufferTest extends \PHPUnit_Framework_TestCase
 
         unset($this->buffer[0]);
 
-        $this->assertFalse(isset($this->buffer[0]));
+        $this->assertArrayNotHasKey(0, $this->buffer);
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\NumberFormatter;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -19,7 +20,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  * Note that there are some values written like -2147483647 - 1. This is the lower 32bit int max and is a known
  * behavior of PHP.
  */
-abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractNumberFormatterTest extends TestCase
 {
     /**
      * @dataProvider formatCurrencyWithDecimalStyleProvider
@@ -82,6 +83,8 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatCurrencyWithCurrencyStyleCostaRicanColonsRounding($value, $currency, $symbol, $expected)
     {
+        IntlTestHelper::requireIntl($this, '58.1');
+
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -89,9 +92,9 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
     public function formatCurrencyWithCurrencyStyleCostaRicanColonsRoundingProvider()
     {
         return array(
-            array(100, 'CRC', 'CRC', '%s100'),
-            array(-100, 'CRC', 'CRC', '-%s100'),
-            array(1000.12, 'CRC', 'CRC', '%s1,000'),
+            array(100, 'CRC', 'CRC', '%s100.00'),
+            array(-100, 'CRC', 'CRC', '-%s100.00'),
+            array(1000.12, 'CRC', 'CRC', '%s1,000.12'),
         );
     }
 
@@ -305,10 +308,17 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider formatTypeCurrencyProvider
-     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testFormatTypeCurrency($formatter, $value)
     {
+        $exceptionCode = 'PHPUnit\Framework\Error\Warning';
+
+        if (class_exists('PHPUnit_Framework_Error_Warning')) {
+            $exceptionCode = 'PHPUnit_Framework_Error_Warning';
+        }
+
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}($exceptionCode);
+
         $formatter->format($value, NumberFormatter::TYPE_CURRENCY);
     }
 
@@ -418,6 +428,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             // array(1.125, '1.13'),
             array(1.127, '1.13'),
             array(1.129, '1.13'),
+            array(1020 / 100, '10.20'),
         );
     }
 
@@ -441,6 +452,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(1.125, '1.12'),
             array(1.127, '1.13'),
             array(1.129, '1.13'),
+            array(1020 / 100, '10.20'),
         );
     }
 
@@ -464,6 +476,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(1.125, '1.12'),
             array(1.127, '1.13'),
             array(1.129, '1.13'),
+            array(1020 / 100, '10.20'),
         );
     }
 
@@ -488,6 +501,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(-1.123, '-1.12'),
             array(-1.125, '-1.12'),
             array(-1.127, '-1.12'),
+            array(1020 / 100, '10.20'),
         );
     }
 
@@ -512,6 +526,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(-1.123, '-1.13'),
             array(-1.125, '-1.13'),
             array(-1.127, '-1.13'),
+            array(1020 / 100, '10.20'),
         );
     }
 
@@ -536,6 +551,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(-1.123, '-1.12'),
             array(-1.125, '-1.12'),
             array(-1.127, '-1.12'),
+            array(1020 / 100, '10.20'),
         );
     }
 
@@ -560,6 +576,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(-1.123, '-1.13'),
             array(-1.125, '-1.13'),
             array(-1.127, '-1.13'),
+            array(1020 / 100, '10.20'),
         );
     }
 
@@ -611,7 +628,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $parsedValue, $message);
         $this->assertSame($expectedPosition, $position, $message);
 
-        if ($expected === false) {
+        if (false === $expected) {
             $errorCode = IntlGlobals::U_PARSE_ERROR;
             $errorMessage = 'Number parsing failed: U_PARSE_ERROR';
         } else {
@@ -621,10 +638,10 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($errorMessage, $this->getIntlErrorMessage());
         $this->assertSame($errorCode, $this->getIntlErrorCode());
-        $this->assertSame($errorCode !== 0, $this->isIntlFailure($this->getIntlErrorCode()));
+        $this->assertSame(0 !== $errorCode, $this->isIntlFailure($this->getIntlErrorCode()));
         $this->assertSame($errorMessage, $formatter->getErrorMessage());
         $this->assertSame($errorCode, $formatter->getErrorCode());
-        $this->assertSame($errorCode !== 0, $this->isIntlFailure($formatter->getErrorCode()));
+        $this->assertSame(0 !== $errorCode, $this->isIntlFailure($formatter->getErrorCode()));
     }
 
     public function parseProvider()
@@ -634,17 +651,22 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array('1.4suffix', (float) 1.4, '->parse() parses a number with a string suffix.', 3),
             array('-.4suffix', (float) -0.4, '->parse() parses a negative dot float with suffix.', 3),
             array('-123,4', false, '->parse() does not parse when invalid grouping used.', 6),
-            array('-1234,567', false, '->parse() does not parse when invalid grouping used.', 5),
+            array('-123,4567', false, '->parse() does not parse when invalid grouping used.', 9),
             array('-123,,456', false, '->parse() does not parse when invalid grouping used.', 4),
             array('-123,,456', -123.0, '->parse() parses when grouping is disabled.', 4, false),
         );
     }
 
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
     public function testParseTypeDefault()
     {
+        $exceptionCode = 'PHPUnit\Framework\Error\Warning';
+
+        if (class_exists('PHPUnit_Framework_Error_Warning')) {
+            $exceptionCode = 'PHPUnit_Framework_Error_Warning';
+        }
+
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}($exceptionCode);
+
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_DEFAULT);
     }
@@ -686,7 +708,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
         // The negative PHP_INT_MAX was being converted to float
-        if ((PHP_VERSION_ID < 50400 && PHP_VERSION_ID >= 50314) || PHP_VERSION_ID >= 50404 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+        if ((\PHP_VERSION_ID < 50400 && \PHP_VERSION_ID >= 50314) || \PHP_VERSION_ID >= 50404 || (\extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
             $this->assertInternalType('int', $parsedValue);
         } else {
             $this->assertInternalType('float', $parsedValue);
@@ -743,7 +765,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
         // A 32 bit integer was being generated instead of a 64 bit integer
-        if (PHP_VERSION_ID < 50314 || (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50404)) {
+        if (\PHP_VERSION_ID < 50314 || (\PHP_VERSION_ID >= 50400 && \PHP_VERSION_ID < 50404)) {
             $this->assertEquals(-2147483648, $parsedValue, '->parse() TYPE_INT64 does not use true 64 bit integers, using only the 32 bit range (PHP < 5.3.14 and PHP < 5.4.4).');
         } else {
             $this->assertEquals(2147483648, $parsedValue, '->parse() TYPE_INT64 uses true 64 bit integers (PHP >= 5.3.14 and PHP >= 5.4.4).');
@@ -754,7 +776,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
         // A 32 bit integer was being generated instead of a 64 bit integer
-        if (PHP_VERSION_ID < 50314 || (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50404)) {
+        if (\PHP_VERSION_ID < 50314 || (\PHP_VERSION_ID >= 50400 && \PHP_VERSION_ID < 50404)) {
             $this->assertEquals(2147483647, $parsedValue, '->parse() TYPE_INT64 does not use true 64 bit integers, using only the 32 bit range  (PHP < 5.3.14 and PHP < 5.4.4).');
         } else {
             $this->assertEquals(-2147483649, $parsedValue, '->parse() TYPE_INT64 uses true 64 bit integers (PHP >= 5.3.14 and PHP >= 5.4.4).');
@@ -781,11 +803,16 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
     public function testParseTypeCurrency()
     {
+        $exceptionCode = 'PHPUnit\Framework\Error\Warning';
+
+        if (class_exists('PHPUnit_Framework_Error_Warning')) {
+            $exceptionCode = 'PHPUnit_Framework_Error_Warning';
+        }
+
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}($exceptionCode);
+
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_CURRENCY);
     }

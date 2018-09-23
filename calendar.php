@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -42,7 +42,7 @@ $day      = Filter::get('day', '\d\d?');
 $month    = Filter::get('month', '[A-Z]{3,5}');
 $year     = Filter::get('year', '\d{1,4}(?: B\.C\.)?|\d\d\d\d\/\d\d|\d+(-\d+|[?]+)?');
 $view     = Filter::get('view', 'day|month|year', 'day');
-$filterev = Filter::get('filterev', '[_A-Z-]+', 'BIRT-MARR-DEAT');
+$filterev = Filter::get('filterev', '[_A-Z-]*', 'BIRT-MARR-DEAT');
 $filterof = Filter::get('filterof', 'all|living|recent', 'all');
 $filtersx = Filter::get('filtersx', '[MF]', '');
 
@@ -519,7 +519,7 @@ case 'month':
 				default:
 					break 2;
 				}
-				if (get_class($alt_date) !== get_class($cal_date)) {
+				if (get_class($alt_date) !== get_class($cal_date) && $alt_date->inValidRange()) {
 					echo '<span class="rtl_cal_day">' . $alt_date->format("%j %M") . '</span>';
 					// Just show the first conversion
 					break;

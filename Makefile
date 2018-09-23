@@ -1,5 +1,5 @@
 # webtrees: online genealogy
-# Copyright (C) 2016 webtrees development team
+# Copyright (C) 2018 webtrees development team
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -24,9 +24,8 @@ WT_VERSION=$(shell grep "'WT_VERSION'" includes/session.php | cut -d "'" -f 4 | 
 WT_RELEASE=$(shell grep "'WT_VERSION'" includes/session.php | cut -d "'" -f 4 | awk -F - '{print $$2}')
 
 # Location of minification tools
-CLOSURE_JS=$(BUILD_DIR)/compiler-20140407.jar
-CLOSURE_CSS=$(BUILD_DIR)/closure-stylesheets-20111230.jar
-YUI_COMPRESSOR=$(BUILD_DIR)/yuicompressor-2.4.8.jar
+CLOSURE_JS=$(BUILD_DIR)/closure-compiler-v20180805.jar
+CLOSURE_CSS=$(BUILD_DIR)/closure-stylesheets-1.5.0.jar
 
 # Files to minify
 CSS_FILES=$(shell find $(BUILD_DIR) -name "*.css")
@@ -58,15 +57,11 @@ vendor:
 build/webtrees: clean update
 	# Extract from the repository, to filter files using .gitattributes
 	git archive --prefix=$@/ $(GIT_BRANCH) | tar -x
-	# Embed the build number in the code (for DEV builds only)
-	sed -i -e "s/define('WT_RELEASE', '$(WT_VERSION)-dev')/define('WT_RELEASE', '$(WT_VERSION)-dev+$(BUILD_NUMBER)')/" $@/includes/session.php
 	# Add language files
 	cp -R $(LANGUAGE_DIR)/*.mo $@/$(LANGUAGE_DIR)/
 	# Minification
 	find $@ -name "*.js" -exec java -jar $(CLOSURE_JS) --js "{}" --js_output_file "{}.tmp" \; -exec mv "{}.tmp" "{}" \;
 	find $@ -name "*.css" -exec java -jar $(CLOSURE_CSS) --output-file "{}.tmp" "{}" \; -exec mv "{}.tmp" "{}" \;
-	find $@ -name "*.js"  -exec java -jar $(YUI_COMPRESSOR) -o "{}" "{}" \;
-	find $@ -name "*.css" -exec java -jar $(YUI_COMPRESSOR) -o "{}" "{}" \;
 	# Zip up the release files
 	cd $(@D) && zip -qr $(@F)-$(BUILD_VERSION).zip $(@F)
 	# If we have a GNU private key, sign the file with it
@@ -88,7 +83,7 @@ clean:
 language/webtrees.pot: $(LANGUAGE_SRC)
 	# Modify the .XML report files so that xgettext can scan them
 	find modules*/ -name "*.xml" -exec cp -p {} {}.bak \;
-	sed -i -e 's~\(I18N::[^)]*[)]\)~<?php echo \1; ?>~g' modules*/*/*.xml
+	sed -i.bak -e 's~\(I18N::[^)]*[)]\)~<?php echo \1; ?>~g' modules*/*/*.xml
 	echo $^ | xargs xgettext --package-name=webtrees --package-version=1.0 --msgid-bugs-address=i18n@webtrees.net --output=$@ --no-wrap --language=PHP --add-comments=I18N --from-code=utf-8 --keyword --keyword=translate:1 --keyword=translateContext:1c,2 --keyword=plural:1,2 --keyword=noop:1
 	# Restore the .XML files
 	find modules*/ -name "*.xml" -exec mv {}.bak {} \;

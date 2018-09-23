@@ -1,6 +1,12 @@
 CHANGE LOG
 ==========
 
+## 1.6.0 (2018-09-09)
+ - Update dependencies
+
+## 1.5.0 (2018-05-11)
+ - Update dependencies
+
 ## 1.4.0 (2016-02-05)
  - Upstream changes to symfony/polyfill
 

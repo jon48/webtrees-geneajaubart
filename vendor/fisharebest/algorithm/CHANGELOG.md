@@ -1,6 +1,13 @@
 CHANGE LOG
 ==========
 
+## 1.5.0 (2018-09-07)
+ - Fix compatibility with PHP5.3
+ - Adopt PSR12 code style
+
+## 1.4.0 (2017-08-21)
+ - each() is deprecated in PHP7.2
+
 ## 1.3.0 (2016-12-05)
  - Find the connected components of a graph using a depth-first search.
 

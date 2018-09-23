@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,6 +16,7 @@
 namespace Fisharebest\Webtrees\Schema;
 
 use Fisharebest\Webtrees\Database;
+use PDOException;
 
 /**
  * Upgrade the database schema from version 29 to version 30.
@@ -34,10 +35,14 @@ class Migration29 implements MigrationInterface {
 		Database::exec("DELETE FROM `##site_setting` WHERE setting_name IN ('REQUIRE_ADMIN_AUTH_REGISTRATION')");
 
 		// https://bugs.launchpad.net/webtrees/+bug/1405672
-		Database::exec(
-			"UPDATE `##site_access_rule` SET user_agent_pattern = 'Mozilla/5.0 (% Konqueror/%'" .
-			" WHERE user_agent_pattern='Mozilla/5.0 (compatible; Konqueror/%'"
-		);
+        try {
+            Database::exec(
+                "UPDATE `##site_access_rule` SET user_agent_pattern = 'Mozilla/5.0 (% Konqueror/%'" .
+                " WHERE user_agent_pattern='Mozilla/5.0 (compatible; Konqueror/%'"
+            );
+        } catch (PDOException $ex) {
+            // Duplicate key?  Already done?
+        }
 
 		// Embedded variables are based on function names - which were renamed for PSR2
 		Database::exec(

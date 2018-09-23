@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -146,7 +146,7 @@ case 'load_json':
 	$order  = Filter::postArray('order');
 
 	$sql_select =
-		"SELECT SQL_CACHE SQL_CALC_FOUND_ROWS '', u.user_id, user_name, real_name, email, us1.setting_value, us2.setting_value, NULL, us3.setting_value, NULL, us4.setting_value, us5.setting_value" .
+		"SELECT SQL_CALC_FOUND_ROWS '', u.user_id, user_name, real_name, email, us1.setting_value, us2.setting_value, NULL, us3.setting_value, NULL, us4.setting_value, us5.setting_value" .
 		" FROM `##user` u" .
 		" LEFT JOIN `##user_setting` us1 ON (u.user_id=us1.user_id AND us1.setting_name='language')" .
 		" LEFT JOIN `##user_setting` us2 ON (u.user_id=us2.user_id AND us2.setting_name='reg_timestamp')" .
@@ -819,9 +819,9 @@ default:
 					/* email             */ null,
 					/* language          */ null,
 					/* registered (sort) */ { visible: false },
-					/* registered        */ { dataSort: 7 },
+					/* registered        */ { dataSort: 6 },
 					/* last_login (sort) */ { visible: false },
-					/* last_login        */ { dataSort: 9 },
+					/* last_login        */ { dataSort: 8 },
 					/* verified          */ null,
 					/* approved          */ null
 				]

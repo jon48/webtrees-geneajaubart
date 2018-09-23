@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -498,12 +498,12 @@ $total_users = User::count();
 
 // Administrators
 $administrators = Database::prepare(
-	"SELECT SQL_CACHE user_id, real_name FROM `##user` JOIN `##user_setting` USING (user_id) WHERE setting_name='canadmin' AND setting_value='1'"
+	"SELECT user_id, real_name FROM `##user` JOIN `##user_setting` USING (user_id) WHERE setting_name='canadmin' AND setting_value='1'"
 )->fetchAll();
 
 // Managers
 $managers = Database::prepare(
-	"SELECT SQL_CACHE user_id, real_name FROM `##user` JOIN `##user_gedcom_setting` USING (user_id)" .
+	"SELECT user_id, real_name FROM `##user` JOIN `##user_gedcom_setting` USING (user_id)" .
 	" WHERE setting_name = 'canedit' AND setting_value='admin'" .
 	" GROUP BY user_id, real_name" .
 	" ORDER BY real_name"
@@ -511,7 +511,7 @@ $managers = Database::prepare(
 
 // Moderators
 $moderators = Database::prepare(
-	"SELECT SQL_CACHE user_id, real_name FROM `##user` JOIN `##user_gedcom_setting` USING (user_id)" .
+	"SELECT user_id, real_name FROM `##user` JOIN `##user_gedcom_setting` USING (user_id)" .
 	" WHERE setting_name = 'canedit' AND setting_value='accept'" .
 	" GROUP BY user_id, real_name" .
 	" ORDER BY real_name"
@@ -519,66 +519,58 @@ $moderators = Database::prepare(
 
 // Number of users who have not verified their email address
 $unverified = Database::prepare(
-	"SELECT SQL_CACHE user_id, real_name FROM `##user` JOIN `##user_setting` USING (user_id)" .
+	"SELECT user_id, real_name FROM `##user` JOIN `##user_setting` USING (user_id)" .
 	" WHERE setting_name = 'verified' AND setting_value = '0'" .
 	" ORDER BY real_name"
 )->fetchAll();
 
 // Number of users whose accounts are not approved by an administrator
 $unapproved = Database::prepare(
-	"SELECT SQL_CACHE user_id, real_name FROM `##user` JOIN `##user_setting` USING (user_id)" .
+	"SELECT user_id, real_name FROM `##user` JOIN `##user_setting` USING (user_id)" .
 	" WHERE setting_name = 'verified_by_admin' AND setting_value = '0'" .
 	" ORDER BY real_name"
 )->fetchAll();
 
 // Users currently logged in
 $logged_in = Database::prepare(
-	"SELECT SQL_NO_CACHE DISTINCT user_id, real_name FROM `##user` JOIN `##session` USING (user_id)" .
+	"SELECT DISTINCT user_id, real_name FROM `##user` JOIN `##session` USING (user_id)" .
 	" ORDER BY real_name"
 )->fetchAll();
 
 // Count of records
 $individuals = Database::prepare(
-	"SELECT SQL_CACHE gedcom_id, COUNT(i_id) AS count FROM `##gedcom` LEFT JOIN `##individuals` ON gedcom_id = i_file GROUP BY gedcom_id"
+	"SELECT gedcom_id, COUNT(i_id) AS count FROM `##gedcom` LEFT JOIN `##individuals` ON gedcom_id = i_file GROUP BY gedcom_id"
 )->fetchAssoc();
 $families = Database::prepare(
-	"SELECT SQL_CACHE gedcom_id, COUNT(f_id) AS count FROM `##gedcom` LEFT JOIN `##families` ON gedcom_id = f_file GROUP BY gedcom_id"
+	"SELECT gedcom_id, COUNT(f_id) AS count FROM `##gedcom` LEFT JOIN `##families` ON gedcom_id = f_file GROUP BY gedcom_id"
 )->fetchAssoc();
 $sources = Database::prepare(
-	"SELECT SQL_CACHE gedcom_id, COUNT(s_id) AS count FROM `##gedcom` LEFT JOIN `##sources` ON gedcom_id = s_file GROUP BY gedcom_id"
+	"SELECT gedcom_id, COUNT(s_id) AS count FROM `##gedcom` LEFT JOIN `##sources` ON gedcom_id = s_file GROUP BY gedcom_id"
 )->fetchAssoc();
 $media = Database::prepare(
-	"SELECT SQL_CACHE gedcom_id, COUNT(m_id) AS count FROM `##gedcom` LEFT JOIN `##media` ON gedcom_id = m_file GROUP BY gedcom_id"
+	"SELECT gedcom_id, COUNT(m_id) AS count FROM `##gedcom` LEFT JOIN `##media` ON gedcom_id = m_file GROUP BY gedcom_id"
 )->fetchAssoc();
 $repositories = Database::prepare(
-	"SELECT SQL_CACHE gedcom_id, COUNT(o_id) AS count FROM `##gedcom` LEFT JOIN `##other` ON gedcom_id = o_file AND o_type = 'REPO' GROUP BY gedcom_id"
+	"SELECT gedcom_id, COUNT(o_id) AS count FROM `##gedcom` LEFT JOIN `##other` ON gedcom_id = o_file AND o_type = 'REPO' GROUP BY gedcom_id"
 )->fetchAssoc();
 $changes = Database::prepare(
-	"SELECT SQL_CACHE g.gedcom_id, COUNT(change_id) AS count FROM `##gedcom` AS g LEFT JOIN `##change` AS c ON g.gedcom_id = c.gedcom_id AND status = 'pending' GROUP BY g.gedcom_id"
+	"SELECT g.gedcom_id, COUNT(change_id) AS count FROM `##gedcom` AS g LEFT JOIN `##change` AS c ON g.gedcom_id = c.gedcom_id AND status = 'pending' GROUP BY g.gedcom_id"
 )->fetchAssoc();
 
 // Server warnings
 // Note that security support for 5.6 ends after security support for 7.0
 $server_warnings = array();
 if (
-	PHP_VERSION_ID < 50500 ||
-	PHP_VERSION_ID < 50600 && date('Y-m-d') >= '2016-07-10' ||
+	PHP_VERSION_ID < 50600 ||
 	PHP_VERSION_ID < 70000 && date('Y-m-d') >= '2018-12-31' ||
-	PHP_VERSION_ID >= 70000 && PHP_VERSION_ID < 70100 && date('Y-m-d') >= '2018-12-03'
+	PHP_VERSION_ID >= 70000 && PHP_VERSION_ID < 70100 && date('Y-m-d') >= '2018-12-03' ||
+	PHP_VERSION_ID < 70200 && date('Y-m-d') >= '2019-12-01' ||
+	PHP_VERSION_ID < 70300 && date('Y-m-d') >= '2020-11-30'
 ) {
 	$server_warnings[] =
 		I18N::translate('Your web server is using PHP version %s, which is no longer receiving security updates. You should upgrade to a later version as soon as possible.', PHP_VERSION) .
 		'<br><a href="https://php.net/supported-versions.php">https://php.net/supported-versions.php</a>';
-} elseif (
-	PHP_VERSION_ID < 50600 ||
-	PHP_VERSION_ID < 70000 && date('Y-m-d') >= '2016-12-31' ||
-	PHP_VERSION_ID < 70100 && date('Y-m-d') >= '2017-12-03'
-) {
-	$server_warnings[] =
-		I18N::translate('Your web server is using PHP version %s, which is no longer maintained. You should upgrade to a later version.', PHP_VERSION) .
-		 '<br><a href="https://php.net/supported-versions.php">https://php.net/supported-versions.php</a>';
 }
-
 ?>
 <h1><?php echo $controller->getPageTitle(); ?></h1>
 

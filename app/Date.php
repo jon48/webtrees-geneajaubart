@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -111,8 +111,8 @@ class Date {
 			$d = $match[1];
 			$m = $match[2];
 			$y = $match[3];
-		} else // A date with just a year
-			if (preg_match('/^(\d{1,4}(?: B\.C\.)?|\d\d\d\d\/\d\d)$/', $date, $match)) {
+		} elseif (preg_match('/^(\d{1,4}(?: B\.C\.)?|\d\d\d\d\/\d\d)$/', $date, $match)) {
+				// A date with just a year
 				$d = '';
 				$m = '';
 				$y = $match[1];
@@ -304,7 +304,7 @@ class Date {
 			$tmp = /* I18N: Gedcom EST dates */ I18N::translate('estimated %s', $d1 . $conv1);
 			break;
 		case 'INT':
-			$tmp = /* I18N: Gedcom INT dates */ I18N::translate('interpreted %s (%s)', $d1 . $conv1, $this->text);
+			$tmp = /* I18N: Gedcom INT dates */ I18N::translate('interpreted %s (%s)', $d1 . $conv1, Filter::escapeHtml($this->text));
 			break;
 		case 'BEF':
 			$tmp = /* I18N: Gedcom BEF dates */ I18N::translate('before %s', $d1 . $conv1);

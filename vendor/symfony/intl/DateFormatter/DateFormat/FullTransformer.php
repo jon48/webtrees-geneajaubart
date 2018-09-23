@@ -37,8 +37,6 @@ class FullTransformer
     private $timezone;
 
     /**
-     * Constructor.
-     *
      * @param string $pattern  The pattern to be used to format and/or parse values
      * @param string $timezone The timezone to perform the date/time calculations
      */
@@ -111,7 +109,7 @@ class FullTransformer
      */
     public function formatReplace($dateChars, $dateTime)
     {
-        $length = strlen($dateChars);
+        $length = \strlen($dateChars);
 
         if ($this->isQuoteMatch($dateChars)) {
             return $this->replaceQuoteMatch($dateChars);
@@ -135,7 +133,7 @@ class FullTransformer
      * @param \DateTime $dateTime A configured DateTime object to use to perform the date calculation
      * @param string    $value    String to convert to a time value
      *
-     * @return int The corresponding Unix timestamp
+     * @return int|false The corresponding Unix timestamp
      *
      * @throws \InvalidArgumentException When the value can not be matched with pattern
      */
@@ -151,7 +149,7 @@ class FullTransformer
 
             foreach ($this->transformers as $char => $transformer) {
                 if (isset($matches[$char])) {
-                    $length = strlen($matches[$char]['pattern']);
+                    $length = \strlen($matches[$char]['pattern']);
                     $options = array_merge($options, $transformer->extractDateOptions($matches[$char]['value'], $length));
                 }
             }
@@ -187,7 +185,7 @@ class FullTransformer
         $escapedPattern = preg_replace('/\\\[\-|\/]/', '[\/\-]', $escapedPattern);
 
         $reverseMatchingRegExp = preg_replace_callback($this->regExp, function ($matches) use ($that) {
-            $length = strlen($matches[0]);
+            $length = \strlen($matches[0]);
             $transformerIndex = $matches[0][0];
 
             $dateChars = $matches[0];
@@ -257,8 +255,6 @@ class FullTransformer
      * Normalize a preg_replace match array, removing the numeric keys and returning an associative array
      * with the value and pattern values for the matched Transformer.
      *
-     * @param array $data
-     *
      * @return array
      */
     protected function normalizeArray(array $data)
@@ -266,7 +262,7 @@ class FullTransformer
         $ret = array();
 
         foreach ($data as $key => $value) {
-            if (!is_string($key)) {
+            if (!\is_string($key)) {
                 continue;
             }
 
@@ -321,7 +317,7 @@ class FullTransformer
 
         // Normalize yy year
         preg_match_all($this->regExp, $this->pattern, $matches);
-        if (in_array('yy', $matches[0])) {
+        if (\in_array('yy', $matches[0])) {
             $dateTime->setTimestamp(time());
             $year = $year > $dateTime->format('y') + 20 ? 1900 + $year : 2000 + $year;
         }
@@ -335,8 +331,6 @@ class FullTransformer
     /**
      * Add sensible default values for missing items in the extracted date/time options array. The values
      * are base in the beginning of the Unix era.
-     *
-     * @param array $options
      *
      * @return array
      */

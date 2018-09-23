@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2016 webtrees development team
+ * Copyright (C) 2018 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -136,7 +136,7 @@ case 'load':
 	$length = Filter::getInteger('length');
 
 	$sql =
-		"SELECT SQL_CACHE SQL_CALC_FOUND_ROWS" .
+		"SELECT SQL_CALC_FOUND_ROWS" .
 		" '', INET_NTOA(ip_address_start), ip_address_start, INET_NTOA(ip_address_end), ip_address_end, user_agent_pattern, rule, comment, site_access_rule_id" .
 		" FROM `##site_access_rule`";
 	$args = array();
