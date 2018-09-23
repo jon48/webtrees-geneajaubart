@@ -1,39 +1,52 @@
 {
-	"name": "jon48/webtrees-geneajaubart",
-	"description": "webtrees online genealogy",
-	"keywords": ["webtrees", "genealogy"],
-	"license": "GPL-3.0",
-	"author": [{
-        "name": "Jonathan Jaubart",
-        "email": "dev@jaubart.com",
-        "homepage": "http://www.jaubart.com",
-        "role": "Developer"
-    }],
-	"autoload": {
-		"psr-4": {
-			"Fisharebest\\Webtrees\\": "app/"
+	"name" : "jon48/webtrees-geneajaubart",
+	"description" : "webtrees online genealogy",
+	"keywords" : [
+		"webtrees",
+		"genealogy"
+	],
+	"license" : "GPL-3.0-or-later",
+	"authors" : [{
+			"name" : "Jonathan Jaubart",
+			"email" : "dev@jaubart.com",
+			"homepage" : "http://www.jaubart.com",
+			"role" : "Developer"
+		}
+	],
+	"autoload" : {
+		"psr-4" : {
+			"Fisharebest\\Webtrees\\" : "app/"
 		}
 	},
-	"require": {
-		"ezyang/htmlpurifier": "4.*",
-		"fisharebest/algorithm": "1.*",
-		"fisharebest/ext-calendar": "2.*",
-		"fisharebest/localization": "1.*",
-		"fisharebest/php-polyfill": "1.*",
-		"jon48/webtrees-lib": "dev-master",
-		"michelf/php-markdown": "1.*",
-		"pclzip/pclzip": "2.*",
-		"rhumsaa/uuid": "2.*",
-		"swiftmailer/swiftmailer": "~5.0",
-		"tecnickcom/tcpdf": "6.*",
-		"twbs/bootstrap": "3.3.*"
+	"require" : {
+		"ezyang/htmlpurifier" : "4.*",
+		"fisharebest/algorithm" : "1.*",
+		"fisharebest/ext-calendar" : "2.*",
+		"fisharebest/localization" : "1.*",
+		"fisharebest/php-polyfill" : "1.*",
+		"jon48/webtrees-lib" : "dev-master",
+		"michelf/php-markdown" : "1.*",
+		"pclzip/pclzip" : "2.*",
+		"rhumsaa/uuid" : "2.*",
+		"swiftmailer/swiftmailer" : "~5.0",
+		"tecnickcom/tcpdf" : "6.*",
+		"twbs/bootstrap" : "3.3.*",
+		"jon48/webtrees-theme-rural" : "dev-master-geneajaubart",
+		"oomphinc/composer-installers-extender" : "~1.1"
 	},
-	"require-dev": {
-		"fabpot/php-cs-fixer": "*",
-		"jon48/webtrees-tools": "dev-master",
-		"mockery/mockery": "*",
-		"phpdocumentor/phpdocumentor": "*",
-		"phpunit/phpunit": "*",
-		"satooshi/php-coveralls": "~1.0"
-	}	
+	"require-dev" : {
+		"jon48/webtrees-tools" : "dev-master",
+		"mockery/mockery" : "*",
+		"phpunit/phpunit" : "*"
+	},
+	"extra" : {
+		"installer-types" : [
+			"webtrees-theme"
+		],
+		"installer-paths" : {
+			"themes/{$name}/" : [
+				"type:webtrees-theme"
+			]
+		}
+	}
 }
