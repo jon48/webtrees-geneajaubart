@@ -89,10 +89,9 @@ return array (
     'Use map'                       =>  'Utiliser une carte',
     'Table'                         =>  'Tableau',
     'There is no geographical dispersion analysis to display.'
-                                    =>  'Il n\'y a aucune analyse de répartition géographique à afficher.'
-    
-    
-    
+                                    =>  'Il n\'y a aucune analyse de répartition géographique à afficher.',
+    'Error when loading map.'       =>  'Erreur lors du chargement de la carte.',
+    'The map could not be loaded.'  =>  'La carte n\'a pas pu être chargée.'
 
 
 );
