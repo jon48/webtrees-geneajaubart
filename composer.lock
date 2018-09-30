@@ -481,12 +481,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "72e2c33cdc3e08f295d102251f2dc76fabff17a1"
+                "reference": "15d9777b10733c12ac9b2d14518ac88062114188"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/72e2c33cdc3e08f295d102251f2dc76fabff17a1",
-                "reference": "72e2c33cdc3e08f295d102251f2dc76fabff17a1",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/15d9777b10733c12ac9b2d14518ac88062114188",
+                "reference": "15d9777b10733c12ac9b2d14518ac88062114188",
                 "shasum": ""
             },
             "require": {
@@ -524,7 +524,7 @@
                 "genealogy",
                 "webtrees"
             ],
-            "time": "2018-09-24T23:59:03+00:00"
+            "time": "2018-09-30T11:06:47+00:00"
         },
         {
             "name": "jon48/webtrees-theme-rural",
@@ -532,12 +532,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-theme-rural.git",
-                "reference": "77e53982cd233b884216269e886fb92ef44f7248"
+                "reference": "815796d861314ef2a2148eb5c0f44dc576246f31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-theme-rural/zipball/77e53982cd233b884216269e886fb92ef44f7248",
-                "reference": "77e53982cd233b884216269e886fb92ef44f7248",
+                "url": "https://api.github.com/repos/jon48/webtrees-theme-rural/zipball/815796d861314ef2a2148eb5c0f44dc576246f31",
+                "reference": "815796d861314ef2a2148eb5c0f44dc576246f31",
                 "shasum": ""
             },
             "require-dev": {
@@ -565,7 +565,7 @@
                 "genealogy",
                 "webtrees"
             ],
-            "time": "2018-09-23T17:55:40+00:00"
+            "time": "2018-09-30T10:36:35+00:00"
         },
         {
             "name": "lutana/pclzip",
