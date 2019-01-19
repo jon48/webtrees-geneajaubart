@@ -16,6 +16,11 @@ class LocaleJvLatn extends LocaleJv
         return 'Basa Jawa';
     }
 
+    public function endonymSortable()
+    {
+        return 'BASA JAWA';
+    }
+
     public function script()
     {
         return new ScriptLatn();

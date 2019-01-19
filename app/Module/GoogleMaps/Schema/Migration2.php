@@ -21,11 +21,13 @@ use Fisharebest\Webtrees\Schema\MigrationInterface;
 /**
  * Upgrade the database schema from version 2 to version 3.
  */
-class Migration2 implements MigrationInterface {
-	/** {@inheritDoc} */
-	public function upgrade() {
-		// Convert flag icons from .gif to .png
+class Migration2 implements MigrationInterface
+{
+    /** {@inheritDoc} */
+    public function upgrade()
+    {
+        // Convert flag icons from .gif to .png
 
-		Database::exec("UPDATE `##placelocation` SET pl_icon=REPLACE(pl_icon, '.gif', '.png')");
-	}
+        Database::exec("UPDATE `##placelocation` SET pl_icon=REPLACE(pl_icon, '.gif', '.png')");
+    }
 }

@@ -21,18 +21,20 @@ use PDOException;
 /**
  * Upgrade the database schema from version 8 to version 9.
  */
-class Migration8 implements MigrationInterface {
-	/**
-	 * Upgrade to to the next version
-	 */
-	public function upgrade() {
-		// Add support for the persian/jalali calendar
-		try {
-			Database::exec(
-				"ALTER TABLE `##dates` CHANGE d_type d_type ENUM('@#DGREGORIAN@', '@#DJULIAN@', '@#DHEBREW@', '@#DFRENCH R@', '@#DHIJRI@', '@#DROMAN@', '@#DJALALI@')"
-			);
-		} catch (PDOException $ex) {
-			// Already been run?
-		}
-	}
+class Migration8 implements MigrationInterface
+{
+    /**
+     * Upgrade to to the next version
+     */
+    public function upgrade()
+    {
+        // Add support for the persian/jalali calendar
+        try {
+            Database::exec(
+                "ALTER TABLE `##dates` CHANGE d_type d_type ENUM('@#DGREGORIAN@', '@#DJULIAN@', '@#DHEBREW@', '@#DFRENCH R@', '@#DHIJRI@', '@#DROMAN@', '@#DJALALI@')"
+            );
+        } catch (PDOException $ex) {
+            // Already been run?
+        }
+    }
 }

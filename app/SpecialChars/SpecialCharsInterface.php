@@ -21,25 +21,26 @@ namespace Fisharebest\Webtrees\SpecialChars;
  * For each language, list the symbols, puncutation and letters with diacritics
  * that may be difficult to type.
  */
-interface SpecialCharsInterface {
-	/**
-	 * A list of magiscule letters.
-	 *
-	 * @return string[]
-	 */
-	public function upper();
+interface SpecialCharsInterface
+{
+    /**
+     * A list of magiscule letters.
+     *
+     * @return string[]
+     */
+    public function upper();
 
-	/**
-	 * A list of miniscule letters.
-	 *
-	 * @return string[]
-	 */
-	public function lower();
+    /**
+     * A list of miniscule letters.
+     *
+     * @return string[]
+     */
+    public function lower();
 
-	/**
-	 * A list of puncutation and other symbols
-	 *
-	 * @return string[]
-	 */
-	public function other();
+    /**
+     * A list of puncutation and other symbols
+     *
+     * @return string[]
+     */
+    public function other();
 }
