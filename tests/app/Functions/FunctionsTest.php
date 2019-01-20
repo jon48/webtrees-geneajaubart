@@ -19,17 +19,19 @@ use Fisharebest\Webtrees\Functions\Functions;
 /**
  * Unit tests for the global functions in the file includes/functions/functions.php
  */
-class FunctionsTest extends \PHPUnit_Framework_TestCase {
-	/**
-	 * Tests for function isFileExternal()
-	 */
-	public function testFunctionIsFileExternal() {
-		$this->assertEquals(Functions::isFileExternal('http://www.example.com/file.txt'), true);
-		$this->assertEquals(Functions::isFileExternal('file.txt'), false);
-		$this->assertEquals(Functions::isFileExternal('folder/file.txt'), false);
-		$this->assertEquals(Functions::isFileExternal('folder\\file.txt'), false);
-		$this->assertEquals(Functions::isFileExternal('/folder/file.txt'), false);
-		$this->assertEquals(Functions::isFileExternal('\\folder\\file.txt'), false);
-		$this->assertEquals(Functions::isFileExternal('C:\\folder\\file.txt'), false);
-	}
+class FunctionsTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * Tests for function isFileExternal()
+     */
+    public function testFunctionIsFileExternal()
+    {
+        $this->assertEquals(Functions::isFileExternal('http://www.example.com/file.txt'), true);
+        $this->assertEquals(Functions::isFileExternal('file.txt'), false);
+        $this->assertEquals(Functions::isFileExternal('folder/file.txt'), false);
+        $this->assertEquals(Functions::isFileExternal('folder\\file.txt'), false);
+        $this->assertEquals(Functions::isFileExternal('/folder/file.txt'), false);
+        $this->assertEquals(Functions::isFileExternal('\\folder\\file.txt'), false);
+        $this->assertEquals(Functions::isFileExternal('C:\\folder\\file.txt'), false);
+    }
 }

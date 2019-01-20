@@ -21,26 +21,29 @@ namespace Fisharebest\Webtrees\SpecialChars;
  * For each language, list the symbols, puncutation and letters with diacritics
  * that may be difficult to type.
  */
-class SpecialCharsDe extends AbstractSpecialChars {
-	/**
-	 * A list of magiscule letters.
-	 *
-	 * @return string[]
-	 */
-	public function upper() {
-		return array(
-			'Ä', 'Ö', 'Ü', 'À', 'É',
-		);
-	}
+class SpecialCharsDe extends AbstractSpecialChars
+{
+    /**
+     * A list of magiscule letters.
+     *
+     * @return string[]
+     */
+    public function upper()
+    {
+        return array(
+            'Ä', 'Ö', 'Ü', 'À', 'É',
+        );
+    }
 
-	/**
-	 * A list of miniscule letters.
-	 *
-	 * @return string[]
-	 */
-	public function lower() {
-		return array(
-			'ä', 'ö', 'ü', 'à', 'é', 'ß',
-		);
-	}
+    /**
+     * A list of miniscule letters.
+     *
+     * @return string[]
+     */
+    public function lower()
+    {
+        return array(
+            'ä', 'ö', 'ü', 'à', 'é', 'ß',
+        );
+    }
 }

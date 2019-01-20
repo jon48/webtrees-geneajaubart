@@ -21,20 +21,22 @@ use Fisharebest\Webtrees\Individual;
 /**
  * The age of a male individual.
  */
-class CensusColumnAgeMale extends AbstractCensusColumn implements CensusColumnInterface {
-	/**
-	 * Generate the likely value of this census column, based on available information.
-	 *
-	 * @param Individual      $individual
-	 * @param Individual|null $head
-	 *
-	 * @return string
-	 */
-	public function generate(Individual $individual, Individual $head = null) {
-		if ($individual->getSex() === 'F') {
-			return '';
-		} else {
-			return (string) Date::getAge($individual->getEstimatedBirthDate(), $this->date(), 0);
-		}
-	}
+class CensusColumnAgeMale extends AbstractCensusColumn implements CensusColumnInterface
+{
+    /**
+     * Generate the likely value of this census column, based on available information.
+     *
+     * @param Individual      $individual
+     * @param Individual|null $head
+     *
+     * @return string
+     */
+    public function generate(Individual $individual, Individual $head = null)
+    {
+        if ($individual->getSex() === 'F') {
+            return '';
+        } else {
+            return (string) Date::getAge($individual->getEstimatedBirthDate(), $this->date(), 0);
+        }
+    }
 }

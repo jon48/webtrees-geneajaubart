@@ -18,40 +18,44 @@ namespace Fisharebest\Webtrees\Controller;
 /**
  * Controller for all popup pages
  */
-class SimpleController extends PageController {
-	/**
-	 * Create content for a popup window.
-	 * The page title is not used by all browsers.
-	 */
-	public function __construct() {
-		parent::__construct();
-		$this->setPageTitle(WT_WEBTREES);
-	}
+class SimpleController extends PageController
+{
+    /**
+     * Create content for a popup window.
+     * The page title is not used by all browsers.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setPageTitle(WT_WEBTREES);
+    }
 
-	/**
-	 * Simple (i.e. popup) windows are deprecated.
-	 *
-	 * @param bool $popup
-	 *
-	 * @return $this
-	 */
-	public function pageHeader($popup = true) {
-		return parent::pageHeader($popup);
-	}
+    /**
+     * Simple (i.e. popup) windows are deprecated.
+     *
+     * @param bool $popup
+     *
+     * @return $this
+     */
+    public function pageHeader($popup = true)
+    {
+        return parent::pageHeader($popup);
+    }
 
-	/**
-	 * Restrict access
-	 *
-	 * @param bool $condition
-	 *
-	 * @return $this
-	 */
-	public function restrictAccess($condition) {
-		if ($condition !== true) {
-			$this->addInlineJavascript('opener.window.location.reload(); window.close();');
-			exit;
-		}
+    /**
+     * Restrict access
+     *
+     * @param bool $condition
+     *
+     * @return $this
+     */
+    public function restrictAccess($condition)
+    {
+        if ($condition !== true) {
+            $this->addInlineJavascript('opener.window.location.reload(); window.close();');
+            exit;
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 }
