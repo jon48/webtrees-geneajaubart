@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2018 webtrees development team
+ * Copyright (C) 2019 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -377,9 +377,11 @@ if ($if_modified_since === $filetimeHeader) {
     }
 }
 
+$disposition = (Filter::getBool('dl')) ? 'attachment' : 'inline';
+
 // send headers for the image
 header('Content-Type: ' . $mimetype);
-header('Content-Disposition: filename="' . addslashes(basename($media->getFilename())) . '"');
+header('Content-Disposition: ' . $disposition . '; filename="' . addslashes(basename($media->getFilename())) . '"');
 
 if ($generatewatermark) {
     // generate the watermarked image

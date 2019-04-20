@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2018 webtrees development team
+ * Copyright (C) 2019 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -1623,6 +1623,7 @@ class FunctionsEdit
             //-- handle the special SOURce case for level 1 sources [ 1759246 ]
             if ($fact === 'SOUR') {
                 self::addSimpleTag('2 PAGE');
+                self::addSimpleTag('2 DATA');
                 self::addSimpleTag('3 TEXT');
                 if ($WT_TREE->getPreference('FULL_SOURCES')) {
                     self::addSimpleTag('3 DATE', '', GedcomTag::getLabel('DATA:DATE'));

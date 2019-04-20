@@ -27,7 +27,7 @@
 		"ext-gd": "*",
 		"ext-iconv": "*",
 		"ext-mbstring": "*",
-        "ext-json": "*",
+        	"ext-json": "*",
 		"ext-pcre": "*",
 		"ext-pdo": "*",
 		"ext-pdo_mysql": "*",
@@ -37,7 +37,7 @@
 		"ezyang/htmlpurifier": "~4.10",
 		"fisharebest/algorithm": "~1.5",
 		"fisharebest/ext-calendar": "~2.4",
-		"fisharebest/localization": "~1.12",
+		"fisharebest/localization": "~1.14",
 		"fisharebest/php-polyfill": "~1.5",
 		"jon48/webtrees-lib" : "dev-master",		
 		"jon48/webtrees-theme-rural" : "dev-master-geneajaubart",
@@ -45,7 +45,7 @@
 		"lutana/pclzip": "2.8.2.1",
 		"ramsey/uuid": "~2.9",
 		"swiftmailer/swiftmailer" : "~5.0",
-		"tecnickcom/tcpdf": "6.*",
+        	"tecnickcom/tcpdf": "~6.2",
 		"symfony/http-foundation": "^2.6",
 		"twbs/bootstrap" : "3.3.*",
 		"oomphinc/composer-installers-extender" : "~1.1"
@@ -66,7 +66,7 @@
            "echo npm install -g uglify-js",
            "echo npm install -g uglifycss",
            "find webtrees -name '*.js' ! -name '*.min.js' -exec uglifyjs -o {}.OUT {} \\; -exec rm {} \\;  -exec mv {}.OUT {} \\;",
-           "find webtrees -name '*.css' ! -name '*.css.js' -exec uglifycss --output {}.OUT {} \\; -exec rm {} \\;  -exec mv {}.OUT {} \\;",
+           "find webtrees -name '*.css' ! -name '*.min.css' -exec uglifycss --output {}.OUT {} \\; -exec rm {} \\;  -exec mv {}.OUT {} \\;",
            "zip --quiet --recurse-paths --move -9 webtrees.zip webtrees"
        ],
         "webtrees:mo": [

@@ -1,7 +1,7 @@
 <?php
 /**
  * webtrees: online genealogy
- * Copyright (C) 2018 webtrees development team
+ * Copyright (C) 2019 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -361,7 +361,7 @@ switch (Filter::get('action')) {
                 <?php echo I18N::translate('Email address'); ?>
             </label>
             <div class="col-sm-9">
-                <input class="form-control" type="email" id="email" name="email" required maxlength="64" value="<?php echo Filter::escapeHtml($user->getEmail()); ?>">
+                <input class="form-control" type="email" id="email" name="email" required maxlength="64" value="<?php echo Filter::escapeHtml($user->getEmail()); ?>" pattern=".*@[^.]+\..*">
                 <p class="small text-muted">
                     <?php echo I18N::translate('This email address will be used to send password reminders, website notifications, and messages from other family members who are registered on the website.'); ?>
                 </p>
