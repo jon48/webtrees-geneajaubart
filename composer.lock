@@ -482,12 +482,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "e8097cdfcdbb3c9e885e7e06fe7683ed39267bb7"
+                "reference": "9fd6b659709e10d4494b2fe288c219c4566e3a56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/e8097cdfcdbb3c9e885e7e06fe7683ed39267bb7",
-                "reference": "e8097cdfcdbb3c9e885e7e06fe7683ed39267bb7",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/9fd6b659709e10d4494b2fe288c219c4566e3a56",
+                "reference": "9fd6b659709e10d4494b2fe288c219c4566e3a56",
                 "shasum": ""
             },
             "require": {
@@ -526,7 +526,7 @@
                 "genealogy",
                 "webtrees"
             ],
-            "time": "2019-04-20T15:12:50+00:00"
+            "time": "2019-07-07T21:16:31+00:00"
         },
         {
             "name": "jon48/webtrees-theme-rural",
