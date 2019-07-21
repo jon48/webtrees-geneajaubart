@@ -482,12 +482,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "9fd6b659709e10d4494b2fe288c219c4566e3a56"
+                "reference": "ce1e09f5e7b7dbbc8a27bd7bbe239880c0759afb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/9fd6b659709e10d4494b2fe288c219c4566e3a56",
-                "reference": "9fd6b659709e10d4494b2fe288c219c4566e3a56",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/ce1e09f5e7b7dbbc8a27bd7bbe239880c0759afb",
+                "reference": "ce1e09f5e7b7dbbc8a27bd7bbe239880c0759afb",
                 "shasum": ""
             },
             "require": {
@@ -515,9 +515,9 @@
             "authors": [
                 {
                     "name": "Jonathan Jaubart",
+                    "role": "Developer",
                     "email": "dev@jaubart.com",
-                    "homepage": "http://www.jaubart.com",
-                    "role": "Developer"
+                    "homepage": "http://www.jaubart.com"
                 }
             ],
             "description": "Library to extend webtrees core capabilities",
@@ -526,7 +526,7 @@
                 "genealogy",
                 "webtrees"
             ],
-            "time": "2019-07-07T21:16:31+00:00"
+            "time": "2019-07-21T15:39:26+00:00"
         },
         {
             "name": "jon48/webtrees-theme-rural",
@@ -2997,8 +2997,8 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
-                    "role": "lead"
+                    "role": "lead",
+                    "email": "sebastian@phpunit.de"
                 }
             ],
             "description": "The PHP Unit Testing framework.",

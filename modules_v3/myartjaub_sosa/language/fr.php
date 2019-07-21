@@ -75,8 +75,14 @@ return array (
                                     =>	'Nombre cumulé d\'ancêtres différents trouvés jusqu\'à la génération G. Un même individu n\'est compté qu\'une seule fois, même s\'il apparait dans plusieurs générations.',
     'Pedigree collapse at generation G. Pedigree collapse is a measure of the real number of ancestors of a person compared to its theorical number. The higher this number is, the more marriages between related persons have happened. Extreme examples of high pedigree collapse are royal families for which this number can be as high as nearly 90%% (Alfonso XII of Spain).'
                                     =>	'Implexe à la génération G. L\'implexe est une mesure du nombre réel d\'ancêtres d\'une personne par rapport au nombre théorique. Plus ce pourcentage est grand, plus il y a eu de mariages entre personnes apparentées. Les familles royales constituent des exemples extrêmes d\'implexe, certains atteignant des niveaux de 90%%, comme le roi Alphonse XII d\'Espagne.',
-    'Generation-equivalent: %s generations'
-                                    =>	'Équivalent-génération : %s générations',
+    'Mean generation depth and standard deviation'
+                                    =>  'Profondeur généalogique moyenne et écart-type',
+    'Mean generation depth: %s'     =>  'Profondeur généalogique moyenne : %s',
+    'Standard deviation: %s'        =>  'Écart-type : %s',
+    '%s generation'                 =>  '%s génération',
+    '%s generations'                =>  '%s générations',
+    'Mean generation depth by grandparents'
+                                    =>  'Profondeur généalogique moyenne par grand-parent',
     'Most duplicated root Sosa ancestors'
                                     =>  'Ancêtres Sosas racines les plus fréquents',
     '%s times'                      =>  '%s fois',
