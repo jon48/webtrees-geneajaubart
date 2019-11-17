@@ -3,15 +3,16 @@ msgstr ""
 "Project-Id-Version: webtrees 1.0\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2018-09-25 11:42+0100\n"
-"PO-Revision-Date: 2018-04-10 08:37+0000\n"
-"Last-Translator: Martin Pannier <der@bauschaffen.de>\n"
-"Language-Team: German <https://translate.webtrees.net/projects/webtrees/webtrees-1-7/de/>\n"
+"PO-Revision-Date: 2019-11-09 09:33+0000\n"
+"Last-Translator: Administrator <greg.roach@open.ac.uk>\n"
+"Language-Team: German <http://translate.webtrees.net/projects/webtrees/"
+"webtrees-17/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2.10\n"
+"X-Generator: Weblate 3.9.1\n"
 
 #: modules_v3/ahnentafel_report/report.xml:160
 #: modules_v3/ahnentafel_report/report.xml:188
@@ -10844,12 +10845,12 @@ msgstr "Wohnsitzort"
 #: admin_site_upgrade.php:354
 #, php-format
 msgid "Place the website offline, by creating the file %s…"
-msgstr "Nehmen Sie die Seite offline, indem Sie die Datei %s erzeugen."
+msgstr "Nehmen Sie die Seite offline, indem Sie die Datei %s erzeugen …"
 
 #: admin_site_upgrade.php:410
 #, php-format
 msgid "Place the website online, by deleting the file %s…"
-msgstr "Nehmen Sie die Seite online, indem Sie die Datei %s löschen."
+msgstr "Nehmen Sie die Seite online, indem Sie die Datei %s löschen …"
 
 #: admin_trees_config.php:1500 search.php:204 statistics.php:408
 msgid "Places"
@@ -14453,22 +14454,22 @@ msgstr "Diese Notiz wurde bearbeitet. Sie sollten die Änderung prüfen und sie 
 #. I18N: Help text for the “Automatically expand notes” configuration setting
 #: admin_trees_config.php:1480
 msgid "This option controls whether or not to automatically display content of a <i>Note</i> record on the Individual page."
-msgstr "Diese Option bestimmt, ob der Inhalt von Notizen auf der Personenseite automatisch angezeigt werden soll oder nicht."
+msgstr "Diese Option steuert, ob der Inhalt eines <i>Notiz</i>-Datensatzes auf der Personenseite automatisch angezeigt wird."
 
 #. I18N: Help text for the “Automatically expand sources” configuration setting
 #: admin_trees_config.php:1495
 msgid "This option controls whether or not to automatically display content of a <i>Source</i> record on the Individual page."
-msgstr "Diese Option bestimmt, ob der Inhalt von Quellenangaben auf der Seite «Persönliche Informationen» automatisch gezeigt werden soll oder nicht."
+msgstr "Diese Option steuert, ob der Inhalt eines <i>Quell</i>-Datensatzes auf der Personenseite automatisch angezeigt wird."
 
 #. I18N: Help text for the “Age of parents next to child’s birthdate” configuration setting
 #: admin_trees_config.php:1316
 msgid "This option controls whether or not to show age of father and mother next to child’s birthdate on charts."
-msgstr "Diese Option bestimmt, ob das Alter der Eltern neben dem Geburtsdatum des Kindes gezeigt werden soll oder nicht."
+msgstr "Diese Option steuert, ob das Alter der Eltern neben dem Geburtsdatum des Kindes angezeigt wird."
 
 #. I18N: Help text for the “Estimated dates for birth and death” configuration setting
 #: admin_trees_config.php:1189
 msgid "This option controls whether or not to show estimated dates for birth and death instead of leaving blanks on individual lists and charts for individuals whose dates are not known."
-msgstr "Diese Option bestimmt, ob geschätzte Daten für Geburten und Tode in Listen gezeigt werden. Wenn nicht, bleiben unbekannte Daten leer."
+msgstr "Diese Option steuert, ob geschätzte Geburts- und Sterbedaten angezeigt werden, anstatt diese in Listen und Diagrammen für Personen leer zu lassen, deren Daten nicht bekannt sind."
 
 #. I18N: Help text for the “Gender icon on charts” configuration setting
 #: admin_trees_config.php:1303
@@ -15751,7 +15752,7 @@ msgstr "Westsahara"
 #. I18N: Help text for the “Keep the existing ‘last change’ information” configuration setting
 #: admin_trees_config.php:2136
 msgid "When a record is edited, the user and timestamp are recorded. Sometimes it is desirable to keep the existing “last change” information, for example when making minor corrections to someone else’s data. This option controls whether this feature is selected by default."
-msgstr "Sobald ein Datensatz bearbeitet wird, wird der Benutzer und ein Zeitstempel aufgezeichnet. In einigen Fällen, z.B. bei kleinen Änderungen an Daten anderer Benutzer, ist es wünschenswert die vorhandene Information über die „Letzte Änderung“ zu erhalten. Diese Auswahl steuert die Voreinstellung für dieses Verhalten."
+msgstr "Wenn ein Datensatz bearbeitet wird, werden der Benutzer und der Zeitstempel aufgezeichnet. In einigen Fällen ist es wünschenswert, die vorhandenen Informationen zur „Letzten Änderung“ beizubehalten, z. B. wenn geringfügige Korrekturen an den Daten einer anderen Person vorgenommen werden. Diese Option steuert, ob diese Funktion standardmäßig ausgewählt ist."
 
 #: admin_users.php:388
 msgid "When a user registers for an account, an email is sent to their email address with a verification link. When they follow this link, we know the email address is correct, and the “email verified” option is selected automatically."
@@ -15790,7 +15791,7 @@ msgstr "Wo befindet sich Ihre PhpGedView Installation?"
 #. I18N: Label for a configuration option
 #: app/Module/SiteMapModule.php:308
 msgid "Which family trees should be included in the sitemaps"
-msgstr "Welche Stammbäume sollen in den Sitemaps enthalten sein?"
+msgstr "Welche Stammbäume sollen in den Sitemaps enthalten sein"
 
 #. I18N: A configuration setting
 #: admin_trees_config.php:1018

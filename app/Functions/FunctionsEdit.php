@@ -74,7 +74,7 @@ class FunctionsEdit
      */
     public static function selectEditControl($name, $values, $empty, $selected, $extra = '')
     {
-        if (is_null($empty)) {
+        if ($empty === null) {
             $html = '';
         } else {
             if (empty($selected)) {
@@ -1009,9 +1009,10 @@ class FunctionsEdit
     /**
      * Genearate a <select> element, with the dates/places of all known censuses
      *
-     *
      * @param string $locale - Sort the censuses for this locale
      * @param string $xref   - The individual for whom we are adding a census
+     *
+     * @return string
      */
     public static function censusDateSelector($locale, $xref)
     {

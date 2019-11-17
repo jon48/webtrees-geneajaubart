@@ -1825,6 +1825,8 @@ class GoogleMapsModule extends AbstractModule implements ModuleConfigInterface, 
      * Build a map for an individual.
      *
      * @param Individual $indi
+     *
+     * @return string
      */
     private function buildIndividualMap(Individual $indi)
     {

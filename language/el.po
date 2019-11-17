@@ -3,15 +3,16 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2018-09-25 11:42+0100\n"
-"PO-Revision-Date: 2018-05-20 07:26+0000\n"
-"Last-Translator: Klimis Panagiotis <klimis.p@gmail.com>\n"
-"Language-Team: Greek <https://translate.webtrees.net/projects/webtrees/webtrees-1-7/el/>\n"
+"PO-Revision-Date: 2019-11-09 09:33+0000\n"
+"Last-Translator: Administrator <greg.roach@open.ac.uk>\n"
+"Language-Team: Greek <http://translate.webtrees.net/projects/webtrees/"
+"webtrees-17/el/>\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2.10\n"
+"X-Generator: Weblate 3.9.1\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Basepath: ..\n"
@@ -125,8 +126,8 @@ msgstr[1] "τα αρχεία %1$s εξήχθησαν σε %2$s δευτερόλ�
 #, php-format
 msgid "%1$s individual displayed, out of the normal total of %2$s, from %3$s generations."
 msgid_plural "%1$s individuals displayed, out of the normal total of %2$s, from %3$s generations."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s άτομο εμφανίσθηκε, από το φυσιολογικό πλήθος των %2$s, από %3$s γενεές."
+msgstr[1] "%1$s άτομα εμφανίσθηκαν, από το φυσιολογικό πλήθος των %2$s, από %3$s γενεές."
 
 #. I18N: %1$s is a count of individuals, %2$s is a list of their names
 #: app/Module/GoogleMapsModule.php:852
@@ -3575,7 +3576,7 @@ msgstr "Έλεγχος ρυθμίσεων διακομιστή"
 #. I18N: Location of an LDS church temple
 #: app/GedcomCode/GedcomCodeTemp.php:131
 msgid "Chicago, Illinois, United States"
-msgstr ""
+msgstr "Σικάγο, Ιλινόϊς, Ηνωμένες Πολιτείες"
 
 #. I18N: gedcom tag CHIL
 #: app/Functions/FunctionsDate.php:35 app/GedcomTag.php:274
@@ -3585,7 +3586,7 @@ msgstr "Τέκνο"
 #: modules_v3/ahnentafel_report/report.xml:388
 #: modules_v3/descendancy_report/report.xml:480
 msgid "Child of "
-msgstr ""
+msgstr "Τέκνο του "
 
 #. I18N: e.g. “Child of [father name & mother name]”
 #: app/Module/InteractiveTree/TreeView.php:352
@@ -3984,7 +3985,7 @@ msgstr "Πίνακας Ελέγχου"
 #: admin_trees_download.php:150 app/Module/ClippingsCartModule.php:426
 #: app/Module/ClippingsCartModule.php:794
 msgid "Convert from UTF-8 to ISO-8859-1"
-msgstr "Θέλετε να μετατρέψετε αυτό το GEDCOM από UTF-8 σε ISO-8859-1;"
+msgstr "Θέλετε να μετατρέψετε αυτό το GEDCOM από UTF-8 σε ISO-8859-1"
 
 #. I18N: Name of a country or state
 #: app/Stats.php:6720
@@ -7353,11 +7354,11 @@ msgstr ""
 
 #: addmedia.php:545 admin_media_upload.php:254
 msgid "If you have a large number of media files, you can organize them into folders and subfolders."
-msgstr ""
+msgstr "Εάν έχετε μεγάλο αριθμό από αρχεία πολυμέσων μπορείτε να τα οργανώσετε σε φακέλους και υποφακέλους."
 
 #: admin_trees_manage.php:278
 msgid "If you have created media objects in webtrees, and have subsequently edited this GEDCOM file using genealogy software that deletes media objects, then select this option to merge the current media objects with the new GEDCOM file."
-msgstr ""
+msgstr "Εάν έχετε δημιουργήσει αντικείμενα μέσων στο webtrees και στη συνέχεια έχετε επεξεργαστεί αυτό το αρχείο GEDCOM χρησιμοποιώντας λογισμικό γενεαλογικού περιεχομένου που διαγράφει αντικείμενα πολυμέσων, επιλέξτε αυτή την επιλογή για να συγχωνεύσετε τα τρέχοντα αντικείμενα μέσων με το νέο αρχείο GEDCOM."
 
 #: app/Module/RecentChangesModule.php:186
 msgid "If you hide an empty block, you will not be able to change its configuration until it becomes visible by no longer being empty."
@@ -7476,7 +7477,7 @@ msgstr "Συμπερ. υποκαταλόγων"
 #. I18N: Label for a configuration option
 #: lifespan.php:86
 msgid "Include the individual’s immediate family"
-msgstr "Να συμπεριληφθεί η άμεση οικογένειά του ατόμου;"
+msgstr "Να συμπεριληφθεί η άμεση οικογένειά του ατόμου"
 
 #. I18N: Name of a country or state
 #: app/Stats.php:6777
@@ -12073,7 +12074,7 @@ msgstr "Αποστολή μαζικών μηνυμάτων"
 #. I18N: Label for a configuration option
 #: app/Module/ReviewChangesModule.php:185
 msgid "Send out reminder emails"
-msgstr "Αποστολή email υπενθύμισης;"
+msgstr "Αποστολή email υπενθύμισης"
 
 #. I18N: A configuration setting
 #: admin_site_config.php:335
@@ -12406,7 +12407,7 @@ msgstr "Συντομότερος γάμος"
 
 #: app/Module/RecentChangesModule.php:181
 msgid "Should this block be hidden when it is empty"
-msgstr "Πρέπει αυτό το πλαίσιο να αποκρύπτεται όταν είναι άδειο;"
+msgstr "Πρέπει αυτό το πλαίσιο να αποκρύπτεται όταν είναι άδειο"
 
 #: calendar.php:221
 msgid "Show"
@@ -12445,7 +12446,7 @@ msgstr "Προβολή όλων των ετικετών"
 #. I18N: an age indicator, which can be dragged around the screen
 #: timeline.php:280
 msgid "Show an age cursor"
-msgstr "Εμφάνιση δείκτη Ηλικίας;"
+msgstr "Εμφάνιση δείκτη Ηλικίας"
 
 #. I18N: A configuration setting
 #: admin_trees_config.php:1285
@@ -12459,7 +12460,7 @@ msgstr ""
 #. I18N: Label for a configuration option
 #: app/Module/TopPageViewsModule.php:165
 msgid "Show counts before or after name"
-msgstr "Τοποθέτηση μετρήσεων πριν ή μετά το όνομα;"
+msgstr "Τοποθέτηση μετρήσεων πριν ή μετά το όνομα"
 
 #: app/Functions/FunctionsPrintLists.php:711
 msgid "Show couples where either partner married more than once."
@@ -12492,7 +12493,7 @@ msgstr "Εμφάνιση ξαδερφιών"
 #. I18N: label for yes/no option
 #: app/Module/FamilyTreeStatisticsModule.php:296
 msgid "Show date of last update"
-msgstr "Εμφάνιση ημερομηνίας τελευταίας ενημέρωσης;"
+msgstr "Εμφάνιση ημερομηνίας τελευταίας ενημέρωσης"
 
 #. I18N: A configuration setting
 #: admin_trees_config.php:384
@@ -12566,17 +12567,17 @@ msgstr "Εμφάνιση σημειώσεων"
 
 #: modules_v3/ahnentafel_report/report.xml:10
 msgid "Show occupations"
-msgstr "Εμφάνιση επαγγελμάτων;"
+msgstr "Εμφάνιση επαγγελμάτων"
 
 #: app/Module/UpcomingAnniversariesModule.php:160
 msgid "Show only births, deaths, and marriages"
-msgstr "Εμφάνιση μόνο γεννήσεων, θανάτων, και γάμων;"
+msgstr "Εμφάνιση μόνο γεννήσεων, θανάτων, και γάμων"
 
 #. I18N: Label for a configuration option
 #: app/Module/OnThisDayModule.php:136
 #: app/Module/UpcomingAnniversariesModule.php:154
 msgid "Show only events of living individuals"
-msgstr "Εμφάνιση συμβάντων από ζωντανά άτομα μόνο;"
+msgstr "Εμφάνιση συμβάντων από ζωντανά άτομα μόνο"
 
 #: app/Functions/FunctionsPrintLists.php:186
 msgid "Show only females."
@@ -12589,7 +12590,7 @@ msgstr "Εμφάνιση μόνο ατόμων αγνώστου φύλου."
 #. I18N: Label for a configuration option
 #: app/Module/SlideShowModule.php:262
 msgid "Show only individuals, events, or all"
-msgstr "Εμφάνιση μόνο ατόμων, συμβάντων, ή όλων;"
+msgstr "Εμφάνιση μόνο ατόμων, συμβάντων, ή όλων"
 
 #: app/Functions/FunctionsPrintLists.php:177
 msgid "Show only males."
@@ -12706,7 +12707,7 @@ msgstr ""
 #: app/Module/FrequentlyAskedQuestionsModule.php:197
 #: app/Module/HtmlBlockModule.php:332 app/Module/StoriesModule.php:259
 msgid "Show this block for which languages"
-msgstr "Για ποιες γλώσσες να εμφανιζεται αυτό το μπλοκ;"
+msgstr "Για ποιες γλώσσες να εμφανιζεται αυτό το μπλοκ"
 
 #: admin_trees_config.php:1051
 msgid "Show thumbnail images in charts and family groups."
@@ -13159,7 +13160,7 @@ msgstr "Εκκίνηση από γονείς"
 #. I18N: Label for a configuration option
 #: app/Module/SlideShowModule.php:415
 msgid "Start slide show on page load"
-msgstr "Εκκίνηση προβολής φωτ/φιών με την φορτωση της σελίδας;"
+msgstr "Εκκίνηση προβολής φωτ/φιών με την φορτωση της σελίδας"
 
 #. I18N: The earliest year in a range
 #: lifespan.php:69
@@ -13221,12 +13222,12 @@ msgstr "Διακοπή"
 #. I18N: A configuration setting
 #: admin_trees_config.php:1113
 msgid "Store watermarked full size images on server"
-msgstr "Αποθήκευση υδατογραφημένων πλήρων εικόνων στον διακομιστή;"
+msgstr "Αποθήκευση υδατογραφημένων πλήρων εικόνων στον διακομιστή"
 
 #. I18N: A configuration setting
 #: admin_trees_config.php:1126
 msgid "Store watermarked thumbnails on server"
-msgstr "Αποθηκευση υδατογραφημένων μικρογραφιών στον διακομιστή;"
+msgstr "Αποθηκευση υδατογραφημένων μικρογραφιών στον διακομιστή"
 
 #. I18N: Name of a module
 #: app/Module/StoriesModule.php:36 app/Module/StoriesModule.php:454
@@ -15795,12 +15796,12 @@ msgstr ""
 #. I18N: Label for a configuration option
 #: app/Module/SiteMapModule.php:308
 msgid "Which family trees should be included in the sitemaps"
-msgstr "Ποιά οικ. δέντρα να συμπεριληφθούν στους χάρτες ιστοσελίδων;"
+msgstr "Ποιά οικ. δέντρα να συμπεριληφθούν στους χάρτες ιστοσελίδων"
 
 #. I18N: A configuration setting
 #: admin_trees_config.php:1018
 msgid "Who can upload new media files"
-msgstr "Ποιοί μπορούν να ανεβάσουν νεα αρχεία πολυμέσων;"
+msgstr "Ποιοί μπορούν να ανεβάσουν νεα αρχεία πολυμέσων"
 
 #. I18N: Name of a module. (A list of users who are online now)
 #: app/Module/LoggedInUsersModule.php:32
