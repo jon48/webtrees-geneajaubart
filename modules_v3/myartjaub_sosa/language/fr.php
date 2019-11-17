@@ -34,7 +34,7 @@ return array (
     'Number of ancestors'			=>	'Nombre total d\'ancêtres',
     'Number of different ancestors'	=>	'Nombre d\'ancêtres différents',
     '%% of ancestors in the base'	=>	'Proportion de Sosas dans la base',
-    'Mean generation time'			=>	'Durée moyenne d\'une génération',
+    'Generation mean duration'		=>	'Durée moyenne d\'une génération',
     'Statistics by generations'		=>	'Statistiques par générations',
     'Theoretical'					=>	'Théoriques',
     'Known'							=>	'Connus',
