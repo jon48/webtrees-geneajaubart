@@ -91,7 +91,9 @@ return array (
     'There is no geographical dispersion analysis to display.'
                                     =>  'Il n\'y a aucune analyse de répartition géographique à afficher.',
     'Error when loading map.'       =>  'Erreur lors du chargement de la carte.',
-    'The map could not be loaded.'  =>  'La carte n\'a pas pu être chargée.'
+    'The map could not be loaded.'  =>  'La carte n\'a pas pu être chargée.',
+    'No place structure could be determined. Please make sure that at least a place exists.'
+                                    =>  'Aucune structure de lieux n\'a pu être déterminée. Assurez-vous qu\'au moins un lieu existe.'
 
 
 );
