@@ -3,9 +3,9 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2018-09-25 11:42+0100\n"
-"PO-Revision-Date: 2019-11-10 15:42+0000\n"
+"PO-Revision-Date: 2020-03-01 16:17+0000\n"
 "Last-Translator: Josef Prause <josef.prause@gmail.com>\n"
-"Language-Team: Czech <http://translate.webtrees.net/projects/webtrees/"
+"Language-Team: Czech <https://translate.webtrees.net/projects/webtrees/"
 "webtrees-17/cs/>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -533,7 +533,7 @@ msgstr "%s&nbsp;n. l."
 #: statisticsplot.php:788
 #, php-format
 msgid "%s+"
-msgstr "%s 1+"
+msgstr "%s+"
 
 #. I18N: %s is a woman's name
 #: app/Module/ClippingsCartModule.php:235
@@ -1397,7 +1397,7 @@ msgstr "Přidat syna nebo dceru"
 #: app/Controller/FamilyController.php:172 app/Functions/FunctionsEdit.php:1057
 #: app/Module/SourcesTabModule.php:95
 msgid "Add a source citation"
-msgstr "Přidat pramen citací"
+msgstr "Přidat citaci pramene"
 
 #: edit_interface.php:817
 msgid "Add a spouse"
@@ -3346,7 +3346,7 @@ msgstr "Calgary, Alberata, Kanada"
 #. I18N: gedcom tag CALN
 #: app/GedcomTag.php:234
 msgid "Call number"
-msgstr "Telefon"
+msgstr "Signatura"
 
 #. I18N: Name of a country or state
 #: app/Stats.php:6793
@@ -3390,7 +3390,7 @@ msgstr "Cardston, Alberta, Kanada"
 
 #: app/Module/BatchUpdate/BatchUpdateSearchReplacePlugin.php:170
 msgid "Case insensitive"
-msgstr "Nerozlišovat velikost písmen"
+msgstr "Bez ohledu na velikost písmen"
 
 #. I18N: gedcom tag CAST
 #: app/GedcomTag.php:238
@@ -20130,7 +20130,7 @@ msgstr "webtrees používá kódování UTF-8 pro písmena s diakritikou, speci�
 
 #: app/Functions/FunctionsPrint.php:211
 msgid "webtrees wiki"
-msgstr "webtrees wiki"
+msgstr "wiki aplikace webtrees"
 
 #: admin_trees_manage.php:718
 msgid "webtrees’ database must be on the same server as PhpGedView’s"

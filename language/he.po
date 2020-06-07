@@ -3,9 +3,9 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2019-04-30 22:45+0100\n"
-"PO-Revision-Date: 2019-11-10 15:42+0000\n"
+"PO-Revision-Date: 2020-05-01 09:45+0000\n"
 "Last-Translator: Meliza Amity <meliza@amitys.com>\n"
-"Language-Team: Hebrew <http://translate.webtrees.net/projects/webtrees/"
+"Language-Team: Hebrew <https://translate.webtrees.net/projects/webtrees/"
 "webtrees-17/he/>\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -680,7 +680,7 @@ msgstr "(בינקות)"
 #. I18N: An individual’s age at an event. e.g. Died 14 Jan 1900 (stillborn)
 #: app/I18N.php:288 app/Age.php:116
 msgid "(stillborn)"
-msgstr "(נולד מת)"
+msgstr "(לידה שקטה)"
 
 #. I18N: This punctuation is used to separate lists of items
 #: app/I18N.php:443 app/I18N.php:383
@@ -9875,7 +9875,7 @@ msgstr "לשוטו"
 #: resources/xml/reports/relative_ext_report.xml:8
 msgctxt "paper size"
 msgid "Letter"
-msgstr "Letter"
+msgstr "מכתבים"
 
 #: app/Module/GoogleMapsModule.php:384 app/Module/GoogleMapsModule.php:400
 #: app/Module/GoogleMapsModule.php:1438 app/Module/GoogleMapsModule.php:3444
@@ -13707,7 +13707,7 @@ msgstr "אנשים קרובים"
 #. I18N: gedcom tag RELA
 #: app/GedcomTag.php:720 app/GedcomTag.php:956
 msgid "Relationship"
-msgstr "קשר משפחתי"
+msgstr "קשר"
 
 #. I18N: gedcom tag _FREL
 #: app/GedcomTag.php:1505 app/GedcomTag.php:1823
@@ -13727,7 +13727,7 @@ msgstr "קשר אל אם"
 #. I18N: gedcom tag PEDI
 #: app/GedcomTag.php:678 app/GedcomTag.php:920
 msgid "Relationship to parents"
-msgstr "היחס אל ההורים"
+msgstr "הקירבה אל ההורים"
 
 #: relationship.php:166 app/Module/RelationshipsChartModule.php:299
 #, php-format

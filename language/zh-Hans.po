@@ -3,9 +3,9 @@ msgstr ""
 "Project-Id-Version: Chinese (Simplified) (webtrees)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-17 08:20+0000\n"
-"PO-Revision-Date: 2019-11-09 09:33+0000\n"
-"Last-Translator: Administrator <greg.roach@open.ac.uk>\n"
-"Language-Team: Chinese (Simplified) <http://translate.webtrees.net/projects/"
+"PO-Revision-Date: 2020-04-26 13:52+0000\n"
+"Last-Translator: rui <xmlf@hotmail.com>\n"
+"Language-Team: Chinese (Simplified) <https://translate.webtrees.net/projects/"
 "webtrees/webtrees-17/zh_Hans/>\n"
 "Language: zh-Hans\n"
 "MIME-Version: 1.0\n"
@@ -970,7 +970,7 @@ msgstr "文件位于服务器"
 #: resources/views/admin/trees-import.phtml:26,
 #: resources/views/modals/media-file-fields.phtml:11,
 msgid "A file on your computer"
-msgstr "文件位于您的计算机"
+msgstr "文件在您的设备上"
 
 # I18N: Description of the “My page” module
 #. I18N: Description of the “My page” module
@@ -1055,7 +1055,8 @@ msgstr "当前在线用户和访客名单。"
 
 #: help_text.php:247 resources/views/help/media-object.phtml:4
 msgid "A media object is a record in the family tree which contains information about a media file. This information may include a title, a copyright notice, a transcript, privacy restrictions, etc. The media file, such as the photo or video, can be stored locally (on this webserver) or remotely (on a different webserver)."
-msgstr "家谱中的媒体对象记录包括标题、版权声明、副本、隐私限制等。多媒体文件，例如照片或视频，可以在存储在本地（在这个服务器）或远程（在另外一个服务器）。"
+msgstr ""
+"家谱中的媒体对象记录包括标题、版权声明、副本、隐私限制等。媒体文件，例如照片或视频，可以在存储在本地（在这个服务器）或远程（在另外一个服务器）。"
 
 #: login.php:264
 #, php-format
@@ -1307,7 +1308,7 @@ msgstr "标签显示的一个人的事迹和事件。"
 #. I18N: Description of the “Media” module
 #: app/Module/MediaTabModule.php:40 app/Module/MediaTabModule.php:69
 msgid "A tab showing the media objects linked to an individual."
-msgstr "这个标签显示连接到个人的多媒体文件。"
+msgstr "这个标签显示连接到个人的媒体文件。"
 
 # I18N: Description of the “Notes” module
 #. I18N: Description of the “Notes” module
@@ -1671,7 +1672,7 @@ msgstr "添加一个兄弟或姐妹"
 #: app/Http/Controllers/EditFamilyController.php:112,
 #: resources/views/family-page-children.phtml:34,
 msgid "Add a child"
-msgstr "添加一个子女"
+msgstr "添加子女"
 
 #: app/Module/RelativesTabModule.php:398 edit_interface.php:575
 #: app/Http/Controllers/EditIndividualController.php:233
@@ -1771,7 +1772,7 @@ msgstr "添加母亲"
 #: resources/views/individual-page-menu.phtml:18
 #: app/Http/Controllers/EditIndividualController.php:645,
 msgid "Add a name"
-msgstr "添加名字"
+msgstr "添加姓名"
 
 #: app/Module/FamilyTreeNewsModule.php:130
 #: resources/views/modules/gedcom_news/list.phtml:45
@@ -2035,7 +2036,7 @@ msgstr "管理员帐号"
 
 #: admin_users.php:495 resources/views/admin/users-edit.phtml:195
 msgid "Administrator comments on user"
-msgstr "管理员对用户的评论"
+msgstr "管理员对用户的注释"
 
 #: admin.php:666 resources/views/admin/control-panel.phtml:222
 msgid "Administrators"
@@ -2212,7 +2213,7 @@ msgstr "高级事件设置"
 #: admin_trees_config.php:2032
 #: resources/views/admin/trees-preferences.phtml:869
 msgid "Advanced name facts"
-msgstr "高级名字事件"
+msgstr "高级姓名事件"
 
 #: admin_trees_config.php:2061
 #: resources/views/admin/trees-preferences.phtml:882
@@ -4213,7 +4214,7 @@ msgstr "伴娘"
 #. I18N: Location of an LDS church temple
 #: app/GedcomCode/GedcomCodeTemp.php:117
 msgid "Brigham City, Utah, United States"
-msgstr ""
+msgstr "布里格姆城, 犹他州, 美国"
 
 # I18N: Location of an LDS church temple
 #. I18N: Location of an LDS church temple
@@ -5081,7 +5082,7 @@ msgstr "洗礼"
 
 #: app/GedcomTag.php:1240 app/GedcomTag.php:1518
 msgid "Christening of a brother"
-msgstr "弟兄的洗礼"
+msgstr "兄弟的洗礼"
 
 #: app/GedcomTag.php:1199 app/GedcomTag.php:1470
 msgid "Christening of a child"
@@ -5319,7 +5320,7 @@ msgstr "主頁"
 #: admin_site_access.php:297 admin_site_access.php:366 app/GedcomTag.php:298
 #: app/GedcomTag.php:606
 msgid "Comment"
-msgstr "评论"
+msgstr "注释"
 
 #: login.php:326 login.php:348 login.php:483
 #: resources/views/emails/register-notify-html.phtml:19
@@ -5328,7 +5329,7 @@ msgstr "评论"
 #: resources/views/emails/register-notify-html.phtml:19,
 #: resources/views/emails/register-notify-text.phtml:9,
 msgid "Comments"
-msgstr "备注"
+msgstr "注释"
 
 # I18N: gedcom tag _COML
 #. I18N: gedcom tag _COML
@@ -5636,7 +5637,7 @@ msgstr "公司"
 #: app/Module/BatchUpdate/BatchUpdateNameFormatPlugin.php:39
 #: app/Module/BatchUpdate/BatchUpdateNameFormatPlugin.php:45
 msgid "Correct NAME records of the form “John/DOE/” or “John /DOE”, as produced by older genealogy programs."
-msgstr "修正由老家谱程序产生的名字记录表单 ‘Joe/BLOGGS/’ or ‘Joe /BLOGGS’。"
+msgstr "修正由旧的家谱程序产生的姓名记录格式 ‘Joe/BLOGGS/’ 或 ‘Joe /BLOGGS’。"
 
 # I18N: Name of a country or state
 #. I18N: Name of a country or state
@@ -5698,7 +5699,7 @@ msgstr "新建一个家谱"
 #: app/Functions/FunctionsEdit.php:473,
 #: resources/views/modals/create-media-from-file.phtml:12,
 msgid "Create a media object"
-msgstr "新建多媒体文件"
+msgstr "新建媒体文件"
 
 #: app/Functions/FunctionsEdit.php:428 edit_interface.php:1492
 #: edit_interface.php:1555 app/Functions/FunctionsEdit.php:518
@@ -7770,7 +7771,7 @@ msgstr "移動這個多媒體"
 #: app/Functions/FunctionsEdit.php:587,
 #: app/Http/Controllers/EditIndividualController.php:597,
 msgid "Edit the name"
-msgstr "编辑名字"
+msgstr "编辑姓名"
 
 #: app/Controller/NoteController.php:39
 msgid "Edit the note"
@@ -8256,7 +8257,7 @@ msgstr "外部文件"
 
 #: admin_media.php:676 resources/views/admin/media.phtml:62
 msgid "External media files have a URL instead of a filename."
-msgstr "外部多媒体文件是URL，而不是一个文件名。"
+msgstr "外部媒体文件是URL，而不是一个文件名。"
 
 # I18N: Name of a module/sidebar
 #. I18N: Name of a module/sidebar
@@ -8495,7 +8496,7 @@ msgstr "福克兰群岛"
 #: resources/views/source-page.phtml:44,
 #: resources/xml/reports/fact_sources.xml:152,
 msgid "Families"
-msgstr "家庭名录"
+msgstr "家庭信息"
 
 #: app/Stats.php:520 statistics.php:395
 #: app/Statistics/Google/ChartFamilyWithSources.php:94
@@ -8990,7 +8991,7 @@ msgstr "文件名"
 #: resources/views/modals/media-file-fields.phtml:40
 #: resources/views/admin/media-upload.phtml:30,
 msgid "Filename on server"
-msgstr "在服务器上的文件名"
+msgstr "服务器上的文件名"
 
 #: addmedia.php:161 addmedia.php:295 admin_media_upload.php:117
 #: app/Http/Controllers/Admin/MediaController.php:546
@@ -9134,7 +9135,7 @@ msgstr "第一条记录"
 #: app/Module/BatchUpdate/BatchUpdateNameFormatPlugin.php:30
 #: app/Module/BatchUpdate/BatchUpdateNameFormatPlugin.php:35
 msgid "Fix name slashes and spaces"
-msgstr "修复名字和空格斜杠"
+msgstr "修复姓名斜杠和空格"
 
 #. I18N: The emblem of a country or region
 #: app/Module/GoogleMapsModule.php:458 app/Module/GoogleMapsModule.php:3390
@@ -9249,7 +9250,7 @@ msgstr "字体"
 #: admin_trees_manage.php:301 resources/views/admin/trees-import.phtml:102
 #, php-format
 msgid "For example, if the GEDCOM file contains %1$s and webtrees expects to find %2$s in the media folder, then you would need to remove %3$s."
-msgstr "例如，如果 GEDCOM 文件包含 %1$s，webtrees 希望在多媒体文件夹中找到 %2$s，然后你将需要删除 %3$s。"
+msgstr "例如，如果 GEDCOM 文件包含 %1$s，webtrees 希望在媒体文件夹中找到 %2$s，然后你将需要删除 %3$s。"
 
 #: admin_users.php:600 resources/views/help/relationship-privacy.phtml:8
 msgid "For example, if you specify a path length of 2, the individual will be able to see their grandson (child, child), their aunt (parent, sibling), their step-daughter (spouse, child), but not their first cousin (parent, sibling, child)."
@@ -10487,7 +10488,7 @@ msgstr "如果这个人在最近这么多年内没有去世、埋葬或火化事
 #: admin_trees_config.php:1008
 #: resources/views/admin/trees-preferences.phtml:258
 msgid "If two family trees use the same media folder, then they will be able to share media files. If they use different media folders, then their media files will be kept separate."
-msgstr "如果两个家谱使用相同的多媒体文件夹，那么他们将能够共享多媒体文件。如果他们使用不同的多媒体文件夹，那么将他们的多媒体文件分开存放。"
+msgstr "如果两个家谱使用相同的媒体文件夹，那么他们将能够共享媒体文件。如果他们使用不同的媒体文件夹，那么将他们的媒体文件分开存放。"
 
 #: admin_trees_config.php:374 resources/views/admin/trees-privacy.phtml:38
 msgid "If visitors can not see the family tree, they will not be able to sign up for an account. You will need to add their account manually."
@@ -10525,11 +10526,11 @@ msgstr "如果你有大量的多媒體文件，你可以將它們放置到文件
 #: addmedia.php:545 admin_media_upload.php:254
 #: resources/views/modals/media-file-fields.phtml:63
 msgid "If you have a large number of media files, you can organize them into folders and subfolders."
-msgstr "如果你有大量的多媒体文件，你可以将它们放置到文件夹和子文件夹中。"
+msgstr "若您有大量的媒体文件，您可以将它们放到一个单独文件夹中。"
 
 #: admin_trees_manage.php:278 resources/views/admin/trees-import.phtml:79
 msgid "If you have created media objects in webtrees, and have subsequently edited this GEDCOM file using genealogy software that deletes media objects, then select this option to merge the current media objects with the new GEDCOM file."
-msgstr "如果您之前已经创建了多媒体文件,并离线使用一个删除多媒体文件的GEDCOM程序编辑你的gedcom文件。在导入合并多媒体文件前，你要勾选这个选项。"
+msgstr "如果您之前已经创建了媒体文件,并离线使用一个删除媒体文件的GEDCOM程序编辑你的gedcom文件。在导入合并媒体文件前，你要勾选这个选项。"
 
 #: app/Module/RecentChangesModule.php:186
 msgid "If you hide an empty block, you will not be able to change its configuration until it becomes visible by no longer being empty."
@@ -10544,7 +10545,7 @@ msgstr "如果你选择一个不同的文件夹，你还必须将所有文件（
 #: admin_trees_config.php:1007
 #: resources/views/admin/trees-preferences.phtml:257
 msgid "If you select a different folder, you must also move any media files from the existing folder to the new one."
-msgstr "如果你选择一个不同的文件夹，你还必须将所有多媒体文件，从现有的文件夹移到新的文件夹。"
+msgstr "如果你选择一个不同的文件夹，你还必须将所有媒体文件，从现有的文件夹移到新的文件夹。"
 
 # I18N: Help text for the “Show living individuals” configuration setting
 #. I18N: Help text for the “Show living individuals” configuration setting
@@ -10908,7 +10909,7 @@ msgstr "最长寿"
 #: resources/views/source-page.phtml:38,
 #: resources/xml/reports/fact_sources.xml:54,
 msgid "Individuals"
-msgstr "族人列表"
+msgstr "族人信息"
 
 #: app/Stats.php:422 statistics.php:394
 #: app/Statistics/Google/ChartIndividualWithSources.php:94
@@ -10992,21 +10993,21 @@ msgstr "内部消息和电子邮件"
 #. I18N: gedcom tag _INTE
 #: app/GedcomTag.php:1547 app/GedcomTag.php:1858
 msgid "Interred"
-msgstr "下墓"
+msgstr "下葬"
 
 # I18N: gedcom tag _INTE
 #. I18N: gedcom tag _INTE
 #: app/GedcomTag.php:1543 app/GedcomTag.php:1854
 msgctxt "FEMALE"
 msgid "Interred"
-msgstr "下墓"
+msgstr "下葬"
 
 # I18N: gedcom tag _INTE
 #. I18N: gedcom tag _INTE
 #: app/GedcomTag.php:1539 app/GedcomTag.php:1849
 msgctxt "MALE"
 msgid "Interred"
-msgstr "下墓"
+msgstr "下葬"
 
 #: import.php:114 app/Http/Controllers/GedcomFileController.php:106
 msgid "Invalid GEDCOM file - no header record found."
@@ -11323,7 +11324,7 @@ msgstr "保持链接列表"
 #. I18N: A configuration setting
 #: admin_trees_manage.php:275 resources/views/admin/trees-import.phtml:76
 msgid "Keep media objects"
-msgstr "保留多媒体文件"
+msgstr "保留媒体文件"
 
 # I18N: A configuration setting
 #. I18N: A configuration setting
@@ -11864,7 +11865,7 @@ msgstr "将这个人作为子女加到现有家庭里"
 #: resources/views/modals/link-media-to-family.phtml:8
 #: resources/views/media-page-menu.phtml:23,
 msgid "Link this media object to a family"
-msgstr "链接此多媒体文件到家庭"
+msgstr "链接此媒体文件到家庭"
 
 #: admin_media.php:532 app/Controller/MediaController.php:61
 #: app/Controller/MediaController.php:130 app/Module/AlbumModule.php:184
@@ -11872,7 +11873,7 @@ msgstr "链接此多媒体文件到家庭"
 #: resources/views/modals/link-media-to-source.phtml:8
 #: resources/views/media-page-menu.phtml:27,
 msgid "Link this media object to a source"
-msgstr "链接此多媒体文件到源"
+msgstr "链接此媒体文件到源"
 
 #: admin_media.php:530 app/Controller/MediaController.php:53
 #: app/Controller/MediaController.php:124 app/Module/AlbumModule.php:172
@@ -11880,7 +11881,7 @@ msgstr "链接此多媒体文件到源"
 #: resources/views/modals/link-media-to-individual.phtml:8
 #: resources/views/media-page-menu.phtml:19,
 msgid "Link this media object to an individual"
-msgstr "链接此多媒体文件到个人"
+msgstr "链接此媒体文件到个人"
 
 #: admin_users.php:594 resources/views/admin/users-edit.phtml:291
 msgid "Link this user to an individual in the family tree."
@@ -11928,7 +11929,7 @@ msgstr "列表"
 #: resources/views/admin/modules.phtml:83,
 #: resources/views/admin/modules.phtml:85,
 msgid "Lists"
-msgstr "名录清单"
+msgstr "列表"
 
 # I18N: Name of a country or state
 #. I18N: Name of a country or state
@@ -12009,7 +12010,9 @@ msgstr "伦敦,英国"
 #: admin_trees_config.php:1176
 #: resources/views/admin/trees-preferences.phtml:370
 msgid "Long lists of individuals with the same surname can be broken into smaller sub-lists according to the first letter of the individual’s given name.<br><br>This option determines when sub-listing of surnames will occur. To disable sub-listing completely, set this option to zero."
-msgstr "长列表拥有相同的姓氏的人可以根据个人的第一个字母的名字分解为更小的子列表。<br><br>这个选项决定姓氏子列表什么时候生成。设置这个选项为零完全禁用子列表。"
+msgstr ""
+"拥有相同姓氏的人的长列表可以根据个人的第一个字母的名字分解为更小的子列表。<br><br>这个选项决定姓氏子列表什么时候生成。设置这个选项为0则完全禁用子"
+"列表。"
 
 #: statistics.php:251
 #: resources/views/statistics/families/marriage-length.phtml:20
@@ -12767,12 +12770,12 @@ msgstr "日曆"
 #: app/Module/BatchUpdate/BatchUpdateSearchReplacePlugin.php:139
 #: app/Module/BatchUpdate/BatchUpdateSearchReplacePlugin.php:174
 msgid "Match the exact text, even if it occurs in the middle of a word."
-msgstr "精确匹配的文本,即使有关键字。"
+msgstr "模糊匹配。"
 
 #: app/Module/BatchUpdate/BatchUpdateSearchReplacePlugin.php:140
 #: app/Module/BatchUpdate/BatchUpdateSearchReplacePlugin.php:175
 msgid "Match the exact text, unless it occurs in the middle of a word."
-msgstr "精确匹配的文本,除非有关键字。"
+msgstr "全字匹配。"
 
 # I18N: Name of a country or state
 #. I18N: Name of a country or state
@@ -12895,39 +12898,39 @@ msgstr "健康情況"
 #: resources/views/media-page.phtml:84, resources/views/media-page.phtml:179,
 #: resources/views/modals/create-media-from-file.phtml:20,
 msgid "Media file"
-msgstr "多媒体文件"
+msgstr "媒体文件"
 
 #: addmedia.php:455 admin_media_upload.php:202
 #: resources/views/admin/media-upload.phtml:20
 msgid "Media file to upload"
-msgstr "多媒体文件上传"
+msgstr "上传媒体文件"
 
 # I18N: %s is the name of a folder.
 #. I18N: %s is the name of a folder.
 #: admin_trees_download.php:163 resources/views/admin/trees-export.phtml:58
 #, php-format
 msgid "Media filenames will be prefixed by %s."
-msgstr "多媒体文件名的前缀将为 %s。"
+msgstr "媒体文件名的前缀将为 %s。"
 
 #: admin_media.php:623 admin_trees_config.php:1013
 #: resources/views/admin/media.phtml:13
 #: resources/views/admin/trees-preferences.phtml:263
 #: resources/views/admin/media.phtml:13,
 msgid "Media files"
-msgstr "多媒体文件"
+msgstr "媒体文件"
 
 # I18N: A configuration setting
 #. I18N: A configuration setting
 #: admin_trees_config.php:988 resources/views/admin/trees-preferences.phtml:244
 msgid "Media folder"
-msgstr "多媒体文件夹"
+msgstr "媒体文件夹"
 
 #: admin_media.php:624 admin_trees_config.php:983
 #: resources/views/admin/media.phtml:14
 #: resources/views/admin/trees-preferences.phtml:239
 #: resources/views/admin/media.phtml:14,
 msgid "Media folders"
-msgstr "多媒体文件夹"
+msgstr "媒体文件夹"
 
 # I18N: gedcom tag OBJE
 #. I18N: gedcom tag OBJE
@@ -12951,7 +12954,7 @@ msgstr "多媒体文件夹"
 #: resources/views/family-page.phtml:91,
 #: resources/views/modules/favorites/favorites.phtml:87,
 msgid "Media object"
-msgstr "多媒体文件"
+msgstr "媒体文件"
 
 # I18N: Name of a module/list
 #. I18N: Name of a module/list
@@ -12993,15 +12996,15 @@ msgstr "多媒体文件"
 #: resources/views/note-page.phtml:50, resources/views/source-page.phtml:50,
 #: resources/views/statistics/other/chart-objects.phtml:10,
 msgid "Media objects"
-msgstr "多媒体文件"
+msgstr "媒体文件"
 
 #: medialist.php:233 resources/views/media-list-page.phtml:74
 msgid "Media objects found"
-msgstr "多媒体文件找到了"
+msgstr "媒体文件找到了"
 
 #: medialist.php:129 resources/views/media-list-page.phtml:30
 msgid "Media objects per page"
-msgstr "每页几个多媒体文件"
+msgstr "每页几个媒体文件"
 
 # I18N: gedcom tag MEDI
 # I18N: gedcom tag _TYPE
@@ -13811,7 +13814,7 @@ msgstr "缅甸"
 #: resources/xml/reports/missing_facts_report.xml:54,
 #: resources/xml/reports/occupation_report.xml:43,
 msgid "Name"
-msgstr "名字"
+msgstr "姓名"
 
 # I18N: gedcom tag REPO:NAME
 #. I18N: gedcom tag REPO:NAME
@@ -13834,13 +13837,13 @@ msgstr "犹太名称"
 #. I18N: gedcom tag NPFX
 #: app/GedcomTag.php:642 app/GedcomTag.php:891
 msgid "Name prefix"
-msgstr "名字前缀"
+msgstr "姓名前缀"
 
 # I18N: gedcom tag NSFX
 #. I18N: gedcom tag NSFX
 #: app/GedcomTag.php:646 app/GedcomTag.php:894
 msgid "Name suffix"
-msgstr "名字后缀"
+msgstr "姓名后缀"
 
 #: modules_v3/cemetery_report/report.xml:7
 #: modules_v3/death_report/report.xml:10 search.php:198 statistics.php:189
@@ -13852,7 +13855,7 @@ msgstr "名字后缀"
 #: resources/views/statistics/individuals/names.phtml:10,
 #: resources/xml/reports/cemetery_report.xml:7,
 msgid "Names"
-msgstr "名字"
+msgstr "姓名"
 
 msgid "Names to add to common surnames (comma separated)"
 msgstr "从常见的姓氏名字添加(逗号分隔)"
@@ -14589,7 +14592,7 @@ msgstr "頁數"
 #: app/Module/TopGivenNamesModule.php:146
 #: resources/views/modules/top10_givnnames/config.phtml:5
 msgid "Number of given names"
-msgstr "给定名字的数量"
+msgstr "名字的数量"
 
 # I18N: gedcom tag NMR
 #. I18N: gedcom tag NMR
@@ -16036,7 +16039,7 @@ msgstr "问题"
 #. I18N: Location of an LDS church temple
 #: app/GedcomCode/GedcomCodeTemp.php:307
 msgid "Quetzaltenango, Guatemala"
-msgstr ""
+msgstr "克萨尔特南戈, 危地马拉"
 
 #: admin_trees_config.php:1823
 #: resources/views/admin/trees-preferences.phtml:772
@@ -16578,14 +16581,14 @@ msgstr "重新编号"
 #: app/Http/Controllers/AdminTreesController.php:1121,
 #: resources/views/admin/trees-merge.phtml:19,
 msgid "Renumber family tree"
-msgstr "重新编号家谱"
+msgstr "重新给家谱编号"
 
 #: admin_trees_places.php:105 search.php:162
 #: resources/views/admin/trees-places.phtml:23
 #: resources/views/search-replace-page.phtml:21
 #: resources/views/admin/trees-places.phtml:23,
 msgid "Replace with"
-msgstr "替换"
+msgstr "替换为"
 
 #: app/Module/BatchUpdate/BatchUpdateSearchReplacePlugin.php:153
 #: app/Module/BatchUpdate/BatchUpdateSearchReplacePlugin.php:188
@@ -16798,7 +16801,7 @@ msgstr "留尼旺岛"
 #. I18N: Location of an LDS church temple
 #: app/GedcomCode/GedcomCodeTemp.php:319
 msgid "Rexburg, Idaho, United States"
-msgstr ""
+msgstr "雷克斯堡, 爱达荷州, 美国"
 
 #: index_edit.php:304
 msgid "Right section blocks"
@@ -17822,7 +17825,7 @@ msgstr "显示祖先的孩子"
 #: app/Module/TopPageViewsModule.php:165
 #: resources/views/modules/top10_pageviews/config.phtml:14
 msgid "Show counts before or after name"
-msgstr "放置计数在名字之前或之后"
+msgstr "在姓名之前或之后显示计数"
 
 #: app/Functions/FunctionsPrintLists.php:711
 #: resources/views/lists/families-table.phtml:240
@@ -18528,7 +18531,9 @@ msgstr "索马里"
 #. I18N: Help text for the “GEDCOM media path” configuration setting. A “path” is something like “C:\Documents\Genealogy\Photos\John_Smith.jpeg”
 #: admin_trees_manage.php:300 resources/views/admin/trees-import.phtml:101
 msgid "Some genealogy software creates GEDCOM files that contain media filenames with full paths. These paths will not exist on the web-server. To allow webtrees to find the file, the first part of the path must be removed."
-msgstr "一些家谱软件创建 GEDCOM 文件，其中包含多媒体文件名的完整路径。 这些路径将在 web 服务器上不存在。 若要允许 webtrees，找到该文件，必须删除路径的第一部分。"
+msgstr ""
+"一些家谱软件创建 GEDCOM 文件，其中包含媒体文件名的完整路径。 这些路径将在 web 服务器上不存在。 若要允许 "
+"webtrees，找到该文件，必须删除路径的第一部分。"
 
 # I18N: Help text for the “Hit counters” configuration setting
 #. I18N: Help text for the “Hit counters” configuration setting
@@ -19050,7 +19055,7 @@ msgstr "水印缩略图存储服务器"
 #: resources/views/modules/stories/edit.phtml:4
 #: app/Module/StoriesModule.php:195,
 msgid "Stories"
-msgstr "传记"
+msgstr "人物传记"
 
 #: app/Module/StoriesModule.php:237
 #: resources/views/modules/stories/edit.phtml:31
@@ -19428,7 +19433,7 @@ msgstr "泰国"
 
 #: help_text.php:219 resources/views/help/name.phtml:4
 msgid "The <b>name</b> field contains the individual’s full name, as they would have spelled it or as it was recorded. This is how it will be displayed on screen. It uses standard genealogy annotations to identify different parts of the name."
-msgstr "<b>名称</b>栏包含个人的全名，可能是拼写或是记录。如何将其显示在屏幕上，决定于当地名字的结构。"
+msgstr "<b>姓名</b>栏包含个人的全名，可能是拼写或是记录。如何将其显示在屏幕上，决定于当地姓名结构。"
 
 #: help_text.php:239 resources/views/help/surname.phtml:4
 msgid "The <b>surname</b> field contains a name that is used for sorting and grouping. It can be different to the individual’s actual surname which is always taken from the <b>name</b> field. This field can be used to sort surnames with or without a prefix (Gogh / van Gogh) and to group spelling variations or inflections (Kowalski / Kowalska). If an individual needs to be listed under more than one surname, each name should be separated by a comma."
@@ -19728,12 +19733,12 @@ msgstr "已更新“%1$s”到“%2$s”的链接。"
 #: app/Http/Controllers/EditMediaController.php:250,
 #, php-format
 msgid "The media file %1$s could not be renamed to %2$s."
-msgstr "多媒体文件 %1$s 不能被重命名为 %2$s。"
+msgstr "媒体文件 %1$s 不能被重命名为 %2$s。"
 
 #: addmedia.php:342 app/Http/Controllers/EditMediaController.php:260
 #, php-format
 msgid "The media file %1$s has been renamed to %2$s."
-msgstr "多媒体文件 %1$s 成功重命名为 %2$s。"
+msgstr "媒体文件 %1$s 成功重命名为 %2$s。"
 
 #: addmedia.php:349
 msgid "The media file %s does not exist."
@@ -19916,7 +19921,7 @@ msgstr "已达到服务器的访问限制。"
 #: app/Module/FamilyTreeStatisticsModule.php:42
 #: app/Module/FamilyTreeStatisticsModule.php:60
 msgid "The size of the family tree, earliest and latest events, common names, etc."
-msgstr "家谱的大小，最早、最新事件，常见的名字等。"
+msgstr "家谱的大小，最早、最新事件，常见的姓名等。"
 
 #: help_text.php:222 resources/views/help/name.phtml:9
 #, php-format
@@ -20094,7 +20099,7 @@ msgstr "这有个人没有事件。"
 
 #: app/Module/MediaTabModule.php:76 resources/views/modules/media/tab.phtml:16
 msgid "There are no media objects for this individual."
-msgstr "这个人没有多媒体文件。"
+msgstr "这个人没有媒体文件。"
 
 #: app/Module/NotesTabModule.php:90 resources/views/modules/notes/tab.phtml:26
 msgid "There are no notes for this individual."
@@ -20297,14 +20302,14 @@ msgstr "本文件被服务器上的另一个家谱数据库调用。它不能被
 #. I18N: Help text for the "Data folder" site configuration setting
 #: admin_site_config.php:186 resources/views/admin/site-preferences.phtml:21
 msgid "This folder will be used by webtrees to store media files, GEDCOM files, temporary files, etc. These files may contain private data, and should not be made available over the internet."
-msgstr "此文件夹将被用来存储多媒体文件，GEDCOM文件，临时文件等等。这些文件可能包含私人数据，并且不应该在互联网上提供。"
+msgstr "此文件夹将被用来存储媒体文件，GEDCOM文件，临时文件等等。这些文件可能包含私人数据，并且不应该在互联网上提供。"
 
 # I18N: Help text for the “Media folder” configuration setting
 #. I18N: Help text for the “Media folder” configuration setting
 #: admin_trees_config.php:1006
 #: resources/views/admin/trees-preferences.phtml:256
 msgid "This folder will be used to store the media files for this family tree."
-msgstr "此文件夹将用于存储多媒体文件。"
+msgstr "此文件夹将用于存储媒体文件。"
 
 #: app/Filter.php:480 app/Http/Middleware/CheckCsrf.php:56
 msgid "This form has expired. Try again."
@@ -20460,28 +20465,36 @@ msgstr "这是 webtrees 的最新版本。 没有可用的升级。"
 #: admin_trees_config.php:1757
 #: resources/views/admin/trees-preferences.phtml:738
 msgid "This is the list of GEDCOM facts that your users can add to families. You can modify this list by removing or adding fact names, even custom ones, as necessary. Fact names that appear in this list must not also appear in the “Unique family facts” list."
-msgstr "这是用户可以添加到家庭中的GEDCOM事件清单。你可以通过删除或添加这些事件名字，甚至可以自定义。在这个清单中的事件，不能同时出现在家庭事件<i>唯一事件</i> 列表中。"
+msgstr ""
+"这是用户可以添加到家庭中的GEDCOM事件清单。你可以通过删除或添加这些事件名称，甚至可以自定义。在这个清单中的事件，不能同时出现在家庭事件<i>唯一事件"
+"</i> 列表中。"
 
 # I18N: Help text for the “All individual facts” configuration setting
 #. I18N: Help text for the “All individual facts” configuration setting
 #: admin_trees_config.php:1639
 #: resources/views/admin/trees-preferences.phtml:684
 msgid "This is the list of GEDCOM facts that your users can add to individuals. You can modify this list by removing or adding fact names, even custom ones, as necessary. Fact names that appear in this list must not also appear in the “Unique individual facts” list."
-msgstr "这是用户可以添加到个人中的GEDCOM事件清单。你可以通过删除或添加此清单上的事件名字，甚至可以自定义。在这个清单中的事件，不能同时出现在个人事件<i>唯一事件</i> 清单。"
+msgstr ""
+"这是用户可以添加到个人中的GEDCOM事件清单。你可以通过删除或添加此清单上的事件名称，甚至可以自定义。在这个清单中的事件，不能同时出现在个人事件<i>唯"
+"一事件</i> 清单。"
 
 # I18N: Help text for the “All repository facts” configuration setting
 #. I18N: Help text for the “All repository facts” configuration setting
 #: admin_trees_config.php:1964
 #: resources/views/admin/trees-preferences.phtml:833
 msgid "This is the list of GEDCOM facts that your users can add to repositories. You can modify this list by removing or adding fact names, even custom ones, as necessary. Fact names that appear in this list must not also appear in the “Unique repository facts” list."
-msgstr "用户可以添加到库中的GEDCOM事件清单。你可以通过删除或添加此清单上的事件名字，甚至可以自定义。在这个清单中的事件，不能同时出现在库事件<i>唯一事件</i> 列表。"
+msgstr ""
+"用户可以添加到库中的GEDCOM事件清单。你可以通过删除或添加此清单上的事件名称，甚至可以自定义。在这个清单中的事件，不能同时出现在库事件<i>唯一事件<"
+"/i> 列表。"
 
 # I18N: Help text for the “All source facts” configuration setting
 #. I18N: Help text for the “All source facts” configuration setting
 #: admin_trees_config.php:1875
 #: resources/views/admin/trees-preferences.phtml:792
 msgid "This is the list of GEDCOM facts that your users can add to sources. You can modify this list by removing or adding fact names, even custom ones, as necessary. Fact names that appear in this list must not also appear in the “Unique source facts” list."
-msgstr "用户可以添加到来源中的GEDCOM事件清单。你可以通过删除或添加此清单上的事件名字，甚至可以自定义。在这个清单中的事件，不能同时出现在来源事件<i>唯一事件</i> 列表。"
+msgstr ""
+"用户可以添加到来源中的GEDCOM事件清单。你可以通过删除或添加此清单上的事件名称，甚至可以自定义。在这个清单中的事件，不能同时出现在来源事件<i>唯一事"
+"件</i> 列表。"
 
 # I18N: Help text for the “Unique family facts” configuration setting
 #. I18N: Help text for the “Unique family facts” configuration setting
@@ -20495,7 +20508,9 @@ msgstr "用户只能在家庭添加<u>一次</u>的GEDCOM事件清单。例如�
 #: admin_trees_config.php:1668
 #: resources/views/admin/trees-preferences.phtml:697
 msgid "This is the list of GEDCOM facts that your users can only add once to individuals. For example, if BIRT is in this list, users will not be able to add more than one BIRT record to an individual. Fact names that appear in this list must not also appear in the “All individual facts” list."
-msgstr "这是用户只能为个人添加<u>一次</u>的GEDCOM事件清单。例如，如果数据是在这个清单中，用户将无法为一个人添加多个报表记录。事件的名字在这个清单，就不能同时出现在个人事件<i>添加事件</i> 清单。"
+msgstr ""
+"这是用户只能为个人添加<u>一次</u>的GEDCOM事件清单。例如，如果是在这个清单中的数据，用户将无法为一个人添加多个报表记录。在这个清单的事件名称，"
+"就不能同时出现在个人事件<i>添加事件</i> 清单。"
 
 # I18N: Help text for the “Unique repository facts” configuration setting
 #. I18N: Help text for the “Unique repository facts” configuration setting
@@ -20509,7 +20524,9 @@ msgstr "用户只能为库添加<u>一次</u>的GEDCOM事件清单。例如，�
 #: admin_trees_config.php:1904
 #: resources/views/admin/trees-preferences.phtml:805
 msgid "This is the list of GEDCOM facts that your users can only add once to sources. For example, if TITL is in this list, users will not be able to add more than one TITL record to a source. Fact names that appear in this list must not also appear in the “All source facts” list."
-msgstr "用户只能为来源添加<u>一次</u>的GEDCOM事件清单。例如，如果TITL在这个清单中，用户将无法添加多个TITL记录到一个来源。在这个清单事实的名字，就不能同时出现在来源事件<i>添加事件</i> 清单。"
+msgstr ""
+"用户只能为来源添加<u>一次</u>的GEDCOM事件清单。例如，如果TITL在这个清单中，用户将无法添加多个TITL记录到一个来源。在这个清单中的事实，"
+"就不能同时出现在来源事件<i>添加事件</i> 清单。"
 
 # I18N: Help text for the “Server name” site configuration setting
 #. I18N: Help text for the “Server name” site configuration setting
@@ -20566,29 +20583,29 @@ msgstr "这是私人信息,不能显示。"
 #: app/Exceptions/MediaNotFoundException.php:33
 #: app/Exceptions/MediaAccessDeniedException.php:33,
 msgid "This media object does not exist or you do not have permission to view it."
-msgstr "该多媒体文件不存在，或者您没有权限查看它。"
+msgstr "该媒体文件不存在，或者您没有权限查看它。"
 
 #: mediaviewer.php:45 resources/views/media-page.phtml:26
 msgid "This media object has been deleted. The deletion will need to be reviewed by a moderator."
-msgstr "这个多媒体文件已被删除。删除需要主编审批后，方可生效。"
+msgstr "这个媒体文件已被删除。删除需要主编审批后，方可生效。"
 
 # I18N: %1$s is “accept”, %2$s is “reject”. These are links.
 #. I18N: %1$s is “accept”, %2$s is “reject”. These are links.
 #: mediaviewer.php:40 resources/views/media-page.phtml:24
 #, php-format
 msgid "This media object has been deleted. You should review the deletion and then %1$s or %2$s it."
-msgstr "这个多媒体文件已被删除。你应该检查此操作，然后决定是 %1$s 或 %2$s。"
+msgstr "这个媒体文件已被删除。你应该检查此操作，然后决定是 %1$s 或 %2$s。"
 
 #: mediaviewer.php:55 resources/views/media-page.phtml:32
 msgid "This media object has been edited. The changes need to be reviewed by a moderator."
-msgstr "这个多媒体文件已经被编辑。更改需要主编审批后，方可生效。"
+msgstr "这个媒体文件已经被编辑。更改需要主编审批后，方可生效。"
 
 # I18N: %1$s is “accept”, %2$s is “reject”. These are links.
 #. I18N: %1$s is “accept”, %2$s is “reject”. These are links.
 #: mediaviewer.php:50 resources/views/media-page.phtml:30
 #, php-format
 msgid "This media object has been edited. You should review the changes and then %1$s or %2$s them."
-msgstr "这个多媒体文件已被删除。你应该检查此操作，然后决定是 %1$s 或 %2$s。"
+msgstr "这个媒体文件已被删除。你应该检查此操作，然后决定是 %1$s 或 %2$s。"
 
 #: admin_media.php:570 find.php:634
 msgid "This media object is not linked to any other record."
@@ -20655,14 +20672,14 @@ msgstr "此选项控制是否将附源引用的事实在记事和源标签在个
 #: admin_trees_config.php:1480
 #: resources/views/admin/trees-preferences.phtml:556
 msgid "This option controls whether or not to automatically display content of a <i>Note</i> record on the Individual page."
-msgstr "这个选项控制是否在个人页面自动显示一个<i>记录</i>。"
+msgstr "这个选项控制是否在个人页面上自动显示<i>记录</i>的内容。"
 
 # I18N: Help text for the “Automatically expand sources” configuration setting
 #. I18N: Help text for the “Automatically expand sources” configuration setting
 #: admin_trees_config.php:1495
 #: resources/views/admin/trees-preferences.phtml:572
 msgid "This option controls whether or not to automatically display content of a <i>Source</i> record on the Individual page."
-msgstr "这个选项控制是否在个人页面自动显示一个<i>来源</i>。"
+msgstr "这个选项控制是否在个人页面自动显示<i>来源</i>的内容。"
 
 # I18N: Help text for the “Age of parents next to child’s birthdate” configuration setting
 #. I18N: Help text for the “Age of parents next to child’s birthdate” configuration setting
@@ -20693,7 +20710,7 @@ msgstr "此选项定义谱系图应该产生横向还是纵向模式。"
 #: admin_trees_config.php:1036
 #: resources/views/admin/trees-preferences.phtml:287
 msgid "This option will make it easier for users to download images."
-msgstr "多媒体查看器可以显示一个链接，点击后，将下载的多媒体文件到本地电脑。<br><br>因为安全原因你可能想要隐藏下载链接。"
+msgstr "多媒体查看器可以显示一个链接，点击后，将下载的媒体文件到本地电脑。<br><br>因为安全原因你可能想要隐藏下载链接。"
 
 # I18N: Help text for the “Show private relationships” configuration setting
 #. I18N: Help text for the “Show private relationships” configuration setting
@@ -21186,7 +21203,7 @@ msgstr "汤加"
 #, php-format
 msgid "Top %s given name"
 msgid_plural "Top %s given names"
-msgstr[0] "最普及的 %s 个名字"
+msgstr[0] "最常用的 %s 个名"
 
 # I18N: Title for a list of the most common surnames, %s is a number. Note that a separate translation exists when %s is 1
 #. I18N: Title for a list of the most common surnames, %s is a number. Note that a separate translation exists when %s is 1
@@ -21200,7 +21217,7 @@ msgstr[0] "前 %s 的姓氏"
 #. I18N: i.e. most popular given name.
 #: app/Module/TopGivenNamesModule.php:71 app/Module/TopGivenNamesModule.php:99
 msgid "Top given name"
-msgstr "最普及的名字"
+msgstr "最常用的名"
 
 # I18N: Name of a module. Top=Most common
 #. I18N: Name of a module. Top=Most common
@@ -21209,7 +21226,7 @@ msgstr "最普及的名字"
 #: resources/views/statistics/individuals/names.phtml:53
 #: app/Module/TopGivenNamesModule.php:45,
 msgid "Top given names"
-msgstr "最普及的名字"
+msgstr "最常用的名"
 
 #: app/Module/GoogleMapsModule.php:3944 app/Module/GoogleMapsModule.php:4020
 #: placelist.php:107
@@ -21494,7 +21511,7 @@ msgstr "特立尼达和多巴哥"
 #. I18N: Location of an LDS church temple
 #: app/GedcomCode/GedcomCodeTemp.php:375
 msgid "Trujillo, Peru"
-msgstr ""
+msgstr "特鲁希略, 秘鲁"
 
 # I18N: abbreviation for Tuesday
 #. I18N: abbreviation for Tuesday
@@ -21548,7 +21565,7 @@ msgstr "图斯特拉-古铁雷斯,墨西哥"
 #. I18N: Location of an LDS church temple
 #: app/GedcomCode/GedcomCodeTemp.php:377
 msgid "Twin Falls, Idaho, United States"
-msgstr ""
+msgstr "双子瀑布, 爱达荷州, 美国"
 
 # I18N: gedcom tag TYPE
 #. I18N: gedcom tag TYPE
@@ -21863,11 +21880,11 @@ msgstr "導入地理數據"
 #: resources/views/admin/control-panel.phtml:494
 #: app/Http/Controllers/Admin/MediaController.php:496,
 msgid "Upload media files"
-msgstr "上传多媒体文件"
+msgstr "上传媒体文件"
 
 #: admin_media_upload.php:187 resources/views/admin/media-upload.phtml:8
 msgid "Upload one or more media files from your local computer. Media files can be pictures, video, audio, or other formats."
-msgstr "从您的本地计算机上上传一个或多个多媒体文件。多媒体文件可以是图片，视频，音频，或其他格式。"
+msgstr "从您的本地计算机上上传一个或多个媒体文件。媒体文件可以是图片，视频，音频，或其他格式。"
 
 # I18N: Name of a country or state
 #. I18N: Name of a country or state
@@ -22111,7 +22128,7 @@ msgstr "乌兹别克斯坦"
 #. I18N: Location of an LDS church temple
 #: app/GedcomCode/GedcomCodeTemp.php:379
 msgid "Vancouver, British Columbia, Canada"
-msgstr ""
+msgstr "温哥华, 不列颠哥伦比亚省, 加拿大"
 
 # I18N: Name of a country or state
 #. I18N: Name of a country or state
@@ -22542,7 +22559,7 @@ msgstr "网站地图中将包含哪个家谱"
 #: admin_trees_config.php:1018
 #: resources/views/admin/trees-preferences.phtml:268
 msgid "Who can upload new media files"
-msgstr "谁可以上传新的多媒体文件"
+msgstr "谁可以上传新的媒体文件"
 
 # I18N: Name of a module. (A list of users who are online now)
 #. I18N: Name of a module. (A list of users who are online now)
@@ -22624,12 +22641,12 @@ msgstr "妻子的年龄"
 #: app/Module/BatchUpdate/BatchUpdateMarriedNamesPlugin.php:160
 #: app/Module/BatchUpdate/BatchUpdateMarriedNamesPlugin.php:200
 msgid "Wife’s maiden surname becomes new given name"
-msgstr "妻子的娘家姓成为新的姓"
+msgstr "妻子的娘家姓成为新的名字"
 
 #: app/Module/BatchUpdate/BatchUpdateMarriedNamesPlugin.php:158
 #: app/Module/BatchUpdate/BatchUpdateMarriedNamesPlugin.php:198
 msgid "Wife’s surname replaced by husband’s surname"
-msgstr "妻子的姓由丈夫的姓代替"
+msgstr "妻子的姓氏被丈夫的姓氏所取代"
 
 #: app/Module/BatchUpdate/BatchUpdateSearchReplacePlugin.php:164
 #: app/Module/BatchUpdate/BatchUpdateSearchReplacePlugin.php:198
@@ -22794,7 +22811,7 @@ msgstr "您可以从%s下载GEDCOM规范的副本。"
 #: app/Module/BatchUpdate/BatchUpdateMarriedNamesPlugin.php:44
 #: app/Module/BatchUpdate/BatchUpdateMarriedNamesPlugin.php:51
 msgid "You can make it easier to search for married women by recording their married name. However not all women take their husband’s surname, so beware of introducing incorrect information into your database."
-msgstr "您可以更容易地搜索已婚妇女如果记录他们的婚姻名。但是不是所有的女人需要随丈夫的姓，所以要当心输入不正确的信息到你的数据库中。"
+msgstr "通过记录已婚女性的姓名，可以更容易地搜索她们。然而，并不是所有的女人都用丈夫的姓，所以要小心不要把不正确的信息写入你的数据库。"
 
 #: admin_site_upgrade.php:137
 msgid "You can re-enable these modules after the upgrade."
@@ -22825,7 +22842,7 @@ msgstr "您可以为特定的记录、事实或事件添加限制访问权限。
 #: app/Module/BatchUpdate/BatchUpdateMissingDeathPlugin.php:40
 #: app/Module/BatchUpdate/BatchUpdateMissingDeathPlugin.php:46
 msgid "You can speed up the privacy calculations by adding a death record to individuals whose death can be inferred from other dates, but who do not have a record of death, burial, cremation, etc."
-msgstr "虽然没有去世，埋葬，火化等记录，你仍然可以通过添加其他可以推断个人去世日期的信息，来加快隐私计算。"
+msgstr "虽然没有去世，埋葬，火化等记录，你可以从其他日期中推断出其已死亡并添加死亡记录来加快隐私计算。"
 
 #: admin_site_access.php:66
 msgid "You cannot create a rule which would prevent yourself from accessing the website."
@@ -22919,7 +22936,7 @@ msgstr "只有家族成员才可以访问网站。"
 
 #: login.php:173 app/Http/Controllers/Auth/LoginController.php:85
 msgid "You need to be an authorized user to access this website."
-msgstr "必须通过验证才可以访问网站。"
+msgstr "必须经过管理员批准后才可访问。"
 
 #: admin_trees_manage.php:320 resources/views/admin/trees.phtml:19
 msgid "You need to create a family tree."
@@ -23018,7 +23035,7 @@ msgstr "您的收集箱是空的。"
 #: resources/views/setup/step-5-administrator.phtml:32
 #: resources/views/contact-page.phtml:22,
 msgid "Your name"
-msgstr "你的名字"
+msgstr "你的姓名"
 
 #. I18N: %s is a server name/URL
 #: login.php:350 app/Http/Controllers/Auth/RegisterController.php:151
@@ -23877,7 +23894,7 @@ msgstr "第八代堂兄(妹)"
 
 #: app/Functions/Functions.php:763 app/Functions/Functions.php:699
 msgid "elder brother"
-msgstr "兄"
+msgstr "哥哥"
 
 #: app/Functions/Functions.php:797 app/Functions/Functions.php:741
 msgid "elder sibling"
@@ -23907,21 +23924,21 @@ msgstr "第十一代堂兄(妹)"
 #. I18N: A name given to an individual, from the farm or estate on which they lived or worked
 #: app/GedcomCode/GedcomCodeName.php:103 app/GedcomCode/GedcomCodeName.php:127
 msgid "estate name"
-msgstr "居住时的名字"
+msgstr "居住时的姓名"
 
 # I18N: A name given to an individual, from the farm or estate on which they lived or worked
 #. I18N: A name given to an individual, from the farm or estate on which they lived or worked
 #: app/GedcomCode/GedcomCodeName.php:100 app/GedcomCode/GedcomCodeName.php:123
 msgctxt "FEMALE"
 msgid "estate name"
-msgstr "居住时的名字"
+msgstr "居住时的姓名"
 
 # I18N: A name given to an individual, from the farm or estate on which they lived or worked
 #. I18N: A name given to an individual, from the farm or estate on which they lived or worked
 #: app/GedcomCode/GedcomCodeName.php:97 app/GedcomCode/GedcomCodeName.php:118
 msgctxt "MALE"
 msgid "estate name"
-msgstr "居住时的名字"
+msgstr "居住时的姓名"
 
 # I18N: Gedcom EST dates
 #. I18N: Gedcom EST dates
@@ -26755,21 +26772,21 @@ msgstr "拒绝"
 #. I18N: A name taken when entering a religion or a religious order
 #: app/GedcomCode/GedcomCodeName.php:144 app/GedcomCode/GedcomCodeName.php:174
 msgid "religious name"
-msgstr "宗教名字"
+msgstr "宗教名称"
 
 # I18N: A name taken when entering a religion or a religious order
 #. I18N: A name taken when entering a religion or a religious order
 #: app/GedcomCode/GedcomCodeName.php:141 app/GedcomCode/GedcomCodeName.php:170
 msgctxt "FEMALE"
 msgid "religious name"
-msgstr "宗教名字"
+msgstr "宗教名称"
 
 # I18N: A name taken when entering a religion or a religious order
 #. I18N: A name taken when entering a religion or a religious order
 #: app/GedcomCode/GedcomCodeName.php:138 app/GedcomCode/GedcomCodeName.php:165
 msgctxt "MALE"
 msgid "religious name"
-msgstr "宗教名字"
+msgstr "宗教名称"
 
 # I18N: A button label.
 #. I18N: A button label.
@@ -28050,7 +28067,7 @@ msgstr "…"
 #: indilist.php:230
 msgctxt "Unknown given name"
 msgid "…"
-msgstr ""
+msgstr "…"
 
 #: app/Family.php:353 app/Family.php:369 app/Individual.php:1213
 #: app/Individual.php:1303 app/Module/FamiliesSidebarModule.php:153
@@ -28059,4 +28076,4 @@ msgstr ""
 #: famlist.php:140 indilist.php:83 indilist.php:108 indilist.php:140
 msgctxt "Unknown surname"
 msgid "…"
-msgstr ""
+msgstr "…"
