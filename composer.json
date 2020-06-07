@@ -24,63 +24,70 @@
 		}
 	},
 	"require" : {
-		"ext-gd": "*",
-		"ext-iconv": "*",
-		"ext-mbstring": "*",
-        	"ext-json": "*",
-		"ext-pcre": "*",
-		"ext-pdo": "*",
-		"ext-pdo_mysql": "*",
-		"ext-session": "*",
-		"ext-simplexml": "*",
-		"ext-xml": "*",
-        "ezyang/htmlpurifier": "~4.12",
-		"fisharebest/algorithm": "~1.5",
-        "fisharebest/ext-calendar": "~2.5",
-        "fisharebest/localization": "~1.15",
-        "fisharebest/php-polyfill": "~1.7",
-		"jon48/webtrees-lib" : "dev-master",		
+		"ext-gd" : "*",
+		"ext-iconv" : "*",
+		"ext-mbstring" : "*",
+		"ext-json" : "*",
+		"ext-pcre" : "*",
+		"ext-pdo" : "*",
+		"ext-pdo_mysql" : "*",
+		"ext-session" : "*",
+		"ext-simplexml" : "*",
+		"ext-xml" : "*",
+		"ezyang/htmlpurifier" : "~4.12",
+		"fisharebest/algorithm" : "~1.5",
+		"fisharebest/ext-calendar" : "~2.5",
+		"fisharebest/localization" : "~1.15",
+		"fisharebest/php-polyfill" : "~1.7",
+		"jon48/webtrees-lib" : "dev-master",
 		"jon48/webtrees-theme-rural" : "dev-master-geneajaubart",
-        "michelf/php-markdown": "~1.9",
-		"lutana/pclzip": "2.8.2.1",
-		"ramsey/uuid": "~2.9",
-        "swiftmailer/swiftmailer": "~5.4",
-        "tecnickcom/tcpdf": "~6.3",
-        "symfony/http-foundation": "^2.8",
+		"michelf/php-markdown" : "~1.9",
+		"lutana/pclzip" : "2.8.2.1",
+		"ramsey/uuid" : "~2.9",
+		"swiftmailer/swiftmailer" : "~5.4",
+		"tecnickcom/tcpdf" : "~6.3",
+		"symfony/http-foundation" : "^2.8",
 		"twbs/bootstrap" : "3.3.*",
 		"oomphinc/composer-installers-extender" : "~1.1"
 	},
 	"require-dev" : {
 		"jon48/webtrees-tools" : "dev-master",
 		"mockery/mockery" : "*",
-        "phpunit/phpunit": "<6.0",
-		"php-coveralls/php-coveralls": "*"
+		"phpunit/phpunit" : "<6.0",
+		"php-coveralls/php-coveralls" : "*",
+		"consolidation/robo" : "^2.1"
 	},
-    "scripts": {
-       "webtrees:build": [
-           "@composer webtrees:mo",
-           "git checkout language/en-US.mo",
-           "rm -Rf webtrees/",
-           "git archive --prefix=webtrees/ HEAD --format=tar | tar -x",
-           "cp language/*.mo webtrees/language/",
-           "echo npm install -g uglify-js",
-           "echo npm install -g uglifycss",
-           "find webtrees -name '*.js' ! -name '*.min.js' -exec uglifyjs -o {}.OUT {} \\; -exec rm {} \\;  -exec mv {}.OUT {} \\;",
-           "find webtrees -name '*.css' ! -name '*.min.css' -exec uglifycss --output {}.OUT {} \\; -exec rm {} \\;  -exec mv {}.OUT {} \\;",
-           "zip --quiet --recurse-paths --move -9 webtrees.zip webtrees"
-       ],
-        "webtrees:mo": [
-            "for FILE in language/*.po; do msgfmt --output=$(dirname $FILE)/$(basename $FILE .po).mo $FILE; done",
-            "rm -Rf data/cache/language*"
+	"scripts" : {
+        "webtrees-geneajaubart:package": [
+            "./vendor/bin/robo package"
         ],
-        "webtrees:po": [
-            "sed -i.bak -e 's/\\(I18N::[^)]*[)]\\)/<?php echo \\1; ?>/g' modules*/*/*.xml",
-            "git grep -I --name-only --fixed-strings -e I18N:: -- '*.php' '*.xml' | xargs xgettext --package-name=webtrees --package-version=1.0 --msgid-bugs-address=i18n@webtrees.net --output=language/webtrees.pot --no-wrap --language=PHP --add-comments=I18N --from-code=utf-8 --keyword --keyword=translate:1 --keyword=translateContext:1c,2 --keyword=plural:1,2",
-            "find modules*/ -name '*.xml' -exec mv {}.bak {} \\;",
-            "find language -name '*.po' -exec msgmerge --no-wrap --sort-output --no-fuzzy-matching --quiet --output={} {} language/webtrees.pot \\;"
-        ]
-    },
-    "extra" : {
+		"webtrees:build" : [
+			"@composer webtrees:mo",
+			"git checkout language/en-US.mo",
+			"rm -Rf webtrees/",
+			"git archive --prefix=webtrees/ HEAD --format=tar | tar -x",
+			"cp language/*.mo webtrees/language/",
+			"echo npm install -g uglify-js",
+			"echo npm install -g uglifycss",
+			"find webtrees -name '*.js' ! -name '*.min.js' -exec uglifyjs -o {}.OUT {} \\; -exec rm {} \\;  -exec mv {}.OUT {} \\;",
+			"find webtrees -name '*.css' ! -name '*.min.css' -exec uglifycss --output {}.OUT {} \\; -exec rm {} \\;  -exec mv {}.OUT {} \\;",
+			"zip --quiet --recurse-paths --move -9 webtrees.zip webtrees"
+		],
+		"webtrees:mo" : [
+			"for FILE in language/*.po; do msgfmt --output=$(dirname $FILE)/$(basename $FILE .po).mo $FILE; done",
+			"rm -Rf data/cache/language*"
+		],
+		"webtrees:po" : [
+			"sed -i.bak -e 's/\\(I18N::[^)]*[)]\\)/<?php echo \\1; ?>/g' modules*/*/*.xml",
+			"git grep -I --name-only --fixed-strings -e I18N:: -- '*.php' '*.xml' | xargs xgettext --package-name=webtrees --package-version=1.0 --msgid-bugs-address=i18n@webtrees.net --output=language/webtrees.pot --no-wrap --language=PHP --add-comments=I18N --from-code=utf-8 --keyword --keyword=translate:1 --keyword=translateContext:1c,2 --keyword=plural:1,2",
+			"find modules*/ -name '*.xml' -exec mv {}.bak {} \\;",
+			"find language -name '*.po' -exec msgmerge --no-wrap --sort-output --no-fuzzy-matching --quiet --output={} {} language/webtrees.pot \\;"
+		]
+	},
+	"scripts-descriptions": {
+        "webtrees-geneajaubart:package": "Create a package file for distribution. Add `-- version commit` for creating a versioned archive against a specific commit."
+	},
+	"extra" : {
 		"installer-types" : [
 			"webtrees-theme"
 		],

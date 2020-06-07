@@ -14,6 +14,8 @@ phpdoc.xml     export-ignore
 phpunit.xml*    export-ignore
 tests/         export-ignore
 
+RoboFile.php	export-ignore
+
 themes/rural/less/          export-ignore
 themes/rural/css-*/images/*.psd    export-ignore
 language/*.po	export-ignore
