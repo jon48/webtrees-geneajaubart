@@ -22,8 +22,8 @@ implemented for the [GeneaJaubart website](http://genea.jaubart.com/wt/).
 ### License
 
 * **webtrees-geneajaubart: webtrees for the GeneaJaubart website**
-* Copyright (C) 2009 to 2019 Jonathan Jaubart.
-* Derived from **webtrees** - Copyright (C) 2010 to 2018  webtrees development team.
+* Copyright (C) 2009 to 2020 Jonathan Jaubart.
+* Derived from **webtrees** - Copyright (C) 2010 to 2020  webtrees development team.
 * Derived from PhpGedView - Copyright (C) 2002 to 2010  PGV Development Team.
 
 This program is free software; you can redistribute it and/or modify it under the
