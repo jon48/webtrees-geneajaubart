@@ -1,0 +1,40 @@
+<?php
+
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\DeletePath;
+use Fisharebest\Webtrees\I18N;
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), $title]]) ?>
+
+<h1><?= $title ?></h1>
+
+<p>
+    <?= I18N::translate('Files marked with %s are required for proper operation and cannot be removed.', view('icons/ban')) ?>
+</p>
+
+<form method="post">
+    <input type="hidden" value="admin-clean-data">
+    <?= csrf_field() ?>
+
+    <ul class="fa-ul">
+        <?php foreach ($entries as $entry) : ?>
+            <li>
+                <?php if (substr_compare($entry, '/', -1) === 0) : ?>
+                    <?= view('icons/folder') ?>
+                <?php else : ?>
+                     <?= view('icons/file') ?>
+                <?php endif ?>
+                <?= e($entry) ?>
+                <?php if (in_array($entry, $protected, true)) : ?>
+                    <?= view('icons/ban') ?>
+                <?php else : ?>
+                    <a href="#" data-post-url="<?= e(route(DeletePath::class, ['path' => $entry])) ?>" class="btn btn-sm btn-link">
+                        <?= view('icons/delete') ?>
+                    </a>
+                <?php endif ?>
+            </li>
+        <?php endforeach ?>
+    </ul>
+</form>

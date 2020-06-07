@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\SurnameTradition;
 
 /**
@@ -21,23 +25,23 @@ namespace Fisharebest\Webtrees\SurnameTradition;
 class DefaultSurnameTradition implements SurnameTraditionInterface
 {
     /** Extract a GIVN from a NAME */
-    const REGEX_GIVN = '~^(?<GIVN>[^/ ]+)~';
+    protected const REGEX_GIVN = '~^(?<GIVN>[^/ ]+)~';
 
     /** Extract a SPFX and SURN from a NAME */
-    const REGEX_SPFX_SURN = '~(?<NAME>/(?<SPFX>[a-z’\']{0,4}(?: [a-z’\']{1,4})*) ?(?<SURN>[^/]*)/)~';
+    protected const REGEX_SPFX_SURN = '~(?<NAME>/(?<SPFX>[a-z’\']{0,4}(?: [a-z’\']{1,4})*) ?(?<SURN>[^/]*)/)~';
 
     /** Extract a simple SURN from a NAME */
-    const REGEX_SURN = '~(?<NAME>/(?<SURN>[^/]+)/)~';
+    protected const REGEX_SURN = '~(?<NAME>/(?<SURN>[^/]+)/)~';
 
     /** Extract two Spanish/Portuguese SURNs from a NAME */
-    const REGEX_SURNS = '~/(?<SURN1>[^ /]+)(?: | y |/ /|/ y /)(?<SURN2>[^ /]+)/~';
+    protected const REGEX_SURNS = '~/(?<SURN1>[^ /]+)(?: | y |/ /|/ y /)(?<SURN2>[^ /]+)/~';
 
     /**
      * Does this surname tradition change surname at marriage?
      *
      * @return bool
      */
-    public function hasMarriedNames()
+    public function hasMarriedNames(): bool
     {
         return false;
     }
@@ -47,7 +51,7 @@ class DefaultSurnameTradition implements SurnameTraditionInterface
      *
      * @return bool
      */
-    public function hasSurnames()
+    public function hasSurnames(): bool
     {
         return true;
     }
@@ -61,11 +65,11 @@ class DefaultSurnameTradition implements SurnameTraditionInterface
      *
      * @return string[] Associative array of GEDCOM name parts (SURN, _MARNM, etc.)
      */
-    public function newChildNames($father_name, $mother_name, $child_sex)
+    public function newChildNames(string $father_name, string $mother_name, string $child_sex): array
     {
-        return array(
+        return [
             'NAME' => '//',
-        );
+        ];
     }
 
     /**
@@ -76,11 +80,11 @@ class DefaultSurnameTradition implements SurnameTraditionInterface
      *
      * @return string[] Associative array of GEDCOM name parts (SURN, _MARNM, etc.)
      */
-    public function newParentNames($child_name, $parent_sex)
+    public function newParentNames(string $child_name, string $parent_sex): array
     {
-        return array(
+        return [
             'NAME' => '//',
-        );
+        ];
     }
 
     /**
@@ -91,10 +95,10 @@ class DefaultSurnameTradition implements SurnameTraditionInterface
      *
      * @return string[] Associative array of GEDCOM name parts (SURN, _MARNM, etc.)
      */
-    public function newSpouseNames($spouse_name, $spouse_sex)
+    public function newSpouseNames(string $spouse_name, string $spouse_sex): array
     {
-        return array(
+        return [
             'NAME' => '//',
-        );
+        ];
     }
 }

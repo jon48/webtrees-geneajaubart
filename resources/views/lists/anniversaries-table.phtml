@@ -1,0 +1,79 @@
+<?php
+
+use Fisharebest\Webtrees\Fact;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\View;
+use Illuminate\Support\Collection;
+
+/**
+ * @var Collection<Fact> $facts
+ * @var int              $limit_high
+ * @var int              $limit_low
+ * @var array<mixed>     $order
+ */
+
+?>
+
+<div class="table-responsive">
+    <table
+        class="table table-sm datatable wt-table-events"
+        <?= view('lists/datatables-attributes') ?>
+        <?php if ($facts->count() < e($limit_high)) : ?>
+            data-paging="false"
+        <?php endif ?>
+        data-filter="false"
+        data-info="false"
+        data-length-change="false"
+        data-page-length="<?= e($limit_low) ?>"
+        data-order="<?= e(json_encode($order ?? [])) ?>"
+    >
+        <thead>
+            <tr>
+                <th>
+                    <?= I18N::translate('Record') ?>
+                </th>
+                <th>
+                    <?= I18N::translate('Date') ?>
+                </th>
+                <th>
+                    <?= view('icons/anniversary') ?>
+                    <span class="sr-only"><?= I18N::translate('Anniversary') ?></span>
+                </th>
+                <th>
+                    <?= I18N::translate('Event') ?>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($facts as $fact) : ?>
+                <?php $record = $fact->record(); ?>
+                <tr>
+                    <td data-sort="<?= e($record->sortName()) ?>">
+                        <a href="<?= e($record->url()) ?>">
+                            <?= $record->fullName() ?>
+                        </a>
+                        <?php if ($record instanceof Individual) : ?>
+                            <small><?= view('icons/sex', ['sex' => $record->sex()]) ?></small>
+                        <?php endif ?>
+                    </td>
+                    <td data-sort="<?= $fact->jd ?>">
+                        <?= $fact->date()->display(true) ?>
+                    </td>
+                    <td data-sort="<?= $fact->anniv ?>">
+                        <?= $fact->anniv ?>
+                    </td>
+                    <td data-sort="<?= $fact->label() ?>">
+                        <?= $fact->label() ?>
+                    </td>
+                </tr>
+            <?php endforeach ?>
+        </tbody>
+    </table>
+</div>
+
+<?php View::push('javascript') ?>
+<script>
+  $(".wt-table-events").dataTable();
+</script>
+<?php View::endpush() ?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,57 +14,45 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Menu;
 
 /**
  * Class OccupationReportModule
  */
 class OccupationReportModule extends AbstractModule implements ModuleReportInterface
 {
-    /** {@inheritdoc} */
-    public function getTitle()
-    {
-        // This text also appears in the .XML file - update both together
-        return /* I18N: Name of a report */ I18N::translate('Occupations');
-    }
+    use ModuleReportTrait;
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    /** @var int The default access level for this module.  It can be changed in the control panel. */
+    protected $access_level = Auth::PRIV_USER;
+
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
     {
         // This text also appears in the .XML file - update both together
-        return /* I18N: Description of the “Occupations” module */ I18N::translate('A report of individuals who had a given occupation.');
+        /* I18N: Name of a report */
+        return I18N::translate('Occupations');
     }
 
     /**
-     * What is the default access level for this module?
+     * A sentence describing what this module does.
      *
-     * Some modules are aimed at admins or managers, and are not generally shown to users.
-     *
-     * @return int
+     * @return string
      */
-    public function defaultAccessLevel()
+    public function description(): string
     {
-        return Auth::PRIV_USER;
-    }
-
-    /**
-     * Return a menu item for this report.
-     *
-     * @return Menu
-     */
-    public function getReportMenu()
-    {
-        global $WT_TREE;
-
-        return new Menu(
-            $this->getTitle(),
-            'reportengine.php?ged=' . $WT_TREE->getNameUrl() . '&amp;action=setup&amp;report=' . WT_MODULES_DIR . $this->getName() . '/report.xml',
-            'menu-report-' . $this->getName(),
-            array('rel' => 'nofollow')
-        );
+        // This text also appears in the .XML file - update both together
+        /* I18N: Description of the “Occupations” module */
+        return I18N::translate('A report of individuals who had a given occupation.');
     }
 }

@@ -1,0 +1,93 @@
+<?php
+
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\I18N;
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route('modules') => I18N::translate('Modules'), $title]]) ?>
+
+<h1><?= $title ?></h1>
+
+<p>
+    <?= /* I18N: FAQ = “Frequently Asked Question” */
+    I18N::translate('FAQs are lists of questions and answers, which allow you to explain the site’s rules, policies, and procedures to your visitors. Questions are typically concerned with privacy, copyright, user-accounts, unsuitable content, requirement for source-citations, etc.') ?>
+    <?= I18N::translate('You may use HTML to format the answer and to add links to other websites.') ?>
+</p>
+
+<p>
+<form method="post" class="form form-inline">
+    <?= csrf_field() ?>
+
+    <label for="tree" class="sr-only">
+        <?= I18N::translate('Family tree') ?>
+    </label>
+    <?= view('components/select', ['name' => 'tree', 'selected' => $tree->name(), 'options' => $tree_names]) ?>
+    <input type="submit" class="btn btn-primary" value="<?= I18N::translate('show') ?>">
+</form>
+</p>
+
+<p>
+    <a href="<?= e(route('module', ['module' => 'faq', 'action' => 'AdminEdit', 'tree' => $tree->name()])) ?>" class="btn btn-link">
+        <?= view('icons/add') ?>
+        <?= /* I18N: FAQ = “Frequently Asked Question” */
+        I18N::translate('Add an FAQ') ?>
+    </a>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th><?= I18N::translate('Sort order') ?></th>
+            <th><?= I18N::translate('Family tree') ?></th>
+            <th><?= I18N::translate('Question') ?></th>
+            <th><?= I18N::translate('Move up') ?></th>
+            <th><?= I18N::translate('Move down') ?></th>
+            <th><?= I18N::translate('Edit') ?></th>
+            <th><?= I18N::translate('Delete') ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($faqs as $faq) : ?>
+            <tr class="faq_edit_pos">
+                <td>
+                    <?= I18N::number($faq->block_order + 1) ?>
+                </td>
+                <td>
+                    <?php if ($faq->gedcom_id === null) : ?>
+                        <?= I18N::translate('All') ?>
+                    <?php else : ?>
+                        <?= e($tree->title()) ?>
+                    <?php endif ?>
+                </td>
+                <td>
+                    <?= e($faq->header) ?>
+                </td>
+                <td>
+                    <?php if ($faq->block_order != $min_block_order) : ?>
+                        <a href="#" data-post-url="<?= e(route('module', ['module' => 'faq', 'action' => 'AdminMoveUp', 'block_id' => $faq->block_id])) ?>" class="btn btn-secondary">
+                            <?= view('icons/arrow-up') ?>
+                        </a>
+                    <?php endif ?>
+                </td>
+                <td>
+                    <?php if ($faq->block_order != $max_block_order) : ?>
+                        <a href="#" data-post-url="<?= e(route('module', ['module' => 'faq', 'action' => 'AdminMoveDown', 'block_id' => $faq->block_id])) ?>" class="btn btn-secondary">
+                        <?= view('icons/arrow-down') ?>
+                        </a>
+                    <?php endif ?>
+                </td>
+                <td>
+                    <a href="<?= e(route('module', ['module' => 'faq', 'action' => 'AdminEdit', 'block_id' => $faq->block_id, 'tree' => $tree->name()])) ?>" class="btn btn-primary">
+                        <?= view('icons/edit') ?>
+                    </a>
+                </td>
+                <td>
+                    <a href="#" data-post-url="<?= e(route('module', ['module' => 'faq', 'action' => 'AdminDelete', 'block_id' => $faq->block_id])) ?>" data-confirm="<?= I18N::translate('Are you sure you want to delete “%s”?', e($faq->header)) ?>" class="btn btn-danger">
+                        <?= view('icons/delete') ?>
+                    </a>
+                </td>
+            </tr>
+        <?php endforeach ?>
+    </tbody>
+</table>

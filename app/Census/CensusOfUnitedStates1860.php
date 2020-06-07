@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfUnitedStates1860 extends CensusOfUnitedStates implements CensusInt
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return 'BET JUN 1860 AND OCT 1860';
     }
@@ -35,9 +39,9 @@ class CensusOfUnitedStates1860 extends CensusOfUnitedStates implements CensusInt
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnFullName($this, 'Name', 'Name'),
             new CensusColumnAge($this, 'Age', 'Age'),
             new CensusColumnSexMF($this, 'Sex', 'Sex'),
@@ -50,6 +54,6 @@ class CensusOfUnitedStates1860 extends CensusOfUnitedStates implements CensusInt
             new CensusColumnNull($this, 'School', 'Attended school within the year'),
             new CensusColumnNull($this, 'R+W', 'Persons over 20 years of age who cannot read and write'),
             new CensusColumnNull($this, 'Infirm', 'Whether deaf and dumb, blind, insane, idiotic, pauper or convict'),
-        );
+        ];
     }
 }

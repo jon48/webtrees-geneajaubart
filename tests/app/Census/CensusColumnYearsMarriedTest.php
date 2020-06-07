@@ -14,127 +14,136 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 use Fisharebest\Webtrees\Date;
-use Mockery;
+use Fisharebest\Webtrees\Fact;
+use Fisharebest\Webtrees\Family;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\TestCase;
+use Illuminate\Support\Collection;
 
 /**
  * Test harness for the class CensusColumnYearsMarried
  */
-class CensusColumnYearsMarriedTest extends \PHPUnit_Framework_TestCase
+class CensusColumnYearsMarriedTest extends TestCase
 {
     /**
-     * Delete mock objects
+     * @covers \Fisharebest\Webtrees\Census\CensusColumnYearsMarried
+     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
+     *
+     * @return void
      */
-    public function tearDown()
+    public function testNoSpouseFamily(): void
     {
-        Mockery::close();
-    }
+        $individual = $this->createMock(Individual::class);
+        $individual->method('spouseFamilies')->willReturn(new Collection());
 
-    /**
-     * @covers Fisharebest\Webtrees\Census\CensusColumnYearsMarried
-     * @covers Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
-    public function testNoSpouseFamily()
-    {
-        $individual = Mockery::mock('Fisharebest\Webtrees\Individual');
-        $individual->shouldReceive('getSpouseFamilies')->andReturn(array());
-
-        $census = Mockery::mock('Fisharebest\Webtrees\Census\CensusInterface');
-        $census->shouldReceive('censusDate')->andReturn('01 JUN 1860');
+        $census = $this->createMock(CensusInterface::class);
+        $census->method('censusDate')->willReturn('01 JUN 1860');
 
         $column = new CensusColumnYearsMarried($census, '', '');
 
-        $this->assertSame('', $column->generate($individual));
+        $this->assertSame('', $column->generate($individual, $individual));
     }
 
     /**
-     * @covers Fisharebest\Webtrees\Census\CensusColumnYearsMarried
-     * @covers Fisharebest\Webtrees\Census\AbstractCensusColumn
+     * @covers \Fisharebest\Webtrees\Census\CensusColumnYearsMarried
+     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
+     *
+     * @return void
      */
-    public function testNoMarriage()
+    public function testNoMarriage(): void
     {
-        $family = Mockery::mock('Fisharebest\Webtrees\Family');
-        $family->shouldReceive('getFacts')->with('MARR', true)->andReturn(array());
+        $family = $this->createMock(Family::class);
+        $family->method('facts')->with(['MARR'], true)->willReturn(new Collection());
 
-        $individual = Mockery::mock('Fisharebest\Webtrees\Individual');
-        $individual->shouldReceive('getSpouseFamilies')->andReturn(array($family));
+        $individual = $this->createMock(Individual::class);
+        $individual->method('spouseFamilies')->willReturn(new Collection([$family]));
 
-        $census = Mockery::mock('Fisharebest\Webtrees\Census\CensusInterface');
-        $census->shouldReceive('censusDate')->andReturn('01 JUN 1860');
+        $census = $this->createMock(CensusInterface::class);
+        $census->method('censusDate')->willReturn('01 JUN 1860');
 
         $column = new CensusColumnYearsMarried($census, '', '');
 
-        $this->assertSame('', $column->generate($individual));
+        $this->assertSame('', $column->generate($individual, $individual));
     }
 
     /**
-     * @covers Fisharebest\Webtrees\Census\CensusColumnYearsMarried
-     * @covers Fisharebest\Webtrees\Census\AbstractCensusColumn
+     * @covers \Fisharebest\Webtrees\Census\CensusColumnYearsMarried
+     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
+     *
+     * @return void
      */
-    public function testUndatedMarriage()
+    public function testUndatedMarriage(): void
     {
-        $fact = Mockery::mock('Fisharebest\Webtrees\Fact');
-        $fact->shouldReceive('getDate')->andReturn(new Date(''));
+        $fact = $this->createMock(Fact::class);
+        $fact->method('date')->willReturn(new Date(''));
 
-        $family = Mockery::mock('Fisharebest\Webtrees\Family');
-        $family->shouldReceive('getFacts')->with('MARR', true)->andReturn(array($fact));
+        $family = $this->createMock(Family::class);
+        $family->method('facts')->with(['MARR'], true)->willReturn(new Collection([$fact]));
 
-        $individual = Mockery::mock('Fisharebest\Webtrees\Individual');
-        $individual->shouldReceive('getSpouseFamilies')->andReturn(array($family));
+        $individual = $this->createMock(Individual::class);
+        $individual->method('spouseFamilies')->willReturn(new Collection([$family]));
 
-        $census = Mockery::mock('Fisharebest\Webtrees\Census\CensusInterface');
-        $census->shouldReceive('censusDate')->andReturn('01 JUN 1860');
+        $census = $this->createMock(CensusInterface::class);
+        $census->method('censusDate')->willReturn('01 JUN 1860');
 
         $column = new CensusColumnYearsMarried($census, '', '');
 
-        $this->assertSame('', $column->generate($individual));
+        $this->assertSame('', $column->generate($individual, $individual));
     }
 
     /**
-     * @covers Fisharebest\Webtrees\Census\CensusColumnYearsMarried
-     * @covers Fisharebest\Webtrees\Census\AbstractCensusColumn
+     * @covers \Fisharebest\Webtrees\Census\CensusColumnYearsMarried
+     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
+     *
+     * @return void
      */
-    public function testMarriageAfterCensus()
+    public function testMarriageAfterCensus(): void
     {
-        $fact = Mockery::mock('Fisharebest\Webtrees\Fact');
-        $fact->shouldReceive('getDate')->andReturn(new Date('1861'));
+        $fact = $this->createMock(Fact::class);
+        $fact->method('date')->willReturn(new Date('1861'));
 
-        $family = Mockery::mock('Fisharebest\Webtrees\Family');
-        $family->shouldReceive('getFacts')->with('MARR', true)->andReturn(array($fact));
+        $family = $this->createMock(Family::class);
+        $family->method('facts')->with(['MARR'], true)->willReturn(new Collection([$fact]));
 
-        $individual = Mockery::mock('Fisharebest\Webtrees\Individual');
-        $individual->shouldReceive('getSpouseFamilies')->andReturn(array($family));
+        $individual = $this->createMock(Individual::class);
+        $individual->method('spouseFamilies')->willReturn(new Collection([$family]));
 
-        $census = Mockery::mock('Fisharebest\Webtrees\Census\CensusInterface');
-        $census->shouldReceive('censusDate')->andReturn('01 JUN 1860');
+        $census = $this->createMock(CensusInterface::class);
+        $census->method('censusDate')->willReturn('01 JUN 1860');
 
         $column = new CensusColumnYearsMarried($census, '', '');
 
-        $this->assertSame('', $column->generate($individual));
+        $this->assertSame('', $column->generate($individual, $individual));
     }
 
     /**
-     * @covers Fisharebest\Webtrees\Census\CensusColumnYearsMarried
-     * @covers Fisharebest\Webtrees\Census\AbstractCensusColumn
+     * @covers \Fisharebest\Webtrees\Census\CensusColumnYearsMarried
+     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
+     *
+     * @return void
      */
-    public function testMarriageBeforeCensus()
+    public function testMarriageBeforeCensus(): void
     {
-        $fact = Mockery::mock('Fisharebest\Webtrees\Fact');
-        $fact->shouldReceive('getDate')->andReturn(new Date('OCT 1851'));
+        $fact = $this->createMock(Fact::class);
+        $fact->method('date')->willReturn(new Date('OCT 1851'));
 
-        $family = Mockery::mock('Fisharebest\Webtrees\Family');
-        $family->shouldReceive('getFacts')->with('MARR', true)->andReturn(array($fact));
+        $family = $this->createMock(Family::class);
+        $family->method('facts')->with(['MARR'], true)->willReturn(new Collection([$fact]));
 
-        $individual = Mockery::mock('Fisharebest\Webtrees\Individual');
-        $individual->shouldReceive('getSpouseFamilies')->andReturn(array($family));
+        $individual = $this->createMock(Individual::class);
+        $individual->method('spouseFamilies')->willReturn(new Collection([$family]));
 
-        $census = Mockery::mock('Fisharebest\Webtrees\Census\CensusInterface');
-        $census->shouldReceive('censusDate')->andReturn('01 JUN 1860');
+        $census = $this->createMock(CensusInterface::class);
+        $census->method('censusDate')->willReturn('01 JUN 1860');
 
         $column = new CensusColumnYearsMarried($census, '', '');
 
-        $this->assertSame('8', $column->generate($individual));
+        $this->assertSame('8', $column->generate($individual, $individual));
     }
 }

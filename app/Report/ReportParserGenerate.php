@@ -1,7 +1,8 @@
 <?php
+
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,37 +14,100 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
 
+use DomainException;
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Database;
+use Fisharebest\Webtrees\Carbon;
 use Fisharebest\Webtrees\Date;
+use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Functions\Functions;
-use Fisharebest\Webtrees\Functions\FunctionsDate;
+use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Log;
-use Fisharebest\Webtrees\Media;
+use Fisharebest\Webtrees\MediaFile;
 use Fisharebest\Webtrees\Note;
 use Fisharebest\Webtrees\Place;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Str;
+use League\Flysystem\FilesystemInterface;
+use LogicException;
+use stdClass;
+use Symfony\Component\Cache\Adapter\NullAdapter;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+
+use function addcslashes;
+use function addslashes;
+use function array_pop;
+use function array_shift;
+use function assert;
+use function call_user_func;
+use function count;
+use function end;
+use function explode;
+use function file;
+use function file_exists;
+use function getimagesize;
+use function imagecreatefromstring;
+use function imagesx;
+use function imagesy;
+use function in_array;
+use function method_exists;
+use function preg_match;
+use function preg_match_all;
+use function preg_replace;
+use function preg_replace_callback;
+use function preg_split;
+use function reset;
+use function round;
+use function sprintf;
+use function str_replace;
+use function strip_tags;
+use function strlen;
+use function strpos;
+use function strstr;
+use function strtoupper;
+use function substr;
+use function trim;
+use function uasort;
+use function xml_error_string;
+use function xml_get_current_line_number;
+use function xml_get_error_code;
+use function xml_parse;
+use function xml_parser_create;
+use function xml_parser_free;
+use function xml_parser_set_option;
+use function xml_set_character_data_handler;
+use function xml_set_element_handler;
+
+use const PREG_SET_ORDER;
+use const XML_OPTION_CASE_FOLDING;
 
 /**
  * Class ReportParserGenerate - parse a report.xml file and generate the report.
  */
 class ReportParserGenerate extends ReportParserBase
 {
-    /** @var bool Are we collecting data from <Footnote> elements  */
+    /** @var bool Are we collecting data from <Footnote> elements */
     private $process_footnote = true;
 
     /** @var bool Are we currently outputing data? */
     private $print_data = false;
 
     /** @var bool[] Push-down stack of $print_data */
-    private $print_data_stack = array();
+    private $print_data_stack = [];
 
     /** @var int Are we processing GEDCOM data */
     private $process_gedcoms = 0;
@@ -51,32 +115,32 @@ class ReportParserGenerate extends ReportParserBase
     /** @var int Are we processing conditionals */
     private $process_ifs = 0;
 
-    /** @var int Are we processing repeats*/
+    /** @var int Are we processing repeats */
     private $process_repeats = 0;
 
     /** @var int Quantity of data to repeat during loops */
     private $repeat_bytes = 0;
 
-    /** @var array[] Repeated data when iterating over loops */
-    private $repeats = array();
+    /** @var string[] Repeated data when iterating over loops */
+    private $repeats = [];
 
     /** @var array[] Nested repeating data */
-    private $repeats_stack = array();
+    private $repeats_stack = [];
 
-    /** @var ReportBase[] Nested repeating data */
-    private $wt_report_stack = array();
+    /** @var AbstractRenderer[] Nested repeating data */
+    private $wt_report_stack = [];
 
     /** @var resource Nested repeating data */
     private $parser;
 
     /** @var resource[] Nested repeating data */
-    private $parser_stack = array();
+    private $parser_stack = [];
 
     /** @var string The current GEDCOM record */
     private $gedrec = '';
 
     /** @var string[] Nested GEDCOM records */
-    private $gedrec_stack = array();
+    private $gedrec_stack = [];
 
     /** @var ReportBaseElement The currently processed element */
     private $current_element;
@@ -97,7 +161,7 @@ class ReportParserGenerate extends ReportParserBase
     private $generation = 1;
 
     /** @var array Source data for processing lists */
-    private $list = array();
+    private $list = [];
 
     /** @var int Number of items in lists */
     private $list_total = 0;
@@ -105,84 +169,101 @@ class ReportParserGenerate extends ReportParserBase
     /** @var int Number of items filtered from lists */
     private $list_private = 0;
 
-    /** @var ReportBase A factory for creating report elements */
+    /** @var string The filename of the XML report */
+    protected $report;
+
+    /** @var AbstractRenderer A factory for creating report elements */
     private $report_root;
 
-    /** @var ReportBase Nested report elements */
+    /** @var AbstractRenderer Nested report elements */
     private $wt_report;
 
-    /** @todo This attribute is public to support the PHP5.3 closure workaround. */
     /** @var string[][] Variables defined in the report at run-time */
-    public $vars;
+    private $vars;
+
+    /** @var Tree The current tree */
+    private $tree;
+
+    /** @var FilesystemInterface */
+    private $data_filesystem;
 
     /**
      * Create a parser for a report
      *
-     * @param string     $report     The XML filename
-     * @param ReportBase $report_root
-     * @param string[][] $vars
+     * @param string              $report The XML filename
+     * @param AbstractRenderer    $report_root
+     * @param string[][]          $vars
+     * @param Tree                $tree
+     * @param FilesystemInterface $data_filesystem
      */
-    public function __construct($report, ReportBase $report_root = null, array $vars = array())
-    {
+    public function __construct(
+        string $report,
+        AbstractRenderer $report_root,
+        array $vars,
+        Tree $tree,
+        FilesystemInterface $data_filesystem
+    ) {
+        $this->report          = $report;
         $this->report_root     = $report_root;
         $this->wt_report       = $report_root;
-        $this->current_element = new ReportBaseElement;
+        $this->current_element = new ReportBaseElement();
         $this->vars            = $vars;
+        $this->tree            = $tree;
+        $this->data_filesystem = $data_filesystem;
+
         parent::__construct($report);
     }
 
     /**
      * XML start element handler
-     *
      * This function is called whenever a starting element is reached
      * The element handler will be called if found, otherwise it must be HTML
      *
      * @param resource $parser the resource handler for the XML parser
      * @param string   $name   the name of the XML element parsed
-     * @param array    $attrs  an array of key value pairs for the attributes
+     * @param string[] $attrs  an array of key value pairs for the attributes
+     *
+     * @return void
      */
-    protected function startElement($parser, $name, $attrs)
+    protected function startElement($parser, string $name, array $attrs): void
     {
-        $newattrs = array();
+        $newattrs = [];
 
         foreach ($attrs as $key => $value) {
             if (preg_match("/^\\$(\w+)$/", $value, $match)) {
-                if ((isset($this->vars[$match[1]]['id'])) && (!isset($this->vars[$match[1]]['gedcom']))) {
+                if (isset($this->vars[$match[1]]['id']) && !isset($this->vars[$match[1]]['gedcom'])) {
                     $value = $this->vars[$match[1]]['id'];
                 }
             }
             $newattrs[$key] = $value;
         }
         $attrs = $newattrs;
-        if ($this->process_footnote && ($this->process_ifs === 0 || $name === "if") && ($this->process_gedcoms === 0 || $name === "Gedcom") && ($this->process_repeats === 0 || $name === "Facts" || $name === "RepeatTag")) {
-            $start_method = $name . 'StartHandler';
-            $end_method   = $name . 'EndHandler';
-            if (method_exists($this, $start_method)) {
-                $this->$start_method($attrs);
-            } elseif (!method_exists($this, $end_method)) {
-                $this->htmlStartHandler($name, $attrs);
+        if ($this->process_footnote && ($this->process_ifs === 0 || $name === 'if') && ($this->process_gedcoms === 0 || $name === 'Gedcom') && ($this->process_repeats === 0 || $name === 'Facts' || $name === 'RepeatTag')) {
+            $method = $name . 'StartHandler';
+
+            if (method_exists($this, $method)) {
+                call_user_func([$this, $method], $attrs);
             }
         }
     }
 
     /**
      * XML end element handler
-     *
      * This function is called whenever an ending element is reached
      * The element handler will be called if found, otherwise it must be HTML
      *
      * @param resource $parser the resource handler for the XML parser
      * @param string   $name   the name of the XML element parsed
+     *
+     * @return void
      */
-    protected function endElement($parser, $name)
+    protected function endElement($parser, string $name): void
     {
-        if (($this->process_footnote || $name === "Footnote") && ($this->process_ifs === 0 || $name === "if") && ($this->process_gedcoms === 0 || $name === "Gedcom") && ($this->process_repeats === 0 || $name === "Facts" || $name === "RepeatTag" || $name === "List" || $name === "Relatives")) {
-            $start_method = $name . 'StartHandler';
-            $end_method   = $name . 'EndHandler';
-            if (method_exists($this, $end_method)) {
-                $this->$end_method();
-            } elseif (!method_exists($this, $start_method)) {
-                $this->htmlEndHandler($name);
+        if (($this->process_footnote || $name === 'Footnote') && ($this->process_ifs === 0 || $name === 'if') && ($this->process_gedcoms === 0 || $name === 'Gedcom') && ($this->process_repeats === 0 || $name === 'Facts' || $name === 'RepeatTag' || $name === 'List' || $name === 'Relatives')) {
+            $method = $name . 'EndHandler';
+
+            if (method_exists($this, $method)) {
+                call_user_func([$this, $method]);
             }
         }
     }
@@ -192,8 +273,10 @@ class ReportParserGenerate extends ReportParserBase
      *
      * @param resource $parser the resource handler for the XML parser
      * @param string   $data   the name of the XML element parsed
+     *
+     * @return void
      */
-    protected function characterData($parser, $data)
+    protected function characterData($parser, $data): void
     {
         if ($this->print_data && $this->process_gedcoms === 0 && $this->process_ifs === 0 && $this->process_repeats === 0) {
             $this->current_element->addText($data);
@@ -201,36 +284,39 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <style>
+     * Handle <style>
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function styleStartHandler($attrs)
+    protected function styleStartHandler(array $attrs): void
     {
         if (empty($attrs['name'])) {
-            throw new \DomainException('REPORT ERROR Style: The "name" of the style is missing or not set in the XML file.');
+            throw new DomainException('REPORT ERROR Style: The "name" of the style is missing or not set in the XML file.');
         }
 
         // array Style that will be passed on
-        $s = array();
+        $s = [];
 
         // string Name af the style
         $s['name'] = $attrs['name'];
 
         // string Name of the DEFAULT font
-        $s['font'] = $this->wt_report->defaultFont;
+        $s['font'] = $this->wt_report->default_font;
         if (!empty($attrs['font'])) {
             $s['font'] = $attrs['font'];
         }
 
         // int The size of the font in points
-        $s['size'] = $this->wt_report->defaultFontSize;
+        $s['size'] = $this->wt_report->default_font_size;
         if (!empty($attrs['size'])) {
-            $s['size'] = (int) $attrs['size'];
-        } // Get it as int to ignore all decimal points or text (if any text then int(0))
+            // Get it as int to ignore all decimal points or text (if no text then 0)
+            $s['size'] = (string) (int) $attrs['size'];
+        }
 
         // string B: bold, I: italic, U: underline, D: line trough, The default value is regular.
-        $s['style'] = "";
+        $s['style'] = '';
         if (!empty($attrs['style'])) {
             $s['style'] = $attrs['style'];
         }
@@ -239,93 +325,94 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <Doc>
-     *
+     * Handle <doc>
      * Sets up the basics of the document proparties
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function docStartHandler($attrs)
+    protected function docStartHandler(array $attrs): void
     {
         $this->parser = $this->xml_parser;
 
         // Custom page width
         if (!empty($attrs['customwidth'])) {
-            $this->wt_report->pagew = (int) $attrs['customwidth'];
+            $this->wt_report->page_width = (int) $attrs['customwidth'];
         } // Get it as int to ignore all decimal points or text (if any text then int(0))
         // Custom Page height
         if (!empty($attrs['customheight'])) {
-            $this->wt_report->pageh = (int) $attrs['customheight'];
+            $this->wt_report->page_height = (int) $attrs['customheight'];
         } // Get it as int to ignore all decimal points or text (if any text then int(0))
 
         // Left Margin
         if (isset($attrs['leftmargin'])) {
-            if ($attrs['leftmargin'] === "0") {
-                $this->wt_report->leftmargin = 0;
+            if ($attrs['leftmargin'] === '0') {
+                $this->wt_report->left_margin = 0;
             } elseif (!empty($attrs['leftmargin'])) {
-                $this->wt_report->leftmargin = (int) $attrs['leftmargin']; // Get it as int to ignore all decimal points or text (if any text then int(0))
+                $this->wt_report->left_margin = (int) $attrs['leftmargin']; // Get it as int to ignore all decimal points or text (if any text then int(0))
             }
         }
         // Right Margin
         if (isset($attrs['rightmargin'])) {
-            if ($attrs['rightmargin'] === "0") {
-                $this->wt_report->rightmargin = 0;
+            if ($attrs['rightmargin'] === '0') {
+                $this->wt_report->right_margin = 0;
             } elseif (!empty($attrs['rightmargin'])) {
-                $this->wt_report->rightmargin = (int) $attrs['rightmargin']; // Get it as int to ignore all decimal points or text (if any text then int(0))
+                $this->wt_report->right_margin = (int) $attrs['rightmargin']; // Get it as int to ignore all decimal points or text (if any text then int(0))
             }
         }
         // Top Margin
         if (isset($attrs['topmargin'])) {
-            if ($attrs['topmargin'] === "0") {
-                $this->wt_report->topmargin = 0;
+            if ($attrs['topmargin'] === '0') {
+                $this->wt_report->top_margin = 0;
             } elseif (!empty($attrs['topmargin'])) {
-                $this->wt_report->topmargin = (int) $attrs['topmargin']; // Get it as int to ignore all decimal points or text (if any text then int(0))
+                $this->wt_report->top_margin = (int) $attrs['topmargin']; // Get it as int to ignore all decimal points or text (if any text then int(0))
             }
         }
         // Bottom Margin
         if (isset($attrs['bottommargin'])) {
-            if ($attrs['bottommargin'] === "0") {
-                $this->wt_report->bottommargin = 0;
+            if ($attrs['bottommargin'] === '0') {
+                $this->wt_report->bottom_margin = 0;
             } elseif (!empty($attrs['bottommargin'])) {
-                $this->wt_report->bottommargin = (int) $attrs['bottommargin']; // Get it as int to ignore all decimal points or text (if any text then int(0))
+                $this->wt_report->bottom_margin = (int) $attrs['bottommargin']; // Get it as int to ignore all decimal points or text (if any text then int(0))
             }
         }
         // Header Margin
         if (isset($attrs['headermargin'])) {
-            if ($attrs['headermargin'] === "0") {
-                $this->wt_report->headermargin = 0;
+            if ($attrs['headermargin'] === '0') {
+                $this->wt_report->header_margin = 0;
             } elseif (!empty($attrs['headermargin'])) {
-                $this->wt_report->headermargin = (int) $attrs['headermargin']; // Get it as int to ignore all decimal points or text (if any text then int(0))
+                $this->wt_report->header_margin = (int) $attrs['headermargin']; // Get it as int to ignore all decimal points or text (if any text then int(0))
             }
         }
         // Footer Margin
         if (isset($attrs['footermargin'])) {
-            if ($attrs['footermargin'] === "0") {
-                $this->wt_report->footermargin = 0;
+            if ($attrs['footermargin'] === '0') {
+                $this->wt_report->footer_margin = 0;
             } elseif (!empty($attrs['footermargin'])) {
-                $this->wt_report->footermargin = (int) $attrs['footermargin']; // Get it as int to ignore all decimal points or text (if any text then int(0))
+                $this->wt_report->footer_margin = (int) $attrs['footermargin']; // Get it as int to ignore all decimal points or text (if any text then int(0))
             }
         }
 
         // Page Orientation
         if (!empty($attrs['orientation'])) {
-            if ($attrs['orientation'] == "landscape") {
-                $this->wt_report->orientation = "landscape";
-            } elseif ($attrs['orientation'] == "portrait") {
-                $this->wt_report->orientation = "portrait";
+            if ($attrs['orientation'] === 'landscape') {
+                $this->wt_report->orientation = 'landscape';
+            } elseif ($attrs['orientation'] === 'portrait') {
+                $this->wt_report->orientation = 'portrait';
             }
         }
         // Page Size
         if (!empty($attrs['pageSize'])) {
-            $this->wt_report->pageFormat = strtoupper($attrs['pageSize']);
+            $this->wt_report->page_format = strtoupper($attrs['pageSize']);
         }
 
         // Show Generated By...
         if (isset($attrs['showGeneratedBy'])) {
-            if ($attrs['showGeneratedBy'] === "0") {
-                $this->wt_report->showGenText = false;
-            } elseif ($attrs['showGeneratedBy'] === "1") {
-                $this->wt_report->showGenText = true;
+            if ($attrs['showGeneratedBy'] === '0') {
+                $this->wt_report->show_generated_by = false;
+            } elseif ($attrs['showGeneratedBy'] === '1') {
+                $this->wt_report->show_generated_by = true;
             }
         }
 
@@ -333,90 +420,78 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML </Doc>
+     * Handle </doc>
+     *
+     * @return void
      */
-    private function docEndHandler()
+    protected function docEndHandler(): void
     {
         $this->wt_report->run();
     }
 
     /**
-     * XML <Header>
+     * Handle <header>
+     *
+     * @return void
      */
-    private function headerStartHandler()
+    protected function headerStartHandler(): void
     {
         // Clear the Header before any new elements are added
         $this->wt_report->clearHeader();
-        $this->wt_report->setProcessing("H");
+        $this->wt_report->setProcessing('H');
     }
 
     /**
-     * XML <PageHeader>
-     */
-    private function pageHeaderStartHandler()
-    {
-        array_push($this->print_data_stack, $this->print_data);
-        $this->print_data = false;
-        array_push($this->wt_report_stack, $this->wt_report);
-        $this->wt_report = $this->report_root->createPageHeader();
-    }
-
-    /**
-     * XML <pageHeaderEndHandler>
-     */
-    private function pageHeaderEndHandler()
-    {
-        $this->print_data        = array_pop($this->print_data_stack);
-        $this->current_element   = $this->wt_report;
-        $this->wt_report         = array_pop($this->wt_report_stack);
-        $this->wt_report->addElement($this->current_element);
-    }
-
-    /**
-     * XML <bodyStartHandler>
-     */
-    private function bodyStartHandler()
-    {
-        $this->wt_report->setProcessing("B");
-    }
-
-    /**
-     * XML <footerStartHandler>
-     */
-    private function footerStartHandler()
-    {
-        $this->wt_report->setProcessing("F");
-    }
-
-    /**
-     * XML <Cell>
+     * Handle <body>
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @return void
      */
-    private function cellStartHandler($attrs)
+    protected function bodyStartHandler(): void
+    {
+        $this->wt_report->setProcessing('B');
+    }
+
+    /**
+     * Handle <footer>
+     *
+     * @return void
+     */
+    protected function footerStartHandler(): void
+    {
+        $this->wt_report->setProcessing('F');
+    }
+
+    /**
+     * Handle <cell>
+     *
+     * @param string[] $attrs
+     *
+     * @return void
+     */
+    protected function cellStartHandler(array $attrs): void
     {
         // string The text alignment of the text in this box.
-        $align = "";
+        $align = '';
         if (!empty($attrs['align'])) {
             $align = $attrs['align'];
             // RTL supported left/right alignment
-            if ($align == "rightrtl") {
+            if ($align === 'rightrtl') {
                 if ($this->wt_report->rtl) {
-                    $align = "left";
+                    $align = 'left';
                 } else {
-                    $align = "right";
+                    $align = 'right';
                 }
-            } elseif ($align == "leftrtl") {
+            } elseif ($align === 'leftrtl') {
                 if ($this->wt_report->rtl) {
-                    $align = "right";
+                    $align = 'right';
                 } else {
-                    $align = "left";
+                    $align = 'left';
                 }
             }
         }
 
         // string The color to fill the background of this cell
-        $bgcolor = "";
+        $bgcolor = '';
         if (!empty($attrs['bgcolor'])) {
             $bgcolor = $attrs['bgcolor'];
         }
@@ -424,9 +499,9 @@ class ReportParserGenerate extends ReportParserBase
         // int Whether or not the background should be painted
         $fill = 1;
         if (isset($attrs['fill'])) {
-            if ($attrs['fill'] === "0") {
+            if ($attrs['fill'] === '0') {
                 $fill = 0;
-            } elseif ($attrs['fill'] === "1") {
+            } elseif ($attrs['fill'] === '1') {
                 $fill = 1;
             }
         }
@@ -434,9 +509,9 @@ class ReportParserGenerate extends ReportParserBase
         $reseth = true;
         // boolean   if true reset the last cell height (default true)
         if (isset($attrs['reseth'])) {
-            if ($attrs['reseth'] === "0") {
+            if ($attrs['reseth'] === '0') {
                 $reseth = false;
-            } elseif ($attrs['reseth'] === "1") {
+            } elseif ($attrs['reseth'] === '1') {
                 $reseth = true;
             }
         }
@@ -447,7 +522,7 @@ class ReportParserGenerate extends ReportParserBase
             $border = $attrs['border'];
         }
         // string Border color in HTML code
-        $bocolor = "";
+        $bocolor = '';
         if (!empty($attrs['bocolor'])) {
             $bocolor = $attrs['bocolor'];
         }
@@ -455,12 +530,12 @@ class ReportParserGenerate extends ReportParserBase
         // int Cell height (expressed in points) The starting height of this cell. If the text wraps the height will automatically be adjusted.
         $height = 0;
         if (!empty($attrs['height'])) {
-            $height = (int) $attrs['height'];
+            $height = $attrs['height'];
         }
         // int Cell width (expressed in points) Setting the width to 0 will make it the width from the current location to the right margin.
         $width = 0;
         if (!empty($attrs['width'])) {
-            $width = (int) $attrs['width'];
+            $width = $attrs['width'];
         }
 
         // int Stretch carachter mode
@@ -470,36 +545,36 @@ class ReportParserGenerate extends ReportParserBase
         }
 
         // mixed Position the left corner of this box on the page. The default is the current position.
-        $left = ".";
+        $left = ReportBaseElement::CURRENT_POSITION;
         if (isset($attrs['left'])) {
-            if ($attrs['left'] === ".") {
-                $left = ".";
+            if ($attrs['left'] === '.') {
+                $left = ReportBaseElement::CURRENT_POSITION;
             } elseif (!empty($attrs['left'])) {
                 $left = (int) $attrs['left'];
-            } elseif ($attrs['left'] === "0") {
+            } elseif ($attrs['left'] === '0') {
                 $left = 0;
             }
         }
         // mixed Position the top corner of this box on the page. the default is the current position
-        $top = ".";
+        $top = ReportBaseElement::CURRENT_POSITION;
         if (isset($attrs['top'])) {
-            if ($attrs['top'] === ".") {
-                $top = ".";
+            if ($attrs['top'] === '.') {
+                $top = ReportBaseElement::CURRENT_POSITION;
             } elseif (!empty($attrs['top'])) {
                 $top = (int) $attrs['top'];
-            } elseif ($attrs['top'] === "0") {
+            } elseif ($attrs['top'] === '0') {
                 $top = 0;
             }
         }
 
         // string The name of the Style that should be used to render the text.
-        $style = "";
+        $style = '';
         if (!empty($attrs['style'])) {
             $style = $attrs['style'];
         }
 
         // string Text color in html code
-        $tcolor = "";
+        $tcolor = '';
         if (!empty($attrs['tcolor'])) {
             $tcolor = $attrs['tcolor'];
         }
@@ -509,23 +584,23 @@ class ReportParserGenerate extends ReportParserBase
         if (isset($attrs['newline'])) {
             if (!empty($attrs['newline'])) {
                 $ln = (int) $attrs['newline'];
-            } elseif ($attrs['newline'] === "0") {
+            } elseif ($attrs['newline'] === '0') {
                 $ln = 0;
             }
         }
 
-        if ($align == "left") {
-            $align = "L";
-        } elseif ($align == "right") {
-            $align = "R";
-        } elseif ($align == "center") {
-            $align = "C";
-        } elseif ($align == "justify") {
-            $align = "J";
+        if ($align === 'left') {
+            $align = 'L';
+        } elseif ($align === 'right') {
+            $align = 'R';
+        } elseif ($align === 'center') {
+            $align = 'C';
+        } elseif ($align === 'justify') {
+            $align = 'J';
         }
 
-        array_push($this->print_data_stack, $this->print_data);
-        $this->print_data = true;
+        $this->print_data_stack[] = $this->print_data;
+        $this->print_data         = true;
 
         $this->current_element = $this->report_root->createCell(
             $width,
@@ -546,48 +621,55 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML </Cell>
+     * Handle </cell>
+     *
+     * @return void
      */
-    private function cellEndHandler()
+    protected function cellEndHandler(): void
     {
         $this->print_data = array_pop($this->print_data_stack);
         $this->wt_report->addElement($this->current_element);
     }
 
     /**
-     * XML <Now /> element handler
+     * Handle <now />
+     *
+     * @return void
      */
-    private function nowStartHandler()
+    protected function nowStartHandler(): void
     {
-        $g = FunctionsDate::timestampToGedcomDate(WT_TIMESTAMP + WT_TIMESTAMP_OFFSET);
-        $this->current_element->addText($g->display());
+        $this->current_element->addText(Carbon::now()->local()->isoFormat('LLLL'));
     }
 
     /**
-     * XML <PageNum /> element handler
+     * Handle <pageNum />
+     *
+     * @return void
      */
-    private function pageNumStartHandler()
+    protected function pageNumStartHandler(): void
     {
-        $this->current_element->addText("#PAGENUM#");
+        $this->current_element->addText('#PAGENUM#');
     }
 
     /**
-     * XML <TotalPages /> element handler
+     * Handle <totalPages />
+     *
+     * @return void
      */
-    private function totalPagesStartHandler()
+    protected function totalPagesStartHandler(): void
     {
-        $this->current_element->addText("{{:ptp:}}");
+        $this->current_element->addText('{{:ptp:}}');
     }
 
     /**
      * Called at the start of an element.
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs an array of key value pairs for the attributes
+     *
+     * @return void
      */
-    private function gedcomStartHandler($attrs)
+    protected function gedcomStartHandler(array $attrs): void
     {
-        global $WT_TREE;
-
         if ($this->process_gedcoms > 0) {
             $this->process_gedcoms++;
 
@@ -595,38 +677,37 @@ class ReportParserGenerate extends ReportParserBase
         }
 
         $tag       = $attrs['id'];
-        $tag       = str_replace("@fact", $this->fact, $tag);
-        $tags      = explode(":", $tag);
+        $tag       = str_replace('@fact', $this->fact, $tag);
+        $tags      = explode(':', $tag);
         $newgedrec = '';
         if (count($tags) < 2) {
-            $tmp       = GedcomRecord::getInstance($attrs['id'], $WT_TREE);
-            $newgedrec = $tmp ? $tmp->privatizeGedcom(Auth::accessLevel($WT_TREE)) : '';
+            $tmp       = Factory::gedcomRecord()->make($attrs['id'], $this->tree);
+            $newgedrec = $tmp ? $tmp->privatizeGedcom(Auth::accessLevel($this->tree)) : '';
         }
         if (empty($newgedrec)) {
             $tgedrec   = $this->gedrec;
             $newgedrec = '';
             foreach ($tags as $tag) {
-                if (preg_match("/\\$(.+)/", $tag, $match)) {
+                if (preg_match('/\$(.+)/', $tag, $match)) {
                     if (isset($this->vars[$match[1]]['gedcom'])) {
                         $newgedrec = $this->vars[$match[1]]['gedcom'];
                     } else {
-                        $tmp       = GedcomRecord::getInstance($match[1], $WT_TREE);
-                        $newgedrec = $tmp ? $tmp->privatizeGedcom(Auth::accessLevel($WT_TREE)) : '';
+                        $tmp       = Factory::gedcomRecord()->make($match[1], $this->tree);
+                        $newgedrec = $tmp ? $tmp->privatizeGedcom(Auth::accessLevel($this->tree)) : '';
                     }
                 } else {
-                    if (preg_match("/@(.+)/", $tag, $match)) {
-                        $gmatch = array();
+                    if (preg_match('/@(.+)/', $tag, $match)) {
+                        $gmatch = [];
                         if (preg_match("/\d $match[1] @([^@]+)@/", $tgedrec, $gmatch)) {
-                            $tmp       = GedcomRecord::getInstance($gmatch[1], $WT_TREE);
-                            $newgedrec = $tmp ? $tmp->privatizeGedcom(Auth::accessLevel($WT_TREE)) : '';
+                            $tmp       = Factory::gedcomRecord()->make($gmatch[1], $this->tree);
+                            $newgedrec = $tmp ? $tmp->privatizeGedcom(Auth::accessLevel($this->tree)) : '';
                             $tgedrec   = $newgedrec;
                         } else {
                             $newgedrec = '';
                             break;
                         }
                     } else {
-                        $temp      = explode(" ", trim($tgedrec));
-                        $level     = $temp[0] + 1;
+                        $level     = 1 + (int) explode(' ', trim($tgedrec))[0];
                         $newgedrec = Functions::getSubRecord($level, "$level $tag", $tgedrec);
                         $tgedrec   = $newgedrec;
                     }
@@ -634,8 +715,8 @@ class ReportParserGenerate extends ReportParserBase
             }
         }
         if (!empty($newgedrec)) {
-            array_push($this->gedrec_stack, array($this->gedrec, $this->fact, $this->desc));
-            $this->gedrec = $newgedrec;
+            $this->gedrec_stack[] = [$this->gedrec, $this->fact, $this->desc];
+            $this->gedrec         = $newgedrec;
             if (preg_match("/(\d+) (_?[A-Z0-9]+) (.*)/", $this->gedrec, $match)) {
                 $this->fact = $match[2];
                 $this->desc = trim($match[3]);
@@ -647,25 +728,29 @@ class ReportParserGenerate extends ReportParserBase
 
     /**
      * Called at the end of an element.
+     *
+     * @return void
      */
-    private function gedcomEndHandler()
+    protected function gedcomEndHandler(): void
     {
         if ($this->process_gedcoms > 0) {
             $this->process_gedcoms--;
         } else {
-            list($this->gedrec, $this->fact, $this->desc) = array_pop($this->gedrec_stack);
+            [$this->gedrec, $this->fact, $this->desc] = array_pop($this->gedrec_stack);
         }
     }
 
     /**
-     * XML <textBoxStartHandler>
+     * Handle <textBox>
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function textBoxStartHandler($attrs)
+    protected function textBoxStartHandler(array $attrs): void
     {
         // string Background color code
-        $bgcolor = "";
+        $bgcolor = '';
         if (!empty($attrs['bgcolor'])) {
             $bgcolor = $attrs['bgcolor'];
         }
@@ -673,9 +758,9 @@ class ReportParserGenerate extends ReportParserBase
         // boolean Wether or not fill the background color
         $fill = true;
         if (isset($attrs['fill'])) {
-            if ($attrs['fill'] === "0") {
+            if ($attrs['fill'] === '0') {
                 $fill = false;
-            } elseif ($attrs['fill'] === "1") {
+            } elseif ($attrs['fill'] === '1') {
                 $fill = true;
             }
         }
@@ -683,9 +768,9 @@ class ReportParserGenerate extends ReportParserBase
         // var boolean Whether or not a border should be printed around this box. 0 = no border, 1 = border. Default is 0
         $border = false;
         if (isset($attrs['border'])) {
-            if ($attrs['border'] === "1") {
+            if ($attrs['border'] === '1') {
                 $border = true;
-            } elseif ($attrs['border'] === "0") {
+            } elseif ($attrs['border'] === '0') {
                 $border = false;
             }
         }
@@ -702,72 +787,72 @@ class ReportParserGenerate extends ReportParserBase
         }
 
         // mixed Position the left corner of this box on the page. The default is the current position.
-        $left = ".";
+        $left = ReportBaseElement::CURRENT_POSITION;
         if (isset($attrs['left'])) {
-            if ($attrs['left'] === ".") {
-                $left = ".";
+            if ($attrs['left'] === '.') {
+                $left = ReportBaseElement::CURRENT_POSITION;
             } elseif (!empty($attrs['left'])) {
                 $left = (int) $attrs['left'];
-            } elseif ($attrs['left'] === "0") {
+            } elseif ($attrs['left'] === '0') {
                 $left = 0;
             }
         }
         // mixed Position the top corner of this box on the page. the default is the current position
-        $top = ".";
+        $top = ReportBaseElement::CURRENT_POSITION;
         if (isset($attrs['top'])) {
-            if ($attrs['top'] === ".") {
-                $top = ".";
+            if ($attrs['top'] === '.') {
+                $top = ReportBaseElement::CURRENT_POSITION;
             } elseif (!empty($attrs['top'])) {
                 $top = (int) $attrs['top'];
-            } elseif ($attrs['top'] === "0") {
+            } elseif ($attrs['top'] === '0') {
                 $top = 0;
             }
         }
         // boolean After this box is finished rendering, should the next section of text start immediately after the this box or should it start on a new line under this box. 0 = no new line, 1 = force new line. Default is 0
         $newline = false;
         if (isset($attrs['newline'])) {
-            if ($attrs['newline'] === "1") {
+            if ($attrs['newline'] === '1') {
                 $newline = true;
-            } elseif ($attrs['newline'] === "0") {
+            } elseif ($attrs['newline'] === '0') {
                 $newline = false;
             }
         }
         // boolean
         $pagecheck = true;
         if (isset($attrs['pagecheck'])) {
-            if ($attrs['pagecheck'] === "0") {
+            if ($attrs['pagecheck'] === '0') {
                 $pagecheck = false;
-            } elseif ($attrs['pagecheck'] === "1") {
+            } elseif ($attrs['pagecheck'] === '1') {
                 $pagecheck = true;
             }
         }
         // boolean Cell padding
         $padding = true;
         if (isset($attrs['padding'])) {
-            if ($attrs['padding'] === "0") {
+            if ($attrs['padding'] === '0') {
                 $padding = false;
-            } elseif ($attrs['padding'] === "1") {
+            } elseif ($attrs['padding'] === '1') {
                 $padding = true;
             }
         }
         // boolean Reset this box Height
         $reseth = false;
         if (isset($attrs['reseth'])) {
-            if ($attrs['reseth'] === "1") {
+            if ($attrs['reseth'] === '1') {
                 $reseth = true;
-            } elseif ($attrs['reseth'] === "0") {
+            } elseif ($attrs['reseth'] === '0') {
                 $reseth = false;
             }
         }
 
         // string Style of rendering
-        $style = "";
+        $style = '';
 
-        array_push($this->print_data_stack, $this->print_data);
-        $this->print_data = false;
+        $this->print_data_stack[] = $this->print_data;
+        $this->print_data         = false;
 
-        array_push($this->wt_report_stack, $this->wt_report);
-        $this->wt_report = $this->report_root->createTextBox(
+        $this->wt_report_stack[] = $this->wt_report;
+        $this->wt_report         = $this->report_root->createTextBox(
             $width,
             $height,
             $border,
@@ -784,12 +869,19 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <textBoxEndHandler>
+     * Handle <textBox>
+     *
+     * @return void
      */
-    private function textBoxEndHandler()
+    protected function textBoxEndHandler(): void
     {
         $this->print_data      = array_pop($this->print_data_stack);
         $this->current_element = $this->wt_report;
+
+        // The TextBox handler is mis-using the wt_report attribute to store an element.
+        // Until this can be re-designed, we need this assertion to help static analysis tools.
+        assert($this->current_element instanceof ReportBaseElement, new LogicException());
+
         $this->wt_report       = array_pop($this->wt_report_stack);
         $this->wt_report->addElement($this->current_element);
     }
@@ -797,21 +889,23 @@ class ReportParserGenerate extends ReportParserBase
     /**
      * XLM <Text>.
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs an array of key value pairs for the attributes
+     *
+     * @return void
      */
-    private function textStartHandler($attrs)
+    protected function textStartHandler(array $attrs): void
     {
-        array_push($this->print_data_stack, $this->print_data);
-        $this->print_data = true;
+        $this->print_data_stack[] = $this->print_data;
+        $this->print_data         = true;
 
         // string The name of the Style that should be used to render the text.
-        $style = "";
+        $style = '';
         if (!empty($attrs['style'])) {
             $style = $attrs['style'];
         }
 
         // string  The color of the text - Keep the black color as default
-        $color = "";
+        $color = '';
         if (!empty($attrs['color'])) {
             $color = $attrs['color'];
         }
@@ -820,41 +914,42 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML </Text>
+     * Handle </text>
+     *
+     * @return void
      */
-    private function textEndHandler()
+    protected function textEndHandler(): void
     {
         $this->print_data = array_pop($this->print_data_stack);
         $this->wt_report->addElement($this->current_element);
     }
 
     /**
-     * XML <GetPersonName/>
-     *
+     * Handle <getPersonName />
      * Get the name
      * 1. id is empty - current GEDCOM record
      * 2. id is set with a record id
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs an array of key value pairs for the attributes
+     *
+     * @return void
      */
-    private function getPersonNameStartHandler($attrs)
+    protected function getPersonNameStartHandler(array $attrs): void
     {
-        global $WT_TREE;
-
-        $id    = "";
-        $match = array();
+        $id    = '';
+        $match = [];
         if (empty($attrs['id'])) {
-            if (preg_match("/0 @(.+)@/", $this->gedrec, $match)) {
+            if (preg_match('/0 @(.+)@/', $this->gedrec, $match)) {
                 $id = $match[1];
             }
         } else {
-            if (preg_match("/\\$(.+)/", $attrs['id'], $match)) {
+            if (preg_match('/\$(.+)/', $attrs['id'], $match)) {
                 if (isset($this->vars[$match[1]]['id'])) {
                     $id = $this->vars[$match[1]]['id'];
                 }
             } else {
-                if (preg_match("/@(.+)/", $attrs['id'], $match)) {
-                    $gmatch = array();
+                if (preg_match('/@(.+)/', $attrs['id'], $match)) {
+                    $gmatch = [];
                     if (preg_match("/\d $match[1] @([^@]+)@/", $this->gedrec, $gmatch)) {
                         $id = $gmatch[1];
                     }
@@ -864,51 +959,48 @@ class ReportParserGenerate extends ReportParserBase
             }
         }
         if (!empty($id)) {
-            $record = GedcomRecord::getInstance($id, $WT_TREE);
+            $record = Factory::gedcomRecord()->make($id, $this->tree);
             if ($record === null) {
                 return;
             }
             if (!$record->canShowName()) {
                 $this->current_element->addText(I18N::translate('Private'));
             } else {
-                $name = $record->getFullName();
+                $name = $record->fullName();
                 $name = preg_replace(
-                    array('/<span class="starredname">/', '/<\/span><\/span>/', '/<\/span>/'),
-                    array('«', '', '»'),
+                    [
+                        '/<span class="starredname">/',
+                        '/<\/span><\/span>/',
+                        '/<\/span>/',
+                    ],
+                    [
+                        '«',
+                        '',
+                        '»',
+                    ],
                     $name
                 );
                 $name = strip_tags($name);
                 if (!empty($attrs['truncate'])) {
-                    if (mb_strlen($name) > $attrs['truncate']) {
-                        $name  = preg_replace("/\(.*\) ?/", '', $name); //removes () and text inbetween - what about ", [ and { etc?
-                        $words = preg_split('/[, -]+/', $name); // names separated with space, comma or hyphen - any others?
-                        $name  = $words[count($words) - 1];
-                        for ($i = count($words) - 2; $i >= 0; $i--) {
-                            $len = mb_strlen($name);
-                            for ($j = count($words) - 3; $j >= 0; $j--) {
-                                $len += mb_strlen($words[$j]);
-                            }
-                            if ($len > $attrs['truncate']) {
-                                $first_letter = mb_substr($words[$i], 0, 1);
-                                // Do not show " of nick-names
-                                if ($first_letter != "\"") {
-                                    $name = mb_substr($words[$i], 0, 1) . '. ' . $name;
-                                }
-                            } else {
-                                $name = $words[$i] . ' ' . $name;
-                            }
-                        }
-                    }
+                    $name = Str::limit($name, (int) $attrs['truncate'], I18N::translate('…'));
                 } else {
-                    $addname = $record->getAddName();
+                    $addname = $record->alternateName();
                     $addname = preg_replace(
-                        array('/<span class="starredname">/', '/<\/span><\/span>/', '/<\/span>/'),
-                        array('«', '', '»'),
+                        [
+                            '/<span class="starredname">/',
+                            '/<\/span><\/span>/',
+                            '/<\/span>/',
+                        ],
+                        [
+                            '«',
+                            '',
+                            '»',
+                        ],
                         $addname
                     );
                     $addname = strip_tags($addname);
                     if (!empty($addname)) {
-                        $name .= " " . $addname;
+                        $name .= ' ' . $addname;
                     }
                 }
                 $this->current_element->addText(trim($name));
@@ -917,45 +1009,44 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <GedcomValue/>
+     * Handle <gedcomValue />
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function gedcomValueStartHandler($attrs)
+    protected function gedcomValueStartHandler(array $attrs): void
     {
-        global $WT_TREE;
-
-        $id    = "";
-        $match = array();
-        if (preg_match("/0 @(.+)@/", $this->gedrec, $match)) {
+        $id    = '';
+        $match = [];
+        if (preg_match('/0 @(.+)@/', $this->gedrec, $match)) {
             $id = $match[1];
         }
 
-        if (isset($attrs['newline']) && $attrs['newline'] == "1") {
-            $useBreak = "1";
+        if (isset($attrs['newline']) && $attrs['newline'] === '1') {
+            $useBreak = '1';
         } else {
-            $useBreak = "0";
+            $useBreak = '0';
         }
 
         $tag = $attrs['tag'];
         if (!empty($tag)) {
-            if ($tag == "@desc") {
+            if ($tag === '@desc') {
                 $value = $this->desc;
                 $value = trim($value);
                 $this->current_element->addText($value);
             }
-            if ($tag == "@id") {
+            if ($tag === '@id') {
                 $this->current_element->addText($id);
             } else {
-                $tag = str_replace("@fact", $this->fact, $tag);
+                $tag = str_replace('@fact', $this->fact, $tag);
                 if (empty($attrs['level'])) {
-                    $temp  = explode(" ", trim($this->gedrec));
-                    $level = $temp[0];
-                    if ($level == 0) {
+                    $level = (int) explode(' ', trim($this->gedrec))[0];
+                    if ($level === 0) {
                         $level++;
                     }
                 } else {
-                    $level = $attrs['level'];
+                    $level = (int) $attrs['level'];
                 }
                 $tags  = preg_split('/[: ]/', $tag);
                 $value = $this->getGedcomValue($tag, $level, $this->gedrec);
@@ -965,23 +1056,28 @@ class ReportParserGenerate extends ReportParserBase
                         $value = $tmp->display();
                         break;
                     case 'PLAC':
-                        $tmp   = new Place($value, $WT_TREE);
-                        $value = $tmp->getShortName();
+                        $tmp   = new Place($value, $this->tree);
+                        $value = $tmp->shortName();
                         break;
                 }
-                if ($useBreak == "1") {
+                if ($useBreak === '1') {
                     // Insert <br> when multiple dates exist.
                     // This works around a TCPDF bug that incorrectly wraps RTL dates on LTR pages
                     $value = str_replace('(', '<br>(', $value);
                     $value = str_replace('<span dir="ltr"><br>', '<br><span dir="ltr">', $value);
                     $value = str_replace('<span dir="rtl"><br>', '<br><span dir="rtl">', $value);
-                    if (substr($value, 0, 6) == '<br>') {
-                        $value = substr($value, 6);
+                    if (substr($value, 0, 4) === '<br>') {
+                        $value = substr($value, 4);
                     }
                 }
                 $tmp = explode(':', $tag);
-                if (in_array(end($tmp), array('NOTE', 'TEXT'))) {
-                    $value = Filter::formatText($value, $WT_TREE); // We'll strip HTML in addText()
+                if (in_array(end($tmp), ['NOTE', 'TEXT'], true)) {
+                    $value = Filter::formatText($value, $this->tree); // We'll strip HTML in addText()
+                }
+
+                if (!empty($attrs['truncate'])) {
+                    $value = strip_tags($value);
+                    $value = Str::limit($value, (int) $attrs['truncate'], I18N::translate('…'));
                 }
                 $this->current_element->addText($value);
             }
@@ -989,38 +1085,34 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <RepeatTag>
+     * Handle <repeatTag>
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function repeatTagStartHandler($attrs)
+    protected function repeatTagStartHandler(array $attrs): void
     {
-        global $WT_TREE;
-
         $this->process_repeats++;
         if ($this->process_repeats > 1) {
             return;
         }
 
-        array_push($this->repeats_stack, array($this->repeats, $this->repeat_bytes));
-        $this->repeats      = array();
-        $this->repeat_bytes = xml_get_current_line_number($this->parser);
+        $this->repeats_stack[] = [$this->repeats, $this->repeat_bytes];
+        $this->repeats         = [];
+        $this->repeat_bytes    = xml_get_current_line_number($this->parser);
 
-        $tag = "";
-        if (isset($attrs['tag'])) {
-            $tag = $attrs['tag'];
-        }
+        $tag = $attrs['tag'] ?? '';
         if (!empty($tag)) {
-            if ($tag == "@desc") {
+            if ($tag === '@desc') {
                 $value = $this->desc;
                 $value = trim($value);
                 $this->current_element->addText($value);
             } else {
-                $tag   = str_replace("@fact", $this->fact, $tag);
-                $tags  = explode(":", $tag);
-                $temp  = explode(" ", trim($this->gedrec));
-                $level = $temp[0];
-                if ($level == 0) {
+                $tag   = str_replace('@fact', $this->fact, $tag);
+                $tags  = explode(':', $tag);
+                $level = (int) explode(' ', trim($this->gedrec))[0];
+                if ($level === 0) {
                     $level++;
                 }
                 $subrec = $this->gedrec;
@@ -1051,8 +1143,8 @@ class ReportParserGenerate extends ReportParserBase
                     $i++;
                     // Privacy check - is this a link, and are we allowed to view the linked object?
                     $subrecord = Functions::getSubRecord($level, "$level $t", $subrec, $i);
-                    if (preg_match('/^\d ' . WT_REGEX_TAG . ' @(' . WT_REGEX_XREF . ')@/', $subrecord, $xref_match)) {
-                        $linked_object = GedcomRecord::getInstance($xref_match[1], $WT_TREE);
+                    if (preg_match('/^\d ' . Gedcom::REGEX_TAG . ' @(' . Gedcom::REGEX_XREF . ')@/', $subrecord, $xref_match)) {
+                        $linked_object = Factory::gedcomRecord()->make($xref_match[1], $this->tree);
                         if ($linked_object && !$linked_object->canShow()) {
                             continue;
                         }
@@ -1064,12 +1156,12 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML </ RepeatTag>
+     * Handle </repeatTag>
+     *
+     * @return void
      */
-    private function repeatTagEndHandler()
+    protected function repeatTagEndHandler(): void
     {
-        global $report;
-
         $this->process_repeats--;
         if ($this->process_repeats > 0) {
             return;
@@ -1084,8 +1176,8 @@ class ReportParserGenerate extends ReportParserBase
                 $lineoffset += $rep[1];
             }
             //-- read the xml from the file
-            $lines = file($report);
-            while (strpos($lines[$lineoffset + $this->repeat_bytes], "<RepeatTag") === false) {
+            $lines = file($this->report);
+            while (strpos($lines[$lineoffset + $this->repeat_bytes], '<RepeatTag') === false) {
                 $lineoffset--;
             }
             $lineoffset++;
@@ -1094,9 +1186,9 @@ class ReportParserGenerate extends ReportParserBase
             // RepeatTag Level counter
             $count = 1;
             while (0 < $count) {
-                if (strstr($lines[$line_nr], "<RepeatTag") !== false) {
+                if (strstr($lines[$line_nr], '<RepeatTag') !== false) {
                     $count++;
-                } elseif (strstr($lines[$line_nr], "</RepeatTag") !== false) {
+                } elseif (strstr($lines[$line_nr], '</RepeatTag') !== false) {
                     $count--;
                 }
                 if (0 < $count) {
@@ -1108,17 +1200,33 @@ class ReportParserGenerate extends ReportParserBase
             unset($lines);
             $reportxml .= "</tempdoc>\n";
             // Save original values
-            array_push($this->parser_stack, $this->parser);
-            $oldgedrec = $this->gedrec;
+            $this->parser_stack[] = $this->parser;
+            $oldgedrec            = $this->gedrec;
             foreach ($this->repeats as $gedrec) {
                 $this->gedrec  = $gedrec;
                 $repeat_parser = xml_parser_create();
                 $this->parser  = $repeat_parser;
                 xml_parser_set_option($repeat_parser, XML_OPTION_CASE_FOLDING, false);
-                xml_set_element_handler($repeat_parser, array($this, 'startElement'), array($this, 'endElement'));
-                xml_set_character_data_handler($repeat_parser, array($this, 'characterData'));
+
+                xml_set_element_handler(
+                    $repeat_parser,
+                    function ($parser, string $name, array $attrs): void {
+                        $this->startElement($parser, $name, $attrs);
+                    },
+                    function ($parser, string $name): void {
+                        $this->endElement($parser, $name);
+                    }
+                );
+
+                xml_set_character_data_handler(
+                    $repeat_parser,
+                    function ($parser, string $data): void {
+                        $this->characterData($parser, $data);
+                    }
+                );
+
                 if (!xml_parse($repeat_parser, $reportxml, true)) {
-                    throw new \DomainException(sprintf(
+                    throw new DomainException(sprintf(
                         'RepeatTagEHandler XML error: %s at line %d',
                         xml_error_string(xml_get_error_code($repeat_parser)),
                         xml_get_current_line_number($repeat_parser)
@@ -1130,26 +1238,26 @@ class ReportParserGenerate extends ReportParserBase
             $this->gedrec = $oldgedrec;
             $this->parser = array_pop($this->parser_stack);
         }
-        list($this->repeats, $this->repeat_bytes) = array_pop($this->repeats_stack);
+        [$this->repeats, $this->repeat_bytes] = array_pop($this->repeats_stack);
     }
 
     /**
      * Variable lookup
-     *
      * Retrieve predefined variables :
-     *
      * @ desc GEDCOM fact description, example:
      *        1 EVEN This is a description
      * @ fact GEDCOM fact tag, such as BIRT, DEAT etc.
      * $ I18N::translate('....')
      * $ language_settings[]
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs an array of key value pairs for the attributes
+     *
+     * @return void
      */
-    private function varStartHandler($attrs)
+    protected function varStartHandler(array $attrs): void
     {
         if (empty($attrs['var'])) {
-            throw new \DomainException('REPORT ERROR var: The attribute "var=" is missing or not set in the XML file on line: ' . xml_get_current_line_number($this->parser));
+            throw new DomainException('REPORT ERROR var: The attribute "var=" is missing or not set in the XML file on line: ' . xml_get_current_line_number($this->parser));
         }
 
         $var = $attrs['var'];
@@ -1158,14 +1266,20 @@ class ReportParserGenerate extends ReportParserBase
             $var = $this->vars[$var]['id'];
         } else {
             $tfact = $this->fact;
-            if (($this->fact === "EVEN" || $this->fact === "FACT") && $this->type !== " ") {
+            if (($this->fact === 'EVEN' || $this->fact === 'FACT') && $this->type !== ' ') {
                 // Use :
                 // n TYPE This text if string
                 $tfact = $this->type;
             }
-            $var = str_replace(array("@fact", "@desc"), array(GedcomTag::getLabel($tfact), $this->desc), $var);
+            $var = str_replace([
+                '@fact',
+                '@desc',
+            ], [
+                GedcomTag::getLabel($tfact),
+                $this->desc,
+            ], $var);
             if (preg_match('/^I18N::number\((.+)\)$/', $var, $match)) {
-                $var = I18N::number($match[1]);
+                $var = I18N::number((int) $match[1]);
             } elseif (preg_match('/^I18N::translate\(\'(.+)\'\)$/', $var, $match)) {
                 $var = I18N::translate($match[1]);
             } elseif (preg_match('/^I18N::translateContext\(\'(.+)\', *\'(.+)\'\)$/', $var, $match)) {
@@ -1174,7 +1288,7 @@ class ReportParserGenerate extends ReportParserBase
         }
         // Check if variable is set as a date and reformat the date
         if (isset($attrs['date'])) {
-            if ($attrs['date'] === "1") {
+            if ($attrs['date'] === '1') {
                 $g   = new Date($var);
                 $var = $g->display();
             }
@@ -1184,63 +1298,62 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <Facts>
+     * Handle <facts>
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function factsStartHandler($attrs)
+    protected function factsStartHandler(array $attrs): void
     {
-        global $WT_TREE;
-
         $this->process_repeats++;
         if ($this->process_repeats > 1) {
             return;
         }
 
-        array_push($this->repeats_stack, array($this->repeats, $this->repeat_bytes));
-        $this->repeats      = array();
-        $this->repeat_bytes = xml_get_current_line_number($this->parser);
+        $this->repeats_stack[] = [$this->repeats, $this->repeat_bytes];
+        $this->repeats         = [];
+        $this->repeat_bytes    = xml_get_current_line_number($this->parser);
 
-        $id    = "";
-        $match = array();
-        if (preg_match("/0 @(.+)@/", $this->gedrec, $match)) {
+        $id    = '';
+        $match = [];
+        if (preg_match('/0 @(.+)@/', $this->gedrec, $match)) {
             $id = $match[1];
         }
-        $tag = "";
+        $tag = '';
         if (isset($attrs['ignore'])) {
             $tag .= $attrs['ignore'];
         }
-        if (preg_match("/\\$(.+)/", $tag, $match)) {
+        if (preg_match('/\$(.+)/', $tag, $match)) {
             $tag = $this->vars[$match[1]]['id'];
         }
 
-        $record = GedcomRecord::getInstance($id, $WT_TREE);
+        $record = Factory::gedcomRecord()->make($id, $this->tree);
         if (empty($attrs['diff']) && !empty($id)) {
-            $facts = $record->getFacts();
-            Functions::sortFacts($facts);
-            $this->repeats  = array();
-            $nonfacts       = explode(',', $tag);
-            foreach ($facts as $event) {
-                if (!in_array($event->getTag(), $nonfacts)) {
-                    $this->repeats[] = $event->getGedcom();
+            $facts = $record->facts([], true);
+            $this->repeats = [];
+            $nonfacts      = explode(',', $tag);
+            foreach ($facts as $fact) {
+                if (!in_array($fact->tag(), $nonfacts, true)) {
+                    $this->repeats[] = $fact->gedcom();
                 }
             }
         } else {
-            foreach ($record->getFacts() as $fact) {
-                if ($fact->isPendingAddition() && $fact->getTag() !== 'CHAN') {
-                    $this->repeats[] = $fact->getGedcom();
+            foreach ($record->facts() as $fact) {
+                if (($fact->isPendingAddition() || $fact->isPendingDeletion()) && $fact->tag() !== 'CHAN') {
+                    $this->repeats[] = $fact->gedcom();
                 }
             }
         }
     }
 
     /**
-     * XML </Facts>
+     * Handle </facts>
+     *
+     * @return void
      */
-    private function factsEndHandler()
+    protected function factsEndHandler(): void
     {
-        global $report;
-
         $this->process_repeats--;
         if ($this->process_repeats > 0) {
             return;
@@ -1248,7 +1361,6 @@ class ReportParserGenerate extends ReportParserBase
 
         // Check if there is anything to repeat
         if (count($this->repeats) > 0) {
-
             $line       = xml_get_current_line_number($this->parser) - 1;
             $lineoffset = 0;
             foreach ($this->repeats_stack as $rep) {
@@ -1256,7 +1368,7 @@ class ReportParserGenerate extends ReportParserBase
             }
 
             //-- read the xml from the file
-            $lines = file($report);
+            $lines = file($this->report);
             while ($lineoffset + $this->repeat_bytes > 0 && strpos($lines[$lineoffset + $this->repeat_bytes], '<Facts ') === false) {
                 $lineoffset--;
             }
@@ -1272,10 +1384,10 @@ class ReportParserGenerate extends ReportParserBase
             unset($lines);
             $reportxml .= "</tempdoc>\n";
             // Save original values
-            array_push($this->parser_stack, $this->parser);
-            $oldgedrec = $this->gedrec;
-            $count     = count($this->repeats);
-            $i         = 0;
+            $this->parser_stack[] = $this->parser;
+            $oldgedrec            = $this->gedrec;
+            $count                = count($this->repeats);
+            $i                    = 0;
             while ($i < $count) {
                 $this->gedrec = $this->repeats[$i];
                 $this->fact   = '';
@@ -1283,7 +1395,7 @@ class ReportParserGenerate extends ReportParserBase
                 if (preg_match('/1 (\w+)(.*)/', $this->gedrec, $match)) {
                     $this->fact = $match[1];
                     if ($this->fact === 'EVEN' || $this->fact === 'FACT') {
-                        $tmatch = array();
+                        $tmatch = [];
                         if (preg_match('/2 TYPE (.+)/', $this->gedrec, $tmatch)) {
                             $this->type = trim($tmatch[1]);
                         } else {
@@ -1296,10 +1408,26 @@ class ReportParserGenerate extends ReportParserBase
                 $repeat_parser = xml_parser_create();
                 $this->parser  = $repeat_parser;
                 xml_parser_set_option($repeat_parser, XML_OPTION_CASE_FOLDING, false);
-                xml_set_element_handler($repeat_parser, array($this, 'startElement'), array($this, 'endElement'));
-                xml_set_character_data_handler($repeat_parser, array($this, 'characterData'));
+
+                xml_set_element_handler(
+                    $repeat_parser,
+                    function ($parser, string $name, array $attrs): void {
+                        $this->startElement($parser, $name, $attrs);
+                    },
+                    function ($parser, string $name): void {
+                        $this->endElement($parser, $name);
+                    }
+                );
+
+                xml_set_character_data_handler(
+                    $repeat_parser,
+                    function ($parser, string $data): void {
+                        $this->characterData($parser, $data);
+                    }
+                );
+
                 if (!xml_parse($repeat_parser, $reportxml, true)) {
-                    throw new \DomainException(sprintf(
+                    throw new DomainException(sprintf(
                         'FactsEHandler XML error: %s at line %d',
                         xml_error_string(xml_get_error_code($repeat_parser)),
                         xml_get_current_line_number($repeat_parser)
@@ -1312,39 +1440,41 @@ class ReportParserGenerate extends ReportParserBase
             $this->parser = array_pop($this->parser_stack);
             $this->gedrec = $oldgedrec;
         }
-        list($this->repeats, $this->repeat_bytes) = array_pop($this->repeats_stack);
+        [$this->repeats, $this->repeat_bytes] = array_pop($this->repeats_stack);
     }
 
     /**
      * Setting upp or changing variables in the XML
      * The XML variable name and value is stored in $this->vars
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs an array of key value pairs for the attributes
+     *
+     * @return void
      */
-    private function setVarStartHandler($attrs)
+    protected function setVarStartHandler(array $attrs): void
     {
         if (empty($attrs['name'])) {
-            throw new \DomainException('REPORT ERROR var: The attribute "name" is missing or not set in the XML file');
+            throw new DomainException('REPORT ERROR var: The attribute "name" is missing or not set in the XML file');
         }
 
         $name  = $attrs['name'];
         $value = $attrs['value'];
-        $match = array();
+        $match = [];
         // Current GEDCOM record strings
-        if ($value == "@ID") {
-            if (preg_match("/0 @(.+)@/", $this->gedrec, $match)) {
+        if ($value === '@ID') {
+            if (preg_match('/0 @(.+)@/', $this->gedrec, $match)) {
                 $value = $match[1];
             }
-        } elseif ($value == "@fact") {
+        } elseif ($value === '@fact') {
             $value = $this->fact;
-        } elseif ($value == "@desc") {
+        } elseif ($value === '@desc') {
             $value = $this->desc;
-        } elseif ($value == "@generation") {
-            $value = $this->generation;
+        } elseif ($value === '@generation') {
+            $value = (string) $this->generation;
         } elseif (preg_match("/@(\w+)/", $value, $match)) {
-            $gmatch = array();
+            $gmatch = [];
             if (preg_match("/\d $match[1] (.+)/", $this->gedrec, $gmatch)) {
-                $value = str_replace("@", "", trim($gmatch[1]));
+                $value = str_replace('@', '', trim($gmatch[1]));
             }
         }
         if (preg_match("/\\$(\w+)/", $name, $match)) {
@@ -1354,49 +1484,41 @@ class ReportParserGenerate extends ReportParserBase
         $i     = 0;
         while ($i < $count) {
             $t     = $this->vars[$match[$i][1]]['id'];
-            $value = preg_replace("/\\$" . $match[$i][1] . "/", $t, $value, 1);
+            $value = preg_replace('/\$' . $match[$i][1] . '/', $t, $value, 1);
             $i++;
         }
         if (preg_match('/^I18N::number\((.+)\)$/', $value, $match)) {
-            $value = I18N::number($match[1]);
+            $value = I18N::number((int) $match[1]);
         } elseif (preg_match('/^I18N::translate\(\'(.+)\'\)$/', $value, $match)) {
             $value = I18N::translate($match[1]);
         } elseif (preg_match('/^I18N::translateContext\(\'(.+)\', *\'(.+)\'\)$/', $value, $match)) {
             $value = I18N::translateContext($match[1], $match[2]);
         }
+
         // Arithmetic functions
-        if (preg_match("/(\d+)\s*([\-\+\*\/])\s*(\d+)/", $value, $match)) {
-            switch ($match[2]) {
-                case "+":
-                    $t     = $match[1] + $match[3];
-                    $value = preg_replace("/" . $match[1] . "\s*([\-\+\*\/])\s*" . $match[3] . "/", $t, $value);
-                    break;
-                case "-":
-                    $t     = $match[1] - $match[3];
-                    $value = preg_replace("/" . $match[1] . "\s*([\-\+\*\/])\s*" . $match[3] . "/", $t, $value);
-                    break;
-                case "*":
-                    $t     = $match[1] * $match[3];
-                    $value = preg_replace("/" . $match[1] . "\s*([\-\+\*\/])\s*" . $match[3] . "/", $t, $value);
-                    break;
-                case "/":
-                    $t     = $match[1] / $match[3];
-                    $value = preg_replace("/" . $match[1] . "\s*([\-\+\*\/])\s*" . $match[3] . "/", $t, $value);
-                    break;
-            }
+        if (preg_match("/(\d+)\s*([-+*\/])\s*(\d+)/", $value, $match)) {
+            // Create an expression language with the functions used by our reports.
+            $expression_provider  = new ReportExpressionLanguageProvider();
+            $expression_cache     = new NullAdapter();
+            $expression_language  = new ExpressionLanguage($expression_cache, [$expression_provider]);
+
+            $value = (string) $expression_language->evaluate($value);
         }
-        if (strpos($value, "@") !== false) {
-            $value = "";
+
+        if (strpos($value, '@') !== false) {
+            $value = '';
         }
         $this->vars[$name]['id'] = $value;
     }
 
     /**
-     * XML <if > start element
+     * Handle <if>
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function ifStartHandler($attrs)
+    protected function ifStartHandler(array $attrs): void
     {
         if ($this->process_ifs > 0) {
             $this->process_ifs++;
@@ -1406,30 +1528,34 @@ class ReportParserGenerate extends ReportParserBase
 
         $condition = $attrs['condition'];
         $condition = $this->substituteVars($condition, true);
-        $condition = str_replace(array(" LT ", " GT "), array("<", ">"), $condition);
-        // Replace the first accurance only once of @fact:DATE or in any other combinations to the current fact, such as BIRT
-        $condition = str_replace("@fact:", $this->fact . ':', $condition);
-        $match     = array();
-        $count     = preg_match_all("/@([\w:\.]+)/", $condition, $match, PREG_SET_ORDER);
+        $condition = str_replace([
+            ' LT ',
+            ' GT ',
+        ], [
+            '<',
+            '>',
+        ], $condition);
+        // Replace the first occurrence only once of @fact:DATE or in any other combinations to the current fact, such as BIRT
+        $condition = str_replace('@fact:', $this->fact . ':', $condition);
+        $match     = [];
+        $count     = preg_match_all("/@([\w:.]+)/", $condition, $match, PREG_SET_ORDER);
         $i         = 0;
         while ($i < $count) {
             $id    = $match[$i][1];
             $value = '""';
-            if ($id == "ID") {
-                if (preg_match("/0 @(.+)@/", $this->gedrec, $match)) {
+            if ($id === 'ID') {
+                if (preg_match('/0 @(.+)@/', $this->gedrec, $match)) {
                     $value = "'" . $match[1] . "'";
                 }
-            } elseif ($id === "fact") {
+            } elseif ($id === 'fact') {
                 $value = '"' . $this->fact . '"';
-            } elseif ($id === "desc") {
+            } elseif ($id === 'desc') {
                 $value = '"' . addslashes($this->desc) . '"';
-            } elseif ($id === "generation") {
+            } elseif ($id === 'generation') {
                 $value = '"' . $this->generation . '"';
             } else {
-
-                $temp  = explode(" ", trim($this->gedrec));
-                $level = $temp[0];
-                if ($level == 0) {
+                $level = (int) explode(' ', trim($this->gedrec))[0];
+                if ($level === 0) {
                     $level++;
                 }
                 $value = $this->getGedcomValue($id, $level, $this->gedrec);
@@ -1437,22 +1563,31 @@ class ReportParserGenerate extends ReportParserBase
                     $level++;
                     $value = $this->getGedcomValue($id, $level, $this->gedrec);
                 }
-                $value = preg_replace('/^@(' . WT_REGEX_XREF . ')@$/', '$1', $value);
+                $value = preg_replace('/^@(' . Gedcom::REGEX_XREF . ')@$/', '$1', $value);
                 $value = '"' . addslashes($value) . '"';
             }
             $condition = str_replace("@$id", $value, $condition);
             $i++;
         }
-        $ret = eval("return (bool) ($condition);");
+
+        // Create an expression language with the functions used by our reports.
+        $expression_provider  = new ReportExpressionLanguageProvider();
+        $expression_cache     = new NullAdapter();
+        $expression_language  = new ExpressionLanguage($expression_cache, [$expression_provider]);
+
+        $ret = $expression_language->evaluate($condition);
+
         if (!$ret) {
             $this->process_ifs++;
         }
     }
 
     /**
-     * XML <if /> end element
+     * Handle </if>
+     *
+     * @return void
      */
-    private function ifEndHandler()
+    protected function ifEndHandler(): void
     {
         if ($this->process_ifs > 0) {
             $this->process_ifs--;
@@ -1460,25 +1595,25 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <Footnote > start element
+     * Handle <footnote>
      * Collect the Footnote links
-     * GEDCOM Records that are protected by Privacy setting will be ignore
+     * GEDCOM Records that are protected by Privacy setting will be ignored
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function footnoteStartHandler($attrs)
+    protected function footnoteStartHandler(array $attrs): void
     {
-        global $WT_TREE;
-
-        $id = "";
-        if (preg_match("/[0-9] (.+) @(.+)@/", $this->gedrec, $match)) {
+        $id = '';
+        if (preg_match('/[0-9] (.+) @(.+)@/', $this->gedrec, $match)) {
             $id = $match[2];
         }
-        $record = GedcomRecord::getInstance($id, $WT_TREE);
+        $record = Factory::gedcomRecord()->make($id, $this->tree);
         if ($record && $record->canShow()) {
-            array_push($this->print_data_stack, $this->print_data);
-            $this->print_data = true;
-            $style            = "";
+            $this->print_data_stack[] = $this->print_data;
+            $this->print_data         = true;
+            $style                    = '';
             if (!empty($attrs['style'])) {
                 $style = $attrs['style'];
             }
@@ -1491,10 +1626,12 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <Footnote /> end element
+     * Handle </footnote>
      * Print the collected Footnote data
+     *
+     * @return void
      */
-    private function footnoteEndHandler()
+    protected function footnoteEndHandler(): void
     {
         if ($this->process_footnote) {
             $this->print_data = array_pop($this->print_data_stack);
@@ -1509,76 +1646,22 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <FootnoteTexts /> element
+     * Handle <footnoteTexts />
+     *
+     * @return void
      */
-    private function footnoteTextsStartHandler()
+    protected function footnoteTextsStartHandler(): void
     {
-        $temp = "footnotetexts";
+        $temp = 'footnotetexts';
         $this->wt_report->addElement($temp);
     }
 
     /**
-     * XML <AgeAtDeath /> element handler
-     */
-    private function ageAtDeathStartHandler()
-    {
-        // This duplicates functionality in FunctionsPrint::format_fact_date()
-        global $factrec, $WT_TREE;
-
-        $match = array();
-        if (preg_match("/0 @(.+)@/", $this->gedrec, $match)) {
-            $person = Individual::getInstance($match[1], $WT_TREE);
-            // Recorded age
-            if (preg_match('/\n2 AGE (.+)/', $factrec, $match)) {
-                $fact_age = $match[1];
-            } else {
-                $fact_age = '';
-            }
-            if (preg_match('/\n2 HUSB\n3 AGE (.+)/', $factrec, $match)) {
-                $husb_age = $match[1];
-            } else {
-                $husb_age = '';
-            }
-            if (preg_match('/\n2 WIFE\n3 AGE (.+)/', $factrec, $match)) {
-                $wife_age = $match[1];
-            } else {
-                $wife_age = '';
-            }
-
-            // Calculated age
-            $birth_date = $person->getBirthDate();
-            // Can't use getDeathDate(), as this also gives BURI/CREM events, which
-            // wouldn't give the correct "days after death" result for people with
-            // no DEAT.
-            $death_event = $person->getFirstFact('DEAT');
-            if ($death_event) {
-                $death_date = $death_event->getDate();
-            } else {
-                $death_date = new Date('');
-            }
-            $value = '';
-            if (Date::compare($birth_date, $death_date) <= 0 || !$person->isDead()) {
-                $age = Date::getAgeGedcom($birth_date, $death_date);
-                // Only show calculated age if it differs from recorded age
-                if ($age != '' && $age != "0d") {
-                    if ($fact_age != '' && $fact_age != $age || $fact_age == '' && $husb_age == '' && $wife_age == '' || $husb_age != '' && $person->getSex() == 'M' && $husb_age != $age || $wife_age != '' && $person->getSex() == 'F' && $wife_age != $age
-                    ) {
-                        $value  = FunctionsDate::getAgeAtEvent($age);
-                        $abbrev = substr($value, 0, strpos($value, ' ') + 5);
-                        if ($value !== $abbrev) {
-                            $value = $abbrev . '.';
-                        }
-                    }
-                }
-            }
-            $this->current_element->addText($value);
-        }
-    }
-
-    /**
      * XML element Forced line break handler - HTML code
+     *
+     * @return void
      */
-    private function brStartHandler()
+    protected function brStartHandler(): void
     {
         if ($this->print_data && $this->process_gedcoms === 0) {
             $this->current_element->addText('<br>');
@@ -1586,9 +1669,12 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <sp />element Forced space handler
+     * Handle <sp />
+     * Forced space
+     *
+     * @return void
      */
-    private function spStartHandler()
+    protected function spStartHandler(): void
     {
         if ($this->print_data && $this->process_gedcoms === 0) {
             $this->current_element->addText(' ');
@@ -1596,208 +1682,110 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <HighlightedImage/>
+     * Handle <highlightedImage />
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function highlightedImageStartHandler($attrs)
+    protected function highlightedImageStartHandler(array $attrs): void
     {
-        global $WT_TREE;
-
-        $id    = '';
-        $match = array();
-        if (preg_match("/0 @(.+)@/", $this->gedrec, $match)) {
+        $id = '';
+        if (preg_match('/0 @(.+)@/', $this->gedrec, $match)) {
             $id = $match[1];
         }
 
-        // mixed Position the top corner of this box on the page. the default is the current position
-        $top = '.';
-        if (isset($attrs['top'])) {
-            if ($attrs['top'] === '0') {
-                $top = 0;
-            } elseif ($attrs['top'] === '.') {
-                $top = '.';
-            } elseif (!empty($attrs['top'])) {
-                $top = (int) $attrs['top'];
-            }
-        }
+        // Position the top corner of this box on the page
+        $top = (float) ($attrs['top'] ?? ReportBaseElement::CURRENT_POSITION);
 
-        // mixed Position the left corner of this box on the page. the default is the current position
-        $left = '.';
-        if (isset($attrs['left'])) {
-            if ($attrs['left'] === '0') {
-                $left = 0;
-            } elseif ($attrs['left'] === '.') {
-                $left = '.';
-            } elseif (!empty($attrs['left'])) {
-                $left = (int) $attrs['left'];
-            }
-        }
+        // Position the left corner of this box on the page
+        $left = (float) ($attrs['left'] ?? ReportBaseElement::CURRENT_POSITION);
 
-        // string Align the image in left, center, right
-        $align = '';
-        if (!empty($attrs['align'])) {
-            $align = $attrs['align'];
-        }
+        // string Align the image in left, center, right (or empty to use x/y position).
+        $align = $attrs['align'] ?? '';
 
         // string Next Line should be T:next to the image, N:next line
-        $ln = '';
-        if (!empty($attrs['ln'])) {
-            $ln = $attrs['ln'];
-        }
+        $ln = $attrs['ln'] ?? 'T';
 
-        $width  = 0;
-        $height = 0;
-        if (!empty($attrs['width'])) {
-            $width = (int) $attrs['width'];
-        }
-        if (!empty($attrs['height'])) {
-            $height = (int) $attrs['height'];
-        }
+        // Width, height (or both).
+        $width  = (float) ($attrs['width'] ?? 0.0);
+        $height = (float) ($attrs['height'] ?? 0.0);
 
-        $person      = Individual::getInstance($id, $WT_TREE);
-        $mediaobject = $person->findHighlightedMedia();
-        if ($mediaobject) {
-            $attributes = $mediaobject->getImageAttributes('thumb');
-            if (in_array(
-                    $attributes['ext'],
-                    array(
-                        'GIF',
-                        'JPG',
-                        'PNG',
-                        'SWF',
-                        'PSD',
-                        'BMP',
-                        'TIFF',
-                        'TIFF',
-                        'JPC',
-                        'JP2',
-                        'JPX',
-                        'JB2',
-                        'SWC',
-                        'IFF',
-                        'WBMP',
-                        'XBM',
-                    )
-                ) && $mediaobject->canShow() && $mediaobject->fileExists('thumb')
-            ) {
-                if ($width > 0 && $height == 0) {
-                    $perc   = $width / $attributes['adjW'];
-                    $height = round($attributes['adjH'] * $perc);
-                } elseif ($height > 0 && $width == 0) {
-                    $perc  = $height / $attributes['adjH'];
-                    $width = round($attributes['adjW'] * $perc);
-                } else {
-                    $width  = $attributes['adjW'];
-                    $height = $attributes['adjH'];
-                }
-                $image = $this->report_root->createImageFromObject($mediaobject, $left, $top, $width, $height, $align, $ln);
-                $this->wt_report->addElement($image);
+        $person     = Factory::individual()->make($id, $this->tree);
+        $media_file = $person->findHighlightedMediaFile();
+
+        if ($media_file instanceof MediaFile && $media_file->fileExists($this->data_filesystem)) {
+            $image      = imagecreatefromstring($media_file->fileContents($this->data_filesystem));
+            $attributes = [imagesx($image), imagesy($image)];
+
+            if ($width > 0 && $height == 0) {
+                $perc   = $width / $attributes[0];
+                $height = round($attributes[1] * $perc);
+            } elseif ($height > 0 && $width == 0) {
+                $perc  = $height / $attributes[1];
+                $width = round($attributes[0] * $perc);
+            } else {
+                $width  = $attributes[0];
+                $height = $attributes[1];
             }
+            $image = $this->report_root->createImageFromObject($media_file, $left, $top, $width, $height, $align, $ln, $this->data_filesystem);
+            $this->wt_report->addElement($image);
         }
     }
 
     /**
-     * XML <Image/>
+     * Handle <image/>
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function imageStartHandler($attrs)
+    protected function imageStartHandler(array $attrs): void
     {
-        global $WT_TREE;
-
-        // mixed Position the top corner of this box on the page. the default is the current position
-        $top = '.';
-        if (isset($attrs['top'])) {
-            if ($attrs['top'] === "0") {
-                $top = 0;
-            } elseif ($attrs['top'] === '.') {
-                $top = '.';
-            } elseif (!empty($attrs['top'])) {
-                $top = (int) $attrs['top'];
-            }
-        }
+        // Position the top corner of this box on the page. the default is the current position
+        $top = (float) ($attrs['top'] ?? ReportBaseElement::CURRENT_POSITION);
 
         // mixed Position the left corner of this box on the page. the default is the current position
-        $left = '.';
-        if (isset($attrs['left'])) {
-            if ($attrs['left'] === '0') {
-                $left = 0;
-            } elseif ($attrs['left'] === '.') {
-                $left = '.';
-            } elseif (!empty($attrs['left'])) {
-                $left = (int) $attrs['left'];
-            }
-        }
+        $left = (float) ($attrs['left'] ?? ReportBaseElement::CURRENT_POSITION);
 
-        // string Align the image in left, center, right
-        $align = '';
-        if (!empty($attrs['align'])) {
-            $align = $attrs['align'];
-        }
+        // string Align the image in left, center, right (or empty to use x/y position).
+        $align = $attrs['align'] ?? '';
 
         // string Next Line should be T:next to the image, N:next line
-        $ln = 'T';
-        if (!empty($attrs['ln'])) {
-            $ln = $attrs['ln'];
-        }
+        $ln = $attrs['ln'] ?? 'T';
 
-        $width  = 0;
-        $height = 0;
-        if (!empty($attrs['width'])) {
-            $width = (int) $attrs['width'];
-        }
-        if (!empty($attrs['height'])) {
-            $height = (int) $attrs['height'];
-        }
+        // Width, height (or both).
+        $width  = (float) ($attrs['width'] ?? 0.0);
+        $height = (float) ($attrs['height'] ?? 0.0);
 
-        $file = '';
-        if (!empty($attrs['file'])) {
-            $file = $attrs['file'];
-        }
-        if ($file == "@FILE") {
-            $match = array();
+        $file = $attrs['file'] ?? '';
+
+        if ($file === '@FILE') {
+            $match = [];
             if (preg_match("/\d OBJE @(.+)@/", $this->gedrec, $match)) {
-                $mediaobject = Media::getInstance($match[1], $WT_TREE);
-                $attributes  = $mediaobject->getImageAttributes('thumb');
-                if (in_array(
-                        $attributes['ext'],
-                        array(
-                            'GIF',
-                            'JPG',
-                            'PNG',
-                            'SWF',
-                            'PSD',
-                            'BMP',
-                            'TIFF',
-                            'TIFF',
-                            'JPC',
-                            'JP2',
-                            'JPX',
-                            'JB2',
-                            'SWC',
-                            'IFF',
-                            'WBMP',
-                            'XBM',
-                        )
-                    ) && $mediaobject->canShow() && $mediaobject->fileExists('thumb')
-                ) {
+                $mediaobject = Factory::media()->make($match[1], $this->tree);
+                $media_file  = $mediaobject->firstImageFile();
+
+                if ($media_file instanceof MediaFile && $media_file->fileExists($this->data_filesystem)) {
+                    $image      = imagecreatefromstring($media_file->fileContents($this->data_filesystem));
+                    $attributes = [imagesx($image), imagesy($image)];
+
                     if ($width > 0 && $height == 0) {
-                        $perc   = $width / $attributes['adjW'];
-                        $height = round($attributes['adjH'] * $perc);
+                        $perc   = $width / $attributes[0];
+                        $height = round($attributes[1] * $perc);
                     } elseif ($height > 0 && $width == 0) {
-                        $perc  = $height / $attributes['adjH'];
-                        $width = round($attributes['adjW'] * $perc);
+                        $perc  = $height / $attributes[1];
+                        $width = round($attributes[0] * $perc);
                     } else {
-                        $width  = $attributes['adjW'];
-                        $height = $attributes['adjH'];
+                        $width  = $attributes[0];
+                        $height = $attributes[1];
                     }
-                    $image = $this->report_root->createImageFromObject($mediaobject, $left, $top, $width, $height, $align, $ln);
+                    $image = $this->report_root->createImageFromObject($media_file, $left, $top, $width, $height, $align, $ln, $this->data_filesystem);
                     $this->wt_report->addElement($image);
                 }
             }
         } else {
-            if (file_exists($file) && preg_match("/(jpg|jpeg|png|gif)$/i", $file)) {
+            if (file_exists($file) && preg_match('/(jpg|jpeg|png|gif)$/i', $file)) {
                 $size = getimagesize($file);
                 if ($width > 0 && $height == 0) {
                     $perc   = $width / $size[0];
@@ -1816,54 +1804,56 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <Line> element handler
+     * Handle <line>
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function lineStartHandler($attrs)
+    protected function lineStartHandler(array $attrs): void
     {
         // Start horizontal position, current position (default)
-        $x1 = ".";
+        $x1 = ReportBaseElement::CURRENT_POSITION;
         if (isset($attrs['x1'])) {
-            if ($attrs['x1'] === "0") {
+            if ($attrs['x1'] === '0') {
                 $x1 = 0;
-            } elseif ($attrs['x1'] === ".") {
-                $x1 = ".";
+            } elseif ($attrs['x1'] === '.') {
+                $x1 = ReportBaseElement::CURRENT_POSITION;
             } elseif (!empty($attrs['x1'])) {
-                $x1 = (int) $attrs['x1'];
+                $x1 = (float) $attrs['x1'];
             }
         }
         // Start vertical position, current position (default)
-        $y1 = ".";
+        $y1 = ReportBaseElement::CURRENT_POSITION;
         if (isset($attrs['y1'])) {
-            if ($attrs['y1'] === "0") {
+            if ($attrs['y1'] === '0') {
                 $y1 = 0;
-            } elseif ($attrs['y1'] === ".") {
-                $y1 = ".";
+            } elseif ($attrs['y1'] === '.') {
+                $y1 = ReportBaseElement::CURRENT_POSITION;
             } elseif (!empty($attrs['y1'])) {
-                $y1 = (int) $attrs['y1'];
+                $y1 = (float) $attrs['y1'];
             }
         }
         // End horizontal position, maximum width (default)
-        $x2 = ".";
+        $x2 = ReportBaseElement::CURRENT_POSITION;
         if (isset($attrs['x2'])) {
-            if ($attrs['x2'] === "0") {
+            if ($attrs['x2'] === '0') {
                 $x2 = 0;
-            } elseif ($attrs['x2'] === ".") {
-                $x2 = ".";
+            } elseif ($attrs['x2'] === '.') {
+                $x2 = ReportBaseElement::CURRENT_POSITION;
             } elseif (!empty($attrs['x2'])) {
-                $x2 = (int) $attrs['x2'];
+                $x2 = (float) $attrs['x2'];
             }
         }
         // End vertical position
-        $y2 = ".";
+        $y2 = ReportBaseElement::CURRENT_POSITION;
         if (isset($attrs['y2'])) {
-            if ($attrs['y2'] === "0") {
+            if ($attrs['y2'] === '0') {
                 $y2 = 0;
-            } elseif ($attrs['y2'] === ".") {
-                $y2 = ".";
+            } elseif ($attrs['y2'] === '.') {
+                $y2 = ReportBaseElement::CURRENT_POSITION;
             } elseif (!empty($attrs['y2'])) {
-                $y2 = (int) $attrs['y2'];
+                $y2 = (float) $attrs['y2'];
             }
         }
 
@@ -1872,20 +1862,20 @@ class ReportParserGenerate extends ReportParserBase
     }
 
     /**
-     * XML <List>
+     * Handle <list>
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function listStartHandler($attrs)
+    protected function listStartHandler(array $attrs): void
     {
-        global $WT_TREE;
-
         $this->process_repeats++;
         if ($this->process_repeats > 1) {
             return;
         }
 
-        $match = array();
+        $match = [];
         if (isset($attrs['sortby'])) {
             $sortby = $attrs['sortby'];
             if (preg_match("/\\$(\w+)/", $sortby, $match)) {
@@ -1893,194 +1883,215 @@ class ReportParserGenerate extends ReportParserBase
                 $sortby = trim($sortby);
             }
         } else {
-            $sortby = "NAME";
+            $sortby = 'NAME';
         }
 
-        if (isset($attrs['list'])) {
-            $listname = $attrs['list'];
-        } else {
-            $listname = "individual";
-        }
+        $listname = $attrs['list'] ?? 'individual';
+
         // Some filters/sorts can be applied using SQL, while others require PHP
         switch ($listname) {
-            case "pending":
-                $rows = Database::prepare(
-                "SELECT xref, CASE new_gedcom WHEN '' THEN old_gedcom ELSE new_gedcom END AS gedcom" .
-                " FROM `##change`" . " WHERE (xref, change_id) IN (" .
-                "  SELECT xref, MAX(change_id)" .
-                "  FROM `##change`" .
-                "  WHERE status = 'pending' AND gedcom_id = :tree_id" .
-                "  GROUP BY xref" .
-                " )"
-                )->execute(array(
-                    'tree_id' => $WT_TREE->getTreeId(),
-                ))->fetchAll();
-                $this->list = array();
-                foreach ($rows as $row) {
-                    $this->list[] = GedcomRecord::getInstance($row->xref, $WT_TREE, $row->gedcom);
+            case 'pending':
+                $xrefs = DB::table('change')
+                    ->whereIn('change_id', function (Builder $query): void {
+                        $query->select(new Expression('MAX(change_id)'))
+                            ->from('change')
+                            ->where('gedcom_id', '=', $this->tree->id())
+                            ->where('status', '=', 'pending')
+                            ->groupBy(['xref']);
+                    })
+                    ->pluck('xref');
+
+                $this->list = [];
+                foreach ($xrefs as $xref) {
+                    $this->list[] = Factory::gedcomRecord()->make($xref, $this->tree);
                 }
                 break;
             case 'individual':
-                $sql_select   = "SELECT i_id AS xref, i_gedcom AS gedcom FROM `##individuals` ";
-                $sql_join     = "";
-                $sql_where    = " WHERE i_file = :tree_id";
-                $sql_order_by = "";
-                $sql_params   = array('tree_id' => $WT_TREE->getTreeId());
+                $query = DB::table('individuals')
+                    ->where('i_file', '=', $this->tree->id())
+                    ->select(['i_id AS xref', 'i_gedcom AS gedcom'])
+                    ->distinct();
+
                 foreach ($attrs as $attr => $value) {
                     if (strpos($attr, 'filter') === 0 && $value) {
                         $value = $this->substituteVars($value, false);
                         // Convert the various filters into SQL
                         if (preg_match('/^(\w+):DATE (LTE|GTE) (.+)$/', $value, $match)) {
-                            $sql_join .= " JOIN `##dates` AS {$attr} ON ({$attr}.d_file=i_file AND {$attr}.d_gid=i_id)";
-                            $sql_where .= " AND {$attr}.d_fact = :{$attr}fact";
-                            $sql_params[$attr . 'fact'] = $match[1];
-                            $date                       = new Date($match[3]);
-                            if ($match[2] == "LTE") {
-                                $sql_where .= " AND {$attr}.d_julianday2 <= :{$attr}date";
-                                $sql_params[$attr . 'date'] = $date->maximumJulianDay();
+                            $query->join('dates AS ' . $attr, static function (JoinClause $join) use ($attr): void {
+                                $join
+                                    ->on($attr . '.d_gid', '=', 'i_id')
+                                    ->on($attr . '.d_file', '=', 'i_file');
+                            });
+
+                            $query->where($attr . '.d_fact', '=', $match[1]);
+
+                            $date = new Date($match[3]);
+
+                            if ($match[2] === 'LTE') {
+                                $query->where($attr . '.d_julianday2', '<=', $date->maximumJulianDay());
                             } else {
-                                $sql_where .= " AND {$attr}.d_julianday1 >= :{$attr}date";
-                                $sql_params[$attr . 'date'] = $date->minimumJulianDay();
+                                $query->where($attr . '.d_julianday1', '>=', $date->minimumJulianDay());
                             }
-                            if ($sortby == $match[1]) {
-                                $sortby = "";
-                                $sql_order_by .= ($sql_order_by ? ", " : " ORDER BY ") . "{$attr}.d_julianday1";
+
+                            // This filter has been fully processed
+                            unset($attrs[$attr]);
+                        } elseif (preg_match('/^NAME CONTAINS (.+)$/', $value, $match)) {
+                            $query->join('name AS ' . $attr, static function (JoinClause $join) use ($attr): void {
+                                $join
+                                    ->on($attr . '.n_id', '=', 'i_id')
+                                    ->on($attr . '.n_file', '=', 'i_file');
+                            });
+                            // Search the DB only if there is any name supplied
+                            $names = explode(' ', $match[1]);
+                            foreach ($names as $n => $name) {
+                                $query->where($attr . '.n_full', 'LIKE', '%' . addcslashes($name, '\\%_') . '%');
                             }
-                            unset($attrs[$attr]); // This filter has been fully processed
-                        } elseif (preg_match('/^NAME CONTAINS (.*)$/', $value, $match)) {
-                            // Do nothing, unless you have to
-                            if ($match[1] != '' || $sortby == 'NAME') {
-                                $sql_join .= " JOIN `##name` AS {$attr} ON (n_file=i_file AND n_id=i_id)";
-                                // Search the DB only if there is any name supplied
-                                if ($match[1] != "") {
-                                    $names = explode(" ", $match[1]);
-                                    foreach ($names as $n => $name) {
-                                        $sql_where .= " AND {$attr}.n_full LIKE CONCAT('%', :{$attr}name{$n}, '%')";
-                                        $sql_params[$attr . 'name' . $n] = $name;
-                                    }
-                                }
-                                // Let the DB do the name sorting even when no name was entered
-                                if ($sortby == "NAME") {
-                                    $sortby = "";
-                                    $sql_order_by .= ($sql_order_by ? ", " : " ORDER BY ") . "{$attr}.n_sort";
-                                }
-                            }
-                            unset($attrs[$attr]); // This filter has been fully processed
-                        } elseif (preg_match('/^REGEXP \/(.+)\//', $value, $match)) {
-                            $sql_where .= " AND i_gedcom REGEXP :{$attr}gedcom";
-                            // PDO helpfully escapes backslashes for us, preventing us from matching "\n1 FACT"
-                            $sql_params[$attr . 'gedcom'] = str_replace('\n', "\n", $match[1]);
-                            unset($attrs[$attr]); // This filter has been fully processed
-                        } elseif (preg_match('/^(?:\w+):PLAC CONTAINS (.+)$/', $value, $match)) {
-                            $sql_join .= " JOIN `##places` AS {$attr}a ON ({$attr}a.p_file = i_file)";
-                            $sql_join .= " JOIN `##placelinks` AS {$attr}b ON ({$attr}a.p_file = {$attr}b.pl_file AND {$attr}b.pl_p_id = {$attr}a.p_id AND {$attr}b.pl_gid = i_id)";
-                            $sql_where .= " AND {$attr}a.p_place LIKE CONCAT('%', :{$attr}place, '%')";
-                            $sql_params[$attr . 'place'] = $match[1];
-                            // Don't unset this filter. This is just initial filtering
-                        } elseif (preg_match('/^(\w*):*(\w*) CONTAINS (.+)$/', $value, $match)) {
-                            $sql_where .= " AND i_gedcom LIKE CONCAT('%', :{$attr}contains1, '%', :{$attr}contains2, '%', :{$attr}contains3, '%')";
-                            $sql_params[$attr . 'contains1'] = $match[1];
-                            $sql_params[$attr . 'contains2'] = $match[2];
-                            $sql_params[$attr . 'contains3'] = $match[3];
-                            // Don't unset this filter. This is just initial filtering
+
+                            // This filter has been fully processed
+                            unset($attrs[$attr]);
+                        } elseif (preg_match('/^LIKE \/(.+)\/$/', $value, $match)) {
+                            // Convert newline escape sequences to actual new lines
+                            $match[1] = str_replace('\n', "\n", $match[1]);
+
+                            $query->where('i_gedcom', 'LIKE', $match[1]);
+
+                            // This filter has been fully processed
+                            unset($attrs[$attr]);
+                        } elseif (preg_match('/^(?:\w*):PLAC CONTAINS (.+)$/', $value, $match)) {
+                            // Don't unset this filter. This is just initial filtering for performance
+                            $query
+                                ->join('placelinks AS ' . $attr . 'a', static function (JoinClause $join) use ($attr): void {
+                                    $join
+                                        ->on($attr . 'a.pl_file', '=', 'i_file')
+                                        ->on($attr . 'a.pl_gid', '=', 'i_id');
+                                })
+                                ->join('places AS ' . $attr . 'b', static function (JoinClause $join) use ($attr): void {
+                                    $join
+                                        ->on($attr . 'b.p_file', '=', $attr . 'a.pl_file')
+                                        ->on($attr . 'b.p_id', '=', $attr . 'a.pl_p_id');
+                                })
+                                ->where($attr . 'b.p_place', '%' . addcslashes($match[1], '\\%_') . '%');
+                        } elseif (preg_match('/^(\w*):(\w+) CONTAINS (.+)$/', $value, $match)) {
+                            // Don't unset this filter. This is just initial filtering for performance
+                            $match[3] = strtr($match[3], ['\\' => '\\\\', '%'  => '\\%', '_'  => '\\_', ' ' => '%']);
+                            $like = "%\n1 " . $match[1] . "%\n2 " . $match[2] . '%' . $match[3] . '%';
+                            $query->where('i_gedcom', 'LIKE', $like);
+                        } elseif (preg_match('/^(\w+) CONTAINS (.+)$/', $value, $match)) {
+                            // Don't unset this filter. This is just initial filtering for performance
+                            $match[2] = strtr($match[2], ['\\' => '\\\\', '%'  => '\\%', '_'  => '\\_', ' ' => '%']);
+                            $like = "%\n1 " . $match[1] . '%' . $match[2] . '%';
+                            $query->where('i_gedcom', 'LIKE', $like);
                         }
                     }
                 }
 
-                $this->list = array();
-                $rows       = Database::prepare(
-                $sql_select . $sql_join . $sql_where . $sql_order_by
-                )->execute($sql_params)->fetchAll();
+                $this->list = [];
 
-                foreach ($rows as $row) {
-                    $this->list[$row->xref] = Individual::getInstance($row->xref, $WT_TREE, $row->gedcom);
+                foreach ($query->get() as $row) {
+                    $this->list[$row->xref] = Factory::individual()->make($row->xref, $this->tree, $row->gedcom);
                 }
                 break;
 
             case 'family':
-                $sql_select   = "SELECT f_id AS xref, f_gedcom AS gedcom FROM `##families`";
-                $sql_join     = "";
-                $sql_where    = " WHERE f_file = :tree_id";
-                $sql_order_by = "";
-                $sql_params   = array('tree_id' => $WT_TREE->getTreeId());
+                $query = DB::table('families')
+                    ->where('f_file', '=', $this->tree->id())
+                    ->select(['f_id AS xref', 'f_gedcom AS gedcom'])
+                    ->distinct();
+
                 foreach ($attrs as $attr => $value) {
                     if (strpos($attr, 'filter') === 0 && $value) {
                         $value = $this->substituteVars($value, false);
                         // Convert the various filters into SQL
                         if (preg_match('/^(\w+):DATE (LTE|GTE) (.+)$/', $value, $match)) {
-                            $sql_join .= " JOIN `##dates` AS {$attr} ON ({$attr}.d_file=f_file AND {$attr}.d_gid=f_id)";
-                            $sql_where .= " AND {$attr}.d_fact = :{$attr}fact";
-                            $sql_params[$attr . 'fact'] = $match[1];
-                            $date                       = new Date($match[3]);
-                            if ($match[2] == "LTE") {
-                                $sql_where .= " AND {$attr}.d_julianday2 <= :{$attr}date";
-                                $sql_params[$attr . 'date'] = $date->maximumJulianDay();
+                            $query->join('dates AS ' . $attr, static function (JoinClause $join) use ($attr): void {
+                                $join
+                                    ->on($attr . '.d_gid', '=', 'f_id')
+                                    ->on($attr . '.d_file', '=', 'f_file');
+                            });
+
+                            $query->where($attr . '.d_fact', '=', $match[1]);
+
+                            $date = new Date($match[3]);
+
+                            if ($match[2] === 'LTE') {
+                                $query->where($attr . '.d_julianday2', '<=', $date->maximumJulianDay());
                             } else {
-                                $sql_where .= " AND {$attr}.d_julianday1 >= :{$attr}date";
-                                $sql_params[$attr . 'date'] = $date->minimumJulianDay();
+                                $query->where($attr . '.d_julianday1', '>=', $date->minimumJulianDay());
                             }
-                            if ($sortby == $match[1]) {
-                                $sortby = "";
-                                $sql_order_by .= ($sql_order_by ? ", " : " ORDER BY ") . "{$attr}.d_julianday1";
-                            }
-                            unset($attrs[$attr]); // This filter has been fully processed
-                        } elseif (preg_match('/^REGEXP \/(.+)\//', $value, $match)) {
-                            $sql_where .= " AND f_gedcom REGEXP :{$attr}gedcom";
-                            // PDO helpfully escapes backslashes for us, preventing us from matching "\n1 FACT"
-                            $sql_params[$attr . 'gedcom'] = str_replace('\n', "\n", $match[1]);
-                            unset($attrs[$attr]); // This filter has been fully processed
-                        } elseif (preg_match('/^NAME CONTAINS (.+)$/', $value, $match)) {
-                            // Do nothing, unless you have to
-                            if ($match[1] != '' || $sortby == 'NAME') {
-                                $sql_join .= " JOIN `##name` AS {$attr} ON n_file = f_file AND n_id IN (f_husb, f_wife)";
+
+                            // This filter has been fully processed
+                            unset($attrs[$attr]);
+                        } elseif (preg_match('/^LIKE \/(.+)\/$/', $value, $match)) {
+                            // Convert newline escape sequences to actual new lines
+                            $match[1] = str_replace('\n', "\n", $match[1]);
+
+                            $query->where('f_gedcom', 'LIKE', $match[1]);
+
+                            // This filter has been fully processed
+                            unset($attrs[$attr]);
+                        } elseif (preg_match('/^NAME CONTAINS (.*)$/', $value, $match)) {
+                            if ($sortby === 'NAME' || $match[1] !== '') {
+                                $query->join('name AS ' . $attr, static function (JoinClause $join) use ($attr): void {
+                                    $join
+                                        ->on($attr . '.n_file', '=', 'f_file')
+                                        ->where(static function (Builder $query): void {
+                                            $query
+                                                ->whereColumn('n_id', '=', 'f_husb')
+                                                ->orWhereColumn('n_id', '=', 'f_wife');
+                                        });
+                                });
                                 // Search the DB only if there is any name supplied
-                                if ($match[1] != "") {
-                                    $names = explode(" ", $match[1]);
+                                if ($match[1] != '') {
+                                    $names = explode(' ', $match[1]);
                                     foreach ($names as $n => $name) {
-                                        $sql_where .= " AND {$attr}.n_full LIKE CONCAT('%', :{$attr}name{$n}, '%')";
-                                        $sql_params[$attr . 'name' . $n] = $name;
+                                        $query->where($attr . '.n_full', 'LIKE', '%' . addcslashes($name, '\\%_') . '%');
                                     }
                                 }
-                                // Let the DB do the name sorting even when no name was entered
-                                if ($sortby == "NAME") {
-                                    $sortby = "";
-                                    $sql_order_by .= ($sql_order_by ? ", " : " ORDER BY ") . "{$attr}.n_sort";
-                                }
                             }
-                            unset($attrs[$attr]); // This filter has been fully processed
 
-                        } elseif (preg_match('/^(?:\w+):PLAC CONTAINS (.+)$/', $value, $match)) {
-                            $sql_join .= " JOIN `##places` AS {$attr}a ON ({$attr}a.p_file=f_file)";
-                            $sql_join .= " JOIN `##placelinks` AS {$attr}b ON ({$attr}a.p_file={$attr}b.pl_file AND {$attr}b.pl_p_id={$attr}a.p_id AND {$attr}b.pl_gid=f_id)";
-                            $sql_where .= " AND {$attr}a.p_place LIKE CONCAT('%', :{$attr}place, '%')";
-                            $sql_params[$attr . 'place'] = $match[1];
-                            // Don't unset this filter. This is just initial filtering
-                        } elseif (preg_match('/^(\w*):*(\w*) CONTAINS (.+)$/', $value, $match)) {
-                            $sql_where .= " AND f_gedcom LIKE CONCAT('%', :{$attr}contains1, '%', :{$attr}contains2, '%', :{$attr}contains3, '%')";
-                            $sql_params[$attr . 'contains1'] = $match[1];
-                            $sql_params[$attr . 'contains2'] = $match[2];
-                            $sql_params[$attr . 'contains3'] = $match[3];
-                            // Don't unset this filter. This is just initial filtering
+                            // This filter has been fully processed
+                            unset($attrs[$attr]);
+                        } elseif (preg_match('/^(?:\w*):PLAC CONTAINS (.+)$/', $value, $match)) {
+                            // Don't unset this filter. This is just initial filtering for performance
+                            $query
+                                ->join('placelinks AS ' . $attr . 'a', static function (JoinClause $join) use ($attr): void {
+                                    $join
+                                        ->on($attr . 'a.pl_file', '=', 'f_file')
+                                        ->on($attr . 'a.pl_gid', '=', 'f_id');
+                                })
+                                ->join('places AS ' . $attr . 'b', static function (JoinClause $join) use ($attr): void {
+                                    $join
+                                        ->on($attr . 'b.p_file', '=', $attr . 'a.pl_file')
+                                        ->on($attr . 'b.p_id', '=', $attr . 'a.pl_p_id');
+                                })
+                                ->where($attr . 'b.p_place', 'LIKE', '%' . addcslashes($match[1], '\\%_') . '%');
+                        } elseif (preg_match('/^(\w*):(\w+) CONTAINS (.+)$/', $value, $match)) {
+                            // Don't unset this filter. This is just initial filtering for performance
+                            $match[3] = strtr($match[3], ['\\' => '\\\\', '%'  => '\\%', '_'  => '\\_', ' ' => '%']);
+                            $like = "%\n1 " . $match[1] . "%\n2 " . $match[2] . '%' . $match[3] . '%';
+                            $query->where('f_gedcom', 'LIKE', $like);
+                        } elseif (preg_match('/^(\w+) CONTAINS (.+)$/', $value, $match)) {
+                            // Don't unset this filter. This is just initial filtering for performance
+                            $match[2] = strtr($match[2], ['\\' => '\\\\', '%'  => '\\%', '_'  => '\\_', ' ' => '%']);
+                            $like = "%\n1 " . $match[1] . '%' . $match[2] . '%';
+                            $query->where('f_gedcom', 'LIKE', $like);
                         }
                     }
                 }
 
-                $this->list = array();
-                $rows       = Database::prepare(
-                $sql_select . $sql_join . $sql_where . $sql_order_by
-                )->execute($sql_params)->fetchAll();
+                $this->list = [];
 
-                foreach ($rows as $row) {
-                    $this->list[$row->xref] = Family::getInstance($row->xref, $WT_TREE, $row->gedcom);
+                foreach ($query->get() as $row) {
+                    $this->list[$row->xref] = Factory::family()->make($row->xref, $this->tree, $row->gedcom);
                 }
                 break;
 
             default:
-                throw new \DomainException('Invalid list name: ' . $listname);
+                throw new DomainException('Invalid list name: ' . $listname);
         }
 
-        $filters  = array();
-        $filters2 = array();
+        $filters  = [];
+        $filters2 = [];
         if (isset($attrs['filter1']) && count($this->list) > 0) {
             foreach ($attrs as $key => $value) {
                 if (preg_match("/filter(\d)/", $key)) {
@@ -2088,17 +2099,17 @@ class ReportParserGenerate extends ReportParserBase
                     if (preg_match("/@(\w+)/", $condition, $match)) {
                         $id    = $match[1];
                         $value = "''";
-                        if ($id == "ID") {
-                            if (preg_match("/0 @(.+)@/", $this->gedrec, $match)) {
+                        if ($id === 'ID') {
+                            if (preg_match('/0 @(.+)@/', $this->gedrec, $match)) {
                                 $value = "'" . $match[1] . "'";
                             }
-                        } elseif ($id == "fact") {
+                        } elseif ($id === 'fact') {
                             $value = "'" . $this->fact . "'";
-                        } elseif ($id == "desc") {
+                        } elseif ($id === 'desc') {
                             $value = "'" . $this->desc . "'";
                         } else {
                             if (preg_match("/\d $id (.+)/", $this->gedrec, $match)) {
-                                $value = "'" . str_replace("@", "", trim($match[1])) . "'";
+                                $value = "'" . str_replace('@', '', trim($match[1])) . "'";
                             }
                         }
                         $condition = preg_replace("/@$id/", $value, $condition);
@@ -2113,32 +2124,33 @@ class ReportParserGenerate extends ReportParserBase
                             $val = trim($val);
                         }
                         if ($val) {
-                            $searchstr = "";
-                            $tags      = explode(":", $tag);
+                            $searchstr = '';
+                            $tags      = explode(':', $tag);
                             //-- only limit to a level number if we are specifically looking at a level
                             if (count($tags) > 1) {
                                 $level = 1;
+                                $t = 'XXXX';
                                 foreach ($tags as $t) {
                                     if (!empty($searchstr)) {
                                         $searchstr .= "[^\n]*(\n[2-9][^\n]*)*\n";
                                     }
                                     //-- search for both EMAIL and _EMAIL... silly double gedcom standard
-                                    if ($t == "EMAIL" || $t == "_EMAIL") {
-                                        $t = "_?EMAIL";
+                                    if ($t === 'EMAIL' || $t === '_EMAIL') {
+                                        $t = '_?EMAIL';
                                     }
-                                    $searchstr .= $level . " " . $t;
+                                    $searchstr .= $level . ' ' . $t;
                                     $level++;
                                 }
                             } else {
-                                if ($tag == "EMAIL" || $tag == "_EMAIL") {
-                                    $tag = "_?EMAIL";
+                                if ($tag === 'EMAIL' || $tag === '_EMAIL') {
+                                    $tag = '_?EMAIL';
                                 }
                                 $t         = $tag;
-                                $searchstr = "1 " . $tag;
+                                $searchstr = '1 ' . $tag;
                             }
                             switch ($expr) {
-                                case "CONTAINS":
-                                    if ($t == "PLAC") {
+                                case 'CONTAINS':
+                                    if ($t === 'PLAC') {
                                         $searchstr .= "[^\n]*[, ]*" . $val;
                                     } else {
                                         $searchstr .= "[^\n]*" . $val;
@@ -2146,7 +2158,11 @@ class ReportParserGenerate extends ReportParserBase
                                     $filters[] = $searchstr;
                                     break;
                                 default:
-                                    $filters2[] = array("tag" => $tag, "expr" => $expr, "val" => $val);
+                                    $filters2[] = [
+                                        'tag'  => $tag,
+                                        'expr' => $expr,
+                                        'val'  => $val,
+                                    ];
                                     break;
                             }
                         }
@@ -2158,7 +2174,7 @@ class ReportParserGenerate extends ReportParserBase
         if ($filters) {
             foreach ($this->list as $key => $record) {
                 foreach ($filters as $filter) {
-                    if (!preg_match("/" . $filter . "/i", $record->privatizeGedcom(Auth::accessLevel($WT_TREE)))) {
+                    if (!preg_match('/' . $filter . '/i', $record->privatizeGedcom(Auth::accessLevel($this->tree)))) {
                         unset($this->list[$key]);
                         break;
                     }
@@ -2166,33 +2182,33 @@ class ReportParserGenerate extends ReportParserBase
             }
         }
         if ($filters2) {
-            $mylist = array();
+            $mylist = [];
             foreach ($this->list as $indi) {
-                $key  = $indi->getXref();
-                $grec = $indi->privatizeGedcom(Auth::accessLevel($WT_TREE));
+                $key  = $indi->xref();
+                $grec = $indi->privatizeGedcom(Auth::accessLevel($this->tree));
                 $keep = true;
                 foreach ($filters2 as $filter) {
                     if ($keep) {
                         $tag  = $filter['tag'];
                         $expr = $filter['expr'];
                         $val  = $filter['val'];
-                        if ($val == "''") {
-                            $val = "";
+                        if ($val === "''") {
+                            $val = '';
                         }
-                        $tags = explode(":", $tag);
+                        $tags = explode(':', $tag);
                         $t    = end($tags);
                         $v    = $this->getGedcomValue($tag, 1, $grec);
                         //-- check for EMAIL and _EMAIL (silly double gedcom standard :P)
-                        if ($t == "EMAIL" && empty($v)) {
-                            $tag  = str_replace("EMAIL", "_EMAIL", $tag);
-                            $tags = explode(":", $tag);
+                        if ($t === 'EMAIL' && empty($v)) {
+                            $tag  = str_replace('EMAIL', '_EMAIL', $tag);
+                            $tags = explode(':', $tag);
                             $t    = end($tags);
                             $v    = Functions::getSubRecord(1, $tag, $grec);
                         }
 
                         switch ($expr) {
-                            case "GTE":
-                                if ($t == "DATE") {
+                            case 'GTE':
+                                if ($t === 'DATE') {
                                     $date1 = new Date($v);
                                     $date2 = new Date($val);
                                     $keep  = (Date::compare($date1, $date2) >= 0);
@@ -2200,8 +2216,8 @@ class ReportParserGenerate extends ReportParserBase
                                     $keep = true;
                                 }
                                 break;
-                            case "LTE":
-                                if ($t == "DATE") {
+                            case 'LTE':
+                                if ($t === 'DATE') {
                                     $date1 = new Date($v);
                                     $date2 = new Date($val);
                                     $keep  = (Date::compare($date1, $date2) <= 0);
@@ -2228,38 +2244,36 @@ class ReportParserGenerate extends ReportParserBase
 
         switch ($sortby) {
             case 'NAME':
-                uasort($this->list, '\Fisharebest\Webtrees\GedcomRecord::compare');
+                uasort($this->list, GedcomRecord::nameComparator());
                 break;
             case 'CHAN':
-                uasort($this->list, function (GedcomRecord $x, GedcomRecord $y) {
-                    return $y->lastChangeTimestamp(true) - $x->lastChangeTimestamp(true);
-                });
+                uasort($this->list, GedcomRecord::lastChangeComparator());
                 break;
             case 'BIRT:DATE':
-                uasort($this->list, '\Fisharebest\Webtrees\Individual::compareBirthDate');
+                uasort($this->list, Individual::birthDateComparator());
                 break;
             case 'DEAT:DATE':
-                uasort($this->list, '\Fisharebest\Webtrees\Individual::compareDeathDate');
+                uasort($this->list, Individual::deathDateComparator());
                 break;
             case 'MARR:DATE':
-                uasort($this->list, '\Fisharebest\Webtrees\Family::compareMarrDate');
+                uasort($this->list, Family::marriageDateComparator());
                 break;
             default:
                 // unsorted or already sorted by SQL
                 break;
         }
 
-        array_push($this->repeats_stack, array($this->repeats, $this->repeat_bytes));
-        $this->repeat_bytes = xml_get_current_line_number($this->parser) + 1;
+        $this->repeats_stack[] = [$this->repeats, $this->repeat_bytes];
+        $this->repeat_bytes    = xml_get_current_line_number($this->parser) + 1;
     }
 
     /**
-     * XML <List>
+     * Handle </list>
+     *
+     * @return void
      */
-    private function listEndHandler()
+    protected function listEndHandler(): void
     {
-        global $report;
-
         $this->process_repeats--;
         if ($this->process_repeats > 0) {
             return;
@@ -2272,8 +2286,8 @@ class ReportParserGenerate extends ReportParserBase
                 $lineoffset += $rep[1];
             }
             //-- read the xml from the file
-            $lines = file($report);
-            while ((strpos($lines[$lineoffset + $this->repeat_bytes], "<List") === false) && (($lineoffset + $this->repeat_bytes) > 0)) {
+            $lines = file($this->report);
+            while ((strpos($lines[$lineoffset + $this->repeat_bytes], '<List') === false) && (($lineoffset + $this->repeat_bytes) > 0)) {
                 $lineoffset--;
             }
             $lineoffset++;
@@ -2282,9 +2296,9 @@ class ReportParserGenerate extends ReportParserBase
             // List Level counter
             $count = 1;
             while (0 < $count) {
-                if (strpos($lines[$line_nr], "<List") !== false) {
+                if (strpos($lines[$line_nr], '<List') !== false) {
                     $count++;
-                } elseif (strpos($lines[$line_nr], "</List") !== false) {
+                } elseif (strpos($lines[$line_nr], '</List') !== false) {
                     $count--;
                 }
                 if (0 < $count) {
@@ -2294,24 +2308,40 @@ class ReportParserGenerate extends ReportParserBase
             }
             // No need to drag this
             unset($lines);
-            $reportxml .= "</tempdoc>";
+            $reportxml .= '</tempdoc>';
             // Save original values
-            array_push($this->parser_stack, $this->parser);
-            $oldgedrec = $this->gedrec;
+            $this->parser_stack[] = $this->parser;
+            $oldgedrec            = $this->gedrec;
 
             $this->list_total   = count($this->list);
             $this->list_private = 0;
             foreach ($this->list as $record) {
                 if ($record->canShow()) {
-                    $this->gedrec = $record->privatizeGedcom(Auth::accessLevel($record->getTree()));
+                    $this->gedrec = $record->privatizeGedcom(Auth::accessLevel($record->tree()));
                     //-- start the sax parser
                     $repeat_parser = xml_parser_create();
                     $this->parser  = $repeat_parser;
                     xml_parser_set_option($repeat_parser, XML_OPTION_CASE_FOLDING, false);
-                    xml_set_element_handler($repeat_parser, array($this, 'startElement'), array($this, 'endElement'));
-                    xml_set_character_data_handler($repeat_parser, array($this, 'characterData'));
+
+                    xml_set_element_handler(
+                        $repeat_parser,
+                        function ($parser, string $name, array $attrs): void {
+                            $this->startElement($parser, $name, $attrs);
+                        },
+                        function ($parser, string $name): void {
+                            $this->endElement($parser, $name);
+                        }
+                    );
+
+                    xml_set_character_data_handler(
+                        $repeat_parser,
+                        function ($parser, string $data): void {
+                            $this->characterData($parser, $data);
+                        }
+                    );
+
                     if (!xml_parse($repeat_parser, $reportxml, true)) {
-                        throw new \DomainException(sprintf(
+                        throw new DomainException(sprintf(
                             'ListEHandler XML error: %s at line %d',
                             xml_error_string(xml_get_error_code($repeat_parser)),
                             xml_get_current_line_number($repeat_parser)
@@ -2322,48 +2352,46 @@ class ReportParserGenerate extends ReportParserBase
                     $this->list_private++;
                 }
             }
-            $this->list   = array();
+            $this->list   = [];
             $this->parser = array_pop($this->parser_stack);
             $this->gedrec = $oldgedrec;
         }
-        list($this->repeats, $this->repeat_bytes) = array_pop($this->repeats_stack);
+        [$this->repeats, $this->repeat_bytes] = array_pop($this->repeats_stack);
     }
 
     /**
-     * XML <ListTotal> element handler
-     *
+     * Handle <listTotal>
      * Prints the total number of records in a list
-     * The total number is collected from
-     * List and Relatives
+     * The total number is collected from <list> and <relatives>
+     *
+     * @return void
      */
-    private function listTotalStartHandler()
+    protected function listTotalStartHandler(): void
     {
         if ($this->list_private == 0) {
-            $this->current_element->addText($this->list_total);
+            $this->current_element->addText((string) $this->list_total);
         } else {
-            $this->current_element->addText(($this->list_total - $this->list_private) . " / " . $this->list_total);
+            $this->current_element->addText(($this->list_total - $this->list_private) . ' / ' . $this->list_total);
         }
     }
 
     /**
-     * XML <Relatives>
+     * Handle <relatives>
      *
-     * @param array $attrs an array of key value pairs for the attributes
+     * @param string[] $attrs
+     *
+     * @return void
      */
-    private function relativesStartHandler($attrs)
+    protected function relativesStartHandler(array $attrs): void
     {
-        global $WT_TREE;
-
         $this->process_repeats++;
         if ($this->process_repeats > 1) {
             return;
         }
 
-        $sortby = "NAME";
-        if (isset($attrs['sortby'])) {
-            $sortby = $attrs['sortby'];
-        }
-        $match = array();
+        $sortby = $attrs['sortby'] ?? 'NAME';
+
+        $match = [];
         if (preg_match("/\\$(\w+)/", $sortby, $match)) {
             $sortby = $this->vars[$match[1]]['id'];
             $sortby = trim($sortby);
@@ -2371,82 +2399,61 @@ class ReportParserGenerate extends ReportParserBase
 
         $maxgen = -1;
         if (isset($attrs['maxgen'])) {
-            $maxgen = $attrs['maxgen'];
-        }
-        if ($maxgen == "*") {
-            $maxgen = -1;
+            $maxgen = (int) $attrs['maxgen'];
         }
 
-        $group = "child-family";
-        if (isset($attrs['group'])) {
-            $group = $attrs['group'];
-        }
+        $group = $attrs['group'] ?? 'child-family';
+
         if (preg_match("/\\$(\w+)/", $group, $match)) {
             $group = $this->vars[$match[1]]['id'];
             $group = trim($group);
         }
 
-        $id = "";
-        if (isset($attrs['id'])) {
-            $id = $attrs['id'];
-        }
+        $id = $attrs['id'] ?? '';
+
         if (preg_match("/\\$(\w+)/", $id, $match)) {
             $id = $this->vars[$match[1]]['id'];
             $id = trim($id);
         }
 
-        $this->list = array();
-        $person     = Individual::getInstance($id, $WT_TREE);
-        if (!empty($person)) {
+        $this->list = [];
+        $person     = Factory::individual()->make($id, $this->tree);
+        if ($person instanceof Individual) {
             $this->list[$id] = $person;
             switch ($group) {
-                case "child-family":
-                    foreach ($person->getChildFamilies() as $family) {
-                        $husband = $family->getHusband();
-                        $wife    = $family->getWife();
-                        if (!empty($husband)) {
-                            $this->list[$husband->getXref()] = $husband;
+                case 'child-family':
+                    foreach ($person->childFamilies() as $family) {
+                        foreach ($family->spouses() as $spouse) {
+                            $this->list[$spouse->xref()] = $spouse;
                         }
-                        if (!empty($wife)) {
-                            $this->list[$wife->getXref()] = $wife;
-                        }
-                        $children = $family->getChildren();
-                        foreach ($children as $child) {
-                            if (!empty($child)) {
-                                $this->list[$child->getXref()] = $child;
-                            }
+
+                        foreach ($family->children() as $child) {
+                            $this->list[$child->xref()] = $child;
                         }
                     }
                     break;
-                case "spouse-family":
-                    foreach ($person->getSpouseFamilies() as $family) {
-                        $husband = $family->getHusband();
-                        $wife    = $family->getWife();
-                        if (!empty($husband)) {
-                            $this->list[$husband->getXref()] = $husband;
+                case 'spouse-family':
+                    foreach ($person->spouseFamilies() as $family) {
+                        foreach ($family->spouses() as $spouse) {
+                            $this->list[$spouse->xref()] = $spouse;
                         }
-                        if (!empty($wife)) {
-                            $this->list[$wife->getXref()] = $wife;
-                        }
-                        $children = $family->getChildren();
-                        foreach ($children as $child) {
-                            if (!empty($child)) {
-                                $this->list[$child->getXref()] = $child;
-                            }
+
+                        foreach ($family->children() as $child) {
+                            $this->list[$child->xref()] = $child;
                         }
                     }
                     break;
-                case "direct-ancestors":
+                case 'direct-ancestors':
                     $this->addAncestors($this->list, $id, false, $maxgen);
                     break;
-                case "ancestors":
+                case 'ancestors':
                     $this->addAncestors($this->list, $id, true, $maxgen);
                     break;
-                case "descendants":
+                case 'descendants':
                     $this->list[$id]->generation = 1;
                     $this->addDescendancy($this->list, $id, false, $maxgen);
                     break;
-                case "all":
+                case 'all':
                     $this->addAncestors($this->list, $id, true, $maxgen);
                     $this->addDescendancy($this->list, $id, true, $maxgen);
                     break;
@@ -2455,23 +2462,23 @@ class ReportParserGenerate extends ReportParserBase
 
         switch ($sortby) {
             case 'NAME':
-                uasort($this->list, '\Fisharebest\Webtrees\GedcomRecord::compare');
+                uasort($this->list, GedcomRecord::nameComparator());
                 break;
             case 'BIRT:DATE':
-                uasort($this->list, '\Fisharebest\Webtrees\Individual::compareBirthDate');
+                uasort($this->list, Individual::birthDateComparator());
                 break;
             case 'DEAT:DATE':
-                uasort($this->list, '\Fisharebest\Webtrees\Individual::compareDeathDate');
+                uasort($this->list, Individual::deathDateComparator());
                 break;
             case 'generation':
-                $newarray = array();
+                $newarray = [];
                 reset($this->list);
                 $genCounter = 1;
                 while (count($newarray) < count($this->list)) {
                     foreach ($this->list as $key => $value) {
                         $this->generation = $value->generation;
                         if ($this->generation == $genCounter) {
-                            $newarray[$key]             = new \stdClass;
+                            $newarray[$key]             = new stdClass();
                             $newarray[$key]->generation = $this->generation;
                         }
                     }
@@ -2483,17 +2490,17 @@ class ReportParserGenerate extends ReportParserBase
                 // unsorted
                 break;
         }
-        array_push($this->repeats_stack, array($this->repeats, $this->repeat_bytes));
-        $this->repeat_bytes = xml_get_current_line_number($this->parser) + 1;
+        $this->repeats_stack[] = [$this->repeats, $this->repeat_bytes];
+        $this->repeat_bytes    = xml_get_current_line_number($this->parser) + 1;
     }
 
     /**
-     * XML </ Relatives>
+     * Handle </relatives>
+     *
+     * @return void
      */
-    private function relativesEndHandler()
+    protected function relativesEndHandler(): void
     {
-        global $report, $WT_TREE;
-
         $this->process_repeats--;
         if ($this->process_repeats > 0) {
             return;
@@ -2506,8 +2513,8 @@ class ReportParserGenerate extends ReportParserBase
                 $lineoffset += $rep[1];
             }
             //-- read the xml from the file
-            $lines = file($report);
-            while ((strpos($lines[$lineoffset + $this->repeat_bytes], "<Relatives") === false) && (($lineoffset + $this->repeat_bytes) > 0)) {
+            $lines = file($this->report);
+            while ((strpos($lines[$lineoffset + $this->repeat_bytes], '<Relatives') === false) && (($lineoffset + $this->repeat_bytes) > 0)) {
                 $lineoffset--;
             }
             $lineoffset++;
@@ -2516,9 +2523,9 @@ class ReportParserGenerate extends ReportParserBase
             // Relatives Level counter
             $count = 1;
             while (0 < $count) {
-                if (strpos($lines[$line_nr], "<Relatives") !== false) {
+                if (strpos($lines[$line_nr], '<Relatives') !== false) {
                     $count++;
-                } elseif (strpos($lines[$line_nr], "</Relatives") !== false) {
+                } elseif (strpos($lines[$line_nr], '</Relatives') !== false) {
                     $count--;
                 }
                 if (0 < $count) {
@@ -2530,142 +2537,91 @@ class ReportParserGenerate extends ReportParserBase
             unset($lines);
             $reportxml .= "</tempdoc>\n";
             // Save original values
-            array_push($this->parser_stack, $this->parser);
-            $oldgedrec = $this->gedrec;
+            $this->parser_stack[] = $this->parser;
+            $oldgedrec            = $this->gedrec;
 
             $this->list_total   = count($this->list);
             $this->list_private = 0;
-            foreach ($this->list as $key => $value) {
+            foreach ($this->list as $xref => $value) {
                 if (isset($value->generation)) {
                     $this->generation = $value->generation;
                 }
-                $tmp          = GedcomRecord::getInstance($key, $WT_TREE);
-                $this->gedrec = $tmp->privatizeGedcom(Auth::accessLevel($WT_TREE));
+                $tmp          = Factory::gedcomRecord()->make((string) $xref, $this->tree);
+                $this->gedrec = $tmp->privatizeGedcom(Auth::accessLevel($this->tree));
 
                 $repeat_parser = xml_parser_create();
                 $this->parser  = $repeat_parser;
                 xml_parser_set_option($repeat_parser, XML_OPTION_CASE_FOLDING, false);
-                xml_set_element_handler($repeat_parser, array($this, 'startElement'), array($this, 'endElement'));
-                xml_set_character_data_handler($repeat_parser, array($this, 'characterData'));
+
+                xml_set_element_handler(
+                    $repeat_parser,
+                    function ($parser, string $name, array $attrs): void {
+                        $this->startElement($parser, $name, $attrs);
+                    },
+                    function ($parser, string $name): void {
+                        $this->endElement($parser, $name);
+                    }
+                );
+
+                xml_set_character_data_handler(
+                    $repeat_parser,
+                    function ($parser, string $data): void {
+                        $this->characterData($parser, $data);
+                    }
+                );
 
                 if (!xml_parse($repeat_parser, $reportxml, true)) {
-                    throw new \DomainException(sprintf("RelativesEHandler XML error: %s at line %d", xml_error_string(xml_get_error_code($repeat_parser)), xml_get_current_line_number($repeat_parser)));
+                    throw new DomainException(sprintf('RelativesEHandler XML error: %s at line %d', xml_error_string(xml_get_error_code($repeat_parser)), xml_get_current_line_number($repeat_parser)));
                 }
                 xml_parser_free($repeat_parser);
             }
             // Clean up the list array
-            $this->list   = array();
+            $this->list   = [];
             $this->parser = array_pop($this->parser_stack);
             $this->gedrec = $oldgedrec;
         }
-        list($this->repeats, $this->repeat_bytes) = array_pop($this->repeats_stack);
+        [$this->repeats, $this->repeat_bytes] = array_pop($this->repeats_stack);
     }
 
     /**
-     * XML <Generation /> element handler
-     *
+     * Handle <generation />
      * Prints the number of generations
+     *
+     * @return void
      */
-    private function generationStartHandler()
+    protected function generationStartHandler(): void
     {
-        $this->current_element->addText($this->generation);
+        $this->current_element->addText((string) $this->generation);
     }
 
     /**
-     * XML <NewPage /> element handler
+     * Handle <newPage />
+     * Has to be placed in an element (header, body or footer)
      *
-     * Has to be placed in an element (header, pageheader, body or footer)
+     * @return void
      */
-    private function newPageStartHandler()
+    protected function newPageStartHandler(): void
     {
-        $temp = "addpage";
+        $temp = 'addpage';
         $this->wt_report->addElement($temp);
     }
 
     /**
-     * XML <html>
+     * Handle </title>
      *
-     * @param string  $tag   HTML tag name
-     * @param array[] $attrs an array of key value pairs for the attributes
+     * @return void
      */
-    private function htmlStartHandler($tag, $attrs)
-    {
-        if ($tag === "tempdoc") {
-            return;
-        }
-        array_push($this->wt_report_stack, $this->wt_report);
-        $this->wt_report       = $this->report_root->createHTML($tag, $attrs);
-        $this->current_element = $this->wt_report;
-
-        array_push($this->print_data_stack, $this->print_data);
-        $this->print_data = true;
-    }
-
-    /**
-     * XML </html>
-     *
-     * @param string $tag
-     */
-    private function htmlEndHandler($tag)
-    {
-        if ($tag === "tempdoc") {
-            return;
-        }
-
-        $this->print_data      = array_pop($this->print_data_stack);
-        $this->current_element = $this->wt_report;
-        $this->wt_report       = array_pop($this->wt_report_stack);
-        if ($this->wt_report !== null) {
-            $this->wt_report->addElement($this->current_element);
-        } else {
-            $this->wt_report = $this->current_element;
-        }
-    }
-
-    /**
-     * Handle <Input>
-     */
-    private function inputStartHandler()
-    {
-        // Dummy function, to prevent the default HtmlStartHandler() being called
-    }
-
-    /**
-     * Handle </Input>
-     */
-    private function inputEndHandler()
-    {
-        // Dummy function, to prevent the default HtmlEndHandler() being called
-    }
-
-    /**
-     * Handle <Report>
-     */
-    private function reportStartHandler()
-    {
-        // Dummy function, to prevent the default HtmlStartHandler() being called
-    }
-
-    /**
-     * Handle </Report>
-     */
-    private function reportEndHandler()
-    {
-        // Dummy function, to prevent the default HtmlEndHandler() being called
-    }
-
-    /**
-     * XML </titleEndHandler>
-     */
-    private function titleEndHandler()
+    protected function titleEndHandler(): void
     {
         $this->report_root->addTitle($this->text);
     }
 
     /**
-     * XML </descriptionEndHandler>
+     * Handle </description>
+     *
+     * @return void
      */
-    private function descriptionEndHandler()
+    protected function descriptionEndHandler(): void
     {
         $this->report_root->addDescription($this->text);
     }
@@ -2675,14 +2631,14 @@ class ReportParserGenerate extends ReportParserBase
      *
      * @param string[] $list
      * @param string   $pid
-     * @param bool  $parents
-     * @param int  $generations
+     * @param bool     $parents
+     * @param int      $generations
+     *
+     * @return void
      */
-    private function addDescendancy(&$list, $pid, $parents = false, $generations = -1)
+    private function addDescendancy(&$list, $pid, $parents = false, $generations = -1): void
     {
-        global $WT_TREE;
-
-        $person = Individual::getInstance($pid, $WT_TREE);
+        $person = Factory::individual()->make($pid, $this->tree);
         if ($person === null) {
             return;
         }
@@ -2692,41 +2648,44 @@ class ReportParserGenerate extends ReportParserBase
         if (!isset($list[$pid]->generation)) {
             $list[$pid]->generation = 0;
         }
-        foreach ($person->getSpouseFamilies() as $family) {
+        foreach ($person->spouseFamilies() as $family) {
             if ($parents) {
-                $husband = $family->getHusband();
-                $wife    = $family->getWife();
+                $husband = $family->husband();
+                $wife    = $family->wife();
                 if ($husband) {
-                    $list[$husband->getXref()] = $husband;
+                    $list[$husband->xref()] = $husband;
                     if (isset($list[$pid]->generation)) {
-                        $list[$husband->getXref()]->generation = $list[$pid]->generation - 1;
+                        $list[$husband->xref()]->generation = $list[$pid]->generation - 1;
                     } else {
-                        $list[$husband->getXref()]->generation = 1;
+                        $list[$husband->xref()]->generation = 1;
                     }
                 }
                 if ($wife) {
-                    $list[$wife->getXref()] = $wife;
+                    $list[$wife->xref()] = $wife;
                     if (isset($list[$pid]->generation)) {
-                        $list[$wife->getXref()]->generation = $list[$pid]->generation - 1;
+                        $list[$wife->xref()]->generation = $list[$pid]->generation - 1;
                     } else {
-                        $list[$wife->getXref()]->generation = 1;
+                        $list[$wife->xref()]->generation = 1;
                     }
                 }
             }
-            $children = $family->getChildren();
+
+            $children = $family->children();
+
             foreach ($children as $child) {
                 if ($child) {
-                    $list[$child->getXref()] = $child;
+                    $list[$child->xref()] = $child;
+
                     if (isset($list[$pid]->generation)) {
-                        $list[$child->getXref()]->generation = $list[$pid]->generation + 1;
+                        $list[$child->xref()]->generation = $list[$pid]->generation + 1;
                     } else {
-                        $list[$child->getXref()]->generation = 2;
+                        $list[$child->xref()]->generation = 2;
                     }
                 }
             }
             if ($generations == -1 || $list[$pid]->generation + 1 < $generations) {
                 foreach ($children as $child) {
-                    $this->addDescendancy($list, $child->getXref(), $parents, $generations); // recurse on the childs family
+                    $this->addDescendancy($list, $child->xref(), $parents, $generations); // recurse on the childs family
                 }
             }
         }
@@ -2735,50 +2694,46 @@ class ReportParserGenerate extends ReportParserBase
     /**
      * Create a list of all ancestors.
      *
-     * @param string[] $list
-     * @param string   $pid
-     * @param bool  $children
-     * @param int  $generations
+     * @param stdClass[] $list
+     * @param string     $pid
+     * @param bool       $children
+     * @param int        $generations
+     *
+     * @return void
      */
-    private function addAncestors(&$list, $pid, $children = false, $generations = -1)
+    private function addAncestors(array &$list, string $pid, bool $children = false, int $generations = -1): void
     {
-        global $WT_TREE;
-
-        $genlist                = array($pid);
+        $genlist                = [$pid];
         $list[$pid]->generation = 1;
         while (count($genlist) > 0) {
             $id = array_shift($genlist);
             if (strpos($id, 'empty') === 0) {
                 continue; // id can be something like “empty7”
             }
-            $person = Individual::getInstance($id, $WT_TREE);
-            foreach ($person->getChildFamilies() as $family) {
-                $husband = $family->getHusband();
-                $wife    = $family->getWife();
+            $person = Factory::individual()->make($id, $this->tree);
+            foreach ($person->childFamilies() as $family) {
+                $husband = $family->husband();
+                $wife    = $family->wife();
                 if ($husband) {
-                    $list[$husband->getXref()]             = $husband;
-                    $list[$husband->getXref()]->generation = $list[$id]->generation + 1;
+                    $list[$husband->xref()]             = $husband;
+                    $list[$husband->xref()]->generation = $list[$id]->generation + 1;
                 }
                 if ($wife) {
-                    $list[$wife->getXref()]             = $wife;
-                    $list[$wife->getXref()]->generation = $list[$id]->generation + 1;
+                    $list[$wife->xref()]             = $wife;
+                    $list[$wife->xref()]->generation = $list[$id]->generation + 1;
                 }
                 if ($generations == -1 || $list[$id]->generation + 1 < $generations) {
                     if ($husband) {
-                        array_push($genlist, $husband->getXref());
+                        $genlist[] = $husband->xref();
                     }
                     if ($wife) {
-                        array_push($genlist, $wife->getXref());
+                        $genlist[] = $wife->xref();
                     }
                 }
                 if ($children) {
-                    foreach ($family->getChildren() as $child) {
-                        $list[$child->getXref()] = $child;
-                        if (isset($list[$id]->generation)) {
-                            $list[$child->getXref()]->generation = $list[$id]->generation;
-                        } else {
-                            $list[$child->getXref()]->generation = 1;
-                        }
+                    foreach ($family->children() as $child) {
+                        $list[$child->xref()] = $child;
+                        $list[$child->xref()]->generation = $list[$id]->generation ?? 1;
                     }
                 }
             }
@@ -2788,26 +2743,25 @@ class ReportParserGenerate extends ReportParserBase
     /**
      * get gedcom tag value
      *
-     * @param string  $tag    The tag to find, use : to delineate subtags
-     * @param int $level  The gedcom line level of the first tag to find, setting level to 0 will cause it to use 1+ the level of the incoming record
-     * @param string  $gedrec The gedcom record to get the value from
+     * @param string $tag    The tag to find, use : to delineate subtags
+     * @param int    $level  The gedcom line level of the first tag to find, setting level to 0 will cause it to use 1+ the level of the incoming record
+     * @param string $gedrec The gedcom record to get the value from
      *
      * @return string the value of a gedcom tag from the given gedcom record
      */
-    private function getGedcomValue($tag, $level, $gedrec)
+    private function getGedcomValue(string $tag, int $level, string $gedrec): string
     {
-        global $WT_TREE;
-
-        if (empty($gedrec)) {
+        if ($gedrec === '') {
             return '';
         }
         $tags      = explode(':', $tag);
         $origlevel = $level;
-        if ($level == 0) {
+        if ($level === 0) {
             $level = $gedrec[0] + 1;
         }
 
         $subrec = $gedrec;
+        $t = 'XXXX';
         foreach ($tags as $t) {
             $lastsubrec = $subrec;
             $subrec     = Functions::getSubRecord($level, "$level $t", $subrec);
@@ -2816,18 +2770,18 @@ class ReportParserGenerate extends ReportParserBase
                 $subrec = Functions::getSubRecord($level, "$level $t", $lastsubrec);
             }
             if (empty($subrec)) {
-                if ($t == "TITL") {
+                if ($t === 'TITL') {
                     $subrec = Functions::getSubRecord($level, "$level ABBR", $lastsubrec);
                     if (!empty($subrec)) {
-                        $t = "ABBR";
+                        $t = 'ABBR';
                     }
                 }
-                if (empty($subrec)) {
+                if ($subrec === '') {
                     if ($level > 0) {
                         $level--;
                     }
                     $subrec = Functions::getSubRecord($level, "@ $t", $gedrec);
-                    if (empty($subrec)) {
+                    if ($subrec === '') {
                         return '';
                     }
                 }
@@ -2836,31 +2790,31 @@ class ReportParserGenerate extends ReportParserBase
         }
         $level--;
         $ct = preg_match("/$level $t(.*)/", $subrec, $match);
-        if ($ct == 0) {
+        if ($ct === 0) {
             $ct = preg_match("/$level @.+@ (.+)/", $subrec, $match);
         }
-        if ($ct == 0) {
+        if ($ct === 0) {
             $ct = preg_match("/@ $t (.+)/", $subrec, $match);
         }
         if ($ct > 0) {
             $value = trim($match[1]);
-            if ($t == 'NOTE' && preg_match('/^@(.+)@$/', $value, $match)) {
-                $note = Note::getInstance($match[1], $WT_TREE);
-                if ($note) {
+            if ($t === 'NOTE' && preg_match('/^@(.+)@$/', $value, $match)) {
+                $note = Factory::note()->make($match[1], $this->tree);
+                if ($note instanceof Note) {
                     $value = $note->getNote();
                 } else {
                     //-- set the value to the id without the @
                     $value = $match[1];
                 }
             }
-            if ($level != 0 || $t != "NOTE") {
+            if ($level !== 0 || $t !== 'NOTE') {
                 $value .= Functions::getCont($level + 1, $subrec);
             }
 
             return $value;
         }
 
-        return "";
+        return '';
     }
 
     /**
@@ -2871,23 +2825,22 @@ class ReportParserGenerate extends ReportParserBase
      *
      * @return string
      */
-    private function substituteVars($expression, $quote)
+    private function substituteVars($expression, $quote): string
     {
-        $that = $this; // PHP5.3 cannot access $this inside a closure
         return preg_replace_callback(
             '/\$(\w+)/',
-            function ($matches) use ($that, $quote) {
-                if (isset($that->vars[$matches[1]]['id'])) {
+            function (array $matches) use ($quote): string {
+                if (isset($this->vars[$matches[1]]['id'])) {
                     if ($quote) {
-                        return "'" . addcslashes($that->vars[$matches[1]]['id'], "'") . "'";
-                    } else {
-                        return $that->vars[$matches[1]]['id'];
+                        return "'" . addcslashes($this->vars[$matches[1]]['id'], "'") . "'";
                     }
-                } else {
-                    Log::addErrorLog(sprintf('Undefined variable $%s in report', $matches[1]));
 
-                    return '$' . $matches[1];
+                    return $this->vars[$matches[1]]['id'];
                 }
+
+                Log::addErrorLog(sprintf('Undefined variable $%s in report', $matches[1]));
+
+                return '$' . $matches[1];
             },
             $expression
         );

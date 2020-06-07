@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
 
 /**
@@ -20,48 +24,26 @@ namespace Fisharebest\Webtrees\Report;
  */
 class ReportBaseImage extends ReportBaseElement
 {
-    /**
-     * Filename of the image
-     *
-     * @var string
-     */
+    /** @var string Filename of the image */
     public $file;
-    /**
-     * Height of the image
-     *
-     * @var float
-     */
+
+    /** @var float Height of the image */
     public $height;
-    /**
-     * Width of the image
-     *
-     * @var float
-     */
+
+    /** @var float Width of the image */
     public $width;
-    /**
-     * X-position (left) of the image
-     *
-     * @var float
-     */
+
+    /** @var float X-position (left) of the image */
     public $x;
-    /**
-     * Y-position (top) of the image
-     *
-     * @var float
-     */
+
+    /** @var float Y-position (top) of the image */
     public $y;
-    /**
-     * Placement fo the image. L: left, C:center, R:right
-     *
-     * @var string
-     */
-    public $align = "";
-    /**
-     * T:same line, N:next line
-     *
-     * @var string
-     */
-    public $line = "";
+
+    /** @var string Placement fo the image. L: left, C:center, R:right (or empty for x/y) */
+    public $align;
+
+    /** @var string T:same line, N:next line */
+    public $line;
 
     /**
      * Image class function - Base
@@ -74,7 +56,7 @@ class ReportBaseImage extends ReportBaseElement
      * @param string $align Placement of the image. L: left, C:center, R:right
      * @param string $ln    T:same line, N:next line
      */
-    public function __construct($file, $x, $y, $w, $h, $align, $ln)
+    public function __construct(string $file, float $x, float $y, float $w, float $h, string $align, string $ln)
     {
         $this->file   = $file;
         $this->width  = $w;
@@ -83,18 +65,16 @@ class ReportBaseImage extends ReportBaseElement
         $this->y      = $y;
         $this->align  = $align;
         $this->line   = $ln;
-
-        return 0;
     }
 
     /**
      * Get the height.
      *
-     * @param $renderer
+     * @param HtmlRenderer|PdfRenderer $renderer
      *
      * @return float
      */
-    public function getHeight($renderer)
+    public function getHeight($renderer): float
     {
         return $this->height;
     }
@@ -102,9 +82,9 @@ class ReportBaseImage extends ReportBaseElement
     /**
      * Get the width.
      *
-     * @param $renderer
+     * @param HtmlRenderer|PdfRenderer $renderer
      *
-     * @return float
+     * @return float|array
      */
     public function getWidth($renderer)
     {

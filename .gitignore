@@ -1,11 +1,21 @@
+/public/mix-manifest.json
+/public/js/*.map
+/public/js/*.js.LICENSE.txt
+/public/robots.txt
 
-robots.txt
+/node_modules/
+/resources/lang/webtees.pot
+/resources/lang/*/messages.php
+!/resources/lang/en-US/messages.php
+
+/robots.txt
+/tests/clover.xml
+/tests/coverage
 
 # /
 /.buildpath
 /.project
 /.settings
-/svn*
 /test*.php
 
 # /modules_v3/
@@ -13,16 +23,4 @@ robots.txt
 
 # Build files
 /build
-/Makefile
-
-# Language folder
-/language/*.po
-/language/extra
-/language/.gitattributes
-/language/.gitignore
-/language/updateLanguages.bat
-
-# Utilities configuration files
-/phpunit.xml
-/phpdoc.xml
-/pdepend.xml
+/tmp

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -20,19 +24,27 @@ namespace Fisharebest\Webtrees\Census;
  */
 class CensusColumnConditionEnglish extends AbstractCensusColumnCondition
 {
-    /* Text to display for married individuals */
-    protected $husband = 'Mar';
-    protected $wife    = 'Mar';
+    // Text to display for married males
+    protected const HUSBAND = 'Mar';
 
-    /* Text to display for unmarried individuals */
-    protected $bachelor = 'Unm';
-    protected $spinster = 'Unm';
+    // Text to display for married females
+    protected const WIFE = 'Mar';
 
-    /* Text to display for divorced individuals */
-    protected $divorce  = 'Div';
-    protected $divorcee = 'Div';
+    // Text to display for married unmarried males
+    protected const BACHELOR = 'Unm';
 
-    /* Text to display for widowed individuals (not yet implemented) */
-    protected $widower = 'Wid';
-    protected $widow   = 'Wid';
+    // Text to display for married unmarried females
+    protected const SPINSTER = 'Unm';
+
+    // Text to display for divorced males
+    protected const DIVORCE = 'Div';
+
+    // Text to display for divorced females
+    protected const DIVORCEE = 'Div';
+
+    // Text to display for widowed males
+    protected const WIDOWER = 'Wid';
+
+    // Text to display for widowed females
+    protected const WIDOW = 'Wid';
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 use Fisharebest\Webtrees\Individual;
@@ -25,19 +29,19 @@ class CensusColumnFatherForeign extends AbstractCensusColumn implements CensusCo
     /**
      * Generate the likely value of this census column, based on available information.
      *
-     * @param Individual      $individual
-     * @param Individual|null $head
+     * @param Individual $individual
+     * @param Individual $head
      *
      * @return string
      */
-    public function generate(Individual $individual, Individual $head = null)
+    public function generate(Individual $individual, Individual $head): string
     {
         $father = $this->father($individual);
 
-        if ($father && $this->lastPartOfPlace($father->getBirthPlace()) !== $this->place()) {
+        if ($father && $this->lastPartOfPlace($father->getBirthPlace()->gedcomName()) !== $this->place()) {
             return 'Y';
-        } else {
-            return '';
         }
+
+        return '';
     }
 }

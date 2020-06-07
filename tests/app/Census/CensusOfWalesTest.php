@@ -14,19 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
+
+use Fisharebest\Webtrees\TestCase;
 
 /**
  * Test harness for the class CensusOfWales
  */
-class CensusOfWalesTest extends \PHPUnit_Framework_TestCase
+class CensusOfWalesTest extends TestCase
 {
     /**
      * Test the census place
      *
-     * @covers Fisharebest\Webtrees\Census\CensusOfWales
+     * @covers \Fisharebest\Webtrees\Census\CensusOfWales
+     *
+     * @return void
      */
-    public function testPlace()
+    public function testPlace(): void
     {
         $census = new CensusOfWales();
 
@@ -34,25 +41,41 @@ class CensusOfWalesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test the census language
+     *
+     * @covers \Fisharebest\Webtrees\Census\CensusOfCzechRepublic
+     *
+     * @return void
+     */
+    public function testLanguage(): void
+    {
+        $census = new CensusOfWales();
+
+        $this->assertSame('en-GB', $census->censusLanguage());
+    }
+
+    /**
      * Test the census dates
      *
-     * @covers Fisharebest\Webtrees\Census\CensusOfWales
+     * @covers \Fisharebest\Webtrees\Census\CensusOfWales
+     *
+     * @return void
      */
-    public function testAllDates()
+    public function testAllDates(): void
     {
-        $census  = new CensusOfWales();
+        $census = new CensusOfWales();
 
         $census_dates = $census->allCensusDates();
 
         $this->assertCount(9, $census_dates);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfWales1841', $census_dates[0]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfWales1851', $census_dates[1]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfWales1861', $census_dates[2]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfWales1871', $census_dates[3]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfWales1881', $census_dates[4]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfWales1891', $census_dates[5]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfWales1901', $census_dates[6]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfWales1911', $census_dates[7]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\RegisterOfWales1939', $census_dates[8]);
+        $this->assertInstanceOf(CensusOfWales1841::class, $census_dates[0]);
+        $this->assertInstanceOf(CensusOfWales1851::class, $census_dates[1]);
+        $this->assertInstanceOf(CensusOfWales1861::class, $census_dates[2]);
+        $this->assertInstanceOf(CensusOfWales1871::class, $census_dates[3]);
+        $this->assertInstanceOf(CensusOfWales1881::class, $census_dates[4]);
+        $this->assertInstanceOf(CensusOfWales1891::class, $census_dates[5]);
+        $this->assertInstanceOf(CensusOfWales1901::class, $census_dates[6]);
+        $this->assertInstanceOf(CensusOfWales1911::class, $census_dates[7]);
+        $this->assertInstanceOf(RegisterOfWales1939::class, $census_dates[8]);
     }
 }

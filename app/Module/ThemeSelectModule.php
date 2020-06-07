@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,81 +14,110 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Theme;
+use Fisharebest\Webtrees\Menu;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Support\Str;
+
+use function app;
+use function view;
 
 /**
  * Class ThemeSelectModule
  */
 class ThemeSelectModule extends AbstractModule implements ModuleBlockInterface
 {
-    /** {@inheritdoc} */
-    public function getTitle()
+    use ModuleBlockTrait;
+
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
     {
-        return /* I18N: Name of a module */ I18N::translate('Theme change');
+        /* I18N: Name of a module */
+        return I18N::translate('Theme change');
     }
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    /**
+     * A sentence describing what this module does.
+     *
+     * @return string
+     */
+    public function description(): string
     {
-        return /* I18N: Description of the “Theme change” module */ I18N::translate('An alternative way to select a new theme.');
+        /* I18N: Description of the “Theme change” module */
+        return I18N::translate('An alternative way to select a new theme.');
     }
 
     /**
      * Generate the HTML content of this block.
      *
+     * @param Tree     $tree
      * @param int      $block_id
-     * @param bool     $template
-     * @param string[] $cfg
+     * @param string   $context
+     * @param string[] $config
      *
      * @return string
      */
-    public function getBlock($block_id, $template = true, $cfg = array())
+    public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
-        $id    = $this->getName() . $block_id;
-        $class = $this->getName() . '_block';
-        $title = $this->getTitle();
-        $menu  = Theme::theme()->menuThemes();
+        $menu = app(ModuleThemeInterface::class)->menuThemes();
 
-        if ($menu) {
-            $content = '<div class="center theme_form">' . $menu . '</div><br>';
+        if ($menu instanceof Menu) {
+            $content = '<ul class="nav text-justify" role="menu">' . view('components/menu-item', ['menu' => $menu]) . '</ul>';
 
-            if ($template) {
-                return Theme::theme()->formatBlock($id, $title, $class, $content);
-            } else {
-                return $content;
+            if ($context !== self::CONTEXT_EMBED) {
+                return view('modules/block-template', [
+                    'block'      => Str::kebab($this->name()),
+                    'id'         => $block_id,
+                    'config_url' => '',
+                    'title'      => $this->title(),
+                    'content'    => $content,
+                ]);
             }
-        } else {
-            return '';
+
+            return $content;
         }
+
+        return '';
     }
 
-    /** {@inheritdoc} */
-    public function loadAjax()
+    /**
+     * Should this block load asynchronously using AJAX?
+     *
+     * Simple blocks are faster in-line, more complex ones can be loaded later.
+     *
+     * @return bool
+     */
+    public function loadAjax(): bool
     {
         return false;
     }
 
-    /** {@inheritdoc} */
-    public function isUserBlock()
-    {
-        return true;
-    }
-
-    /** {@inheritdoc} */
-    public function isGedcomBlock()
+    /**
+     * Can this block be shown on the user’s home page?
+     *
+     * @return bool
+     */
+    public function isUserBlock(): bool
     {
         return true;
     }
 
     /**
-     * An HTML form to edit block settings
+     * Can this block be shown on the tree’s home page?
      *
-     * @param int $block_id
+     * @return bool
      */
-    public function configureBlock($block_id)
+    public function isTreeBlock(): bool
     {
+        return true;
     }
 }

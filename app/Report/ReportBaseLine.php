@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,7 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
+
+use function abs;
 
 /**
  * Class ReportBaseLine
@@ -23,27 +29,27 @@ class ReportBaseLine extends ReportBaseElement
     /**
      * Start horizontal position, current position (default)
      *
-     * @var mixed
+     * @var float
      */
-    public $x1 = ".";
+    public $x1 = ReportBaseElement::CURRENT_POSITION;
     /**
      * Start vertical position, current position (default)
      *
-     * @var mixed
+     * @var float
      */
-    public $y1 = ".";
+    public $y1 = ReportBaseElement::CURRENT_POSITION;
     /**
      * End horizontal position, maximum width (default)
      *
-     * @var mixed
+     * @var float
      */
-    public $x2 = ".";
+    public $x2 = ReportBaseElement::CURRENT_POSITION;
     /**
      * End vertical position
      *
-     * @var mixed
+     * @var float
      */
-    public $y2 = ".";
+    public $y2 = ReportBaseElement::CURRENT_POSITION;
 
     /**
      * Create a line class - Base
@@ -59,18 +65,16 @@ class ReportBaseLine extends ReportBaseElement
         $this->y1 = $y1;
         $this->x2 = $x2;
         $this->y2 = $y2;
-
-        return 0;
     }
 
     /**
      * Get the height of the line.
      *
-     * @param $renderer
+     * @param HtmlRenderer|PdfRenderer $renderer
      *
-     * @return number
+     * @return float
      */
-    public function getHeight($renderer)
+    public function getHeight($renderer): float
     {
         return abs($this->y2 - $this->y1);
     }
@@ -78,9 +82,9 @@ class ReportBaseLine extends ReportBaseElement
     /**
      * Get the width of the line.
      *
-     * @param $renderer
+     * @param HtmlRenderer|PdfRenderer $renderer
      *
-     * @return number
+     * @return float|array
      */
     public function getWidth($renderer)
     {

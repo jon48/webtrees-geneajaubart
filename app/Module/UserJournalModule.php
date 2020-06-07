@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,41 +14,45 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Database;
-use Fisharebest\Webtrees\Filter;
-use Fisharebest\Webtrees\Functions\FunctionsDate;
+use Fisharebest\Webtrees\Carbon;
+use Fisharebest\Webtrees\Exceptions\HttpAccessDeniedException;
+use Fisharebest\Webtrees\Http\RequestHandlers\UserPage;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Theme;
+use Fisharebest\Webtrees\Services\HtmlService;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Str;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use stdClass;
+
+use function assert;
 
 /**
  * Class UserJournalModule
  */
 class UserJournalModule extends AbstractModule implements ModuleBlockInterface
 {
-    /**
-     * Create a new module.
-     *
-     * @param string $directory Where is this module installed
-     */
-    public function __construct($directory)
-    {
-        parent::__construct($directory);
+    use ModuleBlockTrait;
 
-        // Create/update the database tables.
-        Database::updateSchema('\Fisharebest\Webtrees\Module\FamilyTreeNews\Schema', 'NB_SCHEMA_VERSION', 3);
-    }
+    /** @var HtmlService */
+    private $html_service;
 
     /**
-     * How should this module be labelled on tabs, menus, etc.?
+     * HtmlBlockModule constructor.
      *
-     * @return string
+     * @param HtmlService $html_service
      */
-    public function getTitle()
+    public function __construct(HtmlService $html_service)
     {
-        return /* I18N: Name of a module */ I18N::translate('Journal');
+        $this->html_service = $html_service;
     }
 
     /**
@@ -55,96 +60,200 @@ class UserJournalModule extends AbstractModule implements ModuleBlockInterface
      *
      * @return string
      */
-    public function getDescription()
+    public function description(): string
     {
-        return /* I18N: Description of the “Journal” module */ I18N::translate('A private area to record notes or keep a journal.');
+        /* I18N: Description of the “Journal” module */
+        return I18N::translate('A private area to record notes or keep a journal.');
     }
 
     /**
      * Generate the HTML content of this block.
      *
+     * @param Tree     $tree
      * @param int      $block_id
-     * @param bool     $template
-     * @param string[] $cfg
+     * @param string   $context
+     * @param string[] $config
      *
      * @return string
      */
-    public function getBlock($block_id, $template = true, $cfg = array())
+    public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
-        global $ctype, $WT_TREE;
+        $articles = DB::table('news')
+            ->where('user_id', '=', Auth::id())
+            ->orderByDesc('updated')
+            ->get()
+            ->map(static function (stdClass $row): stdClass {
+                $row->updated = Carbon::make($row->updated);
 
-        switch (Filter::get('action')) {
-            case 'deletenews':
-                $news_id = Filter::getInteger('news_id');
-                if ($news_id) {
-                    Database::prepare("DELETE FROM `##news` WHERE news_id = ?")->execute(array($news_id));
-                }
-                break;
+                return $row;
+            });
+
+        $content = view('modules/user_blog/list', [
+            'articles' => $articles,
+            'block_id' => $block_id,
+            'limit'    => 5,
+            'tree'     => $tree,
+        ]);
+
+        if ($context !== self::CONTEXT_EMBED) {
+            return view('modules/block-template', [
+                'block'      => Str::kebab($this->name()),
+                'id'         => $block_id,
+                'config_url' => '',
+                'title'      => $this->title(),
+                'content'    => $content,
+            ]);
         }
 
-        $articles = Database::prepare(
-            "SELECT news_id, user_id, gedcom_id, UNIX_TIMESTAMP(updated) + :offset AS updated, subject, body FROM `##news` WHERE user_id = :user_id ORDER BY updated DESC"
-        )->execute(array(
-            'offset'  => WT_TIMESTAMP_OFFSET,
-            'user_id' => Auth::id(),
-        ))->fetchAll();
-
-        $id      = $this->getName() . $block_id;
-        $class   = $this->getName() . '_block';
-        $title   = $this->getTitle();
-        $content = '';
-
-        if (empty($articles)) {
-            $content .= '<p>' . I18N::translate('You have not created any journal items.') . '</p>';
-        }
-
-        foreach ($articles as $article) {
-            $content .= '<div class="journal_box">';
-            $content .= '<div class="news_title">' . Filter::escapeHtml($article->subject) . '</div>';
-            $content .= '<div class="news_date">' . FunctionsDate::formatTimestamp($article->updated) . '</div>';
-            if ($article->body == strip_tags($article->body)) {
-                $article->body = nl2br($article->body, false);
-            }
-            $content .= $article->body;
-            $content .= '<a href="#" onclick="window.open(\'editnews.php?news_id=\'+' . $article->news_id . ', \'_blank\', indx_window_specs); return false;">' . I18N::translate('Edit') . '</a>';
-            $content .= ' | ';
-            $content .= '<a href="index.php?action=deletenews&amp;news_id=' . $article->news_id . '&amp;ctype=' . $ctype . '&amp;ged=' . $WT_TREE->getNameHtml() . '" onclick="return confirm(\'' . I18N::translate('Are you sure you want to delete “%s”?', Filter::escapeHtml($article->subject)) . "');\">" . I18N::translate('Delete') . '</a><br>';
-            $content .= '</div><br>';
-        }
-
-        $content .= '<p><a href="#" onclick="window.open(\'editnews.php?user_id=' . Auth::id() . '\', \'_blank\', indx_window_specs); return false;">' . I18N::translate('Add a journal entry') . '</a></p>';
-
-        if ($template) {
-            return Theme::theme()->formatBlock($id, $title, $class, $content);
-        } else {
-            return $content;
-        }
+        return $content;
     }
 
-    /** {@inheritdoc} */
-    public function loadAjax()
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
     {
-        return false;
+        /* I18N: Name of a module */
+        return I18N::translate('Journal');
     }
 
-    /** {@inheritdoc} */
-    public function isUserBlock()
-    {
-        return true;
-    }
-
-    /** {@inheritdoc} */
-    public function isGedcomBlock()
+    /**
+     * Should this block load asynchronously using AJAX?
+     *
+     * Simple blocks are faster in-line, more complex ones can be loaded later.
+     *
+     * @return bool
+     */
+    public function loadAjax(): bool
     {
         return false;
     }
 
     /**
-     * An HTML form to edit block settings
+     * Can this block be shown on the user’s home page?
      *
-     * @param int $block_id
+     * @return bool
      */
-    public function configureBlock($block_id)
+    public function isUserBlock(): bool
     {
+        return true;
+    }
+
+    /**
+     * Can this block be shown on the tree’s home page?
+     *
+     * @return bool
+     */
+    public function isTreeBlock(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getEditJournalAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        if (!Auth::check()) {
+            throw new HttpAccessDeniedException();
+        }
+
+        $news_id = $request->getQueryParams()['news_id'] ?? '';
+
+        if ($news_id !== '') {
+            $row = DB::table('news')
+                ->where('news_id', '=', $news_id)
+                ->where('user_id', '=', Auth::id())
+                ->first();
+        } else {
+            $row = (object) [
+                'body'    => '',
+                'subject' => '',
+            ];
+        }
+
+        $title = I18N::translate('Add/edit a journal/news entry');
+
+        return $this->viewResponse('modules/user_blog/edit', [
+            'body'    => $row->body,
+            'news_id' => $news_id,
+            'subject' => $row->subject,
+            'title'   => $title,
+            'tree'    => $tree,
+        ]);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function postEditJournalAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        if (!Auth::check()) {
+            throw new HttpAccessDeniedException();
+        }
+
+        $params = (array) $request->getParsedBody();
+
+        $news_id = $request->getQueryParams()['news_id'] ?? '';
+        $subject = $params['subject'];
+        $body    = $params['body'];
+
+        $subject = $this->html_service->sanitize($subject);
+        $body    = $this->html_service->sanitize($body);
+
+        if ($news_id !== '') {
+            DB::table('news')
+                ->where('news_id', '=', $news_id)
+                ->where('user_id', '=', Auth::id())
+                ->update([
+                    'body'    => $body,
+                    'subject' => $subject,
+                    'updated' => new Expression('updated'), // See issue #3208
+                ]);
+        } else {
+            DB::table('news')->insert([
+                'body'    => $body,
+                'subject' => $subject,
+                'user_id' => Auth::id(),
+            ]);
+        }
+
+        $url = route(UserPage::class, ['tree' => $tree->name()]);
+
+        return redirect($url);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function postDeleteJournalAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $news_id = $request->getQueryParams()['news_id'];
+
+        DB::table('news')
+            ->where('news_id', '=', $news_id)
+            ->where('user_id', '=', Auth::id())
+            ->delete();
+
+        $url = route(UserPage::class, ['tree' => $tree->name()]);
+
+        return redirect($url);
     }
 }

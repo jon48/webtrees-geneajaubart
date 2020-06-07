@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,18 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Date;
 
 use Fisharebest\ExtCalendar\FrenchCalendar;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Services\RomanNumeralsService;
 
 /**
- * Definitions for the French Republican calendar
+ * Definitions for French Republican dates.
  */
-class FrenchDate extends CalendarDate
+class FrenchDate extends AbstractCalendarDate
 {
-    /** @var int[] Convert GEDCOM month names to month numbers  */
-    public static $MONTH_ABBREV = array('' => 0, 'VEND' => 1, 'BRUM' => 2, 'FRIM' => 3, 'NIVO' => 4, 'PLUV' => 5, 'VENT' => 6, 'GERM' => 7, 'FLOR' => 8, 'PRAI' => 9, 'MESS' => 10, 'THER' => 11, 'FRUC' => 12, 'COMP' => 13);
+    // GEDCOM calendar escape
+    public const ESCAPE = '@#DFRENCH R@';
+
+    // Convert GEDCOM month names to month numbers
+    protected const MONTH_ABBREVIATIONS = [
+        ''     => 0,
+        'VEND' => 1,
+        'BRUM' => 2,
+        'FRIM' => 3,
+        'NIVO' => 4,
+        'PLUV' => 5,
+        'VENT' => 6,
+        'GERM' => 7,
+        'FLOR' => 8,
+        'PRAI' => 9,
+        'MESS' => 10,
+        'THER' => 11,
+        'FRUC' => 12,
+        'COMP' => 13,
+    ];
+
+    /** @var RomanNumeralsService */
+    private $roman_numerals_service;
 
     /**
      * Create a date from either:
@@ -32,187 +58,252 @@ class FrenchDate extends CalendarDate
      * day/month/year strings from a GEDCOM date
      * another CalendarDate object
      *
-     * @param array|int|CalendarDate $date
+     * @param array<string>|int|AbstractCalendarDate $date
      */
     public function __construct($date)
     {
-        $this->calendar = new FrenchCalendar;
+        $this->roman_numerals_service = new RomanNumeralsService();
+        $this->calendar               = new FrenchCalendar();
+
         parent::__construct($date);
     }
 
     /**
      * Full month name in nominative case.
      *
-     * @param int  $month_number
-     * @param bool $leap_year    Some calendars use leap months
+     * @param int  $month
+     * @param bool $leap_year Some calendars use leap months
      *
      * @return string
      */
-    public static function monthNameNominativeCase($month_number, $leap_year)
+    protected function monthNameNominativeCase(int $month, bool $leap_year): string
     {
         static $translated_month_names;
 
         if ($translated_month_names === null) {
-            $translated_month_names = array(
+            $translated_month_names = [
                 0  => '',
-                1  => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'Vendemiaire'),
-                2  => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'Brumaire'),
-                3  => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'Frimaire'),
-                4  => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'Nivose'),
-                5  => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'Pluviose'),
-                6  => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'Ventose'),
-                7  => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'Germinal'),
-                8  => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'Floreal'),
-                9  => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'Prairial'),
-                10 => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'Messidor'),
-                11 => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'Thermidor'),
-                12 => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'Fructidor'),
-                13 => /* I18N: a month in the French republican calendar */ I18N::translateContext('NOMINATIVE', 'jours complementaires'),
-            );
+                /* I18N: a month in the French republican calendar */
+                1  => I18N::translateContext('NOMINATIVE', 'Vendemiaire'),
+                /* I18N: a month in the French republican calendar */
+                2  => I18N::translateContext('NOMINATIVE', 'Brumaire'),
+                /* I18N: a month in the French republican calendar */
+                3  => I18N::translateContext('NOMINATIVE', 'Frimaire'),
+                /* I18N: a month in the French republican calendar */
+                4  => I18N::translateContext('NOMINATIVE', 'Nivose'),
+                /* I18N: a month in the French republican calendar */
+                5  => I18N::translateContext('NOMINATIVE', 'Pluviose'),
+                /* I18N: a month in the French republican calendar */
+                6  => I18N::translateContext('NOMINATIVE', 'Ventose'),
+                /* I18N: a month in the French republican calendar */
+                /* I18N: a month in the French republican calendar */
+                7  => I18N::translateContext('NOMINATIVE', 'Germinal'),
+                /* I18N: a month in the French republican calendar */
+                8  => I18N::translateContext('NOMINATIVE', 'Floreal'),
+                /* I18N: a month in the French republican calendar */
+                9  => I18N::translateContext('NOMINATIVE', 'Prairial'),
+                /* I18N: a month in the French republican calendar */
+                10 => I18N::translateContext('NOMINATIVE', 'Messidor'),
+                /* I18N: a month in the French republican calendar */
+                11 => I18N::translateContext('NOMINATIVE', 'Thermidor'),
+                /* I18N: a month in the French republican calendar */
+                12 => I18N::translateContext('NOMINATIVE', 'Fructidor'),
+                /* I18N: a month in the French republican calendar */
+                13 => I18N::translateContext('NOMINATIVE', 'jours complementaires'),
+            ];
         }
 
-        return $translated_month_names[$month_number];
+        return $translated_month_names[$month];
     }
 
     /**
      * Full month name in genitive case.
      *
-     * @param int  $month_number
-     * @param bool $leap_year    Some calendars use leap months
+     * @param int  $month
+     * @param bool $leap_year Some calendars use leap months
      *
      * @return string
      */
-    protected function monthNameGenitiveCase($month_number, $leap_year)
+    protected function monthNameGenitiveCase(int $month, bool $leap_year): string
     {
         static $translated_month_names;
 
         if ($translated_month_names === null) {
-            $translated_month_names = array(
+            $translated_month_names = [
                 0  => '',
-                1  => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'Vendemiaire'),
-                2  => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'Brumaire'),
-                3  => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'Frimaire'),
-                4  => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'Nivose'),
-                5  => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'Pluviose'),
-                6  => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'Ventose'),
-                7  => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'Germinal'),
-                8  => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'Floreal'),
-                9  => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'Prairial'),
-                10 => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'Messidor'),
-                11 => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'Thermidor'),
-                12 => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'Fructidor'),
-                13 => /* I18N: a month in the French republican calendar */ I18N::translateContext('GENITIVE', 'jours complementaires'),
-            );
+                /* I18N: a month in the French republican calendar */
+                1  => I18N::translateContext('GENITIVE', 'Vendemiaire'),
+                /* I18N: a month in the French republican calendar */
+                2  => I18N::translateContext('GENITIVE', 'Brumaire'),
+                /* I18N: a month in the French republican calendar */
+                3  => I18N::translateContext('GENITIVE', 'Frimaire'),
+                /* I18N: a month in the French republican calendar */
+                4  => I18N::translateContext('GENITIVE', 'Nivose'),
+                /* I18N: a month in the French republican calendar */
+                5  => I18N::translateContext('GENITIVE', 'Pluviose'),
+                /* I18N: a month in the French republican calendar */
+                6  => I18N::translateContext('GENITIVE', 'Ventose'),
+                /* I18N: a month in the French republican calendar */
+                7  => I18N::translateContext('GENITIVE', 'Germinal'),
+                /* I18N: a month in the French republican calendar */
+                8  => I18N::translateContext('GENITIVE', 'Floreal'),
+                /* I18N: a month in the French republican calendar */
+                9  => I18N::translateContext('GENITIVE', 'Prairial'),
+                /* I18N: a month in the French republican calendar */
+                10 => I18N::translateContext('GENITIVE', 'Messidor'),
+                /* I18N: a month in the French republican calendar */
+                11 => I18N::translateContext('GENITIVE', 'Thermidor'),
+                /* I18N: a month in the French republican calendar */
+                12 => I18N::translateContext('GENITIVE', 'Fructidor'),
+                /* I18N: a month in the French republican calendar */
+                13 => I18N::translateContext('GENITIVE', 'jours complementaires'),
+            ];
         }
 
-        return $translated_month_names[$month_number];
+        return $translated_month_names[$month];
     }
 
     /**
      * Full month name in locative case.
      *
-     * @param int  $month_number
-     * @param bool $leap_year    Some calendars use leap months
+     * @param int  $month
+     * @param bool $leap_year Some calendars use leap months
      *
      * @return string
      */
-    protected function monthNameLocativeCase($month_number, $leap_year)
+    protected function monthNameLocativeCase(int $month, bool $leap_year): string
     {
         static $translated_month_names;
 
         if ($translated_month_names === null) {
-            $translated_month_names = array(
+            $translated_month_names = [
                 0  => '',
-                1  => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'Vendemiaire'),
-                2  => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'Brumaire'),
-                3  => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'Frimaire'),
-                4  => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'Nivose'),
-                5  => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'Pluviose'),
-                6  => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'Ventose'),
-                7  => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'Germinal'),
-                8  => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'Floreal'),
-                9  => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'Prairial'),
-                10 => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'Messidor'),
-                11 => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'Thermidor'),
-                12 => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'Fructidor'),
-                13 => /* I18N: a month in the French republican calendar */ I18N::translateContext('LOCATIVE', 'jours complementaires'),
-            );
+                /* I18N: a month in the French republican calendar */
+                1  => I18N::translateContext('LOCATIVE', 'Vendemiaire'),
+                /* I18N: a month in the French republican calendar */
+                2  => I18N::translateContext('LOCATIVE', 'Brumaire'),
+                /* I18N: a month in the French republican calendar */
+                3  => I18N::translateContext('LOCATIVE', 'Frimaire'),
+                /* I18N: a month in the French republican calendar */
+                4  => I18N::translateContext('LOCATIVE', 'Nivose'),
+                /* I18N: a month in the French republican calendar */
+                5  => I18N::translateContext('LOCATIVE', 'Pluviose'),
+                /* I18N: a month in the French republican calendar */
+                6  => I18N::translateContext('LOCATIVE', 'Ventose'),
+                /* I18N: a month in the French republican calendar */
+                7  => I18N::translateContext('LOCATIVE', 'Germinal'),
+                /* I18N: a month in the French republican calendar */
+                8  => I18N::translateContext('LOCATIVE', 'Floreal'),
+                /* I18N: a month in the French republican calendar */
+                9  => I18N::translateContext('LOCATIVE', 'Prairial'),
+                /* I18N: a month in the French republican calendar */
+                10 => I18N::translateContext('LOCATIVE', 'Messidor'),
+                /* I18N: a month in the French republican calendar */
+                11 => I18N::translateContext('LOCATIVE', 'Thermidor'),
+                /* I18N: a month in the French republican calendar */
+                12 => I18N::translateContext('LOCATIVE', 'Fructidor'),
+                /* I18N: a month in the French republican calendar */
+                13 => I18N::translateContext('LOCATIVE', 'jours complementaires'),
+            ];
         }
 
-        return $translated_month_names[$month_number];
+        return $translated_month_names[$month];
     }
 
     /**
      * Full month name in instrumental case.
      *
-     * @param int  $month_number
-     * @param bool $leap_year    Some calendars use leap months
+     * @param int  $month
+     * @param bool $leap_year Some calendars use leap months
      *
      * @return string
      */
-    protected function monthNameInstrumentalCase($month_number, $leap_year)
+    protected function monthNameInstrumentalCase(int $month, bool $leap_year): string
     {
         static $translated_month_names;
 
         if ($translated_month_names === null) {
-            $translated_month_names = array(
+            $translated_month_names = [
                 0  => '',
-                1  => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'Vendemiaire'),
-                2  => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'Brumaire'),
-                3  => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'Frimaire'),
-                4  => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'Nivose'),
-                5  => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'Pluviose'),
-                6  => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'Ventose'),
-                7  => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'Germinal'),
-                8  => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'Floreal'),
-                9  => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'Prairial'),
-                10 => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'Messidor'),
-                11 => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'Thermidor'),
-                12 => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'Fructidor'),
-                13 => /* I18N: a month in the French republican calendar */ I18N::translateContext('INSTRUMENTAL', 'jours complementaires'),
-            );
+                /* I18N: a month in the French republican calendar */
+                1  => I18N::translateContext('INSTRUMENTAL', 'Vendemiaire'),
+                /* I18N: a month in the French republican calendar */
+                2  => I18N::translateContext('INSTRUMENTAL', 'Brumaire'),
+                /* I18N: a month in the French republican calendar */
+                3  => I18N::translateContext('INSTRUMENTAL', 'Frimaire'),
+                /* I18N: a month in the French republican calendar */
+                4  => I18N::translateContext('INSTRUMENTAL', 'Nivose'),
+                /* I18N: a month in the French republican calendar */
+                5  => I18N::translateContext('INSTRUMENTAL', 'Pluviose'),
+                /* I18N: a month in the French republican calendar */
+                6  => I18N::translateContext('INSTRUMENTAL', 'Ventose'),
+                /* I18N: a month in the French republican calendar */
+                7  => I18N::translateContext('INSTRUMENTAL', 'Germinal'),
+                /* I18N: a month in the French republican calendar */
+                8  => I18N::translateContext('INSTRUMENTAL', 'Floreal'),
+                /* I18N: a month in the French republican calendar */
+                9  => I18N::translateContext('INSTRUMENTAL', 'Prairial'),
+                /* I18N: a month in the French republican calendar */
+                10 => I18N::translateContext('INSTRUMENTAL', 'Messidor'),
+                /* I18N: a month in the French republican calendar */
+                11 => I18N::translateContext('INSTRUMENTAL', 'Thermidor'),
+                /* I18N: a month in the French republican calendar */
+                12 => I18N::translateContext('INSTRUMENTAL', 'Fructidor'),
+                /* I18N: a month in the French republican calendar */
+                13 => I18N::translateContext('INSTRUMENTAL', 'jours complementaires'),
+            ];
         }
 
-        return $translated_month_names[$month_number];
+        return $translated_month_names[$month];
     }
 
     /**
      * Abbreviated month name
      *
-     * @param int  $month_number
-     * @param bool $leap_year    Some calendars use leap months
+     * @param int  $month
+     * @param bool $leap_year Some calendars use leap months
      *
      * @return string
      */
-    protected function monthNameAbbreviated($month_number, $leap_year)
+    protected function monthNameAbbreviated(int $month, bool $leap_year): string
     {
-        return self::monthNameNominativeCase($month_number, $leap_year);
+        return $this->monthNameNominativeCase($month, $leap_year);
     }
 
     /**
-     * Full day of th eweek
+     * Full day of the week
      *
      * @param int $day_number
      *
      * @return string
      */
-    public function dayNames($day_number)
+    public function dayNames(int $day_number): string
     {
         static $translated_day_names;
 
         if ($translated_day_names === null) {
-            $translated_day_names = array(
-                0  => /* I18N: The first day in the French republican calendar */ I18N::translate('Primidi'),
-                1  => /* I18N: The second day in the French republican calendar */ I18N::translate('Duodi'),
-                2  => /* I18N: The third day in the French republican calendar */ I18N::translate('Tridi'),
-                3  => /* I18N: The fourth day in the French republican calendar */ I18N::translate('Quartidi'),
-                4  => /* I18N: The fifth day in the French republican calendar */ I18N::translate('Quintidi'),
-                5  => /* I18N: The sixth day in the French republican calendar */ I18N::translate('Sextidi'),
-                6  => /* I18N: The seventh day in the French republican calendar */ I18N::translate('Septidi'),
-                7  => /* I18N: The eighth day in the French republican calendar */ I18N::translate('Octidi'),
-                8  => /* I18N: The ninth day in the French republican calendar */ I18N::translate('Nonidi'),
-                9  => /* I18N: The tenth day in the French republican calendar */ I18N::translate('Decidi'),
-            );
+            $translated_day_names = [
+                /* I18N: The first day in the French republican calendar */
+                0 => I18N::translate('Primidi'),
+                /* I18N: The second day in the French republican calendar */
+                1 => I18N::translate('Duodi'),
+                /* I18N: The third day in the French republican calendar */
+                2 => I18N::translate('Tridi'),
+                /* I18N: The fourth day in the French republican calendar */
+                3 => I18N::translate('Quartidi'),
+                /* I18N: The fifth day in the French republican calendar */
+                4 => I18N::translate('Quintidi'),
+                /* I18N: The sixth day in the French republican calendar */
+                5 => I18N::translate('Sextidi'),
+                /* I18N: The seventh day in the French republican calendar */
+                6 => I18N::translate('Septidi'),
+                /* I18N: The eighth day in the French republican calendar */
+                7 => I18N::translate('Octidi'),
+                /* I18N: The ninth day in the French republican calendar */
+                8 => I18N::translate('Nonidi'),
+                /* I18N: The tenth day in the French republican calendar */
+                9 => I18N::translate('Decidi'),
+            ];
         }
 
         return $translated_day_names[$day_number];
@@ -225,7 +316,7 @@ class FrenchDate extends CalendarDate
      *
      * @return string
      */
-    protected function dayNamesAbbreviated($day_number)
+    protected function dayNamesAbbreviated(int $day_number): string
     {
         return $this->dayNames($day_number);
     }
@@ -235,8 +326,8 @@ class FrenchDate extends CalendarDate
      *
      * @return string
      */
-    protected function formatLongYear()
+    protected function formatLongYear(): string
     {
-        return $this->numberToRomanNumerals($this->y);
+        return $this->roman_numerals_service->numberToRomanNumerals($this->year);
     }
 }

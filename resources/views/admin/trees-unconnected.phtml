@@ -1,0 +1,45 @@
+<?php
+
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\UnconnectedAction;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Tree;
+
+/**
+ * @var string         $title
+ * @var bool           $aliases
+ * @var bool           $associates
+ * @var Individual[][] $individual_groups
+ * @var Individual     $root
+ * @var Tree           $tree
+ */
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route('manage-trees', ['tree' => $tree->name()]) => I18N::translate('Manage family trees '), $title]]) ?>
+
+<h1><?= $title ?></h1>
+
+<form method="post" action="<?= e(route(UnconnectedAction::class, ['tree' => $tree->name()])) ?>" class="form-inline">
+    <?= csrf_field() ?>
+
+    <?= view('components/checkbox-inline', ['label' => I18N::translate('Include associates'), 'checked' => $associates, 'name' => 'associates']) ?>
+    <?= view('components/checkbox-inline', ['label' => I18N::translate('Include aliases'), 'checked' => $aliases, 'name' => 'aliases']) ?>
+    <button type="submit" class="btn btn-primary">
+        <?= I18N::translate('update') ?>
+    </button>
+</form>
+
+<p><?= I18N::translate('These groups of individuals are not related to %s.', $root->fullName()) ?></p>
+
+<?php foreach ($individual_groups as $group) : ?>
+    <h2><?= I18N::plural('%s individual', '%s individuals', count($group), I18N::number(count($group))) ?></h2>
+    <ul>
+        <?php foreach ($group as $individual) : ?>
+            <li>
+                <a href="<?= e($individual->url()) ?>"><?= $individual->fullName() ?></a>
+            </li>
+        <?php endforeach ?>
+    </ul>
+<?php endforeach ?>

@@ -1,0 +1,72 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+
+/**
+ * @var int                  $days
+ * @var int                  $max_days
+ * @var string               $infoStyle
+ * @var array<string,string> $info_styles
+ * @var string               $sortStyle
+ * @var array<string,string> $sort_styles
+ * @var string               $source
+ * @var array<string,string> $sources
+ * @var bool                 $show_date
+ * @var bool                 $show_user
+ */
+?>
+
+<div class="form-group row">
+    <label class="col-sm-3 col-form-label" for="days">
+        <?= I18N::translate('Number of days to show') ?>
+    </label>
+    <div class="col-sm-9">
+        <input class="form-control" id="days" name="days" type="number" min="1" max="<?= $max_days ?>" value="<?= e($days) ?>" required>
+        <?= I18N::plural('maximum %s day', 'maximum %s days', $max_days, I18N::number($max_days)) ?>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-3 col-form-label" for="infoStyle">
+        <?= I18N::translate('Presentation style') ?>
+    </label>
+    <div class="col-sm-9">
+        <?= view('components/select', ['name' => 'infoStyle', 'selected' => $infoStyle, 'options' => $info_styles]) ?>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-3 col-form-label" for="sortStyle">
+        <?= I18N::translate('Sort order') ?>
+    </label>
+    <div class="col-sm-9">
+        <?= view('components/select', ['name' => 'sortStyle', 'selected' => $sortStyle, 'options' => $sort_styles]) ?>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-3 col-form-label" for="source">
+        <?= I18N::translate('Changes') ?>
+    </label>
+    <div class="col-sm-9">
+        <?= view('components/select', ['name' => 'source', 'selected' => $source, 'options' => $sources]) ?>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-3 col-form-label" for="show_user">
+        <?= /* I18N: label for a yes/no option */ I18N::translate('Show the user who made the change') ?>
+    </label>
+    <div class="col-sm-9">
+        <?= view('components/radios-inline', ['name' => 'show_user', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => (int) $show_user]) ?>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-3 col-form-label" for="show_date">
+        <?= /* I18N: label for a yes/no option */ I18N::translate('Show the date and time') ?>
+    </label>
+    <div class="col-sm-9">
+        <?= view('components/radios-inline', ['name' => 'show_date', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => (int) $show_date]) ?>
+    </div>
+</div>

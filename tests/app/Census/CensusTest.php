@@ -14,28 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
+
+use Fisharebest\Webtrees\TestCase;
 
 /**
  * Test harness for the class CensusColumnAgeFemale5Years
  */
-class CensusTest extends \PHPUnit_Framework_TestCase
+class CensusTest extends TestCase
 {
     /**
-     * @covers Fisharebest\Webtrees\Census\Census
+     * @covers \Fisharebest\Webtrees\Census\Census
+     *
+     * @return void
      */
-    public function testAllCensus()
+    public function testCensusPlaces(): void
     {
-        $censuses = Census::allCensusPlaces();
+        $censuses = Census::censusPlaces('XX');
 
-        $this->assertCount(8, $censuses);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfCzechRepublic', $censuses[0]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfDenmark', $censuses[1]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfDeutschland', $censuses[2]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfEngland', $censuses[3]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance', $censuses[4]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfScotland', $censuses[5]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfUnitedStates', $censuses[6]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfWales', $censuses[7]);
+        $this->assertCount(9, $censuses);
+        $this->assertInstanceOf(CensusOfUnitedStates::class, $censuses[0]);
+        $this->assertInstanceOf(CensusOfEngland::class, $censuses[1]);
+        $this->assertInstanceOf(CensusOfScotland::class, $censuses[2]);
+        $this->assertInstanceOf(CensusOfWales::class, $censuses[3]);
+        $this->assertInstanceOf(CensusOfDeutschland::class, $censuses[4]);
+        $this->assertInstanceOf(CensusOfFrance::class, $censuses[5]);
+        $this->assertInstanceOf(CensusOfCzechRepublic::class, $censuses[6]);
+        $this->assertInstanceOf(CensusOfSlovakia::class, $censuses[7]);
+        $this->assertInstanceOf(CensusOfDenmark::class, $censuses[8]);
     }
 }

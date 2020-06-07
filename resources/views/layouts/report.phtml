@@ -1,0 +1,24 @@
+<?php
+
+use Fisharebest\Webtrees\DebugBar;
+use Fisharebest\Webtrees\I18N;
+
+?>
+<!DOCTYPE html>
+<html dir="<?= I18N::locale()->direction() ?>" lang="<?= I18N::locale()->languageTag() ?>">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title><?= $title ?></title>
+
+        <link rel="icon" href="<?= e(asset('favicon.ico')) ?>" type="image/x-icon">
+
+        <?= DebugBar::renderHead() ?>
+    </head>
+    <body class="container wt-global wt-report-page">
+        <?= $content ?>
+
+        <?= DebugBar::render() ?>
+    </body>
+</html>

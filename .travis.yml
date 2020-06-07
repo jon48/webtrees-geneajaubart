@@ -1,31 +1,36 @@
 language: php
 
-cache:
-  directories:
-    - ~/.composer/cache
+php:
+  - 7.1
+  - 7.2
+  - 7.3
+  - 7.4
+# doctrine/dbal isn't working with PHP 8.0 builds yet.
+#  - nightly
 
+## Non-sudo environments are faster
 sudo: false
 
-matrix:
-  include:
-    - php: 5.3
-      dist: precise
-    - php: 5.4
-      dist: trusty
-    - php: 5.5
-      dist: trusty
-    - php: 5.6
-      dist: xenial
-    - php: 7.0
-      dist: xenial
-    - php: 7.1
-    - php: 7.2
-    - php: 7.3
+## Cache composer and vendor libraries
+cache:
+  directories:
+    - vendor
+    - $HOME/.composer/cache
+
+# 7.4 does not currently have ext-gd and ext-zip - but we don't need them for our tests
+install:
+  - curl -s http://getcomposer.org/installer | php
+  - travis_retry composer install --ignore-platform-reqs
 
 before_script:
-  - phpenv config-rm xdebug.ini
   - travis_retry composer config github-oauth.github.com "${GITHUB_OAUTH_TOKEN}"
-  - COMPOSER_MEMORY_LIMIT=-1 composer update --no-interaction
 
+# Coverage testing is slow, so only do it once.
 script:
-  - vendor/bin/phpunit
+  - if [ $TRAVIS_PHP_VERSION = 7.4     ]; then vendor/bin/phpunit -c phpunit.xml.dist; fi
+  - if [ $TRAVIS_PHP_VERSION = 7.3     ]; then vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover tests/clover.xml; fi
+  - if [ $TRAVIS_PHP_VERSION = 7.2     ]; then vendor/bin/phpunit -c phpunit.xml.dist; fi
+  - if [ $TRAVIS_PHP_VERSION = 7.1     ]; then vendor/bin/phpunit -c phpunit.xml.dist; fi
+
+after_script:
+  - if [ $TRAVIS_PHP_VERSION = 7.3 ]; then travis_retry php vendor/bin/php-coveralls -v; fi

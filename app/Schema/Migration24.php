@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,35 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Schema;
 
-use Fisharebest\Webtrees\Database;
-
 /**
- * Upgrade the database schema from version 24 to version 25.
+ * Upgrade the database schema from version 24 to version 25 (webtrees 1.4.2).
  */
 class Migration24 implements MigrationInterface
 {
     /**
-     * Upgrade to to the next version
+     * Upgrade to to the next version.
+     *
+     * @return void
      */
-    public function upgrade()
+    public function upgrade(): void
     {
-        // Tree settings become site settings
-        Database::exec(
-            "INSERT IGNORE INTO `##site_setting` (setting_name, setting_value)" .
-            " SELECT setting_name, MIN(setting_value)" . // Can't use ANY_VALUE() until MySQL5.7
-            " FROM `##gedcom_setting`" .
-            " WHERE setting_name IN ('SHOW_REGISTER_CAUTION', 'WELCOME_TEXT_CUST_HEAD') OR setting_name LIKE 'WELCOME_TEXT_AUTH_MODE%'" .
-            " GROUP BY setting_name"
-        );
-
-        Database::exec(
-            "DELETE FROM `##gedcom_setting` WHERE setting_name IN ('ALLOW_EDIT_GEDCOM', 'SHOW_REGISTER_CAUTION', 'WELCOME_TEXT_CUST_HEAD') OR setting_name LIKE 'WELCOME_TEXT_AUTH_MODE%'"
-        );
-
-        Database::exec(
-            "DELETE FROM `##site_setting` WHERE setting_name IN ('STORE_MESSAGES')"
-        );
+        // These migrations have been merged into migration 0.
+        // Direct upgrade from webtrees < 1.7.9 is not supported.
     }
 }

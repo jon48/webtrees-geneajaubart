@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
 
 /**
@@ -25,7 +29,7 @@ class ReportBaseCell extends ReportBaseElement
      *
      * @var string
      */
-    public $align = "";
+    public $align = '';
     /**
      * Whether or not a border should be printed around this box. 0 = no border, 1 = border. Default is 0.
      * Or a string containing some or all of the following characters (in any order):<ul><li>L: left</li><li>T: top</li><li>R: right</li><li>B: bottom</li></ul>
@@ -56,7 +60,7 @@ class ReportBaseCell extends ReportBaseElement
      * Cell height DEFAULT 0 (expressed in points)
      * The starting height of this cell. If the text wraps the height will automatically be adjusted.
      *
-     * @var int
+     * @var float
      */
     public $height;
     /**
@@ -105,11 +109,11 @@ class ReportBaseCell extends ReportBaseElement
      * Cell width DEFAULT 0 (expressed in points)
      * Setting the width to 0 will make it the width from the current location to the right margin.
      *
-     * @var int
+     * @var float
      */
     public $width;
 
-    /** @var int Unknown */
+    /** @var bool */
     public $reseth;
 
     /**
@@ -125,26 +129,26 @@ class ReportBaseCell extends ReportBaseElement
      * @param mixed  $top     Y-position
      * @param mixed  $left    X-position
      * @param int    $fill    Indicates if the cell background must be painted (1) or transparent (0). Default value: 0.
-     * @param int $stretch Stretch carachter mode
+     * @param int    $stretch Stretch carachter mode
      * @param string $bocolor Border color
      * @param string $tcolor  Text color
-     * @param        $reseth
+     * @param bool   $reseth
      */
     public function __construct(
         $width,
         $height,
         $border,
         $align,
-        $bgcolor,
-        $style,
-        $ln,
+        string $bgcolor,
+        string $style,
+        int $ln,
         $top,
         $left,
-        $fill,
-        $stretch,
-        $bocolor,
-        $tcolor,
-        $reseth
+        int $fill,
+        int $stretch,
+        string $bocolor,
+        string $tcolor,
+        bool $reseth
     ) {
         $this->align     = $align;
         $this->border    = $border;
@@ -155,25 +159,23 @@ class ReportBaseCell extends ReportBaseElement
         $this->left      = $left;
         $this->newline   = $ln;
         $this->styleName = $style;
-        $this->text      = "";
+        $this->text      = '';
         $this->tcolor    = $tcolor;
         $this->top       = $top;
-        $this->url       = "";
+        $this->url       = '';
         $this->stretch   = $stretch;
         $this->width     = $width;
         $this->reseth    = $reseth;
-
-        return 0;
     }
 
     /**
      * Get the cell height
      *
-     * @param $renderer
+     * @param HtmlRenderer|PdfRenderer $renderer
      *
      * @return float
      */
-    public function getHeight($renderer)
+    public function getHeight($renderer): float
     {
         return $this->height;
     }
@@ -183,21 +185,19 @@ class ReportBaseCell extends ReportBaseElement
      *
      * @param string $url The URL address to save
      *
-     * @return int
+     * @return void
      */
-    public function setUrl($url)
+    public function setUrl($url): void
     {
         $this->url = $url;
-
-        return 0;
     }
 
     /**
      * Get the cell width
      *
-     * @param $renderer
+     * @param HtmlRenderer|PdfRenderer $renderer
      *
-     * @return float
+     * @return float|array
      */
     public function getWidth($renderer)
     {

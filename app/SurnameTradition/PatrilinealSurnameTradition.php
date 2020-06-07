@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,12 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\SurnameTradition;
 
 /**
  * Children take their father’s surname.
  */
-class PatrilinealSurnameTradition extends DefaultSurnameTradition implements SurnameTraditionInterface
+class PatrilinealSurnameTradition extends DefaultSurnameTradition
 {
     /**
      * What names are given to a new child
@@ -29,19 +33,19 @@ class PatrilinealSurnameTradition extends DefaultSurnameTradition implements Sur
      *
      * @return string[] Associative array of GEDCOM name parts (SURN, _MARNM, etc.)
      */
-    public function newChildNames($father_name, $mother_name, $child_sex)
+    public function newChildNames(string $father_name, string $mother_name, string $child_sex): array
     {
         if (preg_match(self::REGEX_SPFX_SURN, $father_name, $match)) {
-            return array_filter(array(
+            return array_filter([
                 'NAME' => $match['NAME'],
                 'SPFX' => $match['SPFX'],
                 'SURN' => $match['SURN'],
-            ));
-        } else {
-            return array(
-                'NAME' => '//',
-            );
+            ]);
         }
+
+        return [
+            'NAME' => '//',
+        ];
     }
 
     /**
@@ -52,19 +56,19 @@ class PatrilinealSurnameTradition extends DefaultSurnameTradition implements Sur
      *
      * @return string[] Associative array of GEDCOM name parts (SURN, _MARNM, etc.)
      */
-    public function newParentNames($child_name, $parent_sex)
+    public function newParentNames(string $child_name, string $parent_sex): array
     {
         if ($parent_sex === 'M' && preg_match(self::REGEX_SPFX_SURN, $child_name, $match)) {
-            return array_filter(array(
+            return array_filter([
                 'NAME' => $match['NAME'],
                 'SPFX' => $match['SPFX'],
                 'SURN' => $match['SURN'],
-            ));
-        } else {
-            return array(
-                'NAME' => '//',
-            );
+            ]);
         }
+
+        return [
+            'NAME' => '//',
+        ];
     }
 
     /**
@@ -73,7 +77,7 @@ class PatrilinealSurnameTradition extends DefaultSurnameTradition implements Sur
      *
      * @return string An inflected name
      */
-    protected function inflect($name, $inflections)
+    protected function inflect($name, $inflections): string
     {
         foreach ($inflections as $from => $to) {
             $name = preg_replace('~' . $from . '~u', $to, $name);

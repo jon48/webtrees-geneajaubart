@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 use Fisharebest\Webtrees\Individual;
@@ -25,16 +29,16 @@ class CensusColumnMarriedWithinYear extends AbstractCensusColumn implements Cens
     /**
      * Generate the likely value of this census column, based on available information.
      *
-     * @param Individual      $individual
-     * @param Individual|null $head
+     * @param Individual $individual
+     * @param Individual $head
      *
      * @return string
      */
-    public function generate(Individual $individual, Individual $head = null)
+    public function generate(Individual $individual, Individual $head): string
     {
-        foreach ($individual->getSpouseFamilies() as $family) {
-            foreach ($family->getFacts('MARR') as $fact) {
-                $marriage_jd = $fact->getDate()->julianDay();
+        foreach ($individual->spouseFamilies() as $family) {
+            foreach ($family->facts(['MARR']) as $fact) {
+                $marriage_jd = $fact->date()->julianDay();
                 $census_jd   = $this->date()->julianDay();
                 if ($marriage_jd <= $census_jd && $marriage_jd >= $census_jd - 365) {
                     return 'Y';

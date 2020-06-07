@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,20 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
+
+use function str_replace;
+use function strip_tags;
+use function trim;
 
 /**
  * Class ReportBaseElement
  */
 class ReportBaseElement
 {
-    /** @var string Text*/
+    // Special value for X or Y position, to indicate the current position.
+    public const CURRENT_POSITION = -1.0;
+
+    /** @var string Text */
     public $text = '';
 
     /**
      * Element renderer
      *
-     * @param ReportHtml|ReportTcpdf $renderer
+     * @param HtmlRenderer|PdfRenderer $renderer
+     *
+     * @return void
      */
     public function render($renderer)
     {
@@ -36,11 +49,11 @@ class ReportBaseElement
     /**
      * Get the height.
      *
-     * @param ReportHtml|ReportTcpdf $renderer
+     * @param HtmlRenderer|PdfRenderer $renderer
      *
      * @return float
      */
-    public function getHeight($renderer)
+    public function getHeight($renderer): float
     {
         return 0.0;
     }
@@ -48,9 +61,9 @@ class ReportBaseElement
     /**
      * Get the width.
      *
-     * @param ReportHtml|ReportTcpdf $renderer
+     * @param HtmlRenderer|PdfRenderer $renderer
      *
-     * @return float
+     * @return float|array
      */
     public function getWidth($renderer)
     {
@@ -62,28 +75,30 @@ class ReportBaseElement
      *
      * @param string $t
      *
-     * @return int
+     * @return void
      */
-    public function addText($t)
+    public function addText(string $t): void
     {
-        $t = trim($t, "\r\n\t");
-        $t = str_replace(array("<br>", "&nbsp;"), array("\n", " "), $t);
-        $t = strip_tags($t);
+        $t          = trim($t, "\r\n\t");
+        $t          = str_replace([
+            '<br>',
+            '&nbsp;',
+        ], [
+            "\n",
+            ' ',
+        ], $t);
+        $t          = strip_tags($t);
         $this->text .= $t;
-
-        return 0;
     }
 
     /**
      * Add an end-of-line.
      *
-     * @return int
+     * @return void
      */
-    public function addNewline()
+    public function addNewline(): void
     {
         $this->text .= "\n";
-
-        return 0;
     }
 
     /**
@@ -91,7 +106,7 @@ class ReportBaseElement
      *
      * @return string
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->text;
     }
@@ -99,12 +114,12 @@ class ReportBaseElement
     /**
      * Set the width to wrap text.
      *
-     * @param $wrapwidth
-     * @param $cellwidth
+     * @param float $wrapwidth
+     * @param float $cellwidth
      *
-     * @return int
+     * @return float
      */
-    public function setWrapWidth($wrapwidth, $cellwidth)
+    public function setWrapWidth(float $wrapwidth, float $cellwidth): float
     {
         return 0;
     }
@@ -112,18 +127,22 @@ class ReportBaseElement
     /**
      * Render the footnotes.
      *
-     * @param $renderer
+     * @param HtmlRenderer|PdfRenderer $renderer
+     *
+     * @return void
      */
-    public function renderFootnote($renderer)
+    public function renderFootnote($renderer): void
     {
     }
 
     /**
      * Set the text.
      *
-     * @param $text
+     * @param string $text
+     *
+     * @return void
      */
-    public function setText($text)
+    public function setText(string $text): void
     {
         $this->text = $text;
     }

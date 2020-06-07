@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfWales1871 extends CensusOfWales implements CensusInterface
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '02 APR 1871';
     }
@@ -35,17 +39,17 @@ class CensusOfWales1871 extends CensusOfWales implements CensusInterface
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnFullName($this, 'Name', 'Name and surname'),
-            new CensusColumnRelationToHead($this, 'Relation', 'Relation to head of household'),
+            new CensusColumnRelationToHeadEnglish($this, 'Relation', 'Relation to head of household'),
             new CensusColumnConditionEnglish($this, 'Condition', 'Condition'),
             new CensusColumnAgeMale($this, 'AgeM', 'Age (males)'),
             new CensusColumnAgeFemale($this, 'AgeF', 'Age (females)'),
             new CensusColumnOccupation($this, 'Occupation', 'Rank, profession or occupation'),
             new CensusColumnBirthPlace($this, 'Birthplace', 'Where born'),
             new CensusColumnNull($this, 'Infirm', 'Whether deaf-and-dumb, blind, imbecile, idiot or lunatic'),
-        );
+        ];
     }
 }

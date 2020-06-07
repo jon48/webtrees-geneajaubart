@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfUnitedStates1910 extends CensusOfUnitedStates implements CensusInt
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '15 APR 1910';
     }
@@ -35,11 +39,11 @@ class CensusOfUnitedStates1910 extends CensusOfUnitedStates implements CensusInt
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnSurnameGivenNameInitial($this, 'Name', 'Name'),
-            new CensusColumnRelationToHead($this, 'Relation', 'Relationship of each person to the head of the family'),
+            new CensusColumnRelationToHeadEnglish($this, 'Relation', 'Relationship of each person to the head of the family'),
             new CensusColumnSexMF($this, 'Sex', 'Sex'),
             new CensusColumnNull($this, 'Race', 'Color or race'),
             new CensusColumnAge($this, 'Age', 'Age at last birthday'),
@@ -67,6 +71,6 @@ class CensusOfUnitedStates1910 extends CensusOfUnitedStates implements CensusInt
             new CensusColumnNull($this, 'CW', 'Whether a survivor of the Union or Confederate Army or Navy'),
             new CensusColumnNull($this, 'Blind', 'Whether blind (both eyes)'),
             new CensusColumnNull($this, 'Deaf', 'Whether deaf and dumb'),
-        );
+        ];
     }
 }

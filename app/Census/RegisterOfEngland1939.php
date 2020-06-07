@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class RegisterOfEngland1939 extends CensusOfEngland implements CensusInterface
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '29 SEP 1939';
     }
@@ -35,9 +39,9 @@ class RegisterOfEngland1939 extends CensusOfEngland implements CensusInterface
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnNull($this, 'Schedule', 'Schedule Number'),
             new CensusColumnNull($this, 'SubNum', 'Schedule Sub Number'),
             new CensusColumnSurnameGivenNames($this, 'Name', 'Surname & other names'),
@@ -46,6 +50,6 @@ class RegisterOfEngland1939 extends CensusOfEngland implements CensusInterface
             new CensusColumnBirthDayMonthSlashYear($this, 'DOB', 'Date of birth'),
             new CensusColumnConditionEnglish($this, 'MC', 'Marital Condition - Married, Single, Unmarried, Widowed or Divorced'),
             new CensusColumnOccupation($this, 'Occupation', 'Occupation'),
-        );
+        ];
     }
 }

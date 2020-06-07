@@ -1,0 +1,46 @@
+<?php
+
+use Fisharebest\Webtrees\Family;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\View;
+use Illuminate\Support\Collection;
+
+/**
+ * @var int        $generations
+ * @var Individual $individual
+ * @var bool       $spouses
+ */
+
+$children = $individual->spouseFamilies()->map(static function (Family $family): Collection {
+    return $family->children();
+})->flatten();
+
+?>
+
+<div class="d-flex wt-chart-hourglass">
+    <?= view('modules/hourglass-chart/children', ['children' => $children, 'generations' => $generations - 1, 'spouses' => $spouses]) ?>
+    <div class="align-self-center">
+        <?= view('chart-box', ['individual' => $individual]) ?>
+        <?php if ($spouses) : ?>
+            <?php foreach ($individual->spouseFamilies() as $family) : ?>
+                <?= view('chart-box', ['individual' => $family->spouse($individual)]) ?>
+            <?php endforeach ?>
+        <?php endif ?>
+    </div>
+    <?php if ($individual->childFamilies()->first() !== null) : ?>
+        <div class="wt-chart-horizontal-spacer">
+            <div class="wt-chart-horizontal-line"></div>
+        </div>
+        <?= view('modules/hourglass-chart/parents', ['generations' => $generations - 1, 'family' => $individual->childFamilies()->first()]) ?>
+    <?php endif ?>
+</div>
+
+<?php View::push('javascript') ?>
+<script>
+    $(".wt-chart-hourglass").on("click", ".hourglass-arrow[data-xref]", function () {
+        $(this.parentNode).load(this.dataset.xref);
+
+        return false;
+    });
+</script>
+<?php View::endpush() ?>

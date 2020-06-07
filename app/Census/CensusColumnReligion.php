@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,8 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
+use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Individual;
 
 /**
@@ -25,15 +30,24 @@ class CensusColumnReligion extends AbstractCensusColumn implements CensusColumnI
     /**
      * Generate the likely value of this census column, based on available information.
      *
-     * @todo Look for RELI tags (or subtags?)
-     *
-     * @param Individual      $individual
-     * @param Individual|null $head
+     * @param Individual $individual
+     * @param Individual $head
      *
      * @return string
      */
-    public function generate(Individual $individual, Individual $head = null)
+    public function generate(Individual $individual, Individual $head): string
     {
+        $reli_fact = $individual->facts(['RELI'])->first();
+        if ($reli_fact instanceof Fact) {
+            return $reli_fact->value();
+        }
+
+        foreach ($individual->facts() as $fact) {
+            if ($fact->attribute('RELI') !== '') {
+                return $fact->attribute('RELI');
+            }
+        }
+
         return '';
     }
 }

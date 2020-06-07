@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,9 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees;
 
-use Rhumsaa\Uuid\Uuid;
+use function trigger_error;
+
+use const E_USER_DEPRECATED;
 
 /**
  * System for generating menus.
@@ -25,7 +31,7 @@ class Menu
     /** @var string The text to be displayed in the mneu */
     private $label;
 
-    /** @var string The target URL or href*/
+    /** @var string The target URL or href */
     private $link;
 
     /** @var string The CSS class used to style this menu item */
@@ -37,15 +43,6 @@ class Menu
     /** @var Menu[] An optional list of sub-menus. */
     private $submenus;
 
-    /** @var string Used internally to create javascript menus */
-    private $parentmenu;
-
-    /** @var string Used to format javascript menus */
-    private $submenuclass;
-
-    /** @var string Used to format javascript menus */
-    private $menuclass;
-
     /**
      * Constructor for the menu class
      *
@@ -55,7 +52,7 @@ class Menu
      * @param string[] $attrs    Optional attributes, such as onclick or data-xxx
      * @param Menu[]   $submenus Any submenus
      */
-    public function __construct($label, $link = '#', $class = '', array $attrs = array(), array $submenus = array())
+    public function __construct($label, $link = '#', $class = '', array $attrs = [], array $submenus = [])
     {
         $this
             ->setLabel($label)
@@ -66,46 +63,20 @@ class Menu
     }
 
     /**
-     * Convert this menu to an HTML list, for easy rendering of
-     * lists of menus/nulls.
+     * Render this menu using Bootstrap4 markup
      *
      * @return string
-     */
-    public function __toString()
-    {
-        return $this->getMenuAsList();
-    }
-
-    /**
-     * Render this menu using Bootstrap markup
      *
-     * @return string
+     * @deprecated since 2.0.2.  Will be removed in 2.1.0
      */
-    public function bootstrap()
+    public function bootstrap4(): string
     {
-        if ($this->submenus) {
-            $submenus = '';
-            foreach ($this->submenus as $submenu) {
-                $submenus .= $submenu->bootstrap();
-            }
+        trigger_error(
+            'Menu::bootstrap4() is deprecated.  Use the view(components/menu-item) instead',
+            E_USER_DEPRECATED
+        );
 
-            return
-                '<li class="' . $this->class . ' dropdown">' .
-                '<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">' .
-                $this->label .
-                ' <span class="caret"></span></a>' .
-                '<ul class="dropdown-menu" role="menu">' .
-                $submenus .
-                '</ul>' .
-                '</li>';
-        } else {
-            $attrs = '';
-            foreach ($this->attrs as $key => $value) {
-                $attrs .= ' ' . $key . '="' . Filter::escapeHtml($value) . '"';
-            }
-
-            return '<li class="' . $this->class . '"><a href="' . $this->link . '"' . $attrs . '>' . $this->label . '</a></li>';
-        }
+        return view('components/menu-item', ['menu' => $this]);
     }
 
     /**
@@ -113,7 +84,7 @@ class Menu
      *
      * @return string[]
      */
-    public function getAttrs()
+    public function getAttrs(): array
     {
         return $this->attrs;
     }
@@ -125,7 +96,7 @@ class Menu
      *
      * @return $this
      */
-    public function setAttrs(array $attrs)
+    public function setAttrs(array $attrs): self
     {
         $this->attrs = $attrs;
 
@@ -133,23 +104,11 @@ class Menu
     }
 
     /**
-     * Set the CSS classes for the (legacy) javascript menus
-     *
-     * @param string $menuclass
-     * @param string $submenuclass
-     */
-    public function addClass($menuclass, $submenuclass = '')
-    {
-        $this->menuclass    = $menuclass;
-        $this->submenuclass = $submenuclass;
-    }
-
-    /**
      * Get the class.
      *
      * @return string
      */
-    public function getClass()
+    public function getClass(): string
     {
         return $this->class;
     }
@@ -161,7 +120,7 @@ class Menu
      *
      * @return $this
      */
-    public function setClass($class)
+    public function setClass($class): self
     {
         $this->class = $class;
 
@@ -173,7 +132,7 @@ class Menu
      *
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label;
     }
@@ -185,7 +144,7 @@ class Menu
      *
      * @return $this
      */
-    public function setLabel($label)
+    public function setLabel($label): self
     {
         $this->label = $label;
 
@@ -197,7 +156,7 @@ class Menu
      *
      * @return string
      */
-    public function getLink()
+    public function getLink(): string
     {
         return $this->link;
     }
@@ -209,7 +168,7 @@ class Menu
      *
      * @return $this
      */
-    public function setLink($link)
+    public function setLink($link): self
     {
         $this->link = $link;
 
@@ -223,7 +182,7 @@ class Menu
      *
      * @return $this
      */
-    public function addSubmenu($menu)
+    public function addSubmenu($menu): self
     {
         $this->submenus[] = $menu;
 
@@ -231,74 +190,11 @@ class Menu
     }
 
     /**
-     * Render this menu using javascript popups..
-     *
-     * @return string
-     */
-    public function getMenu()
-    {
-        $menu_id     = 'menu-' . Uuid::uuid4();
-        $sub_menu_id = 'sub-' . $menu_id;
-
-        $html = '<a href="' . $this->link . '"';
-        foreach ($this->attrs as $key => $value) {
-            $html .= ' ' . $key . '="' . Filter::escapeHtml($value) . '"';
-        }
-        if (!empty($this->submenus)) {
-            $html .= ' onmouseover="show_submenu(\'' . $sub_menu_id . '\', \'' . $menu_id . '\');"';
-            $html .= ' onmouseout="timeout_submenu(\'' . $sub_menu_id . '\');"';
-        }
-        $html .= '>' . $this->label . '</a>';
-
-        if (!empty($this->submenus)) {
-            $html .= '<div id="' . $sub_menu_id . '" class="' . $this->submenuclass . '"';
-            $html .= ' style="position: absolute; visibility: hidden; z-index: 100; text-align: ' . (I18N::direction() === 'ltr' ? 'left' : 'right') . '"';
-            $html .= ' onmouseover="show_submenu(\'' . $this->parentmenu . '\'); show_submenu(\'' . $sub_menu_id . '\');"';
-            $html .= ' onmouseout="timeout_submenu(\'' . $sub_menu_id . '\');">';
-            foreach ($this->submenus as $submenu) {
-                $submenu->parentmenu = $sub_menu_id;
-                $html .= $submenu->getMenu();
-            }
-            $html .= '</div>';
-        }
-
-        return '<div id="' . $menu_id . '" class="' . $this->menuclass . '">' . $html . '</div>';
-    }
-
-    /**
-     * Render this menu as an HTML list
-     *
-     * @return string
-     */
-    public function getMenuAsList()
-    {
-        $attrs = '';
-        foreach ($this->attrs as $key => $value) {
-            $attrs .= ' ' . $key . '="' . Filter::escapeHtml($value) . '"';
-        }
-        if ($this->link) {
-            $link = ' href="' . $this->link . '"';
-        } else {
-            $link = '';
-        }
-        $html = '<a' . $link . $attrs . '>' . $this->label . '</a>';
-        if ($this->submenus) {
-            $html .= '<ul>';
-            foreach ($this->submenus as $submenu) {
-                $html .= $submenu->getMenuAsList();
-            }
-            $html .= '</ul>';
-        }
-
-        return '<li class="' . $this->class . '">' . $html . '</li>';
-    }
-
-    /**
      * Get the sub-menus.
      *
      * @return Menu[]
      */
-    public function getSubmenus()
+    public function getSubmenus(): array
     {
         return $this->submenus;
     }
@@ -310,7 +206,7 @@ class Menu
      *
      * @return $this
      */
-    public function setSubmenus(array $submenus)
+    public function setSubmenus(array $submenus): self
     {
         $this->submenus = $submenus;
 

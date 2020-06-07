@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,23 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Schema;
 
-use Fisharebest\Webtrees\Database;
-
 /**
- * Upgrade the database schema from version 33 to version 34.
+ * Upgrade the database schema from version 33 to version 34 (webtrees 1.7.3).
  */
 class Migration33 implements MigrationInterface
 {
     /**
      * Upgrade to to the next version
+     *
+     * @return void
      */
-    public function upgrade()
+    public function upgrade(): void
     {
-        Database::exec(
-            "INSERT IGNORE INTO `##site_access_rule` (user_agent_pattern, rule, comment) VALUES" .
-            " ('Mozilla/5.0 (Mobile; Windows Phone 8.1; % Microsoft; %', 'allow', 'Windows Phone 8.1')"
-        );
+        // These migrations have been merged into migration 0.
+        // Direct upgrade from webtrees < 1.7.9 is not supported.
     }
 }

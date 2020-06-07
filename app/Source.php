@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,15 +14,54 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees;
+
+use Closure;
+use Fisharebest\Webtrees\Http\RequestHandlers\SourcePage;
 
 /**
  * A GEDCOM source (SOUR) object.
  */
 class Source extends GedcomRecord
 {
-    const RECORD_TYPE = 'SOUR';
-    const URL_PREFIX  = 'source.php?sid=';
+    public const RECORD_TYPE = 'SOUR';
+
+    protected const ROUTE_NAME  = SourcePage::class;
+
+    /**
+     * A closure which will create a record from a database row.
+     *
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Factory::source()
+     *
+     * @param Tree $tree
+     *
+     * @return Closure
+     */
+    public static function rowMapper(Tree $tree): Closure
+    {
+        return Factory::source()->mapper($tree);
+    }
+
+    /**
+     * Get an instance of a source object. For single records,
+     * we just receive the XREF. For bulk records (such as lists
+     * and search results) we can receive the GEDCOM data as well.
+     *
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Factory::source()
+     *
+     * @param string      $xref
+     * @param Tree        $tree
+     * @param string|null $gedcom
+     *
+     * @return Source|null
+     */
+    public static function getInstance(string $xref, Tree $tree, string $gedcom = null): ?Source
+    {
+        return Factory::source()->make($xref, $tree, $gedcom);
+    }
 
     /**
      * Each object type may have its own special rules, and re-implement this function.
@@ -30,18 +70,18 @@ class Source extends GedcomRecord
      *
      * @return bool
      */
-    protected function canShowByType($access_level)
+    protected function canShowByType(int $access_level): bool
     {
         // Hide sources if they are attached to private repositories ...
         preg_match_all('/\n1 REPO @(.+)@/', $this->gedcom, $matches);
         foreach ($matches[1] as $match) {
-            $repo = Repository::getInstance($match, $this->tree);
+            $repo = Factory::repository()->make($match, $this->tree);
             if ($repo && !$repo->canShow($access_level)) {
                 return false;
             }
         }
 
-        // ... otherwise apply default behaviour
+        // ... otherwise apply default behavior
         return parent::canShowByType($access_level);
     }
 
@@ -52,34 +92,18 @@ class Source extends GedcomRecord
      *
      * @return string
      */
-    protected function createPrivateGedcomRecord($access_level)
+    protected function createPrivateGedcomRecord(int $access_level): string
     {
         return '0 @' . $this->xref . "@ SOUR\n1 TITL " . I18N::translate('Private');
     }
 
     /**
-     * Fetch data from the database
-     *
-     * @param string $xref
-     * @param int    $tree_id
-     *
-     * @return null|string
-     */
-    protected static function fetchGedcomRecord($xref, $tree_id)
-    {
-        return Database::prepare(
-            "SELECT s_gedcom FROM `##sources` WHERE s_id = :xref AND s_file = :tree_id"
-        )->execute(array(
-            'xref'    => $xref,
-            'tree_id' => $tree_id,
-        ))->fetchOne();
-    }
-
-    /**
      * Extract names from the GEDCOM record.
+     *
+     * @return void
      */
-    public function extractNames()
+    public function extractNames(): void
     {
-        parent::extractNamesFromFacts(1, 'TITL', $this->getFacts('TITL'));
+        $this->extractNamesFromFacts(1, 'TITL', $this->facts(['TITL']));
     }
 }

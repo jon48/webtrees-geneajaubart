@@ -1,0 +1,124 @@
+<?php
+
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\SitePreferencesAction;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Site;
+
+/**
+ * @var array<string> $all_themes
+ * @var string        $title
+ */
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), $title]]) ?>
+
+<h1><?= $title ?></h1>
+
+<form method="post" action="<?= e(route(SitePreferencesAction::class)) ?>" class="form-horizontal">
+    <?= csrf_field() ?>
+
+    <!-- INDEX_DIRECTORY -->
+    <div class="row form-group">
+        <label for="INDEX_DIRECTORY" class="col-sm-3 col-form-label">
+            <?= /* I18N: A configuration setting */
+            I18N::translate('Data folder') ?>
+        </label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" dir="ltr" id="INDEX_DIRECTORY" name="INDEX_DIRECTORY" value="<?= e(Site::getPreference('INDEX_DIRECTORY')) ?>" maxlength="255" placeholder="data/" required>
+            <p class="small text-muted">
+                <?= /* I18N: Help text for the "Data folder" site configuration setting */
+                I18N::translate('This folder will be used by webtrees to store media files, GEDCOM files, temporary files, etc. These files may contain private data, and should not be made available over the internet.') ?>
+            </p>
+            <p class="small text-muted">
+                <?= /* I18N: “Apache” is a software program. */
+                I18N::translate('To protect this private data, webtrees uses an Apache configuration file (.htaccess) which blocks all access to this folder. If your web-server does not support .htaccess files, and you cannot restrict access to this folder, then you can select another folder, away from your web documents.') ?>
+            </p>
+            <p class="small text-muted">
+                <?= I18N::translate('If you select a different folder, you must also move all files (except config.ini.php, index.php, and .htaccess) from the existing folder to the new folder.') ?>
+            </p>
+            <p class="small text-muted">
+                <?= I18N::translate('The folder can be specified in full (e.g. /home/user_name/webtrees_data/) or relative to the installation folder (e.g. ../../webtrees_data/).') ?>
+            </p>
+        </div>
+    </div>
+
+    <!-- TIMEZONE -->
+    <div class="row form-group">
+        <label for="TIMEZONE" class="col-sm-3 col-form-label">
+            <?= I18N::translate('Time zone') ?>
+        </label>
+        <div class="col-sm-9">
+            <?= view('components/select', ['name' => 'TIMEZONE', 'selected' => Site::getPreference('TIMEZONE', 'UTC'), 'options' => array_combine(DateTimeZone::listIdentifiers(), DateTimeZone::listIdentifiers())]) ?>
+            <p class="small text-muted">
+                <?= I18N::translate('The time zone is required for date calculations, such as knowing today’s date.') ?>
+            </p>
+        </div>
+    </div>
+
+    <!-- THEME_DIR -->
+    <div class="row form-group">
+        <label for="THEME_DIR" class="col-sm-3 col-form-label">
+            <?= /* I18N: A configuration setting */
+            I18N::translate('Default theme') ?>
+        </label>
+        <div class="col-sm-9">
+            <?= view('components/select', ['name' => 'THEME_DIR', 'selected' => Site::getPreference('THEME_DIR', 'webtrees'), 'options' => $all_themes]) ?>
+            <p class="small text-muted">
+                <?= /* I18N: Help text for the "Default theme" site configuration setting */
+                I18N::translate('You can change the appearance of webtrees using “themes”. Each theme has a different style, layout, color scheme, etc.') ?>
+            </p>
+        </div>
+    </div>
+
+    <!-- LANGUAGE -->
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="LANGUAGE">
+            <?= /* I18N: A configuration setting */ I18N::translate('Language') ?>
+        </label>
+        <div class="col-sm-9">
+            <select id="LANGUAGE" name="LANGUAGE" class="form-control">
+                <?php foreach (I18N::activeLocales() as $active_locale) : ?>
+                    <option value="<?= $active_locale->languageTag() ?>" <?= Site::getPreference('LANGUAGE') === $active_locale->languageTag() ? 'selected' : '' ?>>
+                        <?= $active_locale->endonym() ?>
+                    </option>
+                <?php endforeach ?>
+            </select>
+            <p class="small text-muted">
+                <?= /* I18N: Help text for the “Language” configuration setting */ I18N::translate('If a visitor to the website has not selected a preferred language in their browser preferences, or they have selected an unsupported language, then this language will be used. Typically this applies to search engines.') ?>
+            </p>
+        </div>
+    </div>
+
+    <!-- ALLOW_CHANGE_GEDCOM -->
+    <fieldset class="form-group">
+        <div class="row">
+            <legend class="col-form-label col-sm-3">
+                <?= /* I18N: A configuration setting */
+                I18N::translate('Show list of family trees') ?>
+            </legend>
+            <div class="col-sm-9">
+                <?= view('components/radios-inline', ['name' => 'ALLOW_CHANGE_GEDCOM', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => (int) Site::getPreference('ALLOW_CHANGE_GEDCOM')]) ?>
+                <p class="small text-muted">
+                    <?= /* I18N: Help text for the “Show list of family trees” site configuration setting */
+                    I18N::translate('For websites with more than one family tree, this option will show the list of family trees in the main menu, the search pages, etc.') ?>
+                </p>
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="row form-group">
+        <div class="offset-sm-3 col-sm-9">
+            <button type="submit" class="btn btn-primary">
+                <?= view('icons/save') ?>
+                <?= I18N::translate('save') ?>
+            </button>
+
+            <a href="<?= e(route(ControlPanel::class)) ?>" class="btn btn-secondary">
+                <?= view('icons/cancel') ?>
+                <?= I18N::translate('cancel') ?>
+            </a>
+        </div>
+    </div>
+</form>

@@ -1,7 +1,8 @@
 <?php
+
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,22 +14,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Functions;
 
-use Fisharebest\Webtrees\Database;
 use Fisharebest\Webtrees\Date;
-use Fisharebest\Webtrees\GedcomRecord;
+use Fisharebest\Webtrees\Exceptions\GedcomErrorException;
+use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Family;
+use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomTag;
-use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Header;
 use Fisharebest\Webtrees\Individual;
-use Fisharebest\Webtrees\Log;
+use Fisharebest\Webtrees\Location;
 use Fisharebest\Webtrees\Media;
 use Fisharebest\Webtrees\Note;
+use Fisharebest\Webtrees\Place;
 use Fisharebest\Webtrees\Repository;
+use Fisharebest\Webtrees\Services\GedcomService;
 use Fisharebest\Webtrees\Soundex;
 use Fisharebest\Webtrees\Source;
+use Fisharebest\Webtrees\Submission;
+use Fisharebest\Webtrees\Submitter;
 use Fisharebest\Webtrees\Tree;
-use PDOException;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Query\JoinClause;
+
+use function array_intersect_key;
+use function array_map;
+use function array_unique;
+use function date;
+use function preg_match_all;
+use function strpos;
+use function strtoupper;
+
+use const PREG_SET_ORDER;
 
 /**
  * Class FunctionsImport - common functions
@@ -43,10 +64,10 @@ class FunctionsImport
      *
      * @return string
      */
-    public static function reformatRecord($rec, Tree $tree)
+    public static function reformatRecord(string $rec, Tree $tree): string
     {
-        // Strip out UTF8 formatting characters
-        $rec = str_replace(array(WT_UTF8_BOM, WT_UTF8_LRM, WT_UTF8_RLM), '', $rec);
+        $gedcom_service = app(GedcomService::class);
+        assert($gedcom_service instanceof GedcomService);
 
         // Strip out mac/msdos line endings
         $rec = preg_replace("/[\r\n]+/", "\n", $rec);
@@ -57,140 +78,20 @@ class FunctionsImport
         // Process the record line-by-line
         $newrec = '';
         foreach ($matches as $n => $match) {
-            list(, $level, $xref, $tag, $data) = $match;
-            $tag                               = strtoupper($tag); // Tags should always be upper case
+            [, $level, $xref, $tag, $data] = $match;
+
+            $tag = $gedcom_service->canonicalTag($tag);
+
             switch ($tag) {
-                // Convert PhpGedView tags to WT
-                case '_PGVU':
-                    $tag = '_WT_USER';
-                    break;
-                case '_PGV_OBJS':
-                    $tag = '_WT_OBJE_SORT';
-                    break;
-                // Convert FTM-style "TAG_FORMAL_NAME" into "TAG".
-                case 'ABBREVIATION':
-                    $tag = 'ABBR';
-                    break;
-                case 'ADDRESS':
-                    $tag = 'ADDR';
-                    break;
-                case 'ADDRESS1':
-                    $tag = 'ADR1';
-                    break;
-                case 'ADDRESS2':
-                    $tag = 'ADR2';
-                    break;
-                case 'ADDRESS3':
-                    $tag = 'ADR3';
-                    break;
-                case 'ADOPTION':
-                    $tag = 'ADOP';
-                    break;
-                case 'ADULT_CHRISTENING':
-                    $tag = 'CHRA';
-                    break;
                 case 'AFN':
                     // AFN values are upper case
                     $data = strtoupper($data);
                     break;
-                case 'AGENCY':
-                    $tag = 'AGNC';
-                    break;
-                case 'ALIAS':
-                    $tag = 'ALIA';
-                    break;
-                case 'ANCESTORS':
-                    $tag = 'ANCE';
-                    break;
-                case 'ANCES_INTEREST':
-                    $tag = 'ANCI';
-                    break;
-                case 'ANNULMENT':
-                    $tag = 'ANUL';
-                    break;
-                case 'ASSOCIATES':
-                    $tag = 'ASSO';
-                    break;
-                case 'AUTHOR':
-                    $tag = 'AUTH';
-                    break;
-                case 'BAPTISM':
-                    $tag = 'BAPM';
-                    break;
-                case 'BAPTISM_LDS':
-                    $tag = 'BAPL';
-                    break;
-                case 'BAR_MITZVAH':
-                    $tag = 'BARM';
-                    break;
-                case 'BAS_MITZVAH':
-                    $tag = 'BASM';
-                    break;
-                case 'BIRTH':
-                    $tag = 'BIRT';
-                    break;
-                case 'BLESSING':
-                    $tag = 'BLES';
-                    break;
-                case 'BURIAL':
-                    $tag = 'BURI';
-                    break;
-                case 'CALL_NUMBER':
-                    $tag = 'CALN';
-                    break;
-                case 'CASTE':
-                    $tag = 'CAST';
-                    break;
-                case 'CAUSE':
-                    $tag = 'CAUS';
-                    break;
-                case 'CENSUS':
-                    $tag = 'CENS';
-                    break;
-                case 'CHANGE':
-                    $tag = 'CHAN';
-                    break;
-                case 'CHARACTER':
-                    $tag = 'CHAR';
-                    break;
-                case 'CHILD':
-                    $tag = 'CHIL';
-                    break;
-                case 'CHILDREN_COUNT':
-                    $tag = 'NCHI';
-                    break;
-                case 'CHRISTENING':
-                    $tag = 'CHR';
-                    break;
-                case 'CONCATENATION':
-                    $tag = 'CONC';
-                    break;
-                case 'CONFIRMATION':
-                    $tag = 'CONF';
-                    break;
-                case 'CONFIRMATION_LDS':
-                    $tag = 'CONL';
-                    break;
-                case 'CONTINUED':
-                    $tag = 'CONT';
-                    break;
-                case 'COPYRIGHT':
-                    $tag = 'COPR';
-                    break;
-                case 'CORPORATE':
-                    $tag = 'CORP';
-                    break;
-                case 'COUNTRY':
-                    $tag = 'CTRY';
-                    break;
-                case 'CREMATION':
-                    $tag = 'CREM';
-                    break;
                 case 'DATE':
                     // Preserve text from INT dates
                     if (strpos($data, '(') !== false) {
-                        list($date, $text) = explode('(', $data, 2);
-                        $text              = ' (' . $text;
+                        [$date, $text] = explode('(', $data, 2);
+                        $text = ' (' . $text;
                     } else {
                         $date = $data;
                         $text = '';
@@ -211,6 +112,8 @@ class FunctionsImport
                     $date = str_replace(' APX ', ' ABT ', $date);
                     // B.C. => BC (temporarily, to allow easier handling of ".")
                     $date = str_replace(' B.C. ', ' BC ', $date);
+                    // TMG uses "EITHER X OR Y"
+                    $date = preg_replace('/^ EITHER (.+) OR (.+)/', ' BET $1 AND $2', $date);
                     // "BET X - Y " => "BET X AND Y"
                     $date = preg_replace('/^(.* BET .+) - (.+)/', '$1 AND $2', $date);
                     $date = preg_replace('/^(.* FROM .+) - (.+)/', '$1 TO $2', $date);
@@ -227,319 +130,75 @@ class FunctionsImport
                     // Append the "INT" text
                     $data = $date . $text;
                     break;
-                case 'DEATH':
-                    $tag = 'DEAT';
-                    break;
-                case '_DEATH_OF_SPOUSE':
-                    $tag = '_DETS';
-                    break;
-                case '_DEGREE':
-                    $tag = '_DEG';
-                    break;
-                case 'DESCENDANTS':
-                    $tag = 'DESC';
-                    break;
-                case 'DESCENDANT_INT':
-                    $tag = 'DESI';
-                    break;
-                case 'DESTINATION':
-                    $tag = 'DEST';
-                    break;
-                case 'DIVORCE':
-                    $tag = 'DIV';
-                    break;
-                case 'DIVORCE_FILED':
-                    $tag = 'DIVF';
-                    break;
-                case 'EDUCATION':
-                    $tag = 'EDUC';
-                    break;
-                case 'EMIGRATION':
-                    $tag = 'EMIG';
-                    break;
-                case 'ENDOWMENT':
-                    $tag = 'ENDL';
-                    break;
-                case 'ENGAGEMENT':
-                    $tag = 'ENGA';
-                    break;
-                case 'EVENT':
-                    $tag = 'EVEN';
-                    break;
-                case 'FACSIMILE':
-                    $tag = 'FAX';
-                    break;
-                case 'FAMILY':
-                    $tag = 'FAM';
-                    break;
-                case 'FAMILY_CHILD':
-                    $tag = 'FAMC';
-                    break;
-                case 'FAMILY_FILE':
-                    $tag = 'FAMF';
-                    break;
-                case 'FAMILY_SPOUSE':
-                    $tag = 'FAMS';
-                    break;
-                case 'FIRST_COMMUNION':
-                    $tag = 'FCOM';
-                    break;
                 case '_FILE':
                     $tag = 'FILE';
                     break;
-                case 'FORMAT':
-                    $tag = 'FORM';
                 case 'FORM':
                     // Consistent commas
                     $data = preg_replace('/ *, */', ', ', $data);
                     break;
-                case 'GEDCOM':
-                    $tag = 'GEDC';
-                    break;
-                case 'GIVEN_NAME':
-                    $tag = 'GIVN';
-                    break;
-                case 'GRADUATION':
-                    $tag = 'GRAD';
-                    break;
-                case 'HEADER':
-                    $tag = 'HEAD';
                 case 'HEAD':
                     // HEAD records don't have an XREF or DATA
-                    if ($level == '0') {
+                    if ($level === '0') {
                         $xref = '';
                         $data = '';
                     }
-                    break;
-                case 'HUSBAND':
-                    $tag = 'HUSB';
-                    break;
-                case 'IDENT_NUMBER':
-                    $tag = 'IDNO';
-                    break;
-                case 'IMMIGRATION':
-                    $tag = 'IMMI';
-                    break;
-                case 'INDIVIDUAL':
-                    $tag = 'INDI';
-                    break;
-                case 'LANGUAGE':
-                    $tag = 'LANG';
-                    break;
-                case 'LATITUDE':
-                    $tag = 'LATI';
-                    break;
-                case 'LONGITUDE':
-                    $tag = 'LONG';
-                    break;
-                case 'MARRIAGE':
-                    $tag = 'MARR';
-                    break;
-                case 'MARRIAGE_BANN':
-                    $tag = 'MARB';
-                    break;
-                case 'MARRIAGE_COUNT':
-                    $tag = 'NMR';
-                    break;
-                case 'MARRIAGE_CONTRACT':
-                    $tag = 'MARC';
-                    break;
-                case 'MARRIAGE_LICENSE':
-                    $tag = 'MARL';
-                    break;
-                case 'MARRIAGE_SETTLEMENT':
-                    $tag = 'MARS';
-                    break;
-                case 'MEDIA':
-                    $tag = 'MEDI';
-                    break;
-                case '_MEDICAL':
-                    $tag = '_MDCL';
-                    break;
-                case '_MILITARY_SERVICE':
-                    $tag = '_MILT';
                     break;
                 case 'NAME':
                     // Tidy up whitespace
                     $data = preg_replace('/  +/', ' ', trim($data));
                     break;
-                case 'NAME_PREFIX':
-                    $tag = 'NPFX';
-                    break;
-                case 'NAME_SUFFIX':
-                    $tag = 'NSFX';
-                    break;
-                case 'NATIONALITY':
-                    $tag = 'NATI';
-                    break;
-                case 'NATURALIZATION':
-                    $tag = 'NATU';
-                    break;
-                case 'NICKNAME':
-                    $tag = 'NICK';
-                    break;
-                case 'OBJECT':
-                    $tag = 'OBJE';
-                    break;
-                case 'OCCUPATION':
-                    $tag = 'OCCU';
-                    break;
-                case 'ORDINANCE':
-                    $tag = 'ORDI';
-                    break;
-                case 'ORDINATION':
-                    $tag = 'ORDN';
-                    break;
-                case 'PEDIGREE':
-                    $tag = 'PEDI';
                 case 'PEDI':
                     // PEDI values are lower case
                     $data = strtolower($data);
                     break;
-                case 'PHONE':
-                    $tag = 'PHON';
-                    break;
-                case 'PHONETIC':
-                    $tag = 'FONE';
-                    break;
-                case 'PHY_DESCRIPTION':
-                    $tag = 'DSCR';
-                    break;
-                case 'PLACE':
-                    $tag = 'PLAC';
                 case 'PLAC':
                     // Consistent commas
-                    $data = preg_replace('/ *(،|,) */', ', ', $data);
+                    $data = preg_replace('/ *[,，،] */u', ', ', $data);
                     // The Master Genealogist stores LAT/LONG data in the PLAC field, e.g. Pennsylvania, USA, 395945N0751013W
                     if (preg_match('/(.*), (\d\d)(\d\d)(\d\d)([NS])(\d\d\d)(\d\d)(\d\d)([EW])$/', $data, $match)) {
                         $data =
-                        $match[1] . "\n" .
-                        ($level + 1) . " MAP\n" .
-                        ($level + 2) . " LATI " . ($match[5] . (round($match[2] + ($match[3] / 60) + ($match[4] / 3600), 4))) . "\n" .
-                        ($level + 2) . " LONG " . ($match[9] . (round($match[6] + ($match[7] / 60) + ($match[8] / 3600), 4)));
+                            $match[1] . "\n" .
+                            ($level + 1) . " MAP\n" .
+                            ($level + 2) . ' LATI ' . ($match[5] . round($match[2] + ($match[3] / 60) + ($match[4] / 3600), 4)) . "\n" .
+                            ($level + 2) . ' LONG ' . ($match[9] . round($match[6] + ($match[7] / 60) + ($match[8] / 3600), 4));
                     }
                     break;
-                case 'POSTAL_CODE':
-                    $tag = 'POST';
-                    break;
-                case 'PROBATE':
-                    $tag = 'PROB';
-                    break;
-                case 'PROPERTY':
-                    $tag = 'PROP';
-                    break;
-                case 'PUBLICATION':
-                    $tag = 'PUBL';
-                    break;
-                case 'QUALITY_OF_DATA':
-                    $tag = 'QUAL';
-                    break;
-                case 'REC_FILE_NUMBER':
-                    $tag = 'RFN';
-                    break;
-                case 'REC_ID_NUMBER':
-                    $tag = 'RIN';
-                    break;
-                case 'REFERENCE':
-                    $tag = 'REFN';
-                    break;
-                case 'RELATIONSHIP':
-                    $tag = 'RELA';
-                    break;
-                case 'RELIGION':
-                    $tag = 'RELI';
-                    break;
-                case 'REPOSITORY':
-                    $tag = 'REPO';
-                    break;
-                case 'RESIDENCE':
-                    $tag = 'RESI';
-                    break;
-                case 'RESTRICTION':
-                    $tag = 'RESN';
                 case 'RESN':
                     // RESN values are lower case (confidential, privacy, locked, none)
                     $data = strtolower($data);
-                    if ($data == 'invisible') {
+                    if ($data === 'invisible') {
                         $data = 'confidential'; // From old versions of Legacy.
                     }
-                    break;
-                case 'RETIREMENT':
-                    $tag = 'RETI';
-                    break;
-                case 'ROMANIZED':
-                    $tag = 'ROMN';
-                    break;
-                case 'SEALING_CHILD':
-                    $tag = 'SLGC';
-                    break;
-                case 'SEALING_SPOUSE':
-                    $tag = 'SLGS';
-                    break;
-                case 'SOC_SEC_NUMBER':
-                    $tag = 'SSN';
                     break;
                 case 'SEX':
                     $data = strtoupper($data);
                     break;
-                case 'SOURCE':
-                    $tag = 'SOUR';
-                    break;
-                case 'STATE':
-                    $tag = 'STAE';
-                    break;
-                case 'STATUS':
-                    $tag = 'STAT';
                 case 'STAT':
-                    if ($data == 'CANCELLED') {
+                    if ($data === 'CANCELLED') {
                         // PhpGedView mis-spells this tag - correct it.
                         $data = 'CANCELED';
                     }
                     break;
-                case 'SUBMISSION':
-                    $tag = 'SUBN';
-                    break;
-                case 'SUBMITTER':
-                    $tag = 'SUBM';
-                    break;
-                case 'SURNAME':
-                    $tag = 'SURN';
-                    break;
-                case 'SURN_PREFIX':
-                    $tag = 'SPFX';
-                    break;
-                case 'TEMPLE':
-                    $tag = 'TEMP';
                 case 'TEMP':
                     // Temple codes are upper case
                     $data = strtoupper($data);
                     break;
-                case 'TITLE':
-                    $tag = 'TITL';
-                    break;
-                case 'TRAILER':
-                    $tag = 'TRLR';
                 case 'TRLR':
                     // TRLR records don't have an XREF or DATA
-                    if ($level == '0') {
+                    if ($level === '0') {
                         $xref = '';
                         $data = '';
                     }
                     break;
-                case 'VERSION':
-                    $tag = 'VERS';
-                    break;
-                case 'WEB':
-                    $tag = 'WWW';
-                    break;
             }
             // Suppress "Y", for facts/events with a DATE or PLAC
-            if ($data == 'y') {
+            if ($data === 'y') {
                 $data = 'Y';
             }
-            if ($level == '1' && $data == 'Y') {
-                for ($i = $n + 1; $i < $num_matches - 1 && $matches[$i][1] != '1'; ++$i) {
-                    if ($matches[$i][3] == 'DATE' || $matches[$i][3] == 'PLAC') {
+            if ($level === '1' && $data === 'Y') {
+                for ($i = $n + 1; $i < $num_matches - 1 && $matches[$i][1] !== '1'; ++$i) {
+                    if ($matches[$i][3] === 'DATE' || $matches[$i][3] === 'PLAC') {
                         $data = '';
                         break;
                     }
@@ -552,19 +211,19 @@ class FunctionsImport
                     if (strpos($data, "\t") !== false) {
                         $data = str_replace("\t", ' ', $data);
                     }
-                    if (substr($data, 0, 1) == ' ' || substr($data, -1, 1) == ' ') {
+                    if (substr($data, 0, 1) === ' ' || substr($data, -1, 1) === ' ') {
                         $data = trim($data);
                     }
                     while (strpos($data, '  ')) {
                         $data = str_replace('  ', ' ', $data);
                     }
-                    $newrec .= ($newrec ? "\n" : '') . $level . ' ' . ($level == '0' && $xref ? $xref . ' ' : '') . $tag . ($data === '' && $tag != "NOTE" ? '' : ' ' . $data);
+                    $newrec .= ($newrec ? "\n" : '') . $level . ' ' . ($level === '0' && $xref ? $xref . ' ' : '') . $tag . ($data === '' && $tag !== 'NOTE' ? '' : ' ' . $data);
                     break;
                 case 'NOTE':
                 case 'TEXT':
                 case 'DATA':
                 case 'CONT':
-                    $newrec .= ($newrec ? "\n" : '') . $level . ' ' . ($level == '0' && $xref ? $xref . ' ' : '') . $tag . ($data === '' && $tag != "NOTE" ? '' : ' ' . $data);
+                    $newrec .= ($newrec ? "\n" : '') . $level . ' ' . ($level === '0' && $xref ? $xref . ' ' : '') . $tag . ($data === '' && $tag !== 'NOTE' ? '' : ' ' . $data);
                     break;
                 case 'FILE':
                     // Strip off the user-defined path prefix
@@ -573,9 +232,9 @@ class FunctionsImport
                         $data = substr($data, strlen($GEDCOM_MEDIA_PATH));
                     }
                     // convert backslashes in filenames to forward slashes
-                    $data = preg_replace("/\\\/", "/", $data);
+                    $data = preg_replace("/\\\\/", '/', $data);
 
-                    $newrec .= ($newrec ? "\n" : '') . $level . ' ' . ($level == '0' && $xref ? $xref . ' ' : '') . $tag . ($data === '' && $tag != "NOTE" ? '' : ' ' . $data);
+                    $newrec .= ($newrec ? "\n" : '') . $level . ' ' . ($level === '0' && $xref ? $xref . ' ' : '') . $tag . ($data === '' && $tag !== 'NOTE' ? '' : ' ' . $data);
                     break;
                 case 'CONC':
                     // Merge CONC lines, to simplify access later on.
@@ -589,16 +248,18 @@ class FunctionsImport
 
     /**
      * import record into database
-     *
      * this function will parse the given gedcom record and add it to the database
      *
      * @param string $gedrec the raw gedcom record to parse
      * @param Tree   $tree   import the record into this tree
      * @param bool   $update whether or not this is an updated record that has been accepted
+     *
+     * @return void
+     * @throws GedcomErrorException
      */
-    public static function importRecord($gedrec, Tree $tree, $update)
+    public static function importRecord(string $gedrec, Tree $tree, bool $update): void
     {
-        $tree_id = $tree->getTreeId();
+        $tree_id = $tree->id();
 
         // Escaped @ signs (only if importing from file)
         if (!$update) {
@@ -609,8 +270,8 @@ class FunctionsImport
         $gedrec = self::reformatRecord($gedrec, $tree);
 
         // import different types of records
-        if (preg_match('/^0 @(' . WT_REGEX_XREF . ')@ (' . WT_REGEX_TAG . ')/', $gedrec, $match)) {
-            list(, $xref, $type) = $match;
+        if (preg_match('/^0 @(' . Gedcom::REGEX_XREF . ')@ (' . Gedcom::REGEX_TAG . ')/', $gedrec, $match)) {
+            [, $xref, $type] = $match;
             // check for a _UID, if the record doesn't have one, add one
             if ($tree->getPreference('GENERATE_UIDS') && !strpos($gedrec, "\n1 _UID ")) {
                 $gedrec .= "\n1 _UID " . GedcomTag::createUid();
@@ -619,79 +280,82 @@ class FunctionsImport
             $type = $match[1];
             $xref = $type; // For HEAD/TRLR, use type as pseudo XREF.
         } else {
-            echo I18N::translate('Invalid GEDCOM format'), '<br><pre>', $gedrec, '</pre>';
-
-            return;
+            throw new GedcomErrorException($gedrec);
         }
 
         // If the user has downloaded their GEDCOM data (containing media objects) and edited it
         // using an application which does not support (and deletes) media objects, then add them
         // back in.
         if ($tree->getPreference('keep_media') && $xref) {
-            $old_linked_media =
-                Database::prepare("SELECT l_to FROM `##link` WHERE l_from=? AND l_file=? AND l_type='OBJE'")
-                    ->execute(array($xref, $tree_id))
-                    ->fetchOneColumn();
+            $old_linked_media = DB::table('link')
+                ->where('l_from', '=', $xref)
+                ->where('l_file', '=', $tree_id)
+                ->where('l_type', '=', 'OBJE')
+                ->pluck('l_to');
+
             foreach ($old_linked_media as $media_id) {
-                $gedrec .= "\n1 OBJE @" . $media_id . "@";
+                $gedrec .= "\n1 OBJE @" . $media_id . '@';
             }
         }
 
-        switch ($type) {
-            case 'INDI':
-                // Convert inline media into media objects
-                $gedrec = self::convertInlineMedia($tree, $gedrec);
+        // Convert inline media into media objects
+        $gedrec = self::convertInlineMedia($tree, $gedrec);
 
-                $record = new Individual($xref, $gedrec, null, $tree);
+        switch ($type) {
+            case Individual::RECORD_TYPE:
+                $record = Factory::individual()->new($xref, $gedrec, null, $tree);
+
                 if (preg_match('/\n1 RIN (.+)/', $gedrec, $match)) {
                     $rin = $match[1];
                 } else {
                     $rin = $xref;
                 }
-                Database::prepare(
-                "INSERT INTO `##individuals` (i_id, i_file, i_rin, i_sex, i_gedcom) VALUES (?, ?, ?, ?, ?)"
-                )->execute(array(
-                    $xref, $tree_id, $rin, $record->getSex(), $gedrec,
-                ));
+
+                DB::table('individuals')->insert([
+                    'i_id'     => $xref,
+                    'i_file'   => $tree_id,
+                    'i_rin'    => $rin,
+                    'i_sex'    => $record->sex(),
+                    'i_gedcom' => $gedrec,
+                ]);
+
                 // Update the cross-reference/index tables.
-                self::updatePlaces($xref, $tree_id, $gedrec);
+                self::updatePlaces($xref, $tree, $gedrec);
                 self::updateDates($xref, $tree_id, $gedrec);
-                self::updateLinks($xref, $tree_id, $gedrec);
                 self::updateNames($xref, $tree_id, $record);
                 break;
-            case 'FAM':
-                // Convert inline media into media objects
-                $gedrec = self::convertInlineMedia($tree, $gedrec);
 
-                if (preg_match('/\n1 HUSB @(' . WT_REGEX_XREF . ')@/', $gedrec, $match)) {
+            case Family::RECORD_TYPE:
+                if (preg_match('/\n1 HUSB @(' . Gedcom::REGEX_XREF . ')@/', $gedrec, $match)) {
                     $husb = $match[1];
                 } else {
                     $husb = '';
                 }
-                if (preg_match('/\n1 WIFE @(' . WT_REGEX_XREF . ')@/', $gedrec, $match)) {
+                if (preg_match('/\n1 WIFE @(' . Gedcom::REGEX_XREF . ')@/', $gedrec, $match)) {
                     $wife = $match[1];
                 } else {
                     $wife = '';
                 }
-                $nchi = preg_match_all('/\n1 CHIL @(' . WT_REGEX_XREF . ')@/', $gedrec, $match);
+                $nchi = preg_match_all('/\n1 CHIL @(' . Gedcom::REGEX_XREF . ')@/', $gedrec, $match);
                 if (preg_match('/\n1 NCHI (\d+)/', $gedrec, $match)) {
                     $nchi = max($nchi, $match[1]);
                 }
-                Database::prepare(
-                "INSERT INTO `##families` (f_id, f_file, f_husb, f_wife, f_gedcom, f_numchil) VALUES (?, ?, ?, ?, ?, ?)"
-                )->execute(array(
-                    $xref, $tree_id, $husb, $wife, $gedrec, $nchi,
-                ));
-                // Update the cross-reference/index tables.
-                self::updatePlaces($xref, $tree_id, $gedrec);
-                self::updateDates($xref, $tree_id, $gedrec);
-                self::updateLinks($xref, $tree_id, $gedrec);
-                break;
-            case 'SOUR':
-                // Convert inline media into media objects
-                $gedrec = self::convertInlineMedia($tree, $gedrec);
 
-                $record = new Source($xref, $gedrec, null, $tree);
+                DB::table('families')->insert([
+                    'f_id'      => $xref,
+                    'f_file'    => $tree_id,
+                    'f_husb'    => $husb,
+                    'f_wife'    => $wife,
+                    'f_gedcom'  => $gedrec,
+                    'f_numchil' => $nchi,
+                ]);
+
+                // Update the cross-reference/index tables.
+                self::updatePlaces($xref, $tree, $gedrec);
+                self::updateDates($xref, $tree_id, $gedrec);
+                break;
+
+            case Source::RECORD_TYPE:
                 if (preg_match('/\n1 TITL (.+)/', $gedrec, $match)) {
                     $name = $match[1];
                 } elseif (preg_match('/\n1 ABBR (.+)/', $gedrec, $match)) {
@@ -699,156 +363,116 @@ class FunctionsImport
                 } else {
                     $name = $xref;
                 }
-                Database::prepare(
-                "INSERT INTO `##sources` (s_id, s_file, s_name, s_gedcom) VALUES (?, ?, LEFT(?, 255), ?)"
-                )->execute(array(
-                    $xref, $tree_id, $name, $gedrec,
-                ));
-                // Update the cross-reference/index tables.
-                self::updateLinks($xref, $tree_id, $gedrec);
-                self::updateNames($xref, $tree_id, $record);
-                break;
-            case 'REPO':
-                // Convert inline media into media objects
-                $gedrec = self::convertInlineMedia($tree, $gedrec);
 
-                $record = new Repository($xref, $gedrec, null, $tree);
-                Database::prepare(
-                "INSERT INTO `##other` (o_id, o_file, o_type, o_gedcom) VALUES (?, ?, 'REPO', ?)"
-                )->execute(array(
-                    $xref, $tree_id, $gedrec,
-                ));
-                // Update the cross-reference/index tables.
-                self::updateLinks($xref, $tree_id, $gedrec);
-                self::updateNames($xref, $tree_id, $record);
+                DB::table('sources')->insert([
+                    's_id'     => $xref,
+                    's_file'   => $tree_id,
+                    's_name'   => mb_substr($name, 0, 255),
+                    's_gedcom' => $gedrec,
+                ]);
                 break;
-            case 'NOTE':
-                $record = new Note($xref, $gedrec, null, $tree);
-                Database::prepare(
-                "INSERT INTO `##other` (o_id, o_file, o_type, o_gedcom) VALUES (?, ?, 'NOTE', ?)"
-                )->execute(array(
-                    $xref, $tree_id, $gedrec,
-                ));
-                // Update the cross-reference/index tables.
-                self::updateLinks($xref, $tree_id, $gedrec);
-                self::updateNames($xref, $tree_id, $record);
+
+            case Repository::RECORD_TYPE:
+            case Note::RECORD_TYPE:
+            case Submission::RECORD_TYPE:
+            case Submitter::RECORD_TYPE:
+            case Location::RECORD_TYPE:
+                DB::table('other')->insert([
+                    'o_id'     => $xref,
+                    'o_file'   => $tree_id,
+                    'o_type'   => $type,
+                    'o_gedcom' => $gedrec,
+                ]);
                 break;
-            case 'OBJE':
-                $record = new Media($xref, $gedrec, null, $tree);
-                Database::prepare(
-                "INSERT INTO `##media` (m_id, m_ext, m_type, m_titl, m_filename, m_file, m_gedcom) VALUES (?, LEFT(?, 6), LEFT(?, 60), LEFT(?, 255), left(?, 512), ?, ?)"
-                )->execute(array(
-                    $xref, $record->extension(), $record->getMediaType(), $record->getTitle(), $record->getFilename(), $tree_id, $gedrec,
-                ));
-                // Update the cross-reference/index tables.
-                self::updateLinks($xref, $tree_id, $gedrec);
-                self::updateNames($xref, $tree_id, $record);
-                break;
-            default: // HEAD, TRLR, SUBM, SUBN, and custom record types.
+
+            case Header::RECORD_TYPE:
                 // Force HEAD records to have a creation date.
-                if ($type === 'HEAD' && strpos($gedrec, "\n1 DATE ") === false) {
-                    $gedrec .= "\n1 DATE " . date('j M Y');
+                if (strpos($gedrec, "\n1 DATE ") === false) {
+                    $today = strtoupper(date('d M Y'));
+                    $gedrec .= "\n1 DATE " . $today;
                 }
-                Database::prepare(
-                "INSERT INTO `##other` (o_id, o_file, o_type, o_gedcom) VALUES (?, ?, LEFT(?, 15), ?)"
-                )->execute(array($xref, $tree_id, $type, $gedrec));
-                // Update the cross-reference/index tables.
-                self::updateLinks($xref, $tree_id, $gedrec);
+
+                DB::table('other')->insert([
+                    'o_id'     => $xref,
+                    'o_file'   => $tree_id,
+                    'o_type'   => Header::RECORD_TYPE,
+                    'o_gedcom' => $gedrec,
+                ]);
+                break;
+
+
+            case Media::RECORD_TYPE:
+                $record = Factory::media()->new($xref, $gedrec, null, $tree);
+
+                DB::table('media')->insert([
+                    'm_id'     => $xref,
+                    'm_file'   => $tree_id,
+                    'm_gedcom' => $gedrec,
+                ]);
+
+                foreach ($record->mediaFiles() as $media_file) {
+                    DB::table('media_file')->insert([
+                        'm_id'                 => $xref,
+                        'm_file'               => $tree_id,
+                        'multimedia_file_refn' => mb_substr($media_file->filename(), 0, 248),
+                        'multimedia_format'    => mb_substr($media_file->format(), 0, 4),
+                        'source_media_type'    => mb_substr($media_file->type(), 0, 15),
+                        'descriptive_title'    => mb_substr($media_file->title(), 0, 248),
+                    ]);
+                }
+                break;
+
+            default: // Custom record types.
+                DB::table('other')->insert([
+                    'o_id'     => $xref,
+                    'o_file'   => $tree_id,
+                    'o_type'   => mb_substr($type, 0, 15),
+                    'o_gedcom' => $gedrec,
+                ]);
                 break;
         }
+
+        // Update the cross-reference/index tables.
+        self::updateLinks($xref, $tree_id, $gedrec);
     }
 
     /**
-     * extract all places from the given record and insert them into the places table
+     * Extract all level 2 places from the given record and insert them into the places table
      *
-     * @param string $gid
-     * @param int    $ged_id
+     * @param string $xref
+     * @param Tree   $tree
      * @param string $gedrec
+     *
+     * @return void
      */
-    public static function updatePlaces($gid, $ged_id, $gedrec)
+    public static function updatePlaces(string $xref, Tree $tree, string $gedrec): void
     {
-        global $placecache;
+        // Insert all new rows together
+        $rows = [];
 
-        if (!isset($placecache)) {
-            $placecache = array();
-        }
-        $personplace = array();
-        // import all place locations, but not control info such as
-        // 0 HEAD/1 PLAC or 0 _EVDEF/1 PLAC
-        $pt = preg_match_all("/^[2-9] PLAC (.+)/m", $gedrec, $match, PREG_SET_ORDER);
-        for ($i = 0; $i < $pt; $i++) {
-            $place    = trim($match[$i][1]);
-            $lowplace = I18N::strtolower($place);
-            //-- if we have already visited this place for this person then we don't need to again
-            if (isset($personplace[$lowplace])) {
-                continue;
-            }
-            $personplace[$lowplace] = 1;
-            $places                 = explode(',', $place);
-            //-- reverse the array to start at the highest level
-            $secalp    = array_reverse($places);
-            $parent_id = 0;
-            $search    = true;
+        preg_match_all('/^[2-9] PLAC (.+)/m', $gedrec, $matches);
 
-            foreach ($secalp as $place) {
-                $place = trim($place);
-                $key   = strtolower(mb_substr($place, 0, 150) . "_" . $parent_id);
-                //-- if this place has already been added then we don't need to add it again
-                if (isset($placecache[$key])) {
-                    $parent_id = $placecache[$key];
-                    if (!isset($personplace[$key])) {
-                        $personplace[$key] = 1;
-                        // Use INSERT IGNORE as a (temporary) fix for https://bugs.launchpad.net/webtrees/+bug/582226
-                        // It ignores places that utf8_unicode_ci consider to be the same (i.e. accents).
-                        // For example Québec and Quebec
-                        // We need a better solution that attaches multiple names to single places
-                        Database::prepare(
-                            "INSERT IGNORE INTO `##placelinks` (pl_p_id, pl_gid, pl_file) VALUES (?, ?, ?)"
-                        )->execute(array(
-                            $parent_id, $gid, $ged_id,
-                        ));
-                    }
-                    continue;
-                }
+        $places = array_unique($matches[1]);
 
-                //-- only search the database while we are finding places in it
-                if ($search) {
-                    //-- check if this place and level has already been added
-                    $tmp = Database::prepare(
-                        "SELECT p_id FROM `##places` WHERE p_file = ? AND p_parent_id = ? AND p_place = LEFT(?, 150)"
-                    )->execute(array(
-                        $ged_id, $parent_id, $place,
-                    ))->fetchOne();
-                    if ($tmp) {
-                        $p_id = $tmp;
-                    } else {
-                        $search = false;
-                    }
-                }
+        foreach ($places as $place_name) {
+            $place = new Place($place_name, $tree);
 
-                //-- if we are not searching then we have to insert the place into the db
-                if (!$search) {
-                    $std_soundex = Soundex::russell($place);
-                    $dm_soundex  = Soundex::daitchMokotoff($place);
-                    Database::prepare(
-                        "INSERT INTO `##places` (p_place, p_parent_id, p_file, p_std_soundex, p_dm_soundex) VALUES (LEFT(?, 150), ?, ?, ?, ?)"
-                    )->execute(array(
-                        $place, $parent_id, $ged_id, $std_soundex, $dm_soundex,
-                    ));
-                    $p_id = Database::getInstance()->lastInsertId();
-                }
+            // Calling Place::id() will create the entry in the database, if it doesn't already exist.
+            while ($place->id() !== 0) {
+                $rows[] = [
+                    'pl_p_id' => $place->id(),
+                    'pl_gid'  => $xref,
+                    'pl_file' => $tree->id(),
+                ];
 
-                Database::prepare(
-                    "INSERT IGNORE INTO `##placelinks` (pl_p_id, pl_gid, pl_file) VALUES (?, ?, ?)"
-                )->execute(array(
-                    $p_id, $gid, $ged_id,
-                ));
-                //-- increment the level and assign the parent id for the next place level
-                $parent_id         = $p_id;
-                $placecache[$key]  = $p_id;
-                $personplace[$key] = 1;
+                $place = $place->parent();
             }
         }
+
+        // array_unique doesn't work with arrays of arrays
+        $rows = array_intersect_key($rows, array_unique(array_map('serialize', $rows)));
+
+        DB::table('placelinks')->insert($rows);
     }
 
     /**
@@ -857,48 +481,50 @@ class FunctionsImport
      * @param string $xref
      * @param int    $ged_id
      * @param string $gedrec
+     *
+     * @return void
      */
-    public static function updateDates($xref, $ged_id, $gedrec)
+    public static function updateDates(string $xref, int $ged_id, string $gedrec): void
     {
-        if (strpos($gedrec, '2 DATE ') && preg_match_all("/\n1 (\w+).*(?:\n[2-9].*)*(?:\n2 DATE (.+))(?:\n[2-9].*)*/", $gedrec, $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $match) {
-                $fact = $match[1];
-                if (($fact == 'FACT' || $fact == 'EVEN') && preg_match("/\n2 TYPE ([A-Z]{3,5})/", $match[0], $tmatch)) {
-                    $fact = $tmatch[1];
-                }
-                $date = new Date($match[2]);
-                Database::prepare(
-                    "INSERT INTO `##dates` (d_day,d_month,d_mon,d_year,d_julianday1,d_julianday2,d_fact,d_gid,d_file,d_type) VALUES (?,?,?,?,?,?,?,?,?,?)"
-                )->execute(array(
-                    $date->minimumDate()->d,
-                    $date->minimumDate()->format('%O'),
-                    $date->minimumDate()->m,
-                    $date->minimumDate()->y,
-                    $date->minimumDate()->minJD,
-                    $date->minimumDate()->maxJD,
-                    $fact,
-                    $xref,
-                    $ged_id,
-                    $date->minimumDate()->format('%@'),
-                ));
-                if ($date->minimumDate() !== $date->maximumDate()) {
-                    Database::prepare(
-                        "INSERT INTO `##dates` (d_day,d_month,d_mon,d_year,d_julianday1,d_julianday2,d_fact,d_gid,d_file,d_type) VALUES (?,?,?,?,?,?,?,?,?,?)"
-                    )->execute(array(
-                        $date->maximumDate()->d,
-                        $date->maximumDate()->format('%O'),
-                        $date->maximumDate()->m,
-                        $date->maximumDate()->y,
-                        $date->maximumDate()->minJD,
-                        $date->maximumDate()->maxJD,
-                        $fact,
-                        $xref,
-                        $ged_id,
-                        $date->maximumDate()->format('%@'),
-                    ));
-                }
-            }
+        // Insert all new rows together
+        $rows = [];
+
+        preg_match_all("/\n1 (\w+).*(?:\n[2-9].*)*(?:\n2 DATE (.+))(?:\n[2-9].*)*/", $gedrec, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $match) {
+            $fact = $match[1];
+            $date = new Date($match[2]);
+            $rows[] = [
+                'd_day'        => $date->minimumDate()->day,
+                'd_month'      => $date->minimumDate()->format('%O'),
+                'd_mon'        => $date->minimumDate()->month,
+                'd_year'       => $date->minimumDate()->year,
+                'd_julianday1' => $date->minimumDate()->minimumJulianDay(),
+                'd_julianday2' => $date->minimumDate()->maximumJulianDay(),
+                'd_fact'       => $fact,
+                'd_gid'        => $xref,
+                'd_file'       => $ged_id,
+                'd_type'       => $date->minimumDate()->format('%@'),
+            ];
+
+            $rows[] = [
+                'd_day'        => $date->maximumDate()->day,
+                'd_month'      => $date->maximumDate()->format('%O'),
+                'd_mon'        => $date->maximumDate()->month,
+                'd_year'       => $date->maximumDate()->year,
+                'd_julianday1' => $date->maximumDate()->minimumJulianDay(),
+                'd_julianday2' => $date->maximumDate()->maximumJulianDay(),
+                'd_fact'       => $fact,
+                'd_gid'        => $xref,
+                'd_file'       => $ged_id,
+                'd_type'       => $date->minimumDate()->format('%@'),
+            ];
         }
+
+        // array_unique doesn't work with arrays of arrays
+        $rows = array_intersect_key($rows, array_unique(array_map('serialize', $rows)));
+
+        DB::table('dates')->insert($rows);
     }
 
     /**
@@ -907,68 +533,78 @@ class FunctionsImport
      * @param string $xref
      * @param int    $ged_id
      * @param string $gedrec
+     *
+     * @return void
      */
-    public static function updateLinks($xref, $ged_id, $gedrec)
+    public static function updateLinks(string $xref, int $ged_id, string $gedrec): void
     {
-        if (preg_match_all('/^\d+ (' . WT_REGEX_TAG . ') @(' . WT_REGEX_XREF . ')@/m', $gedrec, $matches, PREG_SET_ORDER)) {
-            $data = array();
-            foreach ($matches as $match) {
-                // Include each link once only.
-                if (!in_array($match[1] . $match[2], $data)) {
-                    $data[] = $match[1] . $match[2];
-                    // Ignore any errors, which may be caused by "duplicates" that differ on case/collation, e.g. "S1" and "s1"
-                    try {
-                        Database::prepare(
-                            "INSERT INTO `##link` (l_from, l_to, l_type, l_file) VALUES (?, ?, ?, ?)"
-                        )->execute(array(
-                            $xref, $match[2], $match[1], $ged_id,
-                        ));
-                    } catch (PDOException $e) {
-                        // We could display a warning here....
-                    }
-                }
-            }
+        // Insert all new rows together
+        $rows = [];
+
+        preg_match_all('/^\d+ (' . Gedcom::REGEX_TAG . ') @(' . Gedcom::REGEX_XREF . ')@/m', $gedrec, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $match) {
+            // Take care of "duplicates" that differ on case/collation, e.g. "SOUR @S1@" and "SOUR @s1@"
+            $rows[$match[1] . strtoupper($match[2])] = [
+                'l_from' => $xref,
+                'l_to'   => $match[2],
+                'l_type' => $match[1],
+                'l_file' => $ged_id,
+            ];
         }
+
+        DB::table('link')->insert($rows);
     }
 
     /**
      * Extract all the names from the given record and insert them into the database.
      *
-     * @param string       $xref
-     * @param int          $ged_id
-     * @param GedcomRecord $record
+     * @param string     $xref
+     * @param int        $ged_id
+     * @param Individual $record
+     *
+     * @return void
      */
-    public static function updateNames($xref, $ged_id, GedcomRecord $record)
+    public static function updateNames(string $xref, int $ged_id, Individual $record): void
     {
+        // Insert all new rows together
+        $rows = [];
+
         foreach ($record->getAllNames() as $n => $name) {
-            if ($record instanceof Individual) {
-                if ($name['givn'] === '@P.N.') {
-                    $soundex_givn_std = null;
-                    $soundex_givn_dm  = null;
-                } else {
-                    $soundex_givn_std = Soundex::russell($name['givn']);
-                    $soundex_givn_dm  = Soundex::daitchMokotoff($name['givn']);
-                }
-                if ($name['surn'] === '@N.N.') {
-                    $soundex_surn_std = null;
-                    $soundex_surn_dm  = null;
-                } else {
-                    $soundex_surn_std = Soundex::russell($name['surname']);
-                    $soundex_surn_dm  = Soundex::daitchMokotoff($name['surname']);
-                }
-                Database::prepare(
-                    "INSERT INTO `##name` (n_file,n_id,n_num,n_type,n_sort,n_full,n_surname,n_surn,n_givn,n_soundex_givn_std,n_soundex_surn_std,n_soundex_givn_dm,n_soundex_surn_dm) VALUES (?, ?, ?, ?, LEFT(?, 255), LEFT(?, 255), LEFT(?, 255), LEFT(?, 255), ?, ?, ?, ?, ?)"
-                )->execute(array(
-                    $ged_id, $xref, $n, $name['type'], $name['sort'], $name['fullNN'], $name['surname'], $name['surn'], $name['givn'], $soundex_givn_std, $soundex_surn_std, $soundex_givn_dm, $soundex_surn_dm,
-                ));
+            if ($name['givn'] === '@P.N.') {
+                $soundex_givn_std = null;
+                $soundex_givn_dm  = null;
             } else {
-                Database::prepare(
-                    "INSERT INTO `##name` (n_file,n_id,n_num,n_type,n_sort,n_full) VALUES (?, ?, ?, ?, LEFT(?, 255), LEFT(?, 255))"
-                )->execute(array(
-                    $ged_id, $xref, $n, $name['type'], $name['sort'], $name['fullNN'],
-                ));
+                $soundex_givn_std = Soundex::russell($name['givn']);
+                $soundex_givn_dm  = Soundex::daitchMokotoff($name['givn']);
             }
+
+            if ($name['surn'] === '@N.N.') {
+                $soundex_surn_std = null;
+                $soundex_surn_dm  = null;
+            } else {
+                $soundex_surn_std = Soundex::russell($name['surname']);
+                $soundex_surn_dm  = Soundex::daitchMokotoff($name['surname']);
+            }
+
+            $rows[] = [
+                'n_file'             => $ged_id,
+                'n_id'               => $xref,
+                'n_num'              => $n,
+                'n_type'             => $name['type'],
+                'n_sort'             => mb_substr($name['sort'], 0, 255),
+                'n_full'             => mb_substr($name['fullNN'], 0, 255),
+                'n_surname'          => mb_substr($name['surname'], 0, 255),
+                'n_surn'             => mb_substr($name['surn'], 0, 255),
+                'n_givn'             => mb_substr($name['givn'], 0, 255),
+                'n_soundex_givn_std' => $soundex_givn_std,
+                'n_soundex_surn_std' => $soundex_surn_std,
+                'n_soundex_givn_dm'  => $soundex_givn_dm,
+                'n_soundex_surn_dm'  => $soundex_surn_dm,
+            ];
         }
+
+        DB::table('name')->insert($rows);
     }
 
     /**
@@ -979,7 +615,7 @@ class FunctionsImport
      *
      * @return string
      */
-    public static function convertInlineMedia(Tree $tree, $gedrec)
+    public static function convertInlineMedia(Tree $tree, string $gedrec): string
     {
         while (preg_match('/\n1 OBJE(?:\n[2-9].+)+/', $gedrec, $match)) {
             $gedrec = str_replace($match[0], self::createMediaObject(1, $match[0], $tree), $gedrec);
@@ -1003,7 +639,7 @@ class FunctionsImport
      *
      * @return string
      */
-    public static function createMediaObject($level, $gedrec, Tree $tree)
+    public static function createMediaObject(int $level, string $gedrec, Tree $tree): string
     {
         if (preg_match('/\n\d FILE (.+)/', $gedrec, $file_match)) {
             $file = $file_match[1];
@@ -1018,149 +654,154 @@ class FunctionsImport
         }
 
         // Have we already created a media object with the same title/filename?
-        $xref = Database::prepare(
-            "SELECT m_id FROM `##media` WHERE m_filename = ? AND m_titl = ? AND m_file = ?"
-        )->execute(array(
-            $file, $titl, $tree->getTreeId(),
-        ))->fetchOne();
+        $xref = DB::table('media_file')
+            ->where('m_file', '=', $tree->id())
+            ->where('descriptive_title', '=', $titl)
+            ->where('multimedia_file_refn', '=', mb_substr($file, 0, 248))
+            ->value('m_id');
 
-        if (!$xref) {
-            $xref = $tree->getNewXref('OBJE');
+        if ($xref === null) {
+            $xref = $tree->getNewXref();
             // renumber the lines
-            $gedrec = preg_replace_callback('/\n(\d+)/', function ($m) use ($level) {
+            $gedrec = preg_replace_callback('/\n(\d+)/', static function (array $m) use ($level): string {
                 return "\n" . ($m[1] - $level);
             }, $gedrec);
             // convert to an object
             $gedrec = str_replace("\n0 OBJE\n", '0 @' . $xref . "@ OBJE\n", $gedrec);
+
             // Fix Legacy GEDCOMS
             $gedrec = preg_replace('/\n1 FORM (.+)\n1 FILE (.+)\n1 TITL (.+)/', "\n1 FILE $2\n2 FORM $1\n2 TITL $3", $gedrec);
+
             // Fix FTB GEDCOMS
             $gedrec = preg_replace('/\n1 FORM (.+)\n1 TITL (.+)\n1 FILE (.+)/', "\n1 FILE $3\n2 FORM $1\n2 TITL $2", $gedrec);
+
+            // Fix RM7 GEDCOMS
+            $gedrec = preg_replace('/\n1 FILE (.+)\n1 FORM (.+)\n1 TITL (.+)/', "\n1 FILE $1\n2 FORM $2\n2 TITL $3", $gedrec);
+
             // Create new record
-            $record = new Media($xref, $gedrec, null, $tree);
-            Database::prepare(
-                "INSERT INTO `##media` (m_id, m_ext, m_type, m_titl, m_filename, m_file, m_gedcom) VALUES (?, ?, ?, ?, ?, ?, ?)"
-            )->execute(array(
-                $xref, $record->extension(), $record->getMediaType(), $record->getTitle(), $record->getFilename(), $tree->getTreeId(), $gedrec,
-            ));
+            $record = Factory::media()->new($xref, $gedrec, null, $tree);
+
+            DB::table('media')->insert([
+                'm_id'     => $xref,
+                'm_file'   => $tree->id(),
+                'm_gedcom' => $gedrec,
+            ]);
+
+            foreach ($record->mediaFiles() as $media_file) {
+                DB::table('media_file')->insert([
+                    'm_id'                 => $xref,
+                    'm_file'               => $tree->id(),
+                    'multimedia_file_refn' => mb_substr($media_file->filename(), 0, 248),
+                    'multimedia_format'    => mb_substr($media_file->format(), 0, 4),
+                    'source_media_type'    => mb_substr($media_file->type(), 0, 15),
+                    'descriptive_title'    => mb_substr($media_file->title(), 0, 248),
+                ]);
+            }
         }
 
         return "\n" . $level . ' OBJE @' . $xref . '@';
     }
 
     /**
-     * Accept all pending changes for a specified record.
-     *
-     * @param string $xref
-     * @param int    $ged_id
-     */
-    public static function acceptAllChanges($xref, $ged_id)
-    {
-        $changes = Database::prepare(
-            "SELECT change_id, gedcom_name, old_gedcom, new_gedcom" .
-            " FROM `##change` c" .
-            " JOIN `##gedcom` g USING (gedcom_id)" .
-            " WHERE c.status='pending' AND xref=? AND gedcom_id=?" .
-            " ORDER BY change_id"
-        )->execute(array($xref, $ged_id))->fetchAll();
-        foreach ($changes as $change) {
-            if (empty($change->new_gedcom)) {
-                // delete
-                self::updateRecord($change->old_gedcom, $ged_id, true);
-            } else {
-                // add/update
-                self::updateRecord($change->new_gedcom, $ged_id, false);
-            }
-            Database::prepare(
-                "UPDATE `##change`" .
-                " SET status='accepted'" .
-                " WHERE status='pending' AND xref=? AND gedcom_id=?"
-            )->execute(array($xref, $ged_id));
-            Log::addEditLog("Accepted change {$change->change_id} for {$xref} / {$change->gedcom_name} into database");
-        }
-    }
-
-    /**
-     * Accept all pending changes for a specified record.
-     *
-     * @param GedcomRecord $record
-     */
-    public static function rejectAllChanges(GedcomRecord $record)
-    {
-        Database::prepare(
-            "UPDATE `##change`" .
-            " SET status = 'rejected'" .
-            " WHERE status = 'pending' AND xref = :xref AND gedcom_id = :tree_id"
-        )->execute(array(
-            'xref'    => $record->getXref(),
-            'tree_id' => $record->getTree()->getTreeId(),
-        ));
-    }
-
-    /**
      * update a record in the database
      *
      * @param string $gedrec
-     * @param int    $ged_id
+     * @param Tree   $tree
      * @param bool   $delete
+     *
+     * @return void
+     * @throws GedcomErrorException
      */
-    public static function updateRecord($gedrec, $ged_id, $delete)
+    public static function updateRecord(string $gedrec, Tree $tree, bool $delete): void
     {
-        if (preg_match('/^0 @(' . WT_REGEX_XREF . ')@ (' . WT_REGEX_TAG . ')/', $gedrec, $match)) {
-            list(, $gid, $type) = $match;
+        if (preg_match('/^0 @(' . Gedcom::REGEX_XREF . ')@ (' . Gedcom::REGEX_TAG . ')/', $gedrec, $match)) {
+            [, $gid, $type] = $match;
         } elseif (preg_match('/^0 (HEAD)(?:\n|$)/', $gedrec, $match)) {
             // The HEAD record has no XREF.  Any others?
             $gid  = $match[1];
             $type = $match[1];
         } else {
-            echo "ERROR: Invalid gedcom record.";
-
-            return;
+            throw new GedcomErrorException($gedrec);
         }
 
-        // TODO deleting unlinked places can be done more efficiently in a single query
-        $placeids =
-            Database::prepare("SELECT pl_p_id FROM `##placelinks` WHERE pl_gid=? AND pl_file=?")
-                ->execute(array($gid, $ged_id))
-                ->fetchOneColumn();
+        // Place links
+        DB::table('placelinks')
+            ->where('pl_gid', '=', $gid)
+            ->where('pl_file', '=', $tree->id())
+            ->delete();
 
-        Database::prepare("DELETE FROM `##placelinks` WHERE pl_gid=? AND pl_file=?")->execute(array($gid, $ged_id));
-        Database::prepare("DELETE FROM `##dates`      WHERE d_gid =? AND d_file =?")->execute(array($gid, $ged_id));
+        // Orphaned places.  If we're deleting  "Westminster, London, England",
+        // then we may also need to delete "London, England" and "England".
+        do {
+            $affected = DB::table('places')
+                ->leftJoin('placelinks', static function (JoinClause $join): void {
+                    $join
+                        ->on('p_id', '=', 'pl_p_id')
+                        ->on('p_file', '=', 'pl_file');
+                })
+                ->whereNull('pl_p_id')
+                ->delete();
+        } while ($affected > 0);
 
-        //-- delete any unlinked places
-        foreach ($placeids as $p_id) {
-            $num =
-                Database::prepare("SELECT count(pl_p_id) FROM `##placelinks` WHERE pl_p_id=? AND pl_file=?")
-                    ->execute(array($p_id, $ged_id))
-                    ->fetchOne();
-            if ($num == 0) {
-                Database::prepare("DELETE FROM `##places` WHERE p_id=? AND p_file=?")->execute(array($p_id, $ged_id));
-            }
-        }
+        DB::table('dates')
+            ->where('d_gid', '=', $gid)
+            ->where('d_file', '=', $tree->id())
+            ->delete();
 
-        Database::prepare("DELETE FROM `##name` WHERE n_id=? AND n_file=?")->execute(array($gid, $ged_id));
-        Database::prepare("DELETE FROM `##link` WHERE l_from=? AND l_file=?")->execute(array($gid, $ged_id));
+        DB::table('name')
+            ->where('n_id', '=', $gid)
+            ->where('n_file', '=', $tree->id())
+            ->delete();
+
+        DB::table('link')
+            ->where('l_from', '=', $gid)
+            ->where('l_file', '=', $tree->id())
+            ->delete();
 
         switch ($type) {
-            case 'INDI':
-                Database::prepare("DELETE FROM `##individuals` WHERE i_id=? AND i_file=?")->execute(array($gid, $ged_id));
+            case Individual::RECORD_TYPE:
+                DB::table('individuals')
+                    ->where('i_id', '=', $gid)
+                    ->where('i_file', '=', $tree->id())
+                    ->delete();
                 break;
-            case 'FAM':
-                Database::prepare("DELETE FROM `##families` WHERE f_id=? AND f_file=?")->execute(array($gid, $ged_id));
+
+            case Family::RECORD_TYPE:
+                DB::table('families')
+                    ->where('f_id', '=', $gid)
+                    ->where('f_file', '=', $tree->id())
+                    ->delete();
                 break;
-            case 'SOUR':
-                Database::prepare("DELETE FROM `##sources` WHERE s_id=? AND s_file=?")->execute(array($gid, $ged_id));
+
+            case Source::RECORD_TYPE:
+                DB::table('sources')
+                    ->where('s_id', '=', $gid)
+                    ->where('s_file', '=', $tree->id())
+                    ->delete();
                 break;
-            case 'OBJE':
-                Database::prepare("DELETE FROM `##media` WHERE m_id=? AND m_file=?")->execute(array($gid, $ged_id));
+
+            case Media::RECORD_TYPE:
+                DB::table('media_file')
+                    ->where('m_id', '=', $gid)
+                    ->where('m_file', '=', $tree->id())
+                    ->delete();
+
+                DB::table('media')
+                    ->where('m_id', '=', $gid)
+                    ->where('m_file', '=', $tree->id())
+                    ->delete();
                 break;
+
             default:
-                Database::prepare("DELETE FROM `##other` WHERE o_id=? AND o_file=?")->execute(array($gid, $ged_id));
+                DB::table('other')
+                    ->where('o_id', '=', $gid)
+                    ->where('o_file', '=', $tree->id())
+                    ->delete();
                 break;
         }
 
         if (!$delete) {
-            self::importRecord($gedrec, Tree::findById($ged_id), true);
+            self::importRecord($gedrec, $tree, true);
         }
     }
 }

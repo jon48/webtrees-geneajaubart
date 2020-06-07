@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,132 +14,44 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees;
 
-/**
- * Defined in session.php
- *
- * @global Tree $WT_TREE
- */
-global $WT_TREE;
+use Middleland\Dispatcher;
+use Nyholm\Psr7Server\ServerRequestCreator;
 
-use Fisharebest\Webtrees\Controller\AjaxController;
-use Fisharebest\Webtrees\Controller\PageController;
-use Fisharebest\Webtrees\Functions\Functions;
-use Fisharebest\Webtrees\Functions\FunctionsDb;
+use function app;
+use function is_file;
+use function is_string;
+use function parse_url;
 
-define('WT_SCRIPT_NAME', 'index.php');
-require './includes/session.php';
+use const PHP_SAPI;
+use const PHP_URL_PATH;
 
-// The only option for action is "ajax"
-$action = Filter::get('action');
+require __DIR__ . '/vendor/autoload.php';
 
-// The default view depends on whether we are logged in
-if (Auth::check()) {
-    $ctype = Filter::get('ctype', 'gedcom|user', 'user');
-} else {
-    $ctype = 'gedcom';
-}
-
-// Get the blocks list
-if ($ctype === 'user') {
-    $blocks = FunctionsDb::getUserBlocks(Auth::id());
-} else {
-    $blocks = FunctionsDb::getTreeBlocks($WT_TREE->getTreeId());
-}
-
-$active_blocks = Module::getActiveBlocks($WT_TREE);
-
-// The latest version is shown on the administration page. This updates it every day.
-Functions::fetchLatestVersion();
-
-// We generate individual blocks using AJAX
-if ($action === 'ajax') {
-    $controller = new AjaxController;
-    $controller->pageHeader();
-
-    // Check we’re displaying an allowable block.
-    $block_id = Filter::getInteger('block_id');
-    if (array_key_exists($block_id, $blocks['main'])) {
-        $module_name = $blocks['main'][$block_id];
-    } elseif (array_key_exists($block_id, $blocks['side'])) {
-        $module_name = $blocks['side'][$block_id];
-    } else {
-        return;
+if (PHP_SAPI === 'cli-server') {
+    $file = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    if (is_string($file) && is_file($file)) {
+        return false;
     }
-    if (array_key_exists($module_name, $active_blocks)) {
-        echo $active_blocks[$module_name]->getBlock($block_id);
-    }
-
-    return;
 }
 
-// Redirect search engines to the full URL
-if (Filter::get('ctype') !== $ctype || Filter::get('ged') !== $WT_TREE->getName()) {
-    header('Location: ' . WT_BASE_URL . 'index.php?ctype=' . $ctype . '&ged=' . $WT_TREE->getNameUrl());
+// Create the application.
+$application = new Webtrees();
+$application->bootstrap();
 
-    return;
-}
+// Select a PSR message factory.
+$application->selectMessageFactory();
 
-$controller = new PageController;
-if ($ctype === 'user') {
-    $controller->restrictAccess(Auth::check());
-}
-$controller
-    ->setPageTitle($ctype === 'user' ? I18N::translate('My page') : $WT_TREE->getTitle())
-    ->setMetaRobots('index,follow')
-    ->pageHeader()
-    // By default jQuery modifies AJAX URLs to disable caching, causing JS libraries to be loaded many times.
-    ->addInlineJavascript('jQuery.ajaxSetup({cache:true});');
+// The application is defined by a stack of middleware and a PSR-11 container.
+$middleware = $application->middleware();
+$container  = app();
+$dispatcher = new Dispatcher($middleware, $container);
 
-if ($ctype === 'user') {
-    echo '<div id="my-page">';
-    echo '<h2 class="center">', I18N::translate('My page'), '</h2>';
-} else {
-    echo '<div id="home-page">';
-}
-if ($blocks['main']) {
-    if ($blocks['side']) {
-        echo '<div id="index_main_blocks">';
-    } else {
-        echo '<div id="index_full_blocks">';
-    }
-    foreach ($blocks['main'] as $block_id => $module_name) {
-        if (array_key_exists($module_name, $active_blocks)) {
-            if (Auth::isSearchEngine() || !$active_blocks[$module_name]->loadAjax()) {
-                // Load the block directly
-                echo $active_blocks[$module_name]->getBlock($block_id);
-            } else {
-                // Load the block asynchronously
-                echo '<div id="block_', $block_id, '"><div class="loading-image"></div></div>';
-                $controller->addInlineJavascript(
-                    'jQuery("#block_' . $block_id . '").load("index.php?ctype=' . $ctype . '&action=ajax&block_id=' . $block_id . '");'
-                );
-            }
-        }
-    }
-    echo '</div>';
-}
-if ($blocks['side']) {
-    if ($blocks['main']) {
-        echo '<div id="index_small_blocks">';
-    } else {
-        echo '<div id="index_full_blocks">';
-    }
-    foreach ($blocks['side'] as $block_id => $module_name) {
-        if (array_key_exists($module_name, $active_blocks)) {
-            if (Auth::isSearchEngine() || !$active_blocks[$module_name]->loadAjax()) {
-                // Load the block directly
-                echo $active_blocks[$module_name]->getBlock($block_id);
-            } else {
-                // Load the block asynchronously
-                echo '<div id="block_', $block_id, '"><div class="loading-image"></div></div>';
-                $controller->addInlineJavascript(
-                    'jQuery("#block_' . $block_id . '").load("index.php?ctype=' . $ctype . '&action=ajax&block_id=' . $block_id . '");'
-                );
-            }
-        }
-    }
-    echo '</div>';
-}
-echo '</div>';
+// Build the request from the PHP super-globals.
+$request = app(ServerRequestCreator::class)->fromGlobals();
+
+$dispatcher->dispatch($request);

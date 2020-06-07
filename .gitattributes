@@ -1,21 +1,27 @@
 # Exclude the following files when we build webtrees
 
-.coveralls.yml export-ignore
-.gitattributes export-ignore
-.gitignore     export-ignore
-.travis.yml    export-ignore
-Makefile       export-ignore
-Vagrantfile    export-ignore
-*.psd			export-ignore
+.coveralls.yml        export-ignore
+.gitattributes        export-ignore
+.github/              export-ignore
+.gitignore            export-ignore
+.php_cs               export-ignore
+.travis.yml           export-ignore
+package.json          export-ignore
+package-lock.json     export-ignore
 
-build/         export-ignore
-js/*.patch     export-ignore
-phpdoc.xml     export-ignore
-phpunit.xml*    export-ignore
-tests/         export-ignore
+phpunit.xml.dist      export-ignore
+phpstan.neon.dist     export-ignore
+phpstan-baseline.neon export-ignore
+tests/                export-ignore
+webpack.mix.js        export-ignore
+
+vendor/*/*/tests      export-ignore
+vendor/*/*/Tests      export-ignore
+
+resources/css/               export-ignore
+resources/js/                export-ignore
+resources/lang/*/messages.po export-ignore
 
 RoboFile.php	export-ignore
 
-themes/rural/less/          export-ignore
-themes/rural/css-*/images/*.psd    export-ignore
-language/*.po	export-ignore
+*.psd			export-ignore

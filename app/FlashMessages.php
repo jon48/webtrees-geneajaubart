@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,7 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees;
+
+use stdClass;
 
 /**
  * Generate messages in one request and display them in the next.
@@ -21,21 +27,23 @@ namespace Fisharebest\Webtrees;
 class FlashMessages
 {
     // Session storage key
-    const FLASH_KEY = 'flash_messages';
+    private const FLASH_KEY = 'flash_messages';
 
     /**
      * Add a message to the session storage.
      *
      * @param string $text
      * @param string $status "success", "info", "warning" or "danger"
+     *
+     * @return void
      */
-    public static function addMessage($text, $status = 'info')
+    public static function addMessage($text, $status = 'info'): void
     {
-        $message         = new \stdClass;
+        $message         = new stdClass();
         $message->text   = $text;
         $message->status = $status;
 
-        $messages   = Session::get(self::FLASH_KEY, array());
+        $messages   = Session::get(self::FLASH_KEY, []);
         $messages[] = $message;
         Session::put(self::FLASH_KEY, $messages);
     }
@@ -43,13 +51,10 @@ class FlashMessages
     /**
      * Get the current messages, and remove them from session storage.
      *
-     * @return string[]
+     * @return stdClass[]
      */
-    public static function getMessages()
+    public static function getMessages(): array
     {
-        $messages = Session::get(self::FLASH_KEY, array());
-        Session::forget(self::FLASH_KEY);
-
-        return $messages;
+        return Session::pull(self::FLASH_KEY, []);
     }
 }

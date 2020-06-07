@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,68 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Schema;
 
-use Fisharebest\Webtrees\Database;
-
 /**
- * Upgrade the database schema from version 26 to version 27.
+ * Upgrade the database schema from version 26 to version 27 (webtrees 1.5.1).
  */
 class Migration26 implements MigrationInterface
 {
     /**
      * Upgrade to to the next version
+     *
+     * @return void
      */
-    public function upgrade()
+    public function upgrade(): void
     {
-        // Earlier versions of webtrees put quote marks round soundex codes.
-        // These are harmless, but clean them up for consistency.
-        Database::exec(
-            "UPDATE `##name` SET" .
-            " n_soundex_givn_std = TRIM('''' FROM n_soundex_givn_std)," .
-            " n_soundex_surn_std = TRIM('''' FROM n_soundex_surn_std)," .
-            " n_soundex_givn_dm  = TRIM('''' FROM n_soundex_givn_dm )," .
-            " n_soundex_surn_dm  = TRIM('''' FROM n_soundex_surn_dm )"
-        );
-
-        // Earlier versions of webtrees added zero codes for names without phonetic content.
-        // These are harmless, but clean them up for consistency.
-        Database::exec(
-            "UPDATE `##name` SET" .
-            " n_soundex_givn_std = REPLACE(n_soundex_givn_std, '0000:',   '')," .
-            " n_soundex_surn_std = REPLACE(n_soundex_surn_std, '0000:',   '')," .
-            " n_soundex_givn_dm  = REPLACE(n_soundex_givn_dm,  '000000:', '')," .
-            " n_soundex_surn_dm  = REPLACE(n_soundex_surn_dm,  '000000:', '')"
-        );
-        Database::exec(
-            "UPDATE `##name` SET" .
-            " n_soundex_givn_std = REPLACE(n_soundex_givn_std, ':0000',   '')," .
-            " n_soundex_surn_std = REPLACE(n_soundex_surn_std, ':0000',   '')," .
-            " n_soundex_givn_dm  = REPLACE(n_soundex_givn_dm,  ':000000', '')," .
-            " n_soundex_surn_dm  = REPLACE(n_soundex_surn_dm,  ':000000', '')"
-        );
-        Database::exec(
-            "UPDATE `##name` SET" .
-            " n_soundex_givn_std = NULLIF(n_soundex_givn_std, '0000'  )," .
-            " n_soundex_surn_std = NULLIF(n_soundex_surn_std, '0000'  )," .
-            " n_soundex_givn_dm  = NULLIF(n_soundex_givn_dm,  '000000')," .
-            " n_soundex_surn_dm  = NULLIF(n_soundex_surn_dm,  '000000')"
-        );
-
-        Database::exec(
-            "UPDATE `##places` SET" .
-            " p_std_soundex = REPLACE(p_std_soundex, '0000:',   '')," .
-            " p_dm_soundex  = REPLACE(p_dm_soundex,  '000000:', '')"
-        );
-        Database::exec(
-            "UPDATE `##places` SET" .
-            " p_std_soundex = REPLACE(p_std_soundex, ':0000',   '')," .
-            " p_dm_soundex  = REPLACE(p_dm_soundex,  ':000000', '')"
-        );
-        Database::exec(
-            "UPDATE `##places` SET" .
-            " p_std_soundex = NULLIF(p_std_soundex, '0000'  )," .
-            " p_dm_soundex  = NULLIF(p_dm_soundex,  '000000')"
-        );
+        // These migrations have been merged into migration 0.
+        // Direct upgrade from webtrees < 1.7.9 is not supported.
     }
 }

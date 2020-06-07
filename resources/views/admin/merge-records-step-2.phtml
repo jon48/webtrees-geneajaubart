@@ -1,0 +1,167 @@
+<?php
+
+use Fisharebest\Webtrees\GedcomRecord;
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\MergeFactsAction;
+use Fisharebest\Webtrees\I18N;
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route('manage-trees', ['tree' => $tree->name()]) => I18N::translate('Manage family trees'), $title]]) ?>
+
+<h1><?= $title ?></h1>
+
+<form method="post" action="<?= e(route(MergeFactsAction::class, ['tree' => $tree->name()])) ?>">
+    <?= csrf_field() ?>
+
+    <input type="hidden" name="xref1" value="<?= e($record1->xref()) ?>">
+    <input type="hidden" name="xref2" value="<?= e($record2->xref()) ?>">
+
+    <p>
+        <?= I18N::translate('Select the facts and events to keep from both records.') ?>
+    </p>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="card-title">
+                <?= I18N::translate('The following facts and events were found in both records.') ?>
+            </h2>
+        </div>
+        <div class="card-body">
+            <?php if ($facts !== []) : ?>
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <th>
+                                <?= I18N::translate('Select') ?>
+                            </th>
+                            <th>
+                                <?= I18N::translate('Details') ?>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($facts as $fact_id => $fact) : ?>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="keep1[]" value="<?= $fact->id() ?>" checked>
+                                </td>
+                                <td>
+                                    <div class="gedcom-data" dir="ltr"><?= e($fact->gedcom()) ?></div>
+                                    <?php if ($fact->target() instanceof GedcomRecord) : ?>
+                                        <a href="<?= e($fact->target()->url()) ?>">
+                                            <?= $fact->target()->fullName() ?>
+                                        </a>
+                                    <?php endif ?>
+                                </td>
+                            </tr>
+                        <?php endforeach ?>
+                    </tbody>
+                </table>
+            <?php else : ?>
+                <p>
+                    <?= I18N::translate('No matching facts found') ?>
+                </p>
+            <?php endif ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <?= /* I18N: the name of an individual, source, etc. */ I18N::translate('The following facts and events were only found in the record of %s.', '<a href="' . e($record1->url()) . '">' . $record1->fullName()) . '</a>' ?>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <?php if ($facts1 !== []) : ?>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <?= I18N::translate('Select') ?>
+                                    </th>
+                                    <th>
+                                        <?= I18N::translate('Details') ?>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($facts1 as $fact_id => $fact) : ?>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="keep1[]" value="<?= $fact->id() ?>" checked>
+                                        </td>
+                                        <td>
+                                            <div class="gedcom-data" dir="ltr"><?= e($fact->gedcom()) ?></div>
+                                            <?php if ($fact->target() instanceof GedcomRecord) : ?>
+                                                <a href="<?= e($fact->target()->url()) ?>">
+                                                    <?= $fact->target()->fullName() ?>
+                                                </a>
+                                            <?php endif ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach ?>
+                            </tbody>
+                        </table>
+                    <?php else : ?>
+                        <p>
+                            <?= I18N::translate('No matching facts found') ?>
+                        </p>
+                    <?php endif ?>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <?= /* I18N: the name of an individual, source, etc. */ I18N::translate('The following facts and events were only found in the record of %s.', '<a href="' . e($record2->url()) . '">' . $record2->fullName()) . '</a>' ?>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <?php if ($facts2 !== []) : ?>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <?= I18N::translate('Select') ?>
+                                    </th>
+                                    <th>
+                                        <?= I18N::translate('Details') ?>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($facts2 as $fact_id => $fact) : ?>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="keep2[]" value="<?= $fact->id() ?>" checked>
+                                        </td>
+                                        <td>
+                                            <div class="gedcom-data" dir="ltr"><?= e($fact->gedcom()) ?></div>
+                                            <?php if ($fact->target() instanceof GedcomRecord) : ?>
+                                                <a href="<?= e($fact->target()->url()) ?>">
+                                                    <?= $fact->target()->fullName() ?>
+                                                </a>
+                                            <?php endif ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach ?>
+                            </tbody>
+                        </table>
+                    <?php else : ?>
+                        <p>
+                            <?= I18N::translate('No matching facts found') ?>
+                        </p>
+                    <?php endif ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        <?= view('icons/save') ?>
+        <?= I18N::translate('save') ?>
+    </button>
+</form>

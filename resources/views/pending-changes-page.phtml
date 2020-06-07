@@ -1,0 +1,113 @@
+<?php
+
+use Fisharebest\Webtrees\Http\RequestHandlers\MessagePage;
+use Fisharebest\Webtrees\Http\RequestHandlers\PendingChangesAcceptChange;
+use Fisharebest\Webtrees\Http\RequestHandlers\PendingChangesAcceptTree;
+use Fisharebest\Webtrees\Http\RequestHandlers\PendingChangesRejectChange;
+use Fisharebest\Webtrees\Http\RequestHandlers\PendingChangesRejectTree;
+use Fisharebest\Webtrees\I18N;
+
+?>
+
+<h2 class="wt-page-title">
+    <?= $title ?>
+</h2>
+
+<?php if ($changes === []) : ?>
+    <p>
+        <?= I18N::translate('There are no pending changes.') ?>
+    </p>
+    <p>
+        <a class="btn btn-primary" href="<?= e($url) ?>">
+            <?= I18N::translate('continue') ?>
+        </a>
+    </p>
+<?php endif ?>
+
+<ul class="nav nav-tabs" role="tablist">
+    <?php foreach ($changes as $tree_name => $gedcom_changes) : ?>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link <?= $tree_name === $active_tree_name ? 'active' : '' ?>" data-toggle="tab" href="#tree-<?= e(md5($tree_name)) ?>" aria-controls="tree-<?= e(md5($tree_name)) ?>" id="tree-<?= e(md5($tree_name)) ?>-tab">
+                <?= e($trees[$tree_name]->title()) ?>
+                <span class="badge badge-secondary">
+                <?= I18N::number(count($gedcom_changes)) ?>
+            </span>
+            </a>
+        </li>
+    <?php endforeach ?>
+</ul>
+
+<div class="tab-content">
+    <?php foreach ($changes as $tree_name => $gedcom_changes) : ?>
+        <div class="tab-pane fade <?= $tree_name === $active_tree_name ? 'show active' : '' ?>" id="tree-<?= e(md5($tree_name)) ?>" role="tabpanel" aria-labelledby="tree-<?= e(md5($tree_name)) ?>-tab">
+            <?php foreach ($gedcom_changes as $record_changes) : ?>
+                <h3 class="pt-2">
+                    <a href="<?= e($record_changes[0]->record->url()) ?>"><?= $record_changes[0]->record->fullName() ?></a>
+                </h3>
+
+                <table class="table table-bordered table-sm">
+                    <thead class="thead-default">
+                        <tr>
+                            <th><?= I18N::translate('Accept') ?></th>
+                            <th><?= I18N::translate('Changes') ?></th>
+                            <th><?= I18N::translate('User') ?></th>
+                            <th><?= I18N::translate('Date') ?></th>
+                            <th><?= I18N::translate('Reject') ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($record_changes as $record_change) : ?>
+                            <tr>
+                                <td>
+                                    <a class="btn btn-primary" href="#" data-post-url="<?= e(route(PendingChangesAcceptChange::class, ['tree' => $tree_name, 'xref' => $record_change->xref, 'change' => $record_change->change_id])) ?>">
+                                        <?= I18N::translate('Accept') ?>
+                                    </a>
+                                </td>
+
+                                <td>
+                                    <?php foreach ($record_change->record->facts() as $fact) : ?>
+                                        <?php if ($fact->tag() !== 'CHAN' && $fact->isPendingAddition()) : ?>
+                                            <div class="wt-new">
+                                                <?= strip_tags($fact->summary()) ?>
+                                            </div>
+                                        <?php elseif ($fact->tag() !== 'CHAN' && $fact->isPendingDeletion()) : ?>
+                                            <div class="wt-old">
+                                                <?= strip_tags($fact->summary()) ?>
+                                            </div>
+                                        <?php endif ?>
+                                    <?php endforeach ?>
+                                </td>
+
+                                <td>
+                                    <a href="<?= e(route(MessagePage::class, ['to' => $record_change->user_name, 'subject' => I18N::translate('Pending changes') . ' - ' . strip_tags($record_change->record->fullName()), 'body' => $record_change->record->url(), 'tree' => $tree_name])) ?>" title="<?= I18N::translate('Send a message') ?>">
+                                        <?= e($record_change->real_name) ?> - <?= e($record_change->user_name) ?>
+                                    </a>
+                                </td>
+
+                                <td>
+                                    <?= view('components/datetime', ['timestamp' => $record_change->change_time]) ?>
+                                </td>
+
+                                <td>
+                                    <a class="btn btn-secondary" href="#" data-post-url="<?= e(route(PendingChangesRejectChange::class, ['tree' => $tree_name, 'xref' => $record_change->xref, 'change' => $record_change->change_id])) ?>">
+                                        <?= I18N::translate('Reject') ?>
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach ?>
+                    </tbody>
+                </table>
+            <?php endforeach ?>
+
+            <div class="d-flex justify-content-between">
+                <a class="btn btn-primary" href="#" data-post-url="<?= e(route(PendingChangesAcceptTree::class, ['tree' => $tree_name])) ?>">
+                    <?= I18N::translate('Accept all changes') ?>
+                </a>
+
+                <a class="btn btn-secondary" href="#" data-post-url="<?= e(route(PendingChangesRejectTree::class, ['tree' => $tree_name])) ?>" data-confirm="<?= I18N::translate('Are you sure you want to reject all the changes to this family tree?') ?>">
+                    <?= I18N::translate('Reject all changes') ?>
+                </a>
+            </div>
+        </div>
+    <?php endforeach ?>
+</div>

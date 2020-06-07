@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
 
 /**
@@ -23,99 +27,75 @@ class ReportPdfImage extends ReportBaseImage
     /**
      * PDF image renderer
      *
-     * @param ReportTcpdf $renderer
+     * @param PdfRenderer $renderer
+     *
+     * @return void
      */
     public function render($renderer)
     {
-        global $lastpicbottom, $lastpicpage, $lastpicleft, $lastpicright;
+        static $lastpicbottom, $lastpicpage, $lastpicleft, $lastpicright;
 
         // Check for a pagebreak first
         if ($renderer->checkPageBreakPDF($this->height + 5)) {
-            $this->y = $renderer->GetY();
+            $this->y = $renderer->tcpdf->GetY();
         }
 
-        $curx = $renderer->GetX();
-        // If current position (left)set "."
-        if ($this->x == ".") {
-            $this->x = $renderer->GetX();
-        } // For static position add margin
-        else {
-            $this->x = $renderer->addMarginX($this->x);
-            $renderer->SetX($curx);
-        }
-        if ($this->y == ".") {
-            //-- first check for a collision with the last picture
-            if (isset($lastpicbottom)) {
-                if (($renderer->PageNo() == $lastpicpage) && ($lastpicbottom >= $renderer->GetY()) && ($this->x >= $lastpicleft) && ($this->x <= $lastpicright)
-                ) {
-                    $renderer->SetY($lastpicbottom + 5);
-                }
-            }
-            $this->y = $renderer->GetY();
+        $curx = $renderer->tcpdf->GetX();
+
+        // Get the current positions
+        if ($this->x === ReportBaseElement::CURRENT_POSITION) {
+            $this->x = $renderer->tcpdf->GetX();
         } else {
-            $renderer->SetY($this->y);
+            // For static position add margin
+            $this->x = $renderer->addMarginX($this->x);
+            $renderer->tcpdf->SetX($curx);
         }
-        if ($renderer->getRTL()) {
-            $renderer->Image(
+        if ($this->y === ReportBaseElement::CURRENT_POSITION) {
+            //-- first check for a collision with the last picture
+            if ($lastpicbottom !== null && $renderer->tcpdf->PageNo() === $lastpicpage && $lastpicbottom >= $renderer->tcpdf->GetY() && $this->x >= $lastpicleft && $this->x <= $lastpicright) {
+                $renderer->tcpdf->SetY($lastpicbottom + 5);
+            }
+            $this->y = $renderer->tcpdf->GetY();
+        } else {
+            $renderer->tcpdf->SetY($this->y);
+        }
+        if ($renderer->tcpdf->getRTL()) {
+            $renderer->tcpdf->Image(
                 $this->file,
-                $renderer->getPageWidth() - $this->x,
+                $renderer->tcpdf->getPageWidth() - $this->x,
                 $this->y,
                 $this->width,
                 $this->height,
-                "",
-                "",
+                '',
+                '',
                 $this->line,
                 false,
                 72,
                 $this->align
             );
         } else {
-            $renderer->Image(
+            $renderer->tcpdf->Image(
                 $this->file,
                 $this->x,
                 $this->y,
                 $this->width,
                 $this->height,
-                "",
-                "",
+                '',
+                '',
                 $this->line,
                 false,
                 72,
                 $this->align
             );
         }
-        $lastpicpage           = $renderer->PageNo();
-        $renderer->lastpicpage = $renderer->getPage();
+        $lastpicpage           = $renderer->tcpdf->PageNo();
+        $renderer->lastpicpage = $renderer->tcpdf->getPage();
         $lastpicleft           = $this->x;
         $lastpicright          = $this->x + $this->width;
         $lastpicbottom         = $this->y + $this->height;
         // Setup for the next line
-        if ($this->line == "N") {
-            $renderer->SetY($lastpicbottom);
+        if ($this->line === 'N') {
+            $renderer->tcpdf->SetY($lastpicbottom);
         }
-    }
-
-    /**
-     * Get the image height
-     *
-     * @param ReportTcpdf $pdf
-     *
-     * @return float
-     */
-    public function getHeight($pdf)
-    {
-        return $this->height;
-    }
-
-    /**
-     * Get the image width.
-     *
-     * @param $pdf
-     *
-     * @return float
-     */
-    public function getWidth($pdf)
-    {
-        return $this->width;
     }
 }

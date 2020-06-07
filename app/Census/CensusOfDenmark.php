@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,9 +29,9 @@ class CensusOfDenmark extends Census implements CensusPlaceInterface
      *
      * @return CensusInterface[]
      */
-    public function allCensusDates()
+    public function allCensusDates(): array
     {
-        return array(
+        return [
             new CensusOfDenmark1787(),
             new CensusOfDenmark1801(),
             new CensusOfDenmark1803(),
@@ -50,7 +54,7 @@ class CensusOfDenmark extends Census implements CensusPlaceInterface
             new CensusOfDenmark1925(),
             new CensusOfDenmark1930(),
             new CensusOfDenmark1940(),
-        );
+        ];
     }
 
     /**
@@ -58,8 +62,18 @@ class CensusOfDenmark extends Census implements CensusPlaceInterface
      *
      * @return string
      */
-    public function censusPlace()
+    public function censusPlace(): string
     {
         return 'Danmark';
+    }
+
+    /**
+     * In which language was this census written.
+     *
+     * @return string
+     */
+    public function censusLanguage(): string
+    {
+        return 'da';
     }
 }

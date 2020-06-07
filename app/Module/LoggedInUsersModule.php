@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,126 +14,104 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
-use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Filter;
-use Fisharebest\Webtrees\Functions\Functions;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Individual;
-use Fisharebest\Webtrees\Theme;
-use Fisharebest\Webtrees\User;
+use Fisharebest\Webtrees\Statistics;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Support\Str;
 
 /**
  * Class LoggedInUsersModule
  */
 class LoggedInUsersModule extends AbstractModule implements ModuleBlockInterface
 {
-    /** {@inheritdoc} */
-    public function getTitle()
+    use ModuleBlockTrait;
+
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
     {
-        return /* I18N: Name of a module. (A list of users who are online now) */ I18N::translate('Who is online');
+        /* I18N: Name of a module. (A list of users who are online now) */
+        return I18N::translate('Who is online');
     }
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    /**
+     * A sentence describing what this module does.
+     *
+     * @return string
+     */
+    public function description(): string
     {
-        return /* I18N: Description of the “Who is online” module */ I18N::translate('A list of users and visitors who are currently online.');
+        /* I18N: Description of the “Who is online” module */
+        return I18N::translate('A list of users and visitors who are currently online.');
     }
 
     /**
      * Generate the HTML content of this block.
      *
+     * @param Tree     $tree
      * @param int      $block_id
-     * @param bool     $template
-     * @param string[] $cfg
+     * @param string   $context
+     * @param string[] $config
      *
      * @return string
      */
-    public function getBlock($block_id, $template = true, $cfg = array())
+    public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
-        global $WT_TREE;
+        /** @var Statistics $statistics */
+        $statistics = app(Statistics::class);
 
-        $id        = $this->getName() . $block_id;
-        $class     = $this->getName() . '_block';
-        $title     = $this->getTitle();
-        $anonymous = 0;
-        $logged_in = array();
-        $content   = '';
-        foreach (User::allLoggedIn() as $user) {
-            if (Auth::isAdmin() || $user->getPreference('visibleonline')) {
-                $logged_in[] = $user;
-            } else {
-                $anonymous++;
-            }
-        }
-        $count_logged_in = count($logged_in);
-        $content .= '<div class="logged_in_count">';
-        if ($anonymous) {
-            $content .= I18N::plural('%s anonymous signed-in user', '%s anonymous signed-in users', $anonymous, I18N::number($anonymous));
-            if ($count_logged_in) {
-                $content .= '&nbsp;|&nbsp;';
-            }
-        }
-        if ($count_logged_in) {
-            $content .= I18N::plural('%s signed-in user', '%s signed-in users', $count_logged_in, I18N::number($count_logged_in));
-        }
-        $content .= '</div>';
-        $content .= '<div class="logged_in_list">';
-        if (Auth::check()) {
-            foreach ($logged_in as $user) {
-                $individual = Individual::getInstance($WT_TREE->getUserPreference($user, 'gedcomid'), $WT_TREE);
+        $content = $statistics->usersLoggedInList();
 
-                $content .= '<div class="logged_in_name">';
-                if ($individual) {
-                    $content .= '<a href="' . $individual->getHtmlUrl() . '">' . $user->getRealNameHtml() . '</a>';
-                } else {
-                    $content .= $user->getRealNameHtml();
-                }
-                $content .= ' - ' . Filter::escapeHtml($user->getUserName());
-                if (Auth::id() != $user->getUserId() && $user->getPreference('contactmethod') != 'none') {
-                    $content .= ' <a class="icon-email" href="#" onclick="return message(\'' . Filter::escapeHtml($user->getUserName()) . '\', \'\', \'' . Filter::escapeHtml(Functions::getQueryUrl()) . '\');" title="' . I18N::translate('Send a message') . '"></a>';
-                }
-                $content .= '</div>';
-            }
-        }
-        $content .= '</div>';
-
-        if ($anonymous === 0 && $count_logged_in === 0) {
-            return '';
+        if ($context !== self::CONTEXT_EMBED) {
+            return view('modules/block-template', [
+                'block'      => Str::kebab($this->name()),
+                'id'         => $block_id,
+                'config_url' => '',
+                'title'      => $this->title(),
+                'content'    => $content,
+            ]);
         }
 
-        if ($template) {
-            return Theme::theme()->formatBlock($id, $title, $class, $content);
-        } else {
-            return $content;
-        }
+        return $content;
     }
 
-    /** {@inheritdoc} */
-    public function loadAjax()
+    /**
+     * Should this block load asynchronously using AJAX?
+     *
+     * Simple blocks are faster in-line, more complex ones can be loaded later.
+     *
+     * @return bool
+     */
+    public function loadAjax(): bool
     {
         return false;
     }
 
-    /** {@inheritdoc} */
-    public function isUserBlock()
-    {
-        return true;
-    }
-
-    /** {@inheritdoc} */
-    public function isGedcomBlock()
+    /**
+     * Can this block be shown on the user’s home page?
+     *
+     * @return bool
+     */
+    public function isUserBlock(): bool
     {
         return true;
     }
 
     /**
-     * An HTML form to edit block settings
+     * Can this block be shown on the tree’s home page?
      *
-     * @param int $block_id
+     * @return bool
      */
-    public function configureBlock($block_id)
+    public function isTreeBlock(): bool
     {
+        return true;
     }
 }

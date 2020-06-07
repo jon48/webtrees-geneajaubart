@@ -1,7 +1,8 @@
 <?php
+
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,90 +14,156 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Http\RequestHandlers\AccountEdit;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Module;
-use Fisharebest\Webtrees\Theme;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Services\ModuleService;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\User;
+use Illuminate\Support\Str;
 
 /**
  * Class UserWelcomeModule
  */
 class UserWelcomeModule extends AbstractModule implements ModuleBlockInterface
 {
-    /** {@inheritdoc} */
-    public function getTitle()
+    use ModuleBlockTrait;
+
+    /**
+     * @var ModuleService
+     */
+    private $module_service;
+
+    /**
+     * UserWelcomeModule constructor.
+     *
+     * @param ModuleService $module_service
+     */
+    public function __construct(ModuleService $module_service)
     {
-        return /* I18N: Name of a module */ I18N::translate('My page');
+        $this->module_service = $module_service;
     }
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
     {
-        return /* I18N: Description of the “My page” module */ I18N::translate('A greeting message and useful links for a user.');
+        /* I18N: Name of a module */
+        return I18N::translate('My page');
+    }
+
+    /**
+     * A sentence describing what this module does.
+     *
+     * @return string
+     */
+    public function description(): string
+    {
+        /* I18N: Description of the “My page” module */
+        return I18N::translate('A greeting message and useful links for a user.');
     }
 
     /**
      * Generate the HTML content of this block.
      *
+     * @param Tree     $tree
      * @param int      $block_id
-     * @param bool     $template
-     * @param string[] $cfg
+     * @param string   $context
+     * @param string[] $config
      *
      * @return string
      */
-    public function getBlock($block_id, $template = true, $cfg = array())
+    public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
-        global $WT_TREE;
+        $gedcomid   = $tree->getUserPreference(Auth::user(), User::PREF_TREE_ACCOUNT_XREF);
+        $individual = Factory::individual()->make($gedcomid, $tree);
+        $links      = [];
 
-        $id      = $this->getName() . $block_id;
-        $class   = $this->getName() . '_block';
-        $title   = '<span dir="auto">' . /* I18N: A greeting; %s is the user’s name */ I18N::translate('Welcome %s', Auth::user()->getRealNameHtml()) . '</span>';
-        $content = '<table><tr>';
-        $content .= '<td><a href="edituser.php"><i class="icon-mypage"></i><br>' . I18N::translate('My account') . '</a></td>';
+        $pedigree_chart = $this->module_service->findByComponent(ModuleChartInterface::class, $tree, Auth::user())
+            ->first(static function (ModuleInterface $module): bool {
+                return $module instanceof PedigreeChartModule;
+            });
 
-        $gedcomid = $WT_TREE->getUserPreference(Auth::user(), 'gedcomid');
-
-        if ($gedcomid) {
-            if (Module::isActiveChart($WT_TREE, 'pedigree_chart')) {
-                $content .= '<td><a href="pedigree.php?rootid=' . $gedcomid . '&amp;ged=' . $WT_TREE->getNameUrl() . '"><i class="icon-pedigree"></i><br>' . I18N::translate('My pedigree') . '</a></td>';
+        if ($individual instanceof Individual) {
+            if ($pedigree_chart instanceof PedigreeChartModule) {
+                $links[] = [
+                    'url'   => $pedigree_chart->chartUrl($individual),
+                    'title' => I18N::translate('Default chart'),
+                    'icon'  => 'icon-pedigree',
+                ];
             }
-            $content .= '<td><a href="individual.php?pid=' . $gedcomid . '&amp;ged=' . $WT_TREE->getNameUrl() . '"><i class="icon-indis"></i><br>' . I18N::translate('My individual record') . '</a></td>';
+
+            $links[] = [
+                'url'   => $individual->url(),
+                'title' => I18N::translate('My individual record'),
+                'icon'  => 'icon-indis',
+            ];
         }
-        $content .= '</tr></table>';
 
-        if ($template) {
-            return Theme::theme()->formatBlock($id, $title, $class, $content);
-        } else {
-            return $content;
+        $links[] = [
+            'url'   => route(AccountEdit::class, ['tree' => $tree->name()]),
+            'title' => I18N::translate('My account'),
+            'icon'  => 'icon-mypage',
+        ];
+        $content = view('modules/user_welcome/welcome', ['links' => $links]);
+
+        $real_name = '<span dir="auto">' . e(Auth::user()->realName()) . '</span>';
+
+        /* I18N: A %s is the user’s name */
+        $title = I18N::translate('Welcome %s', $real_name);
+
+        if ($context !== self::CONTEXT_EMBED) {
+            return view('modules/block-template', [
+                'block'      => Str::kebab($this->name()),
+                'id'         => $block_id,
+                'config_url' => '',
+                'title'      => $title,
+                'content'    => $content,
+            ]);
         }
+
+        return $content;
     }
 
-    /** {@inheritdoc} */
-    public function loadAjax()
-    {
-        return false;
-    }
-
-    /** {@inheritdoc} */
-    public function isUserBlock()
-    {
-        return true;
-    }
-
-    /** {@inheritdoc} */
-    public function isGedcomBlock()
+    /**
+     * Should this block load asynchronously using AJAX?
+     *
+     * Simple blocks are faster in-line, more complex ones can be loaded later.
+     *
+     * @return bool
+     */
+    public function loadAjax(): bool
     {
         return false;
     }
 
     /**
-     * An HTML form to edit block settings
+     * Can this block be shown on the user’s home page?
      *
-     * @param int $block_id
+     * @return bool
      */
-    public function configureBlock($block_id)
+    public function isUserBlock(): bool
     {
+        return true;
+    }
+
+    /**
+     * Can this block be shown on the tree’s home page?
+     *
+     * @return bool
+     */
+    public function isTreeBlock(): bool
+    {
+        return false;
     }
 }

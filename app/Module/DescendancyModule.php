@@ -1,7 +1,8 @@
 <?php
+
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,137 +14,151 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
-use Fisharebest\Webtrees\Database;
+use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\Family;
-use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Services\SearchService;
 use Fisharebest\Webtrees\Tree;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
+use function assert;
+use function view;
 
 /**
  * Class DescendancyModule
  */
 class DescendancyModule extends AbstractModule implements ModuleSidebarInterface
 {
-    /** {@inheritdoc} */
-    public function getTitle()
-    {
-        return /* I18N: Name of a module/sidebar */
-            I18N::translate('Descendants');
-    }
+    use ModuleSidebarTrait;
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    /** @var SearchService */
+    private $search_service;
+
+    /**
+     * DescendancyModule constructor.
+     *
+     * @param SearchService $search_service
+     */
+    public function __construct(SearchService $search_service)
     {
-        return /* I18N: Description of the “Descendants” module */
-            I18N::translate('A sidebar showing the descendants of an individual.');
+        $this->search_service = $search_service;
     }
 
     /**
-     * This is a general purpose hook, allowing modules to respond to routes
-     * of the form module.php?mod=FOO&mod_action=BAR
+     * How should this module be identified in the control panel, etc.?
      *
-     * @param string $mod_action
+     * @return string
      */
-    public function modAction($mod_action)
+    public function title(): string
     {
-        global $WT_TREE;
+        /* I18N: Name of a module/sidebar */
+        return I18N::translate('Descendants');
+    }
 
-        header('Content-Type: text/html; charset=UTF-8');
+    /**
+     * A sentence describing what this module does.
+     *
+     * @return string
+     */
+    public function description(): string
+    {
+        /* I18N: Description of the “Descendants” module */
+        return I18N::translate('A sidebar showing the descendants of an individual.');
+    }
 
-        switch ($mod_action) {
-            case 'search':
-                $search = Filter::get('search');
-                echo $this->search($search, $WT_TREE);
-                break;
-            case 'descendants':
-                $individual = Individual::getInstance(Filter::get('xref', WT_REGEX_XREF), $WT_TREE);
-                if ($individual) {
-                    echo $this->loadSpouses($individual, 1);
-                }
-                break;
-            default:
-                http_response_code(404);
-                break;
+    /**
+     * The default position for this sidebar.  It can be changed in the control panel.
+     *
+     * @return int
+     */
+    public function defaultSidebarOrder(): int
+    {
+        return 3;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getSearchAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $search = $request->getQueryParams()['search'];
+
+        $html = '';
+
+        if (strlen($search) >= 2) {
+            $html = $this->search_service
+                ->searchIndividualNames([$tree], [$search])
+                ->map(function (Individual $individual): string {
+                    return $this->getPersonLi($individual);
+                })
+                ->implode('');
         }
+
+        if ($html !== '') {
+            $html = '<ul>' . $html . '</ul>';
+        }
+
+        return response($html);
     }
 
-    /** {@inheritdoc} */
-    public function defaultSidebarOrder()
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getDescendantsAction(ServerRequestInterface $request): ResponseInterface
     {
-        return 30;
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $xref = $request->getQueryParams()['xref'] ?? '';
+
+        $individual = Factory::individual()->make($xref, $tree);
+
+        if ($individual !== null && $individual->canShow()) {
+            $html = $this->loadSpouses($individual, 1);
+        } else {
+            $html = '';
+        }
+
+        return response($html);
     }
 
-    /** {@inheritdoc} */
-    public function hasSidebarContent()
+    /**
+     * @param Individual $individual
+     *
+     * @return bool
+     */
+    public function hasSidebarContent(Individual $individual): bool
     {
         return true;
-    }
-
-    /** {@inheritdoc} */
-    public function getSidebarAjaxContent()
-    {
-        return '';
     }
 
     /**
      * Load this sidebar synchronously.
      *
+     * @param Individual $individual
+     *
      * @return string
      */
-    public function getSidebarContent()
+    public function getSidebarContent(Individual $individual): string
     {
-        global $controller;
-
-        $controller->addInlineJavascript('
-			function dsearchQ() {
-				var query = jQuery("#sb_desc_name").val();
-				if (query.length>1) {
-					jQuery("#sb_desc_content").load("module.php?mod=' . $this->getName() . '&mod_action=search&search="+query);
-				}
-			}
-
-			jQuery("#sb_desc_name").focus(function(){this.select();});
-			jQuery("#sb_desc_name").blur(function(){if (this.value=="") this.value="' . I18N::translate('Search') . '";});
-			var dtimerid = null;
-			jQuery("#sb_desc_name").keyup(function(e) {
-				if (dtimerid) window.clearTimeout(dtimerid);
-				dtimerid = window.setTimeout("dsearchQ()", 500);
-			});
-
-			jQuery("#sb_desc_content").on("click", ".sb_desc_indi", function() {
-				var self = jQuery(this),
-					state = self.children(".plusminus"),
-					target = self.siblings("div");
-				if(state.hasClass("icon-plus")) {
-					if (jQuery.trim(target.html())) {
-						target.show("fast"); // already got content so just show it
-					} else {
-						target
-							.hide()
-							.load(self.attr("href"), function(response, status, xhr) {
-								if(status == "success" && response !== "") {
-									target.show("fast");
-								}
-							})
-					}
-				} else {
-					target.hide("fast");
-				}
-				state.toggleClass("icon-minus icon-plus");
-				return false;
-			});
-		');
-
-        return
-            '<form method="post" action="module.php?mod=' . $this->getName() . '&amp;mod_action=search" onsubmit="return false;">' .
-            '<input type="search" name="sb_desc_name" id="sb_desc_name" placeholder="' . I18N::translate('Search') . '">' .
-            '</form>' .
-            '<div id="sb_desc_content">' .
-            '<ul>' . $this->getPersonLi($controller->record, 1) . '</ul>' .
-            '</div>';
+        return view('modules/descendancy/sidebar', [
+            'individual_list' => $this->getPersonLi($individual, 1),
+            'tree'            => $individual->tree(),
+        ]);
     }
 
     /**
@@ -154,19 +169,24 @@ class DescendancyModule extends AbstractModule implements ModuleSidebarInterface
      *
      * @return string
      */
-    public function getPersonLi(Individual $person, $generations = 0)
+    public function getPersonLi(Individual $person, $generations = 0): string
     {
         $icon     = $generations > 0 ? 'icon-minus' : 'icon-plus';
-        $lifespan = $person->canShow() ? '(' . $person->getLifeSpan() . ')' : '';
+        $lifespan = $person->canShow() ? '(' . $person->lifespan() . ')' : '';
         $spouses  = $generations > 0 ? $this->loadSpouses($person, 0) : '';
 
         return
             '<li class="sb_desc_indi_li">' .
-            '<a class="sb_desc_indi" href="module.php?mod=' . $this->getName() . '&amp;mod_action=descendants&amp;xref=' . $person->getXref() . '">' .
+            '<a class="sb_desc_indi" href="' . e(route('module', [
+                'module' => $this->name(),
+                'action' => 'Descendants',
+                'tree'    => $person->tree()->name(),
+                'xref'   => $person->xref(),
+            ])) . '">' .
             '<i class="plusminus ' . $icon . '"></i>' .
-            $person->getSexImage() . $person->getFullName() . $lifespan .
+            '<small>' . view('icons/sex', ['sex' => $person->sex()]) . '</small>' . $person->fullName() . $lifespan .
             '</a>' .
-            '<a class="icon-button_indi" href="' . $person->getHtmlUrl() . '"></a>' .
+            '<a href="' . e($person->url()) . '" title="' . strip_tags($person->fullName()) . '">' . view('icons/individual') . '</a>' .
             '<div>' . $spouses . '</div>' .
             '</li>';
     }
@@ -180,89 +200,55 @@ class DescendancyModule extends AbstractModule implements ModuleSidebarInterface
      *
      * @return string
      */
-    public function getFamilyLi(Family $family, Individual $person, $generations = 0)
+    public function getFamilyLi(Family $family, Individual $person, $generations = 0): string
     {
-        $spouse = $family->getSpouse($person);
-        if ($spouse) {
-            $spouse_name = $spouse->getSexImage() . $spouse->getFullName();
-            $spouse_link = '<a class="icon-button_indi" href="' . $spouse->getHtmlUrl() . '"></a>';
+        $spouse = $family->spouse($person);
+        if ($spouse instanceof Individual) {
+            $spouse_name = '<small>' . view('icons/sex', ['sex' => $spouse->sex()]) . '</small>' . $spouse->fullName();
+            $spouse_link = '<a href="' . e($spouse->url()) . '" title="' . strip_tags($spouse->fullName()) . '">' . view('icons/individual') . '</a>';
         } else {
             $spouse_name = '';
             $spouse_link = '';
         }
+
+        $family_link = '<a href="' . e($family->url()) . '" title="' . strip_tags($family->fullName()) . '">' . view('icons/family') . '</a>';
 
         $marryear = $family->getMarriageYear();
         $marr     = $marryear ? '<i class="icon-rings"></i>' . $marryear : '';
 
         return
             '<li class="sb_desc_indi_li">' .
-            '<a class="sb_desc_indi" href="#"><i class="plusminus icon-minus"></i>' . $spouse_name . $marr . '</a>' .
+            '<a class="sb_desc_indi" href="#"><i class="plusminus icon-minus"></i>' .
+            $spouse_name .
+            $marr .
+            '</a>' .
             $spouse_link .
-            '<a href="' . $family->getHtmlUrl() . '" class="icon-button_family"></a>' .
-         '<div>' . $this->loadChildren($family, $generations) . '</div>' .
+            $family_link .
+            '<div>' . $this->loadChildren($family, $generations) . '</div>' .
             '</li>';
-    }
-
-    /**
-     * Respond to an autocomplete search request.
-     *
-     * @param string $query Search for this term
-     * @param Tree   $tree  Search in this tree
-     *
-     * @return string
-     */
-    public function search($query, Tree $tree)
-    {
-        if (strlen($query) < 2) {
-            return '';
-        }
-
-        $rows = Database::prepare(
-            "SELECT i_id AS xref" .
-            " FROM `##individuals`" .
-            " JOIN `##name` ON i_id = n_id AND i_file = n_file" .
-            " WHERE n_sort LIKE CONCAT('%', :query, '%') AND i_file = :tree_id" .
-            " ORDER BY n_sort"
-        )->execute(array(
-            'query'   => $query,
-            'tree_id' => $tree->getTreeId(),
-        ))->fetchAll();
-
-        $out = '';
-        foreach ($rows as $row) {
-            $person = Individual::getInstance($row->xref, $tree);
-            if ($person && $person->canShowName()) {
-                $out .= $this->getPersonLi($person);
-            }
-        }
-        if ($out) {
-            return '<ul>' . $out . '</ul>';
-        } else {
-            return '';
-        }
     }
 
     /**
      * Display spouses.
      *
-     * @param Individual $person
+     * @param Individual $individual
      * @param int        $generations
      *
      * @return string
      */
-    public function loadSpouses(Individual $person, $generations)
+    public function loadSpouses(Individual $individual, $generations): string
     {
         $out = '';
-        if ($person && $person->canShow()) {
-            foreach ($person->getSpouseFamilies() as $family) {
-                $out .= $this->getFamilyLi($family, $person, $generations - 1);
+        if ($individual->canShow()) {
+            foreach ($individual->spouseFamilies() as $family) {
+                $out .= $this->getFamilyLi($family, $individual, $generations - 1);
             }
         }
         if ($out) {
             return '<ul>' . $out . '</ul>';
-        } else {
-            return '';
         }
+
+        return '';
     }
 
     /**
@@ -273,12 +259,13 @@ class DescendancyModule extends AbstractModule implements ModuleSidebarInterface
      *
      * @return string
      */
-    public function loadChildren(Family $family, $generations)
+    public function loadChildren(Family $family, $generations): string
     {
         $out = '';
         if ($family->canShow()) {
-            $children = $family->getChildren();
-            if ($children) {
+            $children = $family->children();
+
+            if ($children->isNotEmpty()) {
                 foreach ($children as $child) {
                     $out .= $this->getPersonLi($child, $generations - 1);
                 }
@@ -288,8 +275,8 @@ class DescendancyModule extends AbstractModule implements ModuleSidebarInterface
         }
         if ($out) {
             return '<ul>' . $out . '</ul>';
-        } else {
-            return '';
         }
+
+        return '';
     }
 }

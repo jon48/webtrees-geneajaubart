@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,8 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
+use Fisharebest\Webtrees\Age;
 use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Individual;
 
@@ -23,148 +28,70 @@ use Fisharebest\Webtrees\Individual;
  */
 abstract class AbstractCensusColumnCondition extends AbstractCensusColumn implements CensusColumnInterface
 {
-    /* Text to display for married males */
-    protected $husband = '';
+    // Text to display for married males
+    protected const HUSBAND = '';
 
-    /* Text to display for married females */
-    protected $wife    = '';
+    // Text to display for married females
+    protected const WIFE = '';
 
-    /* Text to display for unmarried males */
-    protected $bachelor = '';
+    // Text to display for married unmarried males
+    protected const BACHELOR = '';
 
-    /* Text to display for unmarried females */
-    protected $spinster = '';
+    // Text to display for married unmarried females
+    protected const SPINSTER = '';
 
-    /* Text to display for male children */
-    protected $boy  = '';
+    // Text to display for male children
+    protected const BOY = '';
 
-    /* Text to display for female children */
-    protected $girl = '';
+    // Text to display for female children
+    protected const GIRL = '';
 
-    /* Text to display for divorced males */
-    protected $divorce  = '';
+    // Text to display for divorced males
+    protected const DIVORCE = '';
 
-    /* Text to display for divorced females */
-    protected $divorcee = '';
+    // Text to display for divorced females
+    protected const DIVORCEE = '';
 
-    /* Text to display for widowed males */
-    protected $widower = '';
+    // Text to display for widowed males
+    protected const WIDOWER = '';
 
-    /* Text to display for widowed females */
-    protected $widow   = '';
+    // Text to display for widowed females
+    protected const WIDOW = '';
 
-    /* At what age is this individual recorded as an adult */
-    protected $age_adult = 15;
+    // At what age is this individual recorded as an adult
+    protected const AGE_ADULT = 15;
 
     /**
      * Generate the likely value of this census column, based on available information.
      *
-     * @param Individual      $individual
-     * @param Individual|null $head
+     * @param Individual $individual
+     * @param Individual $head
      *
      * @return string
      */
-    public function generate(Individual $individual, Individual $head = null)
+    public function generate(Individual $individual, Individual $head): string
     {
         $family = $this->spouseFamily($individual);
-        $sex    = $individual->getSex();
+        $sex    = $individual->sex();
 
-        if ($family === null || count($family->getFacts('_NMR')) > 0) {
+        if ($family === null || $family->facts(['MARR'])->isEmpty()) {
             if ($this->isChild($individual)) {
                 return $this->conditionChild($sex);
-            } else {
-                return $this->conditionSingle($sex);
             }
-        } elseif (count($family->getFacts('DIV')) > 0) {
+
+            return $this->conditionSingle($sex);
+        }
+
+        if ($family->facts(['DIV'])->isNotEmpty()) {
             return $this->conditionDivorced($sex);
-        } else {
-            $spouse = $family->getSpouse($individual);
-            if ($spouse instanceof Individual && $this->isDead($spouse)) {
-                return $this->conditionWidowed($sex);
-            } else {
-                return $this->conditionMarried($sex);
-            }
         }
-    }
 
-    /**
-     * How is this condition written in a census column.
-     *
-     * @param string $sex
-     *
-     * @return string
-     */
-    private function conditionChild($sex)
-    {
-        if ($sex === 'F') {
-            return $this->girl;
-        } else {
-            return $this->boy;
+        $spouse = $family->spouse($individual);
+        if ($spouse instanceof Individual && $this->isDead($spouse)) {
+            return $this->conditionWidowed($sex);
         }
-    }
 
-    /**
-     * How is this condition written in a census column.
-     *
-     * @param string $sex
-     *
-     * @return string
-     */
-    private function conditionDivorced($sex)
-    {
-        if ($sex === 'F') {
-            return $this->divorcee;
-        } else {
-            return $this->divorce;
-        }
-    }
-
-    /**
-     * How is this condition written in a census column.
-     *
-     * @param string $sex
-     *
-     * @return string
-     */
-    private function conditionMarried($sex)
-    {
-        if ($sex === 'F') {
-            return $this->wife;
-        } else {
-            return $this->husband;
-        }
-    }
-
-    /**
-     * How is this condition written in a census column.
-     *
-     * @param string $sex
-     *
-     * @return string
-     */
-    private function conditionSingle($sex)
-    {
-        if ($sex === 'F') {
-            return $this->spinster;
-        } else {
-            return $this->bachelor;
-        }
-    }
-
-    /**
-     * How is this condition written in a census column.
-     *
-     * @param string $sex
-     *
-     * @return string
-     */
-    private function conditionWidowed($sex)
-    {
-        if ($sex === 'F') {
-            return $this->widow;
-        } else {
-            return $this->widower;
-        }
+        return $this->conditionMarried($sex);
     }
 
     /**
@@ -174,11 +101,59 @@ abstract class AbstractCensusColumnCondition extends AbstractCensusColumn implem
      *
      * @return bool
      */
-    private function isChild(Individual $individual)
+    private function isChild(Individual $individual): bool
     {
-        $age = (int) Date::getAge($individual->getEstimatedBirthDate(), $this->date(), 0);
+        $age = new Age($individual->getEstimatedBirthDate(), $this->date());
 
-        return $age < $this->age_adult;
+        return $age->ageYears() < static::AGE_ADULT;
+    }
+
+    /**
+     * How is this condition written in a census column.
+     *
+     * @param string $sex
+     *
+     * @return string
+     */
+    private function conditionChild(string $sex): string
+    {
+        if ($sex === 'F') {
+            return static::GIRL;
+        }
+
+        return static::BOY;
+    }
+
+    /**
+     * How is this condition written in a census column.
+     *
+     * @param string $sex
+     *
+     * @return string
+     */
+    private function conditionSingle(string $sex): string
+    {
+        if ($sex === 'F') {
+            return static::SPINSTER;
+        }
+
+        return static::BACHELOR;
+    }
+
+    /**
+     * How is this condition written in a census column.
+     *
+     * @param string $sex
+     *
+     * @return string
+     */
+    private function conditionDivorced(string $sex): string
+    {
+        if ($sex === 'F') {
+            return static::DIVORCEE;
+        }
+
+        return static::DIVORCE;
     }
 
     /**
@@ -188,8 +163,40 @@ abstract class AbstractCensusColumnCondition extends AbstractCensusColumn implem
      *
      * @return bool
      */
-    private function isDead(Individual $individual)
+    private function isDead(Individual $individual): bool
     {
         return $individual->getDeathDate()->isOK() && Date::compare($individual->getDeathDate(), $this->date()) < 0;
+    }
+
+    /**
+     * How is this condition written in a census column.
+     *
+     * @param string $sex
+     *
+     * @return string
+     */
+    private function conditionWidowed(string $sex): string
+    {
+        if ($sex === 'F') {
+            return static::WIDOW;
+        }
+
+        return static::WIDOWER;
+    }
+
+    /**
+     * How is this condition written in a census column.
+     *
+     * @param string $sex
+     *
+     * @return string
+     */
+    private function conditionMarried(string $sex): string
+    {
+        if ($sex === 'F') {
+            return static::WIFE;
+        }
+
+        return static::HUSBAND;
     }
 }

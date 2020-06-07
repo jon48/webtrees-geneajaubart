@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfDeutschland1919 extends CensusOfDeutschland implements CensusInter
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '08 OCT 1919';
     }
@@ -35,7 +39,7 @@ class CensusOfDeutschland1919 extends CensusOfDeutschland implements CensusInter
      *
      * @return string
      */
-    public function censusPlace()
+    public function censusPlace(): string
     {
         return 'Mecklenburg-Schwerin, Deutschland';
     }
@@ -45,9 +49,9 @@ class CensusOfDeutschland1919 extends CensusOfDeutschland implements CensusInter
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnNull($this, 'Nummer', 'Laufende Nummer'),
             new CensusColumnGivenNames($this, 'Vorname', 'Vorname'),
             new CensusColumnSurname($this, 'Familienname', 'Familienname'),
@@ -65,6 +69,6 @@ class CensusOfDeutschland1919 extends CensusOfDeutschland implements CensusInter
             new CensusColumnNull($this, 'Wohn-/ Aufenthaltsort', 'Wohnort bei nur vorübergehend Anwesenden. Aufenthaltsort bei vorübergehend Abwesenden'),
             new CensusColumnNull($this, 'Dienstgrad', 'Für Militärpersonen: Angabe des Dienstgrades'),
             new CensusColumnNull($this, 'Kriegsgefangener', 'Angabe ob Kriegsgefangener'),
-        );
+        ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfDenmark1930 extends CensusOfDenmark implements CensusInterface
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '05 NOV 1930';
     }
@@ -35,9 +39,9 @@ class CensusOfDenmark1930 extends CensusOfDenmark implements CensusInterface
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnSurnameGivenNames($this, 'Navn', ''),
             new CensusColumnNull($this, 'Bopæl', ''),
             new CensusColumnNull($this, 'Andetsteds', 'Hvis den i Rubrik 3 opførte Person har fast Bopæl andetsteds, anføres her den faste Bopæl'),
@@ -56,6 +60,6 @@ class CensusOfDenmark1930 extends CensusOfDenmark implements CensusInterface
             new CensusColumnNull($this, '', ''),
             new CensusColumnNull($this, '', ''),
             new CensusColumnNull($this, '', ''),
-        );
+        ];
     }
 }

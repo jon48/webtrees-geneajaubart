@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfUnitedStates1930 extends CensusOfUnitedStates implements CensusInt
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return 'APR 1930';
     }
@@ -35,11 +39,11 @@ class CensusOfUnitedStates1930 extends CensusOfUnitedStates implements CensusInt
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnFullName($this, 'Name', 'Name'),
-            new CensusColumnRelationToHead($this, 'Relation', 'Relationship of each person to the head of the family'),
+            new CensusColumnRelationToHeadEnglish($this, 'Relation', 'Relationship of each person to the head of the family'),
             new CensusColumnNull($this, 'Home', 'Home owned or rented'),
             new CensusColumnNull($this, 'V/R', 'Value of house, if owned, or monthly rental if rented'),
             new CensusColumnNull($this, 'Radio', 'Radio set'),
@@ -66,6 +70,6 @@ class CensusOfUnitedStates1930 extends CensusOfUnitedStates implements CensusInt
             new CensusColumnNull($this, 'Unemp', 'If not, …'),
             new CensusColumnNull($this, 'Vet', 'Whether a veteran of U.S. military or …'),
             new CensusColumnNull($this, 'War', 'What war or …'),
-        );
+        ];
     }
 }

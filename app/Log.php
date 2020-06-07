@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,7 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees;
+
+use Illuminate\Database\Capsule\Manager as DB;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Record webtrees events in the database
@@ -21,13 +28,24 @@ namespace Fisharebest\Webtrees;
 class Log
 {
     // We can log the following types of message in the wt_log table.
-    const TYPE_AUTHENTICATION = 'auth';
-    const TYPE_CONFIGURATION  = 'config';
-    const TYPE_DEBUG          = 'debug';
-    const TYPE_EDIT           = 'edit';
-    const TYPE_ERROR          = 'error';
-    const TYPE_MEDIA          = 'media';
-    const TYPE_SEARCH         = 'search';
+    private const TYPE_AUTHENTICATION = 'auth';
+    private const TYPE_CONFIGURATION  = 'config';
+    private const TYPE_EDIT           = 'edit';
+    private const TYPE_ERROR          = 'error';
+    private const TYPE_MEDIA          = 'media';
+    private const TYPE_SEARCH         = 'search';
+
+    /**
+     * Store an authentication message in the message log.
+     *
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function addAuthenticationLog($message): void
+    {
+        self::addLog($message, self::TYPE_AUTHENTICATION);
+    }
 
     /**
      * Store a new message (of the appropriate type) in the message log.
@@ -35,73 +53,62 @@ class Log
      * @param string    $message
      * @param string    $log_type
      * @param Tree|null $tree
-     */
-    private static function addLog($message, $log_type, Tree $tree = null)
-    {
-        global $WT_TREE;
-
-        if (!$tree) {
-            $tree = $WT_TREE;
-        }
-
-        Database::prepare(
-            "INSERT INTO `##log` (log_type, log_message, ip_address, user_id, gedcom_id) VALUES (?, ?, ?, ?, ?)"
-        )->execute(array(
-                    $log_type,
-                    $message,
-                    WT_CLIENT_IP,
-                    Auth::id(),
-                    $tree ? $tree->getTreeId() : null,
-        ));
-    }
-
-    /**
-     * Store an authentication message in the message log.
      *
-     * @param string $message
+     * @return void
      */
-    public static function addAuthenticationLog($message)
+    private static function addLog($message, $log_type, Tree $tree = null): void
     {
-        self::addLog($message, self::TYPE_AUTHENTICATION);
+        if (app()->has(ServerRequestInterface::class)) {
+            $request    = app(ServerRequestInterface::class);
+            $ip_address = $request->getAttribute('client-ip');
+        } else {
+            $ip_address = '127.0.0.1';
+        }
+        $tree_id    = $tree ? $tree->id() : null;
+
+        DB::table('log')->insert([
+            'log_type'    => $log_type,
+            'log_message' => $message,
+            'ip_address'  => $ip_address,
+            'user_id'     => Auth::id(),
+            'gedcom_id'   => $tree_id,
+        ]);
     }
 
     /**
      * Store a configuration message in the message log.
      *
-     * @param string       $message
+     * @param string    $message
      * @param Tree|null $tree
+     *
+     * @return void
      */
-    public static function addConfigurationLog($message, Tree $tree = null)
+    public static function addConfigurationLog($message, Tree $tree = null): void
     {
         self::addLog($message, self::TYPE_CONFIGURATION, $tree);
-    }
-
-    /**
-     * Store a debug message in the message log.
-     *
-     * @param string $message
-     */
-    public static function addDebugLog($message)
-    {
-        self::addLog($message, self::TYPE_DEBUG);
     }
 
     /**
      * Store an edit message in the message log.
      *
      * @param string $message
+     * @param Tree   $tree
+     *
+     * @return void
      */
-    public static function addEditLog($message)
+    public static function addEditLog($message, Tree $tree): void
     {
-        self::addLog($message, self::TYPE_EDIT);
+        self::addLog($message, self::TYPE_EDIT, $tree);
     }
 
     /**
      * Store an error message in the message log.
      *
      * @param string $message
+     *
+     * @return void
      */
-    public static function addErrorLog($message)
+    public static function addErrorLog($message): void
     {
         self::addLog($message, self::TYPE_ERROR);
     }
@@ -110,22 +117,25 @@ class Log
      * Store an media management message in the message log.
      *
      * @param string $message
+     *
+     * @return void
      */
-    public static function addMediaLog($message)
+    public static function addMediaLog($message): void
     {
         self::addLog($message, self::TYPE_MEDIA);
     }
 
     /**
      * Store a search event in the message log.
-     *
      * Unlike most webtrees activity, search is not restricted to a single tree,
      * so we need to record which trees were searchecd.
      *
-     * @param string    $message
+     * @param string $message
      * @param Tree[] $trees Which trees were searched
+     *
+     * @return void
      */
-    public static function addSearchLog($message, array $trees)
+    public static function addSearchLog($message, array $trees): void
     {
         foreach ($trees as $tree) {
             self::addLog($message, self::TYPE_SEARCH, $tree);

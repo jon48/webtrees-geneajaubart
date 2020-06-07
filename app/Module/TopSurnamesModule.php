@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,30 +14,54 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Filter;
-use Fisharebest\Webtrees\Functions\FunctionsDb;
-use Fisharebest\Webtrees\Functions\FunctionsEdit;
 use Fisharebest\Webtrees\Functions\FunctionsPrintLists;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Query\QueryName;
-use Fisharebest\Webtrees\Theme;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Services\ModuleService;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Str;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class TopSurnamesModule
  */
 class TopSurnamesModule extends AbstractModule implements ModuleBlockInterface
 {
+    use ModuleBlockTrait;
+
+    // Default values for new blocks.
+    private const DEFAULT_NUMBER = '10';
+    private const DEFAULT_STYLE  = 'table';
+
+    /** @var ModuleService */
+    private $module_service;
+
     /**
-     * How should this module be labelled on tabs, menus, etc.?
+     * TopSurnamesModule constructor.
+     *
+     * @param ModuleService $module_service
+     */
+    public function __construct(ModuleService $module_service)
+    {
+        $this->module_service = $module_service;
+    }
+
+    /**
+     * How should this module be identified in the control panel, etc.?
      *
      * @return string
      */
-    public function getTitle()
+    public function title(): string
     {
-        return /* I18N: Name of a module. Top=Most common */ I18N::translate('Top surnames');
+        /* I18N: Name of a module. Top=Most common */
+        return I18N::translate('Top surnames');
     }
 
     /**
@@ -44,134 +69,187 @@ class TopSurnamesModule extends AbstractModule implements ModuleBlockInterface
      *
      * @return string
      */
-    public function getDescription()
+    public function description(): string
     {
-        return /* I18N: Description of the “Top surnames” module */ I18N::translate('A list of the most popular surnames.');
+        /* I18N: Description of the “Top surnames” module */
+        return I18N::translate('A list of the most popular surnames.');
     }
 
     /**
      * Generate the HTML content of this block.
      *
+     * @param Tree     $tree
      * @param int      $block_id
-     * @param bool     $template
-     * @param string[] $cfg
+     * @param string   $context
+     * @param string[] $config
      *
      * @return string
      */
-    public function getBlock($block_id, $template = true, $cfg = array())
+    public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
-        global $WT_TREE, $ctype;
+        $num       = (int) $this->getBlockSetting($block_id, 'num', self::DEFAULT_NUMBER);
+        $infoStyle = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
 
-        $num       = $this->getBlockSetting($block_id, 'num', '10');
-        $infoStyle = $this->getBlockSetting($block_id, 'infoStyle', 'table');
+        extract($config, EXTR_OVERWRITE);
 
-        foreach (array('num', 'infoStyle') as $name) {
-            if (array_key_exists($name, $cfg)) {
-                $$name = $cfg[$name];
-            }
+        // Use the count of base surnames.
+        $top_surnames = DB::table('name')
+            ->where('n_file', '=', $tree->id())
+            ->where('n_type', '<>', '_MARNM')
+            ->whereNotIn('n_surn', ['@N.N.', ''])
+            ->groupBy(['n_surn'])
+            ->orderByDesc(new Expression('COUNT(n_surn)'))
+            ->take($num)
+            ->pluck('n_surn');
+
+        $all_surnames = [];
+
+        foreach ($top_surnames as $top_surname) {
+            $variants = DB::table('name')
+                ->where('n_file', '=', $tree->id())
+                ->where(new Expression('n_surn /*! COLLATE utf8_bin */'), '=', $top_surname)
+                ->groupBy(['surname'])
+                ->select([new Expression('n_surname /*! COLLATE utf8_bin */ AS surname'), new Expression('count(*) AS total')])
+                ->pluck('total', 'surname')
+                ->map(static function ($n): int {
+                    // Some database drivers return numeric columns strings.
+                    return (int) $n;
+                })
+                ->all();
+
+            $all_surnames[$top_surname] = $variants;
         }
-
-        // This next function is a bit out of date, and doesn't cope well with surname variants
-        $top_surnames = FunctionsDb::getTopSurnames($WT_TREE->getTreeId(), 0, $num);
-
-        $all_surnames = array();
-        $i            = 0;
-        foreach (array_keys($top_surnames) as $top_surname) {
-            $all_surnames = array_merge($all_surnames, QueryName::surnames($WT_TREE, $top_surname, '', false, false));
-            if (++$i == $num) {
-                break;
-            }
-        }
-        if ($i < $num) {
-            $num = $i;
-        }
-        $id    = $this->getName() . $block_id;
-        $class = $this->getName() . '_block';
-        if ($ctype === 'gedcom' && Auth::isManager($WT_TREE) || $ctype === 'user' && Auth::check()) {
-            $title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
-        } else {
-            $title = '';
-        }
-
-        if ($num == 1) {
-            // I18N: i.e. most popular surname.
-            $title .= I18N::translate('Top surname');
-        } else {
-            // I18N: Title for a list of the most common surnames, %s is a number. Note that a separate translation exists when %s is 1
-            $title .= I18N::plural('Top %s surname', 'Top %s surnames', $num, I18N::number($num));
-        }
-
+        
+        // Find a module providing individual lists.
+        $module = $this->module_service
+            ->findByComponent(ModuleListInterface::class, $tree, Auth::user())
+            ->first(static function (ModuleInterface $module): bool {
+                return $module instanceof IndividualListModule;
+            });
+        
         switch ($infoStyle) {
             case 'tagcloud':
-                uksort($all_surnames, '\Fisharebest\Webtrees\I18N::strcasecmp');
-                $content = FunctionsPrintLists::surnameTagCloud($all_surnames, 'indilist.php', true, $WT_TREE);
+                uksort($all_surnames, [I18N::class, 'strcasecmp']);
+                $content = FunctionsPrintLists::surnameTagCloud($all_surnames, $module, true, $tree);
                 break;
             case 'list':
-                uasort($all_surnames, '\Fisharebest\Webtrees\Module\TopSurnamesModule::surnameCountSort');
-                $content = FunctionsPrintLists::surnameList($all_surnames, 1, true, 'indilist.php', $WT_TREE);
+                uasort($all_surnames, [$this, 'surnameCountSort']);
+                $content = FunctionsPrintLists::surnameList($all_surnames, 1, true, $module, $tree);
                 break;
             case 'array':
-                uasort($all_surnames, '\Fisharebest\Webtrees\Module\TopSurnamesModule::surnameCountSort');
-                $content = FunctionsPrintLists::surnameList($all_surnames, 2, true, 'indilist.php', $WT_TREE);
+                uasort($all_surnames, [$this, 'surnameCountSort']);
+                $content = FunctionsPrintLists::surnameList($all_surnames, 2, true, $module, $tree);
                 break;
             case 'table':
             default:
-                uasort($all_surnames, '\Fisharebest\Webtrees\Module\TopSurnamesModule::surnameCountSort');
-                $content = FunctionsPrintLists::surnameTable($all_surnames, 'indilist.php', $WT_TREE);
+                $content = view('lists/surnames-table', [
+                    'surnames' => $all_surnames,
+                    'module'   => $module,
+                    'families' => false,
+                    'tree'     => $tree,
+                ]);
                 break;
         }
 
-        if ($template) {
-            return Theme::theme()->formatBlock($id, $title, $class, $content);
-        } else {
-            return $content;
+        if ($context !== self::CONTEXT_EMBED) {
+            $num = count($top_surnames);
+            if ($num === 1) {
+                // I18N: i.e. most popular surname.
+                $title = I18N::translate('Top surname');
+            } else {
+                // I18N: Title for a list of the most common surnames, %s is a number. Note that a separate translation exists when %s is 1
+                $title = I18N::plural('Top %s surname', 'Top %s surnames', $num, I18N::number($num));
+            }
+
+            return view('modules/block-template', [
+                'block'      => Str::kebab($this->name()),
+                'id'         => $block_id,
+                'config_url' => $this->configUrl($tree, $context, $block_id),
+                'title'      => $title,
+                'content'    => $content,
+            ]);
         }
+
+        return $content;
     }
 
-    /** {@inheritdoc} */
-    public function loadAjax()
+    /**
+     * Should this block load asynchronously using AJAX?
+     *
+     * Simple blocks are faster in-line, more complex ones can be loaded later.
+     *
+     * @return bool
+     */
+    public function loadAjax(): bool
     {
-        return true;
+        return false;
     }
 
-    /** {@inheritdoc} */
-    public function isUserBlock()
-    {
-        return true;
-    }
-
-    /** {@inheritdoc} */
-    public function isGedcomBlock()
+    /**
+     * Can this block be shown on the user’s home page?
+     *
+     * @return bool
+     */
+    public function isUserBlock(): bool
     {
         return true;
     }
 
     /**
+     * Can this block be shown on the tree’s home page?
+     *
+     * @return bool
+     */
+    public function isTreeBlock(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Update the configuration for a block.
+     *
+     * @param ServerRequestInterface $request
+     * @param int     $block_id
+     *
+     * @return void
+     */
+    public function saveBlockConfiguration(ServerRequestInterface $request, int $block_id): void
+    {
+        $params = (array) $request->getParsedBody();
+
+        $this->setBlockSetting($block_id, 'num', $params['num']);
+        $this->setBlockSetting($block_id, 'infoStyle', $params['infoStyle']);
+    }
+
+    /**
      * An HTML form to edit block settings
      *
-     * @param int $block_id
+     * @param Tree $tree
+     * @param int  $block_id
+     *
+     * @return string
      */
-    public function configureBlock($block_id)
+    public function editBlockConfiguration(Tree $tree, int $block_id): string
     {
-        if (Filter::postBool('save') && Filter::checkCsrf()) {
-            $this->setBlockSetting($block_id, 'num', Filter::postInteger('num', 1, 10000, 10));
-            $this->setBlockSetting($block_id, 'infoStyle', Filter::post('infoStyle', 'list|array|table|tagcloud', 'table'));
-        }
+        $num       = $this->getBlockSetting($block_id, 'num', self::DEFAULT_NUMBER);
+        $infoStyle = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
 
-        $num       = $this->getBlockSetting($block_id, 'num', '10');
-        $infoStyle = $this->getBlockSetting($block_id, 'infoStyle', 'table');
+        $info_styles = [
+            /* I18N: An option in a list-box */
+            'list'     => I18N::translate('bullet list'),
+            /* I18N: An option in a list-box */
+            'array'    => I18N::translate('compact list'),
+            /* I18N: An option in a list-box */
+            'table'    => I18N::translate('table'),
+            /* I18N: An option in a list-box */
+            'tagcloud' => I18N::translate('tag cloud'),
+        ];
 
-        echo '<tr><td class="descriptionbox wrap width33">';
-        echo /* I18N: ... to show in a list */ I18N::translate('Number of surnames');
-        echo '</td><td class="optionbox">';
-        echo '<input type="text" name="num" size="2" value="', $num, '">';
-        echo '</td></tr>';
-
-        echo '<tr><td class="descriptionbox wrap width33">';
-        echo I18N::translate('Presentation style');
-        echo '</td><td class="optionbox">';
-        echo FunctionsEdit::selectEditControl('infoStyle', array('list' => I18N::translate('bullet list'), 'array' => I18N::translate('compact list'), 'table' => I18N::translate('table'), 'tagcloud' => I18N::translate('tag cloud')), null, $infoStyle, '');
-        echo '</td></tr>';
+        return view('modules/top10_surnames/config', [
+            'num'         => $num,
+            'infoStyle'   => $infoStyle,
+            'info_styles' => $info_styles,
+        ]);
     }
 
     /**
@@ -182,17 +260,8 @@ class TopSurnamesModule extends AbstractModule implements ModuleBlockInterface
      *
      * @return int
      */
-    private static function surnameCountSort($a, $b)
+    private function surnameCountSort(array $a, array $b): int
     {
-        $counta = 0;
-        foreach ($a as $x) {
-            $counta += count($x);
-        }
-        $countb = 0;
-        foreach ($b as $x) {
-            $countb += count($x);
-        }
-
-        return $countb - $counta;
+        return array_sum($b) - array_sum($a);
     }
 }

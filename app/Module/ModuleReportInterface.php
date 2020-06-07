@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,19 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
+use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Menu;
 
 /**
  * Interface ModuleReportInterface - Classes and libraries for module system
  */
-interface ModuleReportInterface
+interface ModuleReportInterface extends ModuleInterface
 {
+    /**
+     * Name of the XML report file, relative to the resources folder.
+     *
+     * @return string
+     */
+    public function xmlFilename(): string;
+
     /**
      * Return a menu item for this report.
      *
+     * @param Individual $individual
+     *
      * @return Menu
      */
-    public function getReportMenu();
+    public function getReportMenu(Individual $individual): Menu;
 }

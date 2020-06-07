@@ -1,0 +1,112 @@
+<?php
+
+use Fisharebest\Webtrees\Functions\FunctionsPrint;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Media;
+use Fisharebest\Webtrees\MediaFile;
+
+/**
+ * @var int       $block_id
+ * @var bool      $show_controls
+ * @var bool      $start_automatically
+ * @var Media     $media
+ * @var MediaFile $media_file
+ */
+
+?>
+
+<div class="wt-slide-show-container">
+    <?php if ($show_controls) : ?>
+        <div class="wt-slide-show-controls text-center">
+            <a href="#" title="<?= I18N::translate('Play') ?>" <?= $start_automatically ? 'hidden' : '' ?>>
+                <?= view('icons/media-play') ?>
+                <span class="sr-only"><?= I18N::translate('Play') ?></span>
+            </a>
+            <a href="#" title="<?= I18N::translate('Stop') ?>" <?= $start_automatically ? '' : 'hidden' ?>>
+                <?= view('icons/media-stop') ?>
+                <span class="sr-only"><?= I18N::translate('Stop') ?></span>
+            </a>
+            <a href="#" title="<?= I18N::translate('Next image') ?>">
+                <?= view('icons/media-next') ?>
+                <span class="sr-only"><?= I18N::translate('Next image') ?></span>
+            </a>
+        </div>
+    <?php endif ?>
+
+    <figure class="wt-slide-show-figure text-center">
+        <?= $media_file->displayImage(200, 200, '', ['class' => 'slide-show-image img-fluid']) ?>
+        <figcaption class="wt-slide-show-figcaption">
+            <a href="<?= e($media->url()) ?>">
+                <b><?= $media->fullName() ?></b>
+            </a>
+        </figcaption>
+    </figure>
+
+    <p class="wt-slide-show-notes text-center">
+        <?= FunctionsPrint::printFactNotes($tree, $media->gedcom(), 1) ?>
+    </p>
+
+    <ul class="fa-ul wt-slide-show-links">
+        <?php foreach ($media->linkedIndividuals('OBJE') as $individual) : ?>
+            <li>
+                <span class="fa-li" title="<?= I18N::translate('Individual') ?>"><?= view('icons/individual') ?></span>
+                <a href="<?= e($individual->url()) ?>" class="wt-slide-show-link">
+                    <?= $individual->fullName() ?>
+                </a>
+            </li>
+        <?php endforeach ?>
+
+        <?php foreach ($media->linkedFamilies('OBJE') as $family) : ?>
+            <li>
+                <span class="fa-li" title="<?= I18N::translate('Family') ?>"><?= view('icons/family') ?></span>
+                <a href="<?= e($family->url()) ?>" class="wt-slide-show-link">
+                    <?= $family->fullName() ?>
+                </a>
+            </li>
+        <?php endforeach ?>
+
+        <?php foreach ($media->linkedSources('OBJE') as $source) : ?>
+            <li>
+                <span class="fa-li" title="<?= I18N::translate('Source') ?>"><?= view('icons/source') ?></span>
+                <a href="<?= e($source->url()) ?>" class="wt-slide-show-link">
+                    <?= $source->fullName() ?>
+                </a>
+            </li>
+        <?php endforeach ?>
+    </ul>
+</div>
+
+<script>
+    var play = <?= json_encode($start_automatically) ?>;
+
+    if (play) {
+        var timeout = setTimeout(slideShowReload, <?= json_encode($delay * 1000) ?>);
+    }
+
+    function slideShowReload() {
+        var block = $("#block-<?= $block_id ?>").parent();
+        clearTimeout(timeout);
+        block.load(block.data("ajaxUrl") + "&start=" + (play ? "1" : "0"));
+
+        return false;
+    }
+
+    $(".wt-icon-media-play").on("click", function () {
+        $(".wt-icon-media-play").parent().attr("hidden", true);
+        $(".wt-icon-media-stop").parent().attr("hidden", false);
+        play = true;
+        return slideShowReload();
+    });
+
+    $(".wt-icon-media-stop").on("click", function () {
+        $(".wt-icon-media-stop").parent().attr("hidden", true);
+        $(".wt-icon-media-play").parent().attr("hidden", false);
+        play = false;
+        clearTimeout(timeout);
+        return false;
+    });
+
+    $(".wt-icon-media-next").on("click", function () {
+        return slideShowReload();
+    });
+</script>

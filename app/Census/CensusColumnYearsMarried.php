@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,9 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
+use Fisharebest\Webtrees\Age;
 use Fisharebest\Webtrees\Date;
+use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 
 /**
@@ -26,27 +32,29 @@ class CensusColumnYearsMarried extends AbstractCensusColumn implements CensusCol
     /**
      * Generate the likely value of this census column, based on available information.
      *
-     * @param Individual      $individual
-     * @param Individual|null $head
+     * @param Individual $individual
+     * @param Individual $head
      *
      * @return string
      */
-    public function generate(Individual $individual, Individual $head = null)
+    public function generate(Individual $individual, Individual $head): string
     {
         $marriage_date = null;
 
-        foreach ($individual->getSpouseFamilies() as $family) {
-            foreach ($family->getFacts('MARR', true) as $fact) {
-                if ($fact->getDate()->isOK() && Date::compare($fact->getDate(), $this->date()) <= 0) {
-                    $marriage_date = $fact->getDate();
+        foreach ($individual->spouseFamilies() as $family) {
+            foreach ($family->facts(['MARR'], true) as $fact) {
+                if ($fact->date()->isOK() && Date::compare($fact->date(), $this->date()) <= 0) {
+                    $marriage_date = $fact->date();
                 }
             }
         }
 
         if ($marriage_date === null) {
             return '';
-        } else {
-            return (string) Date::getAge($marriage_date, $this->date(), 0);
         }
+
+        $age = new Age($marriage_date, $this->date());
+
+        return I18N::number($age->ageYears());
     }
 }

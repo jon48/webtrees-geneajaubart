@@ -1,7 +1,8 @@
 <?php
+
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,228 +14,243 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Database;
-use Fisharebest\Webtrees\Filter;
-use Fisharebest\Webtrees\Functions\FunctionsEdit;
+use Fisharebest\Webtrees\Carbon;
+use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\GedcomRecord;
-use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Theme;
-use Rhumsaa\Uuid\Uuid;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class ResearchTaskModule
  */
 class ResearchTaskModule extends AbstractModule implements ModuleBlockInterface
 {
-    const DEFAULT_SHOW_OTHER      = '1';
-    const DEFAULT_SHOW_UNASSIGNED = '1';
-    const DEFAULT_SHOW_FUTURE     = '1';
-    const DEFAULT_BLOCK           = '1';
+    use ModuleBlockTrait;
 
-    /** {@inheritdoc} */
-    public function getTitle()
+    private const DEFAULT_SHOW_OTHER      = '1';
+    private const DEFAULT_SHOW_UNASSIGNED = '1';
+    private const DEFAULT_SHOW_FUTURE     = '1';
+
+    // Pagination
+    private const LIMIT_LOW  = 10;
+    private const LIMIT_HIGH = 20;
+
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
     {
-        return /* I18N: Name of a module. Tasks that need further research. */ I18N::translate('Research tasks');
+        /* I18N: Name of a module. Tasks that need further research. */
+        return I18N::translate('Research tasks');
     }
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    /**
+     * A sentence describing what this module does.
+     *
+     * @return string
+     */
+    public function description(): string
     {
-        return /* I18N: Description of “Research tasks” module */ I18N::translate('A list of tasks and activities that are linked to the family tree.');
+        /* I18N: Description of “Research tasks” module */
+        return I18N::translate('A list of tasks and activities that are linked to the family tree.');
     }
 
     /**
      * Generate the HTML content of this block.
      *
+     * @param Tree     $tree
      * @param int      $block_id
-     * @param bool     $template
-     * @param string[] $cfg
+     * @param string   $context
+     * @param string[] $config
      *
      * @return string
      */
-    public function getBlock($block_id, $template = true, $cfg = array())
+    public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
-        global $ctype, $controller, $WT_TREE;
-
         $show_other      = $this->getBlockSetting($block_id, 'show_other', self::DEFAULT_SHOW_OTHER);
         $show_unassigned = $this->getBlockSetting($block_id, 'show_unassigned', self::DEFAULT_SHOW_UNASSIGNED);
         $show_future     = $this->getBlockSetting($block_id, 'show_future', self::DEFAULT_SHOW_FUTURE);
-        $block           = $this->getBlockSetting($block_id, 'block', self::DEFAULT_BLOCK);
 
-        foreach (array('show_unassigned', 'show_other', 'show_future', 'block') as $name) {
-            if (array_key_exists($name, $cfg)) {
-                $$name = $cfg[$name];
-            }
-        }
+        extract($config, EXTR_OVERWRITE);
 
-        $id    = $this->getName() . $block_id;
-        $class = $this->getName() . '_block';
-        if ($ctype === 'gedcom' && Auth::isManager($WT_TREE) || $ctype === 'user' && Auth::check()) {
-            $title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
-        } else {
-            $title = '';
-        }
-        $title .= $this->getTitle();
+        $end_jd      = $show_future ? Carbon::maxValue()->julianDay() : Carbon::now()->julianDay();
+        $individuals = $this->individualsWithTasks($tree, $end_jd);
+        $families    = $this->familiesWithTasks($tree, $end_jd);
 
-        $table_id = Uuid::uuid4(); // create a unique ID
+        $records = $individuals->merge($families);
 
-        $controller
-            ->addExternalJavascript(WT_JQUERY_DATATABLES_JS_URL)
-            ->addInlineJavascript('
-			jQuery("#' . $table_id . '").dataTable({
-				dom: \'t\',
-				' . I18N::datatablesI18N() . ',
-				autoWidth: false,
-				paginate: false,
-				lengthChange: false,
-				filter: false,
-				info: true,
-				jQueryUI: true,
-				columns: [
-					null,
-					null,
-					null,
-					null
-				]
-			});
-			jQuery("#' . $table_id . '").css("visibility", "visible");
-			jQuery(".loading-image").css("display", "none");
-		');
+        $tasks = new Collection();
 
-        $content = '';
-        $content .= '<div class="loading-image">&nbsp;</div>';
-        $content .= '<table id="' . $table_id . '" style="visibility:hidden;">';
-        $content .= '<thead><tr>';
-        $content .= '<th>' . GedcomTag::getLabel('DATE') . '</th>';
-        $content .= '<th>' . I18N::translate('Record') . '</th>';
-        $content .= '<th>' . I18N::translate('Username') . '</th>';
-        $content .= '<th>' . GedcomTag::getLabel('TEXT') . '</th>';
-        $content .= '</tr></thead><tbody>';
+        foreach ($records as $record) {
+            foreach ($record->facts(['_TODO']) as $task) {
+                $user_name = $task->attribute('_WT_USER');
 
-        $found  = false;
-        $end_jd = $show_future ? 99999999 : WT_CLIENT_JD;
-
-        $xrefs = Database::prepare(
-            "SELECT DISTINCT d_gid FROM `##dates`" .
-            " WHERE d_file = :tree_id AND d_fact = '_TODO' AND d_julianday1 < :jd"
-        )->execute(array(
-            'tree_id' => $WT_TREE->getTreeId(),
-            'jd'      => $end_jd,
-        ))->fetchOneColumn();
-
-        $facts = array();
-        foreach ($xrefs as $xref) {
-            $record = GedcomRecord::getInstance($xref, $WT_TREE);
-            if ($record->canShow()) {
-                foreach ($record->getFacts('_TODO') as $fact) {
-                    $facts[] = $fact;
+                if ($user_name === Auth::user()->userName()) {
+                    // Tasks belonging to us.
+                    $tasks->add($task);
+                } elseif ($user_name === '' && $show_unassigned) {
+                    // Tasks belonging to nobody.
+                    $tasks->add($task);
+                } elseif ($user_name !== '' && $show_other) {
+                    // Tasks belonging to others.
+                    $tasks->add($task);
                 }
             }
         }
 
-        foreach ($facts as $fact) {
-            $record    = $fact->getParent();
-            $user_name = $fact->getAttribute('_WT_USER');
-            if ($user_name === Auth::user()->getUserName() || !$user_name && $show_unassigned || $user_name && $show_other) {
-                $content .= '<tr>';
-                $content .= '<td data-sort="' . $fact->getDate()->julianDay() . '">' . $fact->getDate()->display() . '</td>';
-                $content .= '<td data-sort="' . Filter::escapeHtml($record->getSortName()) . '"><a href="' . $record->getHtmlUrl() . '">' . $record->getFullName() . '</a></td>';
-                $content .= '<td>' . $user_name . '</td>';
-                $content .= '<td dir="auto">' . $fact->getValue() . '</td>';
-                $content .= '</tr>';
-                $found = true;
-            }
-        }
-
-        $content .= '</tbody></table>';
-        if (!$found) {
-            $content .= '<p>' . I18N::translate('There are no research tasks in this family tree.') . '</p>';
-        }
-
-        if ($template) {
-            if ($block) {
-                $class .= ' small_inner_block';
-            }
-
-            return Theme::theme()->formatBlock($id, $title, $class, $content);
+        if ($records->isEmpty()) {
+            $content = '<p>' . I18N::translate('There are no research tasks in this family tree.') . '</p>';
         } else {
-            return $content;
+            $content = view('modules/todo/research-tasks', [
+                'limit_low'  => self::LIMIT_LOW,
+                'limit_high' => self::LIMIT_HIGH,
+                'tasks'      => $tasks,
+            ]);
         }
+
+        if ($context !== self::CONTEXT_EMBED) {
+            return view('modules/block-template', [
+                'block'      => Str::kebab($this->name()),
+                'id'         => $block_id,
+                'config_url' => $this->configUrl($tree, $context, $block_id),
+                'title'      => $this->title(),
+                'content'    => $content,
+            ]);
+        }
+
+        return $content;
     }
 
-    /** {@inheritdoc} */
-    public function loadAjax()
+    /**
+     * Should this block load asynchronously using AJAX?
+     *
+     * Simple blocks are faster in-line, more complex ones can be loaded later.
+     *
+     * @return bool
+     */
+    public function loadAjax(): bool
     {
         return false;
     }
 
-    /** {@inheritdoc} */
-    public function isUserBlock()
-    {
-        return true;
-    }
-
-    /** {@inheritdoc} */
-    public function isGedcomBlock()
+    /**
+     * Can this block be shown on the user’s home page?
+     *
+     * @return bool
+     */
+    public function isUserBlock(): bool
     {
         return true;
     }
 
     /**
+     * Can this block be shown on the tree’s home page?
+     *
+     * @return bool
+     */
+    public function isTreeBlock(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Update the configuration for a block.
+     *
+     * @param ServerRequestInterface $request
+     * @param int     $block_id
+     *
+     * @return void
+     */
+    public function saveBlockConfiguration(ServerRequestInterface $request, int $block_id): void
+    {
+        $params = (array) $request->getParsedBody();
+
+        $this->setBlockSetting($block_id, 'show_other', $params['show_other']);
+        $this->setBlockSetting($block_id, 'show_unassigned', $params['show_unassigned']);
+        $this->setBlockSetting($block_id, 'show_future', $params['show_future']);
+    }
+
+    /**
      * An HTML form to edit block settings
      *
-     * @param int $block_id
+     * @param Tree $tree
+     * @param int  $block_id
+     *
+     * @return string
      */
-    public function configureBlock($block_id)
+    public function editBlockConfiguration(Tree $tree, int $block_id): string
     {
-        if (Filter::postBool('save') && Filter::checkCsrf()) {
-            $this->setBlockSetting($block_id, 'show_other', Filter::postBool('show_other'));
-            $this->setBlockSetting($block_id, 'show_unassigned', Filter::postBool('show_unassigned'));
-            $this->setBlockSetting($block_id, 'show_future', Filter::postBool('show_future'));
-            $this->setBlockSetting($block_id, 'block', Filter::postBool('block'));
-        }
-
         $show_other      = $this->getBlockSetting($block_id, 'show_other', self::DEFAULT_SHOW_OTHER);
         $show_unassigned = $this->getBlockSetting($block_id, 'show_unassigned', self::DEFAULT_SHOW_UNASSIGNED);
         $show_future     = $this->getBlockSetting($block_id, 'show_future', self::DEFAULT_SHOW_FUTURE);
-        $block           = $this->getBlockSetting($block_id, 'block', self::DEFAULT_BLOCK);
 
-        ?>
-        <tr>
-            <td colspan="2">
-                <?php echo I18N::translate('Research tasks are special events, added to individuals in your family tree, which identify the need for further research. You can use them as a reminder to check facts against more reliable sources, to obtain documents or photographs, to resolve conflicting information, etc.'); ?>
-                <?php echo I18N::translate('To create new research tasks, you must first add “research task” to the list of facts and events in the family tree’s preferences.'); ?>
-                <?php echo I18N::translate('Research tasks are stored using the custom GEDCOM tag “_TODO”. Other genealogy applications may not recognize this tag.'); ?>
-            </td>
-        </tr>
-        <?php
+        return view('modules/todo/config', [
+            'show_future'     => $show_future,
+            'show_other'      => $show_other,
+            'show_unassigned' => $show_unassigned,
+        ]);
+    }
 
-        echo '<tr><td class="descriptionbox wrap width33">';
-        echo I18N::translate('Show research tasks that are assigned to other users');
-        echo '</td><td class="optionbox">';
-        echo FunctionsEdit::editFieldYesNo('show_other', $show_other);
-        echo '</td></tr>';
+    /**
+     * @param Tree $tree
+     * @param int  $max_julian_day
+     *
+     * @return Collection<Family>
+     */
+    private function familiesWithTasks(Tree $tree, int $max_julian_day): Collection
+    {
+        return DB::table('families')
+            ->join('dates', static function (JoinClause $join): void {
+                $join
+                    ->on('f_file', '=', 'd_file')
+                    ->on('f_id', '=', 'd_gid');
+            })
+            ->where('f_file', '=', $tree->id())
+            ->where('d_fact', '=', '_TODO')
+            ->where('d_julianday1', '<', $max_julian_day)
+            ->select(['families.*'])
+            ->distinct()
+            ->get()
+            ->map(Factory::family()->mapper($tree))
+            ->filter(GedcomRecord::accessFilter());
+    }
 
-        echo '<tr><td class="descriptionbox wrap width33">';
-        echo I18N::translate('Show research tasks that are not assigned to any user');
-        echo '</td><td class="optionbox">';
-        echo FunctionsEdit::editFieldYesNo('show_unassigned', $show_unassigned);
-        echo '</td></tr>';
-
-        echo '<tr><td class="descriptionbox wrap width33">';
-        echo I18N::translate('Show research tasks that have a date in the future');
-        echo '</td><td class="optionbox">';
-        echo FunctionsEdit::editFieldYesNo('show_future', $show_future);
-        echo '</td></tr>';
-
-        echo '<tr><td class="descriptionbox wrap width33">';
-        echo /* I18N: label for a yes/no option */ I18N::translate('Add a scrollbar when block contents grow');
-        echo '</td><td class="optionbox">';
-        echo FunctionsEdit::editFieldYesNo('block', $block);
-        echo '</td></tr>';
+    /**
+     * @param Tree $tree
+     * @param int  $max_julian_day
+     *
+     * @return Collection<Individual>
+     */
+    private function individualsWithTasks(Tree $tree, int $max_julian_day): Collection
+    {
+        return DB::table('individuals')
+            ->join('dates', static function (JoinClause $join): void {
+                $join
+                    ->on('i_file', '=', 'd_file')
+                    ->on('i_id', '=', 'd_gid');
+            })
+            ->where('i_file', '=', $tree->id())
+            ->where('d_fact', '=', '_TODO')
+            ->where('d_julianday1', '<', $max_julian_day)
+            ->select(['individuals.*'])
+            ->distinct()
+            ->get()
+            ->map(Factory::individual()->mapper($tree))
+            ->filter(GedcomRecord::accessFilter());
     }
 }

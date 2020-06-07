@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfDeutschland1867 extends CensusOfDeutschland implements CensusInter
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '03 DEC 1867';
     }
@@ -35,7 +39,7 @@ class CensusOfDeutschland1867 extends CensusOfDeutschland implements CensusInter
      *
      * @return string
      */
-    public function censusPlace()
+    public function censusPlace(): string
     {
         return 'Mecklenburg-Schwerin, Deutschland';
     }
@@ -45,9 +49,9 @@ class CensusOfDeutschland1867 extends CensusOfDeutschland implements CensusInter
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnNull($this, '1.Nr.', 'Ordnungs-Nummer (1-15).'),
             new CensusColumnGivenNames($this, '2.Vorname', 'I. Vor- und Familien-Name jeder Person. Vorname'),
             new CensusColumnSurname($this, '3.Familienname', 'I. Vor- und Familien-Name jeder Person. Familienname.'),
@@ -71,6 +75,6 @@ class CensusOfDeutschland1867 extends CensusOfDeutschland implements CensusInter
             new CensusColumnNull($this, '21.taubstumm', 'IX. Besondere Mängel einzelner Individuen. taubstumm.'),
             new CensusColumnNull($this, '22.blödsinnig', 'IX. Besondere Mängel einzelner Individuen. blödsinnig.'),
             new CensusColumnNull($this, '23.irrsinnig', 'IX. Besondere Mängel einzelner Individuen. irrsinnig.'),
-        );
+        ];
     }
 }

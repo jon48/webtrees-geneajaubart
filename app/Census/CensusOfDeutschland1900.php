@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfDeutschland1900 extends CensusOfDeutschland implements CensusInter
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '01 DEC 1900';
     }
@@ -35,7 +39,7 @@ class CensusOfDeutschland1900 extends CensusOfDeutschland implements CensusInter
      *
      * @return string
      */
-    public function censusPlace()
+    public function censusPlace(): string
     {
         return 'Mecklenburg-Schwerin, Deutschland';
     }
@@ -45,9 +49,9 @@ class CensusOfDeutschland1900 extends CensusOfDeutschland implements CensusInter
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnNull($this, 'Lfd.Nr.', 'Laufende Nummer'),
             new CensusColumnGivenNames($this, 'Vorname', 'Vorname'),
             new CensusColumnSurname($this, 'Familienname', 'Familienname'),
@@ -75,6 +79,6 @@ class CensusOfDeutschland1900 extends CensusOfDeutschland implements CensusInter
             new CensusColumnNull($this, 'ZK 11.Dienstgrad', '11. Für Militärpersonen im aktiven Dienste: Dienstgrad:'),
             new CensusColumnNull($this, 'ZK 11.Einheit', 'Truppentheil, Kommando- oder Verwaltungsbehörde:'),
             new CensusColumnNull($this, 'ZK 12.Gebrechen', '12. Etwaige körperliche Mängel und Gebrechen:'),
-        );
+        ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,10 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
 
-use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Carbon;
 use Fisharebest\Webtrees\I18N;
+
+use function preg_match;
+use function strtoupper;
 
 /**
  * Class ReportParserSetup - parse a report.xml file and extract the setup options.
@@ -24,7 +31,7 @@ use Fisharebest\Webtrees\I18N;
 class ReportParserSetup extends ReportParserBase
 {
     /** @var array An array of report options/parameters */
-    private $data = array();
+    private $data = [];
 
     /** @var string[] An array of input attributes */
     private $input;
@@ -34,42 +41,22 @@ class ReportParserSetup extends ReportParserBase
      *
      * @return array
      */
-    public function reportProperties()
+    public function reportProperties(): array
     {
         return $this->data;
     }
 
     /**
-     * Process <Report>
+     * Handle <var var="" />
      *
      * @param string[] $attrs
-     */
-    protected function reportStartHandler($attrs)
-    {
-        $access = Auth::PRIV_PRIVATE;
-        if (isset($attrs['access'])) {
-            if (isset($$attrs["access"])) {
-                $access = $$attrs["access"];
-            }
-        }
-        $this->data['access'] = $access;
-
-        if (isset($attrs['icon'])) {
-            $this->data['icon'] = $attrs['icon'];
-        } else {
-            $this->data['icon'] = '';
-        }
-    }
-
-    /**
-     * Process <var var="">
      *
-     * @param string[] $attrs
+     * @return void
      */
-    protected function varStartHandler($attrs)
+    protected function varStartHandler(array $attrs): void
     {
         if (preg_match('/^I18N::number\((.+)\)$/', $attrs['var'], $match)) {
-            $this->text .= I18N::number($match[1]);
+            $this->text .= I18N::number((int) $match[1]);
         } elseif (preg_match('/^I18N::translate\(\'(.+)\'\)$/', $attrs['var'], $match)) {
             $this->text .= I18N::translate($match[1]);
         } elseif (preg_match('/^I18N::translateContext\(\'(.+)\', *\'(.+)\'\)$/', $attrs['var'], $match)) {
@@ -80,74 +67,86 @@ class ReportParserSetup extends ReportParserBase
     }
 
     /**
-     * Process <Title>
+     * Handle <title>
+     *
+     * @return void
      */
-    protected function titleStartHandler()
+    protected function titleStartHandler(): void
     {
         $this->text = '';
     }
 
     /**
-     * Process </Title>
+     * Handle </title>
+     *
+     * @return void
      */
-    protected function titleEndHandler()
+    protected function titleEndHandler(): void
     {
         $this->data['title'] = $this->text;
-        $this->text          = '';
+
+        $this->text = '';
     }
 
     /**
-     * Process </Description>
+     * Handle </description>
+     *
+     * @return void
      */
-    protected function descriptionEndHandler()
+    protected function descriptionEndHandler(): void
     {
         $this->data['description'] = $this->text;
-        $this->text                = '';
+
+        $this->text = '';
     }
 
     /**
-     * Process <Input>
+     * Handle <input>
      *
      * @param string[] $attrs
+     *
+     * @return void
      */
-    protected function inputStartHandler($attrs)
+    protected function inputStartHandler(array $attrs): void
     {
         $this->text  = '';
-        $this->input = array(
-            'name'    => isset($attrs['name']) ? $attrs['name'] : '',
-            'type'    => isset($attrs['type']) ? $attrs['type'] : '',
-            'lookup'  => isset($attrs['lookup']) ? $attrs['lookup'] : '',
-            'options' => isset($attrs['options']) ? $attrs['options'] : '',
+        $this->input = [
+            'name'    => $attrs['name'] ?? '',
+            'type'    => $attrs['type'] ?? '',
+            'lookup'  => $attrs['lookup'] ?? '',
+            'options' => $attrs['options'] ?? '',
             'default' => '',
             'value'   => '',
-        );
+        ];
 
         if (isset($attrs['default'])) {
             if ($attrs['default'] === 'NOW') {
-                $this->input['default'] = date('d M Y');
+                $date = Carbon::now();
+                $this->input['default'] = strtoupper($date->format('d M Y'));
             } else {
-                $match = array();
-                if (preg_match('/NOW\s*([+\-])\s*(\d+)/', $attrs['default'], $match) > 0) {
-                    $plus = 1;
-                    if ($match[1] === '-') {
-                        $plus = -1;
-                    }
-                    $this->input['default'] = date('d M Y', WT_TIMESTAMP + $plus * 60 * 60 * 24 * $match[2]);
+                $match = [];
+                if (preg_match('/NOW([+\-]\d+)/', $attrs['default'], $match) > 0) {
+                    $date = Carbon::now()->addDays((int) $match[1]);
+                    $this->input['default'] = strtoupper($date->format('d M Y'));
                 } else {
                     $this->input['default'] = $attrs['default'];
                 }
             }
+        } elseif ($attrs['name'] === 'pageSize') {
+            $this->input['default'] = I18N::locale()->territory()->paperSize();
         }
     }
 
     /**
-     * Process </Input>
+     * Handle </input>
+     *
+     * @return void
      */
-    protected function inputEndHandler()
+    protected function inputEndHandler(): void
     {
         $this->input['value'] = $this->text;
         if (!isset($this->data['inputs'])) {
-            $this->data['inputs'] = array();
+            $this->data['inputs'] = [];
         }
         $this->data['inputs'][] = $this->input;
         $this->text             = '';

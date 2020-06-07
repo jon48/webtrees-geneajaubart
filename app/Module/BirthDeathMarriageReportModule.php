@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,26 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
-use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Menu;
 
 /**
  * Class BirthDeathMarriageReportModule
  */
 class BirthDeathMarriageReportModule extends AbstractModule implements ModuleReportInterface
 {
+    use ModuleReportTrait;
+
     /**
-     * How should this module be labelled on tabs, menus, etc.?
+     * How should this module be identified in the control panel, etc.?
      *
      * @return string
      */
-    public function getTitle()
+    public function title(): string
     {
         // This text also appears in the .XML file - update both together
-        return /* I18N: Name of a module/report. “Vital records” are life events - birth/marriage/death */ I18N::translate('Vital records');
+        /* I18N: Name of a module/report. “Vital records” are life events - birth/marriage/death */
+        return I18N::translate('Vital records');
     }
 
     /**
@@ -40,38 +45,10 @@ class BirthDeathMarriageReportModule extends AbstractModule implements ModuleRep
      *
      * @return string
      */
-    public function getDescription()
+    public function description(): string
     {
         // This text also appears in the .XML file - update both together
-        return /* I18N: Description of the “Vital records” module. “Vital records” are life events - birth/marriage/death */ I18N::translate('A report of vital records for a given date or place.');
-    }
-
-    /**
-     * What is the default access level for this module?
-     *
-     * Some modules are aimed at admins or managers, and are not generally shown to users.
-     *
-     * @return int
-     */
-    public function defaultAccessLevel()
-    {
-        return Auth::PRIV_PRIVATE;
-    }
-
-    /**
-     * Return a menu item for this report.
-     *
-     * @return Menu
-     */
-    public function getReportMenu()
-    {
-        global $WT_TREE;
-
-        return new Menu(
-            $this->getTitle(),
-            'reportengine.php?ged=' . $WT_TREE->getNameUrl() . '&amp;action=setup&amp;report=' . WT_MODULES_DIR . $this->getName() . '/report.xml',
-            'menu-report-' . $this->getName(),
-            array('rel' => 'nofollow')
-        );
+        /* I18N: Description of the “Vital records” module. “Vital records” are life events - birth/marriage/death */
+        return I18N::translate('A report of vital records for a given date or place.');
     }
 }

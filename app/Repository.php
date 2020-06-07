@@ -1,7 +1,8 @@
 <?php
+
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,32 +14,53 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees;
+
+use Closure;
+use Fisharebest\Webtrees\Http\RequestHandlers\RepositoryPage;
 
 /**
  * A GEDCOM repository (REPO) object.
  */
 class Repository extends GedcomRecord
 {
-    const RECORD_TYPE = 'REPO';
-    const URL_PREFIX  = 'repo.php?rid=';
+    public const RECORD_TYPE = 'REPO';
+
+    protected const ROUTE_NAME = RepositoryPage::class;
 
     /**
-     * Fetch data from the database
+     * A closure which will create a record from a database row.
      *
-     * @param string $xref
-     * @param int    $tree_id
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Factory::repository()
      *
-     * @return null|string
+     * @param Tree $tree
+     *
+     * @return Closure
      */
-    protected static function fetchGedcomRecord($xref, $tree_id)
+    public static function rowMapper(Tree $tree): Closure
     {
-        return Database::prepare(
-            "SELECT o_gedcom FROM `##other` WHERE o_id = :xref AND o_file = :tree_id AND o_type = 'REPO'"
-        )->execute(array(
-            'xref'    => $xref,
-            'tree_id' => $tree_id,
-        ))->fetchOne();
+        return Factory::repository()->mapper($tree);
+    }
+
+    /**
+     * Get an instance of a repository object. For single records,
+     * we just receive the XREF. For bulk records (such as lists
+     * and search results) we can receive the GEDCOM data as well.
+     *
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Factory::repository()
+     *
+     * @param string      $xref
+     * @param Tree        $tree
+     * @param string|null $gedcom
+     *
+     * @return Repository|null
+     */
+    public static function getInstance(string $xref, Tree $tree, string $gedcom = null): ?Repository
+    {
+        return Factory::repository()->make($xref, $tree, $gedcom);
     }
 
     /**
@@ -48,16 +70,18 @@ class Repository extends GedcomRecord
      *
      * @return string
      */
-    protected function createPrivateGedcomRecord($access_level)
+    protected function createPrivateGedcomRecord(int $access_level): string
     {
         return '0 @' . $this->xref . "@ REPO\n1 NAME " . I18N::translate('Private');
     }
 
     /**
      * Extract names from the GEDCOM record.
+     *
+     * @return void
      */
-    public function extractNames()
+    public function extractNames(): void
     {
-        parent::extractNamesFromFacts(1, 'NAME', $this->getFacts('NAME'));
+        $this->extractNamesFromFacts(1, 'NAME', $this->facts(['NAME']));
     }
 }

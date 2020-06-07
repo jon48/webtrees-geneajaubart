@@ -1,7 +1,8 @@
 <?php
+
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,88 +14,128 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Controller\ChartController;
-use Fisharebest\Webtrees\Filter;
+use Fisharebest\Webtrees\Exceptions\IndividualAccessDeniedException;
+use Fisharebest\Webtrees\Exceptions\IndividualNotFoundException;
+use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Menu;
 use Fisharebest\Webtrees\Module\InteractiveTree\TreeView;
+use Fisharebest\Webtrees\Tree;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
+use function assert;
 
 /**
  * Class InteractiveTreeModule
  * Tip : you could change the number of generations loaded before ajax calls both in individual page and in treeview page to optimize speed and server load
  */
-class InteractiveTreeModule extends AbstractModule implements ModuleTabInterface, ModuleChartInterface
+class InteractiveTreeModule extends AbstractModule implements ModuleChartInterface, ModuleTabInterface
 {
-    /** {@inheritdoc} */
-    public function getTitle()
+    use ModuleChartTrait;
+    use ModuleTabTrait;
+
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
     {
-        return /* I18N: Name of a module */ I18N::translate('Interactive tree');
+        /* I18N: Name of a module */
+        return I18N::translate('Interactive tree');
     }
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    /**
+     * A sentence describing what this module does.
+     *
+     * @return string
+     */
+    public function description(): string
     {
-        return /* I18N: Description of the “Interactive tree” module */ I18N::translate('An interactive tree, showing all the ancestors and descendants of an individual.');
+        /* I18N: Description of the “Interactive tree” module */
+        return I18N::translate('An interactive tree, showing all the ancestors and descendants of an individual.');
     }
 
-    /** {@inheritdoc} */
-    public function defaultTabOrder()
+    /**
+     * The default position for this tab.  It can be changed in the control panel.
+     *
+     * @return int
+     */
+    public function defaultTabOrder(): int
     {
-        return 68;
+        return 7;
     }
 
-    /** {@inheritdoc} */
-    public function getTabContent()
+    /**
+     * Generate the HTML content of this tab.
+     *
+     * @param Individual $individual
+     *
+     * @return string
+     */
+    public function getTabContent(Individual $individual): string
     {
-        global $controller;
+        $treeview = new TreeView('tvTab');
 
-        $tv              = new TreeView('tvTab');
-        list($html, $js) = $tv->drawViewport($controller->record, 3);
+        [$html, $js] = $treeview->drawViewport($individual, 3);
 
-        return
-            '<script src="' . $this->js() . '"></script>' .
-            '<script src="' . WT_JQUERYUI_TOUCH_PUNCH_URL . '"></script>' .
-            '<script>' . $js . '</script>' .
-            $html;
+        return view('modules/interactive-tree/tab', [
+            'html' => $html,
+            'js'   => $js,
+        ]);
     }
 
-    /** {@inheritdoc} */
-    public function hasTabContent()
+    /**
+     * Is this tab empty? If so, we don't always need to display it.
+     *
+     * @param Individual $individual
+     *
+     * @return bool
+     */
+    public function hasTabContent(Individual $individual): bool
     {
-        return !Auth::isSearchEngine();
+        return $individual->facts(['FAMC', 'FAMS'])->isNotEmpty();
     }
 
-    /** {@inheritdoc} */
-    public function isGrayedOut()
+    /**
+     * A greyed out tab has no actual content, but may perhaps have
+     * options to create content.
+     *
+     * @param Individual $individual
+     *
+     * @return bool
+     */
+    public function isGrayedOut(Individual $individual): bool
     {
         return false;
     }
 
-    /** {@inheritdoc} */
-    public function canLoadAjax()
+    /**
+     * Can this tab load asynchronously?
+     *
+     * @return bool
+     */
+    public function canLoadAjax(): bool
     {
         return true;
     }
 
     /**
-     * Return a menu item for this chart.
+     * CSS class for the URL.
      *
-     * @param Individual $individual
-     *
-     * @return Menu|null
+     * @return string
      */
-    public function getChartMenu(Individual $individual)
+    public function chartMenuClass(): string
     {
-        return new Menu(
-            $this->getTitle(),
-            'module.php?mod=tree&amp;mod_action=treeview&amp;rootid=' . $individual->getXref() . '&amp;ged=' . $individual->getTree()->getNameUrl(),
-            'menu-chart-tree',
-            array('rel' => 'nofollow')
-        );
+        return 'menu-chart-tree';
     }
 
     /**
@@ -104,107 +145,137 @@ class InteractiveTreeModule extends AbstractModule implements ModuleTabInterface
      *
      * @return Menu|null
      */
-    public function getBoxChartMenu(Individual $individual)
+    public function chartBoxMenu(Individual $individual): ?Menu
     {
-        return $this->getChartMenu($individual);
-    }
-
-    /** {@inheritdoc} */
-    public function getPreLoadContent()
-    {
-        // We cannot use jQuery("head").append(<link rel="stylesheet" ...as jQuery is not loaded at this time
-        return
-            '<script>
-			if (document.createStyleSheet) {
-				document.createStyleSheet("' . $this->css() . '"); // For Internet Explorer
-			} else {
-				var newSheet=document.createElement("link");
-				newSheet.setAttribute("rel","stylesheet");
-				newSheet.setAttribute("type","text/css");
-				newSheet.setAttribute("href","' . $this->css() . '");
-				document.getElementsByTagName("head")[0].appendChild(newSheet);
-			}
-			</script>';
+        return $this->chartMenu($individual);
     }
 
     /**
-     * This is a general purpose hook, allowing modules to respond to routes
-     * of the form module.php?mod=FOO&mod_action=BAR
+     * The title for a specific instance of this chart.
      *
-     * @param string $mod_action
+     * @param Individual $individual
+     *
+     * @return string
      */
-    public function modAction($mod_action)
+    public function chartTitle(Individual $individual): string
     {
-        global $controller, $WT_TREE;
+        /* I18N: %s is an individual’s name */
+        return I18N::translate('Interactive tree of %s', $individual->fullName());
+    }
 
-        switch ($mod_action) {
-            case 'treeview':
-                $controller = new ChartController;
-                $tv         = new TreeView('tv');
-                ob_start();
+    /**
+     * The URL for this chart.
+     *
+     * @param Individual $individual
+     * @param mixed[]    $parameters
+     *
+     * @return string
+     */
+    public function chartUrl(Individual $individual, array $parameters = []): string
+    {
+        return route('module', [
+                'module' => $this->name(),
+                'action' => 'Chart',
+                'xref'   => $individual->xref(),
+                'tree'    => $individual->tree()->name(),
+            ] + $parameters);
+    }
 
-                $person = $controller->getSignificantIndividual();
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getChartAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
 
-                list($html, $js) = $tv->drawViewport($person, 4);
+        $xref = $request->getQueryParams()['xref'];
 
-                $controller
-                ->setPageTitle(I18N::translate('Interactive tree of %s', $person->getFullName()))
-                ->pageHeader()
-                ->addExternalJavascript($this->js())
-                ->addExternalJavascript(WT_JQUERYUI_TOUCH_PUNCH_URL)
-                ->addInlineJavascript($js)
-                ->addInlineJavascript('
-					if (document.createStyleSheet) {
-						document.createStyleSheet("' . $this->css() . '"); // For Internet Explorer
-					} else {
-						jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="' . $this->css() . '">\');
-					}
-				');
-                echo $html;
-                break;
+        $individual = Factory::individual()->make($xref, $tree);
+        $individual = Auth::checkIndividualAccess($individual, false, true);
 
-            case 'getDetails':
-                header('Content-Type: text/html; charset=UTF-8');
-                $pid        = Filter::get('pid', WT_REGEX_XREF);
-                $i          = Filter::get('instance');
-                $tv         = new TreeView($i);
-                $individual = Individual::getInstance($pid, $WT_TREE);
-                if ($individual) {
-                    echo $tv->getDetails($individual);
-                }
-                break;
+        $user = $request->getAttribute('user');
 
-            case 'getPersons':
-                header('Content-Type: text/html; charset=UTF-8');
-                $q  = Filter::get('q');
-                $i  = Filter::get('instance');
-                $tv = new TreeView($i);
-                echo $tv->getPersons($q);
-                break;
+        Auth::checkComponentAccess($this, 'chart', $tree, $user);
 
-            default:
-                http_response_code(404);
-                break;
+        $tv = new TreeView('tv');
+
+        [$html, $js] = $tv->drawViewport($individual, 4);
+
+        return $this->viewResponse('modules/interactive-tree/page', [
+            'html'       => $html,
+            'individual' => $individual,
+            'js'         => $js,
+            'module'     => $this->name(),
+            'title'      => $this->chartTitle($individual),
+            'tree'       => $tree,
+        ]);
+    }
+
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function postChartAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $params = (array) $request->getParsedBody();
+
+        return redirect(route('module', [
+            'module' => $this->name(),
+            'action' => 'Chart',
+            'tree'   => $tree->name(),
+            'xref'   => $params['xref'] ?? '',
+        ]));
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getDetailsAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $pid        = $request->getQueryParams()['pid'];
+        $individual = Factory::individual()->make($pid, $tree);
+
+        if ($individual === null) {
+            throw new IndividualNotFoundException();
         }
+
+        if (!$individual->canShow()) {
+            throw new IndividualAccessDeniedException();
+        }
+
+        $instance = $request->getQueryParams()['instance'];
+        $treeview = new TreeView($instance);
+
+        return response($treeview->getDetails($individual));
     }
 
     /**
-     * URL for our style sheet.
+     * @param ServerRequestInterface $request
      *
-     * @return string
+     * @return ResponseInterface
      */
-    public function css()
+    public function getIndividualsAction(ServerRequestInterface $request): ResponseInterface
     {
-        return WT_STATIC_URL . WT_MODULES_DIR . $this->getName() . '/css/treeview.css';
-    }
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
 
-    /**
-     * URL for our JavaScript.
-     *
-     * @return string
-     */
-    public function js()
-    {
-        return WT_STATIC_URL . WT_MODULES_DIR . $this->getName() . '/js/treeview.js';
+        $q        = $request->getQueryParams()['q'];
+        $instance = $request->getQueryParams()['instance'];
+        $treeview = new TreeView($instance);
+
+        return response($treeview->getIndividuals($tree, $q));
     }
 }

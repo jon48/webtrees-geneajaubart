@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,55 +14,67 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
-use Fisharebest\Webtrees\Controller\BaseController;
 use Fisharebest\Webtrees\I18N;
 
 /**
  * Class CkeditorModule
  */
-class CkeditorModule extends AbstractModule
+class CkeditorModule extends AbstractModule implements ModuleExternalUrlInterface, ModuleGlobalInterface
 {
-    /** {@inheritdoc} */
-    public function getTitle()
-    {
-        return /* I18N: Name of a module. CKEditor is a trademark. Do not translate it? http://ckeditor.com */ I18N::translate('CKEditor™');
-    }
+    use ModuleExternalUrlTrait;
+    use ModuleGlobalTrait;
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    // Location of our installation of CK editor.
+    public const CKEDITOR_PATH = 'ckeditor-4.11.2-custom/';
+
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
     {
-        return /* I18N: Description of the “CKEditor” module. WYSIWYG = “what you see is what you get” */ I18N::translate('Allow other modules to edit text using a “WYSIWYG” editor, instead of using HTML codes.');
+        /* I18N: Name of a module. CKEditor is a trademark. Do not translate it? http://ckeditor.com */
+        return I18N::translate('CKEditor™');
     }
 
     /**
-     * Convert <textarea class="html-edit"> fields to CKEditor fields
+     * A sentence describing what this module does.
      *
-     * This function needs to be called *after* we have sent the page header and
-     * before we have sent the page footer.
-     *
-     * @param BaseController $controller
+     * @return string
      */
-    public static function enableEditor($controller)
+    public function description(): string
     {
-        $controller
-            ->addExternalJavascript(WT_CKEDITOR_BASE_URL . 'ckeditor.js')
-            ->addExternalJavascript(WT_CKEDITOR_BASE_URL . 'adapters/jquery.js')
-            // Need to specify the path before we load the libary
-            ->addInlineJavascript(
-                'var CKEDITOR_BASEPATH="' . WT_CKEDITOR_BASE_URL . '";',
-                BaseController::JS_PRIORITY_HIGH
-            )
-            // Enable for all browsers
-            ->addInlineJavascript('CKEDITOR.env.isCompatible = true;')
-            // Disable toolbars
-            ->addInlineJavascript('CKEDITOR.config.removePlugins = "forms,newpage,preview,print,save,templates";')
-            ->addInlineJavascript('CKEDITOR.config.extraAllowedContent = 
-    "area[shape,coords,href,target,alt,title];map[name];img[usemap];*[class,style]";')
-            // Activate the editor
-            ->addInlineJavascript('jQuery(".html-edit").ckeditor(function(config){config.removePlugins = "forms";}, {
-				language: "' . strtolower(WT_LOCALE) . '"
-			});');
+        /* I18N: Description of the “CKEditor” module. WYSIWYG = “what you see is what you get” */
+        return I18N::translate('Allow other modules to edit text using a “WYSIWYG” editor, instead of using HTML codes.');
+    }
+
+    /**
+     * Home page for the service.
+     *
+     * @return string
+     */
+    public function externalUrl(): string
+    {
+        return 'https://ckeditor.com';
+    }
+
+    /**
+     * Raw content, to be added at the end of the <body> element.
+     * Typically, this will be <script> elements.
+     *
+     * @return string
+     */
+    public function bodyContent(): string
+    {
+        return view('modules/ckeditor/ckeditor-js', [
+            'ckeditor_path' => asset(self::CKEDITOR_PATH),
+            'language'      => I18N::locale()->language()->code(),
+        ]);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfUnitedStates1890 extends CensusOfUnitedStates implements CensusInt
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '02 JUN 1890';
     }
@@ -35,13 +39,13 @@ class CensusOfUnitedStates1890 extends CensusOfUnitedStates implements CensusInt
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnGivenNameInitial($this, 'Name', 'Christian name in full, and initial of middle name'),
             new CensusColumnSurname($this, 'Surname', 'Surname'),
             new CensusColumnNull($this, 'CW', 'Whether a soldier, sailor or marine during the civil war (U.S. or Conf.), or widow of such person'),
-            new CensusColumnRelationToHead($this, 'Relation', 'Relation to head of family'),
+            new CensusColumnRelationToHeadEnglish($this, 'Relation', 'Relation to head of family'),
             new CensusColumnNull($this, 'Race', 'Whether white, black, mulatto, quadroon, octoroon, Chinese, Japanese, or Indian'),
             new CensusColumnSexMF($this, 'Sex', 'Sex'),
             new CensusColumnAge($this, 'Age', 'Age at nearest birthday. If under one year, give age in months'),
@@ -62,6 +66,6 @@ class CensusOfUnitedStates1890 extends CensusOfUnitedStates implements CensusInt
             new CensusColumnNull($this, 'Disease', 'Whether suffering from acute or chronic disease, with name of disease and length of time afflicted'),
             new CensusColumnNull($this, 'Infirm', 'Whether defective in mind, sight, hearing, or speech, or whether crippled, maimed, or deformed, with name of defect'),
             new CensusColumnNull($this, 'Prisoner', 'Whether a prisoner, convict, homeless child, or pauper'),
-        );
+        ];
     }
 }

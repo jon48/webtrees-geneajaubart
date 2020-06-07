@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,147 +14,165 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
-use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Functions\Functions;
-use Fisharebest\Webtrees\Functions\FunctionsPrintFacts;
-use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Services\ClipboardService;
+use Illuminate\Support\Collection;
 
 /**
  * Class SourcesTabModule
  */
 class SourcesTabModule extends AbstractModule implements ModuleTabInterface
 {
-    /** @var Fact[] All facts belonging to this source. */
+    use ModuleTabTrait;
+
+    /** @var Collection All facts belonging to this source. */
     private $facts;
 
-    /** {@inheritdoc} */
-    public function getTitle()
+    /** @var ClipboardService */
+    private $clipboard_service;
+
+    /**
+     * SourcesTabModule constructor.
+     *
+     * @param ClipboardService $clipboard_service
+     */
+    public function __construct(ClipboardService $clipboard_service)
     {
-        return /* I18N: Name of a module */ I18N::translate('Sources');
+        $this->clipboard_service = $clipboard_service;
     }
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
     {
-        return /* I18N: Description of the “Sources” module */ I18N::translate('A tab showing the sources linked to an individual.');
+        /* I18N: Name of a module */
+        return I18N::translate('Sources');
     }
 
-    /** {@inheritdoc} */
-    public function defaultTabOrder()
+    /**
+     * A sentence describing what this module does.
+     *
+     * @return string
+     */
+    public function description(): string
     {
-        return 30;
+        /* I18N: Description of the “Sources” module */
+        return I18N::translate('A tab showing the sources linked to an individual.');
     }
 
-    /** {@inheritdoc} */
-    public function hasTabContent()
+    /**
+     * The default position for this tab.  It can be changed in the control panel.
+     *
+     * @return int
+     */
+    public function defaultTabOrder(): int
     {
-        global $WT_TREE;
-
-        return Auth::isEditor($WT_TREE) || $this->getFactsWithSources();
+        return 3;
     }
 
-    /** {@inheritdoc} */
-    public function isGrayedOut()
+    /**
+     * Is this tab empty? If so, we don't always need to display it.
+     *
+     * @param Individual $individual
+     *
+     * @return bool
+     */
+    public function hasTabContent(Individual $individual): bool
     {
-        return !$this->getFactsWithSources();
+        return $individual->canEdit() || $this->getFactsWithSources($individual)->isNotEmpty();
     }
 
-    /** {@inheritdoc} */
-    public function getTabContent()
+    /**
+     * A greyed out tab has no actual content, but may perhaps have
+     * options to create content.
+     *
+     * @param Individual $individual
+     *
+     * @return bool
+     */
+    public function isGrayedOut(Individual $individual): bool
     {
-        global $controller;
+        return $this->getFactsWithSources($individual)->isEmpty();
+    }
 
-        ob_start();
-        ?>
-        <table class="facts_table">
-            <tr class="noprint">
-                <td colspan="2" class="descriptionbox rela">
-                    <label>
-                        <input id="show-level-2-sources" type="checkbox">
-                        <?php echo I18N::translate('Show all sources'); ?>
-                    </label>
-                </td>
-            </tr>
-            <?php
-            foreach ($this->getFactsWithSources() as $fact) {
-                if ($fact->getTag() == 'SOUR') {
-                    FunctionsPrintFacts::printMainSources($fact, 1);
-                } else {
-                    FunctionsPrintFacts::printMainSources($fact, 2);
-                }
-            }
-            if (!$this->getFactsWithSources()) {
-                echo '<tr><td id="no_tab4" colspan="2" class="facts_value">', I18N::translate('There are no source citations for this individual.'), '</td></tr>';
-            }
-
-            // New Source Link
-            if ($controller->record->canEdit()) {
-                ?>
-                <tr class="noprint">
-                    <td class="facts_label">
-                        <?php echo GedcomTag::getLabel('SOUR'); ?>
-                    </td>
-                    <td class="facts_value">
-                        <a href="#" onclick="add_new_record('<?php echo $controller->record->getXref(); ?>','SOUR'); return false;">
-                            <?php echo I18N::translate('Add a source citation'); ?>
-                        </a>
-                    </td>
-                </tr>
-                <?php
-            }
-            ?>
-        </table>
-        <script>
-            persistent_toggle("show-level-2-sources", ".row_sour2");
-        </script>
-        <?php
-
-        return '<div id="' . $this->getName() . '_content">' . ob_get_clean() . '</div>';
+    /**
+     * Generate the HTML content of this tab.
+     *
+     * @param Individual $individual
+     *
+     * @return string
+     */
+    public function getTabContent(Individual $individual): string
+    {
+        return view('modules/sources_tab/tab', [
+            'can_edit'        => $individual->canEdit(),
+            'clipboard_facts' => $this->clipboard_service->pastableFactsOfType($individual, $this->supportedFacts()),
+            'individual'      => $individual,
+            'facts'           => $this->getFactsWithSources($individual),
+        ]);
     }
 
     /**
      * Get all the facts for an individual which contain sources.
      *
-     * @return Fact[]
+     * @param Individual $individual
+     *
+     * @return Collection<Fact>
      */
-    private function getFactsWithSources()
+    private function getFactsWithSources(Individual $individual): Collection
     {
-        global $controller;
-
         if ($this->facts === null) {
-            $facts = $controller->record->getFacts();
-            foreach ($controller->record->getSpouseFamilies() as $family) {
+            $facts = $individual->facts();
+
+            foreach ($individual->spouseFamilies() as $family) {
                 if ($family->canShow()) {
-                    foreach ($family->getFacts() as $fact) {
-                        $facts[] = $fact;
+                    foreach ($family->facts() as $fact) {
+                        $facts->push($fact);
                     }
                 }
             }
-            $this->facts = array();
+
+            $this->facts = new Collection();
+
             foreach ($facts as $fact) {
-                if (preg_match('/(?:^1|\n\d) SOUR/', $fact->getGedcom())) {
-                    $this->facts[] = $fact;
+                if (preg_match('/(?:^1|\n\d) SOUR/', $fact->gedcom())) {
+                    $this->facts->push($fact);
                 }
             }
-            Functions::sortFacts($this->facts);
+
+            $this->facts = Fact::sortFacts($this->facts);
         }
 
         return $this->facts;
     }
 
-    /** {@inheritdoc} */
-    public function canLoadAjax()
+    /**
+     * Can this tab load asynchronously?
+     *
+     * @return bool
+     */
+    public function canLoadAjax(): bool
     {
-        return !Auth::isSearchEngine(); // Search engines cannot use AJAX
+        return false;
     }
 
-    /** {@inheritdoc} */
-    public function getPreLoadContent()
+    /**
+     * This module handles the following facts - so don't show them on the "Facts and events" tab.
+     *
+     * @return Collection<string>
+     */
+    public function supportedFacts(): Collection
     {
-        return '';
+        return new Collection(['SOUR']);
     }
 }

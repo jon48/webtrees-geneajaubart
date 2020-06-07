@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,28 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Schema;
 
-use Fisharebest\Webtrees\Database;
-use PDOException;
-
 /**
- * Upgrade the database schema from version 8 to version 9.
+ * Upgrade the database schema from version 8 to version 9 (webtrees 1.1.0).
  */
 class Migration8 implements MigrationInterface
 {
     /**
      * Upgrade to to the next version
+     *
+     * @return void
      */
-    public function upgrade()
+    public function upgrade(): void
     {
-        // Add support for the persian/jalali calendar
-        try {
-            Database::exec(
-                "ALTER TABLE `##dates` CHANGE d_type d_type ENUM('@#DGREGORIAN@', '@#DJULIAN@', '@#DHEBREW@', '@#DFRENCH R@', '@#DHIJRI@', '@#DROMAN@', '@#DJALALI@')"
-            );
-        } catch (PDOException $ex) {
-            // Already been run?
-        }
+        // These migrations have been merged into migration 0.
+        // Direct upgrade from webtrees < 1.7.9 is not supported.
     }
 }

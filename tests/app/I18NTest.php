@@ -15,52 +15,43 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Fisharebest\Webtrees\I18N;
+declare(strict_types=1);
+
+namespace Fisharebest\Webtrees;
 
 /**
  * Test harness for the class I18N
  */
-class I18NTest extends \PHPUnit_Framework_TestCase
+class I18NTest extends TestCase
 {
     /**
-     * Prepare the environment for these tests
-     */
-    public function setUp()
-    {
-        defined('WT_BASE_URL') || define('WT_BASE_URL', 'http://localhost/');
-        defined('WT_DATA_DIR') || define('WT_DATA_DIR', 'data/');
-        defined('WT_MODULES_DIR') || define('WT_MODULES_DIR', 'modules_v3/');
-        I18N::init('en-US');
-    }
-
-    /**
-     * Test I18N::strtoupper()
+     * @covers \Fisharebest\Webtrees\I18N::strtoupper
      *
-     * @todo test all locales
+     * @return void
      */
-    public function testStrtoupper()
+    public function testStrtoupper(): void
     {
         $this->assertSame(I18N::strtoupper(''), '');
         $this->assertSame(I18N::strtoupper('Abc'), 'ABC');
     }
 
     /**
-     * Test I18N::strtolower()
+     * @covers \Fisharebest\Webtrees\I18N::strtolower
      *
-     * @todo test all locales
+     * @return void
      */
-    public function testStrtolower()
+    public function testStrtolower(): void
     {
         $this->assertSame(I18N::strtolower(''), '');
         $this->assertSame(I18N::strtolower('Abc'), 'abc');
     }
 
     /**
-     * Test I18N::strcasecmp()
+     * @covers \Fisharebest\Webtrees\I18N::strcasecmp()
      *
-     * @todo test all locales
+     * @return void
      */
-    public function testStrcasecmp()
+    public function testStrcasecmp(): void
     {
         $this->assertSame(I18N::strcasecmp('', ''), 0);
         $this->assertSame(I18N::strcasecmp('Abc', 'abc'), 0);
@@ -71,9 +62,11 @@ class I18NTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test I18N::reverseText()
+     * @covers \Fisharebest\Webtrees\I18N::reverseText
+     *
+     * @return void
      */
-    public function testReverseText()
+    public function testReverseText(): void
     {
         // Create these strings carefully, as text editors can display them in confusing ways.
         $rtl_abc = 'א' . 'ב' . 'ג';
@@ -91,27 +84,5 @@ class I18NTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(I18N::reverseText($rtl_abc . '[123]'), '[123]' . $rtl_cba);
         $this->assertSame(I18N::reverseText('123' . $rtl_abc . '456'), '456' . $rtl_cba . '123');
         $this->assertSame(I18N::reverseText($rtl_abc . '&lt;'), '>' . $rtl_cba);
-    }
-
-    /**
-     * Test I18N::languageName()
-     */
-    public function testKnownLanguageName()
-    {
-        $this->assertSame('العربية', I18N::languageName('ar'));
-        $this->assertSame('Deutsch', I18N::languageName('de'));
-        $this->assertSame('Ελληνικά', I18N::languageName('el'));
-        $this->assertSame('British English', I18N::languageName('en-GB'));
-        $this->assertSame('français', I18N::languageName('fr'));
-    }
-
-    /**
-     * Test I18N::languageScript()
-     */
-    public function testLanguageScript()
-    {
-        $this->assertSame('Arab', I18N::languageScript('ar'));
-        $this->assertSame('Latn', I18N::languageScript('de'));
-        $this->assertSame('Grek', I18N::languageScript('el'));
     }
 }

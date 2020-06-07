@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfUnitedStates1830 extends CensusOfUnitedStates implements CensusInt
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '01 JUN 1830';
     }
@@ -35,9 +39,9 @@ class CensusOfUnitedStates1830 extends CensusOfUnitedStates implements CensusInt
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnFullName($this, 'Name', 'Name of head of family'),
             new CensusColumnNull($this, 'M0', 'Free white males 0-5 years'),
             new CensusColumnNull($this, 'M5', 'Free white males 5-10 years'),
@@ -89,6 +93,6 @@ class CensusOfUnitedStates1830 extends CensusOfUnitedStates implements CensusInt
             new CensusColumnNull($this, 'F36', 'Free colored females 36-55 years'),
             new CensusColumnNull($this, 'F55', 'Free colored females 55-100 years'),
             new CensusColumnNull($this, 'F100', 'Free colored females 100+ years'),
-        );
+        ];
     }
 }

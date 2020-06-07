@@ -14,19 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
+
+use Fisharebest\Webtrees\TestCase;
 
 /**
  * Test harness for the class CensusOfDenmark1834
  */
-class CensusOfDenmark1834Test extends \PHPUnit_Framework_TestCase
+class CensusOfDenmark1834Test extends TestCase
 {
     /**
      * Test the census place and date
      *
-     * @covers Fisharebest\Webtrees\Census\CensusOfDenmark1834
+     * @covers \Fisharebest\Webtrees\Census\CensusOfDenmark1834
+     *
+     * @return void
      */
-    public function testPlaceAndDate()
+    public function testPlaceAndDate(): void
     {
         $census = new CensusOfDenmark1834();
 
@@ -37,19 +44,21 @@ class CensusOfDenmark1834Test extends \PHPUnit_Framework_TestCase
     /**
      * Test the census columns
      *
-     * @covers Fisharebest\Webtrees\Census\CensusOfDenmark1834
-     * @covers Fisharebest\Webtrees\Census\AbstractCensusColumn
+     * @covers \Fisharebest\Webtrees\Census\CensusOfDenmark1834
+     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
+     *
+     * @return void
      */
-    public function testColumns()
+    public function testColumns(): void
     {
         $census  = new CensusOfDenmark1834();
         $columns = $census->columns();
 
         $this->assertCount(4, $columns);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusColumnFullName', $columns[0]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusColumnAge', $columns[1]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusColumnConditionDanish', $columns[2]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusColumnRelationToHead', $columns[3]);
+        $this->assertInstanceOf(CensusColumnFullName::class, $columns[0]);
+        $this->assertInstanceOf(CensusColumnAge::class, $columns[1]);
+        $this->assertInstanceOf(CensusColumnConditionDanish::class, $columns[2]);
+        $this->assertInstanceOf(CensusColumnRelationToHead::class, $columns[3]);
 
         $this->assertSame('Navn', $columns[0]->abbreviation());
         $this->assertSame('Alder', $columns[1]->abbreviation());

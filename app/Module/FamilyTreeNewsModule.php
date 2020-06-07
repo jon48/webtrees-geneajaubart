@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,47 +14,45 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Database;
-use Fisharebest\Webtrees\Filter;
-use Fisharebest\Webtrees\Functions\FunctionsDate;
+use Fisharebest\Webtrees\Carbon;
+use Fisharebest\Webtrees\Exceptions\HttpAccessDeniedException;
+use Fisharebest\Webtrees\Http\RequestHandlers\TreePage;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Theme;
+use Fisharebest\Webtrees\Services\HtmlService;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Str;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use stdClass;
+
+use function assert;
 
 /**
  * Class FamilyTreeNewsModule
  */
 class FamilyTreeNewsModule extends AbstractModule implements ModuleBlockInterface
 {
-    // How to update the database schema for this module
-    const SCHEMA_TARGET_VERSION   = 3;
-    const SCHEMA_SETTING_NAME     = 'NB_SCHEMA_VERSION';
-    const SCHEMA_MIGRATION_PREFIX = '\Fisharebest\Webtrees\Module\FamilyTreeNews\Schema';
+    use ModuleBlockTrait;
+
+    /** @var HtmlService */
+    private $html_service;
 
     /**
-     * Create a new module.
+     * HtmlBlockModule constructor.
      *
-     * @param string $directory Where is this module installed
+     * @param HtmlService $html_service
      */
-    public function __construct($directory)
+    public function __construct(HtmlService $html_service)
     {
-        parent::__construct($directory);
-
-        // Create/update the database tables.
-        // NOTE: if we want to set any module-settings, we'll need to move this.
-        Database::updateSchema(self::SCHEMA_MIGRATION_PREFIX, self::SCHEMA_SETTING_NAME, self::SCHEMA_TARGET_VERSION);
-    }
-
-    /**
-     * How should this module be labelled on tabs, menus, etc.?
-     *
-     * @return string
-     */
-    public function getTitle()
-    {
-        return /* I18N: Name of a module */ I18N::translate('News');
+        $this->html_service = $html_service;
     }
 
     /**
@@ -61,118 +60,205 @@ class FamilyTreeNewsModule extends AbstractModule implements ModuleBlockInterfac
      *
      * @return string
      */
-    public function getDescription()
+    public function description(): string
     {
-        return /* I18N: Description of the “News” module */ I18N::translate('Family news and site announcements.');
+        /* I18N: Description of the “News” module */
+        return I18N::translate('Family news and site announcements.');
     }
 
     /**
      * Generate the HTML content of this block.
      *
+     * @param Tree     $tree
      * @param int      $block_id
-     * @param bool     $template
-     * @param string[] $cfg
+     * @param string   $context
+     * @param string[] $config
      *
      * @return string
      */
-    public function getBlock($block_id, $template = true, $cfg = array())
+    public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
-        global $ctype, $WT_TREE;
+        $articles = DB::table('news')
+            ->where('gedcom_id', '=', $tree->id())
+            ->orderByDesc('updated')
+            ->get()
+            ->map(static function (stdClass $row): stdClass {
+                $row->updated = Carbon::make($row->updated);
 
-        switch (Filter::get('action')) {
-            case 'deletenews':
-                $news_id = Filter::get('news_id');
-                if ($news_id) {
-                    Database::prepare("DELETE FROM `##news` WHERE news_id = ?")->execute(array($news_id));
-                }
-                break;
+                return $row;
+            });
+
+        $content = view('modules/gedcom_news/list', [
+            'articles' => $articles,
+            'block_id' => $block_id,
+            'limit'    => 5,
+            'tree'     => $tree,
+        ]);
+
+        if ($context !== self::CONTEXT_EMBED) {
+            return view('modules/block-template', [
+                'block'      => Str::kebab($this->name()),
+                'id'         => $block_id,
+                'config_url' => '',
+                'title'      => $this->title(),
+                'content'    => $content,
+            ]);
         }
 
-        $more_news = Filter::getInteger('more_news');
-        $limit     = 5 * (1 + $more_news);
-
-        $articles = Database::prepare(
-            "SELECT news_id, user_id, gedcom_id, UNIX_TIMESTAMP(updated) + :offset AS updated, subject, body FROM `##news` WHERE gedcom_id = :tree_id ORDER BY updated DESC LIMIT :limit"
-        )->execute(array(
-            'offset'  => WT_TIMESTAMP_OFFSET,
-            'tree_id' => $WT_TREE->getTreeId(),
-            'limit'   => $limit,
-        ))->fetchAll();
-
-        $count = Database::prepare(
-            "SELECT COUNT(*) FROM `##news` WHERE gedcom_id = :tree_id"
-        )->execute(array(
-            'tree_id' => $WT_TREE->getTreeId(),
-        ))->fetchOne();
-
-        $id      = $this->getName() . $block_id;
-        $class   = $this->getName() . '_block';
-        $title   = $this->getTitle();
-        $content = '';
-
-        if (empty($articles)) {
-            $content .= I18N::translate('No news articles have been submitted.');
-        }
-
-        foreach ($articles as $article) {
-            $content .= '<div class="news_box">';
-            $content .= '<div class="news_title">' . Filter::escapeHtml($article->subject) . '</div>';
-            $content .= '<div class="news_date">' . FunctionsDate::formatTimestamp($article->updated) . '</div>';
-            if ($article->body == strip_tags($article->body)) {
-                $article->body = nl2br($article->body, false);
-            }
-            $content .= $article->body;
-            if (Auth::isManager($WT_TREE)) {
-                $content .= '<hr>';
-                $content .= '<a href="#" onclick="window.open(\'editnews.php?news_id=\'+' . $article->news_id . ', \'_blank\', news_window_specs); return false;">' . I18N::translate('Edit') . '</a>';
-                $content .= ' | ';
-                $content .= '<a href="index.php?action=deletenews&amp;news_id=' . $article->news_id . '&amp;ctype=' . $ctype . '&amp;ged=' . $WT_TREE->getNameHtml() . '" onclick="return confirm(\'' . I18N::translate('Are you sure you want to delete “%s”?', Filter::escapeHtml($article->subject)) . "');\">" . I18N::translate('Delete') . '</a><br>';
-            }
-            $content .= '</div>';
-        }
-
-        if (Auth::isManager($WT_TREE)) {
-            $content .= '<a href="#" onclick="window.open(\'editnews.php?gedcom_id=' . $WT_TREE->getTreeId() . '\', \'_blank\', news_window_specs); return false;">' . I18N::translate('Add a news article') . '</a>';
-        }
-
-        if ($count > $limit) {
-            if (Auth::isManager($WT_TREE)) {
-                $content .= ' | ';
-            }
-            $content .= '<a href="#" onclick="jQuery(\'#' . $id . '\').load(\'index.php?ctype=gedcom&amp;ged=' . $WT_TREE->getNameUrl() . '&amp;block_id=' . $block_id . '&amp;action=ajax&amp;more_news=' . ($more_news + 1) . '\'); return false;">' . I18N::translate('More news articles') . "</a>";
-        }
-
-        if ($template) {
-            return Theme::theme()->formatBlock($id, $title, $class, $content);
-        } else {
-            return $content;
-        }
+        return $content;
     }
 
-    /** {@inheritdoc} */
-    public function loadAjax()
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
+    {
+        /* I18N: Name of a module */
+        return I18N::translate('News');
+    }
+
+    /**
+     * Should this block load asynchronously using AJAX?
+     *
+     * Simple blocks are faster in-line, more complex ones can be loaded later.
+     *
+     * @return bool
+     */
+    public function loadAjax(): bool
     {
         return false;
     }
 
-    /** {@inheritdoc} */
-    public function isUserBlock()
+    /**
+     * Can this block be shown on the user’s home page?
+     *
+     * @return bool
+     */
+    public function isUserBlock(): bool
     {
         return false;
     }
 
-    /** {@inheritdoc} */
-    public function isGedcomBlock()
+    /**
+     * Can this block be shown on the tree’s home page?
+     *
+     * @return bool
+     */
+    public function isTreeBlock(): bool
     {
         return true;
     }
 
     /**
-     * An HTML form to edit block settings
+     * @param ServerRequestInterface $request
      *
-     * @param int $block_id
+     * @return ResponseInterface
      */
-    public function configureBlock($block_id)
+    public function getEditNewsAction(ServerRequestInterface $request): ResponseInterface
     {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        if (!Auth::isManager($tree)) {
+            throw new HttpAccessDeniedException();
+        }
+
+        $news_id = $request->getQueryParams()['news_id'] ?? '';
+
+        if ($news_id !== '') {
+            $row = DB::table('news')
+                ->where('news_id', '=', $news_id)
+                ->where('gedcom_id', '=', $tree->id())
+                ->first();
+        } else {
+            $row = (object) [
+                'body'    => '',
+                'subject' => '',
+            ];
+        }
+
+        $title = I18N::translate('Add/edit a journal/news entry');
+
+        return $this->viewResponse('modules/gedcom_news/edit', [
+            'body'    => $row->body,
+            'news_id' => $news_id,
+            'subject' => $row->subject,
+            'title'   => $title,
+            'tree'    => $tree,
+        ]);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function postEditNewsAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        if (!Auth::isManager($tree)) {
+            throw new HttpAccessDeniedException();
+        }
+
+        $news_id = $request->getQueryParams()['news_id'] ?? '';
+
+        $params = (array) $request->getParsedBody();
+
+        $subject = $params['subject'];
+        $body    = $params['body'];
+
+        $subject = $this->html_service->sanitize($subject);
+        $body    = $this->html_service->sanitize($body);
+
+        if ($news_id > 0) {
+            DB::table('news')
+                ->where('news_id', '=', $news_id)
+                ->where('gedcom_id', '=', $tree->id())
+                ->update([
+                    'body'    => $body,
+                    'subject' => $subject,
+                    'updated' => new Expression('updated'), // See issue #3208
+                ]);
+        } else {
+            DB::table('news')->insert([
+                'body'      => $body,
+                'subject'   => $subject,
+                'gedcom_id' => $tree->id(),
+            ]);
+        }
+
+        $url = route(TreePage::class, ['tree' => $tree->name()]);
+
+        return redirect($url);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function postDeleteNewsAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $news_id = $request->getQueryParams()['news_id'];
+
+        if (!Auth::isManager($tree)) {
+            throw new HttpAccessDeniedException();
+        }
+
+        DB::table('news')
+            ->where('news_id', '=', $news_id)
+            ->where('gedcom_id', '=', $tree->id())
+            ->delete();
+
+        $url = route(TreePage::class, ['tree' => $tree->name()]);
+
+        return redirect($url);
     }
 }

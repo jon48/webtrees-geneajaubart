@@ -15,23 +15,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+declare(strict_types=1);
+
+namespace Fisharebest\Webtrees\Module;
+
+use Fisharebest\Webtrees\TestCase;
+
 /**
  * Test harness for the class StoriesModule
  */
-class StoriesModuleTest extends \PHPUnit_Framework_TestCase
+class StoriesModuleTest extends TestCase
 {
     /**
-     * Prepare the environment for these tests
-     */
-    public function setUp()
-    {
-    }
-
-    /**
      * Test that the class exists
+     *
+     * @return void
      */
-    public function testClassExists()
+    public function testClassExists(): void
     {
-        $this->assertTrue(class_exists('\Fisharebest\Webtrees\Module\StoriesModule'));
+        $this->assertTrue(class_exists(StoriesModule::class));
     }
 }

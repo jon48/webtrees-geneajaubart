@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,38 +14,70 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
+
+use Fisharebest\Webtrees\Individual;
+use Illuminate\Support\Collection;
 
 /**
  * Interface ModuleSidebarInterface - Classes and libraries for module system
  */
-interface ModuleSidebarInterface
+interface ModuleSidebarInterface extends ModuleInterface
 {
     /**
-     * The user can change the order of sidebars. Until they do this, they are shown in this order.
+     * The text that appears on the sidebar's title.
+     *
+     * @return string
+     */
+    public function sidebarTitle(): string;
+
+    /**
+     * Users change change the order of sidebars using the control panel.
+     *
+     * @param int $sidebar_order
+     *
+     * @return void
+     */
+    public function setSidebarOrder(int $sidebar_order): void;
+
+    /**
+     * Users change change the order of sidebars using the control panel.
      *
      * @return int
      */
-    public function defaultSidebarOrder();
+    public function getSidebarOrder(): int;
 
     /**
-     * Load this sidebar synchronously.
+     * The default position for this sidebar.  It can be changed in the control panel.
+     *
+     * @return int
+     */
+    public function defaultSidebarOrder(): int;
+
+    /**
+     * Sidebar content.
+     *
+     * @param Individual $individual
      *
      * @return string
      */
-    public function getSidebarContent();
-
-    /**
-     * Load this sidebar asynchronously.
-     *
-     * @return string
-     */
-    public function getSidebarAjaxContent();
+    public function getSidebarContent(Individual $individual): string;
 
     /**
      * Does this sidebar have anything to display for this individual?
      *
+     * @param Individual $individual
+     *
      * @return bool
      */
-    public function hasSidebarContent();
+    public function hasSidebarContent(Individual $individual): bool;
+    /**
+     * This module handles the following facts - so don't show them on the "Facts and events" tab.
+     *
+     * @return Collection<string>
+     */
+    public function supportedFacts(): Collection;
 }

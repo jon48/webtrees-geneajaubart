@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,7 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees;
+
+use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\Exceptions\FamilyAccessDeniedException;
+use Fisharebest\Webtrees\Exceptions\FamilyNotFoundException;
+use Fisharebest\Webtrees\Exceptions\HttpAccessDeniedException;
+use Fisharebest\Webtrees\Exceptions\IndividualAccessDeniedException;
+use Fisharebest\Webtrees\Exceptions\IndividualNotFoundException;
+use Fisharebest\Webtrees\Exceptions\MediaAccessDeniedException;
+use Fisharebest\Webtrees\Exceptions\MediaNotFoundException;
+use Fisharebest\Webtrees\Exceptions\NoteAccessDeniedException;
+use Fisharebest\Webtrees\Exceptions\NoteNotFoundException;
+use Fisharebest\Webtrees\Exceptions\RecordAccessDeniedException;
+use Fisharebest\Webtrees\Exceptions\RecordNotFoundException;
+use Fisharebest\Webtrees\Exceptions\RepositoryAccessDeniedException;
+use Fisharebest\Webtrees\Exceptions\RepositoryNotFoundException;
+use Fisharebest\Webtrees\Exceptions\SourceAccessDeniedException;
+use Fisharebest\Webtrees\Exceptions\SourceNotFoundException;
+use Fisharebest\Webtrees\Module\ModuleInterface;
+use Fisharebest\Webtrees\Services\UserService;
 
 /**
  * Authentication.
@@ -21,17 +44,17 @@ namespace Fisharebest\Webtrees;
 class Auth
 {
     // Privacy constants
-    const PRIV_PRIVATE = 2; // Allows visitors to view the item
-    const PRIV_USER    = 1; // Allows members to access the item
-    const PRIV_NONE    = 0; // Allows managers to access the item
-    const PRIV_HIDE    = -1; // Hide the item to all users
+    public const PRIV_PRIVATE = 2; // Allows visitors to view the item
+    public const PRIV_USER    = 1; // Allows members to access the item
+    public const PRIV_NONE    = 0; // Allows managers to access the item
+    public const PRIV_HIDE    = -1; // Hide the item to all users
 
     /**
      * Are we currently logged in?
      *
      * @return bool
      */
-    public static function check()
+    public static function check(): bool
     {
         return self::id() !== null;
     }
@@ -39,128 +62,106 @@ class Auth
     /**
      * Is the specified/current user an administrator?
      *
-     * @param User|null $user
+     * @param UserInterface|null $user
      *
      * @return bool
      */
-    public static function isAdmin(User $user = null)
+    public static function isAdmin(UserInterface $user = null): bool
     {
-        if ($user === null) {
-            $user = self::user();
-        }
+        $user = $user ?? self::user();
 
-        return $user && $user->getPreference('canadmin') === '1';
+        return $user->getPreference(User::PREF_IS_ADMINISTRATOR) === '1';
     }
 
     /**
      * Is the specified/current user a manager of a tree?
      *
-     * @param Tree      $tree
-     * @param User|null $user
+     * @param Tree               $tree
+     * @param UserInterface|null $user
      *
      * @return bool
      */
-    public static function isManager(Tree $tree, User $user = null)
+    public static function isManager(Tree $tree, UserInterface $user = null): bool
     {
-        if ($user === null) {
-            $user = self::user();
-        }
+        $user = $user ?? self::user();
 
-        return self::isAdmin($user) || $user && $tree->getUserPreference($user, 'canedit') === 'admin';
+        return self::isAdmin($user) || $tree->getUserPreference($user, User::PREF_TREE_ROLE) === User::ROLE_MANAGER;
     }
 
     /**
      * Is the specified/current user a moderator of a tree?
      *
-     * @param Tree      $tree
-     * @param User|null $user
+     * @param Tree               $tree
+     * @param UserInterface|null $user
      *
      * @return bool
      */
-    public static function isModerator(Tree $tree, User $user = null)
+    public static function isModerator(Tree $tree, UserInterface $user = null): bool
     {
-        if ($user === null) {
-            $user = self::user();
-        }
+        $user = $user ?? self::user();
 
-        return self::isManager($tree, $user) || $user && $tree->getUserPreference($user, 'canedit') === 'accept';
+        return self::isManager($tree, $user) || $tree->getUserPreference($user, User::PREF_TREE_ROLE) === User::ROLE_MODERATOR;
     }
 
     /**
      * Is the specified/current user an editor of a tree?
      *
-     * @param Tree      $tree
-     * @param User|null $user
+     * @param Tree               $tree
+     * @param UserInterface|null $user
      *
      * @return bool
      */
-    public static function isEditor(Tree $tree, User $user = null)
+    public static function isEditor(Tree $tree, UserInterface $user = null): bool
     {
-        if ($user === null) {
-            $user = self::user();
-        }
+        $user = $user ?? self::user();
 
-        return self::isModerator($tree, $user) || $user && $tree->getUserPreference($user, 'canedit') === 'edit';
+        return self::isModerator($tree, $user) || $tree->getUserPreference($user, User::PREF_TREE_ROLE) === 'edit';
     }
 
     /**
      * Is the specified/current user a member of a tree?
      *
-     * @param Tree      $tree
-     * @param User|null $user
+     * @param Tree               $tree
+     * @param UserInterface|null $user
      *
      * @return bool
      */
-    public static function isMember(Tree $tree, User $user = null)
+    public static function isMember(Tree $tree, UserInterface $user = null): bool
     {
-        if ($user === null) {
-            $user = self::user();
-        }
+        $user = $user ?? self::user();
 
-        return self::isEditor($tree, $user) || $user && $tree->getUserPreference($user, 'canedit') === 'access';
+        return self::isEditor($tree, $user) || $tree->getUserPreference($user, User::PREF_TREE_ROLE) === 'access';
     }
 
     /**
      * What is the specified/current user's access level within a tree?
      *
-     * @param Tree      $tree
-     * @param User|null $user
+     * @param Tree               $tree
+     * @param UserInterface|null $user
      *
      * @return int
      */
-    public static function accessLevel(Tree $tree, User $user = null)
+    public static function accessLevel(Tree $tree, UserInterface $user = null): int
     {
-        if ($user === null) {
-            $user = self::user();
-        }
+        $user = $user ?? self::user();
 
         if (self::isManager($tree, $user)) {
             return self::PRIV_NONE;
-        } elseif (self::isMember($tree, $user)) {
-            return self::PRIV_USER;
-        } else {
-            return self::PRIV_PRIVATE;
         }
-    }
 
-    /**
-     * Is the current visitor a search engine? The global is set in session.php
-     *
-     * @return bool
-     */
-    public static function isSearchEngine()
-    {
-        global $SEARCH_SPIDER;
+        if (self::isMember($tree, $user)) {
+            return self::PRIV_USER;
+        }
 
-        return $SEARCH_SPIDER;
+        return self::PRIV_PRIVATE;
     }
 
     /**
      * The ID of the authenticated user, from the current session.
      *
-     * @return string|null
+     * @return int|null
      */
-    public static function id()
+    public static function id(): ?int
     {
         return Session::get('wt_user');
     }
@@ -168,40 +169,303 @@ class Auth
     /**
      * The authenticated user, from the current session.
      *
-     * @return User
+     * @return UserInterface
      */
-    public static function user()
+    public static function user(): UserInterface
     {
-        $user = User::find(self::id());
-        if ($user === null) {
-            $visitor            = new \stdClass;
-            $visitor->user_id   = '';
-            $visitor->user_name = '';
-            $visitor->real_name = '';
-            $visitor->email     = '';
-
-            return new User($visitor);
-        } else {
-            return $user;
-        }
+        return app(UserService::class)->find(self::id()) ?? new GuestUser();
     }
 
     /**
      * Login directly as an explicit user - for masquerading.
      *
-     * @param User $user
+     * @param UserInterface $user
+     *
+     * @return void
      */
-    public static function login(User $user)
+    public static function login(UserInterface $user): void
     {
         Session::regenerate(false);
-        Session::put('wt_user', $user->getUserId());
+        Session::put('wt_user', $user->id());
     }
 
     /**
      * End the session for the current user.
+     *
+     * @return void
      */
-    public static function logout()
+    public static function logout(): void
     {
         Session::regenerate(true);
+    }
+
+    /**
+     * @param ModuleInterface $module
+     * @param string          $component
+     * @param Tree            $tree
+     * @param UserInterface   $user
+     *
+     * @return void
+     */
+    public static function checkComponentAccess(ModuleInterface $module, string $component, Tree $tree, UserInterface $user): void
+    {
+        if ($module->accessLevel($tree, $component) < self::accessLevel($tree, $user)) {
+            throw new HttpAccessDeniedException();
+        }
+    }
+
+    /**
+     * @param Family|null $family
+     * @param bool        $edit
+     *
+     * @return Family
+     * @throws FamilyNotFoundException
+     * @throws FamilyAccessDeniedException
+     */
+    public static function checkFamilyAccess(?Family $family, bool $edit = false): Family
+    {
+        if ($family === null) {
+            throw new FamilyNotFoundException();
+        }
+
+        if ($edit && $family->canEdit()) {
+            return $family;
+        }
+
+        if ($family->canShow()) {
+            return $family;
+        }
+
+        throw new FamilyAccessDeniedException();
+    }
+
+    /**
+     * @param Header|null $header
+     * @param bool        $edit
+     *
+     * @return Header
+     * @throws RecordNotFoundException
+     * @throws RecordAccessDeniedException
+     */
+    public static function checkHeaderAccess(?Header $header, bool $edit = false): Header
+    {
+        if ($header === null) {
+            throw new RecordNotFoundException();
+        }
+
+        if ($edit && $header->canEdit()) {
+            return $header;
+        }
+
+        if ($header->canShow()) {
+            return $header;
+        }
+
+        throw new RecordAccessDeniedException();
+    }
+
+    /**
+     * @param Individual|null $individual
+     * @param bool            $edit
+     * @param bool            $chart      For some charts, we can show private records
+     *
+     * @return Individual
+     * @throws IndividualNotFoundException
+     * @throws IndividualAccessDeniedException
+     */
+    public static function checkIndividualAccess(?Individual $individual, bool $edit = false, $chart = false): Individual
+    {
+        if ($individual === null) {
+            throw new IndividualNotFoundException();
+        }
+
+        if ($edit && $individual->canEdit()) {
+            return $individual;
+        }
+
+        if ($chart && $individual->tree()->getPreference('SHOW_PRIVATE_RELATIONSHIPS') === '1') {
+            return $individual;
+        }
+
+        if ($individual->canShow()) {
+            return $individual;
+        }
+
+        throw new IndividualAccessDeniedException();
+    }
+
+    /**
+     * @param Media|null $media
+     * @param bool       $edit
+     *
+     * @return Media
+     * @throws MediaNotFoundException
+     * @throws MediaAccessDeniedException
+     */
+    public static function checkMediaAccess(?Media $media, bool $edit = false): Media
+    {
+        if ($media === null) {
+            throw new MediaNotFoundException();
+        }
+
+        if ($edit && $media->canEdit()) {
+            return $media;
+        }
+
+        if ($media->canShow()) {
+            return $media;
+        }
+
+        throw new MediaAccessDeniedException();
+    }
+
+    /**
+     * @param Note|null $note
+     * @param bool      $edit
+     *
+     * @return Note
+     * @throws NoteNotFoundException
+     * @throws NoteAccessDeniedException
+     */
+    public static function checkNoteAccess(?Note $note, bool $edit = false): Note
+    {
+        if ($note === null) {
+            throw new NoteNotFoundException();
+        }
+
+        if ($edit && $note->canEdit()) {
+            return $note;
+        }
+
+        if ($note->canShow()) {
+            return $note;
+        }
+
+        throw new NoteAccessDeniedException();
+    }
+
+    /**
+     * @param GedcomRecord|null $record
+     * @param bool              $edit
+     *
+     * @return GedcomRecord
+     * @throws RecordNotFoundException
+     * @throws RecordAccessDeniedException
+     */
+    public static function checkRecordAccess(?GedcomRecord $record, bool $edit = false): GedcomRecord
+    {
+        if ($record === null) {
+            throw new RecordNotFoundException();
+        }
+
+        if ($edit && $record->canEdit()) {
+            return $record;
+        }
+
+        if ($record->canShow()) {
+            return $record;
+        }
+
+        throw new RecordAccessDeniedException();
+    }
+
+    /**
+     * @param Repository|null $repository
+     * @param bool            $edit
+     *
+     * @return Repository
+     * @throws RepositoryNotFoundException
+     * @throws RepositoryAccessDeniedException
+     */
+    public static function checkRepositoryAccess(?Repository $repository, bool $edit = false): Repository
+    {
+        if ($repository === null) {
+            throw new RepositoryNotFoundException();
+        }
+
+        if ($edit && $repository->canEdit()) {
+            return $repository;
+        }
+
+        if ($repository->canShow()) {
+            return $repository;
+        }
+
+        throw new RepositoryAccessDeniedException();
+    }
+
+    /**
+     * @param Source|null $source
+     * @param bool        $edit
+     *
+     * @return Source
+     * @throws SourceNotFoundException
+     * @throws SourceAccessDeniedException
+     */
+    public static function checkSourceAccess(?Source $source, bool $edit = false): Source
+    {
+        if ($source === null) {
+            throw new SourceNotFoundException();
+        }
+
+        if ($edit && $source->canEdit()) {
+            return $source;
+        }
+
+        if ($source->canShow()) {
+            return $source;
+        }
+
+        throw new SourceAccessDeniedException();
+    }
+    
+    /*
+     * @param Submitter|null $submitter
+     * @param bool           $edit
+     *
+     * @return Submitter
+     * @throws RecordNotFoundException
+     * @throws RecordAccessDeniedException
+     */
+    public static function checkSubmitterAccess(?Submitter $submitter, bool $edit = false): Submitter
+    {
+        if ($submitter === null) {
+            throw new RecordNotFoundException();
+        }
+
+        if ($edit && $submitter->canEdit()) {
+            return $submitter;
+        }
+
+        if ($submitter->canShow()) {
+            return $submitter;
+        }
+
+        throw new RecordAccessDeniedException();
+    }
+
+    /*
+     * @param Submission|null $submission
+     * @param bool            $edit
+     *
+     * @return Submission
+     * @throws RecordNotFoundException
+     * @throws RecordAccessDeniedException
+     */
+    public static function checkSubmissionAccess(?Submission $submission, bool $edit = false): Submission
+    {
+        if ($submission === null) {
+            throw new RecordNotFoundException();
+        }
+
+        if ($edit && $submission->canEdit()) {
+            return $submission;
+        }
+
+        if ($submission->canShow()) {
+            return $submission;
+        }
+
+        throw new RecordAccessDeniedException();
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,39 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Schema;
 
-use Fisharebest\Webtrees\Database;
-use PDOException;
-
 /**
- * Upgrade the database schema from version 4 to version 5.
+ * Upgrade the database schema from version 4 to version 5 (webtrees 1.0.6).
  */
 class Migration4 implements MigrationInterface
 {
     /**
      * Upgrade to to the next version
+     *
+     * @return void
      */
-    public function upgrade()
+    public function upgrade(): void
     {
-        // Add support for sorting gedcoms non-alphabetically
-        // Also clean out some old/unused values and files.
-        try {
-            Database::exec("ALTER TABLE `##gedcom` ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0");
-        } catch (PDOException $ex) {
-            // If this fails, it has probably already been done.
-        }
-
-        try {
-            Database::exec("ALTER TABLE `##gedcom` ADD INDEX ix1 (sort_order)");
-        } catch (PDOException $ex) {
-            // If this fails, it has probably already been done.
-        }
-
-        // No longer used
-        Database::exec("DELETE FROM `##gedcom_setting` WHERE setting_name IN ('PAGE_AFTER_LOGIN')");
-
-        // Change of defaults - do not add ASSO, etc. to NOTE objects
-        Database::exec("UPDATE `##gedcom_setting` SET setting_value='SOUR' WHERE setting_value='ASSO,SOUR,NOTE,REPO' AND setting_name='NOTE_FACTS_ADD'");
+        // These migrations have been merged into migration 0.
+        // Direct upgrade from webtrees < 1.7.9 is not supported.
     }
 }

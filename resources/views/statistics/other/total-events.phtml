@@ -1,0 +1,50 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Statistics;
+
+/** @var Statistics $stats */
+?>
+
+<h4 class="border-bottom p-2 mb-4">
+    <?= I18N::translate('Total events') ?>
+    <span class="badge badge-secondary badge-pill float-right"><?= $stats->totalEvents() ?></span>
+</h4>
+
+<div class="mb-3">
+    <div class="card-deck">
+        <div class="col-12 col-md-6 mb-3">
+            <div class="card m-0">
+                <?php $type   = $stats->firstEventType() ?>
+                <?php $result = $stats->firstEvent() ?>
+                <h5 class="card-header">
+                    <?= I18N::translate('First event') ?>
+                    <?php if ($type) :
+                        ?><?= ' - ', $type ?><?php
+                    endif; ?>
+                </h5>
+                <div class="card-body">
+                    <?= $result ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 mb-3">
+            <div class="card m-0">
+                <?php $type   = $stats->lastEventType() ?>
+                <?php $result = $stats->lastEvent() ?>
+                <h5 class="card-header">
+                    <?= I18N::translate('Last event') ?>
+                    <?php if ($type) :
+                        ?><?= ' - ', $type ?><?php
+                    endif; ?>
+                </h5>
+                <div class="card-body">
+                    <?= $result ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

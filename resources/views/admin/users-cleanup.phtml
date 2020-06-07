@@ -1,0 +1,69 @@
+<?php
+
+use Fisharebest\Webtrees\Carbon;
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\UsersCleanupAction;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\User;
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route('admin-users') => I18N::translate('User administration'), $title]]) ?>
+
+<h1><?= $title ?></h1>
+
+<form method="post" action="<?= e(route(UsersCleanupAction::class)) ?>">
+    <?= csrf_field() ?>
+
+    <table class="table table-bordered">
+        <?php foreach ($inactive_users as $user) : ?>
+            <tr>
+                <td>
+                    <a href="<?= e(route('admin-users-edit', ['user_id' => $user->id()])) ?>">
+                        <?= e($user->userName()) ?>
+                        —
+                        <span dir="auto"><?= e($user->realName()) ?></span>
+                    </a>
+                </td>
+                <td>
+                    <?= I18N::translate('User’s account has been inactive too long: ') ?>
+                    <?= view('components/datetime', ['timestamp' => Carbon::createFromTimestamp(max((int) $user->getPreference(User::PREF_TIMESTAMP_REGISTERED), (int) $user->getPreference(User::PREF_TIMESTAMP_ACTIVE)))]) ?>
+                </td>
+                <td>
+                    <input type="checkbox" name="delete[]" value="<?= $user->id() ?>">
+                </td>
+            </tr>
+        <?php endforeach ?>
+
+        <?php foreach ($unverified_users as $user) : ?>
+            <tr>
+                <td>
+                    <a href="<?= e(route('admin-users-edit', ['user_id' => $user->id()])) ?>">
+                        <?= e($user->userName()) ?>
+                        —
+                        <span dir="auto"><?= e($user->realName()) ?></span>
+                    </a>
+                </td>
+                <td>
+                    <?= I18N::translate('User didn’t verify within 7 days.') ?>
+                    <?php if ($user->getPreference(User::PREF_IS_ACCOUNT_APPROVED) !== '1') : ?>
+                        <?= I18N::translate('User not verified by administrator.') ?>
+                    <?php endif ?>
+                </td>
+                <td>
+                    <input type="checkbox" name="delete[]" value="<?= $user->id() ?>">
+                </td>
+            </tr>
+        <?php endforeach ?>
+    </table>
+
+    <p>
+        <?php if ($inactive_users->isEmpty() && $unverified_users->isEmpty()) : ?>
+            <?= I18N::translate('Nothing found to cleanup') ?>
+        <?php else : ?>
+            <button type="submit" class="btn btn-primary">
+                <?= I18N::translate('delete') ?>
+            </button>
+        <?php endif ?>
+    </p>
+</form>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,7 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
+
+use function abs;
+use function count;
+use function is_object;
+use function ksort;
+use function str_replace;
+use function trim;
 
 /**
  * Class ReportHtmlTextbox
@@ -23,76 +34,77 @@ class ReportHtmlTextbox extends ReportBaseTextbox
     /**
      * Render the elements.
      *
-     * @param ReportHtml $renderer
+     * @param HtmlRenderer $renderer
+     *
+     * @return void
      */
     public function render($renderer)
     {
         // checkFootnote
-        $newelements      = array();
-        $lastelement      = array();
-        $footnote_element = array();
+        $newelements      = [];
+        $lastelement      = [];
+        $footnote_element = [];
         // Element counter
         $cE = count($this->elements);
         //-- collapse duplicate elements
         for ($i = 0; $i < $cE; $i++) {
             $element = $this->elements[$i];
-            if (is_object($element)) {
+            if ($element instanceof ReportBaseElement) {
                 if ($element instanceof ReportBaseText) {
                     if (!empty($footnote_element)) {
                         ksort($footnote_element);
                         foreach ($footnote_element as $links) {
                             $newelements[] = $links;
                         }
-                        $footnote_element = array();
+                        $footnote_element = [];
                     }
                     if (empty($lastelement)) {
                         $lastelement = $element;
                     } else {
                         // Checking if the Text has the same style
-                        if ($element->getStyleName() == $lastelement->getStyleName()) {
-                            $lastelement->addText(str_replace("\n", "<br>", $element->getValue()));
+                        if ($element->getStyleName() === $lastelement->getStyleName()) {
+                            $lastelement->addText(str_replace("\n", '<br>', $element->getValue()));
                         } elseif (!empty($lastelement)) {
                             $newelements[] = $lastelement;
                             $lastelement   = $element;
                         }
                     }
-                } // Collect the Footnote links
-                elseif ($element instanceof ReportBaseFootnote) {
+                } elseif ($element instanceof ReportHtmlFootnote) {
                     // Check if the Footnote has been set with it’s link number
                     $renderer->checkFootnote($element);
                     // Save first the last element if any
                     if (!empty($lastelement)) {
                         $newelements[] = $lastelement;
-                        $lastelement   = array();
+                        $lastelement   = [];
                     }
                     // Save the Footnote with it’s link number as key for sorting later
                     $footnote_element[$element->num] = $element;
-                } //-- do not keep empty footnotes
-                elseif (!($element instanceof ReportBaseFootnote) || trim($element->getValue()) != "") {
+                } elseif (trim($element->getValue()) !== '') {
+                    // Do not keep empty footnotes
                     if (!empty($footnote_element)) {
                         ksort($footnote_element);
                         foreach ($footnote_element as $links) {
                             $newelements[] = $links;
                         }
-                        $footnote_element = array();
+                        $footnote_element = [];
                     }
                     if (!empty($lastelement)) {
                         $newelements[] = $lastelement;
-                        $lastelement   = array();
+                        $lastelement   = [];
                     }
                     $newelements[] = $element;
                 }
             } else {
                 if (!empty($lastelement)) {
                     $newelements[] = $lastelement;
-                    $lastelement   = array();
+                    $lastelement   = [];
                 }
                 if (!empty($footnote_element)) {
                     ksort($footnote_element);
                     foreach ($footnote_element as $links) {
                         $newelements[] = $links;
                     }
-                    $footnote_element = array();
+                    $footnote_element = [];
                 }
                 $newelements[] = $element;
             }
@@ -107,28 +119,28 @@ class ReportHtmlTextbox extends ReportBaseTextbox
             }
         }
         $this->elements = $newelements;
-        unset($footnote_element, $lastelement, $links, $newelements);
+        unset($footnote_element, $lastelement, $newelements);
 
         $cP = 0; // Class Padding
 
         // Used with line breaks and cell height calculation within this box only
         $renderer->largestFontHeight = 0;
 
-        // Current position
-        if ($this->left == ".") {
+        // If current position (left)
+        if ($this->left === ReportBaseElement::CURRENT_POSITION) {
             $cX = $renderer->getX();
         } else {
             $cX = $this->left;
             $renderer->setX($cX);
         }
-        // Current position (top)
-        if ($this->top == ".") {
+        // If current position (top)
+        if ($this->top === ReportBaseElement::CURRENT_POSITION) {
             $this->top = $renderer->getY();
         } else {
             $renderer->setY($this->top);
         }
 
-        // Check the width if set to page wide OR set by xml to larger then page wide
+        // Check the width if set to page wide OR set by xml to larger then page width (margin)
         if ($this->width == 0 || $this->width > $renderer->getRemainingWidth()) {
             $this->width = $renderer->getRemainingWidth();
         }
@@ -152,7 +164,7 @@ class ReportHtmlTextbox extends ReportBaseTextbox
         // 0 => last line width
         // 1 => 1 if text was wrapped, 0 if text did not wrap
         // 2 => number of LF
-        $lw = array();
+        $lw = [];
         // Element counter
         $cE = count($this->elements);
         for ($i = 0; $i < $cE; $i++) {
@@ -180,6 +192,7 @@ class ReportHtmlTextbox extends ReportBaseTextbox
                 $fH += abs($renderer->getFootnotesHeight($cW));
             }
         }
+
         // Add up what’s the final height
         $cH = $this->height;
         // If any element exist
@@ -189,12 +202,12 @@ class ReportHtmlTextbox extends ReportBaseTextbox
                 // Number of LF but at least one line
                 $cHT = ($cHT + 1) * $renderer->cellHeightRatio;
                 // Calculate the cell hight with the largest font size used
-                $cHT = $cHT * $renderer->largestFontHeight;
+                $cHT *= $renderer->largestFontHeight;
                 if ($cH < $cHT) {
                     $cH = $cHT;
                 }
-            } // This is any other element
-            else {
+            } else {
+                // This is any other element
                 if ($cH < $eH) {
                     $cH = $eH;
                 }
@@ -214,28 +227,26 @@ class ReportHtmlTextbox extends ReportBaseTextbox
         $renderer->addMaxY($this->top + $cH);
 
         // Start to print HTML
-        echo "<div style=\"position:absolute;top:", $this->top, "pt;";
+        echo '<div style="position:absolute;top:', $this->top, 'pt;';
         // LTR (left) or RTL (right)
-        echo $renderer->alignRTL, ":", $cX, "pt;";
+        echo $renderer->alignRTL, ':', $cX, 'pt;';
         // Background color
-        if ($this->fill) {
-            if (!empty($this->bgcolor)) {
-                echo " background-color:", $this->bgcolor, ";";
-            }
+        if ($this->fill && $this->bgcolor !== '') {
+            echo ' background-color:', $this->bgcolor, ';';
         }
         // Print padding only when it’s set
         if ($this->padding) {
             // Use Cell around padding to support RTL also
-            echo "padding:", $cP, "pt;";
+            echo 'padding:', $cP, 'pt;';
         }
         // Border setup
         if ($this->border) {
-            echo " border:solid black 1pt;";
-            echo "width:", ($this->width - 1 - ($cP * 2)), "pt;height:", $cH - 1, "pt;";
+            echo ' border:solid black 1pt;';
+            echo 'width:', ($this->width - 1 - ($cP * 2)), 'pt;height:', $cH - 1, 'pt;';
         } else {
-            echo "width:", ($this->width - ($cP * 2)), "pt;height:", $cH, "pt;";
+            echo 'width:', ($this->width - ($cP * 2)), 'pt;height:', $cH, 'pt;';
         }
-        echo "\">";
+        echo '">';
 
         // Do a little "margin" trick before print
         // to get the correct current position => "."
@@ -245,11 +256,13 @@ class ReportHtmlTextbox extends ReportBaseTextbox
 
         // Print the text elements
         foreach ($this->elements as $element) {
-            if (is_object($element)) {
-                $element->render($renderer, $cX, false);
-            } elseif (is_string($element) && $element == "footnotetexts") {
+            if ($element instanceof ReportHtmlText) {
+                $element->render($renderer, false);
+            } elseif ($element instanceof ReportBaseElement) {
+                $element->render($renderer);
+            } elseif ($element === 'footnotetexts') {
                 $renderer->footnotes();
-            } elseif (is_string($element) && $element == "addpage") {
+            } elseif ($element === 'addpage') {
                 $renderer->addPage();
             }
         }

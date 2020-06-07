@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees;
 
 /**
@@ -23,7 +27,7 @@ class ColorGenerator
     /** @var int Current hue */
     private $hue;
 
-    /** @var int Initial hue*/
+    /** @var int Initial hue */
     private $basehue;
 
     /** @var int Saturation */
@@ -32,10 +36,10 @@ class ColorGenerator
     /** @var int Lightness */
     private $lightness;
 
-    /** @var int Initial lightness*/
+    /** @var int Initial lightness */
     private $baselightness;
 
-    /** @var int Alpha transparancy */
+    /** @var float Alpha transparancy */
     private $alpha;
 
     /** @var int Clockwise or anticlockwise color wheel */
@@ -44,13 +48,13 @@ class ColorGenerator
     /**
      * Create a color generator.
      *
-     * @param int $hue (0Deg = Red, 120Deg = green, 240Deg = blue)
-     * @param int $saturation
-     * @param int $lightness
-     * @param int $alpha
-     * @param int $range (sign determines direction. positive = clockwise, negative = anticlockwise)
+     * @param int   $hue        0Deg = Red, 120Deg = green, 240Deg = blue)
+     * @param int   $saturation
+     * @param int   $lightness
+     * @param float $alpha
+     * @param int   $range      sign determines direction. positive = clockwise, negative = anticlockwise
      */
-    public function __construct($hue, $saturation, $lightness, $alpha, $range)
+    public function __construct(int $hue, int $saturation, int $lightness, float $alpha, int $range)
     {
         $this->hue           = $hue;
         $this->basehue       = $hue;
@@ -73,14 +77,18 @@ class ColorGenerator
      *
      * @return string
      */
-    public function getNextColor($lightnessStep = 10, $hueStep = 15)
+    public function getNextColor(int $lightnessStep = 10, int $hueStep = 15): string
     {
         $lightness = $this->lightness + $lightnessStep;
         $hue       = $this->hue;
 
         if ($lightness >= 100) {
             $lightness = $this->baselightness;
-            $hue += $hueStep * (abs($this->range) / $this->range);
+            if ($this->range > 0) {
+                $hue += $hueStep;
+            } else {
+                $hue -= $hueStep;
+            }
             if (($hue - $this->basehue) * ($hue - ($this->basehue + $this->range)) >= 0) {
                 $hue = $this->basehue;
             }
@@ -88,10 +96,6 @@ class ColorGenerator
         }
         $this->lightness = $lightness;
 
-        return sprintf("hsla(%s, %s%%, %s%%, %s)",
-            $this->hue,
-            $this->saturation,
-            $this->lightness,
-            $this->alpha);
+        return sprintf('hsla(%d, %d%%, %d%%, %0.2f)', $this->hue, $this->saturation, $this->lightness, $this->alpha);
     }
 }

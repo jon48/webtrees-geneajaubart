@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,26 +14,48 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Menu;
+use Fisharebest\Webtrees\Tree;
 
 /**
  * Interface ModuleMenuInterface - Classes and libraries for module system
  */
-interface ModuleMenuInterface
+interface ModuleMenuInterface extends ModuleInterface
 {
     /**
-     * The user can re-order menus. Until they do, they are shown in this order.
+     * Users change change the order of menus using the control panel.
+     *
+     * @param int $menu_order
+     *
+     * @return void
+     */
+    public function setMenuOrder(int $menu_order): void;
+
+    /**
+     * Users change change the order of menus using the control panel.
      *
      * @return int
      */
-    public function defaultMenuOrder();
+    public function getMenuOrder(): int;
+
+    /**
+     * The default position for this menu.  It can be changed in the control panel.
+     *
+     * @return int
+     */
+    public function defaultMenuOrder(): int;
 
     /**
      * A menu, to be added to the main application menu.
      *
+     * @param Tree $tree
+     *
      * @return Menu|null
      */
-    public function getMenu();
+    public function getMenu(Tree $tree): ?Menu;
 }

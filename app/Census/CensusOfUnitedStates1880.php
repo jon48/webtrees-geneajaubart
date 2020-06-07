@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfUnitedStates1880 extends CensusOfUnitedStates implements CensusInt
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return 'JUN 1880';
     }
@@ -35,14 +39,14 @@ class CensusOfUnitedStates1880 extends CensusOfUnitedStates implements CensusInt
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnFullName($this, 'Name', 'Name'),
             new CensusColumnAge($this, 'Age', 'Age'),
             new CensusColumnSexMF($this, 'Sex', 'Sex'),
             new CensusColumnMonthIfBornWithinYear($this, 'Mon', 'If born within the year, state month'),
-            new CensusColumnRelationToHead($this, 'Relation', 'Relation to head of household'),
+            new CensusColumnRelationToHeadEnglish($this, 'Relation', 'Relation to head of household'),
             new CensusColumnNull($this, 'S', 'Single'),
             new CensusColumnNull($this, 'M', 'Married'),
             new CensusColumnNull($this, 'W/D', 'Widowed, Divorced'),
@@ -61,6 +65,6 @@ class CensusOfUnitedStates1880 extends CensusOfUnitedStates implements CensusInt
             new CensusColumnBirthPlaceSimple($this, 'BP', 'Place of birth, naming the state, territory, or country'),
             new CensusColumnFatherBirthPlaceSimple($this, 'FBP', 'Place of birth of father, naming the state, territory, or country'),
             new CensusColumnMotherBirthPlaceSimple($this, 'MBP', 'Place of birth of mother, naming the state, territory, or country'),
-        );
+        ];
     }
 }

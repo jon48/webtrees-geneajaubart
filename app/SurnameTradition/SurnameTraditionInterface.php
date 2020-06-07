@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\SurnameTradition;
 
 /**
@@ -26,14 +30,14 @@ interface SurnameTraditionInterface
      *
      * @return bool
      */
-    public function hasMarriedNames();
+    public function hasMarriedNames(): bool;
 
     /**
      * Does this surname tradition use surnames?
      *
      * @return bool
      */
-    public function hasSurnames();
+    public function hasSurnames(): bool;
 
     /**
      * What names are given to a new child
@@ -44,7 +48,7 @@ interface SurnameTraditionInterface
      *
      * @return string[] Associative array of GEDCOM name parts (SURN, _MARNM, etc.)
      */
-    public function newChildNames($father_name, $mother_name, $child_sex);
+    public function newChildNames(string $father_name, string $mother_name, string $child_sex): array;
 
     /**
      * What names are given to a new parent
@@ -54,7 +58,7 @@ interface SurnameTraditionInterface
      *
      * @return string[] Associative array of GEDCOM name parts (SURN, _MARNM, etc.)
      */
-    public function newParentNames($child_name, $parent_sex);
+    public function newParentNames(string $child_name, string $parent_sex): array;
 
     /**
      * What names are given to a new spouse
@@ -64,5 +68,5 @@ interface SurnameTraditionInterface
      *
      * @return string[] Associative array of GEDCOM name parts (SURN, _MARNM, etc.)
      */
-    public function newSpouseNames($spouse_name, $spouse_sex);
+    public function newSpouseNames(string $spouse_name, string $spouse_sex): array;
 }

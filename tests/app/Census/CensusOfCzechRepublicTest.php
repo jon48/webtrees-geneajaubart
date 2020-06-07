@@ -14,19 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
+
+use Fisharebest\Webtrees\TestCase;
 
 /**
  * Test harness for the class CensusOfCzechRepublic
  */
-class CensusOfCzechRepublicTest extends \PHPUnit_Framework_TestCase
+class CensusOfCzechRepublicTest extends TestCase
 {
     /**
      * Test the census place
      *
-     * @covers Fisharebest\Webtrees\Census\CensusOfCzechRepublic
+     * @covers \Fisharebest\Webtrees\Census\CensusOfCzechRepublic
+     *
+     * @return void
      */
-    public function testPlace()
+    public function testPlace(): void
     {
         $census = new CensusOfCzechRepublic();
 
@@ -34,18 +41,37 @@ class CensusOfCzechRepublicTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test the census language
+     *
+     * @covers \Fisharebest\Webtrees\Census\CensusOfCzechRepublic
+     *
+     * @return void
+     */
+    public function testLanguage(): void
+    {
+        $census = new CensusOfCzechRepublic();
+
+        $this->assertSame('cs', $census->censusLanguage());
+    }
+
+    /**
      * Test the census dates
      *
-     * @covers Fisharebest\Webtrees\Census\CensusOfCzechRepublic
+     * @covers \Fisharebest\Webtrees\Census\CensusOfCzechRepublic
+     *
+     * @return void
      */
-    public function testAllDates()
+    public function testAllDates(): void
     {
-        $census  = new CensusOfCzechRepublic();
+        $census = new CensusOfCzechRepublic();
 
         $census_dates = $census->allCensusDates();
 
-        $this->assertCount(2, $census_dates);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfCzechRepublic1880', $census_dates[0]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfCzechRepublic1921', $census_dates[1]);
+        $this->assertCount(5, $census_dates);
+        $this->assertInstanceOf(CensusOfCzechRepublic1880::class, $census_dates[0]);
+        $this->assertInstanceOf(CensusOfCzechRepublic1890::class, $census_dates[1]);
+        $this->assertInstanceOf(CensusOfCzechRepublic1900::class, $census_dates[2]);
+        $this->assertInstanceOf(CensusOfCzechRepublic1910::class, $census_dates[3]);
+        $this->assertInstanceOf(CensusOfCzechRepublic1921::class, $census_dates[4]);
     }
 }

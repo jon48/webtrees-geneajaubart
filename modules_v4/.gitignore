@@ -1,0 +1,10 @@
+# Ignore everything in this directory
+# This is a behaviour different from the upstream webtrees
+*
+
+# Except the example modules and the README
+!/example*
+!/README.md
+
+# And of course itself
+!.gitignore

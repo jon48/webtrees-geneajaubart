@@ -1,0 +1,123 @@
+<?php
+
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\PendingChangesLogData;
+use Fisharebest\Webtrees\Http\RequestHandlers\PendingChangesLogDelete;
+use Fisharebest\Webtrees\Http\RequestHandlers\PendingChangesLogDownload;
+use Fisharebest\Webtrees\Http\RequestHandlers\PendingChangesLogPage;
+use Fisharebest\Webtrees\I18N;
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route('manage-trees', ['tree' => $tree->name()]) => I18N::translate('Manage family trees'), $title]]) ?>
+
+<h1><?= $title ?></h1>
+
+<form method="post" class="form" name="logs">
+    <?= csrf_field() ?>
+
+    <div class="row">
+        <div class="form-group col-sm-6 col-md-3">
+            <label for="from">
+                <?= I18N::translateContext('Start of date range', 'From') ?>
+            </label>
+            <input type="date" class="form-control" id="from" max="<?= e($latest) ?>" min="<?= e($earliest) ?>" name="from" value="<?= e($from) ?>" required>
+        </div>
+
+        <div class="form-group col-sm-6 col-md-3">
+            <label for="to">
+                <?= I18N::translateContext('End of date range', 'To') ?>
+            </label>
+            <input type="date" class="form-control" id="to" max="<?= e($latest) ?>" min="<?= e($earliest) ?>"  name="to" value="<?= e($to) ?>" required>
+        </div>
+
+        <div class="form-group col-sm-6 col-md-3">
+            <label for="type">
+                <?= I18N::translate('Status') ?>
+            </label>
+            <?= view('components/select', ['name' => 'type', 'selected' => $type, 'options' => $statuses]) ?>
+        </div>
+
+        <div class="form-group col-sm-6 col-md-3">
+            <label for="xref">
+                <?= I18N::translate('Record') ?>
+            </label>
+            <input class="form-control" type="text" id="xref" name="xref" value="<?= e($xref) ?>">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-sm-6 col-md-3">
+            <label for="oldged">
+                <?= I18N::translate('Old data') ?>
+            </label>
+            <input class="form-control" type="text" id="oldged" name="oldged" value="<?= e($oldged) ?>">
+        </div>
+
+        <div class="form-group col-sm-6 col-md-3">
+            <label for="newged">
+                <?= I18N::translate('New data') ?>
+            </label>
+            <input class="form-control" type="text" id="newged" name="newged" value="<?= e($newged) ?>">
+        </div>
+
+        <div class="form-group col-sm-6 col-md-3">
+            <label for="username">
+                <?= I18N::translate('User') ?>
+            </label>
+            <?= view('components/select', ['name' => 'username', 'selected' => $username, 'options' => $users]) ?>
+        </div>
+
+        <div class="form-group col-sm-6 col-md-3">
+            <label for="tree">
+                <?= I18N::translate('Family tree') ?>
+            </label>
+            <?= view('components/select', ['name' => 'tree', 'selected' => $tree->name(), 'options' => $trees]) ?>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">
+            <?= view('icons/search') ?>
+            <?= I18N::translate('search') ?>
+        </button>
+
+        <a href="<?= e(route(PendingChangesLogPage::class, ['tree' => $tree->name()])) ?>" type="submit" class="btn btn-secondary">
+            <?= view('icons/cancel') ?>
+            <?= /* I18N: A button label. */ I18N::translate('reset') ?>
+        </a>
+        <a class="btn btn-secondary" href="<?= (route(PendingChangesLogDownload::class, ['from' => $from, 'to' => $to, 'type' => $type, 'xref' => $xref, 'oldged' => $oldged, 'newged' => $newged, 'tree' => $tree->name(), 'username' => $username])) ?>">
+            <?= view('icons/download') ?>
+            <?= /* I18N: A button label. */ I18N::translate('download') ?>
+        </a>
+
+        <a href="#" class="btn btn-danger" data-confirm="<?= I18N::translate('Permanently delete these records?') ?>" data-post-url="<?= (route(PendingChangesLogDelete::class, ['from' => $from, 'to' => $to, 'type' => $type, 'xref' => $xref, 'oldged' => $oldged, 'newged' => $newged, 'tree' => $tree->name(), 'username' => $username])) ?>">
+        <?= view('icons/delete') ?>
+            <?= I18N::translate('delete') ?>
+        </a>
+    </div>
+</form>
+
+<table
+    class="table table-bordered table-sm table-hover table-site-changes datatables d-none"
+    <?= view('lists/datatables-attributes') ?>
+    data-ajax="<?= route(PendingChangesLogData::class, ['from' => $from, 'to' => $to, 'type' => $type, 'xref' => $xref, 'oldged' => $oldged, 'newged' => $newged, 'tree' => $tree->name(), 'username' => $username]) ?>"
+    data-server-side="true"
+    data-sorting="<?= e('[[ 0, "desc" ]]') ?>"
+>
+    <caption class="sr-only">
+        <?= $title ?>
+    </caption>
+
+    <thead>
+        <tr>
+            <th data-visible="false"></th>
+            <th><?= I18N::translate('Timestamp') ?></th>
+            <th><?= I18N::translate('Status') ?></th>
+            <th><?= I18N::translate('Record') ?></th>
+            <th data-sortable="false"><?= I18N::translate('Data') ?></th>
+            <th><?= I18N::translate('User') ?></th>
+            <th><?= I18N::translate('Family tree') ?></th>
+        </tr>
+    </thead>
+</table>

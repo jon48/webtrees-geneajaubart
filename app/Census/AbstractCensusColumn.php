@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,11 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Individual;
+
+use function array_slice;
+use function explode;
+use function implode;
 
 /**
  * Definitions for a census column
@@ -37,10 +45,10 @@ class AbstractCensusColumn
      * Create a column for a census
      *
      * @param CensusInterface $census - The census to which this column forms part.
-     * @param string          $abbr   - The abbrievated on-screen name "BiC"
+     * @param string          $abbr   - The abbreviated on-screen name "BiC"
      * @param string          $title  - The full column heading "Born in the county"
      */
-    public function __construct(CensusInterface $census, $abbr, $title)
+    public function __construct(CensusInterface $census, string $abbr, string $title)
     {
         $this->census = $census;
         $this->abbr   = $abbr;
@@ -52,33 +60,9 @@ class AbstractCensusColumn
      *
      * @return string
      */
-    public function abbreviation()
+    public function abbreviation(): string
     {
         return $this->abbr;
-    }
-
-    /**
-     * Extract the country (last part) of a place name.
-     *
-     * @param string $place - e.g. "London, England"
-     *
-     * @return string - e.g. "England"
-     */
-    protected function lastPartOfPlace($place)
-    {
-        $place = explode(', ', $place);
-
-        return end($place);
-    }
-
-    /**
-     * When did this census occur
-     *
-     * @return Date
-     */
-    public function date()
-    {
-        return new Date($this->census->censusDate());
     }
 
     /**
@@ -88,15 +72,15 @@ class AbstractCensusColumn
      *
      * @return Individual|null
      */
-    public function father(Individual $individual)
+    public function father(Individual $individual): ?Individual
     {
-        $family = $individual->getPrimaryChildFamily();
+        $family = $individual->childFamilies()->first();
 
-        if ($family) {
-            return $family->getHusband();
-        } else {
-            return null;
+        if ($family instanceof Family) {
+            return $family->husband();
         }
+
+        return null;
     }
 
     /**
@@ -106,43 +90,15 @@ class AbstractCensusColumn
      *
      * @return Individual|null
      */
-    public function mother(Individual $individual)
+    public function mother(Individual $individual): ?Individual
     {
-        $family = $individual->getPrimaryChildFamily();
+        $family = $individual->childFamilies()->first();
 
-        if ($family) {
-            return $family->getWife();
-        } else {
-            return null;
+        if ($family instanceof Family) {
+            return $family->wife();
         }
-    }
 
-    /**
-     * Remove the country of a place name, where it is the same as the census place
-     *
-     * @param string $place - e.g. "London, England"
-     *
-     * @return string - e.g. "London" (for census of England) and "London, England" elsewhere
-     */
-    protected function notCountry($place)
-    {
-        $parts = explode(', ', $place);
-
-        if (end($parts) === $this->place()) {
-            return implode(', ', array_slice($parts, 0, -1));
-        } else {
-            return $place;
-        }
-    }
-
-    /**
-     * Where did this census occur
-     *
-     * @return string
-     */
-    public function place()
-    {
-        return $this->census->censusPlace();
+        return null;
     }
 
     /**
@@ -152,25 +108,25 @@ class AbstractCensusColumn
      *
      * @return Family|null
      */
-    public function spouseFamily(Individual $individual)
+    public function spouseFamily(Individual $individual): ?Family
     {
-        // Exclude families that were created after this census date
-        $families = array();
-        foreach ($individual->getSpouseFamilies() as $family) {
-            if (Date::compare($family->getMarriageDate(), $this->date()) <= 0) {
-                $families[] = $family;
-            }
-        }
+        return $individual->spouseFamilies()
+            ->filter(function (Family $family): bool {
+                // Exclude families that were created after this census date
+                return Date::compare($family->getMarriageDate(), $this->date()) <= 0;
+            })
+            ->sort(Family::marriageDateComparator())
+            ->last();
+    }
 
-        if (empty($families)) {
-            return null;
-        } else {
-            usort($families, function (Family $x, Family $y) {
-                return Date::compare($x->getMarriageDate(), $y->getMarriageDate());
-            });
-
-            return end($families);
-        }
+    /**
+     * When did this census occur
+     *
+     * @return Date
+     */
+    public function date(): Date
+    {
+        return new Date($this->census->censusDate());
     }
 
     /**
@@ -178,8 +134,50 @@ class AbstractCensusColumn
      *
      * @return string
      */
-    public function title()
+    public function title(): string
     {
         return $this->title;
+    }
+
+    /**
+     * Extract the country (last part) of a place name.
+     *
+     * @param string $place - e.g. "London, England"
+     *
+     * @return string - e.g. "England"
+     */
+    protected function lastPartOfPlace(string $place): string
+    {
+        $parts = explode(', ', $place);
+
+        return end($parts);
+    }
+
+    /**
+     * Remove the country of a place name, where it is the same as the census place
+     *
+     * @param string $place - e.g. "London, England"
+     *
+     * @return string - e.g. "London" (for census of England) and "London, England" elsewhere
+     */
+    protected function notCountry(string $place): string
+    {
+        $parts = explode(', ', $place);
+
+        if (end($parts) === $this->place()) {
+            return implode(', ', array_slice($parts, 0, -1));
+        }
+
+        return $place;
+    }
+
+    /**
+     * Where did this census occur
+     *
+     * @return string
+     */
+    public function place(): string
+    {
+        return $this->census->censusPlace();
     }
 }

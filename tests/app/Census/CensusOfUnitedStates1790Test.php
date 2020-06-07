@@ -14,19 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
+
+use Fisharebest\Webtrees\TestCase;
 
 /**
  * Test harness for the class CensusOfUnitedStates1790
  */
-class CensusOfUnitedStates1790Test extends \PHPUnit_Framework_TestCase
+class CensusOfUnitedStates1790Test extends TestCase
 {
     /**
      * Test the census place and date
      *
-     * @covers Fisharebest\Webtrees\Census\CensusOfUnitedStates1790
+     * @covers \Fisharebest\Webtrees\Census\CensusOfUnitedStates1790
+     *
+     * @return void
      */
-    public function testPlaceAndDate()
+    public function testPlaceAndDate(): void
     {
         $census = new CensusOfUnitedStates1790();
 
@@ -37,23 +44,25 @@ class CensusOfUnitedStates1790Test extends \PHPUnit_Framework_TestCase
     /**
      * Test the census columns
      *
-     * @covers Fisharebest\Webtrees\Census\CensusOfUnitedStates1790
-     * @covers Fisharebest\Webtrees\Census\AbstractCensusColumn
+     * @covers \Fisharebest\Webtrees\Census\CensusOfUnitedStates1790
+     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
+     *
+     * @return void
      */
-    public function testColumns()
+    public function testColumns(): void
     {
         $census  = new CensusOfUnitedStates1790();
         $columns = $census->columns();
 
         $this->assertCount(8, $columns);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusColumnFullName', $columns[0]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusColumnOccupation', $columns[1]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusColumnNull', $columns[2]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusColumnNull', $columns[3]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusColumnNull', $columns[4]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusColumnNull', $columns[5]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusColumnNull', $columns[6]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusColumnNull', $columns[7]);
+        $this->assertInstanceOf(CensusColumnFullName::class, $columns[0]);
+        $this->assertInstanceOf(CensusColumnOccupation::class, $columns[1]);
+        $this->assertInstanceOf(CensusColumnNull::class, $columns[2]);
+        $this->assertInstanceOf(CensusColumnNull::class, $columns[3]);
+        $this->assertInstanceOf(CensusColumnNull::class, $columns[4]);
+        $this->assertInstanceOf(CensusColumnNull::class, $columns[5]);
+        $this->assertInstanceOf(CensusColumnNull::class, $columns[6]);
+        $this->assertInstanceOf(CensusColumnNull::class, $columns[7]);
 
         $this->assertSame('Name', $columns[0]->abbreviation());
         $this->assertSame('Occupation', $columns[1]->abbreviation());

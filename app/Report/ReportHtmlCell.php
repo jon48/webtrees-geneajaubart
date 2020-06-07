@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,7 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
+
+use function str_replace;
+use function stripos;
+use function strpos;
 
 /**
  * Class ReportHtmlCell
@@ -23,19 +31,27 @@ class ReportHtmlCell extends ReportBaseCell
     /**
      * HTML Cell renderer
      *
-     * @param ReportHtml $renderer
+     * @param HtmlRenderer $renderer
+     *
+     * @return void
      */
     public function render($renderer)
     {
-        if (strpos($this->text, "{{:ptp:}}") !== false) {
+        if (strpos($this->text, '{{:ptp:}}') !== false) {
             return;
         }
-        $temptext = str_replace("#PAGENUM#", $renderer->pageNo(), $this->text);
+        $temptext = str_replace('#PAGENUM#', (string) $renderer->pageNo(), $this->text);
         // underline «title» part of Source item
-        $temptext = str_replace(array('«', '»'), array('<u>', '</u>'), $temptext);
+        $temptext = str_replace([
+            '«',
+            '»',
+        ], [
+            '<u>',
+            '</u>',
+        ], $temptext);
 
-        // Setup the style name
-        if ($renderer->getCurrentStyle() != $this->styleName) {
+        // Set up the text style
+        if ($renderer->getCurrentStyle() !== $this->styleName) {
             $renderer->setCurrentStyle($this->styleName);
         }
 
@@ -43,82 +59,84 @@ class ReportHtmlCell extends ReportBaseCell
         $cP = $renderer->cPadding;
 
         // Adjust the positions
-        if ($this->left == ".") {
+        if ($this->left === ReportBaseElement::CURRENT_POSITION) {
             $this->left = $renderer->getX();
         } else {
             $renderer->setX($this->left);
         }
 
-        if ($this->top == ".") {
+        if ($this->top === ReportBaseElement::CURRENT_POSITION) {
             $this->top = $renderer->getY();
         } else {
             $renderer->setY($this->top);
         }
 
         // Start collecting the HTML code
-        echo "<div class=\"", $this->styleName, "\" style=\"position:absolute;top:", $this->top, "pt;";
+        echo '<div class="', $this->styleName, '" style="position:absolute;top:', $this->top, 'pt;';
         // Use Cell around padding to support RTL also
-        echo "padding:", $cP, "pt;";
+        echo 'padding:', $cP, 'pt;';
         // LTR (left) or RTL (right)
-        echo $renderer->alignRTL, ":", $this->left, "pt;";
+        echo $renderer->alignRTL, ':', $this->left, 'pt;';
+
         // Background color
         if (!empty($this->bgcolor)) {
-            echo "background-color:", $this->bgcolor, ";";
+            echo 'background-color:', $this->bgcolor, ';';
         }
-        // Border setup
+
+        // Borders
         $bpixX = 0;
         $bpixY = 0;
         if (!empty($this->border)) {
             // Border all around
             if ($this->border == 1) {
-                echo " border:solid ";
+                echo ' border:solid ';
                 if (!empty($this->bocolor)) {
                     echo $this->bocolor;
                 } else {
-                    echo "black";
+                    echo 'black';
                 }
-                echo " 1pt;";
+                echo ' 1pt;';
                 $bpixX = 1;
                 $bpixY = 1;
             } else {
-                if (stripos($this->border, "T") !== false) {
-                    echo " border-top:solid ";
+                if (stripos($this->border, 'T') !== false) {
+                    echo ' border-top:solid ';
                     if (!empty($this->bocolor)) {
                         echo $this->bocolor;
                     } else {
-                        echo "black";
+                        echo 'black';
                     }
-                    echo " 1pt;";
+                    echo ' 1pt;';
                     $bpixY = 1;
                 }
-                if (stripos($this->border, "B") !== false) {
-                    echo " border-bottom:solid ";
+                if (stripos($this->border, 'B') !== false) {
+                    echo ' border-bottom:solid ';
                     if (!empty($this->bocolor)) {
                         echo $this->bocolor;
                     } else {
-                        echo "black";
+                        echo 'black';
                     }
-                    echo " 1pt;";
+                    echo ' 1pt;';
                     $bpixY = 1;
                 }
-                if (stripos($this->border, "R") !== false) {
-                    echo " border-right:solid ";
+                if (stripos($this->border, 'R') !== false) {
+                    echo ' border-right:solid ';
                     if (!empty($this->bocolor)) {
                         echo $this->bocolor;
                     } else {
-                        echo "black";
+                        echo 'black';
                     }
-                    echo " 1pt;";
+                    echo ' 1pt;';
                     $bpixX = 1;
                 }
-                if (stripos($this->border, "L") !== false) {
-                    echo " border-left:solid ";
+                if (stripos($this->border, 'L') !== false) {
+                    echo ' border-left:solid ';
                     if (!empty($this->bocolor)) {
                         echo $this->bocolor;
                     } else {
-                        echo "black";
+                        echo 'black';
                     }
-                    echo " 1pt;";
+                    echo ' 1pt;';
                     $bpixX = 1;
                 }
             }
@@ -141,53 +159,54 @@ class ReportHtmlCell extends ReportBaseCell
                 $this->height = $tmph;
             }
         }
-        // Check the last cell height and ajust with the current cell height
+        // Check the last cell height and adjust the current cell height if needed
         if ($renderer->lastCellHeight > $this->height) {
             $this->height = $renderer->lastCellHeight;
         }
-        echo " width:", $cW - $bpixX, "pt;height:", $this->height - $bpixY, "pt;";
+        echo ' width:', $cW - $bpixX, 'pt;height:', $this->height - $bpixY, 'pt;';
 
         // Text alignment
         switch ($this->align) {
-            case "C":
-                echo " text-align:center;";
+            case 'C':
+                echo ' text-align:center;';
                 break;
-            case "L":
-                echo " text-align:left;";
+            case 'L':
+                echo ' text-align:left;';
                 break;
-            case "R":
-                echo " text-align:right;";
+            case 'R':
+                echo ' text-align:right;';
                 break;
         }
 
         // Print the collected HTML code
-        echo "\">";
+        echo '">';
 
         // Print URL
         if (!empty($this->url)) {
-            echo "<a href=\"", $this->url, "\">";
+            echo '<a href="', $this->url, '">';
         }
         // Print any text if exists
         if (!empty($temptext)) {
             $renderer->write($temptext, $this->tcolor, false);
         }
         if (!empty($this->url)) {
-            echo "</a>";
+            echo '</a>';
         }
         // Finish the cell printing and start to clean up
         echo "</div>\n";
+
         // Where to place the next position
-        // -> Next to this cell in the same line
         if ($this->newline == 0) {
+            // -> Next to this cell in the same line
             $renderer->setXy($this->left + $this->width, $this->top);
             $renderer->lastCellHeight = $this->height;
-        } // -> On a new line at the margin - Default
-        elseif ($this->newline == 1) {
+        } elseif ($this->newline == 1) {
+            // -> On a new line at the margin - Default
             $renderer->setXy(0, $renderer->getY() + $this->height + ($cP * 2));
             // Reset the last cell height for the next line
             $renderer->lastCellHeight = 0;
-        } // -> On a new line at the end of this cell
-        elseif ($this->newline == 2) {
+        } elseif ($this->newline == 2) {
+            // -> On a new line at the end of this cell
             $renderer->setXy($renderer->getX() + $this->width, $renderer->getY() + $this->height + ($cP * 2));
             // Reset the last cell height for the next line
             $renderer->lastCellHeight = 0;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfCzechRepublic1880 extends CensusOfCzechRepublic implements CensusI
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '31 DEC 1880';
     }
@@ -35,23 +39,22 @@ class CensusOfCzechRepublic1880 extends CensusOfCzechRepublic implements CensusI
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnFullName($this, 'Jméno', ''),
-            new CensusColumnSexMZ($this, 'Pohlaví', ''),
             new CensusColumnRelationToHead($this, 'Vztah', ''),
+            new CensusColumnSexMZ($this, 'Pohlaví', ''),
             new CensusColumnBirthDaySlashMonthYear($this, 'Narození', 'Datum narození'),
-            new CensusColumnBirthPlace($this, 'Místo', 'Místo narození'),
+            new CensusColumnBirthPlace($this, 'Rodiště', 'Místo narození'),
             new CensusColumnNull($this, 'Přísluší', 'Domovské právo'),
             new CensusColumnReligion($this, 'Vyznání', ''),
             new CensusColumnNull($this, 'Stav', 'Rodinný stav'),
             new CensusColumnNull($this, 'Jazyk', 'Jazyk v obcování'),
             new CensusColumnOccupation($this, 'Povolání', ''),
             new CensusColumnNull($this, 'Postavení', 'Postavení v zaměstnání'),
-            new CensusColumnNull($this, '', ''),
-            new CensusColumnNull($this, '', ''),
-            new CensusColumnNull($this, '', ''),
-        );
+            new CensusColumnNull($this, 'Gramotnost', 'Znalost čtení a psaní'),
+            new CensusColumnNull($this, 'Druh pobytu', 'Pobyt dočasný nebo trvalý'),
+        ];
     }
 }

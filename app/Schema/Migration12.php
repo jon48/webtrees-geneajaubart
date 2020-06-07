@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Fisharebest\Webtrees\Schema;
 
-use Fisharebest\Webtrees\Database;
-use PDOException;
+declare(strict_types=1);
+
+namespace Fisharebest\Webtrees\Schema;
 
 /**
  * Upgrade the database schema from version 12 to version 13.
@@ -24,21 +25,13 @@ use PDOException;
 class Migration12 implements MigrationInterface
 {
     /**
-     * Upgrade to to the next version
+     * Upgrade to to the next version.
+     *
+     * @return void
      */
-    public function upgrade()
+    public function upgrade(): void
     {
-        // Delete old config settings
-
-        // Convert MULTI_MEDIA (0=false, 1=true) to MEDIA_UPLOAD (1=members, 0=managers, -1=nobody)
-        try {
-            Database::exec("UPDATE `##gedcom_setting` SET setting_name='MEDIA_UPLOAD' WHERE setting_name='MULTI_MEDIA'");
-        } catch (PDOException $ex) {
-            // This could theoretically cause a duplicate key error, if a MULTI_MEDIA setting already exists
-        }
-
-        // Remove old settings
-        Database::exec("DELETE FROM `##gedcom_setting` WHERE setting_name IN ('SHOW_MEDIA_FILENAME', 'USE_THUMBS_MAIN', 'MULTI_MEDIA')");
-        Database::exec("DELETE FROM `##default_resn` WHERE tag_type IN ('_PRIM')");
+        // These migrations have been merged into migration 0.
+        // Direct upgrade from webtrees < 1.7.9 is not supported.
     }
 }

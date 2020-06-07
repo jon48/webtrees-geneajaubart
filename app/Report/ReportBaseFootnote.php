@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,7 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
+
+use function strpos;
 
 /**
  * Class ReportBaseFootnote
@@ -25,7 +31,7 @@ class ReportBaseFootnote extends ReportBaseElement
      *
      * @var string
      */
-    public $styleName = "";
+    public $styleName = '';
 
     /**
      * Numbers for the links
@@ -39,7 +45,7 @@ class ReportBaseFootnote extends ReportBaseElement
      *
      * @var string
      */
-    public $numText = "";
+    public $numText = '';
 
     /**
      * Remaining width of a cell
@@ -63,25 +69,25 @@ class ReportBaseFootnote extends ReportBaseElement
      *
      * @param string $style
      */
-    public function __construct($style = "")
+    public function __construct($style = '')
     {
-        $this->text = "";
+        $this->text = '';
         if (!empty($style)) {
             $this->styleName = $style;
         } else {
-            $this->styleName = "footnote";
+            $this->styleName = 'footnote';
         }
     }
 
     /**
      * Set the width to wrap text.
      *
-     * @param $wrapwidth
-     * @param $cellwidth
+     * @param float $wrapwidth
+     * @param float $cellwidth
      *
-     * @return mixed
+     * @return float
      */
-    public function setWrapWidth($wrapwidth, $cellwidth)
+    public function setWrapWidth(float $wrapwidth, float $cellwidth): float
     {
         $this->wrapWidthCell = $cellwidth;
         if (strpos($this->numText, "\n") !== false) {
@@ -96,29 +102,25 @@ class ReportBaseFootnote extends ReportBaseElement
     /**
      * Set the number.
      *
-     * @param $n
+     * @param int $n
      *
-     * @return int
+     * @return void
      */
-    public function setNum($n)
+    public function setNum(int $n): void
     {
         $this->num     = $n;
-        $this->numText = "$n ";
-
-        return 0;
+        $this->numText = $n . ' ';
     }
 
     /**
      * Add a link.
      *
-     * @param $a
+     * @param string $a
      *
-     * @return int
+     * @return void
      */
-    public function setAddlink($a)
+    public function setAddlink(string $a)
     {
         $this->addlink = $a;
-
-        return 0;
     }
 }

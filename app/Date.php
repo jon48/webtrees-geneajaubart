@@ -1,7 +1,8 @@
 <?php
+
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,10 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees;
 
+use DomainException;
 use Fisharebest\ExtCalendar\GregorianCalendar;
-use Fisharebest\Webtrees\Date\CalendarDate;
+use Fisharebest\Webtrees\Date\AbstractCalendarDate;
 use Fisharebest\Webtrees\Date\FrenchDate;
 use Fisharebest\Webtrees\Date\GregorianDate;
 use Fisharebest\Webtrees\Date\HijriDate;
@@ -24,6 +29,11 @@ use Fisharebest\Webtrees\Date\JalaliDate;
 use Fisharebest\Webtrees\Date\JewishDate;
 use Fisharebest\Webtrees\Date\JulianDate;
 use Fisharebest\Webtrees\Date\RomanDate;
+
+use function app;
+use function trigger_error;
+
+use const E_USER_DEPRECATED;
 
 /**
  * A representation of GEDCOM dates and date ranges.
@@ -39,26 +49,26 @@ use Fisharebest\Webtrees\Date\RomanDate;
 class Date
 {
     /** @var string Optional qualifier, such as BEF, FROM, ABT */
-    public $qual1;
+    public $qual1 = '';
 
-    /** @var CalendarDate  The first (or only) date */
+    /** @var AbstractCalendarDate  The first (or only) date */
     private $date1;
 
-    /** @var string  Optional qualifier, such as TO, AND*/
-    public $qual2;
+    /** @var string  Optional qualifier, such as TO, AND */
+    public $qual2 = '';
 
-    /** @var CalendarDate Optional second date */
+    /** @var AbstractCalendarDate|null Optional second date */
     private $date2;
 
-    /** @var string ptional text, as included with an INTerpreted date */
-    private $text;
+    /** @var string Optional text, as included with an INTerpreted date */
+    private $text = '';
 
     /**
      * Create a date, from GEDCOM data.
      *
      * @param string $date A date in GEDCOM format
      */
-    public function __construct($date)
+    public function __construct(string $date)
     {
         // Extract any explanatory text
         if (preg_match('/^(.*) ?[(](.*)[)]/', $date, $match)) {
@@ -85,23 +95,21 @@ class Date
     public function __clone()
     {
         $this->date1 = clone $this->date1;
-        if (is_object($this->date2)) {
+        if ($this->date2 !== null) {
             $this->date2 = clone $this->date2;
         }
     }
 
     /**
      * Convert a calendar date, such as "12 JUN 1943" into calendar date object.
-     *
      * A GEDCOM date range may have two calendar dates.
      *
      * @param string $date
      *
-     * @throws \DomainException
-     *
-     * @return CalendarDate
+     * @throws DomainException
+     * @return AbstractCalendarDate
      */
-    private function parseDate($date)
+    private function parseDate($date): AbstractCalendarDate
     {
         // Valid calendar escape specified? - use it
         if (preg_match('/^(@#D(?:GREGORIAN|JULIAN|HEBREW|HIJRI|JALALI|FRENCH R|ROMAN)+@) ?(.*)/', $date, $match)) {
@@ -141,54 +149,74 @@ class Date
 
         // Unambiguous dates - override calendar escape
         if (preg_match('/^(TSH|CSH|KSL|TVT|SHV|ADR|ADS|NSN|IYR|SVN|TMZ|AAV|ELL)$/', $m)) {
-            $cal = '@#DHEBREW@';
-        } else {
-            if (preg_match('/^(VEND|BRUM|FRIM|NIVO|PLUV|VENT|GERM|FLOR|PRAI|MESS|THER|FRUC|COMP)$/', $m)) {
-                $cal = '@#DFRENCH R@';
-            } else {
-                if (preg_match('/^(MUHAR|SAFAR|RABI[AT]|JUMA[AT]|RAJAB|SHAAB|RAMAD|SHAWW|DHUAQ|DHUAH)$/', $m)) {
-                    $cal = '@#DHIJRI@'; // This is a WT extension
-                } else {
-                    if (preg_match('/^(FARVA|ORDIB|KHORD|TIR|MORDA|SHAHR|MEHR|ABAN|AZAR|DEY|BAHMA|ESFAN)$/', $m)) {
-                        $cal = '@#DJALALI@'; // This is a WT extension
-                    } elseif (preg_match('/^\d{1,4}( B\.C\.)|\d\d\d\d\/\d\d$/', $y)) {
-                        $cal = '@#DJULIAN@';
-                    }
-                }
-            }
+            $cal = JewishDate::ESCAPE;
+        } elseif (preg_match('/^(VEND|BRUM|FRIM|NIVO|PLUV|VENT|GERM|FLOR|PRAI|MESS|THER|FRUC|COMP)$/', $m)) {
+            $cal = FrenchDate::ESCAPE;
+        } elseif (preg_match('/^(MUHAR|SAFAR|RABI[AT]|JUMA[AT]|RAJAB|SHAAB|RAMAD|SHAWW|DHUAQ|DHUAH)$/', $m)) {
+            $cal = HijriDate::ESCAPE; // This is a WT extension
+        } elseif (preg_match('/^(FARVA|ORDIB|KHORD|TIR|MORDA|SHAHR|MEHR|ABAN|AZAR|DEY|BAHMA|ESFAN)$/', $m)) {
+            $cal = JalaliDate::ESCAPE; // This is a WT extension
+        } elseif (preg_match('/^\d{1,4}( B\.C\.)|\d\d\d\d\/\d\d$/', $y)) {
+            $cal = JulianDate::ESCAPE;
         }
 
         // Ambiguous dates - don't override calendar escape
-        if ($cal == '') {
+        if ($cal === '') {
             if (preg_match('/^(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)$/', $m)) {
-                $cal = '@#DGREGORIAN@';
+                $cal =  GregorianDate::ESCAPE;
+            } elseif (preg_match('/^[345]\d\d\d$/', $y)) {
+                // Year 3000-5999
+                $cal = JewishDate::ESCAPE;
             } else {
-                if (preg_match('/^[345]\d\d\d$/', $y)) {
-                    // Year 3000-5999
-                    $cal = '@#DHEBREW@';
-                } else {
-                    $cal = '@#DGREGORIAN@';
-                }
+                $cal = GregorianDate::ESCAPE;
             }
         }
         // Now construct an object of the correct type
         switch ($cal) {
-            case '@#DGREGORIAN@':
-                return new GregorianDate(array($y, $m, $d));
-            case '@#DJULIAN@':
-                return new JulianDate(array($y, $m, $d));
-            case '@#DHEBREW@':
-                return new JewishDate(array($y, $m, $d));
-            case '@#DHIJRI@':
-                return new HijriDate(array($y, $m, $d));
-            case '@#DFRENCH R@':
-                return new FrenchDate(array($y, $m, $d));
-            case '@#DJALALI@':
-                return new JalaliDate(array($y, $m, $d));
-            case '@#DROMAN@':
-                return new RomanDate(array($y, $m, $d));
+            case GregorianDate::ESCAPE:
+                return new GregorianDate([
+                    $y,
+                    $m,
+                    $d,
+                ]);
+            case JulianDate::ESCAPE:
+                return new JulianDate([
+                    $y,
+                    $m,
+                    $d,
+                ]);
+            case JewishDate::ESCAPE:
+                return new JewishDate([
+                    $y,
+                    $m,
+                    $d,
+                ]);
+            case HijriDate::ESCAPE:
+                return new HijriDate([
+                    $y,
+                    $m,
+                    $d,
+                ]);
+            case FrenchDate::ESCAPE:
+                return new FrenchDate([
+                    $y,
+                    $m,
+                    $d,
+                ]);
+            case JalaliDate::ESCAPE:
+                return new JalaliDate([
+                    $y,
+                    $m,
+                    $d,
+                ]);
+            case RomanDate::ESCAPE:
+                return new RomanDate([
+                    $y,
+                    $m,
+                    $d,
+                ]);
             default:
-                throw new \DomainException('Invalid calendar');
+                throw new DomainException('Invalid calendar');
         }
     }
 
@@ -197,16 +225,22 @@ class Date
      *
      * @return string[]
      */
-    public static function calendarNames()
+    public static function calendarNames(): array
     {
-        return array(
-            'gregorian' => /* I18N: The gregorian calendar */ I18N::translate('Gregorian'),
-            'julian'    => /* I18N: The julian calendar */ I18N::translate('Julian'),
-            'french'    => /* I18N: The French calendar */ I18N::translate('French'),
-            'jewish'    => /* I18N: The Hebrew/Jewish calendar */ I18N::translate('Jewish'),
-            'hijri'     => /* I18N: The Arabic/Hijri calendar */ I18N::translate('Hijri'),
-            'jalali'    => /* I18N: The Persian/Jalali calendar */ I18N::translate('Jalali'),
-        );
+        return [
+            /* I18N: The gregorian calendar */
+            'gregorian' => I18N::translate('Gregorian'),
+            /* I18N: The julian calendar */
+            'julian'    => I18N::translate('Julian'),
+            /* I18N: The French calendar */
+            'french'    => I18N::translate('French'),
+            /* I18N: The Hebrew/Jewish calendar */
+            'jewish'    => I18N::translate('Jewish'),
+            /* I18N: The Arabic/Hijri calendar */
+            'hijri'     => I18N::translate('Hijri'),
+            /* I18N: The Persian/Jalali calendar */
+            'jalali'    => I18N::translate('Jalali'),
+        ];
     }
 
     /**
@@ -218,11 +252,16 @@ class Date
      *
      * @return string
      */
-    public function display($url = false, $date_format = null, $convert_calendars = true)
+    public function display($url = false, $date_format = null, $convert_calendars = true): string
     {
-        global $WT_TREE;
-
-        $CALENDAR_FORMAT = $WT_TREE->getPreference('CALENDAR_FORMAT');
+        // Do we need a new DateFormatterService class?
+        if (app()->has(Tree::class)) {
+            $tree            = app(Tree::class);
+            $CALENDAR_FORMAT = $tree->getPreference('CALENDAR_FORMAT');
+        } else {
+            $tree            = null;
+            $CALENDAR_FORMAT = '';
+        }
 
         if ($date_format === null) {
             $date_format = I18N::dateFormat();
@@ -231,7 +270,7 @@ class Date
         if ($convert_calendars) {
             $calendar_format = explode('_and_', $CALENDAR_FORMAT);
         } else {
-            $calendar_format = array();
+            $calendar_format = [];
         }
 
         // Two dates with text before, between and after
@@ -247,7 +286,7 @@ class Date
         $conv1 = '';
         $conv2 = '';
         foreach ($calendar_format as $cal_fmt) {
-            if ($cal_fmt != 'none') {
+            if ($cal_fmt !== 'none') {
                 $d1conv = $this->date1->convertToCalendar($cal_fmt);
                 if ($d1conv->inValidRange()) {
                     $d1tmp = $d1conv->format($date_format, $this->qual1);
@@ -269,17 +308,17 @@ class Date
                 if ($d1 != $d1tmp && $d1tmp !== '') {
                     if ($url) {
                         if ($CALENDAR_FORMAT !== 'none') {
-                            $conv1 .= ' <span dir="' . I18N::direction() . '">(<a href="' . $d1conv->calendarUrl($date_format) . '" rel="nofollow">' . $d1tmp . '</a>)</span>';
+                            $conv1 .= ' <span dir="' . I18N::direction() . '">(<a href="' . $d1conv->calendarUrl($date_format, $tree) . '" rel="nofollow">' . $d1tmp . '</a>)</span>';
                         } else {
-                            $conv1 .= ' <span dir="' . I18N::direction() . '"><br><a href="' . $d1conv->calendarUrl($date_format) . '" rel="nofollow">' . $d1tmp . '</a></span>';
+                            $conv1 .= ' <span dir="' . I18N::direction() . '"><br><a href="' . $d1conv->calendarUrl($date_format, $tree) . '" rel="nofollow">' . $d1tmp . '</a></span>';
                         }
                     } else {
                         $conv1 .= ' <span dir="' . I18N::direction() . '">(' . $d1tmp . ')</span>';
                     }
                 }
-                if ($this->date2 instanceof CalendarDate && $d2 != $d2tmp && $d1tmp != '') {
+                if ($this->date2 !== null && $d2 != $d2tmp && $d1tmp != '') {
                     if ($url) {
-                        $conv2 .= ' <span dir="' . I18N::direction() . '">(<a href="' . $d2conv->calendarUrl($date_format) . '" rel="nofollow">' . $d2tmp . '</a>)</span>';
+                        $conv2 .= ' <span dir="' . I18N::direction() . '">(<a href="' . $d2conv->calendarUrl($date_format, $tree) . '" rel="nofollow">' . $d2tmp . '</a>)</span>';
                     } else {
                         $conv2 .= ' <span dir="' . I18N::direction() . '">(' . $d2tmp . ')</span>';
                     }
@@ -289,9 +328,9 @@ class Date
 
         // Add URLs, if requested
         if ($url) {
-            $d1 = '<a href="' . $this->date1->calendarUrl($date_format) . '" rel="nofollow">' . $d1 . '</a>';
-            if ($this->date2 instanceof CalendarDate) {
-                $d2 = '<a href="' . $this->date2->calendarUrl($date_format) . '" rel="nofollow">' . $d2 . '</a>';
+            $d1 = '<a href="' . $this->date1->calendarUrl($date_format, $tree) . '" rel="nofollow">' . $d1 . '</a>';
+            if ($this->date2 instanceof AbstractCalendarDate) {
+                $d2 = '<a href="' . $this->date2->calendarUrl($date_format, $tree) . '" rel="nofollow">' . $d2 . '</a>';
             }
         }
 
@@ -301,48 +340,55 @@ class Date
                 $tmp = $d1 . $conv1;
                 break;
             case 'ABT':
-                $tmp = /* I18N: Gedcom ABT dates */ I18N::translate('about %s', $d1 . $conv1);
+                /* I18N: Gedcom ABT dates */
+                $tmp = I18N::translate('about %s', $d1 . $conv1);
                 break;
             case 'CAL':
-                $tmp = /* I18N: Gedcom CAL dates */ I18N::translate('calculated %s', $d1 . $conv1);
+                /* I18N: Gedcom CAL dates */
+                $tmp = I18N::translate('calculated %s', $d1 . $conv1);
                 break;
             case 'EST':
-                $tmp = /* I18N: Gedcom EST dates */ I18N::translate('estimated %s', $d1 . $conv1);
+                /* I18N: Gedcom EST dates */
+                $tmp = I18N::translate('estimated %s', $d1 . $conv1);
                 break;
             case 'INT':
-                $tmp = /* I18N: Gedcom INT dates */ I18N::translate('interpreted %s (%s)', $d1 . $conv1, Filter::escapeHtml($this->text));
+                /* I18N: Gedcom INT dates */
+                $tmp = I18N::translate('interpreted %s (%s)', $d1 . $conv1, e($this->text));
                 break;
             case 'BEF':
-                $tmp = /* I18N: Gedcom BEF dates */ I18N::translate('before %s', $d1 . $conv1);
+                /* I18N: Gedcom BEF dates */
+                $tmp = I18N::translate('before %s', $d1 . $conv1);
                 break;
             case 'AFT':
-                $tmp = /* I18N: Gedcom AFT dates */ I18N::translate('after %s', $d1 . $conv1);
+                /* I18N: Gedcom AFT dates */
+                $tmp = I18N::translate('after %s', $d1 . $conv1);
                 break;
             case 'FROM':
-                $tmp = /* I18N: Gedcom FROM dates */ I18N::translate('from %s', $d1 . $conv1);
+                /* I18N: Gedcom FROM dates */
+                $tmp = I18N::translate('from %s', $d1 . $conv1);
                 break;
             case 'TO':
-                $tmp = /* I18N: Gedcom TO dates */ I18N::translate('to %s', $d1 . $conv1);
+                /* I18N: Gedcom TO dates */
+                $tmp = I18N::translate('to %s', $d1 . $conv1);
                 break;
             case 'BETAND':
-                $tmp = /* I18N: Gedcom BET-AND dates */ I18N::translate('between %s and %s', $d1 . $conv1, $d2 . $conv2);
+                /* I18N: Gedcom BET-AND dates */
+                $tmp = I18N::translate('between %s and %s', $d1 . $conv1, $d2 . $conv2);
                 break;
             case 'FROMTO':
-                $tmp = /* I18N: Gedcom FROM-TO dates */ I18N::translate('from %s to %s', $d1 . $conv1, $d2 . $conv2);
+                /* I18N: Gedcom FROM-TO dates */
+                $tmp = I18N::translate('from %s to %s', $d1 . $conv1, $d2 . $conv2);
                 break;
             default:
                 $tmp = I18N::translate('Invalid date');
-                break; // e.g. BET without AND
-        }
-        if ($this->text && !$q1) {
-            $tmp = I18N::translate('%1$s (%2$s)', $tmp, $this->text);
+                break;
         }
 
         if (strip_tags($tmp) === '') {
             return '';
-        } else {
-            return '<span class="date">' . $tmp . '</span>';
         }
+
+        return '<span class="date">' . $tmp . '</span>';
     }
 
     /**
@@ -350,9 +396,9 @@ class Date
      *
      * In the date “FROM 1900 TO 1910”, this would be 1900.
      *
-     * @return CalendarDate
+     * @return AbstractCalendarDate
      */
-    public function minimumDate()
+    public function minimumDate(): AbstractCalendarDate
     {
         return $this->date1;
     }
@@ -362,15 +408,11 @@ class Date
      *
      * In the date “FROM 1900 TO 1910”, this would be 1910.
      *
-     * @return CalendarDate
+     * @return AbstractCalendarDate
      */
-    public function maximumDate()
+    public function maximumDate(): AbstractCalendarDate
     {
-        if ($this->date2 === null) {
-            return $this->date1;
-        } else {
-            return $this->date2;
-        }
+        return $this->date2 ?? $this->date1;
     }
 
     /**
@@ -378,9 +420,9 @@ class Date
      *
      * @return int
      */
-    public function minimumJulianDay()
+    public function minimumJulianDay(): int
     {
-        return $this->minimumDate()->minJD;
+        return $this->minimumDate()->minimumJulianDay();
     }
 
     /**
@@ -388,9 +430,9 @@ class Date
      *
      * @return int
      */
-    public function maximumJulianDay()
+    public function maximumJulianDay(): int
     {
-        return $this->maximumDate()->maxJD;
+        return $this->maximumDate()->maximumJulianDay();
     }
 
     /**
@@ -401,9 +443,9 @@ class Date
      *
      * @return int
      */
-    public function julianDay()
+    public function julianDay(): int
     {
-        return (int) (($this->minimumJulianDay() + $this->maximumJulianDay()) / 2);
+        return intdiv($this->minimumJulianDay() + $this->maximumJulianDay(), 2);
     }
 
     /**
@@ -412,17 +454,17 @@ class Date
      * This is typically used to create an estimated death date,
      * which is before a certain number of years after the birth date.
      *
-     * @param int     $years     a number of years, positive or negative
-     * @param string  $qualifier typically “BEF” or “AFT”
+     * @param int    $years     a number of years, positive or negative
+     * @param string $qualifier typically “BEF” or “AFT”
      *
      * @return Date
      */
-    public function addYears($years, $qualifier = '')
+    public function addYears(int $years, string $qualifier = ''): Date
     {
-        $tmp = clone $this;
-        $tmp->date1->y += $years;
-        $tmp->date1->m = 0;
-        $tmp->date1->d = 0;
+        $tmp               = clone $this;
+        $tmp->date1->year  += $years;
+        $tmp->date1->month = 0;
+        $tmp->date1->day   = 0;
         $tmp->date1->setJdFromYmd();
         $tmp->qual1 = $qualifier;
         $tmp->qual2 = '';
@@ -432,20 +474,80 @@ class Date
     }
 
     /**
-     * Calculate the the age of a person, on a date.
+     * Calculate the the age of a person (n years), on a given date.
      *
      * @param Date $d1
      * @param Date $d2
-     * @param int  $format
      *
-     * @throws \InvalidArgumentException
+     * @return int
      *
-     * @return int|string
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0
      */
-    public static function getAge(Date $d1, Date $d2 = null, $format = 0)
+    public static function getAgeYears(Date $d1, Date $d2): int
     {
-        if ($d2) {
-            if ($d2->maximumJulianDay() >= $d1->minimumJulianDay() && $d2->minimumJulianDay() <= $d1->minimumJulianDay()) {
+        trigger_error('Date::getAgeYears() is deprecated. Use class Age instead.', E_USER_DEPRECATED);
+
+        if (self::compare($d1, $d2) === 0) {
+            // Overlapping dates
+            $jd = $d1->minimumJulianDay();
+        } else {
+            // Non-overlapping dates
+            $jd = $d2->minimumJulianDay();
+        }
+
+        if ($jd && $d1->minimumJulianDay() && $d1->minimumJulianDay() <= $jd) {
+            return $d1->minimumDate()->getAge($jd);
+        }
+
+        return -1;
+    }
+
+    /**
+     * Calculate the the age of a person (n days), on a given date.
+     *
+     * @param Date $d1
+     * @param Date $d2
+     *
+     * @return int
+     *
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0
+     */
+    public static function getAgeDays(Date $d1, Date $d2): int
+    {
+        trigger_error('Date::getAgeDays() is deprecated. Use class Age instead.', E_USER_DEPRECATED);
+
+        if ($d2->maximumJulianDay() >= $d1->minimumJulianDay() && $d2->minimumJulianDay() <= $d1->maximumJulianDay()) {
+            // Overlapping dates
+            $jd = $d1->minimumJulianDay();
+        } else {
+            // Non-overlapping dates
+            $jd = $d2->minimumJulianDay();
+        }
+
+        // Days - integer only (for sorting, rather than for display)
+        if ($jd && $d1->minimumJulianDay()) {
+            return $jd - $d1->minimumJulianDay();
+        }
+
+        return -1;
+    }
+
+    /**
+     * Calculate the the age of a person, on a date.
+     *
+     * @param Date      $d1
+     * @param Date|null $d2
+     *
+     * @return string
+     *
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0
+     */
+    public static function getAge(Date $d1, Date $d2 = null): string
+    {
+        trigger_error('Date::getAge() is deprecated. Use class Age instead.', E_USER_DEPRECATED);
+
+        if ($d2 instanceof self) {
+            if ($d2->maximumJulianDay() >= $d1->minimumJulianDay() && $d2->minimumJulianDay() <= $d1->maximumJulianDay()) {
                 // Overlapping dates
                 $jd = $d1->minimumJulianDay();
             } else {
@@ -454,38 +556,21 @@ class Date
             }
         } else {
             // If second date not specified, use today’s date
-            $jd = WT_CLIENT_JD;
+            $jd = Carbon::now()->julianDay();
         }
 
-        switch ($format) {
-            case 0:
-                // Years - integer only (for statistics, rather than for display)
-                if ($jd && $d1->minimumJulianDay() && $d1->minimumJulianDay() <= $jd) {
-                    return $d1->minimumDate()->getAge(false, $jd, false);
-                } else {
-                    return -1;
-                }
-            case 1:
-                // Days - integer only (for sorting, rather than for display)
-                if ($jd && $d1->minimumJulianDay()) {
-                    return $jd - $d1->minimumJulianDay();
-                } else {
-                    return -1;
-                }
-            case 2:
-                // Just years, in local digits, with warning for negative/
-                if ($jd && $d1->minimumJulianDay()) {
-                    if ($d1->minimumJulianDay() > $jd) {
-                        return '<i class="icon-warning"></i>';
-                    } else {
-                        return I18N::number($d1->minimumDate()->getAge(false, $jd));
-                    }
-                } else {
-                    return '';
-                }
-            default:
-                throw new \InvalidArgumentException('format: ' . $format);
+        // Just years, in local digits, with warning for negative/
+        if ($jd && $d1->minimumJulianDay()) {
+            if ($d1->minimumJulianDay() > $jd) {
+                return view('icons/warning');
+            }
+
+            $years = $d1->minimumDate()->getAge($jd);
+
+            return I18N::number($years);
         }
+
+        return '';
     }
 
     /**
@@ -496,28 +581,33 @@ class Date
      * @param Date|null $d2
      *
      * @return string
+     *
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0
      */
-    public static function getAgeGedcom(Date $d1, Date $d2 = null)
+    public static function getAgeGedcom(Date $d1, Date $d2 = null): string
     {
+        trigger_error('Date::getAgeGedcom() is deprecated. Use class Age instead.', E_USER_DEPRECATED);
+
         if ($d2 === null) {
-            return $d1->date1->getAge(true, WT_CLIENT_JD, true);
-        } else {
-            // If dates overlap, then can’t calculate age.
-            if (self::compare($d1, $d2)) {
-                return $d1->date1->getAge(true, $d2->minimumJulianDay(), true);
-            } elseif (self::compare($d1, $d2) == 0 && $d1->minimumJulianDay() == $d2->minimumJulianDay()) {
-                return '0d';
-            } else {
-                return '';
-            }
+            return $d1->date1->getAgeFull(Carbon::now()->julianDay());
         }
+
+        if (self::compare($d1, $d2) !== 0) {
+            return $d1->date1->getAgeFull($d2->minimumJulianDay());
+        }
+
+        if ($d1->minimumJulianDay() == $d2->minimumJulianDay()) {
+            return '0d';
+        }
+
+        return '';
     }
 
     /**
      * Compare two dates, so they can be sorted.
      *
-     * return <0 if $a<$b
-     * return >0 if $b>$a
+     * return -1 if $a<$b
+     * return +1 if $b>$a
      * return  0 if dates same/overlap
      * BEF/AFT sort as the day before/after
      *
@@ -526,7 +616,7 @@ class Date
      *
      * @return int
      */
-    public static function compare(Date $a, Date $b)
+    public static function compare(Date $a, Date $b): int
     {
         // Get min/max JD for each date.
         switch ($a->qual1) {
@@ -559,15 +649,21 @@ class Date
         }
         if ($amax < $bmin) {
             return -1;
-        } elseif ($amin > $bmax && $bmax > 0) {
-            return 1;
-        } elseif ($amin < $bmin && $amax <= $bmax) {
-            return -1;
-        } elseif ($amin > $bmin && $amax >= $bmax && $bmax > 0) {
-            return 1;
-        } else {
-            return 0;
         }
+
+        if ($amin > $bmax && $bmax > 0) {
+            return 1;
+        }
+
+        if ($amin < $bmin && $amax <= $bmax) {
+            return -1;
+        }
+
+        if ($amin > $bmin && $amax >= $bmax && $bmax > 0) {
+            return 1;
+        }
+
+        return 0;
     }
 
     /**
@@ -578,7 +674,7 @@ class Date
      *
      * @return bool
      */
-    public function isOK()
+    public function isOK(): bool
     {
         return $this->minimumJulianDay() && $this->maximumJulianDay();
     }
@@ -591,15 +687,15 @@ class Date
      *
      * @return int
      */
-    public function gregorianYear()
+    public function gregorianYear(): int
     {
         if ($this->isOK()) {
-            $gregorian_calendar = new GregorianCalendar;
-            list($year)         = $gregorian_calendar->jdToYmd($this->julianDay());
+            $gregorian_calendar = new GregorianCalendar();
+            [$year] = $gregorian_calendar->jdToYmd($this->julianDay());
 
             return $year;
-        } else {
-            return 0;
         }
+
+        return 0;
     }
 }

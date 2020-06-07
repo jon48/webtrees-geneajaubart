@@ -14,19 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
+
+use Fisharebest\Webtrees\TestCase;
 
 /**
  * Test harness for the class CensusOfDeutschland
  */
-class CensusOfDeutschlandTest extends \PHPUnit_Framework_TestCase
+class CensusOfDeutschlandTest extends TestCase
 {
     /**
      * Test the census place
      *
-     * @covers Fisharebest\Webtrees\Census\CensusOfDeutschland
+     * @covers \Fisharebest\Webtrees\Census\CensusOfDeutschland
+     *
+     * @return void
      */
-    public function testPlace()
+    public function testPlace(): void
     {
         $census = new CensusOfDeutschland();
 
@@ -34,21 +41,37 @@ class CensusOfDeutschlandTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test the census language
+     *
+     * @covers \Fisharebest\Webtrees\Census\CensusOfCzechRepublic
+     *
+     * @return void
+     */
+    public function testLanguage(): void
+    {
+        $census = new CensusOfDeutschland();
+
+        $this->assertSame('de', $census->censusLanguage());
+    }
+
+    /**
      * Test the census dates
      *
-     * @covers Fisharebest\Webtrees\Census\CensusOfDeutschland
+     * @covers \Fisharebest\Webtrees\Census\CensusOfDeutschland
+     *
+     * @return void
      */
-    public function testAllDates()
+    public function testAllDates(): void
     {
-        $census  = new CensusOfDeutschland();
+        $census = new CensusOfDeutschland();
 
         $census_dates = $census->allCensusDates();
 
         $this->assertCount(5, $census_dates);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfDeutschland1819', $census_dates[0]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfDeutschland1867', $census_dates[1]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfDeutschlandNL1867', $census_dates[2]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfDeutschland1900', $census_dates[3]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfDeutschland1919', $census_dates[4]);
+        $this->assertInstanceOf(CensusOfDeutschland1819::class, $census_dates[0]);
+        $this->assertInstanceOf(CensusOfDeutschland1867::class, $census_dates[1]);
+        $this->assertInstanceOf(CensusOfDeutschlandNL1867::class, $census_dates[2]);
+        $this->assertInstanceOf(CensusOfDeutschland1900::class, $census_dates[3]);
+        $this->assertInstanceOf(CensusOfDeutschland1919::class, $census_dates[4]);
     }
 }

@@ -15,23 +15,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+declare(strict_types=1);
+
+namespace Fisharebest\Webtrees;
+
 /**
  * Test harness for the class Filter
  */
-class FilterTest extends \PHPUnit_Framework_TestCase
+class FilterTest extends TestCase
 {
     /**
-     * Prepare the environment for these tests
-     */
-    public function setUp()
-    {
-    }
-
-    /**
      * Test that the class exists
+     *
+     * @return void
      */
-    public function testClassExists()
+    public function testClassExists(): void
     {
-        $this->assertTrue(class_exists('\Fisharebest\Webtrees\Filter'));
+        $this->assertTrue(class_exists(Filter::class));
     }
 }

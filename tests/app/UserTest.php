@@ -15,23 +15,86 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+declare(strict_types=1);
+
+namespace Fisharebest\Webtrees;
+
+use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\Services\UserService;
+
 /**
- * Test harness for the class WT_User
+ * Test the user functions
  */
-class UserTest extends \PHPUnit_Framework_TestCase
+class UserTest extends TestCase
 {
+    protected static $uses_database = true;
+
     /**
-     * Prepare the environment for these tests
+     * @covers \Fisharebest\Webtrees\User::__construct
+     * @covers \Fisharebest\Webtrees\User::id
+     * @covers \Fisharebest\Webtrees\User::email
+     * @covers \Fisharebest\Webtrees\User::realName
+     * @covers \Fisharebest\Webtrees\User::userName
+     * @return void
      */
-    public function setUp()
+    public function testConstructor(): void
     {
+        $user = new User(123, 'username', 'real name', 'email');
+
+        $this->assertInstanceOf(UserInterface::class, $user);
+        $this->assertSame(123, $user->id());
+        $this->assertSame('email', $user->email());
+        $this->assertSame('real name', $user->realName());
+        $this->assertSame('username', $user->userName());
     }
 
     /**
-     * Test that the class exists
+     * @covers \Fisharebest\Webtrees\User::setUserName
+     * @covers \Fisharebest\Webtrees\User::userName
+     * @covers \Fisharebest\Webtrees\User::setRealName
+     * @covers \Fisharebest\Webtrees\User::realName
+     * @covers \Fisharebest\Webtrees\User::setEmail
+     * @covers \Fisharebest\Webtrees\User::email
+     * @covers \Fisharebest\Webtrees\User::setPassword
+     * @covers \Fisharebest\Webtrees\User::checkPassword
+     * @return void
      */
-    public function testClassExists()
+    public function testGettersAndSetters(): void
     {
-        $this->assertTrue(class_exists('\Fisharebest\Webtrees\User'));
+        $user_service = new UserService();
+        $user         = $user_service->create('user', 'User', 'user@example.com', 'secret');
+
+        $this->assertSame(1, $user->id());
+
+        $this->assertSame('user', $user->userName());
+        $user->setUserName('foo');
+        $this->assertSame('foo', $user->userName());
+
+        $this->assertSame('User', $user->realName());
+        $user->setRealName('Foo');
+        $this->assertSame('Foo', $user->realName());
+
+        $this->assertSame('user@example.com', $user->email());
+        $user->setEmail('foo@example.com');
+        $this->assertSame('foo@example.com', $user->email());
+
+        $this->assertTrue($user->checkPassword('secret'));
+        $user->setPassword('letmein');
+        $this->assertTrue($user->checkPassword('letmein'));
+    }
+
+    /**
+     * @covers \Fisharebest\Webtrees\User::setPreference
+     * @covers \Fisharebest\Webtrees\User::getPreference
+     * @return void
+     */
+    public function testPreferences(): void
+    {
+        $user_service = new UserService();
+        $user         = $user_service->create('user', 'User', 'user@example.com', 'secret');
+
+        $this->assertSame('', $user->getPreference('foo'));
+        $user->setPreference('foo', 'bar');
+        $this->assertSame('bar', $user->getPreference('foo'));
     }
 }

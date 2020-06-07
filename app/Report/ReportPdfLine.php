@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
 
 /**
@@ -23,26 +27,28 @@ class ReportPdfLine extends ReportBaseLine
     /**
      * PDF line renderer
      *
-     * @param ReportTcpdf $renderer
+     * @param PdfRenderer $renderer
+     *
+     * @return void
      */
     public function render($renderer)
     {
-        if ($this->x1 == ".") {
-            $this->x1 = $renderer->GetX();
+        if ($this->x1 === ReportBaseElement::CURRENT_POSITION) {
+            $this->x1 = $renderer->tcpdf->GetX();
         }
-        if ($this->y1 == ".") {
-            $this->y1 = $renderer->GetY();
+        if ($this->y1 === ReportBaseElement::CURRENT_POSITION) {
+            $this->y1 = $renderer->tcpdf->GetY();
         }
-        if ($this->x2 == ".") {
+        if ($this->x2 === ReportBaseElement::CURRENT_POSITION) {
             $this->x2 = $renderer->getMaxLineWidth();
         }
-        if ($this->y2 == ".") {
-            $this->y2 = $renderer->GetY();
+        if ($this->y2 === ReportBaseElement::CURRENT_POSITION) {
+            $this->y2 = $renderer->tcpdf->GetY();
         }
-        if ($renderer->getRTL()) {
-            $renderer->Line($renderer->getPageWidth() - $this->x1, $this->y1, $renderer->getPageWidth() - $this->x2, $this->y2);
+        if ($renderer->tcpdf->getRTL()) {
+            $renderer->tcpdf->Line($renderer->tcpdf->getPageWidth() - $this->x1, $this->y1, $renderer->tcpdf->getPageWidth() - $this->x2, $this->y2);
         } else {
-            $renderer->Line($this->x1, $this->y1, $this->x2, $this->y2);
+            $renderer->tcpdf->Line($this->x1, $this->y1, $this->x2, $this->y2);
         }
     }
 }

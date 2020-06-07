@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,9 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Schema;
 
-use Fisharebest\Webtrees\Database;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Schema\Blueprint;
 
 /**
  * Upgrade the database schema from version 37 to version 38.
@@ -24,69 +31,86 @@ class Migration37 implements MigrationInterface
 {
     /**
      * Upgrade to to the next version
+     *
+     * @return void
      */
-    public function upgrade()
+    public function upgrade(): void
     {
-        // Move repositories to their own table
-        Database::exec(
-            "CREATE TABLE IF NOT EXISTS `##repository` (" .
-            " repository_id INTEGER AUTO_INCREMENT                      NOT NULL," .
-            " gedcom_id     INTEGER                                     NOT NULL," .
-            " xref          VARCHAR(20)                                 NOT NULL," .
-            " gedcom        LONGTEXT                                    NOT NULL," .
-            " name          VARCHAR(90)                                 NOT NULL," .
-            " address       VARCHAR(255)                                NOT NULL," .
-            " restriction   ENUM('', 'confidential', 'privacy', 'none') NOT NULL," .
-            " uid           VARCHAR(34)                                 NOT NULL," .
-            " changed_at    DATETIME                                    NOT NULL," .
-            " PRIMARY KEY (repository_id)," .
-            " UNIQUE  KEY `##repository_ix1` (gedcom_id, xref)," .
-            " UNIQUE  KEY `##repository_ix2` (xref, gedcom_id)," .
-            "         KEY `##repository_ix3` (name)," .
-            "         KEY `##repository_ix4` (address)," .
-            "         KEY `##repository_ix5` (restriction)," .
-            "         KEY `##repository_ix6` (uid)," .
-            "         KEY `##repository_ix7` (changed_at)," .
-            " CONSTRAINT `##repository_fk1` FOREIGN KEY (gedcom_id) REFERENCES `##gedcom` (gedcom_id)" .
-            ") COLLATE utf8_unicode_ci ENGINE=InnoDB"
-        );
+        // These tables were created by webtrees 1.x, and may not exist if we first installed webtrees 2.x
+        DB::schema()->dropIfExists('site_access_rule');
+        DB::schema()->dropIfExists('next_id');
 
-        Database::exec("START TRANSACTION");
+        // Split the media table into media/media_file so that we can store multiple media
+        // files in each media object.
+        if (!DB::schema()->hasTable('media_file')) {
+            DB::schema()->create('media_file', static function (Blueprint $table): void {
+                $table->integer('id', true);
+                $table->string('m_id', 20);
+                $table->integer('m_file');
+                $table->string('multimedia_file_refn', 248); // GEDCOM only allows 30 characters
+                $table->string('multimedia_format', 4);
+                $table->string('source_media_type', 15);
+                $table->string('descriptive_title', 248);
 
-        $repositories = Database::prepare("SELECT * FROM `##other` WHERE o_type = 'REPO'")->fetchAll();
-
-        foreach ($repositories as $n => $repository) {
-            Database::prepare(
-                "INSERT INTO `##repository` (" .
-                " gedcom_id, xref, gedcom, name, address, restriction, uid, changed_at" .
-                ") VALUES (" .
-                " :gedcom_id, :xref, :gedcom, :name, :address, :restriction, :uid, :changed_at" .
-                ")"
-            )->execute(array(
-                'gedcom_id'   => $repository->o_file,
-                'xref'        => $repository->o_id,
-                'gedcom'      => $repository->o_gedcom,
-                'name'        => '',
-                'address'     => '',
-                'restriction' => '',
-                'uid'         => '',
-                'changed_at'  => '',
-            ));
-
-            Database::prepare(
-                "DELETE FROM `##other` WHERE o_file = :gedcom_id AND o_id = :xref"
-            )->execute(array(
-                'gedcom_id' => $repository->o_file,
-                'xref'      => $repository->o_id,
-            ));
-
-            if ($n % 500 === 499) {
-                Database::exec("COMMIT");
-                Database::exec("START TRANSACTION");
-
-            }
+                $table->index(['m_id', 'm_file']);
+                $table->index(['m_file', 'm_id']);
+                $table->index(['m_file', 'multimedia_file_refn']);
+                $table->index(['m_file', 'multimedia_format']);
+                $table->index(['m_file', 'source_media_type']);
+                $table->index(['m_file', 'descriptive_title']);
+            });
         }
 
-        Database::exec("COMMIT");
+        if (DB::table('media_file')->count() === 0 && DB::schema()->hasColumn('media', 'm_filename')) {
+            (new Builder(DB::connection()))->from('media_file')->insertUsing([
+                'm_id',
+                'm_file',
+                'multimedia_file_refn',
+                'multimedia_format',
+                'source_media_type',
+                'descriptive_title',
+            ], function (Builder $query): void {
+                $query->select([
+                    'm_id',
+                    'm_file',
+                    $this->substring('m_filename', 1, 248),
+                    $this->substring('m_ext', 1, 4),
+                    $this->substring('m_type', 1, 15),
+                    $this->substring('m_titl', 1, 248),
+                ])->from('media');
+            });
+
+            // SQLite can only drop one column at a time.
+            DB::schema()->table('media', static function (Blueprint $table): void {
+                $table->dropColumn('m_filename');
+            });
+            DB::schema()->table('media', static function (Blueprint $table): void {
+                $table->dropColumn('m_ext');
+            });
+            DB::schema()->table('media', static function (Blueprint $table): void {
+                $table->dropColumn('m_type');
+            });
+            DB::schema()->table('media', static function (Blueprint $table): void {
+                $table->dropColumn('m_titl');
+            });
+        }
+    }
+
+    /**
+     * @param string $expression
+     * @param int    $start
+     * @param int    $length
+     *
+     * @return Expression
+     */
+    private function substring(string $expression, int $start, int $length): Expression
+    {
+        // Non-standard
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return new Expression('SUBSTR(' . $expression . ',' . $start . ',' . $length . ')');
+        }
+
+        // SQL-92 standard
+        return new Expression('SUBSTRING(' . $expression . ' FROM ' . $start . ' FOR ' . $length . ')');
     }
 }

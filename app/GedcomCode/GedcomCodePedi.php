@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\GedcomCode;
 
 use Fisharebest\Webtrees\GedcomRecord;
@@ -24,75 +28,85 @@ use Fisharebest\Webtrees\Individual;
  */
 class GedcomCodePedi
 {
-    /** @var string[] Possible values for pedigree field */
-    private static $TYPES = array('adopted', 'birth', 'foster', 'rada', 'sealing');
+    // Possible values for pedigree field
+    private const TYPES = [
+        'adopted',
+        'birth',
+        'foster',
+        'rada',
+        'sealing',
+    ];
 
     /**
      * Translate a code, for an optional record
      *
-     * @param string            $type
+     * @param string $type
      * @param GedcomRecord|null $record
      *
      * @return string
      */
-    public static function getValue($type, GedcomRecord $record = null)
+    public static function getValue($type, GedcomRecord $record = null): string
     {
         if ($record instanceof Individual) {
-            $sex = $record->getSex();
+            $sex = $record->sex();
         } else {
             $sex = 'U';
         }
 
         switch ($type) {
             case 'birth':
-                switch ($sex) {
-                    case 'M':
-                        return I18N::translateContext('Male pedigree', 'Birth');
-                    case 'F':
+                if ($sex === 'M') {
+                    return I18N::translateContext('Male pedigree', 'Birth');
+                }
+
+                if ($sex === 'F') {
                     return I18N::translateContext('Female pedigree', 'Birth');
-                    default:
-                    return I18N::translateContext('Pedigree', 'Birth');
                 }
+
+                return I18N::translateContext('Pedigree', 'Birth');
+
             case 'adopted':
-                switch ($sex) {
-                    case 'M':
-                        return I18N::translateContext('Male pedigree', 'Adopted');
-                    case 'F':
+                if ($sex === 'M') {
+                    return I18N::translateContext('Male pedigree', 'Adopted');
+                }
+
+                if ($sex === 'F') {
                     return I18N::translateContext('Female pedigree', 'Adopted');
-                    default:
-                    return I18N::translateContext('Pedigree', 'Adopted');
                 }
+
+                return I18N::translateContext('Pedigree', 'Adopted');
+
             case 'foster':
-                switch ($sex) {
-                    case 'M':
-                        return I18N::translateContext('Male pedigree', 'Foster');
-                    case 'F':
+                if ($sex === 'M') {
+                    return I18N::translateContext('Male pedigree', 'Foster');
+                }
+
+                if ($sex === 'F') {
                     return I18N::translateContext('Female pedigree', 'Foster');
-                    default:
-                    return I18N::translateContext('Pedigree', 'Foster');
                 }
+
+                return I18N::translateContext('Pedigree', 'Foster');
+
             case 'sealing':
-                switch ($sex) {
-                    case 'M':
-                        return
+                if ($sex === 'M') {
                     /* I18N: “sealing” is a ceremony in the Mormon church. */
-                    I18N::translateContext('Male pedigree', 'Sealing');
-                    case 'F':
-                    return
-                    /* I18N: “sealing” is a ceremony in the Mormon church. */
-                    I18N::translateContext('Female pedigree', 'Sealing');
-                    default:
-                    return
-                    /* I18N: “sealing” is a ceremony in the Mormon church. */
-                    I18N::translateContext('Pedigree', 'Sealing');
+                    return I18N::translateContext('Male pedigree', 'Sealing');
                 }
+
+                if ($sex === 'F') {
+                    /* I18N: “sealing” is a ceremony in the Mormon church. */
+                    return I18N::translateContext('Female pedigree', 'Sealing');
+                }
+
+                /* I18N: “sealing” is a ceremony in the Mormon church. */
+                return I18N::translateContext('Pedigree', 'Sealing');
+
             case 'rada':
                 // Not standard GEDCOM - a webtrees extension
                 // This is an arabic word which does not exist in other languages.
                 // So, it will not have any inflected forms.
-                return
                 /* I18N: This is an Arabic word, pronounced “ra DAH”. It is child-to-parent pedigree, established by wet-nursing. */
-                I18N::translate('Rada');
+                return I18N::translate('Rada');
             default:
                 return $type;
         }
@@ -105,10 +119,10 @@ class GedcomCodePedi
      *
      * @return string[]
      */
-    public static function getValues(GedcomRecord $record = null)
+    public static function getValues(GedcomRecord $record = null): array
     {
-        $values = array();
-        foreach (self::$TYPES as $type) {
+        $values = ['' => ''];
+        foreach (self::TYPES as $type) {
             $values[$type] = self::getValue($type, $record);
         }
         uasort($values, '\Fisharebest\Webtrees\I18N::strcasecmp');
@@ -123,7 +137,7 @@ class GedcomCodePedi
      *
      * @return string
      */
-    public static function getChildFamilyLabel($pedi)
+    public static function getChildFamilyLabel(string $pedi): string
     {
         switch ($pedi) {
             case '':
@@ -134,13 +148,11 @@ class GedcomCodePedi
             case 'foster':
                 return I18N::translate('Family with foster parents');
             case 'sealing':
-                return
                 /* I18N: “sealing” is a Mormon ceremony. */
-                I18N::translate('Family with sealing parents');
+                return I18N::translate('Family with sealing parents');
             case 'rada':
-                return
                 /* I18N: “rada” is an Arabic word, pronounced “ra DAH”. It is child-to-parent pedigree, established by wet-nursing. */
-                I18N::translate('Family with rada parents');
+                return I18N::translate('Family with rada parents');
             default:
                 return I18N::translate('Family with parents') . ' - ' . $pedi;
         }
@@ -149,12 +161,12 @@ class GedcomCodePedi
     /**
      * Create GEDCOM for a new child-family pedigree
      *
-     * @param $pedi
-     * @param $xref
+     * @param string $pedi
+     * @param string $xref
      *
      * @return string
      */
-    public static function createNewFamcPedi($pedi, $xref)
+    public static function createNewFamcPedi(string $pedi, string $xref): string
     {
         switch ($pedi) {
             case '':

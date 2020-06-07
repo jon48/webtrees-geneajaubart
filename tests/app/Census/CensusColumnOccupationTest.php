@@ -14,55 +14,57 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
-use Mockery;
+use Fisharebest\Webtrees\Fact;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\TestCase;
+use Illuminate\Support\Collection;
 
 /**
  * Test harness for the class CensusColumnOccupation
  */
-class CensusColumnOccupationTest extends \PHPUnit_Framework_TestCase
+class CensusColumnOccupationTest extends TestCase
 {
     /**
-     * Delete mock objects
+     * @covers \Fisharebest\Webtrees\Census\CensusColumnOccupation
+     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
+     *
+     * @return void
      */
-    public function tearDown()
+    public function testNoOccupation(): void
     {
-        Mockery::close();
-    }
+        $individual = $this->createMock(Individual::class);
+        $individual->method('facts')->with(['OCCU'])->willReturn(new Collection());
 
-    /**
-     * @covers Fisharebest\Webtrees\Census\CensusColumnOccupation
-     * @covers Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
-    public function testNoOccupation()
-    {
-        $individual = Mockery::mock('Fisharebest\Webtrees\Individual');
-        $individual->shouldReceive('getFacts')->withArgs(array('OCCU'))->andReturn(array());
-
-        $census = Mockery::mock('Fisharebest\Webtrees\Census\CensusInterface');
+        $census = $this->createMock(CensusInterface::class);
 
         $column = new CensusColumnOccupation($census, '', '');
 
-        $this->assertSame('', $column->generate($individual));
+        $this->assertSame('', $column->generate($individual, $individual));
     }
 
     /**
-     * @covers Fisharebest\Webtrees\Census\CensusColumnOccupation
-     * @covers Fisharebest\Webtrees\Census\AbstractCensusColumn
+     * @covers \Fisharebest\Webtrees\Census\CensusColumnOccupation
+     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
+     *
+     * @return void
      */
-    public function testOccupation()
+    public function testOccupation(): void
     {
-        $fact = Mockery::mock('Fisharebest\Webtrees\Fact');
-        $fact->shouldReceive('getValue')->andReturn('Farmer');
+        $fact = $this->createMock(Fact::class);
+        $fact->method('value')->willReturn('Farmer');
 
-        $individual = Mockery::mock('Fisharebest\Webtrees\Individual');
-        $individual->shouldReceive('getFacts')->withArgs(array('OCCU'))->andReturn(array($fact));
+        $individual = $this->createMock(Individual::class);
+        $individual->method('facts')->with(['OCCU'])->willReturn(new Collection([$fact]));
 
-        $census = Mockery::mock('Fisharebest\Webtrees\Census\CensusInterface');
+        $census = $this->createMock(CensusInterface::class);
 
         $column = new CensusColumnOccupation($census, '', '');
 
-        $this->assertSame('Farmer', $column->generate($individual));
+        $this->assertSame('Farmer', $column->generate($individual, $individual));
     }
 }

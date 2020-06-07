@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,22 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Schema;
 
-use Fisharebest\Webtrees\Database;
-
 /**
- * Upgrade the database schema from version 19 to version 20.
+ * Upgrade the database schema from version 19 to version 20 (webtrees 1.3.2).
  */
 class Migration19 implements MigrationInterface
 {
     /**
-     * Upgrade to to the next version
+     * Upgrade to to the next version.
+     *
+     * @return void
      */
-    public function upgrade()
+    public function upgrade(): void
     {
-        // Fix some broken data caused by a bug
-        Database::exec("UPDATE `##default_resn` SET xref     = NULL WHERE xref     = ''");
-        Database::exec("UPDATE `##default_resn` SET tag_type = NULL WHERE tag_type = ''");
+        // These migrations have been merged into migration 0.
+        // Direct upgrade from webtrees < 1.7.9 is not supported.
     }
 }

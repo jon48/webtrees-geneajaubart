@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\GedcomCode;
 
 use Fisharebest\Webtrees\I18N;
@@ -22,8 +26,13 @@ use Fisharebest\Webtrees\I18N;
  */
 class GedcomCodeQuay
 {
-    /** @var string[] Valid values for a QUAY tag. */
-    private static $TYPES = array('3', '2', '1', '0');
+    // Valid values for a QUAY tag.
+    private const TYPES = [
+        '3',
+        '2',
+        '1',
+        '0',
+    ];
 
     /**
      * Translate a code, for an optional record
@@ -32,25 +41,21 @@ class GedcomCodeQuay
      *
      * @return string
      */
-    public static function getValue($type)
+    public static function getValue(string $type): string
     {
         switch ($type) {
             case '3':
-                return
                 /* I18N: Quality of source information - GEDCOM tag “QUAY 3” */
-                I18N::translate('primary evidence');
+                return I18N::translate('primary evidence');
             case '2':
-                return
                 /* I18N: Quality of source information - GEDCOM tag “QUAY 2” */
-                I18N::translate('secondary evidence');
+                return I18N::translate('secondary evidence');
             case '1':
-                return
                 /* I18N: Quality of source information - GEDCOM tag “QUAY 1” */
-                I18N::translate('questionable evidence');
+                return I18N::translate('questionable evidence');
             case '0':
-                return
                 /* I18N: Quality of source information - GEDCOM tag “QUAY 0” */
-                I18N::translate('unreliable evidence');
+                return I18N::translate('unreliable evidence');
             default:
                 return $type;
         }
@@ -61,10 +66,10 @@ class GedcomCodeQuay
      *
      * @return string[]
      */
-    public static function getValues()
+    public static function getValues(): array
     {
-        $values = array();
-        foreach (self::$TYPES as $type) {
+        $values = [];
+        foreach (self::TYPES as $type) {
             $values[$type] = self::getValue($type);
         }
 

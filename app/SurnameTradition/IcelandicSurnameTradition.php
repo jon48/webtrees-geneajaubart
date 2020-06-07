@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\SurnameTradition;
 
 /**
@@ -21,14 +25,14 @@ namespace Fisharebest\Webtrees\SurnameTradition;
  * Sons get their father’s given name plus “sson”
  * Daughters get their father’s given name plus “sdottir”
  */
-class IcelandicSurnameTradition extends DefaultSurnameTradition implements SurnameTraditionInterface
+class IcelandicSurnameTradition extends DefaultSurnameTradition
 {
     /**
      * Does this surname tradition use surnames?
      *
      * @return bool
      */
-    public function hasSurnames()
+    public function hasSurnames(): bool
     {
         return false;
     }
@@ -42,22 +46,22 @@ class IcelandicSurnameTradition extends DefaultSurnameTradition implements Surna
      *
      * @return string[] Associative array of GEDCOM name parts (SURN, _MARNM, etc.)
      */
-    public function newChildNames($father_name, $mother_name, $child_sex)
+    public function newChildNames(string $father_name, string $mother_name, string $child_sex): array
     {
         if (preg_match(self::REGEX_GIVN, $father_name, $father_match)) {
             switch ($child_sex) {
                 case 'M':
-                    return array(
-                    'NAME' => $father_match['GIVN'] . 'sson',
-                );
+                    return [
+                        'NAME' => $father_match['GIVN'] . 'sson',
+                    ];
                 case 'F':
-                    return array(
-                    'NAME' => $father_match['GIVN'] . 'sdottir',
-                );
+                    return [
+                        'NAME' => $father_match['GIVN'] . 'sdottir',
+                    ];
             }
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -68,16 +72,16 @@ class IcelandicSurnameTradition extends DefaultSurnameTradition implements Surna
      *
      * @return string[] Associative array of GEDCOM name parts (SURN, _MARNM, etc.)
      */
-    public function newParentNames($child_name, $parent_sex)
+    public function newParentNames(string $child_name, string $parent_sex): array
     {
         if ($parent_sex === 'M' && preg_match('~(?<GIVN>[^ /]+)(:?sson|sdottir)$~', $child_name, $child_match)) {
-            return array(
+            return [
                 'NAME' => $child_match['GIVN'],
                 'GIVN' => $child_match['GIVN'],
-            );
-        } else {
-            return array();
+            ];
         }
+
+        return [];
     }
 
     /**
@@ -88,8 +92,8 @@ class IcelandicSurnameTradition extends DefaultSurnameTradition implements Surna
      *
      * @return string[] Associative array of GEDCOM name parts (SURN, _MARNM, etc.)
      */
-    public function newSpouseNames($spouse_name, $spouse_sex)
+    public function newSpouseNames(string $spouse_name, string $spouse_sex): array
     {
-        return array();
+        return [];
     }
 }

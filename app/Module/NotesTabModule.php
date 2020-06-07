@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,164 +14,164 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
-use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Functions\Functions;
-use Fisharebest\Webtrees\Functions\FunctionsPrintFacts;
-use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Services\ClipboardService;
+use Illuminate\Support\Collection;
 
 /**
  * Class NotesTabModule
  */
 class NotesTabModule extends AbstractModule implements ModuleTabInterface
 {
-    /** @var Fact[] A list facts for this note. */
+    use ModuleTabTrait;
+
+    /** @var Collection A list facts for this note. */
     private $facts;
 
-    /** {@inheritdoc} */
-    public function getTitle()
+    /** @var ClipboardService */
+    private $clipboard_service;
+
+    /**
+     * NotesTabModule constructor.
+     *
+     * @param ClipboardService $clipboard_service
+     */
+    public function __construct(ClipboardService $clipboard_service)
     {
-        return /* I18N: Name of a module */ I18N::translate('Notes');
+        $this->clipboard_service = $clipboard_service;
     }
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
     {
-        return /* I18N: Description of the “Notes” module */ I18N::translate('A tab showing the notes attached to an individual.');
+        /* I18N: Name of a module */
+        return I18N::translate('Notes');
     }
 
-    /** {@inheritdoc} */
-    public function defaultTabOrder()
+    /**
+     * A sentence describing what this module does.
+     *
+     * @return string
+     */
+    public function description(): string
     {
-        return 40;
+        /* I18N: Description of the “Notes” module */
+        return I18N::translate('A tab showing the notes attached to an individual.');
     }
 
-    /** {@inheritdoc} */
-    public function hasTabContent()
+    /**
+     * The default position for this tab.  It can be changed in the control panel.
+     *
+     * @return int
+     */
+    public function defaultTabOrder(): int
     {
-        global $WT_TREE;
-
-        return Auth::isEditor($WT_TREE) || $this->getFactsWithNotes();
+        return 4;
     }
 
-    /** {@inheritdoc} */
-    public function isGrayedOut()
+    /**
+     * Is this tab empty? If so, we don't always need to display it.
+     *
+     * @param Individual $individual
+     *
+     * @return bool
+     */
+    public function hasTabContent(Individual $individual): bool
     {
-        return !$this->getFactsWithNotes();
+        return $individual->canEdit() || $this->getFactsWithNotes($individual)->isNotEmpty();
     }
 
-    /** {@inheritdoc} */
-    public function getTabContent()
+    /**
+     * A greyed out tab has no actual content, but may perhaps have
+     * options to create content.
+     *
+     * @param Individual $individual
+     *
+     * @return bool
+     */
+    public function isGrayedOut(Individual $individual): bool
     {
-        global $controller;
+        return $this->getFactsWithNotes($individual)->isEmpty();
+    }
 
-        ob_start();
-        ?>
-        <table class="facts_table">
-            <colgroup>
-                <col class="width20">
-                <col class="width80">
-            </colgroup>
-            <tr class="noprint">
-                <td colspan="2" class="descriptionbox rela">
-                    <label>
-                        <input id="show-level-2-notes" type="checkbox">
-                        <?php echo I18N::translate('Show all notes'); ?>
-                    </label>
-                </td>
-            </tr>
-
-        <?php
-        foreach ($this->getFactsWithNotes() as $fact) {
-            if ($fact->getTag() == 'NOTE') {
-                FunctionsPrintFacts::printMainNotes($fact, 1);
-            } else {
-                for ($i = 2; $i < 4; ++$i) {
-                    FunctionsPrintFacts::printMainNotes($fact, $i);
-                }
-            }
-        }
-        if (!$this->getFactsWithNotes()) {
-            echo '<tr><td id="no_tab4" colspan="2" class="facts_value">', I18N::translate('There are no notes for this individual.'), '</td></tr>';
-        }
-
-        // New note link
-        if ($controller->record->canEdit()) {
-            ?>
-            <tr class="noprint">
-                <td class="facts_label">
-                    <?php echo GedcomTag::getLabel('NOTE'); ?>
-                </td>
-                <td class="facts_value">
-                    <a href="#" onclick="add_new_record('<?php echo $controller->record->getXref(); ?>','NOTE'); return false;">
-                        <?php echo I18N::translate('Add a note'); ?>
-                    </a>
-                </td>
-            </tr>
-            <tr class="noprint">
-                <td class="facts_label">
-                    <?php echo GedcomTag::getLabel('SHARED_NOTE'); ?>
-                </td>
-                <td class="facts_value">
-                    <a href="#" onclick="add_new_record('<?php echo $controller->record->getXref(); ?>','SHARED_NOTE'); return false;">
-                        <?php echo I18N::translate('Add a shared note'); ?>
-                    </a>
-                </td>
-            </tr>
-            <?php
-        }
-        ?>
-        </table>
-        <script>
-            persistent_toggle("show-level-2-notes", ".row_note2");
-        </script>
-        <?php
-
-        return '<div id="' . $this->getName() . '_content">' . ob_get_clean() . '</div>';
+    /**
+     * Generate the HTML content of this tab.
+     *
+     * @param Individual $individual
+     *
+     * @return string
+     */
+    public function getTabContent(Individual $individual): string
+    {
+        return view('modules/notes/tab', [
+            'can_edit'        => $individual->canEdit(),
+            'clipboard_facts' => $this->clipboard_service->pastableFactsOfType($individual, $this->supportedFacts()),
+            'individual'      => $individual,
+            'facts'           => $this->getFactsWithNotes($individual),
+        ]);
     }
 
     /**
      * Get all the facts for an individual which contain notes.
      *
-     * @return Fact[]
+     * @param Individual $individual
+     *
+     * @return Collection<Fact>
      */
-    private function getFactsWithNotes()
+    private function getFactsWithNotes(Individual $individual): Collection
     {
-        global $controller;
-
         if ($this->facts === null) {
-            $facts = $controller->record->getFacts();
-            foreach ($controller->record->getSpouseFamilies() as $family) {
+            $facts = $individual->facts();
+
+            foreach ($individual->spouseFamilies() as $family) {
                 if ($family->canShow()) {
-                    foreach ($family->getFacts() as $fact) {
-                        $facts[] = $fact;
+                    foreach ($family->facts() as $fact) {
+                        $facts->push($fact);
                     }
                 }
             }
-            $this->facts = array();
+
+            $this->facts = new Collection();
+
             foreach ($facts as $fact) {
-                if (preg_match('/(?:^1|\n\d) NOTE/', $fact->getGedcom())) {
-                    $this->facts[] = $fact;
+                if (preg_match('/(?:^1|\n\d) NOTE/', $fact->gedcom())) {
+                    $this->facts->push($fact);
                 }
             }
-            Functions::sortFacts($this->facts);
+            $this->facts = Fact::sortFacts($this->facts);
         }
 
         return $this->facts;
     }
 
-    /** {@inheritdoc} */
-    public function canLoadAjax()
+    /**
+     * Can this tab load asynchronously?
+     *
+     * @return bool
+     */
+    public function canLoadAjax(): bool
     {
-        return !Auth::isSearchEngine(); // Search engines cannot use AJAX
+        return false;
     }
 
-    /** {@inheritdoc} */
-    public function getPreLoadContent()
+    /**
+     * This module handles the following facts - so don't show them on the "Facts and events" tab.
+     *
+     * @return Collection<string>
+     */
+    public function supportedFacts(): Collection
     {
-        return '';
+        return new Collection(['NOTE']);
     }
 }

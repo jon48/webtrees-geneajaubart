@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfDeutschlandNL1867 extends CensusOfDeutschland implements CensusInt
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '03 DEC 1867';
     }
@@ -35,7 +39,7 @@ class CensusOfDeutschlandNL1867 extends CensusOfDeutschland implements CensusInt
      *
      * @return string
      */
-    public function censusPlace()
+    public function censusPlace(): string
     {
         return 'Mecklenburg-Schwerin (Nachtragsliste), Deutschland';
     }
@@ -45,9 +49,9 @@ class CensusOfDeutschlandNL1867 extends CensusOfDeutschland implements CensusInt
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnNull($this, '1.Nr.', 'Ordnungs-Nummer.'),
             new CensusColumnGivenNames($this, '2.Vorname', 'I. Vor- und Familienname jeder Person. Vorname.'),
             new CensusColumnSurname($this, '3.Familienname', 'I. Vor- und Familienname jeder Person. Familienname.'),
@@ -66,6 +70,6 @@ class CensusOfDeutschlandNL1867 extends CensusOfDeutschland implements CensusInt
             new CensusColumnNull($this, '16.', 'VII. Art des Abwesenheit vom Zählungsorte. Nicht über ein Jahr Abwesende auf Besuch außerhalb des Orts.'),
             new CensusColumnNull($this, '17.', 'VII. Art des Aufenthalts am Zählungsort. Ueber ein Jahr, oder in anderer Art als nach Spalte 14 bis 16 Abwesende.'),
             new CensusColumnNull($this, '18.Aufenthaltsort', 'VIII. Vermuthlicher Aufenthaltsort zur Zählungszeit.'),
-        );
+        ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,9 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Fisharebest\Webtrees\Schema;
 
-use Fisharebest\Webtrees\Database;
+declare(strict_types=1);
+
+namespace Fisharebest\Webtrees\Schema;
 
 /**
  * Upgrade the database schema from version 7 to version 8.
@@ -24,18 +26,12 @@ class Migration7 implements MigrationInterface
 {
     /**
      * Upgrade to to the next version
+     *
+     * @return void
      */
-    public function upgrade()
+    public function upgrade(): void
     {
-        // Update config data defining theme selection
-        Database::exec(
-            "UPDATE `##gedcom_setting` SET setting_value=TRIM(LEADING 'themes/' FROM TRIM(TRAILING '/' FROM setting_value)) WHERE setting_name='THEME_DIR'"
-        );
-        Database::exec(
-            "UPDATE `##user_setting` SET setting_value=TRIM(LEADING 'themes/' FROM TRIM(TRAILING '/' FROM setting_value)) WHERE setting_name='THEME_DIR'"
-        );
-        Database::exec(
-            "UPDATE `##user_gedcom_setting` SET setting_value=TRIM(LEADING 'themes/' FROM TRIM(TRAILING '/' FROM setting_value)) WHERE setting_name='THEME_DIR'"
-        );
+        // These migrations have been merged into migration 0.
+        // Direct upgrade from webtrees < 1.7.9 is not supported.
     }
 }

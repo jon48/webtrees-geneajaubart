@@ -1,0 +1,146 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Webtrees;
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => $breadcrumbs]) ?>
+
+<h1><?= $title ?></h1>
+
+<table class="table table-bordered table-striped table-sm table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th><?= I18N::translate('Place') ?></th>
+            <th><?= I18N::translate('Latitude') ?></th>
+            <th><?= I18N::translate('Longitude') ?></th>
+            <th><?= I18N::translate('Zoom level') ?></th>
+            <th><?= I18N::translate('Flag') ?> </th>
+            <th><?= I18N::translate('Edit') ?></th>
+            <th><?= I18N::translate('Delete') ?></th>
+        </tr>
+    </thead>
+
+    <tbody>
+    <?php foreach ($placelist as $place) : ?>
+        <tr>
+            <th scope="row">
+                <a href="<?= e(route('map-data', ['parent_id' => $place->pl_id])) ?>">
+                    <?= e($place->pl_place) ?>
+                    <span class="badge badge-pill badge-<?= $place->badge ?>">
+                        <?= I18N::number($place->child_count) ?>
+                    </span>
+                </a>
+            </th>
+
+            <td dir="ltr">
+                <?php if ($place->pl_lati === null) : ?>
+                    <?= view('icons/warning') ?>
+                <?php else : ?>
+                    <?= strtr($place->pl_lati, ['N' => '', 'S' => '-', ',' => '.']) ?>
+                <?php endif ?>
+            </td>
+
+            <td dir="ltr">
+                <?php if ($place->pl_long === null) : ?>
+                    <?= view('icons/warning') ?>
+                <?php else : ?>
+                    <?= strtr($place->pl_long, ['E' => '', 'W' => '-', ',' => '.']) ?>
+                <?php endif ?>
+            </td>
+
+            <td dir="ltr">
+                <?php if ($place->pl_zoom === null) : ?>
+                    <?= view('icons/warning') ?>
+                <?php else : ?>
+                    <?= $place->pl_zoom ?>
+                <?php endif ?>
+            </td>
+
+            <td>
+                <?php if (is_file(Webtrees::MODULES_PATH . 'openstreetmap/' . $place->pl_icon)) : ?>
+                    <img src="<?= e(Webtrees::MODULES_PATH . 'openstreetmap/' . $place->pl_icon) ?>" width="25" height="15" alt="<?= I18N::translate('Flag of %s', $place->pl_place) ?>">
+                <?php endif ?>
+            </td>
+
+            <td>
+                <a class="btn btn-primary" href="<?= e(route('map-data-edit', ['place_id'  => $place->pl_id, 'parent_id' => $place->pl_parent_id])) ?>" title="<?= I18N::translate('Edit') ?>">
+                    <?= view('icons/edit') ?>
+                    <span class="sr-only">
+                        <?= I18N::translate('Edit') ?>
+                    </span>
+                </a>
+            </td>
+
+            <td>
+                <?php if ($place->child_count === 0) : ?>
+                    <form method="post" action="<?= e(route('map-data-delete', ['parent_id' => $parent_id, 'place_id' => $place->pl_id])) ?>"
+                          data-confirm="<?= I18N::translate('Remove this location?') ?>"
+                          onsubmit="return confirm(this.dataset.confirm)">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-danger" aria-label="<?= I18N::translate('delete') ?>">
+                            <?= view('icons/delete') ?>
+                        </button>
+                    </form>
+                <?php else : ?>
+                    <button type="button" class="btn btn-danger" disabled>
+                        <?= view('icons/delete') ?>
+                    </button>
+                <?php endif ?>
+            </td>
+        </tr>
+    <?php endforeach ?>
+    </tbody>
+
+    <tfoot>
+        <tr>
+            <td colspan="7">
+                <a class="btn btn-primary" href="<?= e(route('map-data-edit', ['place_id' => '0', 'parent_id' => $parent_id])) ?>">
+                    <?= view('icons/add') ?>
+                    <?= /* I18N: A button label. */
+                    I18N::translate('add place') ?>
+                </a>
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <?= view('icons/download') ?>
+                    <?= /* I18N: A button label. */
+                    I18N::translate('export file') ?>
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="<?= e(route('locations-export', ['parent_id' => $parent_id, 'format' => 'csv'])) ?>">
+                        csv
+                    </a>
+                    <a class="dropdown-item" href="<?= e(route('locations-export', ['parent_id' => $parent_id, 'format' => 'geojson'])) ?>">
+                        geoJSON
+                    </a>
+                </div>
+                <a class="btn btn-primary" href="<?= e(route('locations-import', ['parent_id' => $parent_id])) ?>">
+                    <?= view('icons/upload') ?>
+                    <?= /* I18N: A button label. */
+                    I18N::translate('import file') ?>
+                </a>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+<form method="post" action="<?= e(route('locations-import-from-tree')) ?>">
+    <?= csrf_field() ?>
+
+    <div class="form-group row">
+        <label class="form-control-plaintext col-sm-4" for="tree">
+            <?= I18N::translate('Import all places from a family tree') ?>
+        </label>
+        <div class="col-sm-6">
+            <?= view('components/select', ['name' => 'ged', 'selected' => '', 'options' => $tree_titles]) ?>
+        </div>
+        <div class="col-sm-2">
+            <button type="submit" class="btn btn-primary">
+                <?= view('icons/upload') ?>
+                <?= /* I18N: A button label. */
+                I18N::translate('import') ?>
+            </button>
+        </div>
+    </div>
+</form>

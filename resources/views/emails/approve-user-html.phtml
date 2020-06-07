@@ -1,0 +1,15 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+
+?>
+
+<div dir="<?= I18N::locale()->direction() ?>" lang="<?= I18N::locale()->languageTag() ?>">
+    <p>
+        <?= I18N::translate('Hello %s…', '<span dir="auto">' . e($user->realName()) . '</span>') ?>
+    </p>
+
+    <p>
+        <?= I18N::translate('The administrator at the webtrees site %s has approved your application for an account. You may now sign in by accessing the following link: %s', e($base_url), e($base_url)) ?>
+    </p>
+</div>

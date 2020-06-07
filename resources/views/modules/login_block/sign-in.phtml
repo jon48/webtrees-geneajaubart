@@ -1,0 +1,70 @@
+<?php
+
+use Fisharebest\Webtrees\Http\RequestHandlers\LoginAction;
+use Fisharebest\Webtrees\Http\RequestHandlers\PasswordRequestAction;
+use Fisharebest\Webtrees\Http\RequestHandlers\RegisterPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\UserPage;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+
+?>
+
+<form method="post" action="<?= route(LoginAction::class, ['tree' => $tree->name()]) ?>" name="login-form">
+    <?= csrf_field() ?>
+    <input type="hidden" name="url" value="<?= e(route(UserPage::class, ['tree' => $tree->name()])) ?>">
+
+    <div class="form-group">
+        <label for="username">
+            <?= I18N::translate('Username') ?>
+        </label>
+        <input type="text" id="username" name="username" class="form-control">
+    </div>
+
+    <div class="form-group">
+        <label for="password">
+            <?= I18N::translate('Password') ?>
+        </label>
+        <input type="password" id="password" name="password" class="form-control" autocomplete="current-password">
+    </div>
+
+    <div>
+        <button type="submit" class="btn btn-primary">
+            <?= /* I18N: A button label. */ I18N::translate('sign in') ?>
+        </button>
+
+        <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#forgot-password" aria-expanded="false" aria-controls="forgot-password">
+            <?= I18N::translate('Forgot password?') ?>
+        </button>
+    </div>
+</form>
+
+<?php if ($allow_register) : ?>
+    <a class="btn btn-link" href="<?= e(route(RegisterPage::class, ['tree' => $tree->name()])) ?>">
+        <?= I18N::translate('Request a new user account') ?>
+    </a>
+<?php endif ?>
+
+<div class="collapse" id="forgot-password">
+    <form method="post" action="<?= e(route(PasswordRequestAction::class, ['tree' => $tree instanceof Tree ? $tree->name() : null])) ?>">
+        <?= I18N::translate('Request a new password') ?>
+        <div class="form-group">
+            <label for="new_passwd_username">
+                <?= I18N::translate('Username or email address') ?>
+                <input type="text" id="new_passwd_username" name="new_passwd_username" class="form-control">
+            </label>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">
+                <?= /* I18N: A button label. */ I18N::translate('continue') ?>
+            </button>
+        </div>
+    </form>
+</div>
+
+<?php View::push('javascript') ?>
+<script>
+    $('#password').hideShowPassword('infer', true);
+</script>
+<?php View::endpush() ?>
+

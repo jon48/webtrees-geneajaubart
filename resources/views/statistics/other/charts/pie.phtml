@@ -1,0 +1,48 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+
+$id   = 'google-chart-' . bin2hex(random_bytes(8));
+$name = 'callback_' . bin2hex(random_bytes(12));
+?>
+
+<?php if (count($data) === 1) : ?>
+    <?= I18N::translate('This information is not available.') ?>
+<?php else : ?>
+    <div id="<?= $id ?>"></div>
+    <script>
+
+    let <?= $name ?> = function () {
+        statistics.drawPieChart(
+            <?= json_encode($id) ?>,
+            <?= json_encode($data) ?>,
+            {
+                title: <?= json_encode($title) ?>,
+
+                // Note: "legend" needs to be defined completely as Object.assign does only a shallow merge
+                legend: {
+                    alignment: 'center',
+                    labeledValueText: <?= json_encode($labeledValueText ?? 'value') ?>,
+                    position: 'labeled'
+                },
+                colors: <?= json_encode($colors) ?>
+            }
+        );
+    };
+
+    if (document.readyState === "complete"
+        || (document.readyState !== "loading" && !document.documentElement.doScroll)
+    ) {
+        statistics.init(<?= json_encode($language) ?>);
+        statistics.addCallback(<?= $name ?>);
+    } else {
+        document.addEventListener("DOMContentLoaded", function () {
+            statistics.init(<?= json_encode($language) ?>);
+            statistics.addCallback(<?= $name ?>);
+        });
+    }
+
+    </script>
+<?php endif; ?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,141 +14,167 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Database;
+use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Webtrees;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Collection;
+use stdClass;
 
 /**
  * Class AbstractModule - common functions for blocks
  */
-abstract class AbstractModule
+abstract class AbstractModule implements ModuleInterface
 {
-    /** @var string The directory where the module is installed */
-    private $directory;
+    use ViewResponseTrait;
 
-    /** @var string[] A cached copy of the module settings */
-    private $settings;
+    /** @var string A unique internal name for this module (based on the installation folder). */
+    private $name = '';
+
+    /** @var int The default access level for this module.  It can be changed in the control panel. */
+    protected $access_level = Auth::PRIV_PRIVATE;
+
+    /** @var bool The default status for this module.  It can be changed in the control panel. */
+    private $enabled = true;
 
     /** @var string For custom modules - optional (recommended) version number */
-    const CUSTOM_VERSION = '';
+    public const CUSTOM_VERSION = '';
 
     /** @var string For custom modules - link for support, upgrades, etc. */
-    const CUSTOM_WEBSITE = '';
+    public const CUSTOM_WEBSITE = '';
 
     /**
-     * Create a new module.
-     *
-     * @param string $directory Where is this module installed
+     * Called for all *enabled* modules.
      */
-    public function __construct($directory)
+    public function boot(): void
     {
-        $this->directory = $directory;
     }
 
     /**
-     * Get a block setting.
-     *
-     * @param int         $block_id
-     * @param string      $setting_name
-     * @param string|null $default_value
-     *
-     * @return null|string
-     */
-    public function getBlockSetting($block_id, $setting_name, $default_value = null)
-    {
-        $setting_value = Database::prepare(
-            "SELECT setting_value FROM `##block_setting` WHERE block_id = :block_id AND setting_name = :setting_name"
-        )->execute(array(
-            'block_id'     => $block_id,
-            'setting_name' => $setting_name,
-        ))->fetchOne();
-
-        return $setting_value === null ? $default_value : $setting_value;
-    }
-
-    /**
-     * Set a block setting.
-     *
-     * @param int         $block_id
-     * @param string      $setting_name
-     * @param string|null $setting_value
-     *
-     * @return $this
-     */
-    public function setBlockSetting($block_id, $setting_name, $setting_value)
-    {
-        if ($setting_value === null) {
-            Database::prepare(
-                "DELETE FROM `##block_setting` WHERE block_id = :block_id AND setting_name = :setting_name"
-            )->execute(array(
-                    'block_id'     => $block_id,
-                    'setting_name' => $setting_name,
-            ));
-        } else {
-            Database::prepare(
-                "REPLACE INTO `##block_setting` (block_id, setting_name, setting_value) VALUES (:block_id, :setting_name, :setting_value)"
-            )->execute(array(
-                'block_id'      => $block_id,
-                'setting_name'  => $setting_name,
-                'setting_value' => $setting_value,
-            ));
-        }
-
-        return $this;
-    }
-
-    /**
-     * How should this module be labelled on tabs, menus, etc.?
+     * How should this module be identified in the control panel, etc.?
      *
      * @return string
      */
-    abstract public function getTitle();
+    public function title(): string
+    {
+        return 'Module name goes here';
+    }
 
     /**
      * A sentence describing what this module does.
      *
      * @return string
      */
-    abstract public function getDescription();
-
-    /**
-     * What is the default access level for this module?
-     *
-     * Some modules are aimed at admins or managers, and are not generally shown to users.
-     *
-     * @return int
-     */
-    public function defaultAccessLevel()
+    public function description(): string
     {
-        // Returns one of: Auth::PRIV_HIDE, Auth::PRIV_PRIVATE, Auth::PRIV_USER, WT_PRIV_ADMIN
-        return Auth::PRIV_PRIVATE;
+        return $this->title();
     }
 
     /**
-     * Provide a unique internal name for this module
+     * Get a block setting.
+     *
+     * Originally, this was just used for the home-page blocks.  Now, it is used by any
+     * module that has repeated blocks of content on the same page.
+     *
+     * @param int    $block_id
+     * @param string $setting_name
+     * @param string $default
      *
      * @return string
      */
-    public function getName()
+    final protected function getBlockSetting(int $block_id, string $setting_name, string $default = ''): string
     {
-        return basename($this->directory);
+        $settings = app('cache.array')->remember('block-setting-' . $block_id, static function () use ($block_id): array {
+            return DB::table('block_setting')
+                ->where('block_id', '=', $block_id)
+                ->pluck('setting_value', 'setting_name')
+                ->all();
+        });
+
+        return $settings[$setting_name] ?? $default;
     }
 
     /**
-     * Load all the settings for the module into a cache.
+     * Set a block setting.
      *
-     * Since modules may have many settings, and will probably want to use
-     * lots of them, load them all at once and cache them.
+     * @param int    $block_id
+     * @param string $setting_name
+     * @param string $setting_value
+     *
+     * @return $this
      */
-    private function loadAllSettings()
+    final protected function setBlockSetting(int $block_id, string $setting_name, string $setting_value): self
     {
-        if ($this->settings === null) {
-            $this->settings = Database::prepare(
-                "SELECT setting_name, setting_value FROM `##module_setting` WHERE module_name = ?"
-            )->execute(array($this->getName()))->fetchAssoc();
-        }
+        DB::table('block_setting')->updateOrInsert([
+            'block_id'      => $block_id,
+            'setting_name'  => $setting_name,
+        ], [
+            'setting_value' => $setting_value,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * A unique internal name for this module (based on the installation folder).
+     *
+     * @param string $name
+     *
+     * @return void
+     */
+    final public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * A unique internal name for this module (based on the installation folder).
+     *
+     * @return string
+     */
+    final public function name(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Modules are either enabled or disabled.
+     *
+     * @param bool $enabled
+     *
+     * @return ModuleInterface
+     */
+    final public function setEnabled(bool $enabled): ModuleInterface
+    {
+        $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * Modules are either enabled or disabled.
+     *
+     * @return bool
+     */
+    final public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * Should this module be enabled when it is first installed?
+     *
+     * @return bool
+     */
+    public function isEnabledByDefault(): bool
+    {
+        return true;
     }
 
     /**
@@ -156,17 +183,14 @@ abstract class AbstractModule
      * @param string $setting_name
      * @param string $default
      *
-     * @return string|null
+     * @return string
      */
-    public function getSetting($setting_name, $default = null)
+    final public function getPreference(string $setting_name, string $default = ''): string
     {
-        $this->loadAllSettings();
-
-        if (array_key_exists($setting_name, $this->settings)) {
-            return $this->settings[$setting_name];
-        } else {
-            return $default;
-        }
+        return DB::table('module_setting')
+            ->where('module_name', '=', $this->name())
+            ->where('setting_name', '=', $setting_name)
+            ->value('setting_value') ?? $default;
     }
 
     /**
@@ -177,63 +201,50 @@ abstract class AbstractModule
      *
      * @param string $setting_name
      * @param string $setting_value
-     */
-    public function setSetting($setting_name, $setting_value)
-    {
-        $this->loadAllSettings();
-
-        if ($setting_value === null) {
-            Database::prepare(
-                "DELETE FROM `##module_setting` WHERE module_name = ? AND setting_name = ?"
-            )->execute(array($this->getName(), $setting_name));
-            unset($this->settings[$setting_name]);
-        } elseif (!array_key_exists($setting_name, $this->settings)) {
-            Database::prepare(
-                "INSERT INTO `##module_setting` (module_name, setting_name, setting_value) VALUES (?, ?, ?)"
-            )->execute(array($this->getName(), $setting_name, $setting_value));
-            $this->settings[$setting_name] = $setting_value;
-        } elseif ($setting_value != $this->settings[$setting_name]) {
-            Database::prepare(
-                "UPDATE `##module_setting` SET setting_value = ? WHERE module_name = ? AND setting_name = ?"
-            )->execute(array($setting_value, $this->getName(), $setting_name));
-            $this->settings[$setting_name] = $setting_value;
-        } else {
-            // Setting already exists, but with the same value - do nothing.
-        }
-    }
-
-    /**
-     * This is a general purpose hook, allowing modules to respond to routes
-     * of the form module.php?mod=FOO&mod_action=BAR
      *
-     * @param string $mod_action
+     * @return void
      */
-    public function modAction($mod_action)
+    final public function setPreference(string $setting_name, string $setting_value): void
     {
+        DB::table('module_setting')->updateOrInsert([
+            'module_name'  => $this->name(),
+            'setting_name' => $setting_name,
+        ], [
+            'setting_value' => $setting_value,
+        ]);
     }
 
     /**
      * Get a the current access level for a module
      *
      * @param Tree   $tree
-     * @param string $component tab, block, menu, etc
+     * @param string $interface
      *
      * @return int
      */
-    public function getAccessLevel(Tree $tree, $component)
+    final public function accessLevel(Tree $tree, string $interface): int
     {
-        $access_level = Database::prepare(
-            "SELECT access_level FROM `##module_privacy` WHERE gedcom_id = :gedcom_id AND module_name = :module_name AND component = :component"
-        )->execute(array(
-            'gedcom_id'   => $tree->getTreeId(),
-            'module_name' => $this->getName(),
-            'component'   => $component,
-        ))->fetchOne();
+        $access_levels = app('cache.array')
+            ->remember('module-privacy-' . $tree->id(), static function () use ($tree): Collection {
+                return DB::table('module_privacy')
+                    ->where('gedcom_id', '=', $tree->id())
+                    ->get();
+            });
 
-        if ($access_level === null) {
-            return $this->defaultAccessLevel();
-        } else {
-            return (int) $access_level;
-        }
+        $row = $access_levels->first(function (stdClass $row) use ($interface): bool {
+            return $row->interface === $interface && $row->module_name === $this->name();
+        });
+
+        return $row ? (int) $row->access_level : $this->access_level;
+    }
+
+    /**
+     * Where does this module store its resources
+     *
+     * @return string
+     */
+    public function resourcesFolder(): string
+    {
+        return Webtrees::ROOT_DIR . 'resources/';
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
 
 /**
@@ -23,29 +27,31 @@ class ReportHtmlLine extends ReportBaseLine
     /**
      * HTML line renderer
      *
-     * @param ReportHtml $renderer
+     * @param HtmlRenderer $renderer
+     *
+     * @return void
      */
     public function render($renderer)
     {
-        if ($this->x1 == '.') {
+        if ($this->x1 === ReportBaseElement::CURRENT_POSITION) {
             $this->x1 = $renderer->getX();
         }
-        if ($this->y1 == '.') {
+        if ($this->y1 === ReportBaseElement::CURRENT_POSITION) {
             $this->y1 = $renderer->getY();
         }
-        if ($this->x2 == '.') {
+        if ($this->x2 === ReportBaseElement::CURRENT_POSITION) {
             $this->x2 = $renderer->getRemainingWidth();
         }
-        if ($this->y2 == '.') {
+        if ($this->y2 === ReportBaseElement::CURRENT_POSITION) {
             $this->y2 = $renderer->getY();
         }
         // Vertical line
         if ($this->x1 == $this->x2) {
-            echo "<div style=\"position:absolute;overflow:hidden;border-", $renderer->alignRTL, ":solid black 1pt;", $renderer->alignRTL, ":", $this->x1, "pt;top:", $this->y1 + 1, "pt;width:1pt;height:", $this->y2 - $this->y1, "pt;\"> </div>\n";
+            echo '<div style="position:absolute;overflow:hidden;border-', $renderer->alignRTL, ':solid black 1pt;', $renderer->alignRTL, ':', $this->x1, 'pt;top:', $this->y1 + 1, 'pt;width:1pt;height:', $this->y2 - $this->y1, "pt;\"> </div>\n";
         }
         // Horizontal line
         if ($this->y1 == $this->y2) {
-            echo "<div style=\"position:absolute;overflow:hidden;border-top:solid black 1pt;", $renderer->alignRTL, ":", $this->x1, "pt;top:", $this->y1 + 1, "pt;width:", $this->x2 - $this->x1, "pt;height:1pt;\"> </div>\n";
+            echo '<div style="position:absolute;overflow:hidden;border-top:solid black 1pt;', $renderer->alignRTL, ':', $this->x1, 'pt;top:', $this->y1 + 1, 'pt;width:', $this->x2 - $this->x1, "pt;height:1pt;\"> </div>\n";
         }
         // Keep max Y updated
         // One or the other will be higher... lasy mans way...

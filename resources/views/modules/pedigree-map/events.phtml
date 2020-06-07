@@ -1,0 +1,30 @@
+<?php
+
+use Fisharebest\Webtrees\Fact;
+
+/**
+ * @var Fact   $fact
+ * @var string $relationship
+ * @var int    $sosa
+ */
+
+?>
+<div class="label">
+    <?= $relationship ?>
+</div>
+
+<?php if ($sosa !== 1) : ?>
+    <a href="<?= e($fact->record()->url()) ?>">
+        <?= $fact->record()->fullName() ?>
+    </a>
+<?php endif ?>
+
+<div>
+    <?= $fact->label() ?>: <?= $fact->date()->display(true) ?>
+</div>
+
+<div>
+    <a href="<?= e($fact->place()->url()) ?>">
+        <?= $fact->place()->fullName() ?>
+    </a>
+</div>

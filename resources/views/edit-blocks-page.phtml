@@ -1,0 +1,112 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\View;
+
+?>
+
+<h2><?= $title ?></h2>
+
+<p class="mt-4 mb-1">
+    <?= I18N::translate('Drag the blocks to change their position.') ?>
+</p>
+
+<form method="post" action="<?= e($url_save) ?>" id="edit-blocks">
+    <?= csrf_field() ?>
+    <div class="card-deck" id="current-blocks">
+        <div class="card">
+            <div class="card-body" id="main-blocks">
+                <?php foreach ($main_blocks as $block_id => $block) : ?>
+                    <?= view('edit-blocks-block', ['block_id' => $block_id, 'block' => $block]) ?>
+                <?php endforeach ?>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body" id="side-blocks">
+                <?php foreach ($side_blocks as $block_id => $block) : ?>
+                    <?= view('edit-blocks-block', ['block_id' => $block_id, 'block' => $block]) ?>
+                <?php endforeach ?>
+            </div>
+        </div>
+    </div>
+
+    <p class="mt-4 mb-1">
+        <?= I18N::translate('Add more blocks from the following list.') ?>
+    </p>
+
+    <div class="d-flex flex-wrap" id="available-blocks">
+        <?php foreach ($all_blocks as $block_id => $block) : ?>
+            <?= view('edit-blocks-block', ['block_id' => $block_id, 'block' => $block]) ?>
+        <?php endforeach ?>
+    </div>
+
+    <hr>
+
+    <div>
+        <button class="btn btn-primary" type="submit">
+            <?= view('icons/save') ?>
+            <?= I18N::translate('save') ?>
+        </button>
+
+        <a class="btn btn-secondary" href="<?= e($url_cancel) ?>">
+            <?= view('icons/cancel') ?>
+            <?= I18N::translate('cancel') ?>
+        </a>
+
+        <?php if ($can_reset) : ?>
+            <button class="btn btn-link" id="defaults" type="submit" name="defaults" value="on" data-confirm="<?= I18N::translate('Restore the default block layout') ?>" onclick="return confirm(this.dataset.confirm)">
+                <?= I18N::translate('Restore the default block layout') ?>
+            </button>
+        <?php endif ?>
+    </div>
+</form>
+
+<?php View::push('styles') ?>
+<style>
+    #available-blocks .wt-icon-delete {
+        display: none;
+    }
+
+    #current-blocks .wt-icon-help {
+        display: none;
+    }
+</style>
+<?php View::endpush() ?>
+
+<?php View::push('javascript') ?>
+<script>
+    new Sortable(document.getElementById("main-blocks"), {
+        group:     "blocks",
+        handle:    ".wt-icon-drag-handle",
+        animation: 150,
+        pull:      "clone",
+    });
+
+    new Sortable(document.getElementById("side-blocks"), {
+        group:     "blocks",
+        handle:    ".wt-icon-drag-handle",
+        animation: 150,
+        pull:      "clone",
+    });
+
+    new Sortable(document.getElementById("available-blocks"), {
+        group:     {
+            name: "blocks",
+            pull: "clone",
+            put:  false,
+        },
+        handle:    ".wt-icon-drag-handle",
+        animation: 150,
+        sort:      false,
+    });
+
+    $("#current-blocks").on("click", ".wt-icon-delete", function () {
+        $(this).closest(".wt-block").remove();
+    });
+
+    $('#edit-blocks').submit(function () {
+        $('#main-blocks input').attr('name', 'main[]');
+        $('#side-blocks input').attr('name', 'side[]');
+    });
+</script>
+<?php View::endpush() ?>

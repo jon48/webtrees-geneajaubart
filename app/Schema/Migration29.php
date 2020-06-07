@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Fisharebest\Webtrees\Schema;
 
-use Fisharebest\Webtrees\Database;
-use PDOException;
+declare(strict_types=1);
+
+namespace Fisharebest\Webtrees\Schema;
 
 /**
  * Upgrade the database schema from version 29 to version 30.
@@ -25,53 +26,12 @@ class Migration29 implements MigrationInterface
 {
     /**
      * Upgrade to to the next version
+     *
+     * @return void
      */
-    public function upgrade()
+    public function upgrade(): void
     {
-        // Originally migrated from PhpGedView, but never used.
-        Database::exec("DROP TABLE IF EXISTS `##ip_address`");
-
-        // No longer used
-        Database::exec("DELETE FROM `##user_setting` WHERE setting_name IN ('editaccount')");
-        Database::exec("DELETE FROM `##gedcom_setting` WHERE setting_name IN ('SHOW_STATS')");
-        Database::exec("DELETE FROM `##site_setting` WHERE setting_name IN ('REQUIRE_ADMIN_AUTH_REGISTRATION')");
-
-        // https://bugs.launchpad.net/webtrees/+bug/1405672
-        try {
-            Database::exec(
-                "UPDATE `##site_access_rule` SET user_agent_pattern = 'Mozilla/5.0 (% Konqueror/%'" .
-                " WHERE user_agent_pattern='Mozilla/5.0 (compatible; Konqueror/%'"
-            );
-        } catch (PDOException $ex) {
-            // Duplicate key?  Already done?
-        }
-
-        // Embedded variables are based on function names - which were renamed for PSR2
-        Database::exec(
-            "UPDATE `##block_setting` " .
-            " JOIN `##block` USING (block_id)" .
-            " SET setting_value = REPLACE(setting_value, '#WT_VERSION#', '#webtreesVersion#')" .
-            " WHERE setting_name = 'html' AND module_name = 'html'"
-        );
-        Database::exec(
-            "UPDATE `##block_setting` " .
-            " JOIN `##block` USING (block_id)" .
-            " SET setting_value = REPLACE(setting_value, '#browserTime24#', '#browserTime#')" .
-            " WHERE setting_name = 'html' AND module_name = 'html'"
-        );
-
-        // Language settings have changed from locale (en_GB) to language tag (en-GB)
-        Database::exec(
-            "UPDATE `##gedcom_setting` SET setting_value = REPLACE(setting_value, '_', '-') WHERE setting_name = 'language'"
-        );
-        Database::exec(
-            "UPDATE `##site_setting` SET setting_value = REPLACE(setting_value, '_', '-') WHERE setting_name = 'language'"
-        );
-        Database::exec(
-            "UPDATE `##user_setting` SET setting_value = REPLACE(setting_value, '_', '-') WHERE setting_name = 'language'"
-        );
-        Database::exec(
-            "UPDATE `##block_setting` SET setting_value = REPLACE(setting_value, '_', '-') WHERE setting_name = 'languages'"
-        );
+        // These migrations have been merged into migration 0.
+        // Direct upgrade from webtrees < 1.7.9 is not supported.
     }
 }

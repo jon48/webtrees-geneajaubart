@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,17 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Date;
 
 use Fisharebest\ExtCalendar\JulianCalendar;
 use Fisharebest\Webtrees\I18N;
 
 /**
- * Definitions for the Julian Proleptic calendar
- * (Proleptic means we extend it backwards, prior to its introduction in 46BC)
+ * Definitions for proleptic Julian dates.
  */
-class JulianDate extends CalendarDate
+class JulianDate extends AbstractGregorianJulianDate
 {
+    // GEDCOM calendar escape
+    public const ESCAPE = '@#DJULIAN@';
+
     /** @var bool True for dates recorded in new-style/old-style format, e.g. 2 FEB 1743/44 */
     private $new_old_style = false;
 
@@ -33,11 +39,11 @@ class JulianDate extends CalendarDate
      * day/month/year strings from a GEDCOM date
      * another CalendarDate object
      *
-     * @param array|int|CalendarDate $date
+     * @param array<string>|int|AbstractCalendarDate $date
      */
     public function __construct($date)
     {
-        $this->calendar = new JulianCalendar;
+        $this->calendar = new JulianCalendar();
         parent::__construct($date);
     }
 
@@ -48,13 +54,13 @@ class JulianDate extends CalendarDate
      *
      * @return int
      */
-    protected function nextYear($year)
+    protected function nextYear(int $year): int
     {
-        if ($year == -1) {
+        if ($year === -1) {
             return 1;
-        } else {
-            return $year + 1;
         }
+
+        return $year + 1;
     }
 
     /**
@@ -64,18 +70,20 @@ class JulianDate extends CalendarDate
      *
      * @return int
      */
-    protected function extractYear($year)
+    protected function extractYear(string $year): int
     {
         if (preg_match('/^(\d\d\d\d)\/\d{1,4}$/', $year, $match)) {
             // Assume the first year is correct
             $this->new_old_style = true;
 
-            return $match[1] + 1;
-        } elseif (preg_match('/^(\d+) B\.C\.$/', $year, $match)) {
-            return -$match[1];
-        } else {
-            return (int) $year;
+            return (int) $match[1] + 1;
         }
+
+        if (preg_match('/^(\d+) B\.C\.$/', $year, $match)) {
+            return - (int) $match[1];
+        }
+
+        return (int) $year;
     }
 
     /**
@@ -83,19 +91,19 @@ class JulianDate extends CalendarDate
      *
      * @return string
      */
-    protected function formatLongYear()
+    protected function formatLongYear(): string
     {
-        if ($this->y < 0) {
+        if ($this->year < 0) {
             return /*  I18N: BCE=Before the Common Era, for Julian years < 0. See http://en.wikipedia.org/wiki/Common_Era */
-                I18N::translate('%s&nbsp;BCE', I18N::digits(-$this->y));
-        } else {
-            if ($this->new_old_style) {
-                return I18N::translate('%s&nbsp;CE', I18N::digits(sprintf('%d/%02d', $this->y - 1, $this->y % 100)));
-            } else {
-                return /* I18N: CE=Common Era, for Julian years > 0. See http://en.wikipedia.org/wiki/Common_Era */
-                    I18N::translate('%s&nbsp;CE', I18N::digits($this->y));
-            }
+                I18N::translate('%s&nbsp;BCE', I18N::digits(-$this->year));
         }
+
+        if ($this->new_old_style) {
+            return I18N::translate('%s&nbsp;CE', I18N::digits(sprintf('%d/%02d', $this->year - 1, $this->year % 100)));
+        }
+
+        /* I18N: CE=Common Era, for Julian years > 0. See http://en.wikipedia.org/wiki/Common_Era */
+        return I18N::translate('%s&nbsp;CE', I18N::digits($this->year));
     }
 
     /**
@@ -103,16 +111,16 @@ class JulianDate extends CalendarDate
      *
      * @return string
      */
-    protected function formatGedcomYear()
+    protected function formatGedcomYear(): string
     {
-        if ($this->y < 0) {
-            return sprintf('%04d B.C.', -$this->y);
-        } else {
-            if ($this->new_old_style) {
-                return sprintf('%04d/%02d', $this->y - 1, $this->y % 100);
-            } else {
-                return sprintf('%04d', $this->y);
-            }
+        if ($this->year < 0) {
+            return sprintf('%04d B.C.', -$this->year);
         }
+
+        if ($this->new_old_style) {
+            return sprintf('%04d/%02d', $this->year - 1, $this->year % 100);
+        }
+
+        return sprintf('%04d', $this->year);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfFrance1851 extends CensusOfFrance implements CensusInterface
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '16 JAN 1851';
     }
@@ -35,9 +39,9 @@ class CensusOfFrance1851 extends CensusOfFrance implements CensusInterface
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnSurname($this, 'Noms', 'Noms de famille'),
             new CensusColumnGivenNames($this, 'Prénoms', ''),
             new CensusColumnOccupation($this, 'Professions', ''),
@@ -51,6 +55,6 @@ class CensusOfFrance1851 extends CensusOfFrance implements CensusInterface
             new CensusColumnNull($this, 'Fr', 'Français d’origine'),
             new CensusColumnNull($this, 'Nat', 'Naturalisés français'),
             new CensusColumnNull($this, 'Etr', 'Étrangers (indiquer leur pays d’origine)'),
-        );
+        ];
     }
 }

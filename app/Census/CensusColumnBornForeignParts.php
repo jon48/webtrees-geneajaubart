@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 use Fisharebest\Webtrees\Individual;
@@ -25,15 +29,14 @@ class CensusColumnBornForeignParts extends AbstractCensusColumn implements Censu
     /**
      * Generate the likely value of this census column, based on available information.
      *
-     * @param Individual      $individual
-     * @param Individual|null $head
+     * @param Individual $individual
+     * @param Individual $head
      *
      * @return string
      */
-    public function generate(Individual $individual, Individual $head = null)
+    public function generate(Individual $individual, Individual $head): string
     {
-        $birth_place  = explode(', ', $individual->getBirthPlace());
-        $birth_place  = end($birth_place);
+        $birth_place  = (string) $individual->getBirthPlace()->lastParts(1)->first();
         $census_place = $this->place();
 
         if ($birth_place === 'Wales') {
@@ -46,10 +49,12 @@ class CensusColumnBornForeignParts extends AbstractCensusColumn implements Censu
 
         if ($birth_place === $census_place || $birth_place === '') {
             return '';
-        } elseif ($birth_place === 'England' || $birth_place === 'Scotland' || $birth_place === 'Ireland') {
-            return substr($birth_place, 0, 1);
-        } else {
-            return 'F';
         }
+
+        if ($birth_place === 'England' || $birth_place === 'Scotland' || $birth_place === 'Ireland') {
+            return substr($birth_place, 0, 1);
+        }
+
+        return 'F';
     }
 }

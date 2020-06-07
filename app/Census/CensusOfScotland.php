@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,9 +29,9 @@ class CensusOfScotland extends Census implements CensusPlaceInterface
      *
      * @return CensusInterface[]
      */
-    public function allCensusDates()
+    public function allCensusDates(): array
     {
-        return array(
+        return [
             new CensusOfScotland1841(),
             new CensusOfScotland1851(),
             new CensusOfScotland1861(),
@@ -36,7 +40,7 @@ class CensusOfScotland extends Census implements CensusPlaceInterface
             new CensusOfScotland1891(),
             new CensusOfScotland1901(),
             new CensusOfScotland1911(),
-        );
+        ];
     }
 
     /**
@@ -44,8 +48,18 @@ class CensusOfScotland extends Census implements CensusPlaceInterface
      *
      * @return string
      */
-    public function censusPlace()
+    public function censusPlace(): string
     {
         return 'Scotland';
+    }
+
+    /**
+     * In which language was this census written.
+     *
+     * @return string
+     */
+    public function censusLanguage(): string
+    {
+        return 'en-GB';
     }
 }

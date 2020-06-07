@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 use Fisharebest\Webtrees\Individual;
@@ -26,18 +30,20 @@ class CensusColumnSurnameGivenNameInitial extends CensusColumnFullName
      * Generate the likely value of this census column, based on available information.
      *
      * @param Individual $individual
-     * @param Individual|null $head
+     * @param Individual $head
      *
      * @return string
      */
-    public function generate(Individual $individual, Individual $head = null)
+    public function generate(Individual $individual, Individual $head): string
     {
         $name  = $this->nameAtCensusDate($individual, $this->date());
         $given = $name['givn'];
-        if (strpos($given, ' ') === false) {
+        $space_pos = strpos($given, ' ');
+
+        if ($space_pos === false) {
             return $name['surname'] . ', ' . $given;
-        } else {
-            return $name['surname'] . ', ' . substr($given, 0, strpos($given, ' ') + 2);
         }
+
+        return $name['surname'] . ', ' . substr($given, 0, $space_pos + 2);
     }
 }

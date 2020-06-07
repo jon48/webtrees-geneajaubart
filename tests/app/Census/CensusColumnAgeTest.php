@@ -14,38 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 use Fisharebest\Webtrees\Date;
-use Mockery;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\TestCase;
 
 /**
  * Test harness for the class CensusColumnAge
  */
-class CensusColumnAgeTest extends \PHPUnit_Framework_TestCase
+class CensusColumnAgeTest extends TestCase
 {
     /**
-     * Delete mock objects
+     * @covers \Fisharebest\Webtrees\Census\CensusColumnAge
+     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
+     *
+     * @return void
      */
-    public function tearDown()
+    public function testGenerateColumn(): void
     {
-        Mockery::close();
-    }
+        $individual = $this->createMock(Individual::class);
+        $individual->method('getEstimatedBirthDate')->willReturn(new Date('01 JAN 1800'));
 
-    /**
-     * @covers Fisharebest\Webtrees\Census\CensusColumnAge
-     * @covers Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
-    public function testGenerateColumn()
-    {
-        $individual = Mockery::mock('Fisharebest\Webtrees\Individual');
-        $individual->shouldReceive('getEstimatedBirthDate')->andReturn(new Date('01 JAN 1800'));
-
-        $census = Mockery::mock('Fisharebest\Webtrees\Census\CensusInterface');
-        $census->shouldReceive('censusDate')->andReturn('30 JUN 1832');
+        $census = $this->createMock(CensusInterface::class);
+        $census->method('censusDate')->willReturn('30 JUN 1832');
 
         $column = new CensusColumnAge($census, '', '');
 
-        $this->assertSame('32', $column->generate($individual));
+        $this->assertSame('32', $column->generate($individual, $individual));
     }
 }

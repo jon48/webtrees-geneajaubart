@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,9 +29,9 @@ class CensusOfUnitedStates extends Census implements CensusPlaceInterface
      *
      * @return CensusInterface[]
      */
-    public function allCensusDates()
+    public function allCensusDates(): array
     {
-        return array(
+        return [
             new CensusOfUnitedStates1790(),
             new CensusOfUnitedStates1800(),
             new CensusOfUnitedStates1810(),
@@ -44,7 +48,7 @@ class CensusOfUnitedStates extends Census implements CensusPlaceInterface
             new CensusOfUnitedStates1920(),
             new CensusOfUnitedStates1930(),
             new CensusOfUnitedStates1940(),
-        );
+        ];
     }
 
     /**
@@ -52,8 +56,18 @@ class CensusOfUnitedStates extends Census implements CensusPlaceInterface
      *
      * @return string
      */
-    public function censusPlace()
+    public function censusPlace(): string
     {
         return 'United States';
+    }
+
+    /**
+     * In which language was this census written.
+     *
+     * @return string
+     */
+    public function censusLanguage(): string
+    {
+        return 'en-US';
     }
 }

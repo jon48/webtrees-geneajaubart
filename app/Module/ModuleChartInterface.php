@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Individual;
@@ -21,23 +25,56 @@ use Fisharebest\Webtrees\Menu;
 /**
  * Interface ModuleChartInterface - Classes and libraries for module system
  */
-interface ModuleChartInterface
+interface ModuleChartInterface extends ModuleInterface
 {
     /**
-     * Return a menu item for this chart.
+     * A menu item for this chart for an individual box in a chart.
      *
      * @param Individual $individual
      *
      * @return Menu|null
      */
-    public function getChartMenu(Individual $individual);
+    public function chartBoxMenu(Individual $individual): ?Menu;
 
     /**
-     * Return a menu item for this chart (for menu in individual box).
+     * A main menu item for this chart.
      *
      * @param Individual $individual
      *
-     * @return Menu|null
+     * @return Menu
      */
-    public function getBoxChartMenu(Individual $individual);
+    public function chartMenu(Individual $individual): Menu;
+
+    /**
+     * CSS class for the menu.
+     *
+     * @return string
+     */
+    public function chartMenuClass(): string;
+
+    /**
+     * The title for a specific instance of this chart.
+     *
+     * @param Individual $individual
+     *
+     * @return string
+     */
+    public function chartTitle(Individual $individual): string;
+
+    /**
+     * The URL for a page showing chart options.
+     *
+     * @param Individual $individual
+     * @param mixed[]    $parameters
+     *
+     * @return string
+     */
+    public function chartUrl(Individual $individual, array $parameters = []): string;
+
+    /**
+     * Attributes for the URL.
+     *
+     * @return string[]
+     */
+    public function chartUrlAttributes(): array;
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,28 +14,96 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
-use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Filter;
-use Fisharebest\Webtrees\Functions\FunctionsEdit;
-use Fisharebest\Webtrees\Functions\FunctionsPrintLists;
+use Fisharebest\Webtrees\Carbon;
+use Fisharebest\Webtrees\Gedcom;
+use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Theme;
+use Fisharebest\Webtrees\Services\CalendarService;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Support\Str;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class UpcomingAnniversariesModule
  */
 class UpcomingAnniversariesModule extends AbstractModule implements ModuleBlockInterface
 {
+    use ModuleBlockTrait;
+
+    // Default values for new blocks.
+    private const DEFAULT_DAYS   = '7';
+    private const DEFAULT_FILTER = '1';
+    private const DEFAULT_SORT   = 'alpha';
+    private const DEFAULT_STYLE  = 'table';
+
+    // Initial sorting for datatables
+    private const DATATABLES_ORDER = [
+        'alpha' => [[0, 'asc']],
+        'anniv' => [[1, 'asc']],
+    ];
+
+    // Can show this number of days into the future.
+    private const MIN_DAYS = 1;
+    private const MAX_DAYS = 30;
+
+    // Pagination
+    private const LIMIT_LOW  = 10;
+    private const LIMIT_HIGH = 20;
+
+    // All standard GEDCOM 5.5.1 events except CENS, RESI and EVEN
+    private const ALL_EVENTS = [
+        'ADOP',
+        'ANUL',
+        'BAPM',
+        'BARM',
+        'BASM',
+        'BIRT',
+        'BLES',
+        'BURI',
+        'CHR',
+        'CHRA',
+        'CONF',
+        'CREM',
+        'DEAT',
+        'DIV',
+        'DIVF',
+        'EMIG',
+        'ENGA',
+        'FCOM',
+        'GRAD',
+        'IMMI',
+        'MARB',
+        'MARC',
+        'MARL',
+        'MARR',
+        'MARS',
+        'NATU',
+        'ORDN',
+        'PROB',
+        'RETI',
+        'WILL',
+    ];
+
+    private const DEFAULT_EVENTS = [
+        'BIRT',
+        'MARR',
+        'DEAT',
+    ];
+
     /**
-     * How should this module be labelled on tabs, menus, etc.?
+     * How should this module be identified in the control panel, etc.?
      *
      * @return string
      */
-    public function getTitle()
+    public function title(): string
     {
-        return /* I18N: Name of a module */ I18N::translate('Upcoming events');
+        /* I18N: Name of a module */
+        return I18N::translate('Upcoming events');
     }
 
     /**
@@ -42,153 +111,189 @@ class UpcomingAnniversariesModule extends AbstractModule implements ModuleBlockI
      *
      * @return string
      */
-    public function getDescription()
+    public function description(): string
     {
-        return /* I18N: Description of the “Upcoming events” module */ I18N::translate('A list of the anniversaries that will occur in the near future.');
+        /* I18N: Description of the “Upcoming events” module */
+        return I18N::translate('A list of the anniversaries that will occur in the near future.');
     }
 
     /**
      * Generate the HTML content of this block.
      *
+     * @param Tree     $tree
      * @param int      $block_id
-     * @param bool     $template
-     * @param string[] $cfg
+     * @param string   $context
+     * @param string[] $config
      *
      * @return string
      */
-    public function getBlock($block_id, $template = true, $cfg = array())
+    public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
-        global $ctype, $WT_TREE;
+        $calendar_service = new CalendarService();
 
-        $days      = $this->getBlockSetting($block_id, 'days', '7');
-        $filter    = $this->getBlockSetting($block_id, 'filter', '1');
-        $onlyBDM   = $this->getBlockSetting($block_id, 'onlyBDM', '0');
-        $infoStyle = $this->getBlockSetting($block_id, 'infoStyle', 'table');
-        $sortStyle = $this->getBlockSetting($block_id, 'sortStyle', 'alpha');
-        $block     = $this->getBlockSetting($block_id, 'block', '1');
+        $default_events = implode(',', self::DEFAULT_EVENTS);
 
-        foreach (array('days', 'filter', 'onlyBDM', 'infoStyle', 'sortStyle', 'block') as $name) {
-            if (array_key_exists($name, $cfg)) {
-                $$name = $cfg[$name];
+        $days      = (int) $this->getBlockSetting($block_id, 'days', self::DEFAULT_DAYS);
+        $filter    = (bool) $this->getBlockSetting($block_id, 'filter', self::DEFAULT_FILTER);
+        $infoStyle = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
+        $sortStyle = $this->getBlockSetting($block_id, 'sortStyle', self::DEFAULT_SORT);
+        $events    = $this->getBlockSetting($block_id, 'events', $default_events);
+
+        extract($config, EXTR_OVERWRITE);
+
+        $event_array = explode(',', $events);
+
+        // If we are only showing living individuals, then we don't need to search for DEAT events.
+        if ($filter) {
+            $event_array  = array_diff($event_array, Gedcom::DEATH_EVENTS);
+        }
+
+        $events_filter = implode('|', $event_array);
+
+        $startjd = Carbon::now()->julianDay() + 1;
+        $endjd   = Carbon::now()->julianDay() + $days;
+
+        $facts = $calendar_service->getEventsList($startjd, $endjd, $events_filter, $filter, $sortStyle, $tree);
+
+        if ($facts->isEmpty()) {
+            if ($endjd == $startjd) {
+                $content = view('modules/upcoming_events/empty', [
+                    'message' => I18N::translate('No events exist for tomorrow.'),
+                ]);
+            } else {
+                /* I18N: translation for %s==1 is unused; it is translated separately as “tomorrow” */                $content = view('modules/upcoming_events/empty', [
+                    'message' => I18N::plural('No events exist for the next %s day.', 'No events exist for the next %s days.', $endjd - $startjd + 1, I18N::number($endjd - $startjd + 1)),
+                ]);
             }
-        }
-
-        $startjd = WT_CLIENT_JD + 1;
-        $endjd   = WT_CLIENT_JD + $days;
-
-        $id    = $this->getName() . $block_id;
-        $class = $this->getName() . '_block';
-        if ($ctype === 'gedcom' && Auth::isManager($WT_TREE) || $ctype === 'user' && Auth::check()) {
-            $title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
+        } elseif ($infoStyle === 'list') {
+            $content = view('lists/anniversaries-list', [
+                'id'         => $block_id,
+                'facts'      => $facts,
+                'limit_low'  => self::LIMIT_LOW,
+                'limit_high' => self::LIMIT_HIGH,
+            ]);
         } else {
-            $title = '';
-        }
-        $title .= $this->getTitle();
-
-        $content = '';
-        switch ($infoStyle) {
-            case 'list':
-                // Output style 1:  Old format, no visible tables, much smaller text. Better suited to right side of page.
-                $content .= FunctionsPrintLists::eventsList($startjd, $endjd, $onlyBDM ? 'BIRT MARR DEAT' : '', $filter, $sortStyle);
-                break;
-            case 'table':
-                // Style 2: New format, tables, big text, etc. Not too good on right side of page
-                ob_start();
-                $content .= FunctionsPrintLists::eventsTable($startjd, $endjd, $onlyBDM ? 'BIRT MARR DEAT' : '', $filter, $sortStyle);
-                $content .= ob_get_clean();
-                break;
+            $content = view('lists/anniversaries-table', [
+                'facts'      => $facts,
+                'limit_low'  => self::LIMIT_LOW,
+                'limit_high' => self::LIMIT_HIGH,
+                'order'      => self::DATATABLES_ORDER[$sortStyle],
+            ]);
         }
 
-        if ($template) {
-            if ($block) {
-                $class .= ' small_inner_block';
-            }
-
-            return Theme::theme()->formatBlock($id, $title, $class, $content);
-        } else {
-            return $content;
+        if ($context !== self::CONTEXT_EMBED) {
+            return view('modules/block-template', [
+                'block'      => Str::kebab($this->name()),
+                'id'         => $block_id,
+                'config_url' => $this->configUrl($tree, $context, $block_id),
+                'title'      => $this->title(),
+                'content'    => $content,
+            ]);
         }
+
+        return $content;
     }
 
-    /** {@inheritdoc} */
-    public function loadAjax()
-    {
-        return true;
-    }
-
-    /** {@inheritdoc} */
-    public function isUserBlock()
-    {
-        return true;
-    }
-
-    /** {@inheritdoc} */
-    public function isGedcomBlock()
+    /**
+     * Should this block load asynchronously using AJAX?
+     *
+     * Simple blocks are faster in-line, more complex ones can be loaded later.
+     *
+     * @return bool
+     */
+    public function loadAjax(): bool
     {
         return true;
     }
 
     /**
+     * Can this block be shown on the user’s home page?
+     *
+     * @return bool
+     */
+    public function isUserBlock(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Can this block be shown on the tree’s home page?
+     *
+     * @return bool
+     */
+    public function isTreeBlock(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Update the configuration for a block.
+     *
+     * @param ServerRequestInterface $request
+     * @param int     $block_id
+     *
+     * @return void
+     */
+    public function saveBlockConfiguration(ServerRequestInterface $request, int $block_id): void
+    {
+        $params = (array) $request->getParsedBody();
+
+        $this->setBlockSetting($block_id, 'days', $params['days']);
+        $this->setBlockSetting($block_id, 'filter', $params['filter']);
+        $this->setBlockSetting($block_id, 'infoStyle', $params['infoStyle']);
+        $this->setBlockSetting($block_id, 'sortStyle', $params['sortStyle']);
+        $this->setBlockSetting($block_id, 'events', implode(',', $params['events'] ?? []));
+    }
+
+    /**
      * An HTML form to edit block settings
      *
-     * @param int $block_id
+     * @param Tree $tree
+     * @param int  $block_id
+     *
+     * @return string
      */
-    public function configureBlock($block_id)
+    public function editBlockConfiguration(Tree $tree, int $block_id): string
     {
-        if (Filter::postBool('save') && Filter::checkCsrf()) {
-            $this->setBlockSetting($block_id, 'days', Filter::postInteger('days', 1, 30, 7));
-            $this->setBlockSetting($block_id, 'filter', Filter::postBool('filter'));
-            $this->setBlockSetting($block_id, 'onlyBDM', Filter::postBool('onlyBDM'));
-            $this->setBlockSetting($block_id, 'infoStyle', Filter::post('infoStyle', 'list|table', 'table'));
-            $this->setBlockSetting($block_id, 'sortStyle', Filter::post('sortStyle', 'alpha|anniv', 'alpha'));
-            $this->setBlockSetting($block_id, 'block', Filter::postBool('block'));
+        $default_events = implode(',', self::DEFAULT_EVENTS);
+
+        $days      = (int) $this->getBlockSetting($block_id, 'days', self::DEFAULT_DAYS);
+        $filter    = $this->getBlockSetting($block_id, 'filter', self::DEFAULT_FILTER);
+        $infoStyle = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
+        $sortStyle = $this->getBlockSetting($block_id, 'sortStyle', self::DEFAULT_SORT);
+        $events    = $this->getBlockSetting($block_id, 'events', $default_events);
+
+        $event_array = explode(',', $events);
+
+        $all_events = [];
+        foreach (self::ALL_EVENTS as $event) {
+            $all_events[$event] = GedcomTag::getLabel($event);
         }
 
-        $days      = $this->getBlockSetting($block_id, 'days', '7');
-        $filter    = $this->getBlockSetting($block_id, 'filter', '1');
-        $onlyBDM   = $this->getBlockSetting($block_id, 'onlyBDM', '0');
-        $infoStyle = $this->getBlockSetting($block_id, 'infoStyle', 'table');
-        $sortStyle = $this->getBlockSetting($block_id, 'sortStyle', 'alpha');
-        $block     = $this->getBlockSetting($block_id, 'block', '1');
+        $info_styles = [
+            /* I18N: An option in a list-box */
+            'list'  => I18N::translate('list'),
+            /* I18N: An option in a list-box */
+            'table' => I18N::translate('table'),
+        ];
 
-        echo '<tr><td class="descriptionbox wrap width33">';
-        echo I18N::translate('Number of days to show');
-        echo '</td><td class="optionbox">';
-        echo '<input type="text" name="days" size="2" value="', $days, '">';
-        echo ' <em>', I18N::plural('maximum %s day', 'maximum %s days', 30, I18N::number(30)), '</em>';
-        echo '</td></tr>';
+        $sort_styles = [
+            /* I18N: An option in a list-box */
+            'alpha' => I18N::translate('sort by name'),
+            /* I18N: An option in a list-box */
+            'anniv' => I18N::translate('sort by date'),
+        ];
 
-        echo '<tr><td class="descriptionbox wrap width33">';
-        echo I18N::translate('Show only events of living individuals');
-        echo '</td><td class="optionbox">';
-        echo FunctionsEdit::editFieldYesNo('filter', $filter);
-        echo '</td></tr>';
-
-        echo '<tr><td class="descriptionbox wrap width33">';
-        echo I18N::translate('Show only births, deaths, and marriages');
-        echo '</td><td class="optionbox">';
-        echo FunctionsEdit::editFieldYesNo('onlyBDM', $onlyBDM);
-        echo '</td></tr>';
-
-        echo '<tr><td class="descriptionbox wrap width33">';
-        echo I18N::translate('Presentation style');
-        echo '</td><td class="optionbox">';
-        echo FunctionsEdit::selectEditControl('infoStyle', array('list' => I18N::translate('list'), 'table' => I18N::translate('table')), null, $infoStyle, '');
-        echo '</td></tr>';
-
-        echo '<tr><td class="descriptionbox wrap width33">';
-        echo I18N::translate('Sort order');
-        echo '</td><td class="optionbox">';
-        echo FunctionsEdit::selectEditControl('sortStyle', array(
-            /* I18N: An option in a list-box */ 'alpha' => I18N::translate('sort by name'),
-            /* I18N: An option in a list-box */ 'anniv' => I18N::translate('sort by date'),
-        ), null, $sortStyle, '');
-        echo '</td></tr>';
-
-        echo '<tr><td class="descriptionbox wrap width33">';
-        echo /* I18N: label for a yes/no option */ I18N::translate('Add a scrollbar when block contents grow');
-        echo '</td><td class="optionbox">';
-        echo FunctionsEdit::editFieldYesNo('block', $block);
-        echo '</td></tr>';
+        return view('modules/upcoming_events/config', [
+            'all_events'  => $all_events,
+            'days'        => $days,
+            'event_array' => $event_array,
+            'filter'      => $filter,
+            'infoStyle'   => $infoStyle,
+            'info_styles' => $info_styles,
+            'max_days'    => self::MAX_DAYS,
+            'sortStyle'   => $sortStyle,
+            'sort_styles' => $sort_styles,
+        ]);
     }
 }

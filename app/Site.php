@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,74 +14,81 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees;
+
+use Illuminate\Database\Capsule\Manager as DB;
+
+use function in_array;
+use function mb_substr;
 
 /**
  * Provide an interface to the wt_site_setting table.
  */
 class Site
 {
+    // The following preferences contain sensitive data, and should not be logged.
+    private const SENSITIVE_PREFERENCES = [
+        'SMTP_AUTH_PASS'
+    ];
+
     /**
      * Everything from the wt_site_setting table.
      *
-     * @var array
+     * @var array<string,string>
      */
-    private static $settings = null;
+    public static $preferences = [];
 
     /**
      * Get the site’s configuration settings
      *
      * @param string $setting_name
+     * @param string $default
      *
-     * @return string|null
+     * @return string
      */
-    public static function getPreference($setting_name)
+    public static function getPreference(string $setting_name, string $default = ''): string
     {
         // There are lots of settings, and we need to fetch lots of them on every page
         // so it is quicker to fetch them all in one go.
-        if (self::$settings === null) {
-            self::$settings = Database::prepare(
-                "SELECT setting_name, setting_value FROM `##site_setting`"
-            )->fetchAssoc();
+        if (self::$preferences === []) {
+            self::$preferences = DB::table('site_setting')
+                ->pluck('setting_value', 'setting_name')
+                ->all();
         }
 
-        // A setting that hasn't yet been set?
-        if (!array_key_exists($setting_name, self::$settings)) {
-            self::$settings[$setting_name] = null;
-        }
-
-        return self::$settings[$setting_name];
+        return self::$preferences[$setting_name] ?? $default;
     }
 
     /**
      * Set the site’s configuration settings.
      *
-     * @param string          $setting_name
-     * @param string|int|bool $setting_value
+     * @param string $setting_name
+     * @param string $setting_value
+     *
+     * @return void
      */
-    public static function setPreference($setting_name, $setting_value)
+    public static function setPreference($setting_name, $setting_value): void
     {
-        // Only need to update the database if the setting has actually changed.
-        if (self::getPreference($setting_name) != $setting_value) {
-            if ($setting_value === null) {
-                Database::prepare(
-                    "DELETE FROM `##site_setting` WHERE setting_name = :setting_name"
-                )->execute(array(
-                    'setting_name' => $setting_name,
-                ));
-            } else {
-                Database::prepare(
-                    "REPLACE INTO `##site_setting` (setting_name, setting_value)" .
-                    " VALUES (:setting_name, LEFT(:setting_value, 2000))"
-                )->execute(array(
-                    'setting_name'  => $setting_name,
-                    'setting_value' => $setting_value,
-                ));
+        // The database column is only this long.
+        $setting_value = mb_substr($setting_value, 0, 2000);
+
+        if (self::getPreference($setting_name) !== $setting_value) {
+            DB::table('site_setting')->updateOrInsert([
+                'setting_name' => $setting_name,
+            ], [
+                'setting_value' => $setting_value,
+            ]);
+
+            self::$preferences[$setting_name] = $setting_value;
+
+            if (in_array($setting_name, self::SENSITIVE_PREFERENCES, true)) {
+                $setting_value = '********';
             }
 
-            self::$settings[$setting_name] = $setting_value;
-
-            Log::addConfigurationLog('Site preference "' . $setting_name . '" set to "' . $setting_value . '"');
+            Log::addConfigurationLog('Site preference "' . $setting_name . '" set to "' . $setting_value . '"', null);
         }
     }
 }

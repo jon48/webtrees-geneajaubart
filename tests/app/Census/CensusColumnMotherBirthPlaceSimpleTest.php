@@ -14,43 +14,62 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
-use Mockery;
+use Fisharebest\Webtrees\Family;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Place;
+use Fisharebest\Webtrees\TestCase;
+use Illuminate\Support\Collection;
 
 /**
  * Test harness for the class CensusColumnMotherBirthPlaceSimple
  */
-class CensusColumnMotherBirthPlaceSimpleTest extends \PHPUnit_Framework_TestCase
+class CensusColumnMotherBirthPlaceSimpleTest extends TestCase
 {
     /**
-     * Delete mock objects
+     * Get place mock.
+     *
+     * @param string $place Gedcom Place
+     *
+     * @return Place
      */
-    public function tearDown()
+    private function getPlaceMock($place): Place
     {
-        Mockery::close();
+        $placeParts = explode(', ', $place);
+
+        $placeMock = $this->createMock(Place::class);
+        $placeMock->method('gedcomName')->willReturn($place);
+        $placeMock->method('lastParts')->willReturn(new Collection($placeParts));
+
+        return $placeMock;
     }
 
     /**
-     * @covers Fisharebest\Webtrees\Census\CensusColumnMotherBirthPlaceSimple
-     * @covers Fisharebest\Webtrees\Census\AbstractCensusColumn
+     * @covers \Fisharebest\Webtrees\Census\CensusColumnMotherBirthPlaceSimple
+     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
+     *
+     * @return void
      */
-    public function testKnownStateAndTown()
+    public function testKnownStateAndTown(): void
     {
-        $father = Mockery::mock('Fisharebest\Webtrees\Individual');
-        $father->shouldReceive('getBirthPlace')->andReturn('Miami, Florida, United States');
+        $father = $this->createMock(Individual::class);
+        $father->method('getBirthPlace')->willReturn($this->getPlaceMock('Miami, Florida, United States'));
 
-        $family = Mockery::mock('Fisharebest\Webtrees\Family');
-        $family->shouldReceive('getWife')->andReturn($father);
+        $family = $this->createMock(Family::class);
+        $family->method('wife')->willReturn($father);
 
-        $individual = Mockery::mock('Fisharebest\Webtrees\Individual');
-        $individual->shouldReceive('getPrimaryChildFamily')->andReturn($family);
+        $individual = $this->createMock(Individual::class);
+        $individual->method('childFamilies')->willReturn(new Collection([$family]));
 
-        $census = Mockery::mock('Fisharebest\Webtrees\Census\CensusInterface');
-        $census->shouldReceive('censusPlace')->andReturn('United States');
+        $census = $this->createMock(CensusInterface::class);
+        $census->method('censusPlace')->willReturn('United States');
 
         $column = new CensusColumnMotherBirthPlaceSimple($census, '', '');
 
-        $this->assertSame('Florida', $column->generate($individual));
+        $this->assertSame('Florida', $column->generate($individual, $individual));
     }
 }

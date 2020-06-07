@@ -1,7 +1,8 @@
 <?php
+
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,816 +14,1073 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
+use Aura\Router\Route;
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Controller\PageController;
+use Fisharebest\Webtrees\Exceptions\FamilyNotFoundException;
+use Fisharebest\Webtrees\Exceptions\IndividualNotFoundException;
+use Fisharebest\Webtrees\Exceptions\MediaNotFoundException;
+use Fisharebest\Webtrees\Exceptions\NoteNotFoundException;
+use Fisharebest\Webtrees\Exceptions\RepositoryNotFoundException;
+use Fisharebest\Webtrees\Exceptions\SourceNotFoundException;
+use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\Family;
-use Fisharebest\Webtrees\Filter;
-use Fisharebest\Webtrees\Functions\FunctionsPrint;
+use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomRecord;
+use Fisharebest\Webtrees\Http\RequestHandlers\FamilyPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\IndividualPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\MediaPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\NotePage;
+use Fisharebest\Webtrees\Http\RequestHandlers\RepositoryPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\SourcePage;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Media;
 use Fisharebest\Webtrees\Menu;
-use Fisharebest\Webtrees\Module;
-use Fisharebest\Webtrees\Module\ClippingsCart\ClippingsCartController;
+use Fisharebest\Webtrees\Note;
+use Fisharebest\Webtrees\Repository;
+use Fisharebest\Webtrees\Services\GedcomExportService;
+use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\Session;
+use Fisharebest\Webtrees\Source;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Support\Collection;
+use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemInterface;
+use League\Flysystem\ZipArchive\ZipArchiveAdapter;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use RuntimeException;
+
+use function app;
+use function array_filter;
+use function array_keys;
+use function array_map;
+use function array_search;
+use function assert;
+use function fopen;
+use function in_array;
+use function is_string;
+use function key;
+use function preg_match_all;
+use function redirect;
+use function rewind;
+use function route;
+use function str_replace;
+use function stream_get_meta_data;
+use function strip_tags;
+use function tmpfile;
+use function uasort;
+
+use const PREG_SET_ORDER;
 
 /**
  * Class ClippingsCartModule
  */
-class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface, ModuleSidebarInterface
+class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
 {
-    /** {@inheritdoc} */
-    public function getTitle()
-    {
-        return /* I18N: Name of a module */
-            I18N::translate('Clippings cart');
-    }
+    use ModuleMenuTrait;
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    // Routes that have a record which can be added to the clipboard
+    private const ROUTES_WITH_RECORDS = [
+        'Family'     => FamilyPage::class,
+        'Individual' => IndividualPage::class,
+        'Media'      => MediaPage::class,
+        'Note'       => NotePage::class,
+        'Repository' => RepositoryPage::class,
+        'Source'     => SourcePage::class,
+    ];
+
+    /** @var int The default access level for this module.  It can be changed in the control panel. */
+    protected $access_level = Auth::PRIV_USER;
+
+    /** @var GedcomExportService */
+    private $gedcom_export_service;
+
+    /** @var UserService */
+    private $user_service;
+
+    /**
+     * ClippingsCartModule constructor.
+     *
+     * @param GedcomExportService $gedcom_export_service
+     * @param UserService         $user_service
+     */
+    public function __construct(GedcomExportService $gedcom_export_service, UserService $user_service)
     {
-        return /* I18N: Description of the “Clippings cart” module */
-            I18N::translate('Select records from your family tree and save them as a GEDCOM file.');
+        $this->gedcom_export_service = $gedcom_export_service;
+        $this->user_service          = $user_service;
     }
 
     /**
-     * What is the default access level for this module?
+     * How should this module be identified in the control panel, etc.?
      *
-     * Some modules are aimed at admins or managers, and are not generally shown to users.
+     * @return string
+     */
+    public function title(): string
+    {
+        /* I18N: Name of a module */
+        return I18N::translate('Clippings cart');
+    }
+
+    /**
+     * A sentence describing what this module does.
+     *
+     * @return string
+     */
+    public function description(): string
+    {
+        /* I18N: Description of the “Clippings cart” module */
+        return I18N::translate('Select records from your family tree and save them as a GEDCOM file.');
+    }
+
+    /**
+     * The default position for this menu.  It can be changed in the control panel.
      *
      * @return int
      */
-    public function defaultAccessLevel()
+    public function defaultMenuOrder(): int
     {
-        return Auth::PRIV_USER;
-    }
-
-    /**
-     * This is a general purpose hook, allowing modules to respond to routes
-     * of the form module.php?mod=FOO&mod_action=BAR
-     *
-     * @param string $mod_action
-     */
-    public function modAction($mod_action)
-    {
-        global $WT_TREE;
-
-        // Only allow access if either the menu or sidebar is enabled.
-        if (
-            !array_key_exists($this->getName(), Module::getActiveSidebars($WT_TREE)) &&
-            !array_key_exists($this->getName(), Module::getActiveMenus($WT_TREE))
-        ) {
-            http_response_code(404);
-
-            return;
-        }
-
-        switch ($mod_action) {
-            case 'ajax':
-                $html = $this->getSidebarAjaxContent();
-                header('Content-Type: text/html; charset=UTF-8');
-                echo $html;
-                break;
-            case 'index':
-                global $controller, $WT_TREE;
-
-                $MAX_PEDIGREE_GENERATIONS = $WT_TREE->getPreference('MAX_PEDIGREE_GENERATIONS');
-
-                $clip_ctrl = new ClippingsCartController;
-                $cart      = Session::get('cart');
-
-                $controller = new PageController;
-                $controller
-                ->setPageTitle($this->getTitle())
-                ->pageHeader()
-                ->addExternalJavascript(WT_AUTOCOMPLETE_JS_URL)
-                ->addInlineJavascript('autocomplete();');
-
-                echo '<script>';
-                echo 'function radAncestors(elementid) {var radFamilies=document.getElementById(elementid);radFamilies.checked=true;}';
-                echo '</script>';
-
-                if (!$cart[$WT_TREE->getTreeId()]) {
-                    echo '<h2>', I18N::translate('Family tree clippings cart'), '</h2>';
-                }
-
-                if ($clip_ctrl->action == 'add') {
-                    $record = GedcomRecord::getInstance($clip_ctrl->id, $WT_TREE);
-                    if ($clip_ctrl->type === 'FAM') { ?>
-                    <form action="module.php" method="get">
-                        <input type="hidden" name="mod" value="clippings">
-                        <input type="hidden" name="mod_action" value="index">
-                        <input type="hidden" name="id" value="<?php echo $clip_ctrl->id; ?>">
-                        <input type="hidden" name="type" value="<?php echo $clip_ctrl->type; ?>">
-                        <input type="hidden" name="action" value="add1">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <td class="topbottombar">
-                                            <?php echo I18N::translate('Add to the clippings cart'); ?>
-                                    </td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="optionbox">
-                                        <input type="radio" name="others" value="parents">
-                                            <?php echo $record->getFullName(); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="optionbox">
-                                        <input type="radio" name="others" value="members" checked>
-                                            <?php echo /* I18N: %s is a family (husband + wife) */
-                                            I18N::translate('%s and their children', $record->getFullName()); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="optionbox">
-                                        <input type="radio" name="others" value="descendants">
-                                            <?php echo /* I18N: %s is a family (husband + wife) */
-                                            I18N::translate('%s and their descendants', $record->getFullName()); ?>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td class="topbottombar"><input type="submit" value="<?php echo I18N::translate('continue'); ?>">
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </form>
-                    <?php } elseif ($clip_ctrl->type === 'INDI') { ?>
-                    <form action="module.php" method="get">
-                        <input type="hidden" name="mod" value="clippings">
-                        <input type="hidden" name="mod_action" value="index">
-                        <input type="hidden" name="id" value="<?php echo $clip_ctrl->id; ?>">
-                        <input type="hidden" name="type" value="<?php echo $clip_ctrl->type; ?>">
-                        <input type="hidden" name="action" value="add1">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <td class="topbottombar">
-                                        <?php echo I18N::translate('Add to the clippings cart'); ?>
-                                    </td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="optionbox">
-                                        <label>
-                                            <input type="radio" name="others" checked value="none">
-                                            <?php echo $record->getFullName(); ?>
-                                        </label>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="optionbox">
-                                        <label>
-                                            <input type="radio" name="others" value="parents">
-                                            <?php
-                                            if ($record->getSex() === 'F') {
-                                                echo /* I18N: %s is a woman's name */
-                                                I18N::translate('%s, her parents and siblings', $record->getFullName());
-                                            } else {
-                                                echo /* I18N: %s is a man's name */
-                                                I18N::translate('%s, his parents and siblings', $record->getFullName());
-                                            }
-                                            ?>
-                                        </label>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="optionbox">
-                                        <label>
-                                            <input type="radio" name="others" value="members">
-                                            <?php
-                                            if ($record->getSex() === 'F') {
-                                                echo /* I18N: %s is a woman's name */
-                                                I18N::translate('%s, her spouses and children', $record->getFullName());
-                                            } else {
-                                                echo /* I18N: %s is a man's name */
-                                                I18N::translate('%s, his spouses and children', $record->getFullName());
-                                            }
-                                            ?>
-                                        </label>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="optionbox">
-                                        <label>
-                                            <input type="radio" name="others" value="ancestors" id="ancestors">
-                                            <?php
-                                            if ($record->getSex() === 'F') {
-                                                echo /* I18N: %s is a woman's name */
-                                                I18N::translate('%s and her ancestors', $record->getFullName());
-                                            } else {
-                                                echo /* I18N: %s is a man's name */
-                                                I18N::translate('%s and his ancestors', $record->getFullName());
-                                            }
-                                            ?>
-                                        </label>
-                                        <br>
-                                        <?php echo I18N::translate('Number of generations'); ?>
-                                        <input type="text" size="5" name="level1" value="<?php echo $MAX_PEDIGREE_GENERATIONS; ?>" onfocus="radAncestors('ancestors');">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="optionbox">
-                                        <label>
-                                            <input type="radio" name="others" value="ancestorsfamilies" id="ancestorsfamilies">
-                                            <?php
-                                            if ($record->getSex() === 'F') {
-                                                echo /* I18N: %s is a woman's name */
-                                                I18N::translate('%s, her ancestors and their families', $record->getFullName());
-                                            } else {
-                                                echo /* I18N: %s is a man's name */
-                                                I18N::translate('%s, his ancestors and their families', $record->getFullName());
-                                            }
-                                            ?>
-                                        </label>
-                                        <br>
-                                        <?php echo I18N::translate('Number of generations'); ?>
-                                        <input type="text" size="5" name="level2" value="<?php echo $MAX_PEDIGREE_GENERATIONS; ?>" onfocus="radAncestors('ancestorsfamilies');">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="optionbox">
-                                        <label>
-                                            <input type="radio" name="others" value="descendants" id="descendants">
-                                            <?php
-                                            if ($record->getSex() === 'F') {
-                                                echo /* I18N: %s is a woman's name */
-                                                I18N::translate('%s, her spouses and descendants', $record->getFullName());
-                                            } else {
-                                                echo /* I18N: %s is a man's name */
-                                                I18N::translate('%s, his spouses and descendants', $record->getFullName());
-                                            }
-                                            ?>
-                                        </label>
-                                        <br>
-                                        <?php echo I18N::translate('Number of generations'); ?>
-                                        <input type="text" size="5" name="level3" value="<?php echo $MAX_PEDIGREE_GENERATIONS; ?>" onfocus="radAncestors('descendants');">
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td class="topbottombar">
-                                        <input type="submit" value="<?php echo I18N::translate('continue'); ?>">
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </form>
-                <?php } elseif ($clip_ctrl->type === 'SOUR') { ?>
-                    <form action="module.php" method="get">
-                        <input type="hidden" name="mod" value="clippings">
-                        <input type="hidden" name="mod_action" value="index">
-                        <input type="hidden" name="id" value="<?php echo $clip_ctrl->id; ?>">
-                        <input type="hidden" name="type" value="<?php echo $clip_ctrl->type; ?>">
-                        <input type="hidden" name="action" value="add1">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <td class="topbottombar">
-                                        <?php echo I18N::translate('Add to the clippings cart'); ?>
-                                    </td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="optionbox">
-                                        <label>
-                                            <input type="radio" name="others" checked value="none">
-                                            <?php echo $record->getFullName(); ?>
-                                        </label>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="optionbox">
-                                        <label>
-                                            <input type="radio" name="others" value="linked">
-                                            <?php echo /* I18N: %s is the name of a source */
-                                            I18N::translate('%s and the individuals that reference it.', $record->getFullName()); ?>
-                                        </label>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td class="topbottombar">
-                                        <input type="submit" value="<?php echo I18N::translate('continue'); ?>">
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </form>
-                <?php }
-                }
-
-                if (!$cart[$WT_TREE->getTreeId()]) {
-                    if ($clip_ctrl->action != 'add') {
-                        echo I18N::translate('The clippings cart allows you to take extracts from this family tree and download them as a GEDCOM file.');
-                        ?>
-                    <form method="get" name="addin" action="module.php">
-                        <input type="hidden" name="mod" value="clippings">
-                        <input type="hidden" name="mod_action" value="index">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <td colspan="2" class="topbottombar">
-                                        <?php echo I18N::translate('Add to the clippings cart'); ?>
-                                    </td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="optionbox">
-                                        <input type="hidden" name="action" value="add">
-                                        <input type="text" data-autocomplete-type="IFSRO" name="id" id="cart_item_id" size="5">
-                                    </td>
-                                    <td class="optionbox">
-                                        <?php echo FunctionsPrint::printFindIndividualLink('cart_item_id'); ?>
-                                        <?php echo FunctionsPrint::printFindFamilyLink('cart_item_id'); ?>
-                                        <?php echo FunctionsPrint::printFindSourceLink('cart_item_id', ''); ?>
-                                        <input type="submit" value="<?php echo /* I18N: A button label. */ I18N::translate('add'); ?>">
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </form>
-                        <?php
-                    }
-
-                    // -- end new lines
-                    echo I18N::translate('Your clippings cart is empty.');
-                } else {
-                    // Keep track of the INDI from the parent page, otherwise it will
-                    // get lost after ajax updates
-                    $pid = Filter::get('pid', WT_REGEX_XREF);
-
-                    if ($clip_ctrl->action !== 'download' && $clip_ctrl->action !== 'add') { ?>
-                    <form method="get" action="module.php">
-                        <input type="hidden" name="mod" value="clippings">
-                        <input type="hidden" name="mod_action" value="index">
-                        <input type="hidden" name="action" value="download">
-                        <input type="hidden" name="pid" value="<?php echo $pid; ?>">
-                        <table>
-                            <tr>
-                                <td colspan="2" class="topbottombar">
-                                    <h2><?php echo I18N::translate('Download'); ?></h2>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="descriptionbox width50 wrap">
-                                        <?php echo I18N::translate('To reduce the size of the download, you can compress the data into a .ZIP file. You will need to uncompress the .ZIP file before you can use it.'); ?>
-                                </td>
-                                <td class="optionbox wrap">
-                                    <input type="checkbox" name="Zip" value="yes">
-                                        <?php echo I18N::translate('Zip file(s)'); ?>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="descriptionbox width50 wrap">
-                                        <?php echo I18N::translate('Include media (automatically zips files)'); ?>
-                                </td>
-                                <td class="optionbox">
-                                    <input type="checkbox" name="IncludeMedia" value="yes">
-                                </td>
-                            </tr>
-
-                                <?php if (Auth::isManager($WT_TREE)) { ?>
-                                <tr>
-                                    <td class="descriptionbox width50 wrap">
-                                        <?php echo I18N::translate('Apply privacy settings'); ?>
-                                    </td>
-                                    <td class="optionbox">
-                                        <input type="radio" name="privatize_export" value="none" checked>
-                                        <?php echo I18N::translate('None'); ?>
-                                        <br>
-                                        <input type="radio" name="privatize_export" value="gedadmin">
-                                        <?php echo I18N::translate('Manager'); ?>
-                                        <br>
-                                        <input type="radio" name="privatize_export" value="user">
-                                        <?php echo I18N::translate('Member'); ?>
-                                        <br>
-                                        <input type="radio" name="privatize_export" value="visitor">
-                                        <?php echo I18N::translate('Visitor'); ?>
-                                    </td>
-                                </tr>
-                            <?php } elseif (Auth::isMember($WT_TREE)) { ?>
-                                <tr>
-                                    <td class="descriptionbox width50 wrap">
-                                        <?php echo I18N::translate('Apply privacy settings'); ?>
-                                    </td>
-                                    <td class="optionbox">
-                                        <input type="radio" name="privatize_export" value="user" checked> <?php echo I18N::translate('Member'); ?><br>
-                                        <input type="radio" name="privatize_export" value="visitor"> <?php echo I18N::translate('Visitor'); ?>
-                                    </td>
-                                </tr>
-                            <?php } ?>
-
-                            <tr>
-                                <td class="descriptionbox width50 wrap">
-                                        <?php echo I18N::translate('Convert from UTF-8 to ISO-8859-1'); ?>
-                                </td>
-                                <td class="optionbox">
-                                    <input type="checkbox" name="convert" value="yes">
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="descriptionbox width50 wrap">
-                                        <?php echo I18N::translate('Add the GEDCOM media path to filenames'); ?>
-                                </td>
-                                <td class="optionbox">
-                                    <input type="checkbox" name="conv_path" value="<?php echo Filter::escapeHtml($WT_TREE->getPreference('GEDCOM_MEDIA_PATH')); ?>">
-                                    <span dir="auto"><?php echo Filter::escapeHtml($WT_TREE->getPreference('GEDCOM_MEDIA_PATH')); ?></span>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="topbottombar" colspan="2">
-                                    <input type="submit" value="<?php echo /* I18N: A button label. */ I18N::translate('download'); ?>">
-                                </td>
-                            </tr>
-                        </table>
-                    </form>
-                    <br>
-
-                    <form method="get" name="addin" action="module.php">
-                        <input type="hidden" name="mod" value="clippings">
-                        <input type="hidden" name="mod_action" value="index">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <td colspan="2" class="topbottombar" style="text-align:center; ">
-                                            <?php echo I18N::translate('Add to the clippings cart'); ?>
-                                    </td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="optionbox">
-                                        <input type="hidden" name="action" value="add">
-                                        <input type="text" data-autocomplete-type="IFSRO" name="id" id="cart_item_id" size="8">
-                                    </td>
-                                    <td class="optionbox">
-                                            <?php echo FunctionsPrint::printFindIndividualLink('cart_item_id'); ?>
-                                            <?php echo FunctionsPrint::printFindFamilyLink('cart_item_id'); ?>
-                                            <?php echo FunctionsPrint::printFindSourceLink('cart_item_id'); ?>
-                                        <input type="submit" value="<?php echo /* I18N: A button label. */ I18N::translate('add'); ?>">
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th colspan="2">
-                                        <a href="module.php?mod=clippings&amp;mod_action=index&amp;action=empty">
-                                                <?php echo I18N::translate('Empty the clippings cart'); ?>
-                                        </a>
-                                    </th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </form>
-
-                    <?php } ?>
-
-                <h2>
-                        <?php echo I18N::translate('Family tree clippings cart'); ?>
-                </h2>
-                <table id="mycart" class="sortable list_table width100">
-                    <thead>
-                        <tr>
-                            <th class="list_label"><?php echo I18N::translate('Record'); ?></th>
-                            <th class="list_label"><?php echo I18N::translate('Remove'); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                            <?php
-                            foreach (array_keys($cart[$WT_TREE->getTreeId()]) as $xref) {
-                                $record = GedcomRecord::getInstance($xref, $WT_TREE);
-                                if ($record) {
-                                    switch ($record::RECORD_TYPE) {
-                                        case 'INDI':
-                                            $icon = 'icon-indis';
-                                            break;
-                                        case 'FAM':
-                                            $icon = 'icon-sfamily';
-                                        break;
-                                        case 'SOUR':
-                                            $icon = 'icon-source';
-                                        break;
-                                        case 'REPO':
-                                            $icon = 'icon-repository';
-                                        break;
-                                        case 'NOTE':
-                                            $icon = 'icon-note';
-                                        break;
-                                        case 'OBJE':
-                                            $icon = 'icon-media';
-                                        break;
-                                        default:
-                                            $icon = 'icon-clippings';
-                                        break;
-                                    }
-                                    ?>
-                                <tr>
-                                    <td class="list_value">
-                                        <i class="<?php echo $icon; ?>"></i>
-                                        <?php
-                                        echo '<a href="', $record->getHtmlUrl(), '">', $record->getFullName(), '</a>';
-                                        ?>
-                                    </td>
-                                    <td class="list_value center vmiddle"><a href="module.php?mod=clippings&amp;mod_action=index&amp;action=remove&amp;id=<?php echo $xref; ?>" class="icon-remove" title="<?php echo I18N::translate('Remove'); ?>"></a></td>
-                                </tr>
-                                    <?php
-                                }
-                            }
-                            ?>
-                </table>
-                    <?php
-                }
-                break;
-            default:
-                http_response_code(404);
-                break;
-        }
-    }
-
-    /**
-     * The user can re-order menus. Until they do, they are shown in this order.
-     *
-     * @return int
-     */
-    public function defaultMenuOrder()
-    {
-        return 20;
+        return 6;
     }
 
     /**
      * A menu, to be added to the main application menu.
      *
+     * @param Tree $tree
+     *
      * @return Menu|null
      */
-    public function getMenu()
+    public function getMenu(Tree $tree): ?Menu
     {
-        global $controller, $WT_TREE;
+        /** @var ServerRequestInterface $request */
+        $request = app(ServerRequestInterface::class);
 
-        $submenus = array();
-        if (isset($controller->record)) {
-            $submenus[] = new Menu($this->getTitle(), 'module.php?mod=clippings&amp;mod_action=index&amp;ged=' . $WT_TREE->getNameUrl(), 'menu-clippingscart', array('rel' => 'nofollow'));
+        $route = $request->getAttribute('route');
+        assert($route instanceof Route);
+
+        $submenus = [
+            new Menu($this->title(), route('module', [
+                'module' => $this->name(),
+                'action' => 'Show',
+                'tree'    => $tree->name(),
+            ]), 'menu-clippings-cart', ['rel' => 'nofollow']),
+        ];
+
+        $action = array_search($route->name, self::ROUTES_WITH_RECORDS, true);
+        if ($action !== false) {
+            $xref = $route->attributes['xref'];
+            assert(is_string($xref));
+
+            $add_route = route('module', [
+                'module' => $this->name(),
+                'action' => 'Add' . $action,
+                'xref'   => $xref,
+                'tree'    => $tree->name(),
+            ]);
+
+            $submenus[] = new Menu(I18N::translate('Add to the clippings cart'), $add_route, 'menu-clippings-add', ['rel' => 'nofollow']);
         }
-        if (!empty($controller->record) && $controller->record->canShow()) {
-            $submenus[] = new Menu(I18N::translate('Add to the clippings cart'), 'module.php?mod=clippings&amp;mod_action=index&amp;action=add&amp;id=' . $controller->record->getXref(), 'menu-clippingsadd', array('rel' => 'nofollow'));
+
+        if (!$this->isCartEmpty($tree)) {
+            $submenus[] = new Menu(I18N::translate('Empty the clippings cart'), route('module', [
+                'module' => $this->name(),
+                'action' => 'Empty',
+                'tree'    => $tree->name(),
+            ]), 'menu-clippings-empty', ['rel' => 'nofollow']);
+
+            $submenus[] = new Menu(I18N::translate('Download'), route('module', [
+                'module' => $this->name(),
+                'action' => 'DownloadForm',
+                'tree'    => $tree->name(),
+            ]), 'menu-clippings-download', ['rel' => 'nofollow']);
         }
 
-        if ($submenus) {
-            return new Menu($this->getTitle(), '#', 'menu-clippings', array('rel' => 'nofollow'), $submenus);
-        } else {
-            return new Menu($this->getTitle(), 'module.php?mod=clippings&amp;mod_action=index&amp;ged=' . $WT_TREE->getNameUrl(), 'menu-clippings', array('rel' => 'nofollow'));
-        }
-    }
-
-    /** {@inheritdoc} */
-    public function defaultSidebarOrder()
-    {
-        return 60;
-    }
-
-    /** {@inheritdoc} */
-    public function hasSidebarContent()
-    {
-        // Creating a controller has the side effect of initialising the cart
-        new ClippingsCartController;
-
-        return true;
+        return new Menu($this->title(), '#', 'menu-clippings', ['rel' => 'nofollow'], $submenus);
     }
 
     /**
-     * Load this sidebar synchronously.
+     * @param ServerRequestInterface $request
      *
-     * @return string
+     * @return ResponseInterface
      */
-    public function getSidebarContent()
+    public function postDownloadAction(ServerRequestInterface $request): ResponseInterface
     {
-        global $controller;
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
 
-        $controller->addInlineJavascript('
-				jQuery("#sb_clippings_content").on("click", ".add_cart, .remove_cart", function() {
-					jQuery("#sb_clippings_content").load(this.href);
-					return false;
-				});
-			');
+        $data_filesystem = $request->getAttribute('filesystem.data');
+        assert($data_filesystem instanceof FilesystemInterface);
 
-        return '<div id="sb_clippings_content">' . $this->getCartList() . '</div>';
-    }
+        $params = (array) $request->getParsedBody();
 
-    /** {@inheritdoc} */
-    public function getSidebarAjaxContent()
-    {
-        global $WT_TREE;
+        $privatize_export = $params['privatize_export'];
 
-        $cart = Session::get('cart');
+        if ($privatize_export === 'none' && !Auth::isManager($tree)) {
+            $privatize_export = 'member';
+        }
 
-        $clip_ctrl         = new ClippingsCartController;
-        $add               = Filter::get('add', WT_REGEX_XREF);
-        $add1              = Filter::get('add1', WT_REGEX_XREF);
-        $remove            = Filter::get('remove', WT_REGEX_XREF);
-        $others            = Filter::get('others');
-        $clip_ctrl->level1 = Filter::getInteger('level1');
-        $clip_ctrl->level2 = Filter::getInteger('level2');
-        $clip_ctrl->level3 = Filter::getInteger('level3');
-        if ($add) {
-            $record = GedcomRecord::getInstance($add, $WT_TREE);
-            if ($record) {
-                $clip_ctrl->id   = $record->getXref();
-                $clip_ctrl->type = $record::RECORD_TYPE;
-                $clip_ctrl->addClipping($record);
-            }
-        } elseif ($add1) {
-            $record = Individual::getInstance($add1, $WT_TREE);
-            if ($record) {
-                $clip_ctrl->id   = $record->getXref();
-                $clip_ctrl->type = $record::RECORD_TYPE;
-                if ($others == 'parents') {
-                    foreach ($record->getChildFamilies() as $family) {
-                        $clip_ctrl->addClipping($family);
-                        $clip_ctrl->addFamilyMembers($family);
-                    }
-                } elseif ($others == 'ancestors') {
-                    $clip_ctrl->addAncestorsToCart($record, $clip_ctrl->level1);
-                } elseif ($others == 'ancestorsfamilies') {
-                    $clip_ctrl->addAncestorsToCartFamilies($record, $clip_ctrl->level2);
-                } elseif ($others == 'members') {
-                    foreach ($record->getSpouseFamilies() as $family) {
-                        $clip_ctrl->addClipping($family);
-                        $clip_ctrl->addFamilyMembers($family);
-                    }
-                } elseif ($others == 'descendants') {
-                    foreach ($record->getSpouseFamilies() as $family) {
-                        $clip_ctrl->addClipping($family);
-                        $clip_ctrl->addFamilyDescendancy($family, $clip_ctrl->level3);
+        if ($privatize_export === 'gedadmin' && !Auth::isManager($tree)) {
+            $privatize_export = 'member';
+        }
+
+        if ($privatize_export === 'user' && !Auth::isMember($tree)) {
+            $privatize_export = 'visitor';
+        }
+
+        $convert = (bool) ($params['convert'] ?? false);
+
+        $cart = Session::get('cart', []);
+
+        $xrefs = array_keys($cart[$tree->name()] ?? []);
+        $xrefs = array_map('strval', $xrefs); // PHP converts numeric keys to integers.
+
+        // Create a new/empty .ZIP file
+        $temp_zip_file  = stream_get_meta_data(tmpfile())['uri'];
+        $zip_adapter    = new ZipArchiveAdapter($temp_zip_file);
+        $zip_filesystem = new Filesystem($zip_adapter);
+
+        $media_filesystem = $tree->mediaFilesystem($data_filesystem);
+
+        // Media file prefix
+        $path = $tree->getPreference('MEDIA_DIRECTORY');
+
+        $encoding = $convert ? 'ANSI' : 'UTF-8';
+
+        $records = new Collection();
+
+        switch ($privatize_export) {
+            case 'gedadmin':
+                $access_level = Auth::PRIV_NONE;
+                break;
+            case 'user':
+                $access_level = Auth::PRIV_USER;
+                break;
+            case 'visitor':
+                $access_level = Auth::PRIV_PRIVATE;
+                break;
+            case 'none':
+            default:
+                $access_level = Auth::PRIV_HIDE;
+                break;
+        }
+
+        foreach ($xrefs as $xref) {
+            $object = Factory::gedcomRecord()->make($xref, $tree);
+            // The object may have been deleted since we added it to the cart....
+            if ($object instanceof  GedcomRecord) {
+                $record = $object->privatizeGedcom($access_level);
+                // Remove links to objects that aren't in the cart
+                preg_match_all('/\n1 ' . Gedcom::REGEX_TAG . ' @(' . Gedcom::REGEX_XREF . ')@(\n[2-9].*)*/', $record, $matches, PREG_SET_ORDER);
+                foreach ($matches as $match) {
+                    if (!in_array($match[1], $xrefs, true)) {
+                        $record = str_replace($match[0], '', $record);
                     }
                 }
-            }
-        } elseif ($remove) {
-            unset($cart[$WT_TREE->getTreeId()][$remove]);
-            Session::put('cart', $cart);
-        } elseif (isset($_REQUEST['empty'])) {
-            $cart[$WT_TREE->getTreeId()] = array();
-            Session::put('cart', $cart);
-        } elseif (isset($_REQUEST['download'])) {
-            return $this->downloadForm($clip_ctrl);
-        }
-
-        return $this->getCartList();
-    }
-
-    /**
-     * A list for the side bar.
-     *
-     * @return string
-     */
-    public function getCartList()
-    {
-        global $WT_TREE;
-
-        $cart = Session::get('cart', array());
-        if (!array_key_exists($WT_TREE->getTreeId(), $cart)) {
-            $cart[$WT_TREE->getTreeId()] = array();
-        }
-        $pid = Filter::get('pid', WT_REGEX_XREF);
-
-        if (!$cart[$WT_TREE->getTreeId()]) {
-            $out = I18N::translate('Your clippings cart is empty.');
-        } else {
-            $out = '<ul>';
-            foreach (array_keys($cart[$WT_TREE->getTreeId()]) as $xref) {
-                $record = GedcomRecord::getInstance($xref, $WT_TREE);
-                if ($record instanceof Individual || $record instanceof Family) {
-                    switch ($record::RECORD_TYPE) {
-                        case 'INDI':
-                            $icon = 'icon-indis';
-                            break;
-                        case 'FAM':
-                            $icon = 'icon-sfamily';
-                            break;
+                preg_match_all('/\n2 ' . Gedcom::REGEX_TAG . ' @(' . Gedcom::REGEX_XREF . ')@(\n[3-9].*)*/', $record, $matches, PREG_SET_ORDER);
+                foreach ($matches as $match) {
+                    if (!in_array($match[1], $xrefs, true)) {
+                        $record = str_replace($match[0], '', $record);
                     }
-                    $out .= '<li>';
-                    if (!empty($icon)) {
-                        $out .= '<i class="' . $icon . '"></i>';
+                }
+                preg_match_all('/\n3 ' . Gedcom::REGEX_TAG . ' @(' . Gedcom::REGEX_XREF . ')@(\n[4-9].*)*/', $record, $matches, PREG_SET_ORDER);
+                foreach ($matches as $match) {
+                    if (!in_array($match[1], $xrefs, true)) {
+                        $record = str_replace($match[0], '', $record);
                     }
-                    $out .= '<a href="' . $record->getHtmlUrl() . '">';
-                    if ($record instanceof Individual) {
-                        $out .= $record->getSexImage();
+                }
+
+                if ($object instanceof Individual || $object instanceof Family) {
+                    $records->add($record . "\n1 SOUR @WEBTREES@\n2 PAGE " . $object->url());
+                } elseif ($object instanceof Source) {
+                    $records->add($record . "\n1 NOTE " . $object->url());
+                } elseif ($object instanceof Media) {
+                    // Add the media files to the archive
+                    foreach ($object->mediaFiles() as $media_file) {
+                        $from = $media_file->filename();
+                        $to   = $path . $media_file->filename();
+                        if (!$media_file->isExternal() && $media_filesystem->has($from) && !$zip_filesystem->has($to)) {
+                            $zip_filesystem->writeStream($to, $media_filesystem->readStream($from));
+                        }
                     }
-                    $out .= ' ' . $record->getFullName() . ' ';
-                    if ($record instanceof Individual && $record->canShow()) {
-                        $out .= ' (' . $record->getLifeSpan() . ')';
-                    }
-                    $out .= '</a>';
-                    $out .= '<a class="icon-remove remove_cart" href="module.php?mod=' . $this->getName() . '&amp;mod_action=ajax&amp;remove=' . $xref . '&amp;pid=' . $pid . '" title="' . I18N::translate('Remove') . '"></a>';
-                    $out .= '</li>';
+                    $records->add($record);
+                } else {
+                    $records->add($record);
                 }
             }
-            $out .= '</ul>';
         }
 
-        if ($cart[$WT_TREE->getTreeId()]) {
-            $out .=
-                '<br><a href="module.php?mod=' . $this->getName() . '&amp;mod_action=ajax&amp;empty=true&amp;pid=' . $pid . '" class="remove_cart">' .
-                I18N::translate('Empty the clippings cart') .
-                '</a>' .
-                '<br>' .
-                '<a href="module.php?mod=' . $this->getName() . '&amp;mod_action=ajax&amp;download=true&amp;pid=' . $pid . '" class="add_cart">' .
-                I18N::translate('Download') .
-                '</a>';
+        $base_url = $request->getAttribute('base_url');
+
+        // Create a source, to indicate the source of the data.
+        $record = "0 @WEBTREES@ SOUR\n1 TITL " . $base_url;
+        $author   = $this->user_service->find((int) $tree->getPreference('CONTACT_USER_ID'));
+        if ($author !== null) {
+            $record .= "\n1 AUTH " . $author->realName();
         }
-        $record = Individual::getInstance($pid, $WT_TREE);
-        if ($record && !array_key_exists($record->getXref(), $cart[$WT_TREE->getTreeId()])) {
-            $out .= '<br><a href="module.php?mod=' . $this->getName() . '&amp;mod_action=ajax&amp;action=add1&amp;type=INDI&amp;id=' . $pid . '&amp;pid=' . $pid . '" class="add_cart"><i class="icon-clippings"></i> ' . I18N::translate('Add %s to the clippings cart', $record->getFullName()) . '</a>';
+        $records->add($record);
+
+        $stream = fopen('php://temp', 'wb+');
+
+        if ($stream === false) {
+            throw new RuntimeException('Failed to create temporary stream');
         }
 
-        return $out;
+        // We have already applied privacy filtering, so do not do it again.
+        $this->gedcom_export_service->export($tree, $stream, false, $encoding, Auth::PRIV_HIDE, $path, $records);
+        rewind($stream);
+
+        // Finally add the GEDCOM file to the .ZIP file.
+        $zip_filesystem->writeStream('clippings.ged', $stream);
+
+        // Need to force-close ZipArchive filesystems.
+        $zip_adapter->getArchive()->close();
+
+        // Use a stream, so that we do not have to load the entire file into memory.
+        $stream = app(StreamFactoryInterface::class)->createStreamFromFile($temp_zip_file);
+
+        /** @var ResponseFactoryInterface $response_factory */
+        $response_factory = app(ResponseFactoryInterface::class);
+
+        return $response_factory->createResponse()
+            ->withBody($stream)
+            ->withHeader('Content-Type', 'application/zip')
+            ->withHeader('Content-Disposition', 'attachment; filename="clippings.zip');
     }
 
     /**
-     * A form to choose the download options.
+     * @param ServerRequestInterface $request
      *
-     * @param ClippingsCartController $clip_ctrl
-     *
-     * @return string
+     * @return ResponseInterface
      */
-    public function downloadForm(ClippingsCartController $clip_ctrl)
+    public function getDownloadFormAction(ServerRequestInterface $request): ResponseInterface
     {
-        global $WT_TREE;
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
 
-        $pid = Filter::get('pid', WT_REGEX_XREF);
+        $user  = $request->getAttribute('user');
+        $title = I18N::translate('Family tree clippings cart') . ' — ' . I18N::translate('Download');
 
-        $out = '<script>';
-        $out .= 'function cancelDownload() {
-				var link = "module.php?mod=' . $this->getName() . '&mod_action=ajax&pid=' . $pid . '";
-				jQuery("#sb_clippings_content").load(link);
-			}';
-        $out .= '</script>';
-        $out .= '<form method="get" action="module.php">
-		<input type="hidden" name="mod" value="clippings">
-		<input type="hidden" name="mod_action" value="index">
-		<input type="hidden" name="pid" value="' . $pid . '">
-		<input type="hidden" name="action" value="download">
-		<table>
-		<tr><td colspan="2" class="topbottombar"><h2>' . I18N::translate('Download') . '</h2></td></tr>
-		<tr><td class="descriptionbox width50 wrap">' . I18N::translate('Zip file(s)') . '</td>
-		<td class="optionbox"><input type="checkbox" name="Zip" value="yes" checked></td></tr>
+        return $this->viewResponse('modules/clippings/download', [
+            'is_manager' => Auth::isManager($tree, $user),
+            'is_member'  => Auth::isMember($tree, $user),
+            'module'     => $this->name(),
+            'title'      => $title,
+            'tree'       => $tree,
+        ]);
+    }
 
-		<tr><td class="descriptionbox width50 wrap">' . I18N::translate('Include media (automatically zips files)') . '</td>
-		<td class="optionbox"><input type="checkbox" name="IncludeMedia" value="yes" checked></td></tr>
-		';
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getEmptyAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
 
-        if (Auth::isManager($WT_TREE)) {
-            $out .=
-                '<tr><td class="descriptionbox width50 wrap">' . I18N::translate('Apply privacy settings') . '</td>' .
-                '<td class="optionbox">' .
-                '<input type="radio" name="privatize_export" value="none" checked> ' . I18N::translate('None') . '<br>' .
-                '<input type="radio" name="privatize_export" value="gedadmin"> ' . I18N::translate('Manager') . '<br>' .
-                '<input type="radio" name="privatize_export" value="user"> ' . I18N::translate('Member') . '<br>' .
-                '<input type="radio" name="privatize_export" value="visitor"> ' . I18N::translate('Visitor') .
-                '</td></tr>';
-        } elseif (Auth::isMember($WT_TREE)) {
-            $out .=
-                '<tr><td class="descriptionbox width50 wrap">' . I18N::translate('Apply privacy settings') . '</td>' .
-                '<td class="list_value">' .
-                '<input type="radio" name="privatize_export" value="user" checked> ' . I18N::translate('Member') . '<br>' .
-                '<input type="radio" name="privatize_export" value="visitor"> ' . I18N::translate('Visitor') .
-                '</td></tr>';
+        $cart                = Session::get('cart', []);
+        $cart[$tree->name()] = [];
+        Session::put('cart', $cart);
+
+        $url = route('module', [
+            'module' => $this->name(),
+            'action' => 'Show',
+            'tree'    => $tree->name(),
+        ]);
+
+        return redirect($url);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function postRemoveAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $xref = $request->getQueryParams()['xref'];
+
+        $cart = Session::get('cart', []);
+        unset($cart[$tree->name()][$xref]);
+        Session::put('cart', $cart);
+
+        $url = route('module', [
+            'module' => $this->name(),
+            'action' => 'Show',
+            'tree'    => $tree->name(),
+        ]);
+
+        return redirect($url);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getShowAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        return $this->viewResponse('modules/clippings/show', [
+            'records' => $this->allRecordsInCart($tree),
+            'title'   => I18N::translate('Family tree clippings cart'),
+            'tree'    => $tree,
+        ]);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getAddFamilyAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $xref = $request->getQueryParams()['xref'];
+
+        $family = Factory::family()->make($xref, $tree);
+
+        if ($family === null) {
+            throw new FamilyNotFoundException();
         }
 
-        $out .= '
-		<tr><td class="descriptionbox width50 wrap">' . I18N::translate('Convert from UTF-8 to ISO-8859-1') . '</td>
-		<td class="optionbox"><input type="checkbox" name="convert" value="yes"></td></tr>
+        $options = $this->familyOptions($family);
 
-		<tr>
-		<td class="descriptionbox width50 wrap">' . I18N::translate('Add the GEDCOM media path to filenames') . '</td>
-		<td class="optionbox">
-		<input type="checkbox" name="conv_path" value="' . Filter::escapeHtml($WT_TREE->getPreference('GEDCOM_MEDIA_PATH')) . '">
-		<span dir="auto">' . Filter::escapeHtml($WT_TREE->getPreference('GEDCOM_MEDIA_PATH')) . '</span></td>
-		</tr>
+        $title = I18N::translate('Add %s to the clippings cart', $family->fullName());
 
-		<input type="hidden" name="conv_path" value="' . $clip_ctrl->conv_path . '">
+        return $this->viewResponse('modules/clippings/add-options', [
+            'options' => $options,
+            'default' => key($options),
+            'record'  => $family,
+            'title'   => $title,
+            'tree'    => $tree,
+        ]);
+    }
 
-		</td></tr>
+    /**
+     * @param Family $family
+     *
+     * @return string[]
+     */
+    private function familyOptions(Family $family): array
+    {
+        $name = strip_tags($family->fullName());
 
-		<tr><td class="topbottombar" colspan="2">
-		<input type="button" value="' . /* I18N: A button label. */ I18N::translate('cancel') . '" onclick="cancelDownload();">
-		<input type="submit" value="' . /* I18N: A button label. */ I18N::translate('download') . '">
-		</form>';
+        return [
+            'parents'     => $name,
+            /* I18N: %s is a family (husband + wife) */
+            'members'     => I18N::translate('%s and their children', $name),
+            /* I18N: %s is a family (husband + wife) */
+            'descendants' => I18N::translate('%s and their descendants', $name),
+        ];
+    }
 
-        return $out;
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function postAddFamilyAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $params = (array) $request->getParsedBody();
+
+        $xref   = $params['xref'];
+        $option = $params['option'];
+
+        $family = Factory::family()->make($xref, $tree);
+
+        if ($family === null) {
+            throw new FamilyNotFoundException();
+        }
+
+        switch ($option) {
+            case 'parents':
+                $this->addFamilyToCart($family);
+                break;
+
+            case 'members':
+                $this->addFamilyAndChildrenToCart($family);
+                break;
+
+            case 'descendants':
+                $this->addFamilyAndDescendantsToCart($family);
+                break;
+        }
+
+        return redirect($family->url());
+    }
+
+    /**
+     * @param Family $family
+     *
+     * @return void
+     */
+    private function addFamilyToCart(Family $family): void
+    {
+        $this->addRecordToCart($family);
+
+        foreach ($family->spouses() as $spouse) {
+            $this->addRecordToCart($spouse);
+        }
+    }
+
+    /**
+     * @param Family $family
+     *
+     * @return void
+     */
+    private function addFamilyAndChildrenToCart(Family $family): void
+    {
+        $this->addRecordToCart($family);
+
+        foreach ($family->spouses() as $spouse) {
+            $this->addRecordToCart($spouse);
+        }
+        foreach ($family->children() as $child) {
+            $this->addRecordToCart($child);
+        }
+    }
+
+    /**
+     * @param Family $family
+     *
+     * @return void
+     */
+    private function addFamilyAndDescendantsToCart(Family $family): void
+    {
+        $this->addRecordToCart($family);
+
+        foreach ($family->spouses() as $spouse) {
+            $this->addRecordToCart($spouse);
+        }
+        foreach ($family->children() as $child) {
+            $this->addRecordToCart($child);
+            foreach ($child->spouseFamilies() as $child_family) {
+                $this->addFamilyAndDescendantsToCart($child_family);
+            }
+        }
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getAddIndividualAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $xref = $request->getQueryParams()['xref'];
+
+        $individual = Factory::individual()->make($xref, $tree);
+
+        if ($individual === null) {
+            throw new IndividualNotFoundException();
+        }
+
+        $options = $this->individualOptions($individual);
+
+        $title = I18N::translate('Add %s to the clippings cart', $individual->fullName());
+
+        return $this->viewResponse('modules/clippings/add-options', [
+            'options' => $options,
+            'default' => key($options),
+            'record'  => $individual,
+            'title'   => $title,
+            'tree'    => $tree,
+        ]);
+    }
+
+    /**
+     * @param Individual $individual
+     *
+     * @return string[]
+     */
+    private function individualOptions(Individual $individual): array
+    {
+        $name = strip_tags($individual->fullName());
+
+        if ($individual->sex() === 'F') {
+            return [
+                'self'              => $name,
+                'parents'           => I18N::translate('%s, her parents and siblings', $name),
+                'spouses'           => I18N::translate('%s, her spouses and children', $name),
+                'ancestors'         => I18N::translate('%s and her ancestors', $name),
+                'ancestor_families' => I18N::translate('%s, her ancestors and their families', $name),
+                'descendants'       => I18N::translate('%s, her spouses and descendants', $name),
+            ];
+        }
+
+        return [
+            'self'              => $name,
+            'parents'           => I18N::translate('%s, his parents and siblings', $name),
+            'spouses'           => I18N::translate('%s, his spouses and children', $name),
+            'ancestors'         => I18N::translate('%s and his ancestors', $name),
+            'ancestor_families' => I18N::translate('%s, his ancestors and their families', $name),
+            'descendants'       => I18N::translate('%s, his spouses and descendants', $name),
+        ];
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function postAddIndividualAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $params = (array) $request->getParsedBody();
+
+        $xref   = $params['xref'];
+        $option = $params['option'];
+
+        $individual = Factory::individual()->make($xref, $tree);
+
+        if ($individual === null) {
+            throw new IndividualNotFoundException();
+        }
+
+        switch ($option) {
+            case 'self':
+                $this->addRecordToCart($individual);
+                break;
+
+            case 'parents':
+                foreach ($individual->childFamilies() as $family) {
+                    $this->addFamilyAndChildrenToCart($family);
+                }
+                break;
+
+            case 'spouses':
+                foreach ($individual->spouseFamilies() as $family) {
+                    $this->addFamilyAndChildrenToCart($family);
+                }
+                break;
+
+            case 'ancestors':
+                $this->addAncestorsToCart($individual);
+                break;
+
+            case 'ancestor_families':
+                $this->addAncestorFamiliesToCart($individual);
+                break;
+
+            case 'descendants':
+                foreach ($individual->spouseFamilies() as $family) {
+                    $this->addFamilyAndDescendantsToCart($family);
+                }
+                break;
+        }
+
+        return redirect($individual->url());
+    }
+
+    /**
+     * @param Individual $individual
+     *
+     * @return void
+     */
+    private function addAncestorsToCart(Individual $individual): void
+    {
+        $this->addRecordToCart($individual);
+
+        foreach ($individual->childFamilies() as $family) {
+            $this->addRecordToCart($family);
+
+            foreach ($family->spouses() as $parent) {
+                $this->addAncestorsToCart($parent);
+            }
+        }
+    }
+
+    /**
+     * @param Individual $individual
+     *
+     * @return void
+     */
+    private function addAncestorFamiliesToCart(Individual $individual): void
+    {
+        foreach ($individual->childFamilies() as $family) {
+            $this->addFamilyAndChildrenToCart($family);
+
+            foreach ($family->spouses() as $parent) {
+                $this->addAncestorFamiliesToCart($parent);
+            }
+        }
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getAddMediaAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $xref = $request->getQueryParams()['xref'];
+
+        $media = Factory::media()->make($xref, $tree);
+
+        if ($media === null) {
+            throw new MediaNotFoundException();
+        }
+
+        $options = $this->mediaOptions($media);
+
+        $title = I18N::translate('Add %s to the clippings cart', $media->fullName());
+
+        return $this->viewResponse('modules/clippings/add-options', [
+            'options' => $options,
+            'default' => key($options),
+            'record'  => $media,
+            'title'   => $title,
+            'tree'    => $tree,
+        ]);
+    }
+
+    /**
+     * @param Media $media
+     *
+     * @return string[]
+     */
+    private function mediaOptions(Media $media): array
+    {
+        $name = strip_tags($media->fullName());
+
+        return [
+            'self' => $name,
+        ];
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function postAddMediaAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $xref = $request->getQueryParams()['xref'];
+
+        $media = Factory::media()->make($xref, $tree);
+
+        if ($media === null) {
+            throw new MediaNotFoundException();
+        }
+
+        $this->addRecordToCart($media);
+
+        return redirect($media->url());
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getAddNoteAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $xref = $request->getQueryParams()['xref'];
+
+        $note = Factory::note()->make($xref, $tree);
+
+        if ($note === null) {
+            throw new NoteNotFoundException();
+        }
+
+        $options = $this->noteOptions($note);
+
+        $title = I18N::translate('Add %s to the clippings cart', $note->fullName());
+
+        return $this->viewResponse('modules/clippings/add-options', [
+            'options' => $options,
+            'default' => key($options),
+            'record'  => $note,
+            'title'   => $title,
+            'tree'    => $tree,
+        ]);
+    }
+
+    /**
+     * @param Note $note
+     *
+     * @return string[]
+     */
+    private function noteOptions(Note $note): array
+    {
+        $name = strip_tags($note->fullName());
+
+        return [
+            'self' => $name,
+        ];
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function postAddNoteAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $xref = $request->getQueryParams()['xref'];
+
+        $note = Factory::note()->make($xref, $tree);
+
+        if ($note === null) {
+            throw new NoteNotFoundException();
+        }
+
+        $this->addRecordToCart($note);
+
+        return redirect($note->url());
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getAddRepositoryAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $xref = $request->getQueryParams()['xref'];
+
+        $repository = Factory::repository()->make($xref, $tree);
+
+        if ($repository === null) {
+            throw new RepositoryNotFoundException();
+        }
+
+        $options = $this->repositoryOptions($repository);
+
+        $title = I18N::translate('Add %s to the clippings cart', $repository->fullName());
+
+        return $this->viewResponse('modules/clippings/add-options', [
+            'options' => $options,
+            'default' => key($options),
+            'record'  => $repository,
+            'title'   => $title,
+            'tree'    => $tree,
+        ]);
+    }
+
+    /**
+     * @param Repository $repository
+     *
+     * @return string[]
+     */
+    private function repositoryOptions(Repository $repository): array
+    {
+        $name = strip_tags($repository->fullName());
+
+        return [
+            'self' => $name,
+        ];
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function postAddRepositoryAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $xref = $request->getQueryParams()['xref'];
+
+        $repository = Factory::repository()->make($xref, $tree);
+
+        if ($repository === null) {
+            throw new RepositoryNotFoundException();
+        }
+
+        $this->addRecordToCart($repository);
+
+        return redirect($repository->url());
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function getAddSourceAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $xref = $request->getQueryParams()['xref'];
+
+        $source = Factory::source()->make($xref, $tree);
+
+        if ($source === null) {
+            throw new SourceNotFoundException();
+        }
+
+        $options = $this->sourceOptions($source);
+
+        $title = I18N::translate('Add %s to the clippings cart', $source->fullName());
+
+        return $this->viewResponse('modules/clippings/add-options', [
+            'options' => $options,
+            'default' => key($options),
+            'record'  => $source,
+            'title'   => $title,
+            'tree'    => $tree,
+        ]);
+    }
+
+    /**
+     * @param Source $source
+     *
+     * @return string[]
+     */
+    private function sourceOptions(Source $source): array
+    {
+        $name = strip_tags($source->fullName());
+
+        return [
+            'only'   => strip_tags($source->fullName()),
+            'linked' => I18N::translate('%s and the individuals that reference it.', $name),
+        ];
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return ResponseInterface
+     */
+    public function postAddSourceAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $tree = $request->getAttribute('tree');
+        assert($tree instanceof Tree);
+
+        $params = (array) $request->getParsedBody();
+
+        $xref   = $params['xref'];
+        $option = $params['option'];
+
+        $source = Factory::source()->make($xref, $tree);
+
+        if ($source === null) {
+            throw new SourceNotFoundException();
+        }
+
+        $this->addRecordToCart($source);
+
+        if ($option === 'linked') {
+            foreach ($source->linkedIndividuals('SOUR') as $individual) {
+                $this->addRecordToCart($individual);
+            }
+            foreach ($source->linkedFamilies('SOUR') as $family) {
+                $this->addRecordToCart($family);
+            }
+        }
+
+        return redirect($source->url());
+    }
+
+    /**
+     * Get all the records in the cart.
+     *
+     * @param Tree $tree
+     *
+     * @return GedcomRecord[]
+     */
+    private function allRecordsInCart(Tree $tree): array
+    {
+        $cart = Session::get('cart', []);
+
+        $xrefs = array_keys($cart[$tree->name()] ?? []);
+        $xrefs = array_map('strval', $xrefs); // PHP converts numeric keys to integers.
+
+        // Fetch all the records in the cart.
+        $records = array_map(static function (string $xref) use ($tree): ?GedcomRecord {
+            return Factory::gedcomRecord()->make($xref, $tree);
+        }, $xrefs);
+
+        // Some records may have been deleted after they were added to the cart.
+        $records = array_filter($records);
+
+        // Group and sort.
+        uasort($records, static function (GedcomRecord $x, GedcomRecord $y): int {
+            return $x::RECORD_TYPE <=> $y::RECORD_TYPE ?: GedcomRecord::nameComparator()($x, $y);
+        });
+
+        return $records;
+    }
+
+    /**
+     * Add a record (and direclty linked sources, notes, etc. to the cart.
+     *
+     * @param GedcomRecord $record
+     *
+     * @return void
+     */
+    private function addRecordToCart(GedcomRecord $record): void
+    {
+        $cart = Session::get('cart', []);
+
+        $tree_name = $record->tree()->name();
+
+        // Add this record
+        $cart[$tree_name][$record->xref()] = true;
+
+        // Add directly linked media, notes, repositories and sources.
+        preg_match_all('/\n\d (?:OBJE|NOTE|SOUR|REPO) @(' . Gedcom::REGEX_XREF . ')@/', $record->gedcom(), $matches);
+
+        foreach ($matches[1] as $match) {
+            $cart[$tree_name][$match] = true;
+        }
+
+        Session::put('cart', $cart);
+    }
+
+    /**
+     * @param Tree $tree
+     *
+     * @return bool
+     */
+    private function isCartEmpty(Tree $tree): bool
+    {
+        $cart     = Session::get('cart', []);
+        $contents = $cart[$tree->name()] ?? [];
+
+        return $contents === [];
     }
 }

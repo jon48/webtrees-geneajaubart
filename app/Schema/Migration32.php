@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Fisharebest\Webtrees\Schema;
 
-use Fisharebest\Webtrees\Database;
-use PDOException;
+declare(strict_types=1);
+
+namespace Fisharebest\Webtrees\Schema;
 
 /**
  * Upgrade the database schema from version 32 to version 33.
@@ -25,19 +26,12 @@ class Migration32 implements MigrationInterface
 {
     /**
      * Upgrade to to the next version
+     *
+     * @return void
      */
-    public function upgrade()
+    public function upgrade(): void
     {
-        try {
-            Database::prepare(
-                "ALTER TABLE `##site_setting` CHANGE setting_value setting_value VARCHAR(2000) NOT NULL"
-            )->execute();
-        } catch (PDOException $ex) {
-            // Already done?
-        }
-
-        Database::prepare(
-            "DELETE FROM `##change` WHERE old_gedcom = '' AND new_gedcom = ''"
-        )->execute();
+        // These migrations have been merged into migration 0.
+        // Direct upgrade from webtrees < 1.7.9 is not supported.
     }
 }

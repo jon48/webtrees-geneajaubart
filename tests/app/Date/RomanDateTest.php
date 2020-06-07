@@ -15,23 +15,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+declare(strict_types=1);
+
+namespace Fisharebest\Webtrees\Date;
+
+use Fisharebest\Webtrees\TestCase;
+
 /**
  * Test harness for the class RomanDate
  */
-class RomanDateTest extends \PHPUnit_Framework_TestCase
+class RomanDateTest extends TestCase
 {
     /**
-     * Prepare the environment for these tests
-     */
-    public function setUp()
-    {
-    }
-
-    /**
      * Test that the class exists
+     *
+     * @return void
      */
-    public function testClassExists()
+    public function testClassExists(): void
     {
-        $this->assertTrue(class_exists('\Fisharebest\Webtrees\Date\RomanDate'));
+        $this->assertTrue(class_exists(RomanDate::class));
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,10 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Date;
 
 /**
- * Definitions for the Roman calendar
+ * Definitions for Roman dtes.
  *
  * The 5.5.1 gedcom spec mentions this calendar, but gives no details of
  * how it is to be represented.... This class is just a place holder so that
@@ -24,15 +28,26 @@ namespace Fisharebest\Webtrees\Date;
  */
 class RomanDate extends JulianDate
 {
-    /** {@inheritdoc} */
-    protected function formatGedcomYear()
+    // GEDCOM calendar escape
+    public const ESCAPE = '@#DROMAN@';
+
+    /**
+     * Generate the %E format for a date.
+     *
+     * @return string
+     */
+    protected function formatGedcomYear(): string
     {
-        return sprintf('%04dAUC', $this->y);
+        return sprintf('%04dAUC', $this->year);
     }
 
-    /** {@inheritdoc} */
-    protected function formatLongYear()
+    /**
+     * Generate the %Y format for a date.
+     *
+     * @return string
+     */
+    protected function formatLongYear(): string
     {
-        return $this->y . 'AUC';
+        return $this->year . 'AUC';
     }
 }

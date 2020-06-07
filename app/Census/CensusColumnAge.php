@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,9 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
-use Fisharebest\Webtrees\Date;
+use Fisharebest\Webtrees\Age;
+use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 
 /**
@@ -26,13 +31,15 @@ class CensusColumnAge extends AbstractCensusColumn implements CensusColumnInterf
     /**
      * Generate the likely value of this census column, based on available information.
      *
-     * @param Individual      $individual
-     * @param Individual|null $head
+     * @param Individual $individual
+     * @param Individual $head
      *
      * @return string
      */
-    public function generate(Individual $individual, Individual $head = null)
+    public function generate(Individual $individual, Individual $head): string
     {
-        return (string) Date::getAge($individual->getEstimatedBirthDate(), $this->date(), 0);
+        $age = new Age($individual->getEstimatedBirthDate(), $this->date());
+
+        return I18N::number($age->ageYears());
     }
 }

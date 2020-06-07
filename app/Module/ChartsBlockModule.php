@@ -1,7 +1,8 @@
 <?php
+
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,227 +14,247 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Controller\HourglassController;
-use Fisharebest\Webtrees\Filter;
-use Fisharebest\Webtrees\Functions\FunctionsEdit;
-use Fisharebest\Webtrees\Functions\FunctionsPrint;
+use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Module\InteractiveTree\TreeView;
-use Fisharebest\Webtrees\Theme;
+use Fisharebest\Webtrees\Services\ModuleService;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\User;
+use Illuminate\Support\Str;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class ChartsBlockModule
  */
 class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
 {
-    /** {@inheritdoc} */
-    public function getTitle()
+    use ModuleBlockTrait;
+
+    /**
+     * @var ModuleService
+     */
+    private $module_service;
+
+    /**
+     * ChartsBlockModule constructor.
+     *
+     * @param ModuleService $module_service
+     */
+    public function __construct(ModuleService $module_service)
     {
-        return /* I18N: Name of a module/block */ I18N::translate('Charts');
+        $this->module_service = $module_service;
     }
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
     {
-        return /* I18N: Description of the “Charts” module */ I18N::translate('An alternative way to display charts.');
+        /* I18N: Name of a module/block */
+        return I18N::translate('Charts');
+    }
+
+    /**
+     * A sentence describing what this module does.
+     *
+     * @return string
+     */
+    public function description(): string
+    {
+        /* I18N: Description of the “Charts” module */
+        return I18N::translate('An alternative way to display charts.');
     }
 
     /**
      * Generate the HTML content of this block.
      *
+     * @param Tree     $tree
      * @param int      $block_id
-     * @param bool     $template
-     * @param string[] $cfg
+     * @param string   $context
+     * @param string[] $config
      *
      * @return string
      */
-    public function getBlock($block_id, $template = true, $cfg = array())
+    public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
-        global $WT_TREE, $ctype, $controller;
+        $PEDIGREE_ROOT_ID = $tree->getPreference('PEDIGREE_ROOT_ID');
+        $gedcomid         = $tree->getUserPreference(Auth::user(), User::PREF_TREE_ACCOUNT_XREF);
+        $default_xref     = $gedcomid ?: $PEDIGREE_ROOT_ID;
 
-        $PEDIGREE_ROOT_ID = $WT_TREE->getPreference('PEDIGREE_ROOT_ID');
-        $gedcomid         = $WT_TREE->getUserPreference(Auth::user(), 'gedcomid');
+        $type = $this->getBlockSetting($block_id, 'type', 'pedigree');
+        $xref = $this->getBlockSetting($block_id, 'pid', $default_xref);
 
-        $details = $this->getBlockSetting($block_id, 'details', '0');
-        $type    = $this->getBlockSetting($block_id, 'type', 'pedigree');
-        $pid     = $this->getBlockSetting($block_id, 'pid', Auth::check() ? ($gedcomid ? $gedcomid : $PEDIGREE_ROOT_ID) : $PEDIGREE_ROOT_ID);
+        extract($config, EXTR_OVERWRITE);
 
-        foreach (array('details', 'type', 'pid', 'block') as $name) {
-            if (array_key_exists($name, $cfg)) {
-                $$name = $cfg[$name];
-            }
-        }
+        $individual = Factory::individual()->make($xref, $tree);
 
-        $person = Individual::getInstance($pid, $WT_TREE);
-        if (!$person) {
-            $pid = $PEDIGREE_ROOT_ID;
-            $this->setBlockSetting($block_id, 'pid', $pid);
-            $person = Individual::getInstance($pid, $WT_TREE);
-        }
+        $title = $this->title();
 
-        $id    = $this->getName() . $block_id;
-        $class = $this->getName() . '_block';
-        if ($ctype == 'gedcom' && Auth::isManager($WT_TREE) || $ctype == 'user' && Auth::check()) {
-            $title = '<a class="icon-admin" title="' . I18N::translate('Preferences') . '" href="block_edit.php?block_id=' . $block_id . '&amp;ged=' . $WT_TREE->getNameHtml() . '&amp;ctype=' . $ctype . '"></a>';
-        } else {
-            $title = '';
-        }
-
-        if ($person) {
-            $content = '';
+        if ($individual instanceof Individual) {
             switch ($type) {
+                default:
                 case 'pedigree':
-                    $title .= I18N::translate('Pedigree of %s', $person->getFullName());
-                    $chartController = new HourglassController($person->getXref(), $details, false);
-                    $controller->addInlineJavascript($chartController->setupJavascript());
-                    $content .= '<table cellspacing="0" cellpadding="0" border="0"><tr>';
-                    $content .= '<td>';
-                    ob_start();
-                    FunctionsPrint::printPedigreePerson($person, $details);
-                    $content .= ob_get_clean();
-                    $content .= '</td>';
-                    $content .= '<td>';
-                    ob_start();
-                    $chartController->printPersonPedigree($person, 1);
-                    $content .= ob_get_clean();
-                    $content .= '</td>';
-                    $content .= '</tr></table>';
+                    /** @var PedigreeChartModule $module */
+                    $module    = $this->module_service->findByInterface(PedigreeChartModule::class)->first();
+                    $title     = $module->chartTitle($individual);
+                    $chart_url = $module->chartUrl($individual, [
+                        'ajax'        => true,
+                        'generations' => 3,
+                        'layout'      => PedigreeChartModule::STYLE_RIGHT,
+                    ]);
+                    $content   = view('modules/charts/chart', [
+                        'block_id'  => $block_id,
+                        'chart_url' => $chart_url,
+                        'class'     => 'wt-chart-pedigree',
+                    ]);
                     break;
+
                 case 'descendants':
-                    $title .= I18N::translate('Descendants of %s', $person->getFullName());
-                    $chartController = new HourglassController($person->getXref(), $details, false);
-                    $controller->addInlineJavascript($chartController->setupJavascript());
-                    ob_start();
-                    $chartController->printDescendency($person, 1, false);
-                    $content .= ob_get_clean();
+                    /** @var DescendancyChartModule $module */
+                    $module    = $this->module_service->findByInterface(DescendancyChartModule::class)->first();
+                    $title     = $module->chartTitle($individual);
+                    $chart_url = $module->chartUrl($individual, [
+                        'ajax'        => true,
+                        'generations' => 2,
+                        'chart_style' => DescendancyChartModule::CHART_STYLE_TREE,
+                    ]);
+                    $content   = view('modules/charts/chart', [
+                        'block_id'  => $block_id,
+                        'chart_url' => $chart_url,
+                        'class'     => 'wt-chart-descendants',
+                    ]);
                     break;
+
                 case 'hourglass':
-                    $title .= I18N::translate('Hourglass chart of %s', $person->getFullName());
-                    $chartController = new HourglassController($person->getXref(), $details, false);
-                    $controller->addInlineJavascript($chartController->setupJavascript());
-                    $content .= '<table cellspacing="0" cellpadding="0" border="0"><tr>';
-                    $content .= '<td>';
-                    ob_start();
-                    $chartController->printDescendency($person, 1, false);
-                    $content .= ob_get_clean();
-                    $content .= '</td>';
-                    $content .= '<td>';
-                    ob_start();
-                    $chartController->printPersonPedigree($person, 1);
-                    $content .= ob_get_clean();
-                    $content .= '</td>';
-                    $content .= '</tr></table>';
+                    /** @var HourglassChartModule $module */
+                    $module    = $this->module_service->findByInterface(HourglassChartModule::class)->first();
+                    $title     = $module->chartTitle($individual);
+                    $chart_url = $module->chartUrl($individual, [
+                        'ajax'        => true,
+                        'generations' => 2,
+                    ]);
+                    $content   = view('modules/charts/chart', [
+                        'block_id'  => $block_id,
+                        'chart_url' => $chart_url,
+                        'class'     => 'wt-chart-hourglass',
+                    ]);
                     break;
+
                 case 'treenav':
-                    $title .= I18N::translate('Interactive tree of %s', $person->getFullName());
-                    $mod = new InteractiveTreeModule(WT_MODULES_DIR . 'tree');
-                    $tv  = new TreeView;
-                    $content .= '<script>jQuery("head").append(\'<link rel="stylesheet" href="' . $mod->css() . '" type="text/css" />\');</script>';
-                    $content .= '<script src="' . $mod->js() . '"></script>';
-                    list($html, $js) = $tv->drawViewport($person, 2);
-                    $content .= $html . '<script>' . $js . '</script>';
+                    /** @var InteractiveTreeModule $module */
+                    $module = $this->module_service->findByInterface(InteractiveTreeModule::class)->first();
+                    $title  = I18N::translate('Interactive tree of %s', $individual->fullName());
+                    $tv     = new TreeView();
+                    [$html, $js] = $tv->drawViewport($individual, 2);
+                    $content = $html . '<script>' . $js . '</script>';
                     break;
             }
         } else {
             $content = I18N::translate('You must select an individual and a chart type in the block preferences');
         }
 
-        if ($template) {
-            return Theme::theme()->formatBlock($id, $title, $class, $content);
-        } else {
-            return $content;
+        if ($context !== self::CONTEXT_EMBED) {
+            return view('modules/block-template', [
+                'block'      => Str::kebab($this->name()),
+                'id'         => $block_id,
+                'config_url' => $this->configUrl($tree, $context, $block_id),
+                'title'      => strip_tags($title),
+                'content'    => $content,
+            ]);
         }
+
+        return $content;
     }
 
-    /** {@inheritdoc} */
-    public function loadAjax()
-    {
-        return true;
-    }
-
-    /** {@inheritdoc} */
-    public function isUserBlock()
-    {
-        return true;
-    }
-
-    /** {@inheritdoc} */
-    public function isGedcomBlock()
+    /**
+     * Should this block load asynchronously using AJAX?
+     *
+     * Simple blocks are faster in-line, more complex ones can be loaded later.
+     *
+     * @return bool
+     */
+    public function loadAjax(): bool
     {
         return true;
     }
 
     /**
+     * Can this block be shown on the user’s home page?
+     *
+     * @return bool
+     */
+    public function isUserBlock(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Can this block be shown on the tree’s home page?
+     *
+     * @return bool
+     */
+    public function isTreeBlock(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Update the configuration for a block.
+     *
+     * @param ServerRequestInterface $request
+     * @param int     $block_id
+     *
+     * @return void
+     */
+    public function saveBlockConfiguration(ServerRequestInterface $request, int $block_id): void
+    {
+        $params = (array) $request->getParsedBody();
+
+        $this->setBlockSetting($block_id, 'type', $params['type'] ?? 'pedigree');
+        $this->setBlockSetting($block_id, 'pid', $params['xref'] ?? '');
+    }
+
+    /**
      * An HTML form to edit block settings
      *
-     * @param int $block_id
+     * @param Tree $tree
+     * @param int  $block_id
+     *
+     * @return string
      */
-    public function configureBlock($block_id)
+    public function editBlockConfiguration(Tree $tree, int $block_id): string
     {
-        global $WT_TREE, $controller;
+        $PEDIGREE_ROOT_ID = $tree->getPreference('PEDIGREE_ROOT_ID');
+        $gedcomid         = $tree->getUserPreference(Auth::user(), User::PREF_TREE_ACCOUNT_XREF);
+        $default_xref     = $gedcomid ?: $PEDIGREE_ROOT_ID;
 
-        $PEDIGREE_ROOT_ID = $WT_TREE->getPreference('PEDIGREE_ROOT_ID');
-        $gedcomid         = $WT_TREE->getUserPreference(Auth::user(), 'gedcomid');
+        $type = $this->getBlockSetting($block_id, 'type', 'pedigree');
+        $xref  = $this->getBlockSetting($block_id, 'pid', $default_xref);
 
-        if (Filter::postBool('save') && Filter::checkCsrf()) {
-            $this->setBlockSetting($block_id, 'details', Filter::postBool('details'));
-            $this->setBlockSetting($block_id, 'type', Filter::post('type', 'pedigree|descendants|hourglass|treenav', 'pedigree'));
-            $this->setBlockSetting($block_id, 'pid', Filter::post('pid', WT_REGEX_XREF));
-        }
-
-        $details = $this->getBlockSetting($block_id, 'details', '0');
-        $type    = $this->getBlockSetting($block_id, 'type', 'pedigree');
-        $pid     = $this->getBlockSetting($block_id, 'pid', Auth::check() ? ($gedcomid ? $gedcomid : $PEDIGREE_ROOT_ID) : $PEDIGREE_ROOT_ID);
-
-        $charts = array(
+        $charts = [
             'pedigree'    => I18N::translate('Pedigree'),
             'descendants' => I18N::translate('Descendants'),
             'hourglass'   => I18N::translate('Hourglass chart'),
             'treenav'     => I18N::translate('Interactive tree'),
-        );
+        ];
         uasort($charts, 'Fisharebest\Webtrees\I18N::strcasecmp');
 
-        $controller
-            ->addExternalJavascript(WT_AUTOCOMPLETE_JS_URL)
-            ->addInlineJavascript('autocomplete();');
-        ?>
-        <tr>
-            <td class="descriptionbox wrap width33">
-                <?php echo I18N::translate('Chart type'); ?>
-            </td>
-            <td class="optionbox">
-                <?php echo FunctionsEdit::selectEditControl('type', $charts, null, $type); ?>
-            </td>
-        </tr>
-        <tr>
-            <td class="descriptionbox wrap width33">
-                <?php echo I18N::translate('Show details'); ?>
-            </td>
-        <td class="optionbox">
-            <?php echo FunctionsEdit::editFieldYesNo('details', $details); ?>
-            </td>
-        </tr>
-        <tr>
-            <td class="descriptionbox wrap width33">
-                <label for="pid">
-                    <?php echo I18N::translate('Individual'); ?>
-                </label>
-            </td>
-            <td class="optionbox">
-                <input data-autocomplete-type="INDI" type="text" name="pid" id="pid" value="<?php echo $pid; ?>" size="5">
-                <?php
-                echo FunctionsPrint::printFindIndividualLink('pid');
-                $root = Individual::getInstance($pid, $WT_TREE);
-                if ($root) {
-                    echo ' <span class="list_item">', $root->getFullName(), $root->formatFirstMajorFact(WT_EVENTS_BIRT, 1), '</span>';
-                }
-                ?>
-            </td>
-        </tr>
-        <?php
+        $individual = Factory::individual()->make($xref, $tree);
+
+        return view('modules/charts/config', [
+            'charts'     => $charts,
+            'individual' => $individual,
+            'tree'       => $tree,
+            'type'       => $type,
+        ]);
     }
 }

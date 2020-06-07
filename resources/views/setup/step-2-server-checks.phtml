@@ -1,0 +1,74 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+
+?>
+
+<form method="post" autocomplete="off">
+    <input name="lang" type="hidden" value="<?= e($lang) ?>">
+    <input name="dbtype" type="hidden" value="<?= e($dbtype) ?>">
+    <input name="dbhost" type="hidden" value="<?= e($dbhost) ?>">
+    <input name="dbport" type="hidden" value="<?= e($dbport) ?>">
+    <input name="dbuser" type="hidden" value="<?= e($dbuser) ?>">
+    <input name="dbpass" type="hidden" value="<?= e($dbpass) ?>">
+    <input name="dbname" type="hidden" value="<?= e($dbname) ?>">
+    <input name="tblpfx" type="hidden" value="<?= e($tblpfx) ?>">
+    <input name="wtname" type="hidden" value="<?= e($wtname) ?>">
+    <input name="wtuser" type="hidden" value="<?= e($wtuser) ?>">
+    <input name="wtpass" type="hidden" value="<?= e($wtpass) ?>">
+    <input name="wtemail" type="hidden" value="<?= e($wtemail) ?>">
+
+    <h2>
+        <?= I18N::translate('Checking server configuration') ?>
+    </h2>
+
+    <?php foreach ($errors as $error) : ?>
+        <p class="alert alert-danger"><?= $error ?></p>
+    <?php endforeach ?>
+
+    <?php foreach ($warnings as $warning) : ?>
+        <p class="alert alert-warning"><?= $warning ?></p>
+    <?php endforeach ?>
+
+    <?php if ($errors->isEmpty() && $warnings->isEmpty()) : ?>
+        <p>
+            <?= I18N::translate('The server configuration is OK.') ?>
+        </p>
+    <?php endif ?>
+
+    <h2><?= I18N::translate('Checking server capacity') ?></h2>
+
+    <p>
+        <?= I18N::translate('The memory and CPU time requirements depend on the number of individuals in your family tree.') ?>
+    </p>
+    <p>
+        <?= I18N::translate('The following list shows typical requirements.') ?>
+    </p>
+    <p>
+        <?= I18N::translate('Small systems (500 individuals): 16–32 MB, 10–20 seconds') ?>
+        <br>
+        <?= I18N::translate('Medium systems (5,000 individuals): 32–64 MB, 20–40 seconds') ?>
+        <br>
+        <?= I18N::translate('Large systems (50,000 individuals): 64–128 MB, 40–80 seconds') ?>
+    </p>
+
+    <p class="alert alert-<?= $memory_limit < 32 || $cpu_limit > 0 && $cpu_limit < 20 ? 'danger' : 'success' ?>">
+        <?= I18N::translate('This server’s memory limit is %s MB and its CPU time limit is %s seconds.', I18N::number($memory_limit), I18N::number($cpu_limit)) ?>
+    </p>
+
+    <p>
+        <?= I18N::translate('If you try to exceed these limits, you may experience server time-outs and blank pages.') ?>
+    </p>
+
+    <hr>
+
+    <div class="d-flex justify-content-between">
+        <button class="btn btn-primary" name="step" type="submit" value="3">
+            <?= I18N::translate('next') ?>
+        </button>
+
+        <button class="btn btn-secondary" name="step" type="submit" value="1">
+            <?= I18N::translate('previous') ?>
+        </button>
+    </div>
+</form>

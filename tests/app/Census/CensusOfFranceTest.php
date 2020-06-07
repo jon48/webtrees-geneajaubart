@@ -14,19 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
+
+use Fisharebest\Webtrees\TestCase;
 
 /**
  * Test harness for the class CensusOfFrance
  */
-class CensusOfFranceTest extends \PHPUnit_Framework_TestCase
+class CensusOfFranceTest extends TestCase
 {
     /**
      * Test the census place
      *
-     * @covers Fisharebest\Webtrees\Census\CensusOfFrance
+     * @covers \Fisharebest\Webtrees\Census\CensusOfFrance
+     *
+     * @return void
      */
-    public function testPlace()
+    public function testPlace(): void
     {
         $census = new CensusOfFrance();
 
@@ -34,38 +41,54 @@ class CensusOfFranceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test the census language
+     *
+     * @covers \Fisharebest\Webtrees\Census\CensusOfCzechRepublic
+     *
+     * @return void
+     */
+    public function testLanguage(): void
+    {
+        $census = new CensusOfFrance();
+
+        $this->assertSame('fr', $census->censusLanguage());
+    }
+
+    /**
      * Test the census dates
      *
-     * @covers Fisharebest\Webtrees\Census\CensusOfFrance
+     * @covers \Fisharebest\Webtrees\Census\CensusOfFrance
+     *
+     * @return void
      */
-    public function testAllDates()
+    public function testAllDates(): void
     {
-        $census  = new CensusOfFrance();
+        $census = new CensusOfFrance();
 
         $census_dates = $census->allCensusDates();
 
         $this->assertCount(22, $census_dates);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1831', $census_dates[0]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1836', $census_dates[1]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1841', $census_dates[2]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1846', $census_dates[3]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1851', $census_dates[4]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1856', $census_dates[5]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1861', $census_dates[6]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1866', $census_dates[7]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1872', $census_dates[8]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1876', $census_dates[9]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1881', $census_dates[10]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1886', $census_dates[11]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1891', $census_dates[12]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1896', $census_dates[13]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1901', $census_dates[14]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1906', $census_dates[15]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1911', $census_dates[16]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1921', $census_dates[17]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1926', $census_dates[18]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1931', $census_dates[19]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1936', $census_dates[20]);
-        $this->assertInstanceOf('Fisharebest\Webtrees\Census\CensusOfFrance1946', $census_dates[21]);
+        $this->assertInstanceOf(CensusOfFrance1831::class, $census_dates[0]);
+        $this->assertInstanceOf(CensusOfFrance1836::class, $census_dates[1]);
+        $this->assertInstanceOf(CensusOfFrance1841::class, $census_dates[2]);
+        $this->assertInstanceOf(CensusOfFrance1846::class, $census_dates[3]);
+        $this->assertInstanceOf(CensusOfFrance1851::class, $census_dates[4]);
+        $this->assertInstanceOf(CensusOfFrance1856::class, $census_dates[5]);
+        $this->assertInstanceOf(CensusOfFrance1861::class, $census_dates[6]);
+        $this->assertInstanceOf(CensusOfFrance1866::class, $census_dates[7]);
+        $this->assertInstanceOf(CensusOfFrance1872::class, $census_dates[8]);
+        $this->assertInstanceOf(CensusOfFrance1876::class, $census_dates[9]);
+        $this->assertInstanceOf(CensusOfFrance1881::class, $census_dates[10]);
+        $this->assertInstanceOf(CensusOfFrance1886::class, $census_dates[11]);
+        $this->assertInstanceOf(CensusOfFrance1891::class, $census_dates[12]);
+        $this->assertInstanceOf(CensusOfFrance1896::class, $census_dates[13]);
+        $this->assertInstanceOf(CensusOfFrance1901::class, $census_dates[14]);
+        $this->assertInstanceOf(CensusOfFrance1906::class, $census_dates[15]);
+        $this->assertInstanceOf(CensusOfFrance1911::class, $census_dates[16]);
+        $this->assertInstanceOf(CensusOfFrance1921::class, $census_dates[17]);
+        $this->assertInstanceOf(CensusOfFrance1926::class, $census_dates[18]);
+        $this->assertInstanceOf(CensusOfFrance1931::class, $census_dates[19]);
+        $this->assertInstanceOf(CensusOfFrance1936::class, $census_dates[20]);
+        $this->assertInstanceOf(CensusOfFrance1946::class, $census_dates[21]);
     }
 }

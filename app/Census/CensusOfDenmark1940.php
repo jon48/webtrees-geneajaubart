@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfDenmark1940 extends CensusOfDenmark implements CensusInterface
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return '05 NOV 1940';
     }
@@ -35,9 +39,9 @@ class CensusOfDenmark1940 extends CensusOfDenmark implements CensusInterface
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnSurnameGivenNames($this, 'Navn', ''),
             new CensusColumnNull($this, 'Nærværende', 'Hvis den i Rubrik 1 opførte Person er midleritidg nærværende d.v.s. har fast Bopæl ????? (er optaget under en anden Address i Folkeregistret), anføres her den faste Bopæls Adresse (Kommunens Navn og den fuldstændige Adresse i denne; for Udlændinge dog kun Landets Navn).'),
             new CensusColumnNull($this, 'Fraværende', 'Hvis den i Rubrik 1 opførte Person er midleritidg fraværende d.v.s. har fast Bopæl paa Tællingsstedet (er optaget underdenne Address i Folkeregistret), men den 5. Novemer ikke er til Stede paa Tællingsstedet, anføres her „fraværende“ og Adressen paa det midlertidige Opholdssted (ved Ophold i Udlandet anføres jun Landets Navn).'),
@@ -53,6 +57,6 @@ class CensusOfDenmark1940 extends CensusOfDenmark implements CensusInterface
             new CensusColumnNull($this, 'Virksomhedens', 'Virksomhedens (Branchens) Art'),
             new CensusColumnNull($this, 'Hustruen', 'Besvares kun af Hustruen og hjemmeboende Børn over 14 Aar'),
             new CensusColumnNull($this, 'Døtre', 'Besvares kun af hjemmeboende Døtre over 14 Aar'),
-        );
+        ];
     }
 }

@@ -1,0 +1,127 @@
+<?php
+
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\MergeRecordsAction;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\View;
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route('manage-trees', ['tree' => $tree->name()]) => I18N::translate('Manage family trees'), $title]]) ?>
+
+<h1><?= $title ?></h1>
+
+<form method="post" action="<?= e(route(MergeRecordsAction::class, ['tree' => $tree->name()])) ?>">
+    <?= csrf_field() ?>
+
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="record-type">
+            <?= I18N::translate('Select two records to merge.') ?>
+        </label>
+        <div class="col-sm-9">
+            <select class="form-control" id="record-type">
+                <option value="individual"><?= I18N::translate('Individuals') ?></option>
+                <option value="family"><?= I18N::translate('Families') ?></option>
+                <option value="source"><?= I18N::translate('Sources') ?></option>
+                <option value="repository"><?= I18N::translate('Repositories') ?></option>
+                <option value="note"><?= I18N::translate('Notes') ?></option>
+                <option value="media"><?= I18N::translate('Media objects') ?></option>
+                <option value="submitter"><?= I18N::translate('Submitters') ?></option>
+            </select>
+        </div>
+    </div>
+
+    <label class="row form-group">
+        <span class="col-sm-3 col-form-label">
+            <?= I18N::translate('First record') ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-individual">
+            <?= view('components/select-individual', ['name' => 'xref1', 'id' => 'individual-xref-1', 'individual' => $individual1, 'tree' => $tree]) ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-family d-none">
+            <?= view('components/select-family', ['name' => 'xref1', 'id' => 'family-xref-1', 'family' => $family1, 'tree' => $tree, 'disabled' => true]) ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-source d-none">
+            <?= view('components/select-source', ['name' => 'xref1', 'id' => 'source-xref-1', 'source' => $source1, 'tree' => $tree, 'disabled' => true]) ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-repository d-none">
+            <?= view('components/select-repository', ['name' => 'xref1', 'id' => 'repository-xref-1', 'repository' => $repository1, 'tree' => $tree, 'disabled' => true]) ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-note d-none">
+            <?= view('components/select-note', ['name' => 'xref1', 'id' => 'note-xref-1', 'note' => $note1, 'tree' => $tree, 'disabled' => true]) ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-media d-none">
+            <?= view('components/select-media', ['name' => 'xref1', 'id' => 'media-xref-1', 'media' => $media1, 'tree' => $tree, 'disabled' => true]) ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-submitter d-none">
+            <?= view('components/select-submitter', ['name' => 'xref1', 'id' => 'submitter-xref-1', 'submitter' => $submitter1, 'tree' => $tree, 'disabled' => true]) ?>
+        </span>
+    </label>
+
+    <label class="row form-group">
+        <span class="col-sm-3 col-form-label">
+            <?= I18N::translate('Second record') ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-individual">
+            <?= view('components/select-individual', ['name' => 'xref2', 'id' => 'individual-xref-2', 'individual' => $individual2, 'tree' => $tree]) ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-family d-none">
+            <?= view('components/select-family', ['name' => 'xref2', 'id' => 'family-xref-2', 'family' => $family2, 'tree' => $tree, 'disabled' => true]) ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-source d-none">
+            <?= view('components/select-source', ['name' => 'xref2', 'id' => 'source-xref-2', 'source' => $source2, 'tree' => $tree, 'disabled' => true]) ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-repository d-none">
+            <?= view('components/select-repository', ['name' => 'xref2', 'id' => 'repository-xref-2', 'repository' => $repository2, 'tree' => $tree, 'disabled' => true]) ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-note d-none">
+            <?= view('components/select-note', ['name' => 'xref2', 'id' => 'note-xref-2', 'note' => $note2, 'tree' => $tree, 'disabled' => true]) ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-media d-none">
+            <?= view('components/select-media', ['name' => 'xref2', 'id' => 'media-xref-2', 'media' => $media2, 'tree' => $tree, 'disabled' => true]) ?>
+        </span>
+
+        <span class="col-sm-9 select-record select-submitter d-none">
+            <?= view('components/select-submitter', ['name' => 'xref2', 'id' => 'submitter-xref-2', 'submitter' => $submitter2, 'tree' => $tree, 'disabled' => true]) ?>
+        </span>
+    </label>
+
+    <div class="row form-group">
+        <div class="col-sm-3">
+        </div>
+
+        <div class="col-sm-9">
+            <button class="btn btn-primary" type="submit">
+                <?= view('icons/save') ?>
+                <?= I18N::translate('continue') ?>
+            </button>
+        </div>
+    </div>
+</form>
+
+<?php View::push('javascript') ?>
+<script>
+  "use strict";
+
+  // Disabled elements do not get submitted with the form.
+  $("#record-type").change(function() {
+      $(".select-record").addClass('d-none');
+      $(".select-" + $(this).val()).removeClass('d-none');
+      $(".select-record select").attr("disabled", true);
+      $(".select-" + $(this).val() + " select").attr("disabled", false);
+  });
+</script>
+<?php View::endpush() ?>

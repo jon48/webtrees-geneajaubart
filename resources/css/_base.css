@@ -1,0 +1,109 @@
+/**
+ * webtrees: online genealogy
+ * Copyright (C) 2020 webtrees development team
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * Common formatting for all themes.
+ */
+
+@import "_block-charts.css";
+@import "_charts.css";
+@import "_colorbox.css";
+@import "_lists.css";
+@import "_mime-type-icons.css";
+@import "_on-screen-keyboard.css";
+@import "_sortable.css";
+@import "_tab-relatives.css";
+
+/* Some icons need to be reversed on right-to-left pages */
+[dir=rtl] .wt-icon-flip-rtl,
+[dir=rtl] .wt-icon-flip-rtl svg
+{
+    transform: scale(-1, 1);
+}
+
+/* Remove border-radius for left-to-right input groups on right-to-left pages */
+[dir=rtl] .input-group[dir=ltr] [dir=ltr] {
+    border-radius: 0;
+}
+
+/* rtl:ignore */
+td.align-digits,
+th.align-digits {
+    text-align: right;
+}
+
+/* Allows twitter typeahead to work with bootstrap input groups */
+.input-group > .twitter-typeahead {
+    flex: 1 1;
+}
+
+/* Allows select2 to work with bootstrap input groups */
+.input-group > .select2-container {
+    flex: 1 1;
+}
+
+/* Workaround for dropdown menu position on RTL with popper.js */
+/* See also https://github.com/FezVrasta/popper.js/issues/695 */
+[dir=rtl] .wt-genealogy-menu .dropdown-menu {
+    right: 0;
+    left: auto !important;
+}
+
+/*
+ * https://github.com/fisharebest/webtrees/issues/2291
+ * Chrome 72 has problems with all cards in the control panel.
+ * Chrome 73 has problems with the family-tree card in the control panel.
+ * Chrome 76 seems OK.
+ * https://github.com/fisharebest/webtrees/issues/2813
+ * Safari 13 has the same issue.
+ */
+.wt-control-panel .card {
+    display: block;
+}
+
+/*
+ * Flexbox fixes for IE11
+ */
+@media (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    /* Move the body down below the mangled header */
+    div.wt-main-container {
+        padding-top: 4rem;
+    }
+}
+
+/* Keep the page as tall as the window, so the footer can remain at the bottom. */
+.wt-global {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+.wt-main-container {
+    flex: 1;
+}
+
+/* Scrollbars */
+.wt-global {
+    /* Prevent redraws when dynamic content requires a scrollbar. */
+    overflow-y: scroll;
+    /* Any wide content will have its own horizontal scrollbar */
+    overflow-x: hidden;
+}
+
+/* Browsers only understand US English */
+[lang=en-AU] q,
+[lang=en-GB] q {
+    quotes: "‘" "’" "“" "”";
+}

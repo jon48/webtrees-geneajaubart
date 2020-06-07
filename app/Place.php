@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,17 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees;
+
+use Fisharebest\Webtrees\Module\ModuleInterface;
+use Fisharebest\Webtrees\Module\ModuleListInterface;
+use Fisharebest\Webtrees\Module\PlaceHierarchyListModule;
+use Fisharebest\Webtrees\Services\ModuleService;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Collection;
+use stdClass;
 
 /**
  * A GEDCOM place (PLAC) object.
  */
 class Place
 {
-    const GEDCOM_SEPARATOR = ', ';
+    /** @var string e.g. "Westminster, London, England" */
+    private $place_name;
 
-    /** @var string[] e.g. array('Westminster', 'London', 'England') */
-    private $gedcom_place;
+    /** @var Collection<string> The parts of a place name, e.g. ["Westminster", "London", "England"] */
+    private $parts;
 
     /** @var Tree We may have the same place name in different trees. */
     private $tree;
@@ -31,39 +45,50 @@ class Place
     /**
      * Create a place.
      *
-     * @param string $gedcom_place
+     * @param string $place_name
      * @param Tree   $tree
      */
-    public function __construct($gedcom_place, Tree $tree)
+    public function __construct(string $place_name, Tree $tree)
     {
-        if ($gedcom_place) {
-            $this->gedcom_place = explode(self::GEDCOM_SEPARATOR, $gedcom_place);
-        } else {
-            // Empty => "Top level"
-            $this->gedcom_place = array();
-        }
+        // Ignore any empty parts in place names such as "Village, , , Country".
+        $this->parts = Collection::make(preg_split(Gedcom::PLACE_SEPARATOR_REGEX, $place_name))
+            ->filter();
+
+        // Rebuild the placename in the correct format.
+        $this->place_name = $this->parts->implode(Gedcom::PLACE_SEPARATOR);
+
         $this->tree = $tree;
     }
 
     /**
-     * Get the identifier for a place.
+     * Find a place by its ID.
      *
-     * @return int
+     * @param int  $id
+     * @param Tree $tree
+     *
+     * @return Place
      */
-    public function getPlaceId()
+    public static function find(int $id, Tree $tree): Place
     {
-        $place_id = 0;
-        foreach (array_reverse($this->gedcom_place) as $place) {
-            $place_id = Database::prepare(
-                "SELECT p_id FROM `##places` WHERE p_parent_id = :parent_id AND p_place = :place AND p_file = :tree_id"
-            )->execute(array(
-                'parent_id' => $place_id,
-                'place'     => $place,
-                'tree_id'   => $this->tree->getTreeId(),
-            ))->fetchOne();
+        $parts = new Collection();
+
+        while ($id !== 0) {
+            $row = DB::table('places')
+                ->where('p_file', '=', $tree->id())
+                ->where('p_id', '=', $id)
+                ->first();
+
+            if ($row instanceof stdClass) {
+                $id = (int) $row->p_parent_id;
+                $parts->add($row->p_place);
+            } else {
+                $id = 0;
+            }
         }
 
-        return $place_id;
+        $place_name = $parts->implode(Gedcom::PLACE_SEPARATOR);
+
+        return new Place($place_name, $tree);
     }
 
     /**
@@ -71,39 +96,105 @@ class Place
      *
      * @return Place
      */
-    public function getParentPlace()
+    public function parent(): Place
     {
-        return new self(implode(self::GEDCOM_SEPARATOR, array_slice($this->gedcom_place, 1)), $this->tree);
+        return new self($this->parts->slice(1)->implode(Gedcom::PLACE_SEPARATOR), $this->tree);
+    }
+
+    /**
+     * The database row that contains this place.
+     * Note that due to database collation, both "Quebec" and "Québec" will share the same row.
+     *
+     * @return int
+     */
+    public function id(): int
+    {
+        return app('cache.array')->remember('place-' . $this->place_name, function (): int {
+            // The "top-level" place won't exist in the database.
+            if ($this->parts->isEmpty()) {
+                return 0;
+            }
+
+            $parent_place_id = $this->parent()->id();
+
+            $place_id = (int) DB::table('places')
+                ->where('p_file', '=', $this->tree->id())
+                ->where('p_place', '=', $this->parts->first())
+                ->where('p_parent_id', '=', $parent_place_id)
+                ->value('p_id');
+
+            if ($place_id === 0) {
+                $place = $this->parts->first();
+
+                DB::table('places')->insert([
+                    'p_file'        => $this->tree->id(),
+                    'p_place'       => $place,
+                    'p_parent_id'   => $parent_place_id,
+                    'p_std_soundex' => Soundex::russell($place),
+                    'p_dm_soundex'  => Soundex::daitchMokotoff($place),
+                ]);
+
+                $place_id = (int) DB::connection()->getPdo()->lastInsertId();
+            }
+
+            return $place_id;
+        });
+    }
+
+    /**
+     * @return Tree
+     */
+    public function tree(): Tree
+    {
+        return $this->tree;
+    }
+
+    /**
+     * Extract the locality (first parts) of a place name.
+     *
+     * @param int $n
+     *
+     * @return Collection<string>
+     */
+    public function firstParts(int $n): Collection
+    {
+        return $this->parts->slice(0, $n);
+    }
+
+    /**
+     * Extract the country (last parts) of a place name.
+     *
+     * @param int $n
+     *
+     * @return Collection<string>
+     */
+    public function lastParts(int $n): Collection
+    {
+        return $this->parts->slice(-$n);
     }
 
     /**
      * Get the lower level places.
      *
-     * @return Place[]
+     * @return array<Place>
      */
-    public function getChildPlaces()
+    public function getChildPlaces(): array
     {
-        $children = array();
-        if ($this->getPlaceId()) {
-            $parent_text = self::GEDCOM_SEPARATOR . $this->getGedcomName();
+        if ($this->place_name !== '') {
+            $parent_text = Gedcom::PLACE_SEPARATOR . $this->place_name;
         } else {
             $parent_text = '';
         }
 
-        $rows = Database::prepare(
-            "SELECT p_place FROM `##places`" .
-            " WHERE p_parent_id = :parent_id AND p_file = :tree_id" .
-            " ORDER BY p_place COLLATE :collation"
-        )->execute(array(
-            'parent_id' => $this->getPlaceId(),
-            'tree_id'   => $this->tree->getTreeId(),
-            'collation' => I18N::collation(),
-        ))->fetchOneColumn();
-        foreach ($rows as $row) {
-            $children[] = new self($row . $parent_text, $this->tree);
-        }
-
-        return $children;
+        return DB::table('places')
+            ->where('p_file', '=', $this->tree->id())
+            ->where('p_parent_id', '=', $this->id())
+            ->orderBy(new Expression('p_place /*! COLLATE ' . I18N::collation() . ' */'))
+            ->pluck('p_place')
+            ->map(function (string $place) use ($parent_text): Place {
+                return new self($place . $parent_text, $this->tree);
+            })
+            ->all();
     }
 
     /**
@@ -111,30 +202,34 @@ class Place
      *
      * @return string
      */
-    public function getURL()
+    public function url(): string
     {
-        if (Auth::isSearchEngine()) {
-            return '#';
-        } else {
-            $url = 'placelist.php';
-            foreach (array_reverse($this->gedcom_place) as $n => $place) {
-                $url .= $n ? '&amp;' : '?';
-                $url .= 'parent%5B%5D=' . rawurlencode($place);
-            }
-            $url .= '&amp;ged=' . $this->tree->getNameUrl();
-
-            return $url;
+        //find a module providing the place hierarchy
+        $module = app(ModuleService::class)
+            ->findByComponent(ModuleListInterface::class, $this->tree, Auth::user())
+            ->first(static function (ModuleInterface $module): bool {
+                return $module instanceof PlaceHierarchyListModule;
+            });
+        
+        if ($module instanceof PlaceHierarchyListModule) {
+            return $module->listUrl($this->tree, [
+                'place_id' => $this->id(),
+                'tree'     => $this->tree->name(),
+            ]);
         }
+
+        // The place-list module is disabled...
+        return '#';
     }
 
     /**
-     * Format this name for GEDCOM data.
+     * Format this place for GEDCOM data.
      *
      * @return string
      */
-    public function getGedcomName()
+    public function gedcomName(): string
     {
-        return implode(self::GEDCOM_SEPARATOR, $this->gedcom_place);
+        return $this->place_name;
     }
 
     /**
@@ -142,156 +237,62 @@ class Place
      *
      * @return string
      */
-    public function getPlaceName()
+    public function placeName(): string
     {
-        $place = reset($this->gedcom_place);
+        $place_name = $this->parts->first() ?? I18N::translate('unknown');
 
-        return $place ? '<span dir="auto">' . Filter::escapeHtml($place) . '</span>' : I18N::translate('unknown');
-    }
-
-    /**
-     * Is this a null/empty/missing/invalid place?
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return empty($this->gedcom_place);
+        return '<span dir="auto">' . e($place_name) . '</span>';
     }
 
     /**
      * Generate the place name for display, including the full hierarchy.
      *
+     * @param bool $link
+     *
      * @return string
      */
-    public function getFullName()
+    public function fullName(bool $link = false): string
     {
-        if (true) {
-            // If a place hierarchy is a single entity
-            return '<span dir="auto">' . Filter::escapeHtml(implode(I18N::$list_separator, $this->gedcom_place)) . '</span>';
-        } else {
-            // If a place hierarchy is a list of distinct items
-            $tmp = array();
-            foreach ($this->gedcom_place as $place) {
-                $tmp[] = '<span dir="auto">' . Filter::escapeHtml($place) . '</span>';
-            }
-
-            return implode(I18N::$list_separator, $tmp);
+        if ($this->parts->isEmpty()) {
+            return '';
         }
+
+        $full_name = $this->parts->implode(I18N::$list_separator);
+
+        if ($link) {
+            return '<a dir="auto" href="' . e($this->url()) . '">' . e($full_name) . '</a>';
+        }
+
+        return '<span dir="auto">' . e($full_name) . '</span>';
     }
 
     /**
      * For lists and charts, where the full name won’t fit.
      *
+     * @param bool $link
+     *
      * @return string
      */
-    public function getShortName()
+    public function shortName(bool $link = false): string
     {
-        $SHOW_PEDIGREE_PLACES = $this->tree->getPreference('SHOW_PEDIGREE_PLACES');
+        $SHOW_PEDIGREE_PLACES = (int) $this->tree->getPreference('SHOW_PEDIGREE_PLACES');
 
-        if ($SHOW_PEDIGREE_PLACES >= count($this->gedcom_place)) {
-            // A short place name - no need to abbreviate
-            return $this->getFullName();
+        // Abbreviate the place name, for lists
+        if ($this->tree->getPreference('SHOW_PEDIGREE_PLACES_SUFFIX')) {
+            $parts = $this->lastParts($SHOW_PEDIGREE_PLACES);
         } else {
-            // Abbreviate the place name, for lists
-            if ($this->tree->getPreference('SHOW_PEDIGREE_PLACES_SUFFIX')) {
-                // The *last* $SHOW_PEDIGREE_PLACES components
-                $short_name = implode(self::GEDCOM_SEPARATOR, array_slice($this->gedcom_place, -$SHOW_PEDIGREE_PLACES));
-            } else {
-                // The *first* $SHOW_PEDIGREE_PLACES components
-                $short_name = implode(self::GEDCOM_SEPARATOR, array_slice($this->gedcom_place, 0, $SHOW_PEDIGREE_PLACES));
-            }
-            // Add a tool-tip showing the full name
-            return '<span title="' . Filter::escapeHtml($this->getGedcomName()) . '" dir="auto">' . Filter::escapeHtml($short_name) . '</span>';
-        }
-    }
-
-    /**
-     * For the "view all" option of placelist.php and find.php
-     *
-     * @return string
-     */
-    public function getReverseName()
-    {
-        $tmp = array();
-        foreach (array_reverse($this->gedcom_place) as $place) {
-            $tmp[] = '<span dir="auto">' . Filter::escapeHtml($place) . '</span>';
+            $parts = $this->firstParts($SHOW_PEDIGREE_PLACES);
         }
 
-        return implode(I18N::$list_separator, $tmp);
-    }
+        $short_name = $parts->implode(I18N::$list_separator);
 
-    /**
-     * Fetch all places from the database.
-     *
-     * @param Tree $tree
-     *
-     * @return string[]
-     */
-    public static function allPlaces(Tree $tree)
-    {
-        $places = array();
-        $rows   =
-            Database::prepare(
-                "SELECT CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place)" .
-                " FROM      `##places` AS p1" .
-                " LEFT JOIN `##places` AS p2 ON (p1.p_parent_id = p2.p_id)" .
-                " LEFT JOIN `##places` AS p3 ON (p2.p_parent_id = p3.p_id)" .
-                " LEFT JOIN `##places` AS p4 ON (p3.p_parent_id = p4.p_id)" .
-                " LEFT JOIN `##places` AS p5 ON (p4.p_parent_id = p5.p_id)" .
-                " LEFT JOIN `##places` AS p6 ON (p5.p_parent_id = p6.p_id)" .
-                " LEFT JOIN `##places` AS p7 ON (p6.p_parent_id = p7.p_id)" .
-                " LEFT JOIN `##places` AS p8 ON (p7.p_parent_id = p8.p_id)" .
-                " LEFT JOIN `##places` AS p9 ON (p8.p_parent_id = p9.p_id)" .
-                " WHERE p1.p_file = :tree_id" .
-                " ORDER BY CONCAT_WS(', ', p9.p_place, p8.p_place, p7.p_place, p6.p_place, p5.p_place, p4.p_place, p3.p_place, p2.p_place, p1.p_place) COLLATE :collate"
-            )
-            ->execute(array(
-                'tree_id' => $tree->getTreeId(),
-                'collate' => I18N::collation(),
-            ))->fetchOneColumn();
-        foreach ($rows as $row) {
-            $places[] = new self($row, $tree);
+        // Add a tool-tip showing the full name
+        $title = strip_tags($this->fullName());
+
+        if ($link) {
+            return '<a dir="auto" href="' . e($this->url()) . '" title="' . $title . '">' . e($short_name) . '</a>';
         }
 
-        return $places;
-    }
-
-    /**
-     * Search for a place name.
-     *
-     * @param string  $filter
-     * @param Tree    $tree
-     *
-     * @return Place[]
-     */
-    public static function findPlaces($filter, Tree $tree)
-    {
-        $places = array();
-        $rows   =
-            Database::prepare(
-                "SELECT CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place)" .
-                " FROM      `##places` AS p1" .
-                " LEFT JOIN `##places` AS p2 ON (p1.p_parent_id = p2.p_id)" .
-                " LEFT JOIN `##places` AS p3 ON (p2.p_parent_id = p3.p_id)" .
-                " LEFT JOIN `##places` AS p4 ON (p3.p_parent_id = p4.p_id)" .
-                " LEFT JOIN `##places` AS p5 ON (p4.p_parent_id = p5.p_id)" .
-                " LEFT JOIN `##places` AS p6 ON (p5.p_parent_id = p6.p_id)" .
-                " LEFT JOIN `##places` AS p7 ON (p6.p_parent_id = p7.p_id)" .
-                " LEFT JOIN `##places` AS p8 ON (p7.p_parent_id = p8.p_id)" .
-                " LEFT JOIN `##places` AS p9 ON (p8.p_parent_id = p9.p_id)" .
-                " WHERE CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place) LIKE CONCAT('%', :filter_1, '%') AND CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place) NOT LIKE CONCAT('%,%', :filter_2, '%') AND p1.p_file = :tree_id" .
-                " ORDER BY  CONCAT_WS(', ', p1.p_place, p2.p_place, p3.p_place, p4.p_place, p5.p_place, p6.p_place, p7.p_place, p8.p_place, p9.p_place) COLLATE :collation"
-            )->execute(array(
-                'filter_1'  => preg_quote($filter),
-                'filter_2'  => preg_quote($filter),
-                'tree_id'   => $tree->getTreeId(),
-                'collation' => I18N::collation(),
-            ))->fetchOneColumn();
-        foreach ($rows as $row) {
-            $places[] = new self($row, $tree);
-        }
-
-        return $places;
+        return '<span dir="auto">' . e($short_name) . '</span>';
     }
 }

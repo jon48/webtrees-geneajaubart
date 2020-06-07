@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,35 +14,93 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees;
 
+use Illuminate\Support\Str;
+use Psr\Http\Message\ServerRequestInterface;
+
+use function array_map;
+use function explode;
+use function implode;
+use function parse_url;
+use function session_name;
+use function session_regenerate_id;
+use function session_register_shutdown;
+use function session_set_cookie_params;
+use function session_set_save_handler;
+use function session_start;
+use function session_status;
+use function session_write_close;
+
+use const PHP_SESSION_ACTIVE;
+use const PHP_URL_HOST;
+use const PHP_URL_PATH;
+use const PHP_URL_SCHEME;
+use const PHP_VERSION_ID;
+
 /**
- * Temporary class to migrate to Symfony-based sessions, which need PHP 5.4.
+ * Session handling
  */
 class Session
 {
+    private const SESSION_NAME = 'WT2_SESSION';
+
     /**
      * Start a session
      *
-     * @param array $config
+     * @param ServerRequestInterface $request
+     *
+     * @return void
      */
-    public static function start(array $config = array())
+    public static function start(ServerRequestInterface $request): void
     {
-        $default_config = array(
-            'use_cookies'     => 1,
-            'name'            => 'WT_SESSION',
-            'cookie_lifetime' => 0,
-            'gc_maxlifetime'  => 7200,
-            'gc_probability'  => 1,
-            'gc_divisor'      => 100,
-            'cookie_path'     => '',
-            'cookie_httponly' => true,
-        );
+        // Store sessions in the database
+        session_set_save_handler(new SessionDatabaseHandler($request));
+
+        $url    = $request->getAttribute('base_url');
+        $secure = parse_url($url, PHP_URL_SCHEME) === 'https';
+        $domain = (string) parse_url($url, PHP_URL_HOST);
+        $path   = (string) parse_url($url, PHP_URL_PATH);
+
+        // Paths containing UTF-8 characters need special handling.
+        $path = implode('/', array_map('rawurlencode', explode('/', $path)));
+
+        session_name(self::SESSION_NAME);
         session_register_shutdown();
-        foreach ($config + $default_config as $key => $value) {
-            ini_set('session.' . $key, $value);
+        // Since PHP 7.3, we can set "SameSite: Lax" to help protect against CSRF attacks.
+        if (PHP_VERSION_ID > 70300) {
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path'     => $path . '/',
+                'domain'   => $domain,
+                'secure'   => $secure,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+        } else {
+            session_set_cookie_params(0, $path . '/', $domain, $secure, true);
         }
         session_start();
+
+        // A new session? Prevent session fixation attacks by choosing a new session ID.
+        if (self::get('initiated') !== true) {
+            self::regenerate(true);
+            self::put('initiated', true);
+        }
+    }
+
+    /**
+     * Save/close the session.  This releases the session lock.
+     * Closing early can help concurrent connections.
+     */
+    public static function save(): void
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
     }
 
     /**
@@ -52,13 +111,53 @@ class Session
      *
      * @return mixed
      */
-    public static function get($name, $default = null)
+    public static function get(string $name, $default = null)
     {
-        if (isset($_SESSION[$name])) {
-            return $_SESSION[$name];
-        } else {
-            return $default;
+        return $_SESSION[$name] ?? $default;
+    }
+
+    /**
+     * Read a value from the session and remove it.
+     *
+     * @param string $name
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public static function pull(string $name, $default = null)
+    {
+        $value = self::get($name, $default);
+        self::forget($name);
+
+        return $value;
+    }
+
+    /**
+     * After any change in authentication level, we should use a new session ID.
+     *
+     * @param bool $destroy
+     *
+     * @return void
+     */
+    public static function regenerate(bool $destroy = false): void
+    {
+        if ($destroy) {
+            self::clear();
         }
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_regenerate_id($destroy);
+        }
+    }
+
+    /**
+     * Remove all stored data from the session.
+     *
+     * @return void
+     */
+    public static function clear(): void
+    {
+        $_SESSION = [];
     }
 
     /**
@@ -66,8 +165,10 @@ class Session
      *
      * @param string $name
      * @param mixed  $value
+     *
+     * @return void
      */
-    public static function put($name, $value)
+    public static function put(string $name, $value): void
     {
         $_SESSION[$name] = $value;
     }
@@ -76,10 +177,27 @@ class Session
      * Remove a value from the session
      *
      * @param string $name
+     *
+     * @return void
      */
-    public static function forget($name)
+    public static function forget(string $name): void
     {
         unset($_SESSION[$name]);
+    }
+
+    /**
+     * Cross-Site Request Forgery tokens - ensure that the user is submitting
+     * a form that was generated by the current session.
+     *
+     * @return string
+     */
+    public static function getCsrfToken(): string
+    {
+        if (!self::has('CSRF_TOKEN')) {
+            self::put('CSRF_TOKEN', Str::random(32));
+        }
+
+        return self::get('CSRF_TOKEN');
     }
 
     /**
@@ -89,39 +207,8 @@ class Session
      *
      * @return bool
      */
-    public static function has($name)
+    public static function has(string $name): bool
     {
         return isset($_SESSION[$name]);
-    }
-
-    /**
-     * Remove all stored data from the session.
-     */
-    public static function clear()
-    {
-        $_SESSION = array();
-    }
-
-    /**
-     * After any change in authentication level, we should use a new session ID.
-     *
-     * @param bool $destroy
-     */
-    public static function regenerate($destroy = false)
-    {
-        if ($destroy) {
-            self::clear();
-        }
-        session_regenerate_id($destroy);
-    }
-
-    /**
-     * Set an explicit session ID. Typically used for search robots.
-     *
-     * @param string $id
-     */
-    public static function setId($id)
-    {
-        session_id($id);
     }
 }

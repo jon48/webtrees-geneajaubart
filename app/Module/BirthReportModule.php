@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,57 +14,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Module;
 
-use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Menu;
 
 /**
  * Class BirthReportModule
  */
 class BirthReportModule extends AbstractModule implements ModuleReportInterface
 {
-    /** {@inheritdoc} */
-    public function getTitle()
-    {
-        // This text also appears in the .XML file - update both together
-        return /* I18N: Name of a module/report */ I18N::translate('Births');
-    }
+    use ModuleReportTrait;
 
-    /** {@inheritdoc} */
-    public function getDescription()
+    /**
+     * How should this module be identified in the control panel, etc.?
+     *
+     * @return string
+     */
+    public function title(): string
     {
         // This text also appears in the .XML file - update both together
-        return /* I18N: Description of the “Births” module */ I18N::translate('A report of individuals who were born in a given time or place.');
+        /* I18N: Name of a module/report */
+        return I18N::translate('Births');
     }
 
     /**
-     * What is the default access level for this module?
+     * A sentence describing what this module does.
      *
-     * Some modules are aimed at admins or managers, and are not generally shown to users.
-     *
-     * @return int
+     * @return string
      */
-    public function defaultAccessLevel()
+    public function description(): string
     {
-        return Auth::PRIV_PRIVATE;
-    }
-
-    /**
-     * Return a menu item for this report.
-     *
-     * @return Menu
-     */
-    public function getReportMenu()
-    {
-        global $WT_TREE;
-
-        return new Menu(
-            $this->getTitle(),
-            'reportengine.php?ged=' . $WT_TREE->getNameUrl() . '&amp;action=setup&amp;report=' . WT_MODULES_DIR . $this->getName() . '/report.xml',
-            'menu-report-' . $this->getName(),
-            array('rel' => 'nofollow')
-        );
+        // This text also appears in the .XML file - update both together
+        /* I18N: Description of the “Births” module */
+        return I18N::translate('A report of individuals who were born in a given time or place.');
     }
 }

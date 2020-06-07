@@ -14,43 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
-use Mockery;
+use Fisharebest\Webtrees\Date;
+use Fisharebest\Webtrees\Date\GregorianDate;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\TestCase;
 
 /**
  * Test harness for the class CensusColumnAge
  */
-class CensusColumnBirthYearTest extends \PHPUnit_Framework_TestCase
+class CensusColumnBirthYearTest extends TestCase
 {
     /**
-     * Delete mock objects
+     * @covers \Fisharebest\Webtrees\Census\CensusColumnBirthYear
+     * @covers \Fisharebest\Webtrees\Census\AbstractCensusColumn
+     *
+     * @return void
      */
-    public function tearDown()
+    public function testGenerateColumn(): void
     {
-        Mockery::close();
-    }
+        $cal_date = $this->createMock(GregorianDate::class);
+        $cal_date->method('format')->willReturn('1800');
 
-    /**
-     * @covers Fisharebest\Webtrees\Census\CensusColumnBirthYear
-     * @covers Fisharebest\Webtrees\Census\AbstractCensusColumn
-     */
-    public function testGenerateColumn()
-    {
-        $cal_date = Mockery::mock('Fisharebest\Webtrees\Date\CalendarDate');
-        $cal_date->shouldReceive('format')->andReturn('1800');
+        $date = $this->createMock(Date::class);
+        $date->method('minimumDate')->willReturn($cal_date);
 
-        $date = Mockery::mock('Fisharebest\Webtrees\Date');
-        $date->shouldReceive('minimumDate')->andReturn($cal_date);
+        $individual = $this->createMock(Individual::class);
+        $individual->method('getEstimatedBirthDate')->willReturn($date);
 
-        $individual = Mockery::mock('Fisharebest\Webtrees\Individual');
-        $individual->shouldReceive('getEstimatedBirthDate')->andReturn($date);
-
-        $census = Mockery::mock('Fisharebest\Webtrees\Census\CensusInterface');
-        $census->shouldReceive('censusDate')->andReturn('30 JUN 1832');
+        $census = $this->createMock(CensusInterface::class);
+        $census->method('censusDate')->willReturn('30 JUN 1832');
 
         $column = new CensusColumnBirthYear($census, '', '');
 
-        $this->assertSame('1800', $column->generate($individual));
+        $this->assertSame('1800', $column->generate($individual, $individual));
     }
 }

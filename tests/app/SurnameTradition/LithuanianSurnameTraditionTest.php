@@ -14,57 +14,74 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition;
-use Fisharebest\Webtrees\SurnameTradition\SurnameTraditionInterface;
+
+declare(strict_types=1);
+
+namespace Fisharebest\Webtrees\SurnameTradition;
+
+use Fisharebest\Webtrees\TestCase;
 
 /**
  * Test harness for the class SpanishSurnameTradition
  */
-class LithuanianSurnameTraditionTest extends \PHPUnit_Framework_TestCase
+class LithuanianSurnameTraditionTest extends TestCase
 {
     /** @var SurnameTraditionInterface */
     private $surname_tradition;
 
     /**
      * Prepare the environment for these tests
+     *
+     * @return void
      */
-    public function setUp()
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $this->surname_tradition = new LithuanianSurnameTradition();
     }
 
     /**
      * Test whether married surnames are used
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testMarriedSurnames()
+    public function testMarriedSurnames(): void
     {
-        $this->assertSame(true, $this->surname_tradition->hasMarriedNames());
+        $this->assertTrue($this->surname_tradition->hasMarriedNames());
     }
 
     /**
      * Test whether surnames are used
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testSurnames()
+    public function testSurnames(): void
     {
-        $this->assertSame(true, $this->surname_tradition->hasSurnames());
+        $this->assertTrue($this->surname_tradition->hasSurnames());
     }
 
     /**
      * Test new son names
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testNewSonNames()
+    public function testNewSonNames(): void
     {
         $this->assertSame(
-            array('NAME' => '/White/', 'SURN' => 'White'),
+            [
+                'NAME' => '/White/',
+                'SURN' => 'White',
+            ],
             $this->surname_tradition->newChildNames('John /White/', 'Mary /Black/', 'M')
         );
     }
@@ -72,13 +89,18 @@ class LithuanianSurnameTraditionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test new daughter names
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testNewDaughterNames()
+    public function testNewDaughterNames(): void
     {
         $this->assertSame(
-            array('NAME' => '/White/', 'SURN' => 'White'),
+            [
+                'NAME' => '/White/',
+                'SURN' => 'White',
+            ],
             $this->surname_tradition->newChildNames('John /White/', 'Mary /Black/', 'F')
         );
     }
@@ -86,33 +108,53 @@ class LithuanianSurnameTraditionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test new daughter names
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testNewDaughterNamesInflected()
+    public function testNewDaughterNamesInflected(): void
     {
         $this->assertSame(
-            array('NAME' => '/Whitaitė/', 'SURN' => 'Whita'),
+            [
+                'NAME' => '/Whitaitė/',
+                'SURN' => 'Whita',
+            ],
             $this->surname_tradition->newChildNames('John /Whita/', 'Mary /Black/', 'F')
         );
         $this->assertSame(
-            array('NAME' => '/Whitaitė/', 'SURN' => 'Whitas'),
+            [
+                'NAME' => '/Whitaitė/',
+                'SURN' => 'Whitas',
+            ],
             $this->surname_tradition->newChildNames('John /Whitas/', 'Mary /Black/', 'F')
         );
         $this->assertSame(
-            array('NAME' => '/Whitytė/', 'SURN' => 'Whitis'),
+            [
+                'NAME' => '/Whitytė/',
+                'SURN' => 'Whitis',
+            ],
             $this->surname_tradition->newChildNames('John /Whitis/', 'Mary /Black/', 'F')
         );
         $this->assertSame(
-            array('NAME' => '/Whitytė/', 'SURN' => 'Whitys'),
+            [
+                'NAME' => '/Whitytė/',
+                'SURN' => 'Whitys',
+            ],
             $this->surname_tradition->newChildNames('John /Whitys/', 'Mary /Black/', 'F')
         );
         $this->assertSame(
-            array('NAME' => '/Whitiūtė/', 'SURN' => 'Whitius'),
+            [
+                'NAME' => '/Whitiūtė/',
+                'SURN' => 'Whitius',
+            ],
             $this->surname_tradition->newChildNames('John /Whitius/', 'Mary /Black/', 'F')
         );
         $this->assertSame(
-            array('NAME' => '/Whitutė/', 'SURN' => 'Whitus'),
+            [
+                'NAME' => '/Whitutė/',
+                'SURN' => 'Whitus',
+            ],
             $this->surname_tradition->newChildNames('John /Whitus/', 'Mary /Black/', 'F')
         );
     }
@@ -120,13 +162,18 @@ class LithuanianSurnameTraditionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test new child names
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testNewChildNames()
+    public function testNewChildNames(): void
     {
         $this->assertSame(
-            array('NAME' => '/White/', 'SURN' => 'White'),
+            [
+                'NAME' => '/White/',
+                'SURN' => 'White',
+            ],
             $this->surname_tradition->newChildNames('John /White/', 'Mary /Black/', 'U')
         );
     }
@@ -134,13 +181,15 @@ class LithuanianSurnameTraditionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test new child names
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testNewChildNamesWithNoParentsNames()
+    public function testNewChildNamesWithNoParentsNames(): void
     {
         $this->assertSame(
-            array('NAME' => '//'),
+            ['NAME' => '//'],
             $this->surname_tradition->newChildNames('', '', 'U')
         );
     }
@@ -148,13 +197,18 @@ class LithuanianSurnameTraditionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test new father names
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testNewFatherNames()
+    public function testNewFatherNames(): void
     {
         $this->assertSame(
-            array('NAME' => '/White/', 'SURN' => 'White'),
+            [
+                'NAME' => '/White/',
+                'SURN' => 'White',
+            ],
             $this->surname_tradition->newParentNames('John /White/', 'M')
         );
     }
@@ -162,25 +216,39 @@ class LithuanianSurnameTraditionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test new father names
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testNewFatherNamesInflected()
+    public function testNewFatherNamesInflected(): void
     {
         $this->assertSame(
-            array('NAME' => '/Whitas/', 'SURN' => 'Whitas'),
+            [
+                'NAME' => '/Whitas/',
+                'SURN' => 'Whitas',
+            ],
             $this->surname_tradition->newParentNames('Mary /Whitaitė/', 'M')
         );
         $this->assertSame(
-            array('NAME' => '/Whitis/', 'SURN' => 'Whitis'),
+            [
+                'NAME' => '/Whitis/',
+                'SURN' => 'Whitis',
+            ],
             $this->surname_tradition->newParentNames('Mary /Whitytė/', 'M')
         );
         $this->assertSame(
-            array('NAME' => '/Whitius/', 'SURN' => 'Whitius'),
+            [
+                'NAME' => '/Whitius/',
+                'SURN' => 'Whitius',
+            ],
             $this->surname_tradition->newParentNames('Mary /Whitiūtė/', 'M')
         );
         $this->assertSame(
-            array('NAME' => '/Whitus/', 'SURN' => 'Whitus'),
+            [
+                'NAME' => '/Whitus/',
+                'SURN' => 'Whitus',
+            ],
             $this->surname_tradition->newParentNames('Mary /Whitutė/', 'M')
         );
     }
@@ -188,13 +256,15 @@ class LithuanianSurnameTraditionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test new mother names
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testNewMotherNames()
+    public function testNewMotherNames(): void
     {
         $this->assertSame(
-            array('NAME' => '//'),
+            ['NAME' => '//'],
             $this->surname_tradition->newParentNames('John /White/', 'F')
         );
     }
@@ -202,13 +272,15 @@ class LithuanianSurnameTraditionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test new parent names
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testNewParentNames()
+    public function testNewParentNames(): void
     {
         $this->assertSame(
-            array('NAME' => '//'),
+            ['NAME' => '//'],
             $this->surname_tradition->newParentNames('John /White/', 'U')
         );
     }
@@ -216,13 +288,15 @@ class LithuanianSurnameTraditionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test new husband names
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testNewHusbandNames()
+    public function testNewHusbandNames(): void
     {
         $this->assertSame(
-            array('NAME' => '//'),
+            ['NAME' => '//'],
             $this->surname_tradition->newSpouseNames('Mary /Black/', 'M')
         );
     }
@@ -230,13 +304,18 @@ class LithuanianSurnameTraditionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test new wife names
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testNewWifeNames()
+    public function testNewWifeNames(): void
     {
         $this->assertSame(
-            array('NAME' => '//', '_MARNM' => '/White/'),
+            [
+                'NAME'   => '//',
+                '_MARNM' => '/White/',
+            ],
             $this->surname_tradition->newSpouseNames('John /White/', 'F')
         );
     }
@@ -244,13 +323,15 @@ class LithuanianSurnameTraditionTest extends \PHPUnit_Framework_TestCase
     /**
      * Test new spouse names
      *
-     * @covers Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
-     * @covers Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\LithuanianSurnameTradition
+     * @covers \Fisharebest\Webtrees\SurnameTradition\PatrilinealSurnameTradition
+     *
+     * @return void
      */
-    public function testNewSpouseNames()
+    public function testNewSpouseNames(): void
     {
         $this->assertSame(
-            array('NAME' => '//'),
+            ['NAME' => '//'],
             $this->surname_tradition->newSpouseNames('Chris /Green/', 'U')
         );
     }

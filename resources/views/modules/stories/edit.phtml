@@ -1,0 +1,69 @@
+<?php
+
+use Fisharebest\Webtrees\Functions\FunctionsEdit;
+
+?>
+<?php
+
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\I18N;
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route('modules') => I18N::translate('Modules'), route('module', ['module' => 'stories', 'action' => 'Admin', 'tree' => $tree->name()]) => I18N::translate('Stories'), $title]]) ?>
+
+<h1><?= $title ?></h1>
+
+<form method="post" action="<?= e(route('module', ['module' => 'stories', 'action' => 'AdminEdit', 'block_id' => $block_id, 'tree' => $tree->name()])) ?>" class="form-horizontal">
+    <?= csrf_field() ?>
+
+    <div class="row form-group">
+        <label for="xref" class="col-sm-3 col-form-label">
+            <?= I18N::translate('Individual') ?>
+        </label>
+        <div class="col-sm-9">
+            <?= view('components/select-individual', ['name' => 'xref', 'individual' => $individual, 'tree' => $tree]) ?>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label for="story-title" class="col-sm-3 col-form-label">
+            <?= I18N::translate('Story title') ?>
+        </label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" name="story_title" id="story-title" value="<?= e($story_title) ?>">
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label for="story-body" class="col-sm-3 col-form-label">
+            <?= I18N::translate('Story') ?>
+        </label>
+        <div class="col-sm-9">
+            <textarea name="story_body" id="story-body" class="html-edit form-control" rows="10"><?= e($story_body) ?></textarea>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label">
+            <?= I18N::translate('Show this block for which languages') ?>
+        </label>
+        <div class="col-sm-9">
+            <?= FunctionsEdit::editLanguageCheckboxes('languages', $languages) ?>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <div class="offset-sm-3 col-sm-9">
+            <button type="submit" class="btn btn-primary">
+                <?= view('icons/save') ?>
+                <?= I18N::translate('save') ?>
+            </button>
+
+            <a href="<?= e(route('module', ['module' => 'stories', 'action' => 'Admin', 'tree' => $tree->name()])) ?>" class="btn btn-secondary">
+                <?= view('icons/cancel') ?>
+                <?= I18N::translate('cancel') ?>
+            </a>
+        </div>
+    </div>
+</form>

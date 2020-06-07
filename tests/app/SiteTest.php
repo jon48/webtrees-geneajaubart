@@ -15,23 +15,54 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+declare(strict_types=1);
+
+namespace Fisharebest\Webtrees;
+
+use function str_repeat;
+
 /**
- * Test harness for the class Site
+ * Test the site functions
  */
-class SiteTest extends \PHPUnit_Framework_TestCase
+class SiteTest extends TestCase
 {
+    protected static $uses_database = true;
+
     /**
-     * Prepare the environment for these tests
+     * @covers \Fisharebest\Webtrees\Site
+     *
+     * @return void
      */
-    public function setUp()
+    public function testDefault(): void
     {
+        $this->assertSame('foo', Site::getPreference('no-such-setting', 'foo'));
+        $this->assertSame('bar', Site::getPreference('no-such-setting', 'bar'));
     }
 
     /**
-     * Test that the class exists
+     * @covers \Fisharebest\Webtrees\Site
+     *
+     * @return void
      */
-    public function testClassExists()
+    public function testSetAndGetPreference(): void
     {
-        $this->assertTrue(class_exists('\Fisharebest\Webtrees\Site'));
+        Site::setPreference('setting', 'foo');
+
+        $this->assertSame('foo', Site::getPreference('setting'));
+    }
+
+    /**
+     * @covers \Fisharebest\Webtrees\Site
+     *
+     * @return void
+     */
+    public function test2000CharacterLimit(): void
+    {
+        $too_long = str_repeat('x', 3000);
+        $expected = str_repeat('x', 2000);
+        
+        Site::setPreference('setting', $too_long);
+
+        $this->assertSame($expected, Site::getPreference('setting'));
     }
 }

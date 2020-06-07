@@ -1,0 +1,48 @@
+<?php
+
+use Fisharebest\Webtrees\Http\RequestHandlers\ReorderMediaAction;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\View;
+
+?>
+
+<h2 class="wt-page-title"><?= $title ?></h2>
+
+<form method="post" action="<?= e(route(ReorderMediaAction::class, ['tree' => $tree->name(), 'xref' => $individual->xref()])) ?>" class="wt-page-content">
+    <?= csrf_field() ?>
+
+    <div class="wt-sortable-list">
+        <?php foreach ($individual->facts(['OBJE']) as $fact) : ?>
+            <div class="card my-2 wt-sortable-item">
+                <input type="hidden" name="order[]" value="<?= $fact->id() ?>">
+                <div class="card-header">
+                    <?= view('edit/reorder-card-header', ['title' => $fact->target()->fullName()]) ?>
+                </div>
+
+                <div class="card-body">
+                    <?= $fact->target()->displayImage(100, 100, 'contain') ?>
+                </div>
+            </div>
+        <?php endforeach ?>
+    </div>
+
+    <p>
+        <button class="btn btn-primary" type="submit">
+            <?= view('icons/save') ?>
+            <?= /* I18N: A button label. */ I18N::translate('save') ?>
+        </button>
+
+        <a class="btn btn-secondary" href="<?= e($individual->url()) ?>">
+            <?= view('icons/cancel') ?>
+            <?= /* I18N: A button label. */ I18N::translate('cancel') ?>
+        </a>
+    </p>
+</form>
+
+<?php View::push('javascript') ?>
+<script>
+    new Sortable(document.querySelector(".wt-sortable-list"), {
+        handle: ".card-header",
+    });
+</script>
+<?php View::endpush() ?>

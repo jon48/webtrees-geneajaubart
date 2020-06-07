@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,12 +29,15 @@ class CensusOfCzechRepublic extends Census implements CensusPlaceInterface
      *
      * @return CensusInterface[]
      */
-    public function allCensusDates()
+    public function allCensusDates(): array
     {
-        return array(
+        return [
             new CensusOfCzechRepublic1880(),
+            new CensusOfCzechRepublic1890(),
+            new CensusOfCzechRepublic1900(),
+            new CensusOfCzechRepublic1910(),
             new CensusOfCzechRepublic1921(),
-        );
+        ];
     }
 
     /**
@@ -38,8 +45,18 @@ class CensusOfCzechRepublic extends Census implements CensusPlaceInterface
      *
      * @return string
      */
-    public function censusPlace()
+    public function censusPlace(): string
     {
         return 'Česko';
+    }
+
+    /**
+     * In which language was this census written.
+     *
+     * @return string
+     */
+    public function censusLanguage(): string
+    {
+        return 'cs';
     }
 }

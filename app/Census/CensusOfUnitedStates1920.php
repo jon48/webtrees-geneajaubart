@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -25,7 +29,7 @@ class CensusOfUnitedStates1920 extends CensusOfUnitedStates implements CensusInt
      *
      * @return string
      */
-    public function censusDate()
+    public function censusDate(): string
     {
         return 'JAN 1920';
     }
@@ -35,11 +39,11 @@ class CensusOfUnitedStates1920 extends CensusOfUnitedStates implements CensusInt
      *
      * @return CensusColumnInterface[]
      */
-    public function columns()
+    public function columns(): array
     {
-        return array(
+        return [
             new CensusColumnSurnameGivenNameInitial($this, 'Name', 'Name'),
-            new CensusColumnRelationToHead($this, 'Relation', 'Relationship of each person to the head of the family'),
+            new CensusColumnRelationToHeadEnglish($this, 'Relation', 'Relationship of each person to the head of the family'),
             new CensusColumnNull($this, 'Home', 'Owned or rented'),
             new CensusColumnNull($this, 'Mort', 'If owned, free or mortgaged'),
             new CensusColumnSexMF($this, 'Sex', 'Sex'),
@@ -62,6 +66,6 @@ class CensusOfUnitedStates1920 extends CensusOfUnitedStates implements CensusInt
             new CensusColumnOccupation($this, 'Occupation', 'Trade, profession, or particular kind of work done'),
             new CensusColumnNull($this, 'Ind', 'Industry, business of establishment in which at work'),
             new CensusColumnNull($this, 'Emp', 'Employer, salary or wage worker, or work on own account'),
-        );
+        ];
     }
 }

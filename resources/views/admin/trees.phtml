@@ -1,0 +1,328 @@
+<?php
+
+use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\CreateMediaObjectModal;
+use Fisharebest\Webtrees\Http\RequestHandlers\CreateNoteModal;
+use Fisharebest\Webtrees\Http\RequestHandlers\CreateRepositoryModal;
+use Fisharebest\Webtrees\Http\RequestHandlers\CreateSourceModal;
+use Fisharebest\Webtrees\Http\RequestHandlers\CreateSubmitterModal;
+use Fisharebest\Webtrees\Http\RequestHandlers\DataFixChoose;
+use Fisharebest\Webtrees\Http\RequestHandlers\DeleteTreeAction;
+use Fisharebest\Webtrees\Http\RequestHandlers\ExportGedcomPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\MergeRecordsPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\PendingChangesLogPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\SelectDefaultTree;
+use Fisharebest\Webtrees\Http\RequestHandlers\TreePage;
+use Fisharebest\Webtrees\Http\RequestHandlers\UnconnectedPage;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Site;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use Illuminate\Database\Capsule\Manager as DB;
+
+/**
+ * @var array<Tree>   $all_trees
+ * @var array<string> $gedcom_files
+ * @var int           $multiple_tree_threshold
+ * @var string        $title
+ * @var Tree          $tree
+ */
+
+?>
+
+<?php if (!empty($all_trees)) : ?>
+    <?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), $title]]) ?>
+<?php endif ?>
+
+<h1><?= $title ?></h1>
+
+<?php if (empty($all_trees)) : ?>
+    <div class="alert alert-info">
+        <?= I18N::translate('You need to create a family tree.') ?>
+    </div>
+<?php endif ?>
+
+<div id="accordion" role="tablist" aria-multiselectable="true">
+    <?php foreach ($all_trees as $managed_tree) : ?>
+        <?php if (Auth::isManager($managed_tree)) : ?>
+            <div class="card">
+                <div class="card-header" role="tab" id="card-tree-header-<?= $managed_tree->id() ?>">
+                    <h2 class="mb-0">
+                        <?= view('icons/tree') ?>
+                        <a data-toggle="collapse" data-parent="#accordion" href="#card-tree-content-<?= $managed_tree->id() ?>" <?= $managed_tree == $tree || $managed_tree->getPreference('imported') === '0' ? 'aria-expanded="true"' : '' ?> aria-controls="card-tree-content-<?= $managed_tree->id() ?>">
+                            <?= e($managed_tree->name()) ?> — <?= e($managed_tree->title()) ?>
+                        </a>
+                    </h2>
+                </div>
+                <div id="card-tree-content-<?= $managed_tree->id() ?>" class="collapse<?= $managed_tree == $tree || $managed_tree->getPreference('imported') === '0' ? ' show' : '' ?>" role="tabpanel" aria-labelledby="panel-tree-header-<?= $managed_tree->id() ?>">
+                    <div class="card-body">
+                        <?php $importing = DB::table('gedcom_chunk')->where('gedcom_id', '=', $managed_tree->id())->where('imported', '=', 0)->exists() ?>
+                        <?php if ($importing) : ?>
+                            <div id="import<?= $managed_tree->id() ?>" class="col-12">
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                        <?= I18N::translate('Calculating…') ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php View::push('javascript'); ?>
+                                <script>
+                                    $("#import<?= $managed_tree->id() ?>").load("<?= route('import', ['tree' => $managed_tree->name()]) ?>", {});
+                                </script>
+                                <?php View::endpush() ?>
+                        <?php endif ?>
+                        <div class="row<?= $importing ? ' d-none' : '' ?>" id="actions<?= $managed_tree->id() ?>">
+                            <div class="col-sm-6 col-md-3">
+                                <h3>
+                                    <?= I18N::translate('Family tree') ?>
+                                </h3>
+                                <ul class="fa-ul">
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/tree') ?></span>
+                                        <a href="<?= e(route(TreePage::class, ['tree' => $managed_tree->name()])) ?>">
+                                            <?= I18N::translate('Home page') ?>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <ul class="fa-ul">
+                                    <!-- PREFERENCES -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/preferences') ?></span>
+                                        <a href="<?= e(route('admin-trees-preferences', ['tree' => $managed_tree->name()])) ?>">
+                                            <?= I18N::translate('Preferences') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                    <!-- PRIVACY -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/lock') ?></span>
+                                        <a href="<?= e(route('tree-privacy', ['tree' => $managed_tree->name()])) ?>">
+                                            <?= I18N::translate('Privacy') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                    <!-- DELETE -->
+                                    <?php if (count($all_trees) > 1 && Auth::isAdmin()) : ?>
+                                        <li>
+                                            <span class="fa-li"><?= view('icons/delete') ?></span>
+                                            <a href="#" data-post-url="<?= e(route(DeleteTreeAction::class, ['tree' => $managed_tree->name()])) ?>" data-confirm="<?= I18N::translate('Are you sure you want to delete “%s”?', e($managed_tree->title())) ?>">
+                                                <?= I18N::translate('Delete') ?>
+                                            </a>
+                                        </li>
+                                    <?php endif ?>
+
+                                    <!-- SET AS DEFAULT -->
+                                    <?php if (count($all_trees) > 1 && Auth::isAdmin()) : ?>
+                                        <li>
+                                            <span class="fa-li"><?= view('icons/favorite') ?></span>
+                                            <?php if ($managed_tree->name() === Site::getPreference('DEFAULT_GEDCOM')) : ?>
+                                                <?= I18N::translate('Default family tree') ?>
+                                            <?php else : ?>
+                                                <a href="#" onclick="document.defaultform<?= $managed_tree->id() ?>.submit();">
+                                                    <?= I18N::translate('Set as default') ?>
+                                                    <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                                </a>
+                                                <form method="post" action="<?= route(SelectDefaultTree::class, ['tree' => $managed_tree->name()]) ?>" name="defaultform<?= $managed_tree->id() ?>">
+                                                    <?= csrf_field() ?>
+                                                    <!-- A11Y - forms need submit buttons, but they look ugly here -->
+                                                    <button class="sr-only" type="submit">
+                                                        <?= I18N::translate('Set as default') ?>
+                                                    </button>
+                                                </form>
+                                            <?php endif ?>
+                                        </li>
+                                    <?php endif ?>
+                                </ul>
+
+                                <ul class="fa-ul">
+                                    <!-- DATA FIXES -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/data-fix') ?></span>
+                                        <a href="<?= e(route(DataFixChoose::class, ['tree' => $managed_tree->name()])) ?>">
+                                            <?= I18N::translate('Data fixes') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <h3>
+                                    <?= /* I18N: Individuals, sources, dates, places, etc. */
+                                    I18N::translate('Genealogy data') ?>
+                                </h3>
+                                <ul class="fa-ul">
+                                    <!-- FIND DUPLICATES -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/copy') ?></span>
+                                        <a href="<?= e(route('admin-trees-duplicates', ['tree' => $managed_tree->name()])) ?>">
+                                            <?= I18N::translate('Find duplicates') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                    <!-- MERGE -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/merge') ?></span>
+                                        <a href="<?= e(route(MergeRecordsPage::class, ['tree' => $managed_tree->name()])) ?>">
+                                            <?= I18N::translate('Merge records') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                    <!-- CHECK FOR ERRORS -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/warning') ?></span>
+                                        <a href="<?= e(route('admin-trees-check', ['tree' => $managed_tree->name()])) ?>">
+                                            <?= I18N::translate('Check for errors') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                    <!-- UNCONNECTED INDIVIDUALS -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/unlink') ?></span>
+                                        <a href="<?= e(route(UnconnectedPage::class, ['tree' => $managed_tree->name()])) ?>">
+                                            <?= I18N::translate('Find unrelated individuals') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                    <!-- RENUMBER -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/sort') ?></span>
+                                        <a href="<?= e(route('admin-trees-renumber', ['tree' => $managed_tree->name()])) ?>">
+                                            <?= I18N::translate('Renumber') ?>
+                                            <span class="sr-only">
+                                        <?= e($managed_tree->title()) ?>
+                                    </span>
+                                        </a>
+                                    </li>
+                                    <!-- CHANGES -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/edit') ?></span>
+                                        <a href="<?= route(PendingChangesLogPage::class, ['tree' => $managed_tree->name()]) ?>">
+                                            <?= I18N::translate('Changes log') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="clearfix visible-sm-block"></div>
+                            <div class="col-sm-6 col-md-3">
+                                <h3>
+                                    <?= I18N::translate('Add unlinked records') ?>
+                                </h3>
+                                <ul class="fa-ul">
+                                    <!-- UNLINKED INDIVIDUAL -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/individual') ?></span>
+                                        <a href="<?= e(route('add-unlinked-individual', ['tree' => $managed_tree->name()])) ?>">
+                                            <?= I18N::translate('Individual') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                    <!-- UNLINKED SOURCE -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/source') ?></span>
+                                        <a href="#" data-href="<?= e(route(CreateSourceModal::class, ['tree' => $managed_tree->name()])) ?>" data-target="#wt-ajax-modal" data-toggle="modal">
+                                            <?= I18N::translate('Source') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                    <!-- UNLINKED REPOSITORY -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/repository') ?></span>
+                                        <a href="#" data-href="<?= e(route(CreateRepositoryModal::class, ['tree' => $managed_tree->name()])) ?>" data-target="#wt-ajax-modal" data-toggle="modal">
+                                            <?= I18N::translate('Repository') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                    <!-- UNLINKED MEDIA OBJECT -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/media') ?></span>
+                                        <a href="#" data-href="<?= e(route(CreateMediaObjectModal::class, ['tree' => $managed_tree->name()])) ?>" data-target="#wt-ajax-modal" data-toggle="modal">
+
+                                            <?= I18N::translate('Media object') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                    <!-- UNLINKED NOTE -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/note') ?></span>
+                                        <a href="#" data-href="<?= e(route(CreateNoteModal::class, ['tree' => $managed_tree->name()])) ?>" data-target="#wt-ajax-modal" data-toggle="modal">
+                                            <?= I18N::translate('Shared note') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                    <!-- UNLINKED SUBMITTER -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/submitter') ?></span>
+                                        <a href="#" data-href="<?= e(route(CreateSubmitterModal::class, ['tree' => $managed_tree->name()])) ?>" data-target="#wt-ajax-modal" data-toggle="modal">
+                                            <?= I18N::translate('Submitter') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <h3>
+                                    <?= I18N::translate('GEDCOM file') ?>
+                                </h3>
+                                <ul class="fa-ul">
+                                    <!-- DOWNLOAD/Export -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/download') ?></span>
+                                        <a href="<?= e(route(ExportGedcomPage::class, ['tree' => $managed_tree->name()])) ?>">
+                                            <?= I18N::translate('Export') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                    <!-- UPLOAD/IMPORT -->
+                                    <li>
+                                        <span class="fa-li"><?= view('icons/upload') ?></span>
+                                        <a href="<?= e(route('admin-trees-import', ['tree' => $managed_tree->name()])) ?>">
+                                            <?= I18N::translate('Import') ?>
+                                            <span class="sr-only"><?= e($managed_tree->title()) ?></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endif ?>
+    <?php endforeach ?>
+
+    <!-- BULK LOAD/SYNCHRONISE GEDCOM FILES -->
+    <?php if (count($gedcom_files) >= $multiple_tree_threshold) : ?>
+        <div class="card">
+            <div class="card-header" id="card-tree-create-header">
+                <h2 class="mb-0">
+                    <?= view('icons/sync') ?>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#synchronize-gedcom-files">
+                        <?= I18N::translate('Synchronize family trees with GEDCOM files') ?>
+                    </a>
+                </h2>
+            </div>
+
+            <div id="synchronize-gedcom-files" class="panel-collapse collapse">
+                <div class="card-body">
+                    <p>
+                        <?= I18N::translate('Create, update, and delete a family tree for every GEDCOM file in the data folder.') ?>
+                    </p>
+                    <form method="post" action="<?= e(route('admin-trees-sync')) ?>" class="form form-horizontal">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-danger">
+                            <?= view('icons/save') ?>
+                            <?= /* I18N: A button label. */
+                            I18N::translate('continue') ?>
+                        </button>
+                        <p class="small text-muted">
+                            <?= I18N::translate('Caution! This may take a long time. Be patient.') ?>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <?php endif ?>
+</div>
+
+<?= view('modals/ajax') ?>

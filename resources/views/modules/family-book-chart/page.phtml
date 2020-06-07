@@ -1,0 +1,61 @@
+<?php
+
+use Fisharebest\Webtrees\Functions\FunctionsEdit;
+use Fisharebest\Webtrees\I18N;
+
+?>
+
+<h2 class="wt-page-title">
+    <?= $title ?>
+</h2>
+
+<form method="post" class="wt-page-options wt-page-options-family-book-chart d-print-none">
+    <?= csrf_field() ?>
+
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label wt-page-options-label" for="xref">
+            <?= I18N::translate('Individual') ?>
+        </label>
+        <div class="col-sm-9 wt-page-options-value">
+            <?= view('components/select-individual', ['name' => 'xref', 'individual' => $individual, 'tree' => $tree, 'required' => true]) ?>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label wt-page-options-label" for="book_size">
+            <?= I18N::translate('Generations') ?>
+        </label>
+        <div class="col-sm-9 wt-page-options-value">
+            <?= view('components/select', ['name' => 'book_size', 'selected' => $book_size, 'options' => FunctionsEdit::numericOptions(range(2, 5))]) ?>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label wt-page-options-label" for="generations">
+            <?= I18N::translate('Descendant generations') ?>
+        </label>
+        <div class="col-sm-9 wt-page-options-value">
+            <?= view('components/select', ['name' => 'generations', 'selected' => $generations, 'options' => FunctionsEdit::numericOptions(range($minimum_generations, $maximum_generations))]) ?>
+        </div>
+    </div>
+
+    <fieldset class="form-group">
+        <div class="row">
+            <legend class="col-form-label col-sm-3 wt-page-options-label">
+                <?= I18N::translate('Spouses') ?>
+            </legend>
+            <div class="col-sm-9 wt-page-options-value">
+                <?= view('components/checkbox', ['label' => I18N::translate('Show spouses'), 'name' => 'spouses', 'checked' => $spouses]) ?>
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="row form-group">
+        <div class="col-sm-3 wt-page-options-label"></div>
+        <div class="col-sm-9 wt-page-options-value">
+            <input class="btn btn-primary" type="submit" value="<?= /* I18N: A button label. */ I18N::translate('view') ?>">
+        </div>
+    </div>
+</form>
+
+<div class="wt-ajax-load wt-page-content wt-chart wt-chart-family-book" data-ajax-url="<?= e($ajax_url) ?>"></div>

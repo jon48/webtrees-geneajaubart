@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Fisharebest\Webtrees\Schema;
 
-use Fisharebest\Webtrees\Database;
-use PDOException;
+declare(strict_types=1);
+
+namespace Fisharebest\Webtrees\Schema;
 
 /**
  * Upgrade the database schema from version 13 to version 14.
@@ -24,15 +25,13 @@ use PDOException;
 class Migration13 implements MigrationInterface
 {
     /**
-     * Upgrade to to the next version
+     * Upgrade to to the next version.
+     *
+     * @return void
      */
-    public function upgrade()
+    public function upgrade(): void
     {
-        // Remove the i_isdead column
-        try {
-            Database::exec("ALTER TABLE `##individuals` DROP i_isdead");
-        } catch (PDOException $ex) {
-            // Already done this?
-        }
+        // These migrations have been merged into migration 0.
+        // Direct upgrade from webtrees < 1.7.9 is not supported.
     }
 }

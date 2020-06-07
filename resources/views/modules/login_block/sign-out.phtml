@@ -1,0 +1,17 @@
+<?php
+
+use Fisharebest\Webtrees\Http\RequestHandlers\HomePage;
+use Fisharebest\Webtrees\Http\RequestHandlers\Logout;
+use Fisharebest\Webtrees\I18N;
+
+?>
+
+<p>
+    <?= I18N::translate('You are signed in as %s.', e($user->userName())) ?>
+</p>
+
+<p>
+    <a href="#" class="btn btn-primary" data-post-url="<?= e(route(Logout::class)) ?>" data-reload-url="<?= e(route(HomePage::class)) ?>">
+        <?= /* I18N: A button label. */ I18N::translate('sign out') ?>
+    </a>
+</p>

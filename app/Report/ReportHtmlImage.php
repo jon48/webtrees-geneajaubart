@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Report;
 
 /**
@@ -23,42 +27,42 @@ class ReportHtmlImage extends ReportBaseImage
     /**
      * Image renderer
      *
-     * @param ReportHtml $renderer
+     * @param HtmlRenderer $renderer
+     *
+     * @return void
      */
     public function render($renderer)
     {
-        global $lastpicbottom, $lastpicpage, $lastpicleft, $lastpicright;
+        static $lastpicbottom, $lastpicpage, $lastpicleft, $lastpicright;
 
         // Get the current positions
-        if ($this->x == ".") {
+        if ($this->x === ReportBaseElement::CURRENT_POSITION) {
             $this->x = $renderer->getX();
         }
-        if ($this->y == ".") {
+        if ($this->y === ReportBaseElement::CURRENT_POSITION) {
             //-- first check for a collision with the last picture
-            if (isset($lastpicbottom)) {
-                if (($renderer->pageNo() == $lastpicpage) && ($lastpicbottom >= $renderer->getY()) && ($this->x >= $lastpicleft) && ($this->x <= $lastpicright)) {
-                    $renderer->setY($lastpicbottom + ($renderer->cPadding * 2));
-                }
+            if ($lastpicbottom !== null && $renderer->pageNo() === $lastpicpage && $lastpicbottom >= $renderer->getY() && $this->x >= $lastpicleft && $this->x <= $lastpicright) {
+                $renderer->setY($lastpicbottom + ($renderer->cPadding * 2));
             }
             $this->y = $renderer->getY();
         }
 
         // Image alignment
         switch ($this->align) {
-            case "L":
-                echo "<div style=\"position:absolute;top:", $this->y, "pt;left:0pt;width:", $renderer->getRemainingWidth(), "pt;text-align:left;\">\n";
-                echo "<img src=\"", $this->file, "\" style=\"width:", $this->width, "pt;height:", $this->height, "pt;\" alt=\"\">\n</div>\n";
+            case 'L':
+                echo '<div style="position:absolute;top:', $this->y, 'pt;left:0pt;width:', $renderer->getRemainingWidth(), "pt;text-align:left;\">\n";
+                echo '<img src="', $this->file, '" style="width:', $this->width, 'pt;height:', $this->height, "pt;\" alt=\"\">\n</div>\n";
                 break;
-            case "C":
-                echo "<div style=\"position:absolute;top:", $this->y, "pt;left:0pt;width:", $renderer->getRemainingWidth(), "pt;text-align:center;\">\n";
-                echo "<img src=\"", $this->file, "\" style=\"width:", $this->width, "pt;height:", $this->height, "pt;\" alt=\"\">\n</div>\n";
+            case 'C':
+                echo '<div style="position:absolute;top:', $this->y, 'pt;left:0pt;width:', $renderer->getRemainingWidth(), "pt;text-align:center;\">\n";
+                echo '<img src="', $this->file, '" style="width:', $this->width, 'pt;height:', $this->height, "pt;\" alt=\"\">\n</div>\n";
                 break;
-            case "R":
-                echo "<div style=\"position:absolute;top:", $this->y, "pt;left:0pt;width:", $renderer->getRemainingWidth(), "pt;text-align:right;\">\n";
-                echo "<img src=\"", $this->file, "\" style=\"width:", $this->width, "pt;height:", $this->height, "pt;\" alt=\"\">\n</div>\n";
+            case 'R':
+                echo '<div style="position:absolute;top:', $this->y, 'pt;left:0pt;width:', $renderer->getRemainingWidth(), "pt;text-align:right;\">\n";
+                echo '<img src="', $this->file, '" style="width:', $this->width, 'pt;height:', $this->height, "pt;\" alt=\"\">\n</div>\n";
                 break;
             default:
-                echo "<img src=\"", $this->file, "\" style=\"position:absolute;", $renderer->alignRTL, ":", $this->x, "pt;top:", $this->y, "pt;width:", $this->width, "pt;height:", $this->height, "pt;\" alt=\"\">\n";
+                echo '<img src="', $this->file, '" style="position:absolute;', $renderer->alignRTL, ':', $this->x, 'pt;top:', $this->y, 'pt;width:', $this->width, 'pt;height:', $this->height, "pt;\" alt=\"\">\n";
         }
 
         $lastpicpage   = $renderer->pageNo();
@@ -66,7 +70,7 @@ class ReportHtmlImage extends ReportBaseImage
         $lastpicright  = $this->x + $this->width;
         $lastpicbottom = $this->y + $this->height;
         // Setup for the next line
-        if ($this->line == "N") {
+        if ($this->line === 'N') {
             $renderer->setY($lastpicbottom);
         }
         // Keep max Y updated
@@ -78,12 +82,12 @@ class ReportHtmlImage extends ReportBaseImage
      * This would be called from the TextBox only for multiple images
      * so we add a bit bottom space between the images
      *
-     * @param ReportHtml $html
+     * @param HtmlRenderer $renderer
      *
      * @return float
      */
-    public function getHeight($html)
+    public function getHeight($renderer): float
     {
-        return $this->height + ($html->cPadding * 2);
+        return $this->height + ($renderer->cPadding * 2);
     }
 }

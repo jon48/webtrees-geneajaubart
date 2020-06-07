@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees: online genealogy
  * Copyright (C) 2019 webtrees development team
@@ -13,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
 namespace Fisharebest\Webtrees\Census;
 
 /**
@@ -20,23 +24,33 @@ namespace Fisharebest\Webtrees\Census;
  */
 class CensusColumnConditionFrenchVeuve extends AbstractCensusColumnCondition
 {
-    /* Text to display for married individuals */
-    protected $husband = '';
-    protected $wife    = '';
+    // Text to display for married males
+    protected const HUSBAND = '';
 
-    /* Text to display for unmarried individuals */
-    protected $bachelor = '';
-    protected $spinster = '';
+    // Text to display for married females
+    protected const WIFE = '';
 
-    /* Text to display for children */
-    protected $boy  = '';
-    protected $girl = '';
+    // Text to display for married unmarried males
+    protected const BACHELOR = '';
 
-    /* Text to display for divorced individuals */
-    protected $divorce  = '';
-    protected $divorcee = '';
+    // Text to display for married unmarried females
+    protected const SPINSTER = '';
 
-    /* Text to display for widowed individuals (not yet implemented) */
-    protected $widower = '';
-    protected $widow   = '1';
+    // Text to display for male children
+    protected const BOY = '';
+
+    // Text to display for female children
+    protected const GIRL = '';
+
+    // Text to display for divorced males
+    protected const DIVORCE = '';
+
+    // Text to display for divorced females
+    protected const DIVORCEE = '';
+
+    // Text to display for widowed males
+    protected const WIDOWER = '';
+
+    // Text to display for widowed females
+    protected const WIDOW = '1';
 }
