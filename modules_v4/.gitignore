@@ -1,10 +1,16 @@
 # Ignore everything in this directory
 # This is a behaviour different from the upstream webtrees
-*
+/*
 
 # Except the example modules and the README
 !/example*
 !/README.md
+
+# Except the myartjaub modules
+!/myartjaub_*
+
+# Ignore modules already in their own repositories
+/myartjaub_ruraltheme
 
 # And of course itself
 !.gitignore

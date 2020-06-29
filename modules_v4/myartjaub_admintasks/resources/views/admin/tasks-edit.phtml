@@ -1,0 +1,120 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\View;
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use MyArtJaub\Webtrees\Module\AdminTasks\AdminTasksModule;
+use MyArtJaub\Webtrees\Module\AdminTasks\Http\RequestHandlers\AdminConfigPage;
+use MyArtJaub\Webtrees\Module\AdminTasks\Http\RequestHandlers\TaskEditAction;
+use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskInterface;
+use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
+
+/**
+ * @var AdminTasksModule    $module
+ * @var string              $title
+ * @var TaskSchedule        $task_schedule
+ * @var TaskInterface       $task
+ * @var bool                $has_task_config
+ * @var string              $task_config_view
+ */
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route('modules') => I18N::translate('Modules'), route(AdminConfigPage::class) => $module->title(), $task->name()]]) ?>
+
+<h1><?= $title ?></h1>
+
+<form method="post" action="<?= e(route(TaskEditAction::class, ['task' => $task_schedule->id()])) ?>" class="form-horizontal" autocomplete="off">
+    <?= csrf_field() ?>
+    <input type="hidden" name="task_sched_id" value="<?= $task_schedule->id() ?>">
+    
+    <h3><?= e(I18N::translate('General')) ?></h3>
+    
+    <!-- FREQUENCY -->
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="frequency">
+            <?= e(I18N::translate('Frequency')) ?>
+        </label>
+        <div class="col-sm-9">
+            <div class="input-group">
+                <input class="form-control" type="number" min="0" id="frequency" name="frequency" required maxlength="70" value="<?= e($task_schedule->frequency()->totalMinutes); ?>" dir="auto">
+                <div class="input-group-append">
+                    <span class="input-group-text" dir="auto">
+                        <?= e(I18N::translate('minutes')) ?>
+                    </span>
+                </div>
+            </div>
+            <p class="small text-muted">
+                <?= e(I18N::translate('Frequency at which the task should be run (in minutes).')) ?>
+                <?= e(I18N::translate('The actual run of the task may not be fired exactly at the frequency defined, but should be run as close as possible to it.')) ?>
+            </p>
+        </div>
+    </div>
+            
+    <!-- LIMITED OCCURRENCES -->
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="is_limited">
+            <?= e(I18N::translate('Run a limited number of times')) ?>
+        </label>
+        <div class="col-sm-9">
+            <?= view('components/radios-inline', ['name' => 'is_limited', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => $task_schedule->remainingOccurences() > 0 ? 1 : 0]) ?>
+            <p class="small text-muted">
+                <?= e(I18N::translate('Defines whether the task should be run only a limited number of times.')) ?>
+            </p>
+        </div>
+    </div>
+            
+    <!-- NB_OCCURRENCES -->
+    <div id="nb_occurences" class="row form-group">
+        <label class="col-sm-3 col-form-label" for="nb_occur">
+            <?= e(I18N::translate('Number of occurrences')) ?>
+        </label>
+        <div class="col-sm-9">
+            <div class="input-group" >
+                <input class="form-control" type="number" min="0" id="nb_occur" name="nb_occur" maxlength="70" value="<?= e($task_schedule->remainingOccurences()) ?>" dir="auto">
+                <span class="input-group-append">
+                	<span class="input-group-text" dir="auto">
+                        <?= e(I18N::translate('time(s)')) ?>
+                    </span>
+                </span>
+            </div>
+            <p class="small text-muted">
+                <?= e(I18N::translate('Defines the number of times the task will run.')) ?>
+            </p>
+        </div>
+    </div>
+    
+    <?php if ($has_task_config) : ?>
+    <h3><?= e(I18N::translate('Options for “%s”', $task->name())) ?></h3>
+    
+    <?= $task_config_view ?>
+    <?php endif; ?>
+
+    <div class="row form-group">
+        <div class="offset-sm-3 col-sm-9">
+            <button type="submit" class="btn btn-primary">
+                <?= e(I18N::translate('save')) ?>
+            </button>
+        </div>
+    </div>
+    
+</form>
+
+<?php View::push('javascript') ?>
+<script>
+
+function toggleRemainingOccurrences() {
+    if($('input:radio[name="is_limited"]:checked').val() == 1) {
+        $('#nb_occurences').show();
+    }
+    else {
+        $('#nb_occurences').hide();
+    }
+}
+
+$('[name="is_limited"]').on('change', toggleRemainingOccurrences);
+toggleRemainingOccurrences();
+
+</script>
+<?php View::endpush() ?>
+

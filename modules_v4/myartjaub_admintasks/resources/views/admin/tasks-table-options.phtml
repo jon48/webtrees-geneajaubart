@@ -1,0 +1,42 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+
+/**
+ * @var int     $task_sched_id
+ * @var bool    $task_sched_enabled
+ * @var string  $task_edit_route
+ * @var string  $task_status_route
+ */
+
+?>
+
+<div class="dropdown">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" id="edit-task-button-<?= $task_sched_id ?>" aria-haspopup="true" aria-expanded="false">
+        <?= view('icons/menu') ?>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="edit-task-button-<?= $task_sched_id ?>">
+        <?php if($task_sched_enabled) : ?>
+        <div class="dropdown-item">
+            <?= view('icons/cancel') ?>
+            <a href="<?= e($task_status_route) ?>">
+                <?= I18N::translate('Disable') ?>
+            </a>
+        </div>
+        <?php else : ?>
+        <div class="dropdown-item">
+            <?= view('icons/add') ?>
+            <a href="<?= e($task_status_route) ?>">
+                <?= I18N::translate('Enable') ?>
+            </a>
+        </div>
+        <?php endif;?>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item">
+            <?= view('icons/edit') ?>
+            <a href="<?= e($task_edit_route) ?>">
+                <?= I18N::translate('Edit') ?>
+            </a>
+        </div>
+    </div>
+</div>

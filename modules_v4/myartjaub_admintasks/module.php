@@ -5,10 +5,13 @@
  * @package MyArtJaub\Webtrees
  * @subpackage Module
  * @author Jonathan Jaubart <dev@jaubart.com>
- * @copyright Copyright (c) 2012, Jonathan Jaubart
+ * @copyright Copyright (c) 2012-2020, Jonathan Jaubart
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3
  */
-namespace MyArtJaub\Webtrees\Module;
+declare(strict_types=1);
 
-return new \MyArtJaub\Webtrees\Module\AdminTasksModule(__DIR__);
+namespace MyArtJaub\Webtrees\Module\AdminTasks;
+
+return app(AdminTasksModule::class);
+
 ?>

@@ -1,0 +1,137 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Http\RequestHandlers\SiteLogsData;
+use Illuminate\Support\Collection;
+
+/**
+ * @var int             $nb_days
+ * @var Tree            $tree
+ * @var bool            $upgrade_available
+ * @var string          $latest_version
+ * @var string          $download_url
+ * @var Collection      $all_users
+ * @var Collection      $unverified
+ * @var Collection      $unapproved
+ * @var Collection      $total_by_type
+ * @var Collection      $change_by_type
+ * @var Collection      $error_logs
+ * @var int             $nb_errors
+ */
+
+?>
+
+<div dir="<?= e(I18N::locale()->direction()) ?>" lang="<?= e(I18N::locale()->languageTag()) ?>">
+    <h2>
+        <?= e(I18N::translate('Health Check Report for the last %d days', $nb_days)) ?>
+    </h2>
+    
+    <h3>
+        <?= e(I18N::translate('Tree %s', $tree->title())) ?>
+    </h3>
+    
+    <?php if($upgrade_available) : ?>
+    <h4><?= e(I18N::translate('News')) ?></h4>
+    <p>
+        <?= e(I18N::translate('A new version of *webtrees* is available: %s. Upgrade as soon as possible.', $latest_version)) ?><br/>
+        <?= e(I18N::translate('Download it here: %s.', $download_url))?>
+    </p>
+    <?php endif; ?>
+    
+    <h4><?= e(I18N::translate('Users')) ?></h4>
+    <p>
+        <a href="<?= route('admin-users') ?>"><?= e(I18N::translate('User administration')) ?></a>
+    </p>
+    <ul>
+        <li>
+            <?= e(I18N::translate('Total number of users')) ?> : <?= e(I18N::number($all_users->count())) ?>
+        </li>
+        <li>
+            <?= e(I18N::translate('Not verified by the user')) ?> : <?= e(I18N::number($unverified->count())) ?>
+        </li>
+        <li>
+            <?= e(I18N::translate('Not approved by an administrator')) ?> : <?= e(I18N::number($unapproved->count())) ?>
+        </li>
+    </ul>
+    
+    <h4><?= e(I18N::translate('Tree statistics')) ?></h4>
+    
+    <table>
+        <thead>
+            <tr>
+                <th><?= e(I18N::translate('Records')) ?></th>
+                <th><?= e(I18N::translate('Count')) ?></th>
+                <th><?= e(I18N::translate('Changes')) ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><?= e(I18N::translate('Individuals')) ?></td>
+                <td><?= e(I18N::number($total_by_type->get('indi', 0))) ?></td>
+                <td><?= e(I18N::number($change_by_type->get('indi', 0))) ?></td>
+            </tr>
+            <tr>
+                <td><?= e(I18N::translate('Families')) ?></td>
+                <td><?= e(I18N::number($total_by_type->get('fam', 0))) ?></td>
+                <td><?= e(I18N::number($change_by_type->get('fam', 0))) ?></td>
+            </tr>
+            <tr>
+                <td><?= e(I18N::translate('Sources')) ?></td>
+                <td><?= e(I18N::number($total_by_type->get('sour', 0))) ?></td>
+                <td><?= e(I18N::number($change_by_type->get('sour', 0))) ?></td>
+            </tr>
+            <tr>
+                <td><?= e(I18N::translate('Repositories')) ?></td>
+                <td><?= e(I18N::number($total_by_type->get('repo', 0))) ?></td>
+                <td><?= e(I18N::number($change_by_type->get('repo', 0))) ?></td>
+            </tr>
+            <tr>
+                <td><?= e(I18N::translate('Media objects')) ?></td>
+                <td><?= e(I18N::number($total_by_type->get('media', 0))) ?></td>
+                <td><?= e(I18N::number($change_by_type->get('media', 0))) ?></td>
+            </tr>
+            <tr>
+                <td><?= e(I18N::translate('Notes')) ?></td>
+                <td><?= e(I18N::number($total_by_type->get('note', 0))) ?></td>
+                <td><?= e(I18N::number($change_by_type->get('note', 0))) ?></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <?php if($nb_errors > 0) : ?>
+    <h4><?= e(I18N::translate('Errors [%d]', $nb_errors)) ?></h4>
+    <p>
+        <a href="<?= route(SiteLogsData::class) ?>"><?= e(I18N::translate('Website logs')) ?></a>
+    </p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th><?= e(I18N::translate('Count')) ?></th>
+                <th><?= e(I18N::translate('Type')) ?></th>
+                <th><?= e(I18N::translate('Last occurrence')) ?></th>
+                <th><?= e(I18N::translate('Error')) ?></th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach($error_logs as $error_log) : ?>
+            <tr>
+                <td><?= e(I18N::number($error_log->nblogs)) ?></td>
+                <td><?= e($error_log->type === 'site' ? I18N::translate('Site') : I18N::translate('Tree')) ?></td>
+                <td><?= e($error_log->lastoccurred)?></td>
+                <td><?= e($error_log->log_message) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    
+    <?php else : ?>
+    <h4><?= e(I18N::translate('Errors', $nb_errors)) ?></h4>
+    <p>
+        <?= e(I18N::translate('No errors')) ?>
+    </p>
+    <?php endif;?>
+    
+</div>
+

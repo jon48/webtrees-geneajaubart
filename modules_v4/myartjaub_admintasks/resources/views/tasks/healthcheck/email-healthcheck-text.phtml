@@ -1,0 +1,67 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Http\RequestHandlers\SiteLogsData;
+use Illuminate\Support\Collection;
+
+/**
+ * @var int             $nb_days
+ * @var Tree            $tree
+ * @var bool            $upgrade_available
+ * @var string          $latest_version
+ * @var string          $download_url
+ * @var Collection      $all_users
+ * @var Collection      $unverified
+ * @var Collection      $unapproved
+ * @var Collection      $total_by_type
+ * @var Collection      $change_by_type
+ * @var Collection      $error_logs
+ * @var int             $nb_errors
+ */
+
+?>
+<?= I18N::translate('Health Check Report for the last %d days', $nb_days) ?>
+
+<?= I18N::translate('Tree %s', $tree->title()) ?>
+==========================================
+<?php if($upgrade_available) : ?>
+<?= I18N::translate('News') ?>
+-------------
+<?= I18N::translate('A new version of *webtrees* is available: %s. Upgrade as soon as possible.', $latest_version) ?>
+<?= I18N::translate('Download it here: %s.', $download_url)?>
+<?php endif; ?>
+
+<?= I18N::translate('Users') ?>
+-------------
+<?= route('admin-users') ?>
+<?= I18N::translate('Total number of users') ?> : <?= I18N::number($all_users->count()) ?>
+<?= I18N::translate('Not verified by the user') ?> : <?= I18N::number($unverified->count()) ?>
+<?= I18N::translate('Not approved by an administrator') ?> : <?= I18N::number($unapproved->count()) ?>
+
+<?= I18N::translate('Tree statistics') ?>
+-------------
+<?= sprintf('%-25s', I18N::translate('Records')) ?>	<?= sprintf('%15s', I18N::translate('Count')) ?>	<?= sprintf('%15s', I18N::translate('Changes')) ?>
+<?= sprintf('%-25s', I18N::translate('Individuals')) ?>	<?= sprintf('%15s', I18N::number($total_by_type->get('indi', 0))) ?>	<?= sprintf('%15s', I18N::number($change_by_type->get('indi', 0))) ?>
+<?= sprintf('%-25s', I18N::translate('Families')) ?>	<?= sprintf('%15s', I18N::number($total_by_type->get('fam', 0))) ?>	<?= sprintf('%15s', I18N::number($change_by_type->get('fam', 0))) ?>
+<?= sprintf('%-25s', I18N::translate('Sources')) ?>	<?= sprintf('%15s', I18N::number($total_by_type->get('sour', 0))) ?>	<?= sprintf('%15s', I18N::number($change_by_type->get('sour', 0))) ?>
+<?= sprintf('%-25s', I18N::translate('Repositories')) ?>	<?= sprintf('%15s', I18N::number($total_by_type->get('repo', 0))) ?>	<?= sprintf('%15s', I18N::number($change_by_type->get('repo', 0))) ?>
+<?= sprintf('%-25s', I18N::translate('Media objects')) ?>	<?= sprintf('%15s', I18N::number($total_by_type->get('media', 0))) ?>	<?= sprintf('%15s', I18N::number($change_by_type->get('media', 0))) ?>
+<?= sprintf('%-25s', I18N::translate('Notes')) ?>	<?= sprintf('%15s', I18N::number($total_by_type->get('note', 0))) ?>	<?= sprintf('%15s', I18N::number($change_by_type->get('note', 0))) ?>
+
+<?php if($nb_errors > 0) :
+    $nb_char_type = max(strlen(I18N::translate('Type')), strlen(I18N::translate('Site')), strlen(I18N::translate('Tree')));
+    $nb_char_count_title = strlen(I18N::translate('Count'));
+?>
+<?= I18N::translate('Errors [%d]', $nb_errors) ?>
+-------------
+<?= route(SiteLogsData::class) ?>
+<?= I18N::translate('Count')?>	<?= sprintf('%-'.$nb_char_type.'s', I18N::translate('Type')) ?>	<?= sprintf('%-20s', I18N::translate('Last occurrence')) ?>	<?= I18N::translate('Error') ?>
+<?= str_repeat('-', $nb_char_count_title) ?>	<?= str_repeat('-', $nb_char_type) ?>	<?= str_repeat('-', 20) ?>	<?= str_repeat('-', strlen(I18N::translate('Error'))) ?>
+<?php foreach($error_logs as $error_log) : ?>
+<?= sprintf('%'.$nb_char_count_title.'d', $error_log->nblogs) ?> <?= sprintf('%'.$nb_char_type.'s', $error_log->type === 'site' ? I18N::translate('Site') : I18N::translate('Tree')) ?>	<?= sprintf('%20s', $error_log->lastoccurred) ?>	<?= str_replace("\n", "\n\t\t\t\t\t\t", $error_log->log_message) ?>
+<?php endforeach; ?>
+<?php else : ?>
+<?= I18N::translate('No errors') ?>
+<?php endif;?>
+

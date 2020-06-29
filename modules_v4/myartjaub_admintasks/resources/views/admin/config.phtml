@@ -1,0 +1,119 @@
+<?php
+
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\View;
+
+/**
+ * @var string  $title
+ * @var string  $trigger_token
+ * @var string  $trigger_route
+ * @var string  $tasks_data_route
+ * @var string  $new_token_route
+ */
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route('modules') => I18N::translate('Modules'), $title]]) ?>
+
+<h1><?= $title ?></h1>
+
+<p><?= I18N::translate('The administration tasks are meant to be run at a regular interval - or as regularly as possible.'); ?></p>
+<p>
+    <?= I18N::translate('It is sometimes necessary to force the execution of a task.'); ?><br />
+    <?= I18N::translate('In order to do so, use the following URL, with the optional parameter <em>%s</em> if you only want to force the execution of one task: ', I18N::translate('task_name')); ?>
+</p>
+<p>
+    <code><?= str_replace(['__TASKNAME__', '__TOKEN__'], ['[' . I18N::translate('task_name') . ']', '<span id="token_url">' . $trigger_token . '</span>'], $trigger_route) ?></code>
+</p>
+<p>
+    <button id="force-token-generate" class="btn btn-primary" onClick="generate_force_token();">
+        <div><?= I18N::translate('Regenerate token'); ?></div>
+        <i class="fas fa-spinner fa-pulse fa-fw d-none"></i>
+    </button>
+</p>
+
+<table class="table table-sm table-bordered table-maj-admintasks-list"
+    <?= view('lists/datatables-attributes') ?>
+>
+    <thead>
+        <tr>
+            <th><?= I18N::translate('Edit') ?></th>
+            <th><?= I18N::translate('Enabled') ?></th>
+            <th><?= I18N::translate('Task name') ?></th>
+            <th><?= I18N::translate('Last success') ?></th>
+            <th><?= I18N::translate('Last result') ?></th>
+            <th><?= I18N::translate('Frequency') ?></th>
+            <th><?= I18N::translate('Remaining occurrences') ?></th>
+            <th><?= I18N::translate('Is running?') ?></th>
+            <th><?= I18N::translate('Run task') ?></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<?php View::push('javascript') ?>
+<script>
+var adminTasksTable = $(".table-maj-admintasks-list").DataTable({
+    processing:          true,
+    serverSide:          true,
+    ajax:                {
+      url: "<?= e($tasks_data_route) ?>"
+    },
+    autoWidth:           false,
+    pageLength:             10,
+    sorting:             [[2, "asc"]],
+    columns: [
+        /* 0 Edit             */ { sortable: false, className: "text-center"},
+        /* 1 Enabled         */ { sortable: false, className: "text-center"  },
+        /* 2 Task Title        */ { className: "text-center" },
+        /* 3 Last Run        */ { className: "text-center" },
+        /* 4 Last status     */ { className: "text-center" },
+        /* 5 Frequency      */ { sortable: false, className: "text-center" },
+        /* 6 Nb Occcurrences*/ { sortable: false, className: "text-center" },
+        /* 7 Is Running        */ { sortable: false, className: "text-center" },
+        /* 8 Run task        */ { sortable: false, className: "text-center" }
+    ],
+    });
+
+function generate_force_token() {
+    $('#force-token-generate').attr('disabled', 'disabled');
+    $('#force-token-generate div').addClass('d-none');
+    $('#force-token-generate .fa-spinner').removeClass('d-none');
+    $.post({
+        url: "<?= e($new_token_route) ?>",
+        dataType: 'json',
+        success: function(data) {
+            $("#token_url").html(data.token);
+            $('#force-token-generate').removeAttr('disabled');
+            $('#force-token-generate div').removeClass('d-none');
+            $('#force-token-generate .fa-spinner').addClass('d-none');
+            adminTasksTable.ajax.reload();
+        }
+    });
+}
+
+function maj_run_admintask(taskid, route) {
+    $('#run-task-button-' + taskid).attr('disabled', 'disabled');
+    $('#run-task-button-' + taskid + ' .maj-loading-initial').addClass('d-none');
+    $('#run-task-button-' + taskid + ' .maj-loading-inprocess').removeClass('d-none');
+    $.post({
+        url: route,
+        success: function(data) {
+            $('#run-task-button-' + taskid).removeAttr('disabled');
+            $('#run-task-button-' + taskid + ' .maj-loading-inprocess').addClass('d-none');
+            $('#run-task-button-' + taskid + ' .maj-loading-complete').removeClass('d-none');
+        }
+    }).done(function() {
+        $('#run-task-button-' + taskid + ' .maj-loading-complete').removeClass('d-none');
+    }).fail(function() {
+        $('#run-task-button-' + taskid + ' .maj-loading-error').removeClass('d-none');
+    }).always(function() {
+        $('#run-task-button-' + taskid).removeAttr('disabled');
+        $('#run-task-button-' + taskid + ' .maj-loading-inprocess').addClass('d-none');
+        adminTasksTable.ajax.reload();
+    });
+} 
+</script>
+<?php View::endpush() ?>

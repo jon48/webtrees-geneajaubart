@@ -1,0 +1,26 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+
+/**
+ * @var int     $task_sched_id
+ * @var string  $run_route
+ */
+
+?>
+
+<button type="button" class="btn btn-primary" id="run-task-button-<?= $task_sched_id ?>" onclick="maj_run_admintask(<?= $task_sched_id ?>, '<?= $run_route ?>')">
+    <div class="maj-loading-initial">
+        <span class="maj-icon-run"><i class="fas fa-play"></i></span>
+        &nbsp;<?= e(I18N::translate('Run')) ?>
+    </div>
+    <i class="fas fa-spinner fa-pulse fa-fw d-none maj-loading-inprocess"></i>
+    <div class="maj-loading-complete d-none">
+        <span class="maj-icon-done"><i class="fas fa-check"></i></span>
+        &nbsp;<?= e(I18N::translate('Done')) ?>
+    </div>
+    <div class="maj-loading-error d-none">
+        <span class="maj-icon-error"><i class="fas fa-times"></i></span>
+        &nbsp;<?= e(I18N::translate('Error')) ?>
+    </div>
+</button>

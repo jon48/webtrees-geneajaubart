@@ -5,9 +5,10 @@
  * @package MyArtJaub\Webtrees
  * @subpackage Module
  * @author Jonathan Jaubart <dev@jaubart.com>
- * @copyright Copyright (c) 2009-2015, Jonathan Jaubart
+ * @copyright Copyright (c) 2009-2020, Jonathan Jaubart
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3
  */
+declare(strict_types=1);
 
 return array (
 
@@ -37,9 +38,10 @@ return array (
     'Not running'					=>	'Arrêté',
     'Run'							=>	'Exécuter',
     'Done'							=>	'Terminé',
+    'Error'							=>	'Erreur',
     'Healthcheck Email'				=>	'État du système',
     'Health Check Report'			=>	'État du système',
-    'Edit the administrative task'  =>  'Éditer la tâche administrative',
+    'Edit the administrative task'  =>  'Éditer la tâche d\'administration',
     'Enable healthcheck emails for'
                                     =>	'Activer les rapports d\'état du système pour',
     'Enable the health check emails for each of the selected trees.'
@@ -52,6 +54,7 @@ return array (
                                     =>	'Une nouvelle version de *webtrees* est disponible : %s. Veuillez mettre à jour dès que possible.',
     'Download it here: %s.'			=>	'Pour la télécharger : %s',
     'Tree statistics'				=>	'Statistiques de l\'arbre',
+    'Errors'                        =>  'Erreurs',
     'Errors [%d]'					=>	'Erreurs [%d]',
     'Last occurrence'				=>	'Dernière occurrence',
     'No errors'						=>	'Aucune erreur',
@@ -71,12 +74,14 @@ return array (
                                     =>  'Détermine si la tâche doit s\'exécuter un nombre déterminé de fois.',
     'Defines the number of times the task will run.'
                                     =>  'Détermine le nombre de fois la tâche doit s\'exécuter.',
-    'The administrative task “%s” has been successfully updated'
-                                    =>  'La  tâche d\'administration “%s” a été mise à jour avec succès',
+    'The scheduled task has been successfully updated'
+                                    =>  'La tâche planifiée a été mise à jour avec succès',
+    'The task shedule with ID “%s” does not exist.'
+                                    =>  'La tâche planifiée avec ID “%s” n\'existe pas',
     'An error occured while editing this task:'
                                     =>  'Une erreur s\'est produite lors de l\'édition de la tâche',
-    'An error occured while updating the administrative task “%s”'
-                                    =>  'Une erreur s\'est produite lors de la mise à jour de la tâche “%s”',
+    'An error occured while updating the scheduled task'
+                                    =>  'Une erreur s\'est produite lors de la mise à jour de la tâche planifiée',
     'An error occured while updating the specific settings of administrative task “%s”'
                                     =>  'Une erreur s\'est produite lors de la mise à jour des paramètres de la tâche “%s”',
     

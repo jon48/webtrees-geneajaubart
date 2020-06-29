@@ -1,0 +1,32 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\AdminTasks\Tasks\HealthCheckEmailTask;
+
+/**
+ * @var Collection      $all_trees
+ */
+
+?>
+
+<div class="row form-group">
+    <label class="col-sm-3 col-form-label">
+        <?= e(I18N::translate('Enable healthcheck emails for')) ?>
+    </label>
+    <div class="col-sm-9">
+    <?php foreach($all_trees as $tree) : ?>
+        <div class="row form-group">
+            <label class="col-sm-4 col-form-label">
+                <?= $tree->title() ?>
+            </label>
+            <div class="col-sm-8">
+                <?= view('components/radios-inline', ['name' => 'HEALTHCHECK_ENABLED_' . $tree->id() , 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => $tree->getPreference(HealthCheckEmailTask::TREE_PREFERENCE_NAME) > 0 ? 1 : 0]) ?>
+            </div>
+        </div>
+    <?php endforeach; ?>
+        <p class="small text-muted">
+            <?= e(I18N::translate('Enable the health check emails for each of the selected trees.')) ?>
+        </p>
+    </div>
+</div>
