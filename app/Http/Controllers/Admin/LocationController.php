@@ -113,7 +113,7 @@ class LocationController extends AbstractAdminController
         $title       = I18N::translate('Geographic data');
         $breadcrumbs = [
             route(ControlPanel::class) => I18N::translate('Control panel'),
-            route('map-data')            => $title,
+            route('map-data')          => $title,
         ];
 
         foreach ($hierarchy as $row) {
@@ -177,7 +177,7 @@ class LocationController extends AbstractAdminController
 
         $rows = DB::table('placelocation')
             ->where('pl_parent_id', '=', $id)
-            ->orderBy('pl_place')
+            ->orderBy(new Expression('pl_place /*! COLLATE ' . I18N::collation() . ' */'))
             ->get();
 
         $list = [];
@@ -217,16 +217,16 @@ class LocationController extends AbstractAdminController
         $prefix = DB::connection()->getTablePrefix();
 
         $expression =
-            $prefix . 'p0.pl_place IS NOT NULL AND ' . $prefix . 'p0.pl_lati IS NULL OR ' .
-            $prefix . 'p1.pl_place IS NOT NULL AND ' . $prefix . 'p1.pl_lati IS NULL OR ' .
-            $prefix . 'p2.pl_place IS NOT NULL AND ' . $prefix . 'p2.pl_lati IS NULL OR ' .
-            $prefix . 'p3.pl_place IS NOT NULL AND ' . $prefix . 'p3.pl_lati IS NULL OR ' .
-            $prefix . 'p4.pl_place IS NOT NULL AND ' . $prefix . 'p4.pl_lati IS NULL OR ' .
-            $prefix . 'p5.pl_place IS NOT NULL AND ' . $prefix . 'p5.pl_lati IS NULL OR ' .
-            $prefix . 'p6.pl_place IS NOT NULL AND ' . $prefix . 'p6.pl_lati IS NULL OR ' .
-            $prefix . 'p7.pl_place IS NOT NULL AND ' . $prefix . 'p7.pl_lati IS NULL OR ' .
-            $prefix . 'p8.pl_place IS NOT NULL AND ' . $prefix . 'p8.pl_lati IS NULL OR ' .
-            $prefix . 'p9.pl_place IS NOT NULL AND ' . $prefix . 'p9.pl_lati IS NULL';
+            $prefix . 'p0.pl_place IS NOT NULL AND COALESCE(' . $prefix . "p0.pl_lati, '') = '' OR " .
+            $prefix . 'p1.pl_place IS NOT NULL AND COALESCE(' . $prefix . "p1.pl_lati, '') = '' OR " .
+            $prefix . 'p2.pl_place IS NOT NULL AND COALESCE(' . $prefix . "p2.pl_lati, '') = '' OR " .
+            $prefix . 'p3.pl_place IS NOT NULL AND COALESCE(' . $prefix . "p3.pl_lati, '') = '' OR " .
+            $prefix . 'p4.pl_place IS NOT NULL AND COALESCE(' . $prefix . "p4.pl_lati, '') = '' OR " .
+            $prefix . 'p5.pl_place IS NOT NULL AND COALESCE(' . $prefix . "p5.pl_lati, '') = '' OR " .
+            $prefix . 'p6.pl_place IS NOT NULL AND COALESCE(' . $prefix . "p6.pl_lati, '') = '' OR " .
+            $prefix . 'p7.pl_place IS NOT NULL AND COALESCE(' . $prefix . "p7.pl_lati, '') = '' OR " .
+            $prefix . 'p8.pl_place IS NOT NULL AND COALESCE(' . $prefix . "p8.pl_lati, '') = '' OR " .
+            $prefix . 'p9.pl_place IS NOT NULL AND COALESCE(' . $prefix . "p9.pl_lati, '') = ''";
 
         return DB::table('placelocation AS p0')
             ->leftJoin('placelocation AS p1', 'p1.pl_parent_id', '=', 'p0.pl_id')
@@ -279,26 +279,24 @@ class LocationController extends AbstractAdminController
     public function mapDataEdit(ServerRequestInterface $request): ResponseInterface
     {
         $parent_id = (int) $request->getQueryParams()['parent_id'];
+        $hierarchy = $this->getHierarchy($parent_id);
+        $fqpn      = $hierarchy === [] ? '' : $hierarchy[0]->fqpn;
+        $parent    = new PlaceLocation($fqpn);
+
         $place_id  = (int) $request->getQueryParams()['place_id'];
         $hierarchy = $this->getHierarchy($place_id);
         $fqpn      = $hierarchy === [] ? '' : $hierarchy[0]->fqpn;
         $location  = new PlaceLocation($fqpn);
 
         if ($location->id() !== 0) {
-            $lat   = $location->latitude();
-            $lng   = $location->longitude();
-            $id    = $place_id;
             $title = e($location->locationName());
         } else {
             // Add a place
-            $lat       = '';
-            $lng       = '';
-            $id        = $parent_id;
             if ($parent_id === 0) {
                 // We're at the global level so create a minimal
                 // place for the page title and breadcrumbs
-                $title         =  I18N::translate('World');
-                $hierarchy     =  [];
+                $title     = I18N::translate('World');
+                $hierarchy = [];
             } else {
                 $hierarchy = $this->getHierarchy($parent_id);
                 $tmp       = new PlaceLocation($hierarchy[0]->fqpn);
@@ -316,23 +314,31 @@ class LocationController extends AbstractAdminController
         }
 
         if ($place_id === 0) {
-            $breadcrumbs[] = I18N::translate('Add');
-            $title         .= ' — ' . I18N::translate('Add');
+            $breadcrumbs[]   = I18N::translate('Add');
+            $title           .= ' — ' . I18N::translate('Add');
+            $latitude        = '';
+            $longitude       = '';
+            $map_bounds      = $parent->boundingRectangle();
+            $marker_position = [$parent->latitude(), $parent->longitude()];
         } else {
-            $breadcrumbs[] = I18N::translate('Edit');
-            $title         .= ' — ' . I18N::translate('Edit');
+            $breadcrumbs[]   = I18N::translate('Edit');
+            $title           .= ' — ' . I18N::translate('Edit');
+            $latitude        = $location->latitude();
+            $longitude       = $location->latitude();
+            $map_bounds      = $location->boundingRectangle();
+            $marker_position = [$location->latitude(), $location->longitude()];
         }
 
         return $this->viewResponse('admin/location-edit', [
-            'breadcrumbs' => $breadcrumbs,
-            'title'       => $title,
-            'location'    => $location,
-            'place_id'    => $place_id,
-            'parent_id'   => $parent_id,
-            'lat'         => $lat,
-            'lng'         => $lng,
-            'data'        => $this->mapLocationData($id),
-            'provider'    => [
+            'breadcrumbs'     => $breadcrumbs,
+            'title'           => $title,
+            'location'        => $location,
+            'latitude'        => $latitude,
+            'longitude'       => $longitude,
+            'map_bounds'      => $map_bounds,
+            'marker_position' => $marker_position,
+            'parent'          => $parent,
+            'provider'        => [
                 'url'     => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 'options' => [
                     'attribution' => '<a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap</a> contributors',
@@ -340,38 +346,6 @@ class LocationController extends AbstractAdminController
                 ]
             ],
         ]);
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return array{'zoom':int,'coordinates':array<float>}
-     */
-    private function mapLocationData(int $id): array
-    {
-        $row = DB::table('placelocation')
-            ->where('pl_id', '=', $id)
-            ->first();
-
-        if ($row === null) {
-            $json = [
-                'zoom'        => 2,
-                'coordinates' => [
-                    0.0,
-                    0.0,
-                ],
-            ];
-        } else {
-            $json = [
-                'zoom'        => (int) $row->pl_zoom ?: 2,
-                'coordinates' => [
-                    (float) strtr($row->pl_lati ?? '0', ['N' => '', 'S' => '-', ',' => '.']),
-                    (float) strtr($row->pl_long ?? '0', ['E' => '', 'W' => '-', ',' => '.']),
-                ],
-            ];
-        }
-
-        return $json;
     }
 
     /**
@@ -549,7 +523,7 @@ class LocationController extends AbstractAdminController
         // Data for the next level.
         $rows = DB::table('placelocation')
             ->where('pl_parent_id', '=', $parent_id)
-            ->orderBy('pl_place')
+            ->orderBy(new Expression('pl_place /*! COLLATE ' . I18N::collation() . ' */'))
             ->get();
 
         foreach ($rows as $row) {

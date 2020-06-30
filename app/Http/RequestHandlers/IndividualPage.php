@@ -316,21 +316,25 @@ class IndividualPage implements RequestHandlerInterface
         if ($fact->canEdit()) {
             $edit_links =
                 '<a class="btn btn-link" href="#" data-confirm="' . I18N::translate('Are you sure you want to delete this fact?') . '" data-post-url="' . e(route(DeleteFact::class, ['tree' => $individual->tree()->name(), 'xref' => $individual->xref(), 'fact_id' => $fact->id()])) . '" title="' . I18N::translate('Delete this name') . '">' . view('icons/delete') . '<span class="sr-only">' . I18N::translate('Delete this name') . '</span></a>' .
-                '<a class="btn btn-link" href="' . e(route('edit-name', ['xref' => $individual->xref(), 'fact_id' => $fact->id(), 'tree' => $individual->tree()->name()])) . '" title="' . I18N::translate('Edit the name') . '">' . view('icons/edit') . '<span class="sr-only">' . I18N::translate('Edit the name') . '</span></a>';
+                '<a class="btn btn-link" href="' . e(route(EditName::class, ['xref' => $individual->xref(), 'fact_id' => $fact->id(), 'tree' => $individual->tree()->name()])) . '" title="' . I18N::translate('Edit the name') . '">' . view('icons/edit') . '<span class="sr-only">' . I18N::translate('Edit the name') . '</span></a>';
         } else {
             $edit_links = '';
         }
 
-        return '
-			<div class="' . $container_class . '">
-        <div class="card-header" role="tab" id="name-header-' . $n . '">
-		        <a data-toggle="collapse" data-parent="#individual-names" href="#name-content-' . $n . '" aria-expanded="' . $aria . '" aria-controls="name-content-' . $n . '">' . $dummy->fullName() . '</a>
-		      ' . $edit_links . '
-        </div>
-		    <div id="name-content-' . $n . '" class="' . $content_class . '" role="tabpanel" aria-labelledby="name-header-' . $n . '">
-		      <div class="card-body">' . $content . '</div>
-        </div>
-      </div>';
+        return
+            '<div class="' . $container_class . '">' .
+            '<div class="card-header" role="tab" id="name-header-' . $n . '">' .
+            '<a data-toggle="collapse" href="#name-content-' . $n . '" aria-expanded="' . $aria . '" aria-controls="name-content-' . $n . '">' .
+            //view('icons/expand') .
+            //view('icons/collapse') .
+            $dummy->fullName() .
+            '</a>' .
+            $edit_links .
+            '</div>' .
+            '<div id="name-content-' . $n . '" class="' . $content_class . '" data-parent="#individual-names" aria-labelledby="name-header-' . $n . '">' .
+            '<div class="card-body">' . $content . '</div>' .
+            '</div>' .
+            '</div>';
     }
 
     /**
@@ -363,8 +367,8 @@ class IndividualPage implements RequestHandlerInterface
             $container_class .= ' wt-new';
         }
 
-        if ($individual->canEdit()) {
-            $edit_links = '<a class="btn btn-link" href="' . e(route(EditFact::class, ['xref' => $individual->xref(), 'fact_id' => $fact->id(), 'tree' => $individual->tree()->name()])) . '" title="' . I18N::translate('Edit the gender') . '">' . view('icons/edit') . '<span class="sr-only">' . I18N::translate('Edit the gender') . '</span></a>';
+        if ($fact->canEdit()) {
+            $edit_links = '<a class="btn btn-link" href="' . e(route(EditFactPage::class, ['xref' => $individual->xref(), 'fact_id' => $fact->id(), 'tree' => $individual->tree()->name()])) . '" title="' . I18N::translate('Edit the gender') . '">' . view('icons/edit') . '<span class="sr-only">' . I18N::translate('Edit the gender') . '</span></a>';
         } else {
             $edit_links = '';
         }

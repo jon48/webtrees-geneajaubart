@@ -33,7 +33,7 @@ use Fisharebest\Webtrees\GedcomCode\GedcomCodeQuay;
 use Fisharebest\Webtrees\GedcomCode\GedcomCodeRela;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\GedcomTag;
-use Fisharebest\Webtrees\Http\RequestHandlers\EditFact;
+use Fisharebest\Webtrees\Http\RequestHandlers\EditFactPage;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Module\ModuleChartInterface;
@@ -48,14 +48,35 @@ use Fisharebest\Webtrees\Submitter;
 use Fisharebest\Webtrees\Tree;
 use Ramsey\Uuid\Uuid;
 
+use function app;
+use function array_merge;
+use function count;
 use function e;
+use function explode;
+use function implode;
+use function ob_get_clean;
+use function ob_start;
+use function preg_match;
+use function preg_match_all;
+use function preg_replace;
+use function preg_split;
+use function rawurlencode;
+use function route;
+use function str_replace;
+use function strip_tags;
+use function strlen;
+use function strpos;
 use function strtoupper;
+use function substr;
+use function trim;
 use function view;
 
 use const PREG_SET_ORDER;
 
 /**
  * Class FunctionsPrintFacts - common functions
+ *
+ * @deprecated since 2.0.6.  Will be removed in 2.1.0
  */
 class FunctionsPrintFacts
 {
@@ -76,11 +97,14 @@ class FunctionsPrintFacts
     {
         $parent = $fact->record();
         $tree   = $parent->tree();
-        $tag    = $fact->tag();
+        $tag    = $fact->getTag();
         $label  = $fact->label();
         $value  = $fact->value();
         $type   = $fact->attribute('TYPE');
         $id     = $fact->id();
+
+        // This preference is named HIDE instead of SHOW
+        $hide_errors = $tree->getPreference('HIDE_GEDCOM_ERRORS') === '0';
 
         // Some facts don't get printed here ...
         switch ($tag) {
@@ -104,11 +128,11 @@ class FunctionsPrintFacts
                 // These are internal links, not facts
                 return;
             case '_WT_OBJE_SORT':
-                // These links are used internally to record the sort order.
+                // These links were once used internally to record the sort order.
                 return;
             default:
                 // Hide unrecognized/custom tags?
-                if ($tree->getPreference('HIDE_GEDCOM_ERRORS') === '0' && !GedcomTag::isTag($tag)) {
+                if ($hide_errors && !GedcomTag::isTag($tag)) {
                     return;
                 }
                 break;
@@ -138,8 +162,8 @@ class FunctionsPrintFacts
             $styles[] = 'wt-historic-fact collapse';
         }
 
-        // Special handling for marriage labels.
-        if ($tag === 'MARR') {
+        // Use marriage type as the label.
+        if ($tag === 'MARR' && $type !== '') {
             switch (strtoupper($type)) {
                 case 'CIVIL':
                     $label = I18N::translate('Civil marriage');
@@ -326,11 +350,11 @@ class FunctionsPrintFacts
 
         // Print any other "2 XXXX" attributes, in the order in which they appear.
         preg_match_all('/\n2 (' . Gedcom::REGEX_TAG . ') (.+)/', $fact->gedcom(), $matches, PREG_SET_ORDER);
-        
+
         //0 SOUR / 1 DATA / 2 EVEN / 3 DATE and 3 PLAC must be collected separately
         preg_match_all('/\n2 EVEN .*((\n[3].*)*)/', $fact->gedcom(), $evenMatches, PREG_SET_ORDER);
         $currentEvenMatch = 0;
-        
+
         foreach ($matches as $match) {
             switch ($match[1]) {
                 case 'DATE':
@@ -366,7 +390,7 @@ class FunctionsPrintFacts
                         $events[] = GedcomTag::getLabel($event);
                     }
                     echo GedcomTag::getLabelValue('EVEN', implode(I18N::$list_separator, $events));
-                    
+
                     if (preg_match('/\n3 DATE (.+)/', $evenMatches[$currentEvenMatch][0], $date_match)) {
                         $date = new Date($date_match[1]);
                         echo GedcomTag::getLabelValue('DATE', $date->display());
@@ -375,7 +399,7 @@ class FunctionsPrintFacts
                         echo GedcomTag::getLabelValue('PLAC', $plac_match[1]);
                     }
                     $currentEvenMatch++;
-                    
+
                     break;
                 case 'FAMC': // 0 INDI / 1 ADOP / 2 FAMC / 3 ADOP
                     $family = Factory::family()->make(str_replace('@', '', $match[2]), $tree);
@@ -435,7 +459,7 @@ class FunctionsPrintFacts
                     echo GedcomTag::getLabelValue($tag . ':' . $match[1], $link);
                     break;
                 default:
-                    if ($tree->getPreference('HIDE_GEDCOM_ERRORS') === '1' || GedcomTag::isTag($match[1])) {
+                    if (!$hide_errors || GedcomTag::isTag($match[1])) {
                         if (preg_match('/^@(' . Gedcom::REGEX_XREF . ')@$/', $match[2], $xmatch)) {
                             // Links
                             $linked_record = Factory::gedcomRecord()->make($xmatch[1], $tree);
@@ -746,7 +770,7 @@ class FunctionsPrintFacts
                         echo GedcomTag::getLabel($factname);
                     }
                 } elseif ($can_edit) {
-                    echo '<a href="' . e(route(EditFact::class, [
+                    echo '<a href="' . e(route(EditFactPage::class, [
                             'xref'    => $parent->xref(),
                             'fact_id' => $fact->id(),
                             'tree'    => $tree->name(),

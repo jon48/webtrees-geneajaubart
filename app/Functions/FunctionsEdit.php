@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2017 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -75,6 +75,8 @@ use function view;
 
 /**
  * Class FunctionsEdit - common functions for editing
+ *
+ * @deprecated since 2.0.6.  Will be removed in 2.1.0
  */
 class FunctionsEdit
 {
@@ -447,11 +449,20 @@ class FunctionsEdit
                 }
             }
         } elseif ($fact === 'NPFX' || $fact === 'NSFX' || $fact === 'SPFX' || $fact === 'NICK') {
+            $html .= '<div class="input-group">';
             $html .= '<input class="form-control" type="text" id="' . $id . '" name="' . $name . '" value="' . e($value) . '" oninput="updatewholename()">';
+            $html .= view('edit/input-addon-keyboard', ['id' => $id]);
+            $html .= '</div>';
         } elseif ($fact === 'GIVN') {
+            $html .= '<div class="input-group">';
             $html .= '<input class="form-control" type="text" id="' . $id . '" name="' . $name . '" value="' . e($value) . '" data-autocomplete-type="GIVN" oninput="updatewholename()" autofocus>';
+            $html .= view('edit/input-addon-keyboard', ['id' => $id]);
+            $html .= '</div>';
         } elseif ($fact === 'SURN' || $fact === '_MARNM_SURN') {
+            $html .= '<div class="input-group">';
             $html .= '<input class="form-control" type="text" id="' . $id . '" name="' . $name . '" value="' . e($value) . '" data-autocomplete-type="SURN" oninput="updatewholename()">';
+            $html .= view('edit/input-addon-keyboard', ['id' => $id]);
+            $html .= '</div>';
         } elseif ($fact === 'ADOP') {
             $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => GedcomCodeAdop::getValues()]);
         } elseif ($fact === 'LANG') {
@@ -733,7 +744,7 @@ class FunctionsEdit
         self::$tags = [];
 
         $level0type = $record::RECORD_TYPE;
-        $level1type = $fact->tag();
+        $level1type = $fact->getTag();
 
         // List of tags we would expect at the next level
         // NB insertMissingSubtags() already takes care of the simple cases

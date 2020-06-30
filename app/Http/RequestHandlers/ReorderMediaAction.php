@@ -67,7 +67,7 @@ class ReorderMediaAction implements RequestHandlerInterface
 
         // Split facts into OBJE and other
         foreach ($individual->facts() as $fact) {
-            if ($fact->tag() === 'OBJE') {
+            if ($fact->getTag() === 'OBJE') {
                 $sort_facts[$fact->id()] = $fact->gedcom();
             } else {
                 $keep_facts[] = $fact->gedcom();
@@ -76,7 +76,7 @@ class ReorderMediaAction implements RequestHandlerInterface
 
         // Sort the facts
         uksort($sort_facts, static function ($x, $y) use ($order) {
-            return array_search($x, $order, true) - array_search($y, $order, true);
+            return array_search($x, $order, true) <=> array_search($y, $order, true);
         });
 
         // Merge the facts

@@ -69,7 +69,7 @@ class ReorderFamiliesAction implements RequestHandlerInterface
         foreach ($individual->facts() as $fact) {
             $tag = $fact->tag();
 
-            if ($tag === 'FAMC' || $tag === 'FAMS') {
+            if ($tag === 'INDI:FAMC' || $tag === 'INDI:FAMS') {
                 $sort_facts[$fact->id()] = $fact->gedcom();
             } else {
                 $keep_facts[] = $fact->gedcom();

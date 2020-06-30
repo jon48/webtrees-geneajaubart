@@ -50,7 +50,7 @@ use Fisharebest\Webtrees\I18N;
                         <tr>
                             <th><?= I18N::translate('Accept') ?></th>
                             <th><?= I18N::translate('Changes') ?></th>
-                            <th><?= I18N::translate('User') ?></th>
+                            <th><?= I18N::translate('Editor') ?></th>
                             <th><?= I18N::translate('Date') ?></th>
                             <th><?= I18N::translate('Reject') ?></th>
                         </tr>
@@ -66,11 +66,11 @@ use Fisharebest\Webtrees\I18N;
 
                                 <td>
                                     <?php foreach ($record_change->record->facts() as $fact) : ?>
-                                        <?php if ($fact->tag() !== 'CHAN' && $fact->isPendingAddition()) : ?>
+                                        <?php if ($fact->getTag() !== 'CHAN' && $fact->isPendingAddition()) : ?>
                                             <div class="wt-new">
                                                 <?= strip_tags($fact->summary()) ?>
                                             </div>
-                                        <?php elseif ($fact->tag() !== 'CHAN' && $fact->isPendingDeletion()) : ?>
+                                        <?php elseif ($fact->getTag() !== 'CHAN' && $fact->isPendingDeletion()) : ?>
                                             <div class="wt-old">
                                                 <?= strip_tags($fact->summary()) ?>
                                             </div>

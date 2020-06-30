@@ -41,20 +41,6 @@ use function strtolower;
 trait ModuleCustomTrait
 {
     /**
-     * Where does this module store its resources
-     *
-     * @return string
-     */
-    abstract public function resourcesFolder(): string;
-
-    /**
-     * A unique internal name for this module (based on the installation folder).
-     *
-     * @return string
-     */
-    abstract public function name(): string;
-
-    /**
      * The person or organisation who created this module.
      *
      * @return string
@@ -198,7 +184,7 @@ trait ModuleCustomTrait
         $mime_type = Mime::TYPES[$extension] ?? Mime::DEFAULT_TYPE;
 
         return response($content, StatusCodeInterface::STATUS_OK)
-            ->withHeader('Cache-Control', 'max-age=31536000, public')
+            ->withHeader('Cache-Control', 'public,max-age=31536000')
             ->withHeader('Content-Length', (string) strlen($content))
             ->withHeader('Content-Type', $mime_type);
     }
