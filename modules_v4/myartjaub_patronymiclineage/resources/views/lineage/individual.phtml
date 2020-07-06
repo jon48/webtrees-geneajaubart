@@ -1,0 +1,16 @@
+<?php 
+
+use Fisharebest\Webtrees\Individual;
+
+/**
+ * @var Individual  $individual
+ * @var bool        $primary
+ */
+?>
+
+<small><?= view('icons/sex', ['sex' => $individual->sex()]) ?></small>
+<a href="<?= e($individual->url()) ?>">
+    <?php if($primary) : ?><strong><?php else: ?><em><?php endif; ?>
+    <?= $individual->fullName() ?>    
+    <?php if($primary) : ?></strong><?php else: ?></em><?php endif; ?>
+</a><?= $individual->lifespan() ?>

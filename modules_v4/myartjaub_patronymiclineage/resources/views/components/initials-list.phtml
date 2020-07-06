@@ -1,0 +1,36 @@
+<?php 
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Session;
+use Fisharebest\Webtrees\Tree;
+use MyArtJaub\Webtrees\Module\PatronymicLineage\Http\RequestHandlers\SurnamesList;
+
+/** 
+ * @var Tree    $tree
+ * @var int[]   $initials_list
+ * @var string  $initial
+ * @var string  $show_all
+ */
+
+?>
+
+<ul class="d-flex flex-wrap list-unstyled justify-content-center wt-initials-list wt-initials-list-surname">
+
+    <?php foreach ($initials_list as $letter => $count) : ?>
+        <li class="wt-initials-list-item d-flex">
+            <?php if ($count > 0) : ?>
+                <a href="<?= e(route(SurnamesList::class, ['alpha' => $letter, 'tree' => $tree->name()])) ?>" class="wt-initial px-1<?= $letter === $initial ? ' active' : '' ?> '" title="<?= I18N::number($count) ?>"><?= e($letter) ?></a>
+            <?php else : ?>
+                <span class="wt-initial px-1 text-muted"><?= e($letter) ?></span>
+            <?php endif ?>
+        </li>
+    <?php endforeach ?>
+
+    <?php if (Session::has('initiated')) : ?>
+        <!-- Search spiders don't get the "show all" option as the other links give them everything. -->
+        <li class="wt-initials-list-item d-flex">
+            <a class="wt-initial px-1<?= $show_all === 'yes' ? ' active' : '' ?>" href="<?= e(route(SurnamesList::class, ['show_all' => 'yes', 'tree' => $tree->name()])) ?>"><?= I18N::translate('All') ?></a>
+        </li>
+    <?php endif ?>
+    
+</ul>

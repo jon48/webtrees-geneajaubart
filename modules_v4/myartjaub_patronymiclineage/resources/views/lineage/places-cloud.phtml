@@ -1,0 +1,35 @@
+<?php 
+
+use Fisharebest\Webtrees\Place;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Support\Collection;
+
+/** 
+ * @var Collection  $places
+ * @var Tree        $tree
+ */
+
+$maximum = max(1, $places->max());
+$minimum = min(PHP_INT_MAX, $places->min());
+
+?>
+
+<div class="tag_cloud">
+    <?php foreach ($places->sortKeys() as $place_name => $count) : ?>
+    	<?php
+    	$place = new Place($place_name, $tree);
+    	$place_parts = $place->firstParts(2);
+    	
+    	if ($maximum === $minimum) {
+    	    // All items occur the same number of times
+    	    $size = 140.0;
+    	} else {
+    	    $size = 75.0 + 125.0 * ($count - $minimum) / ($maximum - $minimum);
+    	}
+    	?>
+    	
+    	<a style="font-size: <?= $size ?>%" href="<?= $place->url() ?>">
+    		<?= e($place_parts->first()) ?> (<?= e($place_parts->last()) ?>)
+    	</a>
+    <?php endforeach; ?>
+</div>
