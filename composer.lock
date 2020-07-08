@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d7ee2596eda333be28723cbc0d72bc3c",
+    "content-hash": "2b8dde60ed2b64e0349ad5cff4b1f4eb",
     "packages": [
         {
             "name": "aura/router",
@@ -1471,10 +1471,16 @@
         {
             "name": "jon48/webtrees-lib",
             "version": "dev-feature/2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jon48/webtrees-lib.git",
+                "reference": "c5308fdaf322449543bd25c4c32194893c8f0e68"
+            },
             "dist": {
-                "type": "path",
-                "url": "../../../www-lib/jon48/webtrees-lib",
-                "reference": "5a02448689abaaff179d2bb7380f1416595486ff"
+                "type": "zip",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/c5308fdaf322449543bd25c4c32194893c8f0e68",
+                "reference": "c5308fdaf322449543bd25c4c32194893c8f0e68",
+                "shasum": ""
             },
             "require": {
                 "ext-xml": "*",
@@ -1494,6 +1500,7 @@
                     "MyArtJaub\\Tests\\": "tests/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0-or-later"
             ],
@@ -1511,34 +1518,31 @@
                 "genealogy",
                 "webtrees"
             ],
-            "support": {
-                "issues": "http://bugs.jaubart.com"
-            },
-            "transport-options": {
-                "relative": true
-            }
+            "time": "2020-07-06T22:57:38+00:00"
         },
         {
             "name": "jon48/webtrees-theme-rural",
-            "version": "dev-feature/nextrelease",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jon48/webtrees-theme-rural.git",
+                "reference": "0e2df15483ad796490d078bb77844814ad2f4f69"
+            },
             "dist": {
-                "type": "path",
-                "url": "../../../www-lib/jon48/webtrees-theme-rural",
-                "reference": "3be0cc5166beeaba0102386202e6d100a022eaee"
+                "type": "zip",
+                "url": "https://api.github.com/repos/jon48/webtrees-theme-rural/zipball/0e2df15483ad796490d078bb77844814ad2f4f69",
+                "reference": "0e2df15483ad796490d078bb77844814ad2f4f69",
+                "shasum": ""
             },
             "require-dev": {
                 "consolidation/robo": "^2.1",
-                "fisharebest/webtrees": "~2.0.6"
+                "fisharebest/webtrees": "~2.0.4"
             },
             "type": "webtrees-theme",
             "extra": {
                 "installer-name": "myartjaub_ruraltheme"
             },
-            "scripts": {
-                "webtrees-theme-rural:package": [
-                    "./vendor/bin/robo package"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0+"
             ],
@@ -1556,12 +1560,7 @@
                 "genealogy",
                 "webtrees"
             ],
-            "support": {
-                "issues": "http://bugs.jaubart.com"
-            },
-            "transport-options": {
-                "relative": true
-            }
+            "time": "2020-06-22T21:10:09+00:00"
         },
         {
             "name": "league/commonmark",
@@ -5292,39 +5291,6 @@
             "time": "2017-12-16T16:06:03+00:00"
         },
         {
-            "name": "jon48/webtrees-tools",
-            "version": "dev-master",
-            "dist": {
-                "type": "path",
-                "url": "../../../www-lib/jon48/webtrees-tools",
-                "reference": "27e9298bbf4e9b7d1d667ac0504854bf5aa45004"
-            },
-            "require": {
-                "fisharebest/localization": "*",
-                "fisharebest/webtrees": "*",
-                "gettext/gettext": "*",
-                "jon48/webtrees-lib": "*",
-                "php": ">=5.4.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "MyArtJaub\\Webtrees\\Tools\\": "src/app/Webtrees/Tools"
-                }
-            },
-            "license": [
-                "GPL-3.0+"
-            ],
-            "description": "Technical tools for webtrees",
-            "homepage": "https://github.com/jon48/webtrees-tools",
-            "support": {
-                "issues": "http://bugs.jaubart.com"
-            },
-            "transport-options": {
-                "relative": true
-            }
-        },
-        {
             "name": "justinrainbow/json-schema",
             "version": "5.2.10",
             "source": {
@@ -7986,8 +7952,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "jon48/webtrees-lib": 20,
-        "jon48/webtrees-theme-rural": 20,
-        "jon48/webtrees-tools": 20
+        "jon48/webtrees-theme-rural": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

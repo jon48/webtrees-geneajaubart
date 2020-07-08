@@ -1,4 +1,5 @@
 <?php
+
 /**
  * webtrees-lib: MyArtJaub library for webtrees
  *
@@ -8,56 +9,57 @@
  * @copyright Copyright (c) 2009-2020, Jonathan Jaubart
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3
  */
+
 declare(strict_types=1);
 
 return array (
 
-    'Administration Tasks'	         =>	'Tâches d\'administration',
+    'Administration Tasks'           => 'Tâches d\'administration',
     'Manage and run nearly-scheduled administration tasks.'
-                                    =>	'Gère et exécute des tâches d\'administration quasi-planifiées.',
+                                    =>  'Gère et exécute des tâches d\'administration quasi-planifiées.',
     'The administration tasks are meant to be run at a regular interval - or as regularly as possible.'
-                                    =>	'Les tâches d\'administration sont destinées à être exécutées à intervalles réguliers, ou aussi réguliers que possible.',
+                                    =>  'Les tâches d\'administration sont destinées à être exécutées à intervalles réguliers, ou aussi réguliers que possible.',
     'It is sometimes necessary to force the execution of a task.'
-                                    =>	'Il est parfois nécessaire de forcer l\'exécution d\'une tâche.',
+                                    =>  'Il est parfois nécessaire de forcer l\'exécution d\'une tâche.',
     'In order to do so, use the following URL, with the optional parameter <em>%s</em> if you only want to force the execution of one task: '
-                                    =>	'Pour cela, utilisez l\'adresse suivante, avec le paramètre optionnel <em>%s</em>, si vous souhaitez forcer l\'exécution d\'une seule tâche',
-    'task_name'						=>	'nom_de_la_tâche',
-    'Regenerate token'				=>	'Regénérer le jeton',
-    'Task name'						=>	'Nom de la tâche',
-    'Enable'						=>	'Activer',
-    'Disable'						=>	'Désactiver',
-    'Last success'					=>	'Dernier succès',
-    'Last result'					=>	'Dernier résultat',
-    'Frequency'			            =>	'Fréquence',
-    'Remaining occurrences'			=>	'Occurrences restantes',
-    'Is running?'					=>	'En cours ?',
-    'Run task'						=>	'Exécuter la tâche',
-    'Disabled'						=>	'Désactivé',
-    'Unlimited'						=>	'Permanent',
-    'Running'						=>	'En cours...',
-    'Not running'					=>	'Arrêté',
-    'Run'							=>	'Exécuter',
-    'Done'							=>	'Terminé',
-    'Error'							=>	'Erreur',
-    'Healthcheck Email'				=>	'État du système',
-    'Health Check Report'			=>	'État du système',
+                                    =>  'Pour cela, utilisez l\'adresse suivante, avec le paramètre optionnel <em>%s</em>, si vous souhaitez forcer l\'exécution d\'une seule tâche',
+    'task_name'                     =>  'nom_de_la_tâche',
+    'Regenerate token'              =>  'Regénérer le jeton',
+    'Task name'                     =>  'Nom de la tâche',
+    'Enable'                        =>  'Activer',
+    'Disable'                       =>  'Désactiver',
+    'Last success'                  =>  'Dernier succès',
+    'Last result'                   =>  'Dernier résultat',
+    'Frequency'                     =>  'Fréquence',
+    'Remaining occurrences'         =>  'Occurrences restantes',
+    'Is running?'                   =>  'En cours ?',
+    'Run task'                      =>  'Exécuter la tâche',
+    'Disabled'                      =>  'Désactivé',
+    'Unlimited'                     =>  'Permanent',
+    'Running'                       =>  'En cours...',
+    'Not running'                   =>  'Arrêté',
+    'Run'                           =>  'Exécuter',
+    'Done'                          =>  'Terminé',
+    'Error'                         =>  'Erreur',
+    'Healthcheck Email'             =>  'État du système',
+    'Health Check Report'           =>  'État du système',
     'Edit the administrative task'  =>  'Éditer la tâche d\'administration',
     'Enable healthcheck emails for'
-                                    =>	'Activer les rapports d\'état du système pour',
+                                    =>  'Activer les rapports d\'état du système pour',
     'Enable the health check emails for each of the selected trees.'
                                     =>  'Active les rapports d\'état du système pour les arbres sélectionnés.',
     'Health Check Report for the last %d days'
-                                    =>	'État du système - Rapport pour les %d derniers jours',
-    'Tree'							=>	'Arbre',
-    'Tree %s'						=>	'Arbre %s',
+                                    =>  'État du système - Rapport pour les %d derniers jours',
+    'Tree'                          =>  'Arbre',
+    'Tree %s'                       =>  'Arbre %s',
     'A new version of *webtrees* is available: %s. Upgrade as soon as possible.'
-                                    =>	'Une nouvelle version de *webtrees* est disponible : %s. Veuillez mettre à jour dès que possible.',
-    'Download it here: %s.'			=>	'Pour la télécharger : %s',
-    'Tree statistics'				=>	'Statistiques de l\'arbre',
+                                    =>  'Une nouvelle version de *webtrees* est disponible : %s. Veuillez mettre à jour dès que possible.',
+    'Download it here: %s.'         =>  'Pour la télécharger : %s',
+    'Tree statistics'               =>  'Statistiques de l\'arbre',
     'Errors'                        =>  'Erreurs',
-    'Errors [%d]'					=>	'Erreurs [%d]',
-    'Last occurrence'				=>	'Dernière occurrence',
-    'No errors'						=>	'Aucune erreur',
+    'Errors [%d]'                   =>  'Erreurs [%d]',
+    'Last occurrence'               =>  'Dernière occurrence',
+    'No errors'                     =>  'Aucune erreur',
     '%a d %h h %i m'                =>  '%a j %h h %i m',
     'minutes'                       =>  'minutes',
     'Number of occurrences'         =>  'Nombre d\'exécutions',
