@@ -177,6 +177,9 @@
 		"webtrees:lang" : "Compile the language files (messages.php)",
 		"webtrees:po" : "Update the language (webtrees.pot, *.po)"
 	},
+	"replace" : {
+		"fisharebest/webtrees": "*"
+	},
 	"extra" : {
 		"installer-types" : [
 			"webtrees-theme"
