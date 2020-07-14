@@ -1,0 +1,46 @@
+<?php 
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\View;
+use MyArtJaub\Webtrees\Module\WelcomeBlock\Http\RequestHandlers\MatomoStats;
+
+/**
+ * @var int     $block_id
+ * @var string  $fab_welcome_block_view
+ * @var string  $fab_login_block_view
+ * @var bool    $matomo_enabled
+ */
+
+?>
+
+<?= $fab_welcome_block_view ?>
+
+<?php if($matomo_enabled) : ?>
+<div class="d-flex flex-wrap justify-content-around">
+	<div id="maj-matomo-stats-<?= $block_id ?>">
+		<div class="maj-loading-initial">
+			<i class="fas fa-spinner fa-pulse fa-fw"></i>
+			&nbsp;<?= I18N::translate('Retrieving Matomo statistics...') ?>
+    	</div>
+        <div class="maj-loading-complete d-none center">
+        </div>
+	</div>
+</div>
+<?php endif; ?>
+
+<hr />
+
+<?= $fab_login_block_view ?>
+
+<?php View::push('javascript') ?>
+<script>
+$(document).ready( function() {
+    $.get("<?= route(MatomoStats::class, ['block_id' => $block_id]) ?>", function(data) {
+        $('#maj-matomo-stats-<?= $block_id ?> .maj-loading-initial').addClass('d-none');
+        $('#maj-matomo-stats-<?= $block_id ?> .maj-loading-complete')
+        	.removeClass('d-none')
+        	.html(data);
+    });
+});
+</script>
+<?php View::endpush() ?>

@@ -1,0 +1,98 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\View;
+
+/**
+ * @var bool    $matomo_enabled
+ * @var string  $matomo_url
+ * @var string  $matomo_token
+ * @var int     $matomo_siteid
+ */
+
+?>
+
+<!-- MATOMO_ENABLED -->
+<fieldset class="form-group">
+    <div class="row">
+        <legend class="col-form-label col-sm-3">
+            <?= I18N::translate('Enable Matomo Statistics') ?>
+        </legend>
+        <div class="col-sm-9">
+        	<?= view('components/radios-inline', ['name' => 'matomo_enabled', 'options' => [ 'yes' => I18N::translate('Yes'), 'no' => I18N::translate('No') ],  'selected' => $matomo_enabled ? 'yes' : 'no']) ?>
+        </div>
+    </div>
+</fieldset>
+
+<div id="matomo_config" class="d-none">
+
+	<!-- MATOMO_URL -->
+    <fieldset class="form-group">
+        <div class="row">
+            <legend class="col-form-label col-sm-3">
+                <?= I18N::translate('Matomo URL') ?>
+            </legend>
+            <div class="col-sm-9">
+            	<input
+                class="form-control"
+                name="matomo_url"
+                type="url"
+                value="<?= e($matomo_url) ?>"
+                >
+            </div>
+        </div>
+    </fieldset>
+    
+    <!-- MATOMO_TOKEN -->
+    <fieldset class="form-group">
+        <div class="row">
+            <legend class="col-form-label col-sm-3">
+                <?= I18N::translate('Matomo Token') ?>
+            </legend>
+            <div class="col-sm-9">
+            	<input
+                class="form-control"
+                name="matomo_token"
+                type="text"
+                value="<?= e($matomo_token) ?>"
+                >
+            </div>
+        </div>
+    </fieldset>
+    
+    <!-- MATOMO_SITE_ID -->
+    <fieldset class="form-group">
+        <div class="row">
+            <legend class="col-form-label col-sm-3">
+                <?= I18N::translate('Matomo Site ID') ?>
+            </legend>
+            <div class="col-sm-2">
+            	<input
+                class="form-control"
+                name="matomo_siteid"
+                min="1"
+                type="number"
+                value="<?= e($matomo_siteid) ?>"
+                >
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+<?php View::push('javascript') ?>
+<script>
+
+function toggleMatomoConfig() {
+    if($('input:radio[name="matomo_enabled"]:checked').val() == 'yes') {
+        $('#matomo_config').removeClass('d-none');
+    }
+    else {
+        $('#matomo_config').addClass('d-none');
+    }
+}
+
+$('[name="matomo_enabled"]').on('change', toggleMatomoConfig);
+toggleMatomoConfig();
+
+</script>
+<?php View::endpush() ?>
