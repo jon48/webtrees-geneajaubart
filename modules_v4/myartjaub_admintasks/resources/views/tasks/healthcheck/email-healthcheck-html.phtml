@@ -31,7 +31,7 @@ use Illuminate\Support\Collection;
         <?= e(I18N::translate('Tree %s', $tree->title())) ?>
     </h3>
     
-    <?php if($upgrade_available) : ?>
+    <?php if ($upgrade_available) : ?>
     <h4><?= e(I18N::translate('News')) ?></h4>
     <p>
         <?= e(I18N::translate('A new version of *webtrees* is available: %s. Upgrade as soon as possible.', $latest_version)) ?><br/>
@@ -99,7 +99,7 @@ use Illuminate\Support\Collection;
         </tbody>
     </table>
     
-    <?php if($nb_errors > 0) : ?>
+    <?php if ($nb_errors > 0) : ?>
     <h4><?= e(I18N::translate('Errors [%d]', $nb_errors)) ?></h4>
     <p>
         <a href="<?= route(SiteLogsData::class) ?>"><?= e(I18N::translate('Website logs')) ?></a>
@@ -115,7 +115,7 @@ use Illuminate\Support\Collection;
             </tr>
         </thead>
         <tbody>
-        <?php foreach($error_logs as $error_log) : ?>
+        <?php foreach ($error_logs as $error_log) : ?>
             <tr>
                 <td><?= e(I18N::number($error_log->nblogs)) ?></td>
                 <td><?= e($error_log->type === 'site' ? I18N::translate('Site') : I18N::translate('Tree')) ?></td>

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
@@ -7,65 +7,65 @@ use Fisharebest\Webtrees\Module\AbstractModule;
 use MyArtJaub\Webtrees\Module\PatronymicLineage\Http\RequestHandlers\LineagesPage;
 use MyArtJaub\Webtrees\Module\PatronymicLineage\Model\LineageNode;
 
-/** 
+/**
  * @var AbstractModule      $module
  * @var Tree                $tree
  * @var LineageNode         $node
  */
 
 $node_indi = $node->individual();
-$spouse_families = $node->families()->filter(function($item) {
+$spouse_families = $node->families()->filter(function ($item) {
     return $item->family->canShow();
 });
 $is_first_family = true;
 ?>
 
-<?php if($node_indi->canShow()) : ?>
+<?php if ($node_indi->canShow()) : ?>
 <ul>
-	<?php if(count($spouse_families) > 0) : ?>	
-		<?php foreach($spouse_families as $spouse_family_node) : ?>
-			<li>
-			<?php if($is_first_family) : ?>
-				<?= view($module->name() . '::lineage/individual', ['individual' => $node_indi, 'primary' => true]) ?>
-			<?php else: ?>
-				<?= view($module->name() . '::lineage/individual', ['individual' => $node_indi, 'primary' => false]) ?>
-			<?php endif; ?>
-			
-			<?php $spouse = $spouse_family_node->family->spouse($node_indi); ?>
-			<?php if($spouse instanceof Individual && $spouse->canShow()) : ?>
-				<?php $marriage_year = $spouse_family_node->family->getMarriageYear(); ?>
-				<a href="<?= e($spouse_family_node->family->url()) ?>" title="<?= $marriage_year ? strip_tags($spouse_family_node->family->getMarriageDate()->display()) : I18N::translate('Marriage'); ?>">
-    				<i class="icon-rings"></i>
-    				<small><?= $marriage_year ? e($marriage_year) : '' ?></small>
-				</a>
-				<?= view($module->name() . '::lineage/individual', ['individual' => $spouse, 'primary' => true]) ?>
-			<?php endif; ?>
-			
-			<?php foreach($spouse_family_node->children as $child_node) : ?>
-				<?php if($child_node !== null) : ?>
-					<?= view($module->name() . '::lineage/lineage-node', ['module' => $module, 'tree' => $tree, 'node' => $child_node ])?>
-				<?php else : ?>
-					<ul>
-						<li>
-							<strong>&hellip;</strong>
-						</li>
-					</ul
-				<?php endif; ?>
-			<?php endforeach; ?>
-			<?php $is_first_family = false; ?>
-			</li>
-		<?php endforeach; ?>
-	<?php else : ?>
-	<li>
-		<?= view($module->name() . '::lineage/individual', ['individual' => $node_indi, 'primary' => true]) ?>
-		<?php if($node->hasFollowUpSurname()) : ?>
-			&nbsp;
-			<a href="<?= route(LineagesPage::class, ['tree' => $tree, 'surname' => $node->followUpSurname()]) ?>">
-				(<?= I18N::translate('Go to %s lineages', $node->followUpSurname()) ?>)
-			</a>
-		<?php endif; ?>
+    <?php if (count($spouse_families) > 0) : ?> 
+        <?php foreach ($spouse_families as $spouse_family_node) : ?>
+            <li>
+            <?php if ($is_first_family) : ?>
+                <?= view($module->name() . '::lineage/individual', ['individual' => $node_indi, 'primary' => true]) ?>
+            <?php else : ?>
+                <?= view($module->name() . '::lineage/individual', ['individual' => $node_indi, 'primary' => false]) ?>
+            <?php endif; ?>
+            
+            <?php $spouse = $spouse_family_node->family->spouse($node_indi); ?>
+            <?php if ($spouse instanceof Individual && $spouse->canShow()) : ?>
+                <?php $marriage_year = $spouse_family_node->family->getMarriageYear(); ?>
+                <a href="<?= e($spouse_family_node->family->url()) ?>" title="<?= $marriage_year ? strip_tags($spouse_family_node->family->getMarriageDate()->display()) : I18N::translate('Marriage'); ?>">
+                    <i class="icon-rings"></i>
+                    <small><?= $marriage_year ? e($marriage_year) : '' ?></small>
+                </a>
+                <?= view($module->name() . '::lineage/individual', ['individual' => $spouse, 'primary' => true]) ?>
+            <?php endif; ?>
+            
+            <?php foreach ($spouse_family_node->children as $child_node) : ?>
+                <?php if ($child_node !== null) : ?>
+                    <?= view($module->name() . '::lineage/lineage-node', ['module' => $module, 'tree' => $tree, 'node' => $child_node ])?>
+                <?php else : ?>
+                    <ul>
+                        <li>
+                            <strong>&hellip;</strong>
+                        </li>
+                    </ul
+                <?php endif; ?>
+            <?php endforeach; ?>
+            <?php $is_first_family = false; ?>
+            </li>
+        <?php endforeach; ?>
+    <?php else : ?>
+    <li>
+        <?= view($module->name() . '::lineage/individual', ['individual' => $node_indi, 'primary' => true]) ?>
+        <?php if ($node->hasFollowUpSurname()) : ?>
+            &nbsp;
+            <a href="<?= route(LineagesPage::class, ['tree' => $tree, 'surname' => $node->followUpSurname()]) ?>">
+                (<?= I18N::translate('Go to %s lineages', $node->followUpSurname()) ?>)
+            </a>
+        <?php endif; ?>
     </li>
-	<?php endif; ?>
+    <?php endif; ?>
 </ul>
 <?php endif; ?>
 

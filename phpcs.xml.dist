@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="MyArtJaub-webtrees-geneajaubart" namespace="MyArtJaub\Webtrees\CS\Standard">
+    <description>MyArtJaub coding standard for webtrees-geneajaubart</description>
+
+    <file>modules_v4/myartjaub_admintasks</file>
+	<file>modules_v4/myartjaub_patronymiclineage</file>
+	<file>modules_v4/myartjaub_welcome_block</file>
+
+    <arg name="extensions" value="php,phtml"/>
+    <arg name="colors"/>
+
+    <rule ref="PSR12" />
+	
+	<rule ref="Generic.Files.LineLength.TooLong">
+        <exclude-pattern>**/resources/lang/**/messages.php</exclude-pattern>
+		<exclude-pattern>*.phtml</exclude-pattern>
+    </rule>
+	
+	<rule ref="Internal.NoCodeFound">
+        <exclude-pattern>*.phtml</exclude-pattern>
+    </rule>
+	
+	<rule ref="PSR2.Files.ClosingTag.NotAllowed">
+        <exclude-pattern>*.phtml</exclude-pattern>
+	</rule>
+	
+	<rule ref="Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace">
+        <exclude-pattern>*.phtml</exclude-pattern>
+	</rule>
+	
+	<rule ref="Squiz.WhiteSpace.ScopeClosingBrace.ContentBefore">
+        <exclude-pattern>*.phtml</exclude-pattern>
+	</rule>
+</ruleset>

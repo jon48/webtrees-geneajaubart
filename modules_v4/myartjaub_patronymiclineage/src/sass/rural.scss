@@ -23,16 +23,13 @@
 
 @import 'base';
 
-.menu-maj-patrolineage::before {content: url(rural/menu-list-lineages.png);}
+.menu-maj-patrolineage::before {content: url('rural/menu-list-lineages.png');}
 
 .maj-patrolineage-lineages {
-    
     .maj-patrolineage-lineage {
-        
-        .maj-patrolineage-places {            
-            border-color: #d3c6b8 ;
-            
+        .maj-patrolineage-places {
             background-color: #f4f0ed;
+            border-color: #d3c6b8;
         }
     }
 }

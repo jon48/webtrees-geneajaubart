@@ -1,11 +1,11 @@
-name: Code style
+name: Code style PHP
 
 on: [push, pull_request]
 
 jobs:
   run:
     runs-on: ubuntu-latest
-    name: PHP/PHTML/CSS
+    name: PHP/PHTML
 
     steps:
       - uses: actions/checkout@v1
@@ -15,7 +15,5 @@ jobs:
       - run: composer global require squizlabs/php_codesniffer=* --quiet
 
       - name: PHP
-        run: ~/.composer/vendor/bin/phpcs --colors --standard=PSR12 --exclude=Generic.Files.LineLength --extensions=php index.php app modules_v4 tests
+        run: ~/.composer/vendor/bin/phpcs -s
 
-      - name: Style sheets
-        run: ~/.composer/vendor/bin/phpcs --colors --extensions=css resources/css

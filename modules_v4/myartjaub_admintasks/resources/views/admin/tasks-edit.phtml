@@ -73,7 +73,7 @@ use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
             <div class="input-group" >
                 <input class="form-control" type="number" min="0" id="nb_occur" name="nb_occur" maxlength="70" value="<?= e($task_schedule->remainingOccurences()) ?>" dir="auto">
                 <span class="input-group-append">
-                	<span class="input-group-text" dir="auto">
+                    <span class="input-group-text" dir="auto">
                         <?= e(I18N::translate('time(s)')) ?>
                     </span>
                 </span>
@@ -87,7 +87,7 @@ use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
     <?php if ($has_task_config) : ?>
     <h3><?= e(I18N::translate('Options for “%s”', $task->name())) ?></h3>
     
-    <?= $task_config_view ?>
+        <?= $task_config_view ?>
     <?php endif; ?>
 
     <div class="row form-group">

@@ -1,10 +1,10 @@
-<?php 
+<?php
 
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Module\AbstractModule;
 use MyArtJaub\Webtrees\Module\PatronymicLineage\Model\LineageRootNode;
 
-/** 
+/**
  * @var AbstractModule      $module
  * @var Tree                $tree
  * @var LineageRootNode     $root_node
@@ -12,20 +12,20 @@ use MyArtJaub\Webtrees\Module\PatronymicLineage\Model\LineageRootNode;
 ?>
 
 <div class="maj-patrolineage-lineage">
-<?php if($root_node->individual() === null) : ?>
-    <?php foreach($root_node->families() as $family_node) :?>
-    	<?php foreach($family_node->children as $child_node) : ?>
-			<?= view($module->name() . '::lineage/lineage-node', ['module' => $module, 'tree' => $tree, 'node' => $child_node ]); ?>
-    	<?php endforeach; ?>
+<?php if ($root_node->individual() === null) : ?>
+    <?php foreach ($root_node->families() as $family_node) :?>
+        <?php foreach ($family_node->children as $child_node) : ?>
+            <?= view($module->name() . '::lineage/lineage-node', ['module' => $module, 'tree' => $tree, 'node' => $child_node ]); ?>
+        <?php endforeach; ?>
     <?php endforeach; ?>
 <?php else : ?>
-	<?= view($module->name() . '::lineage/lineage-node', ['module' => $module, 'tree' => $tree, 'node' => $root_node ]); ?>
+    <?= view($module->name() . '::lineage/lineage-node', ['module' => $module, 'tree' => $tree, 'node' => $root_node ]); ?>
 <?php endif; ?>
 
 
-<?php if(($places = $root_node->places()) && count($places) > 0) : ?>
+<?php if (($places = $root_node->places()) && count($places) > 0) : ?>
 <div class="maj-patrolineage-places">
-	<?= view($module->name() . '::lineage/places-cloud', ['module' => $module, 'tree' => $tree, 'places' => $places ]); ?>
+    <?= view($module->name() . '::lineage/places-cloud', ['module' => $module, 'tree' => $tree, 'places' => $places ]); ?>
 </div>
 <?php endif; ?>
 

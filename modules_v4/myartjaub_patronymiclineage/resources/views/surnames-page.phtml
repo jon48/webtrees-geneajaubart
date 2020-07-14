@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Functions\FunctionsPrintLists;
@@ -12,7 +12,7 @@ use Fisharebest\Webtrees\Module\AbstractModule;
  * @var string          $initial
  * @var string          $show_all
  * @var int[][]         $surnames
- * 
+ *
  */
 
 ?>
@@ -23,30 +23,29 @@ use Fisharebest\Webtrees\Module\AbstractModule;
 <div class="wt-page-content wt-page-content-maj-patrolineage-surnames">
 
     <div class="d-flex flex-column wt-page-options wt-page-options-maj-patrolineage-surnames d-print-none">
-    	<?= view($module->name() . '::components/initials-list', [ 'tree' => $tree, 'initials_list' => $initials_list, 'initial' => $initial, 'show_all' => $show_all ]) ?>
+        <?= view($module->name() . '::components/initials-list', [ 'tree' => $tree, 'initials_list' => $initials_list, 'initial' => $initial, 'show_all' => $show_all ]) ?>
     </div>
 
-    <?php if(count($surnames) > 0) : ?>
-    
-    	<?php 
-    	switch ($tree->getPreference('SURNAME_LIST_STYLE')) {
-    	    case 'style1':
-    	        echo FunctionsPrintLists::surnameList($surnames, 3, true, $module, $tree);
-    	        break;
-    	    case 'style3':
-    	        echo FunctionsPrintLists::surnameTagCloud($surnames, $module, true, $tree);
-    	        break;
-    	    case 'style2':
-    	    default:
-    	        echo view('lists/surnames-table', [
-    	        'surnames' => $surnames,
-    	        'families' => null,
-    	        'module'   => $module,
-    	        'tree'     => $tree,
-    	        ]);
-    	        break;
-    	}
-    	?>
+    <?php if (count($surnames) > 0) : ?>
+        <?php
+        switch ($tree->getPreference('SURNAME_LIST_STYLE')) {
+            case 'style1':
+                echo FunctionsPrintLists::surnameList($surnames, 3, true, $module, $tree);
+                break;
+            case 'style3':
+                echo FunctionsPrintLists::surnameTagCloud($surnames, $module, true, $tree);
+                break;
+            case 'style2':
+            default:
+                echo view('lists/surnames-table', [
+                'surnames' => $surnames,
+                'families' => null,
+                'module'   => $module,
+                'tree'     => $tree,
+                ]);
+                break;
+        }
+        ?>
     <?php endif; ?>
     
 </div>

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\View;
@@ -15,16 +15,16 @@ use MyArtJaub\Webtrees\Module\WelcomeBlock\Http\RequestHandlers\MatomoStats;
 
 <?= $fab_welcome_block_view ?>
 
-<?php if($matomo_enabled) : ?>
+<?php if ($matomo_enabled) : ?>
 <div class="d-flex flex-wrap justify-content-around">
-	<div id="maj-matomo-stats-<?= $block_id ?>">
-		<div class="maj-loading-initial">
-			<i class="fas fa-spinner fa-pulse fa-fw"></i>
-			&nbsp;<?= I18N::translate('Retrieving Matomo statistics...') ?>
-    	</div>
+    <div id="maj-matomo-stats-<?= $block_id ?>">
+        <div class="maj-loading-initial">
+            <i class="fas fa-spinner fa-pulse fa-fw"></i>
+            &nbsp;<?= I18N::translate('Retrieving Matomo statistics...') ?>
+        </div>
         <div class="maj-loading-complete d-none center">
         </div>
-	</div>
+    </div>
 </div>
 <?php endif; ?>
 
@@ -38,8 +38,8 @@ $(document).ready( function() {
     $.get("<?= route(MatomoStats::class, ['block_id' => $block_id]) ?>", function(data) {
         $('#maj-matomo-stats-<?= $block_id ?> .maj-loading-initial').addClass('d-none');
         $('#maj-matomo-stats-<?= $block_id ?> .maj-loading-complete')
-        	.removeClass('d-none')
-        	.html(data);
+            .removeClass('d-none')
+            .html(data);
     });
 });
 </script>

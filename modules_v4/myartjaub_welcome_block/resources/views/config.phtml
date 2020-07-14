@@ -19,21 +19,21 @@ use Fisharebest\Webtrees\View;
             <?= I18N::translate('Enable Matomo Statistics') ?>
         </legend>
         <div class="col-sm-9">
-        	<?= view('components/radios-inline', ['name' => 'matomo_enabled', 'options' => [ 'yes' => I18N::translate('Yes'), 'no' => I18N::translate('No') ],  'selected' => $matomo_enabled ? 'yes' : 'no']) ?>
+            <?= view('components/radios-inline', ['name' => 'matomo_enabled', 'options' => [ 'yes' => I18N::translate('Yes'), 'no' => I18N::translate('No') ],  'selected' => $matomo_enabled ? 'yes' : 'no']) ?>
         </div>
     </div>
 </fieldset>
 
 <div id="matomo_config" class="d-none">
 
-	<!-- MATOMO_URL -->
+    <!-- MATOMO_URL -->
     <fieldset class="form-group">
         <div class="row">
             <legend class="col-form-label col-sm-3">
                 <?= I18N::translate('Matomo URL') ?>
             </legend>
             <div class="col-sm-9">
-            	<input
+                <input
                 class="form-control"
                 name="matomo_url"
                 type="url"
@@ -50,7 +50,7 @@ use Fisharebest\Webtrees\View;
                 <?= I18N::translate('Matomo Token') ?>
             </legend>
             <div class="col-sm-9">
-            	<input
+                <input
                 class="form-control"
                 name="matomo_token"
                 type="text"
@@ -67,7 +67,7 @@ use Fisharebest\Webtrees\View;
                 <?= I18N::translate('Matomo Site ID') ?>
             </legend>
             <div class="col-sm-2">
-            	<input
+                <input
                 class="form-control"
                 name="matomo_siteid"
                 min="1"

@@ -1,5 +1,4 @@
-<?php 
-
+<?php
 
 use Fisharebest\Webtrees\Carbon;
 use Fisharebest\Webtrees\I18N;
@@ -11,12 +10,13 @@ use Fisharebest\Webtrees\I18N;
 
 ?>
 
-<?php if($visits_year !== null) : ?>
-	<?= I18N::translate('%1$s visits since the beginning of %2$s<br>(%3$s today)' ,
-	    '<span class="odometer">' . I18N::number($visits_year) . '</span>',
+<?php if ($visits_year !== null) : ?>
+    <?= I18N::translate(
+        '%1$s visits since the beginning of %2$s<br>(%3$s today)',
+        '<span class="odometer">' . I18N::number($visits_year) . '</span>',
         Carbon::now()->year,
-	    '<span class="odometer">' . I18N::number($visits_today ?? 0) . '</span>'
-        ); ?>
+        '<span class="odometer">' . I18N::number($visits_today ?? 0) . '</span>'
+    ); ?>
 <?php else : ?>
-	<?= I18N::translate('No statistics could be retrieved from Matomo.') ?>
+    <?= I18N::translate('No statistics could be retrieved from Matomo.') ?>
 <?php endif;?>

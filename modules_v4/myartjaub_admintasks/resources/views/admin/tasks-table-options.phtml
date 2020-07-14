@@ -16,7 +16,7 @@ use Fisharebest\Webtrees\I18N;
         <?= view('icons/menu') ?>
     </button>
     <div class="dropdown-menu" aria-labelledby="edit-task-button-<?= $task_sched_id ?>">
-        <?php if($task_sched_enabled) : ?>
+        <?php if ($task_sched_enabled) : ?>
         <div class="dropdown-item">
             <?= view('icons/cancel') ?>
             <a href="<?= e($task_status_route) ?>">

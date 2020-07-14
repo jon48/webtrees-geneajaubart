@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
@@ -26,39 +26,41 @@ use Illuminate\Support\Collection;
 <div class="wt-page-content wt-page-content-maj-patrolineage-lineages">
 
     <div class="d-flex flex-column wt-page-options wt-page-options-maj-patrolineage-lineages d-print-none">
-    	<?= view($module->name() . '::components/initials-list', [ 'tree' => $tree, 'initials_list' => $initials_list, 'initial' => $initial, 'show_all' => $show_all ]) ?>
+        <?= view($module->name() . '::components/initials-list', [ 'tree' => $tree, 'initials_list' => $initials_list, 'initial' => $initial, 'show_all' => $show_all ]) ?>
     </div>
     
-	<?php if($nb_lineages == 0) : ?>
-	<p class="center">
-		<span class="d-flex justify-content-center alert alert-warning">
-		<?= e(I18N::translate('No individuals with surname %s has been found. Please try another name.', 
-		    '<span dir="auto">' . $surname . '</span>')) ?>
-		</span>
-	</p>
-	<?php else : ?>
-	<p>
-		<strong class="d-flex justify-content-center">
-			<a href="<?= app(IndividualListModule::class)->listUrl($tree, ['surname' => $surname]) ?>">
+    <?php if ($nb_lineages == 0) : ?>
+    <p class="center">
+        <span class="d-flex justify-content-center alert alert-warning">
+        <?= e(I18N::translate(
+            'No individuals with surname %s has been found. Please try another name.',
+            '<span dir="auto">' . $surname . '</span>'
+        )) ?>
+        </span>
+    </p>
+    <?php else : ?>
+    <p>
+        <strong class="d-flex justify-content-center">
+            <a href="<?= app(IndividualListModule::class)->listUrl($tree, ['surname' => $surname]) ?>">
                 <?= e(I18N::translate('Go to the list of individuals with surname %s', $surname)) ?>
             </a>
         </strong>
     </p>
-	
-	<div class="maj-patrolineage-lineages">
-		<div class="list_label">
-			<?= e(I18N::translate('Individuals in %s lineages', $surname)) ?>
-		</div>
-		<div class="list_value_wrap">
-		<?php foreach($lineages as $i => $lineage_root_node) : ?>
-			<?= view($module->name() . '::lineage/root-node', ['module' => $module, 'tree' => $tree, 'root_node' => $lineage_root_node ]); ?>
-			<?php if($i < $nb_lineages - 1) : ?><hr /><?php endif; ?>
-		<?php endforeach; ?>
-		</div>
-		<div class="list_label">
-			<?= e(I18N::plural('%s lineage found', '%s lineages found', $nb_lineages, I18N::number($nb_lineages))) ?>
-		</div>
-	</div>
-	<?php endif; ?>
+    
+    <div class="maj-patrolineage-lineages">
+        <div class="list_label">
+            <?= e(I18N::translate('Individuals in %s lineages', $surname)) ?>
+        </div>
+        <div class="list_value_wrap">
+        <?php foreach ($lineages as $i => $lineage_root_node) : ?>
+            <?= view($module->name() . '::lineage/root-node', ['module' => $module, 'tree' => $tree, 'root_node' => $lineage_root_node ]); ?>
+            <?php if ($i < $nb_lineages - 1) : ?><hr /><?php endif; ?>
+        <?php endforeach; ?>
+        </div>
+        <div class="list_label">
+            <?= e(I18N::plural('%s lineage found', '%s lineages found', $nb_lineages, I18N::number($nb_lineages))) ?>
+        </div>
+    </div>
+    <?php endif; ?>
     
 </div>
