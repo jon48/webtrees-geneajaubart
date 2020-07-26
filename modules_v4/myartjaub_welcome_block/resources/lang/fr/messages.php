@@ -27,7 +27,6 @@ return array (
                                     =>  'Les statistiques Matomo ne peuvent être récupérées.',
     '%1$s visits since the beginning of %2$s<br>(%3$s today)'
                                     =>  '%1$s visiteurs depuis le début de l\'année %2$s<br>dont %3$s aujourd\'hui',
-    'Continue'                      =>  'Continuer',
     'The Matomo URL provided is not valid.'
                                     =>  'L\'adresse URL Matomo renseignée n\'est pas valide.',
     'The Matomo Site ID provided is not valid.'

@@ -30,17 +30,14 @@ use Illuminate\Support\Collection;
     </div>
     
     <?php if ($nb_lineages == 0) : ?>
-    <p class="center">
+    <p class="text-center">
         <span class="d-flex justify-content-center alert alert-warning">
-        <?= e(I18N::translate(
-            'No individuals with surname %s has been found. Please try another name.',
-            '<span dir="auto">' . $surname . '</span>'
-        )) ?>
+        <?= e(I18N::translate('No individuals with surname %s has been found. Please try another name.', $surname)) ?>
         </span>
     </p>
     <?php else : ?>
-    <p>
-        <strong class="d-flex justify-content-center">
+    <p class="text-center">
+        <strong>
             <a href="<?= app(IndividualListModule::class)->listUrl($tree, ['surname' => $surname]) ?>">
                 <?= e(I18N::translate('Go to the list of individuals with surname %s', $surname)) ?>
             </a>

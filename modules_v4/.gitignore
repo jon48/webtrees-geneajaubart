@@ -11,6 +11,7 @@
 
 # Ignore modules already in their own repositories
 /myartjaub_ruraltheme
+/myartjaub_translationtool
 
 # And of course itself
 !.gitignore

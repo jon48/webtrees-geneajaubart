@@ -41,6 +41,7 @@ return array (
     'Run'                           =>  'Exécuter',
     'Done'                          =>  'Terminé',
     'Error'                         =>  'Erreur',
+    'Task not found'                =>  'Tâche non trouvée',
     'Healthcheck Email'             =>  'État du système',
     'Health Check Report'           =>  'État du système',
     'Edit the administrative task'  =>  'Éditer la tâche d\'administration',
@@ -56,11 +57,12 @@ return array (
                                     =>  'Une nouvelle version de *webtrees* est disponible : %s. Veuillez mettre à jour dès que possible.',
     'Download it here: %s.'         =>  'Pour la télécharger : %s',
     'Tree statistics'               =>  'Statistiques de l\'arbre',
+    'Total number of users'         =>  'Nombre total d\'utilisateurs',
+    'Count'                         =>  'Nombre',
     'Errors'                        =>  'Erreurs',
     'Errors [%d]'                   =>  'Erreurs [%d]',
     'Last occurrence'               =>  'Dernière occurrence',
     'No errors'                     =>  'Aucune erreur',
-    '%a d %h h %i m'                =>  '%a j %h h %i m',
     'minutes'                       =>  'minutes',
     'Number of occurrences'         =>  'Nombre d\'exécutions',
     'Options for “%s”'              =>  'Options pour “%s”',
@@ -78,13 +80,19 @@ return array (
                                     =>  'Détermine le nombre de fois la tâche doit s\'exécuter.',
     'The scheduled task has been successfully updated'
                                     =>  'La tâche planifiée a été mise à jour avec succès',
-    'The task shedule with ID “%s” does not exist.'
-                                    =>  'La tâche planifiée avec ID “%s” n\'existe pas',
-    'An error occured while editing this task:'
-                                    =>  'Une erreur s\'est produite lors de l\'édition de la tâche',
+    'The attached module could not be found.'
+                                    =>  'Le module associé n\'a pas été trouvé',
+    'The task shedule with ID “%d” does not exist.'
+                                    =>  'La tâche planifiée avec ID “%d” n\'existe pas',
+    'The Task schedule could not be found.'
+                                    =>  'La tâche planifiée n\a pu être trouvée',
     'An error occured while updating the scheduled task'
                                     =>  'Une erreur s\'est produite lors de la mise à jour de la tâche planifiée',
     'An error occured while updating the specific settings of administrative task “%s”'
                                     =>  'Une erreur s\'est produite lors de la mise à jour des paramètres de la tâche “%s”',
+    'The frequency is not in a valid format'
+                                    =>  'Le paramètre de fréquence n\'a pas un format valide',
+    'The number of remaining occurences is not in a valid format'
+                                    =>  'Le paramètre pour le nombre d\'occurrences restantes n\'a pas un format valide',
     
 );
