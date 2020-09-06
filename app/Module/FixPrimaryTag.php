@@ -28,7 +28,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 
 use function e;
-use function strpos;
+use function str_contains;
 use function strtoupper;
 
 /**
@@ -86,7 +86,7 @@ class FixPrimaryTag extends AbstractModule implements ModuleDataFixInterface
      */
     public function doesRecordNeedUpdate(GedcomRecord $record, array $params): bool
     {
-        return strpos($record->gedcom(), "\n1 _PRIM ") !== false;
+        return str_contains($record->gedcom(), "\n1 _PRIM ");
     }
 
     /**
@@ -145,9 +145,7 @@ class FixPrimaryTag extends AbstractModule implements ModuleDataFixInterface
      */
     private function updateMediaLinks(Individual $individual, string $xref, bool $primary): void
     {
-        $facts = $individual->facts()->filter(static function (Fact $fact): bool {
-            return !$fact->isPendingDeletion();
-        });
+        $facts = $individual->facts([], false, null, true);
 
         $facts1 = new Collection();
         $facts2 = new Collection();

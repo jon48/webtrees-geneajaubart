@@ -37,11 +37,13 @@ use function app;
 use function array_keys;
 use function assert;
 use function implode;
+use function intdiv;
 use function is_string;
 use function max;
 use function min;
 use function redirect;
 use function route;
+use function str_contains;
 
 /**
  * Class FanChartModule
@@ -316,7 +318,10 @@ class FanChartModule extends AbstractModule implements ModuleChartInterface, Req
             // clean current generation area
             $deg2 = 360 + ($fandeg - 180) / 2;
             $deg1 = $deg2 - $fandeg;
-            imagefilledarc($image, (int) $cx, (int) $cy, (int) $rx, (int) $rx, (int) $deg1, (int) $deg2, $backgrounds['U'], IMG_ARC_PIE);
+
+            // The arc size must be an even number of pixels: https://bugs.php.net/bug.php?id=79763
+            $even_rx = 2 * intdiv(1 + (int) $rx, 2);
+            imagefilledarc($image, (int) $cx, (int) $cy, $even_rx, $even_rx, (int) $deg1, (int) $deg2, $backgrounds['U'], IMG_ARC_PIE);
             $rx -= 3;
 
             // calculate new angle
@@ -346,7 +351,9 @@ class FanChartModule extends AbstractModule implements ModuleChartInterface, Req
 
                     $background = $backgrounds[$person->sex()];
 
-                    imagefilledarc($image, (int) $cx, (int) $cy, (int) $rx, (int) $rx, (int) $deg1, (int) $deg2, $background, IMG_ARC_PIE);
+                    // The arc size must be an even number of pixels: https://bugs.php.net/bug.php?id=79763
+                    $even_rx = 2 * intdiv(1 + (int) $rx, 2);
+                    imagefilledarc($image, (int) $cx, (int) $cy, $even_rx, $even_rx, (int) $deg1, (int) $deg2, $background, IMG_ARC_PIE);
 
                     // split and center text by lines
                     $wmax = (int) ($angle * 7 / 7 * $scale);
@@ -507,7 +514,7 @@ class FanChartModule extends AbstractModule implements ModuleChartInterface, Req
         // do not split hebrew line
         $found = false;
         foreach ($RTLOrd as $ord) {
-            if (strpos($data, chr($ord)) !== false) {
+            if (str_contains($data, chr($ord))) {
                 $found = true;
             }
         }

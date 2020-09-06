@@ -30,6 +30,8 @@ use Fisharebest\Webtrees\Services\ClipboardService;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Illuminate\Support\Collection;
 
+use function str_contains;
+
 /**
  * Class IndividualFactsTabModule
  */
@@ -128,7 +130,6 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
 
         $exclude_facts = $sidebar_facts->merge($tab_facts)->flatten();
 
-
         // The individual’s own facts
         $indifacts = $individual->facts()
             ->filter(static function (Fact $fact) use ($exclude_facts): bool {
@@ -167,7 +168,7 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
 
         return view('modules/personal_facts/tab', [
             'can_edit'             => $individual->canEdit(),
-            'clipboard_facts'      => $this->clipboard_service->pastableFacts($individual, $exclude_facts),
+            'clipboard_facts'      => $this->clipboard_service->pastableFacts($individual, new Collection()),
             'has_historical_facts' => $historical_facts !== [],
             'individual'           => $individual,
             'facts'                => $indifacts,
@@ -263,7 +264,7 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
 
         $facts = [];
 
-        if (strpos($SHOW_RELATIVES_EVENTS, '_DEAT_SPOU') !== false) {
+        if (str_contains($SHOW_RELATIVES_EVENTS, '_DEAT_SPOU')) {
             foreach ($spouse->facts(['DEAT', 'BURI', 'CREM']) as $fact) {
                 if ($this->includeFact($fact, $min_date, $max_date)) {
                     $facts[] = $this->convertEvent($fact, $death_of_a_spouse[$fact->getTag()][$fact->record()->sex()]);
@@ -609,7 +610,7 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
                 continue;
             }
             // add child’s birth
-            if (strpos($SHOW_RELATIVES_EVENTS, '_BIRT' . str_replace('_HSIB', '_SIBL', $option)) !== false) {
+            if (str_contains($SHOW_RELATIVES_EVENTS, '_BIRT' . str_replace('_HSIB', '_SIBL', $option))) {
                 foreach ($child->facts(['BIRT', 'CHR', 'BAPM', 'ADOP']) as $fact) {
                     // Always show _BIRT_CHIL, even if the dates are not known
                     if ($option === '_CHIL' || $this->includeFact($fact, $min_date, $max_date)) {
@@ -641,7 +642,7 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
                 }
             }
             // add child’s death
-            if (strpos($SHOW_RELATIVES_EVENTS, '_DEAT' . str_replace('_HSIB', '_SIBL', $option)) !== false) {
+            if (str_contains($SHOW_RELATIVES_EVENTS, '_DEAT' . str_replace('_HSIB', '_SIBL', $option))) {
                 foreach ($child->facts(['DEAT', 'BURI', 'CREM']) as $fact) {
                     if ($this->includeFact($fact, $min_date, $max_date)) {
                         switch ($option) {
@@ -673,7 +674,7 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
             }
 
             // add child’s marriage
-            if (strpos($SHOW_RELATIVES_EVENTS, '_MARR' . str_replace('_HSIB', '_SIBL', $option)) !== false) {
+            if (str_contains($SHOW_RELATIVES_EVENTS, '_MARR' . str_replace('_HSIB', '_SIBL', $option))) {
                 foreach ($child->spouseFamilies() as $sfamily) {
                     foreach ($sfamily->facts(['MARR']) as $fact) {
                         if ($this->includeFact($fact, $min_date, $max_date)) {
@@ -826,7 +827,7 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
                 }
             }
 
-            if (strpos($SHOW_RELATIVES_EVENTS, '_MARR_PARE') !== false) {
+            if (str_contains($SHOW_RELATIVES_EVENTS, '_MARR_PARE')) {
                 // add father/mother marriages
                 foreach ($person->childFamilies() as $sfamily) {
                     foreach ($sfamily->facts(['MARR']) as $fact) {
@@ -849,7 +850,7 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
 
         foreach ($person->childFamilies() as $family) {
             foreach ($family->spouses() as $parent) {
-                if (strpos($SHOW_RELATIVES_EVENTS, '_DEAT' . ($sosa === 1 ? '_PARE' : '_GPAR')) !== false) {
+                if (str_contains($SHOW_RELATIVES_EVENTS, '_DEAT' . ($sosa === 1 ? '_PARE' : '_GPAR'))) {
                     foreach ($parent->facts(['DEAT', 'BURI', 'CREM']) as $fact) {
                         if ($this->includeFact($fact, $min_date, $max_date)) {
                             switch ($sosa) {

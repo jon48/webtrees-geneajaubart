@@ -21,6 +21,8 @@ namespace Fisharebest\Webtrees;
 
 use Ramsey\Uuid\Uuid;
 
+use function str_contains;
+
 /**
  * Static GEDCOM data for tags
  */
@@ -792,7 +794,7 @@ class GedcomTag
                 return I18N::translate('Longitude');
             case 'MAP':
                 /* I18N: gedcom tag MAP */
-                return I18N::translate('Location');
+                return I18N::translate('Coordinates');
             case 'MARB':
                 /* I18N: gedcom tag MARB */
                 return I18N::translate('Marriage banns');
@@ -1285,7 +1287,7 @@ class GedcomTag
                 return I18N::translate('Image dimensions');
             default:
                 // If no specialisation exists (e.g. DEAT:CAUS), then look for the general (CAUS)
-                if (strpos($tag, ':') !== false) {
+                if (str_contains($tag, ':')) {
                     [, $tag] = explode(':', $tag, 2);
 
                     return self::getLabel($tag);

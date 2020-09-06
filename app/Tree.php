@@ -22,13 +22,9 @@ namespace Fisharebest\Webtrees;
 use Closure;
 use Fisharebest\Flysystem\Adapter\ChrootAdapter;
 use Fisharebest\Webtrees\Contracts\UserInterface;
-use Fisharebest\Webtrees\Functions\FunctionsExport;
 use Fisharebest\Webtrees\Services\GedcomExportService;
 use Fisharebest\Webtrees\Services\PendingChangesService;
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Query\Expression;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
@@ -36,8 +32,13 @@ use Psr\Http\Message\StreamInterface;
 use stdClass;
 
 use function app;
+use function array_key_exists;
 use function date;
+use function str_starts_with;
+use function strlen;
 use function strtoupper;
+use function substr;
+use function substr_replace;
 
 /**
  * Provide an interface to the wt_gedcom table.
@@ -445,12 +446,12 @@ class Tree
      */
     public function createRecord(string $gedcom): GedcomRecord
     {
-        if (!Str::startsWith($gedcom, '0 @@ ')) {
+        if (!preg_match('/^0 @@ ([_A-Z]+)/', $gedcom, $match)) {
             throw new InvalidArgumentException('GedcomRecord::createRecord(' . $gedcom . ') does not begin 0 @@');
         }
 
-        $xref   = $this->getNewXref();
-        $gedcom = '0 @' . $xref . '@ ' . Str::after($gedcom, '0 @@ ');
+        $xref   = Factory::xref()->make($match[1]);
+        $gedcom = substr_replace($gedcom, $xref, 3, 0);
 
         // Create a change record
         $today = strtoupper(date('d M Y'));
@@ -482,40 +483,11 @@ class Tree
      * Generate a new XREF, unique across all family trees
      *
      * @return string
+     * @deprecated - use the factory directly.
      */
     public function getNewXref(): string
     {
-        // Lock the row, so that only one new XREF may be generated at a time.
-        DB::table('site_setting')
-            ->where('setting_name', '=', 'next_xref')
-            ->lockForUpdate()
-            ->get();
-
-        $prefix = 'X';
-
-        $increment = 1.0;
-        do {
-            $num = (int) Site::getPreference('next_xref') + (int) $increment;
-
-            // This exponential increment allows us to scan over large blocks of
-            // existing data in a reasonable time.
-            $increment *= 1.01;
-
-            $xref = $prefix . $num;
-
-            // Records may already exist with this sequence number.
-            $already_used =
-                DB::table('individuals')->where('i_id', '=', $xref)->exists() ||
-                DB::table('families')->where('f_id', '=', $xref)->exists() ||
-                DB::table('sources')->where('s_id', '=', $xref)->exists() ||
-                DB::table('media')->where('m_id', '=', $xref)->exists() ||
-                DB::table('other')->where('o_id', '=', $xref)->exists() ||
-                DB::table('change')->where('xref', '=', $xref)->exists();
-        } while ($already_used);
-
-        Site::setPreference('next_xref', (string) $num);
-
-        return $xref;
+        return Factory::xref()->make(GedcomRecord::RECORD_TYPE);
     }
 
     /**
@@ -528,12 +500,12 @@ class Tree
      */
     public function createFamily(string $gedcom): GedcomRecord
     {
-        if (!Str::startsWith($gedcom, '0 @@ FAM')) {
+        if (!str_starts_with($gedcom, '0 @@ FAM')) {
             throw new InvalidArgumentException('GedcomRecord::createFamily(' . $gedcom . ') does not begin 0 @@ FAM');
         }
 
-        $xref   = $this->getNewXref();
-        $gedcom = '0 @' . $xref . '@ FAM' . Str::after($gedcom, '0 @@ FAM');
+        $xref   = Factory::xref()->make(Family::RECORD_TYPE);
+        $gedcom = substr_replace($gedcom, $xref, 3, 0);
 
         // Create a change record
         $today = strtoupper(date('d M Y'));
@@ -571,12 +543,12 @@ class Tree
      */
     public function createIndividual(string $gedcom): GedcomRecord
     {
-        if (!Str::startsWith($gedcom, '0 @@ INDI')) {
+        if (!str_starts_with($gedcom, '0 @@ INDI')) {
             throw new InvalidArgumentException('GedcomRecord::createIndividual(' . $gedcom . ') does not begin 0 @@ INDI');
         }
 
-        $xref   = $this->getNewXref();
-        $gedcom = '0 @' . $xref . '@ INDI' . Str::after($gedcom, '0 @@ INDI');
+        $xref   = Factory::xref()->make(Individual::RECORD_TYPE);
+        $gedcom = substr_replace($gedcom, $xref, 3, 0);
 
         // Create a change record
         $today = strtoupper(date('d M Y'));
@@ -614,12 +586,12 @@ class Tree
      */
     public function createMediaObject(string $gedcom): Media
     {
-        if (!Str::startsWith($gedcom, '0 @@ OBJE')) {
+        if (!str_starts_with($gedcom, '0 @@ OBJE')) {
             throw new InvalidArgumentException('GedcomRecord::createIndividual(' . $gedcom . ') does not begin 0 @@ OBJE');
         }
 
-        $xref   = $this->getNewXref();
-        $gedcom = '0 @' . $xref . '@ OBJE' . Str::after($gedcom, '0 @@ OBJE');
+        $xref   = Factory::xref()->make(Media::RECORD_TYPE);
+        $gedcom = substr_replace($gedcom, $xref, 3, 0);
 
         // Create a change record
         $today = strtoupper(date('d M Y'));

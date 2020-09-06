@@ -36,6 +36,7 @@ use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\Http\RequestHandlers\EditFactPage;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Media;
 use Fisharebest\Webtrees\Module\ModuleChartInterface;
 use Fisharebest\Webtrees\Module\ModuleInterface;
 use Fisharebest\Webtrees\Module\RelationshipsChartModule;
@@ -62,6 +63,7 @@ use function preg_replace;
 use function preg_split;
 use function rawurlencode;
 use function route;
+use function str_contains;
 use function str_replace;
 use function strip_tags;
 use function strlen;
@@ -186,7 +188,7 @@ class FunctionsPrintFacts
 
         if ($id !== 'histo' && $id !== 'asso' && $fact->canEdit()) {
             echo '<div class="editfacts nowrap">';
-            echo view('edit/icon-fact-edit', ['fact' => $fact]);
+            echo view('edit/icon-fact-edit', ['fact' => $fact, 'url' => $record->url()]);
             echo view('edit/icon-fact-copy', ['fact' => $fact]);
             echo view('edit/icon-fact-delete', ['fact' => $fact]);
             echo '</div>';
@@ -340,7 +342,7 @@ class FunctionsPrintFacts
 
         $addr = $fact->attribute('ADDR');
         if ($addr !== '') {
-            echo GedcomTag::getLabelValue('ADDR', $addr);
+            echo GedcomTag::getLabelValue($record->tag() . ':' . $fact->getTag() . ':ADDR', $addr);
         }
 
         // Print the associates of this fact/event
@@ -580,7 +582,7 @@ class FunctionsPrintFacts
         // will display nicely when markdown is used.
         $ct = preg_match_all('/' . $level . ' SOUR (.*)((?:\n\d CONT.*)*)/', $factrec, $match, PREG_SET_ORDER);
         for ($j = 0; $j < $ct; $j++) {
-            if (strpos($match[$j][1], '@') === false) {
+            if (!str_contains($match[$j][1], '@')) {
                 $source = e($match[$j][1] . preg_replace('/\n\d CONT ?/', "\n", $match[$j][2]));
                 $data   .= '<div class="fact_SOUR"><span class="label">' . I18N::translate('Source') . ':</span> <span class="field" dir="auto">' . Filter::formatText($source, $tree) . '</span></div>';
             }
@@ -598,26 +600,21 @@ class FunctionsPrintFacts
                     if (!$spos2) {
                         $spos2 = strlen($factrec);
                     }
-                    $srec      = substr($factrec, $spos1, $spos2 - $spos1);
-                    $lt        = preg_match_all("/$nlevel \w+/", $srec, $matches);
-                    $data      .= '<div class="fact_SOUR">';
-                    $elementID = Uuid::uuid4()->toString();
-                    if ($tree->getPreference('EXPAND_SOURCES')) {
-                        $plusminus = 'icon-minus';
-                    } else {
-                        $plusminus = 'icon-plus';
-                    }
+                    $srec     = substr($factrec, $spos1, $spos2 - $spos1);
+                    $lt       = preg_match_all("/$nlevel \w+/", $srec, $matches);
+                    $data     .= '<div class="fact_SOUR">';
+                    $id       = 'collapse-' . Uuid::uuid4()->toString();
+                    $expanded = (bool) $tree->getPreference('EXPAND_SOURCES');
                     if ($lt > 0) {
-                        $data .= '<a href="#" onclick="return expand_layer(\'' . $elementID . '\');"><i id="' . $elementID . '_img" class="' . $plusminus . '"></i></a> ';
+                        $data .= '<a href="#' . e($id) . '" role="button" data-toggle="collapse" aria-controls="' . e($id) . '" aria-expanded="' . ($expanded ? 'true' : 'false') . '">';
+                        $data .= view('icons/expand');
+                        $data .= view('icons/collapse');
+                        $data .= '</a> ';
                     }
                     $data .= GedcomTag::getLabelValue('SOUR', '<a href="' . e($source->url()) . '">' . $source->fullName() . '</a>', null, 'span');
                     $data .= '</div>';
 
-                    $data .= "<div id=\"$elementID\"";
-                    if ($tree->getPreference('EXPAND_SOURCES')) {
-                        $data .= ' style="display:block"';
-                    }
-                    $data .= ' class="source_citations">';
+                    $data .= '<div id="' . e($id) . '" class="collapse ' . ($expanded ? 'show' : '') . '">';
                     $data .= self::printSourceStructure($tree, self::getSourceStructure($srec));
                     $data .= '<div class="indent">';
                     ob_start();
@@ -656,15 +653,12 @@ class FunctionsPrintFacts
             $media    = Factory::media()->make($media_id, $tree);
             if ($media) {
                 if ($media->canShow()) {
-                    if ($objectNum > 0) {
-                        echo '<br class="media-separator" style="clear:both;">';
-                    }
-                    echo '<div class="media-display"><div class="media-display-image">';
+                    echo '<div class="d-flex align-items-center"><div class="p-1">';
                     foreach ($media->mediaFiles() as $media_file) {
                         echo $media_file->displayImage(100, 100, 'contain', []);
                     }
                     echo '</div>';
-                    echo '<div class="media-display-title">';
+                    echo '<div>';
                     echo '<a href="', e($media->url()), '">', $media->fullName(), '</a>';
                     // NOTE: echo the notes of the media
                     echo '<p>';
@@ -675,26 +669,6 @@ class FunctionsPrintFacts
                         echo '<span class="label">', I18N::translate('Type'), ': </span> <span class="field">', $mediaType, '</span>';
                     }
                     //-- print spouse name for marriage events
-                    $ct = preg_match('/WT_SPOUSE: (.*)/', $factrec, $match);
-                    if ($ct > 0) {
-                        $spouse = Factory::individual()->make($match[1], $tree);
-                        if ($spouse) {
-                            echo '<a href="', e($spouse->url()), '">';
-                            echo $spouse->fullName();
-                            echo '</a>';
-                        }
-                        $ct = preg_match('/WT_FAMILY_ID: (.*)/', $factrec, $match);
-                        if ($ct > 0) {
-                            $famid  = trim($match[1]);
-                            $family = Factory::family()->make($famid, $tree);
-                            if ($family) {
-                                if ($spouse) {
-                                    echo ' - ';
-                                }
-                                echo '<a href="', e($family->url()), '">', I18N::translate('View this family'), '</a>';
-                            }
-                        }
-                    }
                     echo FunctionsPrint::printFactNotes($tree, $media->gedcom(), $nlevel);
                     echo self::printFactSources($tree, $media->gedcom(), $nlevel);
                     echo '</div>'; //close div "media-display-title"
@@ -1068,60 +1042,38 @@ class FunctionsPrintFacts
      *
      * @return void
      */
-    public static function printMainMedia(Fact $fact, $level): void
+    public static function printMainMedia(Fact $fact, int $level): void
     {
-        $factrec = $fact->gedcom();
-        $parent  = $fact->record();
-        $tree    = $parent->tree();
+        $tree = $fact->record()->tree();
 
         if ($fact->isPendingAddition()) {
             $styleadd = 'wt-new';
-            $can_edit = $level == 1 && $fact->canEdit();
         } elseif ($fact->isPendingDeletion()) {
             $styleadd = 'wt-old';
-            $can_edit = false;
         } else {
             $styleadd = '';
-            $can_edit = $level == 1 && $fact->canEdit();
         }
 
         // -- find source for each fact
-        preg_match_all('/(?:^|\n)' . $level . ' OBJE @(.*)@/', $factrec, $matches);
+        preg_match_all('/(?:^|\n)' . $level . ' OBJE @(.*)@/', $fact->gedcom(), $matches);
         foreach ($matches[1] as $xref) {
             $media = Factory::media()->make($xref, $tree);
             // Allow access to "1 OBJE @non_existent_source@", so it can be corrected/deleted
-            if (!$media || $media->canShow()) {
-                echo '<tr>';
-                echo '<th scope="row" class="';
-                if ($level > 1) {
-                    echo 'rela ';
-                }
-                echo $styleadd, '">';
-                preg_match("/^\d (\w*)/", $factrec, $factname);
-                $factlines = explode("\n", $factrec); // 1 BIRT Y\n2 SOUR ...
-                $factwords = explode(' ', $factlines[0]); // 1 BIRT Y
-                $factname  = $factwords[1]; // BIRT
-                if ($factname === 'EVEN' || $factname === 'FACT') {
-                    // Add ' EVEN' to provide sensible output for an event with an empty TYPE record
-                    $ct = preg_match('/2 TYPE (.*)/', $factrec, $ematch);
-                    if ($ct > 0) {
-                        $factname = $ematch[1];
-                        echo $factname;
-                    } else {
-                        echo GedcomTag::getLabel($factname);
-                    }
-                } elseif ($can_edit) {
-                    echo GedcomTag::getLabel($factname);
+            if (!$media instanceof Media || $media->canShow()) {
+                echo '<tr class="', $styleadd, '">';
+                echo '<th scope="row">';
+                echo $fact->label();
+
+                if ($level === 1 && $fact->canEdit()) {
                     echo '<div class="editfacts nowrap">';
                     echo view('edit/icon-fact-copy', ['fact' => $fact]);
                     echo view('edit/icon-fact-delete', ['fact' => $fact]);
                     echo '</div>';
-                } else {
-                    echo GedcomTag::getLabel($factname);
                 }
+
                 echo '</th>';
-                echo '<td class="', $styleadd, '">';
-                if ($media) {
+                echo '<td>';
+                if ($media instanceof Media) {
                     foreach ($media->mediaFiles() as $media_file) {
                         echo '<div>';
                         echo $media_file->displayImage(100, 100, 'contain', []);

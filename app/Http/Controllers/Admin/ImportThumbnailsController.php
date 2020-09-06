@@ -21,6 +21,7 @@ namespace Fisharebest\Webtrees\Http\Controllers\Admin;
 
 use Fisharebest\Webtrees\Cache;
 use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Http\RequestHandlers\MediaFileUnused;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Media;
 use Fisharebest\Webtrees\Mime;
@@ -47,10 +48,10 @@ use function is_file;
 use function max;
 use function response;
 use function route;
+use function str_contains;
 use function str_replace;
 use function stripos;
 use function strlen;
-use function strpos;
 use function substr;
 use function substr_compare;
 use function view;
@@ -192,7 +193,7 @@ class ImportThumbnailsController extends AbstractAdminController
         // Fetch all thumbnails
         $thumbnails = Collection::make($data_filesystem->listContents('', true))
             ->filter(static function (array $metadata): bool {
-                return $metadata['type'] === 'file' && strpos($metadata['path'], '/thumbs/') !== false;
+                return $metadata['type'] === 'file' && str_contains($metadata['path'], '/thumbs/');
             })
             ->map(static function (array $metadata): string {
                 return $metadata['path'];
@@ -214,12 +215,12 @@ class ImportThumbnailsController extends AbstractAdminController
                 // Turn each filename into a row for the table
                 $original = $this->findOriginalFileFromThumbnail($thumbnail);
 
-                $original_url  = route('unused-media-thumbnail', [
+                $original_url  = route(MediaFileUnused::class, [
                     'path' => $original,
                     'w'    => 100,
                     'h'    => 100,
                 ]);
-                $thumbnail_url = route('unused-media-thumbnail', [
+                $thumbnail_url = route(MediaFileUnused::class, [
                     'path' => $thumbnail,
                     'w'    => 100,
                     'h'    => 100,

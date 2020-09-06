@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,6 +22,7 @@ namespace Fisharebest\Webtrees\Date;
 use Fisharebest\ExtCalendar\CalendarInterface;
 use Fisharebest\ExtCalendar\JewishCalendar;
 use Fisharebest\Webtrees\Carbon;
+use Fisharebest\Webtrees\Http\RequestHandlers\CalendarPage;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
 use InvalidArgumentException;
@@ -34,12 +35,11 @@ use function is_array;
 use function is_int;
 use function max;
 use function preg_match;
-use function preg_match_all;
-use function preg_replace;
 use function route;
 use function sprintf;
-use function str_replace;
+use function str_contains;
 use function strpbrk;
+use function strtr;
 use function trigger_error;
 use function trim;
 use function view;
@@ -561,27 +561,24 @@ abstract class AbstractCalendarDate
      */
     public function format(string $format, string $qualifier = ''): string
     {
-        // Dates can include additional punctuation and symbols.
-        // e.g. "%Y年 %n月 %j日", "Y.M.D" and "M D, Y".
-        // The logic here is inflexible, and should be replaced with
-        // specific translations for each abbreviated format.
+        // Dates can include additional punctuation and symbols. e.g.
+        // %F %j, %Y
+        // %Y. %F %d.
+        // %Y年 %n月 %j日
+        // %j. %F %Y
+        // Don’t show exact details or unnecessary punctuation for inexact dates.
+        if ($this->day === 0) {
+            $format = strtr($format, ['%d' => '', '%j日' => '', '%j,' => '', '%j' => '', '%l' => '', '%D' => '', '%N' => '', '%S' => '', '%w' => '', '%z' => '']);
+        }
+        if ($this->month === 0) {
+            $format = strtr($format, ['%F' => '', '%m' => '', '%M' => '', '年 %n月' => '', '%n' => '', '%t' => '']);
+        }
+        if ($this->year === 0) {
+            $format = strtr($format, ['%t' => '', '%L' => '', '%G' => '', '%y' => '', '%Y年' => '', '%Y' => '']);
+        }
+        $format = trim($format, ',. /-');
 
-        // Don’t show exact details for inexact dates
-        if (!$this->day) {
-            $format = preg_replace('/%[djlDNSwz][,日]?/u', '', $format);
-            $format = str_replace(['%d,', '%j日', '%j,', '%j', '%l', '%D', '%N', '%S', '%w', '%z'], '', $format);
-        }
-        if (!$this->month) {
-            $format = str_replace(['%F', '%m', '%M', '年 %n月', '%n', '%t'], '', $format);
-        }
-        if (!$this->year) {
-            $format = str_replace(['%t', '%L', '%G', '%y', '%Y年', '%Y'], '', $format);
-        }
-        // If we’ve trimmed the format, also trim the punctuation
-        if (!$this->day || !$this->month || !$this->year) {
-            $format = trim($format, ',. ;/-');
-        }
-        if ($this->day && preg_match('/%[djlDNSwz]/', $format)) {
+        if ($this->day !== 0 && preg_match('/%[djlDNSwz]/', $format)) {
             // If we have a day-number *and* we are being asked to display it, then genitive
             $case = 'GENITIVE';
         } else {
@@ -609,68 +606,63 @@ abstract class AbstractCalendarDate
             }
         }
         // Build up the formatted date, character at a time
-        preg_match_all('/%[^%]/', $format, $matches);
-        foreach ($matches[0] as $match) {
-            switch ($match) {
-                case '%d':
-                    $format = str_replace($match, $this->formatDayZeros(), $format);
-                    break;
-                case '%j':
-                    $format = str_replace($match, $this->formatDay(), $format);
-                    break;
-                case '%l':
-                    $format = str_replace($match, $this->formatLongWeekday(), $format);
-                    break;
-                case '%D':
-                    $format = str_replace($match, $this->formatShortWeekday(), $format);
-                    break;
-                case '%N':
-                    $format = str_replace($match, $this->formatIsoWeekday(), $format);
-                    break;
-                case '%w':
-                    $format = str_replace($match, $this->formatNumericWeekday(), $format);
-                    break;
-                case '%z':
-                    $format = str_replace($match, $this->formatDayOfYear(), $format);
-                    break;
-                case '%F':
-                    $format = str_replace($match, $this->formatLongMonth($case), $format);
-                    break;
-                case '%m':
-                    $format = str_replace($match, $this->formatMonthZeros(), $format);
-                    break;
-                case '%M':
-                    $format = str_replace($match, $this->formatShortMonth(), $format);
-                    break;
-                case '%n':
-                    $format = str_replace($match, $this->formatMonth(), $format);
-                    break;
-                case '%t':
-                    $format = str_replace($match, (string) $this->daysInMonth(), $format);
-                    break;
-                case '%L':
-                    $format = str_replace($match, $this->isLeapYear() ? '1' : '0', $format);
-                    break;
-                case '%Y':
-                    $format = str_replace($match, $this->formatLongYear(), $format);
-                    break;
-                case '%y':
-                    $format = str_replace($match, $this->formatShortYear(), $format);
-                    break;
-                // These 4 extensions are useful for re-formatting gedcom dates.
-                case '%@':
-                    $format = str_replace($match, $this->formatGedcomCalendarEscape(), $format);
-                    break;
-                case '%A':
-                    $format = str_replace($match, $this->formatGedcomDay(), $format);
-                    break;
-                case '%O':
-                    $format = str_replace($match, $this->formatGedcomMonth(), $format);
-                    break;
-                case '%E':
-                    $format = str_replace($match, $this->formatGedcomYear(), $format);
-                    break;
-            }
+        if (str_contains($format, '%d')) {
+            $format = strtr($format, ['%d' => $this->formatDayZeros()]);
+        }
+        if (str_contains($format, '%j')) {
+            $format = strtr($format, ['%j' => $this->formatDay()]);
+        }
+        if (str_contains($format, '%l')) {
+            $format = strtr($format, ['%l' => $this->formatLongWeekday()]);
+        }
+        if (str_contains($format, '%D')) {
+            $format = strtr($format, ['%D' => $this->formatShortWeekday()]);
+        }
+        if (str_contains($format, '%N')) {
+            $format = strtr($format, ['%N' => $this->formatIsoWeekday()]);
+        }
+        if (str_contains($format, '%w')) {
+            $format = strtr($format, ['%w' => $this->formatNumericWeekday()]);
+        }
+        if (str_contains($format, '%z')) {
+            $format = strtr($format, ['%z' => $this->formatDayOfYear()]);
+        }
+        if (str_contains($format, '%F')) {
+            $format = strtr($format, ['%F' => $this->formatLongMonth($case)]);
+        }
+        if (str_contains($format, '%m')) {
+            $format = strtr($format, ['%m' => $this->formatMonthZeros()]);
+        }
+        if (str_contains($format, '%M')) {
+            $format = strtr($format, ['%M' => $this->formatShortMonth()]);
+        }
+        if (str_contains($format, '%n')) {
+            $format = strtr($format, [$this->formatMonth()]);
+        }
+        if (str_contains($format, '%t')) {
+            $format = strtr($format, ['%n' => (string) $this->daysInMonth()]);
+        }
+        if (str_contains($format, '%L')) {
+            $format = strtr($format, ['%L' => $this->isLeapYear() ? '1' : '0']);
+        }
+        if (str_contains($format, '%Y')) {
+            $format = strtr($format, ['%Y' => $this->formatLongYear()]);
+        }
+        if (str_contains($format, '%y')) {
+            $format = strtr($format, ['%y' => $this->formatShortYear()]);
+        }
+        // These 4 extensions are useful for re-formatting gedcom dates.
+        if (str_contains($format, '%@')) {
+            $format = strtr($format, ['%@' => $this->formatGedcomCalendarEscape()]);
+        }
+        if (str_contains($format, '%A')) {
+            $format = strtr($format, ['%A' => $this->formatGedcomDay()]);
+        }
+        if (str_contains($format, '%O')) {
+            $format = strtr($format, ['%O' => $this->formatGedcomMonth()]);
+        }
+        if (str_contains($format, '%E')) {
+            $format = strtr($format, ['%E' => $this->formatGedcomYear()]);
         }
 
         return $format;
@@ -993,7 +985,7 @@ abstract class AbstractCalendarDate
             $view = 'year';
         }
 
-        return route('calendar', [
+        return route(CalendarPage::class, [
             'cal'   => $this->calendar->gedcomCalendarEscape(),
             'year'  => $this->formatGedcomYear(),
             'month' => $this->formatGedcomMonth(),

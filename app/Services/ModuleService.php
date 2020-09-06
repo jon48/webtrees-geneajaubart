@@ -64,15 +64,16 @@ use Fisharebest\Webtrees\Module\FamilyTreeFavoritesModule;
 use Fisharebest\Webtrees\Module\FamilyTreeNewsModule;
 use Fisharebest\Webtrees\Module\FamilyTreeStatisticsModule;
 use Fisharebest\Webtrees\Module\FanChartModule;
-use Fisharebest\Webtrees\Module\FrenchHistory;
 use Fisharebest\Webtrees\Module\FixCemeteryTag;
 use Fisharebest\Webtrees\Module\FixDuplicateLinks;
 use Fisharebest\Webtrees\Module\FixMissingDeaths;
 use Fisharebest\Webtrees\Module\FixMissingMarriedNames;
 use Fisharebest\Webtrees\Module\FixNameSlashesAndSpaces;
+use Fisharebest\Webtrees\Module\FixNameTags;
 use Fisharebest\Webtrees\Module\FixPlaceNames;
 use Fisharebest\Webtrees\Module\FixPrimaryTag;
 use Fisharebest\Webtrees\Module\FixSearchAndReplace;
+use Fisharebest\Webtrees\Module\FrenchHistory;
 use Fisharebest\Webtrees\Module\FrequentlyAskedQuestionsModule;
 use Fisharebest\Webtrees\Module\GoogleAnalyticsModule;
 use Fisharebest\Webtrees\Module\GoogleWebmasterToolsModule;
@@ -145,6 +146,7 @@ use Fisharebest\Webtrees\Module\LanguageSpanish;
 use Fisharebest\Webtrees\Module\LanguageSundanese;
 use Fisharebest\Webtrees\Module\LanguageSwahili;
 use Fisharebest\Webtrees\Module\LanguageSwedish;
+use Fisharebest\Webtrees\Module\LanguageTagalog;
 use Fisharebest\Webtrees\Module\LanguageTamil;
 use Fisharebest\Webtrees\Module\LanguageTatar;
 use Fisharebest\Webtrees\Module\LanguageThai;
@@ -227,11 +229,12 @@ use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Webtrees;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use stdClass;
 use Throwable;
 
 use function app;
+use function str_contains;
+use function strlen;
 
 /**
  * Functions for managing and maintaining modules.
@@ -320,6 +323,7 @@ class ModuleService
         'fix-ceme-tag'            => FixCemeteryTag::class,
         'fix-duplicate-links'     => FixDuplicateLinks::class,
         'fix-name-slashes-spaces' => FixNameSlashesAndSpaces::class,
+        'fix-name-tags'           => FixNameTags::class,
         'fix-place-names'         => FixPlaceNames::class,
         'fix-prim-tag'            => FixPrimaryTag::class,
         'fix-search-and-replace'  => FixSearchAndReplace::class,
@@ -395,6 +399,7 @@ class ModuleService
         'language-sw'             => LanguageSwahili::class,
         'language-ta'             => LanguageTamil::class,
         'language-th'             => LanguageThai::class,
+        'language-tl'             => LanguageTagalog::class,
         'language-tr'             => LanguageTurkish::class,
         'language-tt'             => LanguageTatar::class,
         'language-uk'             => LanguageUkranian::class,
@@ -615,7 +620,13 @@ class ModuleService
                 // This also allows us to ignore modules called "foo.example" and "foo.disable"
                 $module_name = basename(dirname($filename));
 
-                return !Str::contains($module_name, ['.', ' ', '[', ']']) && Str::length($module_name) <= 30;
+                foreach (['.', ' ', '[', ']'] as $character) {
+                    if (str_contains($module_name, $character)) {
+                        return false;
+                    }
+                }
+
+                return strlen($module_name) <= 30;
             })
             ->map(static function (string $filename): ?ModuleCustomInterface {
                 try {
