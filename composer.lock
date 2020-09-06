@@ -2000,12 +2000,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "2da24315249b215a17df1ae331994fb22fcd3a21"
+                "reference": "b0791634021df6401e324219ff15bc6827046f6b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/2da24315249b215a17df1ae331994fb22fcd3a21",
-                "reference": "2da24315249b215a17df1ae331994fb22fcd3a21",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/b0791634021df6401e324219ff15bc6827046f6b",
+                "reference": "b0791634021df6401e324219ff15bc6827046f6b",
                 "shasum": ""
             },
             "require": {
@@ -2042,7 +2042,7 @@
                 "genealogy",
                 "webtrees"
             ],
-            "time": "2020-07-19T11:16:53+00:00"
+            "time": "2020-09-06T18:15:51+00:00"
         },
         {
             "name": "jon48/webtrees-mod-translationtool",
