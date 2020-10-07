@@ -1,0 +1,61 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+
+/**
+ * @var array<array<mixed>>     $data
+ * @var int                     $pieStartAngle
+ * @var string                  $labeledValueText
+ * @var array<string>           $colors
+ * @var string                  $language
+ * @var int|string              $width
+ * @var int|string              $height
+ */
+
+$id   = 'google-chart-' . bin2hex(random_bytes(8));
+$name = 'callback_' . bin2hex(random_bytes(12));
+?>
+
+<?php if (count($data) === 1) : ?>
+    <?= I18N::translate('This information is not available.') ?>
+<?php else : ?>
+    <div id="<?= $id ?>" class="maj-sosa-chart-pie"></div>
+    <script>
+
+    let <?= $name ?> = function () {
+        statistics.drawPieChart(
+            <?= json_encode($id) ?>,
+            <?= json_encode($data) ?>,
+            {
+                <?php if($height !== null) : ?>height: <?= is_int($height) ? (int) $height : '"'.$height.'"' ?>,<?php endif; ?>
+                chartArea : {
+                    <?php if($width !== null) : ?>width: <?= is_int($width) ? (int) $width : '"'.$width.'"' ?>,<?php endif; ?>
+                    <?php if($height !== null) : ?>height: <?= is_int($height) ? (int) $height * 0.9 : '"'.$height.'"' ?><?php endif; ?>
+                },
+                pieStartAngle: <?= json_encode($pieStartAngle ?? 0) ?>,
+                pieHole: 0,
+                // Note: "legend" needs to be defined completely as Object.assign does only a shallow merge
+                legend: {
+                    alignment: 'center',
+                    labeledValueText: <?= json_encode($labeledValueText ?? 'value') ?>,
+                    position: 'labeled'
+                },
+                colors: <?= json_encode($colors) ?>
+            }
+        );
+    };
+
+    if (document.readyState === "complete"
+        || (document.readyState !== "loading" && !document.documentElement.doScroll)
+    ) {
+        statistics.init(<?= json_encode($language) ?>);
+        statistics.addCallback(<?= $name ?>);
+    } else {
+        document.addEventListener("DOMContentLoaded", function () {
+            statistics.init(<?= json_encode($language) ?>);
+            statistics.addCallback(<?= $name ?>);
+        });
+    }
+
+    </script>
+<?php endif; ?>

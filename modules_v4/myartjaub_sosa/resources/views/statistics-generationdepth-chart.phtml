@@ -1,0 +1,77 @@
+<?php 
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Functions\Functions;
+use Fisharebest\Webtrees\Module\ModuleThemeInterface;
+use Illuminate\Support\Collection;
+use Fisharebest\Webtrees\Statistics\Service\ColorService;
+use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Tree;
+
+/**
+ * @var string                  $module_name
+ * @var Tree                    $tree
+ * @var ModuleThemeInterface    $theme
+ * @var Collection              $gen_depth_g3
+ */
+?>
+
+<h3 class="text-center m-3"><?= I18N::translate('Mean generation depth by grandparents'); ?></h3>
+
+<?php 
+$data = [[
+        ['label' => 'Ancestor', 'id' => 'ancestor', 'type' => 'string'],
+        ['label' => I18N::translate('Mean generation depth'), 'id' => 'gendepth', 'type' => 'number'],
+        ['label' => "Error Min", 'id' => 'errmin', 'type' => 'number', 'role' => 'interval'],
+        ['label' => "Error Max", 'id' => 'errmax', 'type' => 'number', 'role' => 'interval']
+    ]];
+$max_gen_depth = 0;
+foreach($gen_depth_g3 as $sosa => $gen_depth_stat) {
+    /** @var \Fisharebest\Webtrees\Individual $ancestor */
+    $ancestor = Factory::individual()->make($gen_depth_stat->root_ancestor_id, $tree);
+    $max_gen_depth = max($max_gen_depth, ceil($gen_depth_stat->mean_gen_depth + $gen_depth_stat->stddev_gen_depth));
+    if($ancestor !== null && $ancestor->canShowName()) {
+        $data[] = [
+            strip_tags($ancestor->fullName()),
+            (float) $gen_depth_stat->mean_gen_depth,
+            $gen_depth_stat->mean_gen_depth - $gen_depth_stat->stddev_gen_depth,
+            $gen_depth_stat->mean_gen_depth + $gen_depth_stat->stddev_gen_depth
+        ];
+    }
+    else {
+        $data[] = [
+            I18N::translate('Sosa %s', I18N::number($sosa)), 
+            (float) $gen_depth_stat->mean_gen_depth,
+            $gen_depth_stat->mean_gen_depth - $gen_depth_stat->stddev_gen_depth,
+            $gen_depth_stat->mean_gen_depth + $gen_depth_stat->stddev_gen_depth
+        ];
+    }
+}
+
+?>
+
+<div class="maj-sosa-gendepth-chart  text-center">
+<?= view($module_name . '::charts/bar', [
+    'data'              =>  $data,
+    'chart_options'     =>  [
+        'bar'       =>  [ 'groupWidth' => '80%' ],
+        'height'    =>  $gen_depth_g3->count() * 45 + 50,
+        'colors'    =>  [ app(ColorService::class)->interpolateRgb($theme->parameter('distribution-chart-low-values'), $theme->parameter('distribution-chart-high-values'), 6)[1]],
+        'hAxis'     =>  [
+            'title'             =>  I18N::translate('Mean generation depth and standard deviation'),
+            'minValue'          =>  0,
+            'maxValue'          =>  $max_gen_depth + 0.1,
+            //'gridlines'         =>  [ 'color'   =>  'none' ],
+            'titleTextStyle'    =>  [ 'italic'  =>  false ],
+            'ticks'             =>  range(0, $max_gen_depth, 1)
+        ],
+        'chartArea' =>  [ 'width' => '70%', 'left' => '30%', 'top' => 10, 'bottom' => 50 ],
+        'intervals' =>  [ 
+            'barWidth'      =>  0.5,
+            'lineWidth'     =>  2
+        ]
+    ],
+    'language'          =>  I18N::languageTag()
+]) ?>
+    
+</div>

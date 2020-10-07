@@ -1,0 +1,48 @@
+<?php 
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Support\Collection;
+use Fisharebest\Webtrees\Module\ModuleThemeInterface;
+
+/**
+ * @var string                          $module_name
+ * @var string                          $title
+ * @var Tree                            $tree
+ * @var ModuleThemeInterface            $theme
+ * @var Individual|NULL                 $root_indi
+ * @var array<string, int|float>        $general_stats
+ * @var array<int, <string, int|float>> $generation_stats
+ * @var object                          $generation_depth
+ * @var Collection                      $multiple_sosas
+ * @var Collection                      $sosa_dispersion_g2
+ * @var Collection                      $sosa_dispersion_g3
+ * @var Collection                      $gen_depth_g3
+ */
+
+?>
+
+<h2 class="wt-page-title mx-auto"><?= e($title) ?></h2>
+
+<?php if($root_indi === null) : ?>
+
+<?= view($module_name . '::errors/no-sosa-defined') ?>
+
+<?php else : ?>
+
+<?php if($root_indi->canShowName()) : ?>
+<h4 class="text-center m-3"><?= I18N::translate('%s: %s', I18N::translate('Root individual'), $root_indi->fullName()) ?></h4>
+<?php endif;?>
+
+<?= view($module_name . '::statistics-general-table', ['general_stats' => $general_stats]) ?>
+
+<?= view($module_name . '::statistics-generations-table', ['tree' => $tree, 'generation_stats' => $generation_stats, 'generation_depth' => $generation_depth]) ?>
+
+<?= view($module_name . '::statistics-multisosa-table', ['tree' => $tree, 'multiple_sosas' => $multiple_sosas]) ?>
+
+<?= view($module_name . '::statistics-dispersion-chart', ['module_name' => $module_name, 'theme' => $theme, 'sosa_dispersion_g2' => $sosa_dispersion_g2, 'sosa_dispersion_g3' => $sosa_dispersion_g3]) ?>
+
+<?= view($module_name . '::statistics-generationdepth-chart', ['module_name' => $module_name, 'theme' => $theme, 'tree' => $tree, 'gen_depth_g3' => $gen_depth_g3]) ?>
+
+<?php endif; ?>

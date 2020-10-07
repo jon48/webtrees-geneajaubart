@@ -4,6 +4,7 @@
 
     <file>modules_v4/myartjaub_admintasks</file>
 	<file>modules_v4/myartjaub_patronymiclineage</file>
+    <file>modules_v4/myartjaub_sosa</file>
 	<file>modules_v4/myartjaub_welcome_block</file>
 
     <arg name="extensions" value="php,phtml"/>

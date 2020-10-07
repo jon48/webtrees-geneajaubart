@@ -1,0 +1,33 @@
+<?php 
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Support\Collection;
+use Fisharebest\Webtrees\Factory;
+
+/**
+ * @var Tree           $tree
+ * @var Collection     $multiple_sosas
+ */
+
+?>
+
+<?php if($multiple_sosas->count() > 0) : ?>
+<h3 class="text-center m-3"><?= I18N::translate('Most duplicated root Sosa ancestors'); ?></h3>
+
+<div class="maj-sosa-table-multisosa maj-sosa-table mx-auto">
+<?php foreach ($multiple_sosas as $count => $multiple_sosa) : ?>
+	<div class="maj-sosa-row">
+		<div class="wt-page-options-label"><?= I18N::translate('%s times', I18N::number($count)); ?></div>
+		<div class="wt-page-options-value text-center">
+        	<?= $multiple_sosa->map(function($item) use ($tree) : string {
+        	    if($indi = Factory::individual()->make($item->sosa_i_id, $tree)) {
+        	        return '<a href="'. $indi->url() . '">'. $indi->fullName() . '&nbsp;' . view('icons/sex', ['sex' => $indi->sex()]) . '</a>';
+        	    }
+        	    return '';
+        	})->filter()->implode(I18N::$list_separator); ?>
+		</div>
+	</div>
+<?php endforeach; ?>
+</div>
+<?php endif; ?>

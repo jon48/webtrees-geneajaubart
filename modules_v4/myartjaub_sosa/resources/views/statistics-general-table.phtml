@@ -1,0 +1,34 @@
+<?php 
+
+use Fisharebest\Webtrees\I18N;
+
+/**
+ * @var array<string, mixed>    $general_stats
+ */
+
+?>
+
+<h3 class="text-center m-3"><?= e(I18N::translate('General statistics')) ?></h3>
+
+<div class="maj-sosa-table-general maj-sosa-table mx-auto">
+	<div class="maj-sosa-row">
+		<div class="wt-page-options-label"><?= I18N::translate('Number of ancestors'); ?></div>
+		<div class="wt-page-options-value"><?= I18N::number($general_stats['sosa_count']); ?></div>
+	</div>
+	<div class="maj-sosa-row">
+		<div class="wt-page-options-label"><?= I18N::translate('Number of different ancestors'); ?></div>
+		<div class="wt-page-options-value"><?= I18N::number($general_stats['distinct_count']); ?></div>
+	</div>
+	<div class="maj-sosa-row">
+		<div class="wt-page-options-label"><?= I18N::translate('%% of ancestors in the base'); ?></div>
+		<div class="wt-page-options-value"><?= I18N::percentage($general_stats['sosa_rate'], 1); ?></div>
+	</div>
+	<div class="maj-sosa-row">
+		<div class="wt-page-options-label"><?= I18N::translate('Pedigree collapse'); ?></div>
+		<div class="wt-page-options-value"><?= I18N::percentage($general_stats['pedi_collapse'], 2); ?></div>
+	</div>
+	<div class="maj-sosa-row">
+		<div class="wt-page-options-label"><?= I18N::translate('Generation mean duration'); ?></div>
+		<div class="wt-page-options-value"><?= I18N::plural('%s year', '%s years', $general_stats['mean_gen_time'],  I18N::number($general_stats['mean_gen_time'], 1)); ?></div>
+	</div>
+</div>

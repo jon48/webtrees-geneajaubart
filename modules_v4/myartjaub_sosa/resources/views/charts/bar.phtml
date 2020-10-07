@@ -1,0 +1,81 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\View;
+
+/**
+ * @var array<array<mixed>>     $data
+ * @var array<string>           $chart_options
+ * @var string                  $language
+ */
+
+$id   = 'google-chart-' . bin2hex(random_bytes(8));
+$name = 'callback_' . bin2hex(random_bytes(12));
+?>
+
+<?php if (count($data) === 1) : ?>
+    <?= I18N::translate('This information is not available.') ?>
+<?php else : ?>
+    <div id="<?= $id ?>" class="maj-sosa-chart-bar mx-auto"></div>
+    <script>
+
+    let <?= $name ?> = function () {
+        statistics.drawBarChart(
+            <?= json_encode($id) ?>,
+            <?= json_encode($data) ?>,
+            <?= json_encode($chart_options) ?>
+        );
+    };
+
+    if (document.readyState === "complete"
+        || (document.readyState !== "loading" && !document.documentElement.doScroll)
+    ) {
+        statistics.init(<?= json_encode($language) ?>);
+        statistics.addCallback(<?= $name ?>);
+    } else {
+        document.addEventListener("DOMContentLoaded", function () {
+            statistics.init(<?= json_encode($language) ?>);
+            statistics.addCallback(<?= $name ?>);
+        });
+    }
+
+    </script>
+<?php endif; ?>
+
+<?php View::pushunique('javascript');?>
+<<script>
+
+Statistics.prototype.drawBarChart = function (elementId, data, options) {
+    // Default chart options
+    const defaults = {
+      title: '',
+      subtitle: '',
+      titleTextStyle: {
+        color: '#757575',
+        fontName: 'Roboto',
+        fontSize: '16px',
+        bold: false,
+        italic: false
+      },
+      height: '100%',
+      width: '100%',
+      vAxis: {
+        title: ''
+      },
+      hAxis: {
+        title: ''
+      },
+      legend: {
+        position: 'none'
+      },
+      backgroundColor: 'transparent'
+    };
+
+    // Merge default with provided options
+    options = Object.assign(defaults, options);
+
+    // Create and draw the chart
+    this.drawChart(elementId, 'BarChart', data, options);
+  }
+</script>
+<?php View::endpush(); ?>

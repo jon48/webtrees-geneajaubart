@@ -6,4 +6,5 @@ parameters:
     paths:
         - modules_v4/myartjaub_admintasks
         - modules_v4/myartjaub_patronymiclineage
+        - modules_v4/myartjaub_sosa
         - modules_v4/myartjaub_welcome_block

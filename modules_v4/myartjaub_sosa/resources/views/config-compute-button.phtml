@@ -1,0 +1,75 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaComputeAction;
+
+/**
+ * @var Tree    $tree
+ * @var string  $user_select_id
+ * @var bool    $immediate_compute
+ * @var string  $selected_user_id
+ */
+
+?>
+
+<label>
+    <button type="button" id="bt-sosa-compute" class="btn btn-primary">
+        <?= view('icons/preferences') ?>
+        <?= I18N::translate('Compute') ?>
+    </button>
+</label>
+
+<label id="lbl-sosa-compute">
+    <div class="maj-loading-inprocess d-none">
+        <i class="fas fa-spinner fa-pulse fa-fw"></i>
+        <label><?= e(I18N::translate('Computing...')) ?></label>
+    </div>
+    <div class="maj-loading-complete d-none">
+        <span class="maj-icon-done"><i class="fas fa-check"></i></span>
+        <label><?= e(I18N::translate('Success')) ?></label>
+    </div>
+    <div class="maj-loading-error d-none">
+        <span class="maj-icon-error"><i class="fas fa-times"></i></span>
+        <label><?= e(I18N::translate('Error')) ?></label>
+    </div>
+</label>
+
+<?php View::push('javascript') ?>
+<script>
+
+$(document).ready(function() {
+    $("#bt-sosa-compute").click(function() {
+        majComputeSosa($("<?= $user_select_id ?>").val());
+     });
+
+    <?php if ($immediate_compute) : ?>
+    majComputeSosa('<?= $selected_user_id ?>');
+    <?php endif; ?>
+});
+
+function majComputeSosa(user_id) {
+    $('#bt-sosa-compute').attr('disabled', 'disabled');
+    $('#lbl-sosa-compute .maj-loading-complete').addClass('d-none');
+    $('#lbl-sosa-compute .maj-loading-error').addClass('d-none');
+    $('#lbl-sosa-compute .maj-loading-inprocess').removeClass('d-none');
+
+    $.post({
+        url: '<?= e(route(SosaComputeAction::class, ['tree' => $tree->name() ])) ?>',
+        data: { user_id : user_id },
+        success: function(data) {
+            $('#lbl-sosa-compute .maj-loading-complete').removeClass('d-none');
+        }
+    }).done(function() {
+        $('#lbl-sosa-compute .maj-loading-complete').removeClass('d-none');
+    }).fail(function() {
+        $('#lbl-sosa-compute .maj-loading-error').removeClass('d-none');
+    }).always(function() {
+        $('#bt-sosa-compute').removeAttr('disabled');
+        $('#lbl-sosa-compute .maj-loading-inprocess').addClass('d-none');
+    });
+}
+
+</script>
+<?php View::endpush() ?>
