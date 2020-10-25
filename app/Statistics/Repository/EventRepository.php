@@ -21,7 +21,7 @@ namespace Fisharebest\Webtrees\Statistics\Repository;
 
 use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Functions\FunctionsPrint;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomTag;
@@ -30,8 +30,6 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Statistics\Repository\Interfaces\EventRepositoryInterface;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Builder;
 use stdClass;
 
 /**
@@ -248,7 +246,7 @@ class EventRepository implements EventRepositoryInterface
         $result = I18N::translate('This information is not available.');
 
         if ($row) {
-            $record = Factory::gedcomRecord()->make($row->id, $this->tree);
+            $record = Registry::gedcomRecordFactory()->make($row->id, $this->tree);
 
             if ($record && $record->canShow()) {
                 $result = $record->formatList();
@@ -366,7 +364,7 @@ class EventRepository implements EventRepositoryInterface
         $row = $this->eventQuery($direction);
 
         if ($row) {
-            $record = Factory::gedcomRecord()->make($row->id, $this->tree);
+            $record = Registry::gedcomRecordFactory()->make($row->id, $this->tree);
 
             if ($record) {
                 return '<a href="' . e($record->url()) . '">' . $record->fullName() . '</a>';
@@ -404,7 +402,7 @@ class EventRepository implements EventRepositoryInterface
         $row = $this->eventQuery($direction);
 
         if ($row) {
-            $record = Factory::gedcomRecord()->make($row->id, $this->tree);
+            $record = Registry::gedcomRecordFactory()->make($row->id, $this->tree);
             $fact   = null;
 
             if ($record) {

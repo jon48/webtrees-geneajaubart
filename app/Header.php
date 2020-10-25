@@ -20,9 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees;
 
 use Closure;
-use Exception;
 use Fisharebest\Webtrees\Http\RequestHandlers\HeaderPage;
-use Illuminate\Database\Capsule\Manager as DB;
 
 /**
  * A GEDCOM header (HEAD) object.
@@ -44,7 +42,7 @@ class Header extends GedcomRecord
      */
     public static function rowMapper(Tree $tree): Closure
     {
-        return Factory::header()->mapper($tree);
+        return Registry::headerFactory()->mapper($tree);
     }
 
     /**
@@ -62,7 +60,7 @@ class Header extends GedcomRecord
      */
     public static function getInstance(string $xref, Tree $tree, string $gedcom = null): ?Header
     {
-        return Factory::header()->make($xref, $tree, $gedcom);
+        return Registry::headerFactory()->make($xref, $tree, $gedcom);
     }
 
     /**

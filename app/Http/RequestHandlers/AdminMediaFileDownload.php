@@ -19,34 +19,18 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
-use Fisharebest\Webtrees\Services\MediaFileService;
-use League\Flysystem\FilesystemInterface;
+use Fisharebest\Webtrees\Registry;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function assert;
-
 /**
- * Controller for the media page and displaying images.
+ * Download a media file.
  */
-class MediaFileUnused implements RequestHandlerInterface
+class AdminMediaFileDownload implements RequestHandlerInterface
 {
-    /** @var MediaFileService */
-    private $media_file_service;
-
     /**
-     * MediaFileController constructor.
-     *
-     * @param MediaFileService $media_file_service
-     */
-    public function __construct(MediaFileService $media_file_service)
-    {
-        $this->media_file_service = $media_file_service;
-    }
-
-    /**
-     * Generate a thumbnail for an unused media file (i.e. not used by any media object).
+     * Download a non-image media file.
      *
      * @param ServerRequestInterface $request
      *
@@ -54,13 +38,10 @@ class MediaFileUnused implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
+        $filesystem = Registry::filesystem()->data();
+        $params     = (array) $request->getQueryParams();
+        $path       = $params['path'] ?? '';
 
-        $params = $request->getQueryParams();
-
-        $file = $params['path'];
-
-        return $this->media_file_service->generateImage('', $file, $data_filesystem, $params);
+        return Registry::imageFactory()->fileResponse($filesystem, $path, false);
     }
 }

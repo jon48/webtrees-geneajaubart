@@ -23,7 +23,6 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Family;
-use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Services\ClipboardService;
@@ -46,7 +45,7 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
     private $clipboard_service;
 
     /**
-     * UserWelcomeModule constructor.
+     * IndividualFactsTabModule constructor.
      *
      * @param ModuleService    $module_service
      * @param ClipboardService $clipboard_service
@@ -665,7 +664,7 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
                             case '_HSIB':
                                 $facts[] = $this->convertEvent($fact, $death_of_a_half_sibling[$fact->getTag()][$fact->record()->sex()]);
                                 break;
-                            case 'CHIL':
+                            case '_CHIL':
                                 $facts[] = $this->convertEvent($fact, $death_of_a_child[$fact->getTag()][$fact->record()->sex()]);
                                 break;
                         }
@@ -951,6 +950,6 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
     {
         // We don't actually displaye these facts, but they are displayed
         // outside the tabs/sidebar systems. This just forces them to be excluded here.
-        return new Collection(['NAME', 'SEX']);
+        return new Collection(['NAME', 'SEX', 'OBJE']);
     }
 }

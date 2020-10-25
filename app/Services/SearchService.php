@@ -22,7 +22,7 @@ namespace Fisharebest\Webtrees\Services;
 use Closure;
 use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Exceptions\HttpServiceUnavailableException;
-use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomRecord;
@@ -134,8 +134,7 @@ class SearchService
         $query
             ->orderBy('husb_name.n_sort')
             ->orderBy('wife_name.n_sort')
-            ->select(['families.*', 'husb_name.n_sort', 'wife_name.n_sort'])
-            ->distinct();
+            ->select(['families.*', 'husb_name.n_sort', 'wife_name.n_sort']);
 
         return $this->paginateQuery($query, $this->familyRowMapper(), GedcomRecord::accessFilter(), $offset, $limit);
     }
@@ -202,7 +201,6 @@ class SearchService
                     ->on('name.n_id', '=', 'individuals.i_id');
             })
             ->orderBy('n_sort')
-            ->distinct()
             ->select(['individuals.*', 'n_sort']);
 
         $this->whereTrees($query, 'i_file', $trees);
@@ -334,6 +332,31 @@ class SearchService
         $this->whereSearch($query, 's_name', $search);
 
         return $this->paginateQuery($query, $this->sourceRowMapper(), GedcomRecord::accessFilter(), $offset, $limit);
+    }
+
+    /**
+     * Search for sources.
+     *
+     * @param Tree[]   $trees
+     * @param string[] $search
+     * @param int      $offset
+     * @param int      $limit
+     *
+     * @return Collection<string>
+     */
+    public function searchSurnames(array $trees, array $search, int $offset = 0, int $limit = PHP_INT_MAX): Collection
+    {
+        $query = DB::table('name');
+
+        $this->whereTrees($query, 'n_file', $trees);
+        $this->whereSearch($query, 'n_surname', $search);
+
+        return $query
+            ->groupBy(['n_surname'])
+            ->orderBy('n_surname')
+            ->skip($offset)
+            ->take($limit)
+            ->pluck('n_surname');
     }
 
     /**
@@ -960,6 +983,11 @@ class SearchService
 
         foreach ($query->cursor() as $row) {
             $record = $row_mapper($row);
+            // searchIndividualNames() and searchFamilyNames() can return duplicate rows,
+            // where individuals have multiple names - and we need to sort results by name.
+            if ($collection->containsStrict($record)) {
+                continue;
+            }
             // If the object has a method "canShow()", then use it to filter for privacy.
             if ($row_filter($record)) {
                 if ($offset > 0) {
@@ -1113,7 +1141,7 @@ class SearchService
         return function (stdClass $row): Family {
             $tree = $this->tree_service->find((int) $row->f_file);
 
-            return Factory::family()->mapper($tree)($row);
+            return Registry::familyFactory()->mapper($tree)($row);
         };
     }
 
@@ -1127,7 +1155,7 @@ class SearchService
         return function (stdClass $row): Individual {
             $tree = $this->tree_service->find((int) $row->i_file);
 
-            return Factory::individual()->mapper($tree)($row);
+            return Registry::individualFactory()->mapper($tree)($row);
         };
     }
 
@@ -1141,7 +1169,7 @@ class SearchService
         return function (stdClass $row): Media {
             $tree = $this->tree_service->find((int) $row->m_file);
 
-            return Factory::media()->mapper($tree)($row);
+            return Registry::mediaFactory()->mapper($tree)($row);
         };
     }
 
@@ -1155,7 +1183,7 @@ class SearchService
         return function (stdClass $row): Note {
             $tree = $this->tree_service->find((int) $row->o_file);
 
-            return Factory::note()->mapper($tree)($row);
+            return Registry::noteFactory()->mapper($tree)($row);
         };
     }
 
@@ -1169,7 +1197,7 @@ class SearchService
         return function (stdClass $row): Repository {
             $tree = $this->tree_service->find((int) $row->o_file);
 
-            return Factory::repository()->mapper($tree)($row);
+            return Registry::repositoryFactory()->mapper($tree)($row);
         };
     }
 
@@ -1183,7 +1211,7 @@ class SearchService
         return function (stdClass $row): Source {
             $tree = $this->tree_service->find((int) $row->s_file);
 
-            return Factory::source()->mapper($tree)($row);
+            return Registry::sourceFactory()->mapper($tree)($row);
         };
     }
 
@@ -1197,7 +1225,7 @@ class SearchService
         return function (stdClass $row): Submitter {
             $tree = $this->tree_service->find((int) $row->o_file);
 
-            return Factory::submitter()->mapper($tree)($row);
+            return Registry::submitterFactory()->mapper($tree)($row);
         };
     }
 }

@@ -36,10 +36,8 @@ use Fisharebest\Webtrees\Http\Middleware\RegisterFactories;
 use Fisharebest\Webtrees\Http\Middleware\Router;
 use Fisharebest\Webtrees\Http\Middleware\SecurityHeaders;
 use Fisharebest\Webtrees\Http\Middleware\UpdateDatabaseSchema;
-use Fisharebest\Webtrees\Http\Middleware\UseCache;
 use Fisharebest\Webtrees\Http\Middleware\UseDatabase;
 use Fisharebest\Webtrees\Http\Middleware\UseDebugbar;
-use Fisharebest\Webtrees\Http\Middleware\UseFilesystem;
 use Fisharebest\Webtrees\Http\Middleware\UseLanguage;
 use Fisharebest\Webtrees\Http\Middleware\UseSession;
 use Fisharebest\Webtrees\Http\Middleware\UseTheme;
@@ -100,12 +98,12 @@ class Webtrees
     public const STABILITY = '';
 
     // Version number
-    public const VERSION = '2.0.7' . self::STABILITY;
+    public const VERSION = '2.0.10' . self::STABILITY;
 
     // Project website.
     public const URL = 'https://webtrees.net/';
 
-    // FAQ linnks
+    // FAQ links
     public const URL_FAQ_EMAIL = 'https://webtrees.net/faq/email';
 
     // Project website.
@@ -119,15 +117,13 @@ class Webtrees
         BaseUrl::class,
         HandleExceptions::class,
         ClientIp::class,
-        UseCache::class,
+        RegisterFactories::class,
         BadBotBlocker::class,
         UseDatabase::class,
         UseDebugbar::class,
         UpdateDatabaseSchema::class,
-        UseFilesystem::class,
         UseSession::class,
         UseLanguage::class,
-        RegisterFactories::class,
         CheckForMaintenanceMode::class,
         UseTheme::class,
         DoHousekeeping::class,

@@ -59,6 +59,7 @@
 		"illuminate/container": "~5.8",
 		"illuminate/database": "~5.8",
 		"illuminate/support": "~5.8",
+        	"intervention/image": "^2.5",
 		"io-developer/php-whois": "~3.5",
 		"jon48/webtrees-lib": "dev-feature/2.0",
 		"jon48/webtrees-mod-translationtool": "dev-master",
@@ -70,8 +71,8 @@
 		"league/glide": "~1.5",
 		"middlewares/client-ip": "~1.3",
 		"mlocati/ip-lib": "~1.9",
-        "nesbot/carbon": "~2.35",
-        "nyholm/psr7": "~1.3",
+        	"nesbot/carbon": "~2.35",
+        	"nyholm/psr7": "~1.3",
 		"nyholm/psr7-server": "~1.0",
 		"oomphinc/composer-installers-extender": "~1.1",
 		"oscarotero/middleland": "~1.0",
@@ -98,6 +99,7 @@
 		"phpunit/phpunit" : "~7.5|~8.0"
 	},
 	"suggest" : {
+        	"ext-imagick": "Required to generate thumbnail images",
 		"ext-pdo_mysql" : "Required to use MySQL for database storage",
 		"ext-pdo_sqlite" : "Required to use SQLite for database storage",
 		"ext-pdo_pgsql" : "Required to use PostgreSQL for database storage",
@@ -158,6 +160,9 @@
 		],
         "webtrees:lang": [
             "Fisharebest\\Webtrees\\Console\\ComposerScripts::languageFiles"
+        ],
+        "webtrees:missing-tests": [
+            "Fisharebest\\Webtrees\\Console\\ComposerScripts::missingTests"
         ],
 		"webtrees:po" : [
 			"sed -i.bak -e 's/\\(I18N::[^)]*[)]\\)/<?php echo \\1; ?>/g' resources/xml/reports/*.xml",

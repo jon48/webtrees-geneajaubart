@@ -27,10 +27,10 @@ use Fisharebest\Webtrees\Date\JalaliDate;
 use Fisharebest\Webtrees\Date\JewishDate;
 use Fisharebest\Webtrees\Date\JulianDate;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\CalendarService;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
@@ -68,7 +68,7 @@ class CalendarEvents implements RequestHandlerInterface
     }
 
     /**
-     * Show anniversaries that occured on a given day/month/year.
+     * Show anniversaries that occurred on a given day/month/year.
      *
      * @param ServerRequestInterface $request
      *
@@ -106,7 +106,7 @@ class CalendarEvents implements RequestHandlerInterface
                 $anniversary_facts = $this->calendar_service->getCalendarEvents($ged_year->minimumJulianDay(), $ged_year->maximumJulianDay(), $filterev, $tree, $filterof, $filtersx);
             }
 
-            $anniversaries     = Collection::make($anniversary_facts)
+            $anniversaries = Collection::make($anniversary_facts)
                 ->unique()
                 ->sort(static function (Fact $x, Fact $y): int {
                     return $x->date()->minimumJulianDay() <=> $y->date()->minimumJulianDay();
@@ -181,7 +181,7 @@ class CalendarEvents implements RequestHandlerInterface
 
         ob_start();
 
-        echo '<table class="w-100"><thead><tr>';
+        echo '<table class="w-100 wt-calendar-month"><thead><tr>';
         for ($week_day = 0; $week_day < $days_in_week; ++$week_day) {
             $day_name = $cal_date->dayNames(($week_day + $week_start) % $days_in_week);
             if ($week_day === $weekend_start || $week_day === $weekend_end) {
@@ -287,7 +287,7 @@ class CalendarEvents implements RequestHandlerInterface
         $html = '';
 
         foreach ($list as $xref => $facts) {
-            $tmp  = Factory::gedcomRecord()->make((string) $xref, $tree);
+            $tmp = Registry::gedcomRecordFactory()->make((string) $xref, $tree);
             $html .= $tag1 . '<a href="' . e($tmp->url()) . '">' . $tmp->fullName() . '</a> ';
             $html .= '<div class="indent">' . $facts . '</div>' . $tag2;
         }

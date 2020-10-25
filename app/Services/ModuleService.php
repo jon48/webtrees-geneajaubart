@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,6 +22,7 @@ namespace Fisharebest\Webtrees\Services;
 use Closure;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Module\AhnentafelReportModule;
@@ -541,7 +542,7 @@ class ModuleService
      */
     public function all(bool $include_disabled = false): Collection
     {
-        return app('cache.array')->remember('all-modules', function (): Collection {
+        return Registry::cache()->array()->remember('all-modules', function (): Collection {
             // Modules have a default status, order etc.
             // We can override these from database settings.
             $module_info = DB::table('module')
@@ -845,6 +846,9 @@ class ModuleService
      */
     public function bootModules(ModuleThemeInterface $current_theme): void
     {
+        // @deprecated since 2.0.8 - will be removed in 2.1.0
+        app()->instance('cache.array', Registry::cache()->array());
+
         foreach ($this->all() as $module) {
             // Only bootstrap the current theme.
             if ($module instanceof ModuleThemeInterface && $module !== $current_theme) {
@@ -856,18 +860,18 @@ class ModuleService
     }
 
     /**
-     * @return string[]
+     * @return Collection<string>
      */
-    public function componentsWithAccess(): array
+    public function componentsWithAccess(): Collection
     {
-        return self::COMPONENTS_WITH_ACCESS;
+        return new Collection(self::COMPONENTS_WITH_ACCESS);
     }
 
     /**
-     * @return string[]
+     * @return Collection<string>
      */
-    public function componentsWithOrder(): array
+    public function componentsWithOrder(): Collection
     {
-        return self::COMPONENTS_WITH_SORT;
+        return new Collection(self::COMPONENTS_WITH_SORT);
     }
 }

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,6 +21,7 @@ namespace Fisharebest\Webtrees\Factories;
 
 use Fisharebest\Webtrees\Cache;
 use Fisharebest\Webtrees\Gedcom;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
@@ -31,17 +32,17 @@ use stdClass;
  */
 abstract class AbstractGedcomRecordFactory
 {
-    /** @var Cache */
+    /** @var Cache  */
     protected $cache;
 
     /**
      * GedcomRecordFactory constructor.
      *
-     * @param Cache $cache
+     * @deprecated since 2.0.8 - will be removed in 2.1.0
      */
-    public function __construct(Cache $cache)
+    public function __construct()
     {
-        $this->cache = $cache;
+        $this->cache = Registry::cache()->array();
     }
 
     /**
@@ -52,7 +53,7 @@ abstract class AbstractGedcomRecordFactory
     protected function pendingChanges(Tree $tree): Collection
     {
         // Caution - this cache can be overwritten by GedcomExportService
-        return $this->cache->remember(__CLASS__ . $tree->id(), static function () use ($tree): Collection {
+        return Registry::cache()->array()->remember(__CLASS__ . $tree->id(), static function () use ($tree): Collection {
             return DB::table('change')
                 ->where('gedcom_id', '=', $tree->id())
                 ->where('status', '=', 'pending')

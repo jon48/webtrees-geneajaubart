@@ -119,14 +119,17 @@ class TopSurnamesModule extends AbstractModule implements ModuleBlockInterface
 
             $all_surnames[$top_surname] = $variants;
         }
-        
+
         // Find a module providing individual lists.
         $module = $this->module_service
             ->findByComponent(ModuleListInterface::class, $tree, Auth::user())
             ->first(static function (ModuleInterface $module): bool {
-                return $module instanceof IndividualListModule;
+                // The family list extends the individual list
+                return
+                    $module instanceof IndividualListModule &&
+                    !$module instanceof FamilyListModule;
             });
-        
+
         switch ($infoStyle) {
             case 'tagcloud':
                 uksort($all_surnames, [I18N::class, 'strcasecmp']);

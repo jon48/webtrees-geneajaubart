@@ -20,17 +20,17 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\Controllers\Admin;
 
 use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
-use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\Functions\Functions;
 use Fisharebest\Webtrees\Html;
+use Fisharebest\Webtrees\Http\RequestHandlers\AdminMediaFileDownload;
+use Fisharebest\Webtrees\Http\RequestHandlers\AdminMediaFileThumbnail;
 use Fisharebest\Webtrees\Http\RequestHandlers\DeletePath;
-use Fisharebest\Webtrees\Http\RequestHandlers\MediaFileUnused;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Log;
 use Fisharebest\Webtrees\Media;
-use Fisharebest\Webtrees\MediaFile;
 use Fisharebest\Webtrees\Mime;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\DatatablesService;
 use Fisharebest\Webtrees\Services\MediaFileService;
 use Fisharebest\Webtrees\Services\TreeService;
@@ -39,6 +39,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
+use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -51,7 +52,6 @@ use function e;
 use function getimagesize;
 use function ini_get;
 use function intdiv;
-use function is_string;
 use function preg_match;
 use function redirect;
 use function route;
@@ -60,6 +60,7 @@ use function str_starts_with;
 use function strlen;
 use function substr;
 use function trim;
+use function view;
 
 use const UPLOAD_ERR_OK;
 
@@ -104,11 +105,8 @@ class MediaController extends AbstractAdminController
      */
     public function index(ServerRequestInterface $request): ResponseInterface
     {
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
-
-        $data_filesystem_name = $request->getAttribute('filesystem.data.name');
-        assert(is_string($data_filesystem_name));
+        $data_filesystem      = Registry::filesystem()->data();
+        $data_filesystem_name = Registry::filesystem()->dataName();
 
         $files         = $request->getQueryParams()['files'] ?? 'local'; // local|unused|external
         $subfolders    = $request->getQueryParams()['subfolders'] ?? 'include'; // include|exclude
@@ -150,10 +148,9 @@ class MediaController extends AbstractAdminController
      */
     public function data(ServerRequestInterface $request): ResponseInterface
     {
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
+        $data_filesystem = Registry::filesystem()->data();
 
-        $files  = $request->getQueryParams()['files']; // local|external|unused
+        $files = $request->getQueryParams()['files']; // local|external|unused
 
         // Files within this folder
         $media_folder = $request->getQueryParams()['media_folder'];
@@ -171,21 +168,31 @@ class MediaController extends AbstractAdminController
         // Convert a row from the database into a row for datatables
         $callback = function (stdClass $row): array {
             $tree = $this->tree_service->find((int) $row->m_file);
-            $media = Factory::media()->make($row->m_id, $tree, $row->m_gedcom);
+            $media = Registry::mediaFactory()->make($row->m_id, $tree, $row->m_gedcom);
             assert($media instanceof Media);
 
-            $media_files = $media->mediaFiles()
-                ->filter(static function (MediaFile $media_file) use ($row): bool {
-                    return $media_file->filename() === $row->multimedia_file_refn;
-                })
-                ->map(static function (MediaFile $media_file): string {
-                    return $media_file->displayImage(150, 150, '', []);
-                })
-                ->first();
+            $path = $row->media_folder . $row->multimedia_file_refn;
+
+            try {
+                $mime_type = Registry::filesystem()->data()->getMimeType($path) ?: Mime::DEFAULT_TYPE;
+
+                if (str_starts_with($mime_type, 'image/')) {
+                    $url = route(AdminMediaFileThumbnail::class, ['path' => $path]);
+                    $img = '<img src="' . e($url) . '">';
+                } else {
+                    $img = view('icons/mime', ['type' => $mime_type]);
+                }
+
+                $url = route(AdminMediaFileDownload::class, ['path' => $path]);
+                $img = '<a href="' . e($url) . '" type="' . $mime_type . '" class="gallery">' . $img . '</a>';
+            } catch (FileNotFoundException $ex) {
+                $url = route(AdminMediaFileThumbnail::class, ['path' => $path]);
+                $img = '<img src="' . e($url) . '">';
+            }
 
             return [
                 $row->multimedia_file_refn,
-                $media_files,
+                $img,
                 $this->mediaObjectInfo($media),
             ];
         };
@@ -202,7 +209,7 @@ class MediaController extends AbstractAdminController
                     ->where('setting_name', '=', 'MEDIA_DIRECTORY')
                     ->where('multimedia_file_refn', 'NOT LIKE', 'http://%')
                     ->where('multimedia_file_refn', 'NOT LIKE', 'https://%')
-                    ->select(['media.*', 'multimedia_file_refn', 'descriptive_title']);
+                    ->select(['media.*', 'multimedia_file_refn', 'descriptive_title', 'setting_value AS media_folder']);
 
                 $query->where(new Expression('setting_value || multimedia_file_refn'), 'LIKE', $media_folder . '%');
 
@@ -246,22 +253,20 @@ class MediaController extends AbstractAdminController
                     });
 
                 $search_columns = [0];
-
-                $sort_columns = [0 => 0];
+                $sort_columns   = [0 => 0];
 
                 $callback = function (array $row) use ($data_filesystem, $media_trees): array {
                     $mime_type = $data_filesystem->getMimeType($row[0]) ?: Mime::DEFAULT_TYPE;
 
                     if (str_starts_with($mime_type, 'image/')) {
-                        $url = route(MediaFileUnused::class, [
-                            'path' => $row[0],
-                            'w'    => 100,
-                            'h'    => 100,
-                        ]);
+                        $url = route(AdminMediaFileThumbnail::class, ['path' => $row[0]]);
                         $img = '<img src="' . e($url) . '">';
                     } else {
                         $img = view('icons/mime', ['type' => $mime_type]);
                     }
+
+                    $url = route(AdminMediaFileDownload::class, ['path' => $row[0]]);
+                    $img = '<a href="' . e($url) . '">' . $img . '</a>';
 
                     // Form to create new media object in each tree
                     $create_form = '';
@@ -269,7 +274,7 @@ class MediaController extends AbstractAdminController
                         if (str_starts_with($row[0], $media_directory)) {
                             $tmp         = substr($row[0], strlen($media_directory));
                             $create_form .=
-                                '<p><a href="#" data-toggle="modal" data-target="#modal-create-media-from-file" data-file="' . e($tmp) . '" data-url="' . e(route('create-media-from-file', ['tree' => $media_tree])) . '" onclick="document.getElementById(\'modal-create-media-from-file-form\').action=this.dataset.url; document.getElementById(\'file\').value=this.dataset.file;">' . I18N::translate('Create') . '</a> — ' . e($media_tree) . '<p>';
+                                '<p><a href="#" data-toggle="modal" data-backdrop="static" data-target="#modal-create-media-from-file" data-file="' . e($tmp) . '" data-url="' . e(route('create-media-from-file', ['tree' => $media_tree])) . '" onclick="document.getElementById(\'modal-create-media-from-file-form\').action=this.dataset.url; document.getElementById(\'file\').value=this.dataset.file;">' . I18N::translate('Create') . '</a> — ' . e($media_tree) . '<p>';
                         }
                     }
 
@@ -382,8 +387,7 @@ class MediaController extends AbstractAdminController
      */
     public function upload(ServerRequestInterface $request): ResponseInterface
     {
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
+        $data_filesystem = Registry::filesystem()->data();
 
         $media_folders = $this->media_file_service->allMediaFolders($data_filesystem);
 
@@ -406,8 +410,7 @@ class MediaController extends AbstractAdminController
      */
     public function uploadAction(ServerRequestInterface $request): ResponseInterface
     {
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
+        $data_filesystem = Registry::filesystem()->data();
 
         $params = (array) $request->getParsedBody();
 

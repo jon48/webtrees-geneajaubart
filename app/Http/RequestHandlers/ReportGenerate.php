@@ -25,12 +25,12 @@ use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Module\ModuleReportInterface;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Report\HtmlRenderer;
 use Fisharebest\Webtrees\Report\PdfRenderer;
 use Fisharebest\Webtrees\Report\ReportParserGenerate;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Tree;
-use League\Flysystem\FilesystemInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -80,8 +80,7 @@ class ReportGenerate implements RequestHandlerInterface
         $user = $request->getAttribute('user');
         assert($user instanceof UserInterface);
 
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
+        $data_filesystem = Registry::filesystem()->data();
 
         $report = $request->getAttribute('report');
         $module = $this->module_service->findByName($report);
@@ -90,7 +89,7 @@ class ReportGenerate implements RequestHandlerInterface
             return redirect(route(ReportListPage::class, ['tree' => $tree->name()]));
         }
 
-        Auth::checkComponentAccess($module, 'report', $tree, $user);
+        Auth::checkComponentAccess($module, ModuleReportInterface::class, $tree, $user);
 
         $varnames  = $request->getQueryParams()['varnames'] ?? [];
         $vars      = $request->getQueryParams()['vars'] ?? [];

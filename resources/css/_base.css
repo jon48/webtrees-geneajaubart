@@ -21,6 +21,7 @@
 @import "_charts.css";
 @import "_colorbox.css";
 @import "_lists.css";
+@import "_markdown.css";
 @import "_mime-type-icons.css";
 @import "_on-screen-keyboard.css";
 @import "_pages.css";
@@ -32,6 +33,11 @@
 [dir=rtl] .wt-icon-flip-rtl svg
 {
     transform: scale(-1, 1);
+}
+
+/* Bootstrap 4.5.1 toggle buttons don't work when labels have additional markup */
+[data-toggle=buttons] > label > .wt-icon-sex {
+    pointer-events: none;
 }
 
 /* Remove border-radius for left-to-right input groups on right-to-left pages */

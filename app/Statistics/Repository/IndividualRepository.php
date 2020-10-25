@@ -21,7 +21,7 @@ namespace Fisharebest\Webtrees\Statistics\Repository;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Carbon;
-use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Functions\FunctionsPrintLists;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomRecord;
@@ -528,7 +528,7 @@ class IndividualRepository implements IndividualRepositoryInterface
     public function getCommonSurname(): string
     {
         $top_surname = $this->topSurnames(1, 0);
-        
+
         return $top_surname
             ? implode(', ', array_keys(array_shift($top_surname)) ?? [])
             : '';
@@ -570,7 +570,7 @@ class IndividualRepository implements IndividualRepositoryInterface
         $module = app(ModuleService::class)->findByComponent(ModuleListInterface::class, $this->tree, Auth::user())->first(static function (ModuleInterface $module): bool {
             return $module instanceof IndividualListModule;
         });
-        
+
         return FunctionsPrintLists::surnameList(
             $surnames,
             ($type === 'list' ? 1 : 2),
@@ -831,7 +831,7 @@ class IndividualRepository implements IndividualRepositoryInterface
         }
 
         /** @var Individual $individual */
-        $individual = Factory::individual()->mapper($this->tree)($row);
+        $individual = Registry::individualFactory()->mapper($this->tree)($row);
 
         if (!$individual->canShow()) {
             return I18N::translate('This information is private and cannot be shown.');
@@ -985,7 +985,7 @@ class IndividualRepository implements IndividualRepositoryInterface
         $top10 = [];
         foreach ($rows as $row) {
             /** @var Individual $individual */
-            $individual = Factory::individual()->mapper($this->tree)($row);
+            $individual = Registry::individualFactory()->mapper($this->tree)($row);
 
             if ($individual->canShow()) {
                 $top10[] = [
@@ -1127,7 +1127,7 @@ class IndividualRepository implements IndividualRepositoryInterface
             ->select(['individuals.*'])
             ->take($total)
             ->get()
-            ->map(Factory::individual()->mapper($this->tree))
+            ->map(Registry::individualFactory()->mapper($this->tree))
             ->filter(GedcomRecord::accessFilter())
             ->map(function (Individual $individual): array {
                 return [

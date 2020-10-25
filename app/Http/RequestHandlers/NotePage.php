@@ -22,10 +22,10 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\Note;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\ClipboardService;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
@@ -70,7 +70,7 @@ class NotePage implements RequestHandlerInterface
         $xref = $request->getAttribute('xref');
         assert(is_string($xref));
 
-        $note = Factory::note()->make($xref, $tree);
+        $note = Registry::noteFactory()->make($xref, $tree);
         $note = Auth::checkNoteAccess($note, false);
 
         // Redirect to correct xref/slug
@@ -84,7 +84,6 @@ class NotePage implements RequestHandlerInterface
             'families'         => $note->linkedFamilies('NOTE'),
             'individuals'      => $note->linkedIndividuals('NOTE'),
             'note'             => $note,
-            'notes'            => new Collection(),
             'media_objects'    => $note->linkedMedia('NOTE'),
             'meta_description' => '',
             'meta_robots'      => 'index,follow',
@@ -104,7 +103,7 @@ class NotePage implements RequestHandlerInterface
     {
         return $record->facts()
             ->filter(static function (Fact $fact): bool {
-                return $fact->getTag() !== 'CONT';
+                return $fact->tag() !== 'NOTE:CONT';
             });
     }
 }

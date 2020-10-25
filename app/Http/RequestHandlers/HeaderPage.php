@@ -22,9 +22,9 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\Header;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
@@ -47,18 +47,18 @@ class HeaderPage implements RequestHandlerInterface
 
     // Show the header's facts in this order:
     private const FACT_ORDER = [
-        1 => 'SOUR',
-        'DEST',
-        'DATE',
-        'SUBM',
-        'SUBN',
-        'FILE',
-        'COPR',
-        'GEDC',
-        'CHAR',
-        'LANG',
-        'PLAC',
-        'NOTE',
+        1 => 'HEAD:SOUR',
+        'HEAD:DEST',
+        'HEAD:DATE',
+        'HEAD:SUBM',
+        'HEAD:SUBN',
+        'HEAD:FILE',
+        'HEAD:COPR',
+        'HEAD:GEDC',
+        'HEAD:CHAR',
+        'HEAD:LANG',
+        'HEAD:PLAC',
+        'HEAD:NOTE',
     ];
 
     /**
@@ -74,7 +74,7 @@ class HeaderPage implements RequestHandlerInterface
         $xref = $request->getAttribute('xref');
         assert(is_string($xref));
 
-        $header = Factory::header()->make($xref, $tree);
+        $header = Registry::headerFactory()->make($xref, $tree);
         $header = Auth::checkHeaderAccess($header, false);
 
         // Redirect to correct xref/slug
@@ -106,8 +106,8 @@ class HeaderPage implements RequestHandlerInterface
     {
         return $record->facts()
             ->sort(static function (Fact $x, Fact $y): int {
-                $sort_x = array_search($x->getTag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
-                $sort_y = array_search($y->getTag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
+                $sort_x = array_search($x->tag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
+                $sort_y = array_search($y->tag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
 
                 return $sort_x <=> $sort_y;
             });

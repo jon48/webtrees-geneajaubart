@@ -22,8 +22,8 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Submission;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
@@ -47,16 +47,16 @@ class SubmissionPage implements RequestHandlerInterface
 
     // Show the submission's facts in this order:
     private const FACT_ORDER = [
-        1 => 'SUBM',
-        'FAMF',
-        'TEMP',
-        'ANCE',
-        'DESC',
-        'ORDI',
-        'OBJE',
-        'RIN',
-        'NOTE',
-        'CHAN',
+        1 => 'SUBN:SUBM',
+        'SUBN:FAMF',
+        'SUBN:TEMP',
+        'SUBN:ANCE',
+        'SUBN:DESC',
+        'SUBN:ORDI',
+        'SUBN:OBJE',
+        'SUBN:RIN',
+        'SUBN:NOTE',
+        'SUBN:CHAN',
     ];
 
     /**
@@ -72,7 +72,7 @@ class SubmissionPage implements RequestHandlerInterface
         $xref = $request->getAttribute('xref');
         assert(is_string($xref));
 
-        $submission = Factory::submission()->make($xref, $tree);
+        $submission = Registry::submissionFactory()->make($xref, $tree);
         $submission = Auth::checkSubmissionAccess($submission, false);
 
         // Redirect to correct xref/slug
@@ -104,8 +104,8 @@ class SubmissionPage implements RequestHandlerInterface
     {
         return $record->facts()
             ->sort(static function (Fact $x, Fact $y): int {
-                $sort_x = array_search($x->getTag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
-                $sort_y = array_search($y->getTag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
+                $sort_x = array_search($x->tag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
+                $sort_y = array_search($y->tag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
 
                 return $sort_x <=> $sort_y;
             });

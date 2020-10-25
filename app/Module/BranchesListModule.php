@@ -23,7 +23,7 @@ use Aura\Router\RouterContainer;
 use Fig\Http\Message\RequestMethodInterface;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
-use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\GedcomCode\GedcomCodePedi;
 use Fisharebest\Webtrees\GedcomRecord;
@@ -54,6 +54,7 @@ use function redirect;
 use function route;
 use function strip_tags;
 use function stripos;
+use function strtolower;
 use function usort;
 use function view;
 
@@ -137,7 +138,7 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
         $xref = app(ServerRequestInterface::class)->getAttribute('xref', '');
 
         if ($xref !== '') {
-            $individual = Factory::individual()->make($xref, $tree);
+            $individual = Registry::individualFactory()->make($xref, $tree);
 
             if ($individual instanceof Individual && $individual->canShow()) {
                 $parameters['surname'] = $parameters['surname'] ?? $individual->getAllNames()[0]['surn'] ?? null;
@@ -201,7 +202,7 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
 
             // Highlight direct-line ancestors of this individual.
             $xref = $tree->getUserPreference($user, User::PREF_TREE_ACCOUNT_XREF);
-            $self = Factory::individual()->make($xref, $tree);
+            $self = Registry::individualFactory()->make($xref, $tree);
 
             if ($surname !== '') {
                 $individuals = $this->loadIndividuals($tree, $surname, $soundex_dm, $soundex_std);
@@ -319,7 +320,7 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
             ->select(['individuals.*'])
             ->distinct()
             ->get()
-            ->map(Factory::individual()->mapper($tree))
+            ->map(Registry::individualFactory()->mapper($tree))
             ->filter(GedcomRecord::accessFilter())
             ->all();
 
@@ -397,7 +398,7 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
         $sosa = array_search($individual, $ancestors, true);
         if (is_int($sosa) && $module instanceof RelationshipsChartModule) {
             $sosa_class = 'search_hit';
-            $sosa_html  = '<a class="small ' . $individual->getBoxStyle() . '" href="' . e($module->chartUrl($individual, ['xref2' => $individuals[1]->xref()])) . '" rel="nofollow" title="' . I18N::translate('Relationships') . '">' . I18N::number($sosa) . '</a>' . self::sosaGeneration($sosa);
+            $sosa_html  = ' <a class="small wt-chart-box-' . strtolower($individual->sex()) . '" href="' . e($module->chartUrl($individual, ['xref2' => $ancestors[1]->xref()])) . '" rel="nofollow" title="' . I18N::translate('Relationship') . '">' . I18N::number($sosa) . '</a>' . self::sosaGeneration($sosa);
         } else {
             $sosa_class = '';
             $sosa_html  = '';
@@ -408,15 +409,16 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
 
         // If this is not a birth pedigree (e.g. an adoption), highlight it
         if ($parents) {
-            $pedi = '';
             foreach ($individual->facts(['FAMC']) as $fact) {
                 if ($fact->target() === $parents) {
                     $pedi = $fact->attribute('PEDI');
+
+                    if ($pedi !== '' && $pedi !== 'birth') {
+                        $pedigree  = GedcomCodePedi::getValue($pedi, $individual);
+                        $indi_html = '<span class="red">' . $pedigree . '</span> ' . $indi_html;
+                    }
                     break;
                 }
-            }
-            if ($pedi !== '' && $pedi !== 'birth') {
-                $indi_html = '<span class="red">' . GedcomCodePedi::getValue($pedi, $individual) . '</span> ' . $indi_html;
             }
         }
 
@@ -434,7 +436,7 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
                     $sosa = array_search($spouse, $ancestors, true);
                     if (is_int($sosa) && $module instanceof RelationshipsChartModule) {
                         $sosa_class = 'search_hit';
-                        $sosa_html  = '<a class="small ' . $spouse->getBoxStyle() . '" href="' . e($module->chartUrl($individual, ['xref2' => $individuals[1]->xref()])) . '" rel="nofollow" title="' . I18N::translate('Relationships') . '">' . I18N::number($sosa) . '</a>' . self::sosaGeneration($sosa);
+                        $sosa_html  = ' <a class="small wt-chart-box-' . strtolower($spouse->sex()) . '" href="' . e($module->chartUrl($spouse, ['xref2' => $ancestors[1]->xref()])) . '" rel="nofollow" title="' . I18N::translate('Relationship') . '">' . I18N::number($sosa) . '</a>' . self::sosaGeneration($sosa);
                     } else {
                         $sosa_class = '';
                         $sosa_html  = '';

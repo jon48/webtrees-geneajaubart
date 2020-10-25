@@ -22,8 +22,8 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\ClipboardService;
 use Fisharebest\Webtrees\Source;
 use Fisharebest\Webtrees\Tree;
@@ -48,20 +48,20 @@ class SourcePage implements RequestHandlerInterface
 
     // Show the source's facts in this order:
     private const FACT_ORDER = [
-        1 => 'TITL',
-        'ABBR',
-        'AUTH',
-        'DATA',
-        'PUBL',
-        'TEXT',
-        'REPO',
-        'NOTE',
-        'OBJE',
-        'REFN',
-        'RIN',
-        '_UID',
-        'CHAN',
-        'RESN',
+        1 => 'SOUR:TITL',
+        'SOUR:ABBR',
+        'SOUR:AUTH',
+        'SOUR:DATA',
+        'SOUR:PUBL',
+        'SOUR:TEXT',
+        'SOUR:REPO',
+        'SOUR:NOTE',
+        'SOUR:OBJE',
+        'SOUR:REFN',
+        'SOUR:RIN',
+        'SOUR:_UID',
+        'SOUR:CHAN',
+        'SOUR:RESN',
     ];
 
     /** @var ClipboardService */
@@ -90,7 +90,7 @@ class SourcePage implements RequestHandlerInterface
         $xref = $request->getAttribute('xref');
         assert(is_string($xref));
 
-        $source = Factory::source()->make($xref, $tree);
+        $source = Registry::sourceFactory()->make($xref, $tree);
         $source = Auth::checkSourceAccess($source, false);
 
         // Redirect to correct xref/slug
@@ -122,8 +122,8 @@ class SourcePage implements RequestHandlerInterface
     {
         return $record->facts()
             ->sort(static function (Fact $x, Fact $y): int {
-                $sort_x = array_search($x->getTag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
-                $sort_y = array_search($y->getTag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
+                $sort_x = array_search($x->tag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
+                $sort_y = array_search($y->tag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
 
                 return $sort_x <=> $sort_y;
             });

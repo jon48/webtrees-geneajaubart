@@ -22,13 +22,14 @@ namespace Fisharebest\Webtrees\Module;
 use Aura\Router\Route;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\Http\RequestHandlers\AccountEdit;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
 use Fisharebest\Webtrees\Http\RequestHandlers\HomePage;
 use Fisharebest\Webtrees\Http\RequestHandlers\LoginPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\Logout;
+use Fisharebest\Webtrees\Http\RequestHandlers\ManageTrees;
 use Fisharebest\Webtrees\Http\RequestHandlers\PendingChanges;
 use Fisharebest\Webtrees\Http\RequestHandlers\SelectLanguage;
 use Fisharebest\Webtrees\Http\RequestHandlers\SelectTheme;
@@ -224,7 +225,7 @@ trait ModuleThemeTrait
         }
 
         if (Auth::isManager($tree)) {
-            return new Menu(I18N::translate('Control panel'), route('manage-trees', ['tree' => $tree->name()]), 'menu-admin');
+            return new Menu(I18N::translate('Control panel'), route(ManageTrees::class, ['tree' => $tree->name()]), 'menu-admin');
         }
 
         return null;
@@ -327,7 +328,7 @@ trait ModuleThemeTrait
      */
     public function menuMyIndividualRecord(Tree $tree): ?Menu
     {
-        $record = Factory::individual()->make($tree->getUserPreference(Auth::user(), User::PREF_TREE_ACCOUNT_XREF), $tree);
+        $record = Registry::individualFactory()->make($tree->getUserPreference(Auth::user(), User::PREF_TREE_ACCOUNT_XREF), $tree);
 
         if ($record) {
             return new Menu(I18N::translate('My individual record'), $record->url(), 'menu-myrecord');
@@ -357,7 +358,7 @@ trait ModuleThemeTrait
      */
     public function menuMyPages(?Tree $tree): ?Menu
     {
-        if (Auth::id()) {
+        if (Auth::check()) {
             if ($tree instanceof Tree) {
                 return new Menu(I18N::translate('My pages'), '#', 'menu-mymenu', [], array_filter([
                     $this->menuMyPage($tree),
@@ -454,7 +455,7 @@ trait ModuleThemeTrait
     }
 
     /**
-     * Misecellaneous dimensions, fonts, styles, etc.
+     * Miscellaneous dimensions, fonts, styles, etc.
      *
      * @param string $parameter_name
      *

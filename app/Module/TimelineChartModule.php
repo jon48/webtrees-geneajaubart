@@ -24,7 +24,7 @@ use Fig\Http\Message\RequestMethodInterface;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Date\GregorianDate;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
@@ -154,7 +154,7 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
 
         $add  = $params['add'] ?? '';
 
-        Auth::checkComponentAccess($this, 'chart', $tree, $user);
+        Auth::checkComponentAccess($this, ModuleChartInterface::class, $tree, $user);
 
         $scale = min($scale, self::MAXIMUM_SCALE);
         $scale = max($scale, self::MINIMUM_SCALE);
@@ -175,7 +175,7 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
         $individuals = (new Collection($xrefs))
             ->uniqueStrict()
             ->map(static function (string $xref) use ($tree): ?Individual {
-                return Factory::individual()->make($xref, $tree);
+                return Registry::individualFactory()->make($xref, $tree);
             })
             ->filter()
             ->filter(GedcomRecord::accessFilter());
@@ -200,14 +200,14 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
         }
 
         $individuals = array_map(static function (string $xref) use ($tree): ?Individual {
-            return Factory::individual()->make($xref, $tree);
+            return Registry::individualFactory()->make($xref, $tree);
         }, $xrefs);
 
         $individuals = array_filter($individuals, static function (?Individual $individual): bool {
             return $individual instanceof Individual && $individual->canShow();
         });
 
-        Auth::checkComponentAccess($this, 'chart', $tree, $user);
+        Auth::checkComponentAccess($this, ModuleChartInterface::class, $tree, $user);
 
         if ($ajax === '1') {
             $this->layout = 'layouts/ajax';
@@ -264,7 +264,7 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
     {
         /** @var Individual[] $individuals */
         $individuals = array_map(static function (string $xref) use ($tree): ?Individual {
-            return Factory::individual()->make($xref, $tree);
+            return Registry::individualFactory()->make($xref, $tree);
         }, $xrefs);
 
         $individuals = array_filter($individuals, static function (?Individual $individual): bool {

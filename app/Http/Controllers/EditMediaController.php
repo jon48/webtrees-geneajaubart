@@ -22,18 +22,17 @@ namespace Fisharebest\Webtrees\Http\Controllers;
 use Exception;
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\Html;
 use Fisharebest\Webtrees\Http\RequestHandlers\TreePage;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\MediaFile;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\MediaFileService;
 use Fisharebest\Webtrees\Services\PendingChangesService;
 use Fisharebest\Webtrees\Tree;
 use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
-use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Util;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -76,11 +75,10 @@ class EditMediaController extends AbstractBaseController
         $tree = $request->getAttribute('tree');
         assert($tree instanceof Tree);
 
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
+        $data_filesystem = Registry::filesystem()->data();
 
         $xref  = $request->getQueryParams()['xref'];
-        $media = Factory::media()->make($xref, $tree);
+        $media = Registry::mediaFactory()->make($xref, $tree);
 
         try {
             $media = Auth::checkMediaAccess($media);
@@ -113,7 +111,7 @@ class EditMediaController extends AbstractBaseController
         assert($tree instanceof Tree);
 
         $xref  = $request->getQueryParams()['xref'];
-        $media = Factory::media()->make($xref, $tree);
+        $media = Registry::mediaFactory()->make($xref, $tree);
 
         $params = (array) $request->getParsedBody();
 
@@ -154,13 +152,12 @@ class EditMediaController extends AbstractBaseController
         $tree = $request->getAttribute('tree');
         assert($tree instanceof Tree);
 
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
+        $data_filesystem = Registry::filesystem()->data();
 
         $params  = $request->getQueryParams();
         $xref    = $params['xref'];
         $fact_id = $params['fact_id'];
-        $media   = Factory::media()->make($xref, $tree);
+        $media   = Registry::mediaFactory()->make($xref, $tree);
 
         try {
             $media = Auth::checkMediaAccess($media);
@@ -199,8 +196,7 @@ class EditMediaController extends AbstractBaseController
         $tree = $request->getAttribute('tree');
         assert($tree instanceof Tree);
 
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
+        $data_filesystem = Registry::filesystem()->data();
 
         $xref    = $request->getQueryParams()['xref'];
         $fact_id = $request->getQueryParams()['fact_id'];
@@ -212,7 +208,7 @@ class EditMediaController extends AbstractBaseController
         $remote   = $params['remote'];
         $title    = $params['title'];
         $type     = $params['type'];
-        $media    = Factory::media()->make($xref, $tree);
+        $media    = Registry::mediaFactory()->make($xref, $tree);
 
         // Tidy non-printing characters
         $type  = trim(preg_replace('/\s+/', ' ', $type));
@@ -298,8 +294,7 @@ class EditMediaController extends AbstractBaseController
         $tree = $request->getAttribute('tree');
         assert($tree instanceof Tree);
 
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
+        $data_filesystem = Registry::filesystem()->data();
 
         return response(view('modals/create-media-object', [
             'max_upload_size' => $this->media_file_service->maxUploadFilesize(),
@@ -345,7 +340,7 @@ class EditMediaController extends AbstractBaseController
         assert($tree instanceof Tree);
 
         $xref  = $request->getQueryParams()['xref'];
-        $media = Factory::media()->make($xref, $tree);
+        $media = Registry::mediaFactory()->make($xref, $tree);
 
         return response(view('modals/link-media-to-individual', [
             'media' => $media,
@@ -365,7 +360,7 @@ class EditMediaController extends AbstractBaseController
 
         $xref = $request->getQueryParams()['xref'];
 
-        $media = Factory::media()->make($xref, $tree);
+        $media = Registry::mediaFactory()->make($xref, $tree);
 
         return response(view('modals/link-media-to-family', [
             'media' => $media,
@@ -385,7 +380,7 @@ class EditMediaController extends AbstractBaseController
 
         $xref = $request->getQueryParams()['xref'];
 
-        $media = Factory::media()->make($xref, $tree);
+        $media = Registry::mediaFactory()->make($xref, $tree);
 
         return response(view('modals/link-media-to-source', [
             'media' => $media,
@@ -410,8 +405,8 @@ class EditMediaController extends AbstractBaseController
 
         $link = $params['link'];
 
-        $media  = Factory::media()->make($xref, $tree);
-        $record = Factory::gedcomRecord()->make($link, $tree);
+        $media  = Registry::mediaFactory()->make($xref, $tree);
+        $record = Registry::gedcomRecordFactory()->make($link, $tree);
 
         $record->createFact('1 OBJE @' . $xref . '@', true);
 

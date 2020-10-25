@@ -30,7 +30,7 @@ use Fisharebest\Webtrees\Date\JalaliDate;
 use Fisharebest\Webtrees\Date\JewishDate;
 use Fisharebest\Webtrees\Date\JulianDate;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\Individual;
@@ -92,7 +92,7 @@ class CalendarService
     }
 
     /**
-     * Get a list of events which occured during a given date range.
+     * Get a list of events which occurred during a given date range.
      *
      * @param int    $jd1      the start range of julian day
      * @param int    $jd2      the end range of julian day
@@ -159,14 +159,14 @@ class CalendarService
         foreach ($queries as $type => $record_query) {
             foreach ($record_query->get() as $row) {
                 if ($type === 'INDI') {
-                    $record = Factory::individual()->make($row->xref, $tree, $row->gedcom);
+                    $record = Registry::individualFactory()->make($row->xref, $tree, $row->gedcom);
                     assert($record instanceof Individual);
 
                     if ($filterof === 'living' && $record->isDead()) {
                         continue;
                     }
                 } else {
-                    $record = Factory::family()->make($row->xref, $tree, $row->gedcom);
+                    $record = Registry::familyFactory()->make($row->xref, $tree, $row->gedcom);
                     assert($record instanceof Family);
                     $husb = $record->husband();
                     $wife = $record->wife();
@@ -258,7 +258,7 @@ class CalendarService
     }
 
     /**
-     * Get a list of events whose anniversary occured on a given julian day.
+     * Get a list of events whose anniversary occurred on a given julian day.
      * Used on the on-this-day/upcoming blocks and the day/month calendar views.
      *
      * @param int    $jd       the julian day
@@ -363,14 +363,14 @@ class CalendarService
             foreach ($queries as $type => $record_query) {
                 foreach ($record_query->get() as $row) {
                     if ($type === 'INDI') {
-                        $record = Factory::individual()->make($row->xref, $tree, $row->gedcom);
+                        $record = Registry::individualFactory()->make($row->xref, $tree, $row->gedcom);
                         assert($record instanceof Individual);
 
                         if ($filterof === 'living' && $record->isDead()) {
                             continue;
                         }
                     } else {
-                        $record = Factory::family()->make($row->xref, $tree, $row->gedcom);
+                        $record = Registry::familyFactory()->make($row->xref, $tree, $row->gedcom);
                         assert($record instanceof Family);
                         $husb = $record->husband();
                         $wife = $record->wife();

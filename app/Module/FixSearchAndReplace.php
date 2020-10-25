@@ -163,7 +163,7 @@ class FixSearchAndReplace extends AbstractModule implements ModuleDataFixInterfa
 
         $query = DB::table('individuals')
             ->where('i_file', '=', $tree->id());
-        
+
         $this->recordQuery($query, 'i_gedcom', $params);
 
         return $query->pluck('i_id');
@@ -361,16 +361,16 @@ class FixSearchAndReplace extends AbstractModule implements ModuleDataFixInterfa
 
         switch ($method) {
             case 'exact':
-                return '/' . preg_quote($search, '/') . '/' . $case;
+                return '/' . preg_quote($search, '/') . '/u' . $case;
 
             case 'words':
-                return '/\b' . preg_quote($search, '/') . '\b/' . $case;
+                return '/\b' . preg_quote($search, '/') . '\b/u' . $case;
 
             case 'wildcards':
-                return '/\b' . strtr(preg_quote($search, '/'), ['\*' => '.*', '\?' => '.']) . '\b/' . $case;
+                return '/\b' . strtr(preg_quote($search, '/'), ['\*' => '.*', '\?' => '.']) . '\b/u' . $case;
 
             case 'regex':
-                $regex = '/' . addcslashes($search, '/') . '/' . $case;
+                $regex = '/' . addcslashes($search, '/') . '/u' . $case;
 
                 try {
                     // A valid regex on an empty string returns zero.

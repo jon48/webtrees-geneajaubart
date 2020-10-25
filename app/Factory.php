@@ -34,45 +34,11 @@ use Fisharebest\Webtrees\Contracts\XrefFactoryInterface;
 
 /**
  * A service locator for our various factory objects.
+ *
+ * @deprecated - will be removed in 2.1.0 - use Registry instead.
  */
 class Factory
 {
-    /** @var FamilyFactoryInterface */
-    private static $family_factory;
-
-    /** @var GedcomRecordFactoryInterface */
-    private static $gedcom_record_factory;
-
-    /** @var HeaderFactoryInterface */
-    private static $header_factory;
-
-    /** @var IndividualFactoryInterface */
-    private static $individual_factory;
-
-    /** @var LocationFactoryInterface */
-    private static $location_factory;
-
-    /** @var MediaFactoryInterface */
-    private static $media_factory;
-
-    /** @var NoteFactoryInterface */
-    private static $note_factory;
-
-    /** @var RepositoryFactoryInterface */
-    private static $repository_factory;
-
-    /** @var SourceFactoryInterface */
-    private static $source_factory;
-
-    /** @var SubmissionFactoryInterface */
-    private static $submission_factory;
-
-    /** @var SubmitterFactoryInterface */
-    private static $submitter_factory;
-
-    /** @var XrefFactoryInterface */
-    private static $xref_factory;
-
     /**
      * Store or retrieve a factory object.
      *
@@ -82,11 +48,7 @@ class Factory
      */
     public static function family(FamilyFactoryInterface $factory = null): FamilyFactoryInterface
     {
-        if ($factory instanceof FamilyFactoryInterface) {
-            self::$family_factory = $factory;
-        }
-
-        return self::$family_factory;
+        return Registry::familyFactory($factory);
     }
 
     /**
@@ -98,11 +60,7 @@ class Factory
      */
     public static function gedcomRecord(GedcomRecordFactoryInterface $factory = null): GedcomRecordFactoryInterface
     {
-        if ($factory instanceof GedcomRecordFactoryInterface) {
-            self::$gedcom_record_factory = $factory;
-        }
-
-        return self::$gedcom_record_factory;
+        return Registry::gedcomRecordFactory($factory);
     }
 
     /**
@@ -114,11 +72,7 @@ class Factory
      */
     public static function header(HeaderFactoryInterface $factory = null): HeaderFactoryInterface
     {
-        if ($factory instanceof HeaderFactoryInterface) {
-            self::$header_factory = $factory;
-        }
-
-        return self::$header_factory;
+        return Registry::headerFactory($factory);
     }
 
     /**
@@ -130,11 +84,7 @@ class Factory
      */
     public static function individual(IndividualFactoryInterface $factory = null): IndividualFactoryInterface
     {
-        if ($factory instanceof IndividualFactoryInterface) {
-            self::$individual_factory = $factory;
-        }
-
-        return self::$individual_factory;
+        return Registry::individualFactory($factory);
     }
 
     /**
@@ -146,11 +96,7 @@ class Factory
      */
     public static function location(LocationFactoryInterface $factory = null): LocationFactoryInterface
     {
-        if ($factory instanceof LocationFactoryInterface) {
-            self::$location_factory = $factory;
-        }
-
-        return self::$location_factory;
+        return Registry::locationFactory($factory);
     }
 
     /**
@@ -162,11 +108,7 @@ class Factory
      */
     public static function media(MediaFactoryInterface $factory = null): MediaFactoryInterface
     {
-        if ($factory instanceof MediaFactoryInterface) {
-            self::$media_factory = $factory;
-        }
-
-        return self::$media_factory;
+        return Registry::mediaFactory($factory);
     }
 
     /**
@@ -178,11 +120,7 @@ class Factory
      */
     public static function note(NoteFactoryInterface $factory = null): NoteFactoryInterface
     {
-        if ($factory instanceof NoteFactoryInterface) {
-            self::$note_factory = $factory;
-        }
-
-        return self::$note_factory;
+        return Registry::noteFactory($factory);
     }
 
     /**
@@ -194,11 +132,7 @@ class Factory
      */
     public static function repository(RepositoryFactoryInterface $factory = null): RepositoryFactoryInterface
     {
-        if ($factory instanceof RepositoryFactoryInterface) {
-            self::$repository_factory = $factory;
-        }
-
-        return self::$repository_factory;
+        return Registry::repositoryFactory($factory);
     }
 
     /**
@@ -210,11 +144,7 @@ class Factory
      */
     public static function source(SourceFactoryInterface $factory = null): SourceFactoryInterface
     {
-        if ($factory instanceof SourceFactoryInterface) {
-            self::$source_factory = $factory;
-        }
-
-        return self::$source_factory;
+        return Registry::sourceFactory($factory);
     }
 
     /**
@@ -226,11 +156,7 @@ class Factory
      */
     public static function submission(SubmissionFactoryInterface $factory = null): SubmissionFactoryInterface
     {
-        if ($factory instanceof SubmissionFactoryInterface) {
-            self::$submission_factory = $factory;
-        }
-
-        return self::$submission_factory;
+        return Registry::submissionFactory($factory);
     }
 
     /**
@@ -242,11 +168,7 @@ class Factory
      */
     public static function submitter(SubmitterFactoryInterface $factory = null): SubmitterFactoryInterface
     {
-        if ($factory instanceof SubmitterFactoryInterface) {
-            self::$submitter_factory = $factory;
-        }
-
-        return self::$submitter_factory;
+        return Registry::submitterFactory($factory);
     }
 
     /**
@@ -258,10 +180,6 @@ class Factory
      */
     public static function xref(XrefFactoryInterface $factory = null): XrefFactoryInterface
     {
-        if ($factory instanceof XrefFactoryInterface) {
-            self::$xref_factory = $factory;
-        }
-
-        return self::$xref_factory;
+        return Registry::xrefFactory($factory);
     }
 }

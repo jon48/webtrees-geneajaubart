@@ -19,10 +19,12 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\Middleware;
 
-use Fisharebest\Webtrees\Cache;
+use Fisharebest\Webtrees\Factories\CacheFactory;
 use Fisharebest\Webtrees\Factories\FamilyFactory;
+use Fisharebest\Webtrees\Factories\FilesystemFactory;
 use Fisharebest\Webtrees\Factories\GedcomRecordFactory;
 use Fisharebest\Webtrees\Factories\HeaderFactory;
+use Fisharebest\Webtrees\Factories\ImageFactory;
 use Fisharebest\Webtrees\Factories\IndividualFactory;
 use Fisharebest\Webtrees\Factories\LocationFactory;
 use Fisharebest\Webtrees\Factories\MediaFactory;
@@ -32,14 +34,11 @@ use Fisharebest\Webtrees\Factories\SourceFactory;
 use Fisharebest\Webtrees\Factories\SubmissionFactory;
 use Fisharebest\Webtrees\Factories\SubmitterFactory;
 use Fisharebest\Webtrees\Factories\XrefFactory;
-use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Registry;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-
-use function app;
-use function assert;
 
 /**
  * Middleware to register various factory objects.
@@ -54,21 +53,21 @@ class RegisterFactories implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $cache = app('cache.array');
-        assert($cache instanceof Cache);
-
-        Factory::family(new FamilyFactory($cache));
-        Factory::gedcomRecord(new GedcomRecordFactory($cache));
-        Factory::header(new HeaderFactory($cache));
-        Factory::individual(new IndividualFactory($cache));
-        Factory::location(new LocationFactory($cache));
-        Factory::media(new MediaFactory($cache));
-        Factory::note(new NoteFactory($cache));
-        Factory::repository(new RepositoryFactory($cache));
-        Factory::source(new SourceFactory($cache));
-        Factory::submission(new SubmissionFactory($cache));
-        Factory::submitter(new SubmitterFactory($cache));
-        Factory::xref(new XrefFactory());
+        Registry::cache(new CacheFactory());
+        Registry::familyFactory(new FamilyFactory());
+        Registry::filesystem(new FilesystemFactory());
+        Registry::gedcomRecordFactory(new GedcomRecordFactory());
+        Registry::headerFactory(new HeaderFactory());
+        Registry::imageFactory(new ImageFactory());
+        Registry::individualFactory(new IndividualFactory());
+        Registry::locationFactory(new LocationFactory());
+        Registry::mediaFactory(new MediaFactory());
+        Registry::noteFactory(new NoteFactory());
+        Registry::repositoryFactory(new RepositoryFactory());
+        Registry::sourceFactory(new SourceFactory());
+        Registry::submissionFactory(new SubmissionFactory());
+        Registry::submitterFactory(new SubmitterFactory());
+        Registry::xrefFactory(new XrefFactory());
 
         return $handler->handle($request);
     }

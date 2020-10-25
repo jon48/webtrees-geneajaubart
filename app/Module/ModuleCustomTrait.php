@@ -20,17 +20,15 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module;
 
 use Fig\Http\Message\StatusCodeInterface;
-use Fisharebest\Webtrees\Cache;
 use Fisharebest\Webtrees\Exceptions\HttpAccessDeniedException;
 use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Mime;
+use Fisharebest\Webtrees\Registry;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use function app;
-use function assert;
 use function str_contains;
 use function strlen;
 use function strtolower;
@@ -82,10 +80,7 @@ trait ModuleCustomTrait
             return $this->customModuleVersion();
         }
 
-        $cache = app('cache.files');
-        assert($cache instanceof Cache);
-
-        return $cache->remember($this->name() . '-latest-version', function () {
+        return Registry::cache()->file()->remember($this->name() . '-latest-version', function () {
             try {
                 $client = new Client([
                     'timeout' => 3,
@@ -183,9 +178,10 @@ trait ModuleCustomTrait
         $extension = strtolower(pathinfo($asset, PATHINFO_EXTENSION));
         $mime_type = Mime::TYPES[$extension] ?? Mime::DEFAULT_TYPE;
 
-        return response($content, StatusCodeInterface::STATUS_OK)
-            ->withHeader('Cache-Control', 'public,max-age=31536000')
-            ->withHeader('Content-Length', (string) strlen($content))
-            ->withHeader('Content-Type', $mime_type);
+        return response($content, StatusCodeInterface::STATUS_OK, [
+            'Cache-Control'  => 'public,max-age=31536000',
+            'Content-Length' => (string) strlen($content),
+            'Content-Type'   => $mime_type,
+        ]);
     }
 }

@@ -23,7 +23,6 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Gedcom;
@@ -41,6 +40,7 @@ use Fisharebest\Webtrees\Module\ModuleChartInterface;
 use Fisharebest\Webtrees\Module\ModuleInterface;
 use Fisharebest\Webtrees\Module\RelationshipsChartModule;
 use Fisharebest\Webtrees\Note;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Repository;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\UserService;
@@ -218,7 +218,7 @@ class FunctionsPrintFacts
         // Print the value of this fact/event
         switch ($tag) {
             case 'ADDR':
-                echo e($value);
+                echo '<div class="d-block" style="white-space: pre-wrap">' . e($value) . '</div';
                 break;
             case 'AFN':
                 echo '<div class="field"><a href="https://familysearch.org/search/tree/results#count=20&query=afn:', rawurlencode($value), '">', e($value), '</a></div>';
@@ -307,7 +307,7 @@ class FunctionsPrintFacts
                         echo '<div class="field">', I18N::translate('No'), '</div>';
                         break;
                     case 'Y':
-                        // Do not display "Yes".
+                        echo '<div class="field">', I18N::translate('Yes'), '</div>';
                         break;
                     default:
                         if (preg_match('/^@(' . Gedcom::REGEX_XREF . ')@$/', $value, $match)) {
@@ -342,7 +342,12 @@ class FunctionsPrintFacts
 
         $addr = $fact->attribute('ADDR');
         if ($addr !== '') {
-            echo GedcomTag::getLabelValue($record->tag() . ':' . $fact->getTag() . ':ADDR', $addr);
+            $addr = e($addr);
+            if (str_contains($addr, "\n")) {
+                $addr = '<span class="d-block" style="white-space: pre-wrap">' . $addr . '</span';
+            }
+
+            echo GedcomTag::getLabelValue($fact->tag() . ':ADDR', $addr);
         }
 
         // Print the associates of this fact/event
@@ -404,7 +409,7 @@ class FunctionsPrintFacts
 
                     break;
                 case 'FAMC': // 0 INDI / 1 ADOP / 2 FAMC / 3 ADOP
-                    $family = Factory::family()->make(str_replace('@', '', $match[2]), $tree);
+                    $family = Registry::familyFactory()->make(str_replace('@', '', $match[2]), $tree);
                     if ($family instanceof Family) {
                         echo GedcomTag::getLabelValue('FAM', '<a href="' . e($family->url()) . '">' . $family->fullName() . '</a>');
                         if (preg_match('/\n3 ADOP (HUSB|WIFE|BOTH)/', $fact->gedcom(), $adop_match)) {
@@ -464,7 +469,7 @@ class FunctionsPrintFacts
                     if (!$hide_errors || GedcomTag::isTag($match[1])) {
                         if (preg_match('/^@(' . Gedcom::REGEX_XREF . ')@$/', $match[2], $xmatch)) {
                             // Links
-                            $linked_record = Factory::gedcomRecord()->make($xmatch[1], $tree);
+                            $linked_record = Registry::gedcomRecordFactory()->make($xmatch[1], $tree);
                             if ($linked_record) {
                                 $link = '<a href="' . e($linked_record->url()) . '">' . $linked_record->fullName() . '</a>';
                                 echo GedcomTag::getLabelValue($tag . ':' . $match[1], $link);
@@ -513,7 +518,7 @@ class FunctionsPrintFacts
         $html = '';
         // For each ASSO record
         foreach (array_merge($amatches1, $amatches2) as $amatch) {
-            $person = Factory::individual()->make($amatch[1], $event->record()->tree());
+            $person = Registry::individualFactory()->make($amatch[1], $event->record()->tree());
             if ($person && $person->canShowName()) {
                 // Is there a "RELA" tag
                 if (preg_match('/\n[23] RELA (.+)/', $amatch[2], $rmatch)) {
@@ -592,7 +597,7 @@ class FunctionsPrintFacts
         $spos2 = 0;
         for ($j = 0; $j < $ct; $j++) {
             $sid    = $match[$j][1];
-            $source = Factory::source()->make($sid, $tree);
+            $source = Registry::sourceFactory()->make($sid, $tree);
             if ($source) {
                 if ($source->canShow()) {
                     $spos1 = strpos($factrec, "$level SOUR @" . $sid . '@', $spos2);
@@ -650,7 +655,7 @@ class FunctionsPrintFacts
         $objectNum = 0;
         while ($objectNum < count($omatch)) {
             $media_id = $omatch[$objectNum][1];
-            $media    = Factory::media()->make($media_id, $tree);
+            $media    = Registry::mediaFactory()->make($media_id, $tree);
             if ($media) {
                 if ($media->canShow()) {
                     echo '<div class="d-flex align-items-center"><div class="p-1">';
@@ -708,17 +713,12 @@ class FunctionsPrintFacts
         }
 
         // -- find source for each fact
-        $ct    = preg_match_all("/($level SOUR (.+))/", $factrec, $match, PREG_SET_ORDER);
-        $spos2 = 0;
-        for ($j = 0; $j < $ct; $j++) {
-            $sid   = trim($match[$j][2], '@');
-            $spos1 = strpos($factrec, $match[$j][1], $spos2);
-            $spos2 = strpos($factrec, "\n$level", $spos1);
-            if (!$spos2) {
-                $spos2 = strlen($factrec);
-            }
-            $srec   = substr($factrec, $spos1, $spos2 - $spos1);
-            $source = Factory::source()->make($sid, $tree);
+        preg_match_all('/(?:^|\n)(' . $level . ' SOUR (.*)(?:\n[' . $nlevel . '-9] .*)*)/', $fact->gedcom(), $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $match) {
+            $srec   = $match[1];
+            $sid    = $match[2];
+            $source = Registry::sourceFactory()->make(trim($sid, '@'), $tree);
             // Allow access to "1 SOUR @non_existent_source@", so it can be corrected/deleted
             if (!$source || $source->canShow()) {
                 if ($level > 1) {
@@ -751,7 +751,7 @@ class FunctionsPrintFacts
                         ])) . '" title="', I18N::translate('Edit'), '">';
                     echo GedcomTag::getLabel($factname), '</a>';
                     echo '<div class="editfacts nowrap">';
-                    if (preg_match('/^@.+@$/', $match[$j][2])) {
+                    if (preg_match('/^@.+@$/', $sid)) {
                         // Inline sources can't be edited. Attempting to save one will convert it
                         // into a link, and delete it.
                         // e.g. "1 SOUR my source" becomes "1 SOUR @my source@" which does not exist.
@@ -933,7 +933,7 @@ class FunctionsPrintFacts
         for ($j = 0; $j < $ct; $j++) {
             // Note object, or inline note?
             if (preg_match("/$level NOTE @(.*)@/", $match[$j][0], $nmatch)) {
-                $note = Factory::note()->make($nmatch[1], $tree);
+                $note = Registry::noteFactory()->make($nmatch[1], $tree);
                 if ($note && !$note->canShow()) {
                     continue;
                 }
@@ -1057,7 +1057,7 @@ class FunctionsPrintFacts
         // -- find source for each fact
         preg_match_all('/(?:^|\n)' . $level . ' OBJE @(.*)@/', $fact->gedcom(), $matches);
         foreach ($matches[1] as $xref) {
-            $media = Factory::media()->make($xref, $tree);
+            $media = Registry::mediaFactory()->make($xref, $tree);
             // Allow access to "1 OBJE @non_existent_source@", so it can be corrected/deleted
             if (!$media instanceof Media || $media->canShow()) {
                 echo '<tr class="', $styleadd, '">';

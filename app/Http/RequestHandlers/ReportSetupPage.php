@@ -21,11 +21,11 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
-use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\Html;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Module\ModuleReportInterface;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Report\ReportParserSetup;
 use Fisharebest\Webtrees\Services\LocalizationService;
 use Fisharebest\Webtrees\Services\ModuleService;
@@ -35,7 +35,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use function assert;
-use function e;
 use function redirect;
 use function route;
 
@@ -84,7 +83,7 @@ class ReportSetupPage implements RequestHandlerInterface
             return redirect(route(ReportListPage::class, ['tree' => $tree->name()]));
         }
 
-        Auth::checkComponentAccess($module, 'report', $tree, $user);
+        Auth::checkComponentAccess($module, ModuleReportInterface::class, $tree, $user);
 
         $xref = $request->getQueryParams()['xref'] ?? '';
 
@@ -105,8 +104,9 @@ class ReportSetupPage implements RequestHandlerInterface
             ];
 
             $attributes = [
-                'id'   => 'input-' . $n,
-                'name' => 'vars[' . $input['name'] . ']',
+                'id'    => 'input-' . $n,
+                'name'  => 'vars[' . $input['name'] . ']',
+                'class' => $input['type'] === 'checkbox' ? 'form-control-check' : 'form-control',
             ];
 
             switch ($input['lookup']) {
@@ -114,7 +114,7 @@ class ReportSetupPage implements RequestHandlerInterface
                     $input['control'] = view('components/select-individual', [
                         'id'         => 'input-' . $n,
                         'name'       => 'vars[' . $input['name'] . ']',
-                        'individual' => Factory::individual()->make($xref, $tree),
+                        'individual' => Registry::individualFactory()->make($xref, $tree),
                         'tree'       => $tree,
                         'required'   => true,
                     ]);
@@ -124,7 +124,7 @@ class ReportSetupPage implements RequestHandlerInterface
                     $input['control'] = view('components/select-family', [
                         'id'       => 'input-' . $n,
                         'name'     => 'vars[' . $input['name'] . ']',
-                        'family'   => Factory::family()->make($xref, $tree),
+                        'family'   => Registry::familyFactory()->make($xref, $tree),
                         'tree'     => $tree,
                         'required' => true,
                     ]);
@@ -134,7 +134,7 @@ class ReportSetupPage implements RequestHandlerInterface
                     $input['control'] = view('components/select-source', [
                         'id'       => 'input-' . $n,
                         'name'     => 'vars[' . $input['name'] . ']',
-                        'family'   => Factory::source()->make($xref, $tree),
+                        'family'   => Registry::sourceFactory()->make($xref, $tree),
                         'tree'     => $tree,
                         'required' => true,
                     ]);
@@ -151,8 +151,7 @@ class ReportSetupPage implements RequestHandlerInterface
                         'onchange' => 'webtrees.reformatDate(this, "' . $dmy . '")'
                     ];
                     $input['control'] = '<input ' . Html::attributes($attributes) . '>';
-                    $input['extra']   = '<a href="#" title="' . I18N::translate('Select a date') . '" class ="btn btn-link" onclick="' . e('return webtrees.calendarWidget("calendar-widget-' . $n . '", "input-' . $n . '");') . '">' . view('icons/calendar') . '</a>' .
-                        '<div id="calendar-widget-' . $n . '" style="position:absolute;visibility:hidden;background-color:white;z-index:1000;"></div>';
+                    $input['extra'] = view('edit/input-addon-calendar', ['id' => 'input-' . $n]);
                     break;
 
                 default:

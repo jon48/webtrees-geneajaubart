@@ -26,11 +26,11 @@ use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataList;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\PlaceLocation;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\GedcomService;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Expression;
-use League\Flysystem\FilesystemInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -54,7 +54,6 @@ use function fopen;
 use function fputcsv;
 use function implode;
 use function is_numeric;
-use function is_string;
 use function json_decode;
 use function preg_replace;
 use function redirect;
@@ -162,17 +161,29 @@ class LocationController extends AbstractAdminController
         if ($place_id === 0) {
             $breadcrumbs[]   = I18N::translate('Add');
             $title           .= ' — ' . I18N::translate('Add');
-            $latitude        = '';
-            $longitude       = '';
+            $latitude        = 0.0;
+            $longitude       = 0.0;
             $map_bounds      = $parent->boundingRectangle();
-            $marker_position = [$parent->latitude(), $parent->longitude()];
         } else {
             $breadcrumbs[]   = I18N::translate('Edit');
             $title           .= ' — ' . I18N::translate('Edit');
             $latitude        = $location->latitude();
             $longitude       = $location->longitude();
             $map_bounds      = $location->boundingRectangle();
-            $marker_position = [$location->latitude(), $location->longitude()];
+        }
+
+        // If the current co-ordinates are unknown, leave the input fields empty,
+        // and show a marker in the middle of the map.
+        if ($latitude === 0.0 && $longitude === 0.0) {
+            $latitude  = '';
+            $longitude = '';
+
+            $marker_position = [
+                ($map_bounds[0][0] + $map_bounds[1][0]) / 2.0,
+                ($map_bounds[0][1] + $map_bounds[1][1]) / 2.0,
+            ];
+        } else {
+            $marker_position = [$latitude, $longitude];
         }
 
         return $this->viewResponse('admin/location-edit', [
@@ -401,7 +412,7 @@ class LocationController extends AbstractAdminController
                 Gedcom::PLACE_SEPARATOR,
                 array_reverse(
                     array_filter(
-                        array_slice($place, 1, $maxlevel + 1)
+                        array_slice($place, 1, $maxlevel)
                     )
                 )
             );
@@ -411,8 +422,8 @@ class LocationController extends AbstractAdminController
                 'geometry'   => [
                     'type'        => 'Point',
                     'coordinates' => [
-                        $this->gedcom_service->readLongitude($place['pl_long'] ?? ''),
-                        $this->gedcom_service->readLatitude($place['pl_lati'] ?? ''),
+                        $this->gedcom_service->readLongitude($place[$maxlevel + 1]),
+                        $this->gedcom_service->readLatitude($place[$maxlevel + 2]),
                     ],
                 ],
                 'properties' => [
@@ -435,11 +446,8 @@ class LocationController extends AbstractAdminController
      */
     public function importLocations(ServerRequestInterface $request): ResponseInterface
     {
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
-
-        $data_filesystem_name = $request->getAttribute('filesystem.data.name');
-        assert(is_string($data_filesystem_name));
+        $data_filesystem      = Registry::filesystem()->data();
+        $data_filesystem_name = Registry::filesystem()->dataName();
 
         $parent_id = (int) $request->getQueryParams()['parent_id'];
 
@@ -474,8 +482,7 @@ class LocationController extends AbstractAdminController
      */
     public function importLocationsAction(ServerRequestInterface $request): ResponseInterface
     {
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
+        $data_filesystem = Registry::filesystem()->data();
 
         $params = (array) $request->getParsedBody();
 

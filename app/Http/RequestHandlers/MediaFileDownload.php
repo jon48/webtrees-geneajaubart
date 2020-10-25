@@ -21,21 +21,15 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Exceptions\HttpAccessDeniedException;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
-use Fisharebest\Webtrees\Exceptions\MediaNotFoundException;
-use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
-use League\Flysystem\FilesystemInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function addcslashes;
 use function assert;
 use function redirect;
-use function response;
-use function strlen;
 
 /**
  * Download a media file.
@@ -54,8 +48,10 @@ class MediaFileDownload implements RequestHandlerInterface
         $tree = $request->getAttribute('tree');
         assert($tree instanceof Tree);
 
-        $data_filesystem = $request->getAttribute('filesystem.data');
-        assert($data_filesystem instanceof FilesystemInterface);
+        $user = $request->getAttribute('user');
+        assert($user instanceof UserInterface);
+
+        $image_factory = Registry::imageFactory();
 
         $disposition = $request->getQueryParams()['disposition'] ?? 'inline';
         assert($disposition === 'inline' || $disposition === 'attachment');
@@ -63,7 +59,7 @@ class MediaFileDownload implements RequestHandlerInterface
         $params  = $request->getQueryParams();
         $xref    = $params['xref'];
         $fact_id = $params['fact_id'];
-        $media   = Factory::media()->make($xref, $tree);
+        $media   = Registry::mediaFactory()->make($xref, $tree);
         $media   = Auth::checkMediaAccess($media);
 
         foreach ($media->mediaFiles() as $media_file) {
@@ -72,18 +68,13 @@ class MediaFileDownload implements RequestHandlerInterface
                     return redirect($media_file->filename());
                 }
 
-                if ($media_file->fileExists($data_filesystem)) {
-                    $data = $media_file->media()->tree()->mediaFilesystem($data_filesystem)->read($media_file->filename());
+                $watermark = $media_file->isImage() && $image_factory->fileNeedsWatermark($media_file, $user);
+                $download  = $disposition === 'attachment';
 
-                    return response($data, StatusCodeInterface::STATUS_OK, [
-                        'Content-Type'        => $media_file->mimeType(),
-                        'Content-Length'      => (string) strlen($data),
-                        'Content-Disposition' => $disposition . '; filename="' . addcslashes($media_file->filename(), '"') . '"',
-                    ]);
-                }
+                return $image_factory->mediaFileResponse($media_file, $watermark, $download);
             }
         }
 
-        throw new HttpNotFoundException();
+        return $image_factory->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND);
     }
 }

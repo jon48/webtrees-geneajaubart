@@ -142,7 +142,7 @@
     datestr = datestr.replace(/(\d)([A-Z])/g, '$1 $2');
     datestr = datestr.replace(/([A-Z])(\d)/g, '$1 $2');
 
-    // Shortcut for quarter format, "Q1 1900" => "BET JAN 1900 AND MAR 1900". See [ 1509083 ]
+    // Shortcut for quarter format, "Q1 1900" => "BET JAN 1900 AND MAR 1900".
     if (datestr.match(/^Q ([1-4]) (\d\d\d\d)$/)) {
       datestr = 'BET ' + months[RegExp.$1 * 3 - 3] + ' ' + RegExp.$2 + ' AND ' + months[RegExp.$1 * 3 - 1] + ' ' + RegExp.$2;
     }
@@ -162,7 +162,7 @@
     }
 
     // All digit dates
-    datestr = datestr.replaceAll(/(\d\d)(\d\d)(\d\d)(\d\d)/g, function () {
+    datestr = datestr.replace(/(\d\d)(\d\d)(\d\d)(\d\d)/g, function () {
       if (RegExp.$1 > '12' && RegExp.$3 <= '12' && RegExp.$4 <= '31') {
         return RegExp.$4 + ' ' + months[RegExp.$3 - 1] + ' ' + RegExp.$1 + RegExp.$2;
       }
@@ -172,21 +172,21 @@
       return RegExp.$1 + RegExp.$2 + RegExp.$3 + RegExp.$4;
     });
 
-    // e.g. 17.11.1860, 3/4/2005 or 1999-12-31. Use locale settings since DMY order is ambiguous.
-    datestr = datestr.replaceAll(/(\d+)([./-])(\d+)([./-])(\d+)/g, function () {
+    // e.g. 17.11.1860, 2 4 1987, 3/4/2005, 1999-12-31. Use locale settings since DMY order is ambiguous.
+    datestr = datestr.replace(/(\d+)([ ./-])(\d+)(\2)(\d+)/g, function () {
       let f1 = parseInt(RegExp.$1, 10);
       let f2 = parseInt(RegExp.$3, 10);
       let f3 = parseInt(RegExp.$5, 10);
       let yyyy = new Date().getFullYear();
       let yy = yyyy % 100;
       let cc = yyyy - yy;
-      if (dmy === 'DMY' && f1 <= 31 && f2 <= 12 || f1 > 13 && f1 <= 31 && f2 <= 12 && f3 > 31) {
+      if ((dmy === 'DMY' || f1 > 13 && f3 > 31) && f1 <= 31 && f2 <= 12) {
         return f1 + ' ' + months[f2 - 1] + ' ' + (f3 >= 100 ? f3 : (f3 <= yy ? f3 + cc : f3 + cc - 100));
       }
-      if (dmy === 'MDY' && f1 <= 12 && f2 <= 31 || f2 > 13 && f2 <= 31 && f1 <= 12 && f3 > 31) {
+      if ((dmy === 'MDY' || f2 > 13 && f3 > 31) && f1 <= 12 && f2 <= 31) {
         return f2 + ' ' + months[f1 - 1] + ' ' + (f3 >= 100 ? f3 : (f3 <= yy ? f3 + cc : f3 + cc - 100));
       }
-      if (dmy === 'YMD' && f2 <= 12 && f3 <= 31 || f3 > 13 && f3 <= 31 && f2 <= 12 && f1 > 31) {
+      if ((dmy === 'YMD' || f1 > 31) && f2 <= 12 && f3 <= 31) {
         return f3 + ' ' + months[f2 - 1] + ' ' + (f1 >= 100 ? f1 : (f1 <= yy ? f1 + cc : f1 + cc - 100));
       }
       return RegExp.$1 + RegExp.$2 + RegExp.$3 + RegExp.$4 + RegExp.$5;
@@ -204,21 +204,21 @@
       .replace(/^([\w ]+) ?- ?([\w ]+)$/, 'BET $1 AND $2')
       .replace(/^([\w ]+) ?~ ?([\w ]+)$/, 'FROM $1 TO $2')
       // Convert full months to short months
-      .replaceAll('JANUARY', 'JAN')
-      .replaceAll('FEBRUARY', 'FEB')
-      .replaceAll('MARCH', 'MAR')
-      .replaceAll('APRIL', 'APR')
-      .replaceAll('JUNE', 'JUN')
-      .replaceAll('JULY', 'JUL')
-      .replaceAll('AUGUST', 'AUG')
-      .replaceAll('SEPTEMBER', 'SEP')
-      .replaceAll('OCTOBER', 'OCT')
-      .replaceAll('NOVEMBER', 'NOV')
-      .replaceAll('DECEMBER', 'DEC')
+      .replace(/JANUARY/g, 'JAN')
+      .replace(/FEBRUARY/g, 'FEB')
+      .replace(/MARCH/g, 'MAR')
+      .replace(/APRIL/g, 'APR')
+      .replace(/JUNE/g, 'JUN')
+      .replace(/JULY/g, 'JUL')
+      .replace(/AUGUST/g, 'AUG')
+      .replace(/SEPTEMBER/g, 'SEP')
+      .replace(/OCTOBER/, 'OCT')
+      .replace(/NOVEMBER/g, 'NOV')
+      .replace(/DECEMBER/g, 'DEC')
       // Americans enter dates as SEP 20, 1999
-      .replaceAll(/(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\.? (\d\d?)[, ]+(\d\d\d\d)/g, '$2 $1 $3')
+      .replace(/(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\.? (\d\d?)[, ]+(\d\d\d\d)/g, '$2 $1 $3')
       // Apply leading zero to day numbers
-      .replaceAll(/(^| )(\d [A-Z]{3,5} \d{4})/g, '$10$2');
+      .replace(/(^| )(\d [A-Z]{3,5} \d{4})/g, '$10$2');
 
     if (datephrase) {
       datestr = datestr + ' (' + datephrase;
@@ -337,10 +337,13 @@
     }
 
     /* Javascript calendar functions only work with precise gregorian dates "D M Y" or "Y" */
-    let greg_regex = /((\d+ (JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC) )?\d+)/i;
+    let greg_regex = /(?:(\d*) ?(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC) )?(\d+)/i;
     let date;
     if (greg_regex.exec(dateField.value)) {
-      date = new Date(RegExp.$1);
+      let day   = RegExp.$1 || '1';
+      let month = RegExp.$2 || 'JAN'
+      let year  = RegExp.$3;
+      date = new Date(day + ' ' + month + ' ' + year);
     } else {
       date = new Date();
     }
@@ -509,15 +512,17 @@
     const key = 'state-of-' + element_id;
     const state = localStorage.getItem(key);
 
-    // Previously selected?
-    if (state === 'true') {
-      element.click();
-    }
+    if (element instanceof HTMLInputElement && element.type === 'checkbox') {
+      // Previously selected?
+      if (state === 'true') {
+        element.click();
+      }
 
-    // Remember state for the next page load.
-    element.addEventListener('change', function () {
-      localStorage.setItem(key, element.checked);
-    });
+      // Remember state for the next page load.
+      element.addEventListener('change', function () {
+        localStorage.setItem(key, element.checked);
+      });
+    }
   };
 
   /**
@@ -586,20 +591,22 @@
       const that = this;
       $(this).typeahead(null, {
         display: 'value',
-        limit: 0,
+        limit: 10,
+        minLength: 2,
         source: new Bloodhound({
           datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
           queryTokenizer: Bloodhound.tokenizers.whitespace,
           remote: {
             url: this.dataset.autocompleteUrl,
             replace: function (url, uriEncodedQuery) {
-              if (that.dataset.autocompleteExtra) {
-                const extra = $(document.querySelector(that.dataset.autocompleteExtra)).val();
-                return url.replace('QUERY', uriEncodedQuery) + '&extra=' + encodeURIComponent(extra);
+              if (that.dataset.autocompleteExtra === 'SOUR') {
+                const element = that.closest('.form-group').previousElementSibling.querySelector('select');
+                const extra   = element.options[element.selectedIndex].value;
+                return url.replace(/(%7B|{)query(%7D|})/, uriEncodedQuery) + '?extra=' + encodeURIComponent(extra);
               }
-              return url.replace('QUERY', uriEncodedQuery);
+              return url.replace(/(%7B|{)query(%7D|})/, uriEncodedQuery);
             },
-            wildcard: 'QUERY'
+            wildcard: '{query}'
           }
         })
       });

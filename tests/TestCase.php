@@ -22,7 +22,10 @@ namespace Fisharebest\Webtrees;
 use Aura\Router\Route;
 use Aura\Router\RouterContainer;
 use Fig\Http\Message\RequestMethodInterface;
+use Fisharebest\Webtrees\Contracts\CacheFactoryInterface;
+use Fisharebest\Webtrees\Factories\CacheFactory;
 use Fisharebest\Webtrees\Factories\FamilyFactory;
+use Fisharebest\Webtrees\Factories\FilesystemFactory;
 use Fisharebest\Webtrees\Factories\GedcomRecordFactory;
 use Fisharebest\Webtrees\Factories\HeaderFactory;
 use Fisharebest\Webtrees\Factories\IndividualFactory;
@@ -34,7 +37,7 @@ use Fisharebest\Webtrees\Factories\SourceFactory;
 use Fisharebest\Webtrees\Factories\SubmissionFactory;
 use Fisharebest\Webtrees\Factories\SubmitterFactory;
 use Fisharebest\Webtrees\Factories\XrefFactory;
-use Fisharebest\Webtrees\Http\Controllers\GedcomFileController;
+use Fisharebest\Webtrees\Http\RequestHandlers\GedcomLoad;
 use Fisharebest\Webtrees\Http\Routes\WebRoutes;
 use Fisharebest\Webtrees\Module\ModuleThemeInterface;
 use Fisharebest\Webtrees\Module\WebtreesTheme;
@@ -87,23 +90,21 @@ class TestCase extends \PHPUnit\Framework\TestCase
         app()->bind(UploadedFileFactoryInterface::class, Psr17Factory::class);
         app()->bind(UriFactoryInterface::class, Psr17Factory::class);
 
-        // Disable the cache.
-        $cache = new Cache(new NullAdapter());
-        app()->instance('cache.array', $cache);
-
         // Register the factories
-        Factory::family(new FamilyFactory($cache));
-        Factory::gedcomRecord(new GedcomRecordFactory($cache));
-        Factory::header(new HeaderFactory($cache));
-        Factory::individual(new IndividualFactory($cache));
-        Factory::location(new LocationFactory($cache));
-        Factory::media(new MediaFactory($cache));
-        Factory::note(new NoteFactory($cache));
-        Factory::repository(new RepositoryFactory($cache));
-        Factory::source(new SourceFactory($cache));
-        Factory::submission(new SubmissionFactory($cache));
-        Factory::submitter(new SubmitterFactory($cache));
-        Factory::xref(new XrefFactory());
+        Registry::cache(new CacheFactory());
+        Registry::familyFactory(new FamilyFactory());
+        Registry::filesystem(new FilesystemFactory());
+        Registry::gedcomRecordFactory(new GedcomRecordFactory());
+        Registry::headerFactory(new HeaderFactory());
+        Registry::individualFactory(new IndividualFactory());
+        Registry::locationFactory(new LocationFactory());
+        Registry::mediaFactory(new MediaFactory());
+        Registry::noteFactory(new NoteFactory());
+        Registry::repositoryFactory(new RepositoryFactory());
+        Registry::sourceFactory(new SourceFactory());
+        Registry::submissionFactory(new SubmissionFactory());
+        Registry::submitterFactory(new SubmitterFactory());
+        Registry::xrefFactory(new XrefFactory());
 
         app()->bind(ModuleThemeInterface::class, WebtreesTheme::class);
 
@@ -180,7 +181,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $server_request_factory = app(ServerRequestFactoryInterface::class);
 
         $uri = 'https://webtrees.test/index.php?' . http_build_query($query);
-        
+
         /** @var ServerRequestInterface $request */
         $request = $server_request_factory
             ->createServerRequest($method, $uri)
@@ -190,8 +191,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
             ->withAttribute('base_url', 'https://webtrees.test')
             ->withAttribute('client-ip', '127.0.0.1')
             ->withAttribute('user', new GuestUser())
-            ->withAttribute('filesystem.data', new Filesystem(new MemoryAdapter()))
-            ->withAttribute('filesystem.data.name', 'data/')
             ->withAttribute('route', new Route());
 
         foreach ($attributes as $key => $value) {
@@ -249,11 +248,11 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $tree->importGedcomFile($stream, $gedcom_file);
 
         $timeout_service = new TimeoutService(microtime(true));
-        $controller      = new GedcomFileController($timeout_service);
+        $controller      = new GedcomLoad($timeout_service);
         $request         = self::createRequest()->withAttribute('tree', $tree);
 
         do {
-            $controller->import($request);
+            $controller->handle($request);
 
             $imported = $tree->getPreference('imported');
         } while (!$imported);

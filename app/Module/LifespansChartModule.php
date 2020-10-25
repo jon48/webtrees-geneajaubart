@@ -25,7 +25,7 @@ use Fisharebest\ExtCalendar\GregorianCalendar;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\ColorGenerator;
 use Fisharebest\Webtrees\Date;
-use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Place;
@@ -39,6 +39,8 @@ use stdClass;
 
 use function app;
 use function assert;
+use function explode;
+use function implode;
 
 /**
  * Class LifespansChartModule
@@ -47,7 +49,11 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
 {
     use ModuleChartTrait;
 
-    protected const ROUTE_URL  = '/tree/{tree}/lifespans';
+    protected const ROUTE_URL = '/tree/{tree}/lifespans';
+
+    // In theory, only "@" is a safe separator, but it gives longer and uglier URLs.
+    // Unless some other application generates XREFs with a ".", we are safe.
+    protected const SEPARATOR = '.';
 
     // Defaults
     protected const DEFAULT_PARAMETERS = [];
@@ -117,7 +123,7 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
     {
         return route(static::class, [
                 'tree'  => $individual->tree()->name(),
-                'xrefs' => [$individual->xref()],
+                'xrefs' => $individual->xref(),
             ] + $parameters + self::DEFAULT_PARAMETERS);
     }
 
@@ -135,6 +141,11 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
         $xrefs     = $request->getQueryParams()['xrefs'] ?? [];
         $ajax      = $request->getQueryParams()['ajax'] ?? '';
 
+        // URLs created by older versions may already contain an array.
+        if (!is_array($xrefs)) {
+            $xrefs = explode(self::SEPARATOR, $xrefs);
+        }
+
         $params = (array) $request->getParsedBody();
 
         $addxref   = $params['addxref'] ?? '';
@@ -150,7 +161,7 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
         $xrefs = array_unique($xrefs);
 
         // Add an individual, and family members
-        $individual = Factory::individual()->make($addxref, $tree);
+        $individual = Registry::individualFactory()->make($addxref, $tree);
         if ($individual !== null) {
             $xrefs[] = $addxref;
             if ($addfam) {
@@ -172,7 +183,7 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
         // Filter duplicates and private individuals.
         $xrefs = array_unique($xrefs);
         $xrefs = array_filter($xrefs, static function (string $xref) use ($tree): bool {
-            $individual = Factory::individual()->make($xref, $tree);
+            $individual = Registry::individualFactory()->make($xref, $tree);
 
             return $individual !== null && $individual->canShow();
         });
@@ -181,11 +192,11 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
         if ($request->getMethod() === RequestMethodInterface::METHOD_POST) {
             return redirect(route(static::class, [
                 'tree'  => $tree->name(),
-                'xrefs' => $xrefs,
+                'xrefs' => implode(self::SEPARATOR, $xrefs),
             ]));
         }
 
-        Auth::checkComponentAccess($this, 'chart', $tree, $user);
+        Auth::checkComponentAccess($this, ModuleChartInterface::class, $tree, $user);
 
         if ($ajax === '1') {
             $this->layout = 'layouts/ajax';
@@ -198,7 +209,7 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
         $ajax_url = route(static::class, [
             'ajax'  => true,
             'tree'  => $tree->name(),
-            'xrefs' => $xrefs,
+            'xrefs' => implode(self::SEPARATOR, $xrefs),
         ]);
 
         return $this->viewResponse('modules/lifespans-chart/page', [
@@ -221,7 +232,7 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
     {
         /** @var Individual[] $individuals */
         $individuals = array_map(static function (string $xref) use ($tree): ?Individual {
-            return Factory::individual()->make($xref, $tree);
+            return Registry::individualFactory()->make($xref, $tree);
         }, $xrefs);
 
         $individuals = array_filter($individuals, static function (?Individual $individual): bool {
@@ -243,7 +254,7 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
 
         $count    = count($xrefs);
         $subtitle = I18N::plural('%s individual', '%s individuals', $count, I18N::number($count));
-        
+
         $html = view('modules/lifespans-chart/chart', [
             'dir'        => I18N::direction(),
             'end_year'   => $end_year,

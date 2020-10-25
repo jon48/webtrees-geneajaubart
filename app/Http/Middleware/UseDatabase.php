@@ -22,7 +22,6 @@ namespace Fisharebest\Webtrees\Http\Middleware;
 use Fisharebest\Webtrees\Webtrees;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
-use LogicException;
 use PDO;
 use PDOException;
 use Psr\Http\Message\ResponseInterface;
@@ -90,13 +89,13 @@ class UseDatabase implements MiddlewareInterface
             'modes'                   => [
                 'ANSI',
                 'STRICT_ALL_TABLES',
-                // Use SQL injection(!) to override MAX_JOIN_SIZE setting.
-                "', SQL_BIG_SELECTS=1, @foobar='"
+                // Use SQL injection(!) to override MAX_JOIN_SIZE and GROUP_CONCAT_MAX_LEN settings.
+                "', SQL_BIG_SELECTS=1, GROUP_CONCAT_MAX_LEN=1048576, @foobar='"
             ],
             // For SQLite
             'foreign_key_constraints' => true,
         ]);
-        
+
         $capsule->setAsGlobal();
 
         Builder::macro('whereContains', function ($column, string $search, string $boolean = 'and'): Builder {
