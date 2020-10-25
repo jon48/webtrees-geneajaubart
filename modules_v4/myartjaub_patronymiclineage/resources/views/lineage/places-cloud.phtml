@@ -19,7 +19,7 @@ $minimum = min(PHP_INT_MAX, $places->min());
         <?php
         $place = new Place($place_name, $tree);
         $place_parts = $place->firstParts(2);
-        
+
         if ($maximum === $minimum) {
             // All items occur the same number of times
             $size = 140.0;

@@ -94,5 +94,5 @@ return array (
                                     =>  'Le paramètre de fréquence n\'a pas un format valide',
     'The number of remaining occurences is not in a valid format'
                                     =>  'Le paramètre pour le nombre d\'occurrences restantes n\'a pas un format valide',
-    
+
 );

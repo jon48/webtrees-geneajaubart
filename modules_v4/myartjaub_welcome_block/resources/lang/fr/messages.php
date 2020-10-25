@@ -13,7 +13,7 @@
 declare(strict_types=1);
 
 return array (
-    
+
     'MyArtJaub Welcome Block'       =>  'Bloc «Accueil MyArtJaub»',
     'The MyArtJaub Welcome block welcomes the visitor to the site, allows a quick login to the site, and displays statistics on visits.'
                                     =>  'Le bloc Accueil MyArtJaub acueille le visiteur sur le site, permet une connexion rapide et affiche des statistiques de visites.',
@@ -31,5 +31,5 @@ return array (
                                     =>  'L\'adresse URL Matomo renseignée n\'est pas valide.',
     'The Matomo Site ID provided is not valid.'
                                     =>  'L\'ID Matomo de site renseigné n\'est pas valide.'
-    
+
 );

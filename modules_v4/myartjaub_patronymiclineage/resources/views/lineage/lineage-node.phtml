@@ -49,7 +49,7 @@ $is_first_family = true;
                         <li>
                             <strong>&hellip;</strong>
                         </li>
-                    </ul
+                    </ul>
                 <?php endif; ?>
             <?php endforeach; ?>
             <?php $is_first_family = false; ?>
@@ -60,7 +60,7 @@ $is_first_family = true;
         <?= view($module->name() . '::lineage/individual', ['individual' => $node_indi, 'primary' => true]) ?>
         <?php if ($node->hasFollowUpSurname()) : ?>
             &nbsp;
-            <a href="<?= route(LineagesPage::class, ['tree' => $tree, 'surname' => $node->followUpSurname()]) ?>">
+            <a href="<?= route(LineagesPage::class, ['tree' => $tree->name(), 'surname' => $node->followUpSurname()]) ?>">
                 (<?= I18N::translate('Go to %s lineages', $node->followUpSurname()) ?>)
             </a>
         <?php endif; ?>
