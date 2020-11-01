@@ -6,7 +6,7 @@
  	@author: Jonathan Jaubart <dev@jaubart.com>
 -->
 <map>
-	<displayName>France par Départements</displayName>
+	<displayName>France métropolitaine par Départements</displayName>
 	<topLevel>France</topLevel>
 	<canvas>
 		<width>530</width>
@@ -116,4 +116,12 @@
 		<subdivision id="94" name="Val-de-Marne">M 282.9375,131.28125 L 282.125,131.9375 L 281.3125,132.0625 L 281.25,132.5 L 281.09375,132.90625 L 281.5,132.90625 L 281.71875,132.71875 L 281.625,132.40625 L 282.875,132.34375 L 283.1875,132.46875 L 283.1875,133.125 L 282.875,133.78125 L 281.0625,133.53125 L 280.78125,133.28125 L 279.9375,133.875 L 279.125,134.09375 L 277.96875,134.03125 L 277.625,135.25 L 277.9375,135.78125 L 277.4375,137.25 L 277.9375,138.1875 L 278.8125,137.75 L 280.90625,138.90625 L 284.53125,138.90625 L 286.6875,139.90625 L 286.65625,139.6875 L 288.1875,135.84375 L 288.1875,134.09375 L 287.21875,133.84375 L 286.96875,133.375 L 286.5625,133.1875 L 285.6875,132.21875 L 284.15625,131.34375 L 282.9375,131.28125 z </subdivision>
 		<subdivision id="95" name="Val-d'Oise">M 255.5625,109.6875 L 254,111.625 L 252.8125,115.9375 L 251.5,118.15625 L 256.25,120.28125 L 259.875,119.625 L 264.375,122.5 L 269.1875,122.71875 L 272.59375,124.78125 L 273.46875,127.65625 L 273.4375,127.71875 L 273.8125,127.65625 L 277.3125,125.78125 L 282.5625,125.4375 L 285.4375,124.125 L 287.28125,122.8125 L 287.875,118.96875 L 286.59375,117.6875 L 282.3125,115.15625 L 278.1875,113 L 276.0625,113.96875 L 273.71875,114.5625 L 272.15625,113.375 L 269.03125,111.4375 L 266.5,113.375 L 262.78125,113.78125 L 257.5,113.375 L 256.3125,111.4375 L 255.5625,109.6875 z </subdivision>
 	</subdivisions>
+	<mappings>
+		<mapping name="Basses-Alpes" mapto="Alpes-de-Haute-Provence" />
+		<mapping name="Basses-Pyrénées" mapto="Pyrénées-Atlantiques" />
+		<mapping name="Charente-Inférieure" mapto="Charente-Maritime" />
+		<mapping name="Côtes-du-Nord" mapto="Côtes-d'Armor" />
+		<mapping name="Loire-Inférieure" mapto="Loire-Atlantique" />
+		<mapping name="Seine-Inférieure" mapto="Seine-Maritime" />
+  </mappings>
 </map>
