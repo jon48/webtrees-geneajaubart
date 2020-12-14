@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+
+/**
+ * @var string                      $module_name
+ * @var Tree                        $tree
+ * @var Collection<int, Individual> $list_ancestors
+ * @var int                         $nb_ancestors_all
+ * @var int                         $nb_ancestors_theor
+ * @var int                         $nb_ancestors_shown
+ */
+
+?>
+
+<div class="maj-sosa-ancestors-indi-tab">
+<?php if ($nb_ancestors_shown === 0 && $nb_ancestors_all === 0) : ?>
+    <p class="text-center warning"><?= I18N::translate('No ancestors could be found for this generation.') ?></p>
+<?php elseif ($nb_ancestors_shown === 0) : ?>
+    <p class="text-center warning"><?= I18N::translate('No ancestors can be displayed for this generation: %s hidden ancestors.', I18N::number($nb_ancestors_all)) ?></p>
+<?php else : ?>
+    <?=  view($module_name . '::lists/ancestors-indi-table', [
+        'module_name'          =>  $module_name,
+        'tree'                 =>  $tree,
+        'ancestors'            =>  $list_ancestors,
+        'nb_ancestors_all'     =>  $nb_ancestors_all,
+        'nb_ancestors_theor'   =>  $nb_ancestors_theor,
+        'nb_ancestors_shown'   =>  $nb_ancestors_shown
+    ]) ; ?>
+
+<?php endif ?>
+</div>

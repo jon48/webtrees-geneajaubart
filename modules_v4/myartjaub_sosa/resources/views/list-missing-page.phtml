@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\MissingAncestorsList;
+
+/**
+ * @var string          $module_name
+ * @var string          $title
+ * @var Individual      $root_indi
+ * @var Tree            $tree
+ * @var int             $max_gen
+ * @var int             $current_gen
+ * @var Collection      $list_missing
+ * @var int             $nb_missing_diff
+ * @var int             $nb_missing_shown
+ * @var double          $gen_completeness
+ * @var double          $gen_potential
+ */
+?>
+
+<h2 class="wt-page-title"><?= e($title) ?></h2>
+
+<div class="wt-page-content wt-page-content-maj-sosa-missing">
+<?php if ($root_indi === null) : ?>
+    <?= view($module_name . '::errors/no-sosa-defined') ?>
+
+<?php else : ?> 
+    <?= view($module_name . '::components/generation-selector', [ 'route_name' => MissingAncestorsList::class, 'tree' => $tree, 'min_gen' => 2, 'max_gen' => $max_gen, 'current_gen' => $current_gen ]) ?>
+    <?= view($module_name . '::components/generation-header', [ 'route_name' => MissingAncestorsList::class, 'tree' => $tree, 'min_gen' => 2, 'max_gen' => $max_gen, 'current_gen' => $current_gen ]) ?>
+    
+    <?php if ($current_gen > 0) : ?>
+        <?php if ($list_missing === null || $list_missing->count() == 0) : ?>
+            <p class="text-center"><?= I18N::translate('No ancestors are missing for this generation. Generation complete at %s.', I18N::percentage($gen_completeness, 2)) ?></p>
+        <?php else : ?>
+            <?= view($module_name . '::lists/missing-table', [
+                'module_name'        =>  $module_name,
+                'tree'               =>  $tree,
+                'list_missing'       =>  $list_missing,
+                'nb_missing_diff'    =>  $nb_missing_diff,
+                'nb_missing_shown'   =>  $nb_missing_shown,
+                'gen_completeness'   =>  $gen_completeness,
+                'gen_potential'      =>  $gen_potential
+            ]) ?>
+        <?php endif;?>
+    
+    <?php endif;?>
+
+<?php endif ?>
+</div>

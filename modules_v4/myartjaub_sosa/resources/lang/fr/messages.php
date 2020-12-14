@@ -15,21 +15,17 @@ declare(strict_types=1);
 use Fisharebest\Webtrees\I18N;
 
 return array (
-    
+
     'Calculate and display Sosa ancestors of the root person.'
                                     =>  'Calcule et affiche les ancêtres Sosa du de-cujus.',
     'Sosa'                          =>  'Sosa',
     'Sosa Configuration'            =>  'Configuration module Sosa',
     'Root individual'               =>  'Individu de-cujus',
     'For user'                      =>  'Pour l\'utilisateur',
-    'The preferences have been updated.'
-                                    =>  'Les préférences ont été mises à jour.',
     'Compute'                       =>  'Calculer',
     'Computing...'                  =>  'En cours...',
-    'Sosas computation'             =>  'Calcul des ancêtres Sosas',
     'Error'                         =>  'Erreur',
     'Success'                       =>  'Succès',
-    'Non existing individual'       =>  'L\'individu n\'existe pas.',
     '(G%s)'                         =>  '(G%s)',
     'Complete Sosas'                =>  'Compléter les Sosas',
     'Sosa Statistics'               =>  'Statistiques Sosa',
@@ -49,10 +45,6 @@ return array (
     'Total Different'               =>  'Cumul Différents',
     'Pedigree collapse'             =>  'Implexe',
     '<strong>G%d</strong>'          =>  '<strong>G%d</strong>',
-    'Known Sosa ancestors\' dispersion'
-                                    =>  'Répartition des ancêtres Sosas connus',
-    'Known Sosa ancestors\' dispersion - G3'
-                                    =>  'Répartition des ancêtres Sosas connus - G3',
     'Known Sosa ancestors\' family dispersion'
                                     =>  'Répartition familiale des ancêtres Sosas connus',
     'Shared'                        =>  'Partagés',
@@ -82,6 +74,7 @@ return array (
                                     =>  'Implexe à la génération G. L\'implexe est une mesure du nombre réel d\'ancêtres d\'une personne par rapport au nombre théorique. Plus ce pourcentage est grand, plus il y a eu de mariages entre personnes apparentées. Les familles royales constituent des exemples extrêmes d\'implexe, certains atteignant des niveaux de 90%%, comme le roi Alphonse XII d\'Espagne.',
     'Mean generation depth and standard deviation'
                                     =>  'Profondeur généalogique moyenne et écart-type',
+    'Mean generation depth'         =>  'Profondeur généalogique moyenne',
     'Mean generation depth: %s'     =>  'Profondeur généalogique moyenne : %s',
     'Standard deviation: %s'        =>  'Écart-type : %s',
     '%s generation' . I18N::PLURAL . '%s generations'
@@ -103,22 +96,40 @@ return array (
     'Potential %s'                  =>  'Potentiel %s',
     'No ancestors are missing for this generation. Generation complete at %s.'
                                     =>  'Il ne manque aucun ancêtre pour cette génération. Génération complète à %s.',
-    'No ancestor has been found for generation %d'
-                                    =>  'Aucun ancêtre n\'a été trouvé pour la génération %d',
-    'No family has been found for generation %d'
-                                    =>  'Aucune famille n\'a été trouvée pour la génération %d',
-    'The list could not be displayed. Reasons might be:'
-                                    =>  'La liste ne peut être affichée. La raison de ceci peut être :',
-    'The Sosa ancestors have not been computed yet.'
-                                    =>  'La liste des ancêtres Sosa n\'a pas été encore calculée.',
-    'No generation were found.'     =>  'Le nombre de générations est insuffisant',
+    'No ancestors could be found for this generation.'
+                                    =>  'Aucun ancêtre n\'a été trouvé pour cette génération.',
+    'No ancestors can be displayed for this generation: %s hidden ancestors.'
+                                    =>  'Aucun ancêtre ne peut être affiché pour cette génération : %s ancêtres cachés.',
+    'No families have be found for this generation.'
+                                    =>  'Aucune famille n\'a été trouvée pour cette génération.',
+    'No families can be displayed for this generation: %s hidden families.'
+                                    =>  'Aucune famille ne peut être affichée pour cette génération : %s familles cachées.',
     'Sosa Ancestors'                =>  'Ancêtres Sosa',
     'Number of Sosa ancestors: %1$s known / %2$s theoretical (%3$s)'
                                     =>  'Nombre d\'ancêtres Sosa : %1$s connus / %2$s théoriques (%3$s)',
-    'An error occurred while retrieving data...'
-                                    =>  'Une erreur s\'est produite en récupérant les données...',
-    'An error occurred while saving data...'
-                                    =>  'Une erreur s\'est produite en sauvant les données...',
-    'Show Sosa ancestors.'          =>  'Montrer les ancêtres Sosa.'
+    'Show missing only fathers.'    =>  'Afficher seulement les pères manquants.',
+    'Show missing only mothers.'    =>  'Afficher seulement les mères manquantes.',
+    'Show missing both parents.'    =>  'Afficher les deux parents manquants.',
+    'Both'                          =>  'Tous les deux',
+    'Show only known birth dates.'  =>  'Afficher seulement les dates de naissance connues.',
+    'Show only known birth places.' =>  'Afficher seulement les lieux de naissance connus.',
+    'Known birth date'              =>  'Date de naissance connue',
+    'Known birth place'             =>  'Lieu de naissance connu',
+    'Computing Sosa ancestors&hellip;'
+                                    =>  'Calcul des ancêtres Sosa&hellip;',
+    'Sosa ancestors computation completed successfully.'
+                                    =>  'Le calcul des ancêtres Sosa s\'est terminé avec succès.',
+    'The root individual has been updated.'
+                                    =>  'L\'individu de-cujus a été mis à jour.',
+    'The root individual could not be updated.'
+                                    =>  'L\'individu de-cujus n\'a pu être mis à jour.',
+    'An error occurred while retrieving data.'
+                                    =>  'Une erreur s\'est produite en récupérant les données.',
+    'An error occurred while computing Sosa ancestors.'
+                                    =>  'Une erreur s\'est produite lors du calcul des ancêtres Sosa.',
+    'You do not have permission to modify the user.'
+                                    =>  'Vous n\'avez pas la permission de modifier l\'utilisateur.',
+
+
 
 );

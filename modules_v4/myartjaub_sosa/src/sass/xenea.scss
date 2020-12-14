@@ -23,11 +23,14 @@
 
 @import 'base';
 
+/* stylelint-disable block-opening-brace-space-before */
 .menu-maj-sosa .nav-link::before{content: url('xenea/menu-sosa.png');}
 .menu-maj-sosa-list::before     {content: url('xenea/menu-sosa-list.png');}
 .menu-maj-sosa-missing::before  {content: url('xenea/menu-sosa-missing.png');}
 .menu-maj-sosa-stats::before    {content: url('xenea/menu-sosa-stats.png');}
 .menu-maj-sosa-config::before   {content: url('xenea/menu-sosa-config.png');}
+.menu-maj-sosa-compute::before  {content: url('xenea/menu-sosa-config.png');}
+/* stylelint-enable block-opening-brace-space-before */
 
 .maj-sosa-percent {
     background-color: #95b8e0;

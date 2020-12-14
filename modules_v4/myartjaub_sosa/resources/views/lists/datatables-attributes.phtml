@@ -1,0 +1,49 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+
+/**
+ * @var bool        $auto_width
+ * @var bool        $state_save
+ * @var array<int>  $length_menu
+ */
+$auto_width = isset($auto_width) ? $auto_width : false;
+$state_save = isset($state_save) ? $state_save : true;
+
+if (!isset($length_menu)) {  $length_menu = [10, 20, 50, 100, 500, 1000, -1];
+}
+$length_menu_labels = array_map(function ($length): string {
+        return $length == -1 ? 'All' : I18N::number($length);
+}, $length_menu);
+
+
+?>
+
+data-auto-width="<?= $auto_width ? 'true' : 'false' ?>"
+data-dom="<&quot;d-flex justify-content-between&quot;pf><t><&quot;d-flex justify-content-between&quot;irl>"
+data-state-save="<?= $state_save ? 'true' : 'false' ?>"
+data-length-menu="<?= e(json_encode([$length_menu, $length_menu_labels])) ?>"
+data-language="<?= e(json_encode([
+    'paginate'       => [
+        /* I18N: A button label, first page */
+        'first'    => I18N::translate('first'),
+        /* I18N: A button label, last page */
+        'last'     => I18N::translate('last'),
+        /* I18N: A button label, next page */
+        'next'     => I18N::translate('next'),
+        /* I18N: A button label, previous page */
+        'previous' => I18N::translate('previous'),
+    ],
+    'emptyTable'     => I18N::translate('No records to display'),
+    /* I18N: %s are placeholders for numbers */
+    'info'           => I18N::translate('Showing %1$s to %2$s of %3$s', '_START_', '_END_', '_TOTAL_'),
+    'infoEmpty'      => I18N::translate('Showing %1$s to %2$s of %3$s', I18N::number(0), I18N::number(0), I18N::number(0)),
+    /* I18N: %s is a number */
+    'infoFiltered'   => I18N::translate('(filtered from %s total entries)', '_MAX_'),
+    /* I18N: %s is a number of records per page */
+    'lengthMenu'     => I18N::translate('Display %s', '_MENU_'),
+    'loadingRecords' => I18N::translate('Loading…'),
+    'processing'     => I18N::translate('Calculating…'),
+    'search'         => I18N::translate('Filter'),
+    'zeroRecords'    => I18N::translate('No records to display'),
+])) ?>"

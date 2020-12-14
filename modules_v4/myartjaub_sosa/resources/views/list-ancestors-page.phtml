@@ -1,0 +1,114 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\AncestorsList;
+use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\AncestorsListFamily;
+use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\AncestorsListIndividual;
+
+/**
+ * @var string          $module_name
+ * @var string          $title
+ * @var Individual      $root_indi
+ * @var Tree            $tree
+ * @var int             $max_gen
+ * @var int             $current_gen
+ */
+?>
+
+<h2 class="wt-page-title"><?= e($title) ?></h2>
+
+<div class="wt-page-content wt-page-content-maj-sosa-missing">
+<?php if ($root_indi === null) : ?>
+    <?= view($module_name . '::errors/no-sosa-defined') ?>
+
+<?php else : ?> 
+    <?= view($module_name . '::components/generation-selector', [ 'route_name' => AncestorsList::class, 'tree' => $tree, 'min_gen' => 1, 'max_gen' => $max_gen, 'current_gen' => $current_gen ]) ?>
+    <?= view($module_name . '::components/generation-header', [ 'route_name' => AncestorsList::class, 'tree' => $tree, 'min_gen' => 1, 'max_gen' => $max_gen, 'current_gen' => $current_gen ]) ?>
+    
+    <?php if ($current_gen > 0) : ?>
+    <div id="maj-ancestors-tabs" class="maj-content-tabs maj-sosa-tabs-ancestors">
+        <ul class="nav nav-tabs flex-wrap" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" data-toggle="tab" role="tab" data-href="<?= route(AncestorsListIndividual::class, ['tree' => $tree->name(), 'gen' => $current_gen])  ?>" href="#maj-sosa-ancestors-indi">
+                    <?= I18N::translate('Individuals'); ?>
+                </a>
+            </li>
+            
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" data-toggle="tab" role="tab" data-href="<?= route(AncestorsListFamily::class, ['tree' => $tree->name(), 'gen' => $current_gen])  ?>" href="#maj-sosa-ancestors-fam">
+                    <?= I18N::translate('Families'); ?>
+                </a>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <div class="tab-pane fade show active" role="tabpanel" id="maj-sosa-ancestors-indi">
+                <i class="fas fa-spinner fa-pulse fa-fw maj-loading-inprocess w-100 mx-auto"></i>
+                <div class="maj-loading-complete d-none"></div>
+                <div class="maj-loading-error d-none text-center"><?= I18N::translate('An error occurred while retrieving data.') ?></div>
+            </div>
+            
+            <div class="tab-pane fade" role="tabpanel" id="maj-sosa-ancestors-fam">
+                <i class="fas fa-spinner fa-pulse fa-fw maj-loading-inprocess w-100 mx-auto"></i>
+                <div class="maj-loading-complete d-none"></div>
+                <div class="maj-loading-error d-none text-center"><?= I18N::translate('An error occurred while retrieving data.') ?>
+            </div>
+        </div>
+    </div>
+    
+        <?php View::push('javascript') ?>
+        <script>
+          "use strict";
+          
+          // Bootstrap tabs - load content dynamically using AJAX
+          $('a[data-toggle="tab"][data-href]').each(function (i, tab) {
+              let hash = this.hash;
+              let target = $(hash + ' .maj-loading-complete:empty');
+              if(target.length > 0) {
+                  fetch(this.dataset.href)
+                    .then(response => {
+                        if(response.ok) {
+                            return response.text();
+                        }
+                        throw new Error(response.statusText);
+                    })
+                    .then(text => {
+                        target.html(text);
+                        $(hash + ' .maj-loading-inprocess').addClass('d-none');
+                        target.removeClass('d-none');
+                    })
+                    .catch(error => {
+                        $(hash + ' .maj-loading-inprocess').addClass('d-none');
+                        $(hash + ' .maj-loading-error').removeClass('d-none');
+                    });
+              }
+          });
+        
+          // If the URL contains a fragment, then activate the corresponding tab.
+          // Use a prefix on the fragment, to prevent scrolling to the element.
+          let target = window.location.hash.replace("tab-", "");
+          let tab = $("#maj-ancestors-tabs .nav-link[href='" + target + "']");
+          // If not, then activate the first tab.
+          if (tab.length === 0) {
+            tab = $("#maj-ancestors-tabs .nav-link:first");
+          }
+          tab.tab("show");
+        
+          // If the user selects a tab, update the URL to reflect this
+          $('#maj-ancestors-tabs a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            window.location.hash = "tab-" + e.target.href.substring(e.target.href.indexOf('#') + 1);
+          });
+        </script>
+        <?php View::endpush() ?>
+    
+    
+        
+    <?php endif;?>
+
+<?php endif ?>
+</div>

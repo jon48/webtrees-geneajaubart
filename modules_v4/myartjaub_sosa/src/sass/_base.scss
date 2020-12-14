@@ -22,7 +22,7 @@
  */
 
 .maj-sosa-table {
-    display:table;
+    display: table;
     overflow-x: auto;
     
     .maj-sosa-row {
@@ -34,7 +34,8 @@
             padding-right: 1em;
         }
         
-        .wt-page-options-label, .wt-page-options-value {
+        .wt-page-options-label,
+        .wt-page-options-value {
             text-align: center;
         }
         
@@ -42,7 +43,8 @@
 }
 
 #content table.maj-sosa-table {
-    .wt-page-options-label, .wt-page-options-value {
+    .wt-page-options-label,
+    .wt-page-options-value {
         padding-left: 0.5em;
         padding-right: 0.5em;
     }
@@ -50,4 +52,10 @@
 
 .maj-sosa-chart-bar {
     width: 75%;
+}
+
+table {
+    .maj-cell-sosa {
+        opacity: 0.65;
+    }
 }

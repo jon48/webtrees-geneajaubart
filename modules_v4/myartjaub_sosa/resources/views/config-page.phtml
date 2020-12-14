@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
@@ -133,9 +135,6 @@ $('#maj-sosa-select-userid').change(function() {
             $('#sosa-rootid').val(null).trigger('change');
         }
     });
-    
-    //$("#sosa-rootid").val(users_array[this.value]);
-    //$("#sosa-rootid").trigger('change');
 });
 
 </script>

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
@@ -24,15 +26,15 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaComputeAction;
 <label id="lbl-sosa-compute">
     <div class="maj-loading-inprocess d-none">
         <i class="fas fa-spinner fa-pulse fa-fw"></i>
-        <label><?= e(I18N::translate('Computing...')) ?></label>
+        <label><?= I18N::translate('Computing...') ?></label>
     </div>
     <div class="maj-loading-complete d-none">
         <span class="maj-icon-done"><i class="fas fa-check"></i></span>
-        <label><?= e(I18N::translate('Success')) ?></label>
+        <label><?= I18N::translate('Success') ?></label>
     </div>
     <div class="maj-loading-error d-none">
         <span class="maj-icon-error"><i class="fas fa-times"></i></span>
-        <label><?= e(I18N::translate('Error')) ?></label>
+        <label><?= I18N::translate('Error') ?></label>
     </div>
 </label>
 

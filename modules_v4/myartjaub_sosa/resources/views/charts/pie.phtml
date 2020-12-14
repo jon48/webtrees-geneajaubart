@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Fisharebest\Webtrees\I18N;
 
 /**
@@ -27,10 +29,10 @@ $name = 'callback_' . bin2hex(random_bytes(12));
             <?= json_encode($id) ?>,
             <?= json_encode($data) ?>,
             {
-                <?php if($height !== null) : ?>height: <?= is_int($height) ? (int) $height : '"'.$height.'"' ?>,<?php endif; ?>
+                <?php if ($height !== null) : ?>height: <?= is_int($height) ? (int) $height : '"' . $height . '"' ?>,<?php endif; ?>
                 chartArea : {
-                    <?php if($width !== null) : ?>width: <?= is_int($width) ? (int) $width : '"'.$width.'"' ?>,<?php endif; ?>
-                    <?php if($height !== null) : ?>height: <?= is_int($height) ? (int) $height * 0.9 : '"'.$height.'"' ?><?php endif; ?>
+                    <?php if ($width !== null) : ?>width: <?= is_int($width) ? (int) $width : '"' . $width . '"' ?>,<?php endif; ?>
+                    <?php if ($height !== null) : ?>height: <?= is_int($height) ? (int) $height * 0.9 : '"' . $height . '"' ?><?php endif; ?>
                 },
                 pieStartAngle: <?= json_encode($pieStartAngle ?? 0) ?>,
                 pieHole: 0,

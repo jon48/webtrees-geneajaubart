@@ -1,0 +1,227 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\GedcomTag;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use Fisharebest\Webtrees\Functions\Functions;
+use Ramsey\Uuid\Uuid;
+
+/**
+ * @var string                      $module_name
+ * @var Collection<MissingAncestor> $list_missing
+ * @var Tree                        $tree
+ * @var int                         $nb_missing_diff
+ * @var int                         $nb_missing_shown
+ * @var double                      $gen_completeness
+ * @var double                      $gen_potential
+ */
+
+// lists requires a unique ID in case there are multiple lists per page
+$table_id = 'table-missing-' . Uuid::uuid4()->toString();
+
+$show_estimated_dates = (bool) $tree->getPreference('SHOW_EST_LIST_DATES');
+$nb_missing_hidden = $nb_missing_diff - $nb_missing_shown;
+
+?>
+
+<?php View::push('javascript') ?>
+<script>
+$("#<?= e($table_id) ?> > .maj-table-missing").dataTable({
+    processing: true,
+    retrieve: true,
+    columns: [
+        /* 0-Sosa        */   { type: "num", class: "text-center" },
+        /* 1-Given names */   { type: "text",  class: "left"},
+        /* 2-Surnames    */   { type: "text" },
+        /* 3-Father      */   { type: "text", class: "text-center"},
+        /* 4-Mother      */   { type: "text", class: "text-center"},
+        /* 5-Birth date  */   { type: "num", class: "text-center"},
+        /* 6-Birth place */   { type: "text", class: "text-center"},
+        /* 7-Filter sex  */   { sortable: false },
+        /* 8-Filter missing */{ sortable: false },
+        /* 9-Filter date  */  { sortable: false },
+        /* 10-Filter place*/  { sortable: false }
+    ],
+    sorting: [[0, "asc"]]
+});
+
+$("#<?= e($table_id) ?>")
+    /* Filter buttons in table header */
+    .on("click", "input[data-filter-column]", function() {
+        let checkbox = $(this);
+        let siblings = checkbox.parent().siblings();
+
+        // Deselect other options
+        siblings.children().prop("checked", false).removeAttr("checked");
+        siblings.removeClass('active');
+
+        // Apply (or clear) this filter
+        let checked = checkbox.prop("checked");
+        let filter  = checked ? checkbox.data("filter-value") : "";
+        let column  = $("#<?= e($table_id) ?> .maj-table-missing").DataTable().column(checkbox.data("filter-column"));
+        column.search(filter).draw();
+    });
+</script>
+<?php View::endpush() ?>
+
+<div id="<?= e($table_id) ?>" class="maj-table-full-width">
+    <table class="table table-bordered table-sm maj-table-missing" 
+    <?= view($module_name . '::lists/datatables-attributes', [ 'length_menu' => [16, 32, 64, 200, 1000, -1]]) ?> 
+    >
+        <thead>
+            <tr>
+                <th colspan="9">
+                    <div class="btn-toolbar d-flex justify-content-center mb-2" role="toolbar">
+                        <div class="btn-group btn-group-toggle btn-group-sm mx-2" data-toggle="buttons">
+                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only males.') ?>">
+                                <input type="checkbox" data-filter-column="7" data-filter-value="M" autocomplete="off">
+                                <?= view('icons/sex', ['sex' => 'M']) ?>
+                            </label>
+                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only females.') ?>">
+                                <input type="checkbox" data-filter-column="7" data-filter-value="F" autocomplete="off">
+                                <?= view('icons/sex', ['sex' => 'F']) ?>
+                            </label>
+                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only individuals for whom the gender is not known.') ?>">
+                                <input type="checkbox" data-filter-column="7" data-filter-value="U" autocomplete="off">
+                                <?= view('icons/sex', ['sex' => 'U']) ?>
+                            </label>
+                        </div>
+                        <div class="btn-group btn-group-toggle btn-group-sm mx-2" data-toggle="buttons">
+                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show missing only fathers.') ?>">
+                                <input type="checkbox" data-filter-column="8" data-filter-value="F" autocomplete="off">
+                                <?= Functions::getRelationshipNameFromPath('fat'); ?>
+                            </label>
+                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show missing only mothers.') ?>">
+                                <input type="checkbox" data-filter-column="8" data-filter-value="M" autocomplete="off">
+                                <?= Functions::getRelationshipNameFromPath('mot'); ?>
+                            </label>
+                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show missing both parents.') ?>">
+                                <input type="checkbox" data-filter-column="8" data-filter-value="B" autocomplete="off">
+                                <?= I18N::translate('Both') ?>
+                            </label>
+                        </div>
+                        
+                        <div class="btn-group btn-group-toggle btn-group-sm mx-2" data-toggle="buttons">
+                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only known birth dates.') ?>">
+                                <input type="checkbox" data-filter-column="9" data-filter-value="Y" autocomplete="off">
+                                <?= I18N::translate('Known birth date') ?>
+                            </label>
+                        </div>
+                        <div class="btn-group btn-group-toggle btn-group-sm mx-2" data-toggle="buttons">
+                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only known birth places.') ?>">
+                                <input type="checkbox" data-filter-column="10" data-filter-value="Y" autocomplete="off">
+                                <?= I18N::translate('Known birth place') ?>
+                            </label>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th><?= I18N::translate('Sosa') ?></th>
+                <th><?= I18N::translate('Given names') ?></th>
+                <th><?= I18N::translate('Surname') ?></th>
+                <th><?= Functions::getRelationshipNameFromPath('fat'); ?></th>
+                <th><?= Functions::getRelationshipNameFromPath('mot'); ?></th>
+                <th><?= I18N::translate('Birth') ?></th>
+                <th><?= I18N::translate('Place') ?></th>
+                <th hidden>SEX</th>
+                <th hidden>MISSING</th>
+                <th hidden>DATE</th>
+                <th hidden>PLACE</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <?php foreach ($list_missing as $missing) : ?>
+                <?php /** @var Individual $individual */  $individual = $missing->individual(); ?>
+            <tr class="<?= $individual->isPendingDeletion() ? 'wt-old' : ($individual->isPendingAddition() ? 'wt-new' : '') ?>">
+                <td class="maj-cell-sosa"><?= I18N::number($missing->sosa()) ?></td>
+
+                <td colspan="2" data-sort="<?= e(str_replace([',', '@P.N.', '@N.N.'], 'AAAA', implode(',', array_reverse(explode(',', $individual->sortName()))))) ?>">
+                    <?php foreach ($individual->getAllNames() as $num => $name) : ?>
+                        <a title="<?= $name['type'] === 'NAME' ? '' : strip_tags(GedcomTag::getLabel($name['type'])) ?>" href="<?= e($individual->url()) ?>" class="<?= $num === $individual->getPrimaryName() ? 'name2' : '' ?>">
+                            <?= $name['full'] ?>
+                        </a>
+                        <?php if ($num === $individual->getPrimaryName()) : ?>
+                            <small><?= view('icons/sex', ['sex' => $individual->sex()]) ?></small>
+                        <?php endif ?>
+                        <br>
+                    <?php endforeach ?>
+                </td>
+
+                <td hidden data-sort="<?= e(str_replace([',', '@P.N.', '@N.N.'], 'AAAA', $individual->sortName())) ?>"></td>
+
+                <td><?= $missing->isFatherMissing() ? view('icons/cancel') : '&nbsp;';  ?></td>
+                <td><?= $missing->isMotherMissing() ? view('icons/cancel') : '&nbsp;';  ?></td>
+
+                <!-- Birth date -->
+                <?php $estimated_birth_date = $individual->getEstimatedBirthDate(); ?>
+                <?php $known_birth_date = false; ?>
+                
+                <td data-sort="<?= $estimated_birth_date->julianDay() ?>">
+                    <?php $birth_dates = $individual->getAllBirthDates(); ?>
+
+                    <?php foreach ($birth_dates as $birth_date) : ?>
+                        <?= $birth_date->display(true) ?>
+                        <?php $known_birth_date = true; ?>
+                        <br>
+                    <?php endforeach ?>
+
+                    <?php if (empty($birth_dates) && $show_estimated_dates) : ?>
+                        <?= $estimated_birth_date->display(true) ?>
+                    <?php endif ?>
+                </td>
+                
+                <!-- Birth place -->
+                <td>
+                    <?php $known_birth_place = false; ?>
+                    <?php foreach ($individual->getAllBirthPlaces() as $birth_place) : ?>
+                        <?= $birth_place->shortName(true) ?>
+                        <?php $known_birth_place = true; ?>
+                        <br>
+                    <?php endforeach ?>
+                </td>
+
+                <!-- Filter by sex -->
+                <td hidden>
+                    <?= $individual->sex() ?>
+                </td>
+                
+                <!-- Filter by missing parent -->
+                <td hidden>
+                    <?= $missing->isFatherMissing() ? ($missing->isMotherMissing() ? 'B' : 'F') : 'M' ?>
+                </td>
+                
+                <!-- Filter by known birth date -->
+                <td hidden>
+                    <?= $known_birth_date ? 'Y' : 'N' ?>
+                </td>
+                
+                <!-- Filter by known birth place -->
+                <td hidden>
+                    <?= $known_birth_place ? 'Y' : 'N' ?>
+                </td>
+            </tr>
+
+            <?php endforeach ?>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th class="maj-th-background" colspan="9">
+                    <div class="text-center">
+                        <?= I18N::translate('Number of different missing ancestors: %s', I18N::number($nb_missing_diff)) ?>
+                        <?= $nb_missing_hidden > 0 ? ' [' . I18N::translate('%s hidden', I18N::number($nb_missing_hidden)) . ']' : '' ?>
+                        <?= ' - ' . I18N::translate('Generation complete at %s', I18N::percentage($gen_completeness, 2)) ?>
+                        <?= ' [' . I18N::translate('Potential %s', I18N::percentage($gen_potential, 2)) . ']' ?>
+                    </div>
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+

@@ -1,12 +1,13 @@
-<?php 
+<?php
 
-use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Functions\Functions;
-use Fisharebest\Webtrees\Module\ModuleThemeInterface;
-use Illuminate\Support\Collection;
-use Fisharebest\Webtrees\Statistics\Service\ColorService;
+declare(strict_types=1);
+
 use Fisharebest\Webtrees\Factory;
+use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Module\ModuleThemeInterface;
+use Fisharebest\Webtrees\Statistics\Service\ColorService;
+use Illuminate\Support\Collection;
 
 /**
  * @var string                  $module_name
@@ -18,7 +19,7 @@ use Fisharebest\Webtrees\Tree;
 
 <h3 class="text-center m-3"><?= I18N::translate('Mean generation depth by grandparents'); ?></h3>
 
-<?php 
+<?php
 $data = [[
         ['label' => 'Ancestor', 'id' => 'ancestor', 'type' => 'string'],
         ['label' => I18N::translate('Mean generation depth'), 'id' => 'gendepth', 'type' => 'number'],
@@ -26,21 +27,20 @@ $data = [[
         ['label' => "Error Max", 'id' => 'errmax', 'type' => 'number', 'role' => 'interval']
     ]];
 $max_gen_depth = 0;
-foreach($gen_depth_g3 as $sosa => $gen_depth_stat) {
+foreach ($gen_depth_g3 as $sosa => $gen_depth_stat) {
     /** @var \Fisharebest\Webtrees\Individual $ancestor */
     $ancestor = Factory::individual()->make($gen_depth_stat->root_ancestor_id, $tree);
     $max_gen_depth = max($max_gen_depth, ceil($gen_depth_stat->mean_gen_depth + $gen_depth_stat->stddev_gen_depth));
-    if($ancestor !== null && $ancestor->canShowName()) {
+    if ($ancestor !== null && $ancestor->canShowName()) {
         $data[] = [
             strip_tags($ancestor->fullName()),
             (float) $gen_depth_stat->mean_gen_depth,
             $gen_depth_stat->mean_gen_depth - $gen_depth_stat->stddev_gen_depth,
             $gen_depth_stat->mean_gen_depth + $gen_depth_stat->stddev_gen_depth
         ];
-    }
-    else {
+    } else {
         $data[] = [
-            I18N::translate('Sosa %s', I18N::number($sosa)), 
+            I18N::translate('Sosa %s', I18N::number($sosa)),
             (float) $gen_depth_stat->mean_gen_depth,
             $gen_depth_stat->mean_gen_depth - $gen_depth_stat->stddev_gen_depth,
             $gen_depth_stat->mean_gen_depth + $gen_depth_stat->stddev_gen_depth
@@ -66,7 +66,7 @@ foreach($gen_depth_g3 as $sosa => $gen_depth_stat) {
             'ticks'             =>  range(0, $max_gen_depth, 1)
         ],
         'chartArea' =>  [ 'width' => '70%', 'left' => '30%', 'top' => 10, 'bottom' => 50 ],
-        'intervals' =>  [ 
+        'intervals' =>  [
             'barWidth'      =>  0.5,
             'lineWidth'     =>  2
         ]

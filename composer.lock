@@ -2032,12 +2032,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "d2af8fd474b9db8cfa4912c9b196c1fda6e69317"
+                "reference": "be78a05d9dd7bb98054151deedfcb52397c553ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/d2af8fd474b9db8cfa4912c9b196c1fda6e69317",
-                "reference": "d2af8fd474b9db8cfa4912c9b196c1fda6e69317",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/be78a05d9dd7bb98054151deedfcb52397c553ca",
+                "reference": "be78a05d9dd7bb98054151deedfcb52397c553ca",
                 "shasum": ""
             },
             "require": {
@@ -2077,7 +2077,7 @@
                 "genealogy",
                 "webtrees"
             ],
-            "time": "2020-10-25T21:44:19+00:00"
+            "time": "2020-12-14T10:52:05+00:00"
         },
         {
             "name": "jon48/webtrees-mod-translationtool",
@@ -2138,12 +2138,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-theme-rural.git",
-                "reference": "40778596550e3dfeacfcbb5225916fd03b09ecb8"
+                "reference": "c53a1a3c22e6c2b00aaffaa7a0a6af783767fc8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-theme-rural/zipball/40778596550e3dfeacfcbb5225916fd03b09ecb8",
-                "reference": "40778596550e3dfeacfcbb5225916fd03b09ecb8",
+                "url": "https://api.github.com/repos/jon48/webtrees-theme-rural/zipball/c53a1a3c22e6c2b00aaffaa7a0a6af783767fc8f",
+                "reference": "c53a1a3c22e6c2b00aaffaa7a0a6af783767fc8f",
                 "shasum": ""
             },
             "require-dev": {
@@ -2172,7 +2172,7 @@
                 "genealogy",
                 "webtrees"
             ],
-            "time": "2020-10-24T19:44:50+00:00"
+            "time": "2020-11-09T22:27:39+00:00"
         },
         {
             "name": "justinrainbow/json-schema",

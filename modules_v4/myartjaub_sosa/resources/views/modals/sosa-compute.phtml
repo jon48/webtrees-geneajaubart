@@ -1,0 +1,49 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaComputeAction;
+use Ramsey\Uuid\Uuid;
+
+/**
+ * @var string  $title
+ * @var Tree    $tree
+ * @var string  $xref
+ */
+
+$modal_id = 'modal-sosa-compute-' . Uuid::uuid4()->toString();
+?>
+
+<?= view('modals/header', ['title' => I18N::translate('Computing Sosa ancestors&hellip;')]) ?>
+
+<div id="<?= $modal_id ?>" class="modal-body text-center">
+    <div class="maj-loading-inprocess">
+        <i class="fas fa-spinner fa-pulse fa-fw"></i>
+        <label><?= I18N::translate('Computing...') ?></label>
+    </div>
+    <div class="maj-loading-complete d-none">
+        <span class="maj-icon-done"><i class="fas fa-check"></i></span>
+        <label><?= I18N::translate('Sosa ancestors computation completed successfully.') ?></label>
+    </div>
+    <div class="maj-loading-error d-none">
+        <span class="maj-icon-error"><i class="fas fa-times"></i></span>
+        <label><?= I18N::translate('Error') ?></label>
+    </div>
+</div>
+
+<?= view('modals/footer-close') ?>
+
+<script>
+$.post({
+    url: '<?= e(route(SosaComputeAction::class, ['tree' => $tree->name() ])) ?>',
+    data: { partial_from: '<?= $xref ?>' }
+}).done(() => {
+    $('#<?= $modal_id ?> .maj-loading-complete').removeClass('d-none');
+    setTimeout(() => $('#wt-ajax-modal').modal('hide'), 2000);
+}).fail((error) => {
+    $('#<?= $modal_id ?>  .maj-loading-error label').html(error.responseText);
+    $('#<?= $modal_id ?> .maj-loading-error').removeClass('d-none');
+}).always(() => {
+    $('#<?= $modal_id ?> .maj-loading-inprocess').addClass('d-none');
+});
+</script>

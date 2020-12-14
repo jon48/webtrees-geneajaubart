@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+
+/**
+ * @var string                  $module_name
+ * @var Tree                    $tree
+ * @var Collection<int, Family> $list_families
+ * @var int                     $nb_families_all
+ * @var int                     $nb_families_shown
+ */
+
+?>
+
+<div class="maj-sosa-ancestors-fam-tab">
+<?php if ($nb_families_shown === 0 && $nb_families_all === 0) : ?>
+    <p class="text-center warning"><?= I18N::translate('No families have be found for this generation.') ?></p>
+<?php elseif ($nb_families_shown === 0) : ?>
+    <p class="text-center warning"><?= I18N::translate('No families can be displayed for this generation: %s hidden families.', I18N::number($nb_families_all)) ?></p>
+<?php else : ?>
+    <?= view($module_name . '::lists/ancestors-fam-table', [ 'module_name' => $module_name, 'tree' => $tree , 'families' => $list_families ])?>
+<?php endif ?>
+</div>

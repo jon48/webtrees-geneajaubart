@@ -1,4 +1,6 @@
-<?php 
+<?php
+
+declare(strict_types=1);
 
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
@@ -16,123 +18,123 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\MissingAncestorsList;
 <h3 class="text-center m-3"><?= e(I18N::translate('Statistics by generations')) ?></h3>
 
 <table class="maj-sosa-table-generations maj-sosa-table mx-auto">
-	<thead>
-		<tr class="maj-sosa-row">
-			<th class="wt-page-options-label" colspan="2" >&nbsp;</th>
-			<th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Theoretical number of ancestors in generation G.')); ?>">
-				<?= I18N::translate('Theoretical'); ?>
-			</th>
-			<th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Number of ancestors found in generation G. A same individual can be counted several times.')); ?>">
-				<?= I18N::translate('Known'); ?>
-			</th>				
-			<th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Ratio of found ancestors in generation G compared to the theoretical number.')); ?>">
-				<?= I18N::translate('%%'); ?>
-			</th>
-			<th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Number of ancestors not found in generation G, but whose children are known in generation G-1.')); ?>">
-				<?= I18N::translate('Losses G-1'); ?>
-			</th>
-			<th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Ratio of not found ancestors in generation G amongst the theoretical ancestors in this generation whose children are known in generation G-1. This is an indicator of the completion of a generation relative to the completion of the previous generation.')); ?>">
-				<?= I18N::translate('%%'); ?>
-			</th>
-			<th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Cumulative number of ancestors found up to generation G. A same individual can be counted  several times.')); ?>">
-				<?= I18N::translate('Total known'); ?>
-			</th>
-			<th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Ratio of cumulative found ancestors in generation G compared to the cumulative theoretical number.')); ?>">
-			<?= I18N::translate('%%'); ?></th>
-			<th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Number of distinct ancestors found in generation G. A same individual is counted only once.')); ?>">
-			<?= I18N::translate('Different'); ?></th>
-			<th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Ratio of distinct individuals compared to the number of ancestors found in generation G.')); ?>">
-			<?= I18N::translate('%%'); ?></th>
-			<th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Number of cumulative distinct ancestors found up to generation G. A same individual is counted only once in the total number, even if present in different generations.')); ?>">
-			<?= I18N::translate('Total Different'); ?></th>
-			<th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Pedigree collapse at generation G. Pedigree collapse is a measure of the real number of ancestors of a person compared to its theorical number. The higher this number is, the more marriages between related persons have happened. Extreme examples of high pedigree collapse are royal families for which this number can be as high as nearly 90%% (Alfonso XII of Spain).')); ?>">
-			<?= I18N::translate('Pedigree collapse'); ?></th>
-		</tr>
-	</thead>
-	<tbody>
-		<?php foreach($generation_stats as $gen => $stats) { ?>
-		<tr class="maj-sosa-row">
-			<td class="wt-page-options-label">
-				<?= I18N::translate('<strong>G%d</strong>', $gen); ?>
-			</td>
-			<td class="wt-page-options-label">
-				<?= I18N::translate('%1$s <> %2$s', $stats['gen_min_birth'] ?? I18N::translate('-'), $stats['gen_max_birth']  ?? I18N::translate('-')); ?>
-			</td>
-			<td class="wt-page-options-value">
-				<?= I18N::number($stats['theoretical']); ?>
-			</td>
-			<td class="wt-page-options-value">
-				<?php if($stats['known'] > 0) : ?>
-				<a href="<?= route(AncestorsList::class, ['tree' => $tree->name(), 'gen' => $gen]) ?>"><?= I18N::number($stats['known']) ?></a>
-				<?php else : ?>
-				<?= I18N::number($stats['known']) ?>
-				<?php endif ?>
-			</td>
-			<td class="wt-page-options-value">
-				<?= I18N::percentage($stats['perc_known'], 2); ?>
-			</td>
-			<td class="wt-page-options-value">
-				<?php if($stats['missing'] > 0) : ?>
-				<a href="<?= route(MissingAncestorsList::class, ['tree' => $tree->name(), 'gen' => $gen]) ?>"><?= I18N::number($stats['missing']) ?></a>
-				<?php else : ?>
-				<?= I18N::number($stats['missing']) ?>
-				<?php endif ?>
-			</td>
-			<td class="wt-page-options-value">
-				<?= I18N::percentage($stats['perc_missing'], 2); ?>
-			</td>
-			<td class="wt-page-options-value">
-				<?= I18N::number($stats['total_known']); ?>
-			</td>
-			<td class="wt-page-options-value">
-				<?= I18N::percentage($stats['perc_total_known'], 2); ?>
-			</td>
-			<td class="wt-page-options-value">
-				<?= I18N::number($stats['different']); ?>
-			</td>
-			<td class="wt-page-options-value left percent_container">
-				<div class="w-100">
-					<div class="maj-sosa-percent" style="width:<?= 100 * $stats['perc_different'] ?>%;">
-						&nbsp;<?= I18N::percentage($stats['perc_different']); ?>&nbsp;
-					</div>
-				</div>
-			</td>
-			<td class="wt-page-options-value">
-				<?= I18N::number($stats['total_different']); ?>
-			</td>
-			<td class="wt-page-options-value">
-				<?= I18N::percentage($stats['pedi_collapse'], 2); ?>
-			</td>
-		</tr>
-		<?php  } ?>
-	</tbody>
-	<tfoot>
-		<tr class="maj-sosa-row">
-			<td class="wt-page-options-label" colspan="13">
-				<?= empty($generation_depth) ? '' : I18N::translate(
-				         'Mean generation depth: %s',
-				         I18N::plural(
-				             '%s generation',
-				             '%s generations',
-				             $generation_depth->mean_gen_depth,
-				             I18N::number($generation_depth->mean_gen_depth,2)
-				         )
-				    ).
-					' &mdash; ' . 
-					I18N::translate(
-					    'Standard deviation: %s',
-					    I18N::plural(
-					        '%s generation', 
-					        '%s generations', 
-					        $generation_depth->stddev_gen_depth, 
-					        I18N::number($generation_depth->stddev_gen_depth,2)
-					    )
-					);
-				?>
-			</td>
-		</tr>
-	</tfoot>
+    <thead>
+        <tr class="maj-sosa-row">
+            <th class="wt-page-options-label" colspan="2" >&nbsp;</th>
+            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Theoretical number of ancestors in generation G.')); ?>">
+                <?= I18N::translate('Theoretical'); ?>
+            </th>
+            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Number of ancestors found in generation G. A same individual can be counted several times.')); ?>">
+                <?= I18N::translate('Known'); ?>
+            </th>               
+            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Ratio of found ancestors in generation G compared to the theoretical number.')); ?>">
+                <?= I18N::translate('%%'); ?>
+            </th>
+            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Number of ancestors not found in generation G, but whose children are known in generation G-1.')); ?>">
+                <?= I18N::translate('Losses G-1'); ?>
+            </th>
+            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Ratio of not found ancestors in generation G amongst the theoretical ancestors in this generation whose children are known in generation G-1. This is an indicator of the completion of a generation relative to the completion of the previous generation.')); ?>">
+                <?= I18N::translate('%%'); ?>
+            </th>
+            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Cumulative number of ancestors found up to generation G. A same individual can be counted  several times.')); ?>">
+                <?= I18N::translate('Total known'); ?>
+            </th>
+            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Ratio of cumulative found ancestors in generation G compared to the cumulative theoretical number.')); ?>">
+            <?= I18N::translate('%%'); ?></th>
+            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Number of distinct ancestors found in generation G. A same individual is counted only once.')); ?>">
+            <?= I18N::translate('Different'); ?></th>
+            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Ratio of distinct individuals compared to the number of ancestors found in generation G.')); ?>">
+            <?= I18N::translate('%%'); ?></th>
+            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Number of cumulative distinct ancestors found up to generation G. A same individual is counted only once in the total number, even if present in different generations.')); ?>">
+            <?= I18N::translate('Total Different'); ?></th>
+            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Pedigree collapse at generation G. Pedigree collapse is a measure of the real number of ancestors of a person compared to its theorical number. The higher this number is, the more marriages between related persons have happened. Extreme examples of high pedigree collapse are royal families for which this number can be as high as nearly 90%% (Alfonso XII of Spain).')); ?>">
+            <?= I18N::translate('Pedigree collapse'); ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($generation_stats as $gen => $stats) { ?>
+        <tr class="maj-sosa-row">
+            <td class="wt-page-options-label">
+                <?= I18N::translate('<strong>G%d</strong>', $gen); ?>
+            </td>
+            <td class="wt-page-options-label">
+                <?= I18N::translate('%1$s <> %2$s', $stats['gen_min_birth'] ?? I18N::translate('-'), $stats['gen_max_birth']  ?? I18N::translate('-')); ?>
+            </td>
+            <td class="wt-page-options-value">
+                <?= I18N::number($stats['theoretical']); ?>
+            </td>
+            <td class="wt-page-options-value">
+                <?php if ($stats['known'] > 0) : ?>
+                <a href="<?= route(AncestorsList::class, ['tree' => $tree->name(), 'gen' => $gen]) ?>"><?= I18N::number($stats['known']) ?></a>
+                <?php else : ?>
+                    <?= I18N::number($stats['known']) ?>
+                <?php endif ?>
+            </td>
+            <td class="wt-page-options-value">
+                <?= I18N::percentage($stats['perc_known'], 2); ?>
+            </td>
+            <td class="wt-page-options-value">
+                <?php if ($stats['missing'] > 0) : ?>
+                <a href="<?= route(MissingAncestorsList::class, ['tree' => $tree->name(), 'gen' => $gen]) ?>"><?= I18N::number($stats['missing']) ?></a>
+                <?php else : ?>
+                    <?= I18N::number($stats['missing']) ?>
+                <?php endif ?>
+            </td>
+            <td class="wt-page-options-value">
+                <?= I18N::percentage($stats['perc_missing'], 2); ?>
+            </td>
+            <td class="wt-page-options-value">
+                <?= I18N::number($stats['total_known']); ?>
+            </td>
+            <td class="wt-page-options-value">
+                <?= I18N::percentage($stats['perc_total_known'], 2); ?>
+            </td>
+            <td class="wt-page-options-value">
+                <?= I18N::number($stats['different']); ?>
+            </td>
+            <td class="wt-page-options-value left percent_container">
+                <div class="w-100">
+                    <div class="maj-sosa-percent" style="width:<?= 100 * $stats['perc_different'] ?>%;">
+                        &nbsp;<?= I18N::percentage($stats['perc_different']); ?>&nbsp;
+                    </div>
+                </div>
+            </td>
+            <td class="wt-page-options-value">
+                <?= I18N::number($stats['total_different']); ?>
+            </td>
+            <td class="wt-page-options-value">
+                <?= I18N::percentage($stats['pedi_collapse'], 2); ?>
+            </td>
+        </tr>
+        <?php  } ?>
+    </tbody>
+    <tfoot>
+        <tr class="maj-sosa-row">
+            <td class="wt-page-options-label" colspan="13">
+                <?= empty($generation_depth) ? '' : I18N::translate(
+                    'Mean generation depth: %s',
+                    I18N::plural(
+                        '%s generation',
+                        '%s generations',
+                        (int) floor($generation_depth->mean_gen_depth),
+                        I18N::number((float) $generation_depth->mean_gen_depth, 2)
+                    )
+                ) .
+                    ' &mdash; ' .
+                    I18N::translate(
+                        'Standard deviation: %s',
+                        I18N::plural(
+                            '%s generation',
+                            '%s generations',
+                            (int) floor($generation_depth->stddev_gen_depth),
+                            I18N::number((float) $generation_depth->stddev_gen_depth, 2)
+                        )
+                    );
+?>
+            </td>
+        </tr>
+    </tfoot>
 </table>
 <div class="text-center">
-	<em><?= I18N::translate('Hover the column headers to display some help on their meaning.'); ?></em>
+    <em><?= I18N::translate('Hover the column headers to display some help on their meaning.'); ?></em>
 </div>
