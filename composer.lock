@@ -2138,12 +2138,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-theme-rural.git",
-                "reference": "c53a1a3c22e6c2b00aaffaa7a0a6af783767fc8f"
+                "reference": "c711d68b50e17ef38875f487c30bf754daaf28b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-theme-rural/zipball/c53a1a3c22e6c2b00aaffaa7a0a6af783767fc8f",
-                "reference": "c53a1a3c22e6c2b00aaffaa7a0a6af783767fc8f",
+                "url": "https://api.github.com/repos/jon48/webtrees-theme-rural/zipball/c711d68b50e17ef38875f487c30bf754daaf28b4",
+                "reference": "c711d68b50e17ef38875f487c30bf754daaf28b4",
                 "shasum": ""
             },
             "require-dev": {
@@ -2172,7 +2172,7 @@
                 "genealogy",
                 "webtrees"
             ],
-            "time": "2020-11-09T22:27:39+00:00"
+            "time": "2020-12-19T17:20:01+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
