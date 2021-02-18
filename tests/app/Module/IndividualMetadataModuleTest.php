@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,31 +17,24 @@
 
 declare(strict_types=1);
 
-namespace Fisharebest\Webtrees\Census;
+namespace Fisharebest\Webtrees\Module;
 
-use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\TestCase;
 
 /**
- * The individual's date of birth.
+ * Test harness for the class IndividualMetadataModule
+ *
+ * @covers \Fisharebest\Webtrees\Module\IndividualMetadataModule
  */
-class CensusColumnBirthDayMonthSlashYear extends AbstractCensusColumn implements CensusColumnInterface
+class IndividualMetadataModuleTest extends TestCase
 {
     /**
-     * Generate the likely value of this census column, based on available information.
+     * Test that the class exists
      *
-     * @param Individual $individual
-     * @param Individual $head
-     *
-     * @return string
+     * @return void
      */
-    public function generate(Individual $individual, Individual $head): string
+    public function testClassExists(): void
     {
-        $birth_date = $individual->getBirthDate();
-
-        if ($birth_date->minimumJulianDay() === $birth_date->maximumJulianDay()) {
-            return $birth_date->minimumDate()->format('%j %M/%Y');
-        }
-
-        return '';
+        self::assertTrue(class_exists(IndividualMetadataModule::class));
     }
 }

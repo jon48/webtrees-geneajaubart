@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,6 +23,8 @@ use Fisharebest\Webtrees\TestCase;
 
 /**
  * Test harness for the class ModuleMenuInterface
+ *
+ * @covers \Fisharebest\Webtrees\Module\ModuleMenuInterface
  */
 class ModuleMenuInterfaceTest extends TestCase
 {
@@ -33,6 +35,6 @@ class ModuleMenuInterfaceTest extends TestCase
      */
     public function testClassExists(): void
     {
-        $this->assertTrue(interface_exists(ModuleMenuInterface::class));
+        self::assertTrue(interface_exists(ModuleMenuInterface::class));
     }
 }

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -36,7 +36,7 @@ class CensusColumnSurnameGivenNamesTest extends TestCase
      */
     public function testOneGivenName(): void
     {
-        $individual = $this->createMock(Individual::class);
+        $individual = self::createMock(Individual::class);
         $individual->method('getAllNames')->willReturn([
             [
                 'givn' => 'Joe',
@@ -45,12 +45,12 @@ class CensusColumnSurnameGivenNamesTest extends TestCase
         ]);
         $individual->method('spouseFamilies')->willReturn(new Collection());
 
-        $census = $this->createMock(CensusInterface::class);
+        $census = self::createMock(CensusInterface::class);
         $census->method('censusDate')->willReturn('');
 
         $column = new CensusColumnSurnameGivenNames($census, '', '');
 
-        $this->assertSame('Sixpack, Joe', $column->generate($individual, $individual));
+        self::assertSame('Sixpack, Joe', $column->generate($individual, $individual));
     }
 
     /**
@@ -61,21 +61,21 @@ class CensusColumnSurnameGivenNamesTest extends TestCase
      */
     public function testMultipleGivenNames(): void
     {
-        $individual = $this->createMock(Individual::class);
+        $individual = self::createMock(Individual::class);
         $individual->method('getAllNames')->willReturn([
             [
-                'givn' => 'Joe Fred',
+                'givn'    => 'Joe Fred',
                 'surname' => 'Sixpack',
             ],
         ]);
         $individual->method('spouseFamilies')->willReturn(new Collection());
 
-        $census = $this->createMock(CensusInterface::class);
+        $census = self::createMock(CensusInterface::class);
         $census->method('censusDate')->willReturn('');
 
         $column = new CensusColumnSurnameGivenNames($census, '', '');
 
-        $this->assertSame('Sixpack, Joe Fred', $column->generate($individual, $individual));
+        self::assertSame('Sixpack, Joe Fred', $column->generate($individual, $individual));
     }
 
     /**
@@ -86,15 +86,20 @@ class CensusColumnSurnameGivenNamesTest extends TestCase
      */
     public function testNoName(): void
     {
-        $individual = $this->createMock(Individual::class);
-        $individual->method('getAllNames')->willReturn([]);
+        $individual = self::createMock(Individual::class);
+        $individual->method('getAllNames')->willReturn([
+            [
+                'givn'    => Individual::PRAENOMEN_NESCIO,
+                'surname' => Individual::NOMEN_NESCIO,
+            ],
+        ]);
         $individual->method('spouseFamilies')->willReturn(new Collection());
 
-        $census = $this->createMock(CensusInterface::class);
+        $census = self::createMock(CensusInterface::class);
         $census->method('censusDate')->willReturn('');
 
         $column = new CensusColumnSurnameGivenNames($census, '', '');
 
-        $this->assertSame('', $column->generate($individual, $individual));
+        self::assertSame('…, …', $column->generate($individual, $individual));
     }
 }

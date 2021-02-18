@@ -17,22 +17,31 @@
 
 declare(strict_types=1);
 
-namespace Fisharebest\Webtrees;
+namespace Fisharebest\Webtrees\Census;
 
-use Fisharebest\Webtrees\Services\EmailService;
+use Fisharebest\Webtrees\Individual;
 
 /**
- * Test harness for the class MailService
+ * The individual's date of birth.
  */
-class MailServiceTest extends TestCase
+class CensusColumnBirthDayMonthYear extends AbstractCensusColumn implements CensusColumnInterface
 {
     /**
-     * Test that the class exists
+     * Generate the likely value of this census column, based on available information.
      *
-     * @return void
+     * @param Individual $individual
+     * @param Individual $head
+     *
+     * @return string
      */
-    public function testClassExists(): void
+    public function generate(Individual $individual, Individual $head): string
     {
-        $this->assertTrue(class_exists(EmailService::class));
+        $birth_date = $individual->getBirthDate();
+
+        if ($birth_date->minimumJulianDay() === $birth_date->maximumJulianDay()) {
+            return $birth_date->minimumDate()->format('%j %M %Y');
+        }
+
+        return '';
     }
 }

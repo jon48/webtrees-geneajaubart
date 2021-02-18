@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2020 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Census;
 
-use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Individual;
 
 /**
@@ -37,40 +36,8 @@ class CensusColumnFullName extends AbstractCensusColumn implements CensusColumnI
      */
     public function generate(Individual $individual, Individual $head): string
     {
-        $name = $this->nameAtCensusDate($individual, $this->date());
+        $name = $this->nameAtCensusDate($individual);
 
         return strip_tags($name['full']);
-    }
-
-    /**
-     * What was an individual's likely name on a given date, allowing
-     * for marriages and married names.
-     *
-     * @param Individual $individual
-     * @param Date       $census_date
-     *
-     * @return string[]
-     */
-    protected function nameAtCensusDate(Individual $individual, Date $census_date): array
-    {
-        $names = $individual->getAllNames();
-        $name  = $names[0];
-
-        foreach ($individual->spouseFamilies() as $family) {
-            foreach ($family->facts(['MARR']) as $marriage) {
-                if ($marriage->date()->isOK() && Date::compare($marriage->date(), $census_date) < 0) {
-                    $spouse = $family->spouse($individual);
-                    foreach ($names as $individual_name) {
-                        foreach ($spouse->getAllNames() as $spouse_name) {
-                            if ($individual_name['type'] === '_MARNM' && $individual_name['surn'] === $spouse_name['surn']) {
-                                return $individual_name;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $name;
     }
 }

@@ -1,11 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Cannot call method getAllNames\\(\\) on Fisharebest\\\\Webtrees\\\\Individual\\|null\\.$#"
-			count: 1
-			path: app/Census/CensusColumnFullName.php
-
-		-
 			message: "#^Parameter \\#1 \\$line of method Fisharebest\\\\Webtrees\\\\CommonMark\\\\CensusTableParser\\:\\:parseRow\\(\\) expects string, string\\|null given\\.$#"
 			count: 1
 			path: app/CommonMark/CensusTableParser.php
@@ -455,17 +450,17 @@ parameters:
 			path: app/Http/Middleware/BaseUrl.php
 
 		-
+			message: "#^Parameter \\#1 \\$scheme of method Psr\\\\Http\\\\Message\\\\UriInterface\\:\\:withScheme\\(\\) expects string, string\\|false given\\.$#"
+			count: 1
+			path: app/Http/Middleware/BaseUrl.php
+
+		-
 			message: "#^Parameter \\#1 \\$host of method Psr\\\\Http\\\\Message\\\\UriInterface\\:\\:withHost\\(\\) expects string, string\\|false given\\.$#"
 			count: 1
 			path: app/Http/Middleware/BaseUrl.php
 
 		-
 			message: "#^Parameter \\#1 \\$port of method Psr\\\\Http\\\\Message\\\\UriInterface\\:\\:withPort\\(\\) expects int\\|null, int\\|false\\|null given\\.$#"
-			count: 1
-			path: app/Http/Middleware/BaseUrl.php
-
-		-
-			message: "#^Parameter \\#1 \\$scheme of method Psr\\\\Http\\\\Message\\\\UriInterface\\:\\:withScheme\\(\\) expects string, string\\|false given\\.$#"
 			count: 1
 			path: app/Http/Middleware/BaseUrl.php
 
@@ -690,6 +685,11 @@ parameters:
 			path: app/I18N.php
 
 		-
+			message: "#^Method Fisharebest\\\\Webtrees\\\\I18N\\:\\:strcasecmp\\(\\) should return int but returns int\\|false\\.$#"
+			count: 1
+			path: app/I18N.php
+
+		-
 			message: "#^Binary operation \"\\*\" between string and 365 results in an error\\.$#"
 			count: 1
 			path: app/Individual.php
@@ -800,6 +800,11 @@ parameters:
 			path: app/Module/FanChartModule.php
 
 		-
+			message: "#^Parameter \\#2 \\$col of function imagecolortransparent expects int, int\\|false given\\.$#"
+			count: 1
+			path: app/Module/FanChartModule.php
+
+		-
 			message: "#^Parameter \\#1 \\$image of method Fisharebest\\\\Webtrees\\\\Module\\\\FanChartModule\\:\\:imageColor\\(\\) expects resource, resource\\|false given\\.$#"
 			count: 4
 			path: app/Module/FanChartModule.php
@@ -811,6 +816,11 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$im of function imagefilledrectangle expects resource, resource\\|false given\\.$#"
+			count: 1
+			path: app/Module/FanChartModule.php
+
+		-
+			message: "#^Parameter \\#6 \\$col of function imagefilledrectangle expects int, int\\|false given\\.$#"
 			count: 1
 			path: app/Module/FanChartModule.php
 
@@ -836,6 +846,11 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$im of function imagedestroy expects resource, resource\\|false given\\.$#"
+			count: 1
+			path: app/Module/FanChartModule.php
+
+		-
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Module\\\\FanChartModule\\:\\:imageColor\\(\\) should return int but returns int\\|false\\.$#"
 			count: 1
 			path: app/Module/FanChartModule.php
 
@@ -1275,6 +1290,11 @@ parameters:
 			path: app/Report/AbstractRenderer.php
 
 		-
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Report\\\\AbstractRenderer\\:\\:getStyle\\(\\) should return array but returns array\\<string\\>\\|false\\.$#"
+			count: 1
+			path: app/Report/AbstractRenderer.php
+
+		-
 			message: "#^Array \\(array\\<Fisharebest\\\\Webtrees\\\\Report\\\\ReportBaseElement\\>\\) does not accept Fisharebest\\\\Webtrees\\\\Report\\\\ReportBaseElement\\|string\\.$#"
 			count: 3
 			path: app/Report/HtmlRenderer.php
@@ -1465,11 +1485,6 @@ parameters:
 			path: app/Report/ReportParserGenerate.php
 
 		-
-			message: "#^Parameter \\#3 \\$subject of function preg_replace expects array\\|string, string\\|null given\\.$#"
-			count: 1
-			path: app/Report/ReportParserGenerate.php
-
-		-
 			message: "#^Parameter \\#1 \\$array_arg of function end expects array\\|object, array\\<int, string\\>\\|false given\\.$#"
 			count: 1
 			path: app/Report/ReportParserGenerate.php
@@ -1477,11 +1492,6 @@ parameters:
 		-
 			message: "#^Cannot access offset float\\|int on array\\<int, string\\>\\|false\\.$#"
 			count: 14
-			path: app/Report/ReportParserGenerate.php
-
-		-
-			message: "#^Property Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\:\\:\\$parser \\(resource\\) does not accept resource\\|null\\.$#"
-			count: 4
 			path: app/Report/ReportParserGenerate.php
 
 		-
@@ -2203,9 +2213,4 @@ parameters:
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: app/Webtrees.php
-
-		-
-			message: "#^Parameter \\#1 \\$middleware of class Middleland\\\\Dispatcher constructor expects array\\<Psr\\\\Http\\\\Server\\\\MiddlewareInterface\\>, array\\<string\\> given\\.$#"
-			count: 1
-			path: index.php
 

@@ -272,7 +272,7 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
         foreach ($xrefs as $xref) {
             $object = Registry::gedcomRecordFactory()->make($xref, $tree);
             // The object may have been deleted since we added it to the cart....
-            if ($object instanceof  GedcomRecord) {
+            if ($object instanceof GedcomRecord) {
                 $record = $object->privatizeGedcom($access_level);
                 // Remove links to objects that aren't in the cart
                 preg_match_all('/\n1 ' . Gedcom::REGEX_TAG . ' @(' . Gedcom::REGEX_XREF . ')@(\n[2-9].*)*/', $record, $matches, PREG_SET_ORDER);
@@ -433,6 +433,7 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
         assert($tree instanceof Tree);
 
         return $this->viewResponse('modules/clippings/show', [
+            'module'  => $this->name(),
             'records' => $this->allRecordsInCart($tree),
             'title'   => I18N::translate('Family tree clippings cart'),
             'tree'    => $tree,
