@@ -19,7 +19,7 @@ require('laravel-mix-clean');
 const postcss_autoprefixer = require("autoprefixer")();
 
 //https://github.com/jakob101/postcss-inline-rtl
-const postcss_rtl = require("postcss-rtl")();
+const postcss_rtl = require("@mjhenkes/postcss-rtl")();
 
 //https://github.com/bezoerb/postcss-image-inliner
 const postcss_image_inliner = require("postcss-image-inliner")({

@@ -13,9 +13,17 @@ use Fisharebest\Webtrees\Tree;
  * @var int     $current_gen
  */
 
-?>
+// GET request from a form will not pass the parameters in the action attribute, so the route needs to be set as hidden input
+$route_url = route($route_name, [ 'tree' => $tree->name() ]);
+$route_params = [];
+parse_str(parse_url($route_url, PHP_URL_QUERY) ?? '', $route_params);
+$route = $route_params['route'] ?? '';
 
-<form method="GET" name="generation-selector" action="<?= route($route_name, [ 'tree' => $tree->name() ]) ?>">
+?>
+<form method="GET" name="generation-selector" action="<?= e(route($route_name, [ 'tree' => $tree->name() ])) ?>">
+    <?php if ($route !== '') : ?>
+    <input type="hidden" name="route" value="<?= e($route) ?>">
+    <?php endif; ?>
     <div class="maj-sosa-table mx-auto">
         <div class="maj-sosa-row">
             <div class="wt-page-options-label"><?= I18N::translate('Choose generation') ?></div>

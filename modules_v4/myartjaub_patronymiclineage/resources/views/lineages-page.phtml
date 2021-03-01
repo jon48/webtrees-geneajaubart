@@ -4,6 +4,7 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Module\AbstractModule;
 use Fisharebest\Webtrees\Module\IndividualListModule;
+use Fisharebest\Webtrees\Services\ModuleService;
 use Illuminate\Support\Collection;
 
 /**
@@ -17,6 +18,8 @@ use Illuminate\Support\Collection;
  * @var Collection      $lineages
  * @var int             $nb_lineages
  */
+
+$individual_module = app(ModuleService::class)->findByInterface(IndividualListModule::class)->first();
 
 ?>
 
@@ -36,13 +39,15 @@ use Illuminate\Support\Collection;
         </span>
     </p>
     <?php else : ?>
-    <p class="text-center">
-        <strong>
-            <a href="<?= app(IndividualListModule::class)->listUrl($tree, ['surname' => $surname]) ?>">
-                <?= e(I18N::translate('Go to the list of individuals with surname %s', $surname)) ?>
-            </a>
-        </strong>
-    </p>
+        <?php if ($individual_module !== null) : ?>
+        <p class="text-center">
+            <strong>
+                <a href="<?= $individual_module->listUrl($tree, ['surname' => $surname]) ?>">
+                    <?= e(I18N::translate('Go to the list of individuals with surname %s', $surname)) ?>
+                </a>
+            </strong>
+        </p>
+        <?php endif; ?>
     
     <div class="maj-patrolineage-lineages">
         <div class="list_label">
