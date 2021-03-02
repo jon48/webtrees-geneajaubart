@@ -5,8 +5,10 @@ declare(strict_types=1);
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
 use Fisharebest\Webtrees\Module\ModuleThemeInterface;
 use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\PedigreeCollapseData;
 
 /**
  * @var string                          $module_name
@@ -48,3 +50,25 @@ use Illuminate\Support\Collection;
 
 <?php endif; ?>
 </div>
+
+<?php View::push('javascript') ?>
+<script>
+
+    $.when($.getJSON('<?= e(route(PedigreeCollapseData::class, ['tree' => $tree->name() ])) ?>'), $.ready)
+    .done(function(data, unused) {
+        $('.maj-sosa-pedicollapse-globalvalue').text(data[0].pedi_collapse);
+        var cells = data[0].cells;
+        $('.maj-sosa-pedicollapse-cell').each(function() {
+            var gen = $(this).data('sosa-gen');
+            $(this).replaceWith(cells.hasOwnProperty(gen) ? cells[gen] : '&hellip;');
+        });
+        
+        $('.maj-sosa-pedicollapse .maj-loading-complete').removeClass('d-none');
+    }).fail(function() {
+        $('.maj-sosa-pedicollapse .maj-loading-error').removeClass('d-none');
+    }).always(function() {
+        $('.maj-sosa-pedicollapse .maj-loading-initial').addClass('d-none');
+    });
+
+</script>
+<?php View::endpush() ?>

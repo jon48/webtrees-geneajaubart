@@ -20,35 +20,63 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\MissingAncestorsList;
 <table class="maj-sosa-table-generations maj-sosa-table mx-auto">
     <thead>
         <tr class="maj-sosa-row">
-            <th class="wt-page-options-label" colspan="2" >&nbsp;</th>
-            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Theoretical number of ancestors in generation G.')); ?>">
+            <th class="wt-page-options-label" colspan="2" rowspan="2" >&nbsp;</th>
+            <th class="wt-page-options-label" colspan="3"><?= I18N::translate('Ancestors'); ?></th>
+            <th class="wt-page-options-label" colspan="2"></th>
+            <th class="wt-page-options-label" colspan="2"><?= I18N::translate('Cumulative known ancestors'); ?></th>
+            <th class="wt-page-options-label" colspan="3"><?= I18N::translate('Different ancestors'); ?></th>
+            <th class="wt-page-options-label help_tooltip" colspan="2" title="<?= e(I18N::translate('Pedigree collapse at generation G. Pedigree collapse is a measure of the real number of ancestors of a person compared to its theorical number. The higher this number is, the more marriages between related persons have happened. Extreme examples of high pedigree collapse are royal families for which this number can be as high as nearly 90%% (Alfonso XII of Spain).')
+                . ' ' . I18N::translate('Multiple computation methods can be found; a non-conventional approach taking into account missing ancestors and cross-generation collapse is being used.')); ?>">
+                <?= I18N::translate('Pedigree collapse'); ?>
+                <span class="maj-sosa-pedicollapse">
+                    <span class="maj-loading-initial">
+                        <i class="fas fa-spinner fa-pulse fa-fw"></i>
+                    </span>
+                    <span class="maj-loading-complete d-none"></span>
+                    <span class="maj-loading-error d-none">
+                        <span class="maj-icon-error"><i class="fas fa-times"></i></span>
+                    </span>
+                 </span>
+            </th>
+            
+        </tr>
+        <tr class="maj-sosa-row">
+            <th class="wt-page-options-label help_tooltip" title="<?= e(I18N::translate('Theoretical number of ancestors in generation G.')); ?>">
                 <?= I18N::translate('Theoretical'); ?>
             </th>
-            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Number of ancestors found in generation G. A same individual can be counted several times.')); ?>">
+            <th class="wt-page-options-label help_tooltip" title="<?= e(I18N::translate('Number of ancestors found in generation G. A same individual can be counted several times.')); ?>">
                 <?= I18N::translate('Known'); ?>
             </th>               
-            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Ratio of found ancestors in generation G compared to the theoretical number.')); ?>">
+            <th class="wt-page-options-label help_tooltip" title="<?= e(I18N::translate('Ratio of found ancestors in generation G compared to the theoretical number.')); ?>">
                 <?= I18N::translate('%%'); ?>
             </th>
-            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Number of ancestors not found in generation G, but whose children are known in generation G-1.')); ?>">
+            <th class="wt-page-options-label help_tooltip" title="<?= e(I18N::translate('Number of ancestors not found in generation G, but whose children are known in generation G-1.')); ?>">
                 <?= I18N::translate('Losses G-1'); ?>
             </th>
-            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Ratio of not found ancestors in generation G amongst the theoretical ancestors in this generation whose children are known in generation G-1. This is an indicator of the completion of a generation relative to the completion of the previous generation.')); ?>">
+            <th class="wt-page-options-label help_tooltip" title="<?= e(I18N::translate('Ratio of not found ancestors in generation G amongst the theoretical ancestors in this generation whose children are known in generation G-1. This is an indicator of the completion of a generation relative to the completion of the previous generation.')); ?>">
                 <?= I18N::translate('%%'); ?>
             </th>
-            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Cumulative number of ancestors found up to generation G. A same individual can be counted  several times.')); ?>">
-                <?= I18N::translate('Total known'); ?>
+            <th class="wt-page-options-label help_tooltip" title="<?= e(I18N::translate('Cumulative number of ancestors found up to generation G. A same individual can be counted  several times.')); ?>">
+                <?= I18N::translate('Count'); ?>
             </th>
-            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Ratio of cumulative found ancestors in generation G compared to the cumulative theoretical number.')); ?>">
-            <?= I18N::translate('%%'); ?></th>
-            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Number of distinct ancestors found in generation G. A same individual is counted only once.')); ?>">
-            <?= I18N::translate('Different'); ?></th>
-            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Ratio of distinct individuals compared to the number of ancestors found in generation G.')); ?>">
-            <?= I18N::translate('%%'); ?></th>
-            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Number of cumulative distinct ancestors found up to generation G. A same individual is counted only once in the total number, even if present in different generations.')); ?>">
-            <?= I18N::translate('Total Different'); ?></th>
-            <th class="wt-page-options-label help_tooltip" title="<?= strip_tags(I18N::translate('Pedigree collapse at generation G. Pedigree collapse is a measure of the real number of ancestors of a person compared to its theorical number. The higher this number is, the more marriages between related persons have happened. Extreme examples of high pedigree collapse are royal families for which this number can be as high as nearly 90%% (Alfonso XII of Spain).')); ?>">
-            <?= I18N::translate('Pedigree collapse'); ?></th>
+            <th class="wt-page-options-label help_tooltip" title="<?= e(I18N::translate('Ratio of cumulative found ancestors in generation G compared to the cumulative theoretical number.')); ?>">
+            <?= I18N::translate('%%'); ?>
+            </th>
+            <th class="wt-page-options-label help_tooltip" title="<?= e(I18N::translate('Number of distinct ancestors found in generation G. A same individual is counted only once.')); ?>">
+            <?= I18N::translate('Count'); ?>
+            </th>
+            <th class="wt-page-options-label help_tooltip" title="<?= e(I18N::translate('Ratio of distinct individuals compared to the number of ancestors found in generation G.')); ?>">
+            <?= I18N::translate('%%'); ?>
+            </th>
+            <th class="wt-page-options-label help_tooltip" title="<?= e(I18N::translate('Number of cumulative distinct ancestors found up to generation G. A same individual is counted only once in the total number, even if present in different generations.')); ?>">
+            <?= I18N::translate('Cumulative'); ?>
+            </th>
+            <th class="wt-page-options-label help_tooltip" title="<?= e(I18N::translate('Minimum pedigree collapse at generation G. The minimum pedigree collapse is a computation of the lowest possible value of the root ancestors collapse at generation G, based on the known ancestors, assuming all further missing ancestors are distinct, taking into account cross-generation collapse.')); ?>">
+            <?= I18N::translate('Minimum'); ?>
+            </th>
+            <th class="wt-page-options-label help_tooltip" title="<?= e(I18N::translate('Pedigree cross-generation shrinkage at generation G. The shinkrage is a measure of the pedigree collapse due to cross-generation marriages. The higher this number is, the more marriages between related persons at different Sosa generations have happened.')); ?>">
+            <?= I18N::translate('Shrinkage'); ?>
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -102,15 +130,13 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\MissingAncestorsList;
             <td class="wt-page-options-value">
                 <?= I18N::number($stats['total_different']); ?>
             </td>
-            <td class="wt-page-options-value">
-                <?= I18N::percentage($stats['pedi_collapse'], 2); ?>
-            </td>
+            <td class="wt-page-options-value maj-sosa-pedicollapse-cell" colspan="2" data-sosa-gen="<?= $gen ?>" />
         </tr>
         <?php  } ?>
     </tbody>
     <tfoot>
         <tr class="maj-sosa-row">
-            <td class="wt-page-options-label" colspan="13">
+            <td class="wt-page-options-label" colspan="14">
                 <?= empty($generation_depth) ? '' : I18N::translate(
                     'Mean generation depth: %s',
                     I18N::plural(

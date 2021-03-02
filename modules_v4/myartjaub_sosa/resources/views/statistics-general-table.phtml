@@ -27,7 +27,17 @@ use Fisharebest\Webtrees\I18N;
     </div>
     <div class="maj-sosa-row">
         <div class="wt-page-options-label"><?= I18N::translate('Pedigree collapse'); ?></div>
-        <div class="wt-page-options-value"><?= I18N::percentage($general_stats['pedi_collapse'], 2); ?></div>
+        <div class="wt-page-options-value">
+            <span class="maj-sosa-pedicollapse">
+                <span class="maj-loading-initial">
+                    <i class="fas fa-spinner fa-pulse fa-fw"></i>
+                </span>
+                <span class="maj-loading-complete d-none maj-sosa-pedicollapse-globalvalue">&hellip;</span>
+                <span class="maj-loading-error d-none">
+                    <span class="maj-icon-error"><i class="fas fa-times"></i></span>
+                </span>
+            </span>
+        </div>
     </div>
     <div class="maj-sosa-row">
         <div class="wt-page-options-label"><?= I18N::translate('Generation mean duration'); ?></div>

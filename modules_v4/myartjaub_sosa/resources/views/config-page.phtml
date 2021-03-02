@@ -8,6 +8,7 @@ use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
 use Fisharebest\Webtrees\Http\RequestHandlers\Select2Individual;
 use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaConfigAction;
+use MyArtJaub\Webtrees\Module\Sosa\Services\SosaRecordsService;
 
 /**
  * @var string                  $module_name
@@ -18,6 +19,8 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaConfigAction;
  * @var bool                    $immediate_compute
  * @var array<string,mixed>     $users_root
  */
+
+$max_gen_system = app(SosaRecordsService::class)->maxSystemGenerations();
 
 ?>
 
@@ -44,16 +47,19 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaConfigAction;
                 <div class="col-sm-9 wt-page-options-value">
                     <?php if (count($users_root) == 1) : ?>
                         <?php $root_id = $users_root[0]['root_id']; ?>
+                        <?php $max_gen = $users_root[0]['max_gen']; ?>
                         <div class="col-sm-9 wt-page-options-value">
                             <input id="maj-sosa-input-userid" type="hidden" name="sosa-userid" value="<?php echo $users_root[0]['user']->id(); ?>" />
                             <label><?= e($users_root[0]['user']->realName()) ?></label>
                         </div>
                     <?php elseif (count($users_root) > 1) : ?>
                         <?php $root_id = $users_root[0]['root_id']; ?>
+                        <?php $max_gen = $users_root[0]['max_gen']; ?>
                         <select id="maj-sosa-select-userid" name="sosa-userid" class="form-control">
                             <?php foreach ($users_root as $i => $user_root) : ?>
                                 <?php if ($user_root['user']->id() == $selected_user_id) {
                                     $root_id = $user_root['root_id'];
+                                    $max_gen = $user_root['max_gen'];
                                     $selected = true;
                                 } else {
                                     $selected = $i == 0;
@@ -75,7 +81,25 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaConfigAction;
                     <?= I18N::translate('Root individual') ?>
                 </label>
                 <div class="col-sm-9 wt-page-options-value">
-                    <?= view('components/select-individual', ['name' => 'sosa-rootid', 'individual' => Factory::individual()->make($root_id, $tree), 'tree' => $tree]) ?>
+                    <?= view('components/select-individual', ['id' => 'maj-sosa-input-rootid', 'name' => 'sosa-rootid', 'individual' => Factory::individual()->make($root_id, $tree), 'tree' => $tree]) ?>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SOSA MAX GEN -->
+        <div class="form-group">
+            <div class="row">
+                <label class="col-sm-3 col-form-label wt-page-options-label" for="maj-sosa-input-maxgen">
+                    <?= I18N::translate('Number of generations to compute') ?>
+                </label>
+                <div class="col-sm-9 wt-page-options-value">
+                    <div class="input-group" id="maj-sosa-inputgroup-maxgen">
+                        <input class="form-control form-range mx-3" type="range" id="maj-sosa-input-maxgen" name="sosa-maxgen"
+                                min="2" max="<?= $max_gen_system ?>" value="<?= $max_gen ?>" dir="auto">
+                        <div class="input-group-append">
+                            <output class="input-group-text" for="maj-sosa-input-maxgen"><?= $max_gen ?></output>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -107,14 +131,14 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaConfigAction;
 var users_array = [];
 
 <?php foreach ($users_root as $user_root) : ?>
-users_array["<?= $user_root['user']->id() ?>"] = "<?= $user_root['root_id'] ?>";
+users_array["<?= $user_root['user']->id() ?>"] = [ "<?= $user_root['root_id'] ?>", <?= $user_root['max_gen'] ?> ];
 <?php endforeach; ?>
 
 $('#maj-sosa-select-userid').change(function() {
     $.ajax({
         type: 'POST',
         url: '<?= e(route(Select2Individual::class, ['tree' => $tree->name(), 'at' => ''])) ?>',
-        data: { q: users_array[this.value] }
+        data: { q: users_array[this.value][0] }
     }).then(function (data) {
         if(data.results.length > 0) {
             result = data.results[0];
@@ -135,7 +159,12 @@ $('#maj-sosa-select-userid').change(function() {
             $('#sosa-rootid').val(null).trigger('change');
         }
     });
+    $('#maj-sosa-input-maxgen').val(users_array[this.value][1]).trigger("input");
 });
+
+$('#maj-sosa-input-maxgen').on("input", function() {
+    $('#maj-sosa-input-maxgen + .input-group-append output').val(this.value);
+}).trigger("change");
 
 </script>
 <?php View::endpush() ?>

@@ -56,6 +56,58 @@
             "time": "2017-03-02T16:34:47+00:00"
         },
         {
+            "name": "brick/math",
+            "version": "0.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/brick/math.git",
+                "reference": "b69d0daabbb830b1dac93d757cdc5dab253574c2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brick/math/zipball/b69d0daabbb830b1dac93d757cdc5dab253574c2",
+                "reference": "b69d0daabbb830b1dac93d757cdc5dab253574c2",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.1|^8.0"
+            },
+            "require-dev": {
+                "php-coveralls/php-coveralls": "^2.2",
+                "phpunit/phpunit": "^7.5.15|^8.5",
+                "vimeo/psalm": "^3.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Brick\\Math\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Arbitrary-precision arithmetic library",
+            "keywords": [
+                "Arbitrary-precision",
+                "BigInteger",
+                "BigRational",
+                "arithmetic",
+                "bigdecimal",
+                "bignum",
+                "brick",
+                "math"
+            ],
+            "funding": [
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/brick/math",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-08-18T09:40:56+00:00"
+        },
+        {
             "name": "composer/ca-bundle",
             "version": "1.2.8",
             "source": {
@@ -2053,17 +2105,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "be78a05d9dd7bb98054151deedfcb52397c553ca"
+                "reference": "9789a89627052f9c7968e191eef589fe8c5f1a7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/be78a05d9dd7bb98054151deedfcb52397c553ca",
-                "reference": "be78a05d9dd7bb98054151deedfcb52397c553ca",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/9789a89627052f9c7968e191eef589fe8c5f1a7c",
+                "reference": "9789a89627052f9c7968e191eef589fe8c5f1a7c",
                 "shasum": ""
             },
             "require": {
+                "brick/math": "0.9",
                 "ext-xml": "*",
-                "fisharebest/webtrees": "~2.0.10",
+                "fisharebest/webtrees": "~2.0.11",
                 "paragonie/sodium_compat": "~1.13"
             },
             "require-dev": {
@@ -2098,7 +2151,7 @@
                 "genealogy",
                 "webtrees"
             ],
-            "time": "2020-12-14T10:52:05+00:00"
+            "time": "2021-03-01T21:41:36+00:00"
         },
         {
             "name": "jon48/webtrees-mod-translationtool",
@@ -2106,12 +2159,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-mod-translationtool.git",
-                "reference": "eb61a8cb9eaef90e482d9f62b3f33b0d60d29c5a"
+                "reference": "834d7a67bbeb27030514aad7af0bded428c80652"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-mod-translationtool/zipball/eb61a8cb9eaef90e482d9f62b3f33b0d60d29c5a",
-                "reference": "eb61a8cb9eaef90e482d9f62b3f33b0d60d29c5a",
+                "url": "https://api.github.com/repos/jon48/webtrees-mod-translationtool/zipball/834d7a67bbeb27030514aad7af0bded428c80652",
+                "reference": "834d7a67bbeb27030514aad7af0bded428c80652",
                 "shasum": ""
             },
             "require": {
@@ -2121,6 +2174,11 @@
                 "gettext/gettext": "~5.0",
                 "gettext/php-scanner": "~1.0",
                 "jon48/webtrees-lib": "dev-feature/2.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan-deprecation-rules": "^0.12.6",
+                "phpstan/phpstan-phpunit": "^0.12.17",
+                "phpstan/phpstan-strict-rules": "^0.12.9"
             },
             "type": "webtrees-module",
             "extra": {
@@ -2151,7 +2209,7 @@
                 "webtrees",
                 "webtrees-module"
             ],
-            "time": "2020-07-26T15:40:26+00:00"
+            "time": "2021-03-01T23:46:58+00:00"
         },
         {
             "name": "jon48/webtrees-theme-rural",
@@ -6118,6 +6176,67 @@
                 "memory"
             ],
             "time": "2019-05-30T21:34:13+00:00"
+        },
+        {
+            "name": "league/glide",
+            "version": "1.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/glide.git",
+                "reference": "ae5e26700573cb678919d28e425a8b87bc71c546"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/glide/zipball/ae5e26700573cb678919d28e425a8b87bc71c546",
+                "reference": "ae5e26700573cb678919d28e425a8b87bc71c546",
+                "shasum": ""
+            },
+            "require": {
+                "intervention/image": "^2.4",
+                "league/flysystem": "^1.0",
+                "php": "^7.2|^8.0",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.3.3",
+                "phpunit/php-token-stream": "^3.1|^4.0",
+                "phpunit/phpunit": "^8.5|^9.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Glide\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jonathan Reinink",
+                    "email": "jonathan@reinink.ca",
+                    "homepage": "http://reinink.ca"
+                }
+            ],
+            "description": "Wonderfully easy on-demand image manipulation library with an HTTP based API.",
+            "homepage": "http://glide.thephpleague.com",
+            "keywords": [
+                "ImageMagick",
+                "editing",
+                "gd",
+                "image",
+                "imagick",
+                "league",
+                "manipulation",
+                "processing"
+            ],
+            "time": "2020-11-05T17:34:03+00:00"
         },
         {
             "name": "maximebf/debugbar",

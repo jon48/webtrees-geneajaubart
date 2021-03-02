@@ -22,7 +22,9 @@ return array (
     'Sosa Configuration'            =>  'Configuration module Sosa',
     'Root individual'               =>  'Individu de-cujus',
     'For user'                      =>  'Pour l\'utilisateur',
-    'Compute'                       =>  'Calculer',
+    'compute'                       =>  'calculer',
+    'Number of generations to compute'
+                                    =>  'Nombre de générations à calculer',
     'Computing...'                  =>  'En cours...',
     'Error'                         =>  'Erreur',
     'Success'                       =>  'Succès',
@@ -40,10 +42,12 @@ return array (
     'Theoretical'                   =>  'Théoriques',
     'Known'                         =>  'Connus',
     'Losses G-1'                    =>  'Pertes G-1',
-    'Total known'                   =>  'Cumul Connus',
-    'Different'                     =>  'Différents',
-    'Total Different'               =>  'Cumul Différents',
+    'Cumulative known ancestors'    =>  'Cumul ancêtres connus',
+    'Different ancestors'           =>  'Ancêtres différents',
+    'Cumulative'                    =>  'Cumul',
     'Pedigree collapse'             =>  'Implexe',
+    'Minimum'                       =>  'Minimal',
+    'Shrinkage'                     =>  'Contraction',
     '<strong>G%d</strong>'          =>  '<strong>G%d</strong>',
     'Known Sosa ancestors\' family dispersion'
                                     =>  'Répartition familiale des ancêtres Sosas connus',
@@ -71,7 +75,13 @@ return array (
     'Number of cumulative distinct ancestors found up to generation G. A same individual is counted only once in the total number, even if present in different generations.'
                                     =>  'Nombre cumulé d\'ancêtres différents trouvés jusqu\'à la génération G. Un même individu n\'est compté qu\'une seule fois, même s\'il apparait dans plusieurs générations.',
     'Pedigree collapse at generation G. Pedigree collapse is a measure of the real number of ancestors of a person compared to its theorical number. The higher this number is, the more marriages between related persons have happened. Extreme examples of high pedigree collapse are royal families for which this number can be as high as nearly 90%% (Alfonso XII of Spain).'
-                                    =>  'Implexe à la génération G. L\'implexe est une mesure du nombre réel d\'ancêtres d\'une personne par rapport au nombre théorique. Plus ce pourcentage est grand, plus il y a eu de mariages entre personnes apparentées. Les familles royales constituent des exemples extrêmes d\'implexe, certains atteignant des niveaux de 90%%, comme le roi Alphonse XII d\'Espagne.',
+                                    =>  'Implexe à la génération G. L\'implexe est une mesure du nombre réel d\'ancêtres d\'une personne par rapport au nombre théorique. Plus ce pourcentage est élevé, plus il y a eu de mariages entre personnes apparentées. Les familles royales constituent des exemples extrêmes d\'implexe, certains atteignant des niveaux de 90%%, comme le roi Alphonse XII d\'Espagne.',
+    'Multiple computation methods can be found; a non-conventional approach taking into account missing ancestors and cross-generation collapse is being used.'
+                                    =>  'Plusieurs méthodes de calcul sont possible; une approche non conventionnelle est utilisée, prenant en compte les ancêtres manquants et la contraction inter-générationnelle.',
+    'Minimum pedigree collapse at generation G. The minimum pedigree collapse is a computation of the lowest possible value of the root ancestors collapse at generation G, based on the known ancestors, assuming all further missing ancestors are distinct, taking into account cross-generation collapse.'
+                                    =>  'Implexe minimal à la génération G. L\'implexe minimal est un calcul de la plus petite valeur possible de l\'implexe des ancêtres racines à la génération G, basé sur les ancêtres connus, prenant en compte la contraction inter-générationnelle, et supposant que les ancêtres manquants ultérieurs sont différents.',
+    'Pedigree cross-generation shrinkage at generation G. The shinkrage is a measure of the pedigree collapse due to cross-generation marriages. The higher this number is, the more marriages between related persons at different Sosa generations have happened.'
+                                    =>  'Contraction inter-génerationnelle à la génération G. La contraction est une mesure de la la réduction de l\'arbre due aux mariages inter-générationels. Plus ce pourcentage est élevé, plus il y a eu de mariages entre personnes apparentées appartenant à des générations Sosa différentes.',
     'Mean generation depth and standard deviation'
                                     =>  'Profondeur généalogique moyenne et écart-type',
     'Mean generation depth'         =>  'Profondeur généalogique moyenne',
