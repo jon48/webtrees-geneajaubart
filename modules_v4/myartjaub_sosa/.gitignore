@@ -7,6 +7,7 @@
 # build products
 /resources/css/
 /resources/images/
+/resources/js/
 mix-manifest.json
 
 # Eclipse

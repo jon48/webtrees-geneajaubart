@@ -2,7 +2,7 @@
  * Styles - MyArtJaub Sosa module
  *
  * webtrees-MyArtJaub
- * Copyright (C) 2009-2020 Jonathan Jaubart
+ * Copyright (C) 2009-2021 Jonathan Jaubart
  * 
  * Based on webtrees: online genealogy
  * Copyright (C) 2020 webtrees development team
@@ -57,5 +57,13 @@
 table {
     .maj-cell-sosa {
         opacity: 0.65;
+    }
+}
+
+.maj-icon-sosa {
+    vertical-align: middle;
+    
+    .fa-layers-text {
+        font-weight: bold;
     }
 }

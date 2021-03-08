@@ -6,7 +6,7 @@
  * @package MyArtJaub\Webtrees
  * @subpackage Sosa
  * @author Jonathan Jaubart <dev@jaubart.com>
- * @copyright Copyright (c) 2009-2020, Jonathan Jaubart
+ * @copyright Copyright (c) 2009-2021, Jonathan Jaubart
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3
  */
 
@@ -33,12 +33,23 @@ return array (
     'Sosa Statistics'               =>  'Statistiques Sosa',
     'No Sosa root individual has been defined.'
                                     =>  'L\'individu de-cujus n\'a pas été défini.',
+    'Sosa %1$s - Generation %2$s'   =>  'Sosa %1$s - Génération %2$s',
+    'Sosa %1$s - Generation %2$s (+%3$s other Sosas)'
+                                    =>  'Sosa %1$s - Génération %2$s (+%3$s autres Sosas)',
+    'This individual'               =>  'Cet individu',
+    'the root individual'           =>  'l\'individu de-cujus',
+    '%1$s is an ancestor of %2$s:'  =>  '%1$s est un ancêtre de %2$s :',
+    '%1$s is %3$s times an ancestor of %2$s:'
+                                    =>  '%1$s est %3$s fois un ancêtre de %2$s :',
+    'Father\'s side'                =>  'Côté paternel',
+    'Mother\'s side'                =>  'Côté maternel',
     'General statistics'            =>  'Statistiques générales',
     'Number of ancestors'           =>  'Nombre total d\'ancêtres',
     'Number of different ancestors' =>  'Nombre d\'ancêtres différents',
     '%% of ancestors in the base'   =>  'Proportion de Sosas dans la base',
     'Generation mean duration'      =>  'Durée moyenne d\'une génération',
     'Statistics by generations'     =>  'Statistiques par générations',
+    'Count'                         =>  'Nombre',
     'Theoretical'                   =>  'Théoriques',
     'Known'                         =>  'Connus',
     'Losses G-1'                    =>  'Pertes G-1',
@@ -77,7 +88,7 @@ return array (
     'Pedigree collapse at generation G. Pedigree collapse is a measure of the real number of ancestors of a person compared to its theorical number. The higher this number is, the more marriages between related persons have happened. Extreme examples of high pedigree collapse are royal families for which this number can be as high as nearly 90%% (Alfonso XII of Spain).'
                                     =>  'Implexe à la génération G. L\'implexe est une mesure du nombre réel d\'ancêtres d\'une personne par rapport au nombre théorique. Plus ce pourcentage est élevé, plus il y a eu de mariages entre personnes apparentées. Les familles royales constituent des exemples extrêmes d\'implexe, certains atteignant des niveaux de 90%%, comme le roi Alphonse XII d\'Espagne.',
     'Multiple computation methods can be found; a non-conventional approach taking into account missing ancestors and cross-generation collapse is being used.'
-                                    =>  'Plusieurs méthodes de calcul sont possible; une approche non conventionnelle est utilisée, prenant en compte les ancêtres manquants et la contraction inter-générationnelle.',
+                                    =>  'Plusieurs méthodes de calcul sont possibles; une approche non conventionnelle est utilisée, prenant en compte les ancêtres manquants et la contraction inter-générationnelle.',
     'Minimum pedigree collapse at generation G. The minimum pedigree collapse is a computation of the lowest possible value of the root ancestors collapse at generation G, based on the known ancestors, assuming all further missing ancestors are distinct, taking into account cross-generation collapse.'
                                     =>  'Implexe minimal à la génération G. L\'implexe minimal est un calcul de la plus petite valeur possible de l\'implexe des ancêtres racines à la génération G, basé sur les ancêtres connus, prenant en compte la contraction inter-générationnelle, et supposant que les ancêtres manquants ultérieurs sont différents.',
     'Pedigree cross-generation shrinkage at generation G. The shinkrage is a measure of the pedigree collapse due to cross-generation marriages. The higher this number is, the more marriages between related persons at different Sosa generations have happened.'
@@ -133,6 +144,8 @@ return array (
                                     =>  'L\'individu de-cujus a été mis à jour.',
     'The root individual could not be updated.'
                                     =>  'L\'individu de-cujus n\'a pu être mis à jour.',
+    'The attached module could not be found.'
+                                    =>  'Le module associé n\'a pas été trouvé',
     'An error occurred while retrieving data.'
                                     =>  'Une erreur s\'est produite en récupérant les données.',
     'An error occurred while computing Sosa ancestors.'

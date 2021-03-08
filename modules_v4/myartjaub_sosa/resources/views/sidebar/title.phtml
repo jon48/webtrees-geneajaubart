@@ -1,0 +1,22 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Illuminate\Support\Collection;
+
+/**
+ * @var string      $module_name
+ * @var Collection  $sosa_numbers
+ */
+
+$count = $sosa_numbers->count();
+$sosa = $sosa_numbers->keys()->first();
+$gen = $sosa_numbers->get($sosa);
+
+?>
+<?= view($module_name . '::icons/sosa', [ 'size_style' => 'fa-lg' ]) ?>
+&nbsp;
+<?php if ($count > 1) : ?>
+    <?= I18N::translate('Sosa %1$s - Generation %2$s (+%3$s other Sosas)', I18N::number($sosa), I18N::number($gen), I18N::number($count - 1)) ?>
+<?php else : ?>
+    <?= I18N::translate('Sosa %1$s - Generation %2$s', I18N::number($sosa), I18N::number($gen)) ?>
+<?php endif; ?>

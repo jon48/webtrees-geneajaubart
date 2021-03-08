@@ -1,0 +1,34 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\Sosa\Services\SosaRecordsService;
+use Fisharebest\Webtrees\Individual;
+
+/**
+ * @var Individual      $sosa_ancestor
+ * @var Individual|null $sosa_root
+ * @var Collection      $sosa_numbers
+ */
+
+$individual_name = $sosa_ancestor->canShowName() ? $sosa_ancestor->fullName() : I18N::translate('This individual');
+$root_name = $sosa_root !== null && $sosa_root->canShowName() ? $sosa_root->fullName() : I18N::translate('the root individual');
+?>
+
+<?php if ($sosa_numbers->count() > 1) : ?>
+    <?= I18N::translate('%1$s is %3$s times an ancestor of %2$s:', $individual_name, $root_name, I18N::number($sosa_numbers->count())) ?>
+<?php else : ?>
+    <?= I18N::translate('%1$s is an ancestor of %2$s:', $individual_name, $root_name) ?>
+<?php endif; ?>
+
+<ul>
+<?php foreach ($sosa_numbers as $sosa => $gen) : ?>
+    <li>
+        <?= I18N::translate('Sosa %1$s - Generation %2$s', I18N::number($sosa), I18N::number($gen)) ?>
+        <?php $sosa_equivalent = app(SosaRecordsService::class)->sosaDescendantOf($sosa, 2) ?>
+        <?php if ($sosa_equivalent == 2) : ?> - <?= I18N::translate('Father\'s side')  ?>
+        <?php elseif ($sosa_equivalent == 3) : ?> - <?= I18N::translate('Mother\'s side') ?>
+        <?php endif; ?>
+    </li>
+<?php endforeach; ?>
+</ul>

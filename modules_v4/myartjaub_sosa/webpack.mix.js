@@ -33,15 +33,16 @@ const postcss_image_inliner = require("postcss-image-inliner")({
 const postcss_custom_properties = require("postcss-custom-properties")();
 
 mix
-    .setPublicPath('resources/css')
-    .sass('src/sass/default.scss', 'default.min.css')
-    .sass('src/sass/clouds.scss', 'clouds.min.css')
-    .sass('src/sass/colors.scss', 'colors.min.css')
-    .sass('src/sass/fab.scss', 'fab.min.css')
-    .sass('src/sass/minimal.scss', 'minimal.min.css')
-    .sass('src/sass/webtrees.scss', 'webtrees.min.css')
-    .sass('src/sass/xenea.scss', 'xenea.min.css')
-    .sass('src/sass/rural.scss', '_myartjaub_ruraltheme_.min.css')
+    .setPublicPath('resources')
+    .js('src/js/sosa.js', 'js/sosa.min.js')
+    .sass('src/sass/default.scss', 'css/default.min.css')
+    .sass('src/sass/clouds.scss', 'css/clouds.min.css')
+    .sass('src/sass/colors.scss', 'css/colors.min.css')
+    .sass('src/sass/fab.scss', 'css/fab.min.css')
+    .sass('src/sass/minimal.scss', 'css/minimal.min.css')
+    .sass('src/sass/webtrees.scss', 'css/webtrees.min.css')
+    .sass('src/sass/xenea.scss', 'css/xenea.min.css')
+    .sass('src/sass/rural.scss', 'css/_myartjaub_ruraltheme_.min.css')
     .options({
         processCssUrls: false,
         postCss: [
@@ -52,5 +53,7 @@ mix
         ]
     })
     .sourceMaps()
-    .clean()
+    .clean({
+        cleanOnceBeforeBuildPatterns: ['css/**/*', 'js/**/*']
+    })
     ;

@@ -21,25 +21,10 @@
  * along with webtrees-MyArtJaub. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
+import { library } from '@fortawesome/fontawesome-svg-core';
 
-/* stylelint-disable block-opening-brace-space-before */
-.menu-maj-sosa .nav-link::before{content: url('rural/menu-sosa.png');}
-.menu-maj-sosa-list::before     {content: url('rural/menu-sosa-list.png');}
-.menu-maj-sosa-missing::before  {content: url('rural/menu-sosa-missing.png');}
-.menu-maj-sosa-stats::before    {content: url('rural/menu-sosa-stats.png');}
-.menu-maj-sosa-config::before   {content: url('rural/menu-sosa-config.png');}
-.menu-maj-sosa-compute::before  {content: url('rural/menu-sosa-config.png');}
-/* stylelint-enable block-opening-brace-space-before */
+import {
+  faCircle
+} from '@fortawesome/free-solid-svg-icons';
 
-.maj-sosa-percent {
-    background-color: var(--maj-c-theme-medium);
-}
-
-table.maj-sosa-table {
-    background-color: var(--maj-c-theme-medium);
-}
-
-.maj-icon-sosa {
-    color: #008000;
-}
+library.add(faCircle);
