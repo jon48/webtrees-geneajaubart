@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2018-09-25 11:42+0100\n"
-"PO-Revision-Date: 2020-04-20 14:19+0000\n"
+"PO-Revision-Date: 2021-02-28 19:27+0000\n"
 "Last-Translator: HRN <hogne.roed.nilsen@gmail.com>\n"
 "Language-Team: Norwegian Nynorsk <https://translate.webtrees.net/projects/"
 "webtrees/webtrees-17/nn/>\n"
@@ -3329,7 +3329,7 @@ msgstr "Kamerun"
 #. I18N: Location of an LDS church temple
 #: app/GedcomCode/GedcomCodeTemp.php:125
 msgid "Campinas, Brazil"
-msgstr "Campinas, Brazil"
+msgstr "Campinas, Brasil"
 
 #. I18N: Name of a country or state
 #: app/Stats.php:6711
@@ -6084,7 +6084,7 @@ msgstr "Familie med foreldre"
 #. I18N: “rada” is an Arabic word, pronounced “ra DAH”. It is child-to-parent pedigree, established by wet-nursing.
 #: app/GedcomCode/GedcomCodePedi.php:139
 msgid "Family with rada parents"
-msgstr "Familie med rada-foreldre"
+msgstr "Familie med amme/pleieforeldre"
 
 #. I18N: “sealing” is a Mormon ceremony.
 #: app/GedcomCode/GedcomCodePedi.php:135
@@ -6279,7 +6279,7 @@ msgstr "Filer merka %s er naudsynte for at webtrees skal fungere, og kan ikkje s
 
 #: app/I18N.php:235 app/Module/SlideShowModule.php:302 find.php:532
 msgid "Filter"
-msgstr "Søk"
+msgstr "Filter"
 
 #: app/Functions/FunctionsPrint.php:794 find.php:76 find.php:81 find.php:86
 #: find.php:91 find.php:96 find.php:101
@@ -10555,11 +10555,11 @@ msgstr "Payson, Utah, USA"
 #: modules_v3/pedigree_report/report.xml:3
 #: modules_v3/pedigree_report/report.xml:43
 msgid "Pedigree"
-msgstr "Anetavle"
+msgstr "Anediagram"
 
 #: modules_v3/pedigree_report/report.xml:739
 msgid "Pedigree chart"
-msgstr "Anetre"
+msgstr "Anediagram"
 
 #: app/Module/GoogleMapsModule.php:210
 msgid "Pedigree map"
@@ -10574,13 +10574,13 @@ msgstr "Anekart til %s"
 #: app/Module/ChartsBlockModule.php:86
 #, php-format
 msgid "Pedigree of %s"
-msgstr "Anetre til %s"
+msgstr "Anediagram til %s"
 
 #. I18N: %s is an individual’s name
 #: app/Controller/PedigreeController.php:85
 #, php-format
 msgid "Pedigree tree of %s"
-msgstr "Anar til %s"
+msgstr "Anediagram til %s"
 
 #. I18N: Name of a module
 #: admin.php:767 admin.php:789 admin_site_upgrade.php:100
@@ -11605,20 +11605,27 @@ msgstr "Søk om brukarkonto"
 #. I18N: gedcom tag _TODO
 #: app/GedcomTag.php:1743
 msgid "Research task"
-msgstr "Forskingsoppgåve"
+msgstr "Granskingsoppgåve"
 
 #. I18N: Name of a module. Tasks that need further research.
 #: app/Module/ResearchTaskModule.php:39
 msgid "Research tasks"
-msgstr "Forskningsoppgåver"
+msgstr "Granskingsoppgåver"
 
 #: app/Module/ResearchTaskModule.php:201
 msgid "Research tasks are special events, added to individuals in your family tree, which identify the need for further research. You can use them as a reminder to check facts against more reliable sources, to obtain documents or photographs, to resolve conflicting information, etc."
-msgstr "Forskningsoppgåver er særskilde hendingar knytte til personar i slektstreet, som syner trong til vidare gransking. Dei kan nyttast som påminning om at data må kontrollerast mot andre kjelder, at dokument eller bileter må innhentast, at motstridande informasjon må kontrollerast, osb."
+msgstr ""
+"Granskingsoppgåver er særskilde hendingar knytte til personar i slektstreet, "
+"som syner trong til vidare gransking. Dei kan nyttast som påminning om at "
+"data må kontrollerast mot andre kjelder, at dokument eller bileter må "
+"innhentast, at motstridande informasjon må kontrollerast, osb."
 
 #: app/Module/ResearchTaskModule.php:203
 msgid "Research tasks are stored using the custom GEDCOM tag “_TODO”. Other genealogy applications may not recognize this tag."
-msgstr "Forskningsoppgåver vert lagra under koden «_TODO». Sidan denne ikkje finnast i GEDCOM-standarden, er det ikkje sikkert at andre slektsforskningsprogram vil forstå den."
+msgstr ""
+"Granskingsoppgåver vert lagra under koden «_TODO». Sidan denne ikkje finnast "
+"i GEDCOM-standarden, er det ikkje sikkert at andre slektsforskningsprogram "
+"vil forstå den."
 
 #. I18N: gedcom tag RESI
 #: app/GedcomTag.php:732
@@ -11687,15 +11694,15 @@ msgstr "Romania"
 #. I18N: gedcom tag ROMN
 #: app/GedcomTag.php:762
 msgid "Romanized"
-msgstr "Latinsk"
+msgstr "Latinsk form"
 
 #: app/GedcomTag.php:690
 msgid "Romanized place"
-msgstr "Stad (latinsk)"
+msgstr "Stad (latinsk form)"
 
 #: app/GedcomTag.php:838
 msgid "Romanized title"
-msgstr "Tittel (latin)"
+msgstr "Tittel (latinsk form)"
 
 #: app/Functions/FunctionsPrintLists.php:267
 #: app/Functions/FunctionsPrintLists.php:657
@@ -12594,7 +12601,7 @@ msgstr "Syne kun personar, hendingar, eller alle"
 
 #: app/Functions/FunctionsPrintLists.php:177
 msgid "Show only males."
-msgstr "Sun kun menn."
+msgstr "Syn kun menn."
 
 #: find.php:527
 msgid "Show only the selected tags"
@@ -12630,15 +12637,15 @@ msgstr "Syn slekta personar/familier"
 
 #: app/Module/ResearchTaskModule.php:209
 msgid "Show research tasks that are assigned to other users"
-msgstr "Syn forskningsoppgåver som er tildelt andre brukarar"
+msgstr "Syn granskingsoppgåver som er tildelt andre brukarar"
 
 #: app/Module/ResearchTaskModule.php:215
 msgid "Show research tasks that are not assigned to any user"
-msgstr "Syn forskningsoppgåver som ikkje er tildelt nokon brukar"
+msgstr "Syn granskingsoppgåver som ikkje er tildelt nokon brukar"
 
 #: app/Module/ResearchTaskModule.php:221
 msgid "Show research tasks that have a date in the future"
-msgstr "Syn komande forskningsoppgåver"
+msgstr "Syn komande granskingsoppgåver"
 
 #: modules_v3/ahnentafel_report/report.xml:11
 msgid "Show residences"
@@ -14058,7 +14065,7 @@ msgstr "Det finnast ingen ventande endringar."
 
 #: app/Module/ResearchTaskModule.php:151
 msgid "There are no research tasks in this family tree."
-msgstr "Det er ingen forskningsoppgåver knytte til slektstreet."
+msgstr "Det er ingen granskingsoppgåver knytte til slektstreet."
 
 #: app/Module/SourcesTabModule.php:83
 msgid "There are no source citations for this individual."
@@ -14483,7 +14490,8 @@ msgstr "Dette valet fastset om ein person sitt kjønn skal synast med ikon på d
 #. I18N: Help text for the “Default pedigree chart layout” tree configuration setting
 #: admin_trees_config.php:1216
 msgid "This option indicates whether the pedigree chart should be generated in landscape or portrait mode."
-msgstr "Dette valet fastset om sletstreet skal synast liggjande eller ståaende."
+msgstr ""
+"Dette valet fastset om anediagrammet skal synast liggjande eller ståaende."
 
 #. I18N: Help text for the “Show a download link in the media viewer” configuration setting
 #: admin_trees_config.php:1036
@@ -14493,7 +14501,10 @@ msgstr "Dette valet vil gjere det enklare for brukarar å laste ned bileter."
 #. I18N: Help text for the “Show private relationships” configuration setting
 #: admin_trees_config.php:494
 msgid "This option will retain family links in private records. This means that you will see empty “private” boxes on the pedigree chart and on other charts with private individuals."
-msgstr "Dette valet vil behalde familieband i private postar. Det tyder at du vil sjå tome «private» bokser i stamtreet og andre diagramer med private personar."
+msgstr ""
+"Dette valet vil behalde familieband i private postar. Det tyder at du vil "
+"sjå tome «private» bokser i anediagrammet og andre diagram med private "
+"personar."
 
 #. I18N: Help text for the “Show names of private individuals” configuration setting
 #: admin_trees_config.php:475
@@ -14798,7 +14809,9 @@ msgstr "For å fullføre oppgraderinga, må du installere filene manuelt."
 
 #: app/Module/ResearchTaskModule.php:202
 msgid "To create new research tasks, you must first add “research task” to the list of facts and events in the family tree’s preferences."
-msgstr "For å opprette nye forskningsoppgåver må først «forskningsoppgåve» leggjast til i lista over fakta og hendingar i innstillingane for slektstreet."
+msgstr ""
+"For å opprette nye granskingsoppgåver må først «granskingsoppgåve» leggjast "
+"til i lista over fakta og hendingar i innstillingane for slektstreet."
 
 #. I18N: Help text for the “Format text and notes” configuration setting
 #: admin_trees_config.php:1562

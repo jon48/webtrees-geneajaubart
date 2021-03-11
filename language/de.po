@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: webtrees 1.0\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2018-09-25 11:42+0100\n"
-"PO-Revision-Date: 2020-03-16 08:33+0000\n"
+"PO-Revision-Date: 2021-03-01 12:17+0000\n"
 "Last-Translator: Martin <der@bauschaffen.de>\n"
 "Language-Team: German <https://translate.webtrees.net/projects/webtrees/"
 "webtrees-17/de/>\n"
@@ -557,7 +557,7 @@ msgstr "&lt;auswählen&gt;"
 #: app/I18N.php:329 app/I18N.php:333
 #, php-format
 msgid "(aged %s)"
-msgstr "(im Alter von %s)"
+msgstr "(%s alt)"
 
 #. I18N: Description of an individual’s age at an event. For example, Died 14 Jan 1900 (aged less than 21 years)
 #: app/I18N.php:323
@@ -717,7 +717,14 @@ msgstr "<Standardthema>"
 
 #: login.php:409
 msgid "<div class=\"largeError\">Notice:</div><div class=\"error\">By completing and submitting this form, you agree:<ul><li>to protect the privacy of living individuals listed on our site;</li><li>and in the text box below, to explain to whom you are related, or to provide us with information on someone who should be listed on our website.</li></ul></div>"
-msgstr "<div class=\"largeError\">Bitte beachten Sie:</div><div class=\"error\">Indem Sie dieses ausgefüllte Formular einsenden, bestätigen Sie Ihr Einverständnis zu den folgenden Bedingungen:<ul><li>Sie behandeln Informationen über lebende Personen, die in dieser Datenbank vorkommen, immer vertraulich;</li><li>und Sie erklären in der unten stehenden Textbox Ihre direkte Verwandtschaft zu Personen in dieser Datenbank oder geben Informationen über Personen, die in dieser Datenbank vorkommen, aber dort eventuell fehlen sollten, an.</li></ul></div>"
+msgstr ""
+"<div class=\"largeError\">Hinweis:</div><div class=\"error\">Mit dem "
+"Ausfüllen und Absenden dieses Formulars erklären Sie sich damit "
+"einverstanden:<ul><li>den Datenschutz von auf unserer Website aufgeführten "
+"lebenden Personen zu beachten</li><li>und im Textfeld unten Ihr "
+"Verwandtschaftsverhältnis zu Personen dieser Website zu beschreiben, oder "
+"uns Informationen über jemanden zukommen zu lassen, der auf unserer Website "
+"aufgeführt werden sollte.</li></ul></div>"
 
 #. I18N: a label/value pair, such as “Occupation: Farmer”. Some languages may need to change the punctuation.
 #: app/Fact.php:413 app/Functions/FunctionsPrintFacts.php:545
@@ -801,7 +808,9 @@ msgstr "Eine Begrüßungsnachricht für Besucher der Seite."
 #. I18N: Description of the “Pending changes” module
 #: app/Module/ReviewChangesModule.php:42
 msgid "A list of changes that need to be reviewed by a moderator, and email notifications."
-msgstr "Eine Liste der Änderungen, die die Zustimmung des Moderators brauchen, sowie E-Mail-Benachrichtigungen."
+msgstr ""
+"Eine Liste der Änderungen, die die Zustimmung des Moderators brauchen, sowie "
+"E-Mail-Benachrichtigungen."
 
 #. I18N: Description of the “FAQ” module
 #: app/Module/FrequentlyAskedQuestionsModule.php:39
@@ -870,7 +879,9 @@ msgstr "Für Ihren Benutzernamen wurde ein neues Passwort angefordert."
 #: login.php:561
 #, php-format
 msgid "A new user (%1$s) has requested an account (%2$s) and verified an email address (%3$s)."
-msgstr "Ein neuer Benutzer (%1$s) hat ein Benutzerkonto (%2$s) angefragt und und dies mit der E-Mail-Adresse (%3$s) bestätigt."
+msgstr ""
+"Ein neuer Benutzer (%1$s) hat ein Benutzerkonto (%2$s) angefragt und und "
+"dies mit der E-Mail-Adresse (%3$s) bestätigt."
 
 #: admin.php:624 admin_site_upgrade.php:79 login.php:116
 msgid "A new version of webtrees is available."
@@ -913,7 +924,8 @@ msgstr "Ein Bericht mit personenbezogenen Detailinformationen."
 
 #: modules_v3/fact_sources/report.xml:4
 msgid "A report of facts which are supported by a given source."
-msgstr "Ein Bericht der Ereignisse, welche durch die gewählte Quelle belegt sind."
+msgstr ""
+"Ein Bericht der Tatsachen, welche durch die gewählte Quelle belegt sind."
 
 #. I18N: Description of the “Family” module
 #: app/Module/FamilyGroupReportModule.php:35
@@ -1044,7 +1056,9 @@ msgstr "Eine Zeitleiste der Ereignisse einer Person."
 
 #: admin_users.php:397
 msgid "A user will not be able to sign in until both “email verified” and “approved by administrator” are selected."
-msgstr "Ein Benutzer kann sich nicht anmelden, solange nicht beide Optionen „E-Mail überprüft“ und „Vom Administrator zugelassen“ erfüllt sind."
+msgstr ""
+"Ein Benutzer kann sich nicht anmelden, solange nicht beide Optionen „E-Mail "
+"überprüft“ und „Vom Administrator zugelassen“ erfüllt sind."
 
 #. I18N: Help text for the “Add watermarks to thumbnails” configuration setting
 #: admin_trees_config.php:1105
@@ -1938,7 +1952,9 @@ msgstr "Eine alternative An- oder Abmeldemöglichkeit."
 
 #: app/Functions/FunctionsEdit.php:910
 msgid "An associate is another individual who was involved with this fact or event, such as a witness or a priest."
-msgstr "Eine verbundene Person ist eine Person, die bei dieser Tastasche oder diesem Ereignis z.B. als Zeuge oder Geistlicher beteiligt war."
+msgstr ""
+"Eine verbundene Person ist eine Person, die bei dieser Tatsache oder diesem "
+"Ereignis z.B. als Zeuge oder Geistlicher beteiligt war."
 
 #: app/Functions/FunctionsEdit.php:908
 msgid "An associate is another individual who was involved with this individual, such as a friend or an employer."
@@ -1996,7 +2012,7 @@ msgstr "Vorfahren von %s"
 #. I18N: gedcom tag AFN
 #: app/GedcomTag.php:138
 msgid "Ancestral file number"
-msgstr "Ancestral File-Nummer"
+msgstr "Ahnendatei-Nummer (AFN)"
 
 #. I18N: Location of an LDS church temple
 #: app/GedcomCode/GedcomCodeTemp.php:91
@@ -5739,7 +5755,7 @@ msgstr "Ereignisse in Ländern"
 
 #: app/Module/IndividualFactsTabModule.php:134
 msgid "Events of close relatives"
-msgstr "Verwandtenereignisse"
+msgstr "Ereignisse naher Verwandter"
 
 #: admin_users.php:532
 msgid "Everybody has this role, including visitors to the website and search engines."
@@ -5929,7 +5945,7 @@ msgstr "Tatsachen und Ereignisse für Archivdatensätze"
 
 #: admin_trees_config.php:1849
 msgid "Facts for source records"
-msgstr "Quellenereignisse"
+msgstr "Tatsachen und Ereignisse für Quellendatensätze"
 
 #. I18N: Name of a country or state
 #: app/Stats.php:6748
@@ -6647,7 +6663,7 @@ msgstr "Begräbnis"
 #. I18N: A configuration setting
 #: admin_trees_check.php:139 admin_trees_config.php:1588
 msgid "GEDCOM errors"
-msgstr "GEDCOM Fehler"
+msgstr "GEDCOM-Fehler"
 
 #. I18N: gedcom tag GEDC
 #. I18N: gedcom tag _GEDF
@@ -7066,16 +7082,16 @@ msgstr "Höhe"
 #: login.php:256 login.php:337
 #, php-format
 msgid "Hello %s…"
-msgstr "Hallo %s…"
+msgstr "Hallo %s!"
 
 #: login.php:389
 #, php-format
 msgid "Hello %s…<br>Thank you for your registration."
-msgstr "Hallo %s …<br>Danke für Ihre Anfrage."
+msgstr "Hallo %s!<br>Danke für Ihre Anfrage."
 
 #: login.php:320 login.php:558
 msgid "Hello administrator…"
-msgstr "Hallo Verwalter…"
+msgstr "Hallo Verwalter!"
 
 #: help_text.php:320
 msgid "Help"
@@ -7282,7 +7298,9 @@ msgstr "Diese Sprache wird genutzt, wenn im Browser des Besuchers keine oder ein
 
 #: admin_users.php:391
 msgid "If an administrator creates a user account, the verification email is not sent, and the email must be verified manually."
-msgstr "Wenn ein Verwalter ein Benutzerkonto anlegt, wird keine E-Mail zur Überprüfung gesendet und die E-Mail muss manuell geprüft werden."
+msgstr ""
+"Wenn ein Verwalter ein Benutzerkonto anlegt, wird keine E-Mail zur "
+"Überprüfung gesendet und die E-Mail muss manuell geprüft werden."
 
 #: help_text.php:228
 #, php-format
@@ -7581,17 +7599,17 @@ msgstr "Kleinkind"
 
 #: app/GedcomCode/GedcomCodeRela.php:182
 msgid "Informant"
-msgstr "Informant"
+msgstr "Anzeigender"
 
 #: app/GedcomCode/GedcomCodeRela.php:180
 msgctxt "FEMALE"
 msgid "Informant"
-msgstr "Informantin"
+msgstr "Anzeigende"
 
 #: app/GedcomCode/GedcomCodeRela.php:178
 msgctxt "MALE"
 msgid "Informant"
-msgstr "Informant"
+msgstr "Anzeigender"
 
 #: admin_pgv_to_wt.php:173
 msgid "Installation folder"
@@ -8088,7 +8106,7 @@ msgstr "Letzte Änderung"
 
 #: app/Module/ReviewChangesModule.php:114
 msgid "Last email reminder was sent "
-msgstr "Die letzte E-Mail als Erinnerung wurde gesendet "
+msgstr "Die letzte Erinnerungs-E-Mail wurde versandt "
 
 #: statistics.php:371
 msgid "Last event"
@@ -8329,7 +8347,7 @@ msgstr "Lokale Dateien"
 #. I18N: gedcom tag _LOC
 #: app/GedcomTag.php:1552
 msgid "Location"
-msgstr "Standort"
+msgstr "Ort"
 
 #: app/Module/GoogleMapsModule.php:3896
 msgid "Location not removed: this location contains sub-locations"
@@ -8545,7 +8563,11 @@ msgstr "Manuskript"
 #. I18N: Help text for the “GEDCOM errors” configuration setting
 #: admin_trees_config.php:1593
 msgid "Many genealogy programs create GEDCOM files with custom tags, and webtrees understands most of them. When unrecognized tags are found, this option lets you choose whether to ignore them or display a warning message."
-msgstr "Viele Ahnenforschungsprogramme erzeugen GEDCOM Dateien mit programmspezifischen Tags, die webtrees in den meisten Fällen kennt und korrekt interpretiert. Wenn unbekannte Tags gefunden werden, erlaubt diese Option, die Tags zu ignorieren oder eine Warnmeldung auszugeben."
+msgstr ""
+"Viele Ahnenforschungsprogramme erzeugen GEDCOM-Dateien mit "
+"programmspezifischen Kennzeichen, die webtrees in den meisten Fällen kennt "
+"und korrekt interpretiert. Wenn unbekannte Kennzeichen gefunden werden, "
+"erlaubt diese Option, diese zu ignorieren oder eine Warnmeldung auszugeben."
 
 #. I18N: Help text for the "Sending server name" site configuration setting
 #: admin_site_config.php:433
@@ -8655,7 +8677,7 @@ msgstr "Familienstand seit"
 #. I18N: gedcom tag _MBON
 #: app/GedcomTag.php:1643
 msgid "Marriage bond"
-msgstr "Verlobung"
+msgstr "Heiratsverpflichtung"
 
 #: app/Stats.php:1690 statistics.php:570
 msgid "Marriage by country"
@@ -9682,7 +9704,7 @@ msgstr "Zeitung"
 
 #: app/Module/ReviewChangesModule.php:115
 msgid "Next email reminder will be sent after "
-msgstr "Nächste E-Mail als Erinnerung wird gesendet nach "
+msgstr "Die nächste Erinnerungs-E-Mail wird gesendet nach "
 
 #: app/Module/SlideShowModule.php:140
 msgid "Next image"
@@ -9863,7 +9885,7 @@ msgstr "Keine Karteninformation für diese Person"
 
 #: admin_site_merge.php:241 admin_site_merge.php:288 admin_site_merge.php:334
 msgid "No matching facts found"
-msgstr "Keine übereinstimmenden Angaben gefunden"
+msgstr "Keine übereinstimmenden Ereignisse gefunden"
 
 #: addmedia.php:168 addmedia.php:302 admin_media_upload.php:126
 msgid "No media file was provided."
@@ -10345,7 +10367,7 @@ msgstr "Sonstiges"
 
 #: admin_trees_config.php:1337
 msgid "Other facts to show in charts"
-msgstr "Andere auf Diagrammen zu zeigende Ereignisse"
+msgstr "Andere in Diagrammen zu zeigende Ereignisse"
 
 #: addmedia.php:524 admin_media_upload.php:242
 msgid "Other folder… please type in"
@@ -11075,7 +11097,9 @@ msgstr "Datenschutzeinschränkungen"
 
 #: admin_trees_config.php:521
 msgid "Privacy restrictions - these apply to records and facts that do not contain a GEDCOM RESN tag"
-msgstr "Datenschutzeinschränkungen - diese werden auf Datensätze angewandt, die keinen GEDCOM RESN-Tag enthalten"
+msgstr ""
+"Datenschutzeinschränkungen - diese werden auf Datensätze und Ereignisse "
+"angewandt, die kein GEDCOM-RESN-Kennzeichen enthalten"
 
 #: app/Controller/GedcomRecordController.php:92 app/GedcomRecord.php:531
 #: app/GedcomRecord.php:609 app/GedcomRecord.php:734 app/Individual.php:1309
@@ -11473,7 +11497,7 @@ msgstr "Kirchliche Trauung"
 
 #: app/Module/ReviewChangesModule.php:189
 msgid "Reminder email frequency (days)"
-msgstr "Häufigkeit der Erinnerungs E-Mail (Tage)"
+msgstr "Häufigkeit der Erinnerungs-E-Mail (Tage)"
 
 #. I18N: gedcom tag SERV
 #: app/GedcomTag.php:766
@@ -11517,7 +11541,7 @@ msgstr "Entfernen Sie den GEDCOM-Medienpfad aus den Dateinamen"
 
 #: app/Module/GoogleMapsModule.php:3917
 msgid "Remove this location?"
-msgstr "Diese Ortsdaten entfernen?"
+msgstr "Diesen Ort entfernen?"
 
 #. I18N: Location of an LDS church temple
 #: app/GedcomCode/GedcomCodeTemp.php:317
@@ -11610,11 +11634,19 @@ msgstr "Forschungsaufgaben"
 
 #: app/Module/ResearchTaskModule.php:201
 msgid "Research tasks are special events, added to individuals in your family tree, which identify the need for further research. You can use them as a reminder to check facts against more reliable sources, to obtain documents or photographs, to resolve conflicting information, etc."
-msgstr "Forschungsaufgaben sind besondere Ereignisse, die zu Personen in Ihrem Stammbaum hinzugefügt werden können, um die Notwendigkeit weitergehender Forschungen zu beschreiben. Man kann sie als Erinnerung nutzen, um Fakten gegen zuverlässigere Quellen zu überprüfen, um Dokumente oder Fotos zu erhalten oder um widersprüchliche Informationen auzulösen, etc."
+msgstr ""
+"Forschungsaufgaben sind besondere Ereignisse, die zu Personen in Ihrem "
+"Stammbaum hinzugefügt werden können, um die Notwendigkeit weitergehender "
+"Forschungen zu beschreiben. Man kann sie als Erinnerung nutzen, um Fakten "
+"gegen zuverlässigere Quellen zu überprüfen, um Dokumente oder Fotos zu "
+"erhalten oder um widersprüchliche Informationen aufzulösen."
 
 #: app/Module/ResearchTaskModule.php:203
 msgid "Research tasks are stored using the custom GEDCOM tag “_TODO”. Other genealogy applications may not recognize this tag."
-msgstr "Forschungsaufgaben werden mithilfe des benutzerdefinierten GEDCOM Tags „_TODO“ gespeichert. Andere Genealogie-Anwendungen können dieses Tag möglicherweise nicht korrekt interpretieren."
+msgstr ""
+"Forschungsaufgaben werden mithilfe des benutzerdefinierten GEDCOM -"
+"Kennzeichens „_TODO“ gespeichert. Andere Genealogie-Anwendungen können "
+"dieses Kennzeichen möglicherweise nicht korrekt interpretieren."
 
 #. I18N: gedcom tag RESI
 #: app/GedcomTag.php:732
@@ -12016,7 +12048,9 @@ msgstr "Bitte wählen Sie einen Anzahlabstand"
 
 #: admin_site_merge.php:200
 msgid "Select the facts and events to keep from both records."
-msgstr "Wählen Sie die Fakten und Ereignisse die Sie aus beiden Datensätzen übernehmen möchten."
+msgstr ""
+"Wählen Sie die Tatsachen und Ereignisse, die Sie aus beiden Datensätzen "
+"übernehmen möchten."
 
 #: admin_site_config.php:634
 msgid "Select the languages that will be shown in menus."
@@ -12070,7 +12104,7 @@ msgstr "Rundmails senden"
 #. I18N: Label for a configuration option
 #: app/Module/ReviewChangesModule.php:185
 msgid "Send out reminder emails"
-msgstr "Erinnerungs E-Mails versenden"
+msgstr "Erinnerungs-E-Mails versenden"
 
 #. I18N: A configuration setting
 #: admin_site_config.php:335
@@ -12080,7 +12114,7 @@ msgstr "Absender"
 #. I18N: Menu entry
 #: admin_site_config.php:144 app/Theme/AdministrationTheme.php:96
 msgid "Sending email"
-msgstr "Sende E-Mail"
+msgstr "E-Mail-Versand"
 
 #. I18N: A configuration setting
 #: admin_site_config.php:428
@@ -12626,15 +12660,16 @@ msgstr "Verbundene Personen/Familien anzeigen"
 
 #: app/Module/ResearchTaskModule.php:209
 msgid "Show research tasks that are assigned to other users"
-msgstr "Zeige Forschungsaufgaben die anderen Benutzern zugeordnet sind"
+msgstr "Forschungsaufgaben anzeigen, die anderen Benutzern zugeordnet sind"
 
 #: app/Module/ResearchTaskModule.php:215
 msgid "Show research tasks that are not assigned to any user"
-msgstr "Zeige Forschungsaufgaben die keinem anderen Benutzer zugeordnet sind"
+msgstr ""
+"Forschungsaufgaben anzeigen, die keinem anderen Benutzer zugeordnet sind"
 
 #: app/Module/ResearchTaskModule.php:221
 msgid "Show research tasks that have a date in the future"
-msgstr "Forschungsaufgaben mit einem Datum in der Zukunft anzeigen"
+msgstr "Forschungsaufgaben anzeigen, die ein Datum in der Zukunft haben"
 
 #: modules_v3/ahnentafel_report/report.xml:11
 msgid "Show residences"
@@ -13696,7 +13731,9 @@ msgstr "Die folgenden Tatsachen und Ereignisse wurden in beiden Datensätze gefu
 #: admin_site_merge.php:252 admin_site_merge.php:298
 #, php-format
 msgid "The following facts and events were only found in the record of %s."
-msgstr "Die folgenden Tatsachen und Ereignisse wurden nur im Datensatz %s gefunden."
+msgstr ""
+"Die folgenden Tatsachen und Ereignisse wurden nur im Datensatz von %s "
+"gefunden."
 
 #: setup.php:174
 msgid "The following list shows typical requirements."
@@ -13814,7 +13851,9 @@ msgstr "Die neuen Dateien befinden sich aktuell im Verzeichnis %s."
 
 #: admin_site_config.php:496
 msgid "The new user will be asked to confirm their email address before the account is created."
-msgstr "Der neue Benutzer wird aufgefordert seine E-Mail-Adresse zu bestätigen, bevor das Konto erstellt wird."
+msgstr ""
+"Der neue Benutzer wird aufgefordert seine E-Mail-Adresse zu bestätigen, "
+"bevor das Konto erstellt wird."
 
 #: help_text.php:298
 msgid "The number of occurrences of the specified name will be shown on the map. If you leave this field empty, the most common surname will be used."
@@ -13956,7 +13995,9 @@ msgstr "Der Benutzer “%s” wurde gelöscht."
 
 #: login.php:327
 msgid "The user has been sent an email with the information necessary to confirm the access request."
-msgstr "Dem Benutzer wurde eine E-Mail geschickt mit den notwendigen Informationen, um die Zugangsanfrage zu bestätigen."
+msgstr ""
+"Dem Benutzer wurde eine E-Mail geschickt mit den notwendigen Informationen, "
+"um die Zugangsanfrage zu bestätigen."
 
 #: login.php:82 login.php:87
 msgid "The username or password is incorrect."
@@ -14038,7 +14079,7 @@ msgstr "Themen können in drei Stufen ausgewählt werden: Benutzer, Stammbaum un
 #: app/Module/ExtraInformationModule.php:65
 #: app/Module/IndividualFactsTabModule.php:148
 msgid "There are no facts for this individual."
-msgstr "Zu dieser Person gibt es keine Fakten."
+msgstr "Zu dieser Person gibt es keine Ereignisse."
 
 #: app/Module/MediaTabModule.php:76
 msgid "There are no media objects for this individual."
@@ -14126,11 +14167,17 @@ msgstr "Das Benutzerkonto wurde noch nicht genehmigt. Bitte warten Sie auf die B
 
 #: login.php:92
 msgid "This account has not been verified. Please check your email for a verification message."
-msgstr "Das Benutzerkonto wurde noch nicht verifiziert. Bitte den E-Mail Posteingang auf eine Bestätigungsmeldung überprüfen."
+msgstr ""
+"Das Benutzerkonto wurde noch nicht verifiziert. Bitte den E-Mail-Posteingang "
+"auf eine Bestätigungsmeldung überprüfen."
 
 #: app/Module/ReviewChangesModule.php:179
 msgid "This block will show editors a list of records with pending changes that need to be reviewed by a moderator. It also generates daily emails to moderators whenever pending changes exist."
-msgstr "Dieser Block zeigt dem Bearbeiter eine Liste von Datensätzen mit ausstehenden Änderungen, die von einem Moderator genehmigt werden müssen. Es erzeugt auch täglich die E-Mails an die Moderatoren, wenn ausstehende Änderungen vorhanden sind."
+msgstr ""
+"Dieser Block zeigt dem Bearbeiter eine Liste von Datensätzen mit "
+"ausstehenden Änderungen, die von einem Moderator genehmigt werden müssen. Es "
+"erzeugt auch täglich die E-Mails an die Moderatoren, wenn ausstehende "
+"Änderungen vorhanden sind."
 
 #: setup.php:351 setup.php:362
 msgid "This database and table-prefix appear to be used by another application. If you have an existing PhpGedView system, you should create a new webtrees system. You can import your PhpGedView data and settings later."
@@ -14143,7 +14190,10 @@ msgstr "Ihre Datenbank lässt nur MySQL Version %s zu. Sie können hier webtrees
 
 #: admin_users.php:366 edituser.php:265 login.php:434 setup.php:445
 msgid "This email address will be used to send password reminders, website notifications, and messages from other family members who are registered on the website."
-msgstr "Diese E-Mail-Adresse dient dem Versand von Passworterinnerungen, Webseitenbenachrichtigungen und Nachrichten von anderen Familienmitgliedern, die auf der Seite registriert sind."
+msgstr ""
+"Diese E-Mail-Adresse dient dem Versand von Passworterinnerungen, "
+"Webseitenbenachrichtigungen und Nachrichten von anderen Familienmitgliedern, "
+"die auf der Seite registriert sind."
 
 #: addmedia.php:540
 msgid "This entry is ignored if you have entered a URL into the filename field."
@@ -14260,22 +14310,41 @@ msgstr "In diesem Feld können Sie das Jahr für die Liste im Modus «Jahr zeige
 #. I18N: Help text for the “Advanced name facts” configuration setting
 #: admin_trees_config.php:2053
 msgid "This is a comma separated list of GEDCOM fact tags that will be shown on the add/edit name form. If you use non-Latin alphabets such as Hebrew, Greek, Cyrillic, or Arabic, you may want to add tags such as _HEB, ROMN, FONE, etc. to allow you to store names in several different alphabets."
-msgstr "Dies ist eine Komma-getrennte Liste von GEDCOM Ereignis-Tags die in dem Bearbeitungsformular für Namen gezeigt werden. Wenn Sie Alphabete benutzen, die nicht vom lateinischen Alphabet stammen, z.B., die hebräischen, griechischen, russischen, oder arabischen Alphabete, möchten Sie wahrscheinlich Tags wie _HEB, ROM, FONE, usw. dem Formular hinzufügen. Solche Tags ermöglichen Ihnen, Namen in verschiedenen Alphabeten zu speichern."
+msgstr ""
+"Dies ist eine Komma-getrennte Liste von GEDCOM-Ereigniskennzeichen, die in "
+"dem Bearbeitungsformular für Namen gezeigt werden. Wenn Sie nicht-"
+"lateinische Alphabete wie Hebräisch, Griechisch, Kyrillisch oder Arabisch "
+"verwenden, können Sie Kennzeichen wie _HEB, ROMN, FONE usw. hinzufügen, "
+"damit Sie Namen in mehreren verschiedenen Alphabeten speichern können."
 
 #. I18N: Help text for the “Facts for new families” configuration setting
 #: admin_trees_config.php:1815
 msgid "This is a comma separated list of GEDCOM fact tags that will be shown when adding a new family. For example, if MARR is in the list, then fields for marriage date and marriage place will be shown on the form."
-msgstr "Dies ist eine Komma-getrennte Liste von korrespondierenden GEDCOM Ereignis-Tags, die beim Hinzufügen einer neuen Familie angezeigt wird. Zum Beispiel: Wenn das Tag MARR in der Liste erscheint, werden die Felder für Heiratsdatum und Heiratsort auf dem Formular angezeigt."
+msgstr ""
+"Dies ist eine Komma-getrennte Liste von GEDCOM-Ereigniskennzeichen, die beim "
+"Hinzufügen einer neuen Familie angezeigt wird. Wenn z. B. MARR in der Liste "
+"steht, werden die Felder für Heiratsdatum und Heiratsort im Formular "
+"angezeigt."
 
 #. I18N: Help text for the “Facts for new individuals” configuration setting
 #: admin_trees_config.php:1697
 msgid "This is a comma separated list of GEDCOM fact tags that will be shown when adding a new individual. For example, if BIRT is in the list, fields for birth date and birth place will be shown on the form."
-msgstr "Dies ist eine Komma-getrennte Liste von korrespondierenden GEDCOM-Ereignis-Tags, die beim Hinzufügen einer neuen Person angezeigt wird. Zum Beispiel: Wenn das Tag BIRT in der Liste erscheint, werden die Felder für Geburtsdatum und Geburtsort auf dem Formular angezeigt."
+msgstr ""
+"Dies ist eine Komma-getrennte Liste von GEDCOM-Ereigniskennzeichen, die beim "
+"Hinzufügen einer neuen Person angezeigt wird. Wenn z. B. BIRT in der Liste "
+"steht, werden die Felder für Geburtsdatum und Geburtsort im Formular "
+"angezeigt."
 
 #. I18N: Help text for the “Advanced place name facts” configuration setting
 #: admin_trees_config.php:2082
 msgid "This is a comma separated list of GEDCOM fact tags that will be shown when you add or edit place names. If you use non-Latin alphabets such as Hebrew, Greek, Cyrillic, or Arabic, you may want to add tags such as _HEB, ROMN, FONE, etc. to allow you to store place names in several different alphabets."
-msgstr "Dies ist eine Komma-getrennte Liste von GEDCOM Ereignis-Tags die in dem Bearbeitungsformular für Ortsnamen gezeigt werden. Wenn Sie Alphabete benutzen, die nicht vom lateinischen Alphabet stammen, z.B., die hebräischen, griechischen, russischen, oder arabischen Alphabete, möchten Sie wahrscheinlich Tags wie _HEB, ROM, FONE, usw. dem Formular hinzufügen. Solche Tags ermöglichen Ihnen, Ortsnamen in verschiedenen Alphabeten zu speichern."
+msgstr ""
+"Dies ist eine Komma-getrennte Liste von GEDCOM-Ereigniskennzeichen, die "
+"angezeigt werden, wenn Sie Ortsnamen hinzufügen oder bearbeiten. Wenn Sie "
+"nicht-lateinische Alphabete wie Hebräisch, Griechisch, Kyrillisch oder "
+"Arabisch verwenden, können Sie Kennzeichen wie _HEB, ROMN, FONE usw. "
+"hinzufügen, damit Sie Ortsnamen in mehreren verschiedenen Alphabeten "
+"speichern können."
 
 #: edituser.php:190
 msgid "This is a link to your own record in the family tree. If this is the wrong individual, contact an administrator."
@@ -14306,42 +14375,82 @@ msgstr "Dies ist die neueste Version von webtrees. Es ist keine Aktualisierung v
 #. I18N: Help text for the “All family facts” configuration setting
 #: admin_trees_config.php:1757
 msgid "This is the list of GEDCOM facts that your users can add to families. You can modify this list by removing or adding fact names, even custom ones, as necessary. Fact names that appear in this list must not also appear in the “Unique family facts” list."
-msgstr "Diese Liste enthält alle Ereignisse, die diesem Familiendatensatz hinzugefügt werden können. Sie können diese Liste durch Entfernen oder Hinzufügen von Ereignis-Merkmalen nach Ihren Wünschen ändern. Ereignis-Merkmale dieser Liste dürfen <u>nicht</u> in der Liste <i>Einmalige Tatsachen oder Ereignisse von Familien</i> vorkommen; d.h., jedes Ereignis-Merkmal darf in nur einer Liste vorkommen."
+msgstr ""
+"Dies ist die Liste der GEDCOM-Ereignisse, die zu Familien hinzugefügt werden "
+"können. Sie können diese Liste ändern, indem Sie Ereignisnamen, auch "
+"benutzerdefinierte, nach Bedarf entfernen oder hinzufügen. Ereignisnamen, "
+"die in dieser Liste erscheinen, dürfen <u>nicht</u> auch in der Liste „"
+"Einmalige Tatsachen oder Ereignisse von Familien“ erscheinen."
 
 #. I18N: Help text for the “All individual facts” configuration setting
 #: admin_trees_config.php:1639
 msgid "This is the list of GEDCOM facts that your users can add to individuals. You can modify this list by removing or adding fact names, even custom ones, as necessary. Fact names that appear in this list must not also appear in the “Unique individual facts” list."
-msgstr "Diese Liste enthält alle Ereignisse, die diesem Personendatensatz hinzugefügt werden können. Sie können diese Liste durch Entfernen oder Hinzufügen von Ereignis-Merkmalen nach Ihren Wünschen ändern. Ereignis-Merkmale dieser Liste dürfen <u>nicht</u> in der Liste <i>Einmalige Tatsachen oder Ereignisse von Personen</i> vorkommen; d.h., jedes Ereignis-Merkmal darf in nur einer Liste vorkommen."
+msgstr ""
+"Dies ist die Liste der GEDCOM-Ereignisse, die zu Personen hinzugefügt werden "
+"können. Sie können diese Liste ändern, indem Sie Ereignisnamen, auch "
+"benutzerdefinierte, nach Bedarf entfernen oder hinzufügen. Ereignisnamen, "
+"die in dieser Liste erscheinen, dürfen <u>nicht</u> auch in der Liste „"
+"Einmalige Tatsachen oder Ereignisse von Personen“ erscheinen."
 
 #. I18N: Help text for the “All repository facts” configuration setting
 #: admin_trees_config.php:1964
 msgid "This is the list of GEDCOM facts that your users can add to repositories. You can modify this list by removing or adding fact names, even custom ones, as necessary. Fact names that appear in this list must not also appear in the “Unique repository facts” list."
-msgstr "Diese Liste enthält alle Ereignisse, die diesem Archiv-Datensatz hinzugefügt werden können. Sie können diese Liste durch Entfernen oder Hinzufügen von Ereignis-Merkmalen nach Ihren Wünschen ändern. Ereignis-Merkmale dieser Liste dürfen <u>nicht</u> in der Liste <i>Einmalige Tatsachen oder Ereignisse von Archiven</i> vorkommen; d.h., jedes Ereignis-Merkmal darf in nur einer Liste vorkommen."
+msgstr ""
+"Dies ist die Liste der GEDCOM-Ereignisse, die zu Archiven hinzugefügt werden "
+"können. Sie können diese Liste ändern, indem Sie Ereignisnamen, auch "
+"benutzerdefinierte, nach Bedarf entfernen oder hinzufügen. Ereignisnamen, "
+"die in dieser Liste erscheinen, dürfen <u>nicht</u> auch in der Liste „"
+"Einmalige Tatsachen oder Ereignisse von Archiven“ erscheinen."
 
 #. I18N: Help text for the “All source facts” configuration setting
 #: admin_trees_config.php:1875
 msgid "This is the list of GEDCOM facts that your users can add to sources. You can modify this list by removing or adding fact names, even custom ones, as necessary. Fact names that appear in this list must not also appear in the “Unique source facts” list."
-msgstr "Diese Liste enthält alle Ereignisse, die diesem Quellendatensatz hinzugefügt werden können. Sie können diese Liste durch Entfernen oder Hinzufügen von Ereignis-Merkmalen nach Ihren Wünschen ändern. Ereignis-Merkmale dieser Liste dürfen <u>nicht</u> in der Liste <i>Einmalige Tatsachen oder Ereignisse von Quellen</i> vorkommen; d.h., jedes Ereignis-Merkmal darf in nur einer Liste vorkommen."
+msgstr ""
+"Dies ist die Liste der GEDCOM-Ereignisse, die zu Quellen hinzugefügt werden "
+"können. Sie können diese Liste ändern, indem Sie Ereignisnamen, auch "
+"benutzerdefinierte, nach Bedarf entfernen oder hinzufügen. Ereignisnamen, "
+"die in dieser Liste erscheinen, dürfen <u>nicht</u> auch in der Liste „"
+"Einmalige Tatsachen oder Ereignisse von Quellen“ erscheinen."
 
 #. I18N: Help text for the “Unique family facts” configuration setting
 #: admin_trees_config.php:1786
 msgid "This is the list of GEDCOM facts that your users can only add once to families. For example, if MARR is in this list, users will not be able to add more than one MARR record to a family. Fact names that appear in this list must not also appear in the “All family facts” list."
-msgstr "Diese Liste enthält alle Ereignisse, die im Familiendatensatz nur <u>einmal</u> vorkommen dürfen; z.B., wenn MARR hier eingegeben ist, darf jeder Familiendatensatz nur eine MARR Zeile enthalten. Ereignis-Merkmale dieser Liste dürfen <u>nicht</u> in der Liste <i>Alle Tatsachen und Ereignisse von Familien</i> vorkommen; d.h., jedes Ereignis-Merkmal darf in nur einer Liste vorkommen."
+msgstr ""
+"Dies ist die Liste der GEDCOM-Ereignisse, die nur <u>einmal</u> zu Familien "
+"hinzugefügt werden können. Wenn zum Beispiel MARR in dieser Liste steht, "
+"kann nicht mehr als ein MARR-Datensatz zu einer Familie hinzugefügt werden. "
+"Ereignisnamen, die in dieser Liste erscheinen, dürfen <u>nicht</u> auch in "
+"der Liste „Alle Tatsachen und Ereignisse von Familien“ erscheinen."
 
 #. I18N: Help text for the “Unique individual facts” configuration setting
 #: admin_trees_config.php:1668
 msgid "This is the list of GEDCOM facts that your users can only add once to individuals. For example, if BIRT is in this list, users will not be able to add more than one BIRT record to an individual. Fact names that appear in this list must not also appear in the “All individual facts” list."
-msgstr "Diese Liste enthält alle Ereignisse, die im Personendatensatz nur <u>einmal</u> vorkommen dürfen; z.B., wenn BIRT hier eingegeben ist, darf jeder Personendatensatz nur eine BIRT Zeile enthalten. Ereignis-Merkmale dieser Liste dürfen <u>nicht</u> in der Liste <i>Alle Tatsachen und Ereignisse von Personen</i> vorkommen; d.h., jedes Ereignis-Merkmal darf in nur einer Liste vorkommen."
+msgstr ""
+"Dies ist die Liste der GEDCOM-Ereignisse, die nur <u>einmal</u> zu Personen "
+"hinzugefügt werden können. Wenn zum Beispiel BIRT in dieser Liste steht, "
+"kann nicht mehr als ein BIRT-Datensatz zu einer Person hinzugefügt werden. "
+"Ereignisnamen, die in dieser Liste erscheinen, dürfen <u>nicht</u> auch in "
+"der Liste „Alle Tatsachen und Ereignisse von Personen“ erscheinen."
 
 #. I18N: Help text for the “Unique repository facts” configuration setting
 #: admin_trees_config.php:1993
 msgid "This is the list of GEDCOM facts that your users can only add once to repositories. For example, if NAME is in this list, users will not be able to add more than one NAME record to a repository. Fact names that appear in this list must not also appear in the “All repository facts” list."
-msgstr "Diese Liste enthält alle Ereignisse, die im Archiv-Datensatz nur <u>einmal</u> vorkommen dürfen; z.B., wenn NAME hier eingegeben ist, darf jeder Archiv-Datensatz nur eine NAME Zeile enthalten. Ereignis-Merkmale dieser Liste dürfen <u>nicht</u> in der Liste <i>Alle Tatsachen und Ereignisse von Archiven</i> vorkommen; d.h., jedes Ereignis-Merkmal darf in nur einer Liste vorkommen."
+msgstr ""
+"Dies ist die Liste der GEDCOM-Ereignisse, die nur <u>einmal</u> zu Archiven "
+"hinzugefügt werden können. Wenn zum Beispiel NAME in dieser Liste steht, "
+"kann nicht mehr als ein NAME-Datensatz zu einem Archiv hinzugefügt werden. "
+"Ereignisnamen, die in dieser Liste erscheinen, dürfen <u>nicht</u> auch in "
+"der Liste „Alle Tatsachen und Ereignisse von Archiven“ erscheinen."
 
 #. I18N: Help text for the “Unique source facts” configuration setting
 #: admin_trees_config.php:1904
 msgid "This is the list of GEDCOM facts that your users can only add once to sources. For example, if TITL is in this list, users will not be able to add more than one TITL record to a source. Fact names that appear in this list must not also appear in the “All source facts” list."
-msgstr "Diese Liste enthält alle Ereignisse, die im Quellendatensatz nur <u>einmal</u> vorkommen dürfen; z.B., wenn TITL hier eingegeben ist, darf jeder Quellendatensatz nur eine TITL Zeile enthalten. Ereignis-Merkmale dieser Liste dürfen <u>nicht</u> in der Liste <i>Alle Tatsachen und Ereignisse von Quellen</i> vorkommen; d.h., jedes Ereignis-Merkmal darf in nur einer Liste vorkommen."
+msgstr ""
+"Dies ist die Liste der GEDCOM-Ereignisse, die nur <u>einmal</u> zu Quellen "
+"hinzugefügt werden können. Wenn zum Beispiel TITL in dieser Liste steht, "
+"kann nicht mehr als ein TITL-Datensatz zu einer Quelle hinzugefügt werden. "
+"Ereignisnamen, die in dieser Liste erscheinen, dürfen <u>nicht</u> auch in "
+"der Liste „Alle Tatsachen und Ereignisse von Quellen“ erscheinen."
 
 #. I18N: Help text for the “Server name” site configuration setting
 #: admin_site_config.php:355
@@ -14425,7 +14534,9 @@ msgstr "Das Passwort muss mindestens sechs Zeichen lang sein. Groß- und Kleinsc
 #. I18N: Help text for the “Sender name” site configuration setting
 #: admin_site_config.php:340
 msgid "This name is used in the “From” field, when sending automatic emails from this server."
-msgstr "Dieser Name wird für die Absenderangabe im „Von“-Feld benutzt, wenn automatische E-Mails von diesem Server versandt werden."
+msgstr ""
+"Dieser Name wird für die Absenderangabe im „Von“-Feld benutzt, wenn "
+"automatische E-Mails von diesem Server versandt werden."
 
 #: note.php:61
 msgid "This note does not exist or you do not have permission to view it."
@@ -14569,7 +14680,11 @@ msgstr "Diese Rolle verfügt über alle Berechtigungen der Bearbeiter-Rolle, zuz
 
 #: admin_users.php:566
 msgid "This role has all the permissions of the manager role in all family trees, plus permission to change the settings/configuration of the website, users, and modules."
-msgstr "Diese Rolle verfügt über alle Berechtigungen der Manager-Rolle in allen Stammbäumen, zuzüglich die Erlaubnis, die Einstellungen/Konfiguration für die ganze Webseite, alle Benutzer und die funktionalen Module betreffend zu ändern."
+msgstr ""
+"Diese Rolle verfügt über alle Berechtigungen der Verwalter-Rolle in allen "
+"Stammbäumen, zuzüglich die Erlaubnis, die Einstellungen/Konfiguration für "
+"die ganze Webseite, alle Benutzer und die funktionalen Module betreffend zu "
+"ändern."
 
 #: admin_users.php:546
 msgid "This role has all the permissions of the member role, plus permission to add/change/delete data. Any changes will need to be reviewed by a moderator, unless the user has the “automatically accept changes” option enabled."
@@ -14596,7 +14711,13 @@ msgstr "Das Speicherlimt des Servers liegt bei %sMB und das CPU-Zeitlimit bei %s
 #. I18N: Help text for the “Other facts to show in charts” configuration setting
 #: admin_trees_config.php:1358
 msgid "This should be a comma or space separated list of facts, in addition to birth and death, that you want to appear in chart boxes such as the pedigree chart. This list requires you to use fact tags as defined in the GEDCOM 5.5.1 standard. For example, if you wanted the occupation to show up in the box, you would add “OCCU” to this field."
-msgstr "Die Liste, deren Einträge durch Komma oder Leerzeichen getrennt sind, bestimmt die Ereignisse oder Fakten die in Boxen in Diagrammen auftreten dürfen. Alle Einträge in dieser Liste müssen Fakten sein, wie im GEDCOM 5.5.1 Standard definiert. Zum Beispiel, falls der Beruf der Person in deren Box zu zeigen ist, muss dieses Feld den Eintrag „OCCU“ enthalten."
+msgstr ""
+"Dies sollte eine durch Komma oder Leerzeichen getrennte Liste von "
+"Ereignissen sein, zusätzlich zu Geburt und Tod, die in Diagrammen wie dem "
+"Stammbaumdiagramm erscheinen sollen. Für diese Liste müssen Sie Ereignis-"
+"Kennzeichen verwenden, wie sie im GEDCOM 5.5.1-Standard definiert sind. Wenn "
+"Sie z. B. möchten, dass der Beruf im Diagramm erscheint, sollten Sie „OCCU“ "
+"zu diesem Feld hinzufügen."
 
 #: source.php:60
 msgid "This source does not exist or you do not have permission to view it."
@@ -14794,7 +14915,10 @@ msgstr "Um die Aktualisierung abzuschließen, installieren Sie die Dateien manue
 
 #: app/Module/ResearchTaskModule.php:202
 msgid "To create new research tasks, you must first add “research task” to the list of facts and events in the family tree’s preferences."
-msgstr "Um neue Forschungsaufgaben zu erstellen, müssen Sie zunächst eine „Forschungsaufgabe“ zur Liste der Tatsachen und Ereignisse in den Stammbaumeinstellungen hinzufügen."
+msgstr ""
+"Um neue Forschungsaufgaben zu erstellen, müssen Sie zuerst die "
+"„Forschungsaufgabe“ zur Liste der Tatsachen und Ereignisse in den "
+"Stammbaumeinstellungen hinzufügen."
 
 #. I18N: Help text for the “Format text and notes” configuration setting
 #: admin_trees_config.php:1562
@@ -15687,7 +15811,15 @@ msgstr "Das Erzeugen von Wasserzeichen kann für große Bilder sehr langsam sein
 #: login.php:390
 #, php-format
 msgid "We will now send a confirmation email to the address <b>%s</b>. You must verify your account request by following instructions in the confirmation email. If you do not confirm your account request within seven days, your application will be rejected automatically. You will have to apply again.<br><br>After you have followed the instructions in the confirmation email, the administrator still has to approve your request before your account can be used.<br><br>To sign in to this website, you will need to know your username and password."
-msgstr "Ihnen wird nun eine Bestätigungsmail an die Adresse <b>%s</b> geschickt. Sie müssen den in der Mail enthaltenen Anweisungen folgen, um Ihr Benutzerkonto zu aktivieren. Falls Sie innerhalb von 7 Tagen nicht reagieren, wird Ihre Registrierungsanfrage automatisch verworfen. Sie müssen dann erneut anfragen.<br><br>Wenn Sie den Anweisungen in der Bestätigungsmail gefolgt sind, muss der Verwalter Ihren Benutzernamen noch freischalten, bevor Sie ihn benutzen können.<br><br>Um sich auf dieser Webseite anzumelden, benötigen Sie dann Ihren Benutzernamen und Ihr Passwort."
+msgstr ""
+"Ihnen wird nun eine Bestätigungs-E-Mail an die Adresse <b>%s</b> geschickt. "
+"Sie müssen den in der E-Mail enthaltenen Anweisungen folgen, um Ihr "
+"Benutzerkonto zu aktivieren. Falls Sie innerhalb von 7 Tagen nicht "
+"reagieren, wird Ihre Registrierungsanfrage automatisch verworfen. Sie müssen "
+"dann erneut anfragen.<br><br>Wenn Sie den Anweisungen in der Bestätigungs-E-"
+"Mail gefolgt sind, muss der Verwalter Ihren Benutzernamen noch freischalten, "
+"bevor Sie ihn benutzen können.<br><br>Um sich auf dieser Webseite "
+"anzumelden, benötigen Sie dann Ihren Benutzernamen und Ihr Passwort."
 
 #. I18N: Menu entry
 #: admin_trees_config.php:914 app/Theme/AdministrationTheme.php:94
@@ -15756,7 +15888,11 @@ msgstr "Wenn ein Datensatz bearbeitet wird, werden der Benutzer und der Zeitstem
 
 #: admin_users.php:388
 msgid "When a user registers for an account, an email is sent to their email address with a verification link. When they follow this link, we know the email address is correct, and the “email verified” option is selected automatically."
-msgstr "Sobald ein Besucher ein Benutzerkonto anfragt, wird eine E-Mail mit einem Bestätigungslink an die angegebene Adresse gesandt. Wenn dieser dem Link folgt, wissen Sie, dass die Emailadresse korrekt ist. Damit wird die Einstellung „E-Mail überprüft“ automatisch ausgewählt."
+msgstr ""
+"Sobald ein Besucher ein Benutzerkonto anfragt, wird eine E-Mail mit einem "
+"Bestätigungslink an die angegebene Adresse gesandt. Wenn dieser dem Link "
+"folgt, wissen Sie, dass die Emailadresse korrekt ist. Damit wird die "
+"Einstellung „E-Mail überprüft“ automatisch ausgewählt."
 
 #: modules_v3/GEDFact_assistant/_MEDIA/media_0_inverselink.php:46
 msgid "When adding a link, the ID field cannot be empty."
@@ -15765,7 +15901,11 @@ msgstr "Beim Hinzufügen einer Verknüpfung darf das ID-Feld nicht leer sein."
 #. I18N: Help text for the “Source type” configuration setting
 #: admin_trees_config.php:2123
 msgid "When adding new close relatives, you can add source citations to the records (individual and family) or to the facts and events (birth, marriage, and death). This option controls whether records or facts will be selected by default."
-msgstr "Beim Hinzufügen von nahen Verwandten, können Quellangaben zu den Personen- und Familendatensätzen oder zu Ereignissen wie Geburt, Heirat und Tod erfolgen. Diese Auswahl steuert die Voreinstellung für dieses Verhalten."
+msgstr ""
+"Beim Hinzufügen von neuen nahen Verwandten, können Quellangaben zu den "
+"Personen- und Familendatensätzen oder zu Ereignissen wie Geburt, Heirat und "
+"Tod erfolgen. Diese Auswahl steuert, ob standardmäßig Datensätze oder "
+"Ereignisse  ausgewählt werden sollen."
 
 #. I18N: Help text for the “Surname tradition” configuration setting
 #: admin_trees_config.php:2097
@@ -15925,7 +16065,9 @@ msgstr "Jemen"
 #: login.php:340
 #, php-format
 msgid "You (or someone claiming to be you) has requested an account at %1$s using the email address %2$s."
-msgstr "Sie selbst (oder jemand der sich für Sie ausgibt) hat bei %1$s ein Benutzerkonto unter Benutzung der E-Mail-Adresse %2$s angefragt."
+msgstr ""
+"Sie selbst (oder jemand der sich für Sie ausgibt) hat bei %1$s ein "
+"Benutzerkonto unter Benutzung der E-Mail-Adresse %2$s angefragt."
 
 #: login.php:292 message.php:57
 msgid "You are not allowed to send messages that contain external links."
@@ -15989,7 +16131,11 @@ msgstr "Sie können einen höheren oder niedrigeren Wert anfordern, wenngleich d
 #. I18N: Privacy restrictions are RESN tags in GEDCOM.
 #: admin_trees_config.php:500
 msgid "You can set the access for a specific record, fact, or event by adding a restriction to it. If a record, fact, or event does not have a restriction, the following default restrictions will be used."
-msgstr "Sie können die Zugriffsrechte für einzelne Datensätze, Gegebenheiten oder Ereignisse setzen, indem Sie eine Einschränkung hinzufügen. Wenn ein Datensatz, eine Gegebenheit oder ein Ereignis keine Einschränkung aufweist, gelten die folgenden voreingestellten Einschränkungen."
+msgstr ""
+"Sie können die Zugriffsrechte für einzelne Datensätze, Tatsachen oder "
+"Ereignisse setzen, indem Sie eine Einschränkung hinzufügen. Wenn ein "
+"Datensatz, eine Tatsache oder ein Ereignis keine Einschränkung aufweist, "
+"gelten die folgenden voreingestellten Einschränkungen."
 
 #: app/Module/BatchUpdate/BatchUpdateMissingDeathPlugin.php:40
 msgid "You can speed up the privacy calculations by adding a death record to individuals whose death can be inferred from other dates, but who do not have a record of death, burial, cremation, etc."
@@ -16137,11 +16283,17 @@ msgstr "Bitte entfernen Sie das „%1$s“ von „%2$s“ und versuchen Sie es e
 
 #: admin_users.php:394
 msgid "You should not approve an account unless you know that the email address is correct."
-msgstr "Sie sollten keinen Zugang genehmigen, solange Sie nicht wissen, dass die E-Mail-Adresse richtig ist."
+msgstr ""
+"Sie sollten keinen Zugang genehmigen, solange Sie nicht wissen, ob die E"
+"-Mail-Adresse richtig ist."
 
 #: login.php:328
 msgid "You will be informed by email when this prospective user has confirmed the request. You can then complete the process by activating the username. The new user will not be able to sign in until you activate the account."
-msgstr "Sie werden per E-Mail informiert, wenn diese Benutzer die Anfrage bestätigt hat. Sie können dann den Prozess abschließen, wenn Sie den Benutzer aktivieren. Der Benutzer wird sich nicht anmelden können, bis Sie den Zugang aktiviert haben."
+msgstr ""
+"Sie werden per E-Mail informiert, wenn diese Benutzer die Anfrage bestätigt "
+"hat. Sie können dann den Prozess abschließen, wenn Sie den Benutzer "
+"aktivieren. Der Benutzer wird sich nicht anmelden können, bis Sie den Zugang "
+"aktiviert haben."
 
 #: setup.php:434
 msgid "You will use this to sign in to webtrees."
@@ -16432,7 +16584,7 @@ msgstr "geborene"
 #: app/GedcomCode/GedcomCodeName.php:73
 msgctxt "MALE"
 msgid "birth name"
-msgstr "geborener"
+msgstr "Geburtsname"
 
 #. I18N: Extend privacy to dead individuals who were…
 #: admin_trees_config.php:450
@@ -16813,7 +16965,7 @@ msgstr "Ex-Frau"
 
 #: admin_trees_config.php:69 modules_v3/fact_sources/report.xml:6
 msgid "facts"
-msgstr "Fakten"
+msgstr "Tatsachen"
 
 #: app/Functions/Functions.php:689
 msgid "father"

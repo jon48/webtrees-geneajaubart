@@ -39,8 +39,8 @@
 		"fisharebest/ext-calendar" : "~2.5",
 		"fisharebest/localization" : "~1.15",
 		"fisharebest/php-polyfill" : "~1.7",
-		"jon48/webtrees-lib" : "dev-master",
-		"jon48/webtrees-theme-rural" : "dev-master-geneajaubart",
+		"jon48/webtrees-lib" : "dev-main-1.7",
+		"jon48/webtrees-theme-rural" : "dev-main-geneajaubart",
 		"michelf/php-markdown" : "~1.9",
 		"lutana/pclzip" : "2.8.2.1",
 		"ramsey/uuid" : "~2.9",
@@ -51,11 +51,11 @@
 		"oomphinc/composer-installers-extender" : "~1.1"
 	},
 	"require-dev" : {
-		"jon48/webtrees-tools" : "dev-master",
+		"jon48/webtrees-tools" : "dev-main",
 		"mockery/mockery" : "*",
 		"phpunit/phpunit" : "<6.0",
 		"php-coveralls/php-coveralls" : "*",
-		"consolidation/robo" : "^2.1"
+		"consolidation/robo" : "*"
 	},
 	"scripts" : {
         "webtrees-geneajaubart:package": [
@@ -86,6 +86,9 @@
 	},
 	"scripts-descriptions": {
         "webtrees-geneajaubart:package": "Create a package file for distribution. Add `-- version commit` for creating a versioned archive against a specific commit."
+	},
+	"replace" : {
+		"fisharebest/webtrees" : "*"
 	},
 	"extra" : {
 		"installer-types" : [

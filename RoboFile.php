@@ -19,7 +19,7 @@ class RoboFile extends \Robo\Tasks
      * @throws \Exception
      * @return \Robo\Result
      */
-    function package($version, $commit = 'master') {
+    function package($version, $commit = 'main-1.7') {
         $getCommitResult = 
             $this->taskExec("git rev-parse --quiet --verify $commit")
                 ->interactive(false)

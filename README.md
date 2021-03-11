@@ -16,14 +16,15 @@ implemented for the [GeneaJaubart website](http://genea.jaubart.com/wt/).
 * [System requirements](#system-requirements)
 * [Installation](#installation)
 * [Upgrading](#upgrading)
+* [Packaging](#packaging)
 * [Contacts](#contacts)
 
 
 ### License
 
 * **webtrees-geneajaubart: webtrees for the GeneaJaubart website**
-* Copyright (C) 2009 to 2020 Jonathan Jaubart.
-* Derived from **webtrees** - Copyright (C) 2010 to 2020  webtrees development team.
+* Copyright (C) 2009 to 2021 Jonathan Jaubart.
+* Derived from **webtrees** - Copyright (C) 2010 to 2021  webtrees development team.
 * Derived from PhpGedView - Copyright (C) 2002 to 2010  PGV Development Team.
 
 This program is free software; you can redistribute it and/or modify it under the
@@ -117,7 +118,7 @@ the Rural theme might present weird displays or alignments. Please contact
 
 ### System requirements
 
-It is required to run PHP 5.4 to be able to run the **webtrees-lib** library.
+It is required to run at least PHP 5.4 to be able to run the **webtrees-lib** library.
 Except the above, **webtrees-lib** shares the same requirements and system configuration as a standard **webtrees** installation.
 
 For a correct installation, you need to have [**composer**](https://getcomposer.org/) installed on your computer.
@@ -196,6 +197,35 @@ removed). Hence, **DO NOT USE the automatic upgrade mechanism**.
 6. Upload the files to your web server, overwriting the existing files.
 7. Delete the file **data/offline.txt**.
 
+### Packaging
+
+A package containing all the files can be generated for distribution, via the [Robo task runner](https://robo.li/).
+
+There is however a conflict between the minimum version of PHP required by Robo 2.1 (for which the tasks have been written), and the one defined in the Composer file.
+As a consequence, for **webtrees-geneajaubart** 1.7 no version constraint is set on the `consolidation/robo` library, even though 2.1 is actually required. This needs to be changed locally before generating the package.
+
+##### To generate the`composer.lock` file for commits
+
+```
+composer require consolidation/robo:* --dev --no-update
+composer update
+```
+
+##### To run the packaging tasks
+```
+composer require consolidation/robo:^2.1 --dev --no-update
+composer update --ignore-platform-reqs
+
+.\vendor\bin\robo package 1.7.18
+```
+That should generate a ZIP archive in the `./build/` folder.
+
+Then restore the initial state: 
+
+```
+git checkout -- composer.json composer.lock
+composer install
+```
 
 ### Contacts
 
