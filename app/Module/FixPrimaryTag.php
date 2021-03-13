@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -24,7 +24,6 @@ use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 
 use function e;
@@ -70,7 +69,7 @@ class FixPrimaryTag extends AbstractModule implements ModuleDataFixInterface
      */
     public function mediaToFix(Tree $tree, array $params): Collection
     {
-        return DB::table('media')
+        return $this->mediaToFixQuery($tree, $params)
             ->where('m_file', '=', $tree->id())
             ->where('m_gedcom', 'LIKE', "%\n1 _PRIM %")
             ->pluck('m_id');

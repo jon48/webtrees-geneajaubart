@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -60,16 +60,17 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
 
     // GEDCOM events that may have DATE data, but should not be displayed
     protected const NON_FACTS = [
-        'BAPL',
-        'ENDL',
-        'SLGC',
-        'SLGS',
-        '_TODO',
-        'CHAN',
+        'FAM:CHAN',
+        'INDI:BAPL',
+        'INDI:CHAN',
+        'INDI:ENDL',
+        'INDI:SLGC',
+        'INDI:SLGS',
+        'INDI:_TODO',
     ];
-    protected const BHEIGHT   = 30;
 
     // Box height
+    protected const BHEIGHT = 30;
 
     /**
      * Initialization.
@@ -294,10 +295,9 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
                     $facts->push($fact);
                 }
             }
+
             foreach ($facts as $event) {
-                // get the fact type
-                $fact = $event->getTag();
-                if (!in_array($fact, self::NON_FACTS, true)) {
+                if (!in_array($event->tag(), self::NON_FACTS, true)) {
                     // check for a date
                     $date = $event->date();
                     if ($date->isOK()) {

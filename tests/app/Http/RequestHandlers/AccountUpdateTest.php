@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\Controllers\Admin;
 
 use Fig\Http\Message\StatusCodeInterface;
+use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Http\RequestHandlers\AccountUpdate;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\TestCase;
@@ -48,14 +49,14 @@ class AccountUpdateTest extends TestCase
         $user->expects(self::exactly(4))
             ->method('setPreference')
             ->withConsecutive(
-                [User::PREF_CONTACT_METHOD, 'a'],
-                [User::PREF_LANGUAGE, 'c'],
-                [User::PREF_TIME_ZONE, 'g'],
-                [User::PREF_IS_VISIBLE_ONLINE, 'i']
+                [UserInterface::PREF_CONTACT_METHOD, 'a'],
+                [UserInterface::PREF_LANGUAGE, 'c'],
+                [UserInterface::PREF_TIME_ZONE, 'g'],
+                [UserInterface::PREF_IS_VISIBLE_ONLINE, 'i']
             );
 
         $tree = self::createMock(Tree::class);
-        $tree->expects(self::once())->method('setUserPreference')->with($user, User::PREF_TREE_DEFAULT_XREF, 'f');
+        $tree->expects(self::once())->method('setUserPreference')->with($user, UserInterface::PREF_TREE_DEFAULT_XREF, 'f');
 
         $handler  = new AccountUpdate($user_service);
         $request  = self::createRequest()

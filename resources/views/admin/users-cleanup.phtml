@@ -1,14 +1,27 @@
 <?php
 
 use Fisharebest\Webtrees\Carbon;
+use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\UserEditPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\UserListPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\UsersCleanupAction;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\User;
+use Illuminate\Support\Collection;
+
+/**
+ * @var Collection<UserInterface> $inactive_users
+ * @var string                    $title
+ * @var Collection<UserInterface> $unverified_users
+ */
 
 ?>
 
-<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route('admin-users') => I18N::translate('User administration'), $title]]) ?>
+<?= view('components/breadcrumbs', ['links' => [
+    route(ControlPanel::class) => I18N::translate('Control panel'),
+    route(UserListPage::class) => I18N::translate('User administration'),
+    $title,
+]]) ?>
 
 <h1><?= $title ?></h1>
 
@@ -22,7 +35,7 @@ use Fisharebest\Webtrees\User;
                     <input type="checkbox" name="delete[]" value="<?= $user->id() ?>" aria-label="<?= e($user->userName()) ?>">
                 </td>
                 <td>
-                    <a href="<?= e(route('admin-users-edit', ['user_id' => $user->id()])) ?>">
+                    <a href="<?= e(route(UserEditPage::class, ['user_id' => $user->id()])) ?>">
                         <?= e($user->userName()) ?>
                         —
                         <span dir="auto"><?= e($user->realName()) ?></span>
@@ -30,7 +43,7 @@ use Fisharebest\Webtrees\User;
                 </td>
                 <td>
                     <?= I18N::translate('User’s account has been inactive too long: ') ?>
-                    <?= view('components/datetime', ['timestamp' => Carbon::createFromTimestamp(max((int) $user->getPreference(User::PREF_TIMESTAMP_REGISTERED), (int) $user->getPreference(User::PREF_TIMESTAMP_ACTIVE)))]) ?>
+                    <?= view('components/datetime', ['timestamp' => Carbon::createFromTimestamp(max((int) $user->getPreference(UserInterface::PREF_TIMESTAMP_REGISTERED), (int) $user->getPreference(UserInterface::PREF_TIMESTAMP_ACTIVE)))]) ?>
                 </td>
             </tr>
         <?php endforeach ?>
@@ -41,7 +54,7 @@ use Fisharebest\Webtrees\User;
                     <input type="checkbox" name="delete[]" value="<?= $user->id() ?>" aria-label="<?= e($user->userName()) ?>">
                 </td>
                 <td>
-                    <a href="<?= e(route('admin-users-edit', ['user_id' => $user->id()])) ?>">
+                    <a href="<?= e(route(UserEditPage::class, ['user_id' => $user->id()])) ?>">
                         <?= e($user->userName()) ?>
                         —
                         <span dir="auto"><?= e($user->realName()) ?></span>
@@ -49,7 +62,7 @@ use Fisharebest\Webtrees\User;
                 </td>
                 <td>
                     <?= I18N::translate('User didn’t verify within 7 days.') ?>
-                    <?php if ($user->getPreference(User::PREF_IS_ACCOUNT_APPROVED) !== '1') : ?>
+                    <?php if ($user->getPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED) !== '1') : ?>
                         <?= I18N::translate('User not verified by administrator.') ?>
                     <?php endif ?>
                 </td>

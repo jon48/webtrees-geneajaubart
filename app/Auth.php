@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -70,7 +70,7 @@ class Auth
     {
         $user = $user ?? self::user();
 
-        return $user->getPreference(User::PREF_IS_ADMINISTRATOR) === '1';
+        return $user->getPreference(UserInterface::PREF_IS_ADMINISTRATOR) === '1';
     }
 
     /**
@@ -85,7 +85,7 @@ class Auth
     {
         $user = $user ?? self::user();
 
-        return self::isAdmin($user) || $tree->getUserPreference($user, User::PREF_TREE_ROLE) === User::ROLE_MANAGER;
+        return self::isAdmin($user) || $tree->getUserPreference($user, UserInterface::PREF_TREE_ROLE) === UserInterface::ROLE_MANAGER;
     }
 
     /**
@@ -100,7 +100,9 @@ class Auth
     {
         $user = $user ?? self::user();
 
-        return self::isManager($tree, $user) || $tree->getUserPreference($user, User::PREF_TREE_ROLE) === User::ROLE_MODERATOR;
+        return
+            self::isManager($tree, $user) ||
+            $tree->getUserPreference($user, UserInterface::PREF_TREE_ROLE) === UserInterface::ROLE_MODERATOR;
     }
 
     /**
@@ -115,7 +117,9 @@ class Auth
     {
         $user = $user ?? self::user();
 
-        return self::isModerator($tree, $user) || $tree->getUserPreference($user, User::PREF_TREE_ROLE) === 'edit';
+        return
+            self::isModerator($tree, $user) ||
+            $tree->getUserPreference($user, UserInterface::PREF_TREE_ROLE) === UserInterface::ROLE_EDITOR;
     }
 
     /**
@@ -130,7 +134,9 @@ class Auth
     {
         $user = $user ?? self::user();
 
-        return self::isEditor($tree, $user) || $tree->getUserPreference($user, User::PREF_TREE_ROLE) === 'access';
+        return
+            self::isEditor($tree, $user) ||
+            $tree->getUserPreference($user, UserInterface::PREF_TREE_ROLE) === UserInterface::ROLE_MEMBER;
     }
 
     /**
@@ -229,6 +235,8 @@ class Auth
         }
 
         if ($edit && $family->canEdit()) {
+            $family->lock();
+
             return $family;
         }
 
@@ -254,6 +262,8 @@ class Auth
         }
 
         if ($edit && $header->canEdit()) {
+            $header->lock();
+
             return $header;
         }
 
@@ -280,6 +290,8 @@ class Auth
         }
 
         if ($edit && $individual->canEdit()) {
+            $individual->lock();
+
             return $individual;
         }
 
@@ -292,6 +304,33 @@ class Auth
         }
 
         throw new IndividualAccessDeniedException();
+    }
+
+    /**
+     * @param Location|null $location
+     * @param bool       $edit
+     *
+     * @return Location
+     * @throws RecordNotFoundException
+     * @throws RecordAccessDeniedException
+     */
+    public static function checkLocationAccess(?Location $location, bool $edit = false): Location
+    {
+        if ($location === null) {
+            throw new RecordNotFoundException();
+        }
+
+        if ($edit && $location->canEdit()) {
+            $location->lock();
+
+            return $location;
+        }
+
+        if ($location->canShow()) {
+            return $location;
+        }
+
+        throw new RecordAccessDeniedException();
     }
 
     /**
@@ -309,6 +348,8 @@ class Auth
         }
 
         if ($edit && $media->canEdit()) {
+            $media->lock();
+
             return $media;
         }
 
@@ -334,6 +375,8 @@ class Auth
         }
 
         if ($edit && $note->canEdit()) {
+            $note->lock();
+
             return $note;
         }
 
@@ -359,6 +402,8 @@ class Auth
         }
 
         if ($edit && $record->canEdit()) {
+            $record->lock();
+
             return $record;
         }
 
@@ -384,6 +429,8 @@ class Auth
         }
 
         if ($edit && $repository->canEdit()) {
+            $repository->lock();
+
             return $repository;
         }
 
@@ -409,6 +456,8 @@ class Auth
         }
 
         if ($edit && $source->canEdit()) {
+            $source->lock();
+
             return $source;
         }
 
@@ -434,6 +483,8 @@ class Auth
         }
 
         if ($edit && $submitter->canEdit()) {
+            $submitter->lock();
+
             return $submitter;
         }
 
@@ -459,6 +510,8 @@ class Auth
         }
 
         if ($edit && $submission->canEdit()) {
+            $submission->lock();
+
             return $submission;
         }
 

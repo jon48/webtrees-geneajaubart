@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -83,8 +83,22 @@ class Age
      * Show zero ages without any units.
      *
      * @return string
+     * @deprecated - will be removed in 2.1.0
      */
     public function ageString(): string
+    {
+        return $this->__toString();
+    }
+
+    /**
+     * Show an age in a human-friendly form, such as "34 years", "8 months", "20 days".
+     * Show an empty string for invalid/missing dates.
+     * Show a warning icon for negative ages.
+     * Show zero ages without any units.
+     *
+     * @return string
+     */
+    public function __toString(): string
     {
         if (!$this->is_valid) {
             return '';
@@ -163,10 +177,11 @@ class Age
      * @param bool $living
      *
      * @return string
+     * @deprecated - will be removed in 2.1.0
      */
     public function ageAtEvent(bool $living): string
     {
-        $age = $this->ageString();
+        $age = (string) $this;
 
         if ($age === '') {
             return '';
@@ -185,6 +200,7 @@ class Age
      * Similar to ageAtEvent, but for events such as burial, cremation, etc.
      *
      * @return string
+     * @deprecated - will be removed in 2.1.0
      */
     public function timeAfterDeath(): string
     {
@@ -200,6 +216,6 @@ class Age
             return '';
         }
 
-        return I18N::translate('(%s after death)', $this->ageString());
+        return I18N::translate('(%s after death)', (string) $this);
     }
 }

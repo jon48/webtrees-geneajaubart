@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -167,12 +167,12 @@ class PlacesModule extends AbstractModule implements ModuleTabInterface
             $longitude = $fact->longitude();
 
             // Use the co-ordinates from the location otherwise.
-            if ($latitude === 0.0 && $longitude === 0.0) {
+            if ($latitude === null || $longitude === null) {
                 $latitude  = $location->latitude();
                 $longitude = $location->longitude();
             }
 
-            if ($latitude !== 0.0 || $longitude !== 0.0) {
+            if ($latitude !== null && $longitude !== null) {
                 $geojson['features'][] = [
                     'type'       => 'Feature',
                     'id'         => $id,
@@ -184,7 +184,6 @@ class PlacesModule extends AbstractModule implements ModuleTabInterface
                         'icon'     => static::ICONS[$fact->getTag()] ?? static::DEFAULT_ICON,
                         'tooltip'  => $fact->place()->gedcomName(),
                         'summary'  => view('modules/places/event-sidebar', $this->summaryData($indi, $fact)),
-                        'zoom'     => $location->zoom(),
                     ],
                 ];
             }
@@ -255,7 +254,6 @@ class PlacesModule extends AbstractModule implements ModuleTabInterface
             'value'  => $fact->value(),
             'date'   => $fact->date()->display(true),
             'place'  => $fact->place(),
-            'addtag' => false,
         ];
     }
 }

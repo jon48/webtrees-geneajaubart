@@ -1,16 +1,29 @@
 <?php
 
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\UserAddAction;
+use Fisharebest\Webtrees\Http\RequestHandlers\UserListPage;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\View;
 
+/**
+ * @var string $email
+ * @var string $real_name
+ * @var string $title
+ * @var string $username
+ */
+
 ?>
 
-<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route('admin-users') => I18N::translate('User administration'), $title]]) ?>
+<?= view('components/breadcrumbs', ['links' => [
+    route(ControlPanel::class) => I18N::translate('Control panel'),
+    route(UserListPage::class) => I18N::translate('User administration'),
+    $title,
+]]) ?>
 
 <h1><?= $title ?></h1>
 
-<form method="post" action="<?= e(route('admin-users-create')) ?>" class="form-horizontal" autocomplete="off">
+<form method="post" action="<?= e(route(UserAddAction::class)) ?>" class="form-horizontal" autocomplete="off">
     <?= csrf_field() ?>
 
     <!-- REAL NAME -->
@@ -19,7 +32,7 @@ use Fisharebest\Webtrees\View;
             <?= I18N::translate('Real name') ?>
         </label>
         <div class="col-sm-9">
-            <input class="form-control" type="text" id="real_name" name="real_name" required maxlength="64" value="<?= e($real_name) ?>" dir="auto">
+            <input class="form-control" type="text" id="real_name" name="real_name" required="required" maxlength="64" value="<?= e($real_name) ?>" dir="auto">
             <p class="small text-muted">
                 <?= I18N::translate('This is your real name, as you would like it displayed on screen.') ?>
             </p>
@@ -32,7 +45,7 @@ use Fisharebest\Webtrees\View;
             <?= I18N::translate('Username') ?>
         </label>
         <div class="col-sm-9">
-            <input class="form-control" type="text" id="username" name="username" required maxlength="32" value="<?= e($username) ?>" dir="auto">
+            <input class="form-control" type="text" id="username" name="username" required="required" maxlength="32" value="<?= e($username) ?>" dir="auto">
             <p class="small text-muted">
                 <?= I18N::translate('Usernames are case-insensitive and ignore accented letters, so that “chloe”, “chloë”, and “Chloe” are considered to be the same.') ?>
             </p>
@@ -45,7 +58,7 @@ use Fisharebest\Webtrees\View;
             <?= I18N::translate('Password') ?>
         </label>
         <div class="col-sm-9">
-            <input class="form-control" type="password" id="password" name="password" pattern = ".{8,}" placeholder="<?= I18N::plural('Use at least %s character.', 'Use at least %s characters.', 8, I18N::number(8)) ?>" required autocomplete="new-password">
+            <input class="form-control" type="password" id="password" name="password" pattern = ".{8,}" placeholder="<?= I18N::plural('Use at least %s character.', 'Use at least %s characters.', 8, I18N::number(8)) ?>" required="required" autocomplete="new-password">
             <p class="small text-muted">
                 <?= I18N::translate('Passwords must be at least 8 characters long and are case-sensitive, so that “secret” is different from “SECRET”.') ?>
             </p>
@@ -58,7 +71,7 @@ use Fisharebest\Webtrees\View;
             <?= I18N::translate('Email address') ?>
         </label>
         <div class="col-sm-9">
-            <input class="form-control" type="email" id="email" name="email" required maxlength="64" value="<?= e($email) ?>">
+            <input class="form-control" type="email" id="email" name="email" required="required" maxlength="64" value="<?= e($email) ?>">
             <p class="small text-muted">
                 <?= I18N::translate('This email address will be used to send password reminders, website notifications, and messages from other family members who are registered on the website.') ?>
             </p>
@@ -77,7 +90,7 @@ use Fisharebest\Webtrees\View;
 <?php View::push('javascript') ?>
 <script>
   function regex_quote(str) {
-    return str.replace(/[\\.?+*()[\](){}|]/g, "\\$&");
+    return str.replace(/[\\.?+*()[\]{}|]/g, "\\$&");
   }
 </script>
 <?php View::endpush() ?>

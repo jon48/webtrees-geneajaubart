@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -145,92 +145,20 @@ class UserMessagesModule extends AbstractModule implements ModuleBlockInterface
 
             return
                 $user->id() !== Auth::id() &&
-                $user->getPreference(User::PREF_IS_ACCOUNT_APPROVED) &&
+                $user->getPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED) &&
                 $can_see_tree &&
-                $user->getPreference(User::PREF_CONTACT_METHOD) !== 'none';
+                $user->getPreference(UserInterface::PREF_CONTACT_METHOD) !== 'none';
         });
 
-        $content = '';
-        if ($users->isNotEmpty()) {
-            $url = route(UserPage::class, ['tree' => $tree->name()]);
-
-            $content .= '<form method="post" action="' . e(route(MessageSelect::class, ['tree' => $tree->name()])) . '">';
-            $content .= csrf_field();
-            $content .= '<input type="hidden" name="url" value="' . e($url) . '">';
-            $content .= '<label for="to">' . I18N::translate('Send a message') . '</label>';
-            $content .= '<select id="to" name="to" required>';
-            $content .= '<option value="">' . I18N::translate('&lt;select&gt;') . '</option>';
-            foreach ($users as $user) {
-                $content .= sprintf('<option value="%1$s">%2$s - %1$s</option>', e($user->userName()), e($user->realName()));
-            }
-            $content .= '</select>';
-            $content .= '<button type="submit">' . I18N::translate('Send') . '</button><br><br>';
-            $content .= '</form>';
-        }
-        $content .= '<form method="post" action="' . e(route('module', [
-                'action'  => 'DeleteMessage',
-                'module'  => $this->name(),
-                'context' => $context,
-                'tree'     => $tree->name(),
-            ])) . '" data-confirm="' . I18N::translate('Are you sure you want to delete this message? It cannot be retrieved later.') . '" onsubmit="return confirm(this.dataset.confirm);" id="messageform" name="messageform">';
-        $content .= csrf_field();
-
-        if ($messages->isNotEmpty()) {
-            $content .= '<div class="table-responsive">';
-            $content .= '<table class="table table-sm w-100"><tr>';
-            $content .= '<th class="list_label">' . I18N::translate('Delete') . '<br><a href="#" onclick="$(\'#block-' . $block_id . ' :checkbox\').prop(\'checked\', true); return false;">' . I18N::translate('All') . '</a></th>';
-            $content .= '<th class="list_label">' . I18N::translate('Subject') . '</th>';
-            $content .= '<th class="list_label">' . I18N::translate('Date sent') . '</th>';
-            $content .= '<th class="list_label">' . I18N::translate('Email address') . '</th>';
-            $content .= '</tr>';
-            foreach ($messages as $message) {
-                $content .= '<tr>' .
-                    '<td class="list_value_wrap center"><input type="checkbox" name="message_id[]" value="' . $message->message_id . '" id="cb_message' . $message->message_id . '"></td>' .
-                    '<td class="list_value_wrap">' .
-                    '<a href="#message' . $message->message_id . '" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="message' . $message->message_id . '">' .
-                    view('icons/expand') .
-                    view('icons/collapse') .
-                    '<b dir="auto">' . e($message->subject) . '</b>' .
-                    '</a></td>' .
-                    '<td class="list_value_wrap">' . view('components/datetime', ['timestamp' => $message->created]) . '</td>' .
-                    '<td class="list_value_wrap">';
-
-                $user = $this->user_service->findByIdentifier($message->sender);
-
-                if ($user instanceof User) {
-                    $content .= '<span dir="auto">' . e($user->realName()) . '</span> - <span dir="auto">' . $user->email() . '</span>';
-                } else {
-                    $content .= '<a href="mailto:' . e($message->sender) . '">' . e($message->sender) . '</a>';
-                }
-
-                $content .= '</td>';
-                $content .= '</tr>';
-                $content .= '<tr><td class="list_value_wrap" colspan="4"><div id="message' . $message->message_id . '" class="collapse">';
-                $content .= '<div dir="auto" style="white-space: pre-wrap;">' . Filter::expandUrls($message->body, $tree) . '</div><br>';
-
-                /* I18N: When replying to an email, the subject becomes “RE: <subject>” */
-                if (!str_starts_with($message->subject, I18N::translate('RE: '))) {
-                    $message->subject = I18N::translate('RE: ') . $message->subject;
-                }
-
-                // If this user still exists, show a reply link.
-                if ($user instanceof User) {
-                    $reply_url = route(MessagePage::class, [
-                        'subject' => $message->subject,
-                        'to'      => $user->userName(),
-                        'tree'    => $tree->name(),
-                        'url'     => route(UserPage::class, ['tree' => $tree->name()]),
-                    ]);
-
-                    $content .= '<a class="btn btn-primary" href="' . e($reply_url) . '" title="' . I18N::translate('Reply') . '">' . I18N::translate('Reply') . '</a> ';
-                }
-                $content .= '<button type="button" class="btn btn-danger" data-confirm="' . I18N::translate('Are you sure you want to delete this message? It cannot be retrieved later.') . '" onclick="if (confirm(this.dataset.confirm)) {$(\'#messageform :checkbox\').prop(\'checked\', false); $(\'#cb_message' . $message->message_id . '\').prop(\'checked\', true); document.messageform.submit();}">' . I18N::translate('Delete') . '</button></div></td></tr>';
-            }
-            $content .= '</table>';
-            $content .= '</div>';
-            $content .= '<p><button type="submit">' . I18N::translate('Delete selected messages') . '</button></p>';
-        }
-        $content .= '</form>';
+        $content = view('modules/user-messages/user-messages', [
+            'block_id'     => $block_id,
+            'context'      => $context,
+            'messages'     => $messages,
+            'module'       => $this,
+            'tree'         => $tree,
+            'user_service' => $this->user_service,
+            'users'        => $users,
+        ]);
 
         if ($context !== self::CONTEXT_EMBED) {
             $count = $messages->count();

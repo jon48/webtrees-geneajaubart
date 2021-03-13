@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -156,9 +156,9 @@ class IndividualRepository implements IndividualRepositoryInterface
             default:
                 array_walk($nameList, static function (string &$value, string $key) use ($show_tot): void {
                     if ($show_tot) {
-                        $value = '<span dir="auto">' . e($key) . '</span>';
-                    } else {
                         $value = '<span dir="auto">' . e($key) . '</span> (' . I18N::number((int) $value) . ')';
+                    } else {
+                        $value = '<span dir="auto">' . e($key) . '</span>';
                     }
                 });
 
@@ -495,26 +495,27 @@ class IndividualRepository implements IndividualRepositoryInterface
             ->whereNotIn('n_surn', ['', Individual::NOMEN_NESCIO])
             ->select(['n_surn'])
             ->groupBy(['n_surn'])
-            ->orderByRaw('count(n_surn) desc')
+            ->orderByRaw('COUNT(n_surn) DESC')
+            ->orderBy(new Expression('COUNT(n_surn)'), 'DESC')
+            ->having(new Expression('COUNT(n_surn)'), '>=', $threshold)
             ->take($number_of_surnames)
             ->get()
             ->pluck('n_surn')
             ->all();
 
         $surnames = [];
+
         foreach ($top_surnames as $top_surname) {
-            $variants = DB::table('name')
+            $surnames[$top_surname] = DB::table('name')
                 ->where('n_file', '=', $this->tree->id())
-                ->where(new Expression('n_surn /* COLLATE ' . I18N::collation() . ' */'), '=', $top_surname)
-                ->select(['n_surn', new Expression('COUNT(*) AS count')])
+                ->where('n_type', '<>', '_MARNM')
+                ->where('n_surn', '=', $top_surname)
+                ->select(['n_surn', new Expression('COUNT(n_surn) AS count')])
                 ->groupBy(['n_surn'])
+                ->orderBy('n_surn')
                 ->get()
                 ->pluck('count', 'n_surn')
                 ->all();
-
-            if (array_sum($variants) > $threshold) {
-                $surnames[$top_surname] = $variants;
-            }
         }
 
         return $surnames;
@@ -609,7 +610,7 @@ class IndividualRepository implements IndividualRepositoryInterface
     public function commonSurnamesTotals(
         int $threshold = 1,
         int $number_of_surnames = 10,
-        string $sorting = 'rcount'
+        string $sorting = 'count'
     ): string {
         return $this->commonSurnamesQuery('nolist', true, $threshold, $number_of_surnames, $sorting);
     }
@@ -643,7 +644,7 @@ class IndividualRepository implements IndividualRepositoryInterface
     public function commonSurnamesListTotals(
         int $threshold = 1,
         int $number_of_surnames = 10,
-        string $sorting = 'rcount'
+        string $sorting = 'count'
     ): string {
         return $this->commonSurnamesQuery('list', true, $threshold, $number_of_surnames, $sorting);
     }
@@ -833,7 +834,7 @@ class IndividualRepository implements IndividualRepositoryInterface
         /** @var Individual $individual */
         $individual = Registry::individualFactory()->mapper($this->tree)($row);
 
-        if (!$individual->canShow()) {
+        if ($type !== 'age' && !$individual->canShow()) {
             return I18N::translate('This information is private and cannot be shown.');
         }
 

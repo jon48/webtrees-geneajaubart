@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -25,7 +25,6 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\GedcomRecord;
-use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Media;
 use Fisharebest\Webtrees\Tree;
@@ -118,7 +117,7 @@ class MediaListModule extends AbstractModule implements ModuleListInterface, Req
     }
 
     /**
-     * @return string[]
+     * @return array<string>
      */
     public function listUrlAttributes(): array
     {
@@ -172,7 +171,7 @@ class MediaListModule extends AbstractModule implements ModuleListInterface, Req
         }
 
         $params  = $request->getQueryParams();
-        $formats = GedcomTag::getFileFormTypes();
+        $formats = Registry::elementFactory()->make('OBJE:FILE:FORM:TYPE')->values();
         $go      = $params['go'] ?? '';
         $page    = (int) ($params['page'] ?? 1);
         $max     = (int) ($params['max'] ?? 20);
@@ -227,7 +226,7 @@ class MediaListModule extends AbstractModule implements ModuleListInterface, Req
      *
      * @param Tree $tree
      *
-     * @return string[]
+     * @return array<string>
      */
     private function allFolders(Tree $tree): array
     {

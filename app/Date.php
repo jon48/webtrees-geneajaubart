@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -106,10 +106,10 @@ class Date
      *
      * @param string $date
      *
-     * @throws DomainException
      * @return AbstractCalendarDate
+     * @throws DomainException
      */
-    private function parseDate($date): AbstractCalendarDate
+    private function parseDate(string $date): AbstractCalendarDate
     {
         // Valid calendar escape specified? - use it
         if (preg_match('/^(@#D(?:GREGORIAN|JULIAN|HEBREW|HIJRI|JALALI|FRENCH R|ROMAN)+@) ?(.*)/', $date, $match)) {
@@ -223,7 +223,7 @@ class Date
     /**
      * A list of supported calendars and their names.
      *
-     * @return string[]
+     * @return array<string>
      */
     public static function calendarNames(): array
     {
@@ -263,9 +263,7 @@ class Date
             $CALENDAR_FORMAT = '';
         }
 
-        if ($date_format === null) {
-            $date_format = I18N::dateFormat();
-        }
+        $date_format = $date_format ?? I18N::dateFormat();
 
         if ($convert_calendars) {
             $calendar_format = explode('_and_', $CALENDAR_FORMAT);

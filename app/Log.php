@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -42,7 +42,7 @@ class Log
      *
      * @return void
      */
-    public static function addAuthenticationLog($message): void
+    public static function addAuthenticationLog(string $message): void
     {
         self::addLog($message, self::TYPE_AUTHENTICATION);
     }
@@ -56,7 +56,7 @@ class Log
      *
      * @return void
      */
-    private static function addLog($message, $log_type, Tree $tree = null): void
+    private static function addLog(string $message, string $log_type, Tree $tree = null): void
     {
         if (app()->has(ServerRequestInterface::class)) {
             $request    = app(ServerRequestInterface::class);
@@ -83,7 +83,7 @@ class Log
      *
      * @return void
      */
-    public static function addConfigurationLog($message, Tree $tree = null): void
+    public static function addConfigurationLog(string $message, Tree $tree = null): void
     {
         self::addLog($message, self::TYPE_CONFIGURATION, $tree);
     }
@@ -96,7 +96,7 @@ class Log
      *
      * @return void
      */
-    public static function addEditLog($message, Tree $tree): void
+    public static function addEditLog(string $message, Tree $tree): void
     {
         self::addLog($message, self::TYPE_EDIT, $tree);
     }
@@ -108,7 +108,7 @@ class Log
      *
      * @return void
      */
-    public static function addErrorLog($message): void
+    public static function addErrorLog(string $message): void
     {
         self::addLog($message, self::TYPE_ERROR);
     }
@@ -120,7 +120,7 @@ class Log
      *
      * @return void
      */
-    public static function addMediaLog($message): void
+    public static function addMediaLog(string $message): void
     {
         self::addLog($message, self::TYPE_MEDIA);
     }
@@ -135,7 +135,7 @@ class Log
      *
      * @return void
      */
-    public static function addSearchLog($message, array $trees): void
+    public static function addSearchLog(string $message, array $trees): void
     {
         foreach ($trees as $tree) {
             self::addLog($message, self::TYPE_SEARCH, $tree);

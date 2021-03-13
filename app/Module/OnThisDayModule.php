@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -242,10 +242,10 @@ class OnThisDayModule extends AbstractModule implements ModuleBlockInterface
     {
         $default_events = implode(',', self::DEFAULT_EVENTS);
 
-        $filter    = $this->getBlockSetting($block_id, 'filter', '1');
-        $infoStyle = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
-        $sortStyle = $this->getBlockSetting($block_id, 'sortStyle', self::DEFAULT_SORT);
-        $events    = $this->getBlockSetting($block_id, 'events', $default_events);
+        $filter     = $this->getBlockSetting($block_id, 'filter', '1');
+        $info_style = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
+        $sort_style = $this->getBlockSetting($block_id, 'sortStyle', self::DEFAULT_SORT);
+        $events     = $this->getBlockSetting($block_id, 'events', $default_events);
 
         $event_array = explode(',', $events);
 
@@ -274,9 +274,9 @@ class OnThisDayModule extends AbstractModule implements ModuleBlockInterface
             'all_events'  => $all_events,
             'event_array' => $event_array,
             'filter'      => $filter,
-            'infoStyle'   => $infoStyle,
+            'info_style'  => $info_style,
             'info_styles' => $info_styles,
-            'sortStyle'   => $sortStyle,
+            'sort_style'  => $sort_style,
             'sort_styles' => $sort_styles,
         ]);
     }

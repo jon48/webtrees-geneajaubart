@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees;
 
 use Fisharebest\Webtrees\CommonMark\CensusTableExtension;
+use Fisharebest\Webtrees\CommonMark\ResponsiveTableExtension;
 use Fisharebest\Webtrees\CommonMark\XrefExtension;
 use League\CommonMark\Block\Element\Document;
 use League\CommonMark\Block\Element\Paragraph;
@@ -103,7 +104,7 @@ class Filter
     public static function markdown(string $text, Tree $tree): string
     {
         $environment = Environment::createCommonMarkEnvironment();
-        $environment->addExtension(new TableExtension());
+        $environment->addExtension(new ResponsiveTableExtension());
         $environment->addExtension(new CensusTableExtension());
         $environment->addExtension(new XrefExtension($tree));
 

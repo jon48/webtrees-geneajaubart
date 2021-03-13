@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -52,8 +52,13 @@ class Menu
      * @param string[] $attrs    Optional attributes, such as onclick or data-xxx
      * @param Menu[]   $submenus Any submenus
      */
-    public function __construct($label, $link = '#', $class = '', array $attrs = [], array $submenus = [])
-    {
+    public function __construct(
+        string $label,
+        string $link = '#',
+        string $class = '',
+        array $attrs = [],
+        array $submenus = []
+    ) {
         $this
             ->setLabel($label)
             ->setLink($link)
@@ -82,7 +87,7 @@ class Menu
     /**
      * Get the optional attributes.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function getAttrs(): array
     {
@@ -120,7 +125,7 @@ class Menu
      *
      * @return $this
      */
-    public function setClass($class): self
+    public function setClass(string $class): self
     {
         $this->class = $class;
 
@@ -144,7 +149,7 @@ class Menu
      *
      * @return $this
      */
-    public function setLabel($label): self
+    public function setLabel(string $label): self
     {
         $this->label = $label;
 
@@ -168,7 +173,7 @@ class Menu
      *
      * @return $this
      */
-    public function setLink($link): self
+    public function setLink(string $link): self
     {
         $this->link = $link;
 
@@ -182,7 +187,7 @@ class Menu
      *
      * @return $this
      */
-    public function addSubmenu($menu): self
+    public function addSubmenu(Menu $menu): self
     {
         $this->submenus[] = $menu;
 

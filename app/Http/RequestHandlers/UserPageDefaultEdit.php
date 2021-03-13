@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -67,7 +67,7 @@ class UserPageDefaultEdit implements RequestHandlerInterface
         $side_blocks = $this->home_page_service->userBlocks($default_tree, $default_user, ModuleBlockInterface::SIDE_BLOCKS);
         $all_blocks  = $this->home_page_service->availableUserBlocks($default_tree, $default_user);
         $title       = I18N::translate('Set the default blocks for new users');
-        $url_cancel  = route('admin-users');
+        $url_cancel  = route(UserListPage::class);
         $url_save    = route(UserPageDefaultUpdate::class);
 
         return $this->viewResponse('edit-blocks-page', [

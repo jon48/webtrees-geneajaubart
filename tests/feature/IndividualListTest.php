@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -39,8 +39,8 @@ class IndividualListTest extends TestCase
      */
     public function testIndividualList(): void
     {
-        $tree                    = $this->importTree('demo.ged');
-        $list_module             = new IndividualListModule(new LocalizationService());
+        $tree        = $this->importTree('demo.ged');
+        $list_module = new IndividualListModule(new LocalizationService());
 
         $request  = self::createRequest(RequestMethodInterface::METHOD_GET, [], [], [], ['tree' => $tree]);
         $response = $list_module->handle($request);

@@ -23,6 +23,8 @@ use Fisharebest\Webtrees\Http\Controllers\AbstractBaseController;
 
 /**
  * Common functions for admin controllers.
+ *
+ * @deprecated since 2.0.11 - will be removed in 2.1.0 - use RequestHandlers instead of Controllers
  */
 abstract class AbstractAdminController extends AbstractBaseController
 {

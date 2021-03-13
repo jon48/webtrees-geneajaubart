@@ -2,9 +2,16 @@
 
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Submitter;
+use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Collection;
+
+/**
+ * @var Collection<Submitter> $submitters
+ * @var Tree                  $tree
+ */
 
 ?>
 
@@ -66,7 +73,7 @@ $count_families = DB::table('families')
 
     <tbody>
         <?php foreach ($submitters as $submitter) : ?>
-            <tr class="<?= $submitter->isPendingDeletion() ? 'wt-old' : ($submitter->isPendingAddition() ? 'wt-new' : '') ?>">
+            <tr class="<?= $submitter->isPendingAddition() ? 'wt-new' : '' ?> <?= $submitter->isPendingDeletion() ? 'wt-old' : '' ?>">
                 <td data-sort="<?= e($submitter->sortName()) ?>">
                     <a href="<?= e($submitter->url()) ?>">
                         <?= $submitter->fullName() ?>

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -21,6 +21,7 @@ namespace Fisharebest\Webtrees\Module;
 
 use Aura\Router\Route;
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Gedcom;
@@ -42,7 +43,6 @@ use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Menu;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Tree;
-use Fisharebest\Webtrees\User;
 use Psr\Http\Message\ServerRequestInterface;
 
 use function app;
@@ -328,7 +328,7 @@ trait ModuleThemeTrait
      */
     public function menuMyIndividualRecord(Tree $tree): ?Menu
     {
-        $record = Registry::individualFactory()->make($tree->getUserPreference(Auth::user(), User::PREF_TREE_ACCOUNT_XREF), $tree);
+        $record = Registry::individualFactory()->make($tree->getUserPreference(Auth::user(), UserInterface::PREF_TREE_ACCOUNT_XREF), $tree);
 
         if ($record) {
             return new Menu(I18N::translate('My individual record'), $record->url(), 'menu-myrecord');
@@ -385,7 +385,7 @@ trait ModuleThemeTrait
      */
     public function menuMyPedigree(Tree $tree): ?Menu
     {
-        $gedcomid = $tree->getUserPreference(Auth::user(), User::PREF_TREE_ACCOUNT_XREF);
+        $gedcomid = $tree->getUserPreference(Auth::user(), UserInterface::PREF_TREE_ACCOUNT_XREF);
 
         $pedigree_chart = app(ModuleService::class)->findByComponent(ModuleChartInterface::class, $tree, Auth::user())
             ->filter(static function (ModuleInterface $module): bool {
@@ -523,7 +523,7 @@ trait ModuleThemeTrait
     /**
      * A list of CSS files to include for this page.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function stylesheets(): array
     {

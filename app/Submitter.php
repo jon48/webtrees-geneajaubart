@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -34,7 +34,7 @@ class Submitter extends GedcomRecord
     /**
      * A closure which will create a record from a database row.
      *
-     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Factory::submitter()
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Registry::submitterFactory()
      *
      * @param Tree $tree
      *
@@ -50,7 +50,7 @@ class Submitter extends GedcomRecord
      * we just receive the XREF. For bulk records (such as lists
      * and search results) we can receive the GEDCOM data as well.
      *
-     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Factory::submitter()
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Registry::submitterFactory()
      *
      * @param string      $xref
      * @param Tree        $tree
@@ -61,18 +61,6 @@ class Submitter extends GedcomRecord
     public static function getInstance(string $xref, Tree $tree, string $gedcom = null): ?Submitter
     {
         return Registry::submitterFactory()->make($xref, $tree, $gedcom);
-    }
-
-    /**
-     * Generate a private version of this record
-     *
-     * @param int $access_level
-     *
-     * @return string
-     */
-    protected function createPrivateGedcomRecord(int $access_level): string
-    {
-        return '0 @' . $this->xref . "@ SUBM\n1 NAME " . I18N::translate('Private');
     }
 
     /**

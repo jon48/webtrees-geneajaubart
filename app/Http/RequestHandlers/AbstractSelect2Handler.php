@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -55,8 +55,8 @@ abstract class AbstractSelect2Handler implements RequestHandlerInterface
 
         $params = (array) $request->getParsedBody();
         $query  = $params['q'] ?? '';
-        $at     = (bool) ($params['at'] ?? false);
         $page   = (int) ($params['page'] ?? 1);
+        $at     = (bool) ($request->getQueryParams()['at'] ?? false);
 
         // Fetch one more row than we need, so we can know if more rows exist.
         $offset = ($page - 1) * self::RESULTS_PER_PAGE;

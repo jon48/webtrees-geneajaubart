@@ -1,9 +1,17 @@
 <?php
 
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Note;
+use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Collection;
+
+/**
+ * @var Collection<Note> $notes
+ * @var Tree             $tree
+ */
 
 ?>
 
@@ -89,7 +97,7 @@ $count_sources = DB::table('sources')
 
     <tbody>
         <?php foreach ($notes as $note) : ?>
-            <tr class="<?= $note->isPendingDeletion() ? 'wt-old' : ($note->isPendingAddition() ? 'wt-new' : '') ?>">
+            <tr class="<?= $note->isPendingAddition() ? 'wt-new' : '' ?> <?= $note->isPendingDeletion() ? 'wt-old' : '' ?>">
                 <!-- Title -->
                 <td data-sort="<?= e($note->sortName()) ?>">
                     <a href="<?= e($note->url()) ?>">

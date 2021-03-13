@@ -1,16 +1,28 @@
 <?php
 
+use Fisharebest\Webtrees\Http\RequestHandlers\EditMediaFileAction;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Media;
+use Fisharebest\Webtrees\MediaFile;
+use Fisharebest\Webtrees\Tree;
+
+/**
+ * @var string                   $max_upload_size
+ * @var Media                    $media
+ * @var MediaFile                $media_file
+ * @var array<int|string,string> $media_types
+ * @var Tree                     $tree
+ */
 
 ?>
 
-<form method="post" action="<?= e(route('edit-media-file', ['xref' => $media->xref(), 'tree' => $media->tree()->name(), 'fact_id' => $media_file->factId()])) ?>" enctype="multipart/form-data">
+<form method="post" action="<?= e(route(EditMediaFileAction::class, ['xref' => $media->xref(), 'tree' => $media->tree()->name(), 'fact_id' => $media_file->factId()])) ?>" enctype="multipart/form-data">
     <?= csrf_field() ?>
 
     <?= view('modals/header', ['title' => I18N::translate('Edit a media file')]) ?>
 
     <div class="modal-body">
-        <?= view('modals/media-file-fields', ['max_upload_size' => $max_upload_size, 'unused_files' => [], 'media_file' => $media_file, 'tree' => $tree]) ?>
+        <?= view('modals/media-file-fields', ['max_upload_size' => $max_upload_size, 'media_file' => $media_file, 'media_types' => $media_types, 'tree' => $tree, 'unused_files' => []]) ?>
     </div>
 
     <?= view('modals/footer-save-cancel') ?>

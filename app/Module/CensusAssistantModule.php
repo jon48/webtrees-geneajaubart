@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -173,7 +173,7 @@ class CensusAssistantModule extends AbstractModule
      *
      * @return string
      */
-    private function createNoteText(CensusInterface $census, $ca_title, $ca_place, $ca_citation, $ca_individuals, $ca_notes): string
+    private function createNoteText(CensusInterface $census, string $ca_title, string $ca_place, string $ca_citation, array $ca_individuals, string $ca_notes): string
     {
         $text = $ca_title . "\n" . $ca_citation . "\n" . $ca_place . "\n\n|";
 

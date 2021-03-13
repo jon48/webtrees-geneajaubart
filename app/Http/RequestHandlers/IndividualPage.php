@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -105,19 +105,6 @@ class IndividualPage implements RequestHandlerInterface
             return redirect($individual->url(), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
         }
 
-        // What is (was) the age of the individual
-        $bdate = $individual->getBirthDate();
-        $ddate = $individual->getDeathDate();
-
-        if ($individual->isDead()) {
-            // If dead, show age at death
-            $age = (new Age($bdate, $ddate))->ageAtEvent(false);
-        } else {
-            // If living, show age today
-            $today = strtoupper(date('d M Y'));
-            $age   = (new Age($bdate, new Date($today)))->ageAtEvent(true);
-        }
-
         // What images are linked to this individual
         $individual_media = new Collection();
         foreach ($individual->facts(['OBJE']) as $fact) {
@@ -143,12 +130,12 @@ class IndividualPage implements RequestHandlerInterface
         if (Auth::isAdmin()) {
             $users = $this->user_service->findByIndividual($individual);
             foreach ($users as $user) {
-                $user_link = ' —  <a href="' . e(route('admin-users', ['filter' => $user->email()])) . '">' . e($user->userName()) . '</a>';
+                $user_link = ' —  <a href="' . e(route(UserListPage::class, ['filter' => $user->email()])) . '">' . e($user->userName()) . '</a>';
             }
         }
 
         return $this->viewResponse('individual-page', [
-            'age'              => $age,
+            'age'              => $this->ageString($individual),
             'clipboard_facts'  => $this->clipboard_service->pastableFacts($individual, new Collection()),
             'individual'       => $individual,
             'individual_media' => $individual_media,
@@ -163,6 +150,46 @@ class IndividualPage implements RequestHandlerInterface
             'tree'             => $tree,
             'user_link'        => $user_link,
         ]);
+    }
+
+    /**
+     * @param Individual $individual
+     *
+     * @return string
+     */
+    private function ageString(Individual $individual): string
+    {
+        if ($individual->isDead()) {
+            // If dead, show age at death
+            $age = (string) new Age($individual->getBirthDate(), $individual->getDeathDate());
+
+            if ($age === '') {
+                return '';
+            }
+
+            switch ($individual->sex()) {
+                case 'M':
+                    /* I18N: The age of an individual at a given date */
+                    return I18N::translateContext('Male', '(aged %s)', $age);
+                case 'F':
+                    /* I18N: The age of an individual at a given date */
+                    return I18N::translateContext('Female', '(aged %s)', $age);
+                default:
+                    /* I18N: The age of an individual at a given date */
+                    return I18N::translate('(aged %s)', $age);
+            }
+        }
+
+        // If living, show age today
+        $today = new Date(strtoupper(date('d M Y')));
+        $age   = (string) new Age($individual->getBirthDate(), $today);
+
+        if ($age === '') {
+            return '';
+        }
+
+        /* I18N: The current age of a living individual */
+        return I18N::translate('(age %s)', $age);
     }
 
     /**

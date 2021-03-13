@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -22,6 +22,7 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 use Exception;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Carbon;
+use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Log;
@@ -29,7 +30,6 @@ use Fisharebest\Webtrees\Services\UpgradeService;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\Session;
 use Fisharebest\Webtrees\Tree;
-use Fisharebest\Webtrees\User;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -80,7 +80,7 @@ class LoginAction implements RequestHandlerInterface
             $this->doLogin($username, $password);
 
             if (Auth::isAdmin() && $this->upgrade_service->isUpgradeAvailable()) {
-                FlashMessages::addMessage(I18N::translate('A new version of webtrees is available.') . ' <a class="alert-link" href="' . e(route('upgrade')) . '">' . I18N::translate('Upgrade to webtrees %s.', '<span dir="ltr">' . $this->upgrade_service->latestVersion() . '</span>') . '</a>');
+                FlashMessages::addMessage(I18N::translate('A new version of webtrees is available.') . ' <a class="alert-link" href="' . e(route(UpgradeWizardPage::class)) . '">' . I18N::translate('Upgrade to webtrees %s.', '<span dir="ltr">' . $this->upgrade_service->latestVersion() . '</span>') . '</a>');
             }
 
             // Redirect to the target URL
@@ -127,22 +127,22 @@ class LoginAction implements RequestHandlerInterface
             throw new Exception(I18N::translate('The username or password is incorrect.'));
         }
 
-        if ($user->getPreference(User::PREF_IS_EMAIL_VERIFIED) !== '1') {
+        if ($user->getPreference(UserInterface::PREF_IS_EMAIL_VERIFIED) !== '1') {
             Log::addAuthenticationLog('Login failed (not verified by user): ' . $username);
             throw new Exception(I18N::translate('This account has not been verified. Please check your email for a verification message.'));
         }
 
-        if ($user->getPreference(User::PREF_IS_ACCOUNT_APPROVED) !== '1') {
+        if ($user->getPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED) !== '1') {
             Log::addAuthenticationLog('Login failed (not approved by admin): ' . $username);
             throw new Exception(I18N::translate('This account has not been approved. Please wait for an administrator to approve it.'));
         }
 
         Auth::login($user);
         Log::addAuthenticationLog('Login: ' . Auth::user()->userName() . '/' . Auth::user()->realName());
-        Auth::user()->setPreference(User::PREF_TIMESTAMP_ACTIVE, (string) Carbon::now()->unix());
+        Auth::user()->setPreference(UserInterface::PREF_TIMESTAMP_ACTIVE, (string) Carbon::now()->unix());
 
-        Session::put('language', Auth::user()->getPreference(User::PREF_LANGUAGE));
-        Session::put('theme', Auth::user()->getPreference(User::PREF_THEME));
-        I18N::init(Auth::user()->getPreference(User::PREF_LANGUAGE));
+        Session::put('language', Auth::user()->getPreference(UserInterface::PREF_LANGUAGE));
+        Session::put('theme', Auth::user()->getPreference(UserInterface::PREF_THEME));
+        I18N::init(Auth::user()->getPreference(UserInterface::PREF_LANGUAGE));
     }
 }

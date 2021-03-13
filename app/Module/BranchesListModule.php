@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -25,14 +25,12 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Family;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodePedi;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Soundex;
 use Fisharebest\Webtrees\Tree;
-use Fisharebest\Webtrees\User;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -151,7 +149,7 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
     }
 
     /**
-     * @return string[]
+     * @return array<string>
      */
     public function listUrlAttributes(): array
     {
@@ -201,7 +199,7 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
             $this->layout = 'layouts/ajax';
 
             // Highlight direct-line ancestors of this individual.
-            $xref = $tree->getUserPreference($user, User::PREF_TREE_ACCOUNT_XREF);
+            $xref = $tree->getUserPreference($user, UserInterface::PREF_TREE_ACCOUNT_XREF);
             $self = Registry::individualFactory()->make($xref, $tree);
 
             if ($surname !== '') {
@@ -414,7 +412,7 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
                     $pedi = $fact->attribute('PEDI');
 
                     if ($pedi !== '' && $pedi !== 'birth') {
-                        $pedigree  = GedcomCodePedi::getValue($pedi, $individual);
+                        $pedigree  = Registry::elementFactory()->make('INDI:FAMC:PEDI')->value($pedi, $tree);
                         $indi_html = '<span class="red">' . $pedigree . '</span> ' . $indi_html;
                     }
                     break;
@@ -497,7 +495,7 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
      *
      * @return string
      */
-    private static function sosaGeneration($sosa): string
+    private static function sosaGeneration(int $sosa): string
     {
         $generation = (int) log($sosa, 2) + 1;
 

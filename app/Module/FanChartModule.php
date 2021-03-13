@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -271,22 +271,22 @@ class FanChartModule extends AbstractModule implements ModuleChartInterface, Req
         $sosa = 2 ** $generations - 1;
 
         // fan size
-        $fanw = 640 * $width / 100;
+        $fanw = intdiv(640 * $width, 100);
         $cx   = $fanw / 2 - 1; // center x
         $cy   = $cx; // center y
         $rx   = $fanw - 1;
         $rw   = $fanw / ($gen + 1);
         $fanh = $fanw; // fan height
         if ($style === self::STYLE_HALF_CIRCLE) {
-            $fanh = $fanh * ($gen + 1) / ($gen * 2);
+            $fanh = intdiv($fanh * ($gen + 1), $gen * 2);
         }
         if ($style === self::STYLE_THREE_QUARTER_CIRCLE) {
-            $fanh *= 0.86;
+            $fanh = intdiv($fanw * 86, 100);
         }
         $scale = $fanw / 640;
 
         // Create the image
-        $image = imagecreate((int) $fanw, (int) $fanh);
+        $image = imagecreate($fanw, $fanh);
 
         // Create colors
         $transparent = imagecolorallocate($image, 0, 0, 0);
@@ -303,7 +303,7 @@ class FanChartModule extends AbstractModule implements ModuleChartInterface, Req
             'U' => $this->imageColor($image, $theme->parameter('chart-background-u')),
         ];
 
-        imagefilledrectangle($image, 0, 0, (int) $fanw, (int) $fanh, $transparent);
+        imagefilledrectangle($image, 0, 0, $fanw, $fanh, $transparent);
 
         $fandeg = 90 * $style;
 

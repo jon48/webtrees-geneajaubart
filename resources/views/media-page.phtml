@@ -1,25 +1,36 @@
 <?php
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Fact;
+use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Functions\FunctionsPrint;
 use Fisharebest\Webtrees\Functions\FunctionsPrintFacts;
-use Fisharebest\Webtrees\GedcomTag;
+use Fisharebest\Webtrees\Http\RequestHandlers\AddMediaFileModal;
 use Fisharebest\Webtrees\Http\RequestHandlers\AddNewFact;
 use Fisharebest\Webtrees\Http\RequestHandlers\DeleteFact;
+use Fisharebest\Webtrees\Http\RequestHandlers\EditMediaFileModal;
 use Fisharebest\Webtrees\Http\RequestHandlers\PendingChangesAcceptRecord;
 use Fisharebest\Webtrees\Http\RequestHandlers\PendingChangesRejectRecord;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Media;
+use Fisharebest\Webtrees\Note;
+use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Source;
+use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
+use League\Flysystem\FilesystemInterface;
 
 /**
- * @var Collection $clipboard_facts
- * @var Collection $facts
- * @var Collection $families
- * @var Collection $individuals
- * @var Media      $media
- * @var Collection $notes
- * @var Collection $sources
+ * @var Collection<Fact>       $clipboard_facts
+ * @var FilesystemInterface    $data_filesystem
+ * @var Collection<Fact>       $facts
+ * @var Collection<Family>     $families
+ * @var Collection<Individual> $individuals
+ * @var Media                  $media
+ * @var Collection<Note>       $notes
+ * @var Collection<Source>     $sources
+ * @var Tree                   $tree
  */
 ?>
 
@@ -87,12 +98,12 @@ use Illuminate\Support\Collection;
         <div class="tab-pane active fade show" role="tabpanel" id="details">
             <table class="table wt-facts-table">
                 <?php foreach ($media->mediaFiles() as $media_file) : ?>
-                    <tr class="<?= $media_file->isPendingAddition() ? 'wt-new' : '' ?><?= $media_file->isPendingDeletion() ? 'wt-old' : '' ?>">
+                    <tr class="<?= $media_file->isPendingAddition() ? 'wt-new' : '' ?> <?= $media_file->isPendingDeletion() ? 'wt-old' : '' ?>">
                         <th scope="row">
                             <?= I18N::translate('Media file') ?>
                             <?php if ($media->canEdit()) : ?>
                                 <div class="editfacts nowrap">
-                                    <a class="btn btn-link" href="#" data-toggle="modal" data-backdrop="static" data-target="#wt-ajax-modal" data-href="<?= route('edit-media-file', ['tree' => $media->tree()->name(), 'xref' => $media->xref(), 'fact_id' => $media_file->factId()]) ?>" title="<?= I18N::translate('Edit') ?>">
+                                    <a class="btn btn-link" href="#" data-toggle="modal" data-backdrop="static" data-target="#wt-ajax-modal" data-href="<?= route(EditMediaFileModal::class, ['tree' => $media->tree()->name(), 'xref' => $media->xref(), 'fact_id' => $media_file->factId()]) ?>" title="<?= I18N::translate('Edit') ?>">
                                         <?= view('icons/edit') ?>
                                         <span class="sr-only">
                                         <?= I18N::translate('Edit') ?>
@@ -114,19 +125,19 @@ use Illuminate\Support\Collection;
                         <td class="d-flex justify-content-between">
                             <div>
                                 <?php if ($media_file->isExternal()) : ?>
-                                    <?= GedcomTag::getLabelValue('URL', e($media_file->filename())) ?>
+                                    <?= Registry::elementFactory()->make('OBJE:FILE')->labelValue($media_file->filename(), $media->tree()) ?>
                                 <?php elseif (Auth::isEditor($media->tree())) :?>
                                     <?php if (!$media_file->fileExists($data_filesystem)) : ?>
                                         <p class="alert alert-danger">
                                             <?= I18N::translate('The file “%s” does not exist.', e($media_file->filename())) ?>
                                         </p>
                                     <?php endif ?>
-                                    <?= GedcomTag::getLabelValue('FILE', e($media_file->filename())) ?>
+                                    <?= Registry::elementFactory()->make('OBJE:FILE')->labelValue($media_file->filename(), $media->tree()) ?>
                                 <?php endif ?>
 
-                                <?= GedcomTag::getLabelValue('TITL', e($media_file->title())) ?>
-                                <?= GedcomTag::getLabelValue('TYPE', GedcomTag::getFileFormTypeValue(e($media_file->type()))) ?>
-                                <?= GedcomTag::getLabelValue('FORM', e($media_file->format())) ?>
+                                <?= Registry::elementFactory()->make('OBJE:FILE:TITL')->labelValue($media_file->title(), $media->tree()) ?>
+                                <?= Registry::elementFactory()->make('OBJE:FILE:FORM:TYPE')->labelValue($media_file->type(), $media->tree()) ?>
+                                <?= Registry::elementFactory()->make('OBJE:FILE:FORM')->labelValue($media_file->format(), $media->tree()) ?>
                             </div>
 
                             <div>
@@ -195,7 +206,7 @@ use Illuminate\Support\Collection;
                             <?= I18N::translate('Media file') ?>
                         </th>
                         <td>
-                            <a href="#" data-href="<?= e(route('add-media-file', ['tree' => $media->tree()->name(), 'xref' => $media->xref()])) ?>" data-target="#wt-ajax-modal" data-toggle="modal" data-backdrop="static">
+                            <a href="#" data-href="<?= e(route(AddMediaFileModal::class, ['tree' => $media->tree()->name(), 'xref' => $media->xref()])) ?>" data-target="#wt-ajax-modal" data-toggle="modal" data-backdrop="static">
                                 <?= I18N::translate('Add a media file') ?>
                             </a>
                         </td>

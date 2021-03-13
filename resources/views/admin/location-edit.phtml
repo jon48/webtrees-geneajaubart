@@ -1,6 +1,7 @@
 <?php
 
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataList;
+use Fisharebest\Webtrees\Http\RequestHandlers\MapDataSave;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\PlaceLocation;
 use Fisharebest\Webtrees\View;
@@ -11,7 +12,7 @@ use Fisharebest\Webtrees\View;
  * @var string               $longitude
  * @var PlaceLocation        $location
  * @var array<array<float>>  $map_bounds
- * @var <array<float>        $marker_position
+ * @var array<float>         $marker_position
  * @var PlaceLocation        $parent
  * @var mixed                $provider
  * @var string               $title
@@ -29,7 +30,7 @@ use Fisharebest\Webtrees\View;
     </div>
 </div>
 
-<form method="post">
+<form method="post" action="<?= e(route(MapDataSave::class)) ?>">
     <?= csrf_field() ?>
     <input type="hidden" name="place_id" value="<?= e($location->id()) ?>">
 
@@ -38,10 +39,8 @@ use Fisharebest\Webtrees\View;
             <?= I18N::translate('Place') ?>
         </label>
         <div class="col-sm-3">
-            <input type="text" id="new_place_name" name="new_place_name" value="<?= e($location->locationName()) ?>" class="form-control" required maxlength="120" pattern="[^,]+">
+            <input type="text" id="new_place_name" name="new_place_name" value="<?= e($location->locationName()) ?>" class="form-control" required="required" maxlength="120" pattern="[^,]+" dir="auto">
         </div>
-
-        <input type="hidden" name="icon" id="icon" class="form-control" value="<?= e($location->icon()) ?>">
     </div>
 
     <div class="form-group row">
@@ -50,7 +49,7 @@ use Fisharebest\Webtrees\View;
         </label>
         <div class="col-sm-3">
             <div class="input-group">
-                <input type="text" dir="ltr" id="new_place_lati" class="editable form-control" name="new_place_lati" required placeholder="<?= I18N::translate('degrees') ?>" value="<?= e($latitude) ?>">
+                <input type="text" dir="ltr" id="new_place_lati" class="editable form-control" name="new_place_lati" placeholder="<?= I18N::translate('degrees') ?>" value="<?= e($latitude) ?>">
             </div>
         </div>
     </div>
@@ -61,11 +60,9 @@ use Fisharebest\Webtrees\View;
         </label>
         <div class="col-sm-3">
             <div class="input-group">
-                <input type="text" dir="ltr" id="new_place_long" class="editable form-control" name="new_place_long" required placeholder="<?= I18N::translate('degrees') ?>" value="<?= e($longitude) ?>">
+                <input type="text" dir="ltr" id="new_place_long" class="editable form-control" name="new_place_long" placeholder="<?= I18N::translate('degrees') ?>" value="<?= e($longitude) ?>">
             </div>
         </div>
-
-        <input type="hidden" id="new_zoom_factor" name="new_zoom_factor" value="<?= e($location->zoom()) ?>" class="form-control">
     </div>
 
     <div class="form-group row">
@@ -96,12 +93,11 @@ use Fisharebest\Webtrees\View;
     'use strict';
 
     window.WT_OSM_ADMIN = (function () {
-        const minZoom = 2;
+        const minZoom   = 2;
+        const provider  = <?= json_encode($provider) ?>;
+        const add_place = <?= json_encode($location->id() === null) ?>;
 
-        let provider = <?= json_encode($provider) ?>;
         let map = null;
-        let add_place = <?= json_encode($location->id() === 0) ?>;
-
         // map components
 
         // postcss_image_inliner breaks the autodetection of image paths.
@@ -116,7 +112,6 @@ use Fisharebest\Webtrees\View;
                 map.panTo(coords);
                 $('#new_place_lati').val(Number(coords.lat).toFixed(5));
                 $('#new_place_long').val(Number(coords.lng).toFixed(5));
-                $('#new_zoom_factor').val(Number(map.getZoom()));
             });
 
         //reset map to initial state
@@ -163,15 +158,14 @@ use Fisharebest\Webtrees\View;
         })
             .on('markgeocode', function (result) {
                 let coords = result.geocode.center;
-                let place = result.geocode.name.split(',', 1);
+                let place = result.geocode.name.split(',', 1).toString();
                 marker.setLatLng(coords);
                 map.panTo(coords);
                 if (add_place) {
-                    $('#new_place_name').val(place.shift());
+                    $('#new_place_name').val(place);
                 }
                 $('#new_place_lati').val(Number(coords.lat).toFixed(5));
                 $('#new_place_long').val(Number(coords.lng).toFixed(5));
-                $('#new_zoom_factor').val(Number(map.getZoom()));
             });
 
         /**
@@ -203,7 +197,7 @@ use Fisharebest\Webtrees\View;
             .addLayer(L.tileLayer(provider.url, provider.options))
             .fitBounds(<?= json_encode($map_bounds) ?>, {padding: [50, 30]})
             .on('zoomend', function () {
-                $('#new_zoom_factor').val(map.getZoom());
+              $('.editable').trigger('change');
             });
 
         return 'Leaflet map interface for webtrees-2';

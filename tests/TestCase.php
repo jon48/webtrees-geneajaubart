@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -25,6 +25,7 @@ use Fig\Http\Message\RequestMethodInterface;
 use Fisharebest\Webtrees\Factories\CacheFactory;
 use Fisharebest\Webtrees\Factories\FamilyFactory;
 use Fisharebest\Webtrees\Factories\FilesystemFactory;
+use Fisharebest\Webtrees\Factories\ElementFactory;
 use Fisharebest\Webtrees\Factories\GedcomRecordFactory;
 use Fisharebest\Webtrees\Factories\HeaderFactory;
 use Fisharebest\Webtrees\Factories\IndividualFactory;
@@ -90,6 +91,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         Registry::cache(new CacheFactory());
         Registry::familyFactory(new FamilyFactory());
         Registry::filesystem(new FilesystemFactory());
+        Registry::elementFactory(new ElementFactory());
         Registry::gedcomRecordFactory(new GedcomRecordFactory());
         Registry::headerFactory(new HeaderFactory());
         Registry::individualFactory(new IndividualFactory());
@@ -241,10 +243,10 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $tree         = $tree_service->create(basename($gedcom_file), basename($gedcom_file));
         $stream       = app(StreamFactoryInterface::class)->createStreamFromFile(__DIR__ . '/data/' . $gedcom_file);
 
-        $tree->importGedcomFile($stream, $gedcom_file);
+        $tree_service->importGedcomFile($tree, $stream, $gedcom_file);
 
         $timeout_service = new TimeoutService(microtime(true));
-        $controller      = new GedcomLoad($timeout_service);
+        $controller      = new GedcomLoad($timeout_service, $tree_service);
         $request         = self::createRequest()->withAttribute('tree', $tree);
 
         do {

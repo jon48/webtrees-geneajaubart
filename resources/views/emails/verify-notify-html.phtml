@@ -1,6 +1,12 @@
 <?php
 
+use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\Http\RequestHandlers\UserEditPage;
 use Fisharebest\Webtrees\I18N;
+
+/**
+ * @var UserInterface $user
+ */
 
 ?>
 <div dir="<?= I18N::locale()->direction() ?>" lang="<?= I18N::locale()->languageTag() ?>">
@@ -22,8 +28,8 @@ use Fisharebest\Webtrees\I18N;
         <?= I18N::translate('You need to review the account details.') ?>
     </p>
 
-    <a href="<?= e(route('admin-users-edit', ['user_id' => $user->id()])) ?>">
-        <?= e(route('admin-users-edit', ['user_id' => $user->id()])) ?>
+    <a href="<?= e(route(UserEditPage::class, ['user_id' => $user->id()])) ?>">
+        <?= e(route(UserEditPage::class, ['user_id' => $user->id()])) ?>
     </a>
 
     <ul>

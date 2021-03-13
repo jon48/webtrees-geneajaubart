@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -21,6 +21,7 @@ namespace Fisharebest\Webtrees;
 
 use Closure;
 use Exception;
+use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Functions\FunctionsPrint;
 use Fisharebest\Webtrees\Http\RequestHandlers\GedcomRecordPage;
 use Fisharebest\Webtrees\Services\PendingChangesService;
@@ -40,6 +41,7 @@ use function count;
 use function date;
 use function e;
 use function explode;
+use function implode;
 use function in_array;
 use function md5;
 use function preg_match;
@@ -50,10 +52,13 @@ use function preg_split;
 use function route;
 use function str_contains;
 use function str_pad;
+use function str_starts_with;
 use function strip_tags;
 use function strtoupper;
+use function substr_count;
 use function trim;
 
+use const PHP_INT_MAX;
 use const PREG_SET_ORDER;
 use const STR_PAD_LEFT;
 
@@ -111,7 +116,7 @@ class GedcomRecord
     /**
      * A closure which will create a record from a database row.
      *
-     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Factory::gedcomRecord()
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Registry::gedcomRecordFactory()
      *
      * @param Tree $tree
      *
@@ -177,7 +182,7 @@ class GedcomRecord
      * we just receive the XREF. For bulk records (such as lists
      * and search results) we can receive the GEDCOM data as well.
      *
-     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Factory::gedcomRecord()
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Registry::gedcomRecordFactory()
      *
      * @param string      $xref
      * @param Tree        $tree
@@ -390,7 +395,7 @@ class GedcomRecord
     /**
      * Derived classes should redefine this function, otherwise the object will have no name
      *
-     * @return string[][]
+     * @return array<array<string>>
      */
     public function getAllNames(): array
     {
@@ -493,7 +498,7 @@ class GedcomRecord
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->xref . '@' . $this->tree->id();
     }
@@ -785,7 +790,7 @@ class GedcomRecord
     public function getAllEventDates(array $events): array
     {
         $dates = [];
-        foreach ($this->facts($events) as $event) {
+        foreach ($this->facts($events, false, null, true) as $event) {
             if ($event->date()->isOK()) {
                 $dates[] = $event->date();
             }
@@ -1001,7 +1006,7 @@ class GedcomRecord
 
             $this->pending = $new_gedcom;
 
-            if (Auth::user()->getPreference(User::PREF_AUTO_ACCEPT_EDITS) === '1') {
+            if (Auth::user()->getPreference(UserInterface::PREF_AUTO_ACCEPT_EDITS) === '1') {
                 app(PendingChangesService::class)->acceptRecord($this);
                 $this->gedcom  = $new_gedcom;
                 $this->pending = null;
@@ -1048,7 +1053,7 @@ class GedcomRecord
         $this->pending = $gedcom;
 
         // Accept this pending change
-        if (Auth::user()->getPreference(User::PREF_AUTO_ACCEPT_EDITS) === '1') {
+        if (Auth::user()->getPreference(UserInterface::PREF_AUTO_ACCEPT_EDITS) === '1') {
             app(PendingChangesService::class)->acceptRecord($this);
             $this->gedcom  = $gedcom;
             $this->pending = null;
@@ -1078,7 +1083,7 @@ class GedcomRecord
         }
 
         // Auto-accept this pending change
-        if (Auth::user()->getPreference(User::PREF_AUTO_ACCEPT_EDITS) === '1') {
+        if (Auth::user()->getPreference(UserInterface::PREF_AUTO_ACCEPT_EDITS) === '1') {
             app(PendingChangesService::class)->acceptRecord($this);
         }
 
@@ -1179,7 +1184,7 @@ class GedcomRecord
      */
     protected function createPrivateGedcomRecord(int $access_level): string
     {
-        return '0 @' . $this->xref . '@ ' . static::RECORD_TYPE . "\n1 NOTE " . I18N::translate('Private');
+        return '0 @' . $this->xref . '@ ' . static::RECORD_TYPE;
     }
 
     /**
@@ -1298,7 +1303,7 @@ class GedcomRecord
         }
 
         // We should always be able to see our own record (unless an admin is applying download restrictions)
-        if ($this->xref() === $this->tree->getUserPreference(Auth::user(), User::PREF_TREE_ACCOUNT_XREF) && $access_level === Auth::accessLevel($this->tree)) {
+        if ($this->xref() === $this->tree->getUserPreference(Auth::user(), UserInterface::PREF_TREE_ACCOUNT_XREF) && $access_level === Auth::accessLevel($this->tree)) {
             return true;
         }
 
@@ -1326,5 +1331,84 @@ class GedcomRecord
 
         // Different types of record have different privacy rules
         return $this->canShowByType($access_level);
+    }
+
+    /**
+     * Lock the database row, to prevent concurrent edits.
+     */
+    public function lock(): void
+    {
+        DB::table('other')
+            ->where('o_file', '=', $this->tree->id())
+            ->where('o_id', '=', $this->xref())
+            ->lockForUpdate()
+            ->get();
+    }
+
+    /**
+     * Add blank lines, to allow a user to add/edit new values.
+     *
+     * @return string
+     */
+    public function insertMissingSubtags(): string
+    {
+        $gedcom = $this->insertMissingLevels($this->tag(), $this->gedcom());
+
+        return preg_replace('/^0.*\n/', '', $gedcom);
+    }
+
+    /**
+     * @param string $tag
+     * @param string $gedcom
+     *
+     * @return string
+     */
+    protected function insertMissingLevels(string $tag, string $gedcom): string
+    {
+        $next_level = substr_count($tag, ':') + 1;
+        $factory    = Registry::elementFactory();
+        $subtags    = $factory->make($tag)->subtags();
+
+        // The first part is level N (includes CONT records).  The remainder are level N+1.
+        $parts  = preg_split('/\n(?=' . $next_level . ')/', $gedcom);
+        $return = array_shift($parts);
+
+        foreach ($subtags as $subtag => $occurrences) {
+            [$min, $max] = explode(':', $occurrences);
+            if ($max === 'M') {
+                $max = PHP_INT_MAX;
+            } else {
+                $max = (int) $max;
+            }
+
+            $count = 0;
+
+            // Add expected subtags in our preferred order.
+            foreach ($parts as $n => $part) {
+                if (str_starts_with($part, $next_level . ' ' . $subtag)) {
+                    $return .= "\n" . $this->insertMissingLevels($tag . ':' . $subtag, $part);
+                    $count++;
+                    unset($parts[$n]);
+                }
+            }
+
+            // Allowed to have more of this subtag?
+            if ($count < $max) {
+                // Create a new one.
+                $gedcom  = $next_level . ' ' . $subtag;
+                $default = $factory->make($tag . ':' . $subtag)->default($this->tree);
+                if ($default !== '') {
+                    $gedcom .= ' ' . $default;
+                }
+                $return .= "\n" . $this->insertMissingLevels($tag . ':' . $subtag, $gedcom);
+            }
+        }
+
+        // Now add any unexpected/existing data.
+        if ($parts !== []) {
+            $return .= "\n" . implode("\n", $parts);
+        }
+
+        return $return;
     }
 }

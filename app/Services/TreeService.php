@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -20,21 +20,24 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Services;
 
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Functions\FunctionsImport;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\Tree;
-use Fisharebest\Webtrees\User;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
+use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use stdClass;
 
 use function assert;
+use function strlen;
+use function substr;
 
 /**
  * Tree management and queries.
@@ -88,18 +91,18 @@ class TreeService
                     ->leftJoin('user_gedcom_setting', static function (JoinClause $join): void {
                         $join->on('user_gedcom_setting.gedcom_id', '=', 'gedcom.gedcom_id')
                             ->where('user_gedcom_setting.user_id', '=', Auth::id())
-                            ->where('user_gedcom_setting.setting_name', '=', User::PREF_TREE_ROLE);
+                            ->where('user_gedcom_setting.setting_name', '=', UserInterface::PREF_TREE_ROLE);
                     })
                     ->where(static function (Builder $query): void {
                         $query
                             // Managers
-                            ->where('user_gedcom_setting.setting_value', '=', User::ROLE_MANAGER)
+                            ->where('user_gedcom_setting.setting_value', '=', UserInterface::ROLE_MANAGER)
                             // Members
                             ->orWhere(static function (Builder $query): void {
                                 $query
                                     ->where('gs2.setting_value', '=', '1')
                                     ->where('gs3.setting_value', '=', '1')
-                                    ->where('user_gedcom_setting.setting_value', '<>', User::ROLE_VISITOR);
+                                    ->where('user_gedcom_setting.setting_value', '<>', UserInterface::ROLE_VISITOR);
                             })
                             // Public trees
                             ->orWhere(static function (Builder $query): void {
@@ -139,7 +142,7 @@ class TreeService
     /**
      * All trees, name => title
      *
-     * @return string[]
+     * @return array<string>
      */
     public function titles(): array
     {
@@ -208,6 +211,55 @@ class TreeService
     }
 
     /**
+     * Import data from a gedcom file into this tree.
+     *
+     * @param Tree            $tree
+     * @param StreamInterface $stream   The GEDCOM file.
+     * @param string          $filename The preferred filename, for export/download.
+     *
+     * @return void
+     */
+    public function importGedcomFile(Tree $tree, StreamInterface $stream, string $filename): void
+    {
+        // Read the file in blocks of roughly 64K. Ensure that each block
+        // contains complete gedcom records. This will ensure we don’t split
+        // multi-byte characters, as well as simplifying the code to import
+        // each block.
+
+        $file_data = '';
+
+        $tree->setPreference('gedcom_filename', $filename);
+        $tree->setPreference('imported', '0');
+
+        DB::table('gedcom_chunk')->where('gedcom_id', '=', $tree->id())->delete();
+
+        while (!$stream->eof()) {
+            $file_data .= $stream->read(65536);
+            // There is no strrpos() function that searches for substrings :-(
+            for ($pos = strlen($file_data) - 1; $pos > 0; --$pos) {
+                if ($file_data[$pos] === '0' && ($file_data[$pos - 1] === "\n" || $file_data[$pos - 1] === "\r")) {
+                    // We’ve found the last record boundary in this chunk of data
+                    break;
+                }
+            }
+            if ($pos) {
+                DB::table('gedcom_chunk')->insert([
+                    'gedcom_id'  => $tree->id(),
+                    'chunk_data' => substr($file_data, 0, $pos),
+                ]);
+
+                $file_data = substr($file_data, $pos);
+            }
+        }
+        DB::table('gedcom_chunk')->insert([
+            'gedcom_id'  => $tree->id(),
+            'chunk_data' => $file_data,
+        ]);
+
+        $stream->close();
+    }
+
+    /**
      * @param Tree $tree
      */
     public function delete(Tree $tree): void
@@ -217,7 +269,9 @@ class TreeService
             Site::setPreference('DEFAULT_GEDCOM', '');
         }
 
-        $tree->deleteGenealogyData(false);
+        DB::table('gedcom_chunk')->where('gedcom_id', '=', $tree->id())->delete();
+
+        $this->deleteGenealogyData($tree, false);
 
         DB::table('block_setting')
             ->join('block', 'block.block_id', '=', 'block_setting.block_id')
@@ -232,6 +286,40 @@ class TreeService
         DB::table('gedcom_chunk')->where('gedcom_id', '=', $tree->id())->delete();
         DB::table('log')->where('gedcom_id', '=', $tree->id())->delete();
         DB::table('gedcom')->where('gedcom_id', '=', $tree->id())->delete();
+    }
+
+    /**
+     * Delete all the genealogy data from a tree - in preparation for importing
+     * new data. Optionally retain the media data, for when the user has been
+     * editing their data offline using an application which deletes (or does not
+     * support) media data.
+     *
+     * @param Tree $tree
+     * @param bool $keep_media
+     *
+     * @return void
+     */
+    public function deleteGenealogyData(Tree $tree, bool $keep_media): void
+    {
+        DB::table('individuals')->where('i_file', '=', $tree->id())->delete();
+        DB::table('families')->where('f_file', '=', $tree->id())->delete();
+        DB::table('sources')->where('s_file', '=', $tree->id())->delete();
+        DB::table('other')->where('o_file', '=', $tree->id())->delete();
+        DB::table('places')->where('p_file', '=', $tree->id())->delete();
+        DB::table('placelinks')->where('pl_file', '=', $tree->id())->delete();
+        DB::table('name')->where('n_file', '=', $tree->id())->delete();
+        DB::table('dates')->where('d_file', '=', $tree->id())->delete();
+        DB::table('change')->where('gedcom_id', '=', $tree->id())->delete();
+
+        if ($keep_media) {
+            DB::table('link')->where('l_file', '=', $tree->id())
+                ->where('l_type', '<>', 'OBJE')
+                ->delete();
+        } else {
+            DB::table('link')->where('l_file', '=', $tree->id())->delete();
+            DB::table('media_file')->where('m_file', '=', $tree->id())->delete();
+            DB::table('media')->where('m_file', '=', $tree->id())->delete();
+        }
     }
 
     /**

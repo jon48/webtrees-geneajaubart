@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -248,9 +248,9 @@ class YahrzeitModule extends AbstractModule implements ModuleBlockInterface
      */
     public function editBlockConfiguration(Tree $tree, int $block_id): string
     {
-        $calendar  = $this->getBlockSetting($block_id, 'calendar', 'jewish');
-        $days      = $this->getBlockSetting($block_id, 'days', self::DEFAULT_DAYS);
-        $infoStyle = $this->getBlockSetting($block_id, 'infoStyle', 'table');
+        $calendar   = $this->getBlockSetting($block_id, 'calendar', 'jewish');
+        $days       = $this->getBlockSetting($block_id, 'days', self::DEFAULT_DAYS);
+        $info_style = $this->getBlockSetting($block_id, 'infoStyle', 'table');
 
         $styles = [
             /* I18N: An option in a list-box */
@@ -265,12 +265,12 @@ class YahrzeitModule extends AbstractModule implements ModuleBlockInterface
         ];
 
         return view('modules/yahrzeit/config', [
-            'calendar'  => $calendar,
-            'calendars' => $calendars,
-            'days'      => $days,
-            'infoStyle' => $infoStyle,
-            'max_days'  => self::MAX_DAYS,
-            'styles'    => $styles,
+            'calendar'   => $calendar,
+            'calendars'  => $calendars,
+            'days'       => $days,
+            'info_style' => $info_style,
+            'max_days'   => self::MAX_DAYS,
+            'styles'     => $styles,
         ]);
     }
 }

@@ -2,11 +2,21 @@
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Config;
+use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Functions\FunctionsEdit;
+use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\Http\RequestHandlers\EditFactAction;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
 use Ramsey\Uuid\Uuid;
+
+/**
+ * @var string       $fact
+ * @var GedcomRecord $record
+ * @var string       $title
+ * @var Tree         $tree
+ */
 
 ?>
 

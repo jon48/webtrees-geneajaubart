@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -25,6 +25,7 @@ use Fisharebest\Webtrees\Http\Middleware\BadBotBlocker;
 use Fisharebest\Webtrees\Http\Middleware\BootModules;
 use Fisharebest\Webtrees\Http\Middleware\CheckForMaintenanceMode;
 use Fisharebest\Webtrees\Http\Middleware\ClientIp;
+use Fisharebest\Webtrees\Http\Middleware\CompressResponse;
 use Fisharebest\Webtrees\Http\Middleware\DoHousekeeping;
 use Fisharebest\Webtrees\Http\Middleware\EmitResponse;
 use Fisharebest\Webtrees\Http\Middleware\HandleExceptions;
@@ -92,13 +93,13 @@ class Webtrees
     public const NAME = 'webtrees';
 
     // Required version of database tables/columns/indexes/etc.
-    public const SCHEMA_VERSION = 44;
+    public const SCHEMA_VERSION = 45;
 
     // e.g. "-dev", "-alpha", "-beta", etc.
     public const STABILITY = '';
 
     // Version number
-    public const VERSION = '2.0.11' . self::STABILITY;
+    public const VERSION = '2.0.12' . self::STABILITY;
 
     // Project website.
     public const URL = 'https://webtrees.net/';
@@ -118,6 +119,7 @@ class Webtrees
         HandleExceptions::class,
         ClientIp::class,
         RegisterFactories::class,
+        CompressResponse::class,
         BadBotBlocker::class,
         UseDatabase::class,
         UseDebugbar::class,
@@ -181,7 +183,7 @@ class Webtrees
     /**
      * The webtrees application is built from middleware.
      *
-     * @return string[]
+     * @return array<string>
      */
     public function middleware(): array
     {

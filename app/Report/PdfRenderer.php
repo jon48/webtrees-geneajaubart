@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -540,7 +540,7 @@ class PdfRenderer extends AbstractRenderer
      *
      * @return ReportBaseCell
      */
-    public function createCell($width, $height, $border, $align, $bgcolor, $style, $ln, $top, $left, $fill, $stretch, $bocolor, $tcolor, $reseth): ReportBaseCell
+    public function createCell(int $width, int $height, $border, string $align, string $bgcolor, string $style, int $ln, $top, $left, int $fill, int $stretch, string $bocolor, string $tcolor, bool $reseth): ReportBaseCell
     {
         return new ReportPdfCell($width, $height, $border, $align, $bgcolor, $style, $ln, $top, $left, $fill, $stretch, $bocolor, $tcolor, $reseth);
     }
@@ -600,7 +600,7 @@ class PdfRenderer extends AbstractRenderer
      *
      * @return ReportBaseFootnote
      */
-    public function createFootnote($style): ReportBaseFootnote
+    public function createFootnote(string $style): ReportBaseFootnote
     {
         return new ReportPdfFootnote($style);
     }

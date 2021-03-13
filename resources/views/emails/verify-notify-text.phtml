@@ -1,6 +1,12 @@
 <?php
 
+use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\Http\RequestHandlers\UserEditPage;
 use Fisharebest\Webtrees\I18N;
+
+/**
+ * @var UserInterface $user
+ */
 
 ?>
 <?= I18N::translate('Hello administrator…') ?>
@@ -14,7 +20,7 @@ use Fisharebest\Webtrees\I18N;
 
 <?= I18N::translate('You need to review the account details.') ?>
 
-<?= route('admin-users-edit', ['user_id' => $user->id()]) ?>
+<?= route(UserEditPage::class, ['user_id' => $user->id()]) ?>
 
 <?= /* I18N: You need to: */ I18N::translate('Set the status to “approved”.') ?>
 <?= /* I18N: You need to: */ I18N::translate('Set the access level for each tree.') ?>

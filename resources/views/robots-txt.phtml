@@ -1,8 +1,24 @@
+<?php
+
+/**
+ * @var array<string> $bad_user_agents
+ * @var string        $base_path
+ * @var string        $base_url
+ * @var string        $sitemap_url
+ */
+
+?>
 # robots.txt for <?= $base_url ?>
 
 <?php if ($base_path !== '') : ?>
 # CAUTION!  This robots.txt needs to be copied to the root folder.
 <?php endif ?>
+
+<?php foreach ($bad_user_agents as $bad_user_agent): ?>
+User-agent: <?= $bad_user_agent ?>
+
+<?php endforeach ?>
+Disallow: /
 
 User-agent: *
 Disallow: <?= $base_path ?>/admin

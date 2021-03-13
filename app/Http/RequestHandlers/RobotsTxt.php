@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,13 +12,14 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
+use Fisharebest\Webtrees\Http\Middleware\BadBotBlocker;
 use Fisharebest\Webtrees\Module\SiteMapModule;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Psr\Http\Message\ResponseInterface;
@@ -65,6 +66,7 @@ class RobotsTxt implements RequestHandlerInterface
         $base_url = $request->getAttribute('base_url');
 
         $data = [
+            'bad_user_agents'  => BadBotBlocker::BAD_ROBOTS,
             'base_url'         => $base_url,
             'base_path'        => parse_url($base_url, PHP_URL_PATH) ?? '',
             'disallowed_paths' => self::DISALLOWED_PATHS,

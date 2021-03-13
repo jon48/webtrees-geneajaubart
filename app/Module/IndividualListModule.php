@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -147,7 +147,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
     }
 
     /**
-     * @return string[]
+     * @return array<string>
      */
     public function listUrlAttributes(): array
     {
@@ -662,20 +662,15 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
             ->orderBy('initial')
             ->pluck(new Expression('COUNT(*) AS aggregate'), new Expression('UPPER(SUBSTR(n_givn, 1, 1)) AS initial'));
 
-        $specials = ['@'];
-
         foreach ($rows as $alpha => $count) {
             if ($alpha !== '@') {
                 $alphas[$alpha] = (int) $count;
             }
         }
 
-        foreach ($specials as $special) {
-            if ($rows->has('@')) {
-                $alphas['@'] = (int) $rows['@'];
-            }
+        if ($rows->has('@')) {
+            $alphas['@'] = (int) $rows['@'];
         }
-
 
         return $alphas;
     }
@@ -840,7 +835,7 @@ class IndividualListModule extends AbstractModule implements ModuleListInterface
      *
      * @return Family[]
      */
-    public function families(Tree $tree, $surn, $salpha, $galpha, $marnm, LocaleInterface $locale): array
+    public function families(Tree $tree, string $surn, string $salpha, string $galpha, bool $marnm, LocaleInterface $locale): array
     {
         $list = [];
         foreach ($this->individuals($tree, $surn, $salpha, $galpha, $marnm, true, $locale) as $indi) {

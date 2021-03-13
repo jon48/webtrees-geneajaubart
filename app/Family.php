@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -21,6 +21,7 @@ namespace Fisharebest\Webtrees;
 
 use Closure;
 use Fisharebest\Webtrees\Http\RequestHandlers\FamilyPage;
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
 
 /**
@@ -65,7 +66,7 @@ class Family extends GedcomRecord
     /**
      * A closure which will create a record from a database row.
      *
-     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Factory::family()
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Registry::familyFactory()
      *
      * @param Tree $tree
      *
@@ -93,7 +94,7 @@ class Family extends GedcomRecord
      * we just receive the XREF. For bulk records (such as lists
      * and search results) we can receive the GEDCOM data as well.
      *
-     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Factory::family()
+     * @deprecated since 2.0.4.  Will be removed in 2.1.0 - Use Registry::familyFactory()
      *
      * @param string      $xref
      * @param Tree        $tree
@@ -374,7 +375,7 @@ class Family extends GedcomRecord
     /**
      * Derived classes should redefine this function, otherwise the object will have no name
      *
-     * @return string[][]
+     * @return array<array<string>>
      */
     public function getAllNames(): array
     {
@@ -459,5 +460,17 @@ class Family extends GedcomRecord
         return
             $this->formatFirstMajorFact(Gedcom::MARRIAGE_EVENTS, 1) .
             $this->formatFirstMajorFact(Gedcom::DIVORCE_EVENTS, 1);
+    }
+
+    /**
+     * Lock the database row, to prevent concurrent edits.
+     */
+    public function lock(): void
+    {
+        DB::table('families')
+            ->where('f_file', '=', $this->tree->id())
+            ->where('f_id', '=', $this->xref())
+            ->lockForUpdate()
+            ->get();
     }
 }

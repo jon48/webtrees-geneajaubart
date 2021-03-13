@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -98,19 +98,20 @@ class SearchGeneralPage implements RequestHandlerInterface
 
         // What trees to search?
         if (Site::getPreference('ALLOW_CHANGE_GEDCOM') === '1') {
-            $all_trees = $this->tree_service->all()->all();
+            $all_trees = $this->tree_service->all();
         } else {
-            $all_trees = [$tree];
+            $all_trees = new Collection([$tree]);
         }
 
-        $search_tree_names = $params['search_trees'] ?? [];
+        $search_tree_names = new Collection($params['search_trees'] ?? []);
 
-        $search_trees = array_filter($all_trees, static function (Tree $tree) use ($search_tree_names): bool {
-            return in_array($tree->name(), $search_tree_names, true);
-        });
+        $search_trees = $all_trees
+            ->filter(static function (Tree $tree) use ($search_tree_names): bool {
+                return $search_tree_names->containsStrict($tree->name());
+            });
 
-        if ($search_trees === []) {
-            $search_trees = [$tree];
+        if ($search_trees->isEmpty()) {
+            $search_trees->add($tree);
         }
 
         // Do the search
@@ -122,12 +123,12 @@ class SearchGeneralPage implements RequestHandlerInterface
 
         if ($search_terms !== []) {
             if ($search_individuals) {
-                $individuals = $this->search_service->searchIndividuals($search_trees, $search_terms);
+                $individuals = $this->search_service->searchIndividuals($search_trees->all(), $search_terms);
             }
 
             if ($search_families) {
-                $tmp1 = $this->search_service->searchFamilies($search_trees, $search_terms);
-                $tmp2 = $this->search_service->searchFamilyNames($search_trees, $search_terms);
+                $tmp1 = $this->search_service->searchFamilies($search_trees->all(), $search_terms);
+                $tmp2 = $this->search_service->searchFamilyNames($search_trees->all(), $search_terms);
 
                 $families = $tmp1->merge($tmp2)->unique(static function (Family $family): string {
                     return $family->xref() . '@' . $family->tree()->id();
@@ -135,15 +136,15 @@ class SearchGeneralPage implements RequestHandlerInterface
             }
 
             if ($search_repositories) {
-                $repositories = $this->search_service->searchRepositories($search_trees, $search_terms);
+                $repositories = $this->search_service->searchRepositories($search_trees->all(), $search_terms);
             }
 
             if ($search_sources) {
-                $sources = $this->search_service->searchSources($search_trees, $search_terms);
+                $sources = $this->search_service->searchSources($search_trees->all(), $search_terms);
             }
 
             if ($search_notes) {
-                $notes = $this->search_service->searchNotes($search_trees, $search_terms);
+                $notes = $this->search_service->searchNotes($search_trees->all(), $search_terms);
             }
         }
 
@@ -190,7 +191,7 @@ class SearchGeneralPage implements RequestHandlerInterface
      *
      * @param string $query
      *
-     * @return string[]
+     * @return array<string>
      */
     private function extractSearchTerms(string $query): array
     {

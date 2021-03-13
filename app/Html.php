@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -36,7 +36,7 @@ class Html
     /**
      * Convert an array of HTML attributes to an HTML string.
      *
-     * @param mixed[] $attributes
+     * @param array<string,string|int|bool> $attributes
      *
      * @return string
      */
@@ -48,8 +48,8 @@ class Html
                 $html[] = e($key) . '="' . e($value) . '"';
             } elseif (is_int($value)) {
                 $html[] = e($key) . '="' . $value . '"';
-            } elseif ($value !== false) {
-                $html[] = e($key);
+            } elseif ($value === true) {
+                $html[] = e($key) . '="' . e($key) . '"';
             }
         }
 
@@ -59,12 +59,12 @@ class Html
     /**
      * Encode a URL.
      *
-     * @param string  $path
-     * @param mixed[] $data
+     * @param string       $path
+     * @param array<mixed> $data
      *
      * @return string
      */
-    public static function url($path, array $data): string
+    public static function url(string $path, array $data): string
     {
         $path = strtr($path, [' ' => '%20']);
 
@@ -82,7 +82,7 @@ class Html
      *
      * @return string
      */
-    public static function filename($filename): string
+    public static function filename(string $filename): string
     {
         return '<samp class="filename" dir="ltr">' . e($filename) . '</samp>';
     }

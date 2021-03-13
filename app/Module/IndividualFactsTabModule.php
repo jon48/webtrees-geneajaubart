@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -226,7 +226,17 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
         $gedcom = preg_replace('/\n2 TYPE .*/', '', $gedcom);
         $gedcom = preg_replace('/^1 .*/', "1 EVEN CLOSE_RELATIVE\n2 TYPE " . $type, $gedcom);
 
-        return new Fact($gedcom, $fact->record(), $fact->id());
+        $converted = new Fact($gedcom, $fact->record(), $fact->id());
+
+        if ($fact->isPendingAddition()) {
+            $converted->setPendingAddition();
+        }
+
+        if ($fact->isPendingDeletion()) {
+            $converted->setPendingDeletion();
+        }
+
+        return $converted;
     }
 
     /**
@@ -286,7 +296,7 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
      *
      * @return Fact[]
      */
-    private function childFacts(Individual $person, Family $family, $option, $relation, Date $min_date, Date $max_date): array
+    private function childFacts(Individual $person, Family $family, string $option, string $relation, Date $min_date, Date $max_date): array
     {
         $SHOW_RELATIVES_EVENTS = $person->tree()->getPreference('SHOW_RELATIVES_EVENTS');
 

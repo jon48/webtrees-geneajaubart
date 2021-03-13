@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -25,8 +25,6 @@ use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Gedcom;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeStat;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeTemp;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\Header;
@@ -87,7 +85,7 @@ class FunctionsPrint
      *
      * @return string
      */
-    private static function printNoteRecord(Tree $tree, $text, $nlevel, $nrec): string
+    private static function printNoteRecord(Tree $tree, string $text, int $nlevel, string $nrec): string
     {
         $text .= Functions::getCont($nlevel, $nrec);
 
@@ -147,7 +145,7 @@ class FunctionsPrint
      *
      * @return string HTML
      */
-    public static function printFactNotes(Tree $tree, $factrec, $level): string
+    public static function printFactNotes(Tree $tree, string $factrec, int $level): string
     {
         $data          = '';
         $previous_spos = 0;
@@ -286,7 +284,7 @@ class FunctionsPrint
      *
      * @return string
      */
-    public static function formatFactDate(Fact $event, GedcomRecord $record, $anchor, $time): string
+    public static function formatFactDate(Fact $event, GedcomRecord $record, bool $anchor, bool $time): string
     {
         $factrec = $event->gedcom();
         $html    = '';
@@ -336,23 +334,46 @@ class FunctionsPrint
                     $ageText = '';
                     if ($fact === 'DEAT' || Date::compare($date, $death_date) <= 0 || !$record->isDead()) {
                         // Before death, print age
-                        $age = (new Age($birth_date, $date))->ageAtEvent(false);
+                        $age = (string) new Age($birth_date, $date);
+
                         // Only show calculated age if it differs from recorded age
                         if ($age !== '') {
-                            if ($fact_age !== '' && $fact_age !== $age) {
-                                $ageText = $age;
-                            } elseif ($fact_age === '' && $husb_age === '' && $wife_age === '') {
-                                $ageText = $age;
-                            } elseif ($husb_age !== '' && $husb_age !== $age && $record->sex() === 'M') {
-                                $ageText = $age;
-                            } elseif ($wife_age !== '' && $wife_age !== $age && $record->sex() === 'F') {
-                                $ageText = $age;
+                            if (
+                                $fact_age !== '' && $fact_age !== $age ||
+                                $fact_age === '' && $husb_age === '' && $wife_age === '' ||
+                                $husb_age !== '' && $husb_age !== $age && $record->sex() === 'M' ||
+                                $wife_age !== '' && $wife_age !== $age && $record->sex() === 'F'
+                            ) {
+                                switch ($record->sex()) {
+                                    case 'M':
+                                        /* I18N: The age of an individual at a given date */
+                                        $ageText = I18N::translateContext('Male', '(aged %s)', $age);
+                                        break;
+                                    case 'F':
+                                        /* I18N: The age of an individual at a given date */
+                                        $ageText = I18N::translateContext('Female', '(aged %s)', $age);
+                                        break;
+                                    default:
+                                        /* I18N: The age of an individual at a given date */
+                                        $ageText = I18N::translate('(aged %s)', $age);
+                                        break;
+                                }
                             }
                         }
                     }
                     if ($fact !== 'DEAT' && $death_date->isOK() && Date::compare($death_date, $date) < 0) {
-                        // After death, print time since death
-                        $ageText = (new Age($death_date, $date))->timeAfterDeath();
+                        $death_day = $death_date->minimumDate()->day();
+                        $event_day = $date->minimumDate()->day();
+                        if ($death_day !== 0 && $event_day !== 0 && $death_day === $event_day) {
+                            // On the exact date of death?
+                            // NOTE: this path is never reached.  Keep the code (translation) in case
+                            // we decide to re-introduce it.
+                            $ageText = I18N::translate('(on the date of death)');
+                        } else {
+                            // After death
+                            $age = (string) new Age($death_date, $date);
+                            $ageText = I18N::translate('(%s after death)', $age);
+                        }
                         // Family events which occur after death are probably errors
                         if ($event->record() instanceof Family) {
                             $ageText .= view('icons/warning');
@@ -447,13 +468,16 @@ class FunctionsPrint
         }
         if ($lds) {
             if (preg_match('/2 TEMP (.*)/', $event->gedcom(), $match)) {
-                $html .= '<br>' . I18N::translate('LDS temple') . ': ' . GedcomCodeTemp::templeName($match[1]);
+                $element = Registry::elementFactory()->make($event->tag() . ':TEMP');
+                $html .= $element->labelValue($match[1], $tree);
             }
             if (preg_match('/2 STAT (.*)/', $event->gedcom(), $match)) {
-                $html .= '<br>' . I18N::translate('Status') . ': ' . GedcomCodeStat::statusName($match[1]);
+                $element = Registry::elementFactory()->make($event->tag() . ':STAT');
+                $html .= $element->labelValue($match[1], $tree);
                 if (preg_match('/3 DATE (.*)/', $event->gedcom(), $match)) {
                     $date = new Date($match[1]);
-                    $html .= ', ' . GedcomTag::getLabel('STAT:DATE') . ': ' . $date->display();
+                    $element = Registry::elementFactory()->make($event->tag() . ':STAT:DATE');
+                    $html .= $element->labelValue($date->display(), $tree);
                 }
             }
         }
@@ -493,7 +517,7 @@ class FunctionsPrint
      *
      * @return void
      */
-    public static function printAddNewFact(GedcomRecord $record, Collection $usedfacts, $type): void
+    public static function printAddNewFact(GedcomRecord $record, Collection $usedfacts, string $type): void
     {
         $tree = $record->tree();
 
@@ -532,24 +556,6 @@ class FunctionsPrint
             case Media::RECORD_TYPE:
                 $addfacts    = ['NOTE'];
                 $uniquefacts = [];
-                $quickfacts  = [];
-                break;
-
-            case Submitter::RECORD_TYPE:
-                $addfacts    = ['LANG', 'OBJE', 'NOTE', 'SHARED_NOTE'];
-                $uniquefacts = ['ADDR', 'EMAIL', 'NAME', 'PHON', 'WWW'];
-                $quickfacts  = [];
-                break;
-
-            case Submission::RECORD_TYPE:
-                $addfacts    = ['NOTE', 'SHARED_NOTE'];
-                $uniquefacts = ['FAMF', 'TEMP', 'ANCE', 'DESC', 'ORDI', 'SUBM'];
-                $quickfacts  = [];
-                break;
-
-            case Header::RECORD_TYPE:
-                $addfacts    = [];
-                $uniquefacts = ['COPR', 'LANG', 'SUBM'];
                 $quickfacts  = [];
                 break;
             default:

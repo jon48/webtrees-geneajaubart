@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -26,11 +26,7 @@ use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Gedcom;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeAdop;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeLang;
 use Fisharebest\Webtrees\GedcomCode\GedcomCodeName;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodePedi;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeQuay;
 use Fisharebest\Webtrees\GedcomCode\GedcomCodeRela;
 use Fisharebest\Webtrees\GedcomCode\GedcomCodeStat;
 use Fisharebest\Webtrees\GedcomCode\GedcomCodeTemp;
@@ -95,7 +91,7 @@ class FunctionsEdit
      *
      * @return string
      */
-    public static function editLanguageCheckboxes($parameter_name, $languages): string
+    public static function editLanguageCheckboxes(string $parameter_name, array $languages): string
     {
         return view('edit/language-checkboxes', ['languages' => $languages]);
     }
@@ -103,7 +99,7 @@ class FunctionsEdit
     /**
      * A list of access levels (e.g. for an edit control).
      *
-     * @return string[]
+     * @return array<string>
      */
     public static function optionsAccessLevels(): array
     {
@@ -113,7 +109,7 @@ class FunctionsEdit
     /**
      * A list of active languages (e.g. for an edit control).
      *
-     * @return string[]
+     * @return array<string>
      */
     public static function optionsActiveLanguages(): array
     {
@@ -128,7 +124,7 @@ class FunctionsEdit
     /**
      * A list of calendar conversions (e.g. for an edit control).
      *
-     * @return string[]
+     * @return array<string>
      */
     public static function optionsCalendarConversions(): array
     {
@@ -138,7 +134,7 @@ class FunctionsEdit
     /**
      * A list of contact methods (e.g. for an edit control).
      *
-     * @return string[]
+     * @return array<string>
      */
     public static function optionsContactMethods(): array
     {
@@ -148,7 +144,7 @@ class FunctionsEdit
     /**
      * A list of hide/show options (e.g. for an edit control).
      *
-     * @return string[]
+     * @return array<string>
      */
     public static function optionsHideShow(): array
     {
@@ -161,11 +157,11 @@ class FunctionsEdit
     /**
      * A list of integers (e.g. for an edit control).
      *
-     * @param int[] $integers
+     * @param array<int> $integers
      *
-     * @return string[]
+     * @return array<int,string>
      */
-    public static function numericOptions($integers): array
+    public static function numericOptions(array $integers): array
     {
         $array = [];
         foreach ($integers as $integer) {
@@ -182,7 +178,7 @@ class FunctionsEdit
     /**
      * A list of no/yes options (e.g. for an edit control).
      *
-     * @return string[]
+     * @return array<string>
      */
     public static function optionsNoYes(): array
     {
@@ -197,9 +193,9 @@ class FunctionsEdit
      *
      * @param string $relationship
      *
-     * @return string[]
+     * @return array<string>
      */
-    public static function optionsRelationships($relationship): array
+    public static function optionsRelationships(string $relationship): array
     {
         $relationships = GedcomCodeRela::getValues();
         // The user is allowed to specify values that aren't in the list.
@@ -215,9 +211,9 @@ class FunctionsEdit
      *
      * @param bool $include_empty
      *
-     * @return string[]
+     * @return array<string>
      */
-    public static function optionsRestrictions($include_empty): array
+    public static function optionsRestrictions(bool $include_empty): array
     {
         $options = [
             'none'         => I18N::translate('Show to visitors'),
@@ -236,7 +232,7 @@ class FunctionsEdit
     /**
      * A list of GEDCOM restrictions for privacy rules.
      *
-     * @return string[]
+     * @return array<string>
      */
     public static function optionsRestrictionsRule(): array
     {
@@ -246,17 +242,17 @@ class FunctionsEdit
     /**
      * A list of temple options (e.g. for an edit control).
      *
-     * @return string[]
+     * @return array<string>
      */
     public static function optionsTemples(): array
     {
-        return ['' => I18N::translate('No temple - living ordinance')] + GedcomCodeTemp::templeNames();
+        return Registry::elementFactory()->make('SUBN:TEMP')->values();
     }
 
     /**
      * A list of user options (e.g. for an edit control).
      *
-     * @return string[]
+     * @return array<string>
      */
     public static function optionsUsers(): array
     {
@@ -286,7 +282,7 @@ class FunctionsEdit
      *
      * @return string
      */
-    public static function addSimpleTag(Tree $tree, $tag, $upperlevel = '', $label = ''): string
+    public static function addSimpleTag(Tree $tree, string $tag, string $upperlevel = '', string $label = ''): string
     {
         $localization_service = app(LocalizationService::class);
 
@@ -441,9 +437,11 @@ class FunctionsEdit
             $html .= view('edit/input-addon-keyboard', ['id' => $id]);
             $html .= '</div>';
         } elseif ($fact === 'ADOP') {
-            $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => GedcomCodeAdop::getValues()]);
+            $element = Registry::elementFactory()->make('INDI:ADOP:FAMC:ADOP');
+            $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => $element->values()]);
         } elseif ($fact === 'LANG') {
-            $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => GedcomCodeLang::getValues()]);
+            $element = Registry::elementFactory()->make('HEAD:LANG');
+            $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => $element->values()]);
         } elseif ($fact === 'ALIA') {
             $html .= '<div class="input-group">';
             $html .= view('components/select-individual', ['id' => $id, 'name' => $name, 'individual' => Registry::individualFactory()->make($value, $tree), 'tree' => $tree]);
@@ -469,11 +467,7 @@ class FunctionsEdit
             $html .= '<div id="caldiv' . $id . '" style="position:absolute;visibility:hidden;background-color:white;z-index:1000"></div>';
             $html .= '<p class="text-muted">' . (new Date($value))->display() . '</p>';
         } elseif ($fact === 'FAMC') {
-            $html .=
-                '<div class="input-group">' .
-                '<div class="input-group-prepend"><button class="btn btn-secondary" type="button" data-toggle="modal" data-backdrop="static" data-target="#modal-create-family" data-element-id="' . $id . '" title="' . I18N::translate('Create a family') . '">' . view('icons/add') . '</button></div>' .
-                view('components/select-family', ['id' => $id, 'name' => $name, 'family' => Registry::familyFactory()->make($value, $tree), 'tree' => $tree]) .
-                '</div>';
+            $html .= view('components/select-family', ['id' => $id, 'name' => $name, 'family' => Registry::familyFactory()->make($value, $tree), 'tree' => $tree]);
         } elseif ($fact === 'LATI') {
             $html .= '<input class="form-control" type="text" id="' . $id . '" name="' . $name . '" value="' . e($value) . '" oninput="webtrees.reformatLatitude(this)">';
         } elseif ($fact === 'LONG') {
@@ -506,7 +500,9 @@ class FunctionsEdit
                     'data-autocomplete-extra' => 'SOUR',
                 ]) . '>';
         } elseif ($fact === 'PEDI') {
-            $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => GedcomCodePedi::getValues()]);
+            $element = Registry::elementFactory()->make('INDI:FAMC:PEDI');
+
+            $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => $element->values()]);
         } elseif ($fact === 'PLAC') {
             $html .= '<div class="input-group">';
             $html .= '<input ' . Html::attributes([
@@ -523,7 +519,8 @@ class FunctionsEdit
             $html .= view('edit/input-addon-help', ['fact' => 'PLAC']);
             $html .= '</div>';
         } elseif ($fact === 'QUAY') {
-            $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => ['' => ''] + GedcomCodeQuay::getValues()]);
+            $element = Registry::elementFactory()->make('INDI:SOUR:QUAY');
+            $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => $element->values()]);
         } elseif ($fact === 'RELA') {
             $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => self::optionsRelationships($value)]);
         } elseif ($fact === 'REPO') {
@@ -567,21 +564,6 @@ class FunctionsEdit
         } elseif ($fact === 'TYPE' && $level === '0') {
             // Level 0 TYPE fields are only used for NAME records
             $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => GedcomCodeName::getValues()]);
-        } elseif ($fact === 'TYPE' && $level === '3') {
-            //-- Build the selector for the Media 'TYPE' Fact
-            $html          .= '<select name="text[]"><option selected value="" ></option>';
-            $selectedValue = strtolower($value);
-            if (!array_key_exists($selectedValue, GedcomTag::getFileFormTypes())) {
-                $html .= '<option selected value="' . e($value) . '" >' . e($value) . '</option>';
-            }
-            foreach (['' => ''] + GedcomTag::getFileFormTypes() + [] as $typeName => $typeValue) {
-                $html .= '<option value="' . $typeName . '" ';
-                if ($selectedValue === $typeName) {
-                    $html .= 'selected';
-                }
-                $html .= '>' . $typeValue . '</option>';
-            }
-            $html .= '</select>';
         } elseif (($fact !== 'NAME' || $upperlevel === 'REPO' || $upperlevel === 'SUBM' || $upperlevel === 'UNKNOWN') && $fact !== '_MARNM') {
             if ($fact === 'TEXT' || $fact === 'ADDR' || ($fact === 'NOTE' && !$islink)) {
                 $html .= '<div class="input-group">';
@@ -634,7 +616,7 @@ class FunctionsEdit
      *
      * @return void
      */
-    public static function addSimpleTags(Tree $tree, $fact): void
+    public static function addSimpleTags(Tree $tree, string $fact): void
     {
         // For new individuals, these facts default to "Y"
         if ($fact === 'MARR') {
@@ -669,7 +651,7 @@ class FunctionsEdit
      *
      * @return void
      */
-    public static function createAddForm(Tree $tree, $fact): void
+    public static function createAddForm(Tree $tree, string $fact): void
     {
         self::$tags = [];
 
@@ -862,7 +844,7 @@ class FunctionsEdit
      *
      * @return void
      */
-    public static function insertMissingSubtags(Tree $tree, $level1tag, $add_date = false): void
+    public static function insertMissingSubtags(Tree $tree, string $level1tag, bool $add_date = false): void
     {
         // handle  MARRiage TYPE
         $type_val = '';

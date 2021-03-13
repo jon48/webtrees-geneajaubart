@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -24,6 +24,7 @@ use Fisharebest\Flysystem\Adapter\ChrootAdapter;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Services\GedcomExportService;
 use Fisharebest\Webtrees\Services\PendingChangesService;
+use Fisharebest\Webtrees\Services\TreeService;
 use Illuminate\Database\Capsule\Manager as DB;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
@@ -314,29 +315,14 @@ class Tree
      * Delete everything relating to a tree
      *
      * @return void
+     *
+     * @deprecated - since 2.0.12 - will be removed in 2.1.0
      */
     public function delete(): void
     {
-        // If this is the default tree, then unset it
-        if (Site::getPreference('DEFAULT_GEDCOM') === $this->name) {
-            Site::setPreference('DEFAULT_GEDCOM', '');
-        }
+        $tree_service = new TreeService();
 
-        $this->deleteGenealogyData(false);
-
-        DB::table('block_setting')
-            ->join('block', 'block.block_id', '=', 'block_setting.block_id')
-            ->where('gedcom_id', '=', $this->id)
-            ->delete();
-        DB::table('block')->where('gedcom_id', '=', $this->id)->delete();
-        DB::table('user_gedcom_setting')->where('gedcom_id', '=', $this->id)->delete();
-        DB::table('gedcom_setting')->where('gedcom_id', '=', $this->id)->delete();
-        DB::table('module_privacy')->where('gedcom_id', '=', $this->id)->delete();
-        DB::table('hit_counter')->where('gedcom_id', '=', $this->id)->delete();
-        DB::table('default_resn')->where('gedcom_id', '=', $this->id)->delete();
-        DB::table('gedcom_chunk')->where('gedcom_id', '=', $this->id)->delete();
-        DB::table('log')->where('gedcom_id', '=', $this->id)->delete();
-        DB::table('gedcom')->where('gedcom_id', '=', $this->id)->delete();
+        $tree_service->delete($this);
     }
 
     /**
@@ -348,29 +334,14 @@ class Tree
      * @param bool $keep_media
      *
      * @return void
+     *
+     * @deprecated - since 2.0.12 - will be removed in 2.1.0
      */
     public function deleteGenealogyData(bool $keep_media): void
     {
-        DB::table('gedcom_chunk')->where('gedcom_id', '=', $this->id)->delete();
-        DB::table('individuals')->where('i_file', '=', $this->id)->delete();
-        DB::table('families')->where('f_file', '=', $this->id)->delete();
-        DB::table('sources')->where('s_file', '=', $this->id)->delete();
-        DB::table('other')->where('o_file', '=', $this->id)->delete();
-        DB::table('places')->where('p_file', '=', $this->id)->delete();
-        DB::table('placelinks')->where('pl_file', '=', $this->id)->delete();
-        DB::table('name')->where('n_file', '=', $this->id)->delete();
-        DB::table('dates')->where('d_file', '=', $this->id)->delete();
-        DB::table('change')->where('gedcom_id', '=', $this->id)->delete();
+        $tree_service = new TreeService();
 
-        if ($keep_media) {
-            DB::table('link')->where('l_file', '=', $this->id)
-                ->where('l_type', '<>', 'OBJE')
-                ->delete();
-        } else {
-            DB::table('link')->where('l_file', '=', $this->id)->delete();
-            DB::table('media_file')->where('m_file', '=', $this->id)->delete();
-            DB::table('media')->where('m_file', '=', $this->id)->delete();
-        }
+        $tree_service->deleteGenealogyData($this, $keep_media);
     }
 
     /**
@@ -396,44 +367,14 @@ class Tree
      * @param string          $filename The preferred filename, for export/download.
      *
      * @return void
+     *
+     * @deprecated since 2.0.12.  Will be removed in 2.1.0
      */
     public function importGedcomFile(StreamInterface $stream, string $filename): void
     {
-        // Read the file in blocks of roughly 64K. Ensure that each block
-        // contains complete gedcom records. This will ensure we don’t split
-        // multi-byte characters, as well as simplifying the code to import
-        // each block.
+        $tree_service = new TreeService();
 
-        $file_data = '';
-
-        $this->deleteGenealogyData((bool) $this->getPreference('keep_media'));
-        $this->setPreference('gedcom_filename', $filename);
-        $this->setPreference('imported', '0');
-
-        while (!$stream->eof()) {
-            $file_data .= $stream->read(65536);
-            // There is no strrpos() function that searches for substrings :-(
-            for ($pos = strlen($file_data) - 1; $pos > 0; --$pos) {
-                if ($file_data[$pos] === '0' && ($file_data[$pos - 1] === "\n" || $file_data[$pos - 1] === "\r")) {
-                    // We’ve found the last record boundary in this chunk of data
-                    break;
-                }
-            }
-            if ($pos) {
-                DB::table('gedcom_chunk')->insert([
-                    'gedcom_id'  => $this->id,
-                    'chunk_data' => substr($file_data, 0, $pos),
-                ]);
-
-                $file_data = substr($file_data, $pos);
-            }
-        }
-        DB::table('gedcom_chunk')->insert([
-            'gedcom_id'  => $this->id,
-            'chunk_data' => $file_data,
-        ]);
-
-        $stream->close();
+        $tree_service->importGedcomFile($this, $stream, $filename);
     }
 
     /**
@@ -468,7 +409,7 @@ class Tree
         ]);
 
         // Accept this pending change
-        if (Auth::user()->getPreference(User::PREF_AUTO_ACCEPT_EDITS)) {
+        if (Auth::user()->getPreference(UserInterface::PREF_AUTO_ACCEPT_EDITS) === '1') {
             $record = Registry::gedcomRecordFactory()->new($xref, $gedcom, null, $this);
 
             app(PendingChangesService::class)->acceptRecord($record);
@@ -522,7 +463,7 @@ class Tree
         ]);
 
         // Accept this pending change
-        if (Auth::user()->getPreference(User::PREF_AUTO_ACCEPT_EDITS) === '1') {
+        if (Auth::user()->getPreference(UserInterface::PREF_AUTO_ACCEPT_EDITS) === '1') {
             $record = Registry::familyFactory()->new($xref, $gedcom, null, $this);
 
             app(PendingChangesService::class)->acceptRecord($record);
@@ -565,7 +506,7 @@ class Tree
         ]);
 
         // Accept this pending change
-        if (Auth::user()->getPreference(User::PREF_AUTO_ACCEPT_EDITS) === '1') {
+        if (Auth::user()->getPreference(UserInterface::PREF_AUTO_ACCEPT_EDITS) === '1') {
             $record = Registry::individualFactory()->new($xref, $gedcom, null, $this);
 
             app(PendingChangesService::class)->acceptRecord($record);
@@ -608,7 +549,7 @@ class Tree
         ]);
 
         // Accept this pending change
-        if (Auth::user()->getPreference(User::PREF_AUTO_ACCEPT_EDITS) === '1') {
+        if (Auth::user()->getPreference(UserInterface::PREF_AUTO_ACCEPT_EDITS) === '1') {
             $record = Registry::mediaFactory()->new($xref, $gedcom, null, $this);
 
             app(PendingChangesService::class)->acceptRecord($record);
@@ -643,12 +584,12 @@ class Tree
             }
         }
 
-        if ($individual === null && $this->getUserPreference($user, User::PREF_TREE_DEFAULT_XREF) !== '') {
-            $individual = Registry::individualFactory()->make($this->getUserPreference($user, User::PREF_TREE_DEFAULT_XREF), $this);
+        if ($individual === null && $this->getUserPreference($user, UserInterface::PREF_TREE_DEFAULT_XREF) !== '') {
+            $individual = Registry::individualFactory()->make($this->getUserPreference($user, UserInterface::PREF_TREE_DEFAULT_XREF), $this);
         }
 
-        if ($individual === null && $this->getUserPreference($user, User::PREF_TREE_ACCOUNT_XREF) !== '') {
-            $individual = Registry::individualFactory()->make($this->getUserPreference($user, User::PREF_TREE_ACCOUNT_XREF), $this);
+        if ($individual === null && $this->getUserPreference($user, UserInterface::PREF_TREE_ACCOUNT_XREF) !== '') {
+            $individual = Registry::individualFactory()->make($this->getUserPreference($user, UserInterface::PREF_TREE_ACCOUNT_XREF), $this);
         }
 
         if ($individual === null && $this->getPreference('PEDIGREE_ROOT_ID') !== '') {

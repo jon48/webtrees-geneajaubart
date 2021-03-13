@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -3482,7 +3482,7 @@ class Soundex
     /**
      * Which algorithms are supported.
      *
-     * @return string[]
+     * @return array<string>
      */
     public static function getAlgorithms(): array
     {
@@ -3502,7 +3502,7 @@ class Soundex
      *
      * @return bool
      */
-    public static function compare($soundex1, $soundex2): bool
+    public static function compare(string $soundex1, string $soundex2): bool
     {
         if ($soundex1 !== '' && $soundex2 !== '') {
             return array_intersect(explode(':', $soundex1), explode(':', $soundex2)) !== [];
@@ -3574,9 +3574,9 @@ class Soundex
      *
      * @param string $name
      *
-     * @return string[] List of possible DM codes for the word.
+     * @return array<string> List of possible DM codes for the word.
      */
-    private static function daitchMokotoffWord($name): array
+    private static function daitchMokotoffWord(string $name): array
     {
         // Apply special transformation rules to the input string
         $name = I18N::strtoupper($name);

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -52,16 +52,13 @@ class MapDataDelete implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $place_id  = (int) $request->getQueryParams()['place_id'];
+        $place_id = (int) $request->getAttribute('place_id');
 
-        $place  = $this->map_data_service->findById($place_id);
-        $parent = $place->parent();
+        $place = $this->map_data_service->findById($place_id);
 
-        if ($place_id !== 0) {
-            $this->map_data_service->deleteRecursively($place_id);
-        }
+        $this->map_data_service->deleteRecursively($place_id);
 
-        $url = route(MapDataList::class, ['parent_id' => $parent->id()]);
+        $url = route(MapDataList::class, ['parent_id' => $place->parent()->id()]);
 
         return redirect($url);
     }

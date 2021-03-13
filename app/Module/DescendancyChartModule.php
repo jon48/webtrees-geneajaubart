@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -220,8 +220,10 @@ class DescendancyChartModule extends AbstractModule implements ModuleChartInterf
                     ]);
 
                 case self::CHART_STYLE_INDIVIDUALS:
+                    $individuals = $this->chart_service->descendants($individual, $generations - 1);
+
                     return $this->viewResponse('lists/individuals-table', [
-                        'individuals' => $this->chart_service->descendants($individual, $generations - 1),
+                        'individuals' => $individuals,
                         'sosa'        => false,
                         'tree'        => $tree,
                     ]);
@@ -229,7 +231,10 @@ class DescendancyChartModule extends AbstractModule implements ModuleChartInterf
                 case self::CHART_STYLE_FAMILIES:
                     $families = $this->chart_service->descendantFamilies($individual, $generations - 1);
 
-                    return $this->viewResponse('lists/families-table', ['families' => $families, 'tree' => $tree]);
+                    return $this->viewResponse('lists/families-table', [
+                        'families' => $families,
+                        'tree'     => $tree,
+                    ]);
             }
         }
 
@@ -257,7 +262,7 @@ class DescendancyChartModule extends AbstractModule implements ModuleChartInterf
     /**
      * This chart can display its output in a number of styles
      *
-     * @return string[]
+     * @return array<string>
      */
     protected function styles(): array
     {

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -41,22 +41,24 @@ class MigrationService
      * @param string $schema_name    Which schema to update.
      * @param int    $target_version Upgrade to this version
      *
-     * @throws PDOException
      * @return bool  Were any updates applied
+     * @throws PDOException
      */
-    public function updateSchema($namespace, $schema_name, $target_version): bool
+    public function updateSchema(string $namespace, string $schema_name, int $target_version): bool
     {
-        try {
-            $this->transactionalTables();
-        } catch (PDOException $ex) {
-            // There is probably nothing we can do.
-        }
-
         try {
             $current_version = (int) Site::getPreference($schema_name);
         } catch (PDOException $ex) {
             // During initial installation, the site_preference table won’t exist.
             $current_version = 0;
+        }
+
+        if ($current_version < $target_version) {
+            try {
+                $this->transactionalTables();
+            } catch (PDOException $ex) {
+                // There is probably nothing we can do.
+            }
         }
 
         $updates_applied = false;

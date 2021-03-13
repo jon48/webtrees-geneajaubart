@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -31,6 +31,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 use function assert;
 use function in_array;
+use function response;
 
 /**
  * Process a form to create a new media object.
@@ -68,11 +69,11 @@ class CreateMediaObjectAction implements RequestHandlerInterface
         assert($tree instanceof Tree);
 
         $params              = (array) $request->getParsedBody();
-        $note                = $params['media-note'];
-        $title               = $params['title'];
-        $type                = $params['type'];
-        $privacy_restriction = $params['privacy-restriction'];
-        $edit_restriction    = $params['edit-restriction'];
+        $note                = $params['media-note'] ?? '';
+        $title               = $params['title'] ?? '';
+        $type                = $params['type'] ?? '';
+        $privacy_restriction = $params['privacy-restriction'] ?? '';
+        $edit_restriction    = $params['edit-restriction'] ?? '';
 
         $file = $this->media_file_service->uploadFile($request);
 
@@ -99,7 +100,7 @@ class CreateMediaObjectAction implements RequestHandlerInterface
         // id and text are for select2 / autocomplete
         // html is for interactive modals
         return response([
-            'id'   => $record->xref(),
+            'id'   => '@' . $record->xref() . '@',
             'text' => view('selects/media', [
                 'media' => $record,
             ]),

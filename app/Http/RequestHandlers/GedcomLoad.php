@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -26,9 +26,13 @@ use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Services\TimeoutService;
+use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\DetectsDeadlocks;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Str;
+use PDOException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -51,18 +55,24 @@ use function view;
 class GedcomLoad implements RequestHandlerInterface
 {
     use ViewResponseTrait;
+    use DetectsDeadlocks;
 
     /** @var TimeoutService */
     private $timeout_service;
+
+    /** @var TreeService */
+    private $tree_service;
 
     /**
      * GedcomLoad constructor.
      *
      * @param TimeoutService $timeout_service
+     * @param TreeService    $tree_service
      */
-    public function __construct(TimeoutService $timeout_service)
+    public function __construct(TimeoutService $timeout_service, TreeService $tree_service)
     {
         $this->timeout_service = $timeout_service;
+        $this->tree_service    = $tree_service;
     }
 
     /**
@@ -78,12 +88,6 @@ class GedcomLoad implements RequestHandlerInterface
         assert($tree instanceof Tree);
 
         try {
-            // Only allow one process to import each gedcom at a time
-            DB::table('gedcom_chunk')
-                ->where('gedcom_id', '=', $tree->id())
-                ->lockForUpdate()
-                ->get();
-
             // What is the current import status?
             $import_offset = DB::table('gedcom_chunk')
                 ->where('gedcom_id', '=', $tree->id())
@@ -120,8 +124,26 @@ class GedcomLoad implements RequestHandlerInterface
                     ->select(['gedcom_chunk_id', 'chunk_data'])
                     ->first();
 
-                // If we are loading the first (header) record, make sure the encoding is UTF-8.
+                if ($data === null) {
+                    break;
+                }
+
+                // Mark the chunk as imported.  This will create a row-lock, to prevent other
+                // processes from reading it until we have finished.
+                $n = DB::table('gedcom_chunk')
+                    ->where('gedcom_chunk_id', '=', $data->gedcom_chunk_id)
+                    ->where('imported', '=', '0')
+                    ->update(['imported' => 1]);
+
+                // Another process has already imported this data?
+                if ($n === 0) {
+                    break;
+                }
+
+                // If we are loading the first (header) record, then delete old data and convert to UTF-8.
                 if ($first_time) {
+                    $this->tree_service->deleteGenealogyData($tree, (bool) $tree->getPreference('keep_media'));
+
                     // Remove any byte-order-mark
                     if (str_starts_with($data->chunk_data, Gedcom::UTF8_BOM)) {
                         $data->chunk_data = substr($data->chunk_data, strlen(Gedcom::UTF8_BOM));
@@ -144,6 +166,7 @@ class GedcomLoad implements RequestHandlerInterface
                     } else {
                         $charset = 'ASCII';
                     }
+
                     // MySQL supports a wide range of collation conversions. These are ones that
                     // have been encountered "in the wild".
                     switch ($charset) {
@@ -210,10 +233,6 @@ class GedcomLoad implements RequestHandlerInterface
                         ->first();
                 }
 
-                if (!$data) {
-                    break;
-                }
-
                 $data->chunk_data = str_replace("\r", "\n", $data->chunk_data);
 
                 // Import all the records in this chunk of data
@@ -225,10 +244,10 @@ class GedcomLoad implements RequestHandlerInterface
                     }
                 }
 
-                // Mark the chunk as imported
+                // Do not need the data any more.
                 DB::table('gedcom_chunk')
                     ->where('gedcom_chunk_id', '=', $data->gedcom_chunk_id)
-                    ->update(['imported' => 1]);
+                    ->update(['chunk_data' => '']);
             } while (!$this->timeout_service->isTimeLimitUp());
 
             return $this->viewResponse('admin/import-progress', [
@@ -238,6 +257,15 @@ class GedcomLoad implements RequestHandlerInterface
             ]);
         } catch (Exception $ex) {
             DB::connection()->rollBack();
+
+            // Deadlock? Try again.
+            if ($this->causedByDeadlock($ex)) {
+                return $this->viewResponse('admin/import-progress', [
+                    'errors'   => '',
+                    'progress' => $progress ?? 0.0,
+                    'tree'     => $tree,
+                ]);
+            }
 
             return $this->viewResponse('admin/import-fail', [
                 'error' => $ex->getMessage(),

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees;
 
 use Fisharebest\Webtrees\Contracts\CacheFactoryInterface;
+use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Services\UserService;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 
@@ -143,7 +144,7 @@ class UserServiceTest extends TestCase
         Auth::login($user);
         $tree = $this->importTree('demo.ged');
         $indi = $tree->createIndividual('0 @@ INDI');
-        $tree->setUserPreference($user, User::PREF_TREE_ACCOUNT_XREF, $indi->xref());
+        $tree->setUserPreference($user, UserInterface::PREF_TREE_ACCOUNT_XREF, $indi->xref());
 
         $users = $user_service->findByIndividual($indi);
 
@@ -178,7 +179,7 @@ class UserServiceTest extends TestCase
         $user_service->create('user', 'User', 'user@example.com', 'secret');
 
         $admin = $user_service->create('admin', 'Admin', 'admin@example.com', 'secret');
-        $admin->setPreference(User::PREF_IS_ADMINISTRATOR, '1');
+        $admin->setPreference(UserInterface::PREF_IS_ADMINISTRATOR, '1');
 
         $users = $user_service->administrators();
 
@@ -199,10 +200,10 @@ class UserServiceTest extends TestCase
         $user4        = $user_service->create('user4', 'User4', 'user4@example.com', 'secret');
 
         $tree = $this->importTree('demo.ged');
-        $tree->setUserPreference($user1, User::PREF_TREE_ROLE, User::ROLE_MANAGER);
-        $tree->setUserPreference($user2, User::PREF_TREE_ROLE, User::ROLE_MODERATOR);
-        $tree->setUserPreference($user3, User::PREF_TREE_ROLE, User::ROLE_EDITOR);
-        $tree->setUserPreference($user4, User::PREF_TREE_ROLE, User::ROLE_MEMBER);
+        $tree->setUserPreference($user1, UserInterface::PREF_TREE_ROLE, UserInterface::ROLE_MANAGER);
+        $tree->setUserPreference($user2, UserInterface::PREF_TREE_ROLE, UserInterface::ROLE_MODERATOR);
+        $tree->setUserPreference($user3, UserInterface::PREF_TREE_ROLE, UserInterface::ROLE_EDITOR);
+        $tree->setUserPreference($user4, UserInterface::PREF_TREE_ROLE, UserInterface::ROLE_MEMBER);
 
         $users = $user_service->managers();
 
@@ -223,10 +224,10 @@ class UserServiceTest extends TestCase
         $user4        = $user_service->create('user4', 'User4', 'user4@example.com', 'secret');
 
         $tree = $this->importTree('demo.ged');
-        $tree->setUserPreference($user1, User::PREF_TREE_ROLE, User::ROLE_MANAGER);
-        $tree->setUserPreference($user2, User::PREF_TREE_ROLE, User::ROLE_MODERATOR);
-        $tree->setUserPreference($user3, User::PREF_TREE_ROLE, User::ROLE_EDITOR);
-        $tree->setUserPreference($user4, User::PREF_TREE_ROLE, User::ROLE_MEMBER);
+        $tree->setUserPreference($user1, UserInterface::PREF_TREE_ROLE, UserInterface::ROLE_MANAGER);
+        $tree->setUserPreference($user2, UserInterface::PREF_TREE_ROLE, UserInterface::ROLE_MODERATOR);
+        $tree->setUserPreference($user3, UserInterface::PREF_TREE_ROLE, UserInterface::ROLE_EDITOR);
+        $tree->setUserPreference($user4, UserInterface::PREF_TREE_ROLE, UserInterface::ROLE_MEMBER);
 
         $users = $user_service->moderators();
 
@@ -247,14 +248,14 @@ class UserServiceTest extends TestCase
         $user3        = $user_service->create('user3', 'User3', 'user3@example.com', 'secret');
         $user4        = $user_service->create('user4', 'User4', 'user4@example.com', 'secret');
 
-        $user1->setPreference(User::PREF_IS_EMAIL_VERIFIED, '');
-        $user1->setPreference(User::PREF_IS_ACCOUNT_APPROVED, '');
-        $user2->setPreference(User::PREF_IS_EMAIL_VERIFIED, '');
-        $user2->setPreference(User::PREF_IS_ACCOUNT_APPROVED, '1');
-        $user3->setPreference(User::PREF_IS_EMAIL_VERIFIED, '1');
-        $user3->setPreference(User::PREF_IS_ACCOUNT_APPROVED, '');
-        $user4->setPreference(User::PREF_IS_EMAIL_VERIFIED, '1');
-        $user4->setPreference(User::PREF_IS_ACCOUNT_APPROVED, '1');
+        $user1->setPreference(UserInterface::PREF_IS_EMAIL_VERIFIED, '');
+        $user1->setPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED, '');
+        $user2->setPreference(UserInterface::PREF_IS_EMAIL_VERIFIED, '');
+        $user2->setPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED, '1');
+        $user3->setPreference(UserInterface::PREF_IS_EMAIL_VERIFIED, '1');
+        $user3->setPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED, '');
+        $user4->setPreference(UserInterface::PREF_IS_EMAIL_VERIFIED, '1');
+        $user4->setPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED, '1');
 
         $users = $user_service->unapproved();
 

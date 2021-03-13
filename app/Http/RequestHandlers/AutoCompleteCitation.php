@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -47,7 +47,7 @@ class AutoCompleteCitation extends AbstractAutocompleteHandler
         $source = Registry::sourceFactory()->make($xref, $tree);
         $source = Auth::checkSourceAccess($source);
 
-        $regex_query = preg_quote(strtr($query, [' ' => '.+']), '/');
+        $regex_query = strtr(preg_quote($query, '/'), [' ' => '.+']);
 
         // Fetch all records with a link to this source
         $individuals = DB::table('individuals')

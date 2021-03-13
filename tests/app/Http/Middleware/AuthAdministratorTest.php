@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\Middleware;
 
 use Fig\Http\Message\StatusCodeInterface;
+use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Exceptions\HttpAccessDeniedException;
 use Fisharebest\Webtrees\GuestUser;
 use Fisharebest\Webtrees\TestCase;
@@ -44,7 +45,7 @@ class AuthAdministratorTest extends TestCase
         $handler->method('handle')->willReturn(response('lorem ipsum'));
 
         $user = self::createMock(User::class);
-        $user->method('getPreference')->with(User::PREF_IS_ADMINISTRATOR)->willReturn('1');
+        $user->method('getPreference')->with(UserInterface::PREF_IS_ADMINISTRATOR)->willReturn('1');
 
         $request    = self::createRequest()->withAttribute('user', $user);
         $middleware = new AuthAdministrator();
@@ -66,7 +67,7 @@ class AuthAdministratorTest extends TestCase
         $handler->method('handle')->willReturn(response('lorem ipsum'));
 
         $user = self::createMock(User::class);
-        $user->method('getPreference')->with(User::PREF_IS_ADMINISTRATOR)->willReturn('');
+        $user->method('getPreference')->with(UserInterface::PREF_IS_ADMINISTRATOR)->willReturn('');
 
         $request    = self::createRequest()->withAttribute('user', $user);
         $middleware = new AuthAdministrator();

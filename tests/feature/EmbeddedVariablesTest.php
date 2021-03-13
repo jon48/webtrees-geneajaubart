@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,13 +12,14 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
 
 namespace Fisharebest\Webtrees;
 
+use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Services\UserService;
@@ -81,7 +82,7 @@ class EmbeddedVariablesTest extends TestCase
 
         // As member
         $user = (new UserService())->create('user', 'User', 'user@example.com', 'secret');
-        $user->setPreference(User::PREF_IS_ADMINISTRATOR, '1');
+        $user->setPreference(UserInterface::PREF_IS_ADMINISTRATOR, '1');
         Auth::login($user);
 
         $text = $statistics->embedTags('#getAllTagsTable#');
@@ -103,7 +104,7 @@ class EmbeddedVariablesTest extends TestCase
 
         // As member
         $user = (new UserService())->create('user', 'User', 'user@example.com', 'secret');
-        $user->setPreference(User::PREF_IS_ADMINISTRATOR, '1');
+        $user->setPreference(UserInterface::PREF_IS_ADMINISTRATOR, '1');
         Auth::login($user);
 
         $text = $statistics->embedTags('#getAllTagsTable#');

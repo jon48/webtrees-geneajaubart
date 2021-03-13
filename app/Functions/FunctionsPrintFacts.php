@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,13 +12,14 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Functions;
 
+use Fisharebest\Webtrees\Age;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Date;
@@ -26,10 +27,6 @@ use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Gedcom;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeAdop;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeLang;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeQuay;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeRela;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\Http\RequestHandlers\EditFactPage;
@@ -68,7 +65,6 @@ use function str_replace;
 use function strip_tags;
 use function strlen;
 use function strpos;
-use function strtoupper;
 use function substr;
 use function trim;
 use function view;
@@ -104,6 +100,8 @@ class FunctionsPrintFacts
         $value  = $fact->value();
         $type   = $fact->attribute('TYPE');
         $id     = $fact->id();
+
+        $element = Registry::elementFactory()->make($fact->tag());
 
         // This preference is named HIDE instead of SHOW
         $hide_errors = $tree->getPreference('HIDE_GEDCOM_ERRORS') === '0';
@@ -164,22 +162,10 @@ class FunctionsPrintFacts
             $styles[] = 'wt-historic-fact collapse';
         }
 
-        // Use marriage type as the label.
-        if ($tag === 'MARR' && $type !== '') {
-            switch (strtoupper($type)) {
-                case 'CIVIL':
-                    $label = I18N::translate('Civil marriage');
-                    $type  = ''; // Do not print this again
-                    break;
-                case 'PARTNERS':
-                    $label = I18N::translate('Registered partnership');
-                    $type  = ''; // Do not print this again
-                    break;
-                case 'RELIGIOUS':
-                    $label = I18N::translate('Religious marriage');
-                    $type  = ''; // Do not print this again
-                    break;
-            }
+        // Use marriage type as the label.  e.g. "Civil partnership"
+        if ($tag === 'MARR') {
+            $label = $fact->label();
+            $type  = '';
         }
 
         echo '<tr class="', implode(' ', $styles), '">';
@@ -218,10 +204,11 @@ class FunctionsPrintFacts
         // Print the value of this fact/event
         switch ($tag) {
             case 'ADDR':
-                echo '<div class="d-block" style="white-space: pre-wrap">' . e($value) . '</div';
-                break;
             case 'AFN':
-                echo '<div class="field"><a href="https://familysearch.org/search/tree/results#count=20&query=afn:', rawurlencode($value), '">', e($value), '</a></div>';
+            case 'LANG':
+            case 'PUBL':
+            case 'RESN':
+                echo '<div class="field">' . $element->value($value, $tree) . '</div>';
                 break;
             case 'ASSO':
                 // we handle this later, in format_asso_rela_record()
@@ -230,35 +217,6 @@ class FunctionsPrintFacts
             case 'EMAI':
             case '_EMAIL':
                 echo '<div class="field"><a href="mailto:', e($value), '">', e($value), '</a></div>';
-                break;
-            case 'LANG':
-                echo GedcomCodeLang::getValue($value);
-                break;
-            case 'RESN':
-                echo '<div class="field">';
-                switch ($value) {
-                    case 'none':
-                        // Note: "1 RESN none" is not valid gedcom.
-                        // However, webtrees privacy rules will interpret it as "show an otherwise private record to public".
-                        echo '<i class="icon-resn-none"></i> ', I18N::translate('Show to visitors');
-                        break;
-                    case 'privacy':
-                        echo '<i class="icon-class-none"></i> ', I18N::translate('Show to members');
-                        break;
-                    case 'confidential':
-                        echo '<i class="icon-confidential-none"></i> ', I18N::translate('Show to managers');
-                        break;
-                    case 'locked':
-                        echo '<i class="icon-locked-none"></i> ', I18N::translate('Only managers can edit');
-                        break;
-                    default:
-                        echo e($value);
-                        break;
-                }
-                echo '</div>';
-                break;
-            case 'PUBL': // Publication details might contain URLs.
-                echo '<div class="field">', Filter::expandUrls($value, $tree), '</div>';
                 break;
             case 'REPO':
                 $repository = $fact->target();
@@ -413,7 +371,7 @@ class FunctionsPrintFacts
                     if ($family instanceof Family) {
                         echo GedcomTag::getLabelValue('FAM', '<a href="' . e($family->url()) . '">' . $family->fullName() . '</a>');
                         if (preg_match('/\n3 ADOP (HUSB|WIFE|BOTH)/', $fact->gedcom(), $adop_match)) {
-                            echo GedcomTag::getLabelValue('ADOP', GedcomCodeAdop::getValue($adop_match[1]));
+                            echo Registry::elementFactory()->make('INDI:ADOP:FAMC:ADOP')->labelValue($adop_match[1], $tree);
                         }
                     } else {
                         echo GedcomTag::getLabelValue('FAM', '<span class="error">' . $match[2] . '</span>');
@@ -452,12 +410,6 @@ class FunctionsPrintFacts
                     break;
                 case 'CALN':
                     echo GedcomTag::getLabelValue('CALN', Filter::expandUrls($match[2], $tree));
-                    break;
-                case 'FORM': // 0 OBJE / 1 FILE / 2 FORM / 3 TYPE
-                    echo GedcomTag::getLabelValue('FORM', $match[2]);
-                    if (preg_match('/\n3 TYPE (.+)/', $fact->gedcom(), $type_match)) {
-                        echo GedcomTag::getLabelValue('TYPE', GedcomTag::getFileFormTypeValue($type_match[1]));
-                    }
                     break;
                 case 'URL':
                 case '_URL':
@@ -523,13 +475,30 @@ class FunctionsPrintFacts
                 // Is there a "RELA" tag
                 if (preg_match('/\n[23] RELA (.+)/', $amatch[2], $rmatch)) {
                     // Use the supplied relationship as a label
-                    $label = GedcomCodeRela::getValue($rmatch[1], $person);
+                    $label = Registry::elementFactory()->make($event->record()::RECORD_TYPE . ':ASSO:RELA')->value($rmatch[1], $parent->tree());
                 } else {
                     // Use a default label
-                    $label = GedcomTag::getLabel('ASSO');
+                    $label = Registry::elementFactory()->make($event->record()::RECORD_TYPE . ':ASSO')->label();
                 }
 
-                $values = ['<a href="' . e($person->url()) . '">' . $person->fullName() . '</a>'];
+                if ($person->getBirthDate()->isOK() && $event->date()->isOK()) {
+                    $age = new Age($person->getBirthDate(), $event->date());
+                    switch ($person->sex()) {
+                        case 'M':
+                            $age_text = ' ' . I18N::translateContext('Male', '(aged %s)', (string) $age);
+                            break;
+                        case 'F':
+                            $age_text = ' ' . I18N::translateContext('Female', '(aged %s)', (string) $age);
+                            break;
+                        default:
+                            $age_text = ' ' . I18N::translate('(aged %s)', (string) $age);
+                            break;
+                    }
+                } else {
+                    $age_text = '';
+                }
+
+                $values = ['<a href="' . e($person->url()) . '">' . $person->fullName() . '</a>' . $age_text];
 
                 $module = app(ModuleService::class)->findByComponent(ModuleChartInterface::class, $person->tree(), Auth::user())->first(static function (ModuleInterface $module) {
                     return $module instanceof RelationshipsChartModule;
@@ -576,7 +545,7 @@ class FunctionsPrintFacts
      *
      * @return string HTML text
      */
-    public static function printFactSources(Tree $tree, $factrec, $level): string
+    public static function printFactSources(Tree $tree, string $factrec, int $level): string
     {
         $data   = '';
         $nlevel = $level + 1;
@@ -646,7 +615,7 @@ class FunctionsPrintFacts
      *
      * @return void
      */
-    public static function printMediaLinks(Tree $tree, $factrec, $level): void
+    public static function printMediaLinks(Tree $tree, string $factrec, int $level): void
     {
         $nlevel = $level + 1;
         if (preg_match_all("/$level OBJE @(.*)@/", $factrec, $omatch, PREG_SET_ORDER) === 0) {
@@ -668,11 +637,6 @@ class FunctionsPrintFacts
                     // NOTE: echo the notes of the media
                     echo '<p>';
                     echo FunctionsPrint::printFactNotes($tree, $media->gedcom(), 1);
-                    $ttype = preg_match('/' . ($nlevel + 1) . ' TYPE (.*)/', $media->gedcom(), $match);
-                    if ($ttype > 0) {
-                        $mediaType = GedcomTag::getFileFormTypeValue($match[1]);
-                        echo '<span class="label">', I18N::translate('Type'), ': </span> <span class="field">', $mediaType, '</span>';
-                    }
                     //-- print spouse name for marriage events
                     echo FunctionsPrint::printFactNotes($tree, $media->gedcom(), $nlevel);
                     echo self::printFactSources($tree, $media->gedcom(), $nlevel);
@@ -834,27 +798,27 @@ class FunctionsPrintFacts
         $html = '';
 
         if ($textSOUR['PAGE'] !== '') {
-            $html .= GedcomTag::getLabelValue('PAGE', Filter::expandUrls($textSOUR['PAGE'], $tree));
+            $html .= Registry::elementFactory()->make('INDI:SOUR:PAGE')->labelValue($textSOUR['PAGE'], $tree);
         }
 
         if ($textSOUR['EVEN'] !== '') {
-            $html .= GedcomTag::getLabelValue('EVEN', e($textSOUR['EVEN']));
+            $html .= Registry::elementFactory()->make('INDI:SOUR:EVEN')->labelValue($textSOUR['EVEN'], $tree);
+
             if ($textSOUR['ROLE']) {
-                $html .= GedcomTag::getLabelValue('ROLE', e($textSOUR['ROLE']));
+                $html .= Registry::elementFactory()->make('INDI:SOUR:EVEN:ROLE')->labelValue($textSOUR['ROLE'], $tree);
             }
         }
 
         if ($textSOUR['DATE'] !== '') {
-            $date = new Date($textSOUR['DATE']);
-            $html .= GedcomTag::getLabelValue('DATA:DATE', $date->display());
+            $html .= Registry::elementFactory()->make('INDI:SOUR:DATA:DATE')->labelValue($textSOUR['DATE'], $tree);
         }
 
         foreach ($textSOUR['TEXT'] as $text) {
-            $html .= GedcomTag::getLabelValue('TEXT', Filter::formatText($text, $tree));
+            $html .= Registry::elementFactory()->make('INDI:SOUR:DATA:TEXT')->labelValue($text, $tree);
         }
 
         if ($textSOUR['QUAY'] !== '') {
-            $html .= GedcomTag::getLabelValue('QUAY', GedcomCodeQuay::getValue($textSOUR['QUAY']));
+            $html .= Registry::elementFactory()->make('INDI:SOUR:QUAY')->labelValue($textSOUR['QUAY'], $tree);
         }
 
         return '<div class="indent">' . $html . '</div>';
@@ -873,7 +837,7 @@ class FunctionsPrintFacts
      *
      * @param string $srec
      *
-     * @return string[]|string[][]
+     * @return array<array<string>>
      */
     public static function getSourceStructure(string $srec): array
     {

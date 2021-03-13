@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -38,7 +38,7 @@ class Functions
      *
      * @return string
      */
-    public static function fileUploadErrorText($error_code): string
+    public static function fileUploadErrorText(int $error_code): string
     {
         switch ($error_code) {
             case UPLOAD_ERR_OK:
@@ -89,7 +89,7 @@ class Functions
      *
      * @return string the subrecord that was found or an empty string "" if not found.
      */
-    public static function getSubRecord($level, $tag, string $gedrec, int $num = 1): string
+    public static function getSubRecord(int $level, string $tag, string $gedrec, int $num = 1): string
     {
         if ($gedrec === '') {
             return '';
@@ -131,7 +131,7 @@ class Functions
      *
      * @return string a string with all CONT lines merged
      */
-    public static function getCont($nlevel, $nrec): string
+    public static function getCont(int $nlevel, string $nrec): string
     {
         $text = '';
 
@@ -370,7 +370,7 @@ class Functions
      *
      * @return string
      */
-    public static function cousinName($n, $sex): string
+    public static function cousinName(int $n, string $sex): string
     {
         if ($sex === 'M') {
             switch ($n) {
@@ -592,7 +592,7 @@ class Functions
      *
      * @return string
      */
-    public static function getRelationshipNameFromPath($path, Individual $person1 = null, Individual $person2 = null): string
+    public static function getRelationshipNameFromPath(string $path, Individual $person1 = null, Individual $person2 = null): string
     {
         if (!preg_match('/^(mot|fat|par|hus|wif|spo|son|dau|chi|bro|sis|sib)*$/', $path)) {
             return '<span class="error">' . $path . '</span>';

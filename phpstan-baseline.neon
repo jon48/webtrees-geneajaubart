@@ -16,6 +16,26 @@ parameters:
 			path: app/Date/AbstractCalendarDate.php
 
 		-
+			message: "#^Parameter \\#1 \\$commonMark of method League\\\\CommonMark\\\\Converter\\:\\:convertToHtml\\(\\) expects string, string\\|null given\\.$#"
+			count: 1
+			path: app/Elements/AbstractElement.php
+
+		-
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Elements\\\\DateValue\\:\\:escape\\(\\) should return string but returns string\\|null\\.$#"
+			count: 1
+			path: app/Elements/DateValue.php
+
+		-
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Elements\\\\LanguageId\\:\\:canonical\\(\\) should return string but returns string\\|null\\.$#"
+			count: 1
+			path: app/Elements/LanguageId.php
+
+		-
+			message: "#^Parameter \\#1 \\$num of function dechex expects int, float\\|int given\\.$#"
+			count: 1
+			path: app/Elements/PafUid.php
+
+		-
 			message: "#^Method Fisharebest\\\\Webtrees\\\\Fact\\:\\:getNotes\\(\\) should return array\\<Fisharebest\\\\Webtrees\\\\Note\\|string\\> but returns array\\<int, array\\|Fisharebest\\\\Webtrees\\\\Note\\|string\\|null\\>\\.$#"
 			count: 1
 			path: app/Fact.php
@@ -116,27 +136,12 @@ parameters:
 			path: app/Functions/FunctionsPrintFacts.php
 
 		-
-			message: "#^Parameter \\#1 \\$text of static method Fisharebest\\\\Webtrees\\\\Filter\\:\\:expandUrls\\(\\) expects string, array\\<string\\>\\|string given\\.$#"
-			count: 1
-			path: app/Functions/FunctionsPrintFacts.php
-
-		-
-			message: "#^Parameter \\#1 \\$value of function e expects Illuminate\\\\Contracts\\\\Support\\\\Htmlable\\|string, array\\<string\\>\\|string given\\.$#"
-			count: 2
-			path: app/Functions/FunctionsPrintFacts.php
-
-		-
-			message: "#^Parameter \\#1 \\$date of class Fisharebest\\\\Webtrees\\\\Date constructor expects string, array\\<string\\>\\|string given\\.$#"
-			count: 1
+			message: "#^Parameter \\#1 \\$value of method Fisharebest\\\\Webtrees\\\\Contracts\\\\ElementInterface\\:\\:labelValue\\(\\) expects string, array\\<string\\>\\|string given\\.$#"
+			count: 5
 			path: app/Functions/FunctionsPrintFacts.php
 
 		-
 			message: "#^Argument of an invalid type array\\<string\\>\\|string supplied for foreach, only iterables are supported\\.$#"
-			count: 1
-			path: app/Functions/FunctionsPrintFacts.php
-
-		-
-			message: "#^Parameter \\#1 \\$type of static method Fisharebest\\\\Webtrees\\\\GedcomCode\\\\GedcomCodeQuay\\:\\:getValue\\(\\) expects string, array\\<string\\>\\|string given\\.$#"
 			count: 1
 			path: app/Functions/FunctionsPrintFacts.php
 
@@ -221,13 +226,13 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$stack of function array_shift expects array, array\\<int, string\\>\\|false given\\.$#"
-			count: 2
+			count: 3
 			path: app/GedcomRecord.php
 
 		-
-			message: "#^Parameter \\#2 \\$input1 of function array_map expects array, array\\|false given\\.$#"
+			message: "#^Method Fisharebest\\\\Webtrees\\\\GedcomRecord\\:\\:insertMissingSubtags\\(\\) should return string but returns string\\|null\\.$#"
 			count: 1
-			path: app/GedcomTag.php
+			path: app/GedcomRecord.php
 
 		-
 			message: "#^Parameter \\#1 \\$num of function dechex expects int, float\\|int given\\.$#"
@@ -243,206 +248,6 @@ parameters:
 			message: "#^Parameter \\#1 \\$string of function strlen expects string, string\\|false given\\.$#"
 			count: 2
 			path: app/Helpers/functions.php
-
-		-
-			message: "#^Cannot call method facts\\(\\) on Fisharebest\\\\Webtrees\\\\Individual\\|null\\.$#"
-			count: 2
-			path: app/Http/Controllers/Admin/FixLevel0MediaController.php
-
-		-
-			message: "#^Cannot call method displayImage\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/FixLevel0MediaController.php
-
-		-
-			message: "#^Cannot call method fullName\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/FixLevel0MediaController.php
-
-		-
-			message: "#^Cannot call method url\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/FixLevel0MediaController.php
-
-		-
-			message: "#^Cannot call method fullName\\(\\) on Fisharebest\\\\Webtrees\\\\Individual\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/FixLevel0MediaController.php
-
-		-
-			message: "#^Cannot call method url\\(\\) on Fisharebest\\\\Webtrees\\\\Individual\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/FixLevel0MediaController.php
-
-		-
-			message: "#^Parameter \\#1 \\$str of function sha1 expects string, string\\|false given\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/ImportThumbnailsController.php
-
-		-
-			message: "#^Cannot call method tree\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/ImportThumbnailsController.php
-
-		-
-			message: "#^Cannot call method firstImageFile\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/ImportThumbnailsController.php
-
-		-
-			message: "#^Cannot call method createFact\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/ImportThumbnailsController.php
-
-		-
-			message: "#^Cannot call method xref\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/ImportThumbnailsController.php
-
-		-
-			message: "#^Cannot call method facts\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/ImportThumbnailsController.php
-
-		-
-			message: "#^Cannot call method updateRecord\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/ImportThumbnailsController.php
-
-		-
-			message: "#^Parameter \\#1 \\$record of method Fisharebest\\\\Webtrees\\\\Services\\\\PendingChangesService\\:\\:acceptRecord\\(\\) expects Fisharebest\\\\Webtrees\\\\GedcomRecord, Fisharebest\\\\Webtrees\\\\Media\\|null given\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/ImportThumbnailsController.php
-
-		-
-			message: "#^Cannot access offset 0 on \\(array\\<int, string\\>&nonEmpty\\)\\|false\\.$#"
-			count: 2
-			path: app/Http/Controllers/Admin/ImportThumbnailsController.php
-
-		-
-			message: "#^Binary operation \"\\.\" between 'Places\\-' and array\\|string\\|null results in an error\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Http\\\\Controllers\\\\Admin\\\\LocationController\\:\\:exportGeoJSON\\(\\) has parameter \\$rows with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Parameter \\#1 \\$source of function stream_get_contents expects resource, resource\\|null given\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Parameter \\#1 \\$haystack of function stripos expects string, string\\|false given\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Parameter \\#1 \\$json of function json_decode expects string, string\\|false given\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Parameter \\#1 \\$fp of function rewind expects resource, resource\\|null given\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Parameter \\#1 \\$fp of function fgetcsv expects resource, resource\\|null given\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Offset 0 does not exist on array\\|null\\.$#"
-			count: 2
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Parameter \\#1 \\$var of function count expects array\\|Countable, array\\|null given\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Parameter \\#1 \\$input of function array_slice expects array, array\\|null given\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Offset int does not exist on array\\|null\\.$#"
-			count: 4
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Parameter \\#1 \\$fp of function fclose expects resource, resource\\|null given\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Cannot access offset 'fqpn' on array\\|false\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Cannot access offset 'pl_lati' on array\\|false\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Cannot access offset 'pl_long' on array\\|false\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Cannot access offset 'pl_zoom' on array\\|false\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Cannot access offset 'pl_icon' on array\\|false\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/LocationController.php
-
-		-
-			message: "#^Parameter \\#4 \\$sort_columns of method Fisharebest\\\\Webtrees\\\\Services\\\\DatatablesService\\:\\:handleQuery\\(\\) expects array\\<string\\>, array\\<int, Illuminate\\\\Database\\\\Query\\\\Expression\\|string\\> given\\.$#"
-			count: 2
-			path: app/Http/Controllers/Admin/MediaController.php
-
-		-
-			message: "#^Cannot access offset '0' on array\\|false\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/MediaController.php
-
-		-
-			message: "#^Cannot access offset '1' on array\\|false\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/MediaController.php
-
-		-
-			message: "#^Parameter \\#2 \\$resource of method League\\\\Flysystem\\\\FilesystemInterface\\:\\:writeStream\\(\\) expects resource, resource\\|null given\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/MediaController.php
-
-		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Http\\\\Controllers\\\\Admin\\\\UsersController\\:\\:themeOptions\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<string\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\>\\.$#"
-			count: 1
-			path: app/Http/Controllers/Admin/UsersController.php
-
-		-
-			message: "#^Cannot call method createFact\\(\\) on Fisharebest\\\\Webtrees\\\\GedcomRecord\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/EditMediaController.php
-
-		-
-			message: "#^Cannot call method url\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
-			count: 1
-			path: app/Http/Controllers/EditMediaController.php
-
-		-
-			message: "#^Parameter \\#1 \\$gedcom of method Fisharebest\\\\Webtrees\\\\GedcomRecord\\:\\:updateRecord\\(\\) expects string, string\\|null given\\.$#"
-			count: 1
-			path: app/Http/Controllers/EditNoteController.php
 
 		-
 			message: "#^Parameter \\#1 \\$path of method Psr\\\\Http\\\\Message\\\\UriInterface\\:\\:withPath\\(\\) expects string, string\\|false given\\.$#"
@@ -545,6 +350,11 @@ parameters:
 			path: app/Http/RequestHandlers/DeleteRecord.php
 
 		-
+			message: "#^Parameter \\#1 \\$gedcom of method Fisharebest\\\\Webtrees\\\\GedcomRecord\\:\\:updateRecord\\(\\) expects string, string\\|null given\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/EditNoteAction.php
+
+		-
 			message: "#^Parameter \\#1 \\$str of function trim expects string, string\\|null given\\.$#"
 			count: 1
 			path: app/Http/RequestHandlers/EditRawRecordAction.php
@@ -560,18 +370,48 @@ parameters:
 			path: app/Http/RequestHandlers/ExportGedcomClient.php
 
 		-
-			message: "#^Cannot access property \\$chunk_data on object\\|null\\.$#"
-			count: 6
-			path: app/Http/RequestHandlers/GedcomLoad.php
+			message: "#^Cannot call method facts\\(\\) on Fisharebest\\\\Webtrees\\\\Individual\\|null\\.$#"
+			count: 2
+			path: app/Http/RequestHandlers/FixLevel0MediaData.php
 
 		-
-			message: "#^Cannot access property \\$gedcom_chunk_id on object\\|null\\.$#"
-			count: 2
+			message: "#^Cannot call method displayImage\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/FixLevel0MediaData.php
+
+		-
+			message: "#^Cannot call method fullName\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/FixLevel0MediaData.php
+
+		-
+			message: "#^Cannot call method url\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/FixLevel0MediaData.php
+
+		-
+			message: "#^Cannot call method fullName\\(\\) on Fisharebest\\\\Webtrees\\\\Individual\\|null\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/FixLevel0MediaData.php
+
+		-
+			message: "#^Cannot call method url\\(\\) on Fisharebest\\\\Webtrees\\\\Individual\\|null\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/FixLevel0MediaData.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$gedcom_chunk_id\\.$#"
+			count: 3
 			path: app/Http/RequestHandlers/GedcomLoad.php
 
 		-
 			message: "#^Access to an undefined property object\\:\\:\\$chunk_data\\.$#"
-			count: 2
+			count: 5
+			path: app/Http/RequestHandlers/GedcomLoad.php
+
+		-
+			message: "#^Cannot access property \\$chunk_data on object\\|null\\.$#"
+			count: 3
 			path: app/Http/RequestHandlers/GedcomLoad.php
 
 		-
@@ -580,7 +420,7 @@ parameters:
 			path: app/Http/RequestHandlers/GedcomLoad.php
 
 		-
-			message: "#^Access to an undefined property object\\:\\:\\$gedcom_chunk_id\\.$#"
+			message: "#^Cannot access property \\$gedcom_chunk_id on object\\|null\\.$#"
 			count: 1
 			path: app/Http/RequestHandlers/GedcomLoad.php
 
@@ -588,6 +428,51 @@ parameters:
 			message: "#^Parameter \\#1 \\$path of function basename expects string, string\\|null given\\.$#"
 			count: 1
 			path: app/Http/RequestHandlers/ImportGedcomAction.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function sha1 expects string, string\\|false given\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/ImportThumbnailsAction.php
+
+		-
+			message: "#^Cannot call method tree\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/ImportThumbnailsAction.php
+
+		-
+			message: "#^Cannot call method firstImageFile\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/ImportThumbnailsAction.php
+
+		-
+			message: "#^Cannot call method createFact\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/ImportThumbnailsAction.php
+
+		-
+			message: "#^Cannot call method xref\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/ImportThumbnailsAction.php
+
+		-
+			message: "#^Cannot call method facts\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/ImportThumbnailsAction.php
+
+		-
+			message: "#^Cannot call method updateRecord\\(\\) on Fisharebest\\\\Webtrees\\\\Media\\|null\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/ImportThumbnailsAction.php
+
+		-
+			message: "#^Parameter \\#1 \\$record of method Fisharebest\\\\Webtrees\\\\Services\\\\PendingChangesService\\:\\:acceptRecord\\(\\) expects Fisharebest\\\\Webtrees\\\\GedcomRecord, Fisharebest\\\\Webtrees\\\\Media\\|null given\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/ImportThumbnailsAction.php
+
+		-
+			message: "#^Cannot access offset 0 on \\(array\\<int, string\\>&nonEmpty\\)\\|false\\.$#"
+			count: 2
+			path: app/Http/RequestHandlers/ImportThumbnailsData.php
 
 		-
 			message: "#^Method Fisharebest\\\\Webtrees\\\\Http\\\\RequestHandlers\\\\IndividualPage\\:\\:getSidebars\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<Fisharebest\\\\Webtrees\\\\Module\\\\ModuleSidebarInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\>\\.$#"
@@ -598,6 +483,51 @@ parameters:
 			message: "#^Method Fisharebest\\\\Webtrees\\\\Http\\\\RequestHandlers\\\\IndividualPage\\:\\:getTabs\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<Fisharebest\\\\Webtrees\\\\Module\\\\ModuleTabInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\>\\.$#"
 			count: 1
 			path: app/Http/RequestHandlers/IndividualPage.php
+
+		-
+			message: "#^Parameter \\#4 \\$sort_columns of method Fisharebest\\\\Webtrees\\\\Services\\\\DatatablesService\\:\\:handleQuery\\(\\) expects array\\<string\\>, array\\<int, Illuminate\\\\Database\\\\Query\\\\Expression\\|string\\> given\\.$#"
+			count: 2
+			path: app/Http/RequestHandlers/ManageMediaData.php
+
+		-
+			message: "#^Cannot access offset '0' on array\\|false\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/ManageMediaData.php
+
+		-
+			message: "#^Cannot access offset '1' on array\\|false\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/ManageMediaData.php
+
+		-
+			message: "#^Parameter \\#1 \\$haystack of function str_contains expects string, string\\|false given\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/MapDataImportAction.php
+
+		-
+			message: "#^Parameter \\#1 \\$json of function json_decode expects string, string\\|false given\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/MapDataImportAction.php
+
+		-
+			message: "#^Offset 0 does not exist on array\\|null\\.$#"
+			count: 2
+			path: app/Http/RequestHandlers/MapDataImportAction.php
+
+		-
+			message: "#^Parameter \\#1 \\$var of function count expects array\\|Countable, array\\|null given\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/MapDataImportAction.php
+
+		-
+			message: "#^Parameter \\#1 \\$input of function array_slice expects array, array\\|null given\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/MapDataImportAction.php
+
+		-
+			message: "#^Offset int does not exist on array\\|null\\.$#"
+			count: 2
+			path: app/Http/RequestHandlers/MapDataImportAction.php
 
 		-
 			message: "#^Parameter \\#1 \\$gedcom of method Fisharebest\\\\Webtrees\\\\GedcomRecord\\:\\:updateRecord\\(\\) expects string, string\\|null given\\.$#"
@@ -668,6 +598,11 @@ parameters:
 			message: "#^Cannot call method local\\(\\) on Fisharebest\\\\Webtrees\\\\Carbon\\|null\\.$#"
 			count: 1
 			path: app/Http/RequestHandlers/SiteLogsData.php
+
+		-
+			message: "#^Parameter \\#2 \\$resource of method League\\\\Flysystem\\\\FilesystemInterface\\:\\:writeStream\\(\\) expects resource, resource\\|null given\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/UploadMediaAction.php
 
 		-
 			message: "#^Method Fisharebest\\\\Webtrees\\\\Http\\\\Routes\\\\ApiRoutes\\:\\:load\\(\\) has parameter \\$router with no value type specified in iterable type Aura\\\\Router\\\\Map\\.$#"
@@ -975,11 +910,6 @@ parameters:
 			path: app/Module/LifespansChartModule.php
 
 		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Module\\\\MediaListModule\\:\\:allFolders\\(\\) should return array\\<string\\> but returns array\\|false\\.$#"
-			count: 1
-			path: app/Module/MediaListModule.php
-
-		-
 			message: "#^Method Fisharebest\\\\Webtrees\\\\Module\\\\ModuleBlockInterface\\:\\:getBlock\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/Module/ModuleBlockInterface.php
@@ -987,7 +917,7 @@ parameters:
 		-
 			message: "#^Parameter \\#1 \\$string of function strlen expects string, string\\|false given\\.$#"
 			count: 1
-			path: modules_v4/example-theme.disable/module.php
+			path: modules_v4/example-footer.disable/module.php
 
 		-
 			message: "#^Parameter \\#1 \\$string of function strlen expects string, string\\|false given\\.$#"
@@ -1002,7 +932,7 @@ parameters:
 		-
 			message: "#^Parameter \\#1 \\$string of function strlen expects string, string\\|false given\\.$#"
 			count: 1
-			path: modules_v4/example-footer.disable/module.php
+			path: modules_v4/example-theme.disable/module.php
 
 		-
 			message: "#^Parameter \\#1 \\$string of function strlen expects string, string\\|false given\\.$#"
@@ -1045,7 +975,7 @@ parameters:
 			path: app/Module/CloudsTheme.php
 
 		-
-			message: "#^Cannot access offset mixed on array\\<int, string\\>\\|false\\.$#"
+			message: "#^Cannot access offset mixed on \\(array\\<int, string\\>&nonEmpty\\)\\|false\\.$#"
 			count: 1
 			path: app/Module/CloudsTheme.php
 
@@ -1070,7 +1000,7 @@ parameters:
 			path: app/Module/FabTheme.php
 
 		-
-			message: "#^Cannot access offset mixed on array\\<int, string\\>\\|false\\.$#"
+			message: "#^Cannot access offset mixed on \\(array\\<int, string\\>&nonEmpty\\)\\|false\\.$#"
 			count: 1
 			path: app/Module/FabTheme.php
 
@@ -1095,7 +1025,7 @@ parameters:
 			path: app/Module/MinimalTheme.php
 
 		-
-			message: "#^Cannot access offset mixed on array\\<int, string\\>\\|false\\.$#"
+			message: "#^Cannot access offset mixed on \\(array\\<int, string\\>&nonEmpty\\)\\|false\\.$#"
 			count: 1
 			path: app/Module/MinimalTheme.php
 
@@ -1120,7 +1050,7 @@ parameters:
 			path: app/Module/WebtreesTheme.php
 
 		-
-			message: "#^Cannot access offset mixed on array\\<int, string\\>\\|false\\.$#"
+			message: "#^Cannot access offset mixed on \\(array\\<int, string\\>&nonEmpty\\)\\|false\\.$#"
 			count: 1
 			path: app/Module/WebtreesTheme.php
 
@@ -1145,7 +1075,7 @@ parameters:
 			path: app/Module/XeneaTheme.php
 
 		-
-			message: "#^Cannot access offset mixed on array\\<int, string\\>\\|false\\.$#"
+			message: "#^Cannot access offset mixed on \\(array\\<int, string\\>&nonEmpty\\)\\|false\\.$#"
 			count: 1
 			path: app/Module/XeneaTheme.php
 
@@ -1183,21 +1113,6 @@ parameters:
 			message: "#^Cannot call method local\\(\\) on Fisharebest\\\\Webtrees\\\\Carbon\\|false\\.$#"
 			count: 1
 			path: app/Module/RecentChangesModule.php
-
-		-
-			message: "#^Binary operation \"\\-\" between int\\<3, max\\>\\|string and 2 results in an error\\.$#"
-			count: 2
-			path: app/Module/RelationshipsChartModule.php
-
-		-
-			message: "#^Binary operation \"\\+\" between int\\<3, max\\>\\|string and 1 results in an error\\.$#"
-			count: 2
-			path: app/Module/RelationshipsChartModule.php
-
-		-
-			message: "#^Binary operation \"\\-\" between int\\<3, max\\>\\|string and 1 results in an error\\.$#"
-			count: 2
-			path: app/Module/RelationshipsChartModule.php
 
 		-
 			message: "#^Cannot call method gedcom\\(\\) on Fisharebest\\\\Webtrees\\\\Family\\|null\\.$#"
@@ -1240,11 +1155,6 @@ parameters:
 			path: app/Module/StatisticsChartModule.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: app/Module/StatisticsChartModule.php
-
-		-
 			message: "#^Binary operation \"\\-\" between string and 1 results in an error\\.$#"
 			count: 2
 			path: app/Module/StatisticsChartModule.php
@@ -1283,6 +1193,16 @@ parameters:
 			message: "#^Cannot access property \\$subject on object\\|null\\.$#"
 			count: 1
 			path: app/Module/UserJournalModule.php
+
+		-
+			message: "#^Cannot access property \\$latitude on object\\|null\\.$#"
+			count: 3
+			path: app/PlaceLocation.php
+
+		-
+			message: "#^Cannot access property \\$longitude on object\\|null\\.$#"
+			count: 3
+			path: app/PlaceLocation.php
 
 		-
 			message: "#^Method Fisharebest\\\\Webtrees\\\\Report\\\\AbstractRenderer\\:\\:getStyle\\(\\) return type has no value type specified in iterable type array\\.$#"
@@ -1430,16 +1350,6 @@ parameters:
 			path: app/Report/ReportParserGenerate.php
 
 		-
-			message: "#^Parameter \\#1 \\$width of method Fisharebest\\\\Webtrees\\\\Report\\\\AbstractRenderer\\:\\:createCell\\(\\) expects int, int\\|string given\\.$#"
-			count: 1
-			path: app/Report/ReportParserGenerate.php
-
-		-
-			message: "#^Parameter \\#2 \\$height of method Fisharebest\\\\Webtrees\\\\Report\\\\AbstractRenderer\\:\\:createCell\\(\\) expects int, int\\|string given\\.$#"
-			count: 1
-			path: app/Report/ReportParserGenerate.php
-
-		-
 			message: "#^Property Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\:\\:\\$print_data \\(bool\\) does not accept bool\\|null\\.$#"
 			count: 4
 			path: app/Report/ReportParserGenerate.php
@@ -1477,11 +1387,6 @@ parameters:
 		-
 			message: "#^Cannot call method addElement\\(\\) on Fisharebest\\\\Webtrees\\\\Report\\\\AbstractRenderer\\|null\\.$#"
 			count: 1
-			path: app/Report/ReportParserGenerate.php
-
-		-
-			message: "#^Parameter \\#1 \\$str of function strip_tags expects string, string\\|null given\\.$#"
-			count: 2
 			path: app/Report/ReportParserGenerate.php
 
 		-
@@ -1650,6 +1555,16 @@ parameters:
 			path: app/Report/TcpdfWrapper.php
 
 		-
+			message: "#^Access to an undefined property object\\:\\:\\$max\\.$#"
+			count: 2
+			path: app/Schema/Migration44.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$min\\.$#"
+			count: 1
+			path: app/Schema/Migration44.php
+
+		-
 			message: "#^Anonymous function should return Fisharebest\\\\Webtrees\\\\Source but returns Fisharebest\\\\Webtrees\\\\Source\\|null\\.$#"
 			count: 1
 			path: app/Services/AdminService.php
@@ -1750,7 +1665,12 @@ parameters:
 			path: app/Services/HomePageService.php
 
 		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\HomePageService\\:\\:filterActiveBlocks\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleBlockInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<string\\>\\.$#"
+			message: "#^Parameter \\#2 \\$active_blocks of method Fisharebest\\\\Webtrees\\\\Services\\\\HomePageService\\:\\:filterActiveBlocks\\(\\) expects Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleBlockInterface\\>, Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleBlockInterface\\> given\\.$#"
+			count: 2
+			path: app/Services/HomePageService.php
+
+		-
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\HomePageService\\:\\:filterActiveBlocks\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleBlockInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<string\\>\\.$#"
 			count: 1
 			path: app/Services/HomePageService.php
 
@@ -1760,28 +1680,18 @@ parameters:
 			path: app/Services/HousekeepingService.php
 
 		-
-			message: "#^Access to an undefined property object\\:\\:\\$pl_place\\.$#"
+			message: "#^Access to an undefined property object\\:\\:\\$place\\.$#"
 			count: 1
 			path: app/Services/MapDataService.php
 
 		-
-			message: "#^Access to an undefined property object\\:\\:\\$pl_parent_id\\.$#"
-			count: 1
-			path: app/Services/MapDataService.php
-
-		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\MapDataService\\:\\:activePlaces\\(\\) should return array\\<string, array\\<stdClass\\>\\> but returns array\\<int\\|string, array\\<int, mixed\\>\\>\\.$#"
+			message: "#^Access to an undefined property object\\:\\:\\$parent_id\\.$#"
 			count: 1
 			path: app/Services/MapDataService.php
 
 		-
 			message: "#^Parameter \\#1 \\$size of method Fisharebest\\\\Webtrees\\\\Services\\\\MediaFileService\\:\\:parseIniFileSize\\(\\) expects string, string\\|false given\\.$#"
 			count: 2
-			path: app/Services/MediaFileService.php
-
-		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\MediaFileService\\:\\:unusedFiles\\(\\) should return array\\<string\\> but returns array\\|false\\.$#"
-			count: 1
 			path: app/Services/MediaFileService.php
 
 		-
@@ -2171,6 +2081,11 @@ parameters:
 
 		-
 			message: "#^Method Fisharebest\\\\Webtrees\\\\Statistics\\\\Repository\\\\IndividualRepository\\:\\:commonGivenUnknownTable\\(\\) should return string but returns array\\<int\\>\\|string\\.$#"
+			count: 1
+			path: app/Statistics/Repository/IndividualRepository.php
+
+		-
+			message: "#^Parameter \\#3 \\$value of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:having\\(\\) expects string\\|null, int given\\.$#"
 			count: 1
 			path: app/Statistics/Repository/IndividualRepository.php
 

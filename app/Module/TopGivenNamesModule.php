@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2019 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -174,8 +174,8 @@ class TopGivenNamesModule extends AbstractModule implements ModuleBlockInterface
      */
     public function editBlockConfiguration(Tree $tree, int $block_id): string
     {
-        $num       = $this->getBlockSetting($block_id, 'num', self::DEFAULT_NUMBER);
-        $infoStyle = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
+        $num        = $this->getBlockSetting($block_id, 'num', self::DEFAULT_NUMBER);
+        $info_style = $this->getBlockSetting($block_id, 'infoStyle', self::DEFAULT_STYLE);
 
         $info_styles = [
             /* I18N: An option in a list-box */
@@ -185,7 +185,7 @@ class TopGivenNamesModule extends AbstractModule implements ModuleBlockInterface
         ];
 
         return view('modules/top10_givnnames/config', [
-            'infoStyle'   => $infoStyle,
+            'info_style'  => $info_style,
             'info_styles' => $info_styles,
             'num'         => $num,
         ]);

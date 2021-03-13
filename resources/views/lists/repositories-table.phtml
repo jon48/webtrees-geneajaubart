@@ -1,9 +1,17 @@
 <?php
 
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Repository;
+use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Collection;
+
+/**
+ * @var Collection<Repository> $repositories
+ * @var Tree                   $tree
+ */
 
 ?>
 
@@ -47,7 +55,7 @@ $count_sources = DB::table('sources')
 
     <tbody>
         <?php foreach ($repositories as $repository) : ?>
-            <tr class="<?= $repository->isPendingDeletion() ? 'wt-old' : ($repository->isPendingAddition() ? 'wt-new' : '') ?>">
+            <tr class="<?= $repository->isPendingAddition() ? 'wt-new' : '' ?> <?= $repository->isPendingDeletion() ? 'wt-old' : '' ?>">
                 <!-- Repository name -->
                 <td data-sort="<?= e($repository->sortName()) ?>">
                     <a href="<?= e($repository->url()) ?>">

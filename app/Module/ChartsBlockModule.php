@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -20,13 +20,13 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Module\InteractiveTree\TreeView;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Tree;
-use Fisharebest\Webtrees\User;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -93,7 +93,7 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
     public function getBlock(Tree $tree, int $block_id, string $context, array $config = []): string
     {
         $PEDIGREE_ROOT_ID = $tree->getPreference('PEDIGREE_ROOT_ID');
-        $gedcomid         = $tree->getUserPreference(Auth::user(), User::PREF_TREE_ACCOUNT_XREF);
+        $gedcomid         = $tree->getUserPreference(Auth::user(), UserInterface::PREF_TREE_ACCOUNT_XREF);
         $default_xref     = $gedcomid ?: $PEDIGREE_ROOT_ID;
 
         $type = $this->getBlockSetting($block_id, 'type', 'pedigree');
@@ -120,7 +120,6 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
                         $content   = view('modules/charts/chart', [
                             'block_id'  => $block_id,
                             'chart_url' => $chart_url,
-                            'class'     => 'wt-chart-pedigree',
                         ]);
                     } else {
                         $title   = I18N::translate('Pedigree');
@@ -141,7 +140,6 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
                         $content   = view('modules/charts/chart', [
                             'block_id'  => $block_id,
                             'chart_url' => $chart_url,
-                            'class'     => 'wt-chart-descendants',
                         ]);
                     } else {
                         $title   = I18N::translate('Descendants');
@@ -162,7 +160,6 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
                         $content   = view('modules/charts/chart', [
                             'block_id'  => $block_id,
                             'chart_url' => $chart_url,
-                            'class'     => 'wt-chart-hourglass',
                         ]);
                     } else {
                         $title   = I18N::translate('Hourglass chart');
@@ -261,7 +258,7 @@ class ChartsBlockModule extends AbstractModule implements ModuleBlockInterface
     public function editBlockConfiguration(Tree $tree, int $block_id): string
     {
         $PEDIGREE_ROOT_ID = $tree->getPreference('PEDIGREE_ROOT_ID');
-        $gedcomid         = $tree->getUserPreference(Auth::user(), User::PREF_TREE_ACCOUNT_XREF);
+        $gedcomid         = $tree->getUserPreference(Auth::user(), UserInterface::PREF_TREE_ACCOUNT_XREF);
         $default_xref     = $gedcomid ?: $PEDIGREE_ROOT_ID;
 
         $type = $this->getBlockSetting($block_id, 'type', 'pedigree');

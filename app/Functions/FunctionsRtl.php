@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -77,7 +77,7 @@ class FunctionsRtl
      *
      * @return string The input string, with &lrm; and &rlm; stripped
      */
-    public static function stripLrmRlm($inputText): string
+    public static function stripLrmRlm(string $inputText): string
     {
         return str_replace([
             self::UTF8_LRM,
@@ -514,7 +514,7 @@ class FunctionsRtl
      *
      * @return string
      */
-    public static function starredName($textSpan, $direction): string
+    public static function starredName(string $textSpan, string $direction): string
     {
         // To avoid a TCPDF bug that mixes up the word order, insert those <u> and </u> tags
         // only when page and span directions are identical.
@@ -597,7 +597,7 @@ class FunctionsRtl
      *
      * @return void
      */
-    public static function breakCurrentSpan(&$result): void
+    public static function breakCurrentSpan(string &$result): void
     {
         // Interrupt the current span, insert that <br>, and then continue the current span
         $result .= self::$waitingText;
@@ -614,7 +614,7 @@ class FunctionsRtl
      *
      * @return void
      */
-    public static function beginCurrentSpan(&$result): void
+    public static function beginCurrentSpan(string &$result): void
     {
         if (self::$currentState === 'LTR') {
             $result .= self::START_LTR;
@@ -634,7 +634,7 @@ class FunctionsRtl
      *
      * @return void
      */
-    public static function finishCurrentSpan(&$result, $theEnd = false): void
+    public static function finishCurrentSpan(string &$result, bool $theEnd = false): void
     {
         $textSpan = substr($result, self::$posSpanStart);
         $result   = substr($result, 0, self::$posSpanStart);
