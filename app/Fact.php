@@ -187,7 +187,7 @@ class Fact
             $this->id     = $id;
             $this->tag    = $match[1];
         } else {
-            throw new InvalidArgumentException('Invalid GEDCOM data passed to Fact::_construct(' . $gedcom . ')');
+            throw new InvalidArgumentException('Invalid GEDCOM data passed to Fact::_construct(' . $gedcom . ',' . $parent->xref() . ')');
         }
     }
 
@@ -428,20 +428,6 @@ class Fact
     public function getTag(): string
     {
         return $this->tag;
-    }
-
-    /**
-     * Used to convert a real fact (e.g. BIRT) into a close-relative’s fact (e.g. _BIRT_CHIL)
-     *
-     * @param string $tag
-     *
-     * @return void
-     *
-     * @deprecated since 2.0.5.  Will be removed in 2.1.0
-     */
-    public function setTag(string $tag): void
-    {
-        $this->tag = $tag;
     }
 
     /**

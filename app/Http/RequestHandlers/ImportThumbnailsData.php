@@ -26,7 +26,11 @@ use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\SearchService;
 use Illuminate\Support\Collection;
 use Intervention\Image\ImageManager;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\StorageAttributes;
+use League\Flysystem\UnableToRetrieveMetadata;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -87,13 +91,17 @@ class ImportThumbnailsData implements RequestHandlerInterface
         $search = $request->getQueryParams()['search']['value'];
 
         // Fetch all thumbnails
-        $thumbnails = Collection::make($data_filesystem->listContents('', true))
-            ->filter(static function (array $metadata): bool {
-                return $metadata['type'] === 'file' && str_contains($metadata['path'], '/thumbs/');
-            })
-            ->map(static function (array $metadata): string {
-                return $metadata['path'];
-            });
+        try {
+            $thumbnails = Collection::make($data_filesystem->listContents('', Filesystem::LIST_DEEP))
+                ->filter(static function (StorageAttributes $attributes): bool {
+                    return $attributes->isFile() && str_contains($attributes->path(), '/thumbs/');
+                })
+                ->map(static function (StorageAttributes $attributes): string {
+                    return $attributes->path();
+                });
+        } catch (FilesystemException $ex) {
+            $thumbnails = new Collection();
+        }
 
         $recordsTotal = $thumbnails->count();
 
@@ -175,31 +183,40 @@ class ImportThumbnailsData implements RequestHandlerInterface
      * Compare two images, and return a quantified difference.
      * 0 (different) ... 100 (same)
      *
-     * @param FilesystemInterface $data_filesystem
-     * @param string              $thumbnail
-     * @param string              $original
+     * @param FilesystemOperator $data_filesystem
+     * @param string             $thumbnail
+     * @param string             $original
      *
      * @return int
      */
-    private function imageDiff(FilesystemInterface $data_filesystem, string $thumbnail, string $original): int
+    private function imageDiff(FilesystemOperator $data_filesystem, string $thumbnail, string $original): int
     {
         // The original filename was generated from the thumbnail filename.
         // It may not actually exist.
-        if (!$data_filesystem->has($original)) {
+        try {
+            $file_exists =  $data_filesystem->fileExists($original);
+        } catch (FilesystemException | UnableToRetrieveMetadata $ex) {
+            $file_exists = false;
+        }
+
+        if (!$file_exists) {
             return 100;
         }
 
-        $thumbnail_type = explode('/', $data_filesystem->getMimetype($thumbnail) ?: Mime::DEFAULT_TYPE)[0];
-        $original_type  = explode('/', $data_filesystem->getMimetype($original) ?: Mime::DEFAULT_TYPE)[0];
-
-        if ($thumbnail_type !== 'image') {
-            // If the thumbnail file is not an image then similarity is unimportant.
-            // Response with an exact match, so the GUI will recommend deleting it.
-            return 100;
+        try {
+            $thumbnail_type = $data_filesystem->mimeType($thumbnail) ?: Mime::DEFAULT_TYPE;
+        } catch (FilesystemException | UnableToRetrieveMetadata $ex) {
+            $thumbnail_type = Mime::DEFAULT_TYPE;
         }
 
-        if ($original_type !== 'image') {
-            // If the original file is not an image then similarity is unimportant .
+        try {
+            $original_type = $data_filesystem->mimeType($original) ?: Mime::DEFAULT_TYPE;
+        } catch (FilesystemException | UnableToRetrieveMetadata $ex) {
+            $original_type = Mime::DEFAULT_TYPE;
+        }
+
+        if (explode('/', $thumbnail_type)[0] !== 'image' || explode('/', $original_type)[0] !== 'image') {
+            // If either file is not an image then similarity is unimportant .
             // Response with an exact mismatch, so the GUI will recommend importing it.
             return 0;
         }
@@ -224,12 +241,12 @@ class ImportThumbnailsData implements RequestHandlerInterface
      * This is a slow operation, add we will do it many times on
      * the "import webtrees 1 thumbnails" page so cache the results.
      *
-     * @param FilesystemInterface $filesystem
-     * @param string              $path
+     * @param FilesystemOperator $filesystem
+     * @param string             $path
      *
      * @return int[][]
      */
-    private function scaledImagePixels(FilesystemInterface $filesystem, string $path): array
+    private function scaledImagePixels(FilesystemOperator $filesystem, string $path): array
     {
         return Registry::cache()->file()->remember('pixels-' . $path, static function () use ($filesystem, $path): array {
             $blob    = $filesystem->read($path);

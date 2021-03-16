@@ -34,7 +34,9 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\StorageAttributes;
 
 use function array_map;
 use function explode;
@@ -240,29 +242,35 @@ class AdminService
     /**
      * A list of GEDCOM files in the data folder.
      *
-     * @param FilesystemInterface $filesystem
+     * @param FilesystemOperator $filesystem
      *
      * @return Collection<string>
      */
-    public function gedcomFiles(FilesystemInterface $filesystem): Collection
+    public function gedcomFiles(FilesystemOperator $filesystem): Collection
     {
-        return Collection::make($filesystem->listContents())
-            ->filter(static function (array $path) use ($filesystem): bool {
-                if ($path['type'] !== 'file') {
-                    return false;
-                }
+        try {
+            $files = $filesystem->listContents('')
+                ->filter(static function (StorageAttributes $attributes) use ($filesystem) {
+                    if (!$attributes->isFile()) {
+                        return false;
+                    }
 
-                $stream = $filesystem->readStream($path['path']);
+                    $stream = $filesystem->readStream($attributes->path());
 
-                $header = fread($stream, 10);
-                fclose($stream);
+                    $header = fread($stream, 10);
+                    fclose($stream);
 
-                return preg_match('/^(' . Gedcom::UTF8_BOM . ')?0 HEAD/', $header) > 0;
-            })
-            ->map(static function (array $path): string {
-                return $path['path'];
-            })
-            ->sort();
+                    return preg_match('/^(' . Gedcom::UTF8_BOM . ')?0 HEAD/', $header) > 0;
+                })
+                ->map(function (StorageAttributes $attributes) {
+                    return $attributes->path();
+                })
+                ->toArray();
+        } catch (FilesystemException $ex) {
+            $files = [];
+        }
+
+        return Collection::make($files)->sort();
     }
 
     /**

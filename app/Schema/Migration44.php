@@ -79,6 +79,33 @@ class Migration44 implements MigrationInterface
                     'pl1.pl_parent_id' => 0,
                 ]);
 
+            // Remove invalid values.
+            if (DB::connection()->getDriverName() === 'mysql') {
+                DB::table('placelocation')
+                    ->where('pl_lati', 'NOT REGEXP', '[^NS][0-9]+[.]?[0-9]*$')
+                    ->orWhere('pl_long', 'NOT REGEXP', '[^EW][0-9]+[.]?[0-9]*$')
+                    ->update([
+                        'pl_lati' => '',
+                        'pl_long' => '',
+                    ]);
+            }
+
+            // The existing data may have placenames that only differ after the first 120 chars.
+            // Need to remove the constraint before we truncate/merge them.
+            try {
+                DB::schema()->table('placelocation', static function (Blueprint $table): void {
+                    $table->dropUnique(['pl_parent_id', 'pl_place']);
+                });
+            } catch (PDOException $ex) {
+                throw $ex;
+                // Already deleted, or does not exist;
+            }
+
+            DB::table('placelocation')
+                ->update([
+                    'pl_place' => new Expression('SUBSTR(pl_place, 1, 120)'),
+                ]);
+
             // The lack of unique key constraints means that there may be duplicates...
             while (true) {
                 // Two places with the same name and parent...
@@ -110,6 +137,7 @@ class Migration44 implements MigrationInterface
             $select1 = DB::table('placelocation')
                 ->leftJoin('place_location', 'id', '=', 'pl_id')
                 ->whereNull('id')
+                ->orderBy('pl_level')
                 ->orderBy('pl_id')
                 ->select([
                     'pl_id',
@@ -123,6 +151,7 @@ class Migration44 implements MigrationInterface
             $select2 = DB::table('placelocation')
                 ->leftJoin('place_location', 'id', '=', 'pl_id')
                 ->whereNull('id')
+                ->orderBy('pl_level')
                 ->orderBy('pl_id')
                 ->select([
                     'pl_id',

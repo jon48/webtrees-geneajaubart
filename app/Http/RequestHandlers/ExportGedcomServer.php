@@ -26,6 +26,8 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\GedcomExportService;
 use Fisharebest\Webtrees\Tree;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToWriteFile;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -91,12 +93,12 @@ class ExportGedcomServer implements RequestHandlerInterface
 
             $this->gedcom_export_service->export($tree, $stream, true);
             rewind($stream);
-            $data_filesystem->putStream($filename, $stream);
+            $data_filesystem->writeStream($filename, $stream);
             fclose($stream);
 
             /* I18N: %s is a filename */
             FlashMessages::addMessage(I18N::translate('The family tree has been exported to %s.', Html::filename($filename)), 'success');
-        } catch (Throwable $ex) {
+        } catch (FilesystemException | UnableToWriteFile $ex) {
             FlashMessages::addMessage(
                 I18N::translate('The file %s could not be created.', Html::filename($filename)) . '<hr><samp dir="ltr">' . $ex->getMessage() . '</samp>',
                 'danger'

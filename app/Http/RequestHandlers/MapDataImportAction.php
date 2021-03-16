@@ -27,6 +27,9 @@ use Fisharebest\Webtrees\PlaceLocation;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\MapDataService;
 use Illuminate\Database\Capsule\Manager as DB;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckFileExistence;
+use League\Flysystem\UnableToReadFile;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -47,6 +50,7 @@ use function route;
 use function str_contains;
 use function stream_get_contents;
 
+use const JSON_THROW_ON_ERROR;
 use const UPLOAD_ERR_OK;
 
 /**
@@ -81,9 +85,20 @@ class MapDataImportAction implements RequestHandlerInterface
 
         $fp = false;
 
-        if ($serverfile !== '' && $data_filesystem->has(MapDataService::PLACES_FOLDER . $serverfile)) {
+        try {
+            $file_exists = $data_filesystem->fileExists(MapDataService::PLACES_FOLDER . $serverfile);
+        } catch (FilesystemException | UnableToCheckFileExistence $ex) {
+            $file_exists = false;
+        }
+
+
+        if ($serverfile !== '' && $file_exists) {
             // first choice is file on server
-            $fp = $data_filesystem->readStream(MapDataService::PLACES_FOLDER . $serverfile);
+            try {
+                $fp = $data_filesystem->readStream(MapDataService::PLACES_FOLDER . $serverfile);
+            } catch (FilesystemException | UnableToReadFile $ex) {
+                $fp = false;
+            }
         } elseif ($local_file instanceof UploadedFileInterface && $local_file->getError() === UPLOAD_ERR_OK) {
             // 2nd choice is local file
             $fp = $local_file->getStream()->detach();
@@ -97,7 +112,7 @@ class MapDataImportAction implements RequestHandlerInterface
 
         // Check the file type
         if (str_contains($string, 'FeatureCollection')) {
-            $input_array = json_decode($string, false);
+            $input_array = json_decode($string, false, 512, JSON_THROW_ON_ERROR);
 
             foreach ($input_array->features as $feature) {
                 $places[] = [

@@ -29,10 +29,8 @@ use Fisharebest\Webtrees\Services\TimeoutService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\DetectsDeadlocks;
+use Illuminate\Database\DetectsConcurrencyErrors;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Support\Str;
-use PDOException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -55,7 +53,7 @@ use function view;
 class GedcomLoad implements RequestHandlerInterface
 {
     use ViewResponseTrait;
-    use DetectsDeadlocks;
+    use DetectsConcurrencyErrors;
 
     /** @var TimeoutService */
     private $timeout_service;
@@ -259,7 +257,7 @@ class GedcomLoad implements RequestHandlerInterface
             DB::connection()->rollBack();
 
             // Deadlock? Try again.
-            if ($this->causedByDeadlock($ex)) {
+            if ($this->causedByConcurrencyError($ex)) {
                 return $this->viewResponse('admin/import-progress', [
                     'errors'   => '',
                     'progress' => $progress ?? 0.0,

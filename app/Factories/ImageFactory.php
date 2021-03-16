@@ -24,6 +24,7 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\ImageFactoryInterface;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\MediaFile;
+use Fisharebest\Webtrees\Mime;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Webtrees;
 use Imagick;
@@ -32,8 +33,10 @@ use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Exception\NotSupportedException;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
-use League\Flysystem\FileNotFoundException;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToRetrieveMetadata;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Throwable;
@@ -41,6 +44,7 @@ use Throwable;
 use function addcslashes;
 use function basename;
 use function extension_loaded;
+use function get_class;
 use function pathinfo;
 use function response;
 use function strlen;
@@ -75,19 +79,25 @@ class ImageFactory implements ImageFactoryInterface
     /**
      * Send the original file - either inline or as a download.
      *
-     * @param FilesystemInterface $filesystem
-     * @param string              $path
-     * @param bool                $download
+     * @param FilesystemOperator $filesystem
+     * @param string             $path
+     * @param bool               $download
      *
      * @return ResponseInterface
      */
-    public function fileResponse(FilesystemInterface $filesystem, string $path, bool $download): ResponseInterface
+    public function fileResponse(FilesystemOperator $filesystem, string $path, bool $download): ResponseInterface
     {
         try {
             $data = $filesystem->read($path);
 
+            try {
+                $content_type = $filesystem->mimeType($path);
+            } catch (UnableToRetrieveMetadata $ex) {
+                $content_type = Mime::DEFAULT_TYPE;
+            }
+
             $headers = [
-                'Content-Type'   => $filesystem->getMimetype($path),
+                'Content-Type'   => $content_type,
                 'Content-Length' => (string) strlen($data),
             ];
 
@@ -96,25 +106,26 @@ class ImageFactory implements ImageFactoryInterface
             }
 
             return response($data, StatusCodeInterface::STATUS_OK, $headers);
-        } catch (FileNotFoundException $ex) {
-            return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND);
+        } catch (FilesystemException | UnableToReadFile $ex) {
+            return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND)
+                ->withHeader('X-Thumbnail-Exception', get_class($ex) . ': ' . $ex->getMessage());
         }
     }
 
     /**
      * Send a thumbnail.
      *
-     * @param FilesystemInterface $filesystem
-     * @param string              $path
-     * @param int                 $width
-     * @param int                 $height
-     * @param string              $fit
+     * @param FilesystemOperator $filesystem
+     * @param string             $path
+     * @param int                $width
+     * @param int                $height
+     * @param string             $fit
      *
      *
      * @return ResponseInterface
      */
     public function thumbnailResponse(
-        FilesystemInterface $filesystem,
+        FilesystemOperator $filesystem,
         string $path,
         int $width,
         int $height,
@@ -131,12 +142,13 @@ class ImageFactory implements ImageFactoryInterface
 
             return $this->imageResponse($data, $image->mime(), '');
         } catch (NotReadableException $ex) {
-            return $this->replacementImageResponse('.' . pathinfo($path, PATHINFO_EXTENSION));
-        } catch (FileNotFoundException $ex) {
+            return $this->replacementImageResponse('.' . pathinfo($path, PATHINFO_EXTENSION))
+                ->withHeader('X-Thumbnail-Exception', get_class($ex) . ': ' . $ex->getMessage());
+        } catch (FilesystemException | UnableToReadFile $ex) {
             return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND);
         } catch (Throwable $ex) {
             return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR)
-                ->withHeader('X-Thumbnail-Exception', $ex->getMessage());
+                ->withHeader('X-Thumbnail-Exception', get_class($ex) . ': ' . $ex->getMessage());
         }
     }
 
@@ -176,7 +188,7 @@ class ImageFactory implements ImageFactoryInterface
         } catch (NotReadableException $ex) {
             return $this->replacementImageResponse(pathinfo($filename, PATHINFO_EXTENSION))
                 ->withHeader('X-Image-Exception', $ex->getMessage());
-        } catch (FileNotFoundException $ex) {
+        } catch (FilesystemException | UnableToReadFile $ex) {
             return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND);
         } catch (Throwable $ex) {
             return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR)
@@ -209,12 +221,12 @@ class ImageFactory implements ImageFactoryInterface
         $path = $media_file->filename();
 
         try {
-            $mime_type = $filesystem->getMimetype($path);
+            $mime_type = $filesystem->mimeType($path);
 
             $key = implode(':', [
                 $media_file->media()->tree()->name(),
                 $path,
-                $filesystem->getTimestamp($path),
+                $filesystem->lastModified($path),
                 (string) $width,
                 (string) $height,
                 $fit,
@@ -243,12 +255,13 @@ class ImageFactory implements ImageFactoryInterface
 
             return $this->imageResponse($data, $mime_type, '');
         } catch (NotReadableException $ex) {
-            return $this->replacementImageResponse('.' . pathinfo($path, PATHINFO_EXTENSION));
-        } catch (FileNotFoundException $ex) {
+            return $this->replacementImageResponse('.' . pathinfo($path, PATHINFO_EXTENSION))
+                ->withHeader('X-Thumbnail-Exception', get_class($ex) . ': ' . $ex->getMessage());
+        } catch (FilesystemException | UnableToReadFile $ex) {
             return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND);
         } catch (Throwable $ex) {
             return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR)
-                ->withHeader('X-Thumbnail-Exception', $ex->getMessage());
+                ->withHeader('X-Thumbnail-Exception', get_class($ex) . ': ' . $ex->getMessage());
         }
     }
 

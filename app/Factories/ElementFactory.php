@@ -85,7 +85,7 @@ use Fisharebest\Webtrees\Elements\FamilyStatusText;
 use Fisharebest\Webtrees\Elements\FileName;
 use Fisharebest\Webtrees\Elements\FirstCommunion;
 use Fisharebest\Webtrees\Elements\Form;
-use Fisharebest\Webtrees\Elements\Gedcom;
+use Fisharebest\Webtrees\Elements\GedcomElement;
 use Fisharebest\Webtrees\Elements\GenerationsOfAncestors;
 use Fisharebest\Webtrees\Elements\GenerationsOfDescendants;
 use Fisharebest\Webtrees\Elements\GovIdentifier;
@@ -348,7 +348,7 @@ class ElementFactory implements ElementFactoryInterface
                 'HEAD:DATE:TIME'           => new TimeValue(I18N::translate('Time')),
                 'HEAD:DEST'                => new ReceivingSystemName(I18N::translate('Destination')),
                 'HEAD:FILE'                => new FileName(I18N::translate('Filename')),
-                'HEAD:GEDC'                => new Gedcom(I18N::translate('GEDCOM')),
+                'HEAD:GEDC'                => new GedcomElement(I18N::translate('GEDCOM')),
                 'HEAD:GEDC:FORM'           => new Form(I18N::translate('Format')),
                 'HEAD:GEDC:VERS'           => new VersionNumber(I18N::translate('Version')),
                 'HEAD:LANG'                => new LanguageId(I18N::translate('Language')),
@@ -1022,7 +1022,6 @@ class ElementFactory implements ElementFactoryInterface
                 'SOUR:QUAY'                  => new CertaintyAssessment(I18N::translate('Quality of data')),
                 'SOUR:RECO'                  => new CustomElement('Recording agency?'),
                 'SOUR:REFS'                  => new XrefSource('Referenced source'),
-                'SOUR:REPO'                  => new XrefRepository('Repository'),
                 'SOUR:REPO:DPRT:ARVL'        => new CustomElement('Departure'),
                 'SOUR:REPO:DPRT:ARVL:DATE'   => new DateValue('Date'),
                 'SOUR:REPO:DPRT:ARVL:PLAC'   => new PlaceName('Place'),

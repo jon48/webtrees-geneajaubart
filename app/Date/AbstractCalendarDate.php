@@ -33,18 +33,13 @@ use function get_class;
 use function intdiv;
 use function is_array;
 use function is_int;
-use function max;
 use function preg_match;
 use function route;
 use function sprintf;
 use function str_contains;
 use function strpbrk;
 use function strtr;
-use function trigger_error;
 use function trim;
-use function view;
-
-use const E_USER_DEPRECATED;
 
 /**
  * Classes for Gedcom Date/Calendar functionality.
@@ -387,95 +382,6 @@ abstract class AbstractCalendarDate
         }
 
         return [$years, $months, $days];
-    }
-
-    /**
-     * How long between an event and a given julian day
-     * Return result as a number of years.
-     *
-     * @param int $jd date for calculation
-     *
-     * @return int
-     *
-     * @deprecated since 2.0.4.  Will be removed in 2.1.0
-     */
-    public function getAge(int $jd): int
-    {
-        trigger_error('AbstractCalendarDate::getAge() is deprecated. Use class Age instead.', E_USER_DEPRECATED);
-
-        if ($this->year === 0 || $jd === 0) {
-            return 0;
-        }
-        if ($this->minimum_julian_day < $jd && $this->maximum_julian_day > $jd) {
-            return 0;
-        }
-        if ($this->minimum_julian_day === $jd) {
-            return 0;
-        }
-        [$y, $m, $d] = $this->calendar->jdToYmd($jd);
-        $dy = $y - $this->year;
-        $dm = $m - max($this->month, 1);
-        $dd = $d - max($this->day, 1);
-        if ($dd < 0) {
-            $dm--;
-        }
-        if ($dm < 0) {
-            $dy--;
-        }
-
-        // Not a full age? Then just the years
-        return $dy;
-    }
-
-    /**
-     * How long between an event and a given julian day
-     * Return result as a gedcom-style age string.
-     *
-     * @param int $jd date for calculation
-     *
-     * @return string
-     *
-     * @deprecated since 2.0.4.  Will be removed in 2.1.0
-     */
-    public function getAgeFull(int $jd): string
-    {
-        trigger_error('AbstractCalendarDate::getAge() is deprecated. Use class Age instead.', E_USER_DEPRECATED);
-
-        if ($this->year === 0 || $jd === 0) {
-            return '';
-        }
-        if ($this->minimum_julian_day < $jd && $this->maximum_julian_day > $jd) {
-            return '';
-        }
-        if ($this->minimum_julian_day === $jd) {
-            return '';
-        }
-        if ($jd < $this->minimum_julian_day) {
-            return view('icons/warning');
-        }
-        [$y, $m, $d] = $this->calendar->jdToYmd($jd);
-        $dy = $y - $this->year;
-        $dm = $m - max($this->month, 1);
-        $dd = $d - max($this->day, 1);
-        if ($dd < 0) {
-            $dm--;
-        }
-        if ($dm < 0) {
-            $dm += $this->calendar->monthsInYear();
-            $dy--;
-        }
-        // Age in years?
-        if ($dy > 1) {
-            return $dy . 'y';
-        }
-        $dm += $dy * $this->calendar->monthsInYear();
-        // Age in months?
-        if ($dm > 1) {
-            return $dm . 'm';
-        }
-
-        // Age in days?
-        return ($jd - $this->minimum_julian_day) . 'd';
     }
 
     /**

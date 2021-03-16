@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Factories;
 
-use Fisharebest\Webtrees\Cache;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
@@ -32,19 +31,6 @@ use stdClass;
  */
 abstract class AbstractGedcomRecordFactory
 {
-    /** @var Cache  */
-    protected $cache;
-
-    /**
-     * GedcomRecordFactory constructor.
-     *
-     * @deprecated since 2.0.8 - will be removed in 2.1.0
-     */
-    public function __construct()
-    {
-        $this->cache = Registry::cache()->array();
-    }
-
     /**
      * @param Tree $tree
      *
