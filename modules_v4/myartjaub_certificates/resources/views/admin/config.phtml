@@ -1,0 +1,262 @@
+<?php
+
+use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
+use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\AdminConfigAction;
+use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\AdminTreesPage;
+use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
+
+/**
+ * @var string              $title
+ * @var Tree                $tree
+ * @var string              $data_folder
+ */
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route(ModulesAllPage::class) => I18N::translate('Modules'), route(AdminTreesPage::class) => $title, $tree->title()]]) ?>
+
+<h1><?= $title ?></h1>
+
+<form method="post" action="<?= e(route(AdminConfigAction::class, ['tree' => $tree->name()])) ?>" class="form-horizontal">
+    <?= csrf_field() ?>
+    
+    <h3><?= I18N::translate('General') ?></h3>
+
+    <!--  MAJ_CERTIF_ROOTDIR -->
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="MAJ_CERTIF_ROOTDIR">
+            <?= I18N::translate('Certificates directory') ?>
+        </label>
+        <div class="col-sm-9">
+            <div class="input-group" dir="ltr">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" dir="ltr">
+                        <?= e($data_folder) ?>
+                    </span>
+                </div>
+                <input
+                    class="form-control"
+                    dir="ltr"
+                    id="MAJ_CERTIF_ROOTDIR"
+                    maxlength="255"
+                    name="MAJ_CERTIF_ROOTDIR"
+                    type="text"
+                    value="<?= e($tree->getPreference('MAJ_CERTIF_ROOTDIR', 'certificates/')) ?>"
+                    required
+                >
+            </div>
+            <p class="small text-muted">
+                <?= I18N::translate('This folder will be used to store the certificate files.') ?>
+                <?= I18N::translate('If you select a different folder, you must also move any certificate files from the existing folder to the new one.') ?>
+            </p>
+        </div>
+    </div>
+    
+    <!-- MAJ_CERTIF_SHOW_CERT -->
+    <div class="row form-group">
+        <div class="col-form-label col-sm-3">
+            <label for="MAJ_CERTIF_SHOW_CERT">
+                <?= I18N::translate('Show certificates') ?>
+            </label>
+            <div class="hidden-xs">
+                <span class="badge visitors"><?= I18N::translate('visitors') ?></span>
+                <span class="badge members"><?= I18N::translate('members') ?></span>
+                <span class="badge managers"><?= I18N::translate('managers') ?></span>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <?= view('components/select', ['name' => 'MAJ_CERTIF_SHOW_CERT', 'selected' => $tree->getPreference('MAJ_CERTIF_SHOW_CERT', Auth::PRIV_HIDE), 'options' => Auth::accessLevelNames()]) ?>
+            <p class="small text-muted">
+                <?= I18N::translate('Define access level required to display certificates in facts sources. By default, nobody can see the certificates.') ?>
+            </p>
+        </div>
+    </div>
+    
+    <h3><?= I18N::translate('Watermarks') ?></h3>
+    
+    <!-- MAJ_CERTIF_SHOW_NO_WATERMARK -->
+    <div class="row form-group">
+        <div class="col-form-label col-sm-3">
+            <label for="MAJ_CERTIF_SHOW_NO_WATERMARK">
+            <?= I18N::translate('Show certificates without watermark') ?>
+            </label>
+            <div class="hidden-xs">
+                <span class="badge visitors"><?= I18N::translate('visitors') ?></span>
+                <span class="badge members"><?= I18N::translate('members') ?></span>
+                <span class="badge managers"><?= I18N::translate('managers') ?></span>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <?= view('components/select', ['name' => 'MAJ_CERTIF_SHOW_NO_WATERMARK', 'selected' => $tree->getPreference('MAJ_CERTIF_SHOW_NO_WATERMARK', Auth::PRIV_HIDE), 'options' => Auth::accessLevelNames()]) ?>
+            <p class="small text-muted">
+                <?= I18N::translate('Define access level of users who can see certificates without any watermark. By default, everybody will see the watermark.') ?>
+            </p>
+            <p class="small text-muted">
+                <?= I18N::translate('When displayed, the watermark is generated from the name of the repository and of the sources, if they exist. Otherwise, a default text is displayed.') ?>
+            </p>
+        </div>
+    </div>
+    
+    <!--  MAJ_CERTIF_WM_DEFAULT -->
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="MAJ_CERTIF_WM_DEFAULT">
+            <?= I18N::translate('Default watermark') ?>
+        </label>
+        <div class="col-sm-9">
+            <input 
+                type="text"
+                class="form-control" 
+                dir="ltr" 
+                id="MAJ_CERTIF_WM_DEFAULT" 
+                name="MAJ_CERTIF_WM_DEFAULT" 
+                value="<?= e($tree->getPreference('MAJ_CERTIF_WM_DEFAULT')) ?>" 
+                maxlength="255" 
+                placeholder="<?= I18N::translate('This image is protected under copyright law.')?>"
+            >
+            <p class="small text-muted">
+                <?= I18N::translate('Text to be displayed by default if no source has been associated with the certificate.') ?>
+            </p>
+        </div>
+    </div>
+    
+    <!--  MAJ_CERTIF_WM_FONT_COLOR -->
+    <div class="row form-group">            
+        <label class="col-sm-3 col-form-label" for="MAJ_CERTIF_WM_FONT_COLOR">
+            <?= I18N::translate('Watermark font color') ?>
+        </label>
+        <div class="col-sm-9">
+            <div class="row">
+                <!--  MAJ_CERTIF_WM_FONT_COLOR -->
+                <div class="col-sm-3">
+                    <div class="input-group" dir="ltr">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" dir="ltr">
+                            <?= I18N::translate('Color') ?>
+                            </span>
+                        </div>
+                        <input
+                            type="color" 
+                            class="form-control" 
+                            dir="ltr" 
+                            id="MAJ_CERTIF_WM_FONT_COLOR" 
+                            name="MAJ_CERTIF_WM_FONT_COLOR" 
+                            value="<?= e($tree->getPreference('MAJ_CERTIF_WM_FONT_COLOR', Watermark::DEFAULT_COLOR)) ?>" 
+                            maxlength="11">
+                    </div>
+                </div>
+            </div>
+            <p class="small text-muted">
+                <?= I18N::translate('Font color for the watermark. By default, <span style="color:%1$s;">the color %1$s</span> is used.', Watermark::DEFAULT_COLOR) ?>
+            </p>
+        </div>
+    </div>
+    
+    
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="MAJ_CERTIF_WM_FONT_MAXSIZE">
+            <?= I18N::translate('Watermark font size') ?>
+        </label>
+        <div class="col-sm-9">
+            <div class="row">
+                <!--  MAJ_CERTIF_WM_FONT_MAXSIZE -->
+                <div class="col-sm-5">
+                    <div class="input-group" dir="ltr">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" dir="ltr">
+                            <?= I18N::translate('Maximum font size') ?>
+                            </span>
+                        </div>
+                        <input
+                            type="number"
+                            class="form-control"
+                            dir="ltr"
+                            id="MAJ_CERTIF_WM_FONT_MAXSIZE"
+                            maxlength="2"
+                            name="MAJ_CERTIF_WM_FONT_MAXSIZE"
+                            value="<?= e($tree->getPreference('MAJ_CERTIF_WM_FONT_MAXSIZE')) ?>"
+                            min="1" max="99"
+                            placeholder="<?= Watermark::DEFAULT_SIZE ?>"
+                        >
+                        <span class="input-group-append">
+                            <span class="input-group-text" dir="ltr">
+                            <?= I18N::translate('pixels') ?>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>              
+            <p class="small text-muted">
+                <?= I18N::translate('Watermark font size') ?>
+            </p>
+        </div>
+    </div>
+    
+    <div class="row form-group">
+        <div class="offset-sm-3 col-sm-9">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa fa-check"></i>
+                <?= I18N::translate('save') ?>
+            </button>
+        
+            <a href="<?= e(route(AdminTreesPage::class)) ?>" class="btn btn-secondary">
+                <?= view('icons/cancel') ?>
+                <?= I18N::translate('cancel') ?>
+            </a>
+        </div>
+    </div>
+</form>
+
+
+<?php View::push('javascript') ?>
+<script>
+    "use strict";
+
+    /**
+     * Hide/show the feedback labels for a privacy option.
+     *
+     * @param sel    the control to change
+     * @param who    "visitors", "members" or "managers"
+     * @param access true or false
+     */
+    function setPrivacyFeedback(sel, who, access) {
+        var formGroup = $(sel).closest(".form-group");
+
+        if (access) {
+            $("." + who, formGroup).addClass("badge-success").removeClass("badge-secondary");
+            $("." + who + " i", formGroup).addClass("fa-check").removeClass("fa-times");
+        } else {
+            $("." + who, formGroup).addClass("badge-secondary").removeClass("badge-success");
+            $("." + who + " i", formGroup).addClass("fa-times").removeClass("fa-check");
+        }
+    }
+
+    /**
+     * Update all the privacy feedback labels.
+     */
+    function updatePrivacyFeedback() {
+        var showCertificates    = parseInt($("[name=MAJ_CERTIF_SHOW_CERT]").val(), 10);
+        var showNoWatermarks    = parseInt($("[name=MAJ_CERTIF_SHOW_NO_WATERMARK]").val(), 10);
+        console.log(showCertificates + " # " + showNoWatermarks);
+
+        setPrivacyFeedback("[name=MAJ_CERTIF_SHOW_CERT]", "visitors", showCertificates >= <?= Auth::PRIV_PRIVATE ?>);
+        setPrivacyFeedback("[name=MAJ_CERTIF_SHOW_CERT]", "members", showCertificates >= <?= Auth::PRIV_USER ?>);
+        setPrivacyFeedback("[name=MAJ_CERTIF_SHOW_CERT]", "managers", showCertificates >= <?= Auth::PRIV_NONE ?>);
+
+        setPrivacyFeedback("[name=MAJ_CERTIF_SHOW_NO_WATERMARK]", "visitors", showNoWatermarks >= <?= Auth::PRIV_PRIVATE ?>);
+        setPrivacyFeedback("[name=MAJ_CERTIF_SHOW_NO_WATERMARK]", "members", showNoWatermarks >= <?= Auth::PRIV_USER ?>);
+        setPrivacyFeedback("[name=MAJ_CERTIF_SHOW_NO_WATERMARK]", "managers", showNoWatermarks >= <?= Auth::PRIV_NONE ?>);
+    }
+
+ // Activate the privacy feedback labels.
+    updatePrivacyFeedback();
+    $("[name=MAJ_CERTIF_SHOW_CERT], [name=MAJ_CERTIF_SHOW_NO_WATERMARK]").on("change", function () {
+        updatePrivacyFeedback();
+    });
+
+</script>
+<?php View::endpush(); ?>

@@ -1,0 +1,28 @@
+<?php
+
+use Fisharebest\Webtrees\Html;
+use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\CertificateImage;
+use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\CertificatePage;
+use MyArtJaub\Webtrees\Module\Certificates\Model\Certificate;
+
+/**
+ * @var Certificate             $certificate
+ * @var UrlObfuscatorService    $url_obfuscator_service
+ */
+$url_obfuscator_service = $url_obfuscator_service ?? null;
+
+?>
+
+<?php
+$certif_url_params = $certificate->urlParameters($url_obfuscator_service);
+
+$link_attributes = Html::attributes([
+    'class'         =>  'gallery',
+    'type'          =>  $certificate->mimeType(),
+    'href'          =>  route(CertificateImage::class, $certif_url_params),
+    'data-title'    =>  '<a href="' . route(CertificatePage::class, $certif_url_params) . '">' . $certificate->name() . '</a>'
+])
+?>
+<a class="gallery" <?= $link_attributes ?>>
+    <img class="maj-certificate-image" alt="<?= $certificate->name() ?>" src="<?= e(route(CertificateImage::class, $certif_url_params)) ?>" />
+</a>

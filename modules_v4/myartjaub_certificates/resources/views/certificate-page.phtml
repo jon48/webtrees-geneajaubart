@@ -1,0 +1,80 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\CertificatesList;
+use MyArtJaub\Webtrees\Module\Certificates\Model\Certificate;
+use MyArtJaub\Webtrees\Module\Certificates\Services\UrlObfuscatorService;
+
+/**
+ * @var string                  $title
+ * @var Tree                    $tree
+ * @var string                  $module_name
+ * @var Certificate             $certificate
+ * @var UrlObfuscatorService    $url_obfuscator_service
+ * @var Collection              $linked_individuals
+ * @var Collection              $linked_families
+ */
+
+$has_individuals = $linked_individuals->count() > 0;
+$has_families = $linked_families->count() > 0;
+
+?>
+
+<h2 class="wt-page-title mx-auto"><?= e($title) ?></h2>
+
+
+<div class="wt-page-content wt-page-content-maj-certificate-page">
+    <h3><?= $certificate->city(); ?></h3>
+    
+    <h4>
+        <a href="<?= route(CertificatesList::class, ['tree' => $tree->name(), 'cityobf' => $url_obfuscator_service->obfuscate($certificate->city())]) ?>">
+        [<?= I18N::translate('See all certificates for %s', $certificate->city()); ?>]
+        </a>
+    </h4>
+    
+    <div id="maj-certificate-linked-tabs" class="maj-content-tabs maj-certificates-tabs-linked">
+        <div class="maj-certificate-image-display">
+            <?= view($module_name . '::components/certificate-image', [ 'certificate' => $certificate, 'url_obfuscator_service' => $url_obfuscator_service ])?>
+        </div>
+
+        <?php if ($has_individuals || $has_families) : ?>
+        <ul class="nav nav-tabs" role="tablist">
+            <?php if ($has_individuals) : ?>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" data-toggle="tab" role="tab" href="#maj-certificate-linked-indi">
+                    <?= I18N::translate('Individuals'); ?>
+                </a>
+            </li>
+            <?php endif;?>
+            
+            <?php if ($has_families) : ?>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link <?= $has_individuals ? '' : 'active' ?>" data-toggle="tab" role="tab" href="#maj-certificate-linked-fam">
+                    <?= I18N::translate('Families'); ?>
+                </a>
+            </li>
+            <?php endif;?>
+        </ul>
+        
+        <div class="tab-content">
+            <?php if ($has_individuals) : ?>
+            <div class="tab-pane fade show active" role="tabpanel" id="maj-certificate-linked-indi">
+                <?= view('lists/individuals-table', ['individuals' => $linked_individuals, 'sosa' => false, 'tree' => $tree]) ?>
+            </div>
+            <?php endif;?>
+            
+            <?php if ($has_families) : ?>
+            <div class="tab-pane fade <?= $has_individuals ? '' : 'show active' ?>" role="tabpanel" id="maj-certificate-linked-fam">
+                <?= view('lists/families-table', ['families' => $linked_families, 'tree' => $tree]) ?>
+            </div>
+            <?php endif;?>
+        </div>
+        <?php endif;?>
+    </div>
+    
+</div>
+
+</div>
+

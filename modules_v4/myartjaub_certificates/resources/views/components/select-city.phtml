@@ -1,0 +1,49 @@
+<?php
+
+use Fisharebest\Webtrees\View;
+
+/**
+ * @var string[][]  $cities
+ * @var string      $selected_city
+ * @var string|null $class
+ * @var string|null $id
+ * @var string      $name
+ * @var bool|null   $disabled
+ * @var bool|null   $required
+ */
+
+?>
+
+<div class="maj-certificate-select2">
+    <select
+        autocomplete="off"
+        class="form-control select2  maj-select2 <?= $class ?? '' ?>"
+        id="<?= e($id ?? $name) ?>"
+        name="<?= e($name) ?>"
+        <?= ($disabled ?? false) ? 'disabled' : '' ?>
+        <?= ($required ?? false) ? 'required' : '' ?>
+    >
+        <?php foreach ($cities as $city) :  ?>
+        <option value="<?= $city[0] ?>" <?= $selected_city === $city[1] ? 'selected' : '' ?>><?= $city[1] ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
+<?php View::pushunique('javascript') ?>
+
+<script>
+//on first focus (bubbles up to document), open the menu
+$(document).on('focus', '.maj-certificate-select2 .select2-selection.select2-selection--single', function (e) {
+  $(this).closest(".select2-container").siblings('select:enabled').select2('open');
+});
+
+//steal focus during close - only capture once and stop propogation
+$('.maj-certificate-select2 select.select2').on('select2:closing', function (e) {
+  $(e.target).data("select2").$selection.one('focus focusin', function (e) {
+    e.stopPropagation();
+  });
+});
+
+</script>
+
+<?php View::endpushunique() ?>

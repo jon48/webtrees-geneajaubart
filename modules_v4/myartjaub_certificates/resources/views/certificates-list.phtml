@@ -1,0 +1,125 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\CertificatesList;
+use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\CertificatePage;
+use Ramsey\Uuid\Uuid;
+
+/**
+ * @var string                  $title
+ * @var Tree                    $tree
+ * @var string                  $module_name
+ * @var string[][]              $cities
+ * @var string                  $selected_city
+ * @var Collection              $certificates_list
+ * @var UrlObfuscatorService    $url_obfuscator_service
+ */
+
+// lists requires a unique ID in case there are multiple lists per page
+$table_id = 'table-maj-certificates-' . Uuid::uuid4()->toString();
+
+// GET request from a form will not pass the parameters in the action attribute, so the route needs to be set as hidden input
+$route_url = route(CertificatesList::class, [ 'tree' => $tree->name() ]);
+$route_params = [];
+parse_str(parse_url($route_url, PHP_URL_QUERY) ?? '', $route_params);
+$route = $route_params['route'] ?? '';
+
+?>
+
+<?php View::push('javascript') ?>
+<script>
+$("#<?= e($table_id) ?> > .maj-table-certificates").dataTable({
+    processing: true,
+    retrieve: true,
+    columns: [
+        /* 0-Date */            { type: "num", width: "15%", class: "text-center" },
+        /* 1-Type */            { type: "text", width: "5%", searchable: false, class: "text-center"},
+        /* 2-Certificate */     { type: "text", class: "left" }
+    ],
+    sorting: [[0, "asc"]]
+});
+
+$("#<?= e($table_id) ?>")
+    /* Filter buttons in table header */
+    .on("click", "input[data-filter-column]", function() {
+        let checkbox = $(this);
+        let siblings = checkbox.parent().siblings();
+
+        // Deselect other options
+        siblings.children().prop("checked", false).removeAttr("checked");
+        siblings.removeClass('active');
+
+        // Apply (or clear) this filter
+        let checked = checkbox.prop("checked");
+        let filter  = checked ? checkbox.data("filter-value") : "";
+        let column  = $("#<?= e($table_id) ?> .maj-table-missing").DataTable().column(checkbox.data("filter-column"));
+        column.search(filter).draw();
+    });
+</script>
+<?php View::endpush() ?>
+
+<h2 class="wt-page-title mx-auto"><?= e($title) ?></h2>
+
+<div class="wt-page-content wt-page-content-maj-certificates-list">
+    <form method="GET" name="certificate-city-selector" action="<?= e($route) ?>">
+        <?php if ($route !== '') : ?>
+        <input type="hidden" name="route" value="<?= e($route) ?>">
+        <?php endif; ?>
+
+        <div class="maj-certificate-table col-sm-9 col-lg-6 mx-auto">
+            <div class="maj-certificate-row">
+                <div class="wt-page-options-label"><?= I18N::translate('Choose a location') ?></div>
+            </div>
+            <div class="maj-certificate-row">
+                <div class="wt-page-options-value">
+                    <?= view($module_name . '::components/select-city', [ 'cities' => $cities, 'name' => 'cityobf', 'selected_city' => $selected_city ]) ?>
+                </div>
+            </div>
+            <div class="maj-certificate-row">
+                <div class="py-2 text-center">
+                    <input type="submit" class="btn btn-primary" value="<?= e(I18N::translate('Show')) ?>" />
+                </div>
+            </div>
+        </div>
+        <br />
+    </form>
+    
+    <?php if (count($certificates_list) > 0) : ?>
+    <div id="<?= e($table_id) ?>" class="maj-table-full-width">
+        <table class="table table-bordered table-sm maj-table-certificates"  data-page-length="20"
+        <?= view('lists/datatables-attributes') ?> 
+        >
+            <thead>
+                <tr>
+                    <th><?= I18N::translate('Date') ?></th>
+                    <th><?= I18N::translate('Type') ?></th>
+                    <th><?= I18N::translate('Certificate') ?></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <?php foreach ($certificates_list as $certificate) : ?>
+                <tr>
+                    <?php $date = $certificate->date(); ?>
+                    <?php if ($date->isOK()) : ?>
+                    <td data-sort='<?= e($date->julianDay()) ?>'><?= $certificate->date()->display(true) ?></td>
+                    <?php else :  ?>
+                    <td></td>
+                    <?php endif; ?>
+                    <td><?= $certificate->type() ?></td>
+                    <td data-sort='<?= e($certificate->sortDescription())?>'>
+                        <a href="<?= e(route(CertificatePage::class, $certificate->urlParameters($url_obfuscator_service))); ?>"><?= $certificate->description() ?></a>
+                    </td>
+                </tr>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+    </div>
+    
+    <?php endif ?>
+
+</div>
+

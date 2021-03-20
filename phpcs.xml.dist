@@ -3,6 +3,7 @@
     <description>MyArtJaub coding standard for webtrees-geneajaubart</description>
 
     <file>modules_v4/myartjaub_admintasks</file>
+    <file>modules_v4/myartjaub_certificates</file>
 	<file>modules_v4/myartjaub_patronymiclineage</file>
     <file>modules_v4/myartjaub_sosa</file>
 	<file>modules_v4/myartjaub_welcome_block</file>
