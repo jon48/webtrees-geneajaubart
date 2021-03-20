@@ -3,6 +3,7 @@
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Http\RequestHandlers\SiteLogsData;
+use Fisharebest\Webtrees\Http\RequestHandlers\UserListPage;
 use Illuminate\Support\Collection;
 
 /**
@@ -41,7 +42,7 @@ use Illuminate\Support\Collection;
     
     <h4><?= e(I18N::translate('Users')) ?></h4>
     <p>
-        <a href="<?= route('admin-users') ?>"><?= e(I18N::translate('User administration')) ?></a>
+        <a href="<?= route(UserListPage::class) ?>"><?= e(I18N::translate('User administration')) ?></a>
     </p>
     <ul>
         <li>

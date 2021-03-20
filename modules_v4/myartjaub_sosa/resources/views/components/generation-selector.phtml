@@ -30,7 +30,7 @@ $route = $route_params['route'] ?? '';
         </div>
         <div class="maj-sosa-row">
             <div class="wt-page-options-value">
-                <select name="gen">                         
+                <select name="gen">
                 <?php for ($i = $min_gen; $i <= $max_gen; $i++) : ?>
                     <option value="<?= $i; ?>"  <?=  $current_gen === $i ? 'selected' : '' ?>>
                         <?= I18N::translate('Generation %d', $i) ?>

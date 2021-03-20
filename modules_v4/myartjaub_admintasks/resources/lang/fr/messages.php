@@ -86,6 +86,7 @@ return array (
                                     =>  'La tâche planifiée avec ID “%d” n\'existe pas',
     'The Task schedule could not be found.'
                                     =>  'La tâche planifiée n\a pu être trouvée',
+    'Error while running task %s:'  =>  'Erreur lors de l\exécution de la tâche %s :',
     'An error occured while updating the scheduled task'
                                     =>  'Une erreur s\'est produite lors de la mise à jour de la tâche planifiée',
     'An error occured while updating the specific settings of administrative task “%s”'

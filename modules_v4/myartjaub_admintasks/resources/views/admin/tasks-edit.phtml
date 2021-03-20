@@ -3,10 +3,11 @@
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\View;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
 use MyArtJaub\Webtrees\Module\AdminTasks\AdminTasksModule;
+use MyArtJaub\Webtrees\Module\AdminTasks\Contracts\TaskInterface;
 use MyArtJaub\Webtrees\Module\AdminTasks\Http\RequestHandlers\AdminConfigPage;
 use MyArtJaub\Webtrees\Module\AdminTasks\Http\RequestHandlers\TaskEditAction;
-use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskInterface;
 use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
 
 /**
@@ -20,7 +21,7 @@ use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
 
 ?>
 
-<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route('modules') => I18N::translate('Modules'), route(AdminConfigPage::class) => $module->title(), $task->name()]]) ?>
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route(ModulesAllPage::class) => I18N::translate('Modules'), route(AdminConfigPage::class) => $module->title(), $task->name()]]) ?>
 
 <h1><?= $title ?></h1>
 

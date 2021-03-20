@@ -3,6 +3,7 @@
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Http\RequestHandlers\SiteLogsData;
+use Fisharebest\Webtrees\Http\RequestHandlers\UserListPage;
 use Illuminate\Support\Collection;
 
 /**
@@ -34,7 +35,7 @@ use Illuminate\Support\Collection;
 
 <?= I18N::translate('Users') ?>
 -------------
-<?= route('admin-users') ?>
+<?= route(UserListPage::class) ?>
 <?= I18N::translate('Total number of users') ?> : <?= I18N::number($all_users->count()) ?>
 <?= I18N::translate('Not verified by the user') ?> : <?= I18N::number($unverified->count()) ?>
 <?= I18N::translate('Not approved by an administrator') ?> : <?= I18N::number($unapproved->count()) ?>
