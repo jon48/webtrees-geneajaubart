@@ -1,0 +1,52 @@
+<?php
+
+use Fisharebest\Webtrees\Family;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Registry;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\IsSourced\Data\FactSourceStatus;
+use MyArtJaub\Webtrees\Module\IsSourced\Data\SourceStatus;
+
+/**
+ * @var string              $module_name
+ * @var Individual          $individual
+ * @var SourceStatus        $source_status_individual
+ * @var FactSourceStatus    $source_status_birth
+ * @var Collection          $source_status_marriages
+ * @var FactSourceStatus    $source_status_death
+ */
+
+$element_factory = Registry::elementFactory();
+$multi_marr = $source_status_marriages->count() > 1;
+
+?>
+<div class="maj-table maj-issourced-sidebar-table mx-auto">
+    <div class="maj-table-row">
+        <div><?= $element_factory->make('INDI')->label() ?></div>
+        <div><?= view($module_name . '::icons/source-status', [ 'module_name' => $module_name, 'source_status' => $source_status_individual, 'context'  => 'INDI', 'size_style' => 'fa-lg' ]) ?></div>
+    </div>
+    <div class="maj-table-row">
+        <div><?= $element_factory->make('INDI:BIRT')->label() ?></div>
+        <div><?= view($module_name . '::icons/source-status', [ 'module_name' => $module_name, 'source_status' => $source_status_birth, 'context'  => 'INDI:BIRT', 'size_style' => 'fa-lg' ]) ?></div>
+    </div>
+    <?php foreach ($source_status_marriages as $nb => $marriage) : ?>
+        <?php
+        $spouse_fam = $marriage[0]; /** @var Family $spouse_fam */
+        ?>
+    <div class="maj-table-row">
+        <div>
+            <a href="<?= e($spouse_fam->url()) ?>"><?= $element_factory->make('FAM:MARR')->label() ?>
+            <?php if ($multi_marr) : ?>&nbsp;<?= I18N::number($nb + 1) ?><?php endif;?>
+            </a>
+        </div>
+        <div><?= view($module_name . '::icons/source-status', [ 'module_name' => $module_name, 'source_status' => $marriage[1], 'context'  => 'FAM:MARR', 'size_style' => 'fa-lg' ]) ?></div>
+    </div>
+    <?php endforeach; ?>
+    <?php if ($individual->isDead()) : ?>
+    <div class="maj-table-row">
+        <div><?= $element_factory->make('INDI:DEAT')->label() ?></div>
+        <div><?= view($module_name . '::icons/source-status', [ 'module_name' => $module_name, 'source_status' => $source_status_death, 'context'  => 'INDI:DEAT', 'size_style' => 'fa-lg' ]) ?></div>
+    </div>
+    <?php endif; ?>
+</div>

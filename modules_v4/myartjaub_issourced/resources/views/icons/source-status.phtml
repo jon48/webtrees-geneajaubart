@@ -1,0 +1,23 @@
+<?php
+
+use MyArtJaub\Webtrees\Module\IsSourced\Data\FactSourceStatus;
+use MyArtJaub\Webtrees\Module\IsSourced\Data\SourceStatus;
+
+/**
+ * @var string          $module_name
+ * @var SourceStatus    $source_status
+ * @var string          $size_style
+ * @var string          $context
+ */
+
+$css_class = 'maj-icon-sourcestatus';
+
+$css_class .= $source_status->hasSource() ? '-s' : '';
+$css_class .= $source_status->hasSupportingDocument() ? '-d' : '';
+?>
+
+<?php if ($source_status instanceof FactSourceStatus) : ?>
+    <?= view($module_name . '::icons/source-status-fact', [ 'source_status' => $source_status, 'context'  => $context, 'size_style' => $size_style, 'css_class' => $css_class ]) ?>
+<?php else : ?>
+    <?= view($module_name . '::icons/source-status-record', [ 'source_status' => $source_status, 'context'  => $context, 'size_style' => $size_style, 'css_class' => $css_class]) ?>
+<?php endif;?>

@@ -1,0 +1,82 @@
+/**
+ * Styles - MyArtJaub IsSourced module
+ *
+ * webtrees-MyArtJaub
+ * Copyright (C) 2009-2021 Jonathan Jaubart
+ * 
+ * Based on webtrees: online genealogy
+ * Copyright (C) 2020 webtrees development team
+ *  
+ * This file is part of webtrees-MyArtJaub
+ *  
+ * webtrees-MyArtJaub is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * webtrees-MyArtJaub is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with webtrees-MyArtJaub. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+.maj-table {
+    display: table;
+    overflow-x: auto;
+    
+    .maj-table-row {
+        display: table-row;
+        
+        > div {
+            display: table-cell;
+            padding-left: 1em;
+            padding-right: 1em;
+        }
+    }
+}
+
+.maj-issourced-sidebar-table {
+    .maj-table-row {
+        > div:first-child {
+            text-align: right;
+        }
+    }
+}
+
+.maj-icon-sourcestatus {
+    vertical-align: middle;
+    
+    .fa-scroll {
+        color: #c9b88c;
+    }
+    
+    
+    .fa-clock {
+        color: #fff;
+        stroke: #000;
+        stroke-width: 20px;
+    }
+    
+    .fa-check {
+        color: #008000;
+    }
+    
+    .fa-times-circle {
+        color: #ed3c02;
+    }
+    
+    .fa-exclamation-triangle {
+        color: #f9c006;
+    }
+    
+    
+    .fa-question {
+        color: #417ab8;
+        
+        &.maj-question-top {
+            color: #00507a;
+        }
+    }
+}

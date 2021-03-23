@@ -1,0 +1,37 @@
+<?php
+
+use MyArtJaub\Webtrees\Module\IsSourced\Data\FactSourceStatus;
+
+/**
+ * @var FactSourceStatus    $source_status
+ * @var string              $size_style
+ * @var string              $css_class
+ * @var string              $context
+ */
+
+$css_class .= $source_status->factHasDate() ? '-fd' : '';
+$css_class .= $source_status->factHasPreciseDate() ? '-fpd' : '';
+$css_class .= $source_status->sourceMatchesFactDate() ? '-smd' : '';
+
+?>
+
+<span class="maj-icon-sourcestatus <?= $css_class ?> fa-layers fa-fw <?= $size_style ?>" aria-hidden="true" title="<?= $source_status->label($context) ?>">
+    <?php if ($source_status->factHasPreciseDate()) : ?>
+        <?php if ($source_status->hasSource()) : ?>
+            <?php if ($source_status->hasSupportingDocument()) : ?>
+            <i class="fas fa-scroll" data-fa-transform="flip-h right-2"></i>
+            <?php endif; ?>
+            <?php if ($source_status->sourceMatchesFactDate()) : ?>
+            <i class="fas fa-clock" data-fa-transform="shrink-8 down-3 right-7"></i>
+            <?php endif; ?>
+        <i class="fas fa-check"></i>
+        <?php else : ?>
+        <i class="fas fa-times-circle"></i>
+        <?php endif; ?>
+    <?php else : ?>
+        <?php if ($source_status->factHasDate()) : ?>
+        <i class="fas fa-question" data-fa-transform="rotate-5 right-4 down-2"></i>
+        <?php endif; ?>
+        <i class="fas fa-question maj-question-top" data-fa-transform="rotate-5"></i>
+    <?php endif; ?>
+</span>

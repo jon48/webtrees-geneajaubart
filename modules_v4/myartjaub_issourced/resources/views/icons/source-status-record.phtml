@@ -1,0 +1,22 @@
+<?php
+
+use MyArtJaub\Webtrees\Module\IsSourced\Data\SourceStatus;
+
+/**
+ * @var SourceStatus    $source_status
+ * @var string          $size_style
+ * @var string          $css_class
+ * @var string          $context
+ */
+?>
+
+<span class="maj-icon-sourcestatus <?= $css_class ?> fa-layers fa-fw <?= $size_style ?>" aria-hidden="true" title="<?= $source_status->label($context) ?>">
+    <?php if ($source_status->hasSupportingDocument()) : ?>
+    <i class="fas fa-scroll" data-fa-transform="flip-h right-2"></i>
+    <?php endif; ?>
+    <?php if ($source_status->hasSource()) :?>
+        <i class="fas fa-check"></i>
+    <?php else : ?>
+        <i class="fas fa-exclamation-triangle"></i>
+    <?php endif; ?>
+</span>
