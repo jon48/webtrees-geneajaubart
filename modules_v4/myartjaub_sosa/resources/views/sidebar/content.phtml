@@ -15,7 +15,9 @@ $individual_name = $sosa_ancestor->canShowName() ? $sosa_ancestor->fullName() : 
 $root_name = $sosa_root !== null && $sosa_root->canShowName() ? $sosa_root->fullName() : I18N::translate('the root individual');
 ?>
 
-<?php if ($sosa_numbers->count() > 1) : ?>
+<?php if ($sosa_ancestor === $sosa_root) : ?>
+    <?= I18N::translate('%s is the root individual', $individual_name) ?>
+<?php elseif ($sosa_numbers->count() > 1) : ?>
     <?= I18N::translate('%1$s is %3$s times an ancestor of %2$s:', $individual_name, $root_name, I18N::number($sosa_numbers->count())) ?>
 <?php else : ?>
     <?= I18N::translate('%1$s is an ancestor of %2$s:', $individual_name, $root_name) ?>

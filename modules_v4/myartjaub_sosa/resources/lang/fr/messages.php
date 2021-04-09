@@ -34,10 +34,13 @@ return array (
     'No Sosa root individual has been defined.'
                                     =>  'L\'individu de-cujus n\'a pas été défini.',
     'Sosa %1$s - Generation %2$s'   =>  'Sosa %1$s - Génération %2$s',
-    'Sosa %1$s - Generation %2$s (+%3$s other Sosas)'
-                                    =>  'Sosa %1$s - Génération %2$s (+%3$s autres Sosas)',
+    'Sosa %1$s - Generation %2$s (%3$s)'
+                                    =>  'Sosa %1$s - Génération %2$s (%3$s)',
+    '+ another Sosa' . I18N::PLURAL . '+ %s other Sosas'
+                                    =>  '+ un autre Sosa' . I18N::PLURAL . '+ %s autres Sosas',
     'This individual'               =>  'Cet individu',
     'the root individual'           =>  'l\'individu de-cujus',
+    '%s is the root individual'     =>  '%s est l\'individu de-cujus',
     '%1$s is an ancestor of %2$s:'  =>  '%1$s est un ancêtre de %2$s :',
     '%1$s is %3$s times an ancestor of %2$s:'
                                     =>  '%1$s est %3$s fois un ancêtre de %2$s :',

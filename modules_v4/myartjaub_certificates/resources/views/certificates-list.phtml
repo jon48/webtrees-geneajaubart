@@ -64,7 +64,7 @@ $("#<?= e($table_id) ?>")
 <h2 class="wt-page-title mx-auto"><?= e($title) ?></h2>
 
 <div class="wt-page-content wt-page-content-maj-certificates-list">
-    <form method="GET" name="certificate-city-selector" action="<?= e($route) ?>">
+    <form method="GET" name="certificate-city-selector" action="<?= e($route_url) ?>">
         <?php if ($route !== '') : ?>
         <input type="hidden" name="route" value="<?= e($route) ?>">
         <?php endif; ?>

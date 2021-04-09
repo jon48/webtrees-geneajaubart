@@ -16,13 +16,15 @@ use MyArtJaub\Webtrees\Module\WelcomeBlock\Http\RequestHandlers\MatomoStats;
 <?= $fab_welcome_block_view ?>
 
 <?php if ($matomo_enabled) : ?>
-<div class="d-flex flex-wrap justify-content-around">
+<div class="d-flex flex-wrap justify-content-around text-center">
     <div id="maj-matomo-stats-<?= $block_id ?>">
         <div class="maj-loading-initial">
             <i class="fas fa-spinner fa-pulse fa-fw"></i>
             &nbsp;<?= I18N::translate('Retrieving Matomo statistics...') ?>
         </div>
-        <div class="maj-loading-complete d-none text-center">
+        <div class="maj-loading-complete d-none text-center"></div>
+        <div class="maj-loading-error d-none text-center">
+            <?= I18N::translate('No statistics could be retrieved from Matomo.') ?>
         </div>
     </div>
 </div>
@@ -35,11 +37,15 @@ use MyArtJaub\Webtrees\Module\WelcomeBlock\Http\RequestHandlers\MatomoStats;
 <?php View::push('javascript') ?>
 <script>
 $(document).ready( function() {
-    $.get("<?= route(MatomoStats::class, ['block_id' => $block_id]) ?>", function(data) {
-        $('#maj-matomo-stats-<?= $block_id ?> .maj-loading-initial').addClass('d-none');
+    $.get("<?= route(MatomoStats::class, ['block_id' => $block_id]) ?>")
+    .done(function(data) {
         $('#maj-matomo-stats-<?= $block_id ?> .maj-loading-complete')
             .removeClass('d-none')
             .html(data);
+    }).fail(function() {
+        $('#maj-matomo-stats-<?= $block_id ?> .maj-loading-error').removeClass('d-none');
+    }).always(function() {
+        $('#maj-matomo-stats-<?= $block_id ?> .maj-loading-initial').addClass('d-none');
     });
 });
 </script>

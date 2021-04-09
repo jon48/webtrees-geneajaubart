@@ -142,7 +142,7 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\MissingAncestorsList;
                     I18N::plural(
                         '%s generation',
                         '%s generations',
-                        (int) floor($generation_depth->mean_gen_depth),
+                        intval($generation_depth->mean_gen_depth),
                         I18N::number((float) $generation_depth->mean_gen_depth, 2)
                     )
                 ) .
@@ -152,7 +152,7 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\MissingAncestorsList;
                         I18N::plural(
                             '%s generation',
                             '%s generations',
-                            (int) floor($generation_depth->stddev_gen_depth),
+                            intval($generation_depth->stddev_gen_depth),
                             I18N::number((float) $generation_depth->stddev_gen_depth, 2)
                         )
                     );

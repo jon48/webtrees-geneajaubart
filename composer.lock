@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0943668e2e36320cde3ef5304fd40d8e",
+    "content-hash": "a3f8b015d2f2b991c868bb4e33bf802d",
     "packages": [
         {
             "name": "aura/router",
@@ -2510,11 +2510,11 @@
         },
         {
             "name": "jon48/webtrees-lib",
-            "version": "dev-2.1-temp",
+            "version": "dev-feature/2.1",
             "dist": {
                 "type": "path",
                 "url": "../../../www-lib/jon48/webtrees-lib",
-                "reference": "ac8c0752e30a545f22a2cfc81e8254eea7a5e4e4"
+                "reference": "bcba57948e6bb7ede2a9ea4c370b9b0d4dd71f04"
             },
             "require": {
                 "aura/router": "~3.1",
@@ -10163,7 +10163,7 @@
     "aliases": [
         {
             "package": "jon48/webtrees-lib",
-            "version": "dev-2.1-temp",
+            "version": "dev-feature/2.1",
             "alias": "dev-feature/2.0",
             "alias_normalized": "dev-feature/2.0"
         }

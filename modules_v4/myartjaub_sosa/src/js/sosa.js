@@ -3,12 +3,12 @@
  *
  * webtrees-MyArtJaub
  * Copyright (C) 2009-2021 Jonathan Jaubart
- * 
+ *
  * Based on webtrees: online genealogy
  * Copyright (C) 2020 webtrees development team
- *  
+ *
  * This file is part of webtrees-MyArtJaub
- *  
+ *
  * webtrees-MyArtJaub is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
