@@ -365,9 +365,7 @@ class Fact
      */
     public function place(): Place
     {
-        if ($this->place === null) {
-            $this->place = new Place($this->attribute('PLAC'), $this->record()->tree());
-        }
+        $this->place ??= new Place($this->attribute('PLAC'), $this->record()->tree());
 
         return $this->place;
     }
@@ -381,9 +379,7 @@ class Fact
      */
     public function date(): Date
     {
-        if ($this->date === null) {
-            $this->date = new Date($this->attribute('DATE'));
-        }
+        $this->date ??= new Date($this->attribute('DATE'));
 
         return $this->date;
     }
@@ -811,5 +807,15 @@ class Fact
     public function __toString(): string
     {
         return $this->id . '@' . $this->record->xref();
+    }
+
+    /**
+     * Add blank lines, to allow a user to add/edit new values.
+     *
+     * @return string
+     */
+    public function insertMissingSubtags(): string
+    {
+        return $this->record()->insertMissingLevels($this->tag(), $this->gedcom());
     }
 }

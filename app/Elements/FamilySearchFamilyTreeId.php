@@ -17,24 +17,34 @@
 
 declare(strict_types=1);
 
-namespace Fisharebest\Webtrees\GedcomCode;
+namespace Fisharebest\Webtrees\Elements;
 
-use Fisharebest\Webtrees\TestCase;
+use Fisharebest\Webtrees\Tree;
+
+use function e;
+use function rawurlencode;
+use function strtoupper;
 
 /**
- * Test harness for the class GedcomCodeAdop
- *
- * @covers \Fisharebest\Webtrees\GedcomCode\GedcomCodeAdop
+ * ANCESTRAL_FILE_NUMBER := {Size=1:12}
+ * A unique permanent record number of an individual record contained in the
+ * Family History Department's Ancestral File.
  */
-class GedcomCodeAdopTest extends TestCase
+class FamilySearchFamilyTreeId extends AbstractExternalLink
 {
+    protected const EXTERNAL_URL = 'https://ancestors.familysearch.org/en/{ID}';
+
+    protected const MAXIMUM_LENGTH = 8;
+
     /**
-     * Test that the class exists
+     * Convert a value to a canonical form.
      *
-     * @return void
+     * @param string $value
+     *
+     * @return string
      */
-    public function testClassExists(): void
+    public function canonical(string $value): string
     {
-        self::assertTrue(class_exists(GedcomCodeAdop::class));
+        return strtoupper(parent::canonical($value));
     }
 }

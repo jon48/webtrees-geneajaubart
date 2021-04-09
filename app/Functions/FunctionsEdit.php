@@ -23,13 +23,10 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Census\Census;
 use Fisharebest\Webtrees\Config;
 use Fisharebest\Webtrees\Date;
+use Fisharebest\Webtrees\Elements\PafUid;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Gedcom;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeName;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeRela;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeStat;
-use Fisharebest\Webtrees\GedcomCode\GedcomCodeTemp;
 use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\Html;
 use Fisharebest\Webtrees\Http\RequestHandlers\AutoCompleteCitation;
@@ -53,7 +50,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Ramsey\Uuid\Uuid;
 
 use function app;
-use function array_key_exists;
 use function array_merge;
 use function array_slice;
 use function count;
@@ -186,24 +182,6 @@ class FunctionsEdit
             '0' => I18N::translate('no'),
             '1' => I18N::translate('yes'),
         ];
-    }
-
-    /**
-     * A list of GEDCOM relationships (e.g. for an edit control).
-     *
-     * @param string $relationship
-     *
-     * @return array<string>
-     */
-    public static function optionsRelationships(string $relationship): array
-    {
-        $relationships = GedcomCodeRela::getValues();
-        // The user is allowed to specify values that aren't in the list.
-        if (!array_key_exists($relationship, $relationships)) {
-            $relationships[$relationship] = I18N::translate($relationship);
-        }
-
-        return $relationships;
     }
 
     /**
@@ -522,7 +500,7 @@ class FunctionsEdit
             $element = Registry::elementFactory()->make('INDI:SOUR:QUAY');
             $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => $element->values()]);
         } elseif ($fact === 'RELA') {
-            $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => self::optionsRelationships($value)]);
+            $html .= Registry::elementFactory()->make('INDI:ASSO:RELA')->edit($id, $name, $value, $tree);
         } elseif ($fact === 'REPO') {
             $html .=
                 '<div class="input-group">' .
@@ -544,7 +522,7 @@ class FunctionsEdit
                 view('components/select-source', ['id' => $id, 'name' => $name, 'source' => Registry::sourceFactory()->make($value, $tree), 'tree' => $tree]) .
                 '</div>';
         } elseif ($fact === 'STAT') {
-            $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => GedcomCodeStat::statusNames($upperlevel)]);
+            $html .= Registry::elementFactory()->make(($upperlevel === 'SLGS' ? 'FAM:' : 'INDI:') . $upperlevel . ':STAT')->edit($id, $name, $value, $tree);
         } elseif ($fact === 'SUBM') {
             $html .=
                 '<div class="input-group">' .
@@ -563,7 +541,7 @@ class FunctionsEdit
             $html .= '<p class="small text-muted">' . I18N::translate('Use this image for charts and on the individual’s page.') . '</p>';
         } elseif ($fact === 'TYPE' && $level === '0') {
             // Level 0 TYPE fields are only used for NAME records
-            $html .= view('components/select', ['id' => $id, 'name' => $name, 'selected' => $value, 'options' => GedcomCodeName::getValues()]);
+            $html .= Registry::elementFactory()->make('INDI:NAME:TYPE')->edit($id, $name, $value, $tree);
         } elseif (($fact !== 'NAME' || $upperlevel === 'REPO' || $upperlevel === 'SUBM' || $upperlevel === 'UNKNOWN') && $fact !== '_MARNM') {
             if ($fact === 'TEXT' || $fact === 'ADDR' || ($fact === 'NOTE' && !$islink)) {
                 $html .= '<div class="input-group">';
@@ -663,7 +641,7 @@ class FunctionsEdit
         } else {
             self::$tags[0] = $fact;
             if ($fact === '_UID') {
-                $fact .= ' ' . GedcomTag::createUid();
+                $fact .= ' ' . (new PafUid(''))->default($tree);
             }
             // These new level 1 tags need to be turned into links
             if (in_array($fact, ['ALIA', 'ASSO'], true)) {
@@ -741,7 +719,7 @@ class FunctionsEdit
             } //else: source records themselves, i.e. 0 SOUR / 1 DATA don't get a 2 DATE!
         }
 
-        if (GedcomCodeTemp::isTagLDS($level1type)) {
+        if ($level1type === 'BAPL' || $level1type === 'CONL' || $level1type === 'ENDL' || $level1type === 'SLGC' || $level1type === 'SLGS') {
             $expected_subtags['STAT'] = ['DATE'];
         }
 
@@ -887,7 +865,7 @@ class FunctionsEdit
                         echo self::addSimpleTag($tree, '3 PLAC');
                         break;
                     case 'STAT':
-                        if (GedcomCodeTemp::isTagLDS($level1tag)) {
+                        if ($level1tag === 'BAPL' || $level1tag === 'CONL' || $level1tag === 'ENDL' || $level1tag === 'SLGC' || $level1tag === 'SLGS') {
                             echo self::addSimpleTag($tree, '3 DATE', '', GedcomTag::getLabel('STAT:DATE'));
                         }
                         break;

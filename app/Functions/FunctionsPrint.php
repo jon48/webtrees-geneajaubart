@@ -26,7 +26,6 @@ use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomRecord;
-use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Media;
@@ -124,7 +123,7 @@ class FunctionsPrint
             '<a href="#' . e($id) . '" role="button" data-toggle="collapse" aria-controls="' . e($id) . '" aria-expanded="' . ($expanded ? 'true' : 'false') . '">' .
             view('icons/expand') .
             view('icons/collapse') .
-            '</a> ' .
+            '</a>' .
             '<span class="label">' . $label . ':</span> ' .
             $first_line .
             '</div>' .
@@ -443,17 +442,17 @@ class FunctionsPrint
                     $map_lati = trim(strtr($map_lati, 'NSEW,�', ' - -. ')); // S5,6789 ==> -5.6789
                     $map_long = trim(strtr($map_long, 'NSEW,�', ' - -. ')); // E3.456� ==> 3.456
 
-                    $html .= '<a href="https://maps.google.com/maps?q=' . e($map_lati) . ',' . e($map_long) . '" rel="nofollow" title="' . I18N::translate('Google Maps™') . '">' .
+                    $html .= '<a href="https://maps.google.com/maps?q=' . e($map_lati) . ',' . e($map_long) . '" rel="nofollow" target="_top" title="' . I18N::translate('Google Maps™') . '">' .
                         view('icons/google-maps') .
                         '<span class="sr-only">' . I18N::translate('Google Maps™') . '</span>' .
                         '</a>';
 
-                    $html .= '<a href="https://www.bing.com/maps/?lvl=15&cp=' . e($map_lati) . '~' . e($map_long) . '" rel="nofollow" title="' . I18N::translate('Bing Maps™') . '">' .
+                    $html .= '<a href="https://www.bing.com/maps/?lvl=15&cp=' . e($map_lati) . '~' . e($map_long) . '" rel="nofollow" target="_top" title="' . I18N::translate('Bing Maps™') . '">' .
                         view('icons/bing-maps') .
                         '<span class="sr-only">' . I18N::translate('Bing Maps™') . '</span>' .
                         '</a>';
 
-                    $html .= '<a href="https://www.openstreetmap.org/#map=15/' . e($map_lati) . '/' . e($map_long) . '" rel="nofollow" title="' . I18N::translate('OpenStreetMap™') . '">' .
+                    $html .= '<a href="https://www.openstreetmap.org/#map=15/' . e($map_lati) . '/' . e($map_long) . '" rel="nofollow" target="_top" title="' . I18N::translate('OpenStreetMap™') . '">' .
                         view('icons/openstreetmap') .
                         '<span class="sr-only">' . I18N::translate('OpenStreetMap™') . '</span>' .
                         '</a>';
@@ -561,12 +560,11 @@ class FunctionsPrint
         $addfacts            = array_merge(self::checkFactUnique($uniquefacts, $usedfacts), $addfacts);
         $quickfacts          = array_intersect($quickfacts, $addfacts);
         $translated_addfacts = [];
+
         foreach ($addfacts as $addfact) {
-            $translated_addfacts[$addfact] = GedcomTag::getLabel($record->tag() . ':' . $addfact);
+            $translated_addfacts[$addfact] = Registry::elementFactory()->make($record->tag() . ':' . $addfact)->label();
         }
-        uasort($translated_addfacts, static function (string $x, string $y): int {
-            return I18N::strcasecmp(I18N::translate($x), I18N::translate($y));
-        });
+        uasort($translated_addfacts, I18N::comparator());
 
         echo view('edit/add-fact-row', [
             'add_facts'   => $translated_addfacts,

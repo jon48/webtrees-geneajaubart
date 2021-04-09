@@ -135,7 +135,7 @@ class GedcomRecord
         return static function (GedcomRecord $x, GedcomRecord $y): int {
             if ($x->canShowName()) {
                 if ($y->canShowName()) {
-                    return I18N::strcasecmp($x->sortName(), $y->sortName());
+                    return I18N::comparator()($x->sortName(), $y->sortName());
                 }
 
                 return -1; // only $y is private
@@ -363,7 +363,7 @@ class GedcomRecord
     /**
      * Derived classes should redefine this function, otherwise the object will have no name
      *
-     * @return array<array<string>>
+     * @return array<int,array<string,string>>
      */
     public function getAllNames(): array
     {
@@ -403,9 +403,7 @@ class GedcomRecord
     {
         static $language_script;
 
-        if ($language_script === null) {
-            $language_script = $language_script ?? I18N::locale()->script()->code();
-        }
+        $language_script ??= I18N::locale()->script()->code();
 
         if ($this->getPrimaryName === null) {
             // Generally, the first name is the primary one....
@@ -1169,7 +1167,7 @@ class GedcomRecord
     {
         $this->getAllNames[] = [
             'type'   => $type,
-            'sort'   => preg_replace_callback('/([0-9]+)/', static function (array $matches): string {
+            'sort'   => preg_replace_callback('/(\d+)/', static function (array $matches): string {
                 return str_pad($matches[0], 10, '0', STR_PAD_LEFT);
             }, $value),
             'full'   => '<span dir="auto">' . e($value) . '</span>',
@@ -1331,7 +1329,7 @@ class GedcomRecord
      *
      * @return string
      */
-    protected function insertMissingLevels(string $tag, string $gedcom): string
+    public function insertMissingLevels(string $tag, string $gedcom): string
     {
         $next_level = substr_count($tag, ':') + 1;
         $factory    = Registry::elementFactory();

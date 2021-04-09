@@ -51,8 +51,8 @@ class MediaFileThumbnail implements RequestHandlerInterface
         assert($user instanceof UserInterface);
 
         $params  = $request->getQueryParams();
-        $xref    = $params['xref'];
-        $fact_id = $params['fact_id'];
+        $xref    = $params['xref'] ?? '';
+        $fact_id = $params['fact_id'] ?? '';
         $media   = Registry::mediaFactory()->make($xref, $tree);
 
         if ($media === null) {
@@ -80,13 +80,15 @@ class MediaFileThumbnail implements RequestHandlerInterface
 
                 $image_factory = Registry::imageFactory();
 
-                return $image_factory->mediaFileThumbnailResponse(
+                $response = $image_factory->mediaFileThumbnailResponse(
                     $media_file,
                     (int) $params['w'],
                     (int) $params['h'],
                     $params['fit'],
                     $image_factory->fileNeedsWatermark($media_file, $user)
                 );
+
+                return $response->withHeader('Cache-Control', 'public,max-age=31536000');
             }
         }
 

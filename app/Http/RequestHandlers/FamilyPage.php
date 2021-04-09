@@ -28,7 +28,6 @@ use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\ClipboardService;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -81,7 +80,7 @@ class FamilyPage implements RequestHandlerInterface
             return redirect($family->url(), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
         }
 
-        $clipboard_facts = $this->clipboard_service->pastableFacts($family, new Collection());
+        $clipboard_facts = $this->clipboard_service->pastableFacts($family);
 
         $facts = $family->facts([], true)
             ->filter(static function (Fact $fact): bool {

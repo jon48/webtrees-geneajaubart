@@ -22,7 +22,6 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Date;
-use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Module\ModuleThemeInterface;
@@ -32,17 +31,15 @@ use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\SurnameTradition;
 use Fisharebest\Webtrees\Tree;
+use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use function app;
-use function array_merge;
-use function array_unique;
 use function assert;
 use function e;
 use function explode;
-use function uasort;
 
 /**
  * Edit the tree preferences.
@@ -50,6 +47,39 @@ use function uasort;
 class TreePreferencesPage implements RequestHandlerInterface
 {
     use ViewResponseTrait;
+
+    private const ALL_FAM_FACTS = [
+        'RESN', 'ANUL', 'CENS', 'DIV', 'DIVF', 'ENGA', 'MARB', 'MARC', 'MARR', 'MARL', 'MARS', 'RESI', 'EVEN',
+        'NCHI', 'SUBM', 'SLGS', 'REFN', 'RIN', 'CHAN', 'NOTE', 'SOUR', 'OBJE',
+        '_NMR', '_COML', '_MBON', '_MARI', '_SEPR', '_TODO',
+    ];
+
+    private const ALL_INDI_FACTS = [
+        'RESN', 'NAME', 'SEX', 'BIRT', 'CHR', 'DEAT', 'BURI', 'CREM', 'ADOP', 'BAPM', 'BARM', 'BASM',
+        'BLES', 'CHRA', 'CONF', 'FCOM', 'ORDN', 'NATU', 'EMIG', 'IMMI', 'CENS', 'PROB', 'WILL',
+        'GRAD', 'RETI', 'EVEN', 'CAST', 'DSCR', 'EDUC', 'IDNO', 'NATI', 'NCHI', 'NMR', 'OCCU', 'PROP',
+        'RELI', 'RESI', 'SSN', 'TITL', 'FACT', 'BAPL', 'CONL', 'ENDL', 'SLGC', 'SUBM', 'ASSO',
+        'ALIA', 'ANCI', 'DESI', 'RFN', 'AFN', 'REFN', 'RIN', 'CHAN', 'NOTE', 'SOUR', 'OBJE',
+        '_BRTM', '_DEG', '_DNA', '_EYEC', '_FNRL', '_HAIR', '_HEIG', '_HNM', '_HOL', '_INTE', '_MDCL',
+        '_MEDC', '_MILI', '_MILT', '_NAME', '_NAMS', '_NLIV', '_NMAR', '_PRMN', '_TODO', '_UID', '_WEIG', '_YART',
+    ];
+
+    private const ALL_NAME_FACTS = [
+        'FONE', 'ROMN', '_HEB', '_AKA', '_MARNM',
+    ];
+
+    private const ALL_PLAC_FACTS = [
+        'FONE', 'ROMN', '_GOV', '_HEB',
+    ];
+
+    private const ALL_REPO_FACTS = [
+        'NAME', 'ADDR', 'PHON', 'EMAIL', 'FAX', 'WWW', 'NOTE', 'REFN', 'RIN', 'CHAN', 'RESN',
+    ];
+
+    private const ALL_SOUR_FACTS = [
+        'DATA', 'AUTH', 'TITL', 'ABBR', 'PUBL', 'TEXT', 'REPO', 'REFN', 'RIN',
+        'CHAN', 'NOTE', 'OBJE', 'RESN',
+    ];
 
     /** @var ModuleService */
     private $module_service;
@@ -128,29 +158,6 @@ class TreePreferencesPage implements RequestHandlerInterface
             Auth::PRIV_HIDE => I18N::translate('Hide from everyone'),
         ];
 
-        $tags = array_unique(array_merge(
-            explode(',', $tree->getPreference('INDI_FACTS_ADD')),
-            explode(',', $tree->getPreference('INDI_FACTS_UNIQUE')),
-            explode(',', $tree->getPreference('FAM_FACTS_ADD')),
-            explode(',', $tree->getPreference('FAM_FACTS_UNIQUE')),
-            explode(',', $tree->getPreference('NOTE_FACTS_ADD')),
-            explode(',', $tree->getPreference('NOTE_FACTS_UNIQUE')),
-            explode(',', $tree->getPreference('SOUR_FACTS_ADD')),
-            explode(',', $tree->getPreference('SOUR_FACTS_UNIQUE')),
-            explode(',', $tree->getPreference('REPO_FACTS_ADD')),
-            explode(',', $tree->getPreference('REPO_FACTS_UNIQUE')),
-            ['SOUR', 'REPO', 'OBJE', '_PRIM', 'NOTE', 'SUBM', 'SUBN', '_UID', 'CHAN']
-        ));
-
-        $all_tags = [];
-        foreach ($tags as $tag) {
-            if ($tag) {
-                $all_tags[$tag] = GedcomTag::getLabel($tag);
-            }
-        }
-
-        uasort($all_tags, '\Fisharebest\Webtrees\I18N::strcasecmp');
-
         // For historical reasons, we have two fields in one
         $calendar_formats = explode('_and_', $tree->getPreference('CALENDAR_FORMAT') . '_and_');
 
@@ -163,12 +170,41 @@ class TreePreferencesPage implements RequestHandlerInterface
             return Auth::isMember($tree, $user);
         });
 
-        $all_fam_facts  = GedcomTag::getPicklistFacts('FAM');
-        $all_indi_facts = GedcomTag::getPicklistFacts('INDI');
-        $all_name_facts = GedcomTag::getPicklistFacts('NAME');
-        $all_plac_facts = GedcomTag::getPicklistFacts('PLAC');
-        $all_repo_facts = GedcomTag::getPicklistFacts('REPO');
-        $all_sour_facts = GedcomTag::getPicklistFacts('SOUR');
+        $all_fam_facts = Collection::make(self::ALL_FAM_FACTS)
+            ->mapWithKeys(static function (string $tag): array {
+                return [$tag => Registry::elementFactory()->make('FAM:' . $tag)->label()];
+            })
+            ->sort(I18N::comparator());
+
+        $all_indi_facts = Collection::make(self::ALL_INDI_FACTS)
+            ->mapWithKeys(static function (string $tag): array {
+                return [$tag => Registry::elementFactory()->make('INDI:' . $tag)->label()];
+            })
+            ->sort(I18N::comparator());
+
+        $all_name_facts = Collection::make(self::ALL_NAME_FACTS)
+            ->mapWithKeys(static function (string $tag): array {
+                return [$tag => Registry::elementFactory()->make('INDI:NAME:' . $tag)->label()];
+            })
+            ->sort(I18N::comparator());
+
+        $all_plac_facts = Collection::make(self::ALL_PLAC_FACTS)
+            ->mapWithKeys(static function (string $tag): array {
+                return [$tag => Registry::elementFactory()->make('INDI:FACT:PLAC:' . $tag)->label()];
+            })
+            ->sort(I18N::comparator());
+
+        $all_repo_facts = Collection::make(self::ALL_REPO_FACTS)
+            ->mapWithKeys(static function (string $tag): array {
+                return [$tag => Registry::elementFactory()->make('REPO:' . $tag)->label()];
+            })
+            ->sort(I18N::comparator());
+
+        $all_sour_facts = Collection::make(self::ALL_SOUR_FACTS)
+            ->mapWithKeys(static function (string $tag): array {
+                return [$tag => Registry::elementFactory()->make('SOUR:' . $tag)->label()];
+            })
+            ->sort(I18N::comparator());
 
         $all_surname_traditions = SurnameTradition::allDescriptions();
 

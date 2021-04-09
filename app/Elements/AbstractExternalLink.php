@@ -17,24 +17,33 @@
 
 declare(strict_types=1);
 
-namespace Fisharebest\Webtrees\GedcomCode;
+namespace Fisharebest\Webtrees\Elements;
 
-use Fisharebest\Webtrees\TestCase;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+
+use function e;
 
 /**
- * Test harness for the class GedcomCodePedi
- *
- * @covers \Fisharebest\Webtrees\GedcomCode\GedcomCodePedi
+ * Events which can take "Y" to indicate that they occurred, but date/place are unknown.
  */
-class GedcomCodePediTest extends TestCase
+class AbstractExternalLink extends AbstractElement
 {
+    protected const EXTERNAL_URL = 'https://www.example.com/{ID}';
+
     /**
-     * Test that the class exists
+     * Display the value of this type of element.
      *
-     * @return void
+     * @param string $value
+     * @param Tree   $tree
+     *
+     * @return string
      */
-    public function testClassExists(): void
+    public function value(string $value, Tree $tree): string
     {
-        self::assertTrue(class_exists(GedcomCodePedi::class));
+        $canonical = $this->canonical($value);
+        $url       = strtr(static::EXTERNAL_URL, ['{ID}' => rawurlencode($canonical)]);
+
+        return '<a dir="ltr" href="' . e($url) . '" rel="nofollow">' . e($canonical) . '</a>';
     }
 }

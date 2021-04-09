@@ -57,8 +57,8 @@ class MediaFileDownload implements RequestHandlerInterface
         assert($disposition === 'inline' || $disposition === 'attachment');
 
         $params  = $request->getQueryParams();
-        $xref    = $params['xref'];
-        $fact_id = $params['fact_id'];
+        $xref    = $params['xref'] ?? '';
+        $fact_id = $params['fact_id'] ?? '';
         $media   = Registry::mediaFactory()->make($xref, $tree);
         $media   = Auth::checkMediaAccess($media);
 
@@ -71,7 +71,9 @@ class MediaFileDownload implements RequestHandlerInterface
                 $watermark = $media_file->isImage() && $image_factory->fileNeedsWatermark($media_file, $user);
                 $download  = $disposition === 'attachment';
 
-                return $image_factory->mediaFileResponse($media_file, $watermark, $download);
+                $response = $image_factory->mediaFileResponse($media_file, $watermark, $download);
+
+                return $response->withHeader('Cache-Control', 'public,max-age=31536000');
             }
         }
 

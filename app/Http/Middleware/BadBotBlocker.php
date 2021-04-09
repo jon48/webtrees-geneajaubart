@@ -61,6 +61,7 @@ class BadBotBlocker implements MiddlewareInterface
         'DotBot',
         'Grapeshot',
         'ia_archiver',
+        'Linguee',
         'MJ12bot',
         'panscient',
         'PetalBot',
@@ -68,6 +69,7 @@ class BadBotBlocker implements MiddlewareInterface
         'SemrushBot',
         'Turnitin',
         'XoviBot',
+        'zoominfobot',
     ];
 
     /**

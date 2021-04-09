@@ -73,8 +73,8 @@ class MediaFileService
     ];
 
     public const EXTENSION_TO_FORM = [
-        'jpg' => 'jpeg',
-        'tif' => 'tiff',
+        'jpeg' => 'jpg',
+        'tiff' => 'tif',
     ];
 
     /**
@@ -118,27 +118,12 @@ class MediaFileService
     }
 
     /**
-     * A list of key/value options for media types.
-     *
-     * @param string $current
-     *
-     * @return array<int|string,string>
-     *
-     * @deprecated - Will be removed in 2.1.0 - use Registry::elementFactory()->make('OBJE:FILE:FORM:TYPE')->values()
-     */
-    public function mediaTypes($current = ''): array
-    {
-        return Registry::elementFactory()->make('OBJE:FILE:FORM:TYPE')->values();
-    }
-
-    /**
      * A list of media files not already linked to a media object.
      *
      * @param Tree               $tree
      * @param FilesystemOperator $data_filesystem
      *
      * @return array<string>
-     * @throws FilesystemException
      */
     public function unusedFiles(Tree $tree, FilesystemOperator $data_filesystem): array
     {
