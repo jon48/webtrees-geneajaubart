@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Module\ModuleThemeInterface;
 use Fisharebest\Webtrees\Statistics\Service\ColorService;
@@ -29,7 +29,7 @@ $data = [[
 $max_gen_depth = 0;
 foreach ($gen_depth_g3 as $sosa => $gen_depth_stat) {
     /** @var \Fisharebest\Webtrees\Individual $ancestor */
-    $ancestor = Factory::individual()->make($gen_depth_stat->root_ancestor_id, $tree);
+    $ancestor = Registry::individualFactory()->make($gen_depth_stat->root_ancestor_id, $tree);
     $max_gen_depth = max($max_gen_depth, ceil($gen_depth_stat->mean_gen_depth + $gen_depth_stat->stddev_gen_depth));
     if ($ancestor !== null && $ancestor->canShowName()) {
         $data[] = [

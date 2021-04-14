@@ -1,0 +1,25 @@
+{
+  "name": "webtrees-mod-maj-welcomeblock",
+  "version": "2.0.0",
+  "description": "MyArtJaub Welcome Block module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jon48/webtrees-geneajaubart.git"
+  },
+  "author": "Jonathan Jaubart",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/jon48/webtrees-geneajaubart#readme",
+  "scripts": {
+    "development": "npx mix",
+    "watch": "npx mix watch",
+    "production": "npx mix --production"
+  },
+  "devDependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.32",
+    "@fortawesome/free-solid-svg-icons": "^5.15.1",
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "laravel-mix": "^6.0.11",
+    "laravel-mix-clean": "^0.1.0",
+    "postcss": "^8.1.14"
+  }
+}

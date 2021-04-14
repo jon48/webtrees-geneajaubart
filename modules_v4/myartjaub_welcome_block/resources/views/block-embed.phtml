@@ -9,6 +9,7 @@ use MyArtJaub\Webtrees\Module\WelcomeBlock\Http\RequestHandlers\MatomoStats;
  * @var string  $fab_welcome_block_view
  * @var string  $fab_login_block_view
  * @var bool    $matomo_enabled
+ * @var string  $js_script_url
  */
 
 ?>
@@ -34,7 +35,14 @@ use MyArtJaub\Webtrees\Module\WelcomeBlock\Http\RequestHandlers\MatomoStats;
 
 <?= $fab_login_block_view ?>
 
+<?php View::pushunique('javascript')?>
+
+<script src="<?= e($js_script_url) ?>"></script>
+
+<?php View::endpushunique() ?>
+
 <?php View::push('javascript') ?>
+
 <script>
 $(document).ready( function() {
     $.get("<?= route(MatomoStats::class, ['block_id' => $block_id]) ?>")

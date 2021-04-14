@@ -2,7 +2,7 @@
  * Styles - MyArtJaub Sosa module
  *
  * webtrees-MyArtJaub
- * Copyright (C) 2009-2021 Jonathan Jaubart
+ * Copyright (C) 2021 Jonathan Jaubart
  *
  * Based on webtrees: online genealogy
  * Copyright (C) 2020 webtrees development team
@@ -24,7 +24,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 
 import {
-  faCircle, faSpinner
+  faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faCircle, faSpinner);
+library.add(faSpinner);

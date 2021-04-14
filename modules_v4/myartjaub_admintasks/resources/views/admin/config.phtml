@@ -11,6 +11,7 @@ use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
  * @var string  $trigger_route
  * @var string  $tasks_data_route
  * @var string  $new_token_route
+ * @var string  $js_script_url
  */
 
 ?>
@@ -53,6 +54,12 @@ use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
     <tbody>
     </tbody>
 </table>
+
+<?php View::pushunique('javascript')?>
+
+<script src="<?= e($js_script_url) ?>"></script>
+
+<?php View::endpushunique() ?>
 
 <?php View::push('javascript') ?>
 <script>
@@ -100,12 +107,7 @@ function maj_run_admintask(taskid, route) {
     $('#run-task-button-' + taskid + ' .maj-loading-initial').addClass('d-none');
     $('#run-task-button-' + taskid + ' .maj-loading-inprocess').removeClass('d-none');
     $.post({
-        url: route,
-        success: function(data) {
-            $('#run-task-button-' + taskid).removeAttr('disabled');
-            $('#run-task-button-' + taskid + ' .maj-loading-inprocess').addClass('d-none');
-            $('#run-task-button-' + taskid + ' .maj-loading-complete').removeClass('d-none');
-        }
+        url: route
     }).done(function() {
         $('#run-task-button-' + taskid + ' .maj-loading-complete').removeClass('d-none');
     }).fail(function() {
@@ -113,7 +115,7 @@ function maj_run_admintask(taskid, route) {
     }).always(function() {
         $('#run-task-button-' + taskid).removeAttr('disabled');
         $('#run-task-button-' + taskid + ' .maj-loading-inprocess').addClass('d-none');
-        adminTasksTable.ajax.reload();
+        setTimeout(() => { adminTasksTable.ajax.reload(); }, 1000);
     });
 } 
 </script>

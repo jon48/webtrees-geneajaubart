@@ -18,7 +18,7 @@ $modal_id = 'modal-sosa-compute-' . Uuid::uuid4()->toString();
 
 <div id="<?= $modal_id ?>" class="modal-body text-center">
     <div class="maj-loading-inprocess">
-        <i class="fas fa-spinner fa-pulse fa-fw"></i>
+        <div class="wt-ajax-load"></div>
         <label><?= I18N::translate('Computing...') ?></label>
     </div>
     <div class="maj-loading-complete d-none">

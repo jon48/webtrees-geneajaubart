@@ -48,13 +48,13 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\AncestorsListIndividual;
         
         <div class="tab-content">
             <div class="tab-pane fade show active" role="tabpanel" id="maj-sosa-ancestors-indi">
-                <i class="fas fa-spinner fa-pulse fa-fw maj-loading-inprocess w-100 mx-auto"></i>
+                <div class="wt-ajax-load maj-loading-inprocess w-100 mx-auto"></div>
                 <div class="maj-loading-complete d-none"></div>
                 <div class="maj-loading-error d-none text-center"><?= I18N::translate('An error occurred while retrieving data.') ?></div>
             </div>
             
             <div class="tab-pane fade" role="tabpanel" id="maj-sosa-ancestors-fam">
-                <i class="fas fa-spinner fa-pulse fa-fw maj-loading-inprocess w-100 mx-auto"></i>
+                <div class="wt-ajax-load maj-loading-inprocess w-100 mx-auto"></div>
                 <div class="maj-loading-complete d-none"></div>
                 <div class="maj-loading-error d-none text-center"><?= I18N::translate('An error occurred while retrieving data.') ?>
             </div>

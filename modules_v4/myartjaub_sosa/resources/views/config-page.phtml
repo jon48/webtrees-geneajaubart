@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
 use Fisharebest\Webtrees\Http\RequestHandlers\Select2Individual;
@@ -81,7 +81,7 @@ $max_gen_system = app(SosaRecordsService::class)->maxSystemGenerations();
                     <?= I18N::translate('Root individual') ?>
                 </label>
                 <div class="col-sm-9 wt-page-options-value">
-                    <?= view('components/select-individual', ['id' => 'maj-sosa-input-rootid', 'name' => 'sosa-rootid', 'individual' => Factory::individual()->make($root_id, $tree), 'tree' => $tree]) ?>
+                    <?= view('components/select-individual', ['id' => 'maj-sosa-input-rootid', 'name' => 'sosa-rootid', 'individual' => Registry::individualFactory()->make($root_id, $tree), 'tree' => $tree]) ?>
                 </div>
             </div>
         </div>

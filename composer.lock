@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a3f8b015d2f2b991c868bb4e33bf802d",
+    "content-hash": "5fec8b446f5b087ae81f02cf86f3bcf9",
     "packages": [
         {
             "name": "aura/router",
@@ -2510,11 +2510,11 @@
         },
         {
             "name": "jon48/webtrees-lib",
-            "version": "dev-feature/2.1",
+            "version": "dev-feature/2.1-geodispersion",
             "dist": {
                 "type": "path",
                 "url": "../../../www-lib/jon48/webtrees-lib",
-                "reference": "bcba57948e6bb7ede2a9ea4c370b9b0d4dd71f04"
+                "reference": "c5fedec1a0b49d5c9cd91efe4f11980fa0295491"
             },
             "require": {
                 "aura/router": "~3.1",
@@ -10163,7 +10163,7 @@
     "aliases": [
         {
             "package": "jon48/webtrees-lib",
-            "version": "dev-feature/2.1",
+            "version": "dev-feature/2.1-geodispersion",
             "alias": "dev-feature/2.0",
             "alias_normalized": "dev-feature/2.0"
         }

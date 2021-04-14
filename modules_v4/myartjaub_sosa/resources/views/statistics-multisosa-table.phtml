@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Fisharebest\Webtrees\Factory;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
 
@@ -23,7 +23,7 @@ use Illuminate\Support\Collection;
         <div class="wt-page-options-label"><?= I18N::translate('%s times', I18N::number($count)); ?></div>
         <div class="wt-page-options-value text-center">
             <?= $multiple_sosa->map(function ($item) use ($tree): string {
-    if ($indi = Factory::individual()->make($item->sosa_i_id, $tree)) {
+    if ($indi = Registry::individualFactory()->make($item->sosa_i_id, $tree)) {
         return '<a href="' . $indi->url() . '">' . $indi->fullName() . '&nbsp;' . view('icons/sex', ['sex' => $indi->sex()]) . '</a>';
     }
                 return '';
