@@ -21,6 +21,8 @@ return array (
     'Sosa'                          =>  'Sosa',
     'Sosa Configuration'            =>  'Configuration module Sosa',
     'Root individual'               =>  'Individu de-cujus',
+    'ancestor' . I18N::PLURAL . 'ancestors'
+                                    =>  'ancêtre' . I18N::PLURAL . 'ancêtres',
     'For user'                      =>  'Pour l\'utilisateur',
     'compute'                       =>  'calculer',
     'Number of generations to compute'

@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use Fisharebest\Webtrees\Module\ModuleThemeInterface;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewTabs;
+use MyArtJaub\Webtrees\Common\GeoDispersion\GeoAnalysis\GeoAnalysisResult;
+use MyArtJaub\Webtrees\Common\GeoDispersion\GeoAnalysis\GeoAnalysisResultItem;
+
+/**
+ * @var int                 $number_top_places
+ * @var GeoAnalysisResult   $result
+ */
+
+$places_known = $result->countKnown();
+$places_unknown = $result->countUnknown();
+
+$places_total = $places_known + $places_unknown;
+$perc_known =  $places_total > 0 ? $places_known / $places_total : 0;
+
+?>
+
+<div class="wt-page-options-label maj-geodisp-cell-detailed-top">
+    <?= $result->description() ?> (<?= I18N::percentage($perc_known, 1) ?>)
+</div>
+
+<div class="wt-page-options-value maj-geodisp-cell-detailed-top">
+<?= $result->sortedKnownPlaces()
+    ->take($number_top_places)
+    ->map(function (GeoAnalysisResultItem $item) use ($places_known) {
+        $place = $item->place();
+        $count = $item->count();
+        return I18N::translate(
+            '<strong title="%1$s">%2$s</strong> [%3$s - %4$s]',
+            e(strip_tags($place->isExcluded() ? I18N::translate('Other places') : $place->place()->fullName())),
+            $place->isExcluded() ? I18N::translate('Other places') : $place->place()->firstParts(1)->first(),
+            I18N::number($count),
+            I18N::percentage($places_known > 0 ? $count / $places_known : 0, 1)
+        );
+    })
+    ->implode(I18N::$list_separator);
+
+?>
+</div>

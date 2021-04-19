@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+
+/**
+ * @var int     $places_known
+ * @var int     $places_unknown
+ * @var int     $places_other
+ */
+
+$places_found = $places_known - $places_other;
+
+$places_total = $places_known + $places_unknown;
+$perc_found = $places_total > 0 ? $places_found / $places_total : 0;
+$perc_other = $places_total > 0 ? $places_other / $places_total : 0;
+$perc_unknown = $places_total > 0 ? $places_unknown / $places_total : 0;
+?>
+
+<div class="maj-geodisp-tab-glb-summary maj-geodisp-table mx-auto">
+    <div class="maj-geodisp-row">
+        <div class="wt-page-options-label"><?= I18N::translate('Places found') ?></div>
+        <div class="wt-page-options-value"><?= I18N::translate('%1$d (%2$s)', $places_found, I18N::percentage($perc_found)) ?></div>
+    </div>
+    <?php if ($places_other > 0) : ?>
+    <div class="maj-geodisp-row">
+        <div class="wt-page-options-label"><?= I18N::translate('Other places') ?></div>
+        <div class="wt-page-options-value"><?= I18N::translate('%1$d (%2$s)', $places_other, I18N::percentage($perc_other)) ?></div>
+    </div>
+    <?php endif; ?>
+    <div class="maj-geodisp-row">
+        <div class="wt-page-options-label"><?= I18N::translate('Places not found') ?></div>
+        <div class="wt-page-options-value"><?= I18N::translate('%1$d (%2$s)', $places_unknown, I18N::percentage($perc_unknown)) ?></div>
+    </div>
+</div>

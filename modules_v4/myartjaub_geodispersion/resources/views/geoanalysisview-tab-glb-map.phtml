@@ -1,0 +1,261 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use Fisharebest\Webtrees\Module\ModuleThemeInterface;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewTabs;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisView;
+use MyArtJaub\Webtrees\Common\GeoDispersion\GeoAnalysis\GeoAnalysisResult;
+use MyArtJaub\Webtrees\Common\GeoDispersion\Config\MapViewConfig;
+use Brick\Geo\IO\GeoJSON\FeatureCollection;
+use Brick\Geo\IO\GeoJSONWriter;
+use Ramsey\Uuid\Uuid;
+use Brick\Geo\IO\GeoJSON\Feature;
+use MyArtJaub\Webtrees\Common\GeoDispersion\Config\MapColorsConfig;
+use Spatie\Color\Color;
+
+/**
+ * @var string              $module_name
+ * @var Tree                $tree
+ * @var GeoAnalysisView     $view
+ * @var GeoAnalysisResult   $result
+ * @var callable            $items_descr
+ * @var Feature[]           $features
+ * @var MapColorsConfig     $colors
+ * @var array               $basemap_provider
+ */
+
+$map_id = 'maj-geodisp-map-' . Uuid::uuid4()->toString();
+
+$places_known = $result->countKnown();
+$places_other = $result->countExcluded();
+$places_unknown = $result->countUnknown();
+
+$max_place_count = $result->maxCount();
+
+?>
+
+<?= view($module_name . '::geoanalysisview-tab-glb-summary', [ 'places_known' => $places_known, 'places_other' => $places_other, 'places_unknown' => $places_unknown]) ?>
+
+<?php if (count($features) > 0) : ?>
+<div class="maj-geodisp-tab-glb-map mx-auto mt-3 text-center">
+    <div class="row maj-geodisp-map-wrapper mx-auto">
+        <div id="<?= e($map_id) ?>" class="col-sm-9 wt-ajax-load maj-geodisp-map" dir="ltr"></div>
+    </div>
+</div>
+
+    <?php
+// Add tooltip and color info to features
+    $features_tooltip = [];
+    foreach ($features as $feature) {
+        if ($feature->getProperty('count') !== null) {
+            $features_tooltip[] = $feature
+            ->withProperty('color_ratio', $feature->getProperty('count') / $max_place_count)
+            ->withProperty('tooltip', view($module_name . '::components/map-tooltip', [ 'properties' => $feature->getProperties(), 'items_descr' => $items_descr]));
+        } else {
+            $features_tooltip[] = $feature;
+        }
+    }
+    $features = new FeatureCollection(...$features_tooltip);
+
+// Prepare colors
+    $colors = collect([
+    'defaultColor'  =>  $colors->defaultColor()->toRgb(),
+    'strokeColor'   =>  $colors->strokeColor()->toRgb(),
+    'lowColor'      =>  $colors->minValueColor()->toRgb(),
+    'highColor'     =>  $colors->maxValueColor()->toRgb(),
+    'hoverColor'    =>  $colors->hoverColor()->toRgb()
+    ])->mapWithKeys(fn(Color $value, string $key): array => [
+    $key => [ 'r' => $value->red(), 'g' => $value->green(), 'b' => $value->blue()]
+]);
+
+// Initiate GeoJson writer
+    $geojson_writer = new GeoJSONWriter();
+
+    ?>
+
+    <?php View::push('javascript') ?>
+<script>
+"use strict";
+    
+(function(majGeodispersion) {
+
+    /** API object */
+    
+    /**
+     * Feature Style object
+     *
+     * @param {{default: Object, stroke: Object, lowColor: Object, maxColor: Object, hover: Object}} colorConfig
+     */
+    majGeodispersion.MapFeaturesStyle = (function (colorConfig) {
+
+        /**
+         * Returns features default style
+         *
+         * @returns {Object}
+         */
+        function defaultStyle() {
+            return {
+                fillColor: colorString(colorConfig.defaultColor),
+                weight: 1,
+                opacity: 1,
+                color: colorString(colorConfig.strokeColor),
+                fillOpacity: 1
+            };
+        }
+
+         /**
+          * Returns features hover style
+          *
+          * @returns {Object}
+          */
+        function hoverStyle() {
+            return {...defaultStyle(), fillColor: colorString(colorConfig.hoverColor)};
+        }
+
+
+        /**
+         * Returns style for a feature based on its data
+         *
+         * @returns {Object}
+         */
+        function featureStyle(feature) {
+            return feature.properties.color_ratio !== undefined ?
+                {
+                    ...defaultStyle(),
+                    fillColor: colorString(
+                        intermediateColor(
+                            feature.properties.color_ratio,
+                            colorConfig.lowColor,
+                            colorConfig.highColor
+                        )
+                    )
+                }
+                : defaultStyle();
+        }
+
+        return {
+            colorConfig: colorConfig,
+            defaultStyle : defaultStyle,
+            hoverStyle: hoverStyle,
+            featureStyle: featureStyle
+        };
+    });
+
+    /** API Functions*/
+    
+    /**
+     * Draws a Leaflet map at a specified element
+     *
+     * @param {string} element_id
+     * @param {{url: string, options: Object}} provider
+     * @returns {MapObject}
+     */
+    majGeodispersion.drawMap = function(element_id, provider) {
+        let dataLayer = new L.FeatureGroup();
+        
+        let map = L.map(element_id, {
+            center     : [0, 0],
+            zoomControl: false,     // disable zoom
+            scrollWheelZoom: false  // disable zoom
+        })
+        .addLayer(L.tileLayer(provider.url, provider.options))
+        .addLayer(dataLayer);
+
+        return new MapObject(map, dataLayer);
+    };
+
+    /**
+     * Adds a GeoJson data layer to the map
+     *
+     * @param {MapObject} map
+     * @param {Object} data
+     * @param {MapFeaturesStyle} style
+     */
+    majGeodispersion.addGeoJsonDataToMap = function(map, data, style) {
+        if(map.dataLayer === undefined || map.leafletMap  === undefined) return;
+        
+        let geoJsonLayer = L.geoJson(data, {
+            onEachFeature: function (feature, layer) {
+                if(feature.properties.tooltip !== undefined) {
+                     layer.bindTooltip(feature.properties.tooltip);
+
+                     // Set the highlight style into layer when 'mouseover'
+                     (function () {
+                       layer.on('mouseover', function () {
+                         // Set the style with classified color
+                         layer.setStyle(style.hoverStyle());
+                       });
+                       layer.on('mouseout', function () {
+                         layer.setStyle(style.featureStyle(feature));
+                       });
+                     })(layer, feature);
+                }
+            },
+            style: style.featureStyle
+        });
+        
+        if (data.features.length > 0) {
+            map.dataLayer.addLayer(geoJsonLayer);
+        }
+        map.leafletMap.fitBounds(map.dataLayer.getBounds());
+    };
+
+    /** Private Objects */
+    
+    /**
+     * @private
+     * @param {Map} map
+     * @param {FeatureGroup} dataLayer
+     * @returns {{leafletMap: Map, dataLayer: FeatureGroup}}
+     */
+    function MapObject(map, dataLayer) {
+        this.leafletMap = map;
+        this.dataLayer = dataLayer;
+    }
+    
+    /** Private Functions */
+    /**
+     * @private
+     * @param {{r: number, g: number, b; number}} color
+     * @returns {string}
+     */
+    function colorString (color) {
+        return 'rgb(' + [color.r, color.g, color.b].join(',') + ')';
+    }
+
+    /**
+     * @private
+     * @param {number} pct
+     * @param {{r: number, g: number, b; number}} lowColor
+     * @param {{r: number, g: number, b; number}} highColor
+     * @returns {{r: number, g: number, b; number}}
+     */
+    function intermediateColor(pct, lowColor, highColor) {
+        let pctLower = 1 - pct;
+        let pctUpper = pct;
+        return {
+            r: Math.floor(lowColor.r * pctLower + highColor.r * pctUpper),
+            g: Math.floor(lowColor.g * pctLower + highColor.g * pctUpper),
+            b: Math.floor(lowColor.b * pctLower + highColor.b * pctUpper)
+        };
+    }
+    
+}(window.majGeodispersion = window.majGeodispersion || {}));
+
+$(function() {
+    let style = majGeodispersion.MapFeaturesStyle(<?= json_encode($colors) ?>);
+    
+    let map = majGeodispersion.drawMap('<?= e($map_id) ?>', <?= json_encode($basemap_provider) ?>);
+    majGeodispersion.addGeoJsonDataToMap(map, <?=  $geojson_writer->write($features) ?>, style);
+});
+
+</script>
+    <?php View::endpush() ?>
+
+<?php endif; ?>

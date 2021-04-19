@@ -1,0 +1,51 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use Fisharebest\Webtrees\Module\ModuleThemeInterface;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewTabs;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisView;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisResult;
+
+/**
+ * @var string              $module_name
+ * @var Tree                $tree
+ * @var GeoAnalysisView     $view
+ * @var Collection          $results
+ * @var callable            $items_descr
+ */
+
+?>
+
+<div class="maj-geodisp-tab-detailed-table-<?= $view->numberTopPlaces() > 0 ? 'top' : 'all' ?> maj-geodisp-table mx-auto mt-3">
+    <?php foreach ($results as $result) : ?>
+        <?php if ($result->countKnown() > 0) : ?>
+        <div class="maj-geodisp-row">
+            <?php if ($view->numberTopPlaces() > 0) : ?>
+                <?= view($module_name . '::geoanalysisview-tab-detailed-row-top', ['result' => $result, 'number_top_places' => $view->numberTopPlaces()]) ?>
+            <?php else : ?>
+                <?= view($module_name . '::geoanalysisview-tab-detailed-row-all', ['result' => $result, 'use_flags' => $view->useFlags()]) ?>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+</div>
+
+<div class="maj-geodisp-tab-detailed-help mt-3 mx-3">
+    <strong><?= I18N::translate('Interpretation help:') ?></strong><br>
+    <?= I18N::translate('<strong><em>Category</em> X (yy %%)</strong>: The percentage indicates the number of found places compared to the total number of %s in this category.', $items_descr(1000))?><br>
+    <?php if ($view->numberTopPlaces() > 0) : ?>
+        <?= I18N::translate('<strong><em>Place</em> [aa - bb %%]</strong>: The first number indicates the total number of %s in this place, the percentage compares this count to the total number of found places.', $items_descr(1000)) ?>
+        <br />
+        <?= I18N::translate('Only the %s most frequent places for each category are displayed.', I18N::number($view->numberTopPlaces())) ?>
+    <?php else : ?>
+        <?= I18N::translate('<strong><em>Place</em> or <em>Flag</em> aa (bb %%)</strong>: The first number indicates the total number of %s in this place, the percentage relates this count to the total number of found places. No percentage means it is less than 10%%.', $items_descr(1000)) ?>
+        <br />
+        <?= I18N::translate('If any, the darker area indicates the number of unknown places within the category or places outside the analysed area, and its percentage compared to the number of known places. No percentage means it is less than 10%%.') ?>
+    <?php endif; ?>
+</div>

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5fec8b446f5b087ae81f02cf86f3bcf9",
+    "content-hash": "bea10c518e604fdd77360b3137a47a69",
     "packages": [
         {
             "name": "aura/router",
@@ -58,6 +58,61 @@
                 "source": "https://github.com/auraphp/Aura.Router/tree/3.x"
             },
             "time": "2017-03-02T16:34:47+00:00"
+        },
+        {
+            "name": "brick/geo",
+            "version": "0.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/brick/geo.git",
+                "reference": "3a9104c0ca7cfe4c85aab83671fd1384509baca9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brick/geo/zipball/3a9104c0ca7cfe4c85aab83671fd1384509baca9",
+                "reference": "3a9104c0ca7cfe4c85aab83671fd1384509baca9",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "brick/reflection": "~0.2.0 || ~0.3.0 || ~0.4.0",
+                "doctrine/data-fixtures": "^1.0",
+                "doctrine/orm": "^2.0",
+                "ext-json": "*",
+                "ext-pdo": "*",
+                "ext-sqlite3": "*",
+                "php-coveralls/php-coveralls": "^2.0",
+                "phpunit/phpunit": "^8.0 || ^9.0",
+                "vimeo/psalm": "4.3.1"
+            },
+            "suggest": {
+                "ext-json": "To read and write GeoJSON"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Brick\\Geo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "GIS geometry library",
+            "keywords": [
+                "brick",
+                "geo",
+                "geography",
+                "geometry",
+                "gis"
+            ],
+            "support": {
+                "issues": "https://github.com/brick/geo/issues",
+                "source": "https://github.com/brick/geo/tree/0.6.0"
+            },
+            "time": "2021-03-16T13:33:27+00:00"
         },
         {
             "name": "brick/math",
@@ -2510,14 +2565,15 @@
         },
         {
             "name": "jon48/webtrees-lib",
-            "version": "dev-feature/2.1-geodispersion",
+            "version": "dev-feature/2.1-geodispersion-dev",
             "dist": {
                 "type": "path",
                 "url": "../../../www-lib/jon48/webtrees-lib",
-                "reference": "c5fedec1a0b49d5c9cd91efe4f11980fa0295491"
+                "reference": "372efb1f6c2b5a2b4f54c9f006ffc46cd486a557"
             },
             "require": {
                 "aura/router": "~3.1",
+                "brick/geo": "^0.6.0",
                 "brick/math": "~0.9",
                 "ext-xml": "*",
                 "fig/http-message-util": "^1.1",
@@ -2532,7 +2588,8 @@
                 "nesbot/carbon": "~2.35",
                 "paragonie/sodium_compat": "~1.13",
                 "psr/http-message": "~1.0",
-                "psr/http-server-handler": "~1.0"
+                "psr/http-server-handler": "~1.0",
+                "spatie/color": "^1.2"
             },
             "require-dev": {
                 "league/flysystem-memory": "^2.0",
@@ -4655,6 +4712,64 @@
                 "source": "https://github.com/Seldaek/phar-utils/tree/master"
             },
             "time": "2020-07-07T18:42:57+00:00"
+        },
+        {
+            "name": "spatie/color",
+            "version": "1.2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/color.git",
+                "reference": "a82a3080bd6ddc4914a6960d0a590c1c8b601e81"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/color/zipball/a82a3080bd6ddc4914a6960d0a590c1c8b601e81",
+                "reference": "a82a3080bd6ddc4914a6960d0a590c1c8b601e81",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.3|^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.5||^9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Color\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian De Deyne",
+                    "email": "sebastian@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A little library to handle color conversions",
+            "homepage": "https://github.com/spatie/color",
+            "keywords": [
+                "color",
+                "conversion",
+                "rgb",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/color/issues",
+                "source": "https://github.com/spatie/color/tree/1.2.4"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2021-02-18T09:37:02+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -10163,7 +10278,7 @@
     "aliases": [
         {
             "package": "jon48/webtrees-lib",
-            "version": "dev-feature/2.1-geodispersion",
+            "version": "dev-feature/2.1-geodispersion-dev",
             "alias": "dev-feature/2.0",
             "alias_normalized": "dev-feature/2.0"
         }

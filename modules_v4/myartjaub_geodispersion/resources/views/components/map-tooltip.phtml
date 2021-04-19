@@ -1,0 +1,25 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+
+/**
+*  @var ?stdClass   $properties
+ * @var callable    $items_descr
+ */
+?>
+
+<div class="text-center">
+<?php if (isset($properties->places)) : ?>
+    <?php foreach ($properties->places as $place) : ?>
+    <strong><?= $place ?></strong><br>
+    <?php endforeach; ?>
+<?php endif; ?>
+<?php if (isset($properties->count)) : ?>
+    <?= I18N::number($properties->count) . ' ' . $items_descr($properties->count) ?><br>
+<?php endif; ?>
+<?php if (isset($properties->ratio)) : ?>
+    <?= I18N::percentage($properties->ratio, 1) ?>
+<?php endif; ?>
+</div>

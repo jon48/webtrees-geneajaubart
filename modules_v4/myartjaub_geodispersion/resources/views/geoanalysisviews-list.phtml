@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewPage;
+use Fisharebest\Webtrees\View;
+use Fisharebest\Webtrees\Module\ModuleInterface;
+
+/**
+*  @var ModuleInterface $module
+ * @var string          $title
+ * @var Tree            $tree
+ * @var Collection      $views_list
+ * @var string          $js_script_url
+ */
+?>
+
+<h2 class="wt-page-title mx-auto"><?= e($title) ?></h2>
+
+<div class="wt-page-content wt-page-content-maj-geodisp-geoanalysislist">
+
+<?php if ($views_list->count() === 0) : ?>
+    <?= view($module->name() . '::errors/no-geoanalysislist') ?>
+<?php else : ?>
+    <p class="text-center"><?= I18N::translate('Choose a geographical dispersion analysis:'); ?><p>
+    <div class="maj-geodisp-table mx-auto">
+        <?php foreach ($views_list as $view) {?>
+        <div class="maj-geodisp-row">
+            <div class="wt-page-options-label px-2 py-1"><?= $view->icon($module) ?></div>
+            <div class="wt-page-options-value">
+                <a href="<?= route(GeoAnalysisViewPage::class, ['tree' => $tree->name(), 'view_id' => $view->id()]) ?>"><?= $view->description()?></a>
+            </div>
+        </div>
+        <?php } ?>
+    </div>
+<?php endif; ?>
+
+<?php View::pushunique('javascript')?>
+
+<script src="<?= e($js_script_url) ?>"></script>
+
+<?php View::endpushunique() ?>

@@ -1,0 +1,96 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use Fisharebest\Webtrees\Module\ModuleThemeInterface;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewTabs;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisView;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisResult;
+
+/**
+ * @var bool                $use_flags
+ * @var GeoAnalysisResult   $result
+ */
+
+$places_known = $result->countKnown();
+$places_other = $result->countExcluded();
+$places_unknown = $result->countUnknown();
+
+$places_found = $places_known - $places_other;
+$places_unfound = $places_other + $places_unknown;
+$places_total = $places_known + $places_unknown;
+
+$perc_known =  $places_total > 0 ? $places_known / $places_total : 0;
+$perc_unfound =  $places_total > 0 ? $places_unfound / $places_total : 0;
+
+$places_count = $result->sortedKnownPlaces(true);
+
+$places_hidden = 0;
+
+?>
+
+<div class="wt-page-options-label maj-geodisp-cell-detailed-all">
+    <?= $result->description() ?>
+    <br>
+    (<?= I18N::percentage($perc_known, 1) ?>)
+</div>
+
+<div class="wt-page-options-value maj-geodisp-cell-detailed-all">
+    <div class="maj-geodisp-table">
+        <div class="maj-geodisp-row">
+            <?php foreach ($places_count as $item) : ?>
+                <?php
+                $place = $item->place();
+                $count = $item->count();
+                $perc_place_in_found =  $places_found > 0 ? $count / $places_found : 0;
+                ?>
+                <?php if ($perc_place_in_found > 0.05) : ?>
+            <div class="maj-geodisp-cell-detailed-all-found" style="flex-grow:<?= $count ?>">
+                <div>
+                    <span title="<?= e(strip_tags($place->place()->fullName())) ?>"><?= $place->place()->firstParts(1)->first() ?></span>
+                    <br>
+                    <?= I18N::number($count) ?>
+                    <?php if ($perc_place_in_found > 0.1) : ?>
+                    <br>
+                    <span class="small">(<?= I18N::percentage($perc_place_in_found, 1) ?>)</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+                <?php else : ?>
+                    <?php $places_hidden += $count ?>
+                <?php endif; ?>
+            <?php endforeach; ?>
+            <?php if ($places_hidden > 0) : ?>
+                <?php $perc_hidden = $places_total > 0 ? $places_hidden / $places_total : 0;  ?>
+            <div class="maj-geodisp-cell-detailed-all-found" style="flex-grow:<?= $places_hidden ?>">
+                <div>
+                    <span title="<?= e(I18N::translate('Other')) ?>"><?= I18N::translate('Other') ?></span>
+                    <br>
+                    <?= I18N::number($places_hidden) ?>
+                    <?php if ($perc_hidden > 0.1) : ?>
+                    <br>
+                    <span class="small">(<?= I18N::percentage($perc_hidden, 1) ?>)</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+            <?php if ($places_unfound > 0) : ?>
+            <div class="maj-geodisp-cell-detailed-all-unfound" style="flex-grow:<?= max(1, intval(100 * $perc_unfound)) ?>">
+                <div>
+                    <?= I18N::number($places_unfound) ?>
+                    <?php if ($perc_unfound >= 0.1) : ?>
+                        <br>
+                        <span class="small">(<?= I18N::percentage($perc_unfound, 1) ?>)</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+        </div>
+        
+    </div>
+</div>

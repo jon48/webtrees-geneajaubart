@@ -1,0 +1,109 @@
+/**
+ * Styles - MyArtJaub GeoDispersion module
+ *
+ * webtrees-MyArtJaub
+ * Copyright (C) 2009-2021 Jonathan Jaubart
+ * 
+ * Based on webtrees: online genealogy
+ * Copyright (C) 2020 webtrees development team
+ *  
+ * This file is part of webtrees-MyArtJaub
+ *  
+ * webtrees-MyArtJaub is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * webtrees-MyArtJaub is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with webtrees-MyArtJaub. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.maj-geodisp-table {
+    display: table;
+    overflow-x: auto;
+    
+    .maj-geodisp-row {
+        display: table-row;
+        
+        > div {
+            display: table-cell;
+            padding-left: 1em;
+            padding-right: 1em;
+        }
+        
+        .wt-page-options-label,
+        .wt-page-options-value {
+            text-align: center;
+            vertical-align: middle;
+        }
+    }
+}
+
+.maj-geodisp-table.maj-geodisp-tab-detailed-table-top {
+    .wt-page-options-value.maj-geodisp-cell-detailed-top {
+        text-align: left;
+    }
+}
+
+.maj-geodisp-table.maj-geodisp-tab-detailed-table-all {
+    border-spacing: 2px;
+    width: 90%;
+    
+    .wt-page-options-value {
+        border-style: none;
+        padding: 0.3em;
+        width: 90%;
+    }
+}
+
+.maj-geodisp-cell-detailed-all {
+    .maj-geodisp-table {
+        width: 100%;
+        
+        .maj-geodisp-row {
+            align-items: stretch;
+            display: flex;
+            flex-flow: row;
+            justify-content: space-around;
+            
+            > div {
+                display: flex;
+                flex-grow: 1;
+                margin-left: 2px;
+                padding-left: 0.5em;
+                text-align: left;
+                
+                div {
+                    align-self: center;
+                }
+            }
+        }
+    }
+    
+    &-found {
+        border: solid 1px #81a9cb;
+    }
+    
+    &-unfound {
+        background-color: #81a9cb;
+        color: #006;
+    }
+}
+
+.maj-icon-view {
+    vertical-align: middle;
+}
+
+.maj-geodisp-map {
+    &-wrapper {
+        height: 70vh;
+        justify-content: center;
+    }
+    
+    &.leaflet-container {
+        //background-color: #fff;
+    }
+}

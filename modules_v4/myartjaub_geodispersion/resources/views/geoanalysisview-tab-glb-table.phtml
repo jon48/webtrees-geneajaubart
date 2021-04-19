@@ -1,0 +1,50 @@
+<?php
+
+declare(strict_types=1);
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use Fisharebest\Webtrees\Module\ModuleThemeInterface;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewTabs;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisView;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisResult;
+
+/**
+ * @var string              $module_name
+ * @var Tree                $tree
+ * @var GeoAnalysisView     $view
+ * @var GeoAnalysisResult   $result
+ * @var callable            $items_descr
+ */
+
+$places_known = $result->countKnown();
+$places_other = $result->countExcluded();
+$places_found = $places_known - $places_other;
+$places_unknown = $result->countUnknown();
+
+?>
+
+<?= view($module_name . '::geoanalysisview-tab-glb-summary', [ 'places_known' => $places_known, 'places_other' => $places_other, 'places_unknown' => $places_unknown]) ?>
+
+<div class="maj-geodisp-tab-glb-table maj-geodisp-table mx-auto mt-3">
+    <?php
+    $places_count = $result->sortedKnownPlaces(true);
+    $rank = 0;
+    $prev_count = -1;
+    ?>
+    <?php foreach ($places_count as $place_item) : ?>
+        <?php $rank++; ?>
+        <?php $place = $place_item->place(); ?>
+        <?php $place_count = $place_item->count(); ?>
+        <div class="maj-geodisp-row">
+            <div class="wt-page-options-label"><strong><?= $place_count === $prev_count ? '&nbsp;' : I18N::number($rank) ?></strong></div>
+            <div class="wt-page-options-label"><?= $place->isExcluded() ? I18N::translate('Other places') : $place->place()->shortName() ?></div>
+            <div class="wt-page-options-value"><?= I18N::number($place_count) ?></div>
+            <div class="wt-page-options-value"><?= I18N::percentage($places_found > 0 ? $place_count / $places_found : 0, 1) ?></div>
+        </div>
+        <?php $prev_count = $place_count ?>
+    <?php endforeach; ?>
+</div>
