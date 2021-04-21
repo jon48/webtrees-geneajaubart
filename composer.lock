@@ -61,16 +61,16 @@
         },
         {
             "name": "brick/geo",
-            "version": "0.6.0",
+            "version": "0.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/geo.git",
-                "reference": "3a9104c0ca7cfe4c85aab83671fd1384509baca9"
+                "reference": "a5325ea308b2fe718a5e67a3baed7feaea643c16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/geo/zipball/3a9104c0ca7cfe4c85aab83671fd1384509baca9",
-                "reference": "3a9104c0ca7cfe4c85aab83671fd1384509baca9",
+                "url": "https://api.github.com/repos/brick/geo/zipball/a5325ea308b2fe718a5e67a3baed7feaea643c16",
+                "reference": "a5325ea308b2fe718a5e67a3baed7feaea643c16",
                 "shasum": ""
             },
             "require": {
@@ -110,32 +110,38 @@
             ],
             "support": {
                 "issues": "https://github.com/brick/geo/issues",
-                "source": "https://github.com/brick/geo/tree/0.6.0"
+                "source": "https://github.com/brick/geo/tree/0.6.1"
             },
-            "time": "2021-03-16T13:33:27+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/BenMorel",
+                    "type": "github"
+                }
+            ],
+            "time": "2021-04-20T15:59:06+00:00"
         },
         {
             "name": "brick/math",
-            "version": "0.9.0",
+            "version": "0.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/math.git",
-                "reference": "b69d0daabbb830b1dac93d757cdc5dab253574c2"
+                "reference": "dff976c2f3487d42c1db75a3b180e2b9f0e72ce0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/math/zipball/b69d0daabbb830b1dac93d757cdc5dab253574c2",
-                "reference": "b69d0daabbb830b1dac93d757cdc5dab253574c2",
+                "url": "https://api.github.com/repos/brick/math/zipball/dff976c2f3487d42c1db75a3b180e2b9f0e72ce0",
+                "reference": "dff976c2f3487d42c1db75a3b180e2b9f0e72ce0",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": "^7.1|^8.0"
+                "php": "^7.1 || ^8.0"
             },
             "require-dev": {
                 "php-coveralls/php-coveralls": "^2.2",
-                "phpunit/phpunit": "^7.5.15|^8.5",
-                "vimeo/psalm": "^3.5"
+                "phpunit/phpunit": "^7.5.15 || ^8.5 || ^9.0",
+                "vimeo/psalm": "4.3.2"
             },
             "type": "library",
             "autoload": {
@@ -160,7 +166,7 @@
             ],
             "support": {
                 "issues": "https://github.com/brick/math/issues",
-                "source": "https://github.com/brick/math/tree/0.9.0"
+                "source": "https://github.com/brick/math/tree/0.9.2"
             },
             "funding": [
                 {
@@ -168,7 +174,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-08-18T09:40:56+00:00"
+            "time": "2021-01-20T22:51:39+00:00"
         },
         {
             "name": "composer/ca-bundle",
@@ -2094,16 +2100,16 @@
         },
         {
             "name": "illuminate/collections",
-            "version": "v8.36.2",
+            "version": "v8.38.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/collections.git",
-                "reference": "591e31015a8b0731708c54411cb52d50a00b2bc3"
+                "reference": "21690cd5591f2d42d792e5e4a687f9beba829f1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/collections/zipball/591e31015a8b0731708c54411cb52d50a00b2bc3",
-                "reference": "591e31015a8b0731708c54411cb52d50a00b2bc3",
+                "url": "https://api.github.com/repos/illuminate/collections/zipball/21690cd5591f2d42d792e5e4a687f9beba829f1d",
+                "reference": "21690cd5591f2d42d792e5e4a687f9beba829f1d",
                 "shasum": ""
             },
             "require": {
@@ -2144,7 +2150,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2021-04-01T13:26:52+00:00"
+            "time": "2021-04-14T11:48:08+00:00"
         },
         {
             "name": "illuminate/container",
@@ -2199,7 +2205,7 @@
         },
         {
             "name": "illuminate/contracts",
-            "version": "v8.36.2",
+            "version": "v8.38.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/contracts.git",
@@ -2315,7 +2321,7 @@
         },
         {
             "name": "illuminate/macroable",
-            "version": "v8.36.2",
+            "version": "v8.38.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/macroable.git",
@@ -3729,16 +3735,16 @@
         },
         {
             "name": "paragonie/sodium_compat",
-            "version": "v1.14.0",
+            "version": "v1.15.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/sodium_compat.git",
-                "reference": "a1cfe0b21faf9c0b61ac0c6188c4af7fd6fd0db3"
+                "reference": "8a93bfe047c7f699f819459de8ddda144cd636a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/sodium_compat/zipball/a1cfe0b21faf9c0b61ac0c6188c4af7fd6fd0db3",
-                "reference": "a1cfe0b21faf9c0b61ac0c6188c4af7fd6fd0db3",
+                "url": "https://api.github.com/repos/paragonie/sodium_compat/zipball/8a93bfe047c7f699f819459de8ddda144cd636a4",
+                "reference": "8a93bfe047c7f699f819459de8ddda144cd636a4",
                 "shasum": ""
             },
             "require": {
@@ -3809,9 +3815,9 @@
             ],
             "support": {
                 "issues": "https://github.com/paragonie/sodium_compat/issues",
-                "source": "https://github.com/paragonie/sodium_compat/tree/v1.14.0"
+                "source": "https://github.com/paragonie/sodium_compat/tree/v1.15.4"
             },
-            "time": "2020-12-03T16:26:19+00:00"
+            "time": "2021-04-17T09:00:05+00:00"
         },
         {
             "name": "php-http/message-factory",
