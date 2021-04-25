@@ -31,6 +31,7 @@ return array (
     'Error'                         =>  'Erreur',
     'Success'                       =>  'Succès',
     '(G%s)'                         =>  '(G%s)',
+    'Generation %s'                 =>  'Génération %s',
     'Complete Sosas'                =>  'Compléter les Sosas',
     'Sosa Statistics'               =>  'Statistiques Sosa',
     'No Sosa root individual has been defined.'
@@ -149,6 +150,8 @@ return array (
                                     =>  'L\'individu de-cujus a été mis à jour.',
     'The root individual could not be updated.'
                                     =>  'L\'individu de-cujus n\'a pu être mis à jour.',
+    'Sosa ancestors places by generation'
+                                    =>  'Lieux des ancêtres Sosas by génération',
     'The attached module could not be found.'
                                     =>  'Le module associé n\'a pas été trouvé',
     'An error occurred while retrieving data.'

@@ -1,0 +1,85 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
+use MyArtJaub\Webtrees\Module\GeoDispersionModule;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\AdminConfigPage;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewEditAction;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Views\AbstractGeoAnalysisView;
+
+/**
+ * @var GeoDispersionModule                 $module
+ * @var string                              $title
+ * @var Tree                                $tree
+ * @var AbstractGeoAnalysisView             $view
+ * @var Collection<GeoAnalysisInterface>    $geoanalysis_list
+ * @var array                               $place_example
+ * @var string                              $global_settings
+ */
+
+?>
+
+<?= view('components/breadcrumbs', [
+    'links' => [
+        route(ControlPanel::class) => I18N::translate('Control panel'),
+        route(ModulesAllPage::class) => I18N::translate('Modules'),
+        route(AdminConfigPage::class) => $module->title(),
+        route(AdminConfigPage::class, ['tree' => $tree->name()]) => $tree->title(),
+        I18N::translate('Edit the view')
+    ]
+]) ?>
+
+<h1><?= $title ?></h1>
+
+<form method="post" action="<?= e(route(GeoAnalysisViewEditAction::class, ['tree' => $tree->name(), 'view_id' => $view->id()])) ?>"
+    class="form-horizontal" autocomplete="off">
+    <?= csrf_field() ?>
+    
+    <h3><?= e(I18N::translate('General')) ?></h3>
+    
+    <?= view($module->name() . '::admin/view-edit-general', ['view' => $view, 'geoanalysis_list' => $geoanalysis_list, 'place_example' => $place_example]) ?>
+    
+    <?php if (mb_strlen($global_settings) > 0) : ?>
+    <h3><?= e(I18N::translate('Global view')) ?></h3>
+    
+        <?= $global_settings ?>
+    <?php endif; ?>
+    
+    <h3><?= e(I18N::translate('Detailed view')) ?></h3>
+
+    <!--  VIEW_TOP_PLACES -->
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="view_top_places">
+            <?= I18N::translate('Top places to display') ?>
+        </label>
+        <div class="col-sm-9">
+            <select class="form-control" id="view_top_places" name="view_top_places">
+                <option value="0" <?= 0 === $view->numberTopPlaces() ? 'selected' : '' ?>><?= I18N::translate('All') ?></option>
+                <?php for ($level = 1; $level <= 10; $level++) : ?>
+                <option value="<?= e($level) ?>" <?= $level === $view->numberTopPlaces() ? 'selected' : '' ?>>
+                    <?= I18N::number($level) ?>
+                </option>
+                <?php endfor;?>
+            </select>
+            <p class="small text-muted">
+                <?= I18N::translate('The number of places to display in the detailed view, by descending count.') ?>
+            </p>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <div class="offset-sm-3 col-sm-9">
+            <button type="submit" class="btn btn-primary">
+                <?= e(I18N::translate('save')) ?>
+            </button>
+            <a type="button" href="<?= e(route(AdminConfigPage::class, ['tree' => $tree->name() ])) ?>" class="btn btn-secondary">
+                <?= view('icons/cancel') ?>
+                <?= I18N::translate('cancel') ?>
+            </a>
+        </div>
+    </div>
+    
+</form>
+

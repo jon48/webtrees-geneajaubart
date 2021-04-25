@@ -1,0 +1,93 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\View;
+use MyArtJaub\Webtrees\Common\GeoDispersion\Config\MapColorsConfig;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterAddPage;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterDeleteAction;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterEditPage;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Views\GeoAnalysisMap;
+use Ramsey\Uuid\Uuid;
+
+/**
+ * @var string                  $module_name
+ * @var GeoAnalysisMap          $view
+ * @var MapColorsConfig         $colors
+ * @var \MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisMapAdapter\GeoAnalysisMapAdapter[] $map_adapters
+ */
+
+$table_id = 'table-maj-mapadapters-' . Uuid::uuid4();
+
+?>
+
+<table id="<?= $table_id ?>" class="table table-sm table-bordered table-maj-mapadapters-list"
+    <?= view('lists/datatables-attributes') ?>
+>
+    <thead>
+        <tr>
+            <th data-sortable="false" data-searchable="false" class="text-center"><?= I18N::translate('Edit') ?></th>
+            <th><?= I18N::translateContext('GEODISPERSION', 'Map') ?></th>
+            <th><?= I18N::translate('Mapper') ?></th>
+            <th data-sortable="false" data-searchable="false" class="text-center"><?= I18N::translate('Mapping property') ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($map_adapters as $map_adapter) : ?>
+        <tr>
+            <td class="text-center">
+            <?= view($module_name . '::admin/map-adapter-table-options', [
+                'map_adapter_id' => $map_adapter->id(),
+                'map_adapter_edit_route' => route(MapAdapterEditPage::class, ['tree' => $view->tree()->name(), 'adapter_id' => $map_adapter->id() ]),
+                'map_adapter_delete_route' => route(MapAdapterDeleteAction::class, ['tree' => $view->tree()->name(), 'adapter_id' => $map_adapter->id() ]),
+            ]) ?>
+            </td>
+            <td><?= $map_adapter->map()->title() ?></td>
+            <td><?= $map_adapter->placeMapper()->title() ?></td>
+            <td class="text-center"><pre><?= $map_adapter->viewConfig()->mapMappingProperty() ?></pre></td>
+        </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<a type="button" class="btn btn-primary my-2" href=<?= route(MapAdapterAddPage::class, ['tree' => $view->tree()->name(), 'view_id' => $view->id() ]) ?>>
+    <?= view('icons/add') ?>
+    <?= I18N::translate('Add a map') ?>
+</a>
+
+<?= view($module_name . '::admin/view-edit-map-color', [
+    'name'      =>  'view_map_color_default',
+    'label'     =>  I18N::translate('Default shape color'),
+    'color'     =>  $colors->defaultColor(),
+    'help_text' =>  I18N::translate('Default color to fill map shapes.')
+]) ?>
+
+<?= view($module_name . '::admin/view-edit-map-color', [
+    'name'      =>  'view_map_color_stroke',
+    'label'     =>  I18N::translate('Shape stroke color'),
+    'color'     =>  $colors->strokeColor(),
+    'help_text' =>  I18N::translate('Color for map shapes’ stroke.')
+]) ?>
+
+<?= view($module_name . '::admin/view-edit-map-color', [
+    'name'      =>  'view_map_color_maxvalue',
+    'label'     =>  I18N::translate('Maximum value shape color'),
+    'color'     =>  $colors->maxValueColor(),
+    'help_text' =>  I18N::translate('Color to fill map shapes with the highest count.')
+]) ?>
+
+<?= view($module_name . '::admin/view-edit-map-color', [
+    'name'      =>  'view_map_color_hover',
+    'label'     =>  I18N::translate('Shape hover color'),
+    'color'     =>  $colors->hoverColor(),
+    'help_text' =>  I18N::translate('Color to fill map shapes when hovering it.')
+]) ?>
+
+
+<?php View::push('javascript') ?>
+<script>
+
+$('#<?= $table_id ?>').DataTable();
+    
+</script>
+<?php View::endpush() ?>
+

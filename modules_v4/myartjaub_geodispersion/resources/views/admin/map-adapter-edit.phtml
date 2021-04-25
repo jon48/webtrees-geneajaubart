@@ -1,0 +1,162 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
+use MyArtJaub\Webtrees\Contracts\GeoDispersion\MapDefinitionInterface;
+use MyArtJaub\Webtrees\Module\GeoDispersionModule;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\AdminConfigPage;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewEditPage;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterMapperConfig;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapFeaturePropertyData;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisMapAdapter;
+
+/**
+ * @var GeoDispersionModule                         $module
+ * @var string                                      $title
+ * @var Tree                                        $tree
+ * @var int                                         $view_id
+ * @var GeoAnalysisMapAdapter|null                  $map_adapter
+ * @var Collection<string, MapDefinitionInterface>  $maps_list
+ * @var Collection<PlaceMapperInterface>            $mappers_list
+ * @var string                                      $route_edit
+ */
+
+$maps_list = $maps_list->sortBy(fn(MapDefinitionInterface $map): string => $map->title());
+
+?>
+
+<?= view('components/breadcrumbs', [
+    'links' => [
+        route(ControlPanel::class) => I18N::translate('Control panel'),
+        route(ModulesAllPage::class) => I18N::translate('Modules'),
+        route(AdminConfigPage::class) => $module->title(),
+        route(AdminConfigPage::class, ['tree' => $tree->name()]) => $tree->title(),
+        route(GeoAnalysisViewEditPage::class, ['tree' => $tree->name(), 'view_id' => $view_id]) => I18N::translateContext('GEODISPERSION', 'View'),
+        I18N::translate('Edit the map configuration')
+    ]
+]) ?>
+
+<h1><?= $title ?></h1>
+
+<form method="post" action="<?= e($route_edit) ?>"
+    class="form-horizontal" autocomplete="off">
+    <?= csrf_field() ?>
+    
+    <!--  MAP_ADAPTER_MAP -->
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="map_adapter_map">
+            <?= I18N::translateContext('GEODISPERSION', 'Map') ?>
+        </label>
+        <div class="col-sm-9">
+            <select class="form-control select2" id="map_adapter_map" name="map_adapter_map">
+            <?php foreach ($maps_list as $map_id => $map) : ?>
+                <option value="<?= e($map_id) ?>" <?= $map_adapter !== null && $map_id === $map_adapter->map()->id()  ? 'selected' : '' ?>>
+                    <?= $map->title() ?>
+                </option>
+            <?php endforeach;?>
+            </select>
+            <p class="small text-muted">
+                <?= I18N::translate('The map to use for the view.') ?>
+            </p>
+        </div>
+    </div>
+    
+    <!--  MAP_ADAPTER_MAPPER -->
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="map_adapter_mapper">
+            <?= I18N::translate('Place mapper') ?>
+        </label>
+        <div class="col-sm-9">
+            <select class="form-control select2" id="map_adapter_mapper" name="map_adapter_mapper">
+            <?php foreach ($mappers_list as $mapper) : ?>
+                <option value="<?= e(get_class($mapper)) ?>" <?= $map_adapter !== null && $map_adapter->placeMapper() instanceof $mapper ? 'selected' : '' ?>>
+                    <?= $mapper->title() ?>
+                </option>
+            <?php endforeach;?>
+            </select>
+            <p class="small text-muted">
+                <?= I18N::translate('The engine to use to map places in the tree to shapes on the map.') ?>
+            </p>
+        </div>
+    </div>
+    
+    <h3><?= e(I18N::translate('Mapping configuration')) ?></h3>
+
+    <!--  MAP_ADAPTER_PROPERTY -->
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="map_adapter_property_selected">
+            <?= I18N::translate('Map shape mapping property') ?>
+        </label>
+        <div class="col-sm-9" id="maj-map-adapter-select-property">
+            <?php if ($map_adapter !== null) : ?>
+            <input type="hidden" value="<?= e($map_adapter->viewConfig()->mapMappingProperty()) ?>" name="map_adapter_property" />
+            <?php endif; ?>
+            <select class="form-control" id="map_adapter_property_selected" name="map_adapter_property_selected">
+            </select>
+            <p class="small text-muted">
+                <?= I18N::translate('The shape property to be used by the place mapper to identify places. For the best results, the property value should be unique.') ?>
+            </p>
+        </div>
+    </div>
+    
+    <div id="maj-map-adapter-mapper-config">
+    </div>
+    
+    <div class="row form-group">
+        <div class="offset-sm-3 col-sm-9">
+            <button type="submit" class="btn btn-primary">
+                <?= e(I18N::translate('save')) ?>
+            </button>
+            <a type="button" href="<?= e(route(GeoAnalysisViewEditPage::class, ['tree' => $tree->name(), 'view_id' => $view_id])) ?>" class="btn btn-secondary">
+                <?= view('icons/cancel') ?>
+                <?= I18N::translate('cancel') ?>
+            </a>
+        </div>
+    </div>
+    
+</form>
+
+<?php View::push('javascript') ?>
+
+<script>
+
+let loadMappingProperty = function(mapId) {
+    $.get("<?= route(MapFeaturePropertyData::class) ?>", { map_id: mapId })
+    .done(function(data) {
+        let select = $('#maj-map-adapter-select-property > select').first();
+        select.empty();
+        let adapter_property = $('#maj-map-adapter-select-property > input[name=map_adapter_property]').val();
+        $.each(data, function (key, property) {
+            let selected = adapter_property == property;
+            select.append(new Option(property, property, selected, selected));
+        });
+    });
+}
+
+let loadMapperConfig = function(mapperClass) {
+
+    $.get(
+        "<?= route(MapAdapterMapperConfig::class, [
+            'tree' => $tree->name(),
+            'adapter_id' => $map_adapter === null ? null : $map_adapter->id()
+        ]) ?>",
+        { mapper: mapperClass }
+    ).done(function(responseText) {
+        $('#maj-map-adapter-mapper-config').html(responseText);
+    });
+}
+
+$('#map_adapter_map').on('change', function() {
+    loadMappingProperty($(this)[0].value);
+}).trigger('change');
+
+$('#map_adapter_mapper').on('change', function() {
+    loadMapperConfig($(this)[0].value);
+}).trigger('change');
+
+</script>
+
+<?php View::endpush() ?>

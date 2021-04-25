@@ -1,0 +1,77 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
+use MyArtJaub\Webtrees\Module\GeoDispersionModule;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\AdminConfigPage;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewAddAction;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Views\AbstractGeoAnalysisView;
+
+/**
+ * @var GeoDispersionModule                 $module
+ * @var string                              $title
+ * @var Tree                                $tree
+ * @var AbstractGeoAnalysisView             $view
+ * @var Collection<GeoAnalysisInterface>    $geoanalysis_list
+ * @var array                               $place_example
+ * @var string                              $global_settings
+ */
+
+$view_types = [ 'table' => I18N::translateContext('GEODISPERSION', 'Table'), 'map' => I18N::translateContext('GEODISPERSION', 'Map') ];
+uasort($view_types, I18N::comparator());
+
+?>
+
+<?= view('components/breadcrumbs', [
+    'links' => [
+        route(ControlPanel::class) => I18N::translate('Control panel'),
+        route(ModulesAllPage::class) => I18N::translate('Modules'),
+        route(AdminConfigPage::class) => $module->title(),
+        route(AdminConfigPage::class, ['tree' => $tree->name()]) => $tree->title(),
+        I18N::translate('Add a view')
+    ]
+]) ?>
+
+<h1><?= $title ?></h1>
+
+<form method="post" action="<?= e(route(GeoAnalysisViewAddAction::class, ['tree' => $tree->name()])) ?>"
+    class="form-horizontal" autocomplete="off">
+    <?= csrf_field() ?>
+    
+    <h3><?= e(I18N::translate('General')) ?></h3>
+    
+    <!--  VIEW_TYPE -->
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="view_type">
+            <?= I18N::translate('Type') ?>
+        </label>
+        <div class="col-sm-9">
+            <select class="form-control select2" id="view_type" name="view_type">
+            <?php foreach ($view_types as $type_key => $type_name) : ?>
+                <option value="<?= e($type_key) ?>"><?= $type_name ?></option>
+            <?php endforeach;?>
+            </select>
+            <p class="small text-muted">
+                <?= I18N::translate('The type of geographical dispersion analysis view to be added.') ?>
+            </p>
+        </div>
+    </div>
+    
+    <?= view($module->name() . '::admin/view-edit-general', ['view' => null, 'geoanalysis_list' => $geoanalysis_list, 'place_example' => $place_example]) ?>
+    
+    <div class="row form-group">
+        <div class="offset-sm-3 col-sm-9">
+            <button type="submit" class="btn btn-primary">
+                <?= e(I18N::translate('save')) ?>
+            </button>
+            <a type="button" href="<?= e(route(AdminConfigPage::class, ['tree' => $tree->name() ])) ?>" class="btn btn-secondary">
+                <?= view('icons/cancel') ?>
+                <?= I18N::translate('cancel') ?>
+            </a>
+        </div>
+    </div>
+    
+</form>
+

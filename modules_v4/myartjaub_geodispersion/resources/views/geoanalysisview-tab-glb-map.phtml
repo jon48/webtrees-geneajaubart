@@ -2,32 +2,25 @@
 
 declare(strict_types=1);
 
-use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Individual;
+use Brick\Geo\IO\GeoJSONWriter;
+use Brick\Geo\IO\GeoJSON\FeatureCollection;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
-use Fisharebest\Webtrees\Module\ModuleThemeInterface;
-use Illuminate\Support\Collection;
-use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewTabs;
-use MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisView;
-use MyArtJaub\Webtrees\Common\GeoDispersion\GeoAnalysis\GeoAnalysisResult;
-use MyArtJaub\Webtrees\Common\GeoDispersion\Config\MapViewConfig;
-use Brick\Geo\IO\GeoJSON\FeatureCollection;
-use Brick\Geo\IO\GeoJSONWriter;
-use Ramsey\Uuid\Uuid;
-use Brick\Geo\IO\GeoJSON\Feature;
 use MyArtJaub\Webtrees\Common\GeoDispersion\Config\MapColorsConfig;
+use MyArtJaub\Webtrees\Common\GeoDispersion\GeoAnalysis\GeoAnalysisResult;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Views\GeoAnalysisView;
+use Ramsey\Uuid\Uuid;
 use Spatie\Color\Color;
 
 /**
- * @var string              $module_name
- * @var Tree                $tree
- * @var GeoAnalysisView     $view
- * @var GeoAnalysisResult   $result
- * @var callable            $items_descr
- * @var Feature[]           $features
- * @var MapColorsConfig     $colors
- * @var array               $basemap_provider
+ * @var string                          $module_name
+ * @var Tree                            $tree
+ * @var GeoAnalysisView                 $view
+ * @var GeoAnalysisResult               $result
+ * @var callable                        $items_descr
+ * @var Brick\Geo\IO\GeoJSON\Feature[]  $features
+ * @var MapColorsConfig                 $colors
+ * @var array                           $basemap_provider
  */
 
 $map_id = 'maj-geodisp-map-' . Uuid::uuid4()->toString();

@@ -1,0 +1,98 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\AdminConfigPage;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewAddPage;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewListData;
+use Ramsey\Uuid\Uuid;
+
+/**
+ * @var string                                  $module_name
+ * @var string                                  $title
+ * @var Tree                                    $tree
+ * @var Illuminate\Support\Collection<Tree>     $other_trees
+ * @var string[]                                $place_example
+ * @var string                                  $js_script_url
+ */
+
+$table_id = 'table-maj-analysisviews-' . Uuid::uuid4();
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route(ModulesAllPage::class) => I18N::translate('Modules'), route(AdminConfigPage::class) => $title, $tree->title()]]) ?>
+
+<h1><?= $title ?></h1>
+
+<div class="d-flex align-items-center justify-content-between">
+    <h3><?= $tree->title(); ?></h3>
+    <?php if ($other_trees->count() > 0) : ?>
+        <?= view($module_name . '::components/change-tree', ['trees_list' => $other_trees, 'route_name' => AdminConfigPage::class]) ?>
+    <?php endif; ?>
+</div>
+
+<p>
+    <?= I18N::translate('The depth of a geographical dispersion analysis view defines the level within the place hierarchy used by the analysis, starting with the top level.') ?><br>
+    <?= I18N::translate('In this tree, the available levels are for instance: ')?>
+    <strong>
+    <?= collect($place_example)
+            ->map(fn(string $place, int $key): string => sprintf('(%s) %s', I18N::number($key + 1), $place))
+            ->implode(I18N::$list_separator) ?>
+    </strong>.
+</p>
+
+<table id="<?= $table_id ?>" class="table table-sm table-bordered table-maj-analysisviews-list"
+    <?= view('lists/datatables-attributes') ?>
+>
+    <thead>
+        <tr>
+            <th data-sortable="false" data-searchable="false"><?= I18N::translate('Edit') ?></th>
+            <th data-searchable="false"><?= I18N::translate('Enabled') ?></th>
+            <th data-sortable="false"><?= I18N::translate('Type') ?></th>
+            <th><?= I18N::translate('Description') ?></th>
+            <th><?= I18N::translate('Analysis') ?></th>
+            <th data-searchable="false"><?= I18N::translate('Depth') ?></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<div>
+    <a type="button" class="btn btn-primary my-2" href=<?= route(GeoAnalysisViewAddPage::class, ['tree' => $tree->name()]) ?>>
+        <?= view('icons/add') ?>
+        <?= I18N::translate('Add a view') ?>
+    </a>
+</div>
+
+<?php View::pushunique('javascript')?>
+
+<script src="<?= e($js_script_url) ?>"></script>
+
+<?php View::endpushunique() ?>
+
+<?php View::push('javascript') ?>
+<script>
+let renderOptions = { _ : "display", sort: "raw", filter: "raw" };
+
+$('#<?= $table_id ?>').DataTable({
+    ajax:                {
+      url: "<?= e(route(GeoAnalysisViewListData::class, ['tree' => $tree->name()])) ?>"
+    },
+    columns: [
+        /* 0 Edit               */ { className: "text-center", data: "edit"},
+        /* 1 Enabled            */ { className: "text-center", data: "enabled", render: renderOptions},
+        /* 2 View type          */ { className: "text-center", data: "type"},
+        /* 3 View description   */ { data: "description", render: renderOptions},
+        /* 4 Analysis name      */ { data: "analysis", render: renderOptions },
+        /* 5 Place depth        */ { className: "text-center", data: "place_depth", render: renderOptions },
+    ],
+    sorting:             [[3, "asc"]],
+    });
+    
+</script>
+<?php View::endpush() ?>
+

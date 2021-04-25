@@ -1,0 +1,49 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+
+/**
+ * @var int     $view_id
+ * @var bool    $view_enabled
+ * @var string  $view_edit_route
+ * @var string  $view_delete_route
+ * @var string  $view_status_route
+ */
+
+?>
+
+<div class="dropdown">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" id="edit-view-button-<?= $view_id ?>" aria-haspopup="true" aria-expanded="false">
+        <?= view('icons/menu') ?>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="edit-view-button-<?= $view_id ?>">
+        <?php if ($view_enabled) : ?>
+        <div class="dropdown-item">
+            <?= view('icons/cancel') ?>
+            <a href="<?= e($view_status_route) ?>">
+                <?= I18N::translate('Disable') ?>
+            </a>
+        </div>
+        <?php else : ?>
+        <div class="dropdown-item">
+            <?= view('icons/add') ?>
+            <a href="<?= e($view_status_route) ?>">
+                <?= I18N::translate('Enable') ?>
+            </a>
+        </div>
+        <?php endif;?>
+        <div class="dropdown-item">
+            <?= view('icons/edit') ?>
+            <a href="<?= e($view_edit_route) ?>">
+                <?= I18N::translate('Edit') ?>
+            </a>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item">
+            <?= view('icons/delete') ?>
+            <a href="<?= e($view_delete_route) ?>">
+                <?= I18N::translate('Delete') ?>
+            </a>
+        </div>
+    </div>
+</div>

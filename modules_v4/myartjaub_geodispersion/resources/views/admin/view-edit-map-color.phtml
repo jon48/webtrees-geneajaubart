@@ -1,0 +1,43 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Spatie\Color\Color;
+
+/**
+ * @var string  $name
+ * @var string  $label
+ * @var Color   $color
+ * @var string  $help_text
+ *
+ */
+
+?>
+<div class="row form-group">
+    <label class="col-sm-3 col-form-label" for="<?= $name ?>">
+        <?= $label ?>
+    </label>
+    <div class="col-sm-9">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="input-group" dir="ltr">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" dir="ltr">
+                        <?= I18N::translate('Color') ?>
+                        </span>
+                    </div>
+                    <input
+                        type="color" 
+                        class="form-control" 
+                        dir="ltr" 
+                        id="<?= $name ?>" 
+                        name="<?= $name ?>" 
+                        value="<?= $color->toHex() ?>"
+                        maxlength="11">
+                </div>
+            </div>
+        </div>
+        <p class="small text-muted">
+            <?= $help_text ?>
+        </p>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+
+/**
+ * @var int     $map_adapter_id
+ * @var string  $map_adapter_edit_route
+ * @var string  $map_adapter_delete_route
+ */
+
+?>
+
+<div class="dropdown">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" id="edit-mapadapter-button-<?= $map_adapter_id ?>" aria-haspopup="true" aria-expanded="false">
+        <?= view('icons/menu') ?>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="edit-mapadapter-button-<?= $map_adapter_id ?>">
+        <div class="dropdown-item">
+            <?= view('icons/edit') ?>
+            <a href="<?= e($map_adapter_edit_route) ?>">
+                <?= I18N::translate('Edit') ?>
+            </a>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item">
+            <?= view('icons/delete') ?>
+            <a href="<?= e($map_adapter_delete_route) ?>">
+                <?= I18N::translate('Delete') ?>
+            </a>
+        </div>
+    </div>
+</div>

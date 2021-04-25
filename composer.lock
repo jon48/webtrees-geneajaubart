@@ -2575,7 +2575,7 @@
             "dist": {
                 "type": "path",
                 "url": "../../../www-lib/jon48/webtrees-lib",
-                "reference": "372efb1f6c2b5a2b4f54c9f006ffc46cd486a557"
+                "reference": "b059fb0e539bf9829a857e47e347e87a619b0b8a"
             },
             "require": {
                 "aura/router": "~3.1",
