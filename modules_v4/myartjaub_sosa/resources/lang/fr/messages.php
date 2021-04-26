@@ -19,6 +19,7 @@ return array (
     'Calculate and display Sosa ancestors of the root person.'
                                     =>  'Calcule et affiche les ancêtres Sosa du de-cujus.',
     'Sosa'                          =>  'Sosa',
+    'SOSA' . I18N::CONTEXT . 'S'    =>  'S',
     'Sosa Configuration'            =>  'Configuration module Sosa',
     'Root individual'               =>  'Individu de-cujus',
     'ancestor' . I18N::PLURAL . 'ancestors'
@@ -66,6 +67,11 @@ return array (
     'Minimum'                       =>  'Minimal',
     'Shrinkage'                     =>  'Contraction',
     '<strong>G%d</strong>'          =>  '<strong>G%d</strong>',
+    'Sosa %s'                       =>  'Sosa %s',
+    '%%'                            =>  '%%',
+    '-'                             =>  '-',
+    '%1$s <> %2$s'                  =>  '%1$s <> %2$s',
+    '%s: %s'                        =>  '%s : %s',
     'Known Sosa ancestors\' family dispersion'
                                     =>  'Répartition familiale des ancêtres Sosas connus',
     'Shared'                        =>  'Partagés',

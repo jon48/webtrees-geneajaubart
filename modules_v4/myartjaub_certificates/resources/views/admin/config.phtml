@@ -7,20 +7,30 @@ use Fisharebest\Webtrees\View;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
 use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
 use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\AdminConfigAction;
-use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\AdminTreesPage;
+use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\AdminConfigPage;
 use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
 
+
 /**
+ * @var string              $module_name
  * @var string              $title
  * @var Tree                $tree
+ * @var Collection<Tree>    $other_trees
  * @var string              $data_folder
  */
 
 ?>
 
-<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route(ModulesAllPage::class) => I18N::translate('Modules'), route(AdminTreesPage::class) => $title, $tree->title()]]) ?>
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route(ModulesAllPage::class) => I18N::translate('Modules'), route(AdminConfigPage::class, ['tree' => $tree->name()]) => $title, $tree->title()]]) ?>
 
 <h1><?= $title ?></h1>
+
+<div class="d-flex align-items-center justify-content-between">
+    <h3><?= $tree->title(); ?></h3>
+    <?php if ($other_trees->count() > 0) : ?>
+        <?= view($module_name . '::components/change-tree', ['trees_list' => $other_trees, 'route_name' => AdminConfigPage::class]) ?>
+    <?php endif; ?>
+</div>
 
 <form method="post" action="<?= e(route(AdminConfigAction::class, ['tree' => $tree->name()])) ?>" class="form-horizontal">
     <?= csrf_field() ?>
@@ -201,11 +211,6 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
                 <i class="fa fa-check"></i>
                 <?= I18N::translate('save') ?>
             </button>
-        
-            <a href="<?= e(route(AdminTreesPage::class)) ?>" class="btn btn-secondary">
-                <?= view('icons/cancel') ?>
-                <?= I18N::translate('cancel') ?>
-            </a>
         </div>
     </div>
 </form>

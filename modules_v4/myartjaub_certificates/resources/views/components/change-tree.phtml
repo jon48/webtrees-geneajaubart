@@ -1,0 +1,27 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+
+/**
+ * @var iterable<Tree>   $trees_list
+ * @var string           $route_name
+ */
+
+?>
+
+<div class="dropdown">
+    <button type="button" class="btn btn-primary dropdown-toggle my-2" data-toggle="dropdown" id="trees-switch" aria-haspopup="true" aria-expanded="false">
+        <?= I18N::translate('Change tree'); ?>
+        <span class="caret"></span>
+    </button>
+    <?php foreach ($trees_list as $tree) : ?>
+    <div class="dropdown-menu" aria-labelledby="trees-switch">
+        <div class="dropdown-item">
+            <?= view('icons/tree') ?>
+            <a href="<?= e(route($route_name, ['tree' => $tree->name() ])) ?>">
+                <?= $tree->title() ?>
+            </a>
+        </div>
+    </div>
+    <?php endforeach; ?>
+</div>

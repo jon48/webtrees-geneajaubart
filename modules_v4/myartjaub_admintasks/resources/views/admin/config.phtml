@@ -40,15 +40,15 @@ use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
 >
     <thead>
         <tr>
-            <th><?= I18N::translate('Edit') ?></th>
-            <th><?= I18N::translate('Enabled') ?></th>
+            <th data-sortable="false" data-searchable="false"><?= I18N::translate('Edit') ?></th>
+            <th data-searchable="false"><?= I18N::translate('Enabled') ?></th>
             <th><?= I18N::translate('Task name') ?></th>
-            <th><?= I18N::translate('Last success') ?></th>
-            <th><?= I18N::translate('Last result') ?></th>
-            <th><?= I18N::translate('Frequency') ?></th>
-            <th><?= I18N::translate('Remaining occurrences') ?></th>
-            <th><?= I18N::translate('Is running?') ?></th>
-            <th><?= I18N::translate('Run task') ?></th>
+            <th data-searchable="false"><?= I18N::translate('Last success') ?></th>
+            <th data-searchable="false"><?= I18N::translate('Last result') ?></th>
+            <th data-sortable="false" data-searchable="false"><?= I18N::translate('Frequency') ?></th>
+            <th data-sortable="false" data-searchable="false"><?= I18N::translate('Remaining occurrences') ?></th>
+            <th data-sortable="false" data-searchable="false"><?= I18N::translate('Is running?') ?></th>
+            <th data-sortable="false" data-searchable="false"><?= I18N::translate('Run task') ?></th>
         </tr>
     </thead>
     <tbody>
@@ -63,27 +63,26 @@ use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
 
 <?php View::push('javascript') ?>
 <script>
+let renderOptions = { _ : "display", sort: "raw", filter: "raw" };
+
 var adminTasksTable = $(".table-maj-admintasks-list").DataTable({
-    processing:          true,
-    serverSide:          true,
     ajax:                {
       url: "<?= e($tasks_data_route) ?>"
     },
     autoWidth:           false,
-    pageLength:             10,
-    sorting:             [[2, "asc"]],
     columns: [
-        /* 0 Edit             */ { sortable: false, className: "text-center"},
-        /* 1 Enabled         */ { sortable: false, className: "text-center"  },
-        /* 2 Task Title        */ { className: "text-center" },
-        /* 3 Last Run        */ { className: "text-center" },
-        /* 4 Last status     */ { className: "text-center" },
-        /* 5 Frequency      */ { sortable: false, className: "text-center" },
-        /* 6 Nb Occcurrences*/ { sortable: false, className: "text-center" },
-        /* 7 Is Running        */ { sortable: false, className: "text-center" },
-        /* 8 Run task        */ { sortable: false, className: "text-center" }
+        /* 0 Edit               */ { className: "text-center", data: "edit"},
+        /* 1 Enabled            */ { className: "text-center", data: "status", render: renderOptions},
+        /* 2 Task Title         */ { className: "text-center", data: "task_name", render: renderOptions},
+        /* 3 Last Run           */ { className: "text-center", data: "last_run", render: renderOptions},
+        /* 4 Last status        */ { className: "text-center", data: "last_result", render: renderOptions},
+        /* 5 Frequency          */ { className: "text-center", data: "frequency"},
+        /* 6 Nb Occcurrences    */ { className: "text-center", data: "nb_occurrences"},
+        /* 7 Is Running         */ { className: "text-center", data: "running"},
+        /* 8 Run task           */ { className: "text-center", data: "run"}
     ],
-    });
+    sorting:             [[2, "asc"]],
+});
 
 function generate_force_token() {
     $('#force-token-generate').attr('disabled', 'disabled');

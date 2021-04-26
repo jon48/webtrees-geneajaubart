@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bea10c518e604fdd77360b3137a47a69",
+    "content-hash": "f54b400d92f56833484481076de832be",
     "packages": [
         {
             "name": "aura/router",
@@ -2575,7 +2575,7 @@
             "dist": {
                 "type": "path",
                 "url": "../../../www-lib/jon48/webtrees-lib",
-                "reference": "b059fb0e539bf9829a857e47e347e87a619b0b8a"
+                "reference": "93a6eead246d00794e363a028201229d3dcad33e"
             },
             "require": {
                 "aura/router": "~3.1",
@@ -2738,11 +2738,11 @@
         },
         {
             "name": "jon48/webtrees-theme-rural",
-            "version": "dev-main",
+            "version": "dev-feature/nextrelease",
             "dist": {
                 "type": "path",
                 "url": "../../../www-lib/jon48/webtrees-theme-rural",
-                "reference": "25269e3a2719afd4e6eb25bdacff19461651030a"
+                "reference": "b09ac35044b32e71ff0abe020770f0d5285333a5"
             },
             "require-dev": {
                 "consolidation/robo": "^3.0",
@@ -10287,6 +10287,12 @@
             "version": "dev-feature/2.1-geodispersion-dev",
             "alias": "dev-feature/2.0",
             "alias_normalized": "dev-feature/2.0"
+        },
+        {
+            "package": "jon48/webtrees-theme-rural",
+            "version": "dev-feature/nextrelease",
+            "alias": "dev-main",
+            "alias_normalized": "dev-main"
         }
     ],
     "minimum-stability": "stable",

@@ -34,7 +34,6 @@ return array (
     'Remaining occurrences'         =>  'Occurrences restantes',
     'Is running?'                   =>  'En cours ?',
     'Run task'                      =>  'Exécuter la tâche',
-    'Disabled'                      =>  'Désactivé',
     'Unlimited'                     =>  'Permanent',
     'Running'                       =>  'En cours...',
     'Not running'                   =>  'Arrêté',
@@ -65,7 +64,7 @@ return array (
     'No errors'                     =>  'Aucune erreur',
     'minutes'                       =>  'minutes',
     'Number of occurrences'         =>  'Nombre d\'exécutions',
-    'Options for “%s”'              =>  'Options pour “%s”',
+    'Options for “%s”'              =>  'Options pour « %s »',
     'Site'                          =>  'Site',
     'time(s)'                       =>  'fois',
     'Yes'                           =>  'Oui',
@@ -78,22 +77,22 @@ return array (
                                     =>  'Détermine si la tâche doit s\'exécuter un nombre déterminé de fois.',
     'Defines the number of times the task will run.'
                                     =>  'Détermine le nombre de fois la tâche doit s\'exécuter.',
-    'The scheduled task has been successfully updated'
-                                    =>  'La tâche planifiée a été mise à jour avec succès',
+    'The scheduled task has been successfully updated.'
+                                    =>  'La tâche planifiée a été mise à jour avec succès.',
     'The attached module could not be found.'
                                     =>  'Le module associé n\'a pas été trouvé',
-    'The task shedule with ID “%d” does not exist.'
-                                    =>  'La tâche planifiée avec ID “%d” n\'existe pas',
+    'The task shedule with ID “%s” does not exist.'
+                                    =>  'La tâche planifiée avec ID « %s » n\'existe pas',
     'The Task schedule could not be found.'
                                     =>  'La tâche planifiée n\a pu être trouvée',
     'Error while running task %s:'  =>  'Erreur lors de l\exécution de la tâche %s :',
-    'An error occured while updating the scheduled task'
-                                    =>  'Une erreur s\'est produite lors de la mise à jour de la tâche planifiée',
-    'An error occured while updating the specific settings of administrative task “%s”'
-                                    =>  'Une erreur s\'est produite lors de la mise à jour des paramètres de la tâche “%s”',
-    'The frequency is not in a valid format'
-                                    =>  'Le paramètre de fréquence n\'a pas un format valide',
-    'The number of remaining occurences is not in a valid format'
-                                    =>  'Le paramètre pour le nombre d\'occurrences restantes n\'a pas un format valide',
+    'An error occured while updating the scheduled task.'
+                                    =>  'Une erreur s\'est produite lors de la mise à jour de la tâche planifiée.',
+    'An error occured while updating the specific settings of administrative task “%s”.'
+                                    =>  'Une erreur s\'est produite lors de la mise à jour des paramètres de la tâche « %s ».',
+    'The frequency is not in a valid format.'
+                                    =>  'Le paramètre de fréquence n\'a pas un format valide.',
+    'The number of remaining occurences is not in a valid format.'
+                                    =>  'Le paramètre pour le nombre d\'occurrences restantes n\'a pas un format valide.',
 
 );

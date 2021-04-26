@@ -21,13 +21,12 @@ return array (
     'Certificates directory'        =>  'Répertoire des actes',
     'Choose a location'             =>  'Choisir un lieu',
     'See all certificates for %s'   =>  'Voir tous les actes pour %s',
+    'Change tree'                   =>  'Changer d’arbre généalogique',
     'This folder will be used to store the certificate files.'
                                     =>  'Ce répertoire est utilisé pour stocker les images d\'actes.',
     'If you select a different folder, you must also move any certificate files from the existing folder to the new one.'
                                     =>  'Si vous désirez utiliser un autre répertoire, vous devez également déplacer les images d\'actes du répertoire existant vers le nouveau.',
     'Show certificates'             =>  'Montrer les actes',
-    'Select a tree to modify its configuration for the “Certificates” module.'
-                                    =>  'Sélectionner un arbre pour modifier sa configuration pour le module “Actes”.',
     'Define access level required to display certificates in facts sources. By default, nobody can see the certificates.'
                                     =>  'Définit le niveau d\'accès requis pour afficher les actes dans les sources des événements. Par défaut, personne ne peut voir les actes.',
     'Show certificates without watermark'
@@ -44,7 +43,9 @@ return array (
     'Font color for the watermark. By default, <span style="color:%1$s;">the color %1$s</span> is used.'
                                     =>  'Couleur de la police du filigrane. Par défault, <span style="color:%1$s">la couleur %1$s</span> est utilisée.',
     'Watermark font size'           =>  'Taille de police du filigrane',
+    '© %s - %s'                     =>  '© %s - %s',
     'Maximum font size'             =>  'Taille de police maximale',
+    'pixels'                        =>  'pixels',
     'This image is protected under copyright law.'
                                     =>  'Cette image est protégée par les lois sur le copyright.',
     'The attached module could not be found.'
