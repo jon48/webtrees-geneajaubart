@@ -45,6 +45,7 @@ return array (
     'Add a view'                    =>  'Ajouter une visualisation',
     'Add a map'                     =>  'Ajouter une carte',
     'Add a map configuration'       =>  'Ajouter une configuration de carte',
+    'Delete invalid maps'           =>  'Supprimer les cartes invalides',
     'Edit the view'                 =>  'Modifier la visualisation',
     'Edit the geographical dispersion analysis view - %s'
                                     =>  'Modifier la visualisation d’analyse de répartition géographique - %s',
@@ -53,7 +54,7 @@ return array (
     'Disable'                       =>  'Désactiver',
     'Global view'                   =>  'Vue globale',
     'Detailed view'                 =>  'Vue détaillée',
-     'GEODISPERSION' . I18N::CONTEXT . 'View'
+    'GEODISPERSION' . I18N::CONTEXT . 'View'
                                     =>  'Visualisation',
     'GEODISPERSION' . I18N::CONTEXT . 'Map'
                                     =>  'Carte',
@@ -103,6 +104,8 @@ return array (
                                     =>  'La couleur pour surligner les formes lors d’un survol',
     'Filter on places belonging to those parent places.'
                                     =>  'Filtrer sur les lieux appartenant à ces lieux d’ordre supérieur.',
+    'The geographical dispersion analyses have been migrated for webtrees 2. Please review their settings.'
+                                    =>  'Les analyses de répartition géographique ont été migrées pour webtrees 2. Veuillez vérifier leurs paramètres.',
     'The geographical dispersion analysis view has been successfully added.'
                                     =>  'La visualisation d’analyse de répartition géographique a été ajoutée avec succès',
     'The geographical dispersion analysis view has been successfully updated.'
@@ -115,6 +118,8 @@ return array (
                                     =>  'La configuration de carte a été mise à jour avec succès',
     'The map configuration has been successfully deleted.'
                                     =>  'La configuration de carte a été supprimée avec succès',
+    'The invalid map configurations have been successfully deleted.'
+                                    =>  'Les configurations de carte invalides ont été supprimées avec succès',
     'The requested dispersion analysis does not exist.'
                                     =>  'L’analyse de répartition géographique demandée n’existe pas.',
     'The view with ID “%s” does not exist.'
@@ -146,6 +151,8 @@ return array (
                                     =>  'Une erreur s’est produire lors de la mise à jour de la configuration de carte.',
     'An error occured while deleting the map configuration.'
                                     =>  'Une erreur s’est produire lors de la suppression de la configuration de carte.',
+    'An error occured while deleting the invalid map configurations.'
+                                    =>  'Une erreur s’est produire lors de la suppression des configurations de carte invalides.',
     'Change tree'                   =>  'Changer d’arbre généalogique',
     'All events places by century'  =>  'Lieux de tous les événements par siècle',
     'All events places by event type'

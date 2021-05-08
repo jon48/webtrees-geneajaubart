@@ -154,6 +154,7 @@ $max_place_count = $result->maxCount();
         
         let map = L.map(element_id, {
             center     : [0, 0],
+            zoomSnap   : 0,
             zoomControl: false,     // disable zoom
             scrollWheelZoom: false  // disable zoom
         })
@@ -196,7 +197,7 @@ $max_place_count = $result->maxCount();
         if (data.features.length > 0) {
             map.dataLayer.addLayer(geoJsonLayer);
         }
-        map.leafletMap.fitBounds(map.dataLayer.getBounds());
+        map.leafletMap.fitBounds(map.dataLayer.getBounds(), { padding: [50, 50] });
     };
 
     /** Private Objects */

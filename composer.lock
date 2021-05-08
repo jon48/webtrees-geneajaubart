@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f54b400d92f56833484481076de832be",
+    "content-hash": "f5a01f91f8d8dec33f9d13e3ef49865b",
     "packages": [
         {
             "name": "aura/router",
@@ -2100,16 +2100,16 @@
         },
         {
             "name": "illuminate/collections",
-            "version": "v8.38.0",
+            "version": "v8.40.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/collections.git",
-                "reference": "21690cd5591f2d42d792e5e4a687f9beba829f1d"
+                "reference": "deccb956d38710f3f8baf36dd876c3fa1585ec22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/collections/zipball/21690cd5591f2d42d792e5e4a687f9beba829f1d",
-                "reference": "21690cd5591f2d42d792e5e4a687f9beba829f1d",
+                "url": "https://api.github.com/repos/illuminate/collections/zipball/deccb956d38710f3f8baf36dd876c3fa1585ec22",
+                "reference": "deccb956d38710f3f8baf36dd876c3fa1585ec22",
                 "shasum": ""
             },
             "require": {
@@ -2150,7 +2150,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2021-04-14T11:48:08+00:00"
+            "time": "2021-04-22T21:08:09+00:00"
         },
         {
             "name": "illuminate/container",
@@ -2205,16 +2205,16 @@
         },
         {
             "name": "illuminate/contracts",
-            "version": "v8.38.0",
+            "version": "v8.40.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/contracts.git",
-                "reference": "5764f703ea8f74ced163125d810951cd5ef2b7e1"
+                "reference": "5152041a5c4ac4dbebb3c8ee72d05666c592ae08"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/contracts/zipball/5764f703ea8f74ced163125d810951cd5ef2b7e1",
-                "reference": "5764f703ea8f74ced163125d810951cd5ef2b7e1",
+                "url": "https://api.github.com/repos/illuminate/contracts/zipball/5152041a5c4ac4dbebb3c8ee72d05666c592ae08",
+                "reference": "5152041a5c4ac4dbebb3c8ee72d05666c592ae08",
                 "shasum": ""
             },
             "require": {
@@ -2249,7 +2249,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2021-04-01T13:09:31+00:00"
+            "time": "2021-04-23T13:31:10+00:00"
         },
         {
             "name": "illuminate/database",
@@ -2321,7 +2321,7 @@
         },
         {
             "name": "illuminate/macroable",
-            "version": "v8.38.0",
+            "version": "v8.40.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/macroable.git",
@@ -2572,10 +2572,16 @@
         {
             "name": "jon48/webtrees-lib",
             "version": "dev-feature/2.1-geodispersion-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jon48/webtrees-lib.git",
+                "reference": "6e23a3278b6ed5fa63ca7ceb3605da84a50c264b"
+            },
             "dist": {
-                "type": "path",
-                "url": "../../../www-lib/jon48/webtrees-lib",
-                "reference": "93a6eead246d00794e363a028201229d3dcad33e"
+                "type": "zip",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/6e23a3278b6ed5fa63ca7ceb3605da84a50c264b",
+                "reference": "6e23a3278b6ed5fa63ca7ceb3605da84a50c264b",
+                "shasum": ""
             },
             "require": {
                 "aura/router": "~3.1",
@@ -2614,31 +2620,7 @@
                     "MyArtJaub\\Tests\\Unit\\": "tests/unit"
                 }
             },
-            "autoload-dev": {
-                "files": [
-                    "vendor/fisharebest/webtrees/tests/TestCase.php"
-                ]
-            },
-            "scripts": {
-                "webtrees-lib:phpcs": [
-                    "phpcs -s"
-                ],
-                "webtrees-lib:phpcbf": [
-                    "phpcbf"
-                ],
-                "webtrees-lib:phpstan": [
-                    "phpstan analyze"
-                ],
-                "webtrees-lib:sonar": [
-                    "sonar-scanner"
-                ],
-                "webtrees-lib:test": [
-                    "phpunit"
-                ],
-                "webtrees-lib:coverage": [
-                    "phpunit --coverage-clover=tests/coverage.xml --coverage-html=tests/coverage"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0-or-later"
             ],
@@ -2657,19 +2639,83 @@
                 "webtrees"
             ],
             "support": {
-                "issues": "http://bugs.jaubart.com"
+                "issues": "http://bugs.jaubart.com",
+                "source": "https://github.com/jon48/webtrees-lib/tree/feature/2.1-geodispersion-dev"
             },
-            "transport-options": {
-                "relative": true
-            }
+            "time": "2021-05-07T11:26:31+00:00"
+        },
+        {
+            "name": "jon48/webtrees-mod-maj-geodata-france",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jon48/webtrees-mod-maj-geodata-france.git",
+                "reference": "dc4178535c7fdd2d0d86e46a8526b5ff03762bde"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jon48/webtrees-mod-maj-geodata-france/zipball/dc4178535c7fdd2d0d86e46a8526b5ff03762bde",
+                "reference": "dc4178535c7fdd2d0d86e46a8526b5ff03762bde",
+                "shasum": ""
+            },
+            "require": {
+                "fisharebest/webtrees": "dev-main",
+                "jon48/webtrees-lib": "dev-feature/2.1-geodispersion-dev",
+                "league/flysystem": "~2.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan-deprecation-rules": "^0.12.6",
+                "phpstan/phpstan-phpunit": "^0.12.17",
+                "phpstan/phpstan-strict-rules": "^0.12.9"
+            },
+            "default-branch": true,
+            "type": "webtrees-module",
+            "extra": {
+                "installer-name": "myartjaub_geodata_france"
+            },
+            "autoload": {
+                "psr-4": {
+                    "MyArtJaub\\Webtrees\\Module\\GeoData\\France\\": "app"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Jonathan Jaubart",
+                    "email": "dev@jaubart.com",
+                    "homepage": "http://www.jaubart.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "MyArtJaub Geographical data Module for webtrees - France",
+            "homepage": "https://github.com/jon48/webtrees-mod-maj-geodata-france",
+            "keywords": [
+                "genealogy",
+                "webtrees",
+                "webtrees-module"
+            ],
+            "support": {
+                "issues": "https://github.com/jon48/webtrees-mod-maj-geodata-france/issues",
+                "source": "https://github.com/jon48/webtrees-mod-maj-geodata-france/tree/main"
+            },
+            "time": "2021-05-08T08:54:41+00:00"
         },
         {
             "name": "jon48/webtrees-mod-translationtool",
             "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jon48/webtrees-mod-translationtool.git",
+                "reference": "0505e26190cf55416b8a3aaa0adac1f5f0a183e9"
+            },
             "dist": {
-                "type": "path",
-                "url": "../../../www-lib/jon48/webtrees-mod-translationtool",
-                "reference": "5e73c957ebe7037cc0513f38366c4537449f1ccd"
+                "type": "zip",
+                "url": "https://api.github.com/repos/jon48/webtrees-mod-translationtool/zipball/0505e26190cf55416b8a3aaa0adac1f5f0a183e9",
+                "reference": "0505e26190cf55416b8a3aaa0adac1f5f0a183e9",
+                "shasum": ""
             },
             "require": {
                 "composer/composer": "^1.0|^2.0",
@@ -2684,6 +2730,7 @@
                 "phpstan/phpstan-phpunit": "^0.12.17",
                 "phpstan/phpstan-strict-rules": "^0.12.9"
             },
+            "default-branch": true,
             "type": "webtrees-module",
             "extra": {
                 "installer-name": "myartjaub_translationtool"
@@ -2693,23 +2740,7 @@
                     "MyArtJaub\\Webtrees\\Module\\TranslationTool\\": "app"
                 }
             },
-            "scripts": {
-                "webtrees-mod-translationtool:phpcs": [
-                    "phpcs -s"
-                ],
-                "webtrees-mod-translationtool:phpcbf": [
-                    "phpcbf"
-                ],
-                "webtrees-mod-translationtool:phpstan": [
-                    "phpstan analyze"
-                ],
-                "webtrees-mod-translationtool:psalm": [
-                    "psalm"
-                ],
-                "webtrees-mod-translationtool:sonar": [
-                    "sonar-scanner"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0-or-later"
             ],
@@ -2730,19 +2761,24 @@
                 "webtrees-module"
             ],
             "support": {
-                "issues": "https://github.com/jon48/webtrees-mod-translationtool/issues"
+                "issues": "https://github.com/jon48/webtrees-mod-translationtool/issues",
+                "source": "https://github.com/jon48/webtrees-mod-translationtool/tree/main"
             },
-            "transport-options": {
-                "relative": true
-            }
+            "time": "2021-04-11T15:08:41+00:00"
         },
         {
             "name": "jon48/webtrees-theme-rural",
             "version": "dev-feature/nextrelease",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jon48/webtrees-theme-rural.git",
+                "reference": "87a3a744bbc9579869ee6d2286223e2ed6bf4287"
+            },
             "dist": {
-                "type": "path",
-                "url": "../../../www-lib/jon48/webtrees-theme-rural",
-                "reference": "b09ac35044b32e71ff0abe020770f0d5285333a5"
+                "type": "zip",
+                "url": "https://api.github.com/repos/jon48/webtrees-theme-rural/zipball/87a3a744bbc9579869ee6d2286223e2ed6bf4287",
+                "reference": "87a3a744bbc9579869ee6d2286223e2ed6bf4287",
+                "shasum": ""
             },
             "require-dev": {
                 "consolidation/robo": "^3.0",
@@ -2753,20 +2789,7 @@
             "extra": {
                 "installer-name": "myartjaub_ruraltheme"
             },
-            "scripts": {
-                "webtrees-theme-rural:package": [
-                    "./vendor/bin/robo package"
-                ],
-                "webtrees-theme-rural:phpcs": [
-                    "phpcs -s"
-                ],
-                "webtrees-theme-rural:phpcbf": [
-                    "phpcbf"
-                ],
-                "webtrees-theme-rural:phpstan": [
-                    "phpstan analyze --no-progress --level=max module.php resources"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0-or-later"
             ],
@@ -2785,11 +2808,10 @@
                 "webtrees"
             ],
             "support": {
-                "issues": "https://github.com/jon48/webtrees-theme-rural/issues"
+                "issues": "https://github.com/jon48/webtrees-theme-rural/issues",
+                "source": "https://github.com/jon48/webtrees-theme-rural/tree/feature/nextrelease"
             },
-            "transport-options": {
-                "relative": true
-            }
+            "time": "2021-05-08T09:23:08+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -3372,16 +3394,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.10.4",
+            "version": "v4.10.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "c6d052fc58cb876152f89f532b95a8d7907e7f0e"
+                "reference": "4432ba399e47c66624bc73c8c0f811e5c109576f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/c6d052fc58cb876152f89f532b95a8d7907e7f0e",
-                "reference": "c6d052fc58cb876152f89f532b95a8d7907e7f0e",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/4432ba399e47c66624bc73c8c0f811e5c109576f",
+                "reference": "4432ba399e47c66624bc73c8c0f811e5c109576f",
                 "shasum": ""
             },
             "require": {
@@ -3422,9 +3444,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v4.10.4"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v4.10.5"
             },
-            "time": "2020-12-20T10:01:03+00:00"
+            "time": "2021-05-03T19:11:20+00:00"
         },
         {
             "name": "nyholm/psr7",
@@ -10298,6 +10320,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "jon48/webtrees-lib": 20,
+        "jon48/webtrees-mod-maj-geodata-france": 20,
         "jon48/webtrees-mod-translationtool": 20,
         "jon48/webtrees-theme-rural": 20
     },

@@ -5,6 +5,7 @@ use Fisharebest\Webtrees\View;
 use MyArtJaub\Webtrees\Common\GeoDispersion\Config\MapColorsConfig;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterAddPage;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterDeleteAction;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterDeleteInvalidAction;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterEditPage;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Views\GeoAnalysisMap;
 use Ramsey\Uuid\Uuid;
@@ -13,10 +14,14 @@ use Ramsey\Uuid\Uuid;
  * @var string                  $module_name
  * @var GeoAnalysisMap          $view
  * @var MapColorsConfig         $colors
- * @var \MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisMapAdapter\GeoAnalysisMapAdapter[] $map_adapters
+ * @var Collection<\MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisMapAdapter\GeoAnalysisMapAdapter|mull> $map_adapters
  */
 
 $table_id = 'table-maj-mapadapters-' . Uuid::uuid4();
+
+$count_adapters = $map_adapters->count();
+$map_adapters = $map_adapters->filter();
+$has_invalid_adapters = $count_adapters - $map_adapters->count() > 0;
 
 ?>
 
@@ -53,6 +58,12 @@ $table_id = 'table-maj-mapadapters-' . Uuid::uuid4();
     <?= view('icons/add') ?>
     <?= I18N::translate('Add a map') ?>
 </a>
+<?php if ($has_invalid_adapters) : ?>
+<a type="button" class="btn btn-danger my-2" href=<?= route(MapAdapterDeleteInvalidAction::class, ['tree' => $view->tree()->name(), 'view_id' => $view->id() ]) ?>>
+    <?= view('icons/delete') ?>
+    <?= I18N::translate('Delete invalid maps') ?>
+</a>
+<?php endif; ?>
 
 <?= view($module_name . '::admin/view-edit-map-color', [
     'name'      =>  'view_map_color_default',
