@@ -1,0 +1,42 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\View;
+use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
+use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
+use Illuminate\Support\Collection;
+use MyArtJaub\Webtrees\Contracts\Hooks\HookCollectorInterface;
+use MyArtJaub\Webtrees\Contracts\Hooks\HookInterface;
+use MyArtJaub\Webtrees\Module\Hooks\Http\RequestHandlers\ModulesHooksPage;
+
+/**
+ * @var string  $title
+ * @var Collection<string, HookCollectorInterface>  $hook_interfaces_list
+ */
+
+$hook_active = fn(HookInterface $hook): bool => $hook->module()->isEnabled();
+
+$hook_interfaces = $hook_interfaces_list->map(fn(HookCollectorInterface $hook_collector) => [
+    'name'          =>  $hook_collector->name(),
+    'title'         =>  $hook_collector->title(),
+    'total_count'   =>  $hook_collector->hooks()->count(),
+    'active_count'  =>  $hook_collector->hooks()->filter($hook_active)->count()
+])->sortBy('title');
+
+?>
+
+<?= view('components/breadcrumbs', ['links' => [route(ControlPanel::class) => I18N::translate('Control panel'), route(ModulesAllPage::class) => I18N::translate('Modules'), $title]]) ?>
+
+<h1><?= $title ?></h1>
+
+<p><?= I18N::translate('Select a hook to configure the loading order of the modules implementing it.') ?>
+
+<ul class="fa-ul">
+    <?php foreach ($hook_interfaces as $hook_interface) : ?>
+    <li>
+        <span class="fa-li"><?= view('icons/module') ?></span>
+        <a href="<?= e(route(ModulesHooksPage::class, [ 'hook_name' => $hook_interface['name']])) ?>"><?= $hook_interface['title'] ?></a>
+        <?= view('components/badge', ['count' => $hook_interface['active_count'], 'total' => $hook_interface['total_count'], 'context' => 'primary']) ?>
+    </li>
+    <?php endforeach; ?>
+</ul>

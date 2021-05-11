@@ -5,6 +5,7 @@
     <file>modules_v4/myartjaub_admintasks</file>
     <file>modules_v4/myartjaub_certificates</file>
     <file>modules_v4/myartjaub_geodispersion</file>
+    <file>modules_v4/myartjaub_hooks</file>
     <file>modules_v4/myartjaub_issourced</file>
 	<file>modules_v4/myartjaub_patronymiclineage</file>
     <file>modules_v4/myartjaub_sosa</file>

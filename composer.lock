@@ -2575,12 +2575,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "6e23a3278b6ed5fa63ca7ceb3605da84a50c264b"
+                "reference": "4a45b2f245360c58f77eebd9d3382a6d506c95e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/6e23a3278b6ed5fa63ca7ceb3605da84a50c264b",
-                "reference": "6e23a3278b6ed5fa63ca7ceb3605da84a50c264b",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/4a45b2f245360c58f77eebd9d3382a6d506c95e8",
+                "reference": "4a45b2f245360c58f77eebd9d3382a6d506c95e8",
                 "shasum": ""
             },
             "require": {
@@ -2618,7 +2618,10 @@
                 "psr-4": {
                     "MyArtJaub\\": "src/",
                     "MyArtJaub\\Tests\\Unit\\": "tests/unit"
-                }
+                },
+                "files": [
+                    "src/Webtrees/Helpers/functions.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2642,7 +2645,7 @@
                 "issues": "http://bugs.jaubart.com",
                 "source": "https://github.com/jon48/webtrees-lib/tree/feature/2.1-geodispersion-dev"
             },
-            "time": "2021-05-07T11:26:31+00:00"
+            "time": "2021-05-11T10:00:11+00:00"
         },
         {
             "name": "jon48/webtrees-mod-maj-geodata-france",

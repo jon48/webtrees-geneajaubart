@@ -4,6 +4,7 @@ parameters:
         - modules_v4/myartjaub_admintasks
         - modules_v4/myartjaub_certificates
         - modules_v4/myartjaub_geodispersion
+        - modules_v4/myartjaub_hooks
         - modules_v4/myartjaub_issourced
         - modules_v4/myartjaub_patronymiclineage
         - modules_v4/myartjaub_sosa
