@@ -33,5 +33,28 @@ return array (
                                     =>  'Extension du titre des citations',
     'Extends the title of source citations with additional text or icons.'
                                     =>  'Étend le titre des citations avec du texte ou des icônes supplémentaires.',
+    'Columns extender for tables of families'
+                                    =>  'Ajout de colonnes dans les tableaux des familles',
+    'Add additional columns to tables of families'
+                                    =>  'Ajoute des colonnes additionnelles dans les tableaux des familles',
+    'Columns extender for tables of individuals'
+                                    =>  'Ajout de colonnes dans les tableaux des individus',
+    'Add additional columns to tables of individuals'
+                                    =>  'Ajoute des colonnes additionnelles dans les tableaux des individus',
+    'Columns extender for tables of ancestors'
+                                    =>  'Ajout de colonnes dans les tableaux des ancêtres',
+    'Add additional columns to tables of ancestors'
+                                    =>  'Ajoute des colonnes additionnelles dans les tableaux des ancêtres',
+    'Columns extender for tables of missing ancestors'
+                                    =>  'Ajout de colonnes dans les tableaux des ancêtres manquants',
+    'Add additional columns to tables of missing ancestors'
+                                    =>  'Ajoute des colonnes additionnelles dans les tableaux des ancêtres manquants',
+    'Columns extender for tables of ancestors’ families'
+                                    =>  'Ajout de colonnes dans les tableaux des familles des ancêtres',
+    'Add additional columns to tables of ancestors’ families'
+                                    =>  'Ajoute des colonnes additionnelles dans les tableaux des familles des ancêtres',
+    '%s sourced'                    =>  '%s documenté(e)',
+    'The attached module could not be found.'
+                                    =>  'Le module associé n\'a pas été trouvé',
 
 );

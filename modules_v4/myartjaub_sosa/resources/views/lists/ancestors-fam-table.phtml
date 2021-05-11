@@ -24,6 +24,25 @@ $hundred_years_ago = Carbon::now()->subYears(100)->julianDay();
 
 ?>
 
+<!-- MYARTJAUB-START -->
+<?php
+    $maj_columns = hook(
+        \MyArtJaub\Webtrees\Contracts\Hooks\SosaFamilyDatatablesExtenderInterface::class,
+        fn(\MyArtJaub\Webtrees\Contracts\Hooks\SosaFamilyDatatablesExtenderInterface $hook) => $hook->sosaFamilyColumns($families),
+        []
+    );
+    $maj_issourced_marr = $maj_columns['issourced']['marr'] ?? null;
+
+    $column_indexes = [];
+    foreach ($maj_columns as $maj_columns_mod) {
+        foreach ($maj_columns_mod as $maj_column) {
+            $column_indexes[] = $maj_column['position'] ?? null;
+        }
+    }
+    $column_indexes = collect($column_indexes)->filter();
+    ?>
+<!-- MYARTJAUB-END -->
+
 <?php View::push('javascript') ?>
 <script>
 $("#<?= e($table_id) ?> > .maj-table-ancestors-family").dataTable({
@@ -39,6 +58,9 @@ $("#<?= e($table_id) ?> > .maj-table-ancestors-family").dataTable({
         /* Age               */ { type: "num" },
         /* Marriage date     */ { type: "num" },
         /* Marriage place    */ { type: "text" },
+        //MYARTJAUB-START
+        <?= $maj_issourced_marr ? json_encode($maj_issourced_marr['column_def']) . ', ' : '' ?>
+        //MYARTJAUB-END
         /* Children          */ { type: "num" },
         /* Filter marriage   */ { sortable: false },
         /* Filter alive/dead */ { sortable: false },
@@ -149,53 +171,54 @@ $marriageAgeData = [
     >
         <thead>
             <tr>
-                <th colspan="13">
+                <!--  MYARTJAUB-START -->
+                <th colspan="<?= columnIndex(13, $column_indexes) ?>">
                     <div class="btn-toolbar d-flex justify-content-between mb-2">
                         <div class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
                             <label class="btn btn-outline-secondary btn-sm" title="' . I18N::translate('Show individuals who are alive or couples where both partners are alive.') ?>">
-                                <input type="checkbox" data-filter-column="11" data-filter-value="N" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(11, $column_indexes) ?>" data-filter-value="N" autocomplete="off">
                                 <?= I18N::translate('Both alive') ?>
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show couples where only the female partner is dead.') ?>">
-                                <input type="checkbox" data-filter-column="11" data-filter-value="W" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(11, $column_indexes) ?>" data-filter-value="W" autocomplete="off">
                                 <?= I18N::translate('Widower') ?>
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show couples where only the male partner is dead.') ?>">
-                                <input type="checkbox" data-filter-column="11" data-filter-value="H" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(11, $column_indexes) ?>" data-filter-value="H" autocomplete="off">
                                 <?= I18N::translate('Widow') ?>
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show individuals who are dead or couples where both partners are dead.') ?>">
-                                <input type="checkbox" data-filter-column="11" data-filter-value="Y" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(11, $column_indexes) ?>" data-filter-value="Y" autocomplete="off">
                                 <?= I18N::translate('Both dead') ?>
                             </label>
                         </div>
 
                         <div class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show “roots” couples or individuals. These individuals may also be called “patriarchs”. They are individuals who have no parents recorded in the database.') ?>">
-                                <input type="checkbox" data-filter-column="12" data-filter-value="R" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(12, $column_indexes) ?>" data-filter-value="R" autocomplete="off">
                                 <?= I18N::translate('Roots') ?>
                             </label>
                         </div>
 
                         <div class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show couples with an unknown marriage date.') ?>">
-                                <input type="checkbox" data-filter-column="10" data-filter-value="U" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(10, $column_indexes) ?>" data-filter-value="U" autocomplete="off">
                                 <?= I18N::translate('Not married') ?>
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show couples who married more than 100 years ago.') ?>">
-                                <input type="checkbox" data-filter-column="10" data-filter-value="YES" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(10, $column_indexes) ?>" data-filter-value="YES" autocomplete="off">
                                 <?= I18N::translate('Marriage') ?>&gt;100
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show couples who married within the last 100 years.') ?>">
-                                <input type="checkbox" data-filter-column="10" data-filter-value="Y100" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(10, $column_indexes) ?>" data-filter-value="Y100" autocomplete="off">
                                 <?= I18N::translate('Marriage') ?>&lt;=100
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show divorced couples.') ?>">
-                                <input type="checkbox" data-filter-column="10" data-filter-value="D" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(10, $column_indexes) ?>" data-filter-value="D" autocomplete="off">
                                 <?= I18N::translate('Divorce') ?>
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show couples where either partner married more than once.') ?>">
-                                <input type="checkbox" data-filter-column="10" data-filter-value="M" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(10, $column_indexes) ?>" data-filter-value="M" autocomplete="off">
                                 <?= I18N::translate('Multiple marriages') ?>
                             </label>
                         </div>
@@ -212,6 +235,11 @@ $marriageAgeData = [
                 <th><?= I18N::translate('Age') ?></th>
                 <th><?= I18N::translate('Marriage') ?></th>
                 <th><?= I18N::translate('Place') ?></th>
+                <!--  MYARTJAUB-START -->
+                <?php if ($maj_issourced_marr !== null) : ?>
+                <th><?= $maj_issourced_marr['th'] ?></th>
+                <?php endif; ?>
+                <!--  MYARTJAUB-END -->
                 <th><i class="icon-children" title="<?= I18N::translate('Children') ?>"></i></th>
                 <th hidden></th>
                 <th hidden></th>
@@ -323,6 +351,15 @@ $marriageAgeData = [
                     <?php endforeach ?>
                 </td>
 
+                <!--  MYARTJAUB-START -->
+                <!-- IsSourced Marriage -->
+                <?php if ($maj_issourced_marr !== null) : ?>
+                <td data-sort="<?= $maj_issourced_marr['records'][$sosa]['order'] ?? 0 ?>">
+                    <?= $maj_issourced_marr['records'][$sosa]['text'] ?? '' ?>
+                </td>
+                <?php endif; ?>
+                <!--  MYARTJAUB-END -->
+
                 <!-- Number of children -->
                 <td class="text-center" data-sort="<?= $family->numberOfChildren() ?>">
                     <?= I18N::number($family->numberOfChildren()) ?>
@@ -383,7 +420,7 @@ $marriageAgeData = [
 
         <tfoot>
             <tr>
-                <th colspan="13">
+                <th colspan="<?= columnIndex(13, $column_indexes) ?>">
                     <div class="btn-group btn-group-sm">
                         <button id="btn-toggle-parents" class="btn btn-outline-secondary" data-toggle="button" data-persist="show-parents">
                             <?= I18N::translate('Show parents') ?>

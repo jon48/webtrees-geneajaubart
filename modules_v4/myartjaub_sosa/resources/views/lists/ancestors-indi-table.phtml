@@ -33,6 +33,26 @@ $unique_indis = []; // Don't double-count indis with multiple names.
 
 ?>
 
+<!-- MYARTJAUB-START -->
+<?php
+    $maj_columns = hook(
+        \MyArtJaub\Webtrees\Contracts\Hooks\SosaIndividualDatatablesExtenderInterface::class,
+        fn(\MyArtJaub\Webtrees\Contracts\Hooks\SosaIndividualDatatablesExtenderInterface $hook) => $hook->sosaIndividualColumns($ancestors),
+        []
+    );
+    $maj_issourced_birth = $maj_columns['issourced']['birth'] ?? null;
+    $maj_issourced_death = $maj_columns['issourced']['death'] ?? null;
+
+    $column_indexes = [];
+    foreach ($maj_columns as $maj_columns_mod) {
+        foreach ($maj_columns_mod as $maj_column) {
+            $column_indexes[] = $maj_column['position'] ?? null;
+        }
+    }
+    $column_indexes = collect($column_indexes)->filter();
+    ?>
+<!-- MYARTJAUB-END -->
+
 <?php View::push('javascript') ?>
 <script>
 $("#<?= e($table_id) ?> > .maj-table-ancestors-indi").dataTable({
@@ -44,9 +64,15 @@ $("#<?= e($table_id) ?> > .maj-table-ancestors-indi").dataTable({
         /* Surnames     */ { type: "text" },
         /* Birth date   */ { type: "num" },
         /* Birthplace   */ { type: "text" },
+        //MYARTJAUB-START
+        <?= $maj_issourced_birth ? json_encode($maj_issourced_birth['column_def']) . ', ' : '' ?>
+        //MYARTJAUB-END
         /* Death date   */ { type: "num" },
         /* Age          */ { type: "num" },
         /* Death place  */ { type: "text" },
+        //MYARTJAUB-START
+        <?= $maj_issourced_death ? json_encode($maj_issourced_death['column_def']) . ', ' : '' ?>
+        //MYARTJAUB-END
         /* Filter sex   */ { sortable: false },
         /* Filter birth */ { sortable: false },
         /* Filter death */ { sortable: false },
@@ -157,61 +183,63 @@ DebugBar::startMeasure('ANCESTORS_TABLE');
     >
         <thead>
             <tr>
-                <th colspan="12">
+                <!-- MYARTJAUB-START -->
+                <th colspan="<?= columnIndex(12, $column_indexes) ?>">
                     <div class="btn-toolbar d-flex justify-content-between mb-2" role="toolbar">
                         <div class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only males.') ?>">
-                                <input type="checkbox" data-filter-column="8" data-filter-value="M" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(8, $column_indexes) ?>" data-filter-value="M" autocomplete="off">
                                 <?= view('icons/sex', ['sex' => 'M']) ?>
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only females.') ?>">
-                                <input type="checkbox" data-filter-column="8" data-filter-value="F" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(8, $column_indexes) ?>" data-filter-value="F" autocomplete="off">
                                 <?= view('icons/sex', ['sex' => 'F']) ?>
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only individuals for whom the gender is not known.') ?>">
-                                <input type="checkbox" data-filter-column="8" data-filter-value="U" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(8, $column_indexes) ?>" data-filter-value="U" autocomplete="off">
                                 <?= view('icons/sex', ['sex' => 'U']) ?>
                             </label>
                         </div>
 
                         <div class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show individuals who are alive or couples where both partners are alive.') ?>">
-                                <input type="checkbox" data-filter-column="10" data-filter-value="N" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(10, $column_indexes) ?>" data-filter-value="N" autocomplete="off">
                                 <?= I18N::translate('Alive') ?>
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show individuals who are dead or couples where both partners are dead.') ?>">
-                                <input type="checkbox" data-filter-column="10" data-filter-value="Y" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(10, $column_indexes) ?>" data-filter-value="Y" autocomplete="off">
                                 <?= I18N::translate('Dead') ?>
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show individuals who died more than 100 years ago.') ?>">
-                                <input type="checkbox" data-filter-column="10" data-filter-value="YES" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(10, $column_indexes) ?>" data-filter-value="YES" autocomplete="off">
                                 <?= I18N::translate('Death') ?>&gt;100
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show individuals who died within the last 100 years.') ?>">
-                                <input type="checkbox" data-filter-column="10" data-filter-value="Y100" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(10, $column_indexes) ?>" data-filter-value="Y100" autocomplete="off">
                                 <?= I18N::translate('Death') ?>&lt;=100
                             </label>
                         </div>
 
                         <div class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show individuals born more than 100 years ago.') ?>">
-                                <input type="checkbox" data-filter-column="9" data-filter-value="YES" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(9, $column_indexes) ?>" data-filter-value="YES" autocomplete="off">
                                 <?= I18N::translate('Birth') ?>&gt;100
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show individuals born within the last 100 years.') ?>">
-                                <input type="checkbox" data-filter-column="9" data-filter-value="Y100" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(9, $column_indexes) ?>" data-filter-value="Y100" autocomplete="off">
                                 <?= I18N::translate('Birth') ?>&lt;=100
                             </label>
                         </div>
 
                         <div class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show “roots” couples or individuals. These individuals may also be called “patriarchs”. They are individuals who have no parents recorded in the database.') ?>">
-                                <input type="checkbox" data-filter-column="11" data-filter-value="R" autocomplete="off">
+                                <input type="checkbox" data-filter-column="<?= columnIndex(11, $column_indexes) ?>" data-filter-value="R" autocomplete="off">
                                 <?= I18N::translate('Roots') ?>
                             </label>
                         </div>
                     </div>
                 </th>
+                <!-- MYARTJAUB-END -->
             </tr>
             <tr>
                 <th class="text-center"><?= I18N::translate('Sosa') ?></th>
@@ -219,9 +247,19 @@ DebugBar::startMeasure('ANCESTORS_TABLE');
                 <th><?= I18N::translate('Surname') ?></th>
                 <th><?= I18N::translate('Birth') ?></th>
                 <th><?= I18N::translate('Place') ?></th>
+                <!--  MYARTJAUB-START -->
+                <?php if ($maj_issourced_birth !== null) : ?>
+                <th><?= $maj_issourced_birth['th'] ?></th>
+                <?php endif; ?>
+                <!--  MYARTJAUB-END -->
                 <th><?= I18N::translate('Death') ?></th>
                 <th><?= I18N::translate('Age') ?></th>
                 <th><?= I18N::translate('Place') ?></th>
+                <!--  MYARTJAUB-START -->
+                <?php if ($maj_issourced_death !== null) : ?>
+                <th><?= $maj_issourced_death['th'] ?></th>
+                <?php endif; ?>
+                <!--  MYARTJAUB-END -->
                 <th hidden></th>
                 <th hidden></th>
                 <th hidden></th>
@@ -277,6 +315,16 @@ DebugBar::startMeasure('ANCESTORS_TABLE');
                         <?= $birth_place->shortName(true) ?>
                         <br>
                     <?php endforeach ?>
+                
+                <!--  MYARTJAUB-START -->
+                <!-- IsSourced Birth -->
+                <?php if ($maj_issourced_birth !== null) : ?>
+                <td data-sort="<?= $maj_issourced_birth['records'][$sosa]['order'] ?? 0 ?>">
+                    <?= $maj_issourced_birth['records'][$sosa]['text'] ?? '' ?>
+                </td>
+                <?php endif; ?>
+                <!--  MYARTJAUB-END -->
+
                 </td>
 
                 <!-- Death date -->
@@ -313,6 +361,16 @@ DebugBar::startMeasure('ANCESTORS_TABLE');
                         <?= $death_place->shortName(true) ?>
                         <br>
                     <?php endforeach ?>
+
+                <!--  MYARTJAUB-START -->
+                <!-- IsSourced Death -->
+                <?php if ($maj_issourced_death !== null) : ?>
+                <td data-sort="<?= $maj_issourced_death['records'][$sosa]['order'] ?? 0 ?>">
+                    <?= $maj_issourced_death['records'][$sosa]['text'] ?? '' ?>
+                </td>
+                <?php endif; ?>
+                <!--  MYARTJAUB-END -->
+
                 </td>
 
                 <!-- Filter by sex -->
@@ -356,7 +414,7 @@ DebugBar::startMeasure('ANCESTORS_TABLE');
 
         <tfoot>
             <tr>
-                <th class="maj-th-background" colspan="12" >
+                <th class="maj-th-background" colspan="<?= columnIndex(12, $column_indexes)?>" >
                     <div class="text-center">
                         <?= I18N::translate(
                             'Number of Sosa ancestors: %1$s known / %2$s theoretical (%3$s)',
@@ -371,7 +429,7 @@ DebugBar::startMeasure('ANCESTORS_TABLE');
                 </th>
             </tr>
             <tr>
-                <th colspan="12">
+                <th colspan="<?= columnIndex(12, $column_indexes)?>">
                     <div class="btn-group btn-group-sm">
                         <button id="btn-toggle-parents" class="btn btn-outline-secondary" data-toggle="button" data-persist="show-parents">
                             <?= I18N::translate('Show parents') ?>
