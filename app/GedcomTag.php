@@ -876,6 +876,14 @@ class GedcomTag
 
                     return self::getLabel($tag);
                 }
+                
+                //MYARTJAUB-START
+                $label = hook(
+                    \MyArtJaub\Webtrees\Contracts\Hooks\CustomSimpleTagEditorInterface::class,
+                    fn(\MyArtJaub\Webtrees\Contracts\Hooks\CustomSimpleTagEditorInterface $hook) => $hook->getLabel($tag),
+                    '');
+                if($label !== '') return $label;
+                //MYARTJAUB-END
 
                 // Still no translation? Highlight this as an error
                 return '<span class="error" title="' . I18N::translate('Unrecognized GEDCOM code') . '">' . e($tag) . '</span>';

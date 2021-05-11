@@ -1,0 +1,71 @@
+<?php
+
+use Fisharebest\Webtrees\Html;
+use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\View;
+use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\AutoCompleteFile;
+
+/**
+ * @var string      $module_name
+ * @var Tree        $tree
+ * @var string      $id
+ * @var string      $name
+ * @var string[][]  $cities
+ * @var string      $value
+ * @var string      $value_city
+ * @var string      $value_file
+ * @var string      $js_script_url
+ */
+
+$attributes_hidden = [
+    'id'                      => $id,
+    'name'                    => $name,
+    'value'                   => $value,
+    'type'                    => 'hidden',
+];
+
+$attributes_cert_file = [
+    'autocomplete'                  =>  'off',
+    'class'                         =>  'form-control',
+    'id'                            =>  $id . '-file',
+    'name'                          =>  'edit-_ACT-file',
+    'value'                         =>  $value_file,
+    'type'                          =>  'text',
+    'data-autocomplete-certif-url'  =>  route(AutoCompleteFile::class, ['tree'  => $tree->name()]),
+];
+
+?>
+
+<input type="hidden" id="'.$element_id.'" name = "'.$element_name.'" value="'.$value.'" size="35"/>
+
+<?= view($module_name . '::components/select-city', ['cities' => $cities, 'id' => $id . '-city', 'name' => 'edit-_ACT-city', 'selected_city' => $value_city]) ?>
+
+<input <?= Html::attributes($attributes_cert_file) ?>>
+<input <?= Html::attributes($attributes_hidden) ?>>
+
+<?php View::pushunique('javascript') ?>
+
+<script src="<?= e($js_script_url) ?>"></script>
+
+<?php View::endpushunique() ?>
+
+<?php View::push('javascript') ?>
+
+<script>
+
+$('#<?= $id ?>-city').change(function(){
+    $('#<?= $id ?>-file').val('').trigger('change');
+});
+
+$('#<?= $id ?>-file').change(function(){
+    if(this.value.length > 0){
+        $('#<?= $id ?>').val($('#<?= $id ?>-city').find(':selected').text() + '/' + this.value);
+    }
+    else{
+        $('#<?= $id ?>').val('');
+    }
+});
+
+</script>
+
+<?php View::endpush() ?>

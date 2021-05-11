@@ -72,6 +72,9 @@ use Illuminate\Support\Collection;
         <?php if ($full_citations) : ?>
             <?= FunctionsEdit::addSimpleTag($tree, ($level + 2) . ' DATE', '', I18N::translate('Date of entry in original source')) ?>
             <?= FunctionsEdit::addSimpleTag($tree, ($level + 1) . ' QUAY') ?>
+            <!--  MYARTJAUB-START -->
+            <?= FunctionsEdit::addSimpleTag($tree, ($level + 1) . ' _ACT') ?>
+            <!--  MYARTJAUB-END -->
         <?php endif ?>
 
         <?= FunctionsEdit::addSimpleTag($tree, ($level + 1) . ' OBJE') ?>

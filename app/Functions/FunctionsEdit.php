@@ -548,8 +548,20 @@ class FunctionsEdit
                 $html .= '<textarea class="form-control" id="' . $id . '" name="' . $name . '" rows="5" dir="auto">' . e($value) . '</textarea>';
                 $html .= '</div>';
             } else {
+                //MYARTJAUB-START
+                $edit_form = hook(
+                    \MyArtJaub\Webtrees\Contracts\Hooks\CustomSimpleTagEditorInterface::class,
+                    fn(\MyArtJaub\Webtrees\Contracts\Hooks\CustomSimpleTagEditorInterface $hook) => $hook->editForm($fact, $id, $name, $value, $tree),
+                    '');
+                if($edit_form !== '') {
+                    $html .= $edit_form;
+                } else {
+                //MYARTJAUB-END
                 // If using GEDFact-assistant window
                 $html .= '<input class="form-control" type="text" id="' . $id . '" name="' . $name . '" value="' . e($value) . '">';
+                //MYARTJAUB-START
+                }
+                //MYARTJAUB-END
             }
         } else {
             // Populated in javascript from sub-tags
@@ -731,6 +743,14 @@ class FunctionsEdit
         if (preg_match_all('/(' . Gedcom::REGEX_TAG . ')/', $record->tree()->getPreference('ADVANCED_PLAC_FACTS'), $match)) {
             $expected_subtags['PLAC'] = array_merge($match[1], $expected_subtags['PLAC']);
         }
+        
+        //MYARTJAUB-START
+        $expected_subtags = hook(
+            \MyArtJaub\Webtrees\Contracts\Hooks\CustomSimpleTagEditorInterface::class,
+            fn(\MyArtJaub\Webtrees\Contracts\Hooks\CustomSimpleTagEditorInterface $hook) => $hook->addExpectedTags($expected_subtags),
+            $expected_subtags
+        );
+        //MYARTJAUB-END
 
         $stack       = [];
         $gedlines    = explode("\n", $fact->gedcom());

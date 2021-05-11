@@ -34,6 +34,7 @@ const postcss_custom_properties = require("postcss-custom-properties")();
 
 mix
     .setPublicPath('resources')
+    .js('src/js/certificates.js', 'js/certificates.min.js')
     .sass('src/sass/default.scss', 'css/default.min.css')
     .sass('src/sass/clouds.scss', 'css/clouds.min.css')
     .sass('src/sass/colors.scss', 'css/colors.min.css')

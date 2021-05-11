@@ -465,6 +465,12 @@ class FunctionsPrintFacts
                         $data .= view('icons/collapse');
                         $data .= '</a>';
                     }
+                    //MYARTJAUB-START
+                    $data .= hook(\MyArtJaub\Webtrees\Contracts\Hooks\FactSourceTextExtenderInterface::class,
+                        fn(\MyArtJaub\Webtrees\Contracts\Hooks\FactSourceTextExtenderInterface $hook) => $hook->factSourcePrepend($tree, $srec, $nlevel),
+                        ''
+                    );
+                    //MYARTJAUB-END
                     $data .= GedcomTag::getLabelValue('SOUR', '<a href="' . e($source->url()) . '">' . $source->fullName() . '</a>', null, 'span');
                     $data .= '</div>';
 

@@ -1,0 +1,38 @@
+<?php
+
+use Fisharebest\Webtrees\Html;
+use Fisharebest\Webtrees\View;
+use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\CertificateImage;
+use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\CertificatePage;
+use MyArtJaub\Webtrees\Module\Certificates\Model\Certificate;
+use MyArtJaub\Webtrees\Module\Certificates\Services\UrlObfuscatorService;
+
+/**
+ * @var string                  $module_name
+ * @var Certificate             $certificate
+ * @var UrlObfuscatorService    $url_obfuscator_service
+ * @var string                  $js_script_url
+ */
+$url_obfuscator_service = $url_obfuscator_service ?? null;
+
+?>
+
+<?php
+$certif_url_params = $certificate->urlParameters($url_obfuscator_service);
+
+$link_attributes = Html::attributes([
+    'class'         =>  'gallery',
+    'type'          =>  $certificate->mimeType(),
+    'href'          =>  route(CertificateImage::class, $certif_url_params),
+    'data-title'    =>  '<a href="' . route(CertificatePage::class, $certif_url_params) . '">' . $certificate->name() . '</a>'
+])
+?>
+<a class="gallery" <?= $link_attributes ?>>
+    <?= view($module_name . '::icons/certificate') ?>
+</a>
+
+<?php View::pushunique('javascript') ?>
+
+<script src="<?= e($js_script_url) ?>"></script>
+
+<?php View::endpushunique() ?>
