@@ -13,3 +13,9 @@ use Fisharebest\Webtrees\MediaFile;
     <?= $individual->findHighlightedMediaFile()->displayImage(30, 40, 'crop', []) ?>
 <?php endif; ?>
 <?= $individual->fullName() ?>, <?= $individual->lifespan() ?>
+<!--  MYARTJAUB-START -->
+<?= hook(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface::class,
+    fn(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface $hook) => $hook->recordNameAppend($individual),
+    '')
+    ?>
+<!--  MYARTJAUB-END -->

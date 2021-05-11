@@ -247,6 +247,12 @@ $marriageAgeData = [
                         </a>
                             <?php if ($num === $husb->getPrimaryName()) : ?>
                                 <small><?= view('icons/sex', ['sex' => $husb->sex()]) ?></small>
+                                <!--  MYARTJAUB -->
+                                <?= hook(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface::class,
+                                    fn(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface $hook) => $hook->recordNameAppend($husb),
+                                    '')
+                                    ?>
+                                <!--  MYARTJAUB -->
                             <?php endif ?>
                         <br>
                         <?php endif ?>
@@ -282,6 +288,12 @@ $marriageAgeData = [
                             </a>
                             <?php if ($num === $wife->getPrimaryName()) : ?>
                                 <small><?= view('icons/sex', ['sex' => $wife->sex()]) ?></small>
+                                <!--  MYARTJAUB -->
+                                <?= hook(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface::class,
+                                    fn(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface $hook) => $hook->recordNameAppend($wife),
+                                    '')
+                                    ?>
+                                <!--  MYARTJAUB -->
                             <?php endif ?>
                             <br>
                         <?php endif ?>

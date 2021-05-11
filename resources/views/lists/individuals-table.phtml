@@ -269,6 +269,12 @@ $deathAgeData = [
                         </a>
                         <?php if ($num === $individual->getPrimaryName()) : ?>
                             <small><?= view('icons/sex', ['sex' => $individual->sex()]) ?></small>
+                            <!--  MYARTJAUB -->
+                            <?= hook(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface::class,
+                                fn(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface $hook) => $hook->recordNameAppend($individual),
+                                '')
+                                ?>
+                            <!--  MYARTJAUB -->
                         <?php endif ?>
                         <br>
                     <?php endforeach ?>

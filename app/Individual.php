@@ -1137,6 +1137,11 @@ class Individual extends GedcomRecord
     public function formatListDetails(): string
     {
         return
+            //MYARTJAUB-START
+            hook(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface::class,
+            fn(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface $hook) => $hook->recordNameAppend($this),
+            '') .
+            //MYARTJAUB-END
             $this->formatFirstMajorFact(Gedcom::BIRTH_EVENTS, 1) .
             $this->formatFirstMajorFact(Gedcom::DEATH_EVENTS, 1);
     }

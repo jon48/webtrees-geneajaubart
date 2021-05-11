@@ -14,3 +14,11 @@ use Fisharebest\Webtrees\Individual;
     <?= $individual->fullName() ?>    
     <?php if ($primary) : ?></strong><?php else : ?></em><?php endif; ?>
 </a><?= $individual->lifespan() ?>
+<!--  MYARTJAUB-START -->
+<?= hook(
+    \MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface::class,
+    fn(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface $hook) => $hook->recordNameAppend($individual, false),
+    ''
+)
+?>
+<!--  MYARTJAUB-END -->
