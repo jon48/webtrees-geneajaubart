@@ -107,6 +107,16 @@ use Illuminate\Support\Collection;
                 <?php foreach ($sex_records as $sex_record) : ?>
                     <?= $sex_record ?>
                 <?php endforeach ?>
+                
+                <!--  MYARTJAUB-START -->
+                <?= hook(
+                        \MyArtJaub\Webtrees\Contracts\Hooks\NameAccordionExtenderInterface::class,
+                        fn(\MyArtJaub\Webtrees\Contracts\Hooks\NameAccordionExtenderInterface $hook) => $hook->accordionCard($individual),
+                        ''
+                    )
+                    ?>
+                <!--  MYARTJAUB-END -->
+                
             </div>
         </div>
 

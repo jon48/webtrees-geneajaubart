@@ -53,6 +53,10 @@ return array (
                                     =>  'Ajout de colonnes dans les tableaux des familles des ancêtres',
     'Add additional columns to tables of ancestors’ families'
                                     =>  'Ajoute des colonnes additionnelles dans les tableaux des familles des ancêtres',
+    'Individual names accordion extender'
+                                    =>  'Extension du panneau ouvrant des noms de l’individu',
+    'Extends the names accordion of on an individual’s page.'
+                                    =>  'Étends le panneau ouvrant des noms sur la page d’un individu',
     '%s sourced'                    =>  '%s documenté(e)',
     'The attached module could not be found.'
                                     =>  'Le module associé n\'a pas été trouvé',

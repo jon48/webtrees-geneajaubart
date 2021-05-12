@@ -1,0 +1,40 @@
+<?php
+
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Services\ModuleService;
+use MyArtJaub\Webtrees\Module\MiscExtensions\MiscExtensionsModule;
+
+/**
+ * @var Collection<UserInterface>            $administrators
+ * @var Collection<ModuleAnalyticsInterface> $analytics
+ * @var string                               $title
+ */
+
+$misc_module = app(ModuleService::class)->findByInterface(MiscExtensionsModule::class)->first();
+$display_cnil = $misc_module !== null ? $misc_module->getPreference('MAJ_DISPLAY_CNIL') : '';
+$cnil_reference = $misc_module !== null ? $misc_module->getPreference('MAJ_CNIL_REFERENCE') : '';
+
+?>
+
+<?= view('::modules/privacy-policy/page', [
+        'administrators' => $administrators,
+        'analytics'      => $analytics,
+        'title'          => $title,
+])?>
+
+<?php if ($display_cnil === '1') : ?>
+<h3><?= I18N::translate('French Data protection Act') ?></h3>
+
+<ul>
+    <?php if (strlen($cnil_reference) > 0) : ?>
+    <li>
+        <?= I18N::translate('This site has been notified to the French National Commission for Data protection (CNIL) and registered under number %s.', $cnil_reference) ?>
+    </li>
+    <?php endif; ?>
+    <li>
+        <?= I18N::translate('In accordance with the French Data protection Act (<em>Loi Informatique et Libertés</em>) of January 6<sup>th</sup>, 1978, you have the right to access, modify, rectify and delete personal information that pertains to you.') ?>
+        <?= I18N::translate('To exercice this right, please contact one of the data controllers listed above, and provide your name, address and a proof of your identity.') ?>
+    </li>
+</ul>
+
+<?php endif; ?>
