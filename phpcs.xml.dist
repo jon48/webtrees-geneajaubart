@@ -2,6 +2,7 @@
 <ruleset name="MyArtJaub-webtrees-geneajaubart" namespace="MyArtJaub\Webtrees\CS\Standard">
     <description>MyArtJaub coding standard for webtrees-geneajaubart</description>
 
+    <file>RoboFile.php</file>
     <file>modules_v4/myartjaub_admintasks</file>
     <file>modules_v4/myartjaub_certificates</file>
     <file>modules_v4/myartjaub_geodispersion</file>

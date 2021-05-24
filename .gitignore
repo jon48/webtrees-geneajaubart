@@ -25,6 +25,12 @@
 /.project
 /.settings
 /test*.php
+/phpcs.xml
+/phpdoc.xml
+/phpstan.neon
+/phpunit.xml
+/pdepend.xml
+/.phpunit.result.cache
 
 # /modules_v3/
 /modules_v3/myartjaub_translationtool
