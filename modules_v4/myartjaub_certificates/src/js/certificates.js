@@ -23,7 +23,9 @@
 
 'use strict';
 
-//Add required icons to Font-Awesome
+/* global $, Bloodhound, majCertificates */
+
+// Add required icons to Font-Awesome
 import { library } from '@fortawesome/fontawesome-svg-core';
 
 import {
@@ -52,10 +54,10 @@ library.add(faScroll);
           remote: {
             url: this.dataset.autocompleteCertifUrl,
             replace: function (url, uriEncodedQuery) {
-                const element = that.closest('.form-group').querySelector('select');
-                const extra   = element.options[element.selectedIndex].value;
-                const symbol  = (url.indexOf("?") > 0) ? '&' : '?';
-                return url.replace(/(%7B|{)query(%7D|})/, uriEncodedQuery) + symbol + 'cityobf=' + encodeURIComponent(extra);
+              const element = that.closest('.form-group').querySelector('select');
+              const extra = element.options[element.selectedIndex].value;
+              const symbol = (url.indexOf('?') > 0) ? '&' : '?';
+              return url.replace(/(%7B|{)query(%7D|})/, uriEncodedQuery) + symbol + 'cityobf=' + encodeURIComponent(extra);
             },
             wildcard: '{query}'
           }

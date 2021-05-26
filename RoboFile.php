@@ -35,32 +35,57 @@ class RoboFile extends \Robo\Tasks
             if ($module->getRelativePathname() === 'myartjaub_ruraltheme') {
                 $collection->taskComposerInstall()
                     ->dir($module_dir)
-                    ->noSuggest()
-                    ->run();
+                    ->noSuggest();
             }
 
             if (Finder::create()->name('package-lock.json')->in($module_dir)->depth(0)->count() > 0) {
                 $collection->taskExec("npm install --no-fund")
-                    ->dir($module_dir)
-                    ->run();
+                    ->dir($module_dir);
                 $collection->taskExecStack()
                     ->dir($module_dir)
                     ->stopOnFail()
-                    ->exec('npm run production')
-                    ->run();
+                    ->exec('npm run production');
             }
 
             if ($delete) {
                 $collection->taskFilesystemStack()
                     ->remove($module_dir . '/node_modules')
-                    ->remove($module_dir . '/vendor')
-                    ->run();
+                    ->remove($module_dir . '/vendor');
             }
         }
 
         return $collection
             ->progressMessage("Application built.")
             ->run();
+    }
+
+    /**
+     * Run the Semistandard Javascript Linter on MyArtJaub modules
+     *
+     * @throws \Exception
+     * @return \Robo\Result<mixed>
+     */
+    public function lintSemistandard(): Result
+    {
+        $collection = $this->collectionBuilder();
+
+        $modules_dir = __DIR__ . '/modules_v4';
+        $modules = Finder::create()->directories()->name('myartjaub_*')->in($modules_dir)->depth(0);
+        foreach ($modules as $module) {
+            $module_dir = $modules_dir . '/' . $module->getRelativePathname();
+
+            if (
+                Finder::create()->name('package-lock.json')->in($module_dir)->depth(0)->count() > 0
+                && Finder::create()->name('composer.json')->in($module_dir)->depth(0)->count() === 0
+            ) {
+                $collection->taskExecStack()
+                    ->dir($module_dir)
+                    ->stopOnFail()
+                    ->exec('npx semistandard');
+            }
+        }
+
+        return $collection->run();
     }
 
     /**

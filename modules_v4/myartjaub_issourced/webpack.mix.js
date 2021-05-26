@@ -16,20 +16,20 @@ const mix = require('laravel-mix');
 require('laravel-mix-clean');
 
 // https://github.com/postcss/autoprefixer
-const postcss_autoprefixer = require('autoprefixer')();
+const postcssAutoprefixer = require('autoprefixer')();
 
 // https://github.com/jakob101/postcss-inline-rtl
-const postcss_rtl = require('@mjhenkes/postcss-rtl')();
+const postcssRtl = require('@mjhenkes/postcss-rtl')();
 
 // https://github.com/bezoerb/postcss-image-inliner
-const postcss_image_inliner = require('postcss-image-inliner')({
+const postcssImageInliner = require('postcss-image-inliner')({
   assetPaths: ['src/sass/resources/images'],
   maxFileSize: 0
 });
 
 // https://github.com/postcss/postcss-custom-properties
 // Enable CSS variables in IE
-const postcss_custom_properties = require('postcss-custom-properties')();
+const postcssCustomProperties = require('postcss-custom-properties')();
 
 mix
   .setPublicPath('resources')
@@ -45,10 +45,10 @@ mix
   .options({
     processCssUrls: false,
     postCss: [
-      postcss_rtl,
-      postcss_autoprefixer,
-      postcss_image_inliner,
-      postcss_custom_properties
+      postcssRtl,
+      postcssAutoprefixer,
+      postcssImageInliner,
+      postcssCustomProperties
     ]
   })
   .clean({

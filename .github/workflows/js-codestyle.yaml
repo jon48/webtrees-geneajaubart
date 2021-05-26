@@ -1,0 +1,28 @@
+name: Code style JavaScript
+
+on:
+   push:
+      branches-ignore:
+         - '**-dev'
+   pull_request:
+
+jobs:
+
+  semistandard:
+    runs-on: ubuntu-latest
+    name: SemiStandard
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: 7.4
+          extensions: gd,intl,mbstring,sqlite,zip
+          coverage: disable
+
+      - run: composer install --no-progress --no-suggest --ignore-platform-reqs
+
+      - run: composer webtrees-geneajaubart:lintjs

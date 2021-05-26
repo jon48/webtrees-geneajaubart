@@ -115,6 +115,7 @@
 	"scripts" : {
         "webtrees-geneajaubart:build" : "./vendor/bin/robo build",
 		"webtrees-geneajaubart:package" : "./vendor/bin/robo package",
+        "webtrees-geneajaubart:lintjs" : "./vendor/bin/robo lint:semistandard",
 		"webtrees:build" : [
 			"rm -Rf webtrees/",
 			"git archive --prefix=webtrees/ HEAD --format=tar | tar -x",
