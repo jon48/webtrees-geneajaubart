@@ -34,8 +34,7 @@ use function route;
  */
 class TreePageBlockUpdate implements RequestHandlerInterface
 {
-    /** @var HomePageService */
-    private $home_page_service;
+    private HomePageService $home_page_service;
 
     /**
      * @param HomePageService $home_page_service
@@ -55,8 +54,7 @@ class TreePageBlockUpdate implements RequestHandlerInterface
         $tree = $request->getAttribute('tree');
         assert($tree instanceof Tree);
 
-        $user     = $request->getAttribute('user');
-        $block    = $this->home_page_service->treeBlock($request, $user);
+        $block    = $this->home_page_service->treeBlock($request);
         $block_id = (int) $request->getQueryParams()['block_id'];
 
         $block->saveBlockConfiguration($request, $block_id);

@@ -37,8 +37,7 @@ class TreePageBlockEdit implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
-    /** @var HomePageService */
-    private $home_page_service;
+    private HomePageService $home_page_service;
 
     /**
      * @param HomePageService $home_page_service
@@ -58,9 +57,8 @@ class TreePageBlockEdit implements RequestHandlerInterface
         $tree = $request->getAttribute('tree');
         assert($tree instanceof Tree);
 
-        $user     = $request->getAttribute('user');
         $block_id = (int) $request->getQueryParams()['block_id'];
-        $block    = $this->home_page_service->treeBlock($request, $user);
+        $block    = $this->home_page_service->treeBlock($request);
         $title    = $block->title() . ' — ' . I18N::translate('Preferences');
 
         return $this->viewResponse('modules/edit-block-config', [

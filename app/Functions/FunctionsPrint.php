@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Functions;
 
 use Fisharebest\Webtrees\Age;
+use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Family;
@@ -28,18 +29,18 @@ use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
-use Fisharebest\Webtrees\Media;
+use Fisharebest\Webtrees\Module\ModuleMapLinkInterface;
 use Fisharebest\Webtrees\Note;
 use Fisharebest\Webtrees\Place;
 use Fisharebest\Webtrees\Registry;
-use Fisharebest\Webtrees\Repository;
-use Fisharebest\Webtrees\Source;
+use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LogicException;
 use Ramsey\Uuid\Uuid;
 
+use function app;
 use function array_filter;
 use function array_intersect;
 use function array_merge;
@@ -57,7 +58,6 @@ use function strlen;
 use function strpos;
 use function strtoupper;
 use function substr;
-use function trim;
 use function uasort;
 use function view;
 
@@ -94,25 +94,29 @@ class FunctionsPrint
             $label      = I18N::translate('Shared note');
             $html       = Filter::formatText($note->getNote(), $tree);
             $first_line = '<a href="' . e($note->url()) . '">' . $note->fullName() . '</a>';
+
+            $one_line_only = strip_tags($note->fullName()) === strip_tags($note->getNote());
         } else {
             // Inline note.
             $label = I18N::translate('Note');
             $html  = Filter::formatText($text, $tree);
 
-            // Only one line?  Remove block-level attributes and skip expand/collapse.
-            if (!str_contains($text, "\n")) {
-                return
-                    '<div class="fact_NOTE">' .
-                    I18N::translate(
-                        '<span class="label">%1$s:</span> <span class="field" dir="auto">%2$s</span>',
-                        $label,
-                        strip_tags($html, '<a><strong><em>')
-                    ) .
-                    '</div>';
-            }
+            [$first_line] = explode("\n", strip_tags($text));
+            // Use same logic as note objects
+            $first_line = Str::limit($first_line, 100, I18N::translate('…'));
 
-            [$text] = explode("\n", strip_tags($text));
-            $first_line = Str::limit($text, 50, I18N::translate('…'));
+            $one_line_only = !str_contains($text, "\n") && mb_strlen($text) <= 100;
+        }
+
+        if ($one_line_only) {
+            return
+                '<div class="fact_NOTE">' .
+                I18N::translate(
+                    '<span class="label">%1$s:</span> <span class="field" dir="auto">%2$s</span>',
+                    $label,
+                    $first_line
+                ) .
+                '</div>';
         }
 
         $id       = 'collapse-' . Uuid::uuid4()->toString();
@@ -426,37 +430,21 @@ class FunctionsPrint
                         $html     .= ' - ' . $wt_place->fullName();
                     }
                 }
-                $map_lati = '';
-                $cts      = preg_match('/\d LATI (.*)/', $placerec, $match);
-                if ($cts > 0) {
-                    $map_lati = $match[1];
-                    $html     .= '<br><span class="label">' . I18N::translate('Latitude') . ': </span>' . $map_lati;
-                }
-                $map_long = '';
-                $cts      = preg_match('/\d LONG (.*)/', $placerec, $match);
-                if ($cts > 0) {
-                    $map_long = $match[1];
-                    $html     .= ' <span class="label">' . I18N::translate('Longitude') . ': </span>' . $map_long;
-                }
-                if ($map_lati && $map_long) {
-                    $map_lati = trim(strtr($map_lati, 'NSEW,�', ' - -. ')); // S5,6789 ==> -5.6789
-                    $map_long = trim(strtr($map_long, 'NSEW,�', ' - -. ')); // E3.456� ==> 3.456
 
-                    $html .= '<a href="https://maps.google.com/maps?q=' . e($map_lati) . ',' . e($map_long) . '" rel="nofollow" target="_top" title="' . I18N::translate('Google Maps™') . '">' .
-                        view('icons/google-maps') .
-                        '<span class="sr-only">' . I18N::translate('Google Maps™') . '</span>' .
-                        '</a>';
+                $latitude  = $event->latitude();
+                $longitude = $event->longitude();
 
-                    $html .= '<a href="https://www.bing.com/maps/?lvl=15&cp=' . e($map_lati) . '~' . e($map_long) . '" rel="nofollow" target="_top" title="' . I18N::translate('Bing Maps™') . '">' .
-                        view('icons/bing-maps') .
-                        '<span class="sr-only">' . I18N::translate('Bing Maps™') . '</span>' .
-                        '</a>';
+                if ($latitude !== null && $longitude !== null) {
+                    $html .= '<br><span class="label">' . I18N::translate('Latitude') . ': </span>' . $latitude;
+                    $html .= ' <span class="label">' . I18N::translate('Longitude') . ': </span>' . $longitude;
 
-                    $html .= '<a href="https://www.openstreetmap.org/#map=15/' . e($map_lati) . '/' . e($map_long) . '" rel="nofollow" target="_top" title="' . I18N::translate('OpenStreetMap™') . '">' .
-                        view('icons/openstreetmap') .
-                        '<span class="sr-only">' . I18N::translate('OpenStreetMap™') . '</span>' .
-                        '</a>';
+                    // Links to external maps
+                    $html .= app(ModuleService::class)
+                        ->findByInterface(ModuleMapLinkInterface::class)
+                        ->map(fn (ModuleMapLinkInterface $module): string => ' ' . $module->mapLink($event))
+                        ->implode('');
                 }
+
                 if (preg_match('/\d NOTE (.*)/', $placerec, $match)) {
                     $html .= '<br>' . self::printFactNotes($tree, $placerec, 3);
                 }
@@ -507,18 +495,16 @@ class FunctionsPrint
     /**
      * Print a new fact box on details pages
      *
-     * @param GedcomRecord     $record    the person, family, source etc the fact will be added to
-     * @param Collection<Fact> $usedfacts an array of facts already used in this record
-     * @param string           $type      the type of record INDI, FAM, SOUR etc
+     * @param GedcomRecord $record the person, family, source etc the fact will be added to
      *
      * @return void
      */
-    public static function printAddNewFact(GedcomRecord $record, Collection $usedfacts, string $type): void
+    public static function printAddNewFact(GedcomRecord $record): void
     {
         $tree = $record->tree();
 
-        // -- Add from pick list
-        switch ($type) {
+        // Add from pick list
+        switch ($record->tag()) {
             case Individual::RECORD_TYPE:
                 $addfacts    = preg_split('/[, ;:]+/', $tree->getPreference('INDI_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
                 $uniquefacts = preg_split('/[, ;:]+/', $tree->getPreference('INDI_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
@@ -531,43 +517,26 @@ class FunctionsPrint
                 $quickfacts  = preg_split('/[, ;:]+/', $tree->getPreference('FAM_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
                 break;
 
-            case Source::RECORD_TYPE:
-                $addfacts    = preg_split('/[, ;:]+/', $tree->getPreference('SOUR_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
-                $uniquefacts = preg_split('/[, ;:]+/', $tree->getPreference('SOUR_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
-                $quickfacts  = preg_split('/[, ;:]+/', $tree->getPreference('SOUR_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
-                break;
-
-            case Note::RECORD_TYPE:
-                $addfacts    = preg_split('/[, ;:]+/', $tree->getPreference('NOTE_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
-                $uniquefacts = preg_split('/[, ;:]+/', $tree->getPreference('NOTE_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
-                $quickfacts  = preg_split('/[, ;:]+/', $tree->getPreference('NOTE_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
-                break;
-
-            case Repository::RECORD_TYPE:
-                $addfacts    = preg_split('/[, ;:]+/', $tree->getPreference('REPO_FACTS_ADD'), -1, PREG_SPLIT_NO_EMPTY);
-                $uniquefacts = preg_split('/[, ;:]+/', $tree->getPreference('REPO_FACTS_UNIQUE'), -1, PREG_SPLIT_NO_EMPTY);
-                $quickfacts  = preg_split('/[, ;:]+/', $tree->getPreference('REPO_FACTS_QUICK'), -1, PREG_SPLIT_NO_EMPTY);
-                break;
-
-            case Media::RECORD_TYPE:
-                $addfacts    = ['NOTE'];
-                $uniquefacts = [];
-                $quickfacts  = [];
-                break;
             default:
                 return;
         }
-        $addfacts            = array_merge(self::checkFactUnique($uniquefacts, $usedfacts), $addfacts);
-        $quickfacts          = array_intersect($quickfacts, $addfacts);
-        $translated_addfacts = [];
 
-        foreach ($addfacts as $addfact) {
-            $translated_addfacts[$addfact] = Registry::elementFactory()->make($record->tag() . ':' . $addfact)->label();
+        // Create a label for a subtag
+        $fn = fn ($subtag) => Registry::elementFactory()->make($record->tag() . ':' . $subtag)->label();
+
+        $addfacts   = array_merge(self::checkFactUnique($uniquefacts, $record->facts()), $addfacts);
+        $quickfacts = array_intersect($quickfacts, $addfacts);
+        $quickfacts = array_combine($quickfacts, array_map($fn, $quickfacts));
+        $addfacts = array_combine($addfacts, array_map($fn, $addfacts));
+
+        uasort($addfacts, I18N::comparator());
+
+        if ($record->tree()->getPreference('MEDIA_UPLOAD') < Auth::accessLevel($record->tree())) {
+            unset($addfacts['OBJE'], $quickfacts['OBJE']);
         }
-        uasort($translated_addfacts, I18N::comparator());
 
         echo view('edit/add-fact-row', [
-            'add_facts'   => $translated_addfacts,
+            'add_facts'   => $addfacts,
             'quick_facts' => $quickfacts,
             'record'      => $record,
             'tree'        => $tree,

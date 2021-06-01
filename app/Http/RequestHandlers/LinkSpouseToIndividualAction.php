@@ -28,6 +28,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use function assert;
+use function is_string;
 use function redirect;
 
 /**
@@ -35,8 +36,7 @@ use function redirect;
  */
 class LinkSpouseToIndividualAction implements RequestHandlerInterface
 {
-    /** @var GedcomEditService */
-    private $gedcom_edit_service;
+    private GedcomEditService $gedcom_edit_service;
 
     /**
      * AddChildToFamilyAction constructor.
@@ -58,14 +58,20 @@ class LinkSpouseToIndividualAction implements RequestHandlerInterface
         $tree = $request->getAttribute('tree');
         assert($tree instanceof Tree);
 
-        $xref = $request->getQueryParams()['xref'];
+        $xref = $request->getAttribute('xref');
+        assert(is_string($xref));
 
         $individual = Registry::individualFactory()->make($xref, $tree);
         $individual = Auth::checkIndividualAccess($individual, true);
 
         $params = (array) $request->getParsedBody();
-        $spid   = $params['spid'];
 
+        $levels = $params['flevels'] ?? [];
+        $tags   = $params['ftags'] ?? [];
+        $values = $params['fvalues'] ?? [];
+
+        // Create the new family
+        $spid   = $params['spid'];
         $spouse = Registry::individualFactory()->make($spid, $tree);
         $spouse = Auth::checkIndividualAccess($spouse, true);
 
@@ -75,12 +81,12 @@ class LinkSpouseToIndividualAction implements RequestHandlerInterface
             $gedcom = "0 @@ FAM\n1 WIFE @" . $individual->xref() . "@\n1 HUSB @" . $spouse->xref() . '@';
         }
 
-        $gedcom .= $this->gedcom_edit_service->addNewFact($request, $tree, 'MARR');
+        $gedcom .= "\n" . $this->gedcom_edit_service->editLinesToGedcom('FAM', $levels, $tags, $values);
 
         $family = $tree->createFamily($gedcom);
 
-        $individual->createFact('1 FAMS @' . $family->xref() . '@', true);
-        $spouse->createFact('1 FAMS @' . $family->xref() . '@', true);
+        $individual->createFact('1 FAMS @' . $family->xref() . '@', false);
+        $spouse->createFact('1 FAMS @' . $family->xref() . '@', false);
 
         return redirect($family->url());
     }

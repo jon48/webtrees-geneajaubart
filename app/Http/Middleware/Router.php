@@ -26,7 +26,7 @@ use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Tree;
-use Middleland\Dispatcher;
+use Fisharebest\Webtrees\Webtrees;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -41,14 +41,11 @@ use function str_contains;
  */
 class Router implements MiddlewareInterface
 {
-    /** @var ModuleService */
-    private $module_service;
+    private ModuleService $module_service;
 
-    /** @var RouterContainer */
-    private $router_container;
+    private RouterContainer $router_container;
 
-    /** @var TreeService */
-    private $tree_service;
+    private TreeService $tree_service;
 
     /**
      * Router constructor.
@@ -57,8 +54,11 @@ class Router implements MiddlewareInterface
      * @param RouterContainer $router_container
      * @param TreeService     $tree_service
      */
-    public function __construct(ModuleService $module_service, RouterContainer $router_container, TreeService $tree_service)
-    {
+    public function __construct(
+        ModuleService $module_service,
+        RouterContainer $router_container,
+        TreeService $tree_service
+    ) {
         $this->module_service   = $module_service;
         $this->router_container = $router_container;
         $this->tree_service     = $tree_service;
@@ -146,8 +146,6 @@ class Router implements MiddlewareInterface
         // Bind the updated request into the container
         app()->instance(ServerRequestInterface::class, $request);
 
-        $dispatcher = new Dispatcher($middleware, app());
-
-        return $dispatcher->dispatch($request);
+        return Webtrees::dispatch($request, $middleware);
     }
 }

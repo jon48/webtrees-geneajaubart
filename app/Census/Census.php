@@ -43,47 +43,7 @@ class Census
                     new CensusOfScotland(),
                     new CensusOfUnitedStates(),
                     new CensusOfWales(),
-                ];
-
-            case 'en-AU':
-            case 'en-GB':
-                return [
-                    new CensusOfEngland(),
-                    new CensusOfScotland(),
-                    new CensusOfWales(),
-                    new CensusOfUnitedStates(),
-                    new CensusOfCzechRepublic(),
-                    new CensusOfDenmark(),
-                    new CensusOfDeutschland(),
-                    new CensusOfFrance(),
-                    new CensusOfSlovakia(),
-                ];
-
-            case 'en-US':
-                return [
-                    new CensusOfUnitedStates(),
-                    new CensusOfCzechRepublic(),
-                    new CensusOfDenmark(),
-                    new CensusOfDeutschland(),
-                    new CensusOfEngland(),
-                    new CensusOfFrance(),
-                    new CensusOfScotland(),
-                    new CensusOfSlovakia(),
-                    new CensusOfWales(),
-                ];
-
-            case 'fr':
-            case 'fr-CA':
-                return [
-                    new CensusOfFrance(),
-                    new CensusOfCzechRepublic(),
-                    new CensusOfDenmark(),
-                    new CensusOfDeutschland(),
-                    new CensusOfEngland(),
-                    new CensusOfScotland(),
-                    new CensusOfSlovakia(),
-                    new CensusOfUnitedStates(),
-                    new CensusOfWales(),
+                    new CensusOfCanada(),
                 ];
 
             case 'da':
@@ -97,6 +57,7 @@ class Census
                     new CensusOfSlovakia(),
                     new CensusOfUnitedStates(),
                     new CensusOfWales(),
+                    new CensusOfCanada(),
                 ];
 
             case 'de':
@@ -106,6 +67,64 @@ class Census
                     new CensusOfDenmark(),
                     new CensusOfEngland(),
                     new CensusOfFrance(),
+                    new CensusOfScotland(),
+                    new CensusOfSlovakia(),
+                    new CensusOfUnitedStates(),
+                    new CensusOfWales(),
+                    new CensusOfCanada(),
+                ];
+
+            case 'en-AU':
+            case 'en-GB':
+                return [
+                    new CensusOfEngland(),
+                    new CensusOfScotland(),
+                    new CensusOfWales(),
+                    new CensusOfCanada(),
+                    new CensusOfUnitedStates(),
+                    new CensusOfCzechRepublic(),
+                    new CensusOfDenmark(),
+                    new CensusOfDeutschland(),
+                    new CensusOfFrance(),
+                    new CensusOfSlovakia(),
+                ];
+
+            case 'en-US':
+                return [
+                    new CensusOfUnitedStates(),
+                    new CensusOfCanada(),
+                    new CensusOfCzechRepublic(),
+                    new CensusOfDenmark(),
+                    new CensusOfDeutschland(),
+                    new CensusOfEngland(),
+                    new CensusOfFrance(),
+                    new CensusOfScotland(),
+                    new CensusOfSlovakia(),
+                    new CensusOfWales(),
+                ];
+
+            case 'fr':
+                return [
+                    new CensusOfFrance(),
+                    new CensusOfCanada(),
+                    new CensusOfCzechRepublic(),
+                    new CensusOfDenmark(),
+                    new CensusOfDeutschland(),
+                    new CensusOfEngland(),
+                    new CensusOfScotland(),
+                    new CensusOfSlovakia(),
+                    new CensusOfUnitedStates(),
+                    new CensusOfWales(),
+                ];
+
+            case 'fr-CA':
+                return [
+                    new CensusOfCanada(),
+                    new CensusOfFrance(),
+                    new CensusOfCzechRepublic(),
+                    new CensusOfDenmark(),
+                    new CensusOfDeutschland(),
+                    new CensusOfEngland(),
                     new CensusOfScotland(),
                     new CensusOfSlovakia(),
                     new CensusOfUnitedStates(),
@@ -123,6 +142,7 @@ class Census
                     new CensusOfScotland(),
                     new CensusOfUnitedStates(),
                     new CensusOfWales(),
+                    new CensusOfCanada(),
                 ];
 
             default:
@@ -136,6 +156,7 @@ class Census
                     new CensusOfCzechRepublic(),
                     new CensusOfSlovakia(),
                     new CensusOfDenmark(),
+                    new CensusOfCanada(),
                 ];
         }
     }

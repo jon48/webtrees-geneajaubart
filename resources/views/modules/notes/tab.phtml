@@ -44,8 +44,6 @@ use Illuminate\Support\Collection;
         <?php endif ?>
 
         <?php if ($can_edit) : ?>
-            <?= view('edit/paste-fact-row', ['record' => $individual, 'facts' => $clipboard_facts]) ?>
-
             <tr>
                 <th scope="row">
                     <?= I18N::translate('Note') ?>
@@ -53,16 +51,6 @@ use Illuminate\Support\Collection;
                 <td>
                     <a href="<?= e(route(AddNewFact::class, ['tree' => $individual->tree()->name(), 'xref' => $individual->xref(), 'fact' => 'NOTE'])) ?>">
                         <?= I18N::translate('Add a note') ?>
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    <?= I18N::translate('Shared note') ?>
-                </th>
-                <td>
-                    <a href="<?= e(route(AddNewFact::class, ['tree' => $individual->tree()->name(), 'xref' => $individual->xref(), 'fact' => 'SHARED_NOTE'])) ?>">
-                        <?= I18N::translate('Add a shared note') ?>
                     </a>
                 </td>
             </tr>

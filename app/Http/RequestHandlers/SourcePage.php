@@ -21,23 +21,17 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\ClipboardService;
-use Fisharebest\Webtrees\Source;
 use Fisharebest\Webtrees\Tree;
-use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function array_search;
 use function assert;
 use function is_string;
 use function redirect;
-
-use const PHP_INT_MAX;
 
 /**
  * Show a source's page.
@@ -46,26 +40,7 @@ class SourcePage implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
-    // Show the source's facts in this order:
-    private const FACT_ORDER = [
-        1 => 'SOUR:TITL',
-        'SOUR:ABBR',
-        'SOUR:AUTH',
-        'SOUR:DATA',
-        'SOUR:PUBL',
-        'SOUR:TEXT',
-        'SOUR:REPO',
-        'SOUR:NOTE',
-        'SOUR:OBJE',
-        'SOUR:REFN',
-        'SOUR:RIN',
-        'SOUR:_UID',
-        'SOUR:CHAN',
-        'SOUR:RESN',
-    ];
-
-    /** @var ClipboardService */
-    private $clipboard_service;
+    private ClipboardService $clipboard_service;
 
     /**
      * SourcePage constructor.
@@ -90,42 +65,28 @@ class SourcePage implements RequestHandlerInterface
         $xref = $request->getAttribute('xref');
         assert(is_string($xref));
 
-        $source = Registry::sourceFactory()->make($xref, $tree);
-        $source = Auth::checkSourceAccess($source, false);
+        $record = Registry::sourceFactory()->make($xref, $tree);
+        $record = Auth::checkSourceAccess($record, false);
 
         // Redirect to correct xref/slug
-        if ($source->xref() !== $xref || $request->getAttribute('slug') !== $source->slug()) {
-            return redirect($source->url(), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
+        $slug = Registry::slugFactory()->make($record);
+
+        if ($record->xref() !== $xref || $request->getAttribute('slug') !== $slug) {
+            return redirect($record->url(), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
         }
 
-        return $this->viewResponse('source-page', [
-            'clipboard_facts'  => $this->clipboard_service->pastableFacts($source),
-            'facts'            => $this->facts($source),
-            'families'         => $source->linkedFamilies('SOUR'),
-            'individuals'      => $source->linkedIndividuals('SOUR'),
-            'meta_description' => '',
-            'meta_robots'      => 'index,follow',
-            'notes'            => $source->linkedNotes('SOUR'),
-            'media_objects'    => $source->linkedMedia('SOUR'),
-            'source'           => $source,
-            'title'            => $source->fullName(),
-            'tree'             => $tree,
+        return $this->viewResponse('record-page', [
+            'clipboard_facts'      => $this->clipboard_service->pastableFacts($record),
+            'linked_families'      => $record->linkedFamilies('SOUR'),
+            'linked_individuals'   => $record->linkedIndividuals('SOUR'),
+            'linked_media_objects' => $record->linkedMedia('SOUR'),
+            'linked_notes'         => $record->linkedNotes('SOUR'),
+            'linked_sources'       => null,
+            'meta_description'     => '',
+            'meta_robots'          => 'index,follow',
+            'record'               => $record,
+            'title'                => $record->fullName(),
+            'tree'                 => $tree,
         ]);
-    }
-
-    /**
-     * @param Source $record
-     *
-     * @return Collection<Fact>
-     */
-    private function facts(Source $record): Collection
-    {
-        return $record->facts()
-            ->sort(static function (Fact $x, Fact $y): int {
-                $sort_x = array_search($x->tag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
-                $sort_y = array_search($y->tag(), self::FACT_ORDER, true) ?: PHP_INT_MAX;
-
-                return $sort_x <=> $sort_y;
-            });
     }
 }

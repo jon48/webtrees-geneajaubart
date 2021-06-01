@@ -1,19 +1,22 @@
 <?php
 
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Http\RequestHandlers\AddName;
+use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Http\RequestHandlers\AddNewFact;
 use Fisharebest\Webtrees\Http\RequestHandlers\DeleteRecord;
 use Fisharebest\Webtrees\Http\RequestHandlers\EditFactPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\EditRawRecordPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\ReorderFamiliesPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\ReorderMediaPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\ReorderNamesPage;
-use Fisharebest\Webtrees\Http\RequestHandlers\ReorderFamiliesPage;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Illuminate\Support\Collection;
 
 /**
- * @var Individual $record
+ * @var Collection<Fact>   $clipboard_facts
+ * @var Individual         $record
+ * @var Collection<string> $shares
  */
 
 ?>
@@ -25,7 +28,16 @@ use Fisharebest\Webtrees\Individual;
     </button>
 
     <div class="dropdown-menu dropdown-menu-right wt-page-menu-items" aria-labelledby="page-menu">
-        <a class="dropdown-item" href="<?= e(route(AddName::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref()])) ?>">
+        <?php if ($shares->isNotEmpty()): ?>
+            <button class="dropdown-item"  data-toggle="modal" data-target="#wt-shares-modal">
+                <?= view('icons/share') ?>
+                <?= I18N::translate('Share') ?>
+            </button>
+
+            <hr>
+        <?php endif ?>
+
+        <a class="dropdown-item" href="<?= e(route(AddNewFact::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref(), 'fact' => 'NAME'])) ?>">
             <?= view('icons/add') ?>
             <?= I18N::translate('Add a name') ?>
         </a>
@@ -91,6 +103,12 @@ use Fisharebest\Webtrees\Individual;
                 <?= view('icons/spacer') ?>
                 <?= I18N::translate('Re-order media') ?>
             </div>
+        <?php endif ?>
+
+        <?php if ($clipboard_facts->isNotEmpty()) : ?>
+            <div class="dropdown-divider"></div>
+
+            <?= view('record-page-menu-clipboard', ['clipboard_facts' => $clipboard_facts, 'record' => $record]) ?>
         <?php endif ?>
 
         <div class="dropdown-divider"></div>

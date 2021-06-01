@@ -66,8 +66,7 @@ class SearchService
     // Do not attempt to show search results larger than this/
     protected const MAX_SEARCH_RESULTS = 5000;
 
-    /** @var TreeService */
-    private $tree_service;
+    private TreeService $tree_service;
 
     /**
      * SearchService constructor.
@@ -1210,8 +1209,8 @@ class SearchService
      */
     private function locationRowMapper(): Closure
     {
-        return function (stdClass $row): Media {
-            $tree = $this->tree_service->find((int) $row->m_file);
+        return function (stdClass $row): Location {
+            $tree = $this->tree_service->find((int) $row->o_file);
 
             return Registry::locationFactory()->mapper($tree)($row);
         };

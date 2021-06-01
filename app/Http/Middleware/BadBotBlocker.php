@@ -58,6 +58,7 @@ class BadBotBlocker implements MiddlewareInterface
         'AhrefsBot',
         'AspiegelBot',
         'Barkrowler',
+        'BLEXBot',
         'DotBot',
         'Grapeshot',
         'ia_archiver',
@@ -69,7 +70,7 @@ class BadBotBlocker implements MiddlewareInterface
         'SemrushBot',
         'Turnitin',
         'XoviBot',
-        'zoominfobot',
+        'ZoominfoBot',
     ];
 
     /**
@@ -143,10 +144,11 @@ class BadBotBlocker implements MiddlewareInterface
      * Some search engines operate from within a designated autonomous system.
      *
      * @see https://developers.facebook.com/docs/sharing/webmasters/crawler
+     * @see https://www.facebook.com/peering/
      */
-    private const ROBOT_ASN = [
-        'facebook' => 'AS32934',
-        'twitter'  => 'AS13414',
+    private const ROBOT_ASNS = [
+        'facebook' => ['AS32934', 'AS63293'],
+        'twitter'  => ['AS13414'],
     ];
 
     /**
@@ -194,15 +196,17 @@ class BadBotBlocker implements MiddlewareInterface
             }
         }
 
-        foreach (self::ROBOT_ASN as $robot => $asn) {
-            if (str_contains($ua, $robot)) {
-                foreach ($this->fetchIpRangesForAsn($asn) as $range) {
-                    if ($range->contains($address)) {
-                        continue 2;
+        foreach (self::ROBOT_ASNS as $robot => $asns) {
+            foreach ($asns as $asn) {
+                if (str_contains($ua, $robot)) {
+                    foreach ($this->fetchIpRangesForAsn($asn) as $range) {
+                        if ($range->contains($address)) {
+                            continue 2;
+                        }
                     }
-                }
 
-                return $this->response();
+                    return $this->response();
+                }
             }
         }
 
@@ -255,14 +259,14 @@ class BadBotBlocker implements MiddlewareInterface
     private function fetchIpRangesForAsn(string $asn): array
     {
         return Registry::cache()->file()->remember('whois-asn-' . $asn, static function () use ($asn): array {
+            $mapper = fn (AsnRouteInfo $route_info): ?RangeInterface => IPFactory::rangeFromString($route_info->route ?: $route_info->route6);
+
             try {
                 $loader = new CurlLoader(self::WHOIS_TIMEOUT);
                 $whois  = new Whois($loader);
                 $info   = $whois->loadAsnInfo($asn);
-                $routes = $info->getRoutes();
-                $ranges = array_map(static function (AsnRouteInfo $route_info): ?RangeInterface {
-                    return IPFactory::rangeFromString($route_info->getRoute() ?: $route_info->getRoute6());
-                }, $routes);
+                $routes = $info->routes;
+                $ranges = array_map($mapper, $routes);
 
                 return array_filter($ranges);
             } catch (Throwable $ex) {

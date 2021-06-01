@@ -29,6 +29,7 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Media;
 use Fisharebest\Webtrees\MediaFile;
+use Fisharebest\Webtrees\Module\ModuleShareInterface;
 use Fisharebest\Webtrees\Module\ModuleSidebarInterface;
 use Fisharebest\Webtrees\Module\ModuleTabInterface;
 use Fisharebest\Webtrees\Registry;
@@ -61,14 +62,11 @@ class IndividualPage implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
-    /** @var ClipboardService */
-    private $clipboard_service;
+    private ClipboardService $clipboard_service;
 
-    /** @var ModuleService */
-    private $module_service;
+    private ModuleService $module_service;
 
-    /** @var UserService */
-    private $user_service;
+    private UserService $user_service;
 
     /**
      * IndividualPage constructor.
@@ -101,7 +99,9 @@ class IndividualPage implements RequestHandlerInterface
         $individual = Auth::checkIndividualAccess($individual);
 
         // Redirect to correct xref/slug
-        if ($individual->xref() !== $xref || $request->getAttribute('slug') !== $individual->slug()) {
+        $slug = Registry::slugFactory()->make($individual);
+
+        if ($individual->xref() !== $xref || $request->getAttribute('slug') !== $slug) {
             return redirect($individual->url(), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
         }
 
@@ -117,14 +117,6 @@ class IndividualPage implements RequestHandlerInterface
             }
         }
 
-        $name_records = $individual->facts(['NAME'])->map(static function (Fact $fact): string {
-            return view('individual-name', ['fact' => $fact]);
-        });
-
-        $sex_records = $individual->facts(['SEX'])->map(static function (Fact $fact): string {
-            return view('individual-sex', ['fact' => $fact]);
-        });
-
         // If this individual is linked to a user account, show the link
         $user_link = '';
         if (Auth::isAdmin()) {
@@ -134,15 +126,18 @@ class IndividualPage implements RequestHandlerInterface
             }
         }
 
+        $shares = $this->module_service->findByInterface(ModuleShareInterface::class)
+            ->map(fn (ModuleShareInterface $module) => $module->share($individual))
+            ->filter();
+
         return $this->viewResponse('individual-page', [
             'age'              => $this->ageString($individual),
             'clipboard_facts'  => $this->clipboard_service->pastableFacts($individual),
-            'individual'       => $individual,
             'individual_media' => $individual_media,
             'meta_description' => $this->metaDescription($individual),
             'meta_robots'      => 'index,follow',
-            'name_records'     => $name_records,
-            'sex_records'      => $sex_records,
+            'record'           => $individual,
+            'shares'           => $shares,
             'sidebars'         => $this->getSidebars($individual),
             'tabs'             => $this->getTabs($individual),
             'significant'      => $this->significant($individual),

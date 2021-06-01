@@ -24,6 +24,7 @@ use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Location;
 use Fisharebest\Webtrees\Media;
 use Fisharebest\Webtrees\Note;
 use Fisharebest\Webtrees\Repository;
@@ -108,6 +109,7 @@ class FixSearchAndReplace extends AbstractModule implements ModuleDataFixInterfa
         $types = [
             Family::RECORD_TYPE     => I18N::translate('Families'),
             Individual::RECORD_TYPE => I18N::translate('Individuals'),
+            Location::RECORD_TYPE   => I18N::translate('Locations'),
             Media::RECORD_TYPE      => I18N::translate('Media objects'),
             Note::RECORD_TYPE       => I18N::translate('Notes'),
             Repository::RECORD_TYPE => I18N::translate('Repositories'),
@@ -167,6 +169,30 @@ class FixSearchAndReplace extends AbstractModule implements ModuleDataFixInterfa
         $this->recordQuery($query, 'i_gedcom', $params);
 
         return $query->pluck('i_id');
+    }
+
+    /**
+     * A list of all records that need examining.  This may include records
+     * that do not need updating, if we can't detect this quickly using SQL.
+     *
+     * @param Tree                 $tree
+     * @param array<string,string> $params
+     *
+     * @return Collection<string>|null
+     */
+    protected function locationsToFix(Tree $tree, array $params): ?Collection
+    {
+        if ($params['type'] !== Note::RECORD_TYPE || $params['search'] === '') {
+            return null;
+        }
+
+        $query = DB::table('other')
+            ->where('o_file', '=', $tree->id())
+            ->where('o_type', '=', Location::RECORD_TYPE);
+
+        $this->recordQuery($query, 'o_gedcom', $params);
+
+        return $query->pluck('o_id');
     }
 
     /**

@@ -32,7 +32,7 @@ import {
   faCalendar, faCaretDown, faCaretUp, faCheck, faCodeBranch, faDownload, faExclamationTriangle, faGenderless,
   faGripHorizontal, faGripLines, faHistory, faInfoCircle, faLanguage, faLink, faList,
   faLock, faMagic, faMap, faMapMarkerAlt, faMars, faMedkit, faPaintBrush, faPause, faPencilAlt,
-  faPlay, faPlus, faPuzzlePiece, faQuestionCircle, faRedo, faSearch, faSearchMinus, faSearchPlus,
+  faPlay, faPlus, faPuzzlePiece, faQuestionCircle, faRedo, faSearch, faSearchLocation, faSearchMinus, faSearchPlus, faShareAlt,
   faSitemap, faSortAmountDown, faStepForward, faStop, faSyncAlt, faTags, faThList, faThumbtack,
   faTimes, faTransgender, faTree, faUniversity, faUnlink, faUpload, faUsers, faVenus, faWrench,
   // For the BeautifyMarker library
@@ -118,6 +118,8 @@ import 'leaflet';
 import 'leaflet.markercluster';
 import 'beautifymarker';
 import 'leaflet-control-geocoder';
+import 'leaflet.control.layers.tree';
+import 'leaflet-bing-layer';
 
 window.$ = window.jQuery = $;
 
@@ -132,7 +134,7 @@ library.add(
   faCalendar, faCaretDown, faCaretUp, faCheck, faCodeBranch, faDownload, faExclamationTriangle, faGenderless,
   faGripHorizontal, faGripLines, faHistory, faInfoCircle, faLanguage, faLink, faList,
   faLock, faMagic, faMap, faMapMarkerAlt, faMars, faMedkit, faPaintBrush, faPause, faPencilAlt,
-  faPlay, faPlus, faPuzzlePiece, faQuestionCircle, faRedo, faSearch, faSearchMinus, faSearchPlus,
+  faPlay, faPlus, faPuzzlePiece, faQuestionCircle, faRedo, faSearch, faSearchLocation, faSearchMinus, faSearchPlus, faShareAlt,
   faSitemap, faSortAmountDown, faStepForward, faStop, faSyncAlt, faThList, faThumbtack,
   faTimes, faTransgender, faTree, faUniversity, faUnlink, faUpload, faUsers, faVenus, faWrench,
   // For the BeautifyMarker library
@@ -148,10 +150,10 @@ window.Sortable = Sortable;
 
 // Add RTL support for dropdown menu - see https://github.com/fisharebest/webtrees/issues/3332
 $('html[dir=rtl] .dropdown').on('shown.bs.dropdown', function (event) {
-  let menu = event.target.querySelector('.dropdown-menu');
+  const menu = event.target.querySelector('.dropdown-menu');
   // Bootstrap sets these *after* the event has fired, so wait before updating them.
   setTimeout(() => {
-    menu.style.right='0';
-    menu.style.left='';
+    menu.style.right = '0';
+    menu.style.left = '';
   }, 1);
 });

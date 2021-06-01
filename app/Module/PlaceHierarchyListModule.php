@@ -22,9 +22,13 @@ namespace Fisharebest\Webtrees\Module;
 use Aura\Router\RouterContainer;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Location;
 use Fisharebest\Webtrees\Place;
 use Fisharebest\Webtrees\PlaceLocation;
+use Fisharebest\Webtrees\Services\LeafletJsService;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\SearchService;
 use Fisharebest\Webtrees\Services\UserService;
@@ -44,6 +48,7 @@ use function ceil;
 use function count;
 use function redirect;
 use function route;
+use function var_export;
 use function view;
 
 /**
@@ -58,17 +63,24 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
     /** @var int The default access level for this module.  It can be changed in the control panel. */
     protected $access_level = Auth::PRIV_USER;
 
-    /** @var SearchService */
-    private $search_service;
+    private LeafletJsService $leaflet_js_service;
+
+    private ModuleService $module_service;
+
+    private SearchService $search_service;
 
     /**
      * PlaceHierarchy constructor.
      *
-     * @param SearchService $search_service
+     * @param LeafletJsService $leaflet_js_service
+     * @param ModuleService    $module_service
+     * @param SearchService    $search_service
      */
-    public function __construct(SearchService $search_service)
+    public function __construct(LeafletJsService $leaflet_js_service, ModuleService $module_service, SearchService $search_service)
     {
-        $this->search_service = $search_service;
+        $this->leaflet_js_service = $leaflet_js_service;
+        $this->module_service = $module_service;
+        $this->search_service     = $search_service;
     }
 
     /**
@@ -118,19 +130,6 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
     }
 
     /**
-     * @param Tree    $tree
-     * @param mixed[] $parameters
-     *
-     * @return string
-     */
-    public function listUrl(Tree $tree, array $parameters = []): string
-    {
-        $parameters['tree'] = $tree->name();
-
-        return route(static::class, $parameters);
-    }
-
-    /**
      * @return array<string>
      */
     public function listUrlAttributes(): array
@@ -163,6 +162,19 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
     }
 
     /**
+     * @param Tree         $tree
+     * @param array<mixed> $parameters
+     *
+     * @return string
+     */
+    public function listUrl(Tree $tree, array $parameters = []): string
+    {
+        $parameters['tree'] = $tree->name();
+
+        return route(static::class, $parameters);
+    }
+
+    /**
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
@@ -186,20 +198,16 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
             return redirect($place->url());
         }
 
+        $map_providers = $this->module_service->findByInterface(ModuleMapProviderInterface::class);
+
         $content = '';
-        $showmap = Site::getPreference('map-provider') !== '';
+        $showmap = $map_providers->isNotEmpty();
         $data    = null;
 
         if ($showmap) {
             $content .= view('modules/place-hierarchy/map', [
-                'data'     => $this->mapData($tree, $place),
-                'provider' => [
-                    'url'    => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    'options' => [
-                        'attribution' => '<a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap</a> contributors',
-                        'max_zoom'    => 19
-                    ]
-                ]
+                'data'           => $this->mapData($tree, $place),
+                'leaflet_config' => $this->leaflet_js_service->config(),
             ]);
         }
 
@@ -208,14 +216,14 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
             default:
                 $alt_link = I18N::translate('Show place hierarchy');
                 $alt_url  = $this->listUrl($tree, ['action2' => 'hierarchy', 'place_id' => $place_id]);
-                $content .= view('modules/place-hierarchy/list', ['columns' => $this->getList($tree)]);
+                $content  .= view('modules/place-hierarchy/list', ['columns' => $this->getList($tree)]);
                 break;
             case 'hierarchy':
             case 'hierarchy-e':
                 $alt_link = I18N::translate('Show all places in a list');
                 $alt_url  = $this->listUrl($tree, ['action2' => 'list', 'place_id' => 0]);
                 $data     = $this->getHierarchy($place);
-                $content .= (null === $data || $showmap) ? '' : view('place-hierarchy', $data);
+                $content  .= (null === $data || $showmap) ? '' : view('place-hierarchy', $data);
                 if (null === $data || $action2 === 'hierarchy-e') {
                     $content .= view('modules/place-hierarchy/events', [
                         'indilist' => $this->search_service->searchIndividualsInPlace($place),
@@ -243,8 +251,79 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
             'place'       => $place,
             'title'       => I18N::translate('Place hierarchy'),
             'tree'        => $tree,
-            'world_url'   => $this->listUrl($tree)
+            'world_url'   => $this->listUrl($tree),
         ]);
+    }
+
+    /**
+     * @param Tree  $tree
+     * @param Place $placeObj
+     *
+     * @return array<mixed>
+     */
+    protected function mapData(Tree $tree, Place $placeObj): array
+    {
+        $places    = $placeObj->getChildPlaces();
+        $features  = [];
+        $sidebar   = '';
+        $show_link = true;
+
+        if ($places === []) {
+            $places[]  = $placeObj;
+            $show_link = false;
+        }
+
+        foreach ($places as $id => $place) {
+            $location = new PlaceLocation($place->gedcomName());
+
+            if ($location->latitude() === null || $location->longitude() === null) {
+                $sidebar_class = 'unmapped';
+            } else {
+                $sidebar_class = 'mapped';
+                $features[]    = [
+                    'type'       => 'Feature',
+                    'id'         => $id,
+                    'geometry'   => [
+                        'type'        => 'Point',
+                        'coordinates' => [$location->longitude(), $location->latitude()],
+                    ],
+                    'properties' => [
+                        'tooltip' => $place->gedcomName(),
+                        'popup'   => view('modules/place-hierarchy/popup', [
+                            'showlink'  => $show_link,
+                            'place'     => $place,
+                            'latitude'  => $location->latitude(),
+                            'longitude' => $location->longitude(),
+                        ]),
+                    ],
+                ];
+            }
+
+            $statistics = new Statistics(app(ModuleService::class), $tree, app(UserService::class));
+
+            //Stats
+            $stats = [];
+            foreach ([Individual::RECORD_TYPE, Family::RECORD_TYPE, Location::RECORD_TYPE] as $type) {
+                $tmp          = $statistics->statsPlaces($type, '', $place->id());
+                $stats[$type] = $tmp === [] ? 0 : $tmp[0]->tot;
+            }
+            $sidebar .= view('modules/place-hierarchy/sidebar', [
+                'showlink'      => $show_link,
+                'id'            => $id,
+                'place'         => $place,
+                'sidebar_class' => $sidebar_class,
+                'stats'         => $stats,
+            ]);
+        }
+
+        return [
+            'bounds'  => (new PlaceLocation($placeObj->gedcomName()))->boundingRectangle(),
+            'sidebar' => $sidebar,
+            'markers' => [
+                'type'     => 'FeatureCollection',
+                'features' => $features,
+            ],
+        ];
     }
 
     /**
@@ -270,7 +349,6 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
 
         return array_chunk($places, (int) ceil($count / $columns));
     }
-
 
     /**
      * @param Place $place
@@ -320,77 +398,6 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
         return [
             'breadcrumbs' => $breadcrumbs,
             'current'     => $current,
-        ];
-    }
-
-    /**
-     * @param Tree  $tree
-     * @param Place $placeObj
-     *
-     * @return array<mixed>
-     */
-    protected function mapData(Tree $tree, Place $placeObj): array
-    {
-        $places    = $placeObj->getChildPlaces();
-        $features  = [];
-        $sidebar   = '';
-        $show_link = true;
-
-        if ($places === []) {
-            $places[] = $placeObj;
-            $show_link = false;
-        }
-
-        foreach ($places as $id => $place) {
-            $location = new PlaceLocation($place->gedcomName());
-
-            if ($location->latitude() === null || $location->longitude() === null) {
-                $sidebar_class = 'unmapped';
-            } else {
-                $sidebar_class = 'mapped';
-                $features[]    = [
-                    'type'       => 'Feature',
-                    'id'         => $id,
-                    'geometry'   => [
-                        'type'        => 'Point',
-                        'coordinates' => [$location->longitude(), $location->latitude()],
-                    ],
-                    'properties' => [
-                        'tooltip' => $place->gedcomName(),
-                        'popup'   => view('modules/place-hierarchy/popup', [
-                            'showlink'  => $show_link,
-                            'place'     => $place,
-                            'latitude'  => $location->latitude(),
-                            'longitude' => $location->longitude(),
-                        ]),
-                    ],
-                ];
-            }
-
-            $statistics = new Statistics(app(ModuleService::class), $tree, app(UserService::class));
-
-            //Stats
-            $placeStats = [];
-            foreach (['INDI', 'FAM'] as $type) {
-                $tmp               = $statistics->statsPlaces($type, '', $place->id());
-                $placeStats[$type] = $tmp === [] ? 0 : $tmp[0]->tot;
-            }
-            $sidebar .= view('modules/place-hierarchy/sidebar', [
-                'showlink'      => $show_link,
-                'id'            => $id,
-                'place'         => $place,
-                'sidebar_class' => $sidebar_class,
-                'stats'         => $placeStats,
-            ]);
-        }
-
-        return [
-            'bounds'  => (new PlaceLocation($placeObj->gedcomName()))->boundingRectangle(),
-            'sidebar' => $sidebar,
-            'markers' => [
-                'type'     => 'FeatureCollection',
-                'features' => $features,
-            ]
         ];
     }
 }

@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Exception;
+use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
@@ -84,9 +85,6 @@ class TreePreferencesAction implements RequestHandlerInterface
         $tree->setPreference('PREFER_LEVEL2_SOURCES', $params['PREFER_LEVEL2_SOURCES'] ?? '');
         $tree->setPreference('QUICK_REQUIRED_FACTS', implode(',', $params['QUICK_REQUIRED_FACTS'] ?? []));
         $tree->setPreference('QUICK_REQUIRED_FAMFACTS', implode(',', $params['QUICK_REQUIRED_FAMFACTS'] ?? []));
-        $tree->setPreference('REPO_FACTS_ADD', implode(',', $params['REPO_FACTS_ADD'] ?? []));
-        $tree->setPreference('REPO_FACTS_QUICK', implode(',', $params['REPO_FACTS_QUICK'] ?? []));
-        $tree->setPreference('REPO_FACTS_UNIQUE', implode(',', $params['REPO_FACTS_UNIQUE'] ?? []));
         $tree->setPreference('SHOW_COUNTER', $params['SHOW_COUNTER'] ?? '');
         $tree->setPreference('SHOW_EST_LIST_DATES', $params['SHOW_EST_LIST_DATES'] ?? '');
         $tree->setPreference('SHOW_FACT_ICONS', $params['SHOW_FACT_ICONS'] ?? '');
@@ -99,9 +97,6 @@ class TreePreferencesAction implements RequestHandlerInterface
         $tree->setPreference('SHOW_PEDIGREE_PLACES', $params['SHOW_PEDIGREE_PLACES'] ?? '');
         $tree->setPreference('SHOW_PEDIGREE_PLACES_SUFFIX', $params['SHOW_PEDIGREE_PLACES_SUFFIX'] ?? '');
         $tree->setPreference('SHOW_RELATIVES_EVENTS', implode(',', $params['SHOW_RELATIVES_EVENTS'] ?? []));
-        $tree->setPreference('SOUR_FACTS_ADD', implode(',', $params['SOUR_FACTS_ADD'] ?? []));
-        $tree->setPreference('SOUR_FACTS_QUICK', implode(',', $params['SOUR_FACTS_QUICK'] ?? []));
-        $tree->setPreference('SOUR_FACTS_UNIQUE', implode(',', $params['SOUR_FACTS_UNIQUE'] ?? []));
         $tree->setPreference('SUBLIST_TRIGGER_I', $params['SUBLIST_TRIGGER_I'] ?? '200');
         $tree->setPreference('SURNAME_LIST_STYLE', $params['SURNAME_LIST_STYLE'] ?? '');
         $tree->setPreference('SURNAME_TRADITION', $params['SURNAME_TRADITION'] ?? '');
@@ -109,25 +104,31 @@ class TreePreferencesAction implements RequestHandlerInterface
         $tree->setPreference('WEBMASTER_USER_ID', $params['WEBMASTER_USER_ID'] ?? '');
         $tree->setPreference('title', $params['title'] ?? '');
 
-        // Only accept valid folders for MEDIA_DIRECTORY
-        $MEDIA_DIRECTORY = $params['MEDIA_DIRECTORY'] ?? '';
-        $MEDIA_DIRECTORY = preg_replace('/[:\/\\\\]+/', '/', $MEDIA_DIRECTORY);
-        $MEDIA_DIRECTORY = trim($MEDIA_DIRECTORY, '/') . '/';
+        if (Auth::isAdmin()) {
+            // Only accept valid folders for MEDIA_DIRECTORY
+            $MEDIA_DIRECTORY = $params['MEDIA_DIRECTORY'] ?? '';
+            $MEDIA_DIRECTORY = preg_replace('/[:\/\\\\]+/', '/', $MEDIA_DIRECTORY);
+            $MEDIA_DIRECTORY = trim($MEDIA_DIRECTORY, '/') . '/';
 
-        $tree->setPreference('MEDIA_DIRECTORY', $MEDIA_DIRECTORY);
+            $tree->setPreference('MEDIA_DIRECTORY', $MEDIA_DIRECTORY);
+        }
 
         $gedcom = $params['gedcom'] ?? '';
+        $url    = route(ManageTrees::class, ['tree' => $tree->name()]);
 
-        if ($gedcom !== '' && $gedcom !== $tree->name()) {
+        if (Auth::isAdmin() && $gedcom !== '' && $gedcom !== $tree->name()) {
             try {
                 DB::table('gedcom')
                     ->where('gedcom_id', '=', $tree->id())
                     ->update(['gedcom_name' => $gedcom]);
 
+                // Did we rename the default tree?
                 DB::table('site_setting')
                     ->where('setting_name', '=', 'DEFAULT_GEDCOM')
                     ->where('setting_value', '=', $tree->name())
                     ->update(['setting_value' => $gedcom]);
+
+                $url = route(ManageTrees::class, ['tree' => $gedcom]);
             } catch (Exception $ex) {
                 // Probably a duplicate name.
             }
@@ -146,8 +147,6 @@ class TreePreferencesAction implements RequestHandlerInterface
         if ($new_trees === 'on') {
             FlashMessages::addMessage(I18N::translate('The preferences for new family trees have been updated.'), 'success');
         }
-
-        $url = route(ManageTrees::class, ['tree' => $gedcom]);
 
         return redirect($url);
     }
