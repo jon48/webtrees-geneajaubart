@@ -3,58 +3,71 @@
 declare(strict_types=1);
 
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Functions\Functions;
+use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Module\ModuleThemeInterface;
+use Fisharebest\Webtrees\Services\RelationshipService;
 use Fisharebest\Webtrees\Statistics\Service\ColorService;
 use Illuminate\Support\Collection;
 
 /**
  * @var string                  $module_name
  * @var ModuleThemeInterface    $theme
+ * @var Individual|null         $root_indi
  * @var Collection              $sosa_dispersion_g2
  * @var Collection              $sosa_dispersion_g3
+ * @var RelationshipService     $relationship_service
  */
+
+$add_branch = function (array $chart, ?stdClass $branch, string $color) use ($relationship_service, $root_indi): array {
+    if ($branch !== null) {
+        $chart['colors'][] = $color;
+        $chart['data'][] = [
+            $branch->majs_i_id === null ?
+                I18N::translate('Shared') :
+                $relationship_service->getCloseRelationshipName(
+                    $root_indi,
+                    Registry::individualFactory()->make($branch->majs_i_id, $root_indi->tree())
+                ),
+            (int) $branch->count_indi
+        ];
+    }
+    return $chart;
+}
+
 ?>
 
 <h3 class="text-center m-3"><?= I18N::translate('Known Sosa ancestors\' family dispersion'); ?></h3>
 
 <div class="maj-sosa-dispersion-charts text-center">
+<?php
+$chart_g2 = ['colors'  => [], 'data' => [["Branche", 'Count']]];
+$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(1), $theme->parameter('chart-background-m'));
+$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(0), $theme->parameter('chart-background-u'));
+$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(2), $theme->parameter('chart-background-f'));
+?>
+
 <?= view($module_name . '::charts/pie', [
-    'colors'            =>  [
-        $theme->parameter('chart-background-m'),
-        $theme->parameter('chart-background-u'),
-        $theme->parameter('chart-background-f')
-    ],
-    'data'              => [
-        ["Branche", 'Count'],
-        [Functions::getRelationshipNameFromPath('fat'), (int) $sosa_dispersion_g2->get(1, 0)],
-        [I18N::translate('Shared'), (int) $sosa_dispersion_g2->get(0, 0)],
-        [Functions::getRelationshipNameFromPath('mot'), (int) $sosa_dispersion_g2->get(2, 0)]
-    ],
+    'colors'            => $chart_g2['colors'],
+    'data'              => $chart_g2['data'],
     'pieStartAngle'     => 180,
     'labeledValueText'  => 'percentage',
     'language'          => I18N::languageTag(),
     'height'            => 250,
     'width'             => '50%'
 ]) ?>
-    
-    
+
+<?php
+$chart_g3 = ['colors'  => [], 'data' => [["Branche", 'Count']]];
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(1), app(ColorService::class)->interpolateRgb($theme->parameter('chart-background-m'), '#00000', 10)[1]);
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(2), $theme->parameter('chart-background-m'));
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(0), $theme->parameter('chart-background-u'));
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(3), app(ColorService::class)->interpolateRgb($theme->parameter('chart-background-f'), '#00000', 10)[1]);
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(4), $theme->parameter('chart-background-f'));
+?>
 <?= view($module_name . '::charts/pie', [
-    'colors'            =>  [
-        app(ColorService::class)->interpolateRgb($theme->parameter('chart-background-m'), '#00000', 10)[1],
-        $theme->parameter('chart-background-m'),
-        $theme->parameter('chart-background-u'),
-        app(ColorService::class)->interpolateRgb($theme->parameter('chart-background-f'), '#00000', 10)[1],
-        $theme->parameter('chart-background-f'),
-    ],
-    'data'              => [
-        ["Branche", 'Count'],
-        [Functions::getRelationshipNameFromPath('fatfat'), (int) $sosa_dispersion_g3->get(1, 0)],
-        [Functions::getRelationshipNameFromPath('fatmot'), (int) $sosa_dispersion_g3->get(2, 0)],
-        [I18N::translate('Shared'), (int) $sosa_dispersion_g3->get(0, 0)],
-        [Functions::getRelationshipNameFromPath('motfat'), (int) $sosa_dispersion_g3->get(3, 0)],
-        [Functions::getRelationshipNameFromPath('motmot'), (int) $sosa_dispersion_g3->get(4, 0)]
-    ],
+    'colors'            => $chart_g3['colors'],
+    'data'              => $chart_g3['data'],
     'pieStartAngle'     => 180,
     'labeledValueText'  => 'percentage',
     'language'          => I18N::languageTag(),

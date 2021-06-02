@@ -7,7 +7,6 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
-use Fisharebest\Webtrees\Functions\Functions;
 use MyArtJaub\Webtrees\Module\Sosa\Data\MissingAncestor;
 use Ramsey\Uuid\Uuid;
 
@@ -121,11 +120,11 @@ $("#<?= e($table_id) ?>")
                         <div class="btn-group btn-group-toggle btn-group-sm mx-2" data-toggle="buttons">
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show missing only fathers.') ?>">
                                 <input type="checkbox" data-filter-column="<?= columnIndex(8, $column_indexes) ?>" data-filter-value="F" autocomplete="off">
-                                <?= Functions::getRelationshipNameFromPath('fat'); ?>
+                                <?= I18N::translate('Father') ?>
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show missing only mothers.') ?>">
                                 <input type="checkbox" data-filter-column="<?= columnIndex(8, $column_indexes) ?>" data-filter-value="M" autocomplete="off">
-                                <?= Functions::getRelationshipNameFromPath('mot'); ?>
+                                <?= I18N::translate('Mother') ?>
                             </label>
                             <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show missing both parents.') ?>">
                                 <input type="checkbox" data-filter-column="<?= columnIndex(8, $column_indexes) ?>" data-filter-value="B" autocomplete="off">
@@ -157,8 +156,8 @@ $("#<?= e($table_id) ?>")
                 <th><?= $maj_issourced_indi['th'] ?></th>
                 <?php endif; ?>
                 <!--  MYARTJAUB-END -->
-                <th><?= Functions::getRelationshipNameFromPath('fat'); ?></th>
-                <th><?= Functions::getRelationshipNameFromPath('mot'); ?></th>
+                <th><?= I18N::translate('Father') ?></th>
+                <th><?= I18N::translate('Mother') ?></th>
                 <th><?= I18N::translate('Birth') ?></th>
                 <th><?= I18N::translate('Place') ?></th>
                 <!--  MYARTJAUB-START -->

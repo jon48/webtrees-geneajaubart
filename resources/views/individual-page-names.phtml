@@ -18,4 +18,13 @@ use Illuminate\Support\Collection;
     <?php foreach ($record->facts(['SEX']) as $fact) : ?>
         <?= view('individual-sex', ['fact' => $fact]) ?>
     <?php endforeach ?>
+    
+    <!--  MYARTJAUB-START -->
+    <?= hook(
+        \MyArtJaub\Webtrees\Contracts\Hooks\NameAccordionExtenderInterface::class,
+        fn(\MyArtJaub\Webtrees\Contracts\Hooks\NameAccordionExtenderInterface $hook) => $hook->accordionCard($record),
+        ''
+    )
+    ?>
+    <!--  MYARTJAUB-END -->
 </div>

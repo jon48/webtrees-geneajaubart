@@ -36,8 +36,6 @@ $attributes_cert_file = [
 
 ?>
 
-<input type="hidden" id="'.$element_id.'" name = "'.$element_name.'" value="'.$value.'" size="35"/>
-
 <?= view($module_name . '::components/select-city', ['cities' => $cities, 'id' => $id . '-city', 'name' => 'edit-_ACT-city', 'selected_city' => $value_city]) ?>
 
 <input <?= Html::attributes($attributes_cert_file) ?>>
@@ -53,16 +51,16 @@ $attributes_cert_file = [
 
 <script>
 
-$('#<?= $id ?>-city').change(function(){
-    $('#<?= $id ?>-file').val('').trigger('change');
+$(document.getElementById('<?= $id ?>-city')).change(function(){
+    $(document.getElementById('<?= $id ?>-file')).val('').trigger('change');
 });
 
-$('#<?= $id ?>-file').change(function(){
+$(document.getElementById('<?= $id ?>-file')).change(function(){
     if(this.value.length > 0){
-        $('#<?= $id ?>').val($('#<?= $id ?>-city').find(':selected').text() + '/' + this.value);
+        $(document.getElementById('<?= $id ?>')).val($(document.getElementById('<?= $id ?>-city')).find(':selected').text() + '/' + this.value);
     }
     else{
-        $('#<?= $id ?>').val('');
+        $(document.getElementById('<?= $id ?>')).val('');
     }
 });
 
