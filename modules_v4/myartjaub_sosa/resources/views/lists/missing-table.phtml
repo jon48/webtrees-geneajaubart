@@ -79,11 +79,10 @@ $("#<?= e($table_id) ?>")
     /* Filter buttons in table header */
     .on("click", "input[data-filter-column]", function() {
         let checkbox = $(this);
-        let siblings = checkbox.parent().siblings();
 
         // Deselect other options
-        siblings.children().prop("checked", false).removeAttr("checked");
-        siblings.removeClass('active');
+        let siblings = checkbox.siblings("input[type='checkbox']");
+        siblings.prop("checked", false).removeAttr("checked");
 
         // Apply (or clear) this filter
         let checked = checkbox.prop("checked");
@@ -101,46 +100,52 @@ $("#<?= e($table_id) ?>")
         <thead>
             <tr>
                 <!-- MYARTJAUB-START -->
-                <th colspan="<?= columnIndex(9, $column_indexes) ?>">
-                    <div class="btn-toolbar d-flex justify-content-center mb-2" role="toolbar">
-                        <div class="btn-group btn-group-toggle btn-group-sm mx-2" data-toggle="buttons">
-                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only males.') ?>">
-                                <input type="checkbox" data-filter-column="<?= columnIndex(7, $column_indexes) ?>" data-filter-value="M" autocomplete="off">
+                <th colspan="<?= columnIndex(10, $column_indexes) ?>">
+                    <div class="btn-toolbar d-flex justify-content-center gap-3 mb-2" role="toolbar">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <input id="<?= e($table_id) ?>-bg-sex-M" class="btn-check" type="checkbox" data-filter-column="<?= columnIndex(7, $column_indexes) ?>" data-filter-value="M" autocomplete="off">
+                            <label for="<?= e($table_id) ?>-bg-sex-M" class="btn btn-outline-secondary" title="<?= I18N::translate('Show only males.') ?>">
                                 <?= view('icons/sex', ['sex' => 'M']) ?>
                             </label>
-                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only females.') ?>">
-                                <input type="checkbox" data-filter-column="<?= columnIndex(7, $column_indexes) ?>" data-filter-value="F" autocomplete="off">
+
+                            <input id="<?= e($table_id) ?>-bg-sex-F" class="btn-check" type="checkbox" data-filter-column="<?= columnIndex(7, $column_indexes) ?>" data-filter-value="F" autocomplete="off">
+                            <label for="<?= e($table_id) ?>-bg-sex-F" class="btn btn-outline-secondary" title="<?= I18N::translate('Show only females.') ?>">
                                 <?= view('icons/sex', ['sex' => 'F']) ?>
                             </label>
-                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only individuals for whom the gender is not known.') ?>">
-                                <input type="checkbox" data-filter-column="<?= columnIndex(7, $column_indexes) ?>" data-filter-value="U" autocomplete="off">
+
+                            <input id="<?= e($table_id) ?>-bg-sex-U" class="btn-check" type="checkbox" data-filter-column="<?= columnIndex(7, $column_indexes) ?>" data-filter-value="U" autocomplete="off">
+                            <label for="<?= e($table_id) ?>-bg-sex-U" class="btn btn-outline-secondary" title="<?= I18N::translate('Show only individuals for whom the gender is not known.') ?>">
                                 <?= view('icons/sex', ['sex' => 'U']) ?>
                             </label>
                         </div>
-                        <div class="btn-group btn-group-toggle btn-group-sm mx-2" data-toggle="buttons">
-                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show missing only fathers.') ?>">
-                                <input type="checkbox" data-filter-column="<?= columnIndex(8, $column_indexes) ?>" data-filter-value="F" autocomplete="off">
+                        
+                        <div class="btn-group btn-group-sm" role="group">
+                            <input id="<?= e($table_id) ?>-bg-missing-F" class="btn-check" type="checkbox" data-filter-column="<?= columnIndex(8, $column_indexes) ?>" data-filter-value="F" autocomplete="off">
+                            <label for="<?= e($table_id) ?>-bg-missing-F" class="btn btn-outline-secondary" title="<?= I18N::translate('Show missing only fathers.') ?>">
                                 <?= I18N::translate('Father') ?>
                             </label>
-                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show missing only mothers.') ?>">
-                                <input type="checkbox" data-filter-column="<?= columnIndex(8, $column_indexes) ?>" data-filter-value="M" autocomplete="off">
+
+                            <input id="<?= e($table_id) ?>-bg-missing-M" class="btn-check" type="checkbox" data-filter-column="<?= columnIndex(8, $column_indexes) ?>" data-filter-value="M" autocomplete="off">
+                            <label for="<?= e($table_id) ?>-bg-missing-M" class="btn btn-outline-secondary" title="<?= I18N::translate('Show missing only mothers.') ?>">
                                 <?= I18N::translate('Mother') ?>
                             </label>
-                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show missing both parents.') ?>">
-                                <input type="checkbox" data-filter-column="<?= columnIndex(8, $column_indexes) ?>" data-filter-value="B" autocomplete="off">
+
+                            <input id="<?= e($table_id) ?>-bg-missing-B" class="btn-check" type="checkbox" data-filter-column="<?= columnIndex(8, $column_indexes) ?>" data-filter-value="B" autocomplete="off">
+                            <label for="<?= e($table_id) ?>-bg-missing-B" class="btn btn-outline-secondary" title="<?= I18N::translate('Show missing both parents.') ?>">
                                 <?= I18N::translate('Both') ?>
                             </label>
                         </div>
                         
-                        <div class="btn-group btn-group-toggle btn-group-sm mx-2" data-toggle="buttons">
-                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only known birth dates.') ?>">
-                                <input type="checkbox" data-filter-column="<?= columnIndex(9, $column_indexes) ?>" data-filter-value="Y" autocomplete="off">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <input id="<?= e($table_id) ?>-bg-knowdates-Y" class="btn-check" type="checkbox" data-filter-column="<?= columnIndex(9, $column_indexes) ?>" data-filter-value="Y" autocomplete="off">
+                            <label for="<?= e($table_id) ?>-bg-knowdates-Y" class="btn btn-outline-secondary" title="<?= I18N::translate('Show only known birth dates.') ?>">
                                 <?= I18N::translate('Known birth date') ?>
                             </label>
                         </div>
-                        <div class="btn-group btn-group-toggle btn-group-sm mx-2" data-toggle="buttons">
-                            <label class="btn btn-outline-secondary" title="<?= I18N::translate('Show only known birth places.') ?>">
-                                <input type="checkbox" data-filter-column="<?= columnIndex(10, $column_indexes) ?>" data-filter-value="Y" autocomplete="off">
+                        
+                        <div class="btn-group btn-group-sm" role="group">
+                            <input id="<?= e($table_id) ?>-bg-knowplaces-Y" class="btn-check" type="checkbox" data-filter-column="<?= columnIndex(10, $column_indexes) ?>" data-filter-value="Y" autocomplete="off">
+                            <label for="<?= e($table_id) ?>-bg-knowplaces-Y" class="btn btn-outline-secondary" title="<?= I18N::translate('Show only known birth places.') ?>">
                                 <?= I18N::translate('Known birth place') ?>
                             </label>
                         </div>
@@ -175,12 +180,12 @@ $("#<?= e($table_id) ?>")
         <tbody>
             <?php foreach ($list_missing as $key => $missing) : ?>
                 <?php /** @var Individual $individual */  $individual = $missing->individual(); ?>
-            <tr class="<?= $individual->isPendingDeletion() ? 'wt-old' : ($individual->isPendingAddition() ? 'wt-new' : '') ?>">
+            <tr class="<?= $individual->isPendingAddition() ? 'wt-new' : '' ?> <?= $individual->isPendingDeletion() ? 'wt-old' : '' ?>">
                 <td class="maj-cell-sosa"><?= I18N::number($missing->sosa()) ?></td>
 
-                <td colspan="2" data-sort="<?= e(str_replace([',', '@P.N.', '@N.N.'], 'AAAA', implode(',', array_reverse(explode(',', $individual->sortName()))))) ?>">
+                <td colspan="2" data-sort="<?= e(str_replace([',', Individual::PRAENOMEN_NESCIO, Individual::NOMEN_NESCIO], 'AAAA', implode(',', array_reverse(explode(',', $individual->sortName()))))) ?>">
                     <?php foreach ($individual->getAllNames() as $num => $name) : ?>
-                        <a title="<?= $name['type'] === 'NAME' ? '' : strip_tags(GedcomTag::getLabel($name['type'])) ?>" href="<?= e($individual->url()) ?>" class="<?= $num === $individual->getPrimaryName() ? 'name2' : '' ?>">
+                        <a title="<?= $name['type'] === '_MARNM' ? I18N::translate('Married name') :  '' ?>" href="<?= e($individual->url()) ?>" class="<?= $num === $individual->getPrimaryName() ? '' : 'text-muted' ?>">
                             <?= $name['full'] ?>
                         </a>
                         <?php if ($num === $individual->getPrimaryName()) : ?>
@@ -190,7 +195,7 @@ $("#<?= e($table_id) ?>")
                     <?php endforeach ?>
                 </td>
 
-                <td hidden data-sort="<?= e(str_replace([',', '@P.N.', '@N.N.'], 'AAAA', $individual->sortName())) ?>"></td>
+                <td hidden data-sort="<?= e(str_replace([',', Individual::PRAENOMEN_NESCIO, Individual::NOMEN_NESCIO], 'AAAA', $individual->sortName())) ?>"></td>
                 
                 <!--  MYARTJAUB-START -->
                 <!-- IsSourced Individual -->
@@ -223,7 +228,7 @@ $("#<?= e($table_id) ?>")
                 </td>
                 
                 <!-- Birth place -->
-                <td>
+                <td data-sort="<?= e($individual->getBirthPlace()->gedcomName()) ?>">
                     <?php $known_birth_place = false; ?>
                     <?php foreach ($individual->getAllBirthPlaces() as $birth_place) : ?>
                         <?= $birth_place->shortName(true) ?>
@@ -267,7 +272,7 @@ $("#<?= e($table_id) ?>")
 
         <tfoot>
             <tr>
-                <th class="maj-th-background" colspan="<?= columnIndex(9, $column_indexes) ?>">
+                <th class="maj-th-background" colspan="<?= columnIndex(10, $column_indexes) ?>">
                     <div class="text-center">
                         <?= I18N::translate('Number of different missing ancestors: %s', I18N::number($nb_missing_diff)) ?>
                         <?= $nb_missing_hidden > 0 ? ' [' . I18N::translate('%s hidden', I18N::number($nb_missing_hidden)) . ']' : '' ?>

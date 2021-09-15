@@ -54,7 +54,7 @@ library.add(faScroll);
           remote: {
             url: this.dataset.autocompleteCertifUrl,
             replace: function (url, uriEncodedQuery) {
-              const element = that.closest('.form-group').querySelector('select');
+              const element = that.closest('form > .row').querySelector('select');
               const extra = element.options[element.selectedIndex].value;
               const symbol = (url.indexOf('?') > 0) ? '&' : '?';
               return url.replace(/(%7B|{)query(%7D|})/, uriEncodedQuery) + symbol + 'cityobf=' + encodeURIComponent(extra);

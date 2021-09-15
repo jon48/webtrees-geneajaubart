@@ -29,7 +29,7 @@ $max_gen_system = app(SosaRecordsService::class)->maxSystemGenerations();
 <div class="wt-page-content wt-page-content-maj-sosa-config">
     <form name="maj-sosa-config-form" method="post" action="<?= e(route(SosaConfigAction::class, ['tree' => $tree->name()])) ?>" class="wt-page-options hidden-print mb-4">
         <?= csrf_field() ?>
-        <div class="row form-group">
+        <div class="row">
             <label class="col-sm-3 col-form-label wt-page-options-label">
                 <?= I18N::translate('Tree') ?>
             </label>
@@ -39,72 +39,64 @@ $max_gen_system = app(SosaRecordsService::class)->maxSystemGenerations();
         </div>
         
         <!-- SOSA USER ID -->
-        <div class="form-group">
-            <div class="row">
-                <label class="col-sm-3 col-form-label wt-page-options-label" for="maj-sosa-select-userid">
-                    <?= I18N::translate('For user') ?>
-                </label>
-                <div class="col-sm-9 wt-page-options-value">
-                    <?php if (count($users_root) == 1) : ?>
-                        <?php $root_id = $users_root[0]['root_id']; ?>
-                        <?php $max_gen = $users_root[0]['max_gen']; ?>
-                        <div class="col-sm-9 wt-page-options-value">
-                            <input id="maj-sosa-input-userid" type="hidden" name="sosa-userid" value="<?php echo $users_root[0]['user']->id(); ?>" />
-                            <label><?= e($users_root[0]['user']->realName()) ?></label>
-                        </div>
-                    <?php elseif (count($users_root) > 1) : ?>
-                        <?php $root_id = $users_root[0]['root_id']; ?>
-                        <?php $max_gen = $users_root[0]['max_gen']; ?>
-                        <select id="maj-sosa-select-userid" name="sosa-userid" class="form-control">
-                            <?php foreach ($users_root as $i => $user_root) : ?>
-                                <?php if ($user_root['user']->id() == $selected_user_id) {
-                                    $root_id = $user_root['root_id'];
-                                    $max_gen = $user_root['max_gen'];
-                                    $selected = true;
-                                } else {
-                                    $selected = $i == 0;
-                                }?>
-                                <option value="<?= $user_root['user']->id() ?>" <?= $selected ? 'selected' : '' ?>>
-                                    <?= e($user_root['user']->realName()) ?>
-                                </option>   
-                            <?php endforeach; ?>
-                        </select>
-                    <?php endif; ?>
-                </div>
+        <div class="row">
+            <label class="col-sm-3 col-form-label wt-page-options-label" for="maj-sosa-select-userid">
+                <?= I18N::translate('For user') ?>
+            </label>
+            <div class="col-sm-9 wt-page-options-value">
+                <?php if (count($users_root) == 1) : ?>
+                    <?php $root_id = $users_root[0]['root_id']; ?>
+                    <?php $max_gen = $users_root[0]['max_gen']; ?>
+                    <div class="col-sm-9 wt-page-options-value">
+                        <input id="maj-sosa-input-userid" type="hidden" name="sosa-userid" value="<?php echo $users_root[0]['user']->id(); ?>" />
+                        <label><?= e($users_root[0]['user']->realName()) ?></label>
+                    </div>
+                <?php elseif (count($users_root) > 1) : ?>
+                    <?php $root_id = $users_root[0]['root_id']; ?>
+                    <?php $max_gen = $users_root[0]['max_gen']; ?>
+                    <select id="maj-sosa-select-userid" name="sosa-userid" class="form-select">
+                        <?php foreach ($users_root as $i => $user_root) : ?>
+                            <?php if ($user_root['user']->id() == $selected_user_id) {
+                                $root_id = $user_root['root_id'];
+                                $max_gen = $user_root['max_gen'];
+                                $selected = true;
+                            } else {
+                                $selected = $i == 0;
+                            }?>
+                            <option value="<?= $user_root['user']->id() ?>" <?= $selected ? 'selected' : '' ?>>
+                                <?= e($user_root['user']->realName()) ?>
+                            </option>   
+                        <?php endforeach; ?>
+                    </select>
+                <?php endif; ?>
             </div>
         </div>
         
         <!-- SOSA ROOT ID -->
-        <div class="form-group">
-            <div class="row">
-                <label class="col-sm-3 col-form-label wt-page-options-label" for="maj-sosa-input-rootid">
-                    <?= I18N::translate('Root individual') ?>
-                </label>
-                <div class="col-sm-9 wt-page-options-value">
-                    <?= view('components/select-individual', ['id' => 'maj-sosa-input-rootid', 'name' => 'sosa-rootid', 'individual' => Registry::individualFactory()->make($root_id, $tree), 'tree' => $tree]) ?>
-                </div>
+        <div class="row">
+            <label class="col-sm-3 col-form-label wt-page-options-label" for="maj-sosa-input-rootid">
+                <?= I18N::translate('Root individual') ?>
+            </label>
+            <div class="col-sm-9 wt-page-options-value">
+                <?= view('components/select-individual', ['id' => 'maj-sosa-input-rootid', 'name' => 'sosa-rootid', 'individual' => Registry::individualFactory()->make($root_id, $tree), 'tree' => $tree]) ?>
             </div>
         </div>
         
         <!-- SOSA MAX GEN -->
-        <div class="form-group">
-            <div class="row">
-                <label class="col-sm-3 col-form-label wt-page-options-label" for="maj-sosa-input-maxgen">
-                    <?= I18N::translate('Number of generations to compute') ?>
-                </label>
-                <div class="col-sm-9 wt-page-options-value">
-                    <div class="input-group" id="maj-sosa-inputgroup-maxgen">
-                        <input class="form-control form-range mx-3" type="range" id="maj-sosa-input-maxgen" name="sosa-maxgen"
-                                min="2" max="<?= $max_gen_system ?>" value="<?= $max_gen ?>" dir="auto">
-                        <div class="input-group-append">
-                            <output class="input-group-text" for="maj-sosa-input-maxgen"><?= $max_gen ?></output>
-                        </div>
-                    </div>
+        <div class="row">
+            <label class="col-sm-3 col-form-label wt-page-options-label" for="maj-sosa-input-maxgen">
+                <?= I18N::translate('Number of generations to compute') ?>
+            </label>
+            <div class="col-sm-9 wt-page-options-value">
+                <div class="input-group" id="maj-sosa-inputgroup-maxgen">
+                    <input class="form-control form-range mx-3" type="range" id="maj-sosa-input-maxgen" name="sosa-maxgen"
+                            min="2" max="<?= $max_gen_system ?>" value="<?= $max_gen ?>" dir="auto">
+                    <output class="input-group-text" for="maj-sosa-input-maxgen"><?= $max_gen ?></output>
                 </div>
             </div>
         </div>
         
-        <div class="row form-group">
+        <div class="row">
             <label class="col-sm-3 col-form-label wt-page-options-label"></label>
             <div class="col-sm-9 wt-page-options-value">
                 <button type="submit" class="btn btn-primary">
@@ -163,7 +155,7 @@ $('#maj-sosa-select-userid').change(function() {
 });
 
 $('#maj-sosa-input-maxgen').on("input", function() {
-    $('#maj-sosa-input-maxgen + .input-group-append output').val(this.value);
+    $('#maj-sosa-input-maxgen + output').val(this.value);
 }).trigger("change");
 
 </script>

@@ -43,7 +43,7 @@ $has_families = $linked_families->count() > 0;
         <ul class="nav nav-tabs" role="tablist">
             <?php if ($has_individuals) : ?>
             <li class="nav-item" role="presentation">
-                <a class="nav-link active" data-toggle="tab" role="tab" href="#maj-certificate-linked-indi">
+                <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#maj-certificate-linked-indi">
                     <?= I18N::translate('Individuals'); ?>
                 </a>
             </li>
@@ -51,7 +51,7 @@ $has_families = $linked_families->count() > 0;
             
             <?php if ($has_families) : ?>
             <li class="nav-item" role="presentation">
-                <a class="nav-link <?= $has_individuals ? '' : 'active' ?>" data-toggle="tab" role="tab" href="#maj-certificate-linked-fam">
+                <a class="nav-link <?= $has_individuals ? '' : 'active' ?>" data-bs-toggle="tab" role="tab" href="#maj-certificate-linked-fam">
                     <?= I18N::translate('Families'); ?>
                 </a>
             </li>

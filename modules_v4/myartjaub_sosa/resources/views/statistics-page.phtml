@@ -61,7 +61,7 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\PedigreeCollapseData;
         $('.maj-sosa-pedicollapse-globalvalue').text(data[0].pedi_collapse);
         var cells = data[0].cells;
         $('.maj-sosa-pedicollapse-cell').each(function() {
-            var gen = $(this).data('sosa-gen');
+            var gen = this.dataset.majSosaGen;
             $(this).replaceWith(cells.hasOwnProperty(gen) ? cells[gen] : '&hellip;');
         });
         

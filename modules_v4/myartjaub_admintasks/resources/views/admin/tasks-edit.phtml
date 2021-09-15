@@ -32,20 +32,18 @@ use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
     <h3><?= e(I18N::translate('General')) ?></h3>
     
     <!-- FREQUENCY -->
-    <div class="row form-group">
+    <div class="row">
         <label class="col-sm-3 col-form-label" for="frequency">
             <?= e(I18N::translate('Frequency')) ?>
         </label>
         <div class="col-sm-9">
             <div class="input-group">
                 <input class="form-control" type="number" min="0" id="frequency" name="frequency" required maxlength="70" value="<?= e($task_schedule->frequency()->totalMinutes); ?>" dir="auto">
-                <div class="input-group-append">
-                    <span class="input-group-text" dir="auto">
-                        <?= e(I18N::translate('minutes')) ?>
-                    </span>
-                </div>
+                <span class="input-group-text" dir="auto">
+                    <?= e(I18N::translate('minutes')) ?>
+                </span>
             </div>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= e(I18N::translate('Frequency at which the task should be run (in minutes).')) ?>
                 <?= e(I18N::translate('The actual run of the task may not be fired exactly at the frequency defined, but should be run as close as possible to it.')) ?>
             </p>
@@ -53,33 +51,31 @@ use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
     </div>
             
     <!-- LIMITED OCCURRENCES -->
-    <div class="row form-group">
+    <div class="row">
         <label class="col-sm-3 col-form-label" for="is_limited">
             <?= e(I18N::translate('Run a limited number of times')) ?>
         </label>
         <div class="col-sm-9">
             <?= view('components/radios-inline', ['name' => 'is_limited', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => $task_schedule->remainingOccurences() > 0 ? 1 : 0]) ?>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= e(I18N::translate('Defines whether the task should be run only a limited number of times.')) ?>
             </p>
         </div>
     </div>
             
     <!-- NB_OCCURRENCES -->
-    <div id="nb_occurences" class="row form-group">
+    <div id="nb_occurences" class="row">
         <label class="col-sm-3 col-form-label" for="nb_occur">
             <?= e(I18N::translate('Number of occurrences')) ?>
         </label>
         <div class="col-sm-9">
             <div class="input-group" >
                 <input class="form-control" type="number" min="0" id="nb_occur" name="nb_occur" maxlength="70" value="<?= e($task_schedule->remainingOccurences()) ?>" dir="auto">
-                <span class="input-group-append">
-                    <span class="input-group-text" dir="auto">
-                        <?= e(I18N::translate('time(s)')) ?>
-                    </span>
+                <span class="input-group-text" dir="auto">
+                    <?= e(I18N::translate('time(s)')) ?>
                 </span>
             </div>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= e(I18N::translate('Defines the number of times the task will run.')) ?>
             </p>
         </div>
@@ -91,7 +87,7 @@ use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
         <?= $task_config_view ?>
     <?php endif; ?>
 
-    <div class="row form-group">
+    <div class="row">
         <div class="offset-sm-3 col-sm-9">
             <button type="submit" class="btn btn-primary">
                 <?= e(I18N::translate('save')) ?>

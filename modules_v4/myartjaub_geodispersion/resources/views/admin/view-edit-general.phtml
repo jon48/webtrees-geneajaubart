@@ -12,7 +12,7 @@ use Fisharebest\Webtrees\I18N;
 
     
 <!--  VIEW_DESCRIPTION -->
-<div class="row form-group">
+<div class="row">
     <label class="col-sm-3 col-form-label" for="view_description">
         <?= I18N::translate('Description') ?>
     </label>
@@ -26,45 +26,45 @@ use Fisharebest\Webtrees\I18N;
             value="<?= e($view === null ? '' : $view->description()) ?>" 
             maxlength="248"
         >
-        <p class="small text-muted">
+        <p class="form-text">
             <?= I18N::translate('Description to be given to the geographical dispersion analysis view. It will be used as the page title for it.') ?>
         </p>
     </div>
 </div>
 
 <!--  VIEW_ANALYSIS -->
-<div class="row form-group">
+<div class="row">
     <label class="col-sm-3 col-form-label" for="view_analysis">
         <?= I18N::translate('Analysis') ?>
     </label>
     <div class="col-sm-9">
-        <select class="form-control select2" id="view_analysis" name="view_analysis">
+        <select class="form-select select2" id="view_analysis" name="view_analysis">
         <?php foreach ($geoanalysis_list as $geoanalysis) : ?>
             <option value="<?= e(get_class($geoanalysis)) ?>" <?= $view !== null && $geoanalysis == $view->analysis()  ? 'selected' : '' ?>>
                 <?= $geoanalysis->title() ?>
             </option>
         <?php endforeach;?>
         </select>
-        <p class="small text-muted">
+        <p class="form-text">
             <?= I18N::translate('The geographical dispersion analysis to be used for this view.') ?>
         </p>
     </div>
 </div>
 
 <!--  VIEW_DEPTH -->
-<div class="row form-group">
+<div class="row">
     <label class="col-sm-3 col-form-label" for="view_depth">
         <?= I18N::translate('Place level to analyze') ?>
     </label>
     <div class="col-sm-9">
-        <select class="form-control" id="view_depth" name="view_depth">
+        <select class="form-select" id="view_depth" name="view_depth">
             <?php foreach ($place_example as $level => $place_part) : ?>
             <option value="<?= e($level + 1) ?>" <?= $view !== null && $level + 1 === $view->placesDepth() ? 'selected' : '' ?>>
                 <?= I18N::number($level + 1) ?> (<?= I18N::translate('%s, for instance', $place_part) ?>)
             </option>
             <?php endforeach;?>
         </select>
-        <p class="small text-muted">
+        <p class="form-text">
             <?= I18N::translate('The depth level within the place hierarchy to be used by the analysis, 1 being the top level.') ?>
         </p>
     </div>

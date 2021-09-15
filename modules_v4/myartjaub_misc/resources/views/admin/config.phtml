@@ -21,7 +21,7 @@ use Fisharebest\Webtrees\Module\ModuleInterface;
     <h3><?= I18N::translate('Titles') ?></h3>
 
     <!--  MAJ_TITLE_PREFIX -->
-    <div class="row form-group">
+    <div class="row">
         <label class="col-sm-3 col-form-label" for="MAJ_TITLE_PREFIX">
             <?= I18N::translate('Title prefixes') ?>
         </label>
@@ -33,12 +33,12 @@ use Fisharebest\Webtrees\Module\ModuleInterface;
                 maxlength="255"
                 name="MAJ_TITLE_PREFIX"
                 type="text"
-                placeholder="de |d'|du |of |von |vom |am |zur |van |del |della |t'|da |ten |ter |das |dos |af "
+                placeholder="de |des |d'|du |of |von |vom |am |zur |van |del |della |t'|da |ten |ter |das |dos |af "
                 value="<?= e($module->getPreference('MAJ_TITLE_PREFIX')) ?>"
             >
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('Set possible aristocratic particles to separate titles from the land they refer to (e.g. Earl <strong>of</strong> Essex). Variants must be separated by the character |.') ?>
-                <?= I18N::translate('An example for this setting is : <strong>de |d\'|du |of |von |vom |am |zur |van |del |della |t\'|da |ten |ter |das |dos |af </strong> (covering some of French, English, German, Dutch, Italian, Spanish, Portuguese, Swedish common particles).') ?>
+                <?= I18N::translate('An example for this setting is : <strong>de |des |d\'|du |of |von |vom |am |zur |van |del |della |t\'|da |ten |ter |das |dos |af </strong> (covering some of French, English, German, Dutch, Italian, Spanish, Portuguese, Swedish common particles).') ?>
             </p>
         </div>
     </div>
@@ -46,22 +46,20 @@ use Fisharebest\Webtrees\Module\ModuleInterface;
     <h3><?= I18N::translate('Privacy') ?></h3>
     
     <!-- MAJ_DISPLAY_CNIL -->
-    <fieldset class="form-group">
-        <div class="row">
-            <legend class="col-form-label col-sm-3">
-                <?= I18N::translate('Display French <em>CNIL</em> disclaimer') ?>
-            </legend>
-            <div class="col-sm-9">
-                <?= view('components/radios-inline', ['name' => 'MAJ_DISPLAY_CNIL', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => (int) $module->getPreference('MAJ_DISPLAY_CNIL')]) ?>
-                <p class="small text-muted">
-                    <?= I18N::translate('Enable this option to display an information disclaimer required by the French <em>CNIL</em> for detaining personal information on users.') ?>
-                </p>
-            </div>
+    <fieldset class="row">
+        <legend class="col-form-label col-sm-3">
+            <?= I18N::translate('Display French <em>CNIL</em> disclaimer') ?>
+        </legend>
+        <div class="col-sm-9">
+            <?= view('components/radios-inline', ['name' => 'MAJ_DISPLAY_CNIL', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => (int) $module->getPreference('MAJ_DISPLAY_CNIL')]) ?>
+            <p class="form-text">
+                <?= I18N::translate('Enable this option to display an information disclaimer required by the French <em>CNIL</em> for detaining personal information on users.') ?>
+            </p>
         </div>
     </fieldset>
 
     <!--  MAJ_CNIL_REFERENCE -->
-    <div class="row form-group">
+    <div class="row">
         <label class="col-sm-3 col-form-label" for="MAJ_CNIL_REFERENCE">
             <?= I18N::translate('<em>CNIL</em> reference') ?>
         </label>
@@ -75,13 +73,13 @@ use Fisharebest\Webtrees\Module\ModuleInterface;
                 type="text"
                 value="<?= e($module->getPreference('MAJ_CNIL_REFERENCE')) ?>"
             >
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('If the website has been notified to the French <em>CNIL</em>, an authorisation number may have been delivered. Providing this reference will display a message on the privacy policy page.') ?>
             </p>
         </div>
     </div>
     
-    <div class="row form-group">
+    <div class="row">
         <div class="offset-sm-3 col-sm-9">
             <button type="submit" class="btn btn-primary">
                 <?= view('icons/save') ?>

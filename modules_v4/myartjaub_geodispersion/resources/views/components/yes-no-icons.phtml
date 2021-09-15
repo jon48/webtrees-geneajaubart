@@ -10,7 +10,7 @@ use Fisharebest\Webtrees\I18N;
 ?>
 
 <?php if ($yes) : ?>
-    <i class="fa fa-check"></i><span class="sr-only"><?= isset($text_yes) ? e($text_yes) : e(I18N::translate('Yes')) ?></span>
+    <i class="fa fa-check"></i><span class="visually-hidden"><?= isset($text_yes) ? e($text_yes) : e(I18N::translate('Yes')) ?></span>
 <?php else : ?>
-    <i class="fa fa-times"></i><span class="sr-only"><?= isset($text_no) ? e($text_no) : e(I18N::translate('No')) ?></span>
+    <i class="fa fa-times"></i><span class="visually-hidden"><?= isset($text_no) ? e($text_no) : e(I18N::translate('No')) ?></span>
 <?php endif ?>

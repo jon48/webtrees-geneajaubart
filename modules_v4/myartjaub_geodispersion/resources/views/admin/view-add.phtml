@@ -43,17 +43,17 @@ uasort($view_types, I18N::comparator());
     <h3><?= e(I18N::translate('General')) ?></h3>
     
     <!--  VIEW_TYPE -->
-    <div class="row form-group">
+    <div class="row">
         <label class="col-sm-3 col-form-label" for="view_type">
             <?= I18N::translate('Type') ?>
         </label>
         <div class="col-sm-9">
-            <select class="form-control select2" id="view_type" name="view_type">
+            <select class="form-select select2" id="view_type" name="view_type">
             <?php foreach ($view_types as $type_key => $type_name) : ?>
                 <option value="<?= e($type_key) ?>"><?= $type_name ?></option>
             <?php endforeach;?>
             </select>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('The type of geographical dispersion analysis view to be added.') ?>
             </p>
         </div>
@@ -61,7 +61,7 @@ uasort($view_types, I18N::comparator());
     
     <?= view($module->name() . '::admin/view-edit-general', ['view' => null, 'geoanalysis_list' => $geoanalysis_list, 'place_example' => $place_example]) ?>
     
-    <div class="row form-group">
+    <div class="row">
         <div class="offset-sm-3 col-sm-9">
             <button type="submit" class="btn btn-primary">
                 <?= e(I18N::translate('save')) ?>

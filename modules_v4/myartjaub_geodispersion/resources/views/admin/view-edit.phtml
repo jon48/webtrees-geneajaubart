@@ -50,12 +50,12 @@ use MyArtJaub\Webtrees\Module\GeoDispersion\Views\AbstractGeoAnalysisView;
     <h3><?= e(I18N::translate('Detailed view')) ?></h3>
 
     <!--  VIEW_TOP_PLACES -->
-    <div class="row form-group">
+    <div class="row">
         <label class="col-sm-3 col-form-label" for="view_top_places">
             <?= I18N::translate('Top places to display') ?>
         </label>
         <div class="col-sm-9">
-            <select class="form-control" id="view_top_places" name="view_top_places">
+            <select class="form-select" id="view_top_places" name="view_top_places">
                 <option value="0" <?= 0 === $view->numberTopPlaces() ? 'selected' : '' ?>><?= I18N::translate('All') ?></option>
                 <?php for ($level = 1; $level <= 10; $level++) : ?>
                 <option value="<?= e($level) ?>" <?= $level === $view->numberTopPlaces() ? 'selected' : '' ?>>
@@ -63,13 +63,13 @@ use MyArtJaub\Webtrees\Module\GeoDispersion\Views\AbstractGeoAnalysisView;
                 </option>
                 <?php endfor;?>
             </select>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('The number of places to display in the detailed view, by descending count.') ?>
             </p>
         </div>
     </div>
 
-    <div class="row form-group">
+    <div class="row">
         <div class="offset-sm-3 col-sm-9">
             <button type="submit" class="btn btn-primary">
                 <?= e(I18N::translate('save')) ?>

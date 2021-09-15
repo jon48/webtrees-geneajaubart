@@ -13,70 +13,62 @@ use Fisharebest\Webtrees\View;
 ?>
 
 <!-- MATOMO_ENABLED -->
-<fieldset class="form-group">
-    <div class="row">
-        <legend class="col-form-label col-sm-3">
-            <?= I18N::translate('Enable Matomo Statistics') ?>
-        </legend>
-        <div class="col-sm-9">
-            <?= view('components/radios-inline', ['name' => 'matomo_enabled', 'options' => [ 'yes' => I18N::translate('Yes'), 'no' => I18N::translate('No') ],  'selected' => $matomo_enabled ? 'yes' : 'no']) ?>
-        </div>
+<div class="row form-group">
+    <label class="col-sm-3 col-form-label" for="matomo_enabled">
+        <?= I18N::translate('Enable Matomo Statistics') ?>
+    </label>
+    <div class="col-sm-9">
+        <?= view('components/radios-inline', ['name' => 'matomo_enabled', 'options' => [ 'yes' => I18N::translate('yes'), 'no' => I18N::translate('no') ],  'selected' => $matomo_enabled ? 'yes' : 'no']) ?>
     </div>
-</fieldset>
+</div>
 
 <div id="matomo_config" class="d-none">
 
     <!-- MATOMO_URL -->
-    <fieldset class="form-group">
-        <div class="row">
-            <legend class="col-form-label col-sm-3">
-                <?= I18N::translate('Matomo URL') ?>
-            </legend>
-            <div class="col-sm-9">
-                <input
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="matomo_url">
+            <?= I18N::translate('Matomo URL') ?>
+        </label>
+        <div class="col-sm-9">
+            <input
                 class="form-control"
                 name="matomo_url"
                 type="url"
                 value="<?= e($matomo_url) ?>"
-                >
-            </div>
+            >
         </div>
-    </fieldset>
+    </div>
     
     <!-- MATOMO_TOKEN -->
-    <fieldset class="form-group">
-        <div class="row">
-            <legend class="col-form-label col-sm-3">
-                <?= I18N::translate('Matomo Token') ?>
-            </legend>
-            <div class="col-sm-9">
-                <input
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="matomo_token">
+            <?= I18N::translate('Matomo Token') ?>
+        </label>
+        <div class="col-sm-9">
+            <input
                 class="form-control"
                 name="matomo_token"
                 type="text"
                 value="<?= e($matomo_token) ?>"
-                >
-            </div>
+            >
         </div>
-    </fieldset>
+    </div>
     
     <!-- MATOMO_SITE_ID -->
-    <fieldset class="form-group">
-        <div class="row">
-            <legend class="col-form-label col-sm-3">
-                <?= I18N::translate('Matomo Site ID') ?>
-            </legend>
-            <div class="col-sm-2">
-                <input
+    <div class="row form-group">
+        <label class="col-sm-3 col-form-label" for="matomo_siteid">
+            <?= I18N::translate('Matomo Site ID') ?>
+        </label>
+        <div class="col-sm-2">
+            <input
                 class="form-control"
                 name="matomo_siteid"
                 min="1"
                 type="number"
                 value="<?= e($matomo_siteid) ?>"
-                >
-            </div>
+            >
         </div>
-    </fieldset>
+    </div>
 </div>
 
 <?php View::push('javascript') ?>

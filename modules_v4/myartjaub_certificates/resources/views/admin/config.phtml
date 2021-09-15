@@ -37,17 +37,15 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
     <h3><?= I18N::translate('General') ?></h3>
 
     <!--  MAJ_CERTIF_ROOTDIR -->
-    <div class="row form-group">
+    <div class="row">
         <label class="col-sm-3 col-form-label" for="MAJ_CERTIF_ROOTDIR">
             <?= I18N::translate('Certificates directory') ?>
         </label>
         <div class="col-sm-9">
             <div class="input-group" dir="ltr">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" dir="ltr">
-                        <?= e($data_folder) ?>
-                    </span>
-                </div>
+                <span class="input-group-text" dir="ltr">
+                    <?= e($data_folder) ?>
+                </span>
                 <input
                     class="form-control"
                     dir="ltr"
@@ -59,7 +57,7 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
                     required
                 >
             </div>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('This folder will be used to store the certificate files.') ?>
                 <?= I18N::translate('If you select a different folder, you must also move any certificate files from the existing folder to the new one.') ?>
             </p>
@@ -67,9 +65,9 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
     </div>
     
     <!-- MAJ_CERTIF_SHOW_CERT -->
-    <div class="row form-group">
+    <div class="row">
         <div class="col-form-label col-sm-3">
-            <label for="MAJ_CERTIF_SHOW_CERT">
+            <label for="MAJ_CERTIF_SHOW_CERT" class="form-label">
                 <?= I18N::translate('Show certificates') ?>
             </label>
             <div class="hidden-xs">
@@ -80,7 +78,7 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
         </div>
         <div class="col-sm-9">
             <?= view('components/select', ['name' => 'MAJ_CERTIF_SHOW_CERT', 'selected' => $tree->getPreference('MAJ_CERTIF_SHOW_CERT', Auth::PRIV_HIDE), 'options' => Auth::accessLevelNames()]) ?>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('Define access level required to display certificates in facts sources. By default, nobody can see the certificates.') ?>
             </p>
         </div>
@@ -89,9 +87,9 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
     <h3><?= I18N::translate('Watermarks') ?></h3>
     
     <!-- MAJ_CERTIF_SHOW_NO_WATERMARK -->
-    <div class="row form-group">
+    <div class="row">
         <div class="col-form-label col-sm-3">
-            <label for="MAJ_CERTIF_SHOW_NO_WATERMARK">
+            <label for="MAJ_CERTIF_SHOW_NO_WATERMARK" class="form-label">
             <?= I18N::translate('Show certificates without watermark') ?>
             </label>
             <div class="hidden-xs">
@@ -102,17 +100,17 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
         </div>
         <div class="col-sm-9">
             <?= view('components/select', ['name' => 'MAJ_CERTIF_SHOW_NO_WATERMARK', 'selected' => $tree->getPreference('MAJ_CERTIF_SHOW_NO_WATERMARK', Auth::PRIV_HIDE), 'options' => Auth::accessLevelNames()]) ?>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('Define access level of users who can see certificates without any watermark. By default, everybody will see the watermark.') ?>
             </p>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('When displayed, the watermark is generated from the name of the repository and of the sources, if they exist. Otherwise, a default text is displayed.') ?>
             </p>
         </div>
     </div>
     
     <!--  MAJ_CERTIF_WM_DEFAULT -->
-    <div class="row form-group">
+    <div class="row">
         <label class="col-sm-3 col-form-label" for="MAJ_CERTIF_WM_DEFAULT">
             <?= I18N::translate('Default watermark') ?>
         </label>
@@ -127,14 +125,14 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
                 maxlength="255" 
                 placeholder="<?= I18N::translate('This image is protected under copyright law.')?>"
             >
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('Text to be displayed by default if no source has been associated with the certificate.') ?>
             </p>
         </div>
     </div>
     
     <!--  MAJ_CERTIF_WM_FONT_COLOR -->
-    <div class="row form-group">            
+    <div class="row">            
         <label class="col-sm-3 col-form-label" for="MAJ_CERTIF_WM_FONT_COLOR">
             <?= I18N::translate('Watermark font color') ?>
         </label>
@@ -142,14 +140,12 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
             <div class="row">
                 <div class="col-sm-3">
                     <div class="input-group" dir="ltr">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" dir="ltr">
-                            <?= I18N::translate('Color') ?>
-                            </span>
-                        </div>
+                        <span class="input-group-text" dir="ltr">
+                        <?= I18N::translate('Color') ?>
+                        </span>
                         <input
                             type="color" 
-                            class="form-control" 
+                            class="form-control form-control-color" 
                             dir="ltr" 
                             id="MAJ_CERTIF_WM_FONT_COLOR" 
                             name="MAJ_CERTIF_WM_FONT_COLOR" 
@@ -158,14 +154,13 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
                     </div>
                 </div>
             </div>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('Font color for the watermark. By default, <span style="color:%1$s;">the color %1$s</span> is used.', Watermark::DEFAULT_COLOR) ?>
             </p>
         </div>
     </div>
     
-    
-    <div class="row form-group">
+    <div class="row">
         <label class="col-sm-3 col-form-label" for="MAJ_CERTIF_WM_FONT_MAXSIZE">
             <?= I18N::translate('Watermark font size') ?>
         </label>
@@ -174,11 +169,9 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
                 <!--  MAJ_CERTIF_WM_FONT_MAXSIZE -->
                 <div class="col-sm-5">
                     <div class="input-group" dir="ltr">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" dir="ltr">
-                            <?= I18N::translate('Maximum font size') ?>
-                            </span>
-                        </div>
+                        <span class="input-group-text" dir="ltr">
+                        <?= I18N::translate('Maximum font size') ?>
+                        </span>
                         <input
                             type="number"
                             class="form-control"
@@ -190,21 +183,19 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
                             min="1" max="99"
                             placeholder="<?= Watermark::DEFAULT_SIZE ?>"
                         >
-                        <span class="input-group-append">
-                            <span class="input-group-text" dir="ltr">
-                            <?= I18N::translate('pixels') ?>
-                            </span>
+                        <span class="input-group-text" dir="ltr">
+                        <?= I18N::translate('pixels') ?>
                         </span>
                     </div>
                 </div>
             </div>              
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('Watermark font size') ?>
             </p>
         </div>
     </div>
     
-    <div class="row form-group">
+    <div class="row">
         <div class="offset-sm-3 col-sm-9">
             <button type="submit" class="btn btn-primary">
                 <i class="fa fa-check"></i>
@@ -227,13 +218,13 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
      * @param access true or false
      */
     function setPrivacyFeedback(sel, who, access) {
-        var formGroup = $(sel).closest(".form-group");
+        var formGroup = $(sel).closest("form > .row");
 
         if (access) {
-            $("." + who, formGroup).addClass("badge-success").removeClass("badge-secondary");
+            $("." + who, formGroup).addClass("bg-success").removeClass("bg-secondary");
             $("." + who + " i", formGroup).addClass("fa-check").removeClass("fa-times");
         } else {
-            $("." + who, formGroup).addClass("badge-secondary").removeClass("badge-success");
+            $("." + who, formGroup).addClass("bg-secondary").removeClass("bg-success");
             $("." + who + " i", formGroup).addClass("fa-times").removeClass("fa-check");
         }
     }

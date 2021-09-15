@@ -34,13 +34,13 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\AncestorsListIndividual;
     <div id="maj-ancestors-tabs" class="maj-content-tabs maj-sosa-tabs-ancestors">
         <ul class="nav nav-tabs flex-wrap" role="tablist">
             <li class="nav-item" role="presentation">
-                <a class="nav-link" data-toggle="tab" role="tab" data-href="<?= route(AncestorsListIndividual::class, ['tree' => $tree->name(), 'gen' => $current_gen])  ?>" href="#maj-sosa-ancestors-indi">
+                <a class="nav-link active" data-bs-toggle="tab" role="tab" data-wt-href="<?= route(AncestorsListIndividual::class, ['tree' => $tree->name(), 'gen' => $current_gen])  ?>" href="#maj-sosa-ancestors-indi">
                     <?= I18N::translate('Individuals'); ?>
                 </a>
             </li>
             
             <li class="nav-item" role="presentation">
-                <a class="nav-link" data-toggle="tab" role="tab" data-href="<?= route(AncestorsListFamily::class, ['tree' => $tree->name(), 'gen' => $current_gen])  ?>" href="#maj-sosa-ancestors-fam">
+                <a class="nav-link" data-bs-toggle="tab" role="tab" data-wt-href="<?= route(AncestorsListFamily::class, ['tree' => $tree->name(), 'gen' => $current_gen])  ?>" href="#maj-sosa-ancestors-fam">
                     <?= I18N::translate('Families'); ?>
                 </a>
             </li>
@@ -66,11 +66,11 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\AncestorsListIndividual;
           "use strict";
           
           // Bootstrap tabs - load content dynamically using AJAX
-          $('a[data-toggle="tab"][data-href]').each(function (i, tab) {
+          $('a[data-bs-toggle="tab"][data-wt-href]').each(function (i, tab) {
               let hash = this.hash;
               let target = $(hash + ' .maj-loading-complete:empty');
               if(target.length > 0) {
-                  fetch(this.dataset.href)
+                  fetch(this.dataset.wtHref)
                     .then(response => {
                         if(response.ok) {
                             return response.text();
@@ -100,7 +100,7 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\AncestorsListIndividual;
           tab.tab("show");
         
           // If the user selects a tab, update the URL to reflect this
-          $('#maj-ancestors-tabs a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+          $('#maj-ancestors-tabs a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             window.location.hash = "tab-" + e.target.href.substring(e.target.href.indexOf('#') + 1);
           });
         </script>

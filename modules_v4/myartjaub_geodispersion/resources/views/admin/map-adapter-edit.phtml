@@ -46,38 +46,38 @@ $maps_list = $maps_list->sortBy(fn(MapDefinitionInterface $map): string => $map-
     <?= csrf_field() ?>
     
     <!--  MAP_ADAPTER_MAP -->
-    <div class="row form-group">
+    <div class="row">
         <label class="col-sm-3 col-form-label" for="map_adapter_map">
             <?= I18N::translateContext('GEODISPERSION', 'Map') ?>
         </label>
         <div class="col-sm-9">
-            <select class="form-control select2" id="map_adapter_map" name="map_adapter_map">
+            <select class="form-select select2" id="map_adapter_map" name="map_adapter_map">
             <?php foreach ($maps_list as $map_id => $map) : ?>
                 <option value="<?= e($map_id) ?>" <?= $map_adapter !== null && $map_id === $map_adapter->map()->id()  ? 'selected' : '' ?>>
                     <?= $map->title() ?>
                 </option>
             <?php endforeach;?>
             </select>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('The map to use for the view.') ?>
             </p>
         </div>
     </div>
     
     <!--  MAP_ADAPTER_MAPPER -->
-    <div class="row form-group">
+    <div class="row">
         <label class="col-sm-3 col-form-label" for="map_adapter_mapper">
             <?= I18N::translate('Place mapper') ?>
         </label>
         <div class="col-sm-9">
-            <select class="form-control select2" id="map_adapter_mapper" name="map_adapter_mapper">
+            <select class="form-select select2" id="map_adapter_mapper" name="map_adapter_mapper">
             <?php foreach ($mappers_list as $mapper) : ?>
                 <option value="<?= e(get_class($mapper)) ?>" <?= $map_adapter !== null && $map_adapter->placeMapper() instanceof $mapper ? 'selected' : '' ?>>
                     <?= $mapper->title() ?>
                 </option>
             <?php endforeach;?>
             </select>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('The engine to use to map places in the tree to shapes on the map.') ?>
             </p>
         </div>
@@ -86,7 +86,7 @@ $maps_list = $maps_list->sortBy(fn(MapDefinitionInterface $map): string => $map-
     <h3><?= e(I18N::translate('Mapping configuration')) ?></h3>
 
     <!--  MAP_ADAPTER_PROPERTY -->
-    <div class="row form-group">
+    <div class="row">
         <label class="col-sm-3 col-form-label" for="map_adapter_property_selected">
             <?= I18N::translate('Map shape mapping property') ?>
         </label>
@@ -94,9 +94,9 @@ $maps_list = $maps_list->sortBy(fn(MapDefinitionInterface $map): string => $map-
             <?php if ($map_adapter !== null) : ?>
             <input type="hidden" value="<?= e($map_adapter->viewConfig()->mapMappingProperty()) ?>" name="map_adapter_property" />
             <?php endif; ?>
-            <select class="form-control" id="map_adapter_property_selected" name="map_adapter_property_selected">
+            <select class="form-select" id="map_adapter_property_selected" name="map_adapter_property_selected">
             </select>
-            <p class="small text-muted">
+            <p class="form-text">
                 <?= I18N::translate('The shape property to be used by the place mapper to identify places. For the best results, the property value should be unique.') ?>
             </p>
         </div>
@@ -105,7 +105,7 @@ $maps_list = $maps_list->sortBy(fn(MapDefinitionInterface $map): string => $map-
     <div id="maj-map-adapter-mapper-config">
     </div>
     
-    <div class="row form-group">
+    <div class="row">
         <div class="offset-sm-3 col-sm-9">
             <button type="submit" class="btn btn-primary">
                 <?= e(I18N::translate('save')) ?>

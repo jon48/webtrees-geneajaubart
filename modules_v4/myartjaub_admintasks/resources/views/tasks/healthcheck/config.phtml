@@ -10,13 +10,13 @@ use MyArtJaub\Webtrees\Module\AdminTasks\Tasks\HealthCheckEmailTask;
 
 ?>
 
-<div class="row form-group">
+<div class="row">
     <label class="col-sm-3 col-form-label">
         <?= e(I18N::translate('Enable healthcheck emails for')) ?>
     </label>
     <div class="col-sm-9">
     <?php foreach ($all_trees as $tree) : ?>
-        <div class="row form-group">
+        <div class="row">
             <label class="col-sm-4 col-form-label">
                 <?= $tree->title() ?>
             </label>
@@ -25,7 +25,7 @@ use MyArtJaub\Webtrees\Module\AdminTasks\Tasks\HealthCheckEmailTask;
             </div>
         </div>
     <?php endforeach; ?>
-        <p class="small text-muted">
+        <p class="form-text">
             <?= e(I18N::translate('Enable the health check emails for each of the selected trees.')) ?>
         </p>
     </div>
