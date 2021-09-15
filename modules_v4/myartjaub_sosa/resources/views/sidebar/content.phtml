@@ -28,8 +28,8 @@ $root_name = $sosa_root !== null && $sosa_root->canShowName() ? $sosa_root->full
     <li>
         <?= I18N::translate('Sosa %1$s - Generation %2$s', I18N::number($sosa), I18N::number($gen)) ?>
         <?php $sosa_equivalent = app(SosaRecordsService::class)->sosaDescendantOf($sosa, 2) ?>
-        <?php if ($sosa_equivalent == 2) : ?> - <?= I18N::translate('Father\'s side')  ?>
-        <?php elseif ($sosa_equivalent == 3) : ?> - <?= I18N::translate('Mother\'s side') ?>
+        <?php if ($sosa_equivalent == 2) : ?> - <?= I18N::translate('Father’s side')  ?>
+        <?php elseif ($sosa_equivalent == 3) : ?> - <?= I18N::translate('Mother’s side') ?>
         <?php endif; ?>
     </li>
 <?php endforeach; ?>

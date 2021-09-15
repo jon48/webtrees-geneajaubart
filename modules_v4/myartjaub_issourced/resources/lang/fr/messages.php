@@ -22,6 +22,6 @@ return array (
     '%s precisely sourced'          =>  '%s documenté(e) précisément',
     '%s sourced with a certificate' =>  '%s documenté(e) avec un acte',
     '%s sourced with exact certificate'
-                                    =>  '%s documenté(e) avec l\'acte exact',
+                                    =>  '%s documenté(e) avec l’acte exact',
 
 );

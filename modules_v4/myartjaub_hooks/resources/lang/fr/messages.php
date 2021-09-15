@@ -22,9 +22,6 @@ return array (
                                     =>  'Les préférences du Hook ont été mises à jour.',
     'The hook with name “%s” does not exist.'
                                     =>  'Le Hook avec le nom « %s » n’existe pas.',
-    'Custom simple tag editor'      =>  'Éditeur de balises personnalisées simples',
-    'Allows for the edition of simple custom tags.'
-                                    =>  'Permet l’édition des balises personnalisées simples',
     'Text extender for records’ name'
                                     =>  'Extension du nom des enregistrements',
     'Extends the full name of GEDCOM records with additional text or icons.'
@@ -59,6 +56,6 @@ return array (
                                     =>  'Étends le panneau ouvrant des noms sur la page d’un individu',
     '%s sourced'                    =>  '%s documenté(e)',
     'The attached module could not be found.'
-                                    =>  'Le module associé n\'a pas été trouvé',
+                                    =>  'Le module associé n’a pas été trouvé',
 
 );

@@ -17,7 +17,7 @@ return array (
     'Miscellaneous extensions for webtrees.'
                                     =>  'Extensions diverses pour webtrees.',
     'The attached module could not be found.'
-                                    =>  'Le module associé n\'a pas été trouvé',
+                                    =>  'Le module associé n’a pas été trouvé',
 
     //Titles
     'Titles'                        =>  'Titres',

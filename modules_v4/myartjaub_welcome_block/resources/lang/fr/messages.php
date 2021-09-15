@@ -26,14 +26,14 @@ return array (
     'No statistics could be retrieved from Matomo.'
                                     =>  'Les statistiques Matomo ne peuvent être récupérées.',
     'Error while retrieving Matomo statistics: '
-                                    =>  'Une erreur s\'est produite lors de la récupération des statistiques Matomo : ',
+                                    =>  'Une erreur s’est produite lors de la récupération des statistiques Matomo : ',
     'Log in as admin for error details'
-                                    =>  'Se connecter comme administrateur pour les détails de l\'erreur',
+                                    =>  'Se connecter comme administrateur pour les détails de l’erreur',
     '%1$s visits since the beginning of %2$s<br>(%3$s today)'
-                                    =>  '%1$s visiteurs depuis le début de l\'année %2$s<br>dont %3$s aujourd\'hui',
+                                    =>  '%1$s visiteurs depuis le début de l’année %2$s<br>dont %3$s aujourd’hui',
     'The Matomo URL provided is not valid.'
-                                    =>  'L\'adresse URL Matomo renseignée n\'est pas valide.',
+                                    =>  'L’adresse URL Matomo renseignée n’est pas valide.',
     'The Matomo Site ID provided is not valid.'
-                                    =>  'L\'ID Matomo de site renseigné n\'est pas valide.'
+                                    =>  'L’ID Matomo de site renseigné n’est pas valide.'
 
 );

@@ -23,7 +23,7 @@ use Fisharebest\Webtrees\Tree;
     </a>
     &nbsp;&nbsp;
     <?php endif; ?>
-    <?= I18N::translate('Generation %d', $current_gen) ?>
+    <?= I18N::translate('Generation %s', I18N::number($current_gen)) ?>
     <?php if ($current_gen < $max_gen) : ?>
     &nbsp;&nbsp;
     <a href="<?= route($route_name, ['tree' => $tree->name(), 'gen' => max($min_gen, $current_gen + 1)]) ?>" title="<?= e(I18N::translate('Next generation'))?>">

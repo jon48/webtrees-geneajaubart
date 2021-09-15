@@ -163,11 +163,11 @@ return array (
     'Mapping on place name with filter'
                                     =>  'Correspondance sur les noms des lieux, avec filtre',
     'The attached module could not be found.'
-                                    =>  'Le module associé n\'a pas été trouvé',
+                                    =>  'Le module associé n’a pas été trouvé',
     'There is no geographical dispersion analysis to display.'
                                     =>  'Il n’y a aucune analyse de répartition géographique à afficher.',
     'An error occurred while retrieving data.'
-                                    =>  'Une erreur s\'est produite en récupérant les données.',
+                                    =>  'Une erreur s’est produite en récupérant les données.',
     'The tab could not be loaded.'  =>  'L’onglet n’a pas pu être chargé.',
     'The map could not be loaded.'  =>  'La carte n’a pas pu être chargée.',
     '<strong title="%1$s">%2$s</strong> [%3$s - %4$s]'
