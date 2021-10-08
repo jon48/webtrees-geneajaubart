@@ -5,7 +5,7 @@ Please note that this file is an extension of the one contained in the standard
 beforehand. You can find a copy on the [Github repository](https://github.com/fisharebest/webtrees).
 
 This documentation focuses specifically on the customisations and modules 
-implemented for the [GeneaJaubart website](http://genea.jaubart.com/wt/).
+implemented for the [GeneaJaubart website](https://genea.jaubart.com/wt/).
 
 ## Contents
 
@@ -22,8 +22,8 @@ implemented for the [GeneaJaubart website](http://genea.jaubart.com/wt/).
 ### License
 
 * **webtrees-geneajaubart: webtrees for the GeneaJaubart website**
-* Copyright (C) 2009 to 2020 Jonathan Jaubart.
-* Derived from **webtrees** - Copyright (C) 2010 to 2020  webtrees development team.
+* Copyright (C) 2009 to 2021 Jonathan Jaubart.
+* Derived from **webtrees** - Copyright (C) 2010 to 2021  webtrees development team.
 * Derived from PhpGedView - Copyright (C) 2002 to 2010  PGV Development Team.
 
 This program is free software; you can redistribute it and/or modify it under the
@@ -200,9 +200,9 @@ removed). Hence, **DO NOT USE the automatic upgrade mechanism**.
 ### Contacts
 
 General questions on the standard **webtrees** software should be addressed to the
-[official forum](http://www.webtrees.net/index.php/forum)
+[official forum](https://www.webtrees.net/index.php/forum)
 
 You can contact the author (Jonathan Jaubart) of the **webtrees-geneajaubart**
-project through his personal [GeneaJaubart website](http://genea.jaubart.com/wt/) (link
+project through his personal [GeneaJaubart website](https://genea.jaubart.com/wt/) (link
 at the bottom of the page).
 

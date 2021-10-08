@@ -30,6 +30,7 @@ use Fisharebest\Webtrees\Factories\HeaderFactory;
 use Fisharebest\Webtrees\Factories\ImageFactory;
 use Fisharebest\Webtrees\Factories\IndividualFactory;
 use Fisharebest\Webtrees\Factories\LocationFactory;
+use Fisharebest\Webtrees\Factories\MarkdownFactory;
 use Fisharebest\Webtrees\Factories\MediaFactory;
 use Fisharebest\Webtrees\Factories\NoteFactory;
 use Fisharebest\Webtrees\Factories\RepositoryFactory;
@@ -43,6 +44,7 @@ use Fisharebest\Webtrees\Http\Middleware\BootModules;
 use Fisharebest\Webtrees\Http\Middleware\CheckForMaintenanceMode;
 use Fisharebest\Webtrees\Http\Middleware\ClientIp;
 use Fisharebest\Webtrees\Http\Middleware\CompressResponse;
+use Fisharebest\Webtrees\Http\Middleware\ContentLength;
 use Fisharebest\Webtrees\Http\Middleware\DoHousekeeping;
 use Fisharebest\Webtrees\Http\Middleware\EmitResponse;
 use Fisharebest\Webtrees\Http\Middleware\HandleExceptions;
@@ -132,7 +134,7 @@ class Webtrees
     public const URL_FAQ_EMAIL = 'https://webtrees.net/faq/email';
 
     // Project website.
-    public const GEDCOM_PDF = 'https://webtrees.net/downloads/gedcom-551.pdf';
+    public const GEDCOM_PDF = 'https://webtrees.net/downloads/gedcom-5-5-1.pdf';
 
     private const MIDDLEWARE = [
         EmitResponse::class,
@@ -141,6 +143,7 @@ class Webtrees
         BaseUrl::class,
         HandleExceptions::class,
         ClientIp::class,
+        ContentLength::class,
         CompressResponse::class,
         BadBotBlocker::class,
         UseDatabase::class,
@@ -185,6 +188,7 @@ class Webtrees
         Registry::imageFactory(new ImageFactory());
         Registry::individualFactory(new IndividualFactory());
         Registry::locationFactory(new LocationFactory());
+        Registry::markdownFactory(new MarkdownFactory());
         Registry::mediaFactory(new MediaFactory());
         Registry::noteFactory(new NoteFactory());
         Registry::repositoryFactory(new RepositoryFactory());

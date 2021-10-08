@@ -2,6 +2,7 @@
 
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataAdd;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataDelete;
+use Fisharebest\Webtrees\Http\RequestHandlers\MapDataDeleteUnused;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataEdit;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataExportCSV;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataExportGeoJson;
@@ -31,7 +32,7 @@ use Illuminate\Support\Collection;
 
 <p>
     <label>
-        <input id="hide-unused-locations" type="checkbox" data-toggle="collapse" data-target=".unused-location">
+        <input id="hide-unused-locations" type="checkbox" data-bs-toggle="collapse" data-bs-target=".unused-location" data-wt-persist="hide-unused-locations">
         <?= I18N::translate('Hide unused locations') ?>
     </label>
 </p>
@@ -56,16 +57,16 @@ use Illuminate\Support\Collection;
         <tr class="<?= $active[$place->key] ?? null ? '' : 'unused-location collapse show' ?>">
             <th scope="row">
                 <a href="<?= e(route(MapDataList::class, ['parent_id' => $place->id])) ?>">
-                    <span dir="auto"><?= e($place->place) ?></span>
+                    <bdi><?= e($place->place) ?></bdi>
                     <?php if ($place->no_coord > 0): ?>
-                        <span class="badge badge-pill badge-secondary">
+                        <span class="badge bg-secondary rounded-pill">
                             <?= view('icons/warning') ?>
                             <?= I18N::number($place->no_coord) ?>
                             /
                             <?= I18N::number($place->child_count) ?>
                         </span>
                     <?php elseif ($place->child_count > 0): ?>
-                        <span class="badge badge-pill badge-secondary">
+                        <span class="badge bg-secondary rounded-pill">
                             <?= I18N::number($place->child_count) ?>
                         </span>
                     <?php endif ?>
@@ -91,7 +92,7 @@ use Illuminate\Support\Collection;
             <td>
                 <a class="btn btn-primary" href="<?= e(route(MapDataEdit::class, ['place_id'  => $place->id])) ?>" title="<?= I18N::translate('Edit') ?>">
                     <?= view('icons/edit') ?>
-                    <span class="sr-only">
+                    <span class="visually-hidden">
                         <?= I18N::translate('Edit') ?>
                     </span>
                 </a>
@@ -105,7 +106,7 @@ use Illuminate\Support\Collection;
                         </a>
                     <?php else: ?>
                         <div class="dropdown">
-                            <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <?= I18N::plural('%s family tree', '%s family trees', count($active[$place->key]), I18N::number(count($active[$place->key]))) ?>
                             </a>
 
@@ -125,7 +126,7 @@ use Illuminate\Support\Collection;
                 <?php if (!array_key_exists($place->key, $active)): ?>
                     <form method="post" action="<?= e(route(MapDataDelete::class, ['place_id' => $place->id])) ?>">
                         <?= csrf_field() ?>
-                        <button type="submit" class="btn btn-danger" aria-label="<?= I18N::translate('delete') ?>" data-confirm="<?= I18N::translate('Remove this location?') ?>">
+                        <button type="submit" class="btn btn-danger" aria-label="<?= I18N::translate('delete') ?>" data-wt-confirm="<?= I18N::translate('Remove this location?') ?>">
                             <?= view('icons/delete') ?>
                         </button>
                     </form>
@@ -137,14 +138,14 @@ use Illuminate\Support\Collection;
 
     <tfoot>
         <tr>
-            <td colspan="7">
+            <td colspan="4">
                 <a class="btn btn-primary" href="<?= e(route(MapDataAdd::class, ['parent_id' => $parent_id])) ?>">
                     <?= view('icons/add') ?>
                     <?= /* I18N: A button label. */
                     I18N::translate('add place') ?>
                 </a>
                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <?= view('icons/download') ?>
                     <?= /* I18N: A button label. */
                     I18N::translate('export file') ?>
@@ -163,14 +164,18 @@ use Illuminate\Support\Collection;
                     I18N::translate('import file') ?>
                 </a>
             </td>
+            <td colspan="2">
+                <?php if (count($active) !== count($placelist)) : ?>
+                    <form class="form-inline d-inline" method="post" action="<?= route(MapDataDeleteUnused::class) ?>">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-danger">
+                            <?= view('icons/delete') ?>
+                            <?= I18N::translate('Delete unused locations') ?>
+                        </button>
+                    </form>
+                <?php endif ?>
+            </td>
         </tr>
     </tfoot>
 </table>
 
-<?php View::push('javascript') ?>
-<script>
-  'use strict';
-
-  webtrees.persistentToggle("hide-unused-locations");
-</script>
-<?php View::endpush() ?>

@@ -18,6 +18,13 @@
 
 @import "_mime-type-icons.css";
 
+:root {
+    --link-color-hover: #0a58ca;
+    --link-color: #0d6efd;
+    --link-decoration-hover: underline;
+    --link-decoration: none;
+}
+
 /* Heading sizes */
 h1 {
     font-size: 2rem;
@@ -101,15 +108,14 @@ h4 {
     background-color: #99c;
 }
 .php-info .v {
-    background-color: #ddd;
+    background-color: #fff;
     max-width: 300px;
     overflow-x: auto;
     word-break: break-all;
-}
-.php-info .v i {
-    color: #999;
 }
 .php-info img {
     float: right;
     border: 0;
 }
+
+

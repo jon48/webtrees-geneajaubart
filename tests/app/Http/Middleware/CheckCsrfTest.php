@@ -40,16 +40,16 @@ class CheckCsrfTest extends TestCase
      */
     public function testMiddleware(): void
     {
-        $handler = self::createMock(RequestHandlerInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
         $handler->method('handle')->willReturn(response());
 
         $request = self::createRequest(RequestMethodInterface::METHOD_POST)
-            ->withUri(app(UriFactoryInterface::class)->createUri('http://example.com'));
+            ->withUri(app(UriFactoryInterface::class)->createUri('https://example.com'));
 
         $middleware = new CheckCsrf();
         $response   = $middleware->process($request, $handler);
 
         self::assertSame(StatusCodeInterface::STATUS_FOUND, $response->getStatusCode());
-        self::assertSame('http://example.com', $response->getHeaderLine('Location'));
+        self::assertSame('https://example.com', $response->getHeaderLine('Location'));
     }
 }

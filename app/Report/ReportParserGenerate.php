@@ -23,19 +23,18 @@ use DomainException;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Carbon;
 use Fisharebest\Webtrees\Date;
-use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Elements\UnknownElement;
 use Fisharebest\Webtrees\Family;
-use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Functions\Functions;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomRecord;
-use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Log;
 use Fisharebest\Webtrees\MediaFile;
 use Fisharebest\Webtrees\Note;
 use Fisharebest\Webtrees\Place;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
@@ -47,6 +46,7 @@ use LogicException;
 use stdClass;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use XMLParser;
 
 use function addcslashes;
 use function addslashes;
@@ -130,17 +130,17 @@ class ReportParserGenerate extends ReportParserBase
     /** @var AbstractRenderer[] Nested repeating data */
     private $wt_report_stack = [];
 
-    /** @var resource Nested repeating data */
+    /** @var XMLParser (resource before PHP 8.0) Nested repeating data */
     private $parser;
 
-    /** @var resource[] Nested repeating data */
-    private $parser_stack = [];
+    /** @var XMLParser[] (resource[] before PHP 8.0) Nested repeating data */
+    private array $parser_stack = [];
 
     /** @var string The current GEDCOM record */
     private $gedrec = '';
 
     /** @var string[] Nested GEDCOM records */
-    private $gedrec_stack = [];
+    private array $gedrec_stack = [];
 
     /** @var ReportBaseElement The currently processed element */
     private $current_element;
@@ -161,7 +161,7 @@ class ReportParserGenerate extends ReportParserBase
     private $generation = 1;
 
     /** @var array Source data for processing lists */
-    private $list = [];
+    private array $list = [];
 
     /** @var int Number of items in lists */
     private $list_total = 0;
@@ -179,13 +179,11 @@ class ReportParserGenerate extends ReportParserBase
     private $wt_report;
 
     /** @var string[][] Variables defined in the report at run-time */
-    private $vars;
+    private array $vars;
 
-    /** @var Tree The current tree */
-    private $tree;
+    private Tree $tree;
 
-    /** @var FilesystemOperator */
-    private $data_filesystem;
+    private FilesystemOperator $data_filesystem;
 
     /**
      * Create a parser for a report
@@ -464,85 +462,52 @@ class ReportParserGenerate extends ReportParserBase
     /**
      * Handle <cell>
      *
-     * @param string[] $attrs
+     * @param array<string,string> $attrs
      *
      * @return void
      */
     protected function cellStartHandler(array $attrs): void
     {
         // string The text alignment of the text in this box.
-        $align = '';
-        if (!empty($attrs['align'])) {
-            $align = $attrs['align'];
-            // RTL supported left/right alignment
-            if ($align === 'rightrtl') {
-                if ($this->wt_report->rtl) {
-                    $align = 'left';
-                } else {
-                    $align = 'right';
-                }
-            } elseif ($align === 'leftrtl') {
-                if ($this->wt_report->rtl) {
-                    $align = 'right';
-                } else {
-                    $align = 'left';
-                }
+        $align = $attrs['align'] ?? '';
+        // RTL supported left/right alignment
+        if ($align === 'rightrtl') {
+            if ($this->wt_report->rtl) {
+                $align = 'left';
+            } else {
+                $align = 'right';
+            }
+        } elseif ($align === 'leftrtl') {
+            if ($this->wt_report->rtl) {
+                $align = 'right';
+            } else {
+                $align = 'left';
             }
         }
 
-        // string The color to fill the background of this cell
-        $bgcolor = '';
-        if (!empty($attrs['bgcolor'])) {
-            $bgcolor = $attrs['bgcolor'];
-        }
+        // The color to fill the background of this cell
+        $bgcolor = $attrs['bgcolor'] ?? '';
 
-        // int Whether or not the background should be painted
-        $fill = 1;
-        if (isset($attrs['fill'])) {
-            if ($attrs['fill'] === '0') {
-                $fill = 0;
-            } elseif ($attrs['fill'] === '1') {
-                $fill = 1;
-            }
-        }
+        // Whether the background should be painted
+        $fill = (int) ($attrs['fill'] ?? '0');
 
-        $reseth = true;
-        // boolean   if true reset the last cell height (default true)
-        if (isset($attrs['reseth'])) {
-            if ($attrs['reseth'] === '0') {
-                $reseth = false;
-            } elseif ($attrs['reseth'] === '1') {
-                $reseth = true;
-            }
-        }
+        // If true reset the last cell height
+        $reseth = (bool) ($attrs['reseth'] ?? '1');
 
-        // mixed Whether or not a border should be printed around this box
-        $border = 0;
-        if (!empty($attrs['border'])) {
-            $border = $attrs['border'];
-        }
+        // Whether a border should be printed around this box
+        $border = $attrs['border'] ?? '';
+
         // string Border color in HTML code
-        $bocolor = '';
-        if (!empty($attrs['bocolor'])) {
-            $bocolor = $attrs['bocolor'];
-        }
+        $bocolor = $attrs['bocolor'] ?? '';
 
-        // int Cell height (expressed in points) The starting height of this cell. If the text wraps the height will automatically be adjusted.
-        $height = 0;
-        if (!empty($attrs['height'])) {
-            $height = $attrs['height'];
-        }
+        // Cell height (expressed in points) The starting height of this cell. If the text wraps the height will automatically be adjusted.
+        $height = (int) ($attrs['height'] ?? '0');
+
         // int Cell width (expressed in points) Setting the width to 0 will make it the width from the current location to the right margin.
-        $width = 0;
-        if (!empty($attrs['width'])) {
-            $width = $attrs['width'];
-        }
+        $width = (int) ($attrs['width'] ?? '0');
 
-        // int Stretch carachter mode
-        $stretch = 0;
-        if (!empty($attrs['stretch'])) {
-            $stretch = (int) $attrs['stretch'];
-        }
+        // Stretch character mode
+        $stretch = (int) ($attrs['stretch'] ?? '0');
 
         // mixed Position the left corner of this box on the page. The default is the current position.
         $left = ReportBaseElement::CURRENT_POSITION;
@@ -567,17 +532,11 @@ class ReportParserGenerate extends ReportParserBase
             }
         }
 
-        // string The name of the Style that should be used to render the text.
-        $style = '';
-        if (!empty($attrs['style'])) {
-            $style = $attrs['style'];
-        }
+        // The name of the Style that should be used to render the text.
+        $style = $attrs['style'] ?? '';
 
         // string Text color in html code
-        $tcolor = '';
-        if (!empty($attrs['tcolor'])) {
-            $tcolor = $attrs['tcolor'];
-        }
+        $tcolor = $attrs['tcolor'] ?? '';
 
         // int Indicates where the current position should go after the call.
         $ln = 0;
@@ -1027,7 +986,7 @@ class ReportParserGenerate extends ReportParserBase
                 switch (end($tags)) {
                     case 'DATE':
                         $tmp   = new Date($value);
-                        $value = $tmp->display();
+                        $value = strip_tags($tmp->display());
                         break;
                     case 'PLAC':
                         $tmp   = new Place($value, $this->tree);
@@ -1046,11 +1005,14 @@ class ReportParserGenerate extends ReportParserBase
                 }
                 $tmp = explode(':', $tag);
                 if (in_array(end($tmp), ['NOTE', 'TEXT'], true)) {
-                    $value = Filter::formatText($value, $this->tree); // We'll strip HTML in addText()
+                    if ($this->tree->getPreference('FORMAT_TEXT') === 'markdown') {
+                        $value = strip_tags(Registry::markdownFactory()->markdown($this->tree)->convertToHtml($value));
+                    } else {
+                        $value = strip_tags(Registry::markdownFactory()->autolink($this->tree)->convertToHtml($value));
+                    }
                 }
 
                 if (!empty($attrs['truncate'])) {
-                    $value = strip_tags($value);
                     $value = Str::limit($value, (int) $attrs['truncate'], I18N::translate('…'));
                 }
                 $this->current_element->addText($value);
@@ -1240,18 +1202,23 @@ class ReportParserGenerate extends ReportParserBase
             $var = $this->vars[$var]['id'];
         } else {
             $tfact = $this->fact;
-            if (($this->fact === 'EVEN' || $this->fact === 'FACT') && $this->type !== ' ') {
+            if (($this->fact === 'EVEN' || $this->fact === 'FACT') && $this->type !== '') {
                 // Use :
                 // n TYPE This text if string
                 $tfact = $this->type;
+            } else {
+                foreach ([Individual::RECORD_TYPE, Family::RECORD_TYPE] as $record_type) {
+                    $element = Registry::elementFactory()->make($record_type . ':' . $this->fact);
+
+                    if (!$element instanceof UnknownElement) {
+                        $tfact = $element->label();
+                        break;
+                    }
+                }
             }
-            $var = str_replace([
-                '@fact',
-                '@desc',
-            ], [
-                GedcomTag::getLabel($tfact),
-                $this->desc,
-            ], $var);
+
+            $var = strtr($var, ['@desc' => $this->desc, '@fact' => $tfact]);
+
             if (preg_match('/^I18N::number\((.+)\)$/', $var, $match)) {
                 $var = I18N::number((int) $match[1]);
             } elseif (preg_match('/^I18N::translate\(\'(.+)\'\)$/', $var, $match)) {
@@ -1308,13 +1275,15 @@ class ReportParserGenerate extends ReportParserBase
             $this->repeats = [];
             $nonfacts      = explode(',', $tag);
             foreach ($facts as $fact) {
-                if (!in_array($fact->getTag(), $nonfacts, true)) {
+                $tag = explode(':', $fact->tag())[1];
+
+                if (!in_array($tag, $nonfacts, true)) {
                     $this->repeats[] = $fact->gedcom();
                 }
             }
         } else {
             foreach ($record->facts() as $fact) {
-                if (($fact->isPendingAddition() || $fact->isPendingDeletion()) && $fact->getTag() !== 'CHAN') {
+                if (($fact->isPendingAddition() || $fact->isPendingDeletion()) && !str_ends_with($fact->tag(), ':CHAN')) {
                     $this->repeats[] = $fact->gedcom();
                 }
             }

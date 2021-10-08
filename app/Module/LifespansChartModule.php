@@ -25,10 +25,10 @@ use Fisharebest\ExtCalendar\GregorianCalendar;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\ColorGenerator;
 use Fisharebest\Webtrees\Date;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Place;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\JoinClause;
@@ -243,8 +243,8 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
     }
 
     /**
-     * @param Tree  $tree
-     * @param array $xrefs
+     * @param Tree          $tree
+     * @param array<string> $xrefs
      *
      * @return ResponseInterface
      */
@@ -290,14 +290,18 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
     /**
      * Find the latest event year for individuals
      *
-     * @param array $individuals
+     * @param array<Individual> $individuals
      *
      * @return int
      */
     protected function maxYear(array $individuals): int
     {
         $jd = array_reduce($individuals, static function ($carry, Individual $item) {
-            return max($carry, $item->getEstimatedDeathDate()->maximumJulianDay());
+            if ($item->getEstimatedDeathDate()->isOK()) {
+                return max($carry, $item->getEstimatedDeathDate()->maximumJulianDay());
+            }
+
+            return $carry;
         }, 0);
 
         $year = $this->jdToYear($jd);
@@ -309,14 +313,18 @@ class LifespansChartModule extends AbstractModule implements ModuleChartInterfac
     /**
      * Find the earliest event year for individuals
      *
-     * @param array $individuals
+     * @param array<Individual> $individuals
      *
      * @return int
      */
     protected function minYear(array $individuals): int
     {
         $jd = array_reduce($individuals, static function ($carry, Individual $item) {
-            return min($carry, $item->getEstimatedBirthDate()->minimumJulianDay());
+            if ($item->getEstimatedBirthDate()->isOK()) {
+                return min($carry, $item->getEstimatedBirthDate()->minimumJulianDay());
+            }
+
+            return $carry;
         }, PHP_INT_MAX);
 
         return $this->jdToYear($jd);

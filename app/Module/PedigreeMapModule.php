@@ -80,8 +80,6 @@ class PedigreeMapModule extends AbstractModule implements ModuleChartInterface, 
         'Brown',
     ];
 
-    private const DEFAULT_ZOOM = 2;
-
     private ChartService $chart_service;
 
     private LeafletJsService $leaflet_js_service;
@@ -307,7 +305,6 @@ class PedigreeMapModule extends AbstractModule implements ModuleChartInterface, 
                             'relationship' => ucfirst($this->getSosaName($sosa)),
                             'sosa'         => $sosa,
                         ]),
-                        'zoom'      => self::DEFAULT_ZOOM,
                     ],
                 ];
             }

@@ -16,15 +16,15 @@
 /* The colors theme is based on the clouds theme */
 @import "clouds.css";
 
+:root {
+    --link-color: #333;
+}
+
 /* Override Bootstrap formatting */
 
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
     background-color: #eee;
     color: #000;
-}
-
-.btn-link {
-    color: #333;
 }
 
 .card-header h4 {
@@ -100,8 +100,19 @@
     color: #333;
 }
 
-.wt-header-wrapper {
-    background: #acf none;
+.wt-header-wrapper, .btn-primary {
+    background: var(--color-1);
+    border: 0;
+    color: var(--color-5);
+}
+
+.btn-primary,
+.btn-primary:focus {
+    background: var(--color-1);
+}
+
+.btn-primary:hover {
+    background: var(--color-2);
 }
 
 .wt-site-title {
@@ -126,6 +137,7 @@
 }
 
 .wt-genealogy-menu {
+    background: var(--color-2);
     /* Extend to full page width */
     flex: 0 1 100vw;
     /* Recalculate margins for content */
@@ -148,6 +160,26 @@
     width: 40px;
     height: 40px;
 }
+
+.wt-page-options-label,
+.wt-facts-table th, .wt-facts-table .dropdown-toggle,
+.descriptionbox, .descriptionbox a,
+.topbottombar, .topbottombar a,
+.list_label, .list_label a {
+    background-color: var(--color-3);
+    color: var(--color-6);
+}
+
+.wt-page-options-value,
+.wt-block-content,
+.wt-facts-table td,
+.ui-widget-header,
+.optionbox, .ui-state-active a:link,
+.list_value, .list_value_wrap, .list_value_wrap a,
+#login-form, #new_passwd_form, #register-form  {
+    background: var(--color-4);
+}
+
 
 .menu-tree .nav-link::before {
     content: url(colors/menu/tree.png);
@@ -374,15 +406,6 @@
     color: #555555;
 }
 
-/* ios on click workaround */
-a {
-    color: #333;
-}
-
-.topbottombar {
-    color: #fff;
-}
-
 .btn-primary.focus, .btn-primary:focus {
     box-shadow:none;
     border: 0;
@@ -413,10 +436,6 @@ table.center {
 
 .date {
     color: #333;
-}
-
-.selected-option {
-    background-color: #edf7fd;
 }
 
 .rtl_cal_day {

@@ -68,6 +68,24 @@ class UseDatabase implements MiddlewareInterface
             $collation = 'utf8_unicode_ci';
         }
 
+        $options = [
+            // Some drivers do this and some don't.  Make them consistent.
+            PDO::ATTR_STRINGIFY_FETCHES => true,
+        ];
+
+        $dbkey    = (string) $request->getAttribute('dbkey');
+        $dbcert   = (string) $request->getAttribute('dbcert');
+        $dbca     = (string) $request->getAttribute('dbca');
+        $dbverify = (bool) $request->getAttribute('dbverify');
+
+        // MySQL/MariaDB support encrypted connections
+        if ($dbkey !== '' && $dbcert !== '' && $dbca !== '') {
+            $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = $dbverify;
+            $options[PDO::MYSQL_ATTR_SSL_KEY]                = Webtrees::ROOT_DIR . 'data/' . $dbkey;
+            $options[PDO::MYSQL_ATTR_SSL_CERT]               = Webtrees::ROOT_DIR . 'data/' . $dbcert;
+            $options[PDO::MYSQL_ATTR_SSL_CA]                 = Webtrees::ROOT_DIR . 'data/' . $dbca;
+        }
+
         $capsule->addConnection([
             'driver'                  => $driver,
             'host'                    => $request->getAttribute('dbhost'),
@@ -77,10 +95,7 @@ class UseDatabase implements MiddlewareInterface
             'password'                => $request->getAttribute('dbpass'),
             'prefix'                  => $request->getAttribute('tblpfx'),
             'prefix_indexes'          => true,
-            'options'                 => [
-                // Some drivers do this and some don't.  Make them consistent.
-                PDO::ATTR_STRINGIFY_FETCHES => true,
-            ],
+            'options'                 => $options,
             // For MySQL
             'charset'                 => $charset,
             'collation'               => $collation,
@@ -97,15 +112,6 @@ class UseDatabase implements MiddlewareInterface
         ]);
 
         $capsule->setAsGlobal();
-
-        Builder::macro('whereContains', function ($column, string $search, string $boolean = 'and'): Builder {
-            // Assertion helps static analysis tools understand where we will be using this closure.
-            assert($this instanceof Builder);
-
-            trigger_error('Builder::whereContains() is deprecated. Use LIKE.', E_USER_DEPRECATED);
-
-            return $this->where($column, 'LIKE', '%' . addcslashes($search, '\\%_') . '%', $boolean);
-        });
 
         try {
             // Eager-load the connection, to prevent database credentials appearing in error logs.

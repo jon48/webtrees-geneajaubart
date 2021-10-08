@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Media;
 use Fisharebest\Webtrees\Mime;
@@ -159,15 +159,18 @@ class ManageMediaData implements RequestHandlerInterface
                             ->on('media.m_file', '=', 'media_file.m_file')
                             ->on('media.m_id', '=', 'media_file.m_id');
                     })
-                    ->join('gedcom_setting', 'gedcom_id', '=', 'media.m_file')
-                    ->where('setting_name', '=', 'MEDIA_DIRECTORY')
+                    ->leftJoin('gedcom_setting', static function (JoinClause $join): void {
+                        $join
+                            ->on('gedcom_setting.gedcom_id', '=', 'media.m_file')
+                            ->where('setting_name', '=', 'MEDIA_DIRECTORY');
+                    })
                     ->where('multimedia_file_refn', 'NOT LIKE', 'http://%')
                     ->where('multimedia_file_refn', 'NOT LIKE', 'https://%')
                     ->select([
                         'media.*',
                         'multimedia_file_refn',
                         'descriptive_title',
-                        'setting_value AS media_folder',
+                        new Expression("COALESCE(setting_value, 'media/') AS media_folder"),
                     ]);
 
                 $query->where(new Expression('setting_value || multimedia_file_refn'), 'LIKE', $media_folder . '%');
@@ -243,11 +246,11 @@ class ManageMediaData implements RequestHandlerInterface
                         if (str_starts_with($row[0], $media_directory)) {
                             $tmp         = substr($row[0], strlen($media_directory));
                             $create_form .=
-                                '<p><a href="#" data-toggle="modal" data-backdrop="static" data-target="#modal-create-media-from-file" data-file="' . e($tmp) . '" data-url="' . e(route(CreateMediaObjectFromFile::class, ['tree' => $media_tree])) . '" onclick="document.getElementById(\'modal-create-media-from-file-form\').action=this.dataset.url; document.getElementById(\'file\').value=this.dataset.file;">' . I18N::translate('Create') . '</a> — ' . e($media_tree) . '<p>';
+                                '<p><a href="#" data-bs-toggle="modal" data-bs-backdrop="static" data-bs-target="#modal-create-media-from-file" data-file="' . e($tmp) . '" data-url="' . e(route(CreateMediaObjectFromFile::class, ['tree' => $media_tree])) . '" onclick="document.getElementById(\'modal-create-media-from-file-form\').action=this.dataset.url; document.getElementById(\'file\').value=this.dataset.file;">' . I18N::translate('Create') . '</a> — ' . e($media_tree) . '<p>';
                         }
                     }
 
-                    $delete_link = '<p><a data-confirm="' . I18N::translate('Are you sure you want to delete “%s”?', e($row[0])) . '" data-post-url="' . e(route(DeletePath::class, [
+                    $delete_link = '<p><a data-wt-confirm="' . I18N::translate('Are you sure you want to delete “%s”?', e($row[0])) . '" data-wt-post-url="' . e(route(DeletePath::class, [
                             'path' => $row[0],
                         ])) . '" href="#">' . I18N::translate('Delete') . '</a></p>';
 

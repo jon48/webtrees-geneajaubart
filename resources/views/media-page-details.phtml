@@ -1,6 +1,7 @@
 <?php
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Functions\FunctionsPrintFacts;
 use Fisharebest\Webtrees\Http\RequestHandlers\DeleteFact;
 use Fisharebest\Webtrees\Http\RequestHandlers\EditMediaFileModal;
@@ -29,17 +30,17 @@ use League\Flysystem\FilesystemOperator;
                 <?= I18N::translate('Media file') ?>
                 <?php if ($record->canEdit()) : ?>
                     <div class="editfacts nowrap">
-                        <a class="btn btn-link" href="#" data-toggle="modal" data-backdrop="static" data-target="#wt-ajax-modal" data-href="<?= route(EditMediaFileModal::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref(), 'fact_id' => $media_file->factId()]) ?>" title="<?= I18N::translate('Edit') ?>">
+                        <a class="btn btn-link" href="#" data-bs-toggle="modal" data-bs-backdrop="static" data-bs-target="#wt-ajax-modal" data-wt-href="<?= route(EditMediaFileModal::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref(), 'fact_id' => $media_file->factId()]) ?>" title="<?= I18N::translate('Edit') ?>">
                             <?= view('icons/edit') ?>
-                            <span class="sr-only">
+                            <span class="visually-hidden">
                             <?= I18N::translate('Edit') ?>
                         </span>
                         </a>
 
                         <?php if (count($record->mediaFiles()) > 1) : ?>
-                            <a class="btn btn-link" href="#" data-confirm="<?= I18N::translate('Are you sure you want to delete this fact?') ?>" data-post-url="<?= e(route(DeleteFact::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref(), 'fact_id' => $media_file->factId()])) ?>" title="<?= I18N::translate('Delete') ?>">
+                            <a class="btn btn-link" href="#" data-wt-confirm="<?= I18N::translate('Are you sure you want to delete this fact?') ?>" data-wt-post-url="<?= e(route(DeleteFact::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref(), 'fact_id' => $media_file->factId()])) ?>" title="<?= I18N::translate('Delete') ?>">
                                 <?= view('icons/delete') ?>
-                                <span class="sr-only">
+                                <span class="visually-hidden">
                             <?= I18N::translate('Delete') ?>
                         </span>
                             </a>
@@ -91,7 +92,7 @@ use League\Flysystem\FilesystemOperator;
         </tr>
     <?php endforeach ?>
 
-    <?php foreach ($record->facts() as $fact) : ?>
+    <?php foreach ($record->facts()->filter(fn (Fact $fact): bool => $fact->tag() !== 'OBJE:FILE') as $fact) : ?>
         <?php FunctionsPrintFacts::printFact($fact, $record) ?>
     <?php endforeach ?>
 </table>

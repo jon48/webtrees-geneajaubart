@@ -415,18 +415,6 @@ class Fact
     }
 
     /**
-     * What is the tag (type) of this fact, such as BIRT, MARR or DEAT.
-     *
-     * @return string
-     *
-     * @deprecated since 2.0.5.  Will be removed in 2.1.0
-     */
-    public function getTag(): string
-    {
-        return $this->tag;
-    }
-
-    /**
      * The Person/Family record where this Fact came from
      *
      * @return Individual|Family|Source|Repository|Media|Note|Submitter|Submission|Location|Header|GedcomRecord
@@ -595,7 +583,7 @@ class Fact
             // Fact value
             $value = $this->value();
             if ($value !== '' && $value !== 'Y') {
-                $attributes[] = '<span dir="auto">' . e($value) . '</span>';
+                $attributes[] = '<bdi>' . e($value) . '</bdi>';
             }
             // Fact date
             $date = $this->date();
@@ -624,6 +612,39 @@ class Fact
             /* I18N: a label/value pair, such as “Occupation: Farmer”. Some languages may need to change the punctuation. */
             I18N::translate('<span class="label">%1$s:</span> <span class="field" dir="auto">%2$s</span>', $this->label(), implode(' — ', $attributes)) .
             '</div>';
+    }
+
+    /**
+     * A one-line summary of the fact - for the clipboard, etc.
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        $items  = [$this->label()];
+        $target = $this->target();
+
+        if ($target instanceof GedcomRecord) {
+            $items[] = '<bdi>' . $target->fullName() . '</bdi>';
+        } else {
+            // Fact value
+            $value = $this->value();
+            if ($value !== '' && $value !== 'Y') {
+                $items[] = '<bdi>' . e($value) . '</bdi>';
+            }
+
+            // Fact date
+            if ($this->date()->isOK()) {
+                $items[] = $this->date()->minimumDate()->format('%Y');
+            }
+
+            // Fact place
+            if ($this->place()->gedcomName() !== '') {
+                $items[] = $this->place()->shortName();
+            }
+        }
+
+        return implode(' — ', $items);
     }
 
     /**
@@ -807,15 +828,5 @@ class Fact
     public function __toString(): string
     {
         return $this->id . '@' . $this->record->xref();
-    }
-
-    /**
-     * Add blank lines, to allow a user to add/edit new values.
-     *
-     * @return string
-     */
-    public function insertMissingSubtags(): string
-    {
-        return $this->record()->insertMissingLevels($this->tag(), $this->gedcom());
     }
 }

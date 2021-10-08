@@ -26,7 +26,7 @@ use function str_repeat;
  */
 class SiteTest extends TestCase
 {
-    protected static $uses_database = true;
+    protected static bool $uses_database = true;
 
     /**
      * @covers \Fisharebest\Webtrees\Site
@@ -35,8 +35,8 @@ class SiteTest extends TestCase
      */
     public function testDefault(): void
     {
-        self::assertSame('foo', Site::getPreference('no-such-setting', 'foo'));
-        self::assertSame('bar', Site::getPreference('no-such-setting', 'bar'));
+        self::assertSame('', Site::getPreference('no-such-setting'));
+        self::assertSame('UTC', Site::getPreference('TIMEZONE'));
     }
 
     /**

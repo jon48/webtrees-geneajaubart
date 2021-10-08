@@ -19,10 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
-use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Services\MediaFileService;
+use Fisharebest\Webtrees\Services\SearchService;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
-use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -33,6 +33,15 @@ use function assert;
  */
 class AutoCompleteFolder extends AbstractAutocompleteHandler
 {
+    private MediaFileService $media_file_service;
+
+    public function __construct(MediaFileService $media_file_service, SearchService $search_service)
+    {
+        parent::__construct($search_service);
+
+        $this->media_file_service = $media_file_service;
+    }
+
     /**
      * @param ServerRequestInterface $request
      *
@@ -43,20 +52,11 @@ class AutoCompleteFolder extends AbstractAutocompleteHandler
         $tree = $request->getAttribute('tree');
         assert($tree instanceof Tree);
 
-        $query = $request->getAttribute('query');
-
-        $media_filesystem = Registry::filesystem()->media($tree);
+        $query = $request->getQueryParams()['query'] ?? '';
 
         try {
-            $contents = new Collection($media_filesystem->listContents('', Filesystem::LIST_DEEP));
-
-            return $contents
-                ->filter(static function (array $object) use ($query): bool {
-                    return $object['type'] === 'dir' && str_contains($object['path'], $query);
-                })
-                ->values()
-                ->pluck('path')
-                ->take(static::LIMIT);
+            return $this->media_file_service->mediaFolders($tree)
+                ->filter(fn (string $path): bool => stripos($path, $query) !== false);
         } catch (FilesystemException $ex) {
             return new Collection();
         }

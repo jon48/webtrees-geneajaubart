@@ -73,7 +73,12 @@ class CopyFact implements RequestHandlerInterface
             if ($fact->id() === $fact_id) {
                 $this->clipboard_service->copyFact($fact);
 
-                FlashMessages::addMessage(I18N::translate('The record has been copied to the clipboard.'));
+                $message =
+                    I18N::translate('“%s“ has been copied to the clipboard.', $fact->name()) .
+                    '<br>' .
+                    I18N::translate('Use the “edit“ menu to paste this into another record.');
+
+                FlashMessages::addMessage($message);
                 break;
             }
         }

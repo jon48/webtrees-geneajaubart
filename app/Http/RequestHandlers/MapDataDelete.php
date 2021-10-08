@@ -28,7 +28,7 @@ use function redirect;
 use function route;
 
 /**
- * Delete a place location from the control panel.
+ * Delete a location from the control panel.
  */
 class MapDataDelete implements RequestHandlerInterface
 {

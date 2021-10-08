@@ -19,17 +19,19 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
-use Fisharebest\Webtrees\Exceptions\HttpAccessDeniedException;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\GuestUser;
+use Fisharebest\Webtrees\Http\Exceptions\HttpAccessDeniedException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Services\CaptchaService;
 use Fisharebest\Webtrees\Services\EmailService;
 use Fisharebest\Webtrees\Services\MessageService;
+use Fisharebest\Webtrees\Services\RateLimitService;
 use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -55,26 +57,31 @@ class ContactAction implements RequestHandlerInterface
 
     private MessageService $message_service;
 
+    private RateLimitService $rate_limit_service;
+
     private UserService $user_service;
 
     /**
      * MessagePage constructor.
      *
-     * @param CaptchaService $captcha_service
-     * @param EmailService   $email_service
-     * @param MessageService $message_service
-     * @param UserService    $user_service
+     * @param CaptchaService   $captcha_service
+     * @param EmailService     $email_service
+     * @param MessageService   $message_service
+     * @param RateLimitService $rate_limit_service
+     * @param UserService      $user_service
      */
     public function __construct(
         CaptchaService $captcha_service,
         EmailService $email_service,
         MessageService $message_service,
+        RateLimitService $rate_limit_service,
         UserService $user_service
     ) {
-        $this->captcha_service = $captcha_service;
-        $this->email_service   = $email_service;
-        $this->user_service    = $user_service;
-        $this->message_service = $message_service;
+        $this->captcha_service    = $captcha_service;
+        $this->email_service      = $email_service;
+        $this->user_service       = $user_service;
+        $this->rate_limit_service = $rate_limit_service;
+        $this->message_service    = $message_service;
     }
 
     /**
@@ -87,13 +94,13 @@ class ContactAction implements RequestHandlerInterface
         $tree = $request->getAttribute('tree');
         assert($tree instanceof Tree);
 
-        $params     = (array) $request->getParsedBody();
-        $body       = $params['body'];
-        $from_email = $params['from_email'];
-        $from_name  = $params['from_name'];
-        $subject    = $params['subject'];
-        $to         = $params['to'];
-        $url        = $params['url'];
+        $base_url   = $request->getAttribute('base_url');
+        $body       = Validator::parsedBody($request)->string('body') ?? '';
+        $from_email = Validator::parsedBody($request)->string('from_email') ?? '';
+        $from_name  = Validator::parsedBody($request)->string('from_name') ?? '';
+        $subject    = Validator::parsedBody($request)->string('subject') ?? '';
+        $to         = Validator::parsedBody($request)->string('to') ?? '';
+        $url        = Validator::parsedBody($request)->isLocalUrl($base_url)->string('url') ?? $base_url;
         $ip         = $request->getAttribute('client-ip');
         $to_user    = $this->user_service->findByUserName($to);
 
@@ -117,10 +124,8 @@ class ContactAction implements RequestHandlerInterface
             $errors = true;
         }
 
-        $base_url = $request->getAttribute('base_url');
-
         if (preg_match('/(?!' . preg_quote($base_url, '/') . ')(((?:ftp|http|https):\/\/)[a-zA-Z0-9.-]+)/', $subject . $body, $match)) {
-            FlashMessages::addMessage(I18N::translate('You are not allowed to send messages that contain external links.') . ' ' . /* I18N: e.g. ‘You should delete the “http://” from “http://www.example.com” and try again.’ */
+            FlashMessages::addMessage(I18N::translate('You are not allowed to send messages that contain external links.') . ' ' . /* I18N: e.g. ‘You should delete the “https://” from “https://www.example.com” and try again.’ */
                 I18N::translate('You should delete the “%1$s” from “%2$s” and try again.', $match[2], $match[1]), 'danger');
             $errors = true;
         }
@@ -139,10 +144,10 @@ class ContactAction implements RequestHandlerInterface
 
         $sender = new GuestUser($from_email, $from_name);
 
+        $this->rate_limit_service->limitRateForUser($to_user, 20, 1200, 'rate-limit-contact');
+
         if ($this->message_service->deliverMessage($sender, $to_user, $subject, $body, $url, $ip)) {
             FlashMessages::addMessage(I18N::translate('The message was successfully sent to %s.', e($to_user->realName())), 'success');
-
-            $url = $url ?: route(TreePage::class, ['tree' => $tree->name()]);
 
             return redirect($url);
         }

@@ -43,9 +43,7 @@ use function count;
 use function date;
 use function e;
 use function explode;
-use function implode;
 use function in_array;
-use function max;
 use function md5;
 use function preg_match;
 use function preg_match_all;
@@ -55,11 +53,9 @@ use function preg_split;
 use function range;
 use function route;
 use function str_contains;
+use function str_ends_with;
 use function str_pad;
-use function str_repeat;
-use function str_starts_with;
 use function strtoupper;
-use function substr_count;
 use function trim;
 
 use const PHP_INT_MAX;
@@ -787,10 +783,13 @@ class GedcomRecord
     ): Collection {
         $access_level = $access_level ?? Auth::accessLevel($this->tree);
 
+        // Convert BIRT into INDI:BIRT, etc.
+        $filter = array_map(fn (string $tag): string => $this->tag() . ':' . $tag, $filter);
+
         $facts = new Collection();
         if ($this->canShow($access_level)) {
             foreach ($this->facts as $fact) {
-                if (($filter === [] || in_array($fact->getTag(), $filter, true)) && $fact->canShow($access_level)) {
+                if (($filter === [] || in_array($fact->tag(), $filter, true)) && $fact->canShow($access_level)) {
                     $facts->push($fact);
                 }
             }
@@ -975,7 +974,7 @@ class GedcomRecord
                     $new_gedcom .= "\n" . $gedcom;
                 }
                 $fact_id = 'NOT A VALID FACT ID'; // Only replace/delete one copy of a duplicate fact
-            } elseif ($fact->getTag() !== 'CHAN' || !$update_chan) {
+            } elseif (!str_ends_with($fact->tag(), ':CHAN') || !$update_chan) {
                 $new_gedcom .= "\n" . $fact->gedcom();
             }
         }
@@ -1201,7 +1200,7 @@ class GedcomRecord
             'sort'   => preg_replace_callback('/(\d+)/', static function (array $matches): string {
                 return str_pad($matches[0], 10, '0', STR_PAD_LEFT);
             }, $value),
-            'full'   => '<span dir="auto">' . e($value) . '</span>',
+            'full'   => '<bdi>' . e($value) . '</bdi>',
             // This is used for display
             'fullNN' => $value,
             // This goes into the database
@@ -1340,90 +1339,5 @@ class GedcomRecord
             ->where('o_id', '=', $this->xref())
             ->lockForUpdate()
             ->get();
-    }
-
-    /**
-     * Add blank lines, to allow a user to add/edit new values.
-     *
-     * @return string
-     */
-    public function insertMissingSubtags(): string
-    {
-        $gedcom = $this->insertMissingLevels($this->tag(), $this->gedcom());
-
-        // NOTE records have data at level 0.  Move it to 1 CONC.
-        if (static::RECORD_TYPE === 'NOTE') {
-            return preg_replace('/^0 @[^@]+@ NOTE/', '1 CONC', $gedcom);
-        }
-
-        return preg_replace('/^0.*\n/', '', $gedcom);
-    }
-
-    /**
-     * @param string $tag
-     * @param string $gedcom
-     *
-     * @return string
-     */
-    public function insertMissingLevels(string $tag, string $gedcom): string
-    {
-        $next_level = substr_count($tag, ':') + 1;
-        $factory    = Registry::elementFactory();
-        $subtags    = $factory->make($tag)->subtags();
-
-        // Merge CONT records onto their parent line.
-        $gedcom = strtr($gedcom, [
-            "\n" . $next_level . ' CONT ' => "\r",
-            "\n" . $next_level . ' CONT' => "\r",
-        ]);
-
-        // The first part is level N.  The remainder are level N+1.
-        $parts  = preg_split('/\n(?=' . $next_level . ')/', $gedcom);
-        $return = array_shift($parts);
-
-        foreach ($subtags as $subtag => $occurrences) {
-            [$min, $max] = explode(':', $occurrences);
-
-            $min = (int) $min;
-
-            if ($max === 'M') {
-                $max = PHP_INT_MAX;
-            } else {
-                $max = (int) $max;
-            }
-
-            $count = 0;
-
-            // Add expected subtags in our preferred order.
-            foreach ($parts as $n => $part) {
-                if (str_starts_with($part, $next_level . ' ' . $subtag)) {
-                    $return .= "\n" . $this->insertMissingLevels($tag . ':' . $subtag, $part);
-                    $count++;
-                    unset($parts[$n]);
-                }
-            }
-
-            // Allowed to have more of this subtag?
-            if ($count < $max) {
-                // Create a new one.
-                $gedcom  = $next_level . ' ' . $subtag;
-                $default = $factory->make($tag . ':' . $subtag)->default($this->tree);
-                if ($default !== '') {
-                    $gedcom .= ' ' . $default;
-                }
-
-                $number_to_add = max(1, $min - $count);
-                $gedcom_to_add = "\n" . $this->insertMissingLevels($tag . ':' . $subtag, $gedcom);
-
-                $return .= str_repeat($gedcom_to_add, $number_to_add);
-            }
-        }
-
-        // Now add any unexpected/existing data.
-        if ($parts !== []) {
-            $return .= "\n" . implode("\n", $parts);
-        }
-
-        return $return;
     }
 }

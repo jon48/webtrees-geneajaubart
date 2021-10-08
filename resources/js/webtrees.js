@@ -1,6 +1,6 @@
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -94,7 +94,9 @@
     surn = inflectSurname(trim(surn.replace(/,/g, separator)), sex);
     nsfx = trim(nsfx);
 
-    const surname = trim(spfx + separator + surn);
+    const surname_separator = spfx.endsWith('\'') || spfx.endsWith('‘') ? '' : ' ';
+
+    const surname = trim(spfx + surname_separator + surn);
 
     const name = surnameFirst ? slash + surname + slash + separator + givn : givn + separator + slash + surname + slash;
 
@@ -505,22 +507,21 @@
 
   /**
    * Persistent checkbox options to hide/show extra data.
-   * @param {string} element_id
+   * @param {HTMLInputElement} element
    */
-  webtrees.persistentToggle = function (element_id) {
-    const element = document.getElementById(element_id);
-    const key = 'state-of-' + element_id;
-    const state = localStorage.getItem(key);
-
+  webtrees.persistentToggle = function (element) {
     if (element instanceof HTMLInputElement && element.type === 'checkbox') {
-      // Previously selected?
+      const key = 'state-of-' + element.dataset.wtPersist;
+      const state = localStorage.getItem(key);
+
+      // Previously selected? Select again now.
       if (state === 'true') {
         element.click();
       }
 
       // Remember state for the next page load.
       element.addEventListener('change', function () {
-        localStorage.setItem(key, element.checked);
+        localStorage.setItem(key, element.checked.toString());
       });
     }
   };
@@ -597,21 +598,20 @@
           datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
           queryTokenizer: Bloodhound.tokenizers.whitespace,
           remote: {
-            url: this.dataset.autocompleteUrl,
+            url: this.dataset.wtAutocompleteUrl,
             replace: function (url, uriEncodedQuery) {
-              if (that.dataset.autocompleteExtra === 'SOUR') {
+              const symbol = (url.indexOf("?") > 0) ? '&' : '?';
+              if (that.dataset.wtAutocompleteExtra === 'SOUR') {
                 let row_group = that.closest('.form-group').previousElementSibling;
                 while (row_group.querySelector('select') === null) {
                   row_group = row_group.previousElementSibling;
                 }
                 const element = row_group.querySelector('select');
                 const extra   = element.options[element.selectedIndex].value.replace(/@/g, '');
-                const symbol  = (url.indexOf("?") > 0) ? '&' : '?';
-                return url.replace(/(%7B|{)query(%7D|})/, uriEncodedQuery) + symbol + 'extra=' + encodeURIComponent(extra);
+                return url + symbol + "query=" + uriEncodedQuery + '&extra=' + encodeURIComponent(extra);
               }
-              return url.replace(/(%7B|{)query(%7D|})/, uriEncodedQuery);
-            },
-            wildcard: '{query}'
+              return url + symbol + "query=" + uriEncodedQuery
+            }
           }
         })
       });
@@ -678,12 +678,12 @@ $.ajaxSetup({
 $(function () {
   // Page elements that load automatically via AJAX.
   // This prevents bad robots from crawling resource-intensive pages.
-  $('[data-ajax-url]').each(function () {
-    $(this).load($(this).data('ajaxUrl'));
+  $('[data-wt-ajax-url]').each(function () {
+    $(this).load(this.dataset.wtAjaxUrl);
   });
 
   // Autocomplete
-  webtrees.autocomplete('input[data-autocomplete-url]');
+  webtrees.autocomplete('input[data-wt-autocomplete-url]');
 
   // Select2 - activate autocomplete fields
   const lang = document.documentElement.lang;
@@ -722,30 +722,21 @@ $(function () {
     $(this).removeClass('d-none');
   });
 
-  // Save button state between pages
-  document.querySelectorAll('[data-toggle=button][data-persist]').forEach((element) => {
-    // Previously selected?
-    if (localStorage.getItem('state-of-' + element.dataset.persist) === 'T') {
-      element.click();
-    }
-    // Save state on change
-    element.addEventListener('click', (event) => {
-      // Event occurs *before* the state changes, so reverse T/F.
-      localStorage.setItem('state-of-' + event.target.dataset.persist, event.target.classList.contains('active') ? 'F' : 'T');
-    });
-  });
+  // Save button/checkbox state between pages
+  document.querySelectorAll('[data-wt-persist]')
+    .forEach((element) => webtrees.persistentToggle(element));
 
   // Activate the on-screen keyboard
   let osk_focus_element;
   $('.wt-osk-trigger').click(function () {
     // When a user clicks the icon, set focus to the corresponding input
-    osk_focus_element = document.getElementById($(this).data('id'));
+    osk_focus_element = document.getElementById(this.dataset.wtId);
     osk_focus_element.focus();
     $('.wt-osk').show();
   });
   $('.wt-osk-script-button').change(function () {
     $('.wt-osk-script').prop('hidden', true);
-    $('.wt-osk-script-' + $(this).data('script')).prop('hidden', false);
+    $('.wt-osk-script-' + this.dataset.wtOskScript).prop('hidden', false);
   });
   $('.wt-osk-shift-button').click(function () {
     document.querySelector('.wt-osk-keys').classList.toggle('shifted');
@@ -767,6 +758,32 @@ $(function () {
   $('.wt-osk-close').on('click', function () {
     $('.wt-osk').hide();
   });
+
+  // Hide/Show password fields
+  $('input[type=password]').each(function () {
+    $(this).hideShowPassword('infer', true, {
+      states: {
+        shown: {
+          toggle: {
+            content: this.dataset.wtHidePasswordText,
+            attr: {
+              title: this.dataset.wtHidePasswordTitle,
+              'aria-label': this.dataset.wtHidePasswordTitle,
+            }
+          }
+        },
+        hidden: {
+          toggle: {
+            content: this.dataset.wtShowPasswordText,
+            attr: {
+              title: this.dataset.wtShowPasswordTitle,
+              'aria-label': this.dataset.wtShowPasswordTitle,
+            }
+          }
+        }
+      }
+    });
+  });
 });
 
 // Prevent form re-submission via accidental double-click.
@@ -784,7 +801,7 @@ document.addEventListener('submit', function (event) {
   }
 });
 
-// Convert data-confirm and data-post-url attributes into useful behavior.
+// Convert data-wt-confirm and data-wt-post-url/data-wt-reload-url attributes into useful behavior.
 document.addEventListener('click', (event) => {
   const target = event.target.closest('a,button');
 
@@ -792,24 +809,23 @@ document.addEventListener('click', (event) => {
     return;
   }
 
-  if ('confirm' in target.dataset && !confirm(target.dataset.confirm)) {
+  if ('wtConfirm' in target.dataset && !confirm(target.dataset.wtConfirm)) {
     event.preventDefault();
-    return;
   }
 
-  if ('postUrl' in target.dataset) {
+  if ('wtPostUrl' in target.dataset) {
     const token = document.querySelector('meta[name=csrf]').content;
 
-    fetch(target.dataset.postUrl, {
+    fetch(target.dataset.wtPostUrl, {
       method: 'POST',
       headers: {
         'X-CSRF-TOKEN': token,
         'X-Requested-with': 'XMLHttpRequest',
       },
     }).then(() => {
-      if ('reloadUrl' in target.dataset) {
-        // Go somewhere else.  e.g. home page after logout.
-        document.location = target.dataset.reloadUrl;
+      if ('wtReloadUrl' in target.dataset) {
+        // Go somewhere else. e.g. the home page after logout.
+        document.location = target.dataset.wtReloadUrl;
       } else {
         // Reload the current page. e.g. change language.
         document.location.reload();

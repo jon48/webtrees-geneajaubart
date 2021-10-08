@@ -22,30 +22,28 @@ use Fisharebest\Webtrees\Tree;
 <form method="post" class="wt-page-options wt-page-options-branches d-print-none">
     <?= csrf_field() ?>
 
-    <div class="form-group row">
+    <div class="row form-group">
         <label class="col-form-label col-sm-3 wt-page-options-label" for="surname">
             <?= I18N::translate('Surname') ?>
         </label>
 
         <div class="col-sm-9 wt-page-options-value">
-            <input class="form-control" data-autocomplete-url="<?= e(route(AutoCompleteSurname::class, ['tree' => $tree->name()])) ?>" autocomplete="off" type="text" name="surname" id="surname" value="<?= e($surname) ?>" dir="auto" required="required">
+            <input class="form-control" data-wt-autocomplete-url="<?= e(route(AutoCompleteSurname::class, ['tree' => $tree->name()])) ?>" autocomplete="off" type="text" name="surname" id="surname" value="<?= e($surname) ?>" dir="auto" required="required">
         </div>
     </div>
 
-    <fieldset class="form-group">
-        <div class="row">
-            <legend class="col-form-label col-sm-3 wt-page-options-label">
-                <?= I18N::translate('Phonetic search') ?>
-            </legend>
+    <fieldset class="row form-group">
+        <legend class="col-form-label col-sm-3 wt-page-options-label">
+            <?= I18N::translate('Phonetic search') ?>
+        </legend>
 
-            <div class="col-sm-9 wt-page-options-value">
-                <?= view('components/checkbox-inline', ['label' => I18N::translate('Russell'), 'name' => 'soundex_std', 'checked' => $soundex_std]) ?>
-                <?= view('components/checkbox-inline', ['label' => I18N::translate('Daitch-Mokotoff'), 'name' => 'soundex_dm', 'checked' => $soundex_dm]) ?>
-            </div>
+        <div class="col-sm-9 wt-page-options-value">
+            <?= view('components/checkbox-inline', ['label' => I18N::translate('Russell'), 'name' => 'soundex_std', 'checked' => $soundex_std]) ?>
+            <?= view('components/checkbox-inline', ['label' => I18N::translate('Daitch-Mokotoff'), 'name' => 'soundex_dm', 'checked' => $soundex_dm]) ?>
         </div>
     </fieldset>
 
-    <div class="form-group row">
+    <div class="row form-group">
         <div class="col-sm-3 wt-page-options-label"></div>
 
         <div class="col-sm-9 wt-page-options-value">
@@ -57,5 +55,5 @@ use Fisharebest\Webtrees\Tree;
 </form>
 
 <?php if ($ajax_url !== '') : ?>
-    <div class="wt-ajax-load wt-page-content wt-chart wt-branches" data-ajax-url="<?= e($ajax_url) ?>"></div>
+    <div class="wt-ajax-load wt-page-content wt-chart wt-branches" data-wt-ajax-url="<?= e($ajax_url) ?>"></div>
 <?php endif ?>

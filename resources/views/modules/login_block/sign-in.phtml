@@ -30,7 +30,7 @@ use Fisharebest\Webtrees\View;
         <label for="password">
             <?= I18N::translate('Password') ?>
         </label>
-        <input type="password" id="password" name="password" class="form-control" autocomplete="current-password">
+        <input type="password" id="password" name="password" class="form-control" autocomplete="current-password" data-wt-show-password-text="<?= e(I18N::translate('show')) ?>" data-wt-show-password-title="<?= e(I18N::translate('Show password')) ?>" data-wt-hide-password-text="<?= e(I18N::translate('hide')) ?>" data-wt-hide-password-title="<?= e(I18N::translate('Hide password')) ?>">
     </div>
 
     <div>
@@ -38,7 +38,7 @@ use Fisharebest\Webtrees\View;
             <?= /* I18N: A button label. */ I18N::translate('sign in') ?>
         </button>
 
-        <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#forgot-password" aria-expanded="false" aria-controls="forgot-password">
+        <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#forgot-password" aria-expanded="false" aria-controls="forgot-password">
             <?= I18N::translate('Forgot password?') ?>
         </button>
     </div>
@@ -66,10 +66,3 @@ use Fisharebest\Webtrees\View;
         </div>
     </form>
 </div>
-
-<?php View::push('javascript') ?>
-<script>
-    $('#password').hideShowPassword('infer', true);
-</script>
-<?php View::endpush() ?>
-

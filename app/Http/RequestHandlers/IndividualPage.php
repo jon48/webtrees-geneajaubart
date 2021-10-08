@@ -23,7 +23,6 @@ use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Age;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Date;
-use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
@@ -41,7 +40,6 @@ use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use stdClass;
 
 use function array_map;
 use function assert;
@@ -53,7 +51,6 @@ use function is_string;
 use function redirect;
 use function route;
 use function strtoupper;
-use function view;
 
 /**
  * Show an individual's page.
@@ -75,8 +72,11 @@ class IndividualPage implements RequestHandlerInterface
      * @param ModuleService    $module_service
      * @param UserService      $user_service
      */
-    public function __construct(ClipboardService $clipboard_service, ModuleService $module_service, UserService $user_service)
-    {
+    public function __construct(
+        ClipboardService $clipboard_service,
+        ModuleService $module_service,
+        UserService $user_service
+    ) {
         $this->clipboard_service = $clipboard_service;
         $this->module_service    = $module_service;
         $this->user_service      = $user_service;
@@ -118,15 +118,14 @@ class IndividualPage implements RequestHandlerInterface
         }
 
         // If this individual is linked to a user account, show the link
-        $user_link = '';
         if (Auth::isAdmin()) {
             $users = $this->user_service->findByIndividual($individual);
-            foreach ($users as $user) {
-                $user_link = ' —  <a href="' . e(route(UserListPage::class, ['filter' => $user->email()])) . '">' . e($user->userName()) . '</a>';
-            }
+        } else {
+            $users = new Collection();
         }
 
-        $shares = $this->module_service->findByInterface(ModuleShareInterface::class)
+        $shares = $this->module_service
+            ->findByInterface(ModuleShareInterface::class)
             ->map(fn (ModuleShareInterface $module) => $module->share($individual))
             ->filter();
 
@@ -143,7 +142,7 @@ class IndividualPage implements RequestHandlerInterface
             'significant'      => $this->significant($individual),
             'title'            => $individual->fullName() . ' ' . $individual->lifespan(),
             'tree'             => $tree,
-            'user_link'        => $user_link,
+            'users'            => $users,
         ]);
     }
 
@@ -250,7 +249,8 @@ class IndividualPage implements RequestHandlerInterface
      */
     public function getSidebars(Individual $individual): Collection
     {
-        return $this->module_service->findByComponent(ModuleSidebarInterface::class, $individual->tree(), Auth::user())
+        return $this->module_service
+            ->findByComponent(ModuleSidebarInterface::class, $individual->tree(), Auth::user())
             ->filter(static function (ModuleSidebarInterface $sidebar) use ($individual): bool {
                 return $sidebar->hasSidebarContent($individual);
             });
@@ -266,7 +266,8 @@ class IndividualPage implements RequestHandlerInterface
      */
     public function getTabs(Individual $individual): Collection
     {
-        return $this->module_service->findByComponent(ModuleTabInterface::class, $individual->tree(), Auth::user())
+        return $this->module_service
+            ->findByComponent(ModuleTabInterface::class, $individual->tree(), Auth::user())
             ->filter(static function (ModuleTabInterface $tab) use ($individual): bool {
                 return $tab->hasTabContent($individual);
             });
@@ -278,9 +279,9 @@ class IndividualPage implements RequestHandlerInterface
      *
      * @param Individual $individual
      *
-     * @return stdClass
+     * @return object
      */
-    private function significant(Individual $individual): stdClass
+    private function significant(Individual $individual): object
     {
         [$surname] = explode(',', $individual->sortName());
 

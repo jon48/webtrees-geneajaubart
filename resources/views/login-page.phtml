@@ -30,7 +30,7 @@ use Fisharebest\Webtrees\View;
     <?= csrf_field() ?>
     <input type="hidden" name="url" value="<?= e($url) ?>">
 
-    <div class="form-group row">
+    <div class="row form-group">
         <label class="col-sm-3 col-form-label wt-page-options-label" for="username">
             <?= I18N::translate('Username') ?>
         </label>
@@ -39,16 +39,16 @@ use Fisharebest\Webtrees\View;
         </div>
     </div>
 
-    <div class="form-group row">
+    <div class="row form-group">
         <label class="col-sm-3 col-form-label wt-page-options-label" for="password">
             <?= I18N::translate('Password') ?>
         </label>
         <div class="col-sm-9 wt-page-options-value">
-            <input autocomplete="current-password" class="form-control" id="password" name="password" required="required" type="password">
+            <input autocomplete="current-password" class="form-control" id="password" name="password" required="required" type="password" data-wt-show-password-text="<?= e(I18N::translate('show')) ?>" data-wt-show-password-title="<?= e(I18N::translate('Show password')) ?>" data-wt-hide-password-text="<?= e(I18N::translate('hide')) ?>" data-wt-hide-password-title="<?= e(I18N::translate('Hide password')) ?>">
         </div>
     </div>
 
-    <div class="form-group row">
+    <div class="row form-group">
         <div class="col-sm-3 col-form-label wt-page-options-label">
         </div>
         <div class="col-sm-9 wt-page-options-value">
@@ -69,9 +69,3 @@ use Fisharebest\Webtrees\View;
         </div>
     </div>
 </form>
-
-<?php View::push('javascript') ?>
-<script>
-    $("#password").hideShowPassword("infer", true);
-</script>
-<?php View::endpush() ?>

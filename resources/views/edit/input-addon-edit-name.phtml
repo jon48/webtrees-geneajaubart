@@ -8,16 +8,15 @@ use Fisharebest\Webtrees\I18N;
 
 ?>
 
-<div class="input-group-prepend">
-    <span class="input-group-text">
-        <a id="<?= e($id) ?>-edit" href="#" title="<?= I18N::translate('Edit the name') ?>">
-            <?= view('icons/edit') ?>
-            <span class="sr-only">
-                <?= I18N::translate('Edit the name') ?>
-            </span>
-        </a>
-    </span>
-</div>
+<span class="input-group-text">
+    <a id="<?= e($id) ?>-edit" href="#" title="<?= I18N::translate('Edit the name') ?>">
+        <?= view('icons/edit') ?>
+        <span class="visually-hidden">
+            <?= I18N::translate('Edit the name') ?>
+        </span>
+    </a>
+</span>
+
 <script>
     document.getElementById('<?= e($id) ?>-edit').addEventListener('click', function (event) {
         event.preventDefault();
@@ -25,8 +24,8 @@ use Fisharebest\Webtrees\I18N;
         element.readOnly = false;
         element.focus();
 
-        let input_addon = this.parentNode.parentNode;
-        input_addon.parentNode.removeChild(input_addon);
+        let input_addon = this.parentNode;
+        input_addon.removeChild(input_addon);
     });
     document.addEventListener('DOMContentLoaded', function () {
         let container = document.getElementById('<?= e($id) ?>').parentNode.parentNode.parentNode.parentNode;
@@ -59,12 +58,12 @@ use Fisharebest\Webtrees\I18N;
                     );
                 }
             }
-            NPFX.addEventListener('input', fn);
-            GIVN.addEventListener('input', fn);
-            SPFX.addEventListener('input', fn);
-            SURN.addEventListener('input', fn);
-            SURN.addEventListener('blur', fn); // For autocompleted entries
-            NSFX.addEventListener('input', fn);
+            NPFX && NPFX.addEventListener('input', fn);
+            GIVN && GIVN.addEventListener('input', fn);
+            SPFX && SPFX.addEventListener('input', fn);
+            SURN && SURN.addEventListener('input', fn);
+            SURN && SURN.addEventListener('blur', fn); // For autocompleted entries
+            NSFX && NSFX.addEventListener('input', fn);
         }
     });
 </script>

@@ -23,16 +23,16 @@ use Aura\Router\Route;
 use Aura\Router\RouterContainer;
 use Fig\Http\Message\StatusCodeInterface;
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\Html;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Media;
 use Fisharebest\Webtrees\Note;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Repository;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Source;
@@ -159,7 +159,7 @@ class SiteMapModule extends AbstractModule implements ModuleConfigInterface, Req
      */
     public function title(): string
     {
-        /* I18N: Name of a module - see http://en.wikipedia.org/wiki/Sitemaps */
+        /* I18N: Name of a module - see https://en.wikipedia.org/wiki/Sitemaps */
         return I18N::translate('Sitemaps');
     }
 

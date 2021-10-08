@@ -31,8 +31,7 @@ class ReportBaseElement
     // Special value for X or Y position, to indicate the current position.
     public const CURRENT_POSITION = -1.0;
 
-    /** @var string Text */
-    public $text = '';
+    public string $text = '';
 
     /**
      * Element renderer
@@ -41,7 +40,7 @@ class ReportBaseElement
      *
      * @return void
      */
-    public function render($renderer)
+    public function render($renderer): void
     {
         //-- to be implemented in inherited classes
     }
@@ -63,11 +62,11 @@ class ReportBaseElement
      *
      * @param HtmlRenderer|PdfRenderer $renderer
      *
-     * @return float|array
+     * @return array{0:float,1:int,2:float}
      */
-    public function getWidth($renderer)
+    public function getWidth($renderer): array
     {
-        return 0.0;
+        return [0.0, 1, 0.0];
     }
 
     /**

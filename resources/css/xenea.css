@@ -1,6 +1,6 @@
 /**
  * webtrees: online genealogy
- * Copyright (C) 2020 webtrees development team
+ * Copyright (C) 2021 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,16 +16,19 @@
 /* The xenea theme */
 @import "_base.css";
 
-/* Colors for chart boxes, etc. */
 :root {
-  --sex-f-fg: #ff2080;
-  --sex-m-fg: #84beff;
-  --sex-u-fg: #008080;
-  --sex-f-bg: #fff0f0;
-  --sex-m-bg: #f0f9ff;
-  --sex-u-bg: #ffffff;
-    --chart-line: solid gray thin;
     --chart-line-radius: 1rem;
+    --chart-line: solid gray thin;
+    --link-color-hover: #f00;
+    --link-color: #00f;
+    --link-decoration-hover: none;
+    --link-decoration: none;
+    --sex-f-bg: #fff0f0;
+    --sex-f-fg: #ff2080;
+    --sex-m-bg: #f0f9ff;
+    --sex-m-fg: #84beff;
+    --sex-u-bg: #ffffff;
+    --sex-u-fg: #008080;
 }
 
 /* Override Bootstrap formatting */
@@ -547,16 +550,6 @@ table {
 
 /* ====== Round Corners ======== */
 
-a {
-    color: #00f;
-    text-decoration: none;
-}
-
-a:hover {
-    color: #f00;
-    text-decoration: none;
-}
-
 :focus {
     outline-style: none;
 }
@@ -570,15 +563,6 @@ img.block {
     border: 0;
     height: 25px;
     vertical-align: middle;
-}
-
-.topbottombar {
-    background-color: #c3dfff;
-    color: #fff;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 4px;
-    text-align: center;
 }
 
 .button {
@@ -656,28 +640,13 @@ div.fact_SHARED_NOTE {
 }
 
 .wt-facts-table .wt-gender-M td {
-    background-color: #f0f9ff;
+    background-color: var(--sex-m-bg);
     border-color: #84beff;
 }
 
 .wt-facts-table .wt-gender-F td {
-    background-color: #fff0f0;
+    background-color: var(--sex-f-bg);
     border-color: #ff2080;
-}
-
-.name1 {
-    font-weight: bold;
-    font-size: 12px;
-}
-
-.name2 {
-    font-size: 16px;
-    }
-
-a:hover .name1, a:hover .name2 {
-    color: #f00;
-    font-weight: bold;
-    font-size: 12px;
 }
 
 .details_label {
@@ -697,49 +666,13 @@ a:hover .name1, a:hover .name2 {
     font-weight: bold;
 }
 
-.largeError {
-    color: #d00;
-    font-size: large;
-    font-weight: bold;
-}
-
-.warning {
-    color: #f00;
-    font-weight: bold;
-}
-
 .indent {
     padding-left: 20px;
-}
-
-.thumbnail {
-    height: auto;
-    padding: 3px;
-}
-
-.icon {
-    border: 0;
-    padding: 0 5px;
-}
-
-.subheaders {
-    font-weight: bold;
-    font-size: 15px;
-    margin-top: 15px;
-    vertical-align: bottom;
 }
 
 .parentdeath {
     border: thin solid #888;
     padding: 1px;
-}
-
-.selected-option {
-    background-color: #edf7fd;
-}
-
-.border1 {
-    border: solid #000 1px;
 }
 
 .journal_box {
@@ -797,11 +730,6 @@ a:hover .name1, a:hover .name2 {
 .layout3 #childbox {
     top: auto;
     bottom: 20px;
-}
-
-#childbox a.name1 {
-    display: block;
-    margin-left: 5px;
 }
 
 .person0 {

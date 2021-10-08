@@ -28,6 +28,9 @@ use Fisharebest\Webtrees\Services\UserService;
 use InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 
+use function fclose;
+use function file_get_contents;
+use function preg_replace;
 use function stream_get_contents;
 
 /**
@@ -35,13 +38,13 @@ use function stream_get_contents;
  */
 class TreeTest extends TestCase
 {
-    protected static $uses_database = true;
+    protected static bool $uses_database = true;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $cache_factory = self::createMock(CacheFactoryInterface::class);
+        $cache_factory = $this->createMock(CacheFactoryInterface::class);
         $cache_factory->method('array')->willReturn(new Cache(new NullAdapter()));
         Registry::cache($cache_factory);
     }
@@ -72,11 +75,8 @@ class TreeTest extends TestCase
         $tree_service = new TreeService();
         $tree         = $tree_service->create('name', 'title');
 
-        $pref = $tree->getPreference('foo', 'default');
-        self::assertSame('default', $pref);
-
         $tree->setPreference('foo', 'bar');
-        $pref = $tree->getPreference('foo', 'default');
+        $pref = $tree->getPreference('foo');
         self::assertSame('bar', $pref);
     }
 
@@ -343,15 +343,12 @@ class TreeTest extends TestCase
     {
         $tree = $this->importTree('demo.ged');
 
-        $fp = fopen('php://memory', 'wb');
-
         $gedcom_export_service = new GedcomExportService();
-        $gedcom_export_service->export($tree, $fp, true);
 
-        rewind($fp);
-
+        $resource = $gedcom_export_service->export($tree, true);
         $original = file_get_contents(__DIR__ . '/../data/demo.ged');
-        $export   = stream_get_contents($fp);
+        $export   = stream_get_contents($resource);
+        fclose($resource);
 
         // The version, date and time in the HEAD record will be different.
         $original = preg_replace('/\n2 VERS .*/', '', $original, 1);

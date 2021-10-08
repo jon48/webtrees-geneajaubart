@@ -108,6 +108,7 @@ use Fisharebest\Webtrees\Http\RequestHandlers\EditRecordAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\EditRecordPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\EmailPreferencesAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\EmailPreferencesPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\EmptyClipboard;
 use Fisharebest\Webtrees\Http\RequestHandlers\ExportGedcomClient;
 use Fisharebest\Webtrees\Http\RequestHandlers\ExportGedcomPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\ExportGedcomServer;
@@ -146,6 +147,7 @@ use Fisharebest\Webtrees\Http\RequestHandlers\ManageMediaPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\ManageTrees;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataAdd;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataDelete;
+use Fisharebest\Webtrees\Http\RequestHandlers\MapDataDeleteUnused;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataEdit;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataExportCSV;
 use Fisharebest\Webtrees\Http\RequestHandlers\MapDataExportGeoJson;
@@ -295,6 +297,8 @@ use Fisharebest\Webtrees\Http\RequestHandlers\TreePreferencesAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\TreePreferencesPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\TreePrivacyAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\TreePrivacyPage;
+use Fisharebest\Webtrees\Http\RequestHandlers\SiteTagsAction;
+use Fisharebest\Webtrees\Http\RequestHandlers\SiteTagsPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\UnconnectedAction;
 use Fisharebest\Webtrees\Http\RequestHandlers\UnconnectedPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\UpgradeWizardConfirm;
@@ -326,6 +330,11 @@ use Fisharebest\Webtrees\Http\RequestHandlers\WebmanifestJson;
  */
 class WebRoutes
 {
+    /**
+     * @param Map $router
+     *
+     * @return void
+     */
     public function load(Map $router): void
     {
         $router->attach('', '', static function (Map $router) {
@@ -372,6 +381,7 @@ class WebRoutes
                 $router->post(UsersCleanupAction::class, '/users-cleanup');
                 $router->get(MapDataAdd::class, '/map-data-add{/parent_id}');
                 $router->post(MapDataDelete::class, '/map-data-delete/{place_id}');
+                $router->post(MapDataDeleteUnused::class, '/map-data-delete-unused');
                 $router->get(MapDataEdit::class, '/map-data-edit/{place_id}');
                 $router->get(MapDataExportCSV::class, '/map-data-csv{/parent_id}');
                 $router->get(MapDataExportGeoJson::class, '/map-data-geojson{/parent_id}');
@@ -433,6 +443,8 @@ class WebRoutes
                 $router->post(SitePreferencesAction::class, '/site-preferences');
                 $router->get(SiteRegistrationPage::class, '/site-registration');
                 $router->post(SiteRegistrationAction::class, '/site-registration');
+                $router->get(SiteTagsPage::class, '/tags');
+                $router->post(SiteTagsAction::class, '/tags');
                 $router->get(TreePageDefaultEdit::class, '/trees/default-blocks');
                 $router->post(TreePageDefaultUpdate::class, '/trees/default-blocks');
                 $router->get(MergeTreesPage::class, '/trees/merge');
@@ -524,10 +536,10 @@ class WebRoutes
                     ],
                 ]);
 
-                $router->get(AutoCompleteCitation::class, '/autocomplete/citation/{query}');
-                $router->get(AutoCompleteFolder::class, '/autocomplete/folder/{query}');
-                $router->get(AutoCompletePlace::class, '/autocomplete/place/{query}');
-                $router->get(AutoCompleteSurname::class, '/autocomplete/surname/{query}');
+                $router->get(AutoCompleteCitation::class, '/autocomplete/citation');
+                $router->get(AutoCompleteFolder::class, '/autocomplete/folder');
+                $router->get(AutoCompletePlace::class, '/autocomplete/place');
+                $router->get(AutoCompleteSurname::class, '/autocomplete/surname');
                 $router->get(AddChildToFamilyPage::class, '/add-child-to-family/{xref}/{sex}');
                 $router->post(AddChildToFamilyAction::class, '/add-child-to-family/{xref}');
                 $router->get(AddNewFact::class, '/add-fact/{xref}/{fact}');
@@ -627,6 +639,7 @@ class WebRoutes
                 $router->get(AccountEdit::class, '/my-account{/tree}');
                 $router->post(AccountUpdate::class, '/my-account{/tree}');
                 $router->post(AccountDelete::class, '/my-account-delete');
+                $router->post(EmptyClipboard::class, '/empty-clipboard');
             });
 
             // Visitor routes - with an optional tree (for sites with no public trees).

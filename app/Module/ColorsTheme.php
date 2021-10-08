@@ -133,7 +133,7 @@ class ColorsTheme extends CloudsTheme
                 '#',
                 'menu-color-' . $palette_id . ($palette === $palette_id ? ' active' : ''),
                 [
-                    'data-post-url' => $url,
+                    'data-wt-post-url' => $url,
                 ]
             );
 
@@ -203,7 +203,11 @@ class ColorsTheme extends CloudsTheme
 
         // We haven't selected one this session? Use the site default
         if ($palette === '') {
-            $palette = Site::getPreference('DEFAULT_COLOR_PALETTE', self::DEFAULT_PALETTE);
+            $palette = Site::getPreference('DEFAULT_COLOR_PALETTE');
+        }
+
+        if ($palette === '') {
+            $palette = self::DEFAULT_PALETTE;
         }
 
         return $palette;

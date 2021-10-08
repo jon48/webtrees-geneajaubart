@@ -20,12 +20,12 @@ use Illuminate\Support\Collection;
 ?>
 
 <div class="dropdown wt-page-menu">
-    <button class="btn btn-primary dropdown-toggle wt-page-menu-button" type="button" id="page-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-primary dropdown-toggle wt-page-menu-button" type="button" id="page-menu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <?= view('icons/menu') ?>
         <?= I18N::translate('edit') ?>
     </button>
 
-    <div class="dropdown-menu dropdown-menu-right wt-page-menu-items" aria-labelledby="page-menu">
+    <div class="dropdown-menu dropdown-menu-end wt-page-menu-items" aria-labelledby="page-menu">
         <a class="dropdown-item" href="<?= e(route(ChangeFamilyMembersPage::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref()])) ?>">
             <?= view('icons/family') ?>
             <?= I18N::translate('Change family members') ?>
@@ -65,7 +65,7 @@ use Illuminate\Support\Collection;
 
         <div class="dropdown-divider"></div>
 
-        <a class="dropdown-item" href="#" data-confirm="<?= I18N::translate('Deleting the family will unlink all of the individuals from each other but will leave the individuals in place. Are you sure you want to delete this family?') ?>" data-post-url="<?= e(route(DeleteRecord::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref()])) ?>">
+        <a class="dropdown-item" href="#" data-wt-confirm="<?= I18N::translate('Deleting the family will unlink all of the individuals from each other but will leave the individuals in place. Are you sure you want to delete this family?') ?>" data-wt-post-url="<?= e(route(DeleteRecord::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref()])) ?>">
             <?= view('icons/delete') ?>
             <?= I18N::translate('Delete') ?>
         </a>

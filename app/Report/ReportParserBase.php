@@ -21,11 +21,12 @@ namespace Fisharebest\Webtrees\Report;
 
 use DomainException;
 use Exception;
+use Fisharebest\Webtrees\Registry;
+use XMLParser;
 
 use function call_user_func;
 use function fclose;
 use function feof;
-use function fopen;
 use function fread;
 use function method_exists;
 use function sprintf;
@@ -46,11 +47,11 @@ use const XML_OPTION_CASE_FOLDING;
  */
 class ReportParserBase
 {
-    /** @var resource The XML parser */
+    /** @var XMLParser (resource before PHP 8.0) The XML parser */
     protected $xml_parser;
 
     /** @var string Text contents of tags */
-    protected $text = '';
+    protected string $text = '';
 
     /**
      * Create a parser for a report
@@ -82,11 +83,7 @@ class ReportParserBase
             }
         );
 
-        $fp = fopen($report, 'rb');
-
-        if ($fp === false) {
-            throw new Exception('Cannot open ' . $report);
-        }
+        $fp = Registry::filesystem()->root()->readStream($report);
 
         while ($data = fread($fp, 4096)) {
             if (!xml_parse($this->xml_parser, $data, feof($fp))) {

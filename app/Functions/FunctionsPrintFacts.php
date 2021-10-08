@@ -23,12 +23,9 @@ use Fisharebest\Webtrees\Age;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Family;
-use Fisharebest\Webtrees\Filter;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\Elements\UnknownElement;
 use Fisharebest\Webtrees\GedcomRecord;
-use Fisharebest\Webtrees\GedcomTag;
-use Fisharebest\Webtrees\Http\RequestHandlers\EditFactPage;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Media;
@@ -53,7 +50,6 @@ use function ob_start;
 use function preg_match;
 use function preg_match_all;
 use function preg_replace;
-use function route;
 use function str_contains;
 use function strip_tags;
 use function strlen;
@@ -86,13 +82,13 @@ class FunctionsPrintFacts
      */
     public static function printFact(Fact $fact, GedcomRecord $record): void
     {
-        $parent = $fact->record();
-        $tree   = $parent->tree();
-        $tag    = $fact->getTag();
-        $label  = $fact->label();
-        $value  = $fact->value();
-        $type   = $fact->attribute('TYPE');
-        $id     = $fact->id();
+        $parent  = $fact->record();
+        $tree    = $parent->tree();
+        [, $tag] = explode(':', $fact->tag());
+        $label   = $fact->label();
+        $value   = $fact->value();
+        $type    = $fact->attribute('TYPE');
+        $id      = $fact->id();
 
         $element = Registry::elementFactory()->make($fact->tag());
 
@@ -141,6 +137,7 @@ class FunctionsPrintFacts
 
         // Event of close relative
         if ($tag === 'EVEN' && $value === 'CLOSE_RELATIVE') {
+            $value = '';
             $styles[] = 'wt-relation-fact collapse';
         }
 
@@ -179,6 +176,9 @@ class FunctionsPrintFacts
         echo '</th>';
         echo '<td>';
 
+        // Primary attributes (value/type/date/place)
+        echo '<div class=mb-2>';
+
         // Event from another record?
         if ($parent !== $record) {
             if ($parent instanceof Family) {
@@ -206,28 +206,18 @@ class FunctionsPrintFacts
             echo Registry::elementFactory()->make($fact->tag() . ':TYPE')->labelValue($type, $tree);
         }
 
-        // Print the date of this fact/event
         echo FunctionsPrint::formatFactDate($fact, $record, true, true);
 
-        // Print the place of this fact/event
         echo '<div class="place">', FunctionsPrint::formatFactPlace($fact, true, true, true), '</div>';
-        // A blank line between the primary attributes (value, date, place) and the secondary ones
-        echo '<br>';
+        echo '</div>';
 
-        $addr = $fact->attribute('ADDR');
-        if ($addr !== '') {
-            echo Registry::elementFactory()->make($fact->tag() . ':ADDR')->labelValue($addr, $tree);
-        }
-
-        // Print the associates of this fact/event
-        if ($id !== 'asso') {
-            echo self::formatAssociateRelationship($fact);
-        }
-
-        // Print any other "2 XXXX" attributes, in the order in which they appear.
-        preg_match_all('/\n2 (' . Gedcom::REGEX_TAG . ') ?(.*)((\n[3-9].*)*)/', $fact->gedcom(), $l2_matches, PREG_SET_ORDER);
+        // Secondary attributes
+        echo '<div class="mb-2">';
+        preg_match_all('/\n2 (' . Gedcom::REGEX_TAG . ') ?(.*(?:\n3 CONT.*)*)((\n[3-9].*)*)/', $fact->gedcom(), $l2_matches, PREG_SET_ORDER);
 
         foreach ($l2_matches as $l2_match) {
+            $value = preg_replace('/\n3 CONT ?/', "\n", $l2_match[2]);
+
             switch ($l2_match[1]) {
                 case 'DATE':
                 case 'TIME':
@@ -235,7 +225,6 @@ class FunctionsPrintFacts
                 case 'HUSB':
                 case 'WIFE':
                 case 'PLAC':
-                case 'ADDR':
                 case 'ALIA':
                 case 'ASSO':
                 case '_ASSO':
@@ -261,7 +250,7 @@ class FunctionsPrintFacts
                         break;
                     }
 
-                    echo $element->labelValue($l2_match[2], $tree);
+                    echo $element->labelValue($value, $tree);
 
                     preg_match_all('/\n3 (' . Gedcom::REGEX_TAG . ') ?(.*)((\n[4-9].*)*)/', $l2_match[3], $l3_matches, PREG_SET_ORDER);
 
@@ -304,6 +293,15 @@ class FunctionsPrintFacts
                     break;
             }
         }
+        echo '</div>';
+
+        // Print the associates of this fact/event
+        if ($id !== 'asso') {
+            echo '<div class="mb-2">';
+            echo self::formatAssociateRelationship($fact);
+            echo '</div>';
+        }
+
         echo self::printFactSources($tree, $fact->gedcom(), 2);
         echo FunctionsPrint::printFactNotes($tree, $fact->gedcom(), 2);
         self::printMediaLinks($tree, $fact->gedcom(), 2);
@@ -433,7 +431,19 @@ class FunctionsPrintFacts
         for ($j = 0; $j < $ct; $j++) {
             if (!str_contains($match[$j][1], '@')) {
                 $source = e($match[$j][1] . preg_replace('/\n\d CONT ?/', "\n", $match[$j][2]));
-                $data   .= '<div class="fact_SOUR"><span class="label">' . I18N::translate('Source') . ':</span> <span class="field" dir="auto">' . Filter::formatText($source, $tree) . '</span></div>';
+                $data   .= '<div class="fact_SOUR"><span class="label">' . I18N::translate('Source') . ':</span> <span class="field" dir="auto">';
+
+                if ($tree->getPreference('FORMAT_TEXT') === 'markdown') {
+                    $data .= '<div class="markdown" dir="auto">' ;
+                    $data .= Registry::markdownFactory()->markdown($tree)->convertToHtml($source);
+                    $data .= '</div>';
+                } else {
+                    $data .= '<div class="markdown" dir="auto" style="white-space: pre-wrap;">';
+                    $data .= Registry::markdownFactory()->autolink($tree)->convertToHtml($source);
+                    $data .= '</div>';
+                }
+
+                $data   .= '</span></div>';
             }
         }
         // Find source for each fact
@@ -455,10 +465,12 @@ class FunctionsPrintFacts
                     $id       = 'collapse-' . Uuid::uuid4()->toString();
                     $expanded = (bool) $tree->getPreference('EXPAND_SOURCES');
                     if ($lt > 0) {
-                        $data .= '<a href="#' . e($id) . '" role="button" data-toggle="collapse" aria-controls="' . e($id) . '" aria-expanded="' . ($expanded ? 'true' : 'false') . '">';
+                        $data .= '<a href="#' . e($id) . '" role="button" data-bs-toggle="collapse" aria-controls="' . e($id) . '" aria-expanded="' . ($expanded ? 'true' : 'false') . '">';
                         $data .= view('icons/expand');
                         $data .= view('icons/collapse');
                         $data .= '</a>';
+                    } elseif ($ct > 1) {
+                        $data .= view('icons/spacer');
                     }
                     //MYARTJAUB-START
                     $data .= hook(\MyArtJaub\Webtrees\Contracts\Hooks\FactSourceTextExtenderInterface::class,
@@ -574,28 +586,11 @@ class FunctionsPrintFacts
                 }
                 echo '<th class="';
                 if ($level > 1) {
-                    echo ' rela';
+                    echo 'rela ';
                 }
-                echo ' ', $styleadd, '">';
-                $factlines = explode("\n", $factrec); // 1 BIRT Y\n2 SOUR ...
-                $factwords = explode(' ', $factlines[0]); // 1 BIRT Y
-                $factname  = $factwords[1]; // BIRT
-                if ($factname === 'EVEN' || $factname === 'FACT') {
-                    // Add ' EVEN' to provide sensible output for an event with an empty TYPE record
-                    $ct = preg_match('/2 TYPE (.*)/', $factrec, $ematch);
-                    if ($ct > 0) {
-                        $factname = trim($ematch[1]);
-                        echo $factname;
-                    } else {
-                        echo GedcomTag::getLabel($factname);
-                    }
-                } elseif ($can_edit) {
-                    echo '<a href="' . e(route(EditFactPage::class, [
-                            'xref'    => $parent->xref(),
-                            'fact_id' => $fact->id(),
-                            'tree'    => $tree->name(),
-                        ])) . '" title="', I18N::translate('Edit'), '">';
-                    echo GedcomTag::getLabel($factname), '</a>';
+                echo $styleadd, '">';
+                echo $fact->label();
+                if ($can_edit) {
                     echo '<div class="editfacts nowrap">';
                     if (preg_match('/^@.+@$/', $sid)) {
                         // Inline sources can't be edited. Attempting to save one will convert it
@@ -605,8 +600,6 @@ class FunctionsPrintFacts
                         echo view('edit/icon-fact-copy', ['fact' => $fact]);
                     }
                     echo view('edit/icon-fact-delete', ['fact' => $fact]);
-                } else {
-                    echo GedcomTag::getLabel($factname);
                 }
                 echo '</th>';
                 echo '<td class="', $styleadd, '">';
@@ -614,8 +607,9 @@ class FunctionsPrintFacts
                     echo '<a href="', e($source->url()), '">', $source->fullName(), '</a>';
                     // 2 RESN tags. Note, there can be more than one, such as "privacy" and "locked"
                     if (preg_match_all("/\n2 RESN (.+)/", $factrec, $rmatches)) {
+                        $label = Registry::elementFactory()->make($fact->tag() . ':RESN')->label();
                         foreach ($rmatches[1] as $rmatch) {
-                            echo '<br><span class="label">', GedcomTag::getLabel('RESN'), ':</span> <span class="field">';
+                            echo '<br><span class="label">', $label, ':</span> <span class="field">';
                             switch ($rmatch) {
                                 case 'none':
                                     // Note: "2 RESN none" is not valid gedcom, and the GUI will not let you add it.
@@ -636,14 +630,6 @@ class FunctionsPrintFacts
                                     break;
                             }
                             echo '</span>';
-                        }
-                    }
-                    $cs = preg_match("/$nlevel EVEN (.*)/", $srec, $cmatch);
-                    if ($cs > 0) {
-                        echo '<br><span class="label">', GedcomTag::getLabel('EVEN'), ' </span><span class="field">', $cmatch[1], '</span>';
-                        $cs = preg_match('/' . ($nlevel + 1) . ' ROLE (.*)/', $srec, $cmatch);
-                        if ($cs > 0) {
-                            echo '<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="label">', GedcomTag::getLabel('ROLE'), ' </span><span class="field">', $cmatch[1], '</span>';
                         }
                     }
                     echo self::printSourceStructure($tree, self::getSourceStructure($srec));
@@ -792,63 +778,43 @@ class FunctionsPrintFacts
             } else {
                 echo '<tr><th scope="row" class="', $styleadd, '">';
             }
-            if ($can_edit) {
-                if ($level < 2) {
-                    if ($note instanceof Note) {
-                        echo '<a href="' . e($note->url()) . '">';
-                        echo I18N::translate('Shared note');
-                        echo view('icons/note');
-                        echo '</a>';
-                    } else {
-                        echo I18N::translate('Note');
-                    }
-                    echo '<div class="editfacts nowrap">';
-                    echo view('edit/icon-fact-edit', ['fact' => $fact]);
-                    echo view('edit/icon-fact-copy', ['fact' => $fact]);
-                    echo view('edit/icon-fact-delete', ['fact' => $fact]);
-                    echo '</div>';
-                }
+
+            if ($note instanceof Note) {
+                echo '<a href="' . e($note->url()) . '">';
+                echo I18N::translate('Shared note');
+                echo view('icons/note');
+                echo '</a>';
             } else {
-                if ($level < 2) {
-                    if ($note) {
-                        echo I18N::translate('Shared note');
-                    } else {
-                        echo I18N::translate('Note');
-                    }
-                }
-                $factlines = explode("\n", $factrec); // 1 BIRT Y\n2 NOTE ...
-                $factwords = explode(' ', $factlines[0]); // 1 BIRT Y
-                $factname  = $factwords[1]; // BIRT
-                if ($factname === 'EVEN' || $factname === 'FACT') {
-                    // Add ' EVEN' to provide sensible output for an event with an empty TYPE record
-                    $ct = preg_match('/2 TYPE (.*)/', $factrec, $ematch);
-                    if ($ct > 0) {
-                        $factname = trim($ematch[1]);
-                        echo $factname;
-                    } else {
-                        echo GedcomTag::getLabel($factname);
-                    }
-                } elseif ($factname !== 'NOTE') {
-                    // Note is already printed
-                    echo GedcomTag::getLabel($factname);
-                    if ($note) {
-                        echo '<a class="btn btn-link" href="' . e($note->url()) . '" title="' . I18N::translate('View') . '"><span class="sr-only">' . I18N::translate('View') . '</span></a>';
-                    }
-                }
+                echo I18N::translate('Note');
+            }
+
+            if ($can_edit) {
+                echo '<div class="editfacts nowrap">';
+                echo view('edit/icon-fact-edit', ['fact' => $fact]);
+                echo view('edit/icon-fact-copy', ['fact' => $fact]);
+                echo view('edit/icon-fact-delete', ['fact' => $fact]);
+                echo '</div>';
             }
             echo '</th>';
-            if ($note) {
-                // Note objects
-                $text = Filter::formatText($note->getNote(), $tree);
+            if ($note instanceof Note) {
+                $text = $note->getNote();
             } else {
-                // Inline notes
                 $nrec = Functions::getSubRecord($level, "$level NOTE", $factrec, $j + 1);
                 $text = $match[$j][1] . Functions::getCont($level + 1, $nrec);
-                $text = Filter::formatText($text, $tree);
+            }
+
+            if ($tree->getPreference('FORMAT_TEXT') === 'markdown') {
+                $formatted_text = '<div class="markdown" dir="auto">' ;
+                $formatted_text .= Registry::markdownFactory()->markdown($tree)->convertToHtml($text);
+                $formatted_text .= '</div>';
+            } else {
+                $formatted_text = '<div class="markdown" dir="auto" style="white-space: pre-wrap;">';
+                $formatted_text .= Registry::markdownFactory()->autolink($tree)->convertToHtml($text);
+                $formatted_text .= '</div>';
             }
 
             echo '<td class="', $styleadd, ' wrap">';
-            echo $text;
+            echo $formatted_text;
             echo '</td></tr>';
         }
     }

@@ -26,6 +26,7 @@ use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\GedcomEditService;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -86,10 +87,11 @@ class EditFactAction implements RequestHandlerInterface
         $census_assistant = $this->module_service->findByInterface(CensusAssistantModule::class)->first();
 
         if ($census_assistant instanceof CensusAssistantModule && $record instanceof Individual) {
-            $gedcom = $census_assistant->updateCensusAssistant($request, $record, $fact_id, $gedcom, $keep_chan);
-            $pid_array = $params['pid_array'] ?? '';
-            if ($pid_array !== '') {
-                foreach (explode(',', $pid_array) as $pid) {
+            $ca_individuals = $params['ca_individuals']['xref'] ?? [];
+
+            if ($ca_individuals !== []) {
+                $gedcom = $census_assistant->updateCensusAssistant($request, $record, $fact_id, $gedcom, $keep_chan);
+                foreach ($ca_individuals as $pid) {
                     if ($pid !== $xref) {
                         $individual = Registry::individualFactory()->make($pid, $tree);
                         if ($individual instanceof Individual && $individual->canEdit()) {
@@ -113,6 +115,9 @@ class EditFactAction implements RequestHandlerInterface
             }
         }
 
-        return redirect($params['url'] ?? $record->url());
+        $base_url = $request->getAttribute('base_url');
+        $url      = Validator::parsedBody($request)->isLocalUrl($base_url)->string('url') ?? $record->url();
+
+        return redirect($url);
     }
 }

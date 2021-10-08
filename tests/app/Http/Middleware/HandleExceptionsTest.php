@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\Middleware;
 
 use Fig\Http\Message\StatusCodeInterface;
-use Fisharebest\Webtrees\Exceptions\HttpServerErrorException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpServerErrorException;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Services\UserService;
@@ -42,12 +42,12 @@ class HandleExceptionsTest extends TestCase
      */
     public function testMiddleware(): void
     {
-        $tree_service = self::createMock(TreeService::class);
+        $tree_service = $this->createMock(TreeService::class);
 
-        $handler = self::createMock(RequestHandlerInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
         $handler->method('handle')->willThrowException(new HttpServerErrorException('eek'));
 
-        $module_service = self::createMock(ModuleService::class);
+        $module_service = $this->createMock(ModuleService::class);
         $module_service->method('findByInterface')->willReturn(new Collection());
         $module_service->method('findByComponent')->willReturn(new Collection());
         app()->instance(ModuleService::class, $module_service);

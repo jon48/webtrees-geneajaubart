@@ -21,15 +21,17 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Exception;
 use Fisharebest\Webtrees\Contracts\UserInterface;
-use Fisharebest\Webtrees\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\FlashMessages;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Log;
 use Fisharebest\Webtrees\NoReplyUser;
 use Fisharebest\Webtrees\Services\CaptchaService;
 use Fisharebest\Webtrees\Services\EmailService;
+use Fisharebest\Webtrees\Services\RateLimitService;
 use Fisharebest\Webtrees\Services\UserService;
+use Fisharebest\Webtrees\Session;
 use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\SiteUser;
 use Fisharebest\Webtrees\Tree;
@@ -53,23 +55,28 @@ class RegisterAction implements RequestHandlerInterface
 
     private EmailService $email_service;
 
+    private RateLimitService $rate_limit_service;
+
     private UserService $user_service;
 
     /**
      * RegisterController constructor.
      *
-     * @param CaptchaService $captcha_service
-     * @param EmailService   $email_service
-     * @param UserService    $user_service
+     * @param CaptchaService   $captcha_service
+     * @param EmailService     $email_service
+     * @param RateLimitService $rate_limit_service
+     * @param UserService      $user_service
      */
     public function __construct(
         CaptchaService $captcha_service,
         EmailService $email_service,
+        RateLimitService $rate_limit_service,
         UserService $user_service
     ) {
-        $this->captcha_service = $captcha_service;
-        $this->email_service   = $email_service;
-        $this->user_service    = $user_service;
+        $this->captcha_service    = $captcha_service;
+        $this->email_service      = $email_service;
+        $this->rate_limit_service = $rate_limit_service;
+        $this->user_service       = $user_service;
     }
 
     /**
@@ -87,7 +94,7 @@ class RegisterAction implements RequestHandlerInterface
 
         $params = (array) $request->getParsedBody();
 
-        $comment  = $params['comment'] ?? '';
+        $comments = $params['comments'] ?? '';
         $email    = $params['email'] ?? '';
         $password = $params['password'] ?? '';
         $realname = $params['realname'] ?? '';
@@ -98,17 +105,24 @@ class RegisterAction implements RequestHandlerInterface
                 throw new Exception(I18N::translate('Please try again.'));
             }
 
-            $this->doValidateRegistration($request, $username, $email, $realname, $comment, $password);
+            $this->doValidateRegistration($request, $username, $email, $realname, $comments, $password);
+
+            Session::forget('register_comments');
+            Session::forget('register_email');
+            Session::forget('register_realname');
+            Session::forget('register_username');
         } catch (Exception $ex) {
             FlashMessages::addMessage($ex->getMessage(), 'danger');
 
-            return redirect(route(RegisterPage::class, [
-                'comment'  => $comment,
-                'email'    => $email,
-                'realname' => $realname,
-                'username' => $username,
-            ]));
+            Session::put('register_comments', $comments);
+            Session::put('register_email', $email);
+            Session::put('register_realname', $realname);
+            Session::put('register_username', $username);
+
+            return redirect(route(RegisterPage::class));
         }
+
+        $this->rate_limit_service->limitRateForSite(5, 300, 'rate-limit-registration');
 
         Log::addAuthenticationLog('User registration requested for: ' . $username);
 
@@ -116,13 +130,13 @@ class RegisterAction implements RequestHandlerInterface
         $token = Str::random(32);
 
         $user->setPreference(UserInterface::PREF_LANGUAGE, I18N::languageTag());
-        $user->setPreference(UserInterface::PREF_TIME_ZONE, Site::getPreference('TIMEZONE', 'UTC'));
+        $user->setPreference(UserInterface::PREF_TIME_ZONE, Site::getPreference('TIMEZONE'));
         $user->setPreference(UserInterface::PREF_IS_EMAIL_VERIFIED, '');
         $user->setPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED, '');
         $user->setPreference(UserInterface::PREF_TIMESTAMP_REGISTERED, date('U'));
         $user->setPreference(UserInterface::PREF_VERIFICATION_TOKEN, $token);
         $user->setPreference(UserInterface::PREF_CONTACT_METHOD, 'messaging2');
-        $user->setPreference(UserInterface::PREF_NEW_ACCOUNT_COMMENT, $comment);
+        $user->setPreference(UserInterface::PREF_NEW_ACCOUNT_COMMENT, $comments);
         $user->setPreference(UserInterface::PREF_IS_VISIBLE_ONLINE, '1');
         $user->setPreference(UserInterface::PREF_AUTO_ACCEPT_EDITS, '');
         $user->setPreference(UserInterface::PREF_IS_ADMINISTRATOR, '');
@@ -157,14 +171,14 @@ class RegisterAction implements RequestHandlerInterface
 
             $body_text = view('emails/register-notify-text', [
                 'user'     => $user,
-                'comments' => $comment,
+                'comments' => $comments,
                 'base_url' => $base_url,
                 'tree'     => $tree,
             ]);
 
             $body_html = view('emails/register-notify-html', [
                 'user'     => $user,
-                'comments' => $comment,
+                'comments' => $comments,
                 'base_url' => $base_url,
                 'tree'     => $tree,
             ]);

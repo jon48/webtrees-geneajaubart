@@ -24,11 +24,14 @@ use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Services\GedcomEditService;
+use Fisharebest\Webtrees\SurnameTradition;
 use Fisharebest\Webtrees\Tree;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
+use function array_map;
 use function assert;
 use function is_string;
 use function route;
@@ -44,7 +47,20 @@ class AddSpouseToIndividualPage implements RequestHandlerInterface
     private const OPPOSITE_SEX = [
         'F' => 'M',
         'M' => 'F',
+        'U' => 'U',
     ];
+
+    private GedcomEditService $gedcom_edit_service;
+
+    /**
+     * LinkSpouseToIndividualPage constructor.
+     *
+     * @param GedcomEditService $gedcom_edit_service
+     */
+    public function __construct(GedcomEditService $gedcom_edit_service)
+    {
+        $this->gedcom_edit_service = $gedcom_edit_service;
+    }
 
     /**
      * @param ServerRequestInterface $request
@@ -63,14 +79,19 @@ class AddSpouseToIndividualPage implements RequestHandlerInterface
         $individual = Auth::checkIndividualAccess($individual, true);
 
         // Create a dummy individual, so that we can create new/empty facts.
-        $sex     = self::OPPOSITE_SEX[$individual->sex()] ?? 'U';
-        $element = Registry::elementFactory()->make('INDI:NAME');
+        $sex     = self::OPPOSITE_SEX[$individual->sex()];
         $dummyi  = Registry::individualFactory()->new('', '0 @@ INDI', null, $tree);
         $dummyf  = Registry::familyFactory()->new('', '0 @@ FAM', null, $tree);
+
+        // Default names facts.
+        $surname_tradition = SurnameTradition::create($tree->getPreference('SURNAME_TRADITION'));
+        $names             = $surname_tradition->newSpouseNames($individual, $sex);
+        $name_facts        = array_map(fn (string $gedcom): Fact => new Fact($gedcom, $dummyi, ''), $names);
+
         $facts   = [
             'i' => [
                 new Fact('1 SEX ' . $sex, $dummyi, ''),
-                new Fact('1 NAME ' . $element->default($tree), $dummyi, ''),
+                ...$name_facts,
                 new Fact('1 BIRT', $dummyi, ''),
                 new Fact('1 DEAT', $dummyi, ''),
             ],
@@ -81,19 +102,20 @@ class AddSpouseToIndividualPage implements RequestHandlerInterface
 
         $titles = [
             'F' => I18N::translate('Add a wife'),
-            'H' => I18N::translate('Add a husband'),
+            'M' => I18N::translate('Add a husband'),
             'U' => I18N::translate('Add a spouse'),
         ];
 
         $title = $titles[$sex] ?? $titles['U'];
 
         return $this->viewResponse('edit/new-individual', [
-            'cancel_url' => $individual->url(),
-            'facts'      => $facts,
-            'post_url'   => route(AddSpouseToIndividualAction::class, ['tree' => $tree->name(), 'xref' => $xref]),
-            'title'      => $individual->fullName() . ' - ' . $title,
-            'tree'       => $tree,
-            'url'        => $request->getQueryParams()['url'] ?? $individual->url(),
+            'cancel_url'          => $individual->url(),
+            'facts'               => $facts,
+            'gedcom_edit_service' => $this->gedcom_edit_service,
+            'post_url'            => route(AddSpouseToIndividualAction::class, ['tree' => $tree->name(), 'xref' => $xref]),
+            'title'               => $individual->fullName() . ' - ' . $title,
+            'tree'                => $tree,
+            'url'                 => $request->getQueryParams()['url'] ?? $individual->url(),
         ]);
     }
 }

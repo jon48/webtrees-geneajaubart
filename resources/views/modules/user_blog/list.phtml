@@ -21,7 +21,7 @@ use Illuminate\Support\Collection;
 <?php foreach ($articles as $n => $article) : ?>
     <?php if ($n === $limit && count($articles) > $limit) : ?>
         <p>
-            <button class="btn btn-sm btn-secondary" data-toggle="collapse" data-target="#more-news-<?= e($block_id) ?>" role="button" aria-expanded="false" aria-controls="more-news-<?= e($block_id) ?>">
+            <button class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#more-news-<?= e($block_id) ?>" role="button" aria-expanded="false" aria-controls="more-news-<?= e($block_id) ?>">
                 <?= view('icons/add') ?>
                 <?= I18N::translate('show more') ?>
             </button>
@@ -42,7 +42,7 @@ use Illuminate\Support\Collection;
                     <?= I18N::translate('Edit') ?>
                 </a>
                 |
-                <button class="btn btn-link" type="submit" data-confirm="<?= I18N::translate('Are you sure you want to delete “%s”?', e($article->subject)) ?>" onclick="return confirm(this.dataset.confirm);">
+                <button class="btn btn-link" type="submit" data-wt-confirm="<?= I18N::translate('Are you sure you want to delete “%s”?', e($article->subject)) ?>" onclick="return confirm(this.dataset.confirm);">
                     <?= I18N::translate('Delete') ?>
                 </button>
             </form>

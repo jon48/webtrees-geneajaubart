@@ -40,23 +40,20 @@ use Fisharebest\Webtrees\I18N;
 
     <div class="col-sm-9">
         <?= view('components/select', ['name' => 'method', 'options' => $methods, 'selected' => $default_method]) ?>
-        <p class="small text-muted">
+        <div class="form-text">
             <?= I18N::translate('Regular expressions are an advanced pattern matching technique.') ?>
-            <?= I18N::translate('See %s for more information.', '<a href="http://php.net/manual/regexp.reference.php">php.net/manual/regexp.reference.php</a>') ?>
-        </p>
+            <?= I18N::translate('See %s for more information.', '<a href="https://php.net/manual/regexp.reference.php">php.net/manual/regexp.reference.php</a>') ?>
+        </div>
     </div>
 </div>
 
 <div class="row form-group">
     <label class="col-sm-3 col-form-label" for="case">
-        <?= I18N::translate('Case insensitive') ?>
+        <?= I18N::translate('Match both upper and lower case letters.') ?>
     </label>
 
     <div class="col-sm-9">
         <?= view('components/radios-inline', ['name' => 'case', 'selected' => '', 'options' => [''  => I18N::translate('no'), 'i' => I18N::translate('yes')]]) ?>
-        <p class="small text-muted">
-            <?= /* I18N: Help text for "Case insensitive" searches */ I18N::translate('Match both upper and lower case letters.') ?>
-        </p>
     </div>
 </div>
 

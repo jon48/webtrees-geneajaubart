@@ -23,6 +23,7 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\GedcomEditService;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -88,6 +89,9 @@ class AddSpouseToIndividualAction implements RequestHandlerInterface
         // Link the spouse to the family
         $spouse->createFact('1 FAMS @' . $family->xref() . '@', false);
 
-        return redirect($params['url'] ?? $spouse->url());
+        $base_url = $request->getAttribute('base_url');
+        $url      = Validator::parsedBody($request)->isLocalUrl($base_url)->string('url') ?? $spouse->url();
+
+        return redirect($url);
     }
 }

@@ -75,28 +75,6 @@ class Individual extends GedcomRecord
     }
 
     /**
-     * Sometimes, we'll know in advance that we need to load a set of records.
-     * Typically when we load families and their members.
-     *
-     * @param Tree     $tree
-     * @param string[] $xrefs
-     *
-     * @return void
-     */
-    public static function load(Tree $tree, array $xrefs): void
-    {
-        $rows = DB::table('individuals')
-            ->where('i_file', '=', $tree->id())
-            ->whereIn('i_id', array_unique($xrefs))
-            ->select(['i_id AS xref', 'i_gedcom AS gedcom'])
-            ->get();
-
-        foreach ($rows as $row) {
-            Registry::individualFactory()->make($row->xref, $tree, $row->gedcom);
-        }
-    }
-
-    /**
      * Can the name of this record be shown?
      *
      * @param int|null $access_level
@@ -489,9 +467,10 @@ class Individual extends GedcomRecord
         $birth_place = strip_tags($this->getBirthPlace()->shortName());
         $death_place = strip_tags($this->getDeathPlace()->shortName());
 
-        // Remove markup from dates.
-        $birth_date = strip_tags($this->getBirthDate()->display());
-        $death_date = strip_tags($this->getDeathDate()->display());
+        // Remove markup from dates.  Use UTF_FSI / UTF_PDI instead of <bdi></bdi>, as
+        // we cannot use HTML markup in title attributes.
+        $birth_date = "\u{2068}" . strip_tags($this->getBirthDate()->display()) . "\u{2069}";
+        $death_date = "\u{2068}" . strip_tags($this->getDeathDate()->display()) . "\u{2069}";
 
         // Use minimum and maximum dates - to agree with the age calculations.
         $birth_year = $this->getBirthDate()->minimumDate()->format('%Y');
