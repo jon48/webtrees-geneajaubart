@@ -379,15 +379,15 @@ class RelationshipNamesTest extends TestCase
     }
 
     /**
-     * @param string                  $expected
-     * @param array                   $nodes
-     * @param ModuleLanguageInterface $language
+     * @param string                   $expected
+     * @param array<Individual|Family> $nodes
+     * @param ModuleLanguageInterface  $language
      */
     private static function assertRelationship(string $expected, array $nodes, ModuleLanguageInterface $language): void
     {
         $service = new RelationshipService();
         $actual  = $service->nameFromPath($nodes, $language);
-        $path    = implode('-', array_map(fn (GedcomRecord $record): string => $record->xref(), $nodes));
+        $path    = implode('-', array_map(static fn (GedcomRecord $record): string => $record->xref(), $nodes));
         $english = $service->nameFromPath($nodes, new LanguageEnglishUnitedStates());
         $message = 'Language: ' . $language->title() . PHP_EOL . 'Path: ' . $path . ' (' . $english . ')';
 
@@ -397,10 +397,10 @@ class RelationshipNamesTest extends TestCase
     /**
      * Test a relationship name in both directions
      *
-     * @param string                  $fwd
-     * @param string                  $rev
-     * @param array                   $nodes
-     * @param ModuleLanguageInterface $language
+     * @param string                   $fwd
+     * @param string                   $rev
+     * @param array<Individual|Family> $nodes
+     * @param ModuleLanguageInterface  $language
      */
     private static function assertRelationships(string $fwd, string $rev, array $nodes, ModuleLanguageInterface $language): void
     {

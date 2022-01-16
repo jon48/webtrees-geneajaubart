@@ -47,7 +47,7 @@ class PedigreeChartModule extends AbstractModule implements ModuleChartInterface
 {
     use ModuleChartTrait;
 
-    protected const ROUTE_URL  = '/tree/{tree}/pedigree-{style}-{generations}/{xref}';
+    protected const ROUTE_URL = '/tree/{tree}/pedigree-{style}-{generations}/{xref}';
 
     // Chart styles
     public const STYLE_LEFT  = 'left';
@@ -75,8 +75,7 @@ class PedigreeChartModule extends AbstractModule implements ModuleChartInterface
         self::STYLE_RIGHT => self::STYLE_LEFT,
     ];
 
-    /** @var ChartService */
-    private $chart_service;
+    private ChartService $chart_service;
 
     /**
      * PedigreeChartModule constructor.
@@ -167,8 +166,8 @@ class PedigreeChartModule extends AbstractModule implements ModuleChartInterface
     /**
      * The URL for a page showing chart options.
      *
-     * @param Individual $individual
-     * @param mixed[]    $parameters
+     * @param Individual                        $individual
+     * @param array<bool|int|string|array|null> $parameters
      *
      * @return string
      */

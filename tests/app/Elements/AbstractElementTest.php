@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-use DOMDocument;
 use Fisharebest\Webtrees\Contracts\ElementInterface;
 use Fisharebest\Webtrees\TestCase;
 use Fisharebest\Webtrees\Tree;
@@ -32,8 +31,7 @@ abstract class AbstractElementTest extends TestCase
     private const EVIL_VALUE = '<script>evil()</script>';
     private const TEST_VALUE = '01 JAN 1970';
 
-    /** @var ElementInterface */
-    protected static $element;
+    protected static ElementInterface $element;
 
     /**
      * @return void

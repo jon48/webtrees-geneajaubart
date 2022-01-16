@@ -39,7 +39,6 @@ use Fisharebest\Webtrees\Elements\AgeAtEvent;
 use Fisharebest\Webtrees\Elements\AncestralFileNumber;
 use Fisharebest\Webtrees\Elements\Annulment;
 use Fisharebest\Webtrees\Elements\ApprovedSystemId;
-use Fisharebest\Webtrees\Elements\AttributeDescriptor;
 use Fisharebest\Webtrees\Elements\AutomatedRecordId;
 use Fisharebest\Webtrees\Elements\Baptism;
 use Fisharebest\Webtrees\Elements\BarMitzvah;
@@ -63,6 +62,7 @@ use Fisharebest\Webtrees\Elements\CopyrightSourceData;
 use Fisharebest\Webtrees\Elements\CountOfChildren;
 use Fisharebest\Webtrees\Elements\CountOfMarriages;
 use Fisharebest\Webtrees\Elements\Cremation;
+use Fisharebest\Webtrees\Elements\CustomElement;
 use Fisharebest\Webtrees\Elements\CustomEvent;
 use Fisharebest\Webtrees\Elements\CustomFact;
 use Fisharebest\Webtrees\Elements\DateLdsOrd;
@@ -79,6 +79,7 @@ use Fisharebest\Webtrees\Elements\EventAttributeType;
 use Fisharebest\Webtrees\Elements\EventOrFactClassification;
 use Fisharebest\Webtrees\Elements\EventsRecorded;
 use Fisharebest\Webtrees\Elements\EventTypeCitedFrom;
+use Fisharebest\Webtrees\Elements\FamilyCensus;
 use Fisharebest\Webtrees\Elements\FamilyRecord;
 use Fisharebest\Webtrees\Elements\FileName;
 use Fisharebest\Webtrees\Elements\FirstCommunion;
@@ -194,6 +195,7 @@ use Fisharebest\Webtrees\Elements\XrefSubmission;
 use Fisharebest\Webtrees\Elements\XrefSubmitter;
 use Fisharebest\Webtrees\I18N;
 
+use function array_merge;
 use function preg_match;
 use function strpos;
 
@@ -318,7 +320,7 @@ class ElementFactory implements ElementFactoryInterface
             'FAM:*:WIFE:AGE'           => new AgeAtEvent(I18N::translate('Wife’s age')),
             'FAM:*:WWW'                => new AddressWebPage(I18N::translate('URL')),
             'FAM:ANUL'                 => new Annulment(I18N::translate('Annulment')),
-            'FAM:CENS'                 => new Census(I18N::translate('Family census')),
+            'FAM:CENS'                 => new FamilyCensus(I18N::translate('Family census')),
             'FAM:CHAN'                 => new Change(I18N::translate('Last change')),
             'FAM:CHAN:DATE'            => new ChangeDate(I18N::translate('Date of last change')),
             'FAM:CHAN:DATE:TIME'       => new TimeValue(I18N::translate('Time of last change')),
@@ -635,6 +637,7 @@ class ElementFactory implements ElementFactoryInterface
             'NOTE:SOUR:PAGE'           => new WhereWithinSource(I18N::translate('Citation details')),
             'NOTE:SOUR:QUAY'           => new CertaintyAssessment(I18N::translate('Quality of data')),
             'OBJE'                     => new MediaRecord(I18N::translate('Media object')),
+            'OBJE:BLOB'                => new CustomElement(I18N::translate('Binary data object')),
             'OBJE:CHAN'                => new Change(I18N::translate('Last change')),
             'OBJE:CHAN:DATE'           => new ChangeDate(I18N::translate('Date of last change')),
             'OBJE:CHAN:DATE:TIME'      => new TimeValue(I18N::translate('Time of last change')),

@@ -86,9 +86,9 @@ class AddSpouseToIndividualPage implements RequestHandlerInterface
         // Default names facts.
         $surname_tradition = SurnameTradition::create($tree->getPreference('SURNAME_TRADITION'));
         $names             = $surname_tradition->newSpouseNames($individual, $sex);
-        $name_facts        = array_map(fn (string $gedcom): Fact => new Fact($gedcom, $dummyi, ''), $names);
+        $name_facts        = array_map(static fn (string $gedcom): Fact => new Fact($gedcom, $dummyi, ''), $names);
 
-        $facts   = [
+        $facts = [
             'i' => [
                 new Fact('1 SEX ' . $sex, $dummyi, ''),
                 ...$name_facts,
@@ -106,7 +106,7 @@ class AddSpouseToIndividualPage implements RequestHandlerInterface
             'U' => I18N::translate('Add a spouse'),
         ];
 
-        $title = $titles[$sex] ?? $titles['U'];
+        $title = $titles[$sex];
 
         return $this->viewResponse('edit/new-individual', [
             'cancel_url'          => $individual->url(),

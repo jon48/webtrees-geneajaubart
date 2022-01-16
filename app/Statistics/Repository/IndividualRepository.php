@@ -21,8 +21,6 @@ namespace Fisharebest\Webtrees\Statistics\Repository;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Carbon;
-use Fisharebest\Webtrees\Registry;
-use Fisharebest\Webtrees\Functions\FunctionsPrintLists;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
@@ -30,6 +28,7 @@ use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Module\IndividualListModule;
 use Fisharebest\Webtrees\Module\ModuleInterface;
 use Fisharebest\Webtrees\Module\ModuleListInterface;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Statistics\Google\ChartAge;
 use Fisharebest\Webtrees\Statistics\Google\ChartBirth;
@@ -41,34 +40,51 @@ use Fisharebest\Webtrees\Statistics\Google\ChartIndividualWithSources;
 use Fisharebest\Webtrees\Statistics\Google\ChartMortality;
 use Fisharebest\Webtrees\Statistics\Google\ChartSex;
 use Fisharebest\Webtrees\Statistics\Repository\Interfaces\IndividualRepositoryInterface;
+use Fisharebest\Webtrees\Statistics\Service\CenturyService;
+use Fisharebest\Webtrees\Statistics\Service\ColorService;
+use Fisharebest\Webtrees\SurnameTradition;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
-use stdClass;
 
+use function app;
 use function array_key_exists;
+use function array_keys;
+use function array_reverse;
+use function array_shift;
 use function array_slice;
+use function array_walk;
+use function arsort;
+use function e;
+use function explode;
+use function implode;
+use function preg_match;
+use function uksort;
+use function view;
 
 /**
- *
+ * A repository providing methods for individual related statistics.
  */
 class IndividualRepository implements IndividualRepositoryInterface
 {
-    /**
-     * @var Tree
-     */
-    private $tree;
+    private CenturyService $century_service;
+
+    private ColorService $color_service;
+
+    private Tree $tree;
 
     /**
-     * Constructor.
-     *
-     * @param Tree $tree
+     * @param CenturyService $century_service
+     * @param ColorService $color_service
+     * @param Tree         $tree
      */
-    public function __construct(Tree $tree)
+    public function __construct(CenturyService $century_service, ColorService $color_service, Tree $tree)
     {
-        $this->tree = $tree;
+        $this->century_service = $century_service;
+        $this->color_service   = $color_service;
+        $this->tree            = $tree;
     }
 
     /**
@@ -80,7 +96,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      * @param int    $threshold
      * @param int    $maxtoshow
      *
-     * @return string|int[]
+     * @return string|array<int>
      */
     private function commonGivenQuery(string $sex, string $type, bool $show_tot, int $threshold, int $maxtoshow)
     {
@@ -429,7 +445,7 @@ class IndividualRepository implements IndividualRepositoryInterface
     /**
      * Count the number of distinct given names (or the number of occurences of specific given names).
      *
-     * @param string[] ...$params
+     * @param array<string> ...$params
      *
      * @return string
      */
@@ -457,7 +473,7 @@ class IndividualRepository implements IndividualRepositoryInterface
     /**
      * Count the number of distinct surnames (or the number of occurrences of specific surnames).
      *
-     * @param string[] ...$params
+     * @param array<string> ...$params
      *
      * @return string
      */
@@ -484,7 +500,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      * @param int $number_of_surnames
      * @param int $threshold
      *
-     * @return int[][]
+     * @return array<array<int>>
      */
     private function topSurnames(int $number_of_surnames, int $threshold): array
     {
@@ -530,9 +546,7 @@ class IndividualRepository implements IndividualRepositoryInterface
     {
         $top_surname = $this->topSurnames(1, 0);
 
-        return $top_surname
-            ? implode(', ', array_keys(array_shift($top_surname)) ?? [])
-            : '';
+        return implode(', ', array_keys(array_shift($top_surname) ?? []));
     }
 
     /**
@@ -572,13 +586,21 @@ class IndividualRepository implements IndividualRepositoryInterface
             return $module instanceof IndividualListModule;
         });
 
-        return FunctionsPrintLists::surnameList(
-            $surnames,
-            ($type === 'list' ? 1 : 2),
-            $show_tot,
-            $module,
-            $this->tree
-        );
+        if ($type === 'list') {
+            return view('lists/surnames-bullet-list', [
+                'surnames' => $surnames,
+                'module'   => $module,
+                'totals'   => $show_tot,
+                'tree'     => $this->tree,
+            ]);
+        }
+
+        return view('lists/surnames-compact-list', [
+            'surnames' => $surnames,
+            'module'   => $module,
+            'totals'   => $show_tot,
+            'tree'     => $this->tree,
+        ]);
     }
 
     /**
@@ -684,13 +706,13 @@ class IndividualRepository implements IndividualRepositoryInterface
     public function statsBirthBySexQuery(int $year1 = -1, int $year2 = -1): Builder
     {
         return $this->statsBirthQuery($year1, $year2)
-                ->select(['d_month', 'i_sex', new Expression('COUNT(*) AS total')])
-                ->join('individuals', static function (JoinClause $join): void {
-                    $join
-                        ->on('i_id', '=', 'd_gid')
-                        ->on('i_file', '=', 'd_file');
-                })
-                ->groupBy(['i_sex']);
+            ->select(['d_month', 'i_sex', new Expression('COUNT(*) AS total')])
+            ->join('individuals', static function (JoinClause $join): void {
+                $join
+                    ->on('i_id', '=', 'd_gid')
+                    ->on('i_file', '=', 'd_file');
+            })
+            ->groupBy(['i_sex']);
     }
 
     /**
@@ -703,7 +725,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      */
     public function statsBirth(string $color_from = null, string $color_to = null): string
     {
-        return (new ChartBirth($this->tree))
+        return (new ChartBirth($this->century_service, $this->color_service, $this->tree))
             ->chartBirth($color_from, $color_to);
     }
 
@@ -742,13 +764,13 @@ class IndividualRepository implements IndividualRepositoryInterface
     public function statsDeathBySexQuery(int $year1 = -1, int $year2 = -1): Builder
     {
         return $this->statsDeathQuery($year1, $year2)
-                ->select(['d_month', 'i_sex', new Expression('COUNT(*) AS total')])
-                ->join('individuals', static function (JoinClause $join): void {
-                    $join
-                        ->on('i_id', '=', 'd_gid')
-                        ->on('i_file', '=', 'd_file');
-                })
-                ->groupBy(['i_sex']);
+            ->select(['d_month', 'i_sex', new Expression('COUNT(*) AS total')])
+            ->join('individuals', static function (JoinClause $join): void {
+                $join
+                    ->on('i_id', '=', 'd_gid')
+                    ->on('i_file', '=', 'd_file');
+            })
+            ->groupBy(['i_sex']);
     }
 
     /**
@@ -761,7 +783,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      */
     public function statsDeath(string $color_from = null, string $color_to = null): string
     {
-        return (new ChartDeath($this->tree))
+        return (new ChartDeath($this->century_service, $this->color_service, $this->tree))
             ->chartDeath($color_from, $color_to);
     }
 
@@ -773,7 +795,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      * @param int    $year1
      * @param int    $year2
      *
-     * @return array<stdClass>
+     * @return array<object>
      */
     public function statsAgeQuery(string $related = 'BIRT', string $sex = 'BOTH', int $year1 = -1, int $year2 = -1): array
     {
@@ -807,7 +829,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      */
     public function statsAge(): string
     {
-        return (new ChartAge($this->tree))->chartAge();
+        return (new ChartAge($this->century_service, $this->tree))->chartAge();
     }
 
     /**
@@ -1289,7 +1311,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      *
      * @return string
      */
-    public function averageLifespan($show_years = false): string
+    public function averageLifespan(bool $show_years): string
     {
         return $this->averageLifespanQuery('BOTH', $show_years);
     }
@@ -1301,7 +1323,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      *
      * @return string
      */
-    public function averageLifespanFemale($show_years = false): string
+    public function averageLifespanFemale(bool $show_years): string
     {
         return $this->averageLifespanQuery('F', $show_years);
     }
@@ -1313,7 +1335,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      *
      * @return string
      */
-    public function averageLifespanMale($show_years = false): string
+    public function averageLifespanMale(bool $show_years): string
     {
         return $this->averageLifespanQuery('M', $show_years);
     }
@@ -1328,7 +1350,7 @@ class IndividualRepository implements IndividualRepositoryInterface
      */
     private function getPercentage(int $count, int $total): string
     {
-        return ($total !== 0) ? I18N::percentage($count / $total, 1) : '';
+        return $total !== 0 ? I18N::percentage($count / $total, 1) : '';
     }
 
     /**
@@ -1772,7 +1794,7 @@ class IndividualRepository implements IndividualRepositoryInterface
             return I18N::translate('This information is not available.');
         }
 
-        return (new ChartCommonGiven())
+        return (new ChartCommonGiven($this->color_service))
             ->chartCommonGiven($tot_indi, $given, $color_from, $color_to);
     }
 
@@ -1797,7 +1819,9 @@ class IndividualRepository implements IndividualRepositoryInterface
             return I18N::translate('This information is not available.');
         }
 
-        return (new ChartCommonSurname($this->tree))
+        $surname_tradition = SurnameTradition::create($this->tree->getPreference('SURNAME_TRADITION'));
+
+        return (new ChartCommonSurname($this->color_service, $surname_tradition))
             ->chartCommonSurnames($tot_indi, $all_surnames, $color_from, $color_to);
     }
 
@@ -1814,7 +1838,7 @@ class IndividualRepository implements IndividualRepositoryInterface
         $tot_l = $this->totalLivingQuery();
         $tot_d = $this->totalDeceasedQuery();
 
-        return (new ChartMortality())
+        return (new ChartMortality($this->color_service))
             ->chartMortality($tot_l, $tot_d, $color_living, $color_dead);
     }
 
@@ -1833,7 +1857,7 @@ class IndividualRepository implements IndividualRepositoryInterface
         $tot_indi        = $this->totalIndividualsQuery();
         $tot_indi_source = $this->totalIndisWithSourcesQuery();
 
-        return (new ChartIndividualWithSources())
+        return (new ChartIndividualWithSources($this->color_service))
             ->chartIndisWithSources($tot_indi, $tot_indi_source, $color_from, $color_to);
     }
 
@@ -1852,7 +1876,7 @@ class IndividualRepository implements IndividualRepositoryInterface
         $tot_fam        = $this->totalFamiliesQuery();
         $tot_fam_source = $this->totalFamsWithSourcesQuery();
 
-        return (new ChartFamilyWithSources())
+        return (new ChartFamilyWithSources($this->color_service))
             ->chartFamsWithSources($tot_fam, $tot_fam_source, $color_from, $color_to);
     }
 

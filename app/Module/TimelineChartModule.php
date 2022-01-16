@@ -24,10 +24,10 @@ use Fig\Http\Message\RequestMethodInterface;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Date\GregorianDate;
 use Fisharebest\Webtrees\Fact;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
@@ -46,7 +46,7 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
 {
     use ModuleChartTrait;
 
-    protected const ROUTE_URL  = '/tree/{tree}/timeline-{scale}';
+    protected const ROUTE_URL = '/tree/{tree}/timeline-{scale}';
 
     // Defaults
     protected const DEFAULT_SCALE      = 10;
@@ -152,7 +152,7 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
 
         $params = (array) $request->getParsedBody();
 
-        $add  = $params['add'] ?? '';
+        $add = $params['add'] ?? '';
 
         Auth::checkComponentAccess($this, ModuleChartInterface::class, $tree, $user);
 
@@ -254,9 +254,9 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
     }
 
     /**
-     * @param Tree  $tree
-     * @param array $xrefs
-     * @param int   $scale
+     * @param Tree          $tree
+     * @param array<string> $xrefs
+     * @param int           $scale
      *
      * @return ResponseInterface
      */

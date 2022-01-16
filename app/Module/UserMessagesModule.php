@@ -31,7 +31,6 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use stdClass;
 
 use function assert;
 use function route;
@@ -44,10 +43,7 @@ class UserMessagesModule extends AbstractModule implements ModuleBlockInterface
 {
     use ModuleBlockTrait;
 
-    /**
-     * @var UserService
-     */
-    private $user_service;
+    private UserService $user_service;
 
     /**
      * UserMessagesModule constructor.
@@ -114,10 +110,10 @@ class UserMessagesModule extends AbstractModule implements ModuleBlockInterface
     /**
      * Generate the HTML content of this block.
      *
-     * @param Tree     $tree
-     * @param int      $block_id
-     * @param string   $context
-     * @param string[] $config
+     * @param Tree          $tree
+     * @param int           $block_id
+     * @param string        $context
+     * @param array<string> $config
      *
      * @return string
      */
@@ -127,7 +123,7 @@ class UserMessagesModule extends AbstractModule implements ModuleBlockInterface
             ->where('user_id', '=', Auth::id())
             ->orderByDesc('message_id')
             ->get()
-            ->map(static function (stdClass $row): stdClass {
+            ->map(static function (object $row): object {
                 $row->created = Carbon::make($row->created);
 
                 return $row;

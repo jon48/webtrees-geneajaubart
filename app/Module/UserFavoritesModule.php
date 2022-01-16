@@ -21,16 +21,15 @@ namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\Http\RequestHandlers\UserPage;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use stdClass;
 
 use function assert;
 
@@ -66,10 +65,10 @@ class UserFavoritesModule extends AbstractModule implements ModuleBlockInterface
     /**
      * Generate the HTML content of this block.
      *
-     * @param Tree     $tree
-     * @param int      $block_id
-     * @param string   $context
-     * @param string[] $config
+     * @param Tree          $tree
+     * @param int           $block_id
+     * @param string        $context
+     * @param array<string> $config
      *
      * @return string
      */
@@ -133,7 +132,7 @@ class UserFavoritesModule extends AbstractModule implements ModuleBlockInterface
      * @param Tree          $tree
      * @param UserInterface $user
      *
-     * @return array<stdClass>
+     * @return array<object>
      */
     public function getFavorites(Tree $tree, UserInterface $user): array
     {
@@ -141,7 +140,7 @@ class UserFavoritesModule extends AbstractModule implements ModuleBlockInterface
             ->where('gedcom_id', '=', $tree->id())
             ->where('user_id', '=', $user->id())
             ->get()
-            ->map(static function (stdClass $row) use ($tree): stdClass {
+            ->map(static function (object $row) use ($tree): object {
                 if ($row->xref !== null) {
                     $row->record = Registry::gedcomRecordFactory()->make($row->xref, $tree);
 

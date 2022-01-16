@@ -22,11 +22,14 @@ namespace Fisharebest\Webtrees\Statistics\Repository;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Statistics\Google\ChartMedia;
 use Fisharebest\Webtrees\Statistics\Repository\Interfaces\MediaRepositoryInterface;
+use Fisharebest\Webtrees\Statistics\Service\ColorService;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 
 use function array_slice;
+use function arsort;
+use function asort;
 use function count;
 use function in_array;
 
@@ -35,10 +38,9 @@ use function in_array;
  */
 class MediaRepository implements MediaRepositoryInterface
 {
-    /**
-     * @var Tree
-     */
-    private $tree;
+    private ColorService $color_service;
+
+    private Tree $tree;
 
     /**
      * Available media types.
@@ -66,8 +68,6 @@ class MediaRepository implements MediaRepositoryInterface
 
     /**
      * List of GEDCOM media types.
-     *
-     * @var string[]
      */
     private const MEDIA_TYPES = [
         self::MEDIA_TYPE_AUDIO,
@@ -91,13 +91,13 @@ class MediaRepository implements MediaRepositoryInterface
     ];
 
     /**
-     * Constructor.
-     *
-     * @param Tree $tree
+     * @param ColorService $color_service
+     * @param Tree         $tree
      */
-    public function __construct(Tree $tree)
+    public function __construct(ColorService $color_service, Tree $tree)
     {
-        $this->tree = $tree;
+        $this->color_service = $color_service;
+        $this->tree          = $tree;
     }
 
     /**
@@ -333,7 +333,7 @@ class MediaRepository implements MediaRepositoryInterface
             }
         }
 
-        if (count($media) > 10 && ($max / $tot) > 0.6) {
+        if (count($media) > 10 && $max / $tot > 0.6) {
             arsort($media);
             $media = array_slice($media, 0, 10);
             $c     = $tot;
@@ -365,7 +365,7 @@ class MediaRepository implements MediaRepositoryInterface
         $tot   = $this->totalMediaTypeQuery(self::MEDIA_TYPE_ALL);
         $media = $this->getSortedMediaTypeList($tot);
 
-        return (new ChartMedia())
+        return (new ChartMedia($this->color_service))
             ->chartMedia($media, $color_from, $color_to);
     }
 }

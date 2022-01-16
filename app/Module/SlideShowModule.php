@@ -19,15 +19,14 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Media;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ServerRequestInterface;
-use stdClass;
 
 use function app;
 use function array_filter;
@@ -64,10 +63,10 @@ class SlideShowModule extends AbstractModule implements ModuleBlockInterface
     /**
      * Generate the HTML content of this block.
      *
-     * @param Tree     $tree
-     * @param int      $block_id
-     * @param string   $context
-     * @param string[] $config
+     * @param Tree          $tree
+     * @param int           $block_id
+     * @param string        $context
+     * @param array<string> $config
      *
      * @return string
      */
@@ -120,7 +119,7 @@ class SlideShowModule extends AbstractModule implements ModuleBlockInterface
             ->select('media.*')
             ->get()
             ->shuffle()
-            ->first(static function (stdClass $row) use ($filter_links, $tree): bool {
+            ->first(static function (object $row) use ($filter_links, $tree): bool {
                 $media = Registry::mediaFactory()->make($row->m_id, $tree, $row->m_gedcom);
                 assert($media instanceof Media);
 

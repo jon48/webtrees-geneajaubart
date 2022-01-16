@@ -59,25 +59,20 @@ abstract class AbstractCalendarDate
     public const ESCAPE = '@#DUNKNOWN@';
 
     // Convert GEDCOM month names to month numbers.
-    protected const MONTH_ABBREVIATIONS = [];
+    protected const MONTH_TO_NUMBER = [];
+    protected const NUMBER_TO_MONTH = [];
 
-    /** @var CalendarInterface The calendar system used to represent this date */
-    protected $calendar;
+    protected CalendarInterface $calendar;
 
-    /** @var int Year number */
-    public $year;
+    public int $year;
 
-    /** @var int Month number */
-    public $month;
+    public int $month;
 
-    /** @var int Day number */
-    public $day;
+    public int $day;
 
-    /** @var int Earliest Julian day number (start of month/year for imprecise dates) */
-    private $minimum_julian_day;
+    private int $minimum_julian_day;
 
-    /** @var int Latest Julian day number (end of month/year for imprecise dates) */
-    private $maximum_julian_day;
+    private int $maximum_julian_day;
 
     /**
      * Create a date from either:
@@ -101,12 +96,12 @@ abstract class AbstractCalendarDate
         // Construct from an array (of three gedcom-style strings: "1900", "FEB", "4")
         if (is_array($date)) {
             $this->day = (int) $date[2];
-            if (array_key_exists($date[1], static::MONTH_ABBREVIATIONS)) {
-                $this->month = static::MONTH_ABBREVIATIONS[$date[1]];
-            } else {
-                $this->month = 0;
+            $this->month = static::MONTH_TO_NUMBER[$date[1]] ?? 0;
+
+            if ($this->month === 0) {
                 $this->day   = 0;
             }
+
             $this->year = $this->extractYear($date[0]);
 
             // Our simple lookup table above does not take into account Adar and leap-years.
@@ -349,7 +344,7 @@ abstract class AbstractCalendarDate
      *
      * @param AbstractCalendarDate $date
      *
-     * @return int[] Age in years/months/days
+     * @return array<int> Age in years/months/days
      */
     public function ageDifference(AbstractCalendarDate $date): array
     {
@@ -679,7 +674,7 @@ abstract class AbstractCalendarDate
      *
      * @return string
      */
-    protected function formatLongMonth($case = 'NOMINATIVE'): string
+    protected function formatLongMonth(string $case = 'NOMINATIVE'): string
     {
         switch ($case) {
             case 'GENITIVE':
@@ -793,7 +788,7 @@ abstract class AbstractCalendarDate
             return 'ADR';
         }
 
-        return array_search($this->month, static::MONTH_ABBREVIATIONS, true);
+        return static::NUMBER_TO_MONTH[$this->month] ?? '';
     }
 
     /**
@@ -833,7 +828,7 @@ abstract class AbstractCalendarDate
     /**
      * Which months follows this one? Calendars with leap-months should provide their own implementation.
      *
-     * @return int[]
+     * @return array<int>
      */
     protected function nextMonth(): array
     {
@@ -846,7 +841,7 @@ abstract class AbstractCalendarDate
     /**
      * Get today’s date in the current calendar.
      *
-     * @return int[]
+     * @return array<int>
      */
     public function todayYmd(): array
     {

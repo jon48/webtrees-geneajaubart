@@ -20,66 +20,52 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Statistics\Google;
 
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Module\ModuleThemeInterface;
-use Fisharebest\Webtrees\Statistics\Repository\IndividualRepository;
-use Fisharebest\Webtrees\Statistics\Repository\PlaceRepository;
+use Fisharebest\Webtrees\Statistics\Repository\Interfaces\IndividualRepositoryInterface;
+use Fisharebest\Webtrees\Statistics\Repository\Interfaces\PlaceRepositoryInterface;
 use Fisharebest\Webtrees\Statistics\Service\CountryService;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
-use stdClass;
 
-use function app;
 use function array_key_exists;
+use function preg_match_all;
+use function view;
 
 /**
  * A chart showing the distribution of different events on a map.
  */
 class ChartDistribution
 {
-    /**
-     * @var Tree
-     */
-    private $tree;
+    private Tree $tree;
+
+    private CountryService $country_service;
+
+    private IndividualRepositoryInterface $individual_repository;
+
+    private PlaceRepositoryInterface $place_repository;
 
     /**
-     * @var ModuleThemeInterface
+     * @var array<string>
      */
-    private $theme;
+    private array $country_to_iso3166;
 
     /**
-     * @var CountryService
+     * @param Tree                          $tree
+     * @param CountryService                $country_service
+     * @param IndividualRepositoryInterface $individual_repository
+     * @param PlaceRepositoryInterface      $place_repository
      */
-    private $country_service;
-
-    /**
-     * @var IndividualRepository
-     */
-    private $individualRepository;
-
-    /**
-     * @var PlaceRepository
-     */
-    private $placeRepository;
-
-    /**
-     * @var string[]
-     */
-    private $country_to_iso3166;
-
-    /**
-     * Constructor.
-     *
-     * @param Tree $tree
-     */
-    public function __construct(Tree $tree)
-    {
-        $this->tree                 = $tree;
-        $this->theme                = app(ModuleThemeInterface::class);
-        $this->country_service      = new CountryService();
-        $this->individualRepository = new IndividualRepository($tree);
-        $this->placeRepository      = new PlaceRepository($tree);
+    public function __construct(
+        Tree $tree,
+        CountryService $country_service,
+        IndividualRepositoryInterface $individual_repository,
+        PlaceRepositoryInterface $place_repository
+    ) {
+        $this->tree                  = $tree;
+        $this->country_service       = $country_service;
+        $this->individual_repository = $individual_repository;
+        $this->place_repository      = $place_repository;
 
         // Get the country names for each language
         $this->country_to_iso3166 = $this->getIso3166Countries();
@@ -152,7 +138,7 @@ class ChartDistribution
     {
         // Count how many people were born in each country
         $surn_countries = [];
-        $b_countries    = $this->placeRepository->statsPlaces('INDI', 'BIRT', 0, true);
+        $b_countries    = $this->place_repository->statsPlaces('INDI', 'BIRT', 0, true);
 
         foreach ($b_countries as $country => $count) {
             // Consolidate places (Germany, DEU => DE)
@@ -179,7 +165,7 @@ class ChartDistribution
     {
         // Count how many people were death in each country
         $surn_countries = [];
-        $d_countries    = $this->placeRepository->statsPlaces('INDI', 'DEAT', 0, true);
+        $d_countries    = $this->place_repository->statsPlaces('INDI', 'DEAT', 0, true);
 
         foreach ($d_countries as $country => $count) {
             // Consolidate places (Germany, DEU => DE)
@@ -206,7 +192,7 @@ class ChartDistribution
     {
         // Count how many families got marriage in each country
         $surn_countries = [];
-        $m_countries    = $this->placeRepository->statsPlaces('FAM');
+        $m_countries    = $this->place_repository->statsPlaces('FAM');
 
         // webtrees uses 3 letter country codes and localised country names, but google uses 2 letter codes.
         foreach ($m_countries as $place) {
@@ -230,7 +216,7 @@ class ChartDistribution
      *
      * @param string $surname
      *
-     * @return array<stdClass>
+     * @return array<object>
      */
     private function queryRecords(string $surname): array
     {
@@ -256,7 +242,7 @@ class ChartDistribution
     private function getSurnameChartData(string $surname): array
     {
         if ($surname === '') {
-            $surname = $this->individualRepository->getCommonSurname();
+            $surname = $this->individual_repository->getCommonSurname();
         }
 
         // Count how many people are events in each country
@@ -264,7 +250,6 @@ class ChartDistribution
         $records        = $this->queryRecords($surname);
 
         foreach ($records as $row) {
-            /** @var string[][] $matches */
             if (preg_match_all('/^2 PLAC (?:.*, *)*(.*)/m', $row->i_gedcom, $matches)) {
                 // webtrees uses 3 letter country codes and localised country names,
                 // but google uses 2 letter codes.
@@ -295,7 +280,7 @@ class ChartDistribution
     {
         // Count how many people have events in each country
         $surn_countries = [];
-        $a_countries    = $this->placeRepository->statsPlaces('INDI');
+        $a_countries    = $this->place_repository->statsPlaces('INDI');
 
         // webtrees uses 3 letter country codes and localised country names, but google uses 2 letter codes.
         foreach ($a_countries as $place) {
@@ -356,13 +341,10 @@ class ChartDistribution
                 break;
         }
 
-        $chart_color2 = $this->theme->parameter('distribution-chart-high-values');
-        $chart_color3 = $this->theme->parameter('distribution-chart-low-values');
-
         return view('statistics/other/charts/geo', [
             'chart_title'  => $chart_title,
-            'chart_color2' => $chart_color2,
-            'chart_color3' => $chart_color3,
+            'chart_color2' => '84beff',
+            'chart_color3' => 'c3dfff',
             'region'       => $chart_shows,
             'data'         => $data,
             'language'     => I18N::languageTag(),

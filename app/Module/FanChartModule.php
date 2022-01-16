@@ -80,7 +80,7 @@ class FanChartModule extends AbstractModule implements ModuleChartInterface, Req
 {
     use ModuleChartTrait;
 
-    protected const ROUTE_URL  = '/tree/{tree}/fan-chart-{style}-{generations}-{width}/{xref}';
+    protected const ROUTE_URL = '/tree/{tree}/fan-chart-{style}-{generations}-{width}/{xref}';
 
     // Chart styles
     private const STYLE_HALF_CIRCLE          = '2';
@@ -332,11 +332,11 @@ class FanChartModule extends AbstractModule implements ModuleChartInterface, Req
         // Use theme-specified colors.
         /** @var ModuleThemeInterface $theme */
         $theme       = app(ModuleThemeInterface::class);
-        $text_color  = $this->imageColor($image, $theme->parameter('chart-font-color'));
+        $text_color  = $this->imageColor($image, '000000');
         $backgrounds = [
-            'M' => $this->imageColor($image, $theme->parameter('chart-background-m')),
-            'F' => $this->imageColor($image, $theme->parameter('chart-background-f')),
-            'U' => $this->imageColor($image, $theme->parameter('chart-background-u')),
+            'M' => $this->imageColor($image, 'b1cff0'),
+            'F' => $this->imageColor($image, 'e9daf1'),
+            'U' => $this->imageColor($image, 'eeeeee'),
         ];
 
         // Co-ordinates are measured from the top-left corner.
@@ -487,13 +487,13 @@ class FanChartModule extends AbstractModule implements ModuleChartInterface, Req
 
                     foreach ($theme->individualBoxMenu($individual) as $menu) {
                         $link  = $menu->getLink();
-                        $class =  $menu->getClass();
+                        $class = $menu->getClass();
                         $html .= '<a href="' . e($link) . '" class="dropdown-item p-1 ' . e($class) . '">';
                         $html .= $menu->getLabel();
                         $html .= '</a>';
                     }
 
-                    $html  .= '</div>';
+                    $html .= '</div>';
                 }
             }
         }

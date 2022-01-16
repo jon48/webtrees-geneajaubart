@@ -31,6 +31,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 use function assert;
 use function asset;
+use function is_string;
 use function response;
 use function uasort;
 
@@ -58,7 +59,7 @@ class ColorsTheme extends CloudsTheme
      *
      * @param Tree|null $tree
      *
-     * @return Menu[]
+     * @return array<Menu>
      */
     public function userMenu(?Tree $tree): array
     {
@@ -194,11 +195,12 @@ class ColorsTheme extends CloudsTheme
     private function palette(): string
     {
         // If we are logged in, use our preference
-        $palette = Auth::user()->getPreference('themecolor', '');
+        $palette = Auth::user()->getPreference('themecolor');
 
         // If not logged in or no preference, use one we selected earlier in the session.
         if ($palette === '') {
-            $palette = Session::get('palette', '');
+            $palette = Session::get('palette');
+            $palette = is_string($palette) ? $palette : '';
         }
 
         // We haven't selected one this session? Use the site default

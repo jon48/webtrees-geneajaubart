@@ -21,45 +21,32 @@ namespace Fisharebest\Webtrees\Statistics\Google;
 
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Module\ModuleThemeInterface;
 use Fisharebest\Webtrees\Statistics\Service\ColorService;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
-use stdClass;
 
-use function app;
 use function count;
+use function htmlspecialchars_decode;
+use function strip_tags;
+use function view;
 
 /**
  * A chart showing the largest families (Families with most children).
  */
 class ChartFamilyLargest
 {
-    /**
-     * @var Tree
-     */
-    private $tree;
+    private Tree $tree;
+
+    private ColorService $color_service;
 
     /**
-     * @var ModuleThemeInterface
+     * @param ColorService $color_service
+     * @param Tree         $tree
      */
-    private $theme;
-
-    /**
-     * @var ColorService
-     */
-    private $color_service;
-
-    /**
-     * Constructor.
-     *
-     * @param Tree $tree
-     */
-    public function __construct(Tree $tree)
+    public function __construct(ColorService $color_service, Tree $tree)
     {
         $this->tree          = $tree;
-        $this->theme         = app(ModuleThemeInterface::class);
-        $this->color_service = new ColorService();
+        $this->color_service = $color_service;
     }
 
     /**
@@ -67,7 +54,7 @@ class ChartFamilyLargest
      *
      * @param int $total
      *
-     * @return array<stdClass>
+     * @return array<object>
      */
     private function queryRecords(int $total): array
     {
@@ -94,10 +81,8 @@ class ChartFamilyLargest
         string $color_to = null,
         int $total = 10
     ): string {
-        $chart_color1 = (string) $this->theme->parameter('distribution-chart-no-values');
-        $chart_color2 = (string) $this->theme->parameter('distribution-chart-high-values');
-        $color_from   = $color_from ?? $chart_color1;
-        $color_to     = $color_to   ?? $chart_color2;
+        $color_from = $color_from ?? 'ffffff';
+        $color_to   = $color_to ?? '84beff';
 
         $data = [
             [

@@ -41,7 +41,6 @@ use Fisharebest\Webtrees\Note;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Repository;
 use Fisharebest\Webtrees\Services\GedcomExportService;
-use Fisharebest\Webtrees\Services\UserService;
 use Fisharebest\Webtrees\Session;
 use Fisharebest\Webtrees\Source;
 use Fisharebest\Webtrees\Submitter;
@@ -55,7 +54,6 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use RuntimeException;
 
 use function app;
 use function array_filter;
@@ -65,6 +63,7 @@ use function array_search;
 use function assert;
 use function fclose;
 use function in_array;
+use function is_array;
 use function is_string;
 use function preg_match_all;
 use function redirect;
@@ -107,11 +106,9 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
     ];
 
     /** @var int The default access level for this module.  It can be changed in the control panel. */
-    protected $access_level = Auth::PRIV_USER;
+    protected int $access_level = Auth::PRIV_USER;
 
     private GedcomExportService $gedcom_export_service;
-
-    private UserService $user_service;
 
     private ResponseFactoryInterface $response_factory;
 
@@ -123,18 +120,15 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
      * @param GedcomExportService      $gedcom_export_service
      * @param ResponseFactoryInterface $response_factory
      * @param StreamFactoryInterface   $stream_factory
-     * @param UserService              $user_service
      */
     public function __construct(
         GedcomExportService $gedcom_export_service,
         ResponseFactoryInterface $response_factory,
-        StreamFactoryInterface $stream_factory,
-        UserService $user_service
+        StreamFactoryInterface $stream_factory
     ) {
         $this->gedcom_export_service = $gedcom_export_service;
         $this->response_factory      = $response_factory;
         $this->stream_factory        = $stream_factory;
-        $this->user_service          = $user_service;
     }
 
     /**
@@ -173,7 +167,8 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
         $route = $request->getAttribute('route');
         assert($route instanceof Route);
 
-        $cart  = Session::get('cart', []);
+        $cart  = Session::get('cart');
+        $cart  = is_array($cart) ? $cart : [];
         $count = count($cart[$tree->name()] ?? []);
         $badge = view('components/badge', ['count' => $count]);
 
@@ -235,7 +230,8 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
      */
     private function isCartEmpty(Tree $tree): bool
     {
-        $cart     = Session::get('cart', []);
+        $cart     = Session::get('cart');
+        $cart     = is_array($cart) ? $cart : [];
         $contents = $cart[$tree->name()] ?? [];
 
         return $contents === [];
@@ -294,7 +290,8 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
 
         $convert = (bool) ($params['convert'] ?? false);
 
-        $cart = Session::get('cart', []);
+        $cart = Session::get('cart');
+        $cart = is_array($cart) ? $cart : [];
 
         $xrefs = array_keys($cart[$tree->name()] ?? []);
         $xrefs = array_map('strval', $xrefs); // PHP converts numeric keys to integers.
@@ -396,7 +393,9 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
         $tree = $request->getAttribute('tree');
         assert($tree instanceof Tree);
 
-        $cart                = Session::get('cart', []);
+        $cart = Session::get('cart');
+        $cart = is_array($cart) ? $cart : [];
+
         $cart[$tree->name()] = [];
         Session::put('cart', $cart);
 
@@ -421,7 +420,9 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
 
         $xref = $request->getQueryParams()['xref'] ?? '';
 
-        $cart = Session::get('cart', []);
+        $cart = Session::get('cart');
+        $cart = is_array($cart) ? $cart : [];
+
         unset($cart[$tree->name()][$xref]);
         Session::put('cart', $cart);
 
@@ -457,11 +458,12 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
      *
      * @param Tree $tree
      *
-     * @return GedcomRecord[]
+     * @return array<GedcomRecord>
      */
     private function allRecordsInCart(Tree $tree): array
     {
-        $cart = Session::get('cart', []);
+        $cart = Session::get('cart');
+        $cart = is_array($cart) ? $cart : [];
 
         $xrefs = array_keys($cart[$tree->name()] ?? []);
         $xrefs = array_map('strval', $xrefs); // PHP converts numeric keys to integers.
@@ -1037,7 +1039,9 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
      */
     protected function addFamilyToCart(Family $family): void
     {
-        $cart = Session::get('cart', []);
+        $cart = Session::get('cart');
+        $cart = is_array($cart) ? $cart : [];
+
         $tree = $family->tree()->name();
         $xref = $family->xref();
 
@@ -1063,7 +1067,9 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
      */
     protected function addIndividualToCart(Individual $individual): void
     {
-        $cart = Session::get('cart', []);
+        $cart = Session::get('cart');
+        $cart = is_array($cart) ? $cart : [];
+
         $tree = $individual->tree()->name();
         $xref = $individual->xref();
 
@@ -1084,7 +1090,9 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
      */
     protected function addLocationToCart(Location $location): void
     {
-        $cart = Session::get('cart', []);
+        $cart = Session::get('cart');
+        $cart = is_array($cart) ? $cart : [];
+
         $tree = $location->tree()->name();
         $xref = $location->xref();
 
@@ -1121,7 +1129,9 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
      */
     protected function addMediaToCart(Media $media): void
     {
-        $cart = Session::get('cart', []);
+        $cart = Session::get('cart');
+        $cart = is_array($cart) ? $cart : [];
+
         $tree = $media->tree()->name();
         $xref = $media->xref();
 
@@ -1155,7 +1165,9 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
      */
     protected function addNoteToCart(Note $note): void
     {
-        $cart = Session::get('cart', []);
+        $cart = Session::get('cart');
+        $cart = is_array($cart) ? $cart : [];
+
         $tree = $note->tree()->name();
         $xref = $note->xref();
 
@@ -1187,7 +1199,9 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
      */
     protected function addSourceToCart(Source $source): void
     {
-        $cart = Session::get('cart', []);
+        $cart = Session::get('cart');
+        $cart = is_array($cart) ? $cart : [];
+
         $tree = $source->tree()->name();
         $xref = $source->xref();
 
@@ -1222,7 +1236,9 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
      */
     protected function addRepositoryToCart(Repository $repository): void
     {
-        $cart = Session::get('cart', []);
+        $cart = Session::get('cart');
+        $cart = is_array($cart) ? $cart : [];
+
         $tree = $repository->tree()->name();
         $xref = $repository->xref();
 
@@ -1256,7 +1272,8 @@ class ClippingsCartModule extends AbstractModule implements ModuleMenuInterface
      */
     protected function addSubmitterToCart(Submitter $submitter): void
     {
-        $cart = Session::get('cart', []);
+        $cart = Session::get('cart');
+        $cart = is_array($cart) ? $cart : [];
         $tree = $submitter->tree()->name();
         $xref = $submitter->xref();
 

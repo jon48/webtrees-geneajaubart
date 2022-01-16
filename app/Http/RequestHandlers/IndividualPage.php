@@ -32,6 +32,7 @@ use Fisharebest\Webtrees\Module\ModuleShareInterface;
 use Fisharebest\Webtrees\Module\ModuleSidebarInterface;
 use Fisharebest\Webtrees\Module\ModuleTabInterface;
 use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Services\AuthorizationService;
 use Fisharebest\Webtrees\Services\ClipboardService;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\UserService;
@@ -49,8 +50,9 @@ use function explode;
 use function implode;
 use function is_string;
 use function redirect;
-use function route;
+use function strip_tags;
 use function strtoupper;
+use function trim;
 
 /**
  * Show an individual's page.
@@ -58,6 +60,8 @@ use function strtoupper;
 class IndividualPage implements RequestHandlerInterface
 {
     use ViewResponseTrait;
+
+    private AuthorizationService $authorization_service;
 
     private ClipboardService $clipboard_service;
 
@@ -68,18 +72,21 @@ class IndividualPage implements RequestHandlerInterface
     /**
      * IndividualPage constructor.
      *
-     * @param ClipboardService $clipboard_service
-     * @param ModuleService    $module_service
-     * @param UserService      $user_service
+     * @param AuthorizationService $authorization_service
+     * @param ClipboardService     $clipboard_service
+     * @param ModuleService        $module_service
+     * @param UserService          $user_service
      */
     public function __construct(
+        AuthorizationService $authorization_service,
         ClipboardService $clipboard_service,
         ModuleService $module_service,
         UserService $user_service
     ) {
-        $this->clipboard_service = $clipboard_service;
-        $this->module_service    = $module_service;
-        $this->user_service      = $user_service;
+        $this->authorization_service = $authorization_service;
+        $this->clipboard_service     = $clipboard_service;
+        $this->module_service        = $module_service;
+        $this->user_service          = $user_service;
     }
 
     /**
@@ -131,6 +138,7 @@ class IndividualPage implements RequestHandlerInterface
 
         return $this->viewResponse('individual-page', [
             'age'              => $this->ageString($individual),
+            'can_upload_media' => $this->authorization_service->canUploadMedia($tree, Auth::user()),
             'clipboard_facts'  => $this->clipboard_service->pastableFacts($individual),
             'individual_media' => $individual_media,
             'meta_description' => $this->metaDescription($individual),
@@ -233,8 +241,8 @@ class IndividualPage implements RequestHandlerInterface
             }
         }
 
-        $meta_facts = array_map('strip_tags', $meta_facts);
-        $meta_facts = array_map('trim', $meta_facts);
+        $meta_facts = array_map(static fn (string $x): string => strip_tags($x), $meta_facts);
+        $meta_facts = array_map(static fn (string $x): string => trim($x), $meta_facts);
 
         return implode(', ', $meta_facts);
     }

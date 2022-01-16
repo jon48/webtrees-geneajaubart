@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Exception;
+use Fisharebest\Webtrees\Exceptions\FileUploadException;
 use Fisharebest\Webtrees\FlashMessages;
 use Fisharebest\Webtrees\Gedcom;
 use Fisharebest\Webtrees\I18N;
@@ -58,18 +59,6 @@ use const UPLOAD_ERR_OK;
  */
 class MapDataImportAction implements RequestHandlerInterface
 {
-    private MapDataService $map_data_service;
-
-    /**
-     * MapDataImportAction constructor.
-     *
-     * @param MapDataService $map_data_service
-     */
-    public function __construct(MapDataService $map_data_service)
-    {
-        $this->map_data_service = $map_data_service;
-    }
-
     /**
      * This function assumes the input file layout is
      * level followed by a variable number of placename fields
@@ -113,6 +102,8 @@ class MapDataImportAction implements RequestHandlerInterface
         } elseif ($local_file instanceof UploadedFileInterface && $local_file->getError() === UPLOAD_ERR_OK) {
             // 2nd choice is local file
             $fp = $local_file->getStream()->detach();
+        } else {
+            throw new FileUploadException($local_file);
         }
 
         if ($fp === false || $fp === null) {
@@ -158,9 +149,9 @@ class MapDataImportAction implements RequestHandlerInterface
         $updated = 0;
 
         // Remove places with 0,0 coordinates at lower levels.
-        $places = array_filter($places, static function ($place) {
-            return !str_contains($place['name'], ',') || $place['longitude'] !== 0.0 || $place['latitude'] !== 0.0;
-        });
+        $callback = static fn (array $place): bool => !str_contains($place['name'], ',') || $place['longitude'] !== 0.0 || $place['latitude'] !== 0.0;
+
+        $places = array_filter($places, $callback);
 
         foreach ($places as $place) {
             $location = new PlaceLocation($place['name']);

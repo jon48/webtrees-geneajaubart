@@ -124,7 +124,7 @@ trait ModuleThemeTrait
      *
      * @param Individual $individual
      *
-     * @return Menu[]
+     * @return array<Menu>
      */
     public function individualBoxMenu(Individual $individual): array
     {
@@ -139,7 +139,7 @@ trait ModuleThemeTrait
      *
      * @param Individual $individual
      *
-     * @return Menu[]
+     * @return array<Menu>
      */
     public function individualBoxMenuCharts(Individual $individual): array
     {
@@ -163,7 +163,7 @@ trait ModuleThemeTrait
      *
      * @param Individual $individual
      *
-     * @return Menu[]
+     * @return array<Menu>
      */
     public function individualBoxMenuFamilyLinks(Individual $individual): array
     {
@@ -281,7 +281,7 @@ trait ModuleThemeTrait
         }
 
         // Stay on the same tree page
-        $url  = route(LoginPage::class, ['tree' => $tree instanceof Tree ? $tree->name() : null, 'url' => $redirect]);
+        $url = route(LoginPage::class, ['tree' => $tree instanceof Tree ? $tree->name() : null, 'url' => $redirect]);
 
         return new Menu(I18N::translate('Sign in'), $url, 'menu-login', ['rel' => 'nofollow']);
     }
@@ -456,23 +456,11 @@ trait ModuleThemeTrait
     }
 
     /**
-     * Miscellaneous dimensions, fonts, styles, etc.
-     *
-     * @param string $parameter_name
-     *
-     * @return string|int|float
-     */
-    public function parameter($parameter_name)
-    {
-        return '';
-    }
-
-    /**
      * Generate a list of items for the main menu.
      *
      * @param Tree|null $tree
      *
-     * @return Menu[]
+     * @return array<Menu>
      */
     public function genealogyMenu(?Tree $tree): array
     {
@@ -491,7 +479,7 @@ trait ModuleThemeTrait
     /**
      * Create the genealogy menu.
      *
-     * @param Menu[] $menus
+     * @param array<Menu> $menus
      *
      * @return string
      */
@@ -507,7 +495,7 @@ trait ModuleThemeTrait
      *
      * @param Tree|null $tree
      *
-     * @return Menu[]
+     * @return array<Menu>
      */
     public function userMenu(?Tree $tree): array
     {

@@ -15,7 +15,7 @@ If you want to submit a patch or feature, please create a pull request on Github
 Before submitting a pull request make sure you have [tested the code](#how-to-test) 
 and [followed the coding conventions](#coding-conventions).
 
-Please read more about [setting up your environment](#how-to-setup-the-environment) for development.
+Please read more about [setting up your environment](#how-to-setup-a-development-environment) for development.
 
 ## How to start
 
@@ -103,8 +103,6 @@ Your code should follow the [PSR-12](https://www.php-fig.org/psr/psr-12/) Extend
 Please do not contribute your IDE directories (e.g. `.idea` or `.vscode`).
 
 ## Translations
-
-Please refer to the guide from the [official wiki](https://wiki.webtrees.net/en/Category:Translation_Guidelines).
 
 There is a [translators forum](http://webtrees.net/index.php/en/forum/8-translation) where you can discuss any issues relating to translation.
 

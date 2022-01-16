@@ -6,11 +6,11 @@ use Fisharebest\Webtrees\Tree;
 use Illuminate\Support\Collection;
 
 /**
- * @var int                  $block_id
- * @var bool                 $can_edit
- * @var Collection<stdClass> $favorites
- * @var string               $module_name
- * @var Tree                 $tree
+ * @var int                $block_id
+ * @var bool               $can_edit
+ * @var Collection<object> $favorites
+ * @var string             $module_name
+ * @var Tree               $tree
  */
 ?>
 
@@ -53,7 +53,7 @@ use Illuminate\Support\Collection;
                         <h5 class="modal-title" id="favorite-form-<?= e($block_id) ?>-label">
                             <?= I18N::translate('Add a favorite') ?>
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?= I18N::translate('close') ?>"">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?= I18N::translate('close') ?>">
                         </button>
                     </div>
                     <div class="modal-body">

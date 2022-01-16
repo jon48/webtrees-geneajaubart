@@ -20,43 +20,32 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Statistics\Google;
 
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Module\ModuleThemeInterface;
 use Fisharebest\Webtrees\Statistics\Service\ColorService;
-use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\SurnameTradition\PolishSurnameTradition;
+use Fisharebest\Webtrees\SurnameTradition\SurnameTraditionInterface;
 
-use function app;
+use function array_sum;
 use function count;
+use function preg_replace;
+use function view;
 
 /**
  * A chart showing the top surnames.
  */
 class ChartCommonSurname
 {
-    /**
-     * @var ModuleThemeInterface
-     */
-    private $theme;
+    private ColorService $color_service;
+
+    private SurnameTraditionInterface $surname_tradition;
 
     /**
-     * @var string
+     * @param ColorService              $color_service
+     * @param SurnameTraditionInterface $surname_tradition
      */
-    private $surname_tradition;
-
-    /**
-     * @var ColorService
-     */
-    private $color_service;
-
-    /**
-     * Constructor.
-     *
-     * @param Tree $tree
-     */
-    public function __construct(Tree $tree)
+    public function __construct(ColorService $color_service, SurnameTraditionInterface $surname_tradition)
     {
-        $this->theme             = app(ModuleThemeInterface::class);
-        $this->surname_tradition = $tree->getPreference('SURNAME_TRADITION');
-        $this->color_service     = new ColorService();
+        $this->surname_tradition = $surname_tradition;
+        $this->color_service     = $color_service;
     }
 
     /**
@@ -84,7 +73,7 @@ class ChartCommonSurname
             }
         }
 
-        if ($this->surname_tradition === 'polish') {
+        if ($this->surname_tradition instanceof PolishSurnameTradition) {
             // Most common surname should be in male variant (Kowalski, not Kowalska)
             $top_name = preg_replace(
                 [
@@ -125,13 +114,11 @@ class ChartCommonSurname
         string $color_from = null,
         string $color_to = null
     ): string {
-        $chart_color1 = (string) $this->theme->parameter('distribution-chart-no-values');
-        $chart_color2 = (string) $this->theme->parameter('distribution-chart-high-values');
-        $color_from   = $color_from ?? $chart_color1;
-        $color_to     = $color_to   ?? $chart_color2;
+        $color_from = $color_from ?? 'ffffff';
+        $color_to   = $color_to ?? '84beff';
 
         $tot = 0;
-        foreach ($all_surnames as $surn => $surnames) {
+        foreach ($all_surnames as $surnames) {
             $tot += array_sum($surnames);
         }
 

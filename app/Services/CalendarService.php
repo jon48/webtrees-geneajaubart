@@ -101,7 +101,7 @@ class CalendarService
      * @param string $filterof filter by living/recent
      * @param string $filtersx filter by sex
      *
-     * @return Fact[]
+     * @return array<Fact>
      */
     public function getCalendarEvents(int $jd1, int $jd2, string $facts, Tree $tree, string $filterof = '', string $filtersx = ''): array
     {
@@ -180,7 +180,7 @@ class CalendarService
 
                 foreach ($record->facts([$row->d_fact]) as $fact) {
                     // For date ranges, we need a match on either the start/end.
-                    if (($fact->date()->minimumJulianDay() === $anniv_date->minimumJulianDay() || $fact->date()->maximumJulianDay() === $anniv_date->maximumJulianDay())) {
+                    if ($fact->date()->minimumJulianDay() === $anniv_date->minimumJulianDay() || $fact->date()->maximumJulianDay() === $anniv_date->maximumJulianDay()) {
                         $fact->anniv   = 0;
                         $found_facts[] = $fact;
                     }
@@ -267,7 +267,7 @@ class CalendarService
      * @param string $filterof filter by living/recent
      * @param string $filtersx filter by sex
      *
-     * @return Fact[]
+     * @return array<Fact>
      */
     public function getAnniversaryEvents(int $jd, string $facts, Tree $tree, string $filterof = '', string $filtersx = ''): array
     {

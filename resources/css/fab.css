@@ -494,6 +494,7 @@ div.fact_SHARED_NOTE {
 .news_box {
     background-color: #ccc;
     border-top: none;
+    padding: 0.25rem;
 }
 
 .news_title {
@@ -622,14 +623,6 @@ div.fact_SHARED_NOTE {
 
 .wt-old {
     outline: solid #f00 1px;
-}
-
-.tag_cloud {
-    text-align: center;
-}
-
-.tag_cloud a {
-    white-space: nowrap;
 }
 
 .nowrap {

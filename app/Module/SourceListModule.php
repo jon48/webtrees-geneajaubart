@@ -20,12 +20,12 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module;
 
 use Aura\Router\RouterContainer;
+use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
-use Fisharebest\Webtrees\Auth;
 use Illuminate\Database\Capsule\Manager as DB;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -45,7 +45,7 @@ class SourceListModule extends AbstractModule implements ModuleListInterface, Re
     protected const ROUTE_URL = '/tree/{tree}/source-list';
 
     /** @var int The default access level for this module.  It can be changed in the control panel. */
-    protected $access_level = Auth::PRIV_USER;
+    protected int $access_level = Auth::PRIV_USER;
 
     /**
      * Initialization.
@@ -94,8 +94,8 @@ class SourceListModule extends AbstractModule implements ModuleListInterface, Re
     }
 
     /**
-     * @param Tree    $tree
-     * @param mixed[] $parameters
+     * @param Tree                              $tree
+     * @param array<bool|int|string|array|null> $parameters
      *
      * @return string
      */

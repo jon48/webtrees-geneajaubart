@@ -38,8 +38,7 @@ class DescendancyModule extends AbstractModule implements ModuleSidebarInterface
 {
     use ModuleSidebarTrait;
 
-    /** @var SearchService */
-    private $search_service;
+    private SearchService $search_service;
 
     /**
      * DescendancyModule constructor.
@@ -169,7 +168,7 @@ class DescendancyModule extends AbstractModule implements ModuleSidebarInterface
      *
      * @return string
      */
-    public function getPersonLi(Individual $person, $generations = 0): string
+    public function getPersonLi(Individual $person, int $generations = 0): string
     {
         $icon     = $generations > 0 ? 'icon-minus' : 'icon-plus';
         $lifespan = $person->canShow() ? '(' . $person->lifespan() . ')' : '';
@@ -200,7 +199,7 @@ class DescendancyModule extends AbstractModule implements ModuleSidebarInterface
      *
      * @return string
      */
-    public function getFamilyLi(Family $family, Individual $person, $generations = 0): string
+    public function getFamilyLi(Family $family, Individual $person, int $generations = 0): string
     {
         $spouse = $family->spouse($person);
         if ($spouse instanceof Individual) {

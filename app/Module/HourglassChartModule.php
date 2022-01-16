@@ -46,7 +46,7 @@ class HourglassChartModule extends AbstractModule implements ModuleChartInterfac
 {
     use ModuleChartTrait;
 
-    protected const ROUTE_URL  = '/tree/{tree}/hourglass-{generations}-{spouses}/{xref}';
+    protected const ROUTE_URL = '/tree/{tree}/hourglass-{generations}-{spouses}/{xref}';
 
     // Defaults
     private const   DEFAULT_GENERATIONS = '3';
@@ -139,8 +139,8 @@ class HourglassChartModule extends AbstractModule implements ModuleChartInterfac
     /**
      * The URL for a page showing chart options.
      *
-     * @param Individual $individual
-     * @param mixed[]    $parameters
+     * @param Individual                        $individual
+     * @param array<bool|int|string|array|null> $parameters
      *
      * @return string
      */

@@ -29,7 +29,6 @@ use Illuminate\Database\Query\Expression;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use stdClass;
 
 use function array_key_exists;
 use function assert;
@@ -93,7 +92,7 @@ class CheckTree implements RequestHandlerInterface
             ->unionAll($q5)
             ->unionAll($q6)
             ->get()
-            ->map(static function (stdClass $row): stdClass {
+            ->map(static function (object $row): object {
                 // Extract type for pending record
                 if ($row->type === '' && preg_match('/^0 @[^@]*@ ([_A-Z0-9]+)/', $row->gedcom, $match)) {
                     $row->type = $match[1];
@@ -170,6 +169,7 @@ class CheckTree implements RequestHandlerInterface
                 'OBJE',
                 'REPO',
                 'AUTH',
+                '_LOC',
             ],
             'REPO' => ['NOTE'],
             'OBJE' => ['NOTE'],
@@ -222,7 +222,7 @@ class CheckTree implements RequestHandlerInterface
                             I18N::translate('%1$s does not exist. Did you mean %2$s?', $this->checkLink($tree, $xref2), $this->checkLink($tree, $upper_links[strtoupper($xref2)]));
                     } else {
                         /* I18N: placeholders are GEDCOM XREFs, such as R123 */
-                        $errors[] = $this->checkLinkMessage($tree, $type1, $xref1, $type2, $xref2) . ' ' . I18N::translate('%1$s does not exist.', $this->checkLink($tree, $xref2));
+                        $errors[] = $this->checkLinkMessage($tree, $type1, $xref1, $type2, $xref2) . ' ' . I18N::translate('%s does not exist.', $this->checkLink($tree, $xref2));
                     }
                 } elseif ($type2 === 'SOUR' && $type1 === 'NOTE') {
                     // Notes are intended to add explanations and comments to other records. They should not have their own sources.
@@ -268,12 +268,12 @@ class CheckTree implements RequestHandlerInterface
     }
 
     /**
-     * @param string     $type
-     * @param string[][] $links
-     * @param string     $xref1
-     * @param string     $xref2
-     * @param string     $link
-     * @param string[]   $reciprocal
+     * @param string               $type
+     * @param array<array<string>> $links
+     * @param string               $xref1
+     * @param string               $xref2
+     * @param string               $link
+     * @param array<string>        $reciprocal
      *
      * @return bool
      */

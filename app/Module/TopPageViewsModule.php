@@ -19,9 +19,9 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Str;
@@ -35,6 +35,8 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface
     use ModuleBlockTrait;
 
     private const DEFAULT_NUMBER_TO_SHOW = '10';
+
+    private const PAGES = ['individual.php', 'family.php', 'source.php', 'repo.php', 'note.php', 'mediaviewer.php'];
 
     /**
      * How should this module be identified in the control panel, etc.?
@@ -61,10 +63,10 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface
     /**
      * Generate the HTML content of this block.
      *
-     * @param Tree     $tree
-     * @param int      $block_id
-     * @param string   $context
-     * @param string[] $config
+     * @param Tree          $tree
+     * @param int           $block_id
+     * @param string        $context
+     * @param array<string> $config
      *
      * @return string
      */
@@ -76,7 +78,7 @@ class TopPageViewsModule extends AbstractModule implements ModuleBlockInterface
 
         $query = DB::table('hit_counter')
             ->where('gedcom_id', '=', $tree->id())
-            ->whereIn('page_name', ['individual.php','family.php','source.php','repo.php','note.php','mediaviewer.php'])
+            ->whereIn('page_name', self::PAGES)
             ->orderByDesc('page_count');
 
         $results = [];

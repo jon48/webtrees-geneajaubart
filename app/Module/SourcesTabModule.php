@@ -32,11 +32,9 @@ class SourcesTabModule extends AbstractModule implements ModuleTabInterface
 {
     use ModuleTabTrait;
 
-    /** @var Collection All facts belonging to this source. */
-    private $facts;
+    private ?Collection $facts = null;
 
-    /** @var ClipboardService */
-    private $clipboard_service;
+    private ClipboardService $clipboard_service;
 
     /**
      * SourcesTabModule constructor.

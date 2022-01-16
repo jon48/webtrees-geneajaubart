@@ -20,13 +20,13 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module;
 
 use Aura\Router\RouterContainer;
+use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Submitter;
 use Fisharebest\Webtrees\Tree;
-use Fisharebest\Webtrees\Auth;
 use Illuminate\Database\Capsule\Manager as DB;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -46,7 +46,7 @@ class SubmitterListModule extends AbstractModule implements ModuleListInterface,
     protected const ROUTE_URL = '/tree/{tree}/submitter-list';
 
     /** @var int The default access level for this module.  It can be changed in the control panel. */
-    protected $access_level = Auth::PRIV_NONE;
+    protected int $access_level = Auth::PRIV_NONE;
 
     /**
      * Initialization.
@@ -105,8 +105,8 @@ class SubmitterListModule extends AbstractModule implements ModuleListInterface,
     }
 
     /**
-     * @param Tree    $tree
-     * @param mixed[] $parameters
+     * @param Tree                              $tree
+     * @param array<bool|int|string|array|null> $parameters
      *
      * @return string
      */

@@ -30,7 +30,6 @@ use Fisharebest\Localization\Translator;
 use Fisharebest\Webtrees\Module\ModuleCustomInterface;
 use Fisharebest\Webtrees\Module\ModuleLanguageInterface;
 use Fisharebest\Webtrees\Services\ModuleService;
-use Illuminate\Support\Collection;
 
 use function array_merge;
 use function class_exists;
@@ -567,14 +566,10 @@ class I18N
     public static function comparator(): Closure
     {
         if (self::$collator instanceof Collator) {
-            return static function (string $x, string $y): int {
-                return (int) self::$collator->compare($x, $y);
-            };
+            return static fn (string $x, string $y): int => (int) self::$collator->compare($x, $y);
         }
 
-        return static function (string $x, string $y): int {
-            return strcmp(self::strtolower($x), self::strtolower($y));
-        };
+        return static fn (string $x, string $y): int => strcmp(self::strtolower($x), self::strtolower($y));
     }
 
 

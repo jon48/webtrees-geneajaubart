@@ -36,8 +36,7 @@ class SubmitterText extends AbstractElement
      */
     public function canonical(string $value): string
     {
-        // Browsers use MS-DOS line endings in multi-line data.
-        return strtr($value, ["\t" => ' ', "\r\n" => "\n", "\r" => "\n"]);
+        return $this->canonicalText($value);
     }
 
     /**
@@ -53,5 +52,18 @@ class SubmitterText extends AbstractElement
     public function edit(string $id, string $name, string $value, Tree $tree): string
     {
         return $this->editTextArea($id, $name, $value);
+    }
+
+    /**
+     * Display the value of this type of element.
+     *
+     * @param string $value
+     * @param Tree   $tree
+     *
+     * @return string
+     */
+    public function value(string $value, Tree $tree): string
+    {
+        return $this->valueFormatted($value, $tree);
     }
 }

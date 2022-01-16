@@ -22,6 +22,7 @@ namespace Fisharebest\Webtrees\Module;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Carbon;
 use Fisharebest\Webtrees\Http\Exceptions\HttpAccessDeniedException;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Http\RequestHandlers\UserPage;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Services\HtmlService;
@@ -31,9 +32,10 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use stdClass;
 
 use function assert;
+use function is_string;
+use function redirect;
 
 /**
  * Class UserJournalModule
@@ -42,8 +44,7 @@ class UserJournalModule extends AbstractModule implements ModuleBlockInterface
 {
     use ModuleBlockTrait;
 
-    /** @var HtmlService */
-    private $html_service;
+    private HtmlService $html_service;
 
     /**
      * HtmlBlockModule constructor.
@@ -69,10 +70,10 @@ class UserJournalModule extends AbstractModule implements ModuleBlockInterface
     /**
      * Generate the HTML content of this block.
      *
-     * @param Tree     $tree
-     * @param int      $block_id
-     * @param string   $context
-     * @param string[] $config
+     * @param Tree          $tree
+     * @param int           $block_id
+     * @param string        $context
+     * @param array<string> $config
      *
      * @return string
      */
@@ -82,7 +83,7 @@ class UserJournalModule extends AbstractModule implements ModuleBlockInterface
             ->where('user_id', '=', Auth::id())
             ->orderByDesc('updated')
             ->get()
-            ->map(static function (stdClass $row): stdClass {
+            ->map(static function (object $row): object {
                 $row->updated = Carbon::make($row->updated);
 
                 return $row;
@@ -172,11 +173,13 @@ class UserJournalModule extends AbstractModule implements ModuleBlockInterface
                 ->where('news_id', '=', $news_id)
                 ->where('user_id', '=', Auth::id())
                 ->first();
+
+            // Record was deleted before we could read it?
+            if (!is_string($row)) {
+                throw new HttpNotFoundException(I18N::translate('%s does not exist.', 'news_id:' . $news_id));
+            }
         } else {
-            $row = (object) [
-                'body'    => '',
-                'subject' => '',
-            ];
+            $row = (object)['body' => '', 'subject' => ''];
         }
 
         $title = I18N::translate('Add/edit a journal/news entry');

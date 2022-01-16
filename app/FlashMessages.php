@@ -19,7 +19,8 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees;
 
-use stdClass;
+use function is_a;
+use function is_array;
 
 /**
  * Generate messages in one request and display them in the next.
@@ -37,24 +38,28 @@ class FlashMessages
      *
      * @return void
      */
-    public static function addMessage(string $text, $status = 'info'): void
+    public static function addMessage(string $text, string $status = 'info'): void
     {
-        $message         = new stdClass();
-        $message->text   = $text;
-        $message->status = $status;
+        $messages = Session::get(self::FLASH_KEY);
+        $messages = is_array($messages) ? $messages : [];
 
-        $messages   = Session::get(self::FLASH_KEY, []);
-        $messages[] = $message;
+        $messages[] = (object) [
+            'text'   => $text,
+            'status' => $status,
+        ];
+
         Session::put(self::FLASH_KEY, $messages);
     }
 
     /**
      * Get the current messages, and remove them from session storage.
      *
-     * @return array<stdClass>
+     * @return array<object>
      */
     public static function getMessages(): array
     {
-        return Session::pull(self::FLASH_KEY, []);
+        $messages = Session::pull(self::FLASH_KEY);
+
+        return is_array($messages) ? $messages : [];
     }
 }

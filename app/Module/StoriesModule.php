@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
 use Fisharebest\Webtrees\I18N;
@@ -31,9 +32,9 @@ use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use stdClass;
 
 use function assert;
+use function is_string;
 use function redirect;
 use function route;
 
@@ -46,11 +47,9 @@ class StoriesModule extends AbstractModule implements ModuleConfigInterface, Mod
     use ModuleConfigTrait;
     use ModuleMenuTrait;
 
-    /** @var HtmlService */
-    private $html_service;
+    private HtmlService $html_service;
 
-    /** @var TreeService */
-    private $tree_service;
+    private TreeService $tree_service;
 
     /**
      * StoriesModule constructor.
@@ -65,7 +64,7 @@ class StoriesModule extends AbstractModule implements ModuleConfigInterface, Mod
     }
 
     /** @var int The default access level for this module.  It can be changed in the control panel. */
-    protected $access_level = Auth::PRIV_HIDE;
+    protected int $access_level = Auth::PRIV_HIDE;
 
     /**
      * A sentence describing what this module does.
@@ -118,7 +117,7 @@ class StoriesModule extends AbstractModule implements ModuleConfigInterface, Mod
     /**
      * @param Individual $individual
      *
-     * @return array<stdClass>
+     * @return array<object>
      */
     private function getStoriesForIndividual(Individual $individual): array
     {
@@ -294,20 +293,23 @@ class StoriesModule extends AbstractModule implements ModuleConfigInterface, Mod
             $story_title = '';
             $story_body  = '';
             $languages   = [];
-            $xref = $request->getQueryParams()['xref'] ?? '';
-
-            $title = I18N::translate('Add a story') . ' — ' . e($tree->title());
+            $xref        = $request->getQueryParams()['xref'] ?? '';
+            $title       = I18N::translate('Add a story') . ' — ' . e($tree->title());
         } else {
             // Editing an existing story
             $xref = (string) DB::table('block')
                 ->where('block_id', '=', $block_id)
                 ->value('xref');
 
+            // Record was deleted before we could read it?
+            if (!is_string($xref)) {
+                throw new HttpNotFoundException(I18N::translate('%s does not exist.', 'block_id:' . $block_id));
+            }
+
             $story_title = $this->getBlockSetting($block_id, 'title');
             $story_body  = $this->getBlockSetting($block_id, 'story_body');
             $languages   = explode(',', $this->getBlockSetting($block_id, 'languages'));
-
-            $title = I18N::translate('Edit the story') . ' — ' . e($tree->title());
+            $title       = I18N::translate('Edit the story') . ' — ' . e($tree->title());
         }
 
         $individual = Registry::individualFactory()->make($xref, $tree);
@@ -420,7 +422,7 @@ class StoriesModule extends AbstractModule implements ModuleConfigInterface, Mod
             ->where('module_name', '=', $this->name())
             ->where('gedcom_id', '=', $tree->id())
             ->get()
-            ->map(function (stdClass $story) use ($tree): stdClass {
+            ->map(function (object $story) use ($tree): object {
                 $block_id = (int) $story->block_id;
                 $xref     = (string) $story->xref;
 
@@ -429,10 +431,10 @@ class StoriesModule extends AbstractModule implements ModuleConfigInterface, Mod
                 $story->languages  = $this->getBlockSetting($block_id, 'languages');
 
                 return $story;
-            })->filter(static function (stdClass $story): bool {
+            })->filter(static function (object $story): bool {
                 // Filter non-existent and private individuals.
                 return $story->individual instanceof Individual && $story->individual->canShow();
-            })->filter(static function (stdClass $story): bool {
+            })->filter(static function (object $story): bool {
                 // Filter foreign languages.
                 return $story->languages === '' || in_array(I18N::languageTag(), explode(',', $story->languages), true);
             });

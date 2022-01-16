@@ -29,15 +29,16 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 
+use function date;
+use function e;
+use function str_replace;
+
 /**
  * A repository providing methods for latest user related statistics.
  */
 class LatestUserRepository implements LatestUserRepositoryInterface
 {
-    /**
-     * @var UserService
-     */
-    private $user_service;
+    private UserService $user_service;
 
     /**
      * LatestUserRepository constructor.
@@ -87,9 +88,7 @@ class LatestUserRepository implements LatestUserRepositoryInterface
             $user_id = (int) $user_id;
         }
 
-        $user = $this->user_service->find($user_id) ?? Auth::user();
-
-        return $user;
+        return $this->user_service->find($user_id) ?? Auth::user();
     }
 
     /**

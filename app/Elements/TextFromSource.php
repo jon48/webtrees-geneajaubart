@@ -41,8 +41,7 @@ class TextFromSource extends AbstractElement
      */
     public function canonical(string $value): string
     {
-        // Browsers use MS-DOS line endings in multi-line data.
-        return strtr($value, ["\t" => ' ', "\r\n" => "\n", "\r" => "\n"]);
+        return $this->canonicalText($value);
     }
 
     /**
@@ -70,6 +69,6 @@ class TextFromSource extends AbstractElement
      */
     public function value(string $value, Tree $tree): string
     {
-        return $this->valueAutoLink($value);
+        return $this->valueFormatted($value, $tree);
     }
 }

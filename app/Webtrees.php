@@ -97,7 +97,7 @@ class Webtrees
     // The system files are always in this location.
     // It is also the default location of user data, such as media and GEDCOM files.
     // The user files could be anywhere supported by Flysystem.
-    public const DATA_DIR  = self::ROOT_DIR . 'data/';
+    public const DATA_DIR = self::ROOT_DIR . 'data/';
 
     // Location of the file containing the database connection details.
     public const CONFIG_FILE = self::DATA_DIR . 'config.ini.php';
@@ -122,7 +122,7 @@ class Webtrees
     public const SCHEMA_VERSION = 45;
 
     // e.g. "-dev", "-alpha", "-beta", etc.
-    public const STABILITY = '-dev';
+    public const STABILITY = '-alpha.1';
 
     // Version number
     public const VERSION = '2.1.0' . self::STABILITY;
@@ -210,20 +210,24 @@ class Webtrees
     }
 
     /**
-     * Response to an HTTP request.
+     * Respond to an HTTP request.
      *
      * @return ResponseInterface
      */
     public function httpRequest(): ResponseInterface
     {
-        // PSR7 messages and PSR17 message-factories
-        self::set(ResponseFactoryInterface::class, Psr17Factory::class);
-        self::set(ServerRequestFactoryInterface::class, Psr17Factory::class);
-        self::set(StreamFactoryInterface::class, Psr17Factory::class);
-        self::set(UploadedFileFactoryInterface::class, Psr17Factory::class);
-        self::set(UriFactoryInterface::class, Psr17Factory::class);
+        $psr17factory = new Psr17Factory();
 
-        $request = $this->captureRequest();
+        // PSR7 messages and PSR17 message-factories
+        self::set(ResponseFactoryInterface::class, $psr17factory);
+        self::set(ServerRequestFactoryInterface::class, $psr17factory);
+        self::set(StreamFactoryInterface::class, $psr17factory);
+        self::set(UploadedFileFactoryInterface::class, $psr17factory);
+        self::set(UriFactoryInterface::class, $psr17factory);
+
+        $server_request_creator = new ServerRequestCreator($psr17factory, $psr17factory, $psr17factory, $psr17factory);
+
+        $request = $server_request_creator->fromGlobals();
 
         return self::dispatch($request, self::MIDDLEWARE);
     }
@@ -256,16 +260,6 @@ class Webtrees
 
             return true;
         };
-    }
-
-    /**
-     * Build the request from the PHP super-globals.
-     *
-     * @return ServerRequestInterface
-     */
-    private function captureRequest(): ServerRequestInterface
-    {
-        return self::make(ServerRequestCreator::class)->fromGlobals();
     }
 
     /**

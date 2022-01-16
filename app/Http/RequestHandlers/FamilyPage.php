@@ -24,19 +24,26 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
+use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Services\AuthorizationService;
 use Fisharebest\Webtrees\Services\ClipboardService;
 use Fisharebest\Webtrees\Tree;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
+use function array_map;
 use function assert;
+use function e;
 use function explode;
+use function implode;
 use function in_array;
 use function is_string;
 use function redirect;
+use function strip_tags;
+use function trim;
 
 /**
  * Show a family's page.
@@ -45,16 +52,20 @@ class FamilyPage implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
+    private AuthorizationService $authorization_service;
+
     private ClipboardService $clipboard_service;
 
     /**
      * FamilyPage constructor.
      *
-     * @param ClipboardService $clipboard_service
+     * @param AuthorizationService $authorization_service
+     * @param ClipboardService     $clipboard_service
      */
-    public function __construct(ClipboardService $clipboard_service)
+    public function __construct(AuthorizationService $authorization_service, ClipboardService $clipboard_service)
     {
-        $this->clipboard_service = $clipboard_service;
+        $this->authorization_service = $authorization_service;
+        $this->clipboard_service     = $clipboard_service;
     }
 
     /**
@@ -88,9 +99,10 @@ class FamilyPage implements RequestHandlerInterface
             });
 
         return $this->viewResponse('family-page', [
+            'can_upload_media' => $this->authorization_service->canUploadMedia($tree, Auth::user()),
             'clipboard_facts'  => $clipboard_facts,
             'facts'            => $facts,
-            'meta_description' => '',
+            'meta_description' => $this->metaDescription($family),
             'meta_robots'      => 'index,follow',
             'record'           => $family,
             'significant'      => $this->significant($family),
@@ -123,5 +135,41 @@ class FamilyPage implements RequestHandlerInterface
         }
 
         return $significant;
+    }
+
+    /**
+     * @param Family $family
+     *
+     * @return string
+     */
+    private function metaDescription(Family $family): string
+    {
+        $meta_facts = [
+            $family->fullName()
+        ];
+
+        foreach ($family->facts(['MARR', 'DIV'], true) as $fact) {
+            if ($fact->date()->isOK()) {
+                $value = strip_tags($fact->date()->display());
+            } else {
+                $value = I18N::translate('yes');
+            }
+
+            $meta_facts[] = Registry::elementFactory()->make($fact->tag())->labelValue($value, $family->tree());
+        }
+
+        if ($family->children()->isNotEmpty()) {
+            $child_names = $family->children()
+            ->map(static fn (Individual $individual): string => e($individual->getAllNames()[0]['givn']))
+            ->filter(static fn (string $x): bool => $x !== Individual::PRAENOMEN_NESCIO)
+            ->implode(', ');
+
+            $meta_facts[] = I18N::translate('Children') . ' ' . $child_names;
+        }
+
+        $meta_facts = array_map(static fn (string $x): string => strip_tags($x), $meta_facts);
+        $meta_facts = array_map(static fn (string $x): string => trim($x), $meta_facts);
+
+        return implode(', ', $meta_facts);
     }
 }

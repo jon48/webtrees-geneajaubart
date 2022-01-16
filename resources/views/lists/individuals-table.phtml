@@ -70,12 +70,12 @@ $("#<?= e($table_id) ?> > .wt-table-individual").dataTable({
     columns: [
         /* Given names  */ { type: "text" },
         /* Surnames     */ { type: "text" },
-        /* SOSA number  */ { type: "num", visible: <?= json_encode($sosa) ?> },
+        /* SOSA number  */ { type: "num", visible: <?= json_encode($sosa, JSON_THROW_ON_ERROR) ?> },
         /* Birth date   */ { type: "num" },
         /* Anniversary  */ { type: "num" },
         /* Birthplace   */ { type: "text" },
         //MYARTJAUB-START
-        <?= $maj_issourced_birth ? json_encode($maj_issourced_birth['column_def']) . ', ' : '' ?>
+        <?= $maj_issourced_birth ? json_encode($maj_issourced_birth['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
         /* Children     */ { type: "num" },
         /* Deate date   */ { type: "num" },
@@ -83,16 +83,16 @@ $("#<?= e($table_id) ?> > .wt-table-individual").dataTable({
         /* Age          */ { type: "num" },
         /* Death place  */ { type: "text" },
         //MYARTJAUB-START
-        <?= $maj_issourced_death ? json_encode($maj_issourced_death['column_def']) . ', ' : '' ?>
+        <?= $maj_issourced_death ? json_encode($maj_issourced_death['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
-        /* Last change  */ { visible: <?= json_encode($tree->getPreference('SHOW_LAST_CHANGE')) ?> },
+        /* Last change  */ { visible: <?= json_encode($tree->getPreference('SHOW_LAST_CHANGE'), JSON_THROW_ON_ERROR) ?> },
         /* Filter sex   */ { sortable: false },
         /* Filter birth */ { sortable: false },
         /* Filter death */ { sortable: false },
         /* Filter tree  */ { sortable: false }
     ],
     //MYARTJAUB-START
-    sorting: <?= json_encode($sosa ? [[columnIndex(4, $column_indexes), 'asc']] : [[columnIndex(1, $column_indexes), 'asc']]) ?>
+    sorting: <?= json_encode($sosa ? [[columnIndex(4, $column_indexes), 'asc']] : [[columnIndex(1, $column_indexes), 'asc']], JSON_THROW_ON_ERROR) ?>
     //MYARTJAUB-END
 });
 
@@ -512,7 +512,7 @@ $deathAgeData = [
             <div class="card-body">
                 <?php
                 foreach ($birt_by_decade as $century => $values) {
-                    if (($values['M'] + $values['F']) > 0) {
+                    if ($values['M'] + $values['F'] > 0) {
                         $birthData[] = [
                             [
                                 'v' => 'Date(' . $century . ', 0, 1)',
@@ -534,7 +534,7 @@ $deathAgeData = [
             <div class="card-body">
                 <?php
                 foreach ($deat_by_decade as $century => $values) {
-                    if (($values['M'] + $values['F']) > 0) {
+                    if ($values['M'] + $values['F'] > 0) {
                         $deathData[] = [
                             [
                                 'v' => 'Date(' . $century . ', 0, 1)',
@@ -560,8 +560,8 @@ $deathAgeData = [
                     $max      = 0;
 
                 foreach ($deat_by_age as $age => $values) {
-                    if (($values['M'] + $values['F']) > 0) {
-                        if (($values['M'] + $values['F']) > $max) {
+                    if ($values['M'] + $values['F'] > 0) {
+                        if ($values['M'] + $values['F'] > $max) {
                             $max = $values['M'] + $values['F'];
                         }
 

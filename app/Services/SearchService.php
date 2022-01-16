@@ -43,7 +43,6 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
-use stdClass;
 
 use function addcslashes;
 use function array_filter;
@@ -82,8 +81,8 @@ class SearchService
     }
 
     /**
-     * @param Tree[]   $trees
-     * @param string[] $search
+     * @param array<Tree>   $trees
+     * @param array<string> $search
      *
      * @return Collection<Family>
      */
@@ -105,10 +104,10 @@ class SearchService
     /**
      * Search for families by name.
      *
-     * @param Tree[]   $trees
-     * @param string[] $search
-     * @param int      $offset
-     * @param int      $limit
+     * @param array<Tree>   $trees
+     * @param array<string> $search
+     * @param int           $offset
+     * @param int           $limit
      *
      * @return Collection<Family>
      */
@@ -165,8 +164,8 @@ class SearchService
     }
 
     /**
-     * @param Tree[]   $trees
-     * @param string[] $search
+     * @param array<Tree>   $trees
+     * @param array<string> $search
      *
      * @return Collection<Individual>
      */
@@ -188,10 +187,10 @@ class SearchService
     /**
      * Search for individuals by name.
      *
-     * @param Tree[]   $trees
-     * @param string[] $search
-     * @param int      $offset
-     * @param int      $limit
+     * @param array<Tree>   $trees
+     * @param array<string> $search
+     * @param int           $offset
+     * @param int           $limit
      *
      * @return Collection<Individual>
      */
@@ -237,10 +236,10 @@ class SearchService
     /**
      * Search for submissions.
      *
-     * @param Tree[]   $trees
-     * @param string[] $search
-     * @param int      $offset
-     * @param int      $limit
+     * @param array<Tree>   $trees
+     * @param array<string> $search
+     * @param int           $offset
+     * @param int           $limit
      *
      * @return Collection<Location>
      */
@@ -258,10 +257,10 @@ class SearchService
     /**
      * Search for media objects.
      *
-     * @param Tree[]   $trees
-     * @param string[] $search
-     * @param int      $offset
-     * @param int      $limit
+     * @param array<Tree>   $trees
+     * @param array<string> $search
+     * @param int           $offset
+     * @param int           $limit
      *
      * @return Collection<Media>
      */
@@ -278,10 +277,10 @@ class SearchService
     /**
      * Search for notes.
      *
-     * @param Tree[]   $trees
-     * @param string[] $search
-     * @param int      $offset
-     * @param int      $limit
+     * @param array<Tree>   $trees
+     * @param array<string> $search
+     * @param int           $offset
+     * @param int           $limit
      *
      * @return Collection<Note>
      */
@@ -299,10 +298,10 @@ class SearchService
     /**
      * Search for repositories.
      *
-     * @param Tree[]   $trees
-     * @param string[] $search
-     * @param int      $offset
-     * @param int      $limit
+     * @param array<Tree>   $trees
+     * @param array<string> $search
+     * @param int           $offset
+     * @param int           $limit
      *
      * @return Collection<Repository>
      */
@@ -320,8 +319,8 @@ class SearchService
     /**
      * Search for sources.
      *
-     * @param Tree[]   $trees
-     * @param string[] $search
+     * @param array<Tree>   $trees
+     * @param array<string> $search
      * @param int      $offset
      * @param int      $limit
      *
@@ -340,10 +339,10 @@ class SearchService
     /**
      * Search for sources by name.
      *
-     * @param Tree[]   $trees
-     * @param string[] $search
-     * @param int      $offset
-     * @param int      $limit
+     * @param array<Tree>   $trees
+     * @param array<string> $search
+     * @param int           $offset
+     * @param int           $limit
      *
      * @return Collection<Source>
      */
@@ -361,10 +360,10 @@ class SearchService
     /**
      * Search for sources.
      *
-     * @param Tree[]   $trees
-     * @param string[] $search
-     * @param int      $offset
-     * @param int      $limit
+     * @param array<Tree>   $trees
+     * @param array<string> $search
+     * @param int           $offset
+     * @param int           $limit
      *
      * @return Collection<string>
      */
@@ -386,10 +385,10 @@ class SearchService
     /**
      * Search for submissions.
      *
-     * @param Tree[]   $trees
-     * @param string[] $search
-     * @param int      $offset
-     * @param int      $limit
+     * @param array<Tree>   $trees
+     * @param array<string> $search
+     * @param int           $offset
+     * @param int           $limit
      *
      * @return Collection<Submission>
      */
@@ -407,10 +406,10 @@ class SearchService
     /**
      * Search for submitters.
      *
-     * @param Tree[]   $trees
-     * @param string[] $search
-     * @param int      $offset
-     * @param int      $limit
+     * @param array<Tree>   $trees
+     * @param array<string> $search
+     * @param int           $offset
+     * @param int           $limit
      *
      * @return Collection<Submitter>
      */
@@ -473,7 +472,7 @@ class SearchService
             $query->where('p' . $level . '.p_place', 'LIKE', '%' . addcslashes($string, '\\%_') . '%');
         }
 
-        $row_mapper = static function (stdClass $row) use ($tree): Place {
+        $row_mapper = static function (object $row) use ($tree): Place {
             $place = implode(', ', array_filter((array) $row));
 
             return new Place($place, $tree);
@@ -487,9 +486,9 @@ class SearchService
     }
 
     /**
-     * @param Tree[]   $trees
-     * @param string[] $fields
-     * @param string[] $modifiers
+     * @param array<Tree>          $trees
+     * @param array<string,string> $fields
+     * @param array<string,string> $modifiers
      *
      * @return Collection<Individual>
      */
@@ -739,30 +738,30 @@ class SearchService
                         $query->where('individuals.i_gedcom', 'LIKE', $like);
                         break;
                 }
-            } elseif (str_starts_with($field_name, 'INDI:')  && str_ends_with($field_name, ':DATE')) {
+            } elseif (str_starts_with($field_name, 'INDI:') && str_ends_with($field_name, ':DATE')) {
                 $date = new Date($field_value);
                 if ($date->isOK()) {
-                    $delta = 365 * ($modifiers[$field_name] ?? 0);
+                    $delta = 365 * (int) ($modifiers[$field_name] ?? 0);
                     $query
                         ->where('date_' . $parts[1] . '.d_fact', '=', $parts[1])
                         ->where('date_' . $parts[1] . '.d_julianday1', '>=', $date->minimumJulianDay() - $delta)
                         ->where('date_' . $parts[1] . '.d_julianday2', '<=', $date->maximumJulianDay() + $delta);
                 }
                 unset($fields[$field_name]);
-            } elseif (str_starts_with($field_name, 'FAM:')  && str_ends_with($field_name, ':DATE')) {
+            } elseif (str_starts_with($field_name, 'FAM:') && str_ends_with($field_name, ':DATE')) {
                 $date = new Date($field_value);
                 if ($date->isOK()) {
-                    $delta = 365 * $modifiers[$field_name];
+                    $delta = 365 * (int) ($modifiers[$field_name] ?? 0);
                     $query
                         ->where('date_' . $parts[1] . '.d_fact', '=', $parts[1])
                         ->where('date_' . $parts[1] . '.d_julianday1', '>=', $date->minimumJulianDay() - $delta)
                         ->where('date_' . $parts[1] . '.d_julianday2', '<=', $date->maximumJulianDay() + $delta);
                 }
                 unset($fields[$field_name]);
-            } elseif (str_starts_with($field_name, 'INDI:')  && str_ends_with($field_name, ':PLAC')) {
+            } elseif (str_starts_with($field_name, 'INDI:') && str_ends_with($field_name, ':PLAC')) {
                 // SQL can only link a place to a person/family, not to an event.
                 $query->where('individual_places.p_place', 'LIKE', '%' . $field_value . '%');
-            } elseif (str_starts_with($field_name, 'FAM:')  && str_ends_with($field_name, ':PLAC')) {
+            } elseif (str_starts_with($field_name, 'FAM:') && str_ends_with($field_name, ':PLAC')) {
                 // SQL can only link a place to a person/family, not to an event.
                 $query->where('family_places.p_place', 'LIKE', '%' . $field_value . '%');
             } elseif (str_starts_with($field_name, 'MOTHER:NAME:') || str_starts_with($field_name, 'FATHER:NAME:')) {
@@ -870,7 +869,7 @@ class SearchService
 
                     $regex = '/' . preg_quote($field_value, '/') . '/i';
 
-                    if (str_starts_with($field_name, 'INDI:')  && str_ends_with($field_name, ':PLAC')) {
+                    if (str_starts_with($field_name, 'INDI:') && str_ends_with($field_name, ':PLAC')) {
                         foreach ($individual->facts([$parts[1]]) as $fact) {
                             if (preg_match($regex, $fact->place()->gedcomName())) {
                                 continue 2;
@@ -879,7 +878,7 @@ class SearchService
                         return false;
                     }
 
-                    if (str_starts_with($field_name, 'FAM:')  && str_ends_with($field_name, ':PLAC')) {
+                    if (str_starts_with($field_name, 'FAM:') && str_ends_with($field_name, ':PLAC')) {
                         foreach ($individual->spouseFamilies() as $family) {
                             foreach ($family->facts([$parts[1]]) as $fact) {
                                 if (preg_match($regex, $fact->place()->gedcomName())) {
@@ -927,11 +926,11 @@ class SearchService
     }
 
     /**
-     * @param string $soundex
-     * @param string $lastname
-     * @param string $firstname
-     * @param string $place
-     * @param Tree[] $search_trees
+     * @param string      $soundex
+     * @param string      $lastname
+     * @param string      $firstname
+     * @param string      $place
+     * @param array<Tree> $search_trees
      *
      * @return Collection<Individual>
      */
@@ -1050,7 +1049,7 @@ class SearchService
      *
      * @param Builder           $query
      * @param Expression|string $field
-     * @param string[]          $search_terms
+     * @param array<string>     $search_terms
      */
     private function whereSearch(Builder $query, $field, array $search_terms): void
     {
@@ -1082,9 +1081,9 @@ class SearchService
     }
 
     /**
-     * @param Builder $query
-     * @param string  $tree_id_field
-     * @param Tree[]  $trees
+     * @param Builder     $query
+     * @param string      $tree_id_field
+     * @param array<Tree> $trees
      */
     private function whereTrees(Builder $query, string $tree_id_field, array $trees): void
     {
@@ -1100,7 +1099,7 @@ class SearchService
      *
      * @param string $file
      *
-     * @return Media[]
+     * @return array<Media>
      */
     public function findMediaObjectsForMediaFile(string $file): array
     {
@@ -1173,7 +1172,7 @@ class SearchService
      */
     private function familyRowMapper(): Closure
     {
-        return function (stdClass $row): Family {
+        return function (object $row): Family {
             $tree = $this->tree_service->find((int) $row->f_file);
 
             return Registry::familyFactory()->mapper($tree)($row);
@@ -1187,7 +1186,7 @@ class SearchService
      */
     private function individualRowMapper(): Closure
     {
-        return function (stdClass $row): Individual {
+        return function (object $row): Individual {
             $tree = $this->tree_service->find((int) $row->i_file);
 
             return Registry::individualFactory()->mapper($tree)($row);
@@ -1201,7 +1200,7 @@ class SearchService
      */
     private function locationRowMapper(): Closure
     {
-        return function (stdClass $row): Location {
+        return function (object $row): Location {
             $tree = $this->tree_service->find((int) $row->o_file);
 
             return Registry::locationFactory()->mapper($tree)($row);
@@ -1215,7 +1214,7 @@ class SearchService
      */
     private function mediaRowMapper(): Closure
     {
-        return function (stdClass $row): Media {
+        return function (object $row): Media {
             $tree = $this->tree_service->find((int) $row->m_file);
 
             return Registry::mediaFactory()->mapper($tree)($row);
@@ -1229,7 +1228,7 @@ class SearchService
      */
     private function noteRowMapper(): Closure
     {
-        return function (stdClass $row): Note {
+        return function (object $row): Note {
             $tree = $this->tree_service->find((int) $row->o_file);
 
             return Registry::noteFactory()->mapper($tree)($row);
@@ -1243,7 +1242,7 @@ class SearchService
      */
     private function repositoryRowMapper(): Closure
     {
-        return function (stdClass $row): Repository {
+        return function (object $row): Repository {
             $tree = $this->tree_service->find((int) $row->o_file);
 
             return Registry::repositoryFactory()->mapper($tree)($row);
@@ -1257,7 +1256,7 @@ class SearchService
      */
     private function sourceRowMapper(): Closure
     {
-        return function (stdClass $row): Source {
+        return function (object $row): Source {
             $tree = $this->tree_service->find((int) $row->s_file);
 
             return Registry::sourceFactory()->mapper($tree)($row);
@@ -1271,7 +1270,7 @@ class SearchService
      */
     private function submissionRowMapper(): Closure
     {
-        return function (stdClass $row): Submission {
+        return function (object $row): Submission {
             $tree = $this->tree_service->find((int) $row->o_file);
 
             return Registry::submissionFactory()->mapper($tree)($row);
@@ -1285,7 +1284,7 @@ class SearchService
      */
     private function submitterRowMapper(): Closure
     {
-        return function (stdClass $row): Submitter {
+        return function (object $row): Submitter {
             $tree = $this->tree_service->find((int) $row->o_file);
 
             return Registry::submitterFactory()->mapper($tree)($row);

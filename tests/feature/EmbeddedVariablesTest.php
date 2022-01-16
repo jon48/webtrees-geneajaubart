@@ -23,6 +23,9 @@ use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Services\UserService;
+use Fisharebest\Webtrees\Statistics\Service\CenturyService;
+use Fisharebest\Webtrees\Statistics\Service\ColorService;
+use Fisharebest\Webtrees\Statistics\Service\CountryService;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -84,7 +87,14 @@ class EmbeddedVariablesTest extends TestCase
         $request    = self::createRequest()->withAttribute('tree', $tree);
         Webtrees::set(ServerRequestInterface::class, $request);
 
-        $statistics = new Statistics(new ModuleService(), $tree, $user_service);
+        $statistics = new Statistics(
+            new CenturyService(),
+            new ColorService(),
+            new CountryService(),
+            new ModuleService(),
+            $tree,
+            $user_service
+        );
 
         // As member
         $text = $statistics->embedTags('#getAllTagsTable#');
@@ -102,7 +112,14 @@ class EmbeddedVariablesTest extends TestCase
     {
         $tree_service = new TreeService();
         $tree         = $tree_service->create('name', 'title');
-        $statistics   = new Statistics(new ModuleService(), $tree, new UserService());
+        $statistics   = new Statistics(
+            new CenturyService(),
+            new ColorService(),
+            new CountryService(),
+            new ModuleService(),
+            $tree,
+            new UserService()
+        );
 
         // As visitor
         $text = $statistics->embedTags('#getAllTagsTable#');

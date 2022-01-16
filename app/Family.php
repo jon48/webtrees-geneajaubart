@@ -33,11 +33,11 @@ class Family extends GedcomRecord
 
     protected const ROUTE_NAME = FamilyPage::class;
 
-    /** @var Individual|null The husband (or first spouse for same-sex couples) */
-    private $husb;
+    // The husband (or first spouse for same-sex couples)
+    private ?Individual $husb = null;
 
-    /** @var Individual|null The wife (or second spouse for same-sex couples) */
-    private $wife;
+    // The wife (or second spouse for same-sex couples)
+    private ?Individual $wife = null;
 
     /**
      * Create a GedcomRecord object from raw GEDCOM data.
@@ -108,7 +108,7 @@ class Family extends GedcomRecord
      *
      * @return Individual|null
      */
-    public function husband($access_level = null): ?Individual
+    public function husband(int $access_level = null): ?Individual
     {
         if ($this->tree->getPreference('SHOW_PRIVATE_RELATIONSHIPS') === '1') {
             $access_level = Auth::PRIV_HIDE;
@@ -128,7 +128,7 @@ class Family extends GedcomRecord
      *
      * @return Individual|null
      */
-    public function wife($access_level = null): ?Individual
+    public function wife(int $access_level = null): ?Individual
     {
         if ($this->tree->getPreference('SHOW_PRIVATE_RELATIONSHIPS') === '1') {
             $access_level = Auth::PRIV_HIDE;
@@ -184,7 +184,7 @@ class Family extends GedcomRecord
      *
      * @return Individual|null
      */
-    public function spouse(Individual $person, $access_level = null): ?Individual
+    public function spouse(Individual $person, int $access_level = null): ?Individual
     {
         if ($person === $this->wife) {
             return $this->husband($access_level);
@@ -200,7 +200,7 @@ class Family extends GedcomRecord
      *
      * @return Collection<Individual>
      */
-    public function spouses($access_level = null): Collection
+    public function spouses(int $access_level = null): Collection
     {
         $spouses = new Collection([
             $this->husband($access_level),
@@ -217,7 +217,7 @@ class Family extends GedcomRecord
      *
      * @return Collection<Individual>
      */
-    public function children($access_level = null): Collection
+    public function children(int $access_level = null): Collection
     {
         $access_level = $access_level ?? Auth::accessLevel($this->tree);
 
@@ -308,7 +308,7 @@ class Family extends GedcomRecord
     /**
      * Get a list of all marriage dates - for the family lists.
      *
-     * @return Date[]
+     * @return array<Date>
      */
     public function getAllMarriageDates(): array
     {
@@ -326,7 +326,7 @@ class Family extends GedcomRecord
     /**
      * Get a list of all marriage places - for the family lists.
      *
-     * @return Place[]
+     * @return array<Place>
      */
     public function getAllMarriagePlaces(): array
     {
@@ -347,7 +347,7 @@ class Family extends GedcomRecord
      */
     public function getAllNames(): array
     {
-        if ($this->getAllNames === null) {
+        if ($this->getAllNames === []) {
             // Check the script used by each name, so we can match cyrillic with cyrillic, greek with greek, etc.
             $husb_names = [];
             if ($this->husb) {

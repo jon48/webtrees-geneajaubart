@@ -61,6 +61,9 @@ class ResearchTaskModule extends AbstractModule implements ModuleBlockInterface
             'INDI:_TODO:DATE'     => new TransmissionDate(I18N::translate('Date')),
             'INDI:_TODO:_WT_USER' => new WebtreesUser(I18N::translate('User')),
         ]);
+
+        Registry::elementFactory()->make('FAM')->subtag('_TODO', '0:M');
+        Registry::elementFactory()->make('INDI')->subtag('_TODO', '0:M');
     }
 
     /**
@@ -77,10 +80,10 @@ class ResearchTaskModule extends AbstractModule implements ModuleBlockInterface
     /**
      * Generate the HTML content of this block.
      *
-     * @param Tree     $tree
-     * @param int      $block_id
-     * @param string   $context
-     * @param string[] $config
+     * @param Tree          $tree
+     * @param int           $block_id
+     * @param string        $context
+     * @param array<string> $config
      *
      * @return string
      */

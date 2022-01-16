@@ -85,7 +85,7 @@ class Individual extends GedcomRecord
     {
         $access_level = $access_level ?? Auth::accessLevel($this->tree);
 
-        return $this->tree->getPreference('SHOW_LIVING_NAMES') >= $access_level || $this->canShow($access_level);
+        return (int) $this->tree->getPreference('SHOW_LIVING_NAMES') >= $access_level || $this->canShow($access_level);
     }
 
     /**
@@ -98,7 +98,7 @@ class Individual extends GedcomRecord
     protected function canShowByType(int $access_level): bool
     {
         // Dead people...
-        if ($this->tree->getPreference('SHOW_DEAD_PEOPLE') >= $access_level && $this->isDead()) {
+        if ((int) $this->tree->getPreference('SHOW_DEAD_PEOPLE') >= $access_level && $this->isDead()) {
             $keep_alive             = false;
             $KEEP_ALIVE_YEARS_BIRTH = (int) $this->tree->getPreference('KEEP_ALIVE_YEARS_BIRTH');
             if ($KEEP_ALIVE_YEARS_BIRTH) {
@@ -226,7 +226,7 @@ class Individual extends GedcomRecord
         $SHOW_PRIVATE_RELATIONSHIPS = (bool) $this->tree->getPreference('SHOW_PRIVATE_RELATIONSHIPS');
 
         $rec = '0 @' . $this->xref . '@ INDI';
-        if ($this->tree->getPreference('SHOW_LIVING_NAMES') >= $access_level) {
+        if ((int) $this->tree->getPreference('SHOW_LIVING_NAMES') >= $access_level) {
             // Show all the NAME tags, including subtags
             foreach ($this->facts(['NAME']) as $fact) {
                 $rec .= "\n" . $fact->gedcom();
@@ -371,10 +371,10 @@ class Individual extends GedcomRecord
      * Display the prefered image for this individual.
      * Use an icon if no image is available.
      *
-     * @param int      $width      Pixels
-     * @param int      $height     Pixels
-     * @param string   $fit        "crop" or "contain"
-     * @param string[] $attributes Additional HTML attributes
+     * @param int           $width      Pixels
+     * @param int           $height     Pixels
+     * @param string        $fit        "crop" or "contain"
+     * @param array<string> $attributes Additional HTML attributes
      *
      * @return string
      */
@@ -487,7 +487,7 @@ class Individual extends GedcomRecord
     /**
      * Get all the birth dates - for the individual lists.
      *
-     * @return Date[]
+     * @return array<Date>
      */
     public function getAllBirthDates(): array
     {
@@ -505,7 +505,7 @@ class Individual extends GedcomRecord
     /**
      * Gat all the birth places - for the individual lists.
      *
-     * @return Place[]
+     * @return array<Place>
      */
     public function getAllBirthPlaces(): array
     {
@@ -523,7 +523,7 @@ class Individual extends GedcomRecord
     /**
      * Get all the death dates - for the individual lists.
      *
-     * @return Date[]
+     * @return array<Date>
      */
     public function getAllDeathDates(): array
     {
@@ -541,7 +541,7 @@ class Individual extends GedcomRecord
     /**
      * Get all the death places - for the individual lists.
      *
-     * @return Place[]
+     * @return array<Place>
      */
     public function getAllDeathPlaces(): array
     {
@@ -694,7 +694,7 @@ class Individual extends GedcomRecord
      *
      * @return Collection<Family>
      */
-    public function spouseFamilies($access_level = null): Collection
+    public function spouseFamilies(int $access_level = null): Collection
     {
         $access_level = $access_level ?? Auth::accessLevel($this->tree);
 
@@ -760,7 +760,7 @@ class Individual extends GedcomRecord
      *
      * @return Collection<Family>
      */
-    public function childFamilies($access_level = null): Collection
+    public function childFamilies(int $access_level = null): Collection
     {
         $access_level = $access_level ?? Auth::accessLevel($this->tree);
 
@@ -966,8 +966,8 @@ class Individual extends GedcomRecord
         ////////////////////////////////////////////////////////////////////////////
 
         $sublevel = 1 + (int) substr($gedcom, 0, 1);
-        $GIVN     = preg_match("/\n{$sublevel} GIVN (.+)/", $gedcom, $match) ? $match[1] : '';
-        $SURN     = preg_match("/\n{$sublevel} SURN (.+)/", $gedcom, $match) ? $match[1] : '';
+        $GIVN     = preg_match('/\n' . $sublevel . ' GIVN (.+)/', $gedcom, $match) ? $match[1] : '';
+        $SURN     = preg_match('/\n' . $sublevel . ' SURN (.+)/', $gedcom, $match) ? $match[1] : '';
 
         // SURN is an comma-separated list of surnames...
         if ($SURN !== '') {
@@ -1016,25 +1016,14 @@ class Individual extends GedcomRecord
 
         // If we don’t have a GIVN record, extract it from the NAME
         if (!$GIVN) {
-            $GIVN = preg_replace(
-                [
-                    '/ ?\/.*\/ ?/',
-                    // remove surname
-                    '/ ?".+"/',
-                    // remove nickname
-                    '/ {2,}/',
-                    // multiple spaces, caused by the above
-                    '/^ | $/',
-                    // leading/trailing spaces, caused by the above
-                ],
-                [
-                    ' ',
-                    ' ',
-                    ' ',
-                    '',
-                ],
-                $full
-            );
+            // remove surname
+            $GIVN = preg_replace('/ ?\/.*\/ ?/', ' ', $full);
+            // remove nickname
+            $GIVN = preg_replace('/ ?".+"/', ' ', $GIVN);
+            // multiple spaces, caused by the above
+            $GIVN = preg_replace('/ {2,}/', ' ', $GIVN);
+            // leading/trailing spaces, caused by the above
+            $GIVN = preg_replace('/^ | $/', '', $GIVN);
         }
 
         // Add placeholder for unknown given name

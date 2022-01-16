@@ -36,6 +36,13 @@ interface ElementInterface
     public function canonical(string $value): string;
 
     /**
+     * Should we collapse the children of this element when editing?
+     *
+     * @return bool
+     */
+    public function collapseChildren(): bool;
+
+    /**
      * Create a default value for this element.
      *
      * @param Tree $tree
@@ -91,7 +98,7 @@ interface ElementInterface
      *
      * @return void
      */
-    public function subtag(string $subtag, string $repeat = '0:1', string $before = ''): void;
+    public function subtag(string $subtag, string $repeat, string $before = ''): void;
 
     /**
      * @return array<string,string>

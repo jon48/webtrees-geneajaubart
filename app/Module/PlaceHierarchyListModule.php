@@ -31,8 +31,6 @@ use Fisharebest\Webtrees\PlaceLocation;
 use Fisharebest\Webtrees\Services\LeafletJsService;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\SearchService;
-use Fisharebest\Webtrees\Services\UserService;
-use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\Statistics;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -40,6 +38,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
+use function app;
 use function array_chunk;
 use function array_pop;
 use function array_reverse;
@@ -48,7 +47,6 @@ use function ceil;
 use function count;
 use function redirect;
 use function route;
-use function var_export;
 use function view;
 
 /**
@@ -61,7 +59,7 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
     protected const ROUTE_URL = '/tree/{tree}/place-list';
 
     /** @var int The default access level for this module.  It can be changed in the control panel. */
-    protected $access_level = Auth::PRIV_USER;
+    protected int $access_level = Auth::PRIV_USER;
 
     private LeafletJsService $leaflet_js_service;
 
@@ -216,14 +214,14 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
             default:
                 $alt_link = I18N::translate('Show place hierarchy');
                 $alt_url  = $this->listUrl($tree, ['action2' => 'hierarchy', 'place_id' => $place_id]);
-                $content  .= view('modules/place-hierarchy/list', ['columns' => $this->getList($tree)]);
+                $content .= view('modules/place-hierarchy/list', ['columns' => $this->getList($tree)]);
                 break;
             case 'hierarchy':
             case 'hierarchy-e':
                 $alt_link = I18N::translate('Show all places in a list');
                 $alt_url  = $this->listUrl($tree, ['action2' => 'list', 'place_id' => 0]);
                 $data     = $this->getHierarchy($place);
-                $content  .= (null === $data || $showmap) ? '' : view('place-hierarchy', $data);
+                $content .= (null === $data || $showmap) ? '' : view('place-hierarchy', $data);
                 if (null === $data || $action2 === 'hierarchy-e') {
                     $content .= view('modules/place-hierarchy/events', [
                         'indilist' => $this->search_service->searchIndividualsInPlace($place),
@@ -299,7 +297,7 @@ class PlaceHierarchyListModule extends AbstractModule implements ModuleListInter
                 ];
             }
 
-            $statistics = new Statistics(app(ModuleService::class), $tree, app(UserService::class));
+            $statistics = app(Statistics::class);
 
             //Stats
             $stats = [];

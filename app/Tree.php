@@ -27,7 +27,6 @@ use Illuminate\Database\Capsule\Manager as DB;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemOperator;
-use stdClass;
 
 use function app;
 use function array_key_exists;
@@ -100,29 +99,26 @@ class Tree
         'WORD_WRAPPED_NOTES'           => '0',
     ];
 
-    /** @var int The tree's ID number */
-    private $id;
+    private int $id;
 
-    /** @var string The tree's name */
-    private $name;
+    private string $name;
 
-    /** @var string The tree's title */
-    private $title;
+    private string $title;
 
-    /** @var int[] Default access rules for facts in this tree */
-    private $fact_privacy;
+    /** @var array<int> Default access rules for facts in this tree */
+    private array $fact_privacy;
 
-    /** @var int[] Default access rules for individuals in this tree */
-    private $individual_privacy;
+    /** @var array<int> Default access rules for individuals in this tree */
+    private array $individual_privacy;
 
-    /** @var integer[][] Default access rules for individual facts in this tree */
-    private $individual_fact_privacy;
+    /** @var array<array<int>> Default access rules for individual facts in this tree */
+    private array $individual_fact_privacy;
 
-    /** @var string[] Cached copy of the wt_gedcom_setting table. */
+    /** @var array<string> Cached copy of the wt_gedcom_setting table. */
     private $preferences = [];
 
-    /** @var string[][] Cached copy of the wt_user_gedcom_setting table. */
-    private $user_preferences = [];
+    /** @var array<array<string>> Cached copy of the wt_user_gedcom_setting table. */
+    private array $user_preferences = [];
 
     /**
      * Create a tree object.
@@ -168,7 +164,7 @@ class Tree
      */
     public static function rowMapper(): Closure
     {
-        return static function (stdClass $row): Tree {
+        return static function (object $row): Tree {
             return new Tree((int) $row->tree_id, $row->tree_name, $row->tree_title);
         };
     }
@@ -242,7 +238,7 @@ class Tree
     /**
      * The fact-level privacy for this tree.
      *
-     * @return int[]
+     * @return array<int>
      */
     public function getFactPrivacy(): array
     {
@@ -252,7 +248,7 @@ class Tree
     /**
      * The individual-level privacy for this tree.
      *
-     * @return int[]
+     * @return array<int>
      */
     public function getIndividualPrivacy(): array
     {
@@ -262,7 +258,7 @@ class Tree
     /**
      * The individual-fact-level privacy for this tree.
      *
-     * @return int[][]
+     * @return array<array<int>>
      */
     public function getIndividualFactPrivacy(): array
     {
@@ -538,7 +534,7 @@ class Tree
      *
      * @return Individual
      */
-    public function significantIndividual(UserInterface $user, $xref = ''): Individual
+    public function significantIndividual(UserInterface $user, string $xref = ''): Individual
     {
         if ($xref === '') {
             $individual = null;

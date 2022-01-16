@@ -65,7 +65,7 @@ $("#<?= e($table_id) ?> > .wt-table-family").dataTable({
         <?= $maj_issourced_marr ? json_encode($maj_issourced_marr['column_def']) . ', ' : '' ?>
         //MYARTJAUB-END
         /* Children          */ { type: "num" },
-        /* Last change       */ { visible: <?= json_encode((bool) $tree->getPreference('SHOW_LAST_CHANGE')) ?> },
+        /* Last change       */ { visible: <?= json_encode((bool) $tree->getPreference('SHOW_LAST_CHANGE'), JSON_THROW_ON_ERROR) ?> },
         /* Filter marriage   */ { sortable: false },
         /* Filter alive/dead */ { sortable: false },
         /* Filter tree       */ { sortable: false }
@@ -492,7 +492,7 @@ $marriageAgeData = [
             </div><div class="card-body">
                 <?php
                 foreach ($birt_by_decade as $century => $values) {
-                    if (($values['M'] + $values['F']) > 0) {
+                    if ($values['M'] + $values['F'] > 0) {
                         $birthData[] = [
                             [
                                 'v' => 'Date(' . $century . ', 0, 1)',
@@ -513,7 +513,7 @@ $marriageAgeData = [
             </div><div class="card-body">
                 <?php
                 foreach ($marr_by_decade as $century => $values) {
-                    if (($values['M'] + $values['F']) > 0) {
+                    if ($values['M'] + $values['F'] > 0) {
                         $marriageData[] = [
                             [
                                 'v' => 'Date(' . $century . ', 0, 1)',
@@ -539,8 +539,8 @@ $marriageAgeData = [
                     $max      = 0;
 
                 foreach ($marr_by_age as $age => $values) {
-                    if (($values['M'] + $values['F']) > 0) {
-                        if (($values['M'] + $values['F']) > $max) {
+                    if ($values['M'] + $values['F'] > 0) {
+                        if ($values['M'] + $values['F'] > $max) {
                             $max = $values['M'] + $values['F'];
                         }
 

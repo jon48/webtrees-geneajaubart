@@ -115,10 +115,10 @@ class OnThisDayModule extends AbstractModule implements ModuleBlockInterface
     /**
      * Generate the HTML content of this block.
      *
-     * @param Tree     $tree
-     * @param int      $block_id
-     * @param string   $context
-     * @param string[] $config
+     * @param Tree          $tree
+     * @param int           $block_id
+     * @param string        $context
+     * @param array<string> $config
      *
      * @return string
      */
@@ -139,7 +139,7 @@ class OnThisDayModule extends AbstractModule implements ModuleBlockInterface
 
         // If we are only showing living individuals, then we don't need to search for DEAT events.
         if ($filter) {
-            $event_array  = array_diff($event_array, Gedcom::DEATH_EVENTS);
+            $event_array = array_diff($event_array, Gedcom::DEATH_EVENTS);
         }
 
         $events_filter = implode('|', $event_array);

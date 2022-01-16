@@ -26,38 +26,33 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
-use stdClass;
+
+use function round;
+use function view;
 
 /**
  * A chart showing the average age of individuals related to the death century.
  */
 class ChartAge
 {
-    /**
-     * @var Tree
-     */
-    private $tree;
+    private Tree $tree;
+
+    private CenturyService $century_service;
 
     /**
-     * @var CenturyService
+     * @param CenturyService $century_service
+     * @param Tree           $tree
      */
-    private $century_service;
-
-    /**
-     * Constructor.
-     *
-     * @param Tree $tree
-     */
-    public function __construct(Tree $tree)
+    public function __construct(CenturyService $century_service, Tree $tree)
     {
+        $this->century_service = $century_service;
         $this->tree            = $tree;
-        $this->century_service = new CenturyService();
     }
 
     /**
      * Returns the related database records.
      *
-     * @return Collection<stdClass>
+     * @return Collection<object>
      */
     private function queryRecords(): Collection
     {
@@ -90,7 +85,7 @@ class ChartAge
             ->orderBy('century')
             ->orderBy('sex')
             ->get()
-            ->map(static function (stdClass $row): stdClass {
+            ->map(static function (object $row): object {
                 return (object) [
                     'age'     => (float) $row->age,
                     'century' => (int) $row->century,

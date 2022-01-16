@@ -20,34 +20,24 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Statistics\Google;
 
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Module\ModuleThemeInterface;
 use Fisharebest\Webtrees\Statistics\Service\ColorService;
 
-use function app;
 use function count;
+use function view;
 
 /**
  * A chart showing individuals with sources.
  */
 class ChartIndividualWithSources
 {
-    /**
-     * @var ModuleThemeInterface
-     */
-    private $theme;
+    private ColorService $color_service;
 
     /**
-     * @var ColorService
+     * @param ColorService $color_service
      */
-    private $color_service;
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
+    public function __construct(ColorService $color_service)
     {
-        $this->theme         = app(ModuleThemeInterface::class);
-        $this->color_service = new ColorService();
+        $this->color_service = $color_service;
     }
 
     /**
@@ -66,10 +56,8 @@ class ChartIndividualWithSources
         string $color_from = null,
         string $color_to = null
     ): string {
-        $chart_color1 = (string) $this->theme->parameter('distribution-chart-no-values');
-        $chart_color2 = (string) $this->theme->parameter('distribution-chart-high-values');
-        $color_from   = $color_from ?? $chart_color1;
-        $color_to     = $color_to   ?? $chart_color2;
+        $color_from = $color_from ?? 'ffffff';
+        $color_to   = $color_to ?? '84beff';
 
         $data = [
             [

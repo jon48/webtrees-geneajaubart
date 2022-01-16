@@ -21,10 +21,11 @@ namespace Fisharebest\Webtrees\Functions;
 
 use Fisharebest\Webtrees\Age;
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Elements\SubmitterText;
+use Fisharebest\Webtrees\Elements\UnknownElement;
 use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Gedcom;
-use Fisharebest\Webtrees\Elements\UnknownElement;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
@@ -208,7 +209,7 @@ class FunctionsPrintFacts
 
         echo FunctionsPrint::formatFactDate($fact, $record, true, true);
 
-        echo '<div class="place">', FunctionsPrint::formatFactPlace($fact, true, true, true), '</div>';
+        echo '<div class="place">', FunctionsPrint::formatFactPlace($fact, $fact->id() !== 'histo', true, true), '</div>';
         echo '</div>';
 
         // Secondary attributes
@@ -431,10 +432,10 @@ class FunctionsPrintFacts
         for ($j = 0; $j < $ct; $j++) {
             if (!str_contains($match[$j][1], '@')) {
                 $source = e($match[$j][1] . preg_replace('/\n\d CONT ?/', "\n", $match[$j][2]));
-                $data   .= '<div class="fact_SOUR"><span class="label">' . I18N::translate('Source') . ':</span> <span class="field" dir="auto">';
+                $data .= '<div class="fact_SOUR"><span class="label">' . I18N::translate('Source') . ':</span> <span class="field" dir="auto">';
 
                 if ($tree->getPreference('FORMAT_TEXT') === 'markdown') {
-                    $data .= '<div class="markdown" dir="auto">' ;
+                    $data .= '<div class="markdown" dir="auto">';
                     $data .= Registry::markdownFactory()->markdown($tree)->convertToHtml($source);
                     $data .= '</div>';
                 } else {
@@ -443,7 +444,7 @@ class FunctionsPrintFacts
                     $data .= '</div>';
                 }
 
-                $data   .= '</span></div>';
+                $data .= '</span></div>';
             }
         }
         // Find source for each fact
@@ -459,11 +460,13 @@ class FunctionsPrintFacts
                     if (!$spos2) {
                         $spos2 = strlen($factrec);
                     }
-                    $srec     = substr($factrec, $spos1, $spos2 - $spos1);
-                    $lt       = preg_match_all("/$nlevel \w+/", $srec, $matches);
-                    $data     .= '<div class="fact_SOUR">';
+
+                    $srec = substr($factrec, $spos1, $spos2 - $spos1);
+                    $lt   = preg_match_all("/$nlevel \w+/", $srec, $matches);
+                    $data .= '<div class="fact_SOUR">';
                     $id       = 'collapse-' . Uuid::uuid4()->toString();
                     $expanded = (bool) $tree->getPreference('EXPAND_SOURCES');
+
                     if ($lt > 0) {
                         $data .= '<a href="#' . e($id) . '" role="button" data-bs-toggle="collapse" aria-controls="' . e($id) . '" aria-expanded="' . ($expanded ? 'true' : 'false') . '">';
                         $data .= view('icons/expand');
@@ -555,7 +558,6 @@ class FunctionsPrintFacts
     public static function printMainSources(Fact $fact, int $level): void
     {
         $factrec = $fact->gedcom();
-        $parent  = $fact->record();
         $tree    = $fact->record()->tree();
 
         $nlevel = $level + 1;
@@ -656,8 +658,8 @@ class FunctionsPrintFacts
      *  This function prints the input array of SOUR sub-records built by the
      *  getSourceStructure() function.
      *
-     * @param Tree                $tree
-     * @param string[]|string[][] $textSOUR
+     * @param Tree                        $tree
+     * @param array<string|array<string>> $textSOUR
      *
      * @return string
      */
@@ -747,8 +749,7 @@ class FunctionsPrintFacts
     public static function printMainNotes(Fact $fact, int $level): void
     {
         $factrec = $fact->gedcom();
-        $parent  = $fact->record();
-        $tree    = $parent->tree();
+        $tree    = $fact->record()->tree();
 
         if ($fact->isPendingAddition()) {
             $styleadd = 'wt-new ';
@@ -803,18 +804,10 @@ class FunctionsPrintFacts
                 $text = $match[$j][1] . Functions::getCont($level + 1, $nrec);
             }
 
-            if ($tree->getPreference('FORMAT_TEXT') === 'markdown') {
-                $formatted_text = '<div class="markdown" dir="auto">' ;
-                $formatted_text .= Registry::markdownFactory()->markdown($tree)->convertToHtml($text);
-                $formatted_text .= '</div>';
-            } else {
-                $formatted_text = '<div class="markdown" dir="auto" style="white-space: pre-wrap;">';
-                $formatted_text .= Registry::markdownFactory()->autolink($tree)->convertToHtml($text);
-                $formatted_text .= '</div>';
-            }
+            $element = new SubmitterText('');
 
             echo '<td class="', $styleadd, ' wrap">';
-            echo $formatted_text;
+            echo $element->value($text, $tree);
             echo '</td></tr>';
         }
     }

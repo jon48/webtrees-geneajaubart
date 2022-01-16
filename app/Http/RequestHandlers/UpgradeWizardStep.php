@@ -36,14 +36,12 @@ use League\Flysystem\FilesystemOperator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use RuntimeException;
 use Throwable;
 
 use function assert;
 use function date;
 use function e;
 use function fclose;
-use function fopen;
 use function intdiv;
 use function microtime;
 use function response;
@@ -223,13 +221,6 @@ class UpgradeWizardStep implements RequestHandlerInterface
      */
     private function wizardStepExport(Tree $tree, FilesystemOperator $data_filesystem): ResponseInterface
     {
-        // We store the data in PHP temporary storage.
-        $stream = fopen('php://memory', 'wb+');
-
-        if ($stream === false) {
-            throw new RuntimeException('Failed to create temporary stream');
-        }
-
         $filename = $tree->name() . date('-Y-m-d') . '.ged';
 
         $stream = $this->gedcom_export_service->export($tree);

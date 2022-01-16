@@ -34,8 +34,7 @@ class HtmlBlockModule extends AbstractModule implements ModuleBlockInterface
 {
     use ModuleBlockTrait;
 
-    /** @var HtmlService */
-    private $html_service;
+    private HtmlService $html_service;
 
     /**
      * HtmlBlockModule bootstrap.
@@ -72,10 +71,10 @@ class HtmlBlockModule extends AbstractModule implements ModuleBlockInterface
     /**
      * Generate the HTML content of this block.
      *
-     * @param Tree     $tree
-     * @param int      $block_id
-     * @param string   $context
-     * @param string[] $config
+     * @param Tree          $tree
+     * @param int           $block_id
+     * @param string        $context
+     * @param array<string> $config
      *
      * @return string
      */

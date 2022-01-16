@@ -1,21 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: webtrees\n"
-"Report-Msgid-Bugs-To: i18n@webtrees.net\n"
-"POT-Creation-Date: 2021-08-18 10:49+0100\n"
-"PO-Revision-Date: 2021-08-18 09:13+0000\n"
-"Last-Translator: TheDutchJewel <thedutchjewel@gmail.com>\n"
-"Language-Team: Dutch <https://translate.webtrees.net/projects/webtrees/webtrees/nl/>\n"
-"Language: nl\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.9.1\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-Basepath: ..\n"
-"X-Poedit-KeywordsList: translate;noop;plural:1,2\n"
-"X-Poedit-SearchPath-0: .\n"
+msgstr "Project-Id-Version: webtrees\nReport-Msgid-Bugs-To: i18n@webtrees.net\nPOT-Creation-Date: 2021-08-18 10:49+0100\nPO-Revision-Date: 2021-11-21 19:05+0000\nLast-Translator: Carmen <carmen@justcarmen.nl>\nLanguage-Team: Dutch <https://translate.webtrees.net/projects/webtrees/webtrees/nl/>\nLanguage: nl\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=n != 1;\nX-Generator: Weblate 3.9.1\nX-Poedit-SourceCharset: utf-8\nX-Poedit-Basepath: ..\nX-Poedit-KeywordsList: translate;noop;plural:1,2\nX-Poedit-SearchPath-0: .\n"
 
 #: resources/xml/reports/ahnentafel_report.xml:161
 #: resources/xml/reports/ahnentafel_report.xml:189
@@ -72,8 +56,8 @@ msgstr "Het downloaden van %1$sKB duurde %2$s seconden."
 
 #: app/Http/RequestHandlers/UserEditAction.php:96
 #, php-format
-msgid "%1$s does not exist"
-msgstr "%1$s bestaat niet"
+msgid "%s does not exist."
+msgstr "%s bestaat niet."
 
 #. I18N: placeholders are GEDCOM XREFs, such as R123
 #: app/Http/RequestHandlers/CheckTree.php:225
@@ -199,14 +183,14 @@ msgstr "%s en hun kinderen"
 #: app/Module/ClippingsCartModule.php:513
 #, php-format
 msgid "%s and their descendants"
-msgstr "%s en hun nakomelingen"
+msgstr "%s en hun afstammelingen"
 
 #: app/Statistics/Repository/UserRepository.php:88
 #, php-format
 msgid "%s anonymous signed-in user"
 msgid_plural "%s anonymous signed-in users"
-msgstr[0] "%s anoniem ingelogde gebruiker"
-msgstr[1] "%s anoniem ingelogde gebruikers"
+msgstr[0] "%s anoniem aangemelde gebruiker"
+msgstr[1] "%s anoniem aangemelde gebruikers"
 
 #: resources/views/family-page-children.phtml:19
 #: resources/views/modules/ancestors-chart/tree.phtml:42
@@ -240,8 +224,8 @@ msgstr[1] "%s gezinnen"
 #, php-format
 msgid "%s family has been updated."
 msgid_plural "%s families have been updated."
-msgstr[0] "%s familie is bijgewerkt."
-msgstr[1] "%s families zijn bijgewerkt."
+msgstr[0] "%s gezin is bijgewerkt."
+msgstr[1] "%s gezinnen zijn bijgewerkt."
 
 #: resources/views/admin/locations.phtml:109
 #, php-format
@@ -443,7 +427,7 @@ msgstr "%s, haar huwelijkspartners en kinderen"
 #: app/Module/ClippingsCartModule.php:615
 #, php-format
 msgid "%s, her spouses and descendants"
-msgstr "%s, haar huwelijkspartners en nakomelingen"
+msgstr "%s, haar huwelijkspartners en afstammelingen"
 
 #: app/Module/ClippingsCartModule.php:623
 #, php-format
@@ -463,7 +447,7 @@ msgstr "%s, zijn huwelijkspartners en kinderen"
 #: app/Module/ClippingsCartModule.php:624
 #, php-format
 msgid "%s, his spouses and descendants"
-msgstr "%s, zijn huwelijkspartners en nakomelingen"
+msgstr "%s, zijn huwelijkspartners en afstammelingen"
 
 #: resources/views/admin/data-fix-select.phtml:33
 #: resources/views/edit/add-fact-row.phtml:33
@@ -512,7 +496,7 @@ msgstr "(leeftijd %s)"
 #: resources/views/lists/datatables-attributes.phtml:27
 #, php-format
 msgid "(filtered from %s total entries)"
-msgstr "(gefilterd uit %s stuks)"
+msgstr "(gefilterd uit %s vermeldingen)"
 
 #: app/Functions/FunctionsPrint.php:323
 msgid "(on the date of death)"
@@ -635,7 +619,7 @@ msgstr "<standaard thema>"
 
 #: resources/views/register-page.phtml:26
 msgid "<p>Notice: By completing and submitting this form, you agree:</p><ul><li>to protect the privacy of living individuals listed on our site;</li><li>and in the text box below, to explain to whom you are related, or to provide us with information on someone who should be listed on our website.</li></ul>"
-msgstr ""
+msgstr "<p>Let op: Door dit formulier in te vullen en te verzenden, gaat u ermee akkoord:</p><ul><li>de privacy te beschermen van levende personen die op onze website zijn vermeld;</li><li>en in het onderstaande tekstvak uit te leggen aan wie u verwant bent, of ons informatie te verstrekken over iemand die op onze website zou moeten worden vermeld.</li></ul>"
 
 #. I18N: a label/value pair, such as “Occupation: Farmer”. Some languages may need to change the punctuation.
 #: app/Fact.php:613 app/Functions/FunctionsPrint.php:106
@@ -660,7 +644,7 @@ msgstr "Een diagram dat de verwantschap tussen twee personen weergeeft."
 #. I18N: Description of the “FamilyBookChart” module
 #: app/Module/FamilyBookChartModule.php:103
 msgid "A chart of an individual’s ancestors and descendants, as a family book."
-msgstr "Een diagram dat de voorouders en nakomelingen van een persoon toont in de vorm van een familieboek."
+msgstr "Een diagram dat de voorouders en afstammelingen van een persoon toont in de vorm van een familieboek."
 
 #. I18N: Description of the “CompactTreeChart” module
 #: app/Module/CompactTreeChartModule.php:96
@@ -680,7 +664,7 @@ msgstr "Een diagram met de voorouders van een persoon."
 #. I18N: Description of the “DescendancyChart” module
 #: app/Module/DescendancyChartModule.php:119
 msgid "A chart of an individual’s descendants."
-msgstr "Een diagram met de nakomelingen van een persoon."
+msgstr "Een diagram met de afstammelingen van een persoon."
 
 #. I18N: Description of the “LifespansChart” module
 #: app/Module/LifespansChartModule.php:121
@@ -689,7 +673,7 @@ msgstr "Een diagram dat de levensduur van één of meerdere personen weergeeft."
 
 #: resources/views/edit/link-child-to-family.phtml:39
 msgid "A child may have more than one set of parents. The relationship between the child and the parents can be biological, legal, or based on local culture and tradition. If no pedigree is specified, then a biological relationship will be assumed."
-msgstr "Een kind kan meer dan één stel ouders hebben. De relatie tussen kind en ouders kan biologisch, wettelijk of gebaseerd zijn op lokale cultuur en traditie. Als de relatie niet is gespecificeerd, dan wordt een biologische relatie aangenomen."
+msgstr "Een kind kan meer dan één stel ouders hebben. De verwantschap tussen kind en ouders kan biologisch, wettelijk of gebaseerd zijn op lokale cultuur en traditie. Als de verwantschap niet is gespecificeerd, dan wordt een biologische verwantschap aangenomen."
 
 #. I18N: Description of a “Data fix” module
 #: app/Module/FixDuplicateLinks.php:69
@@ -745,7 +729,7 @@ msgstr "Een lijst met met familietakken."
 #. I18N: Description of the “Pending changes” module
 #: app/Module/ReviewChangesModule.php:91
 msgid "A list of changes that need to be reviewed by a moderator, and email notifications."
-msgstr "Een lijst van veranderingen die goedkeuring nodig hebben van een moderator en e-mail meldingen."
+msgstr "Een lijst van wijzigingen die goedkeuring nodig hebben van een moderator en e-mailmeldingen."
 
 #. I18N: Description of the “Families” module
 #: app/Module/FamilyListModule.php:57
@@ -830,7 +814,7 @@ msgstr "Een lijst met de meest populaire achternamen."
 #. I18N: Description of the “Most viewed pages” module
 #: app/Module/TopPageViewsModule.php:58
 msgid "A list of the pages that have been viewed the most number of times."
-msgstr "Een lijst van pagina's die het vaakst bekeken werden."
+msgstr "Een lijst van de meest bekeken pagina's."
 
 #. I18N: Description of the “Who is online” module
 #: app/Module/LoggedInUsersModule.php:53
@@ -839,7 +823,7 @@ msgstr "Een lijst van gebruikers en bezoekers die nu online zijn."
 
 #: resources/views/help/media-object.phtml:8
 msgid "A media object is a record in the family tree which contains information about a media file. This information may include a title, a copyright notice, a transcript, privacy restrictions, etc. The media file, such as the photo or video, can be stored locally (on this webserver) or remotely (on a different webserver)."
-msgstr "Een mediaobject is een record in de stamboom welke informatie bevat over een mediabestand. Deze informatie kan een titel, copyrightinformatie, een protocol, privacy beperkingen en dergelijke bevatten. Het mediabestand, zoals een foto of video, kan lokaal (op deze webserver) of elders (op een andere webserver) zijn opgeslagen."
+msgstr "Een mediaobject is een record in de stamboom dat informatie bevat over een mediabestand. Deze informatie kan een titel, copyrightinformatie, een protocol, privacybeperkingen en dergelijke bevatten. Het mediabestand, zoals een foto of video, kan lokaal (op deze webserver) of elders (op een andere webserver) zijn opgeslagen."
 
 #. I18N: %1$s is a real-name, %2$s is a username, %3$s is an email address
 #: resources/views/emails/verify-notify-html.phtml:20
@@ -1000,7 +984,7 @@ msgstr "Een tabblad dat de feiten en gebeurtenissen van een persoon toont."
 #. I18N: Description of the “Media” module
 #: app/Module/MediaTabModule.php:71
 msgid "A tab showing the media objects linked to an individual."
-msgstr "Een tabblad dat de media objecten toont die gekoppeld zijn aan een persoon."
+msgstr "Een tabblad dat de mediaobjecten toont die gekoppeld zijn aan een persoon."
 
 #. I18N: Description of the “Notes” module
 #: app/Module/NotesTabModule.php:70
@@ -1126,7 +1110,7 @@ msgstr "Accepteer"
 
 #: resources/views/pending-changes-page.phtml:101
 msgid "Accept all changes"
-msgstr "Keur alle veranderingen goed"
+msgstr "Keur alle wijzigingen goed"
 
 #: resources/views/admin/components.phtml:42
 #: resources/views/admin/components.phtml:105
@@ -1301,7 +1285,7 @@ msgstr "Voeg een nieuw logboek toe"
 #: resources/views/media-page-menu.phtml:39
 #: resources/views/modals/add-media-file.phtml:21
 msgid "Add a media file"
-msgstr "Voeg een media bestand toe"
+msgstr "Voeg een mediabestand toe"
 
 #: resources/views/individual-page-images.phtml:59
 #: resources/views/individual-page-menu.phtml:93
@@ -1438,7 +1422,7 @@ msgstr "Voeg stijl (CSS) en scripts (JS) toe aan elke pagina."
 #. I18N: A media path (e.g. C:\aaa\bbb\ccc\) in a GEDCOM file
 #: resources/views/admin/trees-export.phtml:90
 msgid "Add the GEDCOM media path to filenames"
-msgstr "Voeg het GEDCOM media pad toe aan bestandsnamen"
+msgstr "Voeg het GEDCOM-mediapad toe aan bestandsnamen"
 
 #. I18N: A configuration setting
 #: resources/views/admin/trees-preferences.phtml:205
@@ -1867,12 +1851,12 @@ msgstr "Een FAQ item kan getoond worden voor één stamboom of voor alle stambom
 
 #: resources/views/admin/site-registration.phtml:59
 msgid "An administrator must approve the new user account and select an access level before the user can sign in."
-msgstr "Een beheerder moet een nieuw gebruikersaccount goedkeuren en een toegangsniveau selecteren voordat de gebruiker kan inloggen."
+msgstr "Een beheerder moet een nieuw gebruikersaccount goedkeuren en een toegangsniveau selecteren voordat de gebruiker kan aanmelden."
 
 #. I18N: Description of the “Album” module
 #: app/Module/AlbumModule.php:53
 msgid "An alternative to the “media” tab, and an enhanced image viewer."
-msgstr "Een alternatief voor het Mediatabblad met een geavanceerde image viewer."
+msgstr "Een alternatief voor het Media-tabblad, en een geavanceerde afbeeldingsviewer."
 
 #. I18N: Description of the “Charts” module
 #: app/Module/ChartsBlockModule.php:80
@@ -1897,7 +1881,7 @@ msgstr "Een andere manier om aan en af te melden."
 #. I18N: Description of the “HourglassChart” module
 #: app/Module/HourglassChartModule.php:101
 msgid "An hourglass chart of an individual’s ancestors and descendants."
-msgstr "Een zandloper diagram met de voorouders en nakomelingen van een persoon."
+msgstr "Een zandloper diagram met de voorouders en afstammelingen van een persoon."
 
 #: resources/views/edit/reorder-families.phtml:75
 msgid "An individual can have more than one set of parents.  For example, birth and adopted."
@@ -1906,7 +1890,7 @@ msgstr "Een persoon kan meerdere ouders hebben. Bijvoorbeeld biologische en adop
 #. I18N: Description of the “Interactive tree” module
 #: app/Module/InteractiveTreeModule.php:64
 msgid "An interactive tree, showing all the ancestors and descendants of an individual."
-msgstr "Een interactieve boom, welke alle voorouders en afstammelingen van een persoon toont."
+msgstr "Een interactieve boom, die alle voorouders en afstammelingen van een persoon toont."
 
 #: resources/views/errors/database-error.phtml:12
 #: resources/views/setup/step-6-failed.phtml:12
@@ -2095,11 +2079,11 @@ msgstr "Weet u zeker dat u dit bericht wilt verwijderen? Herstellen is niet moge
 #: resources/views/record-page-menu.phtml:45
 #, php-format
 msgid "Are you sure you want to delete “%s”?"
-msgstr "Weet u zeker dat u ‘%s’ wilt verwijderen?"
+msgstr "Weet u zeker dat u “%s” wilt verwijderen?"
 
 #: resources/views/pending-changes-page.phtml:104
 msgid "Are you sure you want to reject all the changes to this family tree?"
-msgstr "Weet u zeker dat u alle veranderingen aan deze stamboom ongedaan wilt maken?"
+msgstr "Weet u zeker dat u alle wijzigingen aan deze stamboom ongedaan wilt maken?"
 
 #: resources/views/modules/favorites/favorites.phtml:35
 msgid "Are you sure you want to remove this item from your list of favorites?"
@@ -2540,7 +2524,7 @@ msgstr "Barbados"
 
 #: app/Module/CustomTagsGedcomL.php:130
 msgid "Base GEDCOM tag"
-msgstr "Standaard GEDCOM-labeld"
+msgstr "Standaard GEDCOM-label"
 
 #: app/Factories/ElementFactory.php:471
 #: resources/xml/reports/missing_facts_report.xml:18
@@ -2615,7 +2599,7 @@ msgstr "Billings, Montana, Verenigde Staten"
 
 #: app/Module/CustomTagsGedcom55.php:50
 msgid "Binary data object"
-msgstr "Binair data object"
+msgstr "Binair gegevensobject"
 
 #: app/Module/BingMaps.php:82 app/Module/MapLinkBing.php:42
 msgid "Bing™ maps"
@@ -3483,7 +3467,7 @@ msgstr[1] "Wijzigingen in de laatste %s dagen"
 #: app/Http/RequestHandlers/PendingChangesLogPage.php:99
 #: resources/views/admin/trees.phtml:207
 msgid "Changes log"
-msgstr "Veranderingen log"
+msgstr "Wijzigingenlogboek"
 
 #: app/Factories/ElementFactory.php:372
 msgid "Character set"
@@ -3772,7 +3756,7 @@ msgstr "Ambtenaar Burgerlijke Stand"
 #: app/Http/RequestHandlers/CleanDataFolder.php:101
 #: resources/views/admin/control-panel.phtml:248
 msgid "Clean up data folder"
-msgstr "Ruim de data map op"
+msgstr "Ruim de datamap op"
 
 #. I18N: Name of a module
 #: app/Module/ClippingsCartModule.php:229
@@ -3899,7 +3883,7 @@ msgstr "Voltooiingsdatum"
 #: app/Http/RequestHandlers/HelpText.php:283
 #: resources/views/admin/trees-export.phtml:64
 msgid "Compress the GEDCOM file"
-msgstr "Comprimeer het GEDCOM bestand"
+msgstr "Comprimeer het GEDCOM-bestand"
 
 #: app/Factories/ElementFactory.php:496
 #: resources/xml/reports/missing_facts_report.xml:19
@@ -4130,7 +4114,7 @@ msgstr "Maak een locatie aan"
 #: resources/views/modals/create-media-from-file.phtml:19
 #: resources/views/modals/create-media-object.phtml:19
 msgid "Create a media object"
-msgstr "Maak een nieuw media object aan"
+msgstr "Maak een nieuw mediaobject aan"
 
 #: app/Elements/XrefRepository.php:66
 #: resources/views/modals/create-repository.phtml:18
@@ -4158,7 +4142,7 @@ msgstr "Maak een nieuwe indiening aan"
 #: app/Elements/XrefSubmitter.php:61
 #: resources/views/modals/create-submitter.phtml:16
 msgid "Create a submitter"
-msgstr "Maak een nieuwe inzender aan"
+msgstr "Maak een nieuwe indiener aan"
 
 #: app/Http/RequestHandlers/UpgradeWizardPage.php:120
 msgid "Create a temporary folder…"
@@ -4187,7 +4171,7 @@ msgstr "Stel uw eigen diagram samen"
 
 #: resources/views/admin/synchronize-trees.phtml:18
 msgid "Create, update, and delete a family tree for every GEDCOM file in the data folder."
-msgstr "Stamboom aanmaken, bijwerken of verwijderen voor elk GEDCOM bestand in de data map."
+msgstr "Stamboom aanmaken, bijwerken of verwijderen voor elk GEDCOM-bestand in de datamap."
 
 #: app/Module/CustomTagsGedcomL.php:117 app/Module/CustomTagsGedcomL.php:170
 #: app/Module/CustomTagsGenPluswin.php:86
@@ -4401,7 +4385,7 @@ msgstr "DKIM digitale handtekening"
 #: app/Module/CustomTagsFamilyTreeMaker.php:118
 #: app/Module/CustomTagsRootsMagic.php:51
 msgid "DNA markers"
-msgstr "DNA markers"
+msgstr "DNA-markers"
 
 #. I18N: https://en.wikipedia.org/wiki/Daitch–Mokotoff_Soundex
 #: app/Soundex.php:3493 resources/views/branches-page.phtml:43
@@ -4432,7 +4416,7 @@ msgstr "Verantwoordelijke"
 #: resources/views/admin/data-fix-page.phtml:70
 #: resources/views/admin/data-fix-select.phtml:29
 msgid "Data fix"
-msgstr "Gegevens correctie"
+msgstr "Gegevenscorrectie"
 
 #: app/Http/RequestHandlers/DataFixChoose.php:68
 #: app/Http/RequestHandlers/DataFixPage.php:90
@@ -4442,11 +4426,11 @@ msgstr "Gegevens correctie"
 #: resources/views/admin/data-fix-page.phtml:24
 #: resources/views/admin/trees.phtml:149
 msgid "Data fixes"
-msgstr "Gegevens correcties"
+msgstr "Gegevenscorrecties"
 
 #: resources/views/help/data-fixes.phtml:8
 msgid "Data fixes can require lots of slow calculations, so it is not possible to create an exact list of records that need to be updated."
-msgstr "Voor gegevens correcties zijn veel langdurige berekeningen nodig, het is daarom niet mogelijk om een lijst met de te corrigeren gegevens te genereren."
+msgstr "Voor gegevenscorrecties zijn veel langdurige berekeningen nodig, het is daarom niet mogelijk om een lijst met de te corrigeren gegevens te genereren."
 
 #. I18N: A configuration setting
 #: resources/views/admin/site-preferences.phtml:26
@@ -4518,11 +4502,11 @@ msgstr "Datum verschillen"
 
 #: app/Factories/ElementFactory.php:460
 msgid "Date of LDS baptism"
-msgstr "Datum LDS doop"
+msgstr "Datum van LDS-doop"
 
 #: app/Factories/ElementFactory.php:598
 msgid "Date of LDS child sealing"
-msgstr "Datum van de LDS-kindverzegeling"
+msgstr "Datum van LDS-kindverzegeling"
 
 #: app/Factories/ElementFactory.php:500
 msgid "Date of LDS confirmation"
@@ -4530,7 +4514,7 @@ msgstr "Datum van LDS-bevestiging"
 
 #: app/Factories/ElementFactory.php:520
 msgid "Date of LDS endowment"
-msgstr "Datum van de LDS-schenking"
+msgstr "Datum van LDS-schenking"
 
 #: app/Factories/ElementFactory.php:354
 msgid "Date of LDS spouse sealing"
@@ -4548,12 +4532,12 @@ msgstr "Doopdatum"
 #: app/Factories/ElementFactory.php:469
 #: resources/xml/reports/missing_facts_report.xml:212
 msgid "Date of bar mitzvah"
-msgstr "Bar mitswa datum"
+msgstr "Bar mitswa-datum"
 
 #: app/Factories/ElementFactory.php:472
 #: resources/xml/reports/missing_facts_report.xml:253
 msgid "Date of bat mitzvah"
-msgstr "Datum van de bat mitswa"
+msgstr "Bat mitswa-datum"
 
 #: app/Factories/ElementFactory.php:475
 #: resources/xml/reports/fact_sources.xml:68
@@ -4569,12 +4553,12 @@ msgstr "Datum zegening"
 
 #: app/Module/CustomTagsBrothersKeeper.php:95
 msgid "Date of brit milah"
-msgstr "Datum van brit milah"
+msgstr "Brit milah-datum"
 
 #: app/Factories/ElementFactory.php:482
 #: resources/xml/reports/missing_facts_report.xml:546
 msgid "Date of burial"
-msgstr "Datum van begrafenis"
+msgstr "Begrafenisdatum"
 
 #: app/Factories/ElementFactory.php:492
 #: resources/xml/reports/missing_facts_report.xml:170
@@ -4584,26 +4568,26 @@ msgstr "Doopdatum"
 #: app/Factories/ElementFactory.php:497
 #: resources/xml/reports/missing_facts_report.xml:294
 msgid "Date of confirmation"
-msgstr "Datum vormsel/confirmatie"
+msgstr "Datum van vormsel/confirmatie"
 
 #: app/Factories/ElementFactory.php:506
 msgid "Date of cremation"
-msgstr "Datum crematie"
+msgstr "Crematiedatum"
 
 #: app/Factories/ElementFactory.php:510
 #: resources/xml/reports/cemetery_report.xml:46
 #: resources/xml/reports/fact_sources.xml:274
 #: resources/xml/reports/missing_facts_report.xml:505
 msgid "Date of death"
-msgstr "Datum van overlijden"
+msgstr "Overlijdensdatum"
 
 #: app/Factories/ElementFactory.php:327
 msgid "Date of divorce"
-msgstr "Datum van echtscheiding"
+msgstr "Echtscheidingsdatum"
 
 #: app/Factories/ElementFactory.php:517
 msgid "Date of emigration"
-msgstr "Emigratie datum"
+msgstr "Emigratiedatum"
 
 #: app/Factories/ElementFactory.php:330
 #: resources/xml/reports/missing_facts_report.xml:336
@@ -4621,7 +4605,7 @@ msgstr "Inschrijfdatum in originele bron"
 
 #: app/Factories/ElementFactory.php:526
 msgid "Date of event"
-msgstr "Datum van gebeurtenis"
+msgstr "Gebeurtenisdatum"
 
 #: app/Factories/ElementFactory.php:536
 #: resources/xml/reports/missing_facts_report.xml:378
@@ -4630,7 +4614,7 @@ msgstr "Datum eerste communie"
 
 #: app/Factories/ElementFactory.php:543
 msgid "Date of immigration"
-msgstr "Datum van immigratie"
+msgstr "Immigratiedatum"
 
 #: app/Factories/ElementFactory.php:323 app/Factories/ElementFactory.php:489
 #: app/Factories/ElementFactory.php:620 app/Factories/ElementFactory.php:639
@@ -4653,7 +4637,7 @@ msgstr "Ondertrouwdatum"
 
 #: app/Factories/ElementFactory.php:571
 msgid "Date of naturalization"
-msgstr "Datum naturalisatie"
+msgstr "Naturalisatiedatum"
 
 #: app/Factories/ElementFactory.php:581
 msgid "Date of ordination"
@@ -5225,7 +5209,7 @@ msgstr "Afstammelingen"
 
 #: app/Factories/ElementFactory.php:512
 msgid "Descendants interest"
-msgstr "Interesse in nakomelingen"
+msgstr "Interesse in afstammelingen"
 
 #: resources/xml/reports/descendancy_report.xml:42
 msgid "Descendants of "
@@ -5558,7 +5542,7 @@ msgstr "Wijzig"
 #: app/Http/RequestHandlers/EditMediaFileModal.php:81
 #: resources/views/modals/edit-media-file.phtml:22
 msgid "Edit a media file"
-msgstr "Media bestand wijzigen"
+msgstr "Mediabestand wijzigen"
 
 #. I18N: Options for editing
 #: resources/views/admin/trees-preferences.phtml:678
@@ -5590,11 +5574,11 @@ msgstr "Wijzig naam"
 #: resources/views/family-page-menu.phtml:76
 #: resources/views/individual-page-menu.phtml:124
 msgid "Edit the raw GEDCOM"
-msgstr "Wijzig onbewerkte GEDCOM-record"
+msgstr "Wijzig onbewerkt GEDCOM-record"
 
 #: app/Http/RequestHandlers/EditNotePage.php:59
 msgid "Edit the shared note"
-msgstr "Wijzig een gedeelde notitie"
+msgstr "Wijzig gedeelde notitie"
 
 #: app/Module/StoriesModule.php:310
 #: resources/views/modules/stories/tab.phtml:27
@@ -5738,7 +5722,7 @@ msgstr "Werkgever"
 
 #: resources/views/record-page-menu-clipboard.phtml:36
 msgid "Empty the clipboard"
-msgstr ""
+msgstr "Klembord leegmaken"
 
 #: app/Module/ClippingsCartModule.php:205
 msgid "Empty the clippings cart"
@@ -5757,7 +5741,7 @@ msgstr "Door deze optie in te schakelen worden alle bezoekers gedwongen aan te m
 
 #: resources/views/modules/lifespans-chart/page.phtml:63
 msgid "End year"
-msgstr "Eind Jaar"
+msgstr "Eindjaar"
 
 #: resources/xml/reports/change_report.xml:6
 msgid "Ending range of change dates"
@@ -5799,7 +5783,7 @@ msgstr "Eritrea"
 #: app/Http/RequestHandlers/GedcomLoad.php:219
 #, php-format
 msgid "Error: converting GEDCOM files from %s encoding to UTF-8 encoding not currently supported."
-msgstr "Fout: het converteren van Gedcom bestanden met %s codering naar UTF-8 codering wordt momenteel niet ondersteund."
+msgstr "Fout: het converteren van GEDCOM-bestanden met %s-codering naar UTF-8 codering wordt momenteel niet ondersteund."
 
 #: app/Date/JalaliDate.php:270
 msgctxt "Abbreviation for Persian month: Esfand"
@@ -5930,11 +5914,11 @@ msgstr "Exporteer"
 
 #: app/Http/RequestHandlers/ExportGedcomPage.php:53
 msgid "Export a GEDCOM file"
-msgstr "Exporteer een GEDCOM bestand"
+msgstr "Exporteer een GEDCOM-bestand"
 
 #: app/Http/RequestHandlers/UpgradeWizardPage.php:115
 msgid "Export all the family trees to GEDCOM files…"
-msgstr "Exporteer alle stambomen naar GEDCOM bestanden…"
+msgstr "Exporteer alle stambomen naar GEDCOM-bestanden…"
 
 #: resources/views/admin/trees-export.phtml:58
 msgid "Export preferences"
@@ -5956,7 +5940,7 @@ msgstr "Externe koppeling"
 
 #: resources/views/admin/media.phtml:79
 msgid "External media files have a URL instead of a filename."
-msgstr "Externe media bestanden hebben een URL i.p.v. een bestandsnaam."
+msgstr "Externe mediabestanden hebben een URL in plaats van een bestandsnaam."
 
 #. I18N: Name of a module/sidebar
 #: app/Module/CustomTagsGenPluswin.php:80
@@ -5967,7 +5951,7 @@ msgstr "Extra informatie"
 
 #: app/Module/CustomTagsBrothersKeeper.php:98
 msgid "Eye color"
-msgstr "Kleur ogen"
+msgstr "Oogkleur"
 
 #. I18N: Name of a theme.
 #: app/Module/FabTheme.php:39
@@ -6214,7 +6198,7 @@ msgstr "Gezin van %s"
 
 #: app/Factories/ElementFactory.php:350
 msgid "Family residence"
-msgstr "Gezinswoning"
+msgstr "Gezinswoonplaats"
 
 #: app/Module/CustomTagsGedcomL.php:114
 msgid "Family status"
@@ -6477,12 +6461,12 @@ msgstr "Bestandsnaam op server"
 #: app/Http/RequestHandlers/UploadMediaAction.php:108
 #, php-format
 msgid "Filenames are not allowed to contain the character “%s”."
-msgstr "Bestandsnamen mogen niet het teken ‘%s’ bevatten."
+msgstr "Bestandsnamen mogen niet het teken “%s” bevatten."
 
 #: app/Http/RequestHandlers/UploadMediaAction.php:114
 #, php-format
 msgid "Filenames are not allowed to have the extension “%s”."
-msgstr "Bestandsnamen mogen niet de extensie ‘%s’ hebben."
+msgstr "Bestandsnamen mogen niet de extensie “%s” hebben."
 
 #: resources/views/admin/control-panel.phtml:865
 msgid "Files have been found from a previous version of webtrees. Old files can sometimes be a security risk. You should delete them."
@@ -6491,7 +6475,7 @@ msgstr "Bestanden gevonden van een eerdere versie van webtrees. Oude bestanden v
 #: resources/views/admin/clean-data.phtml:20
 #, php-format
 msgid "Files marked with %s are required for proper operation and cannot be removed."
-msgstr "Bestanden gemarkeerd met %s zijn benodigd voor juiste werking en kunnen niet verwijderd worden."
+msgstr "Bestanden gemarkeerd met %s zijn nodig voor een goede werking en kunnen niet worden verwijderd."
 
 #: resources/views/calendar-page.phtml:119
 #: resources/views/lists/datatables-attributes.phtml:32
@@ -6511,11 +6495,11 @@ msgstr "Vind een speciaal letterteken"
 
 #: app/Module/RelationshipsChartModule.php:739
 msgid "Find all possible relationships"
-msgstr "Vind alle mogelijke relaties"
+msgstr "Vind alle mogelijke verwantschappen"
 
 #: app/Module/RelationshipsChartModule.php:467
 msgid "Find any relationship"
-msgstr "Vind elke relatie"
+msgstr "Vind elke verwantschap"
 
 #: app/Http/RequestHandlers/FindDuplicateRecords.php:63
 #: resources/views/admin/trees.phtml:165
@@ -6524,17 +6508,17 @@ msgstr "Zoek dubbele records"
 
 #: app/Module/RelationshipsChartModule.php:741
 msgid "Find other relationships"
-msgstr "Andere relaties zoeken"
+msgstr "Andere verwantschappen zoeken"
 
 #: app/Module/RelationshipsChartModule.php:468
 #: resources/views/modules/relationships-chart/page.phtml:56
 msgid "Find relationships via ancestors"
-msgstr "Zoek relaties via voorouders"
+msgstr "Zoek verwantschappen via voorouders"
 
 #: app/Module/RelationshipsChartModule.php:745
 #: resources/views/modules/relationships-chart/page.phtml:70
 msgid "Find the closest relationships"
-msgstr "Vind de dichtstbijzijnde relatie"
+msgstr "Vind de dichtstbijzijnde verwantschap"
 
 #: app/Http/RequestHandlers/UnconnectedPage.php:109
 #: resources/views/admin/trees.phtml:189
@@ -6646,7 +6630,7 @@ msgstr "Voetteksten"
 #: resources/views/admin/trees-import.phtml:119
 #, php-format
 msgid "For example, if the GEDCOM file contains %1$s and webtrees expects to find %2$s in the media folder, then you would need to remove %3$s."
-msgstr "Als het GEDCOM bestand bijvoorbeeld %1$s bevat maar webtrees verwacht %2$s in the media map te vinden, dan moet u %3$s verwijderen."
+msgstr "Als het GEDCOM-bestand bijvoorbeeld %1$s bevat maar webtrees verwacht %2$s in the mediamap te vinden, dan moet u %3$s verwijderen."
 
 #: resources/views/help/relationship-privacy.phtml:12
 msgid "For example, if you specify a path length of 2, the individual will be able to see their grandson (child, child), their aunt (parent, sibling), their step-daughter (spouse, child), but not their first cousin (parent, sibling, child)."
@@ -7003,7 +6987,7 @@ msgstr "Generaties van voorouders"
 
 #: app/Factories/ElementFactory.php:736
 msgid "Generations of descendants"
-msgstr "Generaties van nakomelingen"
+msgstr "Generaties van afstammelingen"
 
 #. I18N: https://www.geonames.org
 #: app/Module/GeonamesAutocomplete.php:57
@@ -7253,7 +7237,7 @@ msgstr "HTML"
 
 #: app/Module/CustomTagsBrothersKeeper.php:100
 msgid "Hair color"
-msgstr "Kleur haar"
+msgstr "Haarkleur"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:243
@@ -7561,7 +7545,7 @@ msgstr "Houston, Texas, Verenigde Staten"
 #. I18N: Configuration option
 #: resources/views/modules/relationships-chart/config.phtml:45
 msgid "How much recursion to use when searching for relationships"
-msgstr "Het aantal malen dat het zoeken naar relaties mag worden herhaald"
+msgstr "Het aantal malen dat het zoeken naar verwantschappen mag worden herhaald"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:245
@@ -7622,36 +7606,36 @@ msgstr "Identificaties"
 
 #: resources/views/admin/fix-level-0-media.phtml:20
 msgid "If a media object is linked to an individual, when it should be linked to a fact or event, then you can move it to the correct location."
-msgstr "Als een media-object aan een persoon is gekoppeld, terwijl het aan een feit of gebeurtenis gekoppeld had moeten zijn, kun je het naar de juiste locatie verplaatsen."
+msgstr "Als een mediaobject aan een persoon is gekoppeld, terwijl het aan een feit of gebeurtenis gekoppeld had moeten zijn, kunt u het naar de juiste locatie verplaatsen."
 
 #. I18N: Help text for the “Language” configuration setting
 #: resources/views/admin/site-preferences.phtml:89
 msgid "If a visitor to the website has not selected a preferred language in their browser preferences, or they have selected an unsupported language, then this language will be used. Typically this applies to search engines."
-msgstr "Wanneer een bezoeker van de site geen voorkeurstaal heeft ingesteld in zijn/haar browser configuratie of een niet-ondersteunde taal heeft ingesteld, dan zal deze taal gebruikt worden. Deze instelling geldt voornamelijk voor zoekmachines."
+msgstr "Als een bezoeker van de site in de browserinstellingen geen voorkeurstaal heeft geselecteerd, of een taal heeft geselecteerd die niet wordt ondersteund, dan zal deze taal worden gebruikt. Deze instelling geldt voornamelijk voor zoekmachines."
 
 #: resources/views/admin/users-edit.phtml:111
 msgid "If an administrator creates a user account, the verification email is not sent, and the email must be verified manually."
-msgstr "Als een beheerder een gebruikersaccount aanmaakt wordt er geen verificatie e-mail gestuurd. Het e-mailadres moet dan handmatig geverifieerd worden."
+msgstr "Als een beheerder een gebruikersaccount aanmaakt, wordt de verificatie-e-mail niet verzonden en moet het e-mailadres handmatig worden geverifieerd."
 
 #: resources/views/help/name.phtml:22
 #, php-format
 msgid "If an individual does not have a surname, no slashes are needed: <%s>Jón Einarsson<%s>"
-msgstr "Als een persoon geen achternaam heeft zijn, geen schuine strepen benodigd: <%s>Jón Einarsson<%s>"
+msgstr "Als een persoon geen achternaam heeft, zijn er geen schuine strepen nodig: <%s>Jón Einarsson<%s>"
 
 #: resources/views/help/name.phtml:19
 #, php-format
 msgid "If an individual has two separate surnames, both should be enclosed by slashes: <%s>José Antonio /Gómez/ /Iglesias/<%s>"
-msgstr "Als een persoon twee afzonderlijke achternamen heeft, moeten beiden ingesloten worden door schuine strepen: <%s>José Antonio/Gómez/ /Iglesias/<%s>"
+msgstr "Als een persoon twee verschillende achternamen heeft, moeten beide tussen schuine strepen worden geplaatst: <%s>José Antonio/Gómez/ /Iglesias/<%s>"
 
 #: resources/views/help/name.phtml:28
 #, php-format
 msgid "If an individual was known by a nickname which is not part of their formal name, it should be enclosed by quotation marks. For example, <%s>John &quot;Nobby&quot; /Clark/<%s>."
-msgstr "Als een persoon bekend was onder zijn roepnaam welke geen deel is van zijn formele naam, moet het ingesloten worden door twee aanhalingstekens. B.v. <%s>John &quot;Nobby&quot; /Clark/<%s>."
+msgstr "Als een persoon bekend was onder zijn roepnaam die geen deel uitmaakt van zijn formele naam, moet deze tussen aanhalingstekens worden geplaatst. Bijvoorbeeld <%s>John &quot;Nobby&quot; /Clark/<%s>."
 
 #: resources/views/help/name.phtml:25
 #, php-format
 msgid "If an individual was not known by their first given name, the preferred name should be indicated with an asterisk: <%s>John Paul* /Smith/<%s>"
-msgstr "Als een persoon niet bekend was met zijn eerste voornaam, moet de voorkeursnaam getoond worden met een asterisk: <%s>John Paul* /Smith/<%s>"
+msgstr "Als een persoon niet bekend was met zijn eerste voornaam, moet de voorkeursnaam getoond worden met een asterisk: <%s>Jan Pieter* /Smid/<%s>"
 
 #: resources/views/help/name.phtml:16
 #, php-format
@@ -7660,7 +7644,7 @@ msgstr "Als de achternaam onbekend is, gebruik dan lege schuine strepen: <%s>Mar
 
 #: resources/views/admin/webtrees1-thumbnails.phtml:24
 msgid "If the thumbnail image is a custom image, you should add it to the media object."
-msgstr "Wanneer de miniatuurafbeelding een eigen aangepaste afbeelding is, moet u deze aan het media-object toevoegen."
+msgstr "Wanneer de miniatuurafbeelding een eigen aangepaste afbeelding is, moet u deze aan het mediaobject toevoegen."
 
 #: resources/views/admin/webtrees1-thumbnails.phtml:23
 msgid "If the thumbnail image is the same as the original image, it is no longer needed and you should delete it."
@@ -7674,7 +7658,7 @@ msgstr "Als deze persoon andere gebeurtenissen heeft dan overlijden, begrafenis 
 #. I18N: Help text for the “Media folder” configuration setting
 #: resources/views/admin/trees-preferences.phtml:262
 msgid "If two family trees use the same media folder, then they will be able to share media files. If they use different media folders, then their media files will be kept separate."
-msgstr "Als twee stambomen gebruik maken van dezelfde media map, kunnen zij dezelfde mediabestanden gebruiken. Als er verschillende mappen worden gebruikt, zijn de media bestanden gescheiden."
+msgstr "Als twee stambomen gebruik maken van dezelfde mediamap, kunnen zij dezelfde mediabestanden gebruiken. Als er verschillende mediamappen worden gebruikt, zijn de mediabestanden gescheiden."
 
 #. I18N: Help text for the “Who can upload new media files” configuration setting
 #: resources/views/admin/trees-preferences.phtml:278
@@ -7695,7 +7679,7 @@ msgstr "Wanneer je met een UNIX-poort verbinding maakt met de database, vul dan 
 
 #: resources/views/admin/trees-import.phtml:103
 msgid "If you created this GEDCOM file using genealogy software that omits spaces when splitting long lines, then select this option to reinsert the missing spaces."
-msgstr "Als u dit GEDCOM bestand hebt aangemaakt met genealogie software dat spaties weglaat bij het splitsen van lange regels, selecteer dan deze optie om de ontbrekende spaties weer toe te voegen."
+msgstr "Als u dit GEDCOM-bestand hebt aangemaakt met genealogiesoftware dat spaties weglaat bij het splitsen van lange regels, selecteer dan deze optie om de ontbrekende spaties weer toe te voegen."
 
 #: resources/views/emails/password-request-html.phtml:26
 #: resources/views/emails/password-request-text.phtml:18
@@ -7713,7 +7697,7 @@ msgstr "Als u een groot aantal mediabestanden heeft, kunt u ze organiseren in ma
 
 #: resources/views/admin/trees-import.phtml:96
 msgid "If you have created media objects in webtrees, and have subsequently edited this GEDCOM file using genealogy software that deletes media objects, then select this option to merge the current media objects with the new GEDCOM file."
-msgstr "Als u mediaobjecten hebt gecreëerd in webtrees, en uw gedcom off-line gewijzigd hebt met een programma dat mediaobjecten verwijdert, vink dan dit vakje aan om uw huidige mediaobjecten samen te voegen met het nieuwe GEDCOM bestand."
+msgstr "Als u mediaobjecten hebt aangemaakt in webtrees, en vervolgens dit GEDCOM-bestand hebt bewerkt met genealogiesoftware die mediaobjecten verwijdert, selecteer dan deze optie om de huidige mediaobjecten samen te voegen met het nieuwe GEDCOM-bestand."
 
 #: resources/views/admin/site-preferences.phtml:39
 msgid "If you select a different folder, you must also move all files (except config.ini.php, index.php, and .htaccess) from the existing folder to the new folder."
@@ -7756,7 +7740,7 @@ msgstr "Importeer"
 
 #: app/Http/RequestHandlers/ImportGedcomPage.php:70
 msgid "Import a GEDCOM file"
-msgstr "Een GEDCOM bestand importeren"
+msgstr "Een GEDCOM-bestand importeren"
 
 #: app/Http/RequestHandlers/ImportThumbnailsPage.php:47
 #: resources/views/admin/control-panel.phtml:825
@@ -7805,11 +7789,11 @@ msgstr "In dit jaar…"
 #. I18N: "thumbs" is fixed text.  Do not change it.
 #: resources/views/admin/webtrees1-thumbnails.phtml:19
 msgid "In webtrees version 1, you could add custom thumbnails to media objects by creating files in the “thumbs” folders."
-msgstr "In webtrees versie 1 kon je aangepaste thumbnails aan het media object toevoegen door bestanden aan te maken in de “thumbs” folders."
+msgstr "In webtrees versie 1 kon u aangepaste miniatuurafbeeldingen toevoegen aan het mediaobject door bestanden aan te maken in de “thumbs”-mappen."
 
 #: resources/views/admin/webtrees1-thumbnails.phtml:21
 msgid "In webtrees version 2, custom thumbnails are stored as a second media file in the same media object."
-msgstr "In webtrees versie 2, worden aangepaste miniatuurafbeeldingen opgeslagen als tweede media bestand in hetzelfde media object."
+msgstr "In webtrees versie 2 worden aangepaste miniatuurafbeeldingen opgeslagen als tweede mediabestand in hetzelfde mediaobject."
 
 #: resources/views/admin/trees-unconnected.phtml:29
 msgid "Include aliases"
@@ -7822,11 +7806,11 @@ msgstr "Inclusief gerelateerde personen"
 #: app/Module/IndividualListModule.php:357
 #, php-format
 msgid "Include individuals with “%s” as a married name"
-msgstr "Neem personen met ‘%s’ als huwelijksnaam mee"
+msgstr "Neem personen met “%s” als huwelijksnaam mee"
 
 #: resources/views/admin/trees-export.phtml:72
 msgid "Include media (automatically zips files)"
-msgstr "Met inbegrip van media (er wordt automatisch een zip-bestand gemaakt)"
+msgstr "Inclusief media (er wordt automatisch een zip-bestand gemaakt)"
 
 #. I18N: Label for check-box
 #: resources/views/admin/media.phtml:70
@@ -7983,7 +7967,7 @@ msgstr "Indonesië"
 
 #: app/Elements/AgeAtEvent.php:79
 msgid "Infant"
-msgstr "Kind"
+msgstr "Minder dan 1 jaar oud"
 
 #: app/Elements/RelationIsDescriptor.php:114
 msgid "Informant"
@@ -8031,7 +8015,7 @@ msgstr "Ongeldig GEDCOM-bestand - geen headerrecord gevonden."
 
 #: app/Exceptions/GedcomErrorException.php:37
 msgid "Invalid GEDCOM record"
-msgstr "Ongeldig GEDCOM record"
+msgstr "Ongeldig GEDCOM-record"
 
 #: app/Date.php:378
 msgid "Invalid date"
@@ -8292,7 +8276,7 @@ msgstr "Kazachstan"
 #. I18N: A configuration setting
 #: resources/views/admin/trees-import.phtml:93
 msgid "Keep media objects"
-msgstr "Media objects behouden"
+msgstr "Mediaobjecten behouden"
 
 #: resources/views/modals/on-screen-keyboard.phtml:51
 msgid "Keep open"
@@ -8403,7 +8387,7 @@ msgstr "LDS-doop"
 
 #: app/Factories/ElementFactory.php:597
 msgid "LDS child sealing"
-msgstr "LDS kind verzegeling"
+msgstr "LDS-kindverzegeling"
 
 #: resources/views/admin/tags.phtml:713
 msgid "LDS church"
@@ -8415,7 +8399,7 @@ msgstr "LDS-bevestiging"
 
 #: app/Factories/ElementFactory.php:519
 msgid "LDS endowment"
-msgstr "LDS-gave"
+msgstr "LDS-schenking"
 
 #: app/Factories/ElementFactory.php:353
 msgid "LDS spouse sealing"
@@ -8653,7 +8637,7 @@ msgstr "Lima, Peru"
 #: app/Http/RequestHandlers/FixLevel0MediaPage.php:48
 #: resources/views/admin/control-panel.phtml:819
 msgid "Link media objects to facts and events"
-msgstr "Koppel media objects aan feiten en gebeurtenissen"
+msgstr "Koppel mediaobjecten aan feiten en gebeurtenissen"
 
 #. I18N: You need to:
 #: resources/views/emails/verify-notify-html.phtml:41
@@ -8669,17 +8653,17 @@ msgstr "Koppel deze persoon als kind aan een bestaand gezin"
 #: resources/views/media-page-menu.phtml:63
 #: resources/views/modals/link-media-to-family.phtml:18
 msgid "Link this media object to a family"
-msgstr "Koppel dit media object aan een gezin"
+msgstr "Koppel dit mediaobject aan een gezin"
 
 #: resources/views/media-page-menu.phtml:68
 #: resources/views/modals/link-media-to-source.phtml:18
 msgid "Link this media object to a source"
-msgstr "Koppel dit media object aan een bron"
+msgstr "Koppel dit mediaobject aan een bron"
 
 #: resources/views/media-page-menu.phtml:58
 #: resources/views/modals/link-media-to-individual.phtml:18
 msgid "Link this media object to an individual"
-msgstr "Koppel dit media object aan een persoon"
+msgstr "Koppel dit mediaobject aan een persoon"
 
 #: resources/views/admin/users-edit.phtml:305
 msgid "Link this user to an individual in the family tree."
@@ -9231,7 +9215,7 @@ msgstr "Huwelijkse voorwaarden"
 
 #: app/Module/CustomTagsAldfaer.php:53
 msgid "Marriage type unknown"
-msgstr "Onbekend type huwelijk"
+msgstr "Onbekend soort huwelijk"
 
 #. I18N: Name of a module/report
 #: app/Module/MarriageReportModule.php:40
@@ -9371,7 +9355,7 @@ msgstr "Mediabestand om te uploaden"
 #: resources/views/admin/trees-export.phtml:94
 #, php-format
 msgid "Media filenames will be prefixed by %s."
-msgstr "Aan het begin van media bestandsnamen wordt %s toegevoegd."
+msgstr "Aan het begin van mediabestandsnamen wordt %s toegevoegd."
 
 #: resources/views/admin/media.phtml:31
 #: resources/views/admin/trees-preferences.phtml:268
@@ -9382,12 +9366,12 @@ msgstr "Mediabestanden"
 #: resources/views/admin/media.phtml:63
 #: resources/views/admin/trees-preferences.phtml:248
 msgid "Media folder"
-msgstr "Media map"
+msgstr "Mediamap"
 
 #: resources/views/admin/media.phtml:32
 #: resources/views/admin/trees-preferences.phtml:243
 msgid "Media folders"
-msgstr "Media mappen"
+msgstr "Mediamappen"
 
 #: app/Factories/ElementFactory.php:292 app/Factories/ElementFactory.php:313
 #: app/Factories/ElementFactory.php:347 app/Factories/ElementFactory.php:366
@@ -9433,7 +9417,7 @@ msgstr "Mediaobjecten gevonden"
 
 #: resources/views/modules/media-list/page.phtml:52
 msgid "Media objects per page"
-msgstr "media objecten per pagina"
+msgstr "Mediaobjecten per pagina"
 
 #: app/Factories/ElementFactory.php:644 app/Factories/ElementFactory.php:702
 #: app/Module/CustomTagsGedcom53.php:138
@@ -9895,7 +9879,7 @@ msgstr "Verplaats omlaag"
 
 #: resources/views/admin/fix-level-0-media-action.phtml:17
 msgid "Move the media object?"
-msgstr "Media object verplaatsen?"
+msgstr "Mediaobject verplaatsen?"
 
 #: resources/views/admin/components.phtml:45
 #: resources/views/admin/components.phtml:146
@@ -10237,11 +10221,11 @@ msgstr "Nee"
 #: app/Http/RequestHandlers/ImportGedcomAction.php:93
 #: app/Http/RequestHandlers/ImportGedcomAction.php:105
 msgid "No GEDCOM file was received."
-msgstr "Er is geen GEDCOM bestand ontvangen."
+msgstr "Er is geen GEDCOM-bestand ontvangen."
 
 #: resources/views/admin/trees-import.phtml:72
 msgid "No GEDCOM files found."
-msgstr "Geen GEDCOM bestanden gevonden."
+msgstr "Geen GEDCOM-bestanden gevonden."
 
 #: resources/views/admin/trees-preferences.phtml:124
 #: resources/views/admin/trees-preferences.phtml:127
@@ -10324,7 +10308,7 @@ msgstr "Geen resultaten gevonden."
 
 #: app/Statistics/Repository/UserRepository.php:84
 msgid "No signed-in and no anonymous users"
-msgstr "Niemand ingelogd en geen anonieme gebruikers"
+msgstr "Niemand aangemeld en geen anonieme gebruikers"
 
 #: app/Elements/TempleCode.php:211
 msgid "No temple - living ordinance"
@@ -11016,7 +11000,7 @@ msgstr "Uitstaande wijzigingen"
 
 #: resources/views/help/pending-changes.phtml:20
 msgid "Pending changes are only shown when your account has permission to edit. When you sign out, you will no longer be able to see them. Also, pending changes are only shown on certain pages. For example, they are not shown in lists, reports, or search results."
-msgstr "Uitstaande wijzigingen worden alleen weergegeven wanneer u ingelogd bent en toestemming hebt om gegevens te bewerken. Wanneer u zich afmeldt zijn deze wijzigingen niet meer zichtbaar. Ook zijn deze wijzigingen alleen zichtbaar op bepaalde pagina’s. Uitstaande wijzigingen worden bijvoorbeeld niet weergegeven in lijsten, rapporten of zoekresultaten."
+msgstr "Uitstaande wijzigingen worden alleen weergegeven wanneer u aangemeld bent en toestemming hebt om gegevens te bewerken. Wanneer u zich afmeldt zijn deze wijzigingen niet meer zichtbaar. Ook zijn deze wijzigingen alleen zichtbaar op bepaalde pagina’s. Uitstaande wijzigingen worden bijvoorbeeld niet weergegeven in lijsten, rapporten of zoekresultaten."
 
 #: app/Module/CustomTagsBrothersKeeper.php:67
 #: app/Module/CustomTagsBrothersKeeper.php:107
@@ -11069,7 +11053,7 @@ msgstr "Fonetische naam"
 
 #: app/Factories/ElementFactory.php:295 app/Factories/ElementFactory.php:426
 msgid "Phonetic place"
-msgstr "Plaatsnaam fonetisch"
+msgstr "Fonetische plaatsnaam"
 
 #. I18N: search using “sounds like”, rather than exact spelling
 #: app/Http/RequestHandlers/SearchPhoneticPage.php:100
@@ -11137,7 +11121,7 @@ msgstr "Hiërarchie van plaatsen"
 
 #: app/Module/CustomTagsPhpGedView.php:56
 msgid "Place in Hebrew"
-msgstr "Plaatsnaam in Hebreeuws"
+msgstr "Plaatsnaam in het Hebreeuws"
 
 #: resources/views/modules/place-hierarchy/list.phtml:14
 msgid "Place list"
@@ -11188,12 +11172,12 @@ msgstr "Doopplaats"
 #: app/Factories/ElementFactory.php:470
 #: resources/xml/reports/missing_facts_report.xml:223
 msgid "Place of bar mitzvah"
-msgstr "Plaats van de bar mitswa"
+msgstr "Plaats van bar mitswa"
 
 #: app/Factories/ElementFactory.php:473
 #: resources/xml/reports/missing_facts_report.xml:264
 msgid "Place of bat mitzvah"
-msgstr "Plaats van de bat mitswa"
+msgstr "Plaats van bat mitswa"
 
 #: app/Factories/ElementFactory.php:477
 #: resources/xml/reports/fact_sources.xml:273
@@ -11822,7 +11806,7 @@ msgstr "Record-ID-nummer"
 
 #: app/Factories/ElementFactory.php:594 app/Factories/ElementFactory.php:727
 msgid "Record file number"
-msgstr "Record bestandsnummer"
+msgstr "Recordbestandsnummer"
 
 #: resources/views/modules/fix-search-and-replace/options.phtml:65
 #: resources/views/search-general-page.phtml:61
@@ -11907,25 +11891,25 @@ msgstr "Verwante personen"
 #: app/Module/CustomTagsPhpGedView.php:55 app/Module/CustomTagsWebtrees.php:56
 #: app/Module/CustomTagsWebtrees.php:70
 msgid "Relationship"
-msgstr "Relatie"
+msgstr "Verwantschap"
 
 #: app/Module/CustomTagsFamilyTreeMaker.php:55
 #: app/Module/CustomTagsLegacy.php:58
 msgid "Relationship to father"
-msgstr "Relatie met vader"
+msgstr "Verwantschap met vader"
 
 #: app/Module/RelationshipsChartModule.php:147
 msgid "Relationship to me"
-msgstr "Relatie met mij"
+msgstr "Verwantschap met mij"
 
 #: app/Module/CustomTagsFamilyTreeMaker.php:56
 #: app/Module/CustomTagsLegacy.php:59
 msgid "Relationship to mother"
-msgstr "Relatie met moeder"
+msgstr "Verwantschap met moeder"
 
 #: app/Factories/ElementFactory.php:532
 msgid "Relationship to parents"
-msgstr "Verwantschap met de ouders"
+msgstr "Verwantschap met ouders"
 
 #: app/Module/RelationshipsChartModule.php:336
 #, php-format
@@ -11945,7 +11929,7 @@ msgstr "Verwantschap"
 #: app/Module/RelationshipsChartModule.php:257
 #, php-format
 msgid "Relationships between %1$s and %2$s"
-msgstr "Relaties tussen %1$s en %2$s"
+msgstr "Verwantschappen tussen %1$s en %2$s"
 
 #: app/Module/CustomTagsGenPluswin.php:72
 #: app/Module/CustomTagsGenPluswin.php:104
@@ -12009,7 +11993,7 @@ msgstr "Verwijder persoon"
 #. I18N: A media path (e.g. c:\aaa\bbb\ccc\ddd.jpeg) in a GEDCOM file
 #: resources/views/admin/trees-import.phtml:106
 msgid "Remove the GEDCOM media path from filenames"
-msgstr "Verwijder het GEDCOM media pad uit de bestandsnamen"
+msgstr "Verwijder het GEDCOM-mediapad uit de bestandsnamen"
 
 #: resources/views/admin/locations.phtml:128
 msgid "Remove this location?"
@@ -12255,7 +12239,7 @@ msgstr "SQLite is alleen geschikt voor kleine websites, testen en evaluatie."
 #: app/Services/ServerCheckService.php:215
 #, php-format
 msgid "SQLite version %s is installed. SQLite version %s or later is required."
-msgstr "SQLite versie %s is geïnstalleerd. SQLite version %s of hoger is vereist."
+msgstr "SQLite-versie %s is geïnstalleerd. SQLite-versie %s of hoger is vereist."
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:173
@@ -12495,7 +12479,7 @@ msgstr "Zoek tekst/patroon"
 
 #: resources/views/modules/relationships-chart/config.phtml:24
 msgid "Searching for all possible relationships can take a lot of time in complex trees."
-msgstr "In complexe stambomen kan het zoeken naar alle mogelijke relaties veel tijd kosten."
+msgstr "In complexe stambomen kan het zoeken naar alle mogelijke verwantschappen veel tijd kosten."
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:179
@@ -12530,7 +12514,7 @@ msgstr "Selecteer"
 
 #: resources/views/admin/trees-import.phtml:37
 msgid "Select a GEDCOM file to import"
-msgstr "Selecteer een GEDCOM bestand om te importeren"
+msgstr "Selecteer een GEDCOM-bestand om te importeren"
 
 #: resources/views/edit/input-addon-calendar.phtml:13
 #: resources/views/edit/input-addon-calendar.phtml:16
@@ -12961,7 +12945,7 @@ msgstr "Toon"
 #. I18N: A configuration setting
 #: resources/views/admin/trees-preferences.phtml:287
 msgid "Show a download link in the media viewer"
-msgstr "Toon download-knop in media viewer"
+msgstr "Toon een downloadlink in de mediaviewer"
 
 #. I18N: Description of the “Cookie warning” module
 #: app/Module/PrivacyPolicy.php:78
@@ -13141,7 +13125,7 @@ msgstr "Toon hiërarchie van plaatsen"
 #. I18N: A configuration setting
 #: resources/views/admin/trees-privacy.phtml:156
 msgid "Show private relationships"
-msgstr "Toon privérelaties"
+msgstr "Toon privéverwantschappen"
 
 #: resources/views/modules/todo/config.phtml:21
 msgid "Show research tasks that are assigned to other users"
@@ -13251,7 +13235,7 @@ msgstr "Toon miniatuurafbeeldingen in diagrammen en overzichten."
 #: app/Http/RequestHandlers/TreePrivacyPage.php:93
 #: resources/views/modals/restriction-fields.phtml:21
 msgid "Show to managers"
-msgstr "Toon aan de managers"
+msgstr "Toon aan managers"
 
 #: app/Auth.php:532 app/Auth.php:545 app/Elements/RestrictionNotice.php:76
 #: app/Functions/FunctionsPrintFacts.php:614
@@ -13368,7 +13352,7 @@ msgstr "Website verificatie code"
 #: resources/views/modules/bing-webmaster-tools/form.phtml:18
 #: resources/views/modules/google-webmaster-tools/form.phtml:18
 msgid "Site verification codes do not work when webtrees is installed in a subfolder."
-msgstr "Website verificatie codes werken niet wanneer webtrees is geïnstalleerd in een subfolder."
+msgstr "Website-verificatiecodes werken niet als webtrees is geïnstalleerd in een submap."
 
 #. I18N: Name of a module - see https://en.wikipedia.org/wiki/Sitemaps
 #: app/Module/SiteMapModule.php:163
@@ -13408,7 +13392,7 @@ msgstr "Sivan"
 #: resources/views/layouts/administration.phtml:47
 #: resources/views/layouts/default.phtml:76
 msgid "Skip to content"
-msgstr "Spring naar de inhoud"
+msgstr "Spring naar inhoud"
 
 #: app/Elements/RelationIsDescriptor.php:125
 msgid "Slave"
@@ -13466,7 +13450,7 @@ msgstr "Somalië"
 #. I18N: Help text for the “GEDCOM media path” configuration setting. A “path” is something like “C:\Documents\Genealogy\Photos\John_Smith.jpeg”
 #: resources/views/admin/trees-import.phtml:118
 msgid "Some genealogy software creates GEDCOM files that contain media filenames with full paths. These paths will not exist on the web-server. To allow webtrees to find the file, the first part of the path must be removed."
-msgstr "Sommige genealogieprogramma's maken GEDCOM-bestanden die mediabestandsnamen bevatten met volledige padnamen. Deze paden bestaan niet op de web-server. Om het webtrees mogelijk te maken deze bestanden te vinden, moet het eerste deel van het pad worden verwijderd."
+msgstr "Sommige genealogieprogramma's maken GEDCOM-bestanden die mediabestandsnamen bevatten met volledige padnamen. Deze paden bestaan niet op de webserver. Om het webtrees mogelijk te maken deze bestanden te vinden, moet het eerste deel van het pad worden verwijderd."
 
 #. I18N: Description of a “Data fix” module
 #: app/Module/FixNameTags.php:94
@@ -13713,7 +13697,7 @@ msgstr "Diavoorstelling beginnen als pagina geladen is"
 
 #: resources/views/modules/lifespans-chart/page.phtml:54
 msgid "Start year"
-msgstr "Begin Jaar"
+msgstr "Beginjaar"
 
 #: resources/xml/reports/change_report.xml:5
 msgid "Starting range of change dates"
@@ -13824,7 +13808,7 @@ msgstr "Ingediend, maar nog niet vrijgegeven"
 #: resources/views/modals/submission-fields.phtml:14
 #: resources/views/modules/recent_changes/changes-table.phtml:74
 msgid "Submitter"
-msgstr "Inzender"
+msgstr "Indiener"
 
 #: resources/views/lists/submitters-table.phtml:67
 msgid "Submitter name"
@@ -13967,7 +13951,7 @@ msgstr "Sydney, Australië"
 
 #: resources/views/admin/synchronize-trees.phtml:12
 msgid "Synchronize family trees with GEDCOM files"
-msgstr "Synchroniseer stambomen met GEDCOM bestanden"
+msgstr "Synchroniseer stambomen met GEDCOM-bestanden"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:474
@@ -14141,7 +14125,7 @@ msgstr "Het <b>achternaam</b> veld bevat een naam die gebruikt wordt voor het so
 #: app/Http/RequestHandlers/SynchronizeTrees.php:94
 #, php-format
 msgid "The GEDCOM file “%s” has been imported."
-msgstr "Het GEDCOM bestand “%s” is geïmporteerd."
+msgstr "Het GEDCOM-bestand “%s” is geïmporteerd."
 
 #: resources/views/admin/tags.phtml:24
 msgid "The GEDCOM standard provides a large number of data-entry fields, called tags."
@@ -14160,7 +14144,7 @@ msgstr "De PHP-extensie \"%s\" is niet geïnstalleerd."
 #: app/Services/ServerCheckService.php:182
 #, php-format
 msgid "The PHP function “%1$s” is disabled."
-msgstr "De PHP functie “%1$s” is uitgeschakeld."
+msgstr "De PHP-functie “%1$s” is uitgeschakeld."
 
 #. I18N: PHP internal error message - php.net/manual/en/features.file-upload.errors.php
 #: app/Functions/Functions.php:56
@@ -14170,12 +14154,12 @@ msgstr "De PHP tijdelijke map ontbreekt."
 #: app/Services/ServerCheckService.php:143
 #, php-format
 msgid "The PHP.INI setting “%1$s” is disabled."
-msgstr "DePHP.INI instelling “%1$s” is uitgeschakeld."
+msgstr "De PHP.INI-instelling “%1$s” is uitgeschakeld."
 
 #: app/Services/ServerCheckService.php:147
 #, php-format
 msgid "The PHP.INI setting “%1$s” is enabled."
-msgstr "De PHP.INI instelling “%1$s” is ingeschakeld."
+msgstr "De PHP.INI-instelling “%1$s” is ingeschakeld."
 
 #: resources/views/modules/share-url/share.phtml:30
 msgid "The URL was copied to the clipboard"
@@ -14201,23 +14185,23 @@ msgstr "Het kalender menu."
 #: app/Http/RequestHandlers/PendingChangesAcceptTree.php:65
 #, php-format
 msgid "The changes to “%s” have been accepted."
-msgstr "De veranderingen aan ‘%s’ zijn geaccepteerd."
+msgstr "De wijzigingen aan “%s” zijn geaccepteerd."
 
 #. I18N: %s is the name of a genealogy record
 #: app/Http/RequestHandlers/PendingChangesRejectRecord.php:67
 #: app/Http/RequestHandlers/PendingChangesRejectTree.php:61
 #, php-format
 msgid "The changes to “%s” have been rejected."
-msgstr "De wijzigingen aan ‘%s’ zijn niet geaccepteerd."
+msgstr "De wijzigingen aan “%s” zijn niet geaccepteerd."
 
 #. I18N: Description of the “Charts” module
 #: app/Module/ChartsMenuModule.php:70
 msgid "The charts menu."
-msgstr "Het diagrammen menu."
+msgstr "Het diagrammenmenu."
 
 #: resources/views/modules/clippings/show.phtml:19
 msgid "The clippings cart allows you to take extracts from this family tree and download them as a GEDCOM file."
-msgstr "U kunt uittreksels (knipsels) van deze stamboom bundelen en downloaden als GEDCOM bestand."
+msgstr "U kunt uittreksels (knipsels) van deze stamboom bundelen en downloaden als GEDCOM-bestand."
 
 #: resources/views/admin/trees-preferences.phtml:399
 msgid "The date and time of the last update"
@@ -14309,7 +14293,7 @@ msgstr "Het bestand is slechts gedeeltelijk overgestuurd. Probeer het opnieuw."
 #: resources/views/modules/media-list/page.phtml:142
 #, php-format
 msgid "The file “%s” does not exist."
-msgstr "Het bestand ‘%s’ bestaat niet."
+msgstr "Het bestand “%s” bestaat niet."
 
 #: resources/views/edit/reorder-families.phtml:77
 msgid "The first family in the list will be used in charts, lists, reports, etc."
@@ -14337,7 +14321,7 @@ msgstr "De map kan volledig worden gespecifieerd (b.v. /home/user_name/webtrees_
 #: app/Http/RequestHandlers/SitePreferencesAction.php:55
 #, php-format
 msgid "The folder “%s” does not exist."
-msgstr "De folder “%s” bestaat niet."
+msgstr "De map “%s” bestaat niet."
 
 #: resources/views/admin/merge-records-step-2.phtml:39
 msgid "The following facts and events were found in both records."
@@ -14402,11 +14386,11 @@ msgstr "Het mediabestand %1$s kon niet worden hernoemd in %2$s."
 #: app/Http/RequestHandlers/EditMediaFileAction.php:146
 #, php-format
 msgid "The media file %1$s has been renamed to %2$s."
-msgstr "Het mediabestand %1$s is met succes hernoemd in %2$s."
+msgstr "Het mediabestand %1$s is hernoemd naar %2$s."
 
 #: app/Http/RequestHandlers/CreateMediaObjectAction.php:106
 msgid "The media object has been created"
-msgstr "Het media object is aangemaakt"
+msgstr "Het mediaobject is aangemaakt"
 
 #: resources/views/setup/step-2-server-checks.phtml:62
 msgid "The memory and CPU time requirements depend on the number of individuals in your family tree."
@@ -14425,7 +14409,7 @@ msgstr "Bericht werd niet verstuurd."
 #: app/Http/RequestHandlers/MessageAction.php:96
 #, php-format
 msgid "The message was successfully sent to %s."
-msgstr "Bericht met succes verstuurd naar %s."
+msgstr "Bericht verstuurd naar %s."
 
 #: app/Http/RequestHandlers/AbstractModuleComponentAction.php:76
 #: app/Http/RequestHandlers/ModulesAllAction.php:71
@@ -14692,7 +14676,7 @@ msgstr "Er zijn geen feiten voor deze persoon."
 
 #: app/Http/RequestHandlers/ManageMediaData.php:310
 msgid "There are no links to this media object."
-msgstr "Er bestaan geen koppelingen naar dit media object."
+msgstr "Er bestaan geen koppelingen naar dit mediaobject."
 
 #: resources/views/modules/media/tab.phtml:29
 msgid "There are no media objects for this individual."
@@ -14830,7 +14814,7 @@ msgstr "Deze familie is gewijzigd. De wijzigingen moeten worden nagezien door ee
 #: resources/views/family-page-pending.phtml:23
 #, php-format
 msgid "This family has been edited. You should review the changes and then %1$s or %2$s them."
-msgstr "Deze familie is gewijzigd. Beoordeel de veranderingen en %1$s of %2$s ze dan."
+msgstr "Dit gezin is gewijzigd. Beoordeel de wijzigingen en %1$s of %2$s ze dan."
 
 #: resources/views/admin/trees-renumber.phtml:30
 #, php-format
@@ -14857,7 +14841,7 @@ msgstr "Deze stamboom werd het laatst gewijzigd op %s."
 #. I18N: Help text for the "Data folder" site configuration setting
 #: resources/views/admin/site-preferences.phtml:32
 msgid "This folder will be used by webtrees to store media files, GEDCOM files, temporary files, etc. These files may contain private data, and should not be made available over the internet."
-msgstr "Deze map wordt door webtrees gebruikt om mediabestanden, GEDCOM-bestanden, tijdelijke bestanden enz. in op te slaan. Deze bestanden kunnen privédata bevatten, en mogen niet beschikbaar worden gemaakt over het internet."
+msgstr "Deze map wordt door webtrees gebruikt om mediabestanden, GEDCOM-bestanden, tijdelijke bestanden enz. in op te slaan. Deze bestanden kunnen privégegevens bevatten, en mogen niet beschikbaar worden gemaakt over het internet."
 
 #. I18N: Help text for the “Media folder” configuration setting
 #: resources/views/admin/trees-preferences.phtml:260
@@ -14990,7 +14974,7 @@ msgstr "Deze lijst is gemaakt met een eenvoudige (maar snelle) zoekopdracht en b
 #: app/Exceptions/MediaAccessDeniedException.php:35
 #: app/Exceptions/MediaNotFoundException.php:35
 msgid "This media object does not exist or you do not have permission to view it."
-msgstr "Dit mediaobject bestaat niet of u heeft geen permissie om dit te zien."
+msgstr "Dit mediaobject bestaat niet of u heeft geen toestemming om het te bekijken."
 
 #: resources/views/media-page-pending.phtml:18
 msgid "This media object has been deleted. The deletion will need to be reviewed by a moderator."
@@ -15072,7 +15056,7 @@ msgstr "Hiermee wordt het tonen van de leeftijd van de ouders bij de geboorte va
 #. I18N: Help text for the “Estimated dates for birth and death” configuration setting
 #: resources/views/admin/trees-preferences.phtml:389
 msgid "This option controls whether or not to show estimated dates for birth and death instead of leaving blanks on individual lists and charts for individuals whose dates are not known."
-msgstr "Deze optie beheert het wel of niet tonen van geschatte data voor geboorte en overlijden, i.p.v. lege datavelden op persoonslijsten en diagrammen voor personen wiens data niet bekend zijn."
+msgstr "Deze optie beheert het wel of niet tonen van geschatte datums voor geboorte en overlijden, in plaats van lege datumvelden op persoonslijsten en diagrammen voor personen van wie de datums niet bekend zijn."
 
 #. I18N: Help text for the “Show a download link in the media viewer” configuration setting
 #: resources/views/admin/trees-preferences.phtml:292
@@ -15166,7 +15150,7 @@ msgstr "Deze rol heeft alle rechten van de rol van bezoeker, en daarnaast alle e
 #: resources/views/setup/step-2-server-checks.phtml:76
 #, php-format
 msgid "This server’s memory limit is %s MB and its CPU time limit is %s seconds."
-msgstr "De geheugenlimiet van deze server is %sMB en de tijdslimiet van de processor is %s seconden."
+msgstr "De geheugenlimiet van deze server is %s MB en de tijdslimiet van de processor is %s seconden."
 
 #. I18N: Help text for the “Other facts to show in charts” configuration setting
 #: resources/views/admin/trees-preferences.phtml:436
@@ -15234,7 +15218,7 @@ msgstr "Deze website maakt gebruik van diensten van derden om bezoekersgedrag te
 #: resources/views/admin/trees-import.phtml:27
 #, php-format
 msgid "This will delete all the genealogy data from “%s” and replace it with data from a GEDCOM file."
-msgstr "Hiermee worden alle genealogische gegevens van “%s” verwijderd en vervangen door de gegevens van een GEDCOM bestand."
+msgstr "Hiermee worden alle genealogische gegevens van “%s” verwijderd en vervangen door de gegevens van een GEDCOM-bestand."
 
 #. I18N: abbreviation for Thursday
 #: app/Date/AbstractCalendarDate.php:286
@@ -15459,32 +15443,32 @@ msgstr "Tonga"
 #, php-format
 msgid "Top %s given name"
 msgid_plural "Top %s given names"
-msgstr[0] "Top %s voornamen"
-msgstr[1] "Populairste %s voornamen"
+msgstr[0] "Meest voorkomende voornaam"
+msgstr[1] "Top-%s meest voorkomende voornamen"
 
 #. I18N: Title for a list of the most common surnames, %s is a number. Note that a separate translation exists when %s is 1
 #: app/Module/TopSurnamesModule.php:165
 #, php-format
 msgid "Top %s surname"
 msgid_plural "Top %s surnames"
-msgstr[0] "Top %s achternamen"
-msgstr[1] "Top %s achternamen"
+msgstr[0] "Meest voorkomende achternaam"
+msgstr[1] "Top-%s meest voorkomende achternamen"
 
 #. I18N: i.e. most popular given name.
 #: app/Module/TopGivenNamesModule.php:101
 msgid "Top given name"
-msgstr "Populairste voornaam"
+msgstr "Meest voorkomende voornaam"
 
 #. I18N: Name of a module. Top=Most common
 #: app/Module/TopGivenNamesModule.php:47
 #: resources/views/statistics/individuals/names.phtml:55
 msgid "Top given names"
-msgstr "Populairste voornamen"
+msgstr "Meest voorkomende voornamen"
 
 #. I18N: i.e. most popular surname.
 #: app/Module/TopSurnamesModule.php:162
 msgid "Top surname"
-msgstr "Top achternaam"
+msgstr "Meest voorkomende achternaam"
 
 #. I18N: Name of a module. Top=Most common
 #: app/Module/TopSurnamesModule.php:65
@@ -15912,12 +15896,12 @@ msgstr "De plaatsnamen gedeeltes van een hoger niveau worden bijgewerkt, de dele
 #: resources/views/admin/control-panel.phtml:192
 #, php-format
 msgid "Upgrade to webtrees %s."
-msgstr "Upgraden naar webtrees %s."
+msgstr "Bijwerken naar webtrees %s."
 
 #: app/Http/RequestHandlers/UpgradeWizardPage.php:79
 #: app/Http/RequestHandlers/UpgradeWizardPage.php:119
 msgid "Upgrade wizard"
-msgstr "Upgrade wizard"
+msgstr "Upgrade-wizard"
 
 #: app/Http/RequestHandlers/UploadMediaPage.php:69
 #: resources/views/admin/control-panel.phtml:813
@@ -16004,7 +15988,7 @@ msgstr "Gebruik silhouetten"
 
 #: app/Http/RequestHandlers/CopyFact.php:79
 msgid "Use the “edit“ menu to paste this into another record."
-msgstr ""
+msgstr "Gebruik het \"wijzig\"-menu om dit in een ander record te plakken."
 
 #: resources/views/register-page.phtml:90
 msgid "Use this field to tell the site administrator why you are requesting an account and how you are related to the genealogy displayed on this site. You can also use this to enter any other comments you may have for the site administrator."
@@ -16295,7 +16279,7 @@ msgstr "Een watermerk is optioneel en wordt normaalgesproken alleen getoond aan 
 #: resources/views/register-success-page.phtml:23
 #, php-format
 msgid "We will now send a confirmation email to the address <b>%s</b>. You must verify your account request by following instructions in the confirmation email. If you do not confirm your account request within seven days, your application will be rejected automatically. You will have to apply again.<br><br>After you have followed the instructions in the confirmation email, the administrator still has to approve your request before your account can be used.<br><br>To sign in to this website, you will need to know your username and password."
-msgstr "We zullen nu een e-mailbevestiging sturen naar het adres <b>%s</b>. Volg de instructies in de e-mail op om uw account aanvraag te verifiëren. Doet u dit niet binnen zeven dagen, dan wordt uw aanvraag automatisch verwijderd. U moet dan opnieuw een aanvraag indienen.<br><br>Nadat u de instructies in de e-mailbevestiging hebt opgevolgd zal de beheerder uw aanvraag nog moeten goedkeuren voordat u gebruik kunt maken van uw account.<br><br>Om u aan te melden op deze site heeft u uw gebruikersnaam en wachtwoord nodig."
+msgstr "We zullen nu een e-mailbevestiging sturen naar het adres <b>%s</b>. Volg de instructies in de e-mail op om uw accountaanvraag te verifiëren. Doet u dit niet binnen zeven dagen, dan wordt uw aanvraag automatisch verwijderd. U moet dan opnieuw een aanvraag indienen.<br><br>Nadat u de instructies in de bevestigingsmail hebt opgevolgd zal de beheerder uw aanvraag nog moeten goedkeuren voordat u gebruik kunt maken van uw account.<br><br>Om u aan te melden op deze site heeft u uw gebruikersnaam en wachtwoord nodig."
 
 #: resources/views/admin/control-panel.phtml:163
 #: resources/views/admin/control-panel.phtml:584
@@ -16372,11 +16356,11 @@ msgstr "Bij het toevoegen van een nieuw familielid kan een vooraf ingestelde ach
 
 #: resources/views/help/pending-changes.phtml:12
 msgid "When you add, edit, or delete information, the changes are not saved immediately. Instead, they are kept in a “pending” area. These pending changes need to be reviewed by a moderator before they are accepted."
-msgstr "Wanneer u informatie toevoegt, bewerkt of verwijderd, worden de wijzigingen niet onmiddellijk opgeslagen. In plaats daarvan worden ze bewaard in een \"uitstaand\" gebied. Deze uitstaande veranderingen moeten eerst door een moderator nagekeken worden voordat ze worden geaccepteerd."
+msgstr "Wanneer u informatie toevoegt, bewerkt of verwijderd, worden de wijzigingen niet onmiddellijk opgeslagen. In plaats daarvan worden ze bewaard in een wachtrij van uitstaande wijzigingen. Deze uitstaande wijzigingen moeten eerst door een moderator nagekeken worden voordat ze worden geaccepteerd."
 
 #: resources/views/help/relationship-privacy.phtml:8
 msgid "Where a user is associated to an individual record in a family tree and has a role of member, editor, or moderator, you can prevent them from accessing the details of distant, living relations. You specify the number of relationship steps that the user is allowed to see."
-msgstr "Als een gebruiker is gekoppeld aan een persoonsrecord in de stamboom en de rol heeft van lid, bewerker of moderator, kunt u voorkomen dat deze gebruiker toegang heeft tot de details van verre levende familieleden. U kunt het aantal relatiestappen opgeven welke de gebruiker mag zien."
+msgstr "Als een gebruiker is gekoppeld aan een persoonsrecord in de stamboom en de rol heeft van lid, bewerker of moderator, kunt u voorkomen dat deze gebruiker toegang heeft tot de details van verre levende familieleden. U kunt het aantal verwantschapsstappen opgeven dat de gebruiker mag zien."
 
 #. I18N: Label for a configuration option
 #: resources/views/modules/sitemap/config.phtml:27
@@ -16395,7 +16379,7 @@ msgstr "Wie is online"
 
 #: resources/views/admin/data-fix-page.phtml:82
 msgid "Why does this list include records that do not need to be updated?"
-msgstr "Waarom bevat deze lijst records die niet die niet bijgewerkt dienen te worden?"
+msgstr "Waarom bevat deze lijst records die niet bijgewerkt dienen te worden?"
 
 #: resources/views/lists/families-table.phtml:169
 msgid "Widow"
@@ -16506,7 +16490,7 @@ msgstr "Het is niet toegestaan berichten te versturen die externe links bevatten
 #: resources/views/modules/login_block/sign-out.phtml:15
 #, php-format
 msgid "You are signed in as %s."
-msgstr "U bent ingelogd als %s."
+msgstr "U bent aangemeld als %s."
 
 #: app/Http/RequestHandlers/LoginPage.php:98
 msgid "You can apply for an account using the link below."
@@ -16520,14 +16504,14 @@ msgstr "U kunt het uiterlijk van webtrees met thema's wijzigen. Elk thema heeft 
 #: resources/views/admin/users-edit.phtml:176
 #: resources/views/edit-account-page.phtml:154
 msgid "You can choose whether to appear in the list of users who are currently signed-in."
-msgstr "Hier kunt u aangeven of u zichtbaar wilt zijn in de lijst met ingelogde gebruikers."
+msgstr "Hier kunt u aangeven of u zichtbaar wilt zijn in de lijst met aangemelde gebruikers."
 
 #. I18N: %s is a URL
 #: resources/views/edit/raw-gedcom-fact.phtml:26
 #: resources/views/edit/raw-gedcom-record.phtml:28
 #, php-format
 msgid "You can download a copy of the GEDCOM specification from %s."
-msgstr "U kunt een kopie van de Gedcom specificatie downloaden van %s."
+msgstr "U kunt een kopie van de GEDCOM-specificatie downloaden van %s."
 
 #: resources/views/modules/privacy-policy/page.phtml:61
 msgid "You can opt out of tracking by setting the “Do Not Track” header in your browser preferences."
@@ -16557,7 +16541,7 @@ msgstr "U kunt de privacyberekening versnellen door een overlijdensrecord toe te
 
 #: app/Http/RequestHandlers/LoginAction.php:113
 msgid "You cannot sign in because your browser does not accept cookies."
-msgstr "U kunt niet inloggen omdat uw browser geen cookies accepteert."
+msgstr "U kunt niet aanmelden omdat uw browser geen cookies accepteert."
 
 #: app/Exceptions/HttpAccessDeniedException.php:34
 #: app/Exceptions/HttpNotFoundException.php:34
@@ -16570,7 +16554,7 @@ msgstr "U heeft uw aanvraag, om een geregistreerde gebruiker te worden, bevestig
 
 #: resources/views/admin/trees-import.phtml:30
 msgid "You have selected a GEDCOM file with a different name. Is this correct?"
-msgstr "U heeft een GEDCOM bestand gekozen met een andere naam. Is dat correct?"
+msgstr "U heeft een GEDCOM-bestand gekozen met een andere naam. Is dat correct?"
 
 #: app/Http/RequestHandlers/Logout.php:51
 msgid "You have signed out."
@@ -16594,7 +16578,7 @@ msgstr "U moet een persoon en een diagramtype selecteren in de blok configuratie
 
 #: resources/views/admin/users-edit.phtml:363
 msgid "You must specify an individual record before you can restrict the user to their immediate family."
-msgstr "U moet een persoonsrecord aangeven voordat u de gebruiker kan beperken tot zijn naaste familie."
+msgstr "U moet een persoonsrecord opgeven voordat u de gebruiker kunt beperken tot zijn naaste familie."
 
 #: app/Http/RequestHandlers/LoginPage.php:90
 msgid "You need to be a family member to access this website."
@@ -16688,7 +16672,7 @@ msgstr "In uw gebruikersaccount is de optie “wijzigingen automatisch acceptere
 #: app/Services/ServerCheckService.php:197
 #, php-format
 msgid "Your web server is using PHP version %s, which is no longer receiving security updates. You should upgrade to a later version as soon as possible."
-msgstr "Uw web server gebruikt PHP versie %s dat niet langer beveiligingsupdates ontvangt. U moet zo snel mogelijk upgraden naar een nieuwere versie."
+msgstr "Uw webserver gebruikt PHP-versie %s, die niet langer beveiligingsupdates ontvangt. U moet zo snel mogelijk upgraden naar een nieuwere versie."
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:542
@@ -20503,7 +20487,7 @@ msgstr "de instellingen voor de database verbinding in het bestand “/data/conf
 #. I18N: [you should check that:] ...
 #: resources/views/errors/database-connection.phtml:27
 msgid "the folder “/data” and the file “/data/config.ini.php” have access permissions that allow the webserver to read them"
-msgstr "de map ‘/data’ en het bestand ‘/data/config.ini.php’ toegangsrechten hebben die de webserver toestaat ze te lezen"
+msgstr "de map “/data” en het bestand “/data/config.ini.php” toegangsrechten hebben die de webserver toestaat ze te lezen"
 
 #. I18N: reflexive pronoun - gender neutral version of himself/herself
 #: app/Services/RelationshipService.php:247
@@ -20726,7 +20710,7 @@ msgstr "webtrees stuurt e-mails zonder ze te bewaren"
 
 #: resources/views/help/iso-8859-1.phtml:8
 msgid "webtrees uses UTF-8 encoding for accented letters, special characters and non-Latin scripts. If you want to use this GEDCOM file with genealogy software that does not support UTF-8, then you can create it using ISO-8859-1 encoding."
-msgstr "webtrees gebruikt UTF-8 codering voor geaccentueerde letters, speciale karakters en niet-latijns schrift. Als u dit GEDCOM bestand wilt gebruiken met genealogie software dat geen UTF-8 ondersteunt, kunt u het aanmaken met ISO-8859-1 codering."
+msgstr "webtrees gebruikt UTF-8 codering voor geaccentueerde letters, speciale karakters en niet-latijns schrift. Als u dit GEDCOM-bestand wilt gebruiken met genealogiesoftware dat geen UTF-8 ondersteunt, kunt u het aanmaken met ISO-8859-1-codering."
 
 #: app/Services/RelationshipService.php:388
 msgid "wife"
@@ -20811,7 +20795,7 @@ msgstr[1] "±%s jaar"
 #: app/Http/RequestHandlers/CopyFact.php:77
 #, php-format
 msgid "“%s“ has been copied to the clipboard."
-msgstr ""
+msgstr "\"%s\" is naar het klembord gekopieerd."
 
 #. I18N: %s is the name of a genealogy record
 #: app/Http/RequestHandlers/PendingChangesAcceptRecord.php:65

@@ -34,10 +34,7 @@ class WelcomeBlockModule extends AbstractModule implements ModuleBlockInterface
 {
     use ModuleBlockTrait;
 
-    /**
-     * @var ModuleService
-     */
-    private $module_service;
+    private ModuleService $module_service;
 
     /**
      * WelcomeBlockModule constructor.
@@ -74,10 +71,10 @@ class WelcomeBlockModule extends AbstractModule implements ModuleBlockInterface
     /**
      * Generate the HTML content of this block.
      *
-     * @param Tree     $tree
-     * @param int      $block_id
-     * @param string   $context
-     * @param string[] $config
+     * @param Tree          $tree
+     * @param int           $block_id
+     * @param string        $context
+     * @param array<string> $config
      *
      * @return string
      */

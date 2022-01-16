@@ -46,7 +46,7 @@ class AncestorsChartModule extends AbstractModule implements ModuleChartInterfac
 {
     use ModuleChartTrait;
 
-    protected const ROUTE_URL  = '/tree/{tree}/ancestors-{style}-{generations}/{xref}';
+    protected const ROUTE_URL = '/tree/{tree}/ancestors-{style}-{generations}/{xref}';
 
     // Chart styles
     public const CHART_STYLE_TREE        = 'tree';
@@ -65,8 +65,7 @@ class AncestorsChartModule extends AbstractModule implements ModuleChartInterfac
     protected const MINIMUM_GENERATIONS = 2;
     protected const MAXIMUM_GENERATIONS = 10;
 
-    /** @var ChartService */
-    private $chart_service;
+    private ChartService $chart_service;
 
     /**
      * CompactTreeChartModule constructor.
@@ -157,8 +156,8 @@ class AncestorsChartModule extends AbstractModule implements ModuleChartInterfac
     /**
      * The URL for a page showing chart options.
      *
-     * @param Individual $individual
-     * @param mixed[]    $parameters
+     * @param Individual                                $individual
+     * @param array<bool|int|string|array<string>|null> $parameters
      *
      * @return string
      */

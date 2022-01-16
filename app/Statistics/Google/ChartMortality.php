@@ -23,23 +23,21 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Statistics\Service\ColorService;
 
 use function count;
+use function view;
 
 /**
  * A chart showing the mortality.
  */
 class ChartMortality
 {
-    /**
-     * @var ColorService
-     */
-    private $color_service;
+    private ColorService $color_service;
 
     /**
-     * Constructor.
+     * @param ColorService $color_service
      */
-    public function __construct()
+    public function __construct(ColorService $color_service)
     {
-        $this->color_service = new ColorService();
+        $this->color_service = $color_service;
     }
 
     /**
@@ -74,7 +72,7 @@ class ChartMortality
                 $tot_l
             ];
 
-            $data[] =  [
+            $data[] = [
                 I18N::translate('Dead'),
                 $tot_d
             ];

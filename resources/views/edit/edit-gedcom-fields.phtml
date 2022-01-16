@@ -1,5 +1,6 @@
 <?php
 
+use Fisharebest\Webtrees\Elements\EmptyElement;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Ramsey\Uuid\Uuid;
@@ -11,29 +12,79 @@ use Ramsey\Uuid\Uuid;
  * @var Tree          $tree
  */
 
+preg_match_all('/^(\d+) (\w+) ?(.*)/m', $gedcom, $matches);
+[, $levels, $tags, $values] = $matches;
+$levels   = array_map(static fn(string $x): int => (int) $x, $levels);
+$keys     = array_keys($levels);
+$elements = [];
+$ids      = [];
+$indent   = [];
+$collapse = [];
+
+foreach ($keys as $key) {
+    $hierarchy[$levels[$key]] = $tags[$key];
+    $full_tag                 = implode(':', array_slice($hierarchy, 0, 1 + $levels[$key]));
+    $elements[$key]           = Registry::elementFactory()->make($full_tag);
+    $ids[$key]                = Uuid::uuid4()->toString() . '-' . $full_tag;
+
+    // Does this element have any children?
+    $has_subtags = ($levels[$key + 1] ?? 0) > $levels[$key];
+
+    // Do these children have values?
+    $has_subtags_with_values = false;
+    for ($n = $key + 1; $n < count($keys) && $levels[$n] > $levels[$key]; ++$n) {
+        if ($values[$n] !== '') {
+            $has_subtags_with_values = true;
+            break;
+        }
+    }
+
+    $indent[$key] = $elements[$key]->collapseChildren() && $has_subtags;
+
+    $collapse[$key] = $indent[$key] && !$has_subtags_with_values;
+}
+
 ?>
+<?php foreach ($keys as $key) : ?>
+    <?php if ($indent[$key - 1] ?? false) : ?>
+        <?php if ($collapse[$key - 1] ?? false) : ?>
+            <div id="collapse-<?= $key ?>" class="collapse ms-4 ps-4 border-start border-4">
+        <?php else : ?>
+                <div class="ms-4 ps-4 border-start border-4">
+        <?php endif ?>
+    <?php endif ?>
 
-<?php foreach (explode("\n", $gedcom) as $line) : ?>
-    <?php
-    preg_match('/^(\d+) (\w+) ?(.*)/', $line, $match);
-    [, $level, $tag, $value] = $match;
-    $level             = (int) $level;
-    $hierarchy[$level] = $tag;
-    $full_tag          = implode(':', array_slice($hierarchy, 0, 1 + $level));
-    $element           = Registry::elementFactory()->make($full_tag);
-    $id                = Uuid::uuid4()->toString() . '-' . $full_tag;
-    ?>
+    <?php if ($elements[$key] instanceof EmptyElement && $values[$key] === '') : ?>
+        <input type="hidden" name="<?= e($prefix) ?>levels[]" value="<?= $levels[$key] ?>">
+        <input type="hidden" name="<?= e($prefix) ?>tags[]" value="<?= e($tags[$key]) ?>">
+        <input type="hidden" name="<?= e($prefix) ?>values[]" value="">
+    <?php else : ?>
+        <div class="row form-group mb-3">
+            <label class="col-sm-3 col-form-label" for="<?= e($ids[$key]) ?>">
+                <?= $elements[$key]->label() ?>
+                <?php if ($collapse[$key]) : ?>
+                    <button class="btn btn-link" data-bs-target="#collapse-<?= $key + 1 ?>" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapse-<?= $key + 1 ?>" type="button">
+                        <?= view('icons/expand') ?>
+                        <?= view('icons/collapse') ?>
+                    </button>
+                <?php endif ?>
+            </label>
 
-    <div class="row form-group mb-3">
-        <label class="col-sm-3 col-form-label" for="<?= e($id) ?>">
-            <?= str_repeat('&nbsp;', max(0, $level - 1)) ?>
-            <?= $element->label() ?>
-        </label>
-
-        <div class="col-sm-9">
-            <input type="hidden" name="<?= e($prefix) ?>levels[]" value="<?= $level ?>">
-            <input type="hidden" name="<?= e($prefix) ?>tags[]" value="<?= e($tag) ?>">
-            <?= $element->edit($id, $prefix . 'values[]', strtr($value, ["\r" => "\n"]), $tree) ?>
+            <div class="col-sm">
+                <input type="hidden" name="<?= e($prefix) ?>levels[]" value="<?= $levels[$key] ?>">
+                <input type="hidden" name="<?= e($prefix) ?>tags[]" value="<?= e($tags[$key]) ?>">
+                <?= $elements[$key]->edit($ids[$key], $prefix . 'values[]', strtr($values[$key], ["\r" => "\n"]), $tree) ?>
+            </div>
         </div>
-    </div>
+    <?php endif ?>
+
+    <?php for ($n = $key; $levels[$n] >= ($levels[$key + 1] ?? PHP_INT_MAX); $n--) : ?>
+        <?php if ( $indent[$n] ) : ?>
+            <?php $indent[$n] = false ?>
+            </div>
+        <?php endif ?>
+        <?php if ( $levels[$n] === ($levels[$key + 1] ?? PHP_INT_MAX)) : ?>
+            <?php break; ?>
+        <?php endif ?>
+    <?php endfor ?>
 <?php endforeach ?>

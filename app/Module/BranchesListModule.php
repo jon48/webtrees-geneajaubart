@@ -23,11 +23,11 @@ use Aura\Router\RouterContainer;
 use Fig\Http\Message\RequestMethodInterface;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Contracts\UserInterface;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\GedcomRecord;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Soundex;
 use Fisharebest\Webtrees\Tree;
@@ -63,10 +63,9 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
 {
     use ModuleListTrait;
 
-    protected const ROUTE_URL  = '/tree/{tree}/branches{/surname}';
+    protected const ROUTE_URL = '/tree/{tree}/branches{/surname}';
 
-    /** @var ModuleService */
-    protected $module_service;
+    private ModuleService $module_service;
 
     /**
      * BranchesListModule constructor.
@@ -126,8 +125,8 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
     }
 
     /**
-     * @param Tree    $tree
-     * @param mixed[] $parameters
+     * @param Tree                              $tree
+     * @param array<bool|int|string|array|null> $parameters
      *
      * @return string
      */
@@ -246,7 +245,7 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
      *
      * @param Individual $individual
      *
-     * @return Individual[]
+     * @return array<Individual>
      */
     private function allAncestors(Individual $individual): array
     {
@@ -280,7 +279,7 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
      * @param bool   $soundex_dm
      * @param bool   $soundex_std
      *
-     * @return Individual[]
+     * @return array<Individual>
      */
     private function loadIndividuals(Tree $tree, string $surname, bool $soundex_dm, bool $soundex_std): array
     {
@@ -330,12 +329,12 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
     /**
      * For each individual with no ancestors, list their descendants.
      *
-     * @param Tree         $tree
-     * @param Individual[] $individuals
-     * @param Individual[] $ancestors
-     * @param string       $surname
-     * @param bool         $soundex_dm
-     * @param bool         $soundex_std
+     * @param Tree              $tree
+     * @param array<Individual> $individuals
+     * @param array<Individual> $ancestors
+     * @param string            $surname
+     * @param bool              $soundex_dm
+     * @param bool              $soundex_std
      *
      * @return string
      */
@@ -360,14 +359,14 @@ class BranchesListModule extends AbstractModule implements ModuleListInterface, 
      * Generate a recursive list of descendants of an individual.
      * If parents are specified, we can also show the pedigree (adopted, etc.).
      *
-     * @param Tree         $tree
-     * @param Individual[] $individuals
-     * @param Individual[] $ancestors
-     * @param string       $surname
-     * @param bool         $soundex_dm
-     * @param bool         $soundex_std
-     * @param Individual   $individual
-     * @param Family|null  $parents
+     * @param Tree              $tree
+     * @param array<Individual> $individuals
+     * @param array<Individual> $ancestors
+     * @param string            $surname
+     * @param bool              $soundex_dm
+     * @param bool              $soundex_std
+     * @param Individual        $individual
+     * @param Family|null       $parents
      *
      * @return string
      */

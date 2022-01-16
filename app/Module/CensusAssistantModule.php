@@ -20,9 +20,9 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\Census\CensusInterface;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -164,18 +164,30 @@ class CensusAssistantModule extends AbstractModule
     }
 
     /**
-     * @param CensusInterface $census
-     * @param string          $ca_title
-     * @param string          $ca_place
-     * @param string          $ca_citation
-     * @param string[][]      $ca_individuals
-     * @param string          $ca_notes
+     * @param CensusInterface      $census
+     * @param string               $ca_title
+     * @param string               $ca_place
+     * @param string               $ca_citation
+     * @param array<array<string>> $ca_individuals
+     * @param string               $ca_notes
      *
      * @return string
      */
     private function createNoteText(CensusInterface $census, string $ca_title, string $ca_place, string $ca_citation, array $ca_individuals, string $ca_notes): string
     {
-        $text = $ca_title . "\n" . $ca_citation . "\n" . $ca_place . "\n\n|";
+        $text = $ca_title;
+
+        if ($ca_citation !== '') {
+            // Two trailing spaces create a line-break in markdown
+            $text .= "  \n" . $ca_citation;
+        }
+
+        if ($ca_place !== '') {
+            // Two trailing spaces create a line-break in markdown
+            $text .= "  \n" . $ca_place;
+        }
+
+        $text .= "\n\n|";
 
         foreach ($census->columns() as $column) {
             $text .= ' ' . $column->abbreviation() . ' |';
@@ -191,7 +203,11 @@ class CensusAssistantModule extends AbstractModule
             }
         }
 
-        return $text . "\n\n" . strtr($ca_notes, ["\r" => '']);
+        if ($ca_notes !== '') {
+            $text .= "\n\n" . strtr($ca_notes, ["\r" => '']);
+        }
+
+        return $text;
     }
 
     /**

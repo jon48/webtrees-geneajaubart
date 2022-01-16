@@ -22,10 +22,10 @@ namespace Fisharebest\Webtrees\Module;
 use Aura\Router\RouterContainer;
 use Fig\Http\Message\RequestMethodInterface;
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Menu;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\ChartService;
 use Fisharebest\Webtrees\Tree;
 use Psr\Http\Message\ResponseInterface;
@@ -46,7 +46,7 @@ class DescendancyChartModule extends AbstractModule implements ModuleChartInterf
 {
     use ModuleChartTrait;
 
-    protected const ROUTE_URL  = '/tree/{tree}/descendants-{style}-{generations}/{xref}';
+    protected const ROUTE_URL = '/tree/{tree}/descendants-{style}-{generations}/{xref}';
 
     // Chart styles
     public const CHART_STYLE_TREE        = 'tree';
@@ -65,8 +65,7 @@ class DescendancyChartModule extends AbstractModule implements ModuleChartInterf
     protected const MINIMUM_GENERATIONS = 2;
     protected const MAXIMUM_GENERATIONS = 10;
 
-    /** @var ChartService */
-    private $chart_service;
+    private ChartService $chart_service;
 
     /**
      * DescendancyChartModule constructor.
@@ -157,8 +156,8 @@ class DescendancyChartModule extends AbstractModule implements ModuleChartInterf
     /**
      * The URL for a page showing chart options.
      *
-     * @param Individual $individual
-     * @param mixed[]    $parameters
+     * @param Individual                        $individual
+     * @param array<bool|int|string|array|null> $parameters
      *
      * @return string
      */
