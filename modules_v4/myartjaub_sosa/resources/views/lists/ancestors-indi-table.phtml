@@ -65,13 +65,13 @@ $("#<?= e($table_id) ?> > .maj-table-ancestors-indi").dataTable({
         /* Birth date   */ { type: "num" },
         /* Birthplace   */ { type: "text" },
         //MYARTJAUB-START
-        <?= $maj_issourced_birth ? json_encode($maj_issourced_birth['column_def']) . ', ' : '' ?>
+        <?= $maj_issourced_birth ? json_encode($maj_issourced_birth['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
         /* Death date   */ { type: "num" },
         /* Age          */ { type: "num" },
         /* Death place  */ { type: "text" },
         //MYARTJAUB-START
-        <?= $maj_issourced_death ? json_encode($maj_issourced_death['column_def']) . ', ' : '' ?>
+        <?= $maj_issourced_death ? json_encode($maj_issourced_death['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
         /* Filter sex   */ { sortable: false },
         /* Filter birth */ { sortable: false },

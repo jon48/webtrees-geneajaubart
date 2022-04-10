@@ -56,7 +56,6 @@ foreach ($gen_depth_g3 as $sosa => $gen_depth_stat) {
     'chart_options'     =>  [
         'bar'       =>  [ 'groupWidth' => '80%' ],
         'height'    =>  $gen_depth_g3->count() * 45 + 50,
-        'colors'    =>  [ app(ColorService::class)->interpolateRgb($theme->parameter('distribution-chart-low-values'), $theme->parameter('distribution-chart-high-values'), 6)[1]],
         'hAxis'     =>  [
             'title'             =>  I18N::translate('Mean generation depth and standard deviation'),
             'minValue'          =>  0,
@@ -71,6 +70,8 @@ foreach ($gen_depth_g3 as $sosa => $gen_depth_stat) {
             'lineWidth'     =>  2
         ]
     ],
+    'chart_colors'      =>  [['--chart-values-default', '#84beff']],
+    'steps'             =>  6,
     'language'          =>  I18N::languageTag()
 ]) ?>
     

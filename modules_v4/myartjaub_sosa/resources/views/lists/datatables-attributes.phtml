@@ -22,7 +22,7 @@ $length_menu_labels = array_map(function ($length): string {
 data-auto-width="<?= $auto_width ? 'true' : 'false' ?>"
 data-dom="<&quot;d-flex justify-content-between&quot;pf><t><&quot;d-flex justify-content-between&quot;irl>"
 data-state-save="<?= $state_save ? 'true' : 'false' ?>"
-data-length-menu="<?= e(json_encode([$length_menu, $length_menu_labels])) ?>"
+data-length-menu="<?= e(json_encode([$length_menu, $length_menu_labels], JSON_THROW_ON_ERROR)) ?>"
 data-language="<?= e(json_encode([
     'paginate'       => [
         /* I18N: A button label, first page */
@@ -46,4 +46,4 @@ data-language="<?= e(json_encode([
     'processing'     => I18N::translate('Calculating…'),
     'search'         => I18N::translate('Filter'),
     'zeroRecords'    => I18N::translate('No records to display'),
-])) ?>"
+], JSON_THROW_ON_ERROR)) ?>"

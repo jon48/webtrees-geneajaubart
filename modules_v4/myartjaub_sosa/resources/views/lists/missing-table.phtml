@@ -58,14 +58,14 @@ $("#<?= e($table_id) ?> > .maj-table-missing").dataTable({
         /* 1-Given names */   { type: "text",  class: "left"},
         /* 2-Surnames    */   { type: "text" },
         //MYARTJAUB-START
-        <?= $maj_issourced_indi ? json_encode($maj_issourced_indi['column_def']) . ', ' : '' ?>
+        <?= $maj_issourced_indi ? json_encode($maj_issourced_indi['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
         /* 3-Father      */   { type: "text", class: "text-center"},
         /* 4-Mother      */   { type: "text", class: "text-center"},
         /* 5-Birth date  */   { type: "num", class: "text-center"},
         /* 6-Birth place */   { type: "text", class: "text-center"},
         //MYARTJAUB-START
-        <?= $maj_issourced_birth ? json_encode($maj_issourced_birth['column_def']) . ', ' : '' ?>
+        <?= $maj_issourced_birth ? json_encode($maj_issourced_birth['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
         /* 7-Filter sex  */   { sortable: false },
         /* 8-Filter missing */{ sortable: false },

@@ -84,9 +84,9 @@ $max_place_count = $result->maxCount();
     "use strict";
 
     $(function() {
-        let style = majGeodispersion.MapFeaturesStyle(<?= json_encode($colors) ?>);
+        let style = majGeodispersion.MapFeaturesStyle(<?= json_encode($colors, JSON_THROW_ON_ERROR) ?>);
 
-        let map = majGeodispersion.drawMap('<?= e($map_id) ?>', <?= json_encode($leaflet_config) ?>);
+        let map = majGeodispersion.drawMap('<?= e($map_id) ?>', <?= json_encode($leaflet_config, JSON_THROW_ON_ERROR) ?>);
         majGeodispersion.addGeoJsonDataToMap(map, <?=  $geojson_writer->write($features) ?>, style);
     });
 

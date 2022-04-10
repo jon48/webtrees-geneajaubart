@@ -19,7 +19,7 @@ use Illuminate\Support\Collection;
  * @var RelationshipService     $relationship_service
  */
 
-$add_branch = function (array $chart, ?stdClass $branch, string $color) use ($relationship_service, $root_indi): array {
+$add_branch = function (array $chart, ?stdClass $branch, $color) use ($relationship_service, $root_indi): array {
     if ($branch !== null) {
         $chart['colors'][] = $color;
         $chart['data'][] = [
@@ -42,9 +42,9 @@ $add_branch = function (array $chart, ?stdClass $branch, string $color) use ($re
 <div class="maj-sosa-dispersion-charts text-center">
 <?php
 $chart_g2 = ['colors'  => [], 'data' => [["Branche", 'Count']]];
-$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(1), $theme->parameter('chart-background-m'));
-$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(0), $theme->parameter('chart-background-u'));
-$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(2), $theme->parameter('chart-background-f'));
+$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(1), ['--sex-m-chart', '#edf7fd']);
+$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(0), ['--sex-u-chart', '#ebebeb']);
+$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(2), ['--sex-f-chart', '#e9daf1']);
 ?>
 
 <?= view($module_name . '::charts/pie', [
@@ -59,11 +59,11 @@ $chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(2), $theme->paramete
 
 <?php
 $chart_g3 = ['colors'  => [], 'data' => [["Branche", 'Count']]];
-$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(1), app(ColorService::class)->interpolateRgb($theme->parameter('chart-background-m'), '#00000', 10)[1]);
-$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(2), $theme->parameter('chart-background-m'));
-$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(0), $theme->parameter('chart-background-u'));
-$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(3), app(ColorService::class)->interpolateRgb($theme->parameter('chart-background-f'), '#00000', 10)[1]);
-$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(4), $theme->parameter('chart-background-f'));
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(1), ['--sex-m-chart-dark', '#8ea6c0']);
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(2), ['--sex-m-chart', '#edf7fd']);
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(0), ['--sex-u-chart', '#ebebeb']);
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(3), ['--sex-f-chart-dark', '#baaec1']);
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(4), ['--sex-f-chart', '#e9daf1']);
 ?>
 <?= view($module_name . '::charts/pie', [
     'colors'            => $chart_g3['colors'],

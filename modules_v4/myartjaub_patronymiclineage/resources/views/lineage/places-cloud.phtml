@@ -14,7 +14,7 @@ $minimum = min(PHP_INT_MAX, $places->min());
 
 ?>
 
-<div class="tag_cloud">
+<div class="wt-surnames-tag-cloud">
     <?php foreach ($places->sortKeys() as $place_name => $count) : ?>
         <?php
         $place = new Place($place_name, $tree);

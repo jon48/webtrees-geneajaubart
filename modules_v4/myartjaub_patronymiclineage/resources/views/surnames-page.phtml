@@ -1,7 +1,6 @@
 <?php
 
 use Fisharebest\Webtrees\Tree;
-use Fisharebest\Webtrees\Functions\FunctionsPrintLists;
 use Fisharebest\Webtrees\Module\AbstractModule;
 
 /**
@@ -30,10 +29,20 @@ use Fisharebest\Webtrees\Module\AbstractModule;
         <?php
         switch ($tree->getPreference('SURNAME_LIST_STYLE')) {
             case 'style1':
-                echo FunctionsPrintLists::surnameList($surnames, 3, true, $module, $tree);
+                echo view('lists/surnames-column-list', [
+                    'module'   => $module,
+                    'surnames' => $surnames,
+                    'totals'   => true,
+                    'tree'     => $tree,
+                ]);
                 break;
             case 'style3':
-                echo FunctionsPrintLists::surnameTagCloud($surnames, $module, true, $tree);
+                echo view('lists/surnames-tag-cloud', [
+                    'module'   => $module,
+                    'surnames' => $surnames,
+                    'totals'   => true,
+                    'tree'     => $tree,
+                ]);
                 break;
             case 'style2':
             default:

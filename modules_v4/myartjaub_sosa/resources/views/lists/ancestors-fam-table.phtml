@@ -59,7 +59,7 @@ $("#<?= e($table_id) ?> > .maj-table-ancestors-family").dataTable({
         /* Marriage date     */ { type: "num" },
         /* Marriage place    */ { type: "text" },
         //MYARTJAUB-START
-        <?= $maj_issourced_marr ? json_encode($maj_issourced_marr['column_def']) . ', ' : '' ?>
+        <?= $maj_issourced_marr ? json_encode($maj_issourced_marr['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
         /* Children          */ { type: "num" },
         /* Filter marriage   */ { sortable: false },

@@ -7,6 +7,7 @@ use Fisharebest\Webtrees\I18N;
 /**
  * @var array<array<mixed>>     $data
  * @var int                     $pieStartAngle
+ * @var int                     $steps
  * @var string                  $labeledValueText
  * @var array<string>           $colors
  * @var string                  $language
@@ -16,6 +17,8 @@ use Fisharebest\Webtrees\I18N;
 
 $id   = 'google-chart-' . bin2hex(random_bytes(8));
 $name = 'callback_' . bin2hex(random_bytes(12));
+
+$steps = $steps ?? null;
 ?>
 
 <?php if (count($data) === 1) : ?>
@@ -25,24 +28,31 @@ $name = 'callback_' . bin2hex(random_bytes(12));
     <script>
 
     let <?= $name ?> = function () {
+        let colors = majSosa.colors.fromCss(<?= json_encode($colors, JSON_THROW_ON_ERROR) ?>);
+        <?php if($steps !== null) : ?>
+        if(colors.length > 1) {
+            colors = majSosa.colors.interpolateRgb(colors[0], colors[1], <?= (int) $steps ?>);
+        }
+        <?php endif; ?>
+
         statistics.drawPieChart(
-            <?= json_encode($id) ?>,
-            <?= json_encode($data) ?>,
+            <?= json_encode($id, JSON_THROW_ON_ERROR) ?>,
+            <?= json_encode($data, JSON_THROW_ON_ERROR) ?>,
             {
                 <?php if ($height !== null) : ?>height: <?= is_int($height) ? (int) $height : '"' . $height . '"' ?>,<?php endif; ?>
                 chartArea : {
                     <?php if ($width !== null) : ?>width: <?= is_int($width) ? (int) $width : '"' . $width . '"' ?>,<?php endif; ?>
                     <?php if ($height !== null) : ?>height: <?= is_int($height) ? (int) $height * 0.9 : '"' . $height . '"' ?><?php endif; ?>
                 },
-                pieStartAngle: <?= json_encode($pieStartAngle ?? 0) ?>,
+                pieStartAngle: <?= json_encode($pieStartAngle ?? 0, JSON_THROW_ON_ERROR) ?>,
                 pieHole: 0,
                 // Note: "legend" needs to be defined completely as Object.assign does only a shallow merge
                 legend: {
                     alignment: 'center',
-                    labeledValueText: <?= json_encode($labeledValueText ?? 'value') ?>,
+                    labeledValueText: <?= json_encode($labeledValueText ?? 'value', JSON_THROW_ON_ERROR) ?>,
                     position: 'labeled'
                 },
-                colors: <?= json_encode($colors) ?>
+                colors: colors
             }
         );
     };
@@ -50,11 +60,11 @@ $name = 'callback_' . bin2hex(random_bytes(12));
     if (document.readyState === "complete"
         || (document.readyState !== "loading" && !document.documentElement.doScroll)
     ) {
-        statistics.init(<?= json_encode($language) ?>);
+        statistics.init(<?= json_encode($language, JSON_THROW_ON_ERROR) ?>);
         statistics.addCallback(<?= $name ?>);
     } else {
         document.addEventListener("DOMContentLoaded", function () {
-            statistics.init(<?= json_encode($language) ?>);
+            statistics.init(<?= json_encode($language, JSON_THROW_ON_ERROR) ?>);
             statistics.addCallback(<?= $name ?>);
         });
     }
