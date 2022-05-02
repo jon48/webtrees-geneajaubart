@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,32 +24,32 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\Module\CompactTreeChartModule;
 use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Services\ModuleService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-
-use function redirect;
 
 /**
  * Redirect URLs created by webtrees 1.x (and PhpGedView).
  */
 class RedirectCompactPhp implements RequestHandlerInterface
 {
-    private CompactTreeChartModule $chart;
+    private ModuleService $module_service;
 
     private TreeService $tree_service;
 
     /**
-     * @param CompactTreeChartModule $chart
-     * @param TreeService            $tree_service
+     * @param ModuleService $module_service
+     * @param TreeService   $tree_service
      */
-    public function __construct(CompactTreeChartModule $chart, TreeService $tree_service)
+    public function __construct(ModuleService $module_service, TreeService $tree_service)
     {
-        $this->chart        = $chart;
-        $this->tree_service = $tree_service;
+        $this->tree_service   = $tree_service;
+        $this->module_service = $module_service;
     }
 
     /**
@@ -59,18 +59,17 @@ class RedirectCompactPhp implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $query   = $request->getQueryParams();
-        $ged     = $query['ged'] ?? Site::getPreference('DEFAULT_GEDCOM');
-        $root_id = $query['rootid'] ?? '';
+        $ged     = Validator::queryParams($request)->string('ged', Site::getPreference('DEFAULT_GEDCOM'));
+        $root_id = Validator::queryParams($request)->string('rootid', '');
+        $tree    = $this->tree_service->all()->get($ged);
+        $module  = $this->module_service->findByInterface(CompactTreeChartModule::class)->first();
 
-        $tree = $this->tree_service->all()->get($ged);
-
-        if ($tree instanceof Tree) {
+        if ($tree instanceof Tree && $module instanceof CompactTreeChartModule) {
             $individual = Registry::individualFactory()->make($root_id, $tree) ?? $tree->significantIndividual(Auth::user());
 
-            $url = $this->chart->chartUrl($individual, []);
+            $url = $module->chartUrl($individual, []);
 
-            return redirect($url, StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
+            return Registry::responseFactory()->redirectUrl($url, StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
         }
 
         throw new HttpNotFoundException();

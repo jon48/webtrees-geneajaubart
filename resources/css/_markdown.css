@@ -1,6 +1,6 @@
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,12 +16,22 @@
 /* markdown formatting */
 
 .markdown {
-    /* Tables and pre-formatted text can break the layout. */
-    overflow-x: auto;
+    /* Pre-formatted text can break the layout. */
+    overflow-wrap: break-word;
+}
+
+.markdown p code {
+    /* Bootstrap makes code text red */
+    color: inherit;
 }
 
 .markdown p {
     margin: 0 0 0.5rem;
+}
+
+.markdown blockquote p {
+    border-left: solid thick lightgray;
+    padding-left: 0.5rem;
 }
 
 .markdown table {

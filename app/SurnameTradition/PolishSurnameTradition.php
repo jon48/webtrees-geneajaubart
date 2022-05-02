@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\SurnameTradition;
 
+use Fisharebest\Webtrees\Elements\NameType;
 use Fisharebest\Webtrees\Individual;
 
 /**
@@ -62,10 +63,10 @@ class PolishSurnameTradition extends PaternalSurnameTradition
 
             $surn = $this->inflect($match['SURN'], self::INFLECT_MALE);
 
-            return [$this->buildName($name, ['TYPE' => 'birth', 'SURN' => $surn])];
+            return [$this->buildName($name, ['TYPE' => NameType::VALUE_BIRTH, 'SURN' => $surn])];
         }
 
-        return [$this->buildName('//', ['TYPE' => 'birth'])];
+        return [$this->buildName('//', ['TYPE' => NameType::VALUE_BIRTH])];
     }
 
     /**
@@ -83,11 +84,11 @@ class PolishSurnameTradition extends PaternalSurnameTradition
             $surn = $this->inflect($match['SURN'], self::INFLECT_MALE);
 
             return [
-                $this->buildName($name, ['TYPE' => 'birth', 'SURN' => $surn]),
+                $this->buildName($name, ['TYPE' => NameType::VALUE_BIRTH, 'SURN' => $surn]),
             ];
         }
 
-        return [$this->buildName('//', ['TYPE' => 'birth'])];
+        return [$this->buildName('//', ['TYPE' => NameType::VALUE_BIRTH])];
     }
 
     /**
@@ -105,11 +106,11 @@ class PolishSurnameTradition extends PaternalSurnameTradition
             $surn = $this->inflect($match['SURN'], self::INFLECT_MALE);
 
             return [
-                $this->buildName('//', ['TYPE' => 'birth']),
-                $this->buildName($name, ['TYPE' => 'married', 'SURN' => $surn]),
+                $this->buildName('//', ['TYPE' => NameType::VALUE_BIRTH]),
+                $this->buildName($name, ['TYPE' => NameType::VALUE_MARRIED, 'SURN' => $surn]),
             ];
         }
 
-        return [$this->buildName('//', ['TYPE' => 'birth'])];
+        return [$this->buildName('//', ['TYPE' => NameType::VALUE_BIRTH])];
     }
 }

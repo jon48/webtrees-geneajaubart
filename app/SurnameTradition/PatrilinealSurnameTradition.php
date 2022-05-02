@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\SurnameTradition;
 
+use Fisharebest\Webtrees\Elements\NameType;
 use Fisharebest\Webtrees\Individual;
 
 /**
@@ -43,7 +44,7 @@ class PatrilinealSurnameTradition extends DefaultSurnameTradition
             $surn = $match['SURN'];
 
             return [
-                $this->buildName($name, ['TYPE' => 'birth', 'SPFX' => $spfx, 'SURN' => $surn]),
+                $this->buildName($name, ['TYPE' => NameType::VALUE_BIRTH, 'SPFX' => $spfx, 'SURN' => $surn]),
             ];
         }
 
@@ -66,7 +67,7 @@ class PatrilinealSurnameTradition extends DefaultSurnameTradition
             $surn = $match['SURN'];
 
             return [
-                $this->buildName($name, ['TYPE' => 'birth', 'SPFX' => $spfx, 'SURN' => $surn]),
+                $this->buildName($name, ['TYPE' => NameType::VALUE_BIRTH, 'SPFX' => $spfx, 'SURN' => $surn]),
             ];
         }
 

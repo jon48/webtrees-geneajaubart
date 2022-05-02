@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,18 +32,6 @@ class IcelandicSurnameTraditionTest extends TestCase
     private SurnameTraditionInterface $surname_tradition;
 
     /**
-     * Test whether married surnames are used
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\IcelandicSurnameTradition
-     *
-     * @return void
-     */
-    public function testMarriedSurnames(): void
-    {
-        self::assertFalse($this->surname_tradition->hasMarriedNames());
-    }
-
-    /**
      * Test whether surnames are used
      *
      * @covers \Fisharebest\Webtrees\SurnameTradition\IcelandicSurnameTradition
@@ -52,7 +40,7 @@ class IcelandicSurnameTraditionTest extends TestCase
      */
     public function testSurnames(): void
     {
-        self::assertFalse($this->surname_tradition->hasSurnames());
+        self::assertSame('', $this->surname_tradition->defaultName());
     }
 
     /**
@@ -77,7 +65,7 @@ class IcelandicSurnameTraditionTest extends TestCase
         $mother->method('facts')->willReturn(new Collection([$mother_fact]));
 
         self::assertSame(
-            ["1 NAME Jonsson\n2 TYPE birth\n2 GIVN Jonsson"],
+            ["1 NAME Jonsson\n2 TYPE BIRTH\n2 GIVN Jonsson"],
             $this->surname_tradition->newChildNames($father, $mother, 'M')
         );
     }
@@ -104,7 +92,7 @@ class IcelandicSurnameTraditionTest extends TestCase
         $mother->method('facts')->willReturn(new Collection([$mother_fact]));
 
         self::assertSame(
-            ["1 NAME Jonsdottir\n2 TYPE birth\n2 GIVN Jonsdottir"],
+            ["1 NAME Jonsdottir\n2 TYPE BIRTH\n2 GIVN Jonsdottir"],
             $this->surname_tradition->newChildNames($father, $mother, 'F')
         );
     }
@@ -131,7 +119,7 @@ class IcelandicSurnameTraditionTest extends TestCase
         $mother->method('facts')->willReturn(new Collection([$mother_fact]));
 
         self::assertSame(
-            ["1 NAME\n2 TYPE birth"],
+            ["1 NAME\n2 TYPE BIRTH"],
             $this->surname_tradition->newChildNames($father, $mother, 'U')
         );
     }
@@ -152,7 +140,7 @@ class IcelandicSurnameTraditionTest extends TestCase
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
-            ["1 NAME Einar\n2 TYPE birth\n2 GIVN Einar"],
+            ["1 NAME Einar\n2 TYPE BIRTH\n2 GIVN Einar"],
             $this->surname_tradition->newParentNames($individual, 'M')
         );
     }
@@ -173,7 +161,7 @@ class IcelandicSurnameTraditionTest extends TestCase
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
-            ["1 NAME Eva\n2 TYPE birth\n2 GIVN Eva"],
+            ["1 NAME Eva\n2 TYPE BIRTH\n2 GIVN Eva"],
             $this->surname_tradition->newParentNames($individual, 'F')
         );
     }
@@ -194,7 +182,7 @@ class IcelandicSurnameTraditionTest extends TestCase
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
-            ["1 NAME\n2 TYPE birth"],
+            ["1 NAME\n2 TYPE BIRTH"],
             $this->surname_tradition->newParentNames($individual, 'U')
         );
     }
@@ -215,17 +203,17 @@ class IcelandicSurnameTraditionTest extends TestCase
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
-            ["1 NAME\n2 TYPE birth"],
+            ["1 NAME\n2 TYPE BIRTH"],
             $this->surname_tradition->newSpouseNames($individual, 'M')
         );
 
         self::assertSame(
-            ["1 NAME\n2 TYPE birth"],
+            ["1 NAME\n2 TYPE BIRTH"],
             $this->surname_tradition->newSpouseNames($individual, 'F')
         );
 
         self::assertSame(
-            ["1 NAME\n2 TYPE birth"],
+            ["1 NAME\n2 TYPE BIRTH"],
             $this->surname_tradition->newSpouseNames($individual, 'U')
         );
     }

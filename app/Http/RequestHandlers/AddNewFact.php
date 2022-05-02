@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,14 +24,12 @@ use Fisharebest\Webtrees\Fact;
 use Fisharebest\Webtrees\Http\Exceptions\HttpAccessDeniedException;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\Registry;
-use Fisharebest\Webtrees\Services\AuthorizationService;
 use Fisharebest\Webtrees\Services\GedcomEditService;
-use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function assert;
 use function route;
 use function trim;
 
@@ -42,20 +40,16 @@ class AddNewFact implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
-    private AuthorizationService $authorization_service;
-
     private GedcomEditService $gedcom_edit_service;
 
     /**
      * AddNewFact constructor.
      *
-     * @param AuthorizationService $authorization_service
-     * @param GedcomEditService    $gedcom_edit_service
+     * @param GedcomEditService $gedcom_edit_service
      */
-    public function __construct(AuthorizationService $authorization_service, GedcomEditService $gedcom_edit_service)
+    public function __construct(GedcomEditService $gedcom_edit_service)
     {
-        $this->authorization_service = $authorization_service;
-        $this->gedcom_edit_service   = $gedcom_edit_service;
+        $this->gedcom_edit_service = $gedcom_edit_service;
     }
 
     /**
@@ -65,13 +59,11 @@ class AddNewFact implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = $request->getAttribute('tree');
-        assert($tree instanceof Tree);
+        $tree   = Validator::attributes($request)->tree();
+        $xref   = Validator::attributes($request)->isXref()->string('xref');
+        $subtag = Validator::attributes($request)->isTag()->string('fact');
 
-        $xref   = (string) $request->getAttribute('xref');
-        $subtag = (string) $request->getAttribute('fact');
-
-        if ($subtag === 'OBJE' && !$this->authorization_service->canUploadMedia($tree, Auth::user())) {
+        if ($subtag === 'OBJE' && !Auth::canUploadMedia($tree, Auth::user())) {
             throw new HttpAccessDeniedException();
         }
 

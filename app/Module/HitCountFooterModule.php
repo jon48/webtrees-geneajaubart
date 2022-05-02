@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
-use Aura\Router\Route;
 use Fisharebest\Webtrees\Http\RequestHandlers\FamilyPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\IndividualPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\MediaPage;
@@ -32,13 +31,12 @@ use Fisharebest\Webtrees\Http\RequestHandlers\UserPage;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Session;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Illuminate\Database\Capsule\Manager as DB;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-
-use function assert;
 
 /**
  * Class HitCountFooterModule - show the number of page hits in the footer.
@@ -124,11 +122,9 @@ class HitCountFooterModule extends AbstractModule implements ModuleFooterInterfa
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $route = $request->getAttribute('route');
-        assert($route instanceof Route);
-
-        $tree  = $request->getAttribute('tree');
-        $user  = $request->getAttribute('user');
+        $route = Validator::attributes($request)->route();
+        $tree  = Validator::attributes($request)->treeOptional();
+        $user  = Validator::attributes($request)->user();
 
         if ($tree instanceof Tree && $tree->getPreference('SHOW_COUNTER')) {
             $page_name = self::PAGE_NAMES[$route->name] ?? '';
@@ -141,7 +137,8 @@ class HitCountFooterModule extends AbstractModule implements ModuleFooterInterfa
                 case RepositoryPage::class:
                 case SourcePage::class:
                 case SubmitterPage::class:
-                    $this->page_hits = $this->countHit($tree, $page_name, $request->getAttribute('xref', ''));
+                    $xref = Validator::attributes($request)->isXref()->string('xref');
+                    $this->page_hits = $this->countHit($tree, $page_name, $xref);
                     break;
 
                 case TreePage::class:

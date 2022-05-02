@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,7 +28,6 @@ use Ramsey\Uuid\Uuid;
 use function array_map;
 use function explode;
 use function implode;
-use function strpos;
 use function strtoupper;
 use function trim;
 use function view;
@@ -105,7 +104,7 @@ class EventsRecorded extends AbstractElement
     {
         $value = strtoupper(strtr(parent::canonical($value), [' ' => ',']));
 
-        while (strpos($value, ',,') !== false) {
+        while (str_contains($value, ',,')) {
             $value = strtr($value, [',,' => ',']);
         }
 
@@ -138,11 +137,10 @@ class EventsRecorded extends AbstractElement
         // Our form element name contains "[]", and multiple selections would create multiple values.
         $hidden = '<input type="hidden" id="' . e($id) . '" name="' . e($name) . '" value="' . e($value) . '" />';
         // Combine them into a single value.
-        // The change event doesn't seem to fire for select2 controls, so use form.submit instead.
-        $js = 'document.getElementById("' . $id2 . '").form.addEventListener("submit", function () { document.getElementById("' . $id . '").value = Array.from(document.getElementById("' . $id2 . '").selectedOptions).map(x => x.value).join(","); });';
+        $js = 'document.getElementById("' . $id2 . '").addEventListener("change", function () { document.getElementById("' . $id . '").value = Array.from(document.getElementById("' . $id2 . '").selectedOptions).map(x => x.value).join(","); });';
 
         return view('components/select', [
-            'class'    => 'select2',
+            'class'    => 'tom-select',
             'name'     => '',
             'id'       => $id2,
             'options'  => $options,

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,6 +22,7 @@ namespace Fisharebest\Webtrees;
 use Closure;
 use Fisharebest\ExtCalendar\GregorianCalendar;
 use Fisharebest\Webtrees\Contracts\UserInterface;
+use Fisharebest\Webtrees\Elements\PedigreeLinkageType;
 use Fisharebest\Webtrees\Http\RequestHandlers\IndividualPage;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
@@ -41,14 +42,12 @@ class Individual extends GedcomRecord
 
     protected const ROUTE_NAME = IndividualPage::class;
 
-    /** @var int used in some lists to keep track of this individual’s generation in that list */
-    public $generation;
+    /** Used in some lists to keep track of this individual’s generation in that list */
+    public ?int $generation = null;
 
-    /** @var Date The estimated date of birth */
-    private $estimated_birth_date;
+    private ?Date $estimated_birth_date = null;
 
-    /** @var Date The estimated date of death */
-    private $estimated_death_date;
+    private ?Date $estimated_death_date = null;
 
     /**
      * A closure which will compare individuals by birth date.
@@ -102,7 +101,7 @@ class Individual extends GedcomRecord
             $keep_alive             = false;
             $KEEP_ALIVE_YEARS_BIRTH = (int) $this->tree->getPreference('KEEP_ALIVE_YEARS_BIRTH');
             if ($KEEP_ALIVE_YEARS_BIRTH) {
-                preg_match_all('/\n1 (?:' . implode('|', Gedcom::BIRTH_EVENTS) . ').*(?:\n[2-9].*)*(?:\n2 DATE (.+))/', $this->gedcom, $matches, PREG_SET_ORDER);
+                preg_match_all('/\n1 (?:' . implode('|', Gedcom::BIRTH_EVENTS) . ').*(?:\n[2-9].*)*\n2 DATE (.+)/', $this->gedcom, $matches, PREG_SET_ORDER);
                 foreach ($matches as $match) {
                     $date = new Date($match[1]);
                     if ($date->isOK() && $date->gregorianYear() + $KEEP_ALIVE_YEARS_BIRTH > date('Y')) {
@@ -113,7 +112,7 @@ class Individual extends GedcomRecord
             }
             $KEEP_ALIVE_YEARS_DEATH = (int) $this->tree->getPreference('KEEP_ALIVE_YEARS_DEATH');
             if ($KEEP_ALIVE_YEARS_DEATH) {
-                preg_match_all('/\n1 (?:' . implode('|', Gedcom::DEATH_EVENTS) . ').*(?:\n[2-9].*)*(?:\n2 DATE (.+))/', $this->gedcom, $matches, PREG_SET_ORDER);
+                preg_match_all('/\n1 (?:' . implode('|', Gedcom::DEATH_EVENTS) . ').*(?:\n[2-9].*)*\n2 DATE (.+)/', $this->gedcom, $matches, PREG_SET_ORDER);
                 foreach ($matches as $match) {
                     $date = new Date($match[1]);
                     if ($date->isOK() && $date->gregorianYear() + $KEEP_ALIVE_YEARS_DEATH > date('Y')) {
@@ -257,7 +256,7 @@ class Individual extends GedcomRecord
     public function isDead(): bool
     {
         $MAX_ALIVE_AGE = (int) $this->tree->getPreference('MAX_ALIVE_AGE');
-        $today_jd      = Carbon::now()->julianDay();
+        $today_jd      = Registry::timestampFactory()->now()->julianDay();
 
         // "1 DEAT Y" or "1 DEAT/2 DATE" or "1 DEAT/2 PLAC"
         if (preg_match('/\n1 (?:' . implode('|', Gedcom::DEATH_EVENTS) . ')(?: Y|(?:\n[2-9].+)*\n2 (DATE|PLAC) )/', $this->gedcom)) {
@@ -368,7 +367,7 @@ class Individual extends GedcomRecord
     }
 
     /**
-     * Display the prefered image for this individual.
+     * Display the preferred image for this individual.
      * Use an icon if no image is available.
      *
      * @param int           $width      Pixels
@@ -387,7 +386,7 @@ class Individual extends GedcomRecord
         }
 
         if ($this->tree->getPreference('USE_SILHOUETTE')) {
-            return '<i class="icon-silhouette-' . $this->sex() . '"></i>';
+            return '<i class="icon-silhouette icon-silhouette-' . strtolower($this->sex()) . ' wt-icon-flip-rtl"></i>';
         }
 
         return '';
@@ -680,7 +679,7 @@ class Individual extends GedcomRecord
      */
     public function sex(): string
     {
-        if (preg_match('/\n1 SEX ([MF])/', $this->gedcom . $this->pending, $match)) {
+        if (preg_match('/\n1 SEX ([MFX])/', $this->gedcom . $this->pending, $match)) {
             return $match[1];
         }
 
@@ -692,7 +691,7 @@ class Individual extends GedcomRecord
      *
      * @param int|null $access_level
      *
-     * @return Collection<Family>
+     * @return Collection<int,Family>
      */
     public function spouseFamilies(int $access_level = null): Collection
     {
@@ -758,7 +757,7 @@ class Individual extends GedcomRecord
      *
      * @param int|null $access_level
      *
-     * @return Collection<Family>
+     * @return Collection<int,Family>
      */
     public function childFamilies(int $access_level = null): Collection
     {
@@ -783,7 +782,7 @@ class Individual extends GedcomRecord
     /**
      * Get a list of step-parent families.
      *
-     * @return Collection<Family>
+     * @return Collection<int,Family>
      */
     public function childStepFamilies(): Collection
     {
@@ -807,7 +806,7 @@ class Individual extends GedcomRecord
     /**
      * Get a list of step-parent families.
      *
-     * @return Collection<Family>
+     * @return Collection<int,Family>
      */
     public function spouseStepFamilies(): Collection
     {
@@ -838,19 +837,25 @@ class Individual extends GedcomRecord
      */
     public function getChildFamilyLabel(Family $family): string
     {
-        preg_match('/\n1 FAMC @' . $family->xref() . '@(?:\n[2-9].*)*\n2 PEDI (.+)/', $this->gedcom(), $match);
+        $fact = $this->facts(['FAMC'])->first(static fn (Fact $fact): bool => $fact->target() === $family);
+
+        if ($fact instanceof Fact) {
+            $pedigree = $fact->attribute('PEDI');
+        } else {
+            $pedigree = '';
+        }
 
         $values = [
-            'birth'   => I18N::translate('Family with parents'),
-            'adopted' => I18N::translate('Family with adoptive parents'),
-            'foster'  => I18N::translate('Family with foster parents'),
-            'sealing' => /* I18N: “sealing” is a Mormon ceremony. */
-                I18N::translate('Family with sealing parents'),
-            'rada'    => /* I18N: “rada” is an Arabic word, pronounced “ra DAH”. It is child-to-parent pedigree, established by wet-nursing. */
-                I18N::translate('Family with rada parents'),
+            PedigreeLinkageType::VALUE_BIRTH   => I18N::translate('Family with parents'),
+            PedigreeLinkageType::VALUE_ADOPTED => I18N::translate('Family with adoptive parents'),
+            PedigreeLinkageType::VALUE_FOSTER  => I18N::translate('Family with foster parents'),
+            /* I18N: “sealing” is a Mormon ceremony. */
+            PedigreeLinkageType::VALUE_SEALING => I18N::translate('Family with sealing parents'),
+            /* I18N: “rada” is an Arabic word, pronounced “ra DAH”. It is child-to-parent pedigree, established by wet-nursing. */
+            PedigreeLinkageType::VALUE_RADA    => I18N::translate('Family with rada parents'),
         ];
 
-        return $values[$match[1] ?? 'birth'] ?? $values['birth'];
+        return $values[$pedigree] ?? $values[PedigreeLinkageType::VALUE_BIRTH];
     }
 
     /**

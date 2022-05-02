@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees;
 
 use Closure;
-use Fisharebest\Webtrees\Functions\FunctionsPrint;
+use Fisharebest\Webtrees\Elements\RestrictionNotice;
 use Fisharebest\Webtrees\Services\GedcomService;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -35,6 +35,7 @@ use function preg_match;
 use function preg_match_all;
 use function preg_replace;
 use function str_contains;
+use function str_ends_with;
 use function usort;
 
 use const PREG_SET_ORDER;
@@ -161,8 +162,12 @@ class Fact
 
     private Place $place;
 
-    // Used by Functions::sortFacts()
+    // Used to sort facts
     public int $sortOrder;
+
+    // Used by anniversary calculations
+    public int $jd;
+    public int $anniv;
 
     /**
      * Create an event object from a gedcom fragment.
@@ -259,8 +264,10 @@ class Fact
      */
     public function attribute(string $tag): string
     {
-        if (preg_match('/\n2 (?:' . $tag . ') ?(.*(?:(?:\n3 CONT ?.*)*)*)/', $this->gedcom, $match)) {
-            return preg_replace("/\n3 CONT ?/", "\n", $match[1]);
+        if (preg_match('/\n2 ' . $tag . ' ?(.*(?:(?:\n3 CONT ?.*)*)*)/', $this->gedcom, $match)) {
+            $value = preg_replace("/\n3 CONT ?/", "\n", $match[1]);
+
+            return Registry::elementFactory()->make($this->tag() . ':' . $tag)->canonical($value);
         }
 
         return '';
@@ -309,15 +316,26 @@ class Fact
     {
         $access_level = $access_level ?? Auth::accessLevel($this->record->tree());
 
-        // Does this record have an explicit RESN?
-        if (str_contains($this->gedcom, "\n2 RESN confidential")) {
+        // Does this record have an explicit restriction notice?
+        $restriction = $this->attribute('RESN');
+
+        if (str_ends_with($restriction, RestrictionNotice::VALUE_CONFIDENTIAL)) {
             return Auth::PRIV_NONE >= $access_level;
         }
-        if (str_contains($this->gedcom, "\n2 RESN privacy")) {
+
+        if (str_ends_with($restriction, RestrictionNotice::VALUE_PRIVACY)) {
             return Auth::PRIV_USER >= $access_level;
         }
-        if (str_contains($this->gedcom, "\n2 RESN none")) {
+        if (str_ends_with($restriction, RestrictionNotice::VALUE_NONE)) {
             return true;
+        }
+
+        // A link to a record of the same type: NOTE=>NOTE, OBJE=>OBJE, SOUR=>SOUR, etc.
+        // Use the privacy of the target record.
+        $target = $this->target();
+
+        if ($target instanceof GedcomRecord && $target->tag() === $this->tag) {
+            return $target->canShow($access_level);
         }
 
         // Does this record have a default RESN?
@@ -351,7 +369,7 @@ class Fact
         }
 
         // Members cannot edit RESN, CHAN and locked records
-        return Auth::isEditor($this->record->tree()) && !str_contains($this->gedcom, "\n2 RESN locked") && $this->tag !== 'RESN' && $this->tag !== 'CHAN';
+        return Auth::isEditor($this->record->tree()) && !str_ends_with($this->attribute('RESN'), RestrictionNotice::VALUE_LOCKED) && $this->tag !== 'RESN' && $this->tag !== 'CHAN';
     }
 
     /**
@@ -585,7 +603,7 @@ class Fact
             $date = $this->date();
             if ($date->isOK()) {
                 if ($this->record() instanceof Individual && in_array($this->tag, Gedcom::BIRTH_EVENTS, true) && $this->record()->tree()->getPreference('SHOW_PARENTS_AGE')) {
-                    $attributes[] = $date->display() . FunctionsPrint::formatParentsAges($this->record(), $date);
+                    $attributes[] = $date->display() . view('fact-parents-age', ['individual' => $this->record(), 'birth_date' => $date]);
                 } else {
                     $attributes[] = $date->display();
                 }
@@ -603,11 +621,11 @@ class Fact
             $class .= ' wt-old';
         }
 
-        return
-            '<div class="' . $class . '">' .
-            /* I18N: a label/value pair, such as “Occupation: Farmer”. Some languages may need to change the punctuation. */
-            I18N::translate('<span class="label">%1$s:</span> <span class="field" dir="auto">%2$s</span>', $this->label(), implode(' — ', $attributes)) .
-            '</div>';
+        $label = '<span class="label">' . $this->label() . '</span>';
+        $value = '<span class="field" dir="auto">' . implode(' — ', $attributes) . '</span>';
+
+        /* I18N: a label/value pair, such as “Occupation: Farmer”. Some languages may need to change the punctuation. */
+        return '<div class="' . $class . '">' . I18N::translate('%1$s: %2$s', $label, $value) . '</div>';
     }
 
     /**
@@ -719,7 +737,7 @@ class Fact
             $ret = $factsort[$atag] - $factsort[$btag];
 
             // If facts are the same then put dated facts before non-dated facts
-            if ($ret == 0) {
+            if ($ret === 0) {
                 if ($a->attribute('DATE') !== '' && $b->attribute('DATE') === '') {
                     return -1;
                 }
@@ -743,9 +761,9 @@ class Fact
      * using the compare type function
      * 3. Then merge the arrays back into the original array using the compare type function
      *
-     * @param Collection<Fact> $unsorted
+     * @param Collection<int,Fact> $unsorted
      *
-     * @return Collection<Fact>
+     * @return Collection<int,Fact>
      */
     public static function sortFacts(Collection $unsorted): Collection
     {
@@ -800,9 +818,9 @@ class Fact
     /**
      * Sort fact/event tags using the same order that we use for facts.
      *
-     * @param Collection<string> $unsorted
+     * @param Collection<int,string> $unsorted
      *
-     * @return Collection<string>
+     * @return Collection<int,string>
      */
     public static function sortFactTags(Collection $unsorted): Collection
     {

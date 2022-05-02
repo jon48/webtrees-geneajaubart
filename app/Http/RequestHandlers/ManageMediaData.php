@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,6 +25,7 @@ use Fisharebest\Webtrees\Media;
 use Fisharebest\Webtrees\Mime;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\DatatablesService;
+use Fisharebest\Webtrees\Services\LinkedRecordService;
 use Fisharebest\Webtrees\Services\MediaFileService;
 use Fisharebest\Webtrees\Services\TreeService;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -58,6 +59,8 @@ class ManageMediaData implements RequestHandlerInterface
 {
     private DatatablesService $datatables_service;
 
+    private LinkedRecordService $linked_record_service;
+
     private MediaFileService $media_file_service;
 
     private TreeService $tree_service;
@@ -65,18 +68,21 @@ class ManageMediaData implements RequestHandlerInterface
     /**
      * MediaController constructor.
      *
-     * @param DatatablesService $datatables_service
-     * @param MediaFileService  $media_file_service
-     * @param TreeService       $tree_service
+     * @param DatatablesService   $datatables_service
+     * @param LinkedRecordService $linked_record_service
+     * @param MediaFileService    $media_file_service
+     * @param TreeService         $tree_service
      */
     public function __construct(
         DatatablesService $datatables_service,
+        LinkedRecordService $linked_record_service,
         MediaFileService $media_file_service,
         TreeService $tree_service
     ) {
-        $this->datatables_service = $datatables_service;
-        $this->media_file_service = $media_file_service;
-        $this->tree_service       = $tree_service;
+        $this->datatables_service    = $datatables_service;
+        $this->linked_record_service = $linked_record_service;
+        $this->media_file_service    = $media_file_service;
+        $this->tree_service          = $tree_service;
     }
 
     /**
@@ -224,7 +230,7 @@ class ManageMediaData implements RequestHandlerInterface
                 $callback = function (array $row) use ($data_filesystem, $media_trees): array {
                     try {
                         $mime_type = $data_filesystem->mimeType($row[0]) ?: Mime::DEFAULT_TYPE;
-                    } catch (FileSystemException | UnableToRetrieveMetadata $ex) {
+                    } catch (FilesystemException | UnableToRetrieveMetadata $ex) {
                         $mime_type = Mime::DEFAULT_TYPE;
                     }
 
@@ -276,31 +282,43 @@ class ManageMediaData implements RequestHandlerInterface
      */
     private function mediaObjectInfo(Media $media): string
     {
-        $html = '<b><a href="' . e($media->url()) . '">' . $media->fullName() . '</a></b>' . '<br><i>' . e($media->getNote()) . '</i></br><br>';
+        $element = Registry::elementFactory()->make('NOTE:CONC');
+        $html    = '<a href="' . e($media->url()) . '" title="' . e($media->tree()->title()) . '">' . $media->fullName() . '</a>';
+
+        if ($this->tree_service->all()->count() > 1) {
+            $html .= ' — ' . e($media->tree()->title());
+        }
+
+        $html .= $element->value($media->getNote(), $media->tree());
 
         $linked = [];
-        foreach ($media->linkedIndividuals('OBJE') as $link) {
-            $linked[] = '<a href="' . e($link->url()) . '">' . $link->fullName() . '</a>';
+
+        foreach ($this->linked_record_service->linkedIndividuals($media) as $link) {
+            $linked[] = view('icons/individual') . '<a href="' . e($link->url()) . '">' . $link->fullName() . '</a>';
         }
-        foreach ($media->linkedFamilies('OBJE') as $link) {
-            $linked[] = '<a href="' . e($link->url()) . '">' . $link->fullName() . '</a>';
+
+        foreach ($this->linked_record_service->linkedFamilies($media) as $link) {
+            $linked[] = view('icons/family') . '<a href="' . e($link->url()) . '">' . $link->fullName() . '</a>';
         }
-        foreach ($media->linkedSources('OBJE') as $link) {
-            $linked[] = '<a href="' . e($link->url()) . '">' . $link->fullName() . '</a>';
+
+        foreach ($this->linked_record_service->linkedSources($media) as $link) {
+            $linked[] = view('icons/source') . '<a href="' . e($link->url()) . '">' . $link->fullName() . '</a>';
         }
-        foreach ($media->linkedNotes('OBJE') as $link) {
-            // Invalid GEDCOM - you cannot link a NOTE to an OBJE
-            $linked[] = '<a href="' . e($link->url()) . '">' . $link->fullName() . '</a>';
+
+        foreach ($this->linked_record_service->linkedNotes($media) as $link) {
+            $linked[] = view('icons/note') . '<a href="' . e($link->url()) . '">' . $link->fullName() . '</a>';
         }
-        foreach ($media->linkedRepositories('OBJE') as $link) {
-            // Invalid GEDCOM - you cannot link a REPO to an OBJE
-            $linked[] = '<a href="' . e($link->url()) . '">' . $link->fullName() . '</a>';
+
+        foreach ($this->linked_record_service->linkedRepositories($media) as $link) {
+            $linked[] = view('icons/media') . '<a href="' . e($link->url()) . '">' . $link->fullName() . '</a>';
         }
-        foreach ($media->linkedLocations('OBJE') as $link) {
-            $linked[] = '<a href="' . e($link->url()) . '">' . $link->fullName() . '</a>';
+
+        foreach ($this->linked_record_service->linkedMedia($media) as $link) {
+            $linked[] = view('icons/location') . '<a href="' . e($link->url()) . '">' . $link->fullName() . '</a>';
         }
+
         if ($linked !== []) {
-            $html .= '<ul>';
+            $html .= '<ul class="list-unstyled">';
             foreach ($linked as $link) {
                 $html .= '<li>' . $link . '</li>';
             }

@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,15 +21,17 @@ namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
-use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function assert;
+use function date;
 use function e;
+use function extension_loaded;
 use function pathinfo;
 use function strtolower;
+use function substr;
 
 use const PATHINFO_EXTENSION;
 
@@ -47,9 +49,7 @@ class ExportGedcomPage implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = $request->getAttribute('tree');
-        assert($tree instanceof Tree);
-
+        $tree  = Validator::attributes($request)->tree();
         $title = I18N::translate('Export a GEDCOM file') . ' — ' . e($tree->title());
 
         $this->layout = 'layouts/administration';
@@ -57,14 +57,23 @@ class ExportGedcomPage implements RequestHandlerInterface
         $filename = $tree->name();
 
         // Force a ".ged" suffix
-        if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'ged') {
-            $filename .= '.ged';
+        if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) === 'ged') {
+            $download_filename  = substr($filename, 0, -4);
+        } else {
+            $download_filename = $filename;
         }
 
+        $download_filenames = [
+            $download_filename                  => $download_filename,
+            $download_filename . date('-Y-m-d') => $download_filename . date('-Y-m-d'),
+        ];
+
         return $this->viewResponse('admin/trees-export', [
-            'filename' => $filename,
-            'title'    => $title,
-            'tree'     => $tree,
+            'download_filenames' => $download_filenames,
+            'filename'           => $filename,
+            'title'              => $title,
+            'tree'               => $tree,
+            'zip_available'      => extension_loaded('zip'),
         ]);
     }
 }

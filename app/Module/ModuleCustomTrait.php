@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,13 +30,27 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use function str_contains;
-use function strtolower;
+use function strtoupper;
 
 /**
  * Trait ModuleCustomTrait - default implementation of ModuleCustomInterface
  */
 trait ModuleCustomTrait
 {
+    /**
+     * A unique internal name for this module (based on the installation folder).
+     *
+     * @return string
+     */
+    abstract public function name(): string;
+
+    /**
+     * Where does this module store its resources
+     *
+     * @return string
+     */
+    abstract public function resourcesFolder(): string;
+
     /**
      * The person or organisation who created this module.
      *
@@ -174,12 +188,12 @@ trait ModuleCustomTrait
         }
 
         $content   = file_get_contents($file);
-        $extension = strtolower(pathinfo($asset, PATHINFO_EXTENSION));
+        $extension = strtoupper(pathinfo($asset, PATHINFO_EXTENSION));
         $mime_type = Mime::TYPES[$extension] ?? Mime::DEFAULT_TYPE;
 
         return response($content, StatusCodeInterface::STATUS_OK, [
-            'Cache-Control'  => 'public,max-age=31536000',
-            'Content-Type'   => $mime_type,
+            'cache-control'  => 'public,max-age=31536000',
+            'content-type'   => $mime_type,
         ]);
     }
 }

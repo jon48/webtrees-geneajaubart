@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -85,6 +85,7 @@ class UserAddAction implements RequestHandlerInterface
 
         $new_user = $this->user_service->create($username, $real_name, $email, $password);
         $new_user->setPreference(UserInterface::PREF_IS_EMAIL_VERIFIED, '1');
+        $new_user->setPreference(UserInterface::PREF_IS_ACCOUNT_APPROVED, '1');
         $new_user->setPreference(UserInterface::PREF_LANGUAGE, I18N::languageTag());
         $new_user->setPreference(UserInterface::PREF_TIME_ZONE, Site::getPreference('TIMEZONE'));
         $new_user->setPreference(UserInterface::PREF_TIMESTAMP_REGISTERED, date('U'));

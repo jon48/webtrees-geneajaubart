@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,18 +32,6 @@ class DefaultSurnameTraditionTest extends TestCase
     private SurnameTraditionInterface $surname_tradition;
 
     /**
-     * Test whether married surnames are used
-     *
-     * @covers \Fisharebest\Webtrees\SurnameTradition\DefaultSurnameTradition
-     *
-     * @return void
-     */
-    public function testMarriedSurnames(): void
-    {
-        self::assertFalse($this->surname_tradition->hasMarriedNames());
-    }
-
-    /**
      * Test whether surnames are used
      *
      * @covers \Fisharebest\Webtrees\SurnameTradition\DefaultSurnameTradition
@@ -52,7 +40,7 @@ class DefaultSurnameTraditionTest extends TestCase
      */
     public function testSurnames(): void
     {
-        self::assertTrue($this->surname_tradition->hasSurnames());
+        self::assertSame('//', $this->surname_tradition->defaultName());
     }
 
     /**
@@ -77,17 +65,17 @@ class DefaultSurnameTraditionTest extends TestCase
         $mother->method('facts')->willReturn(new Collection([$mother_fact]));
 
         self::assertSame(
-            ["1 NAME //\n2 TYPE birth"],
+            ["1 NAME //\n2 TYPE BIRTH"],
             $this->surname_tradition->newChildNames($father, $mother, 'M')
         );
 
         self::assertSame(
-            ["1 NAME //\n2 TYPE birth"],
+            ["1 NAME //\n2 TYPE BIRTH"],
             $this->surname_tradition->newChildNames($father, $mother, 'F')
         );
 
         self::assertSame(
-            ["1 NAME //\n2 TYPE birth"],
+            ["1 NAME //\n2 TYPE BIRTH"],
             $this->surname_tradition->newChildNames($father, $mother, 'U')
         );
     }
@@ -108,17 +96,17 @@ class DefaultSurnameTraditionTest extends TestCase
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
-            ["1 NAME //\n2 TYPE birth"],
+            ["1 NAME //\n2 TYPE BIRTH"],
             $this->surname_tradition->newParentNames($individual, 'M')
         );
 
         self::assertSame(
-            ["1 NAME //\n2 TYPE birth"],
+            ["1 NAME //\n2 TYPE BIRTH"],
             $this->surname_tradition->newParentNames($individual, 'F')
         );
 
         self::assertSame(
-            ["1 NAME //\n2 TYPE birth"],
+            ["1 NAME //\n2 TYPE BIRTH"],
             $this->surname_tradition->newParentNames($individual, 'U')
         );
     }
@@ -139,17 +127,17 @@ class DefaultSurnameTraditionTest extends TestCase
         $individual->method('facts')->willReturn(new Collection([$fact]));
 
         self::assertSame(
-            ["1 NAME //\n2 TYPE birth"],
+            ["1 NAME //\n2 TYPE BIRTH"],
             $this->surname_tradition->newSpouseNames($individual, 'M')
         );
 
         self::assertSame(
-            ["1 NAME //\n2 TYPE birth"],
+            ["1 NAME //\n2 TYPE BIRTH"],
             $this->surname_tradition->newSpouseNames($individual, 'F')
         );
 
         self::assertSame(
-            ["1 NAME //\n2 TYPE birth"],
+            ["1 NAME //\n2 TYPE BIRTH"],
             $this->surname_tradition->newSpouseNames($individual, 'U')
         );
     }

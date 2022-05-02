@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -34,7 +34,7 @@ class HijriDate extends AbstractCalendarDate
     public const ESCAPE = '@#DHIJRI@';
 
     // Convert GEDCOM month names to month numbers
-    protected const MONTH__TO_NUMBER = [
+    protected const MONTH_TO_NUMBER = [
         'MUHAR' => 1,
         'SAFAR' => 2,
         'RABIA' => 3,

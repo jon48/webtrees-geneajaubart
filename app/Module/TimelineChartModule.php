@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
-use Aura\Router\RouterContainer;
 use Fig\Http\Message\RequestMethodInterface;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Date\GregorianDate;
@@ -29,13 +28,12 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function app;
-use function assert;
 use function redirect;
 use function route;
 
@@ -78,10 +76,7 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
      */
     public function boot(): void
     {
-        $router_container = app(RouterContainer::class);
-        assert($router_container instanceof RouterContainer);
-
-        $router_container->getMap()
+        Registry::routeFactory()->routeMap()
             ->get(static::class, static::ROUTE_URL, $this)
             ->allows(RequestMethodInterface::METHOD_POST);
     }
@@ -121,8 +116,8 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
     /**
      * The URL for this chart.
      *
-     * @param Individual        $individual
-     * @param array<int|string> $parameters
+     * @param Individual                                $individual
+     * @param array<bool|int|string|array<string>|null> $parameters
      *
      * @return string
      */
@@ -141,35 +136,25 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = $request->getAttribute('tree');
-        assert($tree instanceof Tree);
-
-        $user  = $request->getAttribute('user');
-        $scale = (int) $request->getAttribute('scale');
-        $xrefs = $request->getQueryParams()['xrefs'] ?? [];
-        $ajax  = $request->getQueryParams()['ajax'] ?? '';
-
-
-        $params = (array) $request->getParsedBody();
-
-        $add = $params['add'] ?? '';
-
-        Auth::checkComponentAccess($this, ModuleChartInterface::class, $tree, $user);
-
-        $scale = min($scale, self::MAXIMUM_SCALE);
-        $scale = max($scale, self::MINIMUM_SCALE);
-
-        $xrefs[] = $add;
+        $tree  = Validator::attributes($request)->tree();
+        $user  = Validator::attributes($request)->user();
+        $scale = Validator::attributes($request)->isBetween(self::MINIMUM_SCALE, self::MAXIMUM_SCALE)->integer('scale');
+        $xrefs = Validator::queryParams($request)->array('xrefs');
+        $ajax  = Validator::queryParams($request)->boolean('ajax', false);
         $xrefs = array_filter(array_unique($xrefs));
 
         // Convert POST requests into GET requests for pretty URLs.
         if ($request->getMethod() === RequestMethodInterface::METHOD_POST) {
+            $xrefs[] = Validator::parsedBody($request)->isXref()->string('add', '');
+
             return redirect(route(static::class, [
-                'scale' => $scale,
                 'tree'  => $tree->name(),
+                'scale' => $scale,
                 'xrefs' => $xrefs,
             ]));
         }
+
+        Auth::checkComponentAccess($this, ModuleChartInterface::class, $tree, $user);
 
         // Find the requested individuals.
         $individuals = (new Collection($xrefs))
@@ -207,9 +192,7 @@ class TimelineChartModule extends AbstractModule implements ModuleChartInterface
             return $individual instanceof Individual && $individual->canShow();
         });
 
-        Auth::checkComponentAccess($this, ModuleChartInterface::class, $tree, $user);
-
-        if ($ajax === '1') {
+        if ($ajax) {
             $this->layout = 'layouts/ajax';
 
             return $this->chart($tree, $xrefs, $scale);

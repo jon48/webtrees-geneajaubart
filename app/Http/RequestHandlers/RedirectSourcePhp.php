@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -31,8 +31,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function redirect;
-
 /**
  * Redirect URLs created by webtrees 1.x (and PhpGedView).
  */
@@ -56,15 +54,15 @@ class RedirectSourcePhp implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $ged  = Validator::queryParams($request)->requiredString('ged');
-        $sid  = Validator::queryParams($request)->isXref()->requiredString('sid');
+        $ged  = Validator::queryParams($request)->string('ged');
+        $sid  = Validator::queryParams($request)->isXref()->string('sid');
         $tree = $this->tree_service->all()->get($ged);
 
         if ($tree instanceof Tree) {
             $source = Registry::sourceFactory()->make($sid, $tree);
 
             if ($source instanceof Source) {
-                return redirect($source->url(), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
+                return Registry::responseFactory()->redirectUrl($source->url(), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
             }
         }
 

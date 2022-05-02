@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -41,6 +41,7 @@ use function str_replace;
 use function substr;
 use function trim;
 
+use const UPLOAD_ERR_NO_FILE;
 use const UPLOAD_ERR_OK;
 
 /**
@@ -74,6 +75,10 @@ class UploadMediaAction implements RequestHandlerInterface
         $all_folders = $this->media_file_service->allMediaFolders($data_filesystem);
 
         foreach ($request->getUploadedFiles() as $key => $uploaded_file) {
+            if ($uploaded_file->getError() == UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+
             if ($uploaded_file->getError() !== UPLOAD_ERR_OK) {
                 throw new FileUploadException($uploaded_file);
             }

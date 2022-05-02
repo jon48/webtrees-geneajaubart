@@ -1,6 +1,6 @@
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -602,7 +602,7 @@
             replace: function (url, uriEncodedQuery) {
               const symbol = (url.indexOf("?") > 0) ? '&' : '?';
               if (that.dataset.wtAutocompleteExtra === 'SOUR') {
-                let row_group = that.closest('.form-group').previousElementSibling;
+                let row_group = that.closest('.form-group').parentElement.previousElementSibling;
                 while (row_group.querySelector('select') === null) {
                   row_group = row_group.previousElementSibling;
                 }
@@ -622,12 +622,34 @@
    * Create a LeafletJS map from a list of providers/layers.
    * @param {string} id
    * @param {object} config
+   * @param {function} resetCallback
    * @returns Map
    */
-  webtrees.buildLeafletJsMap = function (id, config) {
+  webtrees.buildLeafletJsMap = function (id, config, resetCallback) {
     const zoomControl = new L.control.zoom({
       zoomInTitle: config.i18n.zoomIn,
       zoomoutTitle: config.i18n.zoomOut,
+    });
+
+    const resetControl = L.Control.extend({
+      options: {
+        position: 'topleft',
+      },
+      onAdd: function (map) {
+        let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        container.onclick = resetCallback;
+        let reset = config.i18n.reset;
+        let anchor = L.DomUtil.create('a', 'leaflet-control-reset', container);
+        anchor.setAttribute('aria-label', reset);
+        anchor.href = '#';
+        anchor.title = reset;
+        anchor.role = 'button';
+        L.DomEvent.addListener(anchor, 'click', L.DomEvent.preventDefault);
+        let image = L.DomUtil.create('i', 'fas fa-redo', anchor);
+        image.alt = reset;
+
+        return container;
+      },
     });
 
     let defaultLayer = null;
@@ -656,6 +678,7 @@
       zoomControl: false,
     })
       .addControl(zoomControl)
+      .addControl(new resetControl())
       .addLayer(defaultLayer)
       .addControl(L.control.layers.tree(config.mapProviders, null, {
         closedSymbol: config.icons.expand,
@@ -663,6 +686,95 @@
       }));
 
   };
+
+  /**
+   * Initialize a tom-select input
+   * @param {Element} element
+   * @returns {TomSelect}
+   */
+  webtrees.initializeTomSelect = function (element) {
+    if (element.tomselect) {
+      return element.tomselect;
+    }
+
+    let options = {};
+
+    if (element.dataset.url) {
+      let plugins = ['dropdown_input', 'virtual_scroll'];
+
+      if (element.multiple) {
+        plugins.push('remove_button');
+      } else if (!element.required) {
+        plugins.push('clear_button');
+      }
+
+      options = {
+        plugins: plugins,
+        maxOptions: false,
+        render: {
+          item: (data, escape) => '<div>' + data.text + '</div>',
+          option: (data, escape) => '<div>' + data.text + '</div>',
+        },
+        firstUrl: query => element.dataset.url + '&query=' + encodeURIComponent(query),
+        load: function (query, callback) {
+          fetch(this.getUrl(query))
+            .then(response => response.json())
+            .then(json => {
+              if (json.nextUrl !== null) {
+                this.setNextUrl(query, json.nextUrl + '&query=' + encodeURIComponent(query));
+              }
+              callback(json.data);
+            })
+            .catch(callback);
+        },
+      };
+    }
+
+    return new TomSelect(element, options);
+  }
+
+  /**
+   * Reset a tom-select input to have a single selected option
+   * @param {TomSelect} tomSelect
+   * @param {string} value
+   * @param {string} text
+   */
+  webtrees.resetTomSelect = function (tomSelect, value, text) {
+    tomSelect.clear(true);
+    tomSelect.clearOptions();
+    tomSelect.addOption({ value: value, text: text });
+    tomSelect.refreshOptions();
+    tomSelect.addItem(value, true);
+    tomSelect.refreshItems();
+  };
+
+  /**
+   * Toggle the visibility/status of INDI/FAM/SOUR/REPO/OBJE selectors
+   *
+   * @param {Element} select
+   * @param {Element} container
+   */
+  webtrees.initializeIFSRO = function(select, container) {
+    select.addEventListener('change', function () {
+      // Show only the selected selector.
+      container.querySelectorAll('.select-record').forEach(element => element.classList.add('d-none'));
+      container.querySelectorAll('.select-' + select.value).forEach(element => element.classList.remove('d-none'));
+
+      // Enable only the selected selector (so that disabled ones do not get submitted).
+      container.querySelectorAll('.select-record select').forEach(element => {
+        element.disabled = true;
+        if (element.matches('.tom-select')) {
+          element.tomselect.disable();
+        }
+      });
+      container.querySelectorAll('.select-' + select.value + ' select').forEach(element => {
+        element.disabled = false;
+        if (element.matches('.tom-select')) {
+          element.tomselect.enable();
+        }
+      });
+    });
+  }
 }(window.webtrees = window.webtrees || {}));
 
 // Send the CSRF token on all AJAX requests
@@ -685,27 +797,15 @@ $(function () {
   // Autocomplete
   webtrees.autocomplete('input[data-wt-autocomplete-url]');
 
-  // Select2 - activate autocomplete fields
-  const lang = document.documentElement.lang;
-  const select2_languages = {
-    'zh-Hans': 'zh-CN',
-    'zh-Hant': 'zh-TW'
-  };
-  $('select.select2').select2({
-    language: select2_languages[lang] || lang,
-    // Needed for elements that are initially hidden.
-    width: '100%',
-    // Do not escape - we do it on the server.
-    escapeMarkup: function (x) {
-      return x;
-    }
-  });
+  document.querySelectorAll('.tom-select').forEach(element => webtrees.initializeTomSelect(element));
 
   // If we clear the select (using the "X" button), we need an empty value
   // (rather than no value at all) for (non-multiple) selects with name="array[]"
-  $('select.select2:not([multiple])')
-    .on('select2:unselect', function (evt) {
-      $(evt.delegateTarget).html('<option value="" selected></option>');
+  document.querySelectorAll('select.tom-select:not([multiple])')
+    .forEach(function (element) {
+      element.addEventListener('clear', function () {
+        webtrees.resetTomSelect(element.tomselect, '', '');
+      });
     });
 
   // Datatables - locale aware sorting
@@ -811,6 +911,7 @@ document.addEventListener('click', (event) => {
 
   if ('wtConfirm' in target.dataset && !confirm(target.dataset.wtConfirm)) {
     event.preventDefault();
+    return;
   }
 
   if ('wtPostUrl' in target.dataset) {

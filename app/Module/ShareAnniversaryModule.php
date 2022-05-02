@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
-use Aura\Router\RouterContainer;
 use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Date\GregorianDate;
 use Fisharebest\Webtrees\Fact;
@@ -29,15 +28,13 @@ use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Registry;
-use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Sabre\VObject\Component\VCalendar;
 
-use function app;
-use function assert;
 use function response;
 use function route;
 use function strip_tags;
@@ -62,10 +59,7 @@ class ShareAnniversaryModule extends AbstractModule implements ModuleShareInterf
      */
     public function boot(): void
     {
-        $router_container = app(RouterContainer::class);
-        assert($router_container instanceof RouterContainer);
-
-        $router_container->getMap()
+        Registry::routeFactory()->routeMap()
             ->get(static::class, static::ROUTE_URL, $this);
     }
 
@@ -116,7 +110,7 @@ class ShareAnniversaryModule extends AbstractModule implements ModuleShareInterf
             ->filter(fn (Fact $fact): bool => $fact->date()->minimumJulianDay() === $fact->date()->maximumJulianDay())
             ->mapWithKeys(fn (Fact $fact): array => [
                 route(static::class, ['tree' => $record->tree()->name(), 'xref' => $fact->record()->xref(), 'fact_id' => $fact->id()]) =>
-                    $fact->label() . ' — ' . $fact->date()->display(false, null, false),
+                    $fact->label() . ' — ' . $fact->date()->display(),
             ]);
 
         if ($facts->isNotEmpty()) {
@@ -139,14 +133,11 @@ class ShareAnniversaryModule extends AbstractModule implements ModuleShareInterf
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = $request->getAttribute('tree');
-        assert($tree instanceof Tree);
-
-        $xref    = $request->getAttribute('xref');
-        $fact_id = $request->getAttribute('fact_id');
-
-        $record = Registry::gedcomRecordFactory()->make($xref, $tree);
-        $record = Auth::checkRecordAccess($record);
+        $tree    = Validator::attributes($request)->tree();
+        $xref    = Validator::attributes($request)->isXref()->string('xref');
+        $fact_id = Validator::attributes($request)->string('fact_id');
+        $record  = Registry::gedcomRecordFactory()->make($xref, $tree);
+        $record  = Auth::checkRecordAccess($record);
 
         $fact = $record->facts()
             ->filter(fn (Fact $fact): bool => $fact->id() === $fact_id)
@@ -162,8 +153,8 @@ class ShareAnniversaryModule extends AbstractModule implements ModuleShareInterf
             $vevent->add('SUMMARY', strip_tags($record->fullName()) . ' — ' . $fact->label());
 
             return response($vcalendar->serialize())
-                ->withHeader('Content-Type', 'text/calendar')
-                ->withHeader('Content-Disposition', 'attachment; filename="' . $fact->id() . '.ics');
+                ->withHeader('content-type', 'text/calendar')
+                ->withHeader('content-disposition', 'attachment; filename="' . $fact->id() . '.ics');
         }
 
         throw new HttpNotFoundException();

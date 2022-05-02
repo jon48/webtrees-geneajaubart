@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,20 +27,17 @@ use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Registry;
-use Fisharebest\Webtrees\Services\AuthorizationService;
 use Fisharebest\Webtrees\Services\ClipboardService;
-use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use function array_map;
-use function assert;
 use function e;
 use function explode;
 use function implode;
 use function in_array;
-use function is_string;
 use function redirect;
 use function strip_tags;
 use function trim;
@@ -52,20 +49,16 @@ class FamilyPage implements RequestHandlerInterface
 {
     use ViewResponseTrait;
 
-    private AuthorizationService $authorization_service;
-
     private ClipboardService $clipboard_service;
 
     /**
      * FamilyPage constructor.
      *
-     * @param AuthorizationService $authorization_service
-     * @param ClipboardService     $clipboard_service
+     * @param ClipboardService $clipboard_service
      */
-    public function __construct(AuthorizationService $authorization_service, ClipboardService $clipboard_service)
+    public function __construct(ClipboardService $clipboard_service)
     {
-        $this->authorization_service = $authorization_service;
-        $this->clipboard_service     = $clipboard_service;
+        $this->clipboard_service = $clipboard_service;
     }
 
     /**
@@ -75,19 +68,14 @@ class FamilyPage implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = $request->getAttribute('tree');
-        assert($tree instanceof Tree);
-
-        $xref = $request->getAttribute('xref');
-        assert(is_string($xref));
-
+        $tree   = Validator::attributes($request)->tree();
+        $xref   = Validator::attributes($request)->isXref()->string('xref');
+        $slug   = Validator::attributes($request)->string('slug', '');
         $family = Registry::familyFactory()->make($xref, $tree);
         $family = Auth::checkFamilyAccess($family, false);
 
         // Redirect to correct xref/slug
-        $slug = Registry::slugFactory()->make($family);
-
-        if ($family->xref() !== $xref || $request->getAttribute('slug') !== $slug) {
+        if ($family->xref() !== $xref || Registry::slugFactory()->make($family) !== $slug) {
             return redirect($family->url(), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
         }
 
@@ -99,7 +87,7 @@ class FamilyPage implements RequestHandlerInterface
             });
 
         return $this->viewResponse('family-page', [
-            'can_upload_media' => $this->authorization_service->canUploadMedia($tree, Auth::user()),
+            'can_upload_media' => Auth::canUploadMedia($tree, Auth::user()),
             'clipboard_facts'  => $clipboard_facts,
             'facts'            => $facts,
             'meta_description' => $this->metaDescription($family),

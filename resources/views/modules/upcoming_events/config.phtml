@@ -16,17 +16,17 @@ use Fisharebest\Webtrees\I18N;
 
 ?>
 
-<div class="row form-group">
+<div class="row form-group mb-3">
     <label class="col-sm-3 col-form-label" for="days">
         <?= I18N::translate('Number of days to show') ?>
     </label>
     <div class="col-sm-9">
-        <input type="text" name="days" id="days" size="2" value="<?= $days ?>">
+        <input type="number" class="form-control" name="days" id="days" size="2" value="<?= $days ?>" min="1" max="<?= $max_days ?>">
         <?= I18N::plural('maximum %s day', 'maximum %s days', $max_days, I18N::number($max_days)) ?>
     </div>
 </div>
 
-<div class="row form-group">
+<div class="row form-group mb-3">
     <label class="col-sm-3 col-form-label" for="filter">
         <?= I18N::translate('Show only events of living individuals') ?>
     </label>
@@ -35,25 +35,25 @@ use Fisharebest\Webtrees\I18N;
     </div>
 </div>
 
-<div class="row form-group">
+<div class="row form-group mb-3">
     <label class="col-sm-3 col-form-label" for="events">
         <?= I18N::translate('Events') ?>
     </label>
     <div class="col-sm-9">
-        <?= view('components/select', ['name' => 'events[]', 'id' => 'events', 'selected' => $event_array, 'options' => $all_events, 'class' => 'select2']) ?>
+        <?= view('components/select', ['name' => 'events[]', 'id' => 'events', 'selected' => $event_array, 'options' => $all_events, 'class' => 'tom-select']) ?>
     </div>
 </div>
 
-<div class="row form-group">
+<div class="row form-group mb-3">
     <label class="col-sm-3 col-form-label" for="infoStyle">
-        <?= /* I18N: Label for a configuration option */ I18N::translate('Presentation style') ?>
+        <?= I18N::translate('Layout') ?>
     </label>
     <div class="col-sm-9">
         <?= view('components/select', ['name' => 'infoStyle', 'selected' => $info_style, 'options' => $info_styles]) ?>
     </div>
 </div>
 
-<div class="row form-group">
+<div class="row form-group mb-3">
     <label class="col-sm-3 col-form-label" for="sortStyle">
         <?= /* I18N: Label for a configuration option */ I18N::translate('Sort order') ?>
     </label>

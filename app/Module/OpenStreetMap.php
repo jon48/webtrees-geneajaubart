@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Module;
 
 use Fisharebest\Webtrees\I18N;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class OpenStreetMap - use maps within webtrees
@@ -50,18 +49,6 @@ class OpenStreetMap extends AbstractModule implements ModuleMapProviderInterface
     public function title(): string
     {
         return I18N::translate('OpenStreetMap™');
-    }
-
-    /**
-     * @return ResponseInterface
-     */
-    public function getAdminAction(): ResponseInterface
-    {
-        $this->layout = 'layouts/administration';
-
-        return $this->viewResponse('modules/openstreetmap/config', [
-            'title'   => $this->title(),
-        ]);
     }
 
     /**

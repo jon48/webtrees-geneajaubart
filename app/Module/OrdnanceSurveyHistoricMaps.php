@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -75,7 +75,7 @@ class OrdnanceSurveyHistoricMaps extends AbstractModule implements ModuleMapProv
                 'bounds'      => [[49.852539, -7.793077], [60.894042, 1.790425]],
                 'default'     => true,
                 'label'       => 'Historic map of Great Britain',
-                'maxZoom'     => 17,
+                'maxZoom'     => 15,
                 'minZoom'     => 2,
                 'subdomains'  => ['0', '1', '2', '3'],
                 'url'         => 'https://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg',

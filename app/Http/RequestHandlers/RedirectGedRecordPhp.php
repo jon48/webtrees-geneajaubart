@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,13 +25,11 @@ use Fisharebest\Webtrees\Http\Exceptions\HttpNotFoundException;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\TreeService;
-use Fisharebest\Webtrees\Site;
 use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-
-use function redirect;
 
 /**
  * Redirect URLs created by webtrees 1.x (and PhpGedView).
@@ -56,16 +54,15 @@ class RedirectGedRecordPhp implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $query = $request->getQueryParams();
-        $ged   = $query['ged'] ?? Site::getPreference('DEFAULT_GEDCOM');
-        $pid   = $query['pid'] ?? '';
-        $tree  = $this->tree_service->all()->get($ged);
+        $ged  = Validator::queryParams($request)->string('ged');
+        $pid  = Validator::queryParams($request)->isXref()->string('pid');
+        $tree = $this->tree_service->all()->get($ged);
 
         if ($tree instanceof Tree) {
             $record = Registry::gedcomRecordFactory()->make($pid, $tree);
 
             if ($record instanceof GedcomRecord) {
-                return redirect($record->url(), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
+                return Registry::responseFactory()->redirectUrl($record->url(), StatusCodeInterface::STATUS_MOVED_PERMANENTLY);
             }
         }
 

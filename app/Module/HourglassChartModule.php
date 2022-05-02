@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2021 webtrees development team
+ * Copyright (C) 2022 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,23 +19,19 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Module;
 
-use Aura\Router\RouterContainer;
 use Fig\Http\Message\RequestMethodInterface;
 use Fisharebest\Webtrees\Auth;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Menu;
-use Fisharebest\Webtrees\Tree;
+use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Validator;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function app;
-use function assert;
-use function is_string;
 use function response;
 use function view;
 
@@ -49,8 +45,8 @@ class HourglassChartModule extends AbstractModule implements ModuleChartInterfac
     protected const ROUTE_URL = '/tree/{tree}/hourglass-{generations}-{spouses}/{xref}';
 
     // Defaults
-    private const   DEFAULT_GENERATIONS = '3';
-    private const   DEFAULT_SPOUSES     = false;
+    public const    DEFAULT_GENERATIONS = '3';
+    public const    DEFAULT_SPOUSES     = false;
     protected const DEFAULT_PARAMETERS  = [
         'generations' => self::DEFAULT_GENERATIONS,
         'spouses'     => self::DEFAULT_SPOUSES,
@@ -67,16 +63,9 @@ class HourglassChartModule extends AbstractModule implements ModuleChartInterfac
      */
     public function boot(): void
     {
-        $router_container = app(RouterContainer::class);
-        assert($router_container instanceof RouterContainer);
-
-        $router_container->getMap()
+        Registry::routeFactory()->routeMap()
             ->get(static::class, static::ROUTE_URL, $this)
-            ->allows(RequestMethodInterface::METHOD_POST)
-            ->tokens([
-                'generations' => '\d+',
-                'spouses'     => '1?',
-            ]);
+            ->allows(RequestMethodInterface::METHOD_POST);
     }
 
     /**
@@ -139,8 +128,8 @@ class HourglassChartModule extends AbstractModule implements ModuleChartInterfac
     /**
      * The URL for a page showing chart options.
      *
-     * @param Individual                        $individual
-     * @param array<bool|int|string|array|null> $parameters
+     * @param Individual                                $individual
+     * @param array<bool|int|string|array<string>|null> $parameters
      *
      * @return string
      */
@@ -159,38 +148,29 @@ class HourglassChartModule extends AbstractModule implements ModuleChartInterfac
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = $request->getAttribute('tree');
-        assert($tree instanceof Tree);
-
-        $xref = $request->getAttribute('xref');
-        assert(is_string($xref));
-
-        $individual = Registry::individualFactory()->make($xref, $tree);
-        $individual = Auth::checkIndividualAccess($individual, false, true);
-
-        $user        = $request->getAttribute('user');
-        $generations = (int) $request->getAttribute('generations');
-        $spouses     = (bool) $request->getAttribute('spouses');
-        $ajax        = $request->getQueryParams()['ajax'] ?? '';
+        $tree        = Validator::attributes($request)->tree();
+        $xref        = Validator::attributes($request)->isXref()->string('xref');
+        $user        = Validator::attributes($request)->user();
+        $generations = Validator::attributes($request)->isBetween(self::MINIMUM_GENERATIONS, self::MAXIMUM_GENERATIONS)->integer('generations');
+        $spouses     = Validator::attributes($request)->boolean('spouses');
+        $ajax        = Validator::queryParams($request)->boolean('ajax', false);
 
         // Convert POST requests into GET requests for pretty URLs.
         if ($request->getMethod() === RequestMethodInterface::METHOD_POST) {
-            $params = (array) $request->getParsedBody();
-
             return redirect(route(static::class, [
                 'tree'        => $tree->name(),
-                'xref'        => $params['xref'],
-                'generations' => $params['generations'],
-                'spouses'     => $params['spouses'] ?? false,
+                'xref'        => Validator::parsedBody($request)->isXref()->string('xref'),
+                'generations' => Validator::parsedBody($request)->isBetween(self::MINIMUM_GENERATIONS, self::MAXIMUM_GENERATIONS)->integer('generations'),
+                'spouses'     => Validator::parsedBody($request)->boolean('spouses'),
             ]));
         }
 
         Auth::checkComponentAccess($this, ModuleChartInterface::class, $tree, $user);
 
-        $generations = min($generations, self::MAXIMUM_GENERATIONS);
-        $generations = max($generations, self::MINIMUM_GENERATIONS);
+        $individual  = Registry::individualFactory()->make($xref, $tree);
+        $individual  = Auth::checkIndividualAccess($individual, false, true);
 
-        if ($ajax === '1') {
+        if ($ajax) {
             $this->layout = 'layouts/ajax';
 
             return $this->viewResponse('modules/hourglass-chart/chart', [
@@ -228,11 +208,8 @@ class HourglassChartModule extends AbstractModule implements ModuleChartInterfac
      */
     public function getAncestorsAction(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = $request->getAttribute('tree');
-        assert($tree instanceof Tree);
-
-        $xref = $request->getQueryParams()['xref'] ?? '';
-
+        $tree   = Validator::attributes($request)->tree();
+        $xref   = Validator::queryParams($request)->isXref()->string('xref');
         $family = Registry::familyFactory()->make($xref, $tree);
         $family = Auth::checkFamilyAccess($family);
 
@@ -251,12 +228,9 @@ class HourglassChartModule extends AbstractModule implements ModuleChartInterfac
      */
     public function getDescendantsAction(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = $request->getAttribute('tree');
-        assert($tree instanceof Tree);
-
-        $xref = $request->getQueryParams()['xref'] ?? '';
-
-        $spouses    = (bool) ($request->getQueryParams()['spouses'] ?? false);
+        $tree       = Validator::attributes($request)->tree();
+        $xref       = Validator::queryParams($request)->isXref()->string('xref');
+        $spouses    = Validator::queryParams($request)->boolean('spouses', false);
         $individual = Registry::individualFactory()->make($xref, $tree);
         $individual = Auth::checkIndividualAccess($individual, false, true);
 
