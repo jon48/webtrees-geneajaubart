@@ -111,13 +111,21 @@ if ($tag === 'MARR') {
                 <?php endif ?>
 
                 <div class="wt-fact-value">
+                    <!--  MYARTJAUB-START -->
+                    <?php if ($fact->target() instanceof \Fisharebest\Webtrees\Source) : ?>
+                        <?= hook(\MyArtJaub\Webtrees\Contracts\Hooks\FactSourceTextExtenderInterface::class,
+                            fn(\MyArtJaub\Webtrees\Contracts\Hooks\FactSourceTextExtenderInterface $hook) => $hook->factSourcePrepend($tree, $fact)
+                        )
+                        ?>
+                        
+                    <?php endif ?>
+                    <!--  MYARTJAUB-END -->
                     <?= $element->value($value, $tree) ?>
                     <?php if ($element instanceof XrefAssociate && $fact->target() instanceof Individual) : ?>
                         <?php
                         $module = app(ModuleService::class)->findByComponent(ModuleChartInterface::class, $tree, Auth::user())
                             ->first(static fn (ModuleInterface $module):bool => $module instanceof RelationshipsChartModule)
                         ?>
-
                         <?php if ($module instanceof RelationshipsChartModule && $record instanceof Individual) : ?>
                             — <a href="<?= $module->chartUrl($fact->target(), ['xref2' => $record->xref()]) ?>" rel="nofollow">
                                 <?= app(RelationshipService::class)->getCloseRelationshipName($fact->target(), $record) ?>

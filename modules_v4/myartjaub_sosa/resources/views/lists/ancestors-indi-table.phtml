@@ -3,11 +3,10 @@
 declare(strict_types=1);
 
 use Fisharebest\Webtrees\Age;
-use Fisharebest\Webtrees\Carbon;
 use Fisharebest\Webtrees\Date;
-use Fisharebest\Webtrees\DebugBar;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
 use Ramsey\Uuid\Uuid;
@@ -15,7 +14,7 @@ use Ramsey\Uuid\Uuid;
 /**
  * @var string                      $module_name
  * @var Tree                        $tree
- * @var Collection<int,Individual>  $ancestors
+ * @var \Illuminate\Support\Collection<int, \Fisharebest\Webtrees\Individual>   $ancestors
  * @var int                         $nb_ancestors_all
  * @var int                         $nb_ancestors_theor
  * @var int                         $nb_ancestors_shown
@@ -24,8 +23,8 @@ use Ramsey\Uuid\Uuid;
 // lists requires a unique ID in case there are multiple lists per page
 $table_id = 'table-ancestors-indi-' . Uuid::uuid4()->toString();
 
-$today_jd          = Carbon::now()->julianDay();
-$hundred_years_ago = Carbon::now()->subYears(100)->julianDay();
+$today_jd          = Registry::timestampFactory()->now()->julianDay();
+$hundred_years_ago = Registry::timestampFactory()->now()->subtractYears(100)->julianDay();
 
 $show_estimated_dates = (bool) $tree->getPreference('SHOW_EST_LIST_DATES');
 
@@ -37,9 +36,8 @@ $unique_indis = []; // Don't double-count indis with multiple names.
 <?php
     $maj_columns = hook(
         \MyArtJaub\Webtrees\Contracts\Hooks\SosaIndividualDatatablesExtenderInterface::class,
-        fn(\MyArtJaub\Webtrees\Contracts\Hooks\SosaIndividualDatatablesExtenderInterface $hook) => $hook->sosaIndividualColumns($ancestors),
-        []
-    );
+        fn(\MyArtJaub\Webtrees\Module\Hooks\Hooks\SosaIndividualDatatablesExtenderCollector $hook) => $hook->sosaIndividualColumns($ancestors)
+    ) ?? [];
     $maj_issourced_birth = $maj_columns['issourced']['birth'] ?? null;
     $maj_issourced_death = $maj_columns['issourced']['death'] ?? null;
 
@@ -65,13 +63,13 @@ $("#<?= e($table_id) ?> > .maj-table-ancestors-indi").dataTable({
         /* Birth date   */ { type: "num" },
         /* Birthplace   */ { type: "text" },
         //MYARTJAUB-START
-        <?= $maj_issourced_birth ? json_encode($maj_issourced_birth['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
+        <?= $maj_issourced_birth !== null ? json_encode($maj_issourced_birth['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
         /* Death date   */ { type: "num" },
         /* Age          */ { type: "num" },
         /* Death place  */ { type: "text" },
         //MYARTJAUB-START
-        <?= $maj_issourced_death ? json_encode($maj_issourced_death['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
+        <?= $maj_issourced_death !== null ? json_encode($maj_issourced_death['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
         /* Filter sex   */ { sortable: false },
         /* Filter birth */ { sortable: false },
@@ -171,8 +169,6 @@ $deathAgeData = [
         I18N::translate('Average age'),
     ]
 ];
-
-DebugBar::startMeasure('ANCESTORS_TABLE');
 
 ?>
 
@@ -301,12 +297,12 @@ DebugBar::startMeasure('ANCESTORS_TABLE');
                     <?php $birth_dates = $individual->getAllBirthDates(); ?>
 
                     <?php foreach ($birth_dates as $birth_date) : ?>
-                        <?= $birth_date->display(true) ?>
+                        <?= $birth_date->display($tree) ?>
                         <br>
                     <?php endforeach ?>
 
-                    <?php if (empty($birth_dates) && $show_estimated_dates) : ?>
-                        <?= $estimated_birth_date->display(true) ?>
+                    <?php if (count($birth_dates) === 0 && $show_estimated_dates) : ?>
+                        <?= $estimated_birth_date->display($tree) ?>
                     <?php endif ?>
                 </td>
                 
@@ -339,12 +335,12 @@ DebugBar::startMeasure('ANCESTORS_TABLE');
                 <?php $death_dates = $individual->getAllDeathDates() ?>
                 <td data-sort="<?= $individual->getEstimatedDeathDate()->julianDay() ?>">
                     <?php foreach ($death_dates as $num => $death_date) : ?>
-                        <?= $death_date->display(true) ?>
+                        <?= $death_date->display($tree) ?>
                     <br>
                     <?php endforeach ?>
 
-                    <?php if (empty($death_dates) && $show_estimated_dates && $individual->getEstimatedDeathDate()->minimumDate()->minimumJulianDay() < $today_jd) : ?>
-                        <?= $individual->getEstimatedDeathDate()->display(true) ?>
+                    <?php if (count($death_dates) === 0 && $show_estimated_dates && $individual->getEstimatedDeathDate()->minimumDate()->minimumJulianDay() < $today_jd) : ?>
+                        <?= $individual->getEstimatedDeathDate()->display($tree) ?>
                     <?php endif ?>
                 </td>
                 

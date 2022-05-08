@@ -14,7 +14,6 @@ use Symfony\Component\Finder\Finder;
 
 class RoboFile extends \Robo\Tasks
 {
-
     /**
      * Build the application ready for use.
      *

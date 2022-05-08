@@ -15,7 +15,6 @@
     "production": "npx mix --production"
   },
   "devDependencies": {
-    "@mjhenkes/postcss-rtl": "^2.0.0",
     "autoprefixer": "^10.2.4",
     "clean-webpack-plugin": "^4.0.0",
     "cross-env": "^7.0.3",
@@ -24,6 +23,7 @@
     "postcss": "^8.1.14",
     "postcss-custom-properties": "^12.0.0",
     "postcss-image-inliner": "^5.0.0",
+    "postcss-rtlcss": "^3.6.3",
     "sass": "^1.32.8",
     "sass-loader": "^12.1.0",
     "webpack": "^5.23.0",

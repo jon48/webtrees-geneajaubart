@@ -4,17 +4,16 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
 use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
-use MyArtJaub\Webtrees\Module\GeoDispersionModule;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\AdminConfigPage;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewAddAction;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Views\AbstractGeoAnalysisView;
 
 /**
- * @var GeoDispersionModule                 $module
+ * @var \MyArtJaub\Webtrees\Module\GeoDispersion\GeoDispersionModule $module
  * @var string                              $title
  * @var Tree                                $tree
  * @var AbstractGeoAnalysisView             $view
- * @var Collection<GeoAnalysisInterface>    $geoanalysis_list
+ * @var \Illuminate\Support\Collection<\MyArtJaub\Webtrees\Contracts\GeoDispersion\GeoAnalysisInterface>    $geoanalysis_list
  * @var array                               $place_example
  * @var string                              $global_settings
  */
@@ -48,7 +47,7 @@ uasort($view_types, I18N::comparator());
             <?= I18N::translate('Type') ?>
         </label>
         <div class="col-sm-9">
-            <select class="form-select select2" id="view_type" name="view_type">
+            <select class="form-select tom-select" id="view_type" name="view_type">
             <?php foreach ($view_types as $type_key => $type_name) : ?>
                 <option value="<?= e($type_key) ?>"><?= $type_name ?></option>
             <?php endforeach;?>

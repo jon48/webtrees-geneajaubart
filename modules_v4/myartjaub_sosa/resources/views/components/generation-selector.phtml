@@ -16,7 +16,7 @@ use Fisharebest\Webtrees\Tree;
 // GET request from a form will not pass the parameters in the action attribute, so the route needs to be set as hidden input
 $route_url = route($route_name, [ 'tree' => $tree->name() ]);
 $route_params = [];
-parse_str(parse_url($route_url, PHP_URL_QUERY) ?? '', $route_params);
+parse_str(parse_url($route_url, PHP_URL_QUERY) ?: '', $route_params);
 $route = $route_params['route'] ?? '';
 
 ?>

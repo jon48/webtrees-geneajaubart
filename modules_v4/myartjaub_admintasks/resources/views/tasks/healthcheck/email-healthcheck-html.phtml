@@ -25,7 +25,7 @@ use Illuminate\Support\Collection;
 
 <div dir="<?= e(I18N::locale()->direction()) ?>" lang="<?= e(I18N::locale()->languageTag()) ?>">
     <h2>
-        <?= e(I18N::translate('Health Check Report for the last %d days', $nb_days)) ?>
+        <?= e(I18N::translate('Health Check Report for the last %d days', I18N::number($nb_days))) ?>
     </h2>
     
     <h3>
@@ -101,7 +101,7 @@ use Illuminate\Support\Collection;
     </table>
     
     <?php if ($nb_errors > 0) : ?>
-    <h4><?= e(I18N::translate('Errors [%d]', $nb_errors)) ?></h4>
+    <h4><?= e(I18N::translate('Errors [%d]', I18N::number($nb_errors))) ?></h4>
     <p>
         <a href="<?= route(SiteLogsData::class) ?>"><?= e(I18N::translate('Website logs')) ?></a>
     </p>
@@ -128,7 +128,7 @@ use Illuminate\Support\Collection;
     </table>
     
     <?php else : ?>
-    <h4><?= e(I18N::translate('Errors', $nb_errors)) ?></h4>
+    <h4><?= e(I18N::translate('Errors', I18N::number($nb_errors))) ?></h4>
     <p>
         <?= e(I18N::translate('No errors')) ?>
     </p>

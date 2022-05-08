@@ -20,15 +20,13 @@ use Illuminate\Support\Collection;
  */
 
 $add_branch = function (array $chart, ?stdClass $branch, $color) use ($relationship_service, $root_indi): array {
-    if ($branch !== null) {
+    if ($branch !== null && $root_indi !== null) {
+        $relative = Registry::individualFactory()->make($branch->majs_i_id ?? '', $root_indi->tree());
         $chart['colors'][] = $color;
         $chart['data'][] = [
-            $branch->majs_i_id === null ?
+            ($branch->majs_i_id === null || $relative === null) ?
                 I18N::translate('Shared') :
-                $relationship_service->getCloseRelationshipName(
-                    $root_indi,
-                    Registry::individualFactory()->make($branch->majs_i_id, $root_indi->tree())
-                ),
+                $relationship_service->getCloseRelationshipName($root_indi, $relative),
             (int) $branch->count_indi
         ];
     }

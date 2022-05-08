@@ -4,17 +4,16 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
 use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
-use MyArtJaub\Webtrees\Module\GeoDispersionModule;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\AdminConfigPage;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewEditAction;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Views\AbstractGeoAnalysisView;
 
 /**
- * @var GeoDispersionModule                 $module
+ * @var \MyArtJaub\Webtrees\Module\GeoDispersion\GeoDispersionModule    $module
  * @var string                              $title
  * @var Tree                                $tree
  * @var AbstractGeoAnalysisView             $view
- * @var Collection<GeoAnalysisInterface>    $geoanalysis_list
+ * @var \Illuminate\Support\Collection<\MyArtJaub\Webtrees\Contracts\GeoDispersion\GeoAnalysisInterface>    $geoanalysis_list
  * @var array                               $place_example
  * @var string                              $global_settings
  */
@@ -58,7 +57,7 @@ use MyArtJaub\Webtrees\Module\GeoDispersion\Views\AbstractGeoAnalysisView;
             <select class="form-select" id="view_top_places" name="view_top_places">
                 <option value="0" <?= 0 === $view->numberTopPlaces() ? 'selected' : '' ?>><?= I18N::translate('All') ?></option>
                 <?php for ($level = 1; $level <= 10; $level++) : ?>
-                <option value="<?= e($level) ?>" <?= $level === $view->numberTopPlaces() ? 'selected' : '' ?>>
+                <option value="<?= $level ?>" <?= $level === $view->numberTopPlaces() ? 'selected' : '' ?>>
                     <?= I18N::number($level) ?>
                 </option>
                 <?php endfor;?>

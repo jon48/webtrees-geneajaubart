@@ -5,9 +5,9 @@ use Fisharebest\Webtrees\Services\ModuleService;
 use MyArtJaub\Webtrees\Module\MiscExtensions\MiscExtensionsModule;
 
 /**
- * @var Collection<UserInterface>            $administrators
- * @var Collection<ModuleAnalyticsInterface> $analytics
- * @var string                               $title
+ * @var \Illuminate\Support\Collection<\Fisharebest\Webtrees\Contracts\UserInterface>   $administrators
+ * @var \Illuminate\Support\Collection<\Fisharebest\Webtrees\Module\ModuleAnalyticsInterface>   $analytics
+ * @var string      $title
  */
 
 $misc_module = app(ModuleService::class)->findByInterface(MiscExtensionsModule::class)->first();

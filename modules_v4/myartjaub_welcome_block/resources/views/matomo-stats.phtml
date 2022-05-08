@@ -1,11 +1,11 @@
 <?php
 
-use Fisharebest\Webtrees\Carbon;
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 
 /**
- * @var int $visits_year
- * @var int $visits_today
+ * @var int|NULL $visits_year
+ * @var int|NULL $visits_today
  */
 
 ?>
@@ -14,7 +14,7 @@ use Fisharebest\Webtrees\I18N;
     <?= I18N::translate(
         '%1$s visits since the beginning of %2$s<br>(%3$s today)',
         '<span class="odometer">' . I18N::number($visits_year) . '</span>',
-        Carbon::now()->year,
+        Registry::timestampFactory()->now()->format('Y'),
         '<span class="odometer">' . I18N::number($visits_today ?? 0) . '</span>'
     ); ?>
 <?php else : ?>

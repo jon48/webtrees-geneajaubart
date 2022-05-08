@@ -8,14 +8,14 @@ use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
 use MyArtJaub\Webtrees\Common\GeoDispersion\Config\MapColorsConfig;
 use MyArtJaub\Webtrees\Common\GeoDispersion\GeoAnalysis\GeoAnalysisResult;
-use MyArtJaub\Webtrees\Module\GeoDispersion\Views\GeoAnalysisView;
+use MyArtJaub\Webtrees\Module\GeoDispersion\Views\AbstractGeoAnalysisView;
 use Ramsey\Uuid\Uuid;
 use Spatie\Color\Color;
 
 /**
  * @var string                          $module_name
  * @var Tree                            $tree
- * @var GeoAnalysisView                 $view
+ * @var AbstractGeoAnalysisView         $view
  * @var GeoAnalysisResult               $result
  * @var callable                        $items_descr
  * @var Brick\Geo\IO\GeoJSON\Feature[]  $features

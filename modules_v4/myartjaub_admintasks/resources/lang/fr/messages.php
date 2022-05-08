@@ -92,7 +92,7 @@ return array (
                                     =>  'Une erreur s’est produite lors de la mise à jour des paramètres de la tâche « %s ».',
     'The frequency is not in a valid format.'
                                     =>  'Le paramètre de fréquence n’a pas un format valide.',
-    'The number of remaining occurences is not in a valid format.'
+    'The number of remaining occurrences is not in a valid format.'
                                     =>  'Le paramètre pour le nombre d’occurrences restantes n’a pas un format valide.',
 
 );

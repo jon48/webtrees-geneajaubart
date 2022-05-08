@@ -9,6 +9,9 @@ use MyArtJaub\Webtrees\Module\PatronymicLineage\Model\LineageRootNode;
  * @var Tree                $tree
  * @var LineageRootNode     $root_node
  */
+
+$places = $root_node->places();
+
 ?>
 
 <div class="maj-patrolineage-lineage">
@@ -23,7 +26,7 @@ use MyArtJaub\Webtrees\Module\PatronymicLineage\Model\LineageRootNode;
 <?php endif; ?>
 
 
-<?php if (($places = $root_node->places()) && count($places) > 0) : ?>
+<?php if ($places->count() > 0) : ?>
 <div class="maj-patrolineage-places">
     <?= view($module->name() . '::lineage/places-cloud', ['module' => $module, 'tree' => $tree, 'places' => $places ]); ?>
 </div>

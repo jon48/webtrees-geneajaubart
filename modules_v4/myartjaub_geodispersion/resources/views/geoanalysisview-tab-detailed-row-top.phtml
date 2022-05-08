@@ -32,7 +32,7 @@ $perc_known =  $places_total > 0 ? $places_known / $places_total : 0;
 <div class="wt-page-options-value maj-geodisp-cell-detailed-top">
 <?= $result->sortedKnownPlaces()
     ->take($number_top_places)
-    ->map(function (GeoAnalysisResultItem $item) use ($places_known) {
+    ->map(function (GeoAnalysisResultItem $item) use ($places_known): string {
         $place = $item->place();
         $count = $item->count();
         return I18N::translate(

@@ -14,12 +14,12 @@ use Ramsey\Uuid\Uuid;
  * @var string                  $module_name
  * @var GeoAnalysisMap          $view
  * @var MapColorsConfig         $colors
- * @var Collection<\MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisMapAdapter\GeoAnalysisMapAdapter|mull> $map_adapters
+ * @var \Illuminate\Support\Collection<\MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisMapAdapter|NULL> $map_adapters
  */
 
 $table_id = 'table-maj-mapadapters-' . Uuid::uuid4();
-
 $count_adapters = $map_adapters->count();
+/** @var \Illuminate\Support\Collection<\MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisMapAdapter> $map_adapters */
 $map_adapters = $map_adapters->filter();
 $has_invalid_adapters = $count_adapters - $map_adapters->count() > 0;
 
@@ -101,4 +101,3 @@ $('#<?= $table_id ?>').DataTable();
     
 </script>
 <?php View::endpush() ?>
-

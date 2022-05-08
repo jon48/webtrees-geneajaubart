@@ -12,11 +12,11 @@ use MyArtJaub\Webtrees\Module\IsSourced\Data\SourceStatus;
 
 <span class="maj-icon-sourcestatus <?= $css_class ?> fa-layers fa-fw <?= $size_style ?>" aria-hidden="true" title="<?= $source_status->label($context) ?>">
     <?php if ($source_status->hasSupportingDocument()) : ?>
-    <i class="fas fa-scroll" data-fa-transform="flip-h right-2"></i>
+    <i class="fa-solid fa-scroll" data-fa-transform="flip-h right-2"></i>
     <?php endif; ?>
     <?php if ($source_status->hasSource()) :?>
-        <i class="fas fa-check"></i>
+        <i class="fa-solid fa-check"></i>
     <?php else : ?>
-        <i class="fas fa-exclamation-triangle"></i>
+        <i class="fa-solid fa-triangle-exclamation"></i>
     <?php endif; ?>
 </span>

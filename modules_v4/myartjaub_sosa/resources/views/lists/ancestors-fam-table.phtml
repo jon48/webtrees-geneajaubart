@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Fisharebest\Webtrees\Age;
-use Fisharebest\Webtrees\Carbon;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Registry;
@@ -14,13 +13,13 @@ use Ramsey\Uuid\Uuid;
 /**
  * @var string                      $module_name
  * @var Tree                        $tree
- * @var Collection<int,Family>      $families
+ * @var \Illuminate\Support\Collection<int, \Fisharebest\Webtrees\Family>   $families
  */
 
 $table_id = 'table-ancestors-fam-' . Uuid::uuid4()->toString(); // lists requires a unique ID in case there are multiple lists per page
 
-$today_jd          = Carbon::now()->julianDay();
-$hundred_years_ago = Carbon::now()->subYears(100)->julianDay();
+$today_jd          = Registry::timestampFactory()->now()->julianDay();
+$hundred_years_ago = Registry::timestampFactory()->now()->subtractYears(100)->julianDay();
 
 ?>
 
@@ -28,9 +27,8 @@ $hundred_years_ago = Carbon::now()->subYears(100)->julianDay();
 <?php
     $maj_columns = hook(
         \MyArtJaub\Webtrees\Contracts\Hooks\SosaFamilyDatatablesExtenderInterface::class,
-        fn(\MyArtJaub\Webtrees\Contracts\Hooks\SosaFamilyDatatablesExtenderInterface $hook) => $hook->sosaFamilyColumns($families),
-        []
-    );
+        fn(\MyArtJaub\Webtrees\Module\Hooks\Hooks\SosaFamilyDatatablesExtenderCollector $hook) => $hook->sosaFamilyColumns($families)
+    ) ?? [];
     $maj_issourced_marr = $maj_columns['issourced']['marr'] ?? null;
 
     $column_indexes = [];
@@ -59,7 +57,7 @@ $("#<?= e($table_id) ?> > .maj-table-ancestors-family").dataTable({
         /* Marriage date     */ { type: "num" },
         /* Marriage place    */ { type: "text" },
         //MYARTJAUB-START
-        <?= $maj_issourced_marr ? json_encode($maj_issourced_marr['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
+        <?= $maj_issourced_marr !== null ? json_encode($maj_issourced_marr['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
         /* Children          */ { type: "num" },
         /* Filter marriage   */ { sortable: false },
@@ -332,9 +330,10 @@ $marriageAgeData = [
 
                 <!-- Marriage date -->
                 <td data-sort="<?= $family->getMarriageDate()->julianDay() ?>">
-                    <?php if ($marriage_dates = $family->getAllMarriageDates()) : ?>
+                    <?php $marriage_dates = $family->getAllMarriageDates(); ?>
+                    <?php if (count($marriage_dates) > 0) : ?>
                         <?php foreach ($marriage_dates as $n => $marriage_date) : ?>
-                            <div><?= $marriage_date->display(true) ?></div>
+                            <div><?= $marriage_date->display($tree) ?></div>
                         <?php endforeach ?>
                         <?php if ($marriage_dates[0]->gregorianYear() >= 1550 && $marriage_dates[0]->gregorianYear() < 2030) : ?>
                             <?php

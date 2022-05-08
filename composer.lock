@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a68a3340cfde037198b311d4a6b6d3d",
+    "content-hash": "6711fc197c8e0803d59d70e70e7f640c",
     "packages": [
         {
             "name": "aura/router",
@@ -2396,7 +2396,7 @@
         },
         {
             "name": "illuminate/collections",
-            "version": "v8.83.10",
+            "version": "v8.83.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/collections.git",
@@ -2501,7 +2501,7 @@
         },
         {
             "name": "illuminate/contracts",
-            "version": "v8.83.10",
+            "version": "v8.83.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/contracts.git",
@@ -2617,7 +2617,7 @@
         },
         {
             "name": "illuminate/macroable",
-            "version": "v8.83.10",
+            "version": "v8.83.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/macroable.git",
@@ -2877,16 +2877,16 @@
         },
         {
             "name": "jon48/webtrees-lib",
-            "version": "dev-feature/2.1-dev",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "b8efed94870f810c00b6d39312e1e138fa0a9a00"
+                "reference": "a2ce2d5a4d43037ce96361be2d71dba523256646"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/b8efed94870f810c00b6d39312e1e138fa0a9a00",
-                "reference": "b8efed94870f810c00b6d39312e1e138fa0a9a00",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/a2ce2d5a4d43037ce96361be2d71dba523256646",
+                "reference": "a2ce2d5a4d43037ce96361be2d71dba523256646",
                 "shasum": ""
             },
             "require": {
@@ -2895,7 +2895,7 @@
                 "brick/math": "~0.9",
                 "fig/http-message-util": "^1.1",
                 "fisharebest/flysystem-chroot-adapter": "~2.0",
-                "fisharebest/webtrees": "2.1.0-alpha.1",
+                "fisharebest/webtrees": "~2.1.1",
                 "guzzlehttp/guzzle": "~7.1",
                 "illuminate/collections": "~8.20",
                 "illuminate/database": "~8.20",
@@ -2920,6 +2920,7 @@
             "suggest": {
                 "ext-sodium": "Better performance, password hashing (Argon2i), secure memory management (memzero), and better security."
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -2949,27 +2950,27 @@
             ],
             "support": {
                 "issues": "http://bugs.jaubart.com",
-                "source": "https://github.com/jon48/webtrees-lib/tree/feature/2.1-dev"
+                "source": "https://github.com/jon48/webtrees-lib/tree/feature/code-analysis"
             },
-            "time": "2022-03-07T21:48:53+00:00"
+            "time": "2022-05-08T14:50:10+00:00"
         },
         {
             "name": "jon48/webtrees-mod-maj-geodata-france",
-            "version": "dev-feature/2.1-dev",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-mod-maj-geodata-france.git",
-                "reference": "b2c75299040d22117005db22171e96f356e9873f"
+                "reference": "5d9bd32abc3c01ec9ea3589776e330082ece210d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-mod-maj-geodata-france/zipball/b2c75299040d22117005db22171e96f356e9873f",
-                "reference": "b2c75299040d22117005db22171e96f356e9873f",
+                "url": "https://api.github.com/repos/jon48/webtrees-mod-maj-geodata-france/zipball/5d9bd32abc3c01ec9ea3589776e330082ece210d",
+                "reference": "5d9bd32abc3c01ec9ea3589776e330082ece210d",
                 "shasum": ""
             },
             "require": {
-                "fisharebest/webtrees": "2.1.0-alpha.1",
-                "jon48/webtrees-lib": "dev-feature/2.1-dev",
+                "fisharebest/webtrees": "~2.1.1",
+                "jon48/webtrees-lib": "dev-main",
                 "league/flysystem": "~2.0"
             },
             "require-dev": {
@@ -2978,6 +2979,7 @@
                 "phpstan/phpstan-strict-rules": "^1.0",
                 "phpunit/phpunit": "@stable"
             },
+            "default-branch": true,
             "type": "webtrees-module",
             "extra": {
                 "installer-name": "myartjaub_geodata_france"
@@ -3008,37 +3010,38 @@
             ],
             "support": {
                 "issues": "https://github.com/jon48/webtrees-mod-maj-geodata-france/issues",
-                "source": "https://github.com/jon48/webtrees-mod-maj-geodata-france/tree/feature/2.1-dev"
+                "source": "https://github.com/jon48/webtrees-mod-maj-geodata-france/tree/main"
             },
-            "time": "2022-03-07T23:58:39+00:00"
+            "time": "2022-05-08T15:04:40+00:00"
         },
         {
             "name": "jon48/webtrees-mod-translationtool",
-            "version": "dev-feature/2.1-dev",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-mod-translationtool.git",
-                "reference": "3730d0437baed726aca920e58b7fab06eecbddcc"
+                "reference": "8cb7782df3db3b17007b778d0fa5dd26c5995e8b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-mod-translationtool/zipball/3730d0437baed726aca920e58b7fab06eecbddcc",
-                "reference": "3730d0437baed726aca920e58b7fab06eecbddcc",
+                "url": "https://api.github.com/repos/jon48/webtrees-mod-translationtool/zipball/8cb7782df3db3b17007b778d0fa5dd26c5995e8b",
+                "reference": "8cb7782df3db3b17007b778d0fa5dd26c5995e8b",
                 "shasum": ""
             },
             "require": {
                 "composer/composer": "^1.0|^2.0",
                 "fisharebest/localization": "~1.0",
-                "fisharebest/webtrees": "2.1.0-alpha.1",
+                "fisharebest/webtrees": "~2.1.1",
                 "gettext/gettext": "~5.0",
                 "gettext/php-scanner": "~1.0",
-                "jon48/webtrees-lib": "dev-feature/2.1-dev"
+                "jon48/webtrees-lib": "dev-main"
             },
             "require-dev": {
                 "phpstan/phpstan-deprecation-rules": "^1.0",
                 "phpstan/phpstan-phpunit": "^1.0",
                 "phpstan/phpstan-strict-rules": "^1.0"
             },
+            "default-branch": true,
             "type": "webtrees-module",
             "extra": {
                 "installer-name": "myartjaub_translationtool"
@@ -3070,29 +3073,30 @@
             ],
             "support": {
                 "issues": "https://github.com/jon48/webtrees-mod-translationtool/issues",
-                "source": "https://github.com/jon48/webtrees-mod-translationtool/tree/feature/2.1-dev"
+                "source": "https://github.com/jon48/webtrees-mod-translationtool/tree/feature/code-analysis"
             },
-            "time": "2022-03-07T23:52:00+00:00"
+            "time": "2022-05-08T16:00:03+00:00"
         },
         {
             "name": "jon48/webtrees-theme-rural",
-            "version": "dev-feature/2.1-dev",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-theme-rural.git",
-                "reference": "7d064577b297eb9d685a07ba59cbaa24ce67cae9"
+                "reference": "7011329643add8154c86e68ea223c25c104b78f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-theme-rural/zipball/7d064577b297eb9d685a07ba59cbaa24ce67cae9",
-                "reference": "7d064577b297eb9d685a07ba59cbaa24ce67cae9",
+                "url": "https://api.github.com/repos/jon48/webtrees-theme-rural/zipball/7011329643add8154c86e68ea223c25c104b78f6",
+                "reference": "7011329643add8154c86e68ea223c25c104b78f6",
                 "shasum": ""
             },
             "require-dev": {
                 "consolidation/robo": "^3.0",
-                "fisharebest/webtrees": "2.1.0-beta.2",
+                "fisharebest/webtrees": "2.1.1",
                 "psr/http-message": "^1.0"
             },
+            "default-branch": true,
             "type": "webtrees-theme",
             "extra": {
                 "installer-name": "myartjaub_ruraltheme"
@@ -3117,9 +3121,9 @@
             ],
             "support": {
                 "issues": "https://github.com/jon48/webtrees-theme-rural/issues",
-                "source": "https://github.com/jon48/webtrees-theme-rural/tree/feature/2.1-dev"
+                "source": "https://github.com/jon48/webtrees-theme-rural/tree/main"
             },
-            "time": "2022-04-11T23:40:20+00:00"
+            "time": "2022-05-08T18:27:50+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -9041,20 +9045,20 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.99",
+            "version": "1.6.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "b4d40f1d759942f523be267a1bab6884f46ca3f7"
+                "reference": "d41c39cb2e487663bce9bbd97c660e244b73abad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/b4d40f1d759942f523be267a1bab6884f46ca3f7",
-                "reference": "b4d40f1d759942f523be267a1bab6884f46ca3f7",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/d41c39cb2e487663bce9bbd97c660e244b73abad",
+                "reference": "d41c39cb2e487663bce9bbd97c660e244b73abad",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1|^8.0"
+                "php": "^7.2|^8.0"
             },
             "conflict": {
                 "phpstan/phpstan-shim": "*"
@@ -9064,11 +9068,6 @@
                 "phpstan.phar"
             ],
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.12-dev"
-                }
-            },
             "autoload": {
                 "files": [
                     "bootstrap.php"
@@ -9081,7 +9080,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.99"
+                "source": "https://github.com/phpstan/phpstan/tree/1.6.7"
             },
             "funding": [
                 {
@@ -9101,36 +9100,35 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-09-12T20:09:55+00:00"
+            "time": "2022-05-04T22:55:41+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
-            "version": "0.12.6",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan-deprecation-rules.git",
-                "reference": "46dbd43c2db973d2876d6653e53f5c2cc3a01fbb"
+                "reference": "e5ccafb0dd8d835dd65d8d7a1a0d2b1b75414682"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-deprecation-rules/zipball/46dbd43c2db973d2876d6653e53f5c2cc3a01fbb",
-                "reference": "46dbd43c2db973d2876d6653e53f5c2cc3a01fbb",
+                "url": "https://api.github.com/repos/phpstan/phpstan-deprecation-rules/zipball/e5ccafb0dd8d835dd65d8d7a1a0d2b1b75414682",
+                "reference": "e5ccafb0dd8d835dd65d8d7a1a0d2b1b75414682",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.1 || ^8.0",
-                "phpstan/phpstan": "^0.12.60"
+                "phpstan/phpstan": "^1.0"
             },
             "require-dev": {
-                "phing/phing": "^2.16.3",
                 "php-parallel-lint/php-parallel-lint": "^1.2",
-                "phpstan/phpstan-phpunit": "^0.12",
-                "phpunit/phpunit": "^7.5.20"
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpunit/phpunit": "^9.5"
             },
             "type": "phpstan-extension",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.12-dev"
+                    "dev-master": "1.0-dev"
                 },
                 "phpstan": {
                     "includes": [
@@ -9150,41 +9148,39 @@
             "description": "PHPStan rules for detecting usage of deprecated classes, methods, properties, constants and traits.",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan-deprecation-rules/issues",
-                "source": "https://github.com/phpstan/phpstan-deprecation-rules/tree/0.12.6"
+                "source": "https://github.com/phpstan/phpstan-deprecation-rules/tree/1.0.0"
             },
-            "time": "2020-12-13T10:20:54+00:00"
+            "time": "2021-09-23T11:02:21+00:00"
         },
         {
             "name": "phpstan/phpstan-phpunit",
-            "version": "0.12.22",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan-phpunit.git",
-                "reference": "7c01ef93bf128b4ac8bdad38c54b2a4fd6b0b3cc"
+                "reference": "4a3c437c09075736285d1cabb5c75bf27ed0bc84"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-phpunit/zipball/7c01ef93bf128b4ac8bdad38c54b2a4fd6b0b3cc",
-                "reference": "7c01ef93bf128b4ac8bdad38c54b2a4fd6b0b3cc",
+                "url": "https://api.github.com/repos/phpstan/phpstan-phpunit/zipball/4a3c437c09075736285d1cabb5c75bf27ed0bc84",
+                "reference": "4a3c437c09075736285d1cabb5c75bf27ed0bc84",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1 || ^8.0",
-                "phpstan/phpstan": "^0.12.92"
+                "php": "^7.2 || ^8.0",
+                "phpstan/phpstan": "^1.5.0"
             },
             "conflict": {
                 "phpunit/phpunit": "<7.0"
             },
             "require-dev": {
+                "nikic/php-parser": "^4.13.0",
                 "php-parallel-lint/php-parallel-lint": "^1.2",
-                "phpstan/phpstan-strict-rules": "^0.12.6",
+                "phpstan/phpstan-strict-rules": "^1.0",
                 "phpunit/phpunit": "^9.5"
             },
             "type": "phpstan-extension",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "0.12-dev"
-                },
                 "phpstan": {
                     "includes": [
                         "extension.neon",
@@ -9204,38 +9200,36 @@
             "description": "PHPUnit extensions and rules for PHPStan",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan-phpunit/issues",
-                "source": "https://github.com/phpstan/phpstan-phpunit/tree/0.12.22"
+                "source": "https://github.com/phpstan/phpstan-phpunit/tree/1.1.1"
             },
-            "time": "2021-08-12T10:53:43+00:00"
+            "time": "2022-04-20T15:24:25+00:00"
         },
         {
             "name": "phpstan/phpstan-strict-rules",
-            "version": "0.12.11",
+            "version": "1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan-strict-rules.git",
-                "reference": "2b72e8e17d2034145f239126e876e5fb659675e2"
+                "reference": "0c82c96f2a55d8b91bbc7ee6512c94f68a206b43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-strict-rules/zipball/2b72e8e17d2034145f239126e876e5fb659675e2",
-                "reference": "2b72e8e17d2034145f239126e876e5fb659675e2",
+                "url": "https://api.github.com/repos/phpstan/phpstan-strict-rules/zipball/0c82c96f2a55d8b91bbc7ee6512c94f68a206b43",
+                "reference": "0c82c96f2a55d8b91bbc7ee6512c94f68a206b43",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1 || ^8.0",
-                "phpstan/phpstan": "^0.12.96"
+                "php": "^7.2 || ^8.0",
+                "phpstan/phpstan": "^1.6.3"
             },
             "require-dev": {
+                "nikic/php-parser": "^4.13.0",
                 "php-parallel-lint/php-parallel-lint": "^1.2",
-                "phpstan/phpstan-phpunit": "^0.12.16",
+                "phpstan/phpstan-phpunit": "^1.0",
                 "phpunit/phpunit": "^9.5"
             },
             "type": "phpstan-extension",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "0.12-dev"
-                },
                 "phpstan": {
                     "includes": [
                         "rules.neon"
@@ -9254,9 +9248,9 @@
             "description": "Extra strict and opinionated rules for PHPStan",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan-strict-rules/issues",
-                "source": "https://github.com/phpstan/phpstan-strict-rules/tree/0.12.11"
+                "source": "https://github.com/phpstan/phpstan-strict-rules/tree/1.2.3"
             },
-            "time": "2021-08-21T11:36:27+00:00"
+            "time": "2022-05-04T15:20:40+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

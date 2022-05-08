@@ -1111,9 +1111,11 @@ class Individual extends GedcomRecord
     {
         return
             //MYARTJAUB-START
-            hook(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface::class,
-            fn(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface $hook) => $hook->recordNameAppend($this),
-            '') .
+            hook(
+                \MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface::class,
+                fn(\MyArtJaub\Webtrees\Module\Hooks\Hooks\RecordNameTextExtenderCollector $hook) => $hook->recordNameAppend($this),
+                ''
+            ) .
             //MYARTJAUB-END
             $this->formatFirstMajorFact(Gedcom::BIRTH_EVENTS, 1) .
             $this->formatFirstMajorFact(Gedcom::DEATH_EVENTS, 1);

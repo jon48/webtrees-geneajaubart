@@ -14,7 +14,7 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
  * @var string              $module_name
  * @var string              $title
  * @var Tree                $tree
- * @var Collection<Tree>    $other_trees
+ * @var \Illuminate\Support\Collection<Tree>    $other_trees
  * @var string              $data_folder
  */
 
@@ -77,7 +77,7 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
             </div>
         </div>
         <div class="col-sm-9">
-            <?= view('components/select', ['name' => 'MAJ_CERTIF_SHOW_CERT', 'selected' => $tree->getPreference('MAJ_CERTIF_SHOW_CERT', Auth::PRIV_HIDE), 'options' => Auth::accessLevelNames()]) ?>
+            <?= view('components/select', ['name' => 'MAJ_CERTIF_SHOW_CERT', 'selected' => $tree->getPreference('MAJ_CERTIF_SHOW_CERT', (string) Auth::PRIV_HIDE), 'options' => Auth::accessLevelNames()]) ?>
             <p class="form-text">
                 <?= I18N::translate('Define access level required to display certificates in facts sources. By default, nobody can see the certificates.') ?>
             </p>
@@ -99,7 +99,7 @@ use MyArtJaub\Webtrees\Module\Certificates\Model\Watermark;
             </div>
         </div>
         <div class="col-sm-9">
-            <?= view('components/select', ['name' => 'MAJ_CERTIF_SHOW_NO_WATERMARK', 'selected' => $tree->getPreference('MAJ_CERTIF_SHOW_NO_WATERMARK', Auth::PRIV_HIDE), 'options' => Auth::accessLevelNames()]) ?>
+            <?= view('components/select', ['name' => 'MAJ_CERTIF_SHOW_NO_WATERMARK', 'selected' => $tree->getPreference('MAJ_CERTIF_SHOW_NO_WATERMARK', (string) Auth::PRIV_HIDE), 'options' => Auth::accessLevelNames()]) ?>
             <p class="form-text">
                 <?= I18N::translate('Define access level of users who can see certificates without any watermark. By default, everybody will see the watermark.') ?>
             </p>

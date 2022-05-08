@@ -6,13 +6,13 @@ use Fisharebest\Webtrees\I18N;
 
 /**
  * @var array<array<mixed>>     $data
- * @var int                     $pieStartAngle
- * @var int                     $steps
- * @var string                  $labeledValueText
+ * @var int|NULL                $pieStartAngle
+ * @var int|NULL                $steps
+ * @var string|NULL             $labeledValueText
  * @var array<string>           $colors
  * @var string                  $language
- * @var int|string              $width
- * @var int|string              $height
+ * @var int|string|NULL         $width
+ * @var int|string|NULL         $height
  */
 
 $id   = 'google-chart-' . bin2hex(random_bytes(8));
@@ -29,9 +29,9 @@ $steps = $steps ?? null;
 
     let <?= $name ?> = function () {
         let colors = majSosa.colors.fromCss(<?= json_encode($colors, JSON_THROW_ON_ERROR) ?>);
-        <?php if($steps !== null) : ?>
+        <?php if ($steps !== null) : ?>
         if(colors.length > 1) {
-            colors = majSosa.colors.interpolateRgb(colors[0], colors[1], <?= (int) $steps ?>);
+            colors = majSosa.colors.interpolateRgb(colors[0], colors[1], <?= $steps ?>);
         }
         <?php endif; ?>
 
@@ -39,10 +39,10 @@ $steps = $steps ?? null;
             <?= json_encode($id, JSON_THROW_ON_ERROR) ?>,
             <?= json_encode($data, JSON_THROW_ON_ERROR) ?>,
             {
-                <?php if ($height !== null) : ?>height: <?= is_int($height) ? (int) $height : '"' . $height . '"' ?>,<?php endif; ?>
+                <?php if ($height !== null) : ?>height: <?= is_int($height) ? $height : '"' . $height . '"' ?>,<?php endif; ?>
                 chartArea : {
-                    <?php if ($width !== null) : ?>width: <?= is_int($width) ? (int) $width : '"' . $width . '"' ?>,<?php endif; ?>
-                    <?php if ($height !== null) : ?>height: <?= is_int($height) ? (int) $height * 0.9 : '"' . $height . '"' ?><?php endif; ?>
+                    <?php if ($width !== null) : ?>width: <?= is_int($width) ? $width : '"' . $width . '"' ?>,<?php endif; ?>
+                    <?php if ($height !== null) : ?>height: <?= is_int($height) ? $height * 0.9 : '"' . $height . '"' ?><?php endif; ?>
                 },
                 pieStartAngle: <?= json_encode($pieStartAngle ?? 0, JSON_THROW_ON_ERROR) ?>,
                 pieHole: 0,

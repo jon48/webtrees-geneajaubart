@@ -3,9 +3,9 @@
 use Fisharebest\Webtrees\I18N;
 
 /**
- * @var bool        $auto_width
- * @var bool        $state_save
- * @var array<int>  $length_menu
+ * @var bool|NULL       $auto_width
+ * @var bool|NULL       $state_save
+ * @var array<int>|NULL $length_menu
  */
 $auto_width = isset($auto_width) ? $auto_width : false;
 $state_save = isset($state_save) ? $state_save : true;
@@ -19,7 +19,7 @@ $length_menu_labels = array_map(function ($length): string {
 
 ?>
 
-data-auto-width="<?= $auto_width ? 'true' : 'false' ?>"
+data-auto-width="<?= $auto_width !== null && $auto_width ? 'true' : 'false' ?>"
 data-dom="<&quot;d-flex justify-content-between&quot;pf><t><&quot;d-flex justify-content-between&quot;irl>"
 data-state-save="<?= $state_save ? 'true' : 'false' ?>"
 data-length-menu="<?= e(json_encode([$length_menu, $length_menu_labels], JSON_THROW_ON_ERROR)) ?>"

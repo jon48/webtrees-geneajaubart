@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Fisharebest\Webtrees\GedcomTag;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Tree;
@@ -12,7 +11,7 @@ use Ramsey\Uuid\Uuid;
 
 /**
  * @var string                      $module_name
- * @var Collection<MissingAncestor> $list_missing
+ * @var \Illuminate\Support\Collection<MissingAncestor> $list_missing
  * @var Tree                        $tree
  * @var int                         $nb_missing_diff
  * @var int                         $nb_missing_shown
@@ -29,12 +28,12 @@ $nb_missing_hidden = $nb_missing_diff - $nb_missing_shown;
 ?>
 <!-- MYARTJAUB-START -->
 <?php
-    $missing_ancestors = $list_missing->map(fn(MissingAncestor $ancestor) => $ancestor->individual());
+    /** @var \Illuminate\Support\Collection<Individual> $missing_ancestors */
+    $missing_ancestors = $list_missing->map(fn(MissingAncestor $ancestor): Individual => $ancestor->individual());
     $maj_columns = hook(
         \MyArtJaub\Webtrees\Contracts\Hooks\SosaMissingDatatablesExtenderInterface::class,
-        fn(\MyArtJaub\Webtrees\Contracts\Hooks\SosaMissingDatatablesExtenderInterface $hook) => $hook->sosaMissingColumns($missing_ancestors),
-        []
-    );
+        fn(\MyArtJaub\Webtrees\Module\Hooks\Hooks\SosaMissingDatatablesExtenderCollector $hook) => $hook->sosaMissingColumns($missing_ancestors)
+    ) ?? [];
     $maj_issourced_indi = $maj_columns['issourced']['indi'] ?? null;
     $maj_issourced_birth = $maj_columns['issourced']['birth'] ?? null;
 
@@ -58,14 +57,14 @@ $("#<?= e($table_id) ?> > .maj-table-missing").dataTable({
         /* 1-Given names */   { type: "text",  class: "left"},
         /* 2-Surnames    */   { type: "text" },
         //MYARTJAUB-START
-        <?= $maj_issourced_indi ? json_encode($maj_issourced_indi['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
+        <?= $maj_issourced_indi !== null ? json_encode($maj_issourced_indi['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
         /* 3-Father      */   { type: "text", class: "text-center"},
         /* 4-Mother      */   { type: "text", class: "text-center"},
         /* 5-Birth date  */   { type: "num", class: "text-center"},
         /* 6-Birth place */   { type: "text", class: "text-center"},
         //MYARTJAUB-START
-        <?= $maj_issourced_birth ? json_encode($maj_issourced_birth['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
+        <?= $maj_issourced_birth !== null ? json_encode($maj_issourced_birth['column_def'], JSON_THROW_ON_ERROR) . ', ' : '' ?>
         //MYARTJAUB-END
         /* 7-Filter sex  */   { sortable: false },
         /* 8-Filter missing */{ sortable: false },
@@ -217,13 +216,13 @@ $("#<?= e($table_id) ?>")
                     <?php $birth_dates = $individual->getAllBirthDates(); ?>
 
                     <?php foreach ($birth_dates as $birth_date) : ?>
-                        <?= $birth_date->display(true) ?>
+                        <?= $birth_date->display($tree) ?>
                         <?php $known_birth_date = true; ?>
                         <br>
                     <?php endforeach ?>
 
-                    <?php if (empty($birth_dates) && $show_estimated_dates) : ?>
-                        <?= $estimated_birth_date->display(true) ?>
+                    <?php if (count($birth_dates) === 0 && $show_estimated_dates) : ?>
+                        <?= $estimated_birth_date->display($tree) ?>
                     <?php endif ?>
                 </td>
                 

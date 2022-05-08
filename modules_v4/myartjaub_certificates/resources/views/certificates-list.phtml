@@ -15,7 +15,7 @@ use Ramsey\Uuid\Uuid;
  * @var string[][]              $cities
  * @var string                  $selected_city
  * @var Collection              $certificates_list
- * @var UrlObfuscatorService    $url_obfuscator_service
+ * @var \MyArtJaub\Webtrees\Module\Certificates\Services\UrlObfuscatorService    $url_obfuscator_service
  */
 
 // lists requires a unique ID in case there are multiple lists per page
@@ -24,7 +24,7 @@ $table_id = 'table-maj-certificates-' . Uuid::uuid4()->toString();
 // GET request from a form will not pass the parameters in the action attribute, so the route needs to be set as hidden input
 $route_url = route(CertificatesList::class, [ 'tree' => $tree->name() ]);
 $route_params = [];
-parse_str(parse_url($route_url, PHP_URL_QUERY) ?? '', $route_params);
+parse_str(parse_url($route_url, PHP_URL_QUERY) ?: '', $route_params);
 $route = $route_params['route'] ?? '';
 
 ?>
@@ -105,7 +105,7 @@ $("#<?= e($table_id) ?>")
                 <tr>
                     <?php $date = $certificate->date(); ?>
                     <?php if ($date->isOK()) : ?>
-                    <td data-sort='<?= e($date->julianDay()) ?>'><?= $certificate->date()->display(true) ?></td>
+                    <td data-sort='<?= e($date->julianDay()) ?>'><?= $certificate->date()->display($tree) ?></td>
                     <?php else :  ?>
                     <td></td>
                     <?php endif; ?>

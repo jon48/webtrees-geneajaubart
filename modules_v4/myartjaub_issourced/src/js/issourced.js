@@ -24,7 +24,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 
 import {
-  faClock, faQuestion, faScroll, faTimesCircle
+  faClock, faQuestion, faScroll, faCircleXmark
 } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faQuestion, faScroll, faTimesCircle, faClock);
+library.add(faQuestion, faScroll, faCircleXmark, faClock);

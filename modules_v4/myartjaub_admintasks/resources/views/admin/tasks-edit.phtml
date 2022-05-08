@@ -4,11 +4,11 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\View;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
 use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
+use MyArtJaub\Webtrees\Common\Tasks\TaskSchedule;
+use MyArtJaub\Webtrees\Contracts\Tasks\TaskInterface;
 use MyArtJaub\Webtrees\Module\AdminTasks\AdminTasksModule;
-use MyArtJaub\Webtrees\Module\AdminTasks\Contracts\TaskInterface;
 use MyArtJaub\Webtrees\Module\AdminTasks\Http\RequestHandlers\AdminConfigPage;
 use MyArtJaub\Webtrees\Module\AdminTasks\Http\RequestHandlers\TaskEditAction;
-use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
 
 /**
  * @var AdminTasksModule    $module
@@ -38,7 +38,7 @@ use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
         </label>
         <div class="col-sm-9">
             <div class="input-group">
-                <input class="form-control" type="number" min="0" id="frequency" name="frequency" required maxlength="70" value="<?= e($task_schedule->frequency()->totalMinutes); ?>" dir="auto">
+                <input class="form-control" type="number" min="0" id="frequency" name="frequency" required maxlength="70" value="<?= $task_schedule->frequency() ?>" dir="auto">
                 <span class="input-group-text" dir="auto">
                     <?= e(I18N::translate('minutes')) ?>
                 </span>
@@ -56,7 +56,7 @@ use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
             <?= e(I18N::translate('Run a limited number of times')) ?>
         </label>
         <div class="col-sm-9">
-            <?= view('components/radios-inline', ['name' => 'is_limited', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => $task_schedule->remainingOccurences() > 0 ? 1 : 0]) ?>
+            <?= view('components/radios-inline', ['name' => 'is_limited', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => $task_schedule->remainingOccurrences() > 0 ? 1 : 0]) ?>
             <p class="form-text">
                 <?= e(I18N::translate('Defines whether the task should be run only a limited number of times.')) ?>
             </p>
@@ -64,13 +64,13 @@ use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
     </div>
             
     <!-- NB_OCCURRENCES -->
-    <div id="nb_occurences" class="row">
+    <div id="nb_occurrences" class="row">
         <label class="col-sm-3 col-form-label" for="nb_occur">
             <?= e(I18N::translate('Number of occurrences')) ?>
         </label>
         <div class="col-sm-9">
             <div class="input-group" >
-                <input class="form-control" type="number" min="0" id="nb_occur" name="nb_occur" maxlength="70" value="<?= e($task_schedule->remainingOccurences()) ?>" dir="auto">
+                <input class="form-control" type="number" min="0" id="nb_occur" name="nb_occur" maxlength="70" value="<?= $task_schedule->remainingOccurrences() ?>" dir="auto">
                 <span class="input-group-text" dir="auto">
                     <?= e(I18N::translate('time(s)')) ?>
                 </span>
@@ -102,10 +102,10 @@ use MyArtJaub\Webtrees\Module\AdminTasks\Model\TaskSchedule;
 
 function toggleRemainingOccurrences() {
     if($('input:radio[name="is_limited"]:checked').val() == 1) {
-        $('#nb_occurences').show();
+        $('#nb_occurrences').show();
     }
     else {
-        $('#nb_occurences').hide();
+        $('#nb_occurrences').hide();
     }
 }
 
@@ -114,4 +114,3 @@ toggleRemainingOccurrences();
 
 </script>
 <?php View::endpush() ?>
-

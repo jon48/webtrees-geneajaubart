@@ -20,7 +20,7 @@ $spouse_families = $node->families()->filter(function ($item) {
 $is_first_family = true;
 ?>
 
-<?php if ($node_indi->canShow()) : ?>
+<?php if ($node_indi !== null && $node_indi->canShow()) : ?>
 <ul>
     <?php if (count($spouse_families) > 0) : ?> 
         <?php foreach ($spouse_families as $spouse_family_node) : ?>
@@ -68,4 +68,3 @@ $is_first_family = true;
     <?php endif; ?>
 </ul>
 <?php endif; ?>
-

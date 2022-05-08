@@ -15,7 +15,7 @@ use Fisharebest\Webtrees\MediaFile;
 <?= $individual->fullName() ?>, <?= $individual->lifespan() ?>
 <!--  MYARTJAUB-START -->
 <?= hook(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface::class,
-    fn(\MyArtJaub\Webtrees\Contracts\Hooks\RecordNameTextExtenderInterface $hook) => $hook->recordNameAppend($individual),
+    fn(\MyArtJaub\Webtrees\Module\Hooks\Hooks\RecordNameTextExtenderCollector $hook) => $hook->recordNameAppend($individual),
     '')
     ?>
 <!--  MYARTJAUB-END -->

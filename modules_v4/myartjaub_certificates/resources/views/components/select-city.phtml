@@ -14,10 +14,10 @@ use Fisharebest\Webtrees\View;
 
 ?>
 
-<div class="maj-certificate-select2">
+<div class="maj-certificate-tom-select">
     <select
         autocomplete="off"
-        class="form-select select2 maj-select2 <?= $class ?? '' ?>"
+        class="form-select tom-select maj-tom-select <?= $class ?? '' ?>"
         id="<?= e($id ?? $name) ?>"
         name="<?= e($name) ?>"
         <?= ($disabled ?? false) ? 'disabled' : '' ?>
@@ -28,22 +28,3 @@ use Fisharebest\Webtrees\View;
         <?php endforeach; ?>
     </select>
 </div>
-
-<?php View::pushunique('javascript') ?>
-
-<script>
-//on first focus (bubbles up to document), open the menu
-$(document).on('focus', '.maj-certificate-select2 .select2-selection.select2-selection--single', function (e) {
-  $(this).closest(".select2-container").siblings('select:enabled').select2('open');
-});
-
-//steal focus during close - only capture once and stop propogation
-$('.maj-certificate-select2 select.select2').on('select2:closing', function (e) {
-  $(e.target).data("select2").$selection.one('focus focusin', function (e) {
-    e.stopPropagation();
-  });
-});
-
-</script>
-
-<?php View::endpushunique() ?>

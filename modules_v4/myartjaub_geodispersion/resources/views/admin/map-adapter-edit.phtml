@@ -6,7 +6,6 @@ use Fisharebest\Webtrees\View;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
 use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
 use MyArtJaub\Webtrees\Contracts\GeoDispersion\MapDefinitionInterface;
-use MyArtJaub\Webtrees\Module\GeoDispersionModule;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\AdminConfigPage;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewEditPage;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterMapperConfig;
@@ -14,13 +13,13 @@ use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapFeaturePrope
 use MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisMapAdapter;
 
 /**
- * @var GeoDispersionModule                         $module
+ * @var \MyArtJaub\Webtrees\Module\GeoDispersion\GeoDispersionModule    $module
  * @var string                                      $title
  * @var Tree                                        $tree
  * @var int                                         $view_id
  * @var GeoAnalysisMapAdapter|null                  $map_adapter
- * @var Collection<string, MapDefinitionInterface>  $maps_list
- * @var Collection<PlaceMapperInterface>            $mappers_list
+ * @var \Illuminate\Support\Collection<string, MapDefinitionInterface>  $maps_list
+ * @var \Illuminate\Support\Collection<\MyArtJaub\Webtrees\Contracts\GeoDispersion\PlaceMapperInterface>    $mappers_list
  * @var string                                      $route_edit
  */
 
@@ -51,7 +50,7 @@ $maps_list = $maps_list->sortBy(fn(MapDefinitionInterface $map): string => $map-
             <?= I18N::translateContext('GEODISPERSION', 'Map') ?>
         </label>
         <div class="col-sm-9">
-            <select class="form-select select2" id="map_adapter_map" name="map_adapter_map">
+            <select class="form-select tom-select" id="map_adapter_map" name="map_adapter_map">
             <?php foreach ($maps_list as $map_id => $map) : ?>
                 <option value="<?= e($map_id) ?>" <?= $map_adapter !== null && $map_id === $map_adapter->map()->id()  ? 'selected' : '' ?>>
                     <?= $map->title() ?>
@@ -70,7 +69,7 @@ $maps_list = $maps_list->sortBy(fn(MapDefinitionInterface $map): string => $map-
             <?= I18N::translate('Place mapper') ?>
         </label>
         <div class="col-sm-9">
-            <select class="form-select select2" id="map_adapter_mapper" name="map_adapter_mapper">
+            <select class="form-select tom-select" id="map_adapter_mapper" name="map_adapter_mapper">
             <?php foreach ($mappers_list as $mapper) : ?>
                 <option value="<?= e(get_class($mapper)) ?>" <?= $map_adapter !== null && $map_adapter->placeMapper() instanceof $mapper ? 'selected' : '' ?>>
                     <?= $mapper->title() ?>

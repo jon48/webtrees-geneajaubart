@@ -61,7 +61,12 @@ foreach ($keys as $key) {
                 <?= view('icons/expand') ?>
                 <?= view('icons/collapse') ?>
              </a>
-
+            <!--  MYARTJAUB-START -->
+            <?= hook(\MyArtJaub\Webtrees\Contracts\Hooks\FactSourceTextExtenderInterface::class,
+                fn(\MyArtJaub\Webtrees\Contracts\Hooks\FactSourceTextExtenderInterface $hook) => $hook->factSourcePrepend($tree, [$elements, $values])
+            )
+            ?>
+            <!--  MYARTJAUB-END -->
             <?php $label = '<span class="label">' . I18N::translate('Source') . '</span>' ?>
             <?php $value = '<span class="field" dir="auto"><a href="' . e($source->url()) . '">' . $source->fullName() . '</a></span>' ?>
             <?= I18N::translate('%1$s: %2$s', $label, $value) ?>

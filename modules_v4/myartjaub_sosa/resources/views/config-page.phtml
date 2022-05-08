@@ -6,7 +6,7 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
-use Fisharebest\Webtrees\Http\RequestHandlers\Select2Individual;
+use Fisharebest\Webtrees\Http\RequestHandlers\TomSelectIndividual;
 use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaConfigAction;
 use MyArtJaub\Webtrees\Module\Sosa\Services\SosaRecordsService;
 
@@ -17,7 +17,7 @@ use MyArtJaub\Webtrees\Module\Sosa\Services\SosaRecordsService;
  * @var int                     $user_id
  * @var int                     $selected_user_id
  * @var bool                    $immediate_compute
- * @var array<string,mixed>     $users_root
+ * @var array<array<string,mixed>>  $users_root
  */
 
 $max_gen_system = app(SosaRecordsService::class)->maxSystemGenerations();
@@ -127,28 +127,18 @@ users_array["<?= $user_root['user']->id() ?>"] = [ "<?= $user_root['root_id'] ?>
 <?php endforeach; ?>
 
 $('#maj-sosa-select-userid').change(function() {
-    $.ajax({
-        type: 'POST',
-        url: '<?= e(route(Select2Individual::class, ['tree' => $tree->name(), 'at' => ''])) ?>',
-        data: { q: users_array[this.value][0] }
-    }).then(function (data) {
-        if(data.results.length > 0) {
-            result = data.results[0];
-        
-            // create the option and append to Select2
-            var option = new Option(result.text, result.id, true, true);
-            $('#sosa-rootid').append(option).trigger('change');
-    
-            // manually trigger the `select2:select` event
-            $('#sosa-rootid').trigger({
-                type: 'select2:select',
-                params: {
-                    data: result
-                }
-            });
-        }
-        else {
-            $('#sosa-rootid').val(null).trigger('change');
+    $.get({
+        url: '<?= e(route(TomSelectIndividual::class, ['tree' => $tree->name()])) ?>',
+        data: { at: '',  query: users_array[this.value][0] }
+    }).then(function (responseJson) {
+        let select = $('#maj-sosa-input-rootid')[0].tomselect;
+        select.clear();
+        select.clearOptions();
+        if(responseJson.data.length > 0) {
+            // Set the individual in the tom-select control 
+            result = responseJson.data[0];
+            select.addOption(result);
+            select.addItem(result.value);
         }
     });
     $('#maj-sosa-input-maxgen').val(users_array[this.value][1]).trigger("input");

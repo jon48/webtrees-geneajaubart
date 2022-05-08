@@ -40,7 +40,7 @@ $places_hidden = 0;
                 <?php
                 $place = $item->place();
                 $count = $item->count();
-                $perc_place_in_found =  $places_found > 0 ? $count / $places_found : 0;
+                $perc_place_in_found =  $places_found > 0 ? (float) $count / $places_found : 0;
                 ?>
                 <?php if ($perc_place_in_found > 0.05) : ?>
             <div class="maj-geodisp-cell-detailed-all-found" style="flex-grow:<?= $count ?>">
@@ -73,7 +73,7 @@ $places_hidden = 0;
             </div>
             <?php endif; ?>
             <?php if ($places_unfound > 0) : ?>
-            <div class="maj-geodisp-cell-detailed-all-unfound" style="flex-grow:<?= max(1, intval(100 * $perc_unfound)) ?>">
+            <div class="maj-geodisp-cell-detailed-all-unfound" style="flex-grow:<?= $places_unfound ?>">
                 <div>
                     <?= I18N::number($places_unfound) ?>
                     <?php if ($perc_unfound >= 0.1) : ?>

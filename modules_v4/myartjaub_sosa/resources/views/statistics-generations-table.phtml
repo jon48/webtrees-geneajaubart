@@ -10,7 +10,7 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\MissingAncestorsList;
 /**
  * @var Tree                            $tree
  * @var array<int, <string, mixed>>     $generation_stats
- * @var object                          $generation_depth
+ * @var \stdClass|NULL                  $generation_depth
  */
 
 ?>
@@ -30,11 +30,11 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\MissingAncestorsList;
                 <?= I18N::translate('Pedigree collapse'); ?>
                 <span class="maj-sosa-pedicollapse">
                     <span class="maj-loading-initial">
-                        <i class="fas fa-spinner fa-pulse fa-fw"></i>
+                        <i class="fa-solid fa-spinner fa-pulse fa-fw"></i>
                     </span>
                     <span class="maj-loading-complete d-none"></span>
                     <span class="maj-loading-error d-none">
-                        <span class="maj-icon-error"><i class="fas fa-times"></i></span>
+                        <span class="maj-icon-error"><i class="fa-solid fa-times"></i></span>
                     </span>
                  </span>
             </th>
@@ -137,7 +137,7 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\MissingAncestorsList;
     <tfoot>
         <tr class="maj-sosa-row">
             <td class="wt-page-options-label" colspan="14">
-                <?= empty($generation_depth) ? '' : I18N::translate(
+                <?= $generation_depth === null ? '' : I18N::translate(
                     'Mean generation depth: %s',
                     I18N::plural(
                         '%s generation',
@@ -156,7 +156,7 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\MissingAncestorsList;
                             I18N::number((float) $generation_depth->stddev_gen_depth, 2)
                         )
                     );
-?>
+                ?>
             </td>
         </tr>
     </tfoot>

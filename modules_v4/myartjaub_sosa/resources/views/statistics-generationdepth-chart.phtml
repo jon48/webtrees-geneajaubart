@@ -28,7 +28,6 @@ $data = [[
     ]];
 $max_gen_depth = 0;
 foreach ($gen_depth_g3 as $sosa => $gen_depth_stat) {
-    /** @var \Fisharebest\Webtrees\Individual $ancestor */
     $ancestor = Registry::individualFactory()->make($gen_depth_stat->root_ancestor_id, $tree);
     $max_gen_depth = max($max_gen_depth, ceil($gen_depth_stat->mean_gen_depth + $gen_depth_stat->stddev_gen_depth));
     if ($ancestor !== null && $ancestor->canShowName()) {

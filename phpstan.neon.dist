@@ -11,6 +11,15 @@ parameters:
       - modules_v4/myartjaub_patronymiclineage
       - modules_v4/myartjaub_sosa
       - modules_v4/myartjaub_welcome_block
+   fileExtensions:
+      - php
+      - phtml
+   checkExplicitMixed: false
+   checkMissingIterableValueType: false
    ignoreErrors:
+      -
+         message: '#^Variable .* might not be defined.$#'
+         path: modules_v4/myartjaub_*/**.phtml
+      - '#^Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.$#'
       - '#^Call to an undefined method Robo\\Collection\\CollectionBuilder.*$#'
       - '#^Call to an undefined method Robo\\Task\\.*::progressMessage\(\)\.$#'

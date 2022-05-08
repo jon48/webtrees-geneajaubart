@@ -16,7 +16,8 @@ use MyArtJaub\Webtrees\Module\Hooks\Http\RequestHandlers\ModulesHooksPage;
 
 $hook_active = fn(HookInterface $hook): bool => $hook->module()->isEnabled();
 
-$hook_interfaces = $hook_interfaces_list->map(fn(HookCollectorInterface $hook_collector) => [
+/** @var \Illuminate\Support\Collection<array<string, mixed>> $hook_interfaces */
+$hook_interfaces = $hook_interfaces_list->map(fn(HookCollectorInterface $hook_collector): array => [
     'name'          =>  $hook_collector->name(),
     'title'         =>  $hook_collector->title(),
     'total_count'   =>  $hook_collector->hooks()->count(),

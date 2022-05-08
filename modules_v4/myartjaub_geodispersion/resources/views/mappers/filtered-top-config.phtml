@@ -3,11 +3,11 @@
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
-use Fisharebest\Webtrees\Http\RequestHandlers\Select2Place;
+use Fisharebest\Webtrees\Http\RequestHandlers\TomSelectPlace;
 
 /**
  * @var Tree                $tree
- * @var Collection<Place>   $top_places
+ * @var \Illuminate\Support\Collection<\Fisharebest\Webtrees\Place>   $top_places
  */
 
 ?>
@@ -19,19 +19,15 @@ use Fisharebest\Webtrees\Http\RequestHandlers\Select2Place;
     </label>
     <div class="col-sm-9">
         <select
-            class="form-select select2"
+            autocomplete="off"
+            class="form-select tom-select"
             id="mapper_filt_top_places"
             name="mapper_filt_top_places[]"
             multiple="multiple"
-            data-ajax--delay="<?= e(Select2Place::AJAX_DELAY) ?>"
-            data-minimum-input-length="<?= e(Select2Place::MINIMUM_INPUT_LENGTH) ?>"
-            data-ajax--type="POST"
-            data-ajax--url="<?= e(route(Select2Place::class, ['tree' => $tree->name()])) ?>"
-            data-allow-clear="true"
-            data-placeholder=""
+            data-url="<?= e(route(TomSelectPlace::class, ['tree' => $tree->name(), 'at' => ''])) ?>"
         >
         <?php foreach ($top_places as $top_place) : ?>
-            <option value="<?= e($top_place->id()) ?>" selected>
+            <option value="<?= $top_place->id() ?>" selected>
                 <?= view('selects/place', ['place' => $top_place]) ?>
             </option>
         <?php endforeach; ?>
@@ -45,7 +41,7 @@ use Fisharebest\Webtrees\Http\RequestHandlers\Select2Place;
 <?php View::push('javascript') ?>
 <script>
 
-$('#mapper_filt_top_places').select2();
+webtrees.initializeTomSelect(document.getElementById('mapper_filt_top_places'));
 
 </script>
 <?php View::endpush() ?>

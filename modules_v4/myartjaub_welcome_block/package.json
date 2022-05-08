@@ -15,8 +15,8 @@
     "production": "npx mix --production"
   },
   "devDependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.32",
-    "@fortawesome/free-solid-svg-icons": "^5.15.1",
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
     "laravel-mix": "^6.0.11",
     "laravel-mix-clean": "^0.1.0",
