@@ -37,6 +37,49 @@
   }
 
   /**
+   * Simple wrapper around fetch() with our preferred headers
+   *
+   * @param {string} url
+   * @returns {Promise}
+   */
+  webtrees.httpGet = function (url) {
+    const options = {
+      method: 'GET',
+      credentials: 'same-origin',
+      referrerPolicy: 'same-origin',
+      headers: new Headers({
+        'x-requested-with': 'XMLHttpRequest',
+      })
+    };
+
+    return fetch(url, options);
+  }
+
+  /**
+   * Simple wrapper around fetch() with our preferred headers
+   *
+   * @param {string} url
+   * @param {string|FormData} body
+   * @returns {Promise}
+   */
+  webtrees.httpPost= function (url, body = '') {
+    const csrfToken = document.head.querySelector('meta[name=csrf]').getAttribute('content');
+
+    const options = {
+      body: body,
+      method: 'POST',
+      credentials: 'same-origin',
+      referrerPolicy:  'same-origin',
+      headers: new Headers({
+        'X-CSRF-TOKEN': csrfToken,
+        'x-requested-with': 'XMLHttpRequest',
+      })
+    };
+
+    return fetch(url, options, body);
+  }
+
+  /**
    * Look for non-latin characters in a string.
    * @param {string} str
    * @returns {string}
@@ -697,19 +740,9 @@
       return element.tomselect;
     }
 
-    let options = {};
-
     if (element.dataset.url) {
-      let plugins = ['dropdown_input', 'virtual_scroll'];
-
-      if (element.multiple) {
-        plugins.push('remove_button');
-      } else if (!element.required) {
-        plugins.push('clear_button');
-      }
-
-      options = {
-        plugins: plugins,
+      let options = {
+        plugins: ['dropdown_input', 'virtual_scroll'],
         maxOptions: false,
         render: {
           item: (data, escape) => '<div>' + data.text + '</div>',
@@ -717,7 +750,7 @@
         },
         firstUrl: query => element.dataset.url + '&query=' + encodeURIComponent(query),
         load: function (query, callback) {
-          fetch(this.getUrl(query))
+          webtrees.httpGet(this.getUrl(query))
             .then(response => response.json())
             .then(json => {
               if (json.nextUrl !== null) {
@@ -728,9 +761,23 @@
             .catch(callback);
         },
       };
+
+      if (!element.required) {
+        options.plugins.push('clear_button');
+      }
+
+      return new TomSelect(element, options);
     }
 
-    return new TomSelect(element, options);
+    if (element.multiple) {
+      return new TomSelect(element, { plugins: ['caret_position', 'remove_button'] });
+    }
+
+    if (!element.required) {
+      return new TomSelect(element, { plugins: ['clear_button'] });
+    }
+
+    return new TomSelect(element, { });
   }
 
   /**
@@ -774,7 +821,37 @@
         }
       });
     });
-  }
+  };
+
+  /**
+   * Save a form using ajax, for use in modals
+   *
+   * @param {Event} event
+   */
+  webtrees.createRecordModalSubmit = function (event) {
+    event.preventDefault();
+    const form = event.target;
+    const modal = document.getElementById('wt-ajax-modal')
+    const modal_content = modal.querySelector('.modal-content');
+    const select = document.getElementById(modal_content.dataset.wtSelectId);
+
+    webtrees.httpPost(form.action, new FormData(form))
+      .then(response => response.json())
+      .then(json => {
+        if (select) {
+          // This modal was activated by the "create new" button in a select edit control.
+          webtrees.resetTomSelect(select.tomselect, json.value, json.text);
+
+          bootstrap.Modal.getInstance(modal).hide();
+        } else {
+          // Show the success message in the existing modal.
+          modal_content.innerHTML = json.html;
+        }
+      })
+      .catch(error => {
+        modal_content.innerHTML = error;
+      });
+  };
 }(window.webtrees = window.webtrees || {}));
 
 // Send the CSRF token on all AJAX requests
@@ -915,15 +992,7 @@ document.addEventListener('click', (event) => {
   }
 
   if ('wtPostUrl' in target.dataset) {
-    const token = document.querySelector('meta[name=csrf]').content;
-
-    fetch(target.dataset.wtPostUrl, {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': token,
-        'X-Requested-with': 'XMLHttpRequest',
-      },
-    }).then(() => {
+    webtrees.httpPost(target.dataset.wtPostUrl).then(() => {
       if ('wtReloadUrl' in target.dataset) {
         // Go somewhere else. e.g. the home page after logout.
         document.location = target.dataset.wtReloadUrl;

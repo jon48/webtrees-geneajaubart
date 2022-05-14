@@ -1037,14 +1037,16 @@ class GedcomRecord
             if (preg_match_all('/^' . $level . ' (' . $fact_type . ') (.+)((\n[' . $sublevel . '-9].+)*)/m', $fact->gedcom(), $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $match) {
                     // Treat 1 NAME / 2 TYPE married the same as _MARNM
-                    if ($match[1] === 'NAME' && str_contains($match[3], "\n2 TYPE married")) {
+                    if ($match[1] === 'NAME' && str_contains(strtoupper($match[3]), "\n2 TYPE MARRIED")) {
                         $this->addName('_MARNM', $match[2], $fact->gedcom());
                     } else {
                         $this->addName($match[1], $match[2], $fact->gedcom());
                     }
                     if ($match[3] && preg_match_all('/^' . $sublevel . ' (ROMN|FONE|_\w+) (.+)((\n[' . $subsublevel . '-9].+)*)/m', $match[3], $submatches, PREG_SET_ORDER)) {
                         foreach ($submatches as $submatch) {
-                            $this->addName($submatch[1], $submatch[2], $match[3]);
+                            if ($submatch[1] !== '_RUFNAME') {
+                                $this->addName($submatch[1], $submatch[2], $match[3]);
+                            }
                         }
                     }
                 }

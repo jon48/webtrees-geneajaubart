@@ -263,63 +263,63 @@ class Gedcom
     // These preferences control multiple tag definitions
     public const HIDDEN_TAGS = [
         // Individual names
-        'NAME_NPFX' => ['INDI:NAME:NPFX', 'INDI:NAME:FONE:NPFX', 'INDI:NAME:ROMN:NPFX'],
-        'NAME_SPFX' => ['INDI:NAME:SPFX', 'INDI:NAME:FONE:SPFX', 'INDI:NAME:ROMN:SPFX'],
-        'NAME_NSFX' => ['INDI:NAME:NSFX', 'INDI:NAME:FONE:NSFX', 'INDI:NAME:ROMN:NSFX'],
-        'NAME_NICK' => ['INDI:NAME:NICK', 'INDI:NAME:FONE:NICK', 'INDI:NAME:ROMN:NICK'],
-        'NAME_FONE' => ['INDI:NAME:FONE'],
-        'NAME_ROMN' => ['INDI:NAME:ROMN'],
-        'NAME_NOTE' => ['INDI:NAME:NOTE'],
-        'NAME_SOUR' => ['INDI:NAME:SOUR'],
+        'NAME_NPFX'  => ['INDI:NAME:NPFX', 'INDI:NAME:FONE:NPFX', 'INDI:NAME:ROMN:NPFX'],
+        'NAME_SPFX'  => ['INDI:NAME:SPFX', 'INDI:NAME:FONE:SPFX', 'INDI:NAME:ROMN:SPFX'],
+        'NAME_NSFX'  => ['INDI:NAME:NSFX', 'INDI:NAME:FONE:NSFX', 'INDI:NAME:ROMN:NSFX'],
+        'NAME_NICK'  => ['INDI:NAME:NICK', 'INDI:NAME:FONE:NICK', 'INDI:NAME:ROMN:NICK'],
+        'NAME_FONE'  => ['INDI:NAME:FONE'],
+        'NAME_ROMN'  => ['INDI:NAME:ROMN'],
+        'NAME_NOTE'  => ['INDI:NAME:NOTE'],
+        'NAME_SOUR'  => ['INDI:NAME:SOUR'],
         // Places
-        'PLAC_MAP'  => ['PLAC:MAP'],
-        'PLAC_FONE' => ['PLAC:FONE'],
-        'PLAC_ROMN' => ['PLAC:ROMN'],
-        'PLAC_FORM' => ['PLAC:FORM', 'HEAD:PLAC'],
-        'PLAC_NOTE' => ['PLAC:NOTE'],
+        'PLAC_MAP'   => [':PLAC:MAP'],
+        'PLAC_FONE'  => [':PLAC:FONE'],
+        'PLAC_ROMN'  => [':PLAC:ROMN'],
+        'PLAC_FORM'  => [':PLAC:FORM', 'HEAD:PLAC'],
+        'PLAC_NOTE'  => [':PLAC:NOTE'],
         // Addresses
-        'ADDR_FAX'  => ['FAX'],
-        'ADDR_PHON' => ['PHON'],
-        'ADDR_WWW'  => ['WWW'],
+        'ADDR_EMAIL' => [':EMAIL'],
+        'ADDR_PHON'  => [':PHON'],
+        'ADDR_WWW'   => [':WWW'],
         // Source citations
-        'SOUR_EVEN' => [':SOUR:EVEN'],
-        'SOUR_DATE' => [':SOUR:DATA:DATE'],
-        'SOUR_NOTE' => [':SOUR:NOTE'],
-        'SOUR_QUAY' => [':SOUR:QUAY'],
+        'SOUR_EVEN'  => [':SOUR:EVEN'],
+        'SOUR_DATE'  => [':SOUR:DATA:DATE'],
+        'SOUR_NOTE'  => [':SOUR:NOTE'],
+        'SOUR_QUAY'  => [':SOUR:QUAY'],
         // Sources
-        'SOUR_DATA' => ['SOUR:DATA:EVEN', 'SOUR:DATA:AGNC', 'SOUR:DATA:NOTE'],
+        'SOUR_DATA'  => ['SOUR:DATA:EVEN', 'SOUR:DATA:AGNC', 'SOUR:DATA:NOTE'],
         // Individuals
-        'BIRT_FAMC' => ['INDI:BIRT:FAMC'],
-        'RELI'      => ['INDI:RELI'],
-        'BAPM'      => ['INDI:BAPM'],
-        'CHR'       => ['INDI:CHR', 'INDI:CHRA'],
-        'FCOM'      => ['INDI:FCOM', 'INDI:CONF'],
-        'ORDN'      => ['INDI:ORDN'],
-        'BARM'      => ['INDI:BARM', 'INDI:BASM'],
-        'ALIA'      => ['INDI:ALIA'],
-        'ASSO'      => ['INDI:ASSO'],
+        'BIRT_FAMC'  => ['INDI:BIRT:FAMC'],
+        'RELI'       => ['INDI:RELI'],
+        'BAPM'       => ['INDI:BAPM'],
+        'CHR'        => ['INDI:CHR', 'INDI:CHRA'],
+        'FCOM'       => ['INDI:FCOM', 'INDI:CONF'],
+        'ORDN'       => ['INDI:ORDN'],
+        'BARM'       => ['INDI:BARM', 'INDI:BASM'],
+        'ALIA'       => ['INDI:ALIA'],
+        'ASSO'       => ['INDI:ASSO'],
         // Families
-        'ENGA'      => ['FAM:ENGA'],
-        'MARB'      => ['FAM:MARB'],
-        'MARC'      => ['FAM:MARC'],
-        'MARL'      => ['FAM:MARL'],
-        'MARS'      => ['FAM:MARS'],
-        'ANUL'      => ['FAM:ANUL'],
-        'DIVF'      => ['FAM:DIVF'],
-        'FAM_RESI'  => ['FAM:RESI'],
-        'FAM_CENS'  => ['FAM:CENS'],
+        'ENGA'       => ['FAM:ENGA'],
+        'MARB'       => ['FAM:MARB'],
+        'MARC'       => ['FAM:MARC'],
+        'MARL'       => ['FAM:MARL'],
+        'MARS'       => ['FAM:MARS'],
+        'ANUL'       => ['FAM:ANUL'],
+        'DIVF'       => ['FAM:DIVF'],
+        'FAM_RESI'   => ['FAM:RESI'],
+        'FAM_CENS'   => ['FAM:CENS'],
         // LDS church
-        'LDS'       => ['INDI:BAPL', 'INDI:CONL', 'INDI:ENDL', 'INDI:SLGC', 'FAM:SLGS', 'HEAD:SUBN'],
+        'LDS'        => ['INDI:BAPL', 'INDI:CONL', 'INDI:ENDL', 'INDI:SLGC', 'FAM:SLGS', 'HEAD:SUBN'],
         // Identifiers
-        'AFN'       => ['INDI:AFN'],
-        'IDNO'      => ['INDI:IDNO'],
-        'SSN'       => ['INDI:SSN'],
-        'RFN'       => ['RFN'],
-        'REFN'      => ['REFN'],
-        'RIN'       => ['RIN'],
+        'AFN'        => ['INDI:AFN'],
+        'IDNO'       => ['INDI:IDNO'],
+        'SSN'        => ['INDI:SSN'],
+        'RFN'        => [':RFN'],
+        'REFN'       => [':REFN'],
+        'RIN'        => [':RIN'],
         // Submitters
-        'SUBM'      => ['INDI:SUBM', 'FAM:SUBM'],
-        'ANCI'      => ['INDI:ANCI', 'INDI:DESI'],
+        'SUBM'       => ['INDI:SUBM', 'FAM:SUBM'],
+        'ANCI'       => ['INDI:ANCI', 'INDI:DESI'],
     ];
 
     // Custom GEDCOM tags that can be created in webtrees.
@@ -848,6 +848,17 @@ class Gedcom
             'SUBN:SUBM'                => new XrefSubmitter(I18N::translate('Submitter')),
             'SUBN:TEMP'                => new TempleCode(/* I18N: https://en.wikipedia.org/wiki/Temple_(LDS_Church)*/ I18N::translate('Temple')),
             'TRLR'                     => new EmptyElement(I18N::translate('Trailer')),
+        ];
+    }
+
+    /**
+     * @return array<string,ElementInterface>
+     */
+    private function aldfaerTags(): array
+    {
+        return [
+            'INDI:BIRT:_LENGTH' => new CustomElement(I18N::translate('Length')),
+            'INDI:BIRT:_WEIGHT' => new CustomElement(I18N::translate('Weight')),
         ];
     }
 
@@ -1534,11 +1545,11 @@ class Gedcom
             'INDI:*:ASSO:RELA'      => new RelationIsDescriptor(I18N::translate('Relationship')),
             'INDI:*:PLAC:_HEB'      => new NoteStructure(I18N::translate('Place in Hebrew')),
             'INDI:ADDR'             => new AddressLine(I18N::translate('Address')),
-            'INDI:BIRT:DATE:TIME'   => new TimeValue(I18N::translate('Time')),
+            'INDI:BIRT:DATE:TIME'   => new TimeValue(I18N::translate('Time of birth')),
             'INDI:BURI:CEME'        => new CustomElement(I18N::translate('Cemetery')),
             'INDI:CHAN:_PGVU'       => new WebtreesUser(I18N::translate('Author of last change')),
             'INDI:COMM'             => new CustomElement(I18N::translate('Comment')),
-            'INDI:DEAT:DATE:TIME'   => new TimeValue(I18N::translate('Time')),
+            'INDI:DEAT:DATE:TIME'   => new TimeValue(I18N::translate('Time of death')),
             'INDI:EMAIL'            => new AddressEmail(I18N::translate('Email address')),
             'INDI:NAME:_HEB'        => new NamePersonal(I18N::translate('Name in Hebrew'), []),
             'INDI:_FNRL'            => new CustomIndividualEvent(I18N::translate('Funeral')),
@@ -1753,6 +1764,11 @@ class Gedcom
             'INDI' => array_map(static fn (string $tag): array => [$tag, '0:M'], $custom_individual_tags),
         ];
 
+        if (Site::getPreference('CUSTOM_TIME_TAGS') === '1') {
+            $subtags['INDI:BIRT:DATE'][] = ['TIME', '0:1'];
+            $subtags['INDI:DEAT:DATE'][] = ['TIME', '0:1'];
+        }
+
         if (Site::getPreference('CUSTOM_GEDCOM_L_TAGS') === '1') {
             $subtags['FAM'][]               = ['_ASSO', '0:M'];
             $subtags['FAM'][]               = ['_STAT', '0:1'];
@@ -1820,6 +1836,7 @@ class Gedcom
             $element_factory->registerSubTags($this->webtreesSubTags());
 
             // Third-party extensions.
+            $element_factory->registerTags($this->aldfaerTags());
             $element_factory->registerTags($this->ancestryTags());
             $element_factory->registerTags($this->brothersKeeperTags());
             $element_factory->registerTags($this->familySearchTags());
