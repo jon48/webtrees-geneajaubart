@@ -51,7 +51,6 @@ mix
       postcssCustomProperties
     ]
   })
-  .sourceMaps()
   .clean({
     cleanOnceBeforeBuildPatterns: ['css/**/*', 'js/**/*']
   })

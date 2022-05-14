@@ -72,7 +72,6 @@
 		"jon48/webtrees-lib" : "dev-main",
 		"jon48/webtrees-mod-maj-geodata-france" : "dev-main",
 		"jon48/webtrees-mod-translationtool" : "dev-main",
-		"jon48/webtrees-theme-rural" : "dev-main",
         "league/commonmark": "2.3.0",
         "league/flysystem": "2.4.5",
 		"league/flysystem-ziparchive" : "2.3.1",

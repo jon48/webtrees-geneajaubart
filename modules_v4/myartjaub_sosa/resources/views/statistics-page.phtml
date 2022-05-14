@@ -56,13 +56,14 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\PedigreeCollapseData;
 <?php View::push('javascript') ?>
 <script>
 
+    var noCollapseData = '<td class="wt-page-options-value">&hellip;</td><td class="wt-page-options-value">&hellip;</td>';
     $.when($.getJSON('<?= e(route(PedigreeCollapseData::class, ['tree' => $tree->name() ])) ?>'), $.ready)
     .done(function(data, unused) {
-        $('.maj-sosa-pedicollapse-globalvalue').text(data[0].pedi_collapse);
         var cells = data[0].cells;
+        $('.maj-sosa-pedicollapse-globalvalue').html(Object.keys(cells).length > 0 ? data[0].pedi_collapse : '&hellip;');
         $('.maj-sosa-pedicollapse-cell').each(function() {
             var gen = this.dataset.majSosaGen;
-            $(this).replaceWith(cells.hasOwnProperty(gen) ? cells[gen] : '&hellip;');
+            $(this).replaceWith(cells.hasOwnProperty(gen) ? cells[gen] : noCollapseData);
         });
         
         $('.maj-sosa-pedicollapse .maj-loading-complete').removeClass('d-none');

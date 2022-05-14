@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "079995130ae4edbb24d9cff72c990fe6",
+    "content-hash": "2cde3647f2106cc7403e8b3ac5cd99b1",
     "packages": [
         {
             "name": "aura/router",
@@ -2881,12 +2881,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "a2ce2d5a4d43037ce96361be2d71dba523256646"
+                "reference": "60fe6304c686414715d85e0aea1ad1b830126b66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/a2ce2d5a4d43037ce96361be2d71dba523256646",
-                "reference": "a2ce2d5a4d43037ce96361be2d71dba523256646",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/60fe6304c686414715d85e0aea1ad1b830126b66",
+                "reference": "60fe6304c686414715d85e0aea1ad1b830126b66",
                 "shasum": ""
             },
             "require": {
@@ -2950,9 +2950,9 @@
             ],
             "support": {
                 "issues": "http://bugs.jaubart.com",
-                "source": "https://github.com/jon48/webtrees-lib/tree/feature/code-analysis"
+                "source": "https://github.com/jon48/webtrees-lib/tree/main"
             },
-            "time": "2022-05-08T14:50:10+00:00"
+            "time": "2022-05-15T13:51:38+00:00"
         },
         {
             "name": "jon48/webtrees-mod-maj-geodata-france",
@@ -3020,12 +3020,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-mod-translationtool.git",
-                "reference": "8cb7782df3db3b17007b778d0fa5dd26c5995e8b"
+                "reference": "5ea097d59c313595fbd1d786e3167e64e2fae677"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-mod-translationtool/zipball/8cb7782df3db3b17007b778d0fa5dd26c5995e8b",
-                "reference": "8cb7782df3db3b17007b778d0fa5dd26c5995e8b",
+                "url": "https://api.github.com/repos/jon48/webtrees-mod-translationtool/zipball/5ea097d59c313595fbd1d786e3167e64e2fae677",
+                "reference": "5ea097d59c313595fbd1d786e3167e64e2fae677",
                 "shasum": ""
             },
             "require": {
@@ -3073,57 +3073,9 @@
             ],
             "support": {
                 "issues": "https://github.com/jon48/webtrees-mod-translationtool/issues",
-                "source": "https://github.com/jon48/webtrees-mod-translationtool/tree/feature/code-analysis"
+                "source": "https://github.com/jon48/webtrees-mod-translationtool/tree/main"
             },
-            "time": "2022-05-08T16:00:03+00:00"
-        },
-        {
-            "name": "jon48/webtrees-theme-rural",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jon48/webtrees-theme-rural.git",
-                "reference": "7011329643add8154c86e68ea223c25c104b78f6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-theme-rural/zipball/7011329643add8154c86e68ea223c25c104b78f6",
-                "reference": "7011329643add8154c86e68ea223c25c104b78f6",
-                "shasum": ""
-            },
-            "require-dev": {
-                "consolidation/robo": "^3.0",
-                "fisharebest/webtrees": "2.1.1",
-                "psr/http-message": "^1.0"
-            },
-            "default-branch": true,
-            "type": "webtrees-theme",
-            "extra": {
-                "installer-name": "myartjaub_ruraltheme"
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Jonathan Jaubart",
-                    "email": "dev@jaubart.com",
-                    "homepage": "https://www.jaubart.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Rural theme for webtrees",
-            "homepage": "https://github.com/jon48/webtrees-theme-rural",
-            "keywords": [
-                "genealogy",
-                "webtrees"
-            ],
-            "support": {
-                "issues": "https://github.com/jon48/webtrees-theme-rural/issues",
-                "source": "https://github.com/jon48/webtrees-theme-rural/tree/main"
-            },
-            "time": "2022-05-08T18:27:50+00:00"
+            "time": "2022-05-12T21:41:32+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -10967,8 +10919,7 @@
     "stability-flags": {
         "jon48/webtrees-lib": 20,
         "jon48/webtrees-mod-maj-geodata-france": 20,
-        "jon48/webtrees-mod-translationtool": 20,
-        "jon48/webtrees-theme-rural": 20
+        "jon48/webtrees-mod-translationtool": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

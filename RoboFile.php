@@ -15,13 +15,37 @@ use Symfony\Component\Finder\Finder;
 class RoboFile extends \Robo\Tasks
 {
     /**
-     * Build the application ready for use.
+     * Build and copy the application languages.
+     *
+     * @param string $target_dir Directory to which languages must be copied
+     * @param string $base_dir Base directory of the application
+     * @throws \Exception
+     * @return \Robo\Result<mixed>
+     */
+    public function buildLanguages(string $target_dir, string $base_dir = __DIR__): Result
+    {
+        $this->taskExec('composer webtrees:lang')->progressMessage("Copying languages")->run();
+        $languages_build = $this->taskFilesystemStack();
+
+        $languages_dir = 'resources/lang';
+        $base_languages_dir = "$base_dir/$languages_dir";
+        $languages = Finder::create()->directories()->in($base_languages_dir)->depth(0);
+        foreach ($languages as $language_dir) {
+            $language_target_dir = "$target_dir/$languages_dir/{$language_dir->getFilename()}";
+            $languages_build->mkdir($language_target_dir);
+            $languages_build->copy("$language_dir/messages.php", "$language_target_dir/messages.php");
+        }
+        return $languages_build->progressMessage("Copying languages")->run();
+    }
+
+    /**
+     * Build the application modules ready for use.
      *
      * @param string $base_dir Base directory of the application
      * @throws \Exception
      * @return \Robo\Result<mixed>
      */
-    public function build(string $base_dir = __DIR__, bool $delete = false): Result
+    public function buildModules(string $base_dir = __DIR__, bool $delete = false): Result
     {
         $collection = $this->collectionBuilder();
 
@@ -55,6 +79,45 @@ class RoboFile extends \Robo\Tasks
 
         return $collection
             ->progressMessage("Application built.")
+            ->run();
+    }
+
+    /**
+     * Clean the application folder by removing development files.
+     *
+     * @param string $base_dir Base directory of the application
+     * @throws \Exception
+     * @return \Robo\Result<mixed>
+     */
+    public function clean(string $base_dir = __DIR__): Result
+    {
+        $collection = $this->collectionBuilder();
+
+        $modules_dir = $base_dir . '/modules_v4';
+        $modules = Finder::create()->directories()->name('myartjaub_*')->in($modules_dir)->depth(0);
+        foreach ($modules as $module) {
+            $collection->progressMessage("Starting deleting development folders for {$module->getRelativePathname()}");
+            $module_dir = $modules_dir . '/' . $module->getRelativePathname();
+
+            $collection->taskFilesystemStack()
+                ->remove($module_dir . '/src')
+                ->remove($module_dir . '/node_modules')
+                ->remove($module_dir . '/vendor');
+        }
+
+        $filesToDelete = Finder::create()
+            ->in($base_dir)
+            ->files()
+            ->notPath('vendor')
+            ->name(['composer*.*', 'package*.*', 'webpack*.*']);
+
+        $collection
+            ->progressMessage("Starting deleting development files")
+            ->taskFilesystemStack()
+                ->remove($filesToDelete);
+
+        return $collection
+            ->progressMessage('Repository cleaning done.')
             ->run();
     }
 
@@ -96,7 +159,7 @@ class RoboFile extends \Robo\Tasks
      * @throws \Exception
      * @return \Robo\Result<mixed>
      */
-    public function package(string $version, string $commit = 'master'): Result
+    public function package(string $version, string $commit = 'main'): Result
     {
         $getCommitResult =
             $this->taskExec("git rev-parse --quiet --verify $commit")
@@ -108,18 +171,19 @@ class RoboFile extends \Robo\Tasks
 
         $collection = $this->collectionBuilder();
 
+        // Define paths and variables
         $workDir = $collection->workDir("build/release.tmp");
 
         $PROJECT_NAME = 'webtrees-geneajaubart';
 
         $output_name = "webtrees-$version";
-        $output_name = str_replace('-v.', '.', $output_name);
 
         $build_archive_dir = "$workDir/$output_name.build";
         $build_archive_zip = "$build_archive_dir.zip";
 
         $build_release_path = "build/$output_name.zip";
 
+        // Extract webtrees archive and build
         $this->taskFilesystemStack()
                 ->mkdir($workDir)
             ->progressMessage("Starting build of $PROJECT_NAME $commit")
@@ -131,14 +195,19 @@ class RoboFile extends \Robo\Tasks
                 ->dir($build_archive_dir)
                 ->noDev()
                 ->preferDist()
-                ->noSuggest()
                 ->optimizeAutoloader()
             ->progressMessage("Extraction of $PROJECT_NAME $commit completed!")
             ->run();
 
-        $this->build($build_archive_dir, true);
+        // Build and copy webtrees languages
+        $this->buildLanguages($build_archive_dir);
+
+        // Build MyArtJaub modules
+        $this->buildModules($build_archive_dir, true);
 
         $collection->progressMessage("Build of $PROJECT_NAME $commit completed!");
+
+        $this->clean($build_archive_dir);
 
         $filesToCompress = Finder::create()
             ->in($build_archive_dir)

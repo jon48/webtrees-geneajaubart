@@ -50,6 +50,5 @@ mix
       postcssCustomProperties
     ]
   })
-  .sourceMaps()
   .clean()
 ;

@@ -25,3 +25,6 @@ resources/lang/*/messages.po export-ignore
 RoboFile.php	export-ignore
 
 *.psd			export-ignore
+
+.stylelintrc.json      export-ignore
+phpcs.xml.dist      export-ignore

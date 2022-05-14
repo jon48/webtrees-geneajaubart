@@ -40,9 +40,9 @@ $add_branch = function (array $chart, ?stdClass $branch, $color) use ($relations
 <div class="maj-sosa-dispersion-charts text-center">
 <?php
 $chart_g2 = ['colors'  => [], 'data' => [["Branche", 'Count']]];
-$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(1), ['--sex-m-chart', '#edf7fd']);
-$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(0), ['--sex-u-chart', '#ebebeb']);
-$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(2), ['--sex-f-chart', '#e9daf1']);
+$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(1), ['--sex-m-chart', '#84beff']);
+$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(0), ['--sex-u-chart', '#777777']);
+$chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(2), ['--sex-f-chart', '#ffd1dc']);
 ?>
 
 <?= view($module_name . '::charts/pie', [
@@ -57,11 +57,11 @@ $chart_g2 = $add_branch($chart_g2, $sosa_dispersion_g2->get(2), ['--sex-f-chart'
 
 <?php
 $chart_g3 = ['colors'  => [], 'data' => [["Branche", 'Count']]];
-$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(1), ['--sex-m-chart-dark', '#8ea6c0']);
-$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(2), ['--sex-m-chart', '#edf7fd']);
-$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(0), ['--sex-u-chart', '#ebebeb']);
-$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(3), ['--sex-f-chart-dark', '#baaec1']);
-$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(4), ['--sex-f-chart', '#e9daf1']);
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(1), ['--sex-m-chart-dark', '#577292']);
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(2), ['--sex-m-chart', '#84beff']);
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(0), ['--sex-u-chart', '#777777']);
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(3), ['--sex-f-chart-dark', '#b998a0']);
+$chart_g3 = $add_branch($chart_g3, $sosa_dispersion_g3->get(4), ['--sex-f-chart', '#ffd1dc']);
 ?>
 <?= view($module_name . '::charts/pie', [
     'colors'            => $chart_g3['colors'],
