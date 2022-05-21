@@ -116,7 +116,8 @@
 		"ext-pdo_pgsql" : "Required to use PostgreSQL for database storage",
 		"ext-pdo_sqlsvr" : "Required to use SQL Server for database storage",
         "ext-zip": "Required to compress downloads and use the upgrade wizard",
-        "ext-zlib": "Required to compress HTTP responses"
+        "ext-zlib": "Required to compress HTTP responses",
+		"jon48/webtrees-theme-rural": "Suggested webtrees theme from same author"
 	},
 	"scripts" : {
 		"webtrees-geneajaubart:build" : "./vendor/bin/robo build",

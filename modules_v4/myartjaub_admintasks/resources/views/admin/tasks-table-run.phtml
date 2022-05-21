@@ -24,3 +24,10 @@ use Fisharebest\Webtrees\I18N;
         &nbsp;<?= e(I18N::translate('Error')) ?>
     </div>
 </button>
+<button type="button" class="btn btn-outline-secondary"
+    title="<?= e(I18N::translate('Copy trigger URL')) ?>" 
+    onclick="maj_copy_admintask_trigger(<?= $task_sched_id ?>)"
+    >
+    <?= view('icons/copy') ?>
+</button>
+<input id="maj-task-trigger-url-<?= $task_sched_id ?>" type="hidden" value="<?= e($run_route) ?>" />

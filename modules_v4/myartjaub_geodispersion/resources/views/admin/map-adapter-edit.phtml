@@ -50,7 +50,7 @@ $maps_list = $maps_list->sortBy(fn(MapDefinitionInterface $map): string => $map-
             <?= I18N::translateContext('GEODISPERSION', 'Map') ?>
         </label>
         <div class="col-sm-9">
-            <select class="form-select tom-select" id="map_adapter_map" name="map_adapter_map">
+            <select class="form-select tom-select" id="map_adapter_map" name="map_adapter_map" required="required">
             <?php foreach ($maps_list as $map_id => $map) : ?>
                 <option value="<?= e($map_id) ?>" <?= $map_adapter !== null && $map_id === $map_adapter->map()->id()  ? 'selected' : '' ?>>
                     <?= $map->title() ?>
@@ -69,7 +69,7 @@ $maps_list = $maps_list->sortBy(fn(MapDefinitionInterface $map): string => $map-
             <?= I18N::translate('Place mapper') ?>
         </label>
         <div class="col-sm-9">
-            <select class="form-select tom-select" id="map_adapter_mapper" name="map_adapter_mapper">
+            <select class="form-select tom-select" id="map_adapter_mapper" name="map_adapter_mapper" required="required">
             <?php foreach ($mappers_list as $mapper) : ?>
                 <option value="<?= e(get_class($mapper)) ?>" <?= $map_adapter !== null && $map_adapter->placeMapper() instanceof $mapper ? 'selected' : '' ?>>
                     <?= $mapper->title() ?>
@@ -93,7 +93,7 @@ $maps_list = $maps_list->sortBy(fn(MapDefinitionInterface $map): string => $map-
             <?php if ($map_adapter !== null) : ?>
             <input type="hidden" value="<?= e($map_adapter->viewConfig()->mapMappingProperty()) ?>" name="map_adapter_property" />
             <?php endif; ?>
-            <select class="form-select" id="map_adapter_property_selected" name="map_adapter_property_selected">
+            <select class="form-select tom-select" id="map_adapter_property_selected" name="map_adapter_property_selected" required="required">
             </select>
             <p class="form-text">
                 <?= I18N::translate('The shape property to be used by the place mapper to identify places. For the best results, the property value should be unique.') ?>
@@ -125,18 +125,18 @@ $maps_list = $maps_list->sortBy(fn(MapDefinitionInterface $map): string => $map-
 let loadMappingProperty = function(mapId) {
     $.get("<?= route(MapFeaturePropertyData::class) ?>", { map_id: mapId })
     .done(function(data) {
-        let select = $('#maj-map-adapter-select-property > select').first();
-        select.empty();
+        let select = $('#maj-map-adapter-select-property > select')[0].tomselect;
+        select.clear();
+        select.clearOptions();
         let adapter_property = $('#maj-map-adapter-select-property > input[name=map_adapter_property]').val();
         $.each(data, function (key, property) {
-            let selected = adapter_property == property;
-            select.append(new Option(property, property, selected, selected));
+            select.addOption({value: property, text: property});
+            if(adapter_property === property) select.addItem(property);
         });
     });
 }
 
 let loadMapperConfig = function(mapperClass) {
-
     $.get(
         "<?= route(MapAdapterMapperConfig::class, [
             'tree' => $tree->name(),

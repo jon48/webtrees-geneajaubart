@@ -117,5 +117,17 @@ function maj_run_admintask(taskid, route) {
         setTimeout(() => { adminTasksTable.ajax.reload(); }, 1000);
     });
 } 
+
+function maj_copy_admintask_trigger(taskid) {
+    const input = document.getElementById('maj-task-trigger-url-' + taskid);
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(input.value);
+    } else {
+        input.select();
+        document.execCommand("copy");
+    }
+    alert(<?= json_encode(I18N::translate('The trigger URL was copied to the clipboard.'), JSON_THROW_ON_ERROR) ?>);
+}
+
 </script>
 <?php View::endpush() ?>

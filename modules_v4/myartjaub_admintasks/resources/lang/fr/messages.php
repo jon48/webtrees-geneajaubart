@@ -77,6 +77,9 @@ return array (
                                     =>  'Détermine si la tâche doit s’exécuter un nombre déterminé de fois.',
     'Defines the number of times the task will run.'
                                     =>  'Détermine le nombre de fois la tâche doit s’exécuter.',
+    'Copy trigger URL'              =>  'Copier le lien d’exécution de la tâche',
+    'The trigger URL was copied to the clipboard.'
+                                    =>  'Le lien d’exécution de la tâche a été copié dans le presse-papiers.',
     'The scheduled task has been successfully updated.'
                                     =>  'La tâche planifiée a été mise à jour avec succès.',
     'The attached module could not be found.'

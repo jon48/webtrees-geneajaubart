@@ -18,6 +18,7 @@ use Fisharebest\Webtrees\View;
     <select
         autocomplete="off"
         class="form-select tom-select maj-tom-select <?= $class ?? '' ?>"
+        required="required"
         id="<?= e($id ?? $name) ?>"
         name="<?= e($name) ?>"
         <?= ($disabled ?? false) ? 'disabled' : '' ?>

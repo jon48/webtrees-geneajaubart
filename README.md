@@ -131,7 +131,10 @@ the Rural theme might present weird displays or alignments. Please contact
 
 **webtrees-geneajaubart** shares the same requirements and system configuration as a standard **webtrees** installation.
 
-For a correct installation, you need to have [**composer**](https://getcomposer.org/) installed on your computer.
+The MyArtJaub Sosa module has limited features when running on a SQLite database.
+
+For a correct installation directly from the source code, you need to have **[composer](https://getcomposer.org/)** and 
+**[npm](https://www.npmjs.com/)** installed on your computer.
 
 ### Installation
 

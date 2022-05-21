@@ -47,7 +47,7 @@ uasort($view_types, I18N::comparator());
             <?= I18N::translate('Type') ?>
         </label>
         <div class="col-sm-9">
-            <select class="form-select tom-select" id="view_type" name="view_type">
+            <select class="form-select tom-select" id="view_type" name="view_type" required="required">
             <?php foreach ($view_types as $type_key => $type_name) : ?>
                 <option value="<?= e($type_key) ?>"><?= $type_name ?></option>
             <?php endforeach;?>

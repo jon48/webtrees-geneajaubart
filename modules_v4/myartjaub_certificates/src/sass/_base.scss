@@ -35,14 +35,18 @@
         }
         
         .wt-page-options-label,
-        .wt-page-options-value {
+        .maj-certificate-tom-select {
             text-align: center;
         }
+        
+        .ts-control {
+            justify-content: center;
+            
+            > input {
+                flex-grow: 0;
+            }
+        }
     }
-}
-
-.maj-certificate-select ul li {
-    text-align: center;
 }
 
 .wt-page-content-maj-certificate-page {
