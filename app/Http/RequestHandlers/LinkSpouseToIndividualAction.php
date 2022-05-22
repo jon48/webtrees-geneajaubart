@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Family;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\GedcomEditService;
 use Fisharebest\Webtrees\Validator;
@@ -58,14 +59,12 @@ class LinkSpouseToIndividualAction implements RequestHandlerInterface
         $individual = Registry::individualFactory()->make($xref, $tree);
         $individual = Auth::checkIndividualAccess($individual, true);
 
-        $params = (array) $request->getParsedBody();
-
-        $levels = $params['flevels'] ?? [];
-        $tags   = $params['ftags'] ?? [];
-        $values = $params['fvalues'] ?? [];
+        $levels = Validator::parsedBody($request)->array('flevels');
+        $tags   = Validator::parsedBody($request)->array('ftags');
+        $values = Validator::parsedBody($request)->array('fvalues');
 
         // Create the new family
-        $spid   = $params['spid'];
+        $spid   = Validator::parsedBody($request)->string('spid');
         $spouse = Registry::individualFactory()->make($spid, $tree);
         $spouse = Auth::checkIndividualAccess($spouse, true);
 
@@ -75,7 +74,7 @@ class LinkSpouseToIndividualAction implements RequestHandlerInterface
             $gedcom = "0 @@ FAM\n1 WIFE @" . $individual->xref() . "@\n1 HUSB @" . $spouse->xref() . '@';
         }
 
-        $gedcom .= "\n" . $this->gedcom_edit_service->editLinesToGedcom('FAM', $levels, $tags, $values);
+        $gedcom .= $this->gedcom_edit_service->editLinesToGedcom(Family::RECORD_TYPE, $levels, $tags, $values);
 
         $family = $tree->createFamily($gedcom);
 

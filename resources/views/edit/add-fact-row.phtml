@@ -22,10 +22,8 @@ use Fisharebest\Webtrees\I18N;
     <td>
         <?php if ($add_facts !== []) : ?>
             <form method="post" action="<?= e(route(SelectNewFact::class, ['tree' => $record->tree()->name(), 'xref' => $record->xref()])) ?>" onsubmit="if ($('#add-fact').val() === null) {event.preventDefault();}">
-                <?= csrf_field() ?>
-
                 <div class="input-group">
-                    <select class="form-control" id="add-fact" name="fact">
+                    <select class="form-select" id="add-fact" name="fact">
                         <option value="" disabled selected>
                             <?= I18N::translate('&lt;select&gt;') ?>
                         </option>
@@ -38,6 +36,8 @@ use Fisharebest\Webtrees\I18N;
                         <?= /* I18N: A button label. */ I18N::translate('add') ?>
                     </button>
                 </div>
+
+                <?= csrf_field() ?>
             </form>
         <?php endif ?>
 

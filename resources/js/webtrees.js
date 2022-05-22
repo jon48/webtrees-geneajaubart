@@ -415,7 +415,7 @@
   function calGenerateSelectorContent (dateFieldId, dateDivId, date) {
     let i, j;
     let content = '<table border="1"><tr>';
-    content += '<td><select class="form-control" id="' + dateFieldId + '_daySelect" onchange="return webtrees.calUpdateCalendar(\'' + dateFieldId + '\', \'' + dateDivId + '\');">';
+    content += '<td><select class="form-select" id="' + dateFieldId + '_daySelect" onchange="return webtrees.calUpdateCalendar(\'' + dateFieldId + '\', \'' + dateDivId + '\');">';
     for (i = 1; i < 32; i++) {
       content += '<option value="' + i + '"';
       if (date.getDate() === i) {
@@ -424,7 +424,7 @@
       content += '>' + i + '</option>';
     }
     content += '</select></td>';
-    content += '<td><select class="form-control" id="' + dateFieldId + '_monSelect" onchange="return webtrees.calUpdateCalendar(\'' + dateFieldId + '\', \'' + dateDivId + '\');">';
+    content += '<td><select class="form-select" id="' + dateFieldId + '_monSelect" onchange="return webtrees.calUpdateCalendar(\'' + dateFieldId + '\', \'' + dateDivId + '\');">';
     for (i = 1; i < 13; i++) {
       content += '<option value="' + i + '"';
       if (date.getMonth() + 1 === i) {
@@ -645,7 +645,7 @@
             replace: function (url, uriEncodedQuery) {
               const symbol = (url.indexOf("?") > 0) ? '&' : '?';
               if (that.dataset.wtAutocompleteExtra === 'SOUR') {
-                let row_group = that.closest('.form-group').parentElement.previousElementSibling;
+                let row_group = that.closest('.wt-nested-edit-fields').previousElementSibling;
                 while (row_group.querySelector('select') === null) {
                   row_group = row_group.previousElementSibling;
                 }
@@ -744,6 +744,7 @@
       let options = {
         plugins: ['dropdown_input', 'virtual_scroll'],
         maxOptions: false,
+        searchField: ['text','value'], // Allow records found by XREF to be displayed
         render: {
           item: (data, escape) => '<div>' + data.text + '</div>',
           option: (data, escape) => '<div>' + data.text + '</div>',
@@ -851,6 +852,28 @@
       .catch(error => {
         modal_content.innerHTML = error;
       });
+  };
+
+  /**
+   * Text areas don't support the pattern attribute, so apply it manually via data-wt-pattern.
+   *
+   * @param {HTMLFormElement} form
+   */
+  webtrees.textareaPatterns = function (form) {
+    form.addEventListener('submit', function (event) {
+      event.target.querySelectorAll('textarea[data-wt-pattern]').forEach(function (element) {
+        const pattern = new RegExp('^' + element.dataset.wtPattern + '$');
+
+        if (!element.readOnly && element.value !== '' && !pattern.test(element.value)) {
+          event.preventDefault();
+          event.stopPropagation();
+          element.classList.add('is-invalid');
+          element.scrollIntoView();
+        } else {
+          element.classList.remove('is-invalid');
+        }
+      });
+    });
   };
 }(window.webtrees = window.webtrees || {}));
 

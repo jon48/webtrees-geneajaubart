@@ -29,7 +29,6 @@ use function htmlspecialchars_decode;
 use function preg_match;
 use function preg_replace;
 use function strip_tags;
-use function trim;
 
 use const ENT_QUOTES;
 
@@ -91,19 +90,47 @@ class Note extends GedcomRecord
     public function extractNames(): void
     {
         if ($this->tree->getPreference('FORMAT_TEXT') === 'markdown') {
-            $text = Registry::markdownFactory()->markdown($this->getNote());
+            $html = Registry::markdownFactory()->markdown($this->getNote());
         } else {
-            $text = Registry::markdownFactory()->autolink($this->getNote());
+            $html = Registry::markdownFactory()->autolink($this->getNote());
         }
 
+        $first_line = self::firstLineOfTextFromHtml($html);
 
-        // Take the first line
-        [$text] = explode(MarkdownFactory::BREAK, strip_tags(trim($text), ['br']));
-
-
-        if ($text !== '') {
-            $text = htmlspecialchars_decode($text, ENT_QUOTES);
-            $this->addName('NOTE', Str::limit($text, 100, I18N::translate('…')), $this->gedcom());
+        if ($first_line !== '') {
+            $this->addName('NOTE', Str::limit($first_line, 100, I18N::translate('…')), $this->gedcom());
         }
+    }
+
+    /**
+     * Notes are converted to HTML for display.  We want the first line
+     *
+     * @param string $html
+     *
+     * @return string
+     */
+    public static function firstLineOfTextFromHtml(string $html): string
+    {
+        $html = strtr($html, [
+            '</blockquote>' => MarkdownFactory::BREAK,
+            '</h1>'         => MarkdownFactory::BREAK,
+            '</h2>'         => MarkdownFactory::BREAK,
+            '</h3>'         => MarkdownFactory::BREAK,
+            '</h4>'         => MarkdownFactory::BREAK,
+            '</h5>'         => MarkdownFactory::BREAK,
+            '</h6>'         => MarkdownFactory::BREAK,
+            '</li>'         => MarkdownFactory::BREAK,
+            '</p>'          => MarkdownFactory::BREAK,
+            '</pre>'        => MarkdownFactory::BREAK,
+            '</td>'         => ' ',
+            '</th>'         => ' ',
+            '<hr>'          => MarkdownFactory::BREAK,
+        ]);
+
+        $html = strip_tags($html, ['br']);
+
+        [$first] = explode(MarkdownFactory::BREAK, $html, 2);
+
+        return htmlspecialchars_decode($first, ENT_QUOTES);
     }
 }

@@ -237,6 +237,18 @@ class Gedcom
     // Regular expression to match a GEDCOM XREF.
     public const REGEX_XREF = '[A-Za-z0-9:_.-]{1,20}';
 
+    // Regular expression to match a GEDCOM fact/event
+    private const REGEX_VALUE   = '( .+)?';
+    private const REGEX_LEVEL_9 = '\n9 ' . self::REGEX_TAG . self::REGEX_VALUE;
+    private const REGEX_LEVEL_8 = '\n8 ' . self::REGEX_TAG . self::REGEX_VALUE . '(' . self::REGEX_LEVEL_9 . ')*';
+    private const REGEX_LEVEL_7 = '\n7 ' . self::REGEX_TAG . self::REGEX_VALUE . '(' . self::REGEX_LEVEL_8 . ')*';
+    private const REGEX_LEVEL_6 = '\n6 ' . self::REGEX_TAG . self::REGEX_VALUE . '(' . self::REGEX_LEVEL_7 . ')*';
+    private const REGEX_LEVEL_5 = '\n5 ' . self::REGEX_TAG . self::REGEX_VALUE . '(' . self::REGEX_LEVEL_6 . ')*';
+    private const REGEX_LEVEL_4 = '\n4 ' . self::REGEX_TAG . self::REGEX_VALUE . '(' . self::REGEX_LEVEL_5 . ')*';
+    private const REGEX_LEVEL_3 = '\n3 ' . self::REGEX_TAG . self::REGEX_VALUE . '(' . self::REGEX_LEVEL_4 . ')*';
+    private const REGEX_LEVEL_2 = '\n2 ' . self::REGEX_TAG . self::REGEX_VALUE . '(' . self::REGEX_LEVEL_3 . ')*';
+    public const REGEX_FACT     = '1 ' . self::REGEX_TAG . self::REGEX_VALUE . '(' . self::REGEX_LEVEL_2 . ')*';
+
     // Separates the parts of a place name.
     public const PLACE_SEPARATOR = ', ';
 
@@ -324,6 +336,7 @@ class Gedcom
 
     // Custom GEDCOM tags that can be created in webtrees.
     public const CUSTOM_FAMILY_TAGS = [
+        'FACT',
         '_COML',
         '_MARI',
         '_MBON',
@@ -727,6 +740,7 @@ class Gedcom
             'NOTE:CHAN:DATE:TIME'      => new TimeValue(I18N::translate('Time of last change')),
             'NOTE:CHAN:NOTE'           => new NoteStructure(I18N::translate('Note')),
             'NOTE:CONC'                => new SubmitterText(I18N::translate('Note')),
+            'NOTE:CONT'                => new SubmitterText(I18N::translate('Continuation')),
             'NOTE:REFN'                => new UserReferenceNumber(I18N::translate('Reference number')),
             'NOTE:REFN:TYPE'           => new UserReferenceType(I18N::translate('Type of reference number')),
             'NOTE:RIN'                 => new AutomatedRecordId(I18N::translate('Record ID number')),
@@ -1115,7 +1129,7 @@ class Gedcom
             'FAM:_TODO:DATA'                  => new SubmitterText(I18N::translate('The solution')),
             'FAM:_TODO:DATE'                  => new DateValue(I18N::translate('Creation date')),
             'FAM:_TODO:DESC'                  => new CustomElement(I18N::translate('Description')),
-            'FAM:_TODO:NOTE'                  => new SubmitterText(I18N::translate('The problem')),
+            'FAM:_TODO:NOTE'                  => new SubmitterText(I18N::translate('Note')),
             'FAM:_TODO:REPO'                  => new XrefRepository(I18N::translate('Repository'), []),
             'FAM:_TODO:STAT'                  => new ResearchTaskStatus(I18N::translate('Status')),
             'FAM:_TODO:TYPE'                  => new ResearchTaskType(I18N::translate('Type of research task')),
@@ -1171,7 +1185,7 @@ class Gedcom
             'INDI:_TODO:DATA'                 => new SubmitterText(I18N::translate('The solution')),
             'INDI:_TODO:DATE'                 => new DateValue(I18N::translate('Creation date')),
             'INDI:_TODO:DESC'                 => new CustomElement(I18N::translate('Description')),
-            'INDI:_TODO:NOTE'                 => new SubmitterText(I18N::translate('The problem')),
+            'INDI:_TODO:NOTE'                 => new SubmitterText(I18N::translate('Note')),
             'INDI:_TODO:REPO'                 => new XrefRepository(I18N::translate('Repository'), []),
             'INDI:_TODO:STAT'                 => new ResearchTaskStatus(I18N::translate('Status')),
             'INDI:_TODO:TYPE'                 => new ResearchTaskType(I18N::translate('Type of research task')),
@@ -1288,6 +1302,37 @@ class Gedcom
     /**
      * @return array<string,ElementInterface>
      */
+    private function geneatique(): array
+    {
+        return [
+            /*
+            Pour déclarer les témoins dans les actes de naissance
+
+            Balise GEDCOM non valide. INDI:BIRT:ASSO
+            INDI:BIRT:ASSO:TYPE
+            INDI:BIRT:ASSO:RELA
+            INDI:DEAT:PLAC:QUAY
+            INDI:BIRT:OBJE:QUAY
+            INDI:BIRT:SOUR:TEXT
+
+            Dans les mariages
+
+            FAM:MARR:ASSO
+            FAM:MARR:ASSO:TYPE
+            FAM:MARR:ASSO:RELA
+            FAM:MARR:WWW:QUAY
+            OBJE:WWW
+            OBJE:SOUR:TEXTHTTPS
+            OBJE:NOTE:WWW
+            SOUR:QUAY
+            SOUR:TYPE
+            */
+        ];
+    }
+
+    /**
+     * @return array<string,ElementInterface>
+     */
     private function genPlusWinTags(): array
     {
         return [
@@ -1368,6 +1413,23 @@ class Gedcom
             'SOUR:_CREAT'             => new DateValue(I18N::translate('Creation date')),
             'SOUR:_KTIT'              => new SourceFiledByEntry(I18N::translate('Abbreviation')),
             'SOUR:_UID'               => new PafUid(I18N::translate('Unique identifier')),
+        ];
+    }
+
+    /**
+     * @return array<string,ElementInterface>
+     */
+    private function heredis(): array
+    {
+        return [
+            'INDI:SIGN'                   => new CustomElement(I18N::translate('Signature')),
+            /* Reported on the forum - but what do they mean?
+            'INDI:_FIL'                   => new CustomElement(I18N::translate('???')),
+            'INDI:*:_FNA'                 => new CustomElement(I18N::translate('???')),
+            'INDI:????:????:_SUBMAP'      => new EmptyElement(I18N::translate('Coordinates'), ['INDI' => '1:1', 'LONG' => '1:1']),
+            'INDI:????:????:_SUBMAP:LATI' => new PlaceLatitude(I18N::translate('Latitude')),
+            'INDI:????:????:_SUBMAP:LONG' => new PlaceLongtitude(I18N::translate('Longitude')),
+            */
         ];
     }
 
@@ -1541,6 +1603,7 @@ class Gedcom
         return [
             'FAM:CHAN:_PGVU'        => new WebtreesUser(I18N::translate('Author of last change')),
             'FAM:COMM'              => new CustomElement(I18N::translate('Comment')),
+            'FAM:FACT'              => new CustomFact(I18N::translate('Fact')),
             'INDI:*:ASSO'           => new XrefAssociate(I18N::translate('Associate')),
             'INDI:*:ASSO:RELA'      => new RelationIsDescriptor(I18N::translate('Relationship')),
             'INDI:*:PLAC:_HEB'      => new NoteStructure(I18N::translate('Place in Hebrew')),
@@ -1843,7 +1906,9 @@ class Gedcom
             $element_factory->registerTags($this->familyTreeBuilderTags());
             $element_factory->registerTags($this->familyTreeMakerTags());
             $element_factory->registerTags($this->gedcomLTags());
+            $element_factory->registerTags($this->geneatique());
             $element_factory->registerTags($this->genPlusWinTags());
+            $element_factory->registerTags($this->heredis());
             $element_factory->registerTags($this->legacyTags());
             $element_factory->registerTags($this->myHeritageTags());
             $element_factory->registerTags($this->personalAncestralFileTags());

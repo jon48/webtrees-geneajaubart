@@ -24,8 +24,6 @@ use Fisharebest\Webtrees\View;
 <h1><?= $title ?></h1>
 
 <form method="post" action="<?= e(route(TreePrivacyAction::class, ['tree' => $tree->name()])) ?>">
-    <?= csrf_field() ?>
-
     <!-- REQUIRE_AUTHENTICATION -->
     <div class="row mb-3">
         <div class="col-form-label col-sm-4">
@@ -161,7 +159,7 @@ use Fisharebest\Webtrees\View;
     <script id="new-resn-template" type="text/html">
         <tr>
             <td class="w-50">
-                <select class="form-control record-type-selector mb-3">
+                <select class="form-select record-type-selector mb-3">
                     <option value="all"><?= I18N::translate('All records') ?></option>
                     <option value="individual"><?= I18N::translate('Individual') ?></option>
                     <option value="family"><?= I18N::translate('Family') ?></option>
@@ -305,10 +303,11 @@ use Fisharebest\Webtrees\View;
                     <?= /* I18N: Label for checkbox */ I18N::translate('Apply these preferences to new family trees') ?>
                 </label>
             </div>
+            -->
         </div>
-        -->
-        </div>
+    </div>
 
+    <?= csrf_field() ?>
 </form>
 
 <?php View::push('javascript') ?>
@@ -323,7 +322,7 @@ use Fisharebest\Webtrees\View;
    * @param access true or false
    */
   function setPrivacyFeedback (sel, who, access) {
-    var formGroup = $(sel).closest('.form-group');
+    var formGroup = $(sel).closest('.row');
 
     if (access) {
       $('.' + who, formGroup).addClass('bg-success').removeClass('bg-secondary');

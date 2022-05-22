@@ -107,6 +107,13 @@ a:hover, .btn-link:hover, .nav-link:hover {
     text-decoration: var(--link-decoration-hover);
 }
 
+/* Some menus (e.g. languages) can be longer than a page */
+.dropdown-menu {
+    max-height: 90vh;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+}
+
 /* User-generated text */
 .ut {
     /* RTL text on LTR pages (or vice-versa) */
@@ -114,4 +121,16 @@ a:hover, .btn-link:hover, .nav-link:hover {
 
     /* Long words without spaces can break the page layout */
     word-break: break-all;
+}
+
+.wt-nested-edit-fields {
+    padding-left: 1rem;
+    margin-left: 1rem;
+    border-left: solid 4px grey;
+}
+
+.wt-text-overflow-elipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

@@ -42,6 +42,7 @@ use Fisharebest\Webtrees\Factories\SlugFactory;
 use Fisharebest\Webtrees\Factories\SourceFactory;
 use Fisharebest\Webtrees\Factories\SubmissionFactory;
 use Fisharebest\Webtrees\Factories\SubmitterFactory;
+use Fisharebest\Webtrees\Factories\SurnameTraditionFactory;
 use Fisharebest\Webtrees\Factories\TimestampFactory;
 use Fisharebest\Webtrees\Factories\XrefFactory;
 use Fisharebest\Webtrees\GedcomFilters\GedcomEncodingFilter;
@@ -49,6 +50,7 @@ use Fisharebest\Webtrees\Http\Middleware\BadBotBlocker;
 use Fisharebest\Webtrees\Http\Middleware\BaseUrl;
 use Fisharebest\Webtrees\Http\Middleware\BootModules;
 use Fisharebest\Webtrees\Http\Middleware\CheckForMaintenanceMode;
+use Fisharebest\Webtrees\Http\Middleware\CheckForNewVersion;
 use Fisharebest\Webtrees\Http\Middleware\ClientIp;
 use Fisharebest\Webtrees\Http\Middleware\CompressResponse;
 use Fisharebest\Webtrees\Http\Middleware\ContentLength;
@@ -137,16 +139,16 @@ class Webtrees
     // e.g. "-dev", "-alpha", "-beta", etc.
     public const STABILITY = '';
 
-    // Version number
-    public const VERSION = '2.1.2' . self::STABILITY;
+    // Version number.
+    public const VERSION = '2.1.4' . self::STABILITY;
 
     // Project website.
     public const URL = 'https://webtrees.net/';
 
-    // FAQ links
+    // FAQ links.
     public const URL_FAQ_EMAIL = 'https://webtrees.net/faq/email';
 
-    // Project website.
+    // GEDCOM specification.
     public const GEDCOM_PDF = 'https://webtrees.net/downloads/gedcom-5-5-1.pdf';
 
     private const MIDDLEWARE = [
@@ -167,6 +169,7 @@ class Webtrees
         UseTheme::class,
         DoHousekeeping::class,
         UseTransaction::class,
+        CheckForNewVersion::class,
         LoadRoutes::class,
         RegisterGedcomTags::class,
         BootModules::class,
@@ -213,6 +216,7 @@ class Webtrees
         Registry::sourceFactory(new SourceFactory());
         Registry::submissionFactory(new SubmissionFactory());
         Registry::submitterFactory(new SubmitterFactory());
+        Registry::surnameTraditionFactory(new SurnameTraditionFactory());
         Registry::timestampFactory(new TimestampFactory());
         Registry::xrefFactory(new XrefFactory());
 

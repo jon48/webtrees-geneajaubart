@@ -70,6 +70,7 @@ use function str_contains;
 use function str_starts_with;
 use function strtoupper;
 use function substr_count;
+use function var_dump;
 
 /**
  * Check a tree for errors.
@@ -137,6 +138,10 @@ class CheckTree implements RequestHandlerInterface
             ->get()
             ->map(static function (object $row): object {
                 // Extract type for pending record
+                if ($row->type === '' && str_starts_with($row->gedcom, '0 HEAD')) {
+                    $row->type = 'HEAD';
+                }
+
                 if ($row->type === '' && preg_match('/^0 @[^@]*@ ([_A-Z0-9]+)/', $row->gedcom, $match) === 1) {
                     $row->type = $match[1];
                 }
@@ -287,7 +292,10 @@ class CheckTree implements RequestHandlerInterface
                     $expected = e($element->canonical($value));
                     $actual   = strtr(e($value), ["\t" => '&rarr;']);
                     $message  = I18N::translate('“%1$s” should be “%2$s”.', $actual, $expected);
-                    $infos[]  = $this->lineError($tree, $record->type, $record->xref, $line_number, $line, $message);
+                    if (strtoupper($element->canonical($value)) !== strtoupper($value)) {
+                        // This will be relevant for GEDCOM 7.0.  It's not relevant now, and causes confusion.
+                        $infos[]  = $this->lineError($tree, $record->type, $record->xref, $line_number, $line, $message);
+                    }
                 } elseif ($element instanceof MultimediaFormat) {
                     $mime = Mime::TYPES[$value] ?? Mime::DEFAULT_TYPE;
 

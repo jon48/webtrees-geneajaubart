@@ -31,7 +31,7 @@ use Fisharebest\Webtrees\SurnameTradition\SpanishSurnameTradition;
 use Fisharebest\Webtrees\SurnameTradition\SurnameTraditionInterface;
 
 /**
- *
+ * @deprecated - Will be removed in 2.2.0 - use the factory to create surname traditions.
  */
 class SurnameTradition
 {
@@ -41,77 +41,21 @@ class SurnameTradition
      * @param string $name Internal name of the surname tradition
      *
      * @return SurnameTraditionInterface
+     * @deprecated - Will be removed in 2.2.0 - use the factory to create surname traditions.
      */
     public static function create(string $name): SurnameTraditionInterface
     {
-        switch ($name) {
-            case 'paternal':
-                return new PaternalSurnameTradition();
-            case 'patrilineal':
-                return new PatrilinealSurnameTradition();
-            case 'matrilineal':
-                return new MatrilinealSurnameTradition();
-            case 'portuguese':
-                return new PortugueseSurnameTradition();
-            case 'spanish':
-                return new SpanishSurnameTradition();
-            case 'polish':
-                return new PolishSurnameTradition();
-            case 'lithuanian':
-                return new LithuanianSurnameTradition();
-            case 'icelandic':
-                return new IcelandicSurnameTradition();
-            default:
-                return new DefaultSurnameTradition();
-        }
+        return Registry::surnameTraditionFactory()->make('name');
     }
 
     /**
      * A list of known surname traditions, with their descriptions
      *
      * @return array<string>
+     * @deprecated - Will be removed in 2.2.0 - use the factory to create surname traditions.
      */
     public static function allDescriptions(): array
     {
-        return [
-            'paternal'    => I18N::translateContext('Surname tradition', 'paternal') . ' — ' .
-                /* I18N: In the paternal surname tradition, ... */
-                I18N::translate('Children take their father’s surname.') . ' ' .
-                /* I18N: In the paternal surname tradition, ... */
-                I18N::translate('Wives take their husband’s surname.'),
-            'patrilineal' =>
-                /* I18N: A system where children take their father’s surname */
-                I18N::translate('patrilineal') . ' — ' .
-                /* I18N: In the patrilineal surname tradition, ... */
-                I18N::translate('Children take their father’s surname.'),
-            'matrilineal' => /* I18N: A system where children take their mother’s surname */
-                I18N::translate('matrilineal') . ' — ' .
-                /* I18N: In the matrilineal surname tradition, ... */
-                I18N::translate('Children take their mother’s surname.'),
-            'spanish'     => I18N::translateContext('Surname tradition', 'Spanish') . ' — ' .
-                /* I18N: In the Spanish surname tradition, ... */
-                I18N::translate('Children take one surname from the father and one surname from the mother.'),
-            'portuguese'  => I18N::translateContext('Surname tradition', 'Portuguese') . ' — ' .
-                /* I18N: In the Portuguese surname tradition, ... */
-                I18N::translate('Children take one surname from the mother and one surname from the father.'),
-            'icelandic'   => I18N::translateContext('Surname tradition', 'Icelandic') . ' — ' .
-                /* I18N: In the Icelandic surname tradition, ... */
-                I18N::translate('Children take a patronym instead of a surname.'),
-            'polish'      => I18N::translateContext('Surname tradition', 'Polish') . ' — ' .
-                /* I18N: In the Polish surname tradition, ... */
-                I18N::translate('Children take their father’s surname.') . ' ' .
-                /* I18N: In the Polish surname tradition, ... */
-                I18N::translate('Wives take their husband’s surname.') . ' ' .
-                /* I18N: In the Polish surname tradition, ... */
-                I18N::translate('Surnames are inflected to indicate an individual’s gender.'),
-            'lithuanian'  => I18N::translateContext('Surname tradition', 'Lithuanian') . ' — ' .
-                /* I18N: In the Lithuanian surname tradition, ... */
-                I18N::translate('Children take their father’s surname.') . ' ' .
-                /* I18N: In the Lithuanian surname tradition, ... */
-                I18N::translate('Wives take their husband’s surname.') . ' ' .
-                /* I18N: In the Lithuanian surname tradition, ... */
-                I18N::translate('Surnames are inflected to indicate an individual’s gender and marital status.'),
-            'none'        => I18N::translateContext('Surname tradition', 'none'),
-        ];
+        return Registry::surnameTraditionFactory()->list();
     }
 }

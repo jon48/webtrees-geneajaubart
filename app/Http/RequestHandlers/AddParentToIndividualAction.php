@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Fisharebest\Webtrees\Http\RequestHandlers;
 
 use Fisharebest\Webtrees\Auth;
+use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Services\GedcomEditService;
 use Fisharebest\Webtrees\Validator;
@@ -55,17 +56,16 @@ class AddParentToIndividualAction implements RequestHandlerInterface
     {
         $tree       = Validator::attributes($request)->tree();
         $xref       = Validator::attributes($request)->isXref()->string('xref');
-        $params     = (array) $request->getParsedBody();
         $individual = Registry::individualFactory()->make($xref, $tree);
         $individual = Auth::checkIndividualAccess($individual, true);
 
-        $levels = $params['ilevels'] ?? [];
-        $tags   = $params['itags'] ?? [];
-        $values = $params['ivalues'] ?? [];
+        $levels = Validator::parsedBody($request)->array('ilevels');
+        $tags   = Validator::parsedBody($request)->array('itags');
+        $values = Validator::parsedBody($request)->array('ivalues');
+        $gedcom = $this->gedcom_edit_service->editLinesToGedcom(Individual::RECORD_TYPE, $levels, $tags, $values);
 
         // Create the new parent
-        $gedcom = "0 @@ INDI\n" . $this->gedcom_edit_service->editLinesToGedcom('INDI', $levels, $tags, $values);
-        $parent = $tree->createIndividual($gedcom);
+        $parent = $tree->createIndividual('0 @@ INDI' . $gedcom);
 
         // Create a new family
         $link   = $parent->sex() === 'F' ? 'WIFE' : 'HUSB';

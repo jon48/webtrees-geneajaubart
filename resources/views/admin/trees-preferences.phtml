@@ -40,8 +40,6 @@ use Illuminate\Support\Collection;
 <h1><?= $title ?></h1>
 
 <form method="post" action="<?= e(route(TreePreferencesAction::class, ['tree' => $tree->name()])) ?>" class="form-horizontal">
-    <?= csrf_field() ?>
-
     <h2><?= I18N::translate('General') ?></h2>
 
     <!-- TREE TITLE -->
@@ -155,7 +153,7 @@ use Illuminate\Support\Collection;
             <?= /* I18N: A configuration setting */ I18N::translate('Genealogy contact') ?>
         </label>
         <div class="col-sm-9">
-            <select id="CONTACT_USER_ID" name="CONTACT_USER_ID" class="form-control">
+            <select id="CONTACT_USER_ID" name="CONTACT_USER_ID" class="form-select">
                 <option value="">&nbsp;</option>
                 <?php foreach ($members as $member) : ?>
                     <option value="<?= $member->id() ?>" <?= (int) $tree->getPreference('CONTACT_USER_ID') === $member->id() ? 'selected' : '' ?>>
@@ -175,7 +173,7 @@ use Illuminate\Support\Collection;
             <?= /* I18N: A configuration setting */ I18N::translate('Technical help contact') ?>
         </label>
         <div class="col-sm-9">
-            <select id="WEBMASTER_USER_ID" name="WEBMASTER_USER_ID" class="form-control">
+            <select id="WEBMASTER_USER_ID" name="WEBMASTER_USER_ID" class="form-select">
                 <option value="">&nbsp;</option>
                 <?php foreach ($members as $member) : ?>
                     <option value="<?= $member->id() ?>" <?= (int) $tree->getPreference('WEBMASTER_USER_ID') === $member->id() ? 'selected' : '' ?>>
@@ -749,7 +747,7 @@ use Illuminate\Support\Collection;
                 <?= I18N::translate('save') ?>
             </button>
             <a class="btn btn-secondary" href="<?= e(route(ManageTrees::class, ['tree' => $tree->name()])) ?>">
-        <?= view('icons/cancel') ?>
+                <?= view('icons/cancel') ?>
                 <?= I18N::translate('cancel') ?>
             </a>
             <!-- Coming soon
@@ -767,7 +765,9 @@ use Illuminate\Support\Collection;
                     <?= /* I18N: Label for checkbox */ I18N::translate('Apply these preferences to new family trees') ?>
                 </label>
             </div>
+            -->
         </div>
-        -->
-        </div>
+    </div>
+
+    <?= csrf_field() ?>
 </form>
