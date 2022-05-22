@@ -28,7 +28,6 @@ $max_gen_system = app(SosaRecordsService::class)->maxSystemGenerations();
 
 <div class="wt-page-content wt-page-content-maj-sosa-config">
     <form name="maj-sosa-config-form" method="post" action="<?= e(route(SosaConfigAction::class, ['tree' => $tree->name()])) ?>" class="wt-page-options hidden-print mb-4">
-        <?= csrf_field() ?>
         <div class="row">
             <label class="col-sm-3 col-form-label wt-page-options-label">
                 <?= I18N::translate('Tree') ?>
@@ -112,7 +111,8 @@ $max_gen_system = app(SosaRecordsService::class)->maxSystemGenerations();
                 ]) ?>
             </div>
         </div>
-        
+
+        <?= csrf_field() ?>
     </form> 
     
 </div>

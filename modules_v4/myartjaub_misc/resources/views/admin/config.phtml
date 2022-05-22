@@ -16,8 +16,6 @@ use Fisharebest\Webtrees\Module\ModuleInterface;
 <h1><?= $title ?></h1>
 
 <form method="post" class="form-horizontal">
-    <?= csrf_field() ?>
-
     <h3><?= I18N::translate('Titles') ?></h3>
 
     <!--  MAJ_TITLE_PREFIX -->
@@ -87,5 +85,6 @@ use Fisharebest\Webtrees\Module\ModuleInterface;
             </button>
         </div>
     </div>
-    
+
+    <?= csrf_field() ?>
 </form>

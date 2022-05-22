@@ -36,10 +36,14 @@ $attributes_cert_file = [
 
 ?>
 
-<?= view($module_name . '::components/select-city', ['cities' => $cities, 'id' => $id . '-city', 'name' => 'edit-_ACT-city', 'selected_city' => $value_city]) ?>
-
-<input <?= Html::attributes($attributes_cert_file) ?>>
-<input <?= Html::attributes($attributes_hidden) ?>>
+<div class="row certificate-edit-group g-1">
+    <?= view($module_name . '::components/select-city', ['cities' => $cities, 'id' => $id . '-city', 'name' => 'edit-_ACT-city', 'selected_city' => $value_city]) ?>
+    
+    <div>
+        <input <?= Html::attributes($attributes_cert_file) ?>>
+        <input <?= Html::attributes($attributes_hidden) ?>>
+    </div>
+</div>
 
 <?php View::pushunique('javascript') ?>
 
