@@ -36,12 +36,15 @@ use Fisharebest\Webtrees\Contracts\NoteFactoryInterface;
 use Fisharebest\Webtrees\Contracts\RepositoryFactoryInterface;
 use Fisharebest\Webtrees\Contracts\ResponseFactoryInterface;
 use Fisharebest\Webtrees\Contracts\RouteFactoryInterface;
+use Fisharebest\Webtrees\Contracts\SharedNoteFactoryInterface;
 use Fisharebest\Webtrees\Contracts\SlugFactoryInterface;
 use Fisharebest\Webtrees\Contracts\SourceFactoryInterface;
 use Fisharebest\Webtrees\Contracts\SubmissionFactoryInterface;
 use Fisharebest\Webtrees\Contracts\SubmitterFactoryInterface;
 use Fisharebest\Webtrees\Contracts\SurnameTraditionFactoryInterface;
+use Fisharebest\Webtrees\Contracts\TimeFactoryInterface;
 use Fisharebest\Webtrees\Contracts\TimestampFactoryInterface;
+use Fisharebest\Webtrees\Contracts\IdFactoryInterface;
 use Fisharebest\Webtrees\Contracts\XrefFactoryInterface;
 
 /**
@@ -65,6 +68,8 @@ class Registry
 
     private static HeaderFactoryInterface $header_factory;
 
+    private static IdFactoryInterface $id_factory;
+
     private static ImageFactoryInterface $image_factory;
 
     private static IndividualFactoryInterface $individual_factory;
@@ -83,6 +88,8 @@ class Registry
 
     private static RouteFactoryInterface $route_factory;
 
+    private static SharedNoteFactoryInterface $shared_note_factory;
+
     private static SlugFactoryInterface $slug_factory;
 
     private static SourceFactoryInterface $source_factory;
@@ -92,6 +99,8 @@ class Registry
     private static SubmitterFactoryInterface $submitter_factory;
 
     private static SurnameTraditionFactoryInterface $surname_tradition_factory;
+
+    private static TimeFactoryInterface $time_factory;
 
     private static TimestampFactoryInterface $timestamp_factory;
 
@@ -223,6 +232,22 @@ class Registry
         }
 
         return self::$header_factory;
+    }
+
+    /**
+     * Store or retrieve a factory object.
+     *
+     * @param IdFactoryInterface|null $factory
+     *
+     * @return IdFactoryInterface
+     */
+    public static function idFactory(IdFactoryInterface $factory = null): IdFactoryInterface
+    {
+        if ($factory instanceof IdFactoryInterface) {
+            self::$id_factory = $factory;
+        }
+
+        return self::$id_factory;
     }
 
     /**
@@ -372,6 +397,22 @@ class Registry
     /**
      * Store or retrieve a factory object.
      *
+     * @param SharedNoteFactoryInterface|null $factory
+     *
+     * @return SharedNoteFactoryInterface
+     */
+    public static function sharedNoteFactory(SharedNoteFactoryInterface $factory = null): SharedNoteFactoryInterface
+    {
+        if ($factory instanceof SharedNoteFactoryInterface) {
+            self::$shared_note_factory = $factory;
+        }
+
+        return self::$shared_note_factory;
+    }
+
+    /**
+     * Store or retrieve a factory object.
+     *
      * @param SlugFactoryInterface|null $factory
      *
      * @return SlugFactoryInterface
@@ -447,6 +488,22 @@ class Registry
         }
 
         return self::$surname_tradition_factory;
+    }
+
+    /**
+     * Store or retrieve a factory object.
+     *
+     * @param TimeFactoryInterface|null $factory
+     *
+     * @return TimeFactoryInterface
+     */
+    public static function timeFactory(TimeFactoryInterface $factory = null): TimeFactoryInterface
+    {
+        if ($factory instanceof TimeFactoryInterface) {
+            self::$time_factory = $factory;
+        }
+
+        return self::$time_factory;
     }
 
     /**

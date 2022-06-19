@@ -38,12 +38,15 @@ use Fisharebest\Webtrees\Factories\NoteFactory;
 use Fisharebest\Webtrees\Factories\RepositoryFactory;
 use Fisharebest\Webtrees\Factories\ResponseFactory;
 use Fisharebest\Webtrees\Factories\RouteFactory;
+use Fisharebest\Webtrees\Factories\SharedNoteFactory;
 use Fisharebest\Webtrees\Factories\SlugFactory;
 use Fisharebest\Webtrees\Factories\SourceFactory;
 use Fisharebest\Webtrees\Factories\SubmissionFactory;
 use Fisharebest\Webtrees\Factories\SubmitterFactory;
 use Fisharebest\Webtrees\Factories\SurnameTraditionFactory;
+use Fisharebest\Webtrees\Factories\TimeFactory;
 use Fisharebest\Webtrees\Factories\TimestampFactory;
+use Fisharebest\Webtrees\Factories\IdFactory;
 use Fisharebest\Webtrees\Factories\XrefFactory;
 use Fisharebest\Webtrees\GedcomFilters\GedcomEncodingFilter;
 use Fisharebest\Webtrees\Http\Middleware\BadBotBlocker;
@@ -140,7 +143,7 @@ class Webtrees
     public const STABILITY = '';
 
     // Version number.
-    public const VERSION = '2.1.4' . self::STABILITY;
+    public const VERSION = '2.1.5' . self::STABILITY;
 
     // Project website.
     public const URL = 'https://webtrees.net/';
@@ -203,6 +206,7 @@ class Webtrees
         Registry::filesystem(new FilesystemFactory());
         Registry::gedcomRecordFactory(new GedcomRecordFactory());
         Registry::headerFactory(new HeaderFactory());
+        Registry::idFactory(new IdFactory());
         Registry::imageFactory(new ImageFactory());
         Registry::individualFactory(new IndividualFactory());
         Registry::locationFactory(new LocationFactory());
@@ -212,11 +216,13 @@ class Webtrees
         Registry::repositoryFactory(new RepositoryFactory());
         Registry::responseFactory(new ResponseFactory(new Psr17Factory(), new Psr17Factory()));
         Registry::routeFactory(new RouteFactory());
+        Registry::sharedNoteFactory(new SharedNoteFactory());
         Registry::slugFactory(new SlugFactory());
         Registry::sourceFactory(new SourceFactory());
         Registry::submissionFactory(new SubmissionFactory());
         Registry::submitterFactory(new SubmitterFactory());
         Registry::surnameTraditionFactory(new SurnameTraditionFactory());
+        Registry::timeFactory(new TimeFactory());
         Registry::timestampFactory(new TimestampFactory());
         Registry::xrefFactory(new XrefFactory());
 

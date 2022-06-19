@@ -19,21 +19,29 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-/**
- * Test harness for the class EntryRecordingDate
- *
- * @covers \Fisharebest\Webtrees\Elements\AbstractElement
- * @covers \Fisharebest\Webtrees\Elements\EntryRecordingDate
- */
-class EntryRecordingDateTest extends AbstractElementTest
-{
-    /**
-     * Standard tests for all elements.
-     */
-    public static function setupBeforeClass(): void
-    {
-        parent::setUpBeforeClass();
+use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\Tree;
 
-        self::$element = new EntryRecordingDate('label');
+/**
+ * UID fields
+ */
+class Uid extends AbstractElement
+{
+    protected const MAXIMUM_LENGTH = 36;
+
+    /**
+     * Create a default value for this element.
+     *
+     * @param Tree $tree
+     *
+     * @return string
+     */
+    public function default(Tree $tree): string
+    {
+        if ($tree->getPreference('GENERATE_UIDS') === '1') {
+            return Registry::idFactory()->uuid();
+        }
+
+        return '';
     }
 }

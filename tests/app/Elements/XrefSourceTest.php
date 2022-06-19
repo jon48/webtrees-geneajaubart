@@ -69,6 +69,28 @@ class XrefSourceTest extends TestCase
         $option_nodes = $select_nodes[0]->getElementsByTagName('option');
         self::assertEquals(1, $option_nodes->count());
     }
+
+    /**
+     * @return void
+     */
+    public function testEditInlineSource(): void
+    {
+        $element = new XrefSource('');
+
+        $tree = $this->createMock(Tree::class);
+
+        $request = self::createRequest();
+
+        app()->instance(ServerRequestInterface::class, $request);
+
+        $html = $element->edit('some-id', 'some-name', 'An inline source', $tree);
+        $dom  = new DOMDocument();
+        $dom->loadHTML($html);
+
+        $textarea_nodes = $dom->getElementsByTagName('textarea');
+        self::assertEquals(1, $textarea_nodes->count());
+    }
+
     /**
      * @return void
      */

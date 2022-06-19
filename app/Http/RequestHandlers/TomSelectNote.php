@@ -72,7 +72,7 @@ class TomSelectNote extends AbstractTomSelectHandler
 
         return $results->map(static function (Note $note) use ($at): array {
             return [
-                'text'  => view('selects/note', ['note' => $note]),
+                'text'  => view('selects/shared-note', ['note' => $note]),
                 'value' => $at . $note->xref() . $at,
             ];
         });

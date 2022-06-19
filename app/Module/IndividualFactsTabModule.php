@@ -125,11 +125,13 @@ class IndividualFactsTabModule extends AbstractModule implements ModuleTabInterf
             ->map(fn (ModuleTabInterface $tab): Collection => $tab->supportedFacts())
             ->flatten();
 
-        $indi_exclude_facts = $sidebar_facts->merge($tab_facts);
-        $fam_exclude_facts  = new Collection(['FAM:CHAN', 'FAM:_UID', 'FAM:HUSB', 'FAM:WIFE', 'FAM:CHIL']);
+        // Don't show family meta-data tags
+        $exclude_facts  = new Collection(['FAM:CHAN', 'FAM:_UID']);
+        // Don't show tags that are shown in tabs or sidebars
+        $exclude_facts = $exclude_facts->merge($sidebar_facts)->merge($tab_facts);
 
-        $individual_facts = $this->individual_facts_service->individualFacts($individual, $indi_exclude_facts);
-        $family_facts     = $this->individual_facts_service->familyFacts($individual, $fam_exclude_facts);
+        $individual_facts = $this->individual_facts_service->individualFacts($individual, $exclude_facts);
+        $family_facts     = $this->individual_facts_service->familyFacts($individual, $exclude_facts);
         $relative_facts   = $this->individual_facts_service->relativeFacts($individual);
         $associate_facts  = $this->individual_facts_service->associateFacts($individual);
         $historic_facts   = $this->individual_facts_service->historicFacts($individual);

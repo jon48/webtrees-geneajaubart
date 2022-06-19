@@ -25,15 +25,6 @@ namespace Fisharebest\Webtrees;
 abstract class MockGlobalFunctions
 {
     /**
-     * Mock version of microtime()
-     *
-     * @param bool $get_as_float
-     *
-     * @return float|array<int>
-     */
-    abstract public function microtime(bool $get_as_float);
-
-    /**
      * Mock version of ini_get()
      *
      * @param string $varname

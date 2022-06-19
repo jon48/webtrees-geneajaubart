@@ -19,30 +19,20 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
-use Fisharebest\Webtrees\Date;
 use Fisharebest\Webtrees\Tree;
+use Ramsey\Uuid\Exception\RandomSourceException;
+use Ramsey\Uuid\Uuid;
+
+use function dechex;
+use function hexdec;
+use function strtolower;
+use function strtoupper;
+use function strtr;
+use function substr;
 
 /**
- * ENTRY_RECORDING_DATE := {Size=1:90}
- * <DATE_VALUE>
- * The date that this event data was entered into the original source document.
+ * EXID:TYPE fields
  */
-class EntryRecordingDate extends AbstractElement
+class ExternalIdentifierType extends AbstractElement
 {
-    /**
-     * Display the value of this type of element.
-     *
-     * @param string $value
-     * @param Tree   $tree
-     *
-     * @return string
-     */
-    public function value(string $value, Tree $tree): string
-    {
-        $canonical = $this->canonical($value);
-
-        $date = new Date($canonical);
-
-        return $date->display();
-    }
 }

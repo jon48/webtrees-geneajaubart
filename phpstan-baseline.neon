@@ -46,11 +46,6 @@ parameters:
 			path: app/Elements/DateValue.php
 
 		-
-			message: "#^Parameter \\#1 \\$num of function dechex expects int, float\\|int given\\.$#"
-			count: 1
-			path: app/Elements/PafUid.php
-
-		-
 			message: "#^Parameter \\#1 \\$str of function trim expects string, string\\|null given\\.$#"
 			count: 1
 			path: app/Elements/PlaceHierarchy.php
@@ -149,6 +144,11 @@ parameters:
 			message: "#^Parameter \\#3 \\$pending of method Fisharebest\\\\Webtrees\\\\Factories\\\\HeaderFactory\\:\\:new\\(\\) expects string\\|null, mixed given\\.$#"
 			count: 1
 			path: app/Factories/HeaderFactory.php
+
+		-
+			message: "#^Parameter \\#1 \\$num of function dechex expects int, float\\|int given\\.$#"
+			count: 1
+			path: app/Factories/IdFactory.php
 
 		-
 			message: "#^Method Fisharebest\\\\Webtrees\\\\Factories\\\\IndividualFactory\\:\\:gedcom\\(\\) should return string\\|null but returns mixed\\.$#"
@@ -251,6 +251,26 @@ parameters:
 			path: app/Factories/RepositoryFactory.php
 
 		-
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Factories\\\\SharedNoteFactory\\:\\:gedcom\\(\\) should return string\\|null but returns mixed\\.$#"
+			count: 1
+			path: app/Factories/SharedNoteFactory.php
+
+		-
+			message: "#^Parameter \\#1 \\$gedcom of method Fisharebest\\\\Webtrees\\\\Factories\\\\AbstractGedcomRecordFactory\\:\\:extractXref\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: app/Factories/SharedNoteFactory.php
+
+		-
+			message: "#^Parameter \\#2 \\$subject of function preg_match expects string, mixed given\\.$#"
+			count: 1
+			path: app/Factories/SharedNoteFactory.php
+
+		-
+			message: "#^Parameter \\#3 \\$pending of class Fisharebest\\\\Webtrees\\\\SharedNote constructor expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: app/Factories/SharedNoteFactory.php
+
+		-
 			message: "#^Parameter \\#1 \\$str of function trim expects string, string\\|null given\\.$#"
 			count: 1
 			path: app/Factories/SlugFactory.php
@@ -326,6 +346,11 @@ parameters:
 			path: app/GedcomFilters/GedcomEncodingFilter.php
 
 		-
+			message: "#^Argument of an invalid type array\\<int, string\\>\\|false supplied for foreach, only iterables are supported\\.$#"
+			count: 2
+			path: app/GedcomRecord.php
+
+		-
 			message: "#^Cannot call method attribute\\(\\) on mixed\\.$#"
 			count: 1
 			path: app/GedcomRecord.php
@@ -347,6 +372,11 @@ parameters:
 
 		-
 			message: "#^Parameter \\#2 \\$haystack of function array_search expects array, array\\<int, string\\>\\|false given\\.$#"
+			count: 2
+			path: app/GedcomRecord.php
+
+		-
+			message: "#^Parameter \\#2 \\$haystack of function in_array expects array, array\\<int, string\\>\\|false given\\.$#"
 			count: 2
 			path: app/GedcomRecord.php
 
@@ -807,7 +837,7 @@ parameters:
 
 		-
 			message: "#^Offset 0 does not exist on array\\|null\\.$#"
-			count: 2
+			count: 1
 			path: app/Http/RequestHandlers/MapDataImportAction.php
 
 		-
@@ -1494,11 +1524,6 @@ parameters:
 			message: "#^Cannot call method embedTags\\(\\) on mixed\\.$#"
 			count: 2
 			path: app/Module/HtmlBlockModule.php
-
-		-
-			message: "#^Parameter \\#2 \\$exclude_facts of method Fisharebest\\\\Webtrees\\\\Services\\\\IndividualFactsService\\:\\:individualFacts\\(\\) expects Illuminate\\\\Support\\\\Collection&iterable\\<int, string\\>, Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\> given\\.$#"
-			count: 1
-			path: app/Module/IndividualFactsTabModule.php
 
 		-
 			message: "#^Cannot access property \\$gedcom on mixed\\.$#"
@@ -2656,6 +2681,11 @@ parameters:
 			path: app/Services/MapDataService.php
 
 		-
+			message: "#^Call to function is_float\\(\\) with int will always evaluate to false\\.$#"
+			count: 1
+			path: app/Services/MediaFileService.php
+
+		-
 			message: "#^Parameter \\#1 \\$column of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:pluck\\(\\) expects string, Illuminate\\\\Database\\\\Query\\\\Expression given\\.$#"
 			count: 1
 			path: app/Services/MediaFileService.php
@@ -2792,6 +2822,11 @@ parameters:
 
 		-
 			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\SearchService\\:\\:searchRepositories\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Repository\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<int, mixed\\>\\.$#"
+			count: 1
+			path: app/Services/SearchService.php
+
+		-
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\SearchService\\:\\:searchSharedNotes\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\SharedNote\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<int, mixed\\>\\.$#"
 			count: 1
 			path: app/Services/SearchService.php
 
@@ -3161,7 +3196,7 @@ parameters:
 			path: app/Statistics/Repository/IndividualRepository.php
 
 		-
-			message: "#^Parameter \\#2 \\$callback of function array_walk expects callable\\(int, string, mixed\\)\\: mixed, Closure\\(string, string\\)\\: void given\\.$#"
+			message: "#^Parameter \\#2 \\$callback of function array_walk expects callable\\(int, string\\)\\: mixed, Closure\\(string, string\\)\\: void given\\.$#"
 			count: 1
 			path: app/Statistics/Repository/IndividualRepository.php
 
