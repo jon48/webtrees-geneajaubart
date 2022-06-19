@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 use Brick\Geo\IO\GeoJSONWriter;
 use Brick\Geo\IO\GeoJSON\FeatureCollection;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
 use MyArtJaub\Webtrees\Common\GeoDispersion\Config\MapColorsConfig;
 use MyArtJaub\Webtrees\Common\GeoDispersion\GeoAnalysis\GeoAnalysisResult;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Views\AbstractGeoAnalysisView;
-use Ramsey\Uuid\Uuid;
 use Spatie\Color\Color;
 
 /**
@@ -24,7 +24,7 @@ use Spatie\Color\Color;
  * @var string                          $js_script_url
  */
 
-$map_id = 'maj-geodisp-map-' . Uuid::uuid4()->toString();
+$map_id = Registry::idFactory()->id('maj-geodisp-map-');
 
 $places_known = $result->countKnown();
 $places_other = $result->countExcluded();

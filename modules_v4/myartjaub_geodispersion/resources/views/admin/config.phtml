@@ -1,6 +1,7 @@
 <?php
 
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
@@ -8,7 +9,6 @@ use Fisharebest\Webtrees\Http\RequestHandlers\ModulesAllPage;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\AdminConfigPage;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewAddPage;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\GeoAnalysisViewListData;
-use Ramsey\Uuid\Uuid;
 
 /**
  * @var string                                  $module_name
@@ -19,7 +19,7 @@ use Ramsey\Uuid\Uuid;
  * @var string                                  $js_script_url
  */
 
-$table_id = 'table-maj-analysisviews-' . Uuid::uuid4();
+$table_id = Registry::idFactory()->id('table-maj-analysisviews-');
 
 ?>
 

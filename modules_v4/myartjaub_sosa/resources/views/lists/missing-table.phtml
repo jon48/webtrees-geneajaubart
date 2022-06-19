@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Individual;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
 use MyArtJaub\Webtrees\Module\Sosa\Data\MissingAncestor;
-use Ramsey\Uuid\Uuid;
 
 /**
  * @var string                      $module_name
@@ -20,7 +20,7 @@ use Ramsey\Uuid\Uuid;
  */
 
 // lists requires a unique ID in case there are multiple lists per page
-$table_id = 'table-missing-' . Uuid::uuid4()->toString();
+$table_id = Registry::idFactory()->id('table-missing-');
 
 $show_estimated_dates = (bool) $tree->getPreference('SHOW_EST_LIST_DATES');
 $nb_missing_hidden = $nb_missing_diff - $nb_missing_shown;

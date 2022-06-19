@@ -1,12 +1,12 @@
 <?php
 
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
 use Illuminate\Support\Collection;
-use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\CertificatesList;
 use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\CertificatePage;
-use Ramsey\Uuid\Uuid;
+use MyArtJaub\Webtrees\Module\Certificates\Http\RequestHandlers\CertificatesList;
 
 /**
  * @var string                  $title
@@ -19,7 +19,7 @@ use Ramsey\Uuid\Uuid;
  */
 
 // lists requires a unique ID in case there are multiple lists per page
-$table_id = 'table-maj-certificates-' . Uuid::uuid4()->toString();
+$table_id = Registry::idFactory()->id('table-maj-certificates-');
 
 // GET request from a form will not pass the parameters in the action attribute, so the route needs to be set as hidden input
 $route_url = route(CertificatesList::class, [ 'tree' => $tree->name() ]);

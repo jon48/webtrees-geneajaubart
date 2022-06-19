@@ -8,7 +8,6 @@ use Fisharebest\Webtrees\Individual;
 use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\View;
-use Ramsey\Uuid\Uuid;
 
 /**
  * @var string                      $module_name
@@ -16,7 +15,7 @@ use Ramsey\Uuid\Uuid;
  * @var \Illuminate\Support\Collection<int, \Fisharebest\Webtrees\Family>   $families
  */
 
-$table_id = 'table-ancestors-fam-' . Uuid::uuid4()->toString(); // lists requires a unique ID in case there are multiple lists per page
+$table_id = Registry::idFactory()->id('table-ancestors-fam-'); // lists requires a unique ID in case there are multiple lists per page
 
 $today_jd          = Registry::timestampFactory()->now()->julianDay();
 $hundred_years_ago = Registry::timestampFactory()->now()->subtractYears(100)->julianDay();

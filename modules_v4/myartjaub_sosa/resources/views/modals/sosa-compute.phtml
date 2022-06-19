@@ -1,9 +1,9 @@
 <?php
 
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Tree;
 use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaComputeAction;
-use Ramsey\Uuid\Uuid;
 
 /**
  * @var string  $title
@@ -11,7 +11,7 @@ use Ramsey\Uuid\Uuid;
  * @var string  $xref
  */
 
-$modal_id = 'modal-sosa-compute-' . Uuid::uuid4()->toString();
+$modal_id = Registry::idFactory()->id('modal-sosa-compute-');
 ?>
 
 <?= view('modals/header', ['title' => I18N::translate('Computing Sosa ancestors&hellip;')]) ?>

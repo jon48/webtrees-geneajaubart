@@ -1,6 +1,7 @@
 <?php
 
 use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\View;
 use MyArtJaub\Webtrees\Common\GeoDispersion\Config\MapColorsConfig;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterAddPage;
@@ -8,7 +9,6 @@ use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterDelet
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterDeleteInvalidAction;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Http\RequestHandlers\MapAdapterEditPage;
 use MyArtJaub\Webtrees\Module\GeoDispersion\Views\GeoAnalysisMap;
-use Ramsey\Uuid\Uuid;
 
 /**
  * @var string                  $module_name
@@ -17,7 +17,7 @@ use Ramsey\Uuid\Uuid;
  * @var \Illuminate\Support\Collection<\MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisMapAdapter|NULL> $map_adapters
  */
 
-$table_id = 'table-maj-mapadapters-' . Uuid::uuid4();
+$table_id = Registry::idFactory()->id('table-maj-mapadapters-');
 $count_adapters = $map_adapters->count();
 /** @var \Illuminate\Support\Collection<\MyArtJaub\Webtrees\Module\GeoDispersion\Model\GeoAnalysisMapAdapter> $map_adapters */
 $map_adapters = $map_adapters->filter();
