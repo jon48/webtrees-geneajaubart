@@ -9,6 +9,7 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaComputeAction;
 
 /**
  * @var Tree    $tree
+ * @var string  $button_id
  * @var string  $user_select_id
  * @var bool    $immediate_compute
  * @var string  $selected_user_id
@@ -17,7 +18,7 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaComputeAction;
 ?>
 
 <label>
-    <button type="button" id="bt-sosa-compute" class="btn btn-primary">
+    <button type="button" id="<?= e($button_id)?>" class="btn btn-primary">
         <?= view('icons/preferences') ?>
         <?= I18N::translate('compute') ?>
     </button>
@@ -42,7 +43,7 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\SosaComputeAction;
 <script>
 
 $(document).ready(function() {
-    $("#bt-sosa-compute").click(function() {
+    $("#<?= e($button_id)?>").click(function() {
         majComputeSosa($("<?= $user_select_id ?>").val());
      });
 
@@ -52,7 +53,7 @@ $(document).ready(function() {
 });
 
 function majComputeSosa(user_id) {
-    $('#bt-sosa-compute').attr('disabled', 'disabled');
+    $('#<?= e($button_id)?>').attr('disabled', 'disabled');
     $('#lbl-sosa-compute .maj-loading-complete').addClass('d-none');
     $('#lbl-sosa-compute .maj-loading-error').addClass('d-none');
     $('#lbl-sosa-compute .maj-loading-inprocess').removeClass('d-none');
@@ -68,7 +69,7 @@ function majComputeSosa(user_id) {
     }).fail(function() {
         $('#lbl-sosa-compute .maj-loading-error').removeClass('d-none');
     }).always(function() {
-        $('#bt-sosa-compute').removeAttr('disabled');
+        $('#<?= e($button_id)?>').removeAttr('disabled');
         $('#lbl-sosa-compute .maj-loading-inprocess').addClass('d-none');
     });
 }

@@ -105,6 +105,7 @@ $max_gen_system = app(SosaRecordsService::class)->maxSystemGenerations();
                 
                 <?= view($module_name . '::config-compute-button', [
                     'tree' => $tree,
+                    'button_id' => 'bt-sosa-compute',
                     'user_select_id' => '#maj-sosa-input-userid, #maj-sosa-select-userid option:selected',
                     'immediate_compute' => $immediate_compute,
                     'selected_user_id' => $selected_user_id
@@ -142,6 +143,7 @@ $('#maj-sosa-select-userid').change(function() {
         }
     });
     $('#maj-sosa-input-maxgen').val(users_array[this.value][1]).trigger("input");
+    document.getElementById('bt-sosa-compute').disabled = users_array[this.value][0] === '';
 });
 
 $('#maj-sosa-input-maxgen').on("input", function() {
