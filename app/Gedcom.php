@@ -140,7 +140,7 @@ use Fisharebest\Webtrees\Elements\NamePieceSurnamePrefix;
 use Fisharebest\Webtrees\Elements\NameRomanizedVariation;
 use Fisharebest\Webtrees\Elements\NameType;
 use Fisharebest\Webtrees\Elements\NationalIdNumber;
-use Fisharebest\Webtrees\Elements\NationOrTribalOrigin;
+use Fisharebest\Webtrees\Elements\NationalOrTribalOrigin;
 use Fisharebest\Webtrees\Elements\Naturalization;
 use Fisharebest\Webtrees\Elements\NobilityTypeTitle;
 use Fisharebest\Webtrees\Elements\NonEvent;
@@ -692,7 +692,7 @@ class Gedcom
             'INDI:NAME:SPFX'           => new NamePieceSurnamePrefix(I18N::translate('Surname prefix')),
             'INDI:NAME:SURN'           => new NamePieceSurname(I18N::translate('Surname')),
             'INDI:NAME:TYPE'           => new NameType(I18N::translate('Type of name')),
-            'INDI:NATI'                => new NationOrTribalOrigin(I18N::translate('Nationality')),
+            'INDI:NATI'                => new NationalOrTribalOrigin(I18N::translate('Nationality')),
             'INDI:NATU'                => new Naturalization(I18N::translate('Naturalization')),
             'INDI:NATU:DATE'           => new DateValue(I18N::translate('Date of naturalization')),
             'INDI:NATU:PLAC'           => new PlaceName(I18N::translate('Place of naturalization')),
@@ -985,17 +985,45 @@ class Gedcom
     }
 
     /**
+     * Aldfaer also uses: _BOLD, _ITALIC, _UNDERLINE, _COLOR
+     *
      * @return array<string,ElementInterface>
      */
     private function aldfaerTags(): array
     {
         return [
-            'FAM:MARR_CIVIL'     => new Marriage(I18N::translate('Civil marriage')),
-            'FAM:MARR_PARTNERS'  => new Marriage(I18N::translate('Registered partnership')),
-            'FAM:MARR_RELIGIOUS' => new Marriage(I18N::translate('Religious marriage')),
-            'FAM:MARR_UNKNOWN'   => new Marriage(I18N::translate('Marriage')),
-            'INDI:BIRT:_LENGTH'  => new CustomElement(I18N::translate('Length')),
-            'INDI:BIRT:_WEIGHT'  => new CustomElement(I18N::translate('Weight')),
+            'FAM:MARR_CIVIL'           => new Marriage(I18N::translate('Civil marriage')),
+            'FAM:MARR_PARTNERS'        => new Marriage(I18N::translate('Registered partnership')),
+            'FAM:MARR_RELIGIOUS'       => new Marriage(I18N::translate('Religious marriage')),
+            'FAM:MARR_UNKNOWN'         => new Marriage(I18N::translate('Marriage')),
+            'FAM:_ALDFAER_NOREL'       => new EmptyElement('No relation'), // What is this?
+            'HEAD:SUBM:ADDR'           => new AddressLine(I18N::translate('Address')),
+            'HEAD:SUBM:PHON'           => new PhoneNumber(I18N::translate('Phone')),
+            'HEAD:SUBM:_EMAI'          => new AddressEmail(I18N::translate('Email')),
+            'HEAD:SUBM:_FAX'           => new AddressFax(I18N::translate('Fax')),
+            'HEAD:SUBM:_WWW'           => new AddressWebPage(I18N::translate('URL')),
+            'INDI:BIRT:_ALDFAER_TIME'  => new TimeValue(I18N::translate('Time of birth')),
+            'INDI:BIRT:_LENGTH'        => new CustomElement(I18N::translate('Length')),
+            'INDI:BIRT:_WEIGHT'        => new CustomElement(I18N::translate('Weight')),
+            'INDI:DEAT:_ALDFAER_TIME'  => new TimeValue(I18N::translate('Time of death')),
+            'INDI:_REFERENCE'          => new CustomElement(''),
+            'INDI:_PRIVACY'            => new CustomElement(''),
+            'INDI:_PRIVACY:_OBJECTION' => new CustomElement(''),
+            'INDI:_PRIVACY:_PUBLISH'   => new CustomElement(''),
+            'INDI:NAME:_SURNAS'        => new CustomElement(I18N::translate('Alternative spelling of surname')),
+            'INDI:DEAT:_DATE'          => new DateValue(I18N::translate('Date')),
+            'INDI:_INQUBIRT'           => new CustomElement(I18N::translate('')),
+            'INDI:_INQUCHIL'           => new CustomElement(I18N::translate('')),
+            'INDI:_INQURELA'           => new CustomElement(I18N::translate('')),
+            'INDI:_INQUDEAT'           => new CustomElement(I18N::translate('')),
+            'INDI:_INQUVAR1'           => new CustomElement(I18N::translate('')),
+            'INDI:_INQUVAR1CAT'        => new CustomElement(I18N::translate('')),
+            'INDI:_INQUVAR2'           => new CustomElement(I18N::translate('')),
+            'INDI:_INQUVAR2CAT'        => new CustomElement(I18N::translate('')),
+            'INDI:_INQUVAR3'           => new CustomElement(I18N::translate('')),
+            'INDI:_INQUVAR3CAT'        => new CustomElement(I18N::translate('')),
+            'INDI:_NOPARTNER'          => new CustomElement(I18N::translate('')),
+            'INDI:_NEW'                => new CustomElement(I18N::translate('')),
         ];
     }
 
@@ -1073,7 +1101,7 @@ class Gedcom
             'INDI:_BRTM:PLAC'  => new PlaceName(I18N::translate('Place of brit milah')),
             'INDI:_EMAIL'      => new AddressEmail(I18N::translate('Email address')),
             'INDI:_EYEC'       => new CustomFact(I18N::translate('Eye color')),
-            'INDI:_FRNL'       => new CustomElement(I18N::translate('Funeral')),
+            'INDI:_FNRL'       => new CustomElement(I18N::translate('Funeral')),
             'INDI:_HAIR'       => new CustomFact(I18N::translate('Hair color')),
             'INDI:_HEIG'       => new CustomFact(I18N::translate('Height')),
             'INDI:_INTE'       => new CustomElement(I18N::translate('Interment')),
@@ -1429,6 +1457,12 @@ class Gedcom
     private function geneatique(): array
     {
         return [
+            'INDI:DEAT:DATE:TIME' => new TimeValue(I18N::translate('Time of death')),
+            'OBJE:FORM'           => new MultimediaFormat(I18N::translate('Format')),
+            'OBJE:TITL'           => new DescriptiveTitle(I18N::translate('Title')),
+            'INDI:NAME:_AKA'      => new NamePersonal(I18N::translate('Also known as'), []),
+            'INDI:NAME:_MARNM'    => new NamePersonal(I18N::translate('Also known as'), []),
+
             /*
             Pour déclarer les témoins dans les actes de naissance
 

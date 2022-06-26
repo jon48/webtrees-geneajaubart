@@ -50,6 +50,7 @@ use function pathinfo;
 use function sha1;
 use function sort;
 use function str_contains;
+use function strlen;
 use function strtoupper;
 use function strtr;
 use function substr;
@@ -250,10 +251,14 @@ class MediaFileService
     {
         $gedcom = '1 FILE ' . $file;
 
-        $format = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
-        $format = self::EXTENSION_TO_FORM[$format] ?? $format;
+        if (str_contains($file, '://')) {
+            $format = '';
+        } else {
+            $format = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
+            $format = self::EXTENSION_TO_FORM[$format] ?? $format;
+        }
 
-        if ($format !== '') {
+        if ($format !== '' && strlen($format) <= 4) {
             $gedcom .= "\n2 FORM " . $format;
         } elseif ($type !== '') {
             $gedcom .= "\n2 FORM";
