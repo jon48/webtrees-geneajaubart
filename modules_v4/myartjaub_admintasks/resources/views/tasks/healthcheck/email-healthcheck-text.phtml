@@ -22,7 +22,7 @@ use Illuminate\Support\Collection;
  */
 
 ?>
-<?= I18N::translate('Health Check Report for the last %d days', I18N::number($nb_days)) ?>
+<?= I18N::translate('Health Check Report for the last %s days', I18N::number($nb_days)) ?>
 
 <?= I18N::translate('Tree %s', $tree->title()) ?>
 ==========================================
@@ -54,7 +54,7 @@ use Illuminate\Support\Collection;
     $nb_char_type = max(strlen(I18N::translate('Type')), strlen(I18N::translate('Site')), strlen(I18N::translate('Tree')));
     $nb_char_count_title = strlen(I18N::translate('Count'));
     ?>
-    <?= I18N::translate('Errors [%d]', I18N::number($nb_errors)) ?>
+    <?= I18N::translate('Errors [%s]', I18N::number($nb_errors)) ?>
 -------------
     <?= route(SiteLogsData::class) ?>
     <?= I18N::translate('Count')?>  <?= sprintf('%-' . $nb_char_type . 's', I18N::translate('Type')) ?> <?= sprintf('%-20s', I18N::translate('Last occurrence')) ?> <?= I18N::translate('Error') ?>

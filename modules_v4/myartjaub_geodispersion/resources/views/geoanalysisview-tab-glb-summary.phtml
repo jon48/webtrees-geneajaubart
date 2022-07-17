@@ -21,16 +21,16 @@ $perc_unknown = $places_total > 0 ? $places_unknown / $places_total : 0;
 <div class="maj-geodisp-tab-glb-summary maj-geodisp-table mx-auto">
     <div class="maj-geodisp-row">
         <div class="wt-page-options-label"><?= I18N::translate('Places found') ?></div>
-        <div class="wt-page-options-value"><?= I18N::translate('%1$d (%2$s)', I18N::number($places_found), I18N::percentage($perc_found)) ?></div>
+        <div class="wt-page-options-value"><?= I18N::translate('%1$s (%2$s)', I18N::number($places_found), I18N::percentage($perc_found)) ?></div>
     </div>
     <?php if ($places_other > 0) : ?>
     <div class="maj-geodisp-row">
         <div class="wt-page-options-label"><?= I18N::translate('Other places') ?></div>
-        <div class="wt-page-options-value"><?= I18N::translate('%1$d (%2$s)', I18N::number($places_other), I18N::percentage($perc_other)) ?></div>
+        <div class="wt-page-options-value"><?= I18N::translate('%1$s (%2$s)', I18N::number($places_other), I18N::percentage($perc_other)) ?></div>
     </div>
     <?php endif; ?>
     <div class="maj-geodisp-row">
         <div class="wt-page-options-label"><?= I18N::translate('Places not found') ?></div>
-        <div class="wt-page-options-value"><?= I18N::translate('%1$d (%2$s)', I18N::number($places_unknown), I18N::percentage($perc_unknown)) ?></div>
+        <div class="wt-page-options-value"><?= I18N::translate('%1$s (%2$s)', I18N::number($places_unknown), I18N::percentage($perc_unknown)) ?></div>
     </div>
 </div>

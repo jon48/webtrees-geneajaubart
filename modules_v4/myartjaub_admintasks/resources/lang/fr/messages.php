@@ -48,8 +48,8 @@ return array (
                                     =>  'Activer les rapports d’état du système pour',
     'Enable the health check emails for each of the selected trees.'
                                     =>  'Active les rapports d’état du système pour les arbres sélectionnés.',
-    'Health Check Report for the last %d days'
-                                    =>  'État du système - Rapport pour les %d derniers jours',
+    'Health Check Report for the last %s days'
+                                    =>  'État du système - Rapport pour les %s derniers jours',
     'Tree'                          =>  'Arbre',
     'Tree %s'                       =>  'Arbre %s',
     'A new version of *webtrees* is available: %s. Upgrade as soon as possible.'
@@ -59,7 +59,7 @@ return array (
     'Total number of users'         =>  'Nombre total d’utilisateurs',
     'Count'                         =>  'Nombre',
     'Errors'                        =>  'Erreurs',
-    'Errors [%d]'                   =>  'Erreurs [%d]',
+    'Errors [%s]'                   =>  'Erreurs [%s]',
     'Last occurrence'               =>  'Dernière occurrence',
     'No errors'                     =>  'Aucune erreur',
     'minutes'                       =>  'minutes',

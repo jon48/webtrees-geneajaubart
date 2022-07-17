@@ -126,7 +126,7 @@ return array (
                                     =>  'La visualisation avec l’identifiant « %s » n’existe pas.',
     'The geographical dispersion analysis view could not be found.'
                                     =>  'La visualisation d’analyse de répartition géographique n’existe pas.',
-    'The map configuration with ID “%d” does not exist.'
+    'The map configuration with ID “%s” does not exist.'
                                     =>  'La configuration de carte avec l’identifiant « %s » n’existe pas.',
     'The parameters for the new view are not valid.'
                                     =>  'Les paramètres de la nouvelle visualisation ne sont pas valides.',
@@ -172,6 +172,6 @@ return array (
     'The map could not be loaded.'  =>  'La carte n’a pas pu être chargée.',
     '<strong title="%1$s">%2$s</strong> [%3$s - %4$s]'
                                     =>  '<strong title="%1$s">%2$s</strong> [%3$s - %4$s]',
-    '%1$d (%2$s)'                   =>  '%1$d (%2$s)',
+    '%1$s (%2$s)'                   =>  '%1$s (%2$s)',
 
 );
