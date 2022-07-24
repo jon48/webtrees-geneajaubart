@@ -44,4 +44,10 @@ return array (
     'If the website has been notified to the French <em>CNIL</em>, an authorisation number may have been delivered. Providing this reference will display a message on the privacy policy page.'
                                     =>  'Si votre site a été déclaré à la Commission Nationale de l’Informatique et des Libertés (CNIL), un numéro d’autorisation a dû vous être délivré. Fournir cette référence affichera un message sur la page de politique de confidentialité.',
 
+    //Legacy XREF
+    'Internal reference numbers (“XREF”)'   =>  'Identifiants internes (« XREF »)',
+    'Generate legacy reference numbers'     =>  'Générer les anciens identifiants',
+    'Enable this option to generate records’ reference numbers based on webtrees 1 algorithm (prefix based on record type, tree and record-specific numbering).'
+                                            =>  'Activer cette option pour générer des idenfiants des enregistrements de manière similaire à webtrees 1 (préfixe basé sur le type de l’enregistrement, numérotation spécifique à l’arbre et type).'
+
 );

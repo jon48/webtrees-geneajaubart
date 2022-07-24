@@ -44,17 +44,17 @@ use Fisharebest\Webtrees\Module\ModuleInterface;
     <h3><?= I18N::translate('Privacy') ?></h3>
     
     <!-- MAJ_DISPLAY_CNIL -->
-    <fieldset class="row">
-        <legend class="col-form-label col-sm-3">
+    <div class="row">
+        <label class="col-form-label col-sm-3" for="MAJ_DISPLAY_CNIL">
             <?= I18N::translate('Display French <em>CNIL</em> disclaimer') ?>
-        </legend>
+        </label>
         <div class="col-sm-9">
             <?= view('components/radios-inline', ['name' => 'MAJ_DISPLAY_CNIL', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => (int) $module->getPreference('MAJ_DISPLAY_CNIL')]) ?>
             <p class="form-text">
                 <?= I18N::translate('Enable this option to display an information disclaimer required by the French <em>CNIL</em> for detaining personal information on users.') ?>
             </p>
         </div>
-    </fieldset>
+    </div>
 
     <!--  MAJ_CNIL_REFERENCE -->
     <div class="row">
@@ -73,6 +73,21 @@ use Fisharebest\Webtrees\Module\ModuleInterface;
             >
             <p class="form-text">
                 <?= I18N::translate('If the website has been notified to the French <em>CNIL</em>, an authorisation number may have been delivered. Providing this reference will display a message on the privacy policy page.') ?>
+            </p>
+        </div>
+    </div>
+    
+    <h3><?= I18N::translate('Internal reference numbers (“XREF”)') ?></h3>
+    
+    <!-- MAJ_USE_LEGACY_XREF -->
+    <div class="row">
+        <label class="col-form-label col-sm-3" for="MAJ_USE_LEGACY_XREF">
+            <?= I18N::translate('Generate legacy reference numbers') ?>
+        </label>
+        <div class="col-sm-9">
+            <?= view('components/radios-inline', ['name' => 'MAJ_USE_LEGACY_XREF', 'options' => [I18N::translate('no'), I18N::translate('yes')], 'selected' => (int) $module->getPreference('MAJ_USE_LEGACY_XREF')]) ?>
+            <p class="form-text">
+                <?= I18N::translate('Enable this option to generate records’ reference numbers based on webtrees 1 algorithm (prefix based on record type, tree and record-specific numbering).') ?>
             </p>
         </div>
     </div>
