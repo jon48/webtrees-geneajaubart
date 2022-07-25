@@ -1,0 +1,32 @@
+<?php
+
+use MyArtJaub\Webtrees\Module\IsSourced\Services\SourceStatusService;
+use Fisharebest\Webtrees\Individual;
+
+/**
+ * @var string                  $module_name
+ * @var SourceStatusService     $source_status_service
+ * @var Individual              $individual
+ * @var string                  $size_style
+ */
+
+?>
+<span class="maj-issourced-hook-name-append align-middle d-inline-flex align-items-stretch justify-content-between">
+    <?= view($module_name . '::icons/source-status', [
+        'module_name'   =>  $module_name,
+        'source_status' =>  $source_status_service->sourceStatusForRecord($individual),
+        'context'       =>  'INDI',
+        'size_style'    =>  $size_style ]) ?>
+    <?= view($module_name . '::icons/source-status', [
+        'module_name'   =>  $module_name,
+        'source_status' =>  $source_status_service->sourceStatusForBirth($individual),
+        'context'       =>  'INDI:BIRT',
+        'size_style'    =>  $size_style ]) ?>
+    <?php if ($individual->isDead()) : ?>
+        <?=  view($module_name . '::icons/source-status', [
+            'module_name'   =>  $module_name,
+            'source_status' =>  $source_status_service->sourceStatusForDeath($individual),
+            'context'       =>  'INDI:DEAT',
+            'size_style'    =>  $size_style ]) ?>
+    <?php endif; ?>
+</span>

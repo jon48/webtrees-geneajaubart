@@ -2884,12 +2884,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "9fcb9f7db3daf19ba783e498633bb64650d59894"
+                "reference": "c808ff9a95c322da6a8958cc142d2136a7b74898"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/9fcb9f7db3daf19ba783e498633bb64650d59894",
-                "reference": "9fcb9f7db3daf19ba783e498633bb64650d59894",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/c808ff9a95c322da6a8958cc142d2136a7b74898",
+                "reference": "c808ff9a95c322da6a8958cc142d2136a7b74898",
                 "shasum": ""
             },
             "require": {
@@ -2955,7 +2955,7 @@
                 "issues": "http://bugs.jaubart.com",
                 "source": "https://github.com/jon48/webtrees-lib/tree/develop"
             },
-            "time": "2022-07-24T19:27:30+00:00"
+            "time": "2022-07-25T22:54:20+00:00"
         },
         {
             "name": "jon48/webtrees-mod-maj-geodata-france",

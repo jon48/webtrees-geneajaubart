@@ -13,9 +13,13 @@ $css_class .= $source_status->factHasDate() ? '-fd' : '';
 $css_class .= $source_status->factHasPreciseDate() ? '-fpd' : '';
 $css_class .= $source_status->sourceMatchesFactDate() ? '-smd' : '';
 
+$size_style .= ($source_status->factHasPreciseDate() &&
+    ($source_status->hasSupportingDocument() || $source_status->sourceMatchesFactDate() || !$source_status->hasSource())) ? ' maj-icon-sourcestatus-mx' : '';
+$size_style .= ($source_status->hasSupportingDocument() || $source_status->sourceMatchesFactDate()) ? ' fa-fw' : '';
+
 ?>
 
-<span class="maj-icon-sourcestatus <?= $css_class ?> fa-layers fa-fw <?= $size_style ?>" aria-hidden="true" title="<?= $source_status->label($context) ?>">
+<span class="maj-icon-sourcestatus <?= $css_class ?> fa-layers <?= $size_style ?>" aria-hidden="true" title="<?= $source_status->label($context) ?>">
     <?php if ($source_status->factHasPreciseDate()) : ?>
         <?php if ($source_status->hasSource()) : ?>
             <?php if ($source_status->hasSupportingDocument()) : ?>

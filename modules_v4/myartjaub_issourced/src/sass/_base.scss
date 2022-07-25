@@ -46,7 +46,10 @@
 }
 
 .maj-icon-sourcestatus {
-    vertical-align: middle;
+    &-mx {
+        margin-left: 0.15em;
+        margin-right: 0.15em;
+    }
     
     .fa-scroll {
         color: #c9b88c;

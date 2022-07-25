@@ -8,9 +8,13 @@ use MyArtJaub\Webtrees\Module\IsSourced\Data\SourceStatus;
  * @var string          $css_class
  * @var string          $context
  */
+
+$size_style .= ($source_status->hasSupportingDocument() || !$source_status->hasSource()) ? ' maj-icon-sourcestatus-mx' : '';
+$size_style .= $source_status->hasSupportingDocument() ? ' fa-fw' : '';
+
 ?>
 
-<span class="maj-icon-sourcestatus <?= $css_class ?> fa-layers fa-fw <?= $size_style ?>" aria-hidden="true" title="<?= $source_status->label($context) ?>">
+<span class="maj-icon-sourcestatus <?= $css_class ?> fa-layers <?= $size_style ?>" aria-hidden="true" title="<?= $source_status->label($context) ?>">
     <?php if ($source_status->hasSupportingDocument()) : ?>
     <i class="fa-solid fa-scroll" data-fa-transform="flip-h right-2"></i>
     <?php endif; ?>
