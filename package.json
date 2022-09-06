@@ -19,7 +19,7 @@
     "sass-loader": "13.0.2",
     "stylelint": "^13.6.1",
     "stylelint-config-sass-guidelines": "^7.0.0",
-    "stylelint-config-standard": "^20.0.0",
+    "stylelint-config-standard": "^20.0.0"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "6.1.2",
