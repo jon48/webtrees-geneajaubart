@@ -56,10 +56,10 @@ foreach ($keys as $key) {
         <?php $id = Registry::idFactory()->id() ?>
         <?php $expanded = $tree->getPreference('EXPAND_SOURCES') === '1' ?>
         <div class="fact_SOUR">
-            <a href="#<?= e($id) ?>" role="button" data-bs-toggle="collapse" aria-controls="<?= e($id) ?>" aria-expanded="<?= $expanded ? 'true' : 'false' ?>">
+            <button type="button" class="btn btn-text p-0" href="#<?= e($id) ?>" data-bs-toggle="collapse" aria-controls="<?= e($id) ?>" aria-expanded="<?= $expanded ? 'true' : 'false' ?>">
                 <?= view('icons/expand') ?>
                 <?= view('icons/collapse') ?>
-             </a>
+             </button>
             <!--  MYARTJAUB-START -->
             <?= hook(\MyArtJaub\Webtrees\Contracts\Hooks\FactSourceTextExtenderInterface::class,
                 fn(\MyArtJaub\Webtrees\Contracts\Hooks\FactSourceTextExtenderInterface $hook) => $hook->factSourcePrepend($tree, [$elements, $values])

@@ -19,13 +19,32 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
+use Fisharebest\Webtrees\Date;
+use Fisharebest\Webtrees\I18N;
+use Fisharebest\Webtrees\Services\LocalizationService;
+use Fisharebest\Webtrees\Tree;
+
+use function app;
+use function date;
+use function e;
+use function preg_replace_callback;
+use function strtoupper;
+use function view;
+
 /**
- * *:CHAN is an empty element with children; DATE and NOTE.
+ * DATE_VALUE := {Size=1:35}
  */
-class Change extends EmptyElement
+class DateValueToday extends DateValueExact
 {
-    protected const SUBTAGS = [
-        'DATE' => '1:1',
-        'NOTE' => '0:M:?',
-    ];
+    /**
+     * Create a default value for this element.
+     *
+     * @param Tree $tree
+     *
+     * @return string
+     */
+    public function default(Tree $tree): string
+    {
+        return strtoupper(date('d M Y'));
+    }
 }

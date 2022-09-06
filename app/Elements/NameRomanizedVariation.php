@@ -44,7 +44,19 @@ class NameRomanizedVariation extends AbstractElement
         'SURN' => '0:1',
         'NSFX' => '0:1',
         'NICK' => '0:1',
+        'NOTE' => '0:M',
+        'SOUR' => '0:M',
     ];
+
+    /**
+     * Should we collapse the children of this element when editing?
+     *
+     * @return bool
+     */
+    public function collapseChildren(): bool
+    {
+        return true;
+    }
 
     /**
      * An edit control for this data.
@@ -61,7 +73,7 @@ class NameRomanizedVariation extends AbstractElement
         return
             '<div class="input-group">' .
             parent::edit($id, $name, $value, $tree) .
-            view('help/link', ['topic' => 'ROMN']) .
+            view('edit/input-addon-help', ['topic' => 'ROMN']) .
             '</div>';
     }
 }

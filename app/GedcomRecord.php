@@ -40,6 +40,7 @@ use function count;
 use function date;
 use function e;
 use function explode;
+use function implode;
 use function in_array;
 use function md5;
 use function preg_match;
@@ -54,6 +55,7 @@ use function str_ends_with;
 use function str_pad;
 use function str_starts_with;
 use function strtoupper;
+use function strtr;
 use function trim;
 use function view;
 
@@ -499,10 +501,10 @@ class GedcomRecord
      */
     public function formatList(): string
     {
-        $html = '<a href="' . e($this->url()) . '" class="list_item">';
+        $html = '<a href="' . e($this->url()) . '">';
         $html .= '<b>' . $this->fullName() . '</b>';
-        $html .= $this->formatListDetails();
         $html .= '</a>';
+        $html .= $this->formatListDetails();
 
         return $html;
     }
@@ -528,24 +530,28 @@ class GedcomRecord
      */
     public function formatFirstMajorFact(array $facts, int $style): string
     {
-        foreach ($this->facts($facts, true) as $event) {
-            // Only display if it has a date or place (or both)
-            if ($event->date()->isOK() && $event->place()->gedcomName() !== '') {
-                $joiner = ' — ';
-            } else {
-                $joiner = '';
-            }
-            if ($event->date()->isOK() || $event->place()->gedcomName() !== '') {
-                switch ($style) {
-                    case 1:
-                        return '<br><em>' . $event->label() . ' ' . view('fact-date', ['cal_link' => 'false', 'fact' => $event, 'record' => $event->record(), 'time' => false]) . '</em>';
-                    case 2:
-                        return '<dl><dt class="label">' . $event->label() . '</dt><dd class="field">' . view('fact-date', ['cal_link' => 'false', 'fact' => $event, 'record' => $event->record(), 'time' => false]) . $joiner . $event->place()->shortName() . '</dd></dl>';
-                }
-            }
+        $fact = $this->facts($facts, true)->first();
+
+        if ($fact === null) {
+            return '';
         }
 
-        return '';
+        // Only display if it has a date or place (or both)
+        $attributes = [];
+
+        if ($fact->date()->isOK()) {
+            $attributes[] = view('fact-date', ['cal_link' => 'false', 'fact' => $fact, 'record' => $fact->record(), 'time' => false]);
+        }
+
+        if ($fact->place()->gedcomName() !== '' && $style === 2) {
+            $attributes[] = $fact->place()->shortName();
+        }
+
+        if ($attributes === []) {
+            return '';
+        }
+
+        return '<div><em>' . I18N::translate('%1$s: %2$s', $fact->label(), implode(' — ', $attributes)) . '</em></div>';
     }
 
     /**
@@ -695,24 +701,24 @@ class GedcomRecord
      */
     public function lastChangeTimestamp(): TimestampInterface
     {
-        /** @var Fact|null $chan */
         $chan = $this->facts(['CHAN'])->first();
 
         if ($chan instanceof Fact) {
             // The record has a CHAN event.
-            $d = $chan->date()->minimumDate()->format('%Y-%m-%d');
+            $date = $chan->date()->minimumDate();
+            $ymd = sprintf('%04d-%02d-%02d', $date->year(), $date->month(), $date->day());
 
-            if ($d !== '') {
+            if ($ymd !== '') {
                 // The CHAN event has a valid DATE.
-                if (preg_match('/\n3 TIME (([01]\d|2[0-3]):([0-5]\d):([0-5]\d))/', $chan->gedcom(), $match)) {
-                    return Registry::timestampFactory()->fromString($d . $match[1], 'Y-m-d H:i:s');
+                if (preg_match('/\n3 TIME (([01]\d|2[0-3]):([0-5]\d):([0-5]\d))/', $chan->gedcom(), $match) === 1) {
+                    return Registry::timestampFactory()->fromString($ymd . $match[1], 'Y-m-d H:i:s');
                 }
 
-                if (preg_match('/\n3 TIME (([01]\d|2[0-3]):([0-5]\d))/', $chan->gedcom(), $match)) {
-                    return Registry::timestampFactory()->fromString($d . $match[1], 'Y-m-d H:i');
+                if (preg_match('/\n3 TIME (([01]\d|2[0-3]):([0-5]\d))/', $chan->gedcom(), $match) === 1) {
+                    return Registry::timestampFactory()->fromString($ymd . $match[1], 'Y-m-d H:i');
                 }
 
-                return Registry::timestampFactory()->fromString($d, 'Y-m-d');
+                return Registry::timestampFactory()->fromString($ymd, 'Y-m-d');
             }
         }
 
@@ -809,7 +815,9 @@ class GedcomRecord
                     $new_gedcom .= "\n" . $gedcom;
                 }
                 $fact_id = 'NOT A VALID FACT ID'; // Only replace/delete one copy of a duplicate fact
-            } elseif (!str_ends_with($fact->tag(), ':CHAN') || !$update_chan) {
+            } elseif ($update_chan && str_ends_with($fact->tag(), ':CHAN')) {
+                $new_gedcom .= "\n" . $this->updateChange($fact->gedcom());
+            } else {
                 $new_gedcom .= "\n" . $fact->gedcom();
             }
         }
@@ -820,9 +828,7 @@ class GedcomRecord
         }
 
         if ($update_chan && !str_contains($new_gedcom, "\n1 CHAN")) {
-            $today = strtoupper(date('d M Y'));
-            $now   = date('H:i:s');
-            $new_gedcom .= "\n1 CHAN\n2 DATE " . $today . "\n3 TIME " . $now . "\n2 _WT_USER " . Auth::user()->userName();
+            $new_gedcom .= $this->updateChange("\n1 CHAN");
         }
 
         if ($new_gedcom !== $old_gedcom) {
@@ -869,10 +875,11 @@ class GedcomRecord
 
         // Update the CHAN record
         if ($update_chan) {
-            $gedcom = preg_replace('/\n1 CHAN(\n[2-9].*)*/', '', $gedcom);
-            $today = strtoupper(date('d M Y'));
-            $now   = date('H:i:s');
-            $gedcom .= "\n1 CHAN\n2 DATE " . $today . "\n3 TIME " . $now . "\n2 _WT_USER " . Auth::user()->userName();
+            if (preg_match('/\n1 CHAN(\n[2-9].*)*/', $gedcom, $match)) {
+                $gedcom = strtr($gedcom, [$match[0] => $this->updateChange($match[0])]);
+            } else {
+                $gedcom .= $this->updateChange("\n1 CHAN");
+            }
         }
 
         // Create a pending change
@@ -1156,5 +1163,22 @@ class GedcomRecord
             ->where('o_id', '=', $this->xref())
             ->lockForUpdate()
             ->get();
+    }
+
+    /**
+     * Change records may contain notes and other fields.  Just update the date/time/author.
+     *
+     * @param string $gedcom
+     *
+     * @return string
+     */
+    private function updateChange(string $gedcom): string
+    {
+        $gedcom = preg_replace('/\n2 (DATE|_WT_USER).*(\n[3-9].*)*/', '', $gedcom);
+        $today  = strtoupper(date('d M Y'));
+        $now    = date('H:i:s');
+        $author = Auth::user()->userName();
+
+        return $gedcom . "\n2 DATE " . $today . "\n3 TIME " . $now . "\n2 _WT_USER " . $author;
     }
 }

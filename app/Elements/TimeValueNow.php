@@ -19,13 +19,24 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees\Elements;
 
+use Fisharebest\Webtrees\Tree;
+
+use function date;
+
 /**
- * *:CHAN is an empty element with children; DATE and NOTE.
+ * TIME_VALUE := {Size=1:12}
  */
-class Change extends EmptyElement
+class TimeValueNow extends TimeValue
 {
-    protected const SUBTAGS = [
-        'DATE' => '1:1',
-        'NOTE' => '0:M:?',
-    ];
+    /**
+     * Create a default value for this element.
+     *
+     * @param Tree $tree
+     *
+     * @return string
+     */
+    public function default(Tree $tree): string
+    {
+        return date('H:i:s');
+    }
 }
