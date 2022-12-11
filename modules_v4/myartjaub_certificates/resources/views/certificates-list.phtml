@@ -26,6 +26,7 @@ $route_url = route(CertificatesList::class, [ 'tree' => $tree->name() ]);
 $route_params = [];
 parse_str(parse_url($route_url, PHP_URL_QUERY) ?: '', $route_params);
 $route = $route_params['route'] ?? '';
+$route = is_string($route) ? $route : '';
 
 ?>
 

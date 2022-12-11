@@ -1,0 +1,60 @@
+# Please see the documentation for all configuration options:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/modules_v4/myartjaub_admintasks" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "production"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/modules_v4/myartjaub_certificates" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "production"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/modules_v4/myartjaub_geodispersion" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "production"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/modules_v4/myartjaub_issourced" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "production"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/modules_v4/myartjaub_patronymiclineage" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "production"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/modules_v4/myartjaub_sosa" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "production"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/modules_v4/myartjaub_welcome_block" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "production"
+    open-pull-requests-limit: 0

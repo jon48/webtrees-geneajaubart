@@ -104,6 +104,22 @@ library.add(faMapMarkedAlt, faTable);
    * @returns {MapObject}
    */
   majGeodispersion.drawMap = function (elementId, config) {
+    const FullscreenControl = L.Control.extend({
+      options: {
+        position: 'topleft'
+      },
+      onAdd: (map) => {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        const anchor = L.DomUtil.create('a', 'leaflet-control-fullscreen', container);
+
+        anchor.setAttribute('role', 'button');
+        anchor.dataset.wtFullscreen = '.maj-geodisp-fullscreen-container';
+        anchor.innerHTML = config.icons.fullScreen;
+
+        return container;
+      }
+    });
+
     const dataLayer = new L.FeatureGroup();
 
     let defaultLayer = null;
@@ -134,6 +150,7 @@ library.add(faMapMarkedAlt, faTable);
     })
       .addLayer(defaultLayer)
       .addLayer(dataLayer)
+      .addControl(new FullscreenControl())
       .addControl(L.control.layers.tree(config.mapProviders, null, {
         closedSymbol: config.icons.expand,
         openedSymbol: config.icons.collapse

@@ -18,6 +18,7 @@ $route_url = route($route_name, [ 'tree' => $tree->name() ]);
 $route_params = [];
 parse_str(parse_url($route_url, PHP_URL_QUERY) ?: '', $route_params);
 $route = $route_params['route'] ?? '';
+$route = is_string($route) ? $route : '';
 
 ?>
 <form method="GET" name="generation-selector" action="<?= e(route($route_name, [ 'tree' => $tree->name() ])) ?>">
