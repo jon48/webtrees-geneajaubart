@@ -33,6 +33,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+use function in_array;
 use function redirect;
 use function route;
 
@@ -261,12 +262,10 @@ class StoriesModule extends AbstractModule implements ModuleConfigInterface, Mod
      */
     public function postAdminAction(ServerRequestInterface $request): ResponseInterface
     {
-        $params = (array) $request->getParsedBody();
-
         return redirect(route('module', [
             'module' => $this->name(),
             'action' => 'Admin',
-            'tree'   => $params['tree'] ?? '',
+            'tree'   => Validator::parsedBody($request)->string('tree'),
         ]));
     }
 
@@ -288,7 +287,7 @@ class StoriesModule extends AbstractModule implements ModuleConfigInterface, Mod
             $story_title = '';
             $story_body  = '';
             $languages   = [];
-            $xref        = $request->getQueryParams()['xref'] ?? '';
+            $xref        = Validator::queryParams($request)->isXref()->string('xref');
             $title       = I18N::translate('Add a story') . ' — ' . e($tree->title());
         } else {
             // Editing an existing story
@@ -366,7 +365,7 @@ class StoriesModule extends AbstractModule implements ModuleConfigInterface, Mod
     public function postAdminDeleteAction(ServerRequestInterface $request): ResponseInterface
     {
         $tree     = Validator::attributes($request)->tree();
-        $block_id = $request->getQueryParams()['block_id'];
+        $block_id = Validator::queryParams($request)->integer('block_id');
 
         DB::table('block_setting')
             ->where('block_id', '=', $block_id)

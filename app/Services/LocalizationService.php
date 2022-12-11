@@ -32,6 +32,8 @@ use function substr_compare;
 
 /**
  * Utilities to support localization.
+ *
+ * @deprecated - Will be removed in webtrees 2.2 - Use I18N::language() instead
  */
 class LocalizationService
 {
@@ -71,6 +73,7 @@ class LocalizationService
         'da'      => self::NORWEGIAN_ALPHABET,
         'es'      => self::SPANISH_ALPHABET,
         'et'      => self::ESTONIAN_ALPHABET,
+        'fa'      => self::ARABIC_ALPHABET,
         'fi'      => self::SWEDISH_ALPHABET,
         'hu'      => self::HUNGARIAN_ALPHABET,
         'lt'      => self::LITHUANIAN_ALPHABET,

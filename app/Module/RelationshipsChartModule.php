@@ -42,6 +42,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
+use function count;
+use function in_array;
 use function redirect;
 use function route;
 use function view;
@@ -430,13 +432,11 @@ class RelationshipsChartModule extends AbstractModule implements ModuleChartInte
      */
     public function postAdminAction(ServerRequestInterface $request): ResponseInterface
     {
-        $params = (array) $request->getParsedBody();
-
         foreach ($this->tree_service->all() as $tree) {
-            $recursion = $params['relationship-recursion-' . $tree->id()] ?? '';
-            $ancestors = $params['relationship-ancestors-' . $tree->id()] ?? '';
+            $recursion = Validator::parsedBody($request)->integer('relationship-recursion-' . $tree->id());
+            $ancestors = Validator::parsedBody($request)->string('relationship-ancestors-' . $tree->id());
 
-            $tree->setPreference('RELATIONSHIP_RECURSION', $recursion);
+            $tree->setPreference('RELATIONSHIP_RECURSION', (string) $recursion);
             $tree->setPreference('RELATIONSHIP_ANCESTORS', $ancestors);
         }
 

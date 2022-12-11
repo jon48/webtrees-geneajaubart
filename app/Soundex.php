@@ -19,6 +19,10 @@ declare(strict_types=1);
 
 namespace Fisharebest\Webtrees;
 
+use function array_slice;
+use function count;
+use function strlen;
+
 /**
  * Phonetic matching of strings.
  */
@@ -708,7 +712,7 @@ class Soundex
 
         // Loop through the input string.
         // Stop when the string is exhausted or when no more partial results remain
-        while (count($partialResult) !== 0 && $currPos <= $lastPos) {
+        while ($partialResult !== [] && $currPos <= $lastPos) {
             // Find the DM coding table entry for the chunk at the current position
             $thisEntry = substr($name, $currPos, self::MAXCHAR); // Get maximum length chunk
             while ($thisEntry !== '') {
@@ -777,7 +781,7 @@ class Soundex
                             // We're looking for 7 entries because the first is '!' and doesn't count
                             $tempResult = str_replace('!', '', implode('', $workingEntry));
                             // Only return codes from recognisable sounds
-                            if ($tempResult) {
+                            if ($tempResult !== '') {
                                 $result[] = substr($tempResult . '000000', 0, 6);
                             }
                         }
@@ -791,7 +795,7 @@ class Soundex
         foreach ($partialResult as $workingEntry) {
             $tempResult = str_replace('!', '', implode('', $workingEntry));
             // Only return codes from recognisable sounds
-            if ($tempResult) {
+            if ($tempResult !== '') {
                 $result[] = substr($tempResult . '000000', 0, 6);
             }
         }

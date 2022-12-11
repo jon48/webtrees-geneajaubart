@@ -99,7 +99,8 @@ class ImageFactory implements ImageFactoryInterface
 
             return $this->imageResponse($filesystem->read($path), $mime_type, $filename);
         } catch (UnableToReadFile | FilesystemException $ex) {
-            return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND);
+            return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND)
+                ->withHeader('x-thumbnail-exception', get_class($ex) . ': ' . $ex->getMessage());
         }
     }
 
@@ -136,7 +137,8 @@ class ImageFactory implements ImageFactoryInterface
             return $this->replacementImageResponse('.' . pathinfo($path, PATHINFO_EXTENSION))
                 ->withHeader('x-thumbnail-exception', get_class($ex) . ': ' . $ex->getMessage());
         } catch (FilesystemException | UnableToReadFile $ex) {
-            return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND);
+            return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND)
+                ->withHeader('x-thumbnail-exception', get_class($ex) . ': ' . $ex->getMessage());
         } catch (Throwable $ex) {
             return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR)
                 ->withHeader('x-thumbnail-exception', get_class($ex) . ': ' . $ex->getMessage());
@@ -154,7 +156,7 @@ class ImageFactory implements ImageFactoryInterface
      */
     public function mediaFileResponse(MediaFile $media_file, bool $add_watermark, bool $download): ResponseInterface
     {
-        $filesystem = Registry::filesystem()->media($media_file->media()->tree());
+        $filesystem = $media_file->media()->tree()->mediaFilesystem();
         $path       = $media_file->filename();
 
         if (!$add_watermark || !$media_file->isImage()) {
@@ -176,7 +178,8 @@ class ImageFactory implements ImageFactoryInterface
             return $this->replacementImageResponse(pathinfo($path, PATHINFO_EXTENSION))
                 ->withHeader('x-image-exception', $ex->getMessage());
         } catch (FilesystemException | UnableToReadFile $ex) {
-            return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND);
+            return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND)
+                ->withHeader('x-thumbnail-exception', get_class($ex) . ': ' . $ex->getMessage());
         } catch (Throwable $ex) {
             return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR)
                 ->withHeader('x-image-exception', $ex->getMessage());
@@ -202,7 +205,7 @@ class ImageFactory implements ImageFactoryInterface
         bool $add_watermark
     ): ResponseInterface {
         // Where are the images stored.
-        $filesystem = Registry::filesystem()->media($media_file->media()->tree());
+        $filesystem = $media_file->media()->tree()->mediaFilesystem();
 
         // Where is the image stored in the filesystem.
         $path = $media_file->filename();
@@ -245,7 +248,8 @@ class ImageFactory implements ImageFactoryInterface
             return $this->replacementImageResponse('.' . pathinfo($path, PATHINFO_EXTENSION))
                 ->withHeader('x-thumbnail-exception', get_class($ex) . ': ' . $ex->getMessage());
         } catch (FilesystemException | UnableToReadFile $ex) {
-            return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND);
+            return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND)
+                ->withHeader('x-thumbnail-exception', get_class($ex) . ': ' . $ex->getMessage());
         } catch (Throwable $ex) {
             return $this->replacementImageResponse((string) StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR)
                 ->withHeader('x-thumbnail-exception', get_class($ex) . ': ' . $ex->getMessage());

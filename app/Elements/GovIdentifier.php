@@ -23,7 +23,6 @@ use Fisharebest\Webtrees\Tree;
 
 use function e;
 use function rawurlencode;
-use function strtoupper;
 
 /**
  * A custom field used in _LOC records
@@ -32,7 +31,7 @@ class GovIdentifier extends AbstractElement
 {
     protected const EXTERNAL_URL = 'https://gov.genealogy.net/item/show/';
 
-    protected const MAXIMUM_LENGTH = 12;
+    protected const MAXIMUM_LENGTH = 14;
 
     /**
      * Display the value of this type of element.

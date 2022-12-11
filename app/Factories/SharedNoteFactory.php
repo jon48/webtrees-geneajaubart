@@ -21,12 +21,11 @@ namespace Fisharebest\Webtrees\Factories;
 
 use Closure;
 use Fisharebest\Webtrees\Contracts\SharedNoteFactoryInterface;
-use Fisharebest\Webtrees\SharedNote;
 use Fisharebest\Webtrees\Registry;
+use Fisharebest\Webtrees\SharedNote;
 use Fisharebest\Webtrees\Tree;
 use Illuminate\Database\Capsule\Manager as DB;
 
-use function assert;
 use function preg_match;
 
 /**
@@ -70,12 +69,7 @@ class SharedNoteFactory extends AbstractGedcomRecordFactory implements SharedNot
      */
     public function mapper(Tree $tree): Closure
     {
-        return function (object $row) use ($tree): SharedNote {
-            $note = $this->make($row->o_id, $tree, $row->o_gedcom);
-            assert($note instanceof SharedNote);
-
-            return $note;
-        };
+        return fn (object $row): SharedNote => $this->make($row->o_id, $tree, $row->o_gedcom);
     }
 
     /**

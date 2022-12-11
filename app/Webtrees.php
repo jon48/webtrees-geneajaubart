@@ -29,6 +29,7 @@ use Fisharebest\Webtrees\Factories\FamilyFactory;
 use Fisharebest\Webtrees\Factories\FilesystemFactory;
 use Fisharebest\Webtrees\Factories\GedcomRecordFactory;
 use Fisharebest\Webtrees\Factories\HeaderFactory;
+use Fisharebest\Webtrees\Factories\IdFactory;
 use Fisharebest\Webtrees\Factories\ImageFactory;
 use Fisharebest\Webtrees\Factories\IndividualFactory;
 use Fisharebest\Webtrees\Factories\LocationFactory;
@@ -46,7 +47,6 @@ use Fisharebest\Webtrees\Factories\SubmitterFactory;
 use Fisharebest\Webtrees\Factories\SurnameTraditionFactory;
 use Fisharebest\Webtrees\Factories\TimeFactory;
 use Fisharebest\Webtrees\Factories\TimestampFactory;
-use Fisharebest\Webtrees\Factories\IdFactory;
 use Fisharebest\Webtrees\Factories\XrefFactory;
 use Fisharebest\Webtrees\GedcomFilters\GedcomEncodingFilter;
 use Fisharebest\Webtrees\Http\Middleware\BadBotBlocker;
@@ -143,7 +143,7 @@ class Webtrees
     public const STABILITY = '';
 
     // Version number.
-    public const VERSION = '2.1.7' . self::STABILITY;
+    public const VERSION = '2.1.8' . self::STABILITY;
 
     // Project website.
     public const URL = 'https://webtrees.net/';

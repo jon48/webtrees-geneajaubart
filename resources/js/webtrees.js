@@ -561,7 +561,7 @@
     const current_state = element.getAttribute('aria-expanded') ?? element.checked.toString();
 
     // Previously selected? Select again now.
-    if (previous_state !== current_state) {
+    if (previous_state !== null && previous_state !== current_state) {
       element.click();
     }
 
@@ -685,18 +685,32 @@
       options: {
         position: 'topleft',
       },
-      onAdd: function (map) {
-        let container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-        container.onclick = resetCallback;
-        let reset = config.i18n.reset;
-        let anchor = L.DomUtil.create('a', 'leaflet-control-reset', container);
-        anchor.setAttribute('aria-label', reset);
+      onAdd: () => {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        const anchor = L.DomUtil.create('a', 'leaflet-control-reset', container);
+
         anchor.href = '#';
-        anchor.title = reset;
+        anchor.setAttribute('aria-label', config.i18n.reset); /* Firefox doesn't yet support element.ariaLabel */
+        anchor.title = config.i18n.reset;
         anchor.role = 'button';
-        L.DomEvent.addListener(anchor, 'click', L.DomEvent.preventDefault);
-        let image = L.DomUtil.create('i', 'fas fa-redo', anchor);
-        image.alt = reset;
+        anchor.innerHTML = config.icons.reset;
+        anchor.onclick = resetCallback;
+
+        return container;
+      },
+    });
+
+    const fullscreenControl = L.Control.extend({
+      options: {
+        position: 'topleft',
+      },
+      onAdd: (map) => {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        const anchor = L.DomUtil.create('a', 'leaflet-control-fullscreen', container);
+
+        anchor.setAttribute('role', 'button');
+        anchor.dataset.wtFullscreen = '.wt-fullscreen-container';
+        anchor.innerHTML = config.icons.fullScreen;
 
         return container;
       },
@@ -728,6 +742,7 @@
       zoomControl: false,
     })
       .addControl(zoomControl)
+      .addControl(new fullscreenControl)
       .addControl(new resetControl())
       .addLayer(defaultLayer)
       .addControl(L.control.layers.tree(config.mapProviders, null, {
@@ -1008,7 +1023,7 @@ document.addEventListener('submit', function (event) {
   }
 });
 
-// Convert data-wt-confirm and data-wt-post-url/data-wt-reload-url attributes into useful behavior.
+// Convert data-wt-* attributes into useful behavior.
 document.addEventListener('click', (event) => {
   const target = event.target.closest('a,button');
 
@@ -1033,5 +1048,19 @@ document.addEventListener('click', (event) => {
     }).catch((error) => {
       alert(error);
     });
+  }
+
+  if (('wtFullscreen' in target.dataset)) {
+    event.stopPropagation();
+
+    const element = target.closest(target.dataset.wtFullscreen);
+
+    if (document.fullscreenElement === element) {
+      document.exitFullscreen()
+        .catch((error) => alert(error));
+    } else {
+      element.requestFullscreen()
+        .catch((error) => alert(error));
+    }
   }
 });

@@ -25,6 +25,7 @@ use Fisharebest\Webtrees\Tree;
 
 use function e;
 use function in_array;
+use function trim;
 use function view;
 
 /**
@@ -86,6 +87,40 @@ class NamePersonal extends AbstractElement
     ];
 
     /**
+     * AbstractGedcomElement constructor.
+     *
+     * @param string             $label
+     * @param array<string>|null $subtags
+     */
+    public function __construct(string $label, array $subtags = null)
+    {
+        if ($subtags === null && in_array(I18N::languageTag(), static::SURNAME_FIRST_LANGUAGES, true)) {
+            $subtags = static::SUBTAGS_SURNAME_FIRST;
+        }
+        parent::__construct($label, $subtags);
+    }
+
+    /**
+     * Convert a value to a canonical form.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public function canonical(string $value): string
+    {
+        $value = parent::canonical($value);
+
+        if ($value === '//') {
+            return '';
+        }
+
+        return $value;
+    }
+
+
+
+    /**
      * Create a default value for this element.
      *
      * @param Tree $tree
@@ -118,17 +153,5 @@ class NamePersonal extends AbstractElement
             view('edit/input-addon-keyboard', ['id' => $id]) .
             view('edit/input-addon-help', ['topic' => 'NAME']) .
             '</div>';
-    }
-
-    /**
-     * @return array<string,string>
-     */
-    public function subtags(): array
-    {
-        if (in_array(I18N::languageTag(), static::SURNAME_FIRST_LANGUAGES, true)) {
-            return static::SUBTAGS_SURNAME_FIRST;
-        }
-
-        return static::SUBTAGS;
     }
 }

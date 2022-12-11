@@ -17,31 +17,39 @@
 
 declare(strict_types=1);
 
-namespace Fisharebest\Webtrees\Services;
+namespace Fisharebest\Webtrees\CustomTags;
 
-use Fisharebest\Webtrees\TestCase;
+use Fisharebest\Webtrees\Contracts\CustomTagInterface;
+use Fisharebest\Webtrees\Contracts\ElementInterface;
+use Fisharebest\Webtrees\Elements\FamilySearchFamilyTreeId;
+use Fisharebest\Webtrees\I18N;
 
 /**
- * Test harness for the class LocalizationService
+ * GEDCOM files created by FamilySearch
+ *
+ * @see https://www.familysearch.org/en
  */
-class LocalizationServiceTest extends TestCase
+class FamilySearch implements CustomTagInterface
 {
     /**
-     * @covers \Fisharebest\Webtrees\Services\LocalizationService::dateFormatToOrder
+     * The name of the application.
      *
-     * @return void
+     * @return string
      */
-    public function testDateFormatToOrder(): void
+    public function name(): string
     {
-        $localization_service = new LocalizationService();
+        return 'FamilySearch';
+    }
 
-        // Chinese
-        self::assertSame('YMD', $localization_service->dateFormatToOrder('%Y年 %n月 %j日'));
-
-        // American
-        self::assertSame('MDY', $localization_service->dateFormatToOrder('%F %j, %Y'));
-
-        // European
-        self::assertSame('DMY', $localization_service->dateFormatToOrder('%j %F %Y'));
+    /**
+     * Tags created by this application.
+     *
+     * @return array<string,ElementInterface>
+     */
+    public function tags(): array
+    {
+        return [
+            'INDI:_FSFTID' => /* I18N: familysearch.org */ new FamilySearchFamilyTreeId(I18N::translate('FamilySearch ID')),
+        ];
     }
 }

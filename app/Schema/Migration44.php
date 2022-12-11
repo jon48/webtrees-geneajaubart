@@ -53,12 +53,21 @@ class Migration44 implements MigrationInterface
                 $table->index(['longitude']);
             });
 
-            DB::schema()->table('place_location', static function (Blueprint $table): void {
+            // SQL-server cannot cascade-delete/update on self-relations.
+            // Users will need to delete all child locations before deleting the parent.
+            if (DB::connection()->getDriverName() === 'sqlsrv') {
+                // SQL-Server doesn't support 'RESTRICT'
+                $action = 'NO ACTION';
+            } else {
+                $action = 'CASCADE';
+            }
+
+            DB::schema()->table('place_location', static function (Blueprint $table) use ($action): void {
                 $table->foreign(['parent_id'])
                     ->references(['id'])
                     ->on('place_location')
-                    ->onDelete('CASCADE')
-                    ->onUpdate('CASCADE');
+                    ->onDelete($action)
+                    ->onUpdate($action);
             });
         }
 
@@ -100,9 +109,11 @@ class Migration44 implements MigrationInterface
                 // Already deleted, or does not exist;
             }
 
+            $substring_function = DB::connection()->getDriverName() === 'sqlite' ? 'SUBSTR' : 'SUBSTRING';
+
             DB::table('placelocation')
                 ->update([
-                    'pl_place' => new Expression('SUBSTR(pl_place, 1, 120)'),
+                    'pl_place' => new Expression($substring_function . '(pl_place, 1, 120)'),
                 ]);
 
             // The lack of unique key constraints means that there may be duplicates...
@@ -159,6 +170,13 @@ class Migration44 implements MigrationInterface
                     new Expression("REPLACE(REPLACE(pl_lati, 'S', '-'), 'N', '')"),
                     new Expression("REPLACE(REPLACE(pl_long, 'W', '-'), 'E', '')"),
                 ]);
+
+            // SQL-server needs to be told to insert values into auto-generated columns.
+            if (DB::connection()->getDriverName() === 'sqlsrv') {
+                $prefix    = DB::connection()->getTablePrefix();
+                $statement = 'SET IDENTITY_INSERT [' . $prefix . 'place_location] ON';
+                DB::connection()->statement($statement);
+            }
 
             try {
                 DB::table('place_location')

@@ -21,6 +21,7 @@ namespace Fisharebest\Webtrees\Elements;
 
 use Fisharebest\Webtrees\Tree;
 
+use function e;
 use function view;
 
 /**
@@ -32,10 +33,8 @@ use function view;
  * name written in kanji, then the ROMANIZED_TYPE subordinate to the ROMN tag
  * would indicate romaji. See page 61.
  */
-class NameRomanizedVariation extends AbstractElement
+class NameRomanizedVariation extends NamePersonal
 {
-    protected const MAXIMUM_LENGTH = 120;
-
     protected const SUBTAGS = [
         'TYPE' => '1:1',
         'NPFX' => '0:1',
@@ -72,7 +71,9 @@ class NameRomanizedVariation extends AbstractElement
     {
         return
             '<div class="input-group">' .
-            parent::edit($id, $name, $value, $tree) .
+            view('edit/input-addon-edit-name', ['id' => $id]) .
+            '<input class="form-control" type="text" id="' . e($id) . '" name="' . e($name) . '" value="' . e($value) . '" readonly="readonly" />' .
+            view('edit/input-addon-keyboard', ['id' => $id]) .
             view('edit/input-addon-help', ['topic' => 'ROMN']) .
             '</div>';
     }

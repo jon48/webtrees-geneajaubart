@@ -37,7 +37,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 use function app;
 use function implode;
-use function response;
 use function str_contains;
 
 /**
@@ -81,7 +80,7 @@ class Router implements MiddlewareInterface
 
         if (!Validator::attributes($request)->boolean('rewrite_urls', false)) {
             // Ugly URLs store the path in a query parameter.
-            $url_route = $request->getQueryParams()['route'] ?? '';
+            $url_route = Validator::queryParams($request)->string('route', '');
             $uri       = $request->getUri()->withPath($url_route);
             $pretty    = $request->withUri($uri);
         }
@@ -96,7 +95,7 @@ class Router implements MiddlewareInterface
 
             if ($failed_route instanceof Route) {
                 if ($failed_route->failedRule === Allows::class) {
-                    Registry::responseFactory()->response('', StatusCodeInterface::STATUS_METHOD_NOT_ALLOWED, [
+                    return Registry::responseFactory()->response('', StatusCodeInterface::STATUS_METHOD_NOT_ALLOWED, [
                         'Allow' => implode(', ', $failed_route->allows),
                     ]);
                 }

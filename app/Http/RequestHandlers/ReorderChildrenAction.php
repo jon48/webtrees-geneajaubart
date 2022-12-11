@@ -28,9 +28,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 use function array_merge;
 use function array_search;
-use function assert;
 use function implode;
-use function is_array;
 use function redirect;
 use function uksort;
 
@@ -46,14 +44,14 @@ class ReorderChildrenAction implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tree   = Validator::attributes($request)->tree();
-        $xref   = Validator::attributes($request)->isXref()->string('xref');
+        $tree = Validator::attributes($request)->tree();
+        $xref = Validator::attributes($request)->isXref()->string('xref');
+
         $family = Registry::familyFactory()->make($xref, $tree);
         $family = Auth::checkFamilyAccess($family, true);
 
-        $params = (array) $request->getParsedBody();
-        $order  = $params['order'];
-        assert(is_array($order));
+        $order = Validator::parsedBody($request)->array('order');
+        $url   = Validator::parsedBody($request)->isLocalUrl()->string('url', $family->url());
 
         $fake_facts = ['0 @' . $family->xref() . '@ FAM'];
         $sort_facts = [];
@@ -77,6 +75,6 @@ class ReorderChildrenAction implements RequestHandlerInterface
 
         $family->updateRecord($gedcom, false);
 
-        return redirect($family->url());
+        return redirect($url);
     }
 }

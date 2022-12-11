@@ -24,7 +24,6 @@ use Fisharebest\Webtrees\Auth;
 use Fisharebest\Webtrees\Http\ViewResponseTrait;
 use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Module\ModuleReportInterface;
-use Fisharebest\Webtrees\Registry;
 use Fisharebest\Webtrees\Report\HtmlRenderer;
 use Fisharebest\Webtrees\Report\PdfRenderer;
 use Fisharebest\Webtrees\Report\ReportParserGenerate;
@@ -69,11 +68,8 @@ class ReportGenerate implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tree = Validator::attributes($request)->tree();
-        $user = Validator::attributes($request)->user();
-
-        $data_filesystem = Registry::filesystem()->data();
-
+        $tree   = Validator::attributes($request)->tree();
+        $user   = Validator::attributes($request)->user();
         $report = Validator::attributes($request)->string('report');
         $module = $this->module_service->findByName($report);
 
@@ -83,8 +79,8 @@ class ReportGenerate implements RequestHandlerInterface
 
         Auth::checkComponentAccess($module, ModuleReportInterface::class, $tree, $user);
 
-        $varnames  = $request->getQueryParams()['varnames'] ?? [];
-        $vars      = $request->getQueryParams()['vars'] ?? [];
+        $varnames  = Validator::queryParams($request)->array('varnames');
+        $vars      = Validator::queryParams($request)->array('vars');
         $variables = [];
 
         foreach ($varnames as $name) {
@@ -92,9 +88,8 @@ class ReportGenerate implements RequestHandlerInterface
         }
 
         $xml_filename = $module->resourcesFolder() . $module->xmlFilename();
-
-        $format      = $request->getQueryParams()['format'] ?? '';
-        $destination = $request->getQueryParams()['destination'] ?? '';
+        $format       = Validator::queryParams($request)->string('format');
+        $destination  = Validator::queryParams($request)->string('destination');
 
         $user->setPreference('default-report-destination', $destination);
         $user->setPreference('default-report-format', $format);
@@ -103,7 +98,7 @@ class ReportGenerate implements RequestHandlerInterface
             default:
             case 'HTML':
                 ob_start();
-                new ReportParserGenerate($xml_filename, new HtmlRenderer(), $variables, $tree, $data_filesystem);
+                new ReportParserGenerate($xml_filename, new HtmlRenderer(), $variables, $tree);
                 $html = ob_get_clean();
 
                 $this->layout = 'layouts/report';
@@ -121,7 +116,7 @@ class ReportGenerate implements RequestHandlerInterface
 
             case 'PDF':
                 ob_start();
-                new ReportParserGenerate($xml_filename, new PdfRenderer(), $variables, $tree, $data_filesystem);
+                new ReportParserGenerate($xml_filename, new PdfRenderer(), $variables, $tree);
                 $pdf = ob_get_clean();
 
                 $headers = ['content-type' => 'application/pdf'];

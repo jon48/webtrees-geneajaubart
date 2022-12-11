@@ -85,7 +85,7 @@ class SetupWizard implements RequestHandlerInterface
         'mysql'  => '3306',
         'pgsql'  => '5432',
         'sqlite' => '',
-        'sqlsvr' => '1433',
+        'sqlsrv' => '', // Do not use default, as it is valid to have no port number.
     ];
 
     private MigrationService $migration_service;
@@ -201,12 +201,10 @@ class SetupWizard implements RequestHandlerInterface
      */
     private function userData(ServerRequestInterface $request): array
     {
-        $params = (array) $request->getParsedBody();
-
         $data = [];
 
         foreach (self::DEFAULT_DATA as $key => $default) {
-            $data[$key] = $params[$key] ?? $default;
+            $data[$key] = Validator::parsedBody($request)->string($key, $default);
         }
 
         return $data;

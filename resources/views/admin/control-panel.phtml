@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Fisharebest\Webtrees\Http\RequestHandlers\BroadcastPage;
 use Fisharebest\Webtrees\Http\RequestHandlers\CleanDataFolder;
 use Fisharebest\Webtrees\Http\RequestHandlers\ControlPanel;
@@ -464,7 +466,7 @@ use Illuminate\Support\Collection;
     </div>
 </div>
 
-<?php if ($show_synchronize): ?>
+<?php if ($show_synchronize) : ?>
     <?= view('admin/synchronize-trees') ?>
 <?php endif ?>
 
