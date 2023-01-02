@@ -174,16 +174,10 @@ library.add(faMapMarkedAlt, faTable);
         if (feature.properties.tooltip !== undefined) {
           layer.bindTooltip(feature.properties.tooltip);
 
-          // Set the highlight style into layer when 'mouseover'
-          (function () {
-            layer.on('mouseover', function () {
-              // Set the style with classified color
-              layer.setStyle(style.hoverStyle());
-            });
-            layer.on('mouseout', function () {
-              layer.setStyle(style.featureStyle(feature));
-            });
-          })(layer, feature);
+          layer.on({
+            mouseover: () => layer.setStyle(style.hoverStyle()),
+            mouseout: () => geoJsonLayer.resetStyle(layer)
+          });
         }
       },
       style: style.featureStyle
