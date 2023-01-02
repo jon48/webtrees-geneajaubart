@@ -70,6 +70,7 @@ class BadBotBlocker implements MiddlewareInterface
         'Barkrowler',
         'BLEXBot',
         'DataForSEO',
+        'DataForSeoBot', // https://dataforseo.com/dataforseo-bot
         'DotBot',
         'Grapeshot',
         'Honolulu-bot', // Aggressive crawer, no info available
@@ -85,6 +86,7 @@ class BadBotBlocker implements MiddlewareInterface
         'SEOkicks',
         'SiteKiosk',
         'Turnitin',
+        'wp_is_mobile', // Nothing to do with wordpress
         'XoviBot',
         'ZoominfoBot',
     ];

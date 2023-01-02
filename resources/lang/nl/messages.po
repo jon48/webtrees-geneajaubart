@@ -3,15 +3,16 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: i18n@webtrees.net\n"
 "POT-Creation-Date: 2022-11-27 17:22+0000\n"
-"PO-Revision-Date: 2022-09-05 19:50+0000\n"
+"PO-Revision-Date: 2022-12-25 07:55+0000\n"
 "Last-Translator: TheDutchJewel <thedutchjewel@gmail.com>\n"
-"Language-Team: Dutch <https://translate.webtrees.net/projects/webtrees/webtrees/nl/>\n"
+"Language-Team: Dutch <https://translate.webtrees.net/projects/webtrees/"
+"webtrees/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.9.1\n"
+"X-Generator: Weblate 4.14.2\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: translate;noop;plural:1,2\n"
@@ -750,7 +751,7 @@ msgstr "Een link naar de webtrees homepage."
 #. I18N: Description of the “Branches” module
 #: app/Module/BranchesListModule.php:112
 msgid "A list of branches of a family."
-msgstr "Een lijst met met familietakken."
+msgstr "Een lijst met familietakken."
 
 #. I18N: Description of the “Pending changes” module
 #: app/Module/ReviewChangesModule.php:93
@@ -983,7 +984,12 @@ msgstr "Een rapport van de vitale records in een bepaalde periode of plaats."
 
 #: resources/views/admin/users-edit.phtml:234
 msgid "A role is a set of access rights, which give permission to view data, change preferences, etc. Access rights are assigned to roles, and roles are granted to users. Each family tree can assign different access to each role, and users can have a different role in each family tree."
-msgstr "Een rol is een verzameling van toegangsrechten om gegevens te bekijken, instellingen te wijzigen, enz.. Toegangsrechten worden toegekend aan rollen, rollen worden verleend aan gebruikers. Elke stamboom kan andere rechten toekennen aan elke rol en gebruikers kunnen een andere rol hebben in elke stamboom."
+msgstr ""
+"Een rol is een verzameling van toegangsrechten om gegevens te bekijken, "
+"instellingen te wijzigen, enz. Toegangsrechten worden toegekend aan rollen, "
+"en rollen worden verleend aan gebruikers. Elke stamboom kan andere rechten "
+"toekennen aan elke rol en gebruikers kunnen een andere rol hebben in elke "
+"stamboom."
 
 #. I18N: Description of the “Family navigator” module
 #: app/Module/FamilyNavigatorModule.php:51
@@ -1881,7 +1887,7 @@ msgid "An hourglass chart of an individual’s ancestors and descendants."
 msgstr "Een zandloper diagram met de voorouders en afstammelingen van een persoon."
 
 #: resources/views/edit/reorder-families.phtml:75
-msgid "An individual can have more than one set of parents.  For example, birth and adopted."
+msgid "An individual can have more than one set of parents. For example, birth and adopted."
 msgstr "Een persoon kan meerdere ouders hebben. Bijvoorbeeld biologische en adoptie ouders."
 
 #. I18N: Description of the “Interactive tree” module
@@ -2437,7 +2443,7 @@ msgstr "Bangladesh"
 #: app/Gedcom.php:591 resources/views/calendar-page.phtml:189
 #: resources/xml/reports/missing_facts_report.xml:16
 msgid "Baptism"
-msgstr "Gedoopt"
+msgstr "Doop"
 
 #: app/Services/IndividualFactsService.php:227
 msgid "Baptism of a brother"
@@ -2733,7 +2739,7 @@ msgstr "Birmingham, Alabama, Verenigde Staten"
 #: resources/xml/reports/pedigree_report.xml:1379
 #: resources/xml/reports/relative_ext_report.xml:63
 msgid "Birth"
-msgstr "Geboren"
+msgstr "Geboorte"
 
 #: app/Elements/PedigreeLinkageType.php:80
 msgctxt "Female pedigree"
@@ -3050,7 +3056,7 @@ msgstr "Bulgarije"
 #: resources/xml/reports/family_group_report.xml:1049
 #: resources/xml/reports/missing_facts_report.xml:25
 msgid "Burial"
-msgstr "Begraven"
+msgstr "Begrafenis"
 
 #: app/Services/IndividualFactsService.php:355
 msgid "Burial of a brother"
@@ -3185,7 +3191,7 @@ msgstr "Plaats begrafenis bevat"
 #: resources/xml/reports/cemetery_report.xml:3
 #: resources/xml/reports/cemetery_report.xml:34
 msgid "Burials"
-msgstr "Begraven"
+msgstr "Begrafenissen"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:83
@@ -3251,7 +3257,7 @@ msgstr "Calgary, Alberta, Canada"
 
 #: app/Gedcom.php:845 resources/views/modals/source-fields.phtml:52
 msgid "Call number"
-msgstr "Inventarisnummer"
+msgstr "Oproepnummer"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:280
@@ -3604,7 +3610,7 @@ msgstr "Kies de hieronder aangemaakte zelfgedefinieerde welkomstekst"
 #: resources/xml/reports/family_group_report.xml:904
 #: resources/xml/reports/missing_facts_report.xml:16
 msgid "Christening"
-msgstr "Gedoopt"
+msgstr "Doop"
 
 #: app/Services/IndividualFactsService.php:222
 msgid "Christening of a brother"
@@ -4411,14 +4417,14 @@ msgstr "Databaseverbinding"
 #: resources/views/setup/step-4-database-sqlite.phtml:54
 #: resources/views/setup/step-4-database-sqlsrv.phtml:97
 msgid "Database name"
-msgstr "Naam van de database"
+msgstr "Databasenaam"
 
 #: app/CustomTags/PhpGedView.php:82
 #: resources/views/setup/step-4-database-mysql.phtml:97
 #: resources/views/setup/step-4-database-pgsql.phtml:85
 #: resources/views/setup/step-4-database-sqlsrv.phtml:85
 msgid "Database password"
-msgstr "Database wachtwoord"
+msgstr "Databasewachtwoord"
 
 #: resources/views/setup/step-3-database-type.phtml:54
 msgid "Database type"
@@ -4429,7 +4435,7 @@ msgstr "Databasetype"
 #: resources/views/setup/step-4-database-pgsql.phtml:73
 #: resources/views/setup/step-4-database-sqlsrv.phtml:73
 msgid "Database user account"
-msgstr "Database gebruikersaccount"
+msgstr "Databasegebruikersaccount"
 
 #: app/CustomTags/Aldfaer.php:80 app/CustomTags/Ancestry.php:72
 #: app/CustomTags/FamilyTreeBuilder.php:58 app/CustomTags/GedcomL.php:118
@@ -4461,7 +4467,7 @@ msgstr "Datum"
 
 #: resources/views/modules/relatives/tab.phtml:37
 msgid "Date differences"
-msgstr "Datum verschillen"
+msgstr "Datumverschillen"
 
 #: app/Gedcom.php:586
 msgid "Date of LDS baptism"
@@ -4508,7 +4514,7 @@ msgstr "Geboortedatum"
 
 #: app/Gedcom.php:605
 msgid "Date of blessing"
-msgstr "Datum zegening"
+msgstr "Zegeningsdatum"
 
 #: app/CustomTags/BrothersKeeper.php:95
 msgid "Date of brit milah"
@@ -4589,11 +4595,11 @@ msgstr "Naturalisatiedatum"
 
 #: app/Gedcom.php:723
 msgid "Date of ordination"
-msgstr "Datum van wijding"
+msgstr "Wijdingsdatum"
 
 #: app/Gedcom.php:731
 msgid "Date of residence"
-msgstr "Datum bewoning"
+msgstr "Bewoningsdatum"
 
 #: app/CustomTags/Gedcom7.php:128
 msgid "Date of status change"
@@ -4601,7 +4607,7 @@ msgstr "Datum van statuswijziging"
 
 #: resources/views/help/date.phtml:107
 msgid "Date period"
-msgstr "Datum periode"
+msgstr "Datumperiode"
 
 #: resources/views/help/date.phtml:100
 msgid "Date periods are used to indicate that a fact, such as an occupation, continued for a period of time."
@@ -4610,7 +4616,7 @@ msgstr "Datumperiodes worden gebruikt om aan te geven dat een feit, zoals een be
 #: app/Gedcom.php:836 resources/views/help/date.phtml:69
 #: resources/views/modules/statistics-chart/custom.phtml:96
 msgid "Date range"
-msgstr "Datum bereik"
+msgstr "Datumbereik"
 
 #: resources/views/help/date.phtml:62
 msgid "Date ranges are used to indicate that an event, such as a birth, happened on an unknown date within a possible range."
@@ -4618,11 +4624,11 @@ msgstr "Datumbereiken worden gebruikt om aan te geven dat een gebeurtenis, zoals
 
 #: resources/views/admin/users.phtml:33
 msgid "Date registered"
-msgstr "Datum geregistreerd"
+msgstr "Registratiedatum"
 
 #: resources/views/modules/user-messages/user-messages.phtml:71
 msgid "Date sent"
-msgstr "Datum verzonden"
+msgstr "Verzenddatum"
 
 #. I18N: Help text for the “Calendar conversion” configuration setting
 #: resources/views/admin/trees-preferences.phtml:129
@@ -4793,11 +4799,11 @@ msgstr "Overleden"
 #: resources/xml/reports/pedigree_report.xml:1381
 #: resources/xml/reports/relative_ext_report.xml:69
 msgid "Death"
-msgstr "Overleden"
+msgstr "Overlijden"
 
 #: app/Statistics/Google/ChartDistribution.php:306
 msgid "Death by country"
-msgstr "Overledenen per land"
+msgstr "Overlijden per land"
 
 #: resources/xml/reports/bdm_report.xml:10
 #: resources/xml/reports/death_report.xml:8
@@ -5711,7 +5717,7 @@ msgstr "Voeg een optionele notitie toe aan deze favoriet"
 #: app/Services/LeafletJsService.php:75
 #: resources/views/modules/interactive-tree/chart.phtml:25
 msgid "Enter fullscreen"
-msgstr ""
+msgstr "Volledig scherm weergeven"
 
 #: resources/views/search-replace-page.phtml:47
 msgid "Entire record"
@@ -5851,7 +5857,7 @@ msgstr "Uitgesloten van onderwerping"
 #: app/Services/LeafletJsService.php:76
 #: resources/views/modules/interactive-tree/chart.phtml:26
 msgid "Exit fullscreen"
-msgstr ""
+msgstr "Volledig scherm afsluiten"
 
 #. I18N: placeholder text for registration-comments field
 #: resources/views/register-page.phtml:89
@@ -5875,7 +5881,7 @@ msgstr "Exporteer alle stambomen naar GEDCOM-bestanden…"
 msgid "Export preferences"
 msgstr "Opties voor exporteren"
 
-#. I18N: A configuration setting. …who were born in the last XX years or died in the    last YY years
+#. I18N: A configuration setting. …who were born in the last XX years or died in the last YY years
 #: resources/views/admin/trees-privacy.phtml:102
 msgid "Extend privacy to dead individuals"
 msgstr "Breid privacy uit met overleden personen"
@@ -6119,7 +6125,7 @@ msgstr "Gezinstelling"
 
 #: resources/views/admin/tags.phtml:975
 msgid "Family fact"
-msgstr ""
+msgstr "Gezinsfeit"
 
 #: resources/views/admin/tags.phtml:1025
 msgid "Family facts and events"
@@ -6829,7 +6835,7 @@ msgstr "GEDCOM"
 
 #: resources/views/admin/tags.phtml:935
 msgid "GEDCOM 7"
-msgstr ""
+msgstr "GEDCOM 7"
 
 #. I18N: A configuration setting
 #: resources/views/admin/trees-check.phtml:27
@@ -7753,7 +7759,7 @@ msgstr "In deze maand…"
 msgid "In this year…"
 msgstr "In dit jaar…"
 
-#. I18N: "thumbs" is fixed text.  Do not change it.
+#. I18N: "thumbs" is fixed text. Do not change it.
 #: resources/views/admin/webtrees1-thumbnails.phtml:21
 msgid "In webtrees version 1, you could add custom thumbnails to media objects by creating files in the “thumbs” folders."
 msgstr "In webtrees versie 1 kon u aangepaste miniatuurafbeeldingen toevoegen aan het mediaobject door bestanden aan te maken in de “thumbs”-mappen."
@@ -9428,7 +9434,7 @@ msgstr "Mediaobjecten per pagina"
 #: resources/views/modals/create-media-from-file.phtml:43
 #: resources/views/modals/media-file-fields.phtml:117
 msgid "Media type"
-msgstr "Soort media"
+msgstr "Mediatype"
 
 #: app/CustomTags/BrothersKeeper.php:103 app/CustomTags/FamilyTreeMaker.php:133
 #: app/CustomTags/Reunion.php:58
@@ -10290,7 +10296,7 @@ msgstr "Geen feiten voor dit gezin."
 #: app/Http/RequestHandlers/MapDataImportAction.php:94
 #: app/Http/RequestHandlers/MapDataImportAction.php:110
 msgid "No file was received."
-msgstr ""
+msgstr "Er is geen bestand ontvangen."
 
 #. I18N: PHP internal error message - php.net/manual/en/features.file-upload.errors.php
 #: app/Exceptions/FileUploadException.php:50
@@ -11201,8 +11207,8 @@ msgid "Place names are frequently too long to fit on charts, lists, etc. They ca
 msgstr "Plaatsnamen zijn vaak te lang om op diagrammen, lijsten etc. te tonen. Ze kunnen worden afgekort door alleen de eerste delen van de naam te tonen, zoals <i>plaats, gemeente</i>, of het laatste gedeelte er van zoals <i>provincie. land</i>."
 
 #: resources/views/help/place.phtml:14
-msgid "Place names can change over time.  In genealogy, it is customary to use the current name for a town or country. The historic name can be shown in sources, notes, etc."
-msgstr "Plaatsnamen wijzigen in de tijd.  In genealogie is het gebruikelijk om de huidige naam voor een plaats of land te gebruiken. De historische naam kan aan de bron, notities, enz. worden toegevoegd."
+msgid "Place names can change over time. In genealogy, it is customary to use the current name for a town or country. The historic name can be shown in sources, notes, etc."
+msgstr "Plaatsnamen wijzigen in de tijd. In genealogie is het gebruikelijk om de huidige naam voor een plaats of land te gebruiken. De historische naam kan aan de bron, notities, enz. worden toegevoegd."
 
 #: resources/views/help/place.phtml:10
 msgid "Place names should be entered as a comma-separated list, starting with the smallest place and ending with the country. For example, “Westminster, London, England”."
@@ -14493,8 +14499,10 @@ msgid "The new user will be asked to confirm their email address before the acco
 msgstr "De nieuwe gebruiker zal worden gevraagd om zijn/haar e-mailadres te bevestigen voordat het account wordt aangemaakt."
 
 #: resources/views/admin/tags.phtml:938
-msgid "The next version of the GEDCOM standard will add new tags and remove old ones.  You can use some of the new tags now."
+msgid "The next version of the GEDCOM standard will add new tags and remove old ones. You can use some of the new tags now."
 msgstr ""
+"De volgende versie van de GEDCOM-standaard zal nieuwe labels toevoegen en "
+"oude verwijderen. U kunt sommige van de nieuwe labels nu al gebruiken."
 
 #: app/Http/RequestHandlers/CreateNoteAction.php:65
 msgid "The note has been created"
@@ -14873,7 +14881,13 @@ msgstr "Deze stamboom heeft geen afbeeldingen om te laten zien."
 #. I18N: do not translate the #keywords#
 #: resources/views/modules/html/template-narrative.phtml:9
 msgid "This family tree was last updated on #gedcomUpdated#. There are #totalSurnames# surnames in this family tree. The earliest recorded event is the #firstEventType# of #firstEventName# in #firstEventYear#. The most recent event is the #lastEventType# of #lastEventName# in #lastEventYear#.<br><br>If you have any comments or feedback please contact #contactWebmaster#."
-msgstr "Deze Stamboom is op #gedcomUpdated# voor het laatst bijgewerkt. Er zijn #totalSurnames# achternamen in deze stamboom. De eerst vastgelegde gebeurtenis is de #firstEventType# van #firstEventName# in het jaar #firstEventYear#. De meest recente gebeurtenis is de #lastEventType# van #lastEventName# in het jaar #lastEventYear#.<br><br>Als u commentaar of opmerkingen heeft neem dan a.u.b. contact op met #contactWebmaster#."
+msgstr ""
+"Deze stamboom is voor het laatst bijgewerkt op #gedcomUpdated#. Er zijn "
+"#totalSurnames# achternamen in deze stamboom. De vroegst geregistreerde "
+"gebeurtenis is de #firstEventType# van #firstEventName# in het jaar "
+"#firstEventYear#. De meest recente gebeurtenis is de #lastEventType# van "
+"#lastEventName# in het jaar #lastEventYear#.<br><br>Als u commentaar of "
+"opmerkingen heeft neem dan contact op met #contactWebmaster#."
 
 #: resources/views/modules/gedcom_stats/statistics.phtml:32
 #: resources/views/modules/html/template-statistics.phtml:20
@@ -16346,7 +16360,7 @@ msgstr "Website"
 #: app/Http/RequestHandlers/SiteLogsPage.php:96
 #: resources/views/admin/control-panel.phtml:241
 msgid "Website logs"
-msgstr "Website logs"
+msgstr "Website-logboekbestanden"
 
 #: app/Http/RequestHandlers/SitePreferencesPage.php:66
 #: resources/views/admin/control-panel.phtml:219
@@ -17084,12 +17098,12 @@ msgstr "sluiten"
 #. I18N: Name of a theme.
 #: app/Module/CloudsTheme.php:43
 msgid "clouds"
-msgstr "clouds"
+msgstr "wolken"
 
 #. I18N: Name of a theme.
 #: app/Module/ColorsTheme.php:53
 msgid "colors"
-msgstr "colors"
+msgstr "kleuren"
 
 #. I18N: An option in a list-box
 #: app/Module/TopSurnamesModule.php:272
@@ -17129,7 +17143,7 @@ msgstr "cultureel"
 
 #: resources/views/modules/statistics-chart/custom.phtml:93
 msgid "date periods"
-msgstr "datum perioden"
+msgstr "datumperiodes"
 
 #: app/Services/RelationshipService.php:428
 msgid "daughter"
@@ -19491,7 +19505,7 @@ msgstr "leden"
 #. I18N: Name of a theme.
 #: app/Module/MinimalTheme.php:39
 msgid "minimal"
-msgstr "minimal"
+msgstr "minimaal"
 
 #: app/Elements/RoleInEvent.php:81 app/Services/RelationshipService.php:349
 msgid "mother"
@@ -21746,7 +21760,7 @@ msgstr "…"
 #~ msgid "If the number of times that a certain surname occurs is lower than the threshold, it will not appear in the list. It can be added here manually. If more than one surname is entered, they must be separated by a comma. <b>Surnames are case-sensitive.</b>"
 #~ msgstr "Als het aantal malen dat een achternaam in de genealogie voorkomt lager is dan de drempelwaarde, verschijnt de naam niet op de lijst. De achternaam kan dan hier handmatig worden toegevoegd. Als er meer namen worden opgegeven, moeten ze met een komma worden gescheiden.<b>Achternamen zijn hoofdlettergevoelig.</b>"
 
-#~ msgid "If the thumbnail image is the same as the original image, it is no longer needed and you should delete it.  If it is a custom image, you should add it to the media object."
+#~ msgid "If the thumbnail image is the same as the original image, it is no longer needed and you should delete it. If it is a custom image, you should add it to the media object."
 #~ msgstr "Als de miniatuur afbeelding hetzelfde is als de originele afbeelding, is deze niet langer nodig en kun je deze verwijderen. Als het een aangepaste afbeelding betreft, zal je deze aan het media object moeten toevoegen."
 
 #~ msgid "If visitors can not see the family tree, they will not be able to sign up for an account. You will need to add their account manually."
