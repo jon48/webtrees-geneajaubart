@@ -4,6 +4,7 @@ use Fisharebest\Webtrees\I18N;
 use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Module\AbstractModule;
 use Fisharebest\Webtrees\Module\IndividualListModule;
+use Fisharebest\Webtrees\Module\ModuleInterface;
 use Fisharebest\Webtrees\Services\ModuleService;
 use Illuminate\Support\Collection;
 
@@ -15,11 +16,13 @@ use Illuminate\Support\Collection;
  * @var string          $initial
  * @var string          $show_all
  * @var string          $surname
+ * @var string          $surname_legend
  * @var Collection      $lineages
  * @var int             $nb_lineages
  */
 
-$individual_module = app(ModuleService::class)->findByInterface(IndividualListModule::class)->first();
+$individual_module = app(ModuleService::class)->all()
+    ->first(fn(ModuleInterface $mod): bool => get_class($mod) === IndividualListModule::class);
 
 ?>
 
@@ -35,7 +38,7 @@ $individual_module = app(ModuleService::class)->findByInterface(IndividualListMo
     <?php if ($nb_lineages == 0) : ?>
     <p class="text-center">
         <span class="d-flex justify-content-center alert alert-warning">
-        <?= e(I18N::translate('No individuals with surname %s has been found. Please try another name.', $surname)) ?>
+        <?= e(I18N::translate('No individuals with surname %s has been found. Please try another name.', $surname_legend)) ?>
         </span>
     </p>
     <?php else : ?>
@@ -43,7 +46,7 @@ $individual_module = app(ModuleService::class)->findByInterface(IndividualListMo
         <p class="text-center">
             <strong>
                 <a href="<?= $individual_module->listUrl($tree, ['surname' => $surname]) ?>">
-                    <?= e(I18N::translate('Go to the list of individuals with surname %s', $surname)) ?>
+                    <?= e(I18N::translate('Go to the list of individuals with surname %s', $surname_legend)) ?>
                 </a>
             </strong>
         </p>
@@ -51,7 +54,7 @@ $individual_module = app(ModuleService::class)->findByInterface(IndividualListMo
     
     <div class="maj-patrolineage-lineages">
         <div class="list_label">
-            <?= e(I18N::translate('Individuals in %s lineages', $surname)) ?>
+            <?= e(I18N::translate('Individuals in %s lineages', $surname_legend)) ?>
         </div>
         <div class="list_value_wrap">
         <?php foreach ($lineages as $i => $lineage_root_node) : ?>

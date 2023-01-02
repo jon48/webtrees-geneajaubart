@@ -69,7 +69,7 @@
         "illuminate/support": "8.83.27",
         "intervention/image": "2.7.2",
         "io-developer/php-whois": "4.1.7",
-		"jon48/webtrees-lib" : "dev-main",
+		"jon48/webtrees-lib" : "dev-main-2.1 as dev-main",
 		"jon48/webtrees-mod-maj-geodata-france" : "dev-main",
 		"jon48/webtrees-mod-translationtool" : "dev-main",
         "league/commonmark": "2.3.8",

@@ -28,7 +28,5 @@ return array (
                                     =>  '%s lignée trouvée' . Translation::PLURAL_SEPARATOR . '%s lignées trouvées',
     'Go to %s lineages'             =>  'Voir les lignées %s',
     'The attached module could not be found.'
-                                    =>  'Le module associé n’a pas été trouvé',
-    'There is no module to handle individual lists.'
-                                    =>  'Aucun module n’a été trouvé pour afficher les listes d’individus.'
+                                    =>  'Le module associé n’a pas été trouvé'
 );

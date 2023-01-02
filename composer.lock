@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0d6685ef777c559f430b3a139a10f074",
+    "content-hash": "c7d543fcc347a18073898196781da6d5",
     "packages": [
         {
             "name": "aura/router",
@@ -2973,16 +2973,16 @@
         },
         {
             "name": "jon48/webtrees-lib",
-            "version": "dev-main",
+            "version": "dev-main-2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jon48/webtrees-lib.git",
-                "reference": "64cea5c898080786017935e7abb850dae9dc4cb4"
+                "reference": "f0a8cf77013fac03be4c9bab1f6f2d2085556d26"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/64cea5c898080786017935e7abb850dae9dc4cb4",
-                "reference": "64cea5c898080786017935e7abb850dae9dc4cb4",
+                "url": "https://api.github.com/repos/jon48/webtrees-lib/zipball/f0a8cf77013fac03be4c9bab1f6f2d2085556d26",
+                "reference": "f0a8cf77013fac03be4c9bab1f6f2d2085556d26",
                 "shasum": ""
             },
             "require": {
@@ -2991,7 +2991,7 @@
                 "brick/math": "~0.9",
                 "fig/http-message-util": "^1.1",
                 "fisharebest/flysystem-chroot-adapter": "~2.0",
-                "fisharebest/webtrees": "~2.1.8",
+                "fisharebest/webtrees": "~2.1.14",
                 "guzzlehttp/guzzle": "~7.1",
                 "illuminate/collections": "~8.20",
                 "illuminate/database": "~8.20",
@@ -3016,7 +3016,6 @@
             "suggest": {
                 "ext-sodium": "Better performance, password hashing (Argon2i), secure memory management (memzero), and better security."
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -3046,9 +3045,9 @@
             ],
             "support": {
                 "issues": "http://bugs.jaubart.com",
-                "source": "https://github.com/jon48/webtrees-lib/tree/develop"
+                "source": "https://github.com/jon48/webtrees-lib/tree/main-2.1"
             },
-            "time": "2022-12-11T17:21:00+00:00"
+            "time": "2023-01-02T21:14:29+00:00"
         },
         {
             "name": "jon48/webtrees-mod-maj-geodata-france",
@@ -10792,7 +10791,14 @@
             "time": "2021-07-28T10:34:58+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "package": "jon48/webtrees-lib",
+            "version": "dev-main-2.1",
+            "alias": "dev-main",
+            "alias_normalized": "dev-main"
+        }
+    ],
     "minimum-stability": "stable",
     "stability-flags": {
         "jon48/webtrees-lib": 20,
