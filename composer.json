@@ -78,7 +78,7 @@
 		"middlewares/client-ip" : "2.0.1",
         "mlocati/ip-lib": "1.18.0",
         "nesbot/carbon": "2.63.0",
-        "nyholm/psr7": "1.5.1",
+        "nyholm/psr7": "1.6.1",
 		"nyholm/psr7-server" : "1.0.2",
 		"oomphinc/composer-installers-extender" : "^2.0",
 		"oscarotero/middleland" : "1.0.1",
