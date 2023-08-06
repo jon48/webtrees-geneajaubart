@@ -87,10 +87,10 @@ library.add(faMapMarkedAlt, faTable);
     }
 
     return {
-      colorConfig: colorConfig,
-      defaultStyle: defaultStyle,
-      hoverStyle: hoverStyle,
-      featureStyle: featureStyle
+      colorConfig,
+      defaultStyle,
+      hoverStyle,
+      featureStyle
     };
   };
 

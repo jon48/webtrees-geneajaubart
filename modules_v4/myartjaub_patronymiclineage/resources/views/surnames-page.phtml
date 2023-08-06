@@ -31,6 +31,7 @@ use Fisharebest\Webtrees\Module\AbstractModule;
             case 'style1':
                 echo view('lists/surnames-column-list', [
                     'module'   => $module,
+                    'params'   => [],
                     'surnames' => $surnames,
                     'totals'   => true,
                     'tree'     => $tree,
@@ -39,6 +40,7 @@ use Fisharebest\Webtrees\Module\AbstractModule;
             case 'style3':
                 echo view('lists/surnames-tag-cloud', [
                     'module'   => $module,
+                    'params'   => [],
                     'surnames' => $surnames,
                     'totals'   => true,
                     'tree'     => $tree,
@@ -48,6 +50,7 @@ use Fisharebest\Webtrees\Module\AbstractModule;
             default:
                 echo view('lists/surnames-table', [
                     'surnames' => $surnames,
+                    'params'   => [],
                     'families' => null,
                     'module'   => $module,
                     'tree'     => $tree,
