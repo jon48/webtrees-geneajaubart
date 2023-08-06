@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -55,7 +55,7 @@ class Individual extends GedcomRecord
     /**
      * A closure which will compare individuals by birth date.
      *
-     * @return Closure
+     * @return Closure(Individual,Individual):int
      */
     public static function birthDateComparator(): Closure
     {
@@ -67,7 +67,7 @@ class Individual extends GedcomRecord
     /**
      * A closure which will compare individuals by death date.
      *
-     * @return Closure
+     * @return Closure(Individual,Individual):int
      */
     public static function deathDateComparator(): Closure
     {

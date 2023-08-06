@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -126,8 +126,7 @@ class IndividualRepository implements IndividualRepositoryInterface
 
         $rows = $query
             ->groupBy(['n_givn'])
-            ->select(['n_givn', new Expression('COUNT(distinct n_id) AS count')])
-            ->pluck('count', 'n_givn');
+            ->pluck(new Expression('COUNT(distinct n_id) AS count'), 'n_givn');
 
         $nameList = [];
 
@@ -444,7 +443,7 @@ class IndividualRepository implements IndividualRepositoryInterface
     }
 
     /**
-     * Count the number of distinct given names (or the number of occurences of specific given names).
+     * Count the number of distinct given names (or the number of occurrences of specific given names).
      *
      * @param array<string> ...$params
      *
@@ -462,7 +461,7 @@ class IndividualRepository implements IndividualRepositoryInterface
                 ->where('n_givn', '<>', Individual::PRAENOMEN_NESCIO)
                 ->whereNotNull('n_givn');
         } else {
-            // Count number of occurences of specific given names.
+            // Count number of occurrences of specific given names.
             $query->whereIn('n_givn', $params);
         }
 
@@ -488,7 +487,7 @@ class IndividualRepository implements IndividualRepositoryInterface
             $query->distinct()
                 ->whereNotNull('n_surn');
         } else {
-            // Count number of occurences of specific surnames.
+            // Count number of occurrences of specific surnames.
             $query->whereIn('n_surn', $params);
         }
 
@@ -821,7 +820,7 @@ class IndividualRepository implements IndividualRepositoryInterface
         }
 
         return $query
-            ->select(new Expression($prefix . 'death.d_julianday2 - ' . $prefix . 'birth.d_julianday1 AS days'))
+            ->select([new Expression($prefix . 'death.d_julianday2 - ' . $prefix . 'birth.d_julianday1 AS days')])
             ->orderBy('days', 'desc')
             ->get()
             ->all();
@@ -1299,7 +1298,7 @@ class IndividualRepository implements IndividualRepositoryInterface
         $prefix = DB::connection()->getTablePrefix();
 
         $days = (int) $this->birthAndDeathQuery($sex)
-            ->select(new Expression('AVG(' . $prefix . 'death.d_julianday2 - ' . $prefix . 'birth.d_julianday1) AS days'))
+            ->select([new Expression('AVG(' . $prefix . 'death.d_julianday2 - ' . $prefix . 'birth.d_julianday1) AS days')])
             ->value('days');
 
         if ($show_years) {
@@ -1543,6 +1542,18 @@ class IndividualRepository implements IndividualRepositoryInterface
     }
 
     /**
+     * Count the total media.
+     *
+     * @return int
+     */
+    private function totalMediaQuery(): int
+    {
+        return DB::table('media')
+            ->where('m_file', '=', $this->tree->id())
+            ->count();
+    }
+
+    /**
      * Returns the total number of records.
      *
      * @return int
@@ -1551,6 +1562,7 @@ class IndividualRepository implements IndividualRepositoryInterface
     {
         return $this->totalIndividualsQuery()
             + $this->totalFamiliesQuery()
+            + $this->totalMediaQuery()
             + $this->totalNotesQuery()
             + $this->totalRepositoriesQuery()
             + $this->totalSourcesQuery();
@@ -1682,11 +1694,33 @@ class IndividualRepository implements IndividualRepositoryInterface
     /**
      * @return string
      */
+    public function totalIndisWithSourcesPercentage(): string
+    {
+        return $this->getPercentage(
+            $this->totalIndisWithSourcesQuery(),
+            $this->totalIndividualsQuery()
+        );
+    }
+
+    /**
+     * @return string
+     */
     public function totalFamiliesPercentage(): string
     {
         return $this->getPercentage(
             $this->totalFamiliesQuery(),
             $this->totalRecordsQuery()
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function totalFamsWithSourcesPercentage(): string
+    {
+        return $this->getPercentage(
+            $this->totalFamsWithSourcesQuery(),
+            $this->totalFamiliesQuery()
         );
     }
 

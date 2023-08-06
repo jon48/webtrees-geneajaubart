@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -88,15 +88,17 @@ class Router implements MiddlewareInterface
 
                 return Registry::responseFactory()->redirectUrl($uri, StatusCodeInterface::STATUS_PERMANENT_REDIRECT);
             }
+
+            $pretty = $request;
         } else {
             // Turn the ugly URL into a pretty one, so the router can parse it.
-            $uri     = $request->getUri()->withPath($url_route);
-            $request = $request->withUri($uri);
+            $uri    = $request->getUri()->withPath($url_route);
+            $pretty = $request->withUri($uri);
         }
 
         // Match the request to a route.
         $matcher = $this->router_container->getMatcher();
-        $route   = $matcher->match($request);
+        $route   = $matcher->match($pretty);
 
         // No route matched?
         if ($route === false) {

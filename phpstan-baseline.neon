@@ -11,11 +11,6 @@ parameters:
 			path: app/Census/CensusColumnBornForeignParts.php
 
 		-
-			message: "#^Cannot call method make\\(\\) on mixed\\.$#"
-			count: 1
-			path: app/Elements/AbstractXrefElement.php
-
-		-
 			message: "#^Method Fisharebest\\\\Webtrees\\\\Elements\\\\AgeAtEvent\\:\\:value\\(\\) should return string but returns string\\|null\\.$#"
 			count: 1
 			path: app/Elements/AgeAtEvent.php
@@ -552,7 +547,7 @@ parameters:
 
 		-
 			message: "#^Generator expects value type Fisharebest\\\\Webtrees\\\\Module\\\\ModuleThemeInterface\\|null, mixed given\\.$#"
-			count: 3
+			count: 2
 			path: app/Http/Middleware/UseTheme.php
 
 		-
@@ -569,11 +564,6 @@ parameters:
 			message: "#^Cannot call method gedcom\\(\\) on mixed\\.$#"
 			count: 2
 			path: app/Http/RequestHandlers/AutoCompleteCitation.php
-
-		-
-			message: "#^Call to an undefined method Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\:\\:searchPlaceNames\\(\\)\\.$#"
-			count: 1
-			path: app/Http/RequestHandlers/AutoCompletePlace.php
 
 		-
 			message: "#^Method Fisharebest\\\\Webtrees\\\\Http\\\\RequestHandlers\\\\AutoCompletePlace\\:\\:search\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<int, string\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Place\\>\\.$#"
@@ -791,22 +781,12 @@ parameters:
 			path: app/Http/RequestHandlers/ImportThumbnailsData.php
 
 		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Http\\\\RequestHandlers\\\\IndividualPage\\:\\:getSidebars\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleSidebarInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\>\\.$#"
-			count: 1
-			path: app/Http/RequestHandlers/IndividualPage.php
-
-		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Http\\\\RequestHandlers\\\\IndividualPage\\:\\:getTabs\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleTabInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\>\\.$#"
-			count: 1
-			path: app/Http/RequestHandlers/IndividualPage.php
-
-		-
-			message: "#^Cannot access offset '0' on array\\|false\\.$#"
+			message: "#^Cannot access offset '0' on array\\{0\\: int, 1\\: int, 2\\: int, 3\\: string, mime\\: string, channels\\?\\: int, bits\\?\\: int\\}\\|false\\.$#"
 			count: 1
 			path: app/Http/RequestHandlers/ManageMediaData.php
 
 		-
-			message: "#^Cannot access offset '1' on array\\|false\\.$#"
+			message: "#^Cannot access offset '1' on array\\{0\\: int, 1\\: int, 2\\: int, 3\\: string, mime\\: string, channels\\?\\: int, bits\\?\\: int\\}\\|false\\.$#"
 			count: 1
 			path: app/Http/RequestHandlers/ManageMediaData.php
 
@@ -1006,6 +986,11 @@ parameters:
 			path: app/Http/RequestHandlers/ReportSetupPage.php
 
 		-
+			message: "#^Binary operation \"\\+\\=\" between string and array\\{type\\: 'text', default\\: '', lookup\\: '', extra\\: ''\\} results in an error\\.$#"
+			count: 1
+			path: app/Http/RequestHandlers/ReportSetupPage.php
+
+		-
 			message: "#^Cannot call method url\\(\\) on mixed\\.$#"
 			count: 5
 			path: app/Http/RequestHandlers/SearchGeneralPage.php
@@ -1058,11 +1043,6 @@ parameters:
 		-
 			message: "#^Parameter \\#1 \\$identifier of method Fisharebest\\\\Webtrees\\\\Services\\\\UserService\\:\\:findByIdentifier\\(\\) expects string, mixed given\\.$#"
 			count: 2
-			path: app/Http/RequestHandlers/SetupWizard.php
-
-		-
-			message: "#^Parameter \\#1 \\$string of function substr expects string, string\\|false given\\.$#"
-			count: 1
 			path: app/Http/RequestHandlers/SetupWizard.php
 
 		-
@@ -1196,11 +1176,6 @@ parameters:
 			path: app/Individual.php
 
 		-
-			message: "#^Binary operation \"\\.\" between non\\-falsy\\-string and array\\<int, string\\>\\|string results in an error\\.$#"
-			count: 1
-			path: app/Individual.php
-
-		-
 			message: "#^Cannot call method spouseFamilies\\(\\) on Fisharebest\\\\Webtrees\\\\Individual\\|null\\.$#"
 			count: 1
 			path: app/Individual.php
@@ -1311,17 +1286,12 @@ parameters:
 			path: app/Module/CensusAssistantModule.php
 
 		-
-			message: "#^Call to an undefined method Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\:\\:chartBoxMenu\\(\\)\\.$#"
+			message: "#^Argument of an invalid type array\\<int, string\\>\\|false supplied for foreach, only iterables are supported\\.$#"
 			count: 1
 			path: app/Module/CloudsTheme.php
 
 		-
 			message: "#^Cannot call method name\\(\\) on mixed\\.$#"
-			count: 1
-			path: app/Module/CloudsTheme.php
-
-		-
-			message: "#^Parameter \\#2 \\$callback of function usort expects callable\\(mixed, mixed\\)\\: int, Closure\\(Fisharebest\\\\Webtrees\\\\Menu, Fisharebest\\\\Webtrees\\\\Menu\\)\\: int given\\.$#"
 			count: 1
 			path: app/Module/CloudsTheme.php
 
@@ -1331,17 +1301,12 @@ parameters:
 			path: app/Module/CloudsTheme.php
 
 		-
-			message: "#^Call to an undefined method Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\:\\:chartBoxMenu\\(\\)\\.$#"
+			message: "#^Argument of an invalid type array\\<int, string\\>\\|false supplied for foreach, only iterables are supported\\.$#"
 			count: 1
 			path: app/Module/FabTheme.php
 
 		-
 			message: "#^Cannot call method name\\(\\) on mixed\\.$#"
-			count: 1
-			path: app/Module/FabTheme.php
-
-		-
-			message: "#^Parameter \\#2 \\$callback of function usort expects callable\\(mixed, mixed\\)\\: int, Closure\\(Fisharebest\\\\Webtrees\\\\Menu, Fisharebest\\\\Webtrees\\\\Menu\\)\\: int given\\.$#"
 			count: 1
 			path: app/Module/FabTheme.php
 
@@ -1653,6 +1618,11 @@ parameters:
 		-
 			message: "#^Parameter \\#1 \\$str of function strtr expects string, string\\|false given\\.$#"
 			count: 1
+			path: app/Module/LanguageBasque.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function strtr expects string, string\\|false given\\.$#"
+			count: 1
 			path: app/Module/LanguageBosnian.php
 
 		-
@@ -1958,6 +1928,11 @@ parameters:
 		-
 			message: "#^Parameter \\#1 \\$str of function strtr expects string, string\\|false given\\.$#"
 			count: 1
+			path: app/Module/LanguageUzbek.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function strtr expects string, string\\|false given\\.$#"
+			count: 1
 			path: app/Module/LanguageVietnamese.php
 
 		-
@@ -1986,17 +1961,12 @@ parameters:
 			path: app/Module/MapGeoLocationOpenRouteService.php
 
 		-
-			message: "#^Call to an undefined method Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\:\\:chartBoxMenu\\(\\)\\.$#"
+			message: "#^Argument of an invalid type array\\<int, string\\>\\|false supplied for foreach, only iterables are supported\\.$#"
 			count: 1
 			path: app/Module/MinimalTheme.php
 
 		-
 			message: "#^Cannot call method name\\(\\) on mixed\\.$#"
-			count: 1
-			path: app/Module/MinimalTheme.php
-
-		-
-			message: "#^Parameter \\#2 \\$callback of function usort expects callable\\(mixed, mixed\\)\\: int, Closure\\(Fisharebest\\\\Webtrees\\\\Menu, Fisharebest\\\\Webtrees\\\\Menu\\)\\: int given\\.$#"
 			count: 1
 			path: app/Module/MinimalTheme.php
 
@@ -2019,11 +1989,6 @@ parameters:
 			message: "#^Parameter \\#2 \\$size of function array_chunk expects int\\<1, max\\>, int given\\.$#"
 			count: 2
 			path: app/Module/PlaceHierarchyListModule.php
-
-		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Module\\\\PrivacyPolicy\\:\\:analyticsModules\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleAnalyticsInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\>\\.$#"
-			count: 1
-			path: app/Module/PrivacyPolicy.php
 
 		-
 			message: "#^Anonymous function should return Fisharebest\\\\Webtrees\\\\GedcomRecord but returns Fisharebest\\\\Webtrees\\\\Family\\|null\\.$#"
@@ -2076,11 +2041,6 @@ parameters:
 			path: app/Module/RelationshipsChartModule.php
 
 		-
-			message: "#^Parameter \\#2 \\$language of method Fisharebest\\\\Webtrees\\\\Services\\\\RelationshipService\\:\\:nameFromPath\\(\\) expects Fisharebest\\\\Webtrees\\\\Module\\\\ModuleLanguageInterface, mixed given\\.$#"
-			count: 1
-			path: app/Module/RelationshipsChartModule.php
-
-		-
 			message: "#^Cannot access property \\$new_gedcom on mixed\\.$#"
 			count: 1
 			path: app/Module/ReviewChangesModule.php
@@ -2114,6 +2074,11 @@ parameters:
 			message: "#^Call to an undefined method Sabre\\\\VObject\\\\Node\\:\\:add\\(\\)\\.$#"
 			count: 3
 			path: app/Module/ShareAnniversaryModule.php
+
+		-
+			message: "#^Parameter \\#1 \\$column of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:pluck\\(\\) expects string, Illuminate\\\\Database\\\\Query\\\\Expression given\\.$#"
+			count: 7
+			path: app/Module/SiteMapModule.php
 
 		-
 			message: "#^Cannot access property \\$m_gedcom on mixed\\.$#"
@@ -2251,17 +2216,12 @@ parameters:
 			path: app/Module/TopSurnamesModule.php
 
 		-
-			message: "#^Call to an undefined method Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\:\\:chartBoxMenu\\(\\)\\.$#"
+			message: "#^Argument of an invalid type array\\<int, string\\>\\|false supplied for foreach, only iterables are supported\\.$#"
 			count: 1
 			path: app/Module/WebtreesTheme.php
 
 		-
 			message: "#^Cannot call method name\\(\\) on mixed\\.$#"
-			count: 1
-			path: app/Module/WebtreesTheme.php
-
-		-
-			message: "#^Parameter \\#2 \\$callback of function usort expects callable\\(mixed, mixed\\)\\: int, Closure\\(Fisharebest\\\\Webtrees\\\\Menu, Fisharebest\\\\Webtrees\\\\Menu\\)\\: int given\\.$#"
 			count: 1
 			path: app/Module/WebtreesTheme.php
 
@@ -2271,17 +2231,12 @@ parameters:
 			path: app/Module/WebtreesTheme.php
 
 		-
-			message: "#^Call to an undefined method Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\:\\:chartBoxMenu\\(\\)\\.$#"
+			message: "#^Argument of an invalid type array\\<int, string\\>\\|false supplied for foreach, only iterables are supported\\.$#"
 			count: 1
 			path: app/Module/XeneaTheme.php
 
 		-
 			message: "#^Cannot call method name\\(\\) on mixed\\.$#"
-			count: 1
-			path: app/Module/XeneaTheme.php
-
-		-
-			message: "#^Parameter \\#2 \\$callback of function usort expects callable\\(mixed, mixed\\)\\: int, Closure\\(Fisharebest\\\\Webtrees\\\\Menu, Fisharebest\\\\Webtrees\\\\Menu\\)\\: int given\\.$#"
 			count: 1
 			path: app/Module/XeneaTheme.php
 
@@ -2366,16 +2321,6 @@ parameters:
 			path: app/PlaceLocation.php
 
 		-
-			message: "#^Binary operation \"/\" between string and 2 results in an error\\.$#"
-			count: 1
-			path: app/Report/HtmlRenderer.php
-
-		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Report\\\\PdfRenderer\\:\\:getStyle\\(\\) should return array\\<string, string\\> but returns array\\<string, string\\>\\|string\\.$#"
-			count: 1
-			path: app/Report/PdfRenderer.php
-
-		-
 			message: "#^Parameter \\#1 \\$fm of method TCPDF\\:\\:setFooterMargin\\(\\) expects int, float given\\.$#"
 			count: 1
 			path: app/Report/PdfRenderer.php
@@ -2384,46 +2329,6 @@ parameters:
 			message: "#^Parameter \\#1 \\$hm of method TCPDF\\:\\:setHeaderMargin\\(\\) expects int, float given\\.$#"
 			count: 1
 			path: app/Report/PdfRenderer.php
-
-		-
-			message: "#^Parameter \\#3 \\$size of method TCPDF\\:\\:setFont\\(\\) expects float\\|null, string given\\.$#"
-			count: 1
-			path: app/Report/PdfRenderer.php
-
-		-
-			message: "#^Property Fisharebest\\\\Webtrees\\\\Report\\\\AbstractRenderer\\:\\:\\$styles \\(array\\<array\\<string, string\\>\\>\\) does not accept array\\<array\\<string, string\\>\\|string\\>\\.$#"
-			count: 1
-			path: app/Report/PdfRenderer.php
-
-		-
-			message: "#^Parameter \\#1 \\$x of method Fisharebest\\\\Webtrees\\\\Report\\\\HtmlRenderer\\:\\:setX\\(\\) expects float, mixed given\\.$#"
-			count: 1
-			path: app/Report/ReportHtmlCell.php
-
-		-
-			message: "#^Parameter \\#1 \\$y of method Fisharebest\\\\Webtrees\\\\Report\\\\HtmlRenderer\\:\\:setY\\(\\) expects float, mixed given\\.$#"
-			count: 1
-			path: app/Report/ReportHtmlCell.php
-
-		-
-			message: "#^Parameter \\#2 \\$y of method Fisharebest\\\\Webtrees\\\\Report\\\\HtmlRenderer\\:\\:setXy\\(\\) expects float, mixed given\\.$#"
-			count: 1
-			path: app/Report/ReportHtmlCell.php
-
-		-
-			message: "#^Parameter \\#3 \\(mixed\\) of echo cannot be converted to string\\.$#"
-			count: 1
-			path: app/Report/ReportHtmlCell.php
-
-		-
-			message: "#^Parameter \\#4 \\(mixed\\) of echo cannot be converted to string\\.$#"
-			count: 1
-			path: app/Report/ReportHtmlCell.php
-
-		-
-			message: "#^Binary operation \"\\*\" between string and 0\\|int\\<2, max\\> results in an error\\.$#"
-			count: 1
-			path: app/Report/ReportHtmlText.php
 
 		-
 			message: "#^Parameter \\#1 \\$fp of function fclose expects resource, resource\\|false given\\.$#"
@@ -2456,7 +2361,7 @@ parameters:
 			path: app/Report/ReportParserGenerate.php
 
 		-
-			message: "#^Access to private property Fisharebest\\\\Webtrees\\\\GedcomRecord\\|static\\(Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\)\\:\\:\\$generation\\.$#"
+			message: "#^Access to protected property Fisharebest\\\\Webtrees\\\\GedcomRecord\\|static\\(Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\)\\:\\:\\$generation\\.$#"
 			count: 1
 			path: app/Report/ReportParserGenerate.php
 
@@ -2486,23 +2391,23 @@ parameters:
 			path: app/Report/ReportParserGenerate.php
 
 		-
-			message: "#^Cannot access offset 0 on array\\|false\\.$#"
-			count: 3
-			path: app/Report/ReportParserGenerate.php
-
-		-
-			message: "#^Cannot access offset 1 on array\\|false\\.$#"
-			count: 3
-			path: app/Report/ReportParserGenerate.php
-
-		-
-			message: "#^Cannot access offset float\\|int on array\\<int, string\\>\\|false\\.$#"
+			message: "#^Cannot access offset \\(float\\|int\\) on array\\<int, string\\>\\|false\\.$#"
 			count: 13
 			path: app/Report/ReportParserGenerate.php
 
 		-
-			message: "#^Cannot access offset float\\|int\\<1, max\\> on array\\<int, string\\>\\|false\\.$#"
+			message: "#^Cannot access offset \\(float\\|int\\<1, max\\>\\) on array\\<int, string\\>\\|false\\.$#"
 			count: 1
+			path: app/Report/ReportParserGenerate.php
+
+		-
+			message: "#^Cannot access offset 0 on array\\{0\\: int, 1\\: int, 2\\: int, 3\\: string, mime\\: string, channels\\?\\: int, bits\\?\\: int\\}\\|false\\.$#"
+			count: 3
+			path: app/Report/ReportParserGenerate.php
+
+		-
+			message: "#^Cannot access offset 1 on array\\{0\\: int, 1\\: int, 2\\: int, 3\\: string, mime\\: string, channels\\?\\: int, bits\\?\\: int\\}\\|false\\.$#"
+			count: 3
 			path: app/Report/ReportParserGenerate.php
 
 		-
@@ -2556,7 +2461,7 @@ parameters:
 			path: app/Report/ReportParserGenerate.php
 
 		-
-			message: "#^Cannot use array destructuring on string\\|null\\.$#"
+			message: "#^Cannot use array destructuring on array\\<int, string\\>\\|null\\.$#"
 			count: 1
 			path: app/Report/ReportParserGenerate.php
 
@@ -2586,11 +2491,6 @@ parameters:
 			path: app/Report/ReportParserGenerate.php
 
 		-
-			message: "#^Parameter \\#1 \\$function of function call_user_func expects callable\\(\\)\\: mixed, array\\{\\$this\\(Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\), non\\-falsy\\-string\\} given\\.$#"
-			count: 2
-			path: app/Report/ReportParserGenerate.php
-
-		-
 			message: "#^Parameter \\#1 \\$im of function imagesx expects resource, resource\\|false given\\.$#"
 			count: 2
 			path: app/Report/ReportParserGenerate.php
@@ -2611,8 +2511,13 @@ parameters:
 			path: app/Report/ReportParserGenerate.php
 
 		-
-			message: "#^Parameter \\#1 \\$style of method Fisharebest\\\\Webtrees\\\\Report\\\\AbstractRenderer\\:\\:addStyle\\(\\) expects array\\<string\\>, array\\<string, float\\|string\\> given\\.$#"
+			message: "#^Parameter \\#2 \\$callback of function uasort expects callable\\(Fisharebest\\\\Webtrees\\\\GedcomRecord\\|static, Fisharebest\\\\Webtrees\\\\GedcomRecord\\|static\\)\\: int, Closure\\(Fisharebest\\\\Webtrees\\\\GedcomRecord, Fisharebest\\\\Webtrees\\\\GedcomRecord\\)\\: int given\\.$#"
 			count: 1
+			path: app/Report/ReportParserGenerate.php
+
+		-
+			message: "#^Parameter \\#2 \\$callback of function uasort expects callable\\(Fisharebest\\\\Webtrees\\\\GedcomRecord\\|static, Fisharebest\\\\Webtrees\\\\GedcomRecord\\|static\\)\\: int, Closure\\(Fisharebest\\\\Webtrees\\\\Individual, Fisharebest\\\\Webtrees\\\\Individual\\)\\: int given\\.$#"
+			count: 2
 			path: app/Report/ReportParserGenerate.php
 
 		-
@@ -2631,18 +2536,13 @@ parameters:
 			path: app/Report/ReportParserGenerate.php
 
 		-
-			message: "#^Property Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\:\\:\\$gedrec_stack \\(array\\<string\\>\\) does not accept array\\<array\\<int, string\\>\\|string\\>\\.$#"
+			message: "#^Property Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\:\\:\\$list \\(array\\<Fisharebest\\\\Webtrees\\\\GedcomRecord\\|static\\(Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\)\\>\\) does not accept array\\<\\(object\\{generation\\: int\\}&stdClass\\)\\|\\(object\\{generation\\: int\\}&stdClass\\)\\>\\.$#"
 			count: 1
 			path: app/Report/ReportParserGenerate.php
 
 		-
 			message: "#^Property Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\:\\:\\$list \\(array\\<Fisharebest\\\\Webtrees\\\\GedcomRecord\\|static\\(Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\)\\>\\) does not accept array\\<Fisharebest\\\\Webtrees\\\\GedcomRecord\\|static\\(Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\)\\|null\\>\\.$#"
 			count: 2
-			path: app/Report/ReportParserGenerate.php
-
-		-
-			message: "#^Property Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\:\\:\\$list \\(array\\<Fisharebest\\\\Webtrees\\\\GedcomRecord\\|static\\(Fisharebest\\\\Webtrees\\\\Report\\\\ReportParserGenerate\\)\\>\\) does not accept array\\<stdClass\\>\\.$#"
-			count: 1
 			path: app/Report/ReportParserGenerate.php
 
 		-
@@ -2706,31 +2606,6 @@ parameters:
 			path: app/Report/ReportParserSetup.php
 
 		-
-			message: "#^Parameter \\#1 \\$x of method Fisharebest\\\\Webtrees\\\\Report\\\\PdfRenderer\\:\\:addMarginX\\(\\) expects float, mixed given\\.$#"
-			count: 1
-			path: app/Report/ReportPdfCell.php
-
-		-
-			message: "#^Parameter \\#1 \\$y of method TCPDF\\:\\:setY\\(\\) expects float, mixed given\\.$#"
-			count: 1
-			path: app/Report/ReportPdfCell.php
-
-		-
-			message: "#^Parameter \\#2 \\$y of method TCPDF\\:\\:Link\\(\\) expects float, mixed given\\.$#"
-			count: 1
-			path: app/Report/ReportPdfCell.php
-
-		-
-			message: "#^Parameter \\#6 \\$fill of method TCPDF\\:\\:MultiCell\\(\\) expects bool, int given\\.$#"
-			count: 1
-			path: app/Report/ReportPdfCell.php
-
-		-
-			message: "#^Parameter \\#9 \\$y of method TCPDF\\:\\:MultiCell\\(\\) expects float\\|null, mixed given\\.$#"
-			count: 1
-			path: app/Report/ReportPdfCell.php
-
-		-
 			message: "#^Method Fisharebest\\\\Webtrees\\\\Report\\\\ReportPdfFootnote\\:\\:getWidth\\(\\) should return array\\{float, int, float\\} but returns array\\{0\\|array\\<float\\>\\|float, 1, int\\<0, max\\>\\}\\.$#"
 			count: 1
 			path: app/Report/ReportPdfFootnote.php
@@ -2751,17 +2626,7 @@ parameters:
 			path: app/Report/ReportPdfText.php
 
 		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Report\\\\ReportPdfText\\:\\:getWidth\\(\\) should return array\\{float, int, float\\} but returns array\\{array\\<float\\>\\|float\\|int, 1, int\\<0, max\\>\\}\\.$#"
-			count: 1
-			path: app/Report/ReportPdfText.php
-
-		-
 			message: "#^Instanceof between Fisharebest\\\\Webtrees\\\\Report\\\\ReportBaseElement and Fisharebest\\\\Webtrees\\\\Report\\\\ReportPdfFootnote will always evaluate to false\\.$#"
-			count: 1
-			path: app/Report/ReportPdfTextBox.php
-
-		-
-			message: "#^Result of \\|\\| is always true\\.$#"
 			count: 1
 			path: app/Report/ReportPdfTextBox.php
 
@@ -2799,16 +2664,6 @@ parameters:
 			message: "#^Parameter \\#3 \\$subject of function str_replace expects array\\|string, string\\|null given\\.$#"
 			count: 1
 			path: app/Report/RightToLeftSupport.php
-
-		-
-			message: "#^Parameter \\#1 \\$h of method TCPDF\\:\\:checkPageBreak\\(\\) expects float, mixed given\\.$#"
-			count: 1
-			path: app/Report/TcpdfWrapper.php
-
-		-
-			message: "#^Parameter \\#2 \\$y of method TCPDF\\:\\:checkPageBreak\\(\\) expects float\\|null, mixed given\\.$#"
-			count: 1
-			path: app/Report/TcpdfWrapper.php
 
 		-
 			message: "#^Cannot access property \\$access_level on mixed\\.$#"
@@ -3001,12 +2856,12 @@ parameters:
 			path: app/Services/HomePageService.php
 
 		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\HomePageService\\:\\:availableTreeBlocks\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleBlockInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\>\\.$#"
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\HomePageService\\:\\:availableTreeBlocks\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleBlockInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleBlockInterface\\>\\.$#"
 			count: 1
 			path: app/Services/HomePageService.php
 
 		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\HomePageService\\:\\:availableUserBlocks\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleBlockInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\>\\.$#"
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\HomePageService\\:\\:availableUserBlocks\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleBlockInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleBlockInterface\\>\\.$#"
 			count: 1
 			path: app/Services/HomePageService.php
 
@@ -3036,12 +2891,12 @@ parameters:
 			path: app/Services/IndividualFactsService.php
 
 		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\IndividualFactsService\\:\\:familyFacts\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<Fisharebest\\\\Webtrees\\\\Fact\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Family\\>\\.$#"
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\IndividualFactsService\\:\\:familyFacts\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Fact\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Family\\>\\.$#"
 			count: 1
 			path: app/Services/IndividualFactsService.php
 
 		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\IndividualFactsService\\:\\:historicFacts\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Fact\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\>\\.$#"
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\IndividualFactsService\\:\\:historicFacts\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Fact\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleHistoricEventsInterface\\>\\.$#"
 			count: 1
 			path: app/Services/IndividualFactsService.php
 
@@ -3092,7 +2947,7 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$column of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:pluck\\(\\) expects string, Illuminate\\\\Database\\\\Query\\\\Expression given\\.$#"
-			count: 1
+			count: 3
 			path: app/Services/MediaFileService.php
 
 		-
@@ -3111,7 +2966,7 @@ parameters:
 			path: app/Services/ModuleService.php
 
 		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\ModuleService\\:\\:setupLanguages\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleLanguageInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<string, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\>\\.$#"
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Services\\\\ModuleService\\:\\:setupLanguages\\(\\) should return Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleLanguageInterface\\> but returns Illuminate\\\\Support\\\\Collection&iterable\\<int, Fisharebest\\\\Webtrees\\\\Module\\\\ModuleInterface\\>\\.$#"
 			count: 1
 			path: app/Services/ModuleService.php
 
@@ -3262,7 +3117,12 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$column of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:where\\(\\) expects array\\|Closure\\|string, Illuminate\\\\Database\\\\Query\\\\Expression given\\.$#"
-			count: 2
+			count: 1
+			path: app/Services/SearchService.php
+
+		-
+			message: "#^Parameter \\#1 \\$column of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:where\\(\\) expects array\\|Closure\\|string, Illuminate\\\\Database\\\\Query\\\\Expression\\|string given\\.$#"
+			count: 1
 			path: app/Services/SearchService.php
 
 		-
@@ -3394,6 +3254,26 @@ parameters:
 			message: "#^Parameter \\#1 \\$century of method Fisharebest\\\\Webtrees\\\\Statistics\\\\Service\\\\CenturyService\\:\\:centuryName\\(\\) expects int, int\\|string given\\.$#"
 			count: 1
 			path: app/Statistics/Google/ChartMarriageAge.php
+
+		-
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Statistics\\\\Repository\\\\EventRepository\\:\\:eventQuery\\(\\) should return object\\{id\\: string, year\\: int, fact\\: string, type\\: string\\}\\|null but returns mixed\\.$#"
+			count: 1
+			path: app/Statistics/Repository/EventRepository.php
+
+		-
+			message: "#^Property object\\{id\\: string, year\\: int, fact\\: string, type\\: string\\}\\:\\:\\$year is not writable\\.$#"
+			count: 1
+			path: app/Statistics/Repository/EventRepository.php
+
+		-
+			message: "#^Method Fisharebest\\\\Webtrees\\\\Statistics\\\\Repository\\\\FamilyDatesRepository\\:\\:eventQuery\\(\\) should return object\\{id\\: string, year\\: int, fact\\: string, type\\: string\\}\\|null but returns mixed\\.$#"
+			count: 1
+			path: app/Statistics/Repository/FamilyDatesRepository.php
+
+		-
+			message: "#^Property object\\{id\\: string, year\\: int, fact\\: string, type\\: string\\}\\:\\:\\$year is not writable\\.$#"
+			count: 1
+			path: app/Statistics/Repository/FamilyDatesRepository.php
 
 		-
 			message: "#^Cannot access property \\$age on mixed\\.$#"
@@ -3586,7 +3466,17 @@ parameters:
 			path: app/Statistics/Repository/IndividualRepository.php
 
 		-
+			message: "#^Parameter \\#1 \\$ of closure expects object, mixed given\\.$#"
+			count: 1
+			path: app/Statistics/Repository/IndividualRepository.php
+
+		-
 			message: "#^Parameter \\#1 \\$column of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:having\\(\\) expects string, Illuminate\\\\Database\\\\Query\\\\Expression given\\.$#"
+			count: 1
+			path: app/Statistics/Repository/IndividualRepository.php
+
+		-
+			message: "#^Parameter \\#1 \\$column of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:pluck\\(\\) expects string, Illuminate\\\\Database\\\\Query\\\\Expression given\\.$#"
 			count: 1
 			path: app/Statistics/Repository/IndividualRepository.php
 

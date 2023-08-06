@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -251,7 +251,7 @@ class RelationshipService
     /**
      * Convert a relationship path into its component pieces; brother, wife, mother, daughter, etc.
      *
-     * @param array<Individual|Family> $nodes - Alternating list of Individual and Family objects
+     * @param array<Individual|Family> $nodes Alternating list of Individual and Family objects
      *
      * @return array<string>
      */
@@ -344,7 +344,7 @@ class RelationshipService
         switch ($path) {
             case '':
                 return I18N::translate('self');
-            //  Level One relationships
+                //  Level One relationships
             case 'mot':
                 return I18N::translate('mother');
             case 'fat':
@@ -492,7 +492,7 @@ class RelationshipService
 
                 return I18N::translate('sibling');
 
-            // Level Two relationships
+                // Level Two relationships
             case 'brochi':
                 return I18N::translateContext('brother’s child', 'nephew/niece');
             case 'brodau':
@@ -656,7 +656,7 @@ class RelationshipService
             case 'wifson':
                 return I18N::translateContext('wife’s son', 'step-son');
 
-            // Level Three relationships
+                // Level Three relationships
             case 'brochichi':
                 if ($sex1 === 'M') {
                     return I18N::translateContext('(a man’s) brother’s child’s child', 'great-nephew/niece');
@@ -1092,7 +1092,7 @@ class RelationshipService
             case 'wifbroson':
                 return I18N::translateContext('wife’s brother’s son', 'nephew');
 
-            // Some “special case” level four relationships that have specific names in certain languages
+                // Some “special case” level four relationships that have specific names in certain languages
             case 'fatfatbrowif':
                 return I18N::translateContext('father’s father’s brother’s wife', 'great-aunt');
             case 'fatfatsibspo':

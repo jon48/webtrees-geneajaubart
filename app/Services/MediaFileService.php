@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -312,15 +312,15 @@ class MediaFileService
             //->where('multimedia_file_refn', 'LIKE', '%/%')
             ->where('multimedia_file_refn', 'NOT LIKE', 'http://%')
             ->where('multimedia_file_refn', 'NOT LIKE', 'https://%')
-            ->where(new Expression('setting_value || multimedia_file_refn'), 'LIKE', $media_folder . '%')
-            ->select(new Expression('setting_value || multimedia_file_refn AS path'))
-            ->orderBy(new Expression('setting_value || multimedia_file_refn'));
+            ->where(new Expression('setting_value || multimedia_file_refn'), 'LIKE', $media_folder . '%');
 
         if (!$subfolders) {
             $query->where(new Expression('setting_value || multimedia_file_refn'), 'NOT LIKE', $media_folder . '%/%');
         }
 
-        return $query->pluck('path');
+        return $query
+            ->orderBy(new Expression('setting_value || multimedia_file_refn'))
+            ->pluck(new Expression('setting_value || multimedia_file_refn AS path'));
     }
 
     /**
@@ -361,8 +361,7 @@ class MediaFileService
             })
             ->where('multimedia_file_refn', 'NOT LIKE', 'http://%')
             ->where('multimedia_file_refn', 'NOT LIKE', 'https://%')
-            ->select(new Expression("COALESCE(setting_value, 'media/') || multimedia_file_refn AS path"))
-            ->pluck('path')
+            ->pluck(new Expression("COALESCE(setting_value, 'media/') || multimedia_file_refn AS path"))
             ->map(static function (string $path): string {
                 return dirname($path) . '/';
             });

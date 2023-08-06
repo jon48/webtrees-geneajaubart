@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -79,12 +79,14 @@ class UseTheme implements MiddlewareInterface
         $themes = $this->module_service->findByInterface(ModuleThemeInterface::class);
 
         // Last theme used
-        yield $themes->get(Session::get('theme'));
+        yield $themes
+            ->first(static fn (ModuleThemeInterface $module): bool => $module->name() === Session::get('theme'));
 
         // Default for site
-        yield $themes->get(Site::getPreference('THEME_DIR'));
+        yield $themes
+            ->first(static fn (ModuleThemeInterface $module): bool => $module->name() === Site::getPreference('THEME_DIR'));
 
         // Default for application
-        yield app(WebtreesTheme::class);
+        yield new WebtreesTheme();
     }
 }

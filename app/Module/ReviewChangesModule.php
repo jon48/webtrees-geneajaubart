@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -168,13 +168,12 @@ class ReviewChangesModule extends AbstractModule implements ModuleBlockInterface
             $changes = DB::table('change')
                 ->where('gedcom_id', '=', $tree->id())
                 ->whereIn('change_id', static function (Builder $query) use ($tree): void {
-                    $query->select(new Expression('MAX(change_id)'))
+                    $query->select([new Expression('MAX(change_id)')])
                         ->from('change')
                         ->where('gedcom_id', '=', $tree->id())
                         ->where('status', '=', 'pending')
                         ->groupBy(['xref']);
                 })
-                //->select(['xref'])
                 ->get();
 
             foreach ($changes as $change) {

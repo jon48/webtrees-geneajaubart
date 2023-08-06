@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -99,7 +99,7 @@ class ChartsMenuModule extends AbstractModule implements ModuleMenuInterface
                 return $module->chartMenu($individual);
             })
             ->sort(static function (Menu $x, Menu $y): int {
-                return $x->getLabel() <=> $y->getLabel();
+                return I18N::comparator()($x->getLabel(), $y->getLabel());
             });
 
         if ($submenus->isEmpty()) {

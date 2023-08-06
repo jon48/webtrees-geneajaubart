@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -97,6 +97,7 @@ use Fisharebest\Webtrees\Module\InteractiveTreeModule;
 use Fisharebest\Webtrees\Module\LanguageAfrikaans;
 use Fisharebest\Webtrees\Module\LanguageAlbanian;
 use Fisharebest\Webtrees\Module\LanguageArabic;
+use Fisharebest\Webtrees\Module\LanguageBasque;
 use Fisharebest\Webtrees\Module\LanguageBosnian;
 use Fisharebest\Webtrees\Module\LanguageBulgarian;
 use Fisharebest\Webtrees\Module\LanguageCatalan;
@@ -161,6 +162,7 @@ use Fisharebest\Webtrees\Module\LanguageThai;
 use Fisharebest\Webtrees\Module\LanguageTurkish;
 use Fisharebest\Webtrees\Module\LanguageUkranian;
 use Fisharebest\Webtrees\Module\LanguageUrdu;
+use Fisharebest\Webtrees\Module\LanguageUzbek;
 use Fisharebest\Webtrees\Module\LanguageVietnamese;
 use Fisharebest\Webtrees\Module\LanguageWelsh;
 use Fisharebest\Webtrees\Module\LanguageYiddish;
@@ -209,7 +211,6 @@ use Fisharebest\Webtrees\Module\OccupationReportModule;
 use Fisharebest\Webtrees\Module\OnThisDayModule;
 use Fisharebest\Webtrees\Module\OpenRouteServiceAutocomplete;
 use Fisharebest\Webtrees\Module\OpenStreetMap;
-use Fisharebest\Webtrees\Module\OrdnanceSurveyHistoricMaps;
 use Fisharebest\Webtrees\Module\PedigreeChartModule;
 use Fisharebest\Webtrees\Module\PedigreeMapModule;
 use Fisharebest\Webtrees\Module\PedigreeReportModule;
@@ -258,6 +259,7 @@ use Fisharebest\Webtrees\Tree;
 use Fisharebest\Webtrees\Webtrees;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
+use Psr\Http\Server\MiddlewareInterface;
 use Throwable;
 
 use function app;
@@ -403,6 +405,7 @@ class ModuleService
         'language-en-US'          => LanguageEnglishUnitedStates::class,
         'language-es'             => LanguageSpanish::class,
         'language-et'             => LanguageEstonian::class,
+        'language-eu'             => LanguageBasque::class,
         'language-fa'             => LanguageFarsi::class,
         'language-fi'             => LanguageFinnish::class,
         'language-fo'             => LanguageFaroese::class,
@@ -453,6 +456,7 @@ class ModuleService
         'language-tt'             => LanguageTatar::class,
         'language-uk'             => LanguageUkranian::class,
         'language-ur'             => LanguageUrdu::class,
+        'language-uz'             => LanguageUzbek::class,
         'language-vi'             => LanguageVietnamese::class,
         'language-yi'             => LanguageYiddish::class,
         'language-zh-Hans'        => LanguageChineseSimplified::class,
@@ -483,7 +487,6 @@ class ModuleService
         'occupation_report'       => OccupationReportModule::class,
         'openrouteservice'        => OpenRouteServiceAutocomplete::class,
         'openstreetmap'           => OpenStreetMap::class,
-        'osgb-historic'           => OrdnanceSurveyHistoricMaps::class,
         'pedigree-map'            => PedigreeMapModule::class,
         'pedigree_chart'          => PedigreeChartModule::class,
         'pedigree_report'         => PedigreeReportModule::class,
@@ -533,7 +536,7 @@ class ModuleService
     /**
      * A function to convert modules into their titles - to create option lists, etc.
      *
-     * @return Closure
+     * @return Closure(ModuleInterface):string
      */
     public function titleMapper(): Closure
     {
@@ -545,11 +548,13 @@ class ModuleService
     /**
      * Modules which (a) provide a specific function and (b) we have permission to see.
      *
-     * @param string        $interface
-     * @param Tree          $tree
-     * @param UserInterface $user
+     * @template T of ModuleInterface
      *
-     * @return Collection<string,ModuleInterface>
+     * @param class-string<T> $interface
+     * @param Tree            $tree
+     * @param UserInterface   $user
+     *
+     * @return Collection<int,T>
      */
     public function findByComponent(string $interface, Tree $tree, UserInterface $user): Collection
     {
@@ -562,32 +567,40 @@ class ModuleService
     /**
      * All modules which provide a specific function.
      *
-     * @param string $interface
-     * @param bool   $include_disabled
-     * @param bool   $sort
+     * @template T of ModuleInterface|MiddlewareInterface
      *
-     * @return Collection<string,ModuleInterface>
+     * @param class-string<T> $interface
+     * @param bool            $include_disabled
+     * @param bool            $sort
+     *
+     * @return Collection<int,T&ModuleInterface>
      */
     public function findByInterface(string $interface, bool $include_disabled = false, bool $sort = false): Collection
     {
+        /** @var Collection<int,T&ModuleInterface> $modules */
         $modules = $this->all($include_disabled)
             ->filter($this->interfaceFilter($interface));
 
         switch ($interface) {
             case ModuleFooterInterface::class:
+                /** @var Collection<int,T&ModuleInterface> */
                 return $modules->sort($this->footerComparator());
 
             case ModuleMenuInterface::class:
+                /** @var Collection<int,T&ModuleInterface> */
                 return $modules->sort($this->menuComparator());
 
             case ModuleSidebarInterface::class:
+                /** @var Collection<int,T&ModuleInterface> */
                 return $modules->sort($this->sidebarComparator());
 
             case ModuleTabInterface::class:
+                /** @var Collection<int,T&ModuleInterface> */
                 return $modules->sort($this->tabComparator());
 
             default:
                 if ($sort) {
+                    /** @var Collection<int,T&ModuleInterface> */
                     return $modules->sort($this->moduleComparator());
                 }
 
@@ -600,7 +613,7 @@ class ModuleService
      *
      * @param bool $include_disabled
      *
-     * @return Collection<string,ModuleInterface>
+     * @return Collection<int,ModuleInterface>
      */
     public function all(bool $include_disabled = false): Collection
     {
@@ -653,7 +666,7 @@ class ModuleService
     /**
      * All core modules in the system.
      *
-     * @return Collection<string,ModuleInterface>
+     * @return Collection<int,ModuleInterface>
      */
     private function coreModules(): Collection
     {
@@ -671,7 +684,7 @@ class ModuleService
     /**
      * All custom modules in the system.  Custom modules are defined in modules_v4/
      *
-     * @return Collection<string,ModuleCustomInterface>
+     * @return Collection<int,ModuleCustomInterface>
      */
     private function customModules(): Collection
     {
@@ -734,7 +747,7 @@ class ModuleService
      *
      * @param bool $include_disabled
      *
-     * @return Closure
+     * @return Closure(ModuleInterface):bool
      */
     private function enabledFilter(bool $include_disabled): Closure
     {
@@ -746,9 +759,11 @@ class ModuleService
     /**
      * A function filter modules by type
      *
-     * @param string $interface
+     * @template T of ModuleInterface|MiddlewareInterface
      *
-     * @return Closure
+     * @param class-string<T> $interface
+     *
+     * @return Closure(ModuleInterface):bool
      */
     private function interfaceFilter(string $interface): Closure
     {
@@ -760,7 +775,7 @@ class ModuleService
     /**
      * A function to sort footers
      *
-     * @return Closure
+     * @return Closure(ModuleFooterInterface,ModuleFooterInterface):int
      */
     private function footerComparator(): Closure
     {
@@ -772,7 +787,7 @@ class ModuleService
     /**
      * A function to sort menus
      *
-     * @return Closure
+     * @return Closure(ModuleMenuInterface,ModuleMenuInterface):int
      */
     private function menuComparator(): Closure
     {
@@ -782,9 +797,9 @@ class ModuleService
     }
 
     /**
-     * A function to sort menus
+     * A function to sort sidebars
      *
-     * @return Closure
+     * @return Closure(ModuleSidebarInterface,ModuleSidebarInterface):int
      */
     private function sidebarComparator(): Closure
     {
@@ -794,9 +809,9 @@ class ModuleService
     }
 
     /**
-     * A function to sort menus
+     * A function to sort tabs
      *
-     * @return Closure
+     * @return Closure(ModuleTabInterface,ModuleTabInterface):int
      */
     private function tabComparator(): Closure
     {
@@ -811,7 +826,7 @@ class ModuleService
      * Languages have a "sortable" name, so that "British English" sorts as "English, British".
      * This provides a more natural order in the language menu.
      *
-     * @return Closure
+     * @return Closure(ModuleInterface,ModuleInterface):int
      */
     private function moduleComparator(): Closure
     {
@@ -826,7 +841,7 @@ class ModuleService
     /**
      * During setup, we'll need access to some languages.
      *
-     * @return Collection<string,ModuleLanguageInterface>
+     * @return Collection<int,ModuleLanguageInterface>
      */
     public function setupLanguages(): Collection
     {
@@ -861,7 +876,7 @@ class ModuleService
      *
      * @param bool $include_disabled
      *
-     * @return Collection<string,ModuleInterface>
+     * @return Collection<int,ModuleInterface>
      */
     public function otherModules(bool $include_disabled = false): Collection
     {

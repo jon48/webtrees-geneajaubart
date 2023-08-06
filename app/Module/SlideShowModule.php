@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -132,7 +132,7 @@ class SlideShowModule extends AbstractModule implements ModuleBlockInterface
             ->where('media.m_file', '=', $tree->id())
             ->whereIn('media_file.multimedia_format', self::SUPPORTED_FORMATS)
             ->whereIn('media_file.source_media_type', $filter_types)
-            ->select('media.*')
+            ->select(['media.*'])
             ->get()
             ->shuffle()
             ->first(function (object $row) use ($filter_links, $tree): bool {

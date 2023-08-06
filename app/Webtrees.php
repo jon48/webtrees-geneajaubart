@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -143,7 +143,7 @@ class Webtrees
     public const STABILITY = '';
 
     // Version number.
-    public const VERSION = '2.1.16' . self::STABILITY;
+    public const VERSION = '2.1.17' . self::STABILITY;
 
     // Project website.
     public const URL = 'https://webtrees.net/';
@@ -278,7 +278,7 @@ class Webtrees
     /**
      * An error handler that can be passed to set_error_handler().
      *
-     * @return Closure
+     * @return Closure(int,string,string,int):bool
      */
     private function phpErrorHandler(): Closure
     {

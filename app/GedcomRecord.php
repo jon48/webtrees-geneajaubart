@@ -2,7 +2,7 @@
 
 /**
  * webtrees: online genealogy
- * Copyright (C) 2022 webtrees development team
+ * Copyright (C) 2023 webtrees development team
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -115,7 +115,7 @@ class GedcomRecord
     /**
      * A closure which will filter out private records.
      *
-     * @return Closure
+     * @return Closure(GedcomRecord):bool
      */
     public static function accessFilter(): Closure
     {
@@ -127,7 +127,7 @@ class GedcomRecord
     /**
      * A closure which will compare records by name.
      *
-     * @return Closure
+     * @return Closure(GedcomRecord,GedcomRecord):int
      */
     public static function nameComparator(): Closure
     {
@@ -153,7 +153,7 @@ class GedcomRecord
      *
      * @param int $direction +1 to sort ascending, -1 to sort descending
      *
-     * @return Closure
+     * @return Closure(GedcomRecord,GedcomRecord):int
      */
     public static function lastChangeComparator(int $direction = 1): Closure
     {
@@ -644,13 +644,16 @@ class GedcomRecord
                         $subtags = array_combine(range(1, count($subtags)), $subtags);
                     }
 
-
                     $facts = $facts
-                        ->sort(static function (Fact $x, Fact $y) use ($subtags): int {
-                            $sort_x = array_search($x->tag(), $subtags, true) ?: PHP_INT_MAX;
-                            $sort_y = array_search($y->tag(), $subtags, true) ?: PHP_INT_MAX;
+                        ->sort(static function (Fact $x, Fact $y) use ($facts, $subtags): int {
+                            $sort_x1 = array_search($x->tag(), $subtags, true) ?: PHP_INT_MAX;
+                            $sort_y1 = array_search($y->tag(), $subtags, true) ?: PHP_INT_MAX;
 
-                            return $sort_x <=> $sort_y;
+                            // For PHP < 8.0, sorting is unstable, so add original position as a second sort key.
+                            $sort_x2 = $facts->search($x, true);
+                            $sort_y2 = $facts->search($x, true);
+
+                            return $sort_x1 <=> $sort_y1 ?: $sort_x2 <=> $sort_y2;
                         });
                     break;
             }
@@ -838,6 +841,7 @@ class GedcomRecord
                 'xref'       => $this->xref,
                 'old_gedcom' => $old_gedcom,
                 'new_gedcom' => $new_gedcom,
+                'status'     => 'pending',
                 'user_id'    => Auth::id(),
             ]);
 
@@ -888,6 +892,7 @@ class GedcomRecord
             'xref'       => $this->xref,
             'old_gedcom' => $this->gedcom(),
             'new_gedcom' => $gedcom,
+            'status'     => 'pending',
             'user_id'    => Auth::id(),
         ]);
 
@@ -923,6 +928,7 @@ class GedcomRecord
                 'xref'       => $this->xref,
                 'old_gedcom' => $this->gedcom(),
                 'new_gedcom' => '',
+                'status'     => 'pending',
                 'user_id'    => Auth::id(),
             ]);
         }
