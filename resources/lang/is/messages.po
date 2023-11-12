@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: webtrees\n"
 "POT-Creation-Date: 2023-03-05 08:26+0000\n"
-"PO-Revision-Date: 2023-07-04 22:01+0000\n"
+"PO-Revision-Date: 2023-09-06 19:12+0000\n"
 "Last-Translator: Gudjon Sigurdsson <gudjon@pm.me>\n"
 "Language-Team: Icelandic <https://translate.webtrees.net/projects/webtrees/"
 "webtrees/is/>\n"
@@ -1682,7 +1682,7 @@ msgstr "Aldur sem hægt er að gera ráð fyrir að einstaklingur sé látin"
 
 #: resources/views/modules/statistics-chart/age-difference.phtml:37
 msgid "Age between husband and wife"
-msgstr "Aldur á milli eiginmanns og eiginkonu"
+msgstr "Aldur á milli maka"
 
 #: resources/views/modules/statistics-chart/age-difference.phtml:17
 msgid "Age between siblings"
@@ -1690,7 +1690,7 @@ msgstr "Aldur milli systkina"
 
 #: resources/views/modules/statistics-chart/age-difference.phtml:46
 msgid "Age between wife and husband"
-msgstr "Aldur á milli eiginkonu og eiginmanns"
+msgstr "Aldur á milli maka"
 
 #: resources/views/modules/statistics-chart/age-difference.phtml:10
 msgid "Age difference"
@@ -1721,7 +1721,7 @@ msgstr "Aldur foreldra við hliðina á fæðingardegi barns"
 #: app/CustomTags/GedcomL.php:233 app/Gedcom.php:408 app/Gedcom.php:542
 #: app/Gedcom.php:833
 msgid "Agency"
-msgstr "Umboðsskrifstofa"
+msgstr "Ábyrgðaraðili"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:50
@@ -6659,12 +6659,12 @@ msgstr "Fort Lauderdale, Flórída, Bandaríkin"
 #: app/Elements/PedigreeLinkageType.php:82
 msgctxt "Female pedigree"
 msgid "Foster"
-msgstr "Fóstra"
+msgstr "Fósturdóttir"
 
 #: app/Elements/PedigreeLinkageType.php:72
 msgctxt "Male pedigree"
 msgid "Foster"
-msgstr "Fóstri"
+msgstr "Fóstursonur"
 
 #: app/Elements/PedigreeLinkageType.php:92
 msgctxt "Pedigree"
@@ -6823,7 +6823,7 @@ msgstr "Fukuoka, Japan"
 
 #: app/CustomTags/Ancestry.php:67 app/CustomTags/BrothersKeeper.php:99
 msgid "Funeral"
-msgstr "Jarðaför"
+msgstr "Útför"
 
 #: app/Gedcom.php:504 resources/views/admin/gedcom-export-options.phtml:32
 msgid "GEDCOM"
@@ -7534,7 +7534,7 @@ msgstr "Ungverjaland"
 #: resources/xml/reports/individual_report.xml:449
 #: resources/xml/reports/relative_ext_report.xml:116
 msgid "Husband"
-msgstr "Eiginmaður"
+msgstr "Maki"
 
 #: app/Gedcom.php:414 resources/views/modules/timeline-chart/chart.phtml:357
 msgid "Husband’s age"
@@ -8407,11 +8407,11 @@ msgstr "Merkja"
 
 #: app/CustomTags/Legacy.php:65
 msgid "Label for husband"
-msgstr "Merki fyrir eiginmann"
+msgstr "Merki fyrir karlkyns maka"
 
 #: app/CustomTags/Legacy.php:69
 msgid "Label for wife"
-msgstr "Merki fyrir eiginkonu"
+msgstr "Merki fyrir kvenkyns maka"
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:107
@@ -10432,7 +10432,7 @@ msgstr "Ekki á lífi"
 #: app/Module/BranchesListModule.php:461
 #: resources/views/lists/families-table.phtml:121
 msgid "Not married"
-msgstr "Ekki gift/-ur"
+msgstr "Ógift"
 
 #. I18N: The record was not recorded in this GEDCOM file.
 #: app/Elements/AbstractXrefElement.php:70
@@ -12703,7 +12703,7 @@ msgstr "Skilin/-n"
 
 #: app/CustomTags/FamilyTreeMaker.php:71
 msgid "Separation"
-msgstr "Skilnaður"
+msgstr "Sambúðarslit"
 
 #: app/Date/AbstractGregorianJulianDate.php:136
 msgctxt "GENITIVE"
@@ -16412,7 +16412,7 @@ msgstr "Móttökutexti á innskráningarsíðu"
 
 #: resources/views/login-page.phtml:23
 msgid "Welcome to this genealogy website"
-msgstr "Velkomin/-n á þessa ættfræðivefsíðu"
+msgstr "Velkomin/-n á ættfræðivefsíðuna"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:179
@@ -18328,7 +18328,7 @@ msgstr "maki ömmubróðurs"
 #: app/Services/RelationshipService.php:805
 msgctxt "father’s mother’s sister"
 msgid "great-aunt"
-msgstr "ömmusystir"
+msgstr "systir móðurafa"
 
 #: app/Services/RelationshipService.php:1109
 msgctxt "father’s parent’s brother’s wife"
@@ -18348,7 +18348,7 @@ msgstr "maki afabróðurs"
 #: app/Services/RelationshipService.php:873
 msgctxt "mother’s father’s sister"
 msgid "great-aunt"
-msgstr "ömmusystir"
+msgstr "systir föðurafa"
 
 #: app/Services/RelationshipService.php:1121
 msgctxt "mother’s mother’s brother’s wife"
@@ -18358,7 +18358,7 @@ msgstr "maki ömmubróðurs"
 #: app/Services/RelationshipService.php:891
 msgctxt "mother’s mother’s sister"
 msgid "great-aunt"
-msgstr "ömmusystir"
+msgstr "systir móðurömmu"
 
 #: app/Services/RelationshipService.php:1127
 msgctxt "mother’s parent’s brother’s wife"
@@ -18774,7 +18774,7 @@ msgstr "barnabarnabarnabarn"
 
 #: app/Services/RelationshipService.php:1978
 msgid "great-great-granddaughter"
-msgstr "barnabarnabarn dóttur"
+msgstr "dóttir barnabarnabarns"
 
 #: app/Services/RelationshipService.php:1817
 msgid "great-great-grandfather"
@@ -18790,7 +18790,7 @@ msgstr "langalangafi og -amma"
 
 #: app/Services/RelationshipService.php:1974
 msgid "great-great-grandson"
-msgstr "barnabarnabarn sonar"
+msgstr "sonur barnabarnabarns"
 
 #: app/Services/RelationshipService.php:1348
 msgid "great-great-great-aunt"
@@ -18806,7 +18806,7 @@ msgstr "barnabarnabarnabarnabarn"
 
 #: app/Services/RelationshipService.php:1989
 msgid "great-great-great-granddaughter"
-msgstr "barnabarnabarnabarn dóttur"
+msgstr "dóttir barnabarnabarnabarns"
 
 #: app/Services/RelationshipService.php:1828
 msgid "great-great-great-grandfather"
@@ -18822,7 +18822,7 @@ msgstr "langalangalangafi og -amma"
 
 #: app/Services/RelationshipService.php:1985
 msgid "great-great-great-grandson"
-msgstr "barnabarnabarnabarn sonar"
+msgstr "sonur barnabarnabarnabarns"
 
 #: app/Services/RelationshipService.php:1561
 msgctxt "(a man’s) brother’s great-great-grandson"
@@ -19372,7 +19372,7 @@ msgstr "heimilishald"
 
 #: app/Elements/RoleInEvent.php:79 app/Services/RelationshipService.php:367
 msgid "husband"
-msgstr "eiginmaður"
+msgstr "maki"
 
 #. I18N: A name taken on immigration - e.g. migrants to the USA frequently anglicized their names
 #: app/Elements/NameType.php:81

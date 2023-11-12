@@ -478,6 +478,14 @@ class Individual extends GedcomRecord
         $birth_year = $this->getBirthDate()->minimumDate()->format('%Y');
         $death_year = $this->getDeathDate()->maximumDate()->format('%Y');
 
+        if ($birth_year === '') {
+            $birth_year = I18N::translate('…');
+        }
+
+        if ($death_year === '' && $this->isDead()) {
+            $death_year = I18N::translate('…');
+        }
+
         /* I18N: A range of years, e.g. “1870–”, “1870–1920”, “–1920” */
         return I18N::translate(
             '%1$s–%2$s',

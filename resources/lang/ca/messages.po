@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: webtrees\n"
 "POT-Creation-Date: 2023-03-05 08:26+0000\n"
-"PO-Revision-Date: 2023-05-02 15:47+0000\n"
-"Last-Translator: BernatBanyuls <bernatbanyuls@gmail.com>\n"
+"PO-Revision-Date: 2023-09-28 17:16+0000\n"
+"Last-Translator: Toni Planas <toniplanasvila@gmail.com>\n"
 "Language-Team: Catalan <https://translate.webtrees.net/projects/webtrees/"
 "webtrees/ca/>\n"
 "Language: ca\n"
@@ -83,15 +83,15 @@ msgstr "%1$s no existeix. Potser volíeu dir %2$s?"
 #: app/Http/RequestHandlers/CheckTree.php:275
 #, php-format
 msgid "%1$s does not have a link back to %2$s."
-msgstr "%1$s no te cap enllaç amb %2$s."
+msgstr "%1$s no té cap enllaç amb %2$s."
 
 #. I18N: …from the .ZIP file, %2$s is a (fractional) number of seconds
 #: app/Http/RequestHandlers/UpgradeWizardStep.php:264
 #, php-format
 msgid "%1$s file was extracted in %2$s seconds."
 msgid_plural "%1$s files were extracted in %2$s seconds."
-msgstr[0] "S’ha extret %1$s fitxer en %2$s segons."
-msgstr[1] "S’han extret %1$s fitxers en %2$s segons."
+msgstr[0] "S’ha extret el fitxer %1$s en %2$s segons."
+msgstr[1] "S’han extret els fitxers %1$s en %2$s segons."
 
 #: app/Http/RequestHandlers/CheckTree.php:392
 #, php-format
@@ -4428,7 +4428,7 @@ msgstr "Tipus de base de dades"
 #: resources/views/setup/step-4-database-pgsql.phtml:73
 #: resources/views/setup/step-4-database-sqlsrv.phtml:73
 msgid "Database user account"
-msgstr "Compte d’usuari de la Base de dades"
+msgstr "Compte d’usuari de la base de dades"
 
 #: app/CustomTags/Aldfaer.php:80 app/CustomTags/Ancestry.php:72
 #: app/CustomTags/FamilyTreeBuilder.php:58 app/CustomTags/GedcomL.php:118
@@ -10731,7 +10731,7 @@ msgstr "Mare de més edat"
 #. I18N: The name of a colour-scheme
 #: app/Module/ColorsTheme.php:172
 msgid "Olivia"
-msgstr "Olivia"
+msgstr "Verd oliva"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:387
@@ -11156,7 +11156,7 @@ msgstr "Frase"
 #. I18N: The name of a colour-scheme
 #: app/Module/ColorsTheme.php:174
 msgid "Pink Plastic"
-msgstr "Plàstic Rosa"
+msgstr "Plàstic rosa"
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:393
@@ -12991,7 +12991,7 @@ msgstr "Xevat"
 #. I18N: The name of a colour-scheme
 #: app/Module/ColorsTheme.php:178
 msgid "Shiny Tomato"
-msgstr "Tomàquet Brillant"
+msgstr "Tomàquet brillant"
 
 #: resources/views/help/date.phtml:37 resources/views/help/date.phtml:75
 #: resources/views/help/date.phtml:113
@@ -14101,7 +14101,7 @@ msgstr "Tanzània"
 #. I18N: The name of a colour-scheme
 #: app/Module/ColorsTheme.php:180
 msgid "Teal Top"
-msgstr "Teal Top"
+msgstr "Verd blavós"
 
 #. I18N: A configuration setting
 #: resources/views/admin/trees-preferences.phtml:175

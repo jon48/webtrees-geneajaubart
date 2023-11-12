@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: webtrees\n"
 "POT-Creation-Date: 2023-03-05 08:26+0000\n"
-"PO-Revision-Date: 2023-07-07 10:51+0000\n"
+"PO-Revision-Date: 2023-10-18 19:00+0000\n"
 "Last-Translator: Oskar-Txoperena <o.txoperena@gogotik.com>\n"
 "Language-Team: Basque https://translate.webtrees.net/projects/webtrees/"
 "webtrees/eu/>\n"
@@ -904,7 +904,7 @@ msgstr "Oharrak grabatzeko edo eguneko bat edukitzeko eremu pribatua."
 #: resources/views/emails/register-notify-text.phtml:20
 #, php-format
 msgid "A prospective user has registered with webtrees at %s."
-msgstr "Erabiltzaile bat %s-ra erregistratu da webtrees-ekin."
+msgstr "Erabiltzaile bat %s-an erregistratu da webtrees-ekin."
 
 #. I18N: Description of the “Pedigree” module
 #: app/Module/PedigreeReportModule.php:52
@@ -996,8 +996,7 @@ msgstr "Iturri batek emandako informazioari buruzko txostena."
 #: resources/xml/reports/missing_facts_report.xml:4
 msgid "A report of the information that is missing for an individual and their relatives."
 msgstr ""
-"Pertsona batetaz eta haren senideetaz falta den informazioari buruzko "
-"txostena."
+"Pertsona bat eta bere senideez falta den informazioari buruzko txostena."
 
 #. I18N: Description of the “Vital records” module. “Vital records” are life events - birth/marriage/death
 #: app/Module/BirthDeathMarriageReportModule.php:52
@@ -2032,7 +2031,7 @@ msgstr "Antigua eta Barbuda"
 msgid "Anyone with a user account can access this website."
 msgstr ""
 "Erabiltzaile-kontua daukan edozeinek izanen du webgune honetan sartzeko "
-"baimena."
+"aukera."
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:59
@@ -3494,7 +3493,7 @@ msgstr "Aldaketak"
 msgid "Changes in the last %s day"
 msgid_plural "Changes in the last %s days"
 msgstr[0] "Aldaketak azkeneko %s egunean"
-msgstr[1] "Aldaketak azkeneko %s egunetan"
+msgstr[1] "Azkeneko %s egunetan egindako aldaketak"
 
 #: app/Http/RequestHandlers/PendingChangesLogPage.php:94
 #: resources/views/admin/trees.phtml:211
@@ -6297,7 +6296,7 @@ msgstr "Familiaren saski genealogikoa"
 #: resources/views/admin/trees-create.phtml:25
 #: resources/views/admin/trees-preferences.phtml:50
 msgid "Family tree title"
-msgstr "Familiko zuhaitzaren izena"
+msgstr "Familiako zuhaitzaren izena"
 
 #. I18N: Name of a module
 #: app/Module/TreesMenuModule.php:59 app/Module/TreesMenuModule.php:108
@@ -7865,8 +7864,8 @@ msgstr ""
 msgid "If you show living individuals to visitors, all other privacy restrictions are ignored. Do this only if all the data in your tree is public."
 msgstr ""
 "Bisitariei gizabanako biziak erakusten badizkiezu, gainerako pribatutasun-"
-"murrizketak ez dira kontuan hartuko. Zure zuhaitzaren datu guztiak publikoak "
-"badira bakarrik egin hori."
+"murrizketak ez dira kontuan hartuko. Zure zuhaitzaren datu guztiak bakarrik "
+"publikoak badira egin hori."
 
 #: resources/views/setup/step-2-server-checks.phtml:82
 msgid "If you try to exceed these limits, you may experience server time-outs and blank pages."
@@ -7956,11 +7955,11 @@ msgstr ""
 #: resources/views/admin/trees-privacy.phtml:113
 msgid "In some countries, privacy laws apply not only to living individuals, but also to those who have died recently. This option will allow you to extend the privacy rules for living individuals to those who were born or died within a specified number of years. Leave these values empty to disable this feature."
 msgstr ""
-"Herrialde batzuetan, pribatutasun-legeak ez zaizkie soilik indibiduo biziei "
-"aplikatzen, baita berriki hil direnei ere. Aukera honi esker, pertsona "
-"bizien pribatutasun-arauak urte kopuru jakin batean jaio edo hil zirenen "
-"pribatutasun-arauetara zabaldu ahal izango dituzu. Utzi balio horiek hutsik "
-"funtzio hau desaktibatzeko."
+"Herrialde batzuetan, pribatutasun-legeak ez zaizkie soilik hilak diren "
+"pertsonei aplikatzen, baizik eta hil berriak direnei ere. Aukera honi esker, "
+"pertsona bizien pribatutasun-arauak, urte kopuru jakin batean, jaio edo hil "
+"direnei ere zabaldu ahal izango dizkiezu. Utzi balio horiek hutsik funtzio "
+"hau desaktibatzeko."
 
 #: app/Http/RequestHandlers/CalendarPage.php:118
 msgid "In this month…"
@@ -9735,7 +9734,7 @@ msgstr "Melbourne, Australia"
 #: resources/views/admin/gedcom-export-options.phtml:108
 #: resources/views/admin/users-edit.phtml:246
 msgid "Member"
-msgstr "Kidea"
+msgstr "Erabiltzailea"
 
 #. I18N: Location of an LDS church temple
 #: app/Elements/TempleCode.php:133
@@ -10205,11 +10204,11 @@ msgstr "Nere erregistro pertsonala"
 #: resources/views/admin/modules.phtml:200
 #: resources/views/layouts/administration.phtml:54
 msgid "My page"
-msgstr "Nere orria"
+msgstr "zuhaitz genealogikoa"
 
 #: app/Module/ModuleThemeTrait.php:374
 msgid "My pages"
-msgstr "Nere orriak"
+msgstr "Zuhaitz guztiak"
 
 #: app/Module/ModuleThemeTrait.php:413
 msgid "My pedigree"
@@ -13546,7 +13545,7 @@ msgstr "Ezkontideak ikusi"
 #: resources/views/admin/trees-preferences.phtml:568
 #, php-format
 msgid "Show the %1$s %2$s parts of a place name."
-msgstr "%1$s %2$sen lekuaren izenaren zatiak ikusi."
+msgstr "Ikusi %1$s %2$sen lekuaren zatiak."
 
 #. I18N: Description of the “Pedigree map” module
 #: app/Module/PedigreeMapModule.php:122
@@ -13727,8 +13726,9 @@ msgstr "Orriaren identifikazio kodea"
 #: resources/views/edit-account-page.phtml:140
 msgid "Site members can send each other messages. You can choose to how these messages are sent to you, or choose not receive them at all."
 msgstr ""
-"Orriko kideak mezuak bidaltzen ahal dizkiete elkarri. Zuk aukeratzen ahal "
-"duzu nola bidaltzen dizkizuten mezuak, edo ez dituzun hartu nahi."
+"Orriaren erabiltzaileek mezuak bidaltzen ahal dizkiete elkarri. Zuk "
+"aukeratzen ahal duzu nola bidaltzen dizkizuten mezuak, edo ez dituzun hartu "
+"nahi."
 
 #. I18N: A configuration setting
 #: resources/views/modules/bing-webmaster-tools/form.phtml:11
@@ -15160,7 +15160,7 @@ msgstr "Ez dago iturri-oharrik pertsona honentzat."
 #: resources/views/emails/pending-changes-html.phtml:22
 #: resources/views/emails/pending-changes-text.phtml:19
 msgid "There are pending changes for you to moderate."
-msgstr "Ez dago behin behineko aldaketarik moderatzeke."
+msgstr "Ez dago moderatu gabeko behin behineko aldaketarik."
 
 #: app/Module/RecentChangesModule.php:151
 #, php-format
@@ -15340,7 +15340,9 @@ msgstr "Formulario hau iraungirik dago. Saiatu berriz."
 
 #: app/Auth.php:289 app/Http/RequestHandlers/RedirectIndividualPhp.php:69
 msgid "This individual does not exist or you do not have permission to view it."
-msgstr "Pertsona hau ez dago zuhaitzean, edo ez duzu baimenik ikusteko."
+msgstr ""
+"Pertsona hau ez dago zuhaitzean, edo ezin zaizu erakutsi pribatutasun arauak "
+"direla medio."
 
 #: resources/views/individual-page-pending.phtml:23
 msgid "This individual has been deleted. The deletion will need to be reviewed by a moderator."
@@ -15415,7 +15417,7 @@ msgstr "Informazio hori ez dago eskuragarri."
 #: app/Statistics/Repository/IndividualRepository.php:1259
 #: app/Statistics/Repository/IndividualRepository.php:1279
 msgid "This information is private and cannot be shown."
-msgstr "Informazio hori pribatua da eta ezin da ikusi."
+msgstr "Informazio hau pribatua da eta ezin da ikusi."
 
 #: resources/views/edit-account-page.phtml:68
 msgid "This is a link to your own record in the family tree. If this is the wrong individual, contact an administrator."
@@ -16921,9 +16923,9 @@ msgstr ""
 "Kontuaren eskaera egiaztatu beharko duzu mezu honetan dauden argibideak "
 "jarraituz. Zure eskaera ez baduzu 7 egunez bideratzen, automatikoki "
 "errefusatuko da. Eskaera berria egin beharko duzu. <br><br>Egiaztapen mezuan "
-"bidalitako argibideak jarraitu ondotik, administratzaileak onartu egin "
-"beharko du zure eskaria erabiltzen hasi baino lehen. <br><br>Orrian sartu "
-"ahal izateko, erabiltzaile izena eta pasahitza beharko dituzu."
+"bidalitako argibideak jarraitu ondotik, zure eskaria erabiltzen hasi baino "
+"lehen, administratzaileak onartu egin beharko du. <br><br>Orrian sartu ahal "
+"izateko, erabiltzaile-izena eta pasahitza beharko dituzu."
 
 #: resources/views/admin/control-panel.phtml:166
 #: resources/views/admin/control-panel.phtml:594
@@ -17156,7 +17158,8 @@ msgstr "%s izenarekin ireki da saioa."
 
 #: app/Http/RequestHandlers/LoginPage.php:99
 msgid "You can apply for an account using the link below."
-msgstr "Behean ageri den loturarekin eskatzen ahal duzu erabiltzaile-kontua."
+msgstr ""
+"Behean ageri den lotura erabiliz erabiltzaile-kontua eskatzen ahal duzu."
 
 #. I18N: Help text for the "Default theme" site configuration setting
 #: resources/views/admin/site-preferences.phtml:70
@@ -17323,10 +17326,10 @@ msgstr ""
 #: resources/views/emails/register-notify-text.phtml:34
 msgid "You will be informed by email when this prospective user has confirmed the request. You can then complete the process by activating the username. The new user will not be able to sign in until you activate the account."
 msgstr ""
-"Erabiltzailea izan litekeenak eskaera konfirmatzen duenean, korreo "
-"elektronikoz informatuko zaio. Ondotik erabiltzaile-izenaren aktibazioa "
-"burutzen ahal du. Erabiltzaile berriak ezin izanen du saiorik ireki kontua "
-"gaitu arte."
+"Erabiltzailea izan litekeenak, eskaera konfirmatu eta onartzen denean, "
+"korreo elektronikoz informatuko zaio. Ondotik erabiltzaile-izenaren "
+"aktibazioa burutzen ahal du. Erabiltzaile berriak ezin izanen du saiorik "
+"ireki administratzaileak kontua gaitu arte."
 
 #: resources/views/setup/step-5-administrator.phtml:73
 msgid "You will use this to sign in to webtrees."
@@ -17416,7 +17419,7 @@ msgstr ""
 #: app/Date.php:185
 #, php-format
 msgid "about %s"
-msgstr "%s-taz"
+msgstr "%sa inguruan"
 
 #. I18N: %1$s is “accept”, %2$s is “reject”. These are links.
 #: resources/views/family-page-pending.phtml:25
@@ -17551,7 +17554,7 @@ msgstr "hasierara itzuli"
 #: app/Date.php:201
 #, php-format
 msgid "before %s"
-msgstr "%sren aitzinetik"
+msgstr "%saren aitzinetik"
 
 #. I18N: Gedcom BET-AND dates
 #: app/Date.php:217
@@ -20149,7 +20152,7 @@ msgstr[1] "%s egun gehienez"
 #: resources/views/admin/trees-privacy.phtml:126
 #: resources/views/admin/trees-privacy.phtml:146
 msgid "members"
-msgstr "kideak"
+msgstr "Erabiltzaileak"
 
 #. I18N: Name of a theme.
 #: app/Module/MinimalTheme.php:39
@@ -20462,7 +20465,7 @@ msgstr "bikotekidea"
 #: app/Services/RelationshipService.php:376
 msgctxt "MALE"
 msgid "partner"
-msgstr "bikoteakidea"
+msgstr "bikotekidea"
 
 #: app/SurnameTradition/PaternalSurnameTradition.php:38
 msgctxt "Surname tradition"
@@ -20843,7 +20846,7 @@ msgstr "deus ez aukeratu"
 
 #: app/Services/RelationshipService.php:346
 msgid "self"
-msgstr "neu"
+msgstr "Bilatutakoa bera"
 
 #: app/Services/RelationshipService.php:2336
 msgid "seventh cousin"
@@ -21461,9 +21464,8 @@ msgstr ""
 #: resources/views/admin/site-mail.phtml:49
 msgid "webtrees needs to send emails, such as password reminders and website notifications."
 msgstr ""
-"webtrees-ek korreo elektronikoak bidaltzeko beharra du, pasahitzen "
-"oroigarriak eta webgunearen jakinarazpenak erabiltzaileei helarazteko, "
-"errate baterako."
+"Webtrees-ek korreo elektronikoak bidaltzen ditu, pasahitzen oroigarriak edo "
+"webgunearen jakinarazpenak erabiltzaileei helarazteko, errate baterako."
 
 #: app/Services/MessageService.php:233
 msgid "webtrees sends emails with no storage"

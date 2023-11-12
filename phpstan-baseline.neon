@@ -1557,16 +1557,6 @@ parameters:
 
 		-
 			message: "#^Cannot access property \\$n_surn on mixed\\.$#"
-			count: 8
-			path: app/Module/IndividualListModule.php
-
-		-
-			message: "#^Cannot access property \\$n_surname on mixed\\.$#"
-			count: 3
-			path: app/Module/IndividualListModule.php
-
-		-
-			message: "#^Cannot access property \\$total on mixed\\.$#"
 			count: 1
 			path: app/Module/IndividualListModule.php
 
@@ -2321,16 +2311,6 @@ parameters:
 			path: app/PlaceLocation.php
 
 		-
-			message: "#^Parameter \\#1 \\$fm of method TCPDF\\:\\:setFooterMargin\\(\\) expects int, float given\\.$#"
-			count: 1
-			path: app/Report/PdfRenderer.php
-
-		-
-			message: "#^Parameter \\#1 \\$hm of method TCPDF\\:\\:setHeaderMargin\\(\\) expects int, float given\\.$#"
-			count: 1
-			path: app/Report/PdfRenderer.php
-
-		-
 			message: "#^Parameter \\#1 \\$fp of function fclose expects resource, resource\\|false given\\.$#"
 			count: 1
 			path: app/Report/ReportParserBase.php
@@ -2606,24 +2586,9 @@ parameters:
 			path: app/Report/ReportParserSetup.php
 
 		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Report\\\\ReportPdfFootnote\\:\\:getWidth\\(\\) should return array\\{float, int, float\\} but returns array\\{0\\|array\\<float\\>\\|float, 1, int\\<0, max\\>\\}\\.$#"
-			count: 1
-			path: app/Report/ReportPdfFootnote.php
-
-		-
 			message: "#^Parameter \\#1 \\$link of method TCPDF\\:\\:setLink\\(\\) expects int, string given\\.$#"
 			count: 1
 			path: app/Report/ReportPdfFootnote.php
-
-		-
-			message: "#^Parameter \\#1 \\$number of function ceil expects float, array\\<float\\>\\|float given\\.$#"
-			count: 3
-			path: app/Report/ReportPdfFootnote.php
-
-		-
-			message: "#^Method Fisharebest\\\\Webtrees\\\\Report\\\\ReportPdfText\\:\\:getWidth\\(\\) should return array\\{float, int, float\\} but returns array\\{array\\<float\\>\\|float, 0\\|2, int\\<0, max\\>\\}\\.$#"
-			count: 1
-			path: app/Report/ReportPdfText.php
 
 		-
 			message: "#^Instanceof between Fisharebest\\\\Webtrees\\\\Report\\\\ReportBaseElement and Fisharebest\\\\Webtrees\\\\Report\\\\ReportPdfFootnote will always evaluate to false\\.$#"
@@ -3316,6 +3281,11 @@ parameters:
 			path: app/Statistics/Repository/FamilyRepository.php
 
 		-
+			message: "#^Cannot call method fullName\\(\\) on mixed\\.$#"
+			count: 2
+			path: app/Statistics/Repository/FamilyRepository.php
+
+		-
 			message: "#^Cannot call method getBirthDate\\(\\) on Fisharebest\\\\Webtrees\\\\Individual\\|null\\.$#"
 			count: 2
 			path: app/Statistics/Repository/FamilyRepository.php
@@ -3333,6 +3303,11 @@ parameters:
 		-
 			message: "#^Cannot call method url\\(\\) on Fisharebest\\\\Webtrees\\\\Individual\\|null\\.$#"
 			count: 1
+			path: app/Statistics/Repository/FamilyRepository.php
+
+		-
+			message: "#^Cannot call method url\\(\\) on mixed\\.$#"
+			count: 2
 			path: app/Statistics/Repository/FamilyRepository.php
 
 		-
