@@ -39,6 +39,8 @@ use Fisharebest\Webtrees\CustomTags\PhpGedView;
 use Fisharebest\Webtrees\CustomTags\ProGen;
 use Fisharebest\Webtrees\CustomTags\Reunion;
 use Fisharebest\Webtrees\CustomTags\RootsMagic;
+use Fisharebest\Webtrees\CustomTags\TheMasterGenealogist;
+use Fisharebest\Webtrees\CustomTags\TheNextGeneration;
 use Fisharebest\Webtrees\Elements\AddressCity;
 use Fisharebest\Webtrees\Elements\AddressCountry;
 use Fisharebest\Webtrees\Elements\AddressEmail;
@@ -594,8 +596,8 @@ class Gedcom
             'INDI:BARM:DATE'             => new DateValue(I18N::translate('Date of bar mitzvah')),
             'INDI:BARM:PLAC'             => new PlaceName(I18N::translate('Place of bar mitzvah')),
             'INDI:BASM'                  => new BasMitzvah(I18N::translate('Bat mitzvah')),
-            'INDI:BASM:DATE'             => new BasMitzvah(I18N::translate('Date of bat mitzvah')),
-            'INDI:BASM:PLAC'             => new DateValue(I18N::translate('Place of bat mitzvah')),
+            'INDI:BASM:DATE'             => new DateValue(I18N::translate('Date of bat mitzvah')),
+            'INDI:BASM:PLAC'             => new PlaceName(I18N::translate('Place of bat mitzvah')),
             'INDI:BIRT'                  => new Birth(I18N::translate('Birth')),
             'INDI:BIRT:DATE'             => new DateValue(I18N::translate('Date of birth')),
             'INDI:BIRT:FAMC'             => new XrefFamily(I18N::translate('Birth parents')),
@@ -1142,6 +1144,8 @@ class Gedcom
                 new ProGen(),
                 new Reunion(),
                 new RootsMagic(),
+                new TheMasterGenealogist(),
+                new TheNextGeneration(),
             ];
 
             foreach ($custom_tags as $custom_tag) {

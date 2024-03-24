@@ -66,21 +66,32 @@ class BadBotBlocker implements MiddlewareInterface
         'Adsbot',
         'AhrefsBot',
         'Amazonbot', // Until it understands crawl-delay and noindex / nofollow
+        'AntBot', // Aggressive crawler
         'AspiegelBot',
         'Awario', // Brand management
-        'Barkrowler',
+        'Barkrowler', // Crawler for babbar.tech
         'BLEXBot',
-        'Bytespider',
+        'Bytespider', // Aggressive crawler from Bytedance/TikTok
         'CCBot', // Used to train a number of LLMs
+        'CensysInspect', // Vulnerability scanner
         'ChatGPT-User', // Used by ChatGPT during operation
+        'ClaudeBot', // Collects training data for LLMs
         'DataForSeoBot', // https://dataforseo.com/dataforseo-bot
         'DotBot',
+        'Expanse', // Another pointless crawler
         'FacebookBot', // Collects training data for Facebook's LLM translator.
+        'fidget-spinner-bot', // Agressive crawler
+        'Foregenix', // Vulnerability scanner
+        'FriendlyCrawler', // Collects training data for LLMs
+        'Go-http-client', // Crawler library used by many bots
         'Google-Extended', // Collects training data for Google Bard
         'GPTBot', // Collects training data for ChatGPT
         'Grapeshot',
         'Honolulu-bot', // Aggressive crawer, no info available
         'ia_archiver',
+        'internet-measurement', // Driftnet
+        'IonCrawl',
+        'Java', // Crawler library used by many bots
         'linabot', // Aggressive crawer, no info available
         'Linguee',
         'MegaIndex.ru',
@@ -89,12 +100,16 @@ class BadBotBlocker implements MiddlewareInterface
         'Omgilibot', // Collects training data for LLMs
         'panscient',
         'PetalBot',
+        'phxbot', // Badly written crawler
         'proximic',
+        'python-requests', // Crawler library used by many bots
+        'Scrapy', // Scraping tool
         'SeekportBot', // Pretends to be a search engine - but isn't
         'SemrushBot',
         'serpstatbot',
         'SEOkicks',
         'SiteKiosk',
+        'test-bot', // Agressive crawler
         'TinyTestBot',
         'Turnitin',
         'wp_is_mobile', // Nothing to do with wordpress
@@ -122,7 +137,7 @@ class BadBotBlocker implements MiddlewareInterface
         'Mail.RU_Bot'      => ['.mail.ru'],
         'MicrosoftPreview' => ['.search.msn.com'],
         'MojeekBot'        => ['.mojeek.com'],
-        'Qwantify'         => ['.search.qwant.com'],
+        'Qwantify'         => ['.qwant.com'],
         'Sogou'            => ['.crawl.sogou.com'],
         'Yahoo'            => ['.crawl.yahoo.net'],
         'Yandex'           => ['.yandex.ru', '.yandex.net', '.yandex.com'],

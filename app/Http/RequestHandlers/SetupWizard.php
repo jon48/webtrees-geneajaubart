@@ -484,5 +484,9 @@ class SetupWizard implements RequestHandlerInterface
         ]);
 
         $capsule->setAsGlobal();
+
+        if ($data['dbtype'] === 'sqlsrv') {
+            DB::connection()->unprepared('SET language us_english'); // For timestamp columns
+        }
     }
 }
