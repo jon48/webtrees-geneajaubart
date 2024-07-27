@@ -244,12 +244,12 @@ class MediaRepository implements MediaRepositoryInterface
      *
      * @return string
      */
-    public function chartMedia(string $color_from = null, string $color_to = null): string
+    public function chartMedia(?string $color_from = null, ?string $color_to = null): string
     {
         $media = DB::table('media_file')
             ->where('m_file', '=', $this->tree->id())
             ->groupBy('source_media_type')
-            ->pluck(new Expression('COUNT(*)'), 'source_media_type')
+            ->pluck(new Expression('COUNT(*) AS total'), 'source_media_type')
             ->map(static fn (string $n): int => (int) $n)
             ->all();
 

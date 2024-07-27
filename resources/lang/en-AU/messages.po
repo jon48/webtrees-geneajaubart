@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-19 13:09+0000\n"
-"PO-Revision-Date: 2024-03-04 10:50+0000\n"
+"PO-Revision-Date: 2024-04-03 08:11+0000\n"
 "Last-Translator: Greg Roach <greg@subaqua.co.uk>\n"
 "Language-Team: English (Australia) <https://translate.webtrees.net/projects/webtrees/webtrees/en_AU/>\n"
 "Language: en-AU\n"
@@ -161,7 +161,7 @@ msgstr "%j %F %Y"
 #: app/Statistics/Service/CenturyService.php:39
 #, php-format
 msgid "%s BCE"
-msgstr "%s B.C."
+msgstr "%s ʙᴄ"
 
 #. I18N: size of file in KB
 #: app/Http/RequestHandlers/ManageMediaData.php:361 app/MediaFile.php:312
@@ -421,13 +421,13 @@ msgstr "%s × cousin"
 #: app/Date/JulianDate.php:98
 #, php-format
 msgid "%s&nbsp;BCE"
-msgstr "%s&nbsp;BC"
+msgstr "%s&nbsp;ʙᴄ"
 
 #. I18N: CE=Common Era, for Julian years > 0. See https://en.wikipedia.org/wiki/Common_Era
 #: app/Date/JulianDate.php:102 app/Date/JulianDate.php:106
 #, php-format
 msgid "%s&nbsp;CE"
-msgstr "AD&nbsp;%s"
+msgstr "ᴀᴅ&nbsp;%s"
 
 #. I18N: Label on a graph; 40+ means 40 or more
 #: app/Module/StatisticsChartModule.php:861
@@ -3266,7 +3266,7 @@ msgstr "Canada"
 #: app/Http/RequestHandlers/SitePreferencesAction.php:61
 #, php-format
 msgid "Cannot write to the folder “%s”."
-msgstr "Cannot write to the folder “%s”."
+msgstr "Cannot write to the folder ‘%s’."
 
 #. I18N: Name of a country or state
 #: app/Statistics/Service/CountryService.php:143
@@ -10344,7 +10344,7 @@ msgstr "No records to display"
 #: resources/views/components/select-submission.phtml:27
 #: resources/views/components/select-submitter.phtml:27
 msgid "No results found"
-msgstr ""
+msgstr "No results found"
 
 #: resources/views/modules/place-hierarchy/events.phtml:36
 #: resources/views/modules/place-hierarchy/events.phtml:48
@@ -14534,7 +14534,7 @@ msgstr "The parameter “%s” is missing."
 #: app/Http/RequestHandlers/AdminMediaFileDownload.php:66
 #: app/Http/RequestHandlers/AdminMediaFileThumbnail.php:66
 msgid "The parameter “path” is invalid."
-msgstr "The parameter “path” is invalid."
+msgstr "The parameter ‘path’ is invalid."
 
 #: app/Http/RequestHandlers/SetupWizard.php:379
 msgid "The password needs to be at least six characters long."
@@ -14760,7 +14760,7 @@ msgstr "There are no facts for this individual."
 #: app/Module/IndividualListModule.php:224
 #, php-format
 msgid "There are no individuals with the surname “%s”"
-msgstr ""
+msgstr "There are no individuals with the surname ‘%s’"
 
 #: app/Http/RequestHandlers/ManageMediaData.php:327
 msgid "There are no links to this media object."
@@ -17169,7 +17169,7 @@ msgstr "continue"
 #: app/Elements/GeneatiqueAct.php:40
 msgctxt "NOUN"
 msgid "copy"
-msgstr ""
+msgstr "copy"
 
 #. I18N: A button label.
 #: resources/views/admin/trees-create.phtml:57
@@ -17351,7 +17351,7 @@ msgstr "export file"
 #: app/Elements/GeneatiqueAct.php:42
 msgctxt "NOUN"
 msgid "extract"
-msgstr ""
+msgstr "extract"
 
 #: app/Http/RequestHandlers/TreePreferencesPage.php:113
 #: resources/xml/reports/fact_sources.xml:6
@@ -19853,7 +19853,7 @@ msgstr "of"
 
 #: app/Elements/GeneatiqueAct.php:38
 msgid "online"
-msgstr ""
+msgstr "online"
 
 #: app/Services/RelationshipService.php:353
 msgid "parent"
@@ -19909,7 +19909,7 @@ msgstr "percentage"
 
 #: app/Elements/GeneatiqueAct.php:41
 msgid "photocopy"
-msgstr ""
+msgstr "photocopy"
 
 #. I18N: https://en.wikipedia.org/wiki/Plain_text
 #: app/Http/RequestHandlers/TreePreferencesPage.php:106

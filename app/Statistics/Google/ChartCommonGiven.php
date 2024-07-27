@@ -53,8 +53,8 @@ class ChartCommonGiven
     public function chartCommonGiven(
         int $tot_indi,
         array $given,
-        string $color_from = null,
-        string $color_to = null
+        ?string $color_from = null,
+        ?string $color_to = null
     ): string {
         $color_from ??= 'ffffff';
         $color_to ??= '84beff';

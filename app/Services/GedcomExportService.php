@@ -182,9 +182,9 @@ class GedcomExportService
         string $encoding = UTF8::NAME,
         int $access_level = Auth::PRIV_HIDE,
         string $line_endings = 'CRLF',
-        Collection $records = null,
-        FilesystemOperator $zip_filesystem = null,
-        string $media_path = null
+        ?Collection $records = null,
+        ?FilesystemOperator $zip_filesystem = null,
+        ?string $media_path = null
     ) {
         $stream = fopen('php://memory', 'wb+');
 
@@ -389,7 +389,6 @@ class GedcomExportService
         $query = DB::table('families')
             ->where('f_file', '=', $tree->id())
             ->select(['f_gedcom', 'f_id']);
-
 
         if ($sort_by_xref) {
             $query

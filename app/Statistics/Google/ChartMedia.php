@@ -52,8 +52,8 @@ class ChartMedia
      */
     public function chartMedia(
         array $media,
-        string $color_from = null,
-        string $color_to = null
+        ?string $color_from = null,
+        ?string $color_to = null
     ): string {
         $color_from ??= 'ffffff';
         $color_to ??= '84beff';

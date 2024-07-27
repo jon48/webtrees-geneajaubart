@@ -47,7 +47,6 @@ class Tree
         'hidden'       => Auth::PRIV_HIDE,
     ];
 
-
     // Default values for some tree preferences.
     protected const DEFAULT_PREFERENCES = [
         'CALENDAR_FORMAT'              => 'gregorian',
@@ -199,7 +198,7 @@ class Tree
      *
      * @return string
      */
-    public function getPreference(string $setting_name, string $default = null): string
+    public function getPreference(string $setting_name, ?string $default = null): string
     {
         if ($this->preferences === []) {
             $this->preferences = DB::table('gedcom_setting')

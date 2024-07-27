@@ -272,7 +272,6 @@ class FamilyRepository
             $top10 = implode('; ', $top10);
         }
 
-
         if ($type === 'list') {
             return '<ul>' . $top10 . '</ul>';
         }
@@ -686,8 +685,8 @@ class FamilyRepository
      * @return string
      */
     public function chartLargestFamilies(
-        string $color_from = null,
-        string $color_to = null,
+        ?string $color_from = null,
+        ?string $color_to = null,
         int $total = 10
     ): string {
         return (new ChartFamilyLargest($this->color_service, $this->tree))
@@ -1725,7 +1724,7 @@ class FamilyRepository
      *
      * @return string
      */
-    public function statsMarr(string $color_from = null, string $color_to = null): string
+    public function statsMarr(?string $color_from = null, ?string $color_to = null): string
     {
         return (new ChartMarriage($this->century_service, $this->color_service, $this->tree))
             ->chartMarriage($color_from, $color_to);
@@ -1739,7 +1738,7 @@ class FamilyRepository
      *
      * @return string
      */
-    public function statsDiv(string $color_from = null, string $color_to = null): string
+    public function statsDiv(?string $color_from = null, ?string $color_to = null): string
     {
         return (new ChartDivorce($this->century_service, $this->color_service, $this->tree))
             ->chartDivorce($color_from, $color_to);

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: webtrees\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-19 13:09+0000\n"
-"PO-Revision-Date: 2024-03-04 10:50+0000\n"
+"PO-Revision-Date: 2024-04-03 08:11+0000\n"
 "Last-Translator: Greg Roach <greg@subaqua.co.uk>\n"
 "Language-Team: English (United Kingdom) <https://translate.webtrees.net/projects/webtrees/webtrees/en_GB/>\n"
 "Language: en-GB\n"
@@ -161,7 +161,7 @@ msgstr "%j %F %Y"
 #: app/Statistics/Service/CenturyService.php:39
 #, php-format
 msgid "%s BCE"
-msgstr "%s B.C."
+msgstr "%s ʙᴄ"
 
 #. I18N: size of file in KB
 #: app/Http/RequestHandlers/ManageMediaData.php:361 app/MediaFile.php:312
@@ -421,13 +421,13 @@ msgstr "%s × cousin"
 #: app/Date/JulianDate.php:98
 #, php-format
 msgid "%s&nbsp;BCE"
-msgstr "%s&nbsp;BC"
+msgstr "%s&nbsp;ʙᴄ"
 
 #. I18N: CE=Common Era, for Julian years > 0. See https://en.wikipedia.org/wiki/Common_Era
 #: app/Date/JulianDate.php:102 app/Date/JulianDate.php:106
 #, php-format
 msgid "%s&nbsp;CE"
-msgstr "AD&nbsp;%s"
+msgstr "ᴀᴅ&nbsp;%s"
 
 #. I18N: Label on a graph; 40+ means 40 or more
 #: app/Module/StatisticsChartModule.php:861
@@ -14760,7 +14760,7 @@ msgstr "There are no facts for this individual."
 #: app/Module/IndividualListModule.php:224
 #, php-format
 msgid "There are no individuals with the surname “%s”"
-msgstr ""
+msgstr "There are no individuals with the surname ‘%s’"
 
 #: app/Http/RequestHandlers/ManageMediaData.php:327
 msgid "There are no links to this media object."
@@ -17169,7 +17169,7 @@ msgstr "continue"
 #: app/Elements/GeneatiqueAct.php:40
 msgctxt "NOUN"
 msgid "copy"
-msgstr ""
+msgstr "copy"
 
 #. I18N: A button label.
 #: resources/views/admin/trees-create.phtml:57
@@ -17351,7 +17351,7 @@ msgstr "export file"
 #: app/Elements/GeneatiqueAct.php:42
 msgctxt "NOUN"
 msgid "extract"
-msgstr ""
+msgstr "extract"
 
 #: app/Http/RequestHandlers/TreePreferencesPage.php:113
 #: resources/xml/reports/fact_sources.xml:6
@@ -19853,7 +19853,7 @@ msgstr "of"
 
 #: app/Elements/GeneatiqueAct.php:38
 msgid "online"
-msgstr ""
+msgstr "online"
 
 #: app/Services/RelationshipService.php:353
 msgid "parent"
@@ -19909,7 +19909,7 @@ msgstr "percentage"
 
 #: app/Elements/GeneatiqueAct.php:41
 msgid "photocopy"
-msgstr ""
+msgstr "photocopy"
 
 #. I18N: https://en.wikipedia.org/wiki/Plain_text
 #: app/Http/RequestHandlers/TreePreferencesPage.php:106
@@ -22694,7 +22694,7 @@ msgstr "…"
 
 #, php-format
 #~ msgid "There are no individuals with the surname “%s“"
-#~ msgstr "There are no individuals with the surname “%s“"
+#~ msgstr "There are no individuals with the surname ‘%s’"
 
 #, php-format
 #~ msgid "There is no account with the username or email “%s”."
