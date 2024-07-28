@@ -23,13 +23,13 @@
 
 @import 'base';
 
-/* stylelint-disable block-opening-brace-space-before */
+/* stylelint-disable @stylistic/block-opening-brace-space-before */
 .menu-maj-geodispersion::before     {content: url('rural/menu-geodispersion.png');}
 
 .maj-icon-view-map                  {content: url('rural/map.png');}
 .maj-icon-view-table                {content: url('rural/table.png');}
 
-/* stylelint-enable block-opening-brace-space-before */
+/* stylelint-enable @stylistic/block-opening-brace-space-before */
 
 .maj-geodisp-cell-detailed-all {
     &-found {
