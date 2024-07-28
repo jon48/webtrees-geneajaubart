@@ -122,6 +122,7 @@
 		"webtrees-geneajaubart:build" : "./vendor/bin/robo build:modules",
 		"webtrees-geneajaubart:package" : "./vendor/bin/robo package",
 		"webtrees-geneajaubart:lintjs" : "./vendor/bin/robo lint:semistandard",
+		"webtrees-geneajaubart:updatenpm" : "./vendor/bin/robo update:npm-modules",
 		"webtrees:build" : [
 			"rm -Rf webtrees/",
 			"git archive --prefix=webtrees/ HEAD --format=tar | tar -x",

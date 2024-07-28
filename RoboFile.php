@@ -55,13 +55,10 @@ class RoboFile extends \Robo\Tasks
             $collection->progressMessage("Building module {$module->getRelativePathname()}");
             $module_dir = $modules_dir . '/' . $module->getRelativePathname();
 
-            if ($module->getRelativePathname() === 'myartjaub_ruraltheme') {
-                $collection->taskComposerInstall()
-                    ->dir($module_dir)
-                    ->noSuggest();
-            }
-
-            if (Finder::create()->name('package-lock.json')->in($module_dir)->depth(0)->count() > 0) {
+            if (
+                Finder::create()->name('package-lock.json')->in($module_dir)->depth(0)->count() > 0
+                && Finder::create()->name('composer.json')->in($module_dir)->depth(0)->count() === 0
+            ) {
                 $collection->taskExec("npm install --no-fund")
                     ->dir($module_dir);
                 $collection->taskExecStack()
@@ -72,8 +69,7 @@ class RoboFile extends \Robo\Tasks
 
             if ($delete) {
                 $collection->taskFilesystemStack()
-                    ->remove($module_dir . '/node_modules')
-                    ->remove($module_dir . '/vendor');
+                    ->remove($module_dir . '/node_modules');
             }
         }
 
@@ -148,6 +144,39 @@ class RoboFile extends \Robo\Tasks
         }
 
         return $collection->run();
+    }
+
+    /**
+     * Update NPM dependencies on MyArtJaub modules
+     *
+     *
+     * @throws \Exception
+     * @return \Robo\Result<mixed>
+     */
+    public function updateNpmModules()
+    {
+        $collection = $this->collectionBuilder();
+
+        $modules_dir = __DIR__ . '/modules_v4';
+        $modules = Finder::create()->directories()->name('myartjaub_*')->in($modules_dir)->depth(0);
+        foreach ($modules as $module) {
+            $module_dir = $modules_dir . '/' . $module->getRelativePathname();
+
+            if (
+                Finder::create()->name('package-lock.json')->in($module_dir)->depth(0)->count() > 0
+                && Finder::create()->name('composer.json')->in($module_dir)->depth(0)->count() === 0
+            ) {
+                $collection->taskExec("npm update")
+                    ->dir($module_dir);
+                $collection->taskExec("npm outdated || exit 0")
+                    ->printOutput(true)
+                    ->dir($module_dir);
+            }
+        }
+
+        return $collection
+            ->progressMessage("NPM Packages updated.")
+            ->run();
     }
 
     /**
