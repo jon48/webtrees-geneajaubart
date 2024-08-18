@@ -84,6 +84,8 @@ Available modules:
   * Runs administrative tasks on a scheduled manner.
 * **MyArtJaub Certificates** (`myartjaub_certificates`)
   * Alternative management of certificates supporting sources.
+* **MyArtJaub Entry Helper** (`myartjaub_entryhelper`)
+  * Provides assistance when entering genealogical data.
 * **MyArtJaub Geographical Dispersion** (`myartjaub_geodispersion`)
   * Provide geographical dispersion analysis on Sosa ancestors.  
 * **MyArtJaub Miscellaneous Extensions** (`myartjaub_misc`)
