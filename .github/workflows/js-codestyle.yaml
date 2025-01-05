@@ -23,6 +23,6 @@ jobs:
           extensions: gd,intl,mbstring,sqlite,zip
           coverage: disable
 
-      - run: composer install --no-progress --no-suggest --ignore-platform-reqs
+      - run: composer install --no-progress --ignore-platform-reqs
 
       - run: composer webtrees-geneajaubart:lintjs
