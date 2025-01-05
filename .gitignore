@@ -19,6 +19,7 @@
 /tests/clover.xml
 /tests/coverage
 /vendor/
+/vendor-bin/*/vendor/
 
 # MYARTJAUB - Other files
 /.buildpath

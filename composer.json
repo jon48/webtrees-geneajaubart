@@ -35,9 +35,10 @@
 		"sort-packages" : true,
 		"process-timeout" : 3600,
 		"allow-plugins" : {
-			"composer/package-versions-deprecated" : true,
-			"composer/installers" : true,
-			"oomphinc/composer-installers-extender" : true
+			"bamarni/composer-bin-plugin": true,
+			"composer/installers": true,
+			"composer/package-versions-deprecated": true,
+			"oomphinc/composer-installers-extender": true
 		}
 	},
 	"require" : {
@@ -95,18 +96,16 @@
         "tecnickcom/tcpdf": "6.7.4"
 	},
 	"require-dev" : {
-		"ext-dom" : "*",
-        "ext-libxml": "*",
-		"ext-pdo_sqlite" : "*",
-		"ext-sqlite3" : "*",
-        "composer/composer": "2.7.2",
-		"consolidation/robo" : "^3.0",
-        "league/flysystem-memory": "2.0.6",
-        "php-coveralls/php-coveralls": "2.7.0",
-		"phpstan/phpstan-deprecation-rules" : "^1.0",
-		"phpstan/phpstan-phpunit" : "^1.0",
-		"phpstan/phpstan-strict-rules" : "^1.0",
-        "phpunit/phpunit": "9.6.18"
+		"ext-dom": "*",
+		"ext-libxml": "*",
+		"ext-pdo_sqlite": "*",
+		"ext-sqlite3": "*",
+		"bamarni/composer-bin-plugin": "^1.8",
+		"composer/composer": "2.7.2",
+		"consolidation/robo": "^3.0",
+		"league/flysystem-memory": "2.0.6",
+		"php-coveralls/php-coveralls": "2.7.0",
+		"phpunit/phpunit": "9.6.18"
 	},
 	"suggest" : {
 		"ext-imagick" : "Required to generate thumbnail images",
@@ -119,10 +118,10 @@
 		"jon48/webtrees-theme-rural": "Suggested webtrees theme from same author"
 	},
 	"scripts" : {
-		"webtrees-geneajaubart:build" : "./vendor/bin/robo build:modules",
-		"webtrees-geneajaubart:package" : "./vendor/bin/robo package",
-		"webtrees-geneajaubart:lintjs" : "./vendor/bin/robo lint:semistandard",
-		"webtrees-geneajaubart:updatenpm" : "./vendor/bin/robo update:npm-modules",
+		"webtrees-geneajaubart:build" : "./vendor-bin/robo/vendor/bin/robo build:modules",
+		"webtrees-geneajaubart:package" : "./vendor-bin/robo/vendor/bin/robo package",
+		"webtrees-geneajaubart:lintjs" : "./vendor-bin/robo/vendor/bin/robo lint:semistandard",
+		"webtrees-geneajaubart:updatenpm" : "./vendor-bin/robo/vendor/bin/robo update:npm-modules",
 		"webtrees:build" : [
 			"rm -Rf webtrees/",
 			"git archive --prefix=webtrees/ HEAD --format=tar | tar -x",
@@ -232,6 +231,10 @@
 				"type:webtrees-theme",
 				"type:webtrees-module"
 			]
-		}
+		},
+		"bamarni-bin": {
+            "bin-links": false,
+			"forward-command": true
+        }
 	}
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9e8da8f848b9f3a14bcc243a4fce6d2b",
+    "content-hash": "03c046b0cac70dc13dde952e1d6c19b8",
     "packages": [
         {
             "name": "aura/router",
@@ -8056,6 +8056,63 @@
     ],
     "packages-dev": [
         {
+            "name": "bamarni/composer-bin-plugin",
+            "version": "1.8.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bamarni/composer-bin-plugin.git",
+                "reference": "92fd7b1e6e9cdae19b0d57369d8ad31a37b6a880"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bamarni/composer-bin-plugin/zipball/92fd7b1e6e9cdae19b0d57369d8ad31a37b6a880",
+                "reference": "92fd7b1e6e9cdae19b0d57369d8ad31a37b6a880",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.0",
+                "php": "^7.2.5 || ^8.0"
+            },
+            "require-dev": {
+                "composer/composer": "^2.0",
+                "ext-json": "*",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.8",
+                "phpstan/phpstan-phpunit": "^1.1",
+                "phpunit/phpunit": "^8.5 || ^9.5",
+                "symfony/console": "^2.8.52 || ^3.4.35 || ^4.4 || ^5.0 || ^6.0",
+                "symfony/finder": "^2.8.52 || ^3.4.35 || ^4.4 || ^5.0 || ^6.0",
+                "symfony/process": "^2.8.52 || ^3.4.35 || ^4.4 || ^5.0 || ^6.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Bamarni\\Composer\\Bin\\BamarniBinPlugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bamarni\\Composer\\Bin\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "No conflicts for your bin dependencies",
+            "keywords": [
+                "composer",
+                "conflict",
+                "dependency",
+                "executable",
+                "isolation",
+                "tool"
+            ],
+            "support": {
+                "issues": "https://github.com/bamarni/composer-bin-plugin/issues",
+                "source": "https://github.com/bamarni/composer-bin-plugin/tree/1.8.2"
+            },
+            "time": "2022-10-31T08:38:03+00:00"
+        },
+        {
             "name": "consolidation/annotated-command",
             "version": "4.10.0",
             "source": {
@@ -8942,212 +8999,6 @@
                 "source": "https://github.com/php-coveralls/php-coveralls/tree/v2.7.0"
             },
             "time": "2023-11-22T10:21:01+00:00"
-        },
-        {
-            "name": "phpstan/phpstan",
-            "version": "1.11.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "6adbd118e6c0515dd2f36b06cde1d6da40f1b8ec"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/6adbd118e6c0515dd2f36b06cde1d6da40f1b8ec",
-                "reference": "6adbd118e6c0515dd2f36b06cde1d6da40f1b8ec",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2|^8.0"
-            },
-            "conflict": {
-                "phpstan/phpstan-shim": "*"
-            },
-            "bin": [
-                "phpstan",
-                "phpstan.phar"
-            ],
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "bootstrap.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "PHPStan - PHP Static Analysis Tool",
-            "keywords": [
-                "dev",
-                "static analysis"
-            ],
-            "support": {
-                "docs": "https://phpstan.org/user-guide/getting-started",
-                "forum": "https://github.com/phpstan/phpstan/discussions",
-                "issues": "https://github.com/phpstan/phpstan/issues",
-                "security": "https://github.com/phpstan/phpstan/security/policy",
-                "source": "https://github.com/phpstan/phpstan-src"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/ondrejmirtes",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/phpstan",
-                    "type": "github"
-                }
-            ],
-            "time": "2024-07-24T07:01:22+00:00"
-        },
-        {
-            "name": "phpstan/phpstan-deprecation-rules",
-            "version": "1.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpstan/phpstan-deprecation-rules.git",
-                "reference": "fa8cce7720fa782899a0aa97b6a41225d1bb7b26"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-deprecation-rules/zipball/fa8cce7720fa782899a0aa97b6a41225d1bb7b26",
-                "reference": "fa8cce7720fa782899a0aa97b6a41225d1bb7b26",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2 || ^8.0",
-                "phpstan/phpstan": "^1.11"
-            },
-            "require-dev": {
-                "php-parallel-lint/php-parallel-lint": "^1.2",
-                "phpstan/phpstan-phpunit": "^1.0",
-                "phpunit/phpunit": "^9.5"
-            },
-            "type": "phpstan-extension",
-            "extra": {
-                "phpstan": {
-                    "includes": [
-                        "rules.neon"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "PHPStan\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "PHPStan rules for detecting usage of deprecated classes, methods, properties, constants and traits.",
-            "support": {
-                "issues": "https://github.com/phpstan/phpstan-deprecation-rules/issues",
-                "source": "https://github.com/phpstan/phpstan-deprecation-rules/tree/1.2.0"
-            },
-            "time": "2024-04-20T06:39:48+00:00"
-        },
-        {
-            "name": "phpstan/phpstan-phpunit",
-            "version": "1.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpstan/phpstan-phpunit.git",
-                "reference": "f3ea021866f4263f07ca3636bf22c64be9610c11"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-phpunit/zipball/f3ea021866f4263f07ca3636bf22c64be9610c11",
-                "reference": "f3ea021866f4263f07ca3636bf22c64be9610c11",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2 || ^8.0",
-                "phpstan/phpstan": "^1.11"
-            },
-            "conflict": {
-                "phpunit/phpunit": "<7.0"
-            },
-            "require-dev": {
-                "nikic/php-parser": "^4.13.0",
-                "php-parallel-lint/php-parallel-lint": "^1.2",
-                "phpstan/phpstan-strict-rules": "^1.5.1",
-                "phpunit/phpunit": "^9.5"
-            },
-            "type": "phpstan-extension",
-            "extra": {
-                "phpstan": {
-                    "includes": [
-                        "extension.neon",
-                        "rules.neon"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "PHPStan\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "PHPUnit extensions and rules for PHPStan",
-            "support": {
-                "issues": "https://github.com/phpstan/phpstan-phpunit/issues",
-                "source": "https://github.com/phpstan/phpstan-phpunit/tree/1.4.0"
-            },
-            "time": "2024-04-20T06:39:00+00:00"
-        },
-        {
-            "name": "phpstan/phpstan-strict-rules",
-            "version": "1.6.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpstan/phpstan-strict-rules.git",
-                "reference": "363f921dd8441777d4fc137deb99beb486c77df1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-strict-rules/zipball/363f921dd8441777d4fc137deb99beb486c77df1",
-                "reference": "363f921dd8441777d4fc137deb99beb486c77df1",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2 || ^8.0",
-                "phpstan/phpstan": "^1.11"
-            },
-            "require-dev": {
-                "nikic/php-parser": "^4.13.0",
-                "php-parallel-lint/php-parallel-lint": "^1.2",
-                "phpstan/phpstan-deprecation-rules": "^1.1",
-                "phpstan/phpstan-phpunit": "^1.0",
-                "phpunit/phpunit": "^9.5"
-            },
-            "type": "phpstan-extension",
-            "extra": {
-                "phpstan": {
-                    "includes": [
-                        "rules.neon"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "PHPStan\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Extra strict and opinionated rules for PHPStan",
-            "support": {
-                "issues": "https://github.com/phpstan/phpstan-strict-rules/issues",
-                "source": "https://github.com/phpstan/phpstan-strict-rules/tree/1.6.0"
-            },
-            "time": "2024-04-20T06:37:51+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
