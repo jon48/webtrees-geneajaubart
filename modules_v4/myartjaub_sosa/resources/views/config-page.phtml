@@ -43,7 +43,7 @@ $max_gen_system = app(SosaRecordsService::class)->maxSystemGenerations();
                 <?= I18N::translate('For user') ?>
             </label>
             <div class="col-sm-9 wt-page-options-value">
-                <?php if (count($users_root) == 1) : ?>
+                <?php if (count($users_root) === 1) : ?>
                     <?php $root_id = $users_root[0]['root_id']; ?>
                     <?php $max_gen = $users_root[0]['max_gen']; ?>
                     <div class="col-sm-9 wt-page-options-value">
@@ -55,12 +55,12 @@ $max_gen_system = app(SosaRecordsService::class)->maxSystemGenerations();
                     <?php $max_gen = $users_root[0]['max_gen']; ?>
                     <select id="maj-sosa-select-userid" name="sosa-userid" class="form-select">
                         <?php foreach ($users_root as $i => $user_root) : ?>
-                            <?php if ($user_root['user']->id() == $selected_user_id) {
+                            <?php if ($user_root['user']->id() === $selected_user_id) {
                                 $root_id = $user_root['root_id'];
                                 $max_gen = $user_root['max_gen'];
                                 $selected = true;
                             } else {
-                                $selected = $i == 0;
+                                $selected = $i === 0;
                             }?>
                             <option value="<?= $user_root['user']->id() ?>" <?= $selected ? 'selected' : '' ?>>
                                 <?= e($user_root['user']->realName()) ?>

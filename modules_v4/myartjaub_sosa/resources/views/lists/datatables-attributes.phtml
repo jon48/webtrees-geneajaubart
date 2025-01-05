@@ -3,7 +3,7 @@
 use Fisharebest\Webtrees\I18N;
 
 /**
- * @var bool|NULL       $auto_width
+ * var bool|NULL       $auto_width
  * @var bool|NULL       $state_save
  * @var array<int>|NULL $length_menu
  */
@@ -13,13 +13,13 @@ $state_save = isset($state_save) ? $state_save : true;
 if (!isset($length_menu)) {  $length_menu = [10, 20, 50, 100, 500, 1000, -1];
 }
 $length_menu_labels = array_map(function ($length): string {
-        return $length == -1 ? 'All' : I18N::number($length);
+        return $length === -1 ? 'All' : I18N::number($length);
 }, $length_menu);
 
 
 ?>
 
-data-auto-width="<?= $auto_width !== null && $auto_width ? 'true' : 'false' ?>"
+data-auto-width="<?= $auto_width ? 'true' : 'false' ?>"
 data-dom="<&quot;d-flex justify-content-between&quot;pf><t><&quot;d-flex justify-content-between&quot;irl>"
 data-state-save="<?= $state_save ? 'true' : 'false' ?>"
 data-length-menu="<?= e(json_encode([$length_menu, $length_menu_labels], JSON_THROW_ON_ERROR)) ?>"

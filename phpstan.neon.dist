@@ -1,5 +1,5 @@
 parameters:
-   level: max
+   level: 9
    paths:
       - RoboFile.php
       - modules_v4/myartjaub_admintasks
@@ -20,6 +20,12 @@ parameters:
       -
          message: '#^Variable .* might not be defined.$#'
          path: modules_v4/myartjaub_*/**.phtml
+      -
+         message: '#^Parameter \#2 \.\.\.\$args of static method Fisharebest\\Webtrees\\I18N\:\:translate\(\) expects string, int given\.$#'
+         path: modules_v4/myartjaub_sosa/resources/views/statistics-generations-table.phtml
+         count: 1
       - '#^Short ternary operator is not allowed. Use null coalesce operator if applicable or consider using long ternary.$#'
       - '#^Call to an undefined method Robo\\Collection\\CollectionBuilder.*$#'
       - '#^Call to an undefined method Robo\\Task\\.*::progressMessage\(\)\.$#'
+      -
+         identifier: varTag.type

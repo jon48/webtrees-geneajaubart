@@ -34,7 +34,7 @@ use MyArtJaub\Webtrees\Module\Sosa\Http\RequestHandlers\MissingAncestorsList;
     <?= view($module_name . '::components/generation-header', [ 'route_name' => MissingAncestorsList::class, 'tree' => $tree, 'min_gen' => 2, 'max_gen' => $max_gen, 'current_gen' => $current_gen ]) ?>
     
     <?php if ($current_gen > 0) : ?>
-        <?php if ($list_missing === null || $list_missing->count() == 0) : ?>
+        <?php if ($list_missing === null || $list_missing->count() === 0) : ?>
             <p class="text-center"><?= I18N::translate('No ancestors are missing for this generation. Generation complete at %s.', I18N::percentage($gen_completeness, 2)) ?></p>
         <?php else : ?>
             <?= view($module_name . '::lists/missing-table', [

@@ -35,7 +35,7 @@ $individual_module = app(ModuleService::class)->all()
         <?= view($module->name() . '::components/initials-list', [ 'tree' => $tree, 'initials_list' => $initials_list, 'initial' => $initial, 'show_all' => $show_all ]) ?>
     </div>
     
-    <?php if ($nb_lineages == 0) : ?>
+    <?php if ($nb_lineages === 0) : ?>
     <p class="text-center">
         <span class="d-flex justify-content-center alert alert-warning">
         <?= e(I18N::translate('No individuals with surname %s has been found. Please try another name.', $surname_legend)) ?>
